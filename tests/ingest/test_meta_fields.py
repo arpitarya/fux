@@ -13,6 +13,7 @@ decoders resolve different dicts.
 
 from __future__ import annotations
 
+from l12_fixtures import template_index
 import pytest
 
 from fux.decode import Decoder
@@ -36,21 +37,21 @@ def test_a_front_matter_doc_id_reaches_the_title_field() -> None:
     """🔴 The whole point. `QCL-IT-ADR-08` appears NOWHERE in the body of the
     document that declares it, and before this change it was absent from the
     index entirely."""
-    fields = extract_fields("seed/11-decision.md", doc(doc_id="QCL-IT-ADR-08"))
+    fields = extract_fields("seed/11-decision.md", doc(doc_id="QCL-IT-ADR-08"), max_phrases=template_index().max_phrases)
     assert {"qcl", "adr", "08"} <= terms_in("title", fields)
 
 
 def test_identity_keys_reach_title_and_tags_reach_ctx() -> None:
     """Decision 23b: an identifier is how a person NAMES a document, so it
     ranks at `title` weight. `ctx` would make it one body word in ten thousand."""
-    fields = extract_fields("a.md", doc(doc_id="KFS-2014", tags=["telematics"]))
+    fields = extract_fields("a.md", doc(doc_id="KFS-2014", tags=["telematics"]), max_phrases=template_index().max_phrases)
     assert "2014" in terms_in("title", fields)
     assert "telemat" in terms_in("ctx", fields)
     assert "telemat" not in terms_in("title", fields)
 
 
 def test_aliases_takes_a_list_because_that_is_what_aliases_are_for() -> None:
-    fields = extract_fields("a.md", doc(aliases=["NGP hub", "Nagpur DC"]))
+    fields = extract_fields("a.md", doc(aliases=["NGP hub", "Nagpur DC"]), max_phrases=template_index().max_phrases)
     assert {"ngp", "hub", "nagpur", "dc"} <= terms_in("title", fields)
 
 
@@ -60,7 +61,7 @@ def test_a_key_nobody_listed_is_not_indexed() -> None:
     """The closed list. `status: rushed-review` is in the golden seed today, and
     *everything in `meta` is searchable* would put workflow noise — and names —
     into posting lists without SR-PII's gate ever being asked."""
-    fields = extract_fields("a.md", doc(status="rushed-review", review_note="messy"))
+    fields = extract_fields("a.md", doc(status="rushed-review", review_note="messy"), max_phrases=template_index().max_phrases)
     assert "rush" not in terms_in("title", fields)
     assert "messi" not in terms_in("ctx", fields)
 
@@ -70,7 +71,7 @@ def test_no_person_key_is_indexed_by_default() -> None:
     `owner`, `author` and `contributors` are names."""
     for key in ("owner", "author", "contributors"):
         assert key not in DEFAULT_META_FIELDS
-    fields = extract_fields("a.md", doc(owner="Revathi Iyer", author="Farhan Qureshi"))
+    fields = extract_fields("a.md", doc(owner="Revathi Iyer", author="Farhan Qureshi"), max_phrases=template_index().max_phrases)
     every = set(fields.terms)
     assert not ({"revathi", "iyer", "farhan", "qureshi"} & every)
 
@@ -173,7 +174,7 @@ def test_values_go_in_through_the_analyzer_so_part_2_reaches_them_too() -> None:
     `IT` still goes to the stopword list, and that is correct: the stopword pass
     runs on the *parts*, never on the whole token, so `qcl-it-adr-08` survives
     beside `qcl`, `adr` and `08`."""
-    fields = extract_fields("a.md", doc(doc_id="QCL-IT-ADR-08"))
+    fields = extract_fields("a.md", doc(doc_id="QCL-IT-ADR-08"), max_phrases=template_index().max_phrases)
     title = terms_in("title", fields)
     assert "it" not in title, "the stopword pass still runs over the parts"
     assert "qcl-it-adr-08" in title, (

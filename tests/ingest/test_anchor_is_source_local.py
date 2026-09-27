@@ -30,6 +30,7 @@ from __future__ import annotations
 
 from fux import store
 from fux.ingest.run import run
+from l12_fixtures import write_config
 
 
 def _init(tmp_path, files: dict[str, str]) -> None:
@@ -38,6 +39,7 @@ def _init(tmp_path, files: dict[str, str]) -> None:
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     for rel, text in files.items():
         path = tmp_path / rel
         path.parent.mkdir(parents=True, exist_ok=True)

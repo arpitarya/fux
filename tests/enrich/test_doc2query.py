@@ -12,12 +12,15 @@ rather than decorative.
 
 from __future__ import annotations
 
+from l12_fixtures import chunk_bounds, template_tune, write_config
 import pytest
 
 from fux.derive import build
-from fux.enrich import ENRICH_DIR, SELF_RETRIEVAL_K, enrich_path, is_question, plan, superseded_by
+from fux.enrich import ENRICH_DIR, enrich_path, is_question, plan, superseded_by
 from fux.ingest import run as ingest_run
 from fux.store import read_index
+
+SELF_RETRIEVAL_K = template_tune().self_retrieval_k
 
 
 def _doc(root, name: str, title: str, body: str) -> None:
@@ -32,6 +35,7 @@ def _repo(tmp_path):
     dirs.write_text("docs                enrich=true\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     return tmp_path
 
 
@@ -98,7 +102,7 @@ def test_a_question_that_retrieves_its_document_passes(tmp_path):
     _enrich(root, _sha_of(root, "docs/catering.md"), "docs/catering.md",
             "When do the espresso beans arrive?\n")
 
-    reports = plan(root, _scopes(root), self_retrieval_k=SELF_RETRIEVAL_K)
+    reports = plan(root, _scopes(root), self_retrieval_k=SELF_RETRIEVAL_K, chunk_bounds=chunk_bounds())
     assert [r.unretrievable for r in reports] == [[]]
     assert reports[0].ok == 2
 
@@ -117,7 +121,7 @@ def test_a_question_that_retrieves_ANOTHER_document_is_refused(tmp_path):
     _enrich(root, _sha_of(root, "docs/rollback.md"), "docs/rollback.md",
             "When do the espresso beans arrive?\n")
 
-    reports = plan(root, _scopes(root), self_retrieval_k=SELF_RETRIEVAL_K)
+    reports = plan(root, _scopes(root), self_retrieval_k=SELF_RETRIEVAL_K, chunk_bounds=chunk_bounds())
     refused = [u for r in reports for u in r.unretrievable]
     assert len(refused) == 1
     path, misses = refused[0]
@@ -130,9 +134,8 @@ def _retrieves(root, question: str, loc: str, weights) -> bool:
     import dataclasses
 
     from fux.query import run_query
-    from fux.tune import Tune
 
-    tune = dataclasses.replace(Tune(), field_weights=weights)
+    tune = dataclasses.replace(template_tune(), field_weights=weights)
     results, _ = run_query(root, question, SELF_RETRIEVAL_K, force_scan=True, tune=tune)
     return loc in [r.loc for r in results]
 
@@ -146,8 +149,10 @@ def test_the_title_field_is_what_the_zeroing_removes(tmp_path):
     halves is what stops this from passing for an unrelated reason: a test that
     only checked "refused" stays green when the zeroing is deleted.
     """
-    from fux.enrich import _FILTER_WEIGHTS
-    from fux.query.bm25f import FIELD_WEIGHTS
+    from fux.enrich import _filter_weights
+
+    FIELD_WEIGHTS = template_tune().field_weights
+    _FILTER_WEIGHTS = _filter_weights(FIELD_WEIGHTS)
 
     root = _repo(tmp_path)
     # No `# {title}` heading echo: the title words must live in the TITLE field
@@ -170,7 +175,7 @@ def test_the_title_field_is_what_the_zeroing_removes(tmp_path):
     )
 
     _enrich(root, _sha_of(root, "docs/zeta.md"), "docs/zeta.md", q + "\n")
-    reports = plan(root, _scopes(root), self_retrieval_k=SELF_RETRIEVAL_K)
+    reports = plan(root, _scopes(root), self_retrieval_k=SELF_RETRIEVAL_K, chunk_bounds=chunk_bounds())
     assert [u[0] for r in reports for u in r.unretrievable]
 
 
@@ -182,8 +187,10 @@ def test_the_ctx_field_is_what_stops_an_enrichment_vouching_for_itself(tmp_path)
     engine's weights — so the filter would pass on the second run what it
     failed on the first. Both halves are asserted, for the reason above.
     """
-    from fux.enrich import _FILTER_WEIGHTS
-    from fux.query.bm25f import FIELD_WEIGHTS
+    from fux.enrich import _filter_weights
+
+    FIELD_WEIGHTS = template_tune().field_weights
+    _FILTER_WEIGHTS = _filter_weights(FIELD_WEIGHTS)
 
     root = _repo(tmp_path)
     _doc(root, "rollback.md", "Gateway rollback",
@@ -204,7 +211,7 @@ def test_the_ctx_field_is_what_stops_an_enrichment_vouching_for_itself(tmp_path)
         "filter's answer depends on whether it has been run before"
     )
 
-    reports = plan(root, _scopes(root), self_retrieval_k=SELF_RETRIEVAL_K)
+    reports = plan(root, _scopes(root), self_retrieval_k=SELF_RETRIEVAL_K, chunk_bounds=chunk_bounds())
     assert [u for r in reports for u in r.unretrievable]
 
 
@@ -217,7 +224,7 @@ def test_the_filter_does_not_run_without_a_k(tmp_path):
     _enrich(root, _sha_of(root, "docs/rollback.md"), "docs/rollback.md",
             "When do the espresso beans arrive?\n")
 
-    reports = plan(root, _scopes(root))  # no k
+    reports = plan(root, _scopes(root), chunk_bounds=chunk_bounds())  # no k
     assert [r.unretrievable for r in reports] == [[]]
     assert reports[0].ok == 1
 
@@ -233,7 +240,7 @@ def test_a_prose_body_written_under_the_old_skill_still_passes(tmp_path):
     _enrich(root, _sha_of(root, "docs/rollback.md"), "docs/rollback.md",
             "Sets the release rollback policy. Covers the freeze and the drain order.\n")
 
-    reports = plan(root, _scopes(root), self_retrieval_k=SELF_RETRIEVAL_K)
+    reports = plan(root, _scopes(root), self_retrieval_k=SELF_RETRIEVAL_K, chunk_bounds=chunk_bounds())
     assert [r.unretrievable for r in reports] == [[]]
 
 

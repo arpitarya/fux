@@ -14,7 +14,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { parseToml, wasFloat } from "../src/config/toml.mjs";
-import { loadTune, DEFAULT_TUNE } from "../src/config/tune.mjs";
+import { loadTune } from "../src/config/tune.mjs";
+import { TUNE_TEMPLATE, tuneText } from "./l12.mjs";
 import { loadOutput, BUILT_IN } from "../src/config/output.mjs";
 import { parseDirs } from "../src/ingest/sourcelist.mjs";
 import { globMatch, isAlreadyText, PROSE_TYPES } from "../src/decode/registry.mjs";
@@ -76,31 +77,38 @@ test("TOML: the float-keys record is invisible to every consumer", () => {
 
 // -- tune --------------------------------------------------------------------
 
-test("tune: an absent file is every default, and --no-tune never reads one", () => {
+test("tune: an absent file is an error naming it, and --no-tune reads the template", () => {
   const root = repo({});
-  assert.equal(loadTune(root).rerankWeight, DEFAULT_TUNE.rerankWeight);
-  const tuned = repo({ ".fux/tune.toml": "[ranking]\nrerank_weight = 0.3\n" });
-  assert.equal(loadTune(tuned).rerankWeight, 0.3);
+  assert.throws(() => loadTune(root, { enabled: true }), /\.fux\/tune\.toml is missing/);
+  const tuned = repo({ ".fux/tune.toml": tuneText({ ranking: { rerank_weight: 0.3 } }) });
+  assert.equal(loadTune(tuned, { enabled: true }).rerankWeight, 0.3);
   assert.equal(loadTune(tuned, { enabled: false }).rerankWeight, 0.0);
   rmSync(root, { recursive: true, force: true });
   rmSync(tuned, { recursive: true, force: true });
 });
 
+test("tune: a missing key names its table and key, in tune.py's words", () => {
+  const text = TUNE_TEMPLATE.split("\n").filter((l) => !l.startsWith("mined_weight")).join("\n");
+  const root = repo({ ".fux/tune.toml": text });
+  assert.throws(() => loadTune(root, { enabled: true }), /\[ranking\] mined_weight is missing/);
+  assert.throws(() => loadTune(root, { enabled: true }), /fux doctor --fix/);
+});
+
 test("tune: an unknown table and an unknown key are REFUSALS, not shrugs", () => {
   const a = repo({ ".fux/tune.toml": "[nope]\nx = 1\n" });
-  assert.throws(() => loadTune(a), /unknown table/);
+  assert.throws(() => loadTune(a, { enabled: true }), /unknown table/);
   const b = repo({ ".fux/tune.toml": "[ranking]\nrerank_weightt = 0.3\n" });
-  assert.throws(() => loadTune(b), /unknown key/);
+  assert.throws(() => loadTune(b, { enabled: true }), /unknown key/);
 });
 
 test("tune: the alpha.1 field spelling names its replacement", () => {
   const root = repo({ ".fux/tune.toml": "[bm25f]\nheading_weight = 3.0\n" });
-  assert.throws(() => loadTune(root), /lost the `_weight` suffix/);
+  assert.throws(() => loadTune(root, { enabled: true }), /lost the `_weight` suffix/);
 });
 
 test("tune: [dense] names what happened to it", () => {
   const root = repo({ ".fux/tune.toml": "[dense]\nmode = \"on\"\n" });
-  assert.throws(() => loadTune(root), /REMOVED on 2026-08-25/);
+  assert.throws(() => loadTune(root, { enabled: true }), /REMOVED on 2026-08-25/);
 });
 
 test("tune: a REMOVED key is named as removed, not reported as unknown", () => {
@@ -108,21 +116,21 @@ test("tune: a REMOVED key is named as removed, not reported as unknown", () => {
   // setup` had written every one of them into the consumer's file.
   for (const key of ["superseded_weight", "archived_weight", "recency_half_life_days"]) {
     const root = repo({ ".fux/tune.toml": `[ranking]\n${key} = 0.5\n` });
-    assert.throws(() => loadTune(root), /REMOVED on 2026-09-13/, key);
+    assert.throws(() => loadTune(root, { enabled: true }), /REMOVED on 2026-09-13/, key);
   }
 });
 
 test("tune: a whole-number key refuses a float, exactly as tune.py does", () => {
-  const root = repo({ ".fux/tune.toml": "[graph]\niterations = 3.0\n" });
-  assert.throws(() => loadTune(root), /must be a whole number/);
+  const root = repo({ ".fux/tune.toml": tuneText({ graph: { iterations: "3.0" } }).replace('iterations = "3.0"', "iterations = 3.0") });
+  assert.throws(() => loadTune(root, { enabled: true }), /must be a whole number/);
 });
 
 test("tune: semantic errors are COLLECTED, not reported one at a time", () => {
   const root = repo({
-    ".fux/tune.toml": "[ranking]\nrerank_weight = -1\nexpand_weight = -2\n",
+    ".fux/tune.toml": tuneText({ ranking: { rerank_weight: -1, expand_weight: -2 } }),
   });
   try {
-    loadTune(root);
+    loadTune(root, { enabled: true });
     assert.fail("expected a refusal");
   } catch (err) {
     assert.ok(err instanceof FuxError);
@@ -133,14 +141,14 @@ test("tune: semantic errors are COLLECTED, not reported one at a time", () => {
 
 test("tune: an unresolved merge conflict is named, not reported as bad TOML", () => {
   const root = repo({ ".fux/tune.toml": "<<<<<<< HEAD\n[ranking]\n=======\n>>>>>>> x\n" });
-  assert.throws(() => loadTune(root), /unresolved merge conflict/);
+  assert.throws(() => loadTune(root, { enabled: true }), /unresolved merge conflict/);
 });
 
 test("tune: [priority] is sorted longest-key-first so the first match wins", () => {
   const root = repo({
-    ".fux/tune.toml": '[priority]\n"docs" = 1.5\n"docs/adr" = 2.0\n',
+    ".fux/tune.toml": tuneText({ priority: { docs: 1.5, "docs/adr": 2.0 } }),
   });
-  assert.deepEqual(loadTune(root).priority, [["docs/adr", 2.0], ["docs", 1.5]]);
+  assert.deepEqual(loadTune(root, { enabled: true }).priority, [["docs/adr", 2.0], ["docs", 1.5]]);
 });
 
 // -- output ------------------------------------------------------------------

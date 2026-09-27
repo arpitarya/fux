@@ -21,6 +21,7 @@ import pytest
 from fux import store as store_mod
 from fux.errors import FuxError
 from fux.ingest.run import _existing_index
+from l12_fixtures import write_config
 
 V1_HEADER = {"_format": "fux.index.v1", "analyzer": "v1", "tf_fields": ["heading", "body"]}
 
@@ -66,6 +67,7 @@ def test_no_index_is_not_foreign(tmp_path):
 
 def test_a_current_index_is_not_foreign(tmp_path):
     store_mod.write_index(tmp_path, [_file_record("docs/a.md")])
+    write_config(tmp_path)
     assert store_mod.index_is_foreign(tmp_path) is False
 
 
@@ -188,4 +190,5 @@ def test_full_on_a_current_index_reads_it_normally(tmp_path):
     """`--full` must not become a blind path on a healthy index — the reuse
     decision belongs to `_reusable`, not to this function."""
     store_mod.write_index(tmp_path, [_file_record("docs/a.md")])
+    write_config(tmp_path)
     assert set(_existing_index(tmp_path, full=True)) == {"file:docs/a.md"}

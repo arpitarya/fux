@@ -27,6 +27,7 @@ import pytest
 
 from fux.ingest import decoderdigest
 from fux.ingest.run import run
+from l12_fixtures import write_config
 
 CSV = "name,role\nada,engineer\ngrace,admiral\n"
 MD = "---\ntitle: Handbook\n---\n\n# Handbook\n\nthe oncall rota and the pager.\n"
@@ -38,6 +39,7 @@ def _init(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     return tmp_path
 

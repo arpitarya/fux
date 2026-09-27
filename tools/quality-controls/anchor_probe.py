@@ -105,7 +105,10 @@ def rank(rung: Path, question: str, weight: float, k: int) -> list[tuple[str, fl
     baseline's average would score a system nobody could ship. That is the M1
     pruning gate's recorded error and it is not repeated here.
     """
-    from fux.query.bm25f import DEFAULT_SCORING, Scoring, score_record
+    from fux.query.bm25f import Scoring, score_record
+    from fux.tune import load as _load_tune
+
+    DEFAULT_SCORING = _load_tune(Path('.'), enabled=False).scoring  # the template's (L12)
     from fux.query.scan import query_term_hashes, scan_candidates
 
     scoring = Scoring(

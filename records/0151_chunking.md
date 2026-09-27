@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-09-06
 feature: chunking — the strategy vocabulary, the boundary ladder, and the retrieval/citation split
-owns: [src/fux/refer/_chunk.py@5226408009de, node/src/refer/chunk.mjs@2161c942b35a]
+owns: [src/fux/refer/_chunk.py@948191765df4, node/src/refer/chunk.mjs@23fc7268065c]
 laws: [L1, L2, L3]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 3b748a9a923746b5528ab91923b3348c6d1b00522b63d1d7d513028c8ad69d1b
+content_sha: b88cdaa67287e932a4c2b30fb5394fe59f165cc41cd474ecb89c6a65a565f91d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -169,7 +169,7 @@ trade-offs.** Index small chunks, return the enclosing parent. Three reasons it
 is the wrong direction here: it costs **~7.5× the tokens per result**, and fux's
 problem is CPU (2.6 s) not context, so it pays in the wrong currency; its
 "parent overlap collapse" risk needs a per-parent cap, which fux already has as
-`PER_DOC_FRACTION`; and it is documented to **fail on highly structured data
+`[refer] per_doc_fraction`; and it is documented to **fail on highly structured data
 (tables, JSON)** — exactly fux's measured win case.
 
 **Sliding-window overlap — rejected.** Standard practice, and it breaks the
@@ -223,10 +223,13 @@ until it is measured this stays a proposal. The harness in
 ```bash
 # every document is quotable
 python -c "
-from fux.refer._chunk import chunk, MAX_PASSAGE_BYTES
+from pathlib import Path
+from fux.refer._chunk import chunk
+from fux.tune import load
+bounds = load(Path('.'), enabled=False).chunk_bounds()   # the template's [refer]
 wall = '# N\n\n' + ' '.join(f'sentence {i} here.' for i in range(200))
-ps = chunk(wall)
-print(len(ps), max(p.nbytes for p in ps) <= MAX_PASSAGE_BYTES)"
+ps = chunk(wall, **bounds, line_numbers=True)
+print(len(ps), max(p.nbytes for p in ps) <= bounds['max_passage_bytes'])"
 # expect: more than one passage, and True
 
 # the line rung is preferred to the word rung

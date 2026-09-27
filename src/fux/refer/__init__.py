@@ -56,14 +56,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from ..decode import DecodeFailed
 from ..decode import decode as _decode_bytes
 from . import arc as arc_mod
 from . import fetchcache as fetchcache_mod
 from . import freshness as freshness_mod
-from ._assemble import DEFAULT_BUDGET, PER_DOC_FRACTION, Assembled, assemble
-from ._chunk import MAX_PASSAGE_BYTES, MIN_PASSAGE_BYTES, chunk
+from ._assemble import Assembled, assemble
+from ._chunk import chunk
 from .freshness import (
     Policy,
     Verdict,
@@ -75,12 +76,14 @@ from ._rescore import ScoredPassage, rescore
 from ..errors import FuxError
 from .source import GIT, Fetched, fetch_document, from_acquired
 
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from ..tune import Tune
+
 __all__ = [
     "Bundle",
     "Cited",
     "Policy",
     "refer",
-    "DEFAULT_BUDGET",
 ]
 
 
@@ -143,12 +146,8 @@ def refer(
     query: str,
     candidates: list[tuple[str, str, str]],
     *,
-    policy: Policy | None = None,
-    budget: int = DEFAULT_BUDGET,
-    per_doc_fraction: float = PER_DOC_FRACTION,
-    min_passage_bytes: int = MIN_PASSAGE_BYTES,
-    max_passage_bytes: int = MAX_PASSAGE_BYTES,
-    rerank_weight: float = 0.0,
+    policy: Policy,
+    tune: "Tune",
     k: int | None = None,
     cache: arc_mod.ARC | None = None,
     fetcher=None,
@@ -160,22 +159,19 @@ def refer(
     documents answer the query, only which of their passages do and which of
     those fit.
 
-    The four `[refer]` keys arrive as parameters and default to the module
-    constants, so an unconfigured caller gets byte-identical bundles. **None of
-    them can change which documents are looked at or what a citation's `sha`
-    is** — they move the passage boundaries and the byte budget, which is
-    downstream of every fetch and every verdict. That is what keeps them
+    `tune` is the caller's already-resolved `.fux/tune.toml` (L12: there is no
+    module default to fall back to). Its `[refer]` keys — the passage bounds,
+    the byte budget, the per-document share and the citation overhead — **cannot
+    change which documents are looked at or what a citation's `sha` is**: they
+    act downstream of every fetch and every verdict, which is what keeps them
     tunables rather than a way to configure the freshness record.
 
-    `rerank_weight` is the **fifth** value with that property and the only one
-    that is not a `[refer]` key: it is `[ranking] rerank_weight`, reaching
-    `rescore` so a passage is scored by the same proximity arithmetic that
-    ranked its document (W-108). It defaults to `0.0` — **off** — rather than
-    to `rerank.WEIGHT`, so a caller that has said nothing gets the bundle this
-    function produced before the parameter existed. `refer()` may not switch on
-    a knob that `ask` has switched off; only the caller's `Tune` decides.
+    `[ranking] rerank_weight` and the proximity mix reach `rescore` too, so a
+    passage is scored by the same arithmetic that ranked its document (W-108),
+    and `[bm25f]` scores the passage exactly as it scored the document.
+    `refer()` may not switch on a knob that `ask` has switched off; only the
+    caller's `Tune` decides.
     """
-    policy = policy or Policy()
     decision = freshness_mod.decide(policy)
 
     documents: list[Cited] = []
@@ -200,20 +196,26 @@ def refer(
                 doc_id,
                 loc,
                 result.sha,
-                chunk(
-                    text,
-                    min_passage_bytes=min_passage_bytes,
-                    max_passage_bytes=max_passage_bytes,
-                    line_numbers=not generated,
-                ),
+                chunk(text, **tune.chunk_bounds(), line_numbers=not generated),
             )
         )
 
     _mark_changed_urls_dirty(root, documents)
 
-    scored: list[ScoredPassage] = rescore(query, fetched, weight=rerank_weight)
+    scored: list[ScoredPassage] = rescore(
+        query,
+        fetched,
+        scoring=tune.scoring,
+        weight=tune.rerank_weight,
+        proximity=tune.proximity,
+    )
     assembled = assemble(
-        scored, budget=budget, k=k, source="fetched", per_doc_fraction=per_doc_fraction
+        scored,
+        budget=tune.budget,
+        k=k,
+        source="fetched",
+        per_doc_fraction=tune.per_doc_fraction,
+        citation_overhead=tune.citation_overhead,
     )
     return Bundle(assembled=assembled, documents=documents, policy=policy.as_record())
 

@@ -2,8 +2,11 @@
 
 [SR-TUNE](../../records/0135_tuning.md) is the record. What this module is:
 
-- **The loader.** Absent, empty, or every key commented out means every
-  default — no error, no warning, no file required. `$0` stays `$0`.
+- **The loader.** Every key is required. An absent file, table or key stops
+  the command naming it ([L12](../../records/0013_LAW-12-values-live-in-config.md)
+  decision 3) — fux holds no copy of these values in code. The shipped values
+  live in one place, `templates/tune.toml.txt`, which `fux setup` writes,
+  `fux doctor --fix` restores keys from, and `--no-tune` reads.
 - **The validator.** The key set is **closed**: an unknown table or key is a
   loud error, because this is the one file that can silently change every
   answer (decision 5).
@@ -67,27 +70,27 @@ mean fux editing a file it promised never to rewrite (decision 3b). `fux tune`
 from __future__ import annotations
 
 import tomllib
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from .errors import FuxError
-from .query.bm25f import ANCHOR, B, FIELD_WEIGHTS, K1, Scoring
-from .query.mined import MINED_WEIGHT
-from .query.confidence import DOC_COVERAGE_FLOOR, SEPARATION_FLOOR
-from .store import TF_FIELDS
 from .constants import fixed
+from .errors import FuxError
+from .query.bm25f import Scoring
+from .store import TF_FIELDS
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from .query.rerank import Proximity
 
 __all__ = [
     "TUNE_NAME",
     "Tune",
-    "DEFAULT_TUNE",
-    "DEFAULT_MAX_PHRASES",
-    "DEFAULT_MAX_TABLE_ROWS",
     "INDEX_TABLE",
     "IndexLimits",
     "index_limits",
     "load",
     "specimen",
+    "template_text",
 ]
 
 #: Committed, and written once by `fux setup` (decision 2 and 3).
@@ -113,21 +116,6 @@ _FIELD_KEYS = tuple(TF_FIELDS)
 #: far enough back that nobody is carrying a file written against it.
 _LEGACY_FIELD_KEYS = {f"{name}_weight": name for name in TF_FIELDS}
 
-#: `[index] max_phrases` — how many of a document's headings are committed as
-#: its `phrases`, in document order. **Display only**: `heading` tf is built
-#: from every heading whatever this is (SR-EXTRACTED). **Raised 12 -> 32 on
-#: 2026-09-11 (Arpit)**: at 12, 87 of 563 markdown documents in fux's own corpus
-#: lost 1 055 headings, and 262 of their 1 584 slots held template headings
-#: (`Context`, `Decision`) — the headings that told documents apart were the
-#: ones cut. At 32, 98.2 % keep every heading for ~0.3 % more index.
-DEFAULT_MAX_PHRASES = 32
-
-#: `[index] max_table_rows` — data rows admitted from one table (per SHEET for
-#: `.xlsx`). Rows past it are not decoded, not indexed and not citable
-#: (SR-TABULAR). Raised 500 -> 20 000 on 2026-09-06; moved here from
-#: `fux.toml [decode]` on 2026-09-11.
-DEFAULT_MAX_TABLE_ROWS = 20_000
-
 #: The one table whose keys change `.fux/index/`. Named so the boundary test
 #: and `index_limits()` refer to the same thing.
 INDEX_TABLE = "index"
@@ -136,7 +124,16 @@ INDEX_TABLE = "index"
 #: SR-TUNE, not a convenience (decision 5).
 _SCHEMA: dict[str, tuple[str, ...]] = {
     "bm25f": ("k1", "b", *_FIELD_KEYS, "anchor"),
-    "ranking": ("rerank_weight", "expand_weight", "mined_weight"),
+    "ranking": (
+        "rerank_weight",
+        "rerank_depth",
+        "rerank_coverage_power",
+        "rerank_base",
+        "rerank_span",
+        "rerank_adjacency",
+        "expand_weight",
+        "mined_weight",
+    ),
     "graph": (
         "damping",
         "iterations",
@@ -144,6 +141,7 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "hop_decay",
         "expand_limit",
         "seed_depth",
+        "path_limit",
         # W-161. The six `ask_*` keys are the graph tier's, and they are in the
         # `[graph]` table rather than in `[ranking]` because the walk they
         # configure is the graph plane's walk. **They do not move `fux graph`**
@@ -157,8 +155,16 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "ask_max_hops",
         "ask_related_limit",
     ),
-    "refer": ("budget", "per_doc_fraction", "min_passage_bytes", "max_passage_bytes"),
+    "refer": (
+        "budget",
+        "per_doc_fraction",
+        "min_passage_bytes",
+        "max_passage_bytes",
+        "citation_overhead",
+        "table_rows_per_passage",
+    ),
     "confidence": ("separation_floor", "doc_coverage_floor"),
+    "enrich": ("self_retrieval_k",),
     # ⚠ THE EXCEPTION TO DECISION 1 — read by ingest, changes committed bytes,
     # untouched by `--no-tune`. See the module docstring.
     INDEX_TABLE: ("max_phrases", "max_table_rows"),
@@ -230,122 +236,79 @@ _REMOVED_KEYS: dict[tuple[str, str], str] = {
 
 @dataclass(frozen=True)
 class Tune:
-    """Every tunable, resolved. Construct via `load()`; the defaults are the engine's."""
+    """Every tunable, resolved. Construct via `load()`; there are no defaults.
+
+    [L12](../../records/0013_LAW-12-values-live-in-config.md): every field is
+    read from `.fux/tune.toml`, or — under `--no-tune` — from the template
+    `fux setup` writes (`src/fux/templates/tune.toml.txt`). What each value is
+    and why is said beside its key in that template, once.
+    """
 
     # [bm25f]
-    k1: float = K1
-    b: float = B
-    field_weights: tuple[float, ...] = FIELD_WEIGHTS
-    #: W-168 step 1 — the anchor field: what other documents call this one when
-    #: they link to it. **Default `ANCHOR` (`1.0`), ON since its PASS on
-    #: 2026-09-24** — SR-RS decision 19: a ranking change ships behind a tunable
-    #: at zero and is defaulted on only by a PASS on a frozen pre-registration.
-    #: `0.0` turns it off.
-    #:
-    #: ⚠ **Not in `field_weights`, deliberately.** That tuple is aligned
-    #: index-for-index with `TF_FIELDS`, the five fields a record COMMITS an
-    #: `flen` for; anchor is folded at read time out of other documents' edges
-    #: and has no committed slot. Padding it in would claim a sixth committed
-    #: field and leave every `flen` one short — see `query/bm25f.py`.
-    anchor_weight: float = ANCHOR
+    k1: float
+    b: float
+    #: Aligned index-for-index with `TF_FIELDS`, the five fields a record
+    #: COMMITS an `flen` for.
+    field_weights: tuple[float, ...]
+    #: W-168 step 1 — the anchor field. ⚠ **Not in `field_weights`,
+    #: deliberately**: anchor is folded at read time out of other documents'
+    #: edges and has no committed slot — see `query/bm25f.py`.
+    anchor_weight: float
 
     # [ranking]
-    #: ⚠ **Three document priors stood here and all three are GONE**, ruled by
-    #: Arpit on 2026-09-13 (SR-TUNE decision 15): `superseded_weight` (W-151),
-    #: then `archived_weight` and `recency_half_life_days` (W-152). Each shipped
-    #: as a no-op, so nothing ranks differently; what went is three global
-    #: multipliers no single value can set correctly. The FACTS they read —
-    #: `archived`, `superseded`, `mtime` — are all untouched and still reach a
-    #: caller.
-    rerank_weight: float = 0.0
-    #: W-109 — what an agent-supplied `--expand` term is worth against a term
-    #: the user actually typed. **`0.2` is Query2doc's 1:5 ratio** (arXiv
-    #: 2303.07678 §3.2 repeats the query five times beside one pseudo-passage),
-    #: ratified by Arpit 2026-09-05 and **documented as unmeasured on this
-    #: corpus until a graded run says otherwise**.
-    #:
-    #: ⚠ Unlike every other key in this table, this one **is a no-op unless a
-    #: caller passes `--expand`** — it cannot change the ranking of a query
-    #: nobody expanded. `0` turns expansion off entirely even when a caller
-    #: does pass one, which is the off-switch a consumer needs when they
-    #: distrust the agent writing the expansions.
-    expand_weight: float = 0.2
-    #: W-168 step 4 — the weight of a spelling the CORPUS supplies: the other
-    #: side of a `Long Form (ABBR)` pair some document declares, added when the
-    #: query carries one side and not the other ([`query/mined.py`](query/mined.py)).
-    #: **Default `MINED_WEIGHT` (`0.5`), ON since its PASS on 2026-09-27**
-    #: against the frozen bar,
-    #: `work/regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md`.
-    #: `0.0` turns it off, and off reads no pair at all, so `0.0` is
-    #: byte-identical to the engine before the key existed.
-    #:
-    #: Its own key and not `expand_weight`, because the arms sweep it and a
-    #: sweep of `expand_weight` would move every caller's `--expand` too. It
-    #: stacks on `--expand`; a hash both supply keeps the caller's weight.
-    #: `fux lexical`, the frozen baseline verb, never folds.
-    mined_weight: float = MINED_WEIGHT
-
+    #: ⚠ **Three document priors stood here and all three are GONE** (SR-TUNE
+    #: decision 15): `superseded_weight`, `archived_weight`,
+    #: `recency_half_life_days`. The FACTS they read are untouched.
+    rerank_weight: float
+    rerank_depth: int
+    rerank_coverage_power: float
+    rerank_base: float
+    rerank_span: float
+    rerank_adjacency: float
+    #: W-109. ⚠ **A no-op unless a caller passes `--expand`.**
+    expand_weight: float
+    #: W-168 step 4 — a spelling the CORPUS supplies. Its own key and not
+    #: `expand_weight`, because a sweep of `expand_weight` would move every
+    #: caller's `--expand` too.
+    mined_weight: float
 
     # [graph]
-    damping: float = 0.85
-    iterations: int = 3
-    laziness: float = 0.5
-    hop_decay: float = 0.5
-    expand_limit: int = 10
-    seed_depth: int = 5
-
-    # [graph] — the W-161 graph tier on `ask`. Six keys, and the two booleans
-    # at the top are the ones that exist so the pre-registration's two arms can
-    # be removed independently of each other
-    # (`work/regression/2026-09-14-graph-ask/PRE-REGISTRATION.md`).
-    #
-    # 🔴 **Both ship ON and both are UNMEASURED**, which is the state the
-    # ratified compare doc puts them in, not an oversight: Arpit accepted the
-    # two-tier `ask` on 2026-09-13 and the measurement needs link-dependent
-    # golden questions that only Codex may author (2026-09-30). The keys are how
-    # a failing arm is withdrawn without touching the other.
-    #: Arm A — re-order the lexical window by `RRF(lexical rank, PPR rank)`.
-    ask_boost: bool = True
-    #: Arm B — the labelled `related` list of link-reached documents with no
-    #: lexical match. `--no-related` is the per-call opt-out.
-    ask_related: bool = True
-    #: Which edge kinds the `ask` walk follows. `ref` alone by default:
-    #: a `tag` edge makes the graph bipartite and one shared tag becomes a
-    #: 200-document hub, which is a hub pulling unrelated documents together
-    #: rather than a link anybody drew between two documents.
-    ask_kinds: str = "ref"
-    #: Hub damping, ON for `ask` and off for `graph`. A link everybody makes
-    #: says little about the document it comes from.
-    ask_link_idf: bool = True
-    #: One hop. For orientation two is right; for an answer a second-hop
-    #: document is a guess about a guess.
-    ask_max_hops: int = 1
-    #: The cap on the `related` list. `related` is a length cost on every
-    #: query, including every one it never helps, which is why the
-    #: pre-registration measures median length across the whole set and not
-    #: across the subset the tier is for.
-    ask_related_limit: int = 5
+    damping: float
+    iterations: int
+    laziness: float
+    hop_decay: float
+    expand_limit: int
+    seed_depth: int
+    #: How many routes `fux path` returns, best first.
+    path_limit: int
+    # [graph] — the W-161 graph tier on `ask`. 🔴 **Both arms are UNMEASURED.**
+    ask_boost: bool
+    ask_related: bool
+    ask_kinds: str
+    ask_link_idf: bool
+    ask_max_hops: int
+    ask_related_limit: int
 
     # [confidence]
-    #: ⚠ **The `grounded`/`weak` cutoff, and the only tunable in this class that
-    #: is UNMEASURED at its default.** R10 is still owed; a repo-local value is
-    #: a preference, never a calibration.
-    separation_floor: float = SEPARATION_FLOOR
-    #: `0.0` = the clause is off, which is a MEASURED ruling (2026-08-28), not a
-    #: placeholder. At `1.0`, 19 of 50 correct answers turn `partial`.
-    doc_coverage_floor: float = DOC_COVERAGE_FLOOR
+    #: ⚠ **The only tunable here UNMEASURED at its shipped value** (R10).
+    separation_floor: float
+    doc_coverage_floor: float
 
     # [refer]
-    budget: int = 8000
-    per_doc_fraction: float = 0.5
-    min_passage_bytes: int = 120
-    max_passage_bytes: int = 4000
+    budget: int
+    per_doc_fraction: float
+    min_passage_bytes: int
+    max_passage_bytes: int
+    citation_overhead: int
+    table_rows_per_passage: int
+
+    # [enrich]
+    self_retrieval_k: int
 
     #: `[priority]`, sorted longest-key-first so a reader can stop at the first
     #: match. **The resolution itself lives on `query.rank.Weighting`**, not
     #: here — one implementation, next to the bound that has to agree with it.
-    #: This class carries the data; the scorer carries the rule.
-    priority: tuple[tuple[str, float], ...] = field(default_factory=tuple)
+    priority: tuple[tuple[str, float], ...]
 
     @property
     def scoring(self) -> Scoring:
@@ -355,33 +318,51 @@ class Tune:
         )
 
     @property
-    def trivial(self) -> bool:
-        """True when nothing was set — used to skip work, never to skip a check."""
-        return self == DEFAULT_TUNE
+    def proximity(self) -> "Proximity":
+        """The reranker's passage arithmetic — coverage power and the mix."""
+        from .query.rerank import Proximity
 
+        return Proximity(
+            coverage_power=self.rerank_coverage_power,
+            base=self.rerank_base,
+            span=self.rerank_span,
+            adjacency=self.rerank_adjacency,
+        )
 
-DEFAULT_TUNE = Tune()
+    def chunk_bounds(self) -> dict[str, int]:
+        """`[refer]`'s three passage bounds, as `refer._chunk.chunk` takes them."""
+        return {
+            "min_passage_bytes": self.min_passage_bytes,
+            "max_passage_bytes": self.max_passage_bytes,
+            "table_rows_per_passage": self.table_rows_per_passage,
+        }
 
 
 @dataclass(frozen=True)
 class IndexLimits:
     """`[index]`, resolved. Deliberately NOT a field of `Tune`: `Tune` is what
-    `--no-tune` replaces with the defaults, and these cannot be replaced at
+    `--no-tune` replaces with the template's, and these cannot be replaced at
     query time without disagreeing with the index they built."""
 
-    max_phrases: int = DEFAULT_MAX_PHRASES
-    max_table_rows: int = DEFAULT_MAX_TABLE_ROWS
+    max_phrases: int
+    max_table_rows: int
 
 
 class _Collector:
     """Gathers semantic errors so a hand-edited file reports them together."""
 
-    def __init__(self, path: Path) -> None:
-        self.path = path
+    def __init__(self, label: "Path | str") -> None:
+        self.label = label
         self.errors: list[str] = []
+        self.missing = False
 
     def add(self, message: str) -> None:
         self.errors.append(message)
+
+    def absent(self, table: str, key: str) -> None:
+        """L12 decision 3 — a missing key is an error that names it."""
+        self.missing = True
+        self.errors.append(f"[{table}] {key} is missing")
 
     def raise_if_any(self) -> None:
         if not self.errors:
@@ -389,25 +370,31 @@ class _Collector:
         shown = self.errors[:_MAX_REPORTED]
         more = len(self.errors) - len(shown)
         tail = f"\n  ... and {more} more" if more > 0 else ""
-        raise FuxError(f"{self.path}:\n  " + "\n  ".join(shown) + tail)
+        if self.missing:
+            tail += f"\n  {_FIX_HINT}"
+        raise FuxError(f"{self.label}:\n  " + "\n  ".join(shown) + tail)
 
 
-def _boolean(c: _Collector, table: str, key: str, value: object, default: bool) -> bool:
+#: What a missing key's error tells the reader to do. One sentence, both
+#: runtimes (`config/tune.mjs`).
+_FIX_HINT = "`fux doctor --fix` writes every missing key from the template `fux setup` uses"
+
+
+def _boolean(c: _Collector, table: str, key: str, value: object) -> object:
     """A strict boolean. `1`/`0` are refused rather than coerced.
 
     ⚠ **`isinstance(1, bool)` is False but `isinstance(True, int)` is True**,
-    which is why every numeric validator above already excludes `bool` by name.
-    This is the same fence from the other side: a consumer who writes
+    which is why every numeric validator already excludes `bool` by name. This
+    is the same fence from the other side: a consumer who writes
     `ask_boost = 1` gets told the key is a boolean, instead of getting a silent
     `True` from a file that does not say so.
     """
     if not isinstance(value, bool):
         c.add(f"[{table}] {key} must be true or false (got {value!r})")
-        return default
     return value
 
 
-def _edge_kinds(c: _Collector, table: str, key: str, value: object, default: str) -> str:
+def _edge_kinds(c: _Collector, table: str, key: str, value: object) -> object:
     """A comma-separated list of edge kinds the index actually mints.
 
     Validated **here**, at load, rather than where the walk runs: an unknown
@@ -418,90 +405,103 @@ def _edge_kinds(c: _Collector, table: str, key: str, value: object, default: str
     """
     if not isinstance(value, str):
         c.add(f"[{table}] {key} must be a string (got {value!r})")
-        return default
+        return value
     from .graph import walk as walk_mod
 
     named = [k.strip() for k in value.split(",") if k.strip()]
     if not named:
         c.add(f"[{table}] {key} names no edge kind; the kinds this index mints are "
               f"{', '.join(walk_mod.EDGE_KINDS)}")
-        return default
+        return value
     unknown = sorted(set(named) - set(walk_mod.EDGE_KINDS))
     if unknown:
         c.add(f"[{table}] {key} names {', '.join(unknown)}, which is not an edge kind; "
               f"the kinds this index mints are {', '.join(walk_mod.EDGE_KINDS)}")
-        return default
+        return value
     return ",".join(named)
 
 
-def _number(c: _Collector, table: str, key: str, value: object, default: float) -> float:
+def _number(c: _Collector, table: str, key: str, value: object) -> object:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         c.add(f"[{table}] {key} must be a number (got {value!r})")
-        return default
+        return value
     return float(value)
 
 
-def _positive(c: _Collector, table: str, key: str, value: object, default: float) -> float:
-    v = _number(c, table, key, value, default)
-    if v <= 0:
+def _positive(c: _Collector, table: str, key: str, value: object) -> object:
+    v = _number(c, table, key, value)
+    if isinstance(v, float) and v <= 0:
         c.add(f"[{table}] {key} must be greater than zero — at zero the term it scales vanishes (got {v})")
-        return default
     return v
 
 
-def _non_negative(c: _Collector, table: str, key: str, value: object, default: float) -> float:
-    v = _number(c, table, key, value, default)
-    if v < 0:
+def _non_negative(c: _Collector, table: str, key: str, value: object) -> object:
+    v = _number(c, table, key, value)
+    if isinstance(v, float) and v < 0:
         c.add(
             f"[{table}] {key} must not be negative — a negative multiplier inverts "
             f"the ordering, which is broken rather than aggressive (got {v})"
         )
-        return default
     return v
 
 
-def _fraction(c: _Collector, table: str, key: str, value: object, default: float) -> float:
-    v = _number(c, table, key, value, default)
-    if not 0.0 <= v <= 1.0:
+def _fraction(c: _Collector, table: str, key: str, value: object) -> object:
+    v = _number(c, table, key, value)
+    if isinstance(v, float) and not 0.0 <= v <= 1.0:
         c.add(
             f"[{table}] {key} must be between 0 and 1 — 0 turns the effect off "
             f"entirely, 1 applies it in full (got {v})"
         )
-        return default
     return v
 
 
-def _at_least(c: _Collector, table: str, key: str, value: object, default: int, floor: int) -> int:
+def _whole(c: _Collector, table: str, key: str, value: object) -> object:
+    """A TOML integer, at least one. `3.0` is refused: it is not one in TOML."""
     if isinstance(value, bool) or not isinstance(value, int):
         c.add(f"[{table}] {key} must be a whole number (got {value!r})")
-        return default
-    if value < floor:
-        c.add(f"[{table}] {key} must be at least {floor} (got {value})")
-        return default
+        return value
+    if value < 1:
+        c.add(f"[{table}] {key} must be at least 1 (got {value})")
     return value
 
 
-def _index_values(c: _Collector, table: object) -> IndexLimits:
+def _read(c: _Collector, data: dict, table: str, key: str, check) -> object:
+    """`[table] key`, validated by `check` — or recorded as missing."""
+    t = data.get(table)
+    if not isinstance(t, dict) or key not in t:
+        c.absent(table, key)
+        return None
+    return check(c, table, key, t[key])
+
+
+def _index_values(c: _Collector, data: dict) -> "IndexLimits":
     """Validate `[index]`'s values. Shared by `load()` and `index_limits()`, so
     `fux ask` and `fux ingest` cannot disagree about what a legal value is."""
-    t = table if isinstance(table, dict) else {}
-    max_phrases = (
-        _at_least(c, INDEX_TABLE, "max_phrases", t["max_phrases"], DEFAULT_MAX_PHRASES, 1)
-        if "max_phrases" in t
-        else DEFAULT_MAX_PHRASES
+    return IndexLimits(
+        max_phrases=_read(c, data, INDEX_TABLE, "max_phrases", _whole),
+        max_table_rows=_read(c, data, INDEX_TABLE, "max_table_rows", _whole),
     )
-    max_table_rows = (
-        _at_least(c, INDEX_TABLE, "max_table_rows", t["max_table_rows"], DEFAULT_MAX_TABLE_ROWS, 1)
-        if "max_table_rows" in t
-        else DEFAULT_MAX_TABLE_ROWS
-    )
-    return IndexLimits(max_phrases=max_phrases, max_table_rows=max_table_rows)
 
 
 def _read_text(path: Path) -> str:
+    """The file's text. Absent is an error that names it (L12 decision 3)."""
+    if not path.is_file():
+        raise FuxError(
+            f"{path} is missing - `fux setup` writes it, and `fux doctor --fix` "
+            "restores a deleted one. fux holds no copy of its values in code"
+        )
+    # Windows editors write a BOM; `tomllib.load` reads binary and fails with a
+    # decode error that names nothing useful (decision 10c).
     text = path.read_bytes().decode("utf-8-sig")
     _reject_conflict_markers(path, text)
     return text
+
+
+def _parse(text: str, label: "Path | str") -> dict:
+    try:
+        return tomllib.loads(text)
+    except tomllib.TOMLDecodeError as exc:
+        raise FuxError(f"{label}: invalid TOML ({exc})") from exc
 
 
 def index_limits(root: Path) -> IndexLimits:
@@ -510,15 +510,10 @@ def index_limits(root: Path) -> IndexLimits:
     **Reads only `[index]`**: a typo in `[bm25f]` is `fux ask`'s error to
     report, never a reason an ingest or a git hook fails. **Takes no
     `enabled`**: `--no-tune` does not reach these keys (module docstring).
-    Absent file, absent table, absent key -> the defaults.
+    An absent file, table or key is an error naming it.
     """
     path = root / TUNE_NAME
-    if not path.is_file():
-        return IndexLimits()
-    try:
-        data = tomllib.loads(_read_text(path))
-    except tomllib.TOMLDecodeError as exc:
-        raise FuxError(f"{path}: invalid TOML ({exc})") from exc
+    data = _parse(_read_text(path), path)
     table = data.get(INDEX_TABLE, {})
     if not isinstance(table, dict):
         raise FuxError(f"{path}: `{INDEX_TABLE}` must be a table (a `[{INDEX_TABLE}]` section), not a bare key")
@@ -529,7 +524,7 @@ def index_limits(root: Path) -> IndexLimits:
             f"known: {list(_SCHEMA[INDEX_TABLE])}"
         )
     c = _Collector(path)
-    limits = _index_values(c, table)
+    limits = _index_values(c, data)
     c.raise_if_any()
     return limits
 
@@ -548,47 +543,46 @@ def _reject_conflict_markers(path: Path, text: str) -> None:
                 f"{path}: unresolved merge conflict — the file still carries conflict markers. "
                 "Resolve it by hand and keep one side; fux never rewrites this file"
             )
-            break
 
 
-def load(root: Path, *, enabled: bool = True) -> Tune:
-    """Read `.fux/tune.toml`. Absent, empty or all-commented means every default.
+def template_text() -> str:
+    """The file `fux setup` writes — `src/fux/templates/tune.toml.txt`, verbatim.
 
-    `enabled=False` is `--no-tune`: the file is not read at all, so the answer
-    is the engine's own, which is what makes *"is it me or the config?"* a
-    single flag rather than an experiment (decision 11).
+    Also what `--no-tune` reads (L12 decision 7) and what `fux tune` prints.
+    """
+    return (Path(__file__).parent / "templates" / fixed("templates", "tune")).read_text(
+        encoding="utf-8"
+    )
+
+
+#: How `--no-tune`'s source is named in an error: never the consumer's path,
+#: because under `--no-tune` their file is not what was read.
+_TEMPLATE_LABEL = "the packaged tune.toml template (--no-tune)"
+
+
+def load(root: Path, *, enabled: bool) -> Tune:
+    """Read `.fux/tune.toml` — every key required.
+
+    `enabled=False` is `--no-tune`: the consumer's file is not read at all and
+    the packaged template is read in its place, so the answer is the one a
+    fresh `fux setup` would give — *"is it me or the config?"* as a single flag
+    rather than an experiment (decision 11; L12 decision 7).
     """
     if not enabled:
-        return DEFAULT_TUNE
-
+        return _resolve(_parse(template_text(), _TEMPLATE_LABEL), _TEMPLATE_LABEL)
     path = root / TUNE_NAME
-    if not path.is_file():
-        return DEFAULT_TUNE
+    return _resolve(_parse(_read_text(path), path), path)
 
-    raw = path.read_bytes()
-    # Windows editors write a BOM; `tomllib.load` reads binary and fails with a
-    # decode error that names nothing useful. Windows-first fleets are in the
-    # litmus, so this is stripped rather than diagnosed (decision 10c).
-    text = raw.decode("utf-8-sig")
-    _reject_conflict_markers(path, text)
 
-    try:
-        data = tomllib.loads(text)
-    except tomllib.TOMLDecodeError as exc:
-        raise FuxError(f"{path}: invalid TOML ({exc})") from exc
-
-    if not data:
-        return DEFAULT_TUNE
-
-    c = _Collector(path)
-
+def _resolve(data: dict, label: "Path | str") -> Tune:
+    """Validate a parsed tune file and build the `Tune` — or raise, naming every fault."""
     if "dense" in data:
         # Removed 2026-08-25 with the embedding model and the lane it fed.
         # A bare "unknown table" error would read as a typo; this file is the
         # one place a consumer configured the lane, so it is where they find
         # out it is gone.
         raise FuxError(
-            f"{path}: [dense] was REMOVED on 2026-08-25 along with the embedding model, "
+            f"{label}: [dense] was REMOVED on 2026-08-25 along with the embedding model, "
             "the committed per-chunk vectors and `ask --hybrid`. The lane never earned "
             "its cost -- DENSE-CHUNK measured 0 fixed / 2 broken at every setting that "
             "fires (work/regression/2026-08-24-dense-lane-gate/). Delete the table; "
@@ -597,7 +591,7 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
     unknown_tables = [k for k in data if k not in _SCHEMA]
     if unknown_tables:
         raise FuxError(
-            f"{path}: unknown table(s) {sorted(unknown_tables)} — known: {sorted(_SCHEMA)}. "
+            f"{label}: unknown table(s) {sorted(unknown_tables)} — known: {sorted(_SCHEMA)}. "
             "The key set is closed on purpose: this is the one file that can change "
             "every answer without changing a byte of the index (all but [index]), so a "
             "typo here must not fail silently"
@@ -605,157 +599,87 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
     for name, value in data.items():
         if not isinstance(value, dict):
             raise FuxError(
-                f"{path}: `{name}` must be a table (a `[{name}]` section), not a bare key"
+                f"{label}: `{name}` must be a table (a `[{name}]` section), not a bare key"
             )
         if name in _OPEN_TABLES:
             continue
         unknown_keys = [k for k in value if k not in _SCHEMA[name]]
         if unknown_keys:
-            # A file written against v2.0.0-alpha.1 spelled these
-            # `<field>_weight`. Reporting them as merely *unknown* would send a
-            # consumer hunting for a typo in a key they copied correctly from
-            # the shipped specimen, so name the rename instead.
             # A key fux removed is named as removed. Sorted so two removed keys
             # in one table report the same one every run (L3 reaches errors too).
             removed = sorted(k for k in unknown_keys if (name, k) in _REMOVED_KEYS)
             if removed:
-                raise FuxError(f"{path}: [{name}] `{removed[0]}` {_REMOVED_KEYS[(name, removed[0])]}")
+                raise FuxError(f"{label}: [{name}] `{removed[0]}` {_REMOVED_KEYS[(name, removed[0])]}")
+            # A file written against v2.0.0-alpha.1 spelled these
+            # `<field>_weight`; name the rename rather than report a typo.
             renamed = sorted(k for k in unknown_keys if k in _LEGACY_FIELD_KEYS)
             if name == "bm25f" and renamed:
                 pairs = ", ".join(f"`{k}` -> `{_LEGACY_FIELD_KEYS[k]}`" for k in renamed)
                 raise FuxError(
-                    f"{path}: [bm25f] field weights lost the `_weight` suffix in "
+                    f"{label}: [bm25f] field weights lost the `_weight` suffix in "
                     f"v2.0.0-alpha.2 -- rename {pairs}. Inside a table already named "
                     f"`bm25f` the suffix was noise, and `k1`/`b` never carried one. "
                     f"`[ranking]` is unchanged and keeps its suffixes."
                 )
             raise FuxError(
-                f"{path}: [{name}] has unknown key(s) {sorted(unknown_keys)} — "
+                f"{label}: [{name}] has unknown key(s) {sorted(unknown_keys)} — "
                 f"known: {list(_SCHEMA[name])}"
             )
 
-    bm25f = data.get("bm25f", {})
-    k1 = _positive(c, "bm25f", "k1", bm25f["k1"], K1) if "k1" in bm25f else K1
-    b = _fraction(c, "bm25f", "b", bm25f["b"], B) if "b" in bm25f else B
-    weights = list(FIELD_WEIGHTS)
-    for i, key in enumerate(_FIELD_KEYS):
-        if key in bm25f:
-            # Zero is legal here and means *ignore this field* — that is a
-            # ranking choice, not the source exclusion decision 9a refuses.
-            weights[i] = _non_negative(c, "bm25f", key, bm25f[key], FIELD_WEIGHTS[i])
-    anchor_weight = (
-        _non_negative(c, "bm25f", "anchor", bm25f["anchor"], ANCHOR)
-        if "anchor" in bm25f
-        else ANCHOR
-    )
+    c = _Collector(label)
 
-    ranking = data.get("ranking", {})
-    rerank_weight = (
-        _non_negative(c, "ranking", "rerank_weight", ranking["rerank_weight"], 0.0)
-        if "rerank_weight" in ranking
-        else 0.0
-    )
-    expand_weight = (
-        _non_negative(c, "ranking", "expand_weight", ranking["expand_weight"], 0.2)
-        if "expand_weight" in ranking
-        else 0.2
-    )
-    mined_weight = (
-        _non_negative(c, "ranking", "mined_weight", ranking["mined_weight"], MINED_WEIGHT)
-        if "mined_weight" in ranking
-        else MINED_WEIGHT
-    )
+    def read(table: str, key: str, check) -> object:
+        return _read(c, data, table, key, check)
 
-    graph = data.get("graph", {})
-    damping = _fraction(c, "graph", "damping", graph["damping"], 0.85) if "damping" in graph else 0.85
-    iterations = (
-        _at_least(c, "graph", "iterations", graph["iterations"], 3, 1) if "iterations" in graph else 3
-    )
-    laziness = (
-        _fraction(c, "graph", "laziness", graph["laziness"], 0.5) if "laziness" in graph else 0.5
-    )
-    hop_decay = (
-        _fraction(c, "graph", "hop_decay", graph["hop_decay"], 0.5) if "hop_decay" in graph else 0.5
-    )
-    expand_limit = (
-        _at_least(c, "graph", "expand_limit", graph["expand_limit"], 10, 1)
-        if "expand_limit" in graph
-        else 10
-    )
-    seed_depth = (
-        _at_least(c, "graph", "seed_depth", graph["seed_depth"], 5, 1) if "seed_depth" in graph else 5
-    )
-    ask_boost = (
-        _boolean(c, "graph", "ask_boost", graph["ask_boost"], True) if "ask_boost" in graph else True
-    )
-    ask_related = (
-        _boolean(c, "graph", "ask_related", graph["ask_related"], True)
-        if "ask_related" in graph
-        else True
-    )
-    ask_kinds = (
-        _edge_kinds(c, "graph", "ask_kinds", graph["ask_kinds"], "ref")
-        if "ask_kinds" in graph
-        else "ref"
-    )
-    ask_link_idf = (
-        _boolean(c, "graph", "ask_link_idf", graph["ask_link_idf"], True)
-        if "ask_link_idf" in graph
-        else True
-    )
-    ask_max_hops = (
-        _at_least(c, "graph", "ask_max_hops", graph["ask_max_hops"], 1, 1)
-        if "ask_max_hops" in graph
-        else 1
-    )
-    ask_related_limit = (
-        _at_least(c, "graph", "ask_related_limit", graph["ask_related_limit"], 5, 1)
-        if "ask_related_limit" in graph
-        else 5
-    )
-
-    conf = data.get("confidence", {})
-    separation_floor = (
-        _fraction(c, "confidence", "separation_floor", conf["separation_floor"], SEPARATION_FLOOR)
-        if "separation_floor" in conf
-        else SEPARATION_FLOOR
-    )
-    doc_coverage_floor = (
-        _fraction(
-            c, "confidence", "doc_coverage_floor", conf["doc_coverage_floor"], DOC_COVERAGE_FLOOR
+    values: dict[str, object] = {
+        "k1": read("bm25f", "k1", _positive),
+        "b": read("bm25f", "b", _fraction),
+        # Zero is legal for a field weight and means *ignore this field* —
+        # a ranking choice, not the source exclusion decision 9a refuses.
+        "field_weights": tuple(read("bm25f", key, _non_negative) for key in _FIELD_KEYS),
+        "anchor_weight": read("bm25f", "anchor", _non_negative),
+        "rerank_weight": read("ranking", "rerank_weight", _non_negative),
+        "rerank_depth": read("ranking", "rerank_depth", _whole),
+        "rerank_coverage_power": read("ranking", "rerank_coverage_power", _positive),
+        "rerank_base": read("ranking", "rerank_base", _fraction),
+        "rerank_span": read("ranking", "rerank_span", _fraction),
+        "rerank_adjacency": read("ranking", "rerank_adjacency", _fraction),
+        "expand_weight": read("ranking", "expand_weight", _non_negative),
+        "mined_weight": read("ranking", "mined_weight", _non_negative),
+        "damping": read("graph", "damping", _fraction),
+        "iterations": read("graph", "iterations", _whole),
+        "laziness": read("graph", "laziness", _fraction),
+        "hop_decay": read("graph", "hop_decay", _fraction),
+        "expand_limit": read("graph", "expand_limit", _whole),
+        "seed_depth": read("graph", "seed_depth", _whole),
+        "path_limit": read("graph", "path_limit", _whole),
+        "ask_boost": read("graph", "ask_boost", _boolean),
+        "ask_related": read("graph", "ask_related", _boolean),
+        "ask_kinds": read("graph", "ask_kinds", _edge_kinds),
+        "ask_link_idf": read("graph", "ask_link_idf", _boolean),
+        "ask_max_hops": read("graph", "ask_max_hops", _whole),
+        "ask_related_limit": read("graph", "ask_related_limit", _whole),
+        "separation_floor": read("confidence", "separation_floor", _fraction),
+        "doc_coverage_floor": read("confidence", "doc_coverage_floor", _fraction),
+        "budget": read("refer", "budget", _whole),
+        "per_doc_fraction": read("refer", "per_doc_fraction", _fraction),
+        "min_passage_bytes": read("refer", "min_passage_bytes", _whole),
+        "max_passage_bytes": read("refer", "max_passage_bytes", _whole),
+        "citation_overhead": read("refer", "citation_overhead", _whole),
+        "table_rows_per_passage": read("refer", "table_rows_per_passage", _whole),
+        "self_retrieval_k": read("enrich", "self_retrieval_k", _whole),
+    }
+    low, high = values["min_passage_bytes"], values["max_passage_bytes"]
+    if isinstance(low, int) and isinstance(high, int) and low >= high:
+        c.add(
+            f"[refer] min_passage_bytes ({low}) must be smaller than "
+            f"max_passage_bytes ({high}) — the first is the floor below which a "
+            "passage is not worth citing, the second the ceiling above which it is cut"
         )
-        if "doc_coverage_floor" in conf
-        else DOC_COVERAGE_FLOOR
-    )
 
     # Validated here too, so `fux ask` reports a bad `[index]` value, but NOT
     # carried on `Tune` — see `IndexLimits`.
-    _index_values(c, data.get(INDEX_TABLE, {}))
-
-    refer = data.get("refer", {})
-    budget = _at_least(c, "refer", "budget", refer["budget"], 8000, 1) if "budget" in refer else 8000
-    per_doc_fraction = (
-        _fraction(c, "refer", "per_doc_fraction", refer["per_doc_fraction"], 0.5)
-        if "per_doc_fraction" in refer
-        else 0.5
-    )
-    min_passage = (
-        _at_least(c, "refer", "min_passage_bytes", refer["min_passage_bytes"], 120, 1)
-        if "min_passage_bytes" in refer
-        else 120
-    )
-    max_passage = (
-        _at_least(c, "refer", "max_passage_bytes", refer["max_passage_bytes"], 4000, 1)
-        if "max_passage_bytes" in refer
-        else 4000
-    )
-    if min_passage >= max_passage:
-        c.add(
-            f"[refer] min_passage_bytes ({min_passage}) must be smaller than "
-            f"max_passage_bytes ({max_passage}) — the first is the floor below which a "
-            "passage is not worth citing, the second the ceiling above which it is cut"
-        )
-        min_passage, max_passage = 120, 4000
+    _index_values(c, data)
 
     priority: list[tuple[str, float]] = []
     for entry, value in data.get("priority", {}).items():
@@ -782,183 +706,15 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
     priority.sort(key=lambda pair: (-len(pair[0]), pair[0]))
 
     c.raise_if_any()
-
-    return Tune(
-        k1=k1,
-        anchor_weight=anchor_weight,
-        b=b,
-        field_weights=tuple(weights),
-        rerank_weight=rerank_weight,
-        expand_weight=expand_weight,
-        mined_weight=mined_weight,
-        damping=damping,
-        iterations=iterations,
-        laziness=laziness,
-        hop_decay=hop_decay,
-        expand_limit=expand_limit,
-        seed_depth=seed_depth,
-        ask_boost=ask_boost,
-        ask_related=ask_related,
-        ask_kinds=ask_kinds,
-        ask_link_idf=ask_link_idf,
-        ask_max_hops=ask_max_hops,
-        ask_related_limit=ask_related_limit,
-        separation_floor=separation_floor,
-        doc_coverage_floor=doc_coverage_floor,
-        budget=budget,
-        per_doc_fraction=per_doc_fraction,
-        min_passage_bytes=min_passage,
-        max_passage_bytes=max_passage,
-        priority=tuple(priority),
-    )
+    return Tune(**values, priority=tuple(priority))
 
 
 def specimen() -> str:
-    """The file `fux setup` writes -- **live lines, not comments.**
+    """The file `fux setup` writes and `fux tune` prints — the template, verbatim.
 
-    Ruled by Arpit 2026-08-27, the same ruling `.fux/formats.toml` and
-    `.fux/output.toml` got the same day: a file of nothing but comments is a
-    menu, and a consumer should be able to read what fux will do without
-    reading fux's source. Every value here is `Tune`'s own default, so a repo
-    with this file and a repo without it rank identically.
-
-    ⚠ **The cost, stated rather than hidden: the tunables FREEZE at setup.**
-    `fux setup` is write-if-missing, so a later change to `K1`, `B`,
-    `FIELD_WEIGHTS` or a `Tune` field reaches a repo that has never run setup
-    and does not reach one that has. Same trade as `.fux/formats.toml`; same
-    remedy, and SR-DOTFUX decision 6 names it -- **a loader refusal or a `fux
-    doctor` check, never a rewrite.**
-
-    ⚠ **`[priority]` stays commented, and that is not an inconsistency.** Its
-    keys are the consumer's own source entries, not tunables with defaults --
-    an uncommented line there would silently reweight a corpus rather than
-    restate a default. Everything unlisted is already `1.0`, which IS the
-    default, spelled out by the table being empty.
-
-    One string, so the writer and `fux tune`'s output cannot drift apart, and
-    the numbers are interpolated from the engine constants rather than typed,
-    so the file and the behaviour cannot drift either (W-83's lesson).
+    **Live lines, not comments** (Arpit, 2026-08-27): a consumer should be able
+    to read what fux will do without reading fux's source. ⚠ **`[priority]`
+    stays commented**: its keys are the consumer's own source entries, not
+    values with a shipped setting.
     """
-    d = DEFAULT_TUNE
-    fields = "\n".join(
-        f"{key:<23} = {FIELD_WEIGHTS[i]}" for i, key in enumerate(_FIELD_KEYS)
-    )
-    # 🔴 **TOML spells a boolean lowercase and Python's `repr` does not**, so an
-    # f-string interpolating a `bool` writes `True` — which this module's own
-    # loader then refuses as an unknown bare word. The specimen is asserted
-    # round-trippable by `tests/test_tune.py`; without this it would have
-    # shipped a file `fux setup` writes and `fux ask` cannot read.
-    ask_boost = str(d.ask_boost).lower()
-    ask_related = str(d.ask_related).lower()
-    ask_link_idf = str(d.ask_link_idf).lower()
-    return f"""\
-# .fux/tune.toml -- HOW results are ordered, plus [index]: how much of a
-# document is indexed.
-#
-# Written once by `fux setup`; fux never rewrites it. Every value here is the
-# engine's own default, spelled out rather than implied: delete the file and
-# nothing changes, edit a line and exactly that line changes.
-#
-# The rule for every table EXCEPT [index] is mechanical: changing a value
-# leaves `.fux/index/` byte-identical, and nothing in it is read by `ingest`,
-# `build` or the hooks.
-#
-# `fux ask --no-tune` ignores this file, which is the "is it me or the
-# config?" switch -- for everything EXCEPT [index], which built the index and
-# cannot be un-built at query time.
-
-[bm25f]
-k1                      = {K1}      # term-frequency saturation
-b                       = {B}     # length normalisation, 0 = off, 1 = full
-# The five field weights, in index order. 0 means "ignore this field".
-{fields}
-# The sixth field is ANCHOR: what OTHER documents call this one when they link
-# to it (W-168 step 1). Folded in at read time from their edges -- it is in no
-# committed posting, so moving this needs no re-ingest. 0 = OFF. The default
-# 1.0 is MEASURED: it passed its pre-registered run on 2026-09-24.
-anchor                  = {d.anchor_weight}
-
-[ranking]
-rerank_weight           = {d.rerank_weight}   # 0 = off; the proximity reranker's uplift
-# What an agent-supplied `--expand` term is worth against a term you typed.
-# A NO-OP unless a caller passes `--expand`; 0 turns expansion off entirely.
-expand_weight           = {d.expand_weight}   # Query2doc's 1:5; unmeasured on your corpus
-# A spelling the corpus supplies: when a query says MKT and some document
-# declares "Mean Kinetic Temperature (MKT)", the other side is added at this
-# weight. 0 = OFF. The default 0.5 is MEASURED: it passed its pre-registered run
-# on 2026-09-27.
-mined_weight            = {d.mined_weight}
-
-[graph]                         # explain / graph / path
-damping      = {d.damping}
-iterations   = {d.iterations}
-laziness     = {d.laziness}
-hop_decay    = {d.hop_decay}
-expand_limit = {d.expand_limit}
-seed_depth   = {d.seed_depth}
-# The graph tier on `ask` (W-161). The two booleans are separate so a failing
-# arm can be withdrawn without touching the other; both are UNMEASURED today.
-ask_boost         = {ask_boost}   # arm A: re-order the window by RRF(lexical, PPR)
-ask_related       = {ask_related}   # arm B: the labelled `related` list
-ask_kinds         = "{d.ask_kinds}"    # `ref` alone; a `tag` edge is a hub, not a link
-ask_link_idf      = {ask_link_idf}   # hub damping, ON here and off for `fux graph`
-ask_max_hops      = {d.ask_max_hops}      # one hop; a second-hop document is a guess
-ask_related_limit = {d.ask_related_limit}
-
-[refer]                         # answer, and the refer plane
-budget            = {d.budget}       # bytes of assembled passage
-per_doc_fraction  = {d.per_doc_fraction}
-min_passage_bytes = {d.min_passage_bytes}
-max_passage_bytes = {d.max_passage_bytes}
-
-[confidence]                    # the BAND -- what fux says ABOUT an answer
-# Neither key can move a score or an ordering. They move the band only, so
-# `.fux/index/` and the result list are byte-identical either way.
-#
-# separation_floor: how far ahead of the runner-up the top result must be
-#   before the band may read `grounded`. LOWERING THIS DOES NOT MAKE ANSWERS
-#   BETTER -- it makes fux quieter about not knowing. At 0.0 nothing is ever
-#   `weak`. The default is PROVISIONAL and UNMEASURED (prediction R10): it is
-#   a defensible starting point, not a calibrated one.
-# doc_coverage_floor: how much of the question the TOP-RANKED DOCUMENT must
-#   itself contain. 0.0 = OFF, and that is a measured ruling, not an omission.
-#   Measured on 50 goldens + 15 decoys: at 1.0, NINETEEN of the fifty correct
-#   answers turn `partial`, and the single decoy this clause could catch sits
-#   at 0.710 -- inside the goldens' range. There is no gap to pick a number in.
-#
-# Both floors are PUBLISHED in the confidence block, so an answer states which
-# floor judged it. `fux ask --no-tune` recomputes the band at the defaults.
-separation_floor   = {d.separation_floor}
-doc_coverage_floor = {d.doc_coverage_floor}
-
-[index]                         # ⚠ CHANGES THE INDEX -- read by `fux ingest`
-# The one table here that changes `.fux/index/`. Changing either key
-# re-extracts every document on the next `fux ingest`, and `--no-tune` does
-# not undo it.
-#
-# max_phrases: how many of a document's headings are committed as its
-#   `phrases` -- what `fux ask` shows as sections. DISPLAY ONLY: ranking reads
-#   every heading regardless. Was a hard-coded 12 until 2026-09-11; at 12,
-#   template headings like `Context` filled the slots.
-# max_table_rows: data rows admitted per table (per SHEET for .xlsx), header
-#   never counted. Rows past it are not indexed and NOT CITABLE. Raising it
-#   costs query latency: refer splits a table one passage per row, and rescore
-#   is O(passages) -- ~63 ms/doc/query at 500 rows, ~2.6 s at 20 000.
-max_phrases    = {DEFAULT_MAX_PHRASES}
-max_table_rows = {DEFAULT_MAX_TABLE_ROWS}
-
-[priority]
-# ⚠ THE ONE TABLE THAT STAYS COMMENTED, and not for consistency's sake: these
-# are not tunables with defaults. A key is a multiplicative weight per SOURCE
-# ENTRY, exactly as it appears in .fux/sources/dirs or .fux/sources/urls, so
-# an uncommented line here would silently REWEIGHT YOUR CORPUS rather than
-# restate a default. Anything unlisted is 1.0 -- an empty table IS the
-# default. When two entries both match, the LONGER one wins.
-#
-# Either direction is allowed and fux states the cost rather than clamping it.
-# Two values are refused, and neither is a preference being denied: a negative
-# weight inverts the ordering, and zero means EXCLUDE -- which already has a
-# home, the `!` prefix in .fux/sources/.
-#"docs/"   = 1.5
-#"vendor/" = 0.3
-"""
+    return template_text()

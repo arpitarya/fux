@@ -58,7 +58,12 @@ sys.path.insert(0, str(ROOT / "src"))
 from fux.ingest import pii as pii_mod  # noqa: E402
 from fux.ingest.extract import _headings_and_body  # noqa: E402
 from fux.ingest.parse import parse_document  # noqa: E402
-from fux.query.bm25f import FIELD_WEIGHTS, derive_wlen  # noqa: E402
+from fux.query.bm25f import derive_wlen  # noqa: E402
+from fux.tune import load as _load_tune  # noqa: E402
+
+#: The template's scoring — L12 left no copy in code (W-225).
+DEFAULT_SCORING = _load_tune(Path('.'), enabled=False).scoring
+FIELD_WEIGHTS = DEFAULT_SCORING.weights
 from fux.query.tokenize import tokenize  # noqa: E402
 from fux.store import TF_FIELDS, reader  # noqa: E402
 
@@ -145,7 +150,7 @@ def rank_arms(rung_dir: Path, rows: list[dict], queries: list[dict], k: int = 10
     final order. That is deliberate: the proposal's claim is about length
     normalisation, and folding three other priors in would measure their sum.
     """
-    from fux.query.bm25f import DEFAULT_SCORING, score_record
+    from fux.query.bm25f import score_record
     from fux.query.scan import query_term_hashes
 
     records = [r for r in reader.read_index(rung_dir).values() if r.get("loc")]
@@ -229,7 +234,7 @@ def prose_probes(rung_dir: Path, rows: list[dict], threshold: float,
     judgement this endpoint exists to avoid. Terms are taken in sorted order so
     the probe set is byte-identical on every run.
     """
-    from fux.query.bm25f import DEFAULT_SCORING, score_record
+    from fux.query.bm25f import score_record
     from fux.query.scan import query_term_hashes
 
     records = [r for r in reader.read_index(rung_dir).values() if r.get("loc")]
@@ -285,7 +290,7 @@ def prose_probes(rung_dir: Path, rows: list[dict], threshold: float,
 
 
 def run_prose_probes(rung_dir: Path, rows: list[dict], threshold: float, dilute: int = 0):
-    from fux.query.bm25f import DEFAULT_SCORING, score_record
+    from fux.query.bm25f import score_record
     from fux.query.scan import query_term_hashes
 
     probes, records, _df_all = prose_probes(rung_dir, rows, threshold, dilute=dilute)

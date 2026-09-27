@@ -11,6 +11,7 @@ from fux.derive import format as fmt
 from fux.errors import FuxError
 from fux.graph import plane as plane_mod
 from fux.store import term_hash, write_index
+from l12_fixtures import write_config
 
 
 def _rec(doc_id, title, terms, edges=()) -> dict:
@@ -40,6 +41,7 @@ def corpus(tmp_path):
             _rec("file:c.md", "C", {term_hash("beta"): [1, 1]}),
         ],
     )
+    write_config(tmp_path)
     build(tmp_path)
     return tmp_path
 
@@ -107,6 +109,7 @@ def test_a_stale_plane_is_refused_rather_than_answered_from(corpus):
                  [{"kind": "ref", "dst": "file:c.md", "grade": 10}]),
         ],
     )
+    write_config(corpus)
     with pytest.raises(FuxError, match="stale"):
         plane_mod.load(corpus)
     # ...and the remedy the message names actually works.

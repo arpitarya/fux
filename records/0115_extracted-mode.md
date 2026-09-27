@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-19
 amended: 2026-09-15
 feature: the `extracted` ingest mode — the value in every committed record's `mode` property, and the contract it asserts
-owns: [src/fux/ingest/extract.py@b3531c00cfdb]
+owns: [src/fux/ingest/extract.py@0c6056aca082]
 laws: [L1, L2, L3, L4]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: a1068c9d2687da907b64685b2d62a5b7662797024328a5559abe7d9b1c9ba390
+content_sha: 4899daae6bf1195766e073835611d68b111c75be0f07119ab2a2c7001f65ef01
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -317,6 +317,18 @@ re-extraction is owed for an edit to how they are taken.
 body, analyzed by the shared analyzer and sorted on their hashes. No model and
 no corpus-wide input touches them; on this repo, full, delta and a second full
 ingest produced one index hash.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `src/fux/ingest/extract.py` — `RULES_VERSION` ← `[versions] extract_rules`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

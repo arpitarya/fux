@@ -4,6 +4,7 @@ import pytest
 
 from fux.errors import FuxError
 from fux.store.collisions import CollisionTracker
+from l12_fixtures import write_config
 
 
 def test_distinct_terms_get_distinct_hashes():
@@ -67,6 +68,7 @@ def test_real_term_hash_produces_distinct_postings_keys_through_hash_terms(tmp_p
         {"id": "file:b.md", "src": "git", "loc": "b.md", "mode": "extracted", "terms": doc2_terms},
     ]
     write_index(tmp_path, records)
+    write_config(tmp_path)
     from fux.store.reader import read_index
 
     got = read_index(tmp_path)

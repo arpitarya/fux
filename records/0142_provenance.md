@@ -12,7 +12,7 @@ owns: [src/fux/query/provenance.py@e6a6a65d7048]
 laws: [L1, L3, L4, L8]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 39ba160bfe7ccfb61a6ed31ae096da2d66c74159cdce340454a36fdf9f2dab1d
+content_sha: ef3a033b3c5d77d8a602be246a3e02e5eba942cb387acb46ad9d18ade4215ed9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -514,6 +514,15 @@ cites it: *a second query against one document, never a tax on the first.*
 and the only two ways to get one are this field or a BM25F implementation in the
 browser. The second is a second ranker. **That is the shape every future panel
 takes: add the field to the engine's own output, or do not show the number.**
+
+<!-- L12-NOTE-START -->
+
+**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** A receipt's config digest is unchanged in
+form; what changed is that a tree with no `.fux/tune.toml` can no longer rank at
+all, so `verify` on such a tree reports `drifted:config` before it looks for an
+index.
+
+<!-- L12-NOTE-END -->
 
 <!-- L12-VALUES-START -->
 

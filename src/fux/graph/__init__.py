@@ -333,8 +333,15 @@ def cmd_path(args) -> int:
     # `--hops` bounds the search and stays a CLI argument; `hop_decay` only
     # orders what the search found. See `walk.routes` for why the boundary is
     # there rather than one step over.
+    tune = _tune_for(root, args)
     found, truncated = routes(
-        plane.graph, src, dst, hops=args.hops, hop_decay=_tune_for(root, args).hop_decay
+        plane.graph,
+        src,
+        dst,
+        hops=args.hops,
+        limit=tune.path_limit,
+        hop_decay=tune.hop_decay,
+        budget=walk_mod.EXPANSION_BUDGET,
     )
 
     if args.json:

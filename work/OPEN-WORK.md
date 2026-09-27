@@ -33,7 +33,7 @@ here. Read that record before changing anything below it.
 ### fux build
 
 - 🟢 **W-168** · `agent` — the ranking ideas. **Step 4 (abbreviations) SHIPPED 2026-09-27** at `mined_weight = 0.5` (`8d401423`). Next: a fresh prompt-4 session rebuilds the eight rungs for generation 3. [detail](open/W-168-search-improvements.md)
-- 🟢 **W-225** · `agent` — L12 migration, building. Stage 1 landed (`constants.toml`, fixed names); R7–R10 ruled strict. Next: `tune.toml` without fallback. [detail](open/W-225-values-live-in-config.md)
+- 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–2 landed (`constants.toml`; `tune.toml` strict + `doctor --fix`). Next: `fux.toml` + `output.toml`. [detail](open/W-225-values-live-in-config.md)
 
 
 ### testing

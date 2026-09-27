@@ -20,6 +20,7 @@ from fux import decode
 from fux.errors import FuxError
 from fux.ingest import sourcelist
 from fux.ingest import ingestlog
+from l12_fixtures import configured_root
 
 
 def _consumer(root, stem, body):
@@ -146,8 +147,8 @@ def test_decode_is_decode_with_plus_an_extension_lookup():
     same body, so a change to `bound_root` or to the failure split reaches both.
     """
     raw = b"a,b\n1,2\n"
-    by_extension = decode.decode(raw, "docs/t.csv")
-    by_name = decode.decode_with(decode.decoder_named("csv"), raw, "docs/t.csv")
+    by_extension = decode.decode(raw, "docs/t.csv", root=configured_root())
+    by_name = decode.decode_with(decode.decoder_named("csv"), raw, "docs/t.csv", configured_root())
     assert by_extension == by_name is not None
 
 

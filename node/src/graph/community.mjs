@@ -5,8 +5,9 @@
  * one entry.
  */
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
+import { fixed } from "../config/constants.mjs";
 
-export const MAX_SWEEPS = 20;
+export const MAX_SWEEPS = fixed("graph", "community_max_sweeps");
 
 /** Rename raw labels to `c0`, `c1`, … by (size desc, smallest member).
  *  Without this, a community's id is whichever node won the propagation —

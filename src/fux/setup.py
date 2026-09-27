@@ -829,6 +829,155 @@ def template_bytes(name: str) -> bytes:
         ) from exc
 
 
+# -- L12: every config file carries every key ----------------------------------
+#
+# SR-LAW-12 decision 3: a missing key is an error, and `fux setup` and `fux
+# doctor --fix` are the only writers of one. What they write is the TEMPLATE's
+# line for that key, with the comment lines directly above it, inserted at the
+# end of its table — so a consumer's edits, comments and order all survive, and
+# nothing the consumer already set is ever touched.
+
+
+def _mandatory_config() -> "tuple[tuple[str, str], ...]":
+    """`(repo-relative path, template text)` for every file L12 makes mandatory.
+
+    A function, not a table of literals: each template is read from the one
+    module that owns its file, so this list cannot state a value of its own.
+    """
+    from . import tune as tune_mod
+
+    return ((tune_mod.TUNE_NAME, tune_mod.template_text()),)
+
+
+_HEADER = re.compile(r"^\s*\[(?P<name>[^\[\]]+)\]\s*(#.*)?$")
+_KEY = re.compile(r"^\s*(?P<key>\"[^\"]+\"|[A-Za-z0-9_-]+)\s*=")
+
+
+def _template_keys(template: str) -> "list[tuple[str, str, list[str]]]":
+    """`(table, key, lines)` for every LIVE key the template declares, in order.
+
+    `lines` is the key's own line plus the comment block directly above it —
+    what a person reading the inserted key needs to know why it is set.
+    """
+    out: list[tuple[str, str, list[str]]] = []
+    table = ""
+    comment: list[str] = []
+    for line in template.split("\n"):
+        header = _HEADER.match(line)
+        if header:
+            table, comment = header.group("name").strip(), []
+            continue
+        stripped = line.strip()
+        if stripped.startswith("#"):
+            comment.append(line)
+            continue
+        key = _KEY.match(line)
+        if key and table:
+            out.append((table, key.group("key").strip('"'), [*comment, line]))
+        comment = []
+    return out
+
+
+def _has(data: dict, table: str, key: str) -> bool:
+    node: object = data
+    for part in table.split("."):
+        if not isinstance(node, dict) or part not in node:
+            return False
+        node = node[part]
+    return isinstance(node, dict) and key in node
+
+
+def missing_config_keys(text: str, template: str) -> "list[tuple[str, str]]":
+    """`(table, key)` the template declares and `text` does not carry."""
+    import tomllib
+
+    data = tomllib.loads(text) if text.strip() else {}
+    return [(t, k) for t, k, _ in _template_keys(template) if not _has(data, t, k)]
+
+
+def fill_config_text(text: str, template: str) -> str:
+    """`text` with every key it is missing inserted from `template`.
+
+    Each missing key lands at the end of its own table's block, in template
+    order; a table the file does not have is appended with the template's header
+    line. Nothing already in `text` is changed or reordered.
+    """
+    import tomllib
+
+    data = tomllib.loads(text) if text.strip() else {}
+    headers = {
+        _HEADER.match(line).group("name").strip(): line
+        for line in template.split("\n")
+        if _HEADER.match(line)
+    }
+    lines = text.split("\n") if text else []
+    for table, key, snippet in _template_keys(template):
+        if _has(data, table, key):
+            continue
+        at = _table_end(lines, table)
+        if at is None:
+            while lines and not lines[-1].strip():
+                lines.pop()
+            lines += (["", headers[table]] if lines else [headers[table]]) + snippet
+        else:
+            lines[at:at] = snippet
+        data = tomllib.loads("\n".join(lines))
+    out = "\n".join(lines)
+    return out if out.endswith("\n") else out + "\n"
+
+
+def _table_end(lines: "list[str]", table: str) -> "int | None":
+    """The index just past `[table]`'s last non-blank line, or `None` if absent."""
+    start = None
+    for i, line in enumerate(lines):
+        header = _HEADER.match(line)
+        if header and header.group("name").strip() == table:
+            start = i
+            break
+    if start is None:
+        return None
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if _HEADER.match(lines[j]):
+            end = j
+            break
+    while end > start + 1 and not lines[end - 1].strip():
+        end -= 1
+    return end
+
+
+def fill_missing(root: Path) -> "list[str]":
+    """Write every missing config file and key from its template. Returns what moved.
+
+    The one writer of a missing key (L12 decision 3), shared by `fux setup` and
+    `fux doctor --fix`. An absent file is written whole; a present one gains
+    only the keys it lacks. Each entry of the result reads
+    `<path>: [table] key`, or `<path>: written`.
+    """
+    import tomllib
+
+    changed: list[str] = []
+    for rel, template in _mandatory_config():
+        path = root / rel
+        if not path.is_file():
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(template, encoding="utf-8")
+            changed.append(f"{rel}: written")
+            continue
+        text = path.read_bytes().decode("utf-8-sig")
+        try:
+            missing = missing_config_keys(text, template)
+        except tomllib.TOMLDecodeError:
+            # A file that does not parse cannot be filled without guessing
+            # what its author meant; its own `loads` check names the fault.
+            continue
+        if not missing:
+            continue
+        path.write_text(fill_config_text(text, template), encoding="utf-8")
+        changed += [f"{rel}: [{table}] {key}" for table, key in missing]
+    return changed
+
+
 def decoder_source(name: str) -> bytes:
     """One built-in decoder's source, read out of the installed package.
 

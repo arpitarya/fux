@@ -20,7 +20,7 @@ import { Confidence, GROUNDED, NONE, PARTIAL, WEAK } from "../src/query/confiden
 /** A block with everything healthy except what the caller overrides. */
 const block = (over = {}) => new Confidence({
   coverage: 1.0, separation: 0.5, support: 3, verified: "unverified",
-  missing: [], docCoverage: 1.0, ...over,
+  missing: [], docCoverage: 1.0, separationFloor: 0.1, docCoverageFloor: 0.0, ...over,
 });
 
 test("the band is first-true-wins, in the same order as Python", () => {

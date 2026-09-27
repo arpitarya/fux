@@ -24,6 +24,7 @@ import pytest
 
 from fux import doctor
 from fux.ingest import ingestlog as provenance
+from l12_fixtures import write_config
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -34,6 +35,7 @@ def _repo(tmp_path) -> Path:
     (fux / "sources").mkdir(parents=True, exist_ok=True)
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
+    write_config((fux).parent)
     (tmp_path / "docs").mkdir(exist_ok=True)
     return tmp_path
 

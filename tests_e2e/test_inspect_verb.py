@@ -36,6 +36,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from l12_fixtures import write_config
 
 #: On every document. Nonsense on purpose: a real word would collide with the
 #: prose below and the plant would stop being the only term at `df == n`.
@@ -87,6 +88,7 @@ def _planted(root: Path) -> None:
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
     (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(root)
     docs = root / "docs"
     docs.mkdir()
 
@@ -314,6 +316,7 @@ def test_inspect_refuses_nothing_and_reports_when_there_is_no_index(tmp_path):
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True, capture_output=True)
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     result = _run(tmp_path, "inspect", check=False)
     assert result.returncode == 1
     assert "fux ingest" in result.stderr
@@ -341,6 +344,7 @@ def test_the_dictionary_never_names_a_value_pii_toml_redacts(tmp_path):
     (tmp_path / ".fux" / "pii.toml").write_text(
         '[[rule]]\nname = "secret"\npattern = "hunter2zzz"\n', encoding="utf-8"
     )
+    write_config(tmp_path)
     docs = tmp_path / "docs"
     docs.mkdir()
     # In the body, and in the frontmatter title -- the third source of

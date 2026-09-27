@@ -7,10 +7,10 @@ description: "BM25F is a bag of words and cannot see where terms are. The rerank
 status: accepted
 date: 2026-08-24
 feature: proximity reranking over the refer plane's passages, and the refusal that bounds it
-owns: [src/fux/query/rerank.py@8b1cb07cd968, node/src/query/rerank.mjs@02ad7272e078]
+owns: [src/fux/query/rerank.py@889da1adc179, node/src/query/rerank.mjs@03c58b47b2e8]
 laws: [L1, L3, L4]
 timestamp: 2026-08-24T00:00:00Z
-content_sha: f804a08f634c0df86c803b41c836c0309531bbc4b11412bb703ba49ed56ca0c6
+content_sha: bf14c000ee5e9e59d0b8186dfb8588f943211c3cac86c7b021c416bac1f48dad
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -173,7 +173,8 @@ against a frozen bar of `net >= +2, broken <= 1`. **Met, decisively. It does not
 flip.**
 
 ⚠ **Because the `+4` is an `informed` number by this project's own rule.** The
-`WEIGHT` and `COVERAGE_POWER` constants were chosen from a 4×5 sweep over the 50
+weight and coverage power (`[ranking] rerank_weight` and `rerank_coverage_power`
+since L12) were chosen from a 4×5 sweep over the 50
 goldens — **retriever settings authored with the evaluation in hand**, which is
 [SR-RS](0133_predictions.md) decision 11's own example of an informed artifact,
 and decision 12 says an informed run **never supplies a delta**.
@@ -205,7 +206,8 @@ see [SR-REFER](0127_refer-plane.md) decision 18 and
 **9. `passage_boost` has a SECOND caller, and it is one constant, not two.**
 `refer/_rescore.py` multiplies each fetched passage's BM25 score by
 `1 + weight * passage_boost(...)` — the same expression `rerank()` applies to
-documents, over the same `analyze()` token stream, the same `COVERAGE_POWER`,
+documents, over the same `analyze()` token stream, the same `[ranking]`
+proximity values (`Tune.proximity`),
 and the same bounded multiplicative shape (decision 3).
 
 **The two are the same object by construction.** `boost()` already chunks a

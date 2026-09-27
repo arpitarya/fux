@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@645f3c41f5d8, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@14ddec87d73b, tools/vector-gate@0023bff0cdef]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 036cdda5847549218335acf172758c3ed527c2ae2e26163c0174a764594cd528
+content_sha: 6e7ec76049f84f25ca51a6f510b56cf2ef5537bc95a757e8346437ba873c714e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -720,7 +720,7 @@ one (W-82 ruling 8).
 - ✅ **RULED by Arpit 2026-08-28: the VERDICT TABLE governs.** A crossing that
   is non-monotone is *"too noisy to read → no change"*, and the selection rule
   applies **only once the verdict table has been satisfied**. So on R10's curve
-  the answer is **no change** — `SEPARATION_FLOOR` stays `0.10`.
+  the answer is **no change** — `separation_floor` stays `0.1`.
 - **The rule going forward, now settled:** *a verdict table outranks a selection
   rule.* A selection rule says **which value** to take; a verdict table says
   **whether a value may be taken at all**, and reading the first without

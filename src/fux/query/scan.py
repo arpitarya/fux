@@ -27,7 +27,7 @@ from pathlib import Path
 from .. import store as store_mod
 from .rank import AskResult, Corpus, rank
 from ..store import TF_FIELDS
-from .bm25f import DEFAULT_SCORING, Scoring, derive_wlen
+from .bm25f import Scoring, derive_wlen
 from .tokenize import tokenize
 
 #: W-168 step 1 — one `ref` edge's anchor length and its target, off the raw
@@ -80,7 +80,7 @@ def query_term_hashes(query: str) -> list[str]:
 
 
 def scan_candidates(
-    root: Path, query_hashes: list[str], *, scoring: Scoring = DEFAULT_SCORING
+    root: Path, query_hashes: list[str], *, scoring: Scoring
 ) -> tuple[list[dict], dict[str, int], Corpus]:
     """The B2 pass: candidate records, `df`, and the corpus statistics.
 
@@ -246,11 +246,11 @@ def _add_anchor_only_candidates(
 def ask(
     root: Path,
     query: str,
-    top: int = 5,
+    top: int,
     *,
     archived_dirs: frozenset[str] = frozenset(),
     weighting=None,
-    scoring: Scoring = DEFAULT_SCORING,
+    scoring: Scoring,
     stats_out: dict | None = None,
     expansion=None,
 ) -> list[AskResult]:

@@ -44,6 +44,13 @@ edge_kinds      = ["ref", "tag", "code", "supersedes"]
 grade_extracted = 10
 grade_ambiguous = 8
 grade_inferred  = 6
+# `fux path`'s WORK bound -- node expansions per search. Not tunable, by ruling
+# (Arpit, 2026-09-14): a tune file that widened it would make `--hops 2` mean
+# different things in two repos. Exceeding it is REPORTED, never absorbed.
+path_expansion_budget = 200000
+# The community sweep cap. Runs in `fux build`, which reads no tune table, so
+# it is the algorithm's bound rather than a knob.
+community_max_sweeps  = 20
 
 # -- Configuration files the engine reads ------------------------------------
 # The NAMES of the consumer's files. Their contents are the consumer's; where
@@ -260,3 +267,18 @@ digest_alg     = "blake2b-160"
 [serve]
 # Localhost only is a law-level choice (SR-SERVE), not a knob.
 host = "127.0.0.1"
+
+# -- Templates `fux setup` writes (src/fux/templates/) -------------------------
+
+[templates]
+tune = "tune.toml.txt"
+
+[fuse]
+# Reciprocal-rank fusion's k (Cormack et al. 2009) -- a published constant,
+# deliberately not a tune key.
+rrf_k = 60
+
+[versions]
+# ingest/extract.py's RULES_VERSION -- bump when what extraction RETURNS moves;
+# the next `fux ingest` then re-extracts the corpus. History: ingest/extract.py.
+extract_rules = 3

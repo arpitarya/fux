@@ -14,6 +14,7 @@ from pathlib import Path
 import pytest
 
 from fux.ingest import register
+from l12_fixtures import write_config
 
 
 def _repo(tmp_path: Path) -> Path:
@@ -22,6 +23,7 @@ def _repo(tmp_path: Path) -> Path:
     (fux / "sources").mkdir(parents=True)
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
+    write_config((fux).parent)
     docs = tmp_path / "docs"
     docs.mkdir()
     (docs / "a.md").write_text("# A\n\nthe rota hands over Monday\n", encoding="utf-8")

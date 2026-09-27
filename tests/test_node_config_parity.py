@@ -21,6 +21,7 @@ W-107 R5 / SR-NODE-SEARCH decision 8.
 
 from __future__ import annotations
 
+from l12_fixtures import template_tune
 import json
 import re
 import subprocess
@@ -90,63 +91,72 @@ def test_the_node_tune_schema_is_the_python_one():
         assert spelled == list(keys), f"[{table}] key set differs from tune.py"
 
 
-@pytest.mark.parametrize(
-    "js, py",
-    [
-        ("k1 = K1", "k1"),
-        ("anchorWeight = ANCHOR", "anchor_weight"),
-        ("rerankWeight = 0.0", "rerank_weight"),
-        ("expandWeight = 0.2", "expand_weight"),
-        ("minedWeight = MINED_WEIGHT", "mined_weight"),
-        ("damping = 0.85", "damping"),
-        ("iterations = 3", "iterations"),
-        ("laziness = 0.5", "laziness"),
-        ("hopDecay = 0.5", "hop_decay"),
-        ("expandLimit = 10", "expand_limit"),
-        ("seedDepth = 5", "seed_depth"),
-        ("budget = 8000", "budget"),
-        ("perDocFraction = 0.5", "per_doc_fraction"),
-        ("minPassageBytes = 120", "min_passage_bytes"),
-        ("maxPassageBytes = 4000", "max_passage_bytes"),
-    ],
-)
-def test_every_tune_default_is_spelled_the_same_on_both_sides(js, py):
-    """The defaults ARE the answer when the file is absent, which is the common
-    case — so a drifted default is a drifted ranking on an untuned repo."""
-    from fux.tune import DEFAULT_TUNE
-
-    source = _source("config/tune.mjs")
-    assert f"this.{js};" in source, f"`this.{js}` is not in config/tune.mjs any more"
-    written = js.split(" = ", 1)[1]
-    if written.isidentifier():
-        return  # imported from the shared constant, so there is nothing to drift
-    assert float(written) == float(getattr(DEFAULT_TUNE, py)), (
-        f"`{py}` defaults to {getattr(DEFAULT_TUNE, py)!r} in tune.py and {written} in Node"
+def _node_tune(root: Path, enabled: bool) -> dict:
+    """Node's resolved `Tune` for `root`, as JSON — or `{"error": message}`."""
+    url = (NODE_SRC / "config" / "tune.mjs").as_uri()
+    script = (
+        f"import({json.dumps(url)}).then(m => {{"
+        f" try {{ process.stdout.write(JSON.stringify(m.loadTune({json.dumps(str(root))},"
+        f" {{ enabled: {'true' if enabled else 'false'} }}))); }}"
+        " catch (e) { process.stdout.write(JSON.stringify({ error: e.message })); } })"
     )
+    out = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True)
+    return json.loads(out.stdout)
 
 
-@pytest.mark.parametrize("name", ["K1", "B", "ANCHOR"])
-def test_the_bm25f_constants_are_the_same_number_on_both_sides(name):
-    """`k1 = K1` above returns early because it is an identifier — so the
-    constant itself is compared here, or the Node default could drift while the
-    spelling test passed. `ANCHOR` is W-168 step 1's measured `1.0`."""
-    from fux.query import bm25f
-
-    source = _source("query/bm25f.mjs")
-    found = re.search(rf"^export const {name} = ([0-9.]+);", source, re.M)
-    assert found, f"no `export const {name}` in query/bm25f.mjs"
-    assert float(found.group(1)) == float(getattr(bm25f, name))
+def _camel(name: str) -> str:
+    head, *rest = name.split("_")
+    return head + "".join(part.title() for part in rest)
 
 
-def test_the_mined_weight_default_is_the_same_number_on_both_sides():
-    """`minedWeight = MINED_WEIGHT` above returns early because it is an
-    identifier, so the constant is compared here. W-168 step 4's measured `0.5`."""
-    from fux.query import mined
+def test_both_readers_resolve_the_template_to_the_same_tune(tmp_path):
+    """Since L12 there is no default to spell twice: both readers read the SAME
+    template file, and this checks they read it to the same values, field by
+    field — the property the old spelling tests only approximated."""
+    import dataclasses
 
-    source = _source("query/mined.mjs")
-    found = re.search(r"^export const MINED_WEIGHT = ([0-9.]+);", source, re.M)
-    assert found, "no `export const MINED_WEIGHT` in query/mined.mjs"
-    assert float(found.group(1)) == float(mined.MINED_WEIGHT) == 0.5
+    from fux.tune import load
+
+    py = dataclasses.asdict(load(tmp_path, enabled=False))
+    node = _node_tune(tmp_path, enabled=False)
+    assert "error" not in node, node
+    for field, value in py.items():
+        got = node[_camel(field)]
+        if isinstance(value, tuple):
+            value = [list(v) if isinstance(v, tuple) else v for v in value]
+        assert got == value, f"`{field}`: Python {value!r}, Node {got!r}"
+
+
+def test_both_readers_name_a_missing_key_in_the_same_words(tmp_path):
+    """L12 decision 4's other half: the SAME error, not merely an error."""
+    from fux.errors import FuxError
+    from fux.tune import load, template_text
+
+    path = tmp_path / ".fux" / "tune.toml"
+    path.parent.mkdir(parents=True)
+    path.write_text(
+        "\n".join(l for l in template_text().splitlines() if not l.startswith("mined_weight")),
+        encoding="utf-8",
+    )
+    with pytest.raises(FuxError) as exc:
+        load(tmp_path, enabled=True)
+    node = _node_tune(tmp_path, enabled=True)
+    py_lines = str(exc.value).splitlines()[1:]
+    node_lines = node["error"].splitlines()[1:]
+    assert py_lines == node_lines == [
+        "  [ranking] mined_weight is missing",
+        "  `fux doctor --fix` writes every missing key from the template `fux setup` uses",
+    ]
+
+
+def test_both_readers_name_a_missing_file_in_the_same_words(tmp_path):
+    from fux.errors import FuxError
+    from fux.tune import load
+
+    with pytest.raises(FuxError) as exc:
+        load(tmp_path, enabled=True)
+    node = _node_tune(tmp_path, enabled=True)
+    assert node["error"] == str(exc.value).replace(str(tmp_path / ".fux" / "tune.toml"), f"{tmp_path}/.fux/tune.toml")
 
 
 # -- .fux/output.toml --------------------------------------------------------

@@ -17,10 +17,9 @@
  */
 import { headings } from "../decode/markdown.mjs";
 
-export const MIN_PASSAGE_BYTES = 120;
-export const MAX_PASSAGE_BYTES = 4000;
-/** Measured 2026-09-06: row-per-passage took hit@1 from 0.229 to 0.875. */
-export const TABLE_ROWS_PER_PASSAGE = 1;
+//: The three passage bounds are `.fux/tune.toml [refer]`'s and arrive from the
+//: caller's `Tune` (L12). Why each is what the template ships — one row per
+//: passage took hit@1 from 0.229 to 0.875 (2026-09-06) — lives beside its key.
 
 const TABLE_ROW_RE = /^\s*\|/;
 const TABLE_SEP_RE = /^\s*\|[\s:|-]+\|?\s*$/;
@@ -86,7 +85,7 @@ function titleIndex(secs) {
  * ⚠ The PARENT's heading survives the fold, with one exception: the document
  * TITLE carries its text but never its name, or `# deck.pptx` ends up cited as
  * the source of slide 1's content. */
-function fold(secs, minPassageBytes = MIN_PASSAGE_BYTES) {
+function fold(secs, minPassageBytes) {
   const out = [];
   let carry = [], carryHeading = "", carryLevel = 0, carryStart = 0;
   const title = titleIndex(secs);
@@ -121,7 +120,7 @@ function fold(secs, minPassageBytes = MIN_PASSAGE_BYTES) {
 
 /** A Markdown table split into row passages, or `null` if not a table.
  *  The header and its separator are repeated into every band. */
-function tableBands(paragraph) {
+function tableBands(paragraph, rowsPerPassage) {
   const lines = paragraph.split("\n");
   if (lines.length < 3) return null;
   for (const line of lines) if (line.trim() && !TABLE_ROW_RE.test(line)) return null;
@@ -133,8 +132,8 @@ function tableBands(paragraph) {
   if (!body.length) return null;
 
   const bands = [];
-  for (let i = 0; i < body.length; i += TABLE_ROWS_PER_PASSAGE) {
-    const rows = body.slice(i, i + TABLE_ROWS_PER_PASSAGE);
+  for (let i = 0; i < body.length; i += rowsPerPassage) {
+    const rows = body.slice(i, i + rowsPerPassage);
     bands.push([[...prefix, ...rows].join("\n"), rows.length]);
   }
   if (bands.length < 2) return null;   // nothing gained; leave it ordinary
@@ -188,7 +187,7 @@ function descend(paragraph, maxPassageBytes) {
 /** `[piece, lineOffset, sourceLines, rung]` — the oversized split.
  *  `sourceLines` is tracked separately from a piece's own line count because a
  *  banded table repeats its header: the band holds more lines than it covers. */
-function pieces(text, maxPassageBytes = MAX_PASSAGE_BYTES) {
+function pieces(text, maxPassageBytes, tableRowsPerPassage) {
   const out = [];
   let cursor = 0, current = [], size = 0;
 
@@ -206,7 +205,7 @@ function pieces(text, maxPassageBytes = MAX_PASSAGE_BYTES) {
     // ⚠ Tables split at EVERY size, not only when oversized. A ten-row table
     // is ten answers, and it simply never crossed the byte ceiling to be
     // noticed — that was the coarse-citation defect.
-    const bands = tableBands(paragraph);
+    const bands = tableBands(paragraph, tableRowsPerPassage);
     if (bands !== null) {
       if (current.length) {
         const [head, span] = bands[0];
@@ -238,15 +237,11 @@ function pieces(text, maxPassageBytes = MAX_PASSAGE_BYTES) {
  *  `lineNumbers=false` suppresses the range for a document whose text was
  *  GENERATED rather than read — a `.docx`'s Markdown exists nowhere on disk,
  *  so a line number would be a confident lie. */
-export function chunk(content, {
-  minPassageBytes = MIN_PASSAGE_BYTES,
-  maxPassageBytes = MAX_PASSAGE_BYTES,
-  lineNumbers = true,
-} = {}) {
+export function chunk(content, { minPassageBytes, maxPassageBytes, tableRowsPerPassage, lineNumbers }) {
   const merged = fold(sections(content), minPassageBytes);
   const passages = [];
   for (const [heading, , text, start, end] of merged) {
-    for (const [piece, offset, span, rung] of pieces(text, maxPassageBytes)) {
+    for (const [piece, offset, span, rung] of pieces(text, maxPassageBytes, tableRowsPerPassage)) {
       const pieceStart = start + offset;
       passages.push({
         heading,

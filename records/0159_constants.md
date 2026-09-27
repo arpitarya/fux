@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@16ce90ea5cd8]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@6ed0ada8517b]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 1835615012d151b7aaaa086b5362f1ee141177cb3aeee9a588949fd97d09c82f
+content_sha: 80f3779884803a58c910c08fa289321896914be8ec2798cab29969a6418c1846
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -18,9 +18,9 @@ ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-
 
 **Owns** — the components this record decides:
 
-- `node/src/config/constants.mjs` · file
-- `src/fux/constants.py` · file
-- `src/fux/constants.toml` · file
+- [`node/src/config/constants.mjs`](../node/src/config/constants.mjs) · file
+- [`src/fux/constants.py`](../src/fux/constants.py) · file
+- [`src/fux/constants.toml`](../src/fux/constants.toml) · file
 
 <!-- COMPONENTS-END -->
 
@@ -90,8 +90,13 @@ algorithm defines.
 
 1. **One file, `src/fux/constants.toml`, holds every fixed engine value.** It is
    organised in tables by subject — `[index]`, `[graph]`, `[files]`,
-   `[runtime]`, `[decoders.<name>]`, `[receipt]`, … — and each key carries the
-   comment that explains it. The explanation of *why a value is what it is*
+   `[runtime]`, `[decoders.<name>]`, `[receipt]`, `[fuse]`, `[versions]`,
+   `[templates]`, … — and each key carries the comment that explains it. Three
+   of its values are algorithm bounds a record already ruled NOT tunable, which
+   is what makes them fixed rather than a `tune.toml` key: `fux path`'s work
+   budget (`[graph] path_expansion_budget`), the community sweep cap that runs
+   in `fux build` (`[graph] community_max_sweeps`), and RRF's published `k`
+   (`[fuse] rrf_k`). The explanation of *why a value is what it is*
    stays beside the code that uses it.
 
 2. **Two loaders, one sentence.** [`src/fux/constants.py`](../src/fux/constants.py)

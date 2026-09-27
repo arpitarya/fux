@@ -19,6 +19,7 @@ from pathlib import Path
 import pytest
 
 from fux.maintain import runner as runner_mod
+from l12_fixtures import write_config
 
 DRIVER = shutil.which("fux-merge-index")
 
@@ -100,6 +101,7 @@ def make_repo(path: Path, *, hooks: bool) -> str:
     (path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(path)
     # aa.md and gr.md land in the SAME shard, so an edit to each produces
     # adjacent changed lines — which is exactly what a textual merge cannot do.
     (path / "docs" / "aa.md").write_text(doc("aa one"), encoding="utf-8")

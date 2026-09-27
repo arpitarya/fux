@@ -3,19 +3,20 @@
  * Owned, with its Python twin, by [SR-EXPAND](../../../records/0149_expand.md).
  */
 import { pyRound9, cmpCodePoints } from "../compat/pyfloat.mjs";
+import { fixed } from "../config/constants.mjs";
 
 /** Cormack et al. 2009's constant. **Not tuned here and not a tune.toml key** —
  *  a knob on it would be a knob on a published constant measured on TREC
  *  collections, with nothing in this repo able to beat it at 10 documents. */
-export const K = 60;
+export const K = fixed("fuse", "rrf_k");
 
 /** `id -> fused score`, from ranked id lists. Rank 0 is best.
  *  A document absent from a list contributes nothing — **not a penalty**. */
-export function rrf(rankLists, k = K) {
+export function rrf(rankLists) {
   const scores = {};
   for (const ranks of rankLists) {
     for (let i = 0; i < ranks.length; i++) {
-      scores[ranks[i]] = (scores[ranks[i]] ?? 0.0) + 1.0 / (k + i + 1);
+      scores[ranks[i]] = (scores[ranks[i]] ?? 0.0) + 1.0 / (K + i + 1);
     }
   }
   return scores;
@@ -27,11 +28,11 @@ export function rrf(rankLists, k = K) {
  * `title` and `archived` are a real document's view, not a merge of several.
  * Only `score` is replaced. Ordered by the same key `rank()` uses, so a fused
  * list is as reproducible as an unfused one. */
-export function fuseResults(resultLists, top, k = K) {
+export function fuseResults(resultLists, top) {
   if (!resultLists.length) return [];
   if (resultLists.length === 1) return resultLists[0].slice(0, top);
 
-  const scores = rrf(resultLists.map((rs) => rs.map((r) => r.id)), k);
+  const scores = rrf(resultLists.map((rs) => rs.map((r) => r.id)));
 
   const bestSeen = new Map();
   for (const results of resultLists) {

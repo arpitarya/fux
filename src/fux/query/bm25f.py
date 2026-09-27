@@ -9,7 +9,7 @@ omits trailing zeros and 92.5 % of postings are body-only — see `TF_FIELDS`.
 
 The length normaliser is a **weighted** sum of per-field token counts:
 
-    wlen = sum_i  FIELD_WEIGHTS[i] * flen[i]
+    wlen = sum_i  weights[i] * flen[i]
 
 Until 2026-08-23 that sum was computed at ingest and **committed** as `wlen`,
 which made a committed field a function of a tunable — the violation
@@ -30,13 +30,13 @@ this module.
 
 W-168 step 1. A document's anchor terms are the words **other documents use
 when they link to it**, and they are folded in here at read time from
-`Scoring.anchor` — default `0.0`, so an unconfigured corpus does exactly the
-arithmetic it did before the field existed.
+`Scoring.anchor` — `0.0` turns it off, and off does exactly the arithmetic
+the engine did before the field existed.
 
 🔴 **It is deliberately outside the `weights`/`TF_FIELDS` tuple.** The five
 are *committed* fields: each has an entry in the record's own `flen`, and the
-index-for-index alignment between `FIELD_WEIGHTS` and `TF_FIELDS` is asserted
-below because a misalignment would weight `title` as `path`. Anchor has no
+index-for-index alignment between `Scoring.weights` and `TF_FIELDS` is asserted
+in `Scoring` because a misalignment would weight `title` as `path`. Anchor has no
 `flen` slot and never enters the committed postings — it is assembled per
 query from the `at` maps on **other documents'** edges. Padding it into the
 aligned tuple would claim a committed field that does not exist, and would
@@ -53,63 +53,6 @@ import math
 from dataclasses import dataclass
 
 from ..store import TF_FIELDS
-
-#: Aligned index-for-index with `store.TF_FIELDS`. The two are asserted equal
-#: in length below because a silent misalignment would weight `title` as
-#: `path` and produce a plausible, wrong ranking.
-#:
-#: `body` and `heading` keep the values the archived engine calibrated (1.0 and
-#: 3.0). `title`, `path` and `ctx` are **new and uncalibrated**: they are set to
-#: defensible starting points, not measured optima, and W-76's Phase 1 gate
-#: (hit@5 / MRR on the 50 goldens) is what has standing to move them.
-FIELD_WEIGHTS: tuple[float, ...] = (1.0, 3.0, 2.0, 1.5, 1.0)
-
-assert len(FIELD_WEIGHTS) == len(TF_FIELDS), "field weights must align with TF_FIELDS"
-
-#: Kept as names so existing callers and records keep reading. They are now
-#: *views* on FIELD_WEIGHTS rather than the source of truth.
-BODY_WEIGHT = FIELD_WEIGHTS[TF_FIELDS.index("body")]
-HEADING_WEIGHT = FIELD_WEIGHTS[TF_FIELDS.index("heading")]
-
-K1 = 1.2
-
-#: 🔴 **`b` is `0.15`, not the literature's `0.75`, and that is MEASURED**
-#: ([W-144](../../../work/regression/2026-09-16-b-sweep-2/VERDICT.md), 2026-09-16).
-#:
-#: `b` is the strength of BM25's length normalisation. At `0.75` a document is
-#: penalised hard for its length — and a **table inflates that length with
-#: tokens that say nothing about the query**, so a document is punished for an
-#: appendix it did not ask to be measured on.
-#:
-#: **The frozen rule was: the FIRST value, descending `0.4 → 0.3 → 0.2 → 0.15`,
-#: that nets positive on both benefit families with every control holding.**
-#: `0.4` moves neither; `0.3` and `0.2` fix the rate-card family and leave the
-#: prose-with-appendix family exactly where `0.75` does; **`0.15` moves both** —
-#: `+30` each, `p = 0.0000` on 30 discordant pairs against a required net of 12,
-#: with `inverse`, `placebo`, `dump` and `verbose` all holding.
-#:
-#: ⚠ **Descending order is what makes it `0.15` and not something lower.** The
-#: rule reports the smallest departure from `0.75` that works, never the best
-#: value, and it stops at the first one.
-#:
-#: ⚠ **One synthetic corpus, `informed`.** 510 generated documents built so the
-#: mechanism *can* move. It says a lower `b` ranks better **on documents shaped
-#: like these** — prose with table appendices, rate cards whose subject is their
-#: rows, data dumps. Real-corpus evidence is W-144's reopen trigger.
-#:
-#: 🔴 **Changing this changes every score in the engine.** The Node twin carries
-#: the same constant and `tests/test_node_config_parity.py` holds the two equal.
-B = 0.15
-
-#: 🔴 **The anchor field's weight — `1.0`, and that is MEASURED.** W-168 step
-#: 1's verdict, ruled PASS by Arpit on 2026-09-24: the first value, ascending,
-#: to clear the frozen table (tagged hit@1 7 wins, 0 losses, p = 0.016; none of
-#: the 41 baseline rank-1 hits lost). ⚠ `informed`, set-3-u only, one
-#: 1 000-document rung — [the verdict](../../../work/regression/2026-09-15-anchor-text/VERDICT.md).
-#: Twin of `query/bm25f.mjs`'s `ANCHOR`; `tests/test_node_config_parity.py`
-#: holds the two equal.
-ANCHOR = 1.0
-
 
 @dataclass(frozen=True)
 class Scoring:
@@ -128,30 +71,27 @@ class Scoring:
     that mistake possible at every call site; one object makes it
     unrepresentable.
 
-    Immutable, and the default instance is shared — a query that sets nothing
-    allocates nothing.
+    Immutable, and built by `tune.Tune.scoring` from `.fux/tune.toml` — the
+    values and why each is what it is live beside their keys in the template
+    `fux setup` writes, never here (L12).
     """
 
-    k1: float = K1
-    b: float = B
-    weights: tuple[float, ...] = FIELD_WEIGHTS
-    #: W-168 step 1 — the anchor field's weight. **Default `ANCHOR` (`1.0`):
-    #: on**, since its PASS on 2026-09-24 (SR-RS decision 19). `0.0` is still
-    #: OFF and is not "weight zero": every anchor branch in the engine tests
-    #: `anchor_on` and is skipped entirely, so a corpus that sets `anchor = 0`
-    #: pays no cost on either candidate path and scores byte-identically to the
-    #: build before anchor text existed.
-    anchor: float = ANCHOR
+    k1: float
+    b: float
+    #: Aligned index-for-index with `store.TF_FIELDS` — asserted in
+    #: `__post_init__`, because a silent misalignment would weight `title` as
+    #: `path` and produce a plausible, wrong ranking.
+    weights: tuple[float, ...]
+    #: W-168 step 1 — the anchor field's weight. `0.0` is OFF and is not
+    #: "weight zero": every anchor branch in the engine tests `anchor_on` and
+    #: is skipped entirely, so a corpus that sets `anchor = 0` pays no cost on
+    #: either candidate path and scores byte-identically to the build before
+    #: anchor text existed.
+    anchor: float
 
-    @property
-    def trivial(self) -> bool:
-        """True when this is the engine default, so callers can skip work."""
-        return (
-            self.k1 == K1
-            and self.b == B
-            and self.weights == FIELD_WEIGHTS
-            and self.anchor == ANCHOR
-        )
+    def __post_init__(self) -> None:
+        if len(self.weights) != len(TF_FIELDS):
+            raise ValueError("field weights must align with TF_FIELDS")
 
     @property
     def anchor_on(self) -> bool:
@@ -165,16 +105,11 @@ class Scoring:
         return self.anchor != 0.0
 
 
-#: The engine defaults. `tune.load()` returns this when `.fux/tune.toml` is
-#: absent, empty, or every key is commented out — the `$0` no-config path.
-DEFAULT_SCORING = Scoring()
-
-
 def idf(df: int, n: int) -> float:
     return math.log((n - df + 0.5) / (df + 0.5) + 1)
 
 
-def weighted_tf(tf: list[int], scoring: Scoring = DEFAULT_SCORING) -> float:
+def weighted_tf(tf: list[int], scoring: Scoring) -> float:
     """The BM25F numerator for one term in one document.
 
     `tf` may be shorter than `weights` — trailing zeros are omitted on the
@@ -190,9 +125,7 @@ def weighted_tf(tf: list[int], scoring: Scoring = DEFAULT_SCORING) -> float:
     return total
 
 
-def derive_wlen(
-    flen: list[int], scoring: Scoring = DEFAULT_SCORING, anchor_len: int = 0
-) -> float:
+def derive_wlen(flen: list[int], scoring: Scoring, anchor_len: int = 0) -> float:
     """The length normaliser, from committed per-field counts and live weights.
 
     **The one place this arithmetic exists.** Four callers need it — ingest's
@@ -222,7 +155,7 @@ def term_contribution(
     df_h: int,
     n: int,
     avg_wlen: float,
-    scoring: Scoring = DEFAULT_SCORING,
+    scoring: Scoring,
 ) -> float:
     """One term's summand — **the only place this arithmetic is written.**
 
@@ -253,7 +186,7 @@ def score_record(
     df: dict[str, int],
     n: int,
     avg_wlen: float,
-    scoring: Scoring = DEFAULT_SCORING,
+    scoring: Scoring,
     term_weights: dict[str, float] | None = None,
     anchor_tf: dict[str, int] | None = None,
     anchor_len: int = 0,

@@ -4,6 +4,7 @@ invariants that refuse to build an accelerator which could disagree with scan.
 
 from __future__ import annotations
 
+from l12_fixtures import scoring, write_config
 import json
 
 import pytest
@@ -52,6 +53,7 @@ def test_build_is_byte_identical_across_runs(tmp_path):
     are the cheap staleness check and cannot be reproducible.
     """
     write_index(tmp_path, _corpus())
+    write_config(tmp_path)
     build(tmp_path)
     first = _snapshot(tmp_path)
     build(tmp_path)
@@ -71,6 +73,7 @@ def _snapshot(root):
 def test_runtime_dir_is_tagged_as_a_cache(tmp_path):
     """SR-DOTFUX: every derived directory carries CACHEDIR.TAG."""
     write_index(tmp_path, _corpus(20))
+    write_config(tmp_path)
     build(tmp_path)
     tag = fmt.runtime_dir(tmp_path) / "CACHEDIR.TAG"
     assert tag.read_text(encoding="ascii").splitlines()[0] == CACHEDIR_SIGNATURE
@@ -83,12 +86,14 @@ def test_rebuild_drops_stale_postings_shards(tmp_path):
     that no longer exist — a wrong answer that looks like a correct one.
     """
     write_index(tmp_path, _corpus(300))
+    write_config(tmp_path)
     build(tmp_path)
     before = {p.name for p in (fmt.runtime_dir(tmp_path) / fmt.POSTINGS_DIR).glob("*.jsonl")}
 
     assert len(before) > 1
 
     write_index(tmp_path, [_rec("file:only.md", "Only", [5], {term_hash("solo"): [0, 1]})])
+    write_config(tmp_path)
     build(tmp_path)
     after = {p.name for p in (fmt.runtime_dir(tmp_path) / fmt.POSTINGS_DIR).glob("*.jsonl")}
 
@@ -107,14 +112,15 @@ def test_stats_match_the_scan_oracle(tmp_path):
     from fux.query.scan import scan_candidates
 
     write_index(tmp_path, _corpus(50))
+    write_config(tmp_path)
     build(tmp_path)
-    _, _, corpus = scan_candidates(tmp_path, [term_hash("common")])
+    _, _, corpus = scan_candidates(tmp_path, [term_hash("common")], scoring=scoring())
 
     stats = json.loads((fmt.runtime_dir(tmp_path) / fmt.STATS_NAME).read_bytes())
     assert stats["n"] == corpus.n
     from fux.query.bm25f import derive_wlen
 
-    assert derive_wlen(list(stats["total_flen"])) == corpus.total_wlen
+    assert derive_wlen(list(stats["total_flen"]), scoring=scoring()) == corpus.total_wlen
 
 
 def test_build_refuses_a_stray_quoted_term_hash(tmp_path):
@@ -127,6 +133,7 @@ def test_build_refuses_a_stray_quoted_term_hash(tmp_path):
     """
     stray = "deadbeefdeadbeef"
     write_index(tmp_path, [_rec("file:a.md", stray, [10], {term_hash("x"): [0, 1]})])
+    write_config(tmp_path)
     with pytest.raises(FuxError, match="outside `terms`"):
         build(tmp_path)
 
@@ -147,6 +154,7 @@ def test_build_refuses_when_regex_flen_disagrees_with_the_parse(tmp_path):
     record = _rec("file:a.md", "A", [10], {term_hash("x"): [0, 1]})
     record["edges"] = [{"dst": "file:b.md", "grade": 8, "kind": "ref", "flen": [999]}]
     write_index(tmp_path, [record])
+    write_config(tmp_path)
     with pytest.raises(FuxError, match="byte-level regex reads"):
         build(tmp_path)
 
@@ -154,6 +162,7 @@ def test_build_refuses_when_regex_flen_disagrees_with_the_parse(tmp_path):
 def test_offset_entries_are_sorted_by_term(tmp_path):
     """The bisect in `blocks_for` is only correct on a sorted table."""
     write_index(tmp_path, _corpus(200))
+    write_config(tmp_path)
     build(tmp_path)
     for path in (fmt.runtime_dir(tmp_path) / fmt.POSTINGS_DIR).glob("*.idx"):
         buf = path.read_bytes()
@@ -165,6 +174,7 @@ def test_offset_entries_are_sorted_by_term(tmp_path):
 
 def test_blocks_hold_at_most_block_size_postings(tmp_path):
     write_index(tmp_path, _corpus(500))
+    write_config(tmp_path)
     report = build(tmp_path)
     assert report.docs == 500
     directory = fmt.runtime_dir(tmp_path) / fmt.POSTINGS_DIR

@@ -12,6 +12,7 @@ how a suite stops being run.
 
 from __future__ import annotations
 
+from l12_fixtures import configured_root, template_index, write_config
 import base64
 import io
 import zipfile
@@ -119,7 +120,7 @@ PDF = _pdf(
 
 
 def test_docx_headings_lists_and_tables():
-    out = decode(DOCX, "runbook.docx")
+    out = decode(DOCX, "runbook.docx", root=configured_root())
     assert out is not None
     assert "# Broker Runbook" in out, "Title style must map to H1, above Heading 1"
     assert "## Draining" in out
@@ -132,7 +133,7 @@ def test_docx_joins_runs_without_inserting_spaces():
     touches it. A space between runs turns "queue" into "que ue" and the term
     stops matching what anyone types.
     """
-    out = decode(DOCX, "runbook.docx")
+    out = decode(DOCX, "runbook.docx", root=configured_root())
     assert "Drain the queue first." in out
 
 
@@ -140,7 +141,7 @@ def test_docx_table_cells_are_not_emitted_twice():
     """Cells are paragraphs too. Without the in-table check they appear in the
     table AND as loose paragraphs, doubling their `tf`.
     """
-    out = decode(DOCX, "runbook.docx")
+    out = decode(DOCX, "runbook.docx", root=configured_root())
     assert out.count("drain") == 1
 
 
@@ -148,17 +149,17 @@ def test_pptx_orders_slides_numerically_not_lexically():
     """slide10 sorts before slide2 lexically. A deck read that way is
     deterministic and wrong, which is worse than noisy — nothing looks broken.
     """
-    out = decode(PPTX, "deck.pptx")
+    out = decode(PPTX, "deck.pptx", root=configured_root())
     assert out.index("Second slide") < out.index("Tenth slide")
 
 
 def test_pptx_keeps_speaker_notes():
-    assert "speaker note here" in decode(PPTX, "deck.pptx")
+    assert "speaker note here" in decode(PPTX, "deck.pptx", root=configured_root())
 
 
 def test_pptx_untitled_slide_still_gets_a_heading():
     deck = zf({"ppt/slides/slide1.xml": _slide("", "orphan bullet")})
-    out = decode(deck, "deck.pptx")
+    out = decode(deck, "deck.pptx", root=configured_root())
     assert "## Slide 1" in out
 
 
@@ -166,7 +167,7 @@ def test_xlsx_resolves_the_shared_string_table():
     """Most cell text is not in the sheet — it is an index into
     `sharedStrings.xml`. A decoder that misses that finds only numbers.
     """
-    out = decode(XLSX, "book.xlsx")
+    out = decode(XLSX, "book.xlsx", root=configured_root())
     assert "drain the queue" in out
     assert "## Runbook" in out, "the sheet name is its heading"
 
@@ -204,6 +205,7 @@ def _tuned(tmp_path, text: str):
     path = tmp_path / TUNE_NAME
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
+    write_config(tmp_path)
     return tmp_path
 
 
@@ -241,14 +243,14 @@ def test_an_xlsx_wider_than_max_cols_discloses_the_dropped_columns():
     count would move every time the file grows."""
     from fux.decode.xlsx import MAX_COLS
 
-    out = decode(_sheet([[f"c{i}" for i in range(MAX_COLS + 5)]]), "book.xlsx")
+    out = decode(_sheet([[f"c{i}" for i in range(MAX_COLS + 5)]]), "book.xlsx", root=configured_root())
     assert f"columns past {MAX_COLS} dropped" in out
     assert "c0" in out and f"c{MAX_COLS + 4}" not in out
 
 
 def test_an_xlsx_within_both_caps_says_nothing(tmp_path):
     """The notices are evidence of loss, so a clean sheet must carry neither."""
-    out = decode(_sheet([["h"], ["a"], ["b"]]), "book.xlsx")
+    out = decode(_sheet([["h"], ["a"], ["b"]]), "book.xlsx", root=configured_root())
     assert "table truncated" not in out
     assert "dropped" not in out
 
@@ -257,7 +259,7 @@ def test_an_xlsx_within_both_caps_says_nothing(tmp_path):
 
 
 def test_drawio_inflates_the_compressed_model_and_converts_html_labels():
-    out = decode(DRAWIO, "arch.drawio")
+    out = decode(DRAWIO, "arch.drawio", root=configured_root())
     assert out is not None
     assert "Ingest plane" in out
     assert "Refer" in out and "&lt;" not in out
@@ -265,14 +267,14 @@ def test_drawio_inflates_the_compressed_model_and_converts_html_labels():
 
 def test_rtf_drops_font_tables_and_keeps_prose():
     raw = rb"{\rtf1\ansi{\fonttbl{\f0 Times New Roman;}}\b Broker\b0  runbook\par drain the queue\par}"
-    out = decode(raw, "a.rtf")
+    out = decode(raw, "a.rtf", root=configured_root())
     assert "Broker runbook" in out
     assert "Times New Roman" not in out, "the font table is metadata, not prose"
 
 
 def test_rtf_decodes_codepage_escapes():
     raw = rb"{\rtf1\ansi\ansicpg1252 caf\'e5 na\'efve\par}"
-    out = decode(raw, "a.rtf")
+    out = decode(raw, "a.rtf", root=configured_root())
     assert "\\'" not in out
 
 
@@ -284,7 +286,7 @@ def test_eml_subject_leads_and_attachments_are_not_opened():
         b'--B\r\nContent-Type: application/pdf\r\nContent-Disposition: attachment; filename="x.pdf"\r\n\r\n'
         b"%PDF-1.4 attachment body\r\n--B--\r\n"
     )
-    out = decode(raw, "mail.eml")
+    out = decode(raw, "mail.eml", root=configured_root())
     assert out.startswith("# Broker restart")
     assert "Drain the queue first." in out
     assert "attachment body" not in out
@@ -292,7 +294,7 @@ def test_eml_subject_leads_and_attachments_are_not_opened():
 
 def test_eml_falls_back_to_html_through_the_shared_converter():
     raw = b"Subject: S\r\nContent-Type: text/html\r\n\r\n<h1>Heading</h1><p>body text</p>\r\n"
-    out = decode(raw, "mail.eml")
+    out = decode(raw, "mail.eml", root=configured_root())
     assert "# Heading" in out and "body text" in out
 
 
@@ -300,7 +302,7 @@ def test_eml_falls_back_to_html_through_the_shared_converter():
 
 
 def test_pdf_extracts_the_text_layer_and_rejoins_hyphenated_breaks():
-    out = decode(PDF, "doc.pdf")
+    out = decode(PDF, "doc.pdf", root=configured_root())
     assert out is not None
     assert "Broker Runbook" in out
     assert "broker service" in out, "a line-break hyphen must not survive as a term"
@@ -312,15 +314,15 @@ def test_pdf_without_a_text_layer_is_none_not_an_error():
     document that needs a model, not a failure.
     """
     scanned = b"%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<< >>\n%%EOF\n"
-    assert decode(scanned, "scan.pdf") is None
+    assert decode(scanned, "scan.pdf", root=configured_root()) is None
 
 
 def test_pdf_reads_an_uncompressed_content_stream():
-    assert "Broker Runbook" in decode(_pdf(PDF and b"BT (Broker Runbook) Tj ET", compress=False), "d.pdf")
+    assert "Broker Runbook" in decode(_pdf(PDF and b"BT (Broker Runbook) Tj ET", compress=False), "d.pdf", root=configured_root())
 
 
 def test_a_file_that_is_not_a_pdf_is_not_guessed_at():
-    assert decode(b"just text", "notreally.pdf") is None
+    assert decode(b"just text", "notreally.pdf", root=configured_root()) is None
 
 
 # -- safety: bombs and entities ---------------------------------------------
@@ -328,7 +330,7 @@ def test_a_file_that_is_not_a_pdf_is_not_guessed_at():
 
 def test_a_zip_bomb_is_refused_rather_than_inflated():
     bomb = zf({"word/document.xml": "A" * (80 * 1024 * 1024)})
-    assert decode(bomb, "bomb.docx") is None
+    assert decode(bomb, "bomb.docx", root=configured_root()) is None
 
 
 def test_a_doctype_is_refused_everywhere_xml_is_parsed():
@@ -339,12 +341,12 @@ def test_a_doctype_is_refused_everywhere_xml_is_parsed():
         b'<?xml version="1.0"?><!DOCTYPE lolz [<!ENTITY lol "lol">'
         b'<!ENTITY lol2 "&lol;&lol;&lol;">]><doc>&lol2;</doc>'
     )
-    assert decode(laughs, "bomb.xml") is None
+    assert decode(laughs, "bomb.xml", root=configured_root()) is None
     # ⚠ The vehicle is `.docx`, not `.odt`. `.odt` lost its decoder on
     # 2026-09-06, and an extension nothing claims returns `None` for a reason
     # that has nothing to do with the DOCTYPE refusal — the assertion would
     # still pass, and would prove nothing.
-    assert decode(zf({"word/document.xml": laughs.decode()}), "bomb.docx") is None
+    assert decode(zf({"word/document.xml": laughs.decode()}), "bomb.docx", root=configured_root()) is None
 
 
 def test_every_registered_extension_survives_garbage_without_raising():
@@ -355,7 +357,7 @@ def test_every_registered_extension_survives_garbage_without_raising():
 
     for ext in sorted(registry()):
         try:
-            decode(b"\x00\x01garbage\xff\xfe", "junk" + ext)
+            decode(b"\x00\x01garbage\xff\xfe", "junk" + ext, root=configured_root())
         except DecodeFailed:
             pass  # recorded as a skip by the caller
 
@@ -376,15 +378,15 @@ def test_every_registered_extension_survives_garbage_without_raising():
     ],
 )
 def test_decoding_the_same_bytes_twice_gives_the_same_string(raw, name):
-    assert decode(raw, name) == decode(raw, name)
+    assert decode(raw, name, root=configured_root()) == decode(raw, name, root=configured_root())
 
 
 def test_json_keys_are_emitted_sorted_not_in_document_order():
     """Two exports of the same data with keys in a different order must decode
     identically, or the index records which exporter ran (L3).
     """
-    first = decode(b'{"alpha":"one text","beta":"two text"}', "a.json")
-    second = decode(b'{"beta":"two text","alpha":"one text"}', "a.json")
+    first = decode(b'{"alpha":"one text","beta":"two text"}', "a.json", root=configured_root())
+    second = decode(b'{"beta":"two text","alpha":"one text"}', "a.json", root=configured_root())
     assert first == second
 
 
@@ -398,7 +400,7 @@ def test_zip_member_order_does_not_reach_the_output():
     with zipfile.ZipFile(buf, "w") as archive:  # reversed write order
         archive.writestr("docProps/core.xml", "<meta/>")
         archive.writestr("word/document.xml", DOCX_CONTENT)
-    assert decode(forward, "a.docx") == decode(buf.getvalue(), "a.docx")
+    assert decode(forward, "a.docx", root=configured_root()) == decode(buf.getvalue(), "a.docx", root=configured_root())
 
 
 
@@ -412,7 +414,7 @@ def test_json_drops_ids_numbers_and_blobs_but_keeps_prose():
         b'"id":"550e8400-e29b-41d4-a716-446655440000",'
         b'"hash":"deadbeefcafe","when":"2026-08-26T10:00:00Z"}'
     )
-    out = decode(raw, "a.json")
+    out = decode(raw, "a.json", root=configured_root())
     assert "the broker runbook" in out
     for noise in ("550e8400", "deadbeef", "2026-08-26", "42"):
         assert noise not in out
@@ -424,12 +426,12 @@ def test_yaml_does_not_expand_aliases():
     for a ranking index.
     """
     raw = b"first: &a shared phrase here\nsecond: *a\nthird: *a\n"
-    out = decode(raw, "a.yaml")
+    out = decode(raw, "a.yaml", root=configured_root())
     assert out.count("shared phrase here") == 1
 
 
 def test_yaml_block_scalars_are_dedented_by_their_own_indent():
-    out = decode(b"notes: |\n    restart after draining\n    then verify\n", "a.yaml")
+    out = decode(b"notes: |\n    restart after draining\n    then verify\n", "a.yaml", root=configured_root())
     assert "restart after draining\nthen verify" in out
 
 def test_csv_truncates_rather_than_indexing_a_dataset():
@@ -437,10 +439,10 @@ def test_csv_truncates_rather_than_indexing_a_dataset():
     It was a hard-coded 500, and that number silently dropped the tail of every
     file over it — a fact in row 600 was not decoded, not indexed and not
     citable, with only this notice as the signal."""
-    from fux.tune import DEFAULT_MAX_TABLE_ROWS
+    DEFAULT_MAX_TABLE_ROWS = template_index().max_table_rows
 
     rows = b"col\n" + b"".join(b"value %d\n" % i for i in range(DEFAULT_MAX_TABLE_ROWS + 400))
-    out = decode(rows, "a.csv")
+    out = decode(rows, "a.csv", root=configured_root())
     assert "table truncated" in out
     assert out.count("\n| value ") == DEFAULT_MAX_TABLE_ROWS
 
@@ -448,11 +450,11 @@ def test_csv_truncates_rather_than_indexing_a_dataset():
 def test_a_csv_under_the_limit_keeps_every_row_and_says_nothing():
     """The regression the raise was for: 900 rows used to lose 400 of them."""
     rows = b"col\n" + b"".join(b"value %d\n" % i for i in range(900))
-    out = decode(rows, "a.csv")
+    out = decode(rows, "a.csv", root=configured_root())
     assert "table truncated" not in out
     assert "| value 899 |" in out
 
 
 def test_properties_files_have_no_section_header_and_still_parse():
-    out = decode(b"db.host=the primary database\ndb.port=5432\n", "app.properties")
+    out = decode(b"db.host=the primary database\ndb.port=5432\n", "app.properties", root=configured_root())
     assert "the primary database" in out

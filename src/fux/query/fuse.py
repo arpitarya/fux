@@ -33,16 +33,18 @@ why.
 from __future__ import annotations
 
 import dataclasses
+from ..constants import fixed
 
 __all__ = ["K", "rrf", "fuse_results"]
 
 #: Cormack et al. 2009's constant. **Not tuned here and not a `tune.toml` key**
 #: — a knob on it would be a knob on a published constant, measured on TREC
-#: collections, with nothing in this repo able to beat it at 10 documents.
-K = 60
+#: collections, with nothing in this repo able to beat it at 10 documents. So
+#: under L12 it is FIXED: `constants.toml [fuse] rrf_k`.
+K = fixed("fuse", "rrf_k")
 
 
-def rrf(rank_lists: list[list[str]], k: int = K) -> dict[str, float]:
+def rrf(rank_lists: list[list[str]]) -> dict[str, float]:
     """`id -> fused score`, from ranked id lists. Rank 0 is best.
 
     A document absent from a list contributes nothing from it — **not a
@@ -53,11 +55,11 @@ def rrf(rank_lists: list[list[str]], k: int = K) -> dict[str, float]:
     scores: dict[str, float] = {}
     for ranks in rank_lists:
         for i, doc_id in enumerate(ranks):
-            scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (k + i + 1)
+            scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (K + i + 1)
     return scores
 
 
-def fuse_results(result_lists: list[list], top: int, k: int = K) -> list:
+def fuse_results(result_lists: list[list], top: int) -> list:
     """Fuse several `run_query` result lists into one, by rank.
 
     Each element of `result_lists` is a list of `AskResult`, already ranked.
@@ -75,7 +77,7 @@ def fuse_results(result_lists: list[list], top: int, k: int = K) -> list:
     if len(result_lists) == 1:
         return list(result_lists[0][:top])
 
-    scores = rrf([[r.id for r in results] for results in result_lists], k)
+    scores = rrf([[r.id for r in results] for results in result_lists])
 
     best_seen: dict[str, tuple[int, object]] = {}
     for results in result_lists:

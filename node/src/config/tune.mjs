@@ -15,7 +15,10 @@
  * key to a person editing it. Node never writes this file, so none of that is
  * transcribed. What IS transcribed, exactly:
  *
- * - **The defaults**, because they are the answer when the file is absent.
+ * - **No defaults.** Every key is required (L12, SR-LAW-12 decision 3): an
+ *   absent file, table or key stops the command naming it, in the same words
+ *   `tune.py` uses. `--no-tune` reads the packaged template — inlined into the
+ *   bundle — never a value in code (L12 decision 7).
  * - **The closed key set.** An unknown table or key is a REFUSAL. This is the
  *   one file that can change every answer without changing a byte of the
  *   index, so a typo must not fail silently — and a Node reader that shrugged
@@ -30,18 +33,16 @@
  * not reach them. Validating them anyway means `fux ask` reports a bad
  * `[index]` value in both runtimes rather than one.
  *
- * R5: **absent, empty or all-commented = every default; malformed = a hard
- * error.** A file that exists and cannot be parsed means somebody edited it and
- * got it wrong; degrading there would answer with the engine's ranking while
- * the reader believed it was theirs (SR-TUNE decision 10).
+ * **Absent, malformed or missing a key = a hard error.** Degrading would answer
+ * with a ranking the reader did not configure while they believed it was
+ * theirs (SR-TUNE decision 10; L12 decision 3).
  */
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { FuxError } from "../errors.mjs";
 import { parseToml, wasFloat } from "./toml.mjs";
-import { ANCHOR, B, FIELD_WEIGHTS, K1, Scoring } from "../query/bm25f.mjs";
-import { DOC_COVERAGE_FLOOR, SEPARATION_FLOOR } from "../query/confidence.mjs";
-import { MINED_WEIGHT } from "../query/mined.mjs";
+import { Scoring } from "../query/bm25f.mjs";
+import { Proximity } from "../query/rerank.mjs";
 import { TF_FIELDS } from "../store/format.mjs";
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
 // `ask_kinds` is validated against the kinds the index mints, at load — the
@@ -61,14 +62,27 @@ const FIELD_KEYS = TF_FIELDS;
 //: Old spelling -> new, for the migration message only.
 const LEGACY_FIELD_KEYS = new Map(TF_FIELDS.map((name) => [`${name}_weight`, name]));
 
-export const DEFAULT_MAX_PHRASES = 32;
-export const DEFAULT_MAX_TABLE_ROWS = 20000;
 export const INDEX_TABLE = "index";
+
+//: The template `fux setup` writes (`src/fux/templates/tune.toml.txt`). In a
+//: checkout it is read from the Python tree; in the bundle it is INLINED
+//: (`@fux-inline`), so `--no-tune` never reads a path the consumer lacks.
+const TEMPLATE_TEXT = /* @fux-inline src/fux/templates/tune.toml.txt */ readFileSync(
+  new URL("../../../src/fux/templates/tune.toml.txt", import.meta.url),
+  "utf8",
+);
+const TEMPLATE_LABEL = "the packaged tune.toml template (--no-tune)";
+
+//: What a missing key's error tells the reader to do — `tune.py`'s sentence.
+const FIX_HINT = "`fux doctor --fix` writes every missing key from the template `fux setup` uses";
 
 //: The closed key set. Table -> keys. Adding one here is a change to SR-TUNE.
 const SCHEMA = {
   bm25f: ["k1", "b", ...FIELD_KEYS, "anchor"],
-  ranking: ["rerank_weight", "expand_weight", "mined_weight"],
+  ranking: [
+    "rerank_weight", "rerank_depth", "rerank_coverage_power", "rerank_base", "rerank_span",
+    "rerank_adjacency", "expand_weight", "mined_weight",
+  ],
   // The six `ask_*` keys are W-161's graph tier. They are parsed and carried
   // here so a consumer's committed `tune.toml` is accepted identically by both
   // readers; whether the Node reader COMPOSES the tier is
@@ -78,11 +92,15 @@ const SCHEMA = {
   // the config parity test exists to forbid.
   graph: [
     "damping", "iterations", "laziness", "hop_decay", "expand_limit", "seed_depth",
-    "ask_boost", "ask_related", "ask_kinds", "ask_link_idf", "ask_max_hops",
+    "path_limit", "ask_boost", "ask_related", "ask_kinds", "ask_link_idf", "ask_max_hops",
     "ask_related_limit",
   ],
-  refer: ["budget", "per_doc_fraction", "min_passage_bytes", "max_passage_bytes"],
+  refer: [
+    "budget", "per_doc_fraction", "min_passage_bytes", "max_passage_bytes",
+    "citation_overhead", "table_rows_per_passage",
+  ],
   confidence: ["separation_floor", "doc_coverage_floor"],
+  enrich: ["self_retrieval_k"],
   // ⚠ THE EXCEPTION — read by ingest, changes committed bytes, untouched by
   // `--no-tune`. Node validates it and carries none of it.
   [INDEX_TABLE]: ["max_phrases", "max_table_rows"],
@@ -140,71 +158,60 @@ const REMOVED_KEYS = new Map([
     "words yourself is untouched: `--expand`, weighted by `expand_weight`."],
 ]);
 
-/** Every tunable, resolved. Build it with `loadTune`; the defaults are the engine's. */
+/** Every tunable, resolved. Build it with `loadTune` — there are no defaults (L12). */
 export class Tune {
-  constructor(values = {}) {
-    // [bm25f]
-    this.k1 = K1;
-    this.b = B;
-    this.fieldWeights = FIELD_WEIGHTS;
-    // W-168 step 1 — the anchor field, folded at read time from other
-    // documents' edges. NOT in `fieldWeights`: that array is aligned with
-    // TF_FIELDS, the five fields a record commits an `flen` for. 0 = off; the
-    // default ANCHOR (1.0) is ON since its pre-registered PASS on 2026-09-24.
-    this.anchorWeight = ANCHOR;
-    // [ranking]
-    // The three DOCUMENT priors were removed on 2026-09-13 (W-151, W-152).
-    this.rerankWeight = 0.0;
-    this.expandWeight = 0.2;
-    // W-168 step 4 — a spelling the corpus supplies (`query/mined.mjs`). 0 =
-    // off, and off reads no pair; the default MINED_WEIGHT (0.5) is ON since
-    // its pre-registered PASS on 2026-09-27.
-    this.minedWeight = MINED_WEIGHT;
-    // [graph]
-    this.damping = 0.85;
-    this.iterations = 3;
-    this.laziness = 0.5;
-    this.hopDecay = 0.5;
-    this.expandLimit = 10;
-    this.seedDepth = 5;
-    // W-161's graph tier. Carried, not composed — see SCHEMA above.
-    this.askBoost = true;
-    this.askRelated = true;
-    this.askKinds = "ref";
-    this.askLinkIdf = true;
-    this.askMaxHops = 1;
-    this.askRelatedLimit = 5;
-    // [confidence]
-    this.separationFloor = SEPARATION_FLOOR;
-    this.docCoverageFloor = DOC_COVERAGE_FLOOR;
-    // [refer]
-    this.budget = 8000;
-    this.perDocFraction = 0.5;
-    this.minPassageBytes = 120;
-    this.maxPassageBytes = 4000;
-    //: `[priority]`, sorted longest-key-first so a reader can stop at the
-    //: first match. The resolution itself lives on `query/rank.mjs`'s
-    //: `Weighting` — this class carries the data, the scorer carries the rule.
-    this.priority = [];
+  constructor(values) {
+    for (const name of TUNE_FIELDS) {
+      if (!Object.hasOwn(values, name)) throw new FuxError(`Tune: ${name} was not supplied`);
+    }
     Object.assign(this, values);
     Object.freeze(this);
   }
 
   /** The three-part BM25F parameter set, as one object. */
   get scoring() { return new Scoring(this.k1, this.b, this.fieldWeights, this.anchorWeight); }
+
+  /** The reranker's passage arithmetic — coverage power and the mix. */
+  get proximity() {
+    return new Proximity(this.rerankCoveragePower, this.rerankBase, this.rerankSpan, this.rerankAdjacency);
+  }
+
+  /** `[refer]`'s three passage bounds, as `refer/chunk.mjs`'s `chunk` takes them. */
+  chunkBounds() {
+    return {
+      minPassageBytes: this.minPassageBytes,
+      maxPassageBytes: this.maxPassageBytes,
+      tableRowsPerPassage: this.tableRowsPerPassage,
+    };
+  }
 }
 
-export const DEFAULT_TUNE = new Tune();
+//: Every field a `Tune` carries — `tune.py`'s dataclass fields, camel-cased.
+const TUNE_FIELDS = [
+  "k1", "b", "fieldWeights", "anchorWeight",
+  "rerankWeight", "rerankDepth", "rerankCoveragePower", "rerankBase", "rerankSpan",
+  "rerankAdjacency", "expandWeight", "minedWeight",
+  "damping", "iterations", "laziness", "hopDecay", "expandLimit", "seedDepth", "pathLimit",
+  "askBoost", "askRelated", "askKinds", "askLinkIdf", "askMaxHops", "askRelatedLimit",
+  "separationFloor", "docCoverageFloor",
+  "budget", "perDocFraction", "minPassageBytes", "maxPassageBytes", "citationOverhead",
+  "tableRowsPerPassage",
+  "selfRetrievalK",
+  "priority",
+];
 
 /** Gathers semantic errors so a hand-edited file reports them together. */
 class Collector {
-  constructor(label) { this.label = label; this.errors = []; }
+  constructor(label) { this.label = label; this.errors = []; this.missing = false; }
   add(message) { this.errors.push(message); }
+  /** L12 decision 3 — a missing key is an error that names it. */
+  absent(table, key) { this.missing = true; this.errors.push(`[${table}] ${key} is missing`); }
   raiseIfAny() {
     if (!this.errors.length) return;
     const shown = this.errors.slice(0, MAX_REPORTED);
     const more = this.errors.length - shown.length;
-    const tail = more > 0 ? `\n  ... and ${more} more` : "";
+    let tail = more > 0 ? `\n  ... and ${more} more` : "";
+    if (this.missing) tail += `\n  ${FIX_HINT}`;
     throw new FuxError(`${this.label}:\n  ` + shown.join("\n  ") + tail);
   }
 }
@@ -218,58 +225,51 @@ function repr(value) {
   return String(value);
 }
 
-function number(c, table, key, value, dflt) {
+function number(c, table, key, value) {
   if (typeof value !== "number") {
     c.add(`[${table}] ${key} must be a number (got ${repr(value)})`);
-    return dflt;
   }
   return value;
 }
 
-function positive(c, table, key, value, dflt) {
-  const v = number(c, table, key, value, dflt);
-  if (v <= 0) {
+function positive(c, table, key, value) {
+  const v = number(c, table, key, value);
+  if (typeof v === "number" && v <= 0) {
     c.add(`[${table}] ${key} must be greater than zero — at zero the term it scales vanishes (got ${v})`);
-    return dflt;
   }
   return v;
 }
 
-function nonNegative(c, table, key, value, dflt) {
-  const v = number(c, table, key, value, dflt);
-  if (v < 0) {
+function nonNegative(c, table, key, value) {
+  const v = number(c, table, key, value);
+  if (typeof v === "number" && v < 0) {
     c.add(
       `[${table}] ${key} must not be negative — a negative multiplier inverts ` +
       `the ordering, which is broken rather than aggressive (got ${v})`,
     );
-    return dflt;
   }
   return v;
 }
 
-function fraction(c, table, key, value, dflt) {
-  const v = number(c, table, key, value, dflt);
-  if (!(v >= 0.0 && v <= 1.0)) {
+function fraction(c, table, key, value) {
+  const v = number(c, table, key, value);
+  if (typeof v === "number" && !(v >= 0.0 && v <= 1.0)) {
     c.add(
       `[${table}] ${key} must be between 0 and 1 — 0 turns the effect off ` +
       `entirely, 1 applies it in full (got ${v})`,
     );
-    return dflt;
   }
   return v;
 }
 
-/** A TOML **integer**, at least `floor`. `3.0` is not an integer here, because
- *  it is not one in `tune.py` either — see `config/toml.mjs`'s `wasFloat`. */
-function atLeast(c, tbl, table, key, value, dflt, floor) {
+/** A TOML **integer**, at least one. `3.0` is not an integer here, because it
+ *  is not one in `tune.py` either — see `config/toml.mjs`'s `wasFloat`. */
+function whole(c, table, key, value, tbl) {
   if (typeof value !== "number" || !Number.isInteger(value) || wasFloat(tbl, key)) {
     c.add(`[${table}] ${key} must be a whole number (got ${repr(value)})`);
-    return dflt;
+    return value;
   }
-  if (value < floor) {
-    c.add(`[${table}] ${key} must be at least ${floor} (got ${value})`);
-    return dflt;
-  }
+  if (value < 1) c.add(`[${table}] ${key} must be at least 1 (got ${value})`);
   return value;
 }
 
@@ -279,11 +279,8 @@ function atLeast(c, tbl, table, key, value, dflt, floor) {
  * `ask_boost = 1` is told the key is a boolean instead of getting a silent
  * `true` out of a file that never said so.
  */
-function boolean(c, table, key, value, dflt) {
-  if (typeof value !== "boolean") {
-    c.add(`[${table}] ${key} must be true or false (got ${repr(value)})`);
-    return dflt;
-  }
+function boolean(c, table, key, value) {
+  if (typeof value !== "boolean") c.add(`[${table}] ${key} must be true or false (got ${repr(value)})`);
   return value;
 }
 
@@ -294,15 +291,15 @@ function boolean(c, table, key, value, dflt) {
  * nothing, and a walk over no edges returns an empty neighbourhood that cannot
  * be told from a corpus with no links at all.
  */
-function edgeKinds(c, table, key, value, dflt) {
+function edgeKinds(c, table, key, value) {
   if (typeof value !== "string") {
     c.add(`[${table}] ${key} must be a string (got ${repr(value)})`);
-    return dflt;
+    return value;
   }
   const named = value.split(",").map((k) => k.trim()).filter((k) => k.length > 0);
   if (named.length === 0) {
     c.add(`[${table}] ${key} names no edge kind; the kinds this index mints are ${EDGE_KINDS.join(", ")}`);
-    return dflt;
+    return value;
   }
   const unknown = [...new Set(named.filter((k) => !EDGE_KINDS.includes(k)))].sort();
   if (unknown.length > 0) {
@@ -310,7 +307,7 @@ function edgeKinds(c, table, key, value, dflt) {
       `[${table}] ${key} names ${unknown.join(", ")}, which is not an edge kind; ` +
       `the kinds this index mints are ${EDGE_KINDS.join(", ")}`,
     );
-    return dflt;
+    return value;
   }
   return named.join(",");
 }
@@ -319,15 +316,14 @@ function has(table, key) {
   return table !== null && typeof table === "object" && Object.prototype.hasOwnProperty.call(table, key);
 }
 
-/** `[index]`'s values, validated and discarded — see the module docstring. */
-function checkIndexValues(c, table) {
-  const t = table && typeof table === "object" ? table : {};
-  if (has(t, "max_phrases")) {
-    atLeast(c, t, INDEX_TABLE, "max_phrases", t.max_phrases, DEFAULT_MAX_PHRASES, 1);
+/** `[table] key`, validated by `check` — or recorded as missing. */
+function read(c, data, table, key, check) {
+  const t = data[table];
+  if (!has(data, table) || t === null || typeof t !== "object" || !has(t, key)) {
+    c.absent(table, key);
+    return undefined;
   }
-  if (has(t, "max_table_rows")) {
-    atLeast(c, t, INDEX_TABLE, "max_table_rows", t.max_table_rows, DEFAULT_MAX_TABLE_ROWS, 1);
-  }
+  return check(c, table, key, t[key], t);
 }
 
 /** A committed file people edit will eventually carry `<<<<<<<`, and the TOML
@@ -343,27 +339,34 @@ function rejectConflictMarkers(label, text) {
   }
 }
 
-/** Read `.fux/tune.toml`. Absent, empty or all-commented means every default.
+/** Read `.fux/tune.toml` — every key required.
  *
- * `enabled=false` is `--no-tune`: the file is not read at all, so the answer is
- * the engine's own (SR-TUNE decision 11). */
-export function loadTune(root, { enabled = true } = {}) {
-  if (!enabled) return DEFAULT_TUNE;
+ * `enabled=false` is `--no-tune`: the consumer's file is not read at all and
+ * the packaged template is read in its place (SR-TUNE decision 11; L12
+ * decision 7). */
+export function loadTune(root, { enabled }) {
+  if (enabled !== true && enabled !== false) throw new FuxError("loadTune: `enabled` is required");
+  if (!enabled) return resolve(parseToml(TEMPLATE_TEXT, TEMPLATE_LABEL), TEMPLATE_LABEL);
 
-  const path = join(root, ".fux", "tune.toml");
+  const path = join(root, TUNE_NAME);
+  const label = `${root}/${TUNE_NAME}`;
   let raw;
   try {
-    if (!statSync(path).isFile()) return DEFAULT_TUNE;
+    if (!statSync(path).isFile()) throw new Error("not a file");
     raw = readFileSync(path, "utf8");
   } catch {
-    return DEFAULT_TUNE;
+    throw new FuxError(
+      `${label} is missing - \`fux setup\` writes it, and \`fux doctor --fix\` ` +
+      "restores a deleted one. fux holds no copy of its values in code",
+    );
   }
-
-  const label = `${root}/${TUNE_NAME}`;
+  if (raw.charCodeAt(0) === 0xfeff) raw = raw.slice(1);
   rejectConflictMarkers(label, raw);
-  const data = parseToml(raw, label);
-  if (!Object.keys(data).length) return DEFAULT_TUNE;
+  return resolve(parseToml(raw, label), label);
+}
 
+/** Validate a parsed tune file and build the `Tune` — or throw, naming every fault. */
+function resolve(data, label) {
   if (has(data, "dense")) {
     throw new FuxError(
       `${label}: [dense] was REMOVED on 2026-08-25 along with the embedding model, ` +
@@ -417,74 +420,60 @@ export function loadTune(root, { enabled = true } = {}) {
   }
 
   const c = new Collector(label);
+  const r = (table, key, check) => read(c, data, table, key, check);
 
-  const bm25f = data.bm25f ?? {};
-  const k1 = has(bm25f, "k1") ? positive(c, "bm25f", "k1", bm25f.k1, K1) : K1;
-  const b = has(bm25f, "b") ? fraction(c, "bm25f", "b", bm25f.b, B) : B;
-  const weights = [...FIELD_WEIGHTS];
-  FIELD_KEYS.forEach((key, i) => {
-    // Zero is legal and means *ignore this field* — a ranking choice, not the
-    // source exclusion `.fux/sources/` owns.
-    if (has(bm25f, key)) weights[i] = nonNegative(c, "bm25f", key, bm25f[key], FIELD_WEIGHTS[i]);
-  });
-
-  const anchorWeight = has(bm25f, "anchor")
-    ? nonNegative(c, "bm25f", "anchor", bm25f.anchor, ANCHOR)
-    : ANCHOR;
-
-  const ranking = data.ranking ?? {};
-  const pick = (table, name, key, dflt, fn = nonNegative) =>
-    (has(table, key) ? fn(c, name, key, table[key], dflt) : dflt);
-
-  const rerankWeight = pick(ranking, "ranking", "rerank_weight", 0.0);
-  const expandWeight = pick(ranking, "ranking", "expand_weight", 0.2);
-  const minedWeight = pick(ranking, "ranking", "mined_weight", MINED_WEIGHT);
-
-  const graph = data.graph ?? {};
-  const damping = pick(graph, "graph", "damping", 0.85, fraction);
-  const laziness = pick(graph, "graph", "laziness", 0.5, fraction);
-  const hopDecay = pick(graph, "graph", "hop_decay", 0.5, fraction);
-  const iterations = has(graph, "iterations")
-    ? atLeast(c, graph, "graph", "iterations", graph.iterations, 3, 1) : 3;
-  const expandLimit = has(graph, "expand_limit")
-    ? atLeast(c, graph, "graph", "expand_limit", graph.expand_limit, 10, 1) : 10;
-  const seedDepth = has(graph, "seed_depth")
-    ? atLeast(c, graph, "graph", "seed_depth", graph.seed_depth, 5, 1) : 5;
-  const askBoost = has(graph, "ask_boost")
-    ? boolean(c, "graph", "ask_boost", graph.ask_boost, true) : true;
-  const askRelated = has(graph, "ask_related")
-    ? boolean(c, "graph", "ask_related", graph.ask_related, true) : true;
-  const askKinds = has(graph, "ask_kinds")
-    ? edgeKinds(c, "graph", "ask_kinds", graph.ask_kinds, "ref") : "ref";
-  const askLinkIdf = has(graph, "ask_link_idf")
-    ? boolean(c, "graph", "ask_link_idf", graph.ask_link_idf, true) : true;
-  const askMaxHops = has(graph, "ask_max_hops")
-    ? atLeast(c, graph, "graph", "ask_max_hops", graph.ask_max_hops, 1, 1) : 1;
-  const askRelatedLimit = has(graph, "ask_related_limit")
-    ? atLeast(c, graph, "graph", "ask_related_limit", graph.ask_related_limit, 5, 1) : 5;
-
-  const conf = data.confidence ?? {};
-  const separationFloor = pick(conf, "confidence", "separation_floor", SEPARATION_FLOOR, fraction);
-  const docCoverageFloor = pick(conf, "confidence", "doc_coverage_floor", DOC_COVERAGE_FLOOR, fraction);
-
-  checkIndexValues(c, data[INDEX_TABLE]);
-
-  const refer = data.refer ?? {};
-  const budget = has(refer, "budget") ? atLeast(c, refer, "refer", "budget", refer.budget, 8000, 1) : 8000;
-  const perDocFraction = pick(refer, "refer", "per_doc_fraction", 0.5, fraction);
-  let minPassage = has(refer, "min_passage_bytes")
-    ? atLeast(c, refer, "refer", "min_passage_bytes", refer.min_passage_bytes, 120, 1) : 120;
-  let maxPassage = has(refer, "max_passage_bytes")
-    ? atLeast(c, refer, "refer", "max_passage_bytes", refer.max_passage_bytes, 4000, 1) : 4000;
-  if (minPassage >= maxPassage) {
+  const values = {
+    k1: r("bm25f", "k1", positive),
+    b: r("bm25f", "b", fraction),
+    // Zero is legal for a field weight and means *ignore this field* — a
+    // ranking choice, not the source exclusion `.fux/sources/` owns.
+    fieldWeights: FIELD_KEYS.map((key) => r("bm25f", key, nonNegative)),
+    anchorWeight: r("bm25f", "anchor", nonNegative),
+    rerankWeight: r("ranking", "rerank_weight", nonNegative),
+    rerankDepth: r("ranking", "rerank_depth", whole),
+    rerankCoveragePower: r("ranking", "rerank_coverage_power", positive),
+    rerankBase: r("ranking", "rerank_base", fraction),
+    rerankSpan: r("ranking", "rerank_span", fraction),
+    rerankAdjacency: r("ranking", "rerank_adjacency", fraction),
+    expandWeight: r("ranking", "expand_weight", nonNegative),
+    minedWeight: r("ranking", "mined_weight", nonNegative),
+    damping: r("graph", "damping", fraction),
+    iterations: r("graph", "iterations", whole),
+    laziness: r("graph", "laziness", fraction),
+    hopDecay: r("graph", "hop_decay", fraction),
+    expandLimit: r("graph", "expand_limit", whole),
+    seedDepth: r("graph", "seed_depth", whole),
+    pathLimit: r("graph", "path_limit", whole),
+    askBoost: r("graph", "ask_boost", boolean),
+    askRelated: r("graph", "ask_related", boolean),
+    askKinds: r("graph", "ask_kinds", edgeKinds),
+    askLinkIdf: r("graph", "ask_link_idf", boolean),
+    askMaxHops: r("graph", "ask_max_hops", whole),
+    askRelatedLimit: r("graph", "ask_related_limit", whole),
+    separationFloor: r("confidence", "separation_floor", fraction),
+    docCoverageFloor: r("confidence", "doc_coverage_floor", fraction),
+    budget: r("refer", "budget", whole),
+    perDocFraction: r("refer", "per_doc_fraction", fraction),
+    minPassageBytes: r("refer", "min_passage_bytes", whole),
+    maxPassageBytes: r("refer", "max_passage_bytes", whole),
+    citationOverhead: r("refer", "citation_overhead", whole),
+    tableRowsPerPassage: r("refer", "table_rows_per_passage", whole),
+    selfRetrievalK: r("enrich", "self_retrieval_k", whole),
+  };
+  const low = values.minPassageBytes, high = values.maxPassageBytes;
+  if (Number.isInteger(low) && Number.isInteger(high) && low >= high) {
     c.add(
-      `[refer] min_passage_bytes (${minPassage}) must be smaller than ` +
-      `max_passage_bytes (${maxPassage}) — the first is the floor below which a ` +
+      `[refer] min_passage_bytes (${low}) must be smaller than ` +
+      `max_passage_bytes (${high}) — the first is the floor below which a ` +
       "passage is not worth citing, the second the ceiling above which it is cut",
     );
-    minPassage = 120;
-    maxPassage = 4000;
   }
+
+  // `[index]` is validated and discarded, exactly as Python does: those keys
+  // change committed bytes at ingest, Node does not ingest, and `--no-tune`
+  // does not reach them.
+  r(INDEX_TABLE, "max_phrases", whole);
+  r(INDEX_TABLE, "max_table_rows", whole);
 
   const priority = [];
   for (const [entry, value] of Object.entries(data.priority ?? {})) {
@@ -515,14 +504,5 @@ export function loadTune(root, { enabled = true } = {}) {
   priority.sort((a, b2) => (a[0].length !== b2[0].length ? b2[0].length - a[0].length : cmpCodePoints(a[0], b2[0])));
 
   c.raiseIfAny();
-
-  return new Tune({
-    k1, b, fieldWeights: weights, anchorWeight,
-    rerankWeight, expandWeight, minedWeight,
-    damping, iterations, laziness, hopDecay, expandLimit, seedDepth,
-    askBoost, askRelated, askKinds, askLinkIdf, askMaxHops, askRelatedLimit,
-    separationFloor, docCoverageFloor,
-    budget, perDocFraction, minPassageBytes: minPassage, maxPassageBytes: maxPassage,
-    priority,
-  });
+  return new Tune({ ...values, priority });
 }

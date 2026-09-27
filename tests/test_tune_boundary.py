@@ -19,12 +19,13 @@ ran the other.
 
 from __future__ import annotations
 
+from l12_fixtures import scoring, tune_text, write_config
 import pytest
 
 from fux.derive import accel, build, format as fmt
 from fux.query import scan
 from fux.store import iter_shard_paths, term_hash, write_index
-from fux.tune import INDEX_TABLE, TUNE_NAME, _SCHEMA, load
+from fux.tune import INDEX_TABLE, TUNE_NAME, _SCHEMA, load, template_text
 
 TOPS = (1, 5, 20)
 
@@ -49,6 +50,13 @@ MUTATIONS: dict[str, dict[str, str]] = {
         "archived_weight": "0.1",
         "recency_half_life_days": "30.0",
         "rerank_weight": "0.75",
+        # W-225 — the reranker's depth and passage arithmetic became keys when
+        # L12 moved them out of `rerank.py`; all read at query time.
+        "rerank_depth": "7",
+        "rerank_coverage_power": "3",
+        "rerank_base": "0.4",
+        "rerank_span": "0.4",
+        "rerank_adjacency": "0.2",
         # W-109. ⚠ A value that CANNOT move a committed byte for a second
         # reason on top of every other key's: nothing reads it unless a caller
         # passes `--expand`, and `fux ingest` never does.
@@ -63,6 +71,7 @@ MUTATIONS: dict[str, dict[str, str]] = {
         "hop_decay": "0.1",
         "expand_limit": "3",
         "seed_depth": "17",
+        "path_limit": "2",
         # W-161's graph tier. ⚠ **These six prove the boundary rule in its
         # weakest form**, like `[confidence]`'s two above and for a related
         # reason: they are read at QUERY time by a stage that runs after the
@@ -86,7 +95,11 @@ MUTATIONS: dict[str, dict[str, str]] = {
         "per_doc_fraction": "0.9",
         "min_passage_bytes": "20",
         "max_passage_bytes": "900",
+        "citation_overhead": "10",
+        "table_rows_per_passage": "4",
     },
+    # `fux enrich --check` — a report over the committed index, never ingest.
+    "enrich": {"self_retrieval_k": "9"},
     # ⚠ These two move the BAND, never a score or an ordering — so unlike every
     # other table here, the boundary test proves something weaker than it looks:
     # of course the index is byte-identical, nothing downstream of the band
@@ -161,6 +174,7 @@ def corpus(tmp_path):
         ),
     ]
     write_index(tmp_path, records)
+    write_config(tmp_path)
     build(tmp_path)
     return tmp_path
 
@@ -175,7 +189,7 @@ def _scoring(**overrides):
     scoring identically to the default and still passing. Dispatching on
     membership in `TF_FIELDS` makes an unknown key a `ValueError` instead.
     """
-    from fux.query.bm25f import DEFAULT_SCORING
+    DEFAULT_SCORING = scoring()
     from fux.store import TF_FIELDS
 
     weights = list(DEFAULT_SCORING.weights)
@@ -188,6 +202,7 @@ def _scoring(**overrides):
         k1=overrides.get("k1", DEFAULT_SCORING.k1),
         b=overrides.get("b", DEFAULT_SCORING.b),
         weights=tuple(weights),
+        anchor=DEFAULT_SCORING.anchor,
     )
 
 
@@ -197,9 +212,16 @@ def _index_bytes(root) -> bytes:
 
 
 def _write_tune(root, table: str, key: str, value: str) -> None:
+    """The template with `[table] key` changed — every other key as shipped."""
+    import tomllib
+
     path = root / TUNE_NAME
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(f"[{table}]\n{key} = {value}\n", encoding="utf-8")
+    path.write_text(tune_text(**{table: {_bare(key): tomllib.loads(f"v = {value}")["v"]}}), encoding="utf-8")
+
+
+def _bare(key: str) -> str:
+    return key[1:-1] if key.startswith('"') and key.endswith('"') else key
 
 
 # -- decision 1: the membership test -----------------------------------------
@@ -216,7 +238,7 @@ def test_mutating_a_key_touches_no_committed_byte(corpus, table, key, value):
     # The read path is exercised so the value is genuinely consumed rather
     # than merely parsed — a key that nothing reads would pass this test for
     # the wrong reason.
-    scan.ask(corpus, "alpha beta", top=5)
+    scan.ask(corpus, "alpha beta", top=5, scoring=scoring())
     assert _index_bytes(corpus) == before, (
         f"[{table}] {key} changed a committed byte — it is an INDEX decision, "
         "not a tunable, and belongs in a record rather than in tune.toml"
@@ -251,6 +273,7 @@ def test_an_index_key_does_change_the_index(tmp_path, key, value):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text(
         "# A\n\n## One\n\nx\n\n## Two\n\ny\n", encoding="utf-8"
@@ -280,7 +303,7 @@ def test_mutating_a_key_needs_no_rebuild(corpus):
         )
     )
     _write_tune(corpus, "bm25f", "heading", "0.25")
-    accel.ask(corpus, "alpha beta", top=5)
+    accel.ask(corpus, "alpha beta", top=5, scoring=scoring(), skipping=True)
     after = b"".join(
         sorted(
             p.read_bytes()
@@ -359,6 +382,7 @@ def _adversarial(n: int = 600) -> list[dict]:
 @pytest.fixture
 def adversarial(tmp_path):
     write_index(tmp_path, _adversarial())
+    write_config(tmp_path)
     build(tmp_path)
     return tmp_path
 
@@ -421,8 +445,8 @@ def test_per_source_priority_reaches_both_paths(corpus):
 
     promoted = Weighting(priority=(("alpha.md", 40.0),))
     for top in TOPS:
-        expected = [r.id for r in scan.ask(corpus, "alpha beta", top=top, weighting=promoted)]
-        got = [r.id for r in accel.ask(corpus, "alpha beta", top=top, weighting=promoted)]
+        expected = [r.id for r in scan.ask(corpus, "alpha beta", top=top, weighting=promoted, scoring=scoring())]
+        got = [r.id for r in accel.ask(corpus, "alpha beta", top=top, weighting=promoted, scoring=scoring(), skipping=True)]
         assert got == expected
 
 
@@ -430,10 +454,10 @@ def test_priority_actually_moves_the_ranking(corpus):
     """A knob that changes nothing observable is not a knob."""
     from fux.query.rank import Weighting
 
-    default = [r.id for r in scan.ask(corpus, "alpha", top=3)]
+    default = [r.id for r in scan.ask(corpus, "alpha", top=3, scoring=scoring())]
     demoted = [
         r.id
-        for r in scan.ask(corpus, "alpha", top=3, weighting=Weighting(priority=(("alpha.md", 0.01),)))
+        for r in scan.ask(corpus, "alpha", top=3, weighting=Weighting(priority=(("alpha.md", 0.01),)), scoring=scoring())
     ]
     assert default != demoted, "a 100x demotion must be visible in the order"
 
@@ -458,10 +482,7 @@ def test_priority_raises_the_bound_ceiling_but_a_demotion_does_not_lower_it(corp
     assert Weighting(priority=(("docs/", 0.25),)).trivial is False
 
 
-def test_the_default_tune_changes_nothing(corpus):
-    """The no-op case survives: a corpus with no file orders as it always did."""
-    baseline = [r.id for r in scan.ask(corpus, "alpha beta", top=5)]
-    (corpus / TUNE_NAME).parent.mkdir(parents=True, exist_ok=True)
-    (corpus / TUNE_NAME).write_text("", encoding="utf-8")
-    assert load(corpus).trivial
-    assert [r.id for r in scan.ask(corpus, "alpha beta", top=5)] == baseline
+def test_the_template_tune_is_what_no_tune_reads(corpus):
+    """`--no-tune` and a fresh `fux setup` rank alike: both read the template."""
+    (corpus / TUNE_NAME).write_text(template_text(), encoding="utf-8")
+    assert load(corpus, enabled=True) == load(corpus, enabled=False)

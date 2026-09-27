@@ -21,7 +21,7 @@ import { runQuery } from "../query/run.mjs";
 import { recordFor } from "../store/reader.mjs";
 import { chunk } from "../refer/chunk.mjs";
 import { rescore } from "../refer/rescore.mjs";
-import { assemble, CITATION_OVERHEAD } from "../refer/assemble.mjs";
+import { assemble } from "../refer/assemble.mjs";
 import { Verdict } from "../refer/freshness.mjs";
 import { resolve, readLocal, fromAcquired, GIT } from "../refer/source.mjs";
 import { passageBoost } from "../query/rerank.mjs";
@@ -146,11 +146,7 @@ export function answerPayload(root, args) {
     verdicts.set(r.id, got.verdict);
     if (got.text === null) continue;
     candidates.push([r.id, r.loc, record.sha || "",
-                     chunk(got.text, {
-                       lineNumbers: got.lineNumbers,
-                       minPassageBytes: tune.minPassageBytes,
-                       maxPassageBytes: tune.maxPassageBytes,
-                     })]);
+                     chunk(got.text, { ...tune.chunkBounds(), lineNumbers: got.lineNumbers })]);
   }
 
   if (!candidates.length) {
@@ -168,10 +164,12 @@ export function answerPayload(root, args) {
   // that reordered the DOCUMENTS now scores their passages, and neither may be
   // turned on without the other (`refer/_rescore.py::rescore`).
   const scored = rescore(query, candidates, {
-    weight: tune.rerankWeight, boostFn: passageBoost,
+    scoring: tune.scoring, weight: tune.rerankWeight, proximity: tune.proximity,
+    boostFn: passageBoost,
   });
   const bundle = assemble(scored, {
-    overhead: CITATION_OVERHEAD, budget: tune.budget, perDocFraction: tune.perDocFraction,
+    overhead: tune.citationOverhead, budget: tune.budget, source: "fetched",
+    perDocFraction: tune.perDocFraction, citationOverhead: tune.citationOverhead,
   });
 
   if (!bundle.citations.length) {

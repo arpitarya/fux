@@ -9,6 +9,7 @@ import pytest
 
 from fux.errors import FuxError
 from fux.ingest import pii
+from l12_fixtures import write_config
 
 
 def rules(*entries):
@@ -157,12 +158,14 @@ def test_a_file_with_no_rules_is_legal_and_redacts_nothing(tmp_path):
     # Missing and empty are different answers: empty is a committed choice.
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "pii.toml").write_text("# every rule commented out\n")
+    write_config(tmp_path)
     assert pii.load(tmp_path) == ()
 
 
 def test_a_malformed_file_raises(tmp_path):
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "pii.toml").write_text("[[rule]\nname = 'x'\n")
+    write_config(tmp_path)
     with pytest.raises(FuxError, match="invalid TOML"):
         pii.load(tmp_path)
 

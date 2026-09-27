@@ -8,6 +8,7 @@ bundle, so this module has no dependency outside the analyzer.
 """
 
 from __future__ import annotations
+from ..constants import fixed
 
 
 
@@ -42,7 +43,7 @@ from __future__ import annotations
 #: document's `Long Form (ABBR)` pairs. Redundant with the `_format` bump to
 #: v5, which already forces re-extraction; bumped anyway because the rule this
 #: constant enforces is about what this module returns, and it now returns more.
-RULES_VERSION = 3
+RULES_VERSION = fixed("versions", "extract_rules")
 
 import re
 from collections import Counter
@@ -165,15 +166,10 @@ def extract_fields(
     rel_path: str,
     doc: ParsedDoc,
     enrichment: str = "",
-    max_phrases: int | None = None,
+    *,
+    max_phrases: int,
     root: Path | None = None,
 ) -> Extracted:
-    # `None` is the default rather than the constant so this module does not
-    # import `fux.tune` (and through it the query package) at import time.
-    if max_phrases is None:
-        from ..tune import DEFAULT_MAX_PHRASES
-
-        max_phrases = DEFAULT_MAX_PHRASES
     # W-86 P0: the heading grammar follows the file type. A decoded document
     # always arrives as Markdown (SR-DECODE decision 2), so only an
     # already-prose `.rst`/`.adoc`/`.org` takes a different pattern.

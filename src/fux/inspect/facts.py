@@ -90,21 +90,25 @@ def _suffix(loc: str) -> str:
     return "." + name.rsplit(".", 1)[-1].lower() if "." in name else ""
 
 
-def cache_key(sha: str, decoder_digest: str, bounds: tuple[int, int]) -> str:
+def cache_key(sha: str, decoder_digest: str, bounds: dict[str, int]) -> str:
     from ..ingest.extract import RULES_VERSION
     from ..store.format import ANALYZER_VERSION
 
-    return f"{sha}|{decoder_digest}|rules{RULES_VERSION}|{ANALYZER_VERSION}|refer{bounds[0]}-{bounds[1]}"
+    return (
+        f"{sha}|{decoder_digest}|rules{RULES_VERSION}|{ANALYZER_VERSION}|refer{bounds['min_passage_bytes']}-{bounds['max_passage_bytes']}"
+        f"-{bounds['table_rows_per_passage']}"
+    )
 
 
-def refer_bounds(root: Path) -> tuple[int, int]:
+def refer_bounds(root: Path) -> dict[str, int]:
+    """`[refer]`'s passage bounds, as `chunk` takes them — no default (L12).
+
+    A missing or malformed `.fux/tune.toml` stops the report naming the key,
+    rather than measuring passages under numbers this repo never chose.
+    """
     from .. import tune as tune_mod
 
-    try:
-        tune = tune_mod.load(root)
-    except Exception:  # pragma: no cover - a report must not fail on a bad tune
-        return 120, 4000
-    return tune.min_passage_bytes, tune.max_passage_bytes
+    return tune_mod.load(root, enabled=True).chunk_bounds()
 
 
 def source_bytes(root: Path, doc_id: str, loc: str) -> bytes | None:
@@ -139,7 +143,7 @@ def readable_text(root: Path, doc_id: str, loc: str, raw: bytes) -> tuple[str, b
     return decoded, True
 
 
-def compute(root: Path, doc, *, decoder: str, bounds: tuple[int, int]) -> dict:
+def compute(root: Path, doc, *, decoder: str, bounds: dict[str, int]) -> dict:
     """One document's summary. **Never raises** — a report must not fail on one file."""
     from ..ingest.extract import _headings_and_body
     from ..ingest.parse import parse_document
@@ -193,7 +197,7 @@ def compute(root: Path, doc, *, decoder: str, bounds: tuple[int, int]) -> dict:
         text, generated = "", False
     out["decoded"] = generated
     out["text_bytes"] = len(text.encode("utf-8"))
-    passages = chunk(text, min_passage_bytes=bounds[0], max_passage_bytes=bounds[1]) if text else []
+    passages = chunk(text, **bounds, line_numbers=True) if text else []
     out["passages"] = len(passages)
     for p in passages:
         out["cuts"][p.cut or "author"] = out["cuts"].get(p.cut or "author", 0) + 1

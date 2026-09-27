@@ -19,6 +19,7 @@ import pytest
 
 from fux.query import rerank
 from fux.query.analyzer import analyze
+from l12_fixtures import template_tune, tuned
 
 
 @dataclass(frozen=True)
@@ -90,8 +91,8 @@ def test_a_missing_term_costs_more_than_linearly():
     missing term at 20 % and loses to a superseded document; squared prices it
     at 36 % and wins."""
     q = analyze("current decision east west traffic")
-    full = rerank.passage_boost(q, analyze("this is the current decision for east west traffic"))
-    partial = rerank.passage_boost(q, analyze("this is the decision for east west traffic"))
+    full = rerank.passage_boost(q, analyze("this is the current decision for east west traffic"), proximity=template_tune().proximity)
+    partial = rerank.passage_boost(q, analyze("this is the decision for east west traffic"), proximity=template_tune().proximity)
     assert full > partial
     assert partial / full < 0.8, "a 4-of-5 match must not keep 80% of its proximity"
 
@@ -103,7 +104,7 @@ def test_a_document_scores_as_its_best_passage_not_its_average():
         f"## Aside {i}\n\nUnrelated prose about other matters entirely." for i in range(9)
     )
     q = analyze("gateway rollback")
-    assert rerank.boost(q, answers_once) == pytest.approx(1.0)
+    assert rerank.boost(q, answers_once, tune=template_tune()) == pytest.approx(1.0)
 
 
 # -- the reranking itself -----------------------------------------------------
@@ -112,7 +113,7 @@ def test_a_document_scores_as_its_best_passage_not_its_average():
 def test_it_reorders_and_never_changes_the_membership():
     results = [_r("a.md", 10.0), _r("b.md", 9.0), _r("c.md", 8.0)]
     texts = {"a.md": "unrelated prose", "b.md": "the gateway rollback procedure", "c.md": "gateway"}
-    out = rerank.rerank(None, "gateway rollback", results, weight=1.0, read=_reader(texts))
+    out = rerank.rerank(None, "gateway rollback", results, tune=tuned(rerank_weight=1.0), read=_reader(texts))
     assert {r.id for r in out} == {r.id for r in results}, "must not add or drop a document"
     assert len(out) == len(results)
 
@@ -120,7 +121,7 @@ def test_it_reorders_and_never_changes_the_membership():
 def test_a_strong_proximity_match_can_overtake_a_higher_bm25f_score():
     results = [_r("a.md", 10.0), _r("b.md", 9.0)]
     texts = {"a.md": "gateway " * 40, "b.md": "run the gateway rollback procedure"}
-    out = rerank.rerank(None, "gateway rollback", results, weight=1.0, read=_reader(texts))
+    out = rerank.rerank(None, "gateway rollback", results, tune=tuned(rerank_weight=1.0), read=_reader(texts))
     assert out[0].loc == "b.md"
 
 
@@ -128,14 +129,14 @@ def test_a_document_that_cannot_be_read_keeps_its_score():
     """Offline, a `url:` document has no text to rerank against. Demoting it
     for being unreachable would make reachability a ranking signal."""
     results = [_r("a.md", 10.0), _r("b.md", 9.0)]
-    out = rerank.rerank(None, "gateway rollback", results, weight=1.0, read=lambda *_: None)
+    out = rerank.rerank(None, "gateway rollback", results, tune=tuned(rerank_weight=1.0), read=lambda *_: None)
     assert [r.loc for r in out] == ["a.md", "b.md"]
     assert [r.score for r in out] == [10.0, 9.0]
 
 
 def test_zero_weight_is_exactly_the_input():
     results = [_r("a.md", 10.0), _r("b.md", 9.0)]
-    assert rerank.rerank(None, "gateway rollback", results, weight=0.0) == results
+    assert rerank.rerank(None, "gateway rollback", results, tune=tuned(rerank_weight=0.0)) == results
 
 
 def test_a_one_term_query_is_left_alone():
@@ -143,14 +144,14 @@ def test_a_one_term_query_is_left_alone():
     reranking it is arithmetic that cannot change an order."""
     results = [_r("a.md", 10.0), _r("b.md", 9.0)]
     texts = {"a.md": "gateway", "b.md": "gateway gateway gateway"}
-    out = rerank.rerank(None, "gateway", results, weight=1.0, read=_reader(texts))
+    out = rerank.rerank(None, "gateway", results, tune=tuned(rerank_weight=1.0), read=_reader(texts))
     assert out == results
 
 
 def test_beyond_the_depth_nothing_is_touched():
     results = [_r(f"{i:02d}.md", 100.0 - i) for i in range(30)]
     texts = {r.loc: "gateway rollback procedure" for r in results}
-    out = rerank.rerank(None, "gateway rollback", results, depth=5, weight=1.0, read=_reader(texts))
+    out = rerank.rerank(None, "gateway rollback", results, tune=tuned(rerank_weight=1.0, rerank_depth=5), read=_reader(texts))
     assert [r.loc for r in out[5:]] == [r.loc for r in results[5:]], "the tail keeps its order"
     assert [r.score for r in out[5:]] == [r.score for r in results[5:]], "and its scores"
 
@@ -158,10 +159,8 @@ def test_beyond_the_depth_nothing_is_touched():
 def test_ties_break_on_id_never_on_input_order():
     """The property the whole output's byte-stability rests on."""
     texts = {"b.md": "gateway rollback", "a.md": "gateway rollback"}
-    forward = rerank.rerank(None, "gateway rollback", [_r("b.md", 5.0), _r("a.md", 5.0)],
-                            weight=1.0, read=_reader(texts))
-    backward = rerank.rerank(None, "gateway rollback", [_r("a.md", 5.0), _r("b.md", 5.0)],
-                             weight=1.0, read=_reader(texts))
+    forward = rerank.rerank(None, "gateway rollback", [_r("b.md", 5.0), _r("a.md", 5.0)], tune=tuned(rerank_weight=1.0), read=_reader(texts))
+    backward = rerank.rerank(None, "gateway rollback", [_r("a.md", 5.0), _r("b.md", 5.0)], tune=tuned(rerank_weight=1.0), read=_reader(texts))
     assert [r.id for r in forward] == [r.id for r in backward] == ["file:a.md", "file:b.md"]
 
 
@@ -170,7 +169,7 @@ def test_it_is_deterministic_across_repeated_calls():
     texts = {r.loc: f"gateway rollback {r.loc}" for r in results}
     runs = [
         [(r.id, round(r.score, 9))
-         for r in rerank.rerank(None, "gateway rollback", results, weight=1.0, read=_reader(texts))]
+         for r in rerank.rerank(None, "gateway rollback", results, tune=tuned(rerank_weight=1.0), read=_reader(texts))]
         for _ in range(5)
     ]
     assert all(run == runs[0] for run in runs)

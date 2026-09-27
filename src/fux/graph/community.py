@@ -43,12 +43,14 @@ small and its meaning readable.
 from __future__ import annotations
 
 from .model import Graph
+from ..constants import fixed
 
 __all__ = ["assign", "MAX_SWEEPS"]
 
 #: Sweeps before the assignment is taken as-is. LPA on sparse graphs settles
-#: in single digits; this is a determinism backstop, not a tuning knob.
-MAX_SWEEPS = 20
+#: in single digits; this is a determinism backstop, not a tuning knob — and it
+#: runs in `fux build`, which reads no tune table — so it is FIXED (L12).
+MAX_SWEEPS = fixed("graph", "community_max_sweeps")
 
 
 def assign(graph: Graph) -> dict[str, str]:

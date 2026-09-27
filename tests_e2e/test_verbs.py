@@ -16,6 +16,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from l12_fixtures import write_config
 
 
 def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
@@ -46,6 +47,7 @@ def _write_fixture(root: Path) -> None:
     dirs.write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(root)
     docs = root / "docs"
     docs.mkdir()
     (docs / "pruning.md").write_text(
@@ -142,6 +144,7 @@ def test_retirement_marks_and_never_demotes(tmp_path):
     dirs.write_text("docs\nold archived=true\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "old").mkdir()
     (tmp_path / "old" / "cache.md").write_text(
@@ -160,6 +163,7 @@ def test_retirement_marks_and_never_demotes(tmp_path):
     (tmp_path / ".fux" / "tune.toml").write_text(
         "[ranking]\narchived_weight = 0.1\n", encoding="utf-8"
     )
+    write_config(tmp_path)
     refused = _run(tmp_path, "ask", "cache", "--json", check=False)
     assert refused.returncode == 1
     assert "REMOVED on 2026-09-13" in refused.stderr
@@ -1009,6 +1013,7 @@ def _url_repo(tmp_path: Path, *, extra: str = "") -> None:
     (fux / "sources" / "dirs").write_text("", encoding="utf-8")
     (fux / "sources" / "urls").write_text("https://x.test/runbook fetch=mw decoder=prose\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
+    write_config((fux).parent)
 
 
 def test_fetch_at_answer_false_answers_from_acquired_and_opens_no_socket(tmp_path):
@@ -1087,6 +1092,7 @@ def test_a_consumer_drops_a_fetcher_in_and_names_it_on_a_line(tmp_path):
         "https://wiki.test/rota fetch=glassbox decoder=prose keep=true\n", encoding="utf-8"
     )
     (fux / "pii.toml").write_text("", encoding="utf-8")
+    write_config((fux).parent)
     fetchers = fux / "fetchers"
     fetchers.mkdir(parents=True, exist_ok=True)
     # The shipped default has to exist too: `[sources.url] fetcher` names it,
@@ -1121,6 +1127,7 @@ def test_a_fetcher_name_with_no_file_is_a_doctor_finding_not_a_parse_error(tmp_p
     (fux / "sources" / "dirs").write_text("", encoding="utf-8")
     (fux / "sources" / "urls").write_text("https://wiki.test/rota fetch=glasbox decoder=prose\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
+    write_config((fux).parent)
     (fux / "fetchers").mkdir(parents=True, exist_ok=True)
     (fux / "fetchers" / "http.py").write_text("def fetch(url):\n    return ''\n", encoding="utf-8")
 

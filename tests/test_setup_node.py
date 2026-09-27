@@ -36,6 +36,7 @@ import subprocess
 from fux import __version__
 from fux.setup import run as setup_run
 from fux.store import fuxdir
+from l12_fixtures import write_config
 
 
 def _setup(tmp_path):
@@ -249,6 +250,7 @@ def test_the_vendored_reader_answers_in_a_clone(tmp_path):
 
     _setup(tmp_path)
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     from fux.store import TF_FIELDS, term_hash, write_index
 
     tf = [0] * len(TF_FIELDS)
@@ -261,6 +263,7 @@ def test_the_vendored_reader_answers_in_a_clone(tmp_path):
         "phrases": [], "terms": {term_hash("rollback"): tf}, "flen": flen,
         "sha": "a" * 40, "edges": [],
     }])
+    write_config(tmp_path)
 
     proc = subprocess.run(
         ["node", str(tmp_path / ".fux" / "node" / "fux.mjs"), "find", "rollback"],

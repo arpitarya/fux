@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@3a28c4061074, src/fux/enrich.py@350b51a69c21, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2, node/src/correct.mjs@859349cb0ace, node/test/pins.test.mjs@daebcdb98aac]
+owns: [src/fux/correct.py@6c5f302479b2, src/fux/enrich.py@88eb1113825a, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2, node/src/correct.mjs@859349cb0ace, node/test/pins.test.mjs@daebcdb98aac]
 laws: [L1, L2, L3, L4]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: dfc0bda5b00e6371b6bcc0eac9cfd9359d9a2379d18e870bad7ed54ebd40fcdf
+content_sha: a49647fbb55e5c93b2631fa75f08a1ff3513972092a4d290f78576015486d742
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -398,7 +398,7 @@ regressed**. ⚠ **Do not cite `net +7 at recall@1` as a pass.** It is one
 reading of a bar that had four, and the verdict says so.
 
 **16. `--check` refuses a question that does not retrieve its own document in
-the top `SELF_RETRIEVAL_K = 3`** (ratified by Arpit, 2026-09-05). doc2query−−
+the top `[enrich] self_retrieval_k`, `3` as shipped** (ratified by Arpit, 2026-09-05). doc2query−−
 (arXiv 2301.03266) filters generated questions with a separate relevance
 model; fux uses **its own index**, which is cheaper and more honest — the thing
 being predicted is exactly what fux will do.

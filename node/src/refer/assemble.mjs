@@ -6,18 +6,15 @@
  */
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
 
-export const DEFAULT_BUDGET = 8000;
-export const PER_DOC_FRACTION = 0.5;
-/** Charged per citation, so the budget bounds the RENDERED answer and not
- *  merely its payload. */
-export const CITATION_OVERHEAD = 80;
+//: `budget`, `perDocFraction` and `citationOverhead` are `.fux/tune.toml
+//: [refer]`'s and arrive from the caller (L12). The overhead is charged per
+//: citation, so the budget bounds the RENDERED answer and not merely its payload.
 
 const enc = new TextEncoder();
 
 export function assemble(scored, {
-  budget = DEFAULT_BUDGET, k = null, source = "fetched",
-  overhead = 0, perDocFraction = PER_DOC_FRACTION,
-} = {}) {
+  budget, k = null, source, overhead = 0, perDocFraction, citationOverhead,
+}) {
   if (budget <= 0) throw new RangeError("budget must be positive");
 
   const candidates = scored.filter((s) => s.score > 0);
@@ -69,7 +66,7 @@ export function assemble(scored, {
       // item: the locator line and separator will be rendered around every
       // passage, so the budget bounds the rendered answer rather than the
       // payload. Charging it here is what makes `used` mean what it says.
-      nbytes: enc.encode(text).length + CITATION_OVERHEAD,
+      nbytes: enc.encode(text).length + citationOverhead,
     };
     const spent = perDoc.get(s.doc_id) ?? 0;
     // A document's FIRST citation is exempt: the cap exists to stop a document

@@ -28,17 +28,9 @@
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
 import { fixed } from "../config/constants.mjs";
 
-//: Restart probability is `1 - DAMPING`. PageRank's published default.
-export const DAMPING = 0.85;
-//: A count, not a convergence test. Three iterations reach two hops of
-//: structure, which is the neighbourhood the expansion is for.
-export const ITERATIONS = 3;
-//: Fraction of a node's mass that stays put each step — what makes the chain
-//: aperiodic. 0.5 is the conventional lazy chain.
-export const LAZINESS = 0.5;
-//: What each additional hop costs a route's reliability. A route that needs two
-//: intermediaries is not "slightly" less trustworthy than a direct link.
-export const HOP_DECAY = 0.5;
+//: `damping`, `iterations`, `laziness` and `hopDecay` are `.fux/tune.toml
+//: [graph]`'s and arrive as arguments (L12); why each is what the template
+//: ships is said beside its key in `templates/tune.toml.txt`.
 
 //: `ingest/edges.py`'s `EXTRACTED_GRADE`. Node does not ingest, so the constant
 //: is carried rather than the module: a grade arrives on the committed record
@@ -120,9 +112,9 @@ function hopsFromSeeds(graph, seeds, maxHops) {
 }
 
 export function ppr(graph, seeds, {
-  damping = DAMPING, iterations = ITERATIONS, laziness = LAZINESS,
+  damping, iterations, laziness,
   kinds = ALL_KINDS, linkIdfOn = false, maxHops = null,
-} = {}) {
+}) {
   if (!seeds.length || !graph.edges.length) return new Map();
   const hopOf = maxHops !== null && maxHops !== undefined
     ? hopsFromSeeds(graph, seeds, maxHops)
@@ -169,9 +161,9 @@ export function ppr(graph, seeds, {
  * The walk parameters are forwarded rather than absorbed: `expand` decides how
  * many nodes come back, `ppr` decides what the numbers mean. */
 export function expand(graph, seeds, {
-  limit, minScore = 0.0, damping = DAMPING, iterations = ITERATIONS, laziness = LAZINESS,
+  limit, minScore = 0.0, damping, iterations, laziness,
   kinds = ALL_KINDS, linkIdfOn = false, maxHops = null,
-} = {}) {
+}) {
   const seedSet = new Set(seeds);
   const walked = ppr(graph, seeds, {
     damping, iterations, laziness, kinds, linkIdfOn, maxHops,
@@ -189,7 +181,7 @@ export function expand(graph, seeds, {
  * `tune.toml` accepts 1.0: a consumer who sets it is saying distance should
  * cost nothing, and the cost of saying it is that a three-hop chain can tie a
  * direct link. Stated rather than clamped. */
-export function reliability(hops, { hopDecay = HOP_DECAY } = {}) {
+export function reliability(hops, { hopDecay }) {
   let score = 1.0;
   for (const edge of hops) score *= edge.grade / EXTRACTED_GRADE;
   return score * (hopDecay ** (hops.length - 1));
@@ -217,7 +209,7 @@ export function reliability(hops, { hopDecay = HOP_DECAY } = {}) {
  * every corpus; depth is not. **Not tunable** — a tune file that could widen a
  * search would make `--hops 2` mean different things in two repositories.
  */
-export const EXPANSION_BUDGET = 200000;
+export const EXPANSION_BUDGET = fixed("graph", "path_expansion_budget");
 
 /** `{routes, truncated}`. **`truncated` describes the SEARCH, not the result
  *  set** — a truncated search that found three routes may have missed a better
@@ -225,7 +217,7 @@ export const EXPANSION_BUDGET = 200000;
  *  found in the first 200 000 expansions"*. Returning the first when the
  *  second is true is a confident answer to a question that was not finished. */
 export function routes(
-  graph, src, dst, { hops, limit = 10, hopDecay = HOP_DECAY, budget = EXPANSION_BUDGET } = {},
+  graph, src, dst, { hops, limit, hopDecay, budget },
 ) {
   if (hops < 1 || src === dst) return { routes: [], truncated: false };
 

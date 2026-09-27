@@ -32,7 +32,7 @@ import { headingsFor } from "./headings.mjs";
 import { fuseResults } from "./fuse.mjs";
 import * as expandMod from "./expand.mjs";
 import { tokenizePairs } from "./tokenize.mjs";
-import { rerank, DEPTH as RERANK_DEPTH } from "./rerank.mjs";
+import { rerank } from "./rerank.mjs";
 import { applyPin } from "../correct.mjs";
 import { loadTune } from "../config/tune.mjs";
 import { archivedDirSet } from "../ingest/gitdir.mjs";
@@ -40,7 +40,6 @@ import { tiers } from "./compose.mjs";
 import { recordFor } from "../store/reader.mjs";
 import { idf } from "./bm25f.mjs";
 
-export { RERANK_DEPTH };
 
 /** The document-level multipliers and the directories they apply to.
  *
@@ -58,9 +57,9 @@ export function archivedRanking(root, tune) {
 }
 
 /** Proximity rerank, then truncate to what the caller asked for. */
-function maybeRerank(root, query, results, weight, top) {
-  if (weight <= 0) return results.slice(0, top);
-  return rerank(root, query, results, { weight }).slice(0, top);
+function maybeRerank(root, query, results, tune, top) {
+  if (tune.rerankWeight <= 0) return results.slice(0, top);
+  return rerank(root, query, results, { tune }).slice(0, top);
 }
 
 /** The confidence block, or `null`. **Never throws** — a signal that can fail a
@@ -72,6 +71,7 @@ function buildConfidence(query, stats, results, tune) {
       tokenizePairs(query), queryTermHashes(query),
       stats.df ?? {}, stats.n ?? 0, results.map((r) => r.score),
       {
+        verified: "unverified",
         topDocHashes: stats.top_doc_hashes ?? null,
         separationFloor: tune.separationFloor,
         docCoverageFloor: tune.docCoverageFloor,
@@ -167,7 +167,7 @@ export function runQuery(root, query, top, {
   // with everything else and the depth goes back with it.
   const rerankWeight = resolved.rerankWeight;
   const graphOn = resolved.askBoost || resolved.askRelated;
-  const depth = (rerankWeight > 0 || graphOn) ? Math.max(top, RERANK_DEPTH) : top;
+  const depth = (rerankWeight > 0 || graphOn) ? Math.max(top, resolved.rerankDepth) : top;
 
   const queryHashes = queryTermHashes(query);
   let expansion = expandMod.build(
@@ -198,7 +198,7 @@ export function runQuery(root, query, top, {
   // signal. Letting the walk re-order a pinned document off the top would mean
   // a person's explicit intervention could be overruled, silently, by a link
   // somebody else drew.
-  const ordered = applyPin(root, query, maybeRerank(root, query, window, rerankWeight, depth), depth);
+  const ordered = applyPin(root, query, maybeRerank(root, query, window, resolved, depth), depth);
   // 🔴 **`find` shares Tier A and never computes Tier B.** `find` is `ask`'s
   // terse sibling — both are *ranked documents* — so a boost that moved one and
   // not the other would make the two verbs rank the same corpus differently,

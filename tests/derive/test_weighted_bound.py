@@ -32,6 +32,7 @@ and it binds whatever multiplier arrives next.**
 
 from __future__ import annotations
 
+from l12_fixtures import scoring, write_config
 import pytest
 
 from fux.derive import accel, build
@@ -100,6 +101,7 @@ def _adversarial_corpus(n_docs: int = 600) -> list[dict]:
 @pytest.fixture
 def built(tmp_path):
     write_index(tmp_path, _adversarial_corpus())
+    write_config(tmp_path)
     build(tmp_path)
     return tmp_path
 
@@ -132,10 +134,10 @@ def test_accelerator_equals_scan_at_any_weight(built, weight, top):
     differential law carries it down both the scan and accelerator paths for
     free"* — which held at `1.0` and at no other value.
     """
-    expected = _payload(scan.ask(built, "alpha beta", top=top, weighting=_weighting(weight)))
+    expected = _payload(scan.ask(built, "alpha beta", top=top, weighting=_weighting(weight), scoring=scoring()))
     for skipping in (False, True):
         got = _payload(
-            accel.ask(built, "alpha beta", top=top, skipping=skipping, weighting=_weighting(weight))
+            accel.ask(built, "alpha beta", top=top, skipping=skipping, weighting=_weighting(weight), scoring=scoring())
         )
         assert got == expected, f"weight={weight} top={top} skipping={skipping}"
 
@@ -155,9 +157,10 @@ def test_promotion_actually_reorders_this_corpus():
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         write_index(root, _adversarial_corpus())
+        write_config(root)
         build(root)
-        at_default = scan.ask(root, "alpha beta", top=20, weighting=_weighting(1.0))
-        promoted = scan.ask(root, "alpha beta", top=20, weighting=_weighting(500.0))
+        at_default = scan.ask(root, "alpha beta", top=20, weighting=_weighting(1.0), scoring=scoring())
+        promoted = scan.ask(root, "alpha beta", top=20, weighting=_weighting(500.0), scoring=scoring())
         assert not any(r.archived for r in at_default), "fixture: archived already in top-20 at default"
         assert any(r.archived for r in promoted), "fixture: weight never reorders — nothing is under test"
 
@@ -175,8 +178,8 @@ def test_skipping_is_still_load_bearing_at_a_weight(built):
     runtime = Runtime(built)
     hashes = query_term_hashes("alpha beta")
     w = _weighting(0.5)
-    with_skip, _, _ = accel_candidates(runtime, hashes, 5, skipping=True, weighting=w)
-    without, _, _ = accel_candidates(runtime, hashes, 5, skipping=False, weighting=w)
+    with_skip, _, _ = accel_candidates(runtime, hashes, 5, skipping=True, weighting=w, scoring=scoring())
+    without, _, _ = accel_candidates(runtime, hashes, 5, skipping=False, weighting=w, scoring=scoring())
     assert len(with_skip) < len(without), "skipping never fired — the bound is not load-bearing"
 
 

@@ -6,6 +6,7 @@ into the tmp repo, which is exactly the trust boundary the design draws."""
 
 from __future__ import annotations
 
+from l12_fixtures import scoring, write_config
 import pytest
 
 from fux import store
@@ -78,6 +79,7 @@ def _write_toml(tmp_path, text, dirs=("docs",)):
     listing.write_text("".join(f"{d}{chr(10)}" for d in dirs), encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
 
 
 def _write_urls(tmp_path, lines):
@@ -702,7 +704,7 @@ def test_a_url_record_shows_its_real_title(tmp_path):
 
     _init(tmp_path, urls=["https://x.test/a"])
     run(tmp_path, refresh_urls=True)
-    (result,) = [r for r in scan.ask(tmp_path, "rendered", top=5) if r.id.startswith("url:")]
+    (result,) = [r for r in scan.ask(tmp_path, "rendered", top=5, scoring=scoring()) if r.id.startswith("url:")]
     assert result.title == "Page a"
 
 

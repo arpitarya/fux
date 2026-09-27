@@ -20,6 +20,7 @@ from importlib import resources
 import pytest
 
 from fux.derive import format as fmt
+from l12_fixtures import write_config
 
 SCHEMA_NAME = "runtime.schema.json"
 
@@ -72,6 +73,7 @@ def test_the_stats_field_set_matches_a_real_stats_file(schema, tmp_path):
             "terms": {term_hash("alpha"): [1, 0]}, "flen": [4], "edges": [],
         }],
     )
+    write_config(tmp_path)
     build(tmp_path)
     produced = json.loads((fmt.runtime_dir(tmp_path) / fmt.STATS_NAME).read_text("utf-8"))
     assert set(produced) == set(schema["stats"]["fields"])

@@ -6,6 +6,7 @@ the ignore file lists only derived dirs, derived dirs carry CACHEDIR.TAG.
 from __future__ import annotations
 
 from fux.store import fuxdir
+from l12_fixtures import write_config
 
 
 def test_ensure_layout_writes_readme_gitignore_and_the_node_reader(tmp_path):
@@ -168,6 +169,7 @@ def test_a_committed_file_is_not_reported_as_undeclared(tmp_path):
 
     fuxdir.ensure_layout(tmp_path)
     (tmp_path / ".fux" / "tune.toml").write_text("[bm25f]\n", encoding="utf-8")
+    write_config(tmp_path)
     extras = sorted(
         p.name for p in (tmp_path / ".fux").iterdir() if p.name not in fuxdir.DECLARED
     )

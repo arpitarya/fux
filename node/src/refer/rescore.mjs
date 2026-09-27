@@ -54,9 +54,9 @@ function termsOf(passage) {
  * guarantee. At `weight <= 0` this is the identity on `score` with **no float
  * arithmetic performed at all**, so no last-bit difference can enter a bundle
  * on a repo that never turned the reranker on. */
-function uplift(score, queryTerms, passage, weight, boostFn) {
+function uplift(score, queryTerms, passage, weight, boostFn, proximity) {
   if (weight <= 0) return score;
-  return score * (1.0 + weight * boostFn(queryTerms, analyze(passage.text)));
+  return score * (1.0 + weight * boostFn(queryTerms, analyze(passage.text), proximity));
 }
 
 /** Score every passage of every fetched document against the query.
@@ -67,8 +67,9 @@ function uplift(score, queryTerms, passage, weight, boostFn) {
  *  **One constant, not a second knob**: `weight` is `[ranking] rerank_weight`,
  *  the same value the document reranker uses. Two knobs for one signal is how
  *  they drift, and the day they disagree `answer` cites a passage the ranking
- *  did not prefer for a reason nobody can name. It defaults to OFF. */
-export function rescore(query, candidates, { weight = 0.0, boostFn = null } = {}) {
+ *  did not prefer for a reason nobody can name. `scoring` is the repo's
+ *  `[bm25f]`, so a passage is scored exactly as its document was. */
+export function rescore(query, candidates, { scoring, weight, proximity, boostFn = null }) {
   const hashes = queryTermHashes(query);
   if (!hashes.length) return [];
   const queryTerms = weight > 0 ? analyze(query) : [];
@@ -80,7 +81,7 @@ export function rescore(query, candidates, { weight = 0.0, boostFn = null } = {}
     for (const passage of passages) {
       const [terms, flen] = termsOf(passage);
       rows.push([docId, loc, sha, passage, terms, flen]);
-      totalWlen += deriveWlen(flen);
+      totalWlen += deriveWlen(flen, scoring);
       for (const term of Object.keys(terms)) df[term] = (df[term] ?? 0) + 1;
     }
   }
@@ -91,8 +92,8 @@ export function rescore(query, candidates, { weight = 0.0, boostFn = null } = {}
   const scored = rows.map(([docId, loc, sha, passage, terms, flen]) => ({
     doc_id: docId, loc, sha, passage,
     score: uplift(
-      scoreRecord(terms, flen, hashes, df, n, avgWlen),
-      queryTerms, passage, weight, boostFn || (() => 0),
+      scoreRecord(terms, flen, hashes, df, n, avgWlen, scoring),
+      queryTerms, passage, weight, boostFn || (() => 0), proximity,
     ),
     get nbytes() { return this.passage.nbytes; },
     get locator() { return locatorOf(this.loc, this.passage); },

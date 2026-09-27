@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@63a9c36a1894, src/fux/query/bm25f.py@aa37960fcdf7, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@38936c39de2a, src/fux/query/stem.py@728155482c94, node/src/query/analyzer.mjs@cee5e31828b2, node/src/query/bm25f.mjs@d7e52fcf5f89, node/src/query/rank.mjs@ba0f2173a355, node/src/query/stem.mjs@85a3f29571a6, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
+owns: [src/fux/query/rank.py@01dfa8388928, src/fux/query/bm25f.py@911171326d9a, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@38936c39de2a, src/fux/query/stem.py@728155482c94, node/src/query/analyzer.mjs@cee5e31828b2, node/src/query/bm25f.mjs@cae5b76af448, node/src/query/rank.mjs@25c604508f55, node/src/query/stem.mjs@85a3f29571a6, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 1efd0faea903ac7ef3ee99009dd099341097b073efe591f6339220b02eb629dd
+content_sha: 1f13a2752f4df76d4b104e37c9e0a6dd8a5c5b511bcadaae8c4a4c0421113f43
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -225,14 +225,17 @@ present thinly in all five would then beat a term that genuinely dominates one.
 iterates over the *posting* rather than over the weights, so a body-only tf of
 `[1]` costs nothing for the four fields it does not carry.
 
-**3. The defaults are `K1 = 1.2`, `B = 0.15`, and `FIELD_WEIGHTS = (1.0, 3.0,
-2.0, 1.5, 1.0)`** — body 1.0, heading 3.0, title 2.0, path 1.5, `ctx` 1.0,
-aligned index-for-index with `TF_FIELDS`, and `bm25f.py` asserts the two are the
-same length. A silent misalignment would weight `title` as `path` and produce a
+**3. The shipped values are `k1 = 1.2`, `b = 0.15`, and field weights `(1.0,
+3.0, 2.0, 1.5, 1.0)`** — body 1.0, heading 3.0, title 2.0, path 1.5, `ctx` 1.0 —
+written by `fux setup` from [`templates/tune.toml.txt`](../src/fux/templates/tune.toml.txt)
+into `.fux/tune.toml [bm25f]`, the only place they live
+([L12](0013_LAW-12-values-live-in-config.md)). The weights are aligned
+index-for-index with `TF_FIELDS`, and `Scoring` asserts the two are the same
+length. A silent misalignment would weight `title` as `path` and produce a
 ranking that is plausible and wrong, which is the failure mode with no symptom.
 
-🔴 **`B` was `0.75` — the literature's value — until 2026-09-16, and `0.15` is
-the first default here that is MEASURED rather than inherited**
+🔴 **`b` was `0.75` — the literature's value — until 2026-09-16, and `0.15` is
+the first shipped value here that is MEASURED rather than inherited**
 ([W-144](../work/regression/2026-09-16-b-sweep-2/VERDICT.md)).
 
 `b` is the strength of length normalisation, and **a table inflates a document's
@@ -251,25 +254,24 @@ reports the smallest departure from `0.75` that works, never the best value.
 ⚠ **One synthetic corpus, and the run is `informed`.** 510 generated documents
 built so the mechanism *can* move. It says a lower `b` ranks better **on
 documents shaped like these**; real-corpus evidence is W-144's reopen trigger.
-**A default shipped on one synthetic corpus is why this paragraph exists rather
+**A value shipped on one synthetic corpus is why this paragraph exists rather
 than a silent value change.**
 
-⚠ **`K1`, heading and body are still carried forward from the archived engine, so
-its recorded numbers remain a free correctness check — but `B` is no longer one
+⚠ **`k1`, heading and body are still carried forward from the archived engine, so
+its recorded numbers remain a free correctness check — but `b` is no longer one
 of them.** `title`, `path` and `ctx` are carried forward from nothing: defensible
 starting points, not measured optima. Listing them in one breath would dress
 guesses as calibration.
 
-⚠ **None of the seven is a constant.** They are the module-level defaults, and
-`[bm25f]` in `.fux/tune.toml` can replace any of them per query
-([SR-TUNE](0135_tuning.md)). An unconfigured corpus scores byte-identically to
-a corpus with no tune file at all, which is what the suites run.
+⚠ **None of the seven is a constant in code.** Each is a required `[bm25f]` key
+in `.fux/tune.toml` ([SR-TUNE](0135_tuning.md)); a repo that has not changed
+them scores byte-identically to `--no-tune`, which reads the template.
 
 **3a. They travel as ONE frozen `Scoring` object, never as separate
-arguments.** `weighted_tf`, `derive_wlen` and `score_record` take
-`scoring: Scoring = DEFAULT_SCORING`; `Scoring` carries `k1`, `b` and the five
-weights together, plus a `trivial` property so a default query can
-short-circuit. The reason is decision 2's fraction read as a whole:
+arguments.** `weighted_tf`, `derive_wlen` and `score_record` take a required
+`scoring: Scoring` — there is no default instance (L12); `Scoring` carries `k1`,
+`b`, the five weights and `anchor` together, built once per query by
+`Tune.scoring`. The reason is decision 2's fraction read as a whole:
 
 ```
 denom = wtf + k1 * (1 - b + b * wlen / avg_wlen)
@@ -556,9 +558,9 @@ pre-registration. That pre-registration is
 [`2026-09-15-anchor-text`](../work/regression/2026-09-15-anchor-text/PRE-REGISTRATION.md),
 and its [`VERDICT.md`](../work/regression/2026-09-15-anchor-text/VERDICT.md)
 is PASS at `anchor = 1.0` — `informed`, set-3-claude only, one 1 000-document rung,
-and **that is the whole of the ranking-quality claim**. The value is `ANCHOR`
-in `query/bm25f.py` and its Node twin, held equal by
-`tests/test_node_config_parity.py`. 🔴 **The differential law now holds at the
+and **that is the whole of the ranking-quality claim**. The value is
+`[bm25f] anchor` in the template both readers load, and
+`tests/test_node_config_parity.py` holds that they resolve it alike. 🔴 **The differential law now holds at the
 default with the fold live**: scan, accelerator, Node reader and published
 bundle are compared byte-for-byte at `anchor = 1.0` —
 `tests/query/test_anchor_field.py` and `tests/query/test_anchor_node_twin.py`.
@@ -695,7 +697,7 @@ this veto watches for.
 
 ```bash
 # 1. one scorer, one sort — a third file scoring is the veto
-grep -rln 'K1\|score_record\|def rank(' src/fux/query/
+grep -rln 'k1 + 1\|score_record\|def rank(' src/fux/query/
 # expect: bm25f.py and rank.py only
 
 # 2. the order is still rounded and id-tie-broken (the accelerator depends on it)
@@ -706,11 +708,12 @@ grep -n 'round(' src/fux/query/rank.py
 grep -rn 'from .tokenize import\|from ..query.tokenize import' src/fux/
 # expect: both ingest/ and query/ importing the same module
 
-# 4. the defaults still match the archived baseline the checks rest on
-grep -nE 'FIELD_WEIGHTS: |^K1|^B ' src/fux/query/bm25f.py
-# expect: (1.0, 3.0, 2.0, 1.5, 1.0), 1.2, 0.15 — body and heading unmoved.
-# These are DEFAULTS; `.fux/tune.toml` replaces any of them per query, so the
-# archived-baseline claim holds for `ask --no-tune` and for an unconfigured repo.
+# 4. the shipped values still match the archived baseline the checks rest on
+grep -nE '^(k1|b|body|heading|title|path|ctx) ' src/fux/templates/tune.toml.txt
+# expect: 1.2, 0.15, then 1.0 3.0 2.0 1.5 1.0 — body and heading unmoved.
+# The template is what `fux setup` writes and `--no-tune` reads; a repo's own
+# `.fux/tune.toml` may set any of them, so the archived-baseline claim holds for
+# `ask --no-tune` and for a repo that kept the template's values.
 
 # 5. the scorer takes them as ONE object, so half a fraction cannot be reweighted
 grep -nE 'scoring: Scoring|weights: tuple' src/fux/query/bm25f.py

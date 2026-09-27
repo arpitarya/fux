@@ -334,6 +334,15 @@ def build_parser() -> argparse.ArgumentParser:
     # 2026-08-22). Promotion to a `fux status` verb has a written condition in
     # SR-CLI; it is not a matter of feeling crowded.
     p_doctor.add_argument("--json", action="store_true", default=None, help="machine-readable report")
+    # L12 decision 3: the one writer of a missing config key besides `fux setup`.
+    # It writes ONLY what is missing, from the packaged template, and never
+    # touches a line the consumer wrote.
+    p_doctor.add_argument(
+        "--fix",
+        action="store_true",
+        default=None,
+        help="write every missing config file and key from its template, then check",
+    )
     _add_output_flags(p_doctor)
     p_doctor.set_defaults(func=_cmd_doctor)
 

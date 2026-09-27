@@ -524,7 +524,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 > - **`SR-CONFIDENCE` once existed at two paths** — `0141_confidence.md` and
 >   `0141_confidence.md`, same `name:` — while `0043` was also `SR-LOCKS`.
 >   Ruled 2026-08-27: keep the later file, on the substantive ground that its
->   decision 6 binds `SEPARATION_FLOOR` to
+>   decision 6 binds `separation_floor` to
 >   [SR-WORK-QUALITY](0056_WORK-quality.md)'s frozen `t = 0.75`. The duplicate
 >   was deleted, and the survivor is now [0141](0141_confidence.md).
 > - **A note here once claimed a renumber had already happened** and pointed at

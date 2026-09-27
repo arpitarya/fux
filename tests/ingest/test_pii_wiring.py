@@ -15,6 +15,7 @@ from pathlib import Path
 import pytest
 
 from fux.ingest import pii
+from l12_fixtures import write_config
 
 SRC = Path(__file__).resolve().parents[2] / "src" / "fux" / "ingest" / "run.py"
 
@@ -262,6 +263,7 @@ def test_ingest_refuses_a_repo_with_no_pii_file(tmp_path):
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# a\n\nmail a@b.com\n", encoding="utf-8")
+    write_config(tmp_path)  # every OTHER file present, so pii.toml is the one missing
     with pytest.raises(FuxError, match="pii.toml is missing"):
         run(tmp_path)
     assert not (tmp_path / ".fux" / "index").exists() or not any(
@@ -283,6 +285,7 @@ def _repo_with_rule(tmp_path, files: dict[str, str]):
         "replacement = '[PII:email]'\n",
         encoding="utf-8",
     )
+    write_config(tmp_path)
     for rel, text in files.items():
         path = tmp_path / rel
         path.parent.mkdir(parents=True, exist_ok=True)

@@ -63,46 +63,38 @@ So the reranker computes three things BM25F structurally cannot, over the
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .analyzer import analyze
 
-__all__ = [
-    "COVERAGE_POWER", "DEPTH", "WEIGHT", "boost", "passage_boost", "phrase_present",
-    "rerank", "signals",
-]
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from ..tune import Tune
 
-#: How far down the ranking to reorder. Beyond this the reranker would be
-#: paying to read documents nobody will look at; W-76's gate is phrased
-#: `top-20 -> top-5`, and this is the 20.
-DEPTH = 20
+__all__ = ["Proximity", "boost", "passage_boost", "phrase_present", "rerank", "signals"]
 
-#: The maximum fraction a perfect proximity match may add to a BM25F score.
-#: A **bounded multiplicative uplift**, exactly like the dense lane's `fuse()`:
-#: the two quantities are on unrelated scales and adding them would let a
-#: proximity signal of 0.4 outweigh a real term match on a corpus where BM25F
-#: happens to score low. Tunable via `[ranking] rerank_weight`.
-#:
-#: `1.0` means *a perfect proximity match may at most double a score*. Chosen
-#: off a measured plateau rather than a peak: the 4x5 sweep of
-#: (COVERAGE_POWER, WEIGHT) over the 50 goldens scores 30-32 everywhere, with
-#: 32 at (2, 1.0), (2, 1.5), (3, 1.5), (3, 2.0) and (4, 2.0). A constant
-#: picked from the middle of a plateau survives a corpus it was not tuned on;
-#: one picked from a spike is an overfit to 50 queries.
-WEIGHT = 1.0
+@dataclass(frozen=True)
+class Proximity:
+    """The passage arithmetic's four `[ranking]` numbers, carried as one.
 
-#: How hard a **missing** query term is punished. Coverage is raised to this
-#: before it multiplies, so a passage covering 4 of 5 query terms keeps 64 %
-#: of its proximity rather than 80 %.
-#:
-#: The measured argument, on golden `q015` (*"what is the current decision for
-#: east west traffic"*): the superseded ADR-0007 scores BM25F **8.01** against
-#: the current ADR-0019's **6.64**, because both are dense in the same
-#: vocabulary and the superseded one is shorter. ADR-0019 contains every query
-#: term; ADR-0007 is missing exactly one -- `current` -- which is *the entire
-#: question*. Linear coverage prices that omission at 20 % and loses; squared
-#: prices it at 36 % and wins.
-COVERAGE_POWER = 2
+    `coverage_power` — how hard a **missing** query term is punished: coverage
+    is raised to it before it multiplies. The measured argument is golden
+    `q015` (*"what is the current decision for east west traffic"*): the
+    superseded ADR scores BM25F 8.01 against the current one's 6.64, and the
+    current one contains every query term while the superseded one misses
+    `current` — which is *the entire question*. Linear coverage prices that
+    omission at 20 % and loses; squared prices it at 36 % and wins.
+
+    `base`, `span`, `adjacency` — the mix. The shipped values, and the depth
+    the reranker reorders to, live in `templates/tune.toml.txt` (L12).
+    """
+
+    coverage_power: float
+    base: float
+    span: float
+    adjacency: float
+
 
 #: Below two distinct query terms there is no proximity to measure -- one term
 #: is always perfectly covered, adjacent to nothing, and spans itself.
@@ -210,7 +202,9 @@ def phrase_present(phrase_terms: list[str], text: str) -> bool:
     return _adjacency_signal(positions, list(phrase_terms)) == 1.0
 
 
-def passage_boost(query_terms: list[str], passage_terms: list[str]) -> float:
+def passage_boost(
+    query_terms: list[str], passage_terms: list[str], proximity: Proximity
+) -> float:
     """One passage's proximity score in `[0, 1]`.
 
     **Coverage multiplies rather than adds**, and that is the whole difference
@@ -229,10 +223,12 @@ def passage_boost(query_terms: list[str], passage_terms: list[str]) -> float:
     coverage, span, adjacency = signals(query_terms, passage_terms)
     if coverage <= 0:
         return 0.0
-    return (coverage**COVERAGE_POWER) * (0.55 + 0.30 * span + 0.15 * adjacency)
+    return (coverage**proximity.coverage_power) * (
+        proximity.base + proximity.span * span + proximity.adjacency * adjacency
+    )
 
 
-def boost(query_terms: list[str], text: str) -> float:
+def boost(query_terms: list[str], text: str, tune: "Tune") -> float:
     """A document scores as its BEST passage, never its average one.
 
     The deleted dense lane made the same argument for vectors (max-sim per
@@ -249,8 +245,9 @@ def boost(query_terms: list[str], text: str) -> float:
     from ..refer._chunk import chunk
 
     best = 0.0
-    for passage in chunk(text):
-        score = passage_boost(query_terms, analyze(passage.text))
+    proximity = tune.proximity
+    for passage in chunk(text, **tune.chunk_bounds(), line_numbers=True):
+        score = passage_boost(query_terms, analyze(passage.text), proximity)
         if score > best:
             best = score
     return best
@@ -261,12 +258,15 @@ def rerank(
     query: str,
     results,
     *,
-    depth: int = DEPTH,
-    weight: float = WEIGHT,
+    tune: "Tune",
     read=None,
     uplift_out: dict | None = None,
 ):
-    """Reorder the top `depth` results by proximity. Never adds or drops one.
+    """Reorder the top `[ranking] rerank_depth` results by proximity. Never adds or drops one.
+
+    `tune` carries every number this pass uses — the depth, the uplift weight,
+    the proximity mix and the chunk bounds — so a caller cannot rerank under
+    one value and cite under another (L12: none of them has a module default).
 
     `read` is **injected, never imported** -- the same rule `refer/source.py`
     follows for fetchers. It takes `(root, doc_id, loc)` and returns text, or
@@ -285,6 +285,8 @@ def rerank(
     `rank`'s `stats_out` is one**: every existing caller is unchanged, and
     nothing read back out of it reaches a score or an ordering.
     """
+    depth = tune.rerank_depth
+    weight = tune.rerank_weight
     if weight <= 0 or depth <= 0 or len(results) < 2:
         return list(results)
 
@@ -310,7 +312,7 @@ def rerank(
                 # its score genuinely passed through unchanged.
                 uplift_out[result.id] = 1.0
             continue
-        uplift = 1.0 + weight * boost(query_terms, text)
+        uplift = 1.0 + weight * boost(query_terms, text, tune)
         if uplift_out is not None:
             uplift_out[result.id] = uplift
         rescored.append((result.score * uplift, result))

@@ -21,6 +21,7 @@ import pytest
 from fux.derive import build
 from fux.query import _declare_no_accelerator
 from fux.store import term_hash, write_index
+from l12_fixtures import write_config
 
 
 def _rec(doc_id, title, terms, flen=(100,)) -> dict:
@@ -41,6 +42,7 @@ def _rec(doc_id, title, terms, flen=(100,)) -> dict:
 def indexed(tmp_path):
     # tf is `[body, heading]` (v2 order — `store.TF_FIELDS`).
     write_index(tmp_path, [_rec("file:a.md", "Alpha", {term_hash("alpha"): [3, 1]})])
+    write_config(tmp_path)
     return tmp_path
 
 

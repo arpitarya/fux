@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@59025a5651b1, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@f3ef6baa4855, node/src/graph/model.mjs@62fe3c17c961, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@e82f1a61be81, node/src/verbs/graph.mjs@5c5960f9bc9a]
+owns: [src/fux/graph@681f6b668ede, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@62fe3c17c961, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@2c157d951ec3, node/src/verbs/graph.mjs@adf3d141af2d]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: c6cf4f4ccc09f5b306d0e6a6246a6a861ac9ad12d0477446224e3efa74b0a057
+content_sha: 53d98c7c694d55065973fea1beadb5ef409b1d8dc9648d2201f15029b326a7f2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -126,8 +126,8 @@ xychart-beta
   unlazy: 0.204   0.588   0.054   0.154   <- inverted at 2 vs 3
   lazy:   0.446   0.406   0.129   0.019   <- monotone
 
-  source: computed from this module's own constants
-          (DAMPING 0.85, ITERATIONS 3, LAZINESS 0.5); the assertion is
+  source: computed at the template's [graph] values
+          (damping 0.85, iterations 3, laziness 0.5); the assertion is
           tests/graph/test_walk.py::test_ppr_scores_decrease_monotonically_with_distance
 ```
 
@@ -225,7 +225,8 @@ mode* name ([SR-EXTRACTED](0115_extracted-mode.md) decision 5).
 **9. The walk is lazy, which is a deliberate correction rather than a port.**
 See §Alternatives and the chart in §1.
 
-**10. Reliability is the grade product decayed per hop** (`HOP_DECAY = 0.5`), so
+**10. Reliability is the grade product decayed per hop** (`[graph] hop_decay`,
+`0.5` as shipped), so
 a direct `EXTRACTED` link is exactly 1.0 and every additional hop at least
 halves it. Two properties are asserted rather than assumed: bounded by 1.0, and
 **strictly decreasing with distance**.
@@ -471,11 +472,13 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
+- `node/src/graph/community.mjs` — `MAX_SWEEPS` ← `[graph] community_max_sweeps`
 - `node/src/graph/model.mjs` — `TAG_PREFIX` ← `[graph] tag_prefix`
 - `node/src/graph/plane.mjs` — `SCHEMA` ← `[graph] schema`, `GRAPH_NAME` ← `[graph] file`
-- `node/src/graph/walk.mjs` — `EXTRACTED_GRADE` ← `[graph] grade_extracted`, `EDGE_KINDS` ← `[graph] edge_kinds`
+- `node/src/graph/walk.mjs` — `EXTRACTED_GRADE` ← `[graph] grade_extracted`, `EDGE_KINDS` ← `[graph] edge_kinds`, `EXPANSION_BUDGET` ← `[graph] path_expansion_budget`
+- `src/fux/graph/community.py` — `MAX_SWEEPS` ← `[graph] community_max_sweeps`
 - `src/fux/graph/plane.py` — `GRAPH_NAME` ← `[graph] file`, `SCHEMA` ← `[graph] schema`
-- `src/fux/graph/walk.py` — `EDGE_KINDS` ← `[graph] edge_kinds`
+- `src/fux/graph/walk.py` — `EDGE_KINDS` ← `[graph] edge_kinds`, `hops` ← `[graph] path_expansion_budget`
 
 <!-- L12-VALUES-END -->
 
@@ -546,10 +549,11 @@ this moved where they are written, not what they are.
   emitted here as `ref` with no such distinction. **Restoring the distinction
   would be a new edge kind**, which is a decision needing its own record — not
   something a port may smuggle in.
-- ⚠ **PPR has three constants and no measurement behind two of them.**
-  `DAMPING = 0.85` is PageRank's published default; `ITERATIONS = 3` and
-  `LAZINESS = 0.5` are conventional choices. **Only the *need* for laziness is
-  measured.** They are honest defaults, not tuned values — and a knob does not
+- ⚠ **PPR has three values and no measurement behind two of them.** The
+  template ships `damping = 0.85`, PageRank's published value, and `iterations =
+  3` and `laziness = 0.5`, conventional choices — all `[graph]` keys, read from
+  `.fux/tune.toml` (L12). **Only the *need* for laziness is measured.** They are
+  honest starting values, not tuned ones — and a knob does not
   measure them: a consumer varying them is evidence-gathering, not evidence.
 - ⚠ **The plane's load cost is profiled, and it is the plane, not the
   algorithms.** A run put **9.34 s of a 9.54 s `fux graph` (98 %) in
@@ -645,8 +649,8 @@ this surface — stderr never stdout, ASCII only, declares never gates.
 
 2. **A corpus exists where `fux graph` ranks a node farther from the seed above
    a nearer one.** That is the defect laziness was added to remove; its return
-   means three iterations is too few for real structure, and `ITERATIONS`
-   becomes a measured constant rather than an inherited one.
+   means three iterations is too few for real structure, and `[graph] iterations`
+   becomes a measured value rather than an inherited one.
 
 3. **The three acceptance phenomena — supersession, near-duplication,
    staleness ≠ wrongness — do not improve.** The lane's whole argument is that

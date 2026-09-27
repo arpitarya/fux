@@ -116,7 +116,11 @@ def blocks_read_with_tight_bound(runtime: Runtime, query: str, top: int) -> int:
 
     The difference between the two counts is fork 3's real price.
     """
-    from fux.query.bm25f import FIELD_WEIGHTS, K1, B, idf, weighted_tf, derive_wlen
+    from fux.query.bm25f import idf, weighted_tf, derive_wlen
+    from fux.tune import load as _load_tune
+
+    _t = _load_tune(Path('.'), enabled=False)  # the template's (L12)
+    FIELD_WEIGHTS, K1, B = _t.field_weights, _t.k1, _t.b
 
     def tight(block, df, n, avg_wlen, weights=FIELD_WEIGHTS):
         postings = original_read(block)

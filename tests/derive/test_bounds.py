@@ -14,6 +14,7 @@ was — see `tools/differential/run.py:TOPS`); this cannot.
 
 from __future__ import annotations
 
+from l12_fixtures import scoring, write_config
 import pytest
 
 from fux.derive import accel, build
@@ -67,6 +68,7 @@ def _spread_corpus(n_docs: int = 400) -> list[dict]:
 @pytest.fixture
 def built(tmp_path):
     write_index(tmp_path, _spread_corpus())
+    write_config(tmp_path)
     build(tmp_path)
     return tmp_path
 
@@ -76,7 +78,7 @@ def test_bound_dominates_every_posting_in_every_block(built):
     runtime = accel.Runtime(built)
     stats = runtime.stats
     n = stats["n"]
-    avg_wlen = derive_wlen(list(stats["total_flen"])) / n
+    avg_wlen = derive_wlen(list(stats["total_flen"]), scoring=scoring()) / n
     docs = runtime.docs
 
     checked_blocks = 0
@@ -90,7 +92,7 @@ def test_bound_dominates_every_posting_in_every_block(built):
             raw = fmt.unpack_entry(buf, index)
             block = accel.Block(raw[0].hex(), raw[1], raw[2], raw[3], raw[4], raw[5], raw[6], raw[7], raw[8])
             df = sum(b.count for b in runtime.blocks_for(block.term))
-            bound = accel.block_bound(block, df, n, avg_wlen)
+            bound = accel.block_bound(block, df, n, avg_wlen, scoring=scoring())
             checked_blocks += 1
 
             for docidx, tf in runtime.read_block(block):
@@ -100,7 +102,7 @@ def test_bound_dominates_every_posting_in_every_block(built):
                     [block.term],
                     {block.term: df},
                     n,
-                    avg_wlen,
+                    avg_wlen, scoring=scoring()
                 )
                 checked_postings += 1
                 assert actual <= bound, (
@@ -182,7 +184,7 @@ def test_bound_is_not_vacuous(built):
     """
     runtime = accel.Runtime(built)
     stats = runtime.stats
-    n, avg_wlen = stats["n"], derive_wlen(list(stats["total_flen"])) / stats["n"]
+    n, avg_wlen = stats["n"], derive_wlen(list(stats["total_flen"]), scoring=scoring()) / stats["n"]
     docs = runtime.docs
 
     attained = 0
@@ -192,10 +194,10 @@ def test_bound_is_not_vacuous(built):
             raw = fmt.unpack_entry(buf, index)
             block = accel.Block(raw[0].hex(), raw[1], raw[2], raw[3], raw[4], raw[5], raw[6], raw[7], raw[8])
             df = sum(b.count for b in runtime.blocks_for(block.term))
-            bound = accel.block_bound(block, df, n, avg_wlen)
+            bound = accel.block_bound(block, df, n, avg_wlen, scoring=scoring())
             for docidx, tf in runtime.read_block(block):
                 actual = score_record(
-                    {block.term: tf}, docs[docidx]["flen"], [block.term], {block.term: df}, n, avg_wlen
+                    {block.term: tf}, docs[docidx]["flen"], [block.term], {block.term: df}, n, avg_wlen, scoring=scoring()
                 )
                 if actual == bound:
                     attained += 1
@@ -228,4 +230,4 @@ def test_a_v3_runtime_plane_is_refused_with_an_actionable_message(tmp_path):
     )
     runtime = accel.Runtime(tmp_path)
     with pytest.raises(FuxError, match=r"run `fux build`"):
-        accel.accel_candidates(runtime, ["deadbeefdeadbeef"], 5)
+        accel.accel_candidates(runtime, ["deadbeefdeadbeef"], 5, scoring=scoring(), skipping=True)

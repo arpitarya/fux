@@ -18,21 +18,18 @@ export const WEAK = "weak";
 export const PARTIAL = "partial";
 export const NONE = "none";
 
-/** The `grounded`/`weak` cutoff. ⚠ `weak` is a SIGNAL, not a refusal
- *  (Arpit 2026-09-22, W-214) — the label is published, nothing abstains on it. */
-export const SEPARATION_FLOOR = 0.10;
-/** `0.0` means the clause is OFF — a measured ruling, not an oversight. */
-export const DOC_COVERAGE_FLOOR = 0.0;
+//: The two floors are `.fux/tune.toml [confidence]`'s and arrive from the
+//: caller (L12). ⚠ `weak` is a SIGNAL, not a refusal (Arpit 2026-09-22,
+//: W-214) — the label is published, nothing abstains on it.
 
 function round4(x) { return Math.round(x * 1e4) / 1e4; }
 function clamp01(x) { return Math.max(0.0, Math.min(1.0, x)); }
 
 export class Confidence {
   constructor({
-    coverage = 0.0, separation = 0.0, support = 0, verified = "unverified",
-    missing = [], docCoverage = 1.0,
-    separationFloor = SEPARATION_FLOOR, docCoverageFloor = DOC_COVERAGE_FLOOR,
-  } = {}) {
+    coverage, separation, support, verified, missing, docCoverage,
+    separationFloor, docCoverageFloor,
+  }) {
     this.coverage = coverage;
     this.separation = separation;
     this.support = support;
@@ -143,16 +140,21 @@ export class Confidence {
  * differ between `--fast` and `--scan`, which is the differential-law break
  * the accelerator record exists to forbid. The law is worth more than the
  * better number. */
+/** The block that claims nothing — twin of `confidence.py::empty`. */
+export function empty(verified, separationFloor, docCoverageFloor) {
+  return new Confidence({
+    coverage: 0.0, separation: 0.0, support: 0, verified, missing: [], docCoverage: 1.0,
+    separationFloor, docCoverageFloor,
+  });
+}
+
 export function signals(
   pairs, queryHashes, df, n, scores,
   {
-    verified = "unverified", topDocHashes = null,
-    separationFloor = SEPARATION_FLOOR, docCoverageFloor = DOC_COVERAGE_FLOOR,
-  } = {},
+    verified, topDocHashes = null, separationFloor, docCoverageFloor,
+  },
 ) {
-  if (!queryHashes.length || n <= 0) {
-    return new Confidence({ verified, separationFloor, docCoverageFloor });
-  }
+  if (!queryHashes.length || n <= 0) return empty(verified, separationFloor, docCoverageFloor);
 
   // First token per hash, mirroring `queryTermHashes`' de-duplication so the
   // two lists cannot fall out of step on a repeated word.

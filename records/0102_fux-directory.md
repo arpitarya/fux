@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@02783a764363, src/fux/setup.py@697f58087b6b, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@02783a764363, src/fux/setup.py@fafd860ce539, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 25155407bc7c1d22ac5a7de9d51b662fd4a631cbb37359a7fc70d98078716d1e
+content_sha: b7ed2bee6f70851046fa59783b7169d29c53aaa032fdbcfe4ad56df499d53d22
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -747,6 +747,16 @@ written, which already says what the note says is missing. The policy marker
 decides it now — the same marker `tests/test_agent_policy_agreement.py`
 compares on, so the two cannot disagree about what *fux's policy is in this
 file* means.
+
+<!-- L12-NOTE-START -->
+
+**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `setup.fill_missing(root)` writes every
+config file L12 makes mandatory from its template, and into a present file only
+the keys it lacks, at the end of their own table with the template's comment —
+nothing the consumer wrote is changed or reordered. `fux setup` and `fux doctor
+--fix` are its only callers.
+
+<!-- L12-NOTE-END -->
 
 <!-- L12-VALUES-START -->
 

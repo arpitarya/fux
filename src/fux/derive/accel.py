@@ -55,7 +55,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ..errors import FuxError
-from ..query.bm25f import DEFAULT_SCORING, Scoring, derive_wlen, idf
+from ..query.bm25f import Scoring, derive_wlen, idf
 from ..query.rank import AskResult, Corpus, rank
 from ..query.scan import query_term_hashes
 from ..query.rank import Weighting
@@ -174,7 +174,7 @@ class Runtime:
 
 
 def block_bound(
-    block: Block, df: int, n: int, avg_wlen: float, scoring: Scoring = DEFAULT_SCORING
+    block: Block, df: int, n: int, avg_wlen: float, scoring: Scoring
 ) -> float:
     """The largest BM25F contribution any posting in `block` can make.
 
@@ -267,9 +267,9 @@ def accel_candidates(
     query_hashes: list[str],
     top: int,
     *,
-    skipping: bool = True,
+    skipping: bool,
     weighting: "Weighting | None" = None,
-    scoring: Scoring = DEFAULT_SCORING,
+    scoring: Scoring,
     expansion=None,
 ) -> tuple[list[dict], dict[str, int], Corpus]:
     """Candidate records, `df`, and the corpus statistics — the scan's contract.
@@ -403,7 +403,7 @@ def accel_candidates(
 
 def _cannot_reach(
     runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen,
-    weighting=None, scoring: Scoring = DEFAULT_SCORING, expansion=None, anchor_tf=None,
+    weighting, scoring: Scoring, expansion, anchor_tf,
 ) -> bool:
     """True when no unseen document can enter the top `top`.
 
@@ -477,7 +477,7 @@ def _cannot_reach(
 
 def _kth_score(
     hits, docs, opened_order, df, corpus, top, avg_wlen,
-    weighting=None, scoring: Scoring = DEFAULT_SCORING, expansion=None, anchor_tf=None,
+    weighting, scoring: Scoring, expansion, anchor_tf,
 ) -> float | None:
     """The `top`-th best **weighted** score among current candidates.
 
@@ -572,12 +572,12 @@ def _fill_deferred(runtime, blocks, opened, query_hashes, hits, read_blocks) -> 
 def ask(
     root: Path,
     query: str,
-    top: int = 5,
+    top: int,
     *,
-    skipping: bool = True,
+    skipping: bool,
     archived_dirs: frozenset[str] = frozenset(),
     weighting: "Weighting | None" = None,
-    scoring: Scoring = DEFAULT_SCORING,
+    scoring: Scoring,
     stats_out: dict | None = None,
     expansion=None,
 ) -> list[AskResult]:

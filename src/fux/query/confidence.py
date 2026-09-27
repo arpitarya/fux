@@ -67,7 +67,7 @@ invented number wearing a decimal point.
 - **`partial`** — a query term matched no document anywhere in the corpus, or
   the cited bytes have changed since ingest. Facts.
 - **`grounded` vs `weak`** — needs a real cutoff on `separation`, and
-  `SEPARATION_FLOOR` is **provisional and unmeasured**. It is registered as
+  `[confidence] separation_floor` is **provisional and unmeasured**. It is registered as
   prediction **R10** and must not be cited as calibrated until that verdict is
   filed.
 
@@ -95,11 +95,9 @@ from .bm25f import idf
 __all__ = [
     "BANDS",
     "Confidence",
-    "DOC_COVERAGE_FLOOR",
     "GROUNDED",
     "NONE",
     "PARTIAL",
-    "SEPARATION_FLOOR",
     "WEAK",
     "signals",
 ]
@@ -122,68 +120,6 @@ NONE = "none"
 
 #: Best first. Order is meaningful — a consumer may compare positions.
 BANDS = (GROUNDED, PARTIAL, WEAK, NONE)
-
-#: ⚠ **PROVISIONAL AND UNMEASURED — registered as R10.**
-#:
-#: The top result must beat the runner-up by this fraction of its own score for
-#: the band to be `grounded`. `0.10` is a defensible starting point and nothing
-#: more: it is not a measured optimum, no verdict backs it, and it is the only
-#: number in this module that is not a structural fact.
-#:
-#: **This is the ENGINE DEFAULT.** ⚠ It was deliberately *not* a `tune.toml`
-#: key until 2026-08-28; **`[confidence] separation_floor` now overrides it**
-#: (SR-CONFIDENCE decision 13, reversing decision 7).
-#:
-#: ⚠ **The cost decision 7 was buying, stated rather than clamped:** a consumer
-#: can lower this until their answers read `grounded`, tuning away the signal
-#: rather than the ranking, and no check catches it. What replaces the
-#: prohibition is **publication** — `as_dict` emits the floor the band was
-#: judged under — and `--no-tune`, which recomputes at this value.
-#:
-#: **Setting it does not settle R10.** The measurement is still owed, and a
-#: repo-local number is a local preference, never a calibration.
-SEPARATION_FLOOR = 0.10
-
-#: How much of the question the TOP-RANKED document must itself contain before
-#: the band may read `grounded`.
-#:
-#: 🔴 **`0.0` — THE CLAUSE IS OFF, AND THAT IS A MEASURED RESULT, NOT AN
-#: OVERSIGHT.** `doc_coverage` is computed and published; it does not gate the
-#: band, because on the only data that exists **it does not separate**:
-#:
-#: | | n | min | median | max |
-#: |---|---:|---:|---:|---:|
-#: | real goldens reaching this clause | 37 | **0.401** | 0.882 | 1.000 |
-#: | decoys reaching it | 1 | **0.710** | — | 0.710 |
-#:
-#: The decoy sits **inside** the goldens' range, so any floor that catches it
-#: demotes real answers below it. A floor of `1.0` turns **19 of 50** correct
-#: answers `partial`; picking a number in a "gap" is impossible because there is
-#: no gap, and picking one anyway would be fitting a threshold to 65 queries —
-#: the failure R10 is currently INCONCLUSIVE over.
-#:
-#: ⚠ **Fourteen of fifteen decoys never reach here**: they are already `partial`
-#: via `missing`, which is the corpus-wide signal working. The scattered-terms
-#: case is **one query in fifteen**, and this module now *reports* it rather than
-#: claiming to catch it.
-#:
-#: ✅ **RULED by Arpit 2026-08-28: leave the gate off; publish the signal.**
-#: Shown the table above, he chose reporting over a claim fux cannot support.
-#: **Set this above `0.0` only with a bigger decoy set and a PRE-REGISTERED
-#: floor** — not a number read off 65 queries. SR-CONFIDENCE decision 12.
-#:
-#: **Overridable since 2026-08-28** as `[confidence] doc_coverage_floor`
-#: (decision 13). ⚠ **The cost here is MEASURED, not guessed**, which is what
-#: separates it from the separation floor: at `1.0` — the only value that reads
-#: structural, *"every term the corpus has, the cited document has too"* —
-#: **19 of 50 correct answers turn `partial`**, and the one decoy this clause
-#: could catch sits at `0.710`, **inside** the goldens' range.
-#:
-#: A repo that would rather over-hedge than over-claim can pay 38 % false
-#: `partial` deliberately. A repo that sets it because the number looks tidy is
-#: paying it for nothing.
-DOC_COVERAGE_FLOOR = 0.0
-
 
 @dataclass(frozen=True)
 class Confidence:
@@ -223,23 +159,24 @@ class Confidence:
     #:
     #: `1.0` when there are no results, so an empty answer is never demoted by
     #: this field; `support == 0` already means `none`.
-    doc_coverage: float = 1.0
+    doc_coverage: float
 
     #: The `separation` cutoff **this block's band was actually computed
-    #: under**. Engine default `SEPARATION_FLOOR`; `.fux/tune.toml` may
-    #: override it (decision 13).
+    #: under** — `.fux/tune.toml [confidence] separation_floor` (decision 13).
+    #: ⚠ **PROVISIONAL AND UNMEASURED — registered as R10**; why, and what
+    #: lowering it costs, is said beside the key in the template.
     #:
     #: ⚠ **Carried on the block rather than read from the module**, and that is
     #: the whole safeguard. Once the floor is local config, a bare `grounded`
     #: no longer means the same thing in two repos — so the block states the
     #: number it was judged by, and a consumer comparing two answers can see
     #: they were not judged alike.
-    separation_floor: float = SEPARATION_FLOOR
+    separation_floor: float
 
     #: The `doc_coverage` cutoff, same contract. `0.0` means **the clause is
-    #: off**, which is the engine default and a measured ruling rather than an
-    #: oversight — see `DOC_COVERAGE_FLOOR`.
-    doc_coverage_floor: float = DOC_COVERAGE_FLOOR
+    #: off**, which is what the template ships and a measured ruling (Arpit,
+    #: 2026-08-28, SR-CONFIDENCE decision 12) rather than an oversight.
+    doc_coverage_floor: float
 
     @property
     def band(self) -> str:
@@ -421,6 +358,25 @@ class Confidence:
         )
 
 
+def empty(verified: str, separation_floor: float, doc_coverage_floor: float) -> Confidence:
+    """The block that claims nothing: no coverage, no separation, no support.
+
+    Its band is `none` whatever the floors are, but the floors are still the
+    ones the caller judged under — a block always states the numbers it was
+    judged by.
+    """
+    return Confidence(
+        coverage=0.0,
+        separation=0.0,
+        support=0,
+        verified=verified,
+        missing=(),
+        doc_coverage=1.0,
+        separation_floor=separation_floor,
+        doc_coverage_floor=doc_coverage_floor,
+    )
+
+
 def signals(
     pairs: list[tuple[str, str]],
     query_hashes: list[str],
@@ -428,10 +384,10 @@ def signals(
     n: int,
     scores: list[float],
     *,
-    verified: str = "unverified",
+    verified: str,
     top_doc_hashes: list[str] | None = None,
-    separation_floor: float = SEPARATION_FLOOR,
-    doc_coverage_floor: float = DOC_COVERAGE_FLOOR,
+    separation_floor: float,
+    doc_coverage_floor: float,
 ) -> Confidence:
     """Compute the block from what `rank()` already had in hand.
 
@@ -465,11 +421,7 @@ def signals(
     law is worth more than the better number.
     """
     if not query_hashes or n <= 0:
-        return Confidence(
-            0.0, 0.0, 0, verified, (),
-            separation_floor=separation_floor,
-            doc_coverage_floor=doc_coverage_floor,
-        )
+        return empty(verified, separation_floor, doc_coverage_floor)
 
     # First token per hash, mirroring `query_term_hashes`' de-duplication so the
     # two lists cannot fall out of step on a repeated word.

@@ -22,6 +22,7 @@ from pathlib import Path
 import pytest
 
 from fux.query import RELATED_HEADING
+from l12_fixtures import write_config, write_tune
 
 EVAL_DIR = Path(__file__).parent / "eval"
 PAIRS = EVAL_DIR / "relational.jsonl"
@@ -55,6 +56,7 @@ def linked(tmp_path_factory) -> Path:
     dirs.write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (proj / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(proj)
     _run(proj, "ingest")
     return proj
 
@@ -149,6 +151,7 @@ def test_ask_is_lexical_when_the_graph_tier_is_off(linked):
     _run(linked, "build")
     off = "[graph]\nask_boost = false\nask_related = false\n"
     (linked / ".fux" / "tune.toml").write_text(off, encoding="utf-8")
+    write_config(linked)
     try:
         for query in ("storage engine selection", "rollback", "catering"):
             for extra in ((), ("--json",), ("--top", "3"), ("--band",)):
@@ -156,7 +159,7 @@ def test_ask_is_lexical_when_the_graph_tier_is_off(linked):
                 lexical = _run(linked, "lexical", query, *extra).stdout
                 assert ask == lexical, (query, extra)
     finally:
-        (linked / ".fux" / "tune.toml").unlink()
+        write_tune(linked)  # back to the template: the file is mandatory (L12)
 
 
 def test_lexical_ignores_a_tune_that_turns_the_tier_on(linked):
@@ -175,13 +178,14 @@ def test_lexical_ignores_a_tune_that_turns_the_tier_on(linked):
     (linked / ".fux" / "tune.toml").write_text(
         "[graph]\nask_boost = true\nask_related = true\n", encoding="utf-8"
     )
+    write_config(linked)
     try:
         for query in ("storage engine selection", "rollback", "catering"):
             payload = json.loads(_run(linked, "lexical", query, "--json").stdout)
             assert "related" not in payload, query
             assert not any(r["boosted"] for r in payload["results"]), query
     finally:
-        (linked / ".fux" / "tune.toml").unlink()
+        write_tune(linked)  # back to the template: the file is mandatory (L12)
 
 
 def test_ask_related_is_the_walk_over_lexical_top_k(linked):

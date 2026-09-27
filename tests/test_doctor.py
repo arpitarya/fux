@@ -6,6 +6,7 @@ import subprocess
 import pytest
 
 from fux import doctor
+from l12_fixtures import write_config
 
 
 def _git_repo(tmp_path):
@@ -164,6 +165,7 @@ def test_cmd_doctor_exit_code_ignores_warnings(tmp_path, monkeypatch, capsys):
     (tmp_path / ".fux").mkdir(exist_ok=True)
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     (tmp_path / ".fux" / "scratch").mkdir()
     monkeypatch.chdir(tmp_path)
     assert doctor.cmd_doctor(None) == 0
@@ -207,6 +209,7 @@ def test_accelerator_reports_fresh_after_a_build(tmp_path):
             }
         ],
     )
+    write_config(tmp_path)
     build(tmp_path)
     check = _check(doctor.run(tmp_path), "accelerator")
     assert check.ok
@@ -230,9 +233,11 @@ def test_accelerator_goes_stale_when_the_index_changes(tmp_path):
         "edges": [],
     }
     write_index(tmp_path, [record])
+    write_config(tmp_path)
     build(tmp_path)
 
     write_index(tmp_path, [record | {"wlen": 99}])
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "accelerator")
     assert "stale" in check.detail
     assert shard_path(tmp_path, "05").exists() or True  # shard identity is not the point
@@ -262,6 +267,7 @@ def _url_index(tmp_path, urls):
             for url in urls
         ],
     )
+    write_config(tmp_path)
 
 
 def test_url_check_says_none_when_no_url_records_are_indexed(tmp_path):
@@ -806,6 +812,7 @@ def test_a_surviving_url_document_keeps_the_refusal_line_quiet(tmp_path):
     _refusals_toml(tmp_path, "sso")
     urlstate.record_refusals(tmp_path, {"sso": 2})
     write_index(tmp_path, [_record(doc_id="url:https://x/a", loc="https://x/a")])
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "refusal rules")
     assert check.ok
 
@@ -898,6 +905,7 @@ def test_a_generated_binding_that_matches_nothing_is_not_reported(tmp_path):
     types.parent.mkdir(parents=True, exist_ok=True)
     types.write_text(typesfile.render(["*.md"], bindings), encoding="utf-8")
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "decoder bindings")
     assert check.ok
     assert "match no indexed document" not in check.detail
@@ -911,6 +919,7 @@ def test_a_hand_written_binding_that_matches_nothing_is_reported(tmp_path):
     types.parent.mkdir(parents=True, exist_ok=True)
     types.write_text('include = ["*.md"]\n[decoders]\njsno = "json"\n', encoding="utf-8")
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "decoder bindings")
     assert not check.ok
     assert check.level == "warn"
@@ -925,6 +934,7 @@ def test_a_hand_written_binding_with_documents_is_quiet(tmp_path):
     types.parent.mkdir(parents=True, exist_ok=True)
     types.write_text('include = ["*.md"]\n[decoders]\ngeojson = "json"\n', encoding="utf-8")
     write_index(tmp_path, [_record(doc_id="file:a.geojson", loc="a.geojson")])
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "decoder bindings")
     assert check.ok
 
@@ -937,6 +947,7 @@ def test_a_corpus_with_no_mtime_reports_the_recency_prior_as_off(tmp_path):
 
     _git_repo(tmp_path)
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "recency prior")
     assert not check.ok
     assert check.level == "warn"
@@ -954,6 +965,7 @@ def test_a_corpus_with_no_mtime_names_what_it_actually_costs(tmp_path):
 
     _git_repo(tmp_path)
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     detail = _check(doctor.run(tmp_path), "recency prior").detail
     assert "no date reaches a caller" in detail
     assert "tie-break" in detail
@@ -965,6 +977,7 @@ def test_a_corpus_where_every_document_has_an_mtime_passes(tmp_path):
 
     _git_repo(tmp_path)
     write_index(tmp_path, [_record(mtime=1788330315)])
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "recency prior")
     assert check.ok
     assert "every one of 1 document(s)" in check.detail
@@ -980,6 +993,7 @@ def test_a_partly_covered_corpus_names_the_documents_with_no_date(tmp_path):
         tmp_path,
         [_record(mtime=1788330315), _record(doc_id="file:b.md", loc="b.md")],
     )
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "recency prior")
     assert check.ok
     assert "1 of 2 document(s) carry an mtime" in check.detail
@@ -1137,6 +1151,7 @@ def test_the_counts_file_is_gitignored_like_every_derived_plane(tmp_path):
 def _tune(tmp_path, body):
     (tmp_path / ".fux").mkdir(exist_ok=True)
     (tmp_path / ".fux" / "tune.toml").write_text(f"[ranking]\n{body}\n", encoding="utf-8")
+    write_config(tmp_path)
 
 
 def test_the_shipped_defaults_are_disclosed_as_switched_off(tmp_path):
@@ -1151,6 +1166,7 @@ def test_the_shipped_defaults_are_disclosed_as_switched_off(tmp_path):
 
     _git_repo(tmp_path)
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "ranking priors")
     assert not check.ok
     assert check.level == "warn"  # a default is not a broken install
@@ -1178,6 +1194,7 @@ def test_the_row_carries_no_count_for_a_prior_with_no_record_field(tmp_path):
 
     _git_repo(tmp_path)
     write_index(tmp_path, [_record("file:a.md", "a.md", archived=True), _record("file:b.md", "b.md")])
+    write_config(tmp_path)
     detail = _check(doctor.run(tmp_path), "ranking priors").detail
     assert "rerank_weight=0" in detail
     assert "document(s)" not in detail
@@ -1190,6 +1207,7 @@ def test_a_prior_that_is_switched_ON_is_not_listed(tmp_path):
     _git_repo(tmp_path)
     _tune(tmp_path, "rerank_weight = 0.5")
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "ranking priors")
     assert check.ok
     assert "rerank_weight" not in check.detail
@@ -1202,6 +1220,7 @@ def test_it_refuses_to_recommend_a_value(tmp_path):
 
     _git_repo(tmp_path)
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     detail = _check(doctor.run(tmp_path), "ranking priors").detail
     assert "does NOT recommend" in detail
     for nudge in ("try ", "set it to", "recommended", "should be"):
@@ -1235,6 +1254,7 @@ def test_a_broken_tune_file_fails_the_doctor(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (tmp_path / ".fux").mkdir(exist_ok=True)
     (tmp_path / ".fux" / "tune.toml").write_text("[ranking]\nrerank_weight = 'not a number'\n", encoding="utf-8")
+    write_config(tmp_path)
 
     check = _check(doctor.run(tmp_path), "tune.toml loads")
     assert not check.ok
@@ -1252,9 +1272,10 @@ def test_the_tune_row_quotes_the_loaders_own_words(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (tmp_path / ".fux").mkdir(exist_ok=True)
     (tmp_path / ".fux" / "tune.toml").write_text("[ranking]\nrerank_weight = 'nope'\n", encoding="utf-8")
+    write_config(tmp_path)
 
     try:
-        tune.load(tmp_path)
+        tune.load(tmp_path, enabled=True)
     except FuxError as exc:
         loader_said = str(exc)
     else:  # pragma: no cover - the fixture is invalid by construction
@@ -1268,16 +1289,30 @@ def test_a_valid_tune_file_passes(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (tmp_path / ".fux").mkdir(exist_ok=True)
     (tmp_path / ".fux" / "tune.toml").write_text("[ranking]\nrerank_weight = 0.5\n", encoding="utf-8")
+    write_config(tmp_path)
     assert _check(doctor.run(tmp_path), "tune.toml loads").ok
 
 
-def test_no_tune_file_is_not_a_problem(tmp_path):
-    """Absent means engine defaults — legitimate and common, unlike a file that
-    somebody wrote and nothing can read."""
+def test_no_tune_file_fails_the_doctor_and_names_the_fix(tmp_path):
+    """L12: there is no engine default to fall back to, so an absent file is the
+    same failure every ranked verb would hit — and the row names the remedy."""
     _git_repo(tmp_path)
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     check = _check(doctor.run(tmp_path), "tune.toml loads")
-    assert check.ok and "absent" in check.detail
+    assert not check.ok and check.level == "error"
+    assert "is missing" in check.detail and "fux doctor --fix" in check.detail
+
+
+def test_doctor_fix_writes_the_missing_file_and_then_passes(tmp_path, monkeypatch, capsys):
+    """`fux doctor --fix` is one of the two writers of a missing key (L12 decision 3)."""
+    import argparse
+
+    _git_repo(tmp_path)
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    doctor.cmd_doctor(argparse.Namespace(fix=True, json=True))
+    assert "fixed: .fux/tune.toml: written" in capsys.readouterr().err
+    assert _check(doctor.run(tmp_path), "tune.toml loads").ok
 
 
 # --- the `fux on PATH` row (SR-NODE-SEARCH R1a mitigation 3) ----------------
@@ -1437,6 +1472,7 @@ def test_doctor_run_includes_the_row(tmp_path):
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     names = [c.name for c in doctor.run(tmp_path)]
     assert "fux on PATH" in names
 
@@ -1507,6 +1543,7 @@ def _drift_repo(tmp_path):
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     return tmp_path
@@ -1700,7 +1737,7 @@ def test_a_tune_file_missing_a_key_the_engine_gained_is_reported(tmp_path):
     (root / ".fux" / "tune.toml").write_text("[bm25f]\nk1 = 1.2\n", encoding="utf-8")
     row = _row(root, "tune.toml current")
     assert not row.ok
-    assert "nothing is broken" in row.detail, "a frozen knob is drift, not breakage"
+    assert "fux doctor --fix" in row.detail, "the row names the one remedy"
 
 
 def test_a_complete_tune_file_is_not_reported(tmp_path):
@@ -1713,11 +1750,12 @@ def test_a_complete_tune_file_is_not_reported(tmp_path):
         lines.append(f"[{table}]")
         lines += [f"{key} = 0" for key in keys]
     (root / ".fux" / "tune.toml").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    write_config(root)
     assert _row(root, "tune.toml current").ok
 
 
 def test_an_absent_tune_file_is_not_frozen(tmp_path):
-    """⚠ Absent is engine defaults, deliberately — `tune.toml loads` says so already."""
+    """⚠ Absent is the `loads` row's to report — one fault, one row."""
     assert _row(_drift_repo(tmp_path), "tune.toml current").ok
 
 

@@ -44,8 +44,8 @@ def answer_via_refer(
     query: str,
     citations: list[tuple[str, str, str]],
     *,
-    tune: "Tune | None" = None,
-    cache_ttl_seconds: int = 0,
+    tune: "Tune",
+    cache_ttl_seconds: int,
 ) -> Bundle | None:
     """Fetch, verify, re-score and assemble the ranked candidates. **W-108.**
 
@@ -74,9 +74,8 @@ def answer_via_refer(
     **not** that case: `refer()` degrades per document, so a `url:` citation
     with no fetcher costs its own citation and nothing else.
 
-    `tune` is the caller's already-loaded `.fux/tune.toml`; `None` means the
-    refer plane's own defaults. **It is passed in rather than loaded here on
-    purpose** — `cmd_answer` has already read the file to rank with, and a
+    `tune` is the caller's already-loaded `.fux/tune.toml`. **It is passed in
+    rather than loaded here on purpose** — `cmd_answer` has already read the file to rank with, and a
     second read could pick up a different one, producing an answer assembled
     under weights that did not choose it. It also keeps `--no-tune` a single
     decision made once, instead of a flag two modules each have to honour.
@@ -84,23 +83,6 @@ def answer_via_refer(
     if not citations:
         return None
     fetch, close, fetch_at_answer = _load_fetchers(root, citations)
-    # Absent, rather than defaulted here: `refer()` owns what these mean when
-    # nobody has said, and restating its four defaults in this module would be
-    # a second copy that no test compares against the first.
-    sizes = (
-        {}
-        if tune is None
-        else {
-            "budget": tune.budget,
-            "per_doc_fraction": tune.per_doc_fraction,
-            "min_passage_bytes": tune.min_passage_bytes,
-            "max_passage_bytes": tune.max_passage_bytes,
-            # `[ranking]`, not `[refer]` — the same constant that reordered the
-            # documents now scores their passages, and neither may be turned on
-            # without the other (`refer/_rescore.py::rescore`).
-            "rerank_weight": tune.rerank_weight,
-        }
-    )
     # ⚠ **`cache_ttl_seconds` was hard-coded to the `Policy` default, so every
     # `ttl=` in every repo was DEAD at ask time** (W-140 row 6, fixed
     # 2026-09-11). [SR-URL-FRESHNESS](../../../records/0147_url-freshness.md)
@@ -143,8 +125,8 @@ def answer_via_refer(
             query,
             list(citations),
             policy=Policy(mode=mode, cache_ttl_seconds=cache_ttl_seconds),
+            tune=tune,
             fetcher=fetch,
-            **sizes,
         )
     finally:
         close()

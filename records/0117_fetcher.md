@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@dd3533b3dec9, src/fux/templates@e9a45a74f9a5]
+owns: [src/fux/ingest/urlsrc.py@dd3533b3dec9, src/fux/templates@f6271d5d3800]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 62f95873484ef13424c9d698815b215050414424123eaa64a7ffa5e9a059c7f4
+content_sha: 413f0c206444d9b41e643c57d0852d166ace1359e3e8f04a6dc2514122750458
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -644,6 +644,17 @@ the pipe exists to separate. **Not removed** — the ramp's cost was never
 measured, and removing it breaks every consumer fetcher written before
 2026-08-26 on a contract change they did not read. It is named here so the next
 session does not mistake the silence for agreement.
+
+<!-- L12-NOTE-START -->
+
+**`src/fux/templates/` holds more than the fetchers since L12 (W-225,
+2026-09-27).** It is the one home of every shipped tunable value
+([SR-LAW-12](0013_LAW-12-values-live-in-config.md) decision 5): `tune.toml.txt`
+is the file `fux setup` writes, `fux doctor --fix` restores a missing key from,
+and `--no-tune` reads. The fetcher templates' rules here are unchanged — bytes,
+copied out, never imported.
+
+<!-- L12-NOTE-END -->
 
 ### Consequences
 

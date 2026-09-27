@@ -18,8 +18,22 @@ and the inertness half would pass for it too.
 
 from __future__ import annotations
 
+from l12_fixtures import template_tune
 from fux.graph.model import Edge, Graph
-from fux.graph.walk import ALL_KINDS, expand, link_idf, ppr
+from fux.graph import walk as _walk
+from fux.graph.walk import ALL_KINDS, link_idf
+
+#: The template's `[graph]` walk — the walk has no defaults of its own (L12).
+_T = template_tune()
+_WALK = {"damping": _T.damping, "iterations": _T.iterations, "laziness": _T.laziness}
+
+
+def ppr(graph, seeds, **kw):
+    return _walk.ppr(graph, seeds, **{**_WALK, **kw})
+
+
+def expand(graph, seeds, **kw):
+    return _walk.expand(graph, seeds, **{**_WALK, **kw})
 
 
 def _graph() -> Graph:

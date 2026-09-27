@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@b51fd9948c4a, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@db9ff8233332, node/src/refer/assemble.mjs@606b563b99c8, node/src/refer/rescore.mjs@e866f6514afb, node/src/refer/source.mjs@aa249e93737f]
+owns: [src/fux/refer@dc16552352e4, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@3286249029a0, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@aa249e93737f]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: ab09cc214288a037ed1d5a922a93317035d729b2036051f4589a93ca0949f1ad
+content_sha: c9f169b17ef17166691be8504cfd023317d59ed4c8fecd9bbda95b2bf2c09e09
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -370,12 +370,13 @@ analyzer and the same chunker. Two knobs for one signal is how they drift, and
 the first day they disagree `answer` cites a passage the ranking did not prefer
 for a reason nobody can name.
 
-⚠ **`refer()` defaults it to `0.0`, not to `rerank.WEIGHT`.** A caller that has
-said nothing gets the bundle this plane produced before the parameter existed —
-byte-identical, with no float arithmetic performed at all
-(`refer/_rescore.py::_uplift`). **`refer()` may not switch on a knob that `ask`
-has switched off**; only the caller's `Tune` decides, and `rerank_weight`'s
-default is Arpit's open call, not this record's.
+⚠ **`refer()` takes the caller's resolved `Tune` and has no default of its own**
+([L12](0013_LAW-12-values-live-in-config.md)). The template ships
+`rerank_weight = 0.0`, and at `0.0` the bundle is byte-identical to the one this
+plane produced before the parameter existed, with no float arithmetic performed
+at all (`refer/_rescore.py::_uplift`). **`refer()` may not switch on a knob that
+`ask` has switched off**; only the caller's `Tune` decides, and the shipped
+value of `rerank_weight` is Arpit's open call, not this record's.
 
 **22. The plane is now routinely called with MORE THAN ONE document, and two
 of its own provisions stop being theoretical.**
@@ -445,7 +446,7 @@ and for a decoded `.docx` the chunked text is Markdown that exists nowhere.
 **25. An oversized Markdown table is banded by rows, and each band repeats the
 header.** A table contains no blank line, so it is a single paragraph to the
 splitter and could never be split — a 40 KB sheet came back whole for the
-assembler to refuse under `PER_DOC_FRACTION`, which is a document that ranks and
+assembler to refuse under `[refer] per_doc_fraction`, which is a document that ranks and
 then cannot be quoted. `xlsx`, `csv`, `docx` and `html` all emit
 them.
 
@@ -466,15 +467,15 @@ them.
   for it; stated here rather than discovered later.
 
 **26. A table bands at its own ceiling, and a run of short headed sections is
-never folded.** Two amendments to decision 25 and to `MIN_PASSAGE_BYTES`, both
+never folded.** Two amendments to decision 25 and to `[refer] min_passage_bytes`, both
 from measurement rather than argument (2026-09-06, prompted by Arpit asking
 whether CSV and Excel should chunk line by line).
 
 - **The obvious answer — one row per passage — defeats itself twice, and the
   numbers are why it is recorded rather than just rejected.** On a 500-row CSV
-  an average row is 58 bytes against `_assemble.CITATION_OVERHEAD`'s 80, so
+  an average row is 58 bytes against `[refer] citation_overhead`'s 80, so
   **58 % of the caller's budget would be locators** and only 57 rows would seat
-  in the 8000-byte default; and every row is under `MIN_PASSAGE_BYTES`, so the
+  in the shipped 8000-byte budget; and every row is under `min_passage_bytes`, so the
   fold put them back before the assembler ever saw them. A lone row
   is also unreadable without its header, and repeating a 30-byte header onto a
   60-byte row makes every row score alike on any header term.
@@ -486,7 +487,7 @@ whether CSV and Excel should chunk line by line).
   that names a neighbourhood rather than a chapter. Not a `[refer]` tunable:
   shipping a knob nobody has had a reason to turn is its own cost.
 - 🔴 **The floor was eating structural boundaries, and that is a defect rather
-  than a tuning question.** `MIN_PASSAGE_BYTES` exists because *"a two-line
+  than a tuning question.** `min_passage_bytes` exists because *"a two-line
   passage is a citation nobody can read in isolation"* — true of a stub heading,
   false of a **complete short unit**. Three instances, all measured: a `.pptx`
   slide with two bullets merged into the next slide so a citation headed

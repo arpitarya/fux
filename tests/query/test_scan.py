@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from l12_fixtures import scoring, write_config
 import pytest
 
 from fux.query.scan import ask, scan_candidates
@@ -29,12 +30,13 @@ def _rec(doc_id, title, flen, terms) -> dict:
 
 
 def test_empty_index_returns_nothing(tmp_path):
-    assert ask(tmp_path, "anything") == []
+    assert ask(tmp_path, "anything", top=5, scoring=scoring()) == []
 
 
 def test_finds_a_matching_document(tmp_path):
     write_index(tmp_path, [_rec("file:a.md", "A", [10], {_h("pruning"): [1, 0]})])
-    results = ask(tmp_path, "pruning")
+    write_config(tmp_path)
+    results = ask(tmp_path, "pruning", top=5, scoring=scoring())
     assert len(results) == 1
     assert results[0].id == "file:a.md"
     assert results[0].title == "A"
@@ -44,7 +46,8 @@ def test_finds_a_matching_document(tmp_path):
 
 def test_query_with_no_matches_returns_empty(tmp_path):
     write_index(tmp_path, [_rec("file:a.md", "A", [10], {_h("pruning"): [1, 0]})])
-    assert ask(tmp_path, "zzznomatch") == []
+    write_config(tmp_path)
+    assert ask(tmp_path, "zzznomatch", top=5, scoring=scoring()) == []
 
 
 def test_heading_match_ranks_above_body_match(tmp_path):
@@ -56,7 +59,8 @@ def test_heading_match_ranks_above_body_match(tmp_path):
             _rec("file:body.md", "Body doc", [10], {_h("install"): [1, 0]}),
         ],
     )
-    results = ask(tmp_path, "install")
+    write_config(tmp_path)
+    results = ask(tmp_path, "install", top=5, scoring=scoring())
     assert [r.id for r in results] == ["file:heading.md", "file:body.md"]
 
 
@@ -68,7 +72,8 @@ def test_deterministic_tiebreak_on_id(tmp_path):
             _rec("file:a.md", "A", [10], {_h("same"): [1, 0]}),
         ],
     )
-    results = ask(tmp_path, "same")
+    write_config(tmp_path)
+    results = ask(tmp_path, "same", top=5, scoring=scoring())
     assert [r.id for r in results] == ["file:a.md", "file:b.md"]
 
 
@@ -77,7 +82,8 @@ def test_top_limits_results(tmp_path):
         tmp_path,
         [_rec(f"file:{i}.md", str(i), [10], {_h("x"): [1, 0]}) for i in range(10)],
     )
-    assert len(ask(tmp_path, "x", top=3)) == 3
+    write_config(tmp_path)
+    assert len(ask(tmp_path, "x", top=3, scoring=scoring())) == 3
 
 
 # -- SR-ARCHIVED-CONTENT decision 6: the archived demotion weight ----------------
@@ -93,6 +99,7 @@ def _archived_setup(tmp_path):
             _rec("file:docs/new.md", "New", [10], {_h("cache"): [1, 0]}),
         ],
     )
+    write_config(tmp_path)
 
 
 def _ranking(results):
@@ -115,8 +122,8 @@ def test_declaring_archived_dirs_cannot_reorder_anything(tmp_path):
     switch, so declaring a source archived can only ever mark it.
     """
     _archived_setup(tmp_path)
-    plain = ask(tmp_path, "cache")
-    with_dirs = ask(tmp_path, "cache", archived_dirs=frozenset({"archive"}))
+    plain = ask(tmp_path, "cache", top=5, scoring=scoring())
+    with_dirs = ask(tmp_path, "cache", archived_dirs=frozenset({"archive"}), top=5, scoring=scoring())
     assert _ranking(plain) == _ranking(with_dirs)
 
 
@@ -128,8 +135,8 @@ def test_the_marker_does_not_move_the_ranking(tmp_path):
     would satisfy the first assertion and fail the second.
     """
     _archived_setup(tmp_path)
-    marked = ask(tmp_path, "cache", archived_dirs=frozenset({"archive"}))
-    assert _ranking(marked) == _ranking(ask(tmp_path, "cache"))
+    marked = ask(tmp_path, "cache", archived_dirs=frozenset({"archive"}), top=5, scoring=scoring())
+    assert _ranking(marked) == _ranking(ask(tmp_path, "cache", top=5, scoring=scoring()))
     assert {r.loc: r.archived for r in marked} == {"archive/old.md": True, "docs/new.md": False}
 
 
@@ -141,7 +148,7 @@ def test_no_archived_document_is_ever_returned_unmarked(tmp_path):
     than a clause inside a broader one.
     """
     _archived_setup(tmp_path)
-    for r in ask(tmp_path, "cache", archived_dirs=frozenset({"archive"})):
+    for r in ask(tmp_path, "cache", archived_dirs=frozenset({"archive"}), top=5, scoring=scoring()):
         assert r.archived == r.loc.startswith("archive/"), r.loc
 
 
@@ -156,7 +163,8 @@ def test_the_record_property_marks_without_any_dirs_declaration(tmp_path):
     rec = _rec("file:old/legacy.md", "Legacy", [10], {_h("cache"): [0, 1]})
     rec["archived"] = True
     write_index(tmp_path, [rec])
-    (result,) = ask(tmp_path, "cache")
+    write_config(tmp_path)
+    (result,) = ask(tmp_path, "cache", top=5, scoring=scoring())
     assert result.archived is True
 
 
@@ -170,7 +178,7 @@ def test_an_archived_document_can_still_win_on_the_text(tmp_path):
     a future demotion cannot be reintroduced by accident.
     """
     _archived_setup(tmp_path)
-    results = ask(tmp_path, "cache", archived_dirs=frozenset({"archive"}))
+    results = ask(tmp_path, "cache", archived_dirs=frozenset({"archive"}), top=5, scoring=scoring())
     assert results[0].id == "file:archive/old.md"  # the heading match, undemoted
     assert results[0].archived is True
 
@@ -183,7 +191,8 @@ def test_multi_term_query_prefers_document_matching_both(tmp_path):
             _rec("file:one.md", "One", [10], {_h("pruning"): [1, 0]}),
         ],
     )
-    results = ask(tmp_path, "pruning gate")
+    write_config(tmp_path)
+    results = ask(tmp_path, "pruning gate", top=5, scoring=scoring())
     assert results[0].id == "file:both.md"
 
 
@@ -192,8 +201,9 @@ def test_results_are_deterministic_across_repeated_calls(tmp_path):
         tmp_path,
         [_rec(f"file:{i}.md", str(i), [10 + i], {_h("pruning"): [1, i % 2]}) for i in range(20)],
     )
-    first = ask(tmp_path, "pruning")
-    second = ask(tmp_path, "pruning")
+    write_config(tmp_path)
+    first = ask(tmp_path, "pruning", top=5, scoring=scoring())
+    second = ask(tmp_path, "pruning", top=5, scoring=scoring())
     assert first == second
 
 
@@ -216,13 +226,14 @@ def test_df_is_not_inflated_by_a_hash_quoted_outside_terms(tmp_path):
             _rec("file:real.md", "Real", [10], {stray_hash: [1, 0]}),
         ],
     )
+    write_config(tmp_path)
     query_hashes = [stray_hash]
-    candidates, df, corpus = scan_candidates(tmp_path, query_hashes)
+    candidates, df, corpus = scan_candidates(tmp_path, query_hashes, scoring=scoring())
     assert df[stray_hash] == 1  # only file:real.md actually has the term
     # Both lines matched the cheap substring prefilter (so both were parsed),
     # but only the real match should ever score above zero and be returned.
     assert {c["id"] for c in candidates} == {"file:stray.md", "file:real.md"}
-    results = ask(tmp_path, "deadbeefdeadbeef")
+    results = ask(tmp_path, "deadbeefdeadbeef", top=5, scoring=scoring())
     assert [r.id for r in results] == ["file:real.md"]
 
 
@@ -237,6 +248,7 @@ def test_scan_never_parses_non_candidate_lines(tmp_path, monkeypatch):
             _rec("file:nomatch.md", "NoMatch", [10], {_h("gate"): [1, 0]}),
         ],
     )
+    write_config(tmp_path)
     real_loads = scan_mod.json.loads
     parsed_ids = []
 
@@ -246,7 +258,7 @@ def test_scan_never_parses_non_candidate_lines(tmp_path, monkeypatch):
         return obj
 
     monkeypatch.setattr(scan_mod.json, "loads", spy)
-    ask(tmp_path, "pruning")
+    ask(tmp_path, "pruning", top=5, scoring=scoring())
     # `json.loads` is also called on each shard's header line internally (store/
     # reader.py's own header validation) — filter those (no "id" key) out and
     # check only that record-line parsing skipped the non-matching document.

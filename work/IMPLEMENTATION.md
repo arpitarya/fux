@@ -26,6 +26,25 @@ Rules:
 
 ---
 
+## 2026-09-27 — **W-225 stage 2: `.fux/tune.toml` is mandatory, key by key**
+
+**Outcome: landed; no value changed, no ranking moved.**
+- **What:** `Tune`, `Scoring`, `IndexLimits` and every ranking, refer, graph and
+  confidence function lost their defaults in both readers; a missing file,
+  table or key raises one sentence in both, with the `fux doctor --fix` remedy.
+  `src/fux/templates/tune.toml.txt` is the one home of the shipped values;
+  `--no-tune` reads it (bundle: inlined). New keys at the old built-in values:
+  the reranker's depth and proximity mix, `path_limit`, `citation_overhead`,
+  `table_rows_per_passage`, `self_retrieval_k`. `fux doctor --fix` and
+  `setup.fill_missing` (the stage-7 writer) landed here because every later
+  stage needs them. Six departures from the classification are listed for
+  Arpit in [the compare doc](compare/l12-classify.compare.md).
+- **Evidence:** 704 of 704 ranked outputs byte-identical to stage 1 on this repo
+  (88 queries × Python scan/fast/find/answer ±refer/lexical + Node ask/answer);
+  unit 5 724, e2e 151, Node 89.
+
+---
+
 ## 2026-09-27 — **W-225 stage 1: the engine's fixed values move to `src/fux/constants.toml`**
 
 **Outcome: landed; no value changed.**

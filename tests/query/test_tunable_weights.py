@@ -29,11 +29,15 @@ about, and the one that cost an offset-table format change to keep.
 
 from __future__ import annotations
 
+import dataclasses
+
+from l12_fixtures import scoring, template_tune, write_config
 import pytest
 
 from fux.derive import accel, build
 from fux.query import scan
-from fux.query.bm25f import FIELD_WEIGHTS, Scoring, derive_wlen
+from fux.query.bm25f import Scoring, derive_wlen
+FIELD_WEIGHTS = template_tune().field_weights
 from fux.store import TF_FIELDS, iter_shard_paths, term_hash, write_index
 
 HEADING = TF_FIELDS.index("heading")
@@ -84,6 +88,7 @@ def _corpus() -> list[dict]:
 @pytest.fixture
 def corpus(tmp_path):
     write_index(tmp_path, _corpus())
+    write_config(tmp_path)
     build(tmp_path)
     return tmp_path
 
@@ -106,7 +111,7 @@ def _weights(heading: float) -> Scoring:
     out[HEADING] = heading
     # One object, because `k1`, `b` and the weights all land in one fraction —
     # SR-TUNE, 2026-08-24.
-    return Scoring(weights=tuple(out))
+    return dataclasses.replace(scoring(), weights=tuple(out))
 
 
 def _order(root, weights):
@@ -115,7 +120,7 @@ def _order(root, weights):
     from fux.query.scan import query_term_hashes, scan_candidates
 
     hashes = query_term_hashes("rollback")
-    candidates, df, _ = scan_candidates(root, hashes)
+    candidates, df, _ = scan_candidates(root, hashes, scoring=scoring())
     n = len(candidates)
     total = sum(derive_wlen(c["flen"], weights) for c in candidates)
     avg = total / n if n else 0.0
@@ -169,11 +174,11 @@ def test_the_two_paths_still_agree_after_the_migration(corpus):
     bound did not quietly break the property everything else rests on.
     """
     for top in (1, 2, 5):
-        expected = [(r.id, round(r.score, 9)) for r in scan.ask(corpus, "rollback", top=top)]
+        expected = [(r.id, round(r.score, 9)) for r in scan.ask(corpus, "rollback", top=top, scoring=scoring())]
         for skipping in (False, True):
             got = [
                 (r.id, round(r.score, 9))
-                for r in accel.ask(corpus, "rollback", top=top, skipping=skipping)
+                for r in accel.ask(corpus, "rollback", top=top, skipping=skipping, scoring=scoring())
             ]
             assert got == expected, f"top={top} skipping={skipping}"
 
@@ -189,6 +194,6 @@ def test_derive_wlen_reads_the_committed_counts(corpus):
     for record in read_index(corpus).values():
         flen = record["flen"]
         assert all(isinstance(v, int) for v in flen), "flen must be raw integer counts"
-        assert derive_wlen(flen) == sum(
+        assert derive_wlen(flen, scoring=scoring()) == sum(
             FIELD_WEIGHTS[i] * v for i, v in enumerate(flen)
         )

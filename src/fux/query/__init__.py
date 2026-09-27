@@ -69,16 +69,13 @@ __all__ = [
 ]
 
 
-def _tune(root: Path, *, enabled: bool = True) -> "Tune":
+def _tune(root: Path, *, enabled: bool) -> "Tune":
     """`.fux/tune.toml`, read once per query.
 
-    **A malformed tune file is a loud error, not a silent default.** That is
-    the opposite of `_archived_ranking`'s old tolerance for a missing
-    `fux.toml`, and deliberately so: an absent file means *"every default"*
-    and is the normal case, while a file that exists and cannot be parsed
-    means someone edited it and got it wrong. Degrading there would answer a
-    question with the engine's ranking while the reader believed it was
-    theirs (SR-TUNE decision 10).
+    **A missing or malformed tune file is a loud error, never a silent
+    default** (SR-TUNE decision 10; L12 decision 3). Degrading would answer a
+    question with a ranking the reader did not configure while they believed
+    it was theirs. `enabled=False` is `--no-tune`: the packaged template.
     """
     from ..tune import load as load_tune
 
@@ -199,7 +196,7 @@ def run_query(
     # it; a repo that has never run `fux build` pays nothing either, because
     # the stage degrades to absent before it costs a read.
     graph_on = tune.ask_boost or tune.ask_related
-    depth = max(top, rerank.DEPTH) if (rerank_weight > 0 or graph_on) else top
+    depth = max(top, tune.rerank_depth) if (rerank_weight > 0 or graph_on) else top
     stats: dict | None = {} if confidence_out is not None else None
 
     from .expand import build as build_expansion
@@ -231,7 +228,7 @@ def run_query(
 
     if use_accel:
         results = accel.ask(
-            root, query, top=depth, weighting=weighting, archived_dirs=dirs,
+            root, query, top=depth, skipping=True, weighting=weighting, archived_dirs=dirs,
             scoring=scoring, stats_out=stats, expansion=expansion,
         )
         final = _compose(
@@ -279,7 +276,7 @@ def _compose(root, query, window, rerank_weight, top, depth, tune, stats, relate
     # can read it.
     uplift: dict = {}
     ordered = _apply_pin(
-        root, query, _maybe_rerank(root, query, window, rerank_weight, depth, uplift), depth
+        root, query, _maybe_rerank(root, query, window, tune, depth, uplift), depth
     )
     if trace_out is not None and uplift:
         # ⚠ **Into the caller's dict, never a module global.** `rank()`'s
@@ -475,6 +472,7 @@ def _fill_confidence(
             # SR-CONFIDENCE: `rank()` put this in the same dict as `df`/`n`,
             # from the record it actually ranked first — so the accelerator and
             # the scan cannot disagree about it.
+            verified="unverified",
             top_doc_hashes=stats.get("top_doc_hashes"),
             separation_floor=tune.separation_floor,
             doc_coverage_floor=tune.doc_coverage_floor,
@@ -505,7 +503,7 @@ def _fill_trace(out: dict | None, window, rerank_weight: float) -> None:
         pass
 
 
-def _maybe_rerank(root: Path, query: str, results, weight: float, top: int, uplift_out=None):
+def _maybe_rerank(root: Path, query: str, results, tune: "Tune", top: int, uplift_out=None):
     """Proximity rerank, then truncate to what the caller asked for.
 
     **It used to run after dense fusion, and the ordering mattered**: fusion
@@ -513,9 +511,9 @@ def _maybe_rerank(root: Path, query: str, results, weight: float, top: int, upli
     document was not yet in would have skipped it. Fusion was deleted on
     2026-08-25, so this is now simply the last stage.
     """
-    if weight <= 0:
+    if tune.rerank_weight <= 0:
         return results[:top]
-    return rerank.rerank(root, query, results, weight=weight, uplift_out=uplift_out)[:top]
+    return rerank.rerank(root, query, results, tune=tune, uplift_out=uplift_out)[:top]
 
 
 # -- the output contract -------------------------------------------------------
@@ -1441,6 +1439,13 @@ def cmd_answer(args) -> int:
         confidence_out=signals, expand=_expand_of(args), related_out=related,
     )
     block = signals.get("confidence")
+    if block is None:
+        # The block could not be computed. Every rendering branch below still
+        # owes one (`answer_payload` requires it), so it is the block that
+        # claims nothing — judged by this repo's floors, which are in hand.
+        from .confidence import empty
+
+        block = empty("unverified", tune.separation_floor, tune.doc_coverage_floor)
     _declare_no_accelerator(root)
 
     if not results:
@@ -1645,24 +1650,13 @@ def cmd_verify(args) -> int:
 
 
 def _block_dict(block) -> dict:
-    """A confidence block as JSON, or the honest empty one when it could not be
-    computed.
+    """A confidence block as JSON.
 
     **Never absent, and never invented.** `answer_payload` declares
-    `confidence` required on every branch, so an absent key would fail fux's own
-    output contract; a *fabricated* healthy block would be worse still. The
-    fallback is the block that claims nothing: no coverage, no separation, no
-    support, `answerable: false`.
-
-    ⚠ **Its two floors are the ENGINE defaults, not the repo's**, because this
-    branch runs only when the block could not be computed at all and there is
-    no tune in hand. `band` is `none` regardless — the floors gate nothing here
-    — but a consumer diffing floors across answers will see this one differ.
+    `confidence` required on every branch, so `cmd_answer` substitutes the
+    block that claims nothing (`confidence.empty`) — under its own repo's
+    floors — when the real one could not be computed, before anything renders.
     """
-    if block is None:
-        from .confidence import Confidence
-
-        return Confidence(0.0, 0.0, 0, "unverified", ()).as_dict()
     return block.as_dict()
 
 

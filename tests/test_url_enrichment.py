@@ -13,6 +13,7 @@ import pytest
 from fux import enrich as enrich_mod
 from fux.ingest import sourcelist
 from fux.store import acquired
+from l12_fixtures import chunk_bounds
 
 #: ⚠ **A bare URL, and it carried `fetch=http` until 2026-09-21.** A `loc` is
 #: an address, never a list LINE, so line attributes never belonged in it; the
@@ -116,19 +117,19 @@ def test_a_url_with_keep_false_reports_zero_chunks_rather_than_crashing(tmp_path
     # `keep=false` opted this line out, so there is nothing to count. `--plan`
     # names it; it must not raise inside a planning command.
     _repo(tmp_path, f"{LOC} fetch=http decoder=html keep=false")
-    assert enrich_mod._chunk_count(tmp_path, {"src": "url", "loc": LOC}) == 0
+    assert enrich_mod._chunk_count(tmp_path, {"src": "url", "loc": LOC}, bounds=chunk_bounds()) == 0
 
 
 def test_a_retained_url_document_chunks(tmp_path):
     _retain(tmp_path)
-    assert enrich_mod._chunk_count(tmp_path, {"src": "url", "loc": LOC}) >= 1
+    assert enrich_mod._chunk_count(tmp_path, {"src": "url", "loc": LOC}, bounds=chunk_bounds()) >= 1
 
 
 def test_a_corrupt_blob_counts_as_zero_never_raises(tmp_path):
     # The LINE declares `pdf`; the bytes are not one, so the decoder gets
     # nothing and the count is zero rather than an exception.
     _retain(tmp_path, raw=b"\x00\x01\x02", ctype="application/pdf", decoder="pdf")
-    assert enrich_mod._chunk_count(tmp_path, {"src": "url", "loc": LOC}) == 0
+    assert enrich_mod._chunk_count(tmp_path, {"src": "url", "loc": LOC}, bounds=chunk_bounds()) == 0
 
 
 def test_a_file_document_still_reads_from_disk(tmp_path):

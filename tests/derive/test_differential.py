@@ -13,6 +13,7 @@ one `top` would certify an unsound bound as proven — so it checks four.
 
 from __future__ import annotations
 
+from l12_fixtures import scoring, write_config
 import json
 
 import pytest
@@ -46,9 +47,9 @@ def _payload(results) -> str:
 def assert_identical(root, queries, tops=TOPS):
     for query in queries:
         for top in tops:
-            expected = _payload(scan.ask(root, query, top=top))
+            expected = _payload(scan.ask(root, query, top=top, scoring=scoring()))
             for skipping in (False, True):
-                got = _payload(accel.ask(root, query, top=top, skipping=skipping))
+                got = _payload(accel.ask(root, query, top=top, skipping=skipping, scoring=scoring()))
                 assert got == expected, (
                     f"differential broken: query={query!r} top={top} skipping={skipping}\n"
                     f"scan:\n{expected}\naccel:\n{got}"
@@ -74,6 +75,7 @@ def corpus(tmp_path):
         wlen = 100 if i % 7 == 0 else 20 + (i * 31) % 700
         records.append(_rec(f"file:d{i:04d}.md", f"Doc {i}", [wlen], terms))
     write_index(tmp_path, records)
+    write_config(tmp_path)
     build(tmp_path)
     return tmp_path
 
@@ -100,7 +102,7 @@ def test_score_ties_break_identically(corpus):
     order vs postings order — so a tie is the one case where the sort itself
     has to do the work.
     """
-    results = scan.ask(corpus, "common", top=50)
+    results = scan.ask(corpus, "common", top=50, scoring=scoring())
     scores = [r.score for r in results]
     assert len(set(scores)) < len(scores), "fixture no longer produces ties"
     assert_identical(corpus, ["common"], tops=(50,))
@@ -112,6 +114,7 @@ def test_top_larger_than_the_corpus(corpus):
 
 def test_single_document_corpus(tmp_path):
     write_index(tmp_path, [_rec("file:a.md", "A", [10], {term_hash("solo"): [1, 1]})])
+    write_config(tmp_path)
     build(tmp_path)
     assert_identical(tmp_path, ["solo", "absent", ""], tops=(1, 5))
 
@@ -126,6 +129,7 @@ def test_document_without_flen(tmp_path):
     record = _rec("file:a.md", "A", [0], {term_hash("solo"): [1, 1]})
     del record["flen"]
     write_index(tmp_path, [record, _rec("file:b.md", "B", [40], {term_hash("solo"): [2, 1]})])
+    write_config(tmp_path)
     build(tmp_path)
     assert_identical(tmp_path, ["solo"], tops=(1, 5))
 
@@ -157,9 +161,10 @@ def _url(doc_id, title, flen, terms) -> dict:
 def test_url_record_titles(tmp_path):
     """A url record resolves the same display title on both paths."""
     write_index(tmp_path, [_url("url:https://x/a", "Page A", [10], {term_hash("solo"): [1, 1]})])
+    write_config(tmp_path)
     build(tmp_path)
     assert_identical(tmp_path, ["solo"], tops=(1,))
-    assert accel.ask(tmp_path, "solo", top=1)[0].title == "Page A"
+    assert accel.ask(tmp_path, "solo", top=1, scoring=scoring(), skipping=True)[0].title == "Page A"
 
 
 def test_a_corpus_holding_a_url_record_builds_and_agrees(tmp_path):
@@ -182,6 +187,7 @@ def test_a_corpus_holding_a_url_record_builds_and_agrees(tmp_path):
         _url("url:https://x/deploys", "Deploy runbook", [20], {term_hash("rotation"): [1, 0]}),
     ]
     write_index(tmp_path, records)
+    write_config(tmp_path)
     build(tmp_path)  # must not raise: the invariant holds by field shape
     assert_identical(tmp_path, ["oncall", "rotation", "pager", "oncall rotation"])
 
@@ -204,6 +210,7 @@ def test_a_stray_quoted_hash_still_stops_the_build(tmp_path):
 
     record = _url("url:https://x/a", term_hash("Page A"), [10], {term_hash("solo"): [1, 1]})
     write_index(tmp_path, [record])
+    write_config(tmp_path)
     with pytest.raises(FuxError, match="appears outside `terms`"):
         build(tmp_path)
 
@@ -217,6 +224,7 @@ def test_a_term_spanning_many_blocks(tmp_path):
         tmp_path,
         [_rec(f"file:d{i:04d}.md", f"D{i}", [10 + i], {term_hash("everywhere"): [1 + i % 3, 0]}) for i in range(n)],
     )
+    write_config(tmp_path)
     build(tmp_path)
     runtime = accel.Runtime(tmp_path)
     assert len(runtime.blocks_for(term_hash("everywhere"))) == 4

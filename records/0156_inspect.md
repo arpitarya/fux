@@ -7,10 +7,10 @@ description: "Arpit asked whether a consumed index is a good index or a bad one.
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@ebf611b8e0bd]
+owns: [src/fux/inspect@b865ff821f61]
 laws: [L2, L3, L4, L6, L8]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 032486422540c4fe17858c9b565b7e36907a63295dae7a5a8b7c217cc7b8214e
+content_sha: 805092f93ddfe4a8341f9dcec1e82a8180392bee9f3b87c404f1acdea96659b8
 ratifies: W-169
 ---
 
@@ -262,6 +262,16 @@ discoverable from the index the whole time and nobody could see it.
     all the same: that table is not a verb list, it is what `.fux/output.toml`
     may legally say, and a repo whose file carries `[cli.json] inspect = true`
     must validate on both readers.
+
+<!-- L12-NOTE-START -->
+
+**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `fux inspect` chunks at the repo's own
+`[refer]` bounds, read strictly from `.fux/tune.toml` — the report no longer
+measures passages under built-in numbers when the file is absent or bad; it
+stops and names it. The facts cache key now carries `table_rows_per_passage` as
+well as the two byte bounds, so a changed value is a cache miss, not a stale row.
+
+<!-- L12-NOTE-END -->
 
 <!-- L12-VALUES-START -->
 

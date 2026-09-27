@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@c9feb60edf5e, tools/differential@bd6cd7fb02de]
+owns: [src/fux/derive@480cac557ebd, tools/differential@68b74242b9a8]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 1532baf441bfe3ebb797cc578b59327f8d63938490e6c496dccf8fe0af6ef9ba
+content_sha: 882df81730f11e041183da98f3933be9ad48dbaba28cc60f92d0ed29c85510a4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -255,6 +255,16 @@ offset entry's is packed through `pack_entry` and round-tripped through
 `unpack_entry`; the doc-table and stats examples are asserted to carry exactly
 the declared field sets; the postings example is checked for ascending docidx
 and trimmed per-field tf.
+
+<!-- L12-NOTE-START -->
+
+**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `accel.ask`, `accel_candidates`,
+`block_bound` and the two helpers take `scoring` (and `skipping`) as required
+arguments — there is no default `Scoring` left to fall back to — so every caller
+names the scoring it ranks under, and the differential law compares two paths
+handed the same object.
+
+<!-- L12-NOTE-END -->
 
 <!-- L12-VALUES-START -->
 

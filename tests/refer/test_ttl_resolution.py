@@ -141,13 +141,15 @@ def test_answer_built_its_policy_with_caching_off_so_every_ttl_was_dead():
 
 
 def test_the_caller_still_gets_no_cache_unless_it_asks():
-    """W-60 verdict F, held by arithmetic: the default is still 0."""
+    """W-60 verdict F: no cache unless a caller asks. Since L12 the refer path
+    has no default to hold it — every caller names the TTL, and `cmd_answer`
+    names `--cache-ttl`'s, which is 0 unless the flag is given."""
     import inspect
 
     from fux.query.refer_answer import answer_via_refer
 
-    default = inspect.signature(answer_via_refer).parameters["cache_ttl_seconds"].default
-    assert default == 0
+    param = inspect.signature(answer_via_refer).parameters["cache_ttl_seconds"]
+    assert param.default is inspect.Parameter.empty, "the TTL must be named, never defaulted"
 
 
 def test_the_flag_is_parsed_by_the_source_lists_own_duration_parser():

@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@7ea6252db31e, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@8c6bcf9dc871, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 56f6df2979f1aab8f592bb0a2e37cd2b4353583e0dec6b53b10c6a7b9cddc136
+content_sha: 1ad48727bee912991b826b81a2da781f583e9b3a1147cde5997bc1ded13bd06a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -182,7 +182,7 @@ authoritative about the row.**
 | `freshness verdicts` | warn | `freshness_counts` and `AS_INGESTED_VETO_SHARE` — the veto instrument, shared verbatim with SR-ACQUIRED's identical one so the quarter has one home | [SR-URL-FRESHNESS](0147_url-freshness.md) |
 | `ranking priors` | warn | every prior that is wired, reads its input and multiplies by one — **and the count of documents it would have acted on**. It refuses to recommend a value | [SR-ARCHIVED-CONTENT](0134_archived-content.md) · [SR-TUNE](0135_tuning.md) |
 | `output.toml present` | warn | absent means every output default is the engine's own and none can be changed | [SR-OUTPUT](0143_output-defaults.md) decision 20 |
-| `tune.toml loads` | warn, **error** when the file will not parse | 🔴 **A broken `.fux/tune.toml` left doctor GREEN until 2026-09-11** (W-140 row 13), which is the worst shape for this file: `fux ingest` reads only `[index]`, so a bad ranking knob does not stop an ingest by design (SR-TUNE decision 13) while `ask`, `find` and `answer` refuse. The repo indexes cleanly, every row is fine, and every query fails. ⚠ **Absent is NOT an error** — that is a repo running engine defaults. It calls `tune.load` rather than re-parsing: a second parser answers a question the real one does not ask | [SR-TUNE](0135_tuning.md) decision 13 |
+| `tune.toml loads` | warn, **error** when the file will not parse | 🔴 **A broken `.fux/tune.toml` left doctor GREEN until 2026-09-11** (W-140 row 13), which is the worst shape for this file: `fux ingest` reads only `[index]`, so a bad ranking knob does not stop an ingest by design (SR-TUNE decision 13) while `ask`, `find` and `answer` refuse. The repo indexes cleanly, every row is fine, and every query fails. **Absent, or missing a key, is an error too** ([L12](0013_LAW-12-values-live-in-config.md)): there is no engine default to read in its place, and `fux doctor --fix` writes what is missing from the template. It calls `tune.load` rather than re-parsing: a second parser answers a question the real one does not ask | [SR-TUNE](0135_tuning.md) decision 13 |
 | `types list usable` | error | a types list with no live pattern — `read_types` refuses it, so ingest stops | [SR-TYPES](0128_types-list.md) decision 10 |
 | `fuxignore usable` | warn, **error** when the patterns will not parse | the `.fuxignore` patterns parse, and duplicates | [SR-FUXIGNORE](0144_fuxignore.md) |
 | `dirs exclusions migrated` | warn | the `!` lines still in `.fux/sources/dirs`, each with the anchored pattern to write instead. `fux remove` stopped writing them on 2026-09-14 (SR-FUXIGNORE decision 5a) and they are read forever, so this reports and never fails. ⚠ **Not the duplicate finding above** — that one needs the pattern in *both* files; this fires on every survivor, including the ones nothing duplicates, which are the ones no other row would mention | [SR-FUXIGNORE](0144_fuxignore.md) decisions 5a–5b · [SR-DIR-LIST](0120_dir-list.md) decision 2d |
@@ -190,7 +190,7 @@ authoritative about the row.**
 | `retired agent folders` | warn | `.codex/skills/` or `.github/skills/` left behind by an older `setup`. **The DUPLICATE is the defect**: Copilot reads `.agents/skills/` *and* `.github/skills/`, so every skill appears twice and the older copy is free to disagree while both look correct. Delete is the whole remedy, and `fux setup` will not, because the folder may hold files fux did not write | [SR-AGENT-POLICY](0132_agent-policy.md) decision 16 |
 | `README.md current` | warn | the file's SECTION SET against the current template's. ⚠ **Sections, not bytes**: the file is write-if-missing so a consumer's notes survive, and a byte comparison would fire on every repo where somebody added a line. An EXTRA heading is the feature, never drift | [SR-DOTFUX](0102_fux-directory.md) decision 6 |
 | `refusal rules current` | warn | `.fux/refusals.toml` byte-equal to a starter fux has **REPLACED** — never edited, and refusing by rules fux stopped shipping. ⚠ **Matching the CURRENT starter is not a finding**; a repo set up yesterday looks exactly like that. Fires only on a digest in `doctor.RETIRED_REFUSAL_STARTERS`, **which is appended to by hand in the change that edits the starter** — fux ships one starter, so "equal to a previous one" is otherwise unanswerable from the tree | [SR-REFUSAL](0146_refusals.md) |
-| `tune.toml current` · `output.toml current` | warn | a key the engine has gained that the consumer's file does not mention. Write-if-missing means it never will, so the knob exists and the one file meant to show it does not. ⚠ **Absent is not frozen** — that is engine defaults, deliberately, and each file's own `loads`/`present` row says so | [SR-TUNE](0135_tuning.md) decision 4 · [SR-OUTPUT](0143_output-defaults.md) decision 14 |
+| `tune.toml current` · `output.toml current` | warn | a key the engine has gained that the consumer's file does not mention. Write-if-missing means it never gains it on its own, and since L12 the verb that reads it stops — so this row names the keys and the remedy, `fux doctor --fix`, which writes exactly those keys from the template. ⚠ **Absent is the file's own `loads`/`present` row's to report**, not this one's | [SR-TUNE](0135_tuning.md) decision 4 · [SR-OUTPUT](0143_output-defaults.md) decision 14 |
 | `declared types are readable` | warn | an include glob in `.fux/formats.toml` naming an extension no built-in and no `.fux/decoders/` decoder claims. ⚠ **Not the `decoder bindings` row**, which fires on a binding no indexed document matches; this one fires on a declared type nothing can READ — the documents are walked and then indexed as raw bytes or skipped, while a committed file says they are documents. **Prose suffixes are exempt**: `extract.py` reads them, so having no decoder is their normal state | [SR-TYPES](0128_types-list.md) |
 | `listed directories exist` | warn | a non-exclusion line in `.fux/sources/dirs` naming a path not on disk. 🔴 **`walk_sources` RAISES on this**, so the next `fux ingest` exits 1 — `fux add` refuses such a path, and a line that arrived another way had nothing checking it. Still `warn`: ingest is where it stops, and a directory not checked out on this branch is a legitimate state for an afternoon | [SR-DIR-LIST](0120_dir-list.md) |
 | `url extraction depth` | warn | a `url:` record whose extracted text is under `THIN_URL_SHARE` of its retained bytes — the `http` fetcher runs no JavaScript, so a single-page app returns a full-size shell and decodes to its nav bar. Read from the committed index and `.fux/acquired/`, never a fetch. ⚠ **Advisory and deliberately loose**: it surfaces the obvious case and adjudicates no extraction quality; `--cdp` is the remedy and whether a page needs one is the consumer's call | [SR-HTTP-FETCHER](0119_http-fetcher.md) |
@@ -325,9 +325,8 @@ shape for **this** file specifically:
   ([SR-TUNE](0135_tuning.md) decision 13) — while `ask`, `find`, `answer`,
   `graph` and `path` all refuse. So the index is clean, every check says fine,
   and every query in the repo fails.
-- **An error, not a warning**, unlike an absent `output.toml`. Absent means
-  engine defaults, which is a legitimate repo; unparseable means a file
-  somebody wrote that nothing reads, and the queries are already failing.
+- **An error, not a warning** — absent, missing a key or unparseable alike:
+  every ranked verb already refuses, and L12 leaves no default to answer from.
 - **It calls `tune.load` and quotes what comes back**, the way the
   `fux.toml loads` row quotes the config loader. A second parser here would
   answer a question the real one does not ask — decision 6's *name the fix*

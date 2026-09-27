@@ -18,6 +18,7 @@ import pytest
 
 from fux import sources
 from fux.errors import FuxError
+from l12_fixtures import write_config
 
 
 def _args(entry, **flags):
@@ -41,6 +42,7 @@ def repo(tmp_path, monkeypatch):
     (tmp_path / ".fux" / "sources" / "urls").write_text("", encoding="utf-8")
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     monkeypatch.setattr("fux.sources.find_root", lambda: tmp_path)

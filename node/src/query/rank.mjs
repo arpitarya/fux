@@ -8,7 +8,7 @@
  *
  * Owned, with its Python twin, by [SR-RANKING](../../../records/0111_ranking.md).
  */
-import { DEFAULT_SCORING, deriveWlen, scoreRecord } from "./bm25f.mjs";
+import { deriveWlen, scoreRecord } from "./bm25f.mjs";
 import { displayTitle } from "../store/format.mjs";
 import { isArchivedLoc } from "../ingest/gitdir.mjs";
 import { pyRound9, cmpCodePoints } from "../compat/pyfloat.mjs";
@@ -65,7 +65,7 @@ export class Weighting {
 /** Rank candidates. `expansion` is `{hashes, required, weights}` or null. */
 export function rank(
   candidates, queryHashes, df, corpus, top,
-  { weighting = null, scoring = DEFAULT_SCORING, statsOut = null, expansion = null } = {},
+  { weighting = null, scoring, statsOut = null, expansion = null },
 ) {
   const termWeights = expansion && expansion.weights && Object.keys(expansion.weights).length
     ? expansion.weights : null;

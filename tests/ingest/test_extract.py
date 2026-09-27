@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from l12_fixtures import scoring, template_index
 import pytest
 
 from fux.ingest.extract import extract_fields
@@ -10,33 +11,33 @@ from fux.query.tokenize import tokenize
 
 def test_title_from_frontmatter():
     doc = parse(b"---\ntitle: Explicit Title\n---\n# Heading\nbody\n")
-    assert extract_fields("a.md", doc).title == "Explicit Title"
+    assert extract_fields("a.md", doc, max_phrases=template_index().max_phrases).title == "Explicit Title"
 
 
 def test_title_falls_back_to_first_heading():
     doc = parse(b"# The Heading\n\nbody text\n")
-    assert extract_fields("a.md", doc).title == "The Heading"
+    assert extract_fields("a.md", doc, max_phrases=template_index().max_phrases).title == "The Heading"
 
 
 def test_title_falls_back_to_filename():
     doc = parse(b"no heading here, just prose\n")
-    assert extract_fields("docs/notes.md", doc).title == "notes.md"
+    assert extract_fields("docs/notes.md", doc, max_phrases=template_index().max_phrases).title == "notes.md"
 
 
 def test_phrases_are_headings_only_capped_at_the_default():
     """The cap was a hard-coded 12 until 2026-09-11; it is `.fux/tune.toml
     [index] max_phrases` now, default `DEFAULT_MAX_PHRASES` (32)."""
-    from fux.tune import DEFAULT_MAX_PHRASES
+    DEFAULT_MAX_PHRASES = template_index().max_phrases
 
     body = "\n".join(f"## Heading {i}" for i in range(DEFAULT_MAX_PHRASES + 8))
     doc = parse(body.encode("utf-8"))
-    fields = extract_fields("a.md", doc)
+    fields = extract_fields("a.md", doc, max_phrases=template_index().max_phrases)
     assert fields.phrases == [f"Heading {i}" for i in range(DEFAULT_MAX_PHRASES)]
 
 
 def test_terms_split_heading_and_body_tf():
     doc = parse(b"# install guide\n\ninstall the thing, then install again\n")
-    fields = extract_fields("a.md", doc)
+    fields = extract_fields("a.md", doc, max_phrases=template_index().max_phrases)
     # v2 order is (body, heading, title, path, ctx). "install" appears twice in
     # the body, once in the heading, and once more in the title (which falls
     # back to the one heading, so it repeats the heading's word, not doubles it).
@@ -46,7 +47,7 @@ def test_terms_split_heading_and_body_tf():
 
 def test_frontmatter_title_distinct_from_heading_is_counted_too():
     doc = parse(b"---\ntitle: install now\n---\n# setup guide\n\nsome body text\n")
-    fields = extract_fields("a.md", doc)
+    fields = extract_fields("a.md", doc, max_phrases=template_index().max_phrases)
     # v2 order is (body, heading, title, path, ctx). "install" appears only in
     # the (distinct) frontmatter title, now its own field -> tf_title=1 and
     # every other field is 0, including heading ("setup guide" has no "install").
@@ -59,14 +60,14 @@ def test_flen_is_per_field_counts_and_derives_the_weighted_wlen():
     # `flen`, raw per-field token counts, and the weighted length normaliser
     # is derived at query time by `query.bm25f.derive_wlen` from live weights.
     doc = parse(b"# x b\n\nc d e\n")
-    fields = extract_fields("x.md", doc)
+    fields = extract_fields("x.md", doc, max_phrases=template_index().max_phrases)
     # title falls back to the heading "x b" -> title tokens "x","b" = 2 (its
     # own field now, not folded into heading); heading tokens "x","b" = 2;
     # body tokens "c","d","e" = 3; path tokens from "x.md": "x","md" = 2; ctx
     # is empty until `fux enrich` exists = 0.
     assert fields.flen == (3, 2, 2, 2, 0)
     assert all(isinstance(n, int) for n in fields.flen)
-    assert derive_wlen(fields.flen) == 1.0 * 3 + 3.0 * 2 + 2.0 * 2 + 1.5 * 2 + 1.0 * 0
+    assert derive_wlen(fields.flen, scoring=scoring()) == 1.0 * 3 + 3.0 * 2 + 2.0 * 2 + 1.5 * 2 + 1.0 * 0
 
 
 def test_extraction_emits_no_vectors_and_no_code():
@@ -90,7 +91,7 @@ def test_extraction_emits_no_vectors_and_no_code():
     test on purpose**, and answer the gate first.
     """
     doc = parse(b"# Rollback procedure\n\nRollbacks complete within two minutes.\n")
-    fields = extract_fields("a.md", doc)
+    fields = extract_fields("a.md", doc, max_phrases=template_index().max_phrases)
     assert not hasattr(fields, "code")
     assert not hasattr(fields, "vectors")
     # And nothing under `embed/` is importable any more -- the package is gone.
@@ -100,8 +101,8 @@ def test_extraction_emits_no_vectors_and_no_code():
 
 def test_extraction_is_deterministic():
     doc = parse(b"# Title\n\nsome repeated repeated words\n")
-    a = extract_fields("a.md", doc)
-    b = extract_fields("a.md", doc)
+    a = extract_fields("a.md", doc, max_phrases=template_index().max_phrases)
+    b = extract_fields("a.md", doc, max_phrases=template_index().max_phrases)
     assert a == b
 
 
@@ -111,7 +112,7 @@ def test_a_fenced_hash_comment_is_not_mined_as_a_heading():
     `phrases`, where `fux ask` renders it as a `§` line. Every SR in this
     repository contains such a block."""
     body = "# Retention\n\nProse.\n\n```bash\n# Install dependencies\nuv sync\n```\n"
-    out = extract_fields("records/retention.md", parse(body.encode("utf-8")))
+    out = extract_fields("records/retention.md", parse(body.encode("utf-8")), max_phrases=template_index().max_phrases)
     assert out.phrases == ["Retention"]
     assert out.title == "Retention"
 
@@ -120,7 +121,7 @@ def test_a_fenced_hash_comment_stays_in_the_body_field():
     """It was stripped out of `body` as well as counted as a heading — so the
     words a reader can see were words the index could not."""
     body = "# Retention\n\nProse.\n\n```bash\n# Install dependencies\nuv sync\n```\n"
-    out = extract_fields("records/retention.md", parse(body.encode("utf-8")))
+    out = extract_fields("records/retention.md", parse(body.encode("utf-8")), max_phrases=template_index().max_phrases)
     body_i = 0  # store.TF_FIELDS order: (body, heading, title, path, ctx)
     for word in ("install", "dependencies"):
         (term,) = tokenize(word)
@@ -131,7 +132,7 @@ def test_a_real_heading_is_still_kept_out_of_the_body_field():
     """The other half of the same rule: a genuine heading is counted once as
     `heading` and must not be counted again as `body`."""
     body = "# Retention\n\nUnrelated prose.\n"
-    out = extract_fields("docs/x.md", parse(body.encode("utf-8")))
+    out = extract_fields("docs/x.md", parse(body.encode("utf-8")), max_phrases=template_index().max_phrases)
     body_i, heading_i = 0, 1
     (term,) = tokenize("retention")
     assert out.terms[term][heading_i] == 1
@@ -146,9 +147,9 @@ def _many_headings(n: int) -> ParsedDoc:
 
 
 def test_phrases_default_cap_is_the_config_default():
-    from fux.tune import DEFAULT_MAX_PHRASES
+    DEFAULT_MAX_PHRASES = template_index().max_phrases
 
-    fields = extract_fields("a.md", _many_headings(DEFAULT_MAX_PHRASES + 8))
+    fields = extract_fields("a.md", _many_headings(DEFAULT_MAX_PHRASES + 8), max_phrases=template_index().max_phrases)
     assert len(fields.phrases) == DEFAULT_MAX_PHRASES
     assert fields.phrases[0] == "Section zeta0"  # document order, not reordered
 

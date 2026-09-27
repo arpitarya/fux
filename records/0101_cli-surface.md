@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@6dae403f7070, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@925dccc045ce, tests_e2e@99091e19262e, node/fux.mjs@b3c33c3898dc]
+owns: [src/fux/cli.py@8811375939b5, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@925dccc045ce, tests_e2e@6d1f242e7f5a, node/fux.mjs@b3c33c3898dc]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 0609d9e849092daf7ce6071eb74c780344e2dd5d4ced22195400e562266cc75d
+content_sha: c3fb4f8803a8e19f773c623582c6324991bce1136f16f0fcfc68e287329c95ea
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -537,6 +537,16 @@ had already done its work.
     [`tests/test_progress.py`](../tests/test_progress.py).
 
 ---
+
+<!-- L12-NOTE-START -->
+
+**`fux doctor --fix` ([L12](0013_LAW-12-values-live-in-config.md) decision 3, W-225, 2026-09-27).** Writes every
+missing config file and key from its packaged template, reports each on stderr as
+`fixed: <file>: [table] key`, and then runs the checks — so `--json` stays a pure
+report. It is one of exactly two writers of a missing key; `fux setup` is the
+other, and nothing else ever writes one.
+
+<!-- L12-NOTE-END -->
 
 ### The commands
 

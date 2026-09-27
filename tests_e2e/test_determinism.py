@@ -12,6 +12,7 @@ import hashlib
 import subprocess
 import sys
 from pathlib import Path
+from l12_fixtures import write_config
 
 
 def _run(cwd: Path, *args: str) -> subprocess.CompletedProcess:
@@ -27,6 +28,7 @@ def _write_fixture(root: Path) -> None:
     dirs.write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(root)
     docs = root / "docs"
     docs.mkdir()
     (docs / "a.md").write_text(

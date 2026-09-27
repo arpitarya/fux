@@ -21,23 +21,16 @@ edited test is how a frozen threshold moves in disguise.
 
 from __future__ import annotations
 
+from l12_fixtures import template_tune, write_config
 import argparse
 import json as json_mod
 
 import pytest
 
 from fux.query import cmd_ask, cmd_find, run_query
-from fux.query.confidence import (
-    BANDS,
-    DOC_COVERAGE_FLOOR,
-    GROUNDED,
-    NONE,
-    PARTIAL,
-    SEPARATION_FLOOR,
-    WEAK,
-    Confidence,
-    signals,
-)
+from fux.query.confidence import BANDS, GROUNDED, NONE, PARTIAL, WEAK, Confidence, signals
+DOC_COVERAGE_FLOOR = template_tune().doc_coverage_floor
+SEPARATION_FLOOR = template_tune().separation_floor
 from fux.query.tokenize import tokenize, tokenize_pairs
 from fux.store import content_sha, term_hash, write_index
 
@@ -57,7 +50,12 @@ def _q(text: str, df: dict[str, int], scores: list[float], **kw) -> Confidence:
     """
     pairs = tokenize_pairs(text)
     hashes = list(dict.fromkeys(term_hash(a) for _, a in pairs))
-    return signals(pairs, hashes, {_h(w): c for w, c in df.items()}, N, scores, **kw)
+    floors = {
+        "verified": "unverified",
+        "separation_floor": template_tune().separation_floor,
+        "doc_coverage_floor": template_tune().doc_coverage_floor,
+    }
+    return signals(pairs, hashes, {_h(w): c for w, c in df.items()}, N, scores, **{**floors, **kw})
 
 
 # -- the four signals ----------------------------------------------------
@@ -213,7 +211,7 @@ def test_the_block_is_a_pure_function_of_its_inputs():
 
 
 def test_an_empty_query_is_none_rather_than_an_exception():
-    block = signals([], [], {}, 0, [])
+    block = signals([], [], {}, 0, [], verified="unverified", separation_floor=template_tune().separation_floor, doc_coverage_floor=template_tune().doc_coverage_floor)
     assert block.band == NONE
     assert block.answerable is False
     assert block.coverage == 0.0
@@ -293,6 +291,7 @@ def _args(**overrides) -> argparse.Namespace:
 
 def test_run_query_fills_confidence_only_when_a_caller_asks(tmp_path, monkeypatch):
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     monkeypatch.chdir(tmp_path)
 
     out: dict = {}
@@ -316,6 +315,7 @@ def test_ask_json_carries_the_block_and_find_keeps_stdout_pipeable(
     as a filename.
     """
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     monkeypatch.setattr("fux.query.find_root", lambda: tmp_path)
 
     cmd_ask(_args(query="rollback pgbouncer", json=True, band=True))
@@ -343,6 +343,7 @@ def test_the_cli_emits_nothing_without_band_and_still_computes_it(
     the path almost every run takes.
     """
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     monkeypatch.setattr("fux.query.find_root", lambda: tmp_path)
 
     cmd_ask(_args(query="rollback pgbouncer", json=True, band=False))
@@ -370,6 +371,7 @@ def test_band_prints_at_grounded_too_once_it_is_asked_for(
     exactly when the answer is good reads as broken.
     """
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     monkeypatch.setattr("fux.query.find_root", lambda: tmp_path)
 
     cmd_find(_args(query="rollback", band=True))
@@ -385,6 +387,7 @@ def test_the_block_cannot_reach_a_score_or_an_ordering(tmp_path, monkeypatch):
     scores as not asking for it.
     """
     write_index(tmp_path, [_record(), _record(id="file:b.md", loc="b.md", title="B")])
+    write_config(tmp_path)
     monkeypatch.chdir(tmp_path)
 
     plain, _ = run_query(tmp_path, "rollback procedure", 5)
@@ -413,7 +416,7 @@ def test_a_question_whose_terms_scatter_across_documents_is_not_grounded():
 
     scattered = Confidence(
         coverage=1.0, separation=0.58, support=3,
-        verified="unverified", missing=(), doc_coverage=0.42,
+        verified="unverified", missing=(), doc_coverage=0.42, separation_floor=template_tune().separation_floor, doc_coverage_floor=template_tune().doc_coverage_floor
     )
     # ⚠ **The clause is OFF** () because the decoy at
     # 0.710 sits INSIDE the real goldens' 0.401-1.000 range -- no floor separates
@@ -429,7 +432,7 @@ def test_a_document_that_carries_the_whole_question_is_still_grounded():
 
     whole = Confidence(
         coverage=1.0, separation=0.58, support=3,
-        verified="unverified", missing=(), doc_coverage=1.0,
+        verified="unverified", missing=(), doc_coverage=1.0, separation_floor=template_tune().separation_floor, doc_coverage_floor=template_tune().doc_coverage_floor
     )
     assert whole.band == GROUNDED
 
@@ -443,8 +446,8 @@ def test_doc_coverage_defaults_to_not_demoting():
     """
     from fux.query.confidence import Confidence
 
-    assert Confidence(1.0, 0.9, 2, "unverified", ()).doc_coverage == 1.0
-    assert Confidence(1.0, 0.9, 2, "unverified", ()).band == GROUNDED
+    assert Confidence(1.0, 0.9, 2, "unverified", (), doc_coverage=1.0, separation_floor=template_tune().separation_floor, doc_coverage_floor=template_tune().doc_coverage_floor).doc_coverage == 1.0
+    assert Confidence(1.0, 0.9, 2, "unverified", (), doc_coverage=1.0, separation_floor=template_tune().separation_floor, doc_coverage_floor=template_tune().doc_coverage_floor).band == GROUNDED
 
 
 def test_the_corpus_wide_coverage_is_unchanged():
@@ -511,9 +514,11 @@ def test_the_doc_coverage_gate_is_off_by_default_and_can_be_switched_on():
     scattered = dict(
         coverage=1.0, separation=0.58, support=3,
         verified="unverified", missing=(), doc_coverage=0.42,
+        separation_floor=template_tune().separation_floor,
     )
-    assert Confidence(**scattered).band == GROUNDED, "the default gate is OFF"
-    assert Confidence(**scattered).doc_coverage_floor == DOC_COVERAGE_FLOOR
+    assert Confidence(**scattered, doc_coverage_floor=DOC_COVERAGE_FLOOR).band == GROUNDED, (
+        "the shipped gate is OFF"
+    )
     assert Confidence(**scattered, doc_coverage_floor=1.0).band == PARTIAL
 
 
@@ -525,6 +530,7 @@ def test_a_tuned_floor_cannot_reach_a_score_or_an_ordering(tmp_path, monkeypatch
     opened a path from `.fux/tune.toml` into the result list.
     """
     write_index(tmp_path, [_record(), _record(id="file:docs/b.md", loc="docs/b.md")])
+    write_config(tmp_path)
     monkeypatch.chdir(tmp_path)
     (tmp_path / ".fux").mkdir(exist_ok=True)
 
@@ -535,6 +541,7 @@ def test_a_tuned_floor_cannot_reach_a_score_or_an_ordering(tmp_path, monkeypatch
         "[confidence]\nseparation_floor = 0.0\ndoc_coverage_floor = 1.0\n",
         encoding="utf-8",
     )
+    write_config(tmp_path)
     out_tuned: dict = {}
     tuned, _ = run_query(tmp_path, "rollback", 5, confidence_out=out_tuned)
 
@@ -550,7 +557,8 @@ def test_no_tune_recomputes_the_band_at_the_ENGINE_defaults():
     reset the floors, a repo could keep a slack `grounded` under the one flag
     that promises the engine's own answer.
     """
-    from fux.tune import DEFAULT_TUNE, load
+    from fux.tune import load
+    DEFAULT_TUNE = template_tune()
 
     import tempfile, pathlib
     with tempfile.TemporaryDirectory() as d:
@@ -559,7 +567,8 @@ def test_no_tune_recomputes_the_band_at_the_ENGINE_defaults():
         (root / ".fux" / "tune.toml").write_text(
             "[confidence]\nseparation_floor = 0.9\n", encoding="utf-8"
         )
-        assert load(root).separation_floor == 0.9
+        write_config(root)
+        assert load(root, enabled=True).separation_floor == 0.9
         assert load(root, enabled=False).separation_floor == SEPARATION_FLOOR
         assert load(root, enabled=False) == DEFAULT_TUNE
 
@@ -656,7 +665,7 @@ def test_the_band_table_and_answerable_cannot_disagree():
     """
     refuse = {NONE}
     for band, block in (
-        (NONE, Confidence(0.0, 0.0, 0, "unverified", ())),
+        (NONE, Confidence(0.0, 0.0, 0, "unverified", (), doc_coverage=1.0, separation_floor=template_tune().separation_floor, doc_coverage_floor=template_tune().doc_coverage_floor)),
         (WEAK, _q("rollback procedure", {"rollback": 40, "procedure": 12}, [1.0, 0.98])),
         (PARTIAL, _q("rollback mtls", {"rollback": 40}, [10.0, 1.0])),
         (GROUNDED, _q("rollback", {"rollback": 40}, [10.0, 1.0])),
@@ -707,7 +716,7 @@ def test_failed_names_which_gate_fired():
     assert weak.band == WEAK and weak.answerable is True
     assert weak.failed == ["separation"]
 
-    nothing = signals([], [], {}, 0, [])
+    nothing = signals([], [], {}, 0, [], verified="unverified", separation_floor=template_tune().separation_floor, doc_coverage_floor=template_tune().doc_coverage_floor)
     assert nothing.band == NONE and nothing.failed == ["no_candidates"]
 
     # `partial` is NOT a refusal: its defect is named in `missing`, and putting
@@ -737,7 +746,7 @@ def test_every_refusal_names_at_least_one_failed_gate():
     the weakening is stated rather than left as a gap.
     """
     for block in (
-        signals([], [], {}, 0, []),
+        signals([], [], {}, 0, [], verified="unverified", separation_floor=template_tune().separation_floor, doc_coverage_floor=template_tune().doc_coverage_floor),
         _q("rollback procedure", {"rollback": 40, "procedure": 12}, [1.0, 0.98]),
         _q("rollback mtls", {"rollback": 40}, [10.0, 1.0]),
         _q("rollback", {"rollback": 40}, [10.0, 1.0]),
@@ -754,7 +763,7 @@ def test_a_named_gate_may_fire_without_refusing():
     legal, is the thing the ruling left it the bytes to do, and is not what
     `answerable` means.
     """
-    nothing = signals([], [], {}, 0, [])
+    nothing = signals([], [], {}, 0, [], verified="unverified", separation_floor=template_tune().separation_floor, doc_coverage_floor=template_tune().doc_coverage_floor)
     assert nothing.failed == ["no_candidates"] and nothing.answerable is False
 
     weak = _q("rollback procedure", {"rollback": 40, "procedure": 12}, [1.0, 0.98])

@@ -23,6 +23,7 @@ from fux.query.rank import AskResult
 from fux.query.scan import ask
 from fux.query.tokenize import tokenize
 from fux.store import term_hash, write_index
+from l12_fixtures import scoring, write_config
 
 
 def _h(word: str) -> str:
@@ -51,6 +52,7 @@ def _corpus(tmp_path):
             _rec("file:other.md", "Other", [10, 2], {_h("rollback"): [1, 0]}),
         ],
     )
+    write_config(tmp_path)
 
 
 # -- identity ------------------------------------------------------------------
@@ -72,6 +74,7 @@ def test_index_digest_is_stable_and_moves_with_content(tmp_path):
     assert first and provenance.index_digest(tmp_path) == first
 
     write_index(tmp_path, [_rec("file:mesh.md", "Mesh", [10, 2], {_h("rollback"): [9, 1]})])
+    write_config(tmp_path)
     assert provenance.index_digest(tmp_path) != first
 
 
@@ -85,6 +88,7 @@ def test_tune_digest_says_none_rather_than_hashing_absence(tmp_path):
     assert provenance.tune_digest(tmp_path) == "none"
     (tmp_path / ".fux").mkdir(exist_ok=True)
     (tmp_path / ".fux" / "tune.toml").write_text("[bm25f]\nk1 = 1.2\n")
+    write_config(tmp_path)
     assert provenance.tune_digest(tmp_path) not in ("", "none")
 
 
@@ -93,7 +97,7 @@ def test_tune_digest_says_none_rather_than_hashing_absence(tmp_path):
 
 def test_derivation_reports_the_four_gates(tmp_path):
     _corpus(tmp_path)
-    results = ask(tmp_path, "rollback")
+    results = ask(tmp_path, "rollback", top=5, scoring=scoring())
     why = provenance.derive(
         tmp_path, "rollback", results[:1], path="scan",
         stats={"df": {_h("rollback"): 2}, "n": 2}, window=results,
@@ -113,7 +117,7 @@ def test_the_cut_line_is_the_window_not_the_placed_set(tmp_path):
     number a reader can already see.
     """
     _corpus(tmp_path)
-    results = ask(tmp_path, "rollback")
+    results = ask(tmp_path, "rollback", top=5, scoring=scoring())
     assert len(results) == 2
     why = provenance.derive(
         tmp_path, "rollback", results[:1], path="scan", window=results
@@ -383,6 +387,7 @@ def test_an_edited_index_drifts_on_the_corpus(tmp_path):
     _corpus(tmp_path)
     payload = provenance.receipt(tmp_path, "rollback", path="refer", subject=[])
     write_index(tmp_path, [_rec("file:mesh.md", "Mesh", [99, 2], {_h("rollback"): [3, 1]})])
+    write_config(tmp_path)
     assert provenance.verify(tmp_path, payload).verdict == provenance.DRIFTED_CORPUS
 
 
@@ -397,6 +402,7 @@ def test_a_new_tune_file_drifts_on_CONFIG_not_on_corpus(tmp_path):
     payload = provenance.receipt(tmp_path, "rollback", path="refer", subject=[])
     (tmp_path / ".fux").mkdir(exist_ok=True)
     (tmp_path / ".fux" / "tune.toml").write_text("[bm25f]\nk1 = 9.9\n")
+    write_config(tmp_path)
     result = provenance.verify(tmp_path, payload)
     assert result.verdict == provenance.DRIFTED_CONFIG
     assert "tune" in result.note
@@ -415,6 +421,9 @@ def test_a_tree_with_no_index_is_unverifiable(tmp_path, tmp_path_factory):
     _corpus(tmp_path)
     payload = provenance.receipt(tmp_path, "rollback", path="refer", subject=[])
     elsewhere = tmp_path_factory.mktemp("empty")
+    # The same config, so the one thing missing is the index (L12: a tree with
+    # no tune.toml has drifted on config before it has failed to be a corpus).
+    write_config(elsewhere)
     assert provenance.verify(elsewhere, payload).verdict == provenance.UNVERIFIABLE
 
 
@@ -490,6 +499,7 @@ def _answerable_repo(tmp_path):
     rec = _rec("file:docs/mesh.md", "Mesh", [10, 2], {_h("rollback"): [3, 1]})
     rec["sha"] = sha
     write_index(tmp_path, [rec])
+    write_config(tmp_path)
     return tmp_path
 
 

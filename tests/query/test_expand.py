@@ -18,6 +18,7 @@ its own adversarial corpus.
 
 from __future__ import annotations
 
+from l12_fixtures import scoring, write_config
 import pytest
 
 from fux.derive import accel, build
@@ -59,6 +60,7 @@ def _corpus() -> list[dict]:
 @pytest.fixture
 def built(tmp_path):
     write_index(tmp_path, _corpus())
+    write_config(tmp_path)
     build(tmp_path)
     return tmp_path
 
@@ -84,13 +86,13 @@ def test_no_expansion_is_byte_identical(built):
     the parameter was unused would break it silently on the day someone diffed
     two versions.
     """
-    base = _payload(scan.ask(built, "alpha", top=10))
-    none = _payload(scan.ask(built, "alpha", top=10, expansion=Expansion.none(scan.query_term_hashes("alpha"))))
+    base = _payload(scan.ask(built, "alpha", top=10, scoring=scoring()))
+    none = _payload(scan.ask(built, "alpha", top=10, expansion=Expansion.none(scan.query_term_hashes("alpha")), scoring=scoring()))
     assert none == base
 
     # And an expansion whose weight is off is the identity too — the
     # off-switch has to be reachable by configuration, not only by omission.
-    off = _payload(scan.ask(built, "alpha", top=10, expansion=_expansion("alpha", "omega", 0.0)))
+    off = _payload(scan.ask(built, "alpha", top=10, expansion=_expansion("alpha", "omega", 0.0), scoring=scoring()))
     assert off == base
 
 
@@ -100,8 +102,8 @@ def test_an_expansion_that_repeats_the_query_changes_nothing(built):
     Otherwise a caller could quietly demote their own query by mentioning one
     of its own words in the expansion — a foot-gun with no upside.
     """
-    base = _payload(scan.ask(built, "alpha", top=10))
-    same = _payload(scan.ask(built, "alpha", top=10, expansion=_expansion("alpha", "alpha", 0.2)))
+    base = _payload(scan.ask(built, "alpha", top=10, scoring=scoring()))
+    same = _payload(scan.ask(built, "alpha", top=10, expansion=_expansion("alpha", "alpha", 0.2), scoring=scoring()))
     assert same == base
 
 
@@ -111,7 +113,7 @@ def test_an_expansion_that_repeats_the_query_changes_nothing(built):
 def test_a_document_matching_only_expansion_terms_is_never_returned(built):
     """🔴 The guard, on the reference path."""
     expansion = _expansion("alpha", "omega", 0.2)
-    ids = [r.id for r in scan.ask(built, "alpha", top=50, expansion=expansion)]
+    ids = [r.id for r in scan.ask(built, "alpha", top=50, expansion=expansion, scoring=scoring())]
     assert "file:omega-only.md" not in ids
     assert "file:both.md" in ids and "file:alpha-only.md" in ids
 
@@ -120,7 +122,7 @@ def test_the_guard_holds_on_the_accelerator_too(built):
     """The same guard, on the path a filter in `cmd_ask` would have missed."""
     expansion = _expansion("alpha", "omega", 0.2)
     for skipping in (False, True):
-        ids = [r.id for r in accel.ask(built, "alpha", top=50, skipping=skipping, expansion=expansion)]
+        ids = [r.id for r in accel.ask(built, "alpha", top=50, skipping=skipping, expansion=expansion, scoring=scoring())]
         assert "file:omega-only.md" not in ids
 
 
@@ -131,7 +133,7 @@ def test_the_guard_holds_at_a_weight_that_would_otherwise_win(built):
     which is what makes this a guard rather than a technicality.
     """
     expansion = _expansion("alpha", "omega", 50.0)
-    ids = [r.id for r in scan.ask(built, "alpha", top=50, expansion=expansion)]
+    ids = [r.id for r in scan.ask(built, "alpha", top=50, expansion=expansion, scoring=scoring())]
     assert "file:omega-only.md" not in ids
     assert ids[0] == "file:both.md", "the expansion should still lift a document that answers the query"
 
@@ -141,10 +143,10 @@ def test_the_guard_holds_at_a_weight_that_would_otherwise_win(built):
 
 def test_an_expansion_lifts_a_document_that_matches_it(built):
     """The fixture must be able to move, or the tests above pass vacuously."""
-    plain = [r.id for r in scan.ask(built, "alpha", top=10)]
+    plain = [r.id for r in scan.ask(built, "alpha", top=10, scoring=scoring())]
     assert plain[0] == "file:alpha-only.md", "precondition: without the expansion, alpha-only wins"
 
-    expanded = [r.id for r in scan.ask(built, "alpha", top=10, expansion=_expansion("alpha", "omega", 0.2))]
+    expanded = [r.id for r in scan.ask(built, "alpha", top=10, expansion=_expansion("alpha", "omega", 0.2), scoring=scoring())]
     assert expanded[0] == "file:both.md", "the expansion term must be able to reorder"
 
 
@@ -152,7 +154,7 @@ def test_the_weight_is_monotone(built):
     """More weight, more lift — the knob has to mean something."""
     scores = []
     for weight in (0.05, 0.2, 1.0, 5.0):
-        results = scan.ask(built, "alpha", top=10, expansion=_expansion("alpha", "omega", weight))
+        results = scan.ask(built, "alpha", top=10, expansion=_expansion("alpha", "omega", weight), scoring=scoring())
         scores.append(next(r.score for r in results if r.id == "file:both.md"))
     assert scores == sorted(scores), scores
 

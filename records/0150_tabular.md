@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-06
 amended: 2026-09-11
 feature: tabular documents — row granularity, the admitted-row limit, and what a table citation is
-owns: [src/fux/decode/csv.py@6da838857256, src/fux/decode/xlsx.py@b19095e458e8, src/fux/decode/_limits.py@5970a244258a]
+owns: [src/fux/decode/csv.py@6da838857256, src/fux/decode/xlsx.py@b19095e458e8, src/fux/decode/_limits.py@ff299fec47e8]
 laws: [L1, L2, L3]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: d5215373117a4d5694926beb2abefbf55d0e53d3dccbc7c77a1b7f4a41d31b00
+content_sha: c07b1d4201836872795b8a170570b2c2f60d1e387945fbc5deaed3e48c570126
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -63,7 +63,7 @@ format, not a zip of XML, and nothing here reads it.
 
 ### Decision
 
-**1. One passage per row.** `_chunk.TABLE_ROWS_PER_PASSAGE = 1`. Tables are
+**1. One passage per row.** `[refer] table_rows_per_passage = 1` as shipped. Tables are
 split at **every size**, not only when a section exceeds the passage ceiling —
 `_pieces` used to return early for any section that fitted, so a ten-row table
 never reached the split at all.

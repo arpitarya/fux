@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from fux import store
 from fux.query.refer_answer import _load_fetchers, answer_via_refer
+from l12_fixtures import template_tune
 
 #: Logs every lifecycle call to a sibling file, since `_load_fetcher` loads
 #: the module internally with no handle the test can inspect afterwards —
@@ -82,7 +83,7 @@ def test_file_document_needs_no_fetcher(tmp_path):
     (tmp_path / "runbook.md").write_text("# R\n\nthe rota hands over Monday\n", encoding="utf-8")
     bundle = answer_via_refer(
         tmp_path, "rota",
-        [("file:runbook.md", "runbook.md", _sha("# R\n\nthe rota hands over Monday\n"))],
+        [("file:runbook.md", "runbook.md", _sha("# R\n\nthe rota hands over Monday\n"))], tune=template_tune(), cache_ttl_seconds=0
     )
     assert bundle is not None
     assert bundle.assembled.citations
@@ -91,7 +92,7 @@ def test_file_document_needs_no_fetcher(tmp_path):
 
 def test_file_document_missing_from_the_working_tree_degrades_to_none(tmp_path):
     """Indexed once, gone now — a real fact about the corpus, not a crash."""
-    bundle = answer_via_refer(tmp_path, "rota", [("file:gone.md", "gone.md", "deadbeef")])
+    bundle = answer_via_refer(tmp_path, "rota", [("file:gone.md", "gone.md", "deadbeef")], tune=template_tune(), cache_ttl_seconds=0)
     assert bundle is None
 
 
@@ -101,7 +102,7 @@ def test_file_document_missing_from_the_working_tree_degrades_to_none(tmp_path):
 def test_url_document_uses_the_configured_fetcher(tmp_path):
     _init_url_repo(tmp_path)
     bundle = answer_via_refer(
-        tmp_path, "page", [("url:https://x.test/a", "https://x.test/a", _sha("nonsense"))]
+        tmp_path, "page", [("url:https://x.test/a", "https://x.test/a", _sha("nonsense"))], tune=template_tune(), cache_ttl_seconds=0
     )
     assert bundle is not None
     assert bundle.assembled.citations
@@ -166,7 +167,7 @@ def test_answer_via_refer_degrades_to_none_when_the_fetcher_is_missing(tmp_path)
     _init_url_repo(tmp_path)
     (tmp_path / ".fux" / "fetchers" / "mw.py").unlink()
     bundle = answer_via_refer(
-        tmp_path, "page", [("url:https://x.test/a", "https://x.test/a", "deadbeef")]
+        tmp_path, "page", [("url:https://x.test/a", "https://x.test/a", "deadbeef")], tune=template_tune(), cache_ttl_seconds=0
     )
     assert bundle is None
 
@@ -189,7 +190,7 @@ def test_three_documents_are_referred_in_one_call(tmp_path):
     b = _write(tmp_path, "b.md", f"# B\n\nthe rota hands over on Monday {pad}\n")
     c = _write(tmp_path, "c.md", f"# C\n\nunrelated {pad}\n")
 
-    bundle = answer_via_refer(tmp_path, "rota hands over", [a, b, c])
+    bundle = answer_via_refer(tmp_path, "rota hands over", [a, b, c], tune=template_tune(), cache_ttl_seconds=0)
     assert bundle is not None
     assert {d.doc_id for d in bundle.documents} == {"file:a.md", "file:b.md", "file:c.md"}
     # The winning passage may come from a document that was not first in.
@@ -208,7 +209,7 @@ def test_the_assembled_answer_never_exceeds_the_budget(tmp_path):
     """
     pad = " ".join(f"pad{i}" for i in range(400))
     docs = [_write(tmp_path, f"{n}.md", f"# {n}\n\nthe rota hands over {pad}\n") for n in "abc"]
-    bundle = answer_via_refer(tmp_path, "rota hands over", docs)
+    bundle = answer_via_refer(tmp_path, "rota hands over", docs, tune=template_tune(), cache_ttl_seconds=0)
     assert bundle is not None
     assert bundle.assembled.used <= bundle.assembled.budget
 
@@ -219,7 +220,7 @@ def test_one_unreachable_document_costs_its_own_citation_and_no_more(tmp_path):
     pad = " ".join(f"pad{i}" for i in range(40))
     good = _write(tmp_path, "good.md", f"# G\n\nthe rota hands over {pad}\n")
     bundle = answer_via_refer(
-        tmp_path, "rota hands over", [("url:https://x.test/a", "https://x.test/a", "deadbeef"), good]
+        tmp_path, "rota hands over", [("url:https://x.test/a", "https://x.test/a", "deadbeef"), good], tune=template_tune(), cache_ttl_seconds=0
     )
     assert bundle is not None
     assert {c.doc_id for c in bundle.assembled.citations} == {"file:good.md"}
@@ -231,9 +232,9 @@ def test_every_document_failing_is_the_only_none(tmp_path):
     """`None` is reserved for *nothing usable at all* — the caller's signal to
     fall back to the index path. One survivor is not that case."""
     assert answer_via_refer(
-        tmp_path, "rota", [("file:gone.md", "gone.md", "x"), ("file:also-gone.md", "also-gone.md", "y")]
+        tmp_path, "rota", [("file:gone.md", "gone.md", "x"), ("file:also-gone.md", "also-gone.md", "y")], tune=template_tune(), cache_ttl_seconds=0
     ) is None
-    assert answer_via_refer(tmp_path, "rota", []) is None
+    assert answer_via_refer(tmp_path, "rota", [], tune=template_tune(), cache_ttl_seconds=0) is None
 
 
 def test_an_empty_citation_list_loads_no_fetcher(tmp_path):
@@ -415,7 +416,7 @@ def test_never_verifies_against_acquired_and_never_opens_a_socket(tmp_path):
     acquired.write_manifest(tmp_path, {"https://x.test/a": blob})
 
     bundle = answer_via_refer(
-        tmp_path, "retained", [("url:https://x.test/a", "https://x.test/a", _sha(body))]
+        tmp_path, "retained", [("url:https://x.test/a", "https://x.test/a", _sha(body))], tune=template_tune(), cache_ttl_seconds=0
     )
     assert bundle is not None
     assert bundle.policy["mode"] == "never"
@@ -428,7 +429,7 @@ def test_never_with_no_retained_bytes_is_unverified_not_a_crash(tmp_path):
     carries the disclosure; the query keeps answering."""
     _init_url_repo(tmp_path, config_table="fetch_at_answer = false\n")
     bundle = answer_via_refer(
-        tmp_path, "nothing retained", [("url:https://x.test/a", "https://x.test/a", "sha")]
+        tmp_path, "nothing retained", [("url:https://x.test/a", "https://x.test/a", "sha")], tune=template_tune(), cache_ttl_seconds=0
     )
     assert bundle is None or bundle.documents[0].verdict.label == "unverified"
     assert not (tmp_path / ".fux" / "fetchers" / "calls.log").exists()
@@ -441,7 +442,7 @@ def test_cache_ttl_is_declared_inert_rather_than_silently_dropped(tmp_path, caps
         tmp_path,
         "q",
         [("url:https://x.test/a", "https://x.test/a", "sha")],
-        cache_ttl_seconds=3600,
+        cache_ttl_seconds=3600, tune=template_tune()
     )
     err = capsys.readouterr().err
     assert "--cache-ttl has no effect" in err

@@ -17,6 +17,7 @@ import pytest
 from fux import setup as setup_mod
 from fux.ingest.urlsrc import DEFAULT_MAX_PARALLEL
 from fux.store import fuxdir
+from l12_fixtures import write_config
 
 TEMPLATES = Path(__file__).resolve().parents[1] / "src" / "fux" / "templates"
 
@@ -422,6 +423,7 @@ def test_a_plain_ingest_puts_no_code_in_the_repo(tmp_path):
     listing.write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
 
     ingest(tmp_path)
     assert not (tmp_path / ".fux" / "fetchers").exists()

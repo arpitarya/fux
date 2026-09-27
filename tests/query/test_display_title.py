@@ -32,6 +32,7 @@ import json as json_mod
 from fux.query import cmd_answer, cmd_ask, cmd_find
 from fux.query.tokenize import tokenize
 from fux.store import content_sha, term_hash, write_index
+from l12_fixtures import write_config
 
 DOC_ID = "url:https://x.test/handbook"
 SHA = content_sha(DOC_ID.encode("utf-8"))
@@ -63,6 +64,7 @@ def _record() -> dict:
 
 def _corpus(tmp_path):
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     return tmp_path
 
 
@@ -142,6 +144,7 @@ def test_a_url_record_needs_no_display_field_a_git_record_does_not(tmp_path):
     rule, and the write below is the proof.
     """
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     records = [
         json_mod.loads(line)
         for path in sorted((tmp_path / ".fux" / "index").glob("*.jsonl"))
@@ -159,6 +162,7 @@ def test_the_index_header_pins_the_current_format(tmp_path):
     what turns a silent misread into a named refusal (`store/reader.py`).
     v5 (W-168 step 4) added `abbr`; the refusal is the same."""
     write_index(tmp_path, [_record()])
+    write_config(tmp_path)
     shard = next((tmp_path / ".fux" / "index").glob("*.jsonl"))
     header = json_mod.loads(shard.read_text(encoding="utf-8").splitlines()[0])
     assert header["_format"] == "fux.index.v5"

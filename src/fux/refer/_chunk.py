@@ -58,33 +58,12 @@ __all__ = ["Passage", "chunk"]
 _TABLE_ROW_RE = re.compile(r"^\s*\|")
 _TABLE_SEP_RE = re.compile(r"^\s*\|[\s:|-]+\|?\s*$")
 
-#: Below this, a section MAY be folded forward — but only into a section
-#: NESTED INSIDE it (`_fold`). Size alone was never the right test: a two-line
-#: stub heading is a citation nobody can read in isolation, and a two-line
-#: slide is a whole slide. Depth is what separates them.
-MIN_PASSAGE_BYTES = 120
-
-#: Above this, a section is split on paragraph boundaries. A single 40 KB
-#: section would otherwise consume any budget by itself.
-MAX_PASSAGE_BYTES = 4000
-
-#: Rows in one table passage. **One**, ruled by Arpit 2026-09-06 on the
-#: measurement in `work/regression/2026-09-06-csv-chunk-granularity/`.
-#:
-#: The band this replaces was 900 bytes (~11 rows), and 4000 before that
-#: (~58 rows). On 48 ambiguous queries over a 12-file, 6 998-row corpus —
-#: queries where every term is common and only the COMBINATION identifies a
-#: row, which is the realistic shape — `hit@1` went **0.229 (58 rows) ->
-#: 0.292 (11 rows) -> 0.875 (1 row)** and bytes returned **6 094 -> 946**.
-#: The win survives the obvious objection: with every candidate the same size,
-#: so passage length cannot be doing the work, the correct row still outranks
-#: the next-best in 42/48.
-#:
-#: ⚠ **The cost is real and was accepted with the number in hand.** `rescore`
-#: is O(passages), so a 20 000-row sheet costs ~2.6 s per document per
-#: query. `.fux/tune.toml [index] max_table_rows` is the lever a consumer with big sheets
-#: turns.
-TABLE_ROWS_PER_PASSAGE = 1
+#: The three `[refer]` bounds — `min_passage_bytes` (below it a section MAY
+#: fold forward, but only into a section NESTED INSIDE it: `_fold`),
+#: `max_passage_bytes` (above it a section splits on paragraph boundaries) and
+#: `table_rows_per_passage` — arrive from the caller's `Tune`, never from this
+#: module (L12). What each is and why its shipped value is what it is lives
+#: beside its key in `templates/tune.toml.txt`.
 
 @dataclass(frozen=True)
 class Passage:
@@ -122,9 +101,10 @@ class Passage:
 def chunk(
     content: str,
     *,
-    min_passage_bytes: int = MIN_PASSAGE_BYTES,
-    max_passage_bytes: int = MAX_PASSAGE_BYTES,
-    line_numbers: bool = True,
+    min_passage_bytes: int,
+    max_passage_bytes: int,
+    table_rows_per_passage: int,
+    line_numbers: bool,
 ) -> list[Passage]:
     """Split into passages, in document order.
 
@@ -161,7 +141,7 @@ def chunk(
 
     passages: list[Passage] = []
     for heading, _level, text, start, end in merged:
-        for piece, offset, span, rung in _pieces(text, max_passage_bytes):
+        for piece, offset, span, rung in _pieces(text, max_passage_bytes, table_rows_per_passage):
             piece_start = start + offset
             passages.append(
                 Passage(
@@ -261,7 +241,7 @@ def _title_index(sections: list[tuple[str, int, str, int, int]]) -> int:
 def _fold(
     sections: list[tuple[str, int, str, int, int]],
     *,
-    min_passage_bytes: int = MIN_PASSAGE_BYTES,
+    min_passage_bytes: int,
 ) -> list[tuple[str, int, str, int, int]]:
     """Fold a short section forward **only into a section nested inside it**.
 
@@ -359,7 +339,9 @@ def _fold(
     return out
 
 
-def _pieces(text: str, max_passage_bytes: int = MAX_PASSAGE_BYTES) -> list[tuple[str, int, int, str]]:
+def _pieces(
+    text: str, max_passage_bytes: int, table_rows_per_passage: int
+) -> list[tuple[str, int, int, str]]:
     """`(piece, line_offset, source_lines)` — the oversized split, with each
     piece's position and reach in the source.
 
@@ -405,7 +387,7 @@ def _pieces(text: str, max_passage_bytes: int = MAX_PASSAGE_BYTES) -> list[tuple
         # table is ten answers, and returning it whole was the coarse-citation
         # defect the measurement above found — it simply never crossed the byte
         # ceiling to be noticed.
-        bands = _table_bands(paragraph)
+        bands = _table_bands(paragraph, table_rows_per_passage)
         if bands is not None:
             # Whatever was pending joins the FIRST band rather than being
             # flushed beside it. A section that is a heading plus a table would
@@ -508,10 +490,10 @@ def _descend(paragraph: str, max_passage_bytes: int) -> list[tuple[str, int, str
     return out
 
 
-def _table_bands(paragraph: str) -> list[tuple[str, int]] | None:
+def _table_bands(paragraph: str, rows_per_passage: int) -> list[tuple[str, int]] | None:
     """A Markdown table split into row passages, or `None` if not a table.
 
-    `TABLE_ROWS_PER_PASSAGE` rows per passage — one, today. Returns
+    `rows_per_passage` rows per passage (`[refer] table_rows_per_passage`). Returns
     `(band, source_lines)` per band.
 
     **The header row and its separator are repeated into every band.** A row
@@ -544,8 +526,8 @@ def _table_bands(paragraph: str) -> list[tuple[str, int]] | None:
         return None
 
     bands: list[tuple[str, int]] = []
-    for index in range(0, len(body), TABLE_ROWS_PER_PASSAGE):
-        rows = body[index : index + TABLE_ROWS_PER_PASSAGE]
+    for index in range(0, len(body), rows_per_passage):
+        rows = body[index : index + rows_per_passage]
         bands.append(("\n".join(prefix + rows), len(rows)))
 
     if len(bands) < 2:

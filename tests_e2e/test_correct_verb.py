@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from l12_fixtures import write_config
 
 NODE = Path(__file__).resolve().parents[1] / "node" / "fux.mjs"
 
@@ -41,6 +42,7 @@ def repo(tmp_path: Path) -> Path:
     sources.mkdir(parents=True)
     (sources / "dirs").write_text("docs\n", encoding="utf-8")
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     docs = tmp_path / "docs"
     docs.mkdir()
     (docs / "runbook-rollback.md").write_text(
@@ -132,6 +134,7 @@ def test_a_pii_match_is_refused_and_not_redacted(repo: Path) -> None:
     (repo / ".fux" / "pii.toml").write_text(
         '[[rule]]\nname = "email"\npattern = "[a-z]+@[a-z]+\\\\.[a-z]+"\n', encoding="utf-8"
     )
+    write_config(repo)
     result = _fux(
         repo, "correct", "who owns this, ops@example.com?", "docs/runbook-rollback.md", check=False
     )

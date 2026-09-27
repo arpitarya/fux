@@ -18,6 +18,7 @@ What the frozen bar requires of the build
 
 from __future__ import annotations
 
+from l12_fixtures import scoring, template_tune, tuned, write_config
 import json
 import os
 import shutil
@@ -34,7 +35,6 @@ from fux.query import mined, run_query
 from fux.query.expand import build as build_expansion
 from fux.query.expand import stack
 from fux.query.scan import query_term_hashes
-from fux.tune import Tune
 
 ENGINE = Path(__file__).resolve().parents[2]
 NODE_ENTRY = ENGINE / "node" / "fux.mjs"
@@ -63,6 +63,7 @@ def _corpus(root: Path, tune: str | None = None) -> Path:
     listing.write_text("docs\n", encoding="utf-8")
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(root)
     for rel, text in FILES.items():
         path = root / rel
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -71,6 +72,7 @@ def _corpus(root: Path, tune: str | None = None) -> Path:
     build(root)
     if tune is not None:
         (root / ".fux" / "tune.toml").write_text(tune, encoding="utf-8")
+        write_config(root)
     return root
 
 
@@ -194,17 +196,17 @@ def test_off_reads_no_pair_and_is_the_engine_before_the_key(corpus, monkeypatch)
     monkeypatch.setattr(accel, "mined_table", boom)
     for q in ("mkt excursion", "mean kinetic temperature", "excursion"):
         for force_scan in (True, False):
-            results, _ = run_query(corpus, q, 10, force_scan=force_scan, tune=Tune(mined_weight=0.0))
+            results, _ = run_query(corpus, q, 10, force_scan=force_scan, tune=tuned(mined_weight=0.0))
             expected = _payload(results)
             from fux.query.scan import ask as scan_ask
 
-            assert _payload(scan_ask(corpus, q, top=10)) == expected
+            assert _payload(scan_ask(corpus, q, top=10, scoring=scoring())) == expected
 
 
 @pytest.mark.parametrize("weight", [0.1, 0.2, 0.3, 0.5])
 @pytest.mark.parametrize("q", ["mkt excursion", "mean kinetic temperature excursion", "sop"])
 def test_the_scan_and_the_accelerator_fold_identically(corpus, q, weight):
-    tune = Tune(mined_weight=weight)
+    tune = tuned(mined_weight=weight)
     scan_results, path_a = run_query(corpus, q, 10, force_scan=True, tune=tune)
     fast_results, path_b = run_query(corpus, q, 10, force_scan=False, tune=tune)
     assert (path_a, path_b) == ("scan", "accelerator")
@@ -212,18 +214,18 @@ def test_the_scan_and_the_accelerator_fold_identically(corpus, q, weight):
 
 
 def test_the_default_is_the_measured_value_and_is_on(corpus):
-    """W-168 step 4 ratified PASS at `0.5` (2026-09-27): with no `tune.toml`,
-    and under `--no-tune`, the weight is `0.5`, not off."""
+    """W-168 step 4 ratified PASS at `0.5` (2026-09-27): the template ships it,
+    so a fresh repo and `--no-tune` both rank at `0.5`, not off."""
     from fux.tune import load
 
-    assert Tune().mined_weight == mined.MINED_WEIGHT == 0.5
-    assert load(corpus).mined_weight == 0.5
+    assert template_tune().mined_weight == 0.5
+    assert load(corpus, enabled=True).mined_weight == 0.5
     assert load(corpus, enabled=False).mined_weight == 0.5
 
 
 def test_on_lifts_the_document_that_spells_it_the_other_way(corpus):
-    off, _ = run_query(corpus, "mkt excursion", 10, tune=Tune(mined_weight=0.0))
-    on, _ = run_query(corpus, "mkt excursion", 10, tune=Tune())
+    off, _ = run_query(corpus, "mkt excursion", 10, tune=tuned(mined_weight=0.0))
+    on, _ = run_query(corpus, "mkt excursion", 10, tune=template_tune())
     score = lambda rs, loc: next(r.score for r in rs if r.loc == loc)  # noqa: E731
     assert score(on, "docs/long.md") > score(off, "docs/long.md")
     # The guard: nothing matching none of the user's own words is returned.

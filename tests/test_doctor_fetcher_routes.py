@@ -14,6 +14,7 @@ import importlib.util
 import pytest
 
 from fux import doctor
+from l12_fixtures import write_config
 
 
 def _repo(tmp_path, *, routes="", urls="", fetchers=("http",)):
@@ -30,6 +31,7 @@ def _repo(tmp_path, *, routes="", urls="", fetchers=("http",)):
     src.mkdir(parents=True, exist_ok=True)
     (src / "urls").write_text(urls, encoding="utf-8")
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     return tmp_path
 
 
@@ -150,6 +152,7 @@ def test_the_register_row_reports_drift_against_the_index(tmp_path):
     (fux / "sources").mkdir(parents=True)
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
+    write_config((fux).parent)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     (tmp_path / ".git").mkdir()

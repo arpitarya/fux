@@ -266,8 +266,7 @@ def document(root: Path, view, loc: str, *, passages_cap: int = 200, words: int 
     if raw is not None:
         text, generated = facts_mod.readable_text(root, doc.id, doc.loc, raw)
         bounds = facts_mod.refer_bounds(root)
-        cut = chunk(text, min_passage_bytes=bounds[0], max_passage_bytes=bounds[1],
-                    line_numbers=not generated) if text else []
+        cut = chunk(text, **bounds, line_numbers=not generated) if text else []
         total_passages = len(cut)
         passage_rows = [
             {"ordinal": p.ordinal, "heading": p.heading, "lines": [p.line_start, p.line_end],

@@ -14,6 +14,9 @@ be discovered**, and each has a test here:
 
 from __future__ import annotations
 
+import dataclasses
+
+from l12_fixtures import scoring, template_tune, write_config
 import json
 
 import pytest
@@ -22,14 +25,16 @@ from fux import store
 from fux.derive import accel, build
 from fux.ingest.run import run
 from fux.query import scan
-from fux.query.bm25f import ANCHOR, DEFAULT_SCORING, Scoring
+from fux.query.bm25f import Scoring
+ANCHOR = template_tune().anchor_weight
+DEFAULT_SCORING = scoring()
 
 #: Not the default, so a test using it proves the value is carried and not
 #: silently replaced by `ANCHOR`.
-ON = Scoring(anchor=2.0)
+ON = dataclasses.replace(scoring(), anchor=2.0)
 #: OFF — the pre-2026-09-24 default, and still what `anchor = 0` in a repo's
 #: `tune.toml` selects (every `fux setup` run before the PASS wrote exactly that).
-OFF = Scoring(anchor=0.0)
+OFF = dataclasses.replace(scoring(), anchor=0.0)
 
 TOPS = (1, 5, 20)
 
@@ -40,10 +45,16 @@ def _init(tmp_path, files: dict[str, str]) -> None:
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     for rel, text in files.items():
         path = tmp_path / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
+
+
+def _accel_ask(*args, **kw):
+    """`accel.ask` with the skipping flag the reference path has no need of."""
+    return accel.ask(*args, skipping=True, **kw)
 
 
 @pytest.fixture
@@ -86,7 +97,7 @@ def test_off_the_TARGET_is_unreachable(corpus):
     the word is ABOUT — which is the whole gap, and why the assertion below is
     about `target.md` and not about the result list being empty.
     """
-    for ask in (scan.ask, accel.ask):
+    for ask in (scan.ask, _accel_ask):
         ids = _ids(ask(corpus, "zarquon", top=5, scoring=OFF))
         assert "file:docs/target.md" not in ids, ids
         assert "file:docs/linker-one.md" in ids
@@ -97,8 +108,8 @@ def test_ON_by_default_since_its_pass(corpus):
     linkers call it, on both candidate paths."""
     assert DEFAULT_SCORING.anchor == ANCHOR == 1.0
     assert DEFAULT_SCORING.anchor_on
-    assert _ids(scan.ask(corpus, "zarquon", top=5))[0] == "file:docs/target.md"
-    assert accel.ask(corpus, "zarquon", top=5)[0].id == "file:docs/target.md"
+    assert _ids(scan.ask(corpus, "zarquon", top=5, scoring=scoring()))[0] == "file:docs/target.md"
+    assert accel.ask(corpus, "zarquon", top=5, scoring=scoring(), skipping=True)[0].id == "file:docs/target.md"
 
 
 def test_a_document_is_reachable_by_what_its_LINKERS_call_it(corpus):
@@ -107,7 +118,7 @@ def test_a_document_is_reachable_by_what_its_LINKERS_call_it(corpus):
     prefilter never looked at it and no scoring fold could rescue it."""
     hits = scan.ask(corpus, "zarquon", top=5, scoring=ON)
     assert _ids(hits)[0] == "file:docs/target.md", _ids(hits)
-    assert accel.ask(corpus, "zarquon", top=5, scoring=ON)[0].id == "file:docs/target.md"
+    assert accel.ask(corpus, "zarquon", top=5, scoring=ON, skipping=True)[0].id == "file:docs/target.md"
 
 
 def test_the_linkers_themselves_are_also_hits(corpus):
@@ -127,7 +138,7 @@ def test_anchor_terms_do_not_move_df(corpus):
     the scan side would be an immediate differential-law break.
     """
     off, on = {}, {}
-    scan.ask(corpus, "widget machinery", top=5, stats_out=off)
+    scan.ask(corpus, "widget machinery", top=5, stats_out=off, scoring=scoring())
     scan.ask(corpus, "widget machinery", top=5, scoring=ON, stats_out=on)
     assert off["df"] == on["df"]
     assert off["n"] == on["n"]
@@ -169,7 +180,7 @@ def test_both_generators_attach_the_anchor_keys_to_EVERY_candidate(corpus):
         assert "atf" in record and "alen" in record, record["id"]
 
     runtime = accel.Runtime(corpus)
-    accelerated, _, _ = accel.accel_candidates(runtime, hashes, 5, scoring=ON)
+    accelerated, _, _ = accel.accel_candidates(runtime, hashes, 5, scoring=ON, skipping=True)
     assert accelerated
     for record in accelerated:
         assert "atf" in record and "alen" in record, record["id"]
@@ -181,7 +192,7 @@ def test_the_two_paths_agree_on_avg_wlen(corpus):
     in its denominator."""
     hashes = scan.query_term_hashes("widget")
     _, _, scan_corpus = scan.scan_candidates(corpus, hashes, scoring=ON)
-    _, _, accel_corpus = accel.accel_candidates(accel.Runtime(corpus), hashes, 5, scoring=ON)
+    _, _, accel_corpus = accel.accel_candidates(accel.Runtime(corpus), hashes, 5, scoring=ON, skipping=True)
     assert scan_corpus.n == accel_corpus.n
     assert scan_corpus.total_wlen == accel_corpus.total_wlen
 
@@ -196,18 +207,16 @@ def test_OFF_scores_byte_identically_to_no_anchor_field(corpus, query):
     field existed. That is the `term_weights` precedent, and it is what keeps
     every repo that ran `fux setup` before the PASS scoring as it did."""
     assert not OFF.anchor_on
-    assert not OFF.trivial
-    assert DEFAULT_SCORING.trivial
     expected = _payload(scan.ask(corpus, query, top=20, scoring=OFF))
-    assert _payload(accel.ask(corpus, query, top=20, scoring=OFF)) == expected
+    assert _payload(accel.ask(corpus, query, top=20, scoring=OFF, skipping=True)) == expected
 
 
 @pytest.mark.parametrize("query", ["widget", "zarquon", "machinery details"])
 def test_the_default_is_the_same_on_both_candidate_paths(corpus, query):
     """Anchor ON is now the default, so the differential law holds at it."""
-    expected = _payload(scan.ask(corpus, query, top=20))
+    expected = _payload(scan.ask(corpus, query, top=20, scoring=scoring()))
     assert _payload(scan.ask(corpus, query, top=20, scoring=DEFAULT_SCORING)) == expected
-    assert _payload(accel.ask(corpus, query, top=20)) == expected
+    assert _payload(accel.ask(corpus, query, top=20, scoring=scoring(), skipping=True)) == expected
 
 
 def test_a_stale_runtime_is_refused_rather_than_read(corpus):

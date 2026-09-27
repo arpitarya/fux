@@ -11,7 +11,7 @@ feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 07889f92b8655e77d1d0d451c8643134ce0ca4579c838d173769c9d5a1de4a30
+content_sha: 5135ef7b70c653f9c100f930b276ea8ffbb0646291227deca766bcd82941732a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -196,8 +196,8 @@ file**, and saying so is the point of the freshness gate — the prompt is *re-r
 the record*, and the honest outcome of re-reading it can be *nothing moved*.
 
 ⚠ **Unchanged by W-168 step 1's default (2026-09-24), and touched here only
-because the register says so.** `src/fux/query/bm25f.py` gained `ANCHOR = 1.0`,
-the anchor field's default weight ([SR-TUNE](0135_tuning.md) decision 17a). This
+because the register says so.** The anchor field gained its weight — `[bm25f]
+anchor`, `1.0` as shipped ([SR-TUNE](0135_tuning.md) decision 17a). This
 record's rule is what makes that safe: `total_anchor_len` is stored **raw**,
 exactly as `total_flen` is, and weighted at query time. So moving the default
 changed no byte of `stats.json`.

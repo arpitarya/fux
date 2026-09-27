@@ -23,6 +23,7 @@ import pytest
 from fux import decode as decode_mod
 from fux.errors import FuxError
 from fux.ingest import sourcelist, urlsrc
+from l12_fixtures import write_config
 
 
 def _parse(text):
@@ -292,6 +293,7 @@ def test_the_line_decides_what_lands_in_the_index(tmp_path):
             "[sources]\n[sources.url]\nmax_parallel = 2\n", encoding="utf-8"
         )
         (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+        write_config(root)
         (root / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
         (root / ".fux" / "sources" / "urls").write_text(
             f"https://x.test/export fetch=probe decoder={stem}\n", encoding="utf-8"

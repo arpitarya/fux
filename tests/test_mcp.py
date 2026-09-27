@@ -24,6 +24,7 @@ from fux.derive import build
 from fux.mcp import PROTOCOL_VERSION, TOOLS, serve
 from fux.output_config import OUTPUT_NAME, specimen
 from fux.store import TF_FIELDS, term_hash, write_index
+from l12_fixtures import template_tune, write_config
 
 BODY = TF_FIELDS.index("body")
 
@@ -92,6 +93,7 @@ def repo(tmp_path):
             ),
         ],
     )
+    write_config(tmp_path)
     build(tmp_path)
     return tmp_path
 
@@ -318,7 +320,7 @@ def test_the_description_names_the_fields_it_tells_an_agent_to_read():
     from fux.query.confidence import Confidence
 
     text = _tool("fux_search")["description"]
-    shape = Confidence(0.0, 0.0, 0, "unverified", ()).as_dict()
+    shape = Confidence(0.0, 0.0, 0, "unverified", (), doc_coverage=1.0, separation_floor=template_tune().separation_floor, doc_coverage_floor=template_tune().doc_coverage_floor).as_dict()
     for field in ("answerable", "band", "missing"):
         assert field in text, f"the description no longer mentions {field}"
         assert field in shape, f"the description names {field}, which the block lacks"

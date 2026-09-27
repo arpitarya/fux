@@ -407,13 +407,20 @@ def _no_op_priors(root: Path) -> Check:
     install, and every one of these values is a legitimate choice somebody may
     have made on purpose.
     """
-    from .tune import DEFAULT_TUNE
     from .tune import load as load_tune
 
     try:
-        tune = load_tune(root)
-    except Exception:
-        tune = DEFAULT_TUNE
+        tune = load_tune(root, enabled=True)
+    except FuxError:
+        # Not assessed rather than assessed against a value from nowhere: L12
+        # leaves no default to read, and the `tune.toml loads` row already
+        # names what is wrong with the file.
+        return Check(
+            "ranking priors",
+            True,
+            "not assessed - .fux/tune.toml does not load (see `tune.toml loads`)",
+            level="warn",
+        )
 
     records = _records(root)
     dead: list[str] = []
@@ -1767,18 +1774,15 @@ def _tune_config_health(root: Path) -> Check:
     """
     from . import tune as tune_mod
 
-    path = root / tune_mod.TUNE_NAME
-    if not path.is_file():
-        return Check("tune.toml loads", True, f"{tune_mod.TUNE_NAME} is absent - engine defaults")
     try:
-        tune_mod.load(root)
+        tune_mod.load(root, enabled=True)
     except FuxError as exc:
         return Check(
             "tune.toml loads",
             False,
             f"{exc} - `ask`, `find` and `answer` refuse while this stands; "
-            "`fux tune > .fux/tune.toml` rewrites the defaults, and `--no-tune` "
-            "skips the file for one command",
+            "`fux doctor --fix` writes a missing key, `fux tune > .fux/tune.toml` "
+            "rewrites the whole file, and `--no-tune` reads the template for one command",
         )
     return Check("tune.toml loads", True, f"{tune_mod.TUNE_NAME}: parsed, every key valid")
 
@@ -2195,14 +2199,13 @@ def _frozen_keys(root: Path) -> list[Check]:
     """`.fux/tune.toml` and `.fux/output.toml` against the keys the engine now has.
 
     **A key the engine gained is a key the consumer's file does not mention**,
-    and because both files are write-if-missing it will never gain it. Reading
-    resolves to the engine default, so nothing is broken — what is lost is that
-    the consumer cannot SEE the knob exists, in the one file whose whole purpose
-    is to show them.
+    and because both files are write-if-missing it will never gain it on its
+    own. Since L12 there is no engine default to read in its place, so the file's
+    own `loads` row fails too; this row names the keys and the one remedy,
+    `fux doctor --fix`, which writes exactly those keys from the template.
 
-    ⚠ **Absent is not frozen.** A repo with no `tune.toml` is running engine
-    defaults deliberately and `_tune_config_health` already says so. This row is
-    about a file that exists and is incomplete.
+    ⚠ **Absent is reported by the `loads` row, not here.** This row is about a
+    file that exists and is incomplete.
     """
     return [
         _frozen_one(
@@ -2210,8 +2213,8 @@ def _frozen_keys(root: Path) -> list[Check]:
             ".fux/tune.toml",
             "tune.toml current",
             _tune_expected_keys(),
-            "`fux tune > .fux/tune.toml` rewrites it with every current key "
-            "(NOTE: it rewrites VALUES too - diff before you keep it)",
+            "`fux doctor --fix` writes exactly the missing keys from the template "
+            "and touches nothing else",
         ),
         _frozen_one(
             root,
@@ -2250,7 +2253,7 @@ def _frozen_one(
     """
     path = root / rel
     if not path.is_file():
-        return Check(name, True, f"{rel} absent - engine defaults, nothing to freeze")
+        return Check(name, True, f"{rel} absent - see the `loads` row")
     try:
         import tomllib
 
@@ -2277,8 +2280,7 @@ def _frozen_one(
         f"{rel} is missing {len(missing)} key(s) the engine now has: "
         + ", ".join(f"`{m}`" for m in missing[:5])
         + (f" and {len(missing) - 5} more" if len(missing) > 5 else "")
-        + f". They resolve to the engine default, so nothing is broken - but this file "
-        f"is where you would change them and it does not mention them. {remedy}",
+        + f". This file is where you would change them and it does not mention them. {remedy}",
         level="warn",
     )
 
@@ -2543,11 +2545,8 @@ def _confidence_floors(root: Path) -> Check:
     """
     from . import tune as tune_mod
 
-    path = root / tune_mod.TUNE_NAME
-    if not path.is_file():
-        return Check("confidence floors", True, "engine defaults - no floor is tuned off")
     try:
-        resolved = tune_mod.load(root)
+        resolved = tune_mod.load(root, enabled=True)
     except (FuxError, OSError):
         return Check("confidence floors", True, "tune.toml not parsed here - see its own row")
     if getattr(resolved, "separation_floor", None) != 0.0:
@@ -3119,7 +3118,31 @@ def _is_git_ignored(root: Path, path: Path) -> bool | None:
     return None  # 128: not a repository, or any other git failure
 
 
+def _fix() -> None:
+    """`fux doctor --fix` — write every missing config key from its template.
+
+    L12 decision 3: `fux setup` and this are the only writers of a missing key.
+    It reports each file and key it wrote on stderr, so `--json` stays a pure
+    report of the checks that follow.
+    """
+    import sys
+
+    from . import setup as setup_mod
+    from .config import find_root
+
+    root = find_root()
+    if root is None:
+        raise FuxError("fux doctor --fix: not inside a fux repository (no fux.toml above here)")
+    changed = setup_mod.fill_missing(root)
+    for line in changed:
+        print(f"fixed: {line}", file=sys.stderr)
+    if not changed:
+        print("fixed: nothing - every config file carries every key", file=sys.stderr)
+
+
 def cmd_doctor(args) -> int:
+    if getattr(args, "fix", False):
+        _fix()
     checks = run()
     exit_code = 0 if all(c.ok for c in checks if c.level == "error") else 1
 

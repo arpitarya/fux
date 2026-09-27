@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@92bf9fd3b1ac, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@059c8ecd1cca, node/src/decode/markdown.mjs@cf8853e196d1, node/src/decode/registry.mjs@90604ed07b71]
+owns: [src/fux/decode@948273149b1c, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@059c8ecd1cca, node/src/decode/markdown.mjs@cf8853e196d1, node/src/decode/registry.mjs@90604ed07b71]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 49441268874276d3751d71eae3a5d6043b706ecd650cf9a169b164b39bd7fd2f
+content_sha: 183706ae205721efac00868e251854bb89f0b2203fa3fcd97ad814af0952054e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

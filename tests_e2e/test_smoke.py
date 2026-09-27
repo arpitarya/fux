@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 from fux import __version__
+from l12_fixtures import write_config
 
 
 def test_fux_version_via_subprocess():
@@ -20,6 +21,7 @@ def test_fux_doctor_via_subprocess(tmp_path):
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")  # SR-PII decision 17
+    write_config(tmp_path)
     result = subprocess.run(
         [sys.executable, "-m", "fux.cli", "doctor"],
         capture_output=True,
@@ -39,6 +41,7 @@ def test_fux_doctor_output_is_ascii_safe(tmp_path):
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")  # SR-PII decision 17
+    write_config(tmp_path)
     env = {**os.environ, "PYTHONIOENCODING": "ascii"}
     result = subprocess.run(
         [sys.executable, "-m", "fux.cli", "doctor"],

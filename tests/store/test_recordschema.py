@@ -17,6 +17,7 @@ import pytest
 
 from fux.errors import FuxError
 from fux.store import canonical, recordschema, writer
+from l12_fixtures import write_config
 
 
 def _git_record(**over):
@@ -194,6 +195,7 @@ def test_validate_is_not_called_on_the_write_path(tmp_path):
     record = _git_record()
     record["undeclared_but_harmless"] = "x"
     writer.write_index(tmp_path, [record])  # no raise
+    write_config(tmp_path)
     with pytest.raises(FuxError):
         recordschema.validate(record)
 

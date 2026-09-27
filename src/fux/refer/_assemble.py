@@ -61,18 +61,12 @@ from dataclasses import dataclass
 
 from ._rescore import ScoredPassage
 
-__all__ = ["Assembled", "Citation", "assemble", "DEFAULT_BUDGET", "PER_DOC_FRACTION"]
+__all__ = ["Assembled", "Citation", "assemble"]
 
-#: Bytes. A default a human can read and an agent can afford.
-DEFAULT_BUDGET = 8000
-
-#: No single document may take more than this share of the budget.
-PER_DOC_FRACTION = 0.5
-
-#: Per-citation overhead charged against the budget — the locator line and the
-#: separator that will be rendered around each passage. Charged rather than
-#: ignored, because the budget bounds the *rendered* answer.
-CITATION_OVERHEAD = 80
+#: `budget`, `per_doc_fraction` and `citation_overhead` are `[refer]`'s and
+#: arrive from the caller's `Tune` (L12). The overhead is the locator line and
+#: separator rendered around each passage — charged rather than ignored,
+#: because the budget bounds the *rendered* answer.
 
 
 @dataclass(frozen=True)
@@ -94,10 +88,6 @@ class Citation:
     #: not carried by the code for six days** (W-140 row 2, fixed 2026-09-12).
     ordinal: int = -1
 
-    @property
-    def nbytes(self) -> int:
-        return len(self.text.encode("utf-8")) + CITATION_OVERHEAD
-
 
 @dataclass(frozen=True)
 class Assembled:
@@ -116,11 +106,12 @@ class Assembled:
 def assemble(
     scored: list[ScoredPassage],
     *,
-    budget: int = DEFAULT_BUDGET,
+    budget: int,
     k: int | None = None,
-    source: str = "fetched",
+    source: str,
     overhead: int = 0,
-    per_doc_fraction: float = PER_DOC_FRACTION,
+    per_doc_fraction: float,
+    citation_overhead: int,
 ) -> Assembled:
     """Fill `budget` bytes with the highest-value passages that fit.
 
@@ -188,16 +179,17 @@ def assemble(
             source=source,
             ordinal=s.passage.ordinal,
         )
+        cost = len(citation.text.encode("utf-8")) + citation_overhead
         spent = per_doc.get(s.doc_id, 0)
         # A document's FIRST citation is exempt from the per-document cap: the
         # cap exists to stop a document dominating, not to stop it appearing.
-        capped = s.doc_id in per_doc and spent + citation.nbytes > per_doc_cap
-        if used + citation.nbytes > budget or capped:
+        capped = s.doc_id in per_doc and spent + cost > per_doc_cap
+        if used + cost > budget or capped:
             dropped += 1
             continue  # skip, don't stop: a smaller passage may still fit
         chosen.append(citation)
-        used += citation.nbytes
-        per_doc[s.doc_id] = spent + citation.nbytes
+        used += cost
+        per_doc[s.doc_id] = spent + cost
 
     # Present in score order — the caller reads the best answer first, even
     # though selection ran on score-per-byte.

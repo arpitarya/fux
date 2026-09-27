@@ -9,6 +9,7 @@ import pytest
 
 from fux import __version__
 from fux.cli import build_parser, main
+from l12_fixtures import write_config
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -291,6 +292,7 @@ def test_the_file_with_no_rules_opens_the_gate(tmp_path, monkeypatch):
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     monkeypatch.chdir(tmp_path)
     _require_pii_rules("find")
 
@@ -310,6 +312,7 @@ def test_the_gate_does_not_import_fux_ingest_when_the_file_exists(tmp_path):
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     code = (
         "import sys; from fux.cli import _require_pii_rules; "
         "_require_pii_rules('find'); print('fux.ingest' in sys.modules)"

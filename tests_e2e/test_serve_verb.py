@@ -27,6 +27,7 @@ import urllib.request
 from pathlib import Path
 
 import pytest
+from l12_fixtures import write_config
 
 DOCS = {
     "ranking.md": "# Ranking\n\nSaturation and length normalisation decide how a long "
@@ -49,6 +50,7 @@ def corpus(tmp_path: Path) -> Path:
     (fux / "sources").mkdir(parents=True)
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
+    write_config((fux).parent)
     docs = tmp_path / "docs"
     docs.mkdir()
     for name, body in DOCS.items():

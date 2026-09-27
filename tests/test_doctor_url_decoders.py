@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from fux import doctor
 from fux.store import acquired
+from l12_fixtures import write_config
 
 
 def _repo(tmp_path, *, urls="", decoders=()):
@@ -41,6 +42,7 @@ def _repo(tmp_path, *, urls="", decoders=()):
     src.mkdir(parents=True, exist_ok=True)
     (src / "urls").write_text(urls, encoding="utf-8")
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     return tmp_path
 
 

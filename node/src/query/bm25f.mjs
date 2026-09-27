@@ -6,47 +6,30 @@
  */
 import { TF_FIELDS } from "../store/format.mjs";
 
-export const FIELD_WEIGHTS = [1.0, 3.0, 2.0, 1.5, 1.0];
-if (FIELD_WEIGHTS.length !== TF_FIELDS.length) {
-  throw new Error("field weights must align with TF_FIELDS");
-}
-export const K1 = 1.2;
-//: 🔴 **`0.15`, not the literature's `0.75`, and that is MEASURED** — W-144's
-//: verdict, 2026-09-16. `b` is the strength of length normalisation, and a table
-//: inflates a document's length with tokens that say nothing about the query. The
-//: frozen rule took the FIRST value, descending, that moved both benefit families
-//: with every control holding; `0.15` is that value (+30 each, p = 0.0000).
-//: ⚠ One synthetic corpus, `informed`. Twin of `query/bm25f.py`'s `B`, and
-//: `tests/test_node_config_parity.py` holds the two equal.
-export const B = 0.15;
-//: 🔴 **The anchor field's weight — `1.0`, and that is MEASURED.** W-168 step
-//: 1's verdict, ruled PASS by Arpit on 2026-09-24 (7 wins, 0 losses). ⚠
-//: `informed`, set-3-u only, one 1 000-document rung. Twin of
-//: `query/bm25f.py`'s `ANCHOR`; `tests/test_node_config_parity.py` holds the
-//: two equal.
-export const ANCHOR = 1.0;
+//: `k1`, `b`, the five field weights and `anchor` are `.fux/tune.toml [bm25f]`'s
+//: and arrive on a `Scoring` built by `config/tune.mjs` (L12). Why each is what
+//: the template ships — `b` MEASURED at 0.15 (W-144), anchor MEASURED at 1.0
+//: (W-168 step 1) — is said once, beside its key in `templates/tune.toml.txt`.
 
 export class Scoring {
-  constructor(k1 = K1, b = B, weights = FIELD_WEIGHTS, anchor = ANCHOR) {
+  constructor(k1, b, weights, anchor) {
+    if (!Array.isArray(weights) || weights.length !== TF_FIELDS.length) {
+      throw new Error("field weights must align with TF_FIELDS");
+    }
+    if (typeof k1 !== "number" || typeof b !== "number" || typeof anchor !== "number") {
+      throw new Error("Scoring needs k1, b and anchor — read from .fux/tune.toml [bm25f]");
+    }
     this.k1 = k1; this.b = b; this.weights = weights;
-    /** W-168 step 1 — the anchor field's weight, default ANCHOR (ON; 0 = OFF). Kept out of
+    /** W-168 step 1 — the anchor field's weight (0 = OFF). Kept out of
      *  `weights` because that array is aligned index-for-index with TF_FIELDS,
      *  the five fields a record commits an `flen` for; anchor has no committed
      *  slot and is folded at read time from other documents' edges. */
     this.anchor = anchor;
     Object.freeze(this);
   }
-  /** True when this is the engine default, so callers can skip work. */
-  get trivial() {
-    return this.k1 === K1 && this.b === B && this.anchor === ANCHOR
-      && this.weights.length === FIELD_WEIGHTS.length
-      && this.weights.every((w, i) => w === FIELD_WEIGHTS[i]);
-  }
   /** The one test for *is the anchor fold live?* — twin of `Scoring.anchor_on`. */
   get anchorOn() { return this.anchor !== 0.0; }
 }
-
-export const DEFAULT_SCORING = new Scoring();
 
 /** ⚠ `Math.log` and Python's `math.log` disagree in the last ulp on ~0.7 % of
  *  inputs (Phase 0, measured on darwin and glibc). **Every difference is one
@@ -57,7 +40,7 @@ export function idf(df, n) { return Math.log((n - df + 0.5) / (df + 0.5) + 1); }
 /** The BM25F numerator for one term in one document.
  *  `tf` may be shorter than `weights` — trailing zeros are omitted on the wire,
  *  so iterating `tf` rather than `weights` makes the short form free. */
-export function weightedTf(tf, scoring = DEFAULT_SCORING) {
+export function weightedTf(tf, scoring) {
   let total = 0.0;
   const weights = scoring.weights;
   for (let i = 0; i < tf.length; i++) {
@@ -70,7 +53,7 @@ export function weightedTf(tf, scoring = DEFAULT_SCORING) {
 /** The length normaliser, from committed per-field counts and live weights.
  *  **The one place this arithmetic exists** — four callers need it, and four
  *  copies is how they drift. */
-export function deriveWlen(flen, scoring = DEFAULT_SCORING, anchorLen = 0) {
+export function deriveWlen(flen, scoring, anchorLen = 0) {
   let total = 0.0;
   const weights = scoring.weights;
   for (let i = 0; i < flen.length; i++) {
@@ -101,7 +84,7 @@ export function deriveWlen(flen, scoring = DEFAULT_SCORING, anchorLen = 0) {
  *  transcribed with the formula so that a future port has one place to reach
  *  for, rather than re-deriving the expression from the Python.
  */
-export function termContribution(wtf, wlen, dfH, n, avgWlen, scoring = DEFAULT_SCORING) {
+export function termContribution(wtf, wlen, dfH, n, avgWlen, scoring) {
   const denom = wtf + scoring.k1 * (1 - scoring.b + scoring.b * wlen / avgWlen);
   return idf(dfH, n) * wtf * (scoring.k1 + 1) / denom;
 }
@@ -115,7 +98,7 @@ export function termContribution(wtf, wlen, dfH, n, avgWlen, scoring = DEFAULT_S
  */
 export function scoreRecord(
   terms, flen, queryHashes, df, n, avgWlen,
-  scoring = DEFAULT_SCORING, termWeights = null, anchorTf = null, anchorLen = 0,
+  scoring, termWeights = null, anchorTf = null, anchorLen = 0,
 ) {
   if (n <= 0 || avgWlen <= 0) return 0.0;
   let wlen;

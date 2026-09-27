@@ -24,6 +24,7 @@ from fux.query import cmd_ask, cmd_find
 from fux.query.headings import MAX_HEADINGS, headings_for
 from fux.query.tokenize import tokenize
 from fux.store import content_sha, term_hash, write_index
+from l12_fixtures import write_config
 
 DOC_ID = "file:docs/mesh.md"
 TITLE = "The mesh"
@@ -61,6 +62,7 @@ def _record(**overrides) -> dict:
 
 def _corpus(tmp_path, record=None):
     write_index(tmp_path, [record or _record()])
+    write_config(tmp_path)
     return tmp_path
 
 
@@ -166,6 +168,7 @@ def test_a_record_with_no_phrases_yields_no_headings(tmp_path):
         "edges": [],
     }
     write_index(tmp_path, [record])
+    write_config(tmp_path)
     assert headings_for(record, "rollback") == []
 
 

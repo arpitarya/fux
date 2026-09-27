@@ -22,6 +22,7 @@ import pytest
 from fux.config import UrlSource
 from fux.errors import FuxError
 from fux.ingest import sourcelist, urlsrc
+from l12_fixtures import write_config
 
 
 def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
@@ -258,6 +259,7 @@ def _repo(tmp_path, urls, fetcher=FAKE):
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a hand-built repo needs this or every verb refuses.
     (fux / "pii.toml").write_text("", encoding="utf-8")
+    write_config((fux).parent)
     docs = tmp_path / "docs"
     docs.mkdir()
     (docs / "a.md").write_text("# Doc A\n\nrepo body\n", encoding="utf-8")

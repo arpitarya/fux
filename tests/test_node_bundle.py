@@ -29,6 +29,7 @@ import pytest
 
 from fux.errors import FuxError
 from fux.store import nodebundle
+from l12_fixtures import write_config
 
 ROOT = Path(__file__).resolve().parent.parent
 NODE = ROOT / "node"
@@ -207,6 +208,7 @@ def _repo_with_an_index(tmp_path: Path) -> Path:
     (tmp_path / ".git").mkdir(exist_ok=True)
     (tmp_path / ".fux").mkdir(exist_ok=True)
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     docs = tmp_path / "docs"
     docs.mkdir(exist_ok=True)
     records = []
@@ -228,6 +230,7 @@ def _repo_with_an_index(tmp_path: Path) -> Path:
             "terms": {term_hash(term): tf}, "flen": flen, "sha": "a" * 40, "edges": [],
         })
     write_index(tmp_path, records)
+    write_config(tmp_path)
     return tmp_path
 
 

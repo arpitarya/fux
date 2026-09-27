@@ -7,11 +7,11 @@ description: "`--expand` scores agent-supplied terms at a lower weight beside th
 status: accepted
 date: 2026-09-05
 feature: agent-side query expansion and multi-query fusion
-owns: [src/fux/query/expand.py@3eb9647e4be9, src/fux/query/fuse.py@749673d52166, node/src/query/expand.mjs@fd39cfaf8fa1, node/src/query/fuse.mjs@de8c87e1d265]
+owns: [src/fux/query/expand.py@3eb9647e4be9, src/fux/query/fuse.py@3d73e2f2638a, node/src/query/expand.mjs@fd39cfaf8fa1, node/src/query/fuse.mjs@580e525266c8]
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: eeed44f1de016c33bcfe4a13a18a40e09e61db49093af73b5326e73e394e2f90
+content_sha: a7e31ae03977a84a6b6e7fbab0c00ba27c2197a9b4afaa955621d1a4cd6def23
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -353,6 +353,19 @@ scored through `Expansion` at `[ranking] mined_weight`
   on 2026-09-27 ([`VERDICT.md`](../work/regression/2026-09-27-mined-expansion/VERDICT.md)).
   ⚠ 5 of its 6 wins lift a relevant document that is not the primary one: the
   document that declares a pair carries both spellings, as the bar predicted.
+
+<!-- L12-VALUES-START -->
+
+**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+Each name below keeps its spelling in code and holds no literal: it is read from
+[`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
+process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
+this moved where they are written, not what they are.
+
+- `node/src/query/fuse.mjs` — `K` ← `[fuse] rrf_k`
+- `src/fux/query/fuse.py` — `K` ← `[fuse] rrf_k`
+
+<!-- L12-VALUES-END -->
 
 ### Consequences
 

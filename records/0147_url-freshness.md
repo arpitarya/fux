@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@c2205bbff313, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 6f73bd3079fa1ce81766dc4fe74675ba9739c793014041408b11c1740d37bc38
+content_sha: 6a5569c0249e8858eac280ceb5c8a6cd38ef6cda0a4e25e8491954ad0c703e74
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -544,6 +544,14 @@ the original: read the *same source of truth*, not a parallel one.
 have nothing to compare*, which is `unverified` and not a verdict
 ([SR-REFER](0127_refer-plane.md)). ⚠ **`ttl=` is untouched**: it bounds how long
 a citation may go unchecked and says nothing about how the bytes are read.
+
+<!-- L12-NOTE-START -->
+
+**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `refer()` takes an explicit `policy` and the
+caller's `Tune`; neither has a default. The freshness decision itself is
+unchanged.
+
+<!-- L12-NOTE-END -->
 
 <!-- L12-VALUES-START -->
 

@@ -57,19 +57,21 @@ def bound_root(root: Path | None):
 
 
 def max_table_rows() -> int:
-    """`.fux/tune.toml [index] max_table_rows`, or the default.
+    """`.fux/tune.toml [index] max_table_rows` — there is no default (L12).
 
-    Never raises: a decoder runs inside a walk over thousands of documents, and
-    a malformed `[index]` is reported by `tune.index_limits()` where ingest
-    reads it first — failing the decode of every document as well would turn
-    one bad line into an unreadable corpus (SR-TABULAR decision 6).
+    A malformed or missing `[index]` is reported by `tune.index_limits()` where
+    ingest reads it first, before any decoder runs, so a walk over thousands of
+    documents stops once, at the top, naming the key (SR-TABULAR decision 6).
+    A decode with no repository in context has no file to read the cap from,
+    and says so rather than inventing one.
     """
-    from ..tune import DEFAULT_MAX_TABLE_ROWS, index_limits
+    from ..errors import FuxError
+    from ..tune import index_limits
 
     root = _ROOT.get()
     if root is None:
-        return DEFAULT_MAX_TABLE_ROWS
-    try:
-        return index_limits(root).max_table_rows
-    except Exception:
-        return DEFAULT_MAX_TABLE_ROWS
+        raise FuxError(
+            "a decoder asked for [index] max_table_rows with no repository in context - "
+            "it is read from .fux/tune.toml, and fux holds no copy of it in code"
+        )
+    return index_limits(root).max_table_rows

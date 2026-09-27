@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@a4bff466df04, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@5c1efeb0a8e8]
+owns: [src/fux/config.py@a4bff466df04, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@07972c7c2f49]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 618612cab8cec45198320adc8f24ec5b08ce171e1f82d7bc894e541ceaceb699
+content_sha: 241a8db5237158c92e3b2fb49a3b3e599e3de581ac26bfd3050534c0bde253df
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -584,6 +584,14 @@ changes an answer.
 ⚠ **It abandons, it does not kill** — [SR-OBSERVE](0157_observe.md) decision
 10b. Past the cap fux stops waiting; the observer may run until the process
 exits, because Python cannot safely interrupt arbitrary consumer code.
+
+<!-- L12-NOTE-START -->
+
+**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `.fux/tune.toml` became mandatory in the same
+change, key by key; `fux.toml`'s own omit-to-inherit rule is next in W-225's
+stage 3 and is still in force until then.
+
+<!-- L12-NOTE-END -->
 
 <!-- L12-VALUES-START -->
 

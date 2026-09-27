@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@2f265132eacd, src/fux/store/nodebundle.py@edf4f3342364]
+owns: [node@d9b030babd4f, src/fux/store/nodebundle.py@edf4f3342364]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: f7b191568b4dc233fb24df3a2e0d87e9c943b3300a08d15eda6f5484317ec936
+content_sha: 6cc65a07ac34fce1cec526ed620b16d7cdeb6bed859896a4454376c8e4c28b12
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -877,9 +877,9 @@ sentence.
 sorts it with Python's tuple order and folds it identically; `expand.stack`
 and `tune.minedWeight` are twinned, and `lexical` forces the weight to `0.0`.
 The Node reader never mines: ingest is Python's. `tests/query/test_mined.py`
-compares both readers' `ask` and `lexical` at the default (`0.5` since
-2026-09-27, `MINED_WEIGHT` twinned and held equal by
-`tests/test_node_config_parity.py`), at `0.0` and at `0.3`.
+compares both readers' `ask` and `lexical` at the shipped value (`0.5` since
+2026-09-27, read by both from the one template, which
+`tests/test_node_config_parity.py` holds they resolve alike), at `0.0` and at `0.3`.
 
 <!-- L12-VALUES-START -->
 

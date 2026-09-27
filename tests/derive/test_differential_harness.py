@@ -24,6 +24,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from l12_fixtures import write_config
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools" / "differential"))
@@ -42,6 +43,7 @@ def _repo(tmp_path: Path, files: dict[str, bytes]) -> Path:
     (tmp_path / ".fux" / "sources").mkdir(exist_ok=True)
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     (tmp_path / ".fux" / "pii.toml").write_text("[rules]\n", encoding="utf-8")
+    write_config(tmp_path)
     for rel, blob in files.items():
         path = tmp_path / rel
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -122,6 +124,6 @@ def test_the_harness_still_takes_a_weight_sweep_the_engine_accepts():
     from fux.query import scan
 
     assert harness.WEIGHTS, "the weight sweep is empty — W-73's property is unchecked"
-    kw = {"archived_dirs": frozenset(), "weighting": None}
-    for fn in (scan.ask, accel.ask):
-        inspect.signature(fn).bind(Path("."), "q", top=5, **kw)
+    kw = {"archived_dirs": frozenset(), "weighting": None, "scoring": None}
+    inspect.signature(scan.ask).bind(Path("."), "q", top=5, **kw)
+    inspect.signature(accel.ask).bind(Path("."), "q", top=5, skipping=True, **kw)

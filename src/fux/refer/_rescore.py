@@ -17,8 +17,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from ..query.analyzer import analyze
-from ..query.bm25f import derive_wlen, score_record
-from ..query.rerank import passage_boost
+from ..query.bm25f import Scoring, derive_wlen, score_record
+from ..query.rerank import Proximity, passage_boost
 from ..query.scan import query_term_hashes
 from ..query.tokenize import tokenize
 from ._chunk import Passage
@@ -65,7 +65,9 @@ def rescore(
     query: str,
     candidates: list[tuple[str, str, str, list[Passage]]],
     *,
-    weight: float = 0.0,
+    scoring: Scoring,
+    weight: float,
+    proximity: Proximity,
 ) -> list[ScoredPassage]:
     """Score every passage of every fetched document against the query.
 
@@ -91,8 +93,8 @@ def rescore(
     first day they disagree, `answer` cites a passage the ranking did not
     prefer for a reason nobody can name.
 
-    ⚠ **It therefore defaults to OFF, because `rerank_weight` does.**
-    `Tune.rerank_weight` is `0.0` out of the box, the uplift is `1 + 0 * x`,
+    ⚠ **It is therefore OFF wherever `rerank_weight` is.** The template ships
+    `0.0`, the uplift is `1 + 0 * x`,
     and every bundle is byte-identical to the one this function produced before
     W-108 — proved by
     `tests/refer/test_rescore.py::test_weight_zero_is_byte_identical_to_the_unweighted_score`.
@@ -115,7 +117,7 @@ def rescore(
         for passage in passages:
             terms, flen = _terms_of(passage)
             rows.append((doc_id, loc, sha, passage, terms, flen))
-            total_wlen += derive_wlen(flen)
+            total_wlen += derive_wlen(flen, scoring)
             for term in terms:
                 df[term] = df.get(term, 0) + 1
 
@@ -131,7 +133,11 @@ def rescore(
             sha=sha,
             passage=passage,
             score=_uplift(
-                score_record(terms, flen, hashes, df, n, avg_wlen), query_terms, passage, weight
+                score_record(terms, flen, hashes, df, n, avg_wlen, scoring),
+                query_terms,
+                passage,
+                weight,
+                proximity,
             ),
         )
         for doc_id, loc, sha, passage, terms, flen in rows
@@ -140,7 +146,9 @@ def rescore(
     return scored
 
 
-def _uplift(score: float, query_terms: list[str], passage: Passage, weight: float) -> float:
+def _uplift(
+    score: float, query_terms: list[str], passage: Passage, weight: float, proximity: Proximity
+) -> float:
     """The bounded multiplicative uplift, or the score untouched.
 
     **Multiplicative, exactly as `rerank.rerank` does it**, and for its reason:
@@ -155,7 +163,7 @@ def _uplift(score: float, query_terms: list[str], passage: Passage, weight: floa
     """
     if weight <= 0:
         return score
-    return score * (1.0 + weight * passage_boost(query_terms, analyze(passage.text)))
+    return score * (1.0 + weight * passage_boost(query_terms, analyze(passage.text), proximity))
 
 
 def _terms_of(passage: Passage) -> tuple[dict[str, list[int]], int]:

@@ -11,7 +11,7 @@
  */
 import { rawRecordLines, iterShardPaths, recordFor } from "../store/reader.mjs";
 import { termHash, TF_FIELDS } from "../store/format.mjs";
-import { DEFAULT_SCORING, deriveWlen } from "./bm25f.mjs";
+import { deriveWlen } from "./bm25f.mjs";
 import { Corpus, rank } from "./rank.mjs";
 import { tokenize } from "./tokenize.mjs";
 
@@ -49,7 +49,7 @@ export function queryTermHashes(query) {
 }
 
 /** The B2 pass: candidate records, `df`, and the corpus statistics. */
-export function scanCandidates(root, queryHashes, { scoring = DEFAULT_SCORING } = {}) {
+export function scanCandidates(root, queryHashes, { scoring }) {
   const patterns = queryHashes.map((h) => Buffer.from(`"${h}"`, "ascii"));
   // W-168 step 1. Nothing below costs anything when the field is off, which
   // is the default: the three `anchorOn` branches are not taken and this
@@ -153,8 +153,8 @@ export function scanCandidates(root, queryHashes, { scoring = DEFAULT_SCORING } 
 }
 
 /** The reference path. */
-export function ask(root, query, top = 5, opts = {}) {
-  const { weighting = null, scoring = DEFAULT_SCORING, statsOut = null, expansion = null } = opts;
+export function ask(root, query, top, opts) {
+  const { weighting = null, scoring, statsOut = null, expansion = null } = opts;
   const queryHashes = queryTermHashes(query);
   if (!queryHashes.length) {
     // A query that tokenizes to nothing still owes the caller its corpus

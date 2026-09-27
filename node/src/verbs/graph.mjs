@@ -252,7 +252,9 @@ export function runPath(root, args) {
   // `--hops` bounds the search and stays a CLI argument; `hop_decay` only
   // orders what the search found.
   const tune = loadTune(root, { enabled: args.noTune !== true });
-  const { routes: found, truncated } = routes(plane.graph, src, dst, { hops, hopDecay: tune.hopDecay });
+  const { routes: found, truncated } = routes(plane.graph, src, dst, {
+    hops, limit: tune.pathLimit, hopDecay: tune.hopDecay, budget: EXPANSION_BUDGET,
+  });
 
   if (args.json) {
     process.stdout.write(JSON.stringify({

@@ -20,6 +20,7 @@ import pytest
 
 from fux.inspect import as_dict, inspect_index
 from fux.serve import HOST, make_server
+from l12_fixtures import write_config
 
 DOCS = {
     "ranking.md": "# Ranking\n\nSaturation and length normalisation decide how a long "
@@ -38,6 +39,7 @@ def corpus(tmp_path_factory) -> Path:
     (fux / "sources").mkdir(parents=True)
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
+    write_config((fux).parent)
     docs = root / "docs"
     docs.mkdir()
     for name, body in DOCS.items():

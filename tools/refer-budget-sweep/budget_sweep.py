@@ -35,7 +35,10 @@ else:
 
 from fux.refer._chunk import chunk
 from fux.refer._rescore import rescore
-from fux.refer._assemble import assemble, Assembled, DEFAULT_BUDGET
+from fux.refer._assemble import assemble, Assembled
+from fux.tune import load as _load_tune
+
+DEFAULT_BUDGET = _load_tune(Path('.'), enabled=False).budget  # the template's (L12)
 
 # The graph-acceptance corpus this sweep reuses (W-57's fux-lab environment).
 ROOT = _REPO_ROOT.parent / "fux-lab" / "graph-acceptance"

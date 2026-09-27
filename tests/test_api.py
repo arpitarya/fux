@@ -29,6 +29,7 @@ from fux.errors import FuxError
 from fux.output_config import OUTPUT_NAME, specimen
 from fux.schema import load as load_schema
 from fux.store import TF_FIELDS, term_hash, write_index
+from l12_fixtures import write_config
 
 BODY = TF_FIELDS.index("body")
 
@@ -56,6 +57,7 @@ def repo(tmp_path):
     # CLAUDE.md §Build & test: a test that builds a repo by hand writes
     # `.fux/pii.toml`, or every verb refuses (SR-PII decision 17).
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     (tmp_path / OUTPUT_NAME).write_text(specimen(), encoding="utf-8")
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "retry.md").write_text(
@@ -71,6 +73,7 @@ def repo(tmp_path):
             _rec("file:docs/new.md", "New decision", "rollback", phrases=["Scope"]),
         ],
     )
+    write_config(tmp_path)
     return tmp_path
 
 

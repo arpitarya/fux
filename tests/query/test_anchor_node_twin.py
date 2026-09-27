@@ -30,6 +30,7 @@ import pytest
 
 from fux.derive import build
 from fux.ingest.run import run
+from l12_fixtures import write_config
 
 ENGINE = Path(__file__).resolve().parents[2]
 NODE_ENTRY = ENGINE / "node" / "fux.mjs"
@@ -55,6 +56,7 @@ def _corpus(tmp_path: Path, tune: str | None = TUNES["two"]) -> Path:
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     files = {
         "docs/target.md": "# Widget\n\nthis page explains the widget machinery in detail\n",
         "docs/linker-one.md": "# One\n\nSee [the zarquon protocol](target.md) for details.\n",
@@ -71,6 +73,7 @@ def _corpus(tmp_path: Path, tune: str | None = TUNES["two"]) -> Path:
     build(tmp_path)
     if tune is not None:
         (tmp_path / ".fux" / "tune.toml").write_text(tune, encoding="utf-8")
+        write_config(tmp_path)
     return tmp_path
 
 

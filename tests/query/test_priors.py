@@ -23,6 +23,7 @@ weighted `theta` read.
 
 from __future__ import annotations
 
+from l12_fixtures import scoring, write_config
 import pytest
 
 from fux.derive import accel, build
@@ -74,6 +75,7 @@ def corpus(tmp_path):
             _rec("file:new.md", "Live decision", 6, mtime=NOW),
         ],
     )
+    write_config(tmp_path)
     build(tmp_path)
     return tmp_path
 
@@ -84,9 +86,9 @@ def _ids(results):
 
 def _both_paths(root, weighting, top=5):
     """Rank down the scan and the accelerator; assert they agree; return one."""
-    expected = scan.ask(root, "rollback", top=top, weighting=weighting)
+    expected = scan.ask(root, "rollback", top=top, weighting=weighting, scoring=scoring())
     for skipping in (False, True):
-        got = accel.ask(root, "rollback", top=top, weighting=weighting, skipping=skipping)
+        got = accel.ask(root, "rollback", top=top, weighting=weighting, skipping=skipping, scoring=scoring())
         assert [(r.id, round(r.score, 9)) for r in got] == [
             (r.id, round(r.score, 9)) for r in expected
         ], f"paths diverged at {weighting} (skipping={skipping})"

@@ -24,6 +24,23 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
+- ⚠ **Every `.fux/tune.toml` key is now required (law L12, W-225) — run
+  `fux doctor --fix` once.** fux no longer keeps a copy of any ranking value in
+  code: a missing `.fux/tune.toml`, table or key stops `ask`, `find`, `answer`,
+  the graph verbs and `fux ingest`, naming the file and the key. **`fux doctor
+  --fix`** (new) writes exactly the missing keys from the template `fux setup`
+  uses, and changes nothing you wrote. `--no-tune` now reads that template.
+  **No value changed**: every key ships at the value the engine used before, and
+  704 of 704 ranked outputs on this repo are byte-identical across the change.
+  New keys, all at the old built-in values: `[ranking] rerank_depth`,
+  `rerank_coverage_power`, `rerank_base`, `rerank_span`, `rerank_adjacency`;
+  `[graph] path_limit`; `[refer] citation_overhead`, `table_rows_per_passage`;
+  `[enrich] self_retrieval_k`. ⚠ Two paths now read your `[bm25f]` where they
+  used the built-in weights — the refer plane's passage re-score and `fux enrich
+  --check`'s filter. On a repo that kept the shipped weights, nothing moves.
+- **The engine's fixed values live in one file, `src/fux/constants.toml`
+  (W-225).** Schema ids, artefact names, decoder versions and extensions: read by
+  both the Python and the Node reader. Nothing a consumer sees changes.
 - ⚠ **The index format is `fux.index.v5`, so re-ingest.** Records may carry
   `abbr`, the hashed `Long Form (ABBR)` pairs a document declares. A v4 index is
   refused with the way out: run `fux ingest --full`, then `fux build`. The

@@ -6,16 +6,12 @@
  * builds the corpus table from the shards and folds it into a query. Mining is
  * not here: the Node reader never ingests.
  *
- * Default `MINED_WEIGHT` (0.5), measured and ratified PASS on 2026-09-27.
- * Off at `mined_weight = 0.0`, and off reads no pair.
+ * The weight is `.fux/tune.toml [ranking] mined_weight` — 0.5 as shipped,
+ * measured and ratified PASS on 2026-09-27. Off at 0.0, and off reads no pair.
  *
  * Owned, with its Python twin, by [SR-EXPAND](../../../records/0149_expand.md).
  */
 import { rawRecordLines, iterShardPaths } from "../store/reader.mjs";
-
-//: The `[ranking] mined_weight` default — W-168 step 4's measured value.
-//: Twin of `MINED_WEIGHT` in `src/fux/query/mined.py`, held equal by a test.
-export const MINED_WEIGHT = 0.5;
 
 //: `abbr` sorts first among a record's keys, so it can only open the line.
 //: Latin-1 view of the raw bytes; every element is a quoted 16-hex hash.

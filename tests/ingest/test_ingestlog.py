@@ -35,6 +35,7 @@ import pytest
 
 from fux.ingest import ingestlog as provenance
 from fux.ingest.run import run
+from l12_fixtures import write_config
 
 
 def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
@@ -73,6 +74,7 @@ def _repo(tmp_path, *, urls=(), files=None):
     )
     # SR-PII decision 17: every verb refuses without this file.
     (fux / "pii.toml").write_text("", encoding="utf-8")
+    write_config((fux).parent)
     for rel, text in files.items():
         path = tmp_path / rel
         path.parent.mkdir(parents=True, exist_ok=True)

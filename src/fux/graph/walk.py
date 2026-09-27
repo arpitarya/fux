@@ -48,26 +48,13 @@ from ..constants import fixed
 
 __all__ = [
     "ppr", "expand", "routes", "Route", "link_idf",
-    "DAMPING", "ITERATIONS", "HOP_DECAY", "LAZINESS", "EDGE_KINDS", "ALL_KINDS",
+    "EDGE_KINDS", "ALL_KINDS",
 ]
 
-#: Restart probability is `1 - DAMPING`. 0.85 is PageRank's published default
-#: and there is no measurement here that would justify moving it.
-DAMPING = 0.85
-
-#: A count, not a convergence test — see the archived kernel's note. Three
-#: iterations reach two hops of structure, which is the neighbourhood the
-#: expansion is for.
-ITERATIONS = 3
-
-#: Fraction of a node's mass that stays put each step. This is what makes the
-#: chain aperiodic, and without it a fixed iteration count produces the parity
-#: artefact documented above. 0.5 is the conventional lazy chain.
-LAZINESS = 0.5
-
-#: What each additional hop costs a route's reliability. A route that needs
-#: two intermediaries is not "slightly" less trustworthy than a direct link.
-HOP_DECAY = 0.5
+#: `damping`, `iterations`, `laziness` and `hop_decay` are `[graph]`'s and
+#: arrive as arguments (L12). Why each is what the template ships — PageRank's
+#: published damping, three iterations for two hops of structure, the
+#: conventional lazy chain — is said beside its key in `templates/tune.toml.txt`.
 
 #: **The three walk parameters W-161 will turn on for `ask`, exposed here and
 #: INERT at their defaults** (W-160 DoD 4). Each is an argument with a default
@@ -96,9 +83,9 @@ def ppr(
     graph: Graph,
     seeds: list[str],
     *,
-    damping: float = DAMPING,
-    iterations: int = ITERATIONS,
-    laziness: float = LAZINESS,
+    damping: float,
+    iterations: int,
+    laziness: float,
     kinds: frozenset[str] | None = ALL_KINDS,
     link_idf_on: bool = False,
     max_hops: int | None = None,
@@ -183,9 +170,9 @@ def expand(
     *,
     limit: int,
     min_score: float = 0.0,
-    damping: float = DAMPING,
-    iterations: int = ITERATIONS,
-    laziness: float = LAZINESS,
+    damping: float,
+    iterations: int,
+    laziness: float,
     kinds: frozenset[str] | None = ALL_KINDS,
     link_idf_on: bool = False,
     max_hops: int | None = None,
@@ -302,6 +289,8 @@ class Route:
         return self.hops[-1].dst
 
 
+
+
 #: How many node expansions one `routes()` search may spend before it stops.
 #:
 #: 🔴 **A WORK bound, not a depth bound, and that is the whole ruling**
@@ -311,15 +300,13 @@ class Route:
 #: wrong on the first corpus shaped differently. **Work is the same on every
 #: corpus; depth is not.**
 #:
-#: ⚠ **NOT tunable**, for this module's own standing reason: a tune file that
-#: could widen a search would make `--hops 2` mean different things in two
-#: repositories, and a route is evidence about a corpus rather than a preference.
-#:
-#: ⚠ **200 000 is a number somebody picked**, and saying so is the point. What
-#: makes it defensible is not the value: it is that exceeding it is **reported**
-#: rather than silently absorbed, so the failure mode is a stated *incomplete*
-#: instead of a confident *no route*.
-EXPANSION_BUDGET = 200_000
+#: ⚠ **NOT tunable** — so under L12 it is a FIXED value, in `constants.toml`,
+#: rather than a `tune.toml` key: a tune file that could widen a search would
+#: make `--hops 2` mean different things in two repositories, and a route is
+#: evidence about a corpus rather than a preference. Exceeding it is
+#: **reported** rather than silently absorbed, so the failure mode is a stated
+#: *incomplete* instead of a confident *no route*.
+EXPANSION_BUDGET = fixed("graph", "path_expansion_budget")
 
 
 def routes(
@@ -328,9 +315,9 @@ def routes(
     dst: str,
     *,
     hops: int,
-    limit: int = 10,
-    hop_decay: float = HOP_DECAY,
-    budget: int = EXPANSION_BUDGET,
+    limit: int,
+    hop_decay: float,
+    budget: int,
 ) -> tuple[list[Route], bool]:
     """Every simple directed route `src` → `dst` of at most `hops` edges.
 
@@ -405,7 +392,7 @@ def routes(
     return found[:limit], truncated[0]
 
 
-def reliability(hops: list[Edge], *, hop_decay: float = HOP_DECAY) -> float:
+def reliability(hops: list[Edge], *, hop_decay: float) -> float:
     """Grade product, decayed per extra hop. A direct EXTRACTED link is 1.0.
 
     Two properties are load-bearing and both are asserted in the eval: it is

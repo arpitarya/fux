@@ -21,6 +21,7 @@ from fux.refer import Policy, refer
 from fux.refer.arc import ARC
 from fux.refer.fetchcache import DEFAULT_TTL_SECONDS, FetchCache
 from fux.refer.freshness import ALWAYS, NEVER, cached, verify
+from l12_fixtures import template_tune
 
 PAGE = "# Handbook\n\nThe on-call rota hands over on Monday and telemetry is checked hourly.\n"
 
@@ -274,8 +275,8 @@ def test_a_ttl_hit_returns_what_a_live_fetch_would_have(repo):
     clock = Clock()
     fc = FetchCache(repo, clock=clock)
 
-    cold = refer(repo, "telemetry rota", url_candidates(), policy=policy, fetcher=fetcher, fetch_cache=fc)
-    warm = refer(repo, "telemetry rota", url_candidates(), policy=policy, fetcher=fetcher, fetch_cache=fc)
+    cold = refer(repo, "telemetry rota", url_candidates(), policy=policy, fetcher=fetcher, fetch_cache=fc, tune=template_tune())
+    warm = refer(repo, "telemetry rota", url_candidates(), policy=policy, fetcher=fetcher, fetch_cache=fc, tune=template_tune())
 
     assert len(calls) == 1, "the second call should not have gone out"
     assert json_mod.dumps([c.__dict__ for c in cold.assembled.citations]) == json_mod.dumps(
@@ -292,7 +293,7 @@ def test_the_cache_is_bypassed_entirely_when_the_ttl_is_zero(repo):
     for _ in range(3):
         bundle = refer(
             repo, "telemetry", url_candidates(), policy=policy,
-            fetcher=lambda u: (calls.append(u), PAGE)[1], fetch_cache=fc,
+            fetcher=lambda u: (calls.append(u), PAGE)[1], fetch_cache=fc, tune=template_tune()
         )
         assert bundle.documents[0].verdict.label != "cached"
     assert len(calls) == 3
@@ -303,7 +304,7 @@ def test_no_cache_prevents_a_cached_verdict_even_with_a_ttl(repo):
     fc = FetchCache(repo, clock=Clock())
     for _ in range(2):
         bundle = refer(repo, "telemetry", url_candidates(), policy=policy,
-                       fetcher=lambda u: PAGE, fetch_cache=fc)
+                       fetcher=lambda u: PAGE, fetch_cache=fc, tune=template_tune())
         assert bundle.documents[0].verdict.label != "cached"
 
 
@@ -314,7 +315,7 @@ def test_a_git_document_is_never_ttl_cached(repo):
     candidates = [("file:runbook.md", "runbook.md", sha_of("# R\n\nlocal content\n"))]
     for _ in range(2):
         bundle = refer(repo, "local", candidates,
-                       policy=Policy(mode=ALWAYS, cache_ttl_seconds=300), fetch_cache=fc)
+                       policy=Policy(mode=ALWAYS, cache_ttl_seconds=300), fetch_cache=fc, tune=template_tune())
         assert bundle.documents[0].verdict.label == "current"
     assert not list(fc.directory.glob("*.json")) if fc.directory.exists() else True
 
@@ -325,7 +326,7 @@ def test_never_still_never_fetches_and_never_serves_a_cached_url(repo):
     fc = FetchCache(repo, clock=Clock())
     fc.put("https://x.test/p", sha_of(PAGE), PAGE.encode())
     bundle = refer(repo, "telemetry", url_candidates(),
-                   policy=Policy(mode=NEVER, cache_ttl_seconds=300), fetch_cache=fc)
+                   policy=Policy(mode=NEVER, cache_ttl_seconds=300), fetch_cache=fc, tune=template_tune())
     assert bundle.documents[0].verdict.label == "unverified"
 
 
@@ -335,7 +336,7 @@ def test_the_ttl_store_is_not_arcs_store(repo):
     arc = ARC(100_000)
     fc = FetchCache(repo, clock=Clock())
     refer(repo, "telemetry", url_candidates(), policy=Policy(mode=ALWAYS, cache_ttl_seconds=300),
-          fetcher=lambda u: PAGE, cache=arc, fetch_cache=fc)
+          fetcher=lambda u: PAGE, cache=arc, fetch_cache=fc, tune=template_tune())
 
     assert ("https://x.test/p", sha_of(PAGE)) in arc          # ARC keyed by (loc, sha)
     assert list(fc.directory.glob("*.json"))                   # the TTL store, separate

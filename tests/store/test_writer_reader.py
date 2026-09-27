@@ -9,6 +9,7 @@ from fux.errors import FuxError
 from fux.store.format import ANALYZER_VERSION, HEADER, shard_for, shard_path
 from fux.store.reader import iter_shard_paths, read_index, read_shard
 from fux.store.writer import write_index
+from l12_fixtures import write_config
 
 
 def _rec(doc_id: str, **extra) -> dict:
@@ -18,12 +19,14 @@ def _rec(doc_id: str, **extra) -> dict:
 def test_write_then_read_round_trips(tmp_path):
     records = [_rec("file:a.md", title="A"), _rec("file:b.md", title="B")]
     write_index(tmp_path, records)
+    write_config(tmp_path)
     got = read_index(tmp_path)
     assert got == {"file:a.md": records[0], "file:b.md": records[1]}
 
 
 def test_shard_files_start_with_format_header(tmp_path):
     write_index(tmp_path, [_rec("file:a.md")])
+    write_config(tmp_path)
     paths = iter_shard_paths(tmp_path)
     assert paths
     for path in paths:
@@ -47,6 +50,7 @@ def test_lines_sorted_by_id_within_a_shard(tmp_path):
                 break
     records = [_rec(doc_id) for doc_id in same_shard]
     write_index(tmp_path, records)
+    write_config(tmp_path)
     _, got = read_shard(shard_path(tmp_path, target))
     assert [r["id"] for r in got] == sorted(same_shard)
 
@@ -54,8 +58,10 @@ def test_lines_sorted_by_id_within_a_shard(tmp_path):
 def test_double_write_is_byte_identical(tmp_path):
     records = [_rec(f"file:doc-{i}.md", title=f"Doc {i}") for i in range(30)]
     write_index(tmp_path, records)
+    write_config(tmp_path)
     before = {p: p.read_bytes() for p in iter_shard_paths(tmp_path)}
     write_index(tmp_path, records)
+    write_config(tmp_path)
     after = {p: p.read_bytes() for p in iter_shard_paths(tmp_path)}
     assert before == after
 
@@ -63,29 +69,36 @@ def test_double_write_is_byte_identical(tmp_path):
 def test_shard_hashes_stable_across_two_full_ingests(tmp_path):
     records = [_rec(f"file:doc-{i}.md", title=f"Doc {i}") for i in range(30)]
     write_index(tmp_path, records)
+    write_config(tmp_path)
     first = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in iter_shard_paths(tmp_path)}
     write_index(tmp_path, records)
+    write_config(tmp_path)
     second = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in iter_shard_paths(tmp_path)}
     assert first == second
 
 
 def test_removing_a_doc_removes_it_from_the_index(tmp_path):
     write_index(tmp_path, [_rec("file:a.md"), _rec("file:b.md")])
+    write_config(tmp_path)
     write_index(tmp_path, [_rec("file:a.md")])
+    write_config(tmp_path)
     assert read_index(tmp_path) == {"file:a.md": _rec("file:a.md")}
 
 
 def test_emptying_a_shard_removes_its_file(tmp_path):
     write_index(tmp_path, [_rec("file:a.md")])
+    write_config(tmp_path)
     path = shard_path(tmp_path, shard_for("file:a.md"))
     assert path.exists()
     write_index(tmp_path, [])
+    write_config(tmp_path)
     assert not path.exists()
 
 
 def test_duplicate_id_rejected(tmp_path):
     with pytest.raises(FuxError, match="duplicate id"):
         write_index(tmp_path, [_rec("file:a.md"), _rec("file:a.md")])
+        write_config(tmp_path)
 
 
 def test_read_shard_rejects_missing_header(tmp_path):
@@ -113,21 +126,26 @@ def test_iter_shard_paths_empty_when_no_index(tmp_path):
 def test_unchanged_shard_is_left_untouched_on_disk(tmp_path):
     records = [_rec("file:a.md", title="A")]
     write_index(tmp_path, records)
+    write_config(tmp_path)
     path = shard_path(tmp_path, shard_for("file:a.md"))
     mtime_before = path.stat().st_mtime_ns
     write_index(tmp_path, records)
+    write_config(tmp_path)
     assert path.stat().st_mtime_ns == mtime_before
 
 
 def test_write_index_returns_only_changed_shards(tmp_path):
     records = [_rec("file:a.md", title="A"), _rec("file:b.md", title="B")]
     write_index(tmp_path, records)
+    write_config(tmp_path)
     changed = write_index(tmp_path, [_rec("file:a.md", title="A changed"), _rec("file:b.md", title="B")])
+    write_config(tmp_path)
     assert changed == [shard_path(tmp_path, shard_for("file:a.md"))]
 
 
 def test_no_leftover_tmp_files_after_write(tmp_path):
     write_index(tmp_path, [_rec("file:a.md")])
+    write_config(tmp_path)
     tmp_files = list((tmp_path / ".fux" / "index").glob("*.tmp"))
     assert tmp_files == []
 
@@ -168,6 +186,7 @@ def test_read_shard_rejects_reversed_tf_fields(tmp_path):
 
 def test_iter_shard_paths_ignores_non_shard_files(tmp_path):
     write_index(tmp_path, [_rec("file:a.md")])
+    write_config(tmp_path)
     stray = tmp_path / ".fux" / "index" / "derived-blah.jsonl"
     stray.write_bytes(b"not a real shard\n")
     names = {p.name for p in iter_shard_paths(tmp_path)}

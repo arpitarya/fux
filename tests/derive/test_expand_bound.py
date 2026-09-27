@@ -24,6 +24,7 @@ set it to 5 and there is no code path that stops them.
 
 from __future__ import annotations
 
+from l12_fixtures import scoring, write_config
 import pytest
 
 from fux.derive import accel, build
@@ -129,6 +130,7 @@ CORPORA = {"theta-shaped": _adversarial_corpus, "ceiling-shaped": _ceiling_corpu
 @pytest.fixture(params=sorted(CORPORA), ids=sorted(CORPORA))
 def built(tmp_path, request):
     write_index(tmp_path, CORPORA[request.param]())
+    write_config(tmp_path)
     build(tmp_path)
     return tmp_path
 
@@ -157,9 +159,9 @@ def _expansion(weight: float):
 def test_accelerator_equals_scan_at_any_expand_weight(built, weight, top):
     """The differential law, stated at the expansion weight rather than at 0."""
     expansion = _expansion(weight)
-    expected = _payload(scan.ask(built, QUERY, top=top, expansion=expansion))
+    expected = _payload(scan.ask(built, QUERY, top=top, expansion=expansion, scoring=scoring()))
     for skipping in (False, True):
-        got = _payload(accel.ask(built, QUERY, top=top, skipping=skipping, expansion=expansion))
+        got = _payload(accel.ask(built, QUERY, top=top, skipping=skipping, expansion=expansion, scoring=scoring()))
         assert got == expected, f"expand_weight={weight} top={top} skipping={skipping}"
 
 
@@ -175,8 +177,8 @@ def test_skipping_is_still_load_bearing(built):
     runtime = Runtime(built)
     expansion = _expansion(0.2)
     hashes = list(expansion.hashes)
-    with_skip, _, _ = accel_candidates(runtime, hashes, 5, skipping=True, expansion=expansion)
-    without, _, _ = accel_candidates(runtime, hashes, 5, skipping=False, expansion=expansion)
+    with_skip, _, _ = accel_candidates(runtime, hashes, 5, skipping=True, expansion=expansion, scoring=scoring())
+    without, _, _ = accel_candidates(runtime, hashes, 5, skipping=False, expansion=expansion, scoring=scoring())
     assert len(with_skip) < len(without), (
         "nothing was skipped, so this file's other assertions cannot fail — "
         "the fixture no longer exercises the bound"
@@ -185,8 +187,8 @@ def test_skipping_is_still_load_bearing(built):
 
 def test_the_weight_actually_reorders_this_corpus(built):
     """The fixture must be able to diverge, or every test here is vacuous."""
-    low = [r.id for r in scan.ask(built, QUERY, top=5, expansion=_expansion(0.05))]
-    high = [r.id for r in scan.ask(built, QUERY, top=5, expansion=_expansion(40.0))]
+    low = [r.id for r in scan.ask(built, QUERY, top=5, expansion=_expansion(0.05), scoring=scoring())]
+    high = [r.id for r in scan.ask(built, QUERY, top=5, expansion=_expansion(40.0), scoring=scoring())]
     assert low != high, "no weight in range reorders this corpus"
 
 
@@ -220,6 +222,7 @@ def test_theta_is_computed_at_the_expansion_weights():
     common = dict(
         hits=hits, docs=docs, opened_order=[alpha, omega],
         df={alpha: 20, omega: 40}, corpus=corpus, top=5, avg_wlen=corpus.avg_wlen,
+        weighting=None, scoring=scoring(), anchor_tf=None,
     )
 
     weighted = _kth_score(**common, expansion=expansion)
@@ -253,6 +256,7 @@ def test_theta_excludes_candidates_the_guard_will_drop():
     common = dict(
         docs=docs, opened_order=[alpha, omega],
         df={alpha: 20, omega: 40}, corpus=corpus, top=5, avg_wlen=corpus.avg_wlen,
+        weighting=None, scoring=scoring(), anchor_tf=None,
     )
 
     with_ghosts = _kth_score(hits={**real, **ghosts}, **common, expansion=expansion)

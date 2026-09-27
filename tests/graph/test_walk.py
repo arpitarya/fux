@@ -2,10 +2,33 @@
 
 from __future__ import annotations
 
+from l12_fixtures import template_tune
 import pytest
 
 from fux.graph.model import Edge, Graph
-from fux.graph.walk import DAMPING, HOP_DECAY, ITERATIONS, expand, ppr, reliability, routes
+from fux.graph import walk as _walk
+
+#: The template's `[graph]` — the walk has no defaults of its own (L12).
+_T = template_tune()
+DAMPING, HOP_DECAY, ITERATIONS, LAZINESS = _T.damping, _T.hop_decay, _T.iterations, _T.laziness
+_WALK = {"damping": DAMPING, "iterations": ITERATIONS, "laziness": LAZINESS}
+
+
+def ppr(graph, seeds, **kw):
+    return _walk.ppr(graph, seeds, **{**_WALK, **kw})
+
+
+def expand(graph, seeds, **kw):
+    return _walk.expand(graph, seeds, **{**_WALK, **kw})
+
+
+def routes(graph, src, dst, **kw):
+    kw = {"limit": _T.path_limit, "hop_decay": HOP_DECAY, "budget": _walk.EXPANSION_BUDGET, **kw}
+    return _walk.routes(graph, src, dst, **kw)
+
+
+def reliability(hops, **kw):
+    return _walk.reliability(hops, **{"hop_decay": HOP_DECAY, **kw})
 
 
 @pytest.fixture
@@ -35,8 +58,6 @@ def test_ppr_scores_decrease_monotonically_with_distance(chain):
 def test_the_walk_is_lazy_and_that_is_load_bearing():
     """Pin the mechanism, not just the symptom — laziness is what makes the
     fixed iteration count safe on a bipartite-ish graph."""
-    from fux.graph.walk import LAZINESS
-
     assert 0 < LAZINESS < 1
 
 

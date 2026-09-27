@@ -29,6 +29,7 @@ decision.
 
 from __future__ import annotations
 
+from l12_fixtures import template_tune
 import sys
 from pathlib import Path
 
@@ -39,7 +40,8 @@ sys.path.insert(0, str(ROOT / "tools" / "quality-controls"))
 
 import band_sweep as bs  # noqa: E402
 
-from fux.query.confidence import Confidence, SEPARATION_FLOOR  # noqa: E402
+from fux.query.confidence import Confidence
+SEPARATION_FLOOR = template_tune().separation_floor
 
 
 def block(separation: float, **over) -> dict:
@@ -51,7 +53,7 @@ def block(separation: float, **over) -> dict:
         verified=over.pop("verified", "unverified"),
         missing=tuple(over.pop("missing", ())),
         doc_coverage=over.pop("doc_coverage", 1.0),
-        doc_coverage_floor=over.pop("doc_coverage_floor", 0.0),
+        doc_coverage_floor=over.pop("doc_coverage_floor", 0.0), separation_floor=template_tune().separation_floor
     )
     assert not over, over
     return base.as_dict()

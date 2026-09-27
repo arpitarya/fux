@@ -54,15 +54,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .errors import FuxError
-from .query.bm25f import FIELD_WEIGHTS
 from .store import TF_FIELDS
 from .constants import fixed
 
-#: W-110. How far down its own ranking a question must place its document.
-#: **3**, ratified by Arpit 2026-09-05 and recorded in SR-ENRICH. A question
-#: is a *retrieval* claim, and one that cannot reach the top three on the
-#: corpus it was written for is not one.
-SELF_RETRIEVAL_K = 3
+#: W-110. How far down its own ranking a question must place its document is
+#: `.fux/tune.toml [enrich] self_retrieval_k` — **3** as shipped, ratified by
+#: Arpit 2026-09-05 and recorded in SR-ENRICH. A question is a *retrieval*
+#: claim, and one that cannot reach the top three on the corpus it was written
+#: for is not one.
 
 ENRICH_DIR = fixed("files", "enrich_dir")
 
@@ -171,11 +170,14 @@ def validate(path: Path, expected_sha: str | None = None) -> str | None:
 #:   whose answer depends on whether it has been run before.
 #:
 #: What is left is `body`, `heading` and `path` — the document's own content,
-#: which is what doc2query-- actually asks about.
-_FILTER_WEIGHTS: tuple[float, ...] = tuple(
-    0.0 if name in ("title", "ctx") else weight
-    for name, weight in zip(TF_FIELDS, FIELD_WEIGHTS)
-)
+#: which is what doc2query-- actually asks about. **At this repo's own
+#: weights** (`.fux/tune.toml [bm25f]`): the filter judges a question by the
+#: ranking this repo's searchers get.
+_FILTER_ZEROED = frozenset({"title", "ctx"})
+
+
+def _filter_weights(weights: tuple[float, ...]) -> tuple[float, ...]:
+    return tuple(0.0 if name in _FILTER_ZEROED else w for name, w in zip(TF_FIELDS, weights))
 
 
 def is_question(line: str) -> bool:
@@ -220,6 +222,7 @@ def plan(
     target: str | None = None,
     pii_rules: tuple = (),
     self_retrieval_k: int = 0,
+    chunk_bounds: dict[str, int],
 ) -> list[ScopeReport]:
     """The worklist, per declared scope.
 
@@ -256,7 +259,7 @@ def plan(
                 filtered += 1
                 continue
             sha = record.get("sha", "")
-            chunks = _chunk_count(root, record)
+            chunks = _chunk_count(root, record, chunk_bounds)
             enrich_target = f"{ENRICH_DIR}/{sha}.md"
             path = enrich_path(root, sha)
             if not path.is_file():
@@ -385,9 +388,10 @@ def _unretrievable(root: Path, path: Path, record: dict, k: int) -> list[tuple[s
     import dataclasses
 
     from .query import run_query
-    from .tune import Tune
+    from .tune import load as load_tune
 
-    tune = dataclasses.replace(Tune(), field_weights=_FILTER_WEIGHTS)
+    tune = load_tune(root, enabled=True)
+    tune = dataclasses.replace(tune, field_weights=_filter_weights(tune.field_weights))
     doc_id = record.get("id", "")
     failures: list[tuple[str, int | None, bool]] = []
     for question in questions:
@@ -430,7 +434,7 @@ def _pii_in_body(path: Path, rules: tuple) -> list[str]:
     return [name for name in hits]
 
 
-def _chunk_count(root: Path, record: dict) -> int:
+def _chunk_count(root: Path, record: dict, bounds: dict[str, int]) -> int:
     """How many passages this document splits into — the unit of enrichment.
 
     Computed from the document rather than stored: it is a pure function of
@@ -442,7 +446,7 @@ def _chunk_count(root: Path, record: dict) -> int:
     text = _document_text(root, record)
     if text is None:
         return 0
-    return len(chunk(text))
+    return len(chunk(text, **bounds, line_numbers=True))
 
 
 #: The synthetic scope every enrichable `url:` document falls under.
@@ -561,15 +565,20 @@ def cmd_enrich(args) -> int:
     pii_rules = pii_mod.load(root)
 
     # W-110 — the self-retrieval filter runs under `--check` only. `k` is
-    # SR-ENRICH's, ratified by Arpit 2026-09-05: a question must place its own
-    # document in the **top 3**, or it is refused as a question that would pull
-    # other documents up rather than its own.
+    # `[enrich] self_retrieval_k` (SR-ENRICH, ratified by Arpit 2026-09-05): a
+    # question must place its own document in the top `k`, or it is refused as
+    # a question that would pull other documents up rather than its own.
+    from .tune import load as load_tune
+
+    tune = load_tune(root, enabled=True)
+    k = tune.self_retrieval_k
     reports = plan(
         root, scopes, target=target, pii_rules=pii_rules,
-        self_retrieval_k=SELF_RETRIEVAL_K if getattr(args, "check", False) else 0,
+        self_retrieval_k=k if getattr(args, "check", False) else 0,
+        chunk_bounds=tune.chunk_bounds(),
     )
     if getattr(args, "check", False):
-        return _render_check(reports, target=target)
+        return _render_check(reports, target=target, k=k)
     return _render_plan(root, reports, target=target)
 
 
@@ -705,7 +714,7 @@ def _render_plan(root: Path, reports: list[ScopeReport], *, target: str | None =
     return 0
 
 
-def _render_check(reports: list[ScopeReport], *, target: str | None = None) -> int:
+def _render_check(reports: list[ScopeReport], *, target: str | None = None, k: int) -> int:
     bad = 0
     scope_word = "scope(s) declared" if target is None else f"scope(s), filtered to {target}"
     print(f"enrichment: {len(reports)} {scope_word}")
@@ -752,7 +761,7 @@ def _render_check(reports: list[ScopeReport], *, target: str | None = None) -> i
                 verb = "reported (human)" if is_human else "refused"
                 print(
                     f"      {verb}: {path} — does not retrieve its document "
-                    f"({where}, wanted top {SELF_RETRIEVAL_K}): {question}"
+                    f"({where}, wanted top {k}): {question}"
                 )
     if any(r.pii for r in reports):
         print(

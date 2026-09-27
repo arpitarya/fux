@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-27
 amended: 2026-09-22
 feature: the confidence plane
-owns: [src/fux/query/confidence.py@2cd8be58107d, tests/test_confidence_floor_off.py@f8e18c079a6e, node/src/query/confidence.mjs@9b42bd23035b, node/test/confidence.test.mjs@7977e76407e2]
+owns: [src/fux/query/confidence.py@20897950b94e, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@620ad647947d, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 87de2e40ca79e5ac2c9823d4bbe1c8a4a5b671cf9803793db87a8ff257a88de4
+content_sha: c79bf2f2a375eef39c3a7e7256a37ca8564bfeeaf1d95923020f560b014f8189
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -214,7 +214,7 @@ should have declined, and this is the surface on which it declines.
    |---|---|---|
    | `none` | nothing scored above zero | abstain; `answerable` is `false` |
    | `partial` | a query term matches no document anywhere, **or** the cited bytes are `stale` | answer, and name what is missing |
-   | `weak` | `separation < SEPARATION_FLOOR` | **a signal: the ranking could not choose between the top hits — decide for yourself.** `answerable` stays `true` (3a) |
+   | `weak` | `separation < separation_floor` | **a signal: the ranking could not choose between the top hits — decide for yourself.** `answerable` stays `true` (3a) |
    | `grounded` | otherwise | use it and cite it |
 
    `stale` lands in `partial` rather than `weak` because it is a **nameable**
@@ -344,7 +344,7 @@ should have declined, and this is the surface on which it declines.
    than to the wrong-answer penalty, so the abstention has to be a distinct
    action rather than a region of a scale.
 
-6. ⚠ **`SEPARATION_FLOOR` is a PROXY, and fux does not get to pick its own
+6. ⚠ **`separation_floor` is a PROXY, and fux does not get to pick its own
    abstention threshold.** [SR-WORK-QUALITY](0056_WORK-quality.md) decision 6
    already froze the economics — `t = 0.75`, penalty `c = t/(1-t) = 2` — and by
    Chow's rule the optimal reject threshold is fixed by that ratio. **Two
@@ -352,8 +352,8 @@ should have declined, and this is the surface on which it declines.
 
    Therefore:
 
-   - `SEPARATION_FLOOR = 0.10` is a **starting value with no standing**, not a
-     measured optimum. Until R10 is filed, no document may describe the
+   - The shipped `separation_floor = 0.1` (the template's, [L12](0013_LAW-12-values-live-in-config.md))
+     is a **starting value with no standing**, not a measured optimum. Until R10 is filed, no document may describe the
      `grounded`/`weak` boundary as calibrated.
    - **R10's job is not to find a good-looking cutoff.** It is to find the
      `separation` value at which `P(correct) = t`, with `t` taken from
@@ -443,8 +443,8 @@ Cowork. This reverses decision 7.**
 
 ```toml
 [confidence]
-separation_floor   = 0.1   # engine default; the `grounded`/`weak` cutoff
-doc_coverage_floor = 0.0   # engine default; 0.0 = the clause is OFF
+separation_floor   = 0.1   # as shipped; the `grounded`/`weak` cutoff
+doc_coverage_floor = 0.0   # as shipped; 0.0 = the clause is OFF
 ```
 
 - **Why the reversal.** The standing rule on any configurable value is *state
@@ -521,7 +521,7 @@ doc_coverage_floor = 0.0   # engine default; 0.0 = the clause is OFF
 - ⚠ **Decision 6's binding is unchanged and now has a gap it did not have.**
   Decision 6 says fux does not get to pick a second abstention threshold. A
   *consumer* now can. That is a real hole in the argument, accepted rather than
-  argued away: fux's engine default stays bound to `t`, and what a consumer sets
+  argued away: the value fux ships stays bound to `t`, and what a consumer sets
   locally is theirs and is published as theirs.
 
 - **`doc_coverage_floor`'s cost is MEASURED, which separates it from the
@@ -635,7 +635,7 @@ one path and not the other.
 **`coverage` is unchanged**, so nothing that reads it changes meaning. That is
 why the field was added rather than redefined.
 
-🔴 **The gate is OFF (`DOC_COVERAGE_FLOOR = 0.0`) because the two populations
+🔴 **The gate is OFF (`doc_coverage_floor = 0.0` as shipped) because the two populations
 overlap.** Measured against the playground's 50 goldens and the 15 decoys —
 ⚠ **an instrument [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md) retired on 2026-09-11.** The
 numbers stand as measured; **turning this gate on needs a new measurement on a
@@ -792,8 +792,8 @@ independently authored **retired** sets, priced at
 `evidence_quoted` as a **named proxy** for *correct*.
 
 - **No candidate clears** the [SR-RS](0133_predictions.md) d19 paired bar in the
-  improving direction, in any set, at the primary rung. `SEPARATION_FLOOR` stays
-  `0.10` by the pre-registration's own outcome 2. ⚠ **Not for want of power** —
+  improving direction, in any set, at the primary rung. `separation_floor` ships
+  at `0.1` by the pre-registration's own outcome 2. ⚠ **Not for want of power** —
   improvement headroom was 49 / 64 / 65 against a floor of 6 flips.
 
 🔴 **The reason no floor wins is that `separation` does not carry correctness on

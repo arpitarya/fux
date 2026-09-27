@@ -109,6 +109,28 @@ R7 and R8 went stricter than recommended. Recorded in SR-LAW-12 decision 6a;
 decision 6's list is now **closed**. The *"first N, then (+M more)"* cut in a
 message is R3's presentation count, not R7.
 
+## Where the build departed from the table — for Arpit's review
+
+Each keeps today's behaviour and satisfies L12; each moves a value to a
+different home than the row proposed, because the code said something the
+scan could not see. **Say so and any of them flips back.**
+
+| row | the table said | built | why |
+|---|---|---|---|
+| `graph/walk.*` `EXPANSION_BUDGET` | `tunable-new` → `tune.toml [graph]` | `fixed` → `constants.toml [graph] path_expansion_budget` | an earlier ruling (Arpit, 2026-09-14, `path-hops-bound` option (c)) made it **NOT tunable**: a tune file that widened it would make `--hops 2` mean different things in two repos |
+| `graph/community.*` `MAX_SWEEPS` | `tunable-new` → `tune.toml [graph]` | `fixed` → `constants.toml [graph] community_max_sweeps` | it runs in `fux build`, and SR-TUNE keeps `tune.toml` off the maintenance path; the code calls it a determinism backstop, not a knob |
+| `query/fuse.*` `K` (RRF k) | not in the table (a one-letter name the grep missed) | `fixed` → `constants.toml [fuse] rrf_k` | the code says *"not tuned here and not a tune.toml key"* — a published constant (Cormack et al. 2009) |
+| `query/rerank.*` `WEIGHT` (R4) | two keys, two names | **one key**, `[ranking] rerank_weight` | on inspection `WEIGHT = 1.0` was only an unused parameter default: every production call passed `tune.rerank_weight`. There is no second knob in behaviour; `1.0` is now the template comment's *"when you turn it on"* value, as R4 did for the fetch-cache TTL |
+| rerank proximity mix `0.55 / 0.30 / 0.15` | not in the table (inline literals) | `tunable` → `tune.toml [ranking] rerank_base / rerank_span / rerank_adjacency` | weights a person could choose differently |
+| `fux path` route limit `10` | not in the table (a parameter default) | `tunable` → `tune.toml [graph] path_limit` | a list length, beside `expand_limit` |
+
+**Two behaviours that are identical at the shipped values and differ only for a
+repo that tuned away from them**, stated because no test on an untuned corpus
+can see them: `refer/_rescore.py` scored passages at the engine's built-in
+BM25F and now scores them at the repo's `[bm25f]`; and `fux enrich --check`'s
+self-retrieval filter zeroed `title`/`ctx` on the built-in weights and now does
+so on the repo's. Neither had a code default left to read.
+
 ## How the table was built
 
 The three veto commands from SR-LAW-12 §Veto condition were run verbatim on

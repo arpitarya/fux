@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING
 
 from .. import store as store_mod
 from ..ingest.gitdir import is_archived_loc
-from .bm25f import DEFAULT_SCORING, Scoring, score_record
+from .bm25f import Scoring, score_record
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from .expand import Expansion
@@ -261,7 +261,7 @@ def rank(
     *,
     archived_dirs: frozenset[str] = frozenset(),
     weighting: "Weighting | None" = None,
-    scoring: Scoring = DEFAULT_SCORING,
+    scoring: Scoring,
     stats_out: dict | None = None,
     expansion: "Expansion | None" = None,
 ) -> list[AskResult]:

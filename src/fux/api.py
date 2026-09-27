@@ -253,7 +253,7 @@ class Index:
         # every arm, the same discipline `_run_fused` applies: two loads could
         # disagree if the file changed between them, and a band explained by a
         # different floor than the one that produced it is worse than none.
-        tune = load_tune(self.root)
+        tune = load_tune(self.root, enabled=True)
         signals: dict = {}
         first, _path = run_query(
             self.root, arms[0], top, tune=tune, confidence_out=signals,

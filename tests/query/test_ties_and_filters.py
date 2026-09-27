@@ -12,6 +12,7 @@ which **removes** results the ranking already produced and retrieves nothing.
 
 from __future__ import annotations
 
+from l12_fixtures import scoring, write_config
 import pytest
 
 from fux.derive import accel, build
@@ -57,13 +58,15 @@ def test_with_no_signals_the_tie_breaks_on_id(tmp_path):
     """The old behaviour, kept as the FINAL tie-break so the order stays total
     and machine-independent."""
     write_index(tmp_path, _tied_corpus())
-    got = _ids(scan.ask(tmp_path, "alpha", top=4))
+    write_config(tmp_path)
+    got = _ids(scan.ask(tmp_path, "alpha", top=4, scoring=scoring()))
     assert got == sorted(got)
 
 
 def test_a_live_document_outranks_a_superseded_one_at_the_same_score(tmp_path):
     write_index(tmp_path, _tied_corpus(a_doc={"superseded": True}))
-    got = _ids(scan.ask(tmp_path, "alpha", top=4))
+    write_config(tmp_path)
+    got = _ids(scan.ask(tmp_path, "alpha", top=4, scoring=scoring()))
     assert got[-1] == "file:a_doc.md", "the superseded document should sort last among equals"
     assert got[0] == "file:b_doc.md", "and `id` should still order the rest"
 
@@ -74,7 +77,8 @@ def test_recency_breaks_a_tie_when_the_recency_WEIGHT_is_off(tmp_path):
     (`recency_half_life_days = 0.0`). That asymmetry is what makes it usable as
     a tie-break without turning a ranking prior on."""
     write_index(tmp_path, _tied_corpus(d_doc={"mtime": 2000}, a_doc={"mtime": 1000}))
-    got = _ids(scan.ask(tmp_path, "alpha", top=4))
+    write_config(tmp_path)
+    got = _ids(scan.ask(tmp_path, "alpha", top=4, scoring=scoring()))
     assert got[0] == "file:d_doc.md", "the newest of four equal scores should lead"
     assert got[1] == "file:a_doc.md", "then the next newest, before the undated ones"
 
@@ -95,8 +99,9 @@ def test_priority_cannot_reach_the_tie_break_and_the_reason_is_recorded(tmp_path
     multiply. **SR-RANKING records this; the code does not pretend.**
     """
     write_index(tmp_path, _tied_corpus())
+    write_config(tmp_path)
     weighting = Weighting(priority=(("c_doc.md", 5.0),))
-    got = scan.ask(tmp_path, "alpha", top=4, weighting=weighting)
+    got = scan.ask(tmp_path, "alpha", top=4, weighting=weighting, scoring=scoring())
     assert got[0].id == "file:c_doc.md"
     assert got[0].score > got[1].score, (
         "priority separated these by SCORE, not by the tie-break — if this ever "
@@ -113,7 +118,8 @@ def test_superseded_outranks_recency_in_the_order(tmp_path):
     recency first would put a retired document at the top for being fresh.
     """
     write_index(tmp_path, _tied_corpus(a_doc={"superseded": True, "mtime": 9999}))
-    got = _ids(scan.ask(tmp_path, "alpha", top=4))
+    write_config(tmp_path)
+    got = _ids(scan.ask(tmp_path, "alpha", top=4, scoring=scoring()))
     assert got[-1] == "file:a_doc.md"
 
 
@@ -129,7 +135,8 @@ def test_the_tie_break_never_moves_a_document_past_one_that_outscores_it(tmp_pat
     # One document scores strictly higher than the rest.
     records.append(_rec("file:z_doc.md", "Z", [50], {ALPHA: [40, 10]}))
     write_index(tmp_path, records)
-    got = scan.ask(tmp_path, "alpha", top=5)
+    write_config(tmp_path)
+    got = scan.ask(tmp_path, "alpha", top=5, scoring=scoring())
     assert got[0].id == "file:z_doc.md"
     assert got[0].score > got[1].score
 
@@ -139,10 +146,11 @@ def test_the_accelerator_orders_ties_identically(tmp_path):
     `rank()` with the same record dicts, and the key reads only fields both
     generators already carry."""
     write_index(tmp_path, _tied_corpus(a_doc={"superseded": True}, d_doc={"mtime": 2000}))
+    write_config(tmp_path)
     build(tmp_path)
-    expected = [(r.id, r.tie) for r in scan.ask(tmp_path, "alpha", top=4)]
+    expected = [(r.id, r.tie) for r in scan.ask(tmp_path, "alpha", top=4, scoring=scoring())]
     for skipping in (False, True):
-        got = [(r.id, r.tie) for r in accel.ask(tmp_path, "alpha", top=4, skipping=skipping)]
+        got = [(r.id, r.tie) for r in accel.ask(tmp_path, "alpha", top=4, skipping=skipping, scoring=scoring())]
         assert got == expected, f"skipping={skipping}"
 
 
@@ -151,14 +159,16 @@ def test_the_accelerator_orders_ties_identically(tmp_path):
 
 def test_every_tied_result_is_marked(tmp_path):
     write_index(tmp_path, _tied_corpus())
-    assert all(r.tie for r in scan.ask(tmp_path, "alpha", top=4))
+    write_config(tmp_path)
+    assert all(r.tie for r in scan.ask(tmp_path, "alpha", top=4, scoring=scoring()))
 
 
 def test_a_result_tied_with_a_document_BELOW_THE_CUT_is_still_marked(tmp_path):
     """The row most likely to have been a coin-toss is the last one shown, and
     a neighbour comparison on the truncated window would silently un-mark it."""
     write_index(tmp_path, _tied_corpus())
-    got = scan.ask(tmp_path, "alpha", top=2)
+    write_config(tmp_path)
+    got = scan.ask(tmp_path, "alpha", top=2, scoring=scoring())
     assert len(got) == 2 and got[-1].tie, (
         "the last row ties with the third document, which is off the page"
     )
@@ -169,7 +179,8 @@ def test_an_untied_result_is_not_marked(tmp_path):
     records = _tied_corpus()
     records.append(_rec("file:z_doc.md", "Z", [50], {ALPHA: [40, 10]}))
     write_index(tmp_path, records)
-    got = scan.ask(tmp_path, "alpha", top=5)
+    write_config(tmp_path)
+    got = scan.ask(tmp_path, "alpha", top=5, scoring=scoring())
     assert got[0].id == "file:z_doc.md" and got[0].tie is False
     assert all(r.tie for r in got[1:])
 
@@ -196,6 +207,7 @@ def _filter_corpus(root):
     dirs.write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(root)
     (root / "docs" / "runbooks").mkdir(parents=True)
     (root / "docs" / "runbooks" / "roll.md").write_text(
         "# Rollback\n\nTo roll back a release, drain the sidecar first.\n", encoding="utf-8")

@@ -29,6 +29,7 @@ from pathlib import Path
 import pytest
 
 from fux import doctor
+from l12_fixtures import write_config
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -40,12 +41,14 @@ def _repo(tmp_path, floor=None):
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# Rollback\n\nhow to roll back\n", encoding="utf-8")
     if floor is not None:
         (tmp_path / ".fux" / "tune.toml").write_text(
             f"[confidence]\nseparation_floor = {floor}\n", encoding="utf-8"
         )
+        write_config(tmp_path)
     return tmp_path
 
 
@@ -87,6 +90,7 @@ def test_doc_coverage_floor_at_zero_is_NOT_reported(tmp_path):
     (root / ".fux" / "tune.toml").write_text(
         "[confidence]\ndoc_coverage_floor = 0.0\n", encoding="utf-8"
     )
+    write_config(root)
     assert _row(root).ok
 
 
@@ -95,6 +99,7 @@ def test_an_unparseable_tune_file_defers_to_its_own_row(tmp_path):
     to trust neither. `tune.toml loads` is the row for that."""
     root = _repo(tmp_path)
     (root / ".fux" / "tune.toml").write_text("[confidence\n", encoding="utf-8")
+    write_config(root)
     assert _row(root).ok
 
 

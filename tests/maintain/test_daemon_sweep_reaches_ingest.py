@@ -31,6 +31,7 @@ from pathlib import Path
 import pytest
 
 from fux.maintain import daemon, runner
+from l12_fixtures import write_config
 
 SRC = Path(__file__).resolve().parents[2] / "src" / "fux"
 
@@ -49,6 +50,7 @@ def repo(tmp_path, monkeypatch):
     (sources / "urls").write_text("", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nsweepterm body\n", encoding="utf-8")
 

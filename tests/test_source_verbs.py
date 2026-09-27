@@ -23,6 +23,7 @@ import pytest
 from fux import sources
 from fux.errors import FuxError
 from fux.ingest import sourcelist
+from l12_fixtures import write_config
 
 
 def _args(entry=None, **flags):
@@ -77,6 +78,7 @@ def repo(tmp_path):
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     (tmp_path / "docs" / "b.md").write_text("# B\n\nbody\n", encoding="utf-8")
@@ -834,6 +836,7 @@ def _check_repo(tmp_path):
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     docs = tmp_path / "docs"
     docs.mkdir(exist_ok=True)
     (docs / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")

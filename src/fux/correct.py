@@ -602,13 +602,15 @@ def cmd_correct(args) -> int:
             print(f"appended to {path.relative_to(root).as_posix()} (human line)")
     else:
         from .enrich import _chunk_count
+        from .tune import load as load_tune
 
+        bounds = load_tune(root, enabled=True).chunk_bounds()
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(
             _new_file(
                 record.get("loc", ""),
                 sha,
-                _chunk_count(root, record),
+                _chunk_count(root, record, bounds),
                 _generated_from(record),
                 question,
             ),

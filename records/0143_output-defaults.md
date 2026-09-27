@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@9b9323869956, .fux/output.toml@3a5b84942f70, node/src/config/output.mjs@b7f85782dc29]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: c565ccc455c35648a6d4381bc1f88d3443ed36fd330bec31e7da913d42a7dc1f
+content_sha: 76f386bd33dc65d4eec7401328de5021f52eee3471c6cc56cf0a0d8c3b4fea53
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -814,6 +814,14 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 `runtime` kind's description string, which gained `runtime/inspect/`
 ([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
 **It does not reach this record's claim on that file.**
+
+<!-- L12-NOTE-START -->
+
+**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `.fux/output.toml` keeps its built-ins until
+W-225's stage 3; `.fux/tune.toml` is mandatory already, so a verb whose output
+default this file sets can now stop on a missing tune key before it renders.
+
+<!-- L12-NOTE-END -->
 
 <!-- L12-VALUES-START -->
 

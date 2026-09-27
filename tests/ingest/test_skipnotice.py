@@ -23,6 +23,7 @@ import pytest
 from fux.ingest import cmd_ingest, fuxignore, ingest_and_report, skipnotice
 from fux.ingest.gitdir import Skipped, read_types, source_excludes
 from fux.store import iter_shard_paths
+from l12_fixtures import write_config
 
 
 def _init(tmp_path) -> None:
@@ -32,6 +33,7 @@ def _init(tmp_path) -> None:
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     (tmp_path / "docs").mkdir(exist_ok=True)
 
 

@@ -586,9 +586,11 @@ def tune_delta(root: Path) -> str:
     """
     import dataclasses
 
-    from fux.tune import Tune, load as load_tune
+    from fux.tune import load as load_tune
 
-    live, defaults = load_tune(root), Tune()
+    # L12: the "defaults" are the template `fux setup` writes, which is what
+    # `--no-tune` reads — there is no other copy of them.
+    live, defaults = load_tune(root, enabled=True), load_tune(root, enabled=False)
     delta = {
         f.name: (getattr(defaults, f.name), getattr(live, f.name))
         for f in dataclasses.fields(live)

@@ -12,6 +12,7 @@ because the regex is the implementation and the field placement is the promise.
 
 from __future__ import annotations
 
+from l12_fixtures import template_index
 import pytest
 
 from fux.ingest.extract import extract_fields
@@ -27,7 +28,7 @@ MD = "# Broker Runbook\n\nDrain the queue.\n\n## Draining\n\nStop consumers.\n"
     "name,body", [("a.rst", RST), ("a.adoc", ADOC), ("a.org", ORG), ("a.md", MD)]
 )
 def test_headings_reach_the_heading_field(name, body):
-    out = extract_fields(name, ParsedDoc(meta={}, body=body))
+    out = extract_fields(name, ParsedDoc(meta={}, body=body), max_phrases=template_index().max_phrases)
     assert out.phrases == ["Broker Runbook", "Draining"], name
     assert out.title == "Broker Runbook", name
 
@@ -39,7 +40,7 @@ def test_a_heading_is_not_counted_twice(name, body):
     """A heading's words must leave the body, or they count once as heading tf
     and once as body tf — which dilutes exactly the signal the field exists for.
     """
-    out = extract_fields(name, ParsedDoc(meta={}, body=body))
+    out = extract_fields(name, ParsedDoc(meta={}, body=body), max_phrases=template_index().max_phrases)
     body_tf, heading_tf = out.terms["runbook"][0], out.terms["runbook"][1]
     assert heading_tf == 1, name
     assert body_tf == 0, name
@@ -49,7 +50,7 @@ def test_org_emphasis_is_not_a_heading():
     """`*emphasis*` and `**bold**` start a line with asterisks and are prose.
     The required space after the run is the whole guard.
     """
-    out = extract_fields("a.org", ParsedDoc(meta={}, body="* Real\n\n*emphasis* here\n"))
+    out = extract_fields("a.org", ParsedDoc(meta={}, body="* Real\n\n*emphasis* here\n"), max_phrases=template_index().max_phrases)
     assert out.phrases == ["Real"]
 
 
@@ -58,12 +59,12 @@ def test_rst_needs_a_full_width_rule():
     is not one either. reStructuredText requires the rule to run the width of
     the text, and honouring that is what keeps tables out of the heading field.
     """
-    out = extract_fields("a.rst", ParsedDoc(meta={}, body="Title\n=====\n\nnot\n-\n"))
+    out = extract_fields("a.rst", ParsedDoc(meta={}, body="Title\n=====\n\nnot\n-\n"), max_phrases=template_index().max_phrases)
     assert out.phrases == ["Title"]
 
 
 def test_adoc_level_one_is_the_document_title():
-    out = extract_fields("a.adoc", ParsedDoc(meta={}, body="= Doc\n\n== Section\n"))
+    out = extract_fields("a.adoc", ParsedDoc(meta={}, body="= Doc\n\n== Section\n"), max_phrases=template_index().max_phrases)
     assert out.phrases == ["Doc", "Section"]
 
 
@@ -72,10 +73,10 @@ def test_a_decoded_document_always_uses_the_markdown_grammar():
     must NOT be read with an Office-shaped grammar — there is no such thing.
     Only already-prose files take a different pattern.
     """
-    out = extract_fields("a.docx", ParsedDoc(meta={}, body="# From a decoder\n\nbody\n"))
+    out = extract_fields("a.docx", ParsedDoc(meta={}, body="# From a decoder\n\nbody\n"), max_phrases=template_index().max_phrases)
     assert out.phrases == ["From a decoder"]
 
 
 def test_an_unknown_extension_falls_back_to_markdown():
-    out = extract_fields("a.weird", ParsedDoc(meta={}, body="# Still a heading\n"))
+    out = extract_fields("a.weird", ParsedDoc(meta={}, body="# Still a heading\n"), max_phrases=template_index().max_phrases)
     assert out.phrases == ["Still a heading"]

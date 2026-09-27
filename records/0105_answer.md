@@ -7,10 +7,10 @@ description: The single best answer the index can give — a fetched, re-scored 
 status: accepted
 date: 2026-08-18
 feature: "`fux answer` — one answer, its footing stated, and the report of what changed since the question was last asked"
-owns: [src/fux/query/refer_answer.py@defdd3c5c0f5]
+owns: [src/fux/query/refer_answer.py@79014cc86dfd]
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 833b7bf83dc279d662932111df9038147cfcede011f15e01deed56d73a399c03
+content_sha: 93d26dc2e8e7b7e6f67a00d7070cb33da7f1a05aa452b747133406df208eae49
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -286,6 +286,16 @@ invariant and it holds
 (`tests/query/test_refer_answer.py::test_the_assembled_answer_never_exceeds_the_budget`);
 the spend is a cost, and it is reported rather than asserted away. A caller who
 wants the old cost sets `[refer] budget` to what it used to spend.
+
+<!-- L12-NOTE-START -->
+
+**[L12](0013_LAW-12-values-live-in-config.md) — no default on this path (W-225, 2026-09-27).** `answer` threads the
+command's one resolved `Tune` into `refer()` and `answer_via_refer`, which take it
+required, together with the named `cache_ttl_seconds`. When the confidence block
+could not be computed, the block that claims nothing (`confidence.empty`) is built
+under this repo's floors before anything renders — never under a value in code.
+
+<!-- L12-NOTE-END -->
 
 <!-- L12-VALUES-START -->
 

@@ -21,6 +21,7 @@ from pathlib import Path
 import pytest
 
 from fux.progress import THRESHOLD
+from l12_fixtures import write_config
 
 # Enough documents that `extract`, `edges` and `postings` all clear the count
 # threshold. Below it, nothing paints and this file would prove nothing.
@@ -46,6 +47,7 @@ def repo(tmp_path: Path) -> Path:
     dirs.write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     docs = tmp_path / "docs"
     docs.mkdir()
     for i in range(CORPUS):

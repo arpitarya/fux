@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-24
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@18bd4318319f, .fux/tune.toml@0c7511a65a32, node/src/config/tune.mjs@c785d72450bb]
+owns: [src/fux/tune.py@51540f8551a4, .fux/tune.toml@1f2f7240794e, node/src/config/tune.mjs@1adf99bbe934]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: d32630b9b806ab011897ad907f5670363adf342cc94b44d3cc1efb41fdae11fe
+content_sha: 15ff5ae1f18a194a88375982130ccfe16d708ae1bef03f8fadc86895319beb00
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -181,8 +181,13 @@ reasons, and the third decides it:
 fetcher precedent, unchanged — **a file the tool rewrites is a file whose
 comments and local reasoning get silently deleted.**
 
-**3a. Absent, or present and empty, means every default** — no error, no
-warning. **The file is a place to deviate, never a requirement.**
+**3a. Every key is required; an absent file, table or key is an error that names
+it** ([L12](0013_LAW-12-values-live-in-config.md) decision 3). fux holds no copy
+of these values in code — the one home of every shipped value is the template,
+[`src/fux/templates/tune.toml.txt`](../src/fux/templates/tune.toml.txt), which
+`fux setup` writes and `fux doctor --fix` restores a missing key from. Both
+readers raise the same sentence: `<path>: [table] key is missing`, plus the
+`--fix` remedy.
 
 **3b. `fux tune` prints; the human pastes.** There is no TOML writer in the
 standard library (`tomllib` reads only), and L1 forbids adding one. **This is
@@ -197,37 +202,36 @@ day; the record was the stale one.**
 > values would **freeze** every repo's ranking against future engine defaults —
 > arguably a feature, but a silent one.
 
-**What ships now:** every value is written **live**, at `Tune`'s own default, so
-a repo with the file and a repo without it rank identically. Ruled the same day
-as the types list and `.fux/output.toml`, for the same reason: *a file of
-nothing but comments is a menu*, and a consumer should be able to read what fux
-will do without reading fux's source.
+**What ships now:** every value is written **live**, from the template. Ruled the
+same day as the types list and `.fux/output.toml`, for the same reason: *a file
+of nothing but comments is a menu*, and a consumer should be able to read what
+fux will do without reading fux's source.
 
-⚠ **The cost the original paragraph correctly named is REAL and is now paid:
-the tunables FREEZE at setup.** `fux setup` is write-if-missing (decision 3), so
-a later change to `K1`, `B`, `FIELD_WEIGHTS` or any `Tune` default reaches a
-repo that has never run setup and **does not reach one that has**. Same trade as
-the types list (`.fux/formats.toml`); the remedy [SR-DOTFUX](0102_fux-directory.md) decision 6
-names is **a loader refusal or a `fux doctor` check, never a rewrite**, and
-neither is built.
+⚠ **The tunables FREEZE at setup, and under L12 that is the design.** A later
+change to a shipped value reaches a repo only when its owner edits the key; a
+NEW key reaches it as a hard error naming the key, fixed by `fux doctor --fix`,
+which writes the missing key from the template and touches nothing else
+([L12](0013_LAW-12-values-live-in-config.md) §Consequences). A raised default no
+longer reaches a consumer silently — every default change ships with a
+CHANGELOG migration line.
 
 ⚠ **`[priority]` stays commented, and that is not an inconsistency** — its keys
 are the consumer's own source entries, not tunables with defaults. An
 uncommented line there would silently reweight a corpus rather than restate a
 default; an empty table *is* the default.
 
-**4a. Measured consequence of the freeze, 2026-08-28:** this repository's own
-`.fux/tune.toml` did **not** gain `[confidence]` from decision 13 — it was
-hand-edited, because setup would never touch it. Every existing consumer is in
-the same position, and an absent `[confidence]` table simply means the engine
-floors, so nothing breaks; it is discoverability that is lost, not behaviour.
+**4a. A key the file lacks stops the ranked verbs, loudly.** The frozen file is
+no longer silently completed by engine defaults — there are none — so a repo
+whose `tune.toml` predates a key learns about the key the first time it runs,
+with the remedy in the same message.
 
 **5. The key set is closed, and an unknown table or key is a loud error.**
 Reader-strict, on the file that can silently change every answer. **Adding a key
-is a change to this record.** **Seven tables**: `bm25f`, `ranking`, `graph`,
-`refer`, `confidence`, `index`, `priority` — and `[priority]` is the one **open**
-table, because its keys are the consumer's own source entries, which fux cannot
-know in advance.
+is a change to this record.** **Eight tables**: `bm25f`, `ranking`, `graph`,
+`refer`, `confidence`, `enrich`, `index`, `priority` — and `[priority]` is the one
+**open** table, because its keys are the consumer's own source entries, which fux
+cannot know in advance. `[enrich]` holds `fux enrich --check`'s self-retrieval
+depth: a report over the committed index, so it passes the boundary rule.
 
 ⚠ **This said SIX and omitted `[index]` until 2026-09-12** (W-140 row 12). The
 table was added on 2026-09-11 as *the declared exception to decision 1* — the one
@@ -278,14 +282,14 @@ testing one configuration eleven times. It dispatches on membership in
 vacuous does not make it red**, which is the class worth remembering.
 
 *Specimen — the shape, not the text. ⚠ **The authority is
-[`tune.specimen()`](../src/fux/tune.py), which interpolates the engine
-constants**, so the file and the behaviour cannot drift; a record that retyped
-the numbers would be a second copy of them (W-83's lesson). Comments elided
-here; the shipped file carries them.*
+[`src/fux/templates/tune.toml.txt`](../src/fux/templates/tune.toml.txt)** — the
+one home of every shipped value (L12); a record that retyped the numbers would
+be a second copy of them (W-83's lesson). Comments elided here; the shipped
+file carries them.*
 
 ```toml
 # .fux/tune.toml — HOW results are ordered. Never what is indexed.
-# Written once by `fux setup`; fux never rewrites it. Absent = every default.
+# Written once by `fux setup`; fux never rewrites it. Every key is required.
 
 [bm25f]                    # k1, b, and the five field weights in TF_FIELDS order
 k1      = 1.2
@@ -473,8 +477,8 @@ field***, which is a ranking choice rather than the source exclusion `!` owns.
 
 ⚠ **The *measured* tier says `fux tune` in earlier readings of this table, and
 `fux tune` measures nothing** (W-140 row 12, corrected 2026-09-12). The verb is
-`print(specimen())` — it emits the engine's defaults as a commented TOML file for
-a human to paste, exactly as decision 3b describes, and it neither reads the
+`print(specimen())` — it emits the packaged template, the file `fux setup`
+writes, for a human to paste, exactly as decision 3b describes, and it neither reads the
 index nor runs a query. **The tier is real; its producer is a measurement run
 under [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md), not a verb**, and naming a verb made a
 one-command answer look available where a filed run is required.
@@ -533,8 +537,10 @@ at the boundary.
 
 **11. `--no-tune` on the read verbs.** A flag, never a subverb. It earns itself
 three times: it is the *"is it me or the config?"* switch when a ranking looks
-wrong, it is how CI compares against engine defaults, and **`fux tune` needs the
-off-arm internally** to compute every off-vs-on number in decision 9b.
+wrong, it is how CI compares against the shipped values, and **`fux tune` needs
+the off-arm internally** to compute every off-vs-on number in decision 9b. It
+reads the packaged template — the file `fux setup` would write today — and never
+a value in code ([L12](0013_LAW-12-values-live-in-config.md) decision 7).
 ⚠ *It does not reach `[index]` (decision 13b) — those keys built the index being
 read, so there is no query-time "off" for them.*
 
@@ -745,6 +751,11 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + bm25f.ctx
 + bm25f.anchor
 + ranking.rerank_weight
++ ranking.rerank_depth
++ ranking.rerank_coverage_power
++ ranking.rerank_base
++ ranking.rerank_span
++ ranking.rerank_adjacency
 + ranking.expand_weight
 + ranking.mined_weight
 + graph.damping
@@ -753,6 +764,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + graph.hop_decay
 + graph.expand_limit
 + graph.seed_depth
++ graph.path_limit
 + graph.ask_boost
 + graph.ask_related
 + graph.ask_kinds
@@ -763,8 +775,11 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + refer.per_doc_fraction
 + refer.min_passage_bytes
 + refer.max_passage_bytes
++ refer.citation_overhead
++ refer.table_rows_per_passage
 + confidence.separation_floor
 + confidence.doc_coverage_floor
++ enrich.self_retrieval_k
 + index.max_phrases
 + index.max_table_rows
 * priority
@@ -1036,12 +1051,9 @@ this moved where they are written, not what they are.
 
 - ✅ **A frozen `.fux/tune.toml` is REPORTED (2026-09-14, W-163).**
   `fux doctor`'s `tune.toml current` row names every `table.key` the engine has
-  gained that the consumer's file does not mention. The file is write-if-missing
-  (SR-DOTFUX decision 6), so it never will — reading resolves to the engine
-  default, **nothing is broken**, and what is lost is that the consumer cannot
-  SEE the knob exists in the one file whose entire purpose is to show them.
-  ⚠ **Absent is not frozen**: a repo with no `tune.toml` is running engine
-  defaults deliberately, and `tune.toml loads` already says so.
+  gained that the consumer's file does not mention. Since L12 such a key also
+  stops `tune.toml loads` — there is no engine default to read in its place —
+  and `fux doctor --fix` writes it from the template.
   ⚠ **The expected key set is DERIVED from `_SCHEMA`, never listed in `doctor.py`**
   — a second copy would be free to disagree while both look correct, and the
   failure is silent: the row simply stops reporting a key nobody remembered.
@@ -1051,17 +1063,17 @@ this moved where they are written, not what they are.
   truncated table) is a function of one. Both are amended below to exclude
   `[index]`; the ruling is decision 13, and **this is the record saying so rather
   than the conditions being quietly narrowed.**
-- ⚠ **"Delete the file and nothing changes" is no longer true of `[index]` for
-  a repo that set non-default values** — deleting it re-extracts at the defaults.
-  The specimen's header says so.
+- ⚠ **Deleting the file stops every ranked verb and `fux ingest`**, naming the
+  file (L12). `fux doctor --fix` restores it from the template.
 - **The constants become decisions with a provenance**, in a file a reviewer can
   read, instead of values a reader must trust.
 - **A consumer whose `vendor/` outranks their `docs/` on volume has a one-line
   answer**, and one that does not require a fork.
 - **Editing your ranking cannot break your index or your hooks.** The boundary
   rule buys a guarantee that costs nothing to keep.
-- **No default moves.** Every key ships at the value the engine already uses, so
-  the file moves no result anywhere until someone writes a line.
+- **No value moves.** Every key ships at the value the engine used before L12
+  moved it out of code, so the file moves no result anywhere until someone
+  writes a line.
 - ⚠ **The accelerator gets slower in proportion to the spread.** Decision 12's
   ceiling scaling loosens every bound, on every query, **including queries that
   touch none of the weighted sources.** The headroom is real — warm `ask`

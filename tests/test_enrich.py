@@ -9,6 +9,7 @@ that never said it, and nothing errors.
 
 from __future__ import annotations
 
+from l12_fixtures import chunk_bounds, template_index
 import pytest
 
 from fux.enrich import (
@@ -97,7 +98,7 @@ def _record(loc, sha):
 def test_plan_reports_missing(tmp_path):
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
-    (report,) = plan(tmp_path, {"docs": [_record("docs/a.md", "sha1")]})
+    (report,) = plan(tmp_path, {"docs": [_record("docs/a.md", "sha1")]}, chunk_bounds=chunk_bounds())
     assert report.ok == 0
     assert [i.loc for i in report.missing] == ["docs/a.md"]
     assert report.stale == []
@@ -113,7 +114,7 @@ def test_plan_distinguishes_stale_from_missing(tmp_path):
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     _write(tmp_path, "oldsha", source="docs/a.md")  # enriched at a PREVIOUS sha
-    (report,) = plan(tmp_path, {"docs": [_record("docs/a.md", "newsha")]})
+    (report,) = plan(tmp_path, {"docs": [_record("docs/a.md", "newsha")]}, chunk_bounds=chunk_bounds())
     assert report.missing == []
     assert len(report.stale) == 1
     assert report.stale[0].stale_sha == "oldsha"
@@ -123,7 +124,7 @@ def test_plan_reports_malformed_separately_from_absent(tmp_path):
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     _write(tmp_path, "sha1", source="docs/a.md", drop="model")
-    (report,) = plan(tmp_path, {"docs": [_record("docs/a.md", "sha1")]})
+    (report,) = plan(tmp_path, {"docs": [_record("docs/a.md", "sha1")]}, chunk_bounds=chunk_bounds())
     assert report.ok == 0
     assert len(report.malformed) == 1
     assert "model" in report.malformed[0][1]
@@ -133,7 +134,7 @@ def test_plan_counts_chunks_from_the_document(tmp_path):
     (tmp_path / "docs").mkdir()
     body = "\n\n".join(f"## S{i}\n\n" + ("word " * 90) for i in range(1, 4))
     (tmp_path / "docs" / "a.md").write_text(body, encoding="utf-8")
-    (report,) = plan(tmp_path, {"docs": [_record("docs/a.md", "sha1")]})
+    (report,) = plan(tmp_path, {"docs": [_record("docs/a.md", "sha1")]}, chunk_bounds=chunk_bounds())
     assert report.missing[0].chunks == 3
 
 
@@ -201,8 +202,8 @@ def test_the_ctx_field_carries_enrichment_vocabulary():
     ctx_i = TF_FIELDS.index("ctx")
     doc = parse(b"# Retry policy\n\nThe parser retries three times.\n")
 
-    plain = extract_fields("docs/a.md", doc)
-    enriched = extract_fields("docs/a.md", doc, "Covers idempotency and circuit breakers.")
+    plain = extract_fields("docs/a.md", doc, max_phrases=template_index().max_phrases)
+    enriched = extract_fields("docs/a.md", doc, "Covers idempotency and circuit breakers.", max_phrases=template_index().max_phrases)
 
     # `extract_fields` returns ANALYZED TOKENS as keys; hashing happens later,
     # in `store.hash_terms`, so this seam is tested in the vocabulary rather
@@ -222,7 +223,7 @@ def test_an_unenriched_document_writes_no_ctx_slot():
     from fux.store import trim
 
     doc = parse(b"# A\n\nbody text\n")
-    plain = extract_fields("docs/a.md", doc)
+    plain = extract_fields("docs/a.md", doc, max_phrases=template_index().max_phrases)
     assert len(trim(plain.flen)) < len(plain.flen)
 
 
@@ -278,7 +279,7 @@ def test_check_REFUSES_a_matching_file_and_does_not_rewrite_it(tmp_path):
     path = _write(tmp_path, "abc123", body="ping arpit@example.com. " + GOOD_BODY)
     before = path.read_bytes()
     records = [{"loc": "docs/a.md", "sha": "abc123"}]
-    (report,) = plan(tmp_path, {"docs": records}, pii_rules=EMAIL_RULES)
+    (report,) = plan(tmp_path, {"docs": records}, pii_rules=EMAIL_RULES, chunk_bounds=chunk_bounds())
     assert report.pii == [(f"{ENRICH_DIR}/abc123.md", ["email"])]
     assert report.ok == 0, "a refused file must not count as covered"
     assert path.read_bytes() == before, "--check rewrote a committed file"
@@ -288,7 +289,7 @@ def test_a_report_spells_every_path_the_way_the_worklist_does(tmp_path):
     """One file, one spelling — on every platform.
 
     🔴 **This failed on Windows CI and nowhere else**, which is how it shipped:
-    `plan()`'s worklist builds `.fux/enrich/<sha>.md` from a literal, while
+    `plan(chunk_bounds=chunk_bounds())`'s worklist builds `.fux/enrich/<sha>.md` from a literal, while
     `malformed:` and `refused:` came from `str(Path)` — `\\` on Windows. The
     same run named the same file two ways and a consumer grepping their log for
     a path found half of it.
@@ -299,7 +300,7 @@ def test_a_report_spells_every_path_the_way_the_worklist_does(tmp_path):
     _write(tmp_path, "abc123", body="ping arpit@example.com. " + GOOD_BODY)
     _write(tmp_path, "def456", drop="model")
     records = [{"loc": "docs/a.md", "sha": "abc123"}, {"loc": "docs/b.md", "sha": "def456"}]
-    (report,) = plan(tmp_path, {"docs": records}, pii_rules=EMAIL_RULES)
+    (report,) = plan(tmp_path, {"docs": records}, pii_rules=EMAIL_RULES, chunk_bounds=chunk_bounds())
 
     shown = [p for p, _ in report.pii] + [p for p, _ in report.malformed]
     assert len(shown) == 2, "the fixture should produce one of each"
@@ -316,7 +317,7 @@ def test_a_refused_file_is_reported_once_not_twice(tmp_path):
     differ, and offering both is offering the wrong one."""
     path = _write(tmp_path, "abc123", body="ping arpit@example.com", drop="model")
     records = [{"loc": "docs/a.md", "sha": "abc123"}]
-    (report,) = plan(tmp_path, {"docs": records}, pii_rules=EMAIL_RULES)
+    (report,) = plan(tmp_path, {"docs": records}, pii_rules=EMAIL_RULES, chunk_bounds=chunk_bounds())
     assert len(report.malformed) == 1
     assert report.pii == []
 
@@ -332,7 +333,7 @@ def _two_docs(tmp_path):
 
 def test_a_target_narrows_the_worklist_to_one_document(tmp_path):
     records = _two_docs(tmp_path)
-    (report,) = plan(tmp_path, {"docs": records}, target="docs/b.md")
+    (report,) = plan(tmp_path, {"docs": records}, target="docs/b.md", chunk_bounds=chunk_bounds())
     assert [item.loc for item in report.missing] == ["docs/b.md"]
     assert report.filtered == 1
 
@@ -345,7 +346,7 @@ def test_a_target_does_NOT_change_the_denominator(tmp_path):
     it never touched.
     """
     records = _two_docs(tmp_path)
-    (report,) = plan(tmp_path, {"docs": records}, target="docs/a.md")
+    (report,) = plan(tmp_path, {"docs": records}, target="docs/a.md", chunk_bounds=chunk_bounds())
     assert report.total == 2
     assert report.ok == 1
 
@@ -354,12 +355,12 @@ def test_matching_is_exact_never_a_prefix(tmp_path):
     """A selector that silently matches two documents turns a one-document
     request into a bulk run."""
     records = _two_docs(tmp_path)
-    (report,) = plan(tmp_path, {"docs": records}, target="docs/")
+    (report,) = plan(tmp_path, {"docs": records}, target="docs/", chunk_bounds=chunk_bounds())
     assert report.missing == [] and report.stale == [] and report.filtered == 2
 
 
 def test_no_target_is_byte_for_byte_the_old_behaviour(tmp_path):
     records = _two_docs(tmp_path)
-    (report,) = plan(tmp_path, {"docs": records})
+    (report,) = plan(tmp_path, {"docs": records}, chunk_bounds=chunk_bounds())
     assert report.total == 2 and report.ok == 1 and report.filtered == 0
     assert [item.loc for item in report.missing] == ["docs/b.md"]

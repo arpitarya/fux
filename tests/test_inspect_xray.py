@@ -26,6 +26,7 @@ import pytest
 from fux.inspect import as_dict, diff as diff_mod, facts as facts_mod, inspect_index, render_markdown
 from fux.inspect import xray as xray_mod
 from fux.inspect._scan import read_index_view
+from l12_fixtures import write_config
 
 DOCS = {
     "docs/runbook.md": "# Drain the retry queue\n\nStop the consumer, then drain the retry "
@@ -61,6 +62,7 @@ def corpus(tmp_path_factory) -> Path:
     (fux / "sources").mkdir(parents=True)
     (fux / "sources" / "dirs").write_text("docs\nwork\n!work/golden\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
+    write_config((fux).parent)
     for rel, body in DOCS.items():
         path = root / rel
         path.parent.mkdir(parents=True, exist_ok=True)

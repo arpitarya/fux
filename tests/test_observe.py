@@ -16,6 +16,7 @@ from pathlib import Path
 import pytest
 
 from fux import observe
+from l12_fixtures import write_config
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -142,6 +143,7 @@ def _repo(tmp_path: Path) -> Path:
     (fux / "sources").mkdir(parents=True, exist_ok=True)
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
+    write_config((fux).parent)
     docs = tmp_path / "docs"
     docs.mkdir(exist_ok=True)
     (docs / "rollback.md").write_text(

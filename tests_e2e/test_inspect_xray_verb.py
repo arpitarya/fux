@@ -13,6 +13,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from l12_fixtures import write_config
 
 STRIPPING_DECODER = '''import re
 
@@ -41,6 +42,7 @@ def test_a_decoder_that_strips_hrefs_is_an_edge_loss_alert(tmp_path):
     sources.mkdir(parents=True)
     (sources / "dirs").write_text("docs\n", encoding="utf-8")
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     docs = tmp_path / "docs"
     docs.mkdir()
     (docs / "target.md").write_text("# Target\n\nThe reconciliation target.\n", encoding="utf-8")
@@ -75,6 +77,7 @@ def test_the_diff_writes_nothing(tmp_path):
     a.write_text(json.dumps({"corpus": {}, "documents": rows}), encoding="utf-8")
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     before = sorted(p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*"))
     _run(tmp_path, "inspect", "--diff", str(a), str(a))
     assert sorted(p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*")) == before

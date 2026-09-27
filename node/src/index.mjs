@@ -75,7 +75,7 @@ class Index {
   async ask(query, { top = 5, band = true, queries = null, sections = true } = {}) {
     // Loaded once and handed to every arm, so a band cannot be explained by a
     // different floor than the one that produced the ranking beside it.
-    const tune = loadTune(this.root);
+    const tune = loadTune(this.root, { enabled: true });
     const { results, confidence, fused } = runFused(
       this.root, [query, ...(queries ?? [])], top, { tune, wantConfidence: band },
     );

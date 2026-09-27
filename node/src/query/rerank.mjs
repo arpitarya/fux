@@ -44,18 +44,19 @@ import { analyze } from "./analyzer.mjs";
 import { chunk } from "../refer/chunk.mjs";
 import { cmpCodePoints, pyRound9 } from "../compat/pyfloat.mjs";
 
-//: How far down the ranking to reorder. W-76's gate is phrased
-//: `top-20 -> top-5`, and this is the 20.
-export const DEPTH = 20;
-
-//: The maximum fraction a perfect proximity match may add to a BM25F score — a
-//: **bounded multiplicative uplift**. Tunable via `[ranking] rerank_weight`.
-export const WEIGHT = 1.0;
-
-//: How hard a **missing** query term is punished. Coverage is raised to this
-//: before it multiplies, so a passage covering 4 of 5 query terms keeps 64 %
-//: of its proximity rather than 80 %.
-export const COVERAGE_POWER = 2;
+/** The passage arithmetic's four `[ranking]` numbers, carried as one — twin
+ *  of `rerank.py::Proximity`. `coveragePower` is how hard a MISSING query term
+ *  is punished; `base`, `span`, `adjacency` are the mix. The depth and the
+ *  uplift weight are `[ranking]`'s too, read off the caller's `Tune` (L12). */
+export class Proximity {
+  constructor(coveragePower, base, span, adjacency) {
+    this.coveragePower = coveragePower;
+    this.base = base;
+    this.span = span;
+    this.adjacency = adjacency;
+    Object.freeze(this);
+  }
+}
 
 //: Below two distinct query terms there is no proximity to measure — one term
 //: is always perfectly covered, adjacent to nothing, and spans itself.
@@ -163,10 +164,11 @@ export function phrasePresent(phraseTerms, text) {
  * weighted addend the reranker moved 2 of 50 golden queries, because every
  * candidate in a corpus about one subject scores 0.85-1.0 and an 8 % spread
  * cannot overcome a BM25F gap. */
-export function passageBoost(queryTerms, passageTerms) {
+export function passageBoost(queryTerms, passageTerms, proximity) {
   const [coverage, span, adjacency] = signals(queryTerms, passageTerms);
   if (coverage <= 0) return 0.0;
-  return (coverage ** COVERAGE_POWER) * (0.55 + 0.30 * span + 0.15 * adjacency);
+  return (coverage ** proximity.coveragePower)
+    * (proximity.base + proximity.span * span + proximity.adjacency * adjacency);
 }
 
 /** A document scores as its BEST passage, never its average one.
@@ -178,10 +180,11 @@ export function passageBoost(queryTerms, passageTerms) {
  *
  * Chunking is the refer plane's, deliberately — one chunker, so a passage the
  * reranker scored is a passage `answer` can cite. */
-export function boost(queryTerms, text) {
+export function boost(queryTerms, text, tune) {
   let best = 0.0;
-  for (const passage of chunk(text)) {
-    const score = passageBoost(queryTerms, analyze(passage.text));
+  const proximity = tune.proximity;
+  for (const passage of chunk(text, { ...tune.chunkBounds(), lineNumbers: true })) {
+    const score = passageBoost(queryTerms, analyze(passage.text), proximity);
     if (score > best) best = score;
   }
   return best;
@@ -206,7 +209,9 @@ export function readLocalText(root, docId, loc) {
  * `read` is **injected, never imported** — the same rule `refer/source.mjs`
  * follows for fetchers. It takes `(root, docId, loc)` and returns text, or
  * `null` when the document cannot be read. */
-export function rerank(root, query, results, { depth = DEPTH, weight = WEIGHT, read = null } = {}) {
+export function rerank(root, query, results, { tune, read = null }) {
+  const depth = tune.rerankDepth;
+  const weight = tune.rerankWeight;
   if (weight <= 0 || depth <= 0 || results.length < 2) return [...results];
 
   const queryTerms = analyze(query);
@@ -223,7 +228,7 @@ export function rerank(root, query, results, { depth = DEPTH, weight = WEIGHT, r
   const rescored = head.map((result) => {
     const text = reader(root, result.id, result.loc);
     if (text === null || text === undefined) return [result.score, result];
-    return [result.score * (1.0 + weight * boost(queryTerms, text)), result];
+    return [result.score * (1.0 + weight * boost(queryTerms, text, tune)), result];
   });
 
   rescored.sort((a, b) => {
