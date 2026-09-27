@@ -32,8 +32,14 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-27** (Claude Code, Opus — W-224 built; W-168 step 4 pre-registered).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-27** (Claude Code, Opus — W-168 step 4 scored, PASS by the table).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### 🔴 2026-09-27 (latest) — W-168 STEP 4 PASSES BY THE TABLE at `mined_weight = 0.5`; Arpit ratifies
+
+- [Verdict](regression/2026-09-27-mined-expansion/VERDICT.md): 6/0 on the 22 tagged questions at `0.5`, exactly the floor. `0.1` to `0.3` come in under it (2, 4, 5). Zero drift at every weight.
+- ⚠ The arms ran at `anchor = 0.0`, but the engine ships `1.0`, so that combination is unmeasured. Five of the six wins are non-primary.
+- **Next:** Arpit ratifies (inbox). Then ship per the bar's §If it passes: the default on both engines, four SRs, byte equality across four surfaces, CHANGELOG.
 
 ### 🟢 2026-09-27 — RM3 IS GONE (W-224); W-168 STEP 4 IS PRE-REGISTERED
 

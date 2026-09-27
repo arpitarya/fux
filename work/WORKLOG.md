@@ -29,6 +29,17 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-27 — W-168 step 4 ratified PASS at `mined_weight = 0.5`  ·  Cowork
+- **Asked:** *"what is `mined_weight`"*, then *"yes"* to ratifying step 4 at `0.5`.
+- **Did:** filed the VERDICT as PASS, ruled by Arpit, with no confirmation arm at `anchor = 1.0`. Recorded the ruling and the ship list in W-168. Removed the inbox row, and re-balled W-168 🟢. The inbox is empty.
+- **Next:** agent — ship the `0.5` default per §If it passes, in one change. Then a prompt-4 rung rebuild.
+
+## 2026-09-27 — W-168 step 4 decided: PASS by the table at mined_weight 0.5  ·  Claude Code
+- **Asked:** Arpit pasted `just golden-score` output for the five mined-expansion arms.
+- **Did:** Ran the frozen `evidence/decide.py`. This session did not build or capture the arms, and it read only the score files (ids, ranks, booleans). Wrote `decision.json` and `per-query.jsonl`, then filed `VERDICT.md`. Moved the inbox row from *score* to *ratify*, and updated W-168, INTERVIEW and NOW.
+- **Decided / open:** By the table, PASS at `0.5`: 6/0 tagged, p = 0.031, exactly the floor, zero drift at any weight. Not shipped. Following step 1's precedent, Arpit ratifies first. Two caveats are named for him: the arms ran at `anchor = 0.0` while the engine ships `1.0`, and 5 of the 6 wins are non-primary relevant documents.
+- **Next:** Arpit ratifies, or asks for a confirmation arm at `anchor = 1.0`.
+
 ## 2026-09-27 — W-168 step 4 built (mined expansion, off at 0.0); prior sessions' work committed  ·  Claude Code
 - **Asked:** *"implement w168"*; then chose *commit first, then build*.
 - **Did:**

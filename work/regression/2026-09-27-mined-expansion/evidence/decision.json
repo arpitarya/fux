@@ -1,0 +1,137 @@
+{
+ "arms": {
+  "mx-0.1": {
+   "clears_gain": false,
+   "drift_losses": [],
+   "gain": {
+    "alpha": 0.05,
+    "b": 2,
+    "c": 0,
+    "discordant": 2,
+    "net": 2,
+    "net_needed": null,
+    "outcome": "no detected change",
+    "p": 0.5
+   },
+   "gain_line": "b=2 c=0 discordant=2 net=2 p=0.5000 (no net difference can clear alpha at this count, alpha=0.05) -> NO DETECTED CHANGE",
+   "hit@10_total": {
+    "baseline": 70,
+    "treatment": 70
+   },
+   "hit@1_untagged": [
+    0,
+    0
+   ],
+   "holds_drift": true,
+   "primary@1_tagged": [
+    0,
+    0
+   ],
+   "primary@1_untagged": [
+    0,
+    0
+   ]
+  },
+  "mx-0.2": {
+   "clears_gain": false,
+   "drift_losses": [],
+   "gain": {
+    "alpha": 0.05,
+    "b": 4,
+    "c": 0,
+    "discordant": 4,
+    "net": 4,
+    "net_needed": null,
+    "outcome": "no detected change",
+    "p": 0.125
+   },
+   "gain_line": "b=4 c=0 discordant=4 net=4 p=0.1250 (no net difference can clear alpha at this count, alpha=0.05) -> NO DETECTED CHANGE",
+   "hit@10_total": {
+    "baseline": 70,
+    "treatment": 70
+   },
+   "hit@1_untagged": [
+    0,
+    0
+   ],
+   "holds_drift": true,
+   "primary@1_tagged": [
+    0,
+    0
+   ],
+   "primary@1_untagged": [
+    0,
+    0
+   ]
+  },
+  "mx-0.3": {
+   "clears_gain": false,
+   "drift_losses": [],
+   "gain": {
+    "alpha": 0.05,
+    "b": 5,
+    "c": 0,
+    "discordant": 5,
+    "net": 5,
+    "net_needed": null,
+    "outcome": "no detected change",
+    "p": 0.0625
+   },
+   "gain_line": "b=5 c=0 discordant=5 net=5 p=0.0625 (no net difference can clear alpha at this count, alpha=0.05) -> NO DETECTED CHANGE",
+   "hit@10_total": {
+    "baseline": 70,
+    "treatment": 70
+   },
+   "hit@1_untagged": [
+    0,
+    0
+   ],
+   "holds_drift": true,
+   "primary@1_tagged": [
+    0,
+    0
+   ],
+   "primary@1_untagged": [
+    0,
+    0
+   ]
+  },
+  "mx-0.5": {
+   "clears_gain": true,
+   "drift_losses": [],
+   "gain": {
+    "alpha": 0.05,
+    "b": 6,
+    "c": 0,
+    "discordant": 6,
+    "net": 6,
+    "net_needed": 6,
+    "outcome": "treatment",
+    "p": 0.03125
+   },
+   "gain_line": "b=6 c=0 discordant=6 net=6 p=0.0312 (net needed 6, alpha=0.05) -> TREATMENT",
+   "hit@10_total": {
+    "baseline": 70,
+    "treatment": 70
+   },
+   "hit@1_untagged": [
+    0,
+    0
+   ],
+   "holds_drift": true,
+   "primary@1_tagged": [
+    1,
+    0
+   ],
+   "primary@1_untagged": [
+    0,
+    0
+   ]
+  }
+ },
+ "headroom": {
+  "improvement_pool": 10,
+  "regression_exposed": 41
+ },
+ "outcome_by_the_table": "PASS \u2014 mx-0.5 (the first, ascending)"
+}

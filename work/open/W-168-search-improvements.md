@@ -7,6 +7,29 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## ✅ STEP 4 (ABBREVIATIONS) FILED PASS at `mined_weight = 0.5` — 2026-09-27 (Arpit, Cowork)
+
+*"yes"*, when asked whether to ratify step 4 at `0.5`. [Verdict](../regression/2026-09-27-mined-expansion/VERDICT.md).
+No confirmation arm at `anchor = 1.0`: the two ship together, and that
+combination is unmeasured.
+
+**Next, agent, in one change** (PRE-REGISTRATION §If it passes, as step 1 shipped):
+- **Default:** `mined_weight = 0.5` in `tune.py` and `tune.mjs`, and in the setup template's comment.
+- **Records:** SR-EXPAND 18 · SR-TUNE 19 · SR-INGEST · SR-INDEX-LIFECYCLE.
+- **Byte equality:** scan = accelerator = Node = bundle at `0.5`.
+- **CHANGELOG:** a `[ranking]` default change reaches every consumer that does not pin it in `tune.toml`.
+- **Reopen-trigger:** a baseline rank-1 hit lost to a mined spelling, in any later run.
+
+## 🔴 STEP 4 PASS BY THE TABLE at `mined_weight = 0.5` — 2026-09-27 (Claude Code, Opus); Arpit ratifies
+
+[Verdict](../regression/2026-09-27-mined-expansion/VERDICT.md). Arpit scored the arms, and a session that did not capture them ran the frozen `decide.py`.
+
+- `hit@1` on the 22 tagged questions, wins/losses: 2/0 · 4/0 · 5/0 · **6/0** at `0.1 · 0.2 · 0.3 · 0.5`. Only `0.5` reaches the floor of 6, with no margin.
+- **No drift loss at any weight**, tagged or not. `hit@10` stays at 70 → 70. Headroom is 10 / 41, as predicted.
+- ⚠ Five of the six wins are a relevant non-primary document reaching rank 1. `primary@1` moves only 1/0.
+- ⚠ The arms ran at the rung's `anchor = 0.0`, but the engine ships `1.0`. The combination is unmeasured.
+- 🔴 **Next:** Arpit ratifies, or asks for a confirmation arm at `anchor = 1.0`. On ratification, ship per the bar's §If it passes, in one change.
+
 ## 🔴 STEP 4 ARMS CAPTURED — 2026-09-27 (Claude Code, Opus); the score is Arpit's, the verdict another session's
 
 [Report](../regression/2026-09-27-mined-expansion/report.md).

@@ -10,6 +10,8 @@ pre_registration: work/regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md
 
 # Report: corpus-mined expansion (`set-3-u`, `rung-01000` copy)
 
+✅ **Scored and decided on 2026-09-27: PASS by the table at `0.5`**, awaiting Arpit's ratification. See [`VERDICT.md`](VERDICT.md). The text below is as it was at capture.
+
 🔴 **Captured, not scored, and not decided.** No answer key reached this session.
 Below, *changed* means **the ranking moved**, never that it *improved*.
 
