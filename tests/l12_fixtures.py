@@ -126,3 +126,33 @@ def configured_root() -> Path:
     root = Path(tempfile.mkdtemp(prefix="fux-l12-root-"))
     write_config(root)
     return root
+
+
+def shipped_output() -> dict:
+    """Every `.fux/output.toml` value as the template ships it, flat by key.
+
+    What the retired `output_config.BUILT_IN` held — derived from the one
+    template instead of a second copy (L12), with `json` meaning `[cli.json]
+    enabled` as it always did.
+    """
+    from fux import output_config
+
+    t = output_config.template()
+    out: dict = {"json": t.resolve_json("ask")}
+    for verb, keys in output_config.CLI_VERBS.items():
+        for key in keys:
+            out.setdefault(key, t.resolve(verb, key))
+    return out
+
+
+def cli_args(**given):
+    """An `argparse.Namespace` as `cli._apply_output_defaults` leaves it.
+
+    Every output key a verb resolves lands on `args` from the template unless
+    the test names it, so a hand-built `args` looks like a real invocation's
+    (L12: downstream code reads a plain value and never a fallback).
+    """
+    import argparse
+
+    shipped = {k: v for k, v in shipped_output().items() if k != "json"}
+    return argparse.Namespace(**{**shipped, **given})

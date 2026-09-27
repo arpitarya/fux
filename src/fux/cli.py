@@ -181,21 +181,21 @@ def _add_progress_flags(parser: argparse.ArgumentParser) -> None:
 
 
 def _top_help() -> str:
-    """`--top`'s help, with the default read from `output_config.BUILT_IN`.
+    """`--top`'s help, naming the value the template ships.
 
-    Decision 6: **one source for every default.** A literal `5` repeated in
-    `add_argument` is the drift this avoids — the help text and the resolver
-    cannot disagree if only one of them holds the number.
+    Decision 6: **one source for every value.** The number is read from the
+    packaged `output.toml` template — the file `fux setup` writes — so the help
+    text and the resolver cannot disagree (L12).
     """
-    from .output_config import BUILT_IN
+    from .output_config import template
 
-    return f"max results (default {BUILT_IN['top']}; .fux/output.toml can change it)"
+    return f"max results ({template().resolve('ask', 'top')} as shipped; .fux/output.toml sets it)"
 
 
 def _hops_help() -> str:
-    from .output_config import BUILT_IN
+    from .output_config import template
 
-    return f"max edges in a route (default {BUILT_IN['hops']}; .fux/output.toml can change it)"
+    return f"max edges in a route ({template().resolve('path', 'hops')} as shipped; .fux/output.toml sets it)"
 
 
 def _apply_output_defaults(args) -> None:
@@ -220,14 +220,16 @@ def _apply_output_defaults(args) -> None:
     *this verb is not shaped by this file*.
 
     **Never raises for a missing repo.** `--help`, `--version` and a run from
-    outside a fux repo must not be broken by a config file that may not
-    exist. Since 2026-08-28 (Arpit) the file, once in effect, is the sole
-    source of truth for every key it is asked for — a malformed file, or one
-    that simply never set a key this verb needs, both raise, with the fix
-    named in the message. `--no-output-config` (or no repo root) bypasses
-    the file entirely rather than reading it and finding it wanting.
+    outside a fux repo read the packaged template, as `--no-output-config`
+    does. In a repo the file is the sole source of truth for every key a verb
+    resolves (L12): a missing file, a malformed one, or one that never set a
+    key this verb needs all raise, with `fux doctor --fix` named as the fix.
+
+    **Every key the verb declares is resolved, flag or not.** A key with no
+    flag (`max_headings`, `progress_threshold`, `candidates`, ...) still lands
+    on `args`, so downstream code reads one plain value and never a default.
     """
-    from .output_config import CLI_VERBS, load as load_output, DEFAULT_OUTPUT
+    from .output_config import CLI_VERBS, load as load_output
 
     verb = getattr(args, "command", None)
     keys = CLI_VERBS.get(verb)
@@ -238,7 +240,19 @@ def _apply_output_defaults(args) -> None:
 
     no_output_config = getattr(args, "no_output_config", False)
     root = None if no_output_config else find_root()
-    cfg = DEFAULT_OUTPUT if root is None else load_output(root, enabled=True)
+    try:
+        cfg = load_output(root, enabled=not no_output_config)
+    except FuxError:
+        if verb != "doctor":
+            raise
+        # 🔴 **`doctor` is the one verb that may not refuse to start because
+        # this file is missing or broken** (SR-OUTPUT decision 20's surviving
+        # half): it is the verb that REPORTS that fault, as an error row, and
+        # `doctor --fix` is the one that writes the file back. It renders from
+        # the template meanwhile — every other verb still refuses.
+        from .output_config import template
+
+        cfg = template()
 
     if hasattr(args, "json"):
         # ⚠ **A rendering default may never change WHAT a command does**, and
@@ -256,9 +270,7 @@ def _apply_output_defaults(args) -> None:
     as_json = bool(getattr(args, "json", False))
 
     for key in keys:
-        if not hasattr(args, key):
-            continue
-        setattr(args, key, cfg.resolve(verb, key, getattr(args, key), as_json=as_json))
+        setattr(args, key, cfg.resolve(verb, key, getattr(args, key, None), as_json=as_json))
 
 
 def _add_tune_flag(parser: argparse.ArgumentParser) -> None:
@@ -272,7 +284,7 @@ def _add_tune_flag(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--no-tune",
         action="store_true",
-        help="ignore .fux/tune.toml and use the engine defaults",
+        help="ignore .fux/tune.toml and use the template `fux setup` writes",
     )
 
 
@@ -299,7 +311,7 @@ def _add_output_flags(parser: argparse.ArgumentParser, *, band: bool = False) ->
     parser.add_argument(
         "--no-output-config",
         action="store_true",
-        help="ignore .fux/output.toml and use the engine defaults",
+        help="ignore .fux/output.toml and use the template `fux setup` writes",
     )
     if band:
         parser.add_argument(
@@ -501,6 +513,9 @@ def build_parser() -> argparse.ArgumentParser:
         "build", help="rebuild the derived accelerator from the committed index"
     )
     _add_progress_flags(p_build)
+    # L12: `[cli] progress_threshold` is read from .fux/output.toml, so this
+    # verb can bisect the file like every other verb that reads it (decision 15).
+    _add_output_flags(p_build)
     p_build.set_defaults(func=_cmd_build)
 
     # The source group. Flat verbs over all three lists, dispatching on the
@@ -552,6 +567,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="URLs: record the line and ingest offline, without fetching this URL",
     )
     _add_progress_flags(p_add)
+    _add_output_flags(p_add)
     p_add.set_defaults(func=_cmd_add)
 
     p_remove = sub.add_parser(
@@ -562,6 +578,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_remove.add_argument("--dry-run", action="store_true", help="say which branch it would take; write nothing")
     p_remove.add_argument("--no-ingest", action="store_true", help="edit the line only; do not re-ingest")
     _add_progress_flags(p_remove)
+    _add_output_flags(p_remove)
     p_remove.set_defaults(func=_cmd_remove)
 
 
@@ -850,7 +867,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_mcp.add_argument(
         "--no-output-config",
         action="store_true",
-        help="ignore .fux/output.toml and use the engine defaults",
+        help="ignore .fux/output.toml and use the template `fux setup` writes",
     )
     p_mcp.set_defaults(func=_cmd_mcp)
 
@@ -862,11 +879,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_serve.add_argument(
         "--port", type=int, default=None, metavar="N",
-        help="port on 127.0.0.1 (default 7337; 0 asks the OS for a free one)",
+        help="port on 127.0.0.1 (.fux/output.toml [cli.serve] port; 0 asks the OS for a free one)",
     )
     p_serve.add_argument(
         "--open", action="store_true", help="open the page in a browser once the server is up"
     )
+    _add_output_flags(p_serve)
     p_serve.set_defaults(func=_cmd_serve)
 
     p_hooks = sub.add_parser("hooks", help="install the git hooks and the index merge driver")
@@ -1081,7 +1099,11 @@ def main(argv: list[str] | None = None) -> int:
         # sequence, not two bars fighting over the same terminal line.
         from .progress import Progress
 
-        args.progress = Progress(no_progress=args.no_progress, force=args.force_progress)
+        args.progress = Progress(
+            no_progress=args.no_progress,
+            force=args.force_progress,
+            threshold=args.progress_threshold,
+        )
     # W-170 — the observer hook's dispatch point, and there is exactly one.
     #
     # 🔴 **After the verb has fully rendered and its exit code is fixed**, which

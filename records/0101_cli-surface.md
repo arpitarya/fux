@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@8811375939b5, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@925dccc045ce, tests_e2e@6d1f242e7f5a, node/fux.mjs@b3c33c3898dc]
+owns: [src/fux/cli.py@08847333f709, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@10364bd02e0a, tests_e2e@026417c3ce58, node/fux.mjs@b3c33c3898dc]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: c3fb4f8803a8e19f773c623582c6324991bce1136f16f0fcfc68e287329c95ea
+content_sha: 617b8c21857ba9f59e64dc1ca41267359171ac49fa8e1259c0eb39514c4222f3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -545,6 +545,14 @@ missing config file and key from its packaged template, reports each on stderr a
 `fixed: <file>: [table] key`, and then runs the checks — so `--json` stays a pure
 report. It is one of exactly two writers of a missing key; `fux setup` is the
 other, and nothing else ever writes one.
+
+**`.fux/output.toml` is required ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3a, 2026-09-27).** Every
+verb's rendering defaults — `top`, `max_headings`, `hops`, `band`, `explain`,
+`sections`, `no_refer`, `journal`, `journal_max`, `port`, `progress_threshold`,
+`json` — resolve from the file ([SR-OUTPUT](0143_output-defaults.md) decisions 19–20); no argparse `default=`
+carries one. `--no-output-config` (now on `build`, `add`, `remove` and `serve`
+too) reads the packaged template. `doctor` alone starts without the file, from
+the template, so it can name the fix.
 
 <!-- L12-NOTE-END -->
 

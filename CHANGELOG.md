@@ -38,6 +38,16 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   `[enrich] self_retrieval_k`. ⚠ Two paths now read your `[bm25f]` where they
   used the built-in weights — the refer plane's passage re-score and `fux enrich
   --check`'s filter. On a repo that kept the shipped weights, nothing moves.
+- ⚠ **`.fux/output.toml` is now required too (law L12, W-225) — `fux doctor
+  --fix` writes it.** Every rendering default a verb reads comes from the file,
+  and a missing file or key stops the verb naming it. `fux doctor` alone still
+  starts without it, and reports it as an error row. `--no-output-config` (now
+  also on `build`, `add`, `remove` and `serve`) and a run outside a repo read
+  the packaged template. New keys, at the old built-in values: `[cli]
+  max_headings = 3`, `progress_threshold = 200`; `[cli.answer] journal_max =
+  1000`; `[cli.serve] port = 7337`; `[mcp] max_headings = 3`. Library callers:
+  `fux.open(...).graph()` now requires `hops`, and `find`/`ask`/`path` read their
+  `top`/`hops` from the file when not given.
 - **The engine's fixed values live in one file, `src/fux/constants.toml`
   (W-225).** Schema ids, artefact names, decoder versions and extensions: read by
   both the Python and the Node reader. Nothing a consumer sees changes.

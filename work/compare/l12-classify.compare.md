@@ -123,6 +123,8 @@ scan could not see. **Say so and any of them flips back.**
 | `query/rerank.*` `WEIGHT` (R4) | two keys, two names | **one key**, `[ranking] rerank_weight` | on inspection `WEIGHT = 1.0` was only an unused parameter default: every production call passed `tune.rerank_weight`. There is no second knob in behaviour; `1.0` is now the template comment's *"when you turn it on"* value, as R4 did for the fetch-cache TTL |
 | rerank proximity mix `0.55 / 0.30 / 0.15` | not in the table (inline literals) | `tunable` → `tune.toml [ranking] rerank_base / rerank_span / rerank_adjacency` | weights a person could choose differently |
 | `fux path` route limit `10` | not in the table (a parameter default) | `tunable` → `tune.toml [graph] path_limit` | a list length, beside `expand_limit` |
+| `query/__init__.*` `ANSWER_TOP = 3` (answer's candidate count) | `presentation` → `output.toml` | `fixed` → `constants.toml [answer] candidates` | it decides which documents the refer plane fetches and re-scores, so it changes what is COMPUTED — SR-OUTPUT decision 2's boundary keeps it out of `output.toml`, and nothing in the product asks to tune it |
+| API `graph(query, hops=2)` | `tunable` → `output.toml [cli.path] hops` | **required argument**, no default | `graph()` is a library call whose shape has no `[cli.graph]` table to read; `path()` does read `[cli.path] hops` (R4). A caller now names the depth |
 
 **Two behaviours that are identical at the shipped values and differ only for a
 repo that tuned away from them**, stated because no test on an untuned corpus

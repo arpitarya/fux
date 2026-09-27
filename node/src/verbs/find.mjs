@@ -190,7 +190,9 @@ export function runFind(root, args) {
 
   if (args.json) {
     const payload = {
-      results: results.map((r) => ({ ...r, headings: headingsFor(recordFor(root, r.id), query) })),
+      results: results.map((r) => ({
+        ...r, headings: headingsFor(recordFor(root, r.id), query, args.maxHeadings),
+      })),
     };
     if (fused) payload.fused = true;
     // SR-CONFIDENCE decision 11: present ONLY under --band. **Absent means

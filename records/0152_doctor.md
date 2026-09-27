@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@8c6bcf9dc871, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@cd62e4e78f25, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 1ad48727bee912991b826b81a2da781f583e9b3a1147cde5997bc1ded13bd06a
+content_sha: 050524b02ece61c435e20727bae998f5d5eb5e839864985398d507ec74132135
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -415,6 +415,17 @@ non-zero in CI over a consumer's own file.
 ⚠ **A repo that has never answered a query reports *not yet observed*, and that
 is not a finding.** The liveness file describes the last run; treating its
 absence as a failure would make every fresh clone look broken.
+
+<!-- L12-NOTE-START -->
+
+**[L12](0013_LAW-12-values-live-in-config.md) (W-225 stage 3a, 2026-09-27).** The frozen-keys check now walks every
+file `fux doctor --fix` writes — `.fux/tune.toml` and `.fux/output.toml` — and
+reports each missing key as an error row naming `--fix`. `output.toml present`
+is an error row, not a warning: every other verb refuses without the file, and
+this row is where that refusal is explained. `doctor` itself runs without the
+file, from the template ([SR-OUTPUT](0143_output-defaults.md) decision 20).
+
+<!-- L12-NOTE-END -->
 
 <!-- L12-VALUES-START -->
 

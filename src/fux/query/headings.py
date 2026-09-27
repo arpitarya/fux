@@ -57,16 +57,16 @@ from __future__ import annotations
 
 from .tokenize import tokenize
 
-#: How many matched headings a single result may show. Three, because the
-#: point is to aim a reader at a section, not to reproduce the outline —
-#: `ingest/extract.py` commits up to `.fux/tune.toml [index] max_phrases`
-#: (default 32).
-MAX_HEADINGS = 3
+#: How many matched headings a single result may show is `.fux/output.toml`'s
+#: `max_headings` (`[cli]` for ask/find, `[mcp]` for the MCP surface) — three
+#: as shipped, because the point is to aim a reader at a section, not to
+#: reproduce the outline; `ingest/extract.py` commits up to `.fux/tune.toml
+#: [index] max_phrases` of them.
 
-__all__ = ["MAX_HEADINGS", "headings_for"]
+__all__ = ["headings_for"]
 
 
-def headings_for(record: dict | None, query: str, *, limit: int = MAX_HEADINGS) -> list[str]:
+def headings_for(record: dict | None, query: str, *, limit: int) -> list[str]:
     """The record's headings that match `query`, best first, at most `limit`.
 
     Empty for a missing record, a record with no `phrases` (a document with

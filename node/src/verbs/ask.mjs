@@ -91,7 +91,7 @@ export function runAsk(root, args, { compose = true } = {}) {
   const showSections = args.sections !== false;
   const rows = results.map((r) => {
     const out = { ...r };
-    if (showSections) out.headings = headingsFor(recordFor(root, r.id), query);
+    if (showSections) out.headings = headingsFor(recordFor(root, r.id), query, args.maxHeadings);
     return out;
   });
 

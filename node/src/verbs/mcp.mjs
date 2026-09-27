@@ -107,7 +107,7 @@ function splitLines(text) {
  *  advertises `path`, so every conformant client got an empty answer from a
  *  server that reported success — shipped to npm and caught by comparing the
  *  handlers with `src/fux/mcp.py` rather than by a client complaining. */
-function fuxSearch(root, args, top) {
+function fuxSearch(root, args, top, maxHeadings) {
   const query = args.query ?? "";
   // `[mcp] top` is this surface's default, because a tool call has no flags.
   // An explicit `k` still wins, exactly as a CLI flag does. ⚠ There is no
@@ -143,7 +143,7 @@ function fuxSearch(root, args, top) {
       // W-84 — free here: the record is already in hand for `sha`. Always
       // present, `[]` when nothing matches, because an absent key would be
       // indistinguishable from an older server.
-      headings: headingsFor(record, query),
+      headings: headingsFor(record, query, maxHeadings),
     };
   });
   return {
@@ -248,7 +248,7 @@ function fuxRelated(root, args) {
   };
 }
 
-export function handle(root, message, top) {
+export function handle(root, message, top, maxHeadings) {
   const method = message.method;
   const id = message.id;
   // A notification has no id and MUST NOT be answered.
@@ -265,7 +265,7 @@ export function handle(root, message, top) {
   if (method === "tools/call") {
     const params = message.params || {};
     const handlers = {
-      fux_search: (r, a) => fuxSearch(r, a, top),
+      fux_search: (r, a) => fuxSearch(r, a, top, maxHeadings),
       fux_passage: fuxPassage,
       fux_related: fuxRelated,
     };
@@ -296,13 +296,14 @@ export function runMcp(root, args) {
   // process whose entire premise is staying resident.
   const cfg = args.outputConfig ?? loadOutput(root, { enabled: args.noOutputConfig !== true });
   const top = Number(cfg.resolveMcp("top", args.top ?? null));
+  const maxHeadings = Number(cfg.resolveMcp("max_headings"));
   const rl = createInterface({ input: process.stdin, terminal: false });
   rl.on("line", (line) => {
     if (!line.trim()) return;
     let message;
     try { message = JSON.parse(line); }
     catch { process.stdout.write(JSON.stringify(err(null, -32700, "parse error")) + "\n"); return; }
-    const response = handle(root, message, top);
+    const response = handle(root, message, top, maxHeadings);
     if (response !== null) process.stdout.write(JSON.stringify(response) + "\n");
   });
   return 0;

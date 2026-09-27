@@ -10,10 +10,10 @@ amended: 2026-08-28
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@9b9323869956, .fux/output.toml@3a5b84942f70, node/src/config/output.mjs@b7f85782dc29]
+owns: [src/fux/output_config.py@988bd2d3cdfb, src/fux/templates/output.toml.txt@7251f3203770, .fux/output.toml@7251f3203770, node/src/config/output.mjs@23ce57d18a76]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 76f386bd33dc65d4eec7401328de5021f52eee3471c6cc56cf0a0d8c3b4fea53
+content_sha: d016aa5123237b4b3b8b2bd8c5b020300055bad3c36c380173f8daf4de503aba
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -23,6 +23,7 @@ content_sha: 76f386bd33dc65d4eec7401328de5021f52eee3471c6cc56cf0a0d8c3b4fea53
 - [`.fux/output.toml`](../.fux/output.toml) · file
 - [`node/src/config/output.mjs`](../node/src/config/output.mjs) · file
 - [`src/fux/output_config.py`](../src/fux/output_config.py) · file
+- [`src/fux/templates/output.toml.txt`](../src/fux/templates/output.toml.txt) · file
 
 **Describes** — reaches into, does not own:
 
@@ -44,10 +45,11 @@ wants a different shape retypes the same flags on every invocation — **and an
 MCP client cannot retype anything, because a tool call has no flags.**
 
 This record adds **`.fux/output.toml`**: committed, and read only at the
-moment a result is printed. ⚠ **Not "optional" since 2026-08-28** — the file
-may be bypassed (`--no-output-config`, or no repo root), but once it is in
-effect it is the *sole* source of every key a verb resolves, and a key it
-does not set is a hard error, not a silent fallback. See decision 19.
+moment a result is printed. **Required, key by key** ([L12](0013_LAW-12-values-live-in-config.md)):
+it is the *sole* source of every key a verb resolves; an absent file or a key
+it does not set is a hard error naming `fux doctor --fix`. `--no-output-config`
+and a run outside any repo read the packaged template instead. See decisions 19
+and 20.
 
 **Why a third file and not a table in `.fux/tune.toml`.** Because the boundary
 is different, and the difference is mechanical rather than aesthetic:
@@ -74,15 +76,15 @@ so on the line itself.
 ⚠ **This diagram showed a `[defaults]` / `[verb]` file until 2026-09-12** and
 that layout has not existed since the three-root rewrite (W-140 row 12). The
 real roots are `[cli]`, `[cli.json]` and `[mcp]`, with per-verb subtables under
-the first two — and the `BUILT_IN` rung is reached **only when the file is
-absent altogether** (decisions 19 and 20), not key by key.
+the first two. **There is no built-in rung** ([L12](0013_LAW-12-values-live-in-config.md)):
+the file read is the repo's `.fux/output.toml`, or — under `--no-output-config`
+or with no repo at all — the packaged template `fux setup` writes.
 
 ```mermaid
 flowchart LR
     F["CLI flag<br/>(passed?)"] -->|yes| OUT[value used]
-    F -->|no| A["file absent?"]
-    A -->|yes| B["BUILT_IN"] --> OUT
-    A -->|no| JV["[cli.json.verb]"]
+    F -->|no| A["which file?<br/>repo's, or the template"]
+    A --> JV["[cli.json.verb]"]
     JV -->|set| OUT
     JV -->|unset| J["[cli.json]"]
     J -->|set| OUT
@@ -90,7 +92,7 @@ flowchart LR
     CV -->|set| OUT
     CV -->|unset| C["[cli]"]
     C -->|set| OUT
-    C -->|unset| E["FuxError<br/>the verb refuses to guess"]
+    C -->|unset| E["FuxError<br/>key is missing — doctor --fix"]
     M["MCP tool arg"] -->|no| MT["[mcp]"] --> OUT
 ```
 
@@ -101,9 +103,8 @@ flowchart LR
         |
         no
         v
-  .fux/output.toml ABSENT? --yes--> BUILT_IN ---> value used   (decision 20)
-        |
-        no   (a PRESENT file RULES -- decision 19)
+  which file? the repo's .fux/output.toml -- or, under --no-output-config or
+        |      with no repo, the packaged template (L12). ABSENT = FuxError.
         v
   [cli.json.<verb>] set? --yes--> value used     (--json renderings only)
         |  no
@@ -117,7 +118,7 @@ flowchart LR
   [cli]             set? --yes--> value used
         |  no
         v
-      FuxError -- the verb refuses to guess, rather than reaching BUILT_IN
+      FuxError -- the key is missing; `fux doctor --fix` writes it
 
   MCP is a separate root and inherits NOTHING from [cli]:
       tool argument --> [mcp] --> value used
@@ -169,8 +170,9 @@ null
 
 ### Decision
 
-1. **`.fux/output.toml` exists.** Committed, optional, written once by
-   `fux setup` and **never rewritten by fux** — the `tune.toml` precedent
+1. **`.fux/output.toml` exists.** Committed, required (L12), written by
+   `fux setup`, and **never rewritten by fux** except that `fux doctor --fix`
+   appends a missing key from the template — the `tune.toml` precedent
    (SR-TUNE decision 3b), for the same reason: `tomllib` reads and the stdlib
    does not write TOML, and a file fux promised was yours must stay yours.
 
@@ -233,9 +235,12 @@ null
    misspelling is the worst available behaviour. Errors are **collected**, up
    to ten, rather than reported one per run.
 
-6. **`BUILT_IN` is the single source of every default**, and the CLI reads it
-   rather than repeating the number in `add_argument`. Two copies of `5` drift;
-   one does not.
+6. **The template is the single home of every shipped value** —
+   [`src/fux/templates/output.toml.txt`](../src/fux/templates/output.toml.txt),
+   which `fux setup` writes, `fux output` prints, `--no-output-config` reads and
+   `fux doctor --fix` restores a missing key from ([L12](0013_LAW-12-values-live-in-config.md)).
+   The CLI's help text reads it rather than repeating the number in
+   `add_argument`. There is no built-in dict in either runtime.
 
 7. **Six keys are refused BY NAME, with the reason**, rather than reported as
    unknown — each is something a reader will plausibly try:
@@ -295,16 +300,14 @@ null
     2026-08-27** — the same ruling the types list got the same day, for
     the same reason: *a file of nothing but comments is a menu, and a consumer
     should be able to read what fux will do without reading fux's source.*
-    Every value equals its entry in `BUILT_IN`, asserted key by key against
-    every verb, so a fresh repo behaves identically with the file or without
-    it.
+    The specimen IS the template, verbatim, so `--no-output-config` and a fresh
+    `fux setup` resolve every key alike.
 
-    **The cost, stated rather than hidden: the defaults FREEZE at setup.**
-    `fux setup` is write-if-missing, so a later change to `BUILT_IN` reaches a
-    repo that has never run setup and does not reach one that has. Same trade
-    the types list (`.fux/formats.toml`) and `fux.toml`'s `max_parallel` already make; the
-    remedy is the one SR-DOTFUX decision 6 names — **a loader refusal or a
-    `fux doctor` check, never a rewrite.**
+    **The values FREEZE at setup, and under L12 that is the design.** A later
+    change to a shipped value reaches a repo only when its owner edits the key;
+    a NEW key reaches it as a hard error naming the key, and `fux doctor --fix`
+    writes exactly that key from the template — never a rewrite of anything the
+    consumer wrote (SR-DOTFUX decision 6).
 
     `[priority]` in `.fux/tune.toml` is the one table that stays commented,
     and it is not an inconsistency: its keys are the consumer's own source
@@ -354,28 +357,19 @@ null
     different code with different inheritance rules and a shared dict implied
     a symmetry that decision 3 explicitly refuses (`[mcp]` inherits nothing).
 
-    **Second: an unset key is now a hard error, not a silent `BUILT_IN`
-    fallback.** Every earlier draft of this record let a key the file did not
-    set fall through quietly — *"the file is optional, absent means every
-    default"*. That is gone. If `.fux/output.toml` is in effect (no
-    `--no-output-config`, and a repo root exists) and a verb resolves a key
-    the file does not set, `resolve()` / `resolve_json()` / `resolve_mcp()`
-    raise `FuxError` naming the key and where to add it
-    (`[cli.<verb>] top = 5`, or `[cli.json]`, or `[mcp]`), rather than
-    returning a number nobody chose and nobody can see in a diff. `load()`
-    itself now raises the same way when the file is missing entirely, naming
-    `fux setup` / `fux output > .fux/output.toml` as the fix.
+    **Second: an unset key is a hard error, never a silent fallback.** When
+    a verb resolves a key the file does not set, `resolve()` / `resolve_json()`
+    / `resolve_mcp()` raise `FuxError` — `<file>:`, then `[table] key is
+    missing`, then the `fux doctor --fix` remedy, in the same words as
+    `.fux/tune.toml` and in both runtimes — rather than returning a number
+    nobody chose and nobody can see in a diff. `load()` raises the same way
+    when the file is missing entirely (decision 20).
 
-    **`BUILT_IN` is not gone — its job narrowed to three things**: the values
-    `fux setup` / `fux output` write into a fresh, LIVE (uncommented)
-    specimen (decision 14's shape, now load-bearing rather than cosmetic —
-    an all-commented specimen would break every verb on the first run after
-    `fux setup`, since a freshly-written file that sets nothing is
-    indistinguishable from one that predates every key); what
-    `--no-output-config` resolves to; and what a run outside any fux repo
-    resolves to, so `--help` / `--version` are never broken by a file that
-    cannot exist yet. `DEFAULT_OUTPUT` (`bypass=True`) is the one
-    `OutputDefaults` that never raises, by construction.
+    **What `--no-output-config` and a run outside any repo read is the
+    packaged template** (L12 decision 7): the values `fux setup` writes, so
+    `--help` / `--version` are never broken by a file that cannot exist yet,
+    and the escape hatch has something to resolve to that is not a value in
+    code.
 
     ⚠ **The bootstrap edge case this closes a gap on, found while building
     it: `--no-output-config` was only wired to `ask` / `find` / `answer` /
@@ -398,50 +392,17 @@ null
     that has run `fux setup` (or copied a current `fux output`) never sees
     this at all — every key is live from the day the file is written.
 
-20. ⚠ **A MISSING FILE FALLS BACK; A PRESENT ONE STILL RULES. Ruled by Arpit,
-    in Cowork, 2026-08-28.** Decision 19 made `load()` raise when
-    `.fux/output.toml` did not exist at all. **That broke every repo that
-    predates the file.** The file is write-if-missing
-    ([SR-DOTFUX](0102_fux-directory.md) decision 6), so `fux setup` writes it
-    into NEW repos only and never rewrites an existing one — which meant
-    `fux ask`, `fux find` and `fux doctor` all exited 1, after an upgrade, in
-    every repo that had ever run an older `fux setup`. 49 tests went red on
-    `main`, and `doctor` — the verb you would run to find out why — was among
-    the broken.
-
-    **The ruling: `load()` returns `ABSENT_OUTPUT` when the file does not
-    exist.** Every key resolves to `BUILT_IN`, exactly as under
-    `--no-output-config`. **Decision 19 is otherwise untouched**: a file that
-    EXISTS and omits a key a verb resolves is still a hard `FuxError`, which
-    is the case decision 19 was actually written about.
-
-    **Why this and not a `fux setup` migration.** The alternative was to keep
-    the refusal and give `setup` a path that reaches existing repos.
-    SR-DOTFUX decision 6 forbids exactly that — *"a rewrite would eat a
-    consumer's annotations"* — and names the two mechanisms that ARE allowed:
-    **a loader refusal, or a `doctor` check, never a rewrite.** Decision 19
-    chose the refusal, and the refusal is what broke them. So the remedy is
-    the other one on decision 6's own list: **`fux doctor` gains an
-    `output.toml present` row** (`_output_config_health`), a WARNING naming
-    `fux output > .fux/output.toml`, modelled line-for-line on
-    `types list usable`, which decision 6 already cites as the worked instance
-    of this same situation.
-
-    **Decision 19's own wording is what survives, not what is overturned.** It
-    says the file is the sole source of every key *"once it is in effect"*.
-    **A file that does not exist is not in effect.** Reading it as *"…and it
-    is always in effect"* is what produced the regression; reading it as
-    written produces this decision. The one-line change is the honest one.
-
-    ⚠ **`bypass` and `absent` are separate fields, deliberately.** Both
-    resolve identically — that is the point — but *"the consumer asked to
-    bypass this file"* and *"there is no file to bypass"* are different facts
-    about a repo, and only the second is something `doctor` should mention.
-    Collapsing them would make the doctor row impossible to write without
-    re-statting the file. `DEFAULT_OUTPUT` keeps `absent=False`;
-    `ABSENT_OUTPUT` is the new sentinel. **Nothing in the resolve chain
-    branches on `absent`** — if anything ever does, the two facts have stopped
-    being the same resolution and this note is wrong.
+20. **A MISSING FILE IS AN ERROR, AND `doctor` STILL RUNS**
+    ([L12](0013_LAW-12-values-live-in-config.md) decision 3; release 3.0,
+    breaking, R9). There is no built-in behind the file, so `load()` raises when
+    `.fux/output.toml` does not exist, naming the file and `fux doctor --fix`.
+    **The lesson that shaped this decision's earlier form still binds: the verb
+    that names the fix must be able to start.** `cli._apply_output_defaults`
+    lets `doctor` alone render from the template when the repo's file cannot be
+    loaded; its `output.toml present` row reports the fault as an ERROR, and
+    `fux doctor --fix` writes the file (and any missing key) from the template.
+    Every other verb refuses. A repo upgraded to 3.0 runs `fux doctor --fix`
+    once — the CHANGELOG's migration line.
 
 20a. ⚠ **Decision 20's lesson was applied by a DIFFERENT record on
     2026-09-11, and the evidence it was learned is an exemption list.**
@@ -459,19 +420,9 @@ null
     with `doctor` among the casualties), and a later record reaching the
     opposite conclusion about the same mechanism would read as a contradiction
     unless the reconciliation is stated where the reversal lives.
-    **The two are not in conflict: decision 20 reversed a refusal that took
-    `doctor` out, not every refusal for an absent file.** The gate is the
-    availability of the verb that names the fix.
-
-    ⚠ **What is NOT reconciled, and is Arpit's:** decision 17 still breaks
-    every repo that predates `.fux/pii.toml`, exactly as decision 19 did —
-    `fux ask` and `fux find` exit 1 after an upgrade until `fux setup` runs.
-    [SR-DOTFUX](0102_fux-directory.md) decision 6's distinction says a loader
-    refusal is for a file that **exists and is wrong**, and a `doctor` check is
-    for one that is **simply absent**. This is absence. **It is recorded here
-    as a live tension rather than adjudicated**, because the answer turns on
-    whether redaction is a thing a repo may silently not have — which is a
-    ruling, not a reading.
+    **The two agree: an absent file is refused, and `doctor` — the verb that
+    names the fix — is exempt from the refusal.** Since L12 that is this
+    file's rule too (decision 20).
 
 21. **`ask` gained `sections`, and it reaches BOTH renderings. Ruled by
     Arpit, in Cowork, 2026-08-28.** W-84 put the matched headings under each
@@ -588,7 +539,7 @@ still names the winning passage's document.
 
 **Additive keys only** — nothing removed, nothing repurposed — which is the
 rule [SR-ASK](0103_ask.md) decision 11 states for this schema.
-`query/output.schema.json`'s `answer_payload` example and doc were updated in
+`schemas/output.schema.json`'s `answer_payload` example and doc were updated in
 the same change, because a declaration that describes a shape the code no
 longer emits is worse than no declaration.
 
@@ -657,8 +608,9 @@ keys`.
       more reviewable than a typed flag: it is in git and it goes through code
       review. [SR-PROVENANCE](0142_provenance.md) decision 10 carries the ruling
       and the reasoning; this record states only what it means for **this file**.
-    - **It is off by default** (`BUILT_IN["journal"] = False`, and the generated
-      specimen says `false`), so nothing records by accident. **The fork
+    - **It ships off** (the template says `journal = false`), so nothing
+      records by accident. How many receipts the journal keeps is
+      `[cli.answer] journal_max` (1000 as shipped). **The fork
       SR-PROVENANCE decision 10 reserved was *always-on by default*, and that is
       still refused** — an opt-in somebody committed is not a default fux picked.
     - 🔴 **This key is therefore a DECLARED EXCEPTION to decision 2's boundary
@@ -709,8 +661,9 @@ and it is resolved **once at start-up** rather than per search, in a warm
 process whose premise is staying resident.
 
 ⚠ **A key set here is now transcribed as well as authored.**
-`tests/test_node_config_parity.py` holds `CLI_VERBS`, `MCP_KEYS` and
-`BUILT_IN` equal across the two runtimes. The differential arm cannot: a
+`tests/test_node_config_parity.py` resolves every key of every verb, and
+`[mcp]`, in both runtimes — from the template and from this repo's own file —
+and holds the two results equal. The differential arm cannot: a
 drifted **refusal** produces an error on one side and an answer on the other,
 which a harness reports as a crash rather than as a finding.
 
@@ -834,7 +787,7 @@ this moved where they are written, not what they are.
 - `node/src/config/output.mjs` — `OUTPUT_NAME` ← `[files] output`
 - `src/fux/mcp.py` — `exposed` ← `[mcp] protocol_version`
 - `src/fux/output_config.py` — `OUTPUT_NAME` ← `[files] output`
-- `src/fux/query/__init__.py` — `OUTPUT_SCHEMA` ← `[schema_files] output`
+- `src/fux/query/__init__.py` — `OUTPUT_SCHEMA` ← `[schema_files] output`, `ANSWER_TOP` ← `[answer] candidates`
 
 <!-- L12-VALUES-END -->
 
@@ -972,7 +925,7 @@ catchable by the tests that existed when they were written.**
   treating this as landed** — this note names what verified it and what did
   not.
 - [SR-TUNE](0135_tuning.md) — the precedent this follows in structure
-  (committed, optional, closed key set, no writer, an `enabled=False` escape
+  (committed, required key by key, closed key set, append-only writer, an `enabled=False` escape
   hatch) and departs from in **boundary**.
 - [SR-CONFIDENCE](0141_confidence.md) decision 11 — the accepted cost this
   record turns from a documentation problem into a default.
@@ -1006,8 +959,8 @@ choice rather than the console's. Nothing about the guard itself changed;
    `default=False`.** The file then silently never takes effect for that key —
    the failure decision 10 exists to prevent, and no test outside `cli.py`
    can see it.
-5. **`BUILT_IN` and a `cli.py` `default=` disagree.** Decision 6's single
-   source has been forked.
+5. **A value appears in `output_config.py`, `output.mjs` or a `cli.py`
+   `default=`.** Decision 6's single home — the template — has been forked (L12).
 6. **A verb resolves a key `.fux/output.toml` does not set and gets a value
    back instead of `FuxError`, while the file is in effect** (no
    `--no-output-config`, a repo root exists). Decision 19 is then false and
@@ -1017,19 +970,15 @@ choice rather than the console's. Nothing about the guard itself changed;
    bisected from the file that might be why it fails, and if the file is
    incomplete it cannot be RUN at all — decision 19's bootstrap gap,
    reopened.
-8. **`load()` raises, or returns anything but a bypassing `OutputDefaults`,
-   for a repo with no `.fux/output.toml`.** Decision 20 is then false and
-   every pre-existing repo is exit-1 again on `ask`, `find` and `doctor` —
-   the regression that put 49 tests red on `main`, 2026-08-28.
-9. **`fux doctor` loses the `output.toml present` row, or it becomes an
-   error rather than a warning.** Losing it strands the pre-existing repo
-   with no way to learn the file exists — decision 20 traded the refusal for
-   this check, and without the check the trade is a silent downgrade.
-   Promoting it to an error re-breaks `doctor` by another route.
-10. **Anything in the resolve chain branches on `absent`.** The two sentinels
-    resolve identically by construction (decision 20); a branch means they no
-    longer do, and `--no-output-config` and "no file" have quietly become
-    different behaviours.
+8. **`load()` returns a value for a repo with no `.fux/output.toml`**, or
+   **`fux doctor` cannot start in one.** The first is the silent fallback L12
+   removes; the second strands the repo with no verb to name — or write — the
+   fix (decision 20).
+9. **`fux doctor` loses the `output.toml present` row, or it stops being an
+   error.** Every other verb refuses without the file, so the row is the one
+   place the refusal is explained.
+10. **`--no-output-config` or a run outside a repo resolves anything other
+    than the packaged template.** A value from anywhere else is a second home.
 11. **`ask --no-sections` leaves `headings` in the `--json` payload, or `[]`
     stops meaning "nothing matched".** The first makes decision 21 half-built
     — the ruling was both renderings; the second is the actual W-48 trap,

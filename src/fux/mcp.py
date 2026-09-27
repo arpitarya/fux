@@ -36,8 +36,7 @@ def _k_property(top: int) -> dict:
     """`k`'s advertised default — the RESOLVED `[mcp] top`, not a literal.
 
     ⚠ **This was a hand-written `5` and `[mcp] top` made it a lie**, and then
-    (until 2026-08-28) `output_config.BUILT_IN['top']` made it a DIFFERENT
-    lie: a repo whose `.fux/output.toml` set `[mcp] top = 20` still advertised
+    (until 2026-08-28) a built-in default made it a DIFFERENT lie: a repo whose `.fux/output.toml` set `[mcp] top = 20` still advertised
     5 in its own tool schema, which is W-83's class of defect exactly — an
     accepted decision (11: "the resolved top") whose code implemented a
     different one. `_tools(top)` closes the gap: it is called once, in
@@ -61,8 +60,8 @@ def _tools(top: int) -> list[dict]:
     Called once per `serve()` (decision 17: `[mcp]` is read ONCE, at
     start-up, not per search — a TOML read per call in a warm process whose
     entire premise is staying resident) and once at import time below, at
-    `BUILT_IN['top']`, so `TOOLS` stays importable for callers and tests that
-    have no repo (and therefore no resolved value) to hand it.
+    the template's `[mcp] top`, so `TOOLS` stays importable for callers and
+    tests that have no repo (and therefore no resolved value) to hand it.
     """
     return [
     {
@@ -150,17 +149,17 @@ def _tools(top: int) -> list[dict]:
 ]
 
 
-def _built_in_top() -> int:
-    from .output_config import BUILT_IN
+def _template_top() -> int:
+    from .output_config import template
 
-    return int(BUILT_IN["top"])
+    return int(template().resolve_mcp("top"))
 
 
-#: The reference view, at the engine's built-in `top` — importable with no
-#: repo and no resolved config to hand it (tests, `--help`-adjacent code).
+#: The reference view, at the template's `[mcp] top` — importable with no repo
+#: and no resolved config to hand it (tests, `--help`-adjacent code).
 #: A live `serve()` uses `_tools(<the resolved top>)` instead — see decision
 #: 17 and `_k_property`'s docstring.
-TOOLS = _tools(_built_in_top())
+TOOLS = _tools(_template_top())
 
 
 def _root() -> Path:
@@ -172,7 +171,7 @@ def _root() -> Path:
     return root
 
 
-def _search(root: Path, args: dict, *, top: int) -> dict:
+def _search(root: Path, args: dict, *, top: int, max_headings: int) -> dict:
     from .query import run_query
     from .query.headings import headings_for
 
@@ -233,7 +232,7 @@ def _search(root: Path, args: dict, *, top: int) -> dict:
                 # indistinguishable from an older server. (It also read `[]`
                 # for a `hashed` record, which carried no display text at all;
                 # W-194 deleted that shape on 2026-09-20.)
-                "headings": headings_for(record, query),
+                "headings": headings_for(record, query, limit=max_headings),
             }
         )
     return {
@@ -386,7 +385,7 @@ def _related(root: Path, args: dict) -> dict:
 _HANDLERS = {"fux_search": _search, "fux_passage": _passage, "fux_related": _related}
 
 
-def _handle(root: Path, message: dict, *, top: int) -> dict | None:
+def _handle(root: Path, message: dict, *, top: int, max_headings: int) -> dict | None:
     """One JSON-RPC message in, one response out (or `None` for a notification).
 
     `top` is the `[mcp] top` this connection resolved ONCE at `serve()`
@@ -416,7 +415,7 @@ def _handle(root: Path, message: dict, *, top: int) -> dict | None:
         params = message.get("params") or {}
         name = params.get("name")
         handlers = {
-            "fux_search": lambda r, a: _search(r, a, top=top),
+            "fux_search": lambda r, a: _search(r, a, top=top, max_headings=max_headings),
             "fux_passage": _passage,
             "fux_related": _related,
         }
@@ -456,16 +455,17 @@ def serve(stdin=None, stdout=None, root: Path | None = None, *, enabled: bool = 
     `[mcp] top` is resolved ONCE here, at start-up (SR-OUTPUT decision 17),
     and threaded into every message handled on this connection — never
     re-read per search. `enabled=False` is `--no-output-config`: `.fux/
-    output.toml` is not read at all and `top` resolves to `BUILT_IN['top']`.
+    output.toml` is not read at all and `[mcp]` resolves from the template.
     """
     stdin = stdin or sys.stdin
     stdout = stdout or sys.stdout
     root = root or _root()
 
-    from .output_config import DEFAULT_OUTPUT, load as load_output
+    from .output_config import load as load_output
 
-    cfg = load_output(root, enabled=enabled) if enabled else DEFAULT_OUTPUT
+    cfg = load_output(root, enabled=enabled)
     top = int(cfg.resolve_mcp("top"))
+    max_headings = int(cfg.resolve_mcp("max_headings"))
 
     for line in stdin:
         line = line.strip()
@@ -477,7 +477,7 @@ def serve(stdin=None, stdout=None, root: Path | None = None, *, enabled: bool = 
             stdout.write(json.dumps(_err(None, -32700, "parse error")) + "\n")
             stdout.flush()
             continue
-        response = _handle(root, message, top=top)
+        response = _handle(root, message, top=top, max_headings=max_headings)
         if response is not None:
             stdout.write(json.dumps(response) + "\n")
             stdout.flush()

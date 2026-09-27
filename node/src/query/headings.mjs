@@ -9,9 +9,9 @@
  */
 import { tokenize } from "./tokenize.mjs";
 
-export const MAX_HEADINGS = 3;
-
-export function headingsFor(record, query, limit = MAX_HEADINGS) {
+//: `limit` is `.fux/output.toml`'s `max_headings` — `[cli]` for ask/find,
+//: `[mcp]` for the MCP surface — resolved by the caller (L12).
+export function headingsFor(record, query, limit) {
   if (!record) return [];
   const phrases = record.phrases || [];
   if (!phrases.length) return [];

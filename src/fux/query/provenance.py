@@ -169,10 +169,10 @@ LEGACY_SCHEMA = fixed("receipt", "legacy_schema")
 
 JOURNAL_NAME = fixed("receipt", "journal")
 
-#: Bound on journalled receipts. A *design* default, not a law: L8 as reverted
-#: requires confinement, not a size. The oldest entries are dropped, because
-#: the value of a use record is overwhelmingly in the recent tail.
-DEFAULT_JOURNAL_MAX = 1000
+#: The bound on journalled receipts is `.fux/output.toml [cli.answer]
+#: journal_max` — a *design* value, not a law: L8 as reverted requires
+#: confinement, not a size. The oldest entries are dropped, because the value of
+#: a use record is overwhelmingly in the recent tail.
 
 #: `verify()`'s four states. Never collapse these into a boolean.
 REPRODUCED = "reproduced"
@@ -803,7 +803,7 @@ def journal_path(root: Path) -> Path:
     return fuxdir.fux_dir(root) / "runtime" / JOURNAL_NAME
 
 
-def remember(root: Path, payload: dict, *, max_entries: int = DEFAULT_JOURNAL_MAX) -> None:
+def remember(root: Path, payload: dict, *, max_entries: int) -> None:
     """Append a receipt to the local journal. **Never raises.**
 
     Gitignored, local, never transmitted — the whole of what L8 still requires.

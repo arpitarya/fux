@@ -30,6 +30,7 @@ import { headingsFor } from "./query/headings.mjs";
 import { recordFor, iterShardPaths, rawRecordLines } from "./store/reader.mjs";
 import { buildPlane } from "./graph/plane.mjs";
 import { loadTune } from "./config/tune.mjs";
+import { loadOutput } from "./config/output.mjs";
 import { answerPayload } from "./verbs/answer.mjs";
 import { cmpCodePoints } from "./compat/pyfloat.mjs";
 
@@ -57,8 +58,13 @@ class Index {
     this._planeCache = null;
   }
 
+  /** `.fux/output.toml`, for the values a caller did not pass — the CLI's own
+   *  keys, exactly as `api.py::_output` reads them (L12). */
+  _output() { return loadOutput(this.root, { enabled: true }); }
+
   /** Ranked document locations. The cheapest verb: no band, no headings. */
-  async find(query, { top = 5, under = null } = {}) {
+  async find(query, { top = null, under = null } = {}) {
+    if (top === null) top = Number(this._output().resolve("find", "top"));
     let results = runQuery(this.root, query, top).results.map((r) => result(r));
     if (under !== null) {
       const prefix = under.endsWith("/") ? under : `${under}/`;
@@ -72,7 +78,10 @@ class Index {
    * `band` defaults TRUE here and false on the CLI, deliberately: a caller in
    * code has already decided to read the object, and the block is the part
    * that says whether to trust it. */
-  async ask(query, { top = 5, band = true, queries = null, sections = true } = {}) {
+  async ask(query, { top = null, band = true, queries = null, sections = true } = {}) {
+    const output = this._output();
+    if (top === null) top = Number(output.resolve("ask", "top"));
+    const maxHeadings = Number(output.resolve("ask", "max_headings"));
     // Loaded once and handed to every arm, so a band cannot be explained by a
     // different floor than the one that produced the ranking beside it.
     const tune = loadTune(this.root, { enabled: true });
@@ -80,7 +89,7 @@ class Index {
       this.root, [query, ...(queries ?? [])], top, { tune, wantConfidence: band },
     );
     const rows = results.map((r) => result(
-      r, sections ? headingsFor(recordFor(this.root, r.id), query) : [],
+      r, sections ? headingsFor(recordFor(this.root, r.id), query, maxHeadings) : [],
     ));
     return {
       results: rows,
@@ -145,7 +154,7 @@ class Index {
   }
 
   /** The neighbourhood around a query's best answers. */
-  async graph(query, { hops = 1, top = 5 } = {}) {
+  async graph(query, { hops, top = null }) {
     const plane = this._plane();
     const seeds = (await this.find(query, { top })).map((r) => r.id);
     const seen = new Map(seeds.map((s) => [s, 0]));
@@ -170,7 +179,9 @@ class Index {
    * Breadth-first, preferring the highest-grade route at equal length: a
    * shorter route through a weak edge is not more reliable than a longer one
    * through strong ones. */
-  async path(src, dst, { hops = 6 } = {}) {
+  async path(src, dst, { hops = null } = {}) {
+    // R4 (Arpit, 2026-09-27): read `[cli.path] hops` like the CLI.
+    if (hops === null) hops = Number(this._output().resolve("path", "hops"));
     const plane = this._plane();
     let best = null;
     const queue = [[src, [src], 0]];

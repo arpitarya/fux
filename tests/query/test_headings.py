@@ -21,7 +21,15 @@ import json as json_mod
 import pytest
 
 from fux.query import cmd_ask, cmd_find
-from fux.query.headings import MAX_HEADINGS, headings_for
+from fux.query import headings as _headings
+from l12_fixtures import cli_args, shipped_output
+
+#: The shipped `[cli] max_headings` (L12: no copy in code).
+MAX_HEADINGS = shipped_output()["max_headings"]
+
+
+def headings_for(record, query, *, limit=MAX_HEADINGS):
+    return _headings.headings_for(record, query, limit=limit)
 from fux.query.tokenize import tokenize
 from fux.store import content_sha, term_hash, write_index
 from l12_fixtures import write_config
@@ -69,7 +77,7 @@ def _corpus(tmp_path, record=None):
 def _args(**overrides) -> argparse.Namespace:
     base = dict(query="rollback", top=5, json=False, scan=True, explain=False, hybrid=False)
     base.update(overrides)
-    return argparse.Namespace(**base)
+    return cli_args(**base)
 
 
 # -- the selection rule -------------------------------------------------
@@ -286,17 +294,6 @@ def test_sections_false_drops_the_json_headings_key_entirely(tmp_path, monkeypat
     assert "headings" not in result
     assert result["loc"] == "docs/mesh.md", "every other field is untouched"
     assert result["id"] == DOC_ID
-
-
-def test_sections_defaults_to_on_when_the_attribute_is_absent(tmp_path, monkeypatch, capsys):
-    """`_as_dict` is shared with `find`, which declares no `sections` key, and
-    the MCP surface builds its args by hand. A missing attribute must read as
-    the built-in default rather than an AttributeError."""
-    monkeypatch.setattr("fux.query.find_root", lambda: _corpus(tmp_path))
-    args = _args(json=True)
-    assert not hasattr(args, "sections")
-    assert cmd_ask(args) == 0
-    assert json_mod.loads(capsys.readouterr().out)["results"][0]["headings"]
 
 
 def test_find_is_not_reachable_by_the_sections_key(tmp_path, monkeypatch, capsys):

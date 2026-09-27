@@ -28,10 +28,11 @@ import { passageBoost } from "../query/rerank.mjs";
 import { alreadyTextGlobs, isAlreadyText } from "../decode/registry.mjs";
 import { declareFloorOff, decline } from "./find.mjs";
 import { declarePinned } from "./ask.mjs";
+import { fixed } from "../config/constants.mjs";
 
 /** `answer` refers the top 3 — W-108. One question and no `-q`: an RRF score
  *  would make the three incomparable. */
-export const ANSWER_TOP = 3;
+export const ANSWER_TOP = fixed("answer", "candidates");
 
 function obtain(root, record, textGlobs) {
   const indexedSha = record.sha || "";

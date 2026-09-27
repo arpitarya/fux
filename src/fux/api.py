@@ -200,7 +200,19 @@ class Index:
 
     # -- read verbs -------------------------------------------------------
 
-    def find(self, query: str, *, top: int = 5, under: str | None = None) -> list[Result]:
+    def _output(self):
+        """`.fux/output.toml`, for the values a caller did not pass (L12).
+
+        The API reads the CLI's own keys — `[cli.<verb>] top`, `hops`,
+        `max_headings` — exactly as the command does, so `fux find` and
+        `fx.find()` truncate alike; R4 ruled this for `path`'s `hops` and it
+        holds for every key the library shares with a verb.
+        """
+        from .output_config import load as load_output
+
+        return load_output(self.root, enabled=True)
+
+    def find(self, query: str, *, top: int | None = None, under: str | None = None) -> list[Result]:
         """Ranked document locations. The cheapest verb: no band, no headings.
 
         🔴 **Through `run_query`, not `scan_ask`** (fixed 2026-09-12, W-107).
@@ -223,6 +235,8 @@ class Index:
         """
         from .query import run_query
 
+        if top is None:
+            top = int(self._output().resolve("find", "top"))
         results = [
             Result(id=r.id, loc=r.loc, title=r.title, score=r.score,
                    archived=r.archived, tie=r.tie, mtime=r.mtime, pinned=r.pinned,
@@ -235,7 +249,7 @@ class Index:
         return results
 
     def ask(
-        self, query: str, *, top: int = 5, band: bool = True,
+        self, query: str, *, top: int | None = None, band: bool = True,
         queries: list[str] | None = None, sections: bool = True,
     ) -> AskAnswer:
         """A ranked list with scores — what you want when judging the engine.
@@ -248,6 +262,10 @@ class Index:
         from .query.headings import headings_for
         from .tune import load as load_tune
 
+        output = self._output()
+        if top is None:
+            top = int(output.resolve("ask", "top"))
+        max_headings = int(output.resolve("ask", "max_headings"))
         arms = list(dict.fromkeys([query, *(queries or [])]))
         # 🔴 `run_query`, not `scan_ask` — see `find`. Loaded ONCE and handed to
         # every arm, the same discipline `_run_fused` applies: two loads could
@@ -272,7 +290,8 @@ class Index:
             Result(id=r.id, loc=r.loc, title=r.title, score=r.score,
                    archived=r.archived, tie=r.tie, mtime=r.mtime, pinned=r.pinned,
                    boosted=r.boosted, route=r.route,
-                   headings=headings_for(self._record(r.id), query) if sections else [])
+                   headings=headings_for(self._record(r.id), query, limit=max_headings)
+                   if sections else [])
             for r in results
         ]
         block = None
@@ -334,8 +353,13 @@ class Index:
             ],
         }
 
-    def graph(self, query: str, *, hops: int = 1, top: int = 5) -> dict:
-        """The neighbourhood around a query's best answers."""
+    def graph(self, query: str, *, hops: int, top: int | None = None) -> dict:
+        """The neighbourhood around a query's best answers.
+
+        `hops` is required: the CLI's `graph` has no hops key to read it from
+        (its walk is `.fux/tune.toml [graph]`'s). `top` defaults to what
+        `find` resolves, because the seeds ARE `find`'s results.
+        """
         plane = self._plane()
         seeds = [r.id for r in self.find(query, top=top)]
         seen = {s: 0 for s in seeds}
@@ -357,13 +381,17 @@ class Index:
             ],
         }
 
-    def path(self, src: str, dst: str, *, hops: int = 6) -> dict:
+    def path(self, src: str, dst: str, *, hops: int | None = None) -> dict:
         """How two documents are connected, most reliable route first.
 
         Breadth-first, preferring the highest-grade route at equal length: a
         shorter route through a weak edge is not more reliable than a longer
         one through strong ones.
         """
+        if hops is None:
+            # R4 (Arpit, 2026-09-27): the API reads `[cli.path] hops` like the
+            # CLI; its own `6` is gone.
+            hops = int(self._output().resolve("path", "hops"))
         plane = self._plane()
         best: tuple[list[str], int] | None = None
         queue: list[tuple[str, list[str], int]] = [(src, [src], 0)]

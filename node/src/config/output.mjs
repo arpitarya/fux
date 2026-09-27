@@ -18,11 +18,11 @@
  * `json` is resolved FIRST and separately, because it selects which chain
  * every other key walks.
  *
- * ⚠ **A MISSING file is not an error** (SR-OUTPUT decision 20): it returns the
- * absent sentinel, which resolves every key to the built-in. The file is
- * write-if-missing, so it reaches new repos only, and refusing without it would
- * break every repo that predates it. *"Once it is in effect"* is the rule that
- * survives — a file that does not exist is not in effect.
+ * **Every key comes from a file, never from code** (L12). In a repo it is
+ * `.fux/output.toml`, and a missing file, table or key is an error naming it
+ * and `fux doctor --fix`, in `output_config.py`'s words. `--no-output-config`
+ * and a run outside any repo read the packaged template — inlined into the
+ * bundle — which is the one home of every shipped rendering value.
  */
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -41,15 +41,15 @@ const ROOTS = ["cli", "mcp"];
 //: not make. `json` is absent from every tuple: it is not a `[cli]` key, it is
 //: the question of WHICH chain the others walk.
 export const CLI_VERBS = {
-  ask: ["band", "top", "explain", "sections"],
+  ask: ["band", "top", "explain", "sections", "max_headings"],
   //: 🔴 **`ask`'s keys exactly.** `fux lexical` is frozen byte-identical to
   //: `ask` (SR-CLI decision 12), and a verb absent from this table has no key
   //: resolved at all — which on the Python side printed `ask` with `§` heading
   //: lines and `lexical` without them, from one ranking. Same table, same
   //: reason, both readers.
-  lexical: ["band", "top", "explain", "sections"],
-  find: ["band", "top"],
-  answer: ["band", "no_refer", "journal"],
+  lexical: ["band", "top", "explain", "sections", "max_headings"],
+  find: ["band", "top", "max_headings"],
+  answer: ["band", "no_refer", "journal", "journal_max"],
   explain: [],
   graph: [],
   path: ["hops"],
@@ -63,19 +63,26 @@ export const CLI_VERBS = {
   //: ⚠ **It was `update: []` until 2026-09-15** — W-177 deleted that verb and
   //: `fux ingest` absorbed `--check --json`, which is the key this row exists
   //: to make resolvable (SR-CLI decision 16).
-  ingest: [],
+  ingest: ["progress_threshold"],
   //: `inspect` is PYTHON-ONLY as a verb (its dictionary build re-tokenises
   //: the sources, which is an ingest-side job Node has no home for yet) and
   //: is still declared here, because this table is not a verb list — it is
   //: what `.fux/output.toml` is allowed to say. A repo whose file carries
   //: `[cli.json] inspect = true` must VALIDATE on both readers, or the same
   //: committed config is legal for one and an error for the other.
-  inspect: [],
+  inspect: ["progress_threshold"],
   //: `correct` is PYTHON-ONLY as a verb (it writes committed files and this
   //: reader never writes) and is declared for the same reason `inspect` is:
   //: this table is what `.fux/output.toml` may SAY, so a repo whose file
   //: carries `[cli.json] correct = true` must validate on both readers.
   correct: [],
+  //: PYTHON-ONLY verbs, declared for the reason `ingest` and `inspect` are:
+  //: this table is what `.fux/output.toml` may SAY, so a key they own must
+  //: validate on both readers (L12 added them, W-225).
+  build: ["progress_threshold"],
+  add: ["progress_threshold"],
+  remove: ["progress_threshold"],
+  serve: ["port"],
 };
 
 //: 🔴 **The one verb that reads ANOTHER verb's subtable**, and it is a fact
@@ -98,29 +105,40 @@ export function subtableFor(verb) {
 
 //: `[mcp]`'s closed key set. `top` only. No `json` (an MCP result is always
 //: JSON) and no `band` (the confidence block is unconditional there).
-export const MCP_KEYS = ["top"];
+export const MCP_KEYS = ["top", "max_headings"];
 
-/** Every key reachable from more than one verb — what a SHARED table may hold.
- *  A key unique to one verb is refused at the shared level by name. */
+/** Every key more than one SUBTABLE declares — what a SHARED table may hold.
+ *  A key unique to one subtable is refused at the shared level by name.
+ *  **By subtable, not by verb** — `output_config.py`'s rule: `lexical` reads
+ *  `ask`'s row, so the two are one declaration, and counting verbs would make
+ *  `[cli] explain` legal here where Python refuses it. */
 const SHARED_CLI_KEYS = (() => {
   const counts = new Map();
-  for (const keys of Object.values(CLI_VERBS)) {
+  const seen = new Set();
+  for (const [verb, keys] of Object.entries(CLI_VERBS)) {
+    const table = subtableFor(verb);
+    if (seen.has(table)) continue;
+    seen.add(table);
     for (const k of keys) counts.set(k, (counts.get(k) ?? 0) + 1);
   }
   return [...counts].filter(([, n]) => n > 1).map(([k]) => k).sort();
 })();
 
-//: The engine's own defaults, per key, as they appear on `args`.
-export const BUILT_IN = {
-  json: false, band: false, top: 5, explain: false,
-  sections: true, no_refer: false, hops: 2, journal: false,
-};
-
 //: Type per key, as spelled IN THE FILE (`enabled`, not `json`).
 const TYPES = {
   band: "bool", explain: "bool", sections: "bool", no_refer: "bool",
   journal: "bool", enabled: "bool", top: "int", hops: "int",
+  max_headings: "int", progress_threshold: "int", journal_max: "int", port: "int",
 };
+
+//: The template `fux setup` writes (`src/fux/templates/output.toml.txt`) —
+//: read in a checkout, INLINED in the bundle (`@fux-inline`).
+const TEMPLATE_TEXT = /* @fux-inline src/fux/templates/output.toml.txt */ readFileSync(
+  new URL("../../../src/fux/templates/output.toml.txt", import.meta.url),
+  "utf8",
+);
+const TEMPLATE_LABEL = "the packaged output.toml template (--no-output-config)";
+const FIX_HINT = "`fux doctor --fix` writes every missing key from the template `fux setup` uses";
 
 //: Refused by NAME with the reason, rather than reported as unknown.
 const REFUSED = {
@@ -161,11 +179,8 @@ class Collector {
 /** Resolved output defaults. Frozen, like `Tune`, so a caller can never hand
  *  two code paths a block that drifted between them. */
 export class OutputDefaults {
-  constructor({
-    cliShared = {}, cliVerb = {}, jsonShared = {}, jsonVerb = {},
-    mcp = {}, bypass = false, absent = false,
-  } = {}) {
-    Object.assign(this, { cliShared, cliVerb, jsonShared, jsonVerb, mcp, bypass, absent });
+  constructor({ cliShared, cliVerb, jsonShared, jsonVerb, mcp, source }) {
+    Object.assign(this, { cliShared, cliVerb, jsonShared, jsonVerb, mcp, source });
     Object.freeze(this);
   }
 
@@ -176,16 +191,10 @@ export class OutputDefaults {
       throw new FuxError(`no output defaults are declared for \`${verb}\` — known: ${Object.keys(CLI_VERBS).sort().join(", ")}`);
     }
     if (cliValue !== null && cliValue !== undefined) return Boolean(cliValue);
-    if (this.bypass) return Boolean(BUILT_IN.json);
     const perVerb = this.jsonVerb[subtableFor(verb)] ?? {};
     if ("enabled" in perVerb) return Boolean(perVerb.enabled);
     if ("enabled" in this.jsonShared) return Boolean(this.jsonShared.enabled);
-    throw new FuxError(
-      `${OUTPUT_NAME} does not set \`enabled\` for the JSON rendering — ` +
-      `add \`enabled = ${BUILT_IN.json}\` under \`[cli.json]\` ` +
-      `(or \`[cli.json.${verb}]\` for \`${verb}\` only). Run \`fux output\` to ` +
-      "see every key, or pass --no-output-config to bypass this file.",
-    );
+    throw new FuxError(`${this.source}:\n  [cli.json] enabled is missing\n  ${FIX_HINT}`);
   }
 
   /** One precedence chain: **flag → json-verb → json-shared → cli-verb →
@@ -200,7 +209,6 @@ export class OutputDefaults {
       throw new FuxError(`\`${key}\` is not an output key for \`${verb}\` — it has: ${[...allowed].sort().join(", ")}`);
     }
     if (cliValue !== null && cliValue !== undefined) return cliValue;
-    if (this.bypass) return BUILT_IN[key];
     const table = subtableFor(verb);
     if (asJson) {
       const perVerb = this.jsonVerb[table] ?? {};
@@ -210,14 +218,8 @@ export class OutputDefaults {
     const perVerb = this.cliVerb[table] ?? {};
     if (key in perVerb) return perVerb[key];
     if (key in this.cliShared) return this.cliShared[key];
-    const where = asJson
-      ? `[cli.json.${table}], [cli.json], [cli.${table}] or [cli]`
-      : `[cli.${table}] or [cli]`;
-    throw new FuxError(
-      `${OUTPUT_NAME} does not set \`${key}\` for \`${verb}\` — add it under ` +
-      `${where} (e.g. \`${key} = ${JSON.stringify(BUILT_IN[key])}\`). Run \`fux output\` to ` +
-      "see every key, or pass --no-output-config to bypass this file.",
-    );
+    const where = verbOwning(key) === table ? `[cli.${table}]` : "[cli]";
+    throw new FuxError(`${this.source}:\n  ${where} ${key} is missing\n  ${FIX_HINT}`);
   }
 
   /** `[mcp]`'s own chain: **tool arg → `[mcp]` → bypass → error.**
@@ -227,22 +229,11 @@ export class OutputDefaults {
       throw new FuxError(`\`${key}\` is not an output key for \`mcp\` — it has: ${[...MCP_KEYS].sort().join(", ")}`);
     }
     if (toolValue !== null && toolValue !== undefined) return toolValue;
-    if (this.bypass) return BUILT_IN[key];
     if (key in this.mcp) return this.mcp[key];
-    throw new FuxError(
-      `${OUTPUT_NAME} does not set \`${key}\` under [mcp] — add ` +
-      `\`${key} = ${JSON.stringify(BUILT_IN[key])}\`. Run \`fux output\` to see every key, ` +
-      "or pass --no-output-config to bypass this file.",
-    );
+    throw new FuxError(`${this.source}:\n  [mcp] ${key} is missing\n  ${FIX_HINT}`);
   }
 }
 
-//: `--no-output-config`, or no repo root at all.
-export const DEFAULT_OUTPUT = new OutputDefaults({ bypass: true });
-//: A repo root exists and `.fux/output.toml` does not. Resolves exactly as the
-//: bypass sentinel does; `absent` is what keeps "the consumer asked to bypass"
-//: and "there is nothing to bypass" distinguishable.
-export const ABSENT_OUTPUT = new OutputDefaults({ bypass: true, absent: true });
 
 function repr(v) {
   if (typeof v === "string") return `'${v}'`;
@@ -276,10 +267,13 @@ function checked(c, table, key, value, raw) {
   return value;
 }
 
-/** The single verb `key` belongs to, if exactly one does. */
+/** The single SUBTABLE `key` belongs to, if exactly one does. By subtable,
+ *  for `SHARED_CLI_KEYS`' reason — `output_config.py::_verb_owning`'s twin. */
 function verbOwning(key) {
-  const owners = Object.entries(CLI_VERBS).filter(([, keys]) => keys.includes(key)).map(([v]) => v);
-  return owners.length === 1 ? owners[0] : null;
+  const owners = new Set(
+    Object.entries(CLI_VERBS).filter(([, keys]) => keys.includes(key)).map(([v]) => subtableFor(v)),
+  );
+  return owners.size === 1 ? [...owners][0] : null;
 }
 
 const isTable = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
@@ -337,22 +331,35 @@ function rejectConflictMarkers(label, text) {
   }
 }
 
-/** Read `.fux/output.toml`. `enabled=false` is `--no-output-config`. */
-export function loadOutput(root, { enabled = true } = {}) {
-  if (!enabled) return DEFAULT_OUTPUT;
+/** Read `.fux/output.toml`. `enabled=false` is `--no-output-config`, and
+ *  `root=null` is a run outside any repo: both read the packaged template. */
+export function loadOutput(root, { enabled }) {
+  if (enabled !== true && enabled !== false) throw new FuxError("loadOutput: `enabled` is required");
+  if (!enabled || root === null || root === undefined) return template();
 
-  const path = join(root, ".fux", "output.toml");
+  const path = join(root, OUTPUT_NAME);
+  const label = `${root}/${OUTPUT_NAME}`;
   let text;
   try {
-    if (!statSync(path).isFile()) return ABSENT_OUTPUT;
+    if (!statSync(path).isFile()) throw new Error("not a file");
     text = readFileSync(path, "utf8");
   } catch {
-    return ABSENT_OUTPUT;
+    throw new FuxError(
+      `${label} is missing - \`fux setup\` writes it, and \`fux doctor --fix\` ` +
+      "restores a deleted one. fux holds no copy of its values in code",
+    );
   }
-
-  const label = `${root}/${OUTPUT_NAME}`;
+  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
   rejectConflictMarkers(label, text);
-  const data = parseToml(text, label);
+  return parse(parseToml(text, label), label);
+}
+
+/** The template, parsed — `--no-output-config` and a run outside any repo. */
+export function template() {
+  return parse(parseToml(TEMPLATE_TEXT, TEMPLATE_LABEL), TEMPLATE_LABEL);
+}
+
+function parse(data, label) {
   const c = new Collector(label);
 
   // A file in the OLD flat layout parses cleanly under this grammar and would
@@ -417,7 +424,7 @@ export function loadOutput(root, { enabled = true } = {}) {
   }
 
   c.raiseIfAny();
-  return new OutputDefaults({ cliShared, cliVerb, jsonShared, jsonVerb, mcp: mcpOut, bypass: false });
+  return new OutputDefaults({ cliShared, cliVerb, jsonShared, jsonVerb, mcp: mcpOut, source: label });
 }
 
 /** Fold the resolved defaults into `args`, ONCE, before dispatch.
@@ -442,5 +449,8 @@ export function applyOutputDefaults(verb, args, cfg) {
 }
 
 //: File spelling -> the name this reader's `parseArgs` puts on `args`. Only
-//: the two that differ are listed; everything else is spelled the same.
-const OUT_KEY_TO_ARG = { no_refer: "noRefer" };
+//: the ones that differ are listed; everything else is spelled the same.
+const OUT_KEY_TO_ARG = {
+  no_refer: "noRefer", max_headings: "maxHeadings", journal_max: "journalMax",
+  progress_threshold: "progressThreshold",
+};

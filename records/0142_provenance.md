@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@e6a6a65d7048]
+owns: [src/fux/query/provenance.py@59ef7c6eea8f]
 laws: [L1, L3, L4, L8]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: ef3a033b3c5d77d8a602be246a3e02e5eba942cb387acb46ad9d18ade4215ed9
+content_sha: 4be1113eef2a59a033bdacbf27fa1e3b1f23ab64299a3d97eb6b45e0981de256
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -521,6 +521,10 @@ takes: add the field to the engine's own output, or do not show the number.**
 form; what changed is that a tree with no `.fux/tune.toml` can no longer rank at
 all, so `verify` on such a tree reports `drifted:config` before it looks for an
 index.
+
+**[L12](0013_LAW-12-values-live-in-config.md) (W-225 stage 3a, 2026-09-27).** How many receipts the journal keeps is
+`.fux/output.toml [cli.answer] journal_max` (1000 as shipped); `remember()`
+takes it required, and the constant it replaced is gone.
 
 <!-- L12-NOTE-END -->
 

@@ -774,12 +774,13 @@ def _declare_related(related) -> None:
         print(f"  {RELATED_MARKER} {mark}{row.title}  ({row.loc})  {row.route}")
 
 
-def _headings_for(record: dict | None, query: str) -> list[str]:
+def _headings_for(record: dict | None, query: str, limit: int) -> list[str]:
     """W-84's matched headings — imported lazily so `find`'s hot path and every
-    caller that never renders one pays nothing for the analyzer import."""
+    caller that never renders one pays nothing for the analyzer import. `limit`
+    is `.fux/output.toml`'s `max_headings`, resolved onto `args` by the CLI."""
     from .headings import headings_for
 
-    return headings_for(record, query)
+    return headings_for(record, query, limit=limit)
 
 
 def _declare_pinned(results) -> None:
@@ -1032,11 +1033,10 @@ def _ask_shaped(args, *, compose: bool) -> int:
     _declare_pending(root)
     _declare_no_accelerator(root)
 
-    # SR-OUTPUT decision 21. `getattr` rather than `args.sections` because
-    # `_as_dict` is shared with `find`, which declares no such key, and a
-    # caller constructing args by hand (the MCP surface, the tests) should get
-    # the built-in rather than an AttributeError.
-    show_sections = bool(getattr(args, "sections", True))
+    # SR-OUTPUT decision 21. `ask`/`lexical` declare `sections`, so the CLI has
+    # always resolved it onto `args` by now — from the flag or the file (L12:
+    # there is no built-in to fall back to).
+    show_sections = bool(args.sections)
 
     if args.json:
         # `--explain` is not text-only: a caller that wants to log which path
@@ -1044,7 +1044,10 @@ def _ask_shaped(args, *, compose: bool) -> int:
         # key is additive and appears only when asked for, so no existing
         # consumer's parse changes (W-48).
         payload: dict = {
-            "results": [_as_dict(root, r, args.query, sections=show_sections) for r in results]
+            "results": [
+                _as_dict(root, r, args.query, sections=show_sections, max_headings=args.max_headings)
+                for r in results
+            ]
         }
         # W-161. **Its own key, never merged into `results`** — a document with
         # no lexical match sitting among real matches *looks like* a match, and
@@ -1111,7 +1114,7 @@ def _ask_shaped(args, *, compose: bool) -> int:
             boost = f"  (graph {r.route.split(' via ')[0]})" if moved else "  (graph)"
         print(f"{r.score:.4f}{tie}{boost}  {mark}{_title_from(root, record, r.title)}  ({r.loc})")
         if show_sections:
-            for heading in _headings_for(record, args.query):
+            for heading in _headings_for(record, args.query, args.max_headings):
                 print(f"        {SECTION_MARKER} {heading}")
     _declare_related(related)
     if getattr(args, "explain", False):
@@ -1355,7 +1358,12 @@ def cmd_find(args) -> int:
     _declare_filters(args, dropped)
 
     if args.json:
-        payload: dict = {"results": [_as_dict(root, r, args.query) for r in results]}
+        payload: dict = {
+            "results": [
+                _as_dict(root, r, args.query, sections=True, max_headings=args.max_headings)
+                for r in results
+            ]
+        }
         if fused:
             payload["fused"] = True
         # SR-CONFIDENCE decision 11: present only under `--band`. **Absent
@@ -1393,13 +1401,14 @@ def cmd_find(args) -> int:
 #: computes passage `df` across all of them, so a fair cross-document passage
 #: contest existed and was being handed a field of one.
 #:
-#: **Three, and not a tunable.** The uplift is bounded by the `recall@1 ->
-#: recall@3` gap, the byte budget is unchanged (`per_doc_fraction` bounds each
-#: document once there is more than one), and every extra candidate is a real
-#: fetch against someone's source system. A `[refer]` key here would be a new
-#: default nobody has measured, on a verb whose defaults are already an open
-#: question on Arpit's desk.
-ANSWER_TOP = 3
+#: **Three, and not a tunable** — so under L12 it is a FIXED value,
+#: `constants.toml [answer] candidates`. The uplift is bounded by the
+#: `recall@1 -> recall@3` gap, the byte budget is unchanged (`per_doc_fraction`
+#: bounds each document once there is more than one), and every extra candidate
+#: is a real fetch against someone's source system. A config key here would be
+#: a new setting nobody has measured, on a verb whose values are already an
+#: open question on Arpit's desk.
+ANSWER_TOP = fixed("answer", "candidates")
 
 
 def cmd_answer(args) -> int:
@@ -1564,7 +1573,7 @@ def _provenance_for(root: Path, args, bundle, block, *, best=None) -> dict:
             if want_receipt:
                 out["receipt"] = payload
             if want_journal:
-                provenance.remember(root, payload)
+                provenance.remember(root, payload, max_entries=args.journal_max)
     except Exception:  # pragma: no cover - provenance must not break an answer
         return out
     return out
@@ -2022,7 +2031,7 @@ def _title_from(root: Path, record: dict | None, fallback_title: str) -> str:
     return store_mod.display_title(record) or fallback_title
 
 
-def _as_dict(root: Path, result: AskResult, query: str, *, sections: bool = True) -> dict:
+def _as_dict(root: Path, result: AskResult, query: str, *, sections: bool, max_headings: int) -> dict:
     """`AskResult` as JSON, with `title` upgraded through the P5 display cache
     and W-84's matched `headings` alongside it.
 
@@ -2046,5 +2055,5 @@ def _as_dict(root: Path, result: AskResult, query: str, *, sections: bool = True
     payload = dict(result.__dict__)
     payload["title"] = _title_from(root, record, result.title)
     if sections:
-        payload["headings"] = _headings_for(record, query)
+        payload["headings"] = _headings_for(record, query, max_headings)
     return payload

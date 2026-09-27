@@ -16,7 +16,7 @@ import { join } from "node:path";
 import { parseToml, wasFloat } from "../src/config/toml.mjs";
 import { loadTune } from "../src/config/tune.mjs";
 import { TUNE_TEMPLATE, tuneText } from "./l12.mjs";
-import { loadOutput, BUILT_IN } from "../src/config/output.mjs";
+import { loadOutput, template } from "../src/config/output.mjs";
 import { parseDirs } from "../src/ingest/sourcelist.mjs";
 import { globMatch, isAlreadyText, PROSE_TYPES } from "../src/decode/registry.mjs";
 import { FuxError } from "../src/errors.mjs";
@@ -153,18 +153,18 @@ test("tune: [priority] is sorted longest-key-first so the first match wins", () 
 
 // -- output ------------------------------------------------------------------
 
-test("output: an ABSENT file resolves to the built-ins and is not an error", () => {
+test("output: an ABSENT file is an error naming it; --no-output-config reads the template", () => {
   const root = repo({});
-  const cfg = loadOutput(root);
-  assert.equal(cfg.absent, true);
-  assert.equal(cfg.resolve("find", "top"), BUILT_IN.top);
+  assert.throws(() => loadOutput(root, { enabled: true }), /\.fux\/output\.toml is missing/);
+  assert.equal(loadOutput(root, { enabled: false }).resolve("find", "top"), template().resolve("find", "top"));
 });
 
 test("output: a PRESENT file that omits a key REFUSES — it is the sole source", () => {
   const root = repo({ ".fux/output.toml": "[cli]\nband = false\n" });
-  const cfg = loadOutput(root);
+  const cfg = loadOutput(root, { enabled: true });
   assert.equal(cfg.resolve("find", "band"), false);
-  assert.throws(() => cfg.resolve("find", "top"), /does not set `top`/);
+  assert.throws(() => cfg.resolve("find", "top"), /\[cli\] top is missing/);
+  assert.throws(() => cfg.resolve("find", "top"), /fux doctor --fix/);
 });
 
 test("output: the precedence chain is flag -> json.verb -> json -> verb -> cli", () => {
@@ -172,7 +172,7 @@ test("output: the precedence chain is flag -> json.verb -> json -> verb -> cli",
     ".fux/output.toml":
       "[cli]\nband = false\ntop = 5\n[cli.find]\ntop = 7\n[cli.json]\nenabled = false\ntop = 9\n",
   });
-  const cfg = loadOutput(root);
+  const cfg = loadOutput(root, { enabled: true });
   assert.equal(cfg.resolve("find", "top"), 7);                      // per-verb
   assert.equal(cfg.resolve("find", "top", null, { asJson: true }), 9);  // json wins
   assert.equal(cfg.resolve("find", "top", 3), 3);                   // a flag wins
@@ -180,22 +180,22 @@ test("output: the precedence chain is flag -> json.verb -> json -> verb -> cli",
 
 test("output: a verb-only key is refused at the SHARED level, by name", () => {
   const root = repo({ ".fux/output.toml": "[cli]\nhops = 3\n" });
-  assert.throws(() => loadOutput(root), /belongs to one verb only \(path\)/);
+  assert.throws(() => loadOutput(root, { enabled: true }), /belongs to one verb only \(path\)/);
 });
 
 test("output: `[mcp]` inherits nothing from `[cli]`", () => {
   const root = repo({ ".fux/output.toml": "[cli]\ntop = 9\n[mcp]\ntop = 3\n" });
-  assert.equal(loadOutput(root).resolveMcp("top"), 3);
+  assert.equal(loadOutput(root, { enabled: true }).resolveMcp("top"), 3);
 });
 
 test("output: `[mcp] band` is refused by name, with the reason", () => {
   const root = repo({ ".fux/output.toml": "[mcp]\nband = true\n" });
-  assert.throws(() => loadOutput(root), /UNCONDITIONAL, by name/);
+  assert.throws(() => loadOutput(root, { enabled: true }), /UNCONDITIONAL, by name/);
 });
 
 test("output: `top = true` is refused — a bool is not a whole number", () => {
   const root = repo({ ".fux/output.toml": "[cli]\ntop = true\n" });
-  assert.throws(() => loadOutput(root), /must be a whole number/);
+  assert.throws(() => loadOutput(root, { enabled: true }), /must be a whole number/);
 });
 
 // -- the dirs list -----------------------------------------------------------

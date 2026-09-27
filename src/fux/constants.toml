@@ -272,6 +272,7 @@ host = "127.0.0.1"
 
 [templates]
 tune = "tune.toml.txt"
+output = "output.toml.txt"
 
 [fuse]
 # Reciprocal-rank fusion's k (Cormack et al. 2009) -- a published constant,
@@ -282,3 +283,9 @@ rrf_k = 60
 # ingest/extract.py's RULES_VERSION -- bump when what extraction RETURNS moves;
 # the next `fux ingest` then re-extracts the corpus. History: ingest/extract.py.
 extract_rules = 3
+
+[answer]
+# How many ranked documents `fux answer` hands the refer plane to cite from
+# (W-108). NOT a tunable, by the reasoning beside ANSWER_TOP in query/__init__.py:
+# every extra candidate is a real fetch against someone's source system.
+candidates = 3

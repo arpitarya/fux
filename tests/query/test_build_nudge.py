@@ -107,6 +107,7 @@ def test_json_stdout_stays_parseable_with_the_note_present(indexed, capsys, monk
         json = True
         fast = False
         scan = False
+        max_headings = 3
 
     capsys.readouterr()
     cmd_find(_Args())

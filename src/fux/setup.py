@@ -844,9 +844,13 @@ def _mandatory_config() -> "tuple[tuple[str, str], ...]":
     A function, not a table of literals: each template is read from the one
     module that owns its file, so this list cannot state a value of its own.
     """
+    from . import output_config as output_mod
     from . import tune as tune_mod
 
-    return ((tune_mod.TUNE_NAME, tune_mod.template_text()),)
+    return (
+        (tune_mod.TUNE_NAME, tune_mod.template_text()),
+        (output_mod.OUTPUT_NAME, output_mod.template_text()),
+    )
 
 
 _HEADER = re.compile(r"^\s*\[(?P<name>[^\[\]]+)\]\s*(#.*)?$")

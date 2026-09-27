@@ -38,6 +38,26 @@ Rules:
 
 ---
 
+## 2026-09-27 — **W-225 stage 3a: `.fux/output.toml` is mandatory, key by key**
+
+**Outcome: landed; no rendering default changed.**
+- **What:** `BUILT_IN` / `DEFAULT_OUTPUT` / `ABSENT_OUTPUT` are gone from both
+  readers. `src/fux/templates/output.toml.txt` is the one home (bundle: inlined),
+  read by `--no-output-config` (now on `build`/`add`/`remove`/`serve` too) and by
+  a run outside a repo. A missing file or key raises the tune.toml sentence.
+  `doctor` alone starts without the file, from the template, and fails the row.
+  New keys at the old in-code values: `[cli] max_headings`, `progress_threshold`,
+  `[cli.answer] journal_max`, `[cli.serve] port`, `[mcp] max_headings`.
+  `answer`'s candidate count went to `constants.toml [answer] candidates` —
+  a departure listed in [the compare doc](compare/l12-classify.compare.md).
+  `fill_missing` and `doctor`'s frozen-keys row now cover both files.
+- **Evidence:** 594 of 704 snapshot outputs byte-identical to stage 2. The 110
+  that differ are all refer-mode `answer`, re-scoring record files the same
+  change edits; every index-only output is identical. Unit: green outside other
+  sessions' in-flight work; e2e 151; Node 89.
+
+---
+
 ## 2026-09-27 — **W-225 stage 2: `.fux/tune.toml` is mandatory, key by key**
 
 **Outcome: landed; no value changed, no ranking moved.**

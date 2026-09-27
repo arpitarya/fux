@@ -175,47 +175,66 @@ def test_the_node_output_verbs_and_keys_are_the_python_ones():
     assert _js_string_list(source, "export const MCP_KEYS") == list(MCP_KEYS)
 
 
-def test_the_node_output_built_ins_are_the_python_ones():
-    """These are what a repo with NO `.fux/output.toml` gets — every repo that
-    predates the file, which is most of them."""
-    import json
-
-    from fux.output_config import BUILT_IN
-
-    source = _source("config/output.mjs")
-    body = re.search(r"export const BUILT_IN = \{(.*?)\};", source, re.S)
-    assert body, "no `BUILT_IN` in config/output.mjs"
-    written = dict(
-        (k, json.loads(v)) for k, v in re.findall(r"(\w+): (true|false|\d+)", body.group(1))
+def _node_output(root, enabled: bool) -> dict:
+    """Node's resolution of every output key for `root` — `{verb.key: value}`."""
+    url = (NODE_SRC / "config" / "output.mjs").as_uri()
+    script = (
+        f"import({json.dumps(url)}).then(m => {{ const c = m.loadOutput("
+        f"{json.dumps(str(root) if root else None)}, {{ enabled: {'true' if enabled else 'false'} }});"
+        " const out = { json: c.resolveJson('ask') };"
+        " for (const [v, ks] of Object.entries(m.CLI_VERBS)) for (const k of ks) out[`${v}.${k}`] = c.resolve(v, k);"
+        " for (const k of m.MCP_KEYS) out[`mcp.${k}`] = c.resolveMcp(k);"
+        " process.stdout.write(JSON.stringify(out)); })"
     )
-    assert written == BUILT_IN
+    out = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True)
+    return json.loads(out.stdout)
+
+
+def _python_output(root, enabled: bool) -> dict:
+    from fux.output_config import CLI_VERBS, MCP_KEYS, load
+
+    c = load(root, enabled=enabled)
+    out: dict = {"json": c.resolve_json("ask")}
+    for verb, keys in CLI_VERBS.items():
+        for key in keys:
+            out[f"{verb}.{key}"] = c.resolve(verb, key)
+    for key in MCP_KEYS:
+        out[f"mcp.{key}"] = c.resolve_mcp(key)
+    return out
+
+
+def test_both_readers_resolve_every_output_key_alike_from_the_template():
+    """Since L12 there is no built-in dict to compare: both readers read the
+    one template, and this holds that they resolve every key of every verb —
+    and `[mcp]` — to the same value."""
+    assert _node_output(None, enabled=False) == _python_output(None, enabled=False)
+
+
+def test_both_readers_resolve_this_repos_own_output_toml_alike():
+    root = Path(__file__).resolve().parents[1]
+    assert _node_output(root, enabled=True) == _python_output(root, enabled=True)
 
 
 def test_the_journal_key_is_bound_on_BOTH_runtimes_by_name():
-    """🔴 W-147, and it names `journal` rather than trusting the two checks above.
+    """🔴 W-147, and it names `journal` rather than trusting the checks above.
 
-    They already cover it — `CLI_VERBS` is compared tuple-for-tuple and
-    `BUILT_IN` dict-for-dict — so this adds no coverage. **What it adds is a
-    grep hit.** SR-PROVENANCE decision 10 as amended makes a committed
+    SR-PROVENANCE decision 10 as amended makes a committed
     `[cli.answer] journal = true` explicit consent, and the failure mode the
     ruling guards against is a later session reading `.fux/output.toml` as a
     pure *rendering* config and tidying the key out of one runtime. A test that
     only fails as *"`answer` key set differs"* does not tell that session what it
     just broke; this one does.
     """
-    from fux.output_config import BUILT_IN, CLI_VERBS
+    from fux.output_config import CLI_VERBS, template
 
     assert "journal" in CLI_VERBS["answer"], "the Python side lost the key"
-    assert BUILT_IN["journal"] is False, "journalling must never default ON"
+    assert template().resolve("answer", "journal") is False, "journalling must never ship ON"
 
     source = _source("config/output.mjs")
     assert re.search(r'answer: \[[^\]]*"journal"', source), (
         "`node/src/config/output.mjs` no longer carries `journal` under `answer`. "
         "It is the ONE key in that file that writes a durable file, and a runtime "
         "that drops it silently ignores a consumer's committed consent."
-    )
-    assert re.search(r"journal:\s*false", source), (
-        "the Node `BUILT_IN` no longer defaults `journal` to false"
     )
 
 

@@ -43,50 +43,22 @@ rendering anyway, not a CLI key. `enabled` is resolved FIRST, in its own pass
         |no
   [cli] set?             --yes--> value used
         |no
-  bypass? (--no-output-config, no repo,      --yes--> BUILT_IN
-           or NO FILE -- decision 20)
-        |no
-      FuxError -- the file exists but does not set this key
+      FuxError -- the key is missing; `fux doctor --fix` writes it
+
+  The FILE read is the repo's `.fux/output.toml`; under --no-output-config, or
+  with no repo root at all, it is the packaged template `fux setup` writes.
 ```
 
-## The file is the sole source of truth — WHEN IT EXISTS (Arpit, 2026-08-28)
+## The file is the sole source of truth, and it must exist (L12)
 
-**Every earlier draft of this record let an unset key fall through to
-`BUILT_IN` silently** — "the file is optional, absent means every default".
-That is no longer true of a file that EXISTS. **If `.fux/output.toml` is in
-effect (it exists, no `--no-output-config`, and a repo root exists) and does
-not set a key a verb needs, resolving it is a hard `FuxError`** naming the
-key and where to add it, not a silent default. `fux setup` (and `fux output`)
-write every key **live** — decision 14 — so a repo that has run setup once
-never sees this; a repo whose `.fux/output.toml` predates a key this version
-added gets a loud, actionable error instead of a value nobody chose and
-nobody can see in a diff. This is the "loader refusal" decision 14 named as
-the sanctioned remedy for the old design's freeze-at-setup cost, chosen over
-the alternative (a silent `fux doctor` warning) because a rendering default
-silently drifting from what the repo's own file states is worse than a verb
-that refuses to guess.
-
-⚠ **A MISSING file is a different question, and it is NOT an error
-(decision 20).** Decision 19 made `load()` raise when the file did not exist
-at all. Because the file is write-if-missing (SR-DOTFUX decision 6) it
-reaches **new repos only** — so that raise turned `ask`, `find` and `doctor`
-into exit-1 in **every repo that predates the file**, with `doctor`, the verb
-you would run to diagnose it, broken too. Decision 6 forbids reaching those
-repos by rewrite and names the two mechanisms that are allowed: a loader
-refusal, or a `doctor` check. The refusal is what broke them, so the check is
-what reaches them: `load()` returns `ABSENT_OUTPUT` and `fux doctor` carries
-an `output.toml present` row. **Decision 19's own wording is the rule that
-survives** — *"once it is in effect"* — and a file that does not exist is
-not in effect.
-
-**`BUILT_IN` still exists** — it is not gone, its JOB changed. It is:
-(1) the values `fux setup`/`fux output` write into a fresh, live specimen,
-(2) what `--no-output-config` resolves to (the escape hatch has to have
-something to fall back to, or it stops being an escape hatch), (3) what a
-run outside any fux repo resolves to, so `--help`/`--version` are never
-broken by a file that cannot exist yet, and (4) what a repo with no
-`.fux/output.toml` resolves to, per decision 20. None of the four is "the
-file was present, silently incomplete, and nobody noticed".
+**Every key a verb resolves comes from a file, never from code.** In a repo it
+is `.fux/output.toml`; a missing file, table or key is a `FuxError` naming it
+and the remedy, `fux doctor --fix`, which writes exactly the missing keys from
+the template ([L12](../../records/0013_LAW-12-values-live-in-config.md)
+decision 3). `--no-output-config` — the "is it me or the config?" switch — and
+a run outside any repo read the packaged template, `templates/output.toml.txt`,
+which is the one home of every shipped rendering value. There is no built-in
+dict behind any of them.
 
 ## There is no writer, deliberately
 
@@ -108,13 +80,12 @@ from .constants import fixed
 __all__ = [
     "OUTPUT_NAME",
     "OutputDefaults",
-    "DEFAULT_OUTPUT",
-    "ABSENT_OUTPUT",
-    "BUILT_IN",
     "CLI_VERBS",
     "MCP_KEYS",
     "load",
     "specimen",
+    "template",
+    "template_text",
 ]
 
 #: Committed, and written once by `fux setup`, exactly as `tune.toml` is.
@@ -139,7 +110,7 @@ _ROOTS = ("cli", "mcp")
 #: key at all, it is the question of WHICH chain the other keys walk
 #: (`resolve_json`), answered once per call before any of these are touched.
 CLI_VERBS: dict[str, tuple[str, ...]] = {
-    "ask": ("band", "top", "explain", "sections"),
+    "ask": ("band", "top", "explain", "sections", "max_headings"),
     # 🔴 **`lexical` carries `ask`'s keys EXACTLY, and omitting it was a live
     # bug for the length of one smoke test** (W-160). `fux lexical` is frozen
     # byte-identical to `ask`; a verb absent from this table has no key
@@ -150,9 +121,10 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
     # and nothing failed: the file loaded, the query ran, the answer was right.
     # This is W-140 row 14's trap (an absent entry never resolves `--json`)
     # arriving through a different door.
-    "lexical": ("band", "top", "explain", "sections"),
-    "find": ("band", "top"),
-    "answer": ("band", "no_refer", "journal"),
+    "lexical": ("band", "top", "explain", "sections", "max_headings"),
+    "find": ("band", "top", "max_headings"),
+    # `journal_max` since L12 (W-225): how many receipts the journal keeps.
+    "answer": ("band", "no_refer", "journal", "journal_max"),
     "explain": (),
     "graph": (),
     "path": ("hops",),
@@ -165,7 +137,7 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
     # `--json` would then never be resolved from `[cli.json]` (W-140 row 14).
     # ⚠ **It arrived with `--check --json` on `fux update` and moved here whole
     # when W-177 deleted that verb.**
-    "ingest": (),
+    "ingest": ("progress_threshold",),
     # ⚠ **`update` had this row until W-177 deleted the verb** (2026-09-15).
     # It is not missing — `ingest` absorbed `--check --json`, so `ingest`
     # carries the row now, above.
@@ -175,11 +147,19 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
     # `--json` unreachable from `[cli.json]` (W-140 row 14, the same trap).
     # `--top` and `--retrieval-sample` stay flags: both are how much WORK to
     # do, not how a result is shown, and SR-OUTPUT's subject is the latter.
-    "inspect": (),
+    "inspect": ("progress_threshold",),
     # `correct` carries no `[cli.correct]` key of its own — only `--json` to
     # resolve, like `doctor`, `ingest` and `inspect`. An EMPTY tuple is the
     # declaration that this verb IS shaped by this file (W-140 row 14).
     "correct": (),
+    # The other three verbs that paint progress (`cli._PROGRESS_COMMANDS`). A
+    # verb listed here is shaped by this file; that is what lets the one
+    # `Progress` a command builds read its threshold from the file (L12).
+    "build": ("progress_threshold",),
+    "add": ("progress_threshold",),
+    "remove": ("progress_threshold",),
+    # `fux serve`'s port. The host is fixed (`constants.toml [serve] host`).
+    "serve": ("port",),
 }
 
 #: 🔴 **The one verb that reads ANOTHER verb's subtable, and it is a fact about
@@ -217,7 +197,7 @@ def subtable_for(verb: str) -> str:
 #: result is always JSON) and, corrected during the first build, no `band`
 #: (SR-CONFIDENCE decision 11 makes the confidence block unconditional over
 #: MCP precisely because a tool call cannot pass a flag).
-MCP_KEYS: tuple[str, ...] = ("top",)
+MCP_KEYS: tuple[str, ...] = ("top", "max_headings")
 
 
 #: Every key `[cli]` / `[cli.json]` may carry at the shared (non-per-verb)
@@ -251,21 +231,6 @@ def _keys_shared_by_more_than_one_verb() -> tuple[str, ...]:
 
 _SHARED_CLI_KEYS: tuple[str, ...] = _keys_shared_by_more_than_one_verb()
 
-#: The engine's own defaults, per key, as they appear ON `args` / in help
-#: text. `json` here is the CLI's `--json`/`enabled` switch's built-in value
-#: — see the module docstring for what this dict is used for now that the
-#: file itself no longer falls through to it silently.
-BUILT_IN: dict[str, object] = {
-    "json": False,
-    "band": False,
-    "top": 5,
-    "explain": False,
-    "sections": True,
-    "no_refer": False,
-    "hops": 2,
-    "journal": False,
-}
-
 #: Type per key, as spelled IN THE FILE (`enabled`, not `json`). `bool` is
 #: checked before `int` everywhere: `isinstance(True, int)` is `True` in
 #: Python, so an unguarded check accepts `top = true` and silently means
@@ -279,6 +244,10 @@ _TYPES: dict[str, type] = {
     "enabled": bool,
     "top": int,
     "hops": int,
+    "max_headings": int,
+    "progress_threshold": int,
+    "journal_max": int,
+    "port": int,
 }
 
 #: Keys refused **by name, with the reason**, under `[cli]` / `[cli.json]`
@@ -355,24 +324,9 @@ class OutputDefaults:
     json_verb: dict[str, dict[str, object]] = field(default_factory=dict)
     #: `[mcp]`'s scalars.
     mcp: dict[str, object] = field(default_factory=dict)
-    #: True for every sentinel that resolves straight to `BUILT_IN` and never
-    #: raises for an unset key: `--no-output-config`, no repo root, and — since
-    #: decision 20 — a repo whose `.fux/output.toml` does not exist. **Not**
-    #: "the file was empty": an empty *but present* file still raises, because
-    #: it is in effect and does not set the key asked for.
-    bypass: bool = False
-    #: Why `bypass` is on. True only for decision 20's case — the file is
-    #: absent, so it is not in effect and cannot be the sole source of a key.
-    #: `doctor` reads this to tell a pre-existing repo the file is missing;
-    #: nothing in the resolve chain branches on it, because the *resolution*
-    #: is identical either way. Kept apart from `bypass` so "the consumer
-    #: asked to bypass" and "there is nothing to bypass" stay distinguishable.
-    absent: bool = False
-
-    @property
-    def trivial(self) -> bool:
-        """True in bypass mode. Kept for callers that want to skip work."""
-        return self.bypass
+    #: Where these values were read from — the repo's file, or the packaged
+    #: template (`--no-output-config`, or no repo root). Named in every error.
+    source: str = ""
 
     def resolve_json(self, verb: str, cli_value: object = None) -> bool:
         """Resolve the JSON-rendering switch — FIRST, before any other key.
@@ -387,18 +341,13 @@ class OutputDefaults:
             raise FuxError(f"no output defaults are declared for `{verb}` — known: {sorted(CLI_VERBS)}")
         if cli_value is not None:
             return bool(cli_value)
-        if self.bypass:
-            return bool(BUILT_IN["json"])
         per_verb = self.json_verb.get(subtable_for(verb), {})
         if "enabled" in per_verb:
             return bool(per_verb["enabled"])
         if "enabled" in self.json_shared:
             return bool(self.json_shared["enabled"])
         raise FuxError(
-            f"{OUTPUT_NAME} does not set `enabled` for the JSON rendering — "
-            f"add `enabled = {bool(BUILT_IN['json'])!s}` under `[cli.json]` "
-            f"(or `[cli.json.{verb}]` for `{verb}` only). Run `fux output` to "
-            "see every key, or pass --no-output-config to bypass this file."
+            f"{self.source}:\n  [cli.json] enabled is missing\n  {_FIX_HINT}"
         )
 
     def resolve(self, verb: str, key: str, cli_value: object = None, *, as_json: bool = False) -> object:
@@ -417,8 +366,6 @@ class OutputDefaults:
             raise FuxError(f"`{key}` is not an output key for `{verb}` — it has: {sorted(allowed)}")
         if cli_value is not None:
             return cli_value
-        if self.bypass:
-            return BUILT_IN[key]
         table = subtable_for(verb)
         if as_json:
             per_verb = self.json_verb.get(table, {})
@@ -431,16 +378,8 @@ class OutputDefaults:
             return per_verb[key]
         if key in self.cli_shared:
             return self.cli_shared[key]
-        where = (
-            f"[cli.json.{table}], [cli.json], [cli.{table}] or [cli]"
-            if as_json
-            else f"[cli.{table}] or [cli]"
-        )
-        raise FuxError(
-            f"{OUTPUT_NAME} does not set `{key}` for `{verb}` — add it under "
-            f"{where} (e.g. `{key} = {BUILT_IN[key]!r}`). Run `fux output` to "
-            "see every key, or pass --no-output-config to bypass this file."
-        )
+        where = f"[cli.{table}]" if _verb_owning(key) == table else "[cli]"
+        raise FuxError(f"{self.source}:\n  {where} {key} is missing\n  {_FIX_HINT}")
 
     def resolve_mcp(self, key: str, tool_value: object = None) -> object:
         """`[mcp]`'s own chain: **tool arg → `[mcp]` → bypass → error.**
@@ -452,25 +391,13 @@ class OutputDefaults:
             raise FuxError(f"`{key}` is not an output key for `mcp` — it has: {sorted(MCP_KEYS)}")
         if tool_value is not None:
             return tool_value
-        if self.bypass:
-            return BUILT_IN[key]
         if key in self.mcp:
             return self.mcp[key]
-        raise FuxError(
-            f"{OUTPUT_NAME} does not set `{key}` under [mcp] — add "
-            f"`{key} = {BUILT_IN[key]!r}`. Run `fux output` to see every key, "
-            "or pass --no-output-config to bypass this file."
-        )
+        raise FuxError(f"{self.source}:\n  [mcp] {key} is missing\n  {_FIX_HINT}")
 
 
-#: The bypass sentinel: `--no-output-config`, or no repo root at all.
-DEFAULT_OUTPUT = OutputDefaults(bypass=True)
-
-#: Decision 20's sentinel: a repo root exists, `.fux/output.toml` does not.
-#: Resolves exactly as `DEFAULT_OUTPUT` does — the difference is `absent`,
-#: which is what `fux doctor` reports on and what keeps this case out of the
-#: "the consumer passed --no-output-config" bucket.
-ABSENT_OUTPUT = OutputDefaults(bypass=True, absent=True)
+#: What a missing key's error tells the reader to do — `tune.py`'s sentence.
+_FIX_HINT = "`fux doctor --fix` writes every missing key from the template `fux setup` uses"
 
 
 class _Collector:
@@ -661,39 +588,29 @@ def _parse(path: Path, data: dict) -> OutputDefaults:
         json_shared=json_shared,
         json_verb=json_verb,
         mcp=mcp_out,
-        bypass=False,
+        source=str(path),
     )
 
 
-def load(root: Path, *, enabled: bool = True) -> OutputDefaults:
-    """Read `.fux/output.toml`.
+def load(root: Path | None, *, enabled: bool) -> OutputDefaults:
+    """Read `.fux/output.toml` — every key a verb resolves must be in it.
 
-    `enabled=False` is `--no-output-config`: the file is not read at all, and
-    every key resolves to `BUILT_IN` — the "is it me or the config?" switch,
-    and the one path that still works when the file is what is broken.
-
-    Otherwise the file, **if it exists**, is the sole source of every key a
-    caller actually resolves — see the module docstring. A file that exists
-    but omits one key is a `FuxError`, from `resolve()`/`resolve_json()`/
-    `resolve_mcp()`, once it is clear which key and which verb.
-
-    ⚠ **A MISSING file is not an error — decision 20.** It returns
-    `ABSENT_OUTPUT`, which resolves every key to `BUILT_IN`. Decision 19
-    briefly made this a hard error too, which broke `ask`/`find`/`doctor` in
-    **every repo that predates the file** — the file is write-if-missing
-    (SR-DOTFUX decision 6), so it reaches new repos only, and decision 6
-    forbids reaching the rest by rewrite. Decision 19's own wording, *"once
-    it is in effect"*, is the rule that survives: a file that does not exist
-    is not in effect, so it cannot be the sole source of anything. The repo
-    that is missing it is reached by decision 6's other sanctioned mechanism,
-    a `doctor` check (`output.toml present`), not by a refusal to run.
+    `enabled=False` is `--no-output-config`, and `root=None` is a run outside
+    any repo: both read the packaged template instead — the file `fux setup`
+    would write today — never a value in code (L12 decision 7). A missing file
+    is an error naming it (L12 decision 3); a missing KEY is reported by
+    `resolve()`/`resolve_json()`/`resolve_mcp()`, once it is clear which key a
+    verb needs.
     """
-    if not enabled:
-        return DEFAULT_OUTPUT
+    if not enabled or root is None:
+        return template()
 
     path = root / OUTPUT_NAME
     if not path.is_file():
-        return ABSENT_OUTPUT
+        raise FuxError(
+            f"{path} is missing - `fux setup` writes it, and `fux doctor --fix` "
+            "restores a deleted one. fux holds no copy of its values in code"
+        )
 
     # Windows editors write a BOM; `tomllib.load` reads binary and fails with
     # a decode error that names nothing useful. Stripped rather than diagnosed.
@@ -708,83 +625,29 @@ def load(root: Path, *, enabled: bool = True) -> OutputDefaults:
     return _parse(path, data)
 
 
+def template_text() -> str:
+    """`templates/output.toml.txt` — what `fux setup` writes and `fux output` prints."""
+    return (Path(__file__).parent / "templates" / fixed("templates", "output")).read_text(
+        encoding="utf-8"
+    )
+
+
+#: How the template is named in an error — it is not the consumer's file.
+_TEMPLATE_LABEL = "the packaged output.toml template (--no-output-config)"
+
+
+def template() -> OutputDefaults:
+    """The template, parsed — `--no-output-config` and a run outside any repo."""
+    return _parse(_TEMPLATE_LABEL, tomllib.loads(template_text()))
+
+
 def specimen() -> str:
     """The file `fux setup` writes (write-if-missing) and `fux output` prints.
 
     ⚠ **Live lines, not comments** (SR-OUTPUT decision 14, ruled by Arpit
-    2026-08-27, and now load-bearing rather than cosmetic: since 2026-08-28 a
-    key this file does not set is a hard error, so a specimen that shipped
-    fully commented would break every verb on the very first run after
-    `fux setup`). Every value equals its entry in `BUILT_IN` — a fresh repo
-    behaves identically to one that never had this file, because both go
-    through the same numbers, just by different roots (this file, vs.
-    `--no-output-config`'s bypass).
+    2026-08-27): every key a verb resolves must be in the file, so a specimen
+    that shipped commented would break every verb on the first run after
+    `fux setup`. It is the template, verbatim — the one home of every shipped
+    rendering value (L12).
     """
-    lines = [
-        "# .fux/output.toml — HOW a result is SHOWN. Never which documents come back.",
-        "#",
-        "# Written once by `fux setup`; fux never rewrites it. Every value below is",
-        "# LIVE — it is what the engine already does, restated so you can see it and",
-        "# change it. Deleting a line does not restore a hidden default: the file is",
-        "# the only source of truth, and a verb that needs a key this file does not",
-        "# set will refuse to guess (`fux output` reprints this if you need it back).",
-        "#",
-        "# Three roots, one per consumer:",
-        "#   [cli]       a person reading stdout",
-        "#   [cli.json]  a machine reading --json  (inherits [cli]; `enabled` switches it on)",
-        "#   [mcp]       an agent over MCP          (inherits NOTHING from [cli])",
-        "#",
-        "# Precedence, highest first:  a CLI flag  ->  [cli.json.<verb>]  ->  [cli.json]",
-        "#   ->  [cli.<verb>]  ->  [cli]              (and, for MCP:  tool arg  ->  [mcp])",
-        "#",
-        "# Per-verb overrides go under [cli.<verb>] / [cli.json.<verb>] — e.g. an",
-        "# uncommented",
-        "#   [cli.find]",
-        "#   band = false        # find pipes bare paths; a band on stdout would break that",
-        "#",
-        "# `fux ask --no-output-config` ignores this whole file — the",
-        '# "is it me or the config?" switch.',
-        "",
-        "# `band` and `top` are shared by more than one verb, so they live here.",
-        "# A key only one verb has (`explain`, `sections`, `hops`, `no_refer`,",
-        "# `journal`) is refused at this level BY NAME — it lives under that",
-        "# verb's own table, below — setting it here would read as global, and",
-        "# it is not.",
-        "[cli]",
-        f"band = {str(bool(BUILT_IN['band'])).lower()}       # the confidence block — SR-CONFIDENCE decision 11",
-        f"top = {int(BUILT_IN['top'])}            # ask/find. ⚠ also bounds `confidence.support`,",
-        "               #   which is a REPORTED signal — the one key here that",
-        "               #   changes a number an agent reads, admitted rather than hidden.",
-        "",
-        "[cli.ask]",
-        f"explain = {str(bool(BUILT_IN['explain'])).lower()}    # report which path answered",
-        f"sections = {str(bool(BUILT_IN['sections'])).lower()}    # the matched `§ heading` lines under each hit.",
-        "               #   Text mode AND the --json `headings` field, together:",
-        "               #   one key, one question, both renderings (decision 21).",
-        "",
-        "[cli.path]",
-        f"hops = {int(BUILT_IN['hops'])}          # max edges in a route",
-        "",
-        "[cli.answer]",
-        f"no_refer = {str(bool(BUILT_IN['no_refer'])).lower()}",
-        # 🔴 The ONE key in this file that writes bytes, and the specimen has to
-        # say so. `.fux/output.toml` is a RENDERING config; a reader scanning it
-        # for things that change what they see would pass over a key that
-        # changes what is on their disk. *"locally"* -- the wording until
-        # 2026-09-13 -- named the place and not the act (W-147).
-        f"journal = {str(bool(BUILT_IN['journal'])).lower()}"
-        "    # ⚠ NOT a rendering key. `true` APPENDS every answer's receipt to",
-        "                     #   a file: .fux/runtime/provenance.jsonl, gitignored,",
-        "                     #   never committed. Consent, either here or per-call",
-        "                     #   with `fux answer --journal` -- both are explicit.",
-        "",
-        "[cli.json]",
-        f"enabled = {str(bool(BUILT_IN['json'])).lower()}   # emit --json by default; per-verb: [cli.json.<verb>] enabled = true",
-        "",
-        "[mcp]                # the one surface with NO command-line flags at all —",
-        "                     # this table is the only way to configure it.",
-        f"top = {int(BUILT_IN['top'])}            # ⚠ no `band` here: the MCP confidence block is",
-        "               #   UNCONDITIONAL (SR-CONFIDENCE decision 11), refused by name.",
-        "",
-    ]
-    return "\n".join(lines) + ("\n" if not lines[-1] else "")
+    return template_text()

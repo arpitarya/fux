@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@6ed0ada8517b]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@589979f4f3eb]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 80f3779884803a58c910c08fa289321896914be8ec2798cab29969a6418c1846
+content_sha: 19d068fe080d28ce7325dcd4be4dc51a21256c46db104fe29af1bcbe159f31bf
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -130,6 +130,15 @@ algorithm defines.
 7. **A consumer never sees this file and cannot change it.** A value a consumer
    may choose is not fixed, and belongs in their `fux.toml` or a `.fux/*.toml`
    ([L12](0013_LAW-12-values-live-in-config.md) decision 1).
+
+<!-- L12-NOTE-START -->
+
+**W-225 stage 3a (2026-09-27)** added `[templates] output` — the output
+template's file name — and `[answer] candidates`, the number of documents
+`fux answer` hands the refer plane. The count stays fixed because every extra
+candidate is a real fetch against someone's source system.
+
+<!-- L12-NOTE-END -->
 
 <!-- L12-VALUES-START -->
 <!-- L12-VALUES-END -->

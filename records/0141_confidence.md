@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@20897950b94e, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@620ad647947d, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: c79bf2f2a375eef39c3a7e7256a37ca8564bfeeaf1d95923020f560b014f8189
+content_sha: e5dd59168314ad28fec4b0f33a66a650e5256cdba40d2ffd2c8ddf00ebd17616
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -609,7 +609,7 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/query/__init__.py` — `OUTPUT_SCHEMA` ← `[schema_files] output`
+- `src/fux/query/__init__.py` — `OUTPUT_SCHEMA` ← `[schema_files] output`, `ANSWER_TOP` ← `[answer] candidates`
 
 <!-- L12-VALUES-END -->
 

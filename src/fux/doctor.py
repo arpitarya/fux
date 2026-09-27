@@ -1721,37 +1721,21 @@ def _freshness_share(root: Path) -> Check:
 
 
 def _output_config_health(root: Path) -> Check:
-    """`.fux/output.toml` absent — the repo that predates the file.
+    """Will `.fux/output.toml` load — every verb that renders reads it.
 
-    SR-OUTPUT decision 19 made a missing file a hard `FuxError` at load time.
-    The file is write-if-missing (SR-DOTFUX decision 6), so it reaches **new
-    repos only** — which made `ask`, `find` and `doctor` exit 1 in every repo
-    that predates it, `doctor` included, the verb you would run to find out
-    why. Decision 20 ruled the fork: a missing file resolves to the engine
-    defaults, and the repo is reached HERE instead.
-
-    ⚠ **This is decision 6's own prescribed mechanism**, the same one
-    `_types_health` implements for the types list: *"if a change must reach
-    existing repos, the mechanism is a loader refusal or a `doctor` check —
-    never a rewrite"*. The refusal is what broke them, so this is the check.
-
-    A **warning**, never an error. Nothing is wrong with a repo that has no
-    `.fux/output.toml`: every verb runs, and every default is the engine's
-    own. What the consumer loses is the ability to CHANGE one — and the MCP
-    surface, which has no flags, cannot be configured at all without it. That
-    is worth a line; it is not a broken repo.
+    Since L12 (W-225) an absent file is an ERROR, not the warning it used to be:
+    there is no engine default behind it any more, so every verb that resolves
+    an output key stops, naming the file. `fux doctor --fix` writes it from the
+    template. ⚠ **A key the file lacks is `output.toml current`'s to report**;
+    this row answers only whether the file exists and parses.
     """
-    path = root / output_config.OUTPUT_NAME
-    if path.is_file():
-        return Check("output.toml present", True, f"{output_config.OUTPUT_NAME}: output defaults are configurable")
-    return Check(
-        "output.toml present",
-        False,
-        f"{output_config.OUTPUT_NAME} is absent, so every output default is the engine's own "
-        f"and none can be changed - run `fux output > {output_config.OUTPUT_NAME}` to write "
-        "the current defaults out (this is the only way to configure `fux mcp`, which has no flags)",
-        level="warn",
-    )
+    from .errors import FuxError as _FuxError
+
+    try:
+        output_config.load(root, enabled=True)
+    except _FuxError as exc:
+        return Check("output.toml present", False, f"{exc}")
+    return Check("output.toml present", True, f"{output_config.OUTPUT_NAME}: parsed, every key valid")
 
 
 def _tune_config_health(root: Path) -> Check:
@@ -2196,135 +2180,55 @@ def _starter_refusals_untouched(root: Path) -> Check:
 
 
 def _frozen_keys(root: Path) -> list[Check]:
-    """`.fux/tune.toml` and `.fux/output.toml` against the keys the engine now has.
+    """Every mandatory config file against the template it was written from.
 
-    **A key the engine gained is a key the consumer's file does not mention**,
-    and because both files are write-if-missing it will never gain it on its
-    own. Since L12 there is no engine default to read in its place, so the file's
-    own `loads` row fails too; this row names the keys and the one remedy,
-    `fux doctor --fix`, which writes exactly those keys from the template.
+    **A key the engine gained is a key the consumer's file does not carry**,
+    and because each file is write-if-missing it never gains it on its own.
+    Since L12 there is no engine default to read in its place, so the verb that
+    needs the key stops; this row names every missing key in one pass, and the
+    remedy, `fux doctor --fix`, which writes exactly those keys.
 
-    ⚠ **Absent is reported by the `loads` row, not here.** This row is about a
-    file that exists and is incomplete.
+    **The comparison is the writer's own** — `setup.missing_config_keys`, the
+    function `--fix` uses — so the row and the fix cannot disagree about what is
+    missing. ⚠ **Absent is the file's own `loads`/`present` row's to report**,
+    not this one's: one fault, one row.
     """
-    return [
-        _frozen_one(
-            root,
-            ".fux/tune.toml",
-            "tune.toml current",
-            _tune_expected_keys(),
-            "`fux doctor --fix` writes exactly the missing keys from the template "
-            "and touches nothing else",
-        ),
-        _frozen_one(
-            root,
-            ".fux/output.toml",
-            "output.toml current",
-            _output_expected_keys(),
-            "`fux output > .fux/output.toml` rewrites it with every current key "
-            "(NOTE: it rewrites VALUES too - diff before you keep it)",
-            by_name=True,
-        ),
-    ]
+    from . import setup as setup_mod
 
-
-def _frozen_one(
-    root: Path, rel: str, name: str, expected: set[str], remedy: str, *, by_name: bool = False
-) -> Check:
-    """One file's key set against the engine's. `by_name` compares LEAF NAMES.
-
-    🔴 **`by_name` exists because the path comparison was a false positive on
-    fux's own repository**, caught by W-163's own keep-call before the row
-    shipped. `.fux/output.toml` is deliberately NESTED PER VERB — `explain`
-    lives under `[cli.ask]`, `hops` under `[cli.path]`, `no_refer` and `journal`
-    under `[cli.answer]`, `enabled` under `[cli.json]` — because a rendering
-    default means different things to different verbs (SR-OUTPUT). Expecting
-    `cli.explain` reported six keys missing from a file that carries all of
-    them, in the right places.
-
-    **So the question this row asks is "does the file MENTION this knob", not
-    "at this exact path".** Looser, deliberately: the cost is that a key moved
-    between tables would not be flagged, and the benefit is that the row is not
-    wrong on every correctly-written file.
-
-    `.fux/tune.toml` keeps the path comparison. Its schema *is* `table.key` with
-    no nesting choice to make, so the exact path is answerable there and a
-    tighter check is free.
-    """
-    path = root / rel
-    if not path.is_file():
-        return Check(name, True, f"{rel} absent - see the `loads` row")
-    try:
-        import tomllib
-
-        data = tomllib.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        # Its own row already reports an unparseable file; saying so twice with
-        # two different wordings is how a reader learns to trust neither.
-        return Check(name, True, f"{rel}: not parsed here - see the `loads` row")
-    present = _leaf_keys(data)
-    if by_name:
-        # ⚠ **Every segment, not just the last.** `json` is a knob whose value
-        # lives at `[cli.json] enabled` — the TABLE carries the name and the leaf
-        # is `enabled`. Comparing final segments alone reported `json` missing
-        # from a file that configures it, which is the same false positive as
-        # the path comparison wearing a different hat. Caught by running the row
-        # on this repository, which is what W-163's keep-call is for.
-        present = {segment for path in present for segment in path.split(".")}
-    missing = sorted(expected - present)
-    if not missing:
-        return Check(name, True, f"{rel}: every key the engine now carries is present")
-    return Check(
-        name,
-        False,
-        f"{rel} is missing {len(missing)} key(s) the engine now has: "
-        + ", ".join(f"`{m}`" for m in missing[:5])
-        + (f" and {len(missing) - 5} more" if len(missing) > 5 else "")
-        + f". This file is where you would change them and it does not mention them. {remedy}",
-        level="warn",
-    )
-
-
-def _leaf_keys(data: dict, prefix: str = "") -> set[str]:
-    """`{"cli": {"top": 5}}` -> `{"cli.top"}`. Tables are paths, leaves are keys."""
-    out: set[str] = set()
-    for key, value in data.items():
-        path = f"{prefix}{key}"
-        if isinstance(value, dict):
-            out |= _leaf_keys(value, f"{path}.")
-        else:
-            out.add(path)
-    return out
-
-
-def _tune_expected_keys() -> set[str]:
-    """Every `table.key` the current tune schema carries — **derived, not listed**.
-
-    A hand-written list here would be a second statement of the schema, free to
-    disagree with it while both look correct. That is the restatement L0 forbids,
-    and the failure mode is silent: the row stops reporting a key nobody added.
-    """
-    from . import tune as tune_mod
-
-    return {
-        f"{table}.{key}"
-        for table, keys in tune_mod._SCHEMA.items()
-        for key in keys
-    }
-
-
-def _output_expected_keys() -> set[str]:
-    """Every knob name the output schema carries — **names, not paths**.
-
-    See `_frozen_one`'s `by_name`: this file nests per verb on purpose, so a
-    path is the wrong unit of comparison and asking for one reported fux's own
-    correctly-written `output.toml` as missing six keys.
-
-    **Derived from `BUILT_IN`, never listed here.** A second copy of the key set
-    is free to disagree with the schema while both look correct, and the failure
-    is silent — the row simply stops reporting a knob nobody remembered to add.
-    """
-    return set(output_config.BUILT_IN) | set(output_config.MCP_KEYS)
+    checks: list[Check] = []
+    for rel, template in setup_mod._mandatory_config():
+        name = f"{Path(rel).name} current"
+        path = root / rel
+        if not path.is_file():
+            checks.append(Check(name, True, f"{rel} absent - see its own `loads`/`present` row"))
+            continue
+        try:
+            missing = setup_mod.missing_config_keys(
+                path.read_bytes().decode("utf-8-sig"), template
+            )
+        except Exception:
+            # Its own row already reports an unparseable file; saying so twice
+            # with two different wordings is how a reader learns to trust neither.
+            checks.append(Check(name, True, f"{rel}: not parsed here - see the `loads` row"))
+            continue
+        if not missing:
+            checks.append(Check(name, True, f"{rel}: every key the engine now carries is present"))
+            continue
+        shown = [f"`[{t}] {k}`" for t, k in missing]
+        checks.append(
+            Check(
+                name,
+                False,
+                f"{rel} is missing {len(missing)} key(s) the engine now has: "
+                + ", ".join(shown[:5])
+                + (f" and {len(shown) - 5} more" if len(shown) > 5 else "")
+                + ". The verbs that read them stop until they are written - "
+                "`fux doctor --fix` writes exactly the missing keys from the template "
+                "and touches nothing else",
+                level="warn",
+            )
+        )
+    return checks
 
 
 def _unbound_types(root: Path) -> Check:

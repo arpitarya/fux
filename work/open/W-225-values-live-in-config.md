@@ -9,7 +9,7 @@ ball: agent
 
 # W-225 — every value lives in a config file (the L12 migration)
 
-**Status: building — stages 1–2 of 8 landed 2026-09-27.** (Stage 7's `doctor --fix` writer landed early, with stage 2: every later stage needs it.) Stages, in order: 1 `constants.toml` + the fixed names · 2 `tune.toml`, no fallback · 3 `fux.toml` + `output.toml` · 4 the other `.fux/*.toml` (formats limits + digest, refusals, `inspect.toml`) · 5 R7 structural numerals · 6 R8 bool and every parameter default · 7 `doctor --fix`/`setup` + the AST test · 8 records, CHANGELOG, byte-equality run. The law is [SR-LAW-12](../../records/0013_LAW-12-values-live-in-config.md);
+**Status: building — stages 1–2 and 3a (`output.toml`) of 8 landed 2026-09-27; 3b (`fux.toml`) is next.** (Stage 7's `doctor --fix` writer landed early, with stage 2: every later stage needs it.) Stages, in order: 1 `constants.toml` + the fixed names · 2 `tune.toml`, no fallback · 3 `fux.toml` + `output.toml` · 4 the other `.fux/*.toml` (formats limits + digest, refusals, `inspect.toml`) · 5 R7 structural numerals · 6 R8 bool and every parameter default · 7 `doctor --fix`/`setup` + the AST test · 8 records, CHANGELOG, byte-equality run. The law is [SR-LAW-12](../../records/0013_LAW-12-values-live-in-config.md);
 this item makes it true.
 
 **Model:** Claude Code, Opus — a cross-plane refactor with byte-equality gates.

@@ -20,7 +20,9 @@ from pathlib import Path
 
 import pytest
 
-from fux.progress import THRESHOLD
+from l12_fixtures import shipped_output
+
+THRESHOLD = shipped_output()["progress_threshold"]
 from l12_fixtures import write_config
 
 # Enough documents that `extract`, `edges` and `postings` all clear the count

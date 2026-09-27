@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@02783a764363, src/fux/setup.py@fafd860ce539, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@02783a764363, src/fux/setup.py@f858254cca34, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: b7ed2bee6f70851046fa59783b7169d29c53aaa032fdbcfe4ad56df499d53d22
+content_sha: bd00efbb3e2498403950b532966311f333d2a43499bd9779192edcd45d93eb67
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -755,6 +755,9 @@ config file L12 makes mandatory from its template, and into a present file only
 the keys it lacks, at the end of their own table with the template's comment —
 nothing the consumer wrote is changed or reordered. `fux setup` and `fux doctor
 --fix` are its only callers.
+
+`.fux/output.toml` joined `fill_missing`'s files in stage 3a (2026-09-27) — its
+template is `src/fux/templates/output.toml.txt`, and it is now required.
 
 <!-- L12-NOTE-END -->
 

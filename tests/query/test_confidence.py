@@ -21,7 +21,7 @@ edited test is how a frozen threshold moves in disguise.
 
 from __future__ import annotations
 
-from l12_fixtures import template_tune, write_config
+from l12_fixtures import cli_args, template_tune, write_config
 import argparse
 import json as json_mod
 
@@ -286,7 +286,7 @@ def _args(**overrides) -> argparse.Namespace:
         hybrid=False, band=True,
     )
     base.update(overrides)
-    return argparse.Namespace(**base)
+    return cli_args(**base)
 
 
 def test_run_query_fills_confidence_only_when_a_caller_asks(tmp_path, monkeypatch):

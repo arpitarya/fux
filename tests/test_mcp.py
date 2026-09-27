@@ -281,7 +281,9 @@ def test_the_advertised_default_is_the_engine_s_default():
     no gate read, which is exactly W-84's class in the one surface whose
     reader is ALWAYS a machine.
     """
-    from fux.output_config import BUILT_IN
+    from l12_fixtures import shipped_output
+
+    BUILT_IN = shipped_output()
 
     k = _tool("fux_search")["inputSchema"]["properties"]["k"]
     assert k["default"] == BUILT_IN["top"]
@@ -393,7 +395,9 @@ def test_the_node_tool_file_matches_the_python_literal():
     import json as json_mod
     from pathlib import Path
 
-    from fux.output_config import BUILT_IN
+    from l12_fixtures import shipped_output
+
+    BUILT_IN = shipped_output()
 
     root = Path(__file__).resolve().parents[1]
     shared = json_mod.loads((root / "node" / "mcp-tools.json").read_text(encoding="utf-8"))

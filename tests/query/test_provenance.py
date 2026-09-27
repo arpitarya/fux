@@ -23,7 +23,7 @@ from fux.query.rank import AskResult
 from fux.query.scan import ask
 from fux.query.tokenize import tokenize
 from fux.store import term_hash, write_index
-from l12_fixtures import scoring, write_config
+from l12_fixtures import scoring, shipped_output, write_config
 
 
 def _h(word: str) -> str:
@@ -250,7 +250,7 @@ def test_a_receipt_records_the_question_in_plaintext(tmp_path):
 def test_the_journal_is_local_and_gitignored_by_its_directory(tmp_path):
     _corpus(tmp_path)
     payload = provenance.receipt(tmp_path, "rollback", path="refer", subject=[])
-    provenance.remember(tmp_path, payload)
+    provenance.remember(tmp_path, payload, max_entries=shipped_output()["journal_max"])
     path = provenance.journal_path(tmp_path)
     assert path.exists()
     assert path.parent.name == "runtime"
@@ -281,7 +281,7 @@ def test_a_zero_bound_writes_nothing(tmp_path):
 
 def test_reading_a_corrupt_journal_line_skips_it(tmp_path):
     _corpus(tmp_path)
-    provenance.remember(tmp_path, provenance.receipt(tmp_path, "q", path="refer", subject=[]))
+    provenance.remember(tmp_path, provenance.receipt(tmp_path, "q", path="refer", subject=[]), max_entries=shipped_output()["journal_max"])
     path = provenance.journal_path(tmp_path)
     path.write_text(path.read_text() + "{not json\n")
     assert len(provenance.read_journal(tmp_path)) == 1
@@ -457,6 +457,8 @@ class _Args:
         self.audit = False
         self.receipt = False
         self.journal = False
+        self.journal_max = shipped_output()["journal_max"]
+        self.max_headings = shipped_output()["max_headings"]
         self.why = False
         # SR-CONFIDENCE decision 11 gates the CLI's confidence block behind
         # `--band`. On by default HERE because this file's subject is the

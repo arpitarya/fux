@@ -16,7 +16,8 @@ Four rules, and every one of them is load-bearing (W-64):
    though the bytes it protects are elsewhere. There is no timer anywhere in
    this file.
 4. **A count threshold, not a delay onset.** A phase paints only once its
-   total exceeds `THRESHOLD`, so a run where almost everything carries
+   total exceeds its threshold (`.fux/output.toml [cli] progress_threshold`),
+   so a run where almost everything carries
    forward (`fux remove`, most `fux ingest` re-runs) never flashes a bar it
    would immediately clear.
 
@@ -32,10 +33,10 @@ import sys
 
 __all__ = ["Progress", "NULL"]
 
-#: Below this total, a phase's bar costs more terminal churn than it earns —
-#: the count threshold rule (W-64, rule 4). No timer backs this: it is
-#: checked once, against a total that is already known.
-THRESHOLD = 200
+#: Below the threshold, a phase's bar costs more terminal churn than it earns —
+#: the count threshold rule (W-64, rule 4). No timer backs it: it is checked
+#: once, against a total that is already known. The number is
+#: `.fux/output.toml [cli] progress_threshold`, resolved by the CLI (L12).
 
 _BAR_WIDTH = 20
 _FULL = "█"  # █
@@ -100,9 +101,10 @@ class Progress:
     """
 
     def __init__(
-        self, *, no_progress: bool = False, force: bool = False, stream=None
+        self, *, no_progress: bool, force: bool, threshold: int, stream=None
     ) -> None:
         self._stream = stream if stream is not None else sys.stderr
+        self._threshold = threshold
         if no_progress:
             enabled = False
         elif force:
@@ -130,7 +132,7 @@ class Progress:
     # -- internals, called only by _Phase -----------------------------------
 
     def _paint(self, name: str, count: int, total: int, detail: str, unit: str) -> None:
-        if not self._enabled or total <= THRESHOLD:
+        if not self._enabled or total <= self._threshold:
             return
         filled = _BAR_WIDTH * min(count, total) // total if total else 0
         bar = _FULL * filled + _EMPTY * (_BAR_WIDTH - filled)

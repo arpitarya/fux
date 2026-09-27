@@ -15,15 +15,20 @@ import pytest
 
 from fux.errors import FuxError
 from fux.output_config import (
-    BUILT_IN,
     CLI_VERBS,
-    DEFAULT_OUTPUT,
     MCP_KEYS,
     OUTPUT_NAME,
     OutputDefaults,
     load,
     specimen,
+    template,
 )
+from l12_fixtures import shipped_output
+
+#: What the retired `BUILT_IN` held, derived from the template (L12), and the
+#: template itself — what `--no-output-config` and a run outside a repo read.
+BUILT_IN = shipped_output()
+DEFAULT_OUTPUT = template()
 
 
 def write(root, body: str):
@@ -37,60 +42,46 @@ def write(root, body: str):
 # --------------------------------------------------------------------------
 
 
-def test_absent_file_falls_back_to_the_engine_defaults(tmp_path):
-    """SR-OUTPUT decision 20 — the fork decision 19 opened, ruled.
-
-    The file is write-if-missing (SR-DOTFUX decision 6), so it reaches NEW
-    repos only. Raising here made every PRE-EXISTING repo exit 1 on `ask`,
-    `find` and `doctor` after an upgrade. A file that does not exist is not
-    "in effect", so it is not the sole source of anything.
-    """
-    cfg = load(tmp_path)
-    assert cfg.bypass, "a missing file must resolve, not raise"
-    assert cfg.absent, "and must be distinguishable from --no-output-config"
-    assert cfg.resolve("ask", "top", as_json=False) == BUILT_IN["top"]
-    assert cfg.resolve_json("ask") is BUILT_IN["json"]
-    assert cfg.resolve_mcp("top") == BUILT_IN["top"]
+def test_absent_file_is_an_error_that_names_it(tmp_path):
+    """L12 decision 3: fux holds no copy of these values in code, so a repo with
+    no `.fux/output.toml` stops, naming the file and `fux doctor --fix`."""
+    with pytest.raises(FuxError, match=r"output\.toml is missing") as exc:
+        load(tmp_path, enabled=True)
+    assert "fux doctor --fix" in str(exc.value)
 
 
 def test_a_present_but_incomplete_file_still_raises(tmp_path):
-    """Decision 20 narrows decision 19; it does not repeal it. The hard error
-    survives for the case decision 19 was actually written about — a file
-    that IS in effect and does not set a key the verb resolves."""
+    """A file that IS in effect and does not set a key the verb resolves."""
     write(tmp_path, "[cli]\nband = true\n")
-    cfg = load(tmp_path)
-    assert not cfg.bypass and not cfg.absent
-    with pytest.raises(FuxError, match="does not set `top`"):
+    cfg = load(tmp_path, enabled=True)
+    with pytest.raises(FuxError, match=r"\[cli\] top is missing"):
         cfg.resolve("ask", "top", as_json=False)
 
 
-def test_absent_and_bypassed_are_distinguishable(tmp_path):
-    """`--no-output-config` is a consumer's request; an absent file is a fact
-    about the repo. Both resolve to `BUILT_IN`; only the second is something
-    `fux doctor` should mention."""
-    assert load(tmp_path, enabled=False).absent is False
-    assert load(tmp_path).absent is True
+def test_no_output_config_reads_the_template(tmp_path):
+    """`--no-output-config` reads what `fux setup` would write (L12 decision 7)."""
+    cfg = load(tmp_path, enabled=False)
+    assert cfg.resolve("ask", "top") == template().resolve("ask", "top")
+    assert load(None, enabled=True).resolve("ask", "top") == cfg.resolve("ask", "top")
 
 
 def test_empty_file_loads_but_every_key_still_errors(tmp_path):
     write(tmp_path, "")
-    cfg = load(tmp_path)
-    assert not cfg.bypass
-    with pytest.raises(FuxError, match="does not set `top`"):
+    cfg = load(tmp_path, enabled=True)
+    with pytest.raises(FuxError, match=r"\[cli\] top is missing"):
         cfg.resolve("ask", "top", as_json=False)
 
 
 def test_all_commented_is_the_same_as_empty(tmp_path):
     write(tmp_path, "# [cli]\n# top = 9\n")
-    cfg = load(tmp_path)
-    with pytest.raises(FuxError, match="does not set `top`"):
+    cfg = load(tmp_path, enabled=True)
+    with pytest.raises(FuxError, match=r"\[cli\] top is missing"):
         cfg.resolve("ask", "top", as_json=False)
 
 
 def test_disabled_does_not_read_the_file_and_never_raises(tmp_path):
     write(tmp_path, "not even valid toml [[[")
     cfg = load(tmp_path, enabled=False)
-    assert cfg.bypass
     assert cfg.resolve("ask", "top") == BUILT_IN["top"]
 
 
@@ -98,7 +89,7 @@ def test_disabled_does_not_even_parse_a_broken_file(tmp_path):
     # `--no-output-config` has to work when the file is what is wrong; that is
     # the entire point of the switch.
     write(tmp_path, "this is not toml at all [[[")
-    assert load(tmp_path, enabled=False).bypass
+    assert load(tmp_path, enabled=False).resolve("ask", "top") == BUILT_IN["top"]
 
 
 # --------------------------------------------------------------------------
@@ -119,7 +110,7 @@ def _full_body() -> str:
 
 
 def test_cli_shared_resolves_for_every_verb_that_declares_it(tmp_path):
-    cfg = load(write(tmp_path, _full_body()))
+    cfg = load(write(tmp_path, _full_body()), enabled=True)
     assert cfg.resolve("ask", "band", as_json=False) is True
     assert cfg.resolve("find", "band", as_json=False) is True
     assert cfg.resolve("ask", "top", as_json=False) == 3
@@ -127,27 +118,27 @@ def test_cli_shared_resolves_for_every_verb_that_declares_it(tmp_path):
 
 def test_verb_subtable_beats_shared_table(tmp_path):
     write(tmp_path, "[cli]\nband = true\n\n[cli.find]\nband = false\n")
-    cfg = load(tmp_path)
+    cfg = load(tmp_path, enabled=True)
     assert cfg.resolve("ask", "band", as_json=False) is True
     assert cfg.resolve("find", "band", as_json=False) is False
 
 
 def test_cli_flag_beats_everything(tmp_path):
-    cfg = load(write(tmp_path, _full_body()))
+    cfg = load(write(tmp_path, _full_body()), enabled=True)
     assert cfg.resolve("ask", "top", cli_value=3, as_json=False) == 3
     assert cfg.resolve("ask", "top", cli_value=77, as_json=False) == 77
 
 
 def test_none_means_the_flag_was_not_passed(tmp_path):
     write(tmp_path, "[cli]\nband = true\n\n[cli.json]\nenabled = false\n")
-    cfg = load(tmp_path)
+    cfg = load(tmp_path, enabled=True)
     assert cfg.resolve("ask", "band", cli_value=None, as_json=False) is True
     assert cfg.resolve("ask", "band", cli_value=False, as_json=False) is False
 
 
 def test_shared_table_reaches_a_verb_only_where_it_declares_the_key(tmp_path):
     write(tmp_path, "[cli]\nband = true\n\n[cli.json]\nenabled = false\n")
-    cfg = load(tmp_path)
+    cfg = load(tmp_path, enabled=True)
     assert cfg.resolve("ask", "band", as_json=False) is True
     with pytest.raises(FuxError, match="not an output key for `doctor`"):
         cfg.resolve("doctor", "band", as_json=False)
@@ -157,7 +148,7 @@ def test_json_branch_still_inherits_cli_shared_and_verb_tables(tmp_path):
     # decision 3: `[cli.json]` DOES inherit from `[cli]` — only `enabled`
     # itself does not fall back to `[cli]` (there is no `[cli] json` at all).
     write(tmp_path, "[cli]\nband = true\ntop = 9\n\n[cli.ask]\nexplain = true\n\n[cli.json]\nenabled = true\n")
-    cfg = load(tmp_path)
+    cfg = load(tmp_path, enabled=True)
     assert cfg.resolve("ask", "band", as_json=True) is True
     assert cfg.resolve("ask", "top", as_json=True) == 9
     assert cfg.resolve("ask", "explain", as_json=True) is True
@@ -168,7 +159,7 @@ def test_json_verb_beats_json_shared_beats_cli(tmp_path):
         tmp_path,
         "[cli]\ntop = 5\n\n[cli.json]\ntop = 7\n\n[cli.json.ask]\ntop = 9\n",
     )
-    cfg = load(tmp_path)
+    cfg = load(tmp_path, enabled=True)
     assert cfg.resolve("ask", "top", as_json=True) == 9
     assert cfg.resolve("find", "top", as_json=True) == 7
     assert cfg.resolve("ask", "top", as_json=False) == 5
@@ -176,7 +167,7 @@ def test_json_verb_beats_json_shared_beats_cli(tmp_path):
 
 def test_json_off_never_consults_the_json_tables(tmp_path):
     write(tmp_path, "[cli]\ntop = 5\n\n[cli.json]\ntop = 999\n")
-    cfg = load(tmp_path)
+    cfg = load(tmp_path, enabled=True)
     assert cfg.resolve("ask", "top", as_json=False) == 5
 
 
@@ -187,33 +178,33 @@ def test_json_off_never_consults_the_json_tables(tmp_path):
 
 def test_resolve_json_flag_beats_everything(tmp_path):
     write(tmp_path, "[cli.json]\nenabled = false\n")
-    cfg = load(tmp_path)
+    cfg = load(tmp_path, enabled=True)
     assert cfg.resolve_json("ask", True) is True
     assert cfg.resolve_json("ask", False) is False
 
 
 def test_resolve_json_enabled_turns_json_on_globally(tmp_path):
     write(tmp_path, "[cli.json]\nenabled = true\n")
-    assert load(tmp_path).resolve_json("ask") is True
+    assert load(tmp_path, enabled=True).resolve_json("ask") is True
 
 
 def test_resolve_json_per_verb_overrides_global(tmp_path):
     write(tmp_path, "[cli.json]\nenabled = false\n\n[cli.json.find]\nenabled = true\n")
-    cfg = load(tmp_path)
+    cfg = load(tmp_path, enabled=True)
     assert cfg.resolve_json("ask") is False
     assert cfg.resolve_json("find") is True
 
 
 def test_resolve_json_raises_when_unset(tmp_path):
     write(tmp_path, "[cli]\nband = true\n")
-    with pytest.raises(FuxError, match="does not set `enabled`"):
-        load(tmp_path).resolve_json("ask")
+    with pytest.raises(FuxError, match=r"\[cli.json\] enabled is missing"):
+        load(tmp_path, enabled=True).resolve_json("ask")
 
 
 def test_resolve_json_rejects_an_unknown_verb(tmp_path):
     write(tmp_path, "[cli.json]\nenabled = false\n")
     with pytest.raises(FuxError, match="no output defaults are declared"):
-        load(tmp_path).resolve_json("nosuchverb")
+        load(tmp_path, enabled=True).resolve_json("nosuchverb")
 
 
 # --------------------------------------------------------------------------
@@ -224,31 +215,31 @@ def test_resolve_json_rejects_an_unknown_verb(tmp_path):
 def test_unknown_table_is_loud(tmp_path):
     write(tmp_path, "[asssk]\ntop = 3\n")
     with pytest.raises(FuxError, match="unknown table"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_unknown_verb_subtable_is_loud(tmp_path):
     write(tmp_path, "[cli.asssk]\ntop = 3\n")
     with pytest.raises(FuxError, match="not a known verb"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_unknown_key_is_loud(tmp_path):
     write(tmp_path, "[cli.ask]\ncolour = true\n")
     with pytest.raises(FuxError, match="unknown key `colour`"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_a_key_on_the_wrong_verb_names_the_right_one(tmp_path):
     write(tmp_path, "[cli.find]\nexplain = true\n")
     with pytest.raises(FuxError, match="is a key of ask, not of `find`"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_a_single_verb_key_is_refused_at_the_shared_level(tmp_path):
     write(tmp_path, "[cli]\nhops = 4\n")
     with pytest.raises(FuxError, match=r"belongs to one verb only \(path\)"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_a_bare_known_key_names_the_table_it_belongs_in(tmp_path):
@@ -256,25 +247,25 @@ def test_a_bare_known_key_names_the_table_it_belongs_in(tmp_path):
     # it sends a reader hunting for a section they never wrote.
     write(tmp_path, "band = true\n")
     with pytest.raises(FuxError, match=r"`band` is a key, not a table"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_a_bare_unknown_key_says_so(tmp_path):
     write(tmp_path, "colour = true\n")
     with pytest.raises(FuxError, match="not a known key at all"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_a_root_name_used_as_a_scalar_is_loud(tmp_path):
     write(tmp_path, "cli = 5\n")
     with pytest.raises(FuxError, match="must be a table"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_errors_are_collected_not_reported_one_at_a_time(tmp_path):
     write(tmp_path, "[cli.ask]\ncolour = true\nshape = 2\nzoom = 9\n")
     with pytest.raises(FuxError) as exc:
-        load(tmp_path)
+        load(tmp_path, enabled=True)
     for key in ("colour", "shape", "zoom"):
         assert key in str(exc.value)
 
@@ -287,13 +278,13 @@ def test_errors_are_collected_not_reported_one_at_a_time(tmp_path):
 def test_old_defaults_table_is_named_as_the_old_layout(tmp_path):
     write(tmp_path, "[defaults]\nband = true\n")
     with pytest.raises(FuxError, match="old layout"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_old_bare_verb_table_is_named_as_the_old_layout(tmp_path):
     write(tmp_path, "[ask]\ntop = 5\n")
     with pytest.raises(FuxError, match=r"\[ask\] at the top level is the old layout"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 # --------------------------------------------------------------------------
@@ -304,42 +295,42 @@ def test_old_bare_verb_table_is_named_as_the_old_layout(tmp_path):
 def test_top_true_is_refused_and_does_not_mean_one(tmp_path):
     write(tmp_path, "[cli]\ntop = true\n")
     with pytest.raises(FuxError, match="must be a whole number"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_band_one_is_refused(tmp_path):
     write(tmp_path, "[cli.ask]\nband = 1\n")
     with pytest.raises(FuxError, match="must be true or false"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_top_zero_is_refused_as_broken_not_aggressive(tmp_path):
     write(tmp_path, "[cli]\ntop = 0\n")
     with pytest.raises(FuxError, match="at least 1"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_top_float_is_refused(tmp_path):
     write(tmp_path, "[cli]\ntop = 5.5\n")
     with pytest.raises(FuxError, match="must be a whole number"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_a_large_top_is_allowed_because_it_is_strong_not_broken(tmp_path):
     write(tmp_path, "[cli]\ntop = 500\n\n[cli.json]\nenabled = false\n")
-    assert load(tmp_path).resolve("ask", "top", as_json=False) == 500
+    assert load(tmp_path, enabled=True).resolve("ask", "top", as_json=False) == 500
 
 
 def test_enabled_wrong_type_is_refused(tmp_path):
     write(tmp_path, "[cli.json]\nenabled = 1\n")
     with pytest.raises(FuxError, match="must be true or false"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_enabled_outside_json_is_refused(tmp_path):
     write(tmp_path, "[cli]\nenabled = true\n")
     with pytest.raises(FuxError, match="only applies inside `\\[cli.json\\]`"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 # --------------------------------------------------------------------------
@@ -351,7 +342,7 @@ def test_enabled_outside_json_is_refused(tmp_path):
 def test_refused_keys_are_named_not_reported_as_unknown(tmp_path, key):
     write(tmp_path, f"[cli.ask]\n{key} = true\n")
     with pytest.raises(FuxError) as exc:
-        load(tmp_path)
+        load(tmp_path, enabled=True)
     message = str(exc.value)
     assert f"`{key}` is refused" in message
     assert "unknown key" not in message
@@ -360,31 +351,31 @@ def test_refused_keys_are_named_not_reported_as_unknown(tmp_path, key):
 def test_json_key_is_refused_and_explains_the_rename(tmp_path):
     write(tmp_path, "[cli]\njson = true\n")
     with pytest.raises(FuxError, match="is spelled `enabled`"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_no_tune_refusal_explains_the_loop(tmp_path):
     write(tmp_path, "[cli]\nno_tune = true\n")
     with pytest.raises(FuxError, match=r"is it me or the config"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_scan_refusal_names_bug_reproduction(tmp_path):
     write(tmp_path, "[cli.ask]\nscan = true\n")
     with pytest.raises(FuxError, match="reproduced explicitly"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_mcp_band_is_refused_by_name_with_the_reason(tmp_path):
     write(tmp_path, "[mcp]\nband = false\n")
     with pytest.raises(FuxError, match="UNCONDITIONAL"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_mcp_json_is_refused_by_name(tmp_path):
     write(tmp_path, "[mcp]\njson = true\n")
     with pytest.raises(FuxError, match="always JSON"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 # --------------------------------------------------------------------------
@@ -395,19 +386,19 @@ def test_mcp_json_is_refused_by_name(tmp_path):
 def test_merge_conflict_markers_are_named(tmp_path):
     write(tmp_path, "[cli]\n<<<<<<< HEAD\ntop = 5\n=======\ntop = 9\n>>>>>>> branch\n")
     with pytest.raises(FuxError, match="merge conflict"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_utf8_bom_is_stripped_not_diagnosed(tmp_path):
     (tmp_path / ".fux").mkdir(parents=True, exist_ok=True)
     (tmp_path / OUTPUT_NAME).write_bytes(b"\xef\xbb\xbf[cli]\ntop = 7\n")
-    assert load(tmp_path).resolve("ask", "top", as_json=False) == 7
+    assert load(tmp_path, enabled=True).resolve("ask", "top", as_json=False) == 7
 
 
 def test_invalid_toml_names_the_file(tmp_path):
     write(tmp_path, "[cli\ntop = 3\n")
     with pytest.raises(FuxError, match="invalid TOML"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 # --------------------------------------------------------------------------
@@ -442,7 +433,7 @@ def test_mcp_is_in_the_schema_at_all():
 
 def test_the_specimen_as_shipped_matches_built_in_for_every_key(tmp_path):
     write(tmp_path, specimen())
-    cfg = load(tmp_path)
+    cfg = load(tmp_path, enabled=True)
     for verb, keys in CLI_VERBS.items():
         as_json = cfg.resolve_json(verb)
         assert as_json == BUILT_IN["json"]
@@ -460,8 +451,8 @@ def test_the_specimen_mentions_every_root(tmp_path):
 def test_the_specimen_is_not_commented_out(tmp_path):
     # ⚠ Decision 14, and load-bearing since 2026-08-28: a fully-commented
     # specimen would break every verb the moment `fux setup` wrote it.
-    load(write(tmp_path, specimen()))  # must not raise on load
-    assert load(tmp_path).resolve("ask", "band", as_json=False) is False
+    load(write(tmp_path, specimen()), enabled=True)  # must not raise on load
+    assert load(tmp_path, enabled=True).resolve("ask", "band", as_json=False) is False
 
 
 def test_the_specimen_warns_that_top_bounds_a_reported_signal():
@@ -502,8 +493,8 @@ def test_output_defaults_is_frozen():
 
 def test_two_loads_of_the_same_file_are_equal(tmp_path):
     write(tmp_path, "[cli]\nband = true\ntop = 9\n\n[cli.json]\nenabled = false\n")
-    assert load(tmp_path) == load(tmp_path)
-    assert isinstance(load(tmp_path), OutputDefaults)
+    assert load(tmp_path, enabled=True) == load(tmp_path, enabled=True)
+    assert isinstance(load(tmp_path, enabled=True), OutputDefaults)
 
 
 def test_bypass_resolves_every_verb_and_mcp_key_to_built_in():
@@ -535,7 +526,7 @@ def test_apply_output_defaults_resolves_against_a_real_repo(tmp_path, monkeypatc
     (tmp_path / "fux.toml").write_text("[fux]\nversion = 1\n", encoding="utf-8")
     write(
         tmp_path,
-        "[cli]\nband = true\ntop = 3\n\n[cli.ask]\nexplain = false\nsections = true\n"
+        "[cli]\nband = true\ntop = 3\nmax_headings = 3\n\n[cli.ask]\nexplain = false\nsections = true\n"
         "\n[cli.json]\nenabled = false\n",
     )
     monkeypatch.chdir(tmp_path)
@@ -583,7 +574,7 @@ def test_apply_output_defaults_raises_when_the_file_is_incomplete(tmp_path, monk
     monkeypatch.chdir(tmp_path)
 
     args = build_parser().parse_args(["ask", "rollback"])
-    with pytest.raises(FuxError, match="does not set `top`"):
+    with pytest.raises(FuxError, match=r"\[cli\] top is missing"):
         _apply_output_defaults(args)
 
 
@@ -595,9 +586,12 @@ def test_apply_output_defaults_falls_back_when_the_file_is_missing_entirely(tmp_
 
     args = build_parser().parse_args(["doctor"])
     # Decision 20: `doctor` is the verb you run to diagnose a broken repo, so
-    # it is the last verb that may refuse to start because a file is missing.
+    # it is the last verb that may refuse to start because a file is missing —
+    # it renders from the template, and its own row reports the file.
     _apply_output_defaults(args)
     assert args.json is BUILT_IN["json"]
+    with pytest.raises(FuxError, match=r"output\.toml is missing"):
+        _apply_output_defaults(build_parser().parse_args(["ask", "rollback"]))
 
 
 def test_no_output_config_bypasses_an_incomplete_file(tmp_path, monkeypatch):
@@ -717,14 +711,14 @@ def test_the_specimen_sets_sections_live(tmp_path):
     assert data["cli"]["ask"]["sections"] is BUILT_IN["sections"]
 
     write(tmp_path, specimen())
-    cfg = load(tmp_path)
+    cfg = load(tmp_path, enabled=True)
     assert cfg.resolve("ask", "sections", None, as_json=False) is BUILT_IN["sections"]
 
 
 def test_sections_is_type_checked_like_every_other_bool(tmp_path):
     write(tmp_path, "[cli.ask]\nsections = 1\n")
     with pytest.raises(FuxError, match="sections"):
-        load(tmp_path)
+        load(tmp_path, enabled=True)
 
 
 def test_the_file_can_turn_sections_off(tmp_path, monkeypatch):

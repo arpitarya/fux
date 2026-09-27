@@ -32,7 +32,7 @@ import json as json_mod
 from fux.query import cmd_answer, cmd_ask, cmd_find
 from fux.query.tokenize import tokenize
 from fux.store import content_sha, term_hash, write_index
-from l12_fixtures import write_config
+from l12_fixtures import cli_args, write_config
 
 DOC_ID = "url:https://x.test/handbook"
 SHA = content_sha(DOC_ID.encode("utf-8"))
@@ -71,7 +71,7 @@ def _corpus(tmp_path):
 def _ask_args(**overrides) -> argparse.Namespace:
     base = dict(query="oncall", top=5, json=False, scan=True, explain=False, hybrid=False)
     base.update(overrides)
-    return argparse.Namespace(**base)
+    return cli_args(**base)
 
 
 # -- the title shows, on every verb, with nothing warmed -----------------
@@ -94,7 +94,7 @@ def test_ask_json_carries_the_real_title(tmp_path, monkeypatch, capsys):
 
 def test_answer_shows_the_real_title(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr("fux.query.find_root", lambda: _corpus(tmp_path))
-    args = argparse.Namespace(query="oncall", json=False, scan=True)
+    args = cli_args(query="oncall", json=False, scan=True)
     assert cmd_answer(args) == 0
     assert capsys.readouterr().out.startswith(TITLE)
 
@@ -104,7 +104,7 @@ def test_find_carries_the_real_title_in_its_json(tmp_path, monkeypatch, capsys):
     assertion is on the JSON. Checked against the verb rather than assumed —
     a text assertion here would pass on the URL and prove nothing."""
     monkeypatch.setattr("fux.query.find_root", lambda: _corpus(tmp_path))
-    assert cmd_find(argparse.Namespace(query="oncall", top=5, json=True)) == 0
+    assert cmd_find(cli_args(query="oncall", top=5, json=True)) == 0
     payload = json_mod.loads(capsys.readouterr().out)
     assert payload["results"][0]["title"] == TITLE
 

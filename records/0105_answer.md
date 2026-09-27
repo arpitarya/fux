@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@79014cc86dfd]
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 93d26dc2e8e7b7e6f67a00d7070cb33da7f1a05aa452b747133406df208eae49
+content_sha: e6921d352981ee70cf47701cdb4bb085a99b8960e40c6aafedd3f9f2cf02079f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -305,7 +305,7 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/query/__init__.py` — `OUTPUT_SCHEMA` ← `[schema_files] output`
+- `src/fux/query/__init__.py` — `OUTPUT_SCHEMA` ← `[schema_files] output`, `ANSWER_TOP` ← `[answer] candidates`
 
 <!-- L12-VALUES-END -->
 

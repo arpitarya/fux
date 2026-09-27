@@ -74,9 +74,9 @@ from ..constants import fixed
 #: The only address this server binds. **Not a flag.** See the module docstring.
 HOST = fixed("serve", "host")
 
-#: Default port. Arbitrary and high, chosen so it collides with nothing common;
-#: `--port` moves it.
-DEFAULT_PORT = 7337
+#: The port is `.fux/output.toml [cli.serve] port` (7337 as shipped: arbitrary
+#: and high, chosen so it collides with nothing common); `--port` moves it, and
+#: the CLI resolves the two onto `args.port` before this module runs (L12).
 
 #: The single bundled page. `L10` — what a consumer is served is build output,
 #: and for one self-contained HTML file the authored form and the built form are
@@ -480,7 +480,7 @@ class _Server(ThreadingHTTPServer):
         self.server_port = port
 
 
-def make_server(port: int = DEFAULT_PORT, host: str | None = None, root=None) -> ThreadingHTTPServer:
+def make_server(port: int, host: str | None = None, root=None) -> ThreadingHTTPServer:
     """A bound server, not yet serving. Separated so a test can take the port.
 
     `port=0` asks the OS for a free one, which is what `tests/serve/` uses —
@@ -495,7 +495,7 @@ def make_server(port: int = DEFAULT_PORT, host: str | None = None, root=None) ->
 
 def cmd_serve(args) -> int:
     """Start the explorer and block until Ctrl-C."""
-    server = make_server(port=getattr(args, "port", DEFAULT_PORT) or DEFAULT_PORT)
+    server = make_server(port=args.port)
     url = f"http://{HOST}:{server.server_address[1]}/"
     # Flushed: stdout is block-buffered when piped, and a process ended by
     # TerminateProcess (Windows' SIGTERM) never flushes, so the URL was lost.
