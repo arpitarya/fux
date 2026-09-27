@@ -1,0 +1,17 @@
+questions                        125
+rows carrying funnel gates  (S4) 125
+empty ranked lists          (S3) 0
+ranked lists shorter than 10     0
+answers declined            (S1) 0
+answers with no citation         0
+answerable: true                 125
+band grounded               (S2) 69
+band partial                (S2) 24
+band weak                   (S2) 32
+band none                   (S2) 0
+rank-1 document under seed/      124
+rank-1 document archived         2
+source                           {'refer': 125}
+freshness                        {'current': 125}
+slowest ask_ms              (S5) s4u-001 211 · s4u-004 199 · s4u-022 188
+slowest answer_ms           (S5) s4u-113 164 · s4u-010 159 · s4u-050 155

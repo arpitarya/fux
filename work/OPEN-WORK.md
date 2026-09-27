@@ -24,7 +24,9 @@ here. Read that record before changing anything below it.
 | what he decides | filed | age |
 |---|---|---|
 | 🔴 **W-227** — L11 breach: my recursive grep walked `work/golden/` (nothing printed); the traversal guard did not fire on a multi-line command. Does it cost anything, and may a session harden the guard? [detail](open/W-227-l11-breach-2026-09-27.md) | 2026-09-27 | 0d |
-| ↳ **blocks:** nothing else in the queue — W-168's phase-5 run may go ahead in any other session. | | |
+| ↳ **blocks:** nothing else in the queue. | | |
+| 🔴 **W-168** — score `set-4-claude`: type `just golden-score work/regression/2026-09-27-golden-set-4-rung-01000`. Steps 6–10 count their pools from it. [report](regression/2026-09-27-golden-set-4-rung-01000/report.md) | 2026-09-27 | 0d |
+| ↳ **blocks:** nothing else in the queue. | | |
 
 ---
 
@@ -33,7 +35,7 @@ here. Read that record before changing anything below it.
 ### fux build
 
 - 🔴 **W-227** · `arpit` — L11 breach, 2026-09-27: the recursive grep and the guard gap. [detail](open/W-227-l11-breach-2026-09-27.md)
-- 🟢 **W-168** · `agent` — the ranking ideas. Step 4 shipped at `mined_weight = 0.5`; gen-3 ladder rebuilt 2026-09-27. Next: a phase-5 run of `set-4-claude` (`fux doctor --fix` on the rung first), by a session other than W-227's. [detail](open/W-168-search-improvements.md)
+- 🔴 **W-168** · `arpit` — the ranking ideas. Step 4 shipped at `mined_weight = 0.5`; `set-4-claude` captured on the gen-3 `rung-01000` 2026-09-27. Next: Arpit scores it; then each step 6–10 counts its pool. [detail](open/W-168-search-improvements.md)
 - 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–3 landed (`constants.toml`; `tune.toml`, `output.toml`, `fux.toml` strict + `doctor --fix`). Next: stage 4, the other `.fux/*.toml`. [detail](open/W-225-values-live-in-config.md)
 
 

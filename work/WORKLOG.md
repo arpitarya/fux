@@ -22,6 +22,12 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-27 — W-168: phase-5 capture of `set-4-claude` on the gen-3 ladder  ·  Claude Code
+- **Asked:** *"implement w-168"*. The next step was the phase-5 run, which had to be done by a session other than W-227's.
+- **Did:** Pre-registered first (`0ce0b845`). Captured 125 questions × `ask --why` + `answer` on `rung-01000` with the rung's own engine `80495b44` (pinned worktree, no re-ingest) at the shipped `anchor 1.0` + `mined 0.5`. 125/125 rows carry gates; there were 0 declines; bands were 69/24/32/0. Filed [`2026-09-27-golden-set-4-rung-01000`](regression/2026-09-27-golden-set-4-rung-01000/report.md). The W-168 row and ball moved to Arpit, with an inbox row.
+- **Decided / open:** I did **not** run `fux doctor --fix` on the rung, as the queue line said: that was written for HEAD, and it would edit a frozen rung. The pin needs no fix and already carries step 4. This session read `set-4-claude`'s question text, so it may not build a rung (A23).
+- **Next:** 🔴 Arpit types `just golden-score work/regression/2026-09-27-golden-set-4-rung-01000`; then each step 6–10 counts its pool.
+
 ## 2026-09-27 — W-226 closed; W-225 stage 3b (`fux.toml` strict); W-227 breach declared  ·  Claude Code
 - **Asked:** *"review open work update it and then build whatever is in green till it gets closed"*.
 - **Did:** Closed W-226 (archived, map row, IMPLEMENTATION reconciled). Built W-225 stage 3b: every `fux.toml` key required, the template the one home, six code defaults deleted, `setup.Mandatory` so `doctor --fix`/`setup` fill `fux.toml` without ever adding `[sources.url]`, insertion after a table's last key, Node `dirsFile` strict. A subagent migrated ~100 test fixtures. 23 records amended with notes; SR-CONFIG decision 17. 120/120 outputs byte-identical to HEAD. Stamped and verified on a clean worktree, because the serve/Words session's files sit uncommitted in the main tree.

@@ -7,6 +7,26 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## 🔴 SET-4-CLAUDE CAPTURED — 2026-09-27 (Claude Code, Opus); the score is Arpit's
+
+[Pre-registration](../regression/2026-09-27-golden-set-4-rung-01000/PRE-REGISTRATION.md) (`0ce0b845`, before any row) · [report](../regression/2026-09-27-golden-set-4-rung-01000/report.md).
+This session is not W-227's, and it built no rung.
+
+- **One arm, `rung-01000`, the rung's own engine `80495b44`**, with no
+  re-ingest. **No `doctor --fix`:** the next-step line above was written for
+  HEAD, whose W-225 stage 2 refuses the rung. Fixing it would have edited a
+  frozen rung. The pin predates stage 2 and already carries step 4.
+- **The shipped combination** (`anchor = 1.0`, `mined_weight = 0.5`) comes from
+  the rung's own `tune.toml`, unedited. With one arm, this is a baseline, not a
+  measurement of that combination.
+- **125/125 rows** carry funnel gates, ten results, a `refer` answer and a
+  `current` citation. None were declined. Bands: 69 `grounded` · 24 `partial` ·
+  32 `weak` · 0 `none`.
+- 🔴 **Next, in order:**
+  1. Arpit types `just golden-score work/regression/2026-09-27-golden-set-4-rung-01000`.
+  2. Each step 6–10 counts its own pool from the score. **Below 6 stops that
+     step.** Step 10 then pre-registers per U0 · B2 · E1.
+
 ## ✅ GENERATION-3 LADDER REBUILT — 2026-09-27 (Claude Code, Opus)
 
 [Report](../regression/2026-09-27-ladder-gen3-rebuild/report.md) · [ANALYSIS](../regression/2026-09-27-ladder-gen3-rebuild/ANALYSIS.md).
