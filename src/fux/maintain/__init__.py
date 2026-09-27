@@ -91,7 +91,8 @@ def cmd_daemon(args) -> int:
         print(f"  daemon    running (pid {state['pid']})")
     else:
         print("  daemon    not running")
-    print(f"  sweep     every {daemon_mod.sweep_minutes(root)} min")
+    minutes = daemon_mod.sweep_minutes(root)
+    print(f"  sweep     every {minutes} min" if minutes is not None else "  sweep     none - no [sources.url]")
     last = state.get("last")
     print(f"  last pass {last['outcome'] if last else 'none yet'}")
     return 0

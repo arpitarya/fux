@@ -57,6 +57,22 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   1000`; `[cli.serve] port = 7337`; `[mcp] max_headings = 3`. Library callers:
   `fux.open(...).graph()` now requires `hops`, and `find`/`ask`/`path` read their
   `top`/`hops` from the file when not given.
+- ⚠ **Every `fux.toml` key is now required too (law L12, W-225) — `fux doctor
+  --fix` writes the missing ones.** A missing `[sources] dirs_file`/`urls_file`,
+  `[index] shards`, `[observe] max_ms` or `[agents] install` stops the run naming
+  every missing key at once; so does any `[sources.url]` key — `keep`, `ttl`,
+  `enrich`, `update`, `fetch_at_answer`, `max_parallel`, `sweep_minutes`,
+  `acquired_max_bytes` — **when that table is present**. Its absence still means
+  *fetch nothing*, and `--fix` never adds it. `ttl`, `sweep_minutes` and
+  `acquired_max_bytes` used to be left out on purpose so a raised default
+  reached you unedited; they are now written at the old values (`"24h"`, `60`,
+  2 GiB), so a future change arrives with a migration line instead.
+  **Four behaviours change for a repo that relied on an absence:** `fux daemon
+  start` refuses a repo with no `[sources.url]` (it swept every 60 minutes);
+  `ask`/`find` stop on a present `fux.toml` that does not load (they silently
+  dropped the archived demotion); observers are skipped when `fux.toml` does not
+  load; `fux doctor`'s dirs rows read your configured `dirs_file`. On this repo
+  120 of 120 ranked outputs are byte-identical across the change.
 - **The engine's fixed values live in one file, `src/fux/constants.toml`
   (W-225).** Schema ids, artefact names, decoder versions and extensions: read by
   both the Python and the Node reader. Nothing a consumer sees changes.

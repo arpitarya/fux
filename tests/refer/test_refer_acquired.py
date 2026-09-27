@@ -13,6 +13,7 @@ import pytest
 from fux.errors import FuxError
 from fux.refer import source as source_mod
 from fux.store import acquired
+from l12_fixtures import write_config
 
 DOC = "url:https://x/share/TOKEN"
 LOC = "https://x/share/TOKEN"
@@ -35,9 +36,8 @@ def _retain(root, raw=PAGE, ctype=HTML, loc=LOC, decoder="html"):
     blob = acquired.save(root, loc, raw, ctype, ".html", run_seq=1)
     acquired.write_manifest(root, {loc: blob})
     if loc.startswith("http"):
-        (root / "fux.toml").write_text(
-            "[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8"
-        )
+        (root / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+        write_config(root)  # every other key from the template (SR-LAW-12)
         listing = root / ".fux" / "sources" / "urls"
         listing.parent.mkdir(parents=True, exist_ok=True)
         listing.write_text(f"{loc} fetch=http decoder={decoder}\n", encoding="utf-8")

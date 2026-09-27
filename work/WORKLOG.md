@@ -22,6 +22,12 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-27 — W-226 closed; W-225 stage 3b (`fux.toml` strict); W-227 breach declared  ·  Claude Code
+- **Asked:** *"review open work update it and then build whatever is in green till it gets closed"*.
+- **Did:** Closed W-226 (archived, map row, IMPLEMENTATION reconciled). Built W-225 stage 3b: every `fux.toml` key required, the template the one home, six code defaults deleted, `setup.Mandatory` so `doctor --fix`/`setup` fill `fux.toml` without ever adding `[sources.url]`, insertion after a table's last key, Node `dirsFile` strict. A subagent migrated ~100 test fixtures. 23 records amended with notes; SR-CONFIG decision 17. 120/120 outputs byte-identical to HEAD. Stamped and verified on a clean worktree, because the serve/Words session's files sit uncommitted in the main tree.
+- **Decided / open:** 🔴 **W-227**: while closing W-226 I ran `grep -rn … work records …`, and it walked `work/golden/` without an exclusion. Nothing was printed. The traversal guard did not fire on that multi-line command, and I stopped short of diagnosing it when the classifier refused a replay. The Blocked-on-Arpit inbox lists it. W-168's phase-5 run is left to another session. Four stage-3b behaviour changes are listed for Arpit in the compare doc. Still red and not mine: `999c1976`'s missing SR-TUNE touch (the fix is a history rewrite or a RULE-SINCE move; Arpit's call).
+- **Next:** W-225 stage 4 (the other `.fux/*.toml`); W-168 phase-5 run in a different session.
+
 ## 2026-09-27 — W-226 and the serve Answer tab committed  ·  Claude Code
 - **Asked:** *"commit everything"*.
 - **Did:** Committed W-226 (schemas → `src/fux/schemas/`), the `fux serve` Answer tab, and the rebuilt `.fux/index`. The gates were owed first. I trimmed the serve skill description to 500 characters in all four copies. I shortened the W-168 and W-226 OPEN-WORK rows. I added `schemas/output.schema.json` to SR-FIND's and SR-OUTPUT's References: both describe `query/__init__.py`, and both decide part of the `--json` shape it declares. I re-stamped `owns:` for 0103, 0117, 0132, 0142, 0154 and 0159 after reading each diff; each was a path move, skill text, or W-225's committed Node change. I also re-stamped `content_sha` on the records named. Unit tests were 5754 passed and 3 failed before the commit; e2e 151/151 and Node 89/89 passed.

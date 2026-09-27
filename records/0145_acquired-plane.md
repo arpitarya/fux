@@ -7,10 +7,10 @@ description: "Fetched source bytes are retained in .fux/acquired/, a third categ
 status: accepted
 date: 2026-09-01
 feature: the acquired plane
-owns: [src/fux/store/acquired.py@62fee04a0972]
+owns: [src/fux/store/acquired.py@a0a92b358251]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 667b6e60f64b501f880037a255a7cbd0361484965884cc07da1c52628301f092
+content_sha: 3344a93445fa946565e71332c08e0294b5ee0cece77b1dfba95c9001ee645f94
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -109,7 +109,7 @@ None is solved by the two caches that already exist, and `refer/fetchcache.py` s
 5. **Retention happens in `fetch_all()`, never inside a fetcher.** W-86 P8 removed conversion from `http.py` and `cdp.py` because it lived there as two hand-maintained copies that a comment asked to keep identical and nothing checked. Retention in the fetchers repeats that defect exactly, and would make *which fetcher retrieved a document* observable again. Above the boundary, every fetcher gains retention with no line changed in any of them.
 6. **The order is `_unpack` → refusal check → persist → decode.** A refusal is never stored. Retaining a login page would keep the wrong bytes *and* make them look authoritative.
 7. **The plane holds no wall clock.** Ordering is by `run_seq`, read from `maintain/urlstate.py` rather than started here — two run counters would drift, and the one that drifts would be the one deciding what gets deleted. Wall clock lives in `runtime/fetch-cache/` and nowhere else.
-8. **The store is bounded by `[sources.url] acquired_max_bytes` (default 2 GiB), and eviction is by `run_seq`, oldest first** — never by `mtime`, which would be a clock. **A blob whose URL has `fail_streak > 0` is never evicted**: that is precisely the copy that cannot be re-acquired. `fail_streak > 0`, not `>= FAILING_STREAK` — that constant is the threshold for *reporting* a URL as dead; here one failure already means "may not be re-acquirable", and the cost of protecting it is one blob of disk.
+8. **The store is bounded by `[sources.url] acquired_max_bytes` (required with the table since W-225 stage 3b; the template writes 2 GiB), and eviction is by `run_seq`, oldest first** — never by `mtime`, which would be a clock. **A blob whose URL has `fail_streak > 0` is never evicted**: that is precisely the copy that cannot be re-acquired. `fail_streak > 0`, not `>= FAILING_STREAK` — that constant is the threshold for *reporting* a URL as dead; here one failure already means "may not be re-acquirable", and the cost of protecting it is one blob of disk.
 8a. ⚠ **`acquired_max_bytes` stays in `fux.toml` while `max_table_rows` left it**
     (2026-09-11). On that day `[decode] max_table_rows` moved to
     `.fux/tune.toml [index]` ([SR-TUNE](0135_tuning.md) decision 13), taking

@@ -11,10 +11,11 @@
 # look correct (SR-LAW-0 decision 4). A key fux does not know is REFUSED by
 # name, so a typo here fails loudly instead of sitting inert.
 #
-# Every key fux writes here is LIVE and carries the value fux itself applies.
-# What is NOT written is deliberate: a key whose default is a number that may
-# rise (acquired_max_bytes, sweep_minutes, ttl) is left out so raising it
-# reaches this repo without an edit.
+# Every key here is REQUIRED (SR-LAW-12): fux holds no copy of these values in
+# code, so a missing key stops the run and names itself. `fux doctor --fix`
+# writes a missing key back from this template and touches nothing else.
+# The one exception is a whole table whose PRESENCE is the setting:
+# [sources.url] (delete it and nothing is fetched) and the two maps below it.
 
 # The two source lists, together: one names the directories, one names the URLs.
 [sources]
@@ -26,13 +27,13 @@ urls_file = ".fux/sources/urls"
 # only `fux add <URL>` lists one.
 [sources.url]
 keep            = true
+ttl             = "24h"
 enrich          = false
 update          = "auto"
 fetch_at_answer = true
-
-# REQUIRED, and may not be commented out: a repo that CAN fetch has to say how
-# hard, in a number a person can read. Comment it out and fux refuses to load.
-max_parallel = {default}
+max_parallel    = 4
+sweep_minutes   = 60
+acquired_max_bytes = 2147483648
 
 # A host map: which fetcher retrieves which host, consulted by `fux add` when
 # no --fetch was given. fux READS every key here -- unlike [sources.url.config]
@@ -62,6 +63,9 @@ max_parallel = {default}
 {url_config}
 [index]
 shards = 256
+
+[observe]
+max_ms = 50
 
 # Which agent vendors `fux setup` writes archived-results policy for. These
 # files land OUTSIDE .fux/ -- in .claude/, .github/, .kiro/ and AGENTS.md at the

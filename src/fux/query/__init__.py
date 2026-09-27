@@ -89,18 +89,25 @@ def _archived_ranking(root: Path, tune: "Tune") -> tuple["Weighting", frozenset[
     of `fux.toml`); the archived *declaration* still comes from the committed
     dirs list, never from a path convention (SR-DIR-LIST decision 4).
 
-    Degrades to no archived directories when the dirs list can't be read, so
-    `ask`/`find` never fail because ranking metadata is missing — the same
-    tolerance `_root()` already extends to a corpus with no `fux.toml` at all.
-    **The tune file is not covered by that tolerance**; see `_tune`.
+    Degrades to no archived directories when there is no `fux.toml` at all or
+    the dirs list can't be read — the tolerance `_root()` already extends to a
+    corpus with no `fux.toml`. ⚠ **A `fux.toml` that is present and does not
+    load is NOT tolerated since W-225 stage 3b**: it used to be, and after
+    SR-LAW-12 that would turn an upgraded file missing one unrelated key into
+    rankings that silently stop demoting archived directories. **The tune
+    file is not covered by the tolerance either**; see `_tune`.
     """
-    from ..config import load as load_config
+    from ..config import CONFIG_NAME, load as load_config
     from ..ingest.gitdir import archived_dirs
 
-    try:
-        dirs = frozenset(archived_dirs(root, load_config(root).dirs_file))
-    except FuxError:
-        dirs = frozenset()
+    if not (root / CONFIG_NAME).is_file():
+        dirs: frozenset[str] = frozenset()
+    else:
+        dirs_file = load_config(root).dirs_file
+        try:
+            dirs = frozenset(archived_dirs(root, dirs_file))
+        except FuxError:
+            dirs = frozenset()
     return (
         Weighting(archived_dirs=dirs, priority=tune.priority),
         dirs,

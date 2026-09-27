@@ -10,7 +10,7 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L1, L2, L3, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: df36a704b4bc830b1404aaa8b5e574186da8eaa1b7c332a9bcd2c06ff2eaaa3a
+content_sha: 2bddaa52469ef17b8335649e619676a1194638c45c709eba16e39789b84495e7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -209,6 +209,8 @@ this moved where they are written, not what they are.
 - `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`
 
 <!-- L12-VALUES-END -->
+
+**The daemon takes no lock on a repo it refuses** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `fux daemon start` now refuses a repo with no `[sources.url]` before spawning, so no `write.lock` or pid file is created for it ([SR-MAINTENANCE](0129_hooks.md) decision 9d).
 
 ### Consequences
 

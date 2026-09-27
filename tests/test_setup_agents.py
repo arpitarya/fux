@@ -17,6 +17,7 @@ check it" runs this file with `-k "announces or optout"`.
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 
 import pytest
@@ -24,6 +25,7 @@ import pytest
 from fux import setup as setup_mod
 from fux.cli import main
 from fux.errors import FuxError
+from l12_fixtures import write_config
 
 # W-82 ruling 16: the repo-root `AGENTS.md` is vendor-NEUTRAL, so it lives
 # outside `AGENT_FILES` (which is keyed by vendor) and has to be added here by
@@ -99,6 +101,7 @@ def test_optout_declaration_writes_no_agent_file(tmp_path):
     """`install = []` is the durable form of the flag."""
     root = _fresh(tmp_path)
     (root / "fux.toml").write_text("[sources]\n[agents]\ninstall = []\n", encoding="utf-8")
+    write_config(root)  # every other key from the template (SR-LAW-12)
     setup_mod.run(root)
     assert _agent_files_on_disk(root) == []
 
@@ -108,6 +111,7 @@ def test_optout_declaration_survives_a_second_setup(tmp_path):
     reinstalls what the consumer removed."""
     root = _fresh(tmp_path)
     (root / "fux.toml").write_text("[sources]\n[agents]\ninstall = []\n", encoding="utf-8")
+    write_config(root)  # every other key from the template (SR-LAW-12)
     setup_mod.run(root)
     setup_mod.run(root)
     assert _agent_files_on_disk(root) == []
@@ -116,6 +120,7 @@ def test_optout_declaration_survives_a_second_setup(tmp_path):
 def test_a_partial_declaration_installs_exactly_what_it_names(tmp_path):
     root = _fresh(tmp_path)
     (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["kiro"]\n', encoding="utf-8")
+    write_config(root)  # every other key from the template (SR-LAW-12)
     setup_mod.run(root)
     guides = [name for name, _tpl in setup_mod.GUIDE_SKILLS]
     assert _agent_files_on_disk(root) == sorted(
@@ -266,6 +271,7 @@ def test_an_unknown_agent_name_is_a_loud_error(tmp_path):
 
     root = _fresh(tmp_path)
     (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["copilto"]\n', encoding="utf-8")
+    write_config(root)  # every other key from the template (SR-LAW-12)
     with pytest.raises(FuxError, match="unknown agent"):
         load(root)
 
@@ -275,19 +281,31 @@ def test_install_must_be_a_list(tmp_path):
 
     root = _fresh(tmp_path)
     (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = "claude"\n', encoding="utf-8")
+    write_config(root)  # every other key from the template (SR-LAW-12)
     with pytest.raises(FuxError, match="must be a list"):
         load(root)
 
 
 def test_absent_and_empty_are_different(tmp_path):
-    """Absent is a repo that never expressed a preference; `[]` is a consumer
-    who said no. Collapsing them would make the opt-out unwritable."""
-    from fux.config import KNOWN_AGENTS, load
+    """`[]` is a consumer who said no. Collapsing it with absent would make the
+    opt-out unwritable.
+
+    ⚠ **Inverted by W-225 stage 3b** (SR-LAW-12). This asserted that an absent
+    `[agents] install` loaded as every known vendor — *a repo that never
+    expressed a preference*. There is no preference-free repo now: absent is a
+    load error naming the key, and the template writes the full list."""
+    from fux.config import load
 
     root = _fresh(tmp_path)
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    assert load(root).agents == KNOWN_AGENTS
+    write_config(root)
+    path = root / "fux.toml"
+    text = path.read_text(encoding="utf-8")
+    path.write_text(re.sub(r"(?m)^install\s*=.*\n", "", text, count=1), encoding="utf-8")
+    with pytest.raises(FuxError, match=r"(?s)\[agents\] install is missing.*fux doctor --fix"):
+        load(root)
     (root / "fux.toml").write_text("[sources]\n[agents]\ninstall = []\n", encoding="utf-8")
+    write_config(root)
     assert load(root).agents == ()
 
 
@@ -299,6 +317,7 @@ def test_the_install_order_does_not_depend_on_the_file(tmp_path):
     (root / "fux.toml").write_text(
         '[sources]\n[agents]\ninstall = ["kiro", "claude", "kiro"]\n', encoding="utf-8"
     )
+    write_config(root)
     assert load(root).agents == ("claude", "kiro")
 
 
@@ -529,6 +548,7 @@ def test_codex_alone_still_gets_the_root_agents_file(tmp_path):
     no archived-results policy, and nothing says so."""
     root = _fresh(tmp_path)
     (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["codex"]\n', encoding="utf-8")
+    write_config(root)  # every other key from the template (SR-LAW-12)
     setup_mod.run(root)
     assert _agent_files_on_disk(root) == sorted(
         [
@@ -610,6 +630,7 @@ def test_copilot_alone_still_gets_every_skill(tmp_path):
     without `codex` must still write the shared skills."""
     root = _fresh(tmp_path)
     (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["copilot"]\n', encoding="utf-8")
+    write_config(root)  # every other key from the template (SR-LAW-12)
     setup_mod.run(root)
     for rel, _tpl in setup_mod.SHARED_SKILLS:
         assert (root / rel).is_file(), rel
@@ -621,6 +642,7 @@ def test_a_partial_declaration_without_codex_writes_no_root_agents_file(tmp_path
     turn a partial declaration into a full one."""
     root = _fresh(tmp_path)
     (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["claude"]\n', encoding="utf-8")
+    write_config(root)  # every other key from the template (SR-LAW-12)
     setup_mod.run(root)
     assert not (root / setup_mod.AGENTS_FILE).exists()
 

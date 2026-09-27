@@ -490,7 +490,10 @@ def test_the_receipt_survives_without_band(tmp_path, monkeypatch, capsys):
 
 def _answerable_repo(tmp_path):
     """A tree the refer plane can actually fetch from: an index AND the file."""
-    (tmp_path / "fux.toml").write_text("[fux]\nversion = 1\n")
+    # ⚠ This wrote `[fux] version = 1`, a key fux.toml never had — harmless
+    # while a fux.toml that failed to load degraded silently. Since W-225
+    # stage 3b a PRESENT fux.toml that does not load stops the answer.
+    (tmp_path / "fux.toml").write_text("[sources]\n")
     docs = tmp_path / "docs"
     docs.mkdir()
     body = "# Mesh\n\n## Rollback procedure\n\nDrain the sidecar and fail open.\n"

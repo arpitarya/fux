@@ -17,6 +17,10 @@
 
 [index]
 dir              = ".fux/index"
+# The shard count. shard = blake2b(id, digest_size=1), so a different count
+# rewrites every path in the tree. `fux.toml [index] shards` is a CHECK that
+# refuses any other number (SR-CONFIG decision 3), never a setting.
+shards           = 256
 # Bump history and why each bump was a _format bump: store/format.py.
 schema           = "fux.index.v5"
 # An ANALYZER bump, not a _format bump -- see store/format.py.

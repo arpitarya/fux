@@ -40,6 +40,7 @@ import tomllib
 from fux import config as config_mod
 from fux import tune as tune_mod
 from fux.errors import FuxError
+from l12_fixtures import write_config
 
 ROOT = Path(__file__).resolve().parents[1]
 SR_CONFIG = ROOT / "records" / "0113_config.md"
@@ -164,9 +165,10 @@ def test_an_opaque_table_keeps_its_own_vocabulary(tmp_path):
     business and fux must not have an opinion (SR-CONFIG decision 8)."""
     root = _write(
         tmp_path,
-        "[sources.url]\nmax_parallel = 4\n\n[sources.url.config]\n"
+        "[sources.url]\n\n[sources.url.config]\n"
         'cdp_port = 9222\nanything_at_all = "fine"\n',
     )
+    write_config(root)  # every other key from the template (SR-LAW-12)
     assert config_mod.load(root).url.config["anything_at_all"] == "fine"
 
 

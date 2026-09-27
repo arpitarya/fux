@@ -1,14 +1,48 @@
 from __future__ import annotations
 
+import re
+
 import pytest
 
+from fux import setup as setup_mod
 from fux.config import load
 from fux.errors import FuxError
 from fux.ingest.gitdir import read_dirs, source_dirs
+from l12_fixtures import write_config
 
 
-def _write(tmp_path, text):
+def _write(tmp_path, text, *, fill=True):
+    """Write `fux.toml` as the test states it, then — unless `fill=False` —
+    every OTHER key from the template (SR-LAW-12, W-225 stage 3b), so a test of
+    one key never spells the rest and never states a value the template holds.
+    Present keys are never changed by the fill."""
     (tmp_path / "fux.toml").write_text(text, encoding="utf-8")
+    if fill:
+        write_config(tmp_path)
+
+
+def _template(table, key):
+    node = setup_mod.template_config()
+    for part in table.split("."):
+        node = node[part]
+    return node[key]
+
+
+def _full_config_without(tmp_path, table, key):
+    """A complete `fux.toml` from the template, with exactly one key removed —
+    how an inverted default test states "this key is absent"."""
+    import re
+
+    _write(tmp_path, "[sources]\n[sources.url]\n")
+    path = tmp_path / "fux.toml"
+    text = path.read_text(encoding="utf-8")
+    stripped = re.sub(rf"(?m)^{re.escape(key)}\s*=.*\n", "", text, count=1)
+    assert stripped != text, f"template has no {key} line"
+    path.write_text(stripped, encoding="utf-8")
+
+
+def _missing(table, key):
+    return rf"(?s)\[{re.escape(table)}\] {key} is missing.*fux doctor --fix"
 
 
 def _write_dirs(tmp_path, lines, rel=".fux/sources/dirs"):
@@ -20,19 +54,28 @@ def _write_dirs(tmp_path, lines, rel=".fux/sources/dirs"):
 def test_loads_minimal_config(tmp_path):
     _write(tmp_path, "[sources]\n")
     config = load(tmp_path)
-    assert config.dirs_file == ".fux/sources/dirs"
-    assert config.shards == 256
+    assert config.dirs_file == _template("sources", "dirs_file")
+    assert config.shards == _template("index", "shards")
 
 
-def test_a_config_with_no_sources_table_at_all_is_valid(tmp_path):
-    """`fux.toml` is policy: every key in it has a default."""
-    _write(tmp_path, "[index]\nshards = 256\n")
-    assert load(tmp_path).dirs_file == ".fux/sources/dirs"
+def test_a_config_with_no_sources_table_at_all_is_refused_naming_its_keys(tmp_path):
+    """⚠ **Inverted by W-225 stage 3b** (SR-LAW-12). This asserted *"`fux.toml`
+    is policy: every key in it has a default"* — a file with no `[sources]`
+    loaded and resolved `dirs_file` to a path held in code. No key has a
+    default now: each missing one is named, with the command that writes it."""
+    _write(tmp_path, "[index]\nshards = 256\n", fill=False)
+    with pytest.raises(FuxError, match=_missing("sources", "dirs_file")) as exc:
+        load(tmp_path)
+    assert "[sources] urls_file is missing" in str(exc.value)
 
 
-def test_shards_defaults_when_omitted(tmp_path):
-    _write(tmp_path, "[sources]\n")
-    assert load(tmp_path).shards == 256
+def test_an_omitted_shards_is_refused_not_defaulted(tmp_path):
+    """⚠ **Inverted by W-225 stage 3b** (SR-LAW-12). This asserted that an
+    omitted `[index] shards` defaulted to 256. The count is fixed in
+    `constants.toml`; `fux.toml` must still state it, and silence is an error."""
+    _full_config_without(tmp_path, "index", "shards")
+    with pytest.raises(FuxError, match=_missing("index", "shards")):
+        load(tmp_path)
 
 
 def test_explicit_matching_shards_ok(tmp_path):
@@ -61,8 +104,10 @@ def test_invalid_toml(tmp_path):
 
 
 def test_the_retired_dirs_key_errors_with_instructions(tmp_path):
+    # It names the KEY that holds the list's path, not a path — since W-225
+    # stage 3b there is no default path in code for it to name.
     _write(tmp_path, '[sources]\ndirs = ["docs", "README.md"]\n')
-    with pytest.raises(FuxError, match=r"\.fux/sources/dirs"):
+    with pytest.raises(FuxError, match=r"`\[sources\] dirs_file` names"):
         load(tmp_path)
 
 
@@ -185,14 +230,17 @@ def test_archived_dirs_excludes_exclusion_lines(tmp_path):
 # name -- a `NameError` on every retaining fetch. These tests are the gate on
 # the parse half; `tests/ingest/test_urlsrc.py` covers the use half.
 
-_URL_SOURCE = '[sources]\n[sources.url]\nmax_parallel = 4\n'
+_URL_SOURCE = '[sources]\n[sources.url]\n'
 
 
-def test_acquired_max_bytes_defaults_to_none_not_to_a_number(tmp_path):
-    """`None` defers to the store's own default rather than freezing today's
-    constant into every repo that never thought about the question."""
-    _write(tmp_path, _URL_SOURCE)
-    assert load(tmp_path).url.acquired_max_bytes is None
+def test_an_absent_acquired_max_bytes_is_refused_not_deferred(tmp_path):
+    """⚠ **Inverted by W-225 stage 3b** (SR-LAW-12). This asserted the key
+    defaulted to `None`, deferring to a store constant in code
+    (`acquired.DEFAULT_MAX_BYTES`, deleted). The template now holds the one
+    value, and a `[sources.url]` without the key is refused by name."""
+    _full_config_without(tmp_path, "sources.url", "acquired_max_bytes")
+    with pytest.raises(FuxError, match=_missing("sources.url", "acquired_max_bytes")):
+        load(tmp_path)
 
 
 def test_acquired_max_bytes_is_read_when_stated(tmp_path):
@@ -222,9 +270,7 @@ def test_acquired_max_bytes_refuses_zero_and_points_at_the_real_knob(tmp_path):
 
 
 def _repo(tmp_path, extra: str = "") -> Path:
-    (tmp_path / "fux.toml").write_text(
-        '[sources]\ndirs_file = ".fux/sources/dirs"\n' + extra, encoding="utf-8"
-    )
+    _write(tmp_path, "[sources]\n" + extra)
     return tmp_path
 
 
@@ -269,21 +315,24 @@ def test_a_types_file_key_is_refused_by_name(tmp_path):
 # -- W-174: `[sources.url] fetch_at_answer` -----------------------------------
 
 
-def test_fetch_at_answer_defaults_to_true(tmp_path):
-    """Silence is today's behaviour, so no existing repo changes meaning."""
-    _write(tmp_path, "[sources]\n[sources.url]\nmax_parallel = 4\n")
-    assert load(tmp_path).url.fetch_at_answer is True
+def test_an_absent_fetch_at_answer_is_refused_not_defaulted(tmp_path):
+    """⚠ **Inverted by W-225 stage 3b** (SR-LAW-12). This asserted that silence
+    meant `true`. The template states `true` now, and a `[sources.url]` that
+    omits the key is refused by name rather than read as the old default."""
+    _full_config_without(tmp_path, "sources.url", "fetch_at_answer")
+    with pytest.raises(FuxError, match=_missing("sources.url", "fetch_at_answer")):
+        load(tmp_path)
 
 
 def test_fetch_at_answer_is_read(tmp_path):
-    _write(tmp_path, "[sources]\n[sources.url]\nmax_parallel = 4\nfetch_at_answer = false\n")
+    _write(tmp_path, "[sources]\n[sources.url]\nfetch_at_answer = false\n")
     assert load(tmp_path).url.fetch_at_answer is False
 
 
 def test_fetch_at_answer_rejects_a_non_bool(tmp_path):
     """Type, not truthiness — SR-CONFIG decision 11. `"false"` is a string and
     would otherwise be truthy, which is the opposite of what was typed."""
-    _write(tmp_path, '[sources]\n[sources.url]\nmax_parallel = 4\nfetch_at_answer = "false"\n')
+    _write(tmp_path, '[sources]\n[sources.url]\nfetch_at_answer = "false"\n')
     with pytest.raises(FuxError, match="fetch_at_answer must be true or false"):
         load(tmp_path)
 
@@ -305,7 +354,7 @@ def test_fetch_at_answer_has_no_line_level_layer(tmp_path):
 def test_a_misspelled_fetch_at_answer_is_refused_by_name(tmp_path):
     """The whole point of the declared key list: a typo cannot restore the
     default silently, leaving a consumer believing they are offline."""
-    _write(tmp_path, "[sources]\n[sources.url]\nmax_parallel = 4\nfetch_at_anwser = false\n")
+    _write(tmp_path, "[sources]\n[sources.url]\nfetch_at_anwser = false\n")
     with pytest.raises(FuxError, match="not a fux.toml key"):
         load(tmp_path)
 
@@ -314,7 +363,7 @@ def test_a_misspelled_fetch_at_answer_is_refused_by_name(tmp_path):
 
 
 def test_urls_file_is_read_from_the_sources_table(tmp_path):
-    _write(tmp_path, '[sources]\nurls_file = "docs/urls.txt"\n[sources.url]\nmax_parallel = 4\n')
+    _write(tmp_path, '[sources]\nurls_file = "docs/urls.txt"\n[sources.url]\n')
     config = load(tmp_path)
     assert config.urls_file == "docs/urls.txt"
     # Carried onto UrlSource too, so every existing caller keeps one field.
@@ -327,11 +376,11 @@ def test_urls_file_resolves_without_a_sources_url_table(tmp_path):
     _write(tmp_path, "[sources]\n")
     config = load(tmp_path)
     assert config.url is None
-    assert config.urls_file == ".fux/sources/urls"
+    assert config.urls_file == _template("sources", "urls_file")
 
 
 def test_the_old_spelling_is_refused_by_name_with_its_new_home(tmp_path):
-    _write(tmp_path, '[sources]\n[sources.url]\nmax_parallel = 4\nurls_file = "x"\n')
+    _write(tmp_path, '[sources]\n[sources.url]\nurls_file = "x"\n')
     with pytest.raises(FuxError, match=r"urls_file moved to \[sources\] urls_file"):
         load(tmp_path)
 
@@ -342,7 +391,7 @@ def test_the_old_spelling_is_refused_by_name_with_its_new_home(tmp_path):
 def _two_level(tmp_path):
     _write(
         tmp_path,
-        "[sources]\n[sources.url]\nmax_parallel = 4\n"
+        "[sources]\n[sources.url]\n"
         "[sources.url.config]\nshared = 1\n"
         "[sources.url.config.http]\ntimeout_s = 5.0\n"
         "[sources.url.config.cdp]\ncdp_port = 9333\n",
@@ -367,7 +416,7 @@ def test_a_fetcher_with_no_table_of_its_own_still_gets_the_shared_keys(tmp_path)
 def test_a_per_fetcher_value_wins_over_a_shared_one(tmp_path):
     _write(
         tmp_path,
-        "[sources]\n[sources.url]\nmax_parallel = 4\n"
+        "[sources]\n[sources.url]\n"
         "[sources.url.config]\ntimeout_s = 1.0\n"
         "[sources.url.config.http]\ntimeout_s = 9.0\n",
     )
@@ -381,7 +430,7 @@ def test_only_the_TOP_level_is_namespaced(tmp_path):
     fetcher that wants nested config still gets it, inside its own table."""
     _write(
         tmp_path,
-        "[sources]\n[sources.url]\nmax_parallel = 4\n"
+        "[sources]\n[sources.url]\n"
         "[sources.url.config.http]\nnested = {deep = [1, 2]}\n",
     )
     assert load(tmp_path).url.config_for("http.py") == {"nested": {"deep": [1, 2]}}
@@ -395,17 +444,27 @@ def test_fux_still_reads_no_KEY_inside_the_table(tmp_path):
     assert not [k for k in KNOWN_KEYS if k.startswith("sources.url.config.")]
     _write(
         tmp_path,
-        "[sources]\n[sources.url]\nmax_parallel = 4\n"
+        "[sources]\n[sources.url]\n"
         "[sources.url.config.http]\nsomething_fux_never_heard_of = true\n",
     )
     assert load(tmp_path).url.config_for("http.py") == {"something_fux_never_heard_of": True}
 
 
-def test_the_agents_default_is_the_known_list_not_a_stale_literal(tmp_path):
+def test_the_agents_value_is_the_templates_and_code_holds_none(tmp_path):
     """It read three of four vendors — Codex missing — from before Codex was
     added. Dead (every caller goes through `load`) and wrong, which is worse:
-    a stale default reads as authority."""
+    a stale default reads as authority.
+
+    ⚠ **Inverted by W-225 stage 3b** (SR-LAW-12). This asserted the dataclass
+    field's default equalled `KNOWN_AGENTS`. There is no field default now: the
+    template states the full list, and an absent `[agents] install` is refused."""
+    import dataclasses
+
     from fux.config import KNOWN_AGENTS, Config
 
-    assert Config.__dataclass_fields__["agents"].default == KNOWN_AGENTS
+    assert Config.__dataclass_fields__["agents"].default is dataclasses.MISSING
+    assert tuple(_template("agents", "install")) == KNOWN_AGENTS
     assert "codex" in KNOWN_AGENTS
+    _full_config_without(tmp_path, "agents", "install")
+    with pytest.raises(FuxError, match=_missing("agents", "install")):
+        load(tmp_path)

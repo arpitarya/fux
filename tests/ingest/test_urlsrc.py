@@ -6,7 +6,7 @@ into the tmp repo, which is exactly the trust boundary the design draws."""
 
 from __future__ import annotations
 
-from l12_fixtures import scoring, write_config
+from l12_fixtures import scoring, url_limits, write_config
 import pytest
 
 from fux import store
@@ -163,17 +163,21 @@ def test_config_rejects_a_meta_key_outright(tmp_path):
     `meta = "cleartext"` — the key is unknown, and an unknown key in a
     committed config is a named error, never a warning or a silent ignore."""
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nmax_parallel = 4\nmeta = "plain"\n'
+        '[sources]\n[sources.url]\nmeta = "plain"\n'
     )
+    write_config(tmp_path)  # every other key, so the unknown key is what fires
     with pytest.raises(FuxError, match=r"\[sources\.url\] meta is not a fux\.toml key"):
         load_config(tmp_path)
 
 
 def test_config_rejects_an_inline_urls_list_and_names_the_file(tmp_path):
+    # It names the KEY that holds the list's path — since W-225 stage 3b there
+    # is no default path in code for the message to name.
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nmax_parallel = 4\nurls = ["https://x.test/a"]\n'
+        '[sources]\n[sources.url]\nurls = ["https://x.test/a"]\n'
     )
-    with pytest.raises(FuxError, match=r"\.fux/sources/urls"):
+    write_config(tmp_path)
+    with pytest.raises(FuxError, match=r"`\[sources\] urls_file` names"):
         load_config(tmp_path)
 
 
@@ -182,8 +186,9 @@ def test_config_table_is_opaque_but_must_be_a_table(tmp_path):
     assert load_config(tmp_path).url.config == {"cdp_port": 9333, "anything_at_all": "fux never reads this"}
 
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nmax_parallel = 4\nconfig = 9222\n'
+        '[sources]\n[sources.url]\nconfig = 9222\n'
     )
+    write_config(tmp_path)  # every other key, so the table check is what fires
     with pytest.raises(FuxError, match=r"\[sources.url.config\] must be a table"):
         load_config(tmp_path)
 
@@ -254,7 +259,7 @@ def test_fetcher_without_fetch_fails_loudly(tmp_path):
 def test_fetch_all_calls_hooks_once_and_skips_failures(tmp_path):
     _write_fetcher(tmp_path, FAKE_FETCHER)
     fetched, skipped = fetch_all(
-        tmp_path, _entries(["https://x.test/b", "https://x.test/boom", "https://x.test/a"])
+        tmp_path, _entries(["https://x.test/b", "https://x.test/boom", "https://x.test/a"]), {}, **url_limits()
     )
     assert [f.url for f in fetched] == ["https://x.test/a", "https://x.test/b"]  # sorted, deterministic
     assert [s.rel_path for s in skipped] == ["https://x.test/boom"]
@@ -301,11 +306,11 @@ def test_configure_is_optional_and_absent_table_is_empty(tmp_path):
         '    return "# T\\n\\nbody\\n"\n',
         encoding="utf-8",
     )
-    fetch_all(tmp_path, _entries(["https://x.test/a"]))  # no table passed at all
+    fetch_all(tmp_path, _entries(["https://x.test/a"]), {}, **url_limits())  # an empty table
     assert (tmp_path / ".fux" / "fetchers" / "log.txt").read_text(encoding="utf-8") == "{}"
 
     _write_fetcher(tmp_path, 'def fetch(url):\n    return "# T\\n\\nbody\\n"\n', encoding="utf-8")
-    fetched, _ = fetch_all(tmp_path, _entries(["https://x.test/a"]), {"k": 1})  # no configure defined
+    fetched, _ = fetch_all(tmp_path, _entries(["https://x.test/a"]), {"k": 1}, **url_limits())  # no configure defined
     assert len(fetched) == 1
 
 
@@ -322,7 +327,7 @@ def test_configure_runs_before_connect(tmp_path):
         '    return "# T\\n\\nbody\\n"\n',
         encoding="utf-8",
     )
-    fetch_all(tmp_path, _entries(["https://x.test/a"]), {})
+    fetch_all(tmp_path, _entries(["https://x.test/a"]), {}, **url_limits())
     assert (tmp_path / ".fux" / "fetchers" / "log.txt").read_text(encoding="utf-8") == "configure,connect"
 
 
@@ -333,7 +338,7 @@ def test_configure_raising_is_a_loud_failure_not_a_skip(tmp_path):
         encoding="utf-8",
     )
     with pytest.raises(FuxError, match="configure\\(\\) failed: unknown key"):
-        fetch_all(tmp_path, _entries(["https://x.test/a"]), {"prot": 1})
+        fetch_all(tmp_path, _entries(["https://x.test/a"]), {"prot": 1}, **url_limits())
 
 
 def test_fetch_all_sanitizes_hostile_line_separators(tmp_path):
@@ -341,7 +346,7 @@ def test_fetch_all_sanitizes_hostile_line_separators(tmp_path):
         'def fetch(url):\n    return "# T\\n\\nbefore\\u2028after \\u2029 \\u0085 end\\n"\n',
         encoding="utf-8",
     )
-    fetched, skipped = fetch_all(tmp_path, _entries(["https://x.test/a"]))
+    fetched, skipped = fetch_all(tmp_path, _entries(["https://x.test/a"]), {}, **url_limits())
     assert skipped == []
     assert b"\xe2\x80\xa8" not in fetched[0].content  # U+2028 gone before the canonical writer
 

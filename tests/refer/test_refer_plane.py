@@ -11,7 +11,7 @@ from fux import store as store_mod
 from fux.refer import Policy, refer
 from fux.refer.arc import ARC
 from fux.refer.freshness import ALWAYS, NEVER
-from l12_fixtures import template_tune
+from l12_fixtures import template_tune, write_config
 
 DOC = """# Rollback runbook
 
@@ -43,9 +43,8 @@ def _list_url(root, url, decoder="prose"):
     by the response header (`urlsrc.declared_decoder`), so a fixture that cites
     a URL has to list it.
     """
-    (root / "fux.toml").write_text(
-        "[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8"
-    )
+    (root / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    write_config(root)  # every other key from the template (SR-LAW-12)
     listing = root / ".fux" / "sources" / "urls"
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text(f"{url} fetch=http decoder={decoder}\n", encoding="utf-8")

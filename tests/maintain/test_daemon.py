@@ -258,13 +258,35 @@ def test_no_hook_starts_the_daemon(name):
 # -- cadence ----------------------------------------------------------------
 
 
-def test_sweep_minutes_falls_back_when_there_is_no_config(root):
-    assert daemon.sweep_minutes(root) == daemon.DEFAULT_SWEEP_MINUTES
+def test_sweep_minutes_is_the_configured_cadence(root):
+    """W-225 stage 3b: `[sources.url] sweep_minutes`, read strictly — the
+    template's value, and never a constant in code."""
+    from fux import setup as setup_mod
+    from l12_fixtures import write_config
+
+    write_config(root)
+    assert daemon.sweep_minutes(root) == setup_mod.template_config()["sources"]["url"]["sweep_minutes"]
+    assert not hasattr(daemon, "DEFAULT_SWEEP_MINUTES")
 
 
-def test_the_default_is_shared_with_config():
-    """Two constants drifting apart is how a documented default stops being the
-    real one."""
-    from fux.config import DEFAULT_SWEEP_MINUTES
+def test_a_repo_with_no_url_source_has_no_cadence_and_start_refuses(root):
+    """No `[sources.url]` means no URLs to keep fresh and no key to pace them.
+    Until stage 3b such a repo swept every 60 minutes on a constant in code."""
+    import re
 
-    assert daemon.DEFAULT_SWEEP_MINUTES == DEFAULT_SWEEP_MINUTES
+    from fux import setup as setup_mod
+    from fux.errors import FuxError
+
+    text = re.sub(r"(?ms)^\[sources\.url[^\n]*\n.*?(?=^\[(?!sources\.url))", "", setup_mod.config_text())
+    (root / "fux.toml").write_text(text, encoding="utf-8")
+    assert daemon.sweep_minutes(root) is None
+    with pytest.raises(FuxError, match=r"no \[sources.url\]"):
+        daemon.start(root)
+
+
+def test_a_fux_toml_that_does_not_load_is_not_given_a_cadence(root):
+    from fux.errors import FuxError
+
+    (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    with pytest.raises(FuxError, match="is missing"):
+        daemon.sweep_minutes(root)

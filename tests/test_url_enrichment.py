@@ -13,7 +13,7 @@ import pytest
 from fux import enrich as enrich_mod
 from fux.ingest import sourcelist
 from fux.store import acquired
-from l12_fixtures import chunk_bounds
+from l12_fixtures import chunk_bounds, write_config
 
 #: ⚠ **A bare URL, and it carried `fetch=http` until 2026-09-21.** A `loc` is
 #: an address, never a list LINE, so line attributes never belonged in it; the
@@ -30,10 +30,8 @@ def _repo(tmp_path, line, source_enrich=None):
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
     (tmp_path / ".fux" / "sources" / "urls").write_text(line + "\n")
     extra = f"enrich = {str(source_enrich).lower()}\n" if source_enrich is not None else ""
-    (tmp_path / "fux.toml").write_text(
-        "[sources.url]\n"
-        "max_parallel = 2\n" + extra
-    )
+    (tmp_path / "fux.toml").write_text("[sources.url]\n" + extra)
+    write_config(tmp_path)  # every other key from the template (SR-LAW-12)
     return tmp_path
 
 

@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from fux import store
 from fux.query.refer_answer import _load_fetchers, answer_via_refer
-from l12_fixtures import template_tune
+from l12_fixtures import template_tune, write_config
 
 #: Logs every lifecycle call to a sibling file, since `_load_fetcher` loads
 #: the module internally with no handle the test can inspect afterwards —
@@ -64,9 +64,8 @@ def _sha(text: str) -> str:
 
 
 def _init_url_repo(tmp_path, *, url="https://x.test/a", config_table=""):
-    (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nmax_parallel = 4\n' + config_table, encoding="utf-8"
-    )
+    (tmp_path / "fux.toml").write_text('[sources]\n[sources.url]\n' + config_table, encoding="utf-8")
+    write_config(tmp_path)  # every other key from the template (SR-LAW-12)
     _write_fetcher(tmp_path, FAKE_FETCHER)
     urls_path = tmp_path / ".fux" / "sources" / "urls"
     urls_path.parent.mkdir(parents=True, exist_ok=True)
@@ -264,10 +263,8 @@ def test_two_urls_behind_different_fetchers_each_get_their_own(tmp_path):
     `fetch=` is a closed set — `http` or `cdp` — so those are the two names,
     and they are exactly the pair the failure is about: `http.py` sees a
     rendered page's shell, `cdp.py` sees the page."""
-    (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nmax_parallel = 4\n',
-        encoding="utf-8",
-    )
+    (tmp_path / "fux.toml").write_text('[sources]\n[sources.url]\n', encoding="utf-8")
+    write_config(tmp_path)
     fetchers = tmp_path / ".fux" / "fetchers"
     fetchers.mkdir(parents=True)
     for name in ("http", "cdp"):

@@ -18,6 +18,7 @@ import { loadTune } from "../src/config/tune.mjs";
 import { TUNE_TEMPLATE, tuneText } from "./l12.mjs";
 import { loadOutput, template } from "../src/config/output.mjs";
 import { parseDirs } from "../src/ingest/sourcelist.mjs";
+import { dirsFile, archivedDirSet } from "../src/ingest/gitdir.mjs";
 import { globMatch, isAlreadyText, PROSE_TYPES } from "../src/decode/registry.mjs";
 import { FuxError } from "../src/errors.mjs";
 
@@ -251,4 +252,35 @@ test("decode: `.fux/formats.toml` REPLACES the default when it is there", () => 
   assert.equal(isAlreadyText(root, "a.txt"), true);
   assert.equal(isAlreadyText(root, "a.md"), false);   // not declared -> not prose here
   assert.deepEqual(PROSE_TYPES.includes("*.md"), true);
+});
+
+
+// -- fux.toml `[sources] dirs_file` (W-225 stage 3b) ----------------------------
+
+test("dirs_file: no fux.toml is no declaration — null, and nothing is archived", () => {
+  const root = repo({});
+  assert.equal(dirsFile(root), null);
+  assert.equal(archivedDirSet(root).size, 0);
+  rmSync(root, { recursive: true });
+});
+
+test("dirs_file: a fux.toml without the key throws config.py's missing-key sentence", () => {
+  const root = repo({ "fux.toml": "[sources]\nurls_file = \".fux/sources/urls\"\n" });
+  assert.throws(() => dirsFile(root), (err) => err instanceof FuxError
+    && /\[sources\] dirs_file is missing/.test(err.message)
+    && /fux doctor --fix/.test(err.message));
+  // ⚠ It used to fall back to `.fux/sources/dirs`; the archived set is no longer
+  // read from a path the repo never named.
+  assert.throws(() => archivedDirSet(root), FuxError);
+  rmSync(root, { recursive: true });
+});
+
+test("dirs_file: the configured list is the one read", () => {
+  const root = repo({
+    "fux.toml": "[sources]\ndirs_file = \"lists/dirs\"\n",
+    "lists/dirs": "old archived=true\n",
+  });
+  assert.equal(dirsFile(root), "lists/dirs");
+  assert.deepEqual([...archivedDirSet(root)], ["old"]);
+  rmSync(root, { recursive: true });
 });

@@ -21,6 +21,10 @@ def test_fux_doctor_via_subprocess(tmp_path):
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")  # SR-PII decision 17
+    # A repo that does not fetch: with no fux.toml, `write_config` writes the
+    # whole template, whose `[sources.url.config.*]` tables name fetchers this
+    # bare repo has not got — a real [FAIL], and not what this test is about.
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     write_config(tmp_path)
     result = subprocess.run(
         [sys.executable, "-m", "fux.cli", "doctor"],
@@ -41,6 +45,10 @@ def test_fux_doctor_output_is_ascii_safe(tmp_path):
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")  # SR-PII decision 17
+    # A repo that does not fetch: with no fux.toml, `write_config` writes the
+    # whole template, whose `[sources.url.config.*]` tables name fetchers this
+    # bare repo has not got — a real [FAIL], and not what this test is about.
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     write_config(tmp_path)
     env = {**os.environ, "PYTHONIOENCODING": "ascii"}
     result = subprocess.run(
@@ -67,6 +75,9 @@ def test_fux_doctor_reports_the_w101_checks_as_a_user_sees_them(tmp_path):
 
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True, capture_output=True)
     (tmp_path / "fux.toml").write_text("", encoding="utf-8")
+    # `fux setup` never rewrites an existing fux.toml, and since W-225 stage 3b
+    # an empty one does not load; fill every key but `[sources.url]` (SR-LAW-12).
+    write_config(tmp_path)
     (tmp_path / "a.md").write_text("# Alpha\n\nsomething findable\n", encoding="utf-8")
     setup = subprocess.run(
         [sys.executable, "-m", "fux.cli", "setup"], capture_output=True, text=True, encoding="utf-8", cwd=tmp_path
@@ -106,6 +117,9 @@ def test_a_generated_types_file_leaves_the_binding_check_quiet(tmp_path):
     """
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True, capture_output=True)
     (tmp_path / "fux.toml").write_text("", encoding="utf-8")
+    # `fux setup` never rewrites an existing fux.toml, and since W-225 stage 3b
+    # an empty one does not load; fill every key but `[sources.url]` (SR-LAW-12).
+    write_config(tmp_path)
     (tmp_path / "a.md").write_text("# Alpha\n\nfindable\n", encoding="utf-8")
     subprocess.run([sys.executable, "-m", "fux.cli", "setup"], check=True, cwd=tmp_path,
                    capture_output=True)
@@ -127,6 +141,9 @@ def test_a_repo_without_pii_toml_stops_every_gated_verb(tmp_path):
     """SR-PII decision 17 through the real CLI: refuse, name the fix, and the fix works."""
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True, capture_output=True)
     (tmp_path / "fux.toml").write_text("", encoding="utf-8")
+    # `fux setup` never rewrites an existing fux.toml, and since W-225 stage 3b
+    # an empty one does not load; fill every key but `[sources.url]` (SR-LAW-12).
+    write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text(
         "# Alpha\n\nmail ops@example.com findable\n", encoding="utf-8"

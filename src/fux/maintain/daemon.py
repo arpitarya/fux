@@ -108,10 +108,9 @@ STOP_TIMEOUT_S = runner.STOP_TIMEOUT_S
 #: indistinguishable from a hung one.
 POLL_S = 1.0
 
-#: Sweep cadence when `fux.toml` does not say. Sixty minutes is conservative on
-#: purpose: this is the *tail*, documents nobody is asking about, so the cost of
-#: being an hour late is an hour of staleness on a document with no reader.
-DEFAULT_SWEEP_MINUTES = 60
+#: ⚠ **`DEFAULT_SWEEP_MINUTES = 60` was deleted by W-225 stage 3b** (SR-LAW-12),
+#: with its twin in `config.py`. The cadence is `[sources.url] sweep_minutes`,
+#: required whenever the table exists; the template writes `60`.
 
 
 def _runtime(root: Path) -> Path:
@@ -192,6 +191,9 @@ def start(root: Path) -> str:
     """
     if live_pid(root) is not None:
         return "already-running"
+    # Before the spawn, so the refusal reaches the person who typed `start`
+    # rather than a detached child's /dev/null.
+    _interval_s(root)
 
     # A stop file from a previous daemon would stop this one on its first poll.
     _clear_stop(root)
@@ -275,23 +277,37 @@ def stop(root: Path, *, timeout: float = STOP_TIMEOUT_S) -> str:
 # -- the loop ---------------------------------------------------------------
 
 
-def sweep_minutes(root: Path) -> int:
-    """`[sources.url] sweep_minutes`, or the default.
+def sweep_minutes(root: Path) -> int | None:
+    """`[sources.url] sweep_minutes` — `None` when there is no `[sources.url]`.
 
-    Unlike `max_parallel` this one **has** a default, and the difference is
-    deliberate: `max_parallel` bounds a blast radius and a repo that can fetch
-    must state it (W-85), while this only decides how often. A missing cadence
-    is not dangerous, merely unopinionated.
+    ⚠ **It fell back to 60 until W-225 stage 3b**, on a missing key, a missing
+    table, or a `fux.toml` that did not load. The key is now required with the
+    table, and a `fux.toml` that does not load raises here as it does
+    everywhere. A repo with no `[sources.url]` fetches nothing, so it has no
+    tail to sweep and no cadence to state: `None`.
     """
     from ..config import load as load_config
 
-    try:
-        config = load_config(root)
-    except FuxError:
-        return DEFAULT_SWEEP_MINUTES
-    url = getattr(config, "url", None)
-    minutes = getattr(url, "sweep_minutes", None) if url else None
-    return int(minutes) if minutes else DEFAULT_SWEEP_MINUTES
+    url = load_config(root).url
+    return None if url is None else url.sweep_minutes
+
+
+def _interval_s(root: Path) -> int:
+    """The sweep interval in seconds, or a `FuxError` naming why there is none.
+
+    ⚠ **A repo with no `[sources.url]` is refused** (W-225 stage 3b). The
+    daemon covers the URL tail (SR-HOOKS decision 9c-i), and its cadence is a
+    key in that table; until stage 3b such a repo swept every 60 minutes on a
+    constant in code, re-walking only what the hooks already re-walk.
+    """
+    minutes = sweep_minutes(root)
+    if minutes is None:
+        raise FuxError(
+            "fux daemon: this repo has no [sources.url] in fux.toml, so there are no URLs "
+            "to keep fresh and no sweep_minutes to pace them. The git hooks keep "
+            "directory sources current (`fux hooks install`)"
+        )
+    return minutes * 60
 
 
 def _write_status(root: Path, outcome: str, **extra) -> None:
@@ -373,7 +389,7 @@ def serve(root: Path) -> str:
     _writable_runtime(root)
     pid_path(root).write_text(json.dumps({"pid": pid}), encoding="utf-8")
 
-    interval = sweep_minutes(root) * 60
+    interval = _interval_s(root)
     try:
         while True:
             if stop_requested(root, pid):

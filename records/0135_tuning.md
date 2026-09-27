@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@51540f8551a4, .fux/tune.toml@1f2f7240794e, node/src/config/tune.mjs@1adf99bbe934]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: a1dab3418d3bd661f0f0b68d27dd4d734ac87b8f31fbc43229ee4241c2550118
+content_sha: ac68f7b2f35e87ed3f67aaf9ac27c4d3996d740228fac1eb9b33972f92679f27
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1029,6 +1029,8 @@ this moved where they are written, not what they are.
 - `src/fux/tune.py` — `TUNE_NAME` ← `[files] tune`
 
 <!-- L12-VALUES-END -->
+
+**No tune key changed** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `fux.toml` joined `tune.toml` and `output.toml` as a file `fux doctor --fix` fills key by key; `node/test/config.test.mjs` gained `fux.toml`'s `dirs_file` cases ([SR-CONFIG](0113_config.md) decision 17).
 
 ### Consequences
 

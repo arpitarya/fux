@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L3, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 564560e468f33a0f9f09ca6705201651bf493992d39b89f0fcc0f73818c55648
+content_sha: 6c7581152cfbe9bef6e6bd728ce7b2449f2f686473dd9c2f4e7d6cf4a3239125
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -472,6 +472,8 @@ this moved where they are written, not what they are.
 - `src/fux/ingest/run.py` — `PII_DIGEST_FILE` ← `[index] pii_digest`, `EXTRACT_CONFIG_DIGEST_FILE` ← `[index] extract_config_digest`, `ENRICH_DIGEST_FILE` ← `[index] enrich_digests`, `DECODER_DIGEST_FILE` ← `[index] decoder_digests`, `STALE_REDACTION_FILE` ← `[runtime] stale_redaction`
 
 <!-- L12-VALUES-END -->
+
+**The archived declaration's list is `[sources] dirs_file`, with no default path** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). An absent `fux.toml` still means *nothing archived*; a present one that lacks the key, in Python or Node, is an error naming it rather than a silent `.fux/sources/dirs` ([SR-CONFIG](0113_config.md) decision 17).
 
 ### Consequences
 

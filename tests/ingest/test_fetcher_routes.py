@@ -17,6 +17,7 @@ import pytest
 
 from fux.errors import FuxError
 from fux.ingest import routes
+from l12_fixtures import write_config
 
 
 def _table(mapping):
@@ -226,9 +227,8 @@ def test_the_answer_path_resolves_through_resolve_urls_and_nothing_else(monkeypa
 
     monkeypatch.setattr(urlsrc, "resolve_urls", _spy)
 
-    (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nmax_parallel = 4\n', encoding="utf-8"
-    )
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    write_config(tmp_path)  # every other key from the template (SR-LAW-12)
     fetchers = tmp_path / ".fux" / "fetchers"
     fetchers.mkdir(parents=True)
     (fetchers / "http.py").write_text('def fetch(url):\n    return "# T\\n\\nbody\\n"\n', encoding="utf-8")

@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@dd3533b3dec9, src/fux/templates@45293c58dba5]
+owns: [src/fux/ingest/urlsrc.py@0238d03fd2d9, src/fux/templates@65c77bda648f]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: d0f892ccd0118a2b52496ea29da87f2e83778f7292edee285a38a8b265fe9c4a
+content_sha: 0196ce763e9636d944fb686e00a845923dc18944d257519dd18e0d188f16be43
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -273,9 +273,11 @@ deliberately a **constant rather than a function**: the four-function contract
 has survived two callers unchanged, and a capability flag is not a capability.
 
 ⚠ **A declaration is a CEILING on what a consumer may ask for, never a FLOOR on
-what fux will do unasked.** When the consumer has configured nothing, fux uses
-`min(declared, DEFAULT_MAX_PARALLEL)` — see [SR-CONFIG](0113_config.md)
-decision 7a. `MAX_PARALLEL` answers *what is safe*; it was never a claim about
+what fux will do unasked.** Fux uses `min(declared, [sources.url]
+max_parallel)` — see [SR-CONFIG](0113_config.md) decision 7a. (⚠ *"When the
+consumer has configured nothing, `min(declared, DEFAULT_MAX_PARALLEL)`"* was
+retired 2026-09-27 by W-225 stage 3b: the key is now required, so there is no
+unconfigured case.) `MAX_PARALLEL` answers *what is safe*; it was never a claim about
 what the consumer's host can absorb, and reading it as one is how `http.py`'s
 honest `8` became eight live connections to a wiki nobody asked about.
 **Fetcher authors: declare the truth about your module and nothing about

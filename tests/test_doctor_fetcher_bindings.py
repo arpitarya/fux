@@ -16,14 +16,12 @@ from __future__ import annotations
 import pytest
 
 from fux.doctor import _fetcher_bindings
+from l12_fixtures import write_config
 
 
 def _repo(tmp_path, *, urls: str, fetchers=("http",)):
-    (tmp_path / "fux.toml").write_text(
-        '[sources]\nurls_file = ".fux/sources/urls"\n'
-        '[sources.url]\nmax_parallel = 4\n',
-        encoding="utf-8",
-    )
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    write_config(tmp_path)  # every other key from the template (SR-LAW-12)
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
     (tmp_path / ".fux" / "sources" / "urls").write_text(urls, encoding="utf-8")
     d = tmp_path / ".fux" / "fetchers"
@@ -79,6 +77,7 @@ def test_it_reads_the_list_not_the_index(tmp_path):
 
 def test_no_url_source_is_not_a_finding(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    write_config(tmp_path)  # loads, and still has no `[sources.url]`
     assert _fetcher_bindings(tmp_path).ok
 
 

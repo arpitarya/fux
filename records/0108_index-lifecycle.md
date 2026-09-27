@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@b77ece805775, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@f47fa69ecb2c]
+owns: [src/fux/store@95799d18167e, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@f47fa69ecb2c]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8a04cf587d60845f338e8c9c2aa4b3601c149a2079301703592db35470734da3
+content_sha: bc07c40b4ccc93dc9aa71daab31e5497cd0788a17977bcd4ec3d5d9214202825
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -558,6 +558,8 @@ the three to be merged, did not.
 - ⚠ **This is a reading error, not a corruption check.** Nothing here validates
   a shard's contents beyond what it always did; a file with markers simply
   stops being mistaken for a truncated one.
+
+**`acquired.DEFAULT_MAX_BYTES` is deleted** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `evict` takes `max_bytes` as a required argument, read from `[sources.url] acquired_max_bytes` ([SR-ACQUIRED](0145_acquired-plane.md) decision 8, [SR-CONFIG](0113_config.md) decision 17).
 
 ### Consequences
 

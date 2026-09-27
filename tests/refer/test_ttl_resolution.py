@@ -15,6 +15,7 @@ import pytest
 
 from fux import refer as refer_mod
 from fux.refer.freshness import Policy
+from l12_fixtures import write_config
 
 
 def eff(loc, policy, declared):
@@ -65,10 +66,8 @@ def _repo(tmp_path, urls_line, source_ttl=None):
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
     (tmp_path / ".fux" / "sources" / "urls").write_text(urls_line + "\n")
     ttl_key = f'ttl = "{source_ttl}"\n' if source_ttl else ""
-    (tmp_path / "fux.toml").write_text(
-        "[sources.url]\n"
-        "max_parallel = 2\n" + ttl_key
-    )
+    (tmp_path / "fux.toml").write_text("[sources.url]\n" + ttl_key)
+    write_config(tmp_path)  # every other key from the template (SR-LAW-12)
     return tmp_path
 
 
@@ -82,9 +81,20 @@ def test_a_line_that_declares_ttl_beats_the_source_wide_value(tmp_path):
     assert refer_mod._declared_ttls(root) == {"https://x/a": 30}
 
 
-def test_with_neither_declared_the_built_in_default_applies(tmp_path):
+def test_with_neither_declared_the_source_wide_key_is_refused_as_missing(tmp_path):
+    """⚠ **Inverted by W-225 stage 3b** (SR-LAW-12). This asserted that with no
+    line `ttl=` and no source-wide `ttl` a built-in default (24h) applied. The
+    source-wide `ttl` is required whenever `[sources.url]` exists, so there is
+    no third layer left in code: a missing one is refused by name."""
+    import re
+
+    from fux.errors import FuxError
+
     root = _repo(tmp_path, "https://x/a fetch=http decoder=prose")
-    assert refer_mod._declared_ttls(root) == {"https://x/a": 86400}
+    path = root / "fux.toml"
+    path.write_text(re.sub(r"(?m)^ttl\s*=.*\n", "", path.read_text(), count=1))
+    with pytest.raises(FuxError, match=r"(?s)\[sources\.url\] ttl is missing.*fux doctor --fix"):
+        refer_mod._declared_ttls(root)
 
 
 def test_a_bad_source_wide_ttl_is_refused_by_the_SAME_grammar(tmp_path):
@@ -97,6 +107,7 @@ def test_a_bad_source_wide_ttl_is_refused_by_the_SAME_grammar(tmp_path):
 
 def test_a_repo_with_no_url_source_reads_nothing(tmp_path):
     (tmp_path / "fux.toml").write_text("")
+    write_config(tmp_path)  # every key but `[sources.url]`, which it never adds
     assert refer_mod._declared_ttls(tmp_path) == {}
 
 

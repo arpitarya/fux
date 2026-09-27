@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@02783a764363, src/fux/setup.py@f858254cca34, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@02783a764363, src/fux/setup.py@5ab91ce704a4, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: bd00efbb3e2498403950b532966311f333d2a43499bd9779192edcd45d93eb67
+content_sha: 0880ed425d490d6a8953b89fbf3262a3960b7e6808424011196aad0627aaa18b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -846,13 +846,16 @@ ruling and for the same reason.
   (`true`/`false`) — is written live with its default: the written line is the
   complete menu, so a reader learns the key *and* its alternatives without
   leaving the file, and nobody greps a record for a flag they do not know
-  exists. A key whose default is a **number that may rise** stays out:
-  `acquired_max_bytes` defers to `None` precisely so raising the store's bound
-  reaches every repo that never thought about it, and `sweep_minutes` is the
-  same shape. `max_parallel` is neither — it is required, with no default at
-  all (W-85).
-- ⚠ **So the test is not "is it important" but "can this value go stale?"**
-  A closed two-value domain cannot; a tuning number can.
+  exists. ⚠ **Superseded 2026-09-27 by W-225 stage 3b ([SR-LAW-12](0013_LAW-12-values-live-in-config.md)):**
+  the other half of this rule — *a key whose default is a number that may rise
+  stays out* (`acquired_max_bytes`, `sweep_minutes`, `ttl`) — is gone, because
+  there is no engine default left for an omitted key to inherit. **Every key is
+  written live** ([SR-CONFIG](0113_config.md) decision 17), and a raised value
+  now reaches a repo through `fux doctor --fix` and a migration line, never
+  silently.
+- ~~**So the test is not "is it important" but "can this value go stale?"**~~
+  Retired with the half above: every value can now go stale, and that is the
+  cost SR-LAW-12 accepted in exchange for no value hiding in code.
 - **What it costs, named:** if fux ever flips either default, existing repos
   keep the old behaviour until someone edits the line. For `fetch_at_answer`
   that is the safer direction — explicit behaviour surviving a default change,

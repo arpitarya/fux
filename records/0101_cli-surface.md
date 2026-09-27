@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@79cb150ca6d9, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@10364bd02e0a, tests_e2e@f84829400ab0, node/fux.mjs@b3c33c3898dc]
+owns: [src/fux/cli.py@40e22cfe1bfb, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@10364bd02e0a, tests_e2e@00b16e9427dc, node/fux.mjs@b3c33c3898dc]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 80dedf1e57aaab34382d3d7abf6e1033d305c525049499cd658131f37d1bf24d
+content_sha: 3256d19f6b9b2e7509653e9bbe3cdf39a8208141b38d0fcfabe1f89f1b51a8e0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -553,6 +553,12 @@ verb's rendering defaults — `top`, `max_headings`, `hops`, `band`, `explain`,
 carries one. `--no-output-config` (now on `build`, `add`, `remove` and `serve`
 too) reads the packaged template. `doctor` alone starts without the file, from
 the template, so it can name the fix.
+
+**`fux.toml` is required key by key ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27)** —
+[SR-CONFIG](0113_config.md) decision 17. One consequence lands in `cli.py`: the
+observer hook ran `.fux/observers/` on a bound of `50` ms held in code when
+`fux.toml` did not load, and now **skips the observers** in that case, because
+there is no bound left to run them on ([SR-OBSERVE](0157_observe.md)).
 
 <!-- L12-NOTE-END -->
 

@@ -9,11 +9,11 @@ amended: 2026-09-13
 date: 2026-08-27
 ratified: 2026-08-27
 feature: the record-to-component model, and the `describes` relation W-82 ruling 4 added to it
-owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@6437d5e21713, scripts/sr-owns.py@eca3c3cfd2b3, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@ccc95d7f5d03, tests/test_sr_content_hash.py@f11f818ed4e9, tests/test_sr_freshness.py@39e5349eef5f, tests/test_sr_frontmatter.py@5ba563cc5d37, tests/test_sr_ownership.py@1d335d33543b, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@660b91e77f7f, tests/test_sr_register_status.py@acae7406d76c]
+owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@6437d5e21713, scripts/sr-owns.py@eca3c3cfd2b3, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@f11f818ed4e9, tests/test_sr_freshness.py@39e5349eef5f, tests/test_sr_frontmatter.py@5ba563cc5d37, tests/test_sr_ownership.py@1d335d33543b, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@660b91e77f7f, tests/test_sr_register_status.py@acae7406d76c]
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 2dc76fabe6c249474fc52d0533adf46e7108e2abe4e9c9dce4d109287b933adf
+content_sha: d464a5b712c8e8baea272a4edb745d328d3684fc4125401346973a1d1c86976b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -483,6 +483,8 @@ top-level definitions.
     - **It carries no row in the registry ([SR-WORK-REGISTRY §3](0067_WORK-registry.md))** —
       that file's rule 1 keeps generated views out of the registry, and the
       block is recorded here instead.
+
+**`tests/test_sr_config_keys.py` moved with `fux.toml`'s strictness** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): its fixtures write only the key under test and fill the rest from the template; the key-tree gate it enforces is unchanged.
 
 ### Consequences
 

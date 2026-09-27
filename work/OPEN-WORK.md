@@ -23,8 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-
-*Empty since 2026-09-27 — step 4 ratified PASS at `0.5`. Next decision: scoring `set-4-claude` after its phase-5 run (W-168; the ladder was rebuilt 2026-09-27).*
+| 🔴 **W-227** — L11 breach: my recursive grep walked `work/golden/` (nothing printed); the traversal guard did not fire on a multi-line command. Does it cost anything, and may a session harden the guard? [detail](open/W-227-l11-breach-2026-09-27.md) | 2026-09-27 | 0d |
+| ↳ **blocks:** nothing else in the queue — W-168's phase-5 run may go ahead in any other session. | | |
 
 ---
 
@@ -32,9 +32,9 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-168** · `agent` — the ranking ideas. Step 4 SHIPPED at `mined_weight = 0.5` (`8d401423`); generation-3 ladder rebuilt 2026-09-27. Next: a phase-5 run of `set-4-claude` (`fux doctor --fix` on the rung first). [detail](open/W-168-search-improvements.md)
-- 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–3a landed (`constants.toml`; `tune.toml` and `output.toml` strict + `doctor --fix`). Next: 3b, `fux.toml`. [detail](open/W-225-values-live-in-config.md)
-- 🟢 **W-226** · `agent` — all five `*.schema.json` into `src/fux/schemas/` + SR-LAWS d6 amended (Arpit, 2026-09-27). **Committed 2026-09-27.** Next: reconcile against IMPLEMENTATION and close. [detail](open/W-226-schemas-directory.md)
+- 🔴 **W-227** · `arpit` — L11 breach, 2026-09-27: the recursive grep and the guard gap. [detail](open/W-227-l11-breach-2026-09-27.md)
+- 🟢 **W-168** · `agent` — the ranking ideas. Step 4 shipped at `mined_weight = 0.5`; gen-3 ladder rebuilt 2026-09-27. Next: a phase-5 run of `set-4-claude` (`fux doctor --fix` on the rung first), by a session other than W-227's. [detail](open/W-168-search-improvements.md)
+- 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–3 landed (`constants.toml`; `tune.toml`, `output.toml`, `fux.toml` strict + `doctor --fix`). Next: stage 4, the other `.fux/*.toml`. [detail](open/W-225-values-live-in-config.md)
 
 
 ### testing

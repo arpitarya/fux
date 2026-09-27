@@ -15,7 +15,6 @@ from pathlib import Path
 import pytest
 
 from fux import setup as setup_mod
-from fux.ingest.urlsrc import DEFAULT_MAX_PARALLEL
 from fux.store import fuxdir
 from l12_fixtures import write_config
 
@@ -291,10 +290,18 @@ def test_setup_bootstraps_a_bare_directory(tmp_path, monkeypatch, capsys):
 
 
 def test_setup_never_overwrites_an_edited_config(tmp_path):
+    """Never OVERWRITES — and since W-225 stage 3b it does FILL: L12 decision 3
+    makes `fux setup` one of the two writers of a missing key. A line the
+    consumer wrote survives byte for byte; the keys they lack are added."""
+    from fux.config import load
+
     (tmp_path / "fux.toml").write_text('[sources]\ndirs_file = "mine"\n', encoding="utf-8")
     report = setup_mod.run(tmp_path)
-    assert (tmp_path / "fux.toml").read_text(encoding="utf-8").endswith('dirs_file = "mine"\n')
+    text = (tmp_path / "fux.toml").read_text(encoding="utf-8")
+    assert text.startswith('[sources]\ndirs_file = "mine"\n')
     assert "fux.toml" in report.kept
+    assert "fux.toml: [observe] max_ms" in report.written
+    assert load(tmp_path).dirs_file == "mine"
 
 
 def test_the_generated_config_loads(tmp_path):
@@ -332,11 +339,12 @@ def test_the_written_config_names_max_parallel_uncommented(tmp_path):
     W-83 wrote `#max_parallel = 4` inside a commented table, so a consumer
     opening `fux.toml` saw a comment about a number rather than a number.
     """
-    from fux.ingest.urlsrc import DEFAULT_MAX_PARALLEL
+    import re
 
+    shipped = setup_mod.template_config()["sources"]["url"]["max_parallel"]
     setup_mod.run(tmp_path)
     written = (tmp_path / "fux.toml").read_text(encoding="utf-8")
-    assert f"\nmax_parallel = {DEFAULT_MAX_PARALLEL}\n" in written, "must be live, not commented"
+    assert re.search(rf"(?m)^max_parallel\s*=\s*{shipped}$", written), "must be live, not commented"
     assert f"#max_parallel" not in written
     assert "\n[sources.url]\n" in written
     # ⚠ **This used to pin the sentence "min(this, what your fetcher declares)".**
@@ -346,20 +354,25 @@ def test_the_written_config_names_max_parallel_uncommented(tmp_path):
     # whose `fux.toml` says nothing and links nowhere is the worse outcome, so
     # this asserts the link rather than dropping the check.
     assert "records/0113_config.md" in written, "the template must name SR-CONFIG"
-    assert "may not be commented out" in written
+    assert "Every key here is REQUIRED" in written
 
 
-def test_the_configs_stated_default_is_the_one_the_engine_applies(tmp_path):
-    """The gate, not the trust. A number typed into the template drifts from the
-    constant beside it — which is the defect W-83 fixed one file over.
-    `config_text()` substitutes `DEFAULT_MAX_PARALLEL` into
-    `templates/fux.toml.txt`; this fails if anyone flattens it."""
+def test_the_configs_stated_value_is_the_one_the_engine_applies(tmp_path):
+    """W-83's defect was a number in the template drifting from a constant
+    beside it. Since SR-LAW-12 there is no constant: the template is the one
+    home, so what a fresh repo loads is exactly what the template states."""
     from fux.config import load
-    from fux.ingest.urlsrc import DEFAULT_MAX_PARALLEL
 
     setup_mod.run(tmp_path)
-    assert "{default}" not in (tmp_path / "fux.toml").read_text(encoding="utf-8")
-    assert load(tmp_path).url.max_parallel == DEFAULT_MAX_PARALLEL
+    shipped = setup_mod.template_config()
+    config = load(tmp_path)
+    url = shipped["sources"]["url"]
+    assert config.url.max_parallel == url["max_parallel"]
+    assert config.url.sweep_minutes == url["sweep_minutes"]
+    assert config.url.acquired_max_bytes == url["acquired_max_bytes"]
+    assert config.url.ttl == url["ttl"]
+    assert config.observe_max_ms == shipped["observe"]["max_ms"]
+    assert list(config.agents) == shipped["agents"]["install"]
 
 
 def test_commenting_max_parallel_out_makes_the_config_refuse_to_load(tmp_path):
@@ -370,29 +383,41 @@ def test_commenting_max_parallel_out_makes_the_config_refuse_to_load(tmp_path):
     migration path**: it puts the key in front of the person on their next
     command, with the value to type.
     """
+    import re
+
     from fux.config import load
     from fux.errors import FuxError
 
     setup_mod.run(tmp_path)
     path = tmp_path / "fux.toml"
-    path.write_text(
-        path.read_text(encoding="utf-8").replace("\nmax_parallel = ", "\n#max_parallel = "),
-        encoding="utf-8",
-    )
+    # By key, not by spacing: the template aligns its `=` signs.
+    text = path.read_text(encoding="utf-8")
+    commented = re.sub(r"(?m)^max_parallel\b", "#max_parallel", text, count=1)
+    assert commented != text, "the template has no max_parallel line to comment out"
+    path.write_text(commented, encoding="utf-8")
     with pytest.raises(FuxError) as exc:
         load(tmp_path)
     message = str(exc.value)
-    assert "max_parallel must be present" in message
-    assert "max_parallel = " in message, "an error that does not say what to type is half a migration"
+    assert "[sources.url] max_parallel is missing" in message
+    assert "fux doctor --fix" in message, "an error that does not say how to fix it is half a migration"
 
 
 def test_a_repo_with_no_url_source_at_all_is_not_forced_to_declare_one(tmp_path):
     """The line W-85 draws. A docs-only repo fetches nothing, so there is
     nothing to bound, and demanding a bound there would make the key noise —
     which is how a safety value stops being read."""
+    import re
+
     from fux.config import load
 
-    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    # The template with every `[sources.url…]` table removed — the table's
+    # ABSENCE is the setting, so none of its keys is required.
+    import tomllib
+
+    text = re.sub(r"(?ms)^\[sources\.url[^\n]*\n.*?(?=^\[(?!sources\.url))", "", setup_mod.config_text())
+    # Parsed, not grepped: the template's header prose names `[sources.url]`.
+    assert "url" not in tomllib.loads(text)["sources"]
+    (tmp_path / "fux.toml").write_text(text, encoding="utf-8")
     assert load(tmp_path).url is None
 
 
@@ -545,10 +570,9 @@ def test_the_scaffolded_config_is_a_template_file_not_a_string(tmp_path):
 
     shipped = (resources.files("fux") / "templates" / "fux.toml.txt").read_text(encoding="utf-8")
     assert "[sources.url]" in shipped
-    assert "{default}" in shipped, "the template holds the placeholder; setup substitutes it"
+    assert "{default}" not in shipped, "SR-LAW-12: the template states every value itself"
     assert "{url_config}" in shipped, "the fetcher tables are DERIVED, never typed here"
-    expected = shipped.replace("{default}", str(DEFAULT_MAX_PARALLEL))
-    expected = expected.replace("{url_config}", setup_mod.url_config_tables())
+    expected = shipped.replace("{url_config}", setup_mod.url_config_tables())
     assert setup_mod.config_text() == expected
 
 
@@ -558,11 +582,12 @@ def test_a_brace_in_the_template_cannot_break_setup(tmp_path, monkeypatch):
     The template is an editable file now, so a `{` added to a comment must be
     written through verbatim rather than raising `KeyError` out of `fux setup`.
     """
-    doctored = '# see {docs} for detail\n[sources]\n[sources.url]\nmax_parallel = {default}\n'
+    doctored = '# see {docs} for detail\n[sources]\n{url_config}\n'
     monkeypatch.setattr(setup_mod, "template_bytes", lambda name: doctored.encode("utf-8"))
+    monkeypatch.setattr(setup_mod, "url_config_tables", lambda: "[sources.url.config]\n")
     out = setup_mod.config_text()
     assert "{docs}" in out
-    assert f"max_parallel = {DEFAULT_MAX_PARALLEL}" in out
+    assert "[sources.url.config]" in out
 
 
 def test_the_two_valued_url_keys_are_written_live_with_their_defaults(tmp_path):
@@ -584,16 +609,16 @@ def test_the_two_valued_url_keys_are_written_live_with_their_defaults(tmp_path):
     config = load(tmp_path)
     assert config.url.update == "auto"
     assert config.url.fetch_at_answer is True
-    # The deferring keys stay OUT: their defaults are numbers that may move.
-    # Assigned lines only — the header names them in prose, saying why.
+    # ⚠ **Inverted by W-225 stage 3b.** These three were left OUT so a raised
+    # engine default reached the repo unedited; SR-LAW-12 removed the engine
+    # default, so every key is written, and a raised value now ships with a
+    # migration line (SR-LAW-12 §Consequences).
     assigned = {
         line.split("=")[0].strip()
         for line in written.splitlines()
         if "=" in line and not line.lstrip().startswith(("#", "["))
     }
-    assert "acquired_max_bytes" not in assigned
-    assert "sweep_minutes" not in assigned
-    assert "ttl" not in assigned
+    assert {"acquired_max_bytes", "sweep_minutes", "ttl"} <= assigned
 
 
 def test_the_fetcher_config_tables_are_derived_from_the_fetchers(tmp_path):

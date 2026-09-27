@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from . import __version__
-from .config import DEFAULT_DIRS_FILE, DEFAULT_TYPES_FILE, FETCHERS_DIR, find_root
+from .config import DEFAULT_TYPES_FILE, FETCHERS_DIR, find_root
 from .errors import FuxError
 from . import output_config
 from .store import fuxdir
@@ -1253,8 +1253,17 @@ def _acquired_health(root: Path) -> Check:
         detail += " (gitignore unchecked: not a git checkout)"
     if orphans > 0:
         detail += f" - {orphans} unreferenced, swept on the next `fux ingest`"
-    cap = acquired.DEFAULT_MAX_BYTES
-    if total > cap * 0.8:
+    # The cap is `[sources.url] acquired_max_bytes` (SR-ACQUIRED decision 8).
+    # No `[sources.url]`, or a fux.toml that does not load, means there is no
+    # cap to compare against here — the store has no default of its own.
+    from .config import load as load_config
+
+    try:
+        url = load_config(root).url
+    except FuxError:
+        url = None
+    cap = url.acquired_max_bytes if url is not None else None
+    if cap is not None and total > cap * 0.8:
         return Check(
             "acquired plane",
             True,
@@ -1912,13 +1921,16 @@ def _ignore_health(root: Path) -> Check:
         rules = fuxignore.read(root).rules
     except (FuxError, OSError) as exc:
         return Check("fuxignore usable", False, f"{fuxignore.IGNORE_FILE}: {exc}")
-    duplicates = fuxignore.duplicate_warnings(root, dirs_file=DEFAULT_DIRS_FILE)
+    dirs_file = _dirs_file(root)
+    duplicates = (
+        fuxignore.duplicate_warnings(root, dirs_file=dirs_file) if dirs_file is not None else []
+    )
     if duplicates:
         return Check(
             "fuxignore usable",
             False,
             f"{len(duplicates)} pattern(s) stated in both {fuxignore.IGNORE_FILE} and "
-            f"{DEFAULT_DIRS_FILE} - run `fux ingest --list-skipped` for the detail",
+            f"{dirs_file} - run `fux ingest --list-skipped` for the detail",
             level="warn",
         )
     active = sum(1 for r in rules if not r.negate)
@@ -1996,20 +2008,23 @@ def _dirs_exclusions_migrated(root: Path) -> Check:
     """
     from .ingest import fuxignore
 
+    dirs_file = _dirs_file(root)
+    if dirs_file is None:
+        return Check("dirs exclusions migrated", True, "not checked - fux.toml does not load; see its row")
     try:
-        notes = fuxignore.dirs_exclusion_notes(root, dirs_file=DEFAULT_DIRS_FILE)
+        notes = fuxignore.dirs_exclusion_notes(root, dirs_file=dirs_file)
     except (FuxError, OSError) as exc:
-        return Check("dirs exclusions migrated", False, f"{DEFAULT_DIRS_FILE}: {exc}", level="warn")
+        return Check("dirs exclusions migrated", False, f"{dirs_file}: {exc}", level="warn")
     if not notes:
         return Check(
             "dirs exclusions migrated",
             True,
-            f"no `!` lines in {DEFAULT_DIRS_FILE} - exclusions live in {fuxignore.IGNORE_FILE}",
+            f"no `!` lines in {dirs_file} - exclusions live in {fuxignore.IGNORE_FILE}",
         )
     return Check(
         "dirs exclusions migrated",
         False,
-        f"{len(notes)} `!` line(s) left in {DEFAULT_DIRS_FILE}. " + " ".join(notes),
+        f"{len(notes)} `!` line(s) left in {dirs_file}. " + " ".join(notes),
         level="warn",
     )
 
@@ -2179,6 +2194,19 @@ def _starter_refusals_untouched(root: Path) -> Check:
     )
 
 
+def _dirs_file(root: Path) -> "str | None":
+    """`[sources] dirs_file` as `fux.toml` names it — `None` when the file does
+    not load, which its own row reports. There is no default path to fall back
+    to (SR-LAW-12), and checking one the repo does not use would be a row about
+    the wrong file."""
+    from .config import load as load_config
+
+    try:
+        return load_config(root).dirs_file
+    except FuxError:
+        return None
+
+
 def _frozen_keys(root: Path) -> list[Check]:
     """Every mandatory config file against the template it was written from.
 
@@ -2196,7 +2224,7 @@ def _frozen_keys(root: Path) -> list[Check]:
     from . import setup as setup_mod
 
     checks: list[Check] = []
-    for rel, template in setup_mod._mandatory_config():
+    for rel, template, present_only, never in setup_mod._mandatory_config():
         name = f"{Path(rel).name} current"
         path = root / rel
         if not path.is_file():
@@ -2204,7 +2232,7 @@ def _frozen_keys(root: Path) -> list[Check]:
             continue
         try:
             missing = setup_mod.missing_config_keys(
-                path.read_bytes().decode("utf-8-sig"), template
+                path.read_bytes().decode("utf-8-sig"), template, present_only, never
             )
         except Exception:
             # Its own row already reports an unparseable file; saying so twice
@@ -2329,15 +2357,18 @@ def _listed_dirs_exist(root: Path) -> Check:
     """
     from .ingest import sourcelist
 
-    path = root / DEFAULT_DIRS_FILE
+    dirs_file = _dirs_file(root)
+    if dirs_file is None:
+        return Check("listed directories exist", True, "not checked - fux.toml does not load; see its row")
+    path = root / dirs_file
     if not path.is_file():
-        return Check("listed directories exist", True, f"{DEFAULT_DIRS_FILE} absent")
+        return Check("listed directories exist", True, f"{dirs_file} absent")
     try:
         entries = sourcelist.parse(
             path.read_text(encoding="utf-8"), sourcelist.DIRS, origin=str(path)
         )
     except (FuxError, OSError) as exc:
-        return Check("listed directories exist", False, f"{DEFAULT_DIRS_FILE}: {exc}", level="warn")
+        return Check("listed directories exist", False, f"{dirs_file}: {exc}", level="warn")
 
     gone = [e.value for e in entries if not e.exclude and not (root / e.value).exists()]
     if not gone:

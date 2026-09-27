@@ -90,20 +90,21 @@ def test_a_fux_toml_the_loader_refuses_makes_doctor_red(tmp_path):
     for a repo where `fux ingest` exits 1. The one verb whose job is to name the
     fix was the one verb that did not name it."""
     _git_repo(tmp_path)
-    # the `max_parallel` refusal (W-85): required, never implicit
+    # the missing-key refusal (W-85's `max_parallel`, every key since SR-LAW-12)
     (tmp_path / "fux.toml").write_text("[sources.url]\n", encoding="utf-8")
     checks = doctor.run(tmp_path)
     loads = _check(checks, "fux.toml loads")
     assert not loads.ok
     assert loads.level == "error"
     # the loader's own words, verbatim — not a second wording that can drift
-    assert "max_parallel must be present" in loads.detail
+    assert "[sources.url] max_parallel is missing" in loads.detail
     assert not all(c.ok for c in checks)
 
 
 def test_a_loadable_fux_toml_passes(tmp_path):
     _git_repo(tmp_path)
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    write_config(tmp_path)
     assert _check(doctor.run(tmp_path), "fux.toml loads").ok
 
 
@@ -165,6 +166,10 @@ def test_cmd_doctor_exit_code_ignores_warnings(tmp_path, monkeypatch, capsys):
     (tmp_path / ".fux").mkdir(exist_ok=True)
     # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # A repo that does not fetch: `write_config` alone would write the whole
+    # template `fux.toml`, whose `[sources.url.config.*]` tables name fetchers
+    # this bare repo has not got — an error row, not the warning under test.
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / ".fux" / "scratch").mkdir()
     monkeypatch.chdir(tmp_path)
@@ -307,9 +312,8 @@ def test_url_check_names_listed_urls_that_have_never_been_fetched(tmp_path):
     """
     _git_repo(tmp_path)
     _url_index(tmp_path, ["https://a"])
-    (tmp_path / "fux.toml").write_text(
-        "[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8"
-    )
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    write_config(tmp_path)
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True, exist_ok=True)
     urls.write_text("https://a fetch=http decoder=prose\nhttps://never-fetched fetch=http decoder=prose\n", encoding="utf-8")
@@ -325,13 +329,12 @@ def test_url_check_names_listed_urls_that_have_never_been_fetched(tmp_path):
 def test_url_check_states_the_concurrency_a_networked_run_will_use(tmp_path):
     """W-83. The number a person needs BEFORE pointing `fux update` at a
     corporate wiki, said by the command whose job is to say what will happen."""
-    from fux.ingest.urlsrc import DEFAULT_MAX_PARALLEL
-
     _git_repo(tmp_path)
     _url_index(tmp_path, ["https://a"])
-    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8")
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\nmax_parallel = 3\n", encoding="utf-8")
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "url sources")
-    assert f"fetches <= {DEFAULT_MAX_PARALLEL} at a time" in check.detail
+    assert "fetches <= 3 at a time" in check.detail
     assert "MAX_PARALLEL" in check.detail  # the other half of the min() is named
 
 
@@ -354,14 +357,13 @@ def test_the_concurrency_is_stated_before_the_first_url_is_indexed(tmp_path):
     first `fux add <URL>` — the moment the number is worth knowing, and the
     only moment nobody can infer it from a previous run.
     """
-    from fux.ingest.urlsrc import DEFAULT_MAX_PARALLEL
-
     _git_repo(tmp_path)
     _url_index(tmp_path, [])
-    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8")
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\nmax_parallel = 3\n", encoding="utf-8")
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "url sources")
     assert "none indexed" in check.detail
-    assert f"fetches <= {DEFAULT_MAX_PARALLEL} at a time" in check.detail
+    assert "fetches <= 3 at a time" in check.detail
 
 
 def test_no_url_source_means_no_concurrency_line_at_all(tmp_path):
@@ -380,6 +382,7 @@ def test_url_check_reports_a_configured_max_parallel(tmp_path):
     (tmp_path / "fux.toml").write_text(
         "[sources]\n[sources.url]\nmax_parallel = 2\n", encoding="utf-8"
     )
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "url sources")
     assert "fetches <= 2 at a time" in check.detail
     assert "unset" not in check.detail
@@ -398,7 +401,8 @@ def test_doctor_never_imports_the_consumers_fetcher_to_read_its_declaration(tmp_
     (fetchers / "http.py").write_text(
         "raise SystemExit('doctor imported the fetcher')\n", encoding="utf-8"
     )
-    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8")
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "url sources")  # must not raise
     assert "fetches <=" in check.detail
 
@@ -602,14 +606,8 @@ def test_doctor_passes_when_there_is_no_types_file(tmp_path):
 # rewrite (SR-DOTFUX decision 6) — `_types_health` above is the precedent.
 
 def _url_repo(root, fetcher_body: str) -> None:
-    (root / "fux.toml").write_text(
-        "[sources]\n"
-        'dirs_file = ".fux/sources/dirs"\n'
-        "[sources.url]\n"
-        
-        "max_parallel = 4\n",
-        encoding="utf-8",
-    )
+    (root / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    write_config(root)
     f = root / ".fux" / "fetchers" / "http.py"
     f.parent.mkdir(parents=True, exist_ok=True)
     f.write_text(fetcher_body, encoding="utf-8")
@@ -643,7 +641,8 @@ def test_doctor_skips_the_fetcher_check_when_the_repo_does_not_fetch(tmp_path):
     """No `[sources.url]` means the fetcher is not a fact about this repo."""
     from fux import doctor as doctor_mod
 
-    (tmp_path / "fux.toml").write_text('[sources]\ndirs_file = ".fux/sources/dirs"\n', encoding="utf-8")
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    write_config(tmp_path)
     check = doctor_mod._fetcher_capabilities(tmp_path)
     assert check.ok and "does not fetch" in check.detail
 
@@ -658,14 +657,8 @@ def test_the_shipped_template_implements_every_optional_function(tmp_path):
     from fux import setup as setup_mod
 
     setup_mod.run(tmp_path)
-    (tmp_path / "fux.toml").write_text(
-        "[sources]\n"
-        'dirs_file = ".fux/sources/dirs"\n'
-        "[sources.url]\n"
-        
-        "max_parallel = 4\n",
-        encoding="utf-8",
-    )
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    write_config(tmp_path)
     check = doctor_mod._fetcher_capabilities(tmp_path)
     assert check.ok and "implements" in check.detail, check.detail
 
@@ -1484,7 +1477,8 @@ def _corpus_with_dirs(tmp_path, dirs_text: str):
     """A minimal repo whose `dirs` list says exactly `dirs_text`."""
     (tmp_path / ".git").mkdir()
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (tmp_path / ".fux" / "sources").mkdir(parents=True)
+    write_config(tmp_path)
+    (tmp_path / ".fux" / "sources").mkdir(parents=True, exist_ok=True)
     (tmp_path / ".fux" / "sources" / "dirs").write_text(dirs_text, encoding="utf-8")
     return tmp_path
 
@@ -1861,9 +1855,8 @@ def test_thin_urls_is_silent_without_an_acquired_plane(tmp_path):
 
 def _pinned_repo(tmp_path, *, urls=("https://x.test/a fetch=http decoder=prose",), flag="fetch_at_answer = false\n"):
     root = _drift_repo(tmp_path)
-    (root / "fux.toml").write_text(
-        "[sources]\n[sources.url]\nmax_parallel = 4\n" + flag, encoding="utf-8"
-    )
+    (root / "fux.toml").write_text("[sources]\n[sources.url]\n" + flag, encoding="utf-8")
+    write_config(root)  # every other key from the template (SR-LAW-12)
     (root / ".fux" / "sources" / "urls").write_text(
         "".join(f"{u}\n" for u in urls), encoding="utf-8"
     )
@@ -1871,7 +1864,7 @@ def _pinned_repo(tmp_path, *, urls=("https://x.test/a fetch=http decoder=prose",
 
 
 def test_pinned_row_is_silent_while_fetch_at_answer_is_on(tmp_path):
-    """The default. There is nothing to warn about while fux may still look."""
+    """The template's value. There is nothing to warn about while fux may still look."""
     row = _row(_pinned_repo(tmp_path, flag=""), "pinned url bytes")
     assert row.ok
     assert "fetch_at_answer is on" in row.detail

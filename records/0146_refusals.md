@@ -10,7 +10,7 @@ feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@3517c1b5cbd3, src/fux/templates/refusals.toml.txt@bdf2356bc679, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@bdf2356bc679]
 laws: [L1, L3]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: f08acad245952e284dea84736b3ebd12cee59f0e17f141ded63fe0e996f49aae
+content_sha: 0a755799d9e5690eefbe8f57451b6630a1f23d06d56c5ccd41230c209cd22713
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -449,6 +449,8 @@ this moved where they are written, not what they are.
 - `src/fux/maintain/urlstate.py` — `STATE_NAME` ← `[maintain] url_state`, `SCHEMA_NAME` ← `[maintain] url_state_schema`
 
 <!-- L12-VALUES-END -->
+
+**No refusal rule changed** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `urlsrc.fetch_all` now takes `config`, `max_parallel` and `acquired_max_bytes` as required arguments; the refusal pass it runs is untouched ([SR-INGEST](0106_ingest.md)).
 
 ### Consequences
 

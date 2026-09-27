@@ -32,15 +32,14 @@ from __future__ import annotations
 import json
 import os
 import re
+from typing import NamedTuple
 from dataclasses import dataclass, field
 from importlib import resources
 from pathlib import Path
 
 from .config import (
     CONFIG_NAME,
-    DEFAULT_DIRS_FILE,
     DEFAULT_TYPES_FILE,
-    DEFAULT_URLS_FILE,
     KNOWN_AGENTS,
     find_root,
     load,
@@ -48,7 +47,6 @@ from .config import (
 from . import decode as decode_mod
 from .errors import FuxError
 from .ingest import fuxignore, pii, refusals
-from .ingest.urlsrc import DEFAULT_MAX_PARALLEL
 from .store import fuxdir
 
 #: Generated name -> the package-data file it is copied from.
@@ -699,17 +697,23 @@ def config_text() -> str:
     consumer is meant to read and edit belongs in a file they can open, not
     inside a Python string where a stray quote is a syntax error in the engine.
 
-    ⚠ **`{default}` is SUBSTITUTED, not `.format`ted** (W-83's property, a
-    safer mechanism). The number in the written `fux.toml` and the number the
-    engine applies are the same object, so the file cannot drift from the
-    behaviour. `str.replace` rather than `str.format` **because the template is
-    now an editable file**: `format` would raise on any future `{` someone adds
-    to a comment, turning a doc edit into a broken `fux setup`.
-    `tests/test_setup.py` asserts the substitution happened.
+    ⚠ **Every value is written in the template itself since SR-LAW-12** (W-225
+    stage 3b). `max_parallel` was a `{default}` substituted from
+    `urlsrc.DEFAULT_MAX_PARALLEL` so the file and the engine could not drift;
+    the engine now holds no copy at all, so there is nothing to drift from.
+    `{url_config}` is still SUBSTITUTED, by `str.replace` rather than
+    `str.format` — the fetcher tables are the fetchers' own, derived from their
+    templates, and `format` would raise on any `{` added to a comment.
     """
     text = template_bytes(CONFIG_TEMPLATE).decode("utf-8")
-    text = text.replace("{default}", str(DEFAULT_MAX_PARALLEL))
     return text.replace("{url_config}", url_config_tables())
+
+
+def template_config() -> dict:
+    """The template's `fux.toml`, parsed — what a fresh `fux setup` writes."""
+    import tomllib
+
+    return tomllib.loads(config_text())
 
 def _urls_header() -> str:
     """The starter `.fux/sources/urls`, with its attribute table DERIVED.
@@ -838,8 +842,25 @@ def template_bytes(name: str) -> bytes:
 # nothing the consumer already set is ever touched.
 
 
-def _mandatory_config() -> "tuple[tuple[str, str], ...]":
-    """`(repo-relative path, template text)` for every file L12 makes mandatory.
+class Mandatory(NamedTuple):
+    """One file L12 makes mandatory, and which of its template's tables are not.
+
+    - `present_only` — a table whose PRESENCE is the setting (`fux.toml
+      [sources.url]`: absent means nothing is fetched). Its keys are required
+      only in a file that has the table, and the writer never adds the table:
+      adding it would switch URL ingestion on behind the consumer's back.
+    - `never` — a table that is the consumer's own map (`[sources.url.config]`,
+      handed to their fetchers unread). Its keys are never required or written.
+    """
+
+    rel: str
+    template: str
+    present_only: tuple[str, ...] = ()
+    never: tuple[str, ...] = ()
+
+
+def _mandatory_config() -> "tuple[Mandatory, ...]":
+    """Every file L12 makes mandatory, with the template it is written from.
 
     A function, not a table of literals: each template is read from the one
     module that owns its file, so this list cannot state a value of its own.
@@ -848,9 +869,35 @@ def _mandatory_config() -> "tuple[tuple[str, str], ...]":
     from . import tune as tune_mod
 
     return (
-        (tune_mod.TUNE_NAME, tune_mod.template_text()),
-        (output_mod.OUTPUT_NAME, output_mod.template_text()),
+        Mandatory(CONFIG_NAME, config_text(), ("sources.url",), ("sources.url.config", "sources.url.routes")),
+        Mandatory(tune_mod.TUNE_NAME, tune_mod.template_text()),
+        Mandatory(output_mod.OUTPUT_NAME, output_mod.template_text()),
     )
+
+
+def _under(table: str, prefixes: "tuple[str, ...]") -> str | None:
+    """The prefix `table` is, or sits under — `None` when it is under none."""
+    for prefix in prefixes:
+        if table == prefix or table.startswith(prefix + "."):
+            return prefix
+    return None
+
+
+def _wanted(data: dict, table: str, present_only: "tuple[str, ...]", never: "tuple[str, ...]") -> bool:
+    """Whether a template key in `table` is required of a file holding `data`."""
+    if _under(table, never):
+        return False
+    gate = _under(table, present_only)
+    return gate is None or _has_table(data, gate)
+
+
+def _has_table(data: dict, table: str) -> bool:
+    node: object = data
+    for part in table.split("."):
+        if not isinstance(node, dict) or part not in node:
+            return False
+        node = node[part]
+    return isinstance(node, dict)
 
 
 _HEADER = re.compile(r"^\s*\[(?P<name>[^\[\]]+)\]\s*(#.*)?$")
@@ -891,15 +938,27 @@ def _has(data: dict, table: str, key: str) -> bool:
     return isinstance(node, dict) and key in node
 
 
-def missing_config_keys(text: str, template: str) -> "list[tuple[str, str]]":
-    """`(table, key)` the template declares and `text` does not carry."""
+def missing_config_keys(
+    text: str, template: str, present_only: "tuple[str, ...]" = (), never: "tuple[str, ...]" = ()
+) -> "list[tuple[str, str]]":
+    """`(table, key)` the template declares and `text` does not carry.
+
+    `present_only` and `never` are `Mandatory`'s: tables required only when the
+    file has them, and tables never required.
+    """
     import tomllib
 
     data = tomllib.loads(text) if text.strip() else {}
-    return [(t, k) for t, k, _ in _template_keys(template) if not _has(data, t, k)]
+    return [
+        (t, k)
+        for t, k, _ in _template_keys(template)
+        if _wanted(data, t, present_only, never) and not _has(data, t, k)
+    ]
 
 
-def fill_config_text(text: str, template: str) -> str:
+def fill_config_text(
+    text: str, template: str, present_only: "tuple[str, ...]" = (), never: "tuple[str, ...]" = ()
+) -> str:
     """`text` with every key it is missing inserted from `template`.
 
     Each missing key lands at the end of its own table's block, in template
@@ -916,7 +975,7 @@ def fill_config_text(text: str, template: str) -> str:
     }
     lines = text.split("\n") if text else []
     for table, key, snippet in _template_keys(template):
-        if _has(data, table, key):
+        if not _wanted(data, table, present_only, never) or _has(data, table, key):
             continue
         at = _table_end(lines, table)
         if at is None:
@@ -931,7 +990,13 @@ def fill_config_text(text: str, template: str) -> str:
 
 
 def _table_end(lines: "list[str]", table: str) -> "int | None":
-    """The index just past `[table]`'s last non-blank line, or `None` if absent."""
+    """The index just past `[table]`'s last KEY line, or `None` if absent.
+
+    ⚠ **Blank lines AND a trailing comment block are backed over** (W-225 stage
+    3b). A comment directly above the next header belongs to that header — in
+    `fux.toml` it is `[sources.url.config]`'s explanation — and inserting there
+    put `[sources.url]` keys inside another table's prose.
+    """
     start = None
     for i, line in enumerate(lines):
         header = _HEADER.match(line)
@@ -945,7 +1010,7 @@ def _table_end(lines: "list[str]", table: str) -> "int | None":
         if _HEADER.match(lines[j]):
             end = j
             break
-    while end > start + 1 and not lines[end - 1].strip():
+    while end > start + 1 and (not lines[end - 1].strip() or lines[end - 1].lstrip().startswith("#")):
         end -= 1
     return end
 
@@ -961,7 +1026,7 @@ def fill_missing(root: Path) -> "list[str]":
     import tomllib
 
     changed: list[str] = []
-    for rel, template in _mandatory_config():
+    for rel, template, present_only, never in _mandatory_config():
         path = root / rel
         if not path.is_file():
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -970,14 +1035,14 @@ def fill_missing(root: Path) -> "list[str]":
             continue
         text = path.read_bytes().decode("utf-8-sig")
         try:
-            missing = missing_config_keys(text, template)
+            missing = missing_config_keys(text, template, present_only, never)
         except tomllib.TOMLDecodeError:
             # A file that does not parse cannot be filled without guessing
             # what its author meant; its own `loads` check names the fault.
             continue
         if not missing:
             continue
-        path.write_text(fill_config_text(text, template), encoding="utf-8")
+        path.write_text(fill_config_text(text, template, present_only, never), encoding="utf-8")
         changed += [f"{rel}: [{table}] {key}" for table, key in missing]
     return changed
 
@@ -1177,7 +1242,7 @@ def _agents_to_install(root: Path, requested: bool) -> tuple[str, ...]:
     try:
         return load(root).agents
     except FuxError:
-        return KNOWN_AGENTS
+        return tuple(template_config()["agents"]["install"])
 
 
 def _write_agents(root: Path, report: SetupReport, agents: tuple[str, ...]) -> None:
@@ -1605,8 +1670,9 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
         directory / OBSERVERS_DIR / "README.md", _OBSERVERS_README.encode("utf-8"), report, root
     )
 
-    _write_if_missing(root / DEFAULT_DIRS_FILE, _seed_dirs(root), report, root)
-    _write_if_missing(root / DEFAULT_URLS_FILE, _urls_header().encode("utf-8"), report, root)
+    lists = template_config()["sources"]
+    _write_if_missing(root / lists["dirs_file"], _seed_dirs(root), report, root)
+    _write_if_missing(root / lists["urls_file"], _urls_header().encode("utf-8"), report, root)
     # Header only, no patterns: an ignore file that arrives with guesses in it
     # is one whose first act is to hide a document nobody asked it to hide.
     # Empty is a legal, meaningful state here (SR-FUXIGNORE decision 6) in a
@@ -1650,6 +1716,11 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     # they are SHOWN. Write-if-missing for the same reason, and `fux output`
     # prints rather than edits.
     _write_if_missing(root / OUTPUT_NAME, output_specimen().encode("utf-8"), report, root)
+    # L12 decision 3: `fux setup` is the other writer of a missing KEY. A file
+    # that already existed was kept above, and it may predate a key the engine
+    # now requires; without this, `_agents_to_install` read a `fux.toml` that
+    # would not load and fell back to the template's vendors (W-225 stage 3b).
+    report.written += fill_missing(root)
 
     # After `fux.toml`, so a first run reads the default this very call just
     # wrote out in full, and a later run reads whatever the consumer edited it

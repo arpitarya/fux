@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@20897950b94e, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@620ad647947d, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: fe0530aec1586c27e1fc8ecf469a4c7dd7dc58a449e202d34dde7ea03938bb3b
+content_sha: bc6c46a2a25393642159e989fe9e27396fba6511c09349a7b0bd53f4db0562cc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -854,6 +854,8 @@ decision 17). The band is built from the one pass there is, as it was before
 block is built on the ORIGINAL query, as decision 16's neighbour says of
 `--expand`: `_fill_confidence` never sees the fold, so `coverage`, `missing` and
 `doc_coverage` describe what the user typed.
+
+**No change to the band** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `query/__init__.py` moved only where the archived declaration is read: a present `fux.toml` that does not load now stops the verb instead of ranking with no archived directories ([SR-ASK](0103_ask.md)).
 
 ### Consequences
 

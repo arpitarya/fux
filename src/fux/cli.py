@@ -1147,16 +1147,16 @@ def _observe(args, argv: list[str] | None, ms: int) -> None:
         root = find_root(Path.cwd())
         if root is None:
             return
-        cfg_max_ms = 50
         try:
             from .config import load as load_config
 
             cfg_max_ms = load_config(root).observe_max_ms
         except Exception:
             # A malformed `fux.toml` already failed the verb if the verb needed
-            # it. It must not additionally fail the hook, and the default is
-            # the right fallback: a bound nobody chose is better than none.
-            pass
+            # it, and it must not additionally fail the hook. ⚠ **Until W-225
+            # stage 3b this ran the observers on a bound of 50 held in code**;
+            # SR-LAW-12 leaves no bound to run them on, so they do not run.
+            return
         record = observe._record_from(
             args.command, list(argv if argv is not None else sys.argv[1:]), ms, __version__
         )

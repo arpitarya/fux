@@ -293,20 +293,11 @@ def configure_fetcher(module, config: dict) -> None:
         raise FuxError(f"[sources.url] fetcher configure() failed: {exc}") from exc
 
 
-#: Politeness default for `[sources.url] max_parallel` (W-82 §3.3, **made
-#: effective by W-83**).
-#:
-#: **A judgement, not a measurement** — low enough to be polite to a single
-#: intranet host without configuration, high enough that the difference from
-#: sequential is immediately visible. Cheap to change; nothing measured it.
-#:
-#: ⚠ **It shipped referenced by nothing, and that was the defect W-83 fixed.**
-#: `resolve_parallel(module, None)` returned `declared`, and the shipped
-#: `http.py` declares `8` — so an unconfigured `fux ingest` over a large list
-#: opened **eight** concurrent connections while this constant sat in the same
-#: file stating the default was four and explaining why four was the polite
-#: number. A wrong constant that reads as authority is worse than no constant.
-DEFAULT_MAX_PARALLEL = 4
+#: ⚠ **`DEFAULT_MAX_PARALLEL = 4` was deleted by W-225 stage 3b** (SR-LAW-12).
+#: It was the politeness default for an unconfigured `[sources.url]`, and W-83
+#: made it effective after it shipped referenced by nothing. `[sources.url]
+#: max_parallel` is now required whenever the table exists, and the template
+#: writes `4`, so there is no unconfigured case left for a constant to answer.
 
 #: A fetcher that declares nothing is called **one URL at a time**, which is
 #: byte-for-byte the behaviour that shipped before this existed. Opting in is
@@ -315,7 +306,7 @@ DEFAULT_MAX_PARALLEL = 4
 UNDECLARED_MAX_PARALLEL = 1
 
 
-def resolve_parallel(module, configured: int | None) -> int:
+def resolve_parallel(module, configured: int) -> int:
     """`min(what the fetcher declared, what the consumer configured)`.
 
     **Two values wearing one name, and they get different kinds of refusal** —
@@ -331,28 +322,14 @@ def resolve_parallel(module, configured: int | None) -> int:
     - **`max_parallel < 1` is BROKEN** and refuses, the same treatment
       `cache_ttl_seconds < 0` already gets in `refer/freshness.py`.
 
-    ## Silence is `min(declared, DEFAULT_MAX_PARALLEL)` — W-83
-
-    **A declaration answers *what is safe*, never *what is polite unasked*.**
-    `http.py`'s `MAX_PARALLEL = 8` is a true statement about `http.py` — a
-    fresh `Request` per call, no shared connection — and it is not a claim
-    about what the consumer's wiki can absorb. Nobody declared `8` for *this*
-    repo, so the safe reading of silence is the polite one, and an
-    unconfigured run is bounded by fux's politeness rather than by the
-    library author's ceiling.
-
-    Three things this deliberately does **not** change:
-
-    - **It can only lower, never raise.** A fetcher declaring `1` still gets
-      `1`, so `cdp.py`'s one-WebSocket hazard is exactly as protected.
-    - **The knob still reaches the ceiling.** `max_parallel = 8` against a
-      fetcher declaring `8` returns `8`, silently — *state the cost, don't
-      clamp the knob* applies to what the consumer **said**, and this rule
-      only decides what saying **nothing** means.
-    - **No warning fires here.** The default is fux's own choice; warning a
-      consumer about a number they did not pick is noise.
+    ⚠ **There is no silence any more** (W-225 stage 3b). This took `None` for
+    an unconfigured source and answered `min(declared, DEFAULT_MAX_PARALLEL)`
+    (W-83); `[sources.url] max_parallel` is now required whenever the table
+    exists, so the consumer's number is always the one applied. It can still
+    only lower a fetcher's declared ceiling, never raise it, so `cdp.py`'s
+    one-WebSocket hazard is exactly as protected.
     """
-    if configured is not None and configured < 1:
+    if configured < 1:
         raise FuxError(
             f"[sources.url] max_parallel must be >= 1, got {configured}. "
             "1 fetches one URL at a time, which is the default when no fetcher declares more"
@@ -363,11 +340,6 @@ def resolve_parallel(module, configured: int | None) -> int:
         # certainly not a reason to guess a larger number: fall back to the
         # value that is always safe.
         declared = UNDECLARED_MAX_PARALLEL
-    if configured is None:
-        # W-83. `min`, not `DEFAULT_MAX_PARALLEL`: a fetcher that declares less
-        # than the politeness default keeps its own smaller number, which is the
-        # whole of `cdp.py`'s protection.
-        return min(declared, DEFAULT_MAX_PARALLEL)
     if configured > declared:
         print(
             f"note: {getattr(module, '__name__', 'fetcher')} declares MAX_PARALLEL = {declared}; "
@@ -673,12 +645,12 @@ def _warn_if_thin(url: str, raw: bytes, markdown: str) -> None:
 def fetch_all(
     root: Path,
     entries: list[UrlEntry],
-    config: dict | None = None,
+    config: dict,
     *,
-    max_parallel: int | None = None,
+    max_parallel: int,
+    acquired_max_bytes: int,
     known_tokens: dict[str, str] | None = None,
     validation_out: dict | None = None,
-    acquired_max_bytes: int | None = None,
 ) -> tuple[list[FetchedUrl], list[Skipped]]:
     """Fetch every URL through the fetcher its line declared.
 
@@ -709,9 +681,9 @@ def fetch_all(
     a single host get the same budget, which is the case the bound exists for.
     The conservative direction is the one that would be wrong here.
 
-    **Unconfigured is `min(declared, DEFAULT_MAX_PARALLEL)`**, so a repo that
-    has never opened `fux.toml` is bounded by fux's politeness rather than by
-    whatever ceiling its fetcher's author found technically sound.
+    **`max_parallel` is the consumer's `[sources.url] max_parallel`**, required
+    by the loader, so a run is bounded by the repo's stated politeness rather
+    than by whatever ceiling its fetcher's author found technically sound.
 
     ⚠ **A blanket pool would have been silently wrong.** The shipped `cdp.py`
     sets a module-global `_session` holding **one WebSocket** that every
@@ -777,7 +749,7 @@ def fetch_all(
     token_shas: dict[str, str] = {}
     for fetcher_path in sorted(groups):
         module = load_fetcher(root, fetcher_path)
-        configure_fetcher(module, fetcher_config(config or {}, fetcher_path))
+        configure_fetcher(module, fetcher_config(config, fetcher_path))
         connect = getattr(module, "connect", None)
         close = getattr(module, "close", None)
         if callable(connect):
@@ -905,8 +877,9 @@ def fetch_all(
             }
         except Exception:
             failing = set()
-        cap = acquired_max_bytes or acquired.DEFAULT_MAX_BYTES
-        evicted = acquired.evict(root, acquired_blobs, max_bytes=cap, protected=failing)
+        evicted = acquired.evict(
+            root, acquired_blobs, max_bytes=acquired_max_bytes, protected=failing
+        )
         for url in evicted:
             acquired_blobs.pop(url, None)
         if evicted:

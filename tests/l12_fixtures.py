@@ -156,3 +156,12 @@ def cli_args(**given):
 
     shipped = {k: v for k, v in shipped_output().items() if k != "json"}
     return argparse.Namespace(**{**shipped, **given})
+
+
+def url_limits() -> dict:
+    """`fetch_all`'s two required bounds as the template ships them — what a
+    fresh repo's `[sources.url]` hands it (W-225 stage 3b)."""
+    from fux import setup as setup_mod
+
+    url = setup_mod.template_config()["sources"]["url"]
+    return {"max_parallel": url["max_parallel"], "acquired_max_bytes": url["acquired_max_bytes"]}

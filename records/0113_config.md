@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@a4bff466df04, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@fb1b77bd6771]
+owns: [src/fux/config.py@81db9b20a917, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@2a75560cd349]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a02ee7317552826564171a1347a834660ada884e3e2698a064ad6cdbe883f15c
+content_sha: 743fc113a48e134709f307a161d90f1f2775f36228bca5258a9202c103cc6b8b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -28,10 +28,16 @@ content_sha: a02ee7317552826564171a1347a834660ada884e3e2698a064ad6cdbe883f15c
 ## §1 — For humans
 
 `fux.toml` is **policy. The source lists are the corpus.** That split is why
-the file is so small: a repo with nothing but `[index] shards` in it is valid,
-because what gets indexed lives in `.fux/sources/dirs`, one entry per line.
+the file is so small: what gets indexed lives in `.fux/sources/dirs`, one entry
+per line, and this file only says how the engine behaves.
 
-Three properties of the schema are worth knowing before you read the table.
+**Every key is required** ([SR-LAW-12](0013_LAW-12-values-live-in-config.md),
+decision 17 below). Fux holds no copy of any value in code, so a missing key
+stops the run and names itself; `fux doctor --fix` writes it back from the
+template `fux setup` uses. **One table is the exception, and its absence is
+itself the setting:** no `[sources.url]` means this repo fetches nothing.
+
+Three more properties of the schema are worth knowing before you read the table.
 
 **Every key fux reads is validated, loudly, with the file and the offending
 value named.** A typo is a stopped run, not a silent default — a misconfigured
@@ -56,17 +62,19 @@ and diagnoses a ranking problem instead of a config one.
 ```mermaid
 flowchart TD
     F["fux.toml"] --> S["[sources]"]
-    S --> D["dirs_file — optional<br/>default .fux/sources/dirs"]
-    S --> U["[sources.url] — optional"]
-    U --> M["fetcher · urls_file<br/>paths, defaulted"]
+    S --> D["dirs_file · urls_file — REQUIRED<br/>the two source lists"]
+    S --> U["[sources.url] — optional TABLE<br/>absent = fetch nothing"]
     U --> ME["keep · ttl · enrich · update<br/>source-wide LAYERS — a URL line wins"]
-    U --> MP["max_parallel — REQUIRED<br/>when the table is present"]
-    U --> SW["sweep_minutes · acquired_max_bytes<br/>defaulted; no line-level layer"]
+    U --> MP["max_parallel · sweep_minutes<br/>fetch_at_answer · acquired_max_bytes"]
+    MP --> RQ["every key REQUIRED<br/>when the table is present"]
+    U --> RO["[sources.url.routes]<br/>optional map — fux reads it"]
     U --> CF["[sources.url.config]<br/>PASSED THROUGH, never read"]
     F --> I["[index]"]
-    I --> SH["shards = 256<br/>documents the value, cannot set it"]
+    I --> SH["shards = 256 — REQUIRED<br/>a check; cannot set it"]
+    F --> OB["[observe]"]
+    OB --> OM["max_ms — REQUIRED"]
     F --> AG["[agents]"]
-    AG --> AI["install — claude · codex · copilot · kiro<br/>absent = all four, [] = none"]
+    AG --> AI["install — REQUIRED<br/>claude · codex · copilot · kiro; [] = none"]
     F -.->|"REFUSED by name<br/>at any value"| RT["[ranking] · [dense] · [decode]"]
     RT ==>|"the keys moved"| TU[".fux/tune.toml<br/>ORDERING — SR-TUNE"]
     CF -.->|"verbatim"| MW["your fetcher's configure()"]
@@ -78,29 +86,34 @@ flowchart TD
 ```text
    fux.toml
      |
-     +-- [sources]
-     |     +-- dirs_file       optional  default .fux/sources/dirs
+     +-- [sources]                  every key REQUIRED
+     |     +-- dirs_file       path of the directory list
+     |     +-- urls_file       path of the URL list
      |     |
-     |     +-- [sources.url]   optional -- the whole URL source
-     |           +-- fetcher       path, default .fux/fetchers/http.py
-     |           +-- urls_file     path, default .fux/sources/urls
-     |           +-- keep          true (default) | false     -- a LAYER
-     |           +-- ttl           "24h" (default), a duration -- a LAYER
-     |           +-- enrich        false (default) | true     -- a LAYER
-     |           +-- update        "auto" (default) | "never"  -- a LAYER
-     |           +-- max_parallel  REQUIRED -- the only key with no default
-     |           +-- sweep_minutes 60 (default)
-     |           +-- acquired_max_bytes  absent = the store's own default
-     |           +-- [sources.url.config]
+     |     +-- [sources.url]   optional TABLE -- absent = fetch nothing;
+     |           |             present = every key below REQUIRED
+     |           +-- keep          true | false                -- a LAYER
+     |           +-- ttl           a duration, e.g. "24h"      -- a LAYER
+     |           +-- enrich        false | true                -- a LAYER
+     |           +-- update        "auto" | "never"            -- a LAYER
+     |           +-- fetch_at_answer  true | false
+     |           +-- max_parallel  URLs fetched at once
+     |           +-- sweep_minutes `fux daemon` cadence
+     |           +-- acquired_max_bytes  the .fux/acquired/ bound
+     |           +-- [sources.url.routes]  optional map, READ by fux
+     |           +-- [sources.url.config]  optional map,
      |                 PASSED THROUGH VERBATIM -- fux never reads a key
      |                        |
      |                        +--> your fetcher's configure(config)
      |
      +-- [index]
-     |     +-- shards = 256   documents the value; cannot change it
+     |     +-- shards = 256   REQUIRED; a check, cannot change it
+     |
+     +-- [observe]
+     |     +-- max_ms         REQUIRED
      |
      +-- [agents]
-     |     +-- install        absent = claude, codex, copilot, kiro; [] = none
+     |     +-- install        REQUIRED; [] = none
      |
      +-- [ranking]  REFUSED --+   an ERROR naming the new home,
      +-- [dense]    REFUSED --+   at any value, never ignored
@@ -118,31 +131,40 @@ Everything the loader reads, annotated:
 
 ```toml
 [sources]
-dirs_file = ".fux/sources/dirs"      # optional; this IS the default
+dirs_file = ".fux/sources/dirs"         # the directory list
+urls_file = ".fux/sources/urls"         # one URL per line, a file not an array
 
-[sources.url]
-fetcher      = ".fux/fetchers/http.py"  # YOUR code; fux loads it by path
-urls_file    = ".fux/sources/urls"      # one URL per line, a file not an array
-keep         = true                     # retain fetched bytes in .fux/acquired/
-ttl          = "24h"                    # ask-time: how long a citation may go unchecked
-enrich       = false                    # whether `fux enrich` plans work for these URLs
-update       = "auto"                   # update-time: "never" pins this source
-max_parallel = 4                        # REQUIRED when this table is present
-sweep_minutes = 60                      # how often `fux daemon` re-checks
+[sources.url]                           # PRESENT: this repo fetches
+keep            = true                  # retain fetched bytes in .fux/acquired/
+ttl             = "24h"                 # ask-time: how long a citation may go unchecked
+enrich          = false                 # whether `fux enrich` plans work for these URLs
+update          = "auto"                # update-time: "never" pins this source
+fetch_at_answer = true                  # ask-time: may `fux answer` open a socket
+max_parallel    = 4                     # URLs fetched at once
+sweep_minutes   = 60                    # how often `fux daemon` re-checks
+acquired_max_bytes = 2147483648         # the .fux/acquired/ bound
 
-[sources.url.config]
-greeting = "hello"                      # the fetcher's vocabulary, never fux's
+[sources.url.config.http]
+timeout_s = 30.0                        # the fetcher's vocabulary, never fux's
 
 [index]
-shards = 256                            # documents the value, cannot set it
+shards = 256                            # a check, cannot set it
+
+[observe]
+max_ms = 50                             # the wait for one .fux/observers/ file
 
 [agents]
-install = ["claude", "codex", "copilot", "kiro"]  # absent = all; [] = none
+install = ["claude", "codex", "copilot", "kiro"]  # [] = none
 ```
 
-A rejected key, named precisely rather than defaulted:
+A missing key, named — and a rejected one, named precisely rather than defaulted:
 
 ```console
+$ fux ingest
+error: /repo/fux.toml:
+  [observe] max_ms is missing
+  `fux doctor --fix` writes every missing key from the template `fux setup` uses
+# exit 1
 $ fux ingest
 error: /repo/fux.toml: [sources.url] ttl must be a duration like 15m, 1h or 7d (got 'soon')
 # exit 1
@@ -169,10 +191,13 @@ extending it is visibly a decision rather than a convenience.
 error in the loader — the caller decides whether it is fatal, which is why
 `fux doctor` can report on a directory that `fux ask` refuses.
 
-**2. `fux.toml` is policy; the source lists are the corpus.** There are no
-required *tables*: a file holding nothing but `[index] shards` is valid.
-`[sources] dirs_file` says where the directory list is and defaults to
-`.fux/sources/dirs` ([SR-DIR-LIST](0120_dir-list.md) decision 1).
+**2. `fux.toml` is policy; the source lists are the corpus.** `[sources]
+dirs_file` says where the directory list is ([SR-DIR-LIST](0120_dir-list.md)
+decision 1) and `urls_file` where the URL list is (decision 11a). ⚠ **Amended
+2026-09-27 (W-225 stage 3b):** this read *"there are no required tables: a
+file holding nothing but `[index] shards` is valid"*, and `dirs_file`
+*"defaults to `.fux/sources/dirs`"*. Since [SR-LAW-12](0013_LAW-12-values-live-in-config.md)
+every key is required and nothing defaults — decision 17.
 
 **3. `[index] shards` documents 256 and cannot change it.** Supplying any other
 value is an error, not a silent override: the shard function is
@@ -180,12 +205,15 @@ value is an error, not a silent override: the shard function is
 tree. The key exists so the number is *visible* rather than folklore.
 
 **4. `[sources.url]` is entirely optional.** Absent means no URL source, and
-`fux ingest` has nothing to do.
+`fux ingest` has nothing to do. **Its absence is the one absence L12 leaves
+legal**, because it is a setting rather than a missing value (decision 17).
 
 **5. `fetcher` and `urls_file` default to `.fux/fetchers/http.py` and
-`.fux/sources/urls`.** Both are repo-relative paths, and both defaults are the
-declared `.fux/` layout ([SR-DOTFUX](0102_fux-directory.md)). The default is
-the plain-GET fetcher ([SR-HTTP-FETCHER](0119_http-fetcher.md) decision 1).
+`.fux/sources/urls`.** ⚠ **Superseded twice, and kept as history:** `fetcher`
+was deleted by decision 16 (2026-09-20), `urls_file` moved to `[sources]` by
+decision 11a (2026-09-14), and since W-225 stage 3b (2026-09-27) neither path
+has a default — `urls_file` is required, and its template value is the
+declared `.fux/` layout ([SR-DOTFUX](0102_fux-directory.md)).
 
 ⚠ **This said *"a URL line carrying no `fetch=` means `fetch=http`"* until
 2026-09-12, and it contradicted the next paragraph** (W-140 row 10). A bare line
@@ -219,13 +247,15 @@ the leak and lost on cost —
 [SR-LAW-5](0007_LAW-5-hashed-meta.md) keeps the argument, the citation and the
 reopen trigger.
 
-**7. `max_parallel` is REQUIRED whenever `[sources.url]` is present**, and it is
-the only key in the file with no default.
+**7. `max_parallel` is REQUIRED whenever `[sources.url]` is present.** It was
+the only key in the file with no default until W-225 stage 3b made every key
+required (decision 17); what is below is why it was required **first**, and it
+still holds for every `[sources.url]` key.
 
 | case | behaviour |
 |---|---|
 | `[sources.url]` live, `max_parallel` live | its value, validated |
-| `[sources.url]` live, `max_parallel` absent or commented | **`FuxError`**, naming the key and quoting the line to paste |
+| `[sources.url]` live, `max_parallel` absent or commented | **`FuxError`**, naming the key; `fux doctor --fix` writes it (it quoted the line to paste until stage 3b) |
 | `[sources.url]` absent entirely | **no error** — nothing fetches, so there is nothing to bound |
 
 **The third row is a drawn line, not an oversight.** A docs-only repo forced to
@@ -255,14 +285,15 @@ refusal** — Arpit's standing rule, *state the cost, don't clamp the knob*:
 | `[sources.url] max_parallel` | **policy** | merely rude → **honoured, with a warning stating the cost**; never clamped down |
 | `max_parallel < 1` | **broken** | `FuxError` |
 
-**Silence is politeness, not the fetcher's ceiling.** A declaration answers
+**The consumer's number, never the fetcher's ceiling.** A declaration answers
 *what is safe* — `http.py`'s `8` is a true statement about a fetcher that
-builds a fresh `Request` per call — and never *what is polite unasked*. Nobody
-declared `8` for a given repo's wiki, so the resolver applies
-`min(declared, DEFAULT_MAX_PARALLEL)`. The default can only ever **lower**:
-`cdp.py`'s `MAX_PARALLEL = 1` still wins. And it decides only what **saying
-nothing** means — `max_parallel = 8` against a fetcher declaring `8` returns
-`8`, silently.
+builds a fresh `Request` per call — and never *what is polite unasked*. The
+resolver applies `min(declared, max_parallel)`, so it can only ever **lower**:
+`cdp.py`'s `MAX_PARALLEL = 1` still wins, and `max_parallel = 8` against a
+fetcher declaring `8` returns `8`, silently. ⚠ **Amended 2026-09-27 (W-225
+stage 3b):** there was a third case, *saying nothing*, answered by
+`min(declared, DEFAULT_MAX_PARALLEL)` (W-83). The key is required whenever the
+table exists, so nothing is left unsaid and the constant is deleted.
 
 **The bound is per fetcher group, not per host.** Twenty hosts behind `http.py`
 share one budget — politer than needed — and five hundred URLs on one host get
@@ -337,11 +368,12 @@ otherwise. The set is closed
 because the failure mode of a typo here is the worst kind: the file a consumer
 asked for is simply never written and nothing says so.
 
-**Absent and `[]` are deliberately different**, which is unusual for this schema
-and is the point: every other key treats absent as *"take the default"*, and so
-does this one — but `install = []` is a consumer who said **no**, and it is the
-durable form of `--no-agents`. Collapsing the two would make the opt-out
-unwritable. **Order is normalised, not preserved**, so what gets written cannot
+**`install` is required, and `[]` is a consumer who said no** — the durable
+form of `--no-agents`. ⚠ **Amended 2026-09-27 (W-225 stage 3b):** absent used
+to mean all four vendors, and *"absent and `[]` are deliberately different"*
+was this decision's point. Absent is now a missing key like any other; `fux
+doctor --fix` writes the template's list, which is the four vendors absent used
+to mean, so no repo's behaviour changes and the opt-out stays writable. **Order is normalised, not preserved**, so what gets written cannot
 depend on the order someone happened to list them in.
 
 **10. A retired key errors with instructions — at any value.** `dirs = []` stops
@@ -417,9 +449,11 @@ resolves all of them.
 - ⚠ **`acquired_max_bytes` is the exception and has NO line-level layer.** It
   bounds `.fux/acquired/` (SR-ACQUIRED decision 8) and it is a property of the
   disk the store sits on, not of one URL — a per-line override could only ever
-  raise somebody else's bound. `None` means the store's own default rather than
-  a number frozen here, so raising that default does not require editing every
-  `fux.toml` that never thought about the question.
+  raise somebody else's bound. ⚠ **Amended 2026-09-27 (W-225 stage 3b):**
+  `None` meant the store's own `DEFAULT_MAX_BYTES`, so raising it reached every
+  `fux.toml` unedited. That default was a value in code; the key is now
+  required with the table, the template writes 2 GiB, and a raised value ships
+  with a migration line (SR-LAW-12 §Consequences).
 - ⚠ **`fetch_at_answer` is the SECOND key with no line-level layer** (W-174,
   2026-09-14), and it is not an exception for `acquired_max_bytes`'s reason.
   That one is a property of the disk; this one is a property of *reaching the
@@ -574,7 +608,9 @@ record was *touched* in a change, never what the record says. This is the W-83
 shape with the two halves swapped, and it is unguarded for the same reason.
 
 **`[observe] max_ms`** (W-170) — how long fux waits for one `.fux/observers/`
-file before abandoning it. Positive integer milliseconds, default `50`.
+file before abandoning it. Positive integer milliseconds, required; the template
+writes `50`. ⚠ **If `fux.toml` does not load, observers do not run** (W-225
+stage 3b): they used to run on a bound of `50` held in `cli.py`.
 
 **It is in `fux.toml` and not in `.fux/tune.toml`** because it is not a ranking
 knob: it bounds what happens **after** the answer is rendered and cannot move a
@@ -587,11 +623,45 @@ exits, because Python cannot safely interrupt arbitrary consumer code.
 
 <!-- L12-NOTE-START -->
 
-**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `.fux/tune.toml` became mandatory in the same
-change, key by key; `fux.toml`'s own omit-to-inherit rule is next in W-225's
-stage 3 and is still in force until then.
+**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `.fux/tune.toml` became mandatory
+in stage 2, `.fux/output.toml` in stage 3a, and `fux.toml` in stage 3b —
+decision 17. The omit-to-inherit rule is gone.
 
 <!-- L12-NOTE-END -->
+
+**17. Every key is REQUIRED, and a missing one is named** ([SR-LAW-12](0013_LAW-12-values-live-in-config.md);
+W-225 stage 3b, 2026-09-27). `config.load` refuses a `fux.toml` lacking any of
+`[sources] dirs_file · urls_file`, `[index] shards`, `[observe] max_ms` or
+`[agents] install` — and, **when `[sources.url]` is present**, any of `keep ·
+ttl · enrich · update · fetch_at_answer · max_parallel · sweep_minutes ·
+acquired_max_bytes`. Every missing key is listed in **one** `FuxError`, after
+the retired and unknown keys have had their own messages, ending in the same
+sentence `tune.toml` and `output.toml` print: *`fux doctor --fix` writes every
+missing key from the template `fux setup` uses.*
+
+- **The template is the one home.** `src/fux/templates/fux.toml.txt` writes
+  every value, and nothing in `src/fux/` or `node/src/` holds a copy. Deleted:
+  `config.DEFAULT_SWEEP_MINUTES`, `DEFAULT_DIRS_FILE`, `DEFAULT_URLS_FILE`;
+  `daemon.DEFAULT_SWEEP_MINUTES`; `urlsrc.DEFAULT_MAX_PARALLEL`;
+  `acquired.DEFAULT_MAX_BYTES`; every `Config`/`UrlSource` field default; the
+  `{default}` placeholder. `FIXED_SHARDS` reads `constants.toml [index] shards`.
+- **Three absences stay legal, because each is a setting and not a value.**
+  `[sources.url]` (absent = fetch nothing, decision 4) and its two maps,
+  `[sources.url.routes]` and `[sources.url.config]` (absent = empty).
+  `setup.Mandatory` declares them — `present_only` and `never` — so `fux doctor
+  --fix` **never adds `[sources.url]`**: adding it would switch fetching on.
+- **`fux doctor --fix` inserts after the table's last key**, backing over a
+  trailing comment block, because a comment above the next header belongs to
+  that header.
+- ⚠ **Four behaviours changed for a repo that relied on an absence**, each
+  listed for Arpit in the classify compare doc: `fux daemon start` refuses a
+  repo with no `[sources.url]` (it swept every 60 minutes on a constant);
+  `ask`/`find` stop on a present `fux.toml` that does not load (they dropped
+  archived demotion silently); observers are skipped when `fux.toml` does not
+  load; and `doctor`'s dirs rows read the configured `dirs_file` instead of
+  `.fux/sources/dirs`.
+- **The Node reader checks only the key it reads**, `[sources] dirs_file`, with
+  the same message; it refuses no retired or unknown key, as before.
 
 <!-- L12-VALUES-START -->
 
@@ -713,9 +783,9 @@ grep -rn 'config\[' src/fux/ | grep -v 'test'
 # expect: no output. Fux validates that it is a table and passes it on.
 
 # 2. the config surface has not grown
-grep -oE '\bdata\.get\("[a-z]+"' src/fux/config.py | sort -u
-# expect exactly: agents, index, sources — and nothing else.
-# A FOURTH top-level table is the veto; a new key inside these three is not.
+grep -n -A6 '^REQUIRED_KEYS' src/fux/config.py
+# expect exactly four tables: sources, index, observe, agents.
+# A FIFTH top-level table is the veto; a new key inside these four is not.
 
 # 3. the retired tables still error rather than being silently ignored
 grep -n 'ranking' src/fux/config.py
@@ -726,10 +796,9 @@ grep -n 'ranking' src/fux/config.py
 fux ingest 2>&1 | head -1
 # on a bad key, expect: error: <path>/fux.toml: <what> must be <what> (got <value>)
 
-# 5. the written template still interpolates the concurrency default
-grep -n 'DEFAULT_MAX_PARALLEL' src/fux/setup.py src/fux/ingest/urlsrc.py
-# expect: setup.py interpolates the constant rather than typing a number —
-# a comment restating a constant is exactly the drift this key was added to fix
+# 5. no value is held in code (decision 17, SR-LAW-12)
+grep -nE 'DEFAULT_(SWEEP_MINUTES|MAX_PARALLEL|MAX_BYTES|DIRS_FILE|URLS_FILE)\s*=' src/fux/ -r
+# expect: no output. The template is the one home of every fux.toml value.
 ```
 
 ---

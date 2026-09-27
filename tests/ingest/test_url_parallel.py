@@ -40,41 +40,34 @@ def _fetcher(*, declared=None, fetch=None, name="test_fetcher"):
 def test_an_undeclared_fetcher_is_called_one_at_a_time():
     """The default is byte-for-byte the behaviour that shipped before this
     existed. Opting in is the fetcher author's act, never fux's inference."""
-    assert urlsrc.resolve_parallel(_fetcher(), None) == 1
     assert urlsrc.resolve_parallel(_fetcher(), 16) == 1
 
 
 def test_the_cap_is_the_minimum_of_the_two():
     assert urlsrc.resolve_parallel(_fetcher(declared=8), 4) == 4
     assert urlsrc.resolve_parallel(_fetcher(declared=2), 8) == 2
-    # ⚠ CHANGED BY W-83, and it is a behaviour change rather than a corrected
-    # test. This line asserted `== 8` when §3.3 shipped: unconfigured meant
-    # *whatever the fetcher declared*, so an untouched repo inherited
-    # `http.py`'s 8. It now means `min(declared, DEFAULT_MAX_PARALLEL)`.
-    assert urlsrc.resolve_parallel(_fetcher(declared=8), None) == urlsrc.DEFAULT_MAX_PARALLEL
 
 
-# -- W-83: what SILENCE means ------------------------------------------------
+# -- W-83's "what SILENCE means" — retired by W-225 stage 3b ----------------
+#
+# `resolve_parallel(module, None)` answered `min(declared, DEFAULT_MAX_PARALLEL)`
+# for an unconfigured `[sources.url]`. SR-LAW-12 made `max_parallel` required
+# whenever the table exists and deleted the constant, so there is no silence
+# left to mean anything: the consumer's number is always the one applied.
 
 
-def test_saying_nothing_gets_the_politeness_default_not_the_fetchers_ceiling():
-    """A declaration answers *what is safe*, never *what is polite unasked*.
-
-    `http.py`'s `MAX_PARALLEL = 8` is a true statement about `http.py` — a
-    fresh `Request` per call — and not a claim about what the consumer's wiki
-    can absorb. Nobody declared 8 for *this* repo.
-    """
-    assert urlsrc.DEFAULT_MAX_PARALLEL < 8, "the test is vacuous if they are equal"
-    assert urlsrc.resolve_parallel(_fetcher(declared=8), None) == urlsrc.DEFAULT_MAX_PARALLEL
-    assert urlsrc.resolve_parallel(_fetcher(declared=64), None) == urlsrc.DEFAULT_MAX_PARALLEL
+def test_there_is_no_unconfigured_parallelism_any_more():
+    assert not hasattr(urlsrc, "DEFAULT_MAX_PARALLEL")
+    with pytest.raises(TypeError):
+        urlsrc.resolve_parallel(_fetcher(declared=8), None)
 
 
-def test_the_default_only_ever_lowers_never_raises():
-    """`min`, not the constant. A fetcher declaring less keeps its own smaller
-    number — which is the whole of `cdp.py`'s one-WebSocket protection."""
-    assert urlsrc.resolve_parallel(_fetcher(declared=1, name="cdp"), None) == 1
-    assert urlsrc.resolve_parallel(_fetcher(), None) == 1  # undeclared is still 1
-    assert urlsrc.resolve_parallel(_fetcher(declared=2), None) == 2
+def test_a_smaller_declaration_still_wins_over_a_larger_setting():
+    """`min`, still. A fetcher declaring less keeps its own smaller number —
+    which is the whole of `cdp.py`'s one-WebSocket protection."""
+    assert urlsrc.resolve_parallel(_fetcher(declared=1, name="cdp"), 4) == 1
+    assert urlsrc.resolve_parallel(_fetcher(), 4) == 1  # undeclared is still 1
+    assert urlsrc.resolve_parallel(_fetcher(declared=2), 4) == 2
 
 
 def test_the_knob_still_reaches_the_declared_ceiling_silently(capsys):

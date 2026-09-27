@@ -32,10 +32,17 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-27** (Claude Code, Opus — W-168 step 4 scored, PASS by the table).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-27** (Claude Code, Opus — W-225 stage 3b landed; W-227 declared).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-09-27 (latest) — W-168 STEP 4 PASSES BY THE TABLE at `mined_weight = 0.5`; Arpit ratifies
+### 🟢 2026-09-27 (latest) — W-225 STAGE 3b: `fux.toml` IS STRICT; W-226 CLOSED; 🔴 W-227 DECLARED
+
+- **`fux.toml`** now requires every key; `[sources.url]` stays optional as a table (absence = fetch nothing) and `doctor --fix` never adds it. [SR-CONFIG](../records/0113_config.md) decision 17. 120/120 outputs byte-identical.
+- **Four behaviour changes** await Arpit's review in [the compare doc](compare/l12-classify.compare.md) §"Where the build departed".
+- 🔴 **[W-227](open/W-227-l11-breach-2026-09-27.md)**: an L11 traversal (recursive grep with `work` as a root; nothing printed) that the W-223 guard did not stop. Arpit rules the cost and whether a session may harden the guard.
+- **Next:** W-225 stage 4. W-168's phase-5 run of `set-4-claude`, by a session other than W-227's.
+
+### 🔴 2026-09-27 — W-168 STEP 4 PASSES BY THE TABLE at `mined_weight = 0.5`; Arpit ratifies
 
 - [Verdict](regression/2026-09-27-mined-expansion/VERDICT.md): 6/0 on the 22 tagged questions at `0.5`, exactly the floor. `0.1` to `0.3` come in under it (2, 4, 5). Zero drift at every weight.
 - ⚠ The arms ran at `anchor = 0.0`, but the engine ships `1.0`, so that combination is unmeasured. Five of the six wins are non-primary.

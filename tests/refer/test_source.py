@@ -10,6 +10,7 @@ import pytest
 
 from fux.errors import FuxError
 from fux.refer.source import GIT, URL, fetch_document, resolve
+from l12_fixtures import write_config
 
 import fux.refer.source  # for the registry lookup below
 
@@ -26,9 +27,8 @@ def _listed(root, url, decoder="prose"):
     construction* — the hazard this module's own docstring is about. A URL that
     is not listed has no line to read, so every case below lists one.
     """
-    (root / "fux.toml").write_text(
-        "[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8"
-    )
+    (root / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    write_config(root)  # every other key from the template (SR-LAW-12)
     listing = root / ".fux" / "sources" / "urls"
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text(f"{url} fetch=http decoder={decoder}\n", encoding="utf-8")

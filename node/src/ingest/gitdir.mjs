@@ -17,31 +17,43 @@ import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { readDirs } from "./sourcelist.mjs";
 import { parseToml } from "../config/toml.mjs";
+import { FuxError } from "../errors.mjs";
 
-//: Where the directory list lives when `fux.toml` does not say otherwise.
-export const DEFAULT_DIRS_FILE = ".fux/sources/dirs";
+//: What a missing key's error tells the reader to do — `config.py`'s sentence.
+const FIX_HINT = "`fux doctor --fix` writes every missing key from the template `fux setup` uses";
 
-/** `[sources] dirs_file`, or the default.
+/** `fux.toml`'s `[sources] dirs_file` — `null` when there is no `fux.toml`.
  *
- * **Tolerant on purpose, exactly as the caller is.** `_archived_ranking`
- * wraps the whole read in a `FuxError` catch and degrades to no archived
- * directories, so `ask`/`find` never fail because ranking metadata is missing.
- * A `fux.toml` this cannot read gets the same treatment. */
+ * ⚠ **It fell back to `.fux/sources/dirs` until W-225 stage 3b**, on an absent
+ * file, an absent key, or a file it could not parse. SR-LAW-12 leaves no
+ * default path: an absent `fux.toml` is `null` (no declaration, so nothing is
+ * archived — `_archived_ranking`'s tolerance), and a present one must carry
+ * the key.
+ *
+ * **Narrowed, and said so:** Python's `config.load` also refuses retired and
+ * unknown keys and validates every value; this reader checks only that
+ * `[sources] dirs_file` is present, the one key it reads. */
 export function dirsFile(root) {
   const path = join(root, "fux.toml");
+  let isFile = false;
   try {
-    if (!statSync(path).isFile()) return DEFAULT_DIRS_FILE;
-    const data = parseToml(readFileSync(path, "utf8"), path);
-    const value = data?.sources?.dirs_file;
-    return typeof value === "string" && value.trim() ? value.trim() : DEFAULT_DIRS_FILE;
+    isFile = statSync(path).isFile();
   } catch {
-    return DEFAULT_DIRS_FILE;
+    isFile = false;
   }
+  if (!isFile) return null;
+  const data = parseToml(readFileSync(path, "utf8"), path);
+  const value = data?.sources?.dirs_file;
+  if (value === undefined) throw new FuxError(`${path}:\n  [sources] dirs_file is missing\n  ${FIX_HINT}`);
+  if (typeof value !== "string" || !value.trim()) {
+    throw new FuxError(`${path}: [sources] dirs_file must be a path to a line-oriented directory list`);
+  }
+  return value.trim();
 }
 
 /** Included entries declared `archived=true`. Never derived from a path. */
-export function archivedDirs(root, relPath = null) {
-  return readDirs(root, relPath ?? dirsFile(root))
+export function archivedDirs(root, relPath) {
+  return readDirs(root, relPath)
     .filter((entry) => !entry.exclude && entry.attrs.archived === "true")
     .map((entry) => entry.value);
 }
@@ -61,14 +73,18 @@ export function isArchivedLoc(loc, dirs) {
 /** The archived set for this root, or an EMPTY set when it cannot be read.
  *
  * The tolerance `_archived_ranking` extends, in one place so every caller gets
- * it: a corpus with no `fux.toml`, no dirs list, or a malformed one still
- * answers — it simply demotes nothing. **The tune file is NOT covered by this**
+ * it: a corpus with no `fux.toml`, or with no readable dirs list, still
+ * answers — it simply demotes nothing. ⚠ **A `fux.toml` that is present and
+ * lacks `dirs_file` throws** (W-225 stage 3b), as Python's does. **The tune
+ * file is NOT covered by this**
  * (`config/tune.mjs`), and the asymmetry is deliberate: an absent dirs list is
  * the normal case for a corpus nobody has declared anything about, while a tune
  * file that exists and will not parse means somebody edited it and got it wrong. */
 export function archivedDirSet(root) {
+  const relPath = dirsFile(root);
+  if (relPath === null) return new Set();
   try {
-    return new Set(archivedDirs(root));
+    return new Set(archivedDirs(root, relPath));
   } catch {
     return new Set();
   }

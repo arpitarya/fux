@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5b02a73a14485232c819730d0a736c5d34129cad11884ec81be35899ed323d95
+content_sha: 3c1c786f9f01994c5b4338f5f12ab90680aee0d6000bbc65c3b9aaa734c8957a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -346,6 +346,8 @@ committed record changed, and which fetcher retrieved a document is still
 **10. A `url:` record carries `abbr` exactly as a git one does** (W-168 step 4,
 2026-09-27). Same extraction, same tracker, omitted when empty. The URL plane
 added nothing of its own.
+
+**Every `[sources.url]` key is required once the table is present** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27); its absence still means *fetch nothing*, and `fux doctor --fix` never adds it. `fetch_all` takes its bounds as required arguments ([SR-CONFIG](0113_config.md) decision 17).
 
 ### Consequences
 

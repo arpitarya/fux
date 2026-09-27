@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@9a50e177ca3b, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@a448d8e2f6f5]
+owns: [src/fux/maintain@7deaa2a852ed, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@a448d8e2f6f5]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 1de12f7faf6cf66845bfd012f350eb7635e5465654a00c93a2dc7aaee8d57629
+content_sha: 4a12e39692cccf4c93c10a0b583bfcda5d405ad2739d57563e75acf8566ab028
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -433,11 +433,14 @@ interval, unassisted** → `stop` → pid reaped, `write.lock` free.
 - ⚠ **macOS only**, and the detached-process mechanics are the part most likely
   to differ on Windows.
 
-**9d. Cadence is `[sources.url] sweep_minutes`, default 60.** It **has** a
-default, unlike `max_parallel`, and the asymmetry is deliberate: `max_parallel`
-bounds a blast radius and must be stated; this only decides how often, so
-silence is unopinionated rather than dangerous. **No adaptive scheduling** —
-proportional-to-change-rate is out of scope.
+**9d. Cadence is `[sources.url] sweep_minutes`, required with the table**
+(W-225 stage 3b, 2026-09-27, [SR-LAW-12](0013_LAW-12-values-live-in-config.md)).
+Until then it had a default of 60, on the argument that it only decides how often. The law
+leaves no default in code; the template writes `60`. **A repo with no
+`[sources.url]` has no cadence, so `fux daemon start` refuses it**, naming why
+— the daemon keeps URLs fresh (9c-i), and the git hooks already keep directory
+sources current. It used to sweep such a repo every 60 minutes. **No adaptive
+scheduling** — proportional-to-change-rate is out of scope.
 
 **10. The dirty list has two producers, and the contract it leans on needs
 saying rather than assuming.** `post-commit` records what a commit changed; the

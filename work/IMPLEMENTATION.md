@@ -40,7 +40,7 @@ Rules:
 
 ## 2026-09-27 — **W-226: every schema in `src/fux/schemas/`**
 
-**Outcome: built, not committed. No shape, id or public output changed.**
+**Outcome: built and committed (`acfe8ab6`); closed 2026-09-27. No shape, id or public output changed.**
 - **What:** the five `*.schema.json` files were moved with `git mv` into
   `src/fux/schemas/`, a package. `fux.schema.load(name)` resolves every name
   from `constants.toml [schema_files] package`, and callers no longer pass a
@@ -62,6 +62,33 @@ Rules:
   bare `--write`. You name the records to stamp, or pass `--all`.
   [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision 13a, enforced
   by `test_a_bare_write_is_refused`.
+
+---
+
+## 2026-09-27 — **W-225 stage 3b: `fux.toml` is mandatory, key by key**
+
+**Outcome: landed; no value changed, no ranking moved.**
+- **What:** `config.load` requires every key — `[sources] dirs_file ·
+  urls_file`, `[index] shards`, `[observe] max_ms`, `[agents] install`, and all
+  eight `[sources.url]` keys **when that table is present** — naming every
+  missing one in one `FuxError` with the `fux doctor --fix` sentence
+  ([SR-CONFIG](../records/0113_config.md) decision 17). The template writes every
+  value (`ttl`, `sweep_minutes`, `acquired_max_bytes` are no longer left out;
+  the `{default}` placeholder is gone). Deleted: `DEFAULT_SWEEP_MINUTES` ×2,
+  `DEFAULT_DIRS_FILE`, `DEFAULT_URLS_FILE`, `DEFAULT_MAX_PARALLEL`,
+  `acquired.DEFAULT_MAX_BYTES`, every `Config`/`UrlSource` field default, the
+  observer hook's `50`. `constants.toml [index] shards` added. `setup.Mandatory`
+  declares `[sources.url]` present-only and its two maps never-written, so
+  `--fix` cannot switch fetching on; `--fix` now inserts after a table's last
+  key. Node's `dirsFile` is strict with the same message. Four behaviour
+  changes for a repo relying on an absence are listed for Arpit in
+  [the compare doc](compare/l12-classify.compare.md).
+- **Evidence:** 120 of 120 outputs byte-identical to HEAD `6978f188` on this
+  repo (30 queries × Python `ask`/`find`/`answer --no-refer` + Node `ask`, one
+  corpus, two source trees). On a clean worktree of HEAD + this change: unit
+  5 765 passed, 2 failed — `999c1976`'s missing SR-TUNE touch (not this
+  change's) and the Node-twin working-tree check the commit message answers;
+  e2e 151; Node 92.
 
 ---
 

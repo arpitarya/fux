@@ -60,7 +60,7 @@ def repo(tmp_path):
     # so a fixture repo that means to accept a URL has to say which fetcher
     # reaches it — which is the behaviour under test in several cases below.
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nmax_parallel = 4\n'
+        '[sources]\n[sources.url]\n'
         '[sources.url.routes]\n"x.test" = "http"\n"*.x.test" = "http"\n'
         '"wiki.test" = "http"\n"example.com" = "http"\n',
         encoding="utf-8",
@@ -629,11 +629,8 @@ def _url_repo(repo):
     repo that had nothing to fetch either way — a fixture with no
     `[sources.url]` passes them vacuously.
     """
-    (repo / "fux.toml").write_text(
-        '[sources]\nurls_file = ".fux/sources/urls"\n'
-        '[sources.url]\nmax_parallel = 4\n',
-        encoding="utf-8",
-    )
+    (repo / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    write_config(repo)  # every other key from the template (SR-LAW-12)
     (repo / ".fux" / "sources" / "urls").write_text(
         "https://x.test/a fetch=http decoder=prose keep=true ttl=24h "
         "enrich=false archived=false update=auto\n",
@@ -775,6 +772,7 @@ def test_a_cli_written_line_states_the_repo_policy_not_the_engine_default(tmp_pa
         "max_parallel = 1\n",
         encoding="utf-8",
     )
+    write_config(tmp_path)  # every other key from the template (SR-LAW-12)
     listing = tmp_path / ".fux" / "sources" / "urls"
     listing.parent.mkdir(parents=True)
     listing.write_text("", encoding="utf-8")

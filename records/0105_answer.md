@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@79014cc86dfd]
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 71b64528c8e1a3e2ddcce2044b5d698a1fb374e96982eda39f26f02d52b2423c
+content_sha: 1b36029db016dbc40863c44c13b8276f23c79857b073ea0fbba41d133c29232f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -494,6 +494,8 @@ shipped at `0.0`, so `answer` cites what it cited before the key existed.
 2026-09-27). Both reach `run_query`, so `[ranking] mined_weight` moves the
 document `answer` cites as it moves `ask`'s #1. At the default `0.0` nothing is
 read and `answer` is byte-identical.
+
+**A present `fux.toml` that does not load now stops `answer`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): the archived declaration is read through `config.load`, which names every missing key; only an absent `fux.toml` is still tolerated ([SR-ASK](0103_ask.md), [SR-CONFIG](0113_config.md) decision 17).
 
 ### Consequences
 

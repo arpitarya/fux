@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7628e166356, src/fux/ingest@75aedb778510, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@eb45c1672eac, node/src/ingest/priors.mjs@11df69775da1]
+owns: [src/fux/ingest/ingestlog.py@f7628e166356, src/fux/ingest@17c7fe9d1b72, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@1420b552a4c5, node/src/ingest/priors.mjs@11df69775da1]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 9099c48042861b1465b838cfca42b9ecd60b08c67a8db487193f00ecd4b359e5
+content_sha: d74a99a9210640c466b1fae60058eb10723d51248595f720fdc2da4accbddd9d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -973,6 +973,13 @@ moved to 3. **No weight reaches ingest**: `mined_weight` is read at query time
 only, so the committed bytes are the same at every arm. That is why its default
 moving to `0.5` on 2026-09-27 ([SR-TUNE](0135_tuning.md) decision 19a) needs no
 re-ingest, and why this decision did not move with it.
+
+**`fetch_all` takes its bounds, never a default** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b,
+2026-09-27). `config`, `max_parallel` and `acquired_max_bytes` are required
+arguments, read from `[sources.url]` by `run.py`; `urlsrc.DEFAULT_MAX_PARALLEL`
+and `acquired.DEFAULT_MAX_BYTES` are deleted, and `resolve_parallel` no longer
+answers an unconfigured call ([SR-CONFIG](0113_config.md) decisions 7a and 17).
+The Node reader's `dirsFile` no longer falls back to `.fux/sources/dirs`.
 
 ### Consequences
 

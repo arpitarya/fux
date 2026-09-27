@@ -10,7 +10,7 @@ feature: the observer hook — the extension point a consumer's analytics subscr
 owns: [src/fux/observe.py@640ad5b17802, tools/observer-bench@e12d60cca125]
 laws: [L1, L2, L3, L4, L8, L10]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 06d3e7ce23bf7ba6563cd6c205dab098bedf3cdffa9d85466c176c710f79e1f8
+content_sha: 764323e60a1341f00daed2da72431ecde3ccee8adc5dde89f1d9a57bbb77d432
 ratifies: W-170
 ---
 
@@ -249,6 +249,12 @@ this moved where they are written, not what they are.
 - `src/fux/observe.py` — `CONSUMER_DIR` ← `[files] observers_dir`, `LIVENESS_NAME` ← `[runtime] observers`
 
 <!-- L12-VALUES-END -->
+
+**No bound, no observers** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). When
+`fux.toml` does not load, `[observe] max_ms` cannot be read, and the hook used
+to run the observers on `50` ms held in `cli.py`. It now **skips them**: the
+bound is the guarantee that a consumer's analytics cannot slow a verb, and
+running them without it would drop the guarantee rather than the observers.
 
 ### Consequences
 

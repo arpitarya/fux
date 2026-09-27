@@ -258,15 +258,6 @@ def write_manifest(root: Path, blobs: dict[str, Blob]) -> None:
         raise
 
 
-#: The store's default ceiling, and the reason `keep` may default to true.
-#:
-#: **A judgement, not a measurement.** Large enough that an ordinary corpus of
-#: documents never reaches it, small enough that a runaway one is noticed as a
-#: bounded number rather than a full disk. `[sources.url] acquired_max_bytes`
-#: overrides it.
-DEFAULT_MAX_BYTES = 2 * 1024 * 1024 * 1024
-
-
 def blobs_on_disk(root: Path) -> list[tuple[Path, int]]:
     """Every stored blob and its size. Sorted for determinism, not for policy."""
     objects = plane(root) / OBJECTS_DIR
@@ -303,7 +294,7 @@ def evict(
     root: Path,
     blobs: dict[str, Blob],
     *,
-    max_bytes: int = DEFAULT_MAX_BYTES,
+    max_bytes: int,
     protected: set[str] | None = None,
 ) -> list[str]:
     """Bring the store under `max_bytes`. Returns the URLs whose blob went.

@@ -22,7 +22,7 @@ import pytest
 from fux.config import UrlSource
 from fux.errors import FuxError
 from fux.ingest import sourcelist, urlsrc
-from l12_fixtures import write_config
+from l12_fixtures import url_limits, write_config
 
 
 def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
@@ -41,14 +41,13 @@ def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
 
 
 def _source(**overrides):
-    base = dict(
-        routes={},
-        urls_file=".fux/sources/urls",
-        keep=True,
-        ttl="24h",
-        config={},
-        max_parallel=4,
-    )
+    """A `UrlSource` as the template's `[sources.url]` states it — every value
+    read from the one home (SR-LAW-12), a test's override on top."""
+    from fux import setup as setup_mod
+
+    shipped = setup_mod.template_config()["sources"]
+    base = {k: v for k, v in shipped["url"].items() if not isinstance(v, dict)}
+    base.update(routes={}, config={}, urls_file=shipped["urls_file"])
     base.update(overrides)
     return UrlSource(**base)
 
@@ -90,18 +89,29 @@ def test_an_unknown_value_is_refused_by_the_grammar_naming_the_line():
 def test_an_unknown_source_wide_value_is_refused_by_the_loader(tmp_path):
     from fux.config import load
 
-    (tmp_path / "fux.toml").write_text(
-        '[sources.url]\nmax_parallel = 4\nupdate = "weekly"\n', encoding="utf-8"
-    )
+    (tmp_path / "fux.toml").write_text('[sources.url]\nupdate = "weekly"\n', encoding="utf-8")
+    write_config(tmp_path)  # every other key, so the value check is what fires
     with pytest.raises(FuxError, match=r'update must be "auto" or "never"'):
         load(tmp_path)
 
 
-def test_the_source_wide_default_is_auto(tmp_path):
+def test_an_absent_source_wide_update_is_refused_not_defaulted_to_auto(tmp_path):
+    """⚠ **Inverted by W-225 stage 3b** (SR-LAW-12). This asserted that an
+    absent `[sources.url] update` loaded as `"auto"`. The template states
+    `"auto"` now — still the status quo for every existing clone — and a
+    `[sources.url]` that omits the key is refused by name."""
+    import re
+
+    from fux import setup as setup_mod
     from fux.config import load
 
-    (tmp_path / "fux.toml").write_text("[sources.url]\nmax_parallel = 4\n", encoding="utf-8")
-    assert load(tmp_path).url.update == "auto"
+    assert setup_mod.template_config()["sources"]["url"]["update"] == "auto"
+    (tmp_path / "fux.toml").write_text("[sources.url]\n", encoding="utf-8")
+    write_config(tmp_path)
+    path = tmp_path / "fux.toml"
+    path.write_text(re.sub(r"(?m)^update\s*=.*\n", "", path.read_text(), count=1))
+    with pytest.raises(FuxError, match=r"(?s)\[sources\.url\] update is missing.*fux doctor --fix"):
+        load(tmp_path)
 
 
 # -- no socket, and no consumer code executed ------------------------------
@@ -129,7 +139,8 @@ def test_a_pinned_url_never_reaches_the_fetcher(tmp_path, monkeypatch):
 
     entries = _resolve("https://x.test/a update=never fetch=mw decoder=prose\nhttps://x.test/b update=never fetch=mw decoder=prose")
     fetched, skipped = urlsrc.fetch_all(
-        tmp_path, [e for e in entries if e.update != "never"], {}, max_parallel=1
+        tmp_path, [e for e in entries if e.update != "never"], {}, max_parallel=1,
+        acquired_max_bytes=url_limits()["acquired_max_bytes"],
     )
     assert not exploded and not fetched and not skipped
 
@@ -172,9 +183,8 @@ def test_doctor_counts_pinned_lines_and_names_the_lossy_ones(tmp_path):
     from fux import doctor
 
     (tmp_path / ".git").mkdir()
-    (tmp_path / "fux.toml").write_text(
-        '[sources]\nurls_file = ".fux/sources/urls"\n[sources.url]\nmax_parallel = 4\n', encoding="utf-8"
-    )
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    write_config(tmp_path)  # every other key from the template (SR-LAW-12)
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True)
     urls.write_text(
@@ -195,9 +205,8 @@ def test_doctor_says_nothing_when_no_line_is_pinned(tmp_path):
     from fux import doctor
 
     (tmp_path / ".git").mkdir()
-    (tmp_path / "fux.toml").write_text(
-        '[sources]\nurls_file = ".fux/sources/urls"\n[sources.url]\nmax_parallel = 4\n', encoding="utf-8"
-    )
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    write_config(tmp_path)  # every other key from the template (SR-LAW-12)
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True)
     urls.write_text("https://x.test/live fetch=mw decoder=prose\n", encoding="utf-8")
@@ -244,8 +253,7 @@ EXPLODING = (
 def _repo(tmp_path, urls, fetcher=FAKE):
     tmp_path.mkdir(parents=True, exist_ok=True)
     (tmp_path / "fux.toml").write_text(
-        '[sources]\ndirs_file = ".fux/sources/dirs"\n'
-        '[sources.url]\nmax_parallel = 4\n'
+        "[sources]\n[sources.url]\n"
         # 🔴 `fux add <url>` resolves a fetcher and REFUSES when nothing
         # matches (W-199 D1) — a fixture repo that means to accept a URL has
         # to say which fetcher reaches it.
