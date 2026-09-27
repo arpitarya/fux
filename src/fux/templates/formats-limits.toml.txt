@@ -1,0 +1,53 @@
+
+# The built-in decoders' caps -- each one bounds what a decoder reads, so each
+# changes committed bytes, and a changed value re-extracts every document at
+# the next `fux ingest` (it is part of the extract-config digest). Every key is
+# REQUIRED (SR-LAW-12); `fux doctor --fix` writes a missing one. The keys are
+# decided in SR-DECODE: https://github.com/arpitarya/fux/blob/main/records/0139_decode.md
+#
+# [limits.zip] is the shared ZIP reader under docx, pptx and xlsx.
+# [limits.json] max_depth is shared by json, jsonl, toml and xml.
+
+[limits.zip]
+max_uncompressed = 67108864
+max_members      = 4096
+max_member_bytes = 33554432
+
+[limits.csv]
+max_cell_chars = 500
+
+[limits.drawio]
+max_inflated = 16777216
+
+[limits.image]
+max_inflated = 1048576
+
+[limits.json]
+max_depth         = 6
+max_heading_depth = 2
+min_prose_len     = 3
+max_items         = 500
+
+[limits.jsonl]
+max_records = 500
+
+[limits.mail]
+max_body_chars = 200000
+max_messages   = 500
+
+[limits.pdf]
+max_streams    = 5000
+max_inflated   = 67108864
+max_text_chars = 2000000
+
+[limits.rtf]
+max_chars = 2000000
+
+[limits.xlsx]
+max_cols = 40
+
+[limits.xml]
+min_attr_len = 12
+
+[limits.yaml]
+max_depth = 6

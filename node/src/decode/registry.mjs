@@ -73,9 +73,11 @@ export function globMatch(pattern, path) {
 /** The `include` globs in force for this repo: `.fux/formats.toml`'s if it has
  *  one, the built-in default otherwise.
  *
- *  **An absent file never means "everything" and never means "nothing"** — it
- *  means the default, which is SR-TYPES' own rule and the reason a missing
- *  file is not an error. */
+ *  **An absent file never means "everything" and never means "nothing".**
+ *  ⚠ Since W-225 stage 4a SR-TYPES makes the file REQUIRED and `fux ingest`
+ *  stops without it; this read stays tolerant because it is on the QUERY path,
+ *  where the cost of the fallback is a conservative skip, never a wrong
+ *  citation — the same tolerance Python's answer path extends. */
 export function alreadyTextGlobs(root) {
   const path = join(root, ".fux", "formats.toml");
   try {

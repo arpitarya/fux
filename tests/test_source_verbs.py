@@ -22,7 +22,7 @@ import pytest
 
 from fux import sources
 from fux.errors import FuxError
-from fux.ingest import sourcelist
+from fux.ingest import sourcelist, typesfile
 from l12_fixtures import write_config
 
 
@@ -262,6 +262,9 @@ def test_removing_a_type_deletes_its_line_and_never_excludes(repo, monkeypatch, 
 def test_a_leftover_line_grammar_types_file_stops_the_verb(repo, monkeypatch):
     from fux.errors import FuxError
 
+    # The fixture now writes `.fux/formats.toml` (W-225 stage 4a: the file is
+    # required), so the pre-migration state — the old file ALONE — is made here.
+    (repo / ".fux" / "formats.toml").unlink()
     (repo / ".fux" / "sources" / "types").write_text("*.md\n", encoding="utf-8")
     with pytest.raises(FuxError, match="fux setup"):
         _add(repo, monkeypatch, _args("*.pdf", types=True))
@@ -584,6 +587,9 @@ def test_adding_the_first_type_seeds_the_built_in_allowlist(repo, monkeypatch):
     """
     from fux.ingest.gitdir import DEFAULT_TYPES, read_types
 
+    # The fixture writes `.fux/formats.toml` (required since W-225 stage 4a);
+    # the seed is `add`'s answer to a repo that has none, so remove it.
+    (repo / ".fux" / "formats.toml").unlink()
     _add(repo, monkeypatch, _args("*.tex", types=True))
     allow = set(read_types(repo).allow)
     assert set(DEFAULT_TYPES) <= allow, "the seed IS the default, map included"
@@ -591,9 +597,13 @@ def test_adding_the_first_type_seeds_the_built_in_allowlist(repo, monkeypatch):
 
 
 def test_adding_a_second_type_does_not_re_seed(repo, monkeypatch):
+    (repo / ".fux" / "formats.toml").unlink()  # the seeding path, as above
     _add(repo, monkeypatch, _args("*.pdf", types=True))
     _add(repo, monkeypatch, _args("*.tex", types=True))
-    assert _types(repo).count('"*.md"') == 1
+    # Counted on the parsed list, not the text: the seeded file's own comment
+    # spells `"*.md"` as an example since W-225 stage 4a made setup's seed the
+    # file every repo starts with.
+    assert typesfile.read(repo).include.count("*.md") == 1
 
 
 # -- L4: these verbs open no socket of their own ----------------------------

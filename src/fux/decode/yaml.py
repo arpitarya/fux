@@ -28,6 +28,7 @@ one codebase is the `_MdParser` defect again, so
 from __future__ import annotations
 
 import re
+from fux.decode._limits import limit
 
 # Imports are ABSOLUTE, not relative, and that is what makes this file work in
 # both places it runs: as a package module, and as a consumer copy in
@@ -44,11 +45,12 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.yaml", "version")
+VERSION = fixed("decoders.yaml", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.yaml", "extensions"))
 
-MAX_DEPTH = 6
+#: ⚠ **`MAX_DEPTH` is `[limits.yaml] max_depth` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: `key:` or `key: value`, capturing indentation. Anchors and tags are stripped
 #: from the value rather than interpreted — `&id001`, `*id001`, `!!str` are
@@ -118,7 +120,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
         depth = _indent(line) // 2 + 1
         if not value:
             if key:
-                out.append(_label(key, min(depth, MAX_DEPTH)))
+                out.append(_label(key, min(depth, limit("yaml", "max_depth"))))
         else:
             prose = _prose(value) or value if len(value) >= 3 else ""
             if prose:

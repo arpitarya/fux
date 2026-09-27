@@ -21,19 +21,23 @@ from __future__ import annotations
 
 import zipfile
 from io import BytesIO
+from fux.decode._limits import limit
 
 #: A single document's uncompressed payload. Generous for a real deck or
 #: spreadsheet (the largest in this repo's fixtures is under 1 MB) and far
 #: below what a bomb needs to hurt.
-MAX_UNCOMPRESSED = 64 * 1024 * 1024
+#: ⚠ **`MAX_UNCOMPRESSED` is `[limits.zip] max_uncompressed` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: Members, not bytes. A deck with a thousand slides is unusual; a hundred
 #: thousand entries is an attack or a mistake, and either way not a document.
-MAX_MEMBERS = 4096
+#: ⚠ **`MAX_MEMBERS` is `[limits.zip] max_members` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: Per-member, so one pathological entry cannot consume the whole budget while
 #: staying under the archive total.
-MAX_MEMBER_BYTES = 32 * 1024 * 1024
+#: ⚠ **`MAX_MEMBER_BYTES` is `[limits.zip] max_member_bytes` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 
 class ZipTooBig(ValueError):
@@ -58,15 +62,15 @@ class SafeZip:
         except (zipfile.BadZipFile, OSError) as exc:
             raise ZipTooBig(f"not a readable zip: {exc}") from exc
         infos = self._zip.infolist()
-        if len(infos) > MAX_MEMBERS:
-            raise ZipTooBig(f"{len(infos)} members exceeds {MAX_MEMBERS}")
+        if len(infos) > limit("zip", "max_members"):
+            raise ZipTooBig(f"{len(infos)} members exceeds {limit('zip', 'max_members')}")
         total = 0
         for info in infos:
-            if info.file_size > MAX_MEMBER_BYTES:
+            if info.file_size > limit("zip", "max_member_bytes"):
                 raise ZipTooBig(f"{info.filename} inflates to {info.file_size} bytes")
             total += info.file_size
-        if total > MAX_UNCOMPRESSED:
-            raise ZipTooBig(f"inflates to {total} bytes, over {MAX_UNCOMPRESSED}")
+        if total > limit("zip", "max_uncompressed"):
+            raise ZipTooBig(f"inflates to {total} bytes, over {limit('zip', 'max_uncompressed')}")
 
     def names(self) -> list[str]:
         """Every member, **sorted**. Never archive order."""

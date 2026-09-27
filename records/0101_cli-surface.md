@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@40e22cfe1bfb, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@10364bd02e0a, tests_e2e@00b16e9427dc, node/fux.mjs@b3c33c3898dc]
+owns: [src/fux/cli.py@40e22cfe1bfb, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@10364bd02e0a, tests_e2e@8a7e8ede5b60, node/fux.mjs@b3c33c3898dc]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 3256d19f6b9b2e7509653e9bbe3cdf39a8208141b38d0fcfabe1f89f1b51a8e0
+content_sha: 89f4cbaad8e787e201f150f27ea86915f2101afa0d3514ad8a19b36d30a5ab01
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1304,6 +1304,8 @@ apart on an L4 surface.
 ([SR-OUTPUT](0143_output-defaults.md) decision 10): *absent* and *given* have to
 be distinguishable, because a `--decoder` that arrived as `""` would be a pin
 nobody wrote.
+
+**`.fux/formats.toml` is required, so the e2e suite's hand-built repos write it through `write_config`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27); no verb's surface changed ([SR-TYPES](0128_types-list.md) decision 14).
 
 ### Consequences
 

@@ -10,7 +10,7 @@ feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted fr
 owns: []
 laws: [L3, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 65ffb7a836b791b98207096604f11666bd269c3480952baf10cf09f9afe48dbd
+content_sha: 71ce4f207e6974536678a73729e1da1d41d5ad6d7bf2d8d1351cafb9d93cb273
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -272,6 +272,8 @@ this moved where they are written, not what they are.
 - `src/fux/ingest/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
 
 <!-- L12-VALUES-END -->
+
+**No dirs-list rule changed** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `gitdir.read_types` no longer falls back to `DEFAULT_TYPES` for an absent `formats.toml` ([SR-TYPES](0128_types-list.md) decision 14).
 
 ### Consequences
 

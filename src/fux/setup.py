@@ -870,6 +870,10 @@ def _mandatory_config() -> "tuple[Mandatory, ...]":
 
     return (
         Mandatory(CONFIG_NAME, config_text(), ("sources.url",), ("sources.url.config", "sources.url.routes")),
+        # `include`, `[decoders]` and `[meta]` are the consumer's own lists: what
+        # counts as a document stays a line a human wrote (SR-TYPES decision 1a),
+        # so only an ABSENT file is written whole; a present one gains `[limits]`.
+        Mandatory(DEFAULT_TYPES_FILE, _seed_types().decode("utf-8"), (), ("decoders", "meta")),
         Mandatory(tune_mod.TUNE_NAME, tune_mod.template_text()),
         Mandatory(output_mod.OUTPUT_NAME, output_mod.template_text()),
     )
@@ -1154,7 +1158,10 @@ def _seed_types() -> bytes:
         decoders_note=_TYPES_DECODERS_NOTE,
         footer=_TYPES_OPT_IN,
     )
-    return text.encode("utf-8")
+    # W-225 stage 4a: the decoders' caps, from their one home (SR-LAW-12 9b).
+    from .decode import _limits
+
+    return (text.rstrip("\n") + "\n" + _limits._template_text()).encode("utf-8")
 
 
 def _convert_legacy_types(root: Path, report: "SetupReport") -> None:

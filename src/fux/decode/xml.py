@@ -20,8 +20,9 @@ from __future__ import annotations
 # package` — the copy would be dead on arrival. Absolute imports mean the file
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
 from fux.decode import _xml
-from fux.decode.json import MAX_DEPTH, _label
+from fux.decode.json import _label
 from fux.constants import fixed
+from fux.decode._limits import limit
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -29,13 +30,14 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.xml", "version")
+VERSION = fixed("decoders.xml", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.xml", "extensions"))
 
 #: An attribute value long enough to be a sentence is prose (a `description=`,
 #: a `title=`); shorter ones are ids, types and flags.
-MIN_ATTR_LEN = 12
+#: ⚠ **`MIN_ATTR_LEN` is `[limits.xml] min_attr_len` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 
 def decode(raw: bytes, rel_path: str) -> str | None:
@@ -50,7 +52,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
 
 
 def _walk(element, out: list[str], *, depth: int) -> None:
-    if depth > MAX_DEPTH:
+    if depth > limit("json", "max_depth"):
         return
     name = _xml.local(element.tag)
     children = list(element)
@@ -65,7 +67,7 @@ def _walk(element, out: list[str], *, depth: int) -> None:
     # of one document decode identically (L3).
     for key in sorted(element.attrib):
         value = " ".join(element.attrib[key].split())
-        if len(value) >= MIN_ATTR_LEN:
+        if len(value) >= limit("xml", "min_attr_len"):
             out.append(f"**{key}:** {value}")
 
     for child in children:

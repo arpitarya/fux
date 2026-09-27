@@ -66,10 +66,13 @@ def _digest(root) -> dict[str, str]:
 
 
 def _typed(root) -> None:
-    """Narrow the allowlist to `*.md` so a `.py` file is a POLICY skip."""
+    """Narrow the allowlist to `*.md` so a `.py` file is a POLICY skip. The
+    rewrite drops the decoder caps `_init` seeded, so they are filled back —
+    `fux ingest` refuses a formats.toml without them (W-225 stage 4a)."""
     types = root / ".fux" / "formats.toml"
     types.parent.mkdir(parents=True, exist_ok=True)
     types.write_text('include = ["*.md"]\n', encoding="utf-8")
+    write_config(root)
 
 
 def _ignore_text(root) -> str:

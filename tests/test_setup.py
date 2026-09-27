@@ -197,11 +197,23 @@ def test_a_freshly_set_up_repo_indexes_its_own_readme(tmp_path):
 
 
 def test_setup_never_overwrites_an_edited_types_file(tmp_path):
+    """⚠ **Inverted by W-225 stage 4a** (SR-LAW-12). This asserted the edited
+    file came back byte-identical. The decoder caps now live in its `[limits]`,
+    and `fux setup` is a writer of a missing key (L12 decision 3) — so it still
+    never REWRITES what the consumer wrote (the list and `[decoders]` are
+    theirs), but it APPENDS the `[limits.*]` keys the file lacks."""
+    from fux.decode._limits import template_limits
+    from fux.ingest import typesfile
+
     setup_mod.run(tmp_path)
     listing = tmp_path / ".fux" / "formats.toml"
     listing.write_text('include = ["*.md"]\n', encoding="utf-8")
     setup_mod.run(tmp_path)
-    assert listing.read_text(encoding="utf-8") == 'include = ["*.md"]\n'
+    text = listing.read_text(encoding="utf-8")
+    assert text.startswith('include = ["*.md"]\n'), "every line the user wrote, byte for byte"
+    listed = typesfile.read(tmp_path)
+    assert listed.include == ("*.md",) and listed.decoders == {}, "the list is never rewritten"
+    assert listed.limits == template_limits(), "only the missing caps were added"
 
 
 # -- SR-TYPES decision 12: the old file is converted, never silently dropped --
@@ -277,7 +289,11 @@ def test_setup_leaves_both_files_alone_when_the_new_one_exists(tmp_path):
     _legacy(tmp_path, "*.rst\n")
     report = setup_mod.run(tmp_path)
     assert not report.converted_types
-    assert (tmp_path / ".fux" / "formats.toml").read_text(encoding="utf-8") == 'include = ["*.md"]\n'
+    # ⚠ Since W-225 stage 4a (SR-LAW-12) "alone" means the list: setup APPENDS
+    # the missing `[limits.*]` caps, and never converts or rewrites a line.
+    text = (tmp_path / ".fux" / "formats.toml").read_text(encoding="utf-8")
+    assert text.startswith('include = ["*.md"]\n') and "*.rst" not in text
+    assert (tmp_path / ".fux" / "sources" / "types").read_text(encoding="utf-8") == "*.rst\n"
 
 
 def test_setup_bootstraps_a_bare_directory(tmp_path, monkeypatch, capsys):

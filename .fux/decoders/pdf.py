@@ -57,6 +57,7 @@ from __future__ import annotations
 import re
 import zlib
 from fux.constants import fixed
+from fux.decode._limits import limit
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -64,13 +65,16 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.pdf", "version")
+VERSION = fixed("decoders.pdf", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.pdf", "extensions"))
 
-MAX_STREAMS = 5000
-MAX_INFLATED = 64 * 1024 * 1024
-MAX_TEXT_CHARS = 2_000_000
+#: ⚠ **`MAX_STREAMS` is `[limits.pdf] max_streams` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
+#: ⚠ **`MAX_INFLATED` is `[limits.pdf] max_inflated` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
+#: ⚠ **`MAX_TEXT_CHARS` is `[limits.pdf] max_text_chars` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 _STREAM_RE = re.compile(rb"stream\r?\n(.*?)endstream", re.DOTALL)
 #: `(literal) Tj` and `[(a) -250 (b)] TJ` — the two text-showing operators that
@@ -112,7 +116,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
         blocks.append(f"## Page {page}")
         blocks.append(body)
         chars += len(body)
-        if chars > MAX_TEXT_CHARS:
+        if chars > limit("pdf", "max_text_chars"):
             break
 
     if not blocks:
@@ -133,11 +137,11 @@ def _streams(raw: bytes) -> list[bytes]:
     """
     out: list[bytes] = []
     for match in _STREAM_RE.finditer(raw):
-        if len(out) >= MAX_STREAMS:
+        if len(out) >= limit("pdf", "max_streams"):
             break
         body = match.group(1)
         try:
-            out.append(zlib.decompressobj().decompress(body, MAX_INFLATED))
+            out.append(zlib.decompressobj().decompress(body, limit("pdf", "max_inflated")))
         except zlib.error:
             if b"BT" in body and b"ET" in body:
                 out.append(body)  # an uncompressed content stream

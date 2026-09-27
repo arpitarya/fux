@@ -19,6 +19,7 @@ import base64
 import re
 import zlib
 from urllib.parse import unquote
+from fux.decode._limits import limit
 
 # Imports are ABSOLUTE, not relative, and that is what makes this file work in
 # both places it runs: as a package module, and as a consumer copy in
@@ -36,14 +37,15 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.drawio", "version")
+VERSION = fixed("decoders.drawio", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.drawio", "extensions"))
 
 #: A diagram page is a complete unit — a short page was being absorbed by
 #: the next one and cited under the wrong name.
 
-MAX_INFLATED = 16 * 1024 * 1024
+#: ⚠ **`MAX_INFLATED` is `[limits.drawio] max_inflated` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 _TAG_RE = re.compile(r"<[^>]+>")
 
 
@@ -86,7 +88,7 @@ def _model(diagram):
         compressed = base64.b64decode(payload, validate=True)
         # -15: raw deflate, no zlib header. draw.io writes it this way and a
         # default-window inflate simply fails, which reads as "not a diagram".
-        inflated = zlib.decompressobj(-15).decompress(compressed, MAX_INFLATED)
+        inflated = zlib.decompressobj(-15).decompress(compressed, limit("drawio", "max_inflated"))
     except (ValueError, zlib.error):
         return None
     try:

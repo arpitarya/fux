@@ -187,6 +187,12 @@ def run(
     # ingest or a hook, and `--no-tune` does not reach these (SR-TUNE
     # decision 13). Read up front so a bad value stops the run before any work.
     limits = tune_mod.index_limits(root)
+    # W-225 stage 4a: the decoders' caps, the same way and for the same reason —
+    # one error naming every missing `[limits.<decoder>]` key, before any
+    # decoder runs, rather than one per document.
+    from ..decode import _limits as decode_limits
+
+    decode_limits.check(root)
     store_mod.ensure_layout(root)  # `.fux/` README + .gitignore, write-if-missing (SR-DOTFUX)
     files, skipped = walk_sources(
         root,
@@ -406,7 +412,7 @@ def run(
     # The new digest is RECORDED only after `write_index` (below): a run
     # stopped before then left the old records in the shards, and a digest
     # already claiming the new value would let the next delta run reuse them.
-    extract_digest = _extract_config_digest(limits)
+    extract_digest = _extract_config_digest(limits, root)
     extract_moved = extract_digest != _read_extract_config_digest(root)
     reusable = {} if (full or pii_moved or extract_moved) else _reusable(root, existing, file_shas)
     # 🔴 **W-110. An enrichment is a second input to extraction, and reuse was
@@ -1022,8 +1028,15 @@ ENRICH_DIGEST_FILE = fixed("index", "enrich_digests")
 DECODER_DIGEST_FILE = fixed("index", "decoder_digests")
 
 
-def _extract_config_digest(limits) -> str:
-    """`[index]`'s values **and `extract.py`'s rule version**, as one string.
+def _extract_config_digest(limits, root: Path) -> str:
+    """`[index]`'s values, `extract.py`'s rule version **and every decoder cap**,
+    as one string.
+
+    ⚠ **The caps joined on 2026-09-27 (W-225 stage 4a, SR-LAW-12 decision 9b).**
+    A cap such as `max_cell_chars` changes what a decoder emits, and once it
+    lives in `.fux/formats.toml` an edit to it bumps no decoder `VERSION` — so
+    without this line a changed cap left an index `fux ingest --check` called
+    current.
 
     ⚠ **`rules=` joined this on 2026-09-14 (W-166).** The digest covered the two
     tunable caps and not the code that reads them, so a changed extraction rule
@@ -1041,8 +1054,15 @@ def _extract_config_digest(limits) -> str:
     return (
         f"max_phrases={limits.max_phrases}\n"
         f"max_table_rows={limits.max_table_rows}\n"
-        f"rules={extract_mod.RULES_VERSION}"
+        f"rules={extract_mod.RULES_VERSION}\n"
+        + _decode_limits_digest(root)
     )
+
+
+def _decode_limits_digest(root: Path) -> str:
+    from ..decode import _limits as decode_limits
+
+    return decode_limits.digest_lines(root)
 
 
 def _read_extract_config_digest(root: Path) -> str:

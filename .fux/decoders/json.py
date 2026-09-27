@@ -31,6 +31,7 @@ from __future__ import annotations
 import json
 import re
 from fux.constants import fixed
+from fux.decode._limits import limit
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -38,14 +39,62 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.json", "version")
+VERSION = fixed("decoders.json", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.json", "extensions"))
 
 #: Depth past which nesting stops being structure and starts being noise. Six
 #: levels covers every config and API payload worth indexing; deeper is usually
 #: machine-generated and repetitive, which is the shape verdict G punished.
-MAX_DEPTH = 6
+#: ⚠ **`MAX_DEPTH` is `[limits.json] max_depth` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
+
+
+class _Cap:
+    """A cap that holds NO value: it reads `[limits.<decoder>] <key>` when compared.
+
+    ⚠ **A compatibility shim for consumer decoders, and only that.** `fux setup`
+    copied `jsonl.py`, `toml.py` and `xml.py` into `.fux/decoders/`, the copy is
+    what runs (SR-DECODE decision 11), and each copy does `from fux.decode.json
+    import MAX_DEPTH` and then `depth > MAX_DEPTH`. Deleting the name would make
+    every such repo's decoders fail to IMPORT on upgrade; a constant would put a
+    value back in code (SR-LAW-12). This resolves at comparison time, under the
+    root the registry binds, so an old copy reads the same `formats.toml` value
+    the built-ins do. New code calls `limit()` directly.
+    """
+
+    def __init__(self, decoder: str, key: str) -> None:
+        self._decoder, self._key = decoder, key
+
+    def __int__(self) -> int:
+        return limit(self._decoder, self._key)
+
+    __index__ = __int__
+
+    def __lt__(self, other) -> bool:
+        return int(self) < other
+
+    def __le__(self, other) -> bool:
+        return int(self) <= other
+
+    def __gt__(self, other) -> bool:
+        return int(self) > other
+
+    def __ge__(self, other) -> bool:
+        return int(self) >= other
+
+    def __eq__(self, other) -> bool:
+        return int(self) == other
+
+    def __hash__(self) -> int:
+        return hash((self._decoder, self._key))
+
+    def __repr__(self) -> str:
+        return f"[limits.{self._decoder}] {self._key}"
+
+
+#: The name old `.fux/decoders/` copies import — see `_Cap`.
+MAX_DEPTH = _Cap("json", "max_depth")
 
 #: Depth past which a key stops being a HEADING and becomes bold body text.
 #: The key is still indexed and still searchable — what it stops doing is
@@ -58,17 +107,20 @@ MAX_DEPTH = 6
 #: and it filled the record's twelve `phrases` slots with fifth-level keys
 #: while the top-level structure that names the document never made it in.
 #: Two levels is what a reader would call the outline of a config file.
-MAX_HEADING_DEPTH = 2
+#: ⚠ **`MAX_HEADING_DEPTH` is `[limits.json] max_heading_depth` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: Below this, a string is a label, an enum, an id — not prose. Two characters
 #: would admit every `"y"`/`"no"` flag in every config in the corpus.
-MIN_PROSE_LEN = 3
+#: ⚠ **`MIN_PROSE_LEN` is `[limits.json] min_prose_len` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: Items of a top-level array past this are a dataset rather than a document —
 #: the same judgement `jsonl.MAX_RECORDS` and `csv.MAX_ROWS` make about the
 #: row-oriented shape a JSON array shares. Truncation is **said in the
 #: document**, not hidden, so a reader of a search hit knows the tail exists.
-MAX_ITEMS = 500
+#: ⚠ **`MAX_ITEMS` is `[limits.json] max_items` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 _NOISE = (
     re.compile(r"^[0-9a-f]{7,}$", re.IGNORECASE),  # hashes, hex ids
@@ -112,14 +164,14 @@ def decode(raw: bytes, rel_path: str) -> str | None:
         # exactly the same shape — an array without the enclosing brackets — and
         # it is fixed here the same way, in `decode` rather than in `_walk`, so
         # a nested array of scalars is untouched.
-        for index, item in enumerate(data[:MAX_ITEMS], start=1):
+        for index, item in enumerate(data[:limit("json", "max_items")], start=1):
             block: list[str] = []
             _walk(item, block, depth=2, label=None)
             if not block:
                 continue
             lines.append(f"## Item {index}")
             lines.extend(block)
-        if len(data) > MAX_ITEMS:
+        if len(data) > limit("json", "max_items"):
             lines.append("*(array truncated)*")
     else:
         _walk(data, lines, depth=1, label=None)
@@ -138,7 +190,7 @@ def _is_record_array(data) -> bool:
 
 
 def _walk(node, out: list[str], *, depth: int, label: str | None) -> None:
-    if depth > MAX_DEPTH:
+    if depth > limit("json", "max_depth"):
         return
     if isinstance(node, dict):
         if label:
@@ -168,7 +220,7 @@ def _label(label: str, depth: int) -> str:
     reason they import `_prose`, so one judgement about what deserves a section
     covers every nested key/value format fux reads.
     """
-    if depth <= MAX_HEADING_DEPTH:
+    if depth <= limit("json", "max_heading_depth"):
         return "#" * min(depth, 6) + " " + label
     return f"**{label}**"
 
@@ -182,7 +234,7 @@ def _prose(value) -> str:
     if not isinstance(value, str):
         return ""
     text = " ".join(value.split())
-    if len(text) < MIN_PROSE_LEN:
+    if len(text) < limit("json", "min_prose_len"):
         return ""
     if any(pattern.match(text) for pattern in _NOISE):
         return ""

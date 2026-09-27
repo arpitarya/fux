@@ -44,6 +44,7 @@ from __future__ import annotations
 import struct
 import zlib
 from fux.constants import fixed
+from fux.decode._limits import limit
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -51,11 +52,12 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.image", "version")
+VERSION = fixed("decoders.image", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.image", "extensions"))
 
-MAX_INFLATED = 1 * 1024 * 1024
+#: ⚠ **`MAX_INFLATED` is `[limits.image] max_inflated` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 _PNG_SIG = b"\x89PNG\r\n\x1a\n"
 _JPEG_SOI = b"\xff\xd8"
@@ -115,7 +117,7 @@ def _png_text(data: bytes) -> dict[str, str]:
                 keyword, _, rest = payload.partition(b"\x00")
                 if len(rest) < 1 or rest[0] != 0:  # only zlib (method 0) is defined
                     continue
-                text = zlib.decompress(rest[1:], 0, MAX_INFLATED).decode("latin-1")
+                text = zlib.decompress(rest[1:], 0, limit("image", "max_inflated")).decode("latin-1")
                 out.setdefault(keyword.decode("latin-1"), text)
             elif ctype == b"iTXt":
                 out.update(_itxt(payload))
@@ -135,7 +137,7 @@ def _itxt(payload: bytes) -> dict[str, str]:
     if compressed:
         if method != 0:
             return {}
-        text_bytes = zlib.decompress(text_bytes, 0, MAX_INFLATED)
+        text_bytes = zlib.decompress(text_bytes, 0, limit("image", "max_inflated"))
     return {keyword.decode("latin-1"): text_bytes.decode("utf-8")}
 
 

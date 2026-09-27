@@ -36,7 +36,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.csv", "version")
+VERSION = fixed("decoders.csv", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.csv", "extensions"))
 
@@ -51,10 +51,11 @@ EXTENSIONS = tuple(fixed("decoders.csv", "extensions"))
 #: `fux.toml [decode]` from 2026-09-06 until Arpit moved it on 2026-09-11).
 #: `[index]` is tune.toml's one table that changes what is **indexed** —
 #: SR-TUNE decision 13.
-from fux.decode._limits import max_table_rows
+from fux.decode._limits import limit, max_table_rows
 
 #: Guards against a malformed quote turning one line into one enormous field.
-MAX_CELL_CHARS = 500
+#: ⚠ **`MAX_CELL_CHARS` is `[limits.csv] max_cell_chars` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 
 def decode(raw: bytes, rel_path: str) -> str | None:
@@ -97,7 +98,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
 def _cell(value: str) -> str:
     # Pipes would break the table grammar; escaping rather than dropping keeps
     # the term searchable, which is the only thing that matters downstream.
-    return " ".join(value.split())[:MAX_CELL_CHARS].replace("|", r"\|")
+    return " ".join(value.split())[:limit("csv", "max_cell_chars")].replace("|", r"\|")
 
 
 def _sniff(text: str) -> str:

@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import re
 from fux.constants import fixed
+from fux.decode._limits import limit
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -39,7 +40,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.rtf", "version")
+VERSION = fixed("decoders.rtf", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.rtf", "extensions"))
 
@@ -58,11 +59,12 @@ _SKIP_DESTINATIONS = {
 }
 _CONTROL = re.compile(r"\\([a-zA-Z]+)(-?\d+)?[ ]?|\\'([0-9a-fA-F]{2})|\\(.)|([{}])|([^\\{}]+)")
 
-MAX_CHARS = 2_000_000
+#: ⚠ **`MAX_CHARS` is `[limits.rtf] max_chars` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 
 def decode(raw: bytes, rel_path: str) -> str | None:
-    text = raw[:MAX_CHARS].decode("latin-1", errors="replace")
+    text = raw[:limit("rtf", "max_chars")].decode("latin-1", errors="replace")
     if not text.lstrip().startswith("{\\rt"):
         return None  # not RTF; a mislabelled file, not a corrupt one
 

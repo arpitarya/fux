@@ -19,13 +19,14 @@ wants different JSONL handling must be able to take that and nothing else
 from __future__ import annotations
 
 import json
+from fux.decode._limits import limit
 
 # Imports are ABSOLUTE, not relative, and that is what makes this file work in
 # both places it runs: as a package module, and as a consumer copy in
 # `.fux/decoders/` loaded by path. A path-loaded file has no parent package, so
 # `from . import json` raises `attempted relative import with no known
 # parent package` — the copy would be dead on arrival.
-from fux.decode.json import MAX_DEPTH, _label, _prose
+from fux.decode.json import _label, _prose
 from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
@@ -34,13 +35,14 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.jsonl", "version")
+VERSION = fixed("decoders.jsonl", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.jsonl", "extensions"))
 
 #: Records past this are a dataset rather than a document — the same judgement
 #: `csv.MAX_ROWS` makes for the row-oriented shape this format shares.
-MAX_RECORDS = 500
+#: ⚠ **`MAX_RECORDS` is `[limits.jsonl] max_records` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 
 def decode(raw: bytes, rel_path: str) -> str | None:
@@ -57,7 +59,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
             records.append(json.loads(line))
         except json.JSONDecodeError:
             continue  # one bad line in a stream must not drop the rest
-        if len(records) >= MAX_RECORDS:
+        if len(records) >= limit("jsonl", "max_records"):
             break
     if not records:
         return None
@@ -90,7 +92,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
 
 
 def _walk(node, out: list[str], *, depth: int, label: str | None) -> None:
-    if depth > MAX_DEPTH:
+    if depth > limit("json", "max_depth"):
         return
     if isinstance(node, dict):
         if label:

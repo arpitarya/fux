@@ -23,7 +23,7 @@ import pytest
 from fux import decode as decode_mod
 from fux.errors import FuxError
 from fux.ingest import sourcelist, urlsrc
-from l12_fixtures import write_config
+from l12_fixtures import configured_root, write_config
 
 
 def _parse(text):
@@ -205,7 +205,8 @@ def test_the_two_skip_reasons_stay_distinguishable():
     them makes the enrichment queue useless.
     """
     missing = urlsrc._decode_fetched(b"x", "nosuch", "https://x.test/a")[1]
-    empty = urlsrc._decode_fetched(b'{"a": 1}', "json", "https://x.test/a")[1]
+    # The json decoder reads `[limits.json]`, so it needs a configured root.
+    empty = urlsrc._decode_fetched(b'{"a": 1}', "json", "https://x.test/a", configured_root())[1]
     assert "no decoder module named" in missing
     assert "nothing readable" in empty and "no decoder" not in empty
 

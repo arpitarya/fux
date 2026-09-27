@@ -1805,8 +1805,6 @@ def _types_health(root: Path) -> Check:
         return Check("types list usable", False, str(exc))
     except OSError as exc:
         return Check("types list usable", False, f"{DEFAULT_TYPES_FILE}: {exc}")
-    if listed is None:
-        return Check("types list usable", True, "absent - the built-in default applies")
     if listed.allow:
         return Check(
             "types list usable",
@@ -2280,7 +2278,7 @@ def _unbound_types(root: Path) -> Check:
         listed = typesfile.read(root, DEFAULT_TYPES_FILE)
     except (FuxError, OSError):
         return Check("declared types are readable", True, "types list not parsed here - see its own row")
-    if listed is None or not listed.allow:
+    if not listed.allow:
         return Check("declared types are readable", True, "no declared types to check")
 
     try:

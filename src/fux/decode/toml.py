@@ -10,6 +10,7 @@ and nothing else.
 from __future__ import annotations
 
 import tomllib
+from fux.decode._limits import limit
 
 # Imports are ABSOLUTE, not relative, and that is what makes this file work in
 # both places it runs: as a package module, and as a consumer copy in
@@ -17,7 +18,7 @@ import tomllib
 # `from . import _xml` raises `attempted relative import with no known parent
 # package` — the copy would be dead on arrival. Absolute imports mean the file
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
-from fux.decode.json import MAX_DEPTH, _prose
+from fux.decode.json import _prose
 from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
@@ -26,7 +27,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.toml", "version")
+VERSION = fixed("decoders.toml", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.toml", "extensions"))
 
@@ -43,7 +44,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
 
 
 def _walk(node, out: list[str], *, depth: int, label: str | None) -> None:
-    if depth > MAX_DEPTH:
+    if depth > limit("json", "max_depth"):
         return
     if isinstance(node, dict):
         if label:

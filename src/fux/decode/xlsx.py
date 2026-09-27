@@ -31,7 +31,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.xlsx", "version")
+VERSION = fixed("decoders.xlsx", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.xlsx", "extensions"))
 
@@ -44,9 +44,10 @@ _WORKBOOK = "xl/workbook.xml"
 #: fifth because the first four were long would be arbitrary.
 #: Was a hard-coded 500; now `.fux/tune.toml [index] max_table_rows` (see `csv.py` for the
 #: data-loss this hid).
-from fux.decode._limits import max_table_rows
+from fux.decode._limits import limit, max_table_rows
 
-MAX_COLS = 40
+#: ⚠ **`MAX_COLS` is `[limits.xlsx] max_cols` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 
 def decode(raw: bytes, rel_path: str) -> str | None:
@@ -63,8 +64,8 @@ def decode(raw: bytes, rel_path: str) -> str | None:
                     root = _xml.parse(archive.read(part))
                 except _xml.UnsafeXml:
                     continue
-                limit = max_table_rows()
-                rows, truncated, dropped_cols = _rows(root, shared, limit + 1)
+                row_limit = max_table_rows()
+                rows, truncated, dropped_cols = _rows(root, shared, row_limit + 1)
                 table = _ooxml.table_markdown(rows)
                 if not table:
                     continue
@@ -83,7 +84,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
                     # A count here, unlike the row case, because a sheet's width
                     # is a property of the sheet rather than of how much of it
                     # was read -- it does not move as the file grows.
-                    notices.append(f"columns past {MAX_COLS} dropped")
+                    notices.append(f"columns past {limit('xlsx', 'max_cols')} dropped")
                 if notices:
                     blocks.append("*(" + "; ".join(notices) + ")*")
     except ZipTooBig:
@@ -124,10 +125,10 @@ def _sheet_names(archive: SafeZip) -> list[str]:
     return names
 
 
-def _rows(root, shared: list[str], limit: int) -> tuple[list[list[str]], bool, bool]:
+def _rows(root, shared: list[str], row_limit: int) -> tuple[list[list[str]], bool, bool]:
     """`(rows, truncated, dropped_cols)`.
 
-    `limit` counts the header too — the caller adds one, so the number a
+    `row_limit` counts the header too — the caller adds one, so the number a
     consumer writes in `.fux/tune.toml` is the number of DATA rows they get.
 
     ⚠ **A BLANK ROW DOES NOT SPEND THE BUDGET, and it used to.** Every `<row>`
@@ -153,7 +154,7 @@ def _rows(root, shared: list[str], limit: int) -> tuple[list[list[str]], bool, b
         for cell in row:
             if _xml.local(cell.tag) != "c":
                 continue
-            if len(cells) >= MAX_COLS:
+            if len(cells) >= limit("xlsx", "max_cols"):
                 dropped_cols = True
                 break
             cells.append(_cell(cell, shared))
@@ -164,9 +165,9 @@ def _rows(root, shared: list[str], limit: int) -> tuple[list[list[str]], bool, b
         # AT the budget cannot tell "exactly filled" from "more remained", and
         # a sheet that exactly fits then claimed a truncation that never
         # happened. `csv.py` never had to solve this — it reads every row and
-        # compares (`len(rows) > limit + 1`); streaming one further and
+        # compares (`len(rows) > row_limit + 1`); streaming one further and
         # discarding it buys the same answer for one row of work.
-        if len(out) > limit:
+        if len(out) > row_limit:
             truncated = True
             out.pop()
             break

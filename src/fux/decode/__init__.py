@@ -476,9 +476,8 @@ def _declared_bindings(root: Path | None) -> dict[str, tuple[str, str]]:
 
     listed = typesfile.read(root, TYPES_FILE)
     out: dict[str, tuple[str, str]] = {}
-    if listed is not None:
-        for ext, name in listed.decoders.items():
-            out[f".{ext}"] = (name, listed.where_decoder(ext))
+    for ext, name in listed.decoders.items():
+        out[f".{ext}"] = (name, listed.where_decoder(ext))
     _BINDINGS[key] = out
     return out
 
@@ -497,8 +496,12 @@ def meta_bindings(root: Path | None) -> dict[str, str]:
         return {}
     from ..ingest import typesfile
 
-    listed = typesfile.read(root, TYPES_FILE)
-    return dict(listed.meta) if listed is not None else {}
+    # Dispatch, not policy: an absent file binds nothing here. That the file
+    # must exist is `read_types`'s (ingest) and `_limits`'s (every capped
+    # decoder) to say, once, with the remedy.
+    if not (root / TYPES_FILE).is_file():
+        return {}
+    return dict(typesfile.read(root, TYPES_FILE).meta)
 
 
 def declared_bindings(root: Path | None) -> dict[str, str]:

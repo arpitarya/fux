@@ -73,6 +73,17 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   dropped the archived demotion); observers are skipped when `fux.toml` does not
   load; `fux doctor`'s dirs rows read your configured `dirs_file`. On this repo
   120 of 120 ranked outputs are byte-identical across the change.
+- ⚠ **`.fux/formats.toml` is now required, and it holds the decoders' caps (law
+  L12, W-225) — `fux doctor --fix` writes what is missing.** An absent file used
+  to mean the built-in types list; it now stops `fux ingest` naming the file, and
+  `--fix` writes it with that same list spelled out. A fourth key,
+  `[limits.<decoder>]`, holds the twenty caps the built-in decoders read (e.g.
+  `[limits.csv] max_cell_chars = 500`, `[limits.xlsx] max_cols = 40`), at the
+  values they had in code; `--fix` adds them to an existing file and never
+  touches your `include`, `[decoders]` or `[meta]`. Editing a cap re-extracts the
+  corpus at the next `fux ingest`. Custom copies in `.fux/decoders/` keep working:
+  `fux.decode.json.MAX_DEPTH` is still importable. On this repo, 1 059 of 1 059
+  decoded documents are byte-identical across the change.
 - **The engine's fixed values live in one file, `src/fux/constants.toml`
   (W-225).** Schema ids, artefact names, decoder versions and extensions: read by
   both the Python and the Node reader. Nothing a consumer sees changes.

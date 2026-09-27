@@ -65,6 +65,32 @@ Rules:
 
 ---
 
+## 2026-09-27 — **W-225 stage 4a: the decoders' caps live in `.fux/formats.toml`**
+
+**Outcome: landed; no cap changed value, no decoded byte moved.**
+- **What:** the twenty built-in decoder caps left their modules for
+  `formats.toml [limits.<decoder>]`, read through `decode._limits.limit()` under
+  the root the registry binds (parsed once per file state). Values live only in
+  `src/fux/templates/formats-limits.toml.txt`, appended to the seeded file.
+  `formats.toml` is REQUIRED ([SR-TYPES](../records/0128_types-list.md) decision
+  14): `typesfile.read` raises on an absent file and `read_types` no longer falls
+  back to `DEFAULT_TYPES`; `setup.Mandatory` covers it, never writing into
+  `include`/`[decoders]`/`[meta]`. `fux ingest` checks every cap up front, and
+  the caps are in the extract-config digest (SR-LAW-12 decision 9b).
+  `json.MAX_DEPTH` stays importable as a value-less `_Cap` so consumer copies of
+  `jsonl`/`toml`/`xml` still import. This repo's `.fux/decoders/` copies were
+  refreshed; the vendored Node bundle was rebuilt (it had also missed stage 3b).
+- **Evidence:** 1 059 of 1 059 tracked non-prose documents decode byte-identically
+  under HEAD's decoders and this change's. On a clean worktree of `82cbc868` +
+  this change: unit 5 774 passed, 1 failed (`999c1976`'s missing SR-TUNE touch,
+  not this change's); e2e 151; Node 92.
+- ⚠ **Open for Arpit:** `fux ingest --check` compares content shas only, so it does
+  not see a changed cap (nor a changed `tune.toml [index]`, today). W-225 DoD 7b
+  asked for that; what is built and tested is that the next `fux ingest`
+  re-extracts. Making `--check` see it needs the digest committed or recomputed.
+
+---
+
 ## 2026-09-27 — **W-225 stage 3b: `fux.toml` is mandatory, key by key**
 
 **Outcome: landed; no value changed, no ranking moved.**

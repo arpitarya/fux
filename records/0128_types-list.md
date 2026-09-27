@@ -3,14 +3,14 @@ type: Standing Record
 kind: component
 name: SR-TYPES
 title: "SR-TYPES (0128) — which files are documents, and which metadata keys are searchable: a built-in allowlist, overridable by .fux/formats.toml and by .fuxignore"
-description: "Prose plus every format a built-in decoder reads is compiled in as an allowlist; a committed types file replaces it, and .fux/.fuxignore outranks it in both directions. Absent means the default, never everything and never nothing."
+description: "Prose plus every format a built-in decoder reads is compiled in as an allowlist; a committed types file replaces it, and .fux/.fuxignore outranks it in both directions. The file is required since W-225 stage 4a, written with that default spelled out; it never means everything and never nothing."
 status: accepted
 date: 2026-08-20
 feature: the file-type allowlist and `.fux/formats.toml`
-owns: [src/fux/ingest/typesfile.py@2ffca40af72c, .fux/formats.toml@86e430d015d0]
+owns: [src/fux/ingest/typesfile.py@0fc3684e7787, .fux/formats.toml@645d9086ac23]
 laws: [L1, L3]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 1fc135667ebaedffe21f9d4cbf0bb47450401ad3f3d6d1ad35529d38b255bd80
+content_sha: 0151a1e02fbbddfd1f2df689280f43bd32deb849a7a02f062fe86ea4e5ec9936
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -40,14 +40,17 @@ took second place on a plain query. Across a corporate estate it means indexing
 lockfiles, generated OpenAPI specs and vendored fixtures — the same waste, one
 corpus at a time.
 
-**An allowlist is compiled in, and a consumer can replace it** by committing
-`.fux/formats.toml`. Absent means the default applies — never *index
-everything*, which was the defect, and never *index nothing*, which looks like
-a broken engine.
+**An allowlist is compiled in, and every repo carries it on disk** as
+`.fux/formats.toml`, which the consumer edits. `fux setup` writes it with the
+default spelled out, and since W-225 stage 4a (2026-09-27) the file is
+**required**: absent is an error naming it, and `fux doctor --fix` writes it
+back with the default — never *index everything*, which was the defect, and
+never *index nothing*, which looks like a broken engine.
 
-**The file has two keys.** `include` lists globs that are already text;
+**The file has four keys** (decision 14). `include` lists globs that are already text;
 `[decoders]` maps an extension to the module that reads it, and **a bound
-extension is a document**. Nothing in it subtracts — exclusions live in
+extension is a document**. `[meta]` routes a decoder's metadata (decision 13),
+and `[limits.<decoder>]` holds the built-in decoders' caps. Nothing in it subtracts — exclusions live in
 `.fux/.fuxignore`. ⚠ **It was `.fux/sources/types`, a line-grammar file, until
 2026-09-11** (decision 12).
 
@@ -116,8 +119,8 @@ An empty allowlist is refused rather than silently emptying the index:
 ```console
 $ printf 'include = []\n' > .fux/formats.toml && fux ingest
 error: .fux/formats.toml: lists no file types - `include` and `[decoders]` are both
-empty - so nothing would be indexed. Delete the file to take the built-in default
-(…), or add at least one entry
+empty - so nothing would be indexed. Add at least one entry, or delete the file
+and run `fux doctor --fix` to write the built-in list (…)
 ```
 
 A leftover line-grammar file is refused, never quietly ignored:
@@ -193,10 +196,12 @@ subtraction at all.** [SR-FUXIGNORE](0144_fuxignore.md) decision 5 made
 naming `.fuxignore`, and `fux setup`'s conversion moves every old `!` line
 there.
 
-**3. Absent means the default, not "everything" and not "nothing".**
+**3. The default, never "everything" and never "nothing".**
 *Everything* is the defect. *Nothing* makes the 86 % case do work for the 14 %
 case, and a missing or empty file that empties the index reads as a broken
-engine rather than a missing config. **A types file that admits nothing — an
+engine rather than a missing config. **Until W-225 stage 4a an ABSENT file
+meant the default**; since then the default is always on disk and an absent
+file is a named error (decision 14). **A types file that admits nothing — an
 empty `include` and an empty `[decoders]` — is a loud error.**
 
 **4. No extensionless files.** Those are `LICENSE`, `Makefile` and `Dockerfile`
@@ -516,6 +521,25 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
+**14. `[limits.<decoder>]` — the fourth key — and the file is REQUIRED**
+([L12](0013_LAW-12-values-live-in-config.md) decision 9b; W-225 stage 4a,
+2026-09-27). The twenty caps the built-in decoders read — `max_cell_chars`,
+`max_cols`, `max_inflated`, `max_depth` and the rest — left the decoder modules
+for `[limits.<decoder>]` tables here, each a whole number `>= 1`. What each cap
+means is [SR-DECODE](0139_decode.md)'s; this record owns only that the file
+carries them.
+
+- **Because the caps have no copy in code, the file has nothing to fall back
+  to**, so `typesfile.read` raises on an absent file, and `read_types` no
+  longer substitutes `DEFAULT_TYPES`. `fux setup` and `fux doctor --fix` write
+  the file with `DEFAULT_TYPES` spelled out plus the caps template — which is
+  exactly what absent used to mean, now on disk.
+- **`--fix` adds only missing `[limits]` keys to a present file.** `include`,
+  `[decoders]` and `[meta]` are the consumer's own lists (decision 1a) and are
+  never written into.
+- **A changed cap re-extracts the corpus** at the next `fux ingest`: the caps
+  are in the extract-config digest ([SR-INGEST](0106_ingest.md)).
+
 ### Consequences
 
 - ✅ **A declared type nothing can READ is REPORTED (2026-09-14, W-163).**
@@ -580,7 +604,9 @@ the short version:
 
 - **A types file with no built-in default.** Rejected: every consumer writes the
   same four lines before fux indexes anything, and a missing or empty file
-  silently produces an empty index.
+  silently produces an empty index. ⚠ Decision 14 does NOT take this option:
+  the built-in default still exists and `fux setup` / `fux doctor --fix` write
+  it, and a missing file is a loud, named error rather than an empty index.
 - **A compiled-in allowlist with no override.** Rejected: a team whose runbooks
   are `.adoc` waits for a fux release to index their own documents. For a `$0`
   offline tool that is a hard stop.

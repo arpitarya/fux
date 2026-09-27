@@ -307,12 +307,13 @@ class TypeFilter:
 
 
 def read_types(root: Path, rel_path: str = TYPES_FILE) -> TypeFilter:
-    """The type allowlist: `.fux/formats.toml` if present, else the built-in.
+    """The type allowlist: `.fux/formats.toml`, which is required.
 
-    **Absent means the default applies, never "index everything".** Indexing
-    everything is the behaviour W-55 was filed about; and it does not mean
-    "index nothing" either, because a missing config that empties the index
-    looks like a broken engine rather than a missing file.
+    ⚠ **Absent meant the built-in default until W-225 stage 4a** (SR-LAW-12).
+    The file now also carries the decoders' caps, which have no copy in code;
+    an absent file is an error naming it, and `fux doctor --fix` writes it with
+    `DEFAULT_TYPES` spelled out — what absent used to mean, now on disk. It
+    still never means "index everything" (W-55) or "index nothing".
 
     **A leftover `.fux/sources/types` is refused** before anything is read
     (`typesfile.check_legacy`): treating it as absent would put the default in
@@ -321,14 +322,12 @@ def read_types(root: Path, rel_path: str = TYPES_FILE) -> TypeFilter:
     from . import typesfile
 
     listed = typesfile.read(root, rel_path)
-    if listed is None:
-        return TypeFilter(allow=DEFAULT_TYPES)
     allow = listed.allow
     if not allow:
         raise FuxError(
             f"{rel_path}: lists no file types - `include` and `[decoders]` are both empty - so "
-            f"nothing would be indexed. Delete the file to take the built-in default "
-            f"({', '.join(DEFAULT_TYPES)}), or add at least one entry"
+            f"nothing would be indexed. Add at least one entry, or delete the file and run "
+            f"`fux doctor --fix` to write the built-in list ({', '.join(DEFAULT_TYPES)})"
         )
     return TypeFilter(allow=allow, default=False)
 

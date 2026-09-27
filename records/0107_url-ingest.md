@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 3c1c786f9f01994c5b4338f5f12ab90680aee0d6000bbc65c3b9aaa734c8957a
+content_sha: 41b505f60ed883d4f70ea37c23b60c3be5207132ae0c06112197356635b28fe3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -348,6 +348,8 @@ committed record changed, and which fetcher retrieved a document is still
 added nothing of its own.
 
 **Every `[sources.url]` key is required once the table is present** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27); its absence still means *fetch nothing*, and `fux doctor --fix` never adds it. `fetch_all` takes its bounds as required arguments ([SR-CONFIG](0113_config.md) decision 17).
+
+**A fetched document's decoder reads its caps from `.fux/formats.toml [limits.<decoder>]`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27), under the root the registry binds, like a walked one ([SR-DECODE](0139_decode.md)).
 
 ### Consequences
 

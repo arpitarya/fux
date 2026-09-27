@@ -53,7 +53,7 @@ def test_a_pdf_title_is_still_the_filename():
     from fux.ingest.extract import extract_fields
     from fux.ingest.parse import parse_document
 
-    doc = parse_document(TWO_PAGE, "policy.pdf")
+    doc = parse_document(TWO_PAGE, "policy.pdf", configured_root())
     assert extract_fields("policy.pdf", doc, max_phrases=template_index().max_phrases).title == "policy.pdf"
 
 

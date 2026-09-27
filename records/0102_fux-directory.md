@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@02783a764363, src/fux/setup.py@5ab91ce704a4, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@02783a764363, src/fux/setup.py@342330dc2d7c, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 0880ed425d490d6a8953b89fbf3262a3960b7e6808424011196aad0627aaa18b
+content_sha: b38b77de123f3fe9101349b9c5d868a4eb865fba86c5fdd3107707b20dae53ec
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -918,6 +918,8 @@ list stops loading until every line carries `decoder=` — the break decision 17
 ruled. A repo that re-runs `fux setup` keeps its stale header beside a file that
 no longer parses, which is the worst pairing available and is why the error a
 line raises names the fix itself rather than pointing at the header.
+
+**`fux setup` seeds `formats.toml` with the caps template appended, and `fill_missing` covers the file** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27): absent is written whole, a present file gains only missing `[limits]` keys ([SR-TYPES](0128_types-list.md) decision 14).
 
 ### Consequences
 

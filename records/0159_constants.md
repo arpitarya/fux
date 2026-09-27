@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@54dfd03cacc5]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@8ec5ecd36b1b]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: e84d49c307c7776444c5ddcd382224e6a386f9f85e609d4f410229881050504c
+content_sha: e8306ec7d46089f32a90127e13ba25b958e66ed8dcaf6f23be70783c29b016da
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -150,6 +150,8 @@ decisions 3 and 17; SR-LAW-12 decision 9a).
 
 <!-- L12-VALUES-START -->
 <!-- L12-VALUES-END -->
+
+**W-225 stage 4a (2026-09-27)** added `[templates] formats_limits` — the file name of the decoder-caps template appended to a seeded `formats.toml`.
 
 ### Consequences
 

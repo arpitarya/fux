@@ -8,7 +8,7 @@ and these do not.
 
 from __future__ import annotations
 
-from l12_fixtures import template_tune, tune_text
+from l12_fixtures import template_tune, tune_text, write_config
 import json
 import re
 import shutil
@@ -459,10 +459,13 @@ def test_no_tune_does_not_reach_the_index_limits(tmp_path):
 
 
 def test_a_decoder_reads_the_configured_row_limit(tmp_path):
-    """`decode/_limits.py`: a two-name decoder seeing committed config."""
+    """`decode/_limits.py`: a two-name decoder seeing committed config. The
+    csv decoder also reads `[limits.csv]` from `.fux/formats.toml`, so the repo
+    gets the rest of its config as `fux setup` writes it (W-225 stage 4a)."""
     from fux.decode import decode
 
     _write(tmp_path, tune_text(index={"max_table_rows": 3}))
+    write_config(tmp_path)
     rows = b"col\n" + b"".join(b"value %d\n" % i for i in range(50))
     out = decode(rows, "a.csv", tmp_path)
     assert out.count("\n| value ") == 3
@@ -474,6 +477,7 @@ def test_the_row_limit_is_not_leaked_between_documents(tmp_path):
     from fux.decode._limits import max_table_rows
 
     _write(tmp_path, tune_text(index={"max_table_rows": 3}))
+    write_config(tmp_path)
     decode(b"col\nv1\nv2\nv3\nv4\nv5\n", "a.csv", tmp_path)
     with pytest.raises(FuxError, match="no repository in context"):
         max_table_rows()  # unbound again, and there is no default to fall back to

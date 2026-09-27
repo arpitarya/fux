@@ -620,6 +620,9 @@ def test_a_types_file_replaces_the_default(tmp_path):
     _write_fixture(tmp_path)
     (tmp_path / "docs" / "note.rst").write_text("Pruning notes\n=============\n", encoding="utf-8")
     (tmp_path / ".fux" / "formats.toml").write_text('include = ["*.rst"]\n', encoding="utf-8")
+    # The rewrite dropped the `[limits.*]` caps `fux ingest` requires (W-225
+    # stage 4a); refill them the way `fux doctor --fix` would, list untouched.
+    write_config(tmp_path)
 
     _run(tmp_path, "ingest")
     found = _run(tmp_path, "find", "pruning", "--json").stdout
@@ -678,6 +681,9 @@ def test_setup_converts_a_leftover_types_file_and_ingest_refuses_until_it_is_gon
     """SR-TYPES decision 12, end to end: refused, converted, then deleted by hand."""
     _write_fixture(tmp_path)
     (tmp_path / "docs" / "note.rst").write_text("Pruning notes\n=============\n", encoding="utf-8")
+    # The fixture writes `.fux/formats.toml` (required since W-225 stage 4a);
+    # the pre-migration repo held the old file ALONE, so remove the new one.
+    (tmp_path / ".fux" / "formats.toml").unlink()
     legacy = tmp_path / ".fux" / "sources" / "types"
     legacy.write_text("*.rst\n", encoding="utf-8")
 

@@ -32,6 +32,7 @@ from __future__ import annotations
 import re
 from email import policy
 from email.parser import BytesParser
+from fux.decode._limits import limit
 
 # Imports are ABSOLUTE, not relative, and that is what makes this file work in
 # both places it runs: as a package module, and as a consumer copy in
@@ -48,7 +49,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.mail", "version")
+VERSION = fixed("decoders.mail", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.mail", "extensions"))
 
@@ -60,11 +61,13 @@ EXTENSIONS = tuple(fixed("decoders.mail", "extensions"))
 #: signatures' case, indistinguishable from base64 junk.
 _HEADERS = ("Subject", "From", "To", "Cc", "Date")
 
-MAX_BODY_CHARS = 200_000
+#: ⚠ **`MAX_BODY_CHARS` is `[limits.mail] max_body_chars` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: Messages past this are an archive rather than a document — the same
 #: judgement `csv.MAX_ROWS` makes about rows.
-MAX_MESSAGES = 500
+#: ⚠ **`MAX_MESSAGES` is `[limits.mail] max_messages` in .fux/formats.toml** since W-225 stage 4a
+#: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: An mbox `From_` separator: literally `From `, an address-shaped token, then
 #: the date. The address requirement is what keeps an unquoted `From the team,`
@@ -86,7 +89,7 @@ def _mbox(raw: bytes, rel_path: str) -> str | None:
     is not titled by its oldest thread.
     """
     blocks = [f"# {rel_path.rsplit('/', 1)[-1]}"]
-    for part in _messages(raw)[:MAX_MESSAGES]:
+    for part in _messages(raw)[:limit("mail", "max_messages")]:
         block = _message(part, level=2)
         if block:
             blocks.append(block)
@@ -171,10 +174,10 @@ def _body(message) -> str:
             html = text
 
     if plain.strip():
-        return plain[:MAX_BODY_CHARS]
+        return plain[:limit("mail", "max_body_chars")]
     if html.strip():
         converted = decode_html(html.encode("utf-8", errors="replace"), "message.html")
-        return _demote(converted or "")[:MAX_BODY_CHARS]
+        return _demote(converted or "")[:limit("mail", "max_body_chars")]
     return ""
 
 

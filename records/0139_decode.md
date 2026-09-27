@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@948273149b1c, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@059c8ecd1cca, node/src/decode/markdown.mjs@cf8853e196d1, node/src/decode/registry.mjs@90604ed07b71]
+owns: [src/fux/decode@e372d743b2ae, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@3bf5fceb872a, node/src/decode/markdown.mjs@cf8853e196d1, node/src/decode/registry.mjs@7fbba8463f4b]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 183706ae205721efac00868e251854bb89f0b2203fa3fcd97ad814af0952054e
+content_sha: 4fe062dd189ab270004984e40b761e8f72cdb3595e9f854a1a5404a18f486e0d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -777,6 +777,27 @@ this moved where they are written, not what they are.
 - `src/fux/decode/yaml.py` — `VERSION` ← `[decoders.yaml] version`, `EXTENSIONS` ← `[decoders.yaml] extensions`
 
 <!-- L12-VALUES-END -->
+
+**The built-in decoders' caps live in `.fux/formats.toml [limits.<decoder>]`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27).
+The twenty module constants — `MAX_CELL_CHARS`, `MAX_COLS`, `MAX_INFLATED`,
+`MAX_DEPTH`, `MAX_ITEMS` and the rest — are deleted; each decoder reads
+`fux.decode._limits.limit(decoder, key)`, served from the file the registry
+binds with the root, parsed once per file state so a per-cell read is a dict
+lookup. `[limits.zip]` belongs to the shared ZIP reader (docx, pptx, xlsx), and
+`[limits.json] max_depth` is shared by json, jsonl, toml and xml, exactly as the
+constant was. The values are unchanged; `VERSION` was not bumped, and each
+changed decoder's `VERSION` line says so.
+
+- ⚠ **`fux.decode.json.MAX_DEPTH` survives as a lazy `_Cap`, holding no value.**
+  Copies of `jsonl.py`, `toml.py` and `xml.py` that `fux setup` wrote into a
+  consumer's `.fux/decoders/` import it and compare `depth > MAX_DEPTH`
+  (decision 11: the copy is what runs). Deleting the name would make those
+  copies fail to import on upgrade; the shim resolves the same `formats.toml`
+  value at comparison time. Other copies keep their own literals — they are
+  the consumer's code — until the consumer refreshes them.
+- **A decoder with no repository bound, or a repo with no `formats.toml`, asks
+  for a cap and gets a named error** — there is no value to fall back to.
+  `fux ingest` checks every cap up front (`_limits.check`), so a walk stops once.
 
 ### Consequences
 

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-06
 amended: 2026-09-11
 feature: tabular documents — row granularity, the admitted-row limit, and what a table citation is
-owns: [src/fux/decode/csv.py@6da838857256, src/fux/decode/xlsx.py@b19095e458e8, src/fux/decode/_limits.py@ff299fec47e8]
+owns: [src/fux/decode/csv.py@2c37b28e4a9f, src/fux/decode/xlsx.py@e3e42687e359, src/fux/decode/_limits.py@bf192fbd7b13]
 laws: [L1, L2, L3]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: c07b1d4201836872795b8a170570b2c2f60d1e387945fbc5deaed3e48c570126
+content_sha: cad1783b6c328fedd01ae2d6b4e10dffc7300d032418b2f2d212b8240ce76624
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -207,6 +207,8 @@ difference" and been wrong.
 decoy rows sharing 3 of 4 query terms, every candidate the same size so length
 cannot do the work. The correct row outranks the next-best in **42/48
 (0.875)**.
+
+**`MAX_CELL_CHARS` and `MAX_COLS` are `[limits.csv] max_cell_chars` and `[limits.xlsx] max_cols`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27), read through `_limits.limit()` like `max_table_rows`; the values and the notices are unchanged ([SR-DECODE](0139_decode.md)).
 
 ### Consequences
 

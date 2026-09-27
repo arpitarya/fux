@@ -16,13 +16,16 @@ invisible.
 
 from __future__ import annotations
 
+import re
 import subprocess
 from pathlib import Path
 
 import pytest
 
 from fux.ingest import extract as extract_mod
+from fux.ingest import typesfile
 from fux.ingest.run import _extract_config_digest
+from l12_fixtures import configured_root, write_config
 
 ROOT = Path(__file__).resolve().parents[2]
 MODULE = "src/fux/ingest/extract.py"
@@ -75,13 +78,34 @@ def test_the_digest_moves_when_the_constant_does(monkeypatch):
     and change nothing, and the test above would pass on every commit while
     guarding a value nothing reads.
     """
-    before = _extract_config_digest(_Limits())
+    root = configured_root()  # the digest reads `[limits]` from its formats.toml
+    before = _extract_config_digest(_Limits(), root)
     monkeypatch.setattr(extract_mod, "RULES_VERSION", extract_mod.RULES_VERSION + 1)
-    assert _extract_config_digest(_Limits()) != before
+    assert _extract_config_digest(_Limits(), root) != before
 
 
 def test_the_caps_are_still_in_the_digest_too():
     """`rules=` was ADDED to this digest, not substituted for what was there."""
-    base = _extract_config_digest(_Limits())
-    assert _extract_config_digest(_Limits(phrases=12)) != base
-    assert _extract_config_digest(_Limits(rows=5)) != base
+    root = configured_root()
+    base = _extract_config_digest(_Limits(), root)
+    assert _extract_config_digest(_Limits(phrases=12), root) != base
+    assert _extract_config_digest(_Limits(rows=5), root) != base
+
+
+def test_a_changed_decoder_cap_forces_re_extraction(tmp_path):
+    """W-225 DoD 7b (SR-LAW-12 decision 9b): a decoder cap moved out of code
+    into `.fux/formats.toml [limits]`, where an edit bumps no decoder `VERSION`.
+    So the digest must carry every cap, or a changed `max_cell_chars` would
+    leave an index `fux ingest --check` calls current while every CSV it holds
+    was cut at the old width. The new value is template + 1, never typed."""
+    write_config(tmp_path)
+    before = _extract_config_digest(_Limits(), tmp_path)
+    path = tmp_path / ".fux" / "formats.toml"
+    shipped = typesfile.read(tmp_path).limits["csv"]["max_cell_chars"]
+    text, n = re.subn(
+        r"(?m)^max_cell_chars\s*=.*$", f"max_cell_chars = {shipped + 1}", path.read_text(encoding="utf-8")
+    )
+    assert n == 1, "exactly one max_cell_chars line, under [limits.csv]"
+    path.write_text(text, encoding="utf-8")
+    assert typesfile.read(tmp_path).limits["csv"]["max_cell_chars"] == shipped + 1
+    assert _extract_config_digest(_Limits(), tmp_path) != before

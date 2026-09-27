@@ -22,6 +22,7 @@ import pytest
 from fux.decode import builtin_bindings, decode, reason, registry
 from fux.errors import FuxError
 from fux.ingest import typesfile
+from l12_fixtures import write_config
 
 
 @pytest.fixture
@@ -183,8 +184,11 @@ def test_a_new_extension_may_be_bound_to_an_existing_decoder(repo: Path):
 
 
 def test_an_extended_extension_actually_decodes(repo: Path):
-    """The binding reaches dispatch, not just the registry."""
+    """The binding reaches dispatch, not just the registry. The json decoder
+    reads `[limits.json] max_depth` from the same file, so the repo gets the
+    `[limits]` tables `fux setup` would write (W-225 stage 4a, SR-LAW-12)."""
     _types(repo, geojson="json")
+    write_config(repo)
     out = decode(b'{"label": "north depot"}', "sites.geojson", repo)
     assert out is not None and "north depot" in out
 

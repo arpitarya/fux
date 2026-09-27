@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@dc7580961239, src/fux/store/nodebundle.py@edf4f3342364]
+owns: [node@a784ad0dcd2f, src/fux/store/nodebundle.py@edf4f3342364]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: e72a3737618e6ba19cb3e33f78e546c4b28b638bcb873d81145d385b0ea3f131
+content_sha: 8a08c60f828799de0fb63b0a2b64a13b5193c01f374b3eef4fd3975b17bc4045
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -896,6 +896,8 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **`dirsFile` is strict** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `null` with no `fux.toml`, a `FuxError` in `config.py`'s words without `[sources] dirs_file` — the fallback to `.fux/sources/dirs` is gone. `node/test/config.test.mjs` holds all three cases ([SR-CONFIG](0113_config.md) decision 17).
+
+**`alreadyTextGlobs` stays tolerant of an absent `formats.toml`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27): the file is now required for `fux ingest`, but this read is on the query path, where the fallback costs a conservative skip and never a wrong citation ([SR-TYPES](0128_types-list.md) decision 14).
 
 ### Consequences
 

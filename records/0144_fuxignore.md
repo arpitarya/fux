@@ -10,7 +10,7 @@ feature: the `.fux/.fuxignore` exclusion file
 owns: [src/fux/ingest/fuxignore.py@6c2b8b6481a4]
 laws: [L1, L3]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: bf238c88dfac24f83652e6a7959d7023d211686582687c6f688bc1450fa4c623
+content_sha: dcb6b379a1d59fa543b1be1344a0351f3292b0d4445079530117157986961a2c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -388,6 +388,8 @@ this moved where they are written, not what they are.
 - `src/fux/ingest/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
 
 <!-- L12-VALUES-END -->
+
+**No `.fuxignore` rule changed** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `gitdir.read_types` no longer falls back to `DEFAULT_TYPES` for an absent `formats.toml`; `.fuxignore` is still read first and outranks it ([SR-TYPES](0128_types-list.md) decision 14).
 
 ### Consequences
 

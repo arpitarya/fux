@@ -76,7 +76,7 @@ from . import sourcelist
 #: ⚠ **Three keys since 2026-09-20, not two** ([SR-TYPES](../../../records/0128_types-list.md)
 #: decision 13). `[meta]` is the binding half of a decoder's `META_FIELDS`
 #: claim: it says which metadata keys reach the index and into which field.
-KEYS: tuple[str, ...] = ("include", "decoders", "meta")
+KEYS: tuple[str, ...] = ("include", "decoders", "meta", "limits")
 
 #: The index fields a `[meta]` value may name, plus the one word that silences a
 #: claim. **Kept as a literal rather than imported from `store.TF_FIELDS`**: this
@@ -112,6 +112,10 @@ class TypesList:
     meta: dict[str, str]
     origin: str
     text: str = field(default="", repr=False, compare=False)
+    #: `[limits.<decoder>]` — the built-in decoders' caps, `{decoder: {key: int}}`
+    #: (W-225 stage 4a, SR-LAW-12 decision 9b). Whether every key a decoder
+    #: reads is PRESENT is `decode._limits.check`'s question, not the parser's.
+    limits: dict = field(default_factory=dict, compare=False)
 
     @property
     def allow(self) -> tuple[str, ...]:
@@ -169,8 +173,14 @@ def check_legacy(root: Path) -> None:
         raise FuxError(legacy_message(root))
 
 
-def read(root: Path, rel_path: str = DEFAULT_TYPES_FILE) -> TypesList | None:
-    """The committed types list, or `None` when there is no file (the default applies).
+def read(root: Path, rel_path: str = DEFAULT_TYPES_FILE) -> TypesList:
+    """The committed types list. Absent is an error that names it (SR-LAW-12).
+
+    ⚠ **It returned `None` until W-225 stage 4a, and the built-in default
+    applied.** The file now also holds the decoders' caps, which have no copy in
+    code, so an absent file has nothing to fall back to: `fux setup` writes it,
+    and `fux doctor --fix` restores a deleted one — with the built-in list
+    spelled out, which is what absent used to mean.
 
     Refuses a repo still holding `.fux/sources/types` before anything else, so
     no caller can reach a state where the old file is silently outranked.
@@ -178,7 +188,11 @@ def read(root: Path, rel_path: str = DEFAULT_TYPES_FILE) -> TypesList | None:
     check_legacy(root)
     path = root / rel_path
     if not path.is_file():
-        return None
+        raise FuxError(
+            f"{rel_path} is missing - `fux setup` writes it, and `fux doctor --fix` "
+            "restores a deleted one with the built-in types list spelled out. It holds "
+            "the decoders' caps, and fux holds no copy of them in code"
+        )
     return parse(path.read_text(encoding="utf-8"), origin=rel_path)
 
 
@@ -199,7 +213,7 @@ def parse(text: str, *, origin: str) -> TypesList:
             )
         raise FuxError(
             f"{origin}: unknown key {unknown[0]!r} - the key set is closed and is "
-            f"`include`, `decoders` and `meta` (SR-TYPES decisions 12 and 13).{hint}"
+            f"`include`, `decoders`, `meta` and `limits` (SR-TYPES decisions 12 and 13).{hint}"
         )
 
     include = data.get("include", [])
@@ -222,6 +236,16 @@ def parse(text: str, *, origin: str) -> TypesList:
     for key, target in meta.items():
         _check_meta(key, target, text, origin)
 
+    limits = data.get("limits", {})
+    if not isinstance(limits, dict) or not all(isinstance(t, dict) for t in limits.values()):
+        raise FuxError(f"{origin}: `limits` must hold one `[limits.<decoder>]` table per decoder")
+    for name, table in limits.items():
+        for key, value in table.items():
+            if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+                raise FuxError(
+                    f"{origin}: [limits.{name}] {key} must be a whole number >= 1 (got {value!r})"
+                )
+
     for glob in include:
         ext = pattern_extension(glob)
         # Exact case: `*.CSV` beside `csv = "csv"` admits upper-case files the
@@ -240,6 +264,7 @@ def parse(text: str, *, origin: str) -> TypesList:
         meta=dict(sorted(meta.items())),
         origin=origin,
         text=text,
+        limits={name: dict(sorted(t.items())) for name, t in sorted(limits.items())},
     )
 
 

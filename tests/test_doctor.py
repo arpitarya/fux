@@ -591,11 +591,18 @@ def test_doctor_passes_a_types_file_setup_wrote(tmp_path):
     assert doctor_mod._types_health(tmp_path).ok
 
 
-def test_doctor_passes_when_there_is_no_types_file(tmp_path):
+def test_doctor_fails_when_there_is_no_types_file(tmp_path):
+    """⚠ **Inverted by W-225 stage 4a** (SR-LAW-12). This was
+    `test_doctor_passes_when_there_is_no_types_file`: absent meant the built-in
+    default applied. The file now holds the decoders' caps, which have no copy
+    in code, so absent is a failing row naming the file and the command that
+    restores it."""
     from fux import doctor as doctor_mod
 
     check = doctor_mod._types_health(tmp_path)
-    assert check.ok and "default" in check.detail
+    assert not check.ok
+    assert ".fux/formats.toml is missing" in check.detail
+    assert "fux doctor --fix" in check.detail
 
 
 # --- the fetcher-capability notice, added 2026-08-28 ------------------------

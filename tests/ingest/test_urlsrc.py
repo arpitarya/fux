@@ -6,7 +6,7 @@ into the tmp repo, which is exactly the trust boundary the design draws."""
 
 from __future__ import annotations
 
-from l12_fixtures import scoring, url_limits, write_config
+from l12_fixtures import configured_root, scoring, url_limits, write_config
 import pytest
 
 from fux import store
@@ -813,7 +813,9 @@ def test_a_decoder_that_ran_and_found_nothing_is_not_reported_as_missing():
     from fux.ingest.urlsrc import _decode_fetched
 
     uuid_only = b'{\n  "uuid": "23f0c01c-4067-49f9-99cd-b19564aa930e"\n}\n'
-    markdown, why = _decode_fetched(uuid_only, "json", "https://httpbin.org/uuid")
+    # `configured_root()`: the json decoder reads its caps from `.fux/formats.toml
+    # [limits.json]`, and with no root there is none to read (W-225 stage 4a).
+    markdown, why = _decode_fetched(uuid_only, "json", "https://httpbin.org/uuid", configured_root())
 
     assert markdown is None
     assert "no decoder" not in why, (
@@ -844,7 +846,7 @@ def test_json_with_prose_in_it_decodes_rather_than_skipping():
     from fux.ingest.urlsrc import _decode_fetched
 
     markdown, why = _decode_fetched(
-        b'{"note": "the paging rotation"}', "json", "https://x.test/y"
+        b'{"note": "the paging rotation"}', "json", "https://x.test/y", configured_root()
     )
     assert why == ""
     assert markdown and "paging rotation" in markdown

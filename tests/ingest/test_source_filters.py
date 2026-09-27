@@ -20,6 +20,7 @@ from fux.ingest.gitdir import (
     walk_sources,
 )
 from fux.ingest.sourcelist import DIRS, TYPES, URLS, glob_match, parse
+from l12_fixtures import write_config
 
 
 # -- the glob matcher ------------------------------------------------------
@@ -101,10 +102,21 @@ def test_a_trailing_slash_in_types_is_refused():
         parse("docs/\n", TYPES, origin="t")
 
 
-def test_an_absent_types_file_means_the_built_in_default(tmp_path):
-    """Not 'everything' — that was the defect — and not 'nothing' either."""
+def test_an_absent_types_file_is_an_error_and_the_fix_writes_the_default(tmp_path):
+    """⚠ **Inverted by W-225 stage 4a** (SR-LAW-12). This was
+    `test_an_absent_types_file_means_the_built_in_default`: absent applied
+    `DEFAULT_TYPES` in code. The file now also holds the decoders' caps, so
+    absent is an error naming it — and what `fux doctor --fix` writes back is
+    that same default spelled out. Still not 'everything' (the W-55 defect),
+    and still not 'nothing'."""
+    with pytest.raises(FuxError) as caught:
+        read_types(tmp_path)
+    assert ".fux/formats.toml is missing" in str(caught.value)
+    assert "fux doctor --fix" in str(caught.value)
+
+    write_config(tmp_path)  # what `fux doctor --fix` runs
     types = read_types(tmp_path)
-    assert types.default and types.allow == DEFAULT_TYPES
+    assert not types.default and set(types.allow) == set(DEFAULT_TYPES)
 
 
 def test_the_default_admits_prose_and_every_decodable_format():
