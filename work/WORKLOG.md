@@ -29,6 +29,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-27 — W-168 step 4 shipped: mined_weight defaults to 0.5  ·  Claude Code
+- **Asked:** *"yes"*, confirming the ratification in chat after the classifier refused to act on it from edited files alone.
+- **Did:** Set `MINED_WEIGHT = 0.5` on both engines, with a parity test, the default tests, six records, the owns/sha restamp and the CHANGELOG. A concurrent session (W-225 / L12) emptied and rebuilt `.fux/` mid-run and then committed these files in `8d401423`. I verified the identical diff on a clean worktree instead: 22 144 scan = accelerator, and 0/225 Node = bundle = Python.
+- **Decided / open:** An owns restamp in a shared tree picked up the other session's `.fux/tune.toml`, and I reverted that entry before it landed. Restamping with `--write` stamps every record, which is unsafe while another session has records open.
+- **Next:** A fresh prompt-4 session rebuilds the eight rungs for generation 3.
+
 ## 2026-09-27 — W-168 step 4 ratified PASS at `mined_weight = 0.5`  ·  Cowork
 - **Asked:** *"what is `mined_weight`"*, then *"yes"* to ratifying step 4 at `0.5`.
 - **Did:** filed the VERDICT as PASS, ruled by Arpit, with no confirmation arm at `anchor = 1.0`. Recorded the ruling and the ship list in W-168. Removed the inbox row, and re-balled W-168 🟢. The inbox is empty.

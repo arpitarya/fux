@@ -7,6 +7,21 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## ✅ STEP 4 SHIPPED at `mined_weight = 0.5` — 2026-09-27 (Claude Code, Opus), in `8d401423`
+
+Shipped per §If it passes, in one change. A concurrent session committed the files as part of `8d401423`, byte-identical to the diff verified below.
+- **Default:** `MINED_WEIGHT = 0.5` in `query/mined.py` and `query/mined.mjs`, read by `Tune` and the loader on both sides, plus the setup template's comment. A new test holds the two constants equal.
+- **Tests:** the arms that meant "off" now pin `0.0`. A new test checks that the default, and `--no-tune`, give `0.5`. The Node reader is now also compared at the default.
+- **Records:** SR-TUNE 19 + new 19a, SR-EXPAND 18, SR-ASK 14, SR-NODE-SEARCH 21, SR-INGEST 23, SR-INDEX-LIFECYCLE 15.
+- **Verified on a clean worktree** (`ef7c6c62` + this diff only), because the main tree was mid-rebuild by another session:
+  - unit tests: 5 716 passed; the only failures are the 8 known ladder-seed ones;
+  - e2e: 151 passed;
+  - Node: 88/88;
+  - scan = accelerator: **22 144 comparisons byte-identical**;
+  - Node = bundle = Python: **0 of 225 discordant**, at this repo's default of `0.5`.
+- **CHANGELOG:** Unreleased/Added. The key never shipped at `0.0`, so **every** upgraded repo's ranking changes. `mined_weight = 0.0` is the way back.
+- ⚠ Unmeasured, and ratified knowing it: the combination with `anchor = 1.0`.
+
 ## ✅ STEP 4 (ABBREVIATIONS) FILED PASS at `mined_weight = 0.5` — 2026-09-27 (Arpit, Cowork)
 
 *"yes"*, when asked whether to ratify step 4 at `0.5`. [Verdict](../regression/2026-09-27-mined-expansion/VERDICT.md).
