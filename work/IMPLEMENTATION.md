@@ -76,7 +76,9 @@ Rules:
   ([SR-REFUSAL](../records/0146_refusals.md) decision 9a). This repo's
   `refusals.toml` gained `[scan]` via `fux doctor --fix`.
 - **Evidence:** every refusal test passes against the template's bounds, the
-  past-64-KiB marker test included. TEST_COUNTS
+  past-64-KiB marker test included. On a clean worktree of `28df6731` + this
+  change: unit 5 776 passed, 1 failed (`999c1976`'s, not this change's); e2e
+  151; Node 92.
 
 ---
 
