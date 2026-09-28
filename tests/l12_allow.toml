@@ -15,6 +15,12 @@ category = "identity"
 basis = "decision 6"
 why = "an arithmetic identity, an empty value or a zero-count start: `0`, `1`, `-1`, `0.0`, `1.0`, `''`"
 sites = [
+  "src/fux/inspect/idfamilies.py::Detection.candidates::class::0",
+  "src/fux/inspect/idfamilies.py::Detection.documents::class::0",
+  "src/fux/inspect/idfamilies.py::Parity.diff::class::''",
+  "node/src/query/identifiers.mjs::FLEX_CLASS::module::\"\"",
+  "node/src/query/identifiers.mjs::groupCount::module::\"\"",
+  "src/fux/store/writer.py::write_index(ids_digest)::param::''",
   "node/src/graph/walk.mjs::expand(minScore)::param::0.0",
   "node/src/index.mjs::seeds(depth)::param::1",
   "node/src/query/bm25f.mjs::deriveWlen(anchorLen)::param::0",
@@ -325,6 +331,29 @@ category = "grammar"
 basis = "decision 6"
 why = "parsing logic: a regex, an algorithm's rule table, a character class, a struct layout"
 sites = [
+  "src/fux/inspect/idfamilies.py::_NODE_SPANS::module::\"let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{...",
+  "src/fux/inspect/idfamilies.py::_utf16::inline::2",
+  "src/fux/inspect/idfamilies.py::regex_parity::inline::2",
+  "node/src/query/analyzer.mjs::withFamilies::inline::2",
+  "node/src/query/identifiers.mjs::CLASS_ESC::module::\"0-9\"",
+  "node/src/query/identifiers.mjs::EDGE::module::\" \"",
+  "node/src/query/identifiers.mjs::PLAIN_ESC::module::\"tnr\"",
+  "node/src/query/identifiers.mjs::RUN_OF_FLEX::module::\"g\"",
+  "node/src/query/identifiers.mjs::checkRegex::inline::2",
+  "node/src/query/identifiers.mjs::checkRegex::inline::3",
+  "node/src/query/identifiers.mjs::checkRegex::inline::4",
+  "node/src/query/identifiers.mjs::escRe::module::\"\\\\$&\"",
+  "node/src/query/identifiers.mjs::kindOf::module::\"d\"",
+  "src/fux/query/analyzer.py::_with_families::inline::2",
+  "src/fux/query/identifiers.py::_CLASS_ESC::module::{'d': '0-9', 'w': 'A-Za-z0-9_'}",
+  "src/fux/query/identifiers.py::_EDGE::module::'[A-Za-z0-9' + ''.join((re.escape(c) for c in _FLEX if c ...",
+  "src/fux/query/identifiers.py::_FLEX_CLASS::module::'[' + ''.join((re.escape(c) for c in _FLEX)) + ']'",
+  "src/fux/query/identifiers.py::_LEAD::module::f'(?<!{_EDGE})(?<![A-Za-z0-9]\\\\.)'",
+  "src/fux/query/identifiers.py::_PLAIN_ESC::module::set('tnr') | set('\\\\.-/()[]{}*+?|^$#:, ')",
+  "src/fux/query/identifiers.py::_TRAIL::module::f'(?!{_EDGE})(?!\\\\.[A-Za-z0-9])'",
+  "src/fux/query/identifiers.py::check_regex::inline::2",
+  "src/fux/query/identifiers.py::check_regex::inline::3",
+  "src/fux/query/identifiers.py::check_regex::inline::4",
   "node/src/config/toml.mjs::BOM::module::\"\\uFEFF\"",
   "node/src/config/toml.mjs::CRLF::module::\"\\r\\n\"",
   "node/src/config/toml.mjs::FLOAT_KEYS::module::\"toml.floatKeys\"",
@@ -359,6 +388,11 @@ category = "presentation"
 basis = "decision 6, R3"
 why = "a presentation count: the first N shown then (+M more), a width, a display rounding"
 sites = [
+  "src/fux/identifiers_cmd.py::cmd_identifiers::inline::2",
+  "src/fux/identifiers_cmd.py::cmd_identifiers::inline::3",
+  "src/fux/inspect/__init__.py::inspect_index::inline::3",
+  "src/fux/inspect/idfamilies.py::regex_parity::inline::160",
+  "src/fux/serve/__init__.py::_State.families::inline::3",
   "node/src/config/output.mjs::MAX_REPORTED::module::10",
   "node/src/config/tune.mjs::MAX_REPORTED::module::10",
   "node/src/verbs/ask.mjs::runAsk::inline::4",

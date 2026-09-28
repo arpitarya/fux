@@ -422,6 +422,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0157](0157_observe.md) | **SR-OBSERVE** | `.fux/observers/` — the observe-only hook fux exposes AFTER a verb has rendered: one frozen counts-only fact record (verb · `args_hash` · band · answerable · counts · refer verdicts · ms · version) handed to every consumer-owned observer, return value discarded, raise → skipped, slow → **abandoned** at `[observe] max_ms`, exit code never touched. The third readable-source exemption in SR-LAW-10. fux ships no observer and names no subscriber. Built 2026-09-15 (W-170): fux's stdout is taken away for the dispatch, because an observer's `print` reached the answer and the hostile test caught it; **Node is declared out of scope** (SR-NODE-SEARCH decision 18) | accepted | yes |
 | [0158](0158_serve.md) | **SR-SERVE** | `fux serve` — the explorer. A stdlib server bound to **`127.0.0.1` with no `--host`** (a contract, not a default) serving ONE self-contained page, and `GET /ask` answering with the **byte-identical stdout of `fux ask --json --why --band`** — because the route runs that command rather than rebuilding its payload. 🔴 **The page computes no score, no band and no rank**: a second ranker in a browser is a restatement in the L0 sense, and the three sample pages this was designed from had one. Lever cards are a rule per condition over the JSON, the two untuned thresholds print the word *provisional* **to the reader**, no route writes anything and `POST` is a 405 with a sentence. Rungs 2–4 (`ask --html`, the per-document findability card, `/docs`) are filed, not built | accepted | yes |
 | [0159](0159_constants.md) | **SR-CONSTANTS** | `src/fux/constants.toml` — the engine's FIXED values (schema ids, format and rules versions, artefact names, decoder versions, and the numbers a format or protocol defines), read by one Python and one Node loader through `fixed(table, key)`. **The Node bundle carries the file inlined** (`@fux-inline`, L10). A missing table or key raises the same sentence in both runtimes; nothing in code supplies a fallback (L12) | accepted | yes |
+| [0160](0160_identifiers.md) | **SR-IDENTIFIERS** | identifier families — `.fux/identifiers.toml` (`[user]` hand-written and winning, `[detected]` written only by `fux identifiers --write`), matched against the text on BOTH readers at ingest and query; each match adds ONE canonical term beside analyzer v3 (`RF 118`, `rf118`, `RF–118` → `rf-118`). Templates by default, a statically guarded `[user]` regex for experts; the effective digest stamped in every shard header. **An empty file is byte-identical to no feature**. Measured PASS (W-233, 2026-09-28) | accepted | yes |
 | [0002](0002_LAW-0-authority.md) | **SR-LAW-0** | L0 — a rule is stated in exactly one SR and every other artifact links to it; the Law records outrank every other record and a conflicting record is void in the conflicting part; a Law changes only on Arpit's ruling | accepted | yes |
 
 > ## Renumbered again on 2026-09-13 — the quality contract became a WORK record
@@ -655,6 +656,8 @@ table does not grant.
 | `src/fux/query/bm25f.py` | SR-RANKING | BM25F, `Scoring`, and `derive_wlen` — the one place the weighting arithmetic exists |
 | `src/fux/query/analyzer.py` | SR-RANKING | split, lowercase, stopword, stem, hash — in that order, shared by ingest and query |
 | `src/fux/query/stem.py` | SR-RANKING | the Porter implementation, checked against the published test vectors |
+| `src/fux/query/identifiers.py` | SR-IDENTIFIERS | identifier families — the template grammar, the static regex guard, the text matcher, the canonical form and the file loader. The analyzer takes its rules as a parameter; every index-matching caller threads them from `for_root(root)` |
+| `src/fux/identifiers_cmd.py` | SR-IDENTIFIERS | `fux identifiers [--write]` — prints the lens's families and their diff against the file; `--write` replaces only `[detected]` |
 | `src/fux/query/tokenize.py` | SR-RANKING | the shim both `ingest/` and `query/` import, which is what makes the two sides agree **by construction** rather than by review |
 | `src/fux/query/rerank.py` | SR-RERANK | proximity reranking — carved out because it is the one thing under `query/` that reads the **working tree** rather than the committed index, and because the decision it carries is a *refusal* |
 | `src/fux/query/confidence.py` | SR-CONFIDENCE | the four signals and the band, computed from what ranking already produced |
@@ -745,6 +748,7 @@ table does not grant.
 | `node/src/query/run.mjs` | SR-ASK | the shared spine of `ask`, `find` and `answer`. Twin of the pure half of `src/fux/query/__init__.py` |
 | `node/src/query/scan.mjs` | SR-ASK | the Node twin of `src/fux/query/scan.py` — the only candidate path Node has |
 | `node/src/query/stem.mjs` | SR-RANKING | the Node twin of `src/fux/query/stem.py` |
+| `node/src/query/identifiers.mjs` | SR-IDENTIFIERS | the Node twin of `src/fux/query/identifiers.py` — the grammar, the guard, the matcher and `identifiersFor(root)`. A divergence is a canonical term one reader writes and the other never asks for |
 | `node/src/query/tokenize.mjs` | SR-RANKING | the Node twin of `src/fux/query/tokenize.py` |
 | `node/src/refer/assemble.mjs` | SR-REFER | the Node twin of `src/fux/refer/_assemble.py` — the byte budget filled by score per byte |
 | `node/src/refer/chunk.mjs` | SR-CHUNKING | the Node twin of `src/fux/refer/_chunk.py` — passages from the document's own heading depth |
@@ -759,6 +763,7 @@ table does not grant.
 | `node/src/verbs/graph.mjs` | SR-GRAPH | `explain` · `graph` · `path` on the Node reader. Twin of `src/fux/graph/__init__.py` |
 | `node/src/verbs/mcp.mjs` | SR-MCP | the Node twin of the MCP server — the same three tools, advertised the same way |
 | `node/test/analyzer.test.mjs` | SR-RANKING | the analyzer pinned to Python's output, identifier by identifier (W-202) |
+| `node/test/identifiers.test.mjs` | SR-IDENTIFIERS | both readers held to one fixture, `tests/query/identifiers-fixture.json`, row by row |
 | `node/test/confidence.test.mjs` | SR-CONFIDENCE | the band and `answerable` pinned on the Node side, so the two readers cannot disagree about when to refuse |
 | `node/test/config.test.mjs` | SR-CONFIG | `fux.toml`'s schema as the Node reader loads it. Named by no record until 2026-09-21 |
 | `node/test/pins.test.mjs` | SR-ENRICH | the pin behaviour pinned. Named by no record until 2026-09-21 |
@@ -811,6 +816,7 @@ table does not grant.
 | `.fux/pii.toml` | SR-PII | this repo's own redaction ruleset. Decision 1 is that the ruleset is COMMITTED, so the committed file is the record's subject and not merely its output |
 | `.fux/refusals.toml` | SR-REFUSAL | this repo's own sign-in and refusal rules — the pair of `src/fux/templates/refusals.toml.txt`, already owned here |
 | `.fux/inspect.toml` | SR-INSPECT | this repo's own `fux inspect` / explorer thresholds, samples and row counts — the pair of `src/fux/templates/inspect.toml.txt` and `inspect/config.py`, already owned here. Changes what the report SAYS, never the index or a ranking |
+| `.fux/identifiers.toml` | SR-IDENTIFIERS | this repo's own identifier families — both tables empty, so this repo's index is v3's, byte for byte |
 | `.fux/formats.toml` | SR-TYPES | this repo's own types list. `ingest/typesfile.py` is the writer, already owned here; this is what it writes |
 | `scripts/check-open-work-inbox.py` | SR-WORK-OPEN-QUEUE | the Blocked-on-Arpit inbox check — rules 39–45, executable |
 | `.claude/hooks/guard-open-work-inbox.sh` | SR-WORK-OPEN-QUEUE | the same check at session start, which is where the first-output rule bites |

@@ -6,7 +6,7 @@ item: W-233
 
 # Identifiers retained whole — W-233
 
-> **Verdict:** 🟡 **PROPOSED 2026-09-28, inside Arpit's F1–F5 ruling.** **Build
+> **Verdict:** ✅ **BUILT and measured PASS 2026-09-28** ([verdict](../regression/2026-09-28-identifier-families/VERDICT.md); [SR-IDENTIFIERS](../../records/0160_identifiers.md)), inside Arpit's F1–F5 ruling; S1–S8 as proposed below, except S4, where the digest went into the shard header. **Build
 > family matching (e) with a per-family canonical form (d), and nothing else.**
 > A template in `.fux/identifiers.toml` (`RF-{n}`) is matched against the
 > **text** on both sides, ingest and query. Each match emits one extra term, its
@@ -19,7 +19,7 @@ item: W-233
 
 | | |
 |---|---|
-| **status** | 🟡 proposed; F1–F5 **ruled** (Arpit, 2026-09-28, Cowork) |
+| **status** | ✅ built; measured PASS (+25 / +88 / +105, 0 broken); F1–F5 **ruled** (Arpit, 2026-09-28, Cowork) |
 | **the call** | (e) + (d) per family, as S1–S8 specify |
 | **confidence** | **high** that it fixes the six measured spelling breaks, which it does by construction; **medium** on cost, which the pre-registered run measures; **low** that the golden ladder can show it. The ladder's questions carry no spelling variants, so the probe is mechanical |
 | **reopen-trigger** | **(c)** a case where the query and the document share the canonical term and a shared-parts neighbour still ranks above the document, on any rung; **(f)** a rung or a consumer corpus with ≥ 6 documents citing a 7–40-char hex id by prefix; **the global dash fold** a letter-prefixed ID written with a Unicode dash that no detected family covers, found by the lens on a real corpus |

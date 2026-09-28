@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@970dcf5c05fc, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@640f6d6d0116, src/fux/progress.py@10364bd02e0a, tests_e2e@db68fd0c4d9f, node/fux.mjs@3015d7cc4305]
+owns: [src/fux/cli.py@311436f30225, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@7a5371c09e45, src/fux/progress.py@10364bd02e0a, tests_e2e@db68fd0c4d9f, node/fux.mjs@3015d7cc4305]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 221a794e82eb344f1aa192ae11e375e3bff01ba1cd9cea5156d40395309028ac
+content_sha: c83d627f1e80c7842adc9828f14e7d7d625545af9f24b46ad7c7f5f30c2c8ddf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -34,7 +34,7 @@ content_sha: 221a794e82eb344f1aa192ae11e375e3bff01ba1cd9cea5156d40395309028ac
 
 | group | verbs | |
 |---|---|---|
-| **lifecycle** | `setup` · `doctor` · `inspect` | set the repo up, check the environment, then X-ray the index — `doctor`'s fix is a command or a config edit, `inspect`'s is a change to the corpus ([SR-INSPECT](0156_inspect.md)) |
+| **lifecycle** | `setup` · `doctor` · `inspect` · `identifiers` | set the repo up, check the environment, then X-ray the index — `doctor`'s fix is a command or a config edit, `inspect`'s is a change to the corpus, and `identifiers` records the ID families `inspect` found (SR-IDENTIFIERS) ([SR-INSPECT](0156_inspect.md)) |
 | **write** | `ingest` · `build` | one writes the committed plane, one derives from it. **`ingest` is the first ingest AND every re-ingest**, directories and URLs alike — decision 16 |
 | **sources** | `add` · `remove` · `enrich` · `correct` | maintain what is indexed — `add` and `remove` write lines and end in an ingest, `enrich` plans and validates a MODEL's text, and `correct` writes one question a PERSON typed ([SR-ENRICH](0137_enrich.md) decision 19). ⚠ **`update` was a fourth verb here and decision 16 deleted it** |
 | **read** | `ask` · `find` · `answer` · `lexical` | differ only in how much they commit to. `lexical` is the words alone, **frozen** — decision 12 |
@@ -1314,6 +1314,9 @@ nobody wrote.
 **No verb's behaviour moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). Internal helpers (`_add_output_flags`, `sources._ingest`, `check_drift`, `_narrow`, `_check`) lost their boolean defaults and are passed their values; `OutputDefaults.resolve` requires `as_json`.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+
+**`fux identifiers [--write] [--json]`** ([SR-IDENTIFIERS](0160_identifiers.md)) proposes identifier families from the index and, with `--write`, replaces only `.fux/identifiers.toml [detected]`; it is gated by `pii.toml` like every non-exempt verb. **`fux ingest --check` reports one index-level drift no document sha shows** — an index built under other identifier families than the file holds (`"state": "identifiers"`), exit 0 like every other drift.
 
 ### Consequences
 

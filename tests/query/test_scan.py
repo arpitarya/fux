@@ -30,6 +30,7 @@ def _rec(doc_id, title, flen, terms) -> dict:
 
 
 def test_empty_index_returns_nothing(tmp_path):
+    write_config(tmp_path)  # W-233: `.fux/identifiers.toml` is read to analyze the question
     assert ask(tmp_path, "anything", top=5, scoring=scoring()) == []
 
 

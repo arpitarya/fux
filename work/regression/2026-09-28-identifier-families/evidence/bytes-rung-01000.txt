@@ -1,0 +1,2 @@
+3304	/Users/arpitarya/my_programs/fux-lab/arms/runs/w233-before/rung-01000/.fux/index
+3312	/Users/arpitarya/my_programs/fux-lab/arms/runs/w233-after/rung-01000/.fux/index

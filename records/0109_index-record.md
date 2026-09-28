@@ -10,7 +10,7 @@ feature: the committed record schema — `fux.index.v2`
 owns: [src/fux/schemas/index-record.schema.json@0caa1702ac5e]
 laws: [L3, L4, ex-L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ee22b20d12eebddaa8c6cee6d7aa9ee13c331d5940207452d0c7b2226872be17
+content_sha: 4dcafb5e94e3c5011f07c7fa8aece23008e767143eb67b0378c73c50479ecb88
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -322,6 +322,9 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **How deep a committed record may nest is `constants.toml [index] max_record_depth`** (64), read by `store/canonical.py`. The bound and its refusal are unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+
+The record's shape is unchanged by identifier families; only the shard header gains an optional `identifiers` field ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 ### Consequences
 

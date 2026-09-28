@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L3, L5, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 9957773e4ea6601ed0fc896e18cdd36e3ee1cde2caf825fbea3b739b10f2c0c5
+content_sha: 3b6a8a35ac86fd6c8b216891b40b283b27811e8bda4768cc2bbcb1c26753429d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -354,6 +354,9 @@ added nothing of its own.
 **The thin-page note, the failing streak and the parallelism note read `fux.toml [sources.url]`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): `thin_words`, `thin_words_per_kb`, `failing_streak`, `parallel_warn_at` ([SR-CONFIG](0113_config.md) decision 18). The rate-limit retries and backoff stay NOT configurable, by ruling 12, and are `constants.toml [fetch]`. Every value is unchanged.
 
 **`resolve_urls` reads `[sources.url] keep`, `ttl` and `update` directly** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28), where it fell back through `getattr(source, "ttl", "24h")` and its siblings: the template is their one home. `UrlEntry.ttl` has no default.
+
+
+**A moved identifier-family digest is a fourth trigger**, beside `pii.toml`, `tune.toml [index]` and a decoder, for re-deriving carried `url:` records from `.fux/acquired/` ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 ### Consequences
 

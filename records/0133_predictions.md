@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@f13810179823, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@9590375d14b3, tools/vector-gate@0023bff0cdef]
 laws: [L4]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 5bec53c60c044c600aa9880ba6d9c40c5065981f424c1b70693fa27091d31753
+content_sha: 881f688da6f6e52131109601c3a416872226c9c3d68f7c8aaa01a4216dce13c5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

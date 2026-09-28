@@ -28,6 +28,8 @@ of THREE kinds:
 | `formats.toml` | committed | which files are documents (`include`) and which decoder reads each extension (`[decoders]`). Optional - absent means the built-in default. Replaced .fux/sources/types on 2026-09-11 (SR-TYPES) |
 | `.fuxignore` | committed | what is NOT indexed, in .gitignore's grammar. The one place exclusions belong, read before the source lists (SR-FUXIGNORE) |
 | `pii.toml` | committed | REQUIRED - every command refuses without it. What is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (SR-PII) |
+| `identifiers.toml` | committed | identifier FAMILIES kept whole however they are typed (RF-{n}: RF 118, rf118 and RF-118 are one term). [user] is yours and wins; [detected] is written by `fux identifiers --write`. CHANGES THE INDEX - re-ingest after an edit (SR-IDENTIFIERS) |
+| `inspect.toml` | committed | the knobs of `fux inspect`'s lenses and floors - what the index REPORT flags, never what is indexed or ranked (SR-INSPECT) |
 | `refusals.toml` | committed | what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (SR-REFUSAL) |
 | `fux` | committed | the shim: `.fux/fux find rollback` in a clone with nothing installed. Resolves the reader in three rungs -- the vendored bundle, this member's `node_modules/.bin`, then every ancestor's -- because npm and yarn hoist that bin and pnpm and bun do not (SR-NODE-SEARCH) |
 | `runtime/` | derived | M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull), and `runtime/trace/` (SR-SERVE: an inspection page for one question or one document - it quotes passages, so it is never committed, and it is regenerable by re-running the verb), and `runtime/inspect/` (SR-INSPECT: `fux inspect`'s and `fux serve`'s reports and caches - the hash-to-word dictionary, per-document facts and probe results - regenerable from the committed index and the sources on this disk); carries `CACHEDIR.TAG` |
@@ -84,7 +86,7 @@ Flat verbs, no subcommand tree. `fux <verb> --help` for any of them.
 
 | group | verbs | what the group does |
 |---|---|---|
-| lifecycle | `setup` `doctor` `inspect` | set the repo up, check the environment, then X-ray the index it produced |
+| lifecycle | `setup` `doctor` `inspect` `identifiers` | set the repo up, check the environment, X-ray the index it produced, and record the ID families it holds |
 | write | `ingest` `build` | `ingest` writes the committed index - the first time and every time after, for directories and URLs alike, re-fetching the URLs known to be stale; `build` derives the local accelerator from it |
 | sources | `add` `remove` `enrich` `correct` | maintain what is indexed. `add`/`remove` write lines and end in an ingest; `enrich` plans and validates a model's text; `correct` writes one question a PERSON typed onto the document that answers it |
 | read | `ask` `find` `answer` `lexical` | the same question, differing only in how much each commits to. `lexical` is BM25F alone, frozen - the baseline `ask` is measured against |

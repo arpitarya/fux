@@ -55,6 +55,9 @@ class InspectConfig:
     core_share: float
     misfit_floor: float
     length_edges: tuple[int, ...]
+    min_values: int
+    min_docs: int
+    parity_sample: int
 
 
 #: `field -> (table, kind)`. `share` is a number in (0, 1]; `count` a whole number
@@ -82,6 +85,9 @@ _SCHEMA: dict[str, tuple[str, str]] = {
     "triage_rows": ("serve", "count"),
     "words_page": ("serve", "count"),
     "words_page_max": ("serve", "count"),
+    "min_values": ("identifiers", "count"),
+    "min_docs": ("identifiers", "count"),
+    "parity_sample": ("identifiers", "count"),
 }
 assert set(_SCHEMA) == {f.name for f in fields(InspectConfig)}
 

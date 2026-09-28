@@ -8,10 +8,10 @@ amended: 2026-09-28
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@f3a09c0602d9, .fux/inspect.toml@28f3b6494463]
+owns: [src/fux/inspect@923af9a6a935, .fux/inspect.toml@c0b3ac0911f7]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 18658ee73083b34c13691b56cf08d6829dbff6d1ce7eddc5daea253af592a62f
+content_sha: 9510af2d55bca90fab16a5873b755bd1ecf2ad6c9795c2d62a722653cf53a4bc
 ratifies: W-169
 ---
 
@@ -239,6 +239,7 @@ discoverable from the index the whole time and nobody could see it.
     | word-cut passage | a decoder that emits one record per paragraph (`fux-decoder`) |
     | page chrome | a consumer html decoder in `.fux/decoders/` that skips `nav`, `header`, `aside` and `footer` (`fux-decoder`) |
     | link-target tokens | none a consumer can turn — an extraction-rule change under SR-EXTRACTED, its own item, measured first |
+    | identifier family | `fux identifiers --write` records it in `.fux/identifiers.toml [detected]`, `[user] drop` refuses one — an index change: `fux ingest` after (SR-IDENTIFIERS) |
 
 13. **Every truncated list ships its full count beside it.** A capped top-20
     read as a total is how *"20 near-duplicate pairs"* comes to mean *exactly
@@ -445,6 +446,9 @@ placed inside `inspect` by the W-220 ruling — a lens, never a verb).
   16). `duplication()`'s exact heading-SET families are unchanged, name and shape.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). `probes` and the findability lens pass `use_tune=True` to `run_query`, which no longer defaults it.
+
+
+**The identifier lens** ([SR-IDENTIFIERS](0160_identifiers.md) decision 9, W-233). `inspect/idfamilies.py` groups every raw analyzer token that starts with a letter, carries a digit and a `-` or `_`, and is not a path, a file name (`.md`), a decimal or version (`0.5`) or a same-prefix range (`L0-L12`), by its literal letter prefix plus the kinds of its later segments; a later letter run stays literal when every member shares it, a digit run is `{n}`. A family qualifies at `inspect.toml [identifiers] min_values` distinct values across `min_docs` documents, and only if its template parses. It is section 12 of the report, the `identifiers` key of `--json`, and the only source `fux identifiers --write` writes from. **Read-only like every lens**: it names the lever and applies none. `[identifiers] parity_sample` is the document count `doctor`'s and the explorer's regex parity reads.
 
 ### Consequences
 

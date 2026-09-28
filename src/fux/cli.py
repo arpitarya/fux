@@ -31,6 +31,12 @@ def _cmd_doctor(args) -> int:
     return cmd_doctor(args)
 
 
+def _cmd_identifiers(args) -> int:
+    from .identifiers_cmd import cmd_identifiers
+
+    return cmd_identifiers(args)
+
+
 def _cmd_inspect(args) -> int:
     from .inspect import cmd_inspect
 
@@ -1000,6 +1006,17 @@ def build_parser() -> argparse.ArgumentParser:
     _add_tune_flag(p_path)
     _add_output_flags(p_path, band=False)
     p_path.set_defaults(func=_cmd_path)
+
+    # W-233 (F1): proposes identifier families; `--write` replaces only the
+    # [detected] table of .fux/identifiers.toml. [user] is never touched.
+    p_ids = sub.add_parser(
+        "identifiers",
+        help="propose identifier families (RF-{n}) from the index; --write records them",
+    )
+    p_ids.add_argument("--write", action="store_true",
+                       help="rewrite .fux/identifiers.toml [detected]; [user] is kept byte for byte")
+    p_ids.add_argument("--json", action="store_true", help="machine-readable output")
+    p_ids.set_defaults(func=_cmd_identifiers)
 
     # A flat verb with no arguments at all: it neither reads the repo nor
     # writes it, so it works before `fux setup` has run and outside a root.

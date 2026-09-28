@@ -907,4 +907,5 @@ def test_the_json_view_is_built_beside_the_text_never_parsed_out_of_it():
     from fux import sources
 
     body = inspect.getsource(sources._check)
-    assert "findings.append" in body and body.count("stale.append") == 2
+    # W-233 added the families drift as a third pair, text and JSON together.
+    assert body.count("stale.append") == body.count("findings.append") == 3

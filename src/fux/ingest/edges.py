@@ -54,6 +54,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import PurePosixPath
 
+from ..query.identifiers import EMPTY, IdentifierRules
 from ..query.tokenize import tokenize
 from .parse import ParsedDoc
 from ..constants import fixed
@@ -117,6 +118,8 @@ def resolve(
     known_ids: set[str],
     by_basename: dict[str, list[str]],
     hash_of: Callable[[str], str],
+    *,
+    ids: IdentifierRules = EMPTY,
 ) -> list[dict]:
     """This document's resolved edges, with anchor terms on the `ref` ones.
 
@@ -142,7 +145,7 @@ def resolve(
             # a body term for the same word are the same hash. A link whose
             # text is empty, punctuation, or nothing but stopwords contributes
             # no terms and the edge keeps its pre-W-168 shape.
-            terms = tokenize(text)
+            terms = tokenize(text, ids)
             if terms:
                 anchor.setdefault(dst, Counter()).update(terms)
 

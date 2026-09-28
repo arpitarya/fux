@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@f635622fc903, tools/differential@46e35c2929fe, src/fux/schemas/runtime.schema.json@f83e87676ef8]
+owns: [src/fux/derive@de9c4a5cc775, tools/differential@46e35c2929fe, src/fux/schemas/runtime.schema.json@f83e87676ef8]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: f59eecdc20b7457e2e60b8b427b11df9e9232644e8edcd6902e936d2956b176e
+content_sha: 575e4728b08b81cc722ce0bf29e13224cb5b99081d64b1a4786c0bf2be8a8773
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -661,6 +661,9 @@ payloads at every arm weight in `tests/query/test_mined.py`.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+
+`accel.ask` analyzes the question with the repo's identifier families exactly as the scan does, so `--fast` and `--scan` hash the same terms ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 ### Consequences
 

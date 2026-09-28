@@ -28,6 +28,8 @@ from .. import store as store_mod
 from .rank import AskResult, Corpus, rank
 from ..store import TF_FIELDS
 from .bm25f import Scoring, derive_wlen
+from . import identifiers as ids_mod
+from .identifiers import EMPTY, IdentifierRules
 from .tokenize import tokenize
 
 #: W-168 step 1 — one `ref` edge's anchor length and its target, off the raw
@@ -70,13 +72,19 @@ def _flen_from_line(line: bytes) -> list[int] | None:
 __all__ = ["AskResult", "ask", "query_term_hashes", "scan_candidates"]
 
 
-def query_term_hashes(query: str) -> list[str]:
+def query_term_hashes(query: str, ids: IdentifierRules = EMPTY) -> list[str]:
     """Query terms as index hashes, deduped, order preserved.
+
+    🔴 **`ids` must be the repo's identifier families** (`identifiers.for_root`)
+    on every path that matches the result against the index: the index was
+    written with them, and a question analyzed without them misses the
+    canonical term silently. `tests/query/test_identifiers_threaded.py`
+    holds every call in `src/` to that.
 
     Order is load-bearing: `rank()` sums BM25F contributions in this order, so
     both candidate generators must derive it identically from the same string.
     """
-    return list(dict.fromkeys(store_mod.term_hash(t) for t in tokenize(query)))
+    return list(dict.fromkeys(store_mod.term_hash(t) for t in tokenize(query, ids)))
 
 
 def scan_candidates(
@@ -262,7 +270,7 @@ def ask(
     is dropped by `rank()` — the guard lives there because it is the one
     function both paths reach.
     """
-    query_hashes = query_term_hashes(query)
+    query_hashes = query_term_hashes(query, ids_mod.for_root(root))
     if not query_hashes:
         # A query that tokenizes to nothing still owes the caller its corpus
         # statistics, or `confidence` cannot tell "no terms" from "not run".

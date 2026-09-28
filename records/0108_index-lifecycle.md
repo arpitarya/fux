@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@5d1e5d23ba1e, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@4828d8b0b5f3]
+owns: [src/fux/store@dcc073e07a71, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@4828d8b0b5f3]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 0152f8f46e2851545f3d69590533e44f14afec1a06933b0d3e5ed12fe52c66d8
+content_sha: 732cc65957a6d6f087034edd38f97518476ad5bb4b9201e75e9971efcc2f8bc0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -566,6 +566,9 @@ the three to be merged, did not.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+
+**The shard header may carry `identifiers`** — the effective identifier-family digest, written by `store.header_for` only when the repo declares families ([SR-IDENTIFIERS](0160_identifiers.md) decision 8). Absent means none, which is true of every earlier index, so `_format` does not move; both readers check `_format`, `analyzer` and `tf_fields` by name and ignore it, and ingest's reuse gate compares the whole expected header.
 
 ### Consequences
 

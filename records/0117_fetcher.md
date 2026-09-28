@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@80b919e8f56c, src/fux/templates@eb83632cfac0]
+owns: [src/fux/ingest/urlsrc.py@80b919e8f56c, src/fux/templates@2d77c4c482e8]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 73af09ccea09e07e45c7a0eedf1ef173b48a947e699df219dfbf34fc939c9787
+content_sha: 34b5913fda0ac5db6718bc4a15b1f0d1b7df54984357285bf21dd4aae65968af
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -673,6 +673,9 @@ copied out, never imported.
 **No fetcher decision moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `src/fux/templates/fux.toml.txt`, under this record's claim on `templates/`, gained `[doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18).
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+
+`src/fux/templates/` also carries `identifiers.toml.txt` ([SR-IDENTIFIERS](0160_identifiers.md)), and `inspect.toml.txt` gained `[identifiers]`; no fetcher template changed.
 
 ### Consequences
 

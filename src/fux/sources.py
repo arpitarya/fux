@@ -1428,6 +1428,21 @@ def _check(root: Path, entry: str | None, *, as_json: bool) -> int:
         else:
             unverified += 1
 
+    # W-233: one drift no document's sha shows — the index built under other
+    # identifier families than `.fux/identifiers.toml` holds. Every document
+    # would re-analyse, so it is reported once, for the index, not per file.
+    # The digest is COMMITTED in the shard header, which is why a fresh clone
+    # in CI can see it at all.
+    if not entry:
+        from .query import identifiers as ids_mod
+
+        built = (store_mod.index_header(root) or {}).get(store_mod.IDENTIFIERS_KEY, "")
+        wanted = ids_mod.load(root).digest
+        if built != wanted:
+            stale.append(f"  families  {ids_mod.FILE:<24} the index was built under other identifier families")
+            findings.append({"id": "", "loc": ids_mod.FILE, "state": "identifiers",
+                             "indexed_digest": built, "file_digest": wanted})
+
     if as_json:
         # ⚠ **Exit 0 either way, in this mode too.** The caller reading JSON is
         # the one that most needs the distinction between *drifted* and

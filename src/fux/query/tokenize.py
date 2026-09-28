@@ -18,16 +18,19 @@ makes it safe to change this file at all.
 from __future__ import annotations
 
 from .analyzer import _STOPWORDS, analyze, analyze_pairs
+from .identifiers import EMPTY, IdentifierRules
 
 __all__ = ["tokenize", "tokenize_pairs", "_STOPWORDS"]
 
 
-def tokenize(text: str) -> list[str]:
-    """Analyzed terms in document order, with duplicates (they are the tf)."""
-    return analyze(text)
+def tokenize(text: str, ids: IdentifierRules = EMPTY) -> list[str]:
+    """Analyzed terms in document order, with duplicates (they are the tf).
+
+    `ids` are the repo's identifier families (W-233); empty is analyzer v3."""
+    return analyze(text, ids)
 
 
-def tokenize_pairs(text: str) -> list[tuple[str, str]]:
+def tokenize_pairs(text: str, ids: IdentifierRules = EMPTY) -> list[tuple[str, str]]:
     """`(surface, analyzed)` for the same terms `tokenize` returns.
 
     The query side's view of the same pipeline: `confidence` reports the word
@@ -36,4 +39,4 @@ def tokenize_pairs(text: str) -> list[tuple[str, str]]:
     all — one stable entry point, so every caller gets the same analysis by
     construction.
     """
-    return analyze_pairs(text)
+    return analyze_pairs(text, ids)

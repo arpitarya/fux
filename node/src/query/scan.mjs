@@ -14,6 +14,7 @@ import { termHash, TF_FIELDS } from "../store/format.mjs";
 import { deriveWlen } from "./bm25f.mjs";
 import { Corpus, rank } from "./rank.mjs";
 import { tokenize } from "./tokenize.mjs";
+import { EMPTY, identifiersFor } from "./identifiers.mjs";
 
 //: The byte-level oracle, over per-field counts. `wlen` is DERIVED from `flen`
 //: at the weights in force, so this parses the array and applies `deriveWlen`
@@ -37,11 +38,14 @@ function flenFromLine(text) {
 
 /** Query terms as index hashes, deduped, ORDER PRESERVED.
  *  Order is load-bearing: `rank()` sums BM25F contributions in it, so both
- *  candidate generators must derive it identically from the same string. */
-export function queryTermHashes(query) {
+ *  candidate generators must derive it identically from the same string.
+ *
+ *  🔴 `ids` must be the repo's identifier families (`identifiersFor(root)`) on
+ *  every path that matches against the index — it was written with them. */
+export function queryTermHashes(query, ids = EMPTY) {
   const seen = new Set();
   const out = [];
-  for (const t of tokenize(query)) {
+  for (const t of tokenize(query, ids)) {
     const h = termHash(t);
     if (!seen.has(h)) { seen.add(h); out.push(h); }
   }
@@ -155,7 +159,7 @@ export function scanCandidates(root, queryHashes, { scoring }) {
 /** The reference path. */
 export function ask(root, query, top, opts) {
   const { weighting = null, scoring, statsOut = null, expansion = null } = opts;
-  const queryHashes = queryTermHashes(query);
+  const queryHashes = queryTermHashes(query, identifiersFor(root));
   if (!queryHashes.length) {
     // A query that tokenizes to nothing still owes the caller its corpus
     // statistics, or confidence cannot tell "no terms" from "not run".

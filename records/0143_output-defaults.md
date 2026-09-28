@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@6e170ba237d7, src/fux/templates/output.toml.txt@38f72dd71a22, .fux/output.toml@38f72dd71a22, node/src/config/output.mjs@e71c6b866b06]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: f9d2d26128a8cf0a9c2e05767f39fd585eb6d6a9129e8bff0f2f24a78b238395
+content_sha: 055bc72fdd35667afd5019c9c6ba27dada089d0397ecb00def100240e10beec7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -816,6 +816,9 @@ readers. `audit` and `receipt` have no CLI key to mirror, so they carry no defau
 anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+
+`fux identifiers`'s `--json` and `--write` are not output-gated: the verb has no `.fux/output.toml` table, so both default to off rather than to `None` ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 ### Consequences
 

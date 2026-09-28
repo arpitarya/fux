@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-19
 amended: 2026-09-15
 feature: the `extracted` ingest mode — the value in every committed record's `mode` property, and the contract it asserts
-owns: [src/fux/ingest/extract.py@02247871bec2]
+owns: [src/fux/ingest/extract.py@ee003bb36414]
 laws: [L2, L3, L4, L5]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 6629cdd8502e57e062dc82f3304f1de8b2fa9c4b3e0d16bbbb0343560f552c84
+content_sha: 4a3893a00bd113ef8f412cdc3aeee6ce29e31bda6ef513217625a3d9a7f0f42a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -329,6 +329,9 @@ this moved where they are written, not what they are.
 - `src/fux/ingest/extract.py` — `RULES_VERSION` ← `[versions] extract_rules`
 
 <!-- L12-VALUES-END -->
+
+
+`extract_fields` takes the repo's identifier families and analyzes every field through them ([SR-IDENTIFIERS](0160_identifiers.md)). `RULES_VERSION` does not move: with no families the output is unchanged, and a change of families is gated by the shard header's digest instead.
 
 ### Consequences
 

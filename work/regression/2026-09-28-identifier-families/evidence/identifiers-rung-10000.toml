@@ -1,0 +1,74 @@
+# .fux/identifiers.toml -- identifier families (SR-IDENTIFIERS).
+#
+# A family keeps an identifier whole however it is typed. With the template
+# RF-{n}, the text "RF 118", "rf118", "RF–118" and "RF-0118" each add the one
+# term rf-118 -- in a document at ingest and in a question at query time -- so
+# the document that names RF-118 outranks one that merely says RF-119 and 118.
+#
+# Template grammar: letters and digits are literal (any case). `-` and `_`
+# accept -, _, a Unicode dash, one space, or nothing between a letter and a
+# digit. `.` `/` `:` match themselves. {n} is digits (leading zeros ignored);
+# {X} is letters. A template must START WITH A LETTER, so prose like "step 4"
+# can never match one.
+#
+# ⚠ CHANGES THE INDEX: after editing, run `fux ingest`. `fux doctor` says when
+# the index was built under different families. Both tables may stay empty;
+# an empty file changes nothing at all.
+
+[user]
+# Yours. fux never writes this table, and it wins over [detected].
+keep = []   # templates to keep whole, e.g. ["RF-{n}", "ADR-{n}"]
+drop = []   # detected templates to ignore
+# EXPERTS ONLY -- prefer a template. A regex is checked when it is loaded and
+# refused if it uses lookaround, a quantified group, an anchor, an unescaped
+# `.` or \s: each behaves differently in the Python and Node readers, or can
+# backtrack without end. `fux serve`'s Identifiers tab tests one first.
+regex = []
+
+[detected]
+# Written by `fux identifiers --write` from the families `fux inspect` finds.
+# Do not edit this table: rerun the verb, or move a line to [user].
+families = [
+  "BWD-{X}-{n}",  # 65 values in 101 documents
+  "BWD-{X}{n}",  # 43 values in 143 documents
+  "BWD-{n}",  # 87 values in 90 documents
+  "CDM-{X}-{n}",  # 62 values in 85 documents
+  "CDM-{X}{n}",  # 43 values in 117 documents
+  "CDM-{n}",  # 58 values in 61 documents
+  "HFP-{X}-{n}",  # 58 values in 85 documents
+  "HFP-{X}{n}",  # 42 values in 141 documents
+  "HFP-{n}",  # 73 values in 78 documents
+  "LQ-{n}",  # 3 values in 3 documents
+  "MBK-{X}-{n}",  # 69 values in 97 documents
+  "MBK-{X}{n}",  # 42 values in 156 documents
+  "MBK-{n}",  # 77 values in 80 documents
+  "NGP-{X}-{n}",  # 3 values in 2 documents
+  "NRL-{X}-{n}",  # 72 values in 102 documents
+  "NRL-{X}{n}",  # 43 values in 161 documents
+  "NRL-{n}",  # 85 values in 91 documents
+  "OKF-{X}-{n}",  # 57 values in 77 documents
+  "OKF-{X}{n}",  # 42 values in 124 documents
+  "OKF-{n}",  # 59 values in 66 documents
+  "PCC-{X}-{n}",  # 64 values in 92 documents
+  "PCC-{X}{n}",  # 42 values in 135 documents
+  "PCC-{n}",  # 73 values in 77 documents
+  "PROJ-{n}",  # 3 values in 6 documents
+  "QCL-F-{n}",  # 11 values in 19 documents
+  "QCL-OPS-NH{n}-{n}",  # 5 values in 5 documents
+  "QCL-{X}-{X}-{n}",  # 34 values in 37 documents
+  "RF-{n}",  # 6 values in 12 documents
+  "SFD-{X}-{n}",  # 64 values in 87 documents
+  "SFD-{X}{n}",  # 42 values in 126 documents
+  "SFD-{n}",  # 67 values in 69 documents
+  "TMS-{n}",  # 4 values in 5 documents
+  "TSL-NGP-{X}{n}-{n}",  # 3 values in 4 documents
+  "TSL-RF-{n}-A",  # 4 values in 4 documents
+  "VTX-{X}-{n}",  # 73 values in 97 documents
+  "VTX-{X}{n}",  # 43 values in 151 documents
+  "VTX-{n}",  # 75 values in 77 documents
+  "WIKI-{X}-{X}-{n}",  # 4 values in 4 documents
+  "WIKI-{X}-{n}",  # 385 values in 495 documents
+  "ZAC-{X}-{n}",  # 67 values in 100 documents
+  "ZAC-{X}{n}",  # 43 values in 165 documents
+  "ZAC-{n}",  # 86 values in 90 documents
+]

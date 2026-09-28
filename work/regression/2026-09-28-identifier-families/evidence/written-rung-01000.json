@@ -1,0 +1,474 @@
+{
+  "documents": 1000,
+  "families": [
+    {
+      "docs": 8,
+      "examples": [
+        "BWD-HSE-39",
+        "BWD-QA-23",
+        "BWD-QA-35"
+      ],
+      "template": "BWD-{X}-{n}",
+      "values": 8
+    },
+    {
+      "docs": 13,
+      "examples": [
+        "BWD-A5",
+        "BWD-B1",
+        "BWD-B4"
+      ],
+      "template": "BWD-{X}{n}",
+      "values": 18
+    },
+    {
+      "docs": 7,
+      "examples": [
+        "BWD-334",
+        "BWD-546",
+        "BWD-548"
+      ],
+      "template": "BWD-{n}",
+      "values": 7
+    },
+    {
+      "docs": 7,
+      "examples": [
+        "CDM-HSE-48",
+        "CDM-HSE-50",
+        "CDM-QA-26"
+      ],
+      "template": "CDM-{X}-{n}",
+      "values": 7
+    },
+    {
+      "docs": 11,
+      "examples": [
+        "CDM-A2",
+        "CDM-A5",
+        "CDM-B2"
+      ],
+      "template": "CDM-{X}{n}",
+      "values": 16
+    },
+    {
+      "docs": 5,
+      "examples": [
+        "CDM-430",
+        "CDM-555",
+        "CDM-841"
+      ],
+      "template": "CDM-{n}",
+      "values": 5
+    },
+    {
+      "docs": 6,
+      "examples": [
+        "HFP-QA-38",
+        "HFP-QA-43",
+        "HFP-QA-52"
+      ],
+      "template": "HFP-QA-{n}",
+      "values": 6
+    },
+    {
+      "docs": 10,
+      "examples": [
+        "HFP-A1",
+        "HFP-A2",
+        "HFP-B1"
+      ],
+      "template": "HFP-{X}{n}",
+      "values": 16
+    },
+    {
+      "docs": 6,
+      "examples": [
+        "HFP-112",
+        "HFP-203",
+        "HFP-445"
+      ],
+      "template": "HFP-{n}",
+      "values": 6
+    },
+    {
+      "docs": 3,
+      "examples": [
+        "LQ-51",
+        "LQ-52",
+        "LQ-53"
+      ],
+      "template": "LQ-{n}",
+      "values": 3
+    },
+    {
+      "docs": 10,
+      "examples": [
+        "MBK-F-11",
+        "MBK-QA-26",
+        "MBK-QA-31"
+      ],
+      "template": "MBK-{X}-{n}",
+      "values": 9
+    },
+    {
+      "docs": 13,
+      "examples": [
+        "MBK-A1",
+        "MBK-A2",
+        "MBK-B5"
+      ],
+      "template": "MBK-{X}{n}",
+      "values": 17
+    },
+    {
+      "docs": 9,
+      "examples": [
+        "MBK-132",
+        "MBK-397",
+        "MBK-426"
+      ],
+      "template": "MBK-{n}",
+      "values": 9
+    },
+    {
+      "docs": 2,
+      "examples": [
+        "NGP-MNT-552",
+        "NGP-MNT-731",
+        "NGP-PNR-18"
+      ],
+      "template": "NGP-{X}-{n}",
+      "values": 3
+    },
+    {
+      "docs": 12,
+      "examples": [
+        "NRL-HSE-40",
+        "NRL-QA-13",
+        "NRL-QA-19"
+      ],
+      "template": "NRL-{X}-{n}",
+      "values": 11
+    },
+    {
+      "docs": 18,
+      "examples": [
+        "NRL-A5",
+        "NRL-B2",
+        "NRL-B4"
+      ],
+      "template": "NRL-{X}{n}",
+      "values": 22
+    },
+    {
+      "docs": 11,
+      "examples": [
+        "NRL-105",
+        "NRL-215",
+        "NRL-337"
+      ],
+      "template": "NRL-{n}",
+      "values": 11
+    },
+    {
+      "docs": 10,
+      "examples": [
+        "OKF-F-11",
+        "OKF-HSE-49",
+        "OKF-IT-3391"
+      ],
+      "template": "OKF-{X}-{n}",
+      "values": 10
+    },
+    {
+      "docs": 16,
+      "examples": [
+        "OKF-A1",
+        "OKF-A2",
+        "OKF-A4"
+      ],
+      "template": "OKF-{X}{n}",
+      "values": 23
+    },
+    {
+      "docs": 9,
+      "examples": [
+        "OKF-198",
+        "OKF-213",
+        "OKF-464"
+      ],
+      "template": "OKF-{n}",
+      "values": 9
+    },
+    {
+      "docs": 9,
+      "examples": [
+        "PCC-F-11",
+        "PCC-QA-35",
+        "PCC-QA-38"
+      ],
+      "template": "PCC-{X}-{n}",
+      "values": 8
+    },
+    {
+      "docs": 13,
+      "examples": [
+        "PCC-B1",
+        "PCC-B2",
+        "PCC-C1"
+      ],
+      "template": "PCC-{X}{n}",
+      "values": 17
+    },
+    {
+      "docs": 8,
+      "examples": [
+        "PCC-127",
+        "PCC-240",
+        "PCC-448"
+      ],
+      "template": "PCC-{n}",
+      "values": 8
+    },
+    {
+      "docs": 6,
+      "examples": [
+        "PROJ-123",
+        "PROJ-124",
+        "PROJ-125"
+      ],
+      "template": "PROJ-{n}",
+      "values": 3
+    },
+    {
+      "docs": 19,
+      "examples": [
+        "QCL-F-09",
+        "QCL-F-12",
+        "QCL-F-17"
+      ],
+      "template": "QCL-F-{n}",
+      "values": 11
+    },
+    {
+      "docs": 5,
+      "examples": [
+        "QCL-OPS-NH3-01",
+        "QCL-OPS-NH3-02",
+        "QCL-OPS-NH3-03"
+      ],
+      "template": "QCL-OPS-NH{n}-{n}",
+      "values": 5
+    },
+    {
+      "docs": 37,
+      "examples": [
+        "QCL-CS-HBK-01",
+        "QCL-CS-MTX-02",
+        "QCL-CS-MTX-03"
+      ],
+      "template": "QCL-{X}-{X}-{n}",
+      "values": 34
+    },
+    {
+      "docs": 12,
+      "examples": [
+        "RF-117",
+        "RF-118",
+        "RF-119"
+      ],
+      "template": "RF-{n}",
+      "values": 6
+    },
+    {
+      "docs": 7,
+      "examples": [
+        "SFD-HSE-41",
+        "SFD-HSE-59",
+        "SFD-HSE-82"
+      ],
+      "template": "SFD-{X}-{n}",
+      "values": 7
+    },
+    {
+      "docs": 9,
+      "examples": [
+        "SFD-B1",
+        "SFD-D3",
+        "SFD-D4"
+      ],
+      "template": "SFD-{X}{n}",
+      "values": 15
+    },
+    {
+      "docs": 4,
+      "examples": [
+        "SFD-205",
+        "SFD-226",
+        "SFD-477"
+      ],
+      "template": "SFD-{n}",
+      "values": 4
+    },
+    {
+      "docs": 5,
+      "examples": [
+        "TMS-41",
+        "TMS-42",
+        "TMS-43"
+      ],
+      "template": "TMS-{n}",
+      "values": 4
+    },
+    {
+      "docs": 4,
+      "examples": [
+        "TSL-NGP-C2-07",
+        "TSL-NGP-C3-02",
+        "TSL-NGP-F1-04"
+      ],
+      "template": "TSL-NGP-{X}{n}-{n}",
+      "values": 3
+    },
+    {
+      "docs": 4,
+      "examples": [
+        "TSL-RF-118-A",
+        "TSL-RF-119-A",
+        "TSL-RF-120-A"
+      ],
+      "template": "TSL-RF-{n}-A",
+      "values": 4
+    },
+    {
+      "docs": 10,
+      "examples": [
+        "VTX-HSE-17",
+        "VTX-HSE-68",
+        "VTX-HSE-75"
+      ],
+      "template": "VTX-{X}-{n}",
+      "values": 10
+    },
+    {
+      "docs": 12,
+      "examples": [
+        "VTX-A1",
+        "VTX-A3",
+        "VTX-B1"
+      ],
+      "template": "VTX-{X}{n}",
+      "values": 22
+    },
+    {
+      "docs": 6,
+      "examples": [
+        "VTX-102",
+        "VTX-365",
+        "VTX-691"
+      ],
+      "template": "VTX-{n}",
+      "values": 6
+    },
+    {
+      "docs": 4,
+      "examples": [
+        "WIKI-HFP-DOCK-12",
+        "WIKI-NGP-DOCK-12",
+        "WIKI-NGP-DOCK-41"
+      ],
+      "template": "WIKI-{X}-{X}-{n}",
+      "values": 4
+    },
+    {
+      "docs": 45,
+      "examples": [
+        "WIKI-BWD-55",
+        "WIKI-BWD-65",
+        "WIKI-CDM-10"
+      ],
+      "template": "WIKI-{X}-{n}",
+      "values": 42
+    },
+    {
+      "docs": 9,
+      "examples": [
+        "ZAC-HSE-30",
+        "ZAC-QA-11",
+        "ZAC-QA-14"
+      ],
+      "template": "ZAC-{X}-{n}",
+      "values": 9
+    },
+    {
+      "docs": 20,
+      "examples": [
+        "ZAC-A2",
+        "ZAC-A4",
+        "ZAC-A5"
+      ],
+      "template": "ZAC-{X}{n}",
+      "values": 23
+    },
+    {
+      "docs": 8,
+      "examples": [
+        "ZAC-101",
+        "ZAC-347",
+        "ZAC-365"
+      ],
+      "template": "ZAC-{n}",
+      "values": 8
+    }
+  ],
+  "gone": [],
+  "new": [
+    "BWD-{X}-{n}",
+    "BWD-{X}{n}",
+    "BWD-{n}",
+    "CDM-{X}-{n}",
+    "CDM-{X}{n}",
+    "CDM-{n}",
+    "HFP-QA-{n}",
+    "HFP-{X}{n}",
+    "HFP-{n}",
+    "LQ-{n}",
+    "MBK-{X}-{n}",
+    "MBK-{X}{n}",
+    "MBK-{n}",
+    "NGP-{X}-{n}",
+    "NRL-{X}-{n}",
+    "NRL-{X}{n}",
+    "NRL-{n}",
+    "OKF-{X}-{n}",
+    "OKF-{X}{n}",
+    "OKF-{n}",
+    "PCC-{X}-{n}",
+    "PCC-{X}{n}",
+    "PCC-{n}",
+    "PROJ-{n}",
+    "QCL-F-{n}",
+    "QCL-OPS-NH{n}-{n}",
+    "QCL-{X}-{X}-{n}",
+    "RF-{n}",
+    "SFD-{X}-{n}",
+    "SFD-{X}{n}",
+    "SFD-{n}",
+    "TMS-{n}",
+    "TSL-NGP-{X}{n}-{n}",
+    "TSL-RF-{n}-A",
+    "VTX-{X}-{n}",
+    "VTX-{X}{n}",
+    "VTX-{n}",
+    "WIKI-{X}-{X}-{n}",
+    "WIKI-{X}-{n}",
+    "ZAC-{X}-{n}",
+    "ZAC-{X}{n}",
+    "ZAC-{n}"
+  ],
+  "user": {
+    "rules": []
+  },
+  "written": true
+}

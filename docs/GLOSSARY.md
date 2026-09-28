@@ -395,6 +395,14 @@ make a hub weightless and turn *widely cited* into *ignored*. **Ships off
 (`--link-idf`) and is measured by nobody yet.** See
 [SR-GRAPH](../records/0126_graph.md) decision 15.
 
+**Identifier family** — A template such as `RF-{n}` in
+`.fux/identifiers.toml` that keeps an ID whole however it is typed: `RF 118`,
+`rf118`, `RF–118` and `RF-0118` each add the one term `rf-118`, in a document at
+ingest and in a question at query time, beside the analyzer's own terms.
+`[user]` is hand-written and wins; `[detected]` is written only by
+`fux identifiers --write` from an inspect lens. An empty file changes nothing.
+See [SR-IDENTIFIERS](../records/0160_identifiers.md).
+
 **Impact quantization** — Storing each posting's precomputed score
 contribution as a **4-bit** bucket against a global scale recorded in the
 segment header, instead of a raw term frequency. Trades a small ranking

@@ -3,7 +3,7 @@
 
 **The research fixture the item orders before any design is compared.** Analyzer
 v3 (W-205 family (a)) made `RF-118` survive whole; this asks the eight questions
-[W-233](../../work/open/W-233-identifiers-retained-whole.md) lists about what it
+[W-233](../../archive/open/W-233-identifiers-retained-whole.md) lists about what it
 did NOT cover, and answers each from the engine rather than from reading code:
 
 - **Q1–Q6** run a fixed fixture of document/query pairs through the analyzer on

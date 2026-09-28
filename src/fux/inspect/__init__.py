@@ -64,6 +64,8 @@ class Report:
     facts: object = None
     #: W-228 — documents grouped by shape; needs pass A's `meta_keys`.
     families: object = None
+    #: W-233 — identifier families (`fux identifiers`); `None` when not computed.
+    identifiers: object = None
     probes: object = None
     fold: object = None
 
@@ -119,6 +121,9 @@ def inspect_index(
     probes_mod.save_cache(root, cache_key, query_cache, before=cached_before)
     fold = xray_mod.fold(view, facts, findability, probes, top=top)
     families = lenses_mod.families(view, facts, top_lists=top)
+    from .idfamilies import identifier_families
+
+    identifiers = identifier_families(root, view, examples=3)
     return Report(
         view=view,
         dictionary=dictionary,
@@ -135,6 +140,7 @@ def inspect_index(
         probes=probes,
         fold=fold,
         families=families,
+        identifiers=identifiers,
     )
 
 
@@ -361,6 +367,7 @@ def render_markdown(report: Report) -> str:
         add("\n**Community sizes:** " + " · ".join(f"`{label}` {size}" for label, size in graph.communities))
 
     _render_xray(report, add)
+    _render_identifiers(report, add)
 
     add("\n---\n")
     add(
@@ -457,6 +464,25 @@ def _render_xray(report: Report, add) -> None:
             add(f"| {len(row['findings'])} | `{row['id']}` | {' · '.join(row['findings'])} |")
         if fold.triage_count > len(fold.triage):
             add(f"\n… {fold.triage_count - len(fold.triage)} more")
+
+
+def _render_identifiers(report: Report, add) -> None:
+    """W-233 — the identifier lens: families the analyzer could keep whole."""
+    ids = report.identifiers
+    if ids is None:
+        return
+    add("\n## 12 · Identifier families — IDs the analyzer can keep whole however typed\n")
+    add(
+        f"**{len(ids.families)} famil{'y' if len(ids.families) == 1 else 'ies'}** in {ids.documents} document(s), "
+        f"from {ids.candidates} identifier-shaped token(s). A family makes `RF 118`, `rf118` and `RF-118` "
+        "one term, at ingest and in a question."
+    )
+    add(f"\nLever: {_lever('identifier family')}\n")
+    if ids.families:
+        add("| template | values | documents | e.g. |")
+        add("|---|---|---|---|")
+        for f in ids.families:
+            add(f"| `{f.template}` | {f.values} | {f.docs} | {', '.join(f'`{e}`' for e in f.examples)} |")
 
 
 def _number(value: float | None, digits: int = 3) -> str:
@@ -582,6 +608,12 @@ def as_dict(report: Report) -> dict:
             "singleton_communities": graph.singleton_communities,
             "communities": [{"label": label, "size": size} for label, size in graph.communities],
             "lever": _lever("orphan"),
+        },
+        "identifiers": None if report.identifiers is None else {
+            "documents": report.identifiers.documents,
+            "candidates": report.identifiers.candidates,
+            "families": [f.__dict__ | {"examples": list(f.examples)} for f in report.identifiers.families],
+            "lever": _lever("identifier family"),
         },
         "levers": dict(sorted(lenses_mod.LEVERS.items())),
         **_xray_dict(report),

@@ -25,6 +25,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | "which documents need attention first?" | `triage` (with `triage_count`), then one row of `documents` |
 | "which decoder or folder is the problem?" | `segments` — one card per decoder × folder × archived |
 | "what kinds of documents does this corpus hold?" | `families` — groups by heading skeleton + front-matter keys among documents that share a heading (a title heading is not part of the skeleton), each named by its shared headings; `families.misfits` names members missing a heading their family carries |
+| "which ID families could fux keep whole?" | `identifiers` — letter-prefixed shapes (`RF-{n}`) repeated across documents, with value and document counts; `fux identifiers --write` records them in `.fux/identifiers.toml [detected]` — an index change, so propose it, never run it unasked |
 | "did this decoder / analyzer change break anything?" | `fux inspect --diff before.json after.json` — **edge loss is always an alert** |
 | "show me ONE document's X-ray" | `fux serve` → the Documents tab (`fux-serve`) |
 | "show me all of this in a browser" | `fux serve` → the Index tab: every section of this report has a card there, and `--diff` a compare card (`fux-serve`) |

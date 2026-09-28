@@ -140,6 +140,10 @@ def test_parser_has_the_verb_surface():
         # checks the ENVIRONMENT, whose fix is a command or a config edit, and
         # `inspect` checks the INDEX, whose fix is a change to the corpus.
         "inspect",
+        # SR-IDENTIFIERS (W-233, F1). A verb rather than a flag on `inspect`,
+        # because it WRITES: `inspect` is read-only by contract, and the one
+        # table it proposes is recorded only when a person asks for it.
+        "identifiers",
         # SR-CLI decision 12 (W-160). The lexical core, named and FROZEN.
         # `ask --scan` already computed it; the verb makes it a contract, so
         # that when W-161 gives `ask` a graph tier there is still a verb whose

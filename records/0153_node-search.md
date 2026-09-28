@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@65dba72ffa5d, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@7c0799c17104, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 757785f615444c5c6a5bc59b43a36c85d97a3650e9ffcbfcc1d771a63f098c8d
+content_sha: 747f163a297eaec0204f7d7b367d3c8d5deea344125c2e75abad050f18db9780
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -921,6 +921,9 @@ this moved where they are written, not what they are.
 **Node's boolean defaults went with Python's** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28): `runQuery`, `runAsk`, `tiers`, `expand`/`ppr` and `OutputDefaults.resolve` take them explicitly, and `runQuery` throws on a missing one. `Index.ask`/`answer` read `.fux/output.toml [api]` ([SR-OUTPUT](0143_output-defaults.md) decision 25).
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+
+**The Node reader analyzes every question with the repo's identifier families**, loaded by `identifiersFor(root)` from `.fux/identifiers.toml`, exactly as Python does; the twin is `node/src/query/identifiers.mjs`, held to Python's by one shared fixture ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 ### Consequences
 

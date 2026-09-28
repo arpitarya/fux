@@ -1,0 +1,144 @@
+{
+  "documents": 100,
+  "families": [
+    {
+      "docs": 3,
+      "examples": [
+        "LQ-51",
+        "LQ-52",
+        "LQ-53"
+      ],
+      "template": "LQ-{n}",
+      "values": 3
+    },
+    {
+      "docs": 2,
+      "examples": [
+        "MBK-D4",
+        "MBK-Q2",
+        "MBK-Q5"
+      ],
+      "template": "MBK-{X}{n}",
+      "values": 3
+    },
+    {
+      "docs": 2,
+      "examples": [
+        "NGP-MNT-552",
+        "NGP-MNT-731",
+        "NGP-PNR-18"
+      ],
+      "template": "NGP-{X}-{n}",
+      "values": 3
+    },
+    {
+      "docs": 6,
+      "examples": [
+        "PROJ-123",
+        "PROJ-124",
+        "PROJ-125"
+      ],
+      "template": "PROJ-{n}",
+      "values": 3
+    },
+    {
+      "docs": 19,
+      "examples": [
+        "QCL-F-09",
+        "QCL-F-12",
+        "QCL-F-17"
+      ],
+      "template": "QCL-F-{n}",
+      "values": 11
+    },
+    {
+      "docs": 5,
+      "examples": [
+        "QCL-OPS-NH3-01",
+        "QCL-OPS-NH3-02",
+        "QCL-OPS-NH3-03"
+      ],
+      "template": "QCL-OPS-NH{n}-{n}",
+      "values": 5
+    },
+    {
+      "docs": 37,
+      "examples": [
+        "QCL-CS-HBK-01",
+        "QCL-CS-MTX-02",
+        "QCL-CS-MTX-03"
+      ],
+      "template": "QCL-{X}-{X}-{n}",
+      "values": 34
+    },
+    {
+      "docs": 12,
+      "examples": [
+        "RF-117",
+        "RF-118",
+        "RF-119"
+      ],
+      "template": "RF-{n}",
+      "values": 6
+    },
+    {
+      "docs": 5,
+      "examples": [
+        "TMS-41",
+        "TMS-42",
+        "TMS-43"
+      ],
+      "template": "TMS-{n}",
+      "values": 4
+    },
+    {
+      "docs": 4,
+      "examples": [
+        "TSL-NGP-C2-07",
+        "TSL-NGP-C3-02",
+        "TSL-NGP-F1-04"
+      ],
+      "template": "TSL-NGP-{X}{n}-{n}",
+      "values": 3
+    },
+    {
+      "docs": 4,
+      "examples": [
+        "TSL-RF-118-A",
+        "TSL-RF-119-A",
+        "TSL-RF-120-A"
+      ],
+      "template": "TSL-RF-{n}-A",
+      "values": 4
+    },
+    {
+      "docs": 4,
+      "examples": [
+        "WIKI-HFP-DOCK-12",
+        "WIKI-NGP-DOCK-12",
+        "WIKI-NGP-DOCK-41"
+      ],
+      "template": "WIKI-{X}-{X}-{n}",
+      "values": 4
+    }
+  ],
+  "gone": [],
+  "new": [
+    "LQ-{n}",
+    "MBK-{X}{n}",
+    "NGP-{X}-{n}",
+    "PROJ-{n}",
+    "QCL-F-{n}",
+    "QCL-OPS-NH{n}-{n}",
+    "QCL-{X}-{X}-{n}",
+    "RF-{n}",
+    "TMS-{n}",
+    "TSL-NGP-{X}{n}-{n}",
+    "TSL-RF-{n}-A",
+    "WIKI-{X}-{X}-{n}"
+  ],
+  "user": {
+    "rules": []
+  },
+  "written": true
+}

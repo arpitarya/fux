@@ -21,6 +21,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | which documents come back first, confidence floors, how much of a document is indexed | `.fux/tune.toml` | `fux setup` once; `fux tune` prints the defaults |
 | how results are shown — band, top, json, sections, hops | `.fux/output.toml` | `fux setup` once; `fux output` prints the defaults |
 | what is redacted from the index | `.fux/pii.toml` | see `fux-pii` |
+| which IDs are kept whole however typed (`RF 118` = `RF-118`) | `.fux/identifiers.toml` | `fux setup` once, both tables empty; `[user]` by hand (it wins), `[detected]` only by `fux identifiers --write`. **Changes the index** — `fux ingest` after, and `fux doctor` says when the index was built under other families |
 
 **Fux never rewrites any of them.** `fux tune` and `fux output` read no
 repository — they print the **engine defaults**, not this repo's values.

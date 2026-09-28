@@ -278,7 +278,9 @@ def _related(root: Path, plane, query: str, walked, in_window: dict[str, int], t
 
     kinds = frozenset(tune.ask_kinds.split(","))
 
-    hashes = set(query_term_hashes(query))
+    from . import identifiers as ids_mod
+
+    hashes = set(query_term_hashes(query, ids_mod.for_root(root)))
     out: list[Related] = []
     for node, mass in walked:
         if node in in_window or len(out) >= tune.ask_related_limit:

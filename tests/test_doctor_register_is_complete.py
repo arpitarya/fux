@@ -43,6 +43,10 @@ RECORD = ROOT / "records" / "0152_doctor.md"
 #: cover rows nobody meant to exempt, which is how a gate stops gating.
 CONDITIONAL = {
     "url daemon": "`_daemon` returns None unless a refresh daemon is configured",
+    # W-233: the three rows about an INDEX need one; the parity row needs a [user] regex.
+    "identifier families indexed": "`_identifiers` reports it only when an index exists",
+    "identifier families current": "`_identifiers` reports it only when an index exists",
+    "identifier regex parity": "`_identifiers` reports it only when `[user] regex` is non-empty",
 }
 
 

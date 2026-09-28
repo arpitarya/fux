@@ -30,6 +30,7 @@ import { runFused } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";
 import { recordFor } from "../store/reader.mjs";
 import { queryTermHashes } from "../query/scan.mjs";
+import { identifiersFor } from "../query/identifiers.mjs";
 import { analyze } from "../query/analyzer.mjs";
 import { phrasePresent, readLocalText } from "../query/rerank.mjs";
 import { fixed } from "../config/constants.mjs";
@@ -66,7 +67,7 @@ function filtered(root, results, query, args) {
   if (requireAll) {
     // Over the COMMITTED record's terms — never fetched text. `find` is an
     // offline verb and the whole point of `--all` is that it is cheap.
-    const wanted = queryTermHashes(query);
+    const wanted = queryTermHashes(query, identifiersFor(root));
     kept = kept.filter((r) => {
       const terms = recordFor(root, r.id)?.terms ?? {};
       return wanted.every((h) => h in terms);

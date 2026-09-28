@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@232892e6641d, src/fux/query/intent.py@fa4902c6d3fe, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@5c3582a2128f, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@9216e1d47097, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@1a1dd7794ab6, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
+owns: [src/fux/query/rank.py@232892e6641d, src/fux/query/intent.py@fa4902c6d3fe, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@63f4c4872bd7, src/fux/query/analyzer.py@8f02dd1c4e44, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@71890f0ff70a, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@1a1dd7794ab6, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@352450f33e0c, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 3b6fe8a536dde971b8842e0bff974590e4fbd48b38d865177d7ac32243476807
+content_sha: 5ee78cde411e905f8823f63ab4a6901445164b057a584060d6e5512b55a48d46
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -618,7 +618,10 @@ intent_weight`. `of(record)` is `priority_for(loc) × intent_for(loc)`, and
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
-**The analyzer's built-in stopwords are `constants.toml [analyzer] stopwords`**, read by both planes ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28); a repo still adds its own in `tune.toml [index]`. Every posting is unchanged.
+**The analyzer's built-in stopwords are `constants.toml [analyzer] stopwords`**, read by both planes ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28); a repo cannot add its own — no key reads one. Every posting is unchanged.
+
+
+**The analyzer takes one more input: the repo's identifier families** ([SR-IDENTIFIERS](0160_identifiers.md)). Each match adds one canonical term beside the pipeline above and changes none of its steps; with no families the output is analyzer v3's, byte for byte, and `ANALYZER_VERSION` stays `v3` because the engine's pipeline did not change.
 
 ### Consequences
 

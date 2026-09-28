@@ -182,7 +182,29 @@ def test_reusable_refuses_a_header_that_is_not_the_current_one(corpus, monkeypat
     # sys.modules under the same dotted path.
     run_mod = sys.modules["fux.ingest.run"]
     monkeypatch.setattr(run_mod.store_mod, "HEADER", dict(HEADER, tf_fields=["body"]))
+    # W-233: the header ingest EXPECTS is built by `format.header_for`, which
+    # reads `format.HEADER` — patch it there too, or the gate never sees it.
+    monkeypatch.setattr(sys.modules["fux.store.format"], "HEADER", dict(HEADER, tf_fields=["body"]))
     assert run(corpus, refresh_urls=False, full=False).reused_count == 0
+
+
+def test_reusable_refuses_an_index_built_under_other_identifier_families(corpus):
+    """W-233: editing `.fux/identifiers.toml` re-analyses every document, and
+    reverting it does the same — the digest in the header is the gate."""
+    from fux.query import identifiers as ids_mod
+
+    assert run(corpus, refresh_urls=False, full=False).reused_count > 0
+    path = ids_mod.path(corpus)
+    original = path.read_text(encoding="utf-8")
+    path.write_text('[user]\nkeep = ["RF-{n}"]\n', encoding="utf-8")
+    assert run(corpus, refresh_urls=False, full=False).reused_count == 0
+    header, _ = read_shard(iter_shard_paths(corpus)[0])
+    assert header["identifiers"] == ids_mod.load(corpus).digest
+    assert run(corpus, refresh_urls=False, full=False).reused_count > 0
+    path.write_text(original, encoding="utf-8")
+    assert run(corpus, refresh_urls=False, full=False).reused_count == 0
+    header, _ = read_shard(iter_shard_paths(corpus)[0])
+    assert "identifiers" not in header
 
 
 def test_full_forces_re_extraction(corpus):

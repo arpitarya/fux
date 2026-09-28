@@ -43,7 +43,7 @@ from ..constants import fixed
 #: document's `Long Form (ABBR)` pairs. Redundant with the `_format` bump to
 #: v5, which already forces re-extraction; bumped anyway because the rule this
 #: constant enforces is about what this module returns, and it now returns more.
-RULES_VERSION = fixed("versions", "extract_rules")  # not bumped by W-234: law handles in comments only
+RULES_VERSION = fixed("versions", "extract_rules")  # not bumped by W-233: no families = identical output; families are gated by the header digest
 
 import re
 from collections import Counter
@@ -52,6 +52,7 @@ from pathlib import Path
 
 from ..decode._markdown import headings as _md_headings
 from ..decode._markdown import strip_headings as _md_strip_headings
+from ..query.identifiers import EMPTY, IdentifierRules
 from ..query.tokenize import tokenize
 from .parse import ParsedDoc, meta_fields
 
@@ -169,6 +170,7 @@ def extract_fields(
     *,
     max_phrases: int,
     root: Path | None = None,
+    ids: IdentifierRules = EMPTY,
 ) -> Extracted:
     # W-86 P0: the heading grammar follows the file type. A decoded document
     # always arrives as Markdown (SR-DECODE decision 2), so only an
@@ -180,17 +182,17 @@ def extract_fields(
     # `title` now has its own field, so it is no longer folded into the
     # heading tokens. Under two fields it had to be (there was nowhere else to
     # put it); doing so now would double-count every title word.
-    heading_tokens = tokenize(" ".join(headings))
+    heading_tokens = tokenize(" ".join(headings), ids)
     # Strip heading lines out of body text too — without this a heading's
     # words would count twice: once as heading tf, once as body tf, diluting
     # "heading match outranks body match". `_headings_and_body` did the strip
     # with the same grammar that found them, so the two cannot disagree.
-    body_tokens = tokenize(stripped_body)
-    title_tokens = tokenize(title)
+    body_tokens = tokenize(stripped_body, ids)
+    title_tokens = tokenize(title, ids)
     # Path segments and the split filename — "where is X" queries. The
     # analyzer's identifier splitting does the work here: `docs/adr-storage.md`
     # yields `docs`, `adr`, `storage`, `md`.
-    path_tokens = tokenize(rel_path.replace("/", " ").replace(".", " "))
+    path_tokens = tokenize(rel_path.replace("/", " ").replace(".", " "), ids)
     # `ctx` — Phase 8's enrichment field. **Pinned TEXT, tokenized like any
     # other field**: by the time it reaches here a model has already run, in an
     # agent, in a separate command, and what fux consumes is a committed file.
@@ -200,7 +202,7 @@ def extract_fields(
     # Empty when a document has no enrichment -- which is the steady state for
     # most corpora and costs nothing: a per-field count of 0 is a trailing zero
     # and is not written at all.
-    ctx_tokens = tokenize(enrichment) if enrichment else []
+    ctx_tokens = tokenize(enrichment, ids) if enrichment else []
 
     # 🔴 **Front-matter identity values, appended to the field the resolver
     # chose** (SR-INGEST decision 23). Until 2026-09-21 `meta` was dropped
@@ -223,7 +225,7 @@ def extract_fields(
     decoder = _decoder_for(rel_path, root) if doc.meta else None
     for key, field_name in meta_fields(decoder, root).items():
         for value in _meta_values(doc.meta.get(key)):
-            by_field[field_name].extend(tokenize(value))
+            by_field[field_name].extend(tokenize(value, ids))
 
     per_field = (body_tokens, heading_tokens, title_tokens, path_tokens, ctx_tokens)
     terms = _term_freqs(per_field)

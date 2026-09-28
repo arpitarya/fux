@@ -22,6 +22,30 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-233 built and measured PASS: identifier families, kept whole however typed  ·  Claude Code (Opus)
+- **Asked:** *"implement w-233"*.
+- **Did:**
+  - DoD 1, the [fixture](regression/2026-09-28-identifier-fixture/report.md): after v3 an ID breaks on SPELLING, not scoring. `RF 118`, `RF–118` and `ADR-4` put a parts-neighbour first; `rf118`, `2.3.1` and a sha prefix reach nothing. Stemming touches no whole form, and an exact query ranks first 7 of 7.
+  - DoD 2, the [compare doc](compare/identifiers-whole.compare.md): (e) + (d) per family, S1–S8 inside F1–F5.
+  - `cca32152`: the pre-registration, frozen with generated query sets (115 / 451 / 433) before any build.
+  - The build:
+    - `query/identifiers.py` and its Node twin, held by one shared fixture;
+    - `analyze(text, ids)` threaded on every index-matching path, held by a static test;
+    - the rules digest in every shard header;
+    - `fux identifiers [--write]`, four doctor rows, the `ingest --check` families drift, inspect §12 and the serve Identifiers tab;
+    - SR-IDENTIFIERS, plus 27 records amended.
+  - The run ([verdict](regression/2026-09-28-identifier-families/VERDICT.md)): **PASS**. Net +25 / +88 / +105 with 0 broken; exact 100 % in both arms; E3 0 of 60; G1–G3 hold; index +0.3 %.
+  - Closed W-233 into `archive/open/`.
+- **Decided / open:**
+  - S4 changed from the draft: the digest went into the shard header, not `runtime/`, because `ingest --check` compares only shas and a fresh clone has no `runtime/`.
+  - F3's parity compares Python `re` with V8 directly over corpus text, so the bundle's public API is unchanged.
+  - Fixed on the way: `inspect.toml` was undeclared in `.fux/`, and SR-RANKING and `constants.toml` claimed a repo could add stopwords, which it cannot.
+- **Watch:**
+  - The PASS is a mechanism result on the ladder's own IDs, not evidence about real query spellings.
+  - The document-side shapes (a Unicode dash in the document, a URL, `#nnn`, hex) are fixture-tested only; they are named for the next generation of test data.
+  - Still red and not mine: `999c19761` / SR-TUNE, and W-232's `anchor-mined` directories and row length.
+- **Next:** nothing on W-233. The inbox is unchanged.
+
 ## 2026-09-28 — W-232: the shipped anchor + mined pair, two bars, one STOP, three arms captured on set-3-claude  ·  Claude Code (Opus)
 - **Asked:** *"implement w-232"*.
 - **Did:**

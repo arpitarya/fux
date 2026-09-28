@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 1a60bb50c8d078dbeeb42e49f775641e84680757ac83a21a61af89b9a3ab830f
+content_sha: 549502a66b32408f60d776198d598a5d042670fe21ad2c9f8aed94161b9f4fdd
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -868,6 +868,9 @@ reader is shown**, which is what this record requires. Off by default, and then
 nothing here changes.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+
+The confidence block's pairs and hashes are both analyzed with the repo's identifier families, together, so they stay aligned by hash ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 ### Consequences
 

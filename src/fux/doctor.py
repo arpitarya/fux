@@ -299,6 +299,7 @@ def _layout(root: Path) -> list[Check]:
     )
     checks.append(_output_config_health(root))
     checks.append(_tune_config_health(root))
+    checks.extend(_identifiers(root))
     checks.append(_types_health(root))
     checks.append(_ignore_health(root))
     checks.append(_dirs_exclusions_migrated(root))
@@ -1749,6 +1750,113 @@ def _output_config_health(root: Path) -> Check:
     except _FuxError as exc:
         return Check("output.toml present", False, f"{exc}")
     return Check("output.toml present", True, f"{output_config.OUTPUT_NAME}: parsed, every key valid")
+
+
+def _identifiers(root: Path) -> list[Check]:
+    """W-233 — `.fux/identifiers.toml`: loads, the index agrees, families current,
+    and a `[user]` regex behaves the same in both readers (F1–F3).
+
+    **Four rows, and only the second is about the index.** A file that does not
+    load stops `ingest`, `ask` and `find` alike, so it is an error. An index
+    built under other families is an error too: the committed postings and the
+    committed file disagree, and a question is analyzed under the file — which
+    is exactly the state `fux ingest --check` fails CI on. New families found
+    since the last write are a warning (F2): nothing is wrong, fux has only
+    noticed something. The parity row runs only when a `[user]` regex exists;
+    a template's two readers are held equal by the engine's own shared fixture.
+    """
+    from . import store as store_mod
+    from .query import identifiers as ids_mod
+
+    try:
+        rules = ids_mod.load(root)
+    except FuxError as exc:
+        return [Check(
+            "identifiers.toml loads",
+            False,
+            f"{exc} - `ingest`, `ask` and `find` refuse while this stands; "
+            "`fux doctor --fix` restores a missing file",
+        )]
+    user_regex = [r for r in rules.rules if r.kind == "regex"]
+    checks = [Check(
+        "identifiers.toml loads",
+        True,
+        f"{ids_mod.FILE}: {len(rules.rules)} famil{'y' if len(rules.rules) == 1 else 'ies'}"
+        + (f", {len(user_regex)} of them [user] regex" if user_regex else ""),
+    )]
+    header = store_mod.index_header(root)
+    if header is None:
+        return checks
+    built = header.get(store_mod.IDENTIFIERS_KEY, "")
+    checks.append(Check(
+        "identifier families indexed",
+        built == rules.digest,
+        "the index was built under the families in the file"
+        if built == rules.digest
+        else f"the index was built under OTHER identifier families than {ids_mod.FILE} holds "
+        "- run `fux ingest`; until then a question gains canonical terms the index lacks",
+    ))
+    checks.append(_identifier_families_current(root))
+    if user_regex:
+        checks.append(_identifier_regex_parity(root, user_regex))
+    return checks
+
+
+def _identifier_families_current(root: Path) -> Check:
+    """F2: `[detected]` against what the lens finds now. A warning, never an error."""
+    import tomllib
+
+    from .inspect._scan import read_index_view
+    from .inspect.idfamilies import identifier_families
+    from .query import identifiers as ids_mod
+
+    try:
+        view = read_index_view(root)
+        found = {f.template for f in identifier_families(root, view, examples=0).families}
+        data = tomllib.loads(ids_mod.path(root).read_bytes().decode("utf-8-sig"))
+    except (FuxError, OSError) as exc:
+        return Check("identifier families current", True, f"skipped: {exc}", level="warn")
+    on_disk = set((data.get("detected") or {}).get("families") or [])
+    new, gone = found - on_disk, on_disk - found
+    if not (new or gone):
+        return Check("identifier families current", True, f"[detected] matches the {len(found)} the lens finds", level="warn")
+    return Check(
+        "identifier families current",
+        False,
+        f"{len(new)} new famil{'y' if len(new) == 1 else 'ies'} since the last write"
+        + (f" (e.g. {sorted(new)[0]})" if new else "")
+        + (f", {len(gone)} no longer detected" if gone else "")
+        + " - `fux identifiers` shows them, `fux identifiers --write` records them",
+        level="warn",
+    )
+
+
+def _identifier_regex_parity(root: Path, regexes) -> Check:
+    """F3: each `[user]` regex, run by BOTH regex engines over this corpus.
+
+    The first `inspect.toml [identifiers] parity_sample` indexed documents, in id
+    order, are matched by Python `re` and by `node` running the same compiled
+    source; any difference in the spans found is a FAIL naming the regex and
+    the document. That is the one thing the static guard cannot prove: that two
+    engines read an admitted pattern the same way on this corpus's text.
+    """
+    from itertools import islice
+
+    from .inspect._scan import read_index_view
+    from .inspect.idfamilies import corpus_texts, regex_parity
+    from .query.identifiers import IdentifierRules
+
+    view = read_index_view(root)
+    texts = list(islice(corpus_texts(root, view), view.config.parity_sample))
+    for rule in regexes:
+        parity = regex_parity(IdentifierRules(rules=(rule,)), texts)
+        if not parity.ran:
+            return Check("identifier regex parity", True, "skipped: needs `node` on PATH", level="warn")
+        if not parity.agree:
+            return Check("identifier regex parity", False,
+                         f"[user] regex {rule.source!r}: {parity.diff} - rewrite it as a template, or narrow it")
+    return Check("identifier regex parity", True,
+                 f"{len(regexes)} [user] regex agree in Python and Node over {len(texts)} documents")
 
 
 def _tune_config_health(root: Path) -> Check:

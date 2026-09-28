@@ -15,6 +15,7 @@
 
 import { stem } from "./stem.mjs";
 import { fixed } from "../config/constants.mjs";
+import { EMPTY } from "./identifiers.mjs";
 
 /** Matched against the ORIGINAL text, not a lowercased copy.
  *
@@ -49,8 +50,13 @@ export function splitIdentifier(raw) {
 }
 
 /** Text to final analyzed terms, in document order, WITH duplicates.
- *  Duplicates are the point: the caller counts them into a term frequency. */
-export function analyze(text) {
+ *  Duplicates are the point: the caller counts them into a term frequency.
+ *
+ *  `ids` — the repo's identifier families (W-233): each match adds ONE
+ *  canonical term beside everything below. With none this is the v3 loop,
+ *  byte for byte. */
+export function analyze(text, ids = EMPTY) {
+  if (ids.rules.length) return withFamilies(text, ids).map((p) => p[1]);
   const out = [];
   const matches = text.match(WORD_RE);
   if (!matches) return out;
@@ -73,7 +79,8 @@ export function analyze(text) {
  *  ⚠ Duplicates `analyze`'s loop deliberately, exactly as Python does, and for
  *  the same reason: `analyze` runs over every token at ingest, and allocating
  *  a pair per token to serve a per-query diagnostic is the wrong trade. */
-export function analyzePairs(text) {
+export function analyzePairs(text, ids = EMPTY) {
+  if (ids.rules.length) return withFamilies(text, ids);
   const out = [];
   const matches = text.match(WORD_RE);
   if (!matches) return out;
@@ -84,6 +91,44 @@ export function analyzePairs(text) {
       out.push([token, stem(lowered)]);
     }
   }
+  return out;
+}
+
+/** `[surface, analyzed]` for v3's terms plus one canonical term per family
+ *  match. Twin of Python's `_with_families`, and the placement rule is the
+ *  one both readers must agree on: a canonical term goes immediately before
+ *  the first raw token that starts at or after the match's start, or after
+ *  the last token when none does. A match adds nothing when v3 already emitted
+ *  the same term for the same span. Never stopworded, never stemmed. */
+function withFamilies(text, ids) {
+  const raws = [];
+  const rx = new RegExp(WORD_RE.source, "g");
+  let m;
+  while ((m = rx.exec(text)) !== null) raws.push([m.index, m.index + m[0].length, m[0]]);
+  // What v3 actually EMITTED for each whole raw token — its stem, or nothing
+  // for a stopword — never the raw spelling (an all-letter canonical term
+  // whose v3 whole form was stemmed away must still be added).
+  const spans = new Map(
+    raws.map(([s, e, r]) => [`${s}:${e}`, STOPWORDS.has(r.toLowerCase()) ? null : stem(r.toLowerCase())]),
+  );
+  const extras = ids
+    .matches(text)
+    .filter(([s, e, c]) => spans.get(`${s}:${e}`) !== c)
+    .map(([s, e, c]) => [s, text.slice(s, e), c]);
+  const out = [];
+  let k = 0;
+  for (const [start, , raw] of raws) {
+    while (k < extras.length && extras[k][0] <= start) {
+      out.push([extras[k][1], extras[k][2]]);
+      k += 1;
+    }
+    for (const token of [raw, ...splitIdentifier(raw)]) {
+      const lowered = token.toLowerCase();
+      if (STOPWORDS.has(lowered)) continue;
+      out.push([token, stem(lowered)]);
+    }
+  }
+  for (; k < extras.length; k += 1) out.push([extras[k][1], extras[k][2]]);
   return out;
 }
 

@@ -585,9 +585,17 @@ def derive(
     is what makes the `in window` gate and the cut line real rather than a
     restatement of `placed`.
     """
+    from . import identifiers as ids_mod
     from .analyzer import analyze_pairs
     from .scan import query_term_hashes
 
+    # W-233: aligned by hash with the ranking, so analyzed with the same
+    # families. This function never raises; a query that reached it already
+    # loaded the file, so a failure here can only be a broken test double.
+    try:
+        ids = ids_mod.for_root(root)
+    except Exception:
+        ids = ids_mod.EMPTY
     stats = stats or {}
     df_map = stats.get("df") or {}
     n = int(stats.get("n", 0) or 0)
@@ -602,11 +610,11 @@ def derive(
     scoring = stats.get("scoring")
 
     try:
-        pairs = list(analyze_pairs(query))
+        pairs = list(analyze_pairs(query, ids))
     except Exception:
         pairs = []
     try:
-        hashes = list(query_term_hashes(query))
+        hashes = list(query_term_hashes(query, ids))
     except Exception:
         hashes = []
     # ⚠ **`query_term_hashes` DEDUPES on the hash and `analyze_pairs` does
@@ -635,7 +643,7 @@ def derive(
     if expand:
         try:
             seen = set(hashes)
-            for surface, analyzed in analyze_pairs(expand):
+            for surface, analyzed in analyze_pairs(expand, ids):
                 h = store_mod.term_hash(analyzed)
                 if h in seen:
                     continue

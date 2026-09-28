@@ -1,0 +1,170 @@
+{
+  "E3": {
+    "changed_ids": [],
+    "questions": 60,
+    "rank1_changed": 0
+  },
+  "gates": {
+    "g1.txt": "G1 PASS",
+    "g2-rung-00100.txt": "G2 PASS: two from-scratch after-arm builds byte-identical on rung-00100",
+    "g2-rung-01000.txt": "G2 PASS: two from-scratch after-arm builds byte-identical on rung-01000",
+    "g2-rung-10000.txt": "G2 PASS: two from-scratch after-arm builds byte-identical on rung-10000",
+    "g3-rung-01000.txt": "G3 PASS: empty identifiers.toml -> byte-identical .fux/index on rung-01000"
+  },
+  "rungs": {
+    "rung-00100": {
+      "E1": {
+        "after_hit1": 87,
+        "before_hit1": 62,
+        "broke": 0,
+        "by_variant": {
+          "endash": {
+            "after_hit1": 28,
+            "before_hit1": 25,
+            "n": 28
+          },
+          "nosep": {
+            "after_hit1": 21,
+            "before_hit1": 6,
+            "n": 21
+          },
+          "space": {
+            "after_hit1": 28,
+            "before_hit1": 25,
+            "n": 28
+          },
+          "unpadded": {
+            "after_hit1": 10,
+            "before_hit1": 6,
+            "n": 10
+          }
+        },
+        "fixed": 25,
+        "headroom_improvement": 25,
+        "headroom_regression": 62,
+        "net": 25,
+        "queries": 87
+      },
+      "E2": {
+        "after_hit1": 28,
+        "before_hit1": 28,
+        "broke": 0,
+        "by_variant": {
+          "exact": {
+            "after_hit1": 28,
+            "before_hit1": 28,
+            "n": 28
+          }
+        },
+        "fixed": 0,
+        "headroom_improvement": 0,
+        "headroom_regression": 28,
+        "net": 0,
+        "queries": 28
+      }
+    },
+    "rung-01000": {
+      "E1": {
+        "after_hit1": 332,
+        "before_hit1": 244,
+        "broke": 0,
+        "by_variant": {
+          "endash": {
+            "after_hit1": 119,
+            "before_hit1": 114,
+            "n": 119
+          },
+          "nosep": {
+            "after_hit1": 84,
+            "before_hit1": 10,
+            "n": 84
+          },
+          "space": {
+            "after_hit1": 119,
+            "before_hit1": 114,
+            "n": 119
+          },
+          "unpadded": {
+            "after_hit1": 10,
+            "before_hit1": 6,
+            "n": 10
+          }
+        },
+        "fixed": 88,
+        "headroom_improvement": 88,
+        "headroom_regression": 244,
+        "net": 88,
+        "queries": 332
+      },
+      "E2": {
+        "after_hit1": 119,
+        "before_hit1": 119,
+        "broke": 0,
+        "by_variant": {
+          "exact": {
+            "after_hit1": 119,
+            "before_hit1": 119,
+            "n": 119
+          }
+        },
+        "fixed": 0,
+        "headroom_improvement": 0,
+        "headroom_regression": 119,
+        "net": 0,
+        "queries": 119
+      }
+    },
+    "rung-10000": {
+      "E1": {
+        "after_hit1": 320,
+        "before_hit1": 215,
+        "broke": 0,
+        "by_variant": {
+          "endash": {
+            "after_hit1": 113,
+            "before_hit1": 101,
+            "n": 113
+          },
+          "nosep": {
+            "after_hit1": 84,
+            "before_hit1": 7,
+            "n": 84
+          },
+          "space": {
+            "after_hit1": 113,
+            "before_hit1": 101,
+            "n": 113
+          },
+          "unpadded": {
+            "after_hit1": 10,
+            "before_hit1": 6,
+            "n": 10
+          }
+        },
+        "fixed": 105,
+        "headroom_improvement": 105,
+        "headroom_regression": 215,
+        "net": 105,
+        "queries": 320
+      },
+      "E2": {
+        "after_hit1": 113,
+        "before_hit1": 113,
+        "broke": 0,
+        "by_variant": {
+          "exact": {
+            "after_hit1": 113,
+            "before_hit1": 113,
+            "n": 113
+          }
+        },
+        "fixed": 0,
+        "headroom_improvement": 0,
+        "headroom_regression": 113,
+        "net": 0,
+        "queries": 113
+      }
+    }
+  },
+  "verdict": "PASS"
+}

@@ -51,6 +51,7 @@ from __future__ import annotations
 import re
 
 from ..constants import fixed
+from .identifiers import EMPTY, IdentifierRules
 from .stem import stem as _stem
 
 #: Matched against the ORIGINAL text, not a lowercased copy — see the module
@@ -106,23 +107,64 @@ def split_identifier(raw: str) -> list[str]:
     return [p for p in parts if len(p) > 1]
 
 
-def analyze(text: str) -> list[str]:
+def analyze(text: str, ids: IdentifierRules = EMPTY) -> list[str]:
     """Text to final analyzed terms, in document order, WITH duplicates.
 
     Duplicates are the point: the caller counts them into a term frequency.
     Returning a set here would silently flatten every tf to 1.
+
+    **`ids` — the repo's identifier families (W-233).** Each family match adds
+    ONE term, its canonical form, beside everything below; nothing below
+    changes. With no families this is the v3 loop, byte for byte, which is what
+    makes an empty `.fux/identifiers.toml` a rollback. See `_with_families`.
     """
-    out: list[str] = []
-    for raw in _WORD_RE.findall(text):
+    if not ids.rules:
+        out: list[str] = []
+        for raw in _WORD_RE.findall(text):
+            for token in (raw, *split_identifier(raw)):
+                lowered = token.lower()
+                if lowered in _STOPWORDS:
+                    continue
+                out.append(_stem(lowered))
+        return out
+    return [a for _, a in _with_families(text, ids)]
+
+
+def _with_families(text: str, ids: IdentifierRules) -> list[tuple[str, str]]:
+    """`(surface, analyzed)` for v3's terms plus one canonical term per match.
+
+    🔴 **Where a canonical term goes, stated once because both readers must
+    agree on it:** immediately before the first v3 raw token that starts at or
+    after the match's start; after the last token when none does. A match
+    inside a longer token (`RF-118` in `example.com/wiki/RF-118`) therefore
+    follows that token's terms.
+
+    **A match adds nothing when v3 already emitted the same term for the same
+    span** — `RF-118` written plainly costs zero postings. Canonical terms are
+    never stopworded and never stemmed (F4: the whole form stays as written).
+    """
+    raws = [(m.start(), m.end(), m.group(0)) for m in _WORD_RE.finditer(text)]
+    # What v3 actually EMITTED for each whole raw token — its stem, or nothing
+    # for a stopword. Comparing against the raw spelling instead would drop an
+    # all-letter canonical term whose v3 whole form was stemmed away.
+    spans = {(s, e): (None if r.lower() in _STOPWORDS else _stem(r.lower())) for s, e, r in raws}
+    extras = [(s, text[s:e], c) for s, e, c in ids.matches(text) if spans.get((s, e)) != c]
+    out: list[tuple[str, str]] = []
+    k = 0
+    for start, _end, raw in raws:
+        while k < len(extras) and extras[k][0] <= start:
+            out.append((extras[k][1], extras[k][2]))
+            k += 1
         for token in (raw, *split_identifier(raw)):
             lowered = token.lower()
             if lowered in _STOPWORDS:
                 continue
-            out.append(_stem(lowered))
+            out.append((token, _stem(lowered)))
+    out.extend((surface, canon) for _, surface, canon in extras[k:])
     return out
 
 
-def analyze_pairs(text: str) -> list[tuple[str, str]]:
+def analyze_pairs(text: str, ids: IdentifierRules = EMPTY) -> list[tuple[str, str]]:
     """`(surface, analyzed)` for every term `analyze` produces, same order.
 
     **What this is for.** An analyzed term is what the index is keyed by; it is
@@ -146,6 +188,8 @@ def analyze_pairs(text: str) -> list[tuple[str, str]]:
     yields `('getUserName', 'getusernam')`, `('User', 'user')`,
     `('Name', 'name')`.
     """
+    if ids.rules:
+        return _with_families(text, ids)
     out: list[tuple[str, str]] = []
     for raw in _WORD_RE.findall(text):
         for token in (raw, *split_identifier(raw)):

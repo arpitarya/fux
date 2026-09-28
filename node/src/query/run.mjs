@@ -33,6 +33,7 @@ import { headingsFor } from "./headings.mjs";
 import { fuseResults } from "./fuse.mjs";
 import * as expandMod from "./expand.mjs";
 import { tokenizePairs } from "./tokenize.mjs";
+import { identifiersFor } from "./identifiers.mjs";
 import { rerank } from "./rerank.mjs";
 import { applyPin } from "../correct.mjs";
 import { loadTune } from "../config/tune.mjs";
@@ -79,10 +80,10 @@ function maybeRerank(root, query, results, tune, top) {
 /** The confidence block, or `null`. **Never throws** — a signal that can fail a
  *  query is worse than no signal, and a caller that gets nothing sees an absent
  *  key, which is the honest report of *"not computed"*. */
-function buildConfidence(query, stats, results, tune) {
+function buildConfidence(query, stats, results, tune, ids) {
   try {
     return signals(
-      tokenizePairs(query), queryTermHashes(query),
+      tokenizePairs(query, ids), queryTermHashes(query, ids),
       stats.df ?? {}, stats.n ?? 0, results.map((r) => r.score),
       {
         verified: "unverified",
@@ -125,7 +126,7 @@ function bandGuard(root, query, statsOut, results) {
     const record = recordFor(root, results[0].id);
     if (record === null || record === undefined) return;
     const terms = record.terms ?? {};
-    const shown = queryTermHashes(query).filter((h) => h in terms);
+    const shown = queryTermHashes(query, identifiersFor(root)).filter((h) => h in terms);
     const df = statsOut.df ?? {};
     const n = statsOut.n ?? 0;
     const weight = (hashes) => hashes.reduce((sum, h) => sum + idf(df[h] ?? 0, n), 0);
@@ -189,9 +190,11 @@ export function runQuery(root, query, top, {
   const graphOn = resolved.askBoost || resolved.askRelated;
   const depth = (rerankWeight > 0 || graphOn) ? Math.max(top, resolved.rerankDepth) : top;
 
-  const queryHashes = queryTermHashes(query);
+  // W-233: the families the index was written with (`RF 118` -> `rf-118`).
+  const ids = identifiersFor(root);
+  const queryHashes = queryTermHashes(query, ids);
   let expansion = expandMod.build(
-    queryHashes, expand ? queryTermHashes(expand) : [], resolved.expandWeight,
+    queryHashes, expand ? queryTermHashes(expand, ids) : [], resolved.expandWeight,
   );
   // W-168 step 4 — corpus-mined expansion. Off at 0.0, and off reads no pair.
   // Folded over the user's words only; stacks on `--expand`, whose hashes keep
@@ -238,7 +241,7 @@ export function runQuery(root, query, top, {
     // or NOT AVAILABLE, and `[]` means *no neighbours*. The `--json` key is
     // omitted on `null`, which is the distinction the schema declares.
     related: resolved.askRelated ? split.related : null,
-    confidence: wantConfidence ? buildConfidence(query, statsOut, results, resolved) : null,
+    confidence: wantConfidence ? buildConfidence(query, statsOut, results, resolved, ids) : null,
     queryHashes,
     stats: statsOut,
     window,

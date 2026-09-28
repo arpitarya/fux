@@ -10,6 +10,10 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Breaking
 
+- **`.fux/identifiers.toml` is a required file** (L12). Every verb that analyzes
+  text refuses without it; `fux doctor --fix` or `fux setup` writes it with both
+  tables empty, which changes nothing in the index. `.fux/inspect.toml` gains
+  `[identifiers]` (`min_values`, `min_docs`, `parity_sample`); `--fix` writes it.
 - **Python ≥ 3.12** (law L7, was ≥ 3.11). `requires-python = ">=3.12"`, so pip
   refuses a 3.11 install instead of the install failing at runtime; `fux doctor`
   checks the same floor. CI no longer tests 3.11.
@@ -25,6 +29,18 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **Identifier families** (W-233, [SR-IDENTIFIERS](records/0160_identifiers.md)) —
+  a committed `.fux/identifiers.toml` names ID shapes such as `RF-{n}`, and both
+  readers match them against the text at ingest and at query time. Each match
+  adds one canonical term beside the analyzer's own, so `RF 118`, `rf118`,
+  `RF–118` and `ADR-4`/`ADR-0004` reach the document that names the ID instead
+  of one that shares its parts. `fux identifiers` proposes families from the
+  index and `--write` records them in `[detected]`; `[user]` is yours and wins,
+  and an expert may write a statically guarded regex there. `fux doctor` gains
+  four rows (loads, indexed, current, regex parity), `fux ingest --check` reports
+  an index built under other families, `fux inspect` gains §12 and an
+  `identifiers` key, and `fux serve` gains an **Identifiers** tab that tests a
+  pattern before you commit it. **An empty file changes no byte of the index.**
 - **`fux serve` is the fux explorer now (was "ask explorer") and gains an Answer tab**, and a `GET /answer?q=…[&no_refer=1]`
   route that is the byte-identical stdout of `fux answer --json --band` — the
   one passage fux would cite, its citation and freshness verdict, the band, and

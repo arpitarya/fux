@@ -5,7 +5,9 @@
  * analysis by construction rather than by review.
  */
 import { analyze, analyzePairs, STOPWORDS } from "./analyzer.mjs";
+import { EMPTY } from "./identifiers.mjs";
 
-export function tokenize(text) { return analyze(text); }
-export function tokenizePairs(text) { return analyzePairs(text); }
+/** `ids` — the repo's identifier families (W-233); `EMPTY` is analyzer v3. */
+export function tokenize(text, ids = EMPTY) { return analyze(text, ids); }
+export function tokenizePairs(text, ids = EMPTY) { return analyzePairs(text, ids); }
 export { STOPWORDS };

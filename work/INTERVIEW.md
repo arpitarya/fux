@@ -32,10 +32,16 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-28** (Claude Code, Opus — W-228 DoD 11 rung; W-168 pools).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-28** (Claude Code, Opus — W-233 shipped; W-228 DoD 11 rung; W-168 pools).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-09-28 (latest) — W-168 STEP 9 SHIPPED: `intent_weight = 0.1`
+### 🟢 2026-09-28 (latest) — W-233 SHIPPED: IDENTIFIER FAMILIES, MEASURED PASS
+
+- `.fux/identifiers.toml` families add one canonical term per match on both readers, so `RF 118`, `rf118` and `RF–118` are `rf-118`. [SR-IDENTIFIERS](../records/0160_identifiers.md) holds the design; the [verdict](regression/2026-09-28-identifier-families/VERDICT.md) is net +25 / +88 / +105 with 0 broken, and an empty file is byte-identical.
+- It is a new required file (L12): `fux doctor --fix` writes it, so the next release's CHANGELOG carries it under Breaking.
+- **Next:** nothing on W-233. The document-side ID shapes wait for the next generation of test data.
+
+### 🟢 2026-09-28 — W-168 STEP 9 SHIPPED: `intent_weight = 0.1`
 
 - It is the template default, with no reader code changed. `[doctype]` ships empty, so nothing moves on upgrade. SR-TUNE 20 now carries MEASURED plus a reopen-trigger.
 - **Next:** step 7 (MMR) pre-registers, then 8.

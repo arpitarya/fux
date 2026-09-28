@@ -872,6 +872,7 @@ def _mandatory_config() -> "tuple[Mandatory, ...]":
     from . import output_config as output_mod
     from . import tune as tune_mod
     from .inspect import config as inspect_config
+    from .query import identifiers as ids_mod
 
     return (
         Mandatory(CONFIG_NAME, config_text(), ("sources.url",), ("sources.url.config", "sources.url.routes")),
@@ -889,6 +890,10 @@ def _mandatory_config() -> "tuple[Mandatory, ...]":
         Mandatory(tune_mod.TUNE_NAME, tune_mod.template_text()),
         Mandatory(inspect_config.INSPECT_NAME, inspect_config.template_text()),
         Mandatory(output_mod.OUTPUT_NAME, output_mod.template_text()),
+        # W-233: the FILE is mandatory, its contents are the consumer's. An empty
+        # [detected], or no [detected] at all, is the ordinary state (F1), so
+        # neither table's keys are ever required or written.
+        Mandatory(ids_mod.FILE, ids_mod.template_text(), never=("user", "detected")),
     )
 
 

@@ -233,7 +233,7 @@
 <div class="wrap">
   <header>
     <h1>fux <span>explorer</span></h1>
-    <div class="sub">Ask: the ten documents an agent would be handed, and why. Answer: the one passage it would cite. Documents, Words and Index: what the index is made of.</div>
+    <div class="sub">Ask: the ten documents an agent would be handed, and why. Answer: the one passage it would cite. Documents, Words and Index: what the index is made of. Identifiers: which ID families it keeps whole.</div>
   </header>
 
   <nav class="tabs" role="tablist">
@@ -242,6 +242,7 @@
     <button class="tab" role="tab" data-tab="docs">Documents</button>
     <button class="tab" role="tab" data-tab="words">Words</button>
     <button class="tab" role="tab" data-tab="index">Index</button>
+    <button class="tab" role="tab" data-tab="ids">Identifiers</button>
   </nav>
 
   <section id="tab-ask">
@@ -292,6 +293,16 @@
 
   <section id="tab-index" hidden>
     <div id="idxout"><div class="card"><h2>index</h2><div class="sub">Open this tab to read the whole index.</div></div></div>
+  </section>
+
+  <section id="tab-ids" hidden>
+    <div class="card"><h2>identifier families — a test bench</h2>
+      <div class="sub">Type a template (<span class="mono">RF-{n}</span>, <span class="mono">WIKI-{X}-{n}</span>) or, for experts, a regex. See what it matches across the corpus, how each match would be indexed, and whether Python and Node read it alike. <b>Nothing is written</b>: copy the line into <span class="mono">.fux/identifiers.toml [user]</span>, then run <span class="mono">fux ingest</span>.</div>
+      <div class="bar" style="margin-top:10px"><input id="idp" autocomplete="off" spellcheck="false" placeholder="RF-{n}"></div>
+      <label class="toggle"><input type="radio" name="idkind" value="template" checked> template</label>
+      <label class="toggle"><input type="radio" name="idkind" value="regex"> regex (experts only — prefer a template)</label>
+      <div id="idbench" class="hint" style="margin-top:8px"></div></div>
+    <div id="idfamilies"></div>
   </section>
 
   <footer id="foot"></footer>
@@ -519,7 +530,7 @@ function render(data) {
 const opened = {};
 function showTab(name) {
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("on", t.dataset.tab === name));
-  ["ask", "answer", "docs", "words", "index"].forEach((n) => { $("tab-" + n).hidden = n !== name; });
+  ["ask", "answer", "docs", "words", "index", "ids"].forEach((n) => { $("tab-" + n).hidden = n !== name; });
   const params = new URLSearchParams(location.search);
   if (name === "ask") params.delete("tab"); else params.set("tab", name);
   history.replaceState(null, "", params.toString() ? "?" + params.toString() : location.pathname);
@@ -528,6 +539,7 @@ function showTab(name) {
     if (name === "docs") loadDocuments();
     if (name === "words") loadWords();
     if (name === "index") loadIndex();
+    if (name === "ids") loadIdentifiers("");
   }
 }
 document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => showTab(t.dataset.tab)));
@@ -783,6 +795,40 @@ async function openWord(term) {
   $("askword").addEventListener("click", () => { $("q").value = r.word; showTab("ask"); ask(r.word); });
 }
 
+/* ---- Identifiers: W-233's test bench. Read-only; prints the line to paste. -- */
+const idKind = () => document.querySelector('input[name="idkind"]:checked').value;
+let idTimer = null;
+$("idp").addEventListener("input", () => { clearTimeout(idTimer); idTimer = setTimeout(() => loadIdentifiers($("idp").value), 300); });
+document.querySelectorAll('input[name="idkind"]').forEach((r) => r.addEventListener("change", () => loadIdentifiers($("idp").value)));
+async function loadIdentifiers(pattern) {
+  let d;
+  $("idbench").innerHTML = pattern.trim() ? "matching…" : "";
+  try {
+    d = await (await fetch("/inspect/identifiers?kind=" + idKind() + "&p=" + encodeURIComponent(pattern.trim()))).json();
+    if (d.error) throw new Error(d.error);
+  } catch (e) { $("idbench").innerHTML = `<span class="err">${esc(e.message || e)}</span>`; return; }
+  const b = d.bench;
+  if (b && b.refused) {
+    $("idbench").innerHTML = `<span class="err">refused — ${esc(b.refused)}</span>`;
+  } else if (b) {
+    const par = b.parity.ran ? (b.parity.agree ? `<b style="color:var(--ok)">Python and Node agree</b> over ${esc(b.parity.documents)} documents`
+      : `<b style="color:var(--bad)">Python and Node DISAGREE</b> — ${esc(b.parity.diff)}`) : "parity not checked (no <span class=\"mono\">node</span> on PATH)";
+    const rows = b.examples.map((x) => `<tr><td class="mono">${esc(x.surface)}</td><td class="mono">${esc(x.canonical)}</td><td class="mono">${esc(x.v3.join(" · "))}</td><td class="mono">${esc(x.with_family.join(" · "))}</td><td class="mono">${esc(x.doc)}</td></tr>`);
+    $("idbench").innerHTML = `<div class="maths"><b>${esc(b.matches)}</b> matches in <b>${esc(b.documents)}</b> documents · ${par}</div>
+      ${rows.length ? table(["as written", "canonical term", "indexed today", "indexed with it", "document"], rows) : '<div class="hint">no match in the indexed documents</div>'}
+      <div class="maths">paste into <span class="mono">[user]</span>: <span class="mono">${esc(b.toml)}</span></div>`;
+  }
+  const eff = (d.effective || []).map((r) => r.source);
+  const fam = (d.detected || []).map((f) => `<tr class="idrow" data-t="${esc(f.template)}"><td class="mono">${esc(f.template)}</td>${cell(f.values)}${cell(f.docs)}<td class="mono">${esc(f.examples.join(", "))}</td><td>${eff.includes(f.template) ? "in effect" : "<b style=\"color:var(--warn)\">not written</b>"}</td></tr>`);
+  $("idfamilies").innerHTML = `<div class="card"><h2>detected families — ${esc(fam.length)}</h2>
+    <div class="sub">What <span class="mono">fux identifiers</span> proposes from the indexed documents. <span class="mono">fux identifiers --write</span> records them in <span class="mono">[detected]</span>. Click a row to test it.</div>
+    ${fam.length ? table(["template", "values", "docs", "e.g.", "state"], fam) : '<div class="hint">none — no letter-prefixed identifier shape repeats across documents</div>'}
+    ${d.effective_error ? `<div class="err">${esc(d.effective_error)}</div>` : ""}</div>`;
+  $("idfamilies").querySelectorAll(".idrow").forEach((r) => r.addEventListener("click", () => {
+    $("idp").value = r.dataset.t; document.querySelector('input[name="idkind"][value="template"]').checked = true; loadIdentifiers(r.dataset.t);
+  }));
+}
+
 let analyzeTimer = null;
 $("analyzeq").addEventListener("input", () => { clearTimeout(analyzeTimer); analyzeTimer = setTimeout(() => analyzeText($("analyzeq").value), 250); });
 async function analyzeText(text) {
@@ -863,6 +909,7 @@ function renderIndex(r, every) {
     ["decoder", "folder", "archived", "docs", "unreadable", "passages", "word-cut", "chrome tok.", "link-target tok.", "shared title", "title in top 10"],
     (r.segments || []).map((s) => `<tr><td>${esc(s.decoder)}</td><td class="mono">${esc(s.folder)}</td><td>${s.archived ? "yes" : "no"}</td>${cell(s.documents)}${cell(s.unreadable)}${cell(s.passages)}${cell(s.word_cut_passages)}${cell(s.chrome_tokens)}${cell(s.link_target_tokens)}${cell(s.shared_title)}${cell(s.probed ? s.title_in_top10 + " / " + s.probed : "—")}</tr>`))}</div>`;
   html += renderChunks(r.chunks);
+  html += renderIdentifierLens(r.identifiers);
   html += `<div class="card"><h2>L3 — triage: documents with findings, most first</h2>
     <div class="sub"><span class="num">${esc(r.triage_count)}</span> of <span class="num">${esc((r.documents || []).length)}</span> documents carry a finding; fux ordered them by how many — a count, not a score.${(r.triage || []).length < r.triage_count ? ` The first <span class="num">${esc(r.triage.length)}</span> are shown.` : ""}</div>
     ${table(["findings", "document"], (r.triage || []).map((d) =>
@@ -982,6 +1029,14 @@ function renderChunks(k) {
   return `<div class="card"><h2>10 · chunks — where refer cuts a passage</h2>
     <div class="sub"><span class="num">${esc(k.passages)}</span> passages · cut at an author boundary <span class="num">${esc(cuts.author)}</span> · a line <span class="num">${esc(cuts.line)}</span> · mid-word <span class="num">${esc(cuts.word)}</span></div>
     ${table(["decoder", "documents", "passages", "word-cut", "word-cut share"], Object.entries(k.by_decoder || {}).map(([name, row]) => `<tr><td>${esc(name)}</td>${cell(row.documents)}${cell(row.passages)}${cell(row.word)}${cell(pct(row.word_share))}</tr>`))}
+    ${leverLine(k.lever)}</div>`;
+}
+
+function renderIdentifierLens(k) {
+  if (!k) return "";
+  return `<div class="card"><h2>12 · identifier families — IDs kept whole however typed</h2>
+    <div class="sub"><span class="num">${esc(k.families.length)}</span> families in <span class="num">${esc(k.documents)}</span> documents, from <span class="num">${esc(k.candidates)}</span> identifier-shaped tokens. The <b>Identifiers</b> tab tests one.</div>
+    ${table(["template", "values", "documents", "e.g."], k.families.map((f) => `<tr><td class="mono">${esc(f.template)}</td>${cell(f.values)}${cell(f.docs)}<td class="mono">${esc(f.examples.join(", "))}</td></tr>`))}
     ${leverLine(k.lever)}</div>`;
 }
 

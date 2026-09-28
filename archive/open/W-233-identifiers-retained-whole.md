@@ -5,7 +5,10 @@ description: "Research, then a compare doc: every way an identifier (RF-118, PRO
 item: W-233
 filed: 2026-09-28
 ball: agent
+status: archived
 ---
+
+> **ARCHIVED 2026-09-28 — closed: built as ruled (F1–F5) and measured PASS.** The live statement is [SR-IDENTIFIERS](../../records/0160_identifiers.md); the evidence is [the verdict](../../work/regression/2026-09-28-identifier-families/VERDICT.md).
 
 # W-233 — identifiers retained whole: research and a compare doc
 

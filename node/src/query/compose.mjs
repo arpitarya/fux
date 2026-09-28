@@ -53,6 +53,7 @@ import { iterShardPaths, rawRecordLines, recordFor } from "../store/reader.mjs";
 import { displayTitle } from "../store/format.mjs";
 import { rrf } from "./fuse.mjs";
 import { queryTermHashes } from "./scan.mjs";
+import { identifiersFor } from "./identifiers.mjs";
 // `pyRound9` and `cmpCodePoints`, not JS `toFixed` and `<`: the boosted
 // order has to break exactly where Python's does, and JS `<` on strings is
 // UTF-16 (W-107 hazard H1).
@@ -197,7 +198,7 @@ function boost(ordered, boostedIds, top, inWindow) {
  * is not `related` to a question nobody asked.
  */
 function related(root, plane, query, walked, inWindow, tune) {
-  const hashes = new Set(queryTermHashes(query));
+  const hashes = new Set(queryTermHashes(query, identifiersFor(root)));
   const kinds = new Set(tune.askKinds.split(","));
   const out = [];
   for (const [node, mass] of walked) {

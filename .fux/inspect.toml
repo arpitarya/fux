@@ -53,3 +53,8 @@ skeleton_jaccard = 0.60
 core_share       = 0.80
 misfit_floor     = 0.20
 length_edges     = [200, 1000, 5000]
+
+[identifiers]
+min_values = 3
+min_docs   = 2
+parity_sample = 500

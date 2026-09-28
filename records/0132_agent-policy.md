@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@2eb889edca28]
+owns: [src/fux/templates/agents@6cc9fb2e9310]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 2754f78a695a0de3aace07b21e96a012c0038f8b319e45768b47a37335f90187
+content_sha: cd6049ebbf470cc4ea147f3602d61d9c3977b002e4782917b3bdc96663b908bf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -794,6 +794,9 @@ sentence* rather than to drop the new fact — `test_setup_agents_guides.py` is 
 gate, and it is the trap that decision warns about.
 
 **`fux-serve`'s description names five tabs** (2026-09-27): the explorer gained a Words tab ([SR-SERVE](0158_serve.md)), and the description was re-trimmed to the 500-character listing budget in all four copies; no policy rendering changed.
+
+
+The shipped `fux-inspect`, `fux-serve` and `fux-config` skills name identifier families ([SR-IDENTIFIERS](0160_identifiers.md)): the `identifiers` lens, the explorer's sixth tab, and `.fux/identifiers.toml` with its `fux identifiers --write` verb — each marked as an index change an agent proposes and never runs unasked.
 
 ### Consequences
 

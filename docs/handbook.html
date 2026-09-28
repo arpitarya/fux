@@ -2456,6 +2456,10 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
       <tr><td><code>fux tune</code></td>
         <td>Prints the tunables file to paste into <code>.fux/tune.toml</code>. Reads and writes
           nothing.</td><td>—</td></tr>
+      <tr><td><code>fux identifiers</code></td>
+        <td>Proposes identifier families (<code>RF-{n}</code>) from the index; <code>--write</code> records them in
+          <code>.fux/identifiers.toml [detected]</code> so <code>RF 118</code>, <code>rf118</code> and <code>RF-118</code> are one term. An index change: <code>fux ingest</code> after.</td>
+        <td><code>--write --json</code></td></tr>
       <tr><td><code>fux add [entry]</code></td>
         <td>List a directory, a file or a URL — and ingest it. Omit the entry to list everything.</td>
         <td><code>--types --cdp --http --archived --keep --no-keep --no-update --ttl --no-ingest --no-fetch --dry-run</code></td></tr>

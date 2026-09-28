@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@7d111b045e0c]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: af36849216ddc34c3571d92c7b127a3039b1ddd9a70437e1d340d3318e3882c2
+content_sha: c406920caad7efb9cfef841b3cf3974c32b1933c01479951dd6dae51af375797
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -506,6 +506,9 @@ re-ordered one. The weight defaults to `0.1` since 2026-09-28, but `[doctype]`
 ships empty, so by default nothing here changes.
 
 **`fux answer` passes `fux.toml [refer] timeout_seconds` into its freshness `Policy`** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28); `Policy` holds no timeout of its own ([SR-CONFIG](0113_config.md) decision 18).
+
+
+The question `fux answer` ranks is analyzed with the repo's identifier families, as `ask`'s is ([SR-IDENTIFIERS](0160_identifiers.md)); refer's passage re-score is not — it analyzes the question and the passage in one function, on analyzer v3's terms, and is self-consistent either way.
 
 ### Consequences
 

@@ -1,0 +1,999 @@
+{"id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ–52", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ-52", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ52", "rank_after": 1, "rank_before": null, "rung": "rung-00100", "variant": "nosep"}
+{"id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ 52", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ–53", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ-53", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ53", "rank_after": 1, "rank_before": null, "rung": "rung-00100", "variant": "nosep"}
+{"id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ 53", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "MBK-D4", "primary": "ext/sibling/00000-sop.md", "query": "MBK–D4", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "MBK-D4", "primary": "ext/sibling/00000-sop.md", "query": "MBK-D4", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "MBK-D4", "primary": "ext/sibling/00000-sop.md", "query": "MBK D4", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "MBK-Q5", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK–Q5", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "MBK-Q5", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK-Q5", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "MBK-Q5", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK Q5", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP–MNT–552", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-MNT-552", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-MNT552", "rank_after": 1, "rank_before": 4, "rung": "rung-00100", "variant": "nosep"}
+{"id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP MNT 552", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP–MNT–731", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP-MNT-731", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP-MNT731", "rank_after": 1, "rank_before": 6, "rung": "rung-00100", "variant": "nosep"}
+{"id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP MNT 731", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP–PNR–18", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-PNR-18", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-PNR18", "rank_after": 1, "rank_before": 4, "rung": "rung-00100", "variant": "nosep"}
+{"id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP PNR 18", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL–CS–HBK–01", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL-CS-HBK-01", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL-CS-HBK01", "rank_after": 1, "rank_before": 3, "rung": "rung-00100", "variant": "nosep"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL CS HBK 01", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL-CS-HBK-1", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "unpadded"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL–CS–MTX–02", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL-CS-MTX-02", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL-CS-MTX02", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "nosep"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL CS MTX 02", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL-CS-MTX-2", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "unpadded"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL–CS–MTX–03", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL-CS-MTX-03", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL-CS-MTX03", "rank_after": 1, "rank_before": 2, "rung": "rung-00100", "variant": "nosep"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL CS MTX 03", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL-CS-MTX-3", "rank_after": 1, "rank_before": 2, "rung": "rung-00100", "variant": "unpadded"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL–F–09", "rank_after": 1, "rank_before": 3, "rung": "rung-00100", "variant": "endash"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F-09", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F09", "rank_after": 1, "rank_before": 6, "rung": "rung-00100", "variant": "nosep"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL F 09", "rank_after": 1, "rank_before": 3, "rung": "rung-00100", "variant": "space"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F-9", "rank_after": 1, "rank_before": 6, "rung": "rung-00100", "variant": "unpadded"}
+{"id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL–F–22", "rank_after": 1, "rank_before": 6, "rung": "rung-00100", "variant": "endash"}
+{"id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F-22", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F22", "rank_after": 1, "rank_before": 6, "rung": "rung-00100", "variant": "nosep"}
+{"id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL F 22", "rank_after": 1, "rank_before": 6, "rung": "rung-00100", "variant": "space"}
+{"id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL–F–31", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL-F-31", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL-F31", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "nosep"}
+{"id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL F 31", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL–OPS–NH3–01", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL-OPS-NH3-01", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL OPS NH3 01", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL-OPS-NH3-1", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "unpadded"}
+{"id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL–OPS–NH3–02", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL-OPS-NH3-02", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL OPS NH3 02", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL-OPS-NH3-2", "rank_after": 1, "rank_before": 5, "rung": "rung-00100", "variant": "unpadded"}
+{"id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL–OPS–NH3–03", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL-OPS-NH3-03", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL OPS NH3 03", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL-OPS-NH3-3", "rank_after": 1, "rank_before": 4, "rung": "rung-00100", "variant": "unpadded"}
+{"id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF–203", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF-203", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF203", "rank_after": 1, "rank_before": null, "rung": "rung-00100", "variant": "nosep"}
+{"id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF 203", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF–221", "rank_after": 1, "rank_before": 3, "rung": "rung-00100", "variant": "endash"}
+{"id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF-221", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF221", "rank_after": 1, "rank_before": null, "rung": "rung-00100", "variant": "nosep"}
+{"id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF 221", "rank_after": 1, "rank_before": 3, "rung": "rung-00100", "variant": "space"}
+{"id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS–42", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS-42", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS42", "rank_after": 1, "rank_before": null, "rung": "rung-00100", "variant": "nosep"}
+{"id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS 42", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS–43", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS-43", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS43", "rank_after": 1, "rank_before": null, "rung": "rung-00100", "variant": "nosep"}
+{"id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS 43", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL–NGP–C3–02", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-C3-02", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL NGP C3 02", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-C3-2", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "unpadded"}
+{"id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL–NGP–F1–04", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-F1-04", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL NGP F1 04", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-F1-4", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "unpadded"}
+{"id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL–RF–119–A", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL-RF-119-A", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL-RF119A", "rank_after": 1, "rank_before": 8, "rung": "rung-00100", "variant": "nosep"}
+{"id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL RF 119 A", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL–RF–120–A", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL-RF-120-A", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL-RF120A", "rank_after": 1, "rank_before": 5, "rung": "rung-00100", "variant": "nosep"}
+{"id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL RF 120 A", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL–RF–221–A", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-RF-221-A", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-RF221A", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "nosep"}
+{"id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL RF 221 A", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI–HFP–DOCK–12", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI-HFP-DOCK-12", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI-HFP-DOCK12", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "nosep"}
+{"id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI HFP DOCK 12", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI–NGP–DOCK–41", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI-NGP-DOCK-41", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI-NGP-DOCK41", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "nosep"}
+{"id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI NGP DOCK 41", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI–SFD–CUST–07", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "endash"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI-SFD-CUST-07", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "exact"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI-SFD-CUST07", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "nosep"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI SFD CUST 07", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "space"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI-SFD-CUST-7", "rank_after": 1, "rank_before": 1, "rung": "rung-00100", "variant": "unpadded"}
+{"id": "BWD-334", "primary": "ext/sibling/00159-sop.md", "query": "BWD–334", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "BWD-334", "primary": "ext/sibling/00159-sop.md", "query": "BWD-334", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "BWD-334", "primary": "ext/sibling/00159-sop.md", "query": "BWD334", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "BWD-334", "primary": "ext/sibling/00159-sop.md", "query": "BWD 334", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "BWD-546", "primary": "ext/sibling/00819-sop.md", "query": "BWD–546", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "BWD-546", "primary": "ext/sibling/00819-sop.md", "query": "BWD-546", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "BWD-546", "primary": "ext/sibling/00819-sop.md", "query": "BWD546", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "BWD-546", "primary": "ext/sibling/00819-sop.md", "query": "BWD 546", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "BWD-548", "primary": "ext/sibling/00826-sop.md", "query": "BWD–548", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "BWD-548", "primary": "ext/sibling/00826-sop.md", "query": "BWD-548", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "BWD-548", "primary": "ext/sibling/00826-sop.md", "query": "BWD548", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "BWD-548", "primary": "ext/sibling/00826-sop.md", "query": "BWD 548", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "BWD-A5", "primary": "ext/sibling/00816-quarantine.md", "query": "BWD–A5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "BWD-A5", "primary": "ext/sibling/00816-quarantine.md", "query": "BWD-A5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "BWD-A5", "primary": "ext/sibling/00816-quarantine.md", "query": "BWD A5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "BWD-B1", "primary": "ext/sibling/00513-sop.md", "query": "BWD–B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "BWD-B1", "primary": "ext/sibling/00513-sop.md", "query": "BWD-B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "BWD-B1", "primary": "ext/sibling/00513-sop.md", "query": "BWD B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "BWD-B4", "primary": "ext/sibling/00790-postmortem.md", "query": "BWD–B4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "BWD-B4", "primary": "ext/sibling/00790-postmortem.md", "query": "BWD-B4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "BWD-B4", "primary": "ext/sibling/00790-postmortem.md", "query": "BWD B4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "BWD-HSE-39", "primary": "ext/sibling/00796-hours.md", "query": "BWD–HSE–39", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "BWD-HSE-39", "primary": "ext/sibling/00796-hours.md", "query": "BWD-HSE-39", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "BWD-HSE-39", "primary": "ext/sibling/00796-hours.md", "query": "BWD-HSE39", "rank_after": 1, "rank_before": 14, "rung": "rung-01000", "variant": "nosep"}
+{"id": "BWD-HSE-39", "primary": "ext/sibling/00796-hours.md", "query": "BWD HSE 39", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "BWD-QA-23", "primary": "ext/sibling/00240-sop.md", "query": "BWD–QA–23", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "BWD-QA-23", "primary": "ext/sibling/00240-sop.md", "query": "BWD-QA-23", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "BWD-QA-23", "primary": "ext/sibling/00240-sop.md", "query": "BWD-QA23", "rank_after": 1, "rank_before": 4, "rung": "rung-01000", "variant": "nosep"}
+{"id": "BWD-QA-23", "primary": "ext/sibling/00240-sop.md", "query": "BWD QA 23", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "BWD-QA-35", "primary": "ext/sibling/00153-sop.md", "query": "BWD–QA–35", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "BWD-QA-35", "primary": "ext/sibling/00153-sop.md", "query": "BWD-QA-35", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "BWD-QA-35", "primary": "ext/sibling/00153-sop.md", "query": "BWD-QA35", "rank_after": 1, "rank_before": 5, "rung": "rung-01000", "variant": "nosep"}
+{"id": "BWD-QA-35", "primary": "ext/sibling/00153-sop.md", "query": "BWD QA 35", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "CDM-430", "primary": "ext/sibling/00453-sop.md", "query": "CDM–430", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "CDM-430", "primary": "ext/sibling/00453-sop.md", "query": "CDM-430", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "CDM-430", "primary": "ext/sibling/00453-sop.md", "query": "CDM430", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "CDM-430", "primary": "ext/sibling/00453-sop.md", "query": "CDM 430", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "CDM-555", "primary": "ext/sibling/00396-quarantine.md", "query": "CDM–555", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "CDM-555", "primary": "ext/sibling/00396-quarantine.md", "query": "CDM-555", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "CDM-555", "primary": "ext/sibling/00396-quarantine.md", "query": "CDM555", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "CDM-555", "primary": "ext/sibling/00396-quarantine.md", "query": "CDM 555", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "CDM-841", "primary": "ext/sibling/00219-sop.md", "query": "CDM–841", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "CDM-841", "primary": "ext/sibling/00219-sop.md", "query": "CDM-841", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "CDM-841", "primary": "ext/sibling/00219-sop.md", "query": "CDM841", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "CDM-841", "primary": "ext/sibling/00219-sop.md", "query": "CDM 841", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "CDM-A2", "primary": "ext/sibling/00396-quarantine.md", "query": "CDM–A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "CDM-A2", "primary": "ext/sibling/00396-quarantine.md", "query": "CDM-A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "CDM-A2", "primary": "ext/sibling/00396-quarantine.md", "query": "CDM A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "CDM-A5", "primary": "ext/sibling/00589-postmortem.md", "query": "CDM–A5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "CDM-A5", "primary": "ext/sibling/00589-postmortem.md", "query": "CDM-A5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "CDM-A5", "primary": "ext/sibling/00589-postmortem.md", "query": "CDM A5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "CDM-B2", "primary": "ext/sibling/00219-sop.md", "query": "CDM–B2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "CDM-B2", "primary": "ext/sibling/00219-sop.md", "query": "CDM-B2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "CDM-B2", "primary": "ext/sibling/00219-sop.md", "query": "CDM B2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "CDM-HSE-48", "primary": "ext/sibling/00866-hours.md", "query": "CDM–HSE–48", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "CDM-HSE-48", "primary": "ext/sibling/00866-hours.md", "query": "CDM-HSE-48", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "CDM-HSE-48", "primary": "ext/sibling/00866-hours.md", "query": "CDM-HSE48", "rank_after": 1, "rank_before": 13, "rung": "rung-01000", "variant": "nosep"}
+{"id": "CDM-HSE-48", "primary": "ext/sibling/00866-hours.md", "query": "CDM HSE 48", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "CDM-HSE-50", "primary": "ext/sibling/00096-hours.md", "query": "CDM–HSE–50", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "CDM-HSE-50", "primary": "ext/sibling/00096-hours.md", "query": "CDM-HSE-50", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "CDM-HSE-50", "primary": "ext/sibling/00096-hours.md", "query": "CDM-HSE50", "rank_after": 1, "rank_before": 12, "rung": "rung-01000", "variant": "nosep"}
+{"id": "CDM-HSE-50", "primary": "ext/sibling/00096-hours.md", "query": "CDM HSE 50", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "CDM-QA-26", "primary": "ext/sibling/00396-quarantine.md", "query": "CDM–QA–26", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "CDM-QA-26", "primary": "ext/sibling/00396-quarantine.md", "query": "CDM-QA-26", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "CDM-QA-26", "primary": "ext/sibling/00396-quarantine.md", "query": "CDM-QA26", "rank_after": 1, "rank_before": 5, "rung": "rung-01000", "variant": "nosep"}
+{"id": "CDM-QA-26", "primary": "ext/sibling/00396-quarantine.md", "query": "CDM QA 26", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "HFP-112", "primary": "ext/sibling/00616-sop.md", "query": "HFP–112", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "HFP-112", "primary": "ext/sibling/00616-sop.md", "query": "HFP-112", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "HFP-112", "primary": "ext/sibling/00616-sop.md", "query": "HFP112", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "HFP-112", "primary": "ext/sibling/00616-sop.md", "query": "HFP 112", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "HFP-203", "primary": "ext/sibling/00399-sop.md", "query": "HFP–203", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "HFP-203", "primary": "ext/sibling/00399-sop.md", "query": "HFP-203", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "HFP-203", "primary": "ext/sibling/00399-sop.md", "query": "HFP203", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "HFP-203", "primary": "ext/sibling/00399-sop.md", "query": "HFP 203", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "HFP-445", "primary": "ext/sibling/00039-sop.md", "query": "HFP–445", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "HFP-445", "primary": "ext/sibling/00039-sop.md", "query": "HFP-445", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "HFP-445", "primary": "ext/sibling/00039-sop.md", "query": "HFP445", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "HFP-445", "primary": "ext/sibling/00039-sop.md", "query": "HFP 445", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "HFP-A1", "primary": "ext/sibling/00850-postmortem.md", "query": "HFP–A1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "HFP-A1", "primary": "ext/sibling/00850-postmortem.md", "query": "HFP-A1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "HFP-A1", "primary": "ext/sibling/00850-postmortem.md", "query": "HFP A1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "HFP-A2", "primary": "ext/sibling/00720-sop.md", "query": "HFP–A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "HFP-A2", "primary": "ext/sibling/00720-sop.md", "query": "HFP-A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "HFP-A2", "primary": "ext/sibling/00720-sop.md", "query": "HFP A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "HFP-B1", "primary": "ext/sibling/00360-sop.md", "query": "HFP–B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "HFP-B1", "primary": "ext/sibling/00360-sop.md", "query": "HFP-B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "HFP-B1", "primary": "ext/sibling/00360-sop.md", "query": "HFP B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "HFP-QA-38", "primary": "ext/sibling/00039-sop.md", "query": "HFP–QA–38", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "HFP-QA-38", "primary": "ext/sibling/00039-sop.md", "query": "HFP-QA-38", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "HFP-QA-38", "primary": "ext/sibling/00039-sop.md", "query": "HFP-QA38", "rank_after": 1, "rank_before": 2, "rung": "rung-01000", "variant": "nosep"}
+{"id": "HFP-QA-38", "primary": "ext/sibling/00039-sop.md", "query": "HFP QA 38", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "HFP-QA-43", "primary": "ext/sibling/00360-sop.md", "query": "HFP–QA–43", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "HFP-QA-43", "primary": "ext/sibling/00360-sop.md", "query": "HFP-QA-43", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "HFP-QA-43", "primary": "ext/sibling/00360-sop.md", "query": "HFP-QA43", "rank_after": 1, "rank_before": 6, "rung": "rung-01000", "variant": "nosep"}
+{"id": "HFP-QA-43", "primary": "ext/sibling/00360-sop.md", "query": "HFP QA 43", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "HFP-QA-52", "primary": "ext/sibling/00720-sop.md", "query": "HFP–QA–52", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "HFP-QA-52", "primary": "ext/sibling/00720-sop.md", "query": "HFP-QA-52", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "HFP-QA-52", "primary": "ext/sibling/00720-sop.md", "query": "HFP-QA52", "rank_after": 1, "rank_before": 3, "rung": "rung-01000", "variant": "nosep"}
+{"id": "HFP-QA-52", "primary": "ext/sibling/00720-sop.md", "query": "HFP QA 52", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ–52", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ-52", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ52", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ 52", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ–53", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ-53", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ53", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ 53", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "MBK-132", "primary": "ext/sibling/00540-sop.md", "query": "MBK–132", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "MBK-132", "primary": "ext/sibling/00540-sop.md", "query": "MBK-132", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "MBK-132", "primary": "ext/sibling/00540-sop.md", "query": "MBK132", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "MBK-132", "primary": "ext/sibling/00540-sop.md", "query": "MBK 132", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "MBK-397", "primary": "ext/sibling/00536-quarantine.md", "query": "MBK–397", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "MBK-397", "primary": "ext/sibling/00536-quarantine.md", "query": "MBK-397", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "MBK-397", "primary": "ext/sibling/00536-quarantine.md", "query": "MBK397", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "MBK-397", "primary": "ext/sibling/00536-quarantine.md", "query": "MBK 397", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "MBK-426", "primary": "ext/sibling/00840-sop.md", "query": "MBK–426", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "MBK-426", "primary": "ext/sibling/00840-sop.md", "query": "MBK-426", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "MBK-426", "primary": "ext/sibling/00840-sop.md", "query": "MBK426", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "MBK-426", "primary": "ext/sibling/00840-sop.md", "query": "MBK 426", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "MBK-A2", "primary": "ext/sibling/00339-sop.md", "query": "MBK–A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "MBK-A2", "primary": "ext/sibling/00339-sop.md", "query": "MBK-A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "MBK-A2", "primary": "ext/sibling/00339-sop.md", "query": "MBK A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "MBK-B5", "primary": "ext/sibling/00840-sop.md", "query": "MBK–B5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "MBK-B5", "primary": "ext/sibling/00840-sop.md", "query": "MBK-B5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "MBK-B5", "primary": "ext/sibling/00840-sop.md", "query": "MBK B5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "MBK-C3", "primary": "ext/sibling/00420-sop.md", "query": "MBK–C3", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "MBK-C3", "primary": "ext/sibling/00420-sop.md", "query": "MBK-C3", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "MBK-C3", "primary": "ext/sibling/00420-sop.md", "query": "MBK C3", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "MBK-F-11", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK–F–11", "rank_after": 1, "rank_before": 2, "rung": "rung-01000", "variant": "endash"}
+{"id": "MBK-F-11", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK-F-11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "MBK-F-11", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK-F11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "nosep"}
+{"id": "MBK-F-11", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK F 11", "rank_after": 1, "rank_before": 2, "rung": "rung-01000", "variant": "space"}
+{"id": "MBK-QA-26", "primary": "ext/sibling/00336-sop.md", "query": "MBK–QA–26", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "MBK-QA-26", "primary": "ext/sibling/00336-sop.md", "query": "MBK-QA-26", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "MBK-QA-26", "primary": "ext/sibling/00336-sop.md", "query": "MBK-QA26", "rank_after": 1, "rank_before": 9, "rung": "rung-01000", "variant": "nosep"}
+{"id": "MBK-QA-26", "primary": "ext/sibling/00336-sop.md", "query": "MBK QA 26", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "MBK-QA-31", "primary": "ext/sibling/00099-sop.md", "query": "MBK–QA–31", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "MBK-QA-31", "primary": "ext/sibling/00099-sop.md", "query": "MBK-QA-31", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "MBK-QA-31", "primary": "ext/sibling/00099-sop.md", "query": "MBK-QA31", "rank_after": 1, "rank_before": 2, "rung": "rung-01000", "variant": "nosep"}
+{"id": "MBK-QA-31", "primary": "ext/sibling/00099-sop.md", "query": "MBK QA 31", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP–MNT–552", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-MNT-552", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-MNT552", "rank_after": 1, "rank_before": 4, "rung": "rung-01000", "variant": "nosep"}
+{"id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP MNT 552", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP–MNT–731", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP-MNT-731", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP-MNT731", "rank_after": 1, "rank_before": 6, "rung": "rung-01000", "variant": "nosep"}
+{"id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP MNT 731", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP–PNR–18", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-PNR-18", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-PNR18", "rank_after": 1, "rank_before": 4, "rung": "rung-01000", "variant": "nosep"}
+{"id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP PNR 18", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "NRL-105", "primary": "ext/sibling/00060-sop.md", "query": "NRL–105", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "NRL-105", "primary": "ext/sibling/00060-sop.md", "query": "NRL-105", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "NRL-105", "primary": "ext/sibling/00060-sop.md", "query": "NRL105", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "NRL-105", "primary": "ext/sibling/00060-sop.md", "query": "NRL 105", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "NRL-215", "primary": "ext/sibling/00300-sop.md", "query": "NRL–215", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "NRL-215", "primary": "ext/sibling/00300-sop.md", "query": "NRL-215", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "NRL-215", "primary": "ext/sibling/00300-sop.md", "query": "NRL215", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "NRL-215", "primary": "ext/sibling/00300-sop.md", "query": "NRL 215", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "NRL-337", "primary": "ext/sibling/00686-sop.md", "query": "NRL–337", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "NRL-337", "primary": "ext/sibling/00686-sop.md", "query": "NRL-337", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "NRL-337", "primary": "ext/sibling/00686-sop.md", "query": "NRL337", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "NRL-337", "primary": "ext/sibling/00686-sop.md", "query": "NRL 337", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "NRL-A5", "primary": "ext/sibling/00910-postmortem.md", "query": "NRL–A5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "NRL-A5", "primary": "ext/sibling/00910-postmortem.md", "query": "NRL-A5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "NRL-A5", "primary": "ext/sibling/00910-postmortem.md", "query": "NRL A5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "NRL-B2", "primary": "ext/sibling/00093-sop.md", "query": "NRL–B2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "NRL-B2", "primary": "ext/sibling/00093-sop.md", "query": "NRL-B2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "NRL-B2", "primary": "ext/sibling/00093-sop.md", "query": "NRL B2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "NRL-B4", "primary": "ext/sibling/00550-postmortem.md", "query": "NRL–B4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "NRL-B4", "primary": "ext/sibling/00550-postmortem.md", "query": "NRL-B4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "NRL-B4", "primary": "ext/sibling/00550-postmortem.md", "query": "NRL B4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "NRL-HSE-40", "primary": "ext/sibling/00586-hours.md", "query": "NRL–HSE–40", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "NRL-HSE-40", "primary": "ext/sibling/00586-hours.md", "query": "NRL-HSE-40", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "NRL-HSE-40", "primary": "ext/sibling/00586-hours.md", "query": "NRL-HSE40", "rank_after": 1, "rank_before": 19, "rung": "rung-01000", "variant": "nosep"}
+{"id": "NRL-HSE-40", "primary": "ext/sibling/00586-hours.md", "query": "NRL HSE 40", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "NRL-QA-13", "primary": "ext/sibling/00093-sop.md", "query": "NRL–QA–13", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "NRL-QA-13", "primary": "ext/sibling/00093-sop.md", "query": "NRL-QA-13", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "NRL-QA-13", "primary": "ext/sibling/00093-sop.md", "query": "NRL-QA13", "rank_after": 1, "rank_before": 10, "rung": "rung-01000", "variant": "nosep"}
+{"id": "NRL-QA-13", "primary": "ext/sibling/00093-sop.md", "query": "NRL QA 13", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "NRL-QA-19", "primary": "ext/sibling/00300-sop.md", "query": "NRL–QA–19", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "NRL-QA-19", "primary": "ext/sibling/00300-sop.md", "query": "NRL-QA-19", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "NRL-QA-19", "primary": "ext/sibling/00300-sop.md", "query": "NRL-QA19", "rank_after": 1, "rank_before": 2, "rung": "rung-01000", "variant": "nosep"}
+{"id": "NRL-QA-19", "primary": "ext/sibling/00300-sop.md", "query": "NRL QA 19", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "OKF-198", "primary": "ext/sibling/00459-sop.md", "query": "OKF–198", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "OKF-198", "primary": "ext/sibling/00459-sop.md", "query": "OKF-198", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "OKF-198", "primary": "ext/sibling/00459-sop.md", "query": "OKF198", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "OKF-198", "primary": "ext/sibling/00459-sop.md", "query": "OKF 198", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "OKF-213", "primary": "ext/sibling/00573-sop.md", "query": "OKF–213", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "OKF-213", "primary": "ext/sibling/00573-sop.md", "query": "OKF-213", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "OKF-213", "primary": "ext/sibling/00573-sop.md", "query": "OKF213", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "OKF-213", "primary": "ext/sibling/00573-sop.md", "query": "OKF 213", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "OKF-464", "primary": "ext/sibling/00196-sop.md", "query": "OKF–464", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "OKF-464", "primary": "ext/sibling/00196-sop.md", "query": "OKF-464", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "OKF-464", "primary": "ext/sibling/00196-sop.md", "query": "OKF464", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "OKF-464", "primary": "ext/sibling/00196-sop.md", "query": "OKF 464", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "OKF-A1", "primary": "ext/sibling/00459-sop.md", "query": "OKF–A1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "OKF-A1", "primary": "ext/sibling/00459-sop.md", "query": "OKF-A1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "OKF-A1", "primary": "ext/sibling/00459-sop.md", "query": "OKF A1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "OKF-A2", "primary": "ext/sibling/00469-postmortem.md", "query": "OKF–A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "OKF-A2", "primary": "ext/sibling/00469-postmortem.md", "query": "OKF-A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "OKF-A2", "primary": "ext/sibling/00469-postmortem.md", "query": "OKF A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "OKF-A4", "primary": "ext/sibling/00883-postmortem.md", "query": "OKF–A4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "OKF-A4", "primary": "ext/sibling/00883-postmortem.md", "query": "OKF-A4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "OKF-A4", "primary": "ext/sibling/00883-postmortem.md", "query": "OKF A4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "OKF-F-11", "primary": "ext/sibling/a04-okapi-night-handover.txt", "query": "OKF–F–11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "OKF-F-11", "primary": "ext/sibling/a04-okapi-night-handover.txt", "query": "OKF-F-11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "OKF-F-11", "primary": "ext/sibling/a04-okapi-night-handover.txt", "query": "OKF-F11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "nosep"}
+{"id": "OKF-F-11", "primary": "ext/sibling/a04-okapi-night-handover.txt", "query": "OKF F 11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "OKF-HSE-49", "primary": "ext/sibling/00376-hours.md", "query": "OKF–HSE–49", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "OKF-HSE-49", "primary": "ext/sibling/00376-hours.md", "query": "OKF-HSE-49", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "OKF-HSE-49", "primary": "ext/sibling/00376-hours.md", "query": "OKF-HSE49", "rank_after": 1, "rank_before": 17, "rung": "rung-01000", "variant": "nosep"}
+{"id": "OKF-HSE-49", "primary": "ext/sibling/00376-hours.md", "query": "OKF HSE 49", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "OKF-IT-3391", "primary": "ext/sibling/a04-okapi-night-handover.txt", "query": "OKF–IT–3391", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "OKF-IT-3391", "primary": "ext/sibling/a04-okapi-night-handover.txt", "query": "OKF-IT-3391", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "OKF-IT-3391", "primary": "ext/sibling/a04-okapi-night-handover.txt", "query": "OKF-IT3391", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "nosep"}
+{"id": "OKF-IT-3391", "primary": "ext/sibling/a04-okapi-night-handover.txt", "query": "OKF IT 3391", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "PCC-127", "primary": "ext/sibling/00546-sop.md", "query": "PCC–127", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "PCC-127", "primary": "ext/sibling/00546-sop.md", "query": "PCC-127", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "PCC-127", "primary": "ext/sibling/00546-sop.md", "query": "PCC127", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "PCC-127", "primary": "ext/sibling/00546-sop.md", "query": "PCC 127", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "PCC-240", "primary": "ext/sibling/00600-sop.md", "query": "PCC–240", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "PCC-240", "primary": "ext/sibling/00600-sop.md", "query": "PCC-240", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "PCC-240", "primary": "ext/sibling/00600-sop.md", "query": "PCC240", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "PCC-240", "primary": "ext/sibling/00600-sop.md", "query": "PCC 240", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "PCC-448", "primary": "ext/sibling/00116-quarantine.md", "query": "PCC–448", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "PCC-448", "primary": "ext/sibling/00116-quarantine.md", "query": "PCC-448", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "PCC-448", "primary": "ext/sibling/00116-quarantine.md", "query": "PCC448", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "PCC-448", "primary": "ext/sibling/00116-quarantine.md", "query": "PCC 448", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "PCC-B1", "primary": "ext/sibling/00109-postmortem.md", "query": "PCC–B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "PCC-B1", "primary": "ext/sibling/00109-postmortem.md", "query": "PCC-B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "PCC-B1", "primary": "ext/sibling/00109-postmortem.md", "query": "PCC B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "PCC-B2", "primary": "ext/sibling/00600-sop.md", "query": "PCC–B2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "PCC-B2", "primary": "ext/sibling/00600-sop.md", "query": "PCC-B2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "PCC-B2", "primary": "ext/sibling/00600-sop.md", "query": "PCC B2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "PCC-C1", "primary": "ext/sibling/a03-petrichor-postmortem-insulin.md", "query": "PCC–C1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "PCC-C1", "primary": "ext/sibling/a03-petrichor-postmortem-insulin.md", "query": "PCC-C1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "PCC-C1", "primary": "ext/sibling/a03-petrichor-postmortem-insulin.md", "query": "PCC C1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "PCC-F-11", "primary": "ext/sibling/a03-petrichor-postmortem-insulin.md", "query": "PCC–F–11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "PCC-F-11", "primary": "ext/sibling/a03-petrichor-postmortem-insulin.md", "query": "PCC-F-11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "PCC-F-11", "primary": "ext/sibling/a03-petrichor-postmortem-insulin.md", "query": "PCC-F11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "nosep"}
+{"id": "PCC-F-11", "primary": "ext/sibling/a03-petrichor-postmortem-insulin.md", "query": "PCC F 11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "PCC-QA-35", "primary": "ext/sibling/00600-sop.md", "query": "PCC–QA–35", "rank_after": 1, "rank_before": 2, "rung": "rung-01000", "variant": "endash"}
+{"id": "PCC-QA-35", "primary": "ext/sibling/00600-sop.md", "query": "PCC-QA-35", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "PCC-QA-35", "primary": "ext/sibling/00600-sop.md", "query": "PCC-QA35", "rank_after": 1, "rank_before": 6, "rung": "rung-01000", "variant": "nosep"}
+{"id": "PCC-QA-35", "primary": "ext/sibling/00600-sop.md", "query": "PCC QA 35", "rank_after": 1, "rank_before": 2, "rung": "rung-01000", "variant": "space"}
+{"id": "PCC-QA-38", "primary": "ext/sibling/00813-sop.md", "query": "PCC–QA–38", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "PCC-QA-38", "primary": "ext/sibling/00813-sop.md", "query": "PCC-QA-38", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "PCC-QA-38", "primary": "ext/sibling/00813-sop.md", "query": "PCC-QA38", "rank_after": 1, "rank_before": 5, "rung": "rung-01000", "variant": "nosep"}
+{"id": "PCC-QA-38", "primary": "ext/sibling/00813-sop.md", "query": "PCC QA 38", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL–CS–HBK–01", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL-CS-HBK-01", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL-CS-HBK01", "rank_after": 1, "rank_before": 3, "rung": "rung-01000", "variant": "nosep"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL CS HBK 01", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL-CS-HBK-1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "unpadded"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL–CS–MTX–02", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL-CS-MTX-02", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL-CS-MTX02", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "nosep"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL CS MTX 02", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL-CS-MTX-2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "unpadded"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL–CS–MTX–03", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL-CS-MTX-03", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL-CS-MTX03", "rank_after": 1, "rank_before": 2, "rung": "rung-01000", "variant": "nosep"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL CS MTX 03", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL-CS-MTX-3", "rank_after": 1, "rank_before": 2, "rung": "rung-01000", "variant": "unpadded"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL–F–09", "rank_after": 1, "rank_before": 3, "rung": "rung-01000", "variant": "endash"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F-09", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F09", "rank_after": 1, "rank_before": 6, "rung": "rung-01000", "variant": "nosep"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL F 09", "rank_after": 1, "rank_before": 3, "rung": "rung-01000", "variant": "space"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F-9", "rank_after": 1, "rank_before": 6, "rung": "rung-01000", "variant": "unpadded"}
+{"id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL–F–22", "rank_after": 1, "rank_before": 6, "rung": "rung-01000", "variant": "endash"}
+{"id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F-22", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F22", "rank_after": 1, "rank_before": 6, "rung": "rung-01000", "variant": "nosep"}
+{"id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL F 22", "rank_after": 1, "rank_before": 6, "rung": "rung-01000", "variant": "space"}
+{"id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL–F–31", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL-F-31", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL-F31", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "nosep"}
+{"id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL F 31", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL–OPS–NH3–01", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL-OPS-NH3-01", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL OPS NH3 01", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL-OPS-NH3-1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "unpadded"}
+{"id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL–OPS–NH3–02", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL-OPS-NH3-02", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL OPS NH3 02", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL-OPS-NH3-2", "rank_after": 1, "rank_before": 5, "rung": "rung-01000", "variant": "unpadded"}
+{"id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL–OPS–NH3–03", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL-OPS-NH3-03", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL OPS NH3 03", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL-OPS-NH3-3", "rank_after": 1, "rank_before": 4, "rung": "rung-01000", "variant": "unpadded"}
+{"id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF–203", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF-203", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF203", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF 203", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF–221", "rank_after": 1, "rank_before": 3, "rung": "rung-01000", "variant": "endash"}
+{"id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF-221", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF221", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF 221", "rank_after": 1, "rank_before": 3, "rung": "rung-01000", "variant": "space"}
+{"id": "SFD-205", "primary": "ext/sibling/00333-sop.md", "query": "SFD–205", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "SFD-205", "primary": "ext/sibling/00333-sop.md", "query": "SFD-205", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "SFD-205", "primary": "ext/sibling/00333-sop.md", "query": "SFD205", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "SFD-205", "primary": "ext/sibling/00333-sop.md", "query": "SFD 205", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "SFD-226", "primary": "ext/sibling/00180-sop.md", "query": "SFD–226", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "SFD-226", "primary": "ext/sibling/00180-sop.md", "query": "SFD-226", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "SFD-226", "primary": "ext/sibling/00180-sop.md", "query": "SFD226", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "SFD-226", "primary": "ext/sibling/00180-sop.md", "query": "SFD 226", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "SFD-477", "primary": "ext/sibling/00256-quarantine.md", "query": "SFD–477", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "SFD-477", "primary": "ext/sibling/00256-quarantine.md", "query": "SFD-477", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "SFD-477", "primary": "ext/sibling/00256-quarantine.md", "query": "SFD477", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "SFD-477", "primary": "ext/sibling/00256-quarantine.md", "query": "SFD 477", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "SFD-B1", "primary": "ext/sibling/00333-sop.md", "query": "SFD–B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "SFD-B1", "primary": "ext/sibling/00333-sop.md", "query": "SFD-B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "SFD-B1", "primary": "ext/sibling/00333-sop.md", "query": "SFD B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "SFD-D3", "primary": "ext/sibling/00180-sop.md", "query": "SFD–D3", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "SFD-D3", "primary": "ext/sibling/00180-sop.md", "query": "SFD-D3", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "SFD-D3", "primary": "ext/sibling/00180-sop.md", "query": "SFD D3", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "SFD-D4", "primary": "ext/sibling/00136-postmortem.md", "query": "SFD–D4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "SFD-D4", "primary": "ext/sibling/00136-postmortem.md", "query": "SFD-D4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "SFD-D4", "primary": "ext/sibling/00136-postmortem.md", "query": "SFD D4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "SFD-HSE-41", "primary": "ext/sibling/00166-hours.md", "query": "SFD–HSE–41", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "SFD-HSE-41", "primary": "ext/sibling/00166-hours.md", "query": "SFD-HSE-41", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "SFD-HSE-41", "primary": "ext/sibling/00166-hours.md", "query": "SFD-HSE41", "rank_after": 1, "rank_before": 10, "rung": "rung-01000", "variant": "nosep"}
+{"id": "SFD-HSE-41", "primary": "ext/sibling/00166-hours.md", "query": "SFD HSE 41", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "SFD-HSE-59", "primary": "ext/sibling/00726-hours.md", "query": "SFD–HSE–59", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "SFD-HSE-59", "primary": "ext/sibling/00726-hours.md", "query": "SFD-HSE-59", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "SFD-HSE-59", "primary": "ext/sibling/00726-hours.md", "query": "SFD-HSE59", "rank_after": 1, "rank_before": 12, "rung": "rung-01000", "variant": "nosep"}
+{"id": "SFD-HSE-59", "primary": "ext/sibling/00726-hours.md", "query": "SFD HSE 59", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "SFD-HSE-82", "primary": "ext/sibling/00656-hours.md", "query": "SFD–HSE–82", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "SFD-HSE-82", "primary": "ext/sibling/00656-hours.md", "query": "SFD-HSE-82", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "SFD-HSE-82", "primary": "ext/sibling/00656-hours.md", "query": "SFD-HSE82", "rank_after": 1, "rank_before": 11, "rung": "rung-01000", "variant": "nosep"}
+{"id": "SFD-HSE-82", "primary": "ext/sibling/00656-hours.md", "query": "SFD HSE 82", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS–42", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS-42", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS42", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS 42", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS–43", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS-43", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS43", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS 43", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL–NGP–C3–02", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-C3-02", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL NGP C3 02", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-C3-2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "unpadded"}
+{"id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL–NGP–F1–04", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-F1-04", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL NGP F1 04", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-F1-4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "unpadded"}
+{"id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL–RF–119–A", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL-RF-119-A", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL-RF119A", "rank_after": 1, "rank_before": 8, "rung": "rung-01000", "variant": "nosep"}
+{"id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL RF 119 A", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL–RF–120–A", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL-RF-120-A", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL-RF120A", "rank_after": 1, "rank_before": 5, "rung": "rung-01000", "variant": "nosep"}
+{"id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL RF 120 A", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL–RF–221–A", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-RF-221-A", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-RF221A", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "nosep"}
+{"id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL RF 221 A", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "VTX-102", "primary": "ext/sibling/00753-sop.md", "query": "VTX–102", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "VTX-102", "primary": "ext/sibling/00753-sop.md", "query": "VTX-102", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "VTX-102", "primary": "ext/sibling/00753-sop.md", "query": "VTX102", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "VTX-102", "primary": "ext/sibling/00753-sop.md", "query": "VTX 102", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "VTX-365", "primary": "ext/sibling/00056-sop.md", "query": "VTX–365", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "VTX-365", "primary": "ext/sibling/00056-sop.md", "query": "VTX-365", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "VTX-365", "primary": "ext/sibling/00056-sop.md", "query": "VTX365", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "VTX-365", "primary": "ext/sibling/00056-sop.md", "query": "VTX 365", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "VTX-691", "primary": "ext/sibling/00676-quarantine.md", "query": "VTX–691", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "VTX-691", "primary": "ext/sibling/00676-quarantine.md", "query": "VTX-691", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "VTX-691", "primary": "ext/sibling/00676-quarantine.md", "query": "VTX691", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "VTX-691", "primary": "ext/sibling/00676-quarantine.md", "query": "VTX 691", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "VTX-A1", "primary": "ext/sibling/a02-vantorix-sensor-thresholds.yaml", "query": "VTX–A1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "VTX-A1", "primary": "ext/sibling/a02-vantorix-sensor-thresholds.yaml", "query": "VTX-A1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "VTX-A1", "primary": "ext/sibling/a02-vantorix-sensor-thresholds.yaml", "query": "VTX A1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "VTX-B1", "primary": "ext/sibling/00283-postmortem.md", "query": "VTX–B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "VTX-B1", "primary": "ext/sibling/00283-postmortem.md", "query": "VTX-B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "VTX-B1", "primary": "ext/sibling/00283-postmortem.md", "query": "VTX B1", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "VTX-B2", "primary": "ext/sibling/a02-vantorix-sensor-thresholds.yaml", "query": "VTX–B2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "VTX-B2", "primary": "ext/sibling/a02-vantorix-sensor-thresholds.yaml", "query": "VTX-B2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "VTX-B2", "primary": "ext/sibling/a02-vantorix-sensor-thresholds.yaml", "query": "VTX B2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "VTX-HSE-17", "primary": "ext/sibling/00236-hours.md", "query": "VTX–HSE–17", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "VTX-HSE-17", "primary": "ext/sibling/00236-hours.md", "query": "VTX-HSE-17", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "VTX-HSE-17", "primary": "ext/sibling/00236-hours.md", "query": "VTX-HSE17", "rank_after": 1, "rank_before": 14, "rung": "rung-01000", "variant": "nosep"}
+{"id": "VTX-HSE-17", "primary": "ext/sibling/00236-hours.md", "query": "VTX HSE 17", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "VTX-HSE-68", "primary": "ext/sibling/00516-hours.md", "query": "VTX–HSE–68", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "VTX-HSE-68", "primary": "ext/sibling/00516-hours.md", "query": "VTX-HSE-68", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "VTX-HSE-68", "primary": "ext/sibling/00516-hours.md", "query": "VTX-HSE68", "rank_after": 1, "rank_before": 16, "rung": "rung-01000", "variant": "nosep"}
+{"id": "VTX-HSE-68", "primary": "ext/sibling/00516-hours.md", "query": "VTX HSE 68", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "VTX-HSE-75", "primary": "ext/sibling/00026-hours.md", "query": "VTX–HSE–75", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "VTX-HSE-75", "primary": "ext/sibling/00026-hours.md", "query": "VTX-HSE-75", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "VTX-HSE-75", "primary": "ext/sibling/00026-hours.md", "query": "VTX-HSE75", "rank_after": 1, "rank_before": 13, "rung": "rung-01000", "variant": "nosep"}
+{"id": "VTX-HSE-75", "primary": "ext/sibling/00026-hours.md", "query": "VTX HSE 75", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "WIKI-BWD-55", "primary": "ext/sibling/00139-dockwiki.html", "query": "WIKI–BWD–55", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "WIKI-BWD-55", "primary": "ext/sibling/00139-dockwiki.html", "query": "WIKI-BWD-55", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "WIKI-BWD-55", "primary": "ext/sibling/00139-dockwiki.html", "query": "WIKI-BWD55", "rank_after": 1, "rank_before": 13, "rung": "rung-01000", "variant": "nosep"}
+{"id": "WIKI-BWD-55", "primary": "ext/sibling/00139-dockwiki.html", "query": "WIKI BWD 55", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "WIKI-BWD-65", "primary": "ext/sibling/00079-dockwiki.html", "query": "WIKI–BWD–65", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "WIKI-BWD-65", "primary": "ext/sibling/00079-dockwiki.html", "query": "WIKI-BWD-65", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "WIKI-BWD-65", "primary": "ext/sibling/00079-dockwiki.html", "query": "WIKI-BWD65", "rank_after": 1, "rank_before": 11, "rung": "rung-01000", "variant": "nosep"}
+{"id": "WIKI-BWD-65", "primary": "ext/sibling/00079-dockwiki.html", "query": "WIKI BWD 65", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "WIKI-CDM-10", "primary": "ext/sibling/00499-dockwiki.html", "query": "WIKI–CDM–10", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "WIKI-CDM-10", "primary": "ext/sibling/00499-dockwiki.html", "query": "WIKI-CDM-10", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "WIKI-CDM-10", "primary": "ext/sibling/00499-dockwiki.html", "query": "WIKI-CDM10", "rank_after": 1, "rank_before": 5, "rung": "rung-01000", "variant": "nosep"}
+{"id": "WIKI-CDM-10", "primary": "ext/sibling/00499-dockwiki.html", "query": "WIKI CDM 10", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI–HFP–DOCK–12", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI-HFP-DOCK-12", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI-HFP-DOCK12", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "nosep"}
+{"id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI HFP DOCK 12", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI–NGP–DOCK–41", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI-NGP-DOCK-41", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI-NGP-DOCK41", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "nosep"}
+{"id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI NGP DOCK 41", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI–SFD–CUST–07", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI-SFD-CUST-07", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI-SFD-CUST07", "rank_after": 1, "rank_before": 2, "rung": "rung-01000", "variant": "nosep"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI SFD CUST 07", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI-SFD-CUST-7", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "unpadded"}
+{"id": "ZAC-101", "primary": "ext/sibling/00406-sop.md", "query": "ZAC–101", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "ZAC-101", "primary": "ext/sibling/00406-sop.md", "query": "ZAC-101", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "ZAC-101", "primary": "ext/sibling/00406-sop.md", "query": "ZAC101", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "ZAC-101", "primary": "ext/sibling/00406-sop.md", "query": "ZAC 101", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "ZAC-347", "primary": "ext/sibling/00326-quarantine.md", "query": "ZAC–347", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "ZAC-347", "primary": "ext/sibling/00326-quarantine.md", "query": "ZAC-347", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "ZAC-347", "primary": "ext/sibling/00326-quarantine.md", "query": "ZAC347", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "ZAC-347", "primary": "ext/sibling/00326-quarantine.md", "query": "ZAC 347", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "ZAC-365", "primary": "ext/sibling/00780-sop.md", "query": "ZAC–365", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "ZAC-365", "primary": "ext/sibling/00780-sop.md", "query": "ZAC-365", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "ZAC-365", "primary": "ext/sibling/00780-sop.md", "query": "ZAC365", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "ZAC-365", "primary": "ext/sibling/00780-sop.md", "query": "ZAC 365", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "ZAC-A2", "primary": "ext/sibling/00010-postmortem.md", "query": "ZAC–A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "ZAC-A2", "primary": "ext/sibling/00010-postmortem.md", "query": "ZAC-A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "ZAC-A2", "primary": "ext/sibling/00010-postmortem.md", "query": "ZAC A2", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "ZAC-A4", "primary": "ext/sibling/00829-postmortem.md", "query": "ZAC–A4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "ZAC-A4", "primary": "ext/sibling/00829-postmortem.md", "query": "ZAC-A4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "ZAC-A4", "primary": "ext/sibling/00829-postmortem.md", "query": "ZAC A4", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "ZAC-A5", "primary": "ext/sibling/00186-quarantine.md", "query": "ZAC–A5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "ZAC-A5", "primary": "ext/sibling/00186-quarantine.md", "query": "ZAC-A5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "ZAC-A5", "primary": "ext/sibling/00186-quarantine.md", "query": "ZAC A5", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "ZAC-HSE-30", "primary": "ext/sibling/00306-hours.md", "query": "ZAC–HSE–30", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "ZAC-HSE-30", "primary": "ext/sibling/00306-hours.md", "query": "ZAC-HSE-30", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "ZAC-HSE-30", "primary": "ext/sibling/00306-hours.md", "query": "ZAC-HSE30", "rank_after": 1, "rank_before": null, "rung": "rung-01000", "variant": "nosep"}
+{"id": "ZAC-HSE-30", "primary": "ext/sibling/00306-hours.md", "query": "ZAC HSE 30", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "ZAC-QA-11", "primary": "ext/sibling/00780-sop.md", "query": "ZAC–QA–11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "ZAC-QA-11", "primary": "ext/sibling/00780-sop.md", "query": "ZAC-QA-11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "ZAC-QA-11", "primary": "ext/sibling/00780-sop.md", "query": "ZAC-QA11", "rank_after": 1, "rank_before": 5, "rung": "rung-01000", "variant": "nosep"}
+{"id": "ZAC-QA-11", "primary": "ext/sibling/00780-sop.md", "query": "ZAC QA 11", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "ZAC-QA-14", "primary": "ext/sibling/00186-quarantine.md", "query": "ZAC–QA–14", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "endash"}
+{"id": "ZAC-QA-14", "primary": "ext/sibling/00186-quarantine.md", "query": "ZAC-QA-14", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "exact"}
+{"id": "ZAC-QA-14", "primary": "ext/sibling/00186-quarantine.md", "query": "ZAC-QA14", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "nosep"}
+{"id": "ZAC-QA-14", "primary": "ext/sibling/00186-quarantine.md", "query": "ZAC QA 14", "rank_after": 1, "rank_before": 1, "rung": "rung-01000", "variant": "space"}
+{"id": "BWD-116", "primary": "ext/sibling/06159-sop.md", "query": "BWD–116", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "BWD-116", "primary": "ext/sibling/06159-sop.md", "query": "BWD-116", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "BWD-116", "primary": "ext/sibling/06159-sop.md", "query": "BWD116", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "BWD-116", "primary": "ext/sibling/06159-sop.md", "query": "BWD 116", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "BWD-128", "primary": "ext/sibling/05226-quarantine.md", "query": "BWD–128", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "BWD-128", "primary": "ext/sibling/05226-quarantine.md", "query": "BWD-128", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "BWD-128", "primary": "ext/sibling/05226-quarantine.md", "query": "BWD128", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "BWD-128", "primary": "ext/sibling/05226-quarantine.md", "query": "BWD 128", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "BWD-142", "primary": "ext/sibling/03896-quarantine.md", "query": "BWD–142", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "BWD-142", "primary": "ext/sibling/03896-quarantine.md", "query": "BWD-142", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "BWD-142", "primary": "ext/sibling/03896-quarantine.md", "query": "BWD142", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "BWD-142", "primary": "ext/sibling/03896-quarantine.md", "query": "BWD 142", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "BWD-F1", "primary": "ext/sibling/05246-postmortem.md", "query": "BWD–F1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "BWD-F1", "primary": "ext/sibling/05246-postmortem.md", "query": "BWD-F1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "BWD-F1", "primary": "ext/sibling/05246-postmortem.md", "query": "BWD F1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "BWD-HSE-27", "primary": "ext/sibling/05906-hours.md", "query": "BWD–HSE–27", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "BWD-HSE-27", "primary": "ext/sibling/05906-hours.md", "query": "BWD-HSE-27", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "BWD-HSE-27", "primary": "ext/sibling/05906-hours.md", "query": "BWD-HSE27", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "BWD-HSE-27", "primary": "ext/sibling/05906-hours.md", "query": "BWD HSE 27", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "BWD-HSE-39", "primary": "ext/sibling/00796-hours.md", "query": "BWD–HSE–39", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "BWD-HSE-39", "primary": "ext/sibling/00796-hours.md", "query": "BWD-HSE-39", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "BWD-HSE-39", "primary": "ext/sibling/00796-hours.md", "query": "BWD-HSE39", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "BWD-HSE-39", "primary": "ext/sibling/00796-hours.md", "query": "BWD HSE 39", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "BWD-HSE-44", "primary": "ext/sibling/08916-hours.md", "query": "BWD–HSE–44", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "BWD-HSE-44", "primary": "ext/sibling/08916-hours.md", "query": "BWD-HSE-44", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "BWD-HSE-44", "primary": "ext/sibling/08916-hours.md", "query": "BWD-HSE44", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "BWD-HSE-44", "primary": "ext/sibling/08916-hours.md", "query": "BWD HSE 44", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "CDM-111", "primary": "ext/sibling/03993-sop.md", "query": "CDM–111", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "CDM-111", "primary": "ext/sibling/03993-sop.md", "query": "CDM-111", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "CDM-111", "primary": "ext/sibling/03993-sop.md", "query": "CDM111", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "CDM-111", "primary": "ext/sibling/03993-sop.md", "query": "CDM 111", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "CDM-130", "primary": "ext/sibling/05133-sop.md", "query": "CDM–130", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "CDM-130", "primary": "ext/sibling/05133-sop.md", "query": "CDM-130", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "CDM-130", "primary": "ext/sibling/05133-sop.md", "query": "CDM130", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "CDM-130", "primary": "ext/sibling/05133-sop.md", "query": "CDM 130", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "CDM-160", "primary": "ext/sibling/04419-sop.md", "query": "CDM–160", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "CDM-160", "primary": "ext/sibling/04419-sop.md", "query": "CDM-160", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "CDM-160", "primary": "ext/sibling/04419-sop.md", "query": "CDM160", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "CDM-160", "primary": "ext/sibling/04419-sop.md", "query": "CDM 160", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "CDM-A1", "primary": "ext/sibling/09086-sop.md", "query": "CDM–A1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "CDM-A1", "primary": "ext/sibling/09086-sop.md", "query": "CDM-A1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "CDM-A1", "primary": "ext/sibling/09086-sop.md", "query": "CDM A1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "CDM-C2", "primary": "ext/sibling/00229-postmortem.md", "query": "CDM–C2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "CDM-C2", "primary": "ext/sibling/00229-postmortem.md", "query": "CDM-C2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "CDM-C2", "primary": "ext/sibling/00229-postmortem.md", "query": "CDM C2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "CDM-D2", "primary": "ext/sibling/07836-postmortem.md", "query": "CDM–D2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "CDM-D2", "primary": "ext/sibling/07836-postmortem.md", "query": "CDM-D2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "CDM-D2", "primary": "ext/sibling/07836-postmortem.md", "query": "CDM D2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "CDM-HSE-18", "primary": "ext/sibling/07516-hours.md", "query": "CDM–HSE–18", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "CDM-HSE-18", "primary": "ext/sibling/07516-hours.md", "query": "CDM-HSE-18", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "CDM-HSE-18", "primary": "ext/sibling/07516-hours.md", "query": "CDM-HSE18", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "CDM-HSE-18", "primary": "ext/sibling/07516-hours.md", "query": "CDM HSE 18", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "CDM-HSE-22", "primary": "ext/sibling/01776-hours.md", "query": "CDM–HSE–22", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "CDM-HSE-22", "primary": "ext/sibling/01776-hours.md", "query": "CDM-HSE-22", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "CDM-HSE-22", "primary": "ext/sibling/01776-hours.md", "query": "CDM-HSE22", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "CDM-HSE-22", "primary": "ext/sibling/01776-hours.md", "query": "CDM HSE 22", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "CDM-HSE-33", "primary": "ext/sibling/06676-hours.md", "query": "CDM–HSE–33", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "CDM-HSE-33", "primary": "ext/sibling/06676-hours.md", "query": "CDM-HSE-33", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "CDM-HSE-33", "primary": "ext/sibling/06676-hours.md", "query": "CDM-HSE33", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "CDM-HSE-33", "primary": "ext/sibling/06676-hours.md", "query": "CDM HSE 33", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "HFP-105", "primary": "ext/sibling/06693-sop.md", "query": "HFP–105", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "HFP-105", "primary": "ext/sibling/06693-sop.md", "query": "HFP-105", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "HFP-105", "primary": "ext/sibling/06693-sop.md", "query": "HFP105", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "HFP-105", "primary": "ext/sibling/06693-sop.md", "query": "HFP 105", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "HFP-123", "primary": "ext/sibling/04176-quarantine.md", "query": "HFP–123", "rank_after": 1, "rank_before": 3, "rung": "rung-10000", "variant": "endash"}
+{"id": "HFP-123", "primary": "ext/sibling/04176-quarantine.md", "query": "HFP-123", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "HFP-123", "primary": "ext/sibling/04176-quarantine.md", "query": "HFP123", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "HFP-123", "primary": "ext/sibling/04176-quarantine.md", "query": "HFP 123", "rank_after": 1, "rank_before": 3, "rung": "rung-10000", "variant": "space"}
+{"id": "HFP-134", "primary": "ext/sibling/08516-quarantine.md", "query": "HFP–134", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "HFP-134", "primary": "ext/sibling/08516-quarantine.md", "query": "HFP-134", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "HFP-134", "primary": "ext/sibling/08516-quarantine.md", "query": "HFP134", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "HFP-134", "primary": "ext/sibling/08516-quarantine.md", "query": "HFP 134", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "HFP-A5", "primary": "ext/sibling/01886-postmortem.md", "query": "HFP–A5", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "HFP-A5", "primary": "ext/sibling/01886-postmortem.md", "query": "HFP-A5", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "HFP-A5", "primary": "ext/sibling/01886-postmortem.md", "query": "HFP A5", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "HFP-D2", "primary": "ext/sibling/09516-postmortem.md", "query": "HFP–D2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "HFP-D2", "primary": "ext/sibling/09516-postmortem.md", "query": "HFP-D2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "HFP-D2", "primary": "ext/sibling/09516-postmortem.md", "query": "HFP D2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "HFP-E2", "primary": "ext/sibling/04483-postmortem.md", "query": "HFP–E2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "HFP-E2", "primary": "ext/sibling/04483-postmortem.md", "query": "HFP-E2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "HFP-E2", "primary": "ext/sibling/04483-postmortem.md", "query": "HFP E2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "HFP-HSE-22", "primary": "ext/sibling/01146-hours.md", "query": "HFP–HSE–22", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "HFP-HSE-22", "primary": "ext/sibling/01146-hours.md", "query": "HFP-HSE-22", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "HFP-HSE-22", "primary": "ext/sibling/01146-hours.md", "query": "HFP-HSE22", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "HFP-HSE-22", "primary": "ext/sibling/01146-hours.md", "query": "HFP HSE 22", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "HFP-HSE-62", "primary": "ext/sibling/08006-hours.md", "query": "HFP–HSE–62", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "HFP-HSE-62", "primary": "ext/sibling/08006-hours.md", "query": "HFP-HSE-62", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "HFP-HSE-62", "primary": "ext/sibling/08006-hours.md", "query": "HFP-HSE62", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "HFP-HSE-62", "primary": "ext/sibling/08006-hours.md", "query": "HFP HSE 62", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "HFP-HSE-69", "primary": "ext/sibling/02126-hours.md", "query": "HFP–HSE–69", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "HFP-HSE-69", "primary": "ext/sibling/02126-hours.md", "query": "HFP-HSE-69", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "HFP-HSE-69", "primary": "ext/sibling/02126-hours.md", "query": "HFP-HSE69", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "HFP-HSE-69", "primary": "ext/sibling/02126-hours.md", "query": "HFP HSE 69", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ–52", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ-52", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ52", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ 52", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ–53", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ-53", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ53", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ 53", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "MBK-132", "primary": "ext/sibling/00540-sop.md", "query": "MBK–132", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "MBK-132", "primary": "ext/sibling/00540-sop.md", "query": "MBK-132", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "MBK-132", "primary": "ext/sibling/00540-sop.md", "query": "MBK132", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "MBK-132", "primary": "ext/sibling/00540-sop.md", "query": "MBK 132", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "MBK-136", "primary": "ext/sibling/04260-sop.md", "query": "MBK–136", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "MBK-136", "primary": "ext/sibling/04260-sop.md", "query": "MBK-136", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "MBK-136", "primary": "ext/sibling/04260-sop.md", "query": "MBK136", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "MBK-136", "primary": "ext/sibling/04260-sop.md", "query": "MBK 136", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "MBK-152", "primary": "ext/sibling/06453-sop.md", "query": "MBK–152", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "MBK-152", "primary": "ext/sibling/06453-sop.md", "query": "MBK-152", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "MBK-152", "primary": "ext/sibling/06453-sop.md", "query": "MBK152", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "MBK-152", "primary": "ext/sibling/06453-sop.md", "query": "MBK 152", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "MBK-E1", "primary": "ext/sibling/03356-postmortem.md", "query": "MBK–E1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "MBK-E1", "primary": "ext/sibling/03356-postmortem.md", "query": "MBK-E1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "MBK-E1", "primary": "ext/sibling/03356-postmortem.md", "query": "MBK E1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "MBK-F-11", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK–F–11", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "endash"}
+{"id": "MBK-F-11", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK-F-11", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "MBK-F-11", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK-F11", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "MBK-F-11", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK F 11", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "space"}
+{"id": "MBK-F3", "primary": "ext/sibling/08470-postmortem.md", "query": "MBK–F3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "MBK-F3", "primary": "ext/sibling/08470-postmortem.md", "query": "MBK-F3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "MBK-F3", "primary": "ext/sibling/08470-postmortem.md", "query": "MBK F3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "MBK-HSE-11", "primary": "ext/sibling/06116-hours.md", "query": "MBK–HSE–11", "rank_after": 1, "rank_before": 2, "rung": "rung-10000", "variant": "endash"}
+{"id": "MBK-HSE-11", "primary": "ext/sibling/06116-hours.md", "query": "MBK-HSE-11", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "MBK-HSE-11", "primary": "ext/sibling/06116-hours.md", "query": "MBK-HSE11", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "MBK-HSE-11", "primary": "ext/sibling/06116-hours.md", "query": "MBK HSE 11", "rank_after": 1, "rank_before": 2, "rung": "rung-10000", "variant": "space"}
+{"id": "MBK-HSE-14", "primary": "ext/sibling/05136-hours.md", "query": "MBK–HSE–14", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "MBK-HSE-14", "primary": "ext/sibling/05136-hours.md", "query": "MBK-HSE-14", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "MBK-HSE-14", "primary": "ext/sibling/05136-hours.md", "query": "MBK-HSE14", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "MBK-HSE-14", "primary": "ext/sibling/05136-hours.md", "query": "MBK HSE 14", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP–MNT–552", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-MNT-552", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-MNT552", "rank_after": 1, "rank_before": 4, "rung": "rung-10000", "variant": "nosep"}
+{"id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP MNT 552", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP–MNT–731", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP-MNT-731", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP-MNT731", "rank_after": 1, "rank_before": 6, "rung": "rung-10000", "variant": "nosep"}
+{"id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP MNT 731", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP–PNR–18", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-PNR-18", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-PNR18", "rank_after": 1, "rank_before": 4, "rung": "rung-10000", "variant": "nosep"}
+{"id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP PNR 18", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "NRL-102", "primary": "ext/sibling/08499-sop.md", "query": "NRL–102", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "NRL-102", "primary": "ext/sibling/08499-sop.md", "query": "NRL-102", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "NRL-102", "primary": "ext/sibling/08499-sop.md", "query": "NRL102", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "NRL-102", "primary": "ext/sibling/08499-sop.md", "query": "NRL 102", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "NRL-105", "primary": "ext/sibling/00060-sop.md", "query": "NRL–105", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "NRL-105", "primary": "ext/sibling/00060-sop.md", "query": "NRL-105", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "NRL-105", "primary": "ext/sibling/00060-sop.md", "query": "NRL105", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "NRL-105", "primary": "ext/sibling/00060-sop.md", "query": "NRL 105", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "NRL-110", "primary": "ext/sibling/09759-sop.md", "query": "NRL–110", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "NRL-110", "primary": "ext/sibling/09759-sop.md", "query": "NRL-110", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "NRL-110", "primary": "ext/sibling/09759-sop.md", "query": "NRL110", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "NRL-110", "primary": "ext/sibling/09759-sop.md", "query": "NRL 110", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "NRL-B3", "primary": "ext/sibling/03703-postmortem.md", "query": "NRL–B3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "NRL-B3", "primary": "ext/sibling/03703-postmortem.md", "query": "NRL-B3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "NRL-B3", "primary": "ext/sibling/03703-postmortem.md", "query": "NRL B3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "NRL-C4", "primary": "ext/sibling/04620-sop.md", "query": "NRL–C4", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "NRL-C4", "primary": "ext/sibling/04620-sop.md", "query": "NRL-C4", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "NRL-C4", "primary": "ext/sibling/04620-sop.md", "query": "NRL C4", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "NRL-E4", "primary": "ext/sibling/00730-postmortem.md", "query": "NRL–E4", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "NRL-E4", "primary": "ext/sibling/00730-postmortem.md", "query": "NRL-E4", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "NRL-E4", "primary": "ext/sibling/00730-postmortem.md", "query": "NRL E4", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "NRL-HSE-21", "primary": "ext/sibling/06466-hours.md", "query": "NRL–HSE–21", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "NRL-HSE-21", "primary": "ext/sibling/06466-hours.md", "query": "NRL-HSE-21", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "NRL-HSE-21", "primary": "ext/sibling/06466-hours.md", "query": "NRL-HSE21", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "NRL-HSE-21", "primary": "ext/sibling/06466-hours.md", "query": "NRL HSE 21", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "NRL-HSE-36", "primary": "ext/sibling/03316-hours.md", "query": "NRL–HSE–36", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "NRL-HSE-36", "primary": "ext/sibling/03316-hours.md", "query": "NRL-HSE-36", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "NRL-HSE-36", "primary": "ext/sibling/03316-hours.md", "query": "NRL-HSE36", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "NRL-HSE-36", "primary": "ext/sibling/03316-hours.md", "query": "NRL HSE 36", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "NRL-HSE-40", "primary": "ext/sibling/00586-hours.md", "query": "NRL–HSE–40", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "NRL-HSE-40", "primary": "ext/sibling/00586-hours.md", "query": "NRL-HSE-40", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "NRL-HSE-40", "primary": "ext/sibling/00586-hours.md", "query": "NRL-HSE40", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "NRL-HSE-40", "primary": "ext/sibling/00586-hours.md", "query": "NRL HSE 40", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "OKF-111", "primary": "ext/sibling/09153-sop.md", "query": "OKF–111", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "OKF-111", "primary": "ext/sibling/09153-sop.md", "query": "OKF-111", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "OKF-111", "primary": "ext/sibling/09153-sop.md", "query": "OKF111", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "OKF-111", "primary": "ext/sibling/09153-sop.md", "query": "OKF 111", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "OKF-115", "primary": "ext/sibling/07299-sop.md", "query": "OKF–115", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "OKF-115", "primary": "ext/sibling/07299-sop.md", "query": "OKF-115", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "OKF-115", "primary": "ext/sibling/07299-sop.md", "query": "OKF115", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "OKF-115", "primary": "ext/sibling/07299-sop.md", "query": "OKF 115", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "OKF-124", "primary": "ext/sibling/06819-sop.md", "query": "OKF–124", "rank_after": 1, "rank_before": 3, "rung": "rung-10000", "variant": "endash"}
+{"id": "OKF-124", "primary": "ext/sibling/06819-sop.md", "query": "OKF-124", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "OKF-124", "primary": "ext/sibling/06819-sop.md", "query": "OKF124", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "OKF-124", "primary": "ext/sibling/06819-sop.md", "query": "OKF 124", "rank_after": 1, "rank_before": 3, "rung": "rung-10000", "variant": "space"}
+{"id": "OKF-A3", "primary": "ext/sibling/07080-sop.md", "query": "OKF–A3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "OKF-A3", "primary": "ext/sibling/07080-sop.md", "query": "OKF-A3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "OKF-A3", "primary": "ext/sibling/07080-sop.md", "query": "OKF A3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "OKF-B3", "primary": "ext/sibling/00626-postmortem.md", "query": "OKF–B3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "OKF-B3", "primary": "ext/sibling/00626-postmortem.md", "query": "OKF-B3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "OKF-B3", "primary": "ext/sibling/00626-postmortem.md", "query": "OKF B3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "OKF-B5", "primary": "ext/sibling/09279-sop.md", "query": "OKF–B5", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "OKF-B5", "primary": "ext/sibling/09279-sop.md", "query": "OKF-B5", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "OKF-B5", "primary": "ext/sibling/09279-sop.md", "query": "OKF B5", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "OKF-F-11", "primary": "ext/sibling/a04-okapi-night-handover.txt", "query": "OKF–F–11", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "OKF-F-11", "primary": "ext/sibling/a04-okapi-night-handover.txt", "query": "OKF-F-11", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "OKF-F-11", "primary": "ext/sibling/a04-okapi-night-handover.txt", "query": "OKF-F11", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "nosep"}
+{"id": "OKF-F-11", "primary": "ext/sibling/a04-okapi-night-handover.txt", "query": "OKF F 11", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "OKF-HSE-16", "primary": "ext/sibling/04646-hours.md", "query": "OKF–HSE–16", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "OKF-HSE-16", "primary": "ext/sibling/04646-hours.md", "query": "OKF-HSE-16", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "OKF-HSE-16", "primary": "ext/sibling/04646-hours.md", "query": "OKF-HSE16", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "OKF-HSE-16", "primary": "ext/sibling/04646-hours.md", "query": "OKF HSE 16", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "OKF-HSE-28", "primary": "ext/sibling/08846-hours.md", "query": "OKF–HSE–28", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "OKF-HSE-28", "primary": "ext/sibling/08846-hours.md", "query": "OKF-HSE-28", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "OKF-HSE-28", "primary": "ext/sibling/08846-hours.md", "query": "OKF-HSE28", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "OKF-HSE-28", "primary": "ext/sibling/08846-hours.md", "query": "OKF HSE 28", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "PCC-109", "primary": "ext/sibling/08079-sop.md", "query": "PCC–109", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "PCC-109", "primary": "ext/sibling/08079-sop.md", "query": "PCC-109", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "PCC-109", "primary": "ext/sibling/08079-sop.md", "query": "PCC109", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "PCC-109", "primary": "ext/sibling/08079-sop.md", "query": "PCC 109", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "PCC-115", "primary": "ext/sibling/06696-quarantine.md", "query": "PCC–115", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "PCC-115", "primary": "ext/sibling/06696-quarantine.md", "query": "PCC-115", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "PCC-115", "primary": "ext/sibling/06696-quarantine.md", "query": "PCC115", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "PCC-115", "primary": "ext/sibling/06696-quarantine.md", "query": "PCC 115", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "PCC-116", "primary": "ext/sibling/07126-sop.md", "query": "PCC–116", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "PCC-116", "primary": "ext/sibling/07126-sop.md", "query": "PCC-116", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "PCC-116", "primary": "ext/sibling/07126-sop.md", "query": "PCC116", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "PCC-116", "primary": "ext/sibling/07126-sop.md", "query": "PCC 116", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "PCC-A3", "primary": "ext/sibling/05410-postmortem.md", "query": "PCC–A3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "PCC-A3", "primary": "ext/sibling/05410-postmortem.md", "query": "PCC-A3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "PCC-A3", "primary": "ext/sibling/05410-postmortem.md", "query": "PCC A3", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "PCC-C2", "primary": "ext/sibling/04293-sop.md", "query": "PCC–C2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "PCC-C2", "primary": "ext/sibling/04293-sop.md", "query": "PCC-C2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "PCC-C2", "primary": "ext/sibling/04293-sop.md", "query": "PCC C2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "PCC-F-11", "primary": "ext/sibling/a03-petrichor-postmortem-insulin.md", "query": "PCC–F–11", "rank_after": 1, "rank_before": 4, "rung": "rung-10000", "variant": "endash"}
+{"id": "PCC-F-11", "primary": "ext/sibling/a03-petrichor-postmortem-insulin.md", "query": "PCC-F-11", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "PCC-F-11", "primary": "ext/sibling/a03-petrichor-postmortem-insulin.md", "query": "PCC-F11", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "nosep"}
+{"id": "PCC-F-11", "primary": "ext/sibling/a03-petrichor-postmortem-insulin.md", "query": "PCC F 11", "rank_after": 1, "rank_before": 4, "rung": "rung-10000", "variant": "space"}
+{"id": "PCC-HSE-20", "primary": "ext/sibling/08146-hours.md", "query": "PCC–HSE–20", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "PCC-HSE-20", "primary": "ext/sibling/08146-hours.md", "query": "PCC-HSE-20", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "PCC-HSE-20", "primary": "ext/sibling/08146-hours.md", "query": "PCC-HSE20", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "PCC-HSE-20", "primary": "ext/sibling/08146-hours.md", "query": "PCC HSE 20", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "PCC-HSE-28", "primary": "ext/sibling/04996-hours.md", "query": "PCC–HSE–28", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "PCC-HSE-28", "primary": "ext/sibling/04996-hours.md", "query": "PCC-HSE-28", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "PCC-HSE-28", "primary": "ext/sibling/04996-hours.md", "query": "PCC-HSE28", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "PCC-HSE-28", "primary": "ext/sibling/04996-hours.md", "query": "PCC HSE 28", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL–CS–HBK–01", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL-CS-HBK-01", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL-CS-HBK01", "rank_after": 1, "rank_before": 3, "rung": "rung-10000", "variant": "nosep"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL CS HBK 01", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL-CS-HBK-1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "unpadded"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL–CS–MTX–02", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL-CS-MTX-02", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL-CS-MTX02", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "nosep"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL CS MTX 02", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL-CS-MTX-2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "unpadded"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL–CS–MTX–03", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL-CS-MTX-03", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL-CS-MTX03", "rank_after": 1, "rank_before": 2, "rung": "rung-10000", "variant": "nosep"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL CS MTX 03", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL-CS-MTX-3", "rank_after": 1, "rank_before": 2, "rung": "rung-10000", "variant": "unpadded"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL–F–09", "rank_after": 1, "rank_before": 2, "rung": "rung-10000", "variant": "endash"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F-09", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F09", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL F 09", "rank_after": 1, "rank_before": 2, "rung": "rung-10000", "variant": "space"}
+{"id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F-9", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "unpadded"}
+{"id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL–F–22", "rank_after": 1, "rank_before": 6, "rung": "rung-10000", "variant": "endash"}
+{"id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F-22", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F22", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL F 22", "rank_after": 1, "rank_before": 6, "rung": "rung-10000", "variant": "space"}
+{"id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL–F–31", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL-F-31", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL-F31", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "nosep"}
+{"id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL F 31", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL–OPS–NH3–01", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL-OPS-NH3-01", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL OPS NH3 01", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL-OPS-NH3-1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "unpadded"}
+{"id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL–OPS–NH3–02", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL-OPS-NH3-02", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL OPS NH3 02", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL-OPS-NH3-2", "rank_after": 1, "rank_before": 5, "rung": "rung-10000", "variant": "unpadded"}
+{"id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL–OPS–NH3–03", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL-OPS-NH3-03", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL OPS NH3 03", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL-OPS-NH3-3", "rank_after": 1, "rank_before": 4, "rung": "rung-10000", "variant": "unpadded"}
+{"id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF–203", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF-203", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF203", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF 203", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF–221", "rank_after": 1, "rank_before": 3, "rung": "rung-10000", "variant": "endash"}
+{"id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF-221", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF221", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF 221", "rank_after": 1, "rank_before": 3, "rung": "rung-10000", "variant": "space"}
+{"id": "SFD-148", "primary": "ext/sibling/01306-quarantine.md", "query": "SFD–148", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "SFD-148", "primary": "ext/sibling/01306-quarantine.md", "query": "SFD-148", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "SFD-148", "primary": "ext/sibling/01306-quarantine.md", "query": "SFD148", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "SFD-148", "primary": "ext/sibling/01306-quarantine.md", "query": "SFD 148", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "SFD-153", "primary": "ext/sibling/04413-sop.md", "query": "SFD–153", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "SFD-153", "primary": "ext/sibling/04413-sop.md", "query": "SFD-153", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "SFD-153", "primary": "ext/sibling/04413-sop.md", "query": "SFD153", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "SFD-153", "primary": "ext/sibling/04413-sop.md", "query": "SFD 153", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "SFD-157", "primary": "ext/sibling/02760-sop.md", "query": "SFD–157", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "SFD-157", "primary": "ext/sibling/02760-sop.md", "query": "SFD-157", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "SFD-157", "primary": "ext/sibling/02760-sop.md", "query": "SFD157", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "SFD-157", "primary": "ext/sibling/02760-sop.md", "query": "SFD 157", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "SFD-C1", "primary": "ext/sibling/06120-sop.md", "query": "SFD–C1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "SFD-C1", "primary": "ext/sibling/06120-sop.md", "query": "SFD-C1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "SFD-C1", "primary": "ext/sibling/06120-sop.md", "query": "SFD C1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "SFD-C4", "primary": "ext/sibling/07309-postmortem.md", "query": "SFD–C4", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "SFD-C4", "primary": "ext/sibling/07309-postmortem.md", "query": "SFD-C4", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "SFD-C4", "primary": "ext/sibling/07309-postmortem.md", "query": "SFD C4", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "SFD-HSE-10", "primary": "ext/sibling/01636-hours.md", "query": "SFD–HSE–10", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "SFD-HSE-10", "primary": "ext/sibling/01636-hours.md", "query": "SFD-HSE-10", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "SFD-HSE-10", "primary": "ext/sibling/01636-hours.md", "query": "SFD-HSE10", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "SFD-HSE-10", "primary": "ext/sibling/01636-hours.md", "query": "SFD HSE 10", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "SFD-HSE-14", "primary": "ext/sibling/06396-hours.md", "query": "SFD–HSE–14", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "SFD-HSE-14", "primary": "ext/sibling/06396-hours.md", "query": "SFD-HSE-14", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "SFD-HSE-14", "primary": "ext/sibling/06396-hours.md", "query": "SFD-HSE14", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "SFD-HSE-14", "primary": "ext/sibling/06396-hours.md", "query": "SFD HSE 14", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "SFD-HSE-29", "primary": "ext/sibling/09056-hours.md", "query": "SFD–HSE–29", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "SFD-HSE-29", "primary": "ext/sibling/09056-hours.md", "query": "SFD-HSE-29", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "SFD-HSE-29", "primary": "ext/sibling/09056-hours.md", "query": "SFD-HSE29", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "SFD-HSE-29", "primary": "ext/sibling/09056-hours.md", "query": "SFD HSE 29", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS–42", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS-42", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS42", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS 42", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS–43", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS-43", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS43", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS 43", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL–NGP–C3–02", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-C3-02", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL NGP C3 02", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-C3-2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "unpadded"}
+{"id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL–NGP–F1–04", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-F1-04", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL NGP F1 04", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-F1-4", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "unpadded"}
+{"id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL–RF–119–A", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL-RF-119-A", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL-RF119A", "rank_after": 1, "rank_before": 8, "rung": "rung-10000", "variant": "nosep"}
+{"id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL RF 119 A", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL–RF–120–A", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL-RF-120-A", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL-RF120A", "rank_after": 1, "rank_before": 5, "rung": "rung-10000", "variant": "nosep"}
+{"id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL RF 120 A", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL–RF–221–A", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-RF-221-A", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-RF221A", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "nosep"}
+{"id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL RF 221 A", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "VTX-102", "primary": "ext/sibling/00753-sop.md", "query": "VTX–102", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "VTX-102", "primary": "ext/sibling/00753-sop.md", "query": "VTX-102", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "VTX-102", "primary": "ext/sibling/00753-sop.md", "query": "VTX102", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "VTX-102", "primary": "ext/sibling/00753-sop.md", "query": "VTX 102", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "VTX-104", "primary": "ext/sibling/03346-sop.md", "query": "VTX–104", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "VTX-104", "primary": "ext/sibling/03346-sop.md", "query": "VTX-104", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "VTX-104", "primary": "ext/sibling/03346-sop.md", "query": "VTX104", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "VTX-104", "primary": "ext/sibling/03346-sop.md", "query": "VTX 104", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "VTX-117", "primary": "ext/sibling/08160-sop.md", "query": "VTX–117", "rank_after": 1, "rank_before": 3, "rung": "rung-10000", "variant": "endash"}
+{"id": "VTX-117", "primary": "ext/sibling/08160-sop.md", "query": "VTX-117", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "VTX-117", "primary": "ext/sibling/08160-sop.md", "query": "VTX117", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "VTX-117", "primary": "ext/sibling/08160-sop.md", "query": "VTX 117", "rank_after": 1, "rank_before": 3, "rung": "rung-10000", "variant": "space"}
+{"id": "VTX-E2", "primary": "ext/sibling/04789-postmortem.md", "query": "VTX–E2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "VTX-E2", "primary": "ext/sibling/04789-postmortem.md", "query": "VTX-E2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "VTX-E2", "primary": "ext/sibling/04789-postmortem.md", "query": "VTX E2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "VTX-G5", "primary": "ext/sibling/06016-postmortem.md", "query": "VTX–G5", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "VTX-G5", "primary": "ext/sibling/06016-postmortem.md", "query": "VTX-G5", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "VTX-G5", "primary": "ext/sibling/06016-postmortem.md", "query": "VTX G5", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "VTX-HSE-17", "primary": "ext/sibling/00236-hours.md", "query": "VTX–HSE–17", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "VTX-HSE-17", "primary": "ext/sibling/00236-hours.md", "query": "VTX-HSE-17", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "VTX-HSE-17", "primary": "ext/sibling/00236-hours.md", "query": "VTX-HSE17", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "VTX-HSE-17", "primary": "ext/sibling/00236-hours.md", "query": "VTX HSE 17", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "VTX-HSE-37", "primary": "ext/sibling/06256-hours.md", "query": "VTX–HSE–37", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "VTX-HSE-37", "primary": "ext/sibling/06256-hours.md", "query": "VTX-HSE-37", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "VTX-HSE-37", "primary": "ext/sibling/06256-hours.md", "query": "VTX-HSE37", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "VTX-HSE-37", "primary": "ext/sibling/06256-hours.md", "query": "VTX HSE 37", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "VTX-HSE-41", "primary": "ext/sibling/05486-hours.md", "query": "VTX–HSE–41", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "VTX-HSE-41", "primary": "ext/sibling/05486-hours.md", "query": "VTX-HSE-41", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "VTX-HSE-41", "primary": "ext/sibling/05486-hours.md", "query": "VTX-HSE41", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "VTX-HSE-41", "primary": "ext/sibling/05486-hours.md", "query": "VTX HSE 41", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "VTX-R1", "primary": "ext/sibling/a02-vantorix-sensor-thresholds.yaml", "query": "VTX–R1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "VTX-R1", "primary": "ext/sibling/a02-vantorix-sensor-thresholds.yaml", "query": "VTX-R1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "VTX-R1", "primary": "ext/sibling/a02-vantorix-sensor-thresholds.yaml", "query": "VTX R1", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "WIKI-BWD-10", "primary": "ext/sibling/01339-dockwiki.html", "query": "WIKI–BWD–10", "rank_after": 1, "rank_before": 17, "rung": "rung-10000", "variant": "endash"}
+{"id": "WIKI-BWD-10", "primary": "ext/sibling/01339-dockwiki.html", "query": "WIKI-BWD-10", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "WIKI-BWD-10", "primary": "ext/sibling/01339-dockwiki.html", "query": "WIKI-BWD10", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "WIKI-BWD-10", "primary": "ext/sibling/01339-dockwiki.html", "query": "WIKI BWD 10", "rank_after": 1, "rank_before": 17, "rung": "rung-10000", "variant": "space"}
+{"id": "WIKI-BWD-12", "primary": "ext/sibling/08959-dockwiki.html", "query": "WIKI–BWD–12", "rank_after": 1, "rank_before": 5, "rung": "rung-10000", "variant": "endash"}
+{"id": "WIKI-BWD-12", "primary": "ext/sibling/08959-dockwiki.html", "query": "WIKI-BWD-12", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "WIKI-BWD-12", "primary": "ext/sibling/08959-dockwiki.html", "query": "WIKI-BWD12", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "WIKI-BWD-12", "primary": "ext/sibling/08959-dockwiki.html", "query": "WIKI BWD 12", "rank_after": 1, "rank_before": 5, "rung": "rung-10000", "variant": "space"}
+{"id": "WIKI-BWD-14", "primary": "ext/sibling/08353-dockwiki.html", "query": "WIKI–BWD–14", "rank_after": 1, "rank_before": 15, "rung": "rung-10000", "variant": "endash"}
+{"id": "WIKI-BWD-14", "primary": "ext/sibling/08353-dockwiki.html", "query": "WIKI-BWD-14", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "WIKI-BWD-14", "primary": "ext/sibling/08353-dockwiki.html", "query": "WIKI-BWD14", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "WIKI-BWD-14", "primary": "ext/sibling/08353-dockwiki.html", "query": "WIKI BWD 14", "rank_after": 1, "rank_before": 15, "rung": "rung-10000", "variant": "space"}
+{"id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI–HFP–DOCK–12", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI-HFP-DOCK-12", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI-HFP-DOCK12", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "nosep"}
+{"id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI HFP DOCK 12", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI–NGP–DOCK–41", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI-NGP-DOCK-41", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI-NGP-DOCK41", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "nosep"}
+{"id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI NGP DOCK 41", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI–SFD–CUST–07", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI-SFD-CUST-07", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI-SFD-CUST07", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI SFD CUST 07", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI-SFD-CUST-7", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "unpadded"}
+{"id": "ZAC-100", "primary": "ext/sibling/01179-sop.md", "query": "ZAC–100", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "ZAC-100", "primary": "ext/sibling/01179-sop.md", "query": "ZAC-100", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "ZAC-100", "primary": "ext/sibling/01179-sop.md", "query": "ZAC100", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "ZAC-100", "primary": "ext/sibling/01179-sop.md", "query": "ZAC 100", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "ZAC-101", "primary": "ext/sibling/00406-sop.md", "query": "ZAC–101", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "ZAC-101", "primary": "ext/sibling/00406-sop.md", "query": "ZAC-101", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "ZAC-101", "primary": "ext/sibling/00406-sop.md", "query": "ZAC101", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "ZAC-101", "primary": "ext/sibling/00406-sop.md", "query": "ZAC 101", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "ZAC-128", "primary": "ext/sibling/01586-quarantine.md", "query": "ZAC–128", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "ZAC-128", "primary": "ext/sibling/01586-quarantine.md", "query": "ZAC-128", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "ZAC-128", "primary": "ext/sibling/01586-quarantine.md", "query": "ZAC128", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "ZAC-128", "primary": "ext/sibling/01586-quarantine.md", "query": "ZAC 128", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "ZAC-B2", "primary": "ext/sibling/06906-quarantine.md", "query": "ZAC–B2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "ZAC-B2", "primary": "ext/sibling/06906-quarantine.md", "query": "ZAC-B2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "ZAC-B2", "primary": "ext/sibling/06906-quarantine.md", "query": "ZAC B2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "ZAC-C2", "primary": "ext/sibling/06366-postmortem.md", "query": "ZAC–C2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "ZAC-C2", "primary": "ext/sibling/06366-postmortem.md", "query": "ZAC-C2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "ZAC-C2", "primary": "ext/sibling/06366-postmortem.md", "query": "ZAC C2", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "ZAC-HSE-12", "primary": "ext/sibling/03596-hours.md", "query": "ZAC–HSE–12", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "ZAC-HSE-12", "primary": "ext/sibling/03596-hours.md", "query": "ZAC-HSE-12", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "ZAC-HSE-12", "primary": "ext/sibling/03596-hours.md", "query": "ZAC-HSE12", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "ZAC-HSE-12", "primary": "ext/sibling/03596-hours.md", "query": "ZAC HSE 12", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "ZAC-HSE-18", "primary": "ext/sibling/05976-hours.md", "query": "ZAC–HSE–18", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "ZAC-HSE-18", "primary": "ext/sibling/05976-hours.md", "query": "ZAC-HSE-18", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "ZAC-HSE-18", "primary": "ext/sibling/05976-hours.md", "query": "ZAC-HSE18", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "ZAC-HSE-18", "primary": "ext/sibling/05976-hours.md", "query": "ZAC HSE 18", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}
+{"id": "ZAC-HSE-27", "primary": "ext/sibling/04086-hours.md", "query": "ZAC–HSE–27", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "endash"}
+{"id": "ZAC-HSE-27", "primary": "ext/sibling/04086-hours.md", "query": "ZAC-HSE-27", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "exact"}
+{"id": "ZAC-HSE-27", "primary": "ext/sibling/04086-hours.md", "query": "ZAC-HSE27", "rank_after": 1, "rank_before": null, "rung": "rung-10000", "variant": "nosep"}
+{"id": "ZAC-HSE-27", "primary": "ext/sibling/04086-hours.md", "query": "ZAC HSE 27", "rank_after": 1, "rank_before": 1, "rung": "rung-10000", "variant": "space"}

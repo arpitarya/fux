@@ -126,10 +126,12 @@ def build(root: Path, view, *, progress=None) -> Dictionary:
     from ..ingest.extract import _headings_and_body, _title
     from ..ingest.parse import parse_document
     from ..progress import NULL as _NULL_PROGRESS
+    from ..query import identifiers as ids_mod
     from ..query.tokenize import tokenize_pairs
     from ..store import term_hash
 
     progress = progress or _NULL_PROGRESS
+    ids = ids_mod.for_root(root)
     # The repository's own rules. `load` never raises for an absent file -- the
     # CLI gate refuses the verb long before this -- and an empty ruleset
     # redacts nothing, which is the common case.
@@ -184,7 +186,9 @@ def build(root: Path, view, *, progress=None) -> Dictionary:
                 if not text:
                     continue
                 raw_runs += _word_runs(text)
-                for surface, analyzed in tokenize_pairs(text):
+                # W-233: the families the index was written with, so a canonical
+                # term (`rf-118`) is named like any other.
+                for surface, analyzed in tokenize_pairs(text, ids):
                     kept += 1
                     h = term_hash(analyzed)
                     out.terms[h] = analyzed

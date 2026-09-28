@@ -134,9 +134,10 @@ def vocabulary(
     }
 
 
-def analyze(view, dictionary, text: str) -> dict:
+def analyze(view, dictionary, text: str, ids=None) -> dict:
     """A question as the analyzer reads it — kept terms with their index
-    statistics, and the tokens it dropped, in order."""
+    statistics, and the tokens it dropped, in order. `ids` are the repo's
+    identifier families (W-233), so a canonical term shows as a kept term."""
     from ..query.analyzer import _WORD_RE, split_identifier
     from ..query.tokenize import _STOPWORDS, tokenize_pairs
     from ..store.format import term_hash
@@ -147,7 +148,7 @@ def analyze(view, dictionary, text: str) -> dict:
         for token in (raw, *split_identifier(raw)):
             if token.lower() in _STOPWORDS:
                 tokens.append({"surface": token, "dropped": "stopword"})
-    kept_pairs = tokenize_pairs(text)
+    kept_pairs = tokenize_pairs(text, ids) if ids is not None else tokenize_pairs(text)
     kept: list[dict] = []
     for surface, analyzed in kept_pairs:
         h = term_hash(analyzed)

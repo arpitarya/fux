@@ -318,9 +318,12 @@ def _named_terms(root: Path, view, doc, raw: bytes, *, words: int) -> dict[str, 
     from ..ingest import pii as pii_mod
     from ..ingest.extract import _headings_and_body, _title
     from ..ingest.parse import parse_document
+    from ..query import identifiers as ids_mod
     from ..query.tokenize import tokenize_pairs
     from ..store import TF_FIELDS, term_hash
     from .dictionary import _enrichment
+
+    ids = ids_mod.for_root(root)
 
     parsed = parse_document(raw, doc.loc, root) if not doc.id.startswith("url:") else None
     if parsed is None:
@@ -349,7 +352,7 @@ def _named_terms(root: Path, view, doc, raw: bytes, *, words: int) -> dict[str, 
     out: dict[str, list] = {}
     for name, text in zip(TF_FIELDS, texts):
         counts: dict[str, list] = {}
-        for surface, analyzed in tokenize_pairs(text or ""):
+        for surface, analyzed in tokenize_pairs(text or "", ids):
             h = term_hash(analyzed)
             row = counts.setdefault(h, [surface, analyzed, 0])
             row[2] += 1

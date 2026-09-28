@@ -405,7 +405,33 @@ class _Handler(BaseHTTPRequestHandler):
         if not text:
             self._json_error(HTTPStatus.BAD_REQUEST, "give me some text: /inspect/analyze?q=…")
             return
-        self._send_json(words_mod.analyze(self.server.state.view(), self.server.state.dictionary(), text))
+        from ..query import identifiers as ids_mod
+
+        state = self.server.state
+        self._send_json(words_mod.analyze(state.view(), state.dictionary(), text, ids_mod.for_root(state.root())))
+
+    def _identifiers(self, params: dict) -> None:
+        """W-233 F3 — the Identifiers test bench. Read-only like every route."""
+        from ..inspect import idfamilies
+        from ..query import identifiers as ids_mod
+
+        state = self.server.state
+        view = state.view()
+        pattern = _first(params, "p").strip()
+        kind = _first(params, "kind").strip() or "template"
+        if kind not in ("template", "regex"):
+            self._json_error(HTTPStatus.BAD_REQUEST, "kind is template or regex")
+            return
+        out: dict = {"detected": [f.__dict__ | {"examples": list(f.examples)} for f in state.families()]}
+        try:
+            out["effective"] = [{"source": r.source, "kind": r.kind} for r in ids_mod.load(state.root()).rules]
+        except FuxError as exc:
+            out["effective_error"] = str(exc)
+        if pattern:
+            out["bench"] = idfamilies.bench(
+                state.texts(), pattern, kind, examples=view.config.words, parity_docs=view.config.parity_sample,
+            )
+        self._send_json(out)
 
     def _word(self, params: dict) -> None:
         from ..inspect import words as words_mod
@@ -433,6 +459,7 @@ _INSPECT_ROUTES = {
     "/inspect/index": "_index",
     "/inspect/probes": "_probes",
     "/inspect/diff": "_diff",
+    "/inspect/identifiers": "_identifiers",
 }
 
 
@@ -508,6 +535,31 @@ class _State:
         return tuple(
             (p.name, p.stat().st_size, p.stat().st_mtime_ns) for p in store_mod.iter_shard_paths(self.root())
         )
+
+    def texts(self):
+        """Every indexed document's text, read once per index state — the
+        Identifiers tab runs a typed pattern over all of it on each keystroke."""
+        from ..inspect.idfamilies import corpus_texts
+
+        key = ("texts", self._shard_key())
+        view = self.view()  # outside the lock: `view()` takes it too
+        with self._lock:
+            if key not in self._jobs:
+                self._jobs[key] = list(corpus_texts(self.root(), view))
+            return self._jobs[key]
+
+    def families(self):
+        """The identifier lens over `texts()`, at `inspect.toml`'s floors."""
+        from ..inspect.idfamilies import detect
+
+        view = self.view()
+        key = ("families", self._shard_key())
+        texts = self.texts()
+        with self._lock:
+            if key not in self._jobs:
+                self._jobs[key] = detect(texts, min_values=view.config.min_values,
+                                         min_docs=view.config.min_docs, examples=3).families
+            return self._jobs[key]
 
     def view(self):
         from ..inspect._scan import read_index_view

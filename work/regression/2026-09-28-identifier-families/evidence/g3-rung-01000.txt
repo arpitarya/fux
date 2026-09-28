@@ -1,0 +1,1 @@
+G3 PASS: empty identifiers.toml -> byte-identical .fux/index on rung-01000

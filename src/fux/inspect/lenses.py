@@ -57,6 +57,7 @@ LEVERS: dict[str, str] = {
     "word-cut passage": "a decoder that emits one record per paragraph (`fux-decoder`)",
     "page chrome": "a consumer html decoder in `.fux/decoders/` that skips `nav`, `header`, `aside` and `footer` (`fux-decoder`)",
     "link-target tokens": "none a consumer can turn — an extraction-rule change under SR-EXTRACTED, its own item, measured first",
+    "identifier family": "`fux identifiers --write` records it in `.fux/identifiers.toml [detected]`, `[user] drop` refuses one — an index change: `fux ingest` after (SR-IDENTIFIERS)",
 }
 
 #: 64 permutations in 16 bands of 4 rows. The banding threshold — the Jaccard

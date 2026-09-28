@@ -236,9 +236,14 @@ def run_query(
     from .expand import build as build_expansion
     from .scan import query_term_hashes
 
-    query_hashes = query_term_hashes(query)
+    from . import identifiers as ids_mod
+
+    # W-233: the families the index was written with, so the question gains
+    # the same canonical terms (`RF 118` -> `rf-118`).
+    ids = ids_mod.for_root(root)
+    query_hashes = query_term_hashes(query, ids)
     expansion = build_expansion(
-        query_hashes, query_term_hashes(expand) if expand else [], tune.expand_weight
+        query_hashes, query_term_hashes(expand, ids) if expand else [], tune.expand_weight
     )
 
     use_accel = False
@@ -270,7 +275,7 @@ def run_query(
             trace_out,
         )
         _fill_trace(trace_out, results, rerank_weight)
-        _fill_confidence(confidence_out, stats, query, final, tune)
+        _fill_confidence(confidence_out, stats, query, final, tune, ids)
         return final, "accelerator"
     results = scan_ask(
         root, query, top=depth, weighting=weighting, archived_dirs=dirs,
@@ -280,7 +285,7 @@ def run_query(
         root, query, results, rerank_weight, top, depth, tune, stats, related_out, trace_out
     )
     _fill_trace(trace_out, results, rerank_weight)
-    _fill_confidence(confidence_out, stats, query, final, tune)
+    _fill_confidence(confidence_out, stats, query, final, tune, ids)
     return final, "scan"
 
 
@@ -386,7 +391,9 @@ def _band_guard(root: Path, query: str, stats: dict | None, results: list) -> No
         from .scan import query_term_hashes
 
         terms = record.get("terms", {})
-        shown = [h for h in query_term_hashes(query) if h in terms]
+        from . import identifiers as ids_mod
+
+        shown = [h for h in query_term_hashes(query, ids_mod.for_root(root)) if h in terms]
         df, n = stats.get("df", {}), int(stats.get("n", 0))
 
         def weight(hashes) -> float:
@@ -469,7 +476,7 @@ def _result_for_pin(root: Path, doc_id: str):
 
 
 def _fill_confidence(
-    out: dict | None, stats: dict | None, query: str, results, tune: "Tune"
+    out: dict | None, stats: dict | None, query: str, results, tune: "Tune", ids
 ) -> None:
     """Assemble the confidence block, if anyone asked for one.
 
@@ -498,8 +505,8 @@ def _fill_confidence(
         # about the same corpus are worse than one.
         out["stats"] = stats
         out["confidence"] = build_signals(
-            tokenize_pairs(query),
-            query_term_hashes(query),
+            tokenize_pairs(query, ids),
+            query_term_hashes(query, ids),
             stats.get("df", {}),
             int(stats.get("n", 0)),
             [r.score for r in results],
@@ -1347,7 +1354,9 @@ def _filtered(root: Path, results, args) -> tuple[list, int]:
     if require_all:
         # Over the COMMITTED record's terms — never fetched text. `find` is an
         # offline verb and the whole point of `--all` is that it is cheap.
-        wanted = set(query_term_hashes(args.query))
+        from . import identifiers as ids_mod
+
+        wanted = set(query_term_hashes(args.query, ids_mod.for_root(root)))
         survivors = []
         for r in kept:
             record = _record_for(root, r.id)

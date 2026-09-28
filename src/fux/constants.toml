@@ -85,6 +85,7 @@ pii_name        = "pii.toml"
 refusals_name   = "refusals.toml"
 observers_dir   = ".fux/observers"
 inspect         = ".fux/inspect.toml"
+identifiers     = ".fux/identifiers.toml"
 
 [routes]
 # A `.fux/sources/routes` host pattern that is a regex, not a literal.
@@ -327,6 +328,7 @@ output = "output.toml.txt"
 # The built-in decoders' caps, appended to the seeded .fux/formats.toml.
 formats_limits = "formats-limits.toml.txt"
 inspect = "inspect.toml.txt"
+identifiers = "identifiers.toml.txt"
 
 [fuse]
 # Reciprocal-rank fusion's k (Cormack et al. 2009) -- a published constant,
@@ -605,7 +607,7 @@ reference = "reference"
 
 [analyzer]
 # The built-in stopwords (query/analyzer.*). A different list writes different
-# postings, so it moves with [index] analyzer; a repo adds its own in tune.toml.
+# postings, so it moves with [index] analyzer. A repo cannot add its own.
 stopwords = [
   "a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "from",
   "has", "have", "how", "i", "if", "in", "into", "is", "it", "its", "of",
@@ -613,3 +615,17 @@ stopwords = [
   "was", "were", "what", "when", "where", "which", "who", "why", "will",
   "with", "you", "your", "we", "our", "not", "can", "may",
 ]
+
+[identifiers]
+# Identifier families (query/identifiers.*, W-233). What a template's `-` or
+# `_` accepts in the text: both ASCII separators, the Unicode dashes U+2010..
+# U+2015 and U+2212, and one space. A different set matches different spans,
+# so it writes different postings on every repo that declares a family.
+flexible_separators = ["-", "_", "\u2010", "\u2011", "\u2012", "\u2013", "\u2014", "\u2015", "\u2212", " "]
+# The shard-header key the effective rules' digest is stamped under. Written
+# only when rules exist, so an index with no families is byte-identical to one
+# built before the feature.
+header_key = "identifiers"
+# The digest's width in bytes (blake2b). It is written into every shard header,
+# so a different width is a different committed byte on every repo with families.
+digest_bytes = 16

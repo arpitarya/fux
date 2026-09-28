@@ -85,6 +85,12 @@ COMMITTED_FILES: dict[str, str] = {
     # ASCII only, like every other value in these tables.
     # ASCII only, like every other value in these tables.
     "pii.toml": "REQUIRED - every command refuses without it. What is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (SR-PII)",
+    # ASCII only, like every other value in these tables.
+    "identifiers.toml": "identifier FAMILIES kept whole however they are typed (RF-{n}: RF 118, rf118 and RF-118 are one term). [user] is yours and wins; [detected] is written by `fux identifiers --write`. CHANGES THE INDEX - re-ingest after an edit (SR-IDENTIFIERS)",
+    # ASCII only, like every other value in these tables. Declared late: until
+    # W-233 found the warning, `fux setup` wrote this file and `doctor` then
+    # called it undeclared.
+    "inspect.toml": "the knobs of `fux inspect`'s lenses and floors - what the index REPORT flags, never what is indexed or ranked (SR-INSPECT)",
     "refusals.toml": "what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (SR-REFUSAL)",
     # ASCII only, like every other value in these tables.
     "fux": "the shim: `.fux/fux find rollback` in a clone with nothing installed. Resolves the reader in three rungs -- the vendored bundle, this member's `node_modules/.bin`, then every ancestor's -- because npm and yarn hoist that bin and pnpm and bun do not (SR-NODE-SEARCH)",
@@ -234,7 +240,7 @@ def _readme() -> str:
         "",
         "| group | verbs | what the group does |",
         "|---|---|---|",
-        "| lifecycle | `setup` `doctor` `inspect` | set the repo up, check the environment, then X-ray the index it produced |",
+        "| lifecycle | `setup` `doctor` `inspect` `identifiers` | set the repo up, check the environment, X-ray the index it produced, and record the ID families it holds |",
         "| write | `ingest` `build` | `ingest` writes the committed index - the first time and every time after, for directories and URLs alike, re-fetching the URLs known to be stale; `build` derives the local accelerator from it |",
         "| sources | `add` `remove` `enrich` `correct` | maintain what is indexed. `add`/`remove` write lines and end in an ingest; `enrich` plans and validates a model's text; `correct` writes one question a PERSON typed onto the document that answers it |",
         "| read | `ask` `find` `answer` `lexical` | the same question, differing only in how much each commits to. `lexical` is BM25F alone, frozen - the baseline `ask` is measured against |",

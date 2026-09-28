@@ -59,3 +59,15 @@ words        = 25
 triage_rows    = 200
 words_page     = 200
 words_page_max = 1000
+
+# Identifier families (`fux identifiers`, W-233): a shape such as RF-{n} is
+# proposed when at least `min_values` distinct identifiers of that shape occur
+# across at least `min_docs` documents. Lower finds more families and more
+# noise; the proposals only take effect once `fux identifiers --write` runs.
+# `parity_sample`: how many indexed documents (in id order) `fux doctor` and
+# `fux serve`'s Identifiers tab match with BOTH regex engines, Python and Node,
+# to prove a [user] regex means the same thing in each.
+[identifiers]
+min_values    = 3
+min_docs      = 2
+parity_sample = 500

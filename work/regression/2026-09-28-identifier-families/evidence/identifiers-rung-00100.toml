@@ -1,0 +1,44 @@
+# .fux/identifiers.toml -- identifier families (SR-IDENTIFIERS).
+#
+# A family keeps an identifier whole however it is typed. With the template
+# RF-{n}, the text "RF 118", "rf118", "RF–118" and "RF-0118" each add the one
+# term rf-118 -- in a document at ingest and in a question at query time -- so
+# the document that names RF-118 outranks one that merely says RF-119 and 118.
+#
+# Template grammar: letters and digits are literal (any case). `-` and `_`
+# accept -, _, a Unicode dash, one space, or nothing between a letter and a
+# digit. `.` `/` `:` match themselves. {n} is digits (leading zeros ignored);
+# {X} is letters. A template must START WITH A LETTER, so prose like "step 4"
+# can never match one.
+#
+# ⚠ CHANGES THE INDEX: after editing, run `fux ingest`. `fux doctor` says when
+# the index was built under different families. Both tables may stay empty;
+# an empty file changes nothing at all.
+
+[user]
+# Yours. fux never writes this table, and it wins over [detected].
+keep = []   # templates to keep whole, e.g. ["RF-{n}", "ADR-{n}"]
+drop = []   # detected templates to ignore
+# EXPERTS ONLY -- prefer a template. A regex is checked when it is loaded and
+# refused if it uses lookaround, a quantified group, an anchor, an unescaped
+# `.` or \s: each behaves differently in the Python and Node readers, or can
+# backtrack without end. `fux serve`'s Identifiers tab tests one first.
+regex = []
+
+[detected]
+# Written by `fux identifiers --write` from the families `fux inspect` finds.
+# Do not edit this table: rerun the verb, or move a line to [user].
+families = [
+  "LQ-{n}",  # 3 values in 3 documents
+  "MBK-{X}{n}",  # 3 values in 2 documents
+  "NGP-{X}-{n}",  # 3 values in 2 documents
+  "PROJ-{n}",  # 3 values in 6 documents
+  "QCL-F-{n}",  # 11 values in 19 documents
+  "QCL-OPS-NH{n}-{n}",  # 5 values in 5 documents
+  "QCL-{X}-{X}-{n}",  # 34 values in 37 documents
+  "RF-{n}",  # 6 values in 12 documents
+  "TMS-{n}",  # 4 values in 5 documents
+  "TSL-NGP-{X}{n}-{n}",  # 3 values in 4 documents
+  "TSL-RF-{n}-A",  # 4 values in 4 documents
+  "WIKI-{X}-{X}-{n}",  # 4 values in 4 documents
+]

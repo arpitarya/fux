@@ -46,7 +46,7 @@ from ..errors import FuxError
 from .canonical import canonical_dumps
 from .collisions import CollisionTracker
 from . import recordschema
-from .format import HEADER, index_dir, shard_for, shard_path
+from .format import HEADER, header_for, index_dir, shard_for, shard_path
 from ..constants import fixed
 
 _SHARDS = fixed("index", "shards")
@@ -54,8 +54,12 @@ _SHARDS = fixed("index", "shards")
 HEADER_LINE = canonical_dumps(HEADER)
 
 
-def write_index(root: Path, records: list[dict]) -> list[Path]:
+def write_index(root: Path, records: list[dict], *, ids_digest: str = "") -> list[Path]:
     """Write the full index from `records` (each must carry a unique `id`).
+
+    `ids_digest` is the repo's effective identifier-family digest (W-233),
+    stamped into every shard header by `header_for`; `""` — no families —
+    writes exactly `HEADER_LINE`, byte for byte what this wrote before.
 
     Returns the shard paths whose bytes actually changed this call (unchanged
     shards are left untouched, not just byte-identically rewritten). Raises
@@ -83,11 +87,12 @@ def write_index(root: Path, records: list[dict]) -> list[Path]:
     except FileExistsError as exc:
         raise FuxError(f"cannot create index dir, a file is in the way: {directory}") from exc
 
+    header_line = canonical_dumps(header_for(ids_digest))
     written: list[Path] = []
     for shard, group in by_shard.items():
         path = shard_path(root, shard)
         group.sort(key=lambda r: r["id"])
-        data = HEADER_LINE + b"".join(canonical_dumps(record) for record in group)
+        data = header_line + b"".join(canonical_dumps(record) for record in group)
         if not path.exists() or path.read_bytes() != data:
             _atomic_write(path, data)
             written.append(path)

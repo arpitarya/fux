@@ -98,6 +98,7 @@ from .gitdir import (
 from .. import decode as decode_mod
 from . import pii as pii_mod
 from . import queue as queue_mod
+from ..query import identifiers as ids_mod
 from .parse import parse, parse_document
 from ..constants import fixed
 
@@ -417,7 +418,19 @@ def run(
     # already claiming the new value would let the next delta run reuse them.
     extract_digest = _extract_config_digest(limits, root)
     extract_moved = extract_digest != _read_extract_config_digest(root)
-    reusable = {} if (full or pii_moved or extract_moved) else _reusable(root, existing, file_shas)
+    # W-233. `.fux/identifiers.toml` is the third input to extraction that no
+    # document's sha carries. Its digest is COMMITTED — stamped into every
+    # shard header — rather than kept in `runtime/` like the two above,
+    # because a fresh clone has no `runtime/` and CI must still be able to see
+    # an index built under other families. So the reuse gate below is the
+    # header comparison itself, and `ids_moved` only has to reach the one
+    # place that gate does not: carried `url:` records.
+    ids = ids_mod.load(root)
+    expected_header = store_mod.header_for(ids.digest)
+    ids_moved = (store_mod.index_header(root) or {}).get(store_mod.IDENTIFIERS_KEY, "") != ids.digest
+    reusable = (
+        {} if (full or pii_moved or extract_moved) else _reusable(root, existing, file_shas, expected_header)
+    )
     # 🔴 **W-110. An enrichment is a second input to extraction, and reuse was
     # keyed on the DOCUMENT's sha alone.** So a newly written `.fux/enrich/`
     # file changed nothing until the document itself changed or `--full` ran:
@@ -454,7 +467,7 @@ def run(
     # them back through the one `parse -> redact -> extract` path rather than
     # opening a second one, which is what keeps the re-derived record
     # byte-identical to a freshly fetched one (L4).
-    if carried and (pii_moved or extract_moved or _decoders_moved(root, decoder_digests)):
+    if carried and (pii_moved or extract_moved or ids_moved or _decoders_moved(root, decoder_digests)):
         reacquired, stranded, reacquired_ids = _reacquire_urls(root, carried, config)
         for doc_id in reacquired:
             carried.pop(doc_id, None)
@@ -583,6 +596,7 @@ def run(
                 # resolved from THIS repo's committed config rather than from
                 # the engine default alone (SR-INGEST decision 23a).
                 root=root,
+                ids=ids,
             )
             p.update(1, detail=_loc_of(doc_id))
     # Re-resolved every run (M5): a new document can resolve a link that
@@ -682,7 +696,7 @@ def run(
         # currency as body terms, through the one object that can see a
         # cross-document collision.
         record["edges"] = edges_mod.resolve(
-            doc_id, scans[doc_id], known_ids, by_basename, tracker.hash_of
+            doc_id, scans[doc_id], known_ids, by_basename, tracker.hash_of, ids=ids
         )
         record["ver"] = ver_for(doc_id, record["sha"])
         records.append(record)
@@ -700,7 +714,7 @@ def run(
             flen=store_mod.trim(fields.flen),
             abbr=_hash_abbr(fields.abbr, tracker),
             edges=edges_mod.resolve(
-                doc_id, scans[doc_id], known_ids, by_basename, tracker.hash_of
+                doc_id, scans[doc_id], known_ids, by_basename, tracker.hash_of, ids=ids
             ),
         )
         record["ver"] = ver_for(doc_id, record["sha"])
@@ -766,7 +780,7 @@ def run(
     if stopping():
         return None
     with progress.phase("write", shard_total, "shards") as p:
-        written = store_mod.write_index(root, records)
+        written = store_mod.write_index(root, records, ids_digest=ids.digest)
         p.update(shard_total)
 
     # W-66: a run that reaches here indexed the whole corpus, so the snapshot
@@ -1563,15 +1577,19 @@ def _drop_changed_enrichment(
     return kept
 
 
-def _reusable(root: Path, existing: dict[str, dict], file_shas: dict[str, str]) -> dict[str, dict]:
+def _reusable(
+    root: Path, existing: dict[str, dict], file_shas: dict[str, str], expected_header: dict
+) -> dict[str, dict]:
     """Prior records whose extraction is still exactly right.
 
     Three conditions, all necessary:
 
-    1. **The shard header matches `store.HEADER`.** It pins the schema id and
-       the analyzer version, so a bump here invalidates every carried field at
-       once. Mixing two analyzers inside one index would be undetectable
-       afterwards and would break the differential law quietly.
+    1. **The shard header matches the one this run will write** —
+       `store.header_for(ids.digest)`. It pins the schema id, the analyzer
+       version and (W-233) the repo's identifier families, so a change to any
+       of them invalidates every carried field at once. Mixing two analyzers —
+       or two family sets — inside one index would be undetectable afterwards
+       and would break the differential law quietly.
     2. **The content sha is unchanged.** Extraction is a pure function of the
        document's bytes and its `loc`, both of which the sha and the id fix.
     3. **It is a `file:` record.** A `url:` record only reappears on a
@@ -1591,7 +1609,7 @@ def _reusable(root: Path, existing: dict[str, dict], file_shas: dict[str, str]) 
     if not paths:
         return {}
     header, _ = store_mod.read_shard(paths[0])
-    if header != store_mod.HEADER:
+    if header != expected_header:
         return {}
     return {
         doc_id: record

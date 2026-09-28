@@ -1,0 +1,4 @@
+rung-00100: 12 families, 115 queries, 0 divergent
+rung-01000: 42 families, 451 queries, 0 divergent
+rung-10000: 42 families, 433 queries, 0 divergent
+G1 PASS

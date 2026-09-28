@@ -88,6 +88,24 @@ HEADER: dict = {
     "tf_fields": list(TF_FIELDS),
 }
 
+#: The key the repo's identifier-family digest is stamped under (W-233).
+IDENTIFIERS_KEY = fixed("identifiers", "header_key")
+
+
+def header_for(ids_digest: str) -> dict:
+    """The header THIS repo's shards carry: `HEADER`, plus the effective
+    identifier-family digest when the repo declares any families.
+
+    **Absent means no families, and that is true of every index written before
+    W-233** — no families existed — so the field needs no `_format` bump
+    (SR-INDEX-LIFECYCLE decision 9.1 concerns a property whose absence is
+    ambiguous; this one's is not). The readers check `_format`, `analyzer` and
+    `tf_fields` by name and ignore it: they see a shard, not a repo, and cannot
+    know which families it should carry. `doctor`, `ingest --check` and
+    ingest's own reuse gate compare it against `.fux/identifiers.toml`.
+    """
+    return {**HEADER, IDENTIFIERS_KEY: ids_digest} if ids_digest else dict(HEADER)
+
 
 def term_hash(term: str) -> str:
     """16-hex (8-byte) blake2b digest of a term — the postings key."""

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-22
 amended: 2026-09-27
 feature: the explorer — a local page over the real ask
-owns: [src/fux/serve@90d3922fcc77]
+owns: [src/fux/serve@7629ef3ce57d]
 laws: [L2, L3, L5, L6, L9, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: 04250d5b883bbdae0c6eb21163051d9ed7f6d8232b9f17bfbea72e7f0169f84b
+content_sha: 56b78d6441da84d9f73ea89fda065f60379fb26aea173e5608cf4295da01400d
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
@@ -310,6 +310,9 @@ this moved where they are written, not what they are.
 **16. Parity: a lens `fux inspect` reports and the explorer does not show is a defect** (Arpit, 2026-09-28, W-229: *"everything in inspect should be present in `serve` so that we can see visually"*). Every top-level section of `inspect.as_dict()` has a card on the Index tab, in the prose report's order, carrying the lens's numbers, its named offenders as the report capped them, and its own lever from `LEVERS`; document names open the Documents tab and terms the Words tab. `/inspect/diff` is `fux inspect --diff` in the explorer: the last report `fux inspect` wrote against the Index tab's, by `inspect.diff.compare`, writing nothing. **Enforced by `tests/test_serve_renders_every_lens.py`**, which fails a report key with no `r.<key>` renderer — so W-228's `families` lens cannot ship invisible. The cards read the server's report and compute nothing (decision 5).
 
 **`fux serve` reads its bound address by unpacking** (`host, port, *_`), which also covers IPv6's four-tuple. Localhost-only is unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+
+**A sixth tab, Identifiers** ([SR-IDENTIFIERS](0160_identifiers.md) decision 11, W-233 F3) — a test bench over `GET /inspect/identifiers?p=…&kind=template|regex`. For a typed pattern it shows the matches across the corpus, each one's canonical term and its terms with and without the family, whether Python `re` and V8 find the same spans, a refusal with the guard's reason, the `[user]` line to paste, and the detected families. **It writes no byte**, like every route: the corpus text it matches is read once per index state and held in memory. The report's section 12 has its Index-tab card, as W-229 requires of every lens.
 
 ### Consequences
 

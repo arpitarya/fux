@@ -57,6 +57,7 @@ from pathlib import Path
 from ..errors import FuxError
 from ..query.bm25f import Scoring, derive_wlen, idf
 from ..query.rank import AskResult, Corpus, rank
+from ..query import identifiers as ids_mod
 from ..query.scan import query_term_hashes
 from ..query.rank import Weighting
 from . import format as fmt
@@ -587,7 +588,7 @@ def ask(
     so `--fast` and `--scan` cannot disagree about how confident fux is
     (SR-CONFIDENCE decision 8).
     """
-    query_hashes = query_term_hashes(query)
+    query_hashes = query_term_hashes(query, ids_mod.for_root(root))
     if not query_hashes:
         if stats_out is not None:
             stats_out.setdefault("df", {})

@@ -1,6 +1,6 @@
 ---
 name: fux-serve
-description: Open the Fux explorer with `fux serve` — a local page with five tabs — Ask (ranked documents, which word earned each score, the band, one lever per finding), Answer (the passage `fux answer` would cite), Words (every term with its df and idf, a question as the analyzer reads it), Documents (one document's X-ray) and Index (worst first). Use for "why did this rank first", "open the fux UI", or to SEE a ranking rather than read JSON. Read-only, localhost only; applies no lever.
+description: Open the Fux explorer with `fux serve` — a local page with six tabs — Ask (ranked documents, which word earned each score, the band, a lever per finding), Answer (the passage `fux answer` would cite), Words (each term's df and idf), Documents (one document's X-ray), Index (worst first) and Identifiers (test an ID family). Use for "why did this rank first", "open the fux UI", or to SEE a ranking rather than read JSON. Read-only, localhost only; applies no lever.
 ---
 
 # The explorer — `fux serve`
@@ -20,8 +20,9 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | "which word is carrying this result?" | the score-by-word bar in the row detail |
 | "why is this document here at all — it has none of my words?" | the **reached by link, not by words** panel |
 | "show me how this document was ingested and indexed" | the **Documents** tab — click the document; its X-ray is computed on the click |
-| "what is wrong with the index, worst first?" | the **Index** tab — **every lens `fux inspect` reports**, one card each in the report's order (boilerplate, findability, lengths, duplication, coverage, graph, probes, identity, segments, chunks, triage), then probes streamed in behind |
+| "what is wrong with the index, worst first?" | the **Index** tab — **every lens `fux inspect` reports**, one card each in the report's order (boilerplate, findability, lengths, duplication, coverage, graph, probes, identity, segments, chunks, identifier families, triage), then probes streamed in behind |
 | "what kinds of documents are in here, and which break their pattern?" | the Index tab's **families** card — open a family to list its members; its misfits name the heading each one lacks |
+| "will `RF-{n}` keep our IDs whole?" · "test an identifier regex" | the **Identifiers** tab — type a template (or, for experts, a regex): its matches, the canonical term each adds, the terms with and without it, whether Python and Node agree, a refusal with its reason, and the `[user]` line to paste. It writes nothing |
 | "what changed since the last `fux inspect`?" | the Index tab's **compare** card — the last report on disk against this one, edge loss flagged |
 | "is the index any good?" | not this verb — `fux inspect` (`fux-inspect`) |
 | "is the repo set up?" | not this verb — `fux doctor` (`fux-index`) |

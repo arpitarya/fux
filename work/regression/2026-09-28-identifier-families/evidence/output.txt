@@ -1,0 +1,53 @@
+=== rung-00100: before ===
+w233-before/rung-00100 -> /Users/arpitarya/my_programs/fux-lab/arms/runs/w233-before/rung-00100
+  ingested 100 docs (100 changed, 0 carried forward), 0 not indexed, 0 skipped, 86 shards written
+  accelerator: 3416 terms, 3416 blocks, 18339 postings (derived, not committed)
+=== rung-00100: after (file empty = the inert state) ===
+w233-after/rung-00100 -> /Users/arpitarya/my_programs/fux-lab/arms/runs/w233-after/rung-00100
+  ingested 100 docs (100 changed, 0 carried forward), 0 not indexed, 0 skipped, 86 shards written
+  accelerator: 3416 terms, 3416 blocks, 18339 postings (derived, not committed)
+accelerator: 3456 terms, 3456 blocks, 18383 postings (derived, not committed)
+  accelerator: 3416 terms, 3416 blocks, 18339 postings (derived, not committed)
+accelerator: 3456 terms, 3456 blocks, 18383 postings (derived, not committed)
+G2 PASS: two from-scratch after-arm builds byte-identical on rung-00100
+=== rung-00100: ranks ===
+/private/tmp/claude-501/-Users-arpitarya-my-programs-fux/f2e0d102-f3ac-4d83-9e32-7b6c5deca5c3/scratchpad/w233-before/src/fux/__init__.py  115 queries  hit@1=90
+/Users/arpitarya/my_programs/fux/src/fux/__init__.py  115 queries  hit@1=115
+648	/Users/arpitarya/my_programs/fux-lab/arms/runs/w233-before/rung-00100/.fux/index
+652	/Users/arpitarya/my_programs/fux-lab/arms/runs/w233-after/rung-00100/.fux/index
+=== rung-01000: before ===
+w233-before/rung-01000 -> /Users/arpitarya/my_programs/fux-lab/arms/runs/w233-before/rung-01000
+  ingested 1000 docs (1000 changed, 0 carried forward), 0 not indexed, 0 skipped, 253 shards written
+  accelerator: 6774 terms, 7085 blocks, 98763 postings (derived, not committed)
+=== rung-01000: after (file empty = the inert state) ===
+w233-after/rung-01000 -> /Users/arpitarya/my_programs/fux-lab/arms/runs/w233-after/rung-01000
+  ingested 1000 docs (1000 changed, 0 carried forward), 0 not indexed, 0 skipped, 253 shards written
+  accelerator: 6774 terms, 7085 blocks, 98763 postings (derived, not committed)
+G3 PASS: empty identifiers.toml -> byte-identical .fux/index on rung-01000
+accelerator: 6987 terms, 7298 blocks, 99060 postings (derived, not committed)
+  accelerator: 6774 terms, 7085 blocks, 98763 postings (derived, not committed)
+accelerator: 6987 terms, 7298 blocks, 99060 postings (derived, not committed)
+G2 PASS: two from-scratch after-arm builds byte-identical on rung-01000
+=== rung-01000: ranks ===
+/private/tmp/claude-501/-Users-arpitarya-my-programs-fux/f2e0d102-f3ac-4d83-9e32-7b6c5deca5c3/scratchpad/w233-before/src/fux/__init__.py  451 queries  hit@1=363
+/Users/arpitarya/my_programs/fux/src/fux/__init__.py  451 queries  hit@1=451
+3304	/Users/arpitarya/my_programs/fux-lab/arms/runs/w233-before/rung-01000/.fux/index
+3312	/Users/arpitarya/my_programs/fux-lab/arms/runs/w233-after/rung-01000/.fux/index
+=== rung-10000: before ===
+w233-before/rung-10000 -> /Users/arpitarya/my_programs/fux-lab/arms/runs/w233-before/rung-10000
+  ingested 10000 docs (10000 changed, 0 carried forward), 0 not indexed, 0 skipped, 256 shards written
+  accelerator: 30841 terms, 36999 blocks, 902972 postings (derived, not committed)
+=== rung-10000: after (file empty = the inert state) ===
+w233-after/rung-10000 -> /Users/arpitarya/my_programs/fux-lab/arms/runs/w233-after/rung-10000
+  ingested 10000 docs (10000 changed, 0 carried forward), 0 not indexed, 0 skipped, 256 shards written
+  accelerator: 30841 terms, 36999 blocks, 902972 postings (derived, not committed)
+accelerator: 31306 terms, 37464 blocks, 905857 postings (derived, not committed)
+  accelerator: 30841 terms, 36999 blocks, 902972 postings (derived, not committed)
+accelerator: 31306 terms, 37464 blocks, 905857 postings (derived, not committed)
+G2 PASS: two from-scratch after-arm builds byte-identical on rung-10000
+=== rung-10000: ranks ===
+/private/tmp/claude-501/-Users-arpitarya-my-programs-fux/f2e0d102-f3ac-4d83-9e32-7b6c5deca5c3/scratchpad/w233-before/src/fux/__init__.py  433 queries  hit@1=328
+/Users/arpitarya/my_programs/fux/src/fux/__init__.py  433 queries  hit@1=433
+26160	/Users/arpitarya/my_programs/fux-lab/arms/runs/w233-before/rung-10000/.fux/index
+26248	/Users/arpitarya/my_programs/fux-lab/arms/runs/w233-after/rung-10000/.fux/index
+DONE

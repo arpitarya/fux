@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@dc815c472a92, src/fux/setup.py@038bbd5962ff, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@ec5a8783f306, src/fux/setup.py@a41435ed30d1, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 2273f1e1e88d06a1ba79b5d41adefd13b8e1618467353ccf7faedfc2ef2025e8
+content_sha: c621dff91fcc451567b23bfa5d7a866259bbc2ca2784d03664f70200acf6a3eb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -929,6 +929,9 @@ line raises names the fix itself rather than pointing at the header.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+
+**`identifiers.toml` and `inspect.toml` are declared committed files** (`COMMITTED_FILES`). `fux setup` and `fux doctor --fix` write `identifiers.toml` whole from its template when it is absent, and both of its tables are the consumer's (`never`), so only the file's existence is enforced ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 ### Consequences
 

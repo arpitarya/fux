@@ -1,0 +1,1 @@
+G2 PASS: two from-scratch after-arm builds byte-identical on rung-01000
