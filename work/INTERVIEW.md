@@ -32,10 +32,17 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-27** (Claude Code, Opus — W-225 stage 3b landed; W-227 declared).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-28** (Claude Code, Opus — W-168 pools; L11 d13a).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-09-28 (latest) — W-230 AND W-227 CLOSED: THE TRAVERSAL GUARD FIRES LIVE
+### 🟢 2026-09-28 (latest) — W-168 STEP POOLS FROM THE KEY: 9, 7, 8 GO; 6 AND 10 STOP
+
+- **L11 decision 13a** (Arpit): `score.py` writes a `pools` block of counts per `exercises` tag. Arpit re-scored set-4-claude the same day.
+- **Pools @1:** 9 intent **14** · 7 MMR **8** · 8 authority **8** · 6 SDM **3** (stops) · 10 section **1** (stops; U0 · B2 · E1 stay ruled, not built).
+- ⚠ Key-free text tags got steps 6 and 10 badly wrong. Don't tag a pool from text again when the key's tag exists.
+- **Next:** step 9 pre-registers from its ruled forks; steps 7 and 8 owe their own pre-registrations.
+
+### 🟢 2026-09-28 — W-230 AND W-227 CLOSED: THE TRAVERSAL GUARD FIRES LIVE
 
 - **W-230 + W-227** (`d82cab8e` and the closing commit): the hook is `100755` and hardened, and `test_hooks_launchable.py` gates the mode. **The live probe was denied.** Recursive walks over `work/` are guarded again. They still need `--exclude-dir=golden`, which is the law.
 - Once live, the guard denied a command carrying an emoji: macOS awk under UTF-8. Fixed with `LC_ALL=C`. That is the third offline/live gap in this guard.

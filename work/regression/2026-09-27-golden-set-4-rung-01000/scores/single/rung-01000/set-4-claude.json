@@ -4,6 +4,71 @@
  "missing_key_lines": [],
  "n": 125,
  "partial": false,
+ "pools": {
+  "_unrecognised": {
+   "answerable": 0,
+   "miss@1": 0,
+   "miss@5": 0,
+   "not_in_top10": 0,
+   "reorderable@1": 0,
+   "reorderable@5": 0,
+   "tagged": 11
+  },
+  "other": {
+   "answerable": 24,
+   "miss@1": 14,
+   "miss@5": 4,
+   "not_in_top10": 4,
+   "reorderable@1": 10,
+   "reorderable@5": 0,
+   "tagged": 24
+  },
+  "step10_section": {
+   "answerable": 15,
+   "miss@1": 1,
+   "miss@5": 0,
+   "not_in_top10": 0,
+   "reorderable@1": 1,
+   "reorderable@5": 0,
+   "tagged": 15
+  },
+  "step6_proximity": {
+   "answerable": 20,
+   "miss@1": 3,
+   "miss@5": 1,
+   "not_in_top10": 0,
+   "reorderable@1": 3,
+   "reorderable@5": 1,
+   "tagged": 20
+  },
+  "step7_diversity": {
+   "answerable": 15,
+   "miss@1": 8,
+   "miss@5": 2,
+   "not_in_top10": 0,
+   "reorderable@1": 8,
+   "reorderable@5": 2,
+   "tagged": 15
+  },
+  "step8_authority": {
+   "answerable": 15,
+   "miss@1": 8,
+   "miss@5": 2,
+   "not_in_top10": 0,
+   "reorderable@1": 8,
+   "reorderable@5": 2,
+   "tagged": 15
+  },
+  "step9_intent": {
+   "answerable": 25,
+   "miss@1": 14,
+   "miss@5": 1,
+   "not_in_top10": 0,
+   "reorderable@1": 14,
+   "reorderable@5": 1,
+   "tagged": 25
+  }
+ },
  "rows": [
   {
    "abstain_correct": false,

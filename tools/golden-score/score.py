@@ -30,6 +30,14 @@ confident-sounding file will read just like the last one.
 | `abstain_wrong` | the band said unanswerable AND the key says it is answerable | the same |
 | `answered_unanswerable` | text returned for a question the key says has no answer | `answer_text` vs the key |
 | `evidence_quoted` | the key's evidence quote appears in the answer text | a normalised substring test |
+| `pools` | per coverage tag: how many questions carry it, and how many of the answerable ones miss rank 1 / rank 5 with the target still in the returned ten | the key's `exercises`, **counted, never echoed per row** |
+
+**`pools` — added 2026-09-28 (Arpit, W-168; L11 decision 13a).** Each ranking
+step's pool is *tagged ∩ answerable ∩ missing the endpoint ∩ in the returned ten*,
+and the tag lives only in the key. The block is **counts keyed by tag name**, and
+a tag name reaches the output only if it has a recipe tag's shape (`stepN_word`
+or `other`); any other value is counted under `_unrecognised`. No row carries a
+tag.
 
 🔴 **`evidence_quoted` is a MECHANICAL PROXY and is NOT the answer-text verdict.**
 W-204 phase D step 3 asks for `correct` · `partial` · `wrong` · `declined`
@@ -157,6 +165,32 @@ def score_one(row: dict, key: dict) -> dict:
     }
 
 
+#: A recipe tag's shape (SR-WORK-TESTDATA A15, R1–R10). Only a name matching it
+#: may reach the output — a malformed key could carry free text in this field.
+POOL_TAG = re.compile(r"step\d{1,2}_[a-z]{1,24}|other")
+POOL_FIELDS = ("tagged", "answerable", "miss@1", "reorderable@1", "miss@5", "reorderable@5", "not_in_top10")
+
+
+def build_pools(scored: list[dict], key: dict[str, dict]) -> dict[str, dict[str, int]]:
+    """Counts per `exercises` tag — decision 13a. Nothing per row."""
+    out: dict[str, dict[str, int]] = {}
+    for s in scored:
+        raw = key[s["id"]].get("exercises")
+        tags = raw if isinstance(raw, list) else [raw] if raw else []
+        for tag in sorted({t if isinstance(t, str) and POOL_TAG.fullmatch(t) else "_unrecognised" for t in tags}):
+            p = out.setdefault(tag, dict.fromkeys(POOL_FIELDS, 0))
+            p["tagged"] += 1
+            if not key[s["id"]].get("answerable"):
+                continue
+            p["answerable"] += 1
+            for k in (1, 5):
+                if not s[f"hit@{k}"]:
+                    p[f"miss@{k}"] += 1
+                    p[f"reorderable@{k}"] += s["hit@10"]
+            p["not_in_top10"] += not s["hit@10"]
+    return out
+
+
 def build_payload(rows: dict[str, dict], key: dict[str, dict], *,
                   rung: str, arm: str, set_name: str) -> dict:
     """The score file. `set_name` is carried verbatim — `"2-u"`, or `"1"`."""
@@ -179,6 +213,7 @@ def build_payload(rows: dict[str, dict], key: dict[str, dict], *,
             "answered_unanswerable": sum(1 for s in scored if s["answered_unanswerable"]),
             "evidence_quoted": sum(1 for s in scored if s["evidence_quoted"]),
         },
+        "pools": build_pools(scored, key),
         "rows": scored,
     }
 
@@ -272,6 +307,8 @@ def main(argv: list[str] | None = None) -> int:
         f"abstain_ok={t['abstain_correct']} abstain_wrong={t['abstain_wrong']} "
         f"evidence_quoted={t['evidence_quoted']}{flag}"
     )
+    for tag, p in sorted(payload["pools"].items()):
+        print(f"  pool {tag}: tagged={p['tagged']} reorderable@1={p['reorderable@1']} reorderable@5={p['reorderable@5']}")
     return 0
 
 

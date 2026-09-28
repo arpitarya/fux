@@ -14,7 +14,7 @@ description: "W-168 step 10 starts as a compare doc (proposal §2). Three forks:
 
 | | |
 |---|---|
-| **status** | proposed 2026-09-25 (Claude Code, Opus) — step 10's blocker was *"owes its own compare doc first"*; this is it |
+| **status** | ⏸ **parked 2026-09-28**: the `step10_section` pool on set-4-claude is **1** at rank 1, counted from the key's tag ([pools](../regression/2026-09-27-golden-set-4-rung-01000/report.md)). By W-219's rule the step stops before any build. U0 · B2 · E1 stay ruled (2026-09-27), deferred and not refused; a set whose `step10_section` pool is ≥ 6 starts the build from them |
 | **the call** | ✅ **U0 · B2 · E1**, Arpit, 2026-09-27 |
 | **confidence** | medium that U0 is the right first arm; **low that step 10 clears the floor at all** — see *Headroom* |
 | **reopen-trigger** | **either** a scored U0 run shows ≥ 6 `step10_section` misses whose primary document is **outside** the re-ranked top-k (the case only a plane change can reach) — **or** `[bm25f] b` is raised back above `0.5`, which restores the long-document dilution this step exists for |

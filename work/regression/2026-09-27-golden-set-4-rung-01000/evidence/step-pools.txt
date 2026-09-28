@@ -1,0 +1,9 @@
+triple topics 5 · authority topics 4 · long docs 4
+set-4-claude
+  step           tagged answerable miss@1 reorderable@1 miss@5 reorderable@5 not-in-top10
+  6 proximity        45         44     16            15      3             2            1
+  7 diversity        11         11      8             8      2             2            0
+  8 authority        58         51     18            18      3             3            0
+  9 intent           20         20     10            10      1             1            0
+  10a section        19         16      7             5      3             1            2
+  10b section        46         39     13            13      1             1            0

@@ -46,6 +46,40 @@ a complete join (0 missing on either side, not partial).
 - **A baseline, not a comparison.** It is generation 3's first number and is
   comparable with nothing from generation 2.
 
+## Step pools — 2026-09-28: text tags, then the key's (L11 d13a)
+
+**Text tags, key-free**, the generation-2 method:
+[`evidence/step_pools.py`](evidence/step_pools.py) →
+[`step-pools.txt`](evidence/step-pools.txt). A pool is tagged ∩ answerable ∩
+missing rank 1 ∩ in the returned ten. Every number is `informed`.
+
+| step | tagged | reorderable@1 | reorderable@5 |
+|---|---:|---:|---:|
+| 6 SDM | 45 | 15 | 2 |
+| 7 MMR | 11 | 8 | 2 |
+| 8 authority | 58 | 18 | 3 |
+| 9 intent | 20 | 10 | 1 |
+| 10 section, rule 10a | 19 | **5** | 1 |
+| 10 section, rule 10b | 46 | **13** | 1 |
+
+- **Step 10 is undecidable from text.** Its two rules land either side of 6.
+- **Ruled by Arpit, 2026-09-28:** the pool of record comes from the key's
+  `exercises` tag. `score.py` now writes a `pools` block of counts
+  ([L11](../../../records/0012_LAW-11-sealed-answer-key.md) d13a).
+- **Re-scored by Arpit the same day.** `pools` in the score file, keyed by the
+  key's tag. These are the pools of record:
+
+| step | tagged | reorderable@1 | reorderable@5 | |
+|---|---:|---:|---:|---|
+| 6 SDM | 20 | **3** | 1 | stops |
+| 7 MMR | 15 | **8** | 2 | goes |
+| 8 authority | 15 | **8** | 2 | goes |
+| 9 intent | 25 | **14** | 1 | goes |
+| 10 section | 15 | **1** | 0 | stops |
+
+- ⚠ **The text table above missed badly** on steps 6 and 10, the two that stop.
+  It stays as the record of why the key's tag was needed.
+
 ## The run
 
 | | |

@@ -158,3 +158,54 @@ def test_a_malformed_key_line_never_reaches_the_error(scorer, tmp_path):
         scorer.read_jsonl(bad, redact=True)
     assert "ALPHA-SECRET" not in str(exc.value)
     assert "line 1" in str(exc.value)
+
+
+# ── decision 13a (Arpit, 2026-09-28, W-168): per-tag pool COUNTS ──────────────
+# The only key field it reads is `exercises`, and it publishes counts keyed by a
+# tag NAME of a recipe's shape. Adding a pool field is an amendment, as above.
+ALLOWED_POOL_FIELDS = {
+    "tagged", "answerable", "miss@1", "reorderable@1", "miss@5", "reorderable@5", "not_in_top10",
+}
+
+
+def _pool_fixture():
+    key = {
+        "q1": {**SYNTHETIC_KEY, "id": "q1", "exercises": "step10_section"},
+        "q2": {**SYNTHETIC_KEY, "id": "q2", "exercises": "step10_section"},
+        "q3": {**SYNTHETIC_KEY, "id": "q3", "exercises": "step10_section", "answerable": False,
+               "relevant": [], "primary": None},
+        "q4": {**SYNTHETIC_KEY, "id": "q4", "exercises": "the quick brown fox SECRET-TAG"},
+        "q5": {**SYNTHETIC_KEY, "id": "q5"},
+    }
+    rows = {
+        # q1: hit at rank 1 · q2: target at rank 7 (reorderable) · q3: unanswerable
+        "q1": {**SYNTHETIC_ROW, "id": "q1"},
+        "q2": {**SYNTHETIC_ROW, "id": "q2", "ranked": [f"docs/x{i}.md" for i in range(6)] + ["docs/BETA-SECRET.md"]},
+        "q3": {**SYNTHETIC_ROW, "id": "q3", "ranked": ["docs/x.md"]},
+        "q4": {**SYNTHETIC_ROW, "id": "q4"},
+        "q5": {**SYNTHETIC_ROW, "id": "q5"},
+    }
+    return rows, key
+
+
+def test_pools_are_counts_under_a_recipe_tag_name(scorer):
+    rows, key = _pool_fixture()
+    pools = scorer.build_payload(rows, key, rung="r", arm="a", set_name="4-claude")["pools"]
+    assert set(pools) == {"step10_section", "_unrecognised"}
+    for p in pools.values():
+        assert set(p) == ALLOWED_POOL_FIELDS
+        assert all(isinstance(v, int) for v in p.values())
+    assert pools["step10_section"] == {
+        "tagged": 3, "answerable": 2, "miss@1": 1, "reorderable@1": 1,
+        "miss@5": 1, "reorderable@5": 1, "not_in_top10": 0,
+    }
+
+
+def test_pools_echo_no_free_text_and_no_row_carries_a_tag(scorer):
+    rows, key = _pool_fixture()
+    payload = scorer.build_payload(rows, key, rung="r", arm="a", set_name="4-claude")
+    blob = json.dumps(payload)
+    for secret in ("SECRET-TAG", "quick brown fox", "ALPHA-SECRET", "BETA-SECRET"):
+        assert secret not in blob
+    for row in payload["rows"]:
+        assert "exercises" not in row and set(row) <= ALLOWED_ROW_KEYS

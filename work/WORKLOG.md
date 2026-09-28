@@ -22,6 +22,20 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-168 steps 6–10 pools: 9, 7, 8 go; 6 and 10 stop (L11 d13a, key-tagged)  ·  Claude Code (Opus)
+- **Asked:** *"implement W-168"*. The next step was counting each step 6–10 pool from Arpit's set-4-claude score.
+- **Did:**
+  - Counted the pools key-free: tags from question text and `seed/` only, the gen-2 method (`evidence/step_pools.py`). Reorderable rank-1 misses: 6 → 15, 7 → 8, 8 → 18, 9 → 10.
+  - **Step 10 cannot be tagged from text.** Rule 10a gives 5 and rule 10b gives 13, and I would have been choosing after seeing both. I asked instead of choosing.
+  - **Arpit ruled "Amend L11 d13".** Built decision 13a:
+    - `score.py` writes a `pools` block of counts per recipe-shaped `exercises` tag, with nothing per row, and a malformed tag becomes `_unrecognised`;
+    - two new tests in `test_golden_score_output.py` against a synthetic key;
+    - the record amendment names the door it adds (`answerable` per tag).
+  - Filed the inbox row and `BLOCKED.json` (ASK, surfaced). **Arpit re-scored mid-session.** Key pools @1: 6 → 3 and 10 → 1 **stop**; 7 → 8, 8 → 8 and 9 → 14 go. Inbox row removed, blocker PROCEED, both compare docs re-statused.
+  - ⚠ **The text cross-check was badly wrong** on exactly the two steps that stop (6 → 15; 10 → 5/13). Asking instead of choosing a rule is what caught it.
+- **Decided / open:** the text table is a cross-check, not the pool of record. Another session has W-225 engine edits uncommitted in the main tree, which breaks `import fux` there. My tagger imports nothing from the engine, and I left its files alone.
+- **Next:** step 9 pre-registers (forks ruled D2 · I1 · M1 · S1, pool 14). Then steps 7 and 8 each owe a compare doc or pre-registration.
+
 ## 2026-09-28 — W-230 and W-227 built and closed: the traversal guard fires live  ·  Claude Code (Opus, fresh session)
 - **Asked:** *"implement W-230"*.
 - **Did:**

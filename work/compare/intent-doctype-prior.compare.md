@@ -2,7 +2,7 @@
 type: Compare Doc
 title: "W-168 step 9 — the intent → doc-type prior: where a document's type is declared, how a question's intent is read, and whether step 3's intent joins it"
 description: "Step 9 starts as a compare doc (proposal §2). Three forks decide whether it can be measured at all: where the doc-type is declared (per source, front-matter, or a query-time glob table), how intent is read from a question (a fixed engine cue lexicon or consumer cues), and whether the history/current intent that foreclosed step 3 becomes part of this step. Measured first: the golden seed declares no type anywhere — 0 of 32 front-matters carry one, and every seed sits in one source directory — so only a query-time table can be tested without changing the frozen ladder. Proposed, not ruled."
-status: parked — the measured pool is below 6 (2026-09-24); forks deferred
+status: ruled and unparked — set-4-claude's step9_intent pool is 14 (2026-09-28); pre-registration next
 timestamp: 2026-09-24T00:00:00Z
 filed: 2026-09-24
 ---
@@ -26,7 +26,7 @@ declared per source"*, which says it *"starts as a compare doc"*.
 
 | | |
 |---|---|
-| **status** | ⏸ **parked 2026-09-24** — the I1-tagged pool on generation 2 is **2 (set-2-claude) and 1 (set-3-claude)**, below 6 at every `k` ([pools](../regression/2026-09-24-golden-gen2-rung-01000/report.md)). By this doc's own stop rule the step stops before any build, so the three forks are **deferred, not refused** |
+| **status** | ▶ **unparked 2026-09-28**: the `step9_intent` pool on set-4-claude is **14** at rank 1, counted from the key's tag ([pools](../regression/2026-09-27-golden-set-4-rung-01000/report.md)). The 2026-09-24 ruling below stands, and the build starts from it, after a pre-registration. The generation-2 park (pools 2 and 1) is superseded |
 | **the call — ✅ RULED 2026-09-24 (Arpit)** | *"agree implement all"* — **D2 · I1 · M1, and step 3's intent stays OUT (S1).** ⚠ **Not built:** the pool rule above fires first, so the ruling waits for a set whose intent-tagged pool is ≥ 6. When that set exists, the build starts from these forks with no new ruling needed. A committed glob → type table read at query time, a fixed engine cue lexicon for three intents, one multiplicative weight at `0.0` by default |
 | **confidence** | medium on D2 (it is the only option testable on the frozen ladder); low that step 9 clears the floor — see *What the pool can be* |
 | **endpoint (already ruled)** | `hit@1`, `primary@1` beside it (Arpit, 2026-09-23) |

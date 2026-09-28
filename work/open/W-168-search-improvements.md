@@ -7,6 +7,27 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## ✅ STEP POOLS COUNTED FROM THE KEY — 2026-09-28 (Arpit re-scored; Claude Code, Opus); steps 6 and 10 stop
+
+[Report §Step pools](../regression/2026-09-27-golden-set-4-rung-01000/report.md) · [scores](../regression/2026-09-27-golden-set-4-rung-01000/scores/single/rung-01000/set-4-claude.json) `pools`.
+
+- **How:** text tags could not settle step 10: two rules gave 5 and 13. Arpit ruled *"Amend L11 d13"*, so [L11](../../records/0012_LAW-11-sealed-answer-key.md) decision 13a lets `score.py` count pools by the key's `exercises` tag, as counts only. He re-scored the same day.
+- **Pools, tagged ∩ answerable ∩ miss@1 ∩ in the top ten** (`informed`):
+
+  | step | tagged | pool @1 | pool @5 | |
+  |---|---:|---:|---:|---|
+  | 6 SDM | 20 | **3** | 1 | ⏸ **stops before build** |
+  | 7 MMR | 15 | **8** | 2 | goes: owes a pre-registration |
+  | 8 authority | 15 | **8** | 2 | goes: owes a pre-registration |
+  | 9 intent | 25 | **14** | 1 | goes: forks already ruled D2 · I1 · M1 · S1 |
+  | 10 section | 15 | **1** | 0 | ⏸ **stops**: U0 · B2 · E1 stay ruled, not built |
+
+- ⚠ **The text cross-check was badly wrong**: it gave 6 → 15 and 10 → 5 or 13 ([`step-pools.txt`](../regression/2026-09-27-golden-set-4-rung-01000/evidence/step-pools.txt)). A key-free tag is not a pool.
+- `_unrecognised` carries 11 questions, all of them unanswerable. Their tag is not recipe-shaped, and the guard counted them without echoing the tag. `other` carries 24 (pool 10).
+- **Next, in order:**
+  1. Step 9 pre-registers (the pool is largest and the forks are ruled). One mechanism per arm.
+  2. Steps 7 and 8 each owe a compare doc or pre-registration.
+
 ## ✅ SET-4-CLAUDE CAPTURED 2026-09-27 AND SCORED 2026-09-28 (Arpit's hand); the pools are next
 
 [Pre-registration](../regression/2026-09-27-golden-set-4-rung-01000/PRE-REGISTRATION.md) (`0ce0b845`, before any row) · [report](../regression/2026-09-27-golden-set-4-rung-01000/report.md).
