@@ -41,3 +41,13 @@ open warning.
    - PASS: file it, and close both steps' "combination unmeasured" warnings in
      W-168.
    - FAIL: back to Arpit. Which default gives way is his call.
+
+## Status
+
+- **2026-09-28 · bar frozen** (Claude Code, Opus). Keep-rule ruled by Arpit
+  the same day: **significance**. `am-A` fails against a comparator only if
+  `verdict.rule` finds the comparator better at the observed discordant count.
+  A loss below the floor → INCONCLUSIVE, to Arpit.
+  [Pre-registration](../regression/2026-09-28-anchor-mined/PRE-REGISTRATION.md) ·
+  decider [`decide.py`](../regression/2026-09-28-anchor-mined/evidence/decide.py),
+  frozen by hash.
