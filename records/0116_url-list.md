@@ -7,10 +7,10 @@ description: "One URL per line in a committed file, deduped and sorted by the lo
 status: accepted
 date: 2026-08-19
 feature: "`.fux/sources/urls` — the file format itself, and the one grammar both committed source lists are parsed by"
-owns: [src/fux/ingest/sourcelist.py@a45ccd18afc2, node/src/ingest/sourcelist.mjs@96fa88451bf5]
-laws: [L2, L3, L4]
+owns: [src/fux/ingest/sourcelist.py@7bed3815ecaa, node/src/ingest/sourcelist.mjs@01a32a15e889]
+laws: [L3, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 7e814ff40b5946a7bcb23afba0d5eb30a9c015cc8302b808a70fb3b776ac73d7
+content_sha: ec141611114ad839a8dc6846efefb8835ca00d36b08501bce469853f79b830c3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -56,7 +56,7 @@ loosenings and only the second happened.
 the index could hold readable display text. **A line still carrying `meta=`
 fails to load with a named error**, because the key set is closed; that is the
 `fux update` precedent (W-177), not a deprecation. The leak it closed is an
-accepted exposure now — [SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded.
+accepted exposure now — [ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded.
 
 ```console
 $ cat .fux/sources/urls
@@ -151,7 +151,7 @@ an agent will treat as authoritative. It belongs in a diff a human reads, not in
 a value nested three levels into a config file.
 
 **It must not affect committed bytes.** Two people can hold the same set in
-different orders; the index must not know. This is L3 — same sources,
+different orders; the index must not know. This is L4 — same sources,
 byte-identical index — applied to *config* rather than content.
 
 ### Decision
@@ -202,7 +202,7 @@ know a key must refuse rather than guess. Silently ignoring one is how a typo'd
 `mata=plain` ships a private document to a public index.
 
 **10. A line attribute beats the source-wide setting, for that URL only.** The
-default stays the strict one — L5 is a safety property, so opting out is
+default stays the strict one — ex-L5 is a safety property, so opting out is
 per-document and visible in a diff, never a blanket flip. **Two lines carrying
 the same URL with *different* attributes are a loud error naming both line
 numbers**, not a last-wins merge: exact URLs cannot legitimately disagree, and
@@ -347,7 +347,7 @@ surprising to have chosen by accident — a warning's shape, not a refusal's.
 ([SR-DOCTOR](0152_doctor.md)). The coherent pair is `update=never keep=true`:
 the bytes sit in `.fux/acquired/`, `answer` verifies against them and reports
 `as-ingested` ([SR-ACQUIRED](0145_acquired-plane.md)), and nothing opens a
-socket — *more* offline, with the grain of L4.
+socket — *more* offline, with the grain of L5.
 
 🔴 **14c. This is NOT the ETag saving, and the records must not let a later
 reader think it was.** `update=never` buys **bandwidth** by giving up
@@ -417,7 +417,7 @@ nobody re-argues them from scratch, and so nobody adds one quietly:
 
 | candidate | what it would do | why not here |
 |---|---|---|
-| `snapshot` | commit a machine-made copy of the content, per URL | the refer/snapshot policy is per *source* today and belongs to [SR-REFER](0127_refer-plane.md); a per-URL form is an L2 decision, not a grammar one |
+| `snapshot` | commit a machine-made copy of the content, per URL | the refer/snapshot policy is per *source* today and belongs to [SR-REFER](0127_refer-plane.md); a per-URL form is an L3 decision, not a grammar one |
 | `tag` | give a URL document the frontmatter tags a repo file has | URL documents have no frontmatter, so their `tag` edges are always empty — a real gap. But it invents corpus structure in a config file, which needs its own record |
 | `max_age` | per-URL freshness bound at answer time | freshness is the refer plane's, and its threshold is a pre-registered prediction. Deciding it here would fix a number no one has measured |
 
@@ -493,7 +493,7 @@ regexes for one idea is how they drift.
 must not depend on importing every decoder. Importing a **fetcher** to validate
 one line would run module-level consumer code that may `connect()` to a
 browser — **so reading a committed file would open a socket to decide whether a
-line is well-formed**, on a path L4 fences. Existence is
+line is well-formed**, on a path L5 fences. Existence is
 `urlsrc._fetcher_path`'s at use time and `fux doctor`'s ahead of time
 ([SR-DOCTOR](0152_doctor.md), the `fetcher bindings` row).
 
@@ -618,7 +618,7 @@ pipe** (Arpit, 2026-09-18; built 2026-09-21 as W-199 DoD 10).
   one. The alternatives were a window in which the committed file does not load,
   or a second way for bytes to enter the index.
 
-**`parse_duration` and the host-glob matcher hold no numeral**: a duration is "a number and a unit" (`<= 1` character is refused), and `**` is matched and skipped by its own length. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**`parse_duration` and the host-glob matcher hold no numeral**: a duration is "a number and a unit" (`<= 1` character is refused), and `**` is matched and skipped by its own length. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 
@@ -674,7 +674,7 @@ pipe** (Arpit, 2026-09-18; built 2026-09-21 as W-199 DoD 10).
   a list that fails the build after a clean merge trains people to stop
   maintaining it.
 - **Preserving file order.** Rejected: it makes committed bytes a function of
-  how someone chose to group their list, which is L3 lost for a cosmetic gain.
+  how someone chose to group their list, which is L4 lost for a cosmetic gain.
 - **Sections** (`[http]` / `[cdp]`) — rejected: they reintroduce order
   significance, which decision 4 spent effort removing, and moving a URL between
   mechanisms becomes a two-line diff instead of a one-word one.

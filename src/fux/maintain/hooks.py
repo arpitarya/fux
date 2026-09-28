@@ -122,7 +122,7 @@ fux ingest --spawn-runner || exit 0
     # 🔴 **`--no-fetch`, and the flag is the whole hook/daemon split** (W-177
     # open question 1, ruled (b) by Arpit 2026-09-15). Since `fux ingest`
     # absorbed `fux update`, the bare verb goes to the network — so a hook that
-    # ran it bare would open sockets on every `git merge`, on a path L4 fences
+    # ran it bare would open sockets on every `git merge`, on a path L5 fences
     # and a person did not ask for. **Split by CALLER, not by flag default:**
     # the freshness daemon is the thing whose job *is* freshness and it writes
     # the bare verb; a git hook stays local-only and names its opt-out here, in

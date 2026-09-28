@@ -105,7 +105,7 @@ systems that own it; verify at answer time.
   *model-derived* and the collision is the whole point of those records.
   **Enrichment never runs inside `fux ingest`** — it is its own command, its
   output pinned and then ingested deterministically. That boundary is what
-  keeps L3 true.
+  keeps L4 true.
 
 **The build is gated on falsifiable predictions** (paper §8): a milestone does
 not start while its gating prediction is unmeasured or failed. That is a hard
@@ -130,7 +130,7 @@ its milestone needs it. Nothing else comes back.
 
 ⚠ **This section is NOT normative, and has not been since 2026-09-12.** Each law
 is *stated* in exactly one record — [SR-LAW-0](records/0002_LAW-0-authority.md)
-through [SR-WORK-ENVIRONMENTS](records/0052_WORK-environments.md) — and the block below is
+through [SR-LAW-12](records/0014_LAW-12-values-live-in-config.md) — and the block below is
 **generated from them** by [`scripts/gen-laws.py`](scripts/gen-laws.py) and held
 byte-equal by [`tests/test_claude_md_laws.py`](tests/test_claude_md_laws.py).
 
@@ -141,7 +141,7 @@ It is reproduced at all because this is the file every session reads first, and
 **for exactly as long as a test binds it** — remove the test and this block
 violates decision 1.
 
-[SR-LAWS](records/0001_LAWS.md) assigns the handles `L0`–`L4`, `L6`–`L8` and `L10`–`L13` and routes
+[SR-LAWS](records/0001_LAWS.md) assigns the handles `L0`–`L12` and routes
 each to its record; that is all it does now.
 
 <!-- LAWS:BEGIN — GENERATED from records/*_LAW-*.md by scripts/gen-laws.py. Do not edit by hand: amend the record, then run `python scripts/gen-laws.py --write`. -->
@@ -150,7 +150,7 @@ each to its record; that is all it does now.
   every other record.** Every rule is *stated* in exactly one SR; every other
   artifact — `CLAUDE.md`, a schema, a config comment, a skill, a diagram —
   **links to it and never restates it**, and a change is made in the record
-  first. The Law records `SR-LAW-0`…`SR-WORK-ENVIRONMENTS` outrank every other SR: **a
+  first. The Law records `SR-LAW-0`…`SR-LAW-12` outrank every other SR: **a
   record that conflicts with a Law is void in the conflicting part**, never a
   trade-off to weigh. **A Law changes only on Arpit's ruling, named in the
   record**; an ordinary SR a session may accept.
@@ -163,16 +163,27 @@ each to its record; that is all it does now.
   2026-09-12 each law is stated in its own `SR-LAW-n` record, and what
   `CLAUDE.md` carries is generated from those records and held equal by a test.
   Precedence is **judgment, never a gate** — no parser reads *"does this
-  contradict L2"* — and a record self-contradicting inside one file stays
+  contradict L3"* — and a record self-contradicting inside one file stays
   ungated. [SR-LAW-0](records/0002_LAW-0-authority.md).
-- **L1** · **`$0`, FOSS-only.** Fux is zero-cost to run and carries no
+- **L1** · **A retired SR is archived, never deleted.** When a standing record's
+  law, rule or subject is retired, the record is **moved** to `archive/records/`,
+  mirroring its path, **in the same change that retires it** — with a row in
+  `archive/README.md`, `status: archived`, and a top banner `ARCHIVED <date> —
+  retired by <ruling>` (no *superseded by* line). An archived record may be
+  **named, never cited** as grounding for a live claim
+  ([SR-WORK-ARCHIVE](records/0062_WORK-archive.md) decisions 4–7). **Superseded records
+  are out of scope**: they are still rewritten or deleted in the change that
+  supersedes them (SR-WORK-ARCHIVE decision 9). A retired law is written
+  `ex-L<n>` in live text; its number may be reused only by a renumber that
+  SR-LAWS records.
+- **L2** · **`$0`, FOSS-only.** Fux is zero-cost to run and carries no
   proprietary dependency: **no commercial licence, no paid or metered API, no
   subscription, no hosted model — ever.** Every dependency ships under an
   **OSI-approved licence**, identified by its **SPDX identifier**; permissive
   and copyleft both qualify, and nothing else does.
   ⚠ **Source-available is not open source, and that is the trap this clause
   exists for.** BSL 1.1, SSPL, Elastic License 2.0, Commons Clause, "fair
-  source", and the free tier of a commercial product all **fail** L1 —
+  source", and the free tier of a commercial product all **fail** L2 —
   precisely because each one looks like it passes. **The test is the OSI
   approved-licence list**, never the price, never a public repo, never the word
   "open" in a README.
@@ -186,21 +197,22 @@ each to its record; that is all it does now.
   ⚠ **Amended 2026-09-06** (Arpit). The previous form forbade third-party runtime
   dependencies outright — the zero-dependency guarantee, sold as the product's
   central promise. **That guarantee is withdrawn**, deliberately, and
-  [SR-LAW-1](records/0003_LAW-1-zero-cost.md) carries what it bought, what replaced
+  [SR-LAW-2](records/0004_LAW-2-zero-cost.md) carries what it bought, what replaced
   it, and the three things it left unguarded.
-- **L2** · **Content is never durable outside its source system.** The index holds
+- **L3** · **Content is never durable outside its source system.** The index holds
   statistics, never content. The single exception is explicit per-source
   `snapshot` policy. This is the law the whole architecture rests on.
-- **L3** · **Deterministic — no model in the maintenance path.** Same sources →
+- **L4** · **Deterministic — no model in the maintenance path.** Same sources →
   byte-identical index and root hash. No wall-clock output, no unseeded
   randomness, no set-iteration-order dependence. No maintenance path may ever
   call a model — not to be "smarter" at ingest, not to summarize, not once.
-- **L4** · **Offline by default.** Network access only inside explicit, fenced,
+- **L5** · **Offline by default.** Network access only inside explicit, fenced,
   opt-in paths. An import fence test enforces it.
 - **L6** · **Say "index", not "db".** What Fux commits is an index — statistics that
   make documents findable. A council ruling, and it is load-bearing vocabulary.
-- **L7** · **Python ≥ 3.11** (`tomllib`, modern typing). Match the surrounding style.
-- **L8** · **A use record is never committed.** Fux may record what was asked
+- **L7** · **Python ≥ 3.12** (`tomllib`, modern typing — PEP 695 type parameters, `typing.override`, `itertools.batched`). Match the surrounding style. **[L8](records/0010_LAW-8-node-22.md) is its Node twin.**
+- **L8** · **Node ≥ 22** — the Node read plane's floor, as [L7](records/0009_LAW-7-python-312.md) is Python's. Every Node artefact fux publishes declares `"engines": { "node": ">=22" }`, and CI tests no Node older than 22.
+- **L9** · **A use record is never committed.** Fux may record what was asked
   and what was answered — **in plaintext, with no law-level size bound** — and
   may print a per-answer provenance receipt on stdout. **Every durable trace of
   use lives on a gitignored path and never reaches a committed byte.**
@@ -208,7 +220,7 @@ each to its record; that is all it does now.
   `fetchers/`, `decoders/`, `enrich/`, `tune.toml`, `output.toml` and
   `.fuxignore` are all **committed**; `.fux/runtime/` is the only derived
   directory under it. *"Inside `.fux/`"* is not the rule and would put a journal
-  beside the committed index. **L2 governs the corpus; L8 governs the record of
+  beside the committed index. **L3 governs the corpus; L9 governs the record of
   who went looking in it** — a query is not content, and no other law reached
   it. ⚠ **Ruled three times on 2026-08-27 (Arpit): written, reverted, then
   narrowed to commits alone.** Hashing, a size bound, the stdout prohibition and
@@ -303,16 +315,6 @@ each to its record; that is all it does now.
   the sets, the guards, the switch's mechanics and the benchmark process are
   [SR-WORK-GOLDEN](records/0066_WORK-golden.md)'s.
 - **L12** · **Every value lives in a config file, never in code.** A *tunable* value — a weight, threshold, limit, timeout, TTL or sample size — is read from a committed TOML file: `fux.toml`, `.fux/tune.toml`, or another `.fux/*.toml`. A *fixed* engine value — a schema id, a format or rules version, the shard count, an artefact file name — is read from the engine's internal constants file, `src/fux/constants.toml`, shipped inside both distributions. Python and Node read the same key from the same file. **A missing file or key is a hard error that names it; no module constant, function body or parameter default supplies a fallback.** The only places a literal value may sit are `setup.py` and `src/fux/templates/`, which write the config files, and `tests/`, `tests_e2e/`, `tools/` and `scripts/`.
-- **L13** · **A retired SR is archived, never deleted.** When a standing record's
-  law, rule or subject is retired, the record is **moved** to `archive/records/`,
-  mirroring its path, **in the same change that retires it** — with a row in
-  `archive/README.md`, `status: archived`, and a top banner `ARCHIVED <date> —
-  retired by <ruling>` (no *superseded by* line). An archived record may be
-  **named, never cited** as grounding for a live claim
-  ([SR-WORK-ARCHIVE](records/0062_WORK-archive.md) decisions 4–7). **Superseded records
-  are out of scope**: they are still rewritten or deleted in the change that
-  supersedes them (SR-WORK-ARCHIVE decision 9). A retired law handle is never
-  reused.
 
 <!-- LAWS:END -->
 
@@ -428,7 +430,7 @@ force.**
 ## Golden answer key (generated — NOT the source)
 
 ⚠ **This section is NOT normative, and it is NOT the prohibition** — that is
-**law [L11](records/0012_LAW-11-sealed-answer-key.md)**, in §Non-negotiable
+**law [L11](records/0013_LAW-11-sealed-answer-key.md)**, in §Non-negotiable
 constraints above. What is *stated* here is the process around it:
 [SR-WORK-GOLDEN](records/0066_WORK-golden.md) decision 2, and the block below is
 **generated from it** by [`scripts/gen-golden.py`](scripts/gen-golden.py) and held
@@ -443,7 +445,7 @@ not read `records/`** — a link would cover nothing it reaches — and
 <!-- GOLDEN:BEGIN — GENERATED from records/0066_WORK-golden.md by scripts/gen-golden.py. Do not edit by hand: amend the record, then run `python scripts/gen-golden.py --write`. -->
 
 🔴 **Golden answers are closed to every agent by law
-[L11](records/0012_LAW-11-sealed-answer-key.md)** — §Non-negotiable constraints above.
+[L11](records/0013_LAW-11-sealed-answer-key.md)** — §Non-negotiable constraints above.
 Read it before anything near `work/golden/`. **This block states none of it.** It
 is the surrounding process:
 
@@ -577,7 +579,7 @@ python -m fux.store.nodebundle node node/dist  # the published bundle (L10)
 
 **Two suites, both maintained**, and a feature is not done until both cover it
 and pass. **What a consumer is served is build output**
-([L10](records/0011_LAW-10-bundled-output.md)): `node/` is authored `.mjs`, and
+([L10](records/0012_LAW-10-bundled-output.md)): `node/` is authored `.mjs`, and
 one generated `fux.mjs` is what ships.
 
 ⚠ **Two invocations that fail for reasons that are not failures** — the bare

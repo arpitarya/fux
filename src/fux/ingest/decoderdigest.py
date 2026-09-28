@@ -42,7 +42,7 @@ place.
 **Markdown and plain text carry no entry**, because no decoder claims them —
 they are read by `extract.py`, whose `RULES_VERSION` is the other half of W-166.
 
-**Deterministic (L3):** both kinds are functions of source-tree bytes, never of
+**Deterministic (L4):** both kinds are functions of source-tree bytes, never of
 time, and the map is built in sorted order.
 """
 

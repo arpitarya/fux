@@ -42,14 +42,14 @@ pre-registration exist.**
 
 | # | idea | what it fixes | cost | law check | golden prerequisite |
 |---|---|---|---|---|---|
-| 1 | **Anchor-text field** — index the words other documents use when *linking* to a document as a BM25F field | vocabulary mismatch: `0126_graph.md` never says "graph lane"; five linkers do. Shrinks Tier B lexically | small — edges are already extracted; one field in `P/` | clean — statistics, not content (L2) | a doc reachable only by link wording |
+| 1 | **Anchor-text field** — index the words other documents use when *linking* to a document as a BM25F field | vocabulary mismatch: `0126_graph.md` never says "graph lane"; five linkers do. Shrinks Tier B lexically | small — edges are already extracted; one field in `P/` | clean — statistics, not content (L3) | a doc reachable only by link wording |
 | 2 | **Corpus-mined expansion** — acronyms from `Term (ABBR)` patterns, glossary `term — definition` lines, `[[alias]]` frontmatter → a deterministic synonym table in `D/`, fed through the existing `--expand` path at `expand_weight`, with SR-EXPAND's refusal intact; the agent's own `--expand` stacks on top | "PPR" vs "personalized pagerank"; house vocabulary | small–medium | clean | an acronym question whose document spells it out |
 | 3 | **Identifier field, unstemmed** — `W-146`, `SR-GRAPH`, `ERR_2031`, versions: exact tokens, high boost | the stemmer mangles ids; agents search by id constantly | small | clean | id-queries |
 | 4 | **RM3 pseudo-relevance feedback** — distinctive terms from the top-k re-queried once at low weight (an auto-filled `--expand`) | recall on under-specified queries | small | clean — **but drift is real; pre-register or don't build** | under-specified questions with a known answer |
 | 5 | **Supersession-aware ranking** — a `supersedes` edge demotes its target in lexical rank *and* inside the walk; the successor inherits the target's anchor text | the biggest wrong-answer class in org knowledge: the old runbook | small — the edge kind exists | clean; pairs with archived markers | a superseded/successor pair |
 | 6 | **Passage proximity (SDM)** — in refer, score ordered and unordered query-term windows on the fetched bytes | "index lock" ≠ "lock the index" — phrase sense without a positional index | small — refer holds the bytes | clean; zero index cost | phrase-sensitive questions |
 | 7 | **Community diversification (MMR)** — if the top-5 share one community, swap #5 for the best document of the next | five near-duplicates, zero coverage | tiny once the graph plane is in `ask` | clean; **measure — it can hurt precision** | multi-facet questions |
-| 8 | **Git-derived authority prior** — distinct authors × commit count, from commit metadata | a document ten people maintain over one person's draft | medium — a new `M/` stat | L3 only if derived from commit metadata, never wall-clock; **recency bias is the trap** | needs a corpus with history — golden is synthetic |
+| 8 | **Git-derived authority prior** — distinct authors × commit count, from commit metadata | a document ten people maintain over one person's draft | medium — a new `M/` stat | L4 only if derived from commit metadata, never wall-clock; **recency bias is the trap** | needs a corpus with history — golden is synthetic |
 | 9 | **Query-intent → doc-type prior** — "how do I…" prefers runbooks, "why did we…" prefers records; declared per source | shape mismatch, not vocabulary mismatch | medium | clean; declarative | intent-labelled questions |
 | 10 | **Section-level index units** — rank sections, back off to the document | long documents where the answer is one heading | large — a plane change, a major of its own | clean | long-document questions |
 
@@ -78,7 +78,7 @@ pre-registration exist.**
 | 5 | SR-RANKING, SR-GRAPH, SR-ARCHIVED-CONTENT | `query/rank.py`, `graph/walk.py` |
 | 6 | SR-REFER-PLANE, SR-CHUNKING | `refer/` |
 | 7 | SR-ASK, SR-GRAPH | `query/__init__.py`, `graph/community.py` |
-| 8 | SR-RANKING, SR-INDEX-RECORD, SR-LAWS L3 note | `ingest/`, `M/` |
+| 8 | SR-RANKING, SR-INDEX-RECORD, SR-LAWS L4 note | `ingest/`, `M/` |
 | 9 | SR-TYPES-LIST, SR-RANKING | `sources.py`, `query/rank.py` |
 | 10 | a new record; SR-POSTINGS, SR-CHUNKING | a plane |
 

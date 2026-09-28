@@ -8,9 +8,9 @@ status: accepted
 date: 2026-08-22
 feature: what happens once a document is declared archived — the record property, ranking, the marker, and the disclaimer
 owns: [tools/archived-signal-eval@30fb75fa7476]
-laws: [L3, L6]
+laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: cb5bef2c5c16b947f61be7d1f56c7b6daf45f4730c73603552349742d2687e8c
+content_sha: 6c5e17f3b42ab6d1b51110fca4057cf688fb7c83382da4834334a830280ce3dd
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -463,7 +463,7 @@ what the words mean. What it demotes is the document, not the vocabulary.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -473,13 +473,13 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**The archived declaration's list is `[sources] dirs_file`, with no default path** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). An absent `fux.toml` still means *nothing archived*; a present one that lacks the key, in Python or Node, is an error naming it rather than a silent `.fux/sources/dirs` ([SR-CONFIG](0113_config.md) decision 17).
+**The archived declaration's list is `[sources] dirs_file`, with no default path** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). An absent `fux.toml` still means *nothing archived*; a present one that lacks the key, in Python or Node, is an error naming it rather than a silent `.fux/sources/dirs` ([SR-CONFIG](0113_config.md) decision 17).
 
-**No archived-content rule changed by stage 4a** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `ingest/run.py` checks the decoders' caps up front and digests them ([SR-INGEST](0106_ingest.md)).
+**No archived-content rule changed by stage 4a** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `ingest/run.py` checks the decoders' caps up front and digests them ([SR-INGEST](0106_ingest.md)).
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
 
 ### Consequences
 

@@ -14,7 +14,7 @@ gitignored progress.**
 | `.fux/enrich/queue.tsv` | **committed** | the backlog is a *team* fact — a teammate cloning the repo should see what still needs a model without re-running ingest |
 | `.fux/runtime/enrich-progress.tsv` | **gitignored** | which entries *this machine* has worked through is a local fact, and committing it would make two people's progress conflict on every pull |
 
-**The queue is committed, so it is bound by L3 and L2 like any committed byte:**
+**The queue is committed, so it is bound by L4 and L3 like any committed byte:**
 
 - **Sorted by path**, always. Walk order is filesystem order, and a queue that
   differed between two machines would make `git status` dirty for no reason.

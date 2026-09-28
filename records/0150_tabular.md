@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-06
 amended: 2026-09-11
 feature: tabular documents — row granularity, the admitted-row limit, and what a table citation is
-owns: [src/fux/decode/csv.py@2c37b28e4a9f, src/fux/decode/xlsx.py@e3e42687e359, src/fux/decode/_limits.py@bf192fbd7b13]
-laws: [L1, L2, L3]
+owns: [src/fux/decode/csv.py@2c37b28e4a9f, src/fux/decode/xlsx.py@e3e42687e359, src/fux/decode/_limits.py@42ac9cfa5394]
+laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: cad1783b6c328fedd01ae2d6b4e10dffc7300d032418b2f2d212b8240ce76624
+content_sha: ad4a6e547e569dadfc9600068a9f7d264bac58447a13d7cce42625cfb89dd673
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -97,7 +97,7 @@ and belonged in `fux.toml`. It also added a **fourth** top-level table to
 days. Arpit moved it beside `max_phrases` into tune.toml's `[index]` — the
 declared exception to SR-TUNE's boundary rule, SR-TUNE decision 13. What
 survives unchanged: it still changes what is indexed, the file is still
-committed, and L3 still reads `same sources + same committed [index] -> same
+committed, and L4 still reads `same sources + same committed [index] -> same
 index`. `fux.toml [decode]` is now refused by name.
 
 **4a. A changed limit now reaches an unchanged table.** 🔴 **From 2026-09-06 to
@@ -156,7 +156,7 @@ indexed text a moving target for no benefit.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -208,7 +208,7 @@ decoy rows sharing 3 of 4 query terms, every candidate the same size so length
 cannot do the work. The correct row outranks the next-best in **42/48
 (0.875)**.
 
-**`MAX_CELL_CHARS` and `MAX_COLS` are `[limits.csv] max_cell_chars` and `[limits.xlsx] max_cols`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27), read through `_limits.limit()` like `max_table_rows`; the values and the notices are unchanged ([SR-DECODE](0139_decode.md)).
+**`MAX_CELL_CHARS` and `MAX_COLS` are `[limits.csv] max_cell_chars` and `[limits.xlsx] max_cols`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27), read through `_limits.limit()` like `max_table_rows`; the values and the notices are unchanged ([SR-DECODE](0139_decode.md)).
 
 ### Consequences
 

@@ -24,7 +24,7 @@ same drifted bytes and agree perfectly.
 The arm compares two readers against each other and needs no ground truth
 (PRE-REG-NODE-2 §4); the manifests name `seed/` and `ext/` documents only, and
 the one directory this module opens under `work/golden/` is `seed/`, which
-[L11](../../records/0012_LAW-11-sealed-answer-key.md) permits — `seed_drift()`
+[L11](../../records/0013_LAW-11-sealed-answer-key.md) permits — `seed_drift()`
 needs the live bytes to know a rung has gone stale.
 """
 

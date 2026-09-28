@@ -23,7 +23,7 @@ to `None` and is **not indexed at all** — there is no equivalent of the `.json
 problem where undecoded bytes inflated `df` for every document, because
 nothing is admitted unless a human actually wrote words into the file.
 
-⚠ **This is a hand-rolled minimal reader, not a full parser, because L1
+⚠ **This is a hand-rolled minimal reader, not a full parser, because L2
 forbids the one library (Pillow) that would make this easy.** Known
 limitations, stated rather than hidden:
 
@@ -52,7 +52,7 @@ from fux.decode._limits import limit
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.image", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
+VERSION = fixed("decoders.image", "version")  # not bumped by W-234: law handles in comments only; W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
 
 EXTENSIONS = tuple(fixed("decoders.image", "extensions"))
 

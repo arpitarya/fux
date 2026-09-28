@@ -13,8 +13,8 @@ This module makes the difference machine-readable.
 Every one of them is a **pure function of what ranking already produced** — the
 query's term hashes, the `df` and corpus statistics BM25F needed anyway, the
 scored result list, and (on `answer` only) the refer plane's freshness verdict.
-Nothing here fetches, samples, calls a model, or reads a clock, so L1, L3 and
-L4 are untouched — see [SR-LAWS](../../../records/0001_LAWS.md).
+Nothing here fetches, samples, calls a model, or reads a clock, so L2, L4 and
+L5 are untouched — see [SR-LAWS](../../../records/0001_LAWS.md).
 
 | signal | what it answers | shape |
 |---|---|---|
@@ -148,7 +148,7 @@ class Confidence:
     verified: str
     #: The query's own terms that match no document anywhere in the corpus,
     #: in the order they were written. The user's words, echoed back — never
-    #: corpus content, so L2 and L5 are not in play.
+    #: corpus content, so L3 and ex-L5 are not in play.
     missing: tuple[str, ...]
 
     #: **How much of the question the TOP-RANKED DOCUMENT itself covers**, as

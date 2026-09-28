@@ -399,7 +399,7 @@ function resolve(data, label) {
     const unknownKeys = Object.keys(value).filter((k) => !SCHEMA[name].includes(k));
     if (unknownKeys.length) {
       // A key fux removed is named as removed. Sorted so two removed keys in
-      // one table report the same one every run (L3 reaches errors too).
+      // one table report the same one every run (L4 reaches errors too).
       const removed = unknownKeys.filter((k) => REMOVED_KEYS.has(`${name}.${k}`)).sort();
       if (removed.length) {
         throw new FuxError(

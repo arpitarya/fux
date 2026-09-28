@@ -193,7 +193,7 @@ def test_an_extraction_rule_bump_re_extracts_the_whole_corpus(mixed, monkeypatch
     assert report.doc_count == 2  # both re-extracted
 
 
-# -- determinism (L3) -------------------------------------------------------
+# -- determinism (L4) -------------------------------------------------------
 
 
 def test_a_delta_run_is_still_byte_identical_to_a_full_run(mixed, monkeypatch):
@@ -221,7 +221,7 @@ def test_a_delta_run_is_still_byte_identical_to_a_full_run(mixed, monkeypatch):
 
 
 def test_the_digests_are_not_functions_of_time(mixed):
-    """L3: the same tree gives the same key, so two clean runs agree."""
+    """L4: the same tree gives the same key, so two clean runs agree."""
     first = decoderdigest.binding_digests(mixed)
     second = decoderdigest.binding_digests(mixed)
     assert first == second

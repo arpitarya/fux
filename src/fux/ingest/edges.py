@@ -35,11 +35,11 @@ linker, re-index it alone, assert the target's committed bytes did not move.
 
 ## Why HASHES and not the anchor string
 
-[L2](../../records/0004_LAW-2-content-never-durable.md) — content is never
+[L3](../../records/0005_LAW-3-content-never-durable.md) — content is never
 durable outside its source system. Link text is a verbatim fragment of the
 source document's prose, so committing it plainly would put content in the
-index. (It would also have needed L5's hashed-meta branch on top — true when
-this was written, and L5 retired with W-194 on 2026-09-20. **L2 is what carries
+index. (It would also have needed ex-L5's hashed-meta branch on top — true when
+this was written, and ex-L5 retired with W-194 on 2026-09-20. **L3 is what carries
 the argument** and it is untouched.) A term hash is a
 *statistic*, which is what the index holds, and it is already the currency
 `terms` is written in — so the scan's byte prefilter finds an anchor source

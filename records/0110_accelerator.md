@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@dd04339e64e2, tools/differential@68b74242b9a8, src/fux/schemas/runtime.schema.json@f83e87676ef8]
-laws: [L1, L3]
+owns: [src/fux/derive@dd04339e64e2, tools/differential@46e35c2929fe, src/fux/schemas/runtime.schema.json@f83e87676ef8]
+laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ae7f4759a7def73dac0f4c6bb9259b17a72451bab7adc214edf379643d6e02d1
+content_sha: e77c7e1be1dcc83455990eacfbf225e694a6e94646b9d6d80a168c08c41edc2f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -259,7 +259,7 @@ and trimmed per-field tf.
 
 <!-- L12-NOTE-START -->
 
-**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `accel.ask`, `accel_candidates`,
+**[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `accel.ask`, `accel_candidates`,
 `block_bound` and the two helpers take `scoring` (and `skipping`) as required
 arguments — there is no default `Scoring` left to fall back to — so every caller
 names the scoring it ranks under, and the differential law compares two paths
@@ -269,7 +269,7 @@ handed the same object.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -370,7 +370,7 @@ Renamed 2026-08-27 on Arpit's ruling — *remove the trap at the source.*
 - ⚠ **What this shape had already cost, unnoticed:** `fux.refer`'s shadow made
   `tests/refer/test_refer_plane.py` feed **three functions** to
   `inspect.getsource` while believing it was scanning three modules for
-  `urllib`/`socket` imports. **L4's network import fence silently stopped
+  `urllib`/`socket` imports. **L5's network import fence silently stopped
   covering three files** — 552 lines — and nothing failed, because
   `getsource` works on a function too. A shadow does not have to break a test to
   cost you one.
@@ -656,7 +656,7 @@ accelerator's candidate and bound code needed no change, because the fold
 arrives as an ordinary `Expansion`. Scan and accelerator returned identical
 payloads at every arm weight in `tests/query/test_mined.py`.
 
-**The offset-table entry is built from the index's own constants**: one `mx`/`mnw` slot per `[index] tf_fields` entry and a key `[index] term_hash_bytes` wide, so the struct layout (`<8sHQI5H5IIIH`) is derived rather than spelled. The u16 and u32 ceilings are `ctypes`' own, the lookup is `bisect_left`, and the bound compares at `[ranking] score_digits`. The runtime schema did not move: every byte of the table is unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**The offset-table entry is built from the index's own constants**: one `mx`/`mnw` slot per `[index] tf_fields` entry and a key `[index] term_hash_bytes` wide, so the struct layout (`<8sHQI5H5IIIH`) is derived rather than spelled. The u16 and u32 ceilings are `ctypes`' own, the lookup is `bisect_left`, and the bound compares at `[ranking] score_digits`. The runtime schema did not move: every byte of the table is unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

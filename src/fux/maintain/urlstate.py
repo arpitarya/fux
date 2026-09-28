@@ -113,7 +113,7 @@ class UrlHealth:
     #: content hash, a version counter, or an internal object id, and this file
     #: — while gitignored — is exactly the kind of local state that ends up in a
     #: support bundle. Storing `sha256(token)` compares as well as the token
-    #: does and carries none of it, so **L5 is untouched by construction.**
+    #: does and carries none of it, so **ex-L5 is untouched by construction.**
     #:
     #: **Counters, no clocks** — unchanged. A token is an opaque equality
     #: witness, not a timestamp, even when a server happened to build it from

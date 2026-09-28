@@ -221,7 +221,7 @@ class Weighting:
         cannot copy that, and the reason is a property worth being pleased
         about — its source lists are loader-sorted and file order is
         presentation only, so there is no first. Longest-match is
-        order-independent, which is what L3 needs. Ties cannot occur because
+        order-independent, which is what L4 needs. Ties cannot occur because
         TOML keys are unique.
 
         **This is the only implementation.** `tune.Tune` carries the data and

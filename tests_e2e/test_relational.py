@@ -96,7 +96,7 @@ def test_graph_surfaces_the_expected_node(linked, case):
 
 
 def test_relational_surfaces_are_deterministic(linked):
-    """L3 at the surface: same corpus, same bytes, every run."""
+    """L4 at the surface: same corpus, same bytes, every run."""
     for args in (
         ("path", "docs/adr-storage.md", "docs/rota-oncall.md", "--json", "--hops", "2"),
         ("explain", "docs/adr-storage.md", "--json"),

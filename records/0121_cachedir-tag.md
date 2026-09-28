@@ -8,9 +8,9 @@ status: accepted
 date: 2026-08-19
 feature: the `CACHEDIR.TAG` file written into every derived `.fux/` subdirectory
 owns: []
-laws: [L3]
+laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 5b3294bf0f8458b5c8ec6c85d78d881b9962e18d5925bffab99f1a69a17256e1
+content_sha: 8a534c1778105c1b7e602ba8820984655c6dcd91cbca904d1815dad3caf46fef
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -130,7 +130,7 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -140,7 +140,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 ### Consequences
 

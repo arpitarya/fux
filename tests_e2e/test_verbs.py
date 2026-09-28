@@ -803,7 +803,7 @@ def test_add_ingests_by_default(tmp_path):
 
 
 def test_add_then_ingest_produces_the_same_bytes(tmp_path):
-    """The L3 assertion that matters most here.
+    """The L4 assertion that matters most here.
 
     `add` must not be a second write path into the index. If it were, the
     bytes it produced and the bytes a plain `fux ingest` produces from the

@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@4f553ab8891d, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@2a75560cd349]
-laws: [L4, L5, L7]
+owns: [src/fux/config.py@7370e58c825d, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@2a75560cd349]
+laws: [L5, ex-L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 56886da797ad2f328fb05e0d69e4a07827912f42da117769b16ebdcbb2a44c93
+content_sha: 31697477306bcd3aedbe54d22cfc2116fc9164f378840136ed729048581c9fb2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -31,7 +31,7 @@ content_sha: 56886da797ad2f328fb05e0d69e4a07827912f42da117769b16ebdcbb2a44c93
 the file is so small: what gets indexed lives in `.fux/sources/dirs`, one entry
 per line, and this file only says how the engine behaves.
 
-**Every key is required** ([SR-LAW-12](0013_LAW-12-values-live-in-config.md),
+**Every key is required** ([SR-LAW-12](0014_LAW-12-values-live-in-config.md),
 decision 17 below). Fux holds no copy of any value in code, so a missing key
 stops the run and names itself; `fux doctor --fix` writes it back from the
 template `fux setup` uses. **One table is the exception, and its absence is
@@ -229,7 +229,7 @@ dirs_file` says where the directory list is ([SR-DIR-LIST](0120_dir-list.md)
 decision 1) and `urls_file` where the URL list is (decision 11a). ⚠ **Amended
 2026-09-27 (W-225 stage 3b):** this read *"there are no required tables: a
 file holding nothing but `[index] shards` is valid"*, and `dirs_file`
-*"defaults to `.fux/sources/dirs`"*. Since [SR-LAW-12](0013_LAW-12-values-live-in-config.md)
+*"defaults to `.fux/sources/dirs`"*. Since [SR-LAW-12](0014_LAW-12-values-live-in-config.md)
 every key is required and nothing defaults — decision 17.
 
 **3. `[index] shards` documents 256 and cannot change it.** Supplying any other
@@ -274,10 +274,10 @@ deprecated. A `fux.toml` still carrying it **fails to load with a named
 error**, because an unknown key in a committed config is a setting somebody
 believes is in force.
 
-🔴 **What the deletion gives up is real:** the ACL-mismatch leak L5 closed is
+🔴 **What the deletion gives up is real:** the ACL-mismatch leak ex-L5 closed is
 now an **accepted, documented exposure**. The reasoning above was right about
 the leak and lost on cost —
-[SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md) keeps the argument, the citation and the
+[ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md) keeps the argument, the citation and the
 reopen trigger.
 
 **7. `max_parallel` is REQUIRED whenever `[sources.url]` is present.** It was
@@ -670,13 +670,13 @@ exits, because Python cannot safely interrupt arbitrary consumer code.
 
 <!-- L12-NOTE-START -->
 
-**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `.fux/tune.toml` became mandatory
+**[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `.fux/tune.toml` became mandatory
 in stage 2, `.fux/output.toml` in stage 3a, and `fux.toml` in stage 3b —
 decision 17. The omit-to-inherit rule is gone.
 
 <!-- L12-NOTE-END -->
 
-**17. Every key is REQUIRED, and a missing one is named** ([SR-LAW-12](0013_LAW-12-values-live-in-config.md);
+**17. Every key is REQUIRED, and a missing one is named** ([SR-LAW-12](0014_LAW-12-values-live-in-config.md);
 W-225 stage 3b, 2026-09-27). `config.load` refuses a `fux.toml` lacking any of
 `[sources] dirs_file · urls_file`, `[index] shards`, `[observe] max_ms` or
 `[agents] install` — and, **when `[sources.url]` is present**, any of `keep ·
@@ -712,7 +712,7 @@ missing key from the template `fux setup` uses.*
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -723,7 +723,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**18. Fourteen values that sat in code joined this file** ([SR-LAW-12](0013_LAW-12-values-live-in-config.md);
+**18. Fourteen values that sat in code joined this file** ([SR-LAW-12](0014_LAW-12-values-live-in-config.md);
 W-225 stage 5e, 2026-09-28). The L12 classification homed each one here, and
 each keeps the number it had in code; the template writes it and `fux doctor
 --fix` fills it in an existing repo.
@@ -791,7 +791,7 @@ each keeps the number it had in code; the template writes it and `fux doctor
   scaffolded after `max_parallel` became required, it fetches. **The gate did
   not disappear — it moved to where it always really was:**
   `.fux/sources/urls` is empty, and the only thing that puts an address in it is
-  an explicit `fux add <URL>`. **L4's *explicit, fenced, opt-in* is satisfied by
+  an explicit `fux add <URL>`. **L5's *explicit, fenced, opt-in* is satisfied by
   the verb, not by a commented table** — and a table you must uncomment before
   the tool works is friction, not a fence. The refusal branch stays for repos
   that genuinely have no `[sources.url]`.

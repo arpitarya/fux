@@ -165,7 +165,7 @@ def compare(
 def _default_priority_prefix(root: Path) -> str | None:
     """The first configured source DIRECTORY, or `None` if there are only files.
 
-    Deterministic because `source_dirs` returns a sorted, deduped list — L3
+    Deterministic because `source_dirs` returns a sorted, deduped list — L4
     applies to the harness too, or a mismatch is not reproducible.
     """
     from fux.config import load

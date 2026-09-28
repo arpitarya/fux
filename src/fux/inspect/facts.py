@@ -112,7 +112,7 @@ def refer_bounds(root: Path) -> dict[str, int]:
 
 
 def source_bytes(root: Path, doc_id: str, loc: str) -> bytes | None:
-    """This document's bytes from disk, never a fetch (L4) — `dictionary`'s rule."""
+    """This document's bytes from disk, never a fetch (L5) — `dictionary`'s rule."""
     from .dictionary import _source_bytes
 
     class _D:  # the two attributes `_source_bytes` reads

@@ -8,9 +8,9 @@ status: accepted
 date: 2026-09-14
 feature: the agent-surface taxonomy, and the five acting surfaces
 owns: [.claude/hooks/fux-index-hint.sh@cf448bb5774a]
-laws: [L1, L3, L4]
+laws: [L2, L4, L5]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: c2fd2b2e78774c1070f205b7549ff8e05b959506d948f2c84788a42a385fce88
+content_sha: 200dfd55091559e3768378eaa9b32200bd777e5ef774b4f5db64ed3287a8b278
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

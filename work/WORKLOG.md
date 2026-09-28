@@ -1616,6 +1616,44 @@ instead of throwing a traceback on a missing key.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-28 — W-234 built: the laws renumbered, L7 Python ≥ 3.12, new L8 Node ≥ 22  ·  Claude Code (Opus)
+
+**Asked:** implement W-234. Arpit chose to run it in place while another session
+(W-168 step 9 / W-225) was editing the same tree, then *"commit everything once
+done"*. Only W-234's changes were committed; the other session's uncommitted
+edits stay in the working tree for it.
+
+**Done:**
+- **The repo-wide mechanical rename** this log's header allows. One simultaneous
+  substitution over every live file: L1→L2, L2→L3, L3→L4, L4→L5, L8→L9, L13→L1,
+  and the retired handles written `ex-L5` / `ex-L9`. `SR-LAW-n` names and record
+  file names moved the same way, and line locators and SVG path data were
+  protected. Then a hand review. **Frozen, left as written:** `archive/`, past
+  entries of this log, filed regression runs, benchmark reports,
+  pre-registrations, released CHANGELOG sections and the generated `.fux/index/`.
+- The law records were renamed `0003`…`0014` in handle order. SR-LAWS got the
+  dense table, decision 2 amended, and decision 2a, the old → new mapping. The
+  register rows, `LAW_ORDER` and the CLAUDE.md block were regenerated.
+- **SR-LAW-7 → Python ≥ 3.12:** `requires-python`, the classifiers,
+  `constants.toml [python] min`, `uv.lock`, and CI without 3.11.
+- **New SR-LAW-8, Node ≥ 22:** `engines`, and CI on 22/24. Node 20's end of
+  life (2026-04-30) was verified against nodejs/Release `schedule.json`.
+- New gate `tests/test_law_handles.py`: every handle a live file cites exists,
+  and the table is dense.
+- **Two false hits reverted:** `tools/archived-signal-eval/queries.jsonl` (query
+  ids `L1`, `L16`) and a literal query string in `tools/differential/node_arm.py`.
+- **Two pre-existing slips fixed on contact:** *"the Law records `SR-LAW-0`…`SR-WORK-ENVIRONMENTS`"*
+  (a leftover from the 2026-09-13 rename) now reads `…SR-LAW-12`, and the
+  architecture diagram's stale hashed-meta row.
+
+**Left open:** the six committed PNGs under `docs/` still show the old handles,
+because there is no renderer in the repo to regenerate them. And **nothing
+mechanical can tell a live `L3` that meant the OLD L3.** SR-LAWS decision 2
+names that exposure.
+
+**Next:** W-168 step 9 and W-225 stage 5 (the other session's), and the W-228
+inbox row, which is Arpit's.
+
 ## 2026-09-15 — the two carried-forward 🔴s were both already dead; W-168 step 1 gets a third option  ·  Cowork
 - **Asked:** *"Look into open work. Explain me the items blocked on me one by one."*, then
   *"Second item, clear blocked JSON. Third one, 2.0.1 is published. First one, explain to me

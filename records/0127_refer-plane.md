@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@5c9517f6108e, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@3286249029a0, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@83d8c624f056]
-laws: [L1, L2, L3, L4]
+owns: [src/fux/refer@a82666a2dbd5, tools/refer-bench@865d1234ec06, tools/refer-budget-sweep@3286249029a0, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@83d8c624f056]
+laws: [L2, L3, L4, L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 58daa8391257e94d8e7e44949bb50c1b9be7a66f165780f6bbba38174f245a7e
+content_sha: 52d5201796b614fe9d3b2cbafe613748a26d4acd1de2d257b5bd56d106e4d231
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -152,7 +152,7 @@ decision 5 does not already answer.
 **5. Freshness is verified by content, and that is stronger than age.** A fetch
 compares the fetched bytes' sha against the recorded sha. This answers *"is the
 index still right"* exactly, where an age only ever answered *"is it probably
-still right"* — and it reads no clock, so it costs L3 nothing.
+still right"* — and it reads no clock, so it costs L4 nothing.
 
 **6. The verdict is four-state: `current` / `stale` / `unverified` / `cached`.**
 `unverified` is not `stale` and is emphatically **not** `current`. The states
@@ -181,7 +181,7 @@ record needs to know they exist, not re-argued.** The `cached` verdict stays
 decision 6's, because a verdict belongs to the plane that reports it.
 
 **10. The answer limit is a byte budget; `k` is a secondary cap.** Bytes, never
-tokens — carrying a tokenizer per model family violates L1, and **an approximate
+tokens — carrying a tokenizer per model family violates L2, and **an approximate
 token count is worse than an exact byte count because it is wrong in a way the
 caller cannot see.** The budget bounds the whole rendered answer, so a
 per-citation overhead is charged and the caller's `overhead` is deducted before
@@ -298,7 +298,7 @@ Renamed 2026-08-27 on Arpit's ruling — *remove the trap at the source.*
 - ⚠ **What this shape had already cost, unnoticed:** `fux.refer`'s shadow made
   `tests/refer/test_refer_plane.py` feed **three functions** to
   `inspect.getsource` while believing it was scanning three modules for
-  `urllib`/`socket` imports. **L4's network import fence silently stopped
+  `urllib`/`socket` imports. **L5's network import fence silently stopped
   covering three files** — 552 lines — and nothing failed, because
   `getsource` works on a function too. A shadow does not have to break a test to
   cost you one.
@@ -371,7 +371,7 @@ the first day they disagree `answer` cites a passage the ranking did not prefer
 for a reason nobody can name.
 
 ⚠ **`refer()` takes the caller's resolved `Tune` and has no default of its own**
-([L12](0013_LAW-12-values-live-in-config.md)). The template ships
+([L12](0014_LAW-12-values-live-in-config.md)). The template ships
 `rerank_weight = 0.0`, and at `0.0` the bundle is byte-identical to the one this
 plane produced before the parameter existed, with no float arithmetic performed
 at all (`refer/_rescore.py::_uplift`). **`refer()` may not switch on a knob that
@@ -617,9 +617,9 @@ degradation this plane already has) and `from_acquired` returns `None`.
 The rule did not change; what changed is that the thing threaded alongside them
 is now a committed fact instead of a response header.
 
-**The refer plane holds no structural numeral**: `source.mjs` strips `file:`/`url:` by their length and fans acquired objects out by `[radix] hex_digits_per_byte`; the fetch cache's key width and the ARC ghost bound are `[refer] cache_key_hex` and `arc_ghost_bytes` ([SR-CACHE](0131_cache.md)). ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**The refer plane holds no structural numeral**: `source.mjs` strips `file:`/`url:` by their length and fans acquired objects out by `[radix] hex_digits_per_byte`; the fetch cache's key width and the ARC ghost bound are `[refer] cache_key_hex` and `arc_ghost_bytes` ([SR-CACHE](0131_cache.md)). ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
-**The fetch cache is sized by `fux.toml [refer] fetch_cache_max_bytes`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28), which the refer plane reads and passes to `FetchCache`; it holds no default of its own ([SR-CONFIG](0113_config.md) decision 18).
+**The fetch cache is sized by `fux.toml [refer] fetch_cache_max_bytes`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28), which the refer plane reads and passes to `FetchCache`; it holds no default of its own ([SR-CONFIG](0113_config.md) decision 18).
 
 ### Consequences
 
@@ -652,7 +652,7 @@ is now a committed fact instead of a response header.
 
 ### Alternatives considered
 
-- **An HTTP client in `src/fux/refer/`.** Rejected: L1, L4 and the adapter cap,
+- **An HTTP client in `src/fux/refer/`.** Rejected: L2, L5 and the adapter cap,
   and it duplicates a contract that already exists and already ships.
 - **Age-based freshness.** Rejected on merit — decisions 4 and 5. Comparing shas
   answers the question exactly; age only approximates it.
@@ -663,7 +663,7 @@ is now a committed fact instead of a response header.
 - **A committed `fetched_at` on the record.** Rejected: a local, derived,
   gitignored timestamp answers *should I go out again* without making any
   committed claim.
-- **A token budget.** Rejected: L1 (a tokenizer per model family), and an
+- **A token budget.** Rejected: L2 (a tokenizer per model family), and an
   approximation the caller cannot audit.
 - **Pure greedy score-per-byte, no floor.** Rejected on the arithmetic in
   decision 11, with a test that fails without the floor.

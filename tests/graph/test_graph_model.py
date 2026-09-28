@@ -29,7 +29,7 @@ def test_outbound_is_directed_and_undirected_is_not():
 
 
 def test_every_accessor_returns_a_sorted_view():
-    """Sorted is L3, not tidiness — float accumulation order depends on it."""
+    """Sorted is L4, not tidiness — float accumulation order depends on it."""
     graph = Graph(
         [
             Edge("a", "ref", "z", 10),

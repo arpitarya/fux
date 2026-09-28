@@ -47,14 +47,14 @@ def test_the_queue_is_sorted_regardless_of_discovery_order():
 
 def test_the_queue_carries_no_timestamp():
     """A clock would make the file change on every run and turn a stable
-    backlog into noise — and it would break L3 for a committed byte.
+    backlog into noise — and it would break L4 for a committed byte.
     """
     text = queue_mod.render([E("file:a.png", "sha", "no decoder for .png")])
     assert "20" not in text.replace("W-86", ""), "looks like a date crept in"
 
 
 def test_the_queue_holds_no_content(repo):
-    """L2: the index holds statistics, never documents. A queue that quoted the
+    """L3: the index holds statistics, never documents. A queue that quoted the
     first line of an unreadable file would be the one place that leaked.
     """
     queue_mod.write(repo, [E("file:secret.png", "abc123", "no decoder for .png")])

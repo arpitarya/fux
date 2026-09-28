@@ -9,7 +9,7 @@ postings mmaps stay resident across calls.
 
 **Stdlib only.** No `mcp` package, no `pydantic`, no framework. MCP over stdio
 is newline-delimited JSON-RPC 2.0, which is `json` and `sys.stdin` — adopting
-a dependency to read a line and dump a dict would break L1 for convenience.
+a dependency to read a line and dump a dict would break L2 for convenience.
 
 **The tool surface is deliberately smaller than the CLI.** `fux answer` is not
 exposed: the agent *is* the answerer, and handing it a pre-composed answer

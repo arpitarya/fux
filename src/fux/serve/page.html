@@ -859,11 +859,11 @@ function renderIndex(r, every) {
     <div class="sub"><span class="num">${esc(id.documents_sharing)}</span> documents share a title, in <span class="num">${esc(id.groups)}</span> groups.</div>
     ${table(["documents", "title"], (id.top || []).map((g) => `<tr>${cell(g.count)}<td>${esc(g.title)}</td></tr>`))}
     ${leverLine(id.lever)}</div>`;
-  html += `<div class="card"><h2>L1 — segments: decoder × folder × archived</h2>${table(
+  html += `<div class="card"><h2>L2 — segments: decoder × folder × archived</h2>${table(
     ["decoder", "folder", "archived", "docs", "unreadable", "passages", "word-cut", "chrome tok.", "link-target tok.", "shared title", "title in top 10"],
     (r.segments || []).map((s) => `<tr><td>${esc(s.decoder)}</td><td class="mono">${esc(s.folder)}</td><td>${s.archived ? "yes" : "no"}</td>${cell(s.documents)}${cell(s.unreadable)}${cell(s.passages)}${cell(s.word_cut_passages)}${cell(s.chrome_tokens)}${cell(s.link_target_tokens)}${cell(s.shared_title)}${cell(s.probed ? s.title_in_top10 + " / " + s.probed : "—")}</tr>`))}</div>`;
   html += renderChunks(r.chunks);
-  html += `<div class="card"><h2>L2 — triage: documents with findings, most first</h2>
+  html += `<div class="card"><h2>L3 — triage: documents with findings, most first</h2>
     <div class="sub"><span class="num">${esc(r.triage_count)}</span> of <span class="num">${esc((r.documents || []).length)}</span> documents carry a finding; fux ordered them by how many — a count, not a score.${(r.triage || []).length < r.triage_count ? ` The first <span class="num">${esc(r.triage.length)}</span> are shown.` : ""}</div>
     ${table(["findings", "document"], (r.triage || []).map((d) =>
       `<tr>${cell(d.findings.length)}<td><a href="#" class="opendoc mono" data-loc="${esc(d.loc)}">${esc(d.loc)}</a><div>${d.findings.map((f) => `<span class="flag">${esc(f)}</span>`).join("")}</div></td></tr>`))}</div>`;

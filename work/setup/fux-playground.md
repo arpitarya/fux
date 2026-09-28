@@ -168,7 +168,7 @@ a separate sibling repository, `fux-playground`.**
 |---|---|
 | Keep `examples/` and add goldens in place | Leaves the corpus-contamination problem entirely unfixed, which was the first of the three reasons to act. |
 | Move it to `tests_e2e/fixtures/` | Makes it a test fixture rather than something a human reads. The corpus has to be readable in twenty minutes or nobody validates that the goldens encode the right answers. |
-| Grade the URL documents too | Third-party content changes without notice, so every such golden is a scheduled false alarm. It would also require committing fetched content, which [L2](../../records/0004_LAW-2-content-never-durable.md) forbids. |
+| Grade the URL documents too | Third-party content changes without notice, so every such golden is a scheduled false alarm. It would also require committing fetched content, which [L3](../../records/0005_LAW-3-content-never-durable.md) forbids. |
 | Publish `fux-playground` with a GitHub remote now | Out of scope and Arpit's call. No remote was created; the repo has one local commit. |
 
 ## Consequences

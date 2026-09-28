@@ -1,6 +1,6 @@
 """The Porter stemmer, stdlib-only — analyzer v2's morphology step.
 
-**Why hand-rolled.** L1 is stdlib-only, and every packaged stemmer
+**Why hand-rolled.** L2 is stdlib-only, and every packaged stemmer
 (`nltk`, `snowballstemmer`, `PyStemmer`) is a dependency. Porter is a fully
 specified algorithm with a published test vocabulary, so "hand-rolled" here
 means "transcribed", not "invented" — which is the same reason the BM25F

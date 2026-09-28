@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-19
 amended: 2026-09-15
 feature: the `extracted` ingest mode — the value in every committed record's `mode` property, and the contract it asserts
-owns: [src/fux/ingest/extract.py@0c6056aca082]
-laws: [L1, L2, L3, L4]
+owns: [src/fux/ingest/extract.py@b0526982a8d3]
+laws: [L2, L3, L4, L5]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 4899daae6bf1195766e073835611d68b111c75be0f07119ab2a2c7001f65ef01
+content_sha: d8725a1c03fa542839468c6b7695d1ceb7b2084b4e7566950d96b59454a22269
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -169,7 +169,7 @@ the committed value of the `mode` property.
 guarantees: every property is a pure function of the document's bytes, its path,
 the corpus's link structure and the two committed extraction limits in
 `.fux/tune.toml [index]` (decision 9); no model was consulted at any point; no network
-was touched (L4's fenced paths fetch *bytes*, and extraction is still
+was touched (L5's fenced paths fetch *bytes*, and extraction is still
 deterministic over them); the run is byte-reproducible.
 
 **3. It is the default, and today it is the only mode that exists.** A record
@@ -320,7 +320,7 @@ ingest produced one index hash.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —

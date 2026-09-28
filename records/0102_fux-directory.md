@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@4e902c65209f, src/fux/setup.py@4f975a5870dc, tests/test_verb_table_agreement.py@1e7999ffd28f]
-laws: [L2, L3, L5]
+owns: [src/fux/store/fuxdir.py@c742770c0d4c, src/fux/setup.py@b3036b8d33a0, tests/test_verb_table_agreement.py@1e7999ffd28f]
+laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 1ea9628ad472c4f0558b1ebd07ff19c99993fc1074b5e9aa44e6e1bac7cb6e47
+content_sha: 92a0266811eb1ebb68e912c82e50dfb9337f95364be524d441c0b0a1c6e84d5e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -224,16 +224,16 @@ table is the reasoning.
 | `formats.toml` | committed | which files are documents and which decoder reads each extension — `include` plus `[decoders]` ([SR-TYPES](0128_types-list.md) decisions 11–12). **Optional**: absent means the built-in default. Write-if-missing — a repo that already has the file keeps it, bindings and all; a repo with only the old `sources/types` has it **converted** by `fux setup`, never rewritten in place |
 | `fetchers/` | committed | consumer code — decision 4 |
 | `decoders/` | committed | consumer code — decision 5 |
-| `enrich/` | committed | pinned enrichment text, one file per **source content sha**, plus `queue.tsv`. It cannot be re-derived: a model wrote it, in an agent, once, and [SR-ENRICH](0137_enrich.md) decision 1 refuses to call one. Committed also means **every clone has identical coverage**, so L3 holds with a wider input rather than a weaker property. Keying by source sha means editing a document orphans its enrichment automatically — staleness is structural rather than a check someone has to remember |
+| `enrich/` | committed | pinned enrichment text, one file per **source content sha**, plus `queue.tsv`. It cannot be re-derived: a model wrote it, in an agent, once, and [SR-ENRICH](0137_enrich.md) decision 1 refuses to call one. Committed also means **every clone has identical coverage**, so L4 holds with a wider input rather than a weaker property. Keying by source sha means editing a document orphans its enrichment automatically — staleness is structural rather than a check someone has to remember |
 | `tune.toml` | committed | how results are **ordered** — plus `[index]` (`max_phrases`, `max_table_rows`), the one table that changes what is indexed ([SR-TUNE](0135_tuning.md) decision 13, 2026-09-11). A preference that does not travel with the clone is not one: two clones would rank the same corpus differently, which is the surprise this split exists to remove |
 | `inspect.toml` | committed | what `fux inspect` and the explorer call a **finding**, how much they sample and how many rows they show ([SR-INSPECT](0156_inspect.md) decision 23; W-225 stage 4c). Changes what the report says, never the index or a ranking. Required: `fux setup` writes it, `fux doctor --fix` restores it |
 | `.fuxignore` | committed | what is **not** indexed, in `.gitignore`'s grammar — the one home for exclusion, read before the source lists and outranking them in both directions ([SR-FUXIGNORE](0144_fuxignore.md)). Committed for the same reason `tune.toml` is: a corpus that differed by clone is the surprise this split removes. Written header-only by `fux setup`. ⚠ **`fux ingest` REWRITES two delimited blocks at its top** — the not-indexed and skipped lists ([SR-FUXIGNORE](0144_fuxignore.md) decision 11), sorted, wall-clock-free, whole rather than appended, and **above every hand-written line** so a human's `!` always wins. This row said *never rewritten* until 2026-09-12 (W-140 row 8); it is the one committed file under `.fux/` that a verb edits, which is exactly the fact a reader of this table needs |
 | `README.md` · `.gitignore` | committed | generated, write-if-missing |
-| `node/` | committed | the **vendored Node read plane** ([SR-NODE-SEARCH](0153_node-search.md)), as **BUILD OUTPUT** — [L10](0011_LAW-10-bundled-output.md). **Two shapes, and `fux setup` decides which:** **A** (the default) is four files — the bundled `fux.mjs`, `package.json`, `mcp-tools.json`, `README.md`, **244 KB**, offline; **C** (a monorepo, auto-detected) is `package.json` alone, declaring `fux-engine@<version>`, with the reader installed into `node/node_modules/`. **Overwritten on a version or shape difference, and PRUNED**: an upgrade deletes whatever the previous engine left, `node_modules/` excepted. ⚠ **It was 47 files / 223 KB of fux's own module tree until 2026-09-12** — the measurement that produced the ruling, kept because this row claiming *"no build step"* and *"196 KB"* while both had moved is exactly the drift L10's §Context describes. Committed because the audience is a host with **no Python**: a gitignored copy could only be regenerated by the interpreter that is, by construction, not there, so gitignoring it withholds the file from exactly the person it is for — and it is still smaller than the `decoders/` Python committed beside it |
+| `node/` | committed | the **vendored Node read plane** ([SR-NODE-SEARCH](0153_node-search.md)), as **BUILD OUTPUT** — [L10](0012_LAW-10-bundled-output.md). **Two shapes, and `fux setup` decides which:** **A** (the default) is four files — the bundled `fux.mjs`, `package.json`, `mcp-tools.json`, `README.md`, **244 KB**, offline; **C** (a monorepo, auto-detected) is `package.json` alone, declaring `fux-engine@<version>`, with the reader installed into `node/node_modules/`. **Overwritten on a version or shape difference, and PRUNED**: an upgrade deletes whatever the previous engine left, `node_modules/` excepted. ⚠ **It was 47 files / 223 KB of fux's own module tree until 2026-09-12** — the measurement that produced the ruling, kept because this row claiming *"no build step"* and *"196 KB"* while both had moved is exactly the drift L10's §Context describes. Committed because the audience is a host with **no Python**: a gitignored copy could only be regenerated by the interpreter that is, by construction, not there, so gitignoring it withholds the file from exactly the person it is for — and it is still smaller than the `decoders/` Python committed beside it |
 | `fux` | committed | a small `/bin/sh` shim — `.fux/fux find rollback` in a clone with nothing installed, mode `0755`. **It RESOLVES the reader in three rungs** since 2026-09-12 ([SR-NODE-SEARCH](0153_node-search.md) decision 16): the vendored bundle (`node .fux/node/fux.mjs`), then this member's `node_modules/.bin/fux`, then every ancestor's — because npm, yarn 1 and Berry-with-`node-modules` hoist that bin to the workspace root and **pnpm and bun do not** ([measured](../work/regression/2026-09-12-workspace-dotpath-probe/report.md), [Berry](../work/regression/2026-09-12-yarn-berry-probe/report.md)). **It is the one entry point correct in every shape, and the only one a README may name** |
 | `refusals.toml` | committed | what a **refusal** looks like in this organisation — the sign-in walls, paywalls and viewer shells a server returns instead of the document ([SR-REFUSAL](0146_refusals.md)). Consumer-owned and additive; the engine ships no vendor knowledge, and the always-on magic-byte floor is not configurable from it. Committed because *"what does a login page look like here"* is a team fact, exactly like `.fuxignore` |
 | `pii.toml` | committed | what is **redacted** from the committed index and nowhere else ([SR-PII](0148_pii.md)). Written by `fux setup` from the starter, never rewritten — and **the one consumer file that is required**: every command refuses in a repo without it (SR-PII decision 17) |
-| `runtime/` | **derived** | accelerator segments, the fetch cache at `runtime/fetch-cache/`, the write lock, the URL counters, the skip ledger, `enrich-progress.tsv` — which machine has handled which queued document, **local by design** so two people's progress cannot conflict on a pull — and **`runtime/trace/`**, where [SR-SERVE](0158_serve.md)'s later rungs write an inspection page for one question or one document. 🔴 **`trace/` is here and not in `acquired/` for a reason that is worth stating**: a trace page quotes passages and names words, so it is content by [L2](0004_LAW-2-content-never-durable.md) and may never be committed — and it is also, unlike an acquired blob, **regenerable from the committed index by re-running the verb**, which is what `runtime/` means. **`runtime/inspect/`** holds [SR-INSPECT](0156_inspect.md)'s report and its three caches — the hash → word dictionary, per-document facts and probe results. It names words, so it is never committed, and it is regenerable from the committed index and the sources on this disk. `fux serve` writes there and **nowhere else** (W-220, 2026-09-23); before that it wrote nothing at all |
+| `runtime/` | **derived** | accelerator segments, the fetch cache at `runtime/fetch-cache/`, the write lock, the URL counters, the skip ledger, `enrich-progress.tsv` — which machine has handled which queued document, **local by design** so two people's progress cannot conflict on a pull — and **`runtime/trace/`**, where [SR-SERVE](0158_serve.md)'s later rungs write an inspection page for one question or one document. 🔴 **`trace/` is here and not in `acquired/` for a reason that is worth stating**: a trace page quotes passages and names words, so it is content by [L3](0005_LAW-3-content-never-durable.md) and may never be committed — and it is also, unlike an acquired blob, **regenerable from the committed index by re-running the verb**, which is what `runtime/` means. **`runtime/inspect/`** holds [SR-INSPECT](0156_inspect.md)'s report and its three caches — the hash → word dictionary, per-document facts and probe results. It names words, so it is never committed, and it is regenerable from the committed index and the sources on this disk. `fux serve` writes there and **nowhere else** (W-220, 2026-09-23); before that it wrote nothing at all |
 | `acquired/` | **acquired** | the bytes a fetch returned, for URLs whose line says `keep=true` — `objects/<sha[:2]>/<sha><ext>` plus an advisory `manifest.json`. Ignored and `CACHEDIR.TAG`-tagged like derived, and **not rebuildable**: `fux build` cannot produce it, only a re-fetch against a source that still exists. It is what lets an offline citation say `as-ingested` instead of `unverified` ([SR-URL-FRESHNESS](0147_url-freshness.md)), and it is bounded and evicted rather than unbounded |
 
 ⚠ **`COMMITTED_FILES` exists because its absence was a live defect.** `DECLARED`
@@ -265,7 +265,7 @@ alike
 `tar --exclude-caches` and IDE indexers skip them without per-tool
 configuration. See [SR-CACHEDIR-TAG](0121_cachedir-tag.md). ⚠ **For
 `acquired/` the tag is doing more than saving disk**: keeping fetched source
-bytes out of a backup is the same L2 concern that makes the gitignore an error
+bytes out of a backup is the same L3 concern that makes the gitignore an error
 rather than a warning.
 
 **6. Scaffolding has two moments. Everything in both is write-if-missing except one shape — see 6a.**
@@ -458,7 +458,7 @@ is built to answer it, so it is free on the ingest path.
 ⚠ **And when it does rewrite, it PRUNES.** Before 2026-09-12 it wrote the new
 files and deleted none, so a repository that had ever run `fux setup` kept every
 file a previous engine put there — 37 to 47 stale `.mjs` modules, which is what
-made [L10](0011_LAW-10-bundled-output.md)'s *"a local edit is invisible"* a live
+made [L10](0012_LAW-10-bundled-output.md)'s *"a local edit is invisible"* a live
 exposure rather than a hypothetical. `_prune_node_reader` deletes everything the
 declared shape does not name, **`node_modules/` excepted**: that holds shape C's
 installed reader, and removing it would leave a manifest pointing at nothing.
@@ -751,7 +751,7 @@ file* means.
 
 <!-- L12-NOTE-START -->
 
-**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `setup.fill_missing(root)` writes every
+**[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `setup.fill_missing(root)` writes every
 config file L12 makes mandatory from its template, and into a present file only
 the keys it lacks, at the end of their own table with the template's comment —
 nothing the consumer wrote is changed or reordered. `fux setup` and `fux doctor
@@ -764,7 +764,7 @@ template is `src/fux/templates/output.toml.txt`, and it is now required.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -847,7 +847,7 @@ ruling and for the same reason.
   (`true`/`false`) — is written live with its default: the written line is the
   complete menu, so a reader learns the key *and* its alternatives without
   leaving the file, and nobody greps a record for a flag they do not know
-  exists. ⚠ **Superseded 2026-09-27 by W-225 stage 3b ([SR-LAW-12](0013_LAW-12-values-live-in-config.md)):**
+  exists. ⚠ **Superseded 2026-09-27 by W-225 stage 3b ([SR-LAW-12](0014_LAW-12-values-live-in-config.md)):**
   the other half of this rule — *a key whose default is a number that may rise
   stays out* (`acquired_max_bytes`, `sweep_minutes`, `ttl`) — is gone, because
   there is no engine default left for an omitted key to inherit. **Every key is
@@ -920,11 +920,11 @@ ruled. A repo that re-runs `fux setup` keeps its stale header beside a file that
 no longer parses, which is the worst pairing available and is why the error a
 line raises names the fix itself rather than pointing at the header.
 
-**`fux setup` seeds `formats.toml` with the caps template appended, and `fill_missing` covers the file** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27): absent is written whole, a present file gains only missing `[limits]` keys ([SR-TYPES](0128_types-list.md) decision 14).
+**`fux setup` seeds `formats.toml` with the caps template appended, and `fill_missing` covers the file** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27): absent is written whole, a present file gains only missing `[limits]` keys ([SR-TYPES](0128_types-list.md) decision 14).
 
-**`setup.Mandatory` gained `whole_file`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27): `.fux/refusals.toml` gains missing `[scan]` keys when present and is never written when absent, because its absence means *no rules* ([SR-REFUSAL](0146_refusals.md) decision 9a).
+**`setup.Mandatory` gained `whole_file`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27): `.fux/refusals.toml` gains missing `[scan]` keys when present and is never written when absent, because its absence means *no rules* ([SR-REFUSAL](0146_refusals.md) decision 9a).
 
-**The `fux` shim's chmod bits are `constants.toml [bundle] shim_mode`** (`0o755`), and the manifest `fux setup` writes is indented by `[json] indent`. Nothing written into `.fux/` changed. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**The `fux` shim's chmod bits are `constants.toml [bundle] shim_mode`** (`0o755`), and the manifest `fux setup` writes is indented by `[json] indent`. Nothing written into `.fux/` changed. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 
@@ -1000,7 +1000,7 @@ line raises names the fix itself rather than pointing at the header.
   in a record. Both halves now come from the same change.
 - **Nothing in `tune.toml` outside `[index]` reaches the maintenance path.**
   `ingest`, `build` and the hooks read no ranking key. `[index]` is read by
-  ingest, so that committed table IS inside the byte-identity argument L3 rests
+  ingest, so that committed table IS inside the byte-identity argument L4 rests
   on — as `fux.toml` already was. `fux setup`'s `fux.toml` template lost its
   `[decode]` table and the tune.toml specimen gained `[index]` in the same
   change ([SR-TUNE](0135_tuning.md) decision 13).

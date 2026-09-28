@@ -189,8 +189,8 @@ def test_records_do_not_restate_the_laws() -> None:
     handles = [
         "stdlib-only runtime",
         "no model in the maintenance path",
-        # L8, added with the law on 2026-08-27. It caught a real paraphrase the
-        # same day: SR-WORK-QUALITY decision 11 was written as "bound by L8 —
+        # L9, added with the law on 2026-08-27. It caught a real paraphrase the
+        # same day: SR-WORK-QUALITY decision 11 was written as "bound by L9 —
         # hashed, bounded, local, off every committed and networked path", which
         # is the drift this test exists to stop. Cite the number, not the words.
         "hashed, bounded, and local",
@@ -199,7 +199,7 @@ def test_records_do_not_restate_the_laws() -> None:
     for path in sorted(records_on_disk()):
         if path.name.endswith("_LAWS.md"):
             continue
-        # SR-LAW-0: the nine law records ARE the law's text, not a second
+        # SR-LAW-0: the law records ARE the law's text, not a second
         # statement of it. This test guards every OTHER record against
         # paraphrasing a law; a law record carrying its own words is the point.
         if "_LAW-" in path.name:
@@ -458,9 +458,9 @@ _UNREACHABLE_BY_THE_GATE = {
     # whether a change under `src/` can demand the record. They still own
     # nothing, and the four runtime-plane records and SR-LOCKS now say in their
     # own bodies which of decision 7's two honest cases that is.
-    "SR-LAW-0", "SR-LAW-1", "SR-LAW-2",
-    "SR-LAW-3", "SR-LAW-4", "SR-LAW-6", "SR-LAW-7",
-    "SR-LAW-8", "SR-WORK-ENVIRONMENTS", "SR-LAW-10", "SR-WORK-OWNERSHIP",
+    "SR-LAW-0", "SR-LAW-2", "SR-LAW-3",
+    "SR-LAW-4", "SR-LAW-5", "SR-LAW-6", "SR-LAW-7", "SR-LAW-8",
+    "SR-LAW-9", "SR-WORK-ENVIRONMENTS", "SR-LAW-10", "SR-WORK-OWNERSHIP",
     "SR-PORT-LIST",
     "SR-WORK-QUALITY", "SR-RS",
     "SR-WORK-BENCHMARK", "SR-WORK-OPEN-QUEUE",
@@ -531,10 +531,10 @@ _UNREACHABLE_BY_THE_GATE = {
     # not exist until W-225 lands, and the law binds every module rather than
     # one, so no single `src/` change can demand it.
     "SR-LAW-12",
-    # SR-LAW-13 (2026-09-28) owns only its enforcement test: a retired record is
+    # SR-LAW-1 (2026-09-28) owns only its enforcement test: a retired record is
     # archived, and no change under `src/` can make that true or false.
-    # (SR-LAW-5 left this set the same day — it moved to `archive/records/`.)
-    "SR-LAW-13",
+    # (ex-SR-LAW-5 left this set the same day — it moved to `archive/records/`.)
+    "SR-LAW-1",
 }
 
 

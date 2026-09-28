@@ -186,7 +186,7 @@ def test_no_fetch_with_the_flag_writes_the_line_offline(repo):
 
 def test_dry_run_opens_nothing_and_says_what_fills_the_placeholder(repo, capsys):
     """🔴 A dry run that fetched in order to print a line it then does not write
-    is the one place *write nothing* and *do nothing* would come apart on an L4
+    is the one place *write nothing* and *do nothing* would come apart on an L5
     surface."""
     _fetcher(repo, '(_ for _ in ()).throw(RuntimeError("should not be called"))')
     assert sources.cmd_add(_args("https://x.test/p", dry_run=True)) == 0

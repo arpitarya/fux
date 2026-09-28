@@ -113,7 +113,7 @@ def test_the_exact_set_families_are_unchanged():
 
 
 def test_the_report_is_a_function_of_the_corpus_not_of_the_order():
-    """L3: shuffled input order, byte-equal output."""
+    """L4: shuffled input order, byte-equal output."""
     base = json.dumps(_run().__dict__, sort_keys=True, default=str)
     rng = random.Random(0)
     for _ in range(5):

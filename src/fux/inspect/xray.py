@@ -3,11 +3,11 @@
 **W-220** ([SR-INSPECT](../../../records/0156_inspect.md) decisions 18–20). Four
 zoom levels, and this module owns the three that are folds:
 
-- **L1 · segments** — decoder × top folder × archived, one report card each.
-- **L2 · triage** — one row per document that carries a finding, worst first.
+- **L2 · segments** — decoder × top folder × archived, one report card each.
+- **L3 · triage** — one row per document that carries a finding, worst first.
   *Worst* is the **number** of findings, then the id: a count a reader can
   check, never a weighted score (decision 11 refuses a single number).
-- **L3 · one document** — `document()`, computed on demand for the one a person
+- **L4 · one document** — `document()`, computed on demand for the one a person
   clicked, and never for all of them up front (ruled 2026-09-23).
 
 L0, the headline, is `__init__.render_markdown`'s.
@@ -234,7 +234,7 @@ def _probe_lens(view, facts, probes, peers, *, top: int) -> dict:
 
 
 # --------------------------------------------------------------------------
-# L3 — one document, on demand
+# L4 — one document, on demand
 # --------------------------------------------------------------------------
 
 

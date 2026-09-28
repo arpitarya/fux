@@ -356,10 +356,10 @@ def test_fetch_all_sanitizes_hostile_line_separators(tmp_path):
 
 def test_refresh_ingests_urls_with_plain_display_text(tmp_path):
     """⚠ **REWRITTEN for W-194.** This asserted the opposite: `meta == "hashed"`,
-    a `title_h`, and *no display text leaks*. That was L5's default and the
+    a `title_h`, and *no display text leaks*. That was ex-L5's default and the
     whole shape is deleted — a url record now carries `title` and `phrases`
     exactly as a git record does. **The ACL-mismatch leak it prevented is
-    accepted, not closed** (SR-LAW-5, superseded)."""
+    accepted, not closed** (ex-SR-LAW-5, superseded)."""
     _init(tmp_path, urls=["https://x.test/a"])
     report = run(tmp_path, refresh_urls=True)
     assert report.doc_count == 2

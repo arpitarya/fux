@@ -754,7 +754,7 @@ def main() -> int:
 
     with ThreadPoolExecutor(max_workers=max(1, args.jobs)) as pool:
         # Order is restored by `jobs`, not by completion — a parallel harness
-        # whose output moves between runs is not reproducible (L3).
+        # whose output moves between runs is not reproducible (L4).
         results = list(pool.map(run, jobs))
 
     bad = [(job, rows) for job, rows in results if rows]

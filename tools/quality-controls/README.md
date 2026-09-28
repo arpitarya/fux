@@ -91,7 +91,7 @@ is attached to.
   target is closer. An earlier version always overshot and gave the arm a
   systematic **+8 %** length bias — confounding length with content, the one
   confound this removes.
-- **Deterministic (L3).** The source sha is the seed; no `random`, no clock, no
+- **Deterministic (L4).** The source sha is the seed; no `random`, no clock, no
   model. Verified byte-identical across runs.
 - ⚠ **The pool is hand-written.** A model asked for "generic text" reaches for
   the subject matter it was shown, which is the leak this control closes.
@@ -161,7 +161,7 @@ python3 tools/quality-controls/seal.py <goldens.jsonl>            # show the cut
 python3 tools/quality-controls/seal.py <goldens.jsonl> --visible  # what you may read
 ```
 
-- **Split by `sha256(id)`, not by shuffling.** Deterministic (L3), seedless, and
+- **Split by `sha256(id)`, not by shuffling.** Deterministic (L4), seedless, and
   **independent of file order**, so re-sorting `queries.jsonl` cannot silently
   change which queries are sealed.
 - **Growing the corpus is a RESEAL, not an append.** A seal is named by the

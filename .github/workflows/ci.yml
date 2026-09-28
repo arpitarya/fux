@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   test:
-    # The support target: Python ≥ 3.11 on Linux, macOS, and Windows (the wheel
+    # The support target: Python ≥ 3.12 (L7) on Linux, macOS, and Windows (the wheel
     # is pure Python — one build covers all three; these runners prove it).
     # Full Python spread on Linux; the version boundaries (oldest + newest) on
     # macOS/Windows, where breakage is OS-shaped, not version-shaped.
@@ -21,11 +21,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python: ["3.11", "3.12", "3.13", "3.14"]
+        python: ["3.12", "3.13", "3.14"]
         exclude:
-          - { os: macos-latest, python: "3.12" }
           - { os: macos-latest, python: "3.13" }
-          - { os: windows-latest, python: "3.12" }
           - { os: windows-latest, python: "3.13" }
 
     steps:

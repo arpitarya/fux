@@ -63,7 +63,7 @@ fixes it, **off at `intent_weight = 0.0` with an empty `[doctype]`**. No treatme
 
 [Report §Step pools](../regression/2026-09-27-golden-set-4-rung-01000/report.md) · [scores](../regression/2026-09-27-golden-set-4-rung-01000/scores/single/rung-01000/set-4-claude.json) `pools`.
 
-- **How:** text tags could not settle step 10: two rules gave 5 and 13. Arpit ruled *"Amend L11 d13"*, so [L11](../../records/0012_LAW-11-sealed-answer-key.md) decision 13a lets `score.py` count pools by the key's `exercises` tag, as counts only. He re-scored the same day.
+- **How:** text tags could not settle step 10: two rules gave 5 and 13. Arpit ruled *"Amend L11 d13"*, so [L11](../../records/0013_LAW-11-sealed-answer-key.md) decision 13a lets `score.py` count pools by the key's `exercises` tag, as counts only. He re-scored the same day.
 - **Pools, tagged ∩ answerable ∩ miss@1 ∩ in the top ten** (`informed`):
 
   | step | tagged | pool @1 | pool @5 | |
@@ -349,7 +349,7 @@ at `cfca651a`) and files `VERDICT.md`. INCONCLUSIVE → Arpit.
   now says the value is measured.
 - **Records:** SR-TUNE 17 + new 17a (the default, the upgrade divergence, and
   `--no-tune` no longer switching anchor off) · SR-RANKING 12c–12d · SR-INGEST new 17e.
-- **L3:** this repo ingested from empty under `0.0` and under `1.0` gives
+- **L4:** this repo ingested from empty under `0.0` and under `1.0` gives
   byte-identical `.fux/index/` (1 792 documents, one hash).
 - **Four surfaces, at `anchor = 1.0`:** scan = accelerator, **22 144
   comparisons byte-identical** (`tools/differential/run.py --skipping both`);
@@ -806,8 +806,8 @@ and it has no `VERDICT.md`.
 
 1. 🔴 **The edge carries hashed TERMS, not the anchor string.** Link text is a
    verbatim fragment of the source's prose, so committing it plainly is content
-   in the index ([L2](../../records/0004_LAW-2-content-never-durable.md)) and
-   would need L5's hashed-meta branch on top. A hash is a statistic, and it is
+   in the index ([L3](../../records/0005_LAW-3-content-never-durable.md)) and
+   would need ex-L5's hashed-meta branch on top. A hash is a statistic, and it is
    the currency `terms` already uses — so the scan's byte prefilter finds an
    anchor source by the substring check it already runs, free. **The ruling was
    about WHERE the byte lives; this is about what it is.** Flagged rather than
@@ -877,7 +877,7 @@ committed bytes while [`maintain/runner.py`](../../src/fux/maintain/runner.py)
 marks only `B` dirty — a full `fux ingest` and an incremental re-index would
 produce **different indexes from the same sources**.
 
-⚠ **That is [L3](../../records/0005_LAW-3-deterministic.md) failing on the
+⚠ **That is [L4](../../records/0006_LAW-4-deterministic.md) failing on the
 incremental path only, which is the worst shape for it**: the full-ingest path
 stays byte-reproducible, so every test and every CI check that rebuilds from
 scratch passes, and the drift appears only in a working repository that has
@@ -922,7 +922,7 @@ it. That is the whole reason the specified form was refused.
 bytes, which is exactly what `Edge` already is — the edge list is already
 written onto the **source** document's committed record. Editing `B` rewrites
 `B`'s edges and moves no other document's bytes. The re-index contract does not
-change and L3 never enters the conversation.
+change and L4 never enters the conversation.
 
 **Step 5 is covered by the same mechanism** rather than inheriting the problem:
 *"the successor inherits the target's anchor text"* becomes a second read-time
@@ -943,7 +943,7 @@ waits on it now.**
 |---|---|---|
 | 1 | `_LINK_RE` captures the anchor text; `DocScan.links` carries `(text, target)`; every caller updated | the words are not extracted anywhere today |
 | 2 | the edge on the **source** document's committed record carries `text`; `index-record.schema.json` amended | this is the whole ruling — the byte stays with the document that wrote it |
-| 3 | a reverse map `dst → [(src, text, grade)]` built in `.fux/runtime/`, by `fux build` and by `runner.py`'s post-pass | derived, gitignored, rebuilt whole — free under L3 |
+| 3 | a reverse map `dst → [(src, text, grade)]` built in `.fux/runtime/`, by `fux build` and by `runner.py`'s post-pass | derived, gitignored, rebuilt whole — free under L4 |
 | 4 | candidate generation: a query term matching anchor text makes the `dst` a candidate | ⚠ **this is a RETRIEVAL change, not a scoring one** — without it the document is never a candidate and no fold can rescue it |
 | 5 | the fold lands **once, in the shared read path** — never in the accelerator alone | [`query/rank.py`](../../src/fux/query/rank.py) states the contract: *"the accelerator's build asserts it reproduces the same statistics"*; one-sided and `--fast` drifts from the scan |
 | 6 | `anchor` is a BM25F field whose weight is a `tune.toml` key, **default 0** | SR-RS d19: behind a tunable, default off |

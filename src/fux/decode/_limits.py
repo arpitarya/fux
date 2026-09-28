@@ -20,7 +20,7 @@ correct under threads and async both — a global would be a latent
 cross-document bleed that only shows up under concurrency, which is the worst
 kind of defect to leave for someone else.
 
-## L3 holds
+## L4 holds
 
 The value lives in `.fux/tune.toml [index]` (moved from `fux.toml [decode]` on
 2026-09-11, Arpit — SR-TUNE decision 13). That file is **committed**, so `same

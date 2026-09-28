@@ -186,7 +186,7 @@ def test_the_counts_survive_the_round_trip(corpus, capsys):
 
 
 def test_the_block_is_byte_stable_after_the_first_run(corpus):
-    """L3: same corpus, same bytes. A committed file may not churn."""
+    """L4: same corpus, same bytes. A committed file may not churn."""
     ingest_and_report(corpus, _args())
     after_first = _ignore_text(corpus)
     ingest_and_report(corpus, _args())

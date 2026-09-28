@@ -8,9 +8,9 @@ status: accepted
 date: 2026-08-19
 feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted from it, which of it is retired, and the grammar for declaring so"
 owns: []
-laws: [L3, L6]
+laws: [L4, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 71ce4f207e6974536678a73729e1da1d41d5ad6d7bf2d8d1351cafb9d93cb273
+content_sha: 7773736fcf0f0d176137b89c8cdd6771ceacd2f77e72e1c370dc192172b19168
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -154,13 +154,13 @@ format has never had. Argued in
 
 **2b. Exclusions in THIS file are order-independent, and there is no
 un-exclude.** The loader sorts, so file order cannot change a committed byte —
-L3 applied to config. `!` subtracts and nothing adds back, which means there is
+L4 applied to config. `!` subtracts and nothing adds back, which means there is
 **no precedence order to remember and none to get wrong** *within this file*;
 `!!` is an error rather than a negation.
 
 ⚠ **`.fux/.fuxignore` is the one place in `.fux/` where order IS semantic**
 (SR-FUXIGNORE decision 2a): it resolves by last-match-wins, because a
-`.gitignore` whose order did not matter would not be a `.gitignore`. L3 is
+`.gitignore` whose order did not matter would not be a `.gitignore`. L4 is
 untouched — the same file still produces the same index everywhere; what that
 file gives up is the weaker property this decision keeps. An
 exclusion also carries **no attributes**: `archived=true` describes a directory
@@ -170,7 +170,7 @@ whose documents are history, and means nothing about a path being removed.
 make `work/regression/*/evidence` also match
 `work/regression/a/b/evidence` — not what anyone writing that line means. `**`
 is the explicit any-depth form, and the matcher is hand-rolled like every other
-codec here (L1).
+codec here (L2).
 
 **2d. Removal has two branches, and which one it took is stated.**
 `fux remove <path>` has two cases and they are not interchangeable:
@@ -263,7 +263,7 @@ yours"* in writing — the [SR-ACQUIRED](0145_acquired-plane.md) precedent.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -273,7 +273,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No dirs-list rule changed** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `gitdir.read_types` no longer falls back to `DEFAULT_TYPES` for an absent `formats.toml` ([SR-TYPES](0128_types-list.md) decision 14).
+**No dirs-list rule changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `gitdir.read_types` no longer falls back to `DEFAULT_TYPES` for an absent `formats.toml` ([SR-TYPES](0128_types-list.md) decision 14).
 
 ### Consequences
 

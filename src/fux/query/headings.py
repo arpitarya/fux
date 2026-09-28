@@ -5,7 +5,7 @@
 `ask` cites a **document**. `answer` cites a **span** — `docs/mesh.md:L10-L13`
 — and it can only do that because it fetched the bytes and chunked them
 ([SR-ANSWER](../../../records/0105_answer.md)). `ask` is offline by default
-(L4), holds statistics rather than text (L2), and therefore has nothing to
+(L5), holds statistics rather than text (L3), and therefore has nothing to
 count lines in.
 
 **Headings are the span-level signal `ask` can honestly give.** A record's
@@ -30,7 +30,7 @@ every `ask` result has always carried.
    three": inventing relevance is the failure the extracted-mode law exists to
    prevent.
 4. Sort by `(-matches, position in the document)`. Ties break on document
-   order, so the output is a deterministic function of the record (L3) with no
+   order, so the output is a deterministic function of the record (L4) with no
    set-iteration dependence.
 5. Cap at `MAX_HEADINGS`.
 
@@ -47,7 +47,7 @@ every `ask` result has always carried.
 
 ⚠ **One branch's worth of reasoning retired on 2026-09-20 (W-194).** This
 said: *a `hashed` record carries no `phrases` at all — `store/writer.py`
-refuses to write display text for one (L5) — so it yields nothing here by
+refuses to write display text for one (ex-L5) — so it yields nothing here by
 construction rather than by a special case.* There is no hashed record now.
 **The empty-`phrases` path is unchanged and still reached** — by a document
 with no headings — which is why there was never a special case to delete.

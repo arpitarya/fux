@@ -1,6 +1,6 @@
 """The L12 scanner — every literal value in `src/fux/**` and `node/src/**`.
 
-[SR-LAW-12](../records/0013_LAW-12-values-live-in-config.md) §Veto condition
+[SR-LAW-12](../records/0014_LAW-12-values-live-in-config.md) §Veto condition
 names this: *one AST-based test (Python `ast`; a tokenizer pass over `.mjs`)
 that fails on any such literal not in its reviewed allow-list of decision-6
 sites.* The test is `test_l12_values_live_in_config.py`; the allow-list is

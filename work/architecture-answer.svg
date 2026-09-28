@@ -89,7 +89,7 @@
 <rect x="326" y="854" width="250" height="140" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
 <text x="342" y="880" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">chunk</text>
 <text x="342" y="902" font-size="10.5" fill="#4a5260">Heading-aware, transient,</text>
-<text x="342" y="919" font-size="10.5" fill="#4a5260">never written (L2). Tables</text>
+<text x="342" y="919" font-size="10.5" fill="#4a5260">never written (L3). Tables</text>
 <text x="342" y="936" font-size="10.5" fill="#4a5260">band at 1 row per passage</text>
 <text x="342" y="953" font-size="10.5" fill="#4a5260">-- hit@1 0.229 -&gt; 0.875.</text>
 <rect x="606" y="854" width="250" height="140" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>

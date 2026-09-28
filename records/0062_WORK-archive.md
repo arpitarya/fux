@@ -3,14 +3,14 @@ type: Standing Record
 kind: process
 name: SR-WORK-ARCHIVE
 title: "SR-WORK-ARCHIVE (0062) — one archive, and archive is not evidence"
-description: "There is exactly one archive, at the repo root, and anything retired moves there mirroring where it came from with a row naming its live successor. An archived doc may be NAMED but never CITED as backing a live claim, because nothing guarantees it was not overwritten after retirement. Records split by law L13: a RETIRED record is archived like any document; a SUPERSEDED record is rewritten or deleted in place."
+description: "There is exactly one archive, at the repo root, and anything retired moves there mirroring where it came from with a row naming its live successor. An archived doc may be NAMED but never CITED as backing a live claim, because nothing guarantees it was not overwritten after retirement. Records split by law L1: a RETIRED record is archived like any document; a SUPERSEDED record is rewritten or deleted in place."
 status: accepted
 date: 2026-09-14
 feature: the one archive, and the line between naming a retired document and grounding a claim in one
 owns: [tests/test_archive_law.py@0bcf319c1b1a]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: b3227b69cdd928c189cc03c2b2359f0ecc4924a172c18c13c35441401bf77cbc
+content_sha: ff0d9b68128c169fe78be0d8f39e5959176a755579ea34f2a7e5a33747bacf6f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -38,7 +38,7 @@ may be *named* — *"superseded by X"*, *"W-52's trigger"* — and that sentence
 carry a hyperlink. What it may never do is **back a live claim**, because nothing
 guarantees the file was not overwritten after it was retired.
 
-**Records split in two** ([L13](0014_LAW-13-retired-records-archived.md),
+**Records split in two** ([L1](0003_LAW-1-retired-records-archived.md),
 Arpit, 2026-09-28). A **superseded** record is rewritten or deleted in the change
 that supersedes it (Arpit, 2026-09-06), so no second file is left behind to be
 mistaken for current. A **retired** record — whose law, rule or subject no longer
@@ -49,7 +49,7 @@ it for live.
 flowchart TD
     A["a document is retired"] --> B{"is it a record?"}
     B -->|"yes — SUPERSEDED"| C["REWRITTEN or DELETED<br/>in the superseding change<br/>never archived"]
-    B -->|"yes — RETIRED (L13)"| R["moved to archive/records/<br/>status: archived + banner<br/>+ an archive row"]
+    B -->|"yes — RETIRED (L1)"| R["moved to archive/records/<br/>status: archived + banner<br/>+ an archive row"]
     B -->|"no"| D["moved to archive/<br/>mirroring where it came from<br/>+ a row naming its live successor"]
     R --> E
     D --> E{"a live doc points at it"}
@@ -66,7 +66,7 @@ flowchart TD
       +-- a record, SUPERSEDED -> REWRITTEN or DELETED in the superseding change
       |                            (never archived)
       |
-      +-- a record, RETIRED    -> moved to archive/records/ (law L13):
+      +-- a record, RETIRED    -> moved to archive/records/ (law L1):
       |                            status: archived, a dated banner, an archive row
       |
       +-- a record?  no  -> moved to archive/, mirroring its origin,
@@ -134,7 +134,7 @@ different costume.
 9. **A superseded record is never archived** (Arpit, 2026-09-06). It is
    **rewritten or deleted in the change that accepts its successor**, and the
    successor states in prose what it replaced. **A RETIRED record is the
-   exception, and it is archived** — law [L13](0014_LAW-13-retired-records-archived.md)
+   exception, and it is archived** — law [L1](0003_LAW-1-retired-records-archived.md)
    (Arpit, 2026-09-28): moved to `archive/records/` in the change that retires it,
    with `status: archived`, a dated banner and a row here, and then decisions 4–7
    apply to it like any archived document. `records/` holds only what binds.
@@ -160,7 +160,7 @@ different costume.
   file.
 - **Decision 9 means a superseded record's history lives only in git.** That is
   the trade [SR-LAW-0](0002_LAW-0-authority.md)'s amend-in-place rule already
-  made. A retired record is different by L13: its argument has no successor to
+  made. A retired record is different by L1: its argument has no successor to
   live on in, so it is archived rather than lost.
 - **Decision 8 is a named hole.** It is the one thing here a check could plausibly
   cover and does not, and it was closed once and reopened deliberately.
@@ -176,7 +176,7 @@ different costume.
   passed would have made it assert something weaker than the rule.
 - **An archive tier for superseded records.** Deleted outright on 2026-09-06:
   it gave a reader a second file that looked authoritative, and the register's
-  own history note records what that cost. **L13 (2026-09-28) brings back an
+  own history note records what that cost. **L1 (2026-09-28) brings back an
   archive for RETIRED records only**, marked three ways so the 2026-09 confusion
   cannot recur, and leaves superseded records where 2026-09-06 put them.
 

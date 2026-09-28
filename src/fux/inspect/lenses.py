@@ -78,7 +78,7 @@ LEVERS: dict[str, str] = {
 #: Fixed permutation seeds — `min(x ^ seed)` over a document's term hashes.
 #: XOR with a constant is a bijection on the 64-bit space, so each seed is a
 #: genuine permutation and the minimum under it is a genuine minhash. Fixed
-#: constants, never `random`: L3.
+#: constants, never `random`: L4.
 @lru_cache(maxsize=4)
 def _seeds(size: int) -> tuple[int, ...]:
     """`size` permutation seeds — a pure function of the configured length."""
@@ -240,7 +240,7 @@ def boilerplate(view, dictionary, *, top: int) -> Boilerplate:
     order = sorted(
         range(len(view.term_of)),
         # `df` descending, then the hash ascending: two terms on exactly the
-        # same number of documents must not swap places between runs (L3).
+        # same number of documents must not swap places between runs (L4).
         key=lambda i: (-view.df[i], view.term_of[i]),
     )[:top]
     out.top = [
@@ -698,7 +698,7 @@ class Families:
     names (pass A's `meta_keys`). Two documents share a family when the Jaccard
     of those feature sets is at least `[families] skeleton_jaccard` against
     EVERY member — complete linkage, one pass in doc-id order, ties to the
-    older family. A function of the corpus and nothing else (L3): no k, no seed.
+    older family. A function of the corpus and nothing else (L4): no k, no seed.
     """
 
     families: list[dict] = field(default_factory=list)
@@ -749,7 +749,7 @@ def families(view, facts, *, top_lists: int) -> Families:
     shaped: list[tuple[int, frozenset, list[str]]] = []
     originals: dict[str, str] = {}
     # Doc-id order, so the spelling a masked heading is shown with — the first
-    # document's — is a function of the corpus and never of read order (L3).
+    # document's — is a function of the corpus and never of read order (L4).
     for index, doc in sorted(enumerate(view.docs), key=lambda pair: pair[1].id):
         masked = [_mask(p) for p in doc.phrases if p and p.strip()]
         for p, m in zip((p for p in doc.phrases if p and p.strip()), masked):

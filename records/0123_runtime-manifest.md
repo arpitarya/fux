@@ -8,9 +8,9 @@ status: accepted
 date: 2026-08-19
 feature: "`.fux/runtime/manifest.json` — the derived plane's freshness contract"
 owns: []
-laws: [L3]
+laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 83d8e9af232e787f684d24169b019dd620fc8d13d8e8dbb8a51723f66f61278d
+content_sha: 1125dc3a6099e43664ae8b8eb763a1762927c3fcab6cc88a504c27b64b5d937b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -160,7 +160,7 @@ gained `mined.json`. A v6 plane is refused and rebuilt, not read as "no pairs".
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -170,7 +170,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 ### Consequences
 

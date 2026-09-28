@@ -11,7 +11,7 @@
 ## `ask` is heading-level; `answer` is line-level (W-84, 2026-08-26)
 
 **`ask` names the sections that match, `answer` names the lines.** The split is
-L2 and L4 showing through the surface, not an omission:
+L3 and L5 showing through the surface, not an omission:
 
 - A **line range** can only be computed by chunking **fetched** bytes, which is
   what `answer` does and `ask`, offline by default, does not. A range computed
@@ -1581,7 +1581,7 @@ def _provenance_for(root: Path, args, bundle, block, *, best=None) -> dict:
     safe, an absent one must never be readable as a claim).
 
     ⚠ **The journal is written only on `--journal`, and that is the consent.**
-    L8 as reverted permits a plaintext local log; it does not oblige fux to
+    L9 as reverted permits a plaintext local log; it does not oblige fux to
     start one behind a consumer's back. A `$0`, offline tool whose pitch is
     *nothing leaves your machine* may not quietly begin recording questions
     because a law was relaxed. Always-on journalling is a real want and it needs

@@ -7,10 +7,10 @@ description: The single best answer the index can give — a fetched, re-scored 
 status: accepted
 date: 2026-08-18
 feature: "`fux answer` — one answer, its footing stated, and the report of what changed since the question was last asked"
-owns: [src/fux/query/refer_answer.py@79014cc86dfd]
-laws: [L1, L2, L3]
+owns: [src/fux/query/refer_answer.py@daff7fd90df1]
+laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 366775fcb7b4f6733463391caac562a925e7dbcb1604c12ebd5ac3e963330cf8
+content_sha: d430d57b86f06cabf56586d05660eabd7632211f3bc89347c3f43b6a2f4f97bb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -289,7 +289,7 @@ wants the old cost sets `[refer] budget` to what it used to spend.
 
 <!-- L12-NOTE-START -->
 
-**[L12](0013_LAW-12-values-live-in-config.md) — no default on this path (W-225, 2026-09-27).** `answer` threads the
+**[L12](0014_LAW-12-values-live-in-config.md) — no default on this path (W-225, 2026-09-27).** `answer` threads the
 command's one resolved `Tune` into `refer()` and `answer_via_refer`, which take it
 required, together with the named `cache_ttl_seconds`. When the confidence block
 could not be computed, the block that claims nothing (`confidence.empty`) is built
@@ -299,7 +299,7 @@ under this repo's floors before anything renders — never under a value in code
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -495,9 +495,9 @@ shipped at `0.0`, so `answer` cites what it cited before the key existed.
 document `answer` cites as it moves `ask`'s #1. At the default `0.0` nothing is
 read and `answer` is byte-identical.
 
-**A present `fux.toml` that does not load now stops `answer`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): the archived declaration is read through `config.load`, which names every missing key; only an absent `fux.toml` is still tolerated ([SR-ASK](0103_ask.md), [SR-CONFIG](0113_config.md) decision 17).
+**A present `fux.toml` that does not load now stops `answer`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): the archived declaration is read through `config.load`, which names every missing key; only an absent `fux.toml` is still tolerated ([SR-ASK](0103_ask.md), [SR-CONFIG](0113_config.md) decision 17).
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 **The intent prior reaches `answer` through `run_query`** (W-168 step 9,
 2026-09-28; [SR-RANKING](0111_ranking.md) decision 13). When `intent_weight > 0`
@@ -509,8 +509,8 @@ re-ordered one. Off by default, and then nothing here changes.
 - ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
   nothing it decides.** Hashed display meta was deleted outright: `meta` and
   `title_h` left the record shape, `store/displaycache.py` and
-  `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law L5
-  retired ([SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). What moved under `query/__init__.py` is `_resolve_title` / `_title_from` — the P5 display-title lookup, now a no-op because every record carries a readable `title`. `cmd_answer`, the refer/index fork and `_freshness_of` are untouched.
+  `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law ex-L5
+  retired ([ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). What moved under `query/__init__.py` is `_resolve_title` / `_title_from` — the P5 display-title lookup, now a no-op because every record carries a readable `title`. `cmd_answer`, the refer/index fork and `_freshness_of` are untouched.
   **This record's decisions are unaffected**, and the line is here because the
   freshness gate asks a describer to say so rather than to be silent.
 

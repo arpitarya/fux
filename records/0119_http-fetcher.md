@@ -7,10 +7,10 @@ description: "A plain stdlib GET is the default fetcher, written write-if-missin
 status: accepted
 date: 2026-08-19
 feature: "`.fux/fetchers/http.py` — the fetcher a URL gets when its line says nothing"
-owns: [.fux/fetchers/http.py@62c4a3f8fe3e, src/fux/templates/http.py.txt@62c4a3f8fe3e]
-laws: [L1, L4, L5]
+owns: [.fux/fetchers/http.py@4f0f4a3431ce, src/fux/templates/http.py.txt@4f0f4a3431ce]
+laws: [L2, L5, ex-L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 1fa4ee926661cb8f4028c72bcfff52313fdc9f408691b0b8efc9712f86eb2a96
+content_sha: e8b70a218187c0a2752bd296086ec30d2e6b0d4fca90a0417de2b9fdbc4b5b09
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -152,8 +152,8 @@ that returns something useless returns something useless, and a human writes
 `fetch=cdp` on that line. [SR-FETCHER](0117_fetcher.md) decision 5 is the rule;
 this is the case that would otherwise have broken it.
 
-**4. ⚠ RETIRED 2026-09-20 (W-194), with L5.** This read: *Hashed meta still
-applies — L5 is a property of the source, not of the transport, and a default
+**4. ⚠ RETIRED 2026-09-20 (W-194), with ex-L5.** This read: *Hashed meta still
+applies — ex-L5 is a property of the source, not of the transport, and a default
 fetcher does not make a URL public.*
 
 🔴 **The separation it drew is what survives, and it is worth more than the
@@ -313,14 +313,14 @@ argument for it: a plain GET that returns a rendered shell on a line declaring
 
 ### Alternatives considered
 
-- **`urllib` inside `src/fux/`.** The obvious placement; L1 and L4 both survive
+- **`urllib` inside `src/fux/`.** The obvious placement; L2 and L5 both survive
   (`urllib` is stdlib, and it would sit inside the same fence). Rejected because
   it spends the **adapter cap**, which is what has kept `src/fux/`
   dependency-free across two rebuilds. **Once core fetches once, every future
   "just add Confluence" argument gets easier.**
 - **Static-first with automatic escalation to CDP.** What the crawler vendors
   do. Rejected under decision 3: same URL, two runs, different bytes, no record
-  of why — L3 lost on the one path already excepted from it. Its own advantage
+  of why — L4 lost on the one path already excepted from it. Its own advantage
   (not paying browser cost per page) is delivered by declaration anyway.
 - **Detect once, then write the verdict back into the URL list.** The strongest
   version of escalation, and genuinely deterministic after the first run. Held,

@@ -8,9 +8,9 @@ status: accepted
 date: 2026-08-19
 feature: "`.fux/runtime/stamp.json` — the cheap staleness pre-filter, and its deliberate exclusion from the determinism set"
 owns: []
-laws: [L3]
+laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: ebaa3afc1d641fd103bd34fd816e5eb5c491155bfacdee9ef4aa77bc3ebdbe80
+content_sha: 31efbe6354199b1af383b621fbb0d696617fe3a0ed30caed5a5c8bef292c0432
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -126,7 +126,7 @@ same build and is covered by the same staleness check.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -136,7 +136,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 ### Consequences
 
@@ -159,7 +159,7 @@ this moved where they are written, not what they are.
   Rejected on cost at scale: re-hashing every committed shard on every
   `fux doctor`/`ask` invocation, even when nothing changed, is wasted work.
 - **Use only mtimes, drop the content-hash check entirely.** Rejected:
-  mtimes are exactly the non-reproducible signal Law L3 keeps out of any
+  mtimes are exactly the non-reproducible signal Law L4 keeps out of any
   correctness claim — fine as a hint, never as proof.
 - **Fold `stamp.json`'s fields into `manifest.json` itself.** Rejected: would
   pull a non-reproducible field into the one file whose whole contract is

@@ -23,7 +23,7 @@ IDS = [f"q{n:03d}" for n in range(1, 51)]
 # --- the seal ---------------------------------------------------------------
 
 def test_the_split_is_deterministic_and_order_independent():
-    """L3. No seed to record, no `random`, and re-sorting the goldens file
+    """L4. No seed to record, no `random`, and re-sorting the goldens file
     cannot silently change which queries are sealed."""
     a, _ = split(IDS)
     b, _ = split(list(reversed(IDS)))

@@ -1,6 +1,6 @@
 # src/fux/constants.toml -- the engine's FIXED values.
 #
-# SR-LAW-12 decision 2 (records/0013_LAW-12-values-live-in-config.md) and
+# SR-LAW-12 decision 2 (records/0014_LAW-12-values-live-in-config.md) and
 # SR-CONSTANTS (records/0159_constants.md). A value is FIXED when changing it
 # changes what a committed byte means -- a schema id, a format or rules version,
 # an artefact name, a byte offset a file format defines (decision 6a, R7).
@@ -100,7 +100,7 @@ builtin_prefix = "built-in:"
 digest_hex     = 16
 consumer_dir   = ".fux/decoders"
 # Sorted and explicit, never discovered: dispatch must not depend on
-# filesystem order (L3).
+# filesystem order (L4).
 builtin        = ["csv", "docx", "drawio", "html", "image", "ini", "json", "jsonl", "mail", "pdf", "pptx", "rtf", "svg", "toml", "xlsx", "xml", "yaml"]
 # Already-text formats that reach no decoder -- the prose half of the default
 # `include` that `fux setup` writes into .fux/formats.toml.
@@ -199,8 +199,8 @@ observers       = "observers.json"
 fetch_cache_dir = "fetch-cache"
 
 [python]
-# L7 -- records/0009_LAW-7-python-311.md.
-min = [3, 11]
+# L7 -- records/0009_LAW-7-python-312.md.
+min = [3, 12]
 
 # -- fux inspect's committed-nowhere report files ----------------------------
 

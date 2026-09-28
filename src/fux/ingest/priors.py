@@ -23,7 +23,7 @@ cannot move a document past one that outscores it.
    query time means one subprocess per candidate; the whole design is that a
    query touches the index and nothing else.
 2. **They must be identical on every clone.** A derivation from local
-   filesystem mtimes would differ per machine and break L3. A git commit
+   filesystem mtimes would differ per machine and break L4. A git commit
    timestamp is a property of the history every clone shares.
 
 The *weights* applied to them were tunable (`tune.toml`); the facts never were.

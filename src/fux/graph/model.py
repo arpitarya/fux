@@ -44,7 +44,7 @@ class Edge:
 class Graph:
     """Adjacency over a set of edges. Every accessor returns sorted lists.
 
-    **Sorted is not tidiness, it is L3.** Community assignment and PPR both
+    **Sorted is not tidiness, it is L4.** Community assignment and PPR both
     accumulate over neighbours, and float accumulation is not associative — an
     unsorted traversal makes the same corpus produce different bytes on
     different runs. Every iteration order in this package is derived from a

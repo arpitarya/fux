@@ -27,7 +27,7 @@ INDEX_DIR = fixed("index", "dir")
 # v4 (W-194, 2026-09-20): `meta` and `title_h` are GONE from the record. Arpit
 # ruled hashed display meta deleted outright rather than deprecated, so a URL
 # record carries a plain `title` and `phrases` like every other record and law
-# L5 retires with the mechanism. **A property disappeared**, which bumps
+# ex-L5 retires with the mechanism. **A property disappeared**, which bumps
 # `_format` for the same reason a property appearing does
 # (SR-INDEX-LIFECYCLE decision 9.1): a v3 index can hold records a v4 reader
 # has no rule for, and "this record has no title" would otherwise be

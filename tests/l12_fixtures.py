@@ -1,6 +1,6 @@
 """The config files every hand-built test repo now needs — L12 (W-225).
 
-[SR-LAW-12](../records/0013_LAW-12-values-live-in-config.md): the engine holds
+[SR-LAW-12](../records/0014_LAW-12-values-live-in-config.md): the engine holds
 no value in code, so a repository with no `.fux/tune.toml` stops the ranked
 verbs and `fux ingest` naming the file. A test that hand-builds a repository
 writes the files `fux setup` would, from the same packaged templates, through

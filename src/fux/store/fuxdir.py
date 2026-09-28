@@ -425,7 +425,7 @@ def ensure_layout(root: Path, *, node_shape: "str | None" = None) -> list[Path]:
 # that claim the same extensions and WIN.
 #
 # 🔴 **What a consumer gets is BUILD OUTPUT, and since 2026-09-12 that is a
-# law** ([L10](../../../records/0011_LAW-10-bundled-output.md)). The 47-file
+# law** ([L10](../../../records/0012_LAW-10-bundled-output.md)). The 47-file
 # module tree this code used to write is gone, in two shapes:
 #
 #   A  the bundle, vendored   -- `package.json`, `fux.mjs`, `mcp-tools.json`,
@@ -582,7 +582,7 @@ def _workspace_manifest(version: str) -> bytes:
     """Shape C's whole payload: a manifest naming the published reader.
 
     ⚠ **This is the one `package.json` fux writes that HAS a `dependencies`
-    key**, and it is not an L1 problem: the dependency is fux itself, pinned to
+    key**, and it is not an L2 problem: the dependency is fux itself, pinned to
     the exact version that wrote the index -- the same guarantee shape A gets by
     carrying the bundle. `private: true` so a `npm publish` at the workspace
     root can never push a consumer's reader stub to the registry.

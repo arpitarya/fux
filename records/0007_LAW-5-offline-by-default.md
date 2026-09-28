@@ -1,23 +1,23 @@
 ---
 type: Standing Record
 kind: law
-name: SR-LAW-4
-title: "SR-LAW-4 (0006) — L4 — offline by default"
+name: SR-LAW-5
+title: "SR-LAW-5 (0007) — L5 — offline by default"
 description: "Network access only inside explicit, fenced, opt-in paths — paths, plural. An import fence enforces it, and the count of fenced paths was never part of the law."
 status: accepted
 date: 2026-08-18
-feature: the rationale, history and reopen-trigger of L4
+feature: the rationale, history and reopen-trigger of L5
 owns: []
-laws: [L4]
+laws: [L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 92bd3591612763305e971a8cfb5d842120ddb46d9de17ae2dd65e304fea24e9a
+content_sha: 72583f3e754ad758db0aecb6a622f9e8cb965eac0c14644a3aebc28e4c7a7e48
 ---
 
-# SR-LAW-4 — L4 — offline by default
+# SR-LAW-5 — L5 — offline by default
 
 ## §1 — For humans
 
-> **This record is the HOME of law L4 — §2's first block IS the law**, and the
+> **This record is the HOME of law L5 — §2's first block IS the law**, and the
 > rest of this record is its rationale: why it exists, what it has cost, how its
 > wording has moved, and what would reopen it.
 > [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a
@@ -53,7 +53,7 @@ the record of why reading a count off this table is the mistake.
 
 ### ⚠ The narrowing that already happened once
 
-**Nine records and eleven module docstrings** had narrowed *"network access only inside explicit, fenced, opt-in paths"* down to `--refresh-urls` **specifically**. So when `fux add <URL>` arrived as a second fenced path, it read as an amendment to L4. **It was not.** The law says *paths*, plural, and the count was never part of it. The records were corrected and `CLAUDE.md` was not touched.
+**Nine records and eleven module docstrings** had narrowed *"network access only inside explicit, fenced, opt-in paths"* down to `--refresh-urls` **specifically**. So when `fux add <URL>` arrived as a second fenced path, it read as an amendment to L5. **It was not.** The law says *paths*, plural, and the count was never part of it. The records were corrected and `CLAUDE.md` was not touched.
 
 **This is the restatement hazard in its purest form** — text that was true when written, became the thing everyone cited, and then made a legal new case look like a law change. It is why [SR-LAWS](0001_LAWS.md) forbids restating a law, and why the named paths live in [SR-CLI](0101_cli-surface.md) rather than here.
 
@@ -61,10 +61,10 @@ the record of why reading a count off this table is the mistake.
 
 ```mermaid
 flowchart LR
-    R["SR-LAW-4<br/>(THIS RECORD — states law L4)"]
-    N["SR-LAWS<br/>(the handles L0..L11 — routes, never states)"]
+    R["SR-LAW-5<br/>(THIS RECORD — states law L5)"]
+    N["SR-LAWS<br/>(the handles L0..L12 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
-    B["records bound by L4<br/>(cite the number, never restate)"]
+    B["records bound by L5<br/>(cite the number, never restate)"]
     R --> C
     N --> R
     N --> B
@@ -75,7 +75,7 @@ flowchart LR
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-       SR-LAW-4   <-- THIS RECORD states law L4
+       SR-LAW-5   <-- THIS RECORD states law L5
             |
             | scripts/gen-laws.py  (test-bound, byte-equal)
             v
@@ -83,11 +83,11 @@ flowchart LR
         (GENERATED -- not the source)
 
                SR-LAWS
-     (the handles L0..L11 -- routes, never states)
+     (the handles L0..L12 -- routes, never states)
                    |
           +--------+---------+
           v                  v
-      SR-LAW-4          records bound by L4
+      SR-LAW-5          records bound by L5
    (the law, plus its     (cite the number,
     rationale, history     never restate)
     and veto)
@@ -101,7 +101,7 @@ flowchart LR
 
 ### The law (normative)
 
-🔴 **This block IS law L4.** It is the only normative statement of it, and
+🔴 **This block IS law L5.** It is the only normative statement of it, and
 [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a **generated**
 copy of it — rendered from these bytes by
 [`scripts/gen-laws.py`](../scripts/gen-laws.py) and held byte-equal by
@@ -110,21 +110,21 @@ Amend it **here**, then run `python scripts/gen-laws.py --write`.
 Amending a law needs Arpit's ruling, named in this record
 ([SR-LAW-0](0002_LAW-0-authority.md) decision 3).
 
-<!-- LAW-TEXT:BEGIN L4 -->
-- **L4** · **Offline by default.** Network access only inside explicit, fenced,
+<!-- LAW-TEXT:BEGIN L5 -->
+- **L5** · **Offline by default.** Network access only inside explicit, fenced,
   opt-in paths. An import fence test enforces it.
-<!-- LAW-TEXT:END L4 -->
+<!-- LAW-TEXT:END L5 -->
 
 ### Context
 
-L4 predates the record set: it lives in the steering doc every session reads
+L5 predates the record set: it lives in the steering doc every session reads
 first, and [SR-LAWS](0001_LAWS.md) gave it a citable handle so a decision could
 name it without quoting it. **What was still missing was a place to put the
 reasoning** — why the law is worth its cost, what it has already been narrowed
 by, and what would have to become true to reopen it.
 
 That material had been accumulating inside `SR-LAWS` itself, which was becoming
-one record carrying eight subjects. This record is L4's share of it, split out
+one record carrying eight subjects. This record is L5's share of it, split out
 on 2026-09-06 at Arpit's ruling.
 
 ### Decision
@@ -141,7 +141,7 @@ on 2026-09-06 at Arpit's ruling.
 
 - **Easier:** deployment in regulated and air-gapped environments, where *"it cannot reach the network"* is a checkbox somebody has to tick.
 - **Harder:** URL freshness needs a deliberate act. `ttl=` and the networked `fux ingest` exist because the law will not let staleness fix itself in the background.
-- ⚠ **L4 does not close the use-record gap.** [L8](0010_LAW-8-use-record.md)'s 2026-08-27 ratification dropped its transmission clause, and L4 is *offline by default* with an existing fenced path — a journal POSTed through that fence would not obviously violate it. **What holds is the code, not this law.**
+- ⚠ **L5 does not close the use-record gap.** [L9](0011_LAW-9-use-record.md)'s 2026-08-27 ratification dropped its transmission clause, and L5 is *offline by default* with an existing fenced path — a journal POSTed through that fence would not obviously violate it. **What holds is the code, not this law.**
 
 ### Alternatives considered
 
@@ -160,7 +160,7 @@ on 2026-09-06 at Arpit's ruling.
 
 **Reopen if** a module on an offline path gains a transport import, or if a networked path ships without its stderr notice.
 
-**Also reopen if** anything proposes transmitting a use record — telemetry, a support bundle, a `doctor --json` upload, a hosted judge. ⚠ **That is not an L4 violation and must not be reported as one**; it is the gap L8's ratification left open, and this is one of the two trip-wires accepted in its place.
+**Also reopen if** anything proposes transmitting a use record — telemetry, a support bundle, a `doctor --json` upload, a hosted judge. ⚠ **That is not an L5 violation and must not be reported as one**; it is the gap L9's ratification left open, and this is one of the two trip-wires accepted in its place.
 
 **How to check it:**
 

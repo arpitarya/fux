@@ -13,7 +13,7 @@ scorers that can disagree while both look correct, which is the restatement
 [SR-LAW-0](../../records/0002_LAW-0-authority.md) decision 1 forbids by its own
 test.
 
-⚠ **Importing is not invoking.** [L11](../../records/0012_LAW-11-sealed-answer-key.md)
+⚠ **Importing is not invoking.** [L11](../../records/0013_LAW-11-sealed-answer-key.md)
 decision 13 reserves *running `score.py`* — the program, through
 `just golden-score` — to Arpit's own hand, in either state. What permits **this**
 file to read a key is **decision 14**: while the tree is UNLOCKED a session may

@@ -155,7 +155,7 @@ def run(
     network for one document without a second write path into the index —
     the whole run still ends in the one `write_index` call below, so a scoped
     fetch and a full refresh produce the same bytes for everything they agree
-    about (L3). `None` means every listed URL.
+    about (L4). `None` means every listed URL.
 
     `first_fetch` is the URL `fux add` has **just written**, and it is the only
     thing that may fetch a line declaring `update=never`. A pin freezes a
@@ -411,7 +411,7 @@ def run(
     # `max_table_rows` decides which rows a table's body holds. Neither moves a
     # document's sha, so a reuse keyed on the sha alone would carry a record
     # extracted under the OLD value forward, and a delta run would stop being
-    # byte-identical to a full one (L3). One digest, both keys.
+    # byte-identical to a full one (L4). One digest, both keys.
     # The new digest is RECORDED only after `write_index` (below): a run
     # stopped before then left the old records in the shards, and a digest
     # already claiming the new value would let the next delta run reuse them.
@@ -453,7 +453,7 @@ def run(
     # `.fux/acquired/` holds the bytes for every `keep=true` line. This routes
     # them back through the one `parse -> redact -> extract` path rather than
     # opening a second one, which is what keeps the re-derived record
-    # byte-identical to a freshly fetched one (L3).
+    # byte-identical to a freshly fetched one (L4).
     if carried and (pii_moved or extract_moved or _decoders_moved(root, decoder_digests)):
         reacquired, stranded, reacquired_ids = _reacquire_urls(root, carried, config)
         for doc_id in reacquired:
@@ -710,7 +710,7 @@ def run(
         # ⚠ **W-194, 2026-09-20 — the privacy fork is gone.** This was the one
         # place a `url:` record forked in shape: `meta=plain` wrote `title` and
         # `phrases`, and the default `meta=hashed` wrote `title_h` plus a
-        # display-cache entry, because L5 made hashing the non-git default.
+        # display-cache entry, because ex-L5 made hashing the non-git default.
         # Arpit ruled the whole mechanism deleted, so a url record is written
         # exactly like a git one and there is nothing left to branch on.
         record["title"] = fields.title
@@ -817,7 +817,7 @@ def run(
     # after `write_index` for the ledger's reason, and from the same provenance
     # map, so the committed file and the per-run ledger cannot disagree about
     # which decoder produced a record. 🔴 It carries no run id and no clock: two
-    # ingests from the same sources write it once (L3), which is what makes a
+    # ingests from the same sources write it once (L4), which is what makes a
     # derived file safe to commit.
     _record_register(
         root,
@@ -1218,7 +1218,7 @@ def _reacquire_urls(
     out: dict[str, bytes] = {}
     seen: set[str] = set()
     stranded: list[str] = []
-    # Sorted: the same tree must give the same index on two machines (L3), and
+    # Sorted: the same tree must give the same index on two machines (L4), and
     # this set feeds `fresh`, whose iteration order decides record order.
     for doc_id in sorted(carried):
         entry = entries.get(doc_id)
@@ -1245,7 +1245,7 @@ STALE_REDACTION_FILE = fixed("runtime", "stale_redaction")
 def _current_run_seq(root: Path) -> int:
     """`url-state.json`'s counter, or `0`. **Never raises.**
 
-    W-200's rows are stamped with a **run counter, never a clock** (L3), and
+    W-200's rows are stamped with a **run counter, never a clock** (L4), and
     this is the counter the repo already has: it increments once per run that
     fetched anything, which is why `url-state.json` owns it. **A file-only
     corpus never bumps it**, so every row in such a repo reads `0` — correct
@@ -1742,7 +1742,7 @@ def _with_archived(record: dict, archived: bool) -> dict:
     is precisely the one that has stopped changing.
 
     **Returns the record unchanged and uncopied when it already agrees**, so a
-    run that changes nothing still writes byte-identical shards (L3), and
+    run that changes nothing still writes byte-identical shards (L4), and
     `archived` is **removed** when the line no longer declares it: a flag that
     could be set but never cleared is a one-way door.
     """
@@ -1771,7 +1771,7 @@ def _without_dangling_edges(record: dict, known_ids: set[str]) -> dict:
     edge itself and is never a document, so it cannot dangle.
 
     Returns the record **unchanged and uncopied** when nothing is dropped, so
-    a run that changes nothing still writes byte-identical shards (L3).
+    a run that changes nothing still writes byte-identical shards (L4).
     """
     edges = record.get("edges")
     if not edges:

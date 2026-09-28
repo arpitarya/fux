@@ -54,7 +54,7 @@ rendering anyway, not a CLI key. `enabled` is resolved FIRST, in its own pass
 **Every key a verb resolves comes from a file, never from code.** In a repo it
 is `.fux/output.toml`; a missing file, table or key is a `FuxError` naming it
 and the remedy, `fux doctor --fix`, which writes exactly the missing keys from
-the template ([L12](../../records/0013_LAW-12-values-live-in-config.md)
+the template ([L12](../../records/0014_LAW-12-values-live-in-config.md)
 decision 3). `--no-output-config` — the "is it me or the config?" switch — and
 a run outside any repo read the packaged template, `templates/output.toml.txt`,
 which is the one home of every shipped rendering value. There is no built-in

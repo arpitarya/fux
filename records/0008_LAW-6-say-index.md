@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L6
 owns: []
 laws: [L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 781b08222b44c7f6fa6cb82047a06813fe13b0a31ffdf7e6623768e37ed7d0ad
+content_sha: daec00754f78b4724fb573f87e2733bada3254b852ba6b3fa5ed68b45dd8d252
 ---
 
 # SR-LAW-6 — L6 — say "index", not "db"
@@ -37,14 +37,14 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 
 **"Index" imports the right ones:** that it points at things it does not contain, that it is rebuilt rather than restored, that it is derived from a corpus that lives elsewhere, and that it can be regenerated if lost.
 
-**This is not style.** [L2](0004_LAW-2-content-never-durable.md) is the architecture; L6 is the sentence that stops people arguing against L2 without realising they are doing it. Every *"why don't we just cache the bodies"* conversation starts with somebody calling it a database.
+**This is not style.** [L3](0005_LAW-3-content-never-durable.md) is the architecture; L6 is the sentence that stops people arguing against L3 without realising they are doing it. Every *"why don't we just cache the bodies"* conversation starts with somebody calling it a database.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
 ```mermaid
 flowchart LR
     R["SR-LAW-6<br/>(THIS RECORD — states law L6)"]
-    N["SR-LAWS<br/>(the handles L0..L11 — routes, never states)"]
+    N["SR-LAWS<br/>(the handles L0..L12 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
     B["records bound by L6<br/>(cite the number, never restate)"]
     R --> C
@@ -65,7 +65,7 @@ flowchart LR
         (GENERATED -- not the source)
 
                SR-LAWS
-     (the handles L0..L11 -- routes, never states)
+     (the handles L0..L12 -- routes, never states)
                    |
           +--------+---------+
           v                  v
@@ -119,7 +119,7 @@ on 2026-09-06 at Arpit's ruling.
 
 ### Consequences
 
-- **Easier:** the L2 conversation, every time, with everyone.
+- **Easier:** the L3 conversation, every time, with everyone.
 - **Harder:** nothing measurable. This law costs a word.
 - ⚠ **It cannot be fully mechanised.** A grep finds the word; it does not find a paragraph that describes an index *as if* it were a database without using the word. That is the same limit [SR-LAWS](0001_LAWS.md) records for the narrower-claim hazard.
 
@@ -132,12 +132,12 @@ on 2026-09-06 at Arpit's ruling.
 
 - `CLAUDE.md` §Non-negotiable constraints — the normative text. Repo path: [`../../CLAUDE.md`](../CLAUDE.md)
 - [`docs/GLOSSARY.md`](../docs/GLOSSARY.md) — every recurring term, defined once
-- [SR-LAW-2](0004_LAW-2-content-never-durable.md) — the architecture this vocabulary protects
+- [SR-LAW-3](0005_LAW-3-content-never-durable.md) — the architecture this vocabulary protects
 - Lakoff & Johnson, *Metaphors We Live By* (1980) — the case that the noun chosen for a system governs the inferences drawn about it
 
 ### Veto condition
 
-**Reopen if** the committed plane ever genuinely holds content — at which point the word would have stopped being wrong, and [L2](0004_LAW-2-content-never-durable.md) would have fallen first.
+**Reopen if** the committed plane ever genuinely holds content — at which point the word would have stopped being wrong, and [L3](0005_LAW-3-content-never-durable.md) would have fallen first.
 
 **How to check it:**
 

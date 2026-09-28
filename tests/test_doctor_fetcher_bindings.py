@@ -87,7 +87,7 @@ def test_it_never_imports_a_fetcher(tmp_path, monkeypatch):
     Importing a fetcher runs module-level consumer code that may `connect()` to
     a browser. `fux doctor` is the command somebody runs when something is
     already wrong; it may not be the command that executes their fetcher — and
-    it is offline by contract (SR-LAW-4 decision 4).
+    it is offline by contract (SR-LAW-5 decision 4).
     """
     import importlib
 

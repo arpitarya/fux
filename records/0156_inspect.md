@@ -8,10 +8,10 @@ amended: 2026-09-27
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@68d47f57511d, .fux/inspect.toml@28f3b6494463]
-laws: [L2, L3, L4, L6, L8]
+owns: [src/fux/inspect@b64cf413afd1, .fux/inspect.toml@28f3b6494463]
+laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: d8a792d396dd2549c606ef65e3d72e1a78af3465672e2442a754358e411f02ea
+content_sha: e324cc49159e68f56465f8ecc95f1a3eeecae1990c0316cbd5835fd419826d3c
 ratifies: W-169
 ---
 
@@ -153,7 +153,7 @@ discoverable from the index the whole time and nobody could see it.
 4. **The dictionary never fetches.** A `file:` document is read from the
    working tree (reading your own checkout is not a fetch); a `url:` document
    is read from `.fux/acquired/` when its bytes were retained and is **skipped,
-   named, and counted** otherwise. L4 has no exception here and needs none.
+   named, and counted** otherwise. L5 has no exception here and needs none.
 
 5. **The field texts are built by `ingest/extract.py`'s own helpers,
    imported.** `_headings_and_body` knows about code fences and about
@@ -247,7 +247,7 @@ discoverable from the index the whole time and nobody could see it.
     first report: orphans read `20` and are **341**.
 
 14. **The report carries no timestamp.** A wall-clock line would make the file
-    differ on every run — L3's byte-identical guarantee broken by a decoration —
+    differ on every run — L4's byte-identical guarantee broken by a decoration —
     and the determinism test would then have to exclude the one line most
     likely to hide a real change underneath it. Provenance is the shard shas,
     which are a fact about the input rather than about when somebody looked.
@@ -267,7 +267,7 @@ discoverable from the index the whole time and nobody could see it.
 
 <!-- L12-NOTE-START -->
 
-**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `fux inspect` chunks at the repo's own
+**[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `fux inspect` chunks at the repo's own
 `[refer]` bounds, read strictly from `.fux/tune.toml` — the report no longer
 measures passages under built-in numbers when the file is absent or bad; it
 stops and names it. The facts cache key now carries `table_rows_per_passage` as
@@ -277,7 +277,7 @@ well as the two byte bounds, so a changed value is a cache miss, not a stale row
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -317,9 +317,9 @@ they decide is stated here.
     document.** Four views, all in `report.json`:
     - **identity** — titles more than one document carries, with the count of
       documents sharing and of data documents identifiable by title;
-    - **segments** (L1) — decoder × top folder × archived, one report card each;
+    - **segments** (L2) — decoder × top folder × archived, one report card each;
     - **chunks** — passages by cut rung, and the word-cut share per decoder;
-    - **triage** (L2) — one row per document that carries a finding, ordered by
+    - **triage** (L3) — one row per document that carries a finding, ordered by
       **how many** findings and then by id. A count a reader can check, never a
       weighted score (decision 11). The findings are `unreadable`, `no text`,
       `no distinctive term`, `shared title`, `title probe miss`, `word-cut
@@ -351,7 +351,7 @@ they decide is stated here.
     the report says so. **A probe number is this corpus describing itself** —
     never a claim about engine quality ([SR-RS](0133_predictions.md)).
 
-20. **L3 — one document's X-ray, on demand** (`xray.document`): what was
+20. **L4 — one document's X-ray, on demand** (`xray.document`): what was
     ingested (pass A's facts, refreshed for that document alone), what was
     indexed (tokens per field, and each field's rarest words named by
     re-tokenising **its own** fields with `pii.toml` applied first, `df` from the
@@ -382,7 +382,7 @@ It states no new threshold: its classes are `BOILERPLATE_DF_SHARE` and
 `DISTINCTIVE_DF_SHARE`, the lenses' own. `fux serve` is its only caller today
 ([SR-SERVE](0158_serve.md) decision 4); `fux inspect` prints none of it.
 
-**23. `.fux/inspect.toml` — every threshold, sample and row count the report uses** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28).
+**23. `.fux/inspect.toml` — every threshold, sample and row count the report uses** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28).
 The first new consumer file L12 created (R6). Nineteen values left the lens
 modules and their parameter defaults — the boilerplate / distinctive df shares,
 the near-duplicate Jaccard, the link-target share, the minhash signature and
@@ -416,7 +416,7 @@ placed inside `inspect` by the W-220 ruling — a lens, never a verb).
   that is topic clustering, which is `graph`'s communities.
 - **A family** is complete-linkage over the set Jaccard of those features at
   `[families] skeleton_jaccard`, one pass in doc-id order, ties to the older
-  family. No k, no seed, no restart — a function of the corpus (L3). It is named
+  family. No k, no seed, no restart — a function of the corpus (L4). It is named
   by its first four core headings, and carries its members, folders, shared
   front-matter keys and the length bands (`[families] length_edges`) they span.
 - **A misfit** is a member missing a heading at least `[families] core_share` of
@@ -475,7 +475,7 @@ placed inside `inspect` by the W-220 ruling — a lens, never a verb).
   that is the point: [SR-POSTINGS](0112_postings.md) decision 2 commits hashes.
   The alternative on the table was committing a term dictionary beside them,
   which trades the privacy property for a convenience and would have to be
-  argued on L2's terms. Nobody has argued it.
+  argued on L3's terms. Nobody has argued it.
 
 - **Publishing the minhash estimate rather than the exact Jaccard.** Rejected:
   a 64-permutation estimate has a standard error near 0.06, so the number in the
@@ -529,7 +529,7 @@ placed inside `inspect` by the W-220 ruling — a lens, never a verb).
 2. **`git status` is not clean after a run in a clean clone.** Decision 15's
    whole claim. `tests_e2e/test_inspect_verb.py` asserts it.
 3. **The report is not byte-identical over an unchanged index.** Decision 14,
-   and an L3 defect rather than a preference.
+   and an L4 defect rather than a preference.
 4. **`LEVERS` and decision 12's table disagree**, which
    `tests/test_inspect_levers.py` catches, or a lever names a knob no record
    describes.

@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@14ddec87d73b, tools/vector-gate@0023bff0cdef]
-laws: [L3]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@b3ea462b7e06, tools/vector-gate@0023bff0cdef]
+laws: [L4]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 6e7ec76049f84f25ca51a6f510b56cf2ef5537bc95a757e8346437ba873c714e
+content_sha: f4cc2298686e060b17151b6006e8eb51846e3f260051a0c915dc98b515c76a71
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -385,7 +385,7 @@ ruled its power tension.
 
 | control | state |
 |---|---|
-| content-free placebo, matched length | ✅ **built** — one shared sentence pool so every placebo has the same vocabulary and cannot discriminate; length matched to within a few words; deterministic from the source sha (L3), no model |
+| content-free placebo, matched length | ✅ **built** — one shared sentence pool so every placebo has the same vocabulary and cannot discriminate; length matched to within a few words; deterministic from the source sha (L4), no model |
 | decoy query set | ✅ **built** — 15 domain-plausible questions the corpus cannot answer. ⚠ **The one kind of evaluation material an agent may author**: no correct answer exists, so there is nothing to fit |
 | **sealed subset** | ✅ **built 2026-08-28** — 15 of 50, split by `sha256(id)`: deterministic, seedless, order-independent |
 | **intent-split prior probes** | ✅ **built 2026-09-12** — 26 probes, 13 current-seeking / 13 history-seeking, over the golden ladder's declared `supersedes:` pairs and `archived=true` directories. ⚠ **Truth is MECHANICAL, read off a declaration**, which is what lets an agent author them: there is a correct answer, but nobody chose it. Adjudicated W-143 the day it was built |
@@ -540,7 +540,7 @@ turns a golden rung's two hand-offs into one human-readable `RUNG-NNNNN.md`.
   does** — scoped to the sections, because the document's header *states* the
   prohibition and a check that flagged that would be firing on correct content.
   *Correct* belongs to a scoring pass over a key, and no Claude session has one
-  ([L11](0012_LAW-11-sealed-answer-key.md)).
+  ([L11](0013_LAW-11-sealed-answer-key.md)).
 - **It refuses rather than renders** when the two sets share an id — one
   ambiguous id scores the wrong set and nothing downstream can see it — and it
   **shouts** when one rung's rows carry more than one `engine_commit`, which
@@ -1058,7 +1058,7 @@ items were waiting on that corpus.
   edges at all. **A hand-count or a reviewer reading the documents cannot see
   that**, and it is the failure mode a countable input is most likely to have.
 - ⚠ **This does not generalise to every input.** *Unanswerable questions* cannot
-  be counted without reading answers ([L11](0012_LAW-11-sealed-answer-key.md)),
+  be counted without reading answers ([L11](0013_LAW-11-sealed-answer-key.md)),
   and that count comes from a scored run or not at all. The rule is: **where the
   input is visible in the committed index, a run that depends on it says how much
   there is, mechanically, before it starts.**
@@ -1141,7 +1141,7 @@ but *input present and never asked for*.
   `golden_run.py` REQUIRES the flag.** They were integers with a `1,2,3`
   default until generation 1 retired — and the moment those three files moved
   to `retired/`, that default named nothing that exists.
-  [L11](0012_LAW-11-sealed-answer-key.md) decision 14 names the next generation
+  [L11](0013_LAW-11-sealed-answer-key.md) decision 14 names the next generation
   `set-<gen>-<x|u>`, which is not an integer, so the value is now whatever sits
   between `set-` and `.jsonl`, restricted to `[A-Za-z0-9-]` because it becomes
   both a path segment under the golden tree and a file name in the evidence.
@@ -1231,7 +1231,7 @@ would produce the instrument's numbers under the engine's name.
   every candidate above the incumbent. It labels the **arm** —
   `candidate-better` — and a test holds it there.
 - **It reads `work/golden/retired/` and no sealed key, in any state**, which is
-  what [L11](0012_LAW-11-sealed-answer-key.md) decision 14 makes retired data
+  what [L11](0013_LAW-11-sealed-answer-key.md) decision 14 makes retired data
   for. Every number it produces is `informed` permanently, and the tool says so.
 
 **24e. HEADROOM IS COMPUTED BEFORE THE BUILD, NOT DISCLOSED AFTER THE RUN**
@@ -1295,7 +1295,7 @@ anchor field could add term frequency and could not make anything findable.
 - **The subtraction is hashes against hashes** — an edge's `at` keys and the
   target record's `terms` keys are the same hashed vocabulary — so the census
   still opens no document and reads no word
-  ([L2](0004_LAW-2-content-never-durable.md)).
+  ([L3](0005_LAW-3-content-never-durable.md)).
 - **Exit `3`**, distinct from `2`'s *no links at all*, because the two zeros are
   different problems and a corpus with the second passes every check the tool
   made before this date.
@@ -1314,7 +1314,7 @@ control, and it asks each identifier TWICE.** An id-query is
 `{identifier, question, primary, relevant}` derived from `work/golden/seed/` by
 grep — **it carries no answer and never enters `work/golden/`**, which is what
 lets an analyzer change be measured without going near a sealed key
-([L11](0012_LAW-11-sealed-answer-key.md)).
+([L11](0013_LAW-11-sealed-answer-key.md)).
 
 🔴 **The bare identifier and the identifier-in-a-question fail differently, and
 reporting only the second is how the 2026-09-16 survival run reached a wrong
@@ -1340,7 +1340,7 @@ correct — [SR-LAW-0](0002_LAW-0-authority.md) decision 1 by its own test, and
 the defect this record spends decision 19 guarding against in another costume.
 
 ⚠ **Importing is not invoking, and the distinction is load-bearing.**
-[L11](0012_LAW-11-sealed-answer-key.md) decision 13 reserves *running* `score.py`
+[L11](0013_LAW-11-sealed-answer-key.md) decision 13 reserves *running* `score.py`
 — the program, via `just golden-score` — to Arpit's own hand in either state.
 What permits the driver to read a key is **decision 14**, which opens the key to
 a session while the tree is unlocked. **The driver refuses to run on a locked

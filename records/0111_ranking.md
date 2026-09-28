@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@82e82cde9f39, src/fux/query/intent.py@deab5f453526, node/src/query/intent.mjs@9a38066c345a, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@37bde1db316b, src/fux/query/stem.py@234cbe8f97b3, node/src/query/analyzer.mjs@891b8d0b9794, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@1a1dd7794ab6, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
-laws: [L1, L3]
+owns: [src/fux/query/rank.py@4b515e855808, src/fux/query/intent.py@fa4902c6d3fe, node/src/query/intent.mjs@9a38066c345a, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@37bde1db316b, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@891b8d0b9794, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@1a1dd7794ab6, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
+laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 7a46bda0427a8ed7a7f35ba2676fb2571b13e1dc878b14e80926250af2623578
+content_sha: 5773a10ef1474fca9c5285185442f6430e4fc192d448bf2b02d0e8e4a19a7d8e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -231,7 +231,7 @@ iterates over the *posting* rather than over the weights, so a body-only tf of
 3.0, 2.0, 1.5, 1.0)`** — body 1.0, heading 3.0, title 2.0, path 1.5, `ctx` 1.0 —
 written by `fux setup` from [`templates/tune.toml.txt`](../src/fux/templates/tune.toml.txt)
 into `.fux/tune.toml [bm25f]`, the only place they live
-([L12](0013_LAW-12-values-live-in-config.md)). The weights are aligned
+([L12](0014_LAW-12-values-live-in-config.md)). The weights are aligned
 index-for-index with `TF_FIELDS`, and `Scoring` asserts the two are the same
 length. A silent misalignment would weight `title` as `path` and produce a
 ranking that is plausible and wrong, which is the failure mode with no symptom.
@@ -585,9 +585,9 @@ of the summand, through the seam `df` and `n` already use. Written after the
 sort, like everything else in that dict, and **nothing read back out of it
 reaches a score or an ordering**.
 
-**The analyzer holds no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). Porter's suffix rules carry their own lengths (`_STEP1A`, `_base`), the consonant-vowel-consonant test is a shape, and fux's three-character floor is `constants.toml [stem] min_chars`; decision 8a's `round(x, 9)` is `[ranking] score_digits`. The stemmer gave the same stem for all 8 982 words in `records/` and `docs/`, before and after.
+**The analyzer holds no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). Porter's suffix rules carry their own lengths (`_STEP1A`, `_base`), the consonant-vowel-consonant test is a shape, and fux's three-character floor is `constants.toml [stem] min_chars`; decision 8a's `round(x, 9)` is `[ranking] score_digits`. The stemmer gave the same stem for all 8 982 words in `records/` and `docs/`, before and after.
 
-**BM25's idf smoothing is `constants.toml [bm25f] idf_offset`** (0.5), read by both planes. Scores are unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**BM25's idf smoothing is `constants.toml [bm25f] idf_offset`** (0.5), read by both planes. Scores are unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 **13. The intent prior is `Weighting`'s SECOND multiplier, and the supremum is a
 product again** (W-168 step 9, 2026-09-28; [SR-TUNE](0135_tuning.md) decision

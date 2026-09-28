@@ -13,12 +13,12 @@ The shape existed in four places and agreed with itself only by habit:
 |---|---|
 | `ingest/run.py` | assembled the dict — **twice**, once for `git` and once for `url` |
 | `ingest/run.py` | `EXTRACTED_FIELDS` — which fields a delta ingest may carry |
-| `store/writer.py` | `DISPLAY_FIELDS` — which fields L5 forbade on a hashed record (L5 retired 2026-09-20, W-194; the list is kept, nothing reads it) |
+| `store/writer.py` | `DISPLAY_FIELDS` — which fields ex-L5 forbade on a hashed record (ex-L5 retired 2026-09-20, W-194; the list is kept, nothing reads it) |
 | SR-RECORD | the prose description everyone reads |
 
 **Nothing compared them.** Adding a display field meant remembering to touch a
 tuple in a different module, and forgetting was silent: the field would ship,
-and L5's check simply would not look at it. That is the same shape as the
+and ex-L5's check simply would not look at it. That is the same shape as the
 governance gap W-82 §5.3 records — a rule that is real, and a check that is
 narrower than it reads.
 
@@ -31,7 +31,7 @@ is why `schema` in the schema must equal `format.SCHEMA_ID` — two fux versions
 with different shapes must never both call their output `fux.index.v5`.
 
 **It is not a validator that runs on every write.** `canonical_dumps` already refuses
-floats, nulls and hostile text. ⚠ **`write_index` used to enforce L5's meta
+floats, nulls and hostile text. ⚠ **`write_index` used to enforce ex-L5's meta
 policy here too; W-194 deleted both the policy and the law**, so
 `canonical_dumps` is now the only thing on the write path. Adding a gate on the
 hot path would cost time to re-check what it already guarantees. `validate()` here is for tests and for callers building records by
@@ -129,7 +129,7 @@ def shape() -> RecordShape:
 
 
 def display_fields() -> tuple[str, ...]:
-    """Fields carrying text a human can read. L5 forbids these on a hashed record."""
+    """Fields carrying text a human can read. ex-L5 forbids these on a hashed record."""
     return shape().display
 
 

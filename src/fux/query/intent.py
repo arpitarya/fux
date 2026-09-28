@@ -28,7 +28,7 @@ A glob is matched by hand over code points rather than compiled to a regex,
 for the same reason: `*` matches any run of characters including `/`, `?`
 exactly one, and nothing else is special. Where two patterns match, the
 longest wins, ties by code-point order — `[priority]`'s rule, so a result
-never depends on file order (L3).
+never depends on file order (L4).
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 /** The graph's shape. Twin of `src/fux/graph/model.py`.
  *
- * **Every accessor returns SORTED lists, and that is L3, not tidiness.**
+ * **Every accessor returns SORTED lists, and that is L4, not tidiness.**
  * Community assignment and PPR both accumulate over neighbours, and float
  * accumulation is not associative — an unsorted traversal makes the same
  * corpus produce different bytes on different runs.

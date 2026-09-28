@@ -2,7 +2,7 @@
 type: Standing Record
 kind: law
 name: SR-LAW-12
-title: "SR-LAW-12 (0013) — L12 — every value lives in a config file, never in code"
+title: "SR-LAW-12 (0014) — L12 — every value lives in a config file, never in code"
 description: "No function, module constant or parameter default in fux's engine holds a value. A tunable value is read from a committed TOML file (fux.toml, .fux/tune.toml or another .fux/*.toml); a fixed engine value is read from one internal constants file shipped with the engine. Python and Node read the same key from the same file, and a missing file or key is a hard error that names it. Setup and its templates, tests, tools and scripts are the only places a literal value may sit."
 status: accepted
 date: 2026-09-27
@@ -10,7 +10,7 @@ feature: the rationale, scope, exceptions and reopen-trigger of L12
 owns: []
 laws: [L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 78da171779cc3ebc959a8d6bf9510023b821490a0a3421c3d453d95288d9d478
+content_sha: a25443222b5fb1551b1fbde2518d6ef889d202dfecefd3ed8df2b2b7adeaf092
 ratifies: "Arpit, 2026-09-27 — 'every const or default value will only and only be defined in tune.toml or fux.toml or in one of the other config files, or maybe create a new config file; if the value is missing throw an error, but there shouldn't be any default value within the functions … be it node or python it should always be read from one of the toml files; exception is the files used for setup.' Asked the scope the same day, he ruled: tunable values only in the TOML config, and 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; a missing file or key is a hard error naming the key; setup.py and templates/, tests/ and tests_e2e/, tools/ and scripts/ are exempt. Ratified by Arpit the same day on the W-225 step 1 classification (work/compare/l12-classify.compare.md), 'I accept the recommendation': enum tags, closed vocabularies and presentation counts are not values; the six two-home conflicts resolve to one home each, keeping today's behaviour; the veto check becomes one AST-based test because the greps reach about 60 % of what the law forbids; inspect thresholds get a new .fux/inspect.toml; and every decoder cap enters the extract-config digest. On the R5 scan the same day he ruled R7–R10: a number fixed by a format, protocol or algorithm is a fixed value for constants.toml; every boolean parameter default is a value and goes; the release is 3.0, breaking, with no automatic --fix; __version__ stays in src/fux/__init__.py"
 ---
 
@@ -156,7 +156,7 @@ renders, so they do not belong in `output.toml` (Arpit, 2026-09-27, R6).
 format or rules version (`RULES_VERSION`, `ANALYZER_VERSION`), the shard count,
 the name of an artefact file under `.fux/index/`. It is **not** a consumer
 knob, so it never appears in a consumer's tree; it ships inside the wheel and,
-per [L10](0011_LAW-10-bundled-output.md), inside the Node bundle. Arpit,
+per [L10](0012_LAW-10-bundled-output.md), inside the Node bundle. Arpit,
 2026-09-27: *"another internal-to-code file for the rest of the values like
 SCHEMA, RULES_VERSION."*
 
@@ -307,7 +307,7 @@ violation, and new code may not add one.
 - `CLAUDE.md` §Non-negotiable constraints — the generated view. Repo path: [`../../CLAUDE.md`](../CLAUDE.md)
 - [W-225 — every value lives in a config file](../work/open/W-225-values-live-in-config.md) — the migration
 - [SR-TUNE](0135_tuning.md) · [SR-CONFIG](0113_config.md) — the two records L12 overrides in part
-- [SR-LAW-10](0011_LAW-10-bundled-output.md) — why the internal constants file ships inside the bundle
+- [SR-LAW-10](0012_LAW-10-bundled-output.md) — why the internal constants file ships inside the bundle
 - [`src/fux/tune.py`](../src/fux/tune.py) · [`node/src/config/tune.mjs`](../node/src/config/tune.mjs) — the loaders that fall back today
 
 ### Veto condition

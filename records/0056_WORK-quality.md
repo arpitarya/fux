@@ -8,9 +8,9 @@ status: accepted
 date: 2026-08-27
 feature: the quality contract — what a fux quality number means
 owns: [tools/quality@97e3d196df53]
-laws: [L1, L2, L3, L4, L8]
+laws: [L2, L3, L4, L5, L9]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: a8788918a6a542dd64fa96b54a93b02edb896901a184a902c1a8340bdd300062
+content_sha: 54c9c9e5bd0d70d1ea7c143fef3db905808b3a1fd1202725d93e2da3257a4f89
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -200,7 +200,7 @@ problem, which is the reason decision 5 is not negotiable.
    ([Overcoming Common Flaws in Selective Classification Evaluation](https://proceedings.neurips.cc/paper_files/paper/2024/file/047c84ec50bd8ea29349b996fc64af4b-Paper-Conference.pdf)).
    The **Utility–Error curve** serves the same purpose for the cost model
    ([Hallucinations Undermine Trust](https://arxiv.org/pdf/2605.01428)).
-9. **The `answered` gate is measured as a separate `judged` series.** L3 is
+9. **The `answered` gate is measured as a separate `judged` series.** L4 is
    **not** the objection — a judge runs in a measurement harness, never the
    maintenance path. **Reproducibility is the objection**, and it is measured
    rather than feared ([Who Drifted](https://arxiv.org/abs/2606.15474);
@@ -219,11 +219,11 @@ problem, which is the reason decision 5 is not negotiable.
     Decision 7's stability interval is what makes publication safe.
 11. **No query log is built.** Decision 4's declared prior makes one optional
     rather than blocking. ✅ **The law question this record declined to settle is
-    now ruled (Arpit, 2026-08-27): L2 does NOT reach it, and `L8` does** — see
-    [SR-LAWS](0001_LAWS.md) decision 8. L2 governs *corpus content*; a record of
+    now ruled (Arpit, 2026-08-27): L3 does NOT reach it, and `L9` does** — see
+    [SR-LAWS](0001_LAWS.md) decision 8. L3 governs *corpus content*; a record of
     what people asked is content-adjacent and privacy-adjacent and no law had
     reached it, so the answer was a new law rather than a stretched one. W-89 is
-    closed. If a log is ever built it is **bound by L8** — read the law at its
+    closed. If a log is ever built it is **bound by L9** — read the law at its
     one home; this record does not restate it — plus these narrower terms of its
     own: opt-in, class counts only, **never the query text**.
 
@@ -418,7 +418,7 @@ future session can be held to.
 
 **The debt is filed**, in [W-87 → W-204](../work/regression/2026-09-22-golden-final-score/FINAL-SCORE.md)
 (phases P1–P5). The law question decision 11 declined to settle was W-89, and it
-is **closed**: [SR-LAWS](0001_LAWS.md) decision 8 ruled it as a new law, `L8`,
+is **closed**: [SR-LAWS](0001_LAWS.md) decision 8 ruled it as a new law, `L9`,
 on 2026-08-27.
 
 ### Alternatives considered

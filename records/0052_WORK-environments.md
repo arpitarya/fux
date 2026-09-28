@@ -11,7 +11,7 @@ feature: which sibling environment may do what — the playground, the lab and t
 owns: [tests/test_work_environments.py@3ed28dd3934f]
 laws: []
 timestamp: 2026-09-11T00:00:00Z
-content_sha: a6946611e6fae9943cf8d9cc2d492f7bd637d2f18af46dc9dd7d761a255c22b0
+content_sha: 70664b0839b7509e888a1bc4a8a88c235afbc4d1ad5a236916439fde63b51ab1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -30,9 +30,9 @@ content_sha: a6946611e6fae9943cf8d9cc2d492f7bd637d2f18af46dc9dd7d761a255c22b0
 > rule**, and the rest of this record is its rationale: why it exists, what it
 > costs and voids, and what would reopen it. **No copy exists anywhere else**;
 > every other artifact references this record.
-> ⚠ **This was law L9 until 2026-09-13** (Arpit). It is a WORK record now —
+> ⚠ **This was law ex-L9 until 2026-09-13** (Arpit). It is a WORK record now —
 > which environment may do what is how work is done, not what the engine
-> guarantees — and **the handle `L9` is retired and never reused.**
+> guarantees — and **the handle `ex-L9` is retired and never reused.**
 
 **The one-line case.** Three sibling directories — `fux-playground`,
 `fux-lab`, `fux-benchmark` — had drifted into doing each other's jobs. The
@@ -167,15 +167,15 @@ playground from here on — reconciled by
 
 **5. A benchmark's retained ranked list is measurement evidence, not a use
 record.** Its queries are a versioned synthetic set, not a record of anyone
-going looking; [L8](0010_LAW-8-use-record.md) is not engaged.
+going looking; [L9](0011_LAW-9-use-record.md) is not engaged.
 
-**6. This is a WORK record, not a law, and the handle `L9` is retired**
+**6. This is a WORK record, not a law, and the handle `ex-L9` is retired**
 (Arpit, 2026-09-13). Which environment may do what is **how work is done** —
 process — not a guarantee the engine makes to a consumer, which is what a law
 is. The record moved from `0011` in the Law range to `0052` in the WORK range
 and changed `kind: law` → `kind: process`; it now **owns its enforcing test**,
 `tests/test_work_environments.py`, which is what that kind means.
-⚠ **`L9` is retired and never reused.** The law handles are `L0`–`L8` and `L10`,
+⚠ **`ex-L9` is retired and never reused.** The law handles are `L0`–`L9` and `L10`,
 with a deliberate gap — renumbering `L10` down would silently change the meaning
 of every citation ever written, which is the failure the retired prediction ids
 `R7`/`R8` already taught. **The file number is a different thing and did move**:
@@ -254,7 +254,7 @@ ruled on 2026-09-11.
 5. **Any file states this rule instead of referencing this record** — a
    `CLAUDE.md` bullet, a skill, a README explaining what the lab is for. There
    is no generated copy, so a second statement is a plain duplication.
-6. **`L9` is reused for a new law.** The handle is an identity and is cited in
+6. **`ex-L9` is reused for a new law.** The handle is an identity and is cited in
    code comments and commit messages nobody will revisit, so reusing it makes an
    old citation resolve to something it never meant.
    ⚠ **The FILE NUMBER is not part of this.** `records/0011` was refilled the

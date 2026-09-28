@@ -19,7 +19,7 @@ ORIGIN = ".fux/formats.toml"
 def test_render_then_parse_is_the_identity_on_the_model():
     text = typesfile.render(["*.md", "docs/*.txt", "*.md"], {"tar.gz": "zip", "csv": "csv"})
     listed = typesfile.parse(text, origin=ORIGIN)
-    assert listed.include == ("*.md", "docs/*.txt"), "sorted and deduped (L3)"
+    assert listed.include == ("*.md", "docs/*.txt"), "sorted and deduped (L4)"
     assert listed.decoders == {"csv": "csv", "tar.gz": "zip"}
     assert '"tar.gz" = "zip"' in text, "a dotted extension is quoted or TOML nests it"
 

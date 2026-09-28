@@ -30,7 +30,7 @@ amending SR-OBSERVE decision 3, never by an observer asking for one.
 ## Why observe-only is structural here rather than a rule
 
 An observer that could **return** something would make `ask` a function of
-consumer code, and [L3](../../records/0005_LAW-3-deterministic.md) would be
+consumer code, and [L4](../../records/0006_LAW-4-deterministic.md) would be
 gone — two machines with the same index would answer differently because one
 had a file in a gitignored-looking directory. So:
 
@@ -78,7 +78,7 @@ CONSUMER_DIR = fixed("files", "observers_dir")
 
 #: The one place a run records that an observer fired, for `fux doctor`'s
 #: liveness row. **Gitignored, under `.fux/runtime/`** — it is a trace of use
-#: and [L8](../../records/0010_LAW-8-use-record.md) keeps every one of those off
+#: and [L9](../../records/0011_LAW-9-use-record.md) keeps every one of those off
 #: a committed byte.
 LIVENESS_NAME = fixed("runtime", "observers")
 
@@ -178,7 +178,7 @@ def args_hash(argv: list[str]) -> str:
     - **The question is excluded.** Positional arguments are dropped entirely.
       A hash *of* the question is still a fingerprint of the question — two
       runs of the same query would match across consumers, which is the
-      re-identification L8 exists to prevent.
+      re-identification L9 exists to prevent.
     - **Flags are sorted**, so `--json --band` and `--band --json` are one
       command. A classifier joining on argv order would miss half its matches
       for no reason a user could see.
@@ -352,7 +352,7 @@ def _record_liveness(root: Path, present: list[str], fired: list[str]) -> None:
 
     🔴 **Gitignored, under `.fux/runtime/`.** It is a durable trace that
     somebody ran a query, which is exactly what
-    [L8](../../records/0010_LAW-8-use-record.md) keeps off a committed byte —
+    [L9](../../records/0011_LAW-9-use-record.md) keeps off a committed byte —
     and *inside `.fux/`* is not the test, the gitignored path is.
     """
     import json

@@ -19,7 +19,7 @@ others — and would measure a different thing. Identical vocabulary across the
 whole corpus is what makes any remaining lift attributable to *presence of
 fluent text* and nothing else.
 
-**Deterministic (L3).** Sentence selection is driven by the source sha, never by
+**Deterministic (L4).** Sentence selection is driven by the source sha, never by
 `random` and never by the wall clock: same corpus in, byte-identical placebos
 out. No model is called — this is the control *for* model-written text, and
 generating it with a model would be circular.

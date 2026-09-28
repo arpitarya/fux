@@ -1,7 +1,7 @@
 """The sealed-key switch — what it takes down, what it never touches, and the
 one promise `lock` makes: **a byte-identical restore.**
 
-[L11](../records/0012_LAW-11-sealed-answer-key.md) decision 14 (Arpit,
+[L11](../records/0013_LAW-11-sealed-answer-key.md) decision 14 (Arpit,
 2026-09-21). The switch is the first thing in this repository that can turn a
 **law's** enforcement off, so the questions this file asks are narrow and
 uncomfortable on purpose:

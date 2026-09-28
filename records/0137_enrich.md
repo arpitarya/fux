@@ -3,15 +3,15 @@ type: Standing Record
 kind: component
 name: SR-ENRICH
 title: "SR-ENRICH (0137) — enrichment as an agent skill, not an API call"
-description: "`fux enrich` plans and validates; a coding agent generates. Fux never calls a model, so L1, L4 and the $0 law are held rather than bracketed — and partial coverage is designed for, because sha-keying makes it the steady state. SUPERSEDES SR-ENRICHED (2026-08-27, W-82 ruling 6): the `enriched` mode taxonomy, its L3 fence, provenance pinning and below-deterministic grading are folded in verbatim, and that mode is still NOT authorized to be built."
+description: "`fux enrich` plans and validates; a coding agent generates. Fux never calls a model, so L2, L5 and the $0 law are held rather than bracketed — and partial coverage is designed for, because sha-keying makes it the steady state. SUPERSEDES SR-ENRICHED (2026-08-27, W-82 ruling 6): the `enriched` mode taxonomy, its L4 fence, provenance pinning and below-deterministic grading are folded in verbatim, and that mode is still NOT authorized to be built."
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@e1fba3f3079a, src/fux/enrich.py@88eb1113825a, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2, node/src/correct.mjs@23e1a337ff92, node/test/pins.test.mjs@daebcdb98aac]
-laws: [L1, L2, L3, L4]
+owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@32d73f5f2dd6, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2, node/src/correct.mjs@23e1a337ff92, node/test/pins.test.mjs@daebcdb98aac]
+laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 0bf7ad60f58d0da7fc5966497f87fe07fed984e4f20d51263821606b31cb2e18
+content_sha: a7a15747b898a3f78c63f5843aa32c614cff3e23e89238dcb2ad7274206795cd
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -112,7 +112,7 @@ The ruling that shaped this:
 
 ### Decision
 
-**1. Fux does not call a model. L1 and L4 are HELD, not bracketed.** This is
+**1. Fux does not call a model. L2 and L5 are HELD, not bracketed.** This is
 [SR-FETCHER](0117_fetcher.md)'s pattern applied to a second boundary:
 
 | fux refuses to own | the consumer owns it as |
@@ -289,7 +289,7 @@ documents turns a one-document request into a bulk run.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -346,7 +346,7 @@ with [SR-EXTRACTED](0115_extracted-mode.md); the pair was one call.
 **2. Enrichment never runs inside the maintenance path.** It is a separate
 command or agent skill, invoked deliberately. `fux ingest` gains no model call,
 no network path, and no `--enrich` flag — not as a convenience, not behind a
-default-off toggle. **L3 is preserved by construction, not by discipline.**
+default-off toggle. **L4 is preserved by construction, not by discipline.**
 
 **3. Output is pinned, then ingested like any other committed content.** The
 enrichment step writes a committed artifact with provenance — what produced it,
@@ -360,7 +360,7 @@ than inventing a second scale.
 **5. Enriched output stays statistic-shaped.** Terms, phrases, edges, flags —
 the things the index already holds. **Prose summaries are excluded**: a
 paragraph of model-written prose in the committed index is durable content in
-every sense that matters to L2, whatever the technicality. If summaries are ever
+every sense that matters to L3, whatever the technicality. If summaries are ever
 wanted, they go through the existing per-source snapshot policy as an explicit,
 visible exception — never silently as a side effect of enrichment.
 
@@ -469,7 +469,7 @@ approved.**
 | **semantic term expansion** | the analyzer sees only literal page vocabulary — a query for "OOM" never reaches a doc that says "memory exhaustion" | dilutes `df`; needs a graded, separable term set or it contaminates the statistics every document is scored against |
 | **inferred edges** | links two documents mean to have but never wrote — "this design implements that decision", with no hyperlink | must carry `INFERRED`; **a wrong edge is worse than a missing one because it is invisible** |
 | **retirement / supersession flags** | nothing in the bytes distinguishes a live document from a retired one | if it reorders rather than annotates, it violates the ruling [SR-ARCHIVED-CONTENT](0134_archived-content.md) already reached |
-| **richer embeddings** | fux computes no vectors at all ([SR-ASK](0103_ask.md) decision 9) | **L1 collision** — a larger or API-served model may be *called once and pinned*, never imported into the runtime |
+| **richer embeddings** | fux computes no vectors at all ([SR-ASK](0103_ask.md) decision 9) | **L2 collision** — a larger or API-served model may be *called once and pinned*, never imported into the runtime |
 
 ### The candidate enrichments, and why each needs a model
 
@@ -481,12 +481,12 @@ approved.**
 | **semantic term expansion** | the analyzer sees only literal page vocabulary — a query for "OOM" never reaches a doc that says "memory exhaustion" | dilutes `df`; needs a graded, separable term set or it contaminates the statistics every document is scored against |
 | **inferred edges** | links two documents mean to have but never wrote — "this design implements that decision", with no hyperlink | must carry `INFERRED`; **a wrong edge is worse than a missing one because it is invisible** |
 | **retirement / supersession flags** | nothing in the bytes distinguishes a live document from a retired one | if it reorders rather than annotates, it violates the ruling [SR-ARCHIVED-CONTENT](0134_archived-content.md) already reached |
-| **richer embeddings** | fux computes no vectors at all ([SR-ASK](0103_ask.md) decision 9) | **L1 collision** — a larger or API-served model may be *called once and pinned*, never imported into the runtime |
+| **richer embeddings** | fux computes no vectors at all ([SR-ASK](0103_ask.md) decision 9) | **L2 collision** — a larger or API-served model may be *called once and pinned*, never imported into the runtime |
 
 ⚠ **Import path moved 2026-08-27, behaviour unchanged.** ``src/fux/enrich.py`` now imports
 `chunk` from **`fux.refer._chunk`**: the module was made private because
 `fux.refer` re-exported the `chunk` *function* over its own submodule of that
-name, a shape that had already cost four defects and silently narrowed L4's
+name, a shape that had already cost four defects and silently narrowed L5's
 network import fence. The function, its signature and its output are untouched —
 see [SR-REFER](0127_refer-plane.md) decision 18 and
 [`tests/test_no_shadowed_submodules.py`](../tests/test_no_shadowed_submodules.py).
@@ -503,7 +503,7 @@ that opts in reports under a single scope named `.fux/sources/urls`.
   applied to the scope itself.
 - ⚠ **This could not exist before `.fux/acquired/`.** Planning needs the
   document's text, and for a URL that meant a network fetch **inside
-  `fux enrich --plan`** — an offline, read-only command (L4). The retained
+  `fux enrich --plan`** — an offline, read-only command (L5). The retained
   bytes are what make the text local, so `_document_text` reads the blob and
   decodes it with ingest's own `_decode_fetched` rather than fetching anything.
 - **`keep=true` is the default, so this works unconfigured.** A line that opted
@@ -536,7 +536,7 @@ ranking code.**
 - **`.fux/eval/corrections.tsv` is the durable record, not the marker.** A
   regenerating agent rewrites the whole file, frontmatter included, so the
   marker cannot survive on its own. The eval file is committed, sorted, and is
-  **the human's own claim rather than a record of use** (L8): a row says *this
+  **the human's own claim rather than a record of use** (L9): a row says *this
   question should reach this document*, never that anybody ran a query.
 - **`--check` REPORTS a human line and never refuses it.** A correction is by
   definition a question that failed retrieval — that is the case it exists for —
@@ -609,7 +609,7 @@ and `--why` exists to tell them apart.
 (the pipe ruling; [SR-URL-INGEST](0107_url-ingest.md) decision 6a).
 
 Planning for a `url:` document reads `.fux/acquired/` — which is what makes it
-possible at all under [L4](0006_LAW-4-offline-by-default.md) — and it now passes
+possible at all under [L5](0007_LAW-5-offline-by-default.md) — and it now passes
 `urlsrc.declared_decoder(root, loc)` to `_decode_fetched` instead of the blob's
 `content_type`.
 
@@ -625,11 +625,11 @@ a missing blob already is — never a crash inside a planning command.
 ⚠ **This changes nothing about the boundary.** Enrichment still never runs inside
 `fux ingest`, and reading a retained blob is not a fetch.
 
-**`corrections.tsv` is read by unpacking** in both planes: four required columns, an optional pin. A short line is still skipped. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**`corrections.tsv` is read by unpacking** in both planes: four required columns, an optional pin. A short line is still skipped. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 
-- **L3 is restated, not weakened:** the index is a deterministic function of
+- **L4 is restated, not weakened:** the index is a deterministic function of
   **(sources ∪ pinned enrichment)**. Same property, wider input. **Every clone
   has the same enrichment files, so every clone builds the same index.**
 - **Generation is not reproducible and the record says so.** Two developers
@@ -652,7 +652,7 @@ a missing blob already is — never a crash inside a planning command.
 
 ### Alternatives considered
 
-- **An SDK call inside `fux enrich`.** Rejected: it would break L1 and L4, put a
+- **An SDK call inside `fux enrich`.** Rejected: it would break L2 and L5, put a
   key and a bill inside fux, and pin a vendor.
 - **Deriving scope from the filesystem.** Rejected under decision 4.
 - **Auto-pruning orphans.** Rejected under decision 7.

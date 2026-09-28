@@ -32,7 +32,7 @@ def test_rel_path_is_nfc_normalized(tmp_path):
     and committed as NFC (the R1/macOS-checkout hazard `parse.py` already
     normalizes content for) — without normalizing the path string too, the
     same document's `rel_path`/`loc` would differ by checkout machine, which
-    is a hole in L3's byte-identical-index guarantee.
+    is a hole in L4's byte-identical-index guarantee.
     """
     decomposed_name = "café.md"  # "café.md" as e + combining acute accent
     composed_name = unicodedata.normalize("NFC", decomposed_name)

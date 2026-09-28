@@ -6,7 +6,7 @@ decision 16.
 🔴 **The property most worth holding is a NEGATIVE one**: resolving a route must
 never import a fetcher. `fux doctor` is offline by contract and
 `fux ingest --check` promises it opens no socket — a fetcher is free to open a
-session at module level, so an import on this path is L4 lost exactly where
+session at module level, so an import on this path is L5 lost exactly where
 nobody would look. It is read with `ast`, and
 `test_resolving_never_imports_a_fetcher` is the gate.
 """

@@ -164,7 +164,7 @@ def test_never_plus_keep_false_is_legal():
 
 
 def test_never_plus_keep_true_is_the_coherent_pair():
-    """More offline, with the grain of L4: the bytes are in `.fux/acquired/`,
+    """More offline, with the grain of L5: the bytes are in `.fux/acquired/`,
     so a fetch that fails or is forbidden verifies against them and reports
     `as-ingested` rather than `unverified`.
 

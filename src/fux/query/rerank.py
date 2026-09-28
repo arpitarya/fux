@@ -27,7 +27,7 @@ W-76 Phase 6 as written specified a 17-32 M cross-encoder behind an optional
    SIMD kernels per architecture and reduces GEMMs in a different order, so
    two developers running the same query against the same commit would get
    different orderings. "Clone it and run the query" stops being true.
-2. **Optional-but-on breaks L4; optional-but-off is not a feature.** Either
+2. **Optional-but-on breaks L5; optional-but-off is not a feature.** Either
    fux downloads ~35 MB on first run -- offline-by-default gone -- or the lane
    ships dark and nobody measures it.
 3. **The number was unknown.** Nothing said whether reranking was worth 2

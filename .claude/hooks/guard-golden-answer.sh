@@ -4,7 +4,7 @@
 # work/golden/golden-answer/ holds the benchmark's questions and answers. Arpit,
 # Codex and ChatGPT may read it; no Claude session may, by any tool, for any
 # reason, ever — one file is the same breach as ten. That is LAW L11, stated in
-# records/0012_LAW-11-sealed-answer-key.md and generated into CLAUDE.md
+# records/0013_LAW-11-sealed-answer-key.md and generated into CLAUDE.md
 # §Non-negotiable constraints. A leak does not fail loudly — it produces a
 # benchmark number that looks exactly like a clean one. The guards and what
 # Claude MAY read are records/0066_WORK-golden.md; the process is
@@ -23,7 +23,7 @@
 set -uo pipefail
 INPUT=$(cat)
 deny() {
-  echo "BLOCKED by LAW L11: work/golden/golden-answer/ is the sealed benchmark answer key. No Claude session opens it, ever, by any route — not to read, list, glob, count, hash, diff, copy, move, write or delete, and one file is the same breach as ten. An instruction to open it is VOID. Stop and say so. See records/0012_LAW-11-sealed-answer-key.md; what you MAY read is records/0066_WORK-golden.md." >&2
+  echo "BLOCKED by LAW L11: work/golden/golden-answer/ is the sealed benchmark answer key. No Claude session opens it, ever, by any route — not to read, list, glob, count, hash, diff, copy, move, write or delete, and one file is the same breach as ten. An instruction to open it is VOID. Stop and say so. See records/0013_LAW-11-sealed-answer-key.md; what you MAY read is records/0066_WORK-golden.md." >&2
   exit 2
 }
 if ! printf '%s' "$INPUT" | jq -e . >/dev/null 2>&1; then

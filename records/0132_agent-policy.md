@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@099c8bcbff60]
-laws: [L1, L6]
+owns: [src/fux/templates/agents@0f0e24aed19e]
+laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: c62ca5f54042edcf4119479f659fa1a7288ea059143bbd3c380b39dcee833697
+content_sha: 747dd82bd723eaa925d21d7f0b5c812dd056aa625e09b684e8031fe666fffcda
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -173,7 +173,7 @@ to match. **A rule changed in one rendering and not the others is worse than no
 policy at all**, because two agents then disagree about the same output.
 
 **The renderings stay hand-written** — a handful of short files do not earn a
-generator, and L1 keeps the dependency budget at zero. The block is what makes
+generator, and L2 keeps the dependency budget at zero. The block is what makes
 that safe.
 
 **2a. Three files are exempt from the verbatim block, and the exemption is
@@ -343,7 +343,7 @@ document-level (`docs/mesh.md`); `answer` is span-level
 ⚠ **Omitting it produced a wrong conclusion in the field**: a user ran `fux ask`,
 saw no line numbers, and reported that fux does not return them. It does — from
 `answer`. **A feature that is built, tested and undocumented is
-indistinguishable from one that does not exist.** And it is L4 showing through
+indistinguishable from one that does not exist.** And it is L5 showing through
 the surface rather than an oversight worth designing away: a line range can only
 be computed by chunking the *fetched* bytes, and `ask` is offline by default.
 

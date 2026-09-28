@@ -13,7 +13,7 @@ from fux.refer.freshness import ALWAYS, NEVER, Policy, decide, verify
 
 
 def test_never_is_the_default():
-    """Offline by default (L4) means the default policy does not go out."""
+    """Offline by default (L5) means the default policy does not go out."""
     assert Policy().mode == NEVER
     assert Policy().forbids_fetch
 

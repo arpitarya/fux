@@ -1,23 +1,23 @@
 ---
 type: Standing Record
 kind: law
-name: SR-LAW-2
-title: "SR-LAW-2 (0004) — L2 — content is never durable outside its source system"
+name: SR-LAW-3
+title: "SR-LAW-3 (0005) — L3 — content is never durable outside its source system"
 description: "The law the whole architecture rests on: the index holds statistics, never content, so nothing fux commits can leak a document a reader was not entitled to."
 status: accepted
 date: 2026-08-18
-feature: the rationale, history and reopen-trigger of L2
+feature: the rationale, history and reopen-trigger of L3
 owns: []
-laws: [L2]
+laws: [L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 4ce008efacf7baa8253b75b0ca38ce2b97b65b3f8329ae99384f424ec7f30cd6
+content_sha: 0849978bb813c1216eb4ac35c7c8373e2251e28d2f83a36d0d0a4cece45c60aa
 ---
 
-# SR-LAW-2 — L2 — content is never durable outside its source system
+# SR-LAW-3 — L3 — content is never durable outside its source system
 
 ## §1 — For humans
 
-> **This record is the HOME of law L2 — §2's first block IS the law**, and the
+> **This record is the HOME of law L3 — §2's first block IS the law**, and the
 > rest of this record is its rationale: why it exists, what it has cost, how its
 > wording has moved, and what would reopen it.
 > [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a
@@ -49,10 +49,10 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 
 ```mermaid
 flowchart LR
-    R["SR-LAW-2<br/>(THIS RECORD — states law L2)"]
-    N["SR-LAWS<br/>(the handles L0..L11 — routes, never states)"]
+    R["SR-LAW-3<br/>(THIS RECORD — states law L3)"]
+    N["SR-LAWS<br/>(the handles L0..L12 — routes, never states)"]
     C["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED from the records · test-bound)"]
-    B["records bound by L2<br/>(cite the number, never restate)"]
+    B["records bound by L3<br/>(cite the number, never restate)"]
     R --> C
     N --> R
     N --> B
@@ -63,7 +63,7 @@ flowchart LR
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-       SR-LAW-2   <-- THIS RECORD states law L2
+       SR-LAW-3   <-- THIS RECORD states law L3
             |
             | scripts/gen-laws.py  (test-bound, byte-equal)
             v
@@ -71,11 +71,11 @@ flowchart LR
         (GENERATED -- not the source)
 
                SR-LAWS
-     (the handles L0..L11 -- routes, never states)
+     (the handles L0..L12 -- routes, never states)
                    |
           +--------+---------+
           v                  v
-      SR-LAW-2          records bound by L2
+      SR-LAW-3          records bound by L3
    (the law, plus its     (cite the number,
     rationale, history     never restate)
     and veto)
@@ -89,7 +89,7 @@ flowchart LR
 
 ### The law (normative)
 
-🔴 **This block IS law L2.** It is the only normative statement of it, and
+🔴 **This block IS law L3.** It is the only normative statement of it, and
 [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a **generated**
 copy of it — rendered from these bytes by
 [`scripts/gen-laws.py`](../scripts/gen-laws.py) and held byte-equal by
@@ -98,22 +98,22 @@ Amend it **here**, then run `python scripts/gen-laws.py --write`.
 Amending a law needs Arpit's ruling, named in this record
 ([SR-LAW-0](0002_LAW-0-authority.md) decision 3).
 
-<!-- LAW-TEXT:BEGIN L2 -->
-- **L2** · **Content is never durable outside its source system.** The index holds
+<!-- LAW-TEXT:BEGIN L3 -->
+- **L3** · **Content is never durable outside its source system.** The index holds
   statistics, never content. The single exception is explicit per-source
   `snapshot` policy. This is the law the whole architecture rests on.
-<!-- LAW-TEXT:END L2 -->
+<!-- LAW-TEXT:END L3 -->
 
 ### Context
 
-L2 predates the record set: it lives in the steering doc every session reads
+L3 predates the record set: it lives in the steering doc every session reads
 first, and [SR-LAWS](0001_LAWS.md) gave it a citable handle so a decision could
 name it without quoting it. **What was still missing was a place to put the
 reasoning** — why the law is worth its cost, what it has already been narrowed
 by, and what would have to become true to reopen it.
 
 That material had been accumulating inside `SR-LAWS` itself, which was becoming
-one record carrying eight subjects. This record is L2's share of it, split out
+one record carrying eight subjects. This record is L3's share of it, split out
 on 2026-09-06 at Arpit's ruling.
 
 ### Decision
@@ -131,7 +131,7 @@ on 2026-09-06 at Arpit's ruling.
 - **Easier:** the compliance conversation. Nothing left the tenant, so nothing needs a retention schedule, a deletion path, or a DPIA.
 - **Harder:** every answer costs a fetch. The refer plane exists entirely to pay this bill, and the fetch cache exists to make it bearable.
 - **Harder:** an answer is impossible when the source is gone. The acquired plane is the mitigation and it is opt-in, so the default really can fail to answer.
-- ⚠ **A hashed key is not anonymity.** Statistics about a document can still identify it. 🔴 **L5 existed because of exactly this, and it was RETIRED on 2026-09-20** (Arpit, W-194) — the ACL-mismatch leak it closed, where a title alone tells a reader that a document they cannot open exists, is now an **accepted, documented exposure**. **L2 is unchanged and is what still stands here**: statistics may be committed, content may not, and no amount of hashing turns content into a statistic. [SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded, keeps the argument and the reopen trigger.
+- ⚠ **A hashed key is not anonymity.** Statistics about a document can still identify it. 🔴 **ex-L5 existed because of exactly this, and it was RETIRED on 2026-09-20** (Arpit, W-194) — the ACL-mismatch leak it closed, where a title alone tells a reader that a document they cannot open exists, is now an **accepted, documented exposure**. **L3 is unchanged and is what still stands here**: statistics may be committed, content may not, and no amount of hashing turns content into a statistic. [ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded, keeps the argument and the reopen trigger.
 
 ### Alternatives considered
 

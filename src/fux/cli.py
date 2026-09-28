@@ -148,7 +148,7 @@ def _cmd_path(args) -> int:
 def _cmd_tune(args) -> int:
     # **Prints, never writes** — SR-TUNE decision 3b. `tomllib` reads and
     # nothing in the stdlib writes TOML, so a writer would mean either a
-    # third-party dependency (L1) or fux round-tripping a commented file it
+    # third-party dependency (L2) or fux round-tripping a commented file it
     # promised never to rewrite. The human pastes; the file stays theirs.
     from .tune import specimen
 
@@ -416,7 +416,7 @@ def build_parser() -> argparse.ArgumentParser:
     # re-ingest are the same command, for directories and URLs alike.
     #
     # ⚠ **A bare `fux ingest` now goes to the network**, which is the ruling
-    # that moves the L4 fence onto the default verb. Narrow-by-default survives
+    # that moves the L5 fence onto the default verb. Narrow-by-default survives
     # the move untouched — W-82 ruling 3 is about *which* URLs, never which
     # verb — so the bare form fetches the ones known to be stale and says so.
     # `--no-fetch` is the offline form, and it is what `fux hooks` writes.
@@ -609,7 +609,7 @@ def build_parser() -> argparse.ArgumentParser:
         # caller — usually a model — hands over the words it expects the
         # document to use; fux analyzes them with the same analyzer the index
         # was built with and scores them at `[ranking] expand_weight`. Fux
-        # never writes one (L3), and a document matching ONLY expansion terms
+        # never writes one (L4), and a document matching ONLY expansion terms
         # is dropped by `rank()` rather than returned.
         p.add_argument(
             "--expand", metavar="TEXT", default=None,

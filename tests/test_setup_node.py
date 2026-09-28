@@ -2,7 +2,7 @@
 the fourth `.fux/` shape.
 
 🔴 **Since 2026-09-12 what is vendored is BUILD OUTPUT, in one of two shapes**
-([L10](../records/0011_LAW-10-bundled-output.md)): the bundle plus its data
+([L10](../records/0012_LAW-10-bundled-output.md)): the bundle plus its data
 sidecars (shape A, offline, the default), or a manifest declaring
 `fux-engine@<version>` when a monorepo was detected (shape C). The 47-file
 module tree is gone, and `ensure_node_reader` **prunes** it from a repository
@@ -54,7 +54,7 @@ def test_setup_writes_the_reader_at_the_engine_version(tmp_path):
     # taken on npm in 2016, so `npx fux` would fetch someone else's package.
     assert meta["name"] == "fux-engine"
     assert meta["bin"] == {"fux": "./fux.mjs"}
-    # L1, asserted rather than trusted: no dependencies key AT ALL — absent
+    # L2, asserted rather than trusted: no dependencies key AT ALL — absent
     # rather than empty, so it cannot grow one by accident — and no build step,
     # because a build step is a dependency.
     assert "dependencies" not in meta

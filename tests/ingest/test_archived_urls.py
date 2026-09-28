@@ -100,7 +100,7 @@ def test_removing_the_declaration_clears_the_flag():
 
 @pytest.mark.parametrize("archived", [True, False])
 def test_an_agreeing_record_is_returned_UNCOPIED(archived):
-    """L3: a run that changes nothing writes byte-identical shards, so the
+    """L4: a run that changes nothing writes byte-identical shards, so the
     no-change path must not even allocate a new dict."""
     record = {"id": "url:x", "sha": "abc"}
     if archived:

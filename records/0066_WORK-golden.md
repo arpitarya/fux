@@ -7,10 +7,10 @@ description: "The prohibition is law L11 and this record states none of it; what
 status: accepted
 date: 2026-09-28
 feature: the golden benchmark — its two question sets, the key's custody, its guards, what Claude may read, and where the prohibition is stated
-owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, .claude/hooks/guard-sealed-key.sh@0d4dd725e7aa, tests/test_golden_key_guards.py@7a29da8b2509, tests/test_settings_never_committed_unlocked.py@55e95884f883, tests/test_golden_hook_prose.py@40d1405ecad6, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@18c50227ff2f]
+owns: [.claude/hooks/guard-golden-answer.sh@de3c4f5d5725, .claude/hooks/guard-sealed-key.sh@85f6df22a301, tests/test_golden_key_guards.py@280935f6475f, tests/test_settings_never_committed_unlocked.py@df702e8bb51c, tests/test_golden_hook_prose.py@5cf50353a104, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@d4b84445ced3]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: 18470913764379fc4c6f238d5bc11b9d6f36f01707ae380a9480706c6db7ffec
+content_sha: 73e280df24a7f84e56a48b72755632ff8ac42b382b6fc8136ad24ab4171667bf
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -33,7 +33,7 @@ ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and
 
 ## §1 — For humans
 
-> ⚠ **The prohibition is [L11](0012_LAW-11-sealed-answer-key.md), and this record
+> ⚠ **The prohibition is [L11](0013_LAW-11-sealed-answer-key.md), and this record
 > states none of it.** Read the law before doing anything near `work/golden/`.
 > **This record is the HOME of the process around it** — the guards, what Claude
 > may read, and the generated view in `CLAUDE.md`. How the benchmark is *run* is
@@ -60,7 +60,7 @@ and on that same day he pasted a key into a *Claude* session to get a score — 
 law called it a leak and he called it *"on me"*. A route whose safe use depends
 on remembering which chat window you are in is not a route. What replaced it is a
 **locked state with a named switch**, `just golden-unlock`, in his hand alone.
-That is [L11](0012_LAW-11-sealed-answer-key.md) decision 14 and is not restated
+That is [L11](0013_LAW-11-sealed-answer-key.md) decision 14 and is not restated
 here; the **mechanics** are decision 15 below.
 
 🔴 **Six guards stand behind the law and none of them is a guarantee.** Claude
@@ -160,7 +160,7 @@ the rule.
 ### Decision
 
 1. **This record states none of the prohibition.** It is
-   [L11](0012_LAW-11-sealed-answer-key.md), stated once there and carried into
+   [L11](0013_LAW-11-sealed-answer-key.md), stated once there and carried into
    `CLAUDE.md` §Non-negotiable constraints by
    [`scripts/gen-laws.py`](../scripts/gen-laws.py). **A second statement of it
    here would be the restatement [SR-LAW-0](0002_LAW-0-authority.md) decision 1
@@ -172,7 +172,7 @@ the rule.
 
 <!-- GOLDEN-TEXT:BEGIN -->
 🔴 **Golden answers are closed to every agent by law
-[L11](0012_LAW-11-sealed-answer-key.md)** — §Non-negotiable constraints above.
+[L11](0013_LAW-11-sealed-answer-key.md)** — §Non-negotiable constraints above.
 Read it before anything near `work/golden/`. **This block states none of it.** It
 is the surrounding process:
 
@@ -346,7 +346,7 @@ is the surrounding process:
 
 10. **Custody replaces the per-run key question.** The old *"(1) the file
     `golden-answer/answers.jsonl`, or (2) the chat?"* question is **removed** (the
-    prompts that asked it were deleted on 2026-09-27), because [L11](0012_LAW-11-sealed-answer-key.md) gives
+    prompts that asked it were deleted on 2026-09-27), because [L11](0013_LAW-11-sealed-answer-key.md) gives
     it one permanent answer. A prompt that still asks it is stale and is fixed,
     not answered.
 
@@ -381,7 +381,7 @@ is the surrounding process:
     availability.
 
     🔴 **What it costs, and the cost is permanent.** Every number on such a set is
-    `informed` for ever ([L11](0012_LAW-11-sealed-answer-key.md) decision 7), so
+    `informed` for ever ([L11](0013_LAW-11-sealed-answer-key.md) decision 7), so
     it can never be the clean arm and never grounds a generalisation estimate.
     **Set 1 remains the only externally-authored set**, and a claim that needs one
     still needs set 1 and still waits.
@@ -408,7 +408,7 @@ is the surrounding process:
     or set 2.
 
 15. **The switch's MECHANICS live here; the permission is
-    [L11](0012_LAW-11-sealed-answer-key.md) decision 14 and this record states
+    [L11](0013_LAW-11-sealed-answer-key.md) decision 14 and this record states
     none of it.** What follows is how the thing works, which is process, and
     process is what this record is for.
 
@@ -538,7 +538,7 @@ is the surrounding process:
       mutates and what may start once it has run. 🔴 **The unlock item and its
       lock item are filed together, in the same change** — a tree stays open
       when the only reminder to close it lived in a session that ended, and
-      [L11](0012_LAW-11-sealed-answer-key.md) forbids a session from closing it
+      [L11](0013_LAW-11-sealed-answer-key.md) forbids a session from closing it
       itself, so nothing but a queue row can carry that obligation.
     - **No →** no item. **A row that sends him to open the tree for nothing is a
       cost, not a precaution** — LOCKED is the resting state, and every unlock is
@@ -563,7 +563,7 @@ is the surrounding process:
 
 - **The prohibition outranks every other record now**, and this one is the
   process that surrounds it. A change to the rule is an amendment to
-  [SR-LAW-11](0012_LAW-11-sealed-answer-key.md) on Arpit's ruling; a change to
+  [SR-LAW-11](0013_LAW-11-sealed-answer-key.md) on Arpit's ruling; a change to
   the guards or to what Claude may read is a change here.
 - **`CLAUDE.md` §Golden answer key can no longer be edited in place** — the test
   fails until this record changes and the generator runs, which is the point.
@@ -589,7 +589,7 @@ is the surrounding process:
 
 ### Reference (required)
 
-- [SR-LAW-11](0012_LAW-11-sealed-answer-key.md) — the law this record surrounds
+- [SR-LAW-11](0013_LAW-11-sealed-answer-key.md) — the law this record surrounds
   and does not state.
 - [SR-LAW-0](0002_LAW-0-authority.md) decision 5 — *a generated view is permitted,
   and only while a test binds it*; decisions 2 and 3 above are that permission
@@ -613,7 +613,7 @@ toward a key file. **Also reopen if** the two sets are found sharing an id
 namespace, or a filed number pools them: decision 9 is the claim that makes two
 sets worth having, and a pooled figure quietly retires it. ⚠ **A Claude session
 found to have held an answer reopens
-[SR-LAW-11](0012_LAW-11-sealed-answer-key.md), not this record** — that is
+[SR-LAW-11](0013_LAW-11-sealed-answer-key.md), not this record** — that is
 evidence about the rule's sufficiency, and the rule is not here.
 
 **How to check it:**
@@ -638,7 +638,7 @@ its synthetic fixtures. A failure of any is this veto firing.
 document is never listed here — the body may name one, but archive is not
 evidence.*
 
-**Records** — [SR-LAW-0](0002_LAW-0-authority.md) · [SR-LAW-11](0012_LAW-11-sealed-answer-key.md) · [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md) · [SR-WORK-BENCHMARK](0053_WORK-benchmark.md) · [SR-WORK-BLOCKERS](0064_WORK-blockers.md) · [SR-RS](0133_predictions.md)
+**Records** — [SR-LAW-0](0002_LAW-0-authority.md) · [SR-LAW-11](0013_LAW-11-sealed-answer-key.md) · [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md) · [SR-WORK-BENCHMARK](0053_WORK-benchmark.md) · [SR-WORK-BLOCKERS](0064_WORK-blockers.md) · [SR-RS](0133_predictions.md)
 
 **Code**
 

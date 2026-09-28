@@ -99,17 +99,17 @@ the ones the rest of this paper uses.
 | handle | the law, in one line | record |
 |---|---|---|
 | **L0** | SRs are the only source of truth; a conflicting record is void in the conflicting part; every other artifact links to a record and never restates it | SR-LAW-0 |
-| **L1** | `$0`, FOSS-only — OSI-approved licences by SPDX id; source-available fails; dependencies ship packaged (the *zero*-dependency guarantee was withdrawn 2026-09-06; a runtime dependency now needs an accepted record) | SR-LAW-1 |
-| **L2** | Content is never durable outside its source system; the index holds statistics; the one exception is an explicit per-source `snapshot` policy | SR-LAW-2 |
-| **L3** | Deterministic: same sources → byte-identical index and root hash; no wall clock, no unseeded randomness, no set-order dependence, no model in the maintenance path | SR-LAW-3 |
-| **L4** | Offline by default; network only inside explicit, fenced, opt-in paths; an import-fence test enforces it | SR-LAW-4 |
-| ~~**L5**~~ | **RETIRED 2026-09-20.** Hashed meta was the default for non-git sources, enforced at write time, closing an ACL-mismatch leak. The mechanism was deleted outright and the leak is now an **accepted, documented exposure**. The handle is never reused | SR-LAW-5 (superseded) |
+| **L2** | `$0`, FOSS-only — OSI-approved licences by SPDX id; source-available fails; dependencies ship packaged (the *zero*-dependency guarantee was withdrawn 2026-09-06; a runtime dependency now needs an accepted record) | SR-LAW-2 |
+| **L3** | Content is never durable outside its source system; the index holds statistics; the one exception is an explicit per-source `snapshot` policy | SR-LAW-3 |
+| **L4** | Deterministic: same sources → byte-identical index and root hash; no wall clock, no unseeded randomness, no set-order dependence, no model in the maintenance path | SR-LAW-4 |
+| **L5** | Offline by default; network only inside explicit, fenced, opt-in paths; an import-fence test enforces it | SR-LAW-5 |
+| ~~**ex-L5**~~ | **RETIRED 2026-09-20.** Hashed meta was the default for non-git sources, enforced at write time, closing an ACL-mismatch leak. The mechanism was deleted outright and the leak is now an **accepted, documented exposure**. The handle is never reused | ex-SR-LAW-5 (superseded) |
 | **L6** | Say *index*, never *db* | SR-LAW-6 |
 | **L7** | Python ≥ 3.11 | SR-LAW-7 |
-| **L8** | A use record is never committed — *gitignored* is the test | SR-LAW-8 |
+| **L9** | A use record is never committed — *gitignored* is the test | SR-LAW-9 |
 | **L10** | The consumer is served build output, never source — one generated artefact per plane; the exemptions are `.fux/decoders/`, `.fux/fetchers/` and (ruled 2026-09-14) `.fux/observers/`, because there readable source *is* the contract | SR-LAW-10 |
 
-L9 is retired: the environment rule became a WORK record
+ex-L9 is retired: the environment rule became a WORK record
 (SR-WORK-ENVIRONMENTS) and the handle is never reused.
 
 ### 1.3 Index-and-refer in one picture
@@ -121,7 +121,7 @@ L9 is retired: the environment rule became a WORK record
 ```mermaid
 flowchart LR
   S["SOURCES own the content<br/>git dirs · url: pages<br/>(never copied into the index)"]
-  I["THE COMMITTED INDEX owns findability<br/>.fux/index — 256 JSONL shards<br/>term hashes · tf per field · flen · sha · edges<br/>deterministic, byte-identical (L3)"]
+  I["THE COMMITTED INDEX owns findability<br/>.fux/index — 256 JSONL shards<br/>term hashes · tf per field · flen · sha · edges<br/>deterministic, byte-identical (L4)"]
   L["THE DERIVED PLANE owns speed<br/>.fux/runtime — gitignored, rebuildable<br/>T1 accelerator · graph.json · caches"]
   A["THE ANSWER PATH owns truth<br/>rank in the index → fetch the cited docs<br/>→ verify sha → re-score passages → cite"]
   S -- "fux ingest: extract, then discard" --> I
@@ -135,7 +135,7 @@ flowchart LR
 
 Sources own content. The committed index owns *findability*. The derived plane
 owns *speed*. The answer path owns *truth*. Nothing in the first box is ever
-copied into the second — that sentence is L2, and it is the reason the rest of
+copied into the second — that sentence is L3, and it is the reason the rest of
 the design has the shape it has.
 
 ---
@@ -229,8 +229,8 @@ classDiagram
   }
   class NeverCommitted {
     wlen — derived at query time from flen
-    scores ranks use-records (L8)
-    content snippets passages (L2)
+    scores ranks use-records (L9)
+    content snippets passages (L3)
     vectors (deleted 2026-08-25)
   }
   Header "1" --> "*" Record
@@ -248,7 +248,7 @@ true); display (`title` and `phrases`); the graph (`edges`, re-resolved every
 run); and policy (`mode`). ⚠ **Display used to fork on privacy** — `title_h`
 instead of `title`/`phrases` when `meta` was `hashed` — and `meta` was the
 second policy field; **both were deleted on 2026-09-20 and `_format` stepped to
-v4** (SR-LAW-5, superseded). What it never carries is
+v4** (ex-SR-LAW-5, superseded). What it never carries is
 as important: weighted length `wlen` is derived at query time from `flen` and
 the current weights, so retuning a field weight never touches a committed byte;
 no score, no rank, no content, no vector.
@@ -306,7 +306,7 @@ flowchart LR
 
 **Decode.** Seventeen built-in decoders — csv, docx, drawio, html, image, ini,
 json, jsonl, mail, pdf, pptx, rtf, svg, toml, xlsx, xml, yaml — are listed by
-name, never discovered by directory scan (L3). The protocol is one function,
+name, never discovered by directory scan (L4). The protocol is one function,
 `decode(raw, rel_path) -> str | None`; `None` queues the document in
 `enrich/queue.tsv` with a reason and is never a silent drop. Tabular sources
 become one passage per row, capped by `[index] max_table_rows` (default
@@ -318,7 +318,7 @@ and reaches the committed index only — acquired bytes, refer passages and
 `fux answer` quotes are unredacted, which is the asymmetry the design intends.
 ⚠ **There used to be a second gate here and it was deleted on 2026-09-20**:
 for any non-git source, `meta: hashed` was enforced inside `write_index` per
-record before a shard was touched (L5; SR-INDEX-LIFECYCLE d13). **The placement
+record before a shard was touched (ex-L5; SR-INDEX-LIFECYCLE d13). **The placement
 argument outlives the rule** — a check that lives in one caller is a convention,
 not a property of the index — and it is why redaction sits where it does.
 
@@ -337,7 +337,7 @@ embedding step that no longer exists
 
 ### 3.1 Enrichment — the model stays outside the wall
 
-Fux never calls a model (L3). What it offers instead is a *place* for model
+Fux never calls a model (L4). What it offers instead is a *place* for model
 output and a check on it.
 
 ![Figure 5 — enrichment and correction](figures/fig-18-enrich.svg)
@@ -347,7 +347,7 @@ output and a check on it.
 ```mermaid
 flowchart LR
   P["fux enrich --plan<br/>MISSING / STALE per source sha"]
-  A["the agent's fux-enrich skill writes<br/>.fux/enrich/&lt;sha&gt;.md — 5–10 questions (doc2query)<br/>fux never calls a model (L3)"]
+  A["the agent's fux-enrich skill writes<br/>.fux/enrich/&lt;sha&gt;.md — 5–10 questions (doc2query)<br/>fux never calls a model (L4)"]
   C["fux enrich --check<br/>a model question must retrieve its own document<br/>in top 3 with title and ctx zeroed — else refused"]
   H["fux correct &quot;question&quot; &lt;doc&gt;<br/>a HUMAN line in the same file, corrections: N<br/>logged to eval/corrections.tsv; --check reports, never refuses"]
   PIN["--pin: one doc to #1 for one exact question"]
@@ -539,7 +539,7 @@ and unmeasured ([§10](#10-open-work)).
 flowchart TB
   R["rank in the index (same path as ask)"]
   T["refer the top 3 (ANSWER_TOP) in one refer() call"]
-  F["fetch bytes through the CONSUMER's fetcher<br/>file: → working tree · url: → http.py / cdp.py<br/>core imports no transport (L4)"]
+  F["fetch bytes through the CONSUMER's fetcher<br/>file: → working tree · url: → http.py / cdp.py<br/>core imports no transport (L5)"]
   V{"verify by content sha"}
   L["verdict, first match wins:<br/>cached → as-ingested → unverified → current / stale"]
   S["seat passages inside the byte budget (8000)<br/>best passage first, then greedy; rescore weight 0.0"]
@@ -555,7 +555,7 @@ queries the winning passage came from document 2 or 3, and the change measured
 **13 fixed / 0 broken, recall 0.4341 → 0.8256** at a byte cost of 2 517 →
 6 467 (`2026-09-05-answer-top3`, informed). Bytes are fetched through the
 consumer's own fetcher — `http.py` or `cdp.py` in `.fux/fetchers/` — so the
-core imports no transport (L4). Each document is verified by content sha and
+core imports no transport (L5). Each document is verified by content sha and
 labelled with one of **five** verdicts, first match wins: `cached`,
 `as-ingested`, `unverified`, then `current` or `stale` (SR-URL-FRESHNESS;
 SR-REFER d19). Per-URL `ttl=` defaults to 24 h and the effective TTL is the
@@ -763,7 +763,7 @@ flowchart LR
   PM["post-merge → re-ingest<br/>post-checkout → rebuild derived"]
   MD["fux-merge-index driver<br/>line-by-line last-writer-wins on (ver, sha)<br/>refuses in four cases, both sides intact"]
   DA["fux daemon (human-started only)<br/>sweeps url: sources every 60 min"]
-  L["never blocks · never touches the network · best-effort (L4)"]
+  L["never blocks · never touches the network · best-effort (L5)"]
   C --> PC --> RN
   C --> PM
   C -. "merge conflict on .fux/index" .-> MD
@@ -819,7 +819,7 @@ killed at `[observe] max_ms`, and the verb's output and exit code are
 byte-identical with zero, one or a misbehaving observer installed. Fux ships no
 observer and names no subscriber; the first will be `cage`'s search-usage leg.
 The hook is *after* render and not before the verb on purpose: a pre-verb
-middleware would make `ask` a function of consumer code, and L3 would be gone.
+middleware would make `ask` a function of consumer code, and L4 would be gone.
 `.fux/observers/` is the third L10 exemption for the same reason the other two
 exist — the consumer writes that code.
 
@@ -1171,7 +1171,7 @@ Content in a dead external source is unrecoverable by design in refer mode;
 the ledger proves *that* and *what hash* was known, never *what was said*, and
 `snapshot` exists for the documents where that is unacceptable. Live
 verification puts the network on an opt-in query path — a fenced exception to
-L4, off by default. `url:` fetches are serial. The only recall figures are
+L5, off by default. `url:` fetches are serial. The only recall figures are
 informed, from a playground set; the blind instrument exists and is unscored.
 Abstention is, today, the absence of any match. BM25F's `title`, `path` and
 `ctx` weights and `expand_weight` are recorded starting points, not measured

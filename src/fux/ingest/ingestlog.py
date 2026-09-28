@@ -5,7 +5,7 @@
 was a defect rather than a confusion.**
 
 `fux.query.provenance` is SR-PROVENANCE's **answer receipts** — how an *answer*
-was produced, a thing [L8](../../../records/0010_LAW-8-use-record.md) governs
+was produced, a thing [L9](../../../records/0011_LAW-9-use-record.md) governs
 because it records what somebody **asked** — and its journal is written to
 `.fux/runtime/provenance.jsonl` **only under explicit consent** (W-147: the flag
 *and* the output-TOML key, ruled by Arpit 2026-09-13, *"I need the flag as well
@@ -14,13 +14,13 @@ as output TOML configuration"*).
 **Writing this ledger there would have made every `fux ingest` create a file
 that is supposed to require consent** — and `tests_e2e/test_verbs.py::
 test_both_journal_consent_surfaces_write_and_neither_alone_is_removable` caught
-it, with the message *"a journal appeared with no consent of any kind"*. **L8
+it, with the message *"a journal appeared with no consent of any kind"*. **L9
 outranks a work item**, so the path moved; the module moved with it, because
 leaving two modules named `provenance` writing differently-named files is the
 same trap one layer up.
 
 **This file records what INGEST did** — never what anyone asked — which is why
-L8 does not reach it, and why **it must never grow a query field.**
+L9 does not reach it, and why **it must never grow a query field.**
 
 **Arpit, 2026-09-18 (W-200):** *"Create a log file of the files that are being
 consumed as well as the URLs that are being consumed, with what decoders were
@@ -40,7 +40,7 @@ nobody could make it. This file makes it.
 
 ⚠ **It answers nothing about a QUERY.** No field here records what was asked,
 who asked, or what came back — it records what *ingest did*, so
-[L8](../../../records/0010_LAW-8-use-record.md) does not reach it, and **it must
+[L9](../../../records/0011_LAW-9-use-record.md) does not reach it, and **it must
 never grow a query field.** A row about a document is not a use record; the
 moment one of these lines names a question, it becomes one.
 
@@ -57,9 +57,9 @@ and a diff between two runs is readable.
 | `id` · `kind` · `loc` | every row | the join key, and the thing a human recognises |
 | `decoder` | every row | the string `decoderdigest` already mints — `xlsx@v1` for a built-in, `xlsxdoc@sha:…` for a consumer file, `prose` for Markdown and text, which no decoder claims |
 | `fetcher` | `url` rows | `<stem>@sha:<file sha>`. **Fetchers have no `VERSION`** — a consumer owns the file, so its sha *is* its version, the same rule a consumer decoder already follows |
-| `raw_sha` · `raw_bytes` · `wlen` | where known | numbers and hashes. **No content, no title, no excerpt** ([L2](../../../records/0004_LAW-2-content-never-durable.md)) |
+| `raw_sha` · `raw_bytes` · `wlen` | where known | numbers and hashes. **No content, no title, no excerpt** ([L3](../../../records/0005_LAW-3-content-never-durable.md)) |
 | `outcome` | every row | `indexed` · `reused` · `skipped:<reason>` · `refused:<rule>` · `queued` |
-| `run_seq` | every row | the counter `url-state.json` already owns. **No wall clock** (L3) |
+| `run_seq` | every row | the counter `url-state.json` already owns. **No wall clock** (L4) |
 
 `loc` is already in `docs.jsonl`, so it leaks nothing new.
 
@@ -73,7 +73,7 @@ and a diff between two runs is readable.
    that it does not travel with a clone, so a teammate sees nothing until they
    ingest.
 2. **Clock-free.** `run_seq`, never `time.time()`, so nothing that reads this
-   can pick up non-determinism (L3). The cost is that *"when"* is answerable
+   can pick up non-determinism (L4). The cost is that *"when"* is answerable
    only as *"how many networked runs ago"*.
 3. **Best-effort, written once, atomically, at the end of ingest.** The
    `_record_refusals` / `_record_stale_redaction` precedent: **a ledger that can
@@ -184,7 +184,7 @@ def write(root: Path, rows: list[Row]) -> None:
     """Replace the ledger with `rows`, sorted by id, atomically. **Never raises.**
 
     Sorted by `id` and with sorted keys so the same tree gives the same bytes on
-    two machines (L3) — the file is gitignored, but a ledger that differs
+    two machines (L4) — the file is gitignored, but a ledger that differs
     run-to-run for no reason is one nobody diffs.
 
     An `OSError` is swallowed by the caller's `try`: see the module docstring,

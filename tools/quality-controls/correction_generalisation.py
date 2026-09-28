@@ -84,7 +84,7 @@ def file_correction(tree: Path, question: str, target: str) -> bool:
 
 def reingest(tree: Path) -> bool:
     # ⚠ `--no-fetch`: this is a local corpus and the run must not depend on a
-    # network, on a path L4 fences (W-177 made the bare verb networked).
+    # network, on a path L5 fences (W-177 made the bare verb networked).
     out = subprocess.run(
         [sys.executable, "-m", "fux.cli", "ingest", "--no-fetch"],
         cwd=tree, capture_output=True, text=True,

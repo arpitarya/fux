@@ -8,7 +8,7 @@ as a rule it could not enforce:
     Both fetchers must produce the same markdown from the same bytes, or which
     fetcher retrieved a document would change the committed index.
 
-That is **same sources -> same index** (L3) demoted to a code comment. Moving
+That is **same sources -> same index** (L4) demoted to a code comment. Moving
 the pass here makes the requirement structurally true instead of asked for:
 there is one implementation, and both fetchers reach it.
 
@@ -32,7 +32,7 @@ from fux.decode._limits import limit
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.html", "version")  # not bumped by W-225 5b: the charset window moved to formats.toml at the same value
+VERSION = fixed("decoders.html", "version")  # not bumped by W-234: law handles in comments only; W-225 5b: the charset window moved to formats.toml at the same value
 
 EXTENSIONS = tuple(fixed("decoders.html", "extensions"))
 

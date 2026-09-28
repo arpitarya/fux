@@ -57,7 +57,7 @@
       "token_sha": {
         "type": "str",
         "required": "never",
-        "doc": "sha256 of the last validation token the fetcher returned. THE HASH, NEVER THE TOKEN -- an ETag can be a content hash, a version counter or an internal object id, and this file ends up in support bundles. Hashing compares as well and carries none of it, so L5 is untouched by construction. Absent = the fetcher has no validate(), or said it could not tell."
+        "doc": "sha256 of the last validation token the fetcher returned. THE HASH, NEVER THE TOKEN -- an ETag can be a content hash, a version counter or an internal object id, and this file ends up in support bundles. Hashing compares as well and carries none of it, so ex-L5 is untouched by construction. Absent = the fetcher has no validate(), or said it could not tell."
       }
     },
     "example": {

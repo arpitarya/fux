@@ -82,7 +82,7 @@ _ENV = {
     "GIT_AUTHOR_EMAIL": "bench@fux",
     "GIT_COMMITTER_NAME": "bench",
     "GIT_COMMITTER_EMAIL": "bench@fux",
-    # L3: no wall clock on the maintenance path, in the fixtures either.
+    # L4: no wall clock on the maintenance path, in the fixtures either.
     "GIT_AUTHOR_DATE": "2026-01-01T00:00:00Z",
     "GIT_COMMITTER_DATE": "2026-01-01T00:00:00Z",
     "SOURCE_DATE_EPOCH": "1767225600",

@@ -80,7 +80,7 @@ accurately: `fux add` proposes from it, a refusal rule may match on it, and
 `fux doctor`'s `observed types` row compares it against the line. Until 2026-08-26 the conversion lived here AND in `cdp.py`, as
 two hand-maintained copies that a comment asked to stay identical and nothing
 checked — which made *which fetcher retrieved a document* a property of the
-committed index, and that is L3. `fetch=` is a routing decision, never a
+committed index, and that is L4. `fetch=` is a routing decision, never a
 property of the document.
 
 If you are editing this file to change how a page becomes markdown, you are in

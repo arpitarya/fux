@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-27
 amended: 2026-09-22
 feature: the confidence plane
-owns: [src/fux/query/confidence.py@ad43c5cb44f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
-laws: [L1, L3, L4]
+owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
+laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 553936b745425b60cf2b8d32e7791334084e4e1a36cc15bf9b5e7583e85186cb
+content_sha: e30962f0e84dd188ea5298225f6e01072e1cd2412cbddc03d4d9ef4983d91efa
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -43,7 +43,7 @@ answer and cites a real file while doing it.
 This record adds a **confidence block** to every answer: four signals computed
 from what ranking already produced, and one **band** that names the action a
 consumer should take. Nothing fetches, samples, calls a model or reads a clock,
-so L1, L3 and L4 are untouched.
+so L2, L4 and L5 are untouched.
 
 **Three of the four band boundaries are structural facts** — nothing scored; a
 query term exists in no document; the cited bytes changed since ingest. Only
@@ -352,7 +352,7 @@ should have declined, and this is the surface on which it declines.
 
    Therefore:
 
-   - The shipped `separation_floor = 0.1` (the template's, [L12](0013_LAW-12-values-live-in-config.md))
+   - The shipped `separation_floor = 0.1` (the template's, [L12](0014_LAW-12-values-live-in-config.md))
      is a **starting value with no standing**, not a measured optimum. Until R10 is filed, no document may describe the
      `grounded`/`weak` boundary as calibrated.
    - **R10's job is not to find a good-looking cutoff.** It is to find the
@@ -603,7 +603,7 @@ that could only ever have been `1.0`.**
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -855,11 +855,11 @@ block is built on the ORIGINAL query, as decision 16's neighbour says of
 `--expand`: `_fill_confidence` never sees the fold, so `coverage`, `missing` and
 `doc_coverage` describe what the user typed.
 
-**No change to the band** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `query/__init__.py` moved only where the archived declaration is read: a present `fux.toml` that does not load now stops the verb instead of ranking with no archived directories ([SR-ASK](0103_ask.md)).
+**No change to the band** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `query/__init__.py` moved only where the archived declaration is read: a present `fux.toml` that does not load now stops the verb instead of ranking with no archived directories ([SR-ASK](0103_ask.md)).
 
-**The four-digit rounding of every published signal is `constants.toml [confidence] signal_digits`** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28), read by both planes. "Has a runner-up" is `len(scores) > 1`. Every signal is unchanged.
+**The four-digit rounding of every published signal is `constants.toml [confidence] signal_digits`** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28), read by both planes. "Has a runner-up" is `len(scores) > 1`. Every signal is unchanged.
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 **The band is computed after the intent prior** (W-168 step 9, 2026-09-28;
 [SR-RANKING](0111_ranking.md) decision 13). The prior scales final scores, so
@@ -872,8 +872,8 @@ nothing here changes.
 - ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
   nothing it decides.** Hashed display meta was deleted outright: `meta` and
   `title_h` left the record shape, `store/displaycache.py` and
-  `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law L5
-  retired ([SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). Nothing in `query/confidence.py` changed. The four signals and the band are computed from `terms`, `flen` and the query — none of which W-194 touched — and a `url:` result now carries a readable title where it used to carry a hash, which is a display fact and not a confidence one.
+  `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law ex-L5
+  retired ([ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). Nothing in `query/confidence.py` changed. The four signals and the band are computed from `terms`, `flen` and the query — none of which W-194 touched — and a `url:` result now carries a readable title where it used to carry a hash, which is a display fact and not a confidence one.
   **This record's decisions are unaffected**, and the line is here because the
   freshness gate asks a describer to say so rather than to be silent.
 
@@ -977,7 +977,7 @@ measurement *easier to paper over*, not less owed.
   never supply a delta.
 - **A cross-encoder or model-scored confidence.** Refused for the reason
   [SR-RERANK](0138_rerank.md) refused it — not cost, but cross-machine
-  determinism, and here additionally L3.
+  determinism, and here additionally L4.
 - **Exposing the floors WITHOUT publishing them in the block** (decision 13).
   Rejected, and it is the version that would have been easy: two `tune.toml`
   keys and nothing else. It would have made `band` mean a different thing in

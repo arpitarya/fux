@@ -5,7 +5,7 @@
 A per-rung document is an **output** record: it carries what fux ranked,
 answered, cited and declined, and never what it should have done. *Correct*
 is born in W-204 phase D, after Arpit opens the key, and nowhere earlier
-([L11](../../records/0012_LAW-11-sealed-answer-key.md)). **A document that
+([L11](../../records/0013_LAW-11-sealed-answer-key.md)). **A document that
 guessed would train the next reader to trust a guess.**
 
 **It is generated, never written by hand**, and that is the point. The `.md` and

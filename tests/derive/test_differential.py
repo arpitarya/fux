@@ -139,7 +139,7 @@ def _url(doc_id, title, flen, terms) -> dict:
 
     ⚠ **REWRITTEN for W-194 (2026-09-20). This was `_hashed()`**, and the
     difference matters to why the fixture exists. It used to delete `title` and
-    `phrases` and write `meta: "hashed"` plus a `title_h`, because L5 made that
+    `phrases` and write `meta: "hashed"` plus a `title_h`, because ex-L5 made that
     the default for a non-git source. All three fields are deleted, so a url
     record now differs from a git one **only** in `src`, `loc` and the id's
     shape — which is exactly what SR-ACCELERATOR §683-687 warned would happen
@@ -174,7 +174,7 @@ def test_a_corpus_holding_a_url_record_builds_and_agrees(tmp_path):
     16-hex `title_h` is a quoted 16-hex token outside `terms`; the scan counts
     it toward that term's df from the raw bytes and the accelerator counts from
     the postings, so the build refused the index rather than diverge — which
-    meant the L5 default shipped an index no `fux build` would accept, and the
+    meant the ex-L5 default shipped an index no `fux build` would accept, and the
     only thing between the engine and a fast wrong answer was a stopped run.
     **The tripwire that caught it is untouched** and is exercised directly by
     `test_a_stray_quoted_hash_still_stops_the_build` below.

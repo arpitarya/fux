@@ -7,7 +7,7 @@ description: "W-225 step 1 — every site SR-LAW-12's veto greps find in src/fux
 
 > **Verdict:** ✅ **RATIFIED 2026-09-27 — Arpit: *"I accept the recommendation."***
 > R1–R6 and the decoder-cap hazard all as recommended; recorded in
-> [SR-LAW-12](../../records/0013_LAW-12-values-live-in-config.md) decisions 1, 6,
+> [SR-LAW-12](../../records/0014_LAW-12-values-live-in-config.md) decisions 1, 6,
 > 9a, 9b and §Veto condition. Step 3 is unblocked for these 359 rows; the ~220
 > sites R5 found beyond the greps are classified here before step 4.
 
@@ -281,7 +281,7 @@ Sorted by class, then by site. Literals are cut at 40 characters.
 | 109 | `src/fux/progress.py:38` | `THRESHOLD` | `200` | tunable-new | output.toml [cli] progress_threshold | when a progress bar appears |
 | 110 | `src/fux/query/__init__.py:1403` | `ANSWER_TOP` | `3` | tunable-new | output.toml [cli.answer] top | `answer` reads no `top` today |
 | 111 | `src/fux/query/headings.py:64` | `MAX_HEADINGS` | `3` | tunable-new | output.toml [cli] max_headings | display count |
-| 112 | `src/fux/query/provenance.py:174` | `DEFAULT_JOURNAL_MAX` | `1000` | tunable-new | output.toml [cli.answer] journal_max | L8 journal bound; SR says a design default |
+| 112 | `src/fux/query/provenance.py:174` | `DEFAULT_JOURNAL_MAX` | `1000` | tunable-new | output.toml [cli.answer] journal_max | L9 journal bound; SR says a design default |
 | 113 | `src/fux/query/rerank.py:78` | `DEPTH` | `20` | tunable-new | tune.toml [ranking] rerank_depth / rerank_coverage_power | ranking knobs |
 | 114 | `src/fux/query/rerank.py:105` | `COVERAGE_POWER` | `2` | tunable-new | tune.toml [ranking] rerank_depth / rerank_coverage_power | ranking knobs |
 | 115 | `src/fux/refer/_assemble.py:75` | `CITATION_OVERHEAD` | `80` | tunable-new | tune.toml [refer] citation_overhead | budget accounting |

@@ -184,7 +184,7 @@ def build_repo(directory: Path, port: int) -> Path:
         "# R4 bench corpus — the mock server\n" + urls + "\n", encoding="utf-8"
     )
     # `meta = "plain"`: the bench needs to read what it cited, and these are
-    # localhost fixtures with no ACL to mismatch. L5's default is untouched.
+    # localhost fixtures with no ACL to mismatch. ex-L5's default is untouched.
     (directory / "fux.toml").write_text(
         '[sources]\n\n[sources.url]\nmeta = "plain"\n', encoding="utf-8"
     )

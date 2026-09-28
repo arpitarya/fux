@@ -93,7 +93,7 @@ class Policy:
     cache_ttl_seconds: int = 0
     #: Never cache this source's bytes at all, whatever the TTL says. The
     #: escape hatch for access-controlled and regulated documents, where a
-    #: local copy outliving the reader's permission is the risk L5 exists for.
+    #: local copy outliving the reader's permission is the risk ex-L5 exists for.
     no_cache: bool = False
 
     def __post_init__(self) -> None:

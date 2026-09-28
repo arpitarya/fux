@@ -11,7 +11,7 @@ their passages is cited. **Since W-108 it is handed up to `ANSWER_TOP` of
 them** rather than one, because the passage contest downstream was always
 cross-document and was being run on a field of one.
 
-## Why this is safe under L4 (offline by default)
+## Why this is safe under L5 (offline by default)
 
 A `file:` citation never needs a fetcher — `refer/source.py`'s git strategy
 reads the local checkout, no network, always. A `url:` citation only exists

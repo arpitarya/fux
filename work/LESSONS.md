@@ -504,7 +504,7 @@ rather than here:**
 | lesson | its home |
 |---|---|
 | **BM25F means weight-then-saturate ONCE** — never sum per-field BM25 | [SR-RANKING](../records/0111_ranking.md) |
-| **No wall-clock output anywhere on the maintenance path** — timestamps derive from `SOURCE_DATE_EPOCH` or source mtime, or the byte-identical guarantee breaks | [SR-LAW-3](../records/0005_LAW-3-deterministic.md) |
+| **No wall-clock output anywhere on the maintenance path** — timestamps derive from `SOURCE_DATE_EPOCH` or source mtime, or the byte-identical guarantee breaks | [SR-LAW-4](../records/0006_LAW-4-deterministic.md) |
 
 They are listed here as the *lessons*; the *rules* are in those two records and
 are not restated.

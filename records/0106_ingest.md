@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@bfcf869ecad7, src/fux/ingest@d9f8042342cb, src/fux/ingest/priors.py@dda8d6b961ee, node/src/ingest/gitdir.mjs@1420b552a4c5, node/src/ingest/priors.mjs@11df69775da1]
-laws: [L2, L3, L4]
+owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@d00208c1eb9b, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@1420b552a4c5, node/src/ingest/priors.mjs@d8d4691d7e49]
+laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: e3a05fac4f54fec737303e36938c7832fd4f29dd4d5865998d4d2cc0fc80eef3
+content_sha: da1439fa620a31005b291df83255286ae7b7a243edeb824357c58c7321ca1b05
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -340,7 +340,7 @@ parses — and never a path convention. Three properties, each deliberate:
   the question does not arise.
 - **It changes committed bytes for the archived population**, so the change that
   ships it re-ingests, and that diff is expected rather than a determinism
-  failure. L3 still holds: same sources, same declaration, same bytes.
+  failure. L4 still holds: same sources, same declaration, same bytes.
 
 
 **13a. …and since 2026-09-11, from a declared-archived URL LINE too** (W-126,
@@ -360,7 +360,7 @@ about the wiring are decisions rather than mechanics:
   `file:` record is rebuilt every run.
 - **The flag is removed when the line stops declaring it**, and the record is
   returned **uncopied** when it already agrees — a run that changes nothing
-  still writes byte-identical shards (L3), and a flag that could be set but
+  still writes byte-identical shards (L4), and a flag that could be set but
   never cleared is a one-way door.
 - **The list is read only when this run holds `url:` records**, so a corpus of
   directories never touches it.
@@ -418,7 +418,7 @@ never looked at one.
 
 **Best-effort and advisory.** The write is wrapped and swallowed: a reporting
 plane that can fail an ingest which otherwise succeeded is worse than no
-reporting plane. Nothing here changes a committed byte, so **L3 is untouched**.
+reporting plane. Nothing here changes a committed byte, so **L4 is untouched**.
 
 **15. Extraction reuse is keyed on the content sha AND the PII ruleset digest**
 ([SR-PII](0148_pii.md)). Redaction runs inside this file, between
@@ -525,7 +525,7 @@ the invariant: editing `B` would move `A`'s committed bytes while the dirty
 list marked only `B`, so a full `fux ingest` and an incremental re-index would
 produce **different indexes from the same sources**.
 
-⚠ **That is [L3](0005_LAW-3-deterministic.md) failing on the INCREMENTAL path
+⚠ **That is [L4](0006_LAW-4-deterministic.md) failing on the INCREMENTAL path
 only, which is the worst shape for it.** The full-ingest path stays
 byte-reproducible, so every test and every CI check that rebuilds from scratch
 passes, and the drift appears only in a working repository that has been edited
@@ -542,9 +542,9 @@ find it.
 
 **17a. Terms, never the anchor string.** Link text is a verbatim fragment of
 the source document's prose, so committing it plainly would put content in the
-index ([L2](0004_LAW-2-content-never-durable.md)). (It would also have needed
-L5's hashed-meta branch on top — true when this was written; **L5 retired with
-W-194 on 2026-09-20 and L2 is what carries the argument**, untouched.) A term hash is a *statistic*, which is what the
+index ([L3](0005_LAW-3-content-never-durable.md)). (It would also have needed
+ex-L5's hashed-meta branch on top — true when this was written; **ex-L5 retired with
+W-194 on 2026-09-20 and L3 is what carries the argument**, untouched.) A term hash is a *statistic*, which is what the
 index holds — and it is the currency `terms` is already written in, so
 `query/scan.py`'s byte prefilter finds an anchor source by the substring check
 it already runs, at no extra cost.
@@ -576,13 +576,13 @@ step 1's PASS moved `[bm25f] anchor` from `0.0` to `1.0` ([SR-TUNE](0135_tuning.
 decision 17a) — a read-time weight. `at` and `al` were already written whenever
 a link had text, at every weight, so **the committed index is byte-identical
 before and after**, and a re-ingest is owed by no one. Checked in the same
-change ([L3](0005_LAW-3-deterministic.md)): a from-empty `fux ingest --no-fetch`
+change ([L4](0006_LAW-4-deterministic.md)): a from-empty `fux ingest --no-fetch`
 of this repository under the old default and under the new one produced
 byte-identical `.fux/index/` trees, 1 792 documents, one hash.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -795,7 +795,7 @@ what** — one join away from three files that nobody could make.
   argument that kept the blob sha off the record
   ([SR-ACQUIRED](0145_acquired-plane.md)). **The cost is that it does not travel
   with a clone.**
-- **Clock-free** (L3): `run_seq`, the counter `url-state.json` already owns,
+- **Clock-free** (L4): `run_seq`, the counter `url-state.json` already owns,
   never `time.time()`. **The cost is that *"when"* is answerable only as *"how
   many networked runs ago"***, and in a file-only corpus `run_seq` never moves.
 - **Best-effort**, written once and atomically at the end of the run, after
@@ -811,12 +811,12 @@ what** — one join away from three files that nobody could make.
   records that were not re-extracted, and `doctor`'s stale-decoder finding could
   never fire. `unknown` when there is no prior row: **absent and unknown are
   different**.
-- ⚠ **It is not a use record and L8 does not reach it.** It records what
+- ⚠ **It is not a use record and L9 does not reach it.** It records what
   *ingest* did, never what anyone asked, and **it must never grow a query
   field** — the moment a line here names a question, the file becomes something
-  [L8](0010_LAW-8-use-record.md) governs. 🔴 **There is a second module called
+  [L9](0011_LAW-9-use-record.md) governs. 🔴 **There is a second module called
   `provenance`** — `fux.query.provenance`, SR-PROVENANCE's answer receipts,
-  which *is* L8's. Both docstrings now open by naming the other.
+  which *is* L9's. Both docstrings now open by naming the other.
 - **No cap and no rotation.** ~200 B x 10 000 documents is 2 MB; a rotation
   policy is a second thing to be wrong about, and the file is one `rm` from gone.
 
@@ -909,23 +909,23 @@ ingested."*
 **`.fux/index/REGISTER`**, committed, one line per document in the index:
 `loc` · `sha` · `decoder@version` · `fetcher` (URLs only) · `outcome`.
 
-🔴 **Bound by [L3](0005_LAW-3-deterministic.md), and that is what makes it
+🔴 **Bound by [L4](0006_LAW-4-deterministic.md), and that is what makes it
 committable at all.** No wall clock, no run id, no ordering that depends on how
 the walk happened to schedule — **sorted by `loc`**, and byte-identical across
 runs from the same sources. It is derived from the same inputs as the index
 beside it, so it changes exactly when the index changes.
 [`tests/…`](../tests/) asserts two consecutive `fux ingest` runs write it once.
 
-🔴 **Bound by [L2](0004_LAW-2-content-never-durable.md): paths and hashes, never
+🔴 **Bound by [L3](0005_LAW-3-content-never-durable.md): paths and hashes, never
 content.** A `sha` is not content and a `loc` is not a quote.
 
-🔴 **NOT bound by [L8](0010_LAW-8-use-record.md), and the distinction is the
-whole reason this file may be committed when W-200's may not.** L8 governs *the
+🔴 **NOT bound by [L9](0011_LAW-9-use-record.md), and the distinction is the
+whole reason this file may be committed when W-200's may not.** L9 governs *the
 record of who went looking*; this records **what the corpus is**. A register line
 names a document that exists whether or not anybody ever queried it. ⚠ **It must
 never grow a field that names a question, a query or a reader** — the moment it
-does, it becomes an L8 artifact sitting on a committed path, which is the
-prohibition L8 exists for.
+does, it becomes an L9 artifact sitting on a committed path, which is the
+prohibition L9 exists for.
 
 **22a. It is not W-200's ledger, and they are not redundant.**
 
@@ -933,7 +933,7 @@ prohibition L8 exists for.
 |---|---|---|
 | committed? | **no** — gitignored, derived | **yes** |
 | scope | **one run**, what that run consumed | **the corpus**, what the index holds |
-| bound by | nothing durable | L3 byte-identity |
+| bound by | nothing durable | L4 byte-identity |
 | answers | *"what did this ingest do?"* | *"what is in here, and what read it?"* |
 
 **The ledger is advisory and per-run; the register is a committed statement about
@@ -957,7 +957,7 @@ The `decoder=` half of the pipe touched `sourcelist.py`, `urlsrc.py` and
 `decoder` column already carried the `decoderdigest` string for whatever read a
 document's bytes, and it now carries the digest of the **declared** decoder
 instead of one re-derived from the response — the same column, resolved from a
-committed line, which is if anything more L3-stable than before.
+committed line, which is if anything more L4-stable than before.
 
 ⚠ **Stated here because this record owns the directory, not because a decision
 moved** — the [SR-ACQUIRED](0145_acquired-plane.md) precedent: the freshness gate
@@ -974,22 +974,22 @@ only, so the committed bytes are the same at every arm. That is why its default
 moving to `0.5` on 2026-09-27 ([SR-TUNE](0135_tuning.md) decision 19a) needs no
 re-ingest, and why this decision did not move with it.
 
-**`fetch_all` takes its bounds, never a default** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b,
+**`fetch_all` takes its bounds, never a default** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b,
 2026-09-27). `config`, `max_parallel` and `acquired_max_bytes` are required
 arguments, read from `[sources.url]` by `run.py`; `urlsrc.DEFAULT_MAX_PARALLEL`
 and `acquired.DEFAULT_MAX_BYTES` are deleted, and `resolve_parallel` no longer
 answers an unconfigured call ([SR-CONFIG](0113_config.md) decisions 7a and 17).
 The Node reader's `dirsFile` no longer falls back to `.fux/sources/dirs`.
 
-**Every decoder cap is in the extract-config digest** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `_extract_config_digest` appends `limits.<decoder>.<key>=<value>` for every cap the built-ins read, so an edited cap re-extracts the corpus at the next `fux ingest`; a consumer's extra `[limits]` table changes nothing fux extracts and is left out. `fux ingest` checks every cap before any decoder runs. ⚠ **`fux ingest --check` still compares content shas only** and does not see a changed cap — the same as a changed `tune.toml [index]` today; the digest lives in gitignored runtime, so a fresh clone has none to compare. Open for Arpit (W-225).
+**Every decoder cap is in the extract-config digest** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `_extract_config_digest` appends `limits.<decoder>.<key>=<value>` for every cap the built-ins read, so an edited cap re-extracts the corpus at the next `fux ingest`; a consumer's extra `[limits]` table changes nothing fux extracts and is left out. `fux ingest` checks every cap before any decoder runs. ⚠ **`fux ingest --check` still compares content shas only** and does not see a changed cap — the same as a changed `tune.toml [index]` today; the digest lives in gitignored runtime, so a fresh clone has none to compare. Open for Arpit (W-225).
 
-**The refusal scan's bounds are `.fux/refusals.toml [scan]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27); `refusals.load` returns them on the `RuleSet` the fetch path already passes ([SR-REFUSAL](0146_refusals.md) decision 9a).
+**The refusal scan's bounds are `.fux/refusals.toml [scan]`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27); `refusals.load` returns them on the `RuleSet` the fetch path already passes ([SR-REFUSAL](0146_refusals.md) decision 9a).
 
-**Ingest's parsers hold no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `pii.py`'s checksum tables are `constants.toml [pii.luhn]` and `[pii.verhoeff]`; `fuxignore.py` and `typesfile.py` measure their own tokens (`len("**/")`, named regex groups). Every extracted byte is unchanged.
+**Ingest's parsers hold no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `pii.py`'s checksum tables are `constants.toml [pii.luhn]` and `[pii.verhoeff]`; `fuxignore.py` and `typesfile.py` measure their own tokens (`len("**/")`, named regex groups). Every extracted byte is unchanged.
 
-**Ingest's line formats are read by unpacking, not by index**: `REGISTER`'s five columns, the queue's two-or-three, a link's text and target by named regex groups. A consumer decoder's or fetcher's digest keeps 16 hex digits of its sha256 through `constants.toml [decoders] digest_hex`. REGISTER's bytes are unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**Ingest's line formats are read by unpacking, not by index**: `REGISTER`'s five columns, the queue's two-or-three, a link's text and target by named regex groups. A consumer decoder's or fetcher's digest keeps 16 hex digits of its sha256 through `constants.toml [decoders] digest_hex`. REGISTER's bytes are unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
-**Two ingest bounds are `fux.toml` keys** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): the cooperative stop is polled every `[maintain] stop_every_docs` documents, and the recency-prior `git log` is bounded by `[index] git_timeout_s` ([SR-CONFIG](0113_config.md) decision 18). The values are unchanged.
+**Two ingest bounds are `fux.toml` keys** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): the cooperative stop is polled every `[maintain] stop_every_docs` documents, and the recency-prior `git log` is bounded by `[index] git_timeout_s` ([SR-CONFIG](0113_config.md) decision 18). The values are unchanged.
 
 ### Consequences
 

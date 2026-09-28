@@ -8,16 +8,16 @@ the materialise-first display cache was warm, and a *labelled* hash — never a
 bare one — when it had gone cold. Six scenarios, three verbs, warm and cold.
 
 `meta`, `title_h` and `.fux/runtime/display-cache/` are deleted, `_format` is
-`fux.index.v4`, and law L5 is retired. **The cold path cannot be reached**, so
+`fux.index.v4`, and law ex-L5 is retired. **The cold path cannot be reached**, so
 the tests that exercised it are gone rather than reworded into something that
 passes trivially.
 
 🔴 **What the deletion gave up, kept here because a test file is where somebody
-looks next.** L5 closed an **ACL-mismatch leak**: a document readable by fifty
+looks next.** ex-L5 closed an **ACL-mismatch leak**: a document readable by fifty
 people inside Confluence became a title readable by everyone with the repo.
 That leak is now an **accepted, documented exposure**, not a solved problem —
-[SR-LAW-5](../../archive/records/0007_LAW-5-hashed-meta.md) keeps the argument, the
-AOL-2006 citation and the reopen trigger. **L5 was right about the leak and
+[ex-SR-LAW-5](../../archive/records/0007_LAW-5-hashed-meta.md) keeps the argument, the
+AOL-2006 citation and the reopen trigger. **ex-L5 was right about the leak and
 lost on cost.**
 
 What is asserted below is the property that replaced it: a url record is shaped
@@ -132,7 +132,7 @@ def test_the_scan_and_accelerator_paths_agree_on_the_title(tmp_path, monkeypatch
     assert json_mod.loads(scan_out)["results"] == json_mod.loads(accel_out)["results"]
 
 
-# -- the property that replaced L5 ---------------------------------------
+# -- the property that replaced ex-L5 ---------------------------------------
 
 
 def test_a_url_record_needs_no_display_field_a_git_record_does_not(tmp_path):

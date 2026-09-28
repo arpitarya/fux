@@ -619,7 +619,7 @@ def _fetcher_routes(root: Path) -> Check:
 
     🔴 **Offline, and it never imports a fetcher.** `ROUTES` is read with `ast`
     (`ingest/routes.claims`), for the reason `_fetcher_capabilities` reads a
-    fetcher as text: importing consumer Python on `doctor`'s path is L4 lost
+    fetcher as text: importing consumer Python on `doctor`'s path is L5 lost
     where nothing would notice — a fetcher is free to open a session at import.
 
     Three faults, and the levels differ because the costs do:
@@ -1666,7 +1666,7 @@ def freshness_counts(root: Path) -> dict[str, int]:
     are different claims and collapsing them would let a repo that has never
     looked read as a repo that looked and found nothing.
 
-    ⚠ **Local and gitignored (L8).** Everything read here lives under
+    ⚠ **Local and gitignored (L9).** Everything read here lives under
     `.fux/runtime/`, reaches no committed byte, and goes nowhere.
     """
     try:

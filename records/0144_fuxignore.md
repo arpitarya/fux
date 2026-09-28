@@ -7,10 +7,10 @@ description: "Exclusion moves out of the source lists into one .gitignore-shaped
 status: accepted
 date: 2026-08-27
 feature: the `.fux/.fuxignore` exclusion file
-owns: [src/fux/ingest/fuxignore.py@6580528a45d8]
-laws: [L1, L3]
+owns: [src/fux/ingest/fuxignore.py@f9b13eeb8de7]
+laws: [L2, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 56d9f4d251c5825c032b3075489ae0c449d2e27a6c173e65ecf2302f0d91fde3
+content_sha: f818a6a4a2c48b8c1efc420845b5a4c1b7fb63017e73dce431d4548083f3de53
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -165,7 +165,7 @@ that did not behave like `.gitignore` would be worse than no file at all.
 **1. There is exactly one ignore file, at `.fux/.fuxignore`, and it is never
 nested.** Git's per-directory files are not copied: a nested form makes the
 skip reason depend on which of several files matched, and needs a defined merge
-order to keep L3. One file, one origin, one line number in every message.
+order to keep L4. One file, one origin, one line number in every message.
 
 **2. The grammar is `.gitignore`'s.** Last match wins; `!` re-includes; a
 trailing `/` restricts a pattern to directories; a leading `/` *or any other
@@ -177,7 +177,7 @@ be re-included**, which is git's rule and the one that surprises people.
 **2a. Order is semantic here and nowhere else in `.fux/`.** Every other list
 fux reads is loader-sorted so that file order cannot change a committed byte
 (SR-URL-LIST decision 10). This one resolves by *last match*, so sorting it
-would change its meaning. **L3 still holds** — the same file produces the same
+would change its meaning. **L4 still holds** — the same file produces the same
 index on every machine; what is given up is the weaker property that the same
 *set* of lines in any order does, and it is given up knowingly, because a
 gitignore whose order did not matter would not be a gitignore.
@@ -329,7 +329,7 @@ Five properties, and each is the answer to a specific way this goes wrong:
 | **the note is the reason that PUT the line there** | a generated verdict reports that reason, not `ignored by .fux/.fuxignore:12`. Otherwise the second run's answer to *why* is *"because the first run said so"*, and the real reason is gone after one ingest |
 | **a path a hand-written pattern already covers gets no line** | `*.py[cod]` written by hand collapses 257 generated lines to zero. One line beats many, and the writer asks `decide(..., hand_only=True)` to find out |
 
-**Sorted, no wall clock, rewritten whole.** Same corpus, same bytes (L3) — this
+**Sorted, no wall clock, rewritten whole.** Same corpus, same bytes (L4) — this
 file is committed, so a timestamp would break the byte-identical guarantee on
 the second machine. Rewritten rather than appended, so a path that stops being
 skipped leaves on the next run. An unchanged result does not touch the file at
@@ -378,7 +378,7 @@ same question.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -389,9 +389,9 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No `.fuxignore` rule changed** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `gitdir.read_types` no longer falls back to `DEFAULT_TYPES` for an absent `formats.toml`; `.fuxignore` is still read first and outranks it ([SR-TYPES](0128_types-list.md) decision 14).
+**No `.fuxignore` rule changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `gitdir.read_types` no longer falls back to `DEFAULT_TYPES` for an absent `formats.toml`; `.fuxignore` is still read first and outranks it ([SR-TYPES](0128_types-list.md) decision 14).
 
-**The glob translator holds no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): it advances by the length of the token it matched (`**/`, `**`, an escaped character). Every pattern compiles to the same regex.
+**The glob translator holds no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): it advances by the length of the token it matched (`**/`, `**`, an escaped character). Every pattern compiles to the same regex.
 
 ### Consequences
 

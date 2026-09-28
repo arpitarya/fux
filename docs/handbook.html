@@ -361,7 +361,7 @@ body.present #progress{display:block}
       <ul class="tight">
         <li>The repo, a wiki, a web page</li>
         <li>The text is read, counted, then dropped</li>
-        <li>One narrow exception: an explicit per-source <code>snapshot</code> policy (L2)</li>
+        <li>One narrow exception: an explicit per-source <code>snapshot</code> policy (L3)</li>
       </ul>
     </div>
     <div class="card">
@@ -759,7 +759,7 @@ body.present #progress{display:block}
         <text x="48" y="864" font-size="11" fill="var(--d-body)">never cited, and nothing noticed. It buys RECALL, not correctness: a changed document could never be mis-answered, only fail to surface.</text>
 
         <line x1="48" y1="886" x2="1192" y2="886" stroke="var(--d-rule)" stroke-width="1"/>
-        <text x="48" y="908" font-size="10.5" fill="var(--d-body)">L1 stdlib only · L2 no durable content · L3 deterministic — the sort, not the loop · L4 offline by default · L6 say "index" · L7 Python ≥ 3.11 · L8 no use record committed</text>
+        <text x="48" y="908" font-size="10.5" fill="var(--d-body)">L2 stdlib only · L3 no durable content · L4 deterministic — the sort, not the loop · L5 offline by default · L6 say "index" · L7 Python ≥ 3.11 · L9 no use record committed</text>
       </svg>
     </div>
   </figure>
@@ -826,7 +826,7 @@ body.present #progress{display:block}
 
         <rect x="40" y="182" width="1120" height="46" rx="9" fill="var(--d-warn-bg)" stroke="var(--d-warn)" stroke-width="1.5"/>
         <text x="58" y="203" font-size="11.5" fill="var(--d-ink)" font-weight="700">Then the text is GONE.</text>
-        <text x="196" y="203" font-size="11.5" fill="var(--d-body)">Never written to .fux/, never cached, never committed — that is L2.</text>
+        <text x="196" y="203" font-size="11.5" fill="var(--d-body)">Never written to .fux/, never cached, never committed — that is L3.</text>
         <text x="58" y="221" font-size="11" fill="var(--d-body)">It is why the index can live in a repo cloned by people whose document permissions differ from yours.</text>
       </svg>
     </div>
@@ -938,12 +938,12 @@ body.present #progress{display:block}
     document's <em>prose</em>; it always reveals its <em>name</em>.
     <br><br>
     <strong>This was a per-source policy until fux 3.x and is not one any more.</strong>
-    <code>meta = hashed</code> was the enforced default for non-git sources (law L5): the record
+    <code>meta = hashed</code> was the enforced default for non-git sources (law ex-L5): the record
     carried a single <code>title_h</code>, with the readable title only in a gitignored display
-    cache. <strong>W-194 deleted the mechanism and retired L5</strong>, so the ACL-mismatch leak it
+    cache. <strong>W-194 deleted the mechanism and retired ex-L5</strong>, so the ACL-mismatch leak it
     closed — a title alone telling a reader that a document they cannot open exists — is now an
     <strong>accepted exposure</strong>. Keep a value out of the index with
-    <code>.fux/pii.toml</code>, or do not index the page. See SR-RECORD and SR-LAW-5.
+    <code>.fux/pii.toml</code>, or do not index the page. See SR-RECORD and ex-SR-LAW-5.
   </div>
   </figure>
 </section>
@@ -1062,7 +1062,7 @@ body.present #progress{display:block}
         <line x1="676" y1="230" x2="700" y2="230" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#v-a)"/>
         <line x1="896" y1="230" x2="920" y2="230" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#v-a)"/>
 
-        <text x="30" y="288" font-size="11" fill="var(--d-body)">A line range can only be computed by chunking the FETCHED bytes. The index holds statistics, not text — it has nothing to count lines in. The split is L4 showing through the surface.</text>
+        <text x="30" y="288" font-size="11" fill="var(--d-body)">A line range can only be computed by chunking the FETCHED bytes. The index holds statistics, not text — it has nothing to count lines in. The split is L5 showing through the surface.</text>
       </svg>
     </div>
   </figure>
@@ -1187,7 +1187,7 @@ application code. The alternative was a library in every service.
         <li>Text before the first heading is its own passage — a preamble is content, and dropping it
           silently is how the one sentence that answers the question disappears.</li>
         <li><strong>The passages are transient</strong>: never written to <code>.fux/</code>, never
-          cached, never indexed. That is L2.</li>
+          cached, never indexed. That is L3.</li>
         <li>It also makes the byte budget honest — chunking runs on fetched bytes, so the assembler
           knows every candidate's real size instead of estimating it. A web-scale system has to guess
           here; this one does not.</li>
@@ -1332,8 +1332,8 @@ fux doctor</code></pre>
     <li>It is a <strong>pure function of what ranking already produced</strong> — the query's term
       hashes, the <code>df</code> statistics BM25F needed anyway, the scored list, and (on
       <code>answer</code> only) the refer plane's verdict.</li>
-    <li><strong>Nothing in it fetches, samples, calls a model, or reads a clock.</strong> L1, L3 and
-      L4 are untouched.</li>
+    <li><strong>Nothing in it fetches, samples, calls a model, or reads a clock.</strong> L2, L4 and
+      L5 are untouched.</li>
   </ul>
 </section>
 
@@ -1557,7 +1557,7 @@ answerable = (band ≠ none)</code></pre>
       <em>nameable</em> defect, which is what <code>partial</code> means. A <code>weak</code> result
       has nothing identifiably wrong; the ranking simply cannot choose.</li>
     <li><strong>Nothing above fetches, samples, calls a model or reads a clock.</strong> Every input
-      is something ranking already produced, which is why L1, L3 and L4 are untouched.</li>
+      is something ranking already produced, which is why L2, L4 and L5 are untouched.</li>
   </ul>
 
   <details class="more">
@@ -1890,7 +1890,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
         <td>A measured run is filed without its <code>blind</code>/<code>informed</code>
           classification, or a verdict is written as an SR instead of a <code>VERDICT.md</code>.</td></tr>
       <tr><td>Import fences</td>
-        <td>Anything under <code>src/fux/</code> imports a network library. L4 is asserted, not
+        <td>Anything under <code>src/fux/</code> imports a network library. L5 is asserted, not
           trusted.</td></tr>
       <tr><td><code>test_windows_console_safe.py</code></td>
         <td>A fancy dash reaches a Windows console's default codepage, where <code>print()</code>
@@ -2183,7 +2183,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
         <text x="58" y="636" font-size="11.5" fill="var(--d-ink)" font-weight="600">same `ver`, different bytes</text>
         <text x="600" y="636" font-size="11.5" fill="var(--d-warn)" font-weight="600">REFUSED — one side ingested content the other did not have</text>
 
-        <text x="40" y="678" font-size="11" fill="var(--d-body)">Output is re-sorted by id, so two machines merging the same three inputs produce the same bytes. Without that, the driver would be a hole in L3 the size of every shared repo.</text>
+        <text x="40" y="678" font-size="11" fill="var(--d-body)">Output is re-sorted by id, so two machines merging the same three inputs produce the same bytes. Without that, the driver would be a hole in L4 the size of every shared repo.</text>
       </svg>
     </div>
     <figcaption>Green resolves, orange refuses. On refusal the driver writes ordinary conflict markers
@@ -2216,7 +2216,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
       <strong>third-party parsing libraries</strong>.</li>
     <li>Each is a file <em>the consumer</em> writes, committed in their repo, that fux loads by path
       and never rewrites.</li>
-    <li>That is how <code>src/fux/</code> stays stdlib-only (L1) and offline by default (L4).</li>
+    <li>That is how <code>src/fux/</code> stays stdlib-only (L2) and offline by default (L5).</li>
   </ul>
 
   <figure>
@@ -2626,22 +2626,23 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
   <p class="lede">Not guidelines. Every record cites them by number and none restates them — a
   paraphrase drifts, and a drifted paraphrase in an accepted record reads as authority.</p>
 
-  <div class="law"><b>L1</b><span><strong>$0, stdlib-only runtime.</strong> No third-party runtime
+  <div class="law"><b>L2</b><span><strong>$0, stdlib-only runtime.</strong> No third-party runtime
     dependency. The frontmatter parser and every codec are hand-rolled on purpose.</span></div>
-  <div class="law"><b>L2</b><span><strong>Content is never durable outside its source system.</strong>
+  <div class="law"><b>L3</b><span><strong>Content is never durable outside its source system.</strong>
     The index holds statistics, never content. The single exception is an explicit per-source
     <code>snapshot</code> policy. The whole architecture rests on this.</span></div>
-  <div class="law"><b>L3</b><span><strong>Deterministic — no model in the maintenance path.</strong>
+  <div class="law"><b>L4</b><span><strong>Deterministic — no model in the maintenance path.</strong>
     Same sources produce a byte-identical index. Nothing calls a model to build one.</span></div>
-  <div class="law"><b>L4</b><span><strong>Offline by default.</strong> Network access only inside
+  <div class="law"><b>L5</b><span><strong>Offline by default.</strong> Network access only inside
     explicit, fenced, opt-in paths — <code>fux add &lt;URL&gt;</code> and <code>fux ingest</code>.</span></div>
-  <div class="law"><b>L5</b><span><s><strong>Hashed meta is the default</strong> for non-git
+  <div class="law"><b>ex-L5</b><span><s><strong>Hashed meta is the default</strong> for non-git
     sources, enforced at write time.</s> <strong>RETIRED in 3.x</strong> — the mechanism was
     deleted and the ACL-mismatch leak it closed is now an accepted exposure. The handle is never
-    reused; there are ten live laws and twelve numbers.</span></div>
+    reused until the 2026-09-28 renumber; <b>L5</b> now names offline by default.</span></div>
   <div class="law"><b>L6</b><span><strong>Say "index", not "db".</strong> Load-bearing vocabulary.</span></div>
-  <div class="law"><b>L7</b><span><strong>Python ≥ 3.11.</strong></span></div>
-  <div class="law"><b>L8</b><span><strong>A use record is never committed.</strong> Fux may record
+  <div class="law"><b>L7</b><span><strong>Python ≥ 3.12.</strong></span></div>
+  <div class="law"><b>L8</b><span><strong>Node ≥ 22.</strong> The Node read plane's floor, L7's twin.</span></div>
+  <div class="law"><b>L9</b><span><strong>A use record is never committed.</strong> Fux may record
     what was asked and what was answered — <strong>in plaintext, with no law-level size bound</strong>
     — and may print a per-answer provenance receipt on stdout. Every durable trace of use lives on a
     <em>gitignored path</em> and never reaches a committed byte.</span></div>
@@ -2652,7 +2653,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
     the tenant. Deterministic means compliance-grade reproducibility.
   </div>
   <div class="note warn">
-    <strong>L8 is the one law that moved, and it moved three times in a day.</strong> Written,
+    <strong>L9 is the one law that moved, and it moved three times in a day.</strong> Written,
     reverted, then narrowed to commits alone (Arpit, 2026-08-27). Hashing, the size bound, the stdout
     prohibition and a transmission clause were all in earlier drafts and <strong>none survives</strong>
     — if you have read an older copy of this handbook, that is the paragraph it got wrong.
@@ -2663,7 +2664,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
     gap the last one leaves open.
   </div>
   <div class="note">
-    <strong>L2 governs the corpus; L8 governs the record of who went looking in it.</strong> A query
+    <strong>L3 governs the corpus; L9 governs the record of who went looking in it.</strong> A query
     is not content, and no other law reached it.
   </div>
 </section>

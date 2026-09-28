@@ -3,8 +3,8 @@
 ## The decision that shapes this whole plane
 
 The obvious reading of M4's "HTTP + Confluence adapters" is *put an HTTP client
-in the refer plane*. That would breach three things at once — L1 (`$0`,
-stdlib-only runtime), L4 (offline by default), and the adapter cap.
+in the refer plane*. That would breach three things at once — L2 (`$0`,
+stdlib-only runtime), L5 (offline by default), and the adapter cap.
 
 The engine already solved this. **SR-FETCHER established that the consumer
 owns the fetcher file**: fux loads it by path and calls

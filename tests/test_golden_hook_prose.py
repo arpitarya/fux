@@ -54,7 +54,7 @@ from test_golden_key_guards import (  # noqa: F401  (import triggers the shared 
 
 # 🔴 **The LOCKED state, and now that is a thing that can be false.**
 # W-209 said so when the file was written — *"under W-204's switch the test runs
-# against the locked state"* — and [L11](../records/0012_LAW-11-sealed-answer-key.md)
+# against the locked state"* — and [L11](../records/0013_LAW-11-sealed-answer-key.md)
 # decision 14 built the switch. While the tree is unlocked the two hooks are
 # deregistered, so a `Bash` command spelling a key path is **allowed**, and every
 # assertion here describes a tree that is not the one on disk.

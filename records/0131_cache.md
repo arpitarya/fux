@@ -8,9 +8,9 @@ status: accepted
 date: 2026-08-21
 feature: the refer plane's two caches, and the wall between them
 owns: [src/fux/refer/arc.py@838fb07d8fc5, src/fux/refer/fetchcache.py@de1ecde351de]
-laws: [L1, L2, L3, L5]
+laws: [L2, L3, L4, ex-L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: e9b8d6eecaae11de27c57bcbfa0eeee76f2eaef04ccf6f2fe927a556d0f35395
+content_sha: 1aecc9a5b58a282b1d278a67b7891d5c2966ab67fc5dde1bba9211c733c156e5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -133,8 +133,8 @@ of them can be proven not to change an answer.
 
 **Caching is a separate mechanism from the plane that uses it**, which is why it
 is a separate record: a different failure mode (a wrong answer, or a leaked
-byte, rather than a missing citation), a different law surface (L2 and L5, not
-just L3), and two files that a future change will touch together and touch
+byte, rather than a missing citation), a different law surface (L3 and ex-L5, not
+just L4), and two files that a future change will touch together and touch
 alone. The replacement-policy fork was settled in
 [`cache-policy.compare.md`](../archive/compare/cache-policy.compare.md), and the
 TTL fork in
@@ -171,7 +171,7 @@ permanent. ~150 LOC from the FAST '03 paper; the IBM patent has expired.
 
 **4. ARC reads no clock.** Recency is a monotonic ordering over the four lists,
 never a timestamp. A cache that reads the clock makes the engine's output
-depend on when it ran, and L3 has no exception for "only in the cache".
+depend on when it ran, and L4 has no exception for "only in the cache".
 
 **5. ARC is bounded in bytes, and so are its ghosts.** `max_bytes` bounds live
 content; a single object larger than the whole budget is never admitted rather
@@ -186,13 +186,13 @@ disable check runs **first and unconditionally** in `get()`, so a caller who
 never opted in cannot be served a cached byte by any code path.
 `Policy.no_cache` refuses caching outright whatever the TTL says: the escape
 hatch for access-controlled and regulated sources, where a local copy outliving
-the reader's permission is the risk L5 exists for. The TTL, when a caller does
+the reader's permission is the risk ex-L5 exists for. The TTL, when a caller does
 opt in, is **300 s**.
 
-**This does not touch L2's single exception** (the per-source `snapshot`
-policy). L2 forbids *durable* content; this store is deliberately the opposite
+**This does not touch L3's single exception** (the per-source `snapshot`
+policy). L3 forbids *durable* content; this store is deliberately the opposite
 — unindexed, gitignored, TTL-bounded, default-off, and confined to one machine.
-Nothing here is ever committed, so there is nothing for L2 to except.
+Nothing here is ever committed, so there is nothing for L3 to except.
 
 **7. `cached` is a fourth verdict and is never folded into `current`.** A TTL
 hit is a distinct epistemic position — *we looked recently* — and it carries its
@@ -241,7 +241,7 @@ comparison against a live source.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -251,9 +251,9 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**A cache entry's file name is `constants.toml [refer] cache_key_hex` hex digits of the loc's sha256** (32), and the ARC ghost lists hold `max_bytes // [refer] arc_ghost_bytes` keys (64). Both are fixed: a changed key width orphans every cached file. The TTL and size tunables are stage 5e's. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**A cache entry's file name is `constants.toml [refer] cache_key_hex` hex digits of the loc's sha256** (32), and the ARC ghost lists hold `max_bytes // [refer] arc_ghost_bytes` keys (64). Both are fixed: a changed key width orphans every cached file. The TTL and size tunables are stage 5e's. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
-**`FetchCache` takes `max_bytes` from its caller**, which reads `fux.toml [refer] fetch_cache_max_bytes` ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). `DEFAULT_TTL_SECONDS` is deleted: the TTL arrives per call as `--cache-ttl` and 0 (off) is its only default; 300 s stays the recommendation, never a fallback ([L12](0013_LAW-12-values-live-in-config.md) decision 9a).
+**`FetchCache` takes `max_bytes` from its caller**, which reads `fux.toml [refer] fetch_cache_max_bytes` ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). `DEFAULT_TTL_SECONDS` is deleted: the TTL arrives per call as `--cache-ttl` and 0 (off) is its only default; 300 s stays the recommendation, never a fallback ([L12](0014_LAW-12-values-live-in-config.md) decision 9a).
 
 ### Consequences
 

@@ -27,7 +27,7 @@ neither.
    `AttributeError` into the broad handler that keeps a daemon alive. It
    started, wrote its pid, wrote `"failed"` to a status file nobody diffed, and
    **indexed nothing**, looking healthy the whole time.
-4. ⚠ **`tests/refer/test_refer_plane.py` silently weakened L4's network import
+4. ⚠ **`tests/refer/test_refer_plane.py` silently weakened L5's network import
    fence.** It reads `from fux.refer import ... assemble, chunk, rescore` and
    feeds each to `inspect.getsource`, believing it is scanning three modules for
    `urllib` / `socket` imports. It was scanning **three functions' bodies**.

@@ -65,11 +65,11 @@ recording ids for the runner to pick up. That makes it a **second writer**, so:
   `fux doctor` reports it and an explicit `fux ingest` takes over. **Nothing
   here silently decides a lock is dead.**
 
-## L3 is not weakened, and the argument is §3.2's
+## L4 is not weakened, and the argument is §3.2's
 
 A partial refresh means the `url:` half of the index holds documents fetched at
 different moments. **It already did** — every record carries whatever its last
-fetch produced, and no two were necessarily fetched together. L3 is *same
+fetch produced, and no two were necessarily fetched together. L4 is *same
 sources → same bytes*, and **a URL is not the same source twice**. The daemon
 changes the spread of those moments, not the kind of object the index is.
 
@@ -93,7 +93,7 @@ from . import runner
 from ..constants import fixed
 
 #: All three live in the gitignored runtime plane. Nothing the daemon writes is
-#: ever committed — that is L2 and L3 both, and it is why there is no
+#: ever committed — that is L3 and L4 both, and it is why there is no
 #: `daemon.toml` or committed state file anywhere in this module.
 PID_NAME = fixed("maintain", "daemon_pid")
 STOP_NAME = fixed("maintain", "daemon_stop")

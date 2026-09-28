@@ -18,8 +18,8 @@ that actually failed.
 
 ## Four things this module refuses to do, and why each one matters
 
-- **It never learns from what anyone clicked.** L8 forbids a committed use
-  record and L3 forbids a model in the maintenance path. A correction is a
+- **It never learns from what anyone clicked.** L9 forbids a committed use
+  record and L4 forbids a model in the maintenance path. A correction is a
   **signed human edit in a diff**, which is the opposite thing: somebody
   decided it, in public, and a reviewer can disagree.
 - **It refuses a negative correction.** *"Don't serve X for this"* is not a
@@ -29,7 +29,7 @@ that actually failed.
   reason for it is gone, and nothing ever says so.
 - **It writes no date of its own.** `generated:` for a file this command
   creates is derived from **the document's own committed `mtime`**, never from
-  the wall clock — L3's rule as
+  the wall clock — L4's rule as
   [CLAUDE.md](../../CLAUDE.md) §Hard-won states it. Two runs of this command a
   week apart on an unchanged document produce byte-identical bytes.
 - **It changes no ranking weight.** A correction bites because `ctx` is already
@@ -80,7 +80,7 @@ __all__ = [
     "save_corrections",
 ]
 
-#: Committed — **it is the human's own claim, not a record of use** (L8). A
+#: Committed — **it is the human's own claim, not a record of use** (L9). A
 #: correction says *this question should reach this document*; nothing here
 #: says anybody ran a query.
 CORRECTIONS_FILE = fixed("files", "corrections")
@@ -218,7 +218,7 @@ _HEADER = (
     "# question\tdoc_id\tloc\tsource_sha\tpin\n"
     "#\n"
     "# COMMITTED, and it is the human's own claim rather than a record of use\n"
-    "# (L8): a row says *this question should reach this document*, never that\n"
+    "# (L9): a row says *this question should reach this document*, never that\n"
     "# anybody ran a query. Written by `fux correct`; sorted, so a review diff\n"
     "# does not depend on the order corrections were filed.\n"
     "#\n"
@@ -356,7 +356,7 @@ def _set_frontmatter_key(front: str, key: str, value: str) -> str:
 
     Written by hand rather than through a YAML writer for the reason
     `enrich.parse_frontmatter` is a hand parser: the key set is closed and flat,
-    and adopting a dependency to write one line is the L1 trade this design
+    and adopting a dependency to write one line is the L2 trade this design
     refuses. **The block's other lines are left byte-identical**, because this
     file is prose a human reviews in a diff.
     """

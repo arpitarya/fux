@@ -1,9 +1,9 @@
 """The canonical writer: records in, deterministic shard files out.
 
-## L5 was enforced here, at write time, and the law retired on 2026-09-20
+## ex-L5 was enforced here, at write time, and the law retired on 2026-09-20
 
 **Hashed meta was the default for non-git sources, enforced at write time**
-(L5). Until M5 that enforcement lived in `ingest/run.py`, which is to say it
+(ex-L5). Until M5 that enforcement lived in `ingest/run.py`, which is to say it
 lived in *one caller* — so it was a convention that happened to hold rather
 than a property of the index. The move here was right: any second writer (an
 enrichment pass, a migration script, a test fixture, a consumer using the
@@ -12,17 +12,17 @@ file, and nothing would have said no.
 
 It closed an **ACL-mismatch leak**: a document readable by fifty people inside
 Confluence becomes a title readable by everyone with the repo. **That leak is
-real and is now accepted.** L5 was not wrong about it; it lost on cost.
+real and is now accepted.** ex-L5 was not wrong about it; it lost on cost.
 
 ⚠ **W-194, 2026-09-20 — THE RULE IS GONE, and so is `assert_meta_policy`.**
 Arpit ruled `meta=hashed` deleted outright: every record now carries plain
-display text, `meta` and `title_h` no longer exist, and **law L5 retires with
+display text, `meta` and `title_h` no longer exist, and **law ex-L5 retires with
 the mechanism**. What the check enforced cannot be violated by a shape that no
 longer exists.
 
-🔴 **The leak L5 closed is now an ACCEPTED, DOCUMENTED EXPOSURE, not a solved
+🔴 **The leak ex-L5 closed is now an ACCEPTED, DOCUMENTED EXPOSURE, not a solved
 problem** — a title alone tells a reader that a document they cannot open
-exists. [SR-LAW-5](../../../archive/records/0007_LAW-5-hashed-meta.md) is kept at
+exists. [ex-SR-LAW-5](../../../archive/records/0007_LAW-5-hashed-meta.md) is kept at
 `status: superseded` with its reopen trigger and its citation, because a reopen
 is cheaper than a rediscovery.
 

@@ -21,7 +21,7 @@ the half of that run that carried the finding.
 That is a question about *movement*, not about *correctness*, so it is decided
 entirely by `{"id", "question"}` — the 124 rows of
 `work/golden/questions/questions.jsonl` — and never by the sealed key
-([L11](../../records/0012_LAW-11-sealed-answer-key.md)). A discordant count is
+([L11](../../records/0013_LAW-11-sealed-answer-key.md)). A discordant count is
 arithmetic on two rank lists; which of them is *better* is Codex's to score and
 is deliberately not computed here.
 

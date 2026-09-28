@@ -8,7 +8,7 @@ flowchart LR
   PM["post-merge → re-ingest<br/>post-checkout → rebuild derived"]:::act
   MD["fux-merge-index driver<br/>line-by-line last-writer-wins on (ver, sha)<br/>refuses in four cases, both sides intact"]:::act
   DA["fux daemon (human-started only)<br/>sweeps url: sources every 60 min"]:::act
-  L["never blocks · never touches the network · best-effort (L4)"]:::law
+  L["never blocks · never touches the network · best-effort (L5)"]:::law
   C --> PC --> RN
   C --> PM
   C -. "merge conflict on .fux/index" .-> MD

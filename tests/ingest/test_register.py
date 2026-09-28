@@ -40,7 +40,7 @@ def _ingest(root: Path) -> None:
 # --- the rule ---------------------------------------------------------------
 
 def test_two_ingests_write_the_register_once(tmp_path):
-    """🔴 L3, and the whole argument for committing this file.
+    """🔴 L4, and the whole argument for committing this file.
 
     The first run indexes every document and the second reuses every one — from
     identical sources. If any run-shaped value reached the file, these bytes
@@ -86,7 +86,7 @@ def test_it_names_every_indexed_document_and_nothing_else(tmp_path):
 
 
 def test_it_carries_no_clock_and_no_run_id(tmp_path):
-    """L3, asserted on the bytes rather than on the writer's intentions."""
+    """L4, asserted on the bytes rather than on the writer's intentions."""
     root = _repo(tmp_path)
     _ingest(root)
     text = register.path_for(root).read_text(encoding="utf-8")
@@ -97,11 +97,11 @@ def test_it_carries_no_clock_and_no_run_id(tmp_path):
 
 
 def test_it_never_grows_a_query_field():
-    """🔴 [L8](../../records/0010_LAW-8-use-record.md) is the reason this file may
+    """🔴 [L9](../../records/0011_LAW-9-use-record.md) is the reason this file may
     be committed at all: it records what the CORPUS is, never who went looking.
 
     The moment a column names a question, a query or a reader, a committed path
-    is carrying a use record — the one thing L8 forbids. The field list is
+    is carrying a use record — the one thing L9 forbids. The field list is
     asserted here so that adding one is a deliberate act with a failing test in
     front of it.
     """

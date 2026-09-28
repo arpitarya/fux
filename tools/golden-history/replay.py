@@ -42,7 +42,7 @@ Tab-separated, `#` comments, one row per commit **of one document**:
   past state of a document, not a document; indexing it would put two versions
   of one fact in the corpus.
 
-## Determinism (L3)
+## Determinism (L4)
 
 Commits are grouped by `(date, author)` and ordered by date, then author, then
 path — no clock, no set order, no environment. The default author's commits keep

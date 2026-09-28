@@ -11,14 +11,14 @@ already ships ([SR-EXPAND](../../records/0149_expand.md)).
 
 🔴 **No model is anywhere in it.** The pair is a regular-expression match on a
 document's own text, analyzed by the one shared analyzer and hashed in the same
-currency as `terms` ([L3](../../records/0005_LAW-3-deterministic.md)).
+currency as `terms` ([L4](../../records/0006_LAW-4-deterministic.md)).
 
 ## Three halves, each in the one place it can live
 
 | half | where | why there |
 |---|---|---|
 | **mine** | `mine()`, called by `ingest/extract.py` | a function of ONE document's bytes, so it is carried forward on an unchanged sha like `terms` |
-| **commit** | the record's own `abbr` property, hashes only | 🔴 *a committed per-document byte is a function of that document alone* (W-168 §RULED 2026-09-15); hashes are statistics, not content ([L2](../../records/0004_LAW-2-content-never-durable.md)) |
+| **commit** | the record's own `abbr` property, hashes only | 🔴 *a committed per-document byte is a function of that document alone* (W-168 §RULED 2026-09-15); hashes are statistics, not content ([L3](../../records/0005_LAW-3-content-never-durable.md)) |
 | **fold** | `fold()`, over the union of every record's pairs | the table is corpus-wide, so it is rebuilt at read time — by `table_from_shards` on the scan, by the accelerator's derived `mined.json` on `--fast` — and **committed nowhere** |
 
 ## The shipped weight is `0.5`, MEASURED; `0.0` is the engine before this module

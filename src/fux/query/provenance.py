@@ -2,8 +2,8 @@
 
 🔴 **NOT `fux.ingest.ingestlog`, which is the opposite of this file.** That one
 is W-200's **ingest ledger** — what decoder and fetcher produced each *record* —
-and it records nothing about a query, which is why L8 does not reach it. **This
-file is about what somebody ASKED**, so L8 does. `tests/test_doctor_provenance.py`
+and it records nothing about a query, which is why L9 does not reach it. **This
+file is about what somebody ASKED**, so L9 does. `tests/test_doctor_provenance.py`
 fences the query plane off from the other one by fully qualified name.
 
 Fux already tells a caller **what** it used (the citation, with a `sha`) and
@@ -22,7 +22,7 @@ query against that receipt and reports whether the answer still reproduces.
 
 That is the in-toto/SLSA shape (envelope → statement → predicate, subject named
 by digest) rather than the logging shape, and it is the shape fux can actually
-support: **fux is deterministic (L3), so a receipt is not a story about the
+support: **fux is deterministic (L4), so a receipt is not a story about the
 past, it is a re-runnable claim.**
 
 ⚠ **The four-state verdict is the load-bearing part, and it is not a boolean.**
@@ -43,9 +43,9 @@ knew. A receipt is *by construction* a claim about a past moment, so
 Folding `unverifiable` into `drifted` would be the fourth instance of the
 defect, and folding it into `reproduced` would be the first *dangerous* one.
 
-## L8, and why this module may write plaintext
+## L9, and why this module may write plaintext
 
-L8 was written on the morning of 2026-08-27 and **reverted by Arpit the same
+L9 was written on the morning of 2026-08-27 and **reverted by Arpit the same
 day**: a use record may now carry the question and the answer in plaintext,
 because a log nobody can read answers no question anyone asks of it. What
 survives is confinement — the journal lives in `.fux/runtime/`, which
@@ -65,7 +65,7 @@ repository — the second reviewable in git rather than by watching a terminal.
 ⚠ **NOT `.fux/tune.toml`**, which this docstring claimed until 2026-09-13 and
 which the ruling explicitly REJECTED as option (c): `tune.toml` is the ranking
 file and journalling is not ranking. `journal_max` bounds it. The bound is a
-*design default*, not a law — L8 no longer requires one, and Arpit's standing
+*design default*, not a law — L9 no longer requires one, and Arpit's standing
 rule is to state the cost rather than clamp the knob.
 
 ## What the derivation may claim, and what it may not
@@ -152,8 +152,8 @@ from ..constants import fixed
 #:
 #: ⚠ **Keyless signing is the right answer and fux cannot have it.** Sigstore
 #: shifts the trust anchor from key management to identity management, and needs
-#: a network (L4), an OIDC identity, a transparency-log service (`$0`) and
-#: non-stdlib dependencies (L1) — four constraints at once.
+#: a network (L5), an OIDC identity, a transparency-log service (`$0`) and
+#: non-stdlib dependencies (L2) — four constraints at once.
 STATEMENT_TYPE = fixed("receipt", "statement_type")
 
 #: What kind of claim the `predicate` carries. A TypeURI, versioned separately
@@ -170,7 +170,7 @@ LEGACY_SCHEMA = fixed("receipt", "legacy_schema")
 JOURNAL_NAME = fixed("receipt", "journal")
 
 #: The bound on journalled receipts is `.fux/output.toml [cli.answer]
-#: journal_max` — a *design* value, not a law: L8 as reverted requires
+#: journal_max` — a *design* value, not a law: L9 as reverted requires
 #: confinement, not a size. The oldest entries are dropped, because the value of
 #: a use record is overwhelmingly in the recent tail.
 
@@ -749,11 +749,11 @@ def receipt(
     was passed**, never "unknown": the key is written only when there was one,
     the same additive rule every other optional key here follows (W-48).
 
-    ⚠ **L8, and the reason this is legal.** An expansion is a *use record* —
+    ⚠ **L9, and the reason this is legal.** An expansion is a *use record* —
     what someone asked and how — so it lives on the receipt and the journal,
     both gitignored, and reaches no committed byte.
 
-    ⚠ **No wall clock.** L3 forbids one on a deterministic path and, more
+    ⚠ **No wall clock.** L4 forbids one on a deterministic path and, more
     practically, a timestamp would make two receipts for the same answer
     differ, which defeats the whole point of a re-runnable claim. The caller
     who wants a time stamps it on the outside — the same rule the runtime
@@ -833,7 +833,7 @@ def journal_path(root: Path) -> Path:
 def remember(root: Path, payload: dict, *, max_entries: int) -> None:
     """Append a receipt to the local journal. **Never raises.**
 
-    Gitignored, local, never transmitted — the whole of what L8 still requires.
+    Gitignored, local, never transmitted — the whole of what L9 still requires.
     Rewrites the file when the bound is exceeded rather than appending forever;
     at the default that is a few hundred kilobytes and one rewrite per thousand
     answers, which is cheaper than any rotation scheme worth its complexity.

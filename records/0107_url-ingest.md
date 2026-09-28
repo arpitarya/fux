@@ -8,9 +8,9 @@ status: accepted
 date: 2026-08-18
 feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
-laws: [L2, L4, L5]
+laws: [L3, L5, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d49b6cc44855bc6dbad1ac1dcb8a0636fca2b4f3710a3b82bb96e5937c252b5b
+content_sha: 3f65b2b8b11b26960735d33c833d0855c3e29574e391c0f1895890f67e20d0d5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -136,14 +136,14 @@ that drifts. What follows is what this record owns: how URL ingestion
 
 **2. Fetching happens only under a named fenced path.** There are two —
 `fux add <URL>`, scoped to the URL just added, and `fux ingest`. **The count is
-not the rule**; being named and fenced is (L4,
+not the rule**; being named and fenced is (L5,
 [SR-CLI](0101_cli-surface.md) decision 1d).
 
 ⚠ **This clause said *a plain ingest never imports the fetcher* until
 2026-09-15.** `fux ingest` absorbed `fux update` (SR-CLI decision 16), so the
 bare verb is the second fenced path rather than the offline one. **The offline
 ingest still exists and is still fenced-out by construction** — it is
-`fux ingest --no-fetch`, it is what the git hooks run, and it is what the L4
+`fux ingest --no-fetch`, it is what the git hooks run, and it is what the L5
 import test now pins. A run with nothing to fetch still carries every listed
 `url:` record forward byte-identically.
 
@@ -179,7 +179,7 @@ the already-text branch.
   `_TYPE_EXT` and the URL-suffix fallback are `fux add`'s tools now
   (`propose_decoder`), where they run **once**. What was a heuristic executed on
   every ingest is a committed line, which is the difference between
-  [L3](0005_LAW-3-deterministic.md) resting on a server being consistent and L3
+  [L4](0006_LAW-4-deterministic.md) resting on a server being consistent and L4
   resting on a file.
 - **A stem naming no module is a recorded skip, not a crash**, with the
   `_bind` message shape — and `fux doctor`'s `url decoders` row reports it
@@ -197,17 +197,17 @@ the already-text branch.
 
 **7. ⚠ DELETED 2026-09-20 (Arpit, W-194).** This read: *Hashed meta is the
 default for URL sources, and `plain` is an explicit per-source opt-in for public
-content (L5).* **`meta` is gone from `[sources.url]` and from the URL line
-grammar, `title_h` is gone from the record, `fux.index` is v4, and law L5
+content (ex-L5).* **`meta` is gone from `[sources.url]` and from the URL line
+grammar, `title_h` is gone from the record, `fux.index` is v4, and law ex-L5
 retires with the mechanism.** A URL record carries a plain `title` and
 `phrases`, exactly as a git record does. 🔴 **The ACL-mismatch leak this closed
 is an accepted, documented exposure** —
-[SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded, keeps the argument and the
+[ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded, keeps the argument and the
 reopen trigger.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -297,7 +297,7 @@ tail is never refreshed unless something else sweeps it."*
   the ruling.** `dirty.is_readable` draws the distinction; fail safe, not fail
   silent.
 - **The announcement always names `--refetch-all`**, and states what it is doing:
-  `fetching 1 of 7 listed URL(s) (network) — 1 known stale`. An L4 announcement
+  `fetching 1 of 7 listed URL(s) (network) — 1 known stale`. An L5 announcement
   that overstates the network is the one thing it may never do.
 - **A dirty URL that is no longer listed is not fetched.** The list is advisory
   and outlives edits to the source list; fetching a removed entry would
@@ -347,11 +347,11 @@ committed record changed, and which fetcher retrieved a document is still
 2026-09-27). Same extraction, same tracker, omitted when empty. The URL plane
 added nothing of its own.
 
-**Every `[sources.url]` key is required once the table is present** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27); its absence still means *fetch nothing*, and `fux doctor --fix` never adds it. `fetch_all` takes its bounds as required arguments ([SR-CONFIG](0113_config.md) decision 17).
+**Every `[sources.url]` key is required once the table is present** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27); its absence still means *fetch nothing*, and `fux doctor --fix` never adds it. `fetch_all` takes its bounds as required arguments ([SR-CONFIG](0113_config.md) decision 17).
 
-**A fetched document's decoder reads its caps from `.fux/formats.toml [limits.<decoder>]`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27), under the root the registry binds, like a walked one ([SR-DECODE](0139_decode.md)).
+**A fetched document's decoder reads its caps from `.fux/formats.toml [limits.<decoder>]`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27), under the root the registry binds, like a walked one ([SR-DECODE](0139_decode.md)).
 
-**The thin-page note, the failing streak and the parallelism note read `fux.toml [sources.url]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): `thin_words`, `thin_words_per_kb`, `failing_streak`, `parallel_warn_at` ([SR-CONFIG](0113_config.md) decision 18). The rate-limit retries and backoff stay NOT configurable, by ruling 12, and are `constants.toml [fetch]`. Every value is unchanged.
+**The thin-page note, the failing streak and the parallelism note read `fux.toml [sources.url]`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): `thin_words`, `thin_words_per_kb`, `failing_streak`, `parallel_warn_at` ([SR-CONFIG](0113_config.md) decision 18). The rate-limit retries and backoff stay NOT configurable, by ruling 12, and are `constants.toml [fetch]`. Every value is unchanged.
 
 ### Consequences
 

@@ -28,7 +28,7 @@ as if it were precise is misreading this file.**
 **By a hash of the query id, not by shuffling.** `sha256(id)` ordered, first 15
 sealed. That means:
 
-- **Deterministic (L3).** No seed to record, no `random` call, and the same 50
+- **Deterministic (L4).** No seed to record, no `random` call, and the same 50
   ids always produce the same 15.
 - **Independent of file order**, so re-sorting `queries.jsonl` cannot silently
   change which queries are sealed.

@@ -23,7 +23,7 @@
  *
  * The determinism discipline carries over unchanged: a **fixed iteration
  * count** instead of a convergence test, and **sorted traversal** so float
- * accumulation order is stable. Both are L3, not tidiness.
+ * accumulation order is stable. Both are L4, not tidiness.
  */
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
 import { fixed } from "../config/constants.mjs";

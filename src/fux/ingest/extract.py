@@ -43,7 +43,7 @@ from ..constants import fixed
 #: document's `Long Form (ABBR)` pairs. Redundant with the `_format` bump to
 #: v5, which already forces re-extraction; bumped anyway because the rule this
 #: constant enforces is about what this module returns, and it now returns more.
-RULES_VERSION = fixed("versions", "extract_rules")
+RULES_VERSION = fixed("versions", "extract_rules")  # not bumped by W-234: law handles in comments only
 
 import re
 from collections import Counter
@@ -195,7 +195,7 @@ def extract_fields(
     # other field**: by the time it reaches here a model has already run, in an
     # agent, in a separate command, and what fux consumes is a committed file.
     # Ingest stays a deterministic function of (sources union pinned
-    # enrichment), which is L3 with a wider input rather than a weaker one.
+    # enrichment), which is L4 with a wider input rather than a weaker one.
     #
     # Empty when a document has no enrichment -- which is the steady state for
     # most corpora and costs nothing: a per-field count of 0 is a trailing zero

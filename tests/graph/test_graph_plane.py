@@ -118,7 +118,7 @@ def test_a_stale_plane_is_refused_rather_than_answered_from(corpus):
 
 
 def test_the_plane_carries_no_content_only_relationships(corpus):
-    """L2, checked: the graph plane holds ids and grades, never document text."""
+    """L3, checked: the graph plane holds ids and grades, never document text."""
     text = (fmt.runtime_dir(corpus) / plane_mod.GRAPH_NAME).read_text()
     payload = json.loads(text)
     assert set(payload) == {"schema", "edges", "communities"}

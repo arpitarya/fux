@@ -35,18 +35,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Both LTS lines. V8's `Math.log` is a port of fdlibm rather than a
+        # Both supported LTS lines — L8 sets the floor at 22. V8's `Math.log` is a port of fdlibm rather than a
         # call into libm, so the Node version is the second axis and not a
         # formality — a V8 change is exactly what would move this number
         # without any glibc change.
-        node: ["20", "22"]
+        node: ["22", "24"]
 
     steps:
       - uses: actions/checkout@v5
 
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - uses: actions/setup-node@v5
         with:

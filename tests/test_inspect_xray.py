@@ -207,7 +207,7 @@ def test_a_rules_version_bump_recomputes_every_document(corpus, report, monkeypa
 
 
 # --------------------------------------------------------------------------
-# L3 — one document
+# L4 — one document
 
 
 def test_one_documents_xray_names_what_was_ingested_indexed_and_linked(corpus, report) -> None:

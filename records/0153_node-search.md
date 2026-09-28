@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@906411b0638e, src/fux/store/nodebundle.py@de287c53d973]
-laws: [L1, L3, L4, L6]
+owns: [node@089b9df4718b, src/fux/store/nodebundle.py@005723cb4f3c]
+laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: a44011740c265cd0cadc71535720492f63f5ca813d42e836b427363702ccdef6
+content_sha: 1b09222de2326d643a4818c8b74ff863b20171223fae5766e7d71fc8c32ac9f7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -434,10 +434,10 @@ distributions.** RULED by Arpit 2026-09-12 and **BUILT the same day**.
   The line narrows to **the consumer's end**, which is the end it was ever
   about. Fux's release has a bundler; nobody running `fux setup` does.
 - **The bundler is fux's own, zero-dependency, and deterministic** — same
-  sources, byte-identical bundle. [L1](0003_LAW-1-zero-cost.md) would permit a
+  sources, byte-identical bundle. [L2](0004_LAW-2-zero-cost.md) would permit a
   third-party one; nothing needs it. ⚠ **Determinism here is a promise adopted
-  voluntarily, not [L3](0005_LAW-3-deterministic.md) reaching a build
-  artefact** — L3 binds the index. Stated so nobody later cites the wrong
+  voluntarily, not [L4](0006_LAW-4-deterministic.md) reaching a build
+  artefact** — L4 binds the index. Stated so nobody later cites the wrong
   authority for it.
   ✅ **What it is:** [`src/fux/store/nodebundle.py`](../src/fux/store/nodebundle.py),
   ~300 lines of stdlib. Each source module becomes an **IIFE returning its
@@ -536,7 +536,7 @@ as well"* is the decision, not a courtesy.
 [SR-FETCHER](0117_fetcher.md) decision 5, and W-86 fork E's refusal of decoder
 auto-detection, both govern **ingest** — where detection would make **the
 index** a function of the environment, which is what
-[L3](0005_LAW-3-deterministic.md) forbids. **`fux setup`'s scaffolding is not
+[L4](0006_LAW-4-deterministic.md) forbids. **`fux setup`'s scaffolding is not
 the index.** Neither precedent reaches it and no law does; W-149 proposed
 *declared* on that mistaken reading and records the correction.
 
@@ -893,7 +893,7 @@ points. Node has no accelerator, so `maximum` has no twin.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -905,15 +905,15 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**`dirsFile` is strict** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `null` with no `fux.toml`, a `FuxError` in `config.py`'s words without `[sources] dirs_file` — the fallback to `.fux/sources/dirs` is gone. `node/test/config.test.mjs` holds all three cases ([SR-CONFIG](0113_config.md) decision 17).
+**`dirsFile` is strict** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `null` with no `fux.toml`, a `FuxError` in `config.py`'s words without `[sources] dirs_file` — the fallback to `.fux/sources/dirs` is gone. `node/test/config.test.mjs` holds all three cases ([SR-CONFIG](0113_config.md) decision 17).
 
-**`alreadyTextGlobs` stays tolerant of an absent `formats.toml`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27): the file is now required for `fux ingest`, but this read is on the query path, where the fallback costs a conservative skip and never a wrong citation ([SR-TYPES](0128_types-list.md) decision 14).
+**`alreadyTextGlobs` stays tolerant of an absent `formats.toml`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27): the file is now required for `fux ingest`, but this read is on the query path, where the fallback costs a conservative skip and never a wrong citation ([SR-TYPES](0128_types-list.md) decision 14).
 
-**The three transcriptions hold no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `hash/blake2b.mjs` reads RFC 7693's IV, message schedule, G steps, rotations and block layout from `constants.toml [blake2b]`, and does its carry, rotation and little-endian reads without a bare number. It matches `hashlib` and `node:crypto` on 154 inputs and is as fast as before (about 4 us per term key). `compat/pyfloat.mjs` reads CPython's `repr` thresholds from `[pyfloat]` and the sort-key resolution from `[ranking] score_digits`; it matches the old version on 2.4 million comparisons. `config/toml.mjs` cannot read the file it parses, so it measures its own tokens instead: TOML's escape widths are in its regexes, `Number` reads a `0x`/`0o`/`0b` prefix, and it exports `BOM`. It parses all 36 TOML inputs checked exactly as before.
+**The three transcriptions hold no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `hash/blake2b.mjs` reads RFC 7693's IV, message schedule, G steps, rotations and block layout from `constants.toml [blake2b]`, and does its carry, rotation and little-endian reads without a bare number. It matches `hashlib` and `node:crypto` on 154 inputs and is as fast as before (about 4 us per term key). `compat/pyfloat.mjs` reads CPython's `repr` thresholds from `[pyfloat]` and the sort-key resolution from `[ranking] score_digits`; it matches the old version on 2.4 million comparisons. `config/toml.mjs` cannot read the file it parses, so it measures its own tokens instead: TOML's escape widths are in its regexes, `Number` reads a `0x`/`0o`/`0b` prefix, and it exports `BOM`. It parses all 36 TOML inputs checked exactly as before.
 
-**The bundler holds no numeral**: its banner rules are `constants.toml [bundle] module_banner_width` and `surface_rule_width`, the import walk marks modules with two sets instead of `0/1/2`, and the checkout root is four `.parent`s up. HEAD's bundler and this one produce the same `fux.mjs` byte for byte. Node's verbs indent `--json` by `[json] indent`, and `store/reader.mjs`, `query/scan.mjs`, `refer/chunk.mjs`, `refer/source.mjs`, `correct.mjs` and `query/bm25f.mjs` lost their numerals as their Python twins did. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**The bundler holds no numeral**: its banner rules are `constants.toml [bundle] module_banner_width` and `surface_rule_width`, the import walk marks modules with two sets instead of `0/1/2`, and the checkout root is four `.parent`s up. HEAD's bundler and this one produce the same `fux.mjs` byte for byte. Node's verbs indent `--json` by `[json] indent`, and `store/reader.mjs`, `query/scan.mjs`, `refer/chunk.mjs`, `refer/source.mjs`, `correct.mjs` and `query/bm25f.mjs` lost their numerals as their Python twins did. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
 
 ### Consequences
 
@@ -1125,7 +1125,7 @@ this moved where they are written, not what they are.
   `blake2b(x, 64)[:8]` disagree on every input.
 - **A WASM build of the Python scorer** — one implementation and no
   transcription, at the price of a build step, a toolchain and a binary in the
-  repo. A build step is a dependency (L1), and the differential law is what
+  repo. A build step is a dependency (L2), and the differential law is what
   makes two implementations safe.
 
 ⚠ **Unchanged by W-220 (2026-09-23), and touched here only because the register

@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@6210d4ec321f, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@4828d8b0b5f3]
-laws: [L1, L2, L3, L6]
+owns: [src/fux/store@7c0c132cc246, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@4828d8b0b5f3]
+laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 985a154d8f74d48aa3be645f62341f9b8fbee9f0c13afd2f0713385886062d47
+content_sha: 4ae9805766b78658e380094b81052ed1fe2567b3f4ef1853f211f25b342c4d83
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -291,7 +291,7 @@ a `DISPLAY_FIELDS` tuple in `store/`, carried forward by an `EXTRACTED_FIELDS`
 tuple in `ingest/`, and described in prose by
 [SR-RECORD](0109_index-record.md). **Nothing compared them.** Adding a display
 field meant remembering a tuple in a different module, and forgetting was
-**silent**: the field shipped and L5's check simply did not look at it.
+**silent**: the field shipped and ex-L5's check simply did not look at it.
 
 Four properties hold it in place:
 
@@ -309,7 +309,7 @@ Four properties hold it in place:
   indistinguishable from *"this index predates plain titles"*.
 - ⚠ **`validate()` is deliberately not on the write path.** `canonical_dumps`
   already refuses floats, nulls and hostile text; a second gate on the hot path
-  would re-check what it guarantees. (⚠ `write_index`'s L5 meta policy was the
+  would re-check what it guarantees. (⚠ `write_index`'s ex-L5 meta policy was the
   other gate named here until W-194 deleted the rule and the law, 2026-09-20 —
   so there is one, not two.) It is a tool for
   tests and for callers building records by hand — and **a test asserts the
@@ -356,7 +356,7 @@ example is packed and round-tripped. **A test asserts every shape has one**,
 since a shape without an example is a shape somebody will guess at.
 
 **13. ⚠ RETIRED 2026-09-20 (Arpit, W-194), with the law it enforced.** This
-decision read: *L5 is enforced inside `write_index`, per record, before any
+decision read: *ex-L5 is enforced inside `write_index`, per record, before any
 shard is touched* — it had lived in one caller, so any second writer could have
 put a private document's title into a committed shard and nothing would have
 refused; a non-git record had to *state* `meta`, and a missing value was refused
@@ -368,8 +368,8 @@ call: a `hashed` record with no matching entry in
 placement argument is what survives and it is worth more than the rule was**:
 *a check that lives in one caller is a convention, not a property of the
 index* — which is why a future write-path rule belongs in `write_index` and
-nowhere else. The leak L5 closed is an accepted exposure
-([SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded).
+nowhere else. The leak ex-L5 closed is an accepted exposure
+([ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded).
 
 
 **14. `_format` bumped to `fux.index.v3` on 2026-09-15** (W-168 step 1), and
@@ -432,7 +432,7 @@ membership in `terms`.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -537,7 +537,7 @@ tripwire directly instead.
   upgrade** trips — named neither.
 - **There is no migrate verb and there is not going to be one.** The way out is
   deleting `.fux/index/` and re-ingesting, which is safe **because the index
-  holds statistics and never content** (L2 paying off), and the message now says
+  holds statistics and never content** (L3 paying off), and the message now says
   exactly that.
 - **A MISSING header is a different failure and says so.** No `_format` at all
   means the file is not a shard or the write was truncated. Telling someone to
@@ -559,9 +559,9 @@ the three to be merged, did not.
   a shard's contents beyond what it always did; a file with markers simply
   stops being mistaken for a truncated one.
 
-**`acquired.DEFAULT_MAX_BYTES` is deleted** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `evict` takes `max_bytes` as a required argument, read from `[sources.url] acquired_max_bytes` ([SR-ACQUIRED](0145_acquired-plane.md) decision 8, [SR-CONFIG](0113_config.md) decision 17).
+**`acquired.DEFAULT_MAX_BYTES` is deleted** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `evict` takes `max_bytes` as a required argument, read from `[sources.url] acquired_max_bytes` ([SR-ACQUIRED](0145_acquired-plane.md) decision 8, [SR-CONFIG](0113_config.md) decision 17).
 
-**A shard's one header line is `constants.toml [index] shard_header_lines`**, which every reader that numbers record lines now counts from; the writer's shard set is `range([index] shards)`, and Node's newline byte is `"\n".charCodeAt(0)`. No committed byte moved. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**A shard's one header line is `constants.toml [index] shard_header_lines`**, which every reader that numbers record lines now counts from; the writer's shard set is `range([index] shards)`, and Node's newline byte is `"\n".charCodeAt(0)`. No committed byte moved. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 
@@ -577,7 +577,7 @@ the three to be merged, did not.
   lets it be rebuilt aggressively.
 - **The invariant can refuse a build the user did not knowingly cause.** That is
   the correct trade, and it bit once: hashed URL records always tripped it, so
-  the L5 default shipped an index no build would accept. **The invariant was not
+  the ex-L5 default shipped an index no build would accept. **The invariant was not
   the bug; the field shape was.** Recorded here because the refusal *looks* like
   an accelerator defect and is not. ⚠ **The field, and the law that defaulted to
   it, were deleted on 2026-09-20** (W-194) — so the one case that ever bit is
@@ -588,7 +588,7 @@ the three to be merged, did not.
   runs, `store/reader.py` refuses the committed shards — loudly, by design,
   rather than returning a silently wrong ranking. On this repo the v2 migration
   discharged 434 records / 218 shards / 6.3 MB, and a delta run reproduces the
-  full run's shards byte for byte, so L3 holds on the migrated index.
+  full run's shards byte for byte, so L4 holds on the migrated index.
 - **Committed index size is measured, never gated.** A packed-size promise at
   100 000 documents was retired by ruling and has **no successor**; a size
   promise returns only as a new prediction at 10 000 documents with a new id.

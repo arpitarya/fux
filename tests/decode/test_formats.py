@@ -385,7 +385,7 @@ def test_decoding_the_same_bytes_twice_gives_the_same_string(raw, name):
 
 def test_json_keys_are_emitted_sorted_not_in_document_order():
     """Two exports of the same data with keys in a different order must decode
-    identically, or the index records which exporter ran (L3).
+    identically, or the index records which exporter ran (L4).
     """
     first = decode(b'{"alpha":"one text","beta":"two text"}', "a.json", root=configured_root())
     second = decode(b'{"beta":"two text","alpha":"one text"}', "a.json", root=configured_root())

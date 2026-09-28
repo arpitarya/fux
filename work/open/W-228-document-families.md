@@ -9,7 +9,7 @@ ball: agent
 
 # W-228 — document families: pattern recognition over the corpus, inside `inspect`
 
-**Status: DoD 1–10 BUILT 2026-09-28 (Claude Code, Opus); DoD 11 open.** The lens, the report section, `--json`, `--diff`, the explorer card, four `[families]` keys in `.fux/inspect.toml` under [L12](../../records/0013_LAW-12-values-live-in-config.md), the tests and SR-INSPECT decision 24 have landed. **Open: DoD 11** — the golden seed needs families and planted misfits, and a filed rung must report the lens, before `misfit_floor` is anything but PROVISIONAL. That is golden-adjacent work; W-230's live probe was denied on 2026-09-28, so the traversal guard fires and it may start.
+**Status: DoD 1–10 BUILT 2026-09-28 (Claude Code, Opus); DoD 11 open.** The lens, the report section, `--json`, `--diff`, the explorer card, four `[families]` keys in `.fux/inspect.toml` under [L12](../../records/0014_LAW-12-values-live-in-config.md), the tests and SR-INSPECT decision 24 have landed. **Open: DoD 11** — the golden seed needs families and planted misfits, and a filed rung must report the lens, before `misfit_floor` is anything but PROVISIONAL. That is golden-adjacent work; W-230's live probe was denied on 2026-09-28, so the traversal guard fires and it may start.
 
 **Model:** Claude Code, Sonnet for the lens and its tests; Opus only if the
 skeleton-distance design in §3 turns out to need a compare doc.
@@ -67,7 +67,7 @@ the Index tab's lazy-per-lens rendering (W-220).
    heading skeleton with numerals and dates masked, (b) the frontmatter key set,
    (c) a length bucket. Family assignment is **agglomerative, single pass,
    complete-linkage over skeleton Jaccard**, threshold from `inspect.toml`,
-   ties broken by doc id — a function of the corpus and nothing else (L3).
+   ties broken by doc id — a function of the corpus and nothing else (L4).
    No k, no seed, no random restart.
 2. **Each family is named** by its shared skeleton (first four headings, as the
    exact-set families are today) and carries: member count, the folder(s) it
@@ -116,7 +116,7 @@ the Index tab's lazy-per-lens rendering (W-220).
 | skeleton = heading **set** or **sequence**? | ordered sequence for the shape; **set** Jaccard for the distance | order is part of a template's identity, but a filled-in template reorders sections and is still the template (today's comment, kept) |
 | distance = Jaccard over headings, or over headings + body terms? | headings + frontmatter keys only | body terms make it topic clustering, which is `graph_shape`'s job and a different grouping |
 | linkage | complete | single-linkage chains unrelated shapes through one bridge doc; average needs a tie rule Jaccard does not give cheaply |
-| embeddings / a local model for header similarity (as arXiv 2402.13906 does) | **no** | L3 keeps models out of anything that produces a committed byte; this lens commits nothing, but a deterministic lens that a golden rung can reproduce byte-for-byte is the point of `inspect` |
+| embeddings / a local model for header similarity (as arXiv 2402.13906 does) | **no** | L4 keeps models out of anything that produces a committed byte; this lens commits nothing, but a deterministic lens that a golden rung can reproduce byte-for-byte is the point of `inspect` |
 
 Arpit overrules any row by editing this table; a builder does not.
 

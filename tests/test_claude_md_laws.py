@@ -6,7 +6,7 @@ one exception: **a generated view is permitted, and only while a test asserts
 equality.** This file is that test.
 
 🔴 **Delete this file and `CLAUDE.md`'s block becomes an illegal restatement** —
-a second normative-looking copy of eleven laws that can drift from the records while
+a second normative-looking copy of thirteen laws that can drift from the records while
 both still look correct, which is the exact failure L0 exists to end. The
 permission is the test, not the generation. SR-LAW-0's veto condition 2 names
 this file's absence as a reopen trigger.
@@ -149,7 +149,7 @@ def test_no_verbatim_third_copy_of_a_law_exists(gen):
     failure in another costume.
 
     **Why not a shorter, more sensitive phrase.** A law's opening bolded
-    statement *is* its handle for the short laws (L5's is five words), and
+    statement *is* its handle for the short laws (ex-L5's is five words), and
     SR-LAWS' table is required to carry the handle. A check on that phrase fires
     on the router doing its job, and the only way to keep it green is to stop
     routing.
@@ -158,8 +158,8 @@ def test_no_verbatim_third_copy_of_a_law_exists(gen):
     records = gen.law_records()
     for handle in gen.LAW_ORDER:
         owner = records[handle]
-        # ⚠ **The two forms are the same bytes for a law that carries no link**
-        # (L2, L4–L7), so the expectation is a SUBSET rather than one file — and
+        # ⚠ **The two forms are the same bytes for a law that carries no link**,
+        # so the expectation is a SUBSET rather than one file — and
         # the two `assert … in` lines below are what stop that subset being
         # satisfied vacuously by a law that appears in neither.
         record_form = _record_form(owner, handle)

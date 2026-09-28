@@ -10,7 +10,7 @@ second boundary. Network I/O is something fux refuses to own, so it lives in
 consumer code under `.fux/fetchers/`; model calls are the same, so they live in
 an agent skill the consumer invokes. **Fux says what needs doing and validates
 what came back.** Nothing here imports an SDK, opens a socket, or holds a key —
-so **L1 and L4 are held, not bracketed**, and the `$0` law survives.
+so **L2 and L5 are held, not bracketed**, and the `$0` law survives.
 
 That leaves two deterministic halves, and they are what this module is:
 
@@ -124,7 +124,7 @@ def parse_frontmatter(text: str) -> dict | None:
 
     Deliberately not a YAML parser: the block is written by an agent following
     a skill, the key set is closed and flat, and adopting a parser to read six
-    strings would be the same L1 trade this whole design refuses.
+    strings would be the same L2 trade this whole design refuses.
     """
     match = _FRONTMATTER_RE.match(text)
     if match is None:
@@ -464,7 +464,7 @@ def _document_text(root: Path, record: dict) -> str | None:
     ⚠ **A `url:` document is readable here only because `.fux/acquired/`
     exists.** Before the acquired plane, planning enrichment for a URL would
     have meant a network fetch inside `fux enrich --plan` -- an offline,
-    read-only command (L4) -- so the attribute could not exist on that list at
+    read-only command (L5) -- so the attribute could not exist on that list at
     all. `keep=true` is the default, so this works without configuration; a
     line that opted out with `keep=false` has nothing to read and reports zero
     chunks, which `--plan` names rather than hiding.

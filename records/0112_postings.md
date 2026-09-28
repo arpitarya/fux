@@ -8,9 +8,9 @@ status: accepted
 date: 2026-08-18
 feature: the postings — `terms` in the committed record, `postings/` in the derived plane, and the standing refusal to prune either
 owns: [tools/pruning-eval@f132f4ab7e46]
-laws: [L2, L3]
+laws: [L3, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: fae6a819f340fc8b8be83ae236dfdac40f39b2d67371fdadd4962156f5264044
+content_sha: a46641d9d4a4776ae412dc09c1c24d7800109b66ee468613e33f3fc5905396a9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

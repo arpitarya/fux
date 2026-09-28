@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-22
 amended: 2026-09-27
 feature: the test-data source — what a seed document, a question set or a rung must contain, how it is authored, and the input each ranking feature needs
-owns: [tests/test_test_data_prompts.py@a84a10681d8b, tools/golden-history@c5dad1092faa, tests/test_golden_history.py@ffae3050d744]
+owns: [tests/test_test_data_prompts.py@a84a10681d8b, tools/golden-history@b6156bbc0ceb, tests/test_golden_history.py@ffae3050d744]
 laws: [L0, L11]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: 92db3e78e8f25f988d2740dae22828290853a8019fdf60a9b85d0e9a53e605d6
+content_sha: 8abbeeb3fbdc4d009dd04945cd88f25bbea467a6e2462e4be3c8cc4e2dabdccb
 ratifies: "Arpit, 2026-09-22 — 'note it down that this is also one of the cases that need to be tested. So in future, the prompt or test data creation should account for this use case … create a work document which will just have pointers what all things test data creation should have … keep everything precise … I was talking about SR work document' · Arpit, 2026-09-27 — 'prompts can have copy of those but sr should be the source and should be maintained … delete them and when a new test data needs to be created create new prompts'\"
 ---
 
@@ -87,7 +87,7 @@ the checklist on 2026-09-22; on 2026-09-27 it absorbed the prompts too.
    | **T10** | **Heading-matched distractors** — so no question is answerable by heading alone | [`work/golden/README.md`](../work/golden/README.md) §Feature coverage, `heading` row · A10 |
    | **T11** | **A corpus with real git history** | **stated here** — decision 3 · R9 |
    | **T12** | **Additions only** — an existing seed document is never edited; new documents rebuild the ladder | A20 · [`work/golden/README.md`](../work/golden/README.md) phase 4 |
-   | **T13** | **Custody and naming** — one designated session per set, `set-<gen>-<claude\|codex>`, and `informed` for every agent-authored set | [L11](0012_LAW-11-sealed-answer-key.md) · [SR-WORK-GOLDEN](0066_WORK-golden.md) d14 · A1–A5 |
+   | **T13** | **Custody and naming** — one designated session per set, `set-<gen>-<claude\|codex>`, and `informed` for every agent-authored set | [L11](0013_LAW-11-sealed-answer-key.md) · [SR-WORK-GOLDEN](0066_WORK-golden.md) d14 · A1–A5 |
    | **T14** | **At most 10 000 documents** on any rung | [SR-WORK-SCALE](0057_WORK-scale.md) |
 
 3. **The three checklist items stated here.**
@@ -152,7 +152,7 @@ the checklist on 2026-09-22; on 2026-09-27 it absorbed the prompts too.
 
    | # | rule |
    |---|---|
-   | **A1** | 🔴 **One designated session per set, and it then leaves.** A fresh session — for Claude, a plain claude.ai chat with no repository, tools or project memory, the seed corpus attached as one file marked `===== FILE: <path> =====`. **A session that has read `work/golden/questions/`, run a rung, seen a score, or authored an earlier set never authors one.** From the handoff on, the set is closed to that session like any other ([L11](0012_LAW-11-sealed-answer-key.md) decision 6) |
+   | **A1** | 🔴 **One designated session per set, and it then leaves.** A fresh session — for Claude, a plain claude.ai chat with no repository, tools or project memory, the seed corpus attached as one file marked `===== FILE: <path> =====`. **A session that has read `work/golden/questions/`, run a rung, seen a score, or authored an earlier set never authors one.** From the handoff on, the set is closed to that session like any other ([L11](0013_LAW-11-sealed-answer-key.md) decision 6) |
    | **A2** | 🔴 **An author reads the seed and nothing else** — `work/golden/seed/`, `seed/archive/`, `seed-dates.tsv`, `seed-history.tsv`, plus named `work/golden/README.md` sections when it runs in the repo. **Never `work/golden/questions/`, never `golden-answers/` or its singular spelling, never a recursive search over `work/` without excluding `work/golden/`.** No web search, no recall of an earlier set |
    | **A3** | 🔴 **An author writes no file.** Its whole output is fenced blocks in its final message: new documents · `seed-dates.tsv` rows · history rows and revisions · **released questions** · **the key**. The key block is Arpit's hand only; every other block he commits. An instruction to write the key to disk, or to repeat it in a later turn, is void — the author says so and stops |
    | **A4** | **Naming.** Sets are `set-<gen>-<claude\|codex>` by author; the file is `work/golden/questions/set-<gen>-<author>.jsonl`. **Ids carry a prefix unique to the set and are never reused** — a prediction file names ids and nothing else, so one collision silently scores the wrong set ([SR-WORK-GOLDEN](0066_WORK-golden.md) decision 8). The author states the set name in its first line |
@@ -255,7 +255,7 @@ input it names must appear in decision 2's table.
 
 ## References
 
-**Records** — [SR-LAW-0](0002_LAW-0-authority.md) · [L11](0012_LAW-11-sealed-answer-key.md) · [SR-WORK-SCALE](0057_WORK-scale.md) · [SR-WORK-GOLDEN](0066_WORK-golden.md) · [SR-INGEST](0106_ingest.md) · [SR-RANKING](0111_ranking.md) · [SR-RS](0133_predictions.md)
+**Records** — [SR-LAW-0](0002_LAW-0-authority.md) · [L11](0013_LAW-11-sealed-answer-key.md) · [SR-WORK-SCALE](0057_WORK-scale.md) · [SR-WORK-GOLDEN](0066_WORK-golden.md) · [SR-INGEST](0106_ingest.md) · [SR-RANKING](0111_ranking.md) · [SR-RS](0133_predictions.md)
 
 **Work** — [`work/golden/README.md`](../work/golden/README.md) · [W-215](../archive/open/W-215-generation-2-corpus.md)
 

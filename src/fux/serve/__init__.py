@@ -29,20 +29,20 @@ microseconds and sells the one property the page exists to have.
 ## The fences
 
 - 🔴 **`127.0.0.1` and nothing else.** `--host` does not exist; a bind address
-  is not a knob. [L4](../../../records/0006_LAW-4-offline-by-default.md) is
+  is not a knob. [L5](../../../records/0007_LAW-5-offline-by-default.md) is
   offline-by-default and a page served on `0.0.0.0` is a corpus's vocabulary
   offered to the network. `_bind_address` is a function so the refusal has a
   name and a test.
 - 🔴 **No route writes a committed byte.** `GET` only; every other method is 405.
   The X-ray routes (W-220) fill `.fux/runtime/inspect/` — the gitignored cache
   `fux inspect` fills for the same index — and nothing else. The
-  server keeps no log of its own — [L8](../../../records/0001_LAWS.md) decision 8
+  server keeps no log of its own — [L9](../../../records/0001_LAWS.md) decision 8
   puts every durable trace of use on a gitignored path, and the one that exists
   is the provenance journal, which is opt-in and is not this.
 - 🔴 **The page is one file with no external host.** Inline CSS and JS, no CDN,
   no font fetch: it must render with the network unplugged, which is the same
   law and also simply what an offline tool owes.
-- **Stdlib only** ([L1](../../../records/0003_LAW-1-zero-cost.md)). `http.server`
+- **Stdlib only** ([L2](../../../records/0004_LAW-2-zero-cost.md)). `http.server`
   is enough for one person on one machine, and the law permits a dependency but
   a record still has to decide one. None is needed here.
 
@@ -141,7 +141,7 @@ class _Handler(BaseHTTPRequestHandler):
     ⚠ **`log_message` is silenced deliberately.** `BaseHTTPRequestHandler`
     writes an access line per request naming the full query string — which is
     the question somebody typed. That is a use record, and
-    [L8](../../../records/0001_LAWS.md) decision 8 says every durable trace of
+    [L9](../../../records/0001_LAWS.md) decision 8 says every durable trace of
     use lives on a gitignored path; a line on the operator's terminal is not
     durable, but it is also not something this verb was asked to print, and the
     provenance journal is the surface that exists for it.

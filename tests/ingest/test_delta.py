@@ -1,7 +1,7 @@
 """Delta ingest — the same bytes, without re-extracting what did not change.
 
 The property that matters is **byte-identity with a full run**. A faster ingest
-that produced a different index would break L3 and the differential law at
+that produced a different index would break L4 and the differential law at
 once, so every test here is written against the full run's output rather than
 against a hand-written expectation.
 """
@@ -213,7 +213,7 @@ def _with_headings(root, n_headings: int, cap: int) -> None:
 
 def test_changing_max_phrases_is_not_carried_forward(corpus):
     """`max_phrases` moves no document's sha, so a sha-keyed reuse would keep
-    the old `phrases` — and a delta run would stop matching a full one (L3)."""
+    the old `phrases` — and a delta run would stop matching a full one (L4)."""
     _with_headings(corpus, 20, cap=4)
     run(corpus)
     assert len(read_index(corpus)["file:docs/long.md"]["phrases"]) == 4

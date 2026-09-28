@@ -78,7 +78,7 @@ def test_a_group_beyond_the_pattern_is_refused_at_load():
         rules({"name": "x", "pattern": r"(a)(b)", "group": 3})
 
 
-# -- determinism (L3) -------------------------------------------------------
+# -- determinism (L4) -------------------------------------------------------
 
 
 def test_the_same_input_and_rules_give_the_same_bytes_every_time():

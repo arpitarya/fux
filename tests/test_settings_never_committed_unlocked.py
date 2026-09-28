@@ -1,6 +1,6 @@
 """🔴 **The committed `.claude/settings.json` is always the LOCKED one.**
 
-[L11](../records/0012_LAW-11-sealed-answer-key.md) decision 14 made the
+[L11](../records/0013_LAW-11-sealed-answer-key.md) decision 14 made the
 prohibition a state, and `just golden-unlock` mutates exactly one file to change
 it. **That file is committed**, so an unlock leaves the repository one careless
 `git commit` away from putting *"the guards are down"* into history and into

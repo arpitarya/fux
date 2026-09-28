@@ -18,7 +18,7 @@ from `ingest/run.py`'s own module rather than re-implemented, and applied to the
 body and to the frontmatter title, which is the third source of committed
 vocabulary and the one that was missed once already.
 
-Three further properties make this safe rather than a hole in L2:
+Three further properties make this safe rather than a hole in L3:
 
 - **The dictionary is gitignored.** It lands under `.fux/runtime/`, which is
   DERIVED — rebuildable, disposable, and already ignored by the `.gitignore`
@@ -28,7 +28,7 @@ Three further properties make this safe rather than a hole in L2:
   content. Nothing here retains a sentence, a position, or an order — only the
   set of analyzed words and how a human spells each one.
 - **It never fetches.** A `url:` document is read from `.fux/acquired/` if its
-  bytes were retained and is skipped otherwise (L4). A `file:` document is read
+  bytes were retained and is skipped otherwise (L5). A `file:` document is read
   out of the working tree, which is not a fetch.
 
 ## Why the surface spelling is here at all
@@ -211,7 +211,7 @@ def _word_runs(text: str) -> int:
 
 
 def _source_bytes(root: Path, doc) -> bytes | None:
-    """This document's source bytes, from disk only. Never a fetch (L4)."""
+    """This document's source bytes, from disk only. Never a fetch (L5)."""
     if doc.id.startswith("url:"):
         from ..refer import source as refer_source
 

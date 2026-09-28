@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@68e1a7088bf4, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@62fe3c17c961, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@2c157d951ec3, node/src/verbs/graph.mjs@960e82061286, src/fux/schemas/graph.schema.json@19bd4c486035]
-laws: [L1, L2, L3, L4]
+owns: [src/fux/graph@68a4eac47aad, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@1832238b76e6, node/src/verbs/graph.mjs@960e82061286, src/fux/schemas/graph.schema.json@19bd4c486035]
+laws: [L2, L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: ba67bc5bd09b8a7513ab549e2bd896a5f3fa4cfed81cb21a934a61a01b422ee6
+content_sha: 470c1d9c9f69ab73e45d544617ea9c222fff15054f601bbbd369222bdb222b11
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -457,7 +457,7 @@ communities are derived because they are **global and would not be**. A
 per-target anchor view is global in exactly that sense — every linker
 contributes to it — so it is folded at read time, which is what keeps a
 one-file commit from producing a corpus-wide diff and what kept
-[L3](0005_LAW-3-deterministic.md) out of the conversation entirely.
+[L4](0006_LAW-4-deterministic.md) out of the conversation entirely.
 
 ⚠ **Step 5 of [W-168](../work/open/W-168-search-improvements.md) —
 supersession-aware ranking — reads this same in-edge map.** *"The successor
@@ -467,7 +467,7 @@ yet.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -483,7 +483,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**`explain`, `graph` and `path` indent `--json` by `constants.toml [json] indent`** in both planes. The column widths of their text output are presentation (R3) and stay. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**`explain`, `graph` and `path` indent `--json` by `constants.toml [json] indent`** in both planes. The column widths of their text output are presentation (R3) and stay. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 
@@ -624,7 +624,7 @@ this surface — stderr never stdout, ASCII only, declares never gates.
 **Reopen this decision if any of these becomes true:**
 
 1. **Community assignment is not byte-identical across two machines** on the
-   same committed index. That is the L3 claim, and it is the one this record
+   same committed index. That is the L4 claim, and it is the one this record
    most depends on.
 
    **Checked and did not fire.** `.fux/runtime/graph.json` over the

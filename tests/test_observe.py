@@ -31,7 +31,7 @@ def test_args_hash_excludes_the_question_entirely():
 
     A hash *of* the question is still a fingerprint of the question: two runs
     of the same query would match across consumers, which is exactly the
-    re-identification L8 exists to prevent. So positionals are dropped, and
+    re-identification L9 exists to prevent. So positionals are dropped, and
     two different questions under the same flags hash the same.
     """
     a = observe.args_hash(["ask", "how do i roll back"])

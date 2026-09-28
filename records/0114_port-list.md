@@ -8,9 +8,9 @@ status: accepted
 date: 2026-08-18
 feature: the boundary between the archived engine and this one
 owns: []
-laws: [L1, L3]
+laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 21bc087eb16e418fc922d31d6b40839672cb88dcb5d8b09dbe8d030bc86deabf
+content_sha: 45f064296c314d71cb9e704cd14b2ff02cf81b060c60b2f194cb37867babcc8b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

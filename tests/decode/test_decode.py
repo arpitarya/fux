@@ -79,7 +79,7 @@ def test_empty_output_reads_as_none_not_as_an_empty_document():
     assert decode(b"<html><body><style>x{}</style></body></html>", "a.html", ROOT) is None
 
 
-# -- determinism (L3) -------------------------------------------------------
+# -- determinism (L4) -------------------------------------------------------
 
 
 def test_decoding_is_byte_identical_across_processes():

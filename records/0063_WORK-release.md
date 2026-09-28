@@ -10,7 +10,7 @@ feature: how a release reaches two registries, how the version stays equal acros
 owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: b2bfb7c7f3d0a1c41075103106d322078189b229b53ce9f6ef1ddfdf7767f5f5
+content_sha: bad338ebed46f69e24ea3f1ef00a809d2032012fe9cefa8a0e090f45d53e882a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -264,7 +264,7 @@ against the `SITES` list in the script, and
 document is never listed here — the body may name one, but archive is not
 evidence.*
 
-**Records** — [SR-LAWS](0001_LAWS.md) · [SR-LAW-10](0011_LAW-10-bundled-output.md) · [SR-NODE-SEARCH](0153_node-search.md) · [SR-WORK-SESSION](0060_WORK-session.md)
+**Records** — [SR-LAWS](0001_LAWS.md) · [SR-LAW-10](0012_LAW-10-bundled-output.md) · [SR-NODE-SEARCH](0153_node-search.md) · [SR-WORK-SESSION](0060_WORK-session.md)
 
 **Code**
 

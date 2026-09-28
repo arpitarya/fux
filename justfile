@@ -5,7 +5,7 @@
 # that the one command an AGENT MUST NOT RUN has a name a human can type.
 #
 # 🔴 `golden-score` is that command. See L11 decision 13,
-#    records/0012_LAW-11-sealed-answer-key.md.
+#    records/0013_LAW-11-sealed-answer-key.md.
 
 # The one permitted home for an answer key — L11 decision 3. Gitignored, never
 # committed, closed to every agent. Named here because guards match paths and an
@@ -115,7 +115,7 @@ golden-guards:
     fail=0
     ok()   { printf '  ok    %s\n' "$1"; }
     bad()  { printf '  FAIL  %s\n' "$1"; fail=1; }
-    echo "L11 guards — records/0012_LAW-11-sealed-answer-key.md"
+    echo "L11 guards — records/0013_LAW-11-sealed-answer-key.md"
     [ -z "$(git ls-files 'work/golden/golden-answer*')" ] \
         && ok "no key tracked on any committed ref" \
         || bad "SOMETHING UNDER THE KEY PATH IS TRACKED — declare a breach"

@@ -148,8 +148,8 @@ saturation value; it is the scale the weights forced.
 
 | law | what it forbids | what it forces |
 |---|---|---|
-| **L1 stdlib-only, $0** | scipy, numpy, Optuna, ranx, an LLM judge | grid + coordinate ascent, hand-rolled — ~150 lines |
-| **L3 byte-deterministic** | an RNG in the public interface; float argmax | quantised objective, ties on `(-score, id)`, exact permutation tests |
+| **L2 stdlib-only, $0** | scipy, numpy, Optuna, ranx, an LLM judge | grid + coordinate ascent, hand-rolled — ~150 lines |
+| **L4 byte-deterministic** | an RNG in the public interface; float argmax | quantised objective, ties on `(-score, id)`, exact permutation tests |
 | **offline by default** | click logs, interleaving, A/B, an LLM grader | hand-written judgments, committed |
 
 Two more from the repo rather than the laws:
@@ -164,7 +164,7 @@ Two more from the repo rather than the laws:
 
 ### §3.1 — The engine/lab split does the heavy lifting
 
-L1 binds `src/`. It does **not** bind `tools/`. `tools/pruning-eval/`,
+L2 binds `src/`. It does **not** bind `tools/`. `tools/pruning-eval/`,
 `tools/refer-budget-sweep/` and `tools/archived-signal-eval/` already exist as
 lab harnesses under exactly that separation.
 
@@ -292,13 +292,13 @@ most shipped tuners:
   list*, not a re-search. That is what makes thousands of evaluations
   tractable in pure Python. Memoise on the quantised θ tuple.
 - **significance:** for n ≤ 20 queries, enumerate all 2ⁿ sign flips exactly —
-  a paired permutation test with **no seed at all**, which is the L3-shaped
+  a paired permutation test with **no seed at all**, which is the L4-shaped
   choice. Above that, hand off to the lab.
 
 **Bayesian optimisation / Optuna is rejected on cost regime, not on
 availability.** TPE and GP surrogates pay for themselves when one evaluation
 costs minutes; a fux evaluation costs milliseconds. It would be the wrong tool
-even if L1 permitted it.
+even if L2 permitted it.
 
 ---
 

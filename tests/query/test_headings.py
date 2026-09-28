@@ -101,7 +101,7 @@ def test_more_distinct_query_terms_wins_over_more_repetitions():
 
 def test_ties_break_on_document_order_not_set_iteration():
     """Two headings match one term each; the earlier one in the document wins.
-    Determinism is L3, and a set-ordering dependence here would be invisible
+    Determinism is L4, and a set-ordering dependence here would be invisible
     until it moved between interpreters."""
     got = headings_for(_record(), "rollback")
     assert got.index("Rollback procedure") < got.index("Rollback and recovery")
@@ -154,14 +154,14 @@ def test_a_non_string_phrase_is_skipped_not_raised():
 
 
 def test_a_record_with_no_phrases_yields_no_headings(tmp_path):
-    """⚠ **REWRITTEN for W-194 (2026-09-20).** This was the L5 case: a `hashed`
+    """⚠ **REWRITTEN for W-194 (2026-09-20).** This was the ex-L5 case: a `hashed`
     record carried no `phrases` at all, because `store/writer.py` refused to
     write display text on one, and the test existed to prove no path
-    re-introduced that text. `meta` and `title_h` are deleted and L5 is
+    re-introduced that text. `meta` and `title_h` are deleted and ex-L5 is
     retired, so the fixture is now just a url record with no headings — which
     is the path that was always the general one. **The specific guarantee that
     went away is an ACL-mismatch leak now accepted, not closed**
-    (SR-LAW-5, superseded).
+    (ex-SR-LAW-5, superseded).
     """
     sha = content_sha(b"url:https://x.test/handbook")
     record = {

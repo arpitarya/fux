@@ -12,7 +12,7 @@ hash cannot cover itself, and hashing only the body would let `owns`, `status`
 or `laws` change without moving it, which are precisely the changes a reader
 cares about.
 
-**Deterministic, as L3 requires:** same bytes in, same digest out, no clock and
+**Deterministic, as L4 requires:** same bytes in, same digest out, no clock and
 no path in the input.
 
 ⚠ **It tells you THAT a record moved, never what moved** — `git diff` does that.

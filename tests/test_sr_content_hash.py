@@ -19,7 +19,7 @@ removed, LF endings, UTF-8, SHA-256, full hex.
 - **Hashing only the body was rejected.** `owns`, `status`, `laws` and `amended`
   could then change without moving the hash, and those are precisely the changes
   a reader pinning a version cares about.
-- **Deterministic, as L3 requires:** same bytes in, same digest out. No clock,
+- **Deterministic, as L4 requires:** same bytes in, same digest out. No clock,
   no path, no ordering dependence.
 
 ## What it does NOT do

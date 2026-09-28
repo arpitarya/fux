@@ -7,10 +7,10 @@ description: "How fresh a url: citation is, said in six positions that never col
 status: accepted
 date: 2026-09-01
 feature: the freshness verdict vocabulary and the per-URL check interval
-owns: [src/fux/refer/freshness.py@c2205bbff313, node/src/refer/freshness.mjs@f44c2c09f8f9]
-laws: [L2, L3, L4]
+owns: [src/fux/refer/freshness.py@b4fa22361e9f, node/src/refer/freshness.mjs@f44c2c09f8f9]
+laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: f570d29780e05aea4b56a7d2500c2c64462ece79aa3323ceb1d6ec26628ac531
+content_sha: edbe42b83ae351a780a193ce53ee77957b8ff83a008fa728a85d6c304e353e4b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -265,7 +265,7 @@ docstring.
 
 12. **A `ttl` of 0 also suppresses the cache WRITE, not just the read.** A copy
     that is written and never read is a copy of an access-controlled document
-    sitting on disk for no benefit — which is the L2 cost with none of the L2
+    sitting on disk for no benefit — which is the L3 cost with none of the L3
     payoff.
 
 13. **The URL list is read only when the caller has already opted into
@@ -463,7 +463,7 @@ record's own module docstring names — *"CI, or a replayed `--audit` bundle:
 - **The name states its clock, which is the entire reason it is three words.**
   Decision 15 exists to keep two clocks from being read as one knob; a third
   key called `offline` or `pinned` would have undone it. `offline` also
-  collides with [L4](0006_LAW-4-offline-by-default.md)'s vocabulary and reads
+  collides with [L5](0007_LAW-5-offline-by-default.md)'s vocabulary and reads
   as the whole engine rather than the URL refer path. Both rejections are
   recorded so neither is re-proposed.
 - **Source-wide, boolean, default `true`** — `true` is the behaviour every
@@ -547,7 +547,7 @@ a citation may go unchecked and says nothing about how the bytes are read.
 
 <!-- L12-NOTE-START -->
 
-**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `refer()` takes an explicit `policy` and the
+**[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `refer()` takes an explicit `policy` and the
 caller's `Tune`; neither has a default. The freshness decision itself is
 unchanged.
 
@@ -555,7 +555,7 @@ unchanged.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -565,13 +565,13 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**`[sources.url] ttl` and `fetch_at_answer` are required with the table** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `ttl` no longer defaults to `"24h"` and `fetch_at_answer` to `true` in code; the template writes both, and a line's own `ttl=` still wins ([SR-CONFIG](0113_config.md) decision 17).
+**`[sources.url] ttl` and `fetch_at_answer` are required with the table** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `ttl` no longer defaults to `"24h"` and `fetch_at_answer` to `true` in code; the template writes both, and a line's own `ttl=` still wins ([SR-CONFIG](0113_config.md) decision 17).
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
-**This record's reopen share (0.25) is `constants.toml [doctor] as_ingested_veto_share`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) — fixed, so no consumer's `fux.toml` can move it. `fux doctor` quotes it from there.
+**This record's reopen share (0.25) is `constants.toml [doctor] as_ingested_veto_share`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) — fixed, so no consumer's `fux.toml` can move it. `fux doctor` quotes it from there.
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `fux doctor`, which this record's checks run through, reads its acquired-plane warning share from `fux.toml [doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18); every threshold is unchanged.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `fux doctor`, which this record's checks run through, reads its acquired-plane warning share from `fux.toml [doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18); every threshold is unchanged.
 
 ### Consequences
 
@@ -609,7 +609,7 @@ asserts the prose no longer says *four-state*.
   ⚠ **Over journalled answers only.** A freshness verdict exists at answer
   time and only the **opt-in** receipt journal (`--journal`) persists one, so a
   repo that has never journalled reports **unknown** rather than a zero share.
-  That is the honest reading and it is the reason nothing new is retained: L8's
+  That is the honest reading and it is the reason nothing new is retained: L9's
   journal already existed, and where it is off there is no number to have.
 - **`ttl=` bounds the TTL fetch cache and nothing else.** It does not yet
   influence which URLs `fux daemon` sweeps first, which is the other place a

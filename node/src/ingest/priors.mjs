@@ -3,7 +3,7 @@
  * Only `supersededIds` has a Node twin: the git half (`git_commit_times`) is an
  * INGEST concern, and Node does not ingest. `mtime` and `superseded` arrive as
  * committed facts on the record, which is the whole reason they are committed —
- * a derivation from local filesystem state would differ per machine and break L3.
+ * a derivation from local filesystem state would differ per machine and break L4.
  *
  * 🔴 **`recencyMultiplier` lived here until 2026-09-13** and went with
  * `recency_half_life_days` (W-152), as `supersededWeight` went with W-151.

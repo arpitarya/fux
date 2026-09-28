@@ -202,7 +202,7 @@ def test_missing_reports_the_word_the_USER_typed_not_the_stem():
 
 
 def test_the_block_is_a_pure_function_of_its_inputs():
-    """L3. Same inputs, same block — no clock, no set-iteration order, no
+    """L4. Same inputs, same block — no clock, no set-iteration order, no
     accumulated state between calls."""
     args = ("rollback pgbouncer procedure", {"rollback": 40, "pgbouncer": 0, "procedure": 12})
     first = _q(*args, [9.0, 3.0, 1.0])

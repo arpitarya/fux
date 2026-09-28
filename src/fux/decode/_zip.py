@@ -14,7 +14,7 @@ Two hazards, both real and both silent:
 * **Member order.** `namelist()` returns *archive* order, which is whatever the
   writing tool chose. A decoder that walked it directly would produce different
   Markdown for two archives with identical content — same sources, different
-  index, which is L3.
+  index, which is L4.
 """
 
 from __future__ import annotations

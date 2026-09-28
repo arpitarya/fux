@@ -28,7 +28,7 @@ from bisect import bisect_left
 __all__ = ["vocabulary", "analyze", "term_documents", "SORTS"]
 
 #: The sort keys the tab may ask for. Ties break on the hash so two runs of
-#: the same index list the same order (L3).
+#: the same index list the same order (L4).
 SORTS = ("df", "cf", "idf", "word")
 
 

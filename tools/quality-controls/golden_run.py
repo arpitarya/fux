@@ -3,7 +3,7 @@
 
 🔴 **It records what fux DID. It never says whether fux was right.**
 There is no answer key anywhere and none reaches a Claude session by any route
-([L11](../../records/0012_LAW-11-sealed-answer-key.md)); *correct* first appears
+([L11](../../records/0013_LAW-11-sealed-answer-key.md)); *correct* first appears
 in prompt 6's output, from Codex, against a key Arpit pastes there. **A report
 that guessed would train the next reader to trust a guess.**
 

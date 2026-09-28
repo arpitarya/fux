@@ -7,10 +7,10 @@ description: "After a verb has fully rendered, fux hands every file in `.fux/obs
 status: accepted
 date: 2026-09-14
 feature: the observer hook — the extension point a consumer's analytics subscribe to
-owns: [src/fux/observe.py@eb7be47ed04d, tools/observer-bench@e12d60cca125]
-laws: [L1, L2, L3, L4, L8, L10]
+owns: [src/fux/observe.py@05c7f57abeb8, tools/observer-bench@e12d60cca125]
+laws: [L2, L3, L4, L5, L9, L10]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: b3391761479ba547c4628f0339f4211918960fc095cdb4410d504a9c356b9ebd
+content_sha: d3bd3390ec32864c7d1116a66681355944423bfe24d016c3127fb625d33e2efa
 ratifies: W-170
 ---
 
@@ -43,13 +43,13 @@ raises is skipped for that run; one that runs past `[observe] max_ms` is killed
 the same way. Byte-for-byte the verb's output is identical with zero, one or a
 misbehaving observer installed, and a test says so. That is why this is a
 seam and not middleware: a pre-verb hook would make `ask` a function of the
-consumer's code, and L3 would be gone.
+consumer's code, and L4 would be gone.
 
 **fux ships no observer and imports none by name.** The first subscriber is
 cage, whose `setup` writes
 `.fux/observers/cage.py`; a test asserts `src/fux` names nothing cage-shaped.
 That is also why `.fux/observers/` is the third readable-source exemption in
-[SR-LAW-10](0011_LAW-10-bundled-output.md) decision 2 (Arpit, 2026-09-14): the
+[SR-LAW-10](0012_LAW-10-bundled-output.md) decision 2 (Arpit, 2026-09-14): the
 consumer, or a tool the consumer installed, writes and owns that code.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
@@ -138,10 +138,10 @@ component.
    names nothing after cage or any other subscriber; a test greps for it.
    A `fux-observer` guide skill is **not** written until a second subscriber
    exists ([SR-AGENT-POLICY](0132_agent-policy.md)).
-9. **Laws.** L2: the record carries no content, so nothing durable leaves the
-   source system. L3: nothing flows back, so determinism is untouched. L4:
-   counts are not a use record of any document. L8: a record handed to the
-   consumer's own code is not a network call and reaches no commit. L1: the
+9. **Laws.** L3: the record carries no content, so nothing durable leaves the
+   source system. L4: nothing flows back, so determinism is untouched. L5:
+   counts are not a use record of any document. L9: a record handed to the
+   consumer's own code is not a network call and reaches no commit. L2: the
    dispatcher is stdlib.
 
 **10. BUILT 2026-09-15, and three things the build settled that the record had
@@ -240,7 +240,7 @@ exists on either.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -250,13 +250,13 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No bound, no observers** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). When
+**No bound, no observers** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). When
 `fux.toml` does not load, `[observe] max_ms` cannot be read, and the hook used
 to run the observers on `50` ms held in `cli.py`. It now **skips them**: the
 bound is the guarantee that a consumer's analytics cannot slow a verb, and
 running them without it would drop the guarantee rather than the observers.
 
-**An observer call's argument hash is `constants.toml [observe] args_hash_hex` hex digits** (16), and its time budget converts through `timedelta`. The liveness file is indented by `[json] indent`. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**An observer call's argument hash is `constants.toml [observe] args_hash_hex` hex digits** (16), and its time budget converts through `timedelta`. The liveness file is indented by `[json] indent`. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 
@@ -266,7 +266,7 @@ running them without it would drop the guarantee rather than the observers.
 - The `args_hash` contract is now shared with a second repository; a change
   to normalisation is a breaking change for every subscriber and must be
   versioned in the record (`fux_version` is in the record for that reason).
-- ⚠ **The cap is a wall-clock, and L3 says nothing about time.** A slow
+- ⚠ **The cap is a wall-clock, and L4 says nothing about time.** A slow
   observer changes *when* fux returns, never *what*; that is stated so nobody
   files it as a determinism defect.
 
@@ -278,7 +278,7 @@ running them without it would drop the guarantee rather than the observers.
   `archive/proposals/cage-search-leg.md` (archived 2026-09-14); the decision is
   cage's `work/compare/fux-search-leg.compare.md` (option C).
 - **A pre-verb middleware** (filter, rewrite, veto) — rejected: `ask` becomes a
-  function of consumer code and L3 is gone. The word *middleware* in the ruling
+  function of consumer code and L4 is gone. The word *middleware* in the ruling
   was narrowed to *observe-only* in the same conversation.
 - **A real-time agent hook** (Claude Code `PreToolUse`) — cage's own rule
   refuses hook-based capture; fux has no say in it.
@@ -289,7 +289,7 @@ running them without it would drop the guarantee rather than the observers.
 
 - W-170 (closed 2026-09-15) — the item; its
   Definition of done is this record's build list
-- [SR-LAW-10](0011_LAW-10-bundled-output.md) decision 2 — the exemption
+- [SR-LAW-10](0012_LAW-10-bundled-output.md) decision 2 — the exemption
 - [SR-DECODE](0139_decode.md) · [SR-FETCHER](0117_fetcher.md) — the two sibling
   exemptions this one is shaped after
 - [SR-CLI](0101_cli-surface.md) — the dispatch point, once built

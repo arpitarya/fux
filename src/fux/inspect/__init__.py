@@ -22,8 +22,8 @@ anything to it.
 **The report names words; the commit never does.** The committed index holds
 term hashes ([SR-POSTINGS](../../../records/0112_postings.md) decision 2); the
 words come from `dictionary.py`, built locally by re-tokenising the sources
-that are already on this disk. Offline (L4), deterministic (L3), nothing new
-committed (L2, L8).
+that are already on this disk. Offline (L5), deterministic (L4), nothing new
+committed (L3, L9).
 """
 
 from __future__ import annotations
@@ -177,7 +177,7 @@ def render_markdown(report: Report) -> str:
     """The report, as Markdown. No timestamp anywhere in it, on purpose.
 
     ⚠ **A wall-clock line would make the file different on every run**, which
-    is L3's *byte-identical* guarantee broken by a decoration — and the
+    is L4's *byte-identical* guarantee broken by a decoration — and the
     determinism test would have to exclude the one line most likely to hide a
     real change underneath it. The index's own shard shas are the provenance,
     and they are a fact about the input rather than about when someone looked.

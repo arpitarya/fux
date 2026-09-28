@@ -16,7 +16,7 @@ reduces to an exact binomial on the discordant pairs.
 
 **So the answer does not depend on the corpus, the engine, or who authored
 anything.** It depends on how many queries flipped. No model, no network, pure
-stdlib — L1, L3 and L4 are not in play.
+stdlib — L2, L4 and L5 are not in play.
 
 ## What it computes
 

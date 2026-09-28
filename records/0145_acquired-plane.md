@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@aa145d42bb5d]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: f30b2b15e35098d6d7583b58152f897504cd3e0f3717f054b54581fcf6f3431d
+content_sha: bd74e48761fea7866104386dc060e3cbb456c65d394c7af5fc2f1285b526c5c3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -298,7 +298,7 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -310,11 +310,11 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**Acquired objects fan out by `constants.toml [radix] hex_digits_per_byte`**, a manifest sha is checked against sha256's own hex length, and the manifest is indented by `[json] indent`. The plane's layout is unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**Acquired objects fan out by `constants.toml [radix] hex_digits_per_byte`**, a manifest sha is checked against sha256's own hex length, and the manifest is indented by `[json] indent`. The plane's layout is unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
-**This record's reopen share (0.25) is `constants.toml [doctor] as_ingested_veto_share`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) — fixed, so no consumer's `fux.toml` can move the condition this record states. `fux doctor` quotes it from there.
+**This record's reopen share (0.25) is `constants.toml [doctor] as_ingested_veto_share`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) — fixed, so no consumer's `fux.toml` can move the condition this record states. `fux doctor` quotes it from there.
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `fux doctor`, which this record's checks run through, reads its acquired-plane warning share from `fux.toml [doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18); every threshold is unchanged.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `fux doctor`, which this record's checks run through, reads its acquired-plane warning share from `fux.toml [doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18); every threshold is unchanged.
 
 ### Consequences
 
@@ -363,7 +363,7 @@ this moved where they are written, not what they are.
 
 **The last owed item closed 2026-09-05 (W-101).** `fux doctor` now reports the `as-ingested` share — `doctor.freshness_counts()`, rendered as the `freshness verdicts` check and, machine-readably, as `fux doctor --json`'s `freshness` block. **The veto below can be run.**
 
-⚠ **What it can be run *against* is narrower than the veto's wording, and that limit is stated rather than hidden.** A freshness verdict exists only at answer time, and the only thing that persists one is the **opt-in** receipt journal (`--journal`, `.fux/runtime/ingest-log.jsonl`, gitignored — L8). So the share is computed over **journalled answers**, not over every answer ever given, and a repo that has never journalled reports **unknown** rather than a zero share. Collapsing those two would let a repo that never looked read as one that looked and found nothing. **Nothing new is retained to make this work**: the journal already existed, and if it is off there is no number.
+⚠ **What it can be run *against* is narrower than the veto's wording, and that limit is stated rather than hidden.** A freshness verdict exists only at answer time, and the only thing that persists one is the **opt-in** receipt journal (`--journal`, `.fux/runtime/ingest-log.jsonl`, gitignored — L9). So the share is computed over **journalled answers**, not over every answer ever given, and a repo that has never journalled reports **unknown** rather than a zero share. Collapsing those two would let a repo that never looked read as one that looked and found nothing. **Nothing new is retained to make this work**: the journal already existed, and if it is off there is no number.
 
 ### Alternatives considered
 

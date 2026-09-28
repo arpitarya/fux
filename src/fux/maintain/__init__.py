@@ -1,4 +1,4 @@
-"""The maintenance plane — M5. Hooks, the merge driver, and L5 at write time.
+"""The maintenance plane — M5. Hooks, the merge driver, and ex-L5 at write time.
 
 Three pieces that together make the index maintain itself in a real repository:
 
@@ -6,7 +6,7 @@ Three pieces that together make the index maintain itself in a real repository:
 |---|---|---|
 | git hooks | `hooks.py` | an index that silently drifts from the content it describes |
 | the merge driver | `mergedriver.py` | two people working at once producing a textual conflict in a machine plane |
-| **L5 at write time** | `store/writer.py` | a private document's title reaching a committed file |
+| **ex-L5 at write time** | `store/writer.py` | a private document's title reaching a committed file |
 
 The third one is not in this package deliberately: it belongs in the writer,
 because the point of moving it there is that **no path into a committed shard

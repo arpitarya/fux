@@ -90,7 +90,7 @@ fields, never on the wording** - the wording is not a contract.
 fux "does not give line numbers" is wrong, and it is the most common way to be
 wrong about this tool.
 
-**This is law L4 showing through the surface, not an omission.** A line range
+**This is law L5 showing through the surface, not an omission.** A line range
 can only be computed by chunking the *fetched* bytes; the index holds
 statistics, not text, so it has nothing to count lines in. Giving `ask` line
 numbers would mean making it fetch, and `ask` is offline by default.

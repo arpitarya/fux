@@ -1,6 +1,6 @@
 """Every sealed-key guard covers BOTH spellings, and none of them may narrow.
 
-[L11](../records/0012_LAW-11-sealed-answer-key.md) decision 3 (Arpit,
+[L11](../records/0013_LAW-11-sealed-answer-key.md) decision 3 (Arpit,
 2026-09-18) permits a key to exist on his machine, at one address —
 ``work/golden/golden-answers/`` — gitignored and closed to every agent. That
 permission moves the law's central claim from *there is nothing on disk to
@@ -100,7 +100,7 @@ GITIGNORE = ROOT / ".gitignore"
 DIRS = ROOT / ".fux" / "sources" / "dirs"
 
 # 🔴 **The switch, and this file now has TWO states to describe.**
-# [L11](../records/0012_LAW-11-sealed-answer-key.md) decision 14 (Arpit,
+# [L11](../records/0013_LAW-11-sealed-answer-key.md) decision 14 (Arpit,
 # 2026-09-21) made the prohibition a **locked state** with a named way out:
 # `just golden-unlock` removes the deny rules and both hook registrations, and
 # `just golden-lock` restores them byte-identically.
@@ -297,7 +297,7 @@ NOT_A_KEY = [
     ".claude/hooks/guard-golden-answer.sh",
     "work/open/W-198-golden-answers-canonical.md",
     "tests/test_golden_key_guards.py",
-    "records/0012_LAW-11-sealed-answer-key.md",
+    "records/0013_LAW-11-sealed-answer-key.md",
 ]
 
 

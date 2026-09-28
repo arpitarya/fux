@@ -106,7 +106,7 @@ def test_writing_the_same_correction_twice_is_idempotent(repo: Path) -> None:
 
 
 def test_the_written_bytes_do_not_depend_on_when_it_ran(repo: Path) -> None:
-    """L3. `generated:` comes from the document's committed mtime, never from
+    """L4. `generated:` comes from the document's committed mtime, never from
     the clock, so two runs a week apart write the same file."""
     _fux(repo, "correct", "how do I roll back?", "docs/runbook-rollback.md")
     first = sorted((repo / ".fux" / "enrich").glob("*.md"))[0].read_bytes()

@@ -8,9 +8,9 @@ status: accepted
 date: 2026-09-01
 feature: refusal detection before decode
 owns: [src/fux/ingest/refusals.py@c2842b4b4bb0, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@5fdc90fab388]
-laws: [L1, L3]
+laws: [L2, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 8e832ecdd9d85305caa0ccebef99cf0ed3485c387e4952bc9e7a26169e595005
+content_sha: eab7765afe2cc7acbb7bc35e17e319204a9132ad2e52d85d75a50704b425ab01
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -440,7 +440,7 @@ false refusals, and a floor that cries wolf gets switched off.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -451,9 +451,9 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No refusal rule changed** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `urlsrc.fetch_all` now takes `config`, `max_parallel` and `acquired_max_bytes` as required arguments; the refusal pass it runs is untouched ([SR-INGEST](0106_ingest.md)).
+**No refusal rule changed** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `urlsrc.fetch_all` now takes `config`, `max_parallel` and `acquired_max_bytes` as required arguments; the refusal pass it runs is untouched ([SR-INGEST](0106_ingest.md)).
 
-**9a. `[scan]` — the two bounds live in the file, and the file stays optional** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27).
+**9a. `[scan]` — the two bounds live in the file, and the file stays optional** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27).
 `BODY_SCAN_BYTES` and `ALWAYS_SCAN_UNDER` left `refusals.py` for `[scan]
 body_scan_bytes` and `[scan] always_scan_under`, whole numbers of bytes `>= 1`;
 the template writes 1 MiB and 8 KiB. `load()` returns a `RuleSet` — a tuple of
@@ -466,9 +466,9 @@ the rules carrying the two bounds — so every caller that iterates is unchanged
   (`setup.Mandatory(whole_file=False)`). With no rules nothing is scanned, so no
   bound is needed — only the magic floor applies.
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
 
 ### Consequences
 
@@ -482,8 +482,8 @@ the rules carrying the two bounds — so every caller that iterates is unchanged
 - ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
   nothing it decides.** Hashed display meta was deleted outright: `meta` and
   `title_h` left the record shape, `store/displaycache.py` and
-  `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law L5
-  retired ([SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). Nothing in `ingest/refusals.py`, `refusals.toml.txt` or `tools/refusal-probe/` changed. A refusal is a judgement about the BYTES a server returned, taken before a record exists; `meta` only ever decided what a record could hold afterwards, so the two never met.
+  `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law ex-L5
+  retired ([ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). Nothing in `ingest/refusals.py`, `refusals.toml.txt` or `tools/refusal-probe/` changed. A refusal is a judgement about the BYTES a server returned, taken before a record exists; `meta` only ever decided what a record could hold afterwards, so the two never met.
   **This record's decisions are unaffected**, and the line is here because the
   freshness gate asks a describer to say so rather than to be silent.
 

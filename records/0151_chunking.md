@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-09-06
 feature: chunking — the strategy vocabulary, the boundary ladder, and the retrieval/citation split
-owns: [src/fux/refer/_chunk.py@62bf5273eab1, node/src/refer/chunk.mjs@3195b329f939]
-laws: [L1, L2, L3]
+owns: [src/fux/refer/_chunk.py@d8b74dfcef1b, node/src/refer/chunk.mjs@0cd18afc0aaf]
+laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 3c3e46bc43237ee05f9654647ae20ea66cd3ceff0630d23f58bdb0cf8ad07913
+content_sha: 4bc500cacbf2399c00f4ab0ace38ad720df394316ed3200a4d6e8ba7e08a53b4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -114,7 +114,7 @@ refuses it: *"Plain text provides inadequate information for determining good
 sentence boundaries. Periods can signal the end of a sentence, indicate
 abbreviations, or be used for decimal points… Without analyzing the text
 semantically, it is impossible to be certain."* Doing it properly needs CLDR
-locale data — **a dependency, L1** — and doing it improperly cuts inside `e.g.`,
+locale data — **a dependency, L2** — and doing it improperly cuts inside `e.g.`,
 `Dr.` and `3.5`, which is the mid-sentence cut this module already refuses. The
 ladder therefore uses only boundaries that need no knowledge of any language.
 
@@ -203,7 +203,7 @@ exactly what scored `hit@1 = 0.229`. **Stage-1 `recall@k` is the gate**, and
 until it is measured this stays a proposal. The harness in
 `fux-lab/2026-09-06-csv-chunk-granularity/` discriminates it as one new arm.
 
-**The chunker holds no numeral**: section tuples are unpacked, "fewer than two" is `<= 1`, a paragraph break costs `len("\n\n")`, and a pipe table's minimum — header, delimiter, one row — is `constants.toml [markdown] min_table_lines` in both planes. Every passage is unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**The chunker holds no numeral**: section tuples are unpacked, "fewer than two" is `<= 1`, a paragraph break costs `len("\n\n")`, and a pipe table's minimum — header, delimiter, one row — is `constants.toml [markdown] min_table_lines` in both planes. Every passage is unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 
@@ -314,7 +314,7 @@ banding, and the two superseded runt rules) ·
   segmentation methods × four embedding models: *"structure-based methods
   outperform semantic/LLM-guided methods."* This is the external case that
   fux's deterministic structural chunking is the **right** answer rather than
-  the one L1 forced. Also relevant to the small-to-big rejection below:
+  the one L2 forced. Also relevant to the small-to-big rejection below:
   contextualising whole documents helped in-corpus retrieval and
   **consistently degraded in-document retrieval**, which is fux's case. ⚠ **It
   does not cover page-level, element-level or table chunking at all** — its

@@ -7,7 +7,7 @@ Element names become headings and text becomes body, on the same reasoning as
 hand-written XML document is the most likely place in the whole corpus to
 carry an entity declaration, which is both the billion-laughs vector and the
 XXE one. A DTD-validated config that gets skipped is a small loss; a decoder
-that fetches a URL during ingest breaks **L4** without ever calling a socket
+that fetches a URL during ingest breaks **L5** without ever calling a socket
 we wrote.
 """
 
@@ -30,7 +30,7 @@ from fux.decode._limits import limit
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.xml", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
+VERSION = fixed("decoders.xml", "version")  # not bumped by W-234: law handles in comments only; W-225 4a: its caps moved to formats.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.xml", "extensions"))
 
@@ -64,7 +64,7 @@ def _walk(element, out: list[str], *, depth: int) -> None:
         out.append(_label(name, depth))
 
     # `element.attrib` is a dict in document order; sorted so two serialisations
-    # of one document decode identically (L3).
+    # of one document decode identically (L4).
     for key in sorted(element.attrib):
         value = " ".join(element.attrib[key].split())
         if len(value) >= limit("xml", "min_attr_len"):

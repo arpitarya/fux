@@ -95,7 +95,7 @@ def test_nothing_is_written_outside_the_repository():
 def test_every_path_it_writes_is_inside_the_runtime_plane(root):
     """pid, stop and status all live in gitignored `.fux/runtime/`.
 
-    Nothing the daemon writes may be committed: that is L2 and L3 together, and
+    Nothing the daemon writes may be committed: that is L3 and L4 together, and
     it is why there is no `daemon.toml` anywhere in this feature.
     """
     for path in (daemon.pid_path(root), daemon._stop_path(root), daemon._status_path(root)):
@@ -234,7 +234,7 @@ def test_a_corrupt_pid_file_reads_as_not_running(root):
 
 
 def test_setup_and_hooks_never_start_the_daemon():
-    """The L4 consent is the whole answer to SR-MAINTENANCE veto 6.
+    """The L5 consent is the whole answer to SR-MAINTENANCE veto 6.
 
     `maintenance-trigger` rejected an always-on process because it had no
     moment of choosing. This one is chosen — and stops being chosen the instant

@@ -90,7 +90,7 @@ def test_the_page_never_reads_a_clock():
 
     ⚠ **`ask --json` carries no `ms` fields today**, so the stepper shows stage
     *completion* rather than stage duration and prints no timing at all. That is
-    the honest version of the requirement: L3 forbids wall-clock output in what
+    the honest version of the requirement: L4 forbids wall-clock output in what
     fux writes, so a page that invented durations would be printing a number no
     verb produced. If `--why` ever gains `ms`, the stepper reads it — and this
     test still holds, because reading a field is not reading a clock.
@@ -103,7 +103,7 @@ def test_the_page_never_reads_a_clock():
 
 
 def test_the_page_fetches_nothing_off_the_machine():
-    """L4, and simply what an offline tool owes: it must render unplugged."""
+    """L5, and simply what an offline tool owes: it must render unplugged."""
     for external in ("http://", "https://", "//cdn", "fonts.googleapis", "unpkg", "jsdelivr"):
         assert external not in SOURCE, (
             f"`{external}` in the page. One file, inline, no external host — "

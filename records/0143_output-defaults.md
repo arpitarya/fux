@@ -10,10 +10,10 @@ amended: 2026-08-28
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@988bd2d3cdfb, src/fux/templates/output.toml.txt@7251f3203770, .fux/output.toml@7251f3203770, node/src/config/output.mjs@850e35e36742]
+owns: [src/fux/output_config.py@daa8822237b1, src/fux/templates/output.toml.txt@a3ffe1caa9d9, .fux/output.toml@a3ffe1caa9d9, node/src/config/output.mjs@850e35e36742]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 09801767aa1d740ff660fc35f875eb9c46d52ac3aa4a352e957e0e85b95593f3
+content_sha: 241ad2ce6287424a203002047f1c1d6141ad69e374f7132c416cfac30dc94d82
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -45,7 +45,7 @@ wants a different shape retypes the same flags on every invocation — **and an
 MCP client cannot retype anything, because a tool call has no flags.**
 
 This record adds **`.fux/output.toml`**: committed, and read only at the
-moment a result is printed. **Required, key by key** ([L12](0013_LAW-12-values-live-in-config.md)):
+moment a result is printed. **Required, key by key** ([L12](0014_LAW-12-values-live-in-config.md)):
 it is the *sole* source of every key a verb resolves; an absent file or a key
 it does not set is a hard error naming `fux doctor --fix`. `--no-output-config`
 and a run outside any repo read the packaged template instead. See decisions 19
@@ -76,7 +76,7 @@ so on the line itself.
 ⚠ **This diagram showed a `[defaults]` / `[verb]` file until 2026-09-12** and
 that layout has not existed since the three-root rewrite (W-140 row 12). The
 real roots are `[cli]`, `[cli.json]` and `[mcp]`, with per-verb subtables under
-the first two. **There is no built-in rung** ([L12](0013_LAW-12-values-live-in-config.md)):
+the first two. **There is no built-in rung** ([L12](0014_LAW-12-values-live-in-config.md)):
 the file read is the repo's `.fux/output.toml`, or — under `--no-output-config`
 or with no repo at all — the packaged template `fux setup` writes.
 
@@ -238,7 +238,7 @@ null
 6. **The template is the single home of every shipped value** —
    [`src/fux/templates/output.toml.txt`](../src/fux/templates/output.toml.txt),
    which `fux setup` writes, `fux output` prints, `--no-output-config` reads and
-   `fux doctor --fix` restores a missing key from ([L12](0013_LAW-12-values-live-in-config.md)).
+   `fux doctor --fix` restores a missing key from ([L12](0014_LAW-12-values-live-in-config.md)).
    The CLI's help text reads it rather than repeating the number in
    `add_argument`. There is no built-in dict in either runtime.
 
@@ -285,7 +285,7 @@ null
     again** — there is a test asserting it is present, for that reason.
 
 12. **Nothing on the maintenance path reads it.** Not `ingest`, not `build`,
-    not the hooks. L3 says no maintenance output may depend on anything but the
+    not the hooks. L4 says no maintenance output may depend on anything but the
     sources, and a rendering preference is not a source. The module imports
     nothing from `ingest`, `derive`, `maintain` or `store`, and a test asserts
     the fence over its own import block.
@@ -393,7 +393,7 @@ null
     this at all — every key is live from the day the file is written.
 
 20. **A MISSING FILE IS AN ERROR, AND `doctor` STILL RUNS**
-    ([L12](0013_LAW-12-values-live-in-config.md) decision 3; release 3.0,
+    ([L12](0014_LAW-12-values-live-in-config.md) decision 3; release 3.0,
     breaking, R9). There is no built-in behind the file, so `load()` raises when
     `.fux/output.toml` does not exist, naming the file and `fux doctor --fix`.
     **The lesson that shaped this decision's earlier form still binds: the verb
@@ -634,7 +634,7 @@ keys`.
       learn:** once `.fux/output.toml` exists every gated key must be set, so a
       two-line snippet is refused. The realistic path — and the one now tested —
       is the specimen with one line flipped.
-    - **L8 is untouched by this.** The journal is gitignored, local, and never
+    - **L9 is untouched by this.** The journal is gitignored, local, and never
       reaches a committed byte — [SR-LAWS](0001_LAWS.md) decision 8. What the
       committed key holds is the *instruction to journal*, never the journal.
     - Found 2026-09-12 re-deriving W-140 (closed 2026-09-15)
@@ -770,7 +770,7 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 
 <!-- L12-NOTE-START -->
 
-**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `.fux/output.toml` keeps its built-ins until
+**[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `.fux/output.toml` keeps its built-ins until
 W-225's stage 3; `.fux/tune.toml` is mandatory already, so a verb whose output
 default this file sets can now stop on a missing tune key before it renders.
 
@@ -778,7 +778,7 @@ default this file sets can now stop on a missing tune key before it renders.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -791,13 +791,13 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No output key changed** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `cli.py`'s observer hook no longer runs observers on a `50` ms bound held in code when `fux.toml` does not load ([SR-OBSERVE](0157_observe.md)); `node/test/config.test.mjs` gained the `dirs_file` cases.
+**No output key changed** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `cli.py`'s observer hook no longer runs observers on a `50` ms bound held in code when `fux.toml` does not load ([SR-OBSERVE](0157_observe.md)); `node/test/config.test.mjs` gained the `dirs_file` cases.
 
-**`fux inspect --top` reads `.fux/inspect.toml [report] top`, not `output.toml`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): it sizes a report's lists, which is SR-INSPECT's, and no output key changed.
+**`fux inspect --top` reads `.fux/inspect.toml [report] top`, not `output.toml`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): it sizes a report's lists, which is SR-INSPECT's, and no output key changed.
 
-**No output key changed** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/output.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
+**No output key changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/output.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 **No output default changed with the intent prior** (W-168 step 9, 2026-09-28).
 `query/__init__.py` gained `_intent_prior` and `--why`'s `intent` block; the
@@ -822,8 +822,8 @@ prior's switches live in `.fux/tune.toml` ([SR-TUNE](0135_tuning.md) decision
 - ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
   nothing it decides.** Hashed display meta was deleted outright: `meta` and
   `title_h` left the record shape, `store/displaycache.py` and
-  `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law L5
-  retired ([SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). Nothing in `output_config.py` changed, and no rendering key gained or lost a meaning. ⚠ **One rendered VALUE did change**: a `url:` result's `title` is the document's title rather than an opaque hash, on every surface — which is what the deletion was for, and is not a change to what `[cli.*]` decides.
+  `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law ex-L5
+  retired ([ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). Nothing in `output_config.py` changed, and no rendering key gained or lost a meaning. ⚠ **One rendered VALUE did change**: a `url:` result's `title` is the document's title rather than an opaque hash, on every surface — which is what the deletion was for, and is not a change to what `[cli.*]` decides.
   **This record's decisions are unaffected**, and the line is here because the
   freshness gate asks a describer to say so rather than to be silent.
 
@@ -919,7 +919,7 @@ catchable by the tests that existed when they were written.**
   the closed key sets (`CLI_VERBS`, `MCP_KEYS`), the precedence chain, the
   refusals, and the no-fallback resolution decision 19 added.
 - [`tests/test_output_config.py`](../tests/test_output_config.py) — 74
-  tests, including the L3 import fence, the `bool`-before-`int` trap, the
+  tests, including the L4 import fence, the `bool`-before-`int` trap, the
   `[mcp]`-row guard, the no-monkeypatch CLI seam, the structural
   `default=None` assertion over every gated flag, and (decision 19) the
   loader-refusal contract and the structural `--no-output-config`-on-every-verb
@@ -963,7 +963,7 @@ choice rather than the console's. Nothing about the guard itself changed;
    `tune.toml`. `top` is the known boundary case and is exempt **only**
    because it truncates without reordering.
 2. **Anything under `ingest/`, `derive/`, `maintain/` or `store/` imports
-   `output_config`.** L3 is then reachable from a rendering preference.
+   `output_config`.** L4 is then reachable from a rendering preference.
 3. **`MCP_KEYS` is empty, or `[mcp]` gains inheritance from `[cli]`.** The
    first makes MCP unconfigurable again; the second reopens the leak decision
    3 exists to close. Either way
@@ -1006,8 +1006,8 @@ choice rather than the console's. Nothing about the guard itself changed;
 - [SR-TUNE](0135_tuning.md) · [SR-CONFIG](0113_config.md) ·
   [SR-CONFIDENCE](0141_confidence.md) · [SR-MCP](0136_mcp.md) ·
   [SR-CLI](0101_cli-surface.md) · [SR-DOTFUX](0102_fux-directory.md)
-- [SR-LAWS](0001_LAWS.md) — L1 (stdlib only: `tomllib`), L3 (no maintenance
-  path reads this), L4 (nothing here reaches the network), L7 (`tomllib`
+- [SR-LAWS](0001_LAWS.md) — L2 (stdlib only: `tomllib`), L4 (no maintenance
+  path reads this), L5 (nothing here reaches the network), L7 (`tomllib`
   requires 3.11+)
 - [`src/fux/schemas/output.schema.json`](../src/fux/schemas/output.schema.json)
   — where the conditional `confidence` block and `sections` are declared

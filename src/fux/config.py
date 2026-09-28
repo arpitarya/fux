@@ -299,7 +299,7 @@ class UrlSource:
     #: words.** Decision 15 keeps two clocks apart on one line -- `ttl` is
     #: ask-time *how often*, `update` is update-time *at all* -- and this is
     #: the third cell: ask-time *at all*. `offline` was rejected (it collides
-    #: with L4's vocabulary and reads as the whole engine) and `pinned` was
+    #: with L5's vocabulary and reads as the whole engine) and `pinned` was
     #: rejected (one word over both clocks, which is the merge decision 15
     #: exists to prevent). **No line-level layer**, like `acquired_max_bytes`:
     #: it answers *"how do I reach these pages?"*, which a source answers for

@@ -21,7 +21,7 @@ list survives it intact.
 **It is advisory, never authoritative.** `fux ingest` walks and re-indexes
 the whole corpus regardless of what this file says — a missing, stale or
 corrupt list can never change a committed byte. That is the sentence that
-keeps L3 true; nothing here is a second write path into the index.
+keeps L4 true; nothing here is a second write path into the index.
 """
 
 from __future__ import annotations

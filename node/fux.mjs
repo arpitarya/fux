@@ -16,7 +16,7 @@ import { runMcp } from "./src/verbs/mcp.mjs";
 import { FuxError } from "./src/errors.mjs";
 import { applyOutputDefaults, loadOutput } from "./src/config/output.mjs";
 // 🔴 **The library surface travels with the CLI, and that is what makes ONE
-// bundle possible** (L10, records/0011_LAW-10-bundled-output.md). `exports`
+// bundle possible** (L10, records/0012_LAW-10-bundled-output.md). `exports`
 // and `bin` in `package.json` both name this file, so `import { open } from
 // "fux-engine"` and `fux ask` reach the same artefact. The twin of this
 // re-export is `src/fux/__init__.py`'s, and it is deliberately thin: the

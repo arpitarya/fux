@@ -18,7 +18,7 @@
     "than written as false. That is SR-ARCHIVED-CONTENT decision 1 -- a live",
     "record's shape is unchanged, so no existing consumer's parse breaks.",
     "",
-    "display: true marks text a human can read. L5 forbade these on a hashed",
+    "display: true marks text a human can read. ex-L5 forbade these on a hashed",
     "record; since W-194 (2026-09-20) there is no hashed record and no rule",
     "reads this flag. It is kept as the one place that says which fields are",
     "human-readable, so a future rule finds it instead of inventing a list.",
@@ -38,7 +38,7 @@
     "per-document byte a function of other documents; editing B would move A's",
     "bytes while the dirty list marked only B, and a full ingest and an",
     "incremental re-index would produce different indexes from the same",
-    "sources. Terms, not text: link text is content, and L2 keeps content out",
+    "sources. Terms, not text: link text is content, and L3 keeps content out",
     "of the index.",
     "",
     "ABBR, W-168 step 4 (2026-09-27, _format v5). A sorted, de-duplicated list",
@@ -46,7 +46,7 @@
     "declares in its own text, analyzed and hashed like `terms`. Absent when",
     "there is none (omit_when). It is a function of THIS document's bytes, so",
     "it is carried; the corpus-wide table is a read-time fold of every record's",
-    "pairs (query/mined.py) and is committed nowhere. Hashes, not text (L2)."
+    "pairs (query/mined.py) and is committed nowhere. Hashes, not text (L3)."
   ],
 
   "schema": "fux.index.v5",
@@ -76,10 +76,10 @@
   "_examples_doc": [
     "Two, one per source kind -- and since W-194 (2026-09-20) they differ only",
     "in `src`, `loc` and the shape of the id. THE PRIVACY FORK IS GONE: `meta`",
-    "and `title_h` are deleted, law L5 is retired, and a url record carries a",
+    "and `title_h` are deleted, law ex-L5 is retired, and a url record carries a",
     "plain `title` and `phrases` exactly as a git record does.",
     "",
-    "The leak L5 closed is ACCEPTED, not solved: a title alone tells a reader",
+    "The leak ex-L5 closed is ACCEPTED, not solved: a title alone tells a reader",
     "that a document they cannot open exists. archive/records/0007_LAW-5-hashed-meta.md",
     "keeps the argument and the reopen trigger.",
     "",

@@ -7,10 +7,10 @@ description: "The merge driver for .fux/index/*.jsonl. A shard is a header plus 
 status: accepted
 date: 2026-08-21
 feature: the merge driver for the committed index
-owns: [src/fux/maintain/mergedriver.py@04553ac25f4c]
-laws: [L1, L3]
+owns: [src/fux/maintain/mergedriver.py@227743230974]
+laws: [L2, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 83660098472a15ead86bab9527adfd2134dc9e0d6870cfd6401323414505e56a
+content_sha: 80aea530b20512078f574d22e5f2af721c8ec8ad6b7245aeabf9cd001d0e7f3d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -207,7 +207,7 @@ outright. This arises in both branches, and the rule is the same in each:
 
 **5. The merged output is sorted by id.** Two machines merging the same three
 inputs produce the same bytes. **Order is rebuilt, never carried over from
-either input.** Without this the driver would be a hole in L3 the size of every
+either input.** Without this the driver would be a hole in L4 the size of every
 collaborative repository.
 
 **6. On refusal: ordinary conflict markers, both sides whole, exit non-zero, and
@@ -269,7 +269,7 @@ it the day the register landed.
 - **`.gitattributes` gains a second line**, appended write-if-missing per line
   like the first.
 
-**The merge driver reads git's `%O %A %B [%P]` by unpacking** and exits `constants.toml [exit] usage` on a short argv. The merge itself is unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**The merge driver reads git's `%O %A %B [%P]` by unpacking** and exits `constants.toml [exit] usage` on a short argv. The merge itself is unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 
@@ -282,7 +282,7 @@ it the day the register landed.
 - **CRLF checkouts neither corrupt the merge nor leak into committed output.**
   `main()` reads with universal-newline translation and writes with
   `newline="\n"` explicitly, so a Windows checkout parses identically to a POSIX
-  one — **L3's byte-identical guarantee had no stated OS exception, and this is
+  one — **L4's byte-identical guarantee had no stated OS exception, and this is
   the one place it could have gained one.**
 - ⚠ **git does not invoke a content merge driver for an add/add**, where a shard
   file is created on both branches with no ancestor. Git resolves that at the

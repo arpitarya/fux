@@ -50,7 +50,7 @@ description: "W-168 step 10 starts as a compare doc (proposal §2). Three forks:
 | reaches a document **outside** the top-k | ❌ — its one limit | ✅ | ✅ |
 | content needed at query time | ✅ the top-k documents' bytes — the ones the reranker already reads | ❌ | ❌ |
 | cost per query | one more score over passages the reranker already holds (it measured +8 ms p95 at 10 000 documents for all of its work) | a larger postings scan | a larger record decode |
-| laws | L2 ✅ (nothing stored) · L3 ✅ · L4 ⚠ URL sources fetch | L2 ✅ statistics only · L3 ✅ the fold is deterministic | same as U2 |
+| laws | L3 ✅ (nothing stored) · L4 ✅ · L5 ⚠ URL sources fetch | L3 ✅ statistics only · L4 ✅ the fold is deterministic | same as U2 |
 | precedent | 🔴 **exact**: [SR-RERANK](../../records/0138_rerank.md) already scores the top-20 over the refer plane's own passages (coverage, span, adjacency) | none — the index has never held a sub-document record | `alen`/`at` — per-document statistics that fold at read time (step 1) |
 
 **Recommend U0, built as a TERM inside the existing rerank stage — never a

@@ -4,7 +4,7 @@
 `just golden-score` calls this and scores what it prints, one tab-separated line
 per hand-off: `handoff  arm  rung  set`. It is split out of the recipe so the
 three evidence layouts can be tested without starting the scorer, which no agent
-does ([L11](../../records/0012_LAW-11-sealed-answer-key.md) decision 13). This
+does ([L11](../../records/0013_LAW-11-sealed-answer-key.md) decision 13). This
 file opens hand-offs by path and nothing else, so **any session may run it**.
 
 | layout | arm | rung |

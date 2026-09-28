@@ -3,14 +3,14 @@ type: Standing Record
 kind: law
 name: SR-LAW-0
 title: "SR-LAW-0 (0002) — L0 — SRs are the only source of truth, and the Law records outrank every other record"
-description: "The constitutional law. A rule is stated in exactly one SR and every other artifact links to it; the nine Law records outrank every other SR and a conflicting record is void in the conflicting part; a Law changes only on Arpit's ruling. Carries the describes/implements/enforces test that makes the source clause followable, and states plainly which half is gated and which is judgment."
+description: "The constitutional law. A rule is stated in exactly one SR and every other artifact links to it; the Law records outrank every other SR and a conflicting record is void in the conflicting part; a Law changes only on Arpit's ruling. Carries the describes/implements/enforces test that makes the source clause followable, and states plainly which half is gated and which is judgment."
 status: accepted
 date: 2026-09-06
 feature: the authority of records — where a rule lives, which record wins, and who may amend one
-owns: [scripts/gen-laws.py@54958fef9e4d, scripts/gen-components.py@f698b5c2305a, tests/test_claude_md_laws.py@0d11020f49f7, tests/test_record_components.py@44f91ccdd550]
+owns: [scripts/gen-laws.py@e827930d1ffc, scripts/gen-components.py@cc4278e50ba4, tests/test_claude_md_laws.py@80d6f56c02d8, tests/test_record_components.py@44f91ccdd550]
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: c73311dab9a4e916506af8644c5f0c25e1f280ed8c0c7f70a32f6dab5a935aa8
+content_sha: 917617d501cf436789ca6dc1ab629328ed247d9f51bbdef1e25e77a405d08d83
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -48,7 +48,7 @@ outrank every other record* — the one-line form from
 
 ```mermaid
 flowchart TB
-  L["LAW RECORDS · SR-LAW-1 … SR-LAW-0<br/>supreme · amended only on Arpit's ruling"]
+  L["LAW RECORDS · SR-LAW-2 … SR-LAW-0<br/>supreme · amended only on Arpit's ruling"]
   A["EVERY OTHER SR<br/>binding on the code · subordinate to the laws"]
   P["EVERY OTHER ARTIFACT<br/>CLAUDE.md · schemas · comments · skills · diagrams · READMEs<br/>links, never restates"]
   L -->|"a conflicting record is VOID<br/>in the conflicting part"| A
@@ -61,7 +61,7 @@ flowchart TB
 
 ```text
         ┌──────────────────────────────────────────────┐
-        │  LAW RECORDS  SR-LAW-1 … SR-LAW-0          │  supreme
+        │  LAW RECORDS  SR-LAW-2 … SR-LAW-0          │  supreme
         │  amended only on Arpit's ruling               │
         └───────────────────┬──────────────────────────┘
                             │ a conflicting record is VOID
@@ -100,7 +100,7 @@ Amending a law needs Arpit's ruling, named in this record
   every other record.** Every rule is *stated* in exactly one SR; every other
   artifact — `CLAUDE.md`, a schema, a config comment, a skill, a diagram —
   **links to it and never restates it**, and a change is made in the record
-  first. The Law records `SR-LAW-0`…`SR-WORK-ENVIRONMENTS` outrank every other SR: **a
+  first. The Law records `SR-LAW-0`…`SR-LAW-12` outrank every other SR: **a
   record that conflicts with a Law is void in the conflicting part**, never a
   trade-off to weigh. **A Law changes only on Arpit's ruling, named in the
   record**; an ordinary SR a session may accept.
@@ -113,7 +113,7 @@ Amending a law needs Arpit's ruling, named in this record
   2026-09-12 each law is stated in its own `SR-LAW-n` record, and what
   `CLAUDE.md` carries is generated from those records and held equal by a test.
   Precedence is **judgment, never a gate** — no parser reads *"does this
-  contradict L2"* — and a record self-contradicting inside one file stays
+  contradict L3"* — and a record self-contradicting inside one file stays
   ungated. [SR-LAW-0](0002_LAW-0-authority.md).
 <!-- LAW-TEXT:END L0 -->
 
@@ -181,7 +181,7 @@ stated in `CLAUDE.md` §Law zero — a hand-written second copy of this record's
 own subject, which decision 4's test classes as a restatement and decision 1
 therefore forbids.
 
-**2. Precedence.** The Law records `SR-LAW-0` … `SR-WORK-ENVIRONMENTS` outrank every
+**2. Precedence.** The Law records `SR-LAW-0` … `SR-LAW-12` outrank every
 other SR. **A record that conflicts with a Law is void in the conflicting
 part** — a defect to fix on contact, never a trade-off to weigh. An ordinary
 record may narrow a law's application to its own subject; it may never widen,
@@ -303,14 +303,14 @@ record-relative to repo-root-relative and doing nothing else;
 byte-equal and refuses a verbatim third copy anywhere in a live document.
 
 ⚠ **Two things the migration corrected on the way, both factual rather than
-normative.** L0's own text enumerated the supreme records as `SR-LAW-0`…`SR-LAW-8`
-while L9 had existed since 2026-09-11 (Arpit's ruling that day made L9 a law; the
-enumeration simply lagged — **L9 was retired on 2026-09-13** and is now
+normative.** L0's own text enumerated the supreme records as `SR-LAW-0`…`SR-LAW-9`
+while ex-L9 had existed since 2026-09-11 (Arpit's ruling that day made ex-L9 a law; the
+enumeration simply lagged — **ex-L9 was retired on 2026-09-13** and is now
 [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md), a WORK record), and it named `this file` where it meant `CLAUDE.md`,
 which stopped being true the moment the text moved. Neither changes what any law
 permits or forbids.
 
-**`scripts/gen-laws.py` renders L13 and refuses a retired law left in `records/`** (2026-09-28, law [L13](0014_LAW-13-retired-records-archived.md)): it used to skip one at `status: superseded`, which let a dead law sit in the live set. The generated block's mechanics — decision 5's view, bound by `tests/test_claude_md_laws.py` — are unchanged.
+**`scripts/gen-laws.py` renders L1 and refuses a retired law left in `records/`** (2026-09-28, law [L1](0003_LAW-1-retired-records-archived.md)): it used to skip one at `status: superseded`, which let a dead law sit in the live set. The generated block's mechanics — decision 5's view, bound by `tests/test_claude_md_laws.py` — are unchanged.
 
 ### Consequences
 
@@ -344,7 +344,7 @@ code disagreeing about configuration. Nothing catches a rule restated in
 English in a skill file.
 
 🔴 **Decision 2 is judgment and will stay judgment.** No parser reads *"does
-this record contradict L2."* Precedence tells a reader which side to take
+this record contradict L3."* Precedence tells a reader which side to take
 once a conflict is found; it does not find one.
 
 🔴 **A record contradicting itself inside one file is still ungated**, exactly

@@ -17,11 +17,11 @@ permission is the test, not the generation.
 
 - Each `records/*_LAW-*.md` record carries **exactly one** normative block::
 
-      <!-- LAW-TEXT:BEGIN L3 -->
-      - **L3** · **Deterministic — no model in the maintenance path.** ...
-      <!-- LAW-TEXT:END L3 -->
+      <!-- LAW-TEXT:BEGIN L4 -->
+      - **L4** · **Deterministic — no model in the maintenance path.** ...
+      <!-- LAW-TEXT:END L4 -->
 
-- The blocks are concatenated in `LAW_ORDER` (`L0 … L13`) between `CLAUDE.md`'s
+- The blocks are concatenated in `LAW_ORDER` (`L0 … L12`) between `CLAUDE.md`'s
   `<!-- LAWS:BEGIN … -->` / `<!-- LAWS:END -->` markers.
 - **Link targets are rewritten, and that is the only transform.** A record lives
   at `records/`, `CLAUDE.md` at the repo root, so the same law text needs two
@@ -44,19 +44,18 @@ ROOT = Path(__file__).resolve().parents[1]
 SR_DIR = ROOT / "records"
 CLAUDE_MD = ROOT / "CLAUDE.md"
 
-#: The live law handles, in the order the block renders them. L0 first because
-#: it is the law that governs the others; the newest last.
+#: The live law handles, in the order the block renders them: L0 first because
+#: it is the law that governs the others, then dense by number.
 #:
-#: ⚠ **TWO handles are absent and both gaps are deliberate.** The environment
-#: rule became SR-WORK-ENVIRONMENTS on 2026-09-13 (**L9**), and hashed display
-#: meta was deleted outright on 2026-09-20 (**L5**, W-194) — its record is
-#: archived at `archive/records/` under law L13, argument and reopen trigger intact.
-#: **Neither handle is ever reused**, and neither is renumbered: renumbering
-#: would silently change the meaning of every citation already written, which
-#: is the one failure a stable handle exists to prevent.
+#: ⚠ **Dense since 2026-09-28** (Arpit, W-234). Until then two retired handles
+#: left gaps and neither was reused, so that no written citation changed meaning.
+#: The renumber reversed that on purpose: live citations were repointed in the
+#: same change, and a document dated earlier is read through SR-LAWS decision 2a.
+#: The two retired laws are `ex-L5` (hashed display meta) and `ex-L9` (the
+#: environment rule) in live text.
 #:
-#: **Twelve live laws, fourteen numbers.**
-LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L6", "L7", "L8", "L10", "L11", "L12", "L13")
+#: **Thirteen live laws, thirteen numbers.**
+LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "L10", "L11", "L12")
 
 BEGIN = "<!-- LAWS:BEGIN"
 END = "<!-- LAWS:END -->"
@@ -106,7 +105,7 @@ def _rewrite_links(text: str) -> str:
 
 #: A law record whose frontmatter says this is HISTORY and is not rendered.
 #:
-#: ⚠ **Added 2026-09-20 for W-194.** L5 was deleted outright, and its record is
+#: ⚠ **Added 2026-09-20 for W-194.** ex-L5 was deleted outright, and its record is
 #: kept — at `status: superseded`, with the argument, the AOL-2006 citation and
 #: the reopen trigger intact, because **a reopen is cheaper than a
 #: rediscovery**. Keeping the file means keeping its `LAW-TEXT` block, and the
@@ -115,14 +114,14 @@ def _rewrite_links(text: str) -> str:
 #:
 #: **Deleting the block instead was the alternative and it is worse**: the one
 #: artifact that says exactly what the rule used to be would no longer say it,
-#: and every citation of L5 in the history would point at a record that had
-#: quietly stopped stating it. The precedent is L9, which left the glob by
-#: being renamed; L5 stays a law record because it never stopped being one —
+#: and every citation of ex-L5 in the history would point at a record that had
+#: quietly stopped stating it. The precedent is ex-L9, which left the glob by
+#: being renamed; ex-L5 stays a law record because it never stopped being one —
 #: it stopped being *in force*.
 #:
-#: ⚠ **Since law L13 (2026-09-28) a retired law record is not SKIPPED here, it is
-#: REFUSED.** SR-LAW-5 moved to `archive/records/`, outside this glob; a retired
-#: record found in `records/` is an L13 violation to fix, never a case to route
+#: ⚠ **Since law L1 (2026-09-28) a retired law record is not SKIPPED here, it is
+#: REFUSED.** ex-SR-LAW-5 moved to `archive/records/`, outside this glob; a retired
+#: record found in `records/` is an L1 violation to fix, never a case to route
 #: around. `tests/test_retired_records_archived.py` checks the same from the
 #: records' side.
 RETIRED_STATUSES = ("superseded", "retired", "archived")
@@ -144,8 +143,8 @@ def law_records() -> dict[str, Path]:
         text = path.read_text(encoding="utf-8")
         if _status(text) in RETIRED_STATUSES:
             raise SystemExit(
-                f"{path.name}: status {_status(text)!r} in records/ — law L13 moves a retired "
-                "record to archive/records/ (SR-LAW-13)"
+                f"{path.name}: status {_status(text)!r} in records/ — law L1 moves a retired "
+                "record to archive/records/ (SR-LAW-1)"
             )
         handles = re.findall(r"<!-- LAW-TEXT:BEGIN (L\d+) -->", text)
         if not handles:

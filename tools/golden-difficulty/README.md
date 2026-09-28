@@ -19,7 +19,7 @@ forces**, derived from the key and the corpus and re-derivable by anyone.
    `type` is withheld ([`work/golden/questions/README.md`](../../work/golden/questions/README.md)).
 3. 🔴 **It refuses a key inside this repository, and that refusal is the point.**
    No answer key lives under this tree
-   ([SR-LAW-11](../../records/0012_LAW-11-sealed-answer-key.md)); *"just point it
+   ([SR-LAW-11](../../records/0013_LAW-11-sealed-answer-key.md)); *"just point it
    at the repo copy"* is how a tool becomes the thing a law forbids, so it fails
    closed instead of trusting the caller.
 

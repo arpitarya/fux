@@ -214,7 +214,7 @@ def test_a_directory_that_is_not_a_repository_is_a_clean_error(tmp_path):
         hooks.install(tmp_path)
 
 
-# -- L4: no hook ever touches the network -----------------------------------
+# -- L5: no hook ever touches the network -----------------------------------
 
 #: Every spelling that makes a fux invocation reach the network. A hook body
 #: containing any of these has broken the invariant below.

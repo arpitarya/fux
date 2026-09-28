@@ -84,7 +84,7 @@ consumer's corpus is shaped for it.
 |---|---|---|---|
 | shape | ~3 intents, each a short list of opening phrases (`how do i`, `how to`, `steps to` → *procedure*; `why did we`, `why was`, `rationale` → *rationale*; `what is`, `what does … mean`, `define` → *reference*) | the same table, written by the consumer | a model |
 | deterministic | ✅ | ✅ | ❌ |
-| laws | ✅ | ✅ | ❌ L1 (`$0`, no hosted model) for the default path |
+| laws | ✅ | ✅ | ❌ L2 (`$0`, no hosted model) for the default path |
 | a restatement risk | the lexicon lives in ONE module, bound by a test | — | — |
 | taggable from question text alone ([SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md) T2) | ✅ **the same lexicon tags the pool** | only once a consumer writes one | ❌ |
 

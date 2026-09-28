@@ -97,7 +97,7 @@ def test_the_token_is_hashed_never_stored(tmp_path):
     An `ETag` is opaque to fux but not necessarily to everyone — it can be a
     content hash, a version counter or an internal object id — and
     `url-state.json`, while gitignored, is the kind of local state that ends up
-    in a support bundle. **L5 is untouched by construction, not by policy.**
+    in a support bundle. **ex-L5 is untouched by construction, not by policy.**
     """
     secret = "W/\"internal-object-id-8891\""
     _, learned = validate_group(fetcher(lambda u: secret), ["https://a.test/x"], {})

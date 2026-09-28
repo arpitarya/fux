@@ -11,7 +11,7 @@ same change that recorded the second occurrence.
 
 Two different routes, **one failure class: golden-key material reaching a Claude
 session's context.** Both routes are ones
-[L11](../records/0012_LAW-11-sealed-answer-key.md) itself names as unguarded, and
+[L11](../records/0013_LAW-11-sealed-answer-key.md) itself names as unguarded, and
 both share the property that makes the law absolute — *a breach does not fail
 loudly; it yields a benchmark number indistinguishable from a clean one.*
 
@@ -26,7 +26,7 @@ leak stops being an incident and becomes permanent, citable and invisible.
 
 ⚠ **This test reads no key, ever.** Check 1 answers from ``git ls-files`` — the
 git index, not the filesystem — which is precisely how
-[L11](../records/0012_LAW-11-sealed-answer-key.md)'s own veto-condition check 2
+[L11](../records/0013_LAW-11-sealed-answer-key.md)'s own veto-condition check 2
 is written, and for the same reason: a ``test -d`` would be a tool call reaching
 the directory. Check 2 skips every path under a sealed-key directory on **both**
 spellings and never opens one.
@@ -76,7 +76,7 @@ SELF = "tests/test_golden_key_never_committed.py"
 #: 🔴 **The one exception, and it exists because Arpit ruled it — not because
 #: this file was inconvenient.**
 #:
-#: [L11](../records/0012_LAW-11-sealed-answer-key.md) decision 14 (2026-09-21)
+#: [L11](../records/0013_LAW-11-sealed-answer-key.md) decision 14 (2026-09-21)
 #: makes `just golden-retire <set>` move a scored set's questions **and answers**
 #: into a committed home, where they become ordinary reusable regression data.
 #: The law's own words are that a retired set *"retires OUT OF this law"* — so
@@ -219,7 +219,7 @@ def test_the_path_matcher_catches_a_sealed_path(rel):
         # The guard itself. The substring draft flagged this one first, which is
         # why the matcher is anchored to a path component.
         ".claude/hooks/guard-golden-answer.sh",
-        "records/0012_LAW-11-sealed-answer-key.md",
+        "records/0013_LAW-11-sealed-answer-key.md",
         "work/golden/questions/set-1.jsonl",
         "work/golden/seed/01-sop-temperature-excursion.md",
         "tests/test_claude_md_golden.py",

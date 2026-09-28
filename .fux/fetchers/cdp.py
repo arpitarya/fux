@@ -391,7 +391,7 @@ class WebSocket:
 # It used to be duplicated here and in http.py, with a comment asking the
 # two copies to stay identical and nothing checking that they did. Two
 # fetchers converting differently would make the committed index depend on
-# WHICH ONE RAN, which is L3. Link extraction stays here: crawling is this
+# WHICH ONE RAN, which is L4. Link extraction stays here: crawling is this
 # fetcher's job, not the decoder plane's.
 #
 # And WHICH decoder converts is the URL LINE's to say (2026-09-21): every

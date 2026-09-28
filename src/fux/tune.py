@@ -3,7 +3,7 @@
 [SR-TUNE](../../records/0135_tuning.md) is the record. What this module is:
 
 - **The loader.** Every key is required. An absent file, table or key stops
-  the command naming it ([L12](../../records/0013_LAW-12-values-live-in-config.md)
+  the command naming it ([L12](../../records/0014_LAW-12-values-live-in-config.md)
   decision 3) — fux holds no copy of these values in code. The shipped values
   live in one place, `templates/tune.toml.txt`, which `fux setup` writes,
   `fux doctor --fix` restores keys from, and `--no-tune` reads.
@@ -48,7 +48,7 @@ floor it was judged under) plus `--no-tune`, not a clamp.
 **Nothing outside `[index]` is read on the maintenance path.** Not by
 `ingest`, not by `build`, not by the hooks. `[index]` is read by ingest because
 it has to be: the file is committed, so `same sources + same committed tune.toml
-[index] -> same index` is the L3 that holds — the shape `[decode]
+[index] -> same index` is the L4 that holds — the shape `[decode]
 max_table_rows` had while it lived in `fux.toml`.
 
 ## Why `k1`, `b` and the field weights arrive as one `Scoring` object
@@ -242,7 +242,7 @@ _REMOVED_KEYS: dict[tuple[str, str], str] = {
 class Tune:
     """Every tunable, resolved. Construct via `load()`; there are no defaults.
 
-    [L12](../../records/0013_LAW-12-values-live-in-config.md): every field is
+    [L12](../../records/0014_LAW-12-values-live-in-config.md): every field is
     read from `.fux/tune.toml`, or — under `--no-tune` — from the template
     `fux setup` writes (`src/fux/templates/tune.toml.txt`). What each value is
     and why is said beside its key in that template, once.
@@ -618,7 +618,7 @@ def _resolve(data: dict, label: "Path | str") -> Tune:
         unknown_keys = [k for k in value if k not in _SCHEMA[name]]
         if unknown_keys:
             # A key fux removed is named as removed. Sorted so two removed keys
-            # in one table report the same one every run (L3 reaches errors too).
+            # in one table report the same one every run (L4 reaches errors too).
             removed = sorted(k for k in unknown_keys if (name, k) in _REMOVED_KEYS)
             if removed:
                 raise FuxError(f"{label}: [{name}] `{removed[0]}` {_REMOVED_KEYS[(name, removed[0])]}")
@@ -730,7 +730,7 @@ def _resolve(data: dict, label: "Path | str") -> Tune:
             continue
         doctype.append((pattern, kind))
     # Longest first, ties by code point: two patterns of one length can both
-    # match a path, and the answer must not depend on file order (L3).
+    # match a path, and the answer must not depend on file order (L4).
     doctype.sort(key=lambda pair: (-len(pair[0]), pair[0]))
 
     c.raise_if_any()

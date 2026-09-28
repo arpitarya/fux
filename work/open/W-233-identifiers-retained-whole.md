@@ -1,0 +1,218 @@
+---
+type: Handoff
+name: W-233
+description: "Research, then a compare doc: every way an identifier (RF-118, PROJ-ALPHA-2, v2.3.1, ADR-0004, a sha, a path) can still be chopped, stemmed, split or mismatched between document and query after analyzer v3, and the candidate mechanisms that keep it whole. Recreates W-168 step 2 as its own item. Arpit, 2026-09-28."
+item: W-233
+filed: 2026-09-28
+ball: agent
+---
+
+# W-233 — identifiers retained whole: research and a compare doc
+
+## ✅ RULED 2026-09-28 (Arpit, Cowork): F1–F5
+
+- **F1: a verb writes `[detected]`**, as in the rec (i), *"let's go with it"*.
+  **Also:** *"if the consumer wants to define it by themselves they can go ahead
+  and define it in identifiers.toml"*. So `.fux/identifiers.toml` may be
+  **hand-authored with no detection ever run**. A `[user]`-only file is valid,
+  and a missing `[detected]` section is not an error. The L12 hard-error rule
+  applies to the file's *existence* and schema, per `fux setup`'s template,
+  never to an empty section.
+- **F2: refresh on demand**, and `doctor` warns *"N new families since last
+  write"*. As recommended.
+- **F5: `[detected]` applies as soon as it is written**, and `[user]` overrides
+  it. As recommended; *"I agree"*.
+- **F3: BOTH templates and regex**, *"regex is something that shouldn't be
+  preferred until unless you are an expert because it can go in a loop"*.
+  - **Templates are the default and the only form `[detected]` ever writes.**
+  - **Regex is allowed in `[user]` only**, for experts, and fux discourages it
+    in the setup template comment, the skill and `doctor` output.
+  - **Regex guards, static and deterministic (L4; no timeout):**
+    - at load, reject constructs that can loop or that behave differently in
+      Python and JS: nested or overlapping quantifiers, backreferences,
+      lookaround, inline flags;
+    - force ASCII classes (`\d` means `[0-9]`) so both readers agree;
+    - a rejected pattern is a hard error that names the construct.
+  - **Parity check:** `fux doctor` runs each regex on both readers over a
+    corpus sample and fails if they disagree.
+  - **New `fux serve` tab, "Identifiers"** (a sixth tab, added to the
+    2026-09-27 five). It is a pattern test bench:
+    - type a template or a regex and see its matches across the corpus
+      (count, documents, examples);
+    - see how each ID would be indexed (whole + parts);
+    - see the Python vs Node parity result, and any rejection with its reason;
+    - see the detected families.
+    It is **read-only** like the rest of serve (SR-SERVE): it prints the TOML
+    line to copy and writes no committed byte.
+- **F4: the ID whole form is stored unstemmed + its parts**, as recommended.
+  Ordinary hyphenated words stay stemmed. A separate exact field (family c)
+  comes only if research question 7 shows a shared-parts neighbour still
+  outranks the exact ID.
+
+**All forks ruled. Ball → agent.** Next: the research fixture, then the
+compare doc folding in F1–F5, then pre-register, then build. The build order is
+the lens, then the file and verb, then the regex guards and parity check, then
+the analyzer on both readers, then the doctor checks, then the Identifiers tab.
+
+## 🔴 DIRECTION 2026-09-28 (Arpit) + PROPOSAL (Cowork, not yet ruled)
+
+*"we have a research tool or inspect tool. So maybe end user can determine what
+all IDs need to be kept intact and they can configure it in a file, or maybe if
+system can do it by itself even better but can be overwritten by the user or can
+be overwritten by the system itself … research and propose"*.
+
+### The shape proposed: detect → commit → ingest reads only the file
+
+```
+fux inspect (read-only)          fux identifiers --write         fux ingest / ask (both readers)
+ identifier lens: shape families  → .fux/identifiers.toml          analyzer reads the COMMITTED file only
+ "RF-{n}: 41 ids, 12 docs"         [detected]  system-owned          keep-whole + parts, unstemmed
+ Index-tab card (W-229 parity)     [user] keep / drop  (wins)        file hash stamped in the index
+```
+
+1. **Detection is a lens in `fux inspect`** (SR-INSPECT stays read-only; it
+   names the lever, applies none). It is deterministic, with no model (L4):
+   - tokenize with a broad class;
+   - reduce each token to a **shape** (letters → `X`/`x`, digit runs → `d`,
+     punctuation kept, runs collapsed): `RF-118` → `X-d`, `v2.3.1` → `xd.d.d`;
+   - group by shape + literal prefix;
+   - a family qualifies when it carries a digit, a separator or case change,
+     and ≥ N distinct values across ≥ M documents. N and M go in
+     `inspect.toml` (L12).
+   The output shows each family with counts and examples: `RF-{n}` (41 values,
+   12 docs), `ADR-{n:4}`, `v{semver}`. There is also a Words/Index-tab card
+   (W-229).
+2. **One committed file, `.fux/identifiers.toml`, two owners:**
+   - `[detected]` is **system-owned**. `fux identifiers --write` (or the
+     ruled verb) regenerates it from the lens, sorted and deterministic. A
+     rerun may add or drop families: that is *"system overrides itself"*.
+   - `[user]` has `keep = […]`, `drop = […]` and `pin`. **The user always
+     wins**, and the system never edits this section: the `fux correct` /
+     `--pin` precedent.
+   - Precedence: `user.drop` > `user.keep` > `detected` > built-in analyzer v3
+     (family (a), whole + parts on `- . / _`).
+3. **Ingest never detects on its own.** It reads the committed file only. Live
+   detection inside ingest would make one new document change the analyzer for
+   every document. That breaks full = delta and L4's "same sources → same index".
+4. **A changed file means a re-analysis.** The file's hash is stamped into the
+   index. `fux doctor` flags a mismatch, and `--fix` re-ingests. Both readers
+   read the same file (the Node twin, L12).
+5. **A restricted template grammar, not free regex.** Templates are
+   `RF-{n}`, `{X}-{n}`, `v{semver}`, `{hex:7..40}`. The same regex source
+   behaves differently in Python `re` and JS `RegExp` (a Node/Python drift
+   risk, and ReDoS). A closed grammar compiles identically on both.
+6. **What "kept whole" does to a matching token:** it is emitted whole and
+   **unstemmed** (family b) plus its parts for recall. Query-side folding per
+   template: dash/space/case (`RF 118`, `rf118`, `RF–118` → `rf-118`),
+   leading zeros for `{n:4}`. A separate exact field (family c) comes only if
+   research question 7 (ranking) shows the whole form still loses to a
+   shared-parts neighbour.
+
+### Prior art (cited in the compare doc)
+
+- Elasticsearch `word_delimiter_graph`: `preserve_original` (whole + parts),
+  `protected_words` / `protected_words_path` (a user list never split), and
+  `type_table`. This is the user-list half, hand-maintained, with no detection.
+- spaCy token `SHAPE` (`Xxxx`, `dddd`) as a deterministic shape feature, used by
+  its rule Matcher. This is the detection half.
+- Regex inference from examples (ACM CIKM 2011; IEEE TKDE 2016). Heavier than
+  needed, and the closed template grammar sidesteps it.
+
+### 🔴 Forks for Arpit
+
+- **F1 · who writes `[detected]`:**
+  - (i) a new verb `fux identifiers --write`;
+  - (ii) `fux doctor --fix`;
+  - (iii) the user copies it from the report.
+  *Rec: (i).* Explicit and diffable in a PR, and inspect stays read-only.
+- **F2 · when detection refreshes:**
+  - (a) on demand; `doctor` warns *"N new families since last write"*;
+  - (b) automatically inside every `fux ingest`.
+  *Rec: (a).* (b) is deterministic, but one added document can trigger a
+  full re-analysis.
+- **F3 · pattern language:** closed templates or free regex. *Rec: templates.*
+- **F4 · whole form:** unstemmed whole + parts (b), with (c) the exact field
+  deferred to the ranking evidence. *Rec: yes.*
+- **F5 · default on a fresh repo:**
+  - `[detected]` applies as soon as it is written;
+  - or it applies only after the user accepts it.
+  *Rec: it applies as soon as written.* That is Arpit's "system does it by
+  itself", and the user can override it.
+
+### Order (after the forks)
+
+1. The research fixture below, which is unchanged.
+2. The compare doc folds in this design.
+3. Pre-register.
+4. Build: the lens, then the file and verb, then the analyzer read on both
+   readers, then the doctor check.
+
+
+**Model: Opus** (analyzer change: both readers, ingest = query, a `_format` question).
+
+**Arpit, 2026-09-28:** *"step 2, recreate a new work item with id's not being
+chopped research how id's can be retained"*.
+
+## Where it stands (read first)
+
+- W-168 step 2 went to **W-205** (ruled 2026-09-20; closed 2026-09-22).
+- **Family (a) shipped**: analyzer `v3` treats `-` `.` `/` like `_` and emits
+  **whole + parts**. The probe showed 33/33 seed identifiers surviving whole, up
+  from 0/33. [SR-RANKING](../../records/0111_ranking.md) decision 9.
+- Its arms were **INCONCLUSIVE** (+1/+3/+4, 0 regressions). It shipped on
+  correctness, at +4.6 % index bytes.
+- **Not built:** (b) unstemmed + stemmed, and (c) a separate exact field.
+  Also unmeasured: restricting the whole form to digit-bearing tokens.
+
+## Research questions — where an ID can STILL break after v3
+
+Build a fixture of identifier shapes and run it through the analyzer on **both
+readers**, doc side and query side, before proposing anything:
+
+1. **Stemming the whole form:** `release-notes-2` or `PROJ-ALPHA-releases`.
+   Does Porter alter the whole token? That is family (b).
+2. **Query/document mismatch:** a query of `RF 118`, `rf118` or `RF–118` (en
+   dash) against a document holding `RF-118`. Unicode dashes and missing
+   separators.
+3. **Leading zeros:** `ADR-0004` vs `ADR-4`.
+4. **Separators v3 does not cover:** `:` (`JIRA:PROJ-1`), `#` (`#1234`), `@`,
+   `+`, `~`, parentheses, and version strings like `v2.3.1-rc.1`.
+5. **Long opaque IDs:** git shas (full vs 7-char prefix), UUIDs, hashes. Prefix
+   matching?
+6. **Paths and URLs:** `src/fux/query/bm25f.py`, and the whole vs the file name.
+7. **Ranking, not just presence:** does an exact whole-form hit outrank a
+   document that merely shares the parts (`RF-118` vs `RF-119`)? That is the
+   shape the failing questions had.
+8. **Cost:** dictionary and index bytes per candidate, at `rung-10000`
+   (SR-WORK-SCALE ceiling).
+
+## Candidate mechanisms to compare (survey prior art; cite it)
+
+- **(a) as shipped:** whole + parts on separators.
+- **(a′):** whole form only for digit-bearing tokens. Sheds most of the +4.6 %.
+- **(b):** the whole form left **unstemmed**, the parts stemmed.
+- **(c):** a separate **exact field** (keyword-style, BM25F weight in
+  `tune.toml`). This is Elasticsearch's multi-field/keyword subfield pattern.
+- **(d):** a **query-side normalizer**: dash/space/case/zero folding applied
+  identically at ingest (e.g. `RF 118` → `rf-118`).
+- **(e):** **consumer-declared ID patterns** (a regex list in a `.fux/*.toml`,
+  per L12). Matching tokens are kept whole and exact. This is the Lucene/ES
+  `pattern_capture` / `word_delimiter_graph` `preserve_original` family.
+- **(f):** prefix matching for shas/UUIDs (edge n-grams or a prefix lookup), if
+  item 5 shows a need.
+
+Constraints: L4 (deterministic, same bytes on both readers), L2 (no dependency
+beyond what a record names), L12 (every weight and pattern in config), and a
+`_format` bump means re-ingesting a rung copy, never a rung.
+
+## Definition of done
+
+1. **The fixture and its results filed** (`work/regression/…`): which of
+   questions 1–7 actually break today, with counts.
+2. **A compare doc**, `work/compare/identifiers-whole.compare.md`: each
+   candidate against the breaks it fixes, its cost and its reopen-trigger, plus
+   a recommendation.
+3. **🔴 Arpit rules the forks.** Only then pre-register, then build.
+4. **Test data:** if the gen-3 seed lacks the failing shapes, name them for the
+   next generation (SR-WORK-TESTDATA). A measurement with no pool stops, as
+   W-168 steps 6 and 10 did.

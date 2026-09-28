@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@823487257176, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
-laws: [L4, L8]
+owns: [src/fux/doctor.py@009a3556007b, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 509f706b2db537df4e3a5e8bc3b70206808c478b063e5f620e69e00a3f977a5f
+content_sha: 489271ba32c7a9c79d8dcda2947c7139f9b8e375dd90b4c281bbf7b9b4409a73
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -182,7 +182,7 @@ authoritative about the row.**
 | `freshness verdicts` | warn | `freshness_counts` and `AS_INGESTED_VETO_SHARE` — the veto instrument, shared verbatim with SR-ACQUIRED's identical one so the quarter has one home | [SR-URL-FRESHNESS](0147_url-freshness.md) |
 | `ranking priors` | warn | every prior that is wired, reads its input and multiplies by one — **and the count of documents it would have acted on**. It refuses to recommend a value | [SR-ARCHIVED-CONTENT](0134_archived-content.md) · [SR-TUNE](0135_tuning.md) |
 | `output.toml present` | warn | absent means every output default is the engine's own and none can be changed | [SR-OUTPUT](0143_output-defaults.md) decision 20 |
-| `tune.toml loads` | warn, **error** when the file will not parse | 🔴 **A broken `.fux/tune.toml` left doctor GREEN until 2026-09-11** (W-140 row 13), which is the worst shape for this file: `fux ingest` reads only `[index]`, so a bad ranking knob does not stop an ingest by design (SR-TUNE decision 13) while `ask`, `find` and `answer` refuse. The repo indexes cleanly, every row is fine, and every query fails. **Absent, or missing a key, is an error too** ([L12](0013_LAW-12-values-live-in-config.md)): there is no engine default to read in its place, and `fux doctor --fix` writes what is missing from the template. It calls `tune.load` rather than re-parsing: a second parser answers a question the real one does not ask | [SR-TUNE](0135_tuning.md) decision 13 |
+| `tune.toml loads` | warn, **error** when the file will not parse | 🔴 **A broken `.fux/tune.toml` left doctor GREEN until 2026-09-11** (W-140 row 13), which is the worst shape for this file: `fux ingest` reads only `[index]`, so a bad ranking knob does not stop an ingest by design (SR-TUNE decision 13) while `ask`, `find` and `answer` refuse. The repo indexes cleanly, every row is fine, and every query fails. **Absent, or missing a key, is an error too** ([L12](0014_LAW-12-values-live-in-config.md)): there is no engine default to read in its place, and `fux doctor --fix` writes what is missing from the template. It calls `tune.load` rather than re-parsing: a second parser answers a question the real one does not ask | [SR-TUNE](0135_tuning.md) decision 13 |
 | `types list usable` | error | a types list with no live pattern — `read_types` refuses it, so ingest stops | [SR-TYPES](0128_types-list.md) decision 10 |
 | `fuxignore usable` | warn, **error** when the patterns will not parse | the `.fuxignore` patterns parse, and duplicates | [SR-FUXIGNORE](0144_fuxignore.md) |
 | `dirs exclusions migrated` | warn | the `!` lines still in `.fux/sources/dirs`, each with the anchored pattern to write instead. `fux remove` stopped writing them on 2026-09-14 (SR-FUXIGNORE decision 5a) and they are read forever, so this reports and never fails. ⚠ **Not the duplicate finding above** — that one needs the pattern in *both* files; this fires on every survivor, including the ones nothing duplicates, which are the ones no other row would mention | [SR-FUXIGNORE](0144_fuxignore.md) decisions 5a–5b · [SR-DIR-LIST](0120_dir-list.md) decision 2d |
@@ -299,7 +299,7 @@ is the single failure the lock exists to prevent
 ([SR-MAINTENANCE](0129_hooks.md) decision 1c, veto 7).
 
 **7. Offline, always — and it reads consumer code as TEXT.** `doctor` never
-touches the network ([L4](0001_LAWS.md)), and it never imports a consumer's
+touches the network ([L5](0001_LAWS.md)), and it never imports a consumer's
 fetcher or decoder: those files are free to open a session at module level, and
 a capability check that ran the code would break the offline guarantee to answer
 a question about the source.
@@ -313,7 +313,7 @@ rule.
 
 **9. Every durable trace `doctor` reads is someone else's.** It writes one
 thing: a `.doctor-probe` file it immediately unlinks, to answer *is `.fux/`
-writable*. L8's gitignored-path rule is not reached because there is no record
+writable*. L9's gitignored-path rule is not reached because there is no record
 of use to keep.
 
 **10. The `tune.toml loads` row** (2026-09-11, W-140 row 13). A tune file that
@@ -418,7 +418,7 @@ absence as a failure would make every fresh clone look broken.
 
 <!-- L12-NOTE-START -->
 
-**[L12](0013_LAW-12-values-live-in-config.md) (W-225 stages 3a–3b, 2026-09-27).** The frozen-keys check now walks every
+**[L12](0014_LAW-12-values-live-in-config.md) (W-225 stages 3a–3b, 2026-09-27).** The frozen-keys check now walks every
 file `fux doctor --fix` writes — `fux.toml`, `.fux/tune.toml` and `.fux/output.toml` — and
 reports each missing key as an error row naming `--fix`. For `fux.toml`,
 `[sources.url]`'s keys are checked only when the table is present, and `--fix`
@@ -434,7 +434,7 @@ file, from the template ([SR-OUTPUT](0143_output-defaults.md) decision 20).
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -444,17 +444,17 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**`types list usable` no longer passes an absent `formats.toml`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27) — the file is required ([SR-TYPES](0128_types-list.md) decision 14) — and `formats.toml current` joins the frozen-keys rows for its `[limits]` keys.
+**`types list usable` no longer passes an absent `formats.toml`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27) — the file is required ([SR-TYPES](0128_types-list.md) decision 14) — and `formats.toml current` joins the frozen-keys rows for its `[limits]` keys.
 
-**`refusals.toml current` joins the frozen-keys rows for `[scan]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27); an absent `refusals.toml` is not reported there, because absent means *no rules* ([SR-REFUSAL](0146_refusals.md) decision 9a).
+**`refusals.toml current` joins the frozen-keys rows for `[scan]`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27); an absent `refusals.toml` is not reported there, because absent means *no rules* ([SR-REFUSAL](0146_refusals.md) decision 9a).
 
-**`inspect.toml current` joins the frozen-keys rows** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28); the file is required and written from its template ([SR-INSPECT](0156_inspect.md) decision 23).
+**`inspect.toml current` joins the frozen-keys rows** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28); the file is required and written from its template ([SR-INSPECT](0156_inspect.md) decision 23).
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
-**The url-extraction-depth row warns at `fux.toml [doctor] thin_url_share` and `thin_url_chars`**, and the url-sources row names a URL at `[sources.url] failing_streak` ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) ([SR-CONFIG](0113_config.md) decision 18). ⚠ `AS_INGESTED_VETO_SHARE` is not a doctor knob — it is SR-ACQUIRED's and SR-URL-FRESHNESS's reopen condition — so it is `constants.toml [doctor] as_ingested_veto_share`.
+**The url-extraction-depth row warns at `fux.toml [doctor] thin_url_share` and `thin_url_chars`**, and the url-sources row names a URL at `[sources.url] failing_streak` ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) ([SR-CONFIG](0113_config.md) decision 18). ⚠ `AS_INGESTED_VETO_SHARE` is not a doctor knob — it is SR-ACQUIRED's and SR-URL-FRESHNESS's reopen condition — so it is `constants.toml [doctor] as_ingested_veto_share`.
 
-**The acquired-plane row warns at `fux.toml [doctor] acquired_warn_share`** (0.8 of `acquired_max_bytes`), and the shim check reads `constants.toml [bundle] shim_sniff_chars` of a launcher ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28; [SR-CONFIG](0113_config.md) decision 18). Every *first N, then (+M more)* cut in a row's detail stays: it is R3's presentation count.
+**The acquired-plane row warns at `fux.toml [doctor] acquired_warn_share`** (0.8 of `acquired_max_bytes`), and the shim check reads `constants.toml [bundle] shim_sniff_chars` of a launcher ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28; [SR-CONFIG](0113_config.md) decision 18). Every *first N, then (+M more)* cut in a row's detail stays: it is R3's presentation count.
 
 ### Consequences
 

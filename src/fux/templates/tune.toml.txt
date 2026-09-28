@@ -2,7 +2,7 @@
 # document is indexed.
 #
 # Written once by `fux setup`; fux never rewrites it. EVERY KEY IS REQUIRED
-# (law L12, records/0013_LAW-12-values-live-in-config.md): fux holds no copy of
+# (law L12, records/0014_LAW-12-values-live-in-config.md): fux holds no copy of
 # these values in code, so a missing key stops the command and names it.
 # `fux doctor --fix` writes a missing key back from the template this file was
 # written from, and nothing else ever writes one.

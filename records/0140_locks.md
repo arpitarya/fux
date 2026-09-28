@@ -8,9 +8,9 @@ status: accepted
 date: 2026-08-27
 feature: the index write lock and the files around it
 owns: []
-laws: [L1, L2, L3, L7]
+laws: [L2, L3, L4, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: d97ec93b977a07b91acaa46cc03fb6fa7b7cf8fb71876a912cc341dc43a4e197
+content_sha: 7a9bff55327ab9319c98671f7542d687ef3c3535813dcd46e65711e8e2297645
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -169,8 +169,8 @@ cooperative is also the portable answer (L7). `daemon.pid` is a liveness marker
 on the same footing: read, never raced on.
 
 **9. The lock lives in the gitignored derived plane, and its name avoids a
-collision.** No lock, no pid and no stop file is ever committed — that is L2
-and L3 together, and it is why `maintain/` has no committed state file at all.
+collision.** No lock, no pid and no stop file is ever committed — that is L3
+and L4 together, and it is why `maintain/` has no committed state file at all.
 The name is `write.lock` and **deliberately not `index.lock`**, because git
 keeps one of those a few directories away in the same repository and
 [`work/MACHINE.md`](../work/MACHINE.md) already records an incident with a
@@ -198,7 +198,7 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -210,11 +210,11 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**The daemon takes no lock on a repo it refuses** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `fux daemon start` now refuses a repo with no `[sources.url]` before spawning, so no `write.lock` or pid file is created for it ([SR-MAINTENANCE](0129_hooks.md) decision 9d).
+**The daemon takes no lock on a repo it refuses** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `fux daemon start` now refuses a repo with no `[sources.url]` before spawning, so no `write.lock` or pid file is created for it ([SR-MAINTENANCE](0129_hooks.md) decision 9d).
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
 
 ### Consequences
 
@@ -242,7 +242,7 @@ this moved where they are written, not what they are.
   on reportability (decision 3): a status that cannot say *which pid* is not a
   status. Re-checked against the consumer-dependency ruling and unchanged —
   `filelock` and `portalocker` are third-party runtime code and stay refused
-  under L1
+  under L2
   ([`work/compare/index-lock.compare.md`](../archive/compare/index-lock.compare.md) §4).
 - **A lock on the read path** — rejected by decision 2.
 - **A daemon-specific lock** — rejected by decision 1: two locks, one resource.
@@ -266,7 +266,7 @@ this moved where they are written, not what they are.
 - [`src/fux/maintain/runner.py`](../src/fux/maintain/runner.py) — the lock,
   the stop, and the status surface, with the reasoning in the module docstring
 - [`work/compare/index-lock.compare.md`](../archive/compare/index-lock.compare.md)
-  — the fork that ruled one file or two, and re-checked L1 against the
+  — the fork that ruled one file or two, and re-checked L2 against the
   consumer-dependency ruling
 - [`tests/ingest/test_queue.py`](../tests/ingest/test_queue.py) — the race
   reproduced with two real processes *before* it was fixed, which is what makes
@@ -280,7 +280,7 @@ this moved where they are written, not what they are.
    creating a lock file.
 2. A read verb acquires or waits on a lock.
 3. The lock stops being gitignored — i.e. a `write.lock` could reach a commit,
-   which would put a pid inside the committed plane and break L3.
+   which would put a pid inside the committed plane and break L4.
 4. 🔴 **A consumer runs `fux` against a repo on a NETWORK FILESYSTEM** — NFS,
    SMB, a mounted enterprise home directory. **`O_EXCL` is documented as racy on
    NFS**, so the pid-file mutex stops being sound the day that is a supported

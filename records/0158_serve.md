@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-22
 amended: 2026-09-27
 feature: the explorer — a local page over the real ask
-owns: [src/fux/serve@221cbd433e64]
-laws: [L1, L2, L4, L6, L8, L10]
+owns: [src/fux/serve@90d3922fcc77]
+laws: [L2, L3, L5, L6, L9, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: f5e799d22f3187392995d15faa6abaaa7c8d29a1ed26513ad55a63465dc0dfec
+content_sha: 04250d5b883bbdae0c6eb21163051d9ed7f6d8232b9f17bfbea72e7f0169f84b
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
@@ -72,7 +72,7 @@ behind a machine transport, or a machine transport behind an HTML renderer.
 
 **W-210, filed 2026-09-22 from five sample pages built in a Cowork session** on
 Arpit's machine, under `.fux/runtime/trace/` — gitignored, never committed,
-because they embed words and quoted passages ([L2](0004_LAW-2-content-never-durable.md)
+because they embed words and quoted passages ([L3](0005_LAW-3-content-never-durable.md)
 and [SR-POSTINGS](0112_postings.md) decision 2). Two of the five were rejected
 and three ratified; the design below is the modern-dark explorer.
 
@@ -96,7 +96,7 @@ every other verb: `--port` and `--open`, no subcommand tree.
 
 **2. 🔴 It binds `127.0.0.1` and there is no `--host`.** Not a default — a
 contract. The page shows a corpus's vocabulary, its passages, and the questions
-somebody typed; [L4](0006_LAW-4-offline-by-default.md) is offline-by-default and
+somebody typed; [L5](0007_LAW-5-offline-by-default.md) is offline-by-default and
 a page on `0.0.0.0` is that content offered to a network.
 `serve._bind_address` is a **function** so the refusal has a name, an error
 message and a test, and so that a future `--host` has to *delete* a refusal
@@ -159,8 +159,8 @@ the lenses' own thresholds, printed as provisional.
 ⚠ **Amended 2026-09-23 (W-220): the five `/inspect/` routes write the
 GITIGNORED runtime cache** — `.fux/runtime/inspect/`'s facts, probes and
 dictionary, exactly what `fux inspect` writes for the same index. Nothing else,
-and never a committed byte ([L2](0004_LAW-2-content-never-durable.md),
-[L8](0001_LAWS.md)). A GET that fills a cache is a read that remembers; a route
+and never a committed byte ([L3](0005_LAW-3-content-never-durable.md),
+[L9](0001_LAWS.md)). A GET that fills a cache is a read that remembers; a route
 that changed what is indexed would be an apply button, which decision 10
 refuses.
 
@@ -189,20 +189,20 @@ the second ranker agree.
 
 **6. One self-contained file, no external host.** `src/fux/serve/page.html`,
 inline CSS and JS: it must render with the network unplugged, which is
-[L4](0006_LAW-4-offline-by-default.md) and also simply what an offline tool
-owes. ⚠ **[L10](0011_LAW-10-bundled-output.md) is satisfied trivially here** —
+[L5](0007_LAW-5-offline-by-default.md) and also simply what an offline tool
+owes. ⚠ **[L10](0012_LAW-10-bundled-output.md) is satisfied trivially here** —
 for one self-contained HTML file the authored form and the built form are the
 same bytes, so there is nothing to bundle. **A page that grows a second file
 gains a build step in the same change**, or it has stopped being one artefact.
 
 **7. Stdlib only.** `http.server` is enough for one person on one machine.
-[L1](0003_LAW-1-zero-cost.md) permits a dependency and a record still has to
+[L2](0004_LAW-2-zero-cost.md) permits a dependency and a record still has to
 decide one; none is decided here, and none is needed.
 
 **8. 🔴 No route logs anything, and `log_message` is silenced deliberately.**
 `BaseHTTPRequestHandler` writes an access line per request naming the full query
 string — which is the question somebody typed.
-[L8](0001_LAWS.md) decision 8 puts every durable trace of use on a gitignored
+[L9](0001_LAWS.md) decision 8 puts every durable trace of use on a gitignored
 path; the one surface that exists for it is the provenance journal, which is
 opt-in ([SR-PROVENANCE](0142_provenance.md) decision 10) and is not this.
 
@@ -248,7 +248,7 @@ and this page **links it rather than rewriting it.**
 
 **13. The stepper shows stage COMPLETION, not stage duration, because there are
 no timings to show.** `ask --json` carries no `ms` fields.
-[L3](0005_LAW-3-deterministic.md) forbids wall-clock output in what fux writes,
+[L4](0006_LAW-4-deterministic.md) forbids wall-clock output in what fux writes,
 so a page that invented durations would be printing a number no verb produced.
 ⚠ **W-210's definition of done asked for *"the stepper reads `ms` from the
 JSON"*, and the honest version of that requirement is this one** — if `--why`
@@ -287,7 +287,7 @@ remember.
 
 <!-- L12-NOTE-START -->
 
-**[L12](0013_LAW-12-values-live-in-config.md) (W-225 stage 3a, 2026-09-27).** The port is `.fux/output.toml
+**[L12](0014_LAW-12-values-live-in-config.md) (W-225 stage 3a, 2026-09-27).** The port is `.fux/output.toml
 [cli.serve] port` (7337 as shipped); `--port` still moves it. `make_server`
 takes `port` required, and `DEFAULT_PORT` is gone.
 
@@ -295,7 +295,7 @@ takes `port` required, and `DEFAULT_PORT` is gone.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -305,11 +305,11 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**The explorer's sizes come from `.fux/inspect.toml [serve]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): `triage_rows` (was `TRIAGE_ROWS = 200`), and the Words tab's `words_page` / `words_page_max` (were `200` / `1000` in the route); a document's probe route passes `[probes] probe_sample` explicitly ([SR-INSPECT](0156_inspect.md) decision 23).
+**The explorer's sizes come from `.fux/inspect.toml [serve]`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): `triage_rows` (was `TRIAGE_ROWS = 200`), and the Words tab's `words_page` / `words_page_max` (were `200` / `1000` in the route); a document's probe route passes `[probes] probe_sample` explicitly ([SR-INSPECT](0156_inspect.md) decision 23).
 
 **16. Parity: a lens `fux inspect` reports and the explorer does not show is a defect** (Arpit, 2026-09-28, W-229: *"everything in inspect should be present in `serve` so that we can see visually"*). Every top-level section of `inspect.as_dict()` has a card on the Index tab, in the prose report's order, carrying the lens's numbers, its named offenders as the report capped them, and its own lever from `LEVERS`; document names open the Documents tab and terms the Words tab. `/inspect/diff` is `fux inspect --diff` in the explorer: the last report `fux inspect` wrote against the Index tab's, by `inspect.diff.compare`, writing nothing. **Enforced by `tests/test_serve_renders_every_lens.py`**, which fails a report key with no `r.<key>` renderer — so W-228's `families` lens cannot ship invisible. The cards read the server's report and compute nothing (decision 5).
 
-**`fux serve` reads its bound address by unpacking** (`host, port, *_`), which also covers IPv6's four-tuple. Localhost-only is unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**`fux serve` reads its bound address by unpacking** (`host, port, *_`), which also covers IPv6's four-tuple. Localhost-only is unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

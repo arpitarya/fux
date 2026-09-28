@@ -1,7 +1,7 @@
 """The refer plane — rank in the index, fetch from the source, cite a fresh sha.
 
 This is the half of "index-and-refer" that the index is *for*. The committed
-plane holds statistics and never content (L2), so an answer that quotes a
+plane holds statistics and never content (L3), so an answer that quotes a
 document has to go and get it — from the git checkout, or from the system that
 owns it through the consumer's fetcher.
 
@@ -299,7 +299,7 @@ def _mark_changed_urls_dirty(root: Path, documents: list[Cited]) -> None:
       write that does not happen costs a delayed refresh and nothing else.
 
     ⚠ **On the "advisory, never authoritative" contract this leans on.**
-    `dirty.py`'s docstring is the sentence that keeps L3 true: `fux ingest`
+    `dirty.py`'s docstring is the sentence that keeps L4 true: `fux ingest`
     re-walks the whole corpus regardless, so the list can never change a
     committed byte. A *URL* refresh driven by this list is authoritative for the
     URLs it names, because not fetching the rest is the entire point -- so the
@@ -307,7 +307,7 @@ def _mark_changed_urls_dirty(root: Path, documents: list[Cited]) -> None:
     is already a mosaic of different moments.** Every record holds whatever its
     last fetch produced, and no two were necessarily fetched together. A partial
     refresh changes the *spread* of those moments, not the kind of object the
-    index is. L3 is *same sources -> same bytes*, and a URL is not the same
+    index is. L4 is *same sources -> same bytes*, and a URL is not the same
     source twice.
 
     ⚠ **This is not "just index the delta"**, which was ruled *not* the fix for

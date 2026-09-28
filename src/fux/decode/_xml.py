@@ -7,7 +7,7 @@ expat expands **internal** entities. A document declaring
     <!DOCTYPE x [ <!ENTITY a "aaaa..."> <!ENTITY b "&a;&a;&a;..."> ]>
 
 expands exponentially — the billion-laughs attack — and exhausts memory at
-ingest, from a file sitting in a git repo. **A decoder that is offline (L4) is
+ingest, from a file sitting in a git repo. **A decoder that is offline (L5) is
 still reachable by anything a colleague commits.**
 
 The defence is blunt on purpose: **refuse any document carrying a DOCTYPE.**

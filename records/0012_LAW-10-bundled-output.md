@@ -2,7 +2,7 @@
 type: Standing Record
 kind: law
 name: SR-LAW-10
-title: "SR-LAW-10 (0011) — L10 — the consumer is served build output, never source"
+title: "SR-LAW-10 (0012) — L10 — the consumer is served build output, never source"
 description: "What fux puts in front of a consumer — vendored into their repository or exposed as a published package's entry point — is a generated bundle, one artefact per plane. Decoders, fetchers and observers are the only exceptions, because there readable source IS the contract."
 status: accepted
 date: 2026-09-12
@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L10
 owns: []
 laws: [L10]
 timestamp: 2026-09-12T00:00:00Z
-content_sha: db016687e165a752b89a1c8c1c39812cb4f65c761207b4f945e31920f95680a6
+content_sha: de5f680a271cd90f6eaca406bd86d7aba28194b9dc30117cddaf1c46ae1cb4a1
 ---
 
 # SR-LAW-10 — L10 — the consumer is served build output, never source
@@ -65,7 +65,7 @@ quoted in [SR-NODE-SEARCH](0153_node-search.md) decision 14 (**W-149**, closed;
 its file is deleted, per OPEN-WORK rule 2, so it is named and never cited). The
 bundle is a release artefact built once in fux's own pipeline and shipped inside
 both distributions. A consumer runs no build step; that is what
-[L4](0006_LAW-4-offline-by-default.md) is owed.
+[L5](0007_LAW-5-offline-by-default.md) is owed.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
@@ -123,7 +123,7 @@ Amending a law needs Arpit's ruling, named in this record
 
 `fux setup` vendors the Node read plane into `.fux/node/` so a fresh clone can
 read the index with nothing installed — the promise
-[L4](0006_LAW-4-offline-by-default.md) makes and
+[L5](0007_LAW-5-offline-by-default.md) makes and
 [SR-NODE-SEARCH](0153_node-search.md) implements. The mechanism chosen in
 W-107 R4 was a **directory copy**: `node/src/**` out of the wheel's
 `templates/node/` payload, file for file, into the consumer's repository
@@ -144,7 +144,7 @@ amendment to SR-NODE-SEARCH:
 2. **A local edit is invisible.** `.fux/node/src/query/rank.mjs` edited by hand
    ranks differently and looks identical in review — a silent fork of the
    engine, which is the class of failure
-   [L3](0005_LAW-3-deterministic.md) exists to make impossible.
+   [L4](0006_LAW-4-deterministic.md) exists to make impossible.
 3. **The boundary was never stated.** Each plane decided vendoring for itself.
    Without a law, the next plane needing a consumer-side runtime makes the same
    choice on the same reasoning, and nobody is wrong.
@@ -184,8 +184,8 @@ refuses with a message that says so — it may never quietly fall back to
 vendoring the module tree, or dev and shipped become two different products.
 
 **4. The bundler is fux's own, deterministic and zero-dependency.** Same sources
-→ byte-identical output, per [L3](0005_LAW-3-deterministic.md). It is a
-build-time tool, never a runtime dependency, so [L1](0003_LAW-1-zero-cost.md) is
+→ byte-identical output, per [L4](0006_LAW-4-deterministic.md). It is a
+build-time tool, never a runtime dependency, so [L2](0004_LAW-2-zero-cost.md) is
 untouched on the consumer's side.
 
 **5. Bundled is not minified.** The requirement is *one artefact, reproducibly
@@ -236,7 +236,7 @@ case decision 2 names, not a gap.
   tampered runtime is detectable by rebuilding. A new plane has its answer
   before it asks.
 - **Harder:** a bundler now sits between `node/src/**` and every consumer, and
-  it has to be deterministic or [L3](0005_LAW-3-deterministic.md) is broken in
+  it has to be deterministic or [L4](0006_LAW-4-deterministic.md) is broken in
   its place. Debugging the vendored reader in situ stops being possible — the
   loop moves back into this repository, where it belonged.
 - **A cost paid deliberately:** the consumer can no longer read the engine in
@@ -263,7 +263,7 @@ case decision 2 names, not a gap.
   explicitly, 2026-09-12: *"It shouldn't be bundled at the consumer end."* It
   would put a build step — and a toolchain — inside the offline promise.
 - **Vendor nothing; make the consumer `npm install fux-engine`.** Rejected: it
-  breaks [L4](0006_LAW-4-offline-by-default.md). A fresh clone must read its
+  breaks [L5](0007_LAW-5-offline-by-default.md). A fresh clone must read its
   index with no network and no install. The workspace shape is offered as an
   option, never as the only one.
 - **Vendor the tree but checksum it.** Rejected: it detects the silent fork
@@ -275,7 +275,7 @@ case decision 2 names, not a gap.
   `.fux/observers/` — already the three exemptions. Everything else is installed into site-packages by
   pip, where shipping bytecode or a single-file bundle breaks editable installs,
   makes every stack trace useless, fights the packaging ecosystem
-  [L1](0003_LAW-1-zero-cost.md) depends on, and protects a repository nobody was
+  [L2](0004_LAW-2-zero-cost.md) depends on, and protects a repository nobody was
   putting files in. ⚠ **Reopen this specific bullet, not the law, if the intent
   was wider** — the ruling this record was written from is quoted in
   [SR-NODE-SEARCH](0153_node-search.md) decisions 13-15.

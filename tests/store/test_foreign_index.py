@@ -41,7 +41,7 @@ def _write_foreign(root, *records, header=None):
 
 def _file_record(loc):
     # `src: "git"` because `write_index` refuses a non-git record with no
-    # `meta` (L5) — irrelevant to what these tests are about, required to
+    # `meta` (ex-L5) — irrelevant to what these tests are about, required to
     # construct a healthy index at all.
     return {
         "id": f"file:{loc}",

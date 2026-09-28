@@ -1,6 +1,6 @@
 """`src/fux/constants.toml` — the engine's fixed values, read once.
 
-[SR-LAW-12](../../records/0013_LAW-12-values-live-in-config.md) decision 2 is
+[SR-LAW-12](../../records/0014_LAW-12-values-live-in-config.md) decision 2 is
 the rule and [SR-CONSTANTS](../../records/0159_constants.md) the owner: a value
 is *fixed* when changing it changes what a committed byte means — a schema id,
 a format or rules version, an artefact name, a byte offset a file format

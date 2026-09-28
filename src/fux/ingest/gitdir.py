@@ -179,7 +179,7 @@ def partition(skips: list[Skipped]) -> tuple[list[Skipped], list[Skipped]]:
     """`(not_indexed, unreadable)` — the deliberate skips and the rest.
 
     Order is preserved in both halves, so a caller that was handed a sorted
-    list gets two sorted lists and never has to re-sort (L3: `walk_sources`
+    list gets two sorted lists and never has to re-sort (L4: `walk_sources`
     and `fetch_all` both sort, and the printer depends on it).
     """
     return [s for s in skips if s.deliberate], [s for s in skips if not s.deliberate]
@@ -367,7 +367,7 @@ def walk_sources(
             # (the R1/macOS-checkout hazard): a filesystem may return a path
             # in NFD even when the file was created and committed as NFC, so
             # the same document's `rel_path`/`loc` would differ by checkout
-            # machine without this — a byte-identical-index guarantee (L3)
+            # machine without this — a byte-identical-index guarantee (L4)
             # that a path string, not just content, has to hold too.
             rel = unicodedata.normalize("NFC", path.relative_to(root).as_posix())
             if rel in files or rel in skipped:

@@ -1158,7 +1158,7 @@ def _seed_types() -> bytes:
     puts `cfg` next to `csv`, which different modules read, and splits
     `htm`/`html`/`xhtml`. Grouping is what makes the table legible AS a map;
     within a group the extensions are still sorted, so the output stays a pure
-    function of the registry (L3).
+    function of the registry (L4).
     """
     from .ingest import typesfile
     from .ingest.gitdir import DEFAULT_TYPES
@@ -1356,7 +1356,7 @@ def _write_root_agents(root: Path, report: SetupReport) -> None:
 #
 # ⚠ **Why detection does not conflict with "declared, never detected"**:
 # SR-FETCHER decision 5 and W-86 fork E govern INGEST, where detection makes
-# the INDEX a function of the environment and L3 forbids it. Scaffolding is not
+# the INDEX a function of the environment and L4 forbids it. Scaffolding is not
 # the index; no law reaches it.
 # ---------------------------------------------------------------------------
 

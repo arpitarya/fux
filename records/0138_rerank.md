@@ -7,10 +7,10 @@ description: "BM25F is a bag of words and cannot see where terms are. The rerank
 status: accepted
 date: 2026-08-24
 feature: proximity reranking over the refer plane's passages, and the refusal that bounds it
-owns: [src/fux/query/rerank.py@37caf0847999, node/src/query/rerank.mjs@813bbbc1359f]
-laws: [L1, L3, L4]
+owns: [src/fux/query/rerank.py@12eab9530681, node/src/query/rerank.mjs@813bbbc1359f]
+laws: [L2, L4, L5]
 timestamp: 2026-08-24T00:00:00Z
-content_sha: e86248600bc2519c09991c536b7f45c3660d56490eed4a1c57383e884af9a3c3
+content_sha: c9b1e0f2f3fa9100538de816a3b6dfc000df2523a89374c7113c41fe2f716486
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -99,7 +99,7 @@ orderings from the same index.** *Clone it and run the query* stops being true,
 and **the differential law loses its meaning**: there would be no single right
 answer for the accelerator and the scan to agree on.
 
-**1b. Optional-but-on breaks L4; optional-but-off is not a feature.** Either fux
+**1b. Optional-but-on breaks L5; optional-but-off is not a feature.** Either fux
 fetches ~35 MB on first use — offline-by-default gone — or the lane ships dark
 and nothing is measured. **There is no third position.**
 
@@ -198,7 +198,7 @@ avoid.
 ⚠ **Import path moved 2026-08-27, behaviour unchanged.** `src/fux/query/rerank.py`
 now imports `chunk` from **`fux.refer._chunk`**: the module was made private
 because `fux.refer` re-exported the `chunk` *function* over its own submodule of
-that name, a shape that had already cost four defects and silently narrowed L4's
+that name, a shape that had already cost four defects and silently narrowed L5's
 network import fence. The function, its signature and its output are untouched —
 see [SR-REFER](0127_refer-plane.md) decision 18 and
 [`tests/test_no_shadowed_submodules.py`](../tests/test_no_shadowed_submodules.py).
@@ -261,7 +261,7 @@ caller is unchanged, the differential law's two paths keep one signature, the
 dict is the caller's rather than this module's (fux runs threads), and nothing
 read back out of it can reach a score or an ordering.
 
-**The reranker holds no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `_MIN_TERMS = 2` became the test it stood for (`<= 1` distinct terms has no proximity), and the sort key reads `constants.toml [ranking] score_digits`. No order moved.
+**The reranker holds no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `_MIN_TERMS = 2` became the test it stood for (`<= 1` distinct terms has no proximity), and the sort key reads `constants.toml [ranking] score_digits`. No order moved.
 
 ### Consequences — the measurement
 

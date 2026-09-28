@@ -260,7 +260,7 @@ def _url_index(tmp_path, urls):
                 "loc": url,
                 "mode": "extracted",
                 # `plain` because the fixture carries readable `title`/`phrases`.
-                # `hashed` is L5's default for non-git sources and the writer
+                # `hashed` is ex-L5's default for non-git sources and the writer
                 # refuses readable text under it — correct, and not what this
                 # test is about.
                 "title": "T",
@@ -1145,7 +1145,7 @@ def test_a_corrupt_counts_file_reads_as_nothing_recorded(tmp_path):
 
 
 def test_the_counts_file_is_gitignored_like_every_derived_plane(tmp_path):
-    """L8 and SR-DOTFUX: a use-shaped record never reaches a committed byte."""
+    """L9 and SR-DOTFUX: a use-shaped record never reaches a committed byte."""
     from fux.ingest import pii
     from fux.store import fuxdir
 

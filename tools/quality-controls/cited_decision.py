@@ -179,7 +179,7 @@ def contests(root: Path, folders: tuple[str, ...] = ("records", "work", "docs"))
 
     ⚠ **`work/golden/` is excluded by path, unconditionally.** The walk is
     recursive over `work/`, which is the one route
-    [L11](../../records/0012_LAW-11-sealed-answer-key.md) names as unguarded.
+    [L11](../../records/0013_LAW-11-sealed-answer-key.md) names as unguarded.
     """
     cache: dict[Path, tuple[list[str], dict[str, tuple[int, int]], list]] = {}
     found: list[Contest] = []

@@ -224,7 +224,7 @@ def test_a_receipt_carries_no_wall_clock(tmp_path):
     """Two receipts for the same answer must be byte-identical.
 
     A timestamp would make every receipt unique, which defeats a re-runnable
-    claim and breaks L3 on a deterministic path.
+    claim and breaks L4 on a deterministic path.
     """
     _corpus(tmp_path)
     subject = [{"id": "file:mesh.md", "loc": "mesh.md:L1-L2", "sha": "abc123"}]
@@ -238,7 +238,7 @@ def test_a_receipt_carries_no_wall_clock(tmp_path):
 
 
 def test_a_receipt_records_the_question_in_plaintext(tmp_path):
-    """L8 as reverted (Arpit, 2026-08-27) permits this; before it, it was illegal."""
+    """L9 as reverted (Arpit, 2026-08-27) permits this; before it, it was illegal."""
     _corpus(tmp_path)
     payload = provenance.receipt(tmp_path, "how do I roll back", path="refer", subject=[])
     assert payload["predicate"]["inputs"]["query"] == "how do I roll back"
@@ -678,7 +678,7 @@ def test_nothing_signs_the_statement(tmp_path):
 
 
 def test_the_module_imports_no_crypto():
-    """L1, and the refusal above. If `hmac` ever appears here, decision 5 moved
+    """L2, and the refusal above. If `hmac` ever appears here, decision 5 moved
     without its record."""
     import inspect
 

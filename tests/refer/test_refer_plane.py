@@ -119,7 +119,7 @@ def test_an_unreachable_url_declares_staleness_rather_than_serving_stale_bytes(r
 
 
 def test_never_does_not_reach_out_for_a_url_document(repo):
-    """L4 at the plane: the default policy opens nothing."""
+    """L5 at the plane: the default policy opens nothing."""
     def forbidden(url):  # pragma: no cover - the point is that it never runs
         raise AssertionError("the never policy must not fetch")
 
@@ -200,7 +200,7 @@ def test_the_same_query_twice_is_the_same_bytes(repo):
 
 
 def test_no_module_in_the_plane_imports_a_network_library():
-    """L4's import fence, extended to the plane that most wants to break it.
+    """L5's import fence, extended to the plane that most wants to break it.
 
     ⚠ **This scanned three FUNCTIONS instead of three modules until 2026-08-27.**
     `fux.refer` re-exported `assemble`, `chunk` and `rescore`, shadowing its own

@@ -58,7 +58,7 @@ seed:
 
 ⚠ **Reads committed index shards only** — `edges`, `kind`, `at`, `al`. It never
 opens a document, never runs a query, and never touches `work/golden/questions/`
-or any path holding an answer ([L11](../../records/0012_LAW-11-sealed-answer-key.md)).
+or any path holding an answer ([L11](../../records/0013_LAW-11-sealed-answer-key.md)).
 """
 
 from __future__ import annotations
@@ -119,7 +119,7 @@ def census(index_dir: Path) -> dict:
             #
             # ⚠ **Hashes against hashes, never content.** `at`'s keys and the
             # record's `terms` keys are the same hashed vocabulary, so the
-            # subtraction is exact and this file still opens no document (L2).
+            # subtraction is exact and this file still opens no document (L3).
             own = (records.get(dst) or {}).get("terms") or {}
             extra = set(at) - set(own)
             if extra:

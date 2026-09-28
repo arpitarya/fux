@@ -1,6 +1,6 @@
 """The Node reader's bundle — one artefact, and it must ANSWER like its sources.
 
-`fux.store.nodebundle` is what makes [L10](../records/0011_LAW-10-bundled-output.md)
+`fux.store.nodebundle` is what makes [L10](../records/0012_LAW-10-bundled-output.md)
 possible: a consumer gets one generated `.mjs`, never `node/src/**`. Two things
 have to hold, and they are different claims:
 
@@ -53,7 +53,7 @@ def built(tmp_path_factory) -> Path:
 
 
 def test_the_bundle_is_byte_identical_across_builds():
-    """L3's promise, adopted voluntarily for a build artefact (decision 14)."""
+    """L4's promise, adopted voluntarily for a build artefact (decision 14)."""
     assert nodebundle.bundle(NODE) == nodebundle.bundle(NODE)
 
 

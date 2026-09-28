@@ -151,7 +151,7 @@ Agents are fux's primary reader.
   than whatever the server said that morning
   ([SR-FETCHER](records/0117_fetcher.md), [SR-URL-LIST](records/0116_url-list.md)).
 - **Offline unless you ask.** Only explicit, opt-in commands touch the network,
-  and they say so on stderr ([L4](records/0006_LAW-4-offline-by-default.md)).
+  and they say so on stderr ([L5](records/0007_LAW-5-offline-by-default.md)).
 - **Sensitive text.** `.fux/pii.toml` redacts matches from the committed index
   ([SR-PII](records/0148_pii.md)). `fux setup` writes it, and fux will not run
   without it. `.fux/refusals.toml` stops a sign-in wall
@@ -176,20 +176,23 @@ Claims ship with a pre-registered bar and a published run — including the ones
 
 ## Design rules
 
-Fux is built under eleven laws, each with its own record in the
+Fux is built under thirteen laws, each with its own record in the
 [SR register](records/README.md) ([SR-LAWS](records/0001_LAWS.md)):
 [L0 SRs are the source of truth](records/0002_LAW-0-authority.md) ·
-[L1 `$0`, FOSS-only](records/0003_LAW-1-zero-cost.md) ·
-[L2 content never durable](records/0004_LAW-2-content-never-durable.md) ·
-[L3 deterministic](records/0005_LAW-3-deterministic.md) ·
-[L4 offline by default](records/0006_LAW-4-offline-by-default.md) ·
-[L5 hashed meta](archive/records/0007_LAW-5-hashed-meta.md) ·
+[L1 a retired SR is archived](records/0003_LAW-1-retired-records-archived.md) ·
+[L2 `$0`, FOSS-only](records/0004_LAW-2-zero-cost.md) ·
+[L3 content never durable](records/0005_LAW-3-content-never-durable.md) ·
+[L4 deterministic](records/0006_LAW-4-deterministic.md) ·
+[L5 offline by default](records/0007_LAW-5-offline-by-default.md) ·
 [L6 say "index"](records/0008_LAW-6-say-index.md) ·
-[L7 Python ≥ 3.11](records/0009_LAW-7-python-311.md) ·
-[L8 use record never committed](records/0010_LAW-8-use-record.md) ·
-[L10 build output, never source](records/0011_LAW-10-bundled-output.md) ·
-[L11 the sealed answer key is closed to Claude](records/0012_LAW-11-sealed-answer-key.md) ·
-[L12 every value lives in a config file](records/0013_LAW-12-values-live-in-config.md).
+[L7 Python ≥ 3.12](records/0009_LAW-7-python-312.md) ·
+[L8 Node ≥ 22](records/0010_LAW-8-node-22.md) ·
+[L9 use record never committed](records/0011_LAW-9-use-record.md) ·
+[L10 build output, never source](records/0012_LAW-10-bundled-output.md) ·
+[L11 the sealed answer key is closed to Claude](records/0013_LAW-11-sealed-answer-key.md) ·
+[L12 every value lives in a config file](records/0014_LAW-12-values-live-in-config.md).
+The laws were renumbered on 2026-09-28; a document older than that is read
+through [SR-LAWS](records/0001_LAWS.md) decision 2a.
 
 ## Reading order
 

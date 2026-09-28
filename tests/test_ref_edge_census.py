@@ -22,7 +22,7 @@ feature.**
 
 ⚠ **The subtraction is hashes against hashes.** An edge's `at` keys and a
 record's `terms` keys are the same hashed vocabulary, so the census stays inside
-[L2](../records/0004_LAW-2-content-never-durable.md) — it opens no document and
+[L3](../records/0005_LAW-3-content-never-durable.md) — it opens no document and
 reads no word.
 """
 

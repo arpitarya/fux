@@ -26,7 +26,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.ini", "version")
+VERSION = fixed("decoders.ini", "version")  # not bumped by W-234: law handles in comments only
 
 EXTENSIONS = tuple(fixed("decoders.ini", "extensions"))
 
@@ -54,7 +54,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
 
     blocks: list[str] = []
     # `parser.sections()` is document order; sorting makes two files that
-    # differ only in section order decode identically (L3).
+    # differ only in section order decode identically (L4).
     for section in sorted(parser.sections()):
         blocks.append("## " + section)
         for key in sorted(parser[section]):

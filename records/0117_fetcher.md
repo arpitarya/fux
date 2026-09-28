@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@e40fb5920ad3, src/fux/templates@5750ebb8754f]
-laws: [L1, L3, L4]
+owns: [src/fux/ingest/urlsrc.py@10cfc57f4793, src/fux/templates@d17a8c5bf886]
+laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 64aaafea5fe827b7a1e53daa0042ef1084a8f940599bcb2b6cb730ead17b3de7
+content_sha: 1787bce6efa8933ce50eb8fdccfa52981255ae90b4cb13d6956d30a6e02c3f49
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -169,7 +169,7 @@ true** — the day a chain lands, the name is wrong again.
 no line names is never imported**, which is what keeps a repo that only wants
 plain HTTP from loading WebSocket code. Automatic escalation from one fetcher to
 another would make the committed bytes a function of network conditions at that
-instant — L3 lost on the one path that is already the exception. This follows
+instant — L4 lost on the one path that is already the exception. This follows
 `scrapy-playwright`, which makes browser rendering a per-request opt-in with no
 automatic fallback at all.
 
@@ -196,7 +196,7 @@ here rather than only in [SR-CDP-FETCHER](0118_cdp-fetcher.md): decision 5
 forbids escalation between fetchers, which is only coherent while the two
 produce the *same kind of thing* for the same URL. A renderer and a downloader
 on one axis would have made "which fetcher ran" a fact about the committed
-index, and that is L3 demoted to a code comment. That is decision 1 made **structural**: a `.py` in the package
+index, and that is L4 demoted to a code comment. That is decision 1 made **structural**: a `.py` in the package
 could be imported by a later edit, a `.py.txt` cannot be. It also answers the
 question a shipped default otherwise raises — how an air-gapped consumer gets a
 working fetcher without being told to copy a file from GitHub.
@@ -422,7 +422,7 @@ Arpit 2026-08-28.** W-82 ruling 12 built it, a real `429` exercised it, and
 ⚠ **no record decided it until now** — it was in the shipped `http.py`, read by
 `urlsrc.py`, and absent from this contract block and from every decision here.
 **A mechanism with a gate and no record is the shape this project keeps paying
-for**; L8 was the same class three days earlier.
+for**; L9 was the same class three days earlier.
 
 **Why the fetcher answers and not the engine.** This is decision 5's *declared,
 never detected* and decision 9's capability/policy split, applied to a third
@@ -573,7 +573,7 @@ there is one file read by the wrong reader, not a corpus fetched by one.
 preference.** `ROUTES` is a module-level literal `dict[str, str]`, parsed from
 source. **Anything else is a hard error naming the file and the line**; no
 `ROUTES` means no claims. 🔴 **Importing a fetcher to resolve a route would run
-consumer code on the offline path**, which is L4 lost at the one point nothing
+consumer code on the offline path**, which is L5 lost at the one point nothing
 would notice: `fux doctor` is offline by contract, and `fux ingest --check`
 promises it opens no network. The precedent is `doctor._fetcher_capabilities`,
 which already reads a fetcher as text, and the gate is the same monkeypatch
@@ -625,7 +625,7 @@ whole reason the line needs two words instead of one.
 and only there.** The header-then-URL-extension-then-prose ladder ran on **every
 ingest**, which made *which decoder read a document* a function of what the
 server happened to say that morning — a heuristic in the maintenance path, with
-[L3](0005_LAW-3-deterministic.md) resting on the server being consistent. The
+[L4](0006_LAW-4-deterministic.md) resting on the server being consistent. The
 ladder is not deleted; it **moves to `fux add`** (`urlsrc.propose_decoder`),
 where it runs once, against a response somebody is watching, and its answer is
 written into a committed line. **Same resolution, one execution, diffable
@@ -651,26 +651,26 @@ session does not mistake the silence for agreement.
 
 **`src/fux/templates/` holds more than the fetchers since L12 (W-225,
 2026-09-27).** It is the one home of every shipped tunable value
-([SR-LAW-12](0013_LAW-12-values-live-in-config.md) decision 5): `tune.toml.txt`
+([SR-LAW-12](0014_LAW-12-values-live-in-config.md) decision 5): `tune.toml.txt`
 is the file `fux setup` writes, `fux doctor --fix` restores a missing key from,
 and `--no-tune` reads. The fetcher templates' rules here are unchanged — bytes,
 copied out, never imported.
 
 <!-- L12-NOTE-END -->
 
-**`src/fux/templates/` gained `formats-limits.toml.txt`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27) — the decoders' caps, owned in substance by [SR-DECODE](0139_decode.md); no fetcher template changed.
+**`src/fux/templates/` gained `formats-limits.toml.txt`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27) — the decoders' caps, owned in substance by [SR-DECODE](0139_decode.md); no fetcher template changed.
 
-**`templates/refusals.toml.txt` gained `[scan]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27) — owned in substance by [SR-REFUSAL](0146_refusals.md) decision 9a.
+**`templates/refusals.toml.txt` gained `[scan]`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27) — owned in substance by [SR-REFUSAL](0146_refusals.md) decision 9a.
 
-**`src/fux/templates/` gained `inspect.toml.txt`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28) — owned in substance by [SR-INSPECT](0156_inspect.md) decision 23.
+**`src/fux/templates/` gained `inspect.toml.txt`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28) — owned in substance by [SR-INSPECT](0156_inspect.md) decision 23.
 
-**No fetcher decision moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5b, 2026-09-28). `src/fux/templates/formats-limits.toml.txt`, which this record's claim on `templates/` covers, gained four decoder caps ([SR-DECODE](0139_decode.md), [SR-TYPES](0128_types-list.md) decision 14).
+**No fetcher decision moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5b, 2026-09-28). `src/fux/templates/formats-limits.toml.txt`, which this record's claim on `templates/` covers, gained four decoder caps ([SR-DECODE](0139_decode.md), [SR-TYPES](0128_types-list.md) decision 14).
 
-**The rate-limit backoff doubles by shift** (`1 << attempt`) and a fetcher's `(bytes, content type)` pair is recognised by its arity. Retries and base are stage 5e's. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**The rate-limit backoff doubles by shift** (`1 << attempt`) and a fetcher's `(bytes, content type)` pair is recognised by its arity. Retries and base are stage 5e's. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
-**An undeclared fetcher's parallelism is `constants.toml [fetch] undeclared_max_parallel`** (1) ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28), fixed by decision 5's *declared, never detected*; the "that is a lot of connections" note fires at `fux.toml [sources.url] parallel_warn_at`.
+**An undeclared fetcher's parallelism is `constants.toml [fetch] undeclared_max_parallel`** (1) ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28), fixed by decision 5's *declared, never detected*; the "that is a lot of connections" note fires at `fux.toml [sources.url] parallel_warn_at`.
 
-**No fetcher decision moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `src/fux/templates/fux.toml.txt`, under this record's claim on `templates/`, gained `[doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18).
+**No fetcher decision moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `src/fux/templates/fux.toml.txt`, under this record's claim on `templates/`, gained `[doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18).
 
 ### Consequences
 
@@ -707,10 +707,10 @@ copied out, never imported.
   document permanently stale — a defect that presents as a working freshness
   feature. Asserted by *function identity* in `tests/refer/test_source.py`, not
   by a string match.
-- **Concurrency inside `fetch_all` is invisible to L3.** Sequential fetching was
+- **Concurrency inside `fetch_all` is invisible to L4.** Sequential fetching was
   never what made the index deterministic — the trailing
   `fetched.sort(...)` / `skipped.sort(...)` is, so completion order never
-  reaches a committed byte. `concurrent.futures` is stdlib, so L1 is untouched.
+  reaches a committed byte. `concurrent.futures` is stdlib, so L2 is untouched.
 - ⚠ **One test earns its place and no manual checking substitutes for it**: a
   fetcher declaring `1` is **observed** never to have two `fetch` calls in
   flight, via a counter inside a test fetcher — with a control arm proving a
@@ -723,7 +723,7 @@ copied out, never imported.
   file depends on fux's internal module layout**: renaming `html` breaks every
   copy in every consumer repo, and those copies are files fux has promised never
   to rewrite. The `.py.txt` extension still keeps the template un-importable, so
-  nothing about L4 changes; what changed is that `fux.decode.html` is
+  nothing about L5 changes; what changed is that `fux.decode.html` is
   **public surface in practice** even though nothing declares it so. **Weigh
   that before renaming anything under `decode/`.**
 - **Conversion left the fetchers entirely.** Both templates used to hold their
@@ -732,7 +732,7 @@ copied out, never imported.
   consumer's repo, so the duplication was **shipped**. `http.py`'s own docstring
   had stated the consequence as a rule nothing enforced: *both fetchers must
   produce the same markdown from the same bytes, or which fetcher retrieved a
-  document would change the committed index*. **That is L3 written as a coding
+  document would change the committed index*. **That is L4 written as a coding
   convention**; decision 2's byte return makes it structural instead.
 - **Renaming the key is a breaking change for anyone with a `[sources.url]`
   block**, and decision 7 makes it a stopped run with instructions rather than a

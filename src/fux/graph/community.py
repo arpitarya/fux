@@ -26,7 +26,7 @@ So both sources of randomness are *removed* rather than pinned:
 3. **A fixed sweep cap** (`MAX_SWEEPS`), and an early exit when a sweep
    changes nothing. Not a convergence *test* on a float — a count.
 
-There is no `random` import in this module, and that is the point: L3 is
+There is no `random` import in this module, and that is the point: L4 is
 satisfied by construction rather than by configuration.
 
 ## Canonical labels

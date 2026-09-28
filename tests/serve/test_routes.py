@@ -110,7 +110,7 @@ def test_any_other_bind_address_is_refused_by_name(host):
     """🔴 **Not a default that can be overridden — a refusal.**
 
     The page shows a corpus's vocabulary, its passages, and the questions
-    somebody typed. L4 is offline-by-default, and there is no flag that reaches
+    somebody typed. L5 is offline-by-default, and there is no flag that reaches
     this function, so a future `--host` would have to delete the refusal rather
     than pass through it — which is a diff somebody reviews.
     """

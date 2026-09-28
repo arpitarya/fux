@@ -7,10 +7,10 @@ description: "The browser fetcher, for documents a plain GET cannot read. Drives
 status: accepted
 date: 2026-08-19
 feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind a session a headless client does not have: it borrows your browser's and hands fux the bytes"
-owns: [.fux/fetchers/cdp.py@78da0fc7c304, src/fux/templates/cdp.py.txt@78da0fc7c304]
-laws: [L1, L4]
+owns: [.fux/fetchers/cdp.py@8af9ecc6bffd, src/fux/templates/cdp.py.txt@8af9ecc6bffd]
+laws: [L2, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: db63b4b5c54c4c89b5d96729bb396ce322b9b59354e0b57764e0b7526ad6112b
+content_sha: 50d3392860b4a85a49fbf85e776bef70bc4c58f7ea1aa995b2b3530c81bf9c2c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -44,7 +44,7 @@ and it is what makes a `.xlsx` behind a login as ingestible as a wiki page.
 Three properties are worth stating because none was forced:
 
 **It carries no dependency.** The WebSocket client is hand-rolled RFC 6455 on
-stdlib `socket`. L1 binds fux's runtime, not your fetcher — this file could have
+stdlib `socket`. L2 binds fux's runtime, not your fetcher — this file could have
 imported `websockets` and nothing would have broken. It does not, so
 `pip install fux-engine` remains the whole install even for the browser path.
 
@@ -52,7 +52,7 @@ imported `websockets` and nothing would have broken. It does not, so
 `document.documentElement.outerHTML` back out of the page. A rendered DOM
 carries nonces, timestamps and session ids, so its sha changed on every fetch —
 nondeterministic input to an engine whose central guarantee is byte-identical
-output (L3). Interception has no such property: the bytes are the server's.
+output (L4). Interception has no such property: the bytes are the server's.
 
 **It is never escalated to.** A URL uses this fetcher because a human wrote
 `fetch=cdp` on its line ([SR-URL-LIST](0116_url-list.md)), not because a
@@ -196,7 +196,7 @@ Discover a running instance on the configured port, or launch the one already
 installed. A tool that downloads a browser has a several-hundred-megabyte
 install and an air-gap story it cannot tell.
 
-**2. Stdlib only, by choice.** RFC 6455 hand-rolled on `socket`. L1 binds fux's
+**2. Stdlib only, by choice.** RFC 6455 hand-rolled on `socket`. L2 binds fux's
 runtime and not consumer code, so this is a choice — made so that the browser
 path costs no install step and the file stays readable as a worked example of
 the contract.
@@ -233,7 +233,7 @@ file that could disagree** — which matters because *which fetcher retrieved a
 document* must never change a committed byte.
 
 **Link extraction stays here.** Crawling is this fetcher's job and has no
-business in the decoder plane, which may not open a socket (L4).
+business in the decoder plane, which may not open a socket (L5).
 
 **6. This fetcher is chosen by declaration.** `fetch=cdp` on the URL's line. It
 is never the target of an automatic escalation from a cheaper fetcher.
@@ -581,12 +581,12 @@ a way that it can pick values from .env file also"*).
 - **The parser is deliberately small** — `KEY=value`, `#` comments, optional
   `export`, optional quotes. No interpolation, no multi-line values: a `.env`
   needing those is one this should not be guessing at. Stdlib only, so
-  [L1](0003_LAW-1-zero-cost.md) is untouched — no `python-dotenv`.
+  [L2](0004_LAW-2-zero-cost.md) is untouched — no `python-dotenv`.
 - **The root is found by walking up for `fux.toml` or `.git`**, so running
   `fux` from a subdirectory still finds the repo's `.env`.
 - ⚠ **No determinism question.** None of these keys reaches a committed byte:
   they decide *how to reach* Chrome, never what a document says.
-  [L3](0005_LAW-3-deterministic.md) is unaffected.
+  [L4](0006_LAW-4-deterministic.md) is unaffected.
 
 **2026-09-21 — the docstring gains the pipe; the fetcher's code does not move.**
 
@@ -651,7 +651,7 @@ constraint and `MAX_PARALLEL = 1` are all untouched.
   [SR-HTTP-FETCHER](0119_http-fetcher.md).
 - **Keeping a private HTML→Markdown copy here.** Rejected under decision 5: two
   copies of one converter make *which fetcher ran* a fact about the committed
-  index, which is L3 demoted to a code comment.
+  index, which is L4 demoted to a code comment.
 - **An in-page `fetch()` via `Runtime.evaluate`.** Rejected on a measurement,
   not a preference — decision 10's table. CORS and CSP are page-level; it
   cannot read a cross-origin body, and it cannot see `ETag` at all.

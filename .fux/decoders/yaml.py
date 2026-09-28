@@ -4,7 +4,7 @@ option rather than the cheap one.**
 The extra 80 % of the YAML 1.2 spec is **type resolution** — is `NO` the string
 "NO" or the boolean false, is `1:30` a sexagesimal, is `2024-01-01` a date.
 Fux consumes **words**, not types, so none of that changes a single term while
-all of it is L1 surface owned forever.
+all of it is L2 surface owned forever.
 
 Worse, one full-spec behaviour is **actively wrong here**:
 
@@ -45,7 +45,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.yaml", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
+VERSION = fixed("decoders.yaml", "version")  # not bumped by W-234: law handles in comments only; W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
 
 EXTENSIONS = tuple(fixed("decoders.yaml", "extensions"))
 

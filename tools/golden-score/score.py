@@ -3,7 +3,7 @@
 
 🔴 **ARPIT RUNS THIS, FROM HIS OWN SHELL, AND NO AGENT EVER INVOKES IT.** That
 sentence is the whole of the permission under which this file exists:
-[L11](../../records/0012_LAW-11-sealed-answer-key.md) **decision 13**, ratified
+[L11](../../records/0013_LAW-11-sealed-answer-key.md) **decision 13**, ratified
 by Arpit on 2026-09-21. The sanctioned way to start it is `just golden-score`.
 
 **Why it is shaped this way.** The guards that seal the key bind a Claude *tool

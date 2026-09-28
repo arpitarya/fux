@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@859e9e4678c5]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@d98ac4e500cd]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 5c9d95476830619c61573568a49306ec4265cead0c16a650097086d7da3bb660
+content_sha: c8eada68f22c180eaca57de4de7808b7c88d66c64b67f1a8783f5616a88616ae
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -28,7 +28,7 @@ ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-
 
 ## §1 — For humans
 
-**Law [L12](0013_LAW-12-values-live-in-config.md) gives every value one home.**
+**Law [L12](0014_LAW-12-values-live-in-config.md) gives every value one home.**
 A *tunable* value — one a person could choose differently — lives in the
 consumer's own TOML. A *fixed* value is different: changing it changes what a
 committed byte means. `fux.index.v5`, the name `graph.json`, a decoder's
@@ -118,7 +118,7 @@ algorithm defines.
    with `/* @fux-inline src/fux/constants.toml */ readFileSync(...)`, and
    [`store/nodebundle.py`](../src/fux/store/nodebundle.py) replaces that
    expression with the file's text as a string literal
-   ([L10](0011_LAW-10-bundled-output.md)). A named file that does not exist
+   ([L10](0012_LAW-10-bundled-output.md)). A named file that does not exist
    fails the bundle.
 
 5. **Built-in decoders import the loader absolutely** — `from fux.constants
@@ -132,7 +132,7 @@ algorithm defines.
 
 7. **A consumer never sees this file and cannot change it.** A value a consumer
    may choose is not fixed, and belongs in their `fux.toml` or a `.fux/*.toml`
-   ([L12](0013_LAW-12-values-live-in-config.md) decision 1).
+   ([L12](0014_LAW-12-values-live-in-config.md) decision 1).
 
 <!-- L12-NOTE-START -->
 
@@ -157,7 +157,7 @@ decisions 3 and 17; SR-LAW-12 decision 9a).
 
 **W-228 (2026-09-28)** bumped `[inspect] facts_schema` to `fux.inspect.facts.v2`: pass A now records each document's front-matter key names (`meta_keys`), so every cached facts entry is recomputed once ([SR-INSPECT](0156_inspect.md) decision 24).
 
-**W-225 stage 5a (2026-09-28)** added the numbers an algorithm fixes ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, R7): `[stem]`, `[json] indent`, `[pii.luhn]`, `[pii.verhoeff]`, `[blake2b]`, `[ranking] score_digits`, `[pyfloat]`, `[frontmatter] indent` and `[confidence] signal_digits`. Where a refactor removed a literal outright (a suffix's own length, a named regex group, tuple unpacking), no key was added. ⚠ `node/src/config/toml.mjs` is the reader of this file and cannot depend on it; it holds no numeral either.
+**W-225 stage 5a (2026-09-28)** added the numbers an algorithm fixes ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, R7): `[stem]`, `[json] indent`, `[pii.luhn]`, `[pii.verhoeff]`, `[blake2b]`, `[ranking] score_digits`, `[pyfloat]`, `[frontmatter] indent` and `[confidence] signal_digits`. Where a refactor removed a literal outright (a suffix's own length, a named regex group, tuple unpacking), no key was added. ⚠ `node/src/config/toml.mjs` is the reader of this file and cannot depend on it; it holds no numeral either.
 
 **W-225 stage 5b (2026-09-28)** added the decoders' format numbers: `[decoders.image.format]`, `[decoders.pdf.format]`, `[decoders.rtf.format]`, `[radix]`, `[markdown]` and `[ooxml]`. A byte string is stored as latin-1 text, and a record layout as a Python `struct` format.
 
@@ -198,10 +198,10 @@ pattern. A consumer who wants other cues is I2, which is not built.
 
 ### Reference (required)
 
-- [SR-LAW-12](0013_LAW-12-values-live-in-config.md) decisions 2, 4, 6a — the law this implements.
+- [SR-LAW-12](0014_LAW-12-values-live-in-config.md) decisions 2, 4, 6a — the law this implements.
 - [W-225](../work/open/W-225-values-live-in-config.md) — the migration.
 - [L12 classify](../work/compare/l12-classify.compare.md) — which values are fixed, and R7–R10.
-- [SR-LAW-10](0011_LAW-10-bundled-output.md) — why the bundle carries the file inlined.
+- [SR-LAW-10](0012_LAW-10-bundled-output.md) — why the bundle carries the file inlined.
 
 ### Veto condition
 
@@ -220,8 +220,8 @@ different sentences for the same missing key.
 
 ## References
 
-**Records** — [SR-LAW-10](0011_LAW-10-bundled-output.md) ·
-[SR-LAW-12](0013_LAW-12-values-live-in-config.md) · [SR-DECODE](0139_decode.md)
+**Records** — [SR-LAW-10](0012_LAW-10-bundled-output.md) ·
+[SR-LAW-12](0014_LAW-12-values-live-in-config.md) · [SR-DECODE](0139_decode.md)
 
 **Work** — [W-225](../work/open/W-225-values-live-in-config.md) ·
 [L12 classify](../work/compare/l12-classify.compare.md)

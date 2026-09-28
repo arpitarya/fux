@@ -10,7 +10,7 @@
  * documented exception — a banded table repeats its header into every band,
  * because a row whose columns have no names is a citation nobody can read.
  *
- * ⚠ **Transient. Never written.** L2: chunks are re-derived from fetched bytes
+ * ⚠ **Transient. Never written.** L3: chunks are re-derived from fetched bytes
  * at answer time and stored nowhere.
  *
  * Owned, with its Python twin, by [SR-CHUNKING](../../../records/0151_chunking.md).
@@ -148,7 +148,7 @@ function tableBands(paragraph, rowsPerPassage) {
  *
  * **There is no sentence rung.** UAX #29 says plain text gives inadequate
  * information for sentence boundaries; doing it properly needs CLDR locale
- * data — a dependency (L1) — and doing it improperly cuts inside `e.g.`,
+ * data — a dependency (L2) — and doing it improperly cuts inside `e.g.`,
  * `Dr.` and `3.5`. So: paragraph -> line -> word, boundaries that need no
  * knowledge of any language. */
 function descend(paragraph, maxPassageBytes) {

@@ -52,7 +52,7 @@ def test_the_surface_is_the_pre_stem_pre_lowercase_spelling():
 
 
 def test_analyze_pairs_is_deterministic():
-    """L3 — same text, same list, every time and in this order."""
+    """L4 — same text, same list, every time and in this order."""
     text = "getUserName mTLS rollbacks sha256"
     first = analyze_pairs(text)
     assert all(analyze_pairs(text) == first for _ in range(5))

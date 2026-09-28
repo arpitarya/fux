@@ -14,14 +14,14 @@ Every test here asserts one of the five decisions the module docstring makes,
 because each has a cost and a test is where a cost stops being rediscovered:
 
 1. **runtime, never committed** — `test_the_ledger_is_under_the_derived_directory`
-2. **clock-free (L3)** — `test_no_row_carries_a_clock`
+2. **clock-free (L4)** — `test_no_row_carries_a_clock`
 3. **best-effort** — `test_an_unwritable_ledger_is_a_note_not_a_failure`
 4. **its own file** — implied by (1); `docs.jsonl` is untouched
 5. **`reused` carries the PRIOR decoder** — `test_a_reused_row_carries_the_decoder_that_made_the_record`,
    which is the one that makes `doctor`'s stale-decoder finding fireable at all
 
 ⚠ **It records what INGEST did, never what anyone asked.** `test_no_row_carries
-_a_query_field` is the L8 fence in test form, and `tests/test_import_fence.py`'s
+_a_query_field` is the L9 fence in test form, and `tests/test_import_fence.py`'s
 companion here asserts no query-plane module imports it.
 """
 
@@ -106,7 +106,7 @@ def test_one_row_per_document_naming_its_decoder(tmp_path):
 
 
 def test_rows_are_sorted_by_id_with_sorted_keys(tmp_path):
-    """Two machines ingesting the same tree write the same bytes (L3).
+    """Two machines ingesting the same tree write the same bytes (L4).
 
     The file is gitignored, so this is not a correctness property of the index
     — it is what makes a diff between two runs readable, which is the only
@@ -134,11 +134,11 @@ def test_a_file_row_carries_no_fetcher_key(tmp_path):
     assert "fetcher" not in _rows(root)["file:docs/a.md"]
 
 
-# --- decision 2: clock-free, and decision 1's L8 fence --------------------
+# --- decision 2: clock-free, and decision 1's L9 fence --------------------
 
 
 def test_no_row_carries_a_clock(tmp_path):
-    """L3. `run_seq` is a counter `url-state.json` already owns.
+    """L4. `run_seq` is a counter `url-state.json` already owns.
 
     A wall-clock field would make the ledger non-reproducible, and anything
     that reads it would inherit that — which is the whole argument the acquired
@@ -153,12 +153,12 @@ def test_no_row_carries_a_clock(tmp_path):
 
 
 def test_no_row_carries_a_query_field(tmp_path):
-    """L8's fence, in test form.
+    """L9's fence, in test form.
 
     This ledger records what **ingest** did, so
-    [L8](../../records/0010_LAW-8-use-record.md) does not reach it. **It must
+    [L9](../../records/0011_LAW-9-use-record.md) does not reach it. **It must
     never grow a query field** — the moment a line here names a question, the
-    file becomes a use record on a path L8 governs, and this test is the thing
+    file becomes a use record on a path L9 governs, and this test is the thing
     that would have to be deleted first.
     """
     root = _repo(tmp_path)
@@ -253,7 +253,7 @@ def test_the_ledger_is_not_the_answer_journal(tmp_path):
     """🔴 **The defect W-200's spec had, pinned so it cannot come back.**
 
     The spec named `.fux/runtime/ingest-log.jsonl`, which is already
-    `fux.query.provenance`'s **answer journal** — an L8 use record written only
+    `fux.query.provenance`'s **answer journal** — an L9 use record written only
     under explicit consent (W-147: the flag *and* the output-TOML key). Writing
     this ledger there would have made **every `fux ingest` create a file that
     is supposed to require consent**.

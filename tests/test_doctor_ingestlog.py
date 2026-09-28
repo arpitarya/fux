@@ -117,17 +117,17 @@ QUERY_PLANES = ("query", "refer", "derive")
 #: name and its file were already taken.**
 #:
 #: - `fux.query.provenance` — SR-PROVENANCE's **answer receipts**: how an answer
-#:   was produced, and a thing [L8](../records/0010_LAW-8-use-record.md)
+#:   was produced, and a thing [L9](../records/0011_LAW-9-use-record.md)
 #:   governs, because it records what somebody **asked**. Its journal is
 #:   `.fux/runtime/provenance.jsonl`, written **only under explicit consent**.
 #: - `fux.ingest.ingestlog` — W-200's ledger: what read each document, and a
-#:   thing L8 does **not** reach, because it records nothing about a query.
+#:   thing L9 does **not** reach, because it records nothing about a query.
 #:   `.fux/runtime/ingest-log.jsonl`, written by every ingest.
 #:
 #: **The file collision was a defect, not a confusion**: writing this ledger to
 #: the journal's path made every `fux ingest` create a file that requires
 #: consent, and the e2e suite caught it with *"a journal appeared with no
-#: consent of any kind"*. **L8 outranks a work item**, so both moved.
+#: consent of any kind"*. **L9 outranks a work item**, so both moved.
 #:
 #: The fence below matches the **fully qualified name**: a bare substring on
 #: `"provenance"` would flag every query module that legitimately imports the

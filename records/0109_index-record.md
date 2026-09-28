@@ -7,10 +7,10 @@ description: What every property of a committed JSONL record is for, why it is i
 status: accepted
 date: 2026-08-18
 feature: the committed record schema — `fux.index.v2`
-owns: [src/fux/schemas/index-record.schema.json@3ebe0a7ebc9a]
-laws: [L2, L3, L5, L6]
+owns: [src/fux/schemas/index-record.schema.json@0caa1702ac5e]
+laws: [L3, L4, ex-L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5d567231d7a6ef3feb87b013b95cb39f90fbdabd4ce7bf6b6eb5b755e284787e
+content_sha: ee22b20d12eebddaa8c6cee6d7aa9ee13c331d5940207452d0c7b2226872be17
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -57,7 +57,7 @@ source ever lands in git.* **`meta` and `title_h` are deleted**, `fux.index` is
 **v4**, and a url record is shaped exactly like a git one. ⚠ **The leak that
 fork closed — a title alone telling a reader that a document they cannot open
 exists — is an ACCEPTED, DOCUMENTED EXPOSURE**, and
-[SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md) (superseded) keeps the argument and the
+[ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md) (superseded) keeps the argument and the
 reopen trigger. One reason a property is conditional is left:
 
 - **Three are written only when they say something.** `archived` and
@@ -247,7 +247,7 @@ tunable side of the line.
 
 | property | purpose |
 |---|---|
-| `mtime` | the unix timestamp of the document's **last git commit** — not a filesystem mtime, which would differ on every clone and break L3. Feeds the recency prior, normalised against the corpus's newest commit so the prior can only ever demote. Written only when git could supply one; absent means no recency prior, which is also the shipped default |
+| `mtime` | the unix timestamp of the document's **last git commit** — not a filesystem mtime, which would differ on every clone and break L4. Feeds the recency prior, normalised against the corpus's newest commit so the prior can only ever demote. Written only when git could supply one; absent means no recency prior, which is also the shipped default |
 | `superseded` | true when another document declares that it supersedes this one. A corpus-wide relation, resolved at ingest, **written only when true** |
 | `archived` | true when the document was ingested under an archived-content rule. The record states the rule it was written under rather than every reader recomputing it ([SR-ARCHIVED-CONTENT](0134_archived-content.md)); **written only when true** |
 
@@ -281,7 +281,7 @@ accelerator's pruning bound.
 
 | property | purpose |
 |---|---|
-| `abbr` | every `Long Form (ABBR)` the document's own body declares, as `[short_hashes, long_hashes]`, sorted and de-duplicated on the hashes. **Written only when non-empty.** A function of this document's bytes alone, so it is carried forward like `terms`; the corpus-wide table is folded at read time ([SR-EXPAND](0149_expand.md) decision 18) and committed nowhere. Hashes, not text ([L2](0004_LAW-2-content-never-durable.md)) |
+| `abbr` | every `Long Form (ABBR)` the document's own body declares, as `[short_hashes, long_hashes]`, sorted and de-duplicated on the hashes. **Written only when non-empty.** A function of this document's bytes alone, so it is carried forward like `terms`; the corpus-wide table is folded at read time ([SR-EXPAND](0149_expand.md) decision 18) and committed nowhere. Hashes, not text ([L3](0005_LAW-3-content-never-durable.md)) |
 
 **Two rules over the whole line:**
 
@@ -311,7 +311,7 @@ paraphrase of the other.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -321,7 +321,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**How deep a committed record may nest is `constants.toml [index] max_record_depth`** (64), read by `store/canonical.py`. The bound and its refusal are unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**How deep a committed record may nest is `constants.toml [index] max_record_depth`** (64), read by `store/canonical.py`. The bound and its refusal are unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 
@@ -340,7 +340,7 @@ this moved where they are written, not what they are.
   now is by construction rather than by care.
 - **`title_h` used to break rule 2, and the fix was the field, not the rule.** A
   bare 16-hex token outside `terms` made the accelerator refuse to build over
-  any corpus containing one — so the `hashed` default, an L5 default, shipped an
+  any corpus containing one — so the `hashed` default, an ex-L5 default, shipped an
   index no `fux build` would accept. Fixed by prefixing the value rather than
   relaxing the invariant. ⚠ **Kept here although the field is gone**, because
   the lesson is about the invariant and not about `title_h`: the invariant is

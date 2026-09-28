@@ -50,7 +50,7 @@ What none of the third-row tools do, and what fux does for documents:
   each agent rebuilds;
 - **verify at answer time** — cite a symbol at a sha and say whether the
   source still matches;
-- **byte-identical from the same tree** (L3) — Codebase-Memory's own paper
+- **byte-identical from the same tree** (L4) — Codebase-Memory's own paper
   concedes a heuristic resolution cascade that is *reproducible, not
   deterministic*.
 
@@ -64,12 +64,12 @@ row 3 is a buy.
 A separate distribution (working name only: `fux-code`; **not** a verb of
 `fux`), sharing fux's laws by adoption rather than by import:
 
-1. **Extract**: tree-sitter grammars vendored per L1 (all MIT/Apache; check
+1. **Extract**: tree-sitter grammars vendored per L2 (all MIT/Apache; check
    each SPDX id before naming it), one deterministic pass → per-file
    **shape**: symbol skeleton (defs, their kinds, their order), import set,
    token-bag minhash. Same masking discipline as W-228's heading skeleton.
 2. **Commit**: one content-addressed plane beside `.fux/index/` — shapes and
-   the clone map, never source text (L2 by analogy; a token *bag* is
+   the clone map, never source text (L3 by analogy; a token *bag* is
    statistics, a token *sequence* is content and stays out).
 3. **Answer**: `families` (which files share a shape), `clones` (near-miss
    pairs with exact Jaccard, the W-228 pattern), `misfits` (a file in a folder
@@ -86,12 +86,12 @@ third.
 
 - `inspect` reads the **document index**; code files are not ingested and the
   analyzer is a text analyzer. A code shape needs a parser per language, which
-  is a dependency decision (L1 permits; a record must decide) and a scope
+  is a dependency decision (L2 permits; a record must decide) and a scope
   decision the positioning already made the other way.
 - The document lens is judged by the **top-10 test**. A code lens has no
   `ask` to serve — its consumer is a different agent question.
 - Mixing them puts a tree-sitter build in every consumer's `fux` install for
-  a feature most corpora never use; L1's *dependencies ship packaged* makes
+  a feature most corpora never use; L2's *dependencies ship packaged* makes
   that cost everyone's.
 
 ## 5. Graduation trigger

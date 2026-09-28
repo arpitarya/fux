@@ -7,7 +7,7 @@ name = "fux-engine"
 dynamic = ["version"]
 description = "Fux — rank your written knowledge (decisions, runbooks, specs, wikis) from a small index committed to git; fetch content from the systems that own it; verify freshness at answer time."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = { text = "MIT" }
 authors = [{ name = "arpit arya", email = "arpitarya.me@gmail.com" }]
 keywords = ["knowledge", "documentation", "search", "index", "bm25", "adr", "runbook", "frontmatter", "agent"]
@@ -17,7 +17,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
@@ -25,9 +24,9 @@ classifiers = [
     "Topic :: Text Processing :: Indexing",
     "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
 ]
-# L1: OSI-approved licences only, ever — source-available (BSL, SSPL, Elastic
+# L2: OSI-approved licences only, ever — source-available (BSL, SSPL, Elastic
 # v2, Commons Clause) does NOT qualify. Fux ships packaged: no feature-extras tier. Anything on the ingest path is pinned: byte-identity is a
-# function of what resolves here. See CLAUDE.md and records/0003_LAW-1-zero-cost.md.
+# function of what resolves here. See CLAUDE.md and records/0004_LAW-2-zero-cost.md.
 dependencies = []
 
 [project.urls]
@@ -53,7 +52,7 @@ packages = ["src/fux"]
 # The Node read plane travels in the wheel so `fux setup` can vendor it into a
 # consumer's `.fux/node/` (SR-NODE-SEARCH decision 13). What travels is the
 # BUNDLE — one generated `.mjs` plus its manifest and tool descriptions, never
-# fux's own module tree, which is L10 (records/0011_LAW-10-bundled-output.md).
+# fux's own module tree, which is L10 (records/0012_LAW-10-bundled-output.md).
 #
 # 🔴 **Generated, so it is a build HOOK and not a `force-include` list.** A
 # static list cannot name a file that does not exist until something has built

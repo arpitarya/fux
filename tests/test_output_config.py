@@ -460,7 +460,7 @@ def test_the_specimen_warns_that_top_bounds_a_reported_signal():
 
 
 # --------------------------------------------------------------------------
-# L3 — nothing on the maintenance path may read this file
+# L4 — nothing on the maintenance path may read this file
 # --------------------------------------------------------------------------
 
 
@@ -473,7 +473,7 @@ def test_the_module_imports_nothing_from_the_maintenance_path():
         line for line in source.splitlines() if line.startswith(("import ", "from "))
     )
     for banned in ("ingest", "derive", "maintain", "store"):
-        assert banned not in body, f"output_config imports from {banned} — L3 fence"
+        assert banned not in body, f"output_config imports from {banned} — L4 fence"
 
 
 def test_resolve_rejects_an_unknown_verb():

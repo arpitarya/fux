@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@a5829526ad0b, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@a448d8e2f6f5]
-laws: [L3, L4, L5, L7]
+owns: [src/fux/maintain@f61f1807a9fe, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
+laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 35cec7d08ca1d318516766772feb8b9114c33e68f1f1b3f4ac87aaf3c5ff2df8
+content_sha: 9b66197a0b2897834ef100bfbb67598ec846930ac2b6998804e07065cc7e1c3a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -54,7 +54,7 @@ flowchart LR
     MD -->|"cannot"| R["REFUSE:<br/>both sides kept"]
     K["git checkout"] --> PK["post-checkout<br/>fux build"]
     D["fux daemon start"] --> SW["sweep: re-fetch URLs<br/>nobody queried"]
-    W["any index writer"] --> L5["write.lock<br/>+ write_index: L5 or FuxError"]
+    W["any index writer"] --> ex-L5["write.lock<br/>+ write_index: ex-L5 or FuxError"]
 ```
 
 <details>
@@ -77,7 +77,7 @@ flowchart LR
 
   fux daemon start --> a clock: re-fetch the URLs nobody queries
 
-  any index WRITER --> write.lock --> write_index --> L5 holds, or FuxError
+  any index WRITER --> write.lock --> write_index --> ex-L5 holds, or FuxError
   any READ verb    --> holds nothing
 ```
 
@@ -110,9 +110,9 @@ $ fux hooks
 The index is committed, so it inherits every problem a generated file in git
 has: it goes stale the moment content changes, and it conflicts whenever two
 people touch the same shard. The staleness half is this record; the conflict
-half is [SR-MERGE-DRIVER](0130_merge-driver.md). Meanwhile L5 — hashed meta for
+half is [SR-MERGE-DRIVER](0130_merge-driver.md). Meanwhile ex-L5 — hashed meta for
 non-git sources — was a rule enforced by the one code path that happened to
-implement it. (⚠ **L5 was retired on 2026-09-20**, W-194; this paragraph is
+implement it. (⚠ **ex-L5 was retired on 2026-09-20**, W-194; this paragraph is
 history, and decision 7 below carries what became of it.)
 
 ### Decision
@@ -303,7 +303,7 @@ specifically proposed and specifically refused.
   string check on purpose**: the failure worth catching is a future edit adding
   a refresh back *just for the sources commit*, and a crude check catches that
   the same day it is written.
-- **This is L4 at its narrowest point.** A git hook is the one path in fux that
+- **This is L5 at its narrowest point.** A git hook is the one path in fux that
   runs **without anyone deciding to run it**.
 
 **6. `fux hooks` registers the merge driver.** It writes
@@ -312,10 +312,10 @@ specifically proposed and specifically refused.
 4 and 5's refuse-rather-than-clobber policy. **What the driver does is
 [SR-MERGE-DRIVER](0130_merge-driver.md)'s.**
 
-**7. ⚠ RETIRED 2026-09-20 (Arpit, W-194), with the law.** This read: *L5 is
+**7. ⚠ RETIRED 2026-09-20 (Arpit, W-194), with the law.** This read: *ex-L5 is
 enforced in `write_index`, per record, before any shard is touched* — a non-git
 record had to **state** `meta`, and `hashed` had to carry `title_h` and no
-`title` or `phrases`. **`assert_meta_policy` is deleted and L5 is superseded.**
+`title` or `phrases`. **`assert_meta_policy` is deleted and ex-L5 is superseded.**
 
 🔴 **What this decision was actually about survives it:** a rule enforced in one
 *caller* is a convention; a rule enforced in `write_index` is a property of the
@@ -434,7 +434,7 @@ interval, unassisted** → `stop` → pid reaped, `write.lock` free.
   to differ on Windows.
 
 **9d. Cadence is `[sources.url] sweep_minutes`, required with the table**
-(W-225 stage 3b, 2026-09-27, [SR-LAW-12](0013_LAW-12-values-live-in-config.md)).
+(W-225 stage 3b, 2026-09-27, [SR-LAW-12](0014_LAW-12-values-live-in-config.md)).
 Until then it had a default of 60, on the argument that it only decides how often. The law
 leaves no default in code; the template writes `60`. **A repo with no
 `[sources.url]` has no cadence, so `fux daemon start` refuses it**, naming why
@@ -448,7 +448,7 @@ refer plane records a `url:` doc id when a cited document's sha no longer
 matches ([SR-REFER](0127_refer-plane.md) decision 15).
 
 `dirty.py` is **advisory, never authoritative**, and that sentence is what keeps
-L3 true: `fux ingest` re-walks the whole corpus regardless, so the list can never
+L4 true: `fux ingest` re-walks the whole corpus regardless, so the list can never
 change a committed byte. **A URL refresh driven by the list *is* authoritative
 for the URLs it names**, because not fetching the rest is the entire point. The
 defence:
@@ -456,7 +456,7 @@ defence:
 > The `url:` half of the index is **already** a mosaic of different moments.
 > Every record holds whatever its last fetch produced, and no two were
 > necessarily fetched together. A partial refresh changes the *spread* of those
-> moments, not the kind of object the index is. L3 is *same sources → same
+> moments, not the kind of object the index is. L4 is *same sources → same
 > bytes*, and **a URL is not the same source twice.**
 
 ⚠ **This is not "just index the delta"**, which was ruled *not* the fix for the
@@ -520,7 +520,7 @@ fork 4, ruled 2026-08-28 with fork 3.
   necessarily to everyone: it can be a content hash, a version counter, or an
   internal object id. This file is gitignored and is still exactly the kind of
   local state that ends up in a support bundle. **Hashing compares as well as the
-  token does and carries none of it, so L5 is untouched by construction.**
+  token does and carries none of it, so ex-L5 is untouched by construction.**
 - **Counters, no clocks — unchanged.** A token is an opaque equality witness,
   not a timestamp, even when a server built it from one.
 - 🔴 **It was declared, written, and NOT READ BACK for its first hour**, so
@@ -601,7 +601,7 @@ reach: the handoff window's surviving ordering needs a delay injected **inside**
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -616,13 +616,13 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**The maintenance plane's fixed numbers are `constants.toml` keys**: a remembered question's key width (`[maintain] question_key_hex`), the write lock's mode (`[maintain] lock_mode`), and the two Windows API constants the liveness check uses (`[win32]`). Its tunables (poll, timeout, passes, streak) are stage 5e's. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**The maintenance plane's fixed numbers are `constants.toml` keys**: a remembered question's key width (`[maintain] question_key_hex`), the write lock's mode (`[maintain] lock_mode`), and the two Windows API constants the liveness check uses (`[win32]`). Its tunables (poll, timeout, passes, streak) are stage 5e's. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
-**The maintenance plane's pacing is `fux.toml [maintain]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): `daemon_poll_s`, `runner_poll_s`, `stop_timeout_s` (shared by `stop` and the runner, one number for one gesture), `last_cited_max` and `stop_every_docs` ([SR-CONFIG](0113_config.md) decision 18). ⚠ **`MAX_PASSES` is not a key**: it is the bound veto condition 6 needs to hold, so it is `constants.toml [maintain] max_passes`. `request_stop`, `take_over` and `stop` take `timeout=None` and read the key.
+**The maintenance plane's pacing is `fux.toml [maintain]`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): `daemon_poll_s`, `runner_poll_s`, `stop_timeout_s` (shared by `stop` and the runner, one number for one gesture), `last_cited_max` and `stop_every_docs` ([SR-CONFIG](0113_config.md) decision 18). ⚠ **`MAX_PASSES` is not a key**: it is the bound veto condition 6 needs to hold, so it is `constants.toml [maintain] max_passes`. `request_stop`, `take_over` and `stop` take `timeout=None` and read the key.
 
 ### Consequences
 
-- **There is no path into a committed shard that skips L5.** That is the
+- **There is no path into a committed shard that skips ex-L5.** That is the
   difference between a law and a habit, and the test that tries to bypass it
   calls `write_index` directly.
 - **A rejected batch leaves the index exactly as it was.** The check runs over
@@ -688,7 +688,7 @@ this moved where they are written, not what they are.
   `git clone` install executable code, which is what decision 5 refuses.
 - **A hook that fetches, but only for the commit that edits the sources file.**
   Rejected under decision 5a — the consent is the problem, not the scope.
-- **Leaving L5 in one caller and documenting the rule.** Rejected on the
+- **Leaving ex-L5 in one caller and documenting the rule.** Rejected on the
   observation that this is what it already was.
 - **An OS advisory lock.** Rejected under Consequences: it forfeits
   observability, which decision 1c makes the property.

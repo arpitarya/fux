@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@b4ccfc003af0]
-laws: [L1, L3, L4, L8]
+owns: [src/fux/query/provenance.py@b790c6aa64e9]
+laws: [L2, L4, L5, L9]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 4322fef39b1042ae79d3fc5d2a8dd0d0daba036b20b9382344813de4906db4f6
+content_sha: f72982aba0ab8512b6d915d7b0020604a5fdfd35847501b797235ab37f413c6e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -40,7 +40,7 @@ document that was considered and cut.
 
 The word *audit trail* implies a log kept over time. Fux's answer is the same
 one it gives the corpus: **it does not hold the trail, it makes one derivable.**
-Because fux is deterministic (L3) and content-addressed throughout, a small
+Because fux is deterministic (L4) and content-addressed throughout, a small
 **receipt** — the index digest, the tune digest, the engine, the question, the
 bytes cited — is not a story about the past but a **re-runnable claim**.
 `fux verify` re-runs it.
@@ -187,7 +187,7 @@ measurement and be a copy of the number beside it.
 bytes. A stamp-keyed receipt could not reproduce on a fresh clone **by
 construction** — that record's own trap, arriving one plane later.
 
-**7. A receipt carries NO WALL CLOCK.** L3 forbids one on a deterministic path,
+**7. A receipt carries NO WALL CLOCK.** L4 forbids one on a deterministic path,
 and a timestamp would make two receipts for the same answer differ, defeating a
 re-runnable claim. A caller who wants a time stamps it on the outside.
 
@@ -204,7 +204,7 @@ answer nobody recomputed — the defect this repo has refused three times
 (`max_age_seconds`; a `cached` verdict reported as `current`; a line range for
 `ask` computed at ingest).
 
-**10. `--receipt` EMITS; `--journal` WRITES.** L8 as reverted permits a
+**10. `--receipt` EMITS; `--journal` WRITES.** L9 as reverted permits a
 plaintext local log; it does not oblige fux to start one. A `$0`, offline tool
 whose pitch is *nothing leaves your machine* may not quietly begin recording
 questions because a law was relaxed. **Consent is explicit, always.**
@@ -255,7 +255,7 @@ ruling, and it is made.**
   before the ruling and nothing mechanical could have caught it.
 
 **11. The journal is bounded by a DESIGN DEFAULT, not by a law.**
-`DEFAULT_JOURNAL_MAX = 1000`, oldest dropped. L8 no longer requires a bound;
+`DEFAULT_JOURNAL_MAX = 1000`, oldest dropped. L9 no longer requires a bound;
 this one exists because an unbounded local file is a support ticket waiting to
 happen, and it is a knob rather than a refusal per Arpit's standing rule —
 state the cost, do not clamp it. `journal_max = 0` is *off*, never *unbounded*.
@@ -268,7 +268,7 @@ routed through `_emit` here, so the declaration is true. ⚠ **This was a promis
 in a machine-facing declaration that nothing enforced** — the same defect class
 W-84 found in the MCP tool descriptions, in a different file.
 
-**13. L8 governs this module and was reverted for it.** See
+**13. L9 governs this module and was reverted for it.** See
 [SR-LAWS](0001_LAWS.md) decision 8. What survives: the journal is gitignored,
 local, and never reaches a committed byte or the network.
 
@@ -326,8 +326,8 @@ signature would imply accountability it structurally cannot carry.
 
 ⚠ **Keyless signing is the right answer and fux cannot have it.** Sigstore
 shifts the trust anchor from key management to identity management, and needs a
-network (**L4**), an OIDC identity, a transparency-log service (**`$0`**) and
-non-stdlib dependencies (**L1**) — four constraints at once. **Recorded so a
+network (**L5**), an OIDC identity, a transparency-log service (**`$0`**) and
+non-stdlib dependencies (**L2**) — four constraints at once. **Recorded so a
 later session does not re-derive the same dead end.**
 
 ⚠ **Do not over-claim that re-running makes signing permanently unnecessary.**
@@ -360,7 +360,7 @@ world?*, whose answer depends on a network the verifier does not control.
   `predicate.verdicts` — `freshness`, `indexed_sha`, `fetched_sha` per document.
   A `verify` that re-asked would be a **second, weaker opinion**, taken later,
   by a machine with different access.
-- **L4 fences it independently**, so this is a design ruling that agrees with a
+- **L5 fences it independently**, so this is a design ruling that agrees with a
   law rather than one propped up by it.
 - **`--fetch` was considered and refused**: it puts two verdict meanings under
   one verb, and `reproduced` would silently depend on whether a flag was passed
@@ -416,7 +416,7 @@ supplied (W-109, 2026-09-05).**
   reads — and filling it with words a model guessed would turn a signal into
   noise.
 
-⚠ **L8 is why this is legal**: an expansion is a use record, so it lives on the
+⚠ **L9 is why this is legal**: an expansion is a use record, so it lives on the
 receipt and the journal, both gitignored, and reaches no committed byte.
 
 **Decision 14 reached the code on 2026-09-11, sixteen days after it was ruled**
@@ -526,12 +526,12 @@ takes: add the field to the engine's own output, or do not show the number.**
 
 <!-- L12-NOTE-START -->
 
-**[L12](0013_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** A receipt's config digest is unchanged in
+**[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** A receipt's config digest is unchanged in
 form; what changed is that a tree with no `.fux/tune.toml` can no longer rank at
 all, so `verify` on such a tree reports `drifted:config` before it looks for an
 index.
 
-**[L12](0013_LAW-12-values-live-in-config.md) (W-225 stage 3a, 2026-09-27).** How many receipts the journal keeps is
+**[L12](0014_LAW-12-values-live-in-config.md) (W-225 stage 3a, 2026-09-27).** How many receipts the journal keeps is
 `.fux/output.toml [cli.answer] journal_max` (1000 as shipped); `remember()`
 takes it required, and the constant it replaced is gone.
 
@@ -539,7 +539,7 @@ takes it required, and the constant it replaced is gone.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -549,14 +549,14 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 ### Consequences
 
 - ⚠ **W-200 (2026-09-20) added the ingest provenance ledger**,
   `.fux/runtime/ingest-log.jsonl` — one runtime line per consumed document
   naming its decoder and, for a URL, its fetcher
-  ([SR-INGEST](0106_ingest.md) decision 19). 🔴 **The new module is `fux.ingest.ingestlog` and it is NOT this record's subject.** This record owns `fux.query.provenance` — answer **receipts**, what somebody asked, which L8 governs. The other records what ingest did and must never grow a query field. The names collided because W-200's spec chose that path and nobody noticed this one; both docstrings now open by naming the other, and `tests/test_doctor_provenance.py` fences the query plane off the ledger by fully qualified name. **This record's decisions
+  ([SR-INGEST](0106_ingest.md) decision 19). 🔴 **The new module is `fux.ingest.ingestlog` and it is NOT this record's subject.** This record owns `fux.query.provenance` — answer **receipts**, what somebody asked, which L9 governs. The other records what ingest did and must never grow a query field. The names collided because W-200's spec chose that path and nobody noticed this one; both docstrings now open by naming the other, and `tests/test_doctor_provenance.py` fences the query plane off the ledger by fully qualified name. **This record's decisions
   are unaffected**, and the line is here because the freshness gate asks a
   describer to say so rather than to be silent.
 
@@ -581,18 +581,18 @@ this moved where they are written, not what they are.
   diagnostic on the hot path, and any per-term contribution reaching the output
   invites a recomputed total that disagrees with the score beside it (decision
   3). Lucene's on-demand model is strictly better here.
-- **Keep a durable answer log inside fux.** Rejected before the L8 reversal
+- **Keep a durable answer log inside fux.** Rejected before the L9 reversal
   because the law forbade it, and *still* rejected after: it would make fux the
   data controller for query text at a 10 000-document corporate corpus, and it
   duplicates a tool — every enterprise already owns a log sink.
 - **A boolean `verified` on the receipt.** Rejected — decision 8. Three prior
   defects in this repo are the argument.
 - **Sign the receipt (in-toto envelope).** Rejected for now: a public-key
-  signature needs a dependency L1 forbids, and stdlib `hmac` gives a keyed
+  signature needs a dependency L2 forbids, and stdlib `hmac` gives a keyed
   digest, which is a *different* security claim. The receipt is a recomputable
   hash and says so. Reopening this is a key-management decision, not a format
   one.
-- **Hash the query in the receipt.** That was L8's first form; Arpit reverted
+- **Hash the query in the receipt.** That was L9's first form; Arpit reverted
   it 2026-08-27 — a log nobody can read answers no question anyone asks of it.
 
 ### Reference (required)
@@ -690,11 +690,11 @@ grep -c "_emit(" src/fux/query/__init__.py
 
 **Project docs**
 
-- [SR-LAW-8](0010_LAW-8-use-record.md) — L8, where it is stated
+- [SR-LAW-9](0011_LAW-9-use-record.md) — L9, where it is stated
 - [`archive/open/W-91-the-provenance-plane.md`](../archive/open/W-91-the-provenance-plane.md)
   and [`archive/proposals/answer-provenance.md`](../archive/proposals/answer-provenance.md)
   — **named, never cited** (archive is not evidence). The decision is grounded
-  in this record and in [SR-LAW-8](0010_LAW-8-use-record.md) above.
+  in this record and in [SR-LAW-9](0011_LAW-9-use-record.md) above.
 
 **Papers and specifications**
 

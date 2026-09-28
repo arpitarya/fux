@@ -52,7 +52,7 @@
 #     no longer parsed as shell — so a Python line mentioning `find` cannot trip
 #     it, and the command AFTER the terminator is still checked.
 #
-# THIS HOOK IS NOT THE RULE — L11 is (records/0012_LAW-11-sealed-answer-key.md);
+# THIS HOOK IS NOT THE RULE — L11 is (records/0013_LAW-11-sealed-answer-key.md);
 # the guard list is records/0066_WORK-golden.md. Deregistered by
 # `just golden-unlock` and restored by `just golden-lock` with the other two.
 # Fails CLOSED: a payload jq cannot parse is scanned as raw text.
@@ -61,7 +61,7 @@ INPUT=$(cat)
 
 deny() {
   [ -n "${1:-}" ] && { echo "$1" >&2; exit 2; }
-  echo "BLOCKED by LAW L11 (W-223 guard): this recursive walk can reach work/golden/, where the sealed answer key lives, and it carries no exclusion. Filtering the OUTPUT (grep -v) is not enough — the walk itself reads the files. Add an exclusion to the command: grep -r … --exclude-dir=golden · rg … -g '!work/golden/**' · find … -path ./work/golden -prune -o … · fd … -E golden — or start the walk below a directory that cannot contain the tree (src/, records/, work/open/). See records/0012_LAW-11-sealed-answer-key.md decision 9." >&2
+  echo "BLOCKED by LAW L11 (W-223 guard): this recursive walk can reach work/golden/, where the sealed answer key lives, and it carries no exclusion. Filtering the OUTPUT (grep -v) is not enough — the walk itself reads the files. Add an exclusion to the command: grep -r … --exclude-dir=golden · rg … -g '!work/golden/**' · find … -path ./work/golden -prune -o … · fd … -E golden — or start the walk below a directory that cannot contain the tree (src/, records/, work/open/). See records/0013_LAW-11-sealed-answer-key.md decision 9." >&2
   exit 2
 }
 
@@ -72,7 +72,7 @@ if printf '%s' "$INPUT" | jq -e . >/dev/null 2>&1; then
 else
   # W-227: fail CLOSED. A raw-text scan of a JSON payload reads it as one quoted
   # string, so it could never have found the walk it was there to find.
-  deny "BLOCKED by LAW L11 (W-227 guard): the hook could not parse this tool call, and a guard that cannot read a command does not allow it. See records/0012_LAW-11-sealed-answer-key.md decision 9."
+  deny "BLOCKED by LAW L11 (W-227 guard): the hook could not parse this tool call, and a guard that cannot read a command does not allow it. See records/0013_LAW-11-sealed-answer-key.md decision 9."
 fi
 PROJ=${CLAUDE_PROJECT_DIR:-}
 [ -n "$CWD" ] || CWD=$(pwd)

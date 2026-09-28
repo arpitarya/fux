@@ -41,7 +41,7 @@ buried:**
    beats bug-compatibility with another.
 2. **There is exactly one `.fuxignore`, at `.fux/.fuxignore`**, and it is never
    nested. A per-directory file would make the skip reason depend on which of
-   several files matched, and would need a defined merge order to keep L3.
+   several files matched, and would need a defined merge order to keep L4.
 
 ## `fux ingest` WRITES into this file, and that is W-93's ruling
 
@@ -436,7 +436,7 @@ def write_blocks(root: Path, *, not_indexed, skipped) -> None:
       in this file, so a block written last would silently beat a `!` you wrote
       — the one hazard of letting a machine edit a `.gitignore`-shaped file.
       First means you always win.
-    - **Sorted, and no wall clock.** Same corpus, same bytes (L3). The file is
+    - **Sorted, and no wall clock.** Same corpus, same bytes (L4). The file is
       committed, so a timestamp here would break the byte-identical guarantee
       on the second machine.
     - **Rewritten whole, never appended to.** A path that stops being skipped
@@ -638,7 +638,7 @@ def _exclusions(root: Path, rel_path: str) -> dict[str, int]:
 def _compiled(body: str, anchored: bool) -> re.Pattern[str]:
     """Compile one glob against a whole repo-relative path.
 
-    Hand-rolled like every other codec here (L1), and **not** `fnmatch`: its
+    Hand-rolled like every other codec here (L2), and **not** `fnmatch`: its
     `*` crosses a `/`, which is the same reason `sourcelist.glob_match` is
     hand-rolled. The prefix is what implements git's *"a pattern with no slash
     matches a basename at any depth"*.

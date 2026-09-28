@@ -20,7 +20,7 @@ entry without that meaning "create it". The engine has exactly **two** named
 networked paths: `fux add <URL>` and `fux ingest`.
 
 ⚠ **W-63 made that count three-becomes-two and read it as the point.** It is
-not — [SR-LAW-4](../../records/0006_LAW-4-offline-by-default.md) says *paths*,
+not — [SR-LAW-5](../../records/0007_LAW-5-offline-by-default.md) says *paths*,
 plural, and never bounded how many. W-177 moved the fence onto the default verb
 and the count stayed at two by coincidence, not by rule.
 
@@ -44,7 +44,7 @@ decision 3), so everything here raises. It does not open a socket: the fetch
 `add` performs is `ingest.run`'s, behind the same consumer-fetcher contract
 every other fetch uses. And it never writes the index itself — `add`,
 `remove` and `update` all end in **one** `ingest.run`, because a second write
-path is how L3's byte-identical guarantee breaks.
+path is how L4's byte-identical guarantee breaks.
 
 ## It edits one line, never the file
 
@@ -259,7 +259,7 @@ def _write(path: Path, lines: list[str]) -> None:
     text = "\n".join(lines).rstrip("\n")
     # `newline="\n"` disables the platform-default translation write_text()
     # otherwise applies — without it this would commit CRLF on Windows and LF
-    # everywhere else, breaking L3's byte-identical guarantee across machines.
+    # everywhere else, breaking L4's byte-identical guarantee across machines.
     path.write_text(text + "\n" if text else "", encoding="utf-8", newline="\n")
 
 
@@ -812,7 +812,7 @@ def _rel(root: Path, path: Path) -> str:
 
 
 def _ingest(root: Path, args, *, refresh_urls: bool = False, only_urls=None, first_fetch=None):
-    """Every verb's single way into the index (L3). Imported lazily (SR-CLI 7)."""
+    """Every verb's single way into the index (L4). Imported lazily (SR-CLI 7)."""
     from .ingest import ingest_and_report
 
     return ingest_and_report(
@@ -898,7 +898,7 @@ def cmd_add(args) -> int:
                 # placeholder.** `fetch=` resolves offline, so the preview can
                 # state it; `decoder=` is *observed*, and a `--dry-run` that
                 # fetched in order to print a line it then does not write would
-                # be the one L4 surface where "write nothing" and "do nothing"
+                # be the one L5 surface where "write nothing" and "do nothing"
                 # came apart. The word is deliberately not a legal stem.
                 overrides["decoder"] = _OBSERVED_AT_ADD
             else:
@@ -1199,7 +1199,7 @@ def plan_url_refresh(root: Path, args) -> tuple[bool, set[str] | None]:
 
     ⚠ **`--no-fetch` short-circuits before anything is read.** The offline form
     must not depend on `[sources.url]` parsing, on the dirty list, or on any
-    announcement — L4's fence test asserts a `--no-fetch` ingest opens no
+    announcement — L5's fence test asserts a `--no-fetch` ingest opens no
     socket, and the cheapest way to keep that true is to decide it first.
     """
     import sys
@@ -1209,7 +1209,7 @@ def plan_url_refresh(root: Path, args) -> tuple[bool, set[str] | None]:
     # ⚠ **Located BEFORE `--no-fetch` is honoured, deliberately.** An entry
     # nobody listed is a typo, and `fux ingest --no-fetch typo` must not
     # quietly re-ingest the whole corpus and report success. Reading two local
-    # files costs the fence nothing — L4 is about opening a socket, not about
+    # files costs the fence nothing — L5 is about opening a socket, not about
     # opening `.fux/sources/`.
     spec = _locate(root, entry) if entry else None
 
@@ -1235,7 +1235,7 @@ def plan_url_refresh(root: Path, args) -> tuple[bool, set[str] | None]:
     # An **empty** list counts as nothing to do, for the same reason. The
     # surface capture caught this announcing "fetching every listed URL
     # (network)" against a list with no lines in it — a claim about the
-    # network that was not true, which is the one thing an L4 announcement
+    # network that was not true, which is the one thing an L5 announcement
     # may never be.
     listed = _read(list_path(root, sourcelist.URLS), sourcelist.URLS) if config.url else []
     if not listed:

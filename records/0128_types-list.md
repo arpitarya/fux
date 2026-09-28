@@ -7,10 +7,10 @@ description: "Prose plus every format a built-in decoder reads is compiled in as
 status: accepted
 date: 2026-08-20
 feature: the file-type allowlist and `.fux/formats.toml`
-owns: [src/fux/ingest/typesfile.py@d9192d085dcb, .fux/formats.toml@05666c969b79]
-laws: [L1, L3]
+owns: [src/fux/ingest/typesfile.py@df33d92cadbd, .fux/formats.toml@05666c969b79]
+laws: [L2, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 0939327a4056203f9645dabe70317f58f5c86f54fa457b2c8bf0777e6d9edded
+content_sha: b0fff5411d82aa9b6d85be9b578acce0f62e3d67b5b23f550db3441c1bd13ccb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -332,7 +332,7 @@ whole point. The tempting behaviour — fall back to the tuple-derived decoder
 and carry on — is the dangerous one: **the wrong decoder does not fail
 visibly.** It produces a plausible index with different postings, and a corpus
 built on it is not detectably wrong from the inside. This is decision 7's rule
-in [SR-DECODE](0139_decode.md) applied one layer up, for the same L3 reason.
+in [SR-DECODE](0139_decode.md) applied one layer up, for the same L4 reason.
 
 **11a. What the module verifies is NARROWER than "the extension is in its
 `EXTENSIONS`", and the line between the two is EXTENDING versus REDIRECTING.**
@@ -486,7 +486,7 @@ one glob per line, one `key = "value"` per line under `[decoders]`, decoders
 grouped by module — and every edit changes **one line** and re-parses its own
 result before writing. **A layout fux did not write is refused, not
 reformatted**: a reformat would eat the comments inside the array. The stdlib
-reads TOML and does not write it, so the writer is hand-rolled (L1).
+reads TOML and does not write it, so the writer is hand-rolled (L2).
 
 **The old file is refused wherever the list is consulted**, including `decode`,
 because `fux ask` decodes fetched documents without walking: a binding it
@@ -511,7 +511,7 @@ nothing had ever read it.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -522,7 +522,7 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **14. `[limits.<decoder>]` — the fourth key — and the file is REQUIRED**
-([L12](0013_LAW-12-values-live-in-config.md) decision 9b; W-225 stage 4a,
+([L12](0014_LAW-12-values-live-in-config.md) decision 9b; W-225 stage 4a,
 2026-09-27). The twenty caps the built-in decoders read — `max_cell_chars`,
 `max_cols`, `max_inflated`, `max_depth` and the rest — left the decoder modules
 for `[limits.<decoder>]` tables here, each a whole number `>= 1`. What each cap
@@ -540,9 +540,9 @@ carries them.
 - **A changed cap re-extracts the corpus** at the next `fux ingest`: the caps
   are in the extract-config digest ([SR-INGEST](0106_ingest.md)).
 
-**`typesfile.py` holds no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `[decoders]` lines are matched by named groups (`key`, `value`), `*.` is removed with `removeprefix`, and a control character is recognised by comparison rather than by code point. The file it writes is unchanged.
+**`typesfile.py` holds no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `[decoders]` lines are matched by named groups (`key`, `value`), `*.` is removed with `removeprefix`, and a control character is recognised by comparison rather than by code point. The file it writes is unchanged.
 
-**Decision 14's caps are twenty-four now** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5b, 2026-09-28): `[limits.html] charset_scan_bytes`, `[limits.xml] prolog_bytes`, and `[limits.yaml] indent_step` and `min_value_len` joined them. Each is a whole number `>= 1`, and what each means is [SR-DECODE](0139_decode.md)'s. A `formats.toml` that lacks one stops `fux ingest` until `fux doctor --fix` writes it.
+**Decision 14's caps are twenty-four now** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5b, 2026-09-28): `[limits.html] charset_scan_bytes`, `[limits.xml] prolog_bytes`, and `[limits.yaml] indent_step` and `min_value_len` joined them. Each is a whole number `>= 1`, and what each means is [SR-DECODE](0139_decode.md)'s. A `formats.toml` that lacks one stops `fux ingest` until `fux doctor --fix` writes it.
 
 ### Consequences
 
@@ -637,7 +637,7 @@ the short version:
   order the loader discards, and it keeps every runtime check `[decoders]`
   makes unwritable.
 - **YAML.** Rejected under decision 12: a third-party parser is a runtime
-  dependency a record would have to name under L1, for no gain over `tomllib`.
+  dependency a record would have to name under L2, for no gain over `tomllib`.
 - **Named type sets, ripgrep-style.** Rejected: ripgrep needs names because a
   human types `-tweb` fifty times a day; fux reads a committed file once per
   ingest. The indirection buys nothing and costs a second grammar.

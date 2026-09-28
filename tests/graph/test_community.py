@@ -1,7 +1,7 @@
 """Label propagation — determinism first, then that it actually separates.
 
 The determinism assertions matter more than the quality ones here. A
-non-deterministic community algorithm violates L3 silently: it does not error,
+non-deterministic community algorithm violates L4 silently: it does not error,
 it does not change a ranking, and no retrieval test would ever see it. That is
 exactly the failure class W-23 named as its hazard.
 """
@@ -52,7 +52,7 @@ def test_labels_are_canonical_largest_community_first():
 
 
 def test_assignment_is_identical_across_runs_and_input_orders():
-    """L3: the same edge set in a different order is the same partition.
+    """L4: the same edge set in a different order is the same partition.
 
     Shuffling the input is the cheap proxy for "a different machine" — it is
     what would differ if any iteration order in the algorithm came from a set

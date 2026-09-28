@@ -5,7 +5,7 @@ The shape used to live in four places — assembled inline twice in
 `EXTRACTED_FIELDS` in `ingest/run.py`, and described in prose by SR-RECORD —
 and **nothing compared them**. Adding a display field meant remembering to touch
 a tuple in a different module, and forgetting was silent: the field shipped and
-L5's check simply did not look at it.
+ex-L5's check simply did not look at it.
 """
 
 from __future__ import annotations
@@ -69,7 +69,7 @@ def test_key_order_in_the_template_cannot_reach_a_committed_byte():
 
 
 def test_display_fields_come_from_the_template():
-    """L5's check reads the schema, so a new display field is protected the
+    """ex-L5's check reads the schema, so a new display field is protected the
     moment it is declared — not the moment someone remembers a tuple."""
     assert writer.DISPLAY_FIELDS == recordschema.display_fields()
     assert set(writer.DISPLAY_FIELDS) == {"title", "phrases"}
@@ -151,7 +151,7 @@ def test_a_missing_required_field_is_named():
 
 def test_meta_and_title_h_are_refused_as_undeclared_fields():
     """⚠ **REPLACES `test_a_non_git_record_must_state_meta` and
-    `test_a_hashed_record_must_carry_title_h`.** Both asserted L5's shape: a
+    `test_a_hashed_record_must_carry_title_h`.** Both asserted ex-L5's shape: a
     non-git record had to state `meta`, and a hashed one had to carry
     `title_h`. W-194 (Arpit, 2026-09-20) deleted both fields, so what is
     asserted now is the other half of the same property — **a record still
@@ -185,7 +185,7 @@ def test_writing_false_where_the_template_says_omit_is_refused():
 def test_validate_is_not_called_on_the_write_path(tmp_path):
     """Deliberate: `canonical_dumps` refuses floats, nulls and hostile text.
     A second gate on the hot path would re-check what it already guarantees.
-    (⚠ `write_index`'s L5 meta policy was the other one named here until W-194
+    (⚠ `write_index`'s ex-L5 meta policy was the other one named here until W-194
     deleted the rule and the law on 2026-09-20.)
 
     Asserted by writing a record with an undeclared field — `validate` would
@@ -248,7 +248,7 @@ def test_the_examples_encode_to_real_committed_lines():
 
 def test_the_url_example_is_shaped_like_the_git_one():
     """⚠ **REPLACES `test_the_hashed_example_carries_no_display_text`**, which
-    asserted L5 on the example a reader copies: a hashed record held `title_h`
+    asserted ex-L5 on the example a reader copies: a hashed record held `title_h`
     and nothing readable. W-194 deleted the fork, so the two examples now
     differ only in `src`, `loc` and the id — and this asserts exactly that,
     because an example that quietly kept a dead field is how a consumer learns

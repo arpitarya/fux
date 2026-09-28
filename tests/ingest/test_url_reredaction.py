@@ -182,7 +182,7 @@ def test_a_decoder_bump_also_reaches_a_retained_url(seeded, monkeypatch):
     monkeypatch.setattr(html_mod, "VERSION", html_mod.VERSION + 1)
     run(seeded)
     # The bytes and the rules are unchanged, so the record is identical -- what
-    # is asserted is that it was RE-DERIVED and still agrees, which is L3.
+    # is asserted is that it was RE-DERIVED and still agrees, which is L4.
     assert _url_record(seeded) == before
 
 
@@ -264,7 +264,7 @@ def test_doctor_is_clean_when_nothing_is_stranded(seeded):
     assert row.ok
 
 
-# -- determinism (L3) -------------------------------------------------------
+# -- determinism (L4) -------------------------------------------------------
 
 
 def test_re_derivation_is_byte_identical_to_what_a_fetch_would_produce(seeded, monkeypatch):

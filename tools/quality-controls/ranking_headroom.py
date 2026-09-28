@@ -70,7 +70,7 @@ def read_jsonl(path: Path) -> list[dict]:
 
 def expectations() -> dict[str, dict]:
     """`id -> expected row`, from the RETIRED sets — open regression data under
-    [L11](../../records/0012_LAW-11-sealed-answer-key.md) decision 14. It opens
+    [L11](../../records/0013_LAW-11-sealed-answer-key.md) decision 14. It opens
     no sealed key on any spelling and needs no unlock."""
     out: dict[str, dict] = {}
     for set_dir in sorted(RETIRED.glob("set-*")):

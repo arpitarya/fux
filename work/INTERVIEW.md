@@ -35,7 +35,12 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-28** (Claude Code, Opus — W-168 pools; L11 d13a).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-09-28 (latest) — W-168 STEP POOLS FROM THE KEY: 9, 7, 8 GO; 6 AND 10 STOP
+### 🟢 2026-09-28 (latest) — W-234 LANDED: LAWS RENUMBERED L0–L12; PYTHON ≥ 3.12; NODE ≥ 22 IS L8
+
+- **The handles are dense now:** L1 = a retired SR is archived (was the last law), L2–L5 = the old L1–L4, L8 = Node ≥ 22 (new), L9 = use record (was L8). A document dated before 2026-09-28 is read through [SR-LAWS](../records/0001_LAWS.md) decision 2a. Retired laws are written `ex-L5` / `ex-L9`.
+- **Breaking in the next release:** Python 3.11 and Node 20 are dropped.
+
+### 🟢 2026-09-28 — W-168 STEP POOLS FROM THE KEY: 9, 7, 8 GO; 6 AND 10 STOP
 
 - **L11 decision 13a** (Arpit): `score.py` writes a `pools` block of counts per `exercises` tag. Arpit re-scored set-4-claude the same day.
 - **Pools @1:** 9 intent **14** · 7 MMR **8** · 8 authority **8** · 6 SDM **3** (stops) · 10 section **1** (stops; U0 · B2 · E1 stay ruled, not built).
@@ -56,7 +61,7 @@ valuable judgement, but not the state of play.
 
 - **W-229** (`9a4d3d3f`): every `fux inspect` lens has an Index-tab card; `/inspect/diff`; a parity test.
 - **W-228** (`79e564bb`): the `families` lens. DoD 11 (golden seed families + a rung) waits on W-230.
-- **W-231** (`cc1aef52`): law **L13** — a retired SR is archived; SR-LAW-5 moved to `archive/records/`.
+- **W-231** (`cc1aef52`): law **L1** — a retired SR is archived; ex-SR-LAW-5 moved to `archive/records/`.
 - **W-230 / W-227:** Arpit ruled the traversal hook is `100644` (never fired live since W-223); a FRESH session commits the exec bit, a `100755` gate, the uncommitted hardening, and runs the live probe. **Until then no session runs a recursive walk that can reach `work/`.**
 - **W-225 stage 5** is next for agents: 1 206 scanner sites (inline 524, module 427, param 88, class 75, path 53, get 39) across 150 files — a multi-session refactor with byte-equality gates.
 
@@ -114,7 +119,7 @@ valuable judgement, but not the state of play.
 
 - **Arpit ruled PASS at `1.0`** (Cowork): the hub never takes rank 1 on a miss.
   Shipped per §If it passes, in one change: the default on both engines, SR-TUNE
-  17/17a, SR-RANKING 12c–12d, SR-INGEST 17e, L3 byte-identity, four surfaces,
+  17/17a, SR-RANKING 12c–12d, SR-INGEST 17e, L4 byte-identity, four surfaces,
   and the CHANGELOG.
 - ⚠ **Upgrade divergence:** a repo that ran `fux setup` keeps `0.0`, and that
   includes this one. `--no-tune` no longer turns anchor off.
@@ -324,7 +329,7 @@ moved.** W-206: **compare 24 → 8, proposals 17 → 10**. Sixteen and six went 
    expecting an exact-match win from part 1 has mis-stated its endpoint.
 4. ⚠ **A spec's own claims about the tree are claims.** Four of W-199's were
    wrong and every one was caught by a test rather than by review — the register
-   conflicting on merge, the `outcome` column that could not survive its own L3
+   conflicting on merge, the `outcome` column that could not survive its own L4
    rule, `fux add` re-routing an existing pin, and a doctor detail that crashes a
    Windows console. **Read a definition of done as a hypothesis.**
 
@@ -397,11 +402,11 @@ require.
 
 **Three things a new session most needs to know from that work:**
 
-1. 🔴 **`fux.index` is `v4` and law `L5` is RETIRED.** `meta` and `title_h` no
+1. 🔴 **`fux.index` is `v4` and law `ex-L5` is RETIRED.** `meta` and `title_h` no
    longer exist; a URL record carries a plain `title` and `phrases` like any
    other. **A v3 index is refused by name** — `fux ingest` then `fux build`.
-   The ACL-mismatch leak L5 closed is an **accepted, documented exposure**
-   ([SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). **Ten live
+   The ACL-mismatch leak ex-L5 closed is an **accepted, documented exposure**
+   ([ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). **Ten live
    laws, twelve numbers.**
 2. 🔴 **A key directory is permitted again, at exactly one address** —
    `work/golden/golden-answers/`, gitignored, and **closed to every agent on
@@ -412,7 +417,7 @@ require.
    archived item file — because the hook's TARGET check is a bare substring and
    both filenames contain it. Filed for Arpit.
 3. ⚠ **Two ratified specs were wrong about the tree and one of them was a
-   defect.** W-200 named a file path that is L8's consent-gated answer journal;
+   defect.** W-200 named a file path that is L9's consent-gated answer journal;
    W-194's reuse gate silently disabled every delta ingest **with a
    byte-identical index and no error**. Both are written up in their archived
    item files. **Read a spec's claims about the tree as claims, not facts.**
@@ -424,7 +429,7 @@ number.**
 
 - 🔴 **A Cowork Claude session was pasted BOTH answer keys** — set 1 (125 rows),
   set 2 (124 rows), `key_version 1` — **and scored the `rung-00100` hand-offs in
-  chat.** [L11](../records/0012_LAW-11-sealed-answer-key.md) gives the paste
+  chat.** [L11](../records/0013_LAW-11-sealed-answer-key.md) gives the paste
   route to **Codex alone** and closes it to every Claude session on every
   surface. **The instruction to score was void on the law's face and the session
   complied with it.** Declared as [W-196](../archive/open/W-196-l11-breach-2026-09-17.md).
@@ -489,7 +494,7 @@ number.**
 - **Verified black-box, not from CI:** `fux --version` → `fux 3.0.0-alpha.0`;
   `fux update` → `invalid choice: 'update'` (the headline break); the npm
   tarball is the four-file bundle with **no `src/`**, which is
-  [L10](../records/0011_LAW-10-bundled-output.md) holding at the registry.
+  [L10](../records/0012_LAW-10-bundled-output.md) holding at the registry.
 
 ### The Blocked-on-Arpit inbox is EMPTY (2026-09-16, Cowork)
 
@@ -766,26 +771,26 @@ full definition of done and is 🟢 for Claude Code.
   owning record was *touched*. It cannot tell a redesign from a typo and never
   will. ⚠ **A failure is a prompt to re-read the record.** If it starts being
   obeyed without reading, **narrow what is owned — never loosen the check.**
-- **`0012_LAW-10` → `0011`**, closing the hole L9 left. The **handle `L10` did
+- **`0012_LAW-10` → `0011`**, closing the hole ex-L9 left. The **handle `L10` did
   not move**: a handle is an identity, a file number is an ordinal.
 - 🔴 **The renumber cost no `RULE-SINCE` entry — the first one that didn't.**
   SR-WORK-OWNERSHIP decision 9 (judge a commit against the register as it stood then)
   is why, and this is its first live proof.
 
-### L9 is retired — the environment rule is a WORK record now (2026-09-13, Cowork)
+### ex-L9 is retired — the environment rule is a WORK record now (2026-09-13, Cowork)
 
-**`SR-LAW-9` → [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)**
+**`ex-SR-LAW-9` → [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)**
 (`0052`, `kind: process`), on Arpit's ruling: which sibling environment may do
 what is **how work is done**, not a guarantee the engine makes.
 
-- 🔴 **The handle `L9` is retired and never reused; `records/0011` is VACATED,
-  not reserved.** Live handles: `L0`–`L8` and `L10`, gap deliberate. Renumbering
+- 🔴 **The handle `ex-L9` is retired and never reused; `records/0011` is VACATED,
+  not reserved.** Live handles: `L0`–`L9` and `L10`, gap deliberate. Renumbering
   `L10` down would change the meaning of every citation already written.
 - **It owns `tests/test_work_environments.py`** (renamed) — an unowned guard
   until today.
 - **The rule's content did not change.** What it lost is law precedence: a
   conflict with it is now a conflict resolved by reading, not a voiding.
-- **Frozen artifacts keep their `L9` citations** and resolve by name against the
+- **Frozen artifacts keep their `ex-L9` citations** and resolve by name against the
   register; `work/regression/`, the sealed golden data and WORKLOG were not
   rewritten.
 
@@ -898,7 +903,7 @@ indirectly dependent on a date gate carries 🟣.**
 
 ### The consumer gets no source — BUILT and CLOSED (2026-09-12, Claude Code)
 
-✅ **W-149 is closed and [L10](../records/0011_LAW-10-bundled-output.md) is
+✅ **W-149 is closed and [L10](../records/0012_LAW-10-bundled-output.md) is
 satisfied.** What a consumer's `.fux/node/` holds is **one generated `fux.mjs`**
 plus `package.json`, `mcp-tools.json` and a README (shape A), or a **workspace
 manifest alone** (shape C); the bundler is
@@ -960,7 +965,7 @@ splice that lives in `setup.py` so `ensure_layout` structurally cannot reach it.
 precedent** — worth knowing, because the wrong version of this rule is easy to
 inherit. [SR-FETCHER](../records/0117_fetcher.md) decision 5 and W-86 fork E
 govern **ingest**, where detection makes the *index* a function of the
-environment and [L3](../records/0005_LAW-3-deterministic.md) forbids it.
+environment and [L4](../records/0006_LAW-4-deterministic.md) forbids it.
 **`fux setup`'s scaffolding is not the index.** Neither precedent reached this,
 and the ruling trades away nothing a law protects.
 
@@ -2149,9 +2154,9 @@ tests go green-by-vacuity without `fux` on `PATH`"* → re-run with
 is the one whose every assertion is that something is ABSENT. **Prefer measuring
 a claim about the test suite over reading one.**
 
-⚠ **L8's one-line handle was stale in four live docs** — including this one and
+⚠ **L9's one-line handle was stale in four live docs** — including this one and
 SR-LAWS' own §1 table — all carrying the form Arpit **withdrew the same day he
-wrote it**. Reconciled. **That is a reconciliation, not a ratification**: the L8
+wrote it**. Reconciled. **That is a reconciliation, not a ratification**: the L9
 sanity-check is still open and still his.
 
 ---
@@ -2224,29 +2229,29 @@ artifacts on every run. Making `.fuxignore` prune the walk saves real work
 **and** collides with reported-never-silently-dropped. Not filed as a `W-nn` —
 the queue is human-blocked and this session was not going to invent scope.
 
-### Before that: there are EIGHT laws now — `L8` (2026-08-27)
+### Before that: there are EIGHT laws now — `L9` (2026-08-27)
 
 **If you read one thing before touching this repo: the law count changed.**
 Ruled by Arpit on 2026-08-27, closing W-89.
 
-> **L8** · *A use record never leaves the machine.*
+> **L9** · *A use record never leaves the machine.*
 >
-> ⚠ **This handle changed on 2026-08-27, the day L8 was written**: it read *"What fux retains about use is hashed, bounded, and local"* until Arpit reverted the hashing, the size bound and the stdout prohibition hours later. Plaintext queries and answers are legal; what survives is the confinement. Read the law where it is stated — [SR-LAW-8](../records/0010_LAW-8-use-record.md) §2 (it lived in `CLAUDE.md` until 2026-09-12).
+> ⚠ **This handle changed on 2026-08-27, the day L9 was written**: it read *"What fux retains about use is hashed, bounded, and local"* until Arpit reverted the hashing, the size bound and the stdout prohibition hours later. Plaintext queries and answers are legal; what survives is the confinement. Read the law where it is stated — [SR-LAW-9](../records/0011_LAW-9-use-record.md) §2 (it lived in `CLAUDE.md` until 2026-09-12).
 
-- **Every one of L1–L7 governs what fux does to documents.** L8 is the first law
-  about what fux retains of *people using it*. L2 governs **corpus content**, and
+- **Every one of L2–L7 governs what fux does to documents.** L9 is the first law
+  about what fux retains of *people using it*. L3 governs **corpus content**, and
   a query is not content however precisely it describes one — that was the gap.
 - **Normative text is `CLAUDE.md` §Non-negotiable constraints**, as always. The
   handle, the reasoning and the limits are
   [SR-LAWS](../records/0001_LAWS.md) **decision 8**. Both changed in one commit,
   which SR-LAWS decision 4 requires — **if you find them committed separately,
   that is the defect, not a style question.**
-- **L8 forbids nothing fux does today.** Verified against the code *before* the
+- **L9 forbids nothing fux does today.** Verified against the code *before* the
   text was written: `maintain/lastcited.py` hashes the query key
   (`sha256[:16]` of the normalised text), bounds the store at `MAX_QUESTIONS = 256`,
   writes into gitignored `.fux/runtime/`, never raises, and reports on **stderr**
   so stdout stays byte-identical.
-- ⚠ **The thing most likely to be misread.** L8 does **not** make the use record
+- ⚠ **The thing most likely to be misread.** L9 does **not** make the use record
   private. `last-cited.json` maps each hashed key to the locators that answered
   it, so it still says *which documents are asked about and how often*. Those
   locators are already in the committed `M/` plane — the file adds **frequency,
@@ -2388,7 +2393,7 @@ W-87 Phase 0 — all six forks, on Arpit's ruling.
    The contract is a declaration, not an instrument; `tools/quality/` is read by
    nothing.
 4. ⚠ **W-87's fork 6 ruled "no query log" and deliberately did NOT rule whether
-   L2 reaches one.** That gap is [W-89](../archive/open/W-89-does-l2-reach-a-query-log.md).
+   L3 reaches one.** That gap is [W-89](../archive/open/W-89-does-l2-reach-a-query-log.md).
    Do not close it by inference from SR-WORK-QUALITY decision 11 — the record
    explicitly declines it.
 
@@ -2460,16 +2465,16 @@ split, 2026-08-26.
 
 **Fork E was ruled the same day, and the law did not move.** Arpit: *"let the
 consumer add the dependencies — unless the consumer adds the dependencies,
-that feature won't be available."* This looked like an L1 amendment and is not
+that feature won't be available."* This looked like an L2 amendment and is not
 one: [SR-ENRICH](../records/0137_enrich.md) decision 1 already states the
 pattern as a table — network I/O → `.fux/fetchers/`, model calls → the
 consumer's agent — and **this is its third row, `.fux/decoders/<name>.py`.**
-L1 constrains the runtime fux ships; consumer code is not that. ⚠ **The
-binding objection was L3, not L1** — a decoder that ran whenever its library
+L2 constrains the runtime fux ships; consumer code is not that. ⚠ **The
+binding objection was L4, not L2** — a decoder that ran whenever its library
 imported would make two developers with identical sources produce different
 root hashes, so the set is **declared, not detected**, and a machine that
 cannot satisfy it **fails loudly** rather than shipping a smaller index. ⚠ The
-honest cost: a consumer decoder **can break L4 and no gate reaches it** — the
+honest cost: a consumer decoder **can break L5 and no gate reaches it** — the
 same asymmetry SR-ENRICH decision 3 owns about `model:`.
 
 **Two refusals to preserve.** `.json` may not re-enter the allowlist by
@@ -2796,7 +2801,7 @@ the reason is that the measuring environments are gone.**
   four groups — lifecycle / write / sources / read — because the *count* was
   never the model. **"No subcommand tree" is the constraint that survived.**
 - **`title_h` carries an `h:` prefix.** That was the defect with a measured
-  cost: the L5 `hashed` default wrote an index no `fux build` would accept, so
+  cost: the ex-L5 `hashed` default wrote an index no `fux build` would accept, so
   27.2 ms became 4 248.8 ms. **Fixed in the field's shape, never in the
   accelerator invariant.** No `_format` or `analyzer` bump — the reasoning is
   [SR-INDEX-LIFECYCLE](../records/0108_index-lifecycle.md) decision 9, and
@@ -2929,7 +2934,7 @@ session would remember is gone:
 - 🔴 **Prompt 5's hand-off is the design.** It carries what fux **answered and
   cited**, not only what it ranked, and Arpit walks it to Codex. **The only place
   a golden answer and a fux answer ever meet is a chat he is sitting in.**
-- 🔴 **Law [L11](../records/0012_LAW-11-sealed-answer-key.md) closes every agent
+- 🔴 **Law [L11](../records/0013_LAW-11-sealed-answer-key.md) closes every agent
   out of a key file and closes Claude out of a paste too.** The one exception is
   **authoring set 2**, one handoff wide: that session writes no file, hands the
   answers over in the chat, and **never runs a rung or returns**.
@@ -3093,7 +3098,7 @@ not a session blocker, just unclosed.
 |---|---|---|
 | **W-82** | 27 forks, none of which an agent may default | 2026-08-26 |
 | **W-87** | ✅ Phase 0 ruled. P1–P5 need **environments, not decisions** — `fux-playground`, a real URL corpus, a 3.11+ install | 2026-08-27 |
-| **W-89** | does **L2** reach a query log? A gap in the laws | 2026-08-27 |
+| **W-89** | does **L3** reach a query log? A gap in the laws | 2026-08-27 |
 
 **The immediate next step: nothing here is agent-closable.** Under CLAUDE.md
 §Triage first, a session that finds this state says so in ≤3 lines and stops.
@@ -3160,7 +3165,7 @@ tell the two apart. Both readings are written out in W-77.
   (`SR-FETCHER` decision 2, four functions) that has survived two callers
   unchanged. **Phases 0 (measure) and 1 (report) are startable now and depend
   on no fork.** ⚠ Three hazards live in the item: `dirty.py`'s *"advisory,
-  never authoritative"* is what keeps L3 true and a URL refresh driven by it is
+  never authoritative"* is what keeps L4 true and a URL refresh driven by it is
   not advisory; a changed validator token must never mean a changed record; and
   **`cdp.py` is not thread-safe** (`global _session`, one WebSocket), so a blind
   thread pool produces plausible documents attributed to the wrong URLs — it
@@ -3174,7 +3179,7 @@ tell the two apart. Both readings are written out in W-77.
   citation and an honest decline count the same. **Nothing is decided — it ends
   in six forks, all Arpit's**, and fork 4 is the one that can quietly break a
   law-adjacent property (measuring the `answered` gate needs a judge model:
-  outside the maintenance path so L3 holds, non-reproducible unless the model
+  outside the maintenance path so L4 holds, non-reproducible unless the model
   and prompt are pinned). **Part A — the declarations — is unblocked by the
   lab; Part B cannot run**, because `acme`/`orbit` are gone and the five-tier
   redesign is unexecuted. ⚠ **It is not a re-filing of the withdrawn W-62** and
@@ -3245,11 +3250,11 @@ tell the two apart. Both readings are written out in W-77.
   the two-strikes rule it became `tests/test_windows_console_safe.py` in the
   change that recorded it. **CI caught what nine local runs could not** — read
   the Windows arms before calling a release green.
-- **L4 now has two named networked paths, and its text did not change.**
+- **L5 now has two named networked paths, and its text did not change.**
   `fux add <URL>` (scoped to that URL) and `fux update`. The law already read
   *"paths"*, plural; what was wrong was the eleven records and docstrings that
   narrowed it to `--refresh-urls`, and those were corrected. **If you are
-  tempted to edit CLAUDE.md's L4, don't** — it is agent-steering text, it is
+  tempted to edit CLAUDE.md's L5, don't** — it is agent-steering text, it is
   Arpit's to ratify, and in this case it was already right.
 - **Concurrent sessions are not hypothetical here — they bit twice on
   2026-08-21.** First `src/fux/cli.py` was overwritten by another session and
@@ -3261,7 +3266,7 @@ tell the two apart. Both readings are written out in W-77.
   concluding a file is free.
 - **Capturing a surface is not paperwork — it found four defects here.** Three
   were in the change being captured, and every one did something defensible
-  while *saying* something false: an L4 announcement that fired with nothing
+  while *saying* something false: an L5 announcement that fired with nothing
   fetched, `add --types` silently replacing the built-in allowlist, a skip
   reported as a failed fetch, `explain` answering for a document not in the
   index. Unit tests were green throughout.
@@ -3350,8 +3355,8 @@ tell the two apart. Both readings are written out in W-77.
 
 ## 3 · Standing constraints
 
-The **laws** are normative in [`../CLAUDE.md`](../CLAUDE.md) §Non-negotiable
-constraints and named L1–L7 by
+The **laws** are stated in their own `SR-LAW-n` records, generated into
+[`../CLAUDE.md`](../CLAUDE.md) §Non-negotiable constraints, and named L0–L12 by
 [SR-LAWS](../records/0001_LAWS.md). They are not restated here — that is the
 rule SR-LAWS exists to enforce. What follows are the constraints *on the work*,
 which are not laws:

@@ -105,7 +105,7 @@ def _families_moved(a: dict, b: dict) -> dict:
     ⚠ **Over the families each report LISTS**, which `[report] top` caps — the
     counts beside them are not capped, and a family below the cut in one report
     and above it in the other reads as gained or lost. Renamed means the SAME
-    member list under a different name; everything is sorted (L3)."""
+    member list under a different name; everything is sorted (L4)."""
     def listed(report: dict) -> dict:
         return {f["name"]: tuple(f["members"]) for f in (report.get("families") or {}).get("families", [])}
 

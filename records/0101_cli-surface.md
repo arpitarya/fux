@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@f50a10b03f00, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@a40b79256420, src/fux/progress.py@10364bd02e0a, tests_e2e@8a7e8ede5b60, node/fux.mjs@b3c33c3898dc]
-laws: [L1, L4, L7]
+owns: [src/fux/cli.py@121a83cd295d, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@68155c41018a, src/fux/progress.py@10364bd02e0a, tests_e2e@db68fd0c4d9f, node/fux.mjs@3015d7cc4305]
+laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ad6668cca1f1eb402efea9e6cfa7b47cefe6a3e9e470586c5507d1dd9c2e31b8
+content_sha: d315761a3218f6d8b61ef7ed1ea9b5dda6c8a13930b47f1a63ccb7e3aefaf567
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -230,9 +230,9 @@ stderr that they went out.
 opt-in is now the *verb* rather than a flag on it, and the opt-**out** is
 `--no-fetch`. **The count is not the law and never was** — see decision 16.
 
-**L4's text does not change, and must not.** It reads *"network access only
+**L5's text does not change, and must not.** It reads *"network access only
 inside explicit, fenced, opt-in paths"* — already plural, already satisfied.
-Restating L4 here would be the defect [SR-LAWS](0001_LAWS.md) decision 3
+Restating L5 here would be the defect [SR-LAWS](0001_LAWS.md) decision 3
 exists to prevent, so this decision names the paths and cites the law rather
 than paraphrasing it.
 
@@ -266,7 +266,7 @@ first tree on this surface.
 `fux <verb> <subverb>`, so `fux tune print` was never on the table. **It prints
 the specimen tunables file and never writes one**: `tomllib` reads and nothing
 in the stdlib writes TOML, so a writer would mean either a third-party runtime
-dependency (L1) or fux round-tripping a commented file it promised never to
+dependency (L2) or fux round-tripping a commented file it promised never to
 rewrite ([SR-DOTFUX](0102_fux-directory.md)). The human pastes; the file stays
 theirs. It reads no repo state either, so it works before `fux setup` has run
 and outside a root — the second verb with that property, earned the opposite
@@ -525,7 +525,7 @@ had already done its work.
       at 44.4 s.
     - ⚠ **This does not touch a committed byte.** The bar is stderr-only and
       TTY-gated (decision 9), so stdout stays byte-identical with it on or
-      off and [SR-LAWS](0001_LAWS.md) L3 is not in play. Terminal width is an
+      off and [SR-LAWS](0001_LAWS.md) L4 is not in play. Terminal width is an
       output-shaping input, not an index input.
     - ⚠ **Still unguarded: display width ≠ `len()`.** A path holding a CJK
       character or an emoji counts as one per character and renders as two
@@ -540,13 +540,13 @@ had already done its work.
 
 <!-- L12-NOTE-START -->
 
-**`fux doctor --fix` ([L12](0013_LAW-12-values-live-in-config.md) decision 3, W-225, 2026-09-27).** Writes every
+**`fux doctor --fix` ([L12](0014_LAW-12-values-live-in-config.md) decision 3, W-225, 2026-09-27).** Writes every
 missing config file and key from its packaged template, reports each on stderr as
 `fixed: <file>: [table] key`, and then runs the checks — so `--json` stays a pure
 report. It is one of exactly two writers of a missing key; `fux setup` is the
 other, and nothing else ever writes one.
 
-**`.fux/output.toml` is required ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3a, 2026-09-27).** Every
+**`.fux/output.toml` is required ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3a, 2026-09-27).** Every
 verb's rendering defaults — `top`, `max_headings`, `hops`, `band`, `explain`,
 `sections`, `no_refer`, `journal`, `journal_max`, `port`, `progress_threshold`,
 `json` — resolve from the file ([SR-OUTPUT](0143_output-defaults.md) decisions 19–20); no argparse `default=`
@@ -554,7 +554,7 @@ carries one. `--no-output-config` (now on `build`, `add`, `remove` and `serve`
 too) reads the packaged template. `doctor` alone starts without the file, from
 the template, so it can name the fix.
 
-**`fux.toml` is required key by key ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27)** —
+**`fux.toml` is required key by key ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27)** —
 [SR-CONFIG](0113_config.md) decision 17. One consequence lands in `cli.py`: the
 observer hook ran `.fux/observers/` on a bound of `50` ms held in code when
 `fux.toml` did not load, and now **skips the observers** in that case, because
@@ -1247,14 +1247,14 @@ two networked paths, *both explicitly named*. This reverses that; the paths are
 `fux add <URL>` and `fux ingest` now.
 
 🔴 **No law changes, and the reason is in the law.**
-[SR-LAW-4](0006_LAW-4-offline-by-default.md) says *paths*, plural, and its own
+[SR-LAW-5](0007_LAW-5-offline-by-default.md) says *paths*, plural, and its own
 §"The narrowing that already happened once" is the record of exactly this
 mistake — **reading a count as the rule** — being made before. Decision 1d's
 count was a fact about the surface of the day, never a constraint on it.
 
 ⚠ **What the move costs.** `fux ingest` was offline *by construction* and the
 import fence asserted that the modules on its path cannot import a transport.
-After this it cannot be. **The fence does not disappear — it moves**: the L4
+After this it cannot be. **The fence does not disappear — it moves**: the L5
 test now asserts that an ingest invoked with `--no-fetch` imports no transport
 and opens no socket, which is the invocation the git hooks actually run.
 
@@ -1298,18 +1298,18 @@ resolves offline so the preview states it; `decoder=` is *observed*, so the
 preview prints `decoder=<observed>` — deliberately not a legal stem — plus a line
 saying what fills it. A dry run that fetched in order to print a line it then
 does not write is the one place *"write nothing"* and *"do nothing"* would come
-apart on an L4 surface.
+apart on an L5 surface.
 
 ⚠ **Its `default` is `None`, like every other gated flag in this file**
 ([SR-OUTPUT](0143_output-defaults.md) decision 10): *absent* and *given* have to
 be distinguishable, because a `--decoder` that arrived as `""` would be a pin
 nobody wrote.
 
-**`.fux/formats.toml` is required, so the e2e suite's hand-built repos write it through `write_config`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27); no verb's surface changed ([SR-TYPES](0128_types-list.md) decision 14).
+**`.fux/formats.toml` is required, so the e2e suite's hand-built repos write it through `write_config`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27); no verb's surface changed ([SR-TYPES](0128_types-list.md) decision 14).
 
-**`fux inspect --top` no longer defaults to 20 in the parser** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): absent, it is `.fux/inspect.toml [report] top` ([SR-INSPECT](0156_inspect.md) decision 23).
+**`fux inspect --top` no longer defaults to 20 in the parser** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): absent, it is `.fux/inspect.toml [report] top` ([SR-INSPECT](0156_inspect.md) decision 23).
 
-**Decision 5's two process codes are `constants.toml [exit]`** — `usage = 2` (argparse's, and the merge driver's) and `interrupted = 130` (Ctrl-C); `FuxError`'s `1` is unchanged. `--diff`'s arity is its metavar's length, and a verb's elapsed milliseconds are `timedelta` arithmetic. Every `--json` payload is indented by `[json] indent`. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+**Decision 5's two process codes are `constants.toml [exit]`** — `usage = 2` (argparse's, and the merge driver's) and `interrupted = 130` (Ctrl-C); `FuxError`'s `1` is unchanged. `--diff`'s arity is its metavar's length, and a verb's elapsed milliseconds are `timedelta` arithmetic. Every `--json` payload is indented by `[json] indent`. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 
@@ -1363,7 +1363,7 @@ nobody wrote.
   dead API; the alternative — removing it and re-adding it later — is worse,
   because exit codes are what scripts branch on.
 - **Capturing the surface finds defects that testing it does not.** Four came
-  out of the source-verbs capture alone: an L4 announcement that fired against
+  out of the source-verbs capture alone: an L5 announcement that fired against
   an empty URL list; `add --types` silently replacing the built-in allowlist; a
   skip reported as a failed fetch; and `explain` answering for a document not
   in the corpus. Each did something defensible and *said* something false,

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The sealed-key switch — `just golden-unlock` / `golden-lock` / `golden-retire`.
 
-🔴 **Read [L11](../../records/0012_LAW-11-sealed-answer-key.md) decision 14 before
+🔴 **Read [L11](../../records/0013_LAW-11-sealed-answer-key.md) decision 14 before
 this file.** Arpit ruled on 2026-09-21: *"Remove the checks through a just recipe
 and then you can access everything. Once the testing is done, move the questions
 somewhere they can be reused for regular testing, feature testing. Then lock it
@@ -59,7 +59,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-#: The one permitted key home — [L11](../../records/0012_LAW-11-sealed-answer-key.md)
+#: The one permitted key home — [L11](../../records/0013_LAW-11-sealed-answer-key.md)
 #: decision 3. Named here because a guard matches paths and an unnamed path is
 #: one nothing can cover; the same reason the `justfile` names it.
 KEY_DIR = ROOT / "work" / "golden" / "golden-answers"
@@ -289,7 +289,7 @@ def cmd_retire(args) -> int:
         "⚠ **`expected.jsonl`, not `answers.jsonl`.** `.gitignore` carries\n"
         "`**/answers.jsonl` so that a key file cannot be committed at any depth; the\n"
         "retired tier is named around that guard rather than through it.\n\n"
-        "Retired under [L11](../../../../records/0012_LAW-11-sealed-answer-key.md)\n"
+        "Retired under [L11](../../../../records/0013_LAW-11-sealed-answer-key.md)\n"
         "decision 14 by `just golden-retire`. The sealed successor is the next\n"
         "generation, named `set-<gen>-<claude|codex>`.\n",
         encoding="utf-8",

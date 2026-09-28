@@ -9,7 +9,7 @@ ball: agent
 
 # W-225 — every value lives in a config file (the L12 migration)
 
-**Status: building — stages 1–4 of 8 landed 2026-09-27/28 (3a `output.toml`, 3b `fux.toml`, 4a decoder caps in `formats.toml`, 4b `refusals.toml [scan]`, 4c `.fux/inspect.toml`); stage 5 (R7 structural numerals → `constants.toml`) is in progress: 5a (hashes, parsers, the analyzer), 5b (decoders), 5c/5d (wire, store, protocols, CLI) and 5e (13 leftover tunables → `fux.toml`, SR-CONFIG decision 18) landed 2026-09-28; 5f (`doctor`/`inspect` numerals, after W-228 commits `src/fux/inspect/`) is next.** Stage 3b's four behaviour changes are listed for Arpit in the compare doc §"Where the build departed". (Stage 7's `doctor --fix` writer landed early, with stage 2: every later stage needs it.) Stages, in order: 1 `constants.toml` + the fixed names · 2 `tune.toml`, no fallback · 3 `fux.toml` + `output.toml` · 4 the other `.fux/*.toml` (formats limits + digest, refusals, `inspect.toml`) · 5 R7 structural numerals · 6 R8 bool and every parameter default · 7 `doctor --fix`/`setup` + the AST test · 8 records, CHANGELOG, byte-equality run. The law is [SR-LAW-12](../../records/0013_LAW-12-values-live-in-config.md);
+**Status: building — stages 1–4 of 8 landed 2026-09-27/28 (3a `output.toml`, 3b `fux.toml`, 4a decoder caps in `formats.toml`, 4b `refusals.toml [scan]`, 4c `.fux/inspect.toml`); stage 5 (R7 structural numerals → `constants.toml`) is in progress: 5a (hashes, parsers, the analyzer), 5b (decoders), 5c/5d (wire, store, protocols, CLI) and 5e (13 leftover tunables → `fux.toml`, SR-CONFIG decision 18) landed 2026-09-28; 5f (`doctor`/`inspect` numerals, after W-228 commits `src/fux/inspect/`) is next.** Stage 3b's four behaviour changes are listed for Arpit in the compare doc §"Where the build departed". (Stage 7's `doctor --fix` writer landed early, with stage 2: every later stage needs it.) Stages, in order: 1 `constants.toml` + the fixed names · 2 `tune.toml`, no fallback · 3 `fux.toml` + `output.toml` · 4 the other `.fux/*.toml` (formats limits + digest, refusals, `inspect.toml`) · 5 R7 structural numerals · 6 R8 bool and every parameter default · 7 `doctor --fix`/`setup` + the AST test · 8 records, CHANGELOG, byte-equality run. The law is [SR-LAW-12](../../records/0014_LAW-12-values-live-in-config.md);
 this item makes it true.
 
 **Model:** Claude Code, Opus — a cross-plane refactor with byte-equality gates.
@@ -58,7 +58,7 @@ recommended; now SR-LAW-12 decisions 1, 6, 9a, 9b and the veto condition:
    review before step 3.**
 2. **`src/fux/constants.toml`** exists, holds every fixed value, is read by
    one Python loader and one Node loader, ships in the wheel, and is inlined
-   into the Node bundle at publish ([L10](../../records/0011_LAW-10-bundled-output.md)).
+   into the Node bundle at publish ([L10](../../records/0012_LAW-10-bundled-output.md)).
    It gets an owner record and a row in `records/README.md`'s ownership table.
 3. **Templates hold every tunable.** `src/fux/templates/` gains
    `tune.toml.txt`, `output.toml.txt`, `formats.toml.txt` (today some are written

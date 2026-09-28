@@ -2,7 +2,7 @@
 
 ## Transient is a law, not a design preference
 
-L2: content is never durable outside its source system. These chunks exist for
+L3: content is never durable outside its source system. These chunks exist for
 the length of one query and are never written to `.fux/`, never cached to disk,
 and never put in the index. The ARC cache holds *fetched document bytes* keyed
 by content address, which is the one explicitly permitted exception; chunks
@@ -438,7 +438,7 @@ def _descend(paragraph: str, max_passage_bytes: int) -> list[tuple[str, int, str
     sentence, indicate abbreviations, or be used for decimal points… Without
     analyzing the text semantically, it is impossible to be certain."* Doing it
     properly needs CLDR locale data for boundary suppressions — **a dependency
-    (L1)** — and doing it improperly cuts inside `e.g.`, `Dr.` and `3.5`, which
+    (L2)** — and doing it improperly cuts inside `e.g.`, `Dr.` and `3.5`, which
     is the mid-sentence cut this module already refuses.
 
     So the ladder uses only boundaries that need no knowledge of any language:

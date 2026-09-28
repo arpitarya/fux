@@ -52,7 +52,7 @@ def test_output_is_sorted_by_id_whatever_the_input_order():
 
 
 def test_merging_is_order_independent_and_therefore_deterministic():
-    """Both sides' machines must produce the same bytes, or L3 has a hole."""
+    """Both sides' machines must produce the same bytes, or L4 has a hole."""
     base = _shard(_line("file:a.md"))
     ours = _shard(_line("file:a.md"), _line("file:b.md", ver=2))
     theirs = _shard(_line("file:a.md"), _line("file:c.md"))
@@ -195,7 +195,7 @@ def test_main_without_three_arguments_is_a_usage_error(tmp_path):
 
 def test_crlf_input_merges_and_output_is_lf_only(tmp_path):
     """A file checked out with CRLF (Windows) must not corrupt the merge, and
-    the result must be LF-only regardless of host OS — L3's byte-identical
+    the result must be LF-only regardless of host OS — L4's byte-identical
     guarantee has no OS exception.
     """
     crlf_shard = _shard(_line("file:a.md"), _line("file:b.md")).replace("\n", "\r\n")

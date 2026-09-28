@@ -375,7 +375,7 @@ def _where_decoder(text: str, origin: str, ext: str) -> str:
 
 
 def quote(value: str) -> str:
-    """A TOML basic string. Hand-rolled like every codec in fux (L1): the stdlib
+    """A TOML basic string. Hand-rolled like every codec in fux (L2): the stdlib
     reads TOML and does not write it."""
     out = ['"']
     for ch in value:
@@ -410,7 +410,7 @@ def render(
     footer: str = "",
     grouped: bool = True,
 ) -> str:
-    """A whole file in the canonical layout. Sorted (L3); decoders grouped by module
+    """A whole file in the canonical layout. Sorted (L4); decoders grouped by module
     when `grouped`, so `htm`/`html`/`xhtml` sit together as the map they are."""
     lines: list[str] = []
     if header:

@@ -36,7 +36,7 @@ disagreement would read as a result.
 ## What it reads, and why that is allowed
 
 **`work/golden/retired/set-N/`** — questions *and* expected values. Those sets
-retired on 2026-09-22 under [L11](../../records/0012_LAW-11-sealed-answer-key.md)
+retired on 2026-09-22 under [L11](../../records/0013_LAW-11-sealed-answer-key.md)
 decision 14 and are **open regression data any session may read in any state**.
 🔴 **It opens no sealed key, on either spelling, and needs no unlock.** The only
 path under `work/golden/` it touches is `retired/`.

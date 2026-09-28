@@ -44,7 +44,7 @@ _RECORD_LEVEL = fixed("markdown", "record_level")
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.json", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
+VERSION = fixed("decoders.json", "version")  # not bumped by W-234: law handles in comments only; W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
 
 EXTENSIONS = tuple(fixed("decoders.json", "extensions"))
 
@@ -203,7 +203,7 @@ def _walk(node, out: list[str], *, depth: int, label: str | None) -> None:
         # Sorted, not insertion order. `json.loads` preserves document order,
         # so insertion order would be stable for one file — but two exports of
         # the same data with keys emitted differently would decode differently,
-        # and the index would record which exporter ran (L3).
+        # and the index would record which exporter ran (L4).
         for key in sorted(node, key=str):
             _walk(node[key], out, depth=depth + 1, label=str(key))
         return

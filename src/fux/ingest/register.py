@@ -13,26 +13,26 @@ and URLs were ingested."*
 |---|---|---|
 | committed? | **no** — gitignored, derived | **yes** |
 | scope | **one run**, what that run consumed | **the corpus**, what the index holds |
-| bound by | nothing durable | [L3](../../../records/0005_LAW-3-deterministic.md) byte-identity |
+| bound by | nothing durable | [L4](../../../records/0006_LAW-4-deterministic.md) byte-identity |
 | answers | *"what did this ingest do?"* | *"what is in here, and what read it?"* |
 
-🔴 **[L3](../../../records/0005_LAW-3-deterministic.md) is what makes it
+🔴 **[L4](../../../records/0006_LAW-4-deterministic.md) is what makes it
 committable at all.** No wall clock, no run id, no ordering that depends on how
 the walk was scheduled — sorted by `loc`, byte-identical across runs from the
 same sources. It is derived from the same inputs as the index beside it, so it
 moves exactly when the index moves.
 
-🔴 **[L2](../../../records/0004_LAW-2-content-never-durable.md):** paths and
+🔴 **[L3](../../../records/0005_LAW-3-content-never-durable.md):** paths and
 hashes, never content. A `sha` is not content and a `loc` is not a quote.
 
-🔴 **NOT [L8](../../../records/0010_LAW-8-use-record.md), and that is the whole
-reason this file may sit on a committed path.** L8 governs *the record of who
+🔴 **NOT [L9](../../../records/0011_LAW-9-use-record.md), and that is the whole
+reason this file may sit on a committed path.** L9 governs *the record of who
 went looking*; this records **what the corpus is**. A register line names a
 document that exists whether or not anybody ever queried it. ⚠ **It must never
 grow a field naming a question, a query or a reader** — the moment it does it
-becomes an L8 artifact on a committed path, which is the one thing L8 forbids.
+becomes an L9 artifact on a committed path, which is the one thing L9 forbids.
 
-## ⚠ The ruling named a fifth column and it could not survive L3
+## ⚠ The ruling named a fifth column and it could not survive L4
 
 D4's words are `loc · sha · decoder@version · fetcher · outcome`. **`outcome`
 is a fact about a RUN, not about the index**: the first ingest of a corpus
@@ -58,7 +58,7 @@ from ..constants import fixed
 NAME = fixed("register", "file")
 
 #: One tab-separated header line, so a reader knows the columns without this
-#: module. ⚠ **Part of the bytes**, therefore part of the L3 claim.
+#: module. ⚠ **Part of the bytes**, therefore part of the L4 claim.
 HEADER = fixed("register", "header")
 
 #: What a URL row carries when no fetcher was recorded for it — a carried
@@ -88,7 +88,7 @@ def render(rows: list[Row]) -> str:
 
     ⚠ **Sorted here rather than by the caller**, so no caller can forget and
     produce a register that is correct in content and unstable in bytes — which
-    is the failure the L3 claim is about, and the one a reviewer cannot see.
+    is the failure the L4 claim is about, and the one a reviewer cannot see.
     """
     body = "\n".join(row.rendered() for row in sorted(rows, key=lambda r: (r.loc, r.kind)))
     return f"{HEADER}\n{body}\n" if body else f"{HEADER}\n"
@@ -150,7 +150,7 @@ def rows_from(records: list[dict], provenance: dict[str, tuple[str, str | None]]
 
     ⚠ **Every record in the index gets a row and nothing else does.** A skip is
     not in the index, and a register that listed skips would change bytes when a
-    transient fetch failed — the L3 break this module's docstring is about,
+    transient fetch failed — the L4 break this module's docstring is about,
     arriving through a different column.
     """
     out: list[Row] = []

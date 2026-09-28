@@ -136,7 +136,7 @@ def ingest_and_report(args_root, args, *, refresh_urls: bool = False, only_urls=
     `fux ingest`, `fux add` and `fux remove` all end here rather than each
     printing their own version of the same three numbers — one format, so a
     person reading two different verbs' output is reading the same thing, and
-    one write path into the index, which is what L3 needs (W-63).
+    one write path into the index, which is what L4 needs (W-63).
 
     **The takeover lives here, not in `cmd_ingest`** (W-66 Phase 2,
     SR-MAINTENANCE decision 1d). Every verb that reaches this function is

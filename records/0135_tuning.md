@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-24
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@0df704d009f0, .fux/tune.toml@06a4246b57c1, node/src/config/tune.mjs@fd8229c9341f]
-laws: [L1, L3, L7]
+owns: [src/fux/tune.py@5a70322d785f, .fux/tune.toml@dd3f734abecc, node/src/config/tune.mjs@1fff66045a71]
+laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 5b98ca55cb94a99d4fb26ed79ee2f3be4f985ac53c839c5ea75259a116aef9f9
+content_sha: 95c0ed5b99738ea3e0fb1d4392f199b7b050ac93031d2db57e8894fc39343664
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -182,7 +182,7 @@ fetcher precedent, unchanged — **a file the tool rewrites is a file whose
 comments and local reasoning get silently deleted.**
 
 **3a. Every key is required; an absent file, table or key is an error that names
-it** ([L12](0013_LAW-12-values-live-in-config.md) decision 3). fux holds no copy
+it** ([L12](0014_LAW-12-values-live-in-config.md) decision 3). fux holds no copy
 of these values in code — the one home of every shipped value is the template,
 [`src/fux/templates/tune.toml.txt`](../src/fux/templates/tune.toml.txt), which
 `fux setup` writes and `fux doctor --fix` restores a missing key from. Both
@@ -190,7 +190,7 @@ readers raise the same sentence: `<path>: [table] key is missing`, plus the
 `--fix` remedy.
 
 **3b. `fux tune` prints; the human pastes.** There is no TOML writer in the
-standard library (`tomllib` reads only), and L1 forbids adding one. **This is
+standard library (`tomllib` reads only), and L2 forbids adding one. **This is
 not a limitation being worked around — it is the correct behaviour arriving for
 free**: a tuned value reaches the repo through a commit that someone approved.
 
@@ -211,7 +211,7 @@ fux will do without reading fux's source.
 change to a shipped value reaches a repo only when its owner edits the key; a
 NEW key reaches it as a hard error naming the key, fixed by `fux doctor --fix`,
 which writes the missing key from the template and touches nothing else
-([L12](0013_LAW-12-values-live-in-config.md) §Consequences). A raised default no
+([L12](0014_LAW-12-values-live-in-config.md) §Consequences). A raised default no
 longer reaches a consumer silently — every default change ships with a
 CHANGELOG migration line.
 
@@ -540,7 +540,7 @@ three times: it is the *"is it me or the config?"* switch when a ranking looks
 wrong, it is how CI compares against the shipped values, and **`fux tune` needs
 the off-arm internally** to compute every off-vs-on number in decision 9b. It
 reads the packaged template — the file `fux setup` would write today — and never
-a value in code ([L12](0013_LAW-12-values-live-in-config.md) decision 7).
+a value in code ([L12](0014_LAW-12-values-live-in-config.md) decision 7).
 ⚠ *It does not reach `[index]` (decision 13b) — those keys built the index being
 read, so there is no query-time "off" for them.*
 
@@ -666,7 +666,7 @@ purpose.
   ([SR-INGEST](0106_ingest.md)). ⚠ **`max_table_rows` had this hole from
   2026-09-06 until this change** — a changed row limit was never applied to an
   unchanged CSV on a delta run.
-- **13d. L3 is unchanged in substance.** The file is committed, so `same
+- **13d. L4 is unchanged in substance.** The file is committed, so `same
   sources + same committed [index] -> same index` holds exactly as `same
   sources + same fux.toml` held for `[decode]`. What changed is which committed
   file carries the input.
@@ -1028,7 +1028,7 @@ step 9, 2026-09-28; ruled D2 · I1 · M1 · S1 on 2026-09-24,
   `reference` — the types `src/fux/constants.toml [intent.type]` names, and
   nothing else is accepted. A glob matches the **whole** location, `*` crosses
   `/`, `?` is one character. Where two match, **the longest wins**, ties by code
-  point, so the answer never depends on file order (L3). ⚠ **Not `[priority]`'s
+  point, so the answer never depends on file order (L4). ⚠ **Not `[priority]`'s
   matcher**: that one is a path prefix (8a).
 - **`intent_weight` scales a document whose declared type is the one the
   question's cue prefers by `1 + intent_weight`.** The cue lexicon is a fixed
@@ -1047,7 +1047,7 @@ step 9, 2026-09-28; ruled D2 · I1 · M1 · S1 on 2026-09-24,
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -1058,9 +1058,9 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No tune key changed** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `fux.toml` joined `tune.toml` and `output.toml` as a file `fux doctor --fix` fills key by key; `node/test/config.test.mjs` gained `fux.toml`'s `dirs_file` cases ([SR-CONFIG](0113_config.md) decision 17).
+**No tune key changed** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `fux.toml` joined `tune.toml` and `output.toml` as a file `fux doctor --fix` fills key by key; `node/test/config.test.mjs` gained `fux.toml`'s `dirs_file` cases ([SR-CONFIG](0113_config.md) decision 17).
 
-**No tune key changed** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/tune.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
+**No tune key changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/tune.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
 
 ### Consequences
 

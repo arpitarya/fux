@@ -1,7 +1,7 @@
 # .fux/output.toml — HOW a result is SHOWN. Never which documents come back.
 #
 # Written once by `fux setup`; fux never rewrites it. EVERY KEY IS REQUIRED
-# (law L12, records/0013_LAW-12-values-live-in-config.md): fux holds no copy of
+# (law L12, records/0014_LAW-12-values-live-in-config.md): fux holds no copy of
 # these values in code, so a missing file or key stops the verb and names it.
 # `fux doctor --fix` writes a missing key back from the template this file was
 # written from, and nothing else ever writes one.
@@ -50,7 +50,7 @@ journal = false    # ⚠ NOT a rendering key. `true` APPENDS every answer's rece
                      #   a file: .fux/runtime/provenance.jsonl, gitignored,
                      #   never committed. Consent, either here or per-call
                      #   with `fux answer --journal` -- both are explicit.
-journal_max = 1000   # the most receipts that journal keeps (L8: gitignored, never committed)
+journal_max = 1000   # the most receipts that journal keeps (L9: gitignored, never committed)
 
 [cli.serve]
 port = 7337        # `fux serve` binds 127.0.0.1 only; this is the port

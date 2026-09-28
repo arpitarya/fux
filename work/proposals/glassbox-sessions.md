@@ -28,7 +28,7 @@ forks that must be ruled before anything is built. **Nothing here is built.**
 
 ## 1. The connection point already exists, and it is not in the package
 
-[SR-LAW-4](../../records/0006_LAW-4-offline-by-default.md) put network code in
+[SR-LAW-5](../../records/0007_LAW-5-offline-by-default.md) put network code in
 the **consumer's repo**, not in fux: `fux setup` writes `http.py` and `cdp.py`
 into `.fux/fetchers/`, and from that moment they are the consumer's own files.
 [SR-URL-INGEST](../../records/0107_url-ingest.md) then fixed routing as *declared,
@@ -172,7 +172,7 @@ alternative, a new plane, should have to argue for itself against that.
 planes ([SR-DOTFUX](../../records/0102_fux-directory.md), enforced by
 `fux doctor`'s check-ignore assertion). Session replay from a regulated
 consumer-facing app therefore means **customer content entering a committed
-index** — and [SR-LAW-2](../../records/0004_LAW-2-content-never-durable.md)'s
+index** — and [SR-LAW-3](../../records/0005_LAW-3-content-never-durable.md)'s
 accepted cost, restated by **B-190**, is that *"a hashed key is not anonymity"*:
 term statistics still come from the document, and `terms` is not salted.
 
@@ -289,8 +289,8 @@ script in one consumer's repo and fux needs to know nothing about it.
 
 ## Reference
 
-- [SR-LAW-4](../../records/0006_LAW-4-offline-by-default.md) — offline by default; why network code lives in the consumer's repo
-- [SR-LAW-2](../../records/0004_LAW-2-content-never-durable.md) · [SR-LAW-5](../../archive/records/0007_LAW-5-hashed-meta.md) — content never durable; hashed meta, and what it does not close
+- [SR-LAW-5](../../records/0007_LAW-5-offline-by-default.md) — offline by default; why network code lives in the consumer's repo
+- [SR-LAW-3](../../records/0005_LAW-3-content-never-durable.md) · [ex-SR-LAW-5](../../archive/records/0007_LAW-5-hashed-meta.md) — content never durable; hashed meta, and what it does not close
 - [SR-URL-INGEST](../../records/0107_url-ingest.md) · [SR-URL-LIST](../../records/0116_url-list.md) · [SR-CDP-FETCHER](../../records/0118_cdp-fetcher.md) — the fetcher contract, the line grammar, the second fetcher as worked example
 - [SR-ACQUIRED](../../records/0145_acquired-plane.md) · [SR-URL-FRESHNESS](../../records/0147_url-freshness.md) · [SR-REFUSAL](../../records/0146_refusals.md) — retained bytes, freshness verdicts, the fail-closed refusal predicate
 - [SR-PII](../../records/0148_pii.md) · [SR-DOTFUX](../../records/0102_fux-directory.md) — redaction's closed validator set; which planes are committed

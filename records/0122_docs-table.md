@@ -8,9 +8,9 @@ status: accepted
 date: 2026-08-19
 feature: "`.fux/runtime/docs.jsonl` — the derived doc table and the join key it defines"
 owns: []
-laws: [L3]
+laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 96c876cdbdca4787c937a67f0a56e862e438566e6d79b7b9999c7417723ddcf8
+content_sha: 58ad5d3e5448f162a85337851eb3febaf18a48fd0f7b3dbe54908ac73f918029
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -159,7 +159,7 @@ the same committed input, verified the same way as `manifest.json` and
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -169,7 +169,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 ### Consequences
 
@@ -195,7 +195,7 @@ this moved where they are written, not what they are.
   `docs.jsonl`'s own line order already is that map, at zero extra storage.
 - **Leave `docs.jsonl` unsorted, in shard-read order.** Rejected: it makes
   `docidx` depend on filesystem iteration order, breaking the byte-identical
-  rebuild guarantee (L3).
+  rebuild guarantee (L4).
 - **Keep scoring data out and let the accelerator re-derive it.** Rejected under
   decision 2 — re-derivation is exactly what made the two query paths disagree.
 

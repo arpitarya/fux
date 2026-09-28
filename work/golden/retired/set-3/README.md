@@ -15,6 +15,6 @@ model family that reads them also tunes against them.
 `**/answers.jsonl` so that a key file cannot be committed at any depth; the
 retired tier is named around that guard rather than through it.
 
-Retired under [L11](../../../../records/0012_LAW-11-sealed-answer-key.md)
+Retired under [L11](../../../../records/0013_LAW-11-sealed-answer-key.md)
 decision 14 by `just golden-retire`. The sealed successor is the next
 generation, named `set-<gen>-<claude|codex>`.

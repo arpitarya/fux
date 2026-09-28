@@ -241,6 +241,14 @@ SR-ENRICHED and folded in here when that record was superseded on 2026-08-27 —
 still **not permission to build**); deferred to
 [M8](../archive/open/W-38-m8-deferred.md).
 
+**`ex-L5`, `ex-L9` (retired law handles)** — How live text names a law that
+retired **before** the 2026-09-28 renumber. `ex-L5` is hashed display meta
+(retired 2026-09-20), and `ex-L9` is the environment rule (retired 2026-09-13,
+now [SR-WORK-ENVIRONMENTS](../records/0052_WORK-environments.md)). The bare
+numbers L5 and L9 name live laws again. A document dated before 2026-09-28 uses
+the old numbers throughout; read it through
+[SR-LAWS](../records/0001_LAWS.md) decision 2a.
+
 **Extracted mode** — The **default** ingest tier: `$0`, offline, stdlib,
 deterministic — conversion, chunking, term selection, static-table embedding
 codes, edge extraction. Everything is *taken from* the document; nothing is
@@ -367,7 +375,7 @@ treated as zero. **Zero headroom in a direction makes a null *Inconclusive*, not
 [SR-RS](../records/0133_predictions.md) decision 22.
 
 **Hashed meta (`meta = hashed`)** — 🔴 **REMOVED in fux 3.x (W-194, Arpit,
-2026-09-20), together with law L5.** It was the **default** for every non-git
+2026-09-20), together with law ex-L5.** It was the **default** for every non-git
 source: the record stored a title *hash* and no readable `title` or `phrases`,
 closing the ACL-mismatch leak where a repo-cloner without source access could
 learn that a document exists and what it is called. `plain` was the opt-in,
@@ -375,7 +383,7 @@ enforced at write time. **Every record now commits readable display text**, and
 that leak is an **accepted, documented exposure** — use `.fux/pii.toml` to keep
 a value out of the committed index, or do not index the page.
 `meta=` in a URL line or in `[sources.url]` is now a **named load error**, not
-an ignored key. See [SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md)
+an ignored key. See [ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md)
 (superseded) and [meta-privacy](../archive/compare/meta-privacy.compare.md).
 
 **Link-IDF** — An inbound edge's discount in the graph walk:
@@ -484,7 +492,7 @@ and they are one mechanism plus its bookkeeping.
   sorted line per indexed document, `loc · kind · sha · decoder · fetcher`.
   Distinct from W-200's gitignored per-run ledger: the ledger answers *"what did
   this ingest do?"*, the register answers *"what is in here, and what read
-  it?"*. Bound by [L3](../records/0005_LAW-3-deterministic.md) — no clock, no
+  it?"*. Bound by [L4](../records/0006_LAW-4-deterministic.md) — no clock, no
   run id, byte-identical across runs — which is the only reason a derived file
   may be committed.
 
@@ -512,7 +520,7 @@ URL line ──fetch=cdp──▶ .fux/fetchers/cdp.py ──bytes──▶ .fux
   the type is seen; it writes the stem it resolved and **refuses** when nothing
   claims that format, rather than writing a line it cannot ingest. Ingest never
   reads a header for routing again — which moves a heuristic out of the
-  maintenance path and into a diffable line ([L3](#l3-deterministic)).
+  maintenance path and into a diffable line ([L4](#l3-deterministic)).
 - **`decoder=prose`** is the one reserved word, for bytes that are already text.
   It names a branch and no module, so `.fux/decoders/prose.py` is refused.
 - **The line wins over the header, silently** — the line is the human's word and
@@ -631,12 +639,12 @@ numbers it produced stand as filed, and the reconciliation is W-138. Replaced
 1. **Answer receipts** (`fux answer --receipt`, `fux.query.provenance`,
    SR-PROVENANCE) — how an *answer* was produced and what it left out. It
    records what somebody **asked**, so
-   [L8](../records/0010_LAW-8-use-record.md) governs it.
+   [L9](../records/0011_LAW-9-use-record.md) governs it.
 2. **The ingest ledger** (`.fux/runtime/ingest-log.jsonl`,
    `fux.ingest.ingestlog`, W-200) — one line per document the last ingest
    consumed: which decoder read it and at what version, which fetcher retrieved
    it, from which bytes, and with what outcome. It records what **ingest** did
-   and nothing about a query, so **L8 does not reach it — and it must never
+   and nothing about a query, so **L9 does not reach it — and it must never
    grow a query field.**
 
 ⚠ **The collision was not noticed when W-200 named the path** (2026-09-18).
@@ -659,7 +667,7 @@ that measures [P1](#p-predictions-p1p7) before any of M2–M6 is built. One
 scorer ([BM25F](#bm25f)), three corpora, k ∈ {baseline, 128, 64}, varying
 **only the index**. Its verdict is [P1-GATE](../work/regression/2026-08-09-pruning-eval/VERDICT.md);
 a FAIL terminates the plan and reopens
-[SR-REFER](../records/0127_refer-plane.md) and [L2](../records/0004_LAW-2-content-never-durable.md)
+[SR-REFER](../records/0127_refer-plane.md) and [L3](../records/0005_LAW-3-content-never-durable.md)
 — argued in [`storage-architecture`](../archive/compare/storage-architecture.compare.md),
 **archived 2026-09-20**.
 
@@ -690,7 +698,7 @@ Ported at [M4](../archive/open/W-24-m4-refer-plane.md) from archived ADR-0007.
 with per-block max impact and skip pointers, decoded at native speed via
 `memoryview.cast`. Large (~2.5 GB at 10⁶ — **a deferred target**, not the design point; see [Litmus](../CLAUDE.md)) and disposable — the mirror image of
 the [wire format](#wire-format). See
-[SR-REFER](../records/0127_refer-plane.md) and [L2](../records/0004_LAW-2-content-never-durable.md)
+[SR-REFER](../records/0127_refer-plane.md) and [L3](../records/0005_LAW-3-content-never-durable.md)
 — argued in [`storage-architecture`](../archive/compare/storage-architecture.compare.md),
 **archived 2026-09-20**.
 
@@ -784,8 +792,8 @@ is the consumer's. Fetching happens only under `fux add <URL>` or `fux ingest`;
 `fux ingest --no-fetch` carries every `url:` record forward byte-identically and
 opens no socket. See [SR-URL-INGEST](../records/0107_url-ingest.md).
 
-**Use record (the law, L8)** — Anything durable fux keeps about **someone using
-it**, as opposed to about the corpus: query keys, citation history, counters. L8
+**Use record (the law, L9)** — Anything durable fux keeps about **someone using
+it**, as opposed to about the corpus: query keys, citation history, counters. L9
 requires every one of them to be **hashed at write time, bounded in size,
 confined to gitignored runtime state, and absent from any committed byte, from
 stdout, and from the network.** Today there is exactly one — `last-cited.json`,
@@ -795,8 +803,8 @@ key is not anonymity** — the value is the locators that answered, so the file
 still says which documents are asked about and how often; those locators are
 already in the committed `M/` plane, so it adds *frequency*, not new exposure.
 Distinct from [content-never-durable](#content-never-durable-the-law), which
-governs the corpus: a query is not content, which is the gap L8 exists to close.
-Stated by [SR-LAW-8](../records/0010_LAW-8-use-record.md); handle assigned by
+governs the corpus: a query is not content, which is the gap L9 exists to close.
+Stated by [SR-LAW-9](../records/0011_LAW-9-use-record.md); handle assigned by
 [SR-LAWS](../records/0001_LAWS.md), whose decision 8 carries the same-day
 write/revert/ratify history.
 

@@ -9,7 +9,7 @@ extension — `?download=1`, `/export`, an `application/octet-stream` — so fux
 guessed from the `Content-Type`, then the URL, then fell back to prose, **on
 every ingest**. Which decoder read a document was therefore a function of what
 the server said that morning, which is a heuristic in the maintenance path
-(L3). The line replaces the guess with a declaration.
+(L4). The line replaces the guess with a declaration.
 
 The edge cases numbered below are
 [`archive/proposals/fetcher-routing.md`](../../archive/proposals/fetcher-routing.md)

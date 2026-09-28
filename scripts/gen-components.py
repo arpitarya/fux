@@ -30,7 +30,7 @@ bind. ⚠ **Remove that test and every block here violates decision 1.**
 - A record with neither, and which is not a law, carries the one honest-case
   line pointing at SR-WORK-OWNERSHIP decision 7. **A law with neither carries no
   block**: a law governs conduct, not components, and an "owns nothing" line on
-  ten law records would be noise that trains a reader to skip the block.
+  thirteen law records would be noise that trains a reader to skip the block.
 
 🔴 **A link is rendered only for a path git tracks.** `node/dist/fux.mjs` is the
 L10 build output — real on a machine that has built it, absent in CI — and a

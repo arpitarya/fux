@@ -8,6 +8,21 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Breaking
+
+- **Python ≥ 3.12** (law L7, was ≥ 3.11). `requires-python = ">=3.12"`, so pip
+  refuses a 3.11 install instead of the install failing at runtime; `fux doctor`
+  checks the same floor. CI no longer tests 3.11.
+- **Node ≥ 22** (new law L8). The npm package declares
+  `"engines": { "node": ">=22" }`, was `>=20`. Node 20 reached end of life on
+  2026-04-30. npm warns on a mismatch (it refuses only under `engine-strict`),
+  and CI tests Node 22 and 24.
+- **The laws are renumbered** (W-234): L13 → L1, L1–L4 → L2–L5, L8 → L9, and
+  the new Node law is L8. Retired laws are written `ex-L5` (hashed meta) and
+  `ex-L9` (environments). An older document keeps its own numbers and is read
+  through SR-LAWS decision 2a. This changes no behaviour, only the names a
+  record or comment uses.
+
 ### Added
 
 - **`fux serve` is the fux explorer now (was "ask explorer") and gains an Answer tab**, and a `GET /answer?q=…[&no_refer=1]`

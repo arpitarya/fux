@@ -7,7 +7,7 @@ grep**: the identifier is a string a document contains, and the primary is the
 document that is *about* it. 🔴 **It is not a golden question, it carries no
 answer, and it never enters `work/golden/`** — which is the whole reason a
 ranking change to the analyzer can be measured at all without going anywhere
-near a sealed key ([L11](../../records/0012_LAW-11-sealed-answer-key.md)).
+near a sealed key ([L11](../../records/0013_LAW-11-sealed-answer-key.md)).
 
 **Two queries per row, because they fail differently.**
 

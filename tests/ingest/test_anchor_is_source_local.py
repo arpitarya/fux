@@ -14,7 +14,7 @@ marked only `B` dirty, so a full `fux ingest` and an incremental re-index would
 produce **different indexes from the same sources**.
 
 ⚠ **That failure would have been invisible here.** It is
-[L3](../../records/0005_LAW-3-deterministic.md) failing on the *incremental*
+[L4](../../records/0006_LAW-4-deterministic.md) failing on the *incremental*
 path only — the full-ingest path stays byte-reproducible, so every test and
 every CI check that rebuilds from scratch passes, and the drift appears only
 in a working repository that has been edited over time. Nothing in this repo
@@ -78,7 +78,7 @@ def test_edge_text_is_a_function_of_its_source_alone(tmp_path):
     assert _line_of(tmp_path, "file:docs/a.md") == a_before, (
         "editing B moved A's committed bytes. The anchor words have drifted "
         "onto the TARGET's record, which is option (a) shipped under (c)'s "
-        "name — and it breaks L3 on the incremental path, where nothing looks."
+        "name — and it breaks L4 on the incremental path, where nothing looks."
     )
     assert _line_of(tmp_path, "file:docs/b.md") != b_before, (
         "B's own anchor words did not change, so this test proved nothing. "

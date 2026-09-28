@@ -26,7 +26,7 @@ The grammar, in one place:
   loads; `render` always emits every attribute, so a generated file holds no
   implicit state.
 - **The loader dedupes and sorts.** File order is presentation only, which is
-  L3 applied to config: two people holding the same set in different orders
+  L4 applied to config: two people holding the same set in different orders
   must produce the same committed bytes. A duplicate entry is a merge
   artefact and not an error — but a duplicate whose *resolved* attributes
   disagree is, naming both line numbers, because exact entries cannot
@@ -38,7 +38,7 @@ The grammar, in one place:
   back, so there is no precedence order to remember or to get wrong.
   Exclusions are **order-independent** — the loader sorts, so two people holding
   the same set in different orders must produce the same committed bytes, which
-  is L3 applied to config.
+  is L4 applied to config.
 - **An exclusion carries no attributes.** `archived=true` describes a directory
   whose documents are history; it means nothing about a path being removed, and
   accepting it silently would be the kind of no-op configuration this grammar's
@@ -57,7 +57,7 @@ strict about.
 `work/regression/a/b/evidence`, which is not what anyone writing that line
 means. `glob_match` compiles the pattern itself: `*` is `[^/]*`, `?` is
 `[^/]`, and `**` is the explicit "any depth" form. Hand-rolled on purpose,
-like every other codec here (L1).
+like every other codec here (L2).
 """
 
 from __future__ import annotations
@@ -305,7 +305,7 @@ def _fetcher_reason(raw: str) -> str | None:
     every decoder. Here, importing a fetcher to validate one line would run
     module-level consumer code that may `connect()` to a browser — so reading a
     committed file would open a socket to decide whether a line is well-formed,
-    on a path L4 fences.
+    on a path L5 fences.
 
     Existence is checked where the name is used (`urlsrc._fetcher_path`, which
     raises naming the missing file) and reported ahead of time by `fux doctor`.
@@ -678,7 +678,7 @@ def parse(text: str, spec: ListSpec, *, origin: str) -> list[Entry]:
             seen[key] = entry
 
     # Sorted by (exclude, value): includes first, then exclusions, each block
-    # alphabetical. File order is presentation only — L3 applied to config.
+    # alphabetical. File order is presentation only — L4 applied to config.
     return sorted(seen.values(), key=lambda e: (e.exclude, e.value))
 
 

@@ -87,7 +87,7 @@ def merge_shards(ancestor: str, ours: str, theirs: str) -> str:
 
     Deterministic: the output is sorted by id, so two machines merging the same
     three inputs produce the same bytes. Without that the merge driver would be
-    a hole in L3 the size of every collaborative repository.
+    a hole in L4 the size of every collaborative repository.
     """
     base_header, base = _split(ancestor)
     our_header, mine = _split(ours)
@@ -247,7 +247,7 @@ def main(argv: list[str] | None = None) -> int:
     # write side needs the opposite instinct — `newline="\n"` below disables
     # the platform-default translation there, so this driver never commits
     # CRLF on Windows while committing LF everywhere else, which would break
-    # L3's byte-identical guarantee across machines.
+    # L4's byte-identical guarantee across machines.
     base_text = ancestor.read_text(encoding="utf-8") if ancestor.exists() else ""
     our_text = ours.read_text(encoding="utf-8")
     their_text = theirs.read_text(encoding="utf-8")

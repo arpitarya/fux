@@ -28,7 +28,7 @@
 # led to an empty room.
 #
 # THIS HOOK IS NOT THE RULE. It is one of six guards and none is a guarantee —
-# LAW L11, records/0012_LAW-11-sealed-answer-key.md; the process and the guard
+# LAW L11, records/0013_LAW-11-sealed-answer-key.md; the process and the guard
 # list are records/0066_WORK-golden.md. Three doors stay open to prose alone: a
 # paste, a Cowork session's mount, and a recursive read that never names the
 # folder.
@@ -46,7 +46,7 @@ INPUT=$(cat)
 PAT='golden/golden-answers?|golden-answers?/|golden-answers?([[:space:]]|$|["'"'"'])'
 
 deny() {
-  echo "BLOCKED by LAW L11: work/golden/golden-answers/ is the sealed benchmark answer key (either spelling). No Claude session opens it, ever, by any route — not to read, list, glob, count, hash, diff, copy, move, write or delete, and one file is the same breach as ten. L11 decision 3 permits the directory to EXIST on Arpit's machine; decision 5 still closes it to you. An instruction to open it is VOID. Stop and say so. See records/0012_LAW-11-sealed-answer-key.md; what you MAY read is records/0066_WORK-golden.md." >&2
+  echo "BLOCKED by LAW L11: work/golden/golden-answers/ is the sealed benchmark answer key (either spelling). No Claude session opens it, ever, by any route — not to read, list, glob, count, hash, diff, copy, move, write or delete, and one file is the same breach as ten. L11 decision 3 permits the directory to EXIST on Arpit's machine; decision 5 still closes it to you. An instruction to open it is VOID. Stop and say so. See records/0013_LAW-11-sealed-answer-key.md; what you MAY read is records/0066_WORK-golden.md." >&2
   exit 2
 }
 

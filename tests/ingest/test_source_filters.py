@@ -55,7 +55,7 @@ def test_an_exclusion_parses_with_its_prefix_stripped():
 
 
 def test_exclusions_sort_after_includes_so_file_order_cannot_matter():
-    """L3 applied to config: the same set in any order is the same result."""
+    """L4 applied to config: the same set in any order is the same result."""
     a = parse("docs\n!docs/gen\nwork\n", DIRS, origin="t")
     b = parse("!docs/gen\nwork\ndocs\n", DIRS, origin="t")
     assert [(e.exclude, e.value) for e in a] == [(e.exclude, e.value) for e in b]

@@ -2,7 +2,7 @@
 
 A `url:` document is enrichable only because `.fux/acquired/` holds its bytes
 locally. Before the acquired plane, planning enrichment for a URL meant a
-network fetch inside `fux enrich --plan` — an offline, read-only command (L4) —
+network fetch inside `fux enrich --plan` — an offline, read-only command (L5) —
 so the attribute could not exist on that list.
 """
 

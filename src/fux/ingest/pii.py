@@ -65,7 +65,7 @@ become each consumer's (SR-PII decision 16).
 
 Same bytes plus same rules gives the same output, always — no clock, no
 randomness, no ordering dependence beyond the declared file order. That is
-what keeps L3 true with redaction switched on.
+what keeps L4 true with redaction switched on.
 
 ⚠ **Editing `pii.toml` must invalidate extraction reuse**, or documents whose
 bytes did not change keep terms built under the OLD rules. `digest()` is what

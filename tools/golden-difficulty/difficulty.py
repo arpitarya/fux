@@ -17,7 +17,7 @@ the field is for. Nothing in this file reads a prediction, a score or an index.
 rather than trusting the caller. ⚠ **That refusal got MORE important on
 2026-09-18, not less:** L11 decision 3 permits a key to exist under this tree, at
 `work/golden/golden-answers/`, and decision 5 still closes it to every agent
-([SR-LAW-11](../../records/0012_LAW-11-sealed-answer-key.md)). A path under
+([SR-LAW-11](../../records/0013_LAW-11-sealed-answer-key.md)). A path under
 either spelling is refused here **because it may now resolve**, which is exactly
 when trusting the caller stops being harmless. The key is Arpit's; he or Codex
 points this at it from wherever he chooses.
@@ -48,7 +48,7 @@ documents that are *not* in ``relevant`` carry the question's top-IDF terms. Thi
 is why a lookup that is trivial at 20 documents is genuinely hard at 10 000, and
 it is the number the ladder exists to expose.
 
-## Determinism (L3)
+## Determinism (L4)
 
 Fixed stopword list, fixed tokenizer, BM25 IDF over a corpus enumerated in sorted
 path order, integer comparisons only. Same key + same corpus in, byte-identical

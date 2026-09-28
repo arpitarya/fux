@@ -606,7 +606,7 @@ def test_adding_a_second_type_does_not_re_seed(repo, monkeypatch):
     assert typesfile.read(repo).include.count("*.md") == 1
 
 
-# -- L4: these verbs open no socket of their own ----------------------------
+# -- L5: these verbs open no socket of their own ----------------------------
 
 
 def test_the_module_imports_no_network_library():
@@ -678,12 +678,12 @@ def _no_sockets(monkeypatch):
     🔴 **Asserting on stderr is not enough for this one.** The announcement is
     the thing a bug would leave in place while the fetch happened anyway, or
     remove while it still happened — so the fence has to be the syscall, which
-    is what L4 is actually about.
+    is what L5 is actually about.
     """
     import socket
 
     def refuse(*a, **kw):
-        raise AssertionError("L4: this path opened a socket")
+        raise AssertionError("L5: this path opened a socket")
 
     monkeypatch.setattr(socket, "socket", refuse)
     monkeypatch.setattr(socket, "create_connection", refuse)

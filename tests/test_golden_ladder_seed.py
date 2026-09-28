@@ -15,7 +15,7 @@ detects it*:
 
 🔴 **A stale rung does not fail loudly.** It answers questions written against
 words it does not contain, and returns a number shaped exactly like a real one
-— the same hazard [L11](../records/0012_LAW-11-sealed-answer-key.md) names for
+— the same hazard [L11](../records/0013_LAW-11-sealed-answer-key.md) names for
 the key. So the check is mechanical and runs in the fast suite.
 
 **It reads `work/golden/seed/` and `work/golden/ladder/` only** — the two

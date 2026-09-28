@@ -1,6 +1,6 @@
 """The Node read plane's bundler — one artefact per plane, built at publish.
 
-**Why this file exists.** [L10](../../../records/0011_LAW-10-bundled-output.md)
+**Why this file exists.** [L10](../../../records/0012_LAW-10-bundled-output.md)
 says the consumer is served build output, never source: what `fux setup` writes
 into `.fux/node/` and what the npm tarball exports is ONE generated `.mjs`,
 never a copy of `node/src/**`. This is the thing that generates it.
@@ -10,7 +10,7 @@ concern** (`records/README.md` §Ownership) — everything else under `store/` i
 the committed index; this is a build-time tool that never touches one.
 
 **Deterministic, and that is a promise adopted voluntarily.** Same sources →
-byte-identical bundle. [L3](../../../records/0005_LAW-3-deterministic.md)
+byte-identical bundle. [L4](../../../records/0006_LAW-4-deterministic.md)
 binds the *index*, not a build artefact, so nobody should later cite the wrong
 authority for it — SR-NODE-SEARCH decision 14 says so out loud. What makes it
 hold: modules are emitted in a topological order with a path tie-break, no
@@ -171,7 +171,7 @@ class _Module:
         if not spec.startswith("."):
             raise FuxError(
                 f"{self.rel}: `{spec}` is a bare package import. The Node read plane has no "
-                "dependencies (L1) and the bundler cannot resolve one."
+                "dependencies (L2) and the bundler cannot resolve one."
             )
         return posixpath.normpath(posixpath.join(posixpath.dirname(self.rel), spec))
 
@@ -353,7 +353,7 @@ def bundle(node_dir: Path) -> str:
         "// the fux repository; `python -m fux.store.nodebundle <node dir>` regenerates",
         "// it byte for byte from a checkout of the matching tag.",
         "//",
-        "// One artefact per plane — L10, records/0011_LAW-10-bundled-output.md. Each",
+        "// One artefact per plane — L10, records/0012_LAW-10-bundled-output.md. Each",
         "// source module is an IIFE returning its exports, so nothing is renamed and",
         "// the bundle reads as its sources in dependency order.",
         "",

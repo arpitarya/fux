@@ -209,7 +209,7 @@ def _scoring(**overrides):
 
 
 def _index_bytes(root) -> bytes:
-    """Every committed shard, order-independent. This is what L2 protects."""
+    """Every committed shard, order-independent. This is what L3 protects."""
     return b"".join(sorted(p.read_bytes() for p in iter_shard_paths(root)))
 
 

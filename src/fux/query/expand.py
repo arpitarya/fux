@@ -9,7 +9,7 @@ and the word never appears. No amount of BM25F tuning reaches it, because the
 term is not there to weight.
 
 Query2doc (arXiv 2303.07678) lifts BM25 by 3-15 % by appending a model-written
-pseudo-passage to the query. **Fux may never call a model** (L3), and it does
+pseudo-passage to the query. **Fux may never call a model** (L4), and it does
 not have to: its caller usually *is* one. `--expand` is the slot where the
 caller hands over the words it thinks the document will use, and fux ranks the
 combination deterministically, records it in the receipt, and can replay it.

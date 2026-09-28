@@ -1,4 +1,4 @@
-"""Law L13 — a retired SR is archived, never deleted ([SR-LAW-13](../records/0014_LAW-13-retired-records-archived.md)).
+"""Law L1 — a retired SR is archived, never deleted ([SR-LAW-1](../records/0003_LAW-1-retired-records-archived.md)).
 
 Arpit, 2026-09-28: *"create a new law if an sr is retired archive it"*. Two
 directions, both from the record's decision 7:
@@ -42,7 +42,7 @@ def test_no_retired_record_is_left_in_records():
         if _status(p.read_text(encoding="utf-8")) in RETIRED_STATUSES
     )
     assert not offenders, (
-        f"{offenders} sit in records/ at a retired status. L13: MOVE a retired record to "
+        f"{offenders} sit in records/ at a retired status. L1: MOVE a retired record to "
         "archive/records/ in the change that retires it — status: archived, the banner, "
         "and an archive/README.md row. A superseded record is rewritten or deleted instead "
         "(SR-WORK-ARCHIVE decision 9)."
@@ -65,6 +65,6 @@ def test_every_archived_record_is_marked_three_ways():
 
 
 def test_there_is_something_to_check():
-    """The backfill of 2026-09-28 moved SR-LAW-5; an empty archive would make the
+    """The backfill of 2026-09-28 moved ex-SR-LAW-5; an empty archive would make the
     second test vacuous."""
     assert (ARCHIVED / "0007_LAW-5-hashed-meta.md").is_file()

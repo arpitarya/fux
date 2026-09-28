@@ -7,7 +7,7 @@ decoder plane, and normalizes the result into ingestable bytes (W-86 P8).
 All network code — transport, browser, auth, retries — lives on the consumer's
 side of that boundary; `src/fux/` stays offline and stdlib-only. Fetching runs
 only under the engine's two named fenced paths — `fux add <URL>`, scoped to the
-one URL, and `fux ingest` (law L4, [SR-CLI](../../records/0101_cli-surface.md)
+one URL, and `fux ingest` (law L5, [SR-CLI](../../records/0101_cli-surface.md)
 decision 1e). A plain ingest never imports a fetcher.
 
 The URL list is a committed *file*, `.fux/sources/urls`, parsed by the one
@@ -672,7 +672,7 @@ def fetch_all(
     fetch raised. A `fetch` that raises becomes a `Skipped`; the batch
     continues.
 
-    ## Concurrency (W-82 §3.3) — and why it is invisible to L3
+    ## Concurrency (W-82 §3.3) — and why it is invisible to L4
 
     **Sequential fetching is not what makes the index deterministic — the sort
     is.** This function ends `fetched.sort(...)` / `skipped.sort(...)`, so
@@ -917,7 +917,7 @@ def fetch_all(
 # retrieval and decoding — and `http.py`'s own docstring stated the consequence
 # as a rule nothing enforced: *"both fetchers must produce the same markdown
 # from the same bytes, or which fetcher retrieved a document would change the
-# committed index."* That is L3 written as a coding convention.
+# committed index."* That is L4 written as a coding convention.
 #
 # `fetch(url) -> tuple[bytes, str]` makes it structural. The content type is
 # load-bearing twice: the fetcher is the ONLY thing that ever sees the HTTP

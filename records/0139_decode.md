@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@f7ab2ca3e7f4, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@b8161299e493, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@68625dfbd069]
-laws: [L1, L2, L3, L4]
+owns: [src/fux/decode@a00e1cf088b4, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@ef3e012bac1c, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@68625dfbd069]
+laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: b66d67ca3dfe6cba6342cc58258c139787ca04712bc1b8376b33f9980a196135
+content_sha: 5a708398f017b995cd570861105b71458451dddf42bfecacef890961a2080ebb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -40,7 +40,7 @@ rule it had no way to enforce:
 > Both fetchers must produce the same markdown from the same bytes, or which
 > fetcher retrieved a document would change the committed index.
 
-**That is L3 demoted to a code comment** — and neither copy was reachable from
+**That is L4 demoted to a code comment** — and neither copy was reachable from
 the git-dir walker, so **a `.html` file sitting on disk was never decoded at
 all.**
 
@@ -56,7 +56,7 @@ flowchart TD
     P --> X["extract.py"]
     C -->|yes| O{"is there a copy in<br/>.fux/decoders/ ?"}
     O -->|"yes: the normal case,<br/>setup writes all of them"| CD["the CONSUMER COPY runs<br/>consumer dependencies allowed"]
-    O -->|"no: the copy was deleted"| BD["the packaged built-in runs<br/>stdlib only, L1"]
+    O -->|"no: the copy was deleted"| BD["the packaged built-in runs<br/>stdlib only, L2"]
     CD --> R{"Markdown, or None?"}
     BD --> R
     R -->|Markdown| N["NFC applied<br/>frontmatter NOT re-read"]
@@ -81,7 +81,7 @@ flowchart TD
         |              writes them all           |
         |                     |                  |
         |            the CONSUMER COPY    the packaged built-in
-        |            runs (consumer       runs (stdlib only, L1)
+        |            runs (consumer       runs (stdlib only, L2)
         |            dependencies OK)           |
         |                     |                  |
         |                     +--------+---------+
@@ -102,7 +102,7 @@ flowchart TD
 
 **Why a consumer may bring a dependency fux may not.** Legacy Office formats,
 OCR and a stronger PDF need libraries the runtime is not allowed to have. **The
-answer is not to amend L1** — it is
+answer is not to amend L2** — it is
 [SR-ENRICH](0137_enrich.md) decision 1's table gaining a third row:
 
 | fux refuses to own | the consumer owns it as |
@@ -176,11 +176,11 @@ a filesystem-ordered registry.
 **6. The built-in module list is an explicit sorted tuple, never a directory
 scan.** A directory listing is filesystem order; **a plane whose dispatch
 depends on filesystem order has a committed index that depends on it too**
-(L3).
+(L4).
 
 **7. A missing consumer dependency is a HARD ERROR naming the module.**
 *Unavailable* has to mean **the ingest stops**, not that the index quietly
-shrinks. ⚠ **Detection would break L3 outright:** a decoder that ran whenever
+shrinks. ⚠ **Detection would break L4 outright:** a decoder that ran whenever
 its library happened to import makes two developers with identical sources
 commit different root hashes. **Declared-and-committed plus a loud failure is
 what preserves *same sources → same index*.**
@@ -233,7 +233,7 @@ sibling, walked the same way. `svg` and `image` are the two format
 families this record's §1 named as "no decoder" the day it was written —
 SVG (markup, geometry dropped, only `<title>`/`<desc>`/`<text>` kept) and
 raster images (PNG/JPEG/GIF, pixels dropped, only embedded text metadata
-kept, hand-rolled per **L1** since Pillow is not stdlib). **The consequence
+kept, hand-rolled per **L2** since Pillow is not stdlib). **The consequence
 belongs to SR-TYPES, not here**: decision 1 unions every built-in's
 extensions into `DEFAULT_TYPES` automatically, so shipping these three
 built-in reverses the SVG half of [SR-TYPES](0128_types-list.md) decision 5
@@ -344,8 +344,8 @@ decoder returning `None` is **discovered**, and had nowhere to go.
 | `.fux/runtime/enrich-progress.tsv` | **gitignored** | which entries *this machine* handled is local; committing it would make two people's progress conflict on every pull |
 
 - **Sorted by doc id, no wall clock, deduplicated.** It is a committed byte, so
-  **L3 applies**: an ingest over an unchanged corpus leaves `git status` clean.
-- **Paths, shas and a reason. Never content (L2).** **A queue that quoted the
+  **L4 applies**: an ingest over an unchanged corpus leaves `git status` clean.
+- **Paths, shas and a reason. Never content (L3).** **A queue that quoted the
   first line of an unreadable file would be the one place the architecture
   leaks.**
 - **The reason distinguishes two facts**, and conflating them would make the
@@ -613,7 +613,7 @@ difference from `ROUTES`.** A decoder is already imported to decode; reading one
 more module attribute costs nothing and adds no new trust. ⚠ **[SR-FETCHER](0117_fetcher.md)
 decision 16d reads `ROUTES` with `ast` and never imports** — because a *fetcher*
 would otherwise be imported on the offline path, where importing consumer code
-breaks L4. **The two rules differ because the risk differs**, and a session
+breaks L5. **The two rules differ because the risk differs**, and a session
 copying one to the other has copied the wrong half.
 
 **20c. A key not in the resolved map is not indexed, and the closed list is per
@@ -752,7 +752,7 @@ reimplemented twice.
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -778,7 +778,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**The built-in decoders' caps live in `.fux/formats.toml [limits.<decoder>]`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27).
+**The built-in decoders' caps live in `.fux/formats.toml [limits.<decoder>]`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27).
 The twenty module constants — `MAX_CELL_CHARS`, `MAX_COLS`, `MAX_INFLATED`,
 `MAX_DEPTH`, `MAX_ITEMS` and the rest — are deleted; each decoder reads
 `fux.decode._limits.limit(decoder, key)`, served from the file the registry
@@ -799,9 +799,9 @@ changed decoder's `VERSION` line says so.
   for a cap and gets a named error** — there is no value to fall back to.
   `fux ingest` checks every cap up front (`_limits.check`), so a walk stops once.
 
-**The Markdown grammar and the glob matcher hold no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `markdown.mjs` reads its fence and heading by named regex groups, and `registry.mjs` tests `**` with `startsWith`. Twin behaviour is unchanged.
+**The Markdown grammar and the glob matcher hold no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `markdown.mjs` reads its fence and heading by named regex groups, and `registry.mjs` tests `**` with `startsWith`. Twin behaviour is unchanged.
 
-**The decoders hold no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5b, 2026-09-28). What a format fixes went to `constants.toml`: PNG/JPEG/EXIF/GIF signatures, markers and record layouts in `[decoders.image.format]` (each layout is a `struct` format, and its size is the offset the walk advances by); PDF's octal-escape width, bfrange span and code length in `[decoders.pdf.format]`; RTF's `\uN` wrap in `[decoders.rtf.format]`; the bases in `[radix]`; Markdown's six levels and a record's level in `[markdown]`; Word's style levels in `[ooxml]`. drawio's raw-deflate window is `-zlib.MAX_WBITS`, and HTML's BOM is `codecs.BOM_UTF8`. **Four scan windows are caps, not format facts, and joined `[limits]`** — the same call as the stage-4a caps: `[limits.html] charset_scan_bytes` (4096), `[limits.xml] prolog_bytes` (8192, the shared XML reader's DOCTYPE window), and `[limits.yaml] indent_step` (2) and `min_value_len` (3). They enter the extract-config digest with the rest. A decoder called with no repository bound now needs one for `html` too; every production caller already passes it. `VERSION` was not bumped, and each changed decoder's `VERSION` line says so. HEAD's and the new decoders return the same result on 17 147 inputs: every tracked file of each type, crafted files for each format, and every prefix of each crafted file.
+**The decoders hold no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5b, 2026-09-28). What a format fixes went to `constants.toml`: PNG/JPEG/EXIF/GIF signatures, markers and record layouts in `[decoders.image.format]` (each layout is a `struct` format, and its size is the offset the walk advances by); PDF's octal-escape width, bfrange span and code length in `[decoders.pdf.format]`; RTF's `\uN` wrap in `[decoders.rtf.format]`; the bases in `[radix]`; Markdown's six levels and a record's level in `[markdown]`; Word's style levels in `[ooxml]`. drawio's raw-deflate window is `-zlib.MAX_WBITS`, and HTML's BOM is `codecs.BOM_UTF8`. **Four scan windows are caps, not format facts, and joined `[limits]`** — the same call as the stage-4a caps: `[limits.html] charset_scan_bytes` (4096), `[limits.xml] prolog_bytes` (8192, the shared XML reader's DOCTYPE window), and `[limits.yaml] indent_step` (2) and `min_value_len` (3). They enter the extract-config digest with the rest. A decoder called with no repository bound now needs one for `html` too; every production caller already passes it. `VERSION` was not bumped, and each changed decoder's `VERSION` line says so. HEAD's and the new decoders return the same result on 17 147 inputs: every tracked file of each type, crafted files for each format, and every prefix of each crafted file.
 
 ### Consequences
 
@@ -837,7 +837,7 @@ changed decoder's `VERSION` line says so.
   ⚠ **Decision 15 remains unmeasured.** No endpoint in that run touches
   `pdf`/`rtf`/`csv`/`jsonl` heading emission, and the verdict says so rather than
   letting the decision list absorb a result that was not about it.
-- ⚠ **A consumer decoder can break L4 and no gate reaches it.** An import fence
+- ⚠ **A consumer decoder can break L5 and no gate reaches it.** An import fence
   cannot see code loaded by path. This is the same asymmetry
   [SR-ENRICH](0137_enrich.md) decision 3 owns about `model:` being a claim fux
   records and cannot confirm: **a documented obligation, checked by review of a
@@ -855,11 +855,11 @@ changed decoder's `VERSION` line says so.
   the day the fetch contract returns bytes.
 - **A structured `headings` field instead of Markdown.** Rejected under decision
   2, with its cost stated. **Reopening it is reopening a ratified decision.**
-- **Amending L1 to permit optional dependencies.** Rejected as unnecessary —
-  see §1's table. **L1 constrains the runtime fux ships; consumer code is not
+- **Amending L2 to permit optional dependencies.** Rejected as unnecessary —
+  see §1's table. **L2 constrains the runtime fux ships; consumer code is not
   that.** A later session proposing this amendment is crossing this fence.
 - **Detecting decoders by whether their library imports.** Rejected under
-  decision 7: **an L3 violation wearing convenience as a disguise.**
+  decision 7: **an L4 violation wearing convenience as a disguise.**
 - **Decoders for in-document structure (tables, code fences).** Rejected as a
   category — by the time a decoder finishes, a table *is* Markdown, and
   weighting it is `extract.py`'s job. **Consumer code owning ranking policy is a
@@ -905,7 +905,7 @@ changed decoder's `VERSION` line says so.
    would mean declaration is not sufficient and decision 7 is wrong.
 2. **A built-in decoder needs a non-stdlib import** to be correct rather than
    merely convenient. **That would mean the built-in/consumer split is drawn in
-   the wrong place, not that L1 should move.**
+   the wrong place, not that L2 should move.**
 3. **The default type allowlist is ever derived from the LIVE registry** rather
    than from the built-ins — a consumer dropping a decoder into `.fux/decoders/`
    must never silently start indexing a new file type

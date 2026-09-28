@@ -7,11 +7,11 @@ description: "`--expand` scores agent-supplied terms at a lower weight beside th
 status: accepted
 date: 2026-09-05
 feature: agent-side query expansion and multi-query fusion
-owns: [src/fux/query/expand.py@3eb9647e4be9, src/fux/query/fuse.py@ca1f9d50d93c, node/src/query/expand.mjs@fd39cfaf8fa1, node/src/query/fuse.mjs@580e525266c8]
+owns: [src/fux/query/expand.py@fe8364556021, src/fux/query/fuse.py@ca1f9d50d93c, node/src/query/expand.mjs@fd39cfaf8fa1, node/src/query/fuse.mjs@580e525266c8]
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: 6cbe6f548faaac7f9695628d7f7c0b107df2a3b5d32ad1b6984263d6f8c4cc32
+content_sha: 8da529209db85e392c8711cad518a0c70f9dd2081a37480ebafae1c7058bc3ca
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -145,7 +145,7 @@ are the measured form of that idea; RRF is Cormack, Clarke & Buettcher 2009.
 **1. Fux never writes an expansion, and this record never lets it.** `--expand`
 is a *term slot*. The text arrives from the caller, is analyzed by
 `query/analyzer.py` — the analyzer the index was built with — and is hashed.
-Nothing in `src/fux/` generates, rewrites or suggests one. L3 is why, and the
+Nothing in `src/fux/` generates, rewrites or suggests one. L4 is why, and the
 slot is what makes the law survivable rather than merely obeyed. **The one
 addition fux makes is not a written expansion in this sense**: decision 18's
 fold adds a spelling the corpus itself DECLARED, deterministically, and is off
@@ -235,7 +235,7 @@ fusing two phrasings is.
 it.** An expansion is an input to the ranking exactly as the query is, so a
 receipt without it describes an answer nobody can reproduce — a re-run of the
 bare question returns a different list and `verify` reports `drifted` for a
-reason that has nothing to do with the corpus. ⚠ **L8**: the expansion is a
+reason that has nothing to do with the corpus. ⚠ **L9**: the expansion is a
 *use record*, so it lives on the receipt and the journal, both gitignored, and
 reaches no committed byte.
 
@@ -356,7 +356,7 @@ scored through `Expansion` at `[ranking] mined_weight`
 
 <!-- L12-VALUES-START -->
 
-**Where this record's fixed values live — [L12](0013_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
+**Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
@@ -367,7 +367,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**`fuse.py`'s sort key reads `constants.toml [ranking] score_digits`** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). RRF's `k` was already `[fuse] rrf_k`. No order moved.
+**`fuse.py`'s sort key reads `constants.toml [ranking] score_digits`** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). RRF's `k` was already `[fuse] rrf_k`. No order moved.
 
 ### Consequences
 
@@ -412,7 +412,7 @@ this moved where they are written, not what they are.
 
 ### Alternatives considered
 
-- **Fux writes the expansion** (PRF/RM3, or a model). A model is refused by L3
+- **Fux writes the expansion** (PRF/RM3, or a model). A model is refused by L4
   outright. PRF was measured as an arm, twice, and **refused on the
   measurement** (decision 17): it drifted at every weight.
 - **Score-space fusion**, as the deleted dense lane did. Refused: decision 8.

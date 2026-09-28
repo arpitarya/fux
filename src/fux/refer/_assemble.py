@@ -14,7 +14,7 @@ because humans genuinely do want a list.
 
 ## Bytes, never tokens
 
-Carrying a tokenizer per model family violates L1, and an *approximate* token
+Carrying a tokenizer per model family violates L2, and an *approximate* token
 count is worse than an honest byte count: it is wrong in a way the caller
 cannot see. Bytes are exact, and the caller knows their own ratio.
 

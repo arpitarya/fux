@@ -268,7 +268,7 @@ def test_inspect_leaves_git_status_clean(planted):
 
 
 def test_the_report_is_byte_identical_twice(planted):
-    """L3. A wall-clock line would break this, which is why there is none."""
+    """L4. A wall-clock line would break this, which is why there is none."""
     first = _run(planted, "inspect", "--retrieval-sample", "0", check=False)
     assert first.returncode == 0, first.stderr
     second = _run(planted, "inspect", "--retrieval-sample", "0", check=False)

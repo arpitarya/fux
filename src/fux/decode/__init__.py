@@ -9,7 +9,7 @@ non-Markdown document. The heading syntax is the interface, so the intermediate
 has to carry it.
 
 **Two kinds of decoder, one protocol.** Built-ins live in this package and are
-stdlib-only (**L1**). Consumer decoders live in `.fux/decoders/<name>.py`, may
+stdlib-only (**L2**). Consumer decoders live in `.fux/decoders/<name>.py`, may
 import whatever the consumer installed, and **override a built-in of the same
 name**. This is [SR-FETCHER]'s pattern at a third boundary: fux refuses to
 own network I/O, model calls, and now third-party parsing libraries — the
@@ -29,13 +29,13 @@ PDF — and is not an error. It is the signal the enrichment queue is built on.
 A decoder never raises for malformed input: one corrupt file in a
 10 000-document corpus must not stop the other 9 999.
 
-**Determinism (L3) is the decoder's obligation, not this module's.** Same bytes
+**Determinism (L4) is the decoder's obligation, not this module's.** Same bytes
 must produce the same string, byte for byte: sort every iteration, never rely
 on `set` order, never read a clock. This module can only guarantee that
 *dispatch* is deterministic, which it does by resolving one extension to one
 decoder with a documented precedence.
 
-**Offline (L4).** No built-in decoder opens a socket — not for a schema, not
+**Offline (L5).** No built-in decoder opens a socket — not for a schema, not
 for a font, not for an XML external entity. The import fence test asserts it
 for this package. ⚠ It cannot reach `.fux/decoders/`, and that limit is stated
 rather than papered over: a consumer decoder's offline behaviour is a
@@ -125,7 +125,7 @@ PROSE_DECODER = "prose"
 #:
 #: Sorted and explicit rather than discovered by scanning the directory: a
 #: directory listing is filesystem order, and a plane whose dispatch depends on
-#: filesystem order is a plane whose committed index depends on it too (L3).
+#: filesystem order is a plane whose committed index depends on it too (L4).
 #: ⚠ **`ipynb` and `odt` were REMOVED on 2026-09-06** (Arpit). Removing `odt`
 #: removed **four** extensions, not one — `.odt`, `.ods`, `.odp` and `.fodt`
 #: were one module because ODF puts every kind of document in the same
@@ -234,7 +234,7 @@ def _load_consumer(path: Path, name: str) -> Decoder:
         # The loud failure Arpit ruled on 2026-08-26. A decoder whose library is
         # absent must NOT quietly hand the file to the enrichment queue: two
         # machines with the same sources would then commit different indexes,
-        # which is L3, not a convenience. Naming the module is most of the fix.
+        # which is L4, not a convenience. Naming the module is most of the fix.
         raise FuxError(
             f"decoder {name} needs a dependency this machine does not have: {exc.name}. "
             f"Install it (for example `uv pip install {exc.name}`), or remove "
@@ -270,7 +270,7 @@ def _from_module(module, name: str, *, origin: str) -> Decoder | None:
         # 20b). A decoder is already imported in order to decode, so reading one
         # more module attribute costs nothing and adds no new trust. A FETCHER is
         # read with `ast` and never imported, because importing consumer code on
-        # the offline path breaks L4. **The two rules differ because the risk
+        # the offline path breaks L5. **The two rules differ because the risk
         # differs**, and copying one to the other copies the wrong half.
         meta_fields=_meta_fields_of(module, name, origin),
     )
@@ -357,7 +357,7 @@ def registry(root: Path | None = None) -> dict[str, Decoder]:
     # Snapshot BEFORE any binding is applied: "does another decoder already
     # claim this extension" must be a question about the modules, not about
     # which binding happened to be resolved first. Iteration order of the
-    # bindings then cannot change any answer (L3).
+    # bindings then cannot change any answer (L4).
     claimed = dict(decoders)
     for ext, (name, where) in _declared_bindings(root).items():
         decoders[ext] = _bind(ext, name, where, available, claimed)

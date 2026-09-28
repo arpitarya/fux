@@ -9,11 +9,11 @@ amended: 2026-09-13
 date: 2026-08-27
 ratified: 2026-08-27
 feature: the record-to-component model, and the `describes` relation W-82 ruling 4 added to it
-owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@6437d5e21713, scripts/sr-owns.py@eca3c3cfd2b3, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@f11f818ed4e9, tests/test_sr_freshness.py@39e5349eef5f, tests/test_sr_frontmatter.py@5ba563cc5d37, tests/test_sr_ownership.py@7104865813d2, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@660b91e77f7f, tests/test_sr_register_status.py@acae7406d76c]
+owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@eca3c3cfd2b3, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@39e5349eef5f, tests/test_sr_frontmatter.py@5ba563cc5d37, tests/test_sr_ownership.py@9d9ddd14cbfd, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@660b91e77f7f, tests/test_sr_register_status.py@acae7406d76c]
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 73b5ca7300cdfbf4efe413d1957adc0aeaba95ec01199fde56081355d7da6bf3
+content_sha: 9612bce5071ddbb1013c49a90be6c69648a66cb4586658bd661de39fd0e0cfe3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -438,7 +438,7 @@ top-level definitions.
     - ⚠ **Generated planes are skipped, authored ones are not.**
       `.fux/index/`, `.fux/runtime/`, `.fux/enrich/`, `.fux/acquired/` and
       `.fux/node/` are rebuilt; `.fux/decoders/` and `.fux/fetchers/` are
-      **authored source and stay checked** — [L10](0011_LAW-10-bundled-output.md)
+      **authored source and stay checked** — [L10](0012_LAW-10-bundled-output.md)
       makes readable source the contract there.
     - ⚠ **This gate does not make a numbered citation CORRECT, only
       resolvable.** The standing rule is still *cite by NAME, never by number*.
@@ -484,9 +484,9 @@ top-level definitions.
       that file's rule 1 keeps generated views out of the registry, and the
       block is recorded here instead.
 
-**`tests/test_sr_config_keys.py` moved with `fux.toml`'s strictness** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): its fixtures write only the key under test and fill the rest from the template; the key-tree gate it enforces is unchanged.
+**`tests/test_sr_config_keys.py` moved with `fux.toml`'s strictness** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): its fixtures write only the key under test and fill the rest from the template; the key-tree gate it enforces is unchanged.
 
-**The gate-unreachable pin swaps SR-LAW-5 for SR-LAW-13** (2026-09-28, law L13): SR-LAW-5 moved to `archive/records/` and left the record set, and SR-LAW-13 owns only its enforcement test, so no change under `src/` can demand it.
+**The gate-unreachable pin swaps ex-SR-LAW-5 for SR-LAW-1** (2026-09-28, law L1): ex-SR-LAW-5 moved to `archive/records/` and left the record set, and SR-LAW-1 owns only its enforcement test, so no change under `src/` can demand it.
 
 ### Consequences
 
