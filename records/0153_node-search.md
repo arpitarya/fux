@@ -11,7 +11,7 @@ owns: [node@7a1f541ceb15, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: a97f9c147b2a3f65cad3061e989d5d7726ddd796e677ed23cd9240022d2df647
+content_sha: 9e17ca04111e1c09a61ebaa1ca07a701bb39b9f10885a6622f1accb0787b2600
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -664,7 +664,7 @@ Node transcription defect and nothing else"*. **Both readers were correct.** The
 ladder's rungs are built; this repo was not, and the decision generalised from
 the corpus that happened to be fine to the one that gates a merge.
 
-✅ **The gate, not a note:** every arm job (`fast.yml`, `main.yml`; `node-arm.yml`
+✅ **The gate, not a note:** every arm job in `ci.yml` (`node-arm.yml`
 until 2026-09-29) runs `fux build` before the arm, and
 again after `adversarial_corpus.py` rewrites the index — **a STALE plane is the
 same as an absent one to `compose.py`**, so the rebuild has to follow every write

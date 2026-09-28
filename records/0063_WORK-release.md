@@ -10,7 +10,7 @@ feature: how a release reaches two registries, how the version stays equal acros
 owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 70728996a28798c8b6c6eb8d0c1b83eda577d11c88a584681734fd205a3c30b4
+content_sha: 48bbbb6afbed0dd3fc80261bd0fdde2017aa192b578696820c538cc051a0c09b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -191,10 +191,10 @@ rather than a string somebody might forget to edit.
     stating it.
 
 11a. **A release, unlike a merge, IS gated on CI** (2026-09-23). The publish
-    workflow's first step refuses unless [`main.yml`](../.github/workflows/main.yml)
+    workflow's first step refuses unless [`ci.yml`](../.github/workflows/ci.yml)
     completed green on the exact commit being released, as a push to `main`
-    (`ci.yml` and `node-arm.yml` both, until decision 13 merged them on
-    2026-09-29). **So create the GitHub release only after it finishes.** Created earlier,
+    — every stage of it, FULL included (`ci.yml` and `node-arm.yml` both,
+    until decision 13 merged them on 2026-09-29). **So create the GitHub release only after it finishes.** Created earlier,
     the gate fails, and re-running the job once CI is green publishes it. This
     is two strikes made into a gate
     ([SR-WORK-SESSION](0060_WORK-session.md) d13): `3.0.0-alpha.2` and
@@ -208,19 +208,28 @@ rather than a string somebody might forget to edit.
     record existed, despite being the only thing standing between a missed bump
     and two registries disagreeing.
 
-13. **CI is two lanes, and only the slow one gates a release** (Arpit,
-    2026-09-29: the pipeline took 14–15 minutes and he asked for two; work
-    reaches `main` by PR *and* by direct push).
-    - [`fast.yml`](../.github/workflows/fast.yml) runs on **every push, `main`
-      included**, and on fork PRs: Linux, Python 3.12, Node 22 — both suites
-      under `pytest -n auto`, packaging, the Node units, and the differential
-      arm's repo pass spread over ten `--shard` runners. It is the two-minute
-      **signal**, and it gates nothing.
-    - [`main.yml`](../.github/workflows/main.yml) runs on push to `main`,
-      nightly and by hand: the full Python matrix (3 OSes, 3.12–3.14), the arm
-      on 3 OSes × Node 22/24 with **both** passes (this repo and the adversarial
-      corpus) in three shards per cell, and the ladder manifests. **It is what
-      decision 11a waits on.**
+13. **CI is one workflow in two stages, and only the whole of it gates a
+    release** (Arpit, 2026-09-29: the pipeline took 14–15 minutes and he asked
+    for two; work reaches `main` by PR *and* by direct push).
+    [`ci.yml`](../.github/workflows/ci.yml):
+    - **FAST** runs on **every push, `main` included**, and on fork PRs:
+      Linux, Python 3.12, Node 22 — both suites under `pytest -n auto`,
+      packaging, the Node units, and the differential arm's repo pass spread
+      over ten `--shard` runners. It is the two-minute **signal**, and gates
+      nothing.
+    - **FULL** runs on push to `main`, nightly and by hand, and **starts only
+      when FAST has finished**, whatever FAST concluded: the Python matrix on
+      3 OSes (3.12–3.14; Linux 3.12 is FAST's), the arm on 3 OSes × Node 22/24
+      with **both** passes in three shards per cell, and the ladder manifests.
+      **Decision 11a waits on the run as a whole.**
+    - 🔴 **One file, not two, and that is measured, not taste.** As
+      `fast.yml` + `main.yml`, a push to `main` started both at once; the full
+      lane took the account's runner slots (20 jobs, 5 on macOS) and FAST's
+      two-minute verdict took six. `needs:` gives FAST the runners first.
+    - ⚠ **A newer push cancels an older run on the same ref, `main`
+      included**, so the old FULL stage never holds the runners the new FAST
+      stage needs. The cost: a sha superseded mid-run has no completed run and
+      cannot be released — release the newer one.
     - ⚠ **`publish.yml` keeps its file name.** The PyPI and npm trusted
       publishers are bound to it; a rename would fail the next release at the
       registry for a reason no diff shows.
@@ -262,8 +271,7 @@ rather than a string somebody might forget to edit.
   that runs it on every push.
 - [`.github/workflows/publish.yml`](../.github/workflows/publish.yml) — one
   trigger, two jobs, and the staged npm approval.
-- [`.github/workflows/fast.yml`](../.github/workflows/fast.yml) and
-  [`.github/workflows/main.yml`](../.github/workflows/main.yml) — the two lanes
+- [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — the two stages
   of decision 13.
 - [`.github/branch-protection.json`](../.github/branch-protection.json) — the
   merge wall, exactly as configured.
@@ -299,7 +307,6 @@ evidence.*
 **Project docs**
 
 - [`.github/workflows/publish.yml`](../.github/workflows/publish.yml)
-- [`.github/workflows/fast.yml`](../.github/workflows/fast.yml)
-- [`.github/workflows/main.yml`](../.github/workflows/main.yml)
+- [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
 - [`.github/branch-protection.json`](../.github/branch-protection.json)
 - [`CHANGELOG.md`](../CHANGELOG.md)

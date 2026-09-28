@@ -1,0 +1,253 @@
+# CI — one workflow, two stages. Rewritten 2026-09-29 (SR-WORK-RELEASE d13).
+#
+# Arpit: the pipeline took 14-15 min; he asked for <= 2. Work reaches `main`
+# both by PR and by direct push, so the fast verdict has to cover both.
+#
+#   FAST  (every push, fork PRs)  Linux · py3.12 · Node 22. unit + e2e under
+#         `pytest -n auto`, packaging + Node units, and the differential arm's
+#         repo pass over ten `--shard` runners. ~2 min — the signal.
+#   FULL  (push to main, nightly, dispatch)  3 OSes x py3.12-3.14, the arm on
+#         3 OSes x Node 22/24 with BOTH passes, the ladder manifests. Starts
+#         only when FAST has finished, whatever FAST concluded.
+#
+# 🔴 **Why one file and not two** (measured 2026-09-29 on a scratch branch):
+# as two workflows, a push to `main` started both at once, the full lane took
+# the account's runner slots (20 jobs, 5 on macOS), and the fast lane's
+# two-minute verdict took six. `needs:` gives FAST the runners first.
+#
+# 🔴 **publish.yml refuses a release unless THIS workflow completed green on
+# the exact sha, as a push to main** — that, not a branch check, is the gate.
+# `main` has no required status checks (.github/branch-protection.json), so the
+# run's own conclusion is the aggregate and there is no gate job.
+name: CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    # 20:30 UTC = 02:00 IST. Catches a runner-image or toolchain change that
+    # breaks the build with no commit to blame.
+    - cron: "30 20 * * *"
+  workflow_dispatch:
+
+concurrency:
+  # A newer push supersedes an older run on the same ref, `main` included —
+  # otherwise the old FULL stage holds the runners the new FAST stage needs.
+  # ⚠ So a sha superseded mid-run has no completed run and cannot be released;
+  # release the newer one. The event is in the key so the nightly run and a
+  # push never cancel each other.
+  group: ci-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ── FAST ─────────────────────────────────────────────────────────────────
+  # A same-repo PR is the same sha its branch push already ran; only a fork's
+  # PR has no push run of its own.
+
+  unit:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
+    name: unit · linux · py3.12
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # test_sr_freshness.py audits every commit since records/RULE-SINCE;
+          # a shallow clone gives it zero commits, which is a silent pass.
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-fux
+        with:
+          python: "3.12"
+      - run: pytest -q -n auto --durations=10 --junitxml=junit-unit.xml tests
+      - if: failure()
+        uses: ./.github/actions/pytest-annotate
+        with:
+          junit: junit-unit.xml
+
+  e2e:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
+    name: e2e · linux · py3.12
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-fux
+        with:
+          python: "3.12"
+      - run: pytest -q -n auto --durations=10 --junitxml=junit-e2e.xml tests_e2e
+      - if: failure()
+        uses: ./.github/actions/pytest-annotate
+        with:
+          junit: junit-e2e.xml
+
+  build:
+    # Packaging + the Node reader's own units. Metadata validation before a
+    # release ever happens: twine catches what PyPI only reveals after publish.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
+    name: build · node units
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-fux
+        with:
+          python: "3.12"
+          node: "22"
+          extras: ""
+      - name: node pins
+        # `working-directory` + bare `node --test`, never `node --test node/test/`
+        # — Node 24 resolves a bare directory argument as a module and dies
+        # MODULE_NOT_FOUND (work/MACHINE.md §Two test invocations).
+        working-directory: node
+        run: node --test
+      - run: python scripts/check-version-parity.py
+      - run: pip install build twine && python -m build && twine check --strict dist/*
+      - name: sdist must not ship the archived old build
+        run: |
+          python - <<'PY'
+          import glob, sys, tarfile
+          sdist = glob.glob("dist/*.tar.gz")[0]
+          # top-level archive/ is the old non-working build; work/archive/ is fine
+          bad = [n for n in tarfile.open(sdist).getnames()
+                 if n.split("/")[1:2] in (["archive"], ["uv.lock"], [".github"])]
+          if bad:
+              print("✗ sdist ships excluded paths:", *bad[:5], sep="\n  ")
+              sys.exit(1)
+          print("✔ sdist clean")
+          PY
+
+  arm:
+    # The differential arm (W-107), transcription pass on this repo, over ten
+    # runners. `--shard` splits the job list by position; the ten together are
+    # exactly the unsharded run (tests/test_differential_arm.py).
+    #
+    # ⚠ The per-query cost is the Node reader's own scan (~1.2 s, measured
+    # 2026-09-29: compose.allRecords + GC), not process start-up — so sharding,
+    # not batching, is what shortens it.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
+    name: arm ${{ matrix.shard }}/10 · linux · node 22
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-fux
+        with:
+          python: "3.12"
+          node: "22"
+          extras: ""
+      # 🔴 A fresh checkout has no .fux/runtime/, and without it Python has no
+      # graph tier while Node rebuilds one in memory — 44 of 202 discordant
+      # by ratified design (SR-NODE-SEARCH decisions 9 and 16). Build first.
+      - run: fux build
+      # `--python-tune off` is the transcription arm: `--no-tune` on both
+      # sides, so a discordance is attributable (node_arm.py's docstring).
+      - run: python tools/differential/node_arm.py . --python-tune off --shard ${{ matrix.shard }}/10
+
+  # ── FULL ─────────────────────────────────────────────────────────────────
+  # `always()` + `!cancelled()`: run after FAST whatever it concluded — a red
+  # unit test says nothing about whether Windows is also broken — but not
+  # after a newer push cancelled this run.
+
+  python:
+    # The support target: Python >= 3.12 (L7) on Linux, macOS and Windows. The
+    # wheel is pure Python; these runners prove it. Linux py3.12 is FAST's.
+    needs: [unit, e2e, build, arm]
+    if: always() && !cancelled() && (github.event_name != 'push' || github.ref == 'refs/heads/main') && github.event_name != 'pull_request'
+    name: ${{ matrix.os == 'ubuntu-latest' && 'linux' || matrix.os == 'macos-latest' && 'macos' || 'windows' }} · py${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.12", "3.13", "3.14"]
+        exclude:
+          - { os: ubuntu-latest, python: "3.12" }
+          - { os: macos-latest, python: "3.13" }
+          - { os: windows-latest, python: "3.13" }
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-fux
+        with:
+          python: ${{ matrix.python }}
+      - name: Unit suite
+        run: pytest -q -n auto --durations=10 --junitxml=junit-unit.xml tests
+      - name: End-to-end suite
+        if: success() || failure()
+        run: pytest -q -n auto --durations=10 --junitxml=junit-e2e.xml tests_e2e
+      - if: failure()
+        uses: ./.github/actions/pytest-annotate
+        with:
+          junit: junit-unit.xml
+      - if: failure()
+        uses: ./.github/actions/pytest-annotate
+        with:
+          junit: junit-e2e.xml
+
+  node-arm:
+    # 🔴 **A green arm on ONE OS is not a green arm.** Two libms disagree in the
+    # last ulp (PRE-REGISTRATION-NODE); the OS x Node matrix is the point.
+    # Three shards per cell; every shard runs its third of BOTH passes — this
+    # repo's index, then the adversarial corpus.
+    needs: [unit, e2e, build, arm]
+    if: always() && !cancelled() && (github.event_name != 'push' || github.ref == 'refs/heads/main') && github.event_name != 'pull_request'
+    name: ${{ matrix.os }} · node ${{ matrix.node }} · ${{ matrix.shard }}/3
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: ["22", "24"]
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-fux
+        with:
+          python: "3.13"
+          node: ${{ matrix.node }}
+          extras: ""
+
+      - name: node pins
+        if: matrix.shard == 1
+        working-directory: node
+        run: node --test
+
+      # 🔴 Build the derived plane first — without it Python has no graph tier
+      # and Node does, and the two disagree by ratified design.
+      - run: fux build
+
+      - name: the differential arm — TRANSCRIPTION (this repo)
+        run: python tools/differential/node_arm.py . --python-tune off --shard ${{ matrix.shard }}/3
+
+      - name: the adversarial corpus, then the arm again
+        # W-107 H1/H2 are invisible on ordinary data: H1 needs tied scores whose
+        # ids straddle U+FFFF. `adversarial_corpus.py` REWRITES .fux/index/, so
+        # the plane built above goes stale — hence `fux build` again.
+        shell: bash
+        run: |
+          python tools/differential/adversarial_corpus.py .
+          fux build
+          python tools/differential/node_arm.py . --python-tune off --shard ${{ matrix.shard }}/3
+
+      - name: N2 — the graph plane digest (adversarial index)
+        if: matrix.shard == 1
+        run: python tools/differential/graph_arm.py .
+
+  ladder:
+    # 🔴 THE GOLDEN CORPUS IS NOT FOR CI (Arpit, 2026-09-14, W-148 row 1): it
+    # runs local-only, in fux-lab. This checks the manifests and nothing else.
+    needs: [unit, e2e, build, arm]
+    if: always() && !cancelled() && (github.event_name != 'push' || github.ref == 'refs/heads/main') && github.event_name != 'pull_request'
+    name: golden ladder manifests (the corpus is local-only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-fux
+        with:
+          python: "3.13"
+          extras: ""
+      - run: python tools/differential/ladder_check.py
