@@ -22,6 +22,23 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-168 step 9 built: the intent → doc-type prior, off at `0.0`  ·  Claude Code (Opus)
+- **Asked:** *"go"*.
+- **Did:**
+  - Built step 9 to the frozen bar (`b3898441`):
+    - the ruled lexicon in `constants.toml [intent]`;
+    - a `[doctype]` glob table;
+    - `[ranking] intent_weight` inside `Weighting`, so `maximum` is a product again;
+    - `--why`'s `intent` block;
+    - the Node twin.
+  - 76 new tests. Unit 5893 passed, e2e 151, Node 92/92. The one red test is the known `999c19761` ADR gate.
+  - Built in a worktree branch because W-225 was editing `constants.toml`. Rebased twice as `main` moved, regenerated the bundle rather than trusting its auto-merge (it differed), and moved `main` with a compare-and-swap.
+  - Three-way merged `CHANGELOG.md`, `IMPLEMENTATION.md` and the regression index into the other sessions' working copies. One conflict, a second row at the same line, was resolved by keeping both.
+- **Decided / open:**
+  - A second fixture bug, the same in Python and Node, was fixed. The helpers appended open-table keys to whichever table is last, which after `[doctype]` was not `[priority]`.
+  - `NOW.md` is left as the W-228 session wrote it.
+- **Next:** capture step 9's five arms on a copy of rung-01000 (`doctor --fix` on the copy, then the three globs). Then 🔴 Arpit scores, and a session that did not capture decides.
+
 ## 2026-09-28 — W-225 stage 5a–5f: algorithm, format, wire and protocol numerals leave the code  ·  Claude Code (Opus)
 - **Asked:** *"implement W-225"*.
 - **Did:**
