@@ -694,11 +694,12 @@ class Families:
     the counts are not** — the `Duplication` rule, for the same reason.
 
     A document's SHAPE is its heading skeleton (the committed `phrases`, masked,
-    so a dated or numbered template is one shape) and its front-matter key
-    names (pass A's `meta_keys`). Two documents share a family when the Jaccard
-    of those feature sets is at least `[families] skeleton_jaccard` against
-    EVERY member — complete linkage, one pass in doc-id order, ties to the
-    older family. A function of the corpus and nothing else (L4): no k, no seed.
+    so a dated or numbered template is one shape, less a leading heading equal
+    to its title) and its front-matter key names (pass A's `meta_keys`). Two
+    documents share a family when they share a heading and the Jaccard of those
+    feature sets is at least `[families] skeleton_jaccard` against EVERY member
+    — complete linkage, one pass in doc-id order, ties to the older family. A
+    function of the corpus and nothing else (L4): no k, no seed.
     """
 
     families: list[dict] = field(default_factory=list)
@@ -751,9 +752,16 @@ def families(view, facts, *, top_lists: int) -> Families:
     # Doc-id order, so the spelling a masked heading is shown with — the first
     # document's — is a function of the corpus and never of read order (L4).
     for index, doc in sorted(enumerate(view.docs), key=lambda pair: pair[1].id):
-        masked = [_mask(p) for p in doc.phrases if p and p.strip()]
-        for p, m in zip((p for p in doc.phrases if p and p.strip()), masked):
-            originals.setdefault(m, p.strip())
+        heads = [p.strip() for p in doc.phrases if p and p.strip()]
+        # A leading heading that IS the document's title is the document's name,
+        # not its template's: kept, it made 14 of rung-01000's 16 misfits and
+        # split one wiki template four ways by company name (W-228 DoD 11 run).
+        # The same test `probes` uses to find a title heading.
+        if heads and heads[0] == (doc.title or "").strip():
+            heads = heads[1:]
+        masked = [_mask(p) for p in heads]
+        for p, m in zip(heads, masked):
+            originals.setdefault(m, p)
         meta = (by_id.get(doc.id) or {}).get("meta_keys") or []
         features = frozenset({"h:" + m for m in masked} | {"m:" + str(k) for k in meta})
         if not masked:
@@ -765,11 +773,14 @@ def families(view, facts, *, top_lists: int) -> Families:
     shaped.sort(key=lambda row: view.docs[row[0]].id)
 
     groups: list[list[int]] = []          # indices into `shaped`
-    postings: dict[str, set[int]] = {}    # feature -> the groups holding it
+    # HEADING -> the groups holding it. Only a shared heading makes two documents
+    # candidates; front-matter keys refine the score and never found a family —
+    # two unrelated notes with six common keys and no common heading clear 0.60.
+    postings: dict[str, set[int]] = {}
     cut = config.skeleton_jaccard
-    for position, (_index, features, _masked) in enumerate(shaped):
+    for position, (_index, features, masked) in enumerate(shaped):
         best, best_score = None, -1.0
-        for group in sorted({g for f in features for g in postings.get(f, ())}):
+        for group in sorted({g for m in masked for g in postings.get(m, ())}):
             worst = 1.0
             for member in groups[group]:
                 worst = min(worst, _jaccard_sets(features, shaped[member][1]))
@@ -781,8 +792,8 @@ def families(view, facts, *, top_lists: int) -> Families:
             best = len(groups)
             groups.append([])
         groups[best].append(position)
-        for f in features:
-            postings.setdefault(f, set()).add(best)
+        for m in masked:
+            postings.setdefault(m, set()).add(best)
 
     edges = config.length_edges
     named: list[dict] = []

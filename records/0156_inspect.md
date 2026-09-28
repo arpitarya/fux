@@ -4,14 +4,14 @@ kind: component
 name: SR-INSPECT
 title: "SR-INSPECT (0156) — `fux inspect`, the index X-ray: six lenses, three flagged checks, a local dictionary that names the hashes, and per-document facts, probes and a diff"
 description: "Arpit asked whether a consumed index is a good index or a bad one. `fux inspect` answers it descriptively: six lenses over the committed shards — boilerplate, findability, length and fields, duplication and templates, analyzer coverage, graph — each printing distributions and named lists, each naming the lever that would change what it found and applying none. Exactly three numbers carry a pass/attention flag and their floors are provisional, measured on the golden ladder and dropped to descriptive if one ever flags a healthy rung. The committed index holds term hashes, so the words come from a gitignored dictionary built by re-tokenising the sources locally; nothing new is committed and nothing is fetched. Since W-220 (2026-09-23) it also computes cached per-document facts, probes each document by its own title and headings (the new findability headline), folds identity, segments, chunks and a worst-first triage, and diffs two reports with edge loss always an alert; fux serve calls the same library."
-amended: 2026-09-27
+amended: 2026-09-28
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@66e83d9d7b80, .fux/inspect.toml@28f3b6494463]
+owns: [src/fux/inspect@f3a09c0602d9, .fux/inspect.toml@28f3b6494463]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 84eedc2c6f7bbee61661a77bfdb81446ee2ea8ab88c4704264f39ab7bbae20f8
+content_sha: 18658ee73083b34c13691b56cf08d6829dbff6d1ce7eddc5daea253af592a62f
 ratifies: W-169
 ---
 
@@ -414,8 +414,14 @@ placed inside `inspect` by the W-220 ruling — a lens, never a verb).
   front-matter key NAMES, which pass A (decision 17) now records as `meta_keys`
   (facts schema `v2`). Values are never read. Body terms are deliberately out:
   that is topic clustering, which is `graph`'s communities.
+- **A leading heading equal to the document's title is left out of its shape** —
+  it names the document, not the template (the test `probes` already uses). On
+  `rung-01000` it made 14 of 16 misfits and split one wiki template four ways by
+  company ([the DoD 11 run](../work/regression/2026-09-28-families-lens-ladder/ANALYSIS.md) §3).
 - **A family** is complete-linkage over the set Jaccard of those features at
-  `[families] skeleton_jaccard`, one pass in doc-id order, ties to the older
+  `[families] skeleton_jaccard`, **among documents that share a heading** —
+  front-matter keys refine the score and never found a family alone, because six
+  common keys and no common heading clear 0.60. One pass in doc-id order, ties to the older
   family. No k, no seed, no restart — a function of the corpus (L4). It is named
   by its first four core headings, and carries its members, folders, shared
   front-matter keys and the length bands (`[families] length_edges`) they span.
@@ -426,7 +432,10 @@ placed inside `inspect` by the W-220 ruling — a lens, never a verb).
 - **`misfit_share` carries the one flag, at `[families] misfit_floor`, PROVISIONAL**
   — the `SEPARATION_FLOOR` discipline: it stays provisional until the golden seed
   corpus carries families and planted misfits and a filed rung reports the lens on
-  it (W-228 DoD 11, open).
+  it (W-228 DoD 11, open). ⚠ **The rung is filed and the planted misfits are not:**
+  on 2026-09-28 the seed carried 8 families and 0 misfits
+  ([the run](../work/regression/2026-09-28-families-lens-ladder/report.md)), so
+  the floor stays PROVISIONAL.
 - **Levers from `LEVERS` only**: a misfit — *unfindable document*'s (fix the
   source); a family's shared headings — *boilerplate term*'s; a family split across
   folders — *template family*'s.

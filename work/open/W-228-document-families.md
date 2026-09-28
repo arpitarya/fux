@@ -9,7 +9,9 @@ ball: agent
 
 # W-228 — document families: pattern recognition over the corpus, inside `inspect`
 
-**Status: DoD 1–10 BUILT 2026-09-28 (Claude Code, Opus); DoD 11 open.** The lens, the report section, `--json`, `--diff`, the explorer card, four `[families]` keys in `.fux/inspect.toml` under [L12](../../records/0014_LAW-12-values-live-in-config.md), the tests and SR-INSPECT decision 24 have landed. **Open: DoD 11** — the golden seed needs families and planted misfits, and a filed rung must report the lens, before `misfit_floor` is anything but PROVISIONAL. That is golden-adjacent work; W-230's live probe was denied on 2026-09-28, so the traversal guard fires and it may start.
+**Status: DoD 1–10 BUILT 2026-09-28 (Claude Code, Opus). DoD 11 is half done.** The lens, the report section, `--json`, `--diff`, the explorer card, four `[families]` keys in `.fux/inspect.toml` under [L12](../../records/0014_LAW-12-values-live-in-config.md), the tests and SR-INSPECT decision 24 have landed.
+
+**DoD 11, 2026-09-28:** the rung is filed — [`2026-09-28-families-lens-ladder`](../regression/2026-09-28-families-lens-ladder/report.md). The seed has 8 families and **0 misfits**. On rung-01000, 14 of 16 misfits were title headings, so the lens changed in the same session: the title heading is out of the shape, and only a shared heading can found a family (SR-INSPECT d24, amended). rung-01000 now has 1 misfit, and it is real. 🔴 **Open: planted misfits in `seed/`.** That is a generation-4 seed addition under [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md) A1–A3 and A20. It rebuilds the ladder, which re-baselines W-168's set-4 pools (A23). **When to do it is Arpit's call** (inbox, 2026-09-28). Until then `misfit_floor` stays PROVISIONAL.
 
 **Model:** Claude Code, Sonnet for the lens and its tests; Opus only if the
 skeleton-distance design in §3 turns out to need a compare doc.

@@ -1,0 +1,61 @@
+# .fux/inspect.toml -- what `fux inspect` and the `fux serve` explorer call a
+# finding, how much they sample, and how many rows they show. Nothing here
+# changes the index or a ranking: it changes only what the report SAYS about
+# them. Every key is REQUIRED (SR-LAW-12); `fux doctor --fix` writes a missing
+# one. The keys are decided in SR-INSPECT:
+#   https://github.com/arpitarya/fux/blob/main/records/0156_inspect.md
+
+# A term on at least this share of documents is boilerplate; one on at most
+# this share (never below one document) is distinctive.
+[thresholds]
+boilerplate_df_share   = 0.50
+distinctive_df_share   = 0.10
+near_duplicate_jaccard = 0.80
+link_target_share      = 0.10
+
+# The near-duplicate lens's minhash: signature length and rows per band.
+[minhash]
+signature_size = 64
+band_rows      = 4
+
+# Self-retrieval: a document is findable when its own most distinctive terms
+# put it in the top `findable_rank`. `retrieval_sample` documents are tried;
+# `--retrieval-sample 0` tries every one.
+[findability]
+fingerprint_terms = 6
+findable_rank     = 3
+retrieval_sample  = 100
+
+# Document families (W-228): two documents share a family when the Jaccard of
+# their heading-and-front-matter-key sets is at least `skeleton_jaccard` against
+# EVERY member (complete linkage). A member missing a heading that at least
+# `core_share` of its family carries is a misfit; `misfit_floor` is the share
+# of family members that flags the lens, PROVISIONAL until measured on golden.
+# `length_edges` cut body tokens into the bands a family reports.
+[families]
+skeleton_jaccard = 0.60
+core_share       = 0.80
+misfit_floor     = 0.20
+length_edges     = [200, 1000, 5000]
+
+# Title probes: a title is a probe that finds its document in the top
+# `probe_rank`. `probe_sample` documents are probed; `--all` probes every one.
+[probes]
+probe_rank   = 10
+probe_sample = 50
+
+# Rows in the written report and in `fux inspect --diff`, when `--top` is not given.
+[report]
+top         = 20
+lengths_top = 10
+
+# One document's X-ray in the explorer.
+[xray]
+passages_cap = 200
+words        = 25
+
+# The explorer's Index-tab triage, and the Words tab's page size and ceiling.
+[serve]
+triage_rows    = 200
+words_page     = 200
+words_page_max = 1000

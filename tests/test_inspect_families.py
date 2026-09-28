@@ -102,6 +102,44 @@ def test_the_misfit_share_is_flagged_only_above_its_provisional_floor():
     assert out.misfit_flagged is (3 / 15 > inspect_template().misfit_floor)
 
 
+def _small(rows):
+    """rows: (id, title, headings, meta keys) — a view outside PLANT."""
+    view = _scan.IndexView(config=inspect_template())
+    for doc_id, title, headings, _meta in sorted(rows):
+        view.docs.append(_scan.Doc(
+            id=doc_id, loc=doc_id.split(":", 1)[1], title=title, sha="0" * 40, src="git",
+            mode="extracted", archived=False, superseded=False, flen=(300, len(headings), 1, 1),
+            nterms=0, phrases=tuple(headings), edges_out=0,
+        ))
+        view.doc_terms.append(array("q"))
+    facts = SimpleNamespace(by_id={i: {"meta_keys": sorted(m)} for i, _t, _h, m in rows})
+    return lenses.families(view, facts, top_lists=50)
+
+
+def test_a_title_heading_is_the_documents_name_not_its_templates():
+    """The 2026-09-28 DoD 11 run: a leading heading equal to the title made 14 of
+    rung-01000's 16 misfits and split one wiki template four ways by company."""
+    sop = ["1. Purpose", "2. Products and limits", "3. Approved records"]
+    title = "Temperature Excursion Response SOP"
+    rows = [(f"file:sop/{n}.md", title, [title] + sop, []) for n in range(4)]
+    rows.append(("file:sop/quarantine.md", "Quarantine Release SOP", ["Quarantine Release SOP"] + sop, []))
+    out = _small(rows)
+    assert out.family_count == 1 and out.families[0]["size"] == 5
+    assert out.misfit_count == 0, "a different title is not a missing section"
+    assert out.families[0]["name"] == " · ".join(sop)
+
+
+def test_front_matter_keys_alone_never_found_a_family():
+    """Six common keys and no common heading clear 0.60 on Jaccard — seed 34 and
+    46 did — so only a shared heading makes two documents candidates."""
+    keys = ["department", "doc_id", "effective_date", "owner", "status", "title"]
+    out = _small([
+        ("file:a.md", "a", ["Module notes", "Languages"], keys),
+        ("file:b.md", "b", ["Fitting", "At the destination"], keys),
+    ])
+    assert out.family_count == 0 and out.singleton_count == 2
+
+
 def test_the_exact_set_families_are_unchanged():
     """`duplication()`'s heading-SET families are what `--diff` and the Index tab
     have always read (W-228 §6): same names, same members, byte for byte."""
