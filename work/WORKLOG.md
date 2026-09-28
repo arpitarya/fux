@@ -22,6 +22,24 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-225 stage 6: parameter defaults removed (R8); the library reads `output.toml [api]`  ·  Claude Code (Opus)
+- **Asked:** *"continue"* (W-225, after stage 5).
+- **Did:**
+  - `4d63291e`: removed about 30 boolean parameter defaults across both planes. Every engine caller passes the old value.
+  - Node's `runQuery` throws on a missing `useTune`/`wantConfidence`/`compose`. A JavaScript destructure cannot require a key, and a missing `compose` would read as `fux lexical`.
+  - The library API reads a new `output.toml [api]` root (SR-OUTPUT decision 25), which ships today's `band`/`sections` on. `fux.open(root)` now requires `root`, and `answer` requires `audit`/`receipt`.
+  - `Policy.timeout_seconds` is now `fux.toml [refer] timeout_seconds`, making SR-CONFIG decision 18 fifteen keys.
+  - `UrlEntry.ttl` has no default. `resolve_urls` reads `[sources.url] keep/ttl/update` directly, with no `getattr` fallbacks.
+  - A subagent migrated about 45 test files to pass the old defaults.
+  - Stamped and tested in a scratch worktree of HEAD plus my diff. The commit was staged from it by blob, so the other session's uncommitted W-228 edits in `inspect/lenses.py` and SR-INSPECT stayed out.
+- **Decided / open:**
+  - ⚠ The byte-equality run caught what the unit suites missed: Node's Related tier vanished, because `wantRelated` went from a `true` default to `undefined`. Fixed before the commit; 150/150 outputs are now byte-identical. This is the first time this failure class is recorded; a second makes it a gate (SR-WORK-SESSION decision 13).
+  - For Arpit, in the compare doc:
+    - the `[api]` root (versus reading `[cli]` and turning the library's band off);
+    - whether R8 reaches boolean **dataclass fields** (about 20, left as they are);
+    - the Node runtime check.
+- **Next:** stage 7 (refine the scanner, then the AST test and its allow-list, about 600 sites, for Arpit to review); stage 8 (the 3.0 CHANGELOG migration lines); 5f `inspect` once W-228 lands.
+
 ## 2026-09-28 — W-168 step 9 scored by Arpit; the verdict is handed to a fresh session  ·  Claude Code (Opus)
 - **Asked:** Arpit pasted `just golden-score work/regression/2026-09-28-intent-prior`.
 - **Did:** filed the five score files (complete, n = 125) and a scored section in the report, with totals explicitly marked not the rule. Removed the inbox row, and put a fresh session on the queue row.

@@ -34,7 +34,7 @@ here. Read that record before changing anything below it.
 ### fux build
 
 - 🟢 **W-168** · `agent` — the ranking ideas. Step 9 scored by Arpit 2026-09-28. Next: a session that did NOT capture the arms runs its `decide.py` and files VERDICT; INCONCLUSIVE → Arpit. Steps 7 and 8 go; 6 and 10 stop. [detail](open/W-168-search-improvements.md)
-- 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–4 and 5a–5f landed (numerals → `constants.toml`; 14 keys → `fux.toml`), bar `inspect`, which waits for W-228. Next: stage 6, parameter defaults. [detail](open/W-225-values-live-in-config.md)
+- 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–6 landed (numerals → `constants.toml`; 15 keys → `fux.toml`; parameter defaults gone; `[api]`), bar `inspect` 5f. Next: stage 7, the AST test + allow-list. [detail](open/W-225-values-live-in-config.md)
 - 🟢 **W-228** · `agent` — document families: DoD 1–10 built 2026-09-28. Next: DoD 11, golden seed families + a rung before the misfit floor leaves PROVISIONAL; unblocked 2026-09-28 (W-230's probe denied). [detail](open/W-228-document-families.md)
 
 
