@@ -1,0 +1,5 @@
+questions=125 fires=7 ceiling@6-10=5
+distinct communities in the top 5: {1: 7, 2: 8, 3: 14, 4: 15, 5: 81}
+graph: 226 linked documents in 95 communities
+fires: s4u-009 s4u-018 s4u-022 s4u-030 s4u-073 s4u-108 s4u-122
+ceiling: s4u-009 s4u-018 s4u-022 s4u-073 s4u-122

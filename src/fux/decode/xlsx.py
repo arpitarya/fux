@@ -31,13 +31,14 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.xlsx", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
+VERSION = fixed("decoders.xlsx", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values; nor by R13: its OOXML part names moved to constants.toml, same values
 
 EXTENSIONS = tuple(fixed("decoders.xlsx", "extensions"))
 
-_SHARED = "xl/sharedStrings.xml"
-_SHEETS = "xl/worksheets/sheet"
-_WORKBOOK = "xl/workbook.xml"
+#: The parts ECMA-376 names -- `constants.toml [decoders.xlsx.format]` (R13).
+_SHARED = fixed("decoders.xlsx.format", "shared")
+_SHEETS = fixed("decoders.xlsx.format", "sheets")
+_WORKBOOK = fixed("decoders.xlsx.format", "workbook")
 
 #: Per SHEET, not per workbook — a five-sheet workbook admits the limit five
 #: times, because a sheet is the document's own division and truncating the

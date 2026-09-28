@@ -67,7 +67,7 @@ from pathlib import Path, PurePosixPath
 from urllib.parse import urlsplit
 
 from ..errors import FuxError
-from ..constants import fixed
+from ..constants import fixed, table
 
 RULES_NAME = fixed("files", "refusals_name")
 
@@ -81,13 +81,14 @@ RULES_NAME = fixed("files", "refusals_name")
 #: absent from this table is simply not checked; guessing a signature would
 #: turn the always-on floor into a source of false refusals, and a floor that
 #: cries wolf gets switched off.
-MAGIC: dict[str, bytes] = {
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": b"PK\x03\x04",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": b"PK\x03\x04",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation": b"PK\x03\x04",
-    "application/vnd.oasis.opendocument.text": b"PK\x03\x04",
-    "application/pdf": b"%PDF-",
-}
+#:
+#: The signatures are `constants.toml [decoders] magic_by_mime` (SR-LAW-12
+#: decision 6b, R13): a format fixes them, so they are not a consumer's knob.
+def _magic_by_mime() -> dict[str, bytes]:
+    return {mime: sig.encode("latin-1") for mime, sig in fixed("decoders", "magic_by_mime").items()}
+
+
+MAGIC: dict[str, bytes] = _magic_by_mime()
 
 #: Decoder stem -> the bytes a real document of that format must begin with.
 #:
@@ -103,12 +104,19 @@ MAGIC: dict[str, bytes] = {
 #: signature. `html`, `json`, `csv` and `xml` have none, so a line declaring one
 #: of those is not checked here and the decoder's own *"nothing readable"* path
 #: records the skip (§3 edge case 4).
-MAGIC_BY_DECODER: dict[str, bytes] = {
-    "xlsx": b"PK\x03\x04",
-    "docx": b"PK\x03\x04",
-    "pptx": b"PK\x03\x04",
-    "pdf": b"%PDF-",
-}
+#:
+#: Built from each built-in decoder whose `[decoders.<name>.format]` names a
+#: `magic` (R13) — so a decoder with a signature is checked by adding the key.
+def _magic_by_decoder() -> dict[str, bytes]:
+    out: dict[str, bytes] = {}
+    for name in fixed("decoders", "builtin"):
+        spec = table(f"decoders.{name}")
+        if "format" in spec and "magic" in spec["format"]:
+            out[name] = spec["format"]["magic"].encode("latin-1")
+    return out
+
+
+MAGIC_BY_DECODER: dict[str, bytes] = _magic_by_decoder()
 
 #: How much of a TEXTY body `body_contains` may search.
 #:

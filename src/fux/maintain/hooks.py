@@ -81,61 +81,67 @@ MERGE_DRIVER_NAME = fixed("hooks", "merge_driver")
 #: what makes installation refuse rather than clobber.
 MARKER = fixed("hooks", "marker")
 
-_PREAMBLE = f"""#!/bin/sh
-{MARKER} — safe to delete, or run `fux hooks --uninstall`
-#
-# Re-indexing is best-effort: a hook that fails must never block a commit, a
-# merge or a checkout. It reports and gets out of the way.
-set -u
-command -v fux >/dev/null 2>&1 || exit 0
-# W-64 turned the progress bar ON here, to break R5's 44.4 s of silence on the
-# commit path, and said in as many words: revisit if the fork resolves to
-# option B. It did (2026-08-22), so this is that revisit. post-commit no
-# longer waits for an ingest at all, and the ingest that does run is detached
-# with no terminal to paint. post-merge and post-checkout still run inline and
-# still want the bar.
-export FUX_NO_PROGRESS=0
-"""
 
-HOOKS: dict[str, str] = {
-    # The committed index is derived from the COMMITTED tree, which is why this
-    # runs after the commit rather than before it. See the module docstring.
-    #
-    # **It defers** (W-66 Phase 2, SR-MAINTENANCE decision 1a). One line, and
-    # everything it does is constant in the corpus: `--spawn-runner` records
-    # HEAD's paths into the dirty list and spawns a detached one-shot
-    # re-index, then returns. R5 failed because this used to be `fux ingest`
-    # inline — 44.4 s at 100 000 documents on a 20-document commit.
-    #
-    # **All the logic moved into Python.** Phase 1 wrote the dirty list with a
-    # `cat`/`sed`/`sort`/`mv` pipeline here; that is the part of a hook most
-    # likely to behave differently under git-for-windows, and it could not be
-    # unit-tested. `runner.record_head` is the same thing where a test can
-    # reach it.
-    "post-commit": _PREAMBLE + """
-fux ingest --spawn-runner || exit 0
-""",
-    # A merge brings in both content and (possibly merge-driver-resolved) index
-    # lines. Re-ingesting derives the index from the merged CONTENT, which is
-    # the authority; it also repairs anything the driver had to refuse.
-    #
-    # 🔴 **`--no-fetch`, and the flag is the whole hook/daemon split** (W-177
-    # open question 1, ruled (b) by Arpit 2026-09-15). Since `fux ingest`
-    # absorbed `fux update`, the bare verb goes to the network — so a hook that
-    # ran it bare would open sockets on every `git merge`, on a path L5 fences
-    # and a person did not ask for. **Split by CALLER, not by flag default:**
-    # the freshness daemon is the thing whose job *is* freshness and it writes
-    # the bare verb; a git hook stays local-only and names its opt-out here, in
-    # the file, where anyone reading their own `.git/hooks/` can see it.
-    "post-merge": _PREAMBLE + """
-fux ingest --no-fetch 2>&1 | sed 's/^/fux: /' || exit 0
-""",
-    # A checkout changes which committed index is present. Nothing needs
-    # re-deriving from content — only the gitignored runtime plane.
-    "post-checkout": _PREAMBLE + """
-fux build >/dev/null 2>&1 || exit 0
-""",
-}
+def _template(name: str) -> str:
+    """`src/fux/templates/<[templates] hooks_dir>/<name>` — a hook body's bytes.
+
+    What fux writes into `.git/hooks/` is a file body, not code: decision 5's
+    home for it is `templates/` (SR-LAW-12 decision 6b, R13).
+    """
+    hooks_dir = Path(__file__).parent.parent / "templates" / fixed("templates", "hooks_dir")
+    return (hooks_dir / name).read_text(encoding="utf-8")
+
+
+#: Every hook starts with this: the MARKER, and best-effort (`set -u`, exit 0 when
+#: `fux` is not on PATH). `templates/hooks/preamble.sh.txt`, `{marker}` filled here.
+def _preamble() -> str:
+    return _template(fixed("templates", "hook_preamble")).replace("{marker}", MARKER)
+
+
+_PREAMBLE = _preamble()
+
+# Each hook's body is `templates/hooks/<name>.sh.txt`, after the preamble, for
+# every name in `constants.toml [hooks] names`, in that order. Why each one does
+# what it does:
+#
+# `post-commit` --
+# The committed index is derived from the COMMITTED tree, which is why this
+# runs after the commit rather than before it. See the module docstring.
+#
+# **It defers** (W-66 Phase 2, SR-MAINTENANCE decision 1a). One line, and
+# everything it does is constant in the corpus: `--spawn-runner` records
+# HEAD's paths into the dirty list and spawns a detached one-shot
+# re-index, then returns. R5 failed because this used to be `fux ingest`
+# inline — 44.4 s at 100 000 documents on a 20-document commit.
+#
+# **All the logic moved into Python.** Phase 1 wrote the dirty list with a
+# `cat`/`sed`/`sort`/`mv` pipeline here; that is the part of a hook most
+# likely to behave differently under git-for-windows, and it could not be
+# unit-tested. `runner.record_head` is the same thing where a test can
+# reach it.
+#
+# `post-merge` --
+# A merge brings in both content and (possibly merge-driver-resolved) index
+# lines. Re-ingesting derives the index from the merged CONTENT, which is
+# the authority; it also repairs anything the driver had to refuse.
+#
+# 🔴 **`--no-fetch`, and the flag is the whole hook/daemon split** (W-177
+# open question 1, ruled (b) by Arpit 2026-09-15). Since `fux ingest`
+# absorbed `fux update`, the bare verb goes to the network — so a hook that
+# ran it bare would open sockets on every `git merge`, on a path L5 fences
+# and a person did not ask for. **Split by CALLER, not by flag default:**
+# the freshness daemon is the thing whose job *is* freshness and it writes
+# the bare verb; a git hook stays local-only and names its opt-out here, in
+# the file, where anyone reading their own `.git/hooks/` can see it.
+#
+# `post-checkout` --
+# A checkout changes which committed index is present. Nothing needs
+# re-deriving from content — only the gitignored runtime plane.
+def _hooks() -> dict[str, str]:
+    return {name: _PREAMBLE + _template(f"{name}.sh.txt") for name in fixed("hooks", "names")}
+
+
+HOOKS: dict[str, str] = _hooks()
 
 
 @dataclass

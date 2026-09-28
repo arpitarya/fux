@@ -22,6 +22,29 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+
+## 2026-09-28 — W-168: L11 13b landed, step 7 STOPS, step 8 ruled and pre-registered  ·  Claude Code (Opus)
+- **Asked:** *"implement w-168"*, i.e. the Cowork ruling's order (1) L11 13b + scorer, (2) step 8's compare doc, (3) steps 7 and 8 pre-register.
+- **Did:**
+  - [L11](../records/0013_LAW-11-sealed-answer-key.md) **13b**: `score.py` emits `facets_top5` / `facets_key` per question, counts only; test pins them (11 pass). Owns and content hashes stamped.
+  - Step 7: a key-free count on the `ip-0.1` hand-off shows the swap fires on 7/125 questions, 5 with a candidate in ranks 6–10. **Arpit ruled "Ranks 6–10 → STOP".** [Report](regression/2026-09-28-mmr-trigger/report.md).
+  - Step 8: [`compare/authority-prior`](compare/authority-prior.compare.md). **Arpit ruled A3 · S2 · L1.** [Pre-registered](regression/2026-09-28-authority-prior/PRE-REGISTRATION.md): tag 101/125, pool 31 (key's 8), set-wide zero-loss clause.
+- **Decided / open:**
+  - ⚠ The auto-mode classifier refused a read of `seed-history.tsv` (author names and emails). The step 8 tag was built from commit counts only, because S2's `f > 0` ⟺ `commits > 1`.
+  - ⚠ The L11 guard refused one Bash call because the command text named the sealed directory, in an `--exclude-dir`. Nothing was opened. Exclude `golden` instead.
+- **Next:** build step 8 (Opus), off at `0.0`, both readers, accelerator bound; then capture the arms on a re-ingested copy.
+
+## 2026-09-28 — W-225 R13 built: the sixteen `for-arpit` sites sorted as ruled, byte-equal  ·  Claude Code (Opus)
+- **Asked:** *"implement w-225"*.
+- **Did:**
+  - R13, as ruled. The OOXML part names and magic bytes moved to `constants.toml` `[decoders.*.format]`. The MIME-keyed table went to `[decoders] magic_by_mime`, because ODT has a signature and no decoder. The five generated bodies moved to `src/fux/templates/` (`fuxdir-gitignore.txt`, `cachedir-tag.txt`, `fux-shim.sh.txt`, `hooks/*.sh.txt`). `sourcelist` became `grammar` in the allow-list. `for-arpit` went from 16 to 0.
+  - **Byte-equal:** I snapshotted every body, both magic tables and the part names before the change and compared after it. No decoder `VERSION` moved; the lines are touched with a note. I refreshed `.fux/decoders/{docx,pptx,xlsx}.py` from the package.
+  - Records: I amended the L12-VALUES blocks in SR-CONSTANTS, SR-DECODE, SR-TABULAR, SR-REFUSAL and SR-MAINTENANCE, and in all six `fuxdir.py` owners. I also amended SR-CACHEDIR-TAG decision 1's wording, then restamped the owns-hashes and content shas.
+  - Suites whole: unit 6177 passed, e2e 154, Node 200/200.
+- **Decided / open:** the scanner flags any string at module level that is not handed to a config reader, so the template assembly sits in small functions. Stage 5f waits on W-228, and stage 8 comes after it. W-225 is now 🟡.
+- **Watch:** still red and not mine: `999c1976`'s ADR history gate, which needs a rewrite or a RULE-SINCE move (Arpit's call). A concurrent session decided W-232 while I was running the suites, and its run folders were briefly red.
+- **Next:** W-168 (L11 13b + `score.py` facet counts) is the one agent-closable item.
+
 ## 2026-09-28 — W-232 decided PASS: the shipped anchor + mined pair loses nothing  ·  Claude Code (Opus)
 - **Asked:** Arpit pasted his `just golden-score` output for the three arms, then *"your recommendation"* (file it).
 - **Did:**
@@ -459,6 +482,20 @@ cited in both files' Reference blocks.
 - **Next:** the single immediate next step.
 ```
 
+
+## 2026-09-28 — W-168 steps 7 and 8: endpoints ruled, ratified not built  ·  Cowork (Opus)
+- **Asked:** *"review open work document explain me the blockers one by one we will ratify them one by one"*.
+- **Did:**
+  - Walked the four inbox rows; proposed order W-168 → W-228 → W-225 → W-232 (W-232 is an action, not a decision).
+  - Explained MMR, why fux's variant swaps only position 5, and why it computes no score.
+  - Filed Arpit's rulings in [W-168](open/W-168-search-improvements.md) §STEPS 7 AND 8 ENDPOINTS RULED: step 8 at `hit@1` + `primary@1`; step 7 as the simple swap with a `diversified` marker, measured by an L11 d13 amendment (13b, per-question facet counts), with a pre-registered minimum multi-facet pool.
+  - W-168's inbox row removed; its item re-balled 🟢; `BLOCKED.json` keeps only W-228's question.
+- **Decided / open:**
+  - L11 13b is **not written yet**, on purpose: it lands in the same change as `score.py` and its test (d13's own warning about prose that runs ahead of code).
+  - Still 🔴: W-228 (misfit timing), W-225 (L12 open calls), W-232 (Arpit scores).
+- **W-228 ruled** (same session): *"go with the recommendation"* — plant seed misfits **after W-168 steps 7 and 8** file verdicts. Filed in [W-228](open/W-228-document-families.md); inbox row removed; item re-balled 🟡 waiting on W-168; `BLOCKED.json` → `PROCEED` (no question left in it). Still 🔴 in the inbox: W-225, W-232.
+- **W-225 ruled** (same session): *"go with the recommendation"* on all three open calls → [SR-LAW-12](../records/0014_LAW-12-values-live-in-config.md) decision **6b** (R11 `[api]` stays · R12 dataclass booleans are not values, veto condition narrowed · R13 the 16 sites). Law amended on Arpit's ruling; content_sha re-stamped. Inbox row removed; item 🟢. NOW.md refreshed.
+- ⚠ **Hazard caused and fixed:** this session's bridge `git status` left an empty `.git/index.lock` it could not unlink; removed with Arpit's delete permission. Nothing committed.
 
 ## 2026-09-28 — W-168: `set-4-claude` scored by Arpit; the inbox row is closed  ·  Claude Code (Opus)
 

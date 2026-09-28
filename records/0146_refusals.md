@@ -7,10 +7,10 @@ description: "A declarative refusal table, every condition pure over the respons
 status: accepted
 date: 2026-09-01
 feature: refusal detection before decode
-owns: [src/fux/ingest/refusals.py@b5eee7cf774c, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@5fdc90fab388]
+owns: [src/fux/ingest/refusals.py@f40de632d66c, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@5fdc90fab388]
 laws: [L2, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 183f147ddcb160193a1835bf7336223b169cf18e5e4fa2625362ef1b9c9d6ea7
+content_sha: b55fd573e94d2864351d69dda7b826b7da603819826b61e77349826aab8cb8b5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -446,7 +446,7 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/ingest/refusals.py` — `RULES_NAME` ← `[files] refusals_name`
+- `src/fux/ingest/refusals.py` — `RULES_NAME` ← `[files] refusals_name`, `MAGIC` ← `[decoders] magic_by_mime`, `MAGIC_BY_DECODER` ← every built-in decoder's `[decoders.<name>.format] magic` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28) — the floor is still fux's and not a consumer's knob: `constants.toml` ships inside the engine
 - `src/fux/maintain/urlstate.py` — `STATE_NAME` ← `[maintain] url_state`, `SCHEMA_NAME` ← `[maintain] url_state_schema`
 
 <!-- L12-VALUES-END -->

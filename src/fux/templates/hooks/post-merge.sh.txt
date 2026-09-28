@@ -1,0 +1,2 @@
+
+fux ingest --no-fetch 2>&1 | sed 's/^/fux: /' || exit 0

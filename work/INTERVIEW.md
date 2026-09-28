@@ -41,6 +41,12 @@ valuable judgement, but not the state of play.
 - ⚠ The frozen decider reads `am-X` and the capture wrote `am3-X`. It was run unedited through a scratch symlink mirror, which the verdict declares.
 - **Next:** nothing on W-232; it is off the inbox and archived.
 
+### 🟢 2026-09-28 — W-168: STEP 7 STOPS; STEP 8 RULED A3 · S2 · L1 AND PRE-REGISTERED
+
+- [L11](../records/0013_LAW-11-sealed-answer-key.md) 13b landed with `score.py`'s per-question facet counts.
+- Step 7 cannot reach the floor: its trigger fires on 7/125 and only 5 have a candidate in ranks 6–10, the depth Arpit ruled ([report](regression/2026-09-28-mmr-trigger/report.md)).
+- Step 8 is [pre-registered](regression/2026-09-28-authority-prior/PRE-REGISTRATION.md). Its tag reaches 101/125 questions, so the zero-loss clause is the gate. **Next: build step 8 (Opus).**
+
 ### 🟢 2026-09-28 — W-233 SHIPPED: IDENTIFIER FAMILIES, MEASURED PASS
 
 - `.fux/identifiers.toml` families add one canonical term per match on both readers, so `RF 118`, `rf118` and `RF–118` are `rf-118`. [SR-IDENTIFIERS](../records/0160_identifiers.md) holds the design; the [verdict](regression/2026-09-28-identifier-families/VERDICT.md) is net +25 / +88 / +105 with 0 broken, and an empty file is byte-identical.
@@ -2915,6 +2921,8 @@ the reason is that the measuring environments are gone.**
 *Updated **2026-09-20** (Claude Code, Opus 5) — maintainer line: this session.*
 *Updated **2026-09-24** (Claude Code, Opus 5.5) — maintainer line: this session. The live next step is §1's newest block: two rulings for Arpit, and his `just golden-score`.*
 *Updated **2026-09-27** (Claude Code, Opus 5.5) — maintainer line: this session. **W-168's generation-3 ladder is rebuilt** — 8/8 frozen at `80495b44` ([report](regression/2026-09-27-ladder-gen3-rebuild/report.md)). Next: a phase-5 run of `set-4-claude`; run `fux doctor --fix` on the rung first, because W-225 stage 2 requires every `tune.toml` key.*
+
+*Updated **2026-09-28** (Claude Code, Opus 5.5) — maintainer line: this session. **W-168 step 8 is pre-registered** ([bar](regression/2026-09-28-authority-prior/PRE-REGISTRATION.md)); the immediate next step is its build (Opus), off at `0.0`. Step 7 STOPped.*
 
 ⚠ **Superseded later the same day — see §1's newest block.** The immediate next
 step is **W-205 part 1**; W-204 phase B is still real and still unstarted, and it

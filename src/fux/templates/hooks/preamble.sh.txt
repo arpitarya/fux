@@ -1,0 +1,14 @@
+#!/bin/sh
+{marker} — safe to delete, or run `fux hooks --uninstall`
+#
+# Re-indexing is best-effort: a hook that fails must never block a commit, a
+# merge or a checkout. It reports and gets out of the way.
+set -u
+command -v fux >/dev/null 2>&1 || exit 0
+# W-64 turned the progress bar ON here, to break R5's 44.4 s of silence on the
+# commit path, and said in as many words: revisit if the fork resolves to
+# option B. It did (2026-08-22), so this is that revisit. post-commit no
+# longer waits for an ingest at all, and the ingest that does run is detached
+# with no terminal to paint. post-merge and post-checkout still run inline and
+# still want the bar.
+export FUX_NO_PROGRESS=0

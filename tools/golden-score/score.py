@@ -30,6 +30,7 @@ confident-sounding file will read just like the last one.
 | `abstain_wrong` | the band said unanswerable AND the key says it is answerable | the same |
 | `answered_unanswerable` | text returned for a question the key says has no answer | `answer_text` vs the key |
 | `evidence_quoted` | the key's evidence quote appears in the answer text | a normalised substring test |
+| `facets_top5` · `facets_key` | per question: how many of the key's facet groups have a document in the top 5, and how many groups the key has | the key's `facets`, **counted, never echoed** |
 | `pools` | per coverage tag: how many questions carry it, and how many of the answerable ones miss rank 1 / rank 5 with the target still in the returned ten | the key's `exercises`, **counted, never echoed per row** |
 
 **`pools` — added 2026-09-28 (Arpit, W-168; L11 decision 13a).** Each ranking
@@ -38,6 +39,12 @@ and the tag lives only in the key. The block is **counts keyed by tag name**, an
 a tag name reaches the output only if it has a recipe tag's shape (`stepN_word`
 or `other`); any other value is counted under `_unrecognised`. No row carries a
 tag.
+
+**`facets_top5` · `facets_key` — added 2026-09-28 (Arpit, W-168 step 7; L11
+decision 13b).** Step 7 (MMR) is judged on facet coverage in the top 5, and the
+facet groups (SR-WORK-TESTDATA R8) live only in the key. Two integers per row, and
+`0 · 0` for a question with no `facets`; a group that is not a non-empty list is
+not counted. No facet's text and no document name reaches the output.
 
 🔴 **`evidence_quoted` is a MECHANICAL PROXY and is NOT the answer-text verdict.**
 W-204 phase D step 3 asks for `correct` · `partial` · `wrong` · `declined`
@@ -145,6 +152,9 @@ def score_one(row: dict, key: dict) -> dict:
     said_unanswerable = row.get("answerable") is False
     quotes = [_norm(e.get("quote", "")) for e in (key.get("evidence") or [])]
     body = _norm(text)
+    raw_facets = key.get("facets")
+    groups = [g for g in raw_facets if isinstance(g, list) and g] if isinstance(raw_facets, list) else []
+    top5 = set(ranked[:5])
 
     return {
         "id": row["id"],
@@ -162,6 +172,9 @@ def score_one(row: dict, key: dict) -> dict:
         # 🔴 a proxy, not a verdict — see the module docstring
         "evidence_quoted": any(q and q in body for q in quotes),
         "answer_text_verdict": None,  # the judged series fills this, never this file
+        # L11 decision 13b — counts only; a facet's members never leave this function
+        "facets_top5": sum(1 for g in groups if top5 & set(g)),
+        "facets_key": len(groups),
     }
 
 

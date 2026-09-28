@@ -101,63 +101,69 @@ DECLARED = (*COMMITTED, *COMMITTED_FILES, *DERIVED, *ACQUIRED, *GENERATED_FILES)
 
 # CACHEDIR.TAG's first line is a fixed signature — byte-exact, per the spec.
 CACHEDIR_SIGNATURE = fixed("fuxdir", "cachedir_signature")
-CACHEDIR_TAG = (
-    f"{CACHEDIR_SIGNATURE}\n"
-    "# This file is a cache directory tag created by fux.\n"
-    "# For information about cache directory tags, see https://bford.info/cachedir/\n"
-)
 
-_GITIGNORE = (
-    "# Gitignored planes, BY NAME. NEVER add `*` here: `.fux/index/`,\n"
-    "# `.fux/sources/`, `.fux/fetchers/`, `.fux/decoders/` and\n"
-    "# `.fux/observers/` are committed,\n"
-    "# and a blanket ignore would drop them from git silently. `fux doctor`\n"
-    "# checks exactly that.\n"
-    "#\n"
-    "# `runtime/` is DERIVED: rebuildable from the committed index by\n"
-    "# `fux build`. `acquired/` is not -- it holds the bytes a fetch actually\n"
-    "# returned, which can only be re-acquired while the source is still\n"
-    "# reachable. Both are ignored; only one can be regenerated.\n"
-    + "".join(f"{name}/\n" for name in DERIVED)
-    + "".join(f"{name}/\n" for name in ACQUIRED)
-    # ⚠ **Not a plane -- CPython's litter beside the committed Python**
-    # (W-140 row 18, 2026-09-11). `fux setup` writes real modules into
-    # `.fux/decoders/` and `.fux/fetchers/` and ingest imports them, so
-    # `__pycache__/` appears next to files a consumer is supposed to commit.
-    # Every repo whose own .gitignore happens to carry the Python line was
-    # fine; one that does not sees untracked bytecode in the directory fux
-    # just told them to commit. By NAME, like everything else here, and
-    # matching at any depth under `.fux/` is exactly the scope wanted.
-    + "__pycache__/\n"
-    # ⚠ **Not a plane either -- a package manager's install directory**, which
-    # only exists in the monorepo shape, where `.fux/node` is a workspace member
-    # and the reader is INSTALLED rather than vendored (SR-NODE-SEARCH
-    # decision 13, shape C). By path rather than by name: `node_modules/` alone
-    # would also ignore one a consumer keeps elsewhere under `.fux/`, and this
-    # file's whole discipline is that nothing is ignored by accident.
-    + "node/node_modules/\n"
-    # 🔴 **The transient a WRITE leaves in a COMMITTED directory** (W-185,
-    # 2026-09-15). `store/writer.py::_atomic_write` writes
-    # `index/<shard>.jsonl.tmp` beside the shard and renames it -- the sibling
-    # is required, because `os.replace` is atomic only within one filesystem.
-    # `post-commit` DEFERS (SR-MAINTENANCE decision 1a), so a consumer's next
-    # `git add -A` legitimately overlaps a live writer, lists the temp file, and
-    # then cannot stat it:
-    #
-    #     fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
-    #
-    # ⚠ **This line IS the fix, and it was measured rather than argued.** A
-    # controlled probe -- the same rename churn, with and without the rule --
-    # gives **0 failures in 3 871 `git add -A` runs ignored** against **2 335 of
-    # 3 933 unignored**. The earlier reasoning that an ignore rule "cannot close
-    # the window because git stats what it listed" is wrong: an excluded path is
-    # never walked.
-    #
-    # **Scoped to the plane and to the suffix**, never `*.tmp` and never `*`:
-    # this file's whole discipline is that nothing is ignored by accident, and a
-    # bare `*.tmp` would also hide a consumer's own file anywhere under `.fux/`.
-    + "index/*.jsonl.tmp\n"
-)
+
+def _template(name: str) -> str:
+    """`src/fux/templates/<name>` — the body of a file fux writes.
+
+    Decision 5's home for what setup writes (SR-LAW-12 decision 6b, R13): these
+    bodies are bytes fux puts on disk, not code, so they are not literals here.
+    """
+    return (Path(__file__).parent.parent / "templates" / name).read_text(encoding="utf-8")
+
+
+def _cachedir_tag() -> str:
+    return _template(fixed("templates", "cachedir_tag")).replace("{signature}", CACHEDIR_SIGNATURE)
+
+
+CACHEDIR_TAG = _cachedir_tag()
+
+# The body is `templates/fuxdir-gitignore.txt` (R13); `{planes}` is every
+# DERIVED and ACQUIRED directory, by name, so the planes have one home.
+# Why each fixed line after them is there:
+#
+# `__pycache__/` -- ⚠ **Not a plane -- CPython's litter beside the committed Python**
+# (W-140 row 18, 2026-09-11). `fux setup` writes real modules into
+# `.fux/decoders/` and `.fux/fetchers/` and ingest imports them, so
+# `__pycache__/` appears next to files a consumer is supposed to commit.
+# Every repo whose own .gitignore happens to carry the Python line was
+# fine; one that does not sees untracked bytecode in the directory fux
+# just told them to commit. By NAME, like everything else here, and
+# matching at any depth under `.fux/` is exactly the scope wanted.
+#
+# `node/node_modules/` -- ⚠ **Not a plane either -- a package manager's install directory**, which
+# only exists in the monorepo shape, where `.fux/node` is a workspace member
+# and the reader is INSTALLED rather than vendored (SR-NODE-SEARCH
+# decision 13, shape C). By path rather than by name: `node_modules/` alone
+# would also ignore one a consumer keeps elsewhere under `.fux/`, and this
+# file's whole discipline is that nothing is ignored by accident.
+#
+# `index/*.jsonl.tmp` -- 🔴 **The transient a WRITE leaves in a COMMITTED directory** (W-185,
+# 2026-09-15). `store/writer.py::_atomic_write` writes
+# `index/<shard>.jsonl.tmp` beside the shard and renames it -- the sibling
+# is required, because `os.replace` is atomic only within one filesystem.
+# `post-commit` DEFERS (SR-MAINTENANCE decision 1a), so a consumer's next
+# `git add -A` legitimately overlaps a live writer, lists the temp file, and
+# then cannot stat it:
+#
+#     fatal: unable to stat '.fux/index/ad.jsonl.tmp': No such file or directory
+#
+# ⚠ **This line IS the fix, and it was measured rather than argued.** A
+# controlled probe -- the same rename churn, with and without the rule --
+# gives **0 failures in 3 871 `git add -A` runs ignored** against **2 335 of
+# 3 933 unignored**. The earlier reasoning that an ignore rule "cannot close
+# the window because git stats what it listed" is wrong: an excluded path is
+# never walked.
+#
+# **Scoped to the plane and to the suffix**, never `*.tmp` and never `*`:
+# this file's whole discipline is that nothing is ignored by accident, and a
+# bare `*.tmp` would also hide a consumer's own file anywhere under `.fux/`.
+def _gitignore() -> str:
+    planes = "".join(f"{name}/\n" for name in (*DERIVED, *ACQUIRED))
+    return _template(fixed("templates", "gitignore")).replace("{planes}\n", planes)
+
+
+_GITIGNORE = _gitignore()
 
 
 def _readme() -> str:
@@ -468,43 +474,9 @@ _NODE_MODULES = "node_modules"
 #: the repo, which is the same set that can read the index it queries.
 _SHIM_MODE = fixed("bundle", "shim_mode")
 
-_SHIM = """#!/bin/sh
-# Vendored by `fux setup`. Runs the Node read plane against this repository.
-# The command is `fux`; the npm package is `fux-engine` (`fux` was taken in
-# 2016). This shim exists so a clone needs nothing installed at all.
-#
-# **Three rungs, because the binary is not in one place.** MEASURED across
-# npm, pnpm, yarn 1 and bun (work/regression/2026-09-12-workspace-dotpath-probe):
-# npm and yarn HOIST `fux` to the workspace root's `node_modules/.bin`, pnpm and
-# bun leave it in the member's own. A shim naming either one would be right for
-# half the ecosystem and silently wrong for the other half, so it tries, in
-# order: the vendored bundle, this member's bin, then every ancestor's.
-dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-
-# 1 - shape A: the bundle `fux setup` vendored. Offline, nothing installed.
-if [ -f "$dir/node/fux.mjs" ]; then
-  exec node "$dir/node/fux.mjs" "$@"
-fi
-
-# 2 - shape C under pnpm or bun: the bin stays in the member.
-if [ -x "$dir/node/node_modules/.bin/fux" ]; then
-  exec "$dir/node/node_modules/.bin/fux" "$@"
-fi
-
-# 3 - shape C under npm or yarn: the bin is hoisted to the workspace root.
-d=$dir
-while [ "$d" != "/" ]; do
-  if [ -x "$d/node_modules/.bin/fux" ]; then
-    exec "$d/node_modules/.bin/fux" "$@"
-  fi
-  d=$(dirname -- "$d")
-done
-
-echo "fux: no Node reader here. This repository declares .fux/node as a" >&2
-echo "     workspace member (shape C), so run your package manager's install" >&2
-echo "     first -- or run 'fux setup' outside a monorepo to vendor the bundle." >&2
-exit 1
-"""
+#: The body is `templates/fux-shim.sh.txt` (R13) — why it has three rungs is
+#: written in the shim itself, where a consumer reading `.fux/fux` sees it.
+_SHIM = _template(fixed("templates", "shim"))
 
 
 def _node_source():

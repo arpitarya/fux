@@ -108,6 +108,12 @@ builtin        = ["csv", "docx", "drawio", "html", "image", "ini", "json", "json
 # Already-text formats that reach no decoder -- the prose half of the default
 # `include` that `fux setup` writes into .fux/formats.toml.
 prose_types    = ["*.md", "*.markdown", "*.txt", "*.rst", "*.adoc", "*.org"]
+# The always-on magic-byte floor, checked against the type the SERVER claimed
+# (ingest/refusals.py `MAGIC`). Keyed by MIME, not by decoder, because ODT has a
+# signature and no decoder. Only formats with a fixed, unambiguous signature: a
+# guessed one turns the floor into a source of false refusals. Latin-1 bytes.
+# The by-decoder half is each `[decoders.<name>.format] magic` (R13).
+magic_by_mime = { "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = "PK\u0003\u0004", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" = "PK\u0003\u0004", "application/vnd.openxmlformats-officedocument.presentationml.presentation" = "PK\u0003\u0004", "application/vnd.oasis.opendocument.text" = "PK\u0003\u0004", "application/pdf" = "%PDF-" }
 
 [decoders.csv]
 version    = 1
@@ -289,6 +295,9 @@ max_passes = 5
 # Written into .git -- how fux recognises its own hooks and merge driver.
 merge_driver = "fux-index"
 marker       = "# installed by `fux hooks --install`"
+# The hooks fux installs, in install order; each body is
+# `templates/<hooks_dir>/<name>.sh.txt` after the shared preamble (R13).
+names        = ["post-commit", "post-merge", "post-checkout"]
 
 [env]
 runner_handoff = "FUX_RUNNER_HANDOFF"
@@ -329,6 +338,13 @@ output = "output.toml.txt"
 formats_limits = "formats-limits.toml.txt"
 inspect = "inspect.toml.txt"
 identifiers = "identifiers.toml.txt"
+# The bodies of files fux writes, not config (SR-LAW-12 decision 6b, R13).
+# `{planes}`, `{signature}` and `{marker}` are filled from the keys that own them.
+gitignore    = "fuxdir-gitignore.txt"
+cachedir_tag = "cachedir-tag.txt"
+shim         = "fux-shim.sh.txt"
+hooks_dir    = "hooks"
+hook_preamble = "preamble.sh.txt"
 
 [fuse]
 # Reciprocal-rank fusion's k (Cormack et al. 2009) -- a published constant,
@@ -506,6 +522,8 @@ gif_image_separator      = 0x2C
 
 [decoders.pdf.format]
 # The numbers PDF fixes (decode/pdf.py; SR-LAW-12 decision 6a).
+# What a real PDF begins with -- the by-decoder magic floor (ingest/refusals.py).
+magic = "%PDF-"
 # A literal string octal escape carries at most three digits.
 octal_escape_digits = 3
 # A bfrange wider than a two-byte code space is refused, not expanded.
@@ -532,6 +550,26 @@ min_table_lines = 3
 # RTF's \uN is a signed 16-bit value; a code point above 32767 is written as
 # N - unicode_wrap (decode/rtf.py).
 unicode_wrap = 65536
+
+# The OOXML part names each decoder reads, and the ZIP local-file-header every
+# OOXML package begins with -- the by-decoder magic floor (ingest/refusals.py).
+# Fixed by ECMA-376, not knobs (SR-LAW-12 decision 6b, R13). Latin-1 bytes.
+[decoders.docx.format]
+magic    = "PK\u0003\u0004"
+document = "word/document.xml"
+
+[decoders.pptx.format]
+magic = "PK\u0003\u0004"
+# Prefixes: slide N is `<slides>N.xml`, its notes `<notes>N.xml`.
+slides = "ppt/slides/slide"
+notes  = "ppt/notesSlides/notesSlide"
+
+[decoders.xlsx.format]
+magic    = "PK\u0003\u0004"
+shared   = "xl/sharedStrings.xml"
+# A prefix: sheet N is `<sheets>N.xml`.
+sheets   = "xl/worksheets/sheet"
+workbook = "xl/workbook.xml"
 
 [ooxml]
 # Word's built-in paragraph styles as Markdown levels (decode/_ooxml.py):

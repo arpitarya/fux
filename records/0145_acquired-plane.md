@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@54b4e504214f]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 7f7d7dbb637f19f7bfd53550fa031cdd7d13d23dde4e5471acc9b276e87aaf24
+content_sha: 9298cc657f1a1743126c1b15b60f96023103985f6fe2d7fbf5b41706cd1f9eb6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -306,7 +306,7 @@ this moved where they are written, not what they are.
 
 - `src/fux/config.py` — `CONFIG_NAME` ← `[files] config`, `FETCHERS_DIR` ← `[files] fetchers_dir`, `DEFAULT_TYPES_FILE` ← `[files] formats`, `LEGACY_TYPES_FILE` ← `[files] formats_legacy`
 - `src/fux/store/acquired.py` — `DIR_NAME` ← `[acquired] dir`, `MANIFEST_NAME` ← `[acquired] manifest`, `OBJECTS_DIR` ← `[acquired] objects_dir`, `SCHEMA` ← `[acquired] schema`
-- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`
+- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`, and three file bodies from `src/fux/templates/` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28): `_GITIGNORE` ← `[templates] gitignore` (`{planes}` filled from `DERIVED` and `ACQUIRED`), `_SHIM` ← `[templates] shim`, `CACHEDIR_TAG` ← `[templates] cachedir_tag` (`{signature}` filled from `[fuxdir] cachedir_signature`)
 
 <!-- L12-VALUES-END -->
 

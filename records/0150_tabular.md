@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-06
 amended: 2026-09-11
 feature: tabular documents — row granularity, the admitted-row limit, and what a table citation is
-owns: [src/fux/decode/csv.py@2c37b28e4a9f, src/fux/decode/xlsx.py@e3e42687e359, src/fux/decode/_limits.py@42ac9cfa5394]
+owns: [src/fux/decode/csv.py@2c37b28e4a9f, src/fux/decode/xlsx.py@1ec265cb92e2, src/fux/decode/_limits.py@42ac9cfa5394]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: ad4a6e547e569dadfc9600068a9f7d264bac58447a13d7cce42625cfb89dd673
+content_sha: bccf4043337cffa364820470bd6f0585321fde475c56346cf5dea8da05cdeee7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -163,7 +163,7 @@ process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchange
 this moved where they are written, not what they are.
 
 - `src/fux/decode/csv.py` — `VERSION` ← `[decoders.csv] version`, `EXTENSIONS` ← `[decoders.csv] extensions`
-- `src/fux/decode/xlsx.py` — `VERSION` ← `[decoders.xlsx] version`, `EXTENSIONS` ← `[decoders.xlsx] extensions`
+- `src/fux/decode/xlsx.py` — `VERSION` ← `[decoders.xlsx] version`, `EXTENSIONS` ← `[decoders.xlsx] extensions`, `_SHARED` / `_SHEETS` / `_WORKBOOK` ← `[decoders.xlsx.format] shared` / `sheets` / `workbook` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28)
 
 <!-- L12-VALUES-END -->
 

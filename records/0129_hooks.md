@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@3839035e9049, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
+owns: [src/fux/maintain@514ae1424ef7, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 60aeac97feaa4139d1d04544f2a3f6fd4bafe3886540cafa7294d3e1fa8db671
+content_sha: 5ecbe8fd68e6cd5cb5e0d82f590ba1b526ac8e978e9e77951474f19cfe651c6e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -609,7 +609,7 @@ this moved where they are written, not what they are.
 
 - `src/fux/maintain/daemon.py` — `PID_NAME` ← `[maintain] daemon_pid`, `STOP_NAME` ← `[maintain] daemon_stop`, `STATUS_NAME` ← `[maintain] daemon_status`
 - `src/fux/maintain/dirty.py` — `DIRTY_NAME` ← `[maintain] dirty`
-- `src/fux/maintain/hooks.py` — `MERGE_DRIVER_NAME` ← `[hooks] merge_driver`, `MARKER` ← `[hooks] marker`
+- `src/fux/maintain/hooks.py` — `MERGE_DRIVER_NAME` ← `[hooks] merge_driver`, `MARKER` ← `[hooks] marker`; and, from `src/fux/templates/hooks/` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28), `_PREAMBLE` ← `[templates] hook_preamble` (`{marker}` filled from `[hooks] marker`) and `HOOKS` ← `[hooks] names`, each body `<name>.sh.txt` after the preamble — the bytes installed are unchanged
 - `src/fux/maintain/lastcited.py` — `short` ← `[maintain] last_cited`
 - `src/fux/maintain/runner.py` — `LOCK_NAME` ← `[maintain] write_lock`, `STOP_NAME` ← `[maintain] runner_stop`, `STATUS_NAME` ← `[maintain] runner_status`, `HANDOFF_ENV` ← `[env] runner_handoff`, `NO_SPAWN_ENV` ← `[env] no_spawn`
 - `src/fux/maintain/urlstate.py` — `STATE_NAME` ← `[maintain] url_state`, `SCHEMA_NAME` ← `[maintain] url_state_schema`

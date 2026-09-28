@@ -11,8 +11,8 @@ that only grows stops being reviewed:
 - every listed site still exists.
 
 ⚠ **What this does NOT see**, stated so a green run is read correctly: a
-boolean in a class body (the ratified scanner skips it — the R8 dataclass
-question is open in the compare doc), a string inside a function body that is
+boolean in a class body (the scanner skips it, and SR-LAW-12 decision 6b R12
+rules it is not a value), a string inside a function body that is
 not path-like, and anything the Node lexer cannot place in a scope.
 """
 

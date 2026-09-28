@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@5ed84346446f]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@675afdc8be43]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 6ccd7b6791b5b89e0baf0c0cdce8da4d8194cdf233d540ed2529684c0ffabd00
+content_sha: dfb1228dbeaf7b57b1ca6ab10260619d04f0c9bc49514e1d2bb404828eba4d6b
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -166,6 +166,8 @@ decisions 3 and 17; SR-LAW-12 decision 9a).
 **W-225 stage 5e (2026-09-28)** added `[fetch]` (`undeclared_max_parallel`, the rate-limit retries and backoff, `kib`), `[maintain] max_passes` and `[doctor] as_ingested_veto_share` — three values the L12 classification had proposed as consumer keys, fixed instead because an earlier ruling or record already decides them ([SR-CONFIG](0113_config.md) decision 18).
 
 **W-225 stage 5f (2026-09-28)** added `[bundle] shim_sniff_chars` — how much of a launcher `fux doctor` reads to tell a fux shim from another tool's.
+
+**W-225 R13 (2026-09-28)** — [L12](0014_LAW-12-values-live-in-config.md) decision 6b — added the OOXML part names and the magic-byte signatures (`[decoders.docx.format]`, `[decoders.pptx.format]`, `[decoders.xlsx.format]`, `[decoders.pdf.format] magic`, and `[decoders] magic_by_mime`, keyed by MIME because ODT has a signature and no decoder), `[hooks] names`, and the `[templates]` names of the five file bodies fux writes (`gitignore`, `cachedir_tag`, `shim`, `hooks_dir`, `hook_preamble`). The bodies themselves are templates, not constants — decision 5's home for what fux writes.
 
 **`[intent]` and `[intent.type]` joined the file on 2026-09-28** (W-168 step 9;
 [SR-RANKING](0111_ranking.md) decision 13). The cue lexicon is a FIXED value and

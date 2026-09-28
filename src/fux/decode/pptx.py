@@ -31,15 +31,16 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.pptx", "version")
+VERSION = fixed("decoders.pptx", "version")  # not bumped by W-225 R13: its OOXML part names moved to constants.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.pptx", "extensions"))
 
 #: A slide is a complete unit: one passage per slide, never merged into
 #: its neighbour and never split at a heading inside it.
 
-_SLIDES = "ppt/slides/slide"
-_NOTES = "ppt/notesSlides/notesSlide"
+#: Part-name prefixes ECMA-376 fixes -- `constants.toml [decoders.pptx.format]` (R13).
+_SLIDES = fixed("decoders.pptx.format", "slides")
+_NOTES = fixed("decoders.pptx.format", "notes")
 
 
 def decode(raw: bytes, rel_path: str) -> str | None:

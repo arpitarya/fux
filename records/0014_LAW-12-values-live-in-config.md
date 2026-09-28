@@ -10,7 +10,7 @@ feature: the rationale, scope, exceptions and reopen-trigger of L12
 owns: []
 laws: [L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: a25443222b5fb1551b1fbde2518d6ef889d202dfecefd3ed8df2b2b7adeaf092
+content_sha: f750fae40cf800aa4afa6b866a9dfdd8f81a7da74c58b09872d1b7d2d5a9ed66
 ratifies: "Arpit, 2026-09-27 — 'every const or default value will only and only be defined in tune.toml or fux.toml or in one of the other config files, or maybe create a new config file; if the value is missing throw an error, but there shouldn't be any default value within the functions … be it node or python it should always be read from one of the toml files; exception is the files used for setup.' Asked the scope the same day, he ruled: tunable values only in the TOML config, and 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; a missing file or key is a hard error naming the key; setup.py and templates/, tests/ and tests_e2e/, tools/ and scripts/ are exempt. Ratified by Arpit the same day on the W-225 step 1 classification (work/compare/l12-classify.compare.md), 'I accept the recommendation': enum tags, closed vocabularies and presentation counts are not values; the six two-home conflicts resolve to one home each, keeping today's behaviour; the veto check becomes one AST-based test because the greps reach about 60 % of what the law forbids; inspect thresholds get a new .fux/inspect.toml; and every decoder cap enters the extract-config digest. On the R5 scan the same day he ruled R7–R10: a number fixed by a format, protocol or algorithm is a fixed value for constants.toml; every boolean parameter default is a value and goes; the release is 3.0, breaking, with no automatic --fix; __version__ stays in src/fux/__init__.py"
 ---
 
@@ -227,6 +227,30 @@ example set:
   attribute, [SR-WORK-RELEASE](0063_WORK-release.md) is its one home, and the
   version-parity test already binds its copies. Allow-listed by name.
 
+**6b. Three calls the build left open — ruled by Arpit, 2026-09-28** (Cowork,
+*"go with the recommendation"*, on [the classification](../work/compare/l12-classify.compare.md)
+§"Where the build departed" and §Stage 7):
+
+- **R11 · The library's defaults have their own root, `output.toml [api]`.** R8's
+  *"the API reads it where the CLI does"* is narrowed: the API reads `[api]`, not
+  `[cli]`, because `[cli] band` ships `false` and would switch the library's
+  confidence block off for every caller. [SR-OUTPUT](0143_output-defaults.md) decision 25
+  holds the keys.
+- **R12 · A record type's boolean field default is NOT a value.** A dataclass
+  field such as `AskResult.archived = False` or `UrlEntry.keep = False` states the
+  shape of a record — *absent means no* — and is not a knob; it joins decision 6's
+  closed list. **Only booleans**: a dataclass field holding any other literal
+  (`Policy.timeout_seconds = 5`, `UrlEntry.ttl = "24h"`) is still a value, as
+  stage 6 built. ⚠ This narrows the veto condition's *"class or dataclass field
+  default"* on purpose; R8 reaches parameters, not record fields.
+- **R13 · The sixteen `for-arpit` sites.** The OOXML part names and the magic
+  bytes (`MAGIC`, `MAGIC_BY_DECODER`) are `fixed` → `constants.toml
+  [decoders.*.format]`, as the image signatures are. The bodies of files fux
+  writes (`_GITIGNORE`, `_SHIM`, `CACHEDIR_TAG`, `HOOKS`, `_PREAMBLE`) move to
+  `src/fux/templates/*.txt`, decision 5's home for what setup writes. The
+  source-list grammar (`DIRS`, `TYPES`, `URLS`) is grammar under decision 6 —
+  reopened only if a consumer should be able to add an attribute.
+
 **7. `--no-tune` reads the packaged template, not code.** The "is it me or the
 config?" switch survives: it swaps the consumer's `.fux/tune.toml` for the one
 `fux setup` would write today. It never falls back to a constant.
@@ -313,7 +337,8 @@ violation, and new code may not add one.
 ### Veto condition
 
 **Reopen if** a literal value outside decision 6's categories — at module
-level, in a class or dataclass field default, in a parameter default, in a
+level, in a class or dataclass field default (other than decision 6b R12's
+record-shape booleans), in a parameter default, in a
 `.get(key, <literal>)` fallback, or inline in a function body — exists in
 `src/fux/**` or `node/src/**` outside `setup.py` and `templates/`; or if a new
 exemption is added without an amendment to this record.

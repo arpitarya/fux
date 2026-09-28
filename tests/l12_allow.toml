@@ -9,6 +9,8 @@
 # `pending-w228` and `for-arpit` are NOT decision-6 categories: the first is
 # stage 5f's remaining work, the second is open questions in
 # work/compare/l12-classify.compare.md. Neither may grow without a ruling.
+# `for-arpit` is empty since 2026-09-28: SR-LAW-12 decision 6b (R13) sorted its
+# sixteen sites -- thirteen moved to constants.toml and templates/, three below.
 
 [[allow]]
 category = "identity"
@@ -565,24 +567,11 @@ sites = [
 ]
 
 [[allow]]
-category = "for-arpit"
-basis = "open"
-why = "a judgement call no ruling covers yet; listed in the compare doc for Arpit"
+category = "grammar"
+basis = "decision 6b, R13"
+why = "the source-list grammar: which attributes a `dirs`/`types`/`urls` line takes -- reopened only if a consumer should be able to add an attribute"
 sites = [
-  "src/fux/decode/docx.py::_DOCUMENT::module::'word/document.xml'",
-  "src/fux/decode/pptx.py::_NOTES::module::'ppt/notesSlides/notesSlide'",
-  "src/fux/decode/pptx.py::_SLIDES::module::'ppt/slides/slide'",
-  "src/fux/decode/xlsx.py::_SHARED::module::'xl/sharedStrings.xml'",
-  "src/fux/decode/xlsx.py::_SHEETS::module::'xl/worksheets/sheet'",
-  "src/fux/decode/xlsx.py::_WORKBOOK::module::'xl/workbook.xml'",
-  "src/fux/ingest/refusals.py::MAGIC::module::{'application/vnd.openxmlformats-officedocument.spreadshe...",
-  "src/fux/ingest/refusals.py::MAGIC_BY_DECODER::module::{'xlsx': b'PK\\x03\\x04', 'docx': b'PK\\x03\\x04', 'pptx': b'...",
   "src/fux/ingest/sourcelist.py::DIRS::module::ListSpec(kind='dirs', attributes=(Attribute('archived', (...",
   "src/fux/ingest/sourcelist.py::TYPES::module::ListSpec(kind='types', attributes=(Attribute('decoder', (...",
   "src/fux/ingest/sourcelist.py::URLS::module::ListSpec(kind='urls', attributes=(Attribute('fetch', (), ...",
-  "src/fux/maintain/hooks.py::HOOKS::module::{'post-commit': _PREAMBLE + '\\nfux ingest --spawn-runner ...",
-  "src/fux/maintain/hooks.py::_PREAMBLE::module::f\"#!/bin/sh\\n{MARKER} — safe to delete, or run `fux hooks...",
-  "src/fux/store/fuxdir.py::CACHEDIR_TAG::module::f'{CACHEDIR_SIGNATURE}\\n# This file is a cache directory ...",
-  "src/fux/store/fuxdir.py::_GITIGNORE::module::'# Gitignored planes, BY NAME. NEVER add `*` here: `.fux/...",
-  "src/fux/store/fuxdir.py::_SHIM::module::'#!/bin/sh\\n# Vendored by `fux setup`. Runs the Node read...",
 ]

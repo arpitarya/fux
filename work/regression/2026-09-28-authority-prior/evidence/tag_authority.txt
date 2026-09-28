@@ -1,0 +1,2 @@
+lifted documents=12 tagged=101 pool(miss@1 ∩ hit@10)=31 tagged_rank1_hits=59
+pool: s4u-005 s4u-008 s4u-012 s4u-017 s4u-020 s4u-024 s4u-025 s4u-032 s4u-040 s4u-041 s4u-048 s4u-051 s4u-058 s4u-063 s4u-065 s4u-067 s4u-073 s4u-078 s4u-079 s4u-080 s4u-087 s4u-088 s4u-089 s4u-092 s4u-100 s4u-101 s4u-109 s4u-116 s4u-121 s4u-123 s4u-124

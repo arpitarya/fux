@@ -45,6 +45,9 @@ ALLOWED_ROW_KEYS = {
     "answered_unanswerable",
     "evidence_quoted",
     "answer_text_verdict",
+    # decision 13b (Arpit, 2026-09-28, W-168 step 7): two counts, never a facet
+    "facets_top5",
+    "facets_key",
 }
 
 # Names that would mean an answer had reached the output. `answerable_key` is
@@ -209,3 +212,39 @@ def test_pools_echo_no_free_text_and_no_row_carries_a_tag(scorer):
         assert secret not in blob
     for row in payload["rows"]:
         assert "exercises" not in row and set(row) <= ALLOWED_ROW_KEYS
+
+
+# ── decision 13b (Arpit, 2026-09-28, W-168 step 7): per-question facet COUNTS ─
+# The key's `facets` (SR-WORK-TESTDATA R8) is a list of document-name groups.
+# The row carries how many groups exist and how many reach the top 5 — two ints.
+FACET_KEY = {
+    **SYNTHETIC_KEY,
+    "facets": [
+        ["docs/ALPHA-SECRET.md", "docs/GAMMA-SECRET.md"],
+        ["docs/BETA-SECRET.md"],
+        ["docs/DELTA-SECRET.md"],
+        "the quick brown fox FACET-TEXT",  # malformed: not a group, not counted
+        [],                                 # empty: not counted
+    ],
+}
+
+
+def test_facets_are_two_counts_over_the_top_five(scorer):
+    row = {**SYNTHETIC_ROW, "ranked": [
+        "docs/ALPHA-SECRET.md", "docs/x1.md", "docs/x2.md", "docs/x3.md", "docs/x4.md",
+        "docs/BETA-SECRET.md",  # rank 6: outside the top 5, so its facet is not covered
+    ]}
+    out = scorer.score_one(row, FACET_KEY)
+    assert (out["facets_top5"], out["facets_key"]) == (1, 3)
+    assert isinstance(out["facets_top5"], int) and isinstance(out["facets_key"], int)
+
+
+def test_a_question_without_facets_scores_zero_zero(scorer):
+    out = scorer.score_one(SYNTHETIC_ROW, SYNTHETIC_KEY)
+    assert (out["facets_top5"], out["facets_key"]) == (0, 0)
+
+
+def test_facets_echo_no_member_and_no_group_text(scorer):
+    blob = json.dumps(scorer.score_one(SYNTHETIC_ROW, FACET_KEY))
+    for secret in ("GAMMA-SECRET", "DELTA-SECRET", "FACET-TEXT", "quick brown fox"):
+        assert secret not in blob

@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@76df8591d7a2, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@7a1f541ceb15, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: ab18a850b8b0a44c41eaf326e0cf21818c01787cbe5c32b15f03e6ebf9d99eda
+content_sha: 3efae6aa3d773939b37a15ab623e0ffe14fc77b4239c4b29909964bf44f6bcef
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -903,7 +903,7 @@ process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchange
 this moved where they are written, not what they are.
 
 - `src/fux/doctor.py` — `PY_MIN` ← `[python] min`
-- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`
+- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`, and three file bodies from `src/fux/templates/` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28): `_GITIGNORE` ← `[templates] gitignore` (`{planes}` filled from `DERIVED` and `ACQUIRED`), `_SHIM` ← `[templates] shim`, `CACHEDIR_TAG` ← `[templates] cachedir_tag` (`{signature}` filled from `[fuxdir] cachedir_signature`)
 - `src/fux/store/nodebundle.py` — `ENTRY` ← `[bundle] entry`, `SIDECARS` ← `[bundle] sidecars`
 
 <!-- L12-VALUES-END -->

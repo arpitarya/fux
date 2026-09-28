@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@fe6f79319e48, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@eb7f2e52930c, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@6748ca720ca3]
+owns: [src/fux/decode@8e416e50936e, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@cbec8e165dca, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@6748ca720ca3]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 3dd42ae3747d621760d69e2f3e2f009088d7f9fcc26961b1f2ef8d06cde78076
+content_sha: 62b9c8a080463a064d083944f4f3c7f6e2b6d259e6eab8c74c33805e20f6cd22
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -760,7 +760,7 @@ this moved where they are written, not what they are.
 
 - `node/src/decode/registry.mjs` — `PROSE_TYPES` ← `[decoders] prose_types`
 - `src/fux/decode/__init__.py` — `CONSUMER_DIR` ← `[decoders] consumer_dir`, `BUILTIN_MODULES` ← `[decoders] builtin`
-- `src/fux/decode/docx.py` — `VERSION` ← `[decoders.docx] version`, `EXTENSIONS` ← `[decoders.docx] extensions`
+- `src/fux/decode/docx.py` — `VERSION` ← `[decoders.docx] version`, `EXTENSIONS` ← `[decoders.docx] extensions`, `_DOCUMENT` ← `[decoders.docx.format] document` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28)
 - `src/fux/decode/drawio.py` — `VERSION` ← `[decoders.drawio] version`, `EXTENSIONS` ← `[decoders.drawio] extensions`
 - `src/fux/decode/html.py` — `VERSION` ← `[decoders.html] version`, `EXTENSIONS` ← `[decoders.html] extensions`
 - `src/fux/decode/image.py` — `VERSION` ← `[decoders.image] version`, `EXTENSIONS` ← `[decoders.image] extensions`
@@ -769,7 +769,7 @@ this moved where they are written, not what they are.
 - `src/fux/decode/jsonl.py` — `VERSION` ← `[decoders.jsonl] version`, `EXTENSIONS` ← `[decoders.jsonl] extensions`
 - `src/fux/decode/mail.py` — `VERSION` ← `[decoders.mail] version`, `EXTENSIONS` ← `[decoders.mail] extensions`
 - `src/fux/decode/pdf.py` — `VERSION` ← `[decoders.pdf] version`, `EXTENSIONS` ← `[decoders.pdf] extensions`
-- `src/fux/decode/pptx.py` — `VERSION` ← `[decoders.pptx] version`, `EXTENSIONS` ← `[decoders.pptx] extensions`
+- `src/fux/decode/pptx.py` — `VERSION` ← `[decoders.pptx] version`, `EXTENSIONS` ← `[decoders.pptx] extensions`, `_SLIDES` ← `[decoders.pptx.format] slides`, `_NOTES` ← `[decoders.pptx.format] notes` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28)
 - `src/fux/decode/rtf.py` — `VERSION` ← `[decoders.rtf] version`, `EXTENSIONS` ← `[decoders.rtf] extensions`
 - `src/fux/decode/svg.py` — `documentation` ← `[decoders.svg] version`, `EXTENSIONS` ← `[decoders.svg] extensions`
 - `src/fux/decode/toml.py` — `VERSION` ← `[decoders.toml] version`, `EXTENSIONS` ← `[decoders.toml] extensions`

@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@ec5a8783f306, src/fux/setup.py@a41435ed30d1, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@e9806d6c1a60, src/fux/setup.py@a41435ed30d1, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: c621dff91fcc451567b23bfa5d7a866259bbc2ca2784d03664f70200acf6a3eb
+content_sha: 3a55884d1aa24272ee88be4604418a1b74cde9012ab036057eb324d226ce0d00
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -770,7 +770,7 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`
+- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`, and three file bodies from `src/fux/templates/` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28): `_GITIGNORE` ← `[templates] gitignore` (`{planes}` filled from `DERIVED` and `ACQUIRED`), `_SHIM` ← `[templates] shim`, `CACHEDIR_TAG` ← `[templates] cachedir_tag` (`{signature}` filled from `[fuxdir] cachedir_signature`)
 
 <!-- L12-VALUES-END -->
 

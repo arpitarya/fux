@@ -111,6 +111,8 @@ message is R3's presentation count, not R7.
 
 ## Where the build departed from the table — for Arpit's review
 
+> ✅ **RULED 2026-09-28 (Arpit): *"go with the recommendation"*** — the `[api]` root stays; dataclass boolean fields are not values; the 16 `for-arpit` sites as recommended in §Stage 7. Now [SR-LAW-12](../../records/0014_LAW-12-values-live-in-config.md) decision 6b, R11–R13.
+
 Each keeps today's behaviour and satisfies L12; each moves a value to a
 different home than the row proposed, because the code said something the
 scan could not see. **Say so and any of them flips back.**
@@ -186,11 +188,11 @@ Before listing, stage 7 moved what still had an obvious home:
 | enum-tag | 69 | decision 6, R1 |
 | vocabulary | 21 | decision 6, R2 |
 | message | 56 | decision 6 |
-| grammar | 27 | decision 6 |
+| grammar | 30 | decision 6 (27), decision 6b R13 (3) |
 | presentation | 45 | decision 6, R3 |
 | bootstrap | 9 | decision 6 |
 | pending-w228 | 101 | stage 5f |
-| for-arpit | 16 | open |
+| for-arpit | 0 | ~~open~~ — sorted by R13, 2026-09-28 |
 
 ⚠ **Two groups are not a permission.** `pending-w228` (101) is stage 5f:
 `src/fux/inspect/`'s numerals and defaults move once W-228 commits the files it
@@ -226,6 +228,16 @@ holds open. `for-arpit` (16) are calls no ruling covers:
 - **`sourcelist` `DIRS` / `TYPES` / `URLS`**: each list file's grammar, made of attribute names and
   their allowed values. Recommend: grammar (decision 6), unless a consumer should be able to
   add an attribute.
+
+> ✅ **BUILT 2026-09-28 (Claude Code, Opus), exactly as ruled (R13).** Thirteen sites moved and
+> three were relabelled `grammar`; `for-arpit` is now 0. The part names and signatures are in
+> `constants.toml` `[decoders.{docx,pptx,xlsx,pdf}.format]` plus `[decoders] magic_by_mime`.
+> That table is keyed by MIME because ODT has a signature and no decoder, so it has no
+> `[decoders.odt]` to live under. The five bodies are `templates/fuxdir-gitignore.txt`,
+> `cachedir-tag.txt`, `fux-shim.sh.txt` and `hooks/{preamble,post-commit,post-merge,post-checkout}.sh.txt`.
+> Each placeholder (`{planes}`, `{signature}`, `{marker}`) is filled from the key that already
+> owns it. **Byte-equal:** every body, both magic tables and the six part names were
+> snapshotted before the change and compared after it.
 
 ## How the table was built
 

@@ -10,7 +10,7 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L2, L3, L4, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 10132cdb67143ebf7bf42ec8325c25a354cb50fcadc963990c5050054176fe49
+content_sha: e2a7f1542c6fec0339a1780b8417aded85f02eb27be3ffd6791e9a5d38a95ae6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -206,7 +206,7 @@ this moved where they are written, not what they are.
 
 - `src/fux/maintain/daemon.py` — `PID_NAME` ← `[maintain] daemon_pid`, `STOP_NAME` ← `[maintain] daemon_stop`, `STATUS_NAME` ← `[maintain] daemon_status`
 - `src/fux/maintain/runner.py` — `LOCK_NAME` ← `[maintain] write_lock`, `STOP_NAME` ← `[maintain] runner_stop`, `STATUS_NAME` ← `[maintain] runner_status`, `HANDOFF_ENV` ← `[env] runner_handoff`, `NO_SPAWN_ENV` ← `[env] no_spawn`
-- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`
+- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`, and three file bodies from `src/fux/templates/` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28): `_GITIGNORE` ← `[templates] gitignore` (`{planes}` filled from `DERIVED` and `ACQUIRED`), `_SHIM` ← `[templates] shim`, `CACHEDIR_TAG` ← `[templates] cachedir_tag` (`{signature}` filled from `[fuxdir] cachedir_signature`)
 
 <!-- L12-VALUES-END -->
 

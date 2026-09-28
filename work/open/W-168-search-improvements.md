@@ -11,6 +11,32 @@ ball: agent
 
 [Verdict](../regression/2026-09-28-anchor-mined-set3/VERDICT.md). The shipped pair `anchor = 1.0` + `mined_weight = 0.5` beats mined-off 6/0 and anchor-off 7/0 at rank 1 on `set-3-claude`, with **0 losses**. All six wins over mined-off are step 4's tagged questions, which is its own 6/0 reproduced at `anchor = 1.0`. **Both steps' *combination unmeasured* warnings below are closed.** `informed`.
 
+## ✅ L11 13b LANDED · STEP 7 STOPS · STEP 8 RULED AND PRE-REGISTERED — 2026-09-28 (Claude Code, Opus)
+
+- **Order (1) done.** [L11](../../records/0013_LAW-11-sealed-answer-key.md) **13b**, `score.py` and `tests/test_golden_score_output.py` landed in one change. `facets_top5` and `facets_key` are counts per question. 13b names both door-4 routes: per-row R8 tag membership, and relevant-document narrowing against `ranked`.
+- ⏸ **Step 7 STOPS before build, key-free.** [Report](../regression/2026-09-28-mmr-trigger/report.md): on the `ip-0.1` hand-off, the swap's trigger (top 5 in one community) fires on **7 of 125** questions. Only **5** have another community in ranks 6–10.
+  - **Arpit ruled the candidate depth** in this session: *"Ranks 6–10 → STOP"*. The swap only reorders what the user already receives, so the ceiling is 5, below 6.
+  - **Cause:** 774 of 1 000 documents have no edge and are each their own community, so 81 of 125 top-5 lists already span five communities.
+  - **Reopens on** a denser graph, or option C (a similarity measure, its own key and sweep). The facet column stays for that.
+- ✅ **Step 8: compare doc filed and ruled.** [`compare/authority-prior`](../compare/authority-prior.compare.md). **Arpit, in this session:** *"Rule A3 · S2 · L1"*: authors × commits; `f = 1 − 1/(a·c)` with no extra key; two ints on `M/` from the existing `git log` walk. It was argued against SR-TUNE d15's two reasons for removing document priors.
+- ✅ **Step 8 pre-registered.** [The frozen bar](../regression/2026-09-28-authority-prior/PRE-REGISTRATION.md).
+  - **Arms:** `authority_weight ∈ {0.1, 0.2, 0.3, 0.5}` vs `0.0`, on a **re-ingested** copy of rung-01000 with the step-9 arm's tune.
+  - **Tag:** the key-free `authority_reach` tag covers **101 of 125** (pool 31; the key's pool is 8). The 12 multi-commit documents are seed documents in most top-10 lists, so **59 held rank-1 hits can only lose**, and the set-wide zero-loss clause is the real gate.
+- **Next: build step 8** (**Opus**), off at `0.0` and byte-identical there, in both readers, with the accelerator bound. Then capture the five arms on the copy. Then 🔴 Arpit scores, and a session that did not capture decides.
+- **W-228's timing** ("after steps 6–10"): only step 8 is left.
+
+## ✅ STEPS 7 AND 8 ENDPOINTS RULED — 2026-09-28 (Arpit, Cowork) · ratified, NOT built
+
+**Arpit, 2026-09-28:** step 8 — *"go with the recommendation"*; step 7 — *"Okay, go with the recommendation"*, after asking what MMR is, why it touches only position 5, and why it computes no score.
+
+- **Step 8 (authority prior):** judged at **`hit@1`, `primary@1` beside it**, as steps 1, 4 and 9 were. Pool of 8.
+- **Step 7 (MMR) — design:** the **simple swap as proposed** (top 5 all in one community → swap #5 for the best document of the next community). **Not** classic scored MMR, and **not** option C (MMR over positions 2–5 with #1 pinned). Option C is reopened only if the simple swap passes but is judged too blunt; it would then need a similarity measure, a λ key in `tune.toml` (L12) and its own sweep.
+- **Step 7 — a marker, not a score.** After a swap, #5 scores lower than the document it displaced, so the list is no longer score-sorted. The build adds a deterministic marker — `diversified: true`, the displaced document, the source community — in `ask --json`, `--why`, and the explorer's Ask tab (the W-229 parity test applies). No MMR number is invented.
+- **Step 7 — measurement: amend [L11](../../records/0013_LAW-11-sealed-answer-key.md) d13** (a new **13b**) so `score.py` also emits, **per question id, two counts only**: *facets covered in the top 5* and *facets in the key*. No facet text, no document name. Arpit's ruling is this entry; the record is amended **in the same change as `score.py` and `tests/test_golden_score_output.py`**, never before — d13's own ⚠ about prose that claims a carve-out before the code has it.
+  - ⚠ **Door 4:** a per-question *facets in the key* count is new per-row key-derived output. The 13b text must name it, as 13a named its `answerable`-per-tag route.
+- **Step 7 — early stop, pre-registered:** the first scored output's *facets in the key* column gives the number of questions with ≥ 2 facets. **The step 7 bar must state, before any row, the minimum multi-facet pool that could clear the SR-RS d19 paired floor (net 6); below it, step 7 STOPs** with no build of the swap.
+- **Order:** (1) L11 13b + `score.py` + its test — **Opus**; (2) step 8's compare doc (unchanged, agent-closable); (3) step 7 and step 8 pre-register, each its own bar. Scoring stays Arpit's hand.
+
 ## 🔴 STEPS 7 AND 8 BLOCKED ON THEIR ENDPOINTS — 2026-09-28 (Claude Code, Opus)
 
 Nothing was pre-registered. Both questions are in `work/BLOCKED.json` and the inbox.

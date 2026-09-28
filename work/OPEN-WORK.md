@@ -23,12 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-228** — when to plant family misfits in `seed/`? It rebuilds the ladder under W-168's pools. **After W-168 steps 6–10** (recommended), now, or never. [report](regression/2026-09-28-families-lens-ladder/report.md) | 2026-09-28 | 0d |
-| ↳ **blocks:** nothing else in the queue; W-228's `misfit_floor` stays PROVISIONAL. | | |
-| 🔴 **W-225** — rule L12's open calls: the `output.toml [api]` root, whether R8 reaches boolean dataclass fields, and 16 `for-arpit` sites. [compare doc](compare/l12-classify.compare.md) | 2026-09-28 | 0d |
-| ↳ **blocks:** nothing else in the queue — W-225 cannot close without it. | | |
-| 🔴 **W-168** — amend L11 d13 so `score.py` emits per-question facet-coverage counts at k = 5 for step 7 (MMR, recommended), or stop step 7? And judge step 8 (authority) at `hit@1` like steps 1, 4 and 9 (recommended)? [detail](open/W-168-search-improvements.md) | 2026-09-28 | 0d |
-| ↳ **blocks:** W-168 steps 7 and 8's pre-registrations; W-228's recommended timing waits on those steps. | | |
+
+*Empty since 2026-09-28 — W-232 decided PASS. Next decision: Arpit scores W-168 steps 7 and 8, once each is pre-registered and captured.*
 
 ---
 
@@ -36,9 +32,9 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-168** · `agent` — the ranking ideas. Step 9 shipped (`intent_weight = 0.1`); 6 and 10 stop. **Steps 7 and 8 wait on Arpit's ruling on their endpoints.** Meanwhile, step 8's compare doc can be written. [detail](open/W-168-search-improvements.md)
-- 🔴 **W-225** · `agent` — L12 migration. Stages 1–7 landed (AST veto test + allow-list). Closing needs Arpit's ruling on the open calls; stage 5f `inspect` is still to do. [detail](open/W-225-values-live-in-config.md)
-- 🔴 **W-228** · `agent` — document families. DoD 11's rung is filed: the seed has 0 misfits; title headings are out (rung-01000: 16 → 1). Waits on Arpit's timing for seed misfits. [detail](open/W-228-document-families.md)
+- 🟢 **W-168** · `agent` — the ranking ideas. Steps 6, 7 and 10 stop; 9 shipped. **Step 8 (authority prior) is ruled A3 · S2 · L1 and [pre-registered](regression/2026-09-28-authority-prior/PRE-REGISTRATION.md); the build is next. Opus.** [detail](open/W-168-search-improvements.md)
+- 🟡 **W-225** · `agent` — L12 migration: no values hidden in code. Stages 1–7 and the 16 odd sites landed. Left: stage 5f `inspect`, **waiting on W-228**, then stage 8. **Opus.** [detail](open/W-225-values-live-in-config.md)
+- 🟡 **W-228** · `agent` — document families. The lens is built; its misfit flag's threshold is still a placeholder. Arpit ruled (not built): plant known misfits in the seed once steps 7 and 8 file verdicts — waiting on W-168. [detail](open/W-228-document-families.md)
 
 
 ### testing

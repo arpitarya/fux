@@ -10,7 +10,7 @@ feature: the `CACHEDIR.TAG` file written into every derived `.fux/` subdirectory
 owns: []
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 2431c69850a8d12a947c2e34566eabaa220ca07f39f0641ce5c098a10dd925b8
+content_sha: 4003f84ac35113e5d4e2e53c107bd57631bb444b6e8f60bbf083e2c119fba073
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -94,9 +94,12 @@ every backup tool, archiver and IDE needs its own configuration line; a
 ### Decision
 
 **1. Byte-exact per the spec.** `CACHEDIR_TAG` in
-[`store/fuxdir.py`](../src/fux/store/fuxdir.py) is a fixed constant — the
+[`store/fuxdir.py`](../src/fux/store/fuxdir.py) is fixed bytes — the
 signature line plus two comment lines — with **no interpolated value of any
-kind**.
+kind**. Since 2026-09-28 the body is `src/fux/templates/cachedir-tag.txt` and
+its one placeholder is the spec's own signature, `[fuxdir] cachedir_signature`
+([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13): nothing that can
+vary by machine, run or version enters it.
 
 **2. Written once, by `derived_dir()`.** The same function that creates
 `.fux/runtime/` writes the tag immediately if it is absent, and never overwrites
@@ -136,7 +139,7 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`
+- `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`, and three file bodies from `src/fux/templates/` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28): `_GITIGNORE` ← `[templates] gitignore` (`{planes}` filled from `DERIVED` and `ACQUIRED`), `_SHIM` ← `[templates] shim`, `CACHEDIR_TAG` ← `[templates] cachedir_tag` (`{signature}` filled from `[fuxdir] cachedir_signature`)
 
 <!-- L12-VALUES-END -->
 

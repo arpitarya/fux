@@ -25,11 +25,12 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.docx", "version")
+VERSION = fixed("decoders.docx", "version")  # not bumped by W-225 R13: its OOXML part names moved to constants.toml at the same values
 
 EXTENSIONS = tuple(fixed("decoders.docx", "extensions"))
 
-_DOCUMENT = "word/document.xml"
+#: The part ECMA-376 names -- `constants.toml [decoders.docx.format]` (R13).
+_DOCUMENT = fixed("decoders.docx.format", "document")
 
 
 def decode(raw: bytes, rel_path: str) -> str | None:
