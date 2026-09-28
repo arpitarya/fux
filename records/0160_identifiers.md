@@ -10,7 +10,7 @@ feature: "identifier families — `.fux/identifiers.toml`, its matcher on both r
 owns: [.fux/identifiers.toml@b595944e4c27, node/src/query/identifiers.mjs@d9fcbed75730, node/test/identifiers.test.mjs@69bcab39922f, src/fux/identifiers_cmd.py@76f2087bb2bb, src/fux/query/identifiers.py@a1dad759d69f]
 laws: [L2, L4, L10, L12]
 timestamp: 2026-09-28T00:00:00Z
-content_sha: 3cadd4b97f4f7b8aefb27561bc03648e0744459356f979fba90c7ab5e72ddcae
+content_sha: 369a53ed4a71955ed8cdb4821d14412675afd680fc9200839e738f19ddbbe666
 ratifies: "W-233 — Arpit, 2026-09-28 (Cowork), F1–F5: a verb writes [detected]; refresh on demand with a doctor warning; templates by default and a guarded regex in [user] only; the whole form unstemmed plus its parts; [detected] applies once written and [user] overrides it"
 ---
 
@@ -18,11 +18,11 @@ ratifies: "W-233 — Arpit, 2026-09-28 (Cowork), F1–F5: a verb writes [detecte
 
 **Owns** — the components this record decides:
 
-- `.fux/identifiers.toml` · file
-- `node/src/query/identifiers.mjs` · file
-- `node/test/identifiers.test.mjs` · file
-- `src/fux/identifiers_cmd.py` · file
-- `src/fux/query/identifiers.py` · file
+- [`.fux/identifiers.toml`](../.fux/identifiers.toml) · file
+- [`node/src/query/identifiers.mjs`](../node/src/query/identifiers.mjs) · file
+- [`node/test/identifiers.test.mjs`](../node/test/identifiers.test.mjs) · file
+- [`src/fux/identifiers_cmd.py`](../src/fux/identifiers_cmd.py) · file
+- [`src/fux/query/identifiers.py`](../src/fux/query/identifiers.py) · file
 
 <!-- COMPONENTS-END -->
 
