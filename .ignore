@@ -1,0 +1,3 @@
+# Read by rg/ag/fd, not by grep or find. A convenience, never the guard:
+# .claude/hooks/guard-golden-traversal.sh is the guard, and L11 decision 9 is the rule.
+work/golden/

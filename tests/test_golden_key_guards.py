@@ -174,16 +174,26 @@ LEGACY = "work/golden/golden-answer"
 # --- the two hooks ----------------------------------------------------------
 
 
+def hook_argv(hook: Path) -> list[str]:
+    """How a guard is launched: BY PATH, as Claude Code launches it (W-230).
+
+    🔴 **On posix, never through `bash <hook>`.** From W-223 until W-230 the
+    traversal guard was committed `100644`; Claude Code could not launch it, a
+    hook that fails to launch is a non-blocking error, and every live command
+    ran unguarded — while this suite, feeding it to `bash`, stayed green.
+    ⚠ **Windows is the one exception**: it does not honour the
+    `#!/usr/bin/env bash` shebang, so a bare path raises `WinError 193`; there
+    the guard goes through the PROBED `bash` (see `_usable_bash`, where the
+    shell that answers on a Windows runner exits 1 without running anything),
+    and the mode git carries is asserted separately.
+    """
+    return [BASH, str(hook)] if os.name == "nt" else [str(hook)]
+
+
 def run_hook(hook: Path, payload: dict) -> int:
     """Feed one PreToolUse payload to a guard. Returns its exit code (2 = deny)."""
-    # 🔴 Through a PROBED `bash`, never as a bare path. Each guard carries a
-    # `#!/usr/bin/env bash` shebang, which Windows does not honour: there a
-    # bare `[str(hook)]` raises `WinError 193` before the guard runs at all.
-    # Naming `bash` was the first fix and was not enough — see `_usable_bash`,
-    # where the shell that answers on a Windows runner exits 1 without running
-    # anything, which every assertion here then reads as an ALLOW.
     proc = subprocess.run(
-        [BASH, str(hook)],
+        hook_argv(hook),
         input=json.dumps(payload),
         capture_output=True,
         text=True,

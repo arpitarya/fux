@@ -5,12 +5,12 @@ name: SR-WORK-GOLDEN
 title: "SR-WORK-GOLDEN (0066) — the two golden question sets, the key's custody, and what Claude may read instead"
 description: "The prohibition is law L11 and this record states none of it; what it holds is the process around it — the three question sets, Arpit's custody of every answer half, the one permitted key directory and the guards that defend it, the SWITCH that opens and closes it (`just golden-unlock` / `golden-lock` / `golden-retire`, mechanics in decision 15; the paste route retired 2026-09-21), what Claude may read, and the bind that keeps CLAUDE.md's view legal."
 status: accepted
-date: 2026-09-18
+date: 2026-09-28
 feature: the golden benchmark — its two question sets, the key's custody, its guards, what Claude may read, and where the prohibition is stated
-owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, .claude/hooks/guard-sealed-key.sh@0d4dd725e7aa, tests/test_golden_key_guards.py@fb4cf92458d6, tests/test_settings_never_committed_unlocked.py@55e95884f883, tests/test_golden_hook_prose.py@40d1405ecad6, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@18c50227ff2f]
+owns: [.claude/hooks/guard-golden-answer.sh@c505d04c0628, .claude/hooks/guard-sealed-key.sh@0d4dd725e7aa, tests/test_golden_key_guards.py@7a29da8b2509, tests/test_settings_never_committed_unlocked.py@55e95884f883, tests/test_golden_hook_prose.py@40d1405ecad6, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@18c50227ff2f]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: 7a299905f455dc9b33d26ded1aac2174600e286f16cc26f079c8fb758e06e8af
+content_sha: 18470913764379fc4c6f238d5bc11b9d6f36f01707ae380a9480706c6db7ffec
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -240,7 +240,8 @@ is the surrounding process:
   part of the rule. ⚠ **Partly guarded since 2026-09-27** (W-223):
   `guard-golden-traversal.sh` refuses a shell walk whose root can reach the tree
   and that has no golden exclusion; a program that walks on its own is still
-  prose. **A paste**: an answer put into a Claude session's context by
+  prose. ⚠ **It never fired live until 2026-09-28** (W-230): it was committed
+  `100644`, and a hook that cannot launch does not block. **A paste**: an answer put into a Claude session's context by
   any hand is a leak to declare, never a permission that arrived by another door.
   And **a Cowork session's mount**, which reaches the directory with a plain
   shell call that no deny rule and no hook sees — **accepted, not closed.**

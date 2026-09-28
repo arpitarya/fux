@@ -35,6 +35,23 @@
 # Tokens are split on whitespace, so a quoted pattern with spaces can be read
 # as a root; the error is toward DENY, which costs one exclusion flag.
 #
+# 🔴 **Hardened by W-227** (ruled by Arpit 2026-09-27, *"go with the
+# recommendation"*). On 2026-09-27 a multi-line command whose LAST line was
+# `grep -rn … work … | grep -v "^work/golden"` ran in a live session. Replayed
+# through this hook on stdin afterwards, byte for byte, it is DENIED — so the
+# route was not the parser as written, and the live cause is not reproduced.
+# What W-227 closes is every way this file could ALLOW without deciding:
+#   - **Any failure denies.** awk exiting anything but 0 (a runtime error, a
+#     killed process) used to fall through to `exit 0`. Only a clean 0 allows.
+#   - **A payload jq cannot parse is denied outright.** It used to be scanned as
+#     raw text, where one JSON line of `\"`-escaped quotes reads as a single
+#     quoted string and hides every command inside it.
+#   - **Heredoc bodies are sorted by what they feed.** A body fed to a shell
+#     (bash, sh, zsh, eval, ssh, xargs …) is checked line by line as commands;
+#     a body fed to anything else (`python3 - <<'EOF'`, `cat <<EOF`) is data and
+#     no longer parsed as shell — so a Python line mentioning `find` cannot trip
+#     it, and the command AFTER the terminator is still checked.
+#
 # THIS HOOK IS NOT THE RULE — L11 is (records/0012_LAW-11-sealed-answer-key.md);
 # the guard list is records/0066_WORK-golden.md. Deregistered by
 # `just golden-unlock` and restored by `just golden-lock` with the other two.
@@ -43,6 +60,7 @@ set -uo pipefail
 INPUT=$(cat)
 
 deny() {
+  [ -n "${1:-}" ] && { echo "$1" >&2; exit 2; }
   echo "BLOCKED by LAW L11 (W-223 guard): this recursive walk can reach work/golden/, where the sealed answer key lives, and it carries no exclusion. Filtering the OUTPUT (grep -v) is not enough — the walk itself reads the files. Add an exclusion to the command: grep -r … --exclude-dir=golden · rg … -g '!work/golden/**' · find … -path ./work/golden -prune -o … · fd … -E golden — or start the walk below a directory that cannot contain the tree (src/, records/, work/open/). See records/0012_LAW-11-sealed-answer-key.md decision 9." >&2
   exit 2
 }
@@ -52,8 +70,9 @@ if printf '%s' "$INPUT" | jq -e . >/dev/null 2>&1; then
   CMD=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // ""')
   CWD=$(printf '%s' "$INPUT" | jq -r '.cwd // ""')
 else
-  CMD=$INPUT
-  CWD=""
+  # W-227: fail CLOSED. A raw-text scan of a JSON payload reads it as one quoted
+  # string, so it could never have found the walk it was there to find.
+  deny "BLOCKED by LAW L11 (W-227 guard): the hook could not parse this tool call, and a guard that cannot read a command does not allow it. See records/0012_LAW-11-sealed-answer-key.md decision 9."
 fi
 PROJ=${CLAUDE_PROJECT_DIR:-}
 [ -n "$CWD" ] || CWD=$(pwd)
@@ -104,7 +123,7 @@ function neutral(line,   out, i, ch, q) {
     ch = substr(line, i, 1)
     if (q != "") {
       if (ch == q) { q = ""; continue }
-      if (ch ~ /[ \t;|&()`]/) ch = "_"
+      if (ch ~ /[ \t;|&()`<]/) ch = "_"
       out = out ch; continue
     }
     if (ch == "\"" || ch == "'"'"'") { q = ch; continue }
@@ -152,8 +171,37 @@ function check(seg,   n, tok, i, b, cmd, k, rec, isfind, pat_skipped, has_e, roo
   if (roots == 0) risky = cwd_risky()
   return risky
 }
+# W-227 — heredocs. `feeds_shell` is the base name of the command the heredoc
+# is attached to: a shell runs its body, anything else reads it as data.
+function feeds_shell(pre,   n, parts, w, i, b) {
+  gsub(/&&|\|\||[;|&(]/, "\n", pre)
+  n = split(pre, parts, "\n"); pre = parts[n]
+  n = split(pre, w, /[ \t]+/)
+  for (i = 1; i <= n; i++) {
+    if (w[i] == "" || w[i] ~ /^[A-Za-z_][A-Za-z0-9_]*=/ || w[i] ~ /^(sudo|env|command|exec|nohup|time)$/) continue
+    b = base(w[i])
+    return (b ~ /^(sh|bash|zsh|dash|ksh|fish|eval|source|\.|xargs|ssh|parallel)$/)
+  }
+  return 1                                          # nothing named it: treat as a shell, fail closed
+}
 {
-  line = neutral($0)
+  raw = $0
+  if (in_doc) {
+    t = raw
+    if (doc_tabs) sub(/^\t+/, "", t)
+    if (t == doc_term) { in_doc = 0; next }
+    if (!doc_shell) next                             # data, not commands
+  }
+  # Matched on the NEUTRAL line (W-230): a `<<EOF` inside quotes is text to bash,
+  # and read raw it would make every later line look like a data body.
+  line = neutral(raw)
+  if (!in_doc && match(line, /<<-?[ \t]*[A-Za-z_][A-Za-z0-9_]*/) && substr(line, RSTART - 1, 1) != "<" && substr(line, RSTART + 2, 1) != "<") {
+    marker = substr(line, RSTART, RLENGTH)
+    doc_tabs = (substr(marker, 3, 1) == "-")
+    doc_term = marker; sub(/^<<-?[ \t]*/, "", doc_term)
+    doc_shell = feeds_shell(substr(line, 1, RSTART - 1))
+    in_doc = 1
+  }
   gsub(/\\[()]/, " ", line)                         # the find grouping, escaped parens, is not a subshell
   gsub(/\$\(/, ";", line); gsub(/`/, ";", line)
   gsub(/&&|\|\||[;|&()]/, "\n", line)
@@ -163,5 +211,7 @@ function check(seg,   n, tok, i, b, cmd, k, rec, isfind, pat_skipped, has_e, roo
 END { exit hit ? 3 : 0 }
 '
 rc=$?
-[ "$rc" -eq 3 ] && deny
+# W-227: only a clean 0 allows. 3 is a found walk; anything else — an awk error,
+# a signal — is a hook that did not decide, and that is a deny.
+[ "$rc" -eq 0 ] || deny
 exit 0

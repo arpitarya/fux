@@ -5,7 +5,7 @@ name: SR-LAW-11
 title: "SR-LAW-11 (0012) — L11 — the golden answer key is Arpit's custody, and no agent may read one"
 description: "Every answer set — Claude's set 2 and set 3, Codex's set 1 — is Arpit's custody. Since 2026-09-18 a key MAY exist at one address, `work/golden/golden-answers/`, gitignored and closed to every agent on both spellings; the one route an answer travels is Arpit pasting it into a chat, and that route is Codex's alone. Claude is closed on every route, a paste included, with two carve-outs: authoring an agent-authored set, per set; and, since 2026-09-21, a named scoring program Arpit runs from his own shell, which no agent invokes and for which no guard moves. A breach does not fail loudly because a contaminated benchmark number looks exactly like a clean one."
 status: accepted
-date: 2026-09-21
+date: 2026-09-28
 feature: the golden answer key as a law — custody, the numbered sets, the one route an answer travels, the per-set authoring carve-out, and the scoring-program carve-out
 owns: [tools/golden-switch@706971ccc4dd, tools/golden-score@cafee104e53f, tests/test_golden_score_output.py@6d8a58dfdc05]
 laws: [L11]
@@ -464,6 +464,18 @@ whose root can reach `work/golden/` and that carries no golden exclusion is
 refused. The exclusion stays part of the law. The guard is a guard, not the
 rule, and a walk the shell cannot see (a program that walks on its own, a path
 built at runtime) is still covered by this decision alone.
+**Since 2026-09-28 (Arpit, W-227 and W-230: *"go with the recommendation"*)
+the guard fails closed, and it can run.** It checks every line and segment,
+reads a heredoc body as commands only when a shell is fed it, and denies any
+payload it cannot parse and any exit it did not decide. ⚠ **From W-223 until
+W-230 it did not fire live at all.** It was committed `100644`, a hook that
+cannot launch does not block, and two walks over `work/` ran (W-227, W-230)
+while every offline replay denied them.
+`tests/test_hooks_launchable.py` now requires every registered hook to be
+`100755`, and the hook tests launch hooks by path. **The route is partly
+closed, not closed**: a walk that a program does on its own is still this
+decision alone. A root `.ignore` names `work/golden/` for `rg`; it is a
+convenience, never the guard.
 
 **10. Declaring a leak is mandatory and comes before anything else.** If an
 answer reaches the context by any route — a paste, a tool result, a stray grep, a

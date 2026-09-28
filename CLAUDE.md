@@ -511,7 +511,8 @@ is the surrounding process:
   part of the rule. ⚠ **Partly guarded since 2026-09-27** (W-223):
   `guard-golden-traversal.sh` refuses a shell walk whose root can reach the tree
   and that has no golden exclusion; a program that walks on its own is still
-  prose. **A paste**: an answer put into a Claude session's context by
+  prose. ⚠ **It never fired live until 2026-09-28** (W-230): it was committed
+  `100644`, and a hook that cannot launch does not block. **A paste**: an answer put into a Claude session's context by
   any hand is a leak to declare, never a permission that arrived by another door.
   And **a Cowork session's mount**, which reaches the directory with a plain
   shell call that no deny rule and no hook sees — **accepted, not closed.**

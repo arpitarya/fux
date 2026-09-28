@@ -26,7 +26,7 @@ import subprocess
 
 import pytest
 
-from test_golden_key_guards import BASH, ROOT, SETTINGS  # noqa: F401 — the probe's skip propagates
+from test_golden_key_guards import BASH, ROOT, SETTINGS, hook_argv  # noqa: F401 — the probe's skip propagates
 
 HOOK = ROOT / ".claude" / "hooks" / "guard-golden-traversal.sh"
 
@@ -35,7 +35,7 @@ def run(command: str, cwd_rel: str = "") -> int:
     cwd = ROOT / cwd_rel if cwd_rel else ROOT
     payload = {"tool_name": "Bash", "tool_input": {"command": command}, "cwd": str(cwd)}
     proc = subprocess.run(
-        [BASH, str(HOOK)],
+        hook_argv(HOOK),
         input=json.dumps(payload),
         capture_output=True,
         text=True,
@@ -62,6 +62,19 @@ DENIED = [
     ("grep -rn foo ..", "src"),
     ("cd work && grep -r x ../", ""),
     ("echo $(grep -r x .)", ""),
+    # W-227 — the 2026-09-27 shape: a data heredoc, then the walk on a later line.
+    (
+        "cd /tmp && git mv a b && python3 - <<'EOF'\nimport os\nprint(os.getcwd())\nEOF\n"
+        "grep -n foo work/OPEN-WORK.md\n"
+        'grep -rn "open/W-226" work records docs src CLAUDE.md 2>/dev/null | grep -v "^work/golden"',
+        "",
+    ),
+    # W-230 — a heredoc ended early by a body line that is exactly its terminator.
+    ("cat >> t.py <<'EOF'\nx = '''\nEOF\ngrep -rn probe work\n'''\nEOF", ""),
+    # W-230 — a `<<EOF` inside quotes is text, and must not hide the next line.
+    ('echo "x <<EOF"\ngrep -rn probe work', ""),
+    ("bash <<'EOF'\ngrep -rn x work\nEOF", ""),  # a body fed to a shell is commands
+    ("false && grep -rn probe work", ""),  # the W-230 live probe
 ]
 
 ALLOWED = [
@@ -85,6 +98,8 @@ ALLOWED = [
     ("grep -rn -A 3 foo records 2>/dev/null | head", ""),
     ('echo "use grep -r . to search"', ""),
     ("uv run pytest -q tests", ""),
+    ("grep -rn foo work --exclude-dir=golden", ""),
+    ("python3 - <<'EOF'\n# find . ; grep -r x .\nprint(1)\nEOF", ""),  # a data body is not shell
 ]
 
 
@@ -102,13 +117,13 @@ def test_ordinary_reading_is_not_blocked(command, cwd):
 
 
 def test_it_fails_closed_on_a_payload_it_cannot_parse():
-    proc = subprocess.run([BASH, str(HOOK)], input="not json grep -r x .", capture_output=True, text=True, cwd=ROOT)
+    proc = subprocess.run(hook_argv(HOOK), input="not json grep -r x .", capture_output=True, text=True, cwd=ROOT)
     assert proc.returncode == 2
 
 
 def test_a_non_shell_tool_is_not_its_business():
     payload = {"tool_name": "Read", "tool_input": {"file_path": "README.md"}}
-    proc = subprocess.run([BASH, str(HOOK)], input=json.dumps(payload), capture_output=True, text=True, cwd=ROOT)
+    proc = subprocess.run(hook_argv(HOOK), input=json.dumps(payload), capture_output=True, text=True, cwd=ROOT)
     assert proc.returncode == 0
 
 
