@@ -33,7 +33,7 @@ play: the worklog is the granular, per-exchange trail.
   - `c4b2ed2c`: the CHANGELOG's 3.0 migration lines for stages 5–7.
   - Filed a Blocked-on-Arpit row for W-225's open calls.
 - **Decided / open:**
-  - The allow-list holds 373 decision-6 sites across 8 categories. Two groups are not a permission:
+  - The allow-list holds 356 decision-6 sites across 8 categories. Two groups are not a permission:
     - `pending-w228` (101): `src/fux/inspect/`, stage 5f, after W-228 commits;
     - `for-arpit` (16): OOXML part names, magic bytes, generated file bodies, the list grammars. The compare doc recommends a disposition for each.
   - Committed from a scratch worktree by blob again, so the other session's uncommitted W-228, W-233 and W-234 edits stayed out.
