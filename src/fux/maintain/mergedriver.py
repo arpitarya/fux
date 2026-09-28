@@ -172,7 +172,7 @@ def _conflict_text(ours: str, theirs: str, ids: list[str]) -> str:
 
 #: The committed register's filename, so the driver can recognise it without
 #: importing the ingest plane (this module is a console script and stays thin).
-_REGISTER_NAME = "REGISTER"
+_REGISTER_NAME = fixed("register", "file")
 
 
 def _merge_register(ours: str, theirs: str) -> str:

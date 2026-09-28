@@ -80,7 +80,7 @@ class Row:
 
 
 def path_for(root: Path) -> Path:
-    return root / ".fux" / "index" / NAME
+    return root / fixed("index", "dir") / NAME
 
 
 def render(rows: list[Row]) -> str:

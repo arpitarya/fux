@@ -7,10 +7,10 @@ description: "The refer plane's caching, carved out of SR-REFER. ARC is keyed by
 status: accepted
 date: 2026-08-21
 feature: the refer plane's two caches, and the wall between them
-owns: [src/fux/refer/arc.py@838fb07d8fc5, src/fux/refer/fetchcache.py@de1ecde351de]
+owns: [src/fux/refer/arc.py@838fb07d8fc5, src/fux/refer/fetchcache.py@0946b328bf10]
 laws: [L2, L3, L4, ex-L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 1aecc9a5b58a282b1d278a67b7891d5c2966ab67fc5dde1bba9211c733c156e5
+content_sha: c8936c6a958309f84da4c396b3605dfd9be45396d906c30954a0400d9a928ba3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -254,6 +254,8 @@ this moved where they are written, not what they are.
 **A cache entry's file name is `constants.toml [refer] cache_key_hex` hex digits of the loc's sha256** (32), and the ARC ghost lists hold `max_bytes // [refer] arc_ghost_bytes` keys (64). Both are fixed: a changed key width orphans every cached file. The TTL and size tunables are stage 5e's. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 **`FetchCache` takes `max_bytes` from its caller**, which reads `fux.toml [refer] fetch_cache_max_bytes` ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). `DEFAULT_TTL_SECONDS` is deleted: the TTL arrives per call as `--cache-ttl` and 0 (off) is its only default; 300 s stays the recommendation, never a fallback ([L12](0014_LAW-12-values-live-in-config.md) decision 9a).
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

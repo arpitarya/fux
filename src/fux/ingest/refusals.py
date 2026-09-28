@@ -213,7 +213,7 @@ def rules_path(root: Path) -> Path:
     are relocatable either. A knob here would buy nothing and cost a key in
     `fux.toml` that every reader has to learn.
     """
-    return root / ".fux" / RULES_NAME
+    return root / fixed("fuxdir", "dir") / RULES_NAME
 
 
 def load(root: Path) -> RuleSet:

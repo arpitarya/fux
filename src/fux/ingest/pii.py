@@ -265,7 +265,7 @@ def rules_path(root: Path) -> Path:
     Beside `.fuxignore`, `tune.toml`, `output.toml` and `refusals.toml`, none
     of which are relocatable either.
     """
-    return root / ".fux" / RULES_NAME
+    return root / fixed("fuxdir", "dir") / RULES_NAME
 
 
 def require(root: Path) -> Path:

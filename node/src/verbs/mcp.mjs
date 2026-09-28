@@ -34,6 +34,7 @@ import { fixed } from "../config/constants.mjs";
 const JSON_INDENT = fixed("json", "indent");
 
 /** JSON-RPC 2.0's reserved error codes and the MCP score resolution. */
+const JSONRPC = fixed("mcp", "jsonrpc");
 const PARSE_ERROR = fixed("mcp", "parse_error");
 const INVALID_PARAMS = fixed("mcp", "invalid_params");
 const METHOD_NOT_FOUND = fixed("mcp", "method_not_found");
@@ -55,7 +56,8 @@ const HERE = dirname(fileURLToPath(import.meta.url));
  * an upward search would find another package's file in a monorepo.
  */
 function toolsPath() {
-  for (const candidate of [join(HERE, "mcp-tools.json"), join(HERE, "..", "..", "mcp-tools.json")]) {
+  const name = fixed("bundle", "mcp_tools");
+  for (const candidate of [join(HERE, name), join(HERE, "..", "..", name)]) {
     try {
       if (statSync(candidate).isFile()) return candidate;
     } catch {
@@ -84,8 +86,8 @@ function tools(top) {
   return JSON.parse(text);
 }
 
-const ok = (id, result) => ({ jsonrpc: "2.0", id, result });
-const err = (id, code, message) => ({ jsonrpc: "2.0", id, error: { code, message } });
+const ok = (id, result) => ({ jsonrpc: JSONRPC, id, result });
+const err = (id, code, message) => ({ jsonrpc: JSONRPC, id, error: { code, message } });
 
 /** Every committed record, keyed by id — `store.read_index`'s shape. */
 function recordsById(root) {
@@ -167,7 +169,7 @@ function fuxSearch(root, args, top, maxHeadings) {
     // NOT `score` — a related document has none, and naming the walk mass
     // `score` would make every agent that sorts on it interleave the lists.
     related: (related ?? []).map((r) => ({
-      path: r.loc, title: r.title, mass: pyRound(r.mass, 6),
+      path: r.loc, title: r.title, mass: pyRound(r.mass, SCORE_DIGITS),
       archived: r.archived, route: r.route,
     })),
     // Node has no accelerator; the scan is the only path, and saying anything

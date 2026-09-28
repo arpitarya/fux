@@ -10,7 +10,7 @@ feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted fr
 owns: []
 laws: [L4, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 1427a7aa70a002ffd0063ba3b9ca9c0f1f42dda61178e01241e3df3e6f1b843f
+content_sha: 4163e4996864aaf8d5b464103a9ab8c611120ef365ec5395417ec78ae1e7d7d4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -276,6 +276,8 @@ this moved where they are written, not what they are.
 **No dirs-list rule changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `gitdir.read_types` no longer falls back to `DEFAULT_TYPES` for an absent `formats.toml` ([SR-TYPES](0128_types-list.md) decision 14).
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

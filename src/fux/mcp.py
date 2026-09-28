@@ -34,6 +34,7 @@ _JSON_INDENT = fixed("json", "indent")
 
 #: JSON-RPC 2.0's reserved error codes and the MCP score resolution --
 #: `constants.toml [mcp]`, read by both planes.
+_JSONRPC = fixed("mcp", "jsonrpc")
 _PARSE_ERROR = fixed("mcp", "parse_error")
 _INVALID_PARAMS = fixed("mcp", "invalid_params")
 _METHOD_NOT_FOUND = fixed("mcp", "method_not_found")
@@ -448,11 +449,11 @@ def _handle(root: Path, message: dict, *, top: int, max_headings: int) -> dict |
 
 
 def _ok(msg_id, result) -> dict:
-    return {"jsonrpc": "2.0", "id": msg_id, "result": result}
+    return {"jsonrpc": _JSONRPC, "id": msg_id, "result": result}
 
 
 def _err(msg_id, code: int, message: str) -> dict:
-    return {"jsonrpc": "2.0", "id": msg_id, "error": {"code": code, "message": message}}
+    return {"jsonrpc": _JSONRPC, "id": msg_id, "error": {"code": code, "message": message}}
 
 
 def serve(stdin=None, stdout=None, root: Path | None = None, *, enabled: bool) -> int:

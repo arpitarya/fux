@@ -30,6 +30,8 @@ tf_fields        = ["body", "heading", "title", "path", "ctx"]
 # blake2b digest sizes, in bytes: the postings key, the ledger sha.
 term_hash_bytes  = 8
 content_sha_bytes = 20
+# A shard file's suffix (store/reader.py's regex spells the same).
+shard_suffix = ".jsonl"
 # Every shard file opens with one header line; records follow it.
 shard_header_lines = 1
 # How deep a committed record may nest (store/canonical.py). Deeper is refused,
@@ -222,6 +224,8 @@ data_suffixes     = [".json", ".jsonl", ".csv", ".toml", ".yaml", ".yml"]
 [fuxdir]
 dir       = ".fux"
 generated = ["README.md", ".gitignore"]
+# The generated README among them, by name.
+readme    = "README.md"
 # The CACHEDIR.TAG signature -- a spec'd byte string (bford.info/cachedir).
 cachedir_signature = "Signature: 8a477f597d28d172789f06886806bc55"
 
@@ -231,6 +235,9 @@ dir      = "node"
 entry    = "fux.mjs"
 shim     = "fux"
 sidecars = ["package.json", "mcp-tools.json", "README.md"]
+# Two of the sidecars, by name: the package manifest and the MCP tool schema.
+package   = "package.json"
+mcp_tools = "mcp-tools.json"
 # chmod bits of the generated `fux` shim: rwxr-xr-x.
 shim_mode = 0o755
 # The rule after a module's banner in the generated bundle, and after the
@@ -269,6 +276,8 @@ url_state        = "url-state.json"
 url_state_schema = "state.schema.json"
 # A remembered question is stored as this many hex digits of its sha256.
 question_key_hex = 16
+# The runtime file of per-URL content shas (maintain/urlstate.py).
+url_shas = "url-shas.json"
 # chmod bits of the runner's write lock.
 lock_mode = 0o644
 # The runner's absolute bound on consecutive passes. A bound, not a knob: it is
@@ -288,6 +297,8 @@ no_spawn       = "FUX_NO_SPAWN"
 
 [mcp]
 protocol_version = "2024-11-05"
+# The JSON-RPC version every message carries.
+jsonrpc          = "2.0"
 # JSON-RPC 2.0's reserved error codes (mcp.py, verbs/mcp.mjs).
 parse_error      = -32700
 invalid_params   = -32602
@@ -301,6 +312,8 @@ predicate_type = "https://fux.dev/receipt/v1"
 legacy_schema  = "fux.receipt.v1"
 journal        = "provenance.jsonl"
 digest_alg     = "blake2b-160"
+# The annotation key a receipt carries its citation's loc under.
+loc_annotation = "fux.dev/loc"
 
 [serve]
 # Localhost only is a law-level choice (SR-SERVE), not a knob.
@@ -536,6 +549,8 @@ args_hash_hex = 16
 [refer]
 # A fetch-cache entry's file name: this many hex digits of the loc's sha256.
 cache_key_hex = 32
+# The suffix of a fetch-cache entry's file.
+cache_suffix = ".json"
 # The ARC ghost lists are bounded at max_bytes // arc_ghost_bytes entries --
 # the bytes one remembered key is assumed to cost.
 arc_ghost_bytes = 64
@@ -587,3 +602,14 @@ reference = ['^what is\b', '^what does\b.*\bmean\b', "^what'?s the\\b", '^define
 procedure = "procedure"
 rationale = "decision"
 reference = "reference"
+
+[analyzer]
+# The built-in stopwords (query/analyzer.*). A different list writes different
+# postings, so it moves with [index] analyzer; a repo adds its own in tune.toml.
+stopwords = [
+  "a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "from",
+  "has", "have", "how", "i", "if", "in", "into", "is", "it", "its", "of",
+  "on", "or", "that", "the", "their", "then", "there", "these", "this", "to",
+  "was", "were", "what", "when", "where", "which", "who", "why", "will",
+  "with", "you", "your", "we", "our", "not", "can", "may",
+]

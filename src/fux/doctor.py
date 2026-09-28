@@ -197,7 +197,7 @@ def _repo_root(start: Path | None) -> list[Check]:
     if root is None:
         return [Check("repo root", False, "no fux.toml or .git found above the current directory")]
     checks = [Check("repo root", True, str(root)), _config_loads(root)]
-    fux_dir = root / ".fux"
+    fux_dir = root / fixed("fuxdir", "dir")
     # 🔴 **This CREATED `.fux/` until 2026-09-12** (W-140 row 7). `doctor` is
     # read-only by contract — it is the first line of this record and of the
     # README — and a health command that materialises the directory it is
@@ -250,7 +250,7 @@ def _config_loads(root: Path) -> Check:
     from .config import load as load_config
 
     name = "fux.toml loads"
-    if not (root / "fux.toml").is_file():
+    if not (root / fixed("files", "config")).is_file():
         # `find_root` accepts a bare `.git` checkout. Nothing to load, nothing
         # to refuse — reporting a failure here would fire on every repo that
         # simply has not run `fux setup` yet.
@@ -262,7 +262,7 @@ def _config_loads(root: Path) -> Check:
         # carry an em-dash, which is why nothing here interpolates it into an
         # ASCII-by-invariant string.
         return Check(name, False, str(exc))
-    return Check(name, True, "fux.toml")
+    return Check(name, True, fixed("files", "config"))
 
 
 def _layout(root: Path) -> list[Check]:
@@ -2102,7 +2102,7 @@ def _readme_current(root: Path) -> Check:
     """
     from .store import fuxdir
 
-    path = root / ".fux" / "README.md"
+    path = root / fixed("fuxdir", "dir") / fixed("fuxdir", "readme")
     if not path.is_file():
         return Check("README.md current", True, "absent - nothing to be stale")
     builder = getattr(fuxdir, "_readme", None)
@@ -2172,7 +2172,7 @@ def _starter_refusals_untouched(root: Path) -> Check:
     """
     import hashlib
 
-    path = root / ".fux" / "refusals.toml"
+    path = root / fixed("fuxdir", "dir") / fixed("files", "refusals_name")
     if not path.is_file():
         return Check("refusal rules current", True, "`.fux/refusals.toml` absent")
     try:
@@ -2787,7 +2787,7 @@ def _node_reader(root: Path) -> Check:
         return Check("node reader", True, "absent - `fux setup` writes it", level="warn")
 
     shape = fuxdir.node_shape(directory)
-    where = f".fux/{fuxdir.NODE_DIR}/"
+    where = f"{fixed("fuxdir", "dir")}/{fuxdir.NODE_DIR}/"
     if found != __version__:
         return Check(
             "node reader",

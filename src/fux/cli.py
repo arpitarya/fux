@@ -1030,7 +1030,8 @@ PII_EXEMPT = frozenset({"setup", "tune", "output", "doctor"})
 #: `pii.rules_path()`'s location, spelled here so the gate costs a stat call and
 #: not an import of `fux.ingest` (~70 ms of decoders on every `ask` and `find`).
 #: `tests/test_cli.py` holds the two equal; the refusal's wording stays in `pii`.
-_PII_RULES = (".fux", "pii.toml")
+#: `.fux/pii.toml`, from `constants.toml [files]` -- the one home of the name.
+_PII_RULES = (fixed("fuxdir", "dir"), fixed("files", "pii_name"))
 
 
 def _require_pii_rules(command: str) -> None:

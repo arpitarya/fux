@@ -32,13 +32,14 @@ from fux.decode._limits import limit
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.html", "version")  # not bumped by W-234: law handles in comments only; W-225 5b: the charset window moved to formats.toml at the same value
+VERSION = fixed("decoders.html", "version")  # not bumped by W-234: law handles in comments only; W-225 5b: the charset window moved to formats.toml at the same value; nor 7: the h1-h6 map is derived, same output
 
 EXTENSIONS = tuple(fixed("decoders.html", "extensions"))
 
 _SKIP = {"script", "style", "head", "noscript", "template", "svg", "iframe"}
 _BLOCK_BREAK = {"p", "div", "section", "article", "main", "header", "footer", "figure"}
-_HEADINGS = {"h1": 1, "h2": 2, "h3": 3, "h4": 4, "h5": 5, "h6": 6}
+#: `<h1>`..`<h6>` -- HTML's six levels are Markdown's (`constants.toml [markdown]`).
+_HEADINGS = {f"h{level}": level for level in range(1, fixed("markdown", "max_heading") + 1)}
 
 #: `<meta charset=...>` / `<meta http-equiv=content-type ... charset=...>`.
 #: Only the first 4 KiB is searched, which is where the spec requires it and

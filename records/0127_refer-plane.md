@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@0f5f11e4caf6, tools/refer-bench@865d1234ec06, tools/refer-budget-sweep@3286249029a0, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@83d8c624f056]
+owns: [src/fux/refer@b178ed78f0e8, tools/refer-bench@865d1234ec06, tools/refer-budget-sweep@3286249029a0, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@3435e942da20]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: eb28303dab0e518a4bf96cdac72ea6d5c237cb6b57803ace7f970bf24d4d3c5d
+content_sha: 1fac533df9d9c4bf73926e9fa242af2278e4b6ca14289455e6704c3ab60d3a41
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -622,6 +622,8 @@ is now a committed fact instead of a response header.
 **The fetch cache is sized by `fux.toml [refer] fetch_cache_max_bytes`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28), which the refer plane reads and passes to `FetchCache`; it holds no default of its own ([SR-CONFIG](0113_config.md) decision 18).
 
 **`Policy.timeout_seconds` has no default** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28): the caller passes `fux.toml [refer] timeout_seconds`.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

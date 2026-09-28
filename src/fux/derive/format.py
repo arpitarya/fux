@@ -174,7 +174,7 @@ DETERMINISTIC_FILES = (DOCS_NAME, STATS_NAME, MINED_NAME, MANIFEST_NAME, fixed("
 
 
 def runtime_dir(root: Path) -> Path:
-    return root / ".fux" / RUNTIME_DIR
+    return root / fixed("fuxdir", "dir") / RUNTIME_DIR
 
 
 def postings_dir(root: Path) -> Path:

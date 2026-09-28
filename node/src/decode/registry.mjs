@@ -79,7 +79,7 @@ export function globMatch(pattern, path) {
  *  where the cost of the fallback is a conservative skip, never a wrong
  *  citation — the same tolerance Python's answer path extends. */
 export function alreadyTextGlobs(root) {
-  const path = join(root, ".fux", "formats.toml");
+  const path = join(root, fixed("files", "formats"));
   try {
     if (!statSync(path).isFile()) return PROSE_TYPES;
     const data = parseToml(readFileSync(path, "utf8"), path);

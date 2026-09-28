@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@c742770c0d4c, src/fux/setup.py@038bbd5962ff, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@dc815c472a92, src/fux/setup.py@038bbd5962ff, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: dd0e564373fcc543ab5316ca0812b1484244b92f8ed7e867a6a1c4404fc75dcf
+content_sha: 2273f1e1e88d06a1ba79b5d41adefd13b8e1618467353ccf7faedfc2ef2025e8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -927,6 +927,8 @@ line raises names the fix itself rather than pointing at the header.
 **The `fux` shim's chmod bits are `constants.toml [bundle] shim_mode`** (`0o755`), and the manifest `fux setup` writes is indented by `[json] indent`. Nothing written into `.fux/` changed. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

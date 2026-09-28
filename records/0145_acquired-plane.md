@@ -7,10 +7,10 @@ description: "Fetched source bytes are retained in .fux/acquired/, a third categ
 status: accepted
 date: 2026-09-01
 feature: the acquired plane
-owns: [src/fux/store/acquired.py@aa145d42bb5d]
+owns: [src/fux/store/acquired.py@54b4e504214f]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 34eaec8ed913c3e9c726c233a38f15ae1b9d7ec892b481e7dee34d8eece48c0a
+content_sha: 5bbeb91e7d67fe5af72b094dba57edc104cef0ccb2b60907ee1c9c70818dd07b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -317,6 +317,8 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `fux doctor`, which this record's checks run through, reads its acquired-plane warning share from `fux.toml [doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18); every threshold is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

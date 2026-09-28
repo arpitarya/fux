@@ -340,7 +340,7 @@ def observe(
     return state
 
 
-_SHAS_NAME = "url-shas.json"
+_SHAS_NAME = fixed("maintain", "url_shas")
 
 
 def _read_shas(root: Path) -> dict[str, str]:
@@ -352,7 +352,7 @@ def _read_shas(root: Path) -> dict[str, str]:
     itself.
     """
     try:
-        raw = json.loads((fuxdir.fux_dir(root) / "runtime" / _SHAS_NAME).read_text(encoding="utf-8"))
+        raw = json.loads((fuxdir.fux_dir(root) / fixed("runtime", "dir") / _SHAS_NAME).read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
     return {k: v for k, v in raw.items() if isinstance(k, str) and isinstance(v, str)} if isinstance(raw, dict) else {}

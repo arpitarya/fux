@@ -17,6 +17,7 @@ import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { readDirs } from "./sourcelist.mjs";
 import { parseToml } from "../config/toml.mjs";
+import { fixed } from "../config/constants.mjs";
 import { FuxError } from "../errors.mjs";
 
 //: What a missing key's error tells the reader to do — `config.py`'s sentence.
@@ -34,7 +35,7 @@ const FIX_HINT = "`fux doctor --fix` writes every missing key from the template 
  * unknown keys and validates every value; this reader checks only that
  * `[sources] dirs_file` is present, the one key it reads. */
 export function dirsFile(root) {
-  const path = join(root, "fux.toml");
+  const path = join(root, fixed("files", "config"));
   let isFile = false;
   try {
     isFile = statSync(path).isFile();

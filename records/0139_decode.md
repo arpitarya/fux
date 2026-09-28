@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@a00e1cf088b4, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@ef3e012bac1c, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@68625dfbd069]
+owns: [src/fux/decode@fe6f79319e48, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@eb7f2e52930c, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@6748ca720ca3]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 5a708398f017b995cd570861105b71458451dddf42bfecacef890961a2080ebb
+content_sha: 3dd42ae3747d621760d69e2f3e2f009088d7f9fcc26961b1f2ef8d06cde78076
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -802,6 +802,8 @@ changed decoder's `VERSION` line says so.
 **The Markdown grammar and the glob matcher hold no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `markdown.mjs` reads its fence and heading by named regex groups, and `registry.mjs` tests `**` with `startsWith`. Twin behaviour is unchanged.
 
 **The decoders hold no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5b, 2026-09-28). What a format fixes went to `constants.toml`: PNG/JPEG/EXIF/GIF signatures, markers and record layouts in `[decoders.image.format]` (each layout is a `struct` format, and its size is the offset the walk advances by); PDF's octal-escape width, bfrange span and code length in `[decoders.pdf.format]`; RTF's `\uN` wrap in `[decoders.rtf.format]`; the bases in `[radix]`; Markdown's six levels and a record's level in `[markdown]`; Word's style levels in `[ooxml]`. drawio's raw-deflate window is `-zlib.MAX_WBITS`, and HTML's BOM is `codecs.BOM_UTF8`. **Four scan windows are caps, not format facts, and joined `[limits]`** — the same call as the stage-4a caps: `[limits.html] charset_scan_bytes` (4096), `[limits.xml] prolog_bytes` (8192, the shared XML reader's DOCTYPE window), and `[limits.yaml] indent_step` (2) and `min_value_len` (3). They enter the extract-config digest with the rest. A decoder called with no repository bound now needs one for `html` too; every production caller already passes it. `VERSION` was not bumped, and each changed decoder's `VERSION` line says so. HEAD's and the new decoders return the same result on 17 147 inputs: every tracked file of each type, crafted files for each format, and every prefix of each crafted file.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

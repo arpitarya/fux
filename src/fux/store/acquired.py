@@ -103,7 +103,7 @@ def plane(root: Path) -> Path:
     had never opted in, and `fux doctor` would then report a directory the
     consumer never asked for. Writers call `ensure_plane`; readers do not.
     """
-    return root / ".fux" / DIR_NAME
+    return root / fixed("fuxdir", "dir") / DIR_NAME
 
 
 def ensure_plane(root: Path) -> Path:

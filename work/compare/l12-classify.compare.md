@@ -159,6 +159,74 @@ BM25F and now scores them at the repo's `[bm25f]`; and `fux enrich --check`'s
 self-retrieval filter zeroed `title`/`ctx` on the built-in weights and now does
 so on the repo's. Neither had a code default left to read.
 
+## Stage 7 — the AST test and its allow-list (2026-09-28) — for Arpit
+
+`tests/test_l12_values_live_in_config.py` is the veto check SR-LAW-12 §Veto
+condition names. It fails on a literal the scanner finds that
+`tests/l12_allow.toml` does not list, and on a listed site that no longer
+exists. A third test holds the Python and Node parses of `constants.toml` equal.
+The scanner now treats a string handed to a config reader (`fixed`, `table`,
+`limit`, …) as a key name, mechanically, which cleared 219 bindings from the list.
+
+Before listing, stage 7 moved what still had an obvious home:
+- the analyzer's built-in stopwords, which went to `[analyzer] stopwords` in both planes;
+- `.fux`, `fux.toml`, `tune.toml`, `refusals.toml`, `REGISTER`, `url-shas.json`,
+  `package.json`, `mcp-tools.json` and the shard and cache suffixes, which went to `constants.toml` keys;
+- HTML's `h1..h6` map, derived from `[markdown] max_heading`;
+- the duration units, now `timedelta` arithmetic;
+- JSON-RPC's `"2.0"`;
+- `enrich`'s scopes, which read the configured `dirs_file` instead of the template's
+  `.fux/sources/dirs` (the stage-3b doctor precedent: a behaviour change only for a
+  repo that renamed its list).
+
+| category | sites | basis |
+|---|---|---|
+| identity | 79 | decision 6 |
+| key-name | 50 | decision 6 |
+| enum-tag | 69 | decision 6, R1 |
+| vocabulary | 21 | decision 6, R2 |
+| message | 56 | decision 6 |
+| grammar | 27 | decision 6 |
+| presentation | 45 | decision 6, R3 |
+| bootstrap | 9 | decision 6 |
+| pending-w228 | 101 | stage 5f |
+| for-arpit | 16 | open |
+
+⚠ **Two groups are not a permission.** `pending-w228` (101) is stage 5f:
+`src/fux/inspect/`'s numerals and defaults move once W-228 commits the files it
+holds open. `for-arpit` (16) are calls no ruling covers:
+
+| file | site |
+|---|---|
+| `decode/docx.py` | `_DOCUMENT` |
+| `decode/pptx.py` | `_NOTES` |
+| `decode/pptx.py` | `_SLIDES` |
+| `decode/xlsx.py` | `_SHARED` |
+| `decode/xlsx.py` | `_SHEETS` |
+| `decode/xlsx.py` | `_WORKBOOK` |
+| `ingest/refusals.py` | `MAGIC` |
+| `ingest/refusals.py` | `MAGIC_BY_DECODER` |
+| `ingest/sourcelist.py` | `DIRS` |
+| `ingest/sourcelist.py` | `TYPES` |
+| `ingest/sourcelist.py` | `URLS` |
+| `maintain/hooks.py` | `HOOKS` |
+| `maintain/hooks.py` | `_PREAMBLE` |
+| `store/fuxdir.py` | `CACHEDIR_TAG` |
+| `store/fuxdir.py` | `_GITIGNORE` |
+| `store/fuxdir.py` | `_SHIM` |
+
+- **The OOXML part names** (`word/document.xml`, `ppt/slides/slide`, …) and **the magic bytes
+  by type and by decoder** (`MAGIC`, `MAGIC_BY_DECODER`) are names and bytes a *format* fixes,
+  and R7 speaks of numbers. Recommend: `fixed` → `constants.toml [decoders.*.format]`, like
+  the image signatures.
+- **Generated file bodies**: `_GITIGNORE`, `_SHIM`, `CACHEDIR_TAG`, the git `HOOKS` scripts and
+  `_PREAMBLE` are the text of files `fux setup` / `fux hooks` write. Decision 5 names
+  `src/fux/templates/` as the home of what setup writes. Recommend: move them to
+  `templates/*.txt`.
+- **`sourcelist` `DIRS` / `TYPES` / `URLS`**: each list file's grammar, made of attribute names and
+  their allowed values. Recommend: grammar (decision 6), unless a consumer should be able to
+  add an attribute.
+
 ## How the table was built
 
 The three veto commands from SR-LAW-12 §Veto condition were run verbatim on

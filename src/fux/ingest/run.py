@@ -232,7 +232,7 @@ def run(
         if config.url is None:
             raise FuxError(
                 f"a URL fetch was asked for, but there is no [sources.url] in "
-                f"{root / 'fux.toml'} to do it with. `fux setup` writes a fetcher"
+                f"{root / fixed("files", "config")} to do it with. `fux setup` writes a fetcher"
             )
         resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
         url_listed = {f"url:{entry.url}" for entry in resolved}

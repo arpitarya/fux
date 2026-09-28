@@ -471,7 +471,7 @@ def record_head(root: Path) -> int:
         # `.fux/` is fux's own output, not corpus content. Recording the index
         # it just wrote as "dirty" would make every re-index dirty the list it
         # is trying to drain, and the count would never reach zero.
-        dirty.record(root, [f"file:{p}" for p in paths if not p.startswith(".fux/")])
+        dirty.record(root, [f"file:{p}" for p in paths if not p.startswith(fixed("fuxdir", "dir") + "/")])
     return len(dirty.read(root))
 
 

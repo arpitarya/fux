@@ -221,7 +221,7 @@ def _write_gitattributes(root: Path) -> None:
     # on the register — a machine plane conflicting on the mere fact that two
     # people worked at once, which is the thing this driver exists to prevent.
     lines = [
-        f".fux/index/*.jsonl merge={MERGE_DRIVER_NAME}",
+        f"{fixed('index', 'dir')}/*{fixed('index', 'shard_suffix')} merge={MERGE_DRIVER_NAME}",
         f".fux/index/REGISTER merge={MERGE_DRIVER_NAME}",
     ]
     existing = path.read_text(encoding="utf-8") if path.exists() else ""

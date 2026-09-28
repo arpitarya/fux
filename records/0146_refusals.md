@@ -7,10 +7,10 @@ description: "A declarative refusal table, every condition pure over the respons
 status: accepted
 date: 2026-09-01
 feature: refusal detection before decode
-owns: [src/fux/ingest/refusals.py@e984db83cf94, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@5fdc90fab388]
+owns: [src/fux/ingest/refusals.py@b5eee7cf774c, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@5fdc90fab388]
 laws: [L2, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 0dd2fb650a7e24d11bd495b2ab9201e57d3290ecfc1aeaffbae3e304c3c33034
+content_sha: 183f147ddcb160193a1835bf7336223b169cf18e5e4fa2625362ef1b9c9d6ea7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -471,6 +471,8 @@ the rules carrying the two bounds — so every caller that iterates is unchanged
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

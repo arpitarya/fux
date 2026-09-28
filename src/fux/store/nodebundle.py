@@ -333,10 +333,10 @@ def version(node_dir: Path) -> str:
     Read from `package.json`, which is the file npm reads too, so the bundle
     cannot be a fifth version site (`scripts/check-version-parity.py`).
     """
-    meta = json.loads((node_dir / "package.json").read_text(encoding="utf-8"))
+    meta = json.loads((node_dir / fixed("bundle", "package")).read_text(encoding="utf-8"))
     got = meta.get("version")
     if not isinstance(got, str) or not got:
-        raise FuxError(f"{node_dir / 'package.json'} carries no version string")
+        raise FuxError(f"{node_dir / fixed("bundle", "package")} carries no version string")
     return got
 
 

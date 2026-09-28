@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 1fc7cf871d9dee36647aaa47ed2b8bc264c6fd9a63028f0dfc3b24b2c2b9227d
+content_sha: 511f4f9cd5c443353d56ef567bec3c8de2afe3c200a03c4e273df9800b726789
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -574,6 +574,8 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `fux doctor`, which this record's checks run through, reads its acquired-plane warning share from `fux.toml [doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18); every threshold is unchanged.
 
 **`Policy.timeout_seconds` has no default** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28): it is `fux.toml [refer] timeout_seconds`, passed by `fux answer`.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

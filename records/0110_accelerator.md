@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@f47daddd88a5, tools/differential@46e35c2929fe, src/fux/schemas/runtime.schema.json@f83e87676ef8]
+owns: [src/fux/derive@f635622fc903, tools/differential@46e35c2929fe, src/fux/schemas/runtime.schema.json@f83e87676ef8]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 1d86e10bfe06ef7d6465480449bd469ad9be9485216c0d01a4ce64c2392c6057
+content_sha: f59eecdc20b7457e2e60b8b427b11df9e9232644e8edcd6902e936d2956b176e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -659,6 +659,8 @@ payloads at every arm weight in `tests/query/test_mined.py`.
 **The offset-table entry is built from the index's own constants**: one `mx`/`mnw` slot per `[index] tf_fields` entry and a key `[index] term_hash_bytes` wide, so the struct layout (`<8sHQI5H5IIIH`) is derived rather than spelled. The u16 and u32 ceilings are `ctypes`' own, the lookup is `bisect_left`, and the bound compares at `[ranking] score_digits`. The runtime schema did not move: every byte of the table is unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

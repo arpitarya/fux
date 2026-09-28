@@ -14,6 +14,7 @@
  */
 
 import { stem } from "./stem.mjs";
+import { fixed } from "../config/constants.mjs";
 
 /** Matched against the ORIGINAL text, not a lowercased copy.
  *
@@ -37,11 +38,8 @@ const WORD_RE = /[A-Za-z0-9_]+(?:[-./][A-Za-z0-9_]+)*/g;
  *  the WHOLE, and that is the whole of family (a). */
 const BOUNDARY_RE = /[_\-./]+|(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/;
 
-const STOPWORDS = new Set(
-  `a an and are as at be but by for from has have how i if in into is it its
-   of on or that the their then there these this to was were what when where
-   which who why will with you your we our not can may`.split(/\s+/),
-);
+//: `constants.toml [analyzer] stopwords` — the Python twin reads the same key.
+const STOPWORDS = new Set(fixed("analyzer", "stopwords"));
 
 /** The parts of one raw token, or `[]` when there is no boundary in it. */
 export function splitIdentifier(raw) {

@@ -56,6 +56,7 @@ from ..constants import fixed
 __all__ = ["FetchCache", "CacheEntry", "CACHE_DIR"]
 
 CACHE_DIR = fixed("runtime", "fetch_cache_dir")
+_SUFFIX = fixed("refer", "cache_suffix")
 
 #: The TTL arrives per call as `--cache-ttl` (`Policy.cache_ttl_seconds`, 0 =
 #: off); Arpit's 300 s of 2026-08-20 is the documented recommendation, never a
@@ -95,7 +96,7 @@ class FetchCache:
     def _path(self, loc: str) -> Path:
         # Hashed filename: a `loc` is a URL and contains `/`, `?` and `:`.
         digest = hashlib.sha256(loc.encode("utf-8")).hexdigest()[: fixed("refer", "cache_key_hex")]
-        return self.directory / f"{digest}.json"
+        return self.directory / f"{digest}{_SUFFIX}"
 
     def now(self) -> int:
         return int(self._clock())
@@ -160,7 +161,7 @@ class FetchCache:
         caller, so its current size is freed without deleting the file out
         from under the write that follows.
         """
-        sizes = {p: p.stat().st_size for p in self.directory.glob("*.json")}
+        sizes = {p: p.stat().st_size for p in self.directory.glob("*" + _SUFFIX)}
         total = sum(sizes.values()) - sizes.get(keep, 0)
         if total + incoming <= self.max_bytes:
             return
@@ -178,5 +179,5 @@ class FetchCache:
             path.unlink(missing_ok=True)
 
     def clear(self) -> None:
-        for path in self.directory.glob("*.json"):
+        for path in self.directory.glob("*" + _SUFFIX):
             path.unlink(missing_ok=True)

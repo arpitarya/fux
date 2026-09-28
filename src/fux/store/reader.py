@@ -30,7 +30,8 @@ def iter_shard_paths(root: Path) -> list[Path]:
     directory = index_dir(root)
     if not directory.is_dir():
         return []
-    return sorted(p for p in directory.glob("*.jsonl") if _SHARD_NAME_RE.fullmatch(p.name))
+    # The regex is the whole shard-name grammar, suffix included.
+    return sorted(p for p in directory.iterdir() if p.is_file() and _SHARD_NAME_RE.fullmatch(p.name))
 
 
 def raw_record_lines(path: Path) -> tuple[dict, list[bytes]]:

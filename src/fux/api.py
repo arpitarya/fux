@@ -59,6 +59,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
+from .constants import fixed
 from .errors import FuxError
 
 __all__ = ["Index", "Result", "AskAnswer", "Answer", "open"]
@@ -67,7 +68,8 @@ __all__ = ["Index", "Result", "AskAnswer", "Answer", "open"]
 #: not an import of `fux.ingest`. **This is the second copy of the path in the
 #: tree** and `tests/test_cli.py` holds all of them equal — the refusal's
 #: wording stays in `pii`, which is the part that must not be duplicated.
-_PII_RULES = (".fux", "pii.toml")
+#: `.fux/pii.toml`, from `constants.toml [files]` -- the one home of the name.
+_PII_RULES = (fixed("fuxdir", "dir"), fixed("files", "pii_name"))
 
 
 class _Args(SimpleNamespace):

@@ -64,10 +64,12 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from datetime import timedelta
 from functools import lru_cache
 from pathlib import Path, PurePosixPath
 from typing import Callable
 
+from ..constants import fixed
 from ..errors import FuxError
 
 
@@ -236,7 +238,12 @@ def _type_reason(entry: str) -> str | None:
 #: and unreadable at a glance; named tiers (`daily`, `hourly`) would have been
 #: readable and ambiguous -- is `daily` a rolling 24h or midnight? A suffixed
 #: integer is both, and it is the same shape `acquired_max_bytes` reads.
-_DURATION_UNITS = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+#: Each unit letter names a `timedelta` field; its length in seconds is the
+#: standard library's arithmetic, not a number held here.
+_DURATION_UNITS = {
+    letter: int(timedelta(**{field: 1}).total_seconds())
+    for letter, field in {"s": "seconds", "m": "minutes", "h": "hours", "d": "days"}.items()
+}
 
 _TTL_HELP = (
     "must be 0 (always re-fetch) or <number><unit> where unit is "

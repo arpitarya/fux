@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@009a3556007b, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@8cbbf1d64cd2, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 489271ba32c7a9c79d8dcda2947c7139f9b8e375dd90b4c281bbf7b9b4409a73
+content_sha: 749e15a350d94868842675fdc416214ad14018d1e2e6426dcb640139e236e356
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -455,6 +455,8 @@ this moved where they are written, not what they are.
 **The url-extraction-depth row warns at `fux.toml [doctor] thin_url_share` and `thin_url_chars`**, and the url-sources row names a URL at `[sources.url] failing_streak` ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) ([SR-CONFIG](0113_config.md) decision 18). ⚠ `AS_INGESTED_VETO_SHARE` is not a doctor knob — it is SR-ACQUIRED's and SR-URL-FRESHNESS's reopen condition — so it is `constants.toml [doctor] as_ingested_veto_share`.
 
 **The acquired-plane row warns at `fux.toml [doctor] acquired_warn_share`** (0.8 of `acquired_max_bytes`), and the shim check reads `constants.toml [bundle] shim_sniff_chars` of a launcher ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28; [SR-CONFIG](0113_config.md) decision 18). Every *first N, then (+M more)* cut in a row's detail stays: it is R3's presentation count.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

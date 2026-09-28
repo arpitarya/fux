@@ -76,11 +76,36 @@ def _is_number(node: ast.AST) -> bool:
     )
 
 
+#: The config readers. A string passed to one is a KEY NAME -- `fixed("index",
+#: "shards")` names a value, it does not hold one -- which decision 6 exempts.
+#: Mechanical, so it is here rather than in the allow-list (W-225 stage 7).
+CONFIG_READERS = frozenset({
+    "fixed", "table", "limit", "_Cap", "resolve", "resolve_api", "resolve_mcp", "resolve_json",
+})
+
+
+def _reader_args(node: ast.AST) -> set[int]:
+    """`id()`s of the string constants passed to a config reader under `node`."""
+    out: set[int] = set()
+    for sub in ast.walk(node):
+        if not isinstance(sub, ast.Call):
+            continue
+        f = sub.func
+        name = f.attr if isinstance(f, ast.Attribute) else getattr(f, "id", None)
+        if name in CONFIG_READERS:
+            for arg in [*sub.args, *(k.value for k in sub.keywords)]:
+                if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                    out.add(id(arg))
+    return out
+
+
 def _holds_literal(node: ast.AST) -> bool:
-    """True when `node` contains a number, string or bytes literal."""
+    """True when `node` contains a number, string or bytes literal that is not a
+    key name handed to a config reader."""
+    keys = _reader_args(node)
     for sub in ast.walk(node):
         if isinstance(sub, ast.Constant) and isinstance(sub.value, (int, float, str, bytes)):
-            if isinstance(sub.value, bool):
+            if isinstance(sub.value, bool) or id(sub) in keys:
                 continue
             return True
     return False
@@ -378,6 +403,7 @@ def scan_node(path: Path) -> list[Site]:
     in_params = 0  # paren depth at which a parameter list opened, 0 when not
     param_owner = ""
     recorded: set[str] = set()  # one `module` site per const, like Python's one per statement
+    reader_level = None  # paren depth inside a config reader's argument list
     for idx, t in enumerate(toks):
         prev = toks[idx - 1] if idx else None
         nxt = toks[idx + 1] if idx + 1 < len(toks) else None
@@ -403,6 +429,14 @@ def scan_node(path: Path) -> list[Site]:
             while scope_stack and scope_stack[-1][0] > t.depth:
                 scope_stack.pop()
         scope = scope_stack[-1][1] if scope_stack else ""
+
+        # A config reader's arguments are key names (see CONFIG_READERS).
+        if t.kind == "ident" and t.text in CONFIG_READERS and nxt is not None and nxt.text == "(":
+            reader_level = nxt.paren + 1
+        if reader_level is not None and t.paren < reader_level and t.text == ")":
+            reader_level = None
+        if t.kind == "str" and reader_level is not None and t.paren >= reader_level:
+            continue
 
         if t.kind not in ("num", "str"):
             continue

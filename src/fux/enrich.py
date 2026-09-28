@@ -624,7 +624,11 @@ def _scopes(root: Path) -> dict[str, list[dict]]:
     from . import store as store_mod
     from .ingest.gitdir import enrich_dirs
 
-    declared = enrich_dirs(root, ".fux/sources/dirs")
+    from .config import load as load_config
+
+    # The CONFIGURED list -- `.fux/sources/dirs` is only what the template names
+    # (W-225 stage 7; the stage-3b doctor precedent).
+    declared = enrich_dirs(root, load_config(root).dirs_file)
     urls = _enrich_urls(root)
     if not declared and not urls:
         return {}

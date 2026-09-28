@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@39d5e17e260d, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@1420b552a4c5, node/src/ingest/priors.mjs@d8d4691d7e49]
+owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@be84c741eca0, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@a6b1bb5f5517, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 60369b0e3a9654c6fe7d7a8bd0649acf16e1949fb9915e330b44b305fabc27ff
+content_sha: e2f66ed9f53326646039604ab2e221a3a4ae771d6a930ba64090dcfccbaecd71
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -992,6 +992,8 @@ The Node reader's `dirsFile` no longer falls back to `.fux/sources/dirs`.
 **Two ingest bounds are `fux.toml` keys** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): the cooperative stop is polled every `[maintain] stop_every_docs` documents, and the recency-prior `git log` is bounded by `[index] git_timeout_s` ([SR-CONFIG](0113_config.md) decision 18). The values are unchanged.
 
 **`run()` requires `refresh_urls` and `full`, `ingest_and_report` requires `refresh_urls`** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28); every caller — the verbs, the runner, the daemon, `fux setup` — states them. `Ignores.decide`, `typesfile.render` and `_strs` lost their boolean defaults the same way.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

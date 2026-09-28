@@ -613,7 +613,7 @@ def node_version(directory: Path) -> "str | None":
     """
     import json
 
-    path = directory / NODE_DIR / "package.json"
+    path = directory / NODE_DIR / fixed("bundle", "package")
     if not path.is_file():
         return None
     try:
@@ -632,7 +632,7 @@ def node_shape(directory: Path) -> "str | None":
     """
     import json
 
-    path = directory / NODE_DIR / "package.json"
+    path = directory / NODE_DIR / fixed("bundle", "package")
     if not path.is_file():
         return None
     try:
@@ -680,7 +680,7 @@ def _expected_layout(shape: str) -> "set[str]":
     build on the maintenance path.
     """
     if shape == SHAPE_WORKSPACE:
-        return {"package.json"}
+        return {fixed("bundle", "package")}
     from . import nodebundle
 
     return {nodebundle.ENTRY, *nodebundle.SIDECARS}
@@ -739,7 +739,7 @@ def ensure_node_reader(root: Path, *, shape: "str | None" = None) -> "list[Path]
         or _layout_is_stale(target, declared)
     ):
         if declared == SHAPE_WORKSPACE:
-            payload = [("package.json", _workspace_manifest(__version__))]
+            payload = [(fixed("bundle", "package"), _workspace_manifest(__version__))]
         else:
             payload = _packaged_node_files()
 

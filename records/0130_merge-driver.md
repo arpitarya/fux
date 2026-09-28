@@ -7,10 +7,10 @@ description: "The merge driver for .fux/index/*.jsonl. A shard is a header plus 
 status: accepted
 date: 2026-08-21
 feature: the merge driver for the committed index
-owns: [src/fux/maintain/mergedriver.py@227743230974]
+owns: [src/fux/maintain/mergedriver.py@cd579346e718]
 laws: [L2, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 80aea530b20512078f574d22e5f2af721c8ec8ad6b7245aeabf9cd001d0e7f3d
+content_sha: 34dfa5e0c533edb744549af011055f12a69ba21952ce8113bebf49e37df55274
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -270,6 +270,8 @@ it the day the register landed.
   like the first.
 
 **The merge driver reads git's `%O %A %B [%P]` by unpacking** and exits `constants.toml [exit] usage` on a short argv. The merge itself is unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

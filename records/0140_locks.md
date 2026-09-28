@@ -10,7 +10,7 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L2, L3, L4, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 90aebdef79728c08db01986611dd68c893c48e77cb1d3ce27ab2540fdbab01fb
+content_sha: fcc8e90cc1cfe6a75745c341f074c2e183bc66d5c6ef7727245c3119620803c0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -217,6 +217,8 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

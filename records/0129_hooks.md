@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@38219728706a, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
+owns: [src/fux/maintain@3839035e9049, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 33a4ab00174eb4d14afa0d4b83a372227258cc217fac8cd8937726db7666994c
+content_sha: 60aeac97feaa4139d1d04544f2a3f6fd4bafe3886540cafa7294d3e1fa8db671
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -621,6 +621,8 @@ this moved where they are written, not what they are.
 **The maintenance plane's pacing is `fux.toml [maintain]`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): `daemon_poll_s`, `runner_poll_s`, `stop_timeout_s` (shared by `stop` and the runner, one number for one gesture), `last_cited_max` and `stop_every_docs` ([SR-CONFIG](0113_config.md) decision 18). ⚠ **`MAX_PASSES` is not a key**: it is the bound veto condition 6 needs to hold, so it is `constants.toml [maintain] max_passes`. `request_stop`, `take_over` and `stop` take `timeout=None` and read the key.
 
 **`runner.acquire` requires `required` and `runner.spawn` requires `handoff`** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28); the runner and the daemon pass `refresh_urls` and `full` to `run()`.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 

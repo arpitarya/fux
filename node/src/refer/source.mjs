@@ -52,7 +52,10 @@ export function readLocal(root, relPath) {
  *  NOT rebuildable — only re-acquirable, and only while the source still
  *  exists, which is why the acquired plane has its own kind in `.fux/`. */
 export function fromAcquired(root, sha) {
-  const path = join(root, ".fux", "acquired", "objects", sha.slice(0, fixed("radix", "hex_digits_per_byte")), sha);
+  const path = join(
+    root, fixed("fuxdir", "dir"), fixed("acquired", "dir"), fixed("acquired", "objects_dir"),
+    sha.slice(0, fixed("radix", "hex_digits_per_byte")), sha,
+  );
   for (const candidate of [path, path + ".md", path + ".txt", path + ".html"]) {
     if (existsSync(candidate)) {
       const raw = readFileSync(candidate);

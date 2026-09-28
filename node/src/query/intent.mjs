@@ -32,7 +32,7 @@ export function prepare(question) {
   return question
     .replace(/[ \t\n\r\f\v]+/g, " ")
     .replace(/^ +| +$/g, "")
-    .replace(/[A-Z]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) + 32));
+    .replace(/[A-Z]/g, (ch) => ch.toLowerCase()); // ASCII A-Z only, like the Python twin's maketrans
 }
 
 /** The first intent in `[intent] order` with a matching cue, or `null`. */

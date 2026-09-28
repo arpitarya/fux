@@ -225,7 +225,7 @@ def tune_digest(root: Path) -> str:
     changed because somebody *added* a tune file has drifted on config exactly
     as much as one whose weights were edited.
     """
-    path = fuxdir.fux_dir(root) / "tune.toml"
+    path = root / fixed("files", "tune")
     try:
         return hashlib.sha256(path.read_bytes()).hexdigest()
     except OSError:
@@ -809,7 +809,7 @@ def _resource(cited: dict) -> dict:
     resource = {"name": str(cited.get("id", "")), "digest": {DIGEST_ALG: sha}}
     loc = cited.get("loc")
     if loc:
-        resource["annotations"] = {"fux.dev/loc": str(loc)}
+        resource["annotations"] = {fixed("receipt", "loc_annotation"): str(loc)}
     return resource
 
 

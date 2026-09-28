@@ -50,6 +50,7 @@ from __future__ import annotations
 
 import re
 
+from ..constants import fixed
 from .stem import stem as _stem
 
 #: Matched against the ORIGINAL text, not a lowercased copy — see the module
@@ -87,11 +88,9 @@ _WORD_RE = re.compile(r"[A-Za-z0-9_]+(?:[-./][A-Za-z0-9_]+)*")
 #: Now `RF-118` behaves exactly as `ERR_2031` always did.
 _BOUNDARY_RE = re.compile(r"[_\-./]+|(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])")
 
-_STOPWORDS = frozenset(
-    """a an and are as at be but by for from has have how i if in into is it its
-    of on or that the their then there these this to was were what when where
-    which who why will with you your we our not can may""".split()
-)
+#: The built-in stopwords -- `constants.toml [analyzer] stopwords`, read by both
+#: planes: a different list writes different postings (W-225 stage 7).
+_STOPWORDS = frozenset(fixed("analyzer", "stopwords"))
 
 
 def split_identifier(raw: str) -> list[str]:

@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@b790c6aa64e9]
+owns: [src/fux/query/provenance.py@d32bb8330108]
 laws: [L2, L4, L5, L9]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: f72982aba0ab8512b6d915d7b0020604a5fdfd35847501b797235ab37f413c6e
+content_sha: 56d542cae942d9f65d799e87b8a3e016a3ce04593029429e7b2917f4fdfcd74f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -550,6 +550,8 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 ### Consequences
 
