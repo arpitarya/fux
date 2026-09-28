@@ -24,7 +24,7 @@ here. Read that record before changing anything below it.
 | what he decides | filed | age |
 |---|---|---|
 | 🔴 **W-168** — score step 9's arms: type `just golden-score work/regression/2026-09-28-intent-prior`. No unlock needed. [report](regression/2026-09-28-intent-prior/report.md) | 2026-09-28 | 0d |
-| ↳ **blocks:** W-168 step 9's verdict. | | |
+| ↳ **blocks:** nothing else in the queue — W-168 step 9's verdict waits on it. | | |
 
 
 ---
