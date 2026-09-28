@@ -7,6 +7,18 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## 🟢 STEP 9 SCORED — 2026-09-28 (Arpit's hand); the verdict is a NON-capturing session's
+
+[Report §Scored](../regression/2026-09-28-intent-prior/report.md). Five complete
+score files; set-wide `hit@1` 66 → 72 / 74 / 77 / 80 and `primary@1` 62 → 68 /
+70 / 73 / 76 at `0.1 / 0.2 / 0.3 / 0.5`. **These totals are not the rule.**
+Clauses 1–2 read tagged per-query flips, the SR-RS d19 floor, and zero baseline
+rank-1 losses.
+**Next:** a session that did not capture the arms runs
+[`decide.py`](../regression/2026-09-28-intent-prior/evidence/decide.py) (sha
+`85298465…`, written before the score) and files `VERDICT.md`. INCONCLUSIVE → Arpit.
+This session wrote the bar, built step 9 and captured the arms, so it cannot.
+
 ## 🔴 STEP 9 ARMS CAPTURED — 2026-09-28 (Claude Code, Opus); the score is Arpit's, the verdict another session's
 
 [Report](../regression/2026-09-28-intent-prior/report.md).

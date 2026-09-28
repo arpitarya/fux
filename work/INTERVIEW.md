@@ -43,7 +43,7 @@ valuable judgement, but not the state of play.
 - **Step 9 pre-registered** ([bar](regression/2026-09-28-intent-prior/PRE-REGISTRATION.md)): the lexicon pool is 14, equal to the key's. ⚠ `[doctype]` needs a new glob matcher, because `[priority]` is prefix-only.
 - **Step 9 built** (`b3898441`), off at `intent_weight = 0.0` with an empty `[doctype]`; unmeasured.
 - **Step 9's arms captured** ([report](regression/2026-09-28-intent-prior/report.md)): rank 1 moved on 6/8/11/14 questions, all tagged; `ip-0.0` equals the 2026-09-27 capture on 125/125.
-- 🔴 **Next:** Arpit scores (`just golden-score work/regression/2026-09-28-intent-prior`); a session that did not capture runs `decide.py`. Steps 7 and 8 owe their own pre-registrations.
+- **Scored by Arpit 2026-09-28** (five complete files). 🔴 **Next:** a session that did NOT capture the arms runs `decide.py` and files VERDICT. Steps 7 and 8 owe their own pre-registrations.
 
 ### 🟢 2026-09-28 — W-230 AND W-227 CLOSED: THE TRAVERSAL GUARD FIRES LIVE
 

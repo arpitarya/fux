@@ -10,7 +10,7 @@ pre_registration: work/regression/2026-09-28-intent-prior/PRE-REGISTRATION.md
 
 # Report: the intent → doc-type prior (`set-4-claude`, `rung-01000` copy)
 
-🔴 **Captured, not scored, and not decided.** No answer key reached this session.
+✅ **Scored 2026-09-28 (Arpit's hand); not decided.** No answer key reached this session.
 Below, *changed* means **the ranking moved**, never that it *improved*.
 
 - **Who scores:** Arpit, with `just golden-score work/regression/2026-09-28-intent-prior`, in his own shell. No unlock is needed.
@@ -18,6 +18,25 @@ Below, *changed* means **the ranking moved**, never that it *improved*.
   [`evidence/decide.py`](evidence/decide.py), sha256 `8529846567a3…61652da5`. It
   is step 4's decider with the arm names, the set and the tag reading changed,
   plus `primary@1` per intent. It was written before any score existed.
+
+## 🔴 Scored — 2026-09-28, Arpit's hand · `informed`
+
+`just golden-score` → `scores/ip-<w>/rung-01000/set-4-claude.json`, five
+complete joins (n = 125, none partial).
+
+| arm | hit@1 | hit@5 | hit@10 | primary@1 | answered unanswerable | evidence quoted |
+|---|---:|---:|---:|---:|---:|---:|
+| `ip-0.0` | 66 | 104 | 110 | 62 | 11 | 95 |
+| `ip-0.1` | 72 | 104 | 110 | 68 | 11 | 96 |
+| `ip-0.2` | 74 | 105 | 110 | 70 | 11 | 96 |
+| `ip-0.3` | 77 | 105 | 110 | 73 | 11 | 96 |
+| `ip-0.5` | 80 | 105 | 110 | 76 | 11 | 97 |
+
+🔴 **These totals are NOT the rule, and this session files no verdict.** The
+frozen bar decides on tagged per-query flips against the SR-RS d19 floor
+(clause 1) and on **zero** baseline rank-1 losses anywhere (clause 2). A net
+total can hide a loss, and only `decide.py` reads the flips. This session
+captured the arms, so it may not run it (§What this run may NOT do, item 5).
 
 ## 1 · What ran
 

@@ -22,6 +22,12 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-168 step 9 scored by Arpit; the verdict is handed to a fresh session  ·  Claude Code (Opus)
+- **Asked:** Arpit pasted `just golden-score work/regression/2026-09-28-intent-prior`.
+- **Did:** filed the five score files (complete, n = 125) and a scored section in the report, with totals explicitly marked not the rule. Removed the inbox row, and put a fresh session on the queue row.
+- **Decided / open:** this session did not run `decide.py`. It wrote the bar, built step 9 and captured the arms, and the bar forbids it from adjudicating. The scorer's uncommitted diff at score time was W-234's link renumbering only.
+- **Next:** a fresh session runs `work/regression/2026-09-28-intent-prior/evidence/decide.py` and files `VERDICT.md`.
+
 ## 2026-09-28 — W-168 step 9 arms captured: rank 1 moved on 6–14 questions, all tagged  ·  Claude Code (Opus)
 - **Asked:** *"go"*.
 - **Did:**
