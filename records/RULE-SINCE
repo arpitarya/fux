@@ -121,8 +121,31 @@
 # (SR-WORK-OWNERSHIP veto condition 2), and the describes relation is read from
 # the historical register too, so the removal is not retroactive either.
 #
+# 2026-09-28 — THE SIXTH ENTRY. THE BASELINE MOVES, FOR THE 2026-09-11 CAUSE.
+#
+# Ruled by Arpit, 2026-09-28: "move baseline", after the 2026-09-11 precedent
+# was put to him, to release 3.0.0-alpha.6 over a green main.
+#
+# `999c19761` (W-225 stage 3a) edited `node/test/config.test.mjs`, which the
+# register at that commit assigns to SR-TUNE. The file holds BOTH readers'
+# config tests; the commit changed only the `output:` tests in it (no `tune`
+# line touched) and amended SR-OUTPUT-DEFAULTS, the record that owns what
+# those tests pin. SR-TUNE was not affected.
+#
+# THIS IS THE 2026-09-11 CAUSE, NOT A NEW ONE: ownership is FILE-SCOPED and
+# the change was narrower than the file. Decision 9 (the register read as it
+# stood at each commit) is unaffected and still holds.
+#
+# NOT DONE: rewording the commit. 57 commits sit on top of it, it is already
+# on origin/main, and the rewrite would change every sha `work/` cites.
+#
+# THE COST, stated rather than buried: every commit from `ce425c7` up to and
+# including `999c19761` is no longer re-auditable by this gate. Every one of
+# them passed except `999c19761` itself when the baseline moved.
+#
 # Previous baselines:
 #   1fc51a7257efeb943c512809bc531c7817dbc753
 #   301c65af310424d266ad40a4e22961722a586d97
 #   9bb870ef7dc4c25386cca15d999bcb2b4e7a81f5
-ce425c7764822938912219a00e7b9a2720961289
+#   ce425c7764822938912219a00e7b9a2720961289
+999c1976119d662f56a936d7624ea19f9b1695d3
