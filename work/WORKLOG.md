@@ -37,7 +37,7 @@ play: the worklog is the granular, per-exchange trail.
     - For every packet, HEAD and the new tree ingest identical `.fux/index` postings and runtime (in 5b, REGISTER differs only in the decoder-copy digest).
     - Every ask/find/answer output compared was byte-identical, Python and the Node bundle: 300, 300, 150 and 150 across the four runs.
 - **Decided / open:**
-  - Scanner: 1 206 → about 950 sites. The rest are R3 presentation cuts, `fixed(...)` key names and enum tags, which stage 7's allow-list takes, plus stage 6's parameter defaults.
+  - Scanner: 1 206 → 882 sites (151 of them numbers; the module count rose as `fixed(...)` bindings replaced literals). The rest are R3 presentation cuts, `fixed(...)` key names and enum tags, which stage 7's allow-list takes, plus stage 6's parameter defaults.
   - ⚠ `src/fux/inspect/` is untouched: W-228's `lenses.py` is uncommitted there.
   - Judgement calls are in the compare doc §"Where the build departed", 16 new rows, for Arpit.
   - Still red and not mine: `999c1976`'s history gate (a `RULE-SINCE` move or a rewrite, Arpit's call).
