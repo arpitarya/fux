@@ -8,6 +8,14 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.0-alpha.6] - 2026-09-28
+
+**Identifier families, corpus-mined expansion and an intent prior — and three
+floors move.** Python ≥ 3.12, Node ≥ 22, and `.fux/identifiers.toml` is now a
+required file: run `fux doctor --fix` after upgrading to write it and the new
+`inspect.toml` keys. Ranking changes on any corpus, since mined expansion and
+the intent prior are both on by default.
+
 ### Breaking
 
 - **`.fux/identifiers.toml` is a required file** (L12). Every verb that analyzes
