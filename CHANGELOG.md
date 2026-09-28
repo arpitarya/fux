@@ -37,6 +37,17 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   measured with the anchor field off, so its combination with the default
   `anchor = 1.0` is unmeasured. `--no-tune` leaves it on, because it restores
   the defaults. `fux lexical` never uses it.
+- **An intent → document-type prior, built OFF (W-168 step 9).** A question
+  that opens with a cue — *how do I*, *why was*, *what is* — can prefer the
+  procedure, the decision or the reference document, declared by a new
+  `.fux/tune.toml [doctype]` table of path globs (`"*-runbook-*" = "procedure"`)
+  and scaled by `[ranking] intent_weight`. **Nothing changes on upgrade:** the
+  weight ships at `0.0`, the table ships empty, and either one alone does
+  nothing. ⚠ `intent_weight` is a required key, so an existing `tune.toml` needs
+  `fux doctor --fix` once. **Unmeasured**: the pre-registered run
+  ([bar](work/regression/2026-09-28-intent-prior/PRE-REGISTRATION.md)) has not
+  been captured. `fux ask --why` names the prior when it runs, and `fux lexical`
+  never uses it.
 
 ### Changed
 

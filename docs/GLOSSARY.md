@@ -402,6 +402,14 @@ clone/merge/checkout: decodes the committed [wire format](#wire-format) into
 [runtime segments](#runtime-segments). It is why the committed artifact never
 pays a query-speed tax and the runtime format never pays a clone tax.
 
+**Intent prior** — A question's opening cue (*how do I*, *why was*, *what
+is*) read by a fixed lexicon, and the document of the matching type —
+procedure, decision, reference, declared by a `[doctype]` path glob in
+`.fux/tune.toml` — scaled by `1 + [ranking] intent_weight`. **Built 2026-09-28
+(W-168 step 9), off at `0.0` with an empty table, unmeasured.** See
+[SR-RANKING](../records/0111_ranking.md) decision 13 and
+[SR-TUNE](../records/0135_tuning.md) decision 20.
+
 **Keyspace (one MST)** — All six planes (`L/ P/ D/ V/ E/ M/`) are key ranges
 in a **single content-addressed Merkle Search Tree**. Consequences that make
 it worth the constraint: one **root hash names the whole corpus state**, one

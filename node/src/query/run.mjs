@@ -39,6 +39,7 @@ import { archivedDirSet } from "../ingest/gitdir.mjs";
 import { tiers } from "./compose.mjs";
 import { recordFor } from "../store/reader.mjs";
 import { idf } from "./bm25f.mjs";
+import { intentOf, typeOfIntent } from "./intent.mjs";
 
 
 /** The document-level multipliers and the directories they apply to.
@@ -47,13 +48,25 @@ import { idf } from "./bm25f.mjs";
  * comes from the committed dirs list, never from a path convention
  * (SR-DIR-LIST decision 4). `archivedDirSet` carries the tolerance: a corpus
  * whose dirs list cannot be read still answers, demoting nothing. */
-export function archivedRanking(root, tune) {
+export function archivedRanking(root, tune, query = "") {
   const dirs = archivedDirSet(root);
   return new Weighting({
     archivedWeight: tune.archivedWeight,
     archivedDirs: dirs,
     priority: tune.priority,
+    ...intentPrior(tune, query),
   });
+}
+
+/** W-168 step 9 — the per-query half of `Weighting`, or nothing. Twin of
+ *  `_intent_prior`: off at `intentWeight = 0` or with no `[doctype]`, and then
+ *  the lexicon is never consulted. The intent is read from the user's question
+ *  only, never from `--expand`. */
+function intentPrior(tune, query) {
+  if (!(tune.intentWeight > 0) || !tune.doctype.length) return {};
+  const cue = intentOf(query);
+  if (cue === null) return {};
+  return { doctype: tune.doctype, intentType: typeOfIntent(cue), intentFactor: 1.0 + tune.intentWeight };
 }
 
 /** Proximity rerank, then truncate to what the caller asked for. */
@@ -148,13 +161,14 @@ export function runQuery(root, query, top, {
   // below would then be `undefined` and every score would be computed at
   // default weights, on the frozen baseline verb, with nothing failing.
   // W-168 step 4: the frozen baseline never folds mined pairs either.
-  if (!compose) resolved = withTier(resolved, { askBoost: false, askRelated: false, minedWeight: 0.0 });
+  // W-168 step 9: nor applies the intent prior.
+  if (!compose) resolved = withTier(resolved, { askBoost: false, askRelated: false, minedWeight: 0.0, intentWeight: 0.0 });
   else if (wantRelated === false) resolved = withTier(resolved, { askRelated: false });
   // After the two lines above, `wantRelated` and `resolved.askRelated` agree, so
   // the tier reads one of them and the verb reads the other without either
   // having to know about the flag that set it.
   const scoring = resolved.scoring;
-  const weighting = archivedRanking(root, resolved);
+  const weighting = archivedRanking(root, resolved, query);
 
   // W-76 Phase 6: when the reranker is on, retrieve DEEPER than the caller
   // asked and hand back `top` from the reordered list. A reranker that can only

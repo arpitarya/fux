@@ -7,6 +7,19 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## ✅ STEP 9 BUILT — 2026-09-28 (Claude Code, Opus); the arms are next
+
+The mechanism exactly as [the bar](../regression/2026-09-28-intent-prior/PRE-REGISTRATION.md)
+fixes it, **off at `intent_weight = 0.0` with an empty `[doctype]`**. No treatment number exists.
+
+- **Lexicon:** `constants.toml [intent]`, test-bound to the frozen tag. On set-4-claude, the engine's intents equal `tags-set-4-claude.jsonl`.
+- **Prior:** inside `Weighting`, built per question; `maximum` = priority supremum × `(1 + w)`. `fux lexical` forces `0.0`.
+- **`--why`:** `intent` {cue, type, weight} and per-document `intent_factor`, **absent when off**.
+- **Both readers:** `node/src/query/intent.mjs`. ASCII-only case and whitespace, `.` over every character, globs over code points.
+- **Proved** (`tests/query/test_intent_prior.py`): off never consults the lexicon; on scales exactly `1 + w`; scan = accelerator at 0.1/0.2/0.3/0.5, `[priority]` stacked; Node = Python.
+- **Records:** SR-TUNE 20, SR-RANKING 13, SR-ASK 15, SR-NODE-SEARCH 22, SR-PROVENANCE, SR-CONSTANTS.
+- **Next:** capture the five arms on a COPY of rung-01000 (`b73348d5`) at one engine commit. Run `doctor --fix` on the copy, then add the three globs. Then 🔴 Arpit scores, and a session that did not capture decides.
+
 ## ✅ STEP 9 PRE-REGISTERED — 2026-09-28 (Claude Code, Opus); the build is next
 
 [The frozen bar](../regression/2026-09-28-intent-prior/PRE-REGISTRATION.md).

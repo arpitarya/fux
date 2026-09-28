@@ -49,6 +49,7 @@ import { cmpCodePoints } from "../compat/pyfloat.mjs";
 // same list `graph --kinds` refuses against at the CLI boundary.
 import { EDGE_KINDS } from "../graph/walk.mjs";
 import { fixed } from "./constants.mjs";
+import { intentTypes } from "../query/intent.mjs";
 
 export const TUNE_NAME = fixed("files", "tune");
 
@@ -81,7 +82,7 @@ const SCHEMA = {
   bm25f: ["k1", "b", ...FIELD_KEYS, "anchor"],
   ranking: [
     "rerank_weight", "rerank_depth", "rerank_coverage_power", "rerank_base", "rerank_span",
-    "rerank_adjacency", "expand_weight", "mined_weight",
+    "rerank_adjacency", "expand_weight", "mined_weight", "intent_weight",
   ],
   // The six `ask_*` keys are W-161's graph tier. They are parsed and carried
   // here so a consumer's committed `tune.toml` is accepted identically by both
@@ -107,9 +108,11 @@ const SCHEMA = {
   // `[priority]` is the one open table: its keys are the consumer's own
   // source entries, which fux cannot know in advance.
   priority: [],
+  // W-168 step 9 (D2): glob -> document type, the consumer's own patterns.
+  doctype: [],
 };
 
-const OPEN_TABLES = new Set(["priority"]);
+const OPEN_TABLES = new Set(["priority", "doctype"]);
 
 //: Keys fux ITSELF shipped and then removed. `"<table>.<key>" -> the rest of
 //: the sentence`, so the error names the removal and its date rather than
@@ -190,7 +193,7 @@ export class Tune {
 const TUNE_FIELDS = [
   "k1", "b", "fieldWeights", "anchorWeight",
   "rerankWeight", "rerankDepth", "rerankCoveragePower", "rerankBase", "rerankSpan",
-  "rerankAdjacency", "expandWeight", "minedWeight",
+  "rerankAdjacency", "expandWeight", "minedWeight", "intentWeight",
   "damping", "iterations", "laziness", "hopDecay", "expandLimit", "seedDepth", "pathLimit",
   "askBoost", "askRelated", "askKinds", "askLinkIdf", "askMaxHops", "askRelatedLimit",
   "separationFloor", "docCoverageFloor",
@@ -198,6 +201,7 @@ const TUNE_FIELDS = [
   "tableRowsPerPassage",
   "selfRetrievalK",
   "priority",
+  "doctype",
 ];
 
 /** Gathers semantic errors so a hand-edited file reports them together. */
@@ -437,6 +441,7 @@ function resolve(data, label) {
     rerankAdjacency: r("ranking", "rerank_adjacency", fraction),
     expandWeight: r("ranking", "expand_weight", nonNegative),
     minedWeight: r("ranking", "mined_weight", nonNegative),
+    intentWeight: r("ranking", "intent_weight", nonNegative),
     damping: r("graph", "damping", fraction),
     iterations: r("graph", "iterations", whole),
     laziness: r("graph", "laziness", fraction),
@@ -503,6 +508,24 @@ function resolve(data, label) {
   // Python sorts by the string and JS `<` is UTF-16 (W-107 hazard H1).
   priority.sort((a, b2) => (a[0].length !== b2[0].length ? b2[0].length - a[0].length : cmpCodePoints(a[0], b2[0])));
 
+  // W-168 step 9 — `[doctype]`, validated as `tune.py` does and sorted the same
+  // way: longest first by CODE POINTS (Python's `len`), ties by code point.
+  const types = intentTypes();
+  const doctype = [];
+  for (const [pattern, kind] of Object.entries(data.doctype ?? {})) {
+    if (typeof kind !== "string" || !types.has(kind)) {
+      c.add(
+        `[doctype] "${pattern}" must be one of ${repr([...types].sort(cmpCodePoints))} ` +
+        `(got ${repr(kind)}) — the types an intent cue can prefer ` +
+        "(src/fux/constants.toml [intent.type])",
+      );
+      continue;
+    }
+    doctype.push([pattern, kind]);
+  }
+  const cp = (x) => Array.from(x).length;
+  doctype.sort((a, b2) => (cp(a[0]) !== cp(b2[0]) ? cp(b2[0]) - cp(a[0]) : cmpCodePoints(a[0], b2[0])));
+
   c.raiseIfAny();
-  return new Tune({ ...values, priority });
+  return new Tune({ ...values, priority, doctype });
 }

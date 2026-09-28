@@ -659,6 +659,7 @@ table does not grant.
 | `src/fux/query/confidence.py` | SR-CONFIDENCE | the four signals and the band, computed from what ranking already produced |
 | `src/fux/query/expand.py` | SR-EXPAND | the `Expansion` object — what to score, what the user actually asked, and at what weight. Carved out of `query/` because the decision it carries is a **refusal**: a document matching no original term is not ranked low, it is not returned |
 | `src/fux/query/fuse.py` | SR-EXPAND | reciprocal rank fusion for `-q`. **A revival, not a restoration** — the deleted module fused SCORES; this one fuses ranks, which is why it comes back under a record rather than off the port list |
+| `src/fux/query/intent.py` | SR-RANKING | W-168 step 9 — the cue lexicon's reader, the `[doctype]` glob matcher and the type resolver. The prior itself is applied by `rank.py::Weighting`; this module only answers *which intent* and *which type*. Python and Node must agree byte for byte |
 | `src/fux/query/provenance.py` | SR-PROVENANCE | the derivation, the receipt, the journal and `verify`'s four-state verdict. **Carved out of `query/` for a different DECISION, not a different concern**: everything else under `query/` answers a question, and this answers *how the answer was reached* — and it is the one module in the tree that may write a plaintext use record (L8, as reverted) |
 | `src/fux/output_config.py` | SR-OUTPUT | `.fux/output.toml` — three roots (`[cli]`, `[cli.json]`, `[mcp]`), the two closed key sets (`CLI_VERBS`, `MCP_KEYS`), and the precedence chain (flag -> `[cli.json.<verb>]` -> `[cli.json]` -> `[cli.<verb>]` -> `[cli]` -> bypass -> `FuxError`). **Since 2026-08-28 the file, once in effect, is the sole source of truth** — an unset key errors rather than falling back to `BUILT_IN`. **Top-level, beside `tune.py`, because it is a peer of it**: same shape, different boundary — `tune.py` changes which documents come back, this changes how they are shown |
 | `src/fux/enrich.py` | SR-ENRICH | `fux enrich --plan/--check` — the deterministic halves |
@@ -737,6 +738,7 @@ table does not grant.
 | `node/src/query/expand.mjs` | SR-EXPAND | the Node twin of `src/fux/query/expand.py` |
 | `node/src/query/fuse.mjs` | SR-EXPAND | the Node twin of `src/fux/query/fuse.py` |
 | `node/src/query/headings.mjs` | SR-ASK | the Node twin of `src/fux/query/headings.py` — display only, never a score |
+| `node/src/query/intent.mjs` | SR-RANKING | the Node twin of `src/fux/query/intent.py` — ASCII-only case and whitespace, `.` over every character, globs over code points |
 | `node/src/query/rank.mjs` | SR-RANKING | the Node twin of the scorer. **The differential law is the whole point**: one scorer changing without the other is two engines answering differently from one index |
 | `node/src/query/rerank.mjs` | SR-RERANK | the Node twin of `src/fux/query/rerank.py` — the proximity reranker |
 | `node/src/query/run.mjs` | SR-ASK | the shared spine of `ask`, `find` and `answer`. Twin of the pure half of `src/fux/query/__init__.py` |

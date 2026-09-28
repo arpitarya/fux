@@ -40,8 +40,12 @@ export function tuneText(overrides = {}) {
   for (const [t, keys] of Object.entries(pending)) {
     const rest = Object.entries(keys);
     if (!rest.length) continue;
-    if (!TUNE_TEMPLATE.includes(`[${t}]`)) out.push(`[${t}]`);
-    for (const [k, v] of rest) out.push(`${JSON.stringify(k)} = ${toml(v)}`);
+    // Under the table's own header when the template has one (`[priority]`,
+    // `[doctype]`): appending at the end puts them in whichever table is LAST.
+    const entries = rest.map(([k, v]) => `${JSON.stringify(k)} = ${toml(v)}`);
+    const at = out.indexOf(`[${t}]`);
+    if (at >= 0) out.splice(at + 1, 0, ...entries);
+    else out.push(`[${t}]`, ...entries);
   }
   return out.join("\n") + "\n";
 }

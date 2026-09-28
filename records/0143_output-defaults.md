@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@988bd2d3cdfb, src/fux/templates/output.toml.txt@7251f3203770, .fux/output.toml@7251f3203770, node/src/config/output.mjs@850e35e36742]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: f7bc74b01ea2f42c02d783bccb6a1ee476cd402eaff474013b56064f9a3da20a
+content_sha: 09801767aa1d740ff660fc35f875eb9c46d52ac3aa4a352e957e0e85b95593f3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -798,6 +798,11 @@ this moved where they are written, not what they are.
 **No output key changed** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/output.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
 
 **No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+
+**No output default changed with the intent prior** (W-168 step 9, 2026-09-28).
+`query/__init__.py` gained `_intent_prior` and `--why`'s `intent` block; the
+prior's switches live in `.fux/tune.toml` ([SR-TUNE](0135_tuning.md) decision
+20), not here.
 
 ### Consequences
 

@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@500a74b692bc, src/fux/store/nodebundle.py@de287c53d973]
+owns: [node@906411b0638e, src/fux/store/nodebundle.py@de287c53d973]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: b1743aa3a7a5b763de7faaa492f5f82879ffeb42a428f10278013b05983e7821
+content_sha: a44011740c265cd0cadc71535720492f63f5ca813d42e836b427363702ccdef6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -880,6 +880,16 @@ The Node reader never mines: ingest is Python's. `tests/query/test_mined.py`
 compares both readers' `ask` and `lexical` at the shipped value (`0.5` since
 2026-09-27, read by both from the one template, which
 `tests/test_node_config_parity.py` holds they resolve alike), at `0.0` and at `0.3`.
+
+**22. The intent prior is transcribed, not diverged** (W-168 step 9,
+2026-09-28). `node/src/query/intent.mjs` twins `src/fux/query/intent.py`, and
+`Weighting`, `archivedRanking` and `tune.mjs` carry `doctype` and
+`intentWeight`. **Three defaults would have diverged, and each is closed in both
+readers the same way:** `toLowerCase` and `\s` reach non-ASCII characters, so
+only ASCII is folded and collapsed; JavaScript's `.` skips four line terminators
+where Python's skips one, so both match every character (`s` flag, `re.DOTALL`);
+and `.length` counts UTF-16 units, so globs and the longest-first sort count code
+points. Node has no accelerator, so `maximum` has no twin.
 
 <!-- L12-VALUES-START -->
 

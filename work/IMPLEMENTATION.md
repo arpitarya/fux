@@ -26,6 +26,29 @@ Rules:
 
 ---
 
+## 2026-09-28 — **W-168 step 9 built: the intent → doc-type prior, off at `0.0`**
+
+**Outcome: built to the frozen bar, unmeasured, and ranking unchanged at the default.**
+- **What:** the ruled I1 cue lexicon in `constants.toml [intent]`, a
+  `[doctype]` glob table in `.fux/tune.toml` (empty), and `[ranking]
+  intent_weight` (default `0.0`) applied inside `Weighting`, so `maximum` is a
+  product again. `--why` gains `intent` / `intent_factor`, absent when off. Both
+  readers.
+- **Evidence:** `tests/query/test_intent_prior.py`:
+  - the lexicon equals the frozen tag's, and reads 15 edge questions as the tag does;
+  - off never consults it;
+  - on scales exactly `1 + w`;
+  - scan = accelerator at every arm weight, with `[priority]` stacked;
+  - lexical is untouched;
+  - Node = Python on intent, globs, `ask` and `lexical`.
+
+  On set-4-claude, the engine's intents equal the frozen tags file.
+  Bar: [PRE-REGISTRATION](regression/2026-09-28-intent-prior/PRE-REGISTRATION.md).
+- **Records:** [SR-TUNE](../records/0135_tuning.md) d20, [SR-RANKING](../records/0111_ranking.md) d13,
+  [SR-ASK](../records/0103_ask.md) d15, [SR-NODE-SEARCH](../records/0153_node-search.md) d22,
+  [SR-PROVENANCE](../records/0142_provenance.md), [SR-CONSTANTS](../records/0159_constants.md).
+- ⚠ `intent_weight` is required, so every existing `tune.toml` (the ladder rungs included) needs `fux doctor --fix`, and the arms' rung copy gets it anyway.
+
 ## 2026-09-28 — **W-230 + W-227: the traversal guard can launch, and it is hardened**
 
 **Outcome: built and closed. The live probe was DENIED.**

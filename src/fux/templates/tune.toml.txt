@@ -60,6 +60,12 @@ expand_weight           = 0.2   # Query2doc's 1:5; unmeasured on your corpus
 # weight. 0 = OFF. The default 0.5 is MEASURED: it passed its pre-registered run
 # on 2026-09-27.
 mined_weight            = 0.5
+# Prefer the kind of document a question asks for: "how do I" -> a procedure,
+# "why did we" -> a decision, "what is" -> a reference. A document whose
+# [doctype] type matches is scaled by 1 + this. 0 = OFF, and without a
+# [doctype] table it does nothing at any value. UNMEASURED until W-168 step 9's
+# pre-registered run.
+intent_weight           = 0.0
 
 [graph]                         # explain / graph / path
 damping      = 0.85   # restart probability is 1 - damping; PageRank's published value
@@ -146,3 +152,13 @@ max_table_rows = 20000
 # home, the `!` prefix in .fux/sources/.
 #"docs/"   = 1.5
 #"vendor/" = 0.3
+
+[doctype]
+# Stays commented, like [priority]: a key is a pattern over YOUR file paths,
+# and fux cannot know them. It declares a document's type for intent_weight.
+# `*` matches any run of characters including `/`, `?` exactly one; a pattern
+# must match the whole path. When two match, the LONGER one wins. Types:
+# procedure, decision, reference. An empty table IS the default.
+#"*-runbook-*"  = "procedure"
+#"docs/adr/*"   = "decision"
+#"*glossary*"   = "reference"

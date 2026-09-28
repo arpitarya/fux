@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@ad43c5cb44f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L1, L3, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: c6a3356c9d6bd2c702f2ae5764912797ba7ed79ccf6d584e956b69e8c784df3a
+content_sha: 553936b745425b60cf2b8d32e7791334084e4e1a36cc15bf9b5e7583e85186cb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -860,6 +860,12 @@ block is built on the ORIGINAL query, as decision 16's neighbour says of
 **The four-digit rounding of every published signal is `constants.toml [confidence] signal_digits`** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28), read by both planes. "Has a runner-up" is `len(scores) > 1`. Every signal is unchanged.
 
 **No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+
+**The band is computed after the intent prior** (W-168 step 9, 2026-09-28;
+[SR-RANKING](0111_ranking.md) decision 13). The prior scales final scores, so
+when it runs it can move `separation`, and with it the band, **of the list the
+reader is shown**, which is what this record requires. Off by default, and then
+nothing here changes.
 
 ### Consequences
 

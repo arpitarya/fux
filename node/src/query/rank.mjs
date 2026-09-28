@@ -12,6 +12,7 @@ import { deriveWlen, scoreRecord } from "./bm25f.mjs";
 import { displayTitle } from "../store/format.mjs";
 import { isArchivedLoc } from "../ingest/gitdir.mjs";
 import { pyRound9, cmpCodePoints } from "../compat/pyfloat.mjs";
+import { typeFor } from "./intent.mjs";
 
 export class Corpus {
   constructor(n = 0, totalWlen = 0.0) {
@@ -34,6 +35,7 @@ function recordIsArchived(record, archivedDirs) {
 export class Weighting {
   constructor({
     archivedDirs = new Set(), priority = [],
+    doctype = [], intentType = null, intentFactor = 1.0,
   } = {}) {
     // 🔴 The three DOCUMENT priors were REMOVED on 2026-09-13 (W-151, W-152):
     // supersession, retirement and age are FACTS, not weights. `archivedDirs`
@@ -41,10 +43,21 @@ export class Weighting {
     // `archived` record property shipped — it scales nothing.
     this.archivedDirs = archivedDirs;
     this.priority = priority;   // [[prefix, weight], ...], longest-prefix wins
+    // W-168 step 9 — the intent prior, per query. Twin of `rank.py`.
+    this.doctype = doctype;
+    this.intentType = intentType;
+    this.intentFactor = intentFactor;
     Object.freeze(this);
   }
+  get intentActive() {
+    return this.doctype.length > 0 && this.intentType !== null && this.intentFactor !== 1.0;
+  }
+  intentFor(loc) {
+    if (!this.intentActive) return 1.0;
+    return typeFor(loc, this.doctype) === this.intentType ? this.intentFactor : 1.0;
+  }
   get trivial() {
-    return this.priority.length === 0;
+    return this.priority.length === 0 && !this.intentActive;
   }
   priorityFor(loc) {
     let best = 1.0, bestLen = -1;
@@ -55,10 +68,12 @@ export class Weighting {
     }
     return best;
   }
-  /** The multiplier for one record: per-source priority, and nothing else. */
+  /** The multiplier for one record: per-source priority times the intent prior. */
   of(record) {
     if (this.trivial) return 1.0;
-    return this.priorityFor(record.loc || "");
+    const loc = record.loc || "";
+    const weight = this.priorityFor(loc);
+    return this.intentActive ? weight * this.intentFor(loc) : weight;
   }
 }
 

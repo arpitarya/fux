@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@59ef7c6eea8f]
+owns: [src/fux/query/provenance.py@b4ccfc003af0]
 laws: [L1, L3, L4, L8]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 871cf4069898fcfa086abc3ae76f728655d7610c6828a184b50eaa3b13e38eac
+content_sha: 4322fef39b1042ae79d3fc5d2a8dd0d0daba036b20b9382344813de4906db4f6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -501,6 +501,15 @@ documents' edges, so it is not on the committed record this pass re-reads. With
 it on, the identity loses the anchor share. **Named, not hidden**, and the fix
 when somebody needs it is to hand the fold through the same seam rather than to
 recompute it here.
+
+⚠ **The intent prior is a factor on the right when it ran** (W-168 step 9,
+2026-09-28; [SR-RANKING](0111_ranking.md) decision 13). `intent_factor` is `1 +
+intent_weight` on a document of the question's preferred type and `1.0` on any
+other, and the block carries `intent` (`cue`, `type`, `weight`). **Both are
+absent when the prior did not run**, so a `--why` block at the default is
+byte-identical to one written before the prior existed. ⚠ **`multiplier` still
+reports the archived fact only**, not `[priority]`: a `[priority]` corpus's
+identity is short that factor, as it was before this change.
 
 🔴 **This is not the instrumentation §*What the derivation may claim* refuses,
 and the distinction is the whole permission.** That paragraph forbids threading

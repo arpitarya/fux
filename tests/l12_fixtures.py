@@ -72,9 +72,15 @@ def tune_text(**overrides: "dict[str, object]") -> str:
         out.append(line)
     leftover = {t: v for t, v in pending.items() if v}
     for t, keys in leftover.items():
-        # A table the template does not carry (e.g. `[priority]` entries).
-        out.append(f"[{t}]" if f"[{t}]" not in lines else "")
-        out += [f"{_key(k)} = {_toml(v)}" for k, v in keys.items()]
+        # Keys the template does not carry (e.g. `[priority]` or `[doctype]`
+        # entries): under the table's own header when the template has one —
+        # appending at the end would put them in whichever table is LAST.
+        entries = [f"{_key(k)} = {_toml(v)}" for k, v in keys.items()]
+        if f"[{t}]" in out:
+            at = out.index(f"[{t}]") + 1
+            out[at:at] = entries
+        else:
+            out += [f"[{t}]", *entries]
     return "\n".join(out) + "\n"
 
 

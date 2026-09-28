@@ -84,7 +84,9 @@ def _tune(root: Path, *, enabled: bool) -> "Tune":
     return load_tune(root, enabled=enabled)
 
 
-def _archived_ranking(root: Path, tune: "Tune") -> tuple["Weighting", frozenset[str]]:
+def _archived_ranking(
+    root: Path, tune: "Tune", query: str = ""
+) -> tuple["Weighting", frozenset[str]]:
     """The document-level multipliers and the directories they apply to.
 
     The weights come from `.fux/tune.toml` (SR-TUNE decision 7 moved them out
@@ -111,9 +113,32 @@ def _archived_ranking(root: Path, tune: "Tune") -> tuple["Weighting", frozenset[
         except FuxError:
             dirs = frozenset()
     return (
-        Weighting(archived_dirs=dirs, priority=tune.priority),
+        Weighting(archived_dirs=dirs, priority=tune.priority, **_intent_prior(tune, query)),
         dirs,
     )
+
+
+def _intent_prior(tune: "Tune", query: str) -> dict:
+    """W-168 step 9 — the per-query half of `Weighting`, or nothing.
+
+    🔴 **Off at `intent_weight = 0.0` means the lexicon is never consulted**,
+    and so does an empty `[doctype]` table — the default is the engine before
+    the key existed, and a test holds it byte for byte. The intent is read from
+    the USER's question only, never from `--expand`: an agent's expansion words
+    are not a question anybody asked.
+    """
+    if tune.intent_weight <= 0 or not tune.doctype:
+        return {}
+    from .intent import intent_of, type_of_intent
+
+    cue = intent_of(query)
+    if cue is None:
+        return {}
+    return {
+        "doctype": tune.doctype,
+        "intent_type": type_of_intent(cue),
+        "intent_factor": 1.0 + tune.intent_weight,
+    }
 
 
 def run_query(
@@ -184,7 +209,7 @@ def run_query(
     if tune is None:
         tune = _tune(root, enabled=use_tune)
     scoring = tune.scoring
-    weighting, dirs = _archived_ranking(root, tune)
+    weighting, dirs = _archived_ranking(root, tune, query)
     # The dense lane is GONE (2026-08-25, Arpit) -- `--hybrid`, `[dense]`, the
     # committed vectors and the embedding model with it. DENSE-CHUNK measured
     # 0 fixed / 2 broken at every setting that fires, and a lane that is off by
@@ -1023,7 +1048,10 @@ def _ask_shaped(args, *, compose: bool) -> int:
 
         # W-168 step 4: the frozen baseline never folds mined pairs — it is the
         # words the user typed (SR-CLI decision 12).
-        tune = dataclasses.replace(tune, ask_boost=False, ask_related=False, mined_weight=0.0)
+        # W-168 step 9: nor applies the intent prior (SR-CLI decision 12).
+        tune = dataclasses.replace(
+            tune, ask_boost=False, ask_related=False, mined_weight=0.0, intent_weight=0.0
+        )
     elif getattr(args, "related", None) is False:
         import dataclasses
 
@@ -1207,9 +1235,28 @@ def _derivation_for(root: Path, args, results, path, signals, trace, tune):
             untuned=untuned,
             expand=_expand_of(args),
             rerank_uplift=(trace or {}).get("rerank_uplift"),
+            intent=_intent_shown(tune, args.query),
         )
     except Exception:  # pragma: no cover - a diagnostic must not break an answer
         return None
+
+
+def _intent_shown(tune, query: str) -> dict | None:
+    """What `--why` says about W-168 step 9's prior: the same decision
+    `_intent_prior` made for the ranking, or `None` when it made none."""
+    if tune is None:
+        return None
+    prior = _intent_prior(tune, query)
+    if not prior:
+        return None
+    from .intent import intent_of
+
+    return {
+        "cue": intent_of(query),
+        "type": prior["intent_type"],
+        "weight": tune.intent_weight,
+        "doctype": prior["doctype"],
+    }
 
 
 def _declare_derivation(why) -> None:

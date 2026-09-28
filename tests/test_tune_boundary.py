@@ -63,6 +63,7 @@ MUTATIONS: dict[str, dict[str, str]] = {
         "expand_weight": "0.75",
         # W-168 step 4: off by default, and nothing ingest does reads it.
         "mined_weight": "0.3",
+        "intent_weight": "0.3",
     },
     "graph": {
         "damping": "0.25",
@@ -110,6 +111,7 @@ MUTATIONS: dict[str, dict[str, str]] = {
         "doc_coverage_floor": "1.0",
     },
     "priority": {'"alpha.md"': "6.0", '"beta.md"': "0.2"},
+    "doctype": {'"*alpha*"': '"procedure"'},
 }
 
 #: ⚠ **The declared exception to decision 1** (Arpit, 2026-09-11, SR-TUNE
@@ -250,7 +252,7 @@ def test_every_key_is_exercised():
     missing = [
         f"[{table}] {key}"
         for table, keys in _SCHEMA.items()
-        if table not in ("priority", INDEX_TABLE)
+        if table not in ("priority", "doctype", INDEX_TABLE)
         for key in keys
         if key not in MUTATIONS.get(table, {})
     ]

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@22e241e7c853, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@37bde1db316b, src/fux/query/stem.py@234cbe8f97b3, node/src/query/analyzer.mjs@891b8d0b9794, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@25c604508f55, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
+owns: [src/fux/query/rank.py@82e82cde9f39, src/fux/query/intent.py@deab5f453526, node/src/query/intent.mjs@9a38066c345a, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@37bde1db316b, src/fux/query/stem.py@234cbe8f97b3, node/src/query/analyzer.mjs@891b8d0b9794, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@1a1dd7794ab6, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8b433eebc39b40da1e0df3a81ce19b9dd78b6660258719c1986ca6892f4235b0
+content_sha: 7a46bda0427a8ed7a7f35ba2676fb2571b13e1dc878b14e80926250af2623578
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -20,12 +20,14 @@ content_sha: 8b433eebc39b40da1e0df3a81ce19b9dd78b6660258719c1986ca6892f4235b0
 
 - [`node/src/query/analyzer.mjs`](../node/src/query/analyzer.mjs) · file
 - [`node/src/query/bm25f.mjs`](../node/src/query/bm25f.mjs) · file
+- [`node/src/query/intent.mjs`](../node/src/query/intent.mjs) · file
 - [`node/src/query/rank.mjs`](../node/src/query/rank.mjs) · file
 - [`node/src/query/stem.mjs`](../node/src/query/stem.mjs) · file
 - [`node/src/query/tokenize.mjs`](../node/src/query/tokenize.mjs) · file
 - [`node/test/analyzer.test.mjs`](../node/test/analyzer.test.mjs) · file
 - [`src/fux/query/analyzer.py`](../src/fux/query/analyzer.py) · file
 - [`src/fux/query/bm25f.py`](../src/fux/query/bm25f.py) · file
+- [`src/fux/query/intent.py`](../src/fux/query/intent.py) · file
 - [`src/fux/query/rank.py`](../src/fux/query/rank.py) · file
 - [`src/fux/query/stem.py`](../src/fux/query/stem.py) · file
 - [`src/fux/query/tokenize.py`](../src/fux/query/tokenize.py) · file
@@ -586,6 +588,30 @@ reaches a score or an ordering**.
 **The analyzer holds no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). Porter's suffix rules carry their own lengths (`_STEP1A`, `_base`), the consonant-vowel-consonant test is a shape, and fux's three-character floor is `constants.toml [stem] min_chars`; decision 8a's `round(x, 9)` is `[ranking] score_digits`. The stemmer gave the same stem for all 8 982 words in `records/` and `docs/`, before and after.
 
 **BM25's idf smoothing is `constants.toml [bm25f] idf_offset`** (0.5), read by both planes. Scores are unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+**13. The intent prior is `Weighting`'s SECOND multiplier, and the supremum is a
+product again** (W-168 step 9, 2026-09-28; [SR-TUNE](0135_tuning.md) decision
+20). `run_query` builds a `Weighting` per question, and when the prior is live
+it carries `[doctype]`, the type the question's cue prefers, and `1 +
+intent_weight`. `of(record)` is `priority_for(loc) × intent_for(loc)`, and
+`maximum` is the priority supremum **times** the intent factor.
+
+- **Why here and not after the sort.** The accelerator prunes on
+  `ceiling × maximum` against a weighted `theta` (W-73). A multiplier applied
+  anywhere else would make `--fast` and `--scan` disagree the first time it
+  promoted an unseen document. Inside `Weighting`, the differential law holds
+  by construction, and a test sweeps it at four weights with `[priority]`
+  stacked on top.
+- **The product, not the larger** — this class's own docstring said to restore
+  it *"the moment a second one arrives"*, and a document can be both
+  priority-scaled and the preferred type.
+- **Off is `trivial`.** With no live prior, `trivial`, `maximum` and `of` are
+  exactly what they were, so every corpus without a `[doctype]` table ranks
+  byte-identically.
+- **The resolver is [`query/intent.py`](../src/fux/query/intent.py)** — which
+  intent, which type. Its three parity rules with Node (ASCII-only case and
+  whitespace, `.` over every character, globs over code points) are stated
+  there.
 
 ### Consequences
 

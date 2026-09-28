@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@bf354f23c2c2]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@859e9e4678c5]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: f6e621f29cf5a78fe834d0457b04209327126140d13fbe42fe76c6cb1031b5ba
+content_sha: 5c9d95476830619c61573568a49306ec4265cead0c16a650097086d7da3bb660
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -166,6 +166,12 @@ decisions 3 and 17; SR-LAW-12 decision 9a).
 **W-225 stage 5e (2026-09-28)** added `[fetch]` (`undeclared_max_parallel`, the rate-limit retries and backoff, `kib`), `[maintain] max_passes` and `[doctor] as_ingested_veto_share` — three values the L12 classification had proposed as consumer keys, fixed instead because an earlier ruling or record already decides them ([SR-CONFIG](0113_config.md) decision 18).
 
 **W-225 stage 5f (2026-09-28)** added `[bundle] shim_sniff_chars` — how much of a launcher `fux doctor` reads to tell a fux shim from another tool's.
+
+**`[intent]` and `[intent.type]` joined the file on 2026-09-28** (W-168 step 9;
+[SR-RANKING](0111_ranking.md) decision 13). The cue lexicon is a FIXED value and
+not a tunable: a pre-registration froze it, and
+`tests/query/test_intent_prior.py` holds it equal to that bar's tag, pattern for
+pattern. A consumer who wants other cues is I2, which is not built.
 
 ### Consequences
 

@@ -133,6 +133,7 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "rerank_adjacency",
         "expand_weight",
         "mined_weight",
+        "intent_weight",
     ),
     "graph": (
         "damping",
@@ -171,9 +172,12 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
     # `[priority]` is the one open table: its keys are the consumer's own
     # source entries, which fux cannot know in advance (decision 8).
     "priority": (),
+    # W-168 step 9 (D2): glob → document type, the consumer's own patterns.
+    # Open for the same reason — fux cannot know a consumer's file names.
+    "doctype": (),
 }
 
-_OPEN_TABLES = frozenset({"priority"})
+_OPEN_TABLES = frozenset({"priority", "doctype"})
 
 #: Keys fux ITSELF shipped and then removed. `(table, key) -> the rest of the
 #: sentence`, so the error names the removal and its date instead of reporting
@@ -271,6 +275,11 @@ class Tune:
     #: `expand_weight`, because a sweep of `expand_weight` would move every
     #: caller's `--expand` too.
     mined_weight: float
+    #: W-168 step 9 — the intent → doc-type prior. A document whose `[doctype]`
+    #: type is the one the question's cue prefers is scaled by
+    #: `1 + intent_weight`. ⚠ **Inert without a `[doctype]` table**, whatever
+    #: its value.
+    intent_weight: float
 
     # [graph]
     damping: float
@@ -309,6 +318,9 @@ class Tune:
     #: match. **The resolution itself lives on `query.rank.Weighting`**, not
     #: here — one implementation, next to the bound that has to agree with it.
     priority: tuple[tuple[str, float], ...]
+    #: `[doctype]`, sorted longest-pattern-first, ties by code point, so the
+    #: first match is the rule (`query/intent.py::type_for`).
+    doctype: tuple[tuple[str, str], ...]
 
     @property
     def scoring(self) -> Scoring:
@@ -646,6 +658,7 @@ def _resolve(data: dict, label: "Path | str") -> Tune:
         "rerank_adjacency": read("ranking", "rerank_adjacency", _fraction),
         "expand_weight": read("ranking", "expand_weight", _non_negative),
         "mined_weight": read("ranking", "mined_weight", _non_negative),
+        "intent_weight": read("ranking", "intent_weight", _non_negative),
         "damping": read("graph", "damping", _fraction),
         "iterations": read("graph", "iterations", _whole),
         "laziness": read("graph", "laziness", _fraction),
@@ -705,8 +718,23 @@ def _resolve(data: dict, label: "Path | str") -> Tune:
     # case cannot occur: TOML keys are unique.
     priority.sort(key=lambda pair: (-len(pair[0]), pair[0]))
 
+    from .query.intent import TYPES
+
+    doctype: list[tuple[str, str]] = []
+    for pattern, kind in data.get("doctype", {}).items():
+        if not isinstance(kind, str) or kind not in TYPES:
+            c.add(
+                f'[doctype] "{pattern}" must be one of {sorted(TYPES)} (got {kind!r}) — '
+                "the types an intent cue can prefer (src/fux/constants.toml [intent.type])"
+            )
+            continue
+        doctype.append((pattern, kind))
+    # Longest first, ties by code point: two patterns of one length can both
+    # match a path, and the answer must not depend on file order (L3).
+    doctype.sort(key=lambda pair: (-len(pair[0]), pair[0]))
+
     c.raise_if_any()
-    return Tune(**values, priority=tuple(priority))
+    return Tune(**values, priority=tuple(priority), doctype=tuple(doctype))
 
 
 def specimen() -> str:

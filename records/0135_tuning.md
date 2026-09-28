@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-24
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@51540f8551a4, .fux/tune.toml@1f2f7240794e, node/src/config/tune.mjs@90294c362ca0]
+owns: [src/fux/tune.py@0df704d009f0, .fux/tune.toml@06a4246b57c1, node/src/config/tune.mjs@fd8229c9341f]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: c1b48b04662c74dbfe2e8a1fb5021dfc470d70d5df0962cd59786c073af0cc50
+content_sha: 5b98ca55cb94a99d4fb26ed79ee2f3be4f985ac53c839c5ea75259a116aef9f9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -758,6 +758,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + ranking.rerank_adjacency
 + ranking.expand_weight
 + ranking.mined_weight
++ ranking.intent_weight
 + graph.damping
 + graph.iterations
 + graph.laziness
@@ -783,6 +784,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + index.max_phrases
 + index.max_table_rows
 * priority
+* doctype
 ```
 
 ⚠ **`[priority]` is `*` and cannot be anything else.** Its keys are the
@@ -1016,6 +1018,32 @@ may.
   way back.
 - **Reopen-trigger** (the verdict's): any later run in which a mined spelling
   costs a baseline rank-1 hit reopens step 4.
+
+**20. `[ranking] intent_weight`, default `0.0`, and `[doctype]`, empty** (W-168
+step 9, 2026-09-28; ruled D2 · I1 · M1 · S1 on 2026-09-24,
+[compare doc](../work/compare/intent-doctype-prior.compare.md); [frozen bar](../work/regression/2026-09-28-intent-prior/PRE-REGISTRATION.md)). The intent → doc-type prior.
+
+- **`[doctype]` is the second open table**, beside `[priority]`: a key is a glob
+  over the consumer's own paths, a value is one of `procedure`, `decision` or
+  `reference` — the types `src/fux/constants.toml [intent.type]` names, and
+  nothing else is accepted. A glob matches the **whole** location, `*` crosses
+  `/`, `?` is one character. Where two match, **the longest wins**, ties by code
+  point, so the answer never depends on file order (L3). ⚠ **Not `[priority]`'s
+  matcher**: that one is a path prefix (8a).
+- **`intent_weight` scales a document whose declared type is the one the
+  question's cue prefers by `1 + intent_weight`.** The cue lexicon is a fixed
+  engine value (`[intent]` in `constants.toml`), not a key here: the frozen bar
+  froze it, and a test holds it equal to the bar's tag.
+- **`0.0` is off, and off reads no cue.** So does any weight with an empty
+  `[doctype]`, which is the shipped state: **the default is inert on upgrade
+  whatever the weight**, because fux cannot know a consumer's file names. The
+  template carries the table commented, as `[priority]`.
+- **Inside decision 1's boundary.** Read at query time; no committed byte, no
+  re-ingest, no rebuild.
+- **`fux lexical` forces it to `0.0`**, in both readers, as it does
+  `mined_weight`.
+- ⚠ **UNMEASURED.** The pre-registered arms have not run. A PASS would move the
+  weight's default and still leave `[doctype]` empty.
 
 <!-- L12-VALUES-START -->
 

@@ -568,3 +568,22 @@ kib = 1024
 # doctor's number: it is the reopen condition SR-ACQUIRED and SR-URL-FRESHNESS
 # state, so a consumer cannot move it.
 as_ingested_veto_share = 0.25
+
+[intent]
+# W-168 step 9 (I1, ruled 2026-09-24): the fixed cue lexicon that reads a
+# question's intent for [ranking] intent_weight. Tried in `order`; the first
+# intent with a matching pattern wins, and none means no prior. Matched against
+# the question with ASCII whitespace collapsed and ASCII letters lowercased,
+# compiled ASCII-only with `.` matching every character, so Python and Node
+# agree byte for byte. Held equal to the frozen tag
+# (work/regression/2026-09-28-intent-prior/evidence/tag_intent.py) by a test.
+order     = ["procedure", "rationale", "reference"]
+procedure = ['^how (do|should|can) (i|we)\b', '^how to\b', '\bsteps? to\b', '^what (do|should) (i|we) do\b']
+rationale = ['^why\b', '\bwhat was the (reason|rationale)\b']
+reference = ['^what is\b', '^what does\b.*\bmean\b', "^what'?s the\\b", '^define\b']
+
+[intent.type]
+# The document type each intent prefers -- the value a [doctype] glob declares.
+procedure = "procedure"
+rationale = "decision"
+reference = "reference"

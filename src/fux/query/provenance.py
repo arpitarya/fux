@@ -413,6 +413,12 @@ class DocDerivation:
     #: one* this module refuses to emit. **Stating the factor is the honest
     #: alternative to making a consumer infer it.**
     rerank_uplift: float | None = None
+    #: W-168 step 9 — the intent prior's factor on this document: `1 +
+    #: intent_weight` when its `[doctype]` type is the one the question's cue
+    #: prefers, `1.0` when it is not. `None` — and ABSENT from the dict — when
+    #: the prior did not run on this query, so a `--why` block at the default is
+    #: byte-identical to one written before the prior existed.
+    intent_factor: float | None = None
 
     def as_dict(self) -> dict:
         out = {
@@ -434,6 +440,8 @@ class DocDerivation:
             out["rank_before_rerank"] = self.rank_before_rerank
         if self.rank_untuned is not None:
             out["rank_untuned"] = self.rank_untuned
+        if self.intent_factor is not None:
+            out["intent_factor"] = self.intent_factor
         return out
 
 
@@ -465,14 +473,30 @@ class Derivation:
     path: str
     gates: Gates
     documents: list[DocDerivation] = field(default_factory=list)
+    #: W-168 step 9 — `{"cue", "type", "weight"}` when the intent prior ran on
+    #: this query: the intent the lexicon read, the document type it prefers,
+    #: and `intent_weight`. Absent when it did not run (see `intent_factor`).
+    intent: dict | None = None
 
     def as_dict(self) -> dict:
-        return {
+        out = {
             "query": self.query,
             "path": self.path,
             "gates": self.gates.as_dict(),
             "documents": [d.as_dict() for d in self.documents],
         }
+        if self.intent is not None:
+            out["intent"] = dict(self.intent)
+        return out
+
+
+def _intent_factor(intent: dict | None, loc: str) -> float | None:
+    """The intent prior's factor on one document, or `None` when it did not run."""
+    if intent is None:
+        return None
+    from .intent import type_for
+
+    return 1.0 + intent["weight"] if type_for(loc, intent["doctype"]) == intent["type"] else 1.0
 
 
 def _record_terms(record: dict | None) -> dict:
@@ -549,6 +573,7 @@ def derive(
     multiplier: float = 1.0,
     expand: str = "",
     rerank_uplift: dict | None = None,
+    intent: dict | None = None,
 ) -> Derivation:
     """Build the derivation for a result list. **Never raises.**
 
@@ -680,6 +705,7 @@ def derive(
                 rank_before_rerank=before.get(result.id),
                 rank_untuned=untuned_rank.get(result.id),
                 rerank_uplift=uplift_map.get(result.id),
+                intent_factor=_intent_factor(intent, result.loc),
             )
         )
 
@@ -692,7 +718,8 @@ def derive(
         answered=1 if results else 0,
         cut_score=cut,
     )
-    return Derivation(query=query, path=path, gates=gates, documents=docs)
+    shown = None if intent is None else {k: intent[k] for k in ("cue", "type", "weight")}
+    return Derivation(query=query, path=path, gates=gates, documents=docs, intent=shown)
 
 
 # -- the receipt ---------------------------------------------------------------

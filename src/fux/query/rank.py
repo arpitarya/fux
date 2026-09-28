@@ -189,6 +189,29 @@ class Weighting:
     #: longest-key-first** by the loader so `priority_for` can stop at the
     #: first match. Empty is the default and costs nothing.
     priority: tuple[tuple[str, float], ...] = ()
+    #: W-168 step 9 — the intent → doc-type prior (M1). `doctype` is
+    #: `.fux/tune.toml`'s `[doctype]`, sorted longest-pattern-first;
+    #: `intent_type` is the type the QUESTION's intent prefers
+    #: (`query/intent.py`); `intent_factor` is `1 + intent_weight`. **All three
+    #: are per query**, which is why `run_query` builds a `Weighting` for every
+    #: question rather than one per corpus. Left at the defaults, the prior does
+    #: not exist: `intent_active` is false and nothing below changes.
+    doctype: tuple[tuple[str, str], ...] = ()
+    intent_type: str | None = None
+    intent_factor: float = 1.0
+
+    @property
+    def intent_active(self) -> bool:
+        """The prior can scale some document on this query."""
+        return bool(self.doctype) and self.intent_type is not None and self.intent_factor != 1.0
+
+    def intent_for(self, loc: str) -> float:
+        """`intent_factor` for a document of the question's preferred type, else `1.0`."""
+        if not self.intent_active:
+            return 1.0
+        from .intent import type_for
+
+        return self.intent_factor if type_for(loc, self.doctype) == self.intent_type else 1.0
 
     def priority_for(self, loc: str) -> float:
         """The per-source multiplier for a document location; unlisted is `1.0`.
@@ -229,7 +252,7 @@ class Weighting:
         property it guards is the one the accelerator's bound rests on, and
         `[priority]` can still make it false.
         """
-        return not self.priority
+        return not self.priority and not self.intent_active
 
     @property
     def maximum(self) -> float:
@@ -246,14 +269,21 @@ class Weighting:
         the moment a second one arrives** — a document can carry two independent
         weights and be scaled twice, and taking the larger under-estimates the
         ceiling, which is the W-73 defect's exact shape.
+
+        ⚠ **Restored 2026-09-28 (W-168 step 9)**: the intent prior is the second
+        multiplier, and it can land on a document `[priority]` also scales. So
+        the supremum is the product of the two, never the larger.
         """
-        return max([1.0, *(w for _, w in self.priority)])
+        top = max([1.0, *(w for _, w in self.priority)])
+        return top * self.intent_factor if self.intent_active else top
 
     def of(self, record: dict) -> float:
-        """The multiplier for one record: per-source priority, and nothing else."""
+        """The multiplier for one record: per-source priority times the intent prior."""
         if self.trivial:
             return 1.0
-        return self.priority_for(record.get("loc", ""))
+        loc = record.get("loc", "")
+        weight = self.priority_for(loc)
+        return weight * self.intent_for(loc) if self.intent_active else weight
 
 
 def rank(
