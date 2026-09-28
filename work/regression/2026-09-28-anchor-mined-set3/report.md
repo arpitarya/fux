@@ -10,6 +10,10 @@ pre_registration: work/regression/2026-09-28-anchor-mined-set3/PRE-REGISTRATION.
 
 # Report: the shipped pair on `set-3-claude`, gen-2 `rung-01000` copy
 
+✅ **Decided 2026-09-28: [PASS](VERDICT.md)** by the frozen table. A beats B 6/0
+and C 7/0 at rank 1, with 0 losses. The capture text below is left as it was
+filed.
+
 **Captured, not scored, not decided.** Below, *changed* means **the ranking
 moved**, never that it *improved*.
 
@@ -54,6 +58,17 @@ moved**, never that it *improved*.
 
 Read from each **comparator** arm once scored (d22f). `decide.py` writes it into
 `decision.json`. This report claims no figure.
+
+**Filled 2026-09-28, after scoring** (from [`decision.json`](evidence/decision.json),
+by the session that decided, not the one that captured):
+
+| endpoint `hit@1` | shipped A | comparator | improvement headroom (comparator in top 10, not at rank 1) | regression headroom (comparator at rank 1) |
+|---|---:|---:|---:|---:|
+| vs `am3-B` | 54 | 48 | 23 | 48 |
+| vs `am3-C` | 54 | 47 | 23 | 47 |
+
+Neither direction is near zero, so the 0 losses are a real null and not a
+saturated endpoint.
 
 ## 4 · Reproduce
 

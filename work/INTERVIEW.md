@@ -35,7 +35,13 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-28** (Claude Code, Opus — W-233 shipped; W-228 DoD 11 rung; W-168 pools).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-09-28 (latest) — W-233 SHIPPED: IDENTIFIER FAMILIES, MEASURED PASS
+### 🟢 2026-09-28 (latest) — W-232 PASS: THE SHIPPED ANCHOR + MINED PAIR LOSES NOTHING
+
+- [Verdict](regression/2026-09-28-anchor-mined-set3/VERDICT.md): `anchor 1.0 + mined 0.5` beats mined-off 6/0 and anchor-off 7/0 at rank 1 on `set-3-claude`, with 0 losses. `hit@1` is 54 / 48 / 47. W-168 steps 1 and 4's *combination unmeasured* warnings are closed.
+- ⚠ The frozen decider reads `am-X` and the capture wrote `am3-X`. It was run unedited through a scratch symlink mirror, which the verdict declares.
+- **Next:** nothing on W-232; it is off the inbox and archived.
+
+### 🟢 2026-09-28 — W-233 SHIPPED: IDENTIFIER FAMILIES, MEASURED PASS
 
 - `.fux/identifiers.toml` families add one canonical term per match on both readers, so `RF 118`, `rf118` and `RF–118` are `rf-118`. [SR-IDENTIFIERS](../records/0160_identifiers.md) holds the design; the [verdict](regression/2026-09-28-identifier-families/VERDICT.md) is net +25 / +88 / +105 with 0 broken, and an empty file is byte-identical.
 - It is a new required file (L12): `fux doctor --fix` writes it, so the next release's CHANGELOG carries it under Breaking.

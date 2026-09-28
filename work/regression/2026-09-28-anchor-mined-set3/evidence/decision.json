@@ -1,0 +1,106 @@
+{
+ "comparisons": {
+  "am-B": {
+   "arm": "anchor 1.0 + mined 0.0",
+   "headroom": {
+    "improvement_pool": 23,
+    "regression_exposed": 48
+   },
+   "hit@1": {
+    "alpha": 0.05,
+    "b": 6,
+    "c": 0,
+    "discordant": 6,
+    "net": 6,
+    "net_needed": 6,
+    "outcome": "am-A",
+    "p": 0.03125
+   },
+   "hit@10": [
+    0,
+    0
+   ],
+   "hit@1_line": "b=6 c=0 discordant=6 net=6 p=0.0312 (net needed 6, alpha=0.05) -> AM-A",
+   "lost": [],
+   "primary@1": [
+    1,
+    0
+   ],
+   "totals": {
+    "hit@1": {
+     "comparator": 48,
+     "shipped": 54
+    },
+    "hit@10": {
+     "comparator": 71,
+     "shipped": 71
+    },
+    "primary@1": {
+     "comparator": 30,
+     "shipped": 31
+    }
+   },
+   "verdict": "PASS",
+   "won": [
+    "s3u-007",
+    "s3u-019",
+    "s3u-038",
+    "s3u-050",
+    "s3u-059",
+    "s3u-071"
+   ]
+  },
+  "am-C": {
+   "arm": "anchor 0.0 + mined 0.5",
+   "headroom": {
+    "improvement_pool": 23,
+    "regression_exposed": 47
+   },
+   "hit@1": {
+    "alpha": 0.05,
+    "b": 7,
+    "c": 0,
+    "discordant": 7,
+    "net": 7,
+    "net_needed": 7,
+    "outcome": "am-A",
+    "p": 0.015625
+   },
+   "hit@10": [
+    1,
+    0
+   ],
+   "hit@1_line": "b=7 c=0 discordant=7 net=7 p=0.0156 (net needed 7, alpha=0.05) -> AM-A",
+   "lost": [],
+   "primary@1": [
+    12,
+    0
+   ],
+   "totals": {
+    "hit@1": {
+     "comparator": 47,
+     "shipped": 54
+    },
+    "hit@10": {
+     "comparator": 70,
+     "shipped": 71
+    },
+    "primary@1": {
+     "comparator": 19,
+     "shipped": 31
+    }
+   },
+   "verdict": "PASS",
+   "won": [
+    "s3u-002",
+    "s3u-029",
+    "s3u-032",
+    "s3u-040",
+    "s3u-055",
+    "s3u-065",
+    "s3u-072"
+   ]
+  }
+ },
+ "outcome_by_the_table": "PASS \u2014 the shipped pair loses nothing either step holds alone"
+}

@@ -7,6 +7,10 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## ✅ STEPS 1 + 4 MEASURED TOGETHER — 2026-09-28 (Claude Code, Opus; a non-capturing session), W-232 PASS
+
+[Verdict](../regression/2026-09-28-anchor-mined-set3/VERDICT.md). The shipped pair `anchor = 1.0` + `mined_weight = 0.5` beats mined-off 6/0 and anchor-off 7/0 at rank 1 on `set-3-claude`, with **0 losses**. All six wins over mined-off are step 4's tagged questions, which is its own 6/0 reproduced at `anchor = 1.0`. **Both steps' *combination unmeasured* warnings below are closed.** `informed`.
+
 ## 🔴 STEPS 7 AND 8 BLOCKED ON THEIR ENDPOINTS — 2026-09-28 (Claude Code, Opus)
 
 Nothing was pre-registered. Both questions are in `work/BLOCKED.json` and the inbox.
@@ -174,13 +178,13 @@ Shipped per §If it passes, in one change. A concurrent session committed the fi
   - scan = accelerator: **22 144 comparisons byte-identical**;
   - Node = bundle = Python: **0 of 225 discordant**, at this repo's default of `0.5`.
 - **CHANGELOG:** Unreleased/Added. The key never shipped at `0.0`, so **every** upgraded repo's ranking changes. `mined_weight = 0.0` is the way back.
-- ⚠ Unmeasured, and ratified knowing it: the combination with `anchor = 1.0`.
+- ⚠ Unmeasured, and ratified knowing it: the combination with `anchor = 1.0`. ✅ *Measured 2026-09-28 by W-232: [PASS](../regression/2026-09-28-anchor-mined-set3/VERDICT.md).*
 
 ## ✅ STEP 4 (ABBREVIATIONS) FILED PASS at `mined_weight = 0.5` — 2026-09-27 (Arpit, Cowork)
 
 *"yes"*, when asked whether to ratify step 4 at `0.5`. [Verdict](../regression/2026-09-27-mined-expansion/VERDICT.md).
 No confirmation arm at `anchor = 1.0`: the two ship together, and that
-combination is unmeasured.
+combination is unmeasured. ✅ *Measured 2026-09-28 by W-232: [PASS](../regression/2026-09-28-anchor-mined-set3/VERDICT.md).*
 
 **Next, agent, in one change** (PRE-REGISTRATION §If it passes, as step 1 shipped):
 - **Default:** `mined_weight = 0.5` in `tune.py` and `tune.mjs`, and in the setup template's comment.
@@ -196,7 +200,7 @@ combination is unmeasured.
 - `hit@1` on the 22 tagged questions, wins/losses: 2/0 · 4/0 · 5/0 · **6/0** at `0.1 · 0.2 · 0.3 · 0.5`. Only `0.5` reaches the floor of 6, with no margin.
 - **No drift loss at any weight**, tagged or not. `hit@10` stays at 70 → 70. Headroom is 10 / 41, as predicted.
 - ⚠ Five of the six wins are a relevant non-primary document reaching rank 1. `primary@1` moves only 1/0.
-- ⚠ The arms ran at the rung's `anchor = 0.0`, but the engine ships `1.0`. The combination is unmeasured.
+- ⚠ The arms ran at the rung's `anchor = 0.0`, but the engine ships `1.0`. The combination is unmeasured. ✅ *Measured 2026-09-28 by W-232: [PASS](../regression/2026-09-28-anchor-mined-set3/VERDICT.md).*
 - 🔴 **Next:** Arpit ratifies, or asks for a confirmation arm at `anchor = 1.0`. On ratification, ship per the bar's §If it passes, in one change.
 
 ## 🔴 STEP 4 ARMS CAPTURED — 2026-09-27 (Claude Code, Opus); the score is Arpit's, the verdict another session's

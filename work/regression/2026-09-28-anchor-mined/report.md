@@ -95,3 +95,12 @@ was scored before. This session wrote the bar and captured the arms, so it may
 not decide them. It read `work/golden/questions/set-4-claude.jsonl` (ids and text)
 and the ladder manifest, and **no other path under `work/golden/`**. It opened no
 key and no score file.
+
+## Headroom (SR-RS d22), added 2026-09-28 by the deciding session
+
+**Not measurable, because the run was never scored.** The STOP came before
+scoring, so neither **improvement** nor **regression** headroom exists for any
+arm. The precondition's own count stands in for both: `am-B` changes **0** of 125
+rankings, so no question could move in either direction on the mined switch.
+That is the STOP. The second bar ([`2026-09-28-anchor-mined-set3`](../2026-09-28-anchor-mined-set3/VERDICT.md))
+is where W-232 was decided.

@@ -22,6 +22,16 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-232 decided PASS: the shipped anchor + mined pair loses nothing  ·  Claude Code (Opus)
+- **Asked:** Arpit pasted his `just golden-score` output for the three arms, then *"your recommendation"* (file it).
+- **Did:**
+  - Checked `decide.py` against the bar's frozen hash (`7fb7ab4d…`). Run in place, it refuses: it reads `scores/am-X`, and the capture wrote `am3-X`. Rather than edit a frozen file, I ran it byte-identical from a scratch mirror with `am-X` → `am3-X` symlinks.
+  - **PASS**: A beats B 6/0 (p = 0.031, exactly the floor) and C 7/0 (p = 0.016), with 0 losses. All six wins over B are step 4's tagged questions; all seven over C are untagged.
+  - Filed the [verdict](regression/2026-09-28-anchor-mined-set3/VERDICT.md), `decision.json` and `per-query.jsonl`. Closed W-168's two warnings. Archived W-232 with its map row. Indexed both W-232 runs in `regression/README.md`, including the first bar's STOP, which had no row.
+- **Decided / open:** the naming mismatch is declared as a deviation, not a rule change. Arpit approved filing it this way.
+- **Watch:** a frozen decider should be run once against its capture's real directory names before it is frozen. This is the first time the mismatch has been seen, so no gate yet.
+- **Next:** nothing on W-232; it is off the inbox and archived. The shared queue files also carry the Cowork session's uncommitted rulings, which this commit leaves unstaged.
+
 ## 2026-09-28 — W-233 built and measured PASS: identifier families, kept whole however typed  ·  Claude Code (Opus)
 - **Asked:** *"implement w-233"*.
 - **Did:**
