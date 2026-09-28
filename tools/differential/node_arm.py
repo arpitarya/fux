@@ -57,6 +57,7 @@ import json
 import os
 import subprocess
 import sys
+import tomllib
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -143,6 +144,10 @@ class Arm:
         # result row of every query, which is O(corpus x results) and is what
         # made a 10 000-document rung impossible rather than merely slow.
         self.records: dict[str, dict] = py_reader.read_index(root)
+        # The same key the CLI and the Node reader read for `--json` headings,
+        # from the same file — never a copy of its value (L12).
+        with (root / ".fux" / "output.toml").open("rb") as f:
+            self.max_headings: int = tomllib.load(f)["cli"]["max_headings"]
 
     # -- the two readers ------------------------------------------------------
 
@@ -171,7 +176,7 @@ class Arm:
         """What `fux find`/`fux ask` computes, through the CLI's own seam."""
         out: dict = {} if want_confidence else None
         results, _path = run_query(
-            self.root, query, top, confidence_out=out, use_tune=self.use_tune
+            self.root, query, top, force_scan=True, confidence_out=out, use_tune=self.use_tune
         )
         rows = [
             {"id": r.id, "loc": r.loc, "title": r.title, "score": r.score,
@@ -181,7 +186,7 @@ class Arm:
         if not want_confidence:
             return {"results": rows}
         for row, r in zip(rows, results):
-            row["headings"] = headings_for(self.records.get(r.id), query)
+            row["headings"] = headings_for(self.records.get(r.id), query, limit=self.max_headings)
         confidence = out.get("confidence")
         return {"results": rows, "confidence": confidence.as_dict() if confidence else None}
 
@@ -345,7 +350,7 @@ process.stdout.write(JSON.stringify({
   explain: await ix.explain(%(doc)s),
   graph: await ix.graph(%(q)s, { hops: 1, top: 3 }),
   path: await ix.path(%(doc)s, %(doc2)s, { hops: 3 }),
-  answer: (await ix.answer(%(q)s)).asDict(),
+  answer: (await ix.answer(%(q)s, { audit: false })).asDict(),
 }));
 """
 
@@ -358,7 +363,7 @@ print(json.dumps({
   "explain": ix.explain(%(doc)s),
   "graph": ix.graph(%(q)s, hops=1, top=3),
   "path": ix.path(%(doc)s, %(doc2)s, hops=3),
-  "answer": ix.answer(%(q)s).as_dict(),
+  "answer": ix.answer(%(q)s, audit=False, receipt=False).as_dict(),
 }))
 """
 

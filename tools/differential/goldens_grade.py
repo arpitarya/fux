@@ -118,7 +118,7 @@ def grade(
     force_scan = FORCE_SCAN[mode]
     for golden in goldens:
         top = golden.get("top", DEFAULT_TOP)
-        results, path = run_query(root, golden["q"], top, force_scan=force_scan, tune=tune)
+        results, path = run_query(root, golden["q"], top, force_scan=force_scan, tune=tune, use_tune=True)
         if mode == "accelerator" and path != "accelerator":
             # `run_query` falls back to scan silently when no fresh accelerator
             # build exists. Silent here would mislabel a scan result as the
