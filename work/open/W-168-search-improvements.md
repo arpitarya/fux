@@ -7,6 +7,19 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## 🔴 STEPS 7 AND 8 BLOCKED ON THEIR ENDPOINTS — 2026-09-28 (Claude Code, Opus)
+
+Nothing was pre-registered. Both questions are in `work/BLOCKED.json` and the inbox.
+
+- **Step 7 (MMR) cannot use the pool of 8.** That pool is counted at rank 1, and MMR swaps position 5 only, so it cannot move `hit@1` by design.
+- **Its ruled endpoint needs the key.** The 2026-09-23 ruling says *coverage in the top k, with `precision@1` unchanged*. The facets exist only in the key (prompt 11 Input 3). [L11](../../records/0013_LAW-11-sealed-answer-key.md) d13a lets `score.py` write per-tag pool counts and nothing per row.
+  - A decider needs per-question coverage flips.
+  - That output is a new entry on d13's allow-list, and a Law changes only on Arpit's ruling.
+  - **Recommended:** amend d13 so the scorer also emits, per question id, *facets covered in the top 5* and *facets in the key*, as counts only. The alternative is to stop step 7.
+- **Step 8 (authority) has no ruled endpoint.** The 2026-09-23 table predates the history corpus. Its pools were counted at rank 1 (pool 8) and rank 5 (pool 2).
+  - **Recommended:** judge it at `hit@1` with `primary@1` beside it, as steps 1, 4 and 9 were.
+- **Agent-closable meanwhile:** step 8's compare doc, covering the prior's form (authors × commits, log scaling, where the statistic lives in `M/`) and the recency trap. It needs no ruling to write.
+
 ## ✅ STEP 9 SHIPPED — 2026-09-28 (Claude Code, Opus); step 7 is next
 
 - **`intent_weight = 0.1`** is the value in `src/fux/templates/tune.toml.txt`, which `fux setup` and `doctor --fix` write (L12: the template is the default's one home). The repo's own `.fux/tune.toml` matches it. **No reader code changed**: both planes read the key and hold no default of their own.

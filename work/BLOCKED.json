@@ -1,8 +1,11 @@
 {
  "decision": "ASK",
- "reason": "W-228 DoD 11 needs planted family misfits in the golden seed; the seed has 0 (2026-09-28 run), and a seed addition rebuilds the ladder under W-168's set-4 pools (SR-WORK-TESTDATA A23).",
- "questions": ["When may a generation-4 author session plant family misfits in seed/ — after W-168 steps 6–10 (recommended), now, or never (drop DoD 11's planting half)?"],
- "safe_alternative": "W-168 step 9 and W-225 stage 5c–5f are agent-closable meanwhile.",
+ "reason": "W-228 DoD 11 needs planted family misfits in the golden seed; the seed has 0 (2026-09-28 run), and a seed addition rebuilds the ladder under W-168's set-4 pools (SR-WORK-TESTDATA A23). · W-168 step 7 (MMR) is judged on facet coverage in the top k, but `facets` is key-only and L11 d13a lets score.py emit pool counts only; step 8's endpoint was never ruled.",
+ "questions": [
+  "When may a generation-4 author session plant family misfits in seed/ — after W-168 steps 6–10 (recommended), now, or never (drop DoD 11's planting half)?",
+  "W-168: amend L11 d13 so score.py also emits per-question facet-coverage counts at k = 5 (step 7, recommended) — or stop step 7; and judge step 8 (authority) at rank 1, hit@1 with primary@1 beside it, as steps 1, 4 and 9 were (recommended)?"
+ ],
+ "safe_alternative": "W-225 stage 5c–5f, and W-168 step 8's compare doc (the prior's forms, the recency trap), are agent-closable meanwhile; W-168 step 9 shipped.",
  "surfaced": true,
  "filed": "2026-09-28"
 }
