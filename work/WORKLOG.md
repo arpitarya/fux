@@ -22,6 +22,27 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-225 stage 5a–5f: algorithm, format, wire and protocol numerals leave the code  ·  Claude Code (Opus)
+- **Asked:** *"implement W-225"*.
+- **Did:**
+  - `a2ce3fc6` 5a/5b: the stemmer, BLAKE2b, the PII checksums, pyfloat, the TOML reader, front matter, `.fuxignore`, `typesfile` and the 17 decoders. `constants.toml` gained `[stem]`, `[blake2b]`, `[pii.*]`, `[pyfloat]`, `[ranking] score_digits`, `[json] indent`, `[decoders.*.format]`, `[radix]`, `[markdown]` and `[ooxml]`.
+  - Four decoder scan windows went to `formats.toml [limits]` (html charset, xml prolog, two yaml keys).
+  - `f47afb91` 5c/5d: wire, store, chunker, hash widths, JSON-RPC codes, `[exit]`, `[win32]` and the bundler.
+  - `a8435a2a` 5e: 13 leftover tunables → `fux.toml` (SR-CONFIG decision 18). Three stay fixed because an earlier ruling decides them: the rate-limit retries (W-82 ruling 12), `MAX_PASSES` (SR-MAINTENANCE veto 6), and the as-ingested veto share (a record's reopen condition).
+  - `dc1f36fe` 5f: doctor's `[doctor] acquired_warn_share`.
+  - A refactor that removes a literal outright was preferred to a key: suffix lengths, named regex groups, unpacking, `zip(it, it)`, `struct` sizes, `timedelta`, `ctypes` ceilings. `toml.mjs` reads `constants.toml` and so holds no numeral at all.
+  - **Evidence**:
+    - HEAD's and the new decoders agree on 17 147 inputs (every tracked file, crafted files, every prefix).
+    - The stemmer agrees on 8 982 words; pyfloat on 2.4 M comparisons; BLAKE2b on 154 inputs, at HEAD's speed.
+    - For every packet, HEAD and the new tree ingest identical `.fux/index` postings and runtime (in 5b, REGISTER differs only in the decoder-copy digest).
+    - Every ask/find/answer output compared was byte-identical, Python and the Node bundle: 300, 300, 150 and 150 across the four runs.
+- **Decided / open:**
+  - Scanner: 1 206 → about 950 sites. The rest are R3 presentation cuts, `fixed(...)` key names and enum tags, which stage 7's allow-list takes, plus stage 6's parameter defaults.
+  - ⚠ `src/fux/inspect/` is untouched: W-228's `lenses.py` is uncommitted there.
+  - Judgement calls are in the compare doc §"Where the build departed", 16 new rows, for Arpit.
+  - Still red and not mine: `999c1976`'s history gate (a `RULE-SINCE` move or a rewrite, Arpit's call).
+- **Next:** 5f `inspect` once W-228 lands; stage 6 (R8 bools and every parameter default); stage 7 (the AST test and allow-list); stage 8 (CHANGELOG 3.0 migration lines, byte-equality run).
+
 ## 2026-09-28 — W-168 step 9 pre-registered: lexicon pool 14, equal to the key's  ·  Claude Code (Opus)
 - **Asked:** *"commit and continue"*.
 - **Did:**
