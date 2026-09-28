@@ -1,0 +1,63 @@
+{
+ "arms": {
+  "am-A": {
+   "ask_ms_median": 169.1,
+   "bands": {
+    "grounded": 69,
+    "partial": 24,
+    "weak": 32
+   },
+   "engine_commits": [
+    "641ee38a"
+   ],
+   "gates_captured": 125,
+   "n": 125
+  },
+  "am-B": {
+   "ask_ms_median": 163.2,
+   "bands": {
+    "grounded": 69,
+    "partial": 24,
+    "weak": 32
+   },
+   "engine_commits": [
+    "641ee38a"
+   ],
+   "gates_captured": 125,
+   "n": 125
+  },
+  "am-C": {
+   "ask_ms_median": 166.1,
+   "bands": {
+    "grounded": 69,
+    "partial": 24,
+    "weak": 32
+   },
+   "engine_commits": [
+    "641ee38a"
+   ],
+   "gates_captured": 125,
+   "n": 125
+  }
+ },
+ "build_check_vs_2026_09_27": {
+  "band_equal": 125,
+  "n": 125,
+  "ranked_equal": 125
+ },
+ "stop": [
+  "am-B"
+ ],
+ "vs_shipped": {
+  "am-B": {
+   "membership_changed": 0,
+   "order_changed": 0,
+   "top1_changed": 0
+  },
+  "am-C": {
+   "membership_changed": 5,
+   "order_changed": 13,
+   "top1_changed": 0
+  }
+ }
+}

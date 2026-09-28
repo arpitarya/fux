@@ -51,3 +51,10 @@ open warning.
   [Pre-registration](../regression/2026-09-28-anchor-mined/PRE-REGISTRATION.md) ·
   decider [`decide.py`](../regression/2026-09-28-anchor-mined/evidence/decide.py),
   frozen by hash.
+- **2026-09-28 · STOP on set-4-claude** (same session). Captured at `641ee38a`:
+  `am-B` (mined off) ranks all 125 questions identically to `am-A`, because no
+  set-4-claude question carries any of the rung's 9 mined forms. The fold itself
+  is live on probes. Not scored, and no verdict. [Report](../regression/2026-09-28-anchor-mined/report.md).
+- **2026-09-28 · Arpit: re-run on set-3-claude** (was `set-3-u`, 22
+  `expansion_form` questions), at a copy of step 4's own `mx-base` (the gen-2
+  `9cdde333` corpus, re-ingested `v5`). This needs a new pre-registration.
