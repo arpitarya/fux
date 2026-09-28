@@ -22,6 +22,19 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-230 and W-227 built and closed: the traversal guard fires live  ·  Claude Code (Opus, fresh session)
+- **Asked:** *"implement W-230"*.
+- **Did:**
+  - `chmod +x` and `git update-index --chmod=+x` on `guard-golden-traversal.sh`. Committed W-227's hardening with it (`d82cab8e`).
+  - Offline replay on stdin (W-227's ruling) found a hole in that hardening: a quoted `"<<EOF"` hid every later line. Heredoc markers are now matched on the quote-neutral line.
+  - Gate: `tests/test_hooks_launchable.py`, which requires every registered or tracked hook to be `100755`. The hook tests launch hooks by path; the probed `bash` stays for Windows only.
+  - Added the W-227 and W-230 shapes and the probe as DENIED cases. Amended L11 decision 9 and SR-WORK-GOLDEN, regenerated CLAUDE.md, and added a root `.ignore`.
+  - **Live probe `false && grep -rn probe work` was DENIED.** Closed W-230 and W-227 and archived both detail files. W-228 DoD 11 is unblocked.
+  - Once live, the hook denied a `sed` carrying 🟡 (macOS awk plus a UTF-8 locale). Fixed with `LC_ALL=C` and a UTF-8-locale test.
+  - ⚠ My lapse: `d82cab8e` amended L11 without re-stamping its `content_sha`. The worktree run reported it and I read only two of the three failures. It is stamped in the closing commit.
+- **Decided / open:** Another session has `src/fux/query/stem.py` uncommitted (W-225), which breaks the constants lookup in the main tree. I ran the suites in a scratch worktree of HEAD plus my change, and did not touch its file. One test fails on HEAD and was failing before this change: `test_no_behaviour_change_landed_without_its_adr` on `999c19761` (W-225 stage 3a, SR-TUNE not touched).
+- **Next:** W-228 DoD 11; W-168 steps 6–10; W-225 stage 5.
+
 ## 2026-09-28 — W-231 built and closed: law L13, SR-LAW-5 archived  ·  Claude Code
 - **Asked:** *"review all the work items on open work implement all of them"*.
 - **Did:**

@@ -26,6 +26,33 @@ Rules:
 
 ---
 
+## 2026-09-28 — **W-230 + W-227: the traversal guard can launch, and it is hardened**
+
+**Outcome: built and closed. The live probe was DENIED.**
+- **What (`d82cab8e`):** `guard-golden-traversal.sh` is `100755`. It had been
+  `100644` since W-223, so Claude Code could not launch it and it never fired
+  live. W-227's hardening landed with it: fail closed on an unparseable payload
+  or an undecided exit, and heredoc bodies read as commands only when a shell is
+  fed them. Heredoc markers are now matched on the quote-neutral line: a quoted
+  `"<<EOF"` hid every later line, found offline in this session and fixed.
+  A root `.ignore` names `work/golden/` for `rg`.
+- **Gate (two strikes):** `tests/test_hooks_launchable.py` requires every
+  registered or tracked hook to be `100755` in git and executable on disk. The
+  hook tests launch hooks by path; `bash <hook>` is kept only for Windows.
+- **Evidence:** the live probe `false && grep -rn probe work` was DENIED by the
+  hook in a Claude Code session after the commit. Both suites green in a clean
+  worktree of HEAD + this change, except one pre-existing failure:
+  `test_no_behaviour_change_landed_without_its_adr` on `999c19761`, W-225's.
+- **Records:** [L11](../records/0012_LAW-11-sealed-answer-key.md) decision 9
+  and [SR-WORK-GOLDEN](../records/0066_WORK-golden.md) amended.
+- **Found once it ran live:** under a UTF-8 locale macOS `awk` died on a 4-byte
+  character (an emoji in a `sed` script), and fail-closed denied the command.
+  The hook now runs awk with `LC_ALL=C`, and
+  `test_a_utf8_locale_does_not_change_the_verdict` runs it the way a live
+  session does. That is the third offline/live gap in this guard.
+
+---
+
 ## 2026-09-27 — **W-168: the golden ladder, generation 3**
 
 **Outcome: landed; all eight rungs frozen at `80495b44`.**

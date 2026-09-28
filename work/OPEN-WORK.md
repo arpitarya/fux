@@ -32,11 +32,9 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-230** · `agent` — L11 breach, 2026-09-28. BUILT: the hook is `100755`, `test_hooks_launchable.py` gates it, hook tests launch by path. Next: the live probe must be denied. [detail](open/W-230-l11-breach-2026-09-28.md)
-- 🟡 **W-227** · `agent` — L11 breach, 2026-09-27; hardening committed with W-230, green. Closes when W-230's live probe is denied. [detail](open/W-227-l11-breach-2026-09-27.md)
 - 🟢 **W-168** · `agent` — the ranking ideas. `set-4-claude` scored by Arpit 2026-09-28 (`hit@1` 66/125, `informed`). Next: each step 6–10 counts its pool from the score; below 6 stops it. [detail](open/W-168-search-improvements.md)
 - 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–4 landed (`constants.toml`; `tune`/`output`/`fux.toml` strict; `formats.toml` caps; `refusals.toml [scan]`; `inspect.toml`). Next: stage 5, R7 numerals. [detail](open/W-225-values-live-in-config.md)
-- 🟡 **W-228** · `agent` — document families: DoD 1–10 built 2026-09-28. Open: DoD 11, golden seed families + a rung before the misfit floor leaves PROVISIONAL; waits on W-230's live probe. [detail](open/W-228-document-families.md)
+- 🟢 **W-228** · `agent` — document families: DoD 1–10 built 2026-09-28. Next: DoD 11, golden seed families + a rung before the misfit floor leaves PROVISIONAL; unblocked 2026-09-28 (W-230's probe denied). [detail](open/W-228-document-families.md)
 
 
 ### testing

@@ -1,6 +1,6 @@
 """Every hook `.claude/settings.json` registers can be LAUNCHED — `100755` in git.
 
-[W-230](../work/open/W-230-l11-breach-2026-09-28.md), ruled by Arpit on
+[W-230](../archive/open/W-230-l11-breach-2026-09-28.md), ruled by Arpit on
 2026-09-28. ``guard-golden-traversal.sh`` was committed ``100644`` by W-223 and
 stayed that way for three days. Claude Code launches a hook by path; a file
 that is not executable fails to launch, that failure is non-blocking, and the

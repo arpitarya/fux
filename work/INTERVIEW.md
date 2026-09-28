@@ -35,7 +35,14 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-27** (Claude Code, Opus — W-225 stage 3b landed; W-227 declared).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-09-28 (latest) — W-229, W-228 AND W-231 LANDED; W-230 IS A FRESH SESSION'S
+### 🟢 2026-09-28 (latest) — W-230 AND W-227 CLOSED: THE TRAVERSAL GUARD FIRES LIVE
+
+- **W-230 + W-227** (`d82cab8e` and the closing commit): the hook is `100755` and hardened, and `test_hooks_launchable.py` gates the mode. **The live probe was denied.** Recursive walks over `work/` are guarded again. They still need `--exclude-dir=golden`, which is the law.
+- Once live, the guard denied a command carrying an emoji: macOS awk under UTF-8. Fixed with `LC_ALL=C`. That is the third offline/live gap in this guard.
+- **W-228 DoD 11 is unblocked.** Next for agents: W-228 DoD 11, W-168 steps 6–10, W-225 stage 5.
+- ⚠ `test_no_behaviour_change_landed_without_its_adr` is red on HEAD for `999c19761` (W-225 stage 3a did not touch SR-TUNE). It belongs to W-225's session.
+
+### 🟢 2026-09-28 — W-229, W-228 AND W-231 LANDED; W-230 IS A FRESH SESSION'S
 
 - **W-229** (`9a4d3d3f`): every `fux inspect` lens has an Index-tab card; `/inspect/diff`; a parity test.
 - **W-228** (`79e564bb`): the `families` lens. DoD 11 (golden seed families + a rung) waits on W-230.
@@ -59,7 +66,7 @@ valuable judgement, but not the state of play.
 
 - **`fux.toml`** now requires every key; `[sources.url]` stays optional as a table (absence = fetch nothing) and `doctor --fix` never adds it. [SR-CONFIG](../records/0113_config.md) decision 17. 120/120 outputs byte-identical.
 - **Four behaviour changes** await Arpit's review in [the compare doc](compare/l12-classify.compare.md) §"Where the build departed".
-- 🔴 **[W-227](open/W-227-l11-breach-2026-09-27.md)**: an L11 traversal (recursive grep with `work` as a root; nothing printed) that the W-223 guard did not stop. Arpit rules the cost and whether a session may harden the guard.
+- 🔴 **[W-227](../archive/open/W-227-l11-breach-2026-09-27.md)**: an L11 traversal (recursive grep with `work` as a root; nothing printed) that the W-223 guard did not stop. Arpit rules the cost and whether a session may harden the guard.
 - **Next:** W-225 stage 4. W-168's phase-5 run of `set-4-claude`, by a session other than W-227's.
 
 ### 🔴 2026-09-27 — W-168 STEP 4 PASSES BY THE TABLE at `mined_weight = 0.5`; Arpit ratifies

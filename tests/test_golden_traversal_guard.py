@@ -116,6 +116,16 @@ def test_ordinary_reading_is_not_blocked(command, cwd):
     )
 
 
+@pytest.mark.parametrize("expected,command", [(0, "sed -i '' 's/🟡 x/🟢 x/' work/OPEN-WORK.md"), (2, "echo 🟡 && grep -rn x work")])
+def test_a_utf8_locale_does_not_change_the_verdict(expected, command):
+    """W-230: a live session has LANG=…UTF-8 and this suite had none. macOS awk
+    died on a 4-byte character there, and fail-closed made that a deny."""
+    payload = {"tool_name": "Bash", "tool_input": {"command": command}, "cwd": str(ROOT)}
+    env = {"CLAUDE_PROJECT_DIR": str(ROOT), "PATH": __import__("os").environ.get("PATH", ""), "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8"}
+    proc = subprocess.run(hook_argv(HOOK), input=json.dumps(payload), capture_output=True, text=True, cwd=ROOT, env=env)
+    assert proc.returncode == expected, proc.stderr
+
+
 def test_it_fails_closed_on_a_payload_it_cannot_parse():
     proc = subprocess.run(hook_argv(HOOK), input="not json grep -r x .", capture_output=True, text=True, cwd=ROOT)
     assert proc.returncode == 2

@@ -78,7 +78,10 @@ PROJ=${CLAUDE_PROJECT_DIR:-}
 [ -n "$CWD" ] || CWD=$(pwd)
 [ -n "$PROJ" ] || PROJ=$(pwd)
 
-printf '%s\n' "$CMD" | awk -v cwd="$CWD" -v proj="$PROJ" '
+# LC_ALL=C (W-230): under a UTF-8 locale macOS awk dies on a 4-byte character
+# (an emoji in a sed script), and fail-closed turned that into a deny. Every
+# pattern here is ASCII, so reading bytes decides exactly what reading chars would.
+printf '%s\n' "$CMD" | LC_ALL=C awk -v cwd="$CWD" -v proj="$PROJ" '
 function strip(t) { gsub(/["'"'"'`]/, "", t); return t }
 function trim_slash(t) { while (length(t) > 1 && substr(t, length(t)) == "/") t = substr(t, 1, length(t) - 1); return t }
 function cwd_risky(   rel) {
