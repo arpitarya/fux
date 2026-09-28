@@ -7,6 +7,19 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## 🔴 STEP 9 ARMS CAPTURED — 2026-09-28 (Claude Code, Opus); the score is Arpit's, the verdict another session's
+
+[Report](../regression/2026-09-28-intent-prior/report.md).
+
+- **Five arms** `0.0 / 0.1 / 0.2 / 0.3 / 0.5` on one copy of rung-01000 (`b73348d5`), engine `a113b727` pinned in its own worktree. `doctor --fix` ran on the copy (10 tune keys, all template values), then the bar's three globs. No re-ingest.
+- **`ip-0.0` equals the 2026-09-27 capture on 125/125 ranked lists and bands**, so the pool of 14 applies.
+- **Rank 1 moves on 6 / 8 / 11 / 14 questions, all tagged.** No untagged ranking moved at all. These are changes, not improvements.
+- **Written before any score:** [`evidence/decide.py`](../regression/2026-09-28-intent-prior/evidence/decide.py) (step 4's decider, arm names, set and tag reading changed) and `describe.py`.
+- 🔴 **Next, in order:**
+  1. Arpit runs `just golden-score work/regression/2026-09-28-intent-prior`. No unlock is needed.
+  2. A session that did **not** capture the arms runs `evidence/decide.py`.
+  3. An INCONCLUSIVE goes back to Arpit.
+
 ## ✅ STEP 9 BUILT — 2026-09-28 (Claude Code, Opus); the arms are next
 
 The mechanism exactly as [the bar](../regression/2026-09-28-intent-prior/PRE-REGISTRATION.md)

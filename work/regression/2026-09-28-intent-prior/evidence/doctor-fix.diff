@@ -1,0 +1,62 @@
+ .fux/formats.toml  | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ .fux/output.toml   | 12 ++++++++++++
+ .fux/refusals.toml |  4 ++++
+ .fux/tune.toml     | 28 ++++++++++++++++++++++++++++
+ 4 files changed, 94 insertions(+)
+diff --git a/.fux/tune.toml b/.fux/tune.toml
+index 3ce0495..9f33a14 100644
+--- a/.fux/tune.toml
++++ b/.fux/tune.toml
+@@ -38,6 +38,21 @@ expand_weight           = 0.2   # Query2doc's 1:5; unmeasured on your corpus
+ # weight. 0 = OFF. The default 0.5 is MEASURED: it passed its pre-registered run
+ # on 2026-09-27.
+ mined_weight            = 0.5
++# How far down the ranking the reranker (and the graph tier) reorders.
++rerank_depth            = 20
++# How hard a MISSING query term is punished: coverage is raised to this power.
++# At 2, a passage covering 4 of 5 terms keeps 64 % of its proximity, not 80 %.
++rerank_coverage_power   = 2
++# The proximity mix -- base + span + adjacency, each scaled by coverage.
++rerank_base             = 0.55
++rerank_span             = 0.30
++rerank_adjacency        = 0.15
++# Prefer the kind of document a question asks for: "how do I" -> a procedure,
++# "why did we" -> a decision, "what is" -> a reference. A document whose
++# [doctype] type matches is scaled by 1 + this. 0 = OFF, and without a
++# [doctype] table it does nothing at any value. UNMEASURED until W-168 step 9's
++# pre-registered run.
++intent_weight           = 0.0
+ 
+ [graph]                         # explain / graph / path
+ damping      = 0.85
+@@ -54,12 +69,20 @@ ask_kinds         = "ref"    # `ref` alone; a `tag` edge is a hub, not a link
+ ask_link_idf      = true   # hub damping, ON here and off for `fux graph`
+ ask_max_hops      = 1      # one hop; a second-hop document is a guess
+ ask_related_limit = 5
++path_limit   = 10     # routes `fux path` returns, most reliable first
+ 
+ [refer]                         # answer, and the refer plane
+ budget            = 8000       # bytes of assembled passage
+ per_doc_fraction  = 0.5
+ min_passage_bytes = 120
+ max_passage_bytes = 4000
++# Bytes charged per citation for its header line, so the budget is honest.
++citation_overhead = 80
++# Data rows per passage when refer splits a table. ONE, ruled 2026-09-06 on a
++# measurement (work/regression/2026-09-06-csv-chunk-granularity/): on 48
++# ambiguous queries over 6 998 rows, hit@1 went 0.229 (58 rows) -> 0.292
++# (11 rows) -> 0.875 (1 row). The cost: rescore is O(passages).
++table_rows_per_passage = 1
+ 
+ [confidence]                    # the BAND -- what fux says ABOUT an answer
+ # Neither key can move a score or an ordering. They move the band only, so
+@@ -111,3 +134,8 @@ max_table_rows = 20000
+ # home, the `!` prefix in .fux/sources/.
+ #"docs/"   = 1.5
+ #"vendor/" = 0.3
++
++[enrich]                        # `fux enrich --check`
++# A generated question passes the self-retrieval check when its own document
++# ranks in the top this-many.
++self_retrieval_k = 3
+untracked written: ?? .fux/inspect.toml ?? fux.toml 

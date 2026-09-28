@@ -22,6 +22,16 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-168 step 9 arms captured: rank 1 moved on 6–14 questions, all tagged  ·  Claude Code (Opus)
+- **Asked:** *"go"*.
+- **Did:**
+  - Captured five arms (`intent_weight` 0.0–0.5) on a copy of rung-01000, from a pinned `a113b727` worktree. The main tree carried another session's engine edits.
+  - `doctor --fix` ran on the copy only (10 tune keys, template values), then the bar's three globs.
+  - `ip-0.0` equals the 2026-09-27 capture on 125/125, so the pool of 14 applies. Every ranking change, at every weight, is on a tagged question.
+  - Wrote `decide.py` (sha `85298465…`) and `describe.py` before any score. Filed the inbox row for Arpit's score.
+- **Decided / open:** at 0.5, rank 1 moved on exactly 14 questions, the pool's size; whether those are wins is the score's to say. This session may not decide, having captured.
+- **Next:** 🔴 Arpit types `just golden-score work/regression/2026-09-28-intent-prior`. Then a non-capturing session runs `evidence/decide.py`.
+
 ## 2026-09-28 — W-168 step 9 built: the intent → doc-type prior, off at `0.0`  ·  Claude Code (Opus)
 - **Asked:** *"go"*.
 - **Did:**

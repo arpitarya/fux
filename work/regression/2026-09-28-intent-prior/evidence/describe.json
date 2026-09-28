@@ -1,0 +1,97 @@
+{
+ "ip-0.0": {
+  "ask_ms_median": 169.0,
+  "bands": {
+   "grounded": 69,
+   "partial": 24,
+   "weak": 32
+  },
+  "engine_commits": [
+   "a113b727"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 0,
+  "n": 125,
+  "order_changed_vs_baseline": 0,
+  "top1_changed_vs_baseline": {
+   "all": 0,
+   "tagged": 0
+  }
+ },
+ "ip-0.1": {
+  "ask_ms_median": 164.2,
+  "bands": {
+   "grounded": 67,
+   "partial": 24,
+   "weak": 34
+  },
+  "engine_commits": [
+   "a113b727"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 1,
+  "n": 125,
+  "order_changed_vs_baseline": 11,
+  "top1_changed_vs_baseline": {
+   "all": 6,
+   "tagged": 6
+  }
+ },
+ "ip-0.2": {
+  "ask_ms_median": 163.3,
+  "bands": {
+   "grounded": 73,
+   "partial": 24,
+   "weak": 28
+  },
+  "engine_commits": [
+   "a113b727"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 3,
+  "n": 125,
+  "order_changed_vs_baseline": 13,
+  "top1_changed_vs_baseline": {
+   "all": 8,
+   "tagged": 8
+  }
+ },
+ "ip-0.3": {
+  "ask_ms_median": 163.1,
+  "bands": {
+   "grounded": 74,
+   "partial": 24,
+   "weak": 27
+  },
+  "engine_commits": [
+   "a113b727"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 8,
+  "n": 125,
+  "order_changed_vs_baseline": 18,
+  "top1_changed_vs_baseline": {
+   "all": 11,
+   "tagged": 11
+  }
+ },
+ "ip-0.5": {
+  "ask_ms_median": 167.6,
+  "bands": {
+   "grounded": 78,
+   "partial": 24,
+   "weak": 23
+  },
+  "engine_commits": [
+   "a113b727"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 12,
+  "n": 125,
+  "order_changed_vs_baseline": 19,
+  "top1_changed_vs_baseline": {
+   "all": 14,
+   "tagged": 14
+  }
+ }
+}

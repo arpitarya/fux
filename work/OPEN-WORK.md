@@ -23,8 +23,9 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
+| 🔴 **W-168** — score step 9's arms: type `just golden-score work/regression/2026-09-28-intent-prior`. No unlock needed. [report](regression/2026-09-28-intent-prior/report.md) | 2026-09-28 | 0d |
+| ↳ **blocks:** W-168 step 9's verdict. | | |
 
-*Empty since 2026-09-28 — W-227, W-168's score and W-230 all ruled or taken. Next decision: none filed.*
 
 ---
 
@@ -32,7 +33,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-168** · `agent` — the ranking ideas. Step 9 built 2026-09-28, off at `intent_weight` 0.0, unmeasured. Next: capture its five arms on a copy of rung-01000; then Arpit scores. Steps 7 and 8 go (pools 8); 6 and 10 stop. [detail](open/W-168-search-improvements.md)
+- 🔴 **W-168** · `agent` — the ranking ideas. Step 9's five arms captured 2026-09-28 (rank 1 moved on 6–14 questions, all tagged). Waits on Arpit's score; then a non-capturing session decides. Steps 7 and 8 go; 6 and 10 stop. [detail](open/W-168-search-improvements.md)
 - 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–4 and 5a–5f landed (numerals → `constants.toml`; 14 keys → `fux.toml`), bar `inspect`, which waits for W-228. Next: stage 6, parameter defaults. [detail](open/W-225-values-live-in-config.md)
 - 🟢 **W-228** · `agent` — document families: DoD 1–10 built 2026-09-28. Next: DoD 11, golden seed families + a rung before the misfit floor leaves PROVISIONAL; unblocked 2026-09-28 (W-230's probe denied). [detail](open/W-228-document-families.md)
 
