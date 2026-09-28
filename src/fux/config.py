@@ -46,7 +46,7 @@ REQUIRED_KEYS: dict[str, tuple[str, ...]] = {
         "stop_every_docs",
     ),
     "refer": ("fetch_cache_max_bytes",),
-    "doctor": ("thin_url_share", "thin_url_chars"),
+    "doctor": ("thin_url_share", "thin_url_chars", "acquired_warn_share"),
 }
 REQUIRED_URL_KEYS: tuple[str, ...] = (
     "keep",
@@ -108,6 +108,7 @@ KNOWN_KEYS: tuple[str, ...] = (
     "refer.fetch_cache_max_bytes",
     "doctor.thin_url_share",
     "doctor.thin_url_chars",
+    "doctor.acquired_warn_share",
 )
 
 #: Tables fux accepts and does not look inside. **One entry, and it stays one.**
@@ -416,6 +417,9 @@ class Doctor:
 
     thin_url_share: float
     thin_url_chars: int
+    #: The acquired-plane row warns once `.fux/acquired/` passes this share of
+    #: `[sources.url] acquired_max_bytes`.
+    acquired_warn_share: float
 
 
 def _number(path: Path, where: str, value, *, whole: bool, positive: bool):
@@ -536,6 +540,9 @@ def load(root: Path) -> Config:
     doctor = Doctor(
         thin_url_share=_number(path, "[doctor] thin_url_share", d["thin_url_share"], whole=False, positive=False),
         thin_url_chars=_number(path, "[doctor] thin_url_chars", d["thin_url_chars"], whole=True, positive=False),
+        acquired_warn_share=_number(
+            path, "[doctor] acquired_warn_share", d["acquired_warn_share"], whole=False, positive=True
+        ),
     )
 
     return Config(

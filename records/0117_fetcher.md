@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@e40fb5920ad3, src/fux/templates@e447f2c0a4a4]
+owns: [src/fux/ingest/urlsrc.py@e40fb5920ad3, src/fux/templates@f5eaedd4fc84]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 318e17cc58acb0f4b998cdb1553ae946496864aebac9ea17b47da0db5d7725c9
+content_sha: 1fbd7df0937c712539737d3377408a9940883abe6262a233db995a93753a0059
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -669,6 +669,8 @@ copied out, never imported.
 **The rate-limit backoff doubles by shift** (`1 << attempt`) and a fetcher's `(bytes, content type)` pair is recognised by its arity. Retries and base are stage 5e's. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 **An undeclared fetcher's parallelism is `constants.toml [fetch] undeclared_max_parallel`** (1) ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28), fixed by decision 5's *declared, never detected*; the "that is a lot of connections" note fires at `fux.toml [sources.url] parallel_warn_at`.
+
+**No fetcher decision moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `src/fux/templates/fux.toml.txt`, under this record's claim on `templates/`, gained `[doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18).
 
 ### Consequences
 

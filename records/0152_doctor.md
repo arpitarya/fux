@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@5ff32bd8b277, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@823487257176, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 11dc31e137d4548df61734cfa9c7fe6f3d92ffd92bd1e0c24daed6ee0a97aab5
+content_sha: 509f706b2db537df4e3a5e8bc3b70206808c478b063e5f620e69e00a3f977a5f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -453,6 +453,8 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 **The url-extraction-depth row warns at `fux.toml [doctor] thin_url_share` and `thin_url_chars`**, and the url-sources row names a URL at `[sources.url] failing_streak` ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) ([SR-CONFIG](0113_config.md) decision 18). ⚠ `AS_INGESTED_VETO_SHARE` is not a doctor knob — it is SR-ACQUIRED's and SR-URL-FRESHNESS's reopen condition — so it is `constants.toml [doctor] as_ingested_veto_share`.
+
+**The acquired-plane row warns at `fux.toml [doctor] acquired_warn_share`** (0.8 of `acquired_max_bytes`), and the shim check reads `constants.toml [bundle] shim_sniff_chars` of a launcher ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28; [SR-CONFIG](0113_config.md) decision 18). Every *first N, then (+M more)* cut in a row's detail stays: it is R3's presentation count.
 
 ### Consequences
 

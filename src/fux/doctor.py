@@ -183,7 +183,7 @@ def _daemon(root: Path) -> Check | None:
 
 
 def _python_version() -> Check:
-    ok = sys.version_info[:2] >= PY_MIN
+    ok = sys.version_info[: len(PY_MIN)] >= PY_MIN
     have = f"{sys.version_info.major}.{sys.version_info.minor}"
     return Check(
         "python version",
@@ -1266,7 +1266,8 @@ def _acquired_health(root: Path) -> Check:
     except FuxError:
         url = None
     cap = url.acquired_max_bytes if url is not None else None
-    if cap is not None and total > cap * 0.8:
+    share = config_mod.load(root).doctor.acquired_warn_share if cap is not None else None
+    if cap is not None and total > cap * share:
         return Check(
             "acquired plane",
             True,
@@ -2334,7 +2335,7 @@ def _glob_suffix(glob: str) -> str:
     consumer did not make.
     """
     name = glob.rsplit("/", 1)[-1]
-    if not name.startswith("*.") or "*" in name[2:] or "?" in name or "[" in name:
+    if not name.startswith("*.") or "*" in name.removeprefix("*.") or "?" in name or "[" in name:
         return ""
     return name[1:].lower()
 
@@ -2875,7 +2876,7 @@ def _is_node_shim(path: Path) -> bool:
     if suffix not in _SHIM_SUFFIXES:
         return False  # a compiled launcher; not a shim, and not read as text
     try:
-        head = target.read_text(encoding="utf-8", errors="replace")[:512]
+        head = target.read_text(encoding="utf-8", errors="replace")[: fixed("bundle", "shim_sniff_chars")]
     except OSError:
         return False
     return "node" in head

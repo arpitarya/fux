@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@c2205bbff313, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 343530a39dd61b6c5fe75bec7b3114d2dcc2c6039c1296ada85b42aff998c69b
+content_sha: f570d29780e05aea4b56a7d2500c2c64462ece79aa3323ceb1d6ec26628ac531
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -570,6 +570,8 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 **This record's reopen share (0.25) is `constants.toml [doctor] as_ingested_veto_share`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) — fixed, so no consumer's `fux.toml` can move it. `fux doctor` quotes it from there.
+
+**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `fux doctor`, which this record's checks run through, reads its acquired-plane warning share from `fux.toml [doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18); every threshold is unchanged.
 
 ### Consequences
 

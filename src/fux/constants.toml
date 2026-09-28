@@ -237,6 +237,8 @@ shim_mode = 0o755
 # package-surface banner (store/nodebundle.py). The bundle is committed bytes.
 module_banner_width = 68
 surface_rule_width  = 47
+# `fux doctor` reads this much of a launcher to tell a fux shim from another tool's.
+shim_sniff_chars = 512
 
 [acquired]
 dir         = "acquired"

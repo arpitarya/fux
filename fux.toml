@@ -118,3 +118,4 @@ fetch_cache_max_bytes = 524288000
 [doctor]
 thin_url_share         = 0.01
 thin_url_chars         = 200
+acquired_warn_share = 0.8

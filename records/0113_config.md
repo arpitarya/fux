@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@995a0e9f409e, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@2a75560cd349]
+owns: [src/fux/config.py@4f553ab8891d, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@2a75560cd349]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: da82184632248d0645a37c5edb3dacc7974b92a194d5ea89ad39459d1c607929
+content_sha: 56886da797ad2f328fb05e0d69e4a07827912f42da117769b16ebdcbb2a44c93
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -122,7 +122,8 @@ flowchart TD
      +-- [maintain]   daemon_poll_s, runner_poll_s, stop_timeout_s,
      |                last_cited_max, stop_every_docs     every key REQUIRED
      +-- [refer]      fetch_cache_max_bytes               REQUIRED
-     +-- [doctor]     thin_url_share, thin_url_chars      every key REQUIRED
+     +-- [doctor]     thin_url_share, thin_url_chars,
+     |                acquired_warn_share                 every key REQUIRED
      |
      +-- [agents]
      |     +-- install        REQUIRED; [] = none
@@ -183,6 +184,7 @@ fetch_cache_max_bytes = 524288000       # the fetch cache's disk bound
 [doctor]
 thin_url_share = 0.01                   # extracted/retained below this is thin ...
 thin_url_chars = 200                    # ... unless it extracted at least this much
+acquired_warn_share = 0.8               # warn once .fux/acquired/ passes this share of its bound
 
 [agents]
 install = ["claude", "codex", "copilot", "kiro"]  # [] = none
@@ -558,6 +560,7 @@ at any value, with an error naming the new home.
 + refer.fetch_cache_max_bytes
 + doctor.thin_url_share
 + doctor.thin_url_chars
++ doctor.acquired_warn_share
 - sources.dirs
 - sources.types_file
 - sources.url.urls
@@ -720,7 +723,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**18. Thirteen values that sat in code joined this file** ([SR-LAW-12](0013_LAW-12-values-live-in-config.md);
+**18. Fourteen values that sat in code joined this file** ([SR-LAW-12](0013_LAW-12-values-live-in-config.md);
 W-225 stage 5e, 2026-09-28). The L12 classification homed each one here, and
 each keeps the number it had in code; the template writes it and `fux doctor
 --fix` fills it in an existing repo.
@@ -735,6 +738,7 @@ each keeps the number it had in code; the template writes it and `fux doctor
 | `[maintain] last_cited_max`, `stop_every_docs` | remembered questions; documents between stop checks | `lastcited.MAX_QUESTIONS`, `run._STOP_EVERY` |
 | `[refer] fetch_cache_max_bytes` | the fetch cache's disk bound | `fetchcache.DEFAULT_MAX_BYTES` |
 | `[doctor] thin_url_share`, `thin_url_chars` | where the url-extraction-depth row warns | `doctor.THIN_URL_SHARE`, `THIN_URL_CHARS` |
+| `[doctor] acquired_warn_share` | the share of `acquired_max_bytes` at which the acquired-plane row warns | an inline `0.8` (stage 5f) |
 
 - **The `[sources.url]` four are required only with the table**, like the rest
   of it: without `[sources.url]` nothing is fetched, so nothing is thin or fails.

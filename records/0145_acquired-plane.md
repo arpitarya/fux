@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@aa145d42bb5d]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 4187464f2ac91aa1b486307486ff78d92e0f7923655992b7aa5dd265f7e889f6
+content_sha: f30b2b15e35098d6d7583b58152f897504cd3e0f3717f054b54581fcf6f3431d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -313,6 +313,8 @@ this moved where they are written, not what they are.
 **Acquired objects fan out by `constants.toml [radix] hex_digits_per_byte`**, a manifest sha is checked against sha256's own hex length, and the manifest is indented by `[json] indent`. The plane's layout is unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 **This record's reopen share (0.25) is `constants.toml [doctor] as_ingested_veto_share`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) — fixed, so no consumer's `fux.toml` can move the condition this record states. `fux doctor` quotes it from there.
+
+**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `fux doctor`, which this record's checks run through, reads its acquired-plane warning share from `fux.toml [doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18); every threshold is unchanged.
 
 ### Consequences
 
