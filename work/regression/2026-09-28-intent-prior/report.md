@@ -10,6 +10,8 @@ pre_registration: work/regression/2026-09-28-intent-prior/PRE-REGISTRATION.md
 
 # Report: the intent → doc-type prior (`set-4-claude`, `rung-01000` copy)
 
+✅ **Decided on 2026-09-28: PASS by the table at `0.1`, ratified by Arpit the same day.** See [`VERDICT.md`](VERDICT.md). The text below is as it was at scoring.
+
 ✅ **Scored 2026-09-28 (Arpit's hand); not decided.** No answer key reached this session.
 Below, *changed* means **the ranking moved**, never that it *improved*.
 

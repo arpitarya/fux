@@ -40,6 +40,30 @@ play: the worklog is the granular, per-exchange trail.
   - Still red and not mine: `999c1976`; the W-233 row length.
 - **Next:** Arpit rules the inbox row. Then 5f `inspect` once W-228 lands, and stage 8's closing flip of SR-LAW-12 decision 9.
 
+## 2026-09-28 — W-168 step 9 shipped: `intent_weight` defaults to `0.1`  ·  Claude Code (Opus)
+- **Asked:** *"go"* (ship the ratified default).
+- **Did:**
+  - Set `intent_weight = 0.1` in the template and in the repo's `.fux/tune.toml`. Under L12 the template is the default, so no Python or Node code changed.
+  - Updated the test's default assertion, six records (SR-TUNE 20 now MEASURED with a reopen-trigger), GLOSSARY and CHANGELOG. Stamped the content hashes of my six records and SR-TUNE's `owns:` hash.
+  - Unit suite: 5934 passed, 6 failed. The failures are other sessions' uncommitted work: the W-233 row length, the unlisted `anchor-mined` run, and hashes for SR-WORK-REGISTRY, agent-policy, inspect, extracted-mode and fetcher. e2e passed 152/152 and Node 92/92.
+- **Decided / open:**
+  - ⚠ SR-FETCHER owns all of `src/fux/templates`. That hash was left unstamped, because another session's `INSPECT-SKILL.md` edit sits in the same directory.
+  - Not committed: the index carries other sessions' work.
+- **Next:** W-168 step 7 (MMR) pre-registers.
+
+## 2026-09-28 — W-168 step 9 decided: PASS at `intent_weight = 0.1`, ratified  ·  Claude Code (Opus)
+- **Asked:** *"implement w-168 run step 9's decide.py."*
+- **Did:**
+  - Checked `evidence/decide.py` against the report's sha (`85298465…`): it is unchanged since `253f9c88`, before the scoring commit. This session did not write the bar, build or capture, so it may decide.
+  - Ran it. It read only the five score files (ids, ranks, booleans) and the frozen tags, and opened no key. It wrote `decision.json` and `per-query.jsonl`.
+  - Tagged `hit@1`: **6/0 · 8/0 · 11/0 · 14/0**, all clearing d19. Zero drift anywhere. **PASS at `0.1`**, the first ascending, at exactly the floor.
+  - Filed `VERDICT.md`. Asked Arpit, who **ratified PASS at `0.1`**.
+  - Updated the W-168 row and detail, the report pointer, the IMPLEMENTATION verdict row, NOW and INTERVIEW.
+- **Decided / open:**
+  - Every win is a primary win, and the wins are nested; `0.5` wins all 14 in the pool. First-that-clears still picks `0.1`, as frozen.
+  - Not committed: the shared `work/` files carry other sessions' uncommitted edits.
+- **Next:** ship `intent_weight = 0.1` per §If it passes (Opus). Then steps 7 and 8 pre-register.
+
 ## 2026-09-28 — W-225 stage 6: parameter defaults removed (R8); the library reads `output.toml [api]`  ·  Claude Code (Opus)
 - **Asked:** *"continue"* (W-225, after stage 5).
 - **Did:**
@@ -58,11 +82,32 @@ play: the worklog is the granular, per-exchange trail.
     - the Node runtime check.
 - **Next:** stage 7 (refine the scanner, then the AST test and its allow-list, about 600 sites, for Arpit to review); stage 8 (the 3.0 CHANGELOG migration lines); 5f `inspect` once W-228 lands.
 
+## 2026-09-28 — proposal filed: cross-model agent guides  ·  Cowork (Opus)
+
+Arpit asked whether the agent-facing set works the same on Sonnet, Opus and GPT,
+and whether guides should branch on the model; then *"create a proposal. Not a
+work item."* Filed `work/proposals/cross-model-agent-guides.md` (B-251): answer
+is no on both counts; five deterministic levers parked, eval matrix first.
+No work item, no code, no template touched.
+
+## 2026-09-28 — W-234 filed: the laws reordered and renumbered  ·  Cowork (Opus)
+
+Arpit ruled:
+- L13 (retired SR archived) becomes **L1**, and the rest are renumbered densely,
+  reusing the retired L5/L9 handles;
+- L7 becomes **Python ≥ 3.12**;
+- a new **L8, Node ≥ 22**, sits right after Python.
+Old handles map through a dated table in SR-LAWS. Live docs are repointed in one
+change; archive and past WORKLOG entries are left as written. Both version
+bumps are Breaking in the next release. Unchanged: L0, L6, L7, L10, L11, L12.
+No code moved.
+
 ## 2026-09-28 — W-168 step 9 scored by Arpit; the verdict is handed to a fresh session  ·  Claude Code (Opus)
 - **Asked:** Arpit pasted `just golden-score work/regression/2026-09-28-intent-prior`.
 - **Did:** filed the five score files (complete, n = 125) and a scored section in the report, with totals explicitly marked not the rule. Removed the inbox row, and put a fresh session on the queue row.
 - **Decided / open:** this session did not run `decide.py`. It wrote the bar, built step 9 and captured the arms, and the bar forbids it from adjudicating. The scorer's uncommitted diff at score time was W-234's link renumbering only.
 - **Next:** a fresh session runs `work/regression/2026-09-28-intent-prior/evidence/decide.py` and files `VERDICT.md`.
+
 
 ## 2026-09-28 — W-168 step 9 arms captured: rank 1 moved on 6–14 questions, all tagged  ·  Claude Code (Opus)
 - **Asked:** *"go"*.
@@ -73,6 +118,7 @@ play: the worklog is the granular, per-exchange trail.
   - Wrote `decide.py` (sha `85298465…`) and `describe.py` before any score. Filed the inbox row for Arpit's score.
 - **Decided / open:** at 0.5, rank 1 moved on exactly 14 questions, the pool's size; whether those are wins is the score's to say. This session may not decide, having captured.
 - **Next:** 🔴 Arpit types `just golden-score work/regression/2026-09-28-intent-prior`. Then a non-capturing session runs `evidence/decide.py`.
+
 
 ## 2026-09-28 — W-168 step 9 built: the intent → doc-type prior, off at `0.0`  ·  Claude Code (Opus)
 - **Asked:** *"go"*.
@@ -111,6 +157,63 @@ play: the worklog is the granular, per-exchange trail.
   - Judgement calls are in the compare doc §"Where the build departed", 16 new rows, for Arpit.
   - Still red and not mine: `999c1976`'s history gate (a `RULE-SINCE` move or a rewrite, Arpit's call).
 - **Next:** 5f `inspect` once W-228 lands; stage 6 (R8 bools and every parameter default); stage 7 (the AST test and allow-list); stage 8 (CHANGELOG 3.0 migration lines, byte-equality run).
+
+## 2026-09-28 — W-233 ruled F1–F5  ·  Cowork (Opus)
+
+Arpit ruled all five forks:
+- F1: a verb writes `[detected]`, and a consumer may hand-author the file with
+  no detection at all.
+- F2: detection refreshes on demand.
+- F3: both templates and regex. Regex is for experts, `[user]` only, with
+  static loop and parity guards and a doctor parity check. A new `fux serve`
+  **Identifiers** tab is a read-only test bench for patterns.
+- F4: the ID whole form is stored unstemmed plus its parts.
+- F5: `[detected]` applies as soon as it is written.
+W-233 is now 🟢 agent. No code moved.
+
+## 2026-09-28 — W-233 direction: detect ID families, user overrides  ·  Cowork (Opus)
+
+Arpit asked that the inspect tool find the IDs to keep whole, with the user able
+to configure or override them, or the system detecting them itself. Proposal
+filed in W-233:
+- a deterministic shape lens in `fux inspect`;
+- a committed `.fux/identifiers.toml` with a system-owned `[detected]` section
+  and a user-owned `[user]` section, where the user always wins;
+- ingest reads only the committed file, so one new document cannot silently
+  change the analyzer for all others (L3, full = delta);
+- a closed template grammar instead of regex, for Python/Node parity;
+- prior art: Elasticsearch `word_delimiter_graph`, spaCy `SHAPE`.
+Forks F1–F5 are in the inbox. No code moved.
+
+## 2026-09-28 — W-233 filed: identifiers retained whole  ·  Cowork (Opus)
+
+Arpit: *"step 2, recreate a new work item with id's not being chopped research
+how id's can be retained"*. Filed **W-233**: a fixture of eight ID-break
+questions still open after analyzer v3 (stemmed whole form, query/doc separator
+mismatch, leading zeros, uncovered separators, shas, paths, exact-vs-shared-parts
+ranking, cost), then a compare doc of six mechanisms, then his ruling. No code moved.
+
+## 2026-09-28 — W-232 filed: measure anchor + mined together  ·  Cowork (Opus)
+
+Arpit reviewed W-168 step by step. Answered in chat: why step 2 left for W-205,
+why 6 and 10 stopped, whether 7 is built (it is not), and what is building now.
+On step 4's open warning, *"measure it - a new work item"*, filed **W-232**: three
+paired arms (shipped pair, anchor alone, mined alone) on a copy of a gen-3 rung,
+pre-registered first. No code moved.
+
+## 2026-09-28 — W-228 DoD 11: the rung is filed, the lens drops title headings, seed misfits wait on Arpit  ·  Claude Code (Opus)
+- **Asked:** *"implement W-228"*. The open part was DoD 11.
+- **Did:**
+  - Ran the lens on scratch copies of `rung-seed` and `rung-01000`, from a clean worktree at `a2ce3fc6`. The kept rungs were not modified. Filed [`2026-09-28-families-lens-ladder`](regression/2026-09-28-families-lens-ladder/report.md).
+  - **The seed has 8 families and 0 misfits.** On rung-01000, 14 of 16 misfits were the document's own title heading, and one wiki template split four ways by company.
+  - Changed `lenses.families()`:
+    - the title heading is out of the shape;
+    - only a shared heading can found a family, because front-matter keys alone put seeds 34 and 46 together.
+  - rung-01000 now has 23 families and 1 misfit, a real missing section. Two new tests fail on the old lens. Amended SR-INSPECT d24 and stamped it in the worktree, because `src/fux/inspect/` carries another session's uncommitted edits. Updated the skills ×3 and the CHANGELOG.
+  - Filed the inbox row and `BLOCKED.json` (ASK, surfaced).
+  - **Suites:** run whole in a worktree of HEAD plus this change. Fast: 5819 passed, 1 failed (`test_no_behaviour_change_landed_without_its_adr`, red on HEAD before this change). e2e: 151 passed. The INSPECT-SKILL template moved SR-FETCHER and SR-AGENT-POLICY `owns:` hashes, and I restamped both. W-225's session had already restamped SR-INSPECT over the shared tree.
+- **Decided / open:** planting misfits is a generation-4 seed addition (A1–A3, A20). It rebuilds the ladder, which re-baselines W-168's set-4 pools (A23), so its timing is Arpit's call. The traversal guard blocked one of my recursive greps with no golden exclusion, before it ran; the retry carried `--exclude-dir=golden`. Nothing is committed: the user did not ask for a commit, and the queue files carry the W-168 session's edits too.
+- **Next:** 🔴 Arpit rules the seed-misfit timing. Agents: W-168 step 9, W-225 stage 5.
 
 ## 2026-09-28 — W-168 step 9 pre-registered: lexicon pool 14, equal to the key's  ·  Claude Code (Opus)
 - **Asked:** *"commit and continue"*.

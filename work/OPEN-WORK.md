@@ -23,10 +23,10 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-
+| 🔴 **W-228** — when to plant family misfits in `seed/`? It rebuilds the ladder under W-168's pools. **After W-168 steps 6–10** (recommended), now, or never. [report](regression/2026-09-28-families-lens-ladder/report.md) | 2026-09-28 | 0d |
+| ↳ **blocks:** nothing else in the queue; W-228's `misfit_floor` stays PROVISIONAL. | | |
 | 🔴 **W-225** — rule L12's open calls: the `output.toml [api]` root, whether R8 reaches boolean dataclass fields, and 16 `for-arpit` sites. [compare doc](compare/l12-classify.compare.md) | 2026-09-28 | 0d |
 | ↳ **blocks:** nothing else in the queue — W-225 cannot close without it. | | |
-
 
 ---
 
@@ -34,9 +34,11 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-168** · `agent` — the ranking ideas. Step 9 scored by Arpit 2026-09-28. Next: a session that did NOT capture the arms runs its `decide.py` and files VERDICT; INCONCLUSIVE → Arpit. Steps 7 and 8 go; 6 and 10 stop. [detail](open/W-168-search-improvements.md)
+- 🟢 **W-168** · `agent` — the ranking ideas. **Step 9 shipped 2026-09-28**: `intent_weight` defaults to the measured `0.1`. Next: step 7 (MMR) pre-registers, then 8 (authority). 6 and 10 stop. [detail](open/W-168-search-improvements.md)
 - 🔴 **W-225** · `agent` — L12 migration. Stages 1–7 landed (AST veto test + allow-list). Closing needs Arpit's ruling on the open calls; stage 5f `inspect` is still to do. [detail](open/W-225-values-live-in-config.md)
-- 🟢 **W-228** · `agent` — document families: DoD 1–10 built 2026-09-28. Next: DoD 11, golden seed families + a rung before the misfit floor leaves PROVISIONAL; unblocked 2026-09-28 (W-230's probe denied). [detail](open/W-228-document-families.md)
+- 🔴 **W-228** · `agent` — document families. DoD 11's rung is filed: the seed has 0 misfits; title headings are out (rung-01000: 16 → 1). Waits on Arpit's timing for seed misfits. [detail](open/W-228-document-families.md)
+- 🟢 **W-232** · `agent` — measure the shipped pair `anchor = 1.0` + `mined_weight = 0.5`, never tested together. Three arms, pre-registered first; Arpit scores. **Opus.** [detail](open/W-232-anchor-mined-combination.md)
+- 🟢 **W-233** · `agent` — identifiers retained whole. Ruled F1–F5: inspect detects ID families → `.fux/identifiers.toml` (`[detected]` templates via a verb; `[user]` hand-authored, templates or guarded expert regex, wins) → analyzer reads the file only; whole unstemmed + parts; a serve "Identifiers" test tab. Fixture first. **Opus.** [detail](open/W-233-identifiers-retained-whole.md)
 
 
 ### testing

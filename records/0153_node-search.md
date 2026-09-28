@@ -11,7 +11,7 @@ owns: [node@65dba72ffa5d, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 13932f95d17b420009692688c5d35cbc1199f67a10816183840aea40dff5b51e
+content_sha: 757785f615444c5c6a5bc59b43a36c85d97a3650e9ffcbfcc1d771a63f098c8d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -889,7 +889,10 @@ readers the same way:** `toLowerCase` and `\s` reach non-ASCII characters, so
 only ASCII is folded and collapsed; JavaScript's `.` skips four line terminators
 where Python's skips one, so both match every character (`s` flag, `re.DOTALL`);
 and `.length` counts UTF-16 units, so globs and the longest-first sort count code
-points. Node has no accelerator, so `maximum` has no twin.
+points. Node has no accelerator, so `maximum` has no twin. **The `0.1` default
+(2026-09-28, [SR-TUNE](0135_tuning.md) decision 20) is the template's value and
+Node reads it from the same `tune.toml` key**; Node holds no default of its own
+([L12](0014_LAW-12-values-live-in-config.md)).
 
 <!-- L12-VALUES-START -->
 

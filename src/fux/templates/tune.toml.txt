@@ -63,9 +63,9 @@ mined_weight            = 0.5
 # Prefer the kind of document a question asks for: "how do I" -> a procedure,
 # "why did we" -> a decision, "what is" -> a reference. A document whose
 # [doctype] type matches is scaled by 1 + this. 0 = OFF, and without a
-# [doctype] table it does nothing at any value. UNMEASURED until W-168 step 9's
-# pre-registered run.
-intent_weight           = 0.0
+# [doctype] table it does nothing at any value. The default 0.1 is MEASURED: it
+# passed its pre-registered run on 2026-09-28.
+intent_weight           = 0.1
 
 [graph]                         # explain / graph / path
 damping      = 0.85   # restart probability is 1 - damping; PageRank's published value

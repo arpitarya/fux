@@ -58,6 +58,19 @@ moved to the archive on 2026-09-14.
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
 
+## Filed 2026-09-28
+
+* [Cross-model agent guides](cross-model-agent-guides.md) — Arpit's ask
+  (2026-09-28): do the shipped skills, steering, rules, instructions and agent
+  files behave the same on Sonnet, Opus and GPT, and should they branch on the
+  model? **No, and no** — delivery is identical but triggering, body length,
+  🔴 emphasis and judgment jobs vary by model, and a model cannot reliably say
+  which it is. Parks five checkable levers: an eval matrix in fux-lab first,
+  then model pins from consumer TOML, a core-first skill shape, de-shouting,
+  and branching only on observable facts. **Graduates on the first filed
+  mis-trigger or broken rule on a non-Claude or smaller model**, or when Arpit
+  asks for the matrix.
+
 ## Filed 2026-09-27
 
 * [Code pattern recognition — beside fux, not inside it](code-pattern-recognition.md)

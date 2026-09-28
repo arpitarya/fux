@@ -33,7 +33,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   document at a time with its counts up front, probes first, the long tables
   folded, links that open the linked document, and `?tab=docs&doc=…` deep links.
   The page still computes nothing (SR-SERVE decision 3, amended 2026-09-27).
-- **`fux inspect` groups documents into families by shape** (W-228) — a heading skeleton (digits masked, so a dated template is one shape) plus front-matter key names; each family named by its shared headings, with its folders and length bands. **Misfits** — members missing a heading their family carries — are named worst first, and `misfit_share` carries a PROVISIONAL flag. `--json` (`families`), the report's §4b, `--diff` (families gained, lost, renamed) and a card on the explorer's Index tab. New `.fux/inspect.toml [families]` keys; `fux doctor --fix` writes them. The first run after upgrading recomputes the inspect facts cache once.
+- **`fux inspect` groups documents into families by shape** (W-228) — a heading skeleton (digits masked, so a dated template is one shape) plus front-matter key names; each family named by its shared headings, with its folders and length bands. A leading heading equal to the document's title is left out of its shape, and only a shared heading makes two documents one family. **Misfits** — members missing a heading their family carries — are named worst first, and `misfit_share` carries a PROVISIONAL flag. `--json` (`families`), the report's §4b, `--diff` (families gained, lost, renamed) and a card on the explorer's Index tab. New `.fux/inspect.toml [families]` keys; `fux doctor --fix` writes them. The first run after upgrading recomputes the inspect facts cache once.
 - **The explorer's Index tab shows every lens `fux inspect` reports** (W-229) — boilerplate, findability, lengths and fields, duplication and templates, analyzer coverage, graph and chunks join the cards it had, in the report's own order, each with its lever; document names open the Documents tab and words the Words tab. A **compare** card runs `fux inspect --diff` against the last report on disk (`GET /inspect/diff`). A test fails any future lens the page does not render.
 - **`fux serve` gains a Words tab** — every term the index holds with its `df`,
   `cf`, `idf` and class (boilerplate · common · distinctive · hapax), sorted,
@@ -52,17 +52,19 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   measured with the anchor field off, so its combination with the default
   `anchor = 1.0` is unmeasured. `--no-tune` leaves it on, because it restores
   the defaults. `fux lexical` never uses it.
-- **An intent → document-type prior, built OFF (W-168 step 9).** A question
+- **An intent → document-type prior (W-168 step 9).** A question
   that opens with a cue — *how do I*, *why was*, *what is* — can prefer the
   procedure, the decision or the reference document, declared by a new
   `.fux/tune.toml [doctype]` table of path globs (`"*-runbook-*" = "procedure"`)
-  and scaled by `[ranking] intent_weight`. **Nothing changes on upgrade:** the
-  weight ships at `0.0`, the table ships empty, and either one alone does
-  nothing. ⚠ `intent_weight` is a required key, so an existing `tune.toml` needs
-  `fux doctor --fix` once. **Unmeasured**: the pre-registered run
-  ([bar](work/regression/2026-09-28-intent-prior/PRE-REGISTRATION.md)) has not
-  been captured. `fux ask --why` names the prior when it runs, and `fux lexical`
-  never uses it.
+  and scaled by `[ranking] intent_weight`, **default `0.1`, measured**: it passed
+  its pre-registered run on 2026-09-28
+  ([verdict](work/regression/2026-09-28-intent-prior/VERDICT.md): tagged rank-1
+  wins 6, losses 0, and no rank-1 hit lost anywhere). **Nothing changes on
+  upgrade:** the `[doctype]` table ships empty, and without it the weight does
+  nothing. Declare types to turn it on; set `intent_weight = 0.0` to keep it off
+  after that. ⚠ `intent_weight` is a required key, so an existing `tune.toml`
+  needs `fux doctor --fix` once, which writes `0.1`. `fux ask --why` names the
+  prior when it runs, and `fux lexical` never uses it.
 
 ### Changed
 

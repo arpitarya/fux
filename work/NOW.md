@@ -3,4 +3,4 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
-🟢 2026-09-28 Claude Code (Opus): **W-234 landed** — laws are L0–L12, dense (map older docs through SR-LAWS 2a); Python ≥ 3.12, Node ≥ 22 (new L8). 🔴 W-228 seed misfits wait on Arpit. Agents next: W-168 step 9 → steps 7, 8; W-225 stage 5.
+🟢 2026-09-28 Claude Code (Opus): **W-168 step 9 shipped: `intent_weight` defaults to the measured `0.1`** (inert until `[doctype]` is declared). Next: step 7 (MMR) pre-registers, then 8. 🔴 W-228 seed misfits and W-225's L12 calls wait on Arpit.

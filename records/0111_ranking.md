@@ -11,7 +11,7 @@ feature: scoring, ordering, and the analyzer they share with ingest
 owns: [src/fux/query/rank.py@232892e6641d, src/fux/query/intent.py@fa4902c6d3fe, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@5c3582a2128f, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@9216e1d47097, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@1a1dd7794ab6, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 2f42741b5df92015ce40cd573d5e1cfde033ccaffa59c71e93fa86551444ff86
+content_sha: 3b6fe8a536dde971b8842e0bff974590e4fbd48b38d865177d7ac32243476807
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -608,6 +608,9 @@ intent_weight`. `of(record)` is `priority_for(loc) × intent_for(loc)`, and
 - **Off is `trivial`.** With no live prior, `trivial`, `maximum` and `of` are
   exactly what they were, so every corpus without a `[doctype]` table ranks
   byte-identically.
+- **The default weight is `0.1`**, measured and ratified 2026-09-28
+  ([SR-TUNE](0135_tuning.md) decision 20). The prior is live only where a
+  consumer declares `[doctype]`, so the shipped state is still `trivial`.
 - **The resolver is [`query/intent.py`](../src/fux/query/intent.py)** — which
   intent, which type. Its three parity rules with Node (ASCII-only case and
   whitespace, `.` over every character, globs over code points) are stated

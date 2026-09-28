@@ -7,6 +7,26 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## ✅ STEP 9 SHIPPED — 2026-09-28 (Claude Code, Opus); step 7 is next
+
+- **`intent_weight = 0.1`** is the value in `src/fux/templates/tune.toml.txt`, which `fux setup` and `doctor --fix` write (L12: the template is the default's one home). The repo's own `.fux/tune.toml` matches it. **No reader code changed**: both planes read the key and hold no default of their own.
+- `[doctype]` still ships empty, so nothing ranks differently on upgrade (the key is unreleased; `doctor --fix` writes `0.1`).
+- **Records:** SR-TUNE 20 (default, MEASURED, reopen-trigger), SR-RANKING 13, SR-ASK 15, SR-NODE-SEARCH 22, SR-ANSWER, SR-PROVENANCE. Content and `owns:` hashes stamped. GLOSSARY and CHANGELOG updated.
+- **Byte equality** is unchanged: no engine code moved. `test_intent_prior.py` still sweeps scan = accelerator = Node at `0.1` through `0.5`. The unit suite has 6 failures, all from other sessions' uncommitted work. e2e 152/152, Node 92/92.
+- **Next:** step 7 (MMR, pool 8) pre-registers. **Opus.**
+
+## ✅ STEP 9 DECIDED AND RATIFIED — 2026-09-28 (Claude Code, Opus; a non-capturing session); ship `intent_weight = 0.1`
+
+[VERDICT](../regression/2026-09-28-intent-prior/VERDICT.md). The frozen
+`decide.py` (sha `85298465…`, unchanged since `253f9c88`) read the five score
+files and the frozen tags. It opened no key.
+
+- **Tagged `hit@1` wins/losses:** 6/0 · 8/0 · 11/0 · 14/0 at `0.1 / 0.2 / 0.3 / 0.5`. Every value clears d19; **`0.1` is first, at exactly the floor** (net 6, p = 0.031).
+- **Clause 2 holds everywhere:** no baseline rank-1 hit is lost at any weight, tagged or not. `hit@10` is 110 → 110.
+- Every win is also a `primary@1` win. The wins are nested, and `0.5` wins the whole pool of 14. Headroom from the baseline arm is 14 / 66, as predicted.
+- **Arpit ratified PASS at `0.1`** in this session.
+- **Next:** ship per the bar's §If it passes, in one change: the `[ranking] intent_weight` default `0.1` on both engines (template and `constants`/tune reading), SR-RANKING, SR-TUNE, SR-ASK and SR-NODE-SEARCH amended, scan = accelerator = Node = bundle byte-identical, a CHANGELOG line. **Opus.** Then steps 7 and 8 pre-register.
+
 ## 🟢 STEP 9 SCORED — 2026-09-28 (Arpit's hand); the verdict is a NON-capturing session's
 
 [Report §Scored](../regression/2026-09-28-intent-prior/report.md). Five complete

@@ -238,6 +238,7 @@ with its proposal.
 | B-247 | `DOC-REGISTRY.md` scoped to untested prose — its unique value is the docs nothing else checks (`WORKLOG`, `MACHINE`, `GLOSSARY`, the paper); SRs and `setup/` have dedicated tests. Parked since 2026-08-21, never litigated | [SR-WORK-GOVERNANCE](../records/0065_WORK-governance.md) Consequences | Arpit rules on the scope, or rules it stays whole |
 | B-248 | Glassbox sessions — counts and cross-session joins, which fux does not do; the sketch is materialise-then-index. ⚠ The `fetch=` closed-tuple blocker is **struck** (W-178, then W-199) | [`glassbox-sessions.md`](proposals/glassbox-sessions.md) | A second event-stream source is asked for |
 | B-250 | Code pattern recognition — a committed, deterministic clone-and-shape map for code, as a separate distribution; the query and call-graph halves are a buy (ast-grep, tree-sitter graph servers) | [`code-pattern-recognition.md`](proposals/code-pattern-recognition.md) | A second ask for a code-shape answer that must be committed at a sha |
+| B-251 | Cross-model agent guides — the shipped guides load the same everywhere but trigger and comply differently per model; five deterministic levers, eval matrix first, and no in-file "if you are model X" branch | [`cross-model-agent-guides.md`](proposals/cross-model-agent-guides.md) | A filed mis-trigger or broken rule on a non-Claude or smaller model, or Arpit asks for the matrix |
 
 ---
 

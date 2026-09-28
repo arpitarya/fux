@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-19
 amended: 2026-09-15
 feature: the `extracted` ingest mode — the value in every committed record's `mode` property, and the contract it asserts
-owns: [src/fux/ingest/extract.py@b0526982a8d3]
+owns: [src/fux/ingest/extract.py@02247871bec2]
 laws: [L2, L3, L4, L5]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: d8725a1c03fa542839468c6b7695d1ceb7b2084b4e7566950d96b59454a22269
+content_sha: 6629cdd8502e57e062dc82f3304f1de8b2fa9c4b3e0d16bbbb0343560f552c84
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

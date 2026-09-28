@@ -1,0 +1,193 @@
+{
+ "arms": {
+  "ip-0.1": {
+   "clears_gain": true,
+   "drift_losses": [],
+   "gain": {
+    "alpha": 0.05,
+    "b": 6,
+    "c": 0,
+    "discordant": 6,
+    "net": 6,
+    "net_needed": 6,
+    "outcome": "treatment",
+    "p": 0.03125
+   },
+   "gain_line": "b=6 c=0 discordant=6 net=6 p=0.0312 (net needed 6, alpha=0.05) -> TREATMENT",
+   "hit@10_total": {
+    "baseline": 110,
+    "treatment": 110
+   },
+   "hit@1_untagged": [
+    0,
+    0
+   ],
+   "holds_drift": true,
+   "primary@1_per_intent": {
+    "procedure": [
+     2,
+     0
+    ],
+    "rationale": [
+     2,
+     0
+    ],
+    "reference": [
+     2,
+     0
+    ]
+   },
+   "primary@1_tagged": [
+    6,
+    0
+   ],
+   "primary@1_untagged": [
+    0,
+    0
+   ]
+  },
+  "ip-0.2": {
+   "clears_gain": true,
+   "drift_losses": [],
+   "gain": {
+    "alpha": 0.05,
+    "b": 8,
+    "c": 0,
+    "discordant": 8,
+    "net": 8,
+    "net_needed": 8,
+    "outcome": "treatment",
+    "p": 0.007812
+   },
+   "gain_line": "b=8 c=0 discordant=8 net=8 p=0.0078 (net needed 8, alpha=0.05) -> TREATMENT",
+   "hit@10_total": {
+    "baseline": 110,
+    "treatment": 110
+   },
+   "hit@1_untagged": [
+    0,
+    0
+   ],
+   "holds_drift": true,
+   "primary@1_per_intent": {
+    "procedure": [
+     3,
+     0
+    ],
+    "rationale": [
+     3,
+     0
+    ],
+    "reference": [
+     2,
+     0
+    ]
+   },
+   "primary@1_tagged": [
+    8,
+    0
+   ],
+   "primary@1_untagged": [
+    0,
+    0
+   ]
+  },
+  "ip-0.3": {
+   "clears_gain": true,
+   "drift_losses": [],
+   "gain": {
+    "alpha": 0.05,
+    "b": 11,
+    "c": 0,
+    "discordant": 11,
+    "net": 11,
+    "net_needed": 9,
+    "outcome": "treatment",
+    "p": 0.000977
+   },
+   "gain_line": "b=11 c=0 discordant=11 net=11 p=0.0010 (net needed 9, alpha=0.05) -> TREATMENT",
+   "hit@10_total": {
+    "baseline": 110,
+    "treatment": 110
+   },
+   "hit@1_untagged": [
+    0,
+    0
+   ],
+   "holds_drift": true,
+   "primary@1_per_intent": {
+    "procedure": [
+     3,
+     0
+    ],
+    "rationale": [
+     4,
+     0
+    ],
+    "reference": [
+     4,
+     0
+    ]
+   },
+   "primary@1_tagged": [
+    11,
+    0
+   ],
+   "primary@1_untagged": [
+    0,
+    0
+   ]
+  },
+  "ip-0.5": {
+   "clears_gain": true,
+   "drift_losses": [],
+   "gain": {
+    "alpha": 0.05,
+    "b": 14,
+    "c": 0,
+    "discordant": 14,
+    "net": 14,
+    "net_needed": 10,
+    "outcome": "treatment",
+    "p": 0.000122
+   },
+   "gain_line": "b=14 c=0 discordant=14 net=14 p=0.0001 (net needed 10, alpha=0.05) -> TREATMENT",
+   "hit@10_total": {
+    "baseline": 110,
+    "treatment": 110
+   },
+   "hit@1_untagged": [
+    0,
+    0
+   ],
+   "holds_drift": true,
+   "primary@1_per_intent": {
+    "procedure": [
+     4,
+     0
+    ],
+    "rationale": [
+     5,
+     0
+    ],
+    "reference": [
+     5,
+     0
+    ]
+   },
+   "primary@1_tagged": [
+    14,
+    0
+   ],
+   "primary@1_untagged": [
+    0,
+    0
+   ]
+  }
+ },
+ "headroom": {
+  "improvement_pool": 14,
+  "regression_exposed": 66
+ },
+ "outcome_by_the_table": "PASS \u2014 ip-0.1 (the first, ascending)"
+}

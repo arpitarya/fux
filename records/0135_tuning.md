@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-24
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@5a70322d785f, .fux/tune.toml@dd3f734abecc, node/src/config/tune.mjs@1fff66045a71]
+owns: [src/fux/tune.py@5a70322d785f, .fux/tune.toml@fbc012c8ee4f, node/src/config/tune.mjs@1fff66045a71]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: a46deee2edf6ffe7fae79aa65f219e39116d2999b503f3a381f30082069d1c39
+content_sha: 2dd4cd15638cbb1d76595b270655d7496917e2f25d167c8636296500a43bfb18
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1019,7 +1019,7 @@ may.
 - **Reopen-trigger** (the verdict's): any later run in which a mined spelling
   costs a baseline rank-1 hit reopens step 4.
 
-**20. `[ranking] intent_weight`, default `0.0`, and `[doctype]`, empty** (W-168
+**20. `[ranking] intent_weight`, default `0.1`, and `[doctype]`, empty** (W-168
 step 9, 2026-09-28; ruled D2 · I1 · M1 · S1 on 2026-09-24,
 [compare doc](../work/compare/intent-doctype-prior.compare.md); [frozen bar](../work/regression/2026-09-28-intent-prior/PRE-REGISTRATION.md)). The intent → doc-type prior.
 
@@ -1042,8 +1042,16 @@ step 9, 2026-09-28; ruled D2 · I1 · M1 · S1 on 2026-09-24,
   re-ingest, no rebuild.
 - **`fux lexical` forces it to `0.0`**, in both readers, as it does
   `mined_weight`.
-- ⚠ **UNMEASURED.** The pre-registered arms have not run. A PASS would move the
-  weight's default and still leave `[doctype]` empty.
+- **The default `0.1` is MEASURED** ([verdict](../work/regression/2026-09-28-intent-prior/VERDICT.md),
+  PASS by the frozen table, ratified by Arpit 2026-09-28): on `set-4-claude` at
+  a copy of `rung-01000`, with the bar's three globs, the tagged `hit@1` flips
+  were 6/0 · 8/0 · 11/0 · 14/0 at `0.1 / 0.2 / 0.3 / 0.5`, and no baseline
+  rank-1 hit was lost at any weight. `0.1` is the first that clears, at exactly
+  the d19 floor. It was measured at the shipped `anchor = 1.0` and
+  `mined_weight = 0.5`. `[doctype]` still ships empty, so the default moves no
+  consumer until that consumer declares types. `informed`, one Claude-authored set.
+- **Reopen-trigger** (the verdict's): any later run in which the prior costs a
+  baseline rank-1 hit reopens step 9.
 
 <!-- L12-VALUES-START -->
 

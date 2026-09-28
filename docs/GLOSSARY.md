@@ -414,7 +414,8 @@ pays a query-speed tax and the runtime format never pays a clone tax.
 is*) read by a fixed lexicon, and the document of the matching type —
 procedure, decision, reference, declared by a `[doctype]` path glob in
 `.fux/tune.toml` — scaled by `1 + [ranking] intent_weight`. **Built 2026-09-28
-(W-168 step 9), off at `0.0` with an empty table, unmeasured.** See
+(W-168 step 9); the weight defaults to the measured `0.1`, and the table ships
+empty, so it runs only where types are declared.** See
 [SR-RANKING](../records/0111_ranking.md) decision 13 and
 [SR-TUNE](../records/0135_tuning.md) decision 20.
 

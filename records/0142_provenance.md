@@ -12,7 +12,7 @@ owns: [src/fux/query/provenance.py@d32bb8330108]
 laws: [L2, L4, L5, L9]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 56d542cae942d9f65d799e87b8a3e016a3ce04593029429e7b2917f4fdfcd74f
+content_sha: 30466191c09e956609a7fdb1b4d7fbfcce5d945b0a87dd1c8adfd055158a6f1a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -506,8 +506,8 @@ recompute it here.
 2026-09-28; [SR-RANKING](0111_ranking.md) decision 13). `intent_factor` is `1 +
 intent_weight` on a document of the question's preferred type and `1.0` on any
 other, and the block carries `intent` (`cue`, `type`, `weight`). **Both are
-absent when the prior did not run**, so a `--why` block at the default is
-byte-identical to one written before the prior existed. ⚠ **`multiplier` still
+absent when the prior did not run**, so a `--why` block with an empty
+`[doctype]` — the shipped state, whatever the weight — is byte-identical to one written before the prior existed. ⚠ **`multiplier` still
 reports the archived fact only**, not `[priority]`: a `[priority]` corpus's
 identity is short that factor, as it was before this change.
 

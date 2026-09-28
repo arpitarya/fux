@@ -176,8 +176,9 @@ def test_a_doctype_outside_the_three_is_refused(tmp_path):
 # -- the prior -----------------------------------------------------------------
 
 
-def test_the_default_is_off_and_the_template_declares_no_type():
-    assert template_tune().intent_weight == 0.0
+def test_the_default_is_the_measured_value_and_the_template_declares_no_type():
+    """W-168 step 9 ratified PASS at `0.1`; the empty `[doctype]` keeps it inert."""
+    assert template_tune().intent_weight == 0.1
     assert template_tune().doctype == ()
 
 

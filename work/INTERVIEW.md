@@ -32,13 +32,30 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-28** (Claude Code, Opus — W-168 pools; L11 d13a).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-28** (Claude Code, Opus — W-228 DoD 11 rung; W-168 pools).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-09-28 (latest) — W-234 LANDED: LAWS RENUMBERED L0–L12; PYTHON ≥ 3.12; NODE ≥ 22 IS L8
+### 🟢 2026-09-28 (latest) — W-168 STEP 9 SHIPPED: `intent_weight = 0.1`
+
+- It is the template default, with no reader code changed. `[doctype]` ships empty, so nothing moves on upgrade. SR-TUNE 20 now carries MEASURED plus a reopen-trigger.
+- **Next:** step 7 (MMR) pre-registers, then 8.
+
+### 🟢 2026-09-28 — W-168 STEP 9 PASSES at `intent_weight = 0.1`; ARPIT RATIFIED
+
+- [Verdict](regression/2026-09-28-intent-prior/VERDICT.md): tagged `hit@1` 6/0 · 8/0 · 11/0 · 14/0. Every value clears, and `0.1` is first, exactly at the floor. Zero drift at any weight; every win is a primary win.
+- Unlike step 4, the arms ran at the shipped `anchor = 1.0` + `mined_weight = 0.5`, so nothing ships unmeasured. The default `[doctype]` is empty, so the default is inert on upgrade.
+- **Next:** ship per §If it passes (both engines, four SRs, byte equality, CHANGELOG). Then steps 7 and 8 pre-register.
+
+### 🟢 2026-09-28 — W-234 LANDED: LAWS RENUMBERED L0–L12; PYTHON ≥ 3.12; NODE ≥ 22 IS L8
 
 - **The handles are dense now:** L1 = a retired SR is archived (was the last law), L2–L5 = the old L1–L4, L8 = Node ≥ 22 (new), L9 = use record (was L8). A document dated before 2026-09-28 is read through [SR-LAWS](../records/0001_LAWS.md) decision 2a. Retired laws are written `ex-L5` / `ex-L9`.
 - **Breaking in the next release:** Python 3.11 and Node 20 are dropped.
+
+### 🔴 2026-09-28 — W-228 DoD 11: RUNG FILED, TITLE HEADINGS OUT; SEED MISFITS WAIT ON ARPIT
+
+- **The rung** ([`2026-09-28-families-lens-ladder`](regression/2026-09-28-families-lens-ladder/report.md)): the seed has 8 families and **0 misfits**. On rung-01000, 14 of 16 misfits were the document's own title heading.
+- **The lens changed** (SR-INSPECT d24, amended): the title heading is out of the shape, and only a shared heading can found a family. rung-01000 now has 1 misfit, a real missing section.
+- 🔴 **Inbox:** when to plant seed misfits. It is a generation-4 seed addition, which rebuilds the ladder under W-168's set-4 pools. The recommendation is after W-168 steps 6–10. `misfit_floor` stays PROVISIONAL until then.
 
 ### 🟢 2026-09-28 — W-168 STEP POOLS FROM THE KEY: 9, 7, 8 GO; 6 AND 10 STOP
 
