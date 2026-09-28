@@ -134,6 +134,37 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 - **The engine's fixed values live in one file, `src/fux/constants.toml`
   (W-225).** Schema ids, artefact names, decoder versions and extensions: read by
   both the Python and the Node reader. Nothing a consumer sees changes.
+- ⚠ **`fux.toml` gains fifteen required keys (law L12, W-225) — `fux doctor
+  --fix` writes them.** Values that were constants in code now live in the file,
+  at the same values:
+  - `[sources.url] thin_words = 50`, `thin_words_per_kb = 2.0`, `failing_streak = 5` and
+    `parallel_warn_at = 16`. These are required only when `[sources.url]` is present.
+  - `[index] git_timeout_s = 120`.
+  - A new `[maintain]` table: `daemon_poll_s = 1.0`, `runner_poll_s = 0.05`,
+    `stop_timeout_s = 30.0`, `last_cited_max = 256` and `stop_every_docs = 64`.
+  - A new `[refer]` table: `fetch_cache_max_bytes = 524288000` and `timeout_seconds = 5`.
+  - A new `[doctor]` table: `thin_url_share = 0.01`, `thin_url_chars = 200` and
+    `acquired_warn_share = 0.8`.
+
+  Three values stay out of the file on purpose, because an earlier ruling or record fixes
+  them: the rate-limit retries, the runner's pass cap, and the as-ingested reopen share.
+- ⚠ **`.fux/formats.toml` gains four more caps (W-225) — `fux doctor --fix` adds
+  them.** They are `[limits.html] charset_scan_bytes = 4096`, `[limits.xml] prolog_bytes = 8192`,
+  `[limits.yaml] indent_step = 2` and `min_value_len = 3`, each at its old value.
+- ⚠ **`.fux/output.toml` gains an `[api]` table (W-225) — `fux doctor --fix`
+  writes it.** It holds `band = true`, `sections = true` and `no_refer = false`: the
+  defaults of the `fux.open()` library, which ships the confidence block ON where the
+  CLI ships it off. **Library callers:** `fux.open(root)` now requires `root` (it
+  defaulted to `"."`), and `Index.answer` requires `audit=` and `receipt=`. The
+  Node `Index` matches.
+- **`fux enrich` plans from your configured `[sources] dirs_file`** (W-225). It
+  read `.fux/sources/dirs` even when `fux.toml` named another list. Only a repo that
+  renamed its list sees a change.
+- **No engine value is spelled in code any more, outside a reviewed list (law
+  L12, W-225).** Hash tables, byte layouts, protocol codes and artefact names
+  moved to `src/fux/constants.toml`, which is read by both readers. A new test fails on
+  any literal value that `tests/l12_allow.toml` does not list. Every ranked output on
+  this repo is byte-identical across each step.
 - ⚠ **The index format is `fux.index.v5`, so re-ingest.** Records may carry
   `abbr`, the hashed `Long Form (ABBR)` pairs a document declares. A v4 index is
   refused with the way out: run `fux ingest --full`, then `fux build`. The
