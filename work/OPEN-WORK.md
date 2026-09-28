@@ -24,6 +24,8 @@ here. Read that record before changing anything below it.
 | what he decides | filed | age |
 |---|---|---|
 
+*Empty since 2026-09-28 — W-168's step 9 score taken. Next decision: none filed.*
+
 
 ---
 
