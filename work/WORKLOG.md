@@ -22,6 +22,24 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-225 stage 7: the L12 veto test and its allow-list; the CHANGELOG's 3.0 lines  ·  Claude Code (Opus)
+- **Asked:** *"continue"* (W-225).
+- **Did:**
+  - `dad6c5fa`: `tests/test_l12_values_live_in_config.py` fails on a scanned literal that `tests/l12_allow.toml` does not list, and on a listed site that is gone. A third test holds the Python and Node parses of `constants.toml` equal.
+  - The scanner treats config-reader arguments as key names. That cleared 219 bindings.
+  - Moved first: the analyzer's stopwords, which went to `[analyzer] stopwords`; hand-spelled artefact names (`.fux`, `fux.toml`, `REGISTER`, `package.json`, …); the HTML heading map; the duration units; JSON-RPC `"2.0"`; Node's MCP `mass` digits; and `intent.mjs`'s `+32`.
+  - `enrich` reads the configured `dirs_file`.
+  - 150/150 outputs are byte-identical. REGISTER moved only in the html decoder-copy digest.
+  - `c4b2ed2c`: the CHANGELOG's 3.0 migration lines for stages 5–7.
+  - Filed a Blocked-on-Arpit row for W-225's open calls.
+- **Decided / open:**
+  - The allow-list holds 373 decision-6 sites across 8 categories. Two groups are not a permission:
+    - `pending-w228` (101): `src/fux/inspect/`, stage 5f, after W-228 commits;
+    - `for-arpit` (16): OOXML part names, magic bytes, generated file bodies, the list grammars. The compare doc recommends a disposition for each.
+  - Committed from a scratch worktree by blob again, so the other session's uncommitted W-228, W-233 and W-234 edits stayed out.
+  - Still red and not mine: `999c1976`; the W-233 row length.
+- **Next:** Arpit rules the inbox row. Then 5f `inspect` once W-228 lands, and stage 8's closing flip of SR-LAW-12 decision 9.
+
 ## 2026-09-28 — W-225 stage 6: parameter defaults removed (R8); the library reads `output.toml [api]`  ·  Claude Code (Opus)
 - **Asked:** *"continue"* (W-225, after stage 5).
 - **Did:**

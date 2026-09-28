@@ -24,7 +24,8 @@ here. Read that record before changing anything below it.
 | what he decides | filed | age |
 |---|---|---|
 
-*Empty since 2026-09-28 — W-168's step 9 score taken. Next decision: none filed.*
+| 🔴 **W-225** — rule L12's open calls: the `output.toml [api]` root, whether R8 reaches boolean dataclass fields, and 16 `for-arpit` sites. [compare doc](compare/l12-classify.compare.md) | 2026-09-28 | 0d |
+| ↳ **blocks:** nothing else in the queue — W-225 cannot close without it. | | |
 
 
 ---
@@ -34,7 +35,7 @@ here. Read that record before changing anything below it.
 ### fux build
 
 - 🟢 **W-168** · `agent` — the ranking ideas. Step 9 scored by Arpit 2026-09-28. Next: a session that did NOT capture the arms runs its `decide.py` and files VERDICT; INCONCLUSIVE → Arpit. Steps 7 and 8 go; 6 and 10 stop. [detail](open/W-168-search-improvements.md)
-- 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–6 landed (numerals → `constants.toml`; 15 keys → `fux.toml`; parameter defaults gone; `[api]`), bar `inspect` 5f. Next: stage 7, the AST test + allow-list. [detail](open/W-225-values-live-in-config.md)
+- 🔴 **W-225** · `agent` — L12 migration. Stages 1–7 landed (AST veto test + allow-list). Closing needs Arpit's ruling on the open calls; stage 5f `inspect` is still to do. [detail](open/W-225-values-live-in-config.md)
 - 🟢 **W-228** · `agent` — document families: DoD 1–10 built 2026-09-28. Next: DoD 11, golden seed families + a rung before the misfit floor leaves PROVISIONAL; unblocked 2026-09-28 (W-230's probe denied). [detail](open/W-228-document-families.md)
 
 
