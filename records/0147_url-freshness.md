@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@c2205bbff313, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L2, L3, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 41af8a028677eeb3fd8d12cb795aeb663844903231f9eb54a242cfa04aaa7071
+content_sha: 343530a39dd61b6c5fe75bec7b3114d2dcc2c6039c1296ada85b42aff998c69b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -568,6 +568,8 @@ this moved where they are written, not what they are.
 **`[sources.url] ttl` and `fetch_at_answer` are required with the table** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `ttl` no longer defaults to `"24h"` and `fetch_at_answer` to `true` in code; the template writes both, and a line's own `ttl=` still wins ([SR-CONFIG](0113_config.md) decision 17).
 
 **No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+
+**This record's reopen share (0.25) is `constants.toml [doctor] as_ingested_veto_share`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) — fixed, so no consumer's `fux.toml` can move it. `fux doctor` quotes it from there.
 
 ### Consequences
 

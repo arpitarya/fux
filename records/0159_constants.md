@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@af39c3b31cac]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@437b4427a662]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 4490ad6c051379510cf43e3c639f8f5214b2e4c0cce8dbdba44ac5827a93d331
+content_sha: d6c5742b510c1e5495bded9ef005e45adfae23cba33fd0af005faf2c1b1f5c47
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -162,6 +162,8 @@ decisions 3 and 17; SR-LAW-12 decision 9a).
 **W-225 stage 5b (2026-09-28)** added the decoders' format numbers: `[decoders.image.format]`, `[decoders.pdf.format]`, `[decoders.rtf.format]`, `[radix]`, `[markdown]` and `[ooxml]`. A byte string is stored as latin-1 text, and a record layout as a Python `struct` format.
 
 **W-225 stage 5c (2026-09-28)** added the wire, store and protocol numbers: `[index] shard_header_lines` and `max_record_depth`, `[bundle] shim_mode` and the banner widths, `[markdown] min_table_lines`, `[decoders] digest_hex`, `[maintain] question_key_hex` and `lock_mode`, `[bm25f]`, `[observe]`, `[refer]`, `[mcp]`'s JSON-RPC codes and `score_digits`, `[exit]` and `[win32]`.
+
+**W-225 stage 5e (2026-09-28)** added `[fetch]` (`undeclared_max_parallel`, the rate-limit retries and backoff, `kib`), `[maintain] max_passes` and `[doctor] as_ingested_veto_share` — three values the L12 classification had proposed as consumer keys, fixed instead because an earlier ruling or record already decides them ([SR-CONFIG](0113_config.md) decision 18).
 
 ### Consequences
 

@@ -297,6 +297,9 @@ def run(
             to_fetch,
             config.url.config,
             max_parallel=config.url.max_parallel,
+            parallel_warn_at=config.url.parallel_warn_at,
+            thin_words=config.url.thin_words,
+            thin_words_per_kb=config.url.thin_words_per_kb,
             known_tokens=known_tokens,
             validation_out=validation,
             acquired_max_bytes=config.url.acquired_max_bytes,
@@ -549,11 +552,11 @@ def run(
     extracted: dict[str, extract_mod.Extracted] = {}
     with progress.phase("extract", len(to_extract)) as p:
         for n, doc_id in enumerate(to_extract):
-            # Polled every `_STOP_EVERY` documents rather than every one: the
+            # Polled every `[maintain] stop_every_docs` documents rather than every one: the
             # check is a file read, and a stop noticed a few documents late is
             # still sub-second while a per-document poll would put a syscall
             # on the hot loop the progress plane exists to show moving.
-            if n % _STOP_EVERY == 0 and stopping():
+            if n % config.maintain.stop_every_docs == 0 and stopping():
                 return None
             # W-76 Phase 8: pinned enrichment, keyed by the SOURCE content
             # sha. A document that changed no longer matches its enrichment
@@ -587,7 +590,7 @@ def run(
     scans: dict[str, list] = {}
     with progress.phase("edges", len(parsed)) as p:
         for n, (doc_id, doc) in enumerate(parsed.items()):
-            if n % _STOP_EVERY == 0 and stopping():
+            if n % config.maintain.stop_every_docs == 0 and stopping():
                 return None
             scans[doc_id] = edges_mod.scan(doc)
             p.update(1)
@@ -745,7 +748,9 @@ def run(
     # file is written later, so its `superseded_by:` can — and it is the only
     # key in that frontmatter that reaches the ranking rather than a report.
     retired |= _superseded_by_enrichment(root, records, file_shas)
-    commit_times = git_commit_times(root, [r["loc"] for r in records if r.get("src") == "git"])
+    commit_times = git_commit_times(
+        root, [r["loc"] for r in records if r.get("src") == "git"], timeout_s=config.git_timeout_s
+    )
     for record in records:
         if record["id"] in retired:
             record["superseded"] = True
@@ -923,10 +928,10 @@ def _enrichment_for(root, sha: str, rules=()) -> tuple[str, dict[str, int]]:
     return pii_mod.redact(rules, body)
 
 
-#: How often the cooperative stop is polled inside the two per-document loops.
-#: A stop is noticed within this many documents, which at any corpus size fux
-#: is judged at is well under a second.
-_STOP_EVERY = 64
+#: How often the cooperative stop is polled inside the two per-document loops is
+#: `fux.toml [maintain] stop_every_docs` (W-225 stage 5e): a stop is noticed
+#: within that many documents, which at any corpus size fux is judged at is
+#: well under a second.
 
 #: The fields extraction owns — pure functions of one document's own bytes, and
 #: therefore the only ones a delta run may carry forward. `edges` is absent on
@@ -1648,11 +1653,15 @@ def _report_dead_urls(root: Path, failed_now: list[str]) -> None:
 
     try:
         state = urlstate.read(root)
+        url_source = load_config(root).url
     except Exception:  # pragma: no cover - a report must not break the run
         return
+    if url_source is None:  # no [sources.url]: nothing was fetched to fail
+        return
+    streak = url_source.failing_streak  # `fux.toml [sources.url] failing_streak`
     for url in sorted(failed_now):
         health = state.urls.get(url)
-        if health is None or health.fail_streak < urlstate.FAILING_STREAK:
+        if health is None or health.fail_streak < streak:
             continue
         print(
             f"note: {url} has now failed {health.fail_streak} runs in a row. "

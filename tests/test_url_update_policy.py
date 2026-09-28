@@ -139,8 +139,7 @@ def test_a_pinned_url_never_reaches_the_fetcher(tmp_path, monkeypatch):
 
     entries = _resolve("https://x.test/a update=never fetch=mw decoder=prose\nhttps://x.test/b update=never fetch=mw decoder=prose")
     fetched, skipped = urlsrc.fetch_all(
-        tmp_path, [e for e in entries if e.update != "never"], {}, max_parallel=1,
-        acquired_max_bytes=url_limits()["acquired_max_bytes"],
+        tmp_path, [e for e in entries if e.update != "never"], {}, **{**url_limits(), "max_parallel": 1},
     )
     assert not exploded and not fetched and not skipped
 

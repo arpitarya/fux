@@ -269,6 +269,9 @@ url_state_schema = "state.schema.json"
 question_key_hex = 16
 # chmod bits of the runner's write lock.
 lock_mode = 0o644
+# The runner's absolute bound on consecutive passes. A bound, not a knob: it is
+# what makes `run_once` provably terminate (SR-MAINTENANCE veto 6).
+max_passes = 5
 
 [hooks]
 # Written into .git -- how fux recognises its own hooks and merge driver.
@@ -545,3 +548,21 @@ interrupted = 130  # 128 + SIGINT: the shell's convention for Ctrl-C
 # (maintain/runner.py): OpenProcess access right, WaitForSingleObject result.
 synchronize  = 0x00100000
 wait_timeout = 258
+
+[fetch]
+# A fetcher that declares no MAX_PARALLEL is called one URL at a time --
+# SR-FETCHER decision 5, declared never detected (SR-LAW-12 decision 9a).
+undeclared_max_parallel = 1
+# Retries after a rate-limit refusal, and the first backoff in seconds (it
+# doubles). NOT a knob, by W-82 ruling 12: a second concurrency control under
+# another name. `[sources.url] max_parallel` is the one.
+rate_limit_retries   = 3
+rate_limit_backoff_s = 1.0
+# `[sources.url] thin_words_per_kb` counts words per this many bytes.
+kib = 1024
+
+[doctor]
+# The share of `as-ingested` verdicts past which the fetch path is broken. Not
+# doctor's number: it is the reopen condition SR-ACQUIRED and SR-URL-FRESHNESS
+# state, so a consumer cannot move it.
+as_ingested_veto_share = 0.25

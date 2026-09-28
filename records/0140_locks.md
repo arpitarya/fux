@@ -10,7 +10,7 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L1, L2, L3, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 5be25d8d8d8ca9d90595e60103ea97611cf48d58a7f623650a55f4461768e576
+content_sha: d97ec93b977a07b91acaa46cc03fb6fa7b7cf8fb71876a912cc341dc43a4e197
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -213,6 +213,8 @@ this moved where they are written, not what they are.
 **The daemon takes no lock on a repo it refuses** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `fux daemon start` now refuses a repo with no `[sources.url]` before spawning, so no `write.lock` or pid file is created for it ([SR-MAINTENANCE](0129_hooks.md) decision 9d).
 
 **No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+
+**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
 
 ### Consequences
 

@@ -90,9 +90,9 @@ def _file_schema():
 def _health_schema():
     return _shape("url_health")
 
-#: Consecutive failed fetches before `fux doctor` names a URL individually.
-#: A single failure is a flaky network; five in a row is a fact about the URL.
-FAILING_STREAK = 5
+#: Consecutive failed fetches before `fux doctor` names a URL individually is
+#: `fux.toml [sources.url] failing_streak` (W-225 stage 5e): a single failure is
+#: a flaky network; five in a row, as the template ships it, is a fact about the URL.
 
 
 @dataclass
@@ -381,7 +381,7 @@ class Summary:
         return self.indexed > 0
 
 
-def summarize(state: UrlState, indexed_urls) -> Summary:
+def summarize(state: UrlState, indexed_urls, *, failing_streak: int | None) -> Summary:
     """Fold the state and the index's `url:` records into one report.
 
     **The index is the population, not the state file.** A URL present in the
@@ -400,7 +400,8 @@ def summarize(state: UrlState, indexed_urls) -> Summary:
             confirmed += 1
         if health is not None and health.fail_streak > 0:
             failing += 1
-            if health.fail_streak >= FAILING_STREAK:
+            # `None`: no [sources.url], so no streak bar to name a URL against.
+            if failing_streak is not None and health.fail_streak >= failing_streak:
                 failing_urls.append(url)
     return Summary(
         indexed=len(urls),

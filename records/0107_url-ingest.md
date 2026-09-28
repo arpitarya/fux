@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 9b679f5578e8cad8302d71f64f287d5c12861a736bc47e84a15b0f1f3143dd9a
+content_sha: d49b6cc44855bc6dbad1ac1dcb8a0636fca2b4f3710a3b82bb96e5937c252b5b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -350,6 +350,8 @@ added nothing of its own.
 **Every `[sources.url]` key is required once the table is present** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27); its absence still means *fetch nothing*, and `fux doctor --fix` never adds it. `fetch_all` takes its bounds as required arguments ([SR-CONFIG](0113_config.md) decision 17).
 
 **A fetched document's decoder reads its caps from `.fux/formats.toml [limits.<decoder>]`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27), under the root the registry binds, like a walked one ([SR-DECODE](0139_decode.md)).
+
+**The thin-page note, the failing streak and the parallelism note read `fux.toml [sources.url]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): `thin_words`, `thin_words_per_kb`, `failing_streak`, `parallel_warn_at` ([SR-CONFIG](0113_config.md) decision 18). The rate-limit retries and backoff stay NOT configurable, by ruling 12, and are `constants.toml [fetch]`. Every value is unchanged.
 
 ### Consequences
 

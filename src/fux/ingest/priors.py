@@ -37,7 +37,7 @@ import subprocess
 from pathlib import Path
 
 
-def git_commit_times(root: Path, rel_paths: list[str]) -> dict[str, int]:
+def git_commit_times(root: Path, rel_paths: list[str], *, timeout_s: float) -> dict[str, int]:
     """`{rel_path: unix seconds of its last commit}` in ONE git invocation.
 
     **One call, not one per document.** `git log -1 -- <path>` per document is
@@ -66,7 +66,7 @@ def git_commit_times(root: Path, rel_paths: list[str]) -> dict[str, int]:
             # or come back mangled and silently lose that file's recency prior.
             encoding="utf-8",
             errors="replace",
-            timeout=120,
+            timeout=timeout_s,  # `fux.toml [index] git_timeout_s`
         )
     except (OSError, subprocess.SubprocessError):
         return {}

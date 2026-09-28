@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@a7abf88edaf5, src/fux/templates@cd1ac2fd613b]
+owns: [src/fux/ingest/urlsrc.py@e40fb5920ad3, src/fux/templates@e447f2c0a4a4]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 3cc5d2d1b2f2d8f3ba7d0f0d33ef993f5e80429ad04f0644d8bec2c27cde315d
+content_sha: 318e17cc58acb0f4b998cdb1553ae946496864aebac9ea17b47da0db5d7725c9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -667,6 +667,8 @@ copied out, never imported.
 **No fetcher decision moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5b, 2026-09-28). `src/fux/templates/formats-limits.toml.txt`, which this record's claim on `templates/` covers, gained four decoder caps ([SR-DECODE](0139_decode.md), [SR-TYPES](0128_types-list.md) decision 14).
 
 **The rate-limit backoff doubles by shift** (`1 << attempt`) and a fetcher's `(bytes, content type)` pair is recognised by its arity. Retries and base are stage 5e's. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+**An undeclared fetcher's parallelism is `constants.toml [fetch] undeclared_max_parallel`** (1) ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28), fixed by decision 5's *declared, never detected*; the "that is a lot of connections" note fires at `fux.toml [sources.url] parallel_warn_at`.
 
 ### Consequences
 

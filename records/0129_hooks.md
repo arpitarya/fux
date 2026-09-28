@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@a778422a81fd, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@a448d8e2f6f5]
+owns: [src/fux/maintain@a5829526ad0b, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@a448d8e2f6f5]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 03f410fc5c972db5f130d001efd4d23e9b2273f7897d29ad3ebda48c418ac25d
+content_sha: 35cec7d08ca1d318516766772feb8b9114c33e68f1f1b3f4ac87aaf3c5ff2df8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -617,6 +617,8 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **The maintenance plane's fixed numbers are `constants.toml` keys**: a remembered question's key width (`[maintain] question_key_hex`), the write lock's mode (`[maintain] lock_mode`), and the two Windows API constants the liveness check uses (`[win32]`). Its tunables (poll, timeout, passes, streak) are stage 5e's. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+**The maintenance plane's pacing is `fux.toml [maintain]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): `daemon_poll_s`, `runner_poll_s`, `stop_timeout_s` (shared by `stop` and the runner, one number for one gesture), `last_cited_max` and `stop_every_docs` ([SR-CONFIG](0113_config.md) decision 18). ⚠ **`MAX_PASSES` is not a key**: it is the bound veto condition 6 needs to hold, so it is `constants.toml [maintain] max_passes`. `request_stop`, `take_over` and `stop` take `timeout=None` and read the key.
 
 ### Consequences
 

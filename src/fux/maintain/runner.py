@@ -108,12 +108,18 @@ LOCK_NAME = fixed("maintain", "write_lock")
 STOP_NAME = fixed("maintain", "runner_stop")
 STATUS_NAME = fixed("maintain", "runner_status")
 
-#: How long `request_stop` waits for a cooperative runner to reach a safe point.
-#: Generous on purpose: the longest unit of work between stop checks is one
-#: `write_index`, and a stop that gave up early would be a stop that leaves two
-#: writers believing they hold the index.
-STOP_TIMEOUT_S = 30.0
-_POLL_S = 0.05
+#: How long `request_stop` waits for a cooperative runner to reach a safe point
+#: is `fux.toml [maintain] stop_timeout_s`, and how often it looks is
+#: `runner_poll_s` (W-225 stage 5e). Generous on purpose: the longest unit of
+#: work between stop checks is one `write_index`, and a stop that gave up early
+#: would be a stop that leaves two writers believing they hold the index.
+
+
+def pacing(root: Path):
+    """`fux.toml [maintain]` -- the runner's and the daemon's pacing."""
+    from ..config import load
+
+    return load(root).maintain
 
 #: How many times one runner will re-drain the dirty list before exiting and
 #: leaving the rest to the next commit's spawn.
@@ -124,7 +130,7 @@ _POLL_S = 0.05
 #: the resident process SR-MAINTENANCE veto condition 6 forbids. Reaching the
 #: cap is not an error — the leftovers stay in the dirty list, `fux doctor`
 #: reports them, and the next commit spawns a fresh runner.
-MAX_PASSES = 5
+MAX_PASSES = fixed("maintain", "max_passes")
 
 
 def _runtime(root: Path) -> Path:
@@ -314,7 +320,7 @@ def _clear_stop(root: Path) -> None:
         pass
 
 
-def request_stop(root: Path, *, timeout: float = STOP_TIMEOUT_S) -> str:
+def request_stop(root: Path, *, timeout: float | None = None) -> str:
     """Ask a live runner to stop, and wait for it to let go of the lock.
 
     Returns one of:
@@ -334,6 +340,9 @@ def request_stop(root: Path, *, timeout: float = STOP_TIMEOUT_S) -> str:
     pid = holder(root)
     if pid is None:
         return "idle"
+    pace = pacing(root)
+    if timeout is None:
+        timeout = pace.stop_timeout_s
 
     directory = fuxdir.derived_dir(root, "runtime")
     try:
@@ -348,7 +357,7 @@ def request_stop(root: Path, *, timeout: float = STOP_TIMEOUT_S) -> str:
             return "stopped"
         if not is_alive(pid):
             break
-        time.sleep(_POLL_S)
+        time.sleep(pace.runner_poll_s)
 
     _clear_stop(root)
     if holder(root) is None:
@@ -359,7 +368,7 @@ def request_stop(root: Path, *, timeout: float = STOP_TIMEOUT_S) -> str:
     return "wedged"
 
 
-def take_over(root: Path, *, timeout: float = STOP_TIMEOUT_S) -> str:
+def take_over(root: Path, *, timeout: float | None = None) -> str:
     """Stop whatever is running so an explicit command can write the index.
 
     SR-MAINTENANCE decision 1d: *the explicit instruction wins*. Refusing

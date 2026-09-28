@@ -7,6 +7,10 @@ import json
 import pytest
 
 from fux.maintain import urlstate
+from l12_fixtures import template_fux_toml
+
+#: `[sources.url] failing_streak` as the template ships it (W-225 stage 5e).
+_STREAK = template_fux_toml()["sources"]["url"]["failing_streak"]
 
 
 @pytest.fixture
@@ -129,7 +133,7 @@ def test_shas_sidecar_drops_delisted_urls_too(root):
 def test_a_url_in_the_index_with_no_health_entry_counts_as_never_confirmed(root):
     """The case the report exists to surface, and the one that would be
     invisible if this iterated the state file instead of the index."""
-    summary = urlstate.summarize(urlstate.UrlState(), ["https://never-touched"])
+    summary = urlstate.summarize(urlstate.UrlState(), ["https://never-touched"], failing_streak=_STREAK)
     assert summary.indexed == 1
     assert summary.never_confirmed == 1
     assert summary.confirmed_last_run == 0
@@ -141,10 +145,10 @@ def test_summary_counts_split_confirmed_stale_and_failing(root):
         urls={
             "https://fresh": urlstate.UrlHealth(last_seen_run=9),
             "https://stale": urlstate.UrlHealth(last_seen_run=4),
-            "https://dead": urlstate.UrlHealth(last_seen_run=2, fail_streak=urlstate.FAILING_STREAK),
+            "https://dead": urlstate.UrlHealth(last_seen_run=2, fail_streak=_STREAK),
         },
     )
-    summary = urlstate.summarize(state, ["https://fresh", "https://stale", "https://dead"])
+    summary = urlstate.summarize(state, ["https://fresh", "https://stale", "https://dead"], failing_streak=_STREAK)
     assert summary.indexed == 3
     assert summary.confirmed_last_run == 1
     assert summary.failing == 1
@@ -156,14 +160,14 @@ def test_a_url_below_the_failing_streak_is_counted_but_not_named(root):
     state = urlstate.UrlState(
         run_seq=2, urls={"https://flaky": urlstate.UrlHealth(last_seen_run=1, fail_streak=1)}
     )
-    summary = urlstate.summarize(state, ["https://flaky"])
+    summary = urlstate.summarize(state, ["https://flaky"], failing_streak=_STREAK)
     assert summary.failing == 1
     assert summary.failing_urls == ()
 
 
 def test_state_entries_for_urls_not_in_the_index_do_not_inflate_the_count(root):
     state = urlstate.UrlState(run_seq=1, urls={"https://ghost": urlstate.UrlHealth(last_seen_run=1)})
-    assert urlstate.summarize(state, []).indexed == 0
+    assert urlstate.summarize(state, [], failing_streak=_STREAK).indexed == 0
 
 
 def test_every_declared_field_survives_a_round_trip(tmp_path):

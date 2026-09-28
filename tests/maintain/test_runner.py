@@ -122,6 +122,7 @@ def test_request_stop_with_nothing_running_is_idle(tmp_path):
 def test_request_stop_breaks_a_lock_whose_holder_is_gone(tmp_path):
     dead = subprocess.Popen([sys.executable, "-c", "pass"])
     dead.wait()
+    write_config(tmp_path)
     runtime = tmp_path / ".fux" / "runtime"
     runtime.mkdir(parents=True)
     (runtime / runner.LOCK_NAME).write_text(json.dumps({"pid": dead.pid}), encoding="utf-8")
@@ -133,6 +134,7 @@ def test_request_stop_breaks_a_lock_whose_holder_is_gone(tmp_path):
 def test_a_live_holder_that_ignores_the_stop_is_wedged_not_broken(tmp_path):
     """The lock is NOT broken here. Breaking a lock whose owner is provably
     alive is the two-writers failure the lock exists to prevent."""
+    write_config(tmp_path)
     runtime = tmp_path / ".fux" / "runtime"
     runtime.mkdir(parents=True)
     # This process is alive and will never poll the stop file.
@@ -146,6 +148,7 @@ def test_request_stop_clears_its_own_stop_file(tmp_path):
     """A leftover stop file would halt the next runner before it started."""
     dead = subprocess.Popen([sys.executable, "-c", "pass"])
     dead.wait()
+    write_config(tmp_path)
     runtime = tmp_path / ".fux" / "runtime"
     runtime.mkdir(parents=True)
     (runtime / runner.LOCK_NAME).write_text(json.dumps({"pid": dead.pid}), encoding="utf-8")
@@ -356,7 +359,10 @@ def test_a_wedged_runner_refuses_the_write_rather_than_racing_it(tmp_path, monke
     runtime = tmp_path / ".fux" / "runtime"
     runtime.mkdir(parents=True, exist_ok=True)
     (runtime / runner.LOCK_NAME).write_text(json.dumps({"pid": os.getpid()}), encoding="utf-8")
-    monkeypatch.setattr(runner, "STOP_TIMEOUT_S", 0.1)
+    # `[maintain] stop_timeout_s`, shortened: this holder never lets go.
+    toml = tmp_path / "fux.toml"
+    toml.write_text(toml.read_text(encoding="utf-8").replace("stop_timeout_s  = 30.0", "stop_timeout_s  = 0.1"), encoding="utf-8")
+    assert "stop_timeout_s  = 0.1" in toml.read_text(encoding="utf-8")
 
     class Args:
         progress = None

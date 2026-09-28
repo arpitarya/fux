@@ -11,7 +11,7 @@ owns: [node@500a74b692bc, src/fux/store/nodebundle.py@de287c53d973]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 7abddbf38ee1d6cd39b37d1d807e6b6b4f919a162ebe78c0295e7ab319e6ecd3
+content_sha: b1743aa3a7a5b763de7faaa492f5f82879ffeb42a428f10278013b05983e7821
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -902,6 +902,8 @@ this moved where they are written, not what they are.
 **The three transcriptions hold no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `hash/blake2b.mjs` reads RFC 7693's IV, message schedule, G steps, rotations and block layout from `constants.toml [blake2b]`, and does its carry, rotation and little-endian reads without a bare number. It matches `hashlib` and `node:crypto` on 154 inputs and is as fast as before (about 4 us per term key). `compat/pyfloat.mjs` reads CPython's `repr` thresholds from `[pyfloat]` and the sort-key resolution from `[ranking] score_digits`; it matches the old version on 2.4 million comparisons. `config/toml.mjs` cannot read the file it parses, so it measures its own tokens instead: TOML's escape widths are in its regexes, `Number` reads a `0x`/`0o`/`0b` prefix, and it exports `BOM`. It parses all 36 TOML inputs checked exactly as before.
 
 **The bundler holds no numeral**: its banner rules are `constants.toml [bundle] module_banner_width` and `surface_rule_width`, the import walk marks modules with two sets instead of `0/1/2`, and the checkout root is four `.parent`s up. HEAD's bundler and this one produce the same `fux.mjs` byte for byte. Node's verbs indent `--json` by `[json] indent`, and `store/reader.mjs`, `query/scan.mjs`, `refer/chunk.mjs`, `refer/source.mjs`, `correct.mjs` and `query/bm25f.mjs` lost their numerals as their Python twins did. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
 
 ### Consequences
 

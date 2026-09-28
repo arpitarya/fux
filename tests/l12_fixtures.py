@@ -164,7 +164,20 @@ def url_limits() -> dict:
     from fux import setup as setup_mod
 
     url = setup_mod.template_config()["sources"]["url"]
-    return {"max_parallel": url["max_parallel"], "acquired_max_bytes": url["acquired_max_bytes"]}
+    return {
+        "max_parallel": url["max_parallel"],
+        "acquired_max_bytes": url["acquired_max_bytes"],
+        "parallel_warn_at": url["parallel_warn_at"],
+        "thin_words": url["thin_words"],
+        "thin_words_per_kb": url["thin_words_per_kb"],
+    }
+
+
+def template_fux_toml() -> dict:
+    """`fux.toml` as the template ships it, parsed (W-225 stage 5e)."""
+    from fux import setup as setup_mod
+
+    return setup_mod.template_config()
 
 
 def refusals_scan() -> dict:

@@ -54,6 +54,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path, PurePosixPath
 
+from ..constants import fixed
 from ..errors import FuxError
 from ..store import acquired
 from .. import config
@@ -303,10 +304,10 @@ def configure_fetcher(module, config: dict) -> None:
 #: byte-for-byte the behaviour that shipped before this existed. Opting in is
 #: the author's act, never fux's inference — SR-FETCHER decision 5's
 #: *declared, never detected*, applied to a second property.
-UNDECLARED_MAX_PARALLEL = 1
+UNDECLARED_MAX_PARALLEL = fixed("fetch", "undeclared_max_parallel")
 
 
-def resolve_parallel(module, configured: int) -> int:
+def resolve_parallel(module, configured: int, warn_at: int) -> int:
     """`min(what the fetcher declared, what the consumer configured)`.
 
     **Two values wearing one name, and they get different kinds of refusal** —
@@ -347,7 +348,7 @@ def resolve_parallel(module, configured: int) -> int:
             "maximum is a correctness violation, not a preference",
             file=sys.stderr,
         )
-    elif configured >= 16:
+    elif configured >= warn_at:  # `[sources.url] parallel_warn_at`
         print(
             f"note: max_parallel = {configured} will open up to {configured} concurrent "
             "connections; many intranet hosts rate-limit well below that and return 429, "
@@ -361,9 +362,10 @@ def resolve_parallel(module, configured: int) -> int:
 #: How many times one URL is retried after a rate-limit refusal, and the base
 #: of the exponential backoff in seconds. Bounded, small, and NOT configurable:
 #: a knob here would be a second concurrency control wearing a different name,
-#: which is exactly what ruling 12 refused.
-RATE_LIMIT_RETRIES = 3
-RATE_LIMIT_BACKOFF_BASE = 1.0
+#: which is exactly what ruling 12 refused -- so they are FIXED,
+#: `constants.toml [fetch]`, and not `fux.toml` keys (W-225 stage 5e).
+RATE_LIMIT_RETRIES = fixed("fetch", "rate_limit_retries")
+RATE_LIMIT_BACKOFF_BASE = fixed("fetch", "rate_limit_backoff_s")
 
 
 def host_of(url: str) -> str:
@@ -593,7 +595,8 @@ def _report_rate_limits(root: Path, limited: dict[str, int]) -> None:
 #: legitimate document -- a stub, a redirect notice, a one-line changelog. A
 #: filter here would silently lose them; a note costs one line and loses
 #: nothing.
-THIN_DOCUMENT_WORDS = 50
+#:
+#: `[sources.url] thin_words` since W-225 stage 5e -- passed in by `fetch_all`.
 
 #: Below this ratio of decoded words per KB of source, the response is mostly
 #: machinery: script, style and markup with almost no prose in it.
@@ -605,10 +608,12 @@ THIN_DOCUMENT_WORDS = 50
 #: HTML carrying zero characters of visible text -- and it sails past every
 #: byte-level rule while producing an index record that looks like a document
 #: and answers nothing.
-THIN_WORDS_PER_KB = 2.0
+#:
+#: `[sources.url] thin_words_per_kb` since W-225 stage 5e -- passed in by
+#: `fetch_all`, per `constants.toml [fetch] kib` bytes.
 
 
-def _warn_if_thin(url: str, raw: bytes, markdown: str) -> None:
+def _warn_if_thin(url: str, raw: bytes, markdown: str, *, thin_words: int, per_kb: float) -> None:
     """Say so on stderr when a fetch decoded to almost nothing.
 
     `http.py`'s docstring already names the signal -- *"a tiny wlen in the
@@ -619,7 +624,7 @@ def _warn_if_thin(url: str, raw: bytes, markdown: str) -> None:
     reads as success.
     """
     words = len(markdown.split())
-    kb = max(len(raw) / 1024.0, 0.001)
+    kb = len(raw) / fixed("fetch", "kib")
     # ⚠ **EITHER test passing is enough, and it was AND until 2026-09-01.**
     # A real 6,727-byte workbook holding one small sheet decodes to 21 words
     # -- under the absolute floor -- and warned, which is noise on a document
@@ -629,7 +634,8 @@ def _warn_if_thin(url: str, raw: bytes, markdown: str) -> None:
     # The absolute floor stays as the second escape, for the opposite case:
     # a large binary document is dense, so a 40 MB workbook full of prose has
     # a low ratio and must not warn either.
-    if (words / kb) >= THIN_WORDS_PER_KB or words >= THIN_DOCUMENT_WORDS:
+    # Multiplied, not divided: a zero-byte response has no ratio to divide by.
+    if words >= per_kb * kb or words >= thin_words:
         return
     print(
         f"note: {url}\n"
@@ -649,6 +655,9 @@ def fetch_all(
     *,
     max_parallel: int,
     acquired_max_bytes: int,
+    parallel_warn_at: int,
+    thin_words: int,
+    thin_words_per_kb: float,
     known_tokens: dict[str, str] | None = None,
     validation_out: dict | None = None,
 ) -> tuple[list[FetchedUrl], list[Skipped]]:
@@ -770,7 +779,7 @@ def fetch_all(
                 validated.append(url)
             urls = [u for u in urls if u not in unchanged]
 
-            workers = resolve_parallel(module, max_parallel)
+            workers = resolve_parallel(module, max_parallel, parallel_warn_at)
             for url, text, exc in _fetch_group(module, urls, workers, limited):
                 if exc is not None:  # a failed page is a fact, not a crash
                     skipped.append(
@@ -832,7 +841,7 @@ def fetch_all(
                 if not markdown.strip():
                     skipped.append(Skipped(rel_path=url, reason="fetcher returned no text"))
                     continue
-                _warn_if_thin(url, raw, markdown)
+                _warn_if_thin(url, raw, markdown, thin_words=thin_words, per_kb=thin_words_per_kb)
                 # W-200: which decoder actually read these bytes, recorded
                 # where it is KNOWN rather than re-derived later from the URL's
                 # extension — the header is authoritative and the extension is
@@ -866,7 +875,7 @@ def fetch_all(
         try:
             from ..maintain import urlstate
 
-            # `fail_streak > 0`, not `>= FAILING_STREAK`. That constant is the
+            # `fail_streak > 0`, not `>= failing_streak`. That key is the
             # threshold for *reporting* a URL as dead; here a SINGLE failure is
             # already enough to mean "this one may not be re-acquirable right
             # now", and the cost of protecting it is one blob of disk.

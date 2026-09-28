@@ -24,6 +24,10 @@ import pytest
 
 from fux.errors import FuxError
 from fux.ingest import urlsrc
+from l12_fixtures import url_limits
+
+#: `[sources.url] parallel_warn_at` as the template ships it.
+_WARN = url_limits()["parallel_warn_at"]
 
 
 def _fetcher(*, declared=None, fetch=None, name="test_fetcher"):
@@ -40,12 +44,12 @@ def _fetcher(*, declared=None, fetch=None, name="test_fetcher"):
 def test_an_undeclared_fetcher_is_called_one_at_a_time():
     """The default is byte-for-byte the behaviour that shipped before this
     existed. Opting in is the fetcher author's act, never fux's inference."""
-    assert urlsrc.resolve_parallel(_fetcher(), 16) == 1
+    assert urlsrc.resolve_parallel(_fetcher(), 16, _WARN) == 1
 
 
 def test_the_cap_is_the_minimum_of_the_two():
-    assert urlsrc.resolve_parallel(_fetcher(declared=8), 4) == 4
-    assert urlsrc.resolve_parallel(_fetcher(declared=2), 8) == 2
+    assert urlsrc.resolve_parallel(_fetcher(declared=8), 4, _WARN) == 4
+    assert urlsrc.resolve_parallel(_fetcher(declared=2), 8, _WARN) == 2
 
 
 # -- W-83's "what SILENCE means" — retired by W-225 stage 3b ----------------
@@ -59,28 +63,28 @@ def test_the_cap_is_the_minimum_of_the_two():
 def test_there_is_no_unconfigured_parallelism_any_more():
     assert not hasattr(urlsrc, "DEFAULT_MAX_PARALLEL")
     with pytest.raises(TypeError):
-        urlsrc.resolve_parallel(_fetcher(declared=8), None)
+        urlsrc.resolve_parallel(_fetcher(declared=8), None, _WARN)
 
 
 def test_a_smaller_declaration_still_wins_over_a_larger_setting():
     """`min`, still. A fetcher declaring less keeps its own smaller number —
     which is the whole of `cdp.py`'s one-WebSocket protection."""
-    assert urlsrc.resolve_parallel(_fetcher(declared=1, name="cdp"), 4) == 1
-    assert urlsrc.resolve_parallel(_fetcher(), 4) == 1  # undeclared is still 1
-    assert urlsrc.resolve_parallel(_fetcher(declared=2), 4) == 2
+    assert urlsrc.resolve_parallel(_fetcher(declared=1, name="cdp"), 4, _WARN) == 1
+    assert urlsrc.resolve_parallel(_fetcher(), 4, _WARN) == 1  # undeclared is still 1
+    assert urlsrc.resolve_parallel(_fetcher(declared=2), 4, _WARN) == 2
 
 
 def test_the_knob_still_reaches_the_declared_ceiling_silently(capsys):
     """The default decides what saying NOTHING means. It must not become a
     second clamp on what the consumer explicitly asked for."""
-    assert urlsrc.resolve_parallel(_fetcher(declared=8), 8) == 8
+    assert urlsrc.resolve_parallel(_fetcher(declared=8), 8, _WARN) == 8
     assert capsys.readouterr().err == ""
 
 
 def test_exceeding_a_declared_capability_clamps_down_loudly(capsys):
     """CAPABILITY. Exceeding what the author said is safe is a correctness
     violation, not a preference — so it is clamped, and it says so."""
-    assert urlsrc.resolve_parallel(_fetcher(declared=2, name="cdp"), 32) == 2
+    assert urlsrc.resolve_parallel(_fetcher(declared=2, name="cdp"), 32, _WARN) == 2
     err = capsys.readouterr().err
     assert "cdp" in err and "MAX_PARALLEL = 2" in err and "clamped" in err
 
@@ -88,16 +92,16 @@ def test_exceeding_a_declared_capability_clamps_down_loudly(capsys):
 def test_a_large_policy_value_is_honoured_with_a_warning_never_clamped(capsys):
     """POLICY. *State the cost, don't clamp the knob* — a large value is merely
     rude, and the note states the cost in the units that matter."""
-    assert urlsrc.resolve_parallel(_fetcher(declared=64), 32) == 32
+    assert urlsrc.resolve_parallel(_fetcher(declared=64), 32, _WARN) == 32
     err = capsys.readouterr().err
     assert "429" in err and "skip" in err
 
 
 def test_a_value_below_one_is_broken_and_refuses():
     with pytest.raises(FuxError, match="max_parallel"):
-        urlsrc.resolve_parallel(_fetcher(declared=8), 0)
+        urlsrc.resolve_parallel(_fetcher(declared=8), 0, _WARN)
     with pytest.raises(FuxError):
-        urlsrc.resolve_parallel(_fetcher(declared=8), -3)
+        urlsrc.resolve_parallel(_fetcher(declared=8), -3, _WARN)
 
 
 @pytest.mark.parametrize("bad", ["four", 0, -1, True, None])
@@ -106,7 +110,7 @@ def test_a_malformed_declaration_falls_back_to_safe_not_to_fast(bad):
     one with none. Guessing upward here is how the cdp corruption ships."""
     if bad is None:
         pytest.skip("absent is covered by the undeclared test")
-    assert urlsrc.resolve_parallel(_fetcher(declared=bad), 8) == 1
+    assert urlsrc.resolve_parallel(_fetcher(declared=bad), 8, _WARN) == 1
 
 
 # -- the test no amount of manual checking substitutes for --------------------
@@ -135,7 +139,7 @@ def test_a_fetcher_declaring_one_is_never_called_concurrently():
 
     module = _fetcher(declared=1, fetch=fetch)
     urls = [f"https://x/{n}" for n in range(8)]
-    list(urlsrc._fetch_group(module, urls, urlsrc.resolve_parallel(module, 8)))
+    list(urlsrc._fetch_group(module, urls, urlsrc.resolve_parallel(module, 8, _WARN)))
     assert peak == 1
 
 
@@ -158,7 +162,7 @@ def test_a_fetcher_declaring_more_actually_runs_concurrently():
 
     module = _fetcher(declared=4, fetch=fetch)
     urls = [f"https://x/{n}" for n in range(8)]
-    list(urlsrc._fetch_group(module, urls, urlsrc.resolve_parallel(module, 4)))
+    list(urlsrc._fetch_group(module, urls, urlsrc.resolve_parallel(module, 4, _WARN)))
     assert peak > 1
 
 
@@ -331,6 +335,6 @@ def test_configure_runs_BEFORE_resolve_parallel_reads_the_module():
 def test_a_configured_ceiling_is_what_resolve_parallel_uses():
     """End to end at the seam, on a stand-in module rather than a template."""
     module = _fetcher(declared=1)
-    assert urlsrc.resolve_parallel(module, 8) == 1
+    assert urlsrc.resolve_parallel(module, 8, _WARN) == 1
     module.MAX_PARALLEL = 4  # what configure() does
-    assert urlsrc.resolve_parallel(module, 8) == 4
+    assert urlsrc.resolve_parallel(module, 8, _WARN) == 4

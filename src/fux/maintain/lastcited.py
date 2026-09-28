@@ -54,10 +54,10 @@ _JSON_INDENT = fixed("json", "indent")
 
 LOG_NAME = fixed("maintain", "last_cited")
 
-#: Bound on remembered questions. A local diagnostic must not grow without
-#: limit; the oldest entries are dropped by insertion order, which is enough
-#: for a feature whose value is entirely in the *most recent* repeat.
-MAX_QUESTIONS = 256
+#: The bound on remembered questions is `fux.toml [maintain] last_cited_max`
+#: (W-225 stage 5e). A local diagnostic must not grow without limit; the oldest
+#: entries are dropped by insertion order, which is enough for a feature whose
+#: value is entirely in the *most recent* repeat.
 
 
 def key_for(query: str) -> str:
@@ -146,9 +146,12 @@ def remember(root: Path, query: str, cited: dict[str, str]) -> None:
     rule the detector and the URL health counter follow.
     """
     try:
+        from ..config import load
+
+        bound = load(root).maintain.last_cited_max
         store = _read(root)
         store[key_for(query)] = dict(cited)
-        while len(store) > MAX_QUESTIONS:
+        while len(store) > bound:
             store.pop(next(iter(store)))
         directory = fuxdir.derived_dir(root, "runtime")
         text = json.dumps(store, indent=_JSON_INDENT, sort_keys=True) + "\n"

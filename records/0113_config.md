@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@81db9b20a917, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@2a75560cd349]
+owns: [src/fux/config.py@995a0e9f409e, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@2a75560cd349]
 laws: [L4, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a49a9f12a4ac74efd8d226d7b240700aa4006ba3a14af3238d4e5354cb0ef3df
+content_sha: da82184632248d0645a37c5edb3dacc7974b92a194d5ea89ad39459d1c607929
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -65,14 +65,17 @@ flowchart TD
     S --> D["dirs_file · urls_file — REQUIRED<br/>the two source lists"]
     S --> U["[sources.url] — optional TABLE<br/>absent = fetch nothing"]
     U --> ME["keep · ttl · enrich · update<br/>source-wide LAYERS — a URL line wins"]
-    U --> MP["max_parallel · sweep_minutes<br/>fetch_at_answer · acquired_max_bytes"]
+    U --> MP["max_parallel · sweep_minutes<br/>fetch_at_answer · acquired_max_bytes<br/>thin_words · thin_words_per_kb<br/>failing_streak · parallel_warn_at"]
     MP --> RQ["every key REQUIRED<br/>when the table is present"]
     U --> RO["[sources.url.routes]<br/>optional map — fux reads it"]
     U --> CF["[sources.url.config]<br/>PASSED THROUGH, never read"]
     F --> I["[index]"]
     I --> SH["shards = 256 — REQUIRED<br/>a check; cannot set it"]
+    I --> GT["git_timeout_s — REQUIRED"]
     F --> OB["[observe]"]
     OB --> OM["max_ms — REQUIRED"]
+    F --> MA["[maintain] · [refer] · [doctor]"]
+    MA --> MK["runner and daemon pacing · the fetch-cache bound<br/>the thin-URL check — every key REQUIRED"]
     F --> AG["[agents]"]
     AG --> AI["install — REQUIRED<br/>claude · codex · copilot · kiro; [] = none"]
     F -.->|"REFUSED by name<br/>at any value"| RT["[ranking] · [dense] · [decode]"]
@@ -100,6 +103,9 @@ flowchart TD
      |           +-- max_parallel  URLs fetched at once
      |           +-- sweep_minutes `fux daemon` cadence
      |           +-- acquired_max_bytes  the .fux/acquired/ bound
+     |           +-- thin_words, thin_words_per_kb  when a fetch is reported thin
+     |           +-- failing_streak     failed runs before a URL is named
+     |           +-- parallel_warn_at   max_parallel that earns a note
      |           +-- [sources.url.routes]  optional map, READ by fux
      |           +-- [sources.url.config]  optional map,
      |                 PASSED THROUGH VERBATIM -- fux never reads a key
@@ -108,9 +114,15 @@ flowchart TD
      |
      +-- [index]
      |     +-- shards = 256   REQUIRED; a check, cannot change it
+     |     +-- git_timeout_s  REQUIRED; the recency-prior `git log` bound
      |
      +-- [observe]
      |     +-- max_ms         REQUIRED
+     |
+     +-- [maintain]   daemon_poll_s, runner_poll_s, stop_timeout_s,
+     |                last_cited_max, stop_every_docs     every key REQUIRED
+     +-- [refer]      fetch_cache_max_bytes               REQUIRED
+     +-- [doctor]     thin_url_share, thin_url_chars      every key REQUIRED
      |
      +-- [agents]
      |     +-- install        REQUIRED; [] = none
@@ -143,15 +155,34 @@ fetch_at_answer = true                  # ask-time: may `fux answer` open a sock
 max_parallel    = 4                     # URLs fetched at once
 sweep_minutes   = 60                    # how often `fux daemon` re-checks
 acquired_max_bytes = 2147483648         # the .fux/acquired/ bound
+thin_words        = 50                  # fewer decoded words than this ...
+thin_words_per_kb = 2.0                 # ... and fewer per KiB: reported thin
+failing_streak    = 5                   # failed runs before a URL is named
+parallel_warn_at  = 16                  # max_parallel that earns a note
 
 [sources.url.config.http]
 timeout_s = 30.0                        # the fetcher's vocabulary, never fux's
 
 [index]
 shards = 256                            # a check, cannot set it
+git_timeout_s = 120                     # the recency-prior `git log` bound, seconds
 
 [observe]
 max_ms = 50                             # the wait for one .fux/observers/ file
+
+[maintain]
+daemon_poll_s   = 1.0                   # how often the daemon checks for `stop`
+runner_poll_s   = 0.05                  # how often `stop` checks the runner
+stop_timeout_s  = 30.0                  # how long `stop` waits for a safe point
+last_cited_max  = 256                   # remembered questions in last-cited.json
+stop_every_docs = 64                    # ingest checks for `stop` per this many docs
+
+[refer]
+fetch_cache_max_bytes = 524288000       # the fetch cache's disk bound
+
+[doctor]
+thin_url_share = 0.01                   # extracted/retained below this is thin ...
+thin_url_chars = 200                    # ... unless it extracted at least this much
 
 [agents]
 install = ["claude", "codex", "copilot", "kiro"]  # [] = none
@@ -510,10 +541,23 @@ at any value, with an error naming the new home.
 + sources.url.max_parallel
 + sources.url.sweep_minutes
 + sources.url.acquired_max_bytes
++ sources.url.thin_words
++ sources.url.thin_words_per_kb
++ sources.url.failing_streak
++ sources.url.parallel_warn_at
 * sources.url.config
 + index.shards
++ index.git_timeout_s
 + agents.install
 + observe.max_ms
++ maintain.daemon_poll_s
++ maintain.runner_poll_s
++ maintain.stop_timeout_s
++ maintain.last_cited_max
++ maintain.stop_every_docs
++ refer.fetch_cache_max_bytes
++ doctor.thin_url_share
++ doctor.thin_url_chars
 - sources.dirs
 - sources.types_file
 - sources.url.urls
@@ -675,6 +719,36 @@ this moved where they are written, not what they are.
 - `src/fux/config.py` — `CONFIG_NAME` ← `[files] config`, `FETCHERS_DIR` ← `[files] fetchers_dir`, `DEFAULT_TYPES_FILE` ← `[files] formats`, `LEGACY_TYPES_FILE` ← `[files] formats_legacy`
 
 <!-- L12-VALUES-END -->
+
+**18. Thirteen values that sat in code joined this file** ([SR-LAW-12](0013_LAW-12-values-live-in-config.md);
+W-225 stage 5e, 2026-09-28). The L12 classification homed each one here, and
+each keeps the number it had in code; the template writes it and `fux doctor
+--fix` fills it in an existing repo.
+
+| key | what it bounds | was |
+|---|---|---|
+| `[sources.url] thin_words`, `thin_words_per_kb` | when a fetch that decoded to little is REPORTED as thin (never dropped) | `urlsrc.THIN_DOCUMENT_WORDS`, `THIN_WORDS_PER_KB` |
+| `[sources.url] failing_streak` | failed runs in a row before `fux ingest` and `fux doctor` name a URL | `urlstate.FAILING_STREAK` |
+| `[sources.url] parallel_warn_at` | the `max_parallel` that earns a note; never a clamp | an inline `16` |
+| `[index] git_timeout_s` | ingest's one `git log` for recency priors | an inline `120` |
+| `[maintain] daemon_poll_s`, `runner_poll_s`, `stop_timeout_s` | how often and how long `stop` waits | `daemon.POLL_S`, `runner._POLL_S`, `STOP_TIMEOUT_S` |
+| `[maintain] last_cited_max`, `stop_every_docs` | remembered questions; documents between stop checks | `lastcited.MAX_QUESTIONS`, `run._STOP_EVERY` |
+| `[refer] fetch_cache_max_bytes` | the fetch cache's disk bound | `fetchcache.DEFAULT_MAX_BYTES` |
+| `[doctor] thin_url_share`, `thin_url_chars` | where the url-extraction-depth row warns | `doctor.THIN_URL_SHARE`, `THIN_URL_CHARS` |
+
+- **The `[sources.url]` four are required only with the table**, like the rest
+  of it: without `[sources.url]` nothing is fetched, so nothing is thin or fails.
+- ⚠ **Three values the classification put here are NOT keys**, because an
+  earlier ruling or record fixes them: the rate-limit retries and backoff
+  (W-82 ruling 12 — a second concurrency control under another name),
+  `MAX_PASSES` (the bound that makes the runner provably terminate,
+  SR-MAINTENANCE veto 6), and `AS_INGESTED_VETO_SHARE` (SR-ACQUIRED's and
+  SR-URL-FRESHNESS's reopen condition, which a consumer must not move). They
+  are `constants.toml [fetch]`, `[maintain] max_passes` and `[doctor]`
+  ([SR-CONSTANTS](0159_constants.md)).
+- **The fetch cache's TTL is not a key.** It arrives per call as `--cache-ttl`,
+  and `0` (off) is its only default; 300 s is the recommendation in the
+  template's own history, never a fallback (SR-LAW-12 decision 9a).
 
 ### Consequences
 

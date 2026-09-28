@@ -35,9 +35,18 @@ _FIX_HINT = "`fux doctor --fix` writes every missing key from the template `fux 
 #: map is an empty one.
 REQUIRED_KEYS: dict[str, tuple[str, ...]] = {
     "sources": ("dirs_file", "urls_file"),
-    "index": ("shards",),
+    "index": ("shards", "git_timeout_s"),
     "observe": ("max_ms",),
     "agents": ("install",),
+    "maintain": (
+        "daemon_poll_s",
+        "runner_poll_s",
+        "stop_timeout_s",
+        "last_cited_max",
+        "stop_every_docs",
+    ),
+    "refer": ("fetch_cache_max_bytes",),
+    "doctor": ("thin_url_share", "thin_url_chars"),
 }
 REQUIRED_URL_KEYS: tuple[str, ...] = (
     "keep",
@@ -48,6 +57,10 @@ REQUIRED_URL_KEYS: tuple[str, ...] = (
     "max_parallel",
     "sweep_minutes",
     "acquired_max_bytes",
+    "thin_words",
+    "thin_words_per_kb",
+    "failing_streak",
+    "parallel_warn_at",
 )
 
 #: Every key `fux.toml` may carry, as dotted paths.
@@ -70,7 +83,12 @@ KNOWN_KEYS: tuple[str, ...] = (
     "sources.url.max_parallel",
     "sources.url.sweep_minutes",
     "sources.url.acquired_max_bytes",
+    "sources.url.thin_words",
+    "sources.url.thin_words_per_kb",
+    "sources.url.failing_streak",
+    "sources.url.parallel_warn_at",
     "index.shards",
+    "index.git_timeout_s",
     "agents.install",
     # W-170. **`[observe] max_ms` is in `fux.toml` and not in `tune.toml`**,
     # because it is not a ranking knob: it bounds how long fux WAITS for a
@@ -78,6 +96,18 @@ KNOWN_KEYS: tuple[str, ...] = (
     # move a result. `tune.toml`'s boundary rule (SR-TUNE decision 1) is about
     # what changes an answer; this changes nothing about one.
     "observe.max_ms",
+    # W-225 stage 5e. Values the L12 classification homed here that stages 3-4
+    # left in code: the maintenance plane's pacing, the fetch cache's bound,
+    # and `fux doctor`'s thin-URL thresholds. None changes a ranking, so none is
+    # `tune.toml`'s (SR-TUNE decision 1).
+    "maintain.daemon_poll_s",
+    "maintain.runner_poll_s",
+    "maintain.stop_timeout_s",
+    "maintain.last_cited_max",
+    "maintain.stop_every_docs",
+    "refer.fetch_cache_max_bytes",
+    "doctor.thin_url_share",
+    "doctor.thin_url_chars",
 )
 
 #: Tables fux accepts and does not look inside. **One entry, and it stays one.**
@@ -280,6 +310,15 @@ class UrlSource:
     #: store sits on, not of one URL, and a per-line override could only ever
     #: raise somebody else's bound.
     acquired_max_bytes: int
+    #: A fetched page decoding to fewer than `thin_words` words AND fewer than
+    #: `thin_words_per_kb` words per KiB of source is reported as thin.
+    thin_words: int
+    thin_words_per_kb: float
+    #: Consecutive failed runs before a URL is named as failing.
+    failing_streak: int
+    #: A `max_parallel` at or above this prints the "that is a lot of
+    #: connections" note. Never a clamp.
+    parallel_warn_at: int
 
     def config_for(self, fetcher_path: str) -> dict:
         """What `configure()` receives for the fetcher at `fetcher_path`.
@@ -344,6 +383,51 @@ class Config:
     agents: tuple[str, ...]
     #: `None` when `[sources.url]` is absent: this repo fetches nothing.
     url: UrlSource | None
+    #: `[index] git_timeout_s` -- the bound on ingest's one `git log` call for
+    #: recency priors (W-225 stage 5e).
+    git_timeout_s: float
+    #: `[maintain]` -- the runner's and daemon's pacing (W-225 stage 5e).
+    maintain: "Maintain"
+    #: `[refer] fetch_cache_max_bytes` -- the fetch cache's disk bound.
+    fetch_cache_max_bytes: int
+    #: `[doctor]` -- the thresholds its advisory checks warn at.
+    doctor: "Doctor"
+
+
+@dataclass(frozen=True)
+class Maintain:
+    """`fux.toml [maintain]` -- pacing, never behaviour (SR-MAINTENANCE)."""
+
+    #: The daemon wakes this often to notice `stop`.
+    daemon_poll_s: float
+    #: `stop` / `take_over` poll the runner this often.
+    runner_poll_s: float
+    #: How long `stop` waits for a cooperative exit.
+    stop_timeout_s: float
+    #: How many remembered questions `.fux/runtime/last-cited.json` keeps.
+    last_cited_max: int
+    #: Ingest polls the cooperative stop once per this many documents.
+    stop_every_docs: int
+
+
+@dataclass(frozen=True)
+class Doctor:
+    """`fux.toml [doctor]` -- where the thin-URL check starts to warn (SR-DOCTOR)."""
+
+    thin_url_share: float
+    thin_url_chars: int
+
+
+def _number(path: Path, where: str, value, *, whole: bool, positive: bool):
+    """A required number: whole or real, and `> 0` or `>= 0`. Named on error."""
+    kinds = (int,) if whole else (int, float)
+    if isinstance(value, bool) or not isinstance(value, kinds):
+        noun = "an integer" if whole else "a number"
+        raise FuxError(f"{path}: {where} must be {noun} (got {value!r})")
+    if (value <= 0) if positive else (value < 0):
+        bound = "> 0" if positive else ">= 0"
+        raise FuxError(f"{path}: {where} must be {bound} (got {value!r})")
+    return value
 
 
 def load(root: Path) -> Config:
@@ -440,6 +524,20 @@ def load(root: Path) -> Config:
     if shards != FIXED_SHARDS:
         raise FuxError(f"{path}: [index] shards must be {FIXED_SHARDS} this milestone (got {shards!r})")
 
+    m = data["maintain"]
+    maintain = Maintain(
+        daemon_poll_s=_number(path, "[maintain] daemon_poll_s", m["daemon_poll_s"], whole=False, positive=True),
+        runner_poll_s=_number(path, "[maintain] runner_poll_s", m["runner_poll_s"], whole=False, positive=True),
+        stop_timeout_s=_number(path, "[maintain] stop_timeout_s", m["stop_timeout_s"], whole=False, positive=True),
+        last_cited_max=_number(path, "[maintain] last_cited_max", m["last_cited_max"], whole=True, positive=True),
+        stop_every_docs=_number(path, "[maintain] stop_every_docs", m["stop_every_docs"], whole=True, positive=True),
+    )
+    d = data["doctor"]
+    doctor = Doctor(
+        thin_url_share=_number(path, "[doctor] thin_url_share", d["thin_url_share"], whole=False, positive=False),
+        thin_url_chars=_number(path, "[doctor] thin_url_chars", d["thin_url_chars"], whole=True, positive=False),
+    )
+
     return Config(
         root=root,
         dirs_file=dirs_file.strip(),
@@ -448,6 +546,12 @@ def load(root: Path) -> Config:
         observe_max_ms=observe_max_ms,
         agents=_load_agents(path, data["agents"]),
         url=_load_url_source(path, sources.get("url"), urls_file.strip()),
+        git_timeout_s=_number(path, "[index] git_timeout_s", data["index"]["git_timeout_s"], whole=False, positive=True),
+        maintain=maintain,
+        fetch_cache_max_bytes=_number(
+            path, "[refer] fetch_cache_max_bytes", data["refer"]["fetch_cache_max_bytes"], whole=True, positive=True
+        ),
+        doctor=doctor,
     )
 
 
@@ -700,4 +804,12 @@ def _load_url_source(path: Path, raw, urls_file: str) -> UrlSource | None:
         max_parallel=max_parallel,
         sweep_minutes=sweep_minutes,
         acquired_max_bytes=acquired_max_bytes,
+        thin_words=_number(path, "[sources.url] thin_words", raw["thin_words"], whole=True, positive=False),
+        thin_words_per_kb=_number(
+            path, "[sources.url] thin_words_per_kb", raw["thin_words_per_kb"], whole=False, positive=False
+        ),
+        failing_streak=_number(path, "[sources.url] failing_streak", raw["failing_streak"], whole=True, positive=True),
+        parallel_warn_at=_number(
+            path, "[sources.url] parallel_warn_at", raw["parallel_warn_at"], whole=True, positive=True
+        ),
     )

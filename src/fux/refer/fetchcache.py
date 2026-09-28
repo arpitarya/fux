@@ -53,18 +53,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from ..constants import fixed
 
-__all__ = ["FetchCache", "CacheEntry", "CACHE_DIR", "DEFAULT_TTL_SECONDS", "DEFAULT_MAX_BYTES"]
+__all__ = ["FetchCache", "CacheEntry", "CACHE_DIR"]
 
 CACHE_DIR = fixed("runtime", "fetch_cache_dir")
 
-#: Arpit's number, 2026-08-20. Only in force when a caller opts in — the
-#: `Policy` default is 0, which disables the cache entirely.
-DEFAULT_TTL_SECONDS = 300
-
-#: No number was specified for this (PRIORITY.md P4, 2026-08-21) — chosen to
-#: bound a per-machine disposable cache without requiring active management.
-#: Tune it via the `FetchCache(..., max_bytes=...)` constructor argument.
-DEFAULT_MAX_BYTES = 500 * 1024 * 1024
+#: The TTL arrives per call as `--cache-ttl` (`Policy.cache_ttl_seconds`, 0 =
+#: off); Arpit's 300 s of 2026-08-20 is the documented recommendation, never a
+#: fallback (SR-LAW-12 decision 9a). The disk bound is `fux.toml [refer]
+#: fetch_cache_max_bytes`, passed in by the caller (W-225 stage 5e).
 
 
 @dataclass(frozen=True)
@@ -87,7 +83,7 @@ class FetchCache:
     always safe: the next query fetches.
     """
 
-    def __init__(self, root: Path, *, clock=time.time, max_bytes: int = DEFAULT_MAX_BYTES) -> None:
+    def __init__(self, root: Path, *, max_bytes: int, clock=time.time) -> None:
         from ..derive import format as fmt
 
         self.directory = fmt.runtime_dir(root) / CACHE_DIR

@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from . import __version__
+from . import config as config_mod
 from .config import DEFAULT_TYPES_FILE, FETCHERS_DIR, find_root
 from .errors import FuxError
 from . import output_config
@@ -1690,7 +1691,7 @@ def freshness_counts(root: Path) -> dict[str, int]:
 #: masking it"*. **Not a threshold this check invented** — it is the reopen
 #: condition written into SR-ACQUIRED and SR-URL-FRESHNESS, quoted here so
 #: the number has one home.
-AS_INGESTED_VETO_SHARE = 0.25
+AS_INGESTED_VETO_SHARE = fixed("doctor", "as_ingested_veto_share")
 
 
 def _freshness_share(root: Path) -> Check:
@@ -2397,11 +2398,10 @@ def _listed_dirs_exist(root: Path) -> Check:
 #: is fine; a 400 KB HTML document that extracted 300 characters is a sign-in
 #: wall or an app shell. The floor is deliberately generous: this row exists to
 #: surface the obvious case, never to adjudicate extraction quality, and a
-#: tighter number would need evidence nobody has gathered.
-THIN_URL_SHARE = 0.01
-#: Below this many characters, the share is meaningless and the absolute number
-#: is the signal.
-THIN_URL_CHARS = 200
+#: tighter number would need evidence nobody has gathered. The share is
+#: `fux.toml [doctor] thin_url_share`; below `[doctor] thin_url_chars`
+#: characters the share is meaningless and the absolute number is the signal
+#: (W-225 stage 5e).
 
 
 def _thin_urls(root: Path) -> Check:
@@ -2429,6 +2429,10 @@ def _thin_urls(root: Path) -> Check:
     if not manifest:
         return Check("url extraction depth", True, "no retained url bytes to compare against")
 
+    try:
+        bounds = config_mod.load(root).doctor
+    except FuxError:
+        return Check("url extraction depth", True, "skipped (fux.toml does not load)")
     thin: list[str] = []
     for doc_id, record in _records(root).items():
         if not doc_id.startswith("url:"):
@@ -2438,9 +2442,9 @@ def _thin_urls(root: Path) -> Check:
             continue
         raw = getattr(blob, "bytes", None) or getattr(blob, "size", 0)
         extracted = sum(record.get("flen", ())) if record.get("flen") else 0
-        if not raw or extracted >= THIN_URL_CHARS:
+        if not raw or extracted >= bounds.thin_url_chars:
             continue
-        if extracted / raw < THIN_URL_SHARE:
+        if extracted / raw < bounds.thin_url_share:
             thin.append(record.get("loc", doc_id))
 
     if not thin:
@@ -2533,14 +2537,19 @@ def _url_health(root: Path) -> Check:
     try:
         from .store import reader
 
-        indexed = [doc_id[4:] for doc_id in reader.read_index(root) if doc_id.startswith("url:")]
+        indexed = [doc_id.removeprefix("url:") for doc_id in reader.read_index(root) if doc_id.startswith("url:")]
     except Exception:
         # An unreadable or absent index is another check's business, not this
         # one's. Reporting "cannot tell" beats a traceback on a health command.
         return Check("url sources", True, "skipped (no readable index)", level="warn")
 
     state = urlstate.read(root)
-    summary = urlstate.summarize(state, indexed)
+    try:
+        url_source = config_mod.load(root).url
+    except FuxError:
+        url_source = None  # `fux.toml loads` is the row that reports this
+    streak = url_source.failing_streak if url_source is not None else None
+    summary = urlstate.summarize(state, indexed, failing_streak=streak)
     policy = _parallel_policy(root)
 
     def _rate_limit_note() -> str | None:
@@ -2612,7 +2621,7 @@ def _url_health(root: Path) -> Check:
         listed = ", ".join(summary.failing_urls[:5])
         more = f" (+{len(summary.failing_urls) - 5} more)" if len(summary.failing_urls) > 5 else ""
         detail += (
-            f" - failed {urlstate.FAILING_STREAK}+ runs in a row: {listed}{more}. "
+            f" - failed {streak}+ runs in a row: {listed}{more}. "
             "fux never deletes a URL record; remove the line from .fux/sources/urls yourself"
         )
     return Check("url sources", not summary.failing_urls, detail, level="warn")

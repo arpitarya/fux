@@ -34,6 +34,10 @@ fetch_at_answer = true
 max_parallel    = 4
 sweep_minutes   = 60
 acquired_max_bytes = 2147483648
+thin_words           = 50
+thin_words_per_kb    = 2.0
+failing_streak       = 5
+parallel_warn_at     = 16
 
 # A host map: which fetcher retrieves which host, consulted by `fux add` when
 # no --fetch was given. fux READS every key here -- unlike [sources.url.config]
@@ -62,10 +66,27 @@ acquired_max_bytes = 2147483648
 
 {url_config}
 [index]
-shards = 256
+shards        = 256
+git_timeout_s = 120
 
 [observe]
 max_ms = 50
+
+# The runner's and daemon's pacing. None of these changes what is indexed.
+[maintain]
+daemon_poll_s   = 1.0
+runner_poll_s   = 0.05
+stop_timeout_s  = 30.0
+last_cited_max  = 256
+stop_every_docs = 64
+
+[refer]
+fetch_cache_max_bytes = 524288000
+
+# Where `fux doctor`'s checks start to warn.
+[doctor]
+thin_url_share         = 0.01
+thin_url_chars         = 200
 
 # Which agent vendors `fux setup` writes archived-results policy for. These
 # files land OUTSIDE .fux/ -- in .claude/, .github/, .kiro/ and AGENTS.md at the

@@ -7,10 +7,10 @@ description: "The refer plane's caching, carved out of SR-REFER. ARC is keyed by
 status: accepted
 date: 2026-08-21
 feature: the refer plane's two caches, and the wall between them
-owns: [src/fux/refer/arc.py@838fb07d8fc5, src/fux/refer/fetchcache.py@74d2e37123ae]
+owns: [src/fux/refer/arc.py@838fb07d8fc5, src/fux/refer/fetchcache.py@de1ecde351de]
 laws: [L1, L2, L3, L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 78c4c059f3332f928d300abd0e446397d76cccacb6c974627e9d55437ac25b9b
+content_sha: e9b8d6eecaae11de27c57bcbfa0eeee76f2eaef04ccf6f2fe927a556d0f35395
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -252,6 +252,8 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **A cache entry's file name is `constants.toml [refer] cache_key_hex` hex digits of the loc's sha256** (32), and the ARC ghost lists hold `max_bytes // [refer] arc_ghost_bytes` keys (64). Both are fixed: a changed key width orphans every cached file. The TTL and size tunables are stage 5e's. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+**`FetchCache` takes `max_bytes` from its caller**, which reads `fux.toml [refer] fetch_cache_max_bytes` ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). `DEFAULT_TTL_SECONDS` is deleted: the TTL arrives per call as `--cache-ttl` and 0 (off) is its only default; 300 s stays the recommendation, never a fallback ([L12](0013_LAW-12-values-live-in-config.md) decision 9a).
 
 ### Consequences
 

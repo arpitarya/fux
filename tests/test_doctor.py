@@ -6,7 +6,7 @@ import subprocess
 import pytest
 
 from fux import doctor
-from l12_fixtures import refusals_scan, write_config
+from l12_fixtures import template_fux_toml, refusals_scan, write_config
 
 
 def _git_repo(tmp_path):
@@ -430,8 +430,10 @@ def test_url_check_names_a_persistently_failing_url_and_refuses_to_delete_it(tmp
     from fux.store import reader
 
     _git_repo(tmp_path)
+    # A present [sources.url] is what gives the streak a bar (`failing_streak`).
+    (tmp_path / "fux.toml").write_text("[sources.url]\n", encoding="utf-8")
     _url_index(tmp_path, ["https://dead"])
-    for _ in range(urlstate.FAILING_STREAK):
+    for _ in range(template_fux_toml()["sources"]["url"]["failing_streak"]):
         urlstate.observe(tmp_path, fetched={}, failed=["https://dead"], listed=["https://dead"])
 
     check = _check(doctor.run(tmp_path), "url sources")

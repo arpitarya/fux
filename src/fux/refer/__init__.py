@@ -178,7 +178,9 @@ def refer(
     fetched: list[tuple[str, str, str, list]] = []
 
     if fetch_cache is None and policy.caches:
-        fetch_cache = fetchcache_mod.FetchCache(root)
+        from ..config import load as load_config
+
+        fetch_cache = fetchcache_mod.FetchCache(root, max_bytes=load_config(root).fetch_cache_max_bytes)
 
     # Read once per call, and only when it can matter -- see `_declared_ttls`.
     ttls = _declared_ttls(root) if policy.caches else {}

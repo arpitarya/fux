@@ -84,6 +84,7 @@ import os
 import subprocess
 import sys
 import time
+from datetime import timedelta
 from pathlib import Path
 
 from ..errors import FuxError
@@ -98,15 +99,12 @@ PID_NAME = fixed("maintain", "daemon_pid")
 STOP_NAME = fixed("maintain", "daemon_stop")
 STATUS_NAME = fixed("maintain", "daemon_status")
 
-#: How long `stop` waits for a cooperative exit before reporting that the
-#: daemon did not let go. Matches `runner.STOP_TIMEOUT_S` deliberately: a
-#: consumer should not have to learn two numbers for the same gesture.
-STOP_TIMEOUT_S = runner.STOP_TIMEOUT_S
-
-#: The loop wakes this often to check for a stop, regardless of how long the
-#: sweep interval is. A daemon that only noticed `stop` once an hour would be
-#: indistinguishable from a hung one.
-POLL_S = 1.0
+#: How long `stop` waits for a cooperative exit is the runner's own
+#: `[maintain] stop_timeout_s`, deliberately: a consumer should not have to
+#: learn two numbers for the same gesture. The loop wakes every `[maintain]
+#: daemon_poll_s` to check for a stop, regardless of how long the sweep
+#: interval is -- a daemon that only noticed `stop` once an hour would be
+#: indistinguishable from a hung one (W-225 stage 5e).
 
 #: ⚠ **`DEFAULT_SWEEP_MINUTES = 60` was deleted by W-225 stage 3b** (SR-LAW-12),
 #: with its twin in `config.py`. The cadence is `[sources.url] sweep_minutes`,
@@ -245,7 +243,7 @@ def stop_requested(root: Path, pid: int) -> bool:
         return False
 
 
-def stop(root: Path, *, timeout: float = STOP_TIMEOUT_S) -> str:
+def stop(root: Path, *, timeout: float | None = None) -> str:
     """Ask a live daemon to stop and wait for it to go.
 
     | result | meaning |
@@ -262,6 +260,9 @@ def stop(root: Path, *, timeout: float = STOP_TIMEOUT_S) -> str:
     if pid is None:
         return "not-running"
 
+    pace = runner.pacing(root)
+    if timeout is None:
+        timeout = pace.stop_timeout_s
     _writable_runtime(root)
     _stop_path(root).write_text(json.dumps({"pid": pid}), encoding="utf-8")
 
@@ -270,7 +271,7 @@ def stop(root: Path, *, timeout: float = STOP_TIMEOUT_S) -> str:
         if live_pid(root) is None:
             _clear_stop(root)
             return "stopped"
-        time.sleep(runner._POLL_S)
+        time.sleep(pace.runner_poll_s)
     return "timeout"
 
 
@@ -307,7 +308,7 @@ def _interval_s(root: Path) -> int:
             "to keep fresh and no sweep_minutes to pace them. The git hooks keep "
             "directory sources current (`fux hooks install`)"
         )
-    return minutes * 60
+    return timedelta(minutes=minutes).total_seconds()
 
 
 def _write_status(root: Path, outcome: str, **extra) -> None:
@@ -390,6 +391,7 @@ def serve(root: Path) -> str:
     pid_path(root).write_text(json.dumps({"pid": pid}), encoding="utf-8")
 
     interval = _interval_s(root)
+    poll_s = runner.pacing(root).daemon_poll_s
     try:
         while True:
             if stop_requested(root, pid):
@@ -398,15 +400,15 @@ def serve(root: Path) -> str:
             result = _sweep(root)
             _write_status(root, **result)
 
-            # Sleep in POLL_S slices so `stop` is noticed in about a second
+            # Sleep in `daemon_poll_s` slices so `stop` is noticed in about a second
             # rather than at the end of the interval.
             waited = 0.0
             while waited < interval:
                 if stop_requested(root, pid):
                     _write_status(root, "stopped")
                     return "stopped"
-                time.sleep(POLL_S)
-                waited += POLL_S
+                time.sleep(poll_s)
+                waited += poll_s
     finally:
         # The pid file is this process's claim to be running; dropping it on
         # the way out is what makes `stop` return promptly and what stops

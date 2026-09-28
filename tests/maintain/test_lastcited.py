@@ -13,11 +13,12 @@ import json
 import pytest
 
 from fux.maintain import lastcited
+from l12_fixtures import template_fux_toml, write_config
 
 
 @pytest.fixture
 def root(tmp_path):
-    (tmp_path / "fux.toml").write_text("", encoding="utf-8")
+    write_config(tmp_path)
     return tmp_path
 
 
@@ -105,10 +106,10 @@ def test_remember_never_raises_on_an_unwritable_root(root, monkeypatch):
 
 
 def test_the_store_is_bounded(root):
-    for n in range(lastcited.MAX_QUESTIONS + 20):
+    for n in range(template_fux_toml()["maintain"]["last_cited_max"] + 20):
         lastcited.remember(root, f"question {n}", {"a.md": "s"})
     stored = json.loads((root / ".fux" / "runtime" / lastcited.LOG_NAME).read_text(encoding="utf-8"))
-    assert len(stored) <= lastcited.MAX_QUESTIONS
+    assert len(stored) <= template_fux_toml()["maintain"]["last_cited_max"]
 
 
 def test_the_line_is_ascii_in_every_branch(root):

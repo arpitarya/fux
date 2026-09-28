@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@7851c01281d6, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@3286249029a0, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@83d8c624f056]
+owns: [src/fux/refer@5c9517f6108e, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@3286249029a0, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@83d8c624f056]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 83cea8b5da3c9f0e8649a0febf0d10b7082c4c6612c3f59ccd87c61129d00668
+content_sha: 58daa8391257e94d8e7e44949bb50c1b9be7a66f165780f6bbba38174f245a7e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -618,6 +618,8 @@ The rule did not change; what changed is that the thing threaded alongside them
 is now a committed fact instead of a response header.
 
 **The refer plane holds no structural numeral**: `source.mjs` strips `file:`/`url:` by their length and fans acquired objects out by `[radix] hex_digits_per_byte`; the fetch cache's key width and the ARC ghost bound are `[refer] cache_key_hex` and `arc_ghost_bytes` ([SR-CACHE](0131_cache.md)). ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+**The fetch cache is sized by `fux.toml [refer] fetch_cache_max_bytes`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28), which the refer plane reads and passes to `FetchCache`; it holds no default of its own ([SR-CONFIG](0113_config.md) decision 18).
 
 ### Consequences
 

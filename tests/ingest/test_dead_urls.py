@@ -12,6 +12,10 @@ import pytest
 from importlib import import_module
 
 from fux.maintain import urlstate
+from l12_fixtures import template_fux_toml, write_config
+
+#: `[sources.url] failing_streak` as the template ships it (W-225 stage 5e).
+_STREAK = template_fux_toml()["sources"]["url"]["failing_streak"]
 
 # ⚠ `from fux.ingest import run` gives the FUNCTION `fux.ingest.run`, not the
 # module `fux.ingest.run` — the package re-exports a callable of the same name
@@ -22,7 +26,9 @@ URL = "https://wiki.corp/handbook"
 
 
 def _repo(tmp_path):
-    (tmp_path / "fux.toml").write_text("[fux]\nversion = 1\n", encoding="utf-8")
+    # A present [sources.url] is what makes a URL fetchable, and so failable.
+    (tmp_path / "fux.toml").write_text("[sources.url]\n", encoding="utf-8")
+    write_config(tmp_path)
     return tmp_path
 
 
@@ -43,17 +49,17 @@ def test_a_single_failure_is_not_announced(tmp_path, capsys):
 
 def test_the_streak_is_announced_once_it_reaches_the_bar(tmp_path, capsys):
     root = _repo(tmp_path)
-    _fail_n_runs(root, URL, urlstate.FAILING_STREAK)
+    _fail_n_runs(root, URL, _STREAK)
     run_mod._report_dead_urls(root, [URL])
     err = capsys.readouterr().err
     assert URL in err
-    assert f"failed {urlstate.FAILING_STREAK} runs in a row" in err
+    assert f"failed {_STREAK} runs in a row" in err
 
 
 def test_it_says_what_to_do_about_it(tmp_path, capsys):
     """A warning that names a problem and no action is a warning people skip."""
     root = _repo(tmp_path)
-    _fail_n_runs(root, URL, urlstate.FAILING_STREAK)
+    _fail_n_runs(root, URL, _STREAK)
     run_mod._report_dead_urls(root, [URL])
     assert f"fux remove {URL}" in capsys.readouterr().err
 
@@ -61,7 +67,7 @@ def test_it_says_what_to_do_about_it(tmp_path, capsys):
 def test_it_goes_to_stderr_never_stdout(tmp_path, capsys):
     """The query plane's standing contract: declarations never touch stdout."""
     root = _repo(tmp_path)
-    _fail_n_runs(root, URL, urlstate.FAILING_STREAK)
+    _fail_n_runs(root, URL, _STREAK)
     run_mod._report_dead_urls(root, [URL])
     captured = capsys.readouterr()
     assert captured.out == ""
@@ -75,14 +81,14 @@ def test_a_url_that_did_not_fail_this_run_is_not_reported(tmp_path, capsys):
     walking the whole state would re-report URLs this run never touched.
     """
     root = _repo(tmp_path)
-    _fail_n_runs(root, URL, urlstate.FAILING_STREAK)
+    _fail_n_runs(root, URL, _STREAK)
     run_mod._report_dead_urls(root, [])
     assert capsys.readouterr().err == ""
 
 
 def test_a_recovered_url_stops_being_reported(tmp_path, capsys):
     root = _repo(tmp_path)
-    _fail_n_runs(root, URL, urlstate.FAILING_STREAK)
+    _fail_n_runs(root, URL, _STREAK)
     urlstate.observe(root, fetched={URL: "a" * 40}, failed=[], listed={URL})
     run_mod._report_dead_urls(root, [URL])
     assert capsys.readouterr().err == "", "a success resets the streak"
@@ -92,7 +98,7 @@ def test_it_never_raises_when_the_state_is_unreadable(tmp_path, capsys):
     """Best-effort, like everything on this plane: a report must never be able
     to fail an ingest that otherwise succeeded."""
     root = _repo(tmp_path)
-    _fail_n_runs(root, URL, urlstate.FAILING_STREAK)
+    _fail_n_runs(root, URL, _STREAK)
     (root / ".fux" / "runtime" / urlstate.STATE_NAME).write_text("{ not json", encoding="utf-8")
     run_mod._report_dead_urls(root, [URL])  # must not raise
     assert capsys.readouterr().err == ""
