@@ -8,10 +8,10 @@ amended: 2026-09-28
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@923af9a6a935, .fux/inspect.toml@c0b3ac0911f7]
+owns: [src/fux/inspect@ed7a96992226, .fux/inspect.toml@c0b3ac0911f7]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 9510af2d55bca90fab16a5873b755bd1ecf2ad6c9795c2d62a722653cf53a4bc
+content_sha: f017334b63e30f0e503d4cff511a27287238722c07f32c6906076a8a9e67bdf9
 ratifies: W-169
 ---
 
