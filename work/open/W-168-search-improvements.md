@@ -7,6 +7,20 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## ✅ STEP 9 PRE-REGISTERED — 2026-09-28 (Claude Code, Opus); the build is next
+
+[The frozen bar](../regression/2026-09-28-intent-prior/PRE-REGISTRATION.md).
+**Nothing is built and no treatment number exists.**
+
+- **D2 · I1 · M1 · S1 as ruled:**
+  - a query-time `[doctype]` glob table;
+  - the 2026-09-24 cue lexicon, verbatim, test-bound to the tag;
+  - `[ranking] intent_weight`, arms `{0.1, 0.2, 0.3, 0.5}` against `0.0`, first that clears.
+- **The tag is the lexicon:** 25 questions (rationale 10 · reference 8 · procedure 7). **Pool 14**, equal to the key's `step9_intent` on both counts. No stop.
+- ⚠ **`[priority]` is prefix-matched, not globbed**, so `[doctype]` needs a new matcher: whole-location, `*` crosses `/`, longest pattern wins.
+- ⚠ The arm's three globs also type **15 `ext/` decoys `decision`**. They are left in.
+- **Next:** build step 9 (**Opus**: a new tune table, a new ranking key and a lexicon in `constants.toml`, in both readers), off at `0.0` and byte-identical there. Then capture both arms at one commit on a copy of rung-01000. Then 🔴 Arpit scores, and a session that did not capture decides.
+
 ## ✅ STEP POOLS COUNTED FROM THE KEY — 2026-09-28 (Arpit re-scored; Claude Code, Opus); steps 6 and 10 stop
 
 [Report §Step pools](../regression/2026-09-27-golden-set-4-rung-01000/report.md) · [scores](../regression/2026-09-27-golden-set-4-rung-01000/scores/single/rung-01000/set-4-claude.json) `pools`.

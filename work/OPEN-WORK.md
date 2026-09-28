@@ -32,7 +32,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-168** · `agent` — the ranking ideas. Key pools on set-4-claude (L11 d13a): 9 → 14, 7 → 8, 8 → 8 go; 6 → 3, 10 → 1 stop. Next: step 9 pre-registers (D2 · I1 · M1 · S1). [detail](open/W-168-search-improvements.md)
+- 🟢 **W-168** · `agent` — the ranking ideas. Step 9 pre-registered 2026-09-28 (pool 14, equal to the key's). Next: build it, `intent_weight` off at `0.0`, both readers. Steps 7 and 8 go (pools 8); 6 and 10 stop. [detail](open/W-168-search-improvements.md)
 - 🟢 **W-225** · `agent` — L12 migration, building. Stages 1–4 landed; stage 5a–5b too (analyzer, hashes, parsers, decoders → `constants.toml`). Next: 5c–5f (wire/store, protocols/CLI, leftover tunables, doctor/inspect). [detail](open/W-225-values-live-in-config.md)
 - 🟢 **W-228** · `agent` — document families: DoD 1–10 built 2026-09-28. Next: DoD 11, golden seed families + a rung before the misfit floor leaves PROVISIONAL; unblocked 2026-09-28 (W-230's probe denied). [detail](open/W-228-document-families.md)
 

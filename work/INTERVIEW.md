@@ -40,7 +40,8 @@ valuable judgement, but not the state of play.
 - **L11 decision 13a** (Arpit): `score.py` writes a `pools` block of counts per `exercises` tag. Arpit re-scored set-4-claude the same day.
 - **Pools @1:** 9 intent **14** · 7 MMR **8** · 8 authority **8** · 6 SDM **3** (stops) · 10 section **1** (stops; U0 · B2 · E1 stay ruled, not built).
 - ⚠ Key-free text tags got steps 6 and 10 badly wrong. Don't tag a pool from text again when the key's tag exists.
-- **Next:** step 9 pre-registers from its ruled forks; steps 7 and 8 owe their own pre-registrations.
+- **Step 9 pre-registered** ([bar](regression/2026-09-28-intent-prior/PRE-REGISTRATION.md)): the lexicon pool is 14, equal to the key's. ⚠ `[doctype]` needs a new glob matcher, because `[priority]` is prefix-only.
+- **Next:** build step 9, off at `0.0`, both readers. Steps 7 and 8 owe their own pre-registrations.
 
 ### 🟢 2026-09-28 — W-230 AND W-227 CLOSED: THE TRAVERSAL GUARD FIRES LIVE
 

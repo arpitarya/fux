@@ -22,6 +22,15 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-168 step 9 pre-registered: lexicon pool 14, equal to the key's  ·  Claude Code (Opus)
+- **Asked:** *"commit and continue"*.
+- **Did:**
+  - Committed the pools filing as `9cc3a670`. ⚠ The first attempt, `a62e4dd2`, was built on a stale HEAD and reverted W-225's `f47afb91`. It was rebuilt on `f47afb91` with only my 13 paths, and `main` was moved with a compare-and-swap before anything was pushed.
+  - Froze step 9's bar (`2026-09-28-intent-prior`), D2 · I1 · M1 · S1. The lexicon tags 25 questions with pool 14, equal to the key's `step9_intent` counts.
+  - Caught before freezing: `[priority]` is prefix-matched, not globbed, so `[doctype]` needs a new matcher. The arm's globs also type 15 `ext/` decoys.
+- **Decided / open:** the auto-mode safety check returned no verdict six times this session. When a commit waits on it, re-read HEAD right before building the tree.
+- **Next:** build step 9, off at `0.0`, in Python and Node; then the arms.
+
 ## 2026-09-28 — W-168 steps 6–10 pools: 9, 7, 8 go; 6 and 10 stop (L11 d13a, key-tagged)  ·  Claude Code (Opus)
 - **Asked:** *"implement W-168"*. The next step was counting each step 6–10 pool from Arpit's set-4-claude score.
 - **Did:**
