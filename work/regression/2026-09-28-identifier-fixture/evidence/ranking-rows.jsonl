@@ -1,0 +1,14 @@
+{"query": "RF-118", "rank": 1, "target": "rf-118.md", "top3": ["rf-118.md", "rf-119.md"]}
+{"query": "RF 118", "rank": 2, "target": "rf-118.md", "top3": ["rf-119.md", "rf-118.md"]}
+{"query": "rf118", "rank": null, "target": "rf-118.md", "top3": []}
+{"query": "RF–118", "rank": 2, "target": "rf-118.md", "top3": ["rf-119.md", "rf-118.md"]}
+{"query": "what is RF-118", "rank": 1, "target": "rf-118.md", "top3": ["rf-118.md", "rf-119.md"]}
+{"query": "ADR-0004", "rank": 1, "target": "adr-0004.md", "top3": ["adr-0004.md", "adr-0040.md"]}
+{"query": "ADR-4", "rank": 2, "target": "adr-0004.md", "top3": ["adr-0040.md", "adr-0004.md"]}
+{"query": "ADR 4", "rank": 2, "target": "adr-0004.md", "top3": ["adr-0040.md", "adr-0004.md", "filler-04.md"]}
+{"query": "v2.3.1", "rank": 1, "target": "v231.md", "top3": ["v231.md", "v230.md"]}
+{"query": "2.3.1", "rank": null, "target": "v231.md", "top3": []}
+{"query": "d3139fdb", "rank": null, "target": "sha.md", "top3": []}
+{"query": "d3139fdb8e4a2c1f0b9a7e6d5c4b3a2918f7e6d5", "rank": 1, "target": "sha.md", "top3": ["sha.md"]}
+{"query": "bm25f.py", "rank": 1, "target": "bm25f.md", "top3": ["bm25f.md", "bm25.md"]}
+{"query": "src/fux/query/bm25f.py", "rank": 1, "target": "bm25f.md", "top3": ["bm25f.md", "bm25.md"]}

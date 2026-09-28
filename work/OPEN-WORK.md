@@ -42,7 +42,7 @@ here. Read that record before changing anything below it.
 - 🔴 **W-225** · `agent` — L12 migration. Stages 1–7 landed (AST veto test + allow-list). Closing needs Arpit's ruling on the open calls; stage 5f `inspect` is still to do. [detail](open/W-225-values-live-in-config.md)
 - 🔴 **W-228** · `agent` — document families. DoD 11's rung is filed: the seed has 0 misfits; title headings are out (rung-01000: 16 → 1). Waits on Arpit's timing for seed misfits. [detail](open/W-228-document-families.md)
 - 🔴 **W-232** · `Arpit` — the shipped pair `anchor = 1.0` + `mined_weight = 0.5`. Set-4-claude STOPped (no question reaches the mined fold); re-captured on set-3-claude at step 4's gen-2 copy, precondition held. **Arpit scores**; then a non-capturing session runs `decide.py`. **Opus.** [detail](open/W-232-anchor-mined-combination.md)
-- 🟢 **W-233** · `agent` — identifiers retained whole. Ruled F1–F5: inspect detects ID families → `.fux/identifiers.toml` (`[detected]` templates via a verb; `[user]` hand-authored, templates or guarded expert regex, wins) → analyzer reads the file only; whole unstemmed + parts; a serve "Identifiers" test tab. Fixture first. **Opus.** [detail](open/W-233-identifiers-retained-whole.md)
+- 🟢 **W-233** · `agent` — identifiers retained whole. Fixture filed; compare proposed inside F1–F5; run pre-registered. What breaks is spelling (`RF 118`, `ADR-4`). Next: build, then the run. **Opus.** [detail](open/W-233-identifiers-retained-whole.md)
 
 
 ### testing

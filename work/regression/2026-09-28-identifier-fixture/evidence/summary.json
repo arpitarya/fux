@@ -1,0 +1,485 @@
+{
+  "cases": {
+    "Q1": {
+      "PARTS": 1,
+      "WHOLE": 7,
+      "parity_fail": 0,
+      "whole_stemmed": 0
+    },
+    "Q2": {
+      "NONE": 2,
+      "PARTS": 7,
+      "WHOLE": 2,
+      "parity_fail": 0,
+      "whole_stemmed": 0
+    },
+    "Q3": {
+      "PARTS": 4,
+      "WHOLE": 1,
+      "parity_fail": 0,
+      "whole_stemmed": 0
+    },
+    "Q4": {
+      "NONE": 1,
+      "PARTS": 8,
+      "WHOLE": 3,
+      "parity_fail": 0,
+      "whole_stemmed": 0
+    },
+    "Q5": {
+      "NONE": 2,
+      "WHOLE": 4,
+      "parity_fail": 0,
+      "whole_stemmed": 0
+    },
+    "Q6": {
+      "PARTS": 4,
+      "WHOLE": 2,
+      "parity_fail": 0,
+      "whole_stemmed": 0
+    }
+  },
+  "cost": {
+    "distinct_terms": 13625,
+    "docs_with": {
+      "colon_prefixed_id": 0,
+      "hash_number": 0,
+      "hex_7_40": 0,
+      "unicode_dash_between_alnum": 662,
+      "unicode_dash_id": 0,
+      "zero_padded_id": 35
+    },
+    "documents": 10000,
+    "families_letter_prefixed": 43,
+    "families_qualifying_n3_m2": 53,
+    "families_top": [
+      {
+        "docs": 7182,
+        "examples": [
+          "2016-04-04",
+          "2019-01-02",
+          "2019-01-03",
+          "2019-01-04"
+        ],
+        "family": "|d-d-d",
+        "values": 2264
+      },
+      {
+        "docs": 1890,
+        "examples": [
+          "0.15",
+          "0.36",
+          "0.65",
+          "10.1"
+        ],
+        "family": "|d.d",
+        "values": 1407
+      },
+      {
+        "docs": 991,
+        "examples": [
+          "ext/archive/00005-decision-retired.md",
+          "ext/archive/00015-ratecard-retired.md",
+          "ext/archive/00025-hours-retired.md",
+          "ext/archive/00035-notification-retired.md"
+        ],
+        "family": "ext|/x/d-x-x.x",
+        "values": 991
+      },
+      {
+        "docs": 495,
+        "examples": [
+          "WIKI-BWD-10",
+          "WIKI-BWD-11",
+          "WIKI-BWD-12",
+          "WIKI-BWD-14"
+        ],
+        "family": "WIKI|-X-d",
+        "values": 385
+      },
+      {
+        "docs": 643,
+        "examples": [
+          "400/hour",
+          "401/hour",
+          "402/hour",
+          "403/hour"
+        ],
+        "family": "|d/x",
+        "values": 377
+      },
+      {
+        "docs": 165,
+        "examples": [
+          "1.11.2",
+          "1.11.4",
+          "1.11.6",
+          "1.12.1"
+        ],
+        "family": "|d.d.d",
+        "values": 146
+      },
+      {
+        "docs": 90,
+        "examples": [
+          "BWD-116",
+          "BWD-128",
+          "BWD-142",
+          "BWD-159"
+        ],
+        "family": "BWD|-d",
+        "values": 87
+      },
+      {
+        "docs": 90,
+        "examples": [
+          "ZAC-100",
+          "ZAC-101",
+          "ZAC-107",
+          "ZAC-128"
+        ],
+        "family": "ZAC|-d",
+        "values": 86
+      },
+      {
+        "docs": 91,
+        "examples": [
+          "NRL-102",
+          "NRL-105",
+          "NRL-110",
+          "NRL-133"
+        ],
+        "family": "NRL|-d",
+        "values": 85
+      },
+      {
+        "docs": 80,
+        "examples": [
+          "MBK-132",
+          "MBK-136",
+          "MBK-152",
+          "MBK-153"
+        ],
+        "family": "MBK|-d",
+        "values": 77
+      },
+      {
+        "docs": 77,
+        "examples": [
+          "VTX-102",
+          "VTX-104",
+          "VTX-117",
+          "VTX-123"
+        ],
+        "family": "VTX|-d",
+        "values": 75
+      },
+      {
+        "docs": 78,
+        "examples": [
+          "HFP-105",
+          "HFP-112",
+          "HFP-123",
+          "HFP-134"
+        ],
+        "family": "HFP|-d",
+        "values": 73
+      },
+      {
+        "docs": 77,
+        "examples": [
+          "PCC-109",
+          "PCC-115",
+          "PCC-116",
+          "PCC-127"
+        ],
+        "family": "PCC|-d",
+        "values": 73
+      },
+      {
+        "docs": 97,
+        "examples": [
+          "VTX-HSE-16",
+          "VTX-HSE-17",
+          "VTX-HSE-27",
+          "VTX-HSE-32"
+        ],
+        "family": "VTX|-X-d",
+        "values": 73
+      },
+      {
+        "docs": 102,
+        "examples": [
+          "NRL-HSE-21",
+          "NRL-HSE-25",
+          "NRL-HSE-36",
+          "NRL-HSE-40"
+        ],
+        "family": "NRL|-X-d",
+        "values": 72
+      },
+      {
+        "docs": 97,
+        "examples": [
+          "MBK-F-11",
+          "MBK-HSE-11",
+          "MBK-HSE-14",
+          "MBK-HSE-22"
+        ],
+        "family": "MBK|-X-d",
+        "values": 69
+      },
+      {
+        "docs": 69,
+        "examples": [
+          "SFD-148",
+          "SFD-153",
+          "SFD-157",
+          "SFD-166"
+        ],
+        "family": "SFD|-d",
+        "values": 67
+      },
+      {
+        "docs": 100,
+        "examples": [
+          "ZAC-HSE-12",
+          "ZAC-HSE-18",
+          "ZAC-HSE-27",
+          "ZAC-HSE-30"
+        ],
+        "family": "ZAC|-X-d",
+        "values": 67
+      },
+      {
+        "docs": 101,
+        "examples": [
+          "BWD-HSE-24",
+          "BWD-HSE-27",
+          "BWD-HSE-39",
+          "BWD-HSE-44"
+        ],
+        "family": "BWD|-X-d",
+        "values": 65
+      },
+      {
+        "docs": 92,
+        "examples": [
+          "PCC-F-11",
+          "PCC-HSE-20",
+          "PCC-HSE-28",
+          "PCC-HSE-31"
+        ],
+        "family": "PCC|-X-d",
+        "values": 64
+      },
+      {
+        "docs": 87,
+        "examples": [
+          "SFD-HSE-10",
+          "SFD-HSE-14",
+          "SFD-HSE-29",
+          "SFD-HSE-36"
+        ],
+        "family": "SFD|-X-d",
+        "values": 64
+      },
+      {
+        "docs": 85,
+        "examples": [
+          "CDM-HSE-18",
+          "CDM-HSE-19",
+          "CDM-HSE-22",
+          "CDM-HSE-33"
+        ],
+        "family": "CDM|-X-d",
+        "values": 62
+      },
+      {
+        "docs": 66,
+        "examples": [
+          "OKF-111",
+          "OKF-115",
+          "OKF-124",
+          "OKF-133"
+        ],
+        "family": "OKF|-d",
+        "values": 59
+      },
+      {
+        "docs": 61,
+        "examples": [
+          "CDM-111",
+          "CDM-130",
+          "CDM-160",
+          "CDM-192"
+        ],
+        "family": "CDM|-d",
+        "values": 58
+      },
+      {
+        "docs": 85,
+        "examples": [
+          "HFP-HSE-22",
+          "HFP-HSE-62",
+          "HFP-HSE-69",
+          "HFP-HSE-72"
+        ],
+        "family": "HFP|-X-d",
+        "values": 58
+      }
+    ],
+    "postings": 975188,
+    "rung": "rung-10000",
+    "tokens": 1305929,
+    "whole_changed_by_stemming": {
+      "distinct": 0,
+      "examples": [],
+      "postings": 0
+    },
+    "whole_digit_free": {
+      "distinct": 289,
+      "examples": [
+        "a-to-z",
+        "after-hours",
+        "alarm-level",
+        "alarm_label",
+        "alert-failure",
+        "allowed_manual_ack",
+        "anjali.deshmukh",
+        "api_export",
+        "applies_to",
+        "approved-record",
+        "ashgrove-insure.example",
+        "auto-cancelled",
+        "back-to-cold",
+        "basic_percent",
+        "better-known"
+      ],
+      "postings": 40870
+    },
+    "whole_form": {
+      "distinct": 7862,
+      "postings": 61554
+    }
+  },
+  "ranking": [
+    {
+      "query": "RF-118",
+      "rank": 1,
+      "target": "rf-118.md",
+      "top3": [
+        "rf-118.md",
+        "rf-119.md"
+      ]
+    },
+    {
+      "query": "RF 118",
+      "rank": 2,
+      "target": "rf-118.md",
+      "top3": [
+        "rf-119.md",
+        "rf-118.md"
+      ]
+    },
+    {
+      "query": "rf118",
+      "rank": null,
+      "target": "rf-118.md",
+      "top3": []
+    },
+    {
+      "query": "RF–118",
+      "rank": 2,
+      "target": "rf-118.md",
+      "top3": [
+        "rf-119.md",
+        "rf-118.md"
+      ]
+    },
+    {
+      "query": "what is RF-118",
+      "rank": 1,
+      "target": "rf-118.md",
+      "top3": [
+        "rf-118.md",
+        "rf-119.md"
+      ]
+    },
+    {
+      "query": "ADR-0004",
+      "rank": 1,
+      "target": "adr-0004.md",
+      "top3": [
+        "adr-0004.md",
+        "adr-0040.md"
+      ]
+    },
+    {
+      "query": "ADR-4",
+      "rank": 2,
+      "target": "adr-0004.md",
+      "top3": [
+        "adr-0040.md",
+        "adr-0004.md"
+      ]
+    },
+    {
+      "query": "ADR 4",
+      "rank": 2,
+      "target": "adr-0004.md",
+      "top3": [
+        "adr-0040.md",
+        "adr-0004.md",
+        "filler-04.md"
+      ]
+    },
+    {
+      "query": "v2.3.1",
+      "rank": 1,
+      "target": "v231.md",
+      "top3": [
+        "v231.md",
+        "v230.md"
+      ]
+    },
+    {
+      "query": "2.3.1",
+      "rank": null,
+      "target": "v231.md",
+      "top3": []
+    },
+    {
+      "query": "d3139fdb",
+      "rank": null,
+      "target": "sha.md",
+      "top3": []
+    },
+    {
+      "query": "d3139fdb8e4a2c1f0b9a7e6d5c4b3a2918f7e6d5",
+      "rank": 1,
+      "target": "sha.md",
+      "top3": [
+        "sha.md"
+      ]
+    },
+    {
+      "query": "bm25f.py",
+      "rank": 1,
+      "target": "bm25f.md",
+      "top3": [
+        "bm25f.md",
+        "bm25.md"
+      ]
+    },
+    {
+      "query": "src/fux/query/bm25f.py",
+      "rank": 1,
+      "target": "bm25f.md",
+      "top3": [
+        "bm25f.md",
+        "bm25.md"
+      ]
+    }
+  ]
+}

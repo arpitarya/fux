@@ -1,0 +1,115 @@
+{"family": "LQ|-d", "id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ-52", "variant": "exact"}
+{"family": "LQ|-d", "id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ 52", "variant": "space"}
+{"family": "LQ|-d", "id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ52", "variant": "nosep"}
+{"family": "LQ|-d", "id": "LQ-52", "primary": "seed/28-lane-qualification-LQ-52.md", "query": "LQ–52", "variant": "endash"}
+{"family": "LQ|-d", "id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ-53", "variant": "exact"}
+{"family": "LQ|-d", "id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ 53", "variant": "space"}
+{"family": "LQ|-d", "id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ53", "variant": "nosep"}
+{"family": "LQ|-d", "id": "LQ-53", "primary": "seed/29-lane-qualification-LQ-53.md", "query": "LQ–53", "variant": "endash"}
+{"family": "MBK|-Xd", "id": "MBK-D4", "primary": "ext/sibling/00000-sop.md", "query": "MBK-D4", "variant": "exact"}
+{"family": "MBK|-Xd", "id": "MBK-D4", "primary": "ext/sibling/00000-sop.md", "query": "MBK D4", "variant": "space"}
+{"family": "MBK|-Xd", "id": "MBK-D4", "primary": "ext/sibling/00000-sop.md", "query": "MBK–D4", "variant": "endash"}
+{"family": "MBK|-Xd", "id": "MBK-Q5", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK-Q5", "variant": "exact"}
+{"family": "MBK|-Xd", "id": "MBK-Q5", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK Q5", "variant": "space"}
+{"family": "MBK|-Xd", "id": "MBK-Q5", "primary": "ext/sibling/a01-marrowbeck-excursion-sop.md", "query": "MBK–Q5", "variant": "endash"}
+{"family": "NGP|-X-d", "id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-MNT-552", "variant": "exact"}
+{"family": "NGP|-X-d", "id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP MNT 552", "variant": "space"}
+{"family": "NGP|-X-d", "id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-MNT552", "variant": "nosep"}
+{"family": "NGP|-X-d", "id": "NGP-MNT-552", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP–MNT–552", "variant": "endash"}
+{"family": "NGP|-X-d", "id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP-MNT-731", "variant": "exact"}
+{"family": "NGP|-X-d", "id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP MNT 731", "variant": "space"}
+{"family": "NGP|-X-d", "id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP-MNT731", "variant": "nosep"}
+{"family": "NGP|-X-d", "id": "NGP-MNT-731", "primary": "seed/16-reefer-RF-118-asset-file.md", "query": "NGP–MNT–731", "variant": "endash"}
+{"family": "NGP|-X-d", "id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-PNR-18", "variant": "exact"}
+{"family": "NGP|-X-d", "id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP PNR 18", "variant": "space"}
+{"family": "NGP|-X-d", "id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP-PNR18", "variant": "nosep"}
+{"family": "NGP|-X-d", "id": "NGP-PNR-18", "primary": "seed/03-postmortem-nagpur-vaccine-excursion.md", "query": "NGP–PNR–18", "variant": "endash"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL-CS-HBK-01", "variant": "exact"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL CS HBK 01", "variant": "space"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL-CS-HBK01", "variant": "nosep"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL–CS–HBK–01", "variant": "endash"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-HBK-01", "primary": "seed/54-customer-service-handbook.md", "query": "QCL-CS-HBK-1", "variant": "unpadded"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL-CS-MTX-02", "variant": "exact"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL CS MTX 02", "variant": "space"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL-CS-MTX02", "variant": "nosep"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL–CS–MTX–02", "variant": "endash"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-MTX-02", "primary": "seed/14-customer-notification-matrix-2025.md", "query": "QCL-CS-MTX-2", "variant": "unpadded"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL-CS-MTX-03", "variant": "exact"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL CS MTX 03", "variant": "space"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL-CS-MTX03", "variant": "nosep"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL–CS–MTX–03", "variant": "endash"}
+{"family": "QCL|-X-X-d", "id": "QCL-CS-MTX-03", "primary": "seed/15-customer-notification-matrix-2026.md", "query": "QCL-CS-MTX-3", "variant": "unpadded"}
+{"family": "QCL|-X-Xd-d", "id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL-OPS-NH3-01", "variant": "exact"}
+{"family": "QCL|-X-Xd-d", "id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL OPS NH3 01", "variant": "space"}
+{"family": "QCL|-X-Xd-d", "id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL–OPS–NH3–01", "variant": "endash"}
+{"family": "QCL|-X-Xd-d", "id": "QCL-OPS-NH3-01", "primary": "seed/43-procedure-ammonia-leak-response.md", "query": "QCL-OPS-NH3-1", "variant": "unpadded"}
+{"family": "QCL|-X-Xd-d", "id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL-OPS-NH3-02", "variant": "exact"}
+{"family": "QCL|-X-Xd-d", "id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL OPS NH3 02", "variant": "space"}
+{"family": "QCL|-X-Xd-d", "id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL–OPS–NH3–02", "variant": "endash"}
+{"family": "QCL|-X-Xd-d", "id": "QCL-OPS-NH3-02", "primary": "seed/44-decision-ammonia-leak-response.md", "query": "QCL-OPS-NH3-2", "variant": "unpadded"}
+{"family": "QCL|-X-Xd-d", "id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL-OPS-NH3-03", "variant": "exact"}
+{"family": "QCL|-X-Xd-d", "id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL OPS NH3 03", "variant": "space"}
+{"family": "QCL|-X-Xd-d", "id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL–OPS–NH3–03", "variant": "endash"}
+{"family": "QCL|-X-Xd-d", "id": "QCL-OPS-NH3-03", "primary": "seed/45-reference-ammonia-leak-response.md", "query": "QCL-OPS-NH3-3", "variant": "unpadded"}
+{"family": "QCL|-X-d", "id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F-09", "variant": "exact"}
+{"family": "QCL|-X-d", "id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL F 09", "variant": "space"}
+{"family": "QCL|-X-d", "id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F09", "variant": "nosep"}
+{"family": "QCL|-X-d", "id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL–F–09", "variant": "endash"}
+{"family": "QCL|-X-d", "id": "QCL-F-09", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F-9", "variant": "unpadded"}
+{"family": "QCL|-X-d", "id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F-22", "variant": "exact"}
+{"family": "QCL|-X-d", "id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL F 22", "variant": "space"}
+{"family": "QCL|-X-d", "id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL-F22", "variant": "nosep"}
+{"family": "QCL|-X-d", "id": "QCL-F-22", "primary": "seed/01-sop-temperature-excursion.md", "query": "QCL–F–22", "variant": "endash"}
+{"family": "QCL|-X-d", "id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL-F-31", "variant": "exact"}
+{"family": "QCL|-X-d", "id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL F 31", "variant": "space"}
+{"family": "QCL|-X-d", "id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL-F31", "variant": "nosep"}
+{"family": "QCL|-X-d", "id": "QCL-F-31", "primary": "seed/31-quarantine-release-and-return-procedure.md", "query": "QCL–F–31", "variant": "endash"}
+{"family": "RF|-d", "id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF-203", "variant": "exact"}
+{"family": "RF|-d", "id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF 203", "variant": "space"}
+{"family": "RF|-d", "id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF203", "variant": "nosep"}
+{"family": "RF|-d", "id": "RF-203", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF–203", "variant": "endash"}
+{"family": "RF|-d", "id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF-221", "variant": "exact"}
+{"family": "RF|-d", "id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF 221", "variant": "space"}
+{"family": "RF|-d", "id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF221", "variant": "nosep"}
+{"family": "RF|-d", "id": "RF-221", "primary": "seed/04-night-shift-handover-log.txt", "query": "RF–221", "variant": "endash"}
+{"family": "TMS|-d", "id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS-42", "variant": "exact"}
+{"family": "TMS|-d", "id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS 42", "variant": "space"}
+{"family": "TMS|-d", "id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS42", "variant": "nosep"}
+{"family": "TMS|-d", "id": "TMS-42", "primary": "seed/24-mapping-study-TMS-42.md", "query": "TMS–42", "variant": "endash"}
+{"family": "TMS|-d", "id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS-43", "variant": "exact"}
+{"family": "TMS|-d", "id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS 43", "variant": "space"}
+{"family": "TMS|-d", "id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS43", "variant": "nosep"}
+{"family": "TMS|-d", "id": "TMS-43", "primary": "seed/25-mapping-study-TMS-43.md", "query": "TMS–43", "variant": "endash"}
+{"family": "TSL|-X-Xd-d", "id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-C3-02", "variant": "exact"}
+{"family": "TSL|-X-Xd-d", "id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL NGP C3 02", "variant": "space"}
+{"family": "TSL|-X-Xd-d", "id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL–NGP–C3–02", "variant": "endash"}
+{"family": "TSL|-X-Xd-d", "id": "TSL-NGP-C3-02", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-C3-2", "variant": "unpadded"}
+{"family": "TSL|-X-Xd-d", "id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-F1-04", "variant": "exact"}
+{"family": "TSL|-X-Xd-d", "id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL NGP F1 04", "variant": "space"}
+{"family": "TSL|-X-Xd-d", "id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL–NGP–F1–04", "variant": "endash"}
+{"family": "TSL|-X-Xd-d", "id": "TSL-NGP-F1-04", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-NGP-F1-4", "variant": "unpadded"}
+{"family": "TSL|-X-d-X", "id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL-RF-119-A", "variant": "exact"}
+{"family": "TSL|-X-d-X", "id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL RF 119 A", "variant": "space"}
+{"family": "TSL|-X-d-X", "id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL-RF119A", "variant": "nosep"}
+{"family": "TSL|-X-d-X", "id": "TSL-RF-119-A", "primary": "seed/17-reefer-RF-119-asset-file.md", "query": "TSL–RF–119–A", "variant": "endash"}
+{"family": "TSL|-X-d-X", "id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL-RF-120-A", "variant": "exact"}
+{"family": "TSL|-X-d-X", "id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL RF 120 A", "variant": "space"}
+{"family": "TSL|-X-d-X", "id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL-RF120A", "variant": "nosep"}
+{"family": "TSL|-X-d-X", "id": "TSL-RF-120-A", "primary": "seed/18-reefer-RF-120-asset-file.md", "query": "TSL–RF–120–A", "variant": "endash"}
+{"family": "TSL|-X-d-X", "id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-RF-221-A", "variant": "exact"}
+{"family": "TSL|-X-d-X", "id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL RF 221 A", "variant": "space"}
+{"family": "TSL|-X-d-X", "id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL-RF221A", "variant": "nosep"}
+{"family": "TSL|-X-d-X", "id": "TSL-RF-221-A", "primary": "seed/02-sensor-thresholds.yaml", "query": "TSL–RF–221–A", "variant": "endash"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI-HFP-DOCK-12", "variant": "exact"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI HFP DOCK 12", "variant": "space"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI-HFP-DOCK12", "variant": "nosep"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-HFP-DOCK-12", "primary": "ext/sibling/a07-halberd-dock-wiki.html", "query": "WIKI–HFP–DOCK–12", "variant": "endash"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI-NGP-DOCK-41", "variant": "exact"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI NGP DOCK 41", "variant": "space"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI-NGP-DOCK41", "variant": "nosep"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-NGP-DOCK-41", "primary": "seed/09-dock-scheduling-wiki-export.html", "query": "WIKI–NGP–DOCK–41", "variant": "endash"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI-SFD-CUST-07", "variant": "exact"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI SFD CUST 07", "variant": "space"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI-SFD-CUST07", "variant": "nosep"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI–SFD–CUST–07", "variant": "endash"}
+{"family": "WIKI|-X-X-d", "id": "WIKI-SFD-CUST-07", "primary": "ext/adjacent/a14-sundari-onboarding.html", "query": "WIKI-SFD-CUST-7", "variant": "unpadded"}
