@@ -115,3 +115,36 @@ def test_compare_verb_actually_routes_through_the_rule():
         "rounding — comparing one rounded against one raw is worse than comparing "
         "neither, because it fails asymmetrically"
     )
+
+
+# -- sharding (2026-09-29, the CI rewrite) -----------------------------------
+#
+# CI spreads one arm across several runners with `--shard K/N`. The property
+# that makes that safe is that the N shards together are the unsharded run:
+# nothing dropped, nothing doubled. A shard that silently ran nothing would be
+# a green arm that checked nothing, so a malformed spec must refuse.
+
+
+@pytest.mark.parametrize("n", [1, 2, 3, 4, 7])
+def test_shards_partition_the_job_list_exactly(n):
+    jobs = [("find", f"q{i}", top) for i in range(29) for top in (1, 5, 20)]
+    shards = [jobs[k - 1::n] for k in range(1, n + 1)]
+    flat = [j for s in shards for j in s]
+    assert sorted(flat) == sorted(jobs)
+    assert len(flat) == len(jobs)
+
+
+@pytest.mark.parametrize("spec", ["0/3", "4/3", "x/3", "3", "1/0", ""])
+def test_a_malformed_shard_refuses(spec):
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    with pytest.raises(SystemExit):
+        node_arm._parse_shard(ap, spec)
+
+
+def test_a_wellformed_shard_parses():
+    import argparse
+
+    assert node_arm._parse_shard(argparse.ArgumentParser(), "2/4") == (2, 4)
+    assert node_arm._parse_shard(argparse.ArgumentParser(), None) is None

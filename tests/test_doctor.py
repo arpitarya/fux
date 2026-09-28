@@ -17,8 +17,13 @@ def _git_repo(tmp_path):
     return tmp_path
 
 
-def test_python_version_check_passes_on_current_interpreter():
-    checks = doctor.run()
+def test_python_version_check_passes_on_current_interpreter(tmp_path):
+    # A bare git root, not the repo itself: `doctor.run()` with no argument
+    # walks THIS repository's whole index and took ~35 s — the slowest test in
+    # the suite by 10x, and under xdist the one that set the wall clock
+    # (2026-09-29). The python-version row does not depend on the root.
+    (tmp_path / ".git").mkdir()
+    checks = doctor.run(tmp_path)
     py = next(c for c in checks if c.name == "python version")
     assert py.ok
 

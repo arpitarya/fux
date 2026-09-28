@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@de9c4a5cc775, tools/differential@b495fa30d77e, src/fux/schemas/runtime.schema.json@f83e87676ef8]
+owns: [src/fux/derive@de9c4a5cc775, tools/differential@5f789d2db31b, src/fux/schemas/runtime.schema.json@f83e87676ef8]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: c3044ddb1e163095e8beb1337c1b6fe92dfd9ecad14c11830996ce47966a9899
+content_sha: ddd8006408ed7593bba389700785eb72e6242862a3b153b71f623d330ad8cb0e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -755,9 +755,13 @@ payloads at every arm weight in `tests/query/test_mined.py`.
     it runs in a copy or in CI, never against a repository anyone reads.
 
   ⚠ **The warning above still applies, and applies harder: no test imports any
-  of them.** They are run by [`node-arm.yml`](../.github/workflows/node-arm.yml)
-  on every push across 3 OSes × Node 20/22, which is a schedule rather than a
-  gate — CI green is nobody's required check on `main`.
+  of them.** They are run by [`fast.yml`](../.github/workflows/fast.yml) on
+  every push (Linux, Node 22, the repo pass) and by
+  [`main.yml`](../.github/workflows/main.yml) on `main` across 3 OSes × Node
+  22/24 with the adversarial pass, each spread over runners by `node_arm.py
+  --shard K/N` (the N slices together are exactly the unsharded run) — a
+  schedule rather than a merge gate: CI green
+  is nobody's required check on `main`, and only a release waits on `main.yml`.
 - ⚠ **`tools/differential/goldens_grade.py` grades two modes — `scan` and
   `accelerator` — and no test imports it.** ⚠ **It was `playground_grade.py`
   until 2026-09-12**, when [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md) took its default

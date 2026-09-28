@@ -19,20 +19,23 @@ jobs:
         # Two strikes, so a gate (SR-WORK-SESSION d13). 3.0.0-alpha.2 and
         # 3.0.0-alpha.3 were both published while main's CI was red, because
         # `main` has no required checks (SR-WORK-RELEASE d10). Nothing blocked
-        # it. Create the release AFTER both workflows finish green on the commit;
-        # while they are still running, this step refuses, and so does red.
+        # it. Create the release AFTER main.yml finishes green on the commit;
+        # while it is still running, this step refuses, and so does red.
+        #
+        # ⚠ One workflow since 2026-09-29: main.yml is the full lane (every OS,
+        # both arms) and replaced ci.yml + node-arm.yml. fast.yml is the
+        # two-minute signal and is deliberately NOT the release gate — it runs
+        # one OS. ⚠ This file keeps its NAME: the PyPI and npm trusted
+        # publishers are bound to `publish.yml`, and renaming it would make the
+        # next release fail at the registry for a reason no diff shows.
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          fail=0
-          for wf in ci.yml node-arm.yml; do
-            got="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$wf/runs?head_sha=$GITHUB_SHA&event=push&branch=main&per_page=1" \
-                   -q '.workflow_runs[0] | "\(.status) \(.conclusion)"')"
-            echo "$wf on ${GITHUB_SHA::8}: ${got:-no run}"
-            [ "$got" = "completed success" ] || fail=1
-          done
-          if [ "$fail" = 1 ]; then
-            echo "✗ refusing to publish: CI is not green on ${GITHUB_SHA::8}. Wait for it, fix it, or re-run this job." >&2
+          got="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/main.yml/runs?head_sha=$GITHUB_SHA&event=push&branch=main&per_page=1" \
+                 -q '.workflow_runs[0] | "\(.status) \(.conclusion)"')"
+          echo "main.yml on ${GITHUB_SHA::8}: ${got:-no run}"
+          if [ "$got" != "completed success" ]; then
+            echo "✗ refusing to publish: main.yml is not green on ${GITHUB_SHA::8}. Wait for it, fix it, or re-run this job." >&2
             exit 1
           fi
 

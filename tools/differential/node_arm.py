@@ -606,6 +606,21 @@ def tune_delta(root: Path) -> str:
     return ", ".join(f"{k}: default {d!r} -> {v!r}" for k, (d, v) in sorted(delta.items()))
 
 
+def _parse_shard(ap: argparse.ArgumentParser, spec: "str | None") -> "tuple[int, int] | None":
+    """`K/N` -> (K, N), 1 <= K <= N. A malformed value is a usage error, not a
+    silent full run — a shard that quietly ran everything would hide nothing,
+    but one that quietly ran NOTHING would be a green arm that checked nothing."""
+    if spec is None:
+        return None
+    try:
+        k, n = (int(x) for x in spec.split("/"))
+    except ValueError:
+        ap.error(f"--shard must be K/N, got {spec!r}")
+    if not 1 <= k <= n:
+        ap.error(f"--shard needs 1 <= K <= N, got {spec!r}")
+    return k, n
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("corpus", nargs="?", default=None,
@@ -634,7 +649,13 @@ def main() -> int:
                          "off = the transcription arm (`--no-tune`, the engine's own answer)")
     ap.add_argument("--skip-document-verify", action="store_true",
                     help="skip the per-document hash pass when resolving a rung")
+    ap.add_argument("--shard", default=None, metavar="K/N",
+                    help="run only the K-th of N interleaved slices of the job list "
+                         "(1-based). The N shards together run exactly the unsharded "
+                         "job list, so CI can spread one arm across N runners")
     args = ap.parse_args()
+
+    shard = _parse_shard(ap, args.shard)
 
     if args.rung and args.corpus:
         ap.error("--rung and a corpus path are two ways to say the same thing; pass one")
@@ -723,6 +744,24 @@ def main() -> int:
             if args.bundle_cap:
                 jobs.append(("bundle-api", (queries[0], picked[0], picked[1]), None))
 
+    # 🔴 **Sharding splits the list, never the question** (2026-09-29, the CI
+    # rewrite). Measured that day: a Node `find` on this repo costs ~1.2 s, and
+    # nearly all of it is the reader's own scan — `compose.allRecords` rebuilding
+    # the graph plane in memory, then GC — not process start-up. So batching
+    # every query into one Node process would save well under a tenth, and the
+    # only honest way to shorten the wall clock without touching the engine is
+    # to run the same comparisons on more runners at once.
+    #
+    # The partition is by POSITION in `jobs`, which is itself deterministic, so
+    # the union of shards 1..N is exactly the unsharded run — no job is skipped
+    # or run twice, and a discordance names the same job whichever shard found
+    # it.
+    if shard is not None:
+        k, n = shard
+        total = len(jobs)
+        jobs = jobs[k - 1::n]
+        print(f"shard    : {k}/{n} — {len(jobs)} of {total} jobs")
+
     def run(job):
         verb, query, top = job
         try:
@@ -775,6 +814,8 @@ def main() -> int:
         # and from nothing else.
         args.evidence.mkdir(parents=True, exist_ok=True)
         suffix = "contract" if use_tune else "transcription"
+        if shard is not None:
+            suffix += f"-shard{shard[0]}of{shard[1]}"
         out = args.evidence / f"node-arm-{label}-{suffix}.jsonl"
         condition = {
             "_condition": {

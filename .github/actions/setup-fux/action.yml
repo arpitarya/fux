@@ -1,0 +1,40 @@
+# One setup for every CI job — Python, optionally Node, and fux installed.
+#
+# Checkout stays in the calling job: a composite action cannot check out the
+# repository it lives in. `shell: bash` on every step, because the matrix runs
+# on Windows too and pwsh would read the install line differently.
+name: setup-fux
+description: Python (pip-cached), optional Node, and `pip install -e .[extras]`
+inputs:
+  python:
+    description: Python version (L7 floor is 3.12)
+    required: true
+  node:
+    description: Node version, or empty for none (L8 floor is 22)
+    required: false
+    default: ""
+  extras:
+    description: pip extras to install with the package; empty for the bare engine
+    required: false
+    default: dev
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python }}
+        cache: pip
+
+    - if: inputs.node != ''
+      uses: actions/setup-node@v5
+      with:
+        node-version: ${{ inputs.node }}
+
+    - name: Install fux
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.extras }}" ]; then
+          pip install -e ".[${{ inputs.extras }}]"
+        else
+          pip install -e .
+        fi
