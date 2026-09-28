@@ -12,7 +12,7 @@ owns: [src/fux/query/provenance.py@59ef7c6eea8f]
 laws: [L1, L3, L4, L8]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 450c24767c0ec0f88db91800633f4c71d579389f25859946ed23c98806d357bb
+content_sha: 871cf4069898fcfa086abc3ae76f728655d7610c6828a184b50eaa3b13e38eac
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -539,6 +539,8 @@ this moved where they are written, not what they are.
 - `src/fux/query/provenance.py` — `Reference` ← `[receipt] statement_type`, `PREDICATE_TYPE` ← `[receipt] predicate_type`, `LEGACY_SCHEMA` ← `[receipt] legacy_schema`, `JOURNAL_NAME` ← `[receipt] journal`, `DIGEST_ALG` ← `[receipt] digest_alg`
 
 <!-- L12-VALUES-END -->
+
+**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 ### Consequences
 

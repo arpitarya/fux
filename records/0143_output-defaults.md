@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@988bd2d3cdfb, src/fux/templates/output.toml.txt@7251f3203770, .fux/output.toml@7251f3203770, node/src/config/output.mjs@850e35e36742]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 33deb66c67a7582c4bff151de676a2ed62548d6a36a79f0dbeb0e2b6cbc92029
+content_sha: f7bc74b01ea2f42c02d783bccb6a1ee476cd402eaff474013b56064f9a3da20a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -796,6 +796,8 @@ this moved where they are written, not what they are.
 **`fux inspect --top` reads `.fux/inspect.toml [report] top`, not `output.toml`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): it sizes a report's lists, which is SR-INSPECT's, and no output key changed.
 
 **No output key changed** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/output.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
+
+**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 ### Consequences
 

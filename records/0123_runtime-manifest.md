@@ -10,7 +10,7 @@ feature: "`.fux/runtime/manifest.json` — the derived plane's freshness contrac
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 3039e7e66c2db0b925e53b27236c6fa616801c773ae9607395f549589db5c8b2
+content_sha: 83d8e9af232e787f684d24169b019dd620fc8d13d8e8dbb8a51723f66f61278d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -169,6 +169,8 @@ this moved where they are written, not what they are.
 - `src/fux/derive/format.py` — `RUNTIME_DIR` ← `[runtime] dir`, `BLOCK_SIZE` ← `[runtime] block_size`, `RUNTIME_SCHEMA` ← `[runtime] schema`, `DOCS_FIELDS` ← `[runtime] docs_fields`, `DOCS_NAME` ← `[runtime] docs`, `ANCHORS_DIR` ← `[runtime] anchors_dir`, `STATS_NAME` ← `[runtime] stats`, `MINED_NAME` ← `[runtime] mined`, `MANIFEST_NAME` ← `[runtime] manifest`, `STAMP_NAME` ← `[runtime] stamp`, `POSTINGS_DIR` ← `[runtime] postings_dir`, `DETERMINISTIC_FILES` ← `[graph] file`
 
 <!-- L12-VALUES-END -->
+
+**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 ### Consequences
 

@@ -225,7 +225,7 @@ def fetcher_digest(fetcher_path: str | Path) -> str:
         raw = p.read_bytes()
     except OSError:
         return f"{p.stem}@sha:unreadable"
-    return f"{p.stem}@sha:{hashlib.sha256(raw).hexdigest()[:16]}"
+    return f"{p.stem}@sha:{hashlib.sha256(raw).hexdigest()[: fixed('decoders', 'digest_hex')]}"
 
 
 def stale_decoder_count(root: Path, current: dict[str, str]) -> int:

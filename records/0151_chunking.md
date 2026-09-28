@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-09-06
 feature: chunking — the strategy vocabulary, the boundary ladder, and the retrieval/citation split
-owns: [src/fux/refer/_chunk.py@948191765df4, node/src/refer/chunk.mjs@23fc7268065c]
+owns: [src/fux/refer/_chunk.py@62bf5273eab1, node/src/refer/chunk.mjs@3195b329f939]
 laws: [L1, L2, L3]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: b88cdaa67287e932a4c2b30fb5394fe59f165cc41cd474ecb89c6a65a565f91d
+content_sha: 3c3e46bc43237ee05f9654647ae20ea66cd3ceff0630d23f58bdb0cf8ad07913
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -202,6 +202,8 @@ first stage's recall is the ceiling on everything after it, and band dilution is
 exactly what scored `hit@1 = 0.229`. **Stage-1 `recall@k` is the gate**, and
 until it is measured this stays a proposal. The harness in
 `fux-lab/2026-09-06-csv-chunk-granularity/` discriminates it as one new arm.
+
+**The chunker holds no numeral**: section tuples are unpacked, "fewer than two" is `<= 1`, a paragraph break costs `len("\n\n")`, and a pipe table's minimum — header, delimiter, one row — is `constants.toml [markdown] min_table_lines` in both planes. Every passage is unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

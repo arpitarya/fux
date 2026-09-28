@@ -29,6 +29,9 @@ import { runFused } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";
 import { recordFor } from "../store/reader.mjs";
 import { declareArchived, declareConfidence, declareFloorOff, decline } from "./find.mjs";
+import { fixed } from "../config/constants.mjs";
+
+const JSON_INDENT = fixed("json", "indent");
 
 export const ARCHIVED_MARKER = "[archived]";
 
@@ -113,7 +116,7 @@ export function runAsk(root, args, { compose = true } = {}) {
     // An RRF score and a BM25F score are not comparable, so a consumer must be
     // told which it is holding. Absent means "one question", never "unknown".
     if (fused) payload.fused = true;
-    process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
+    process.stdout.write(JSON.stringify(payload, null, JSON_INDENT) + "\n");
     declareArchived(results);
     return 0;
   }

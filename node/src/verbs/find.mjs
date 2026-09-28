@@ -32,6 +32,9 @@ import { recordFor } from "../store/reader.mjs";
 import { queryTermHashes } from "../query/scan.mjs";
 import { analyze } from "../query/analyzer.mjs";
 import { phrasePresent, readLocalText } from "../query/rerank.mjs";
+import { fixed } from "../config/constants.mjs";
+
+const JSON_INDENT = fixed("json", "indent");
 
 /** `find`'s three precision controls. W-111.
  *
@@ -198,7 +201,7 @@ export function runFind(root, args) {
     // SR-CONFIDENCE decision 11: present ONLY under --band. **Absent means
     // NOT ASKED FOR — it is never a claim about the answer.**
     if (confidence && args.band) payload.confidence = confidence.asDict();
-    process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
+    process.stdout.write(JSON.stringify(payload, null, JSON_INDENT) + "\n");
     declareArchived(results);
     return 0;
   }

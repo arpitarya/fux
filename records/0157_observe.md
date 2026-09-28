@@ -7,10 +7,10 @@ description: "After a verb has fully rendered, fux hands every file in `.fux/obs
 status: accepted
 date: 2026-09-14
 feature: the observer hook — the extension point a consumer's analytics subscribe to
-owns: [src/fux/observe.py@640ad5b17802, tools/observer-bench@e12d60cca125]
+owns: [src/fux/observe.py@eb7be47ed04d, tools/observer-bench@e12d60cca125]
 laws: [L1, L2, L3, L4, L8, L10]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 764323e60a1341f00daed2da72431ecde3ccee8adc5dde89f1d9a57bbb77d432
+content_sha: b3391761479ba547c4628f0339f4211918960fc095cdb4410d504a9c356b9ebd
 ratifies: W-170
 ---
 
@@ -255,6 +255,8 @@ this moved where they are written, not what they are.
 to run the observers on `50` ms held in `cli.py`. It now **skips them**: the
 bound is the guarantee that a consumer's analytics cannot slow a verb, and
 running them without it would drop the guarantee rather than the observers.
+
+**An observer call's argument hash is `constants.toml [observe] args_hash_hex` hex digits** (16), and its time budget converts through `timedelta`. The liveness file is indented by `[json] indent`. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

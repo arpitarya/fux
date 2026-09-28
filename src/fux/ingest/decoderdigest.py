@@ -86,7 +86,7 @@ def of(decoder) -> str:
         # read as "unchanged", or the reuse key would carry stale extraction
         # forward on exactly the run that could not check it.
         return f"{name}@sha:unreadable"
-    return f"{name}@sha:{hashlib.sha256(raw).hexdigest()[:16]}"
+    return f"{name}@sha:{hashlib.sha256(raw).hexdigest()[: fixed('decoders', 'digest_hex')]}"
 
 
 def binding_digests(root: Path | None = None) -> dict[str, str]:

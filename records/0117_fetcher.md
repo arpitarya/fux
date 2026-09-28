@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@0238d03fd2d9, src/fux/templates@cd1ac2fd613b]
+owns: [src/fux/ingest/urlsrc.py@a7abf88edaf5, src/fux/templates@cd1ac2fd613b]
 laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 93d5be1647de7c54a368f2389e64c272ae13d1e8c917944c3e2cffe18c562349
+content_sha: 3cc5d2d1b2f2d8f3ba7d0f0d33ef993f5e80429ad04f0644d8bec2c27cde315d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -665,6 +665,8 @@ copied out, never imported.
 **`src/fux/templates/` gained `inspect.toml.txt`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28) — owned in substance by [SR-INSPECT](0156_inspect.md) decision 23.
 
 **No fetcher decision moved** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 5b, 2026-09-28). `src/fux/templates/formats-limits.toml.txt`, which this record's claim on `templates/` covers, gained four decoder caps ([SR-DECODE](0139_decode.md), [SR-TYPES](0128_types-list.md) decision 14).
+
+**The rate-limit backoff doubles by shift** (`1 << attempt`) and a fetcher's `(bytes, content type)` pair is recognised by its arity. Retries and base are stage 5e's. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

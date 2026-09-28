@@ -7,10 +7,10 @@ description: "One URL per line in a committed file, deduped and sorted by the lo
 status: accepted
 date: 2026-08-19
 feature: "`.fux/sources/urls` — the file format itself, and the one grammar both committed source lists are parsed by"
-owns: [src/fux/ingest/sourcelist.py@019a49b17232, node/src/ingest/sourcelist.mjs@96fa88451bf5]
+owns: [src/fux/ingest/sourcelist.py@a45ccd18afc2, node/src/ingest/sourcelist.mjs@96fa88451bf5]
 laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 34c989bc16ac5bb62d887aeb8804f0de5d0b28e3a49369968c3f12a1ba504538
+content_sha: 7e814ff40b5946a7bcb23afba0d5eb30a9c015cc8302b808a70fb3b776ac73d7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -617,6 +617,8 @@ pipe** (Arpit, 2026-09-18; built 2026-09-21 as W-199 DoD 10).
   skips the observation, and so does re-adding a URL whose line already declares
   one. The alternatives were a window in which the committed file does not load,
   or a second way for bytes to enter the index.
+
+**`parse_duration` and the host-glob matcher hold no numeral**: a duration is "a number and a unit" (`<= 1` character is refused), and `**` is matched and skipped by its own length. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

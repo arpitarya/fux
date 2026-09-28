@@ -589,7 +589,7 @@ class _Server(ThreadingHTTPServer):
         import socketserver
 
         socketserver.TCPServer.server_bind(self)
-        host, port = self.server_address[:2]
+        host, port, *_ = self.server_address  # IPv6 adds flowinfo and scope
         self.server_name = host
         self.server_port = port
 

@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@bd584327969d, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@62fe3c17c961, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@2c157d951ec3, node/src/verbs/graph.mjs@adf3d141af2d, src/fux/schemas/graph.schema.json@19bd4c486035]
+owns: [src/fux/graph@68e1a7088bf4, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@62fe3c17c961, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@2c157d951ec3, node/src/verbs/graph.mjs@960e82061286, src/fux/schemas/graph.schema.json@19bd4c486035]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: a9a9078a3a7e05ab1ec9b21e0aa3af71c0280836d65e56e2967088aca07a2d89
+content_sha: ba67bc5bd09b8a7513ab549e2bd896a5f3fa4cfed81cb21a934a61a01b422ee6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -482,6 +482,8 @@ this moved where they are written, not what they are.
 - `src/fux/graph/walk.py` — `EDGE_KINDS` ← `[graph] edge_kinds`, `hops` ← `[graph] path_expansion_budget`
 
 <!-- L12-VALUES-END -->
+
+**`explain`, `graph` and `path` indent `--json` by `constants.toml [json] indent`** in both planes. The column widths of their text output are presentation (R3) and stay. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

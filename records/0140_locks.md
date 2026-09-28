@@ -10,7 +10,7 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L1, L2, L3, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 2bddaa52469ef17b8335649e619676a1194638c45c709eba16e39789b84495e7
+content_sha: 5be25d8d8d8ca9d90595e60103ea97611cf48d58a7f623650a55f4461768e576
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -211,6 +211,8 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **The daemon takes no lock on a repo it refuses** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `fux daemon start` now refuses a repo with no `[sources.url]` before spawning, so no `write.lock` or pid file is created for it ([SR-MAINTENANCE](0129_hooks.md) decision 9d).
+
+**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 ### Consequences
 

@@ -130,10 +130,10 @@ def read(root: Path) -> dict[str, Row]:
     for line in text.splitlines():
         if not line or line.startswith("#"):
             continue
-        parts = line.split("\t")
-        if len(parts) != 5:
-            continue
-        loc, kind, sha, decoder, fetcher = parts
+        try:
+            loc, kind, sha, decoder, fetcher = line.split("\t")
+        except ValueError:
+            continue  # not the five REGISTER columns
         out[loc] = Row(
             loc=loc, kind=kind, sha=sha, decoder=decoder,
             fetcher=None if fetcher == UNKNOWN else fetcher,

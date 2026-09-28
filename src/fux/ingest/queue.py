@@ -95,12 +95,13 @@ def read(root: Path) -> list[QueueEntry]:
     for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
         if not line.strip() or line.startswith("#"):
             continue
-        parts = line.split("\t")
-        if len(parts) < 2:
-            continue
+        try:
+            doc_id, sha, *rest = line.split("\t")
+        except ValueError:
+            continue  # no sha column
         out.append(
             QueueEntry(
-                doc_id=parts[0], sha=parts[1], reason=parts[2] if len(parts) > 2 else ""
+                doc_id=doc_id, sha=sha, reason=rest[0] if rest else ""
             )
         )
     return sorted(out, key=lambda e: e.doc_id)

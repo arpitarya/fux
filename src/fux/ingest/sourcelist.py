@@ -255,7 +255,7 @@ def parse_duration(raw: str) -> int | None:
     text = raw.strip()
     if text == "0":
         return 0
-    if len(text) < 2:
+    if len(text) <= 1:  # a duration is a number AND a unit
         return None
     unit = _DURATION_UNITS.get(text[-1])
     if unit is None or not text[:-1].isdigit():
@@ -566,9 +566,9 @@ def _compiled(pattern: str) -> re.Pattern[str]:
     while i < len(pattern):
         ch = pattern[i]
         if ch == "*":
-            if pattern[i : i + 2] == "**":
+            if pattern.startswith("**", i):
                 out.append(".*")
-                i += 2
+                i += len("**")
                 continue
             out.append("[^/]*")
         elif ch == "?":

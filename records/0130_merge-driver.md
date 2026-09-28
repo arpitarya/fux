@@ -7,10 +7,10 @@ description: "The merge driver for .fux/index/*.jsonl. A shard is a header plus 
 status: accepted
 date: 2026-08-21
 feature: the merge driver for the committed index
-owns: [src/fux/maintain/mergedriver.py@f8b0c118dec2]
+owns: [src/fux/maintain/mergedriver.py@04553ac25f4c]
 laws: [L1, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 1787c01eeb8c7cea1cdae396cc59a81897ce640c1f4cfe524b82b1658453c731
+content_sha: 83660098472a15ead86bab9527adfd2134dc9e0d6870cfd6401323414505e56a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -268,6 +268,8 @@ it the day the register landed.
   unparseable rather than merging it wrongly. `fux hooks` re-registers.
 - **`.gitattributes` gains a second line**, appended write-if-missing per line
   like the first.
+
+**The merge driver reads git's `%O %A %B [%P]` by unpacking** and exits `constants.toml [exit] usage` on a short argv. The merge itself is unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

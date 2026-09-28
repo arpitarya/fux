@@ -47,6 +47,9 @@ from .canonical import canonical_dumps
 from .collisions import CollisionTracker
 from . import recordschema
 from .format import HEADER, index_dir, shard_for, shard_path
+from ..constants import fixed
+
+_SHARDS = fixed("index", "shards")
 
 HEADER_LINE = canonical_dumps(HEADER)
 
@@ -89,7 +92,7 @@ def write_index(root: Path, records: list[dict]) -> list[Path]:
             _atomic_write(path, data)
             written.append(path)
 
-    for shard in {format(i, "02x") for i in range(256)} - by_shard.keys():
+    for shard in {format(i, "02x") for i in range(_SHARDS)} - by_shard.keys():
         path = shard_path(root, shard)
         path.unlink(missing_ok=True)
 

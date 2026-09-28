@@ -50,6 +50,8 @@ from pathlib import Path
 from ..store import fuxdir
 from ..constants import fixed
 
+_JSON_INDENT = fixed("json", "indent")
+
 LOG_NAME = fixed("maintain", "last_cited")
 
 #: Bound on remembered questions. A local diagnostic must not grow without
@@ -67,7 +69,7 @@ def key_for(query: str) -> str:
     gitignored, but keeping plaintext questions out of it costs one line.
     """
     normal = " ".join(query.split()).lower()
-    return hashlib.sha256(normal.encode("utf-8")).hexdigest()[:16]
+    return hashlib.sha256(normal.encode("utf-8")).hexdigest()[: fixed("maintain", "question_key_hex")]
 
 
 @dataclass(frozen=True)
@@ -149,7 +151,7 @@ def remember(root: Path, query: str, cited: dict[str, str]) -> None:
         while len(store) > MAX_QUESTIONS:
             store.pop(next(iter(store)))
         directory = fuxdir.derived_dir(root, "runtime")
-        text = json.dumps(store, indent=2, sort_keys=True) + "\n"
+        text = json.dumps(store, indent=_JSON_INDENT, sort_keys=True) + "\n"
         (directory / LOG_NAME).write_text(text, encoding="utf-8")
     except Exception:  # pragma: no cover - a report must not break an answer
         pass

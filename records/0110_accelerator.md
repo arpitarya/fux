@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@8118fc4bcf5d, tools/differential@68b74242b9a8, src/fux/schemas/runtime.schema.json@f83e87676ef8]
+owns: [src/fux/derive@dd04339e64e2, tools/differential@68b74242b9a8, src/fux/schemas/runtime.schema.json@f83e87676ef8]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ea12cdb1b3b4237ba5e7ee072d40e4eba3ced79854ff17507596632fe25e651f
+content_sha: ae7f4759a7def73dac0f4c6bb9259b17a72451bab7adc214edf379643d6e02d1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -655,6 +655,8 @@ sorted, built from the same records the doc table is, and one of
 accelerator's candidate and bound code needed no change, because the fold
 arrives as an ordinary `Expansion`. Scan and accelerator returned identical
 payloads at every arm weight in `tests/query/test_mined.py`.
+
+**The offset-table entry is built from the index's own constants**: one `mx`/`mnw` slot per `[index] tf_fields` entry and a key `[index] term_hash_bytes` wide, so the struct layout (`<8sHQI5H5IIIH`) is derived rather than spelled. The u16 and u32 ceilings are `ctypes`' own, the lookup is `bisect_left`, and the bound compares at `[ranking] score_digits`. The runtime schema did not move: every byte of the table is unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

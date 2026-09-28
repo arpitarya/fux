@@ -65,6 +65,8 @@ from ..schema import load as load_schema
 from ..store import fuxdir
 from ..constants import fixed
 
+_JSON_INDENT = fixed("json", "indent")
+
 STATE_NAME = fixed("maintain", "url_state")
 
 #: The declared shapes (`schemas/state.schema.json`).
@@ -222,7 +224,7 @@ def write(root: Path, state: UrlState) -> None:
     generated file here — this is gitignored, but a file that diffs cleanly is
     readable by a human debugging a failing URL, which is its whole audience."""
     directory = fuxdir.derived_dir(root, "runtime")
-    text = json.dumps(state.as_json(), indent=2, sort_keys=True) + "\n"
+    text = json.dumps(state.as_json(), indent=_JSON_INDENT, sort_keys=True) + "\n"
     (directory / STATE_NAME).write_text(text, encoding="utf-8")
 
 
@@ -359,7 +361,7 @@ def _read_shas(root: Path) -> dict[str, str]:
 def _write_shas(root: Path, shas: dict[str, str], listed: set[str]) -> None:
     directory = fuxdir.derived_dir(root, "runtime")
     kept = {url: sha for url, sha in shas.items() if url in listed}
-    text = json.dumps(kept, indent=2, sort_keys=True) + "\n"
+    text = json.dumps(kept, indent=_JSON_INDENT, sort_keys=True) + "\n"
     (directory / _SHAS_NAME).write_text(text, encoding="utf-8")
 
 

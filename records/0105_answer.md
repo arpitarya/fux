@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@79014cc86dfd]
 laws: [L1, L2, L3]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: da858da05d17e6099819a4eccfa5b88f7bc1e15525bacb380cb8d7d07a57c8ea
+content_sha: 682e14dfdde0e1804d894b0874edca4f22ccf6db9b300bbb1a88dad633d878e7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -496,6 +496,8 @@ document `answer` cites as it moves `ask`'s #1. At the default `0.0` nothing is
 read and `answer` is byte-identical.
 
 **A present `fux.toml` that does not load now stops `answer`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): the archived declaration is read through `config.load`, which names every missing key; only an absent `fux.toml` is still tolerated ([SR-ASK](0103_ask.md), [SR-CONFIG](0113_config.md) decision 17).
+
+**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 ### Consequences
 

@@ -48,6 +48,9 @@ from dataclasses import dataclass
 # normally, but the grammar it shares lives beside the decoders that produce
 # the Markdown being split. See `decode/_markdown.py` for why there is one.
 from fux.decode._markdown import headings as _headings
+from ..constants import fixed
+
+_MIN_TABLE_LINES = fixed("markdown", "min_table_lines")
 
 __all__ = ["Passage", "chunk"]
 
@@ -185,7 +188,8 @@ def _sections(content: str) -> list[tuple[str, int, str, int, int]]:
         if found is not None:
             sections.append((found.text, found.level, [line], lineno))
         else:
-            sections[-1][2].append(line)
+            *_, body, _start = sections[-1]
+            body.append(line)
 
     return _spans(sections)
 
@@ -229,7 +233,7 @@ def _title_index(sections: list[tuple[str, int, str, int, int]]) -> int:
     section, so it names its own passage like any other.
     """
     headed = [i for i, s in enumerate(sections) if s[0]]
-    if len(headed) < 2:
+    if len(headed) <= 1:
         return -1
     first = headed[0]
     heading, level, text, _, _ = sections[first]
@@ -334,7 +338,7 @@ def _fold(
         # the last section can never be carrying. Kept total rather than
         # asserted — a chunker that raises loses the document.
         out.append(
-            (carry_heading, carry_level, "\n\n".join(carry), carry_start or 1, sections[-1][4])
+            (carry_heading, carry_level, "\n\n".join(carry), carry_start or 1, sections[-1][-1])
         )
     return out
 
@@ -382,7 +386,7 @@ def _pieces(
         current, size = [], 0
 
     for paragraph in text.split("\n\n"):
-        paragraph_size = len(paragraph.encode("utf-8")) + 2
+        paragraph_size = len(paragraph.encode("utf-8")) + len("\n\n")
         # ⚠ Tables are split at EVERY size, not only when oversized. A ten-row
         # table is ten answers, and returning it whole was the coarse-citation
         # defect the measurement above found — it simply never crossed the byte
@@ -474,7 +478,7 @@ def _descend(paragraph: str, max_passage_bytes: int) -> list[tuple[str, int, str
         paragraph = out[0][0] if out else paragraph
 
     words = paragraph.split(" ")
-    if len(words) < 2:
+    if len(words) <= 1:
         return [(paragraph, paragraph.count("\n") + 1, "")]  # nothing to cut on
     out = []
     current, size = [], 0
@@ -513,7 +517,7 @@ def _table_bands(paragraph: str, rows_per_passage: int) -> list[tuple[str, int]]
     would cost more than the duplication does.
     """
     lines = paragraph.split("\n")
-    if len(lines) < 3:
+    if len(lines) < _MIN_TABLE_LINES:
         return None
     if not all(_TABLE_ROW_RE.match(line) for line in lines if line.strip()):
         return None
@@ -530,7 +534,7 @@ def _table_bands(paragraph: str, rows_per_passage: int) -> list[tuple[str, int]]
         rows = body[index : index + rows_per_passage]
         bands.append(("\n".join(prefix + rows), len(rows)))
 
-    if len(bands) < 2:
+    if len(bands) <= 1:
         return None  # nothing was gained; leave it as the ordinary case
     # The first band covers its own rows AND the header lines above them.
     first, first_span = bands[0]

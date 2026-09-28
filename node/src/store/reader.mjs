@@ -12,7 +12,7 @@ import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { INDEX_DIR, SCHEMA_ID, ANALYZER_VERSION, TF_FIELDS, shardFor } from "./format.mjs";
 
-const NL = 0x0a;
+const NL = "\n".charCodeAt(0);
 
 export function indexDir(root) { return join(root, INDEX_DIR); }
 

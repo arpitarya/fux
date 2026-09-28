@@ -25,14 +25,14 @@ const FLEN_RE = /"flen":\[([0-9,\s]*)\]/;
 //: and `at` is a flat hash -> int map with no nested object. Global, because
 //: a line carries many edges. Compiled always, matched only when the anchor
 //: field is switched on.
-const EDGE_ANCHOR_RE = /"al":(\d+),"at":\{[^}]*\},"dst":"([^"]+)"/g;
+const EDGE_ANCHOR_RE = /"al":(?<len>\d+),"at":\{[^}]*\},"dst":"(?<dst>[^"]+)"/g;
 
 function flenFromLine(text) {
   const m = FLEN_RE.exec(text);
   if (!m) return null;
   const inner = m[1].trim();
   if (!inner) return [];
-  return inner.split(",").map((p) => parseInt(p, 10));
+  return inner.split(",").map((p) => Number.parseInt(p));
 }
 
 /** Query terms as index hashes, deduped, ORDER PRESERVED.
@@ -90,8 +90,8 @@ export function scanCandidates(root, queryHashes, { scoring }) {
         EDGE_ANCHOR_RE.lastIndex = 0;
         let m;
         while ((m = EDGE_ANCHOR_RE.exec(text)) !== null) {
-          const length = parseInt(m[1], 10);
-          const dst = m[2];
+          const length = Number.parseInt(m.groups.len);
+          const dst = m.groups.dst;
           anchorLen.set(dst, (anchorLen.get(dst) ?? 0) + length);
           totalAnchorLen += length;
         }

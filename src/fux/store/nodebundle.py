@@ -243,7 +243,8 @@ class _Module:
             local if local == exported else f"{exported}: {local}"
             for local, exported in self.exports
         )
-        lines = [f"// ── {self.rel} " + "─" * max(0, 68 - len(self.rel)), f"const {var} = (() => {{"]
+        rule = "─" * max(0, fixed("bundle", "module_banner_width") - len(self.rel))
+        lines = [f"// ── {self.rel} " + rule, f"const {var} = (() => {{"]
         lines += [f"  {line}" if line else "" for line in self.prologue]
         if self.prologue:
             lines.append("")
@@ -279,19 +280,20 @@ def _order(mods: "dict[str, _Module]") -> "list[str]":
     at whichever call site runs first.
     """
     order: list[str] = []
-    state: dict[str, int] = {}
+    active: set[str] = set()
+    done: set[str] = set()
 
     def visit(rel: str, stack: "list[str]") -> None:
-        mark = state.get(rel, 0)
-        if mark == 2:
+        if rel in done:
             return
-        if mark == 1:
+        if rel in active:
             cycle = " -> ".join([*stack, rel])
             raise FuxError(f"the Node reader has an import cycle, which cannot be bundled: {cycle}")
-        state[rel] = 1
+        active.add(rel)
         for dep in sorted(set(mods[rel].deps)):
             visit(dep, [*stack, rel])
-        state[rel] = 2
+        active.discard(rel)
+        done.add(rel)
         order.append(rel)
 
     for rel in sorted(mods):
@@ -362,7 +364,7 @@ def bundle(node_dir: Path) -> str:
     entry = _module_var(ENTRY)
     exported = ", ".join(exported for _, exported in mods[ENTRY].exports)
     tail = [
-        "// ── the package surface " + "─" * 47,
+        "// ── the package surface " + "─" * fixed("bundle", "surface_rule_width"),
         f"const {{ {exported} }} = {entry};",
         f"export {{ {exported} }};",
         "",
@@ -404,7 +406,7 @@ def main(argv: "list[str] | None" = None) -> int:
     import sys
 
     args = list(sys.argv[1:] if argv is None else argv)
-    here = Path(__file__).resolve().parents[3]
+    here = Path(__file__).resolve().parent.parent.parent.parent  # the checkout root
     node_dir = Path(args[0]) if args else here / "node"
     out_dir = Path(args[1]) if len(args) > 1 else node_dir / "dist"
     written = write(node_dir, out_dir)

@@ -67,6 +67,8 @@ from pathlib import Path
 from .errors import FuxError
 from .constants import fixed
 
+_JSON_INDENT = fixed("json", "indent")
+
 __all__ = [
     "Correction",
     "CORRECTIONS_FILE",
@@ -186,11 +188,11 @@ def load_corrections(root: Path) -> list[Correction]:
     for line in text.splitlines():
         if not line.strip() or line.startswith("#"):
             continue
-        parts = line.split("\t")
-        if len(parts) < 4:
-            continue
-        question, doc_id, loc, source_sha = parts[:4]
-        pin = len(parts) > 4 and parts[4].strip() == "1"
+        try:
+            question, doc_id, loc, source_sha, *rest = line.split("\t")
+        except ValueError:
+            continue  # fewer than the four required columns
+        pin = bool(rest) and rest[0].strip() == "1"
         out.append(Correction(question, doc_id, loc, source_sha, pin))
     return out
 
@@ -517,7 +519,7 @@ def cmd_correct(args) -> int:
                             for c, why in suspended_pins(root)
                         ],
                     },
-                    indent=2,
+                    indent=_JSON_INDENT,
                 )
             )
             return 0

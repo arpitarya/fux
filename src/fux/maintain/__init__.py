@@ -22,6 +22,9 @@ from pathlib import Path
 from ..config import find_root
 from ..errors import FuxError
 from . import hooks as hooks_mod
+from ..constants import fixed
+
+_JSON_INDENT = fixed("json", "indent")
 
 __all__ = ["cmd_hooks"]
 
@@ -85,7 +88,7 @@ def cmd_daemon(args) -> int:
 
     state = daemon_mod.status(root)
     if getattr(args, "json", False):
-        print(json.dumps(state, indent=2, sort_keys=True))
+        print(json.dumps(state, indent=_JSON_INDENT, sort_keys=True))
         return 0
     if state["running"]:
         print(f"  daemon    running (pid {state['pid']})")
@@ -120,7 +123,7 @@ def cmd_hooks(args) -> int:
     if getattr(args, "status", False) or getattr(args, "json_explicit", False):
         state = hooks_mod.status(root)
         if getattr(args, "json", False):
-            print(json.dumps(state, indent=2, sort_keys=True))
+            print(json.dumps(state, indent=_JSON_INDENT, sort_keys=True))
         else:
             for name, how in sorted(state["hooks"].items()):
                 print(f"  {name:<14} {how}")
@@ -137,7 +140,7 @@ def cmd_hooks(args) -> int:
             "kept": sorted(report.kept),
             "refused": sorted(report.refused),
             "merge_driver": report.merge_driver,
-        }, indent=2, sort_keys=True))
+        }, indent=_JSON_INDENT, sort_keys=True))
         return 0
     for name in report.installed:
         print(f"  wrote  {name}")

@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@6c5f302479b2, src/fux/enrich.py@88eb1113825a, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2, node/src/correct.mjs@859349cb0ace, node/test/pins.test.mjs@daebcdb98aac]
+owns: [src/fux/correct.py@e1fba3f3079a, src/fux/enrich.py@88eb1113825a, src/fux/templates/agents/ENRICH-SKILL.md@5c384af659f2, node/src/correct.mjs@23e1a337ff92, node/test/pins.test.mjs@daebcdb98aac]
 laws: [L1, L2, L3, L4]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: a49647fbb55e5c93b2631fa75f08a1ff3513972092a4d290f78576015486d742
+content_sha: 0bf7ad60f58d0da7fc5966497f87fe07fed984e4f20d51263821606b31cb2e18
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -624,6 +624,8 @@ a missing blob already is — never a crash inside a planning command.
 
 ⚠ **This changes nothing about the boundary.** Enrichment still never runs inside
 `fux ingest`, and reading a retained blob is not a fetch.
+
+**`corrections.tsv` is read by unpacking** in both planes: four required columns, an optional pin. A short line is still skipped. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

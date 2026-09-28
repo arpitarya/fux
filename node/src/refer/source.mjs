@@ -26,13 +26,14 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { contentSha } from "../store/format.mjs";
+import { fixed } from "../config/constants.mjs";
 
 export const GIT = "git";
 export const URL = "url";
 
 export function resolve(docId) {
-  if (docId.startsWith("file:")) return [GIT, docId.slice(5)];
-  if (docId.startsWith("url:")) return [URL, docId.slice(4)];
+  if (docId.startsWith("file:")) return [GIT, docId.slice("file:".length)];
+  if (docId.startsWith("url:")) return [URL, docId.slice("url:".length)];
   return [GIT, docId];
 }
 
@@ -51,7 +52,7 @@ export function readLocal(root, relPath) {
  *  NOT rebuildable — only re-acquirable, and only while the source still
  *  exists, which is why the acquired plane has its own kind in `.fux/`. */
 export function fromAcquired(root, sha) {
-  const path = join(root, ".fux", "acquired", "objects", sha.slice(0, 2), sha);
+  const path = join(root, ".fux", "acquired", "objects", sha.slice(0, fixed("radix", "hex_digits_per_byte")), sha);
   for (const candidate of [path, path + ".md", path + ".txt", path + ".html"]) {
     if (existsSync(candidate)) {
       const raw = readFileSync(candidate);

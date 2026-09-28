@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@97f208bd1ecd, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@9876744812b5, src/fux/progress.py@10364bd02e0a, tests_e2e@8a7e8ede5b60, node/fux.mjs@b3c33c3898dc]
+owns: [src/fux/cli.py@f50a10b03f00, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@a40b79256420, src/fux/progress.py@10364bd02e0a, tests_e2e@8a7e8ede5b60, node/fux.mjs@b3c33c3898dc]
 laws: [L1, L4, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 35be4225775c4f6dc6d243907f0adf533256e44286f7c6e727ba396913de37a8
+content_sha: ad6668cca1f1eb402efea9e6cfa7b47cefe6a3e9e470586c5507d1dd9c2e31b8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1308,6 +1308,8 @@ nobody wrote.
 **`.fux/formats.toml` is required, so the e2e suite's hand-built repos write it through `write_config`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27); no verb's surface changed ([SR-TYPES](0128_types-list.md) decision 14).
 
 **`fux inspect --top` no longer defaults to 20 in the parser** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): absent, it is `.fux/inspect.toml [report] top` ([SR-INSPECT](0156_inspect.md) decision 23).
+
+**Decision 5's two process codes are `constants.toml [exit]`** — `usage = 2` (argparse's, and the merge driver's) and `interrupted = 130` (Ctrl-C); `FuxError`'s `1` is unchanged. `--diff`'s arity is its metavar's length, and a verb's elapsed milliseconds are `timedelta` arithmetic. Every `--json` payload is indented by `[json] indent`. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

@@ -60,6 +60,9 @@ from ..query.rank import AskResult, Corpus, rank
 from ..query.scan import query_term_hashes
 from ..query.rank import Weighting
 from . import format as fmt
+from ..constants import fixed
+
+_SCORE_DIGITS = fixed("ranking", "score_digits")
 
 __all__ = ["ask", "accel_candidates", "block_bound", "is_fresh", "Runtime"]
 
@@ -148,20 +151,15 @@ class Runtime:
         count = len(buf) // fmt.ENTRY_SIZE
         key = bytes.fromhex(term)
 
-        lo, hi = 0, count
-        while lo < hi:  # first entry whose term >= key
-            mid = (lo + hi) // 2
-            if fmt.unpack_entry(buf, mid)[0] < key:
-                lo = mid + 1
-            else:
-                hi = mid
+        # first entry whose term >= key
+        lo = bisect_left(range(count), key, key=lambda i: fmt.unpack_entry(buf, i)[0])
 
         out: list[Block] = []
         while lo < count:
             raw = fmt.unpack_entry(buf, lo)
             if raw[0] != key:
                 break
-            out.append(Block(term, raw[1], raw[2], raw[3], raw[4], raw[5], raw[6], raw[7], raw[8]))
+            out.append(Block(term, *raw[1:]))
             lo += 1
         return out
 
@@ -472,7 +470,7 @@ def _cannot_reach(
         return False
     # Rounding-aware: `rank()` compares round(score, 9), so a bound that merely
     # falls below theta could still tie after rounding and win on id.
-    return round(ceiling, 9) < round(theta, 9)
+    return round(ceiling, _SCORE_DIGITS) < round(theta, _SCORE_DIGITS)
 
 
 def _kth_score(

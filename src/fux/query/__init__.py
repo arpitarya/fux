@@ -60,6 +60,8 @@ from .rank import AskResult, Weighting
 from .scan import ask as scan_ask
 from ..constants import fixed
 
+_JSON_INDENT = fixed("json", "indent")
+
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from ..tune import Tune
 
@@ -565,7 +567,7 @@ def _emit(payload: dict, shape: str, *, band_requested: bool = False) -> None:
         label=f"--json {shape}",
         conditions={"band_requested": lambda _payload: band_requested},
     )
-    print(json_mod.dumps(payload, indent=2))
+    print(json_mod.dumps(payload, indent=_JSON_INDENT))
 
 
 def _root() -> Path:
@@ -1079,7 +1081,7 @@ def _ask_shaped(args, *, compose: bool) -> int:
             payload["path"] = path
         if why is not None:
             payload["derivation"] = why.as_dict()
-        print(json_mod.dumps(payload, indent=2))
+        print(json_mod.dumps(payload, indent=_JSON_INDENT))
         _declare_pinned(results)
         _declare_archived(results)
         _note_run(args, results, related, block)
@@ -1378,7 +1380,7 @@ def cmd_find(args) -> int:
         # is why the schema makes it conditional rather than optional-in-prose.
         if block is not None and _show_band(args):
             payload["confidence"] = block.as_dict()
-        print(json_mod.dumps(payload, indent=2))
+        print(json_mod.dumps(payload, indent=_JSON_INDENT))
         _declare_archived(results)
         return 0
 
@@ -1659,7 +1661,7 @@ def cmd_verify(args) -> int:
 
     result = provenance.verify(root, payload, rerun=rerun)
     if args.json:
-        print(json_mod.dumps(result.as_dict(), indent=2))
+        print(json_mod.dumps(result.as_dict(), indent=_JSON_INDENT))
     else:
         print(result.verdict + (f" — {result.note}" if result.note else ""))
     return 0 if result.verdict == provenance.REPRODUCED else 1

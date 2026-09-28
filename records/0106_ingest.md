@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7628e166356, src/fux/ingest@299733a41fad, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@1420b552a4c5, node/src/ingest/priors.mjs@11df69775da1]
+owns: [src/fux/ingest/ingestlog.py@bfcf869ecad7, src/fux/ingest@34b1adcd1889, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@1420b552a4c5, node/src/ingest/priors.mjs@11df69775da1]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: bd02d6c180ceca9af4a1954fd847efca31770eee32059a7c606567c74573933c
+content_sha: 4104cbeef535ea051719dd1667cf6025c118434a3bbf938402a5c14f18ffa626
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -986,6 +986,8 @@ The Node reader's `dirsFile` no longer falls back to `.fux/sources/dirs`.
 **The refusal scan's bounds are `.fux/refusals.toml [scan]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27); `refusals.load` returns them on the `RuleSet` the fetch path already passes ([SR-REFUSAL](0146_refusals.md) decision 9a).
 
 **Ingest's parsers hold no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `pii.py`'s checksum tables are `constants.toml [pii.luhn]` and `[pii.verhoeff]`; `fuxignore.py` and `typesfile.py` measure their own tokens (`len("**/")`, named regex groups). Every extracted byte is unchanged.
+
+**Ingest's line formats are read by unpacking, not by index**: `REGISTER`'s five columns, the queue's two-or-three, a link's text and target by named regex groups. A consumer decoder's or fetcher's digest keeps 16 hex digits of its sha256 through `constants.toml [decoders] digest_hex`. REGISTER's bytes are unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

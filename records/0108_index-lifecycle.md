@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@63c3999c7211, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@f47fa69ecb2c]
+owns: [src/fux/store@6210d4ec321f, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@4828d8b0b5f3]
 laws: [L1, L2, L3, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: b469f136048d02a08f2ee30b792c99fee4431ec4a4696cc14d9087f761c08929
+content_sha: 985a154d8f74d48aa3be645f62341f9b8fbee9f0c13afd2f0713385886062d47
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -560,6 +560,8 @@ the three to be merged, did not.
   stops being mistaken for a truncated one.
 
 **`acquired.DEFAULT_MAX_BYTES` is deleted** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `evict` takes `max_bytes` as a required argument, read from `[sources.url] acquired_max_bytes` ([SR-ACQUIRED](0145_acquired-plane.md) decision 8, [SR-CONFIG](0113_config.md) decision 17).
+
+**A shard's one header line is `constants.toml [index] shard_header_lines`**, which every reader that numbers record lines now counts from; the writer's shard set is `range([index] shards)`, and Node's newline byte is `"\n".charCodeAt(0)`. No committed byte moved. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

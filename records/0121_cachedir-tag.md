@@ -10,7 +10,7 @@ feature: the `CACHEDIR.TAG` file written into every derived `.fux/` subdirectory
 owns: []
 laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: e7f86efb3307fe25b8976675e13bd8d4f7b82c1f1928cd561dff9a44b0cbeb62
+content_sha: 5b3294bf0f8458b5c8ec6c85d78d881b9962e18d5925bffab99f1a69a17256e1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -139,6 +139,8 @@ this moved where they are written, not what they are.
 - `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`
 
 <!-- L12-VALUES-END -->
+
+**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 ### Consequences
 

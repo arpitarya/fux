@@ -5,6 +5,9 @@
  * weights and forgets `k1` reweights half a formula.
  */
 import { TF_FIELDS } from "../store/format.mjs";
+import { fixed } from "../config/constants.mjs";
+
+const IDF_OFFSET = fixed("bm25f", "idf_offset");
 
 //: `k1`, `b`, the five field weights and `anchor` are `.fux/tune.toml [bm25f]`'s
 //: and arrive on a `Scoring` built by `config/tune.mjs` (L12). Why each is what
@@ -35,7 +38,7 @@ export class Scoring {
  *  inputs (Phase 0, measured on darwin and glibc). **Every difference is one
  *  ulp and none survives `round(9)`**, which is the sort key's own resolution
  *  — SR-RANKING decision 8a. This is the tolerance Arpit ruled, option (b). */
-export function idf(df, n) { return Math.log((n - df + 0.5) / (df + 0.5) + 1); }
+export function idf(df, n) { return Math.log((n - df + IDF_OFFSET) / (df + IDF_OFFSET) + 1); }
 
 /** The BM25F numerator for one term in one document.
  *  `tf` may be shorter than `weights` — trailing zeros are omitted on the wire,

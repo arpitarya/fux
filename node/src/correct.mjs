@@ -46,10 +46,9 @@ export function loadCorrections(root) {
   const out = [];
   for (const line of text.split("\n")) {
     if (!line.trim() || line.startsWith("#")) continue;
-    const parts = line.split("\t");
-    if (parts.length < 4) continue;
-    const [question, docId, loc, sourceSha] = parts;
-    out.push({ question, docId, loc, sourceSha, pin: parts.length > 4 && parts[4].trim() === "1" });
+    const [question, docId, loc, sourceSha, pin] = line.split("\t");
+    if (sourceSha === undefined) continue; // fewer than the four required columns
+    out.push({ question, docId, loc, sourceSha, pin: pin !== undefined && pin.trim() === "1" });
   }
   return out;
 }

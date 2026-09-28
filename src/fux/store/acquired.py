@@ -55,6 +55,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from ..constants import fixed
 
+_JSON_INDENT = fixed("json", "indent")
+
+#: Objects fan out by their sha's first byte, like the index shards.
+_FANOUT = fixed("radix", "hex_digits_per_byte")
+_SHA_HEX = len(hashlib.sha256().hexdigest())
+
 #: The plane's directory name under `.fux/`.
 DIR_NAME = fixed("acquired", "dir")
 
@@ -127,7 +133,7 @@ def blob_path(root: Path, sha: str, ext: str = "") -> Path:
     """`objects/<sha[:2]>/<sha><ext>` — sharded like the index, for the same
     reason: one directory holding ten thousand files is a directory no tool
     enjoys walking."""
-    return plane(root) / OBJECTS_DIR / sha[:2] / f"{sha}{ext}"
+    return plane(root) / OBJECTS_DIR / sha[:_FANOUT] / f"{sha}{ext}"
 
 
 def sha_of(raw: bytes) -> str:
@@ -159,7 +165,7 @@ def read_manifest(root: Path) -> dict[str, Blob]:
         if not isinstance(rec, dict):
             continue
         sha = rec.get("sha")
-        if not isinstance(sha, str) or len(sha) != 64:
+        if not isinstance(sha, str) or len(sha) != _SHA_HEX:
             continue
         out[url] = Blob(
             url=url,
@@ -181,7 +187,7 @@ def stored(root: Path, url: str) -> Path | None:
     blob = read_manifest(root).get(url)
     if blob is None:
         return None
-    for path in plane(root).joinpath(OBJECTS_DIR, blob.sha[:2]).glob(f"{blob.sha}*"):
+    for path in plane(root).joinpath(OBJECTS_DIR, blob.sha[:_FANOUT]).glob(f"{blob.sha}*"):
         return path
     return None
 
@@ -244,7 +250,7 @@ def write_manifest(root: Path, blobs: dict[str, Blob]) -> None:
         "schema": SCHEMA,
         "entries": {url: blobs[url].as_json() for url in sorted(blobs)},
     }
-    text = json.dumps(body, indent=2, sort_keys=True) + "\n"
+    text = json.dumps(body, indent=_JSON_INDENT, sort_keys=True) + "\n"
     fd, tmp = tempfile.mkstemp(dir=str(path.parent), suffix=".part")
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as handle:

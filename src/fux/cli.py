@@ -11,9 +11,11 @@ from __future__ import annotations
 import argparse
 import sys
 import time
+from datetime import timedelta
 from pathlib import Path
 
 from . import __version__
+from .constants import fixed
 from .errors import FuxError
 
 
@@ -395,7 +397,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_inspect.add_argument(
         "--diff",
-        nargs=2,
+        nargs=len(("A", "B")),
         metavar=("A", "B"),
         default=None,
         help="compare two report.json files per document; edge loss is always an alert. Writes nothing",
@@ -1123,8 +1125,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {exc}", file=sys.stderr)
         code = exc.exit_code
     except KeyboardInterrupt:
-        return 130
-    _observe(args, argv, int((time.monotonic() - started) * 1000))
+        return fixed("exit", "interrupted")
+    _observe(args, argv, int(timedelta(seconds=time.monotonic() - started) / timedelta(milliseconds=1)))
     return code
 
 

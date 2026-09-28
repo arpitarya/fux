@@ -50,6 +50,8 @@ import json
 import sys
 from pathlib import Path
 
+from ..constants import fixed
+
 __all__ = ["merge_shards", "main", "MergeConflict"]
 
 
@@ -209,11 +211,12 @@ def main(argv: list[str] | None = None) -> int:
 
     _stdio_utf8()
     argv = list(sys.argv[1:] if argv is None else argv)
-    if len(argv) < 3:
+    try:
+        ancestor, ours, theirs, *rest = argv  # git's %O %A %B, then %P when given
+    except ValueError:
         print("usage: fux-merge-index <ancestor> <ours> <theirs> [pathname]", file=sys.stderr)
-        return 2
-
-    ancestor, ours, theirs = (Path(a) for a in argv[:3])
+        return fixed("exit", "usage")
+    ancestor, ours, theirs = Path(ancestor), Path(ours), Path(theirs)
 
     # 🔴 **`.fux/index/REGISTER` is merged too, and by a different rule** (W-199
     # D4, 2026-09-20). It is a committed TSV, one sorted line per indexed
@@ -228,7 +231,7 @@ def main(argv: list[str] | None = None) -> int:
     # shard, where two sides editing one document at the same revision is a real
     # disagreement about content.
     # `%P` when git supplied it; `%A`'s name is a temp file and cannot answer.
-    pathname = argv[3] if len(argv) > 3 else ""
+    pathname = rest[0] if rest else ""
     if pathname.endswith(_REGISTER_NAME):
         ours.write_text(
             _merge_register(

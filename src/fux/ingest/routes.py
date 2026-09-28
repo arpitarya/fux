@@ -125,7 +125,8 @@ def _matches(pattern: str, compiled: re.Pattern[str] | None, host: str) -> bool:
         # ⚠ **A wildcard does NOT match the apex**, and this is the first thing
         # a consumer gets wrong. `*.example.com` matches `a.example.com` and not
         # `example.com`; the apex needs its own row.
-        return host.endswith(pattern[1:]) and host != pattern[2:]
+        apex = pattern.removeprefix("*.")
+        return host.endswith("." + apex) and host != apex
     return host == pattern
 
 

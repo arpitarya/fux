@@ -16,6 +16,9 @@
  * Owned, with its Python twin, by [SR-CHUNKING](../../../records/0151_chunking.md).
  */
 import { headings } from "../decode/markdown.mjs";
+import { fixed } from "../config/constants.mjs";
+
+const MIN_TABLE_LINES = fixed("markdown", "min_table_lines");
 
 //: The three passage bounds are `.fux/tune.toml [refer]`'s and arrive from the
 //: caller's `Tune` (L12). Why each is what the template ships — one row per
@@ -45,7 +48,7 @@ function sections(content) {
   for (let i = 0; i < lines.length; i++) {
     const found = starts.get(i + 1);
     if (found !== undefined) acc.push([found.text, found.level, [lines[i]], i + 1]);
-    else acc[acc.length - 1][2].push(lines[i]);
+    else { const [, , body] = acc[acc.length - 1]; body.push(lines[i]); }
   }
 
   const out = [];
@@ -67,7 +70,7 @@ function sections(content) {
 function titleIndex(secs) {
   const headed = [];
   for (let i = 0; i < secs.length; i++) if (secs[i][0]) headed.push(i);
-  if (headed.length < 2) return -1;
+  if (headed.length <= 1) return -1;
   const first = headed[0];
   const [, level, text] = secs[first];
   if (text.trim() !== text.trim().split("\n")[0].trim()) return -1;  // has a body
@@ -113,7 +116,7 @@ function fold(secs, minPassageBytes) {
   if (carry.length) {
     // Unreachable — a section only carries when a DEEPER one follows it. Kept
     // total rather than asserted: a chunker that raises loses the document.
-    out.push([carryHeading, carryLevel, carry.join("\n\n"), carryStart || 1, secs[secs.length - 1][4]]);
+    out.push([carryHeading, carryLevel, carry.join("\n\n"), carryStart || 1, secs[secs.length - 1].at(-1)]);
   }
   return out;
 }
@@ -122,7 +125,7 @@ function fold(secs, minPassageBytes) {
  *  The header and its separator are repeated into every band. */
 function tableBands(paragraph, rowsPerPassage) {
   const lines = paragraph.split("\n");
-  if (lines.length < 3) return null;
+  if (lines.length < MIN_TABLE_LINES) return null;
   for (const line of lines) if (line.trim() && !TABLE_ROW_RE.test(line)) return null;
 
   const header = lines[0];
@@ -136,7 +139,7 @@ function tableBands(paragraph, rowsPerPassage) {
     const rows = body.slice(i, i + rowsPerPassage);
     bands.push([[...prefix, ...rows].join("\n"), rows.length]);
   }
-  if (bands.length < 2) return null;   // nothing gained; leave it ordinary
+  if (bands.length <= 1) return null;   // nothing gained; leave it ordinary
   bands[0] = [bands[0][0], bands[0][1] + prefix.length];
   return bands;
 }
@@ -169,7 +172,7 @@ function descend(paragraph, maxPassageBytes) {
   }
 
   const words = paragraph.split(" ");
-  if (words.length < 2) return [[paragraph, countNl(paragraph) + 1, ""]];
+  if (words.length <= 1) return [[paragraph, countNl(paragraph) + 1, ""]];
   const out = [];
   let current = [], size = 0;
   for (const word of words) {
@@ -201,7 +204,7 @@ function pieces(text, maxPassageBytes, tableRowsPerPassage) {
   };
 
   for (const paragraph of text.split("\n\n")) {
-    const paragraphSize = nbytes(paragraph) + 2;
+    const paragraphSize = nbytes(paragraph) + "\n\n".length;
     // ⚠ Tables split at EVERY size, not only when oversized. A ten-row table
     // is ten answers, and it simply never crossed the byte ceiling to be
     // noticed — that was the coarse-citation defect.

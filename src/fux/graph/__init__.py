@@ -31,6 +31,9 @@ from . import plane as plane_mod
 from . import walk as walk_mod
 from .model import TAG_PREFIX
 from .walk import expand, routes
+from ..constants import fixed
+
+_JSON_INDENT = fixed("json", "indent")
 
 __all__ = ["cmd_explain", "cmd_graph", "cmd_path"]
 
@@ -141,7 +144,7 @@ def cmd_explain(args) -> int:
         # straight through to the empty answer.
         _refuse_unknown(root, plane, doc_id, flag="")
         if args.json:
-            print(json_mod.dumps({"doc": doc_id, "edges": [], "community": None}, indent=2))
+            print(json_mod.dumps({"doc": doc_id, "edges": [], "community": None}, indent=_JSON_INDENT))
         else:
             print(f"{doc_id} has no recorded relationships.")
         return 0
@@ -156,7 +159,7 @@ def cmd_explain(args) -> int:
                     ],
                     "community": label,
                 },
-                indent=2,
+                indent=_JSON_INDENT,
             )
         )
         return 0
@@ -304,7 +307,7 @@ def cmd_graph(args) -> int:
     ]
 
     if args.json:
-        print(json_mod.dumps({"nodes": nodes}, indent=2))
+        print(json_mod.dumps({"nodes": nodes}, indent=_JSON_INDENT))
         return 0
 
     if not nodes:
@@ -369,7 +372,7 @@ def cmd_path(args) -> int:
                     # claim, not an absence (W-48).
                     "truncated": truncated,
                 },
-                indent=2,
+                indent=_JSON_INDENT,
             )
         )
         return 0

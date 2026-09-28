@@ -7,10 +7,10 @@ description: "Fetched source bytes are retained in .fux/acquired/, a third categ
 status: accepted
 date: 2026-09-01
 feature: the acquired plane
-owns: [src/fux/store/acquired.py@a0a92b358251]
+owns: [src/fux/store/acquired.py@aa145d42bb5d]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 3344a93445fa946565e71332c08e0294b5ee0cece77b1dfba95c9001ee645f94
+content_sha: c93a57c63bc8b1c2615ed7722b01afd3f6ab5db48729a2953ff59cf778570917
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -309,6 +309,8 @@ this moved where they are written, not what they are.
 - `src/fux/store/fuxdir.py` — `FUX_DIR` ← `[fuxdir] dir`, `GENERATED_FILES` ← `[fuxdir] generated`, `CACHEDIR_SIGNATURE` ← `[fuxdir] cachedir_signature`, `NODE_DIR` ← `[bundle] dir`, `NODE_ENTRY` ← `[bundle] entry`, `NODE_SHIM` ← `[bundle] shim`
 
 <!-- L12-VALUES-END -->
+
+**Acquired objects fan out by `constants.toml [radix] hex_digits_per_byte`**, a manifest sha is checked against sha256's own hex length, and the manifest is indented by `[json] indent`. The plane's layout is unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

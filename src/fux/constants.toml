@@ -30,6 +30,11 @@ tf_fields        = ["body", "heading", "title", "path", "ctx"]
 # blake2b digest sizes, in bytes: the postings key, the ledger sha.
 term_hash_bytes  = 8
 content_sha_bytes = 20
+# Every shard file opens with one header line; records follow it.
+shard_header_lines = 1
+# How deep a committed record may nest (store/canonical.py). Deeper is refused,
+# so a different bound changes which records are legal.
+max_record_depth = 64
 # Digests and ledgers committed beside the shards.
 pii_digest            = "pii-digest"
 extract_config_digest = "extract-config-digest"
@@ -90,6 +95,9 @@ regex_prefix = "re:"
 
 [decoders]
 builtin_prefix = "built-in:"
+# A consumer decoder's digest and a fetcher's: `<name>@sha:` and this many hex
+# digits of the sha256 of its source. It is written into REGISTER.
+digest_hex     = 16
 consumer_dir   = ".fux/decoders"
 # Sorted and explicit, never discovered: dispatch must not depend on
 # filesystem order (L3).
@@ -223,6 +231,12 @@ dir      = "node"
 entry    = "fux.mjs"
 shim     = "fux"
 sidecars = ["package.json", "mcp-tools.json", "README.md"]
+# chmod bits of the generated `fux` shim: rwxr-xr-x.
+shim_mode = 0o755
+# The rule after a module's banner in the generated bundle, and after the
+# package-surface banner (store/nodebundle.py). The bundle is committed bytes.
+module_banner_width = 68
+surface_rule_width  = 47
 
 [acquired]
 dir         = "acquired"
@@ -251,6 +265,10 @@ runner_stop      = "runner.stop"
 runner_status    = "runner.status"
 url_state        = "url-state.json"
 url_state_schema = "state.schema.json"
+# A remembered question is stored as this many hex digits of its sha256.
+question_key_hex = 16
+# chmod bits of the runner's write lock.
+lock_mode = 0o644
 
 [hooks]
 # Written into .git -- how fux recognises its own hooks and merge driver.
@@ -265,6 +283,12 @@ no_spawn       = "FUX_NO_SPAWN"
 
 [mcp]
 protocol_version = "2024-11-05"
+# JSON-RPC 2.0's reserved error codes (mcp.py, verbs/mcp.mjs).
+parse_error      = -32700
+invalid_params   = -32602
+method_not_found = -32601
+# fux_search's score and fux_related's mass are rounded to this many digits.
+score_digits     = 6
 
 [receipt]
 statement_type = "https://in-toto.io/Statement/v1"
@@ -481,6 +505,8 @@ max_heading  = 6
 # A record's heading inside a multi-record document (a JSON array, a JSONL
 # line, a mailbox message): one level below the document's H1.
 record_level = 2
+# A pipe table is a header row, a delimiter row and at least one body row.
+min_table_lines = 3
 
 [decoders.rtf.format]
 # RTF's \uN is a signed 16-bit value; a code point above 32767 is written as
@@ -493,3 +519,29 @@ unicode_wrap = 65536
 title_level      = 1
 subtitle_level   = 2
 unnumbered_level = 2
+
+[bm25f]
+# Robertson-Sparck Jones idf smoothing: log((n - df + k) / (df + k) + 1).
+idf_offset = 0.5
+
+[observe]
+# An observer call's argument hash: this many hex digits of a sha256.
+args_hash_hex = 16
+
+[refer]
+# A fetch-cache entry's file name: this many hex digits of the loc's sha256.
+cache_key_hex = 32
+# The ARC ghost lists are bounded at max_bytes // arc_ghost_bytes entries --
+# the bytes one remembered key is assumed to cost.
+arc_ghost_bytes = 64
+
+[exit]
+# Process exit codes beyond FuxError's 1 (SR-CLI decisions 4 and 5).
+usage       = 2    # a malformed command line -- argparse's own code
+interrupted = 130  # 128 + SIGINT: the shell's convention for Ctrl-C
+
+[win32]
+# Windows API constants the runner's liveness check passes and compares
+# (maintain/runner.py): OpenProcess access right, WaitForSingleObject result.
+synchronize  = 0x00100000
+wait_timeout = 258

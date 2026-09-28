@@ -30,6 +30,8 @@ from __future__ import annotations
 from pathlib import Path
 from ..constants import fixed
 
+_JSON_INDENT = fixed("json", "indent")
+
 FUX_DIR = fixed("fuxdir", "dir")
 
 #: Declared children of `.fux/` — name -> one-line description for the README.
@@ -458,7 +460,7 @@ _NODE_MODULES = "node_modules"
 
 #: `chmod` bits for the shim -- readable and executable by everyone who can read
 #: the repo, which is the same set that can read the index it queries.
-_SHIM_MODE = 0o755
+_SHIM_MODE = fixed("bundle", "shim_mode")
 
 _SHIM = """#!/bin/sh
 # Vendored by `fux setup`. Runs the Node read plane against this repository.
@@ -520,7 +522,8 @@ def _node_source():
     packaged = resources.files("fux") / "templates" / NODE_DIR
     if packaged.is_dir():
         return packaged
-    checkout = Path(__file__).resolve().parents[3] / NODE_DIR
+    # src/fux/store/fuxdir.py -> the checkout root, three directories up
+    checkout = Path(__file__).resolve().parent.parent.parent.parent / NODE_DIR
     if checkout.is_dir():
         return checkout
     from ..errors import FuxError
@@ -597,7 +600,7 @@ def _workspace_manifest(version: str) -> bytes:
             ),
             "dependencies": {"fux-engine": version},
         },
-        indent=2,
+        indent=_JSON_INDENT,
     ).encode("utf-8") + b"\n"
 
 

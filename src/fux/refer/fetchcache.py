@@ -98,7 +98,7 @@ class FetchCache:
 
     def _path(self, loc: str) -> Path:
         # Hashed filename: a `loc` is a URL and contains `/`, `?` and `:`.
-        digest = hashlib.sha256(loc.encode("utf-8")).hexdigest()[:32]
+        digest = hashlib.sha256(loc.encode("utf-8")).hexdigest()[: fixed("refer", "cache_key_hex")]
         return self.directory / f"{digest}.json"
 
     def now(self) -> int:

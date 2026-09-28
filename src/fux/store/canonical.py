@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import unicodedata
 
+from ..constants import fixed
 from ..errors import FuxError
 
 # Legal JSON, hostile to every line-oriented tool downstream (git diff, the
@@ -18,7 +19,9 @@ from ..errors import FuxError
 # Keep shard files strictly one-record-per-`\n` at the character level too.
 _HOSTILE_LINE_BREAKS = (" ", " ", "")
 
-_MAX_DEPTH = 64
+#: How deep a committed record may nest -- a record deeper than this is refused,
+#: so changing it changes which records are legal (`constants.toml [index]`).
+_MAX_DEPTH = fixed("index", "max_record_depth")
 
 
 def canonical_dumps(record: dict) -> bytes:

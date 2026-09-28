@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@e32e7938ff39, src/fux/store/nodebundle.py@edf4f3342364]
+owns: [node@500a74b692bc, src/fux/store/nodebundle.py@de287c53d973]
 laws: [L1, L3, L4, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: d18efe00dbdfbd99f1b3a4529eddfe9aca4b0d63b922c78a37c98a9e60511374
+content_sha: 7abddbf38ee1d6cd39b37d1d807e6b6b4f919a162ebe78c0295e7ab319e6ecd3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -900,6 +900,8 @@ this moved where they are written, not what they are.
 **`alreadyTextGlobs` stays tolerant of an absent `formats.toml`** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27): the file is now required for `fux ingest`, but this read is on the query path, where the fallback costs a conservative skip and never a wrong citation ([SR-TYPES](0128_types-list.md) decision 14).
 
 **The three transcriptions hold no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `hash/blake2b.mjs` reads RFC 7693's IV, message schedule, G steps, rotations and block layout from `constants.toml [blake2b]`, and does its carry, rotation and little-endian reads without a bare number. It matches `hashlib` and `node:crypto` on 154 inputs and is as fast as before (about 4 us per term key). `compat/pyfloat.mjs` reads CPython's `repr` thresholds from `[pyfloat]` and the sort-key resolution from `[ranking] score_digits`; it matches the old version on 2.4 million comparisons. `config/toml.mjs` cannot read the file it parses, so it measures its own tokens instead: TOML's escape widths are in its regexes, `Number` reads a `0x`/`0o`/`0b` prefix, and it exports `BOM`. It parses all 36 TOML inputs checked exactly as before.
+
+**The bundler holds no numeral**: its banner rules are `constants.toml [bundle] module_banner_width` and `surface_rule_width`, the import walk marks modules with two sets instead of `0/1/2`, and the checkout root is four `.parent`s up. HEAD's bundler and this one produce the same `fux.mjs` byte for byte. Node's verbs indent `--json` by `[json] indent`, and `store/reader.mjs`, `query/scan.mjs`, `refer/chunk.mjs`, `refer/source.mjs`, `correct.mjs` and `query/bm25f.mjs` lost their numerals as their Python twins did. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

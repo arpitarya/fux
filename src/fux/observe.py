@@ -61,11 +61,14 @@ import hashlib
 import importlib.util
 import io
 import os
+from datetime import timedelta
 import sys
 import threading
 from dataclasses import dataclass, field
 from pathlib import Path
 from .constants import fixed
+
+_JSON_INDENT = fixed("json", "indent")
 
 __all__ = ["CONSUMER_DIR", "Record", "args_hash", "dispatch", "observers_in"]
 
@@ -222,7 +225,7 @@ def args_hash(argv: list[str]) -> str:
         flags.append(token)
         i += 1
     normalised = " ".join([verb, *sorted(flags)]).strip()
-    return hashlib.sha256(normalised.encode("utf-8")).hexdigest()[:16]
+    return hashlib.sha256(normalised.encode("utf-8")).hexdigest()[: fixed("observe", "args_hash_hex")]
 
 
 def observers_in(root: Path) -> list[Path]:
@@ -314,7 +317,7 @@ def _run_one(path: Path, record: Record, *, max_ms: int) -> bool:
     # observer running, because Python cannot safely interrupt arbitrary code.
     thread = threading.Thread(target=call, name=f"fux-observe-{path.name}", daemon=True)
     thread.start()
-    if not done.wait(timeout=max(max_ms, 0) / 1000.0):
+    if not done.wait(timeout=timedelta(milliseconds=max(max_ms, 0)).total_seconds()):
         _debug(f"observer {path.name} exceeded [observe] max_ms={max_ms}; abandoned")
         return False
     if failure:
@@ -360,7 +363,7 @@ def _record_liveness(root: Path, present: list[str], fired: list[str]) -> None:
         directory = derive_fmt.runtime_dir(root)
         directory.mkdir(parents=True, exist_ok=True)
         (directory / LIVENESS_NAME).write_text(
-            json.dumps({"present": sorted(present), "fired": sorted(fired)}, indent=2) + "\n",
+            json.dumps({"present": sorted(present), "fired": sorted(fired)}, indent=_JSON_INDENT) + "\n",
             encoding="utf-8",
         )
     except Exception:  # pragma: no cover - liveness must not fail a verb

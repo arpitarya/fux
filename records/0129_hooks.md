@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@7deaa2a852ed, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@a448d8e2f6f5]
+owns: [src/fux/maintain@a778422a81fd, tools/maintenance-bench@23a6ade137a5, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@a448d8e2f6f5]
 laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 4a12e39692cccf4c93c10a0b583bfcda5d405ad2739d57563e75acf8566ab028
+content_sha: 03f410fc5c972db5f130d001efd4d23e9b2273f7897d29ad3ebda48c418ac25d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -615,6 +615,8 @@ this moved where they are written, not what they are.
 - `src/fux/maintain/urlstate.py` — `STATE_NAME` ← `[maintain] url_state`, `SCHEMA_NAME` ← `[maintain] url_state_schema`
 
 <!-- L12-VALUES-END -->
+
+**The maintenance plane's fixed numbers are `constants.toml` keys**: a remembered question's key width (`[maintain] question_key_hex`), the write lock's mode (`[maintain] lock_mode`), and the two Windows API constants the liveness check uses (`[win32]`). Its tunables (poll, timeout, passes, streak) are stage 5e's. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

@@ -89,6 +89,9 @@ from .config import (
 )
 from .errors import FuxError
 from .ingest import fuxignore, sourcelist, typesfile
+from .constants import fixed
+
+_JSON_INDENT = fixed("json", "indent")
 
 # -- which list, and where it lives ----------------------------------------
 
@@ -1436,7 +1439,7 @@ def _check(root: Path, entry: str | None, *, as_json: bool = False) -> int:
                     "fresh": fresh,
                     "unchecked_urls": unverified,
                 },
-                indent=2,
+                indent=_JSON_INDENT,
                 sort_keys=True,
             )
         )

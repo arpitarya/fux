@@ -120,8 +120,13 @@ RUNTIME_SCHEMA = fixed("runtime", "schema")
 #:
 #: Entry grows 40 B -> 62 B. The offset table is derived and disposable, so
 #: this costs disk in `.fux/runtime/` and nothing in git.
-_FIELD_COUNT = 5
-ENTRY_STRUCT = struct.Struct("<8sHQI" + f"{_FIELD_COUNT}H" + f"{_FIELD_COUNT}I" + "IIH")
+#: One `mx`/`mnw` slot per tf field, in `[index] tf_fields` order; the key is
+#: the term hash, `[index] term_hash_bytes` wide.
+_FIELD_COUNT = len(fixed("index", "tf_fields"))
+_TERM_BYTES = fixed("index", "term_hash_bytes")
+#: A postings shard is the term hash's first byte, as hex.
+_PREFIX_CHARS = fixed("radix", "hex_digits_per_byte")
+ENTRY_STRUCT = struct.Struct(f"<{_TERM_BYTES}sHQI{_FIELD_COUNT}H{_FIELD_COUNT}IIIH")
 ENTRY_SIZE = ENTRY_STRUCT.size  # 62
 
 #: Every key the doc table carries. **Part of the runtime contract, checked by
@@ -194,7 +199,7 @@ def offsets_path(root: Path, prefix: str) -> Path:
 
 def term_prefix(term_hash: str) -> str:
     """Postings shard for a term — its hash's first byte, mirroring the store."""
-    return term_hash[:2]
+    return term_hash[:_PREFIX_CHARS]
 
 
 def pack_entry(
@@ -216,11 +221,8 @@ def pack_entry(
 
 def unpack_entry(buf, index: int):
     """`(term, block_no, offset, length, mx_tuple, mnw_tuple, first, last, count)`."""
-    raw = ENTRY_STRUCT.unpack_from(buf, index * ENTRY_SIZE)
-    n = _FIELD_COUNT
-    return (
-        raw[0], raw[1], raw[2], raw[3],
-        raw[4 : 4 + n],
-        raw[4 + n : 4 + 2 * n],
-        raw[4 + 2 * n], raw[5 + 2 * n], raw[6 + 2 * n],
+    term, block_no, offset, length, *fields, first, last, count = ENTRY_STRUCT.unpack_from(
+        buf, index * ENTRY_SIZE
     )
+    mx, mnw = tuple(fields[:_FIELD_COUNT]), tuple(fields[_FIELD_COUNT:])
+    return term, block_no, offset, length, mx, mnw, first, last, count

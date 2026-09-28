@@ -30,6 +30,15 @@ from pathlib import Path
 from .errors import FuxError
 from .constants import fixed
 
+_JSON_INDENT = fixed("json", "indent")
+
+#: JSON-RPC 2.0's reserved error codes and the MCP score resolution --
+#: `constants.toml [mcp]`, read by both planes.
+_PARSE_ERROR = fixed("mcp", "parse_error")
+_INVALID_PARAMS = fixed("mcp", "invalid_params")
+_METHOD_NOT_FOUND = fixed("mcp", "method_not_found")
+_SCORE_DIGITS = fixed("mcp", "score_digits")
+
 PROTOCOL_VERSION = fixed("mcp", "protocol_version")
 
 def _k_property(top: int) -> dict:
@@ -212,7 +221,7 @@ def _search(root: Path, args: dict, *, top: int, max_headings: int) -> dict:
             {
                 "path": r.loc,
                 "title": r.title,
-                "score": round(r.score, 6),
+                "score": round(r.score, _SCORE_DIGITS),
                 # The hash the ranking was computed against. An agent that
                 # reads the file and gets a different sha knows the index is
                 # behind WITHOUT having to trust it -- which is the whole
@@ -256,7 +265,7 @@ def _search(root: Path, args: dict, *, top: int, max_headings: int) -> dict:
                 # definition of the tier — and `mass` is a walk statistic on a
                 # scale nothing else here shares. Naming it `score` would make
                 # every agent that sorts on `score` interleave the two lists.
-                "mass": round(r.mass, 6),
+                "mass": round(r.mass, _SCORE_DIGITS),
                 "archived": r.archived,
                 "route": r.route,
             }
@@ -421,7 +430,7 @@ def _handle(root: Path, message: dict, *, top: int, max_headings: int) -> dict |
         }
         handler = handlers.get(name)
         if handler is None:
-            return _err(msg_id, -32602, f"unknown tool {name!r}")
+            return _err(msg_id, _INVALID_PARAMS, f"unknown tool {name!r}")
         try:
             payload = handler(root, params.get("arguments") or {})
         except FuxError as exc:
@@ -431,10 +440,10 @@ def _handle(root: Path, message: dict, *, top: int, max_headings: int) -> dict |
             # transport fault, which it usually cannot.
             return _ok(msg_id, {"content": [{"type": "text", "text": str(exc)}], "isError": True})
         return _ok(msg_id, {
-            "content": [{"type": "text", "text": json.dumps(payload, indent=2)}],
+            "content": [{"type": "text", "text": json.dumps(payload, indent=_JSON_INDENT)}],
             "structuredContent": payload,
         })
-    return _err(msg_id, -32601, f"unknown method {method!r}")
+    return _err(msg_id, _METHOD_NOT_FOUND, f"unknown method {method!r}")
 
 
 def _ok(msg_id, result) -> dict:
@@ -474,7 +483,7 @@ def serve(stdin=None, stdout=None, root: Path | None = None, *, enabled: bool = 
         try:
             message = json.loads(line)
         except ValueError:
-            stdout.write(json.dumps(_err(None, -32700, "parse error")) + "\n")
+            stdout.write(json.dumps(_err(None, _PARSE_ERROR, "parse error")) + "\n")
             stdout.flush()
             continue
         response = _handle(root, message, top=top, max_headings=max_headings)

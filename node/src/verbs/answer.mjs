@@ -30,6 +30,8 @@ import { declareFloorOff, decline } from "./find.mjs";
 import { declarePinned } from "./ask.mjs";
 import { fixed } from "../config/constants.mjs";
 
+const JSON_INDENT = fixed("json", "indent");
+
 /** `answer` refers the top 3 — W-108. One question and no `-q`: an RRF score
  *  would make the three incomparable. */
 export const ANSWER_TOP = fixed("answer", "candidates");
@@ -219,7 +221,7 @@ export function runAnswer(root, args) {
       decline();
       return 0;
     }
-    process.stdout.write(JSON.stringify(payload, null, 2) + "\n");
+    process.stdout.write(JSON.stringify(payload, null, JSON_INDENT) + "\n");
     return 0;
   }
 

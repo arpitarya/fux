@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-22
 amended: 2026-09-27
 feature: the explorer — a local page over the real ask
-owns: [src/fux/serve@4fc7d0d5b77f]
+owns: [src/fux/serve@221cbd433e64]
 laws: [L1, L2, L4, L6, L8, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: dd0442a38fe6bf2cae0e3fea968fac287835e83a5d198d411e907cc01be08018
+content_sha: f5e799d22f3187392995d15faa6abaaa7c8d29a1ed26513ad55a63465dc0dfec
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
@@ -308,6 +308,8 @@ this moved where they are written, not what they are.
 **The explorer's sizes come from `.fux/inspect.toml [serve]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): `triage_rows` (was `TRIAGE_ROWS = 200`), and the Words tab's `words_page` / `words_page_max` (were `200` / `1000` in the route); a document's probe route passes `[probes] probe_sample` explicitly ([SR-INSPECT](0156_inspect.md) decision 23).
 
 **16. Parity: a lens `fux inspect` reports and the explorer does not show is a defect** (Arpit, 2026-09-28, W-229: *"everything in inspect should be present in `serve` so that we can see visually"*). Every top-level section of `inspect.as_dict()` has a card on the Index tab, in the prose report's order, carrying the lens's numbers, its named offenders as the report capped them, and its own lever from `LEVERS`; document names open the Documents tab and terms the Words tab. `/inspect/diff` is `fux inspect --diff` in the explorer: the last report `fux inspect` wrote against the Index tab's, by `inspect.diff.compare`, writing nothing. **Enforced by `tests/test_serve_renders_every_lens.py`**, which fails a report key with no `r.<key>` renderer — so W-228's `families` lens cannot ship invisible. The cards read the server's report and compute nothing (decision 5).
+
+**`fux serve` reads its bound address by unpacking** (`host, port, *_`), which also covers IPv6's four-tuple. Localhost-only is unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

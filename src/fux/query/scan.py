@@ -43,7 +43,7 @@ from .tokenize import tokenize
 #: the anchor field is switched on — a document's anchor LENGTH is needed for
 #: its `wlen` whether or not it matches the query, and `avg_wlen` needs the
 #: corpus total. An unconfigured corpus never compiles a match here.
-_EDGE_ANCHOR_RE = re.compile(rb'"al":(\d+),"at":\{[^}]*\},"dst":"([^"]+)"')
+_EDGE_ANCHOR_RE = re.compile(rb'"al":(?P<len>\d+),"at":\{[^}]*\},"dst":"(?P<dst>[^"]+)"')
 
 #: The byte-level oracle, now over per-field counts (W-76 Phase 1).
 #:
@@ -149,8 +149,8 @@ def scan_candidates(
             # side — this is the same fix on the scan side, at the root.
             if anchor_on:
                 for m in _EDGE_ANCHOR_RE.finditer(line):
-                    length = int(m.group(1))
-                    dst = m.group(2).decode("utf-8")
+                    length = int(m.group("len"))
+                    dst = m.group("dst").decode("utf-8")
                     anchor_len[dst] = anchor_len.get(dst, 0) + length
                     total_anchor_len += length
             if not any(pattern in line for pattern in patterns.values()):

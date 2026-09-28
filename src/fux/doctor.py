@@ -26,6 +26,8 @@ from . import output_config
 from .store import fuxdir
 from .constants import fixed
 
+_JSON_INDENT = fixed("json", "indent")
+
 PY_MIN = tuple(fixed("python", "min"))
 
 
@@ -3116,7 +3118,7 @@ def cmd_doctor(args) -> int:
             # **Absent counts and zero counts are different** — an empty
             # object means no ledger, which is *unknown*, not *clean*.
             payload["provenance"] = provenance_counts(root)
-        print(json_mod.dumps(payload, indent=2, sort_keys=True))
+        print(json_mod.dumps(payload, indent=_JSON_INDENT, sort_keys=True))
         return exit_code
 
     for check in checks:

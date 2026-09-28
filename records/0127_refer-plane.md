@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@dc16552352e4, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@3286249029a0, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@aa249e93737f]
+owns: [src/fux/refer@7851c01281d6, tools/refer-bench@cfdb47b24af2, tools/refer-budget-sweep@3286249029a0, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@83d8c624f056]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: c9f169b17ef17166691be8504cfd023317d59ed4c8fecd9bbda95b2bf2c09e09
+content_sha: 83cea8b5da3c9f0e8649a0febf0d10b7082c4c6612c3f59ccd87c61129d00668
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -616,6 +616,8 @@ degradation this plane already has) and `from_acquired` returns `None`.
 ⚠ **`_decode_fetched` and `sanitize` are still IMPORTED, never reimplemented.**
 The rule did not change; what changed is that the thing threaded alongside them
 is now a committed fact instead of a response header.
+
+**The refer plane holds no structural numeral**: `source.mjs` strips `file:`/`url:` by their length and fans acquired objects out by `[radix] hex_digits_per_byte`; the fetch cache's key width and the ARC ghost bound are `[refer] cache_key_hex` and `arc_ghost_bytes` ([SR-CACHE](0131_cache.md)). ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

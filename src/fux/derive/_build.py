@@ -28,6 +28,7 @@ divergence that no test would ever catch.
 
 from __future__ import annotations
 
+import ctypes
 import json
 import re
 from dataclasses import dataclass
@@ -42,6 +43,10 @@ from ..query import mined as mined_mod
 from ..store import TF_FIELDS
 from . import format as fmt
 from .format import _FIELD_COUNT
+from ..constants import fixed
+
+#: `mnw` is a per-field u32; this is its "no document seen yet" sentinel.
+_MAX_LEN = ctypes.c_uint32(-1).value  # the largest u32
 
 _QUOTED_HASH_RE = re.compile(rb'"([0-9a-f]{16})"')
 _FLEN_RE = re.compile(rb'"flen":\[([0-9,\s]*)\]')
@@ -50,7 +55,7 @@ _FLEN_RE = re.compile(rb'"flen":\[([0-9,\s]*)\]')
 #: one term in one field is not a corpus fux serves, and packing one would
 #: silently truncate the bound — which is the one error direction that loses
 #: documents. Refuse instead.
-_MAX_TF = 0xFFFF
+_MAX_TF = ctypes.c_uint16(-1).value  # the largest u16
 
 
 @dataclass
@@ -157,7 +162,7 @@ def _read_committed(root: Path, progress=None):
                 (path.name, store_mod.content_sha(raw), stat.st_size, stat.st_mtime_ns)
             )
             _, lines = store_mod.raw_record_lines(path)
-            for lineno, line in enumerate(lines, start=2):
+            for lineno, line in enumerate(lines, start=fixed("index", "shard_header_lines") + 1):
                 total_docs += 1
                 record = json.loads(line)
                 _assert_invariants(path, lineno, line, record)
@@ -378,14 +383,14 @@ def _per_field_max(block) -> tuple[int, ...]:
 
 def _per_field_min_len(block, flens: list[list[int]]) -> tuple[int, ...]:
     """The smallest token count each field reaches anywhere in the block."""
-    out = [0xFFFFFFFF] * _FIELD_COUNT
+    out = [_MAX_LEN] * _FIELD_COUNT
     for docidx, _ in block:
         flen = flens[docidx]
         for i in range(_FIELD_COUNT):
             value = flen[i] if i < len(flen) else 0
             if value < out[i]:
                 out[i] = value
-    return tuple(0 if v == 0xFFFFFFFF else v for v in out)
+    return tuple(0 if v == _MAX_LEN else v for v in out)
 
 
 def _write_postings(

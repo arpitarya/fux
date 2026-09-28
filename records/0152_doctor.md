@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@37fb7feb889a, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
+owns: [src/fux/doctor.py@b598b4c53399, tests/test_doctor_register_is_complete.py@6c3d2378d45f]
 laws: [L4, L8]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 555e9d7aacf22a4f5f10f7ffb91afc70f4a005f0566236384ac2df90e216a458
+content_sha: c09aa5c9567c3101c7a39f3a8a4b4af7ffd15d477fde5c2ff501a7a5fd182bd9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -449,6 +449,8 @@ this moved where they are written, not what they are.
 **`refusals.toml current` joins the frozen-keys rows for `[scan]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27); an absent `refusals.toml` is not reported there, because absent means *no rules* ([SR-REFUSAL](0146_refusals.md) decision 9a).
 
 **`inspect.toml current` joins the frozen-keys rows** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28); the file is required and written from its template ([SR-INSPECT](0156_inspect.md) decision 23).
+
+**No decision here moved** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 ### Consequences
 

@@ -464,7 +464,7 @@ def _fetch_one(
             hits += 1
             if attempt == RATE_LIMIT_RETRIES:
                 return None, exc, hits
-            sleep(RATE_LIMIT_BACKOFF_BASE * (2**attempt))
+            sleep(RATE_LIMIT_BACKOFF_BASE * (1 << attempt))  # doubling
     # Unreachable; the loop always returns.
     return None, None, hits
 
@@ -1013,7 +1013,7 @@ def _unpack(result) -> tuple[bytes | None, str]:
     contract change they never read. A `str` is treated as already-prose, which
     is exactly what it was.
     """
-    if isinstance(result, tuple) and len(result) == 2:
+    if isinstance(result, tuple) and len(result) == len(("raw", "content_type")):
         raw, content_type = result
         if isinstance(raw, str):
             raw = raw.encode("utf-8")

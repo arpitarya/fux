@@ -31,6 +31,14 @@ import { Graph, edgesFromRecords } from "../graph/model.mjs";
 import { FuxError } from "../errors.mjs";
 import { fixed } from "../config/constants.mjs";
 
+const JSON_INDENT = fixed("json", "indent");
+
+/** JSON-RPC 2.0's reserved error codes and the MCP score resolution. */
+const PARSE_ERROR = fixed("mcp", "parse_error");
+const INVALID_PARAMS = fixed("mcp", "invalid_params");
+const METHOD_NOT_FOUND = fixed("mcp", "method_not_found");
+const SCORE_DIGITS = fixed("mcp", "score_digits");
+
 export const PROTOCOL_VERSION = fixed("mcp", "protocol_version");
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -129,7 +137,7 @@ function fuxSearch(root, args, top, maxHeadings) {
     return {
       path: r.loc,
       title: r.title,
-      score: pyRound(r.score, 6),
+      score: pyRound(r.score, SCORE_DIGITS),
       // The hash the ranking was computed against. An agent that reads the
       // file and gets a different sha knows the index is behind WITHOUT having
       // to trust it — the whole premise of ranking from an index and fetching
@@ -242,7 +250,7 @@ function fuxRelated(root, args) {
     archived: Boolean(record.archived ?? false),
     superseded: Boolean(record.superseded ?? false),
     outbound: (record.edges ?? []).map((e) => ({
-      path: e.dst.startsWith("file:") ? e.dst.slice(5) : e.dst, kind: e.kind,
+      path: e.dst.startsWith("file:") ? e.dst.slice("file:".length) : e.dst, kind: e.kind,
     })),
     inbound,
   };
@@ -270,7 +278,7 @@ export function handle(root, message, top, maxHeadings) {
       fux_related: fuxRelated,
     };
     const handler = handlers[params.name];
-    if (handler === undefined) return err(id, -32602, `unknown tool ${JSON.stringify(params.name)}`);
+    if (handler === undefined) return err(id, INVALID_PARAMS, `unknown tool ${JSON.stringify(params.name)}`);
     let payload;
     try { payload = handler(root, params.arguments || {}); }
     catch (e) {
@@ -283,11 +291,11 @@ export function handle(root, message, top, maxHeadings) {
       return ok(id, { content: [{ type: "text", text: String(e.message) }], isError: true });
     }
     return ok(id, {
-      content: [{ type: "text", text: JSON.stringify(payload, null, 2) }],
+      content: [{ type: "text", text: JSON.stringify(payload, null, JSON_INDENT) }],
       structuredContent: payload,
     });
   }
-  return err(id, -32601, `unknown method ${JSON.stringify(method)}`);
+  return err(id, METHOD_NOT_FOUND, `unknown method ${JSON.stringify(method)}`);
 }
 
 export function runMcp(root, args) {
@@ -302,7 +310,7 @@ export function runMcp(root, args) {
     if (!line.trim()) return;
     let message;
     try { message = JSON.parse(line); }
-    catch { process.stdout.write(JSON.stringify(err(null, -32700, "parse error")) + "\n"); return; }
+    catch { process.stdout.write(JSON.stringify(err(null, PARSE_ERROR, "parse error")) + "\n"); return; }
     const response = handle(root, message, top, maxHeadings);
     if (response !== null) process.stdout.write(JSON.stringify(response) + "\n");
   });

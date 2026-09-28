@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@22e241e7c853, src/fux/query/bm25f.py@911171326d9a, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@37bde1db316b, src/fux/query/stem.py@234cbe8f97b3, node/src/query/analyzer.mjs@891b8d0b9794, node/src/query/bm25f.mjs@cae5b76af448, node/src/query/rank.mjs@25c604508f55, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
+owns: [src/fux/query/rank.py@22e241e7c853, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@37bde1db316b, src/fux/query/stem.py@234cbe8f97b3, node/src/query/analyzer.mjs@891b8d0b9794, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@25c604508f55, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5f66cee82a8057ec5bff549ea8d91b01202fdd9f8591b358dd42d203f1cc88c5
+content_sha: 8b433eebc39b40da1e0df3a81ce19b9dd78b6660258719c1986ca6892f4235b0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -584,6 +584,8 @@ sort, like everything else in that dict, and **nothing read back out of it
 reaches a score or an ordering**.
 
 **The analyzer holds no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). Porter's suffix rules carry their own lengths (`_STEP1A`, `_base`), the consonant-vowel-consonant test is a shape, and fux's three-character floor is `constants.toml [stem] min_chars`; decision 8a's `round(x, 9)` is `[ranking] score_digits`. The stemmer gave the same stem for all 8 982 words in `records/` and `docs/`, before and after.
+
+**BM25's idf smoothing is `constants.toml [bm25f] idf_offset`** (0.5), read by both planes. Scores are unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 

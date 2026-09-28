@@ -169,13 +169,12 @@ def is_alive(pid: int | None) -> bool:
     if sys.platform == "win32":  # pragma: no cover - exercised on the Windows CI arms
         import ctypes
 
-        synchronize = 0x00100000
-        handle = ctypes.windll.kernel32.OpenProcess(synchronize, False, pid)
+        handle = ctypes.windll.kernel32.OpenProcess(fixed("win32", "synchronize"), False, pid)
         if not handle:
             return False
         try:
             # WAIT_TIMEOUT (258) means it has not exited; WAIT_OBJECT_0 (0) means it has.
-            return ctypes.windll.kernel32.WaitForSingleObject(handle, 0) == 258
+            return ctypes.windll.kernel32.WaitForSingleObject(handle, 0) == fixed("win32", "wait_timeout")
         finally:
             ctypes.windll.kernel32.CloseHandle(handle)
     try:
@@ -229,7 +228,9 @@ def acquire(root: Path, *, required: bool = False) -> bool:
     """
     directory = fuxdir.derived_dir(root, "runtime")
     try:
-        fd = os.open(str(directory / LOCK_NAME), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
+        fd = os.open(
+            str(directory / LOCK_NAME), os.O_CREAT | os.O_EXCL | os.O_WRONLY, fixed("maintain", "lock_mode")
+        )
     except FileExistsError:
         if required:
             raise FuxError(

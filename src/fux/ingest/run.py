@@ -324,7 +324,7 @@ def run(
             root,
             fetched=fetched,
             skipped=url_skipped,
-            listed=sorted(doc_id[4:] for doc_id in url_listed),
+            listed=sorted(doc_id.removeprefix("url:") for doc_id in url_listed),
             token_shas=validation.get("token_shas") or {},
         )
         # A URL whose bytes arrived and yielded nothing needs a MODEL, exactly as

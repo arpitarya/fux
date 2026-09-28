@@ -27,6 +27,9 @@ import { iterShardPaths, rawRecordLines } from "../store/reader.mjs";
 import { runQuery } from "../query/run.mjs";
 import { loadTune } from "../config/tune.mjs";
 import { FuxError } from "../errors.mjs";
+import { fixed } from "../config/constants.mjs";
+
+const JSON_INDENT = fixed("json", "indent");
 
 function allRecords(root) {
   const out = [];
@@ -93,7 +96,7 @@ export function runExplain(root, args) {
     // though it were still indexed is the case that made it visible.
     refuseUnknown(records, plane, docId, "");
     if (args.json) {
-      process.stdout.write(JSON.stringify({ doc: docId, edges: [], community: null }, null, 2) + "\n");
+      process.stdout.write(JSON.stringify({ doc: docId, edges: [], community: null }, null, JSON_INDENT) + "\n");
     } else {
       process.stdout.write(`${docId} has no recorded relationships.\n`);
     }
@@ -105,7 +108,7 @@ export function runExplain(root, args) {
       doc: docId,
       edges: edges.map((e) => ({ kind: e.kind, dst: e.dst, grade: e.grade })),
       community: label,
-    }, null, 2) + "\n");
+    }, null, JSON_INDENT) + "\n");
     return 0;
   }
 
@@ -219,7 +222,7 @@ export function runGraph(root, args) {
   ];
 
   if (args.json) {
-    process.stdout.write(JSON.stringify({ nodes }, null, 2) + "\n");
+    process.stdout.write(JSON.stringify({ nodes }, null, JSON_INDENT) + "\n");
     return 0;
   }
   if (!nodes.length) { process.stdout.write("No confident matches.\n"); return 0; }
@@ -268,7 +271,7 @@ export function runPath(root, args) {
       // callers most likely to ask for a deep walk, so the boolean is in the
       // payload. Always present; `false` is a claim, not an absence (W-48).
       truncated,
-    }, null, 2) + "\n");
+    }, null, JSON_INDENT) + "\n");
     return 0;
   }
 

@@ -28,6 +28,8 @@ from __future__ import annotations
 
 from collections import OrderedDict
 
+from ..constants import fixed
+
 __all__ = ["ARC", "CacheKey"]
 
 CacheKey = tuple[str, str]  # (loc, sha) — the content address is part of the key
@@ -133,7 +135,7 @@ class ARC:
         Unbounded ghost lists are a slow memory leak that looks like nothing,
         which is the worst shape a leak can have.
         """
-        limit = max(1, self.max_bytes // 64)
+        limit = max(1, self.max_bytes // fixed("refer", "arc_ghost_bytes"))
         while len(self.b1) > limit:
             self.b1.popitem(last=False)
         while len(self.b2) > limit:

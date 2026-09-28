@@ -53,6 +53,9 @@ import math
 from dataclasses import dataclass
 
 from ..store import TF_FIELDS
+from ..constants import fixed
+
+_IDF_OFFSET = fixed("bm25f", "idf_offset")
 
 @dataclass(frozen=True)
 class Scoring:
@@ -106,7 +109,7 @@ class Scoring:
 
 
 def idf(df: int, n: int) -> float:
-    return math.log((n - df + 0.5) / (df + 0.5) + 1)
+    return math.log((n - df + _IDF_OFFSET) / (df + _IDF_OFFSET) + 1)
 
 
 def weighted_tf(tf: list[int], scoring: Scoring) -> float:

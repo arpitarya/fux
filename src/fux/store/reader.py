@@ -19,6 +19,9 @@ from pathlib import Path
 
 from ..errors import FuxError
 from .format import HEADER, index_dir, shard_for
+from ..constants import fixed
+
+_HEADER_LINES = fixed("index", "shard_header_lines")
 
 _SHARD_NAME_RE = re.compile(r"[0-9a-f]{2}\.jsonl")
 
@@ -129,7 +132,8 @@ def _refuse_conflict_markers(raw: bytes, path: Path) -> None:
 
 def read_shard(path: Path) -> tuple[dict, list[dict]]:
     header, lines = raw_record_lines(path)
-    records = [_load_json(line, path=path, lineno=i + 2) for i, line in enumerate(lines)]
+    first = _HEADER_LINES + 1  # the first record's 1-based line
+    records = [_load_json(line, path=path, lineno=first + i) for i, line in enumerate(lines)]
     return header, records
 
 
@@ -222,7 +226,7 @@ def foreign_url_ids(root: Path) -> list[str]:
     out: list[str] = []
     for path in iter_shard_paths(root):
         lines = path.read_bytes().split(b"\n")
-        for lineno, line in enumerate(lines[1:], start=2):
+        for lineno, line in enumerate(lines[_HEADER_LINES:], start=_HEADER_LINES + 1):
             if not line or b'"url:' not in line:
                 continue
             record = _load_json(line, path=path, lineno=lineno)

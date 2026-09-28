@@ -71,7 +71,7 @@ INFERRED_GRADE = fixed("graph", "grade_inferred")
 #: ⚠ **Group 1 is the ANCHOR TEXT and it used to be discarded.** It sat in a
 #: non-capturing class until W-168 step 1, so the proposal's *"edges are
 #: already extracted"* was half true: the edges were, the words were not.
-_LINK_RE = re.compile(r"\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+_LINK_RE = re.compile(r"\[(?P<text>[^\]]*)\]\((?P<target>[^)\s]+)(?:\s+\"[^\"]*\")?\)")
 _INLINE_CODE_RE = re.compile(r"`([^`\n]+)`")
 
 
@@ -93,7 +93,7 @@ class DocScan:
 
 def scan(doc: ParsedDoc) -> DocScan:
     return DocScan(
-        links=[(m.group(1), m.group(2)) for m in _LINK_RE.finditer(doc.body)],
+        links=[(m.group("text"), m.group("target")) for m in _LINK_RE.finditer(doc.body)],
         code_spans=[m.group(1) for m in _INLINE_CODE_RE.finditer(doc.body)],
         tags=_scan_tags(doc.meta),
         supersedes=_scan_supersedes(doc.meta),

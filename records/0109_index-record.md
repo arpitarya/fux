@@ -10,7 +10,7 @@ feature: the committed record schema — `fux.index.v2`
 owns: [src/fux/schemas/index-record.schema.json@3ebe0a7ebc9a]
 laws: [L2, L3, L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 9d6cb8c809d18531f342c97fbb56ce9d87fa0ed8b16943fb9cf223aa109b59df
+content_sha: 5d567231d7a6ef3feb87b013b95cb39f90fbdabd4ce7bf6b6eb5b755e284787e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -320,6 +320,8 @@ this moved where they are written, not what they are.
 - `src/fux/store/format.py` — `INDEX_DIR` ← `[index] dir`, `SCHEMA_ID` ← `[index] schema`, `ANALYZER_VERSION` ← `[index] analyzer`, `TF_FIELDS` ← `[index] tf_fields`, `_TERM_HASH_BYTES` ← `[index] term_hash_bytes`, `_CONTENT_SHA_BYTES` ← `[index] content_sha_bytes`
 
 <!-- L12-VALUES-END -->
+
+**How deep a committed record may nest is `constants.toml [index] max_record_depth`** (64), read by `store/canonical.py`. The bound and its refusal are unchanged. ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 ### Consequences
 
