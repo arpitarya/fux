@@ -8,10 +8,10 @@
  * Owned, with its Python twin, by [SR-DECODE](../../../records/0139_decode.md).
  */
 
-const HEADING_RE = /^(#{1,6})\s+(.*?)\s*#*\s*$/;
+const HEADING_RE = /^(?<hashes>#{1,6})\s+(?<text>.*?)\s*#*\s*$/;
 /** Up to three leading spaces per CommonMark; a fourth makes it an indented
  *  code block, which cannot contain a heading anyway. */
-const FENCE_RE = /^ {0,3}(`{3,}|~{3,})(.*)$/;
+const FENCE_RE = /^ {0,3}(?<fence>`{3,}|~{3,})(?<info>.*)$/;
 
 /** `[lineno, line, fenced]` per line, `lineno` 1-based.
  *
@@ -27,15 +27,15 @@ export function* walk(markdown) {
     const lineno = i + 1;
     const match = FENCE_RE.exec(line);
     if (fence === null) {
-      if (match) { fence = match[1]; yield [lineno, line, true]; }
+      if (match) { fence = match.groups.fence; yield [lineno, line, true]; }
       else yield [lineno, line, false];
       continue;
     }
     const closes = match !== null
-      && match[1][0] === fence[0]
-      && match[1].length >= fence.length
+      && match.groups.fence[0] === fence[0]
+      && match.groups.fence.length >= fence.length
       // A closing fence carries no info string.
-      && match[2].trim() === "";
+      && match.groups.info.trim() === "";
     if (closes) fence = null;
     yield [lineno, line, true];
   }
@@ -48,7 +48,7 @@ export function headings(markdown) {
   for (const [lineno, line, fenced] of walk(markdown)) {
     if (fenced) continue;
     const match = HEADING_RE.exec(line);
-    if (match) found.push({ lineno, level: match[1].length, text: match[2].trim() });
+    if (match) found.push({ lineno, level: match.groups.hashes.length, text: match.groups.text.trim() });
   }
   return found;
 }

@@ -301,3 +301,195 @@ extract_rules = 3
 # (W-108). NOT a tunable, by the reasoning beside ANSWER_TOP in query/__init__.py:
 # every extra candidate is a real fetch against someone's source system.
 candidates = 3
+
+# -- Numbers an algorithm or a format fixes (SR-LAW-12 decision 6a, R7) -------
+# W-225 stage 5. Each is here because changing it changes a committed byte or
+# the meaning of one. Where a refactor removed the literal outright -- a
+# suffix's own length, tuple unpacking -- that was preferred to a key.
+
+[stem]
+# Tokens shorter than this are never Porter-stemmed (query/stem.*). A different
+# floor writes different postings, so it moves with [index] analyzer.
+min_chars = 3
+
+[json]
+# The indent of every JSON file fux writes for a person to read -- a runtime
+# segment, a report, a manifest. A different indent rewrites those bytes.
+indent = 2
+
+[pii.luhn]
+# ISO/IEC 7812-1 Annex B (ingest/pii.py). `doubled[d]` is 2d with its digits
+# summed; the check passes when the total is a multiple of `modulus`.
+doubled = [0, 2, 4, 6, 8, 1, 3, 5, 7, 9]
+modulus = 10
+
+[pii.verhoeff]
+# Verhoeff (1969): `d` is the multiplication table of the dihedral group D5;
+# row i of `p` is the permutation applied at position i mod len(p).
+d = [
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
+  [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],
+  [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],
+  [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+  [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],
+  [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
+  [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
+  [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
+  [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+]
+p = [
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
+  [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],
+  [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],
+  [9, 4, 5, 3, 1, 2, 7, 6, 8, 0],
+  [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
+  [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
+  [7, 0, 4, 6, 9, 1, 3, 2, 5, 8],
+]
+
+[blake2b]
+# RFC 7693 -- node/src/hash/blake2b.mjs, the Node plane's transcription (the
+# Python plane calls hashlib). Change one and every term key, content sha and
+# shard bucket the Node reader computes stops matching the committed index.
+word_bits = 64
+block_bytes = 128
+max_digest_bytes = 64
+max_key_bytes = 64
+# RFC 7693 2.5, the parameter block's word 0: 0x0101kknn -- fanout 1, depth 1;
+# the key length sits `key_length_shift` bits up, the digest length below it.
+param_block = 0x01010000
+key_length_shift = 8
+# RFC 7693 3.2: the byte counter is xored into v[12], the final flag into v[14].
+counter_word = 12
+final_word = 14
+# RFC 7693 3.1: G's four rotations, in order.
+rotations = [32, 24, 16, 63]
+# RFC 7693 3.2: a round's eight G applications as (a, b, c, d) word indexes --
+# four columns, then four diagonals.
+g_steps = [
+  [0, 4, 8, 12], [1, 5, 9, 13], [2, 6, 10, 14], [3, 7, 11, 15],
+  [0, 5, 10, 15], [1, 6, 11, 12], [2, 7, 8, 13], [3, 4, 9, 14],
+]
+# RFC 7693 2.6: the SHA-512 IV, as 32-bit halves, lo then hi per word.
+iv = [
+  0xf3bcc908, 0x6a09e667, 0x84caa73b, 0xbb67ae85,
+  0xfe94f82b, 0x3c6ef372, 0x5f1d36f1, 0xa54ff53a,
+  0xade682d1, 0x510e527f, 0x2b3e6c1f, 0x9b05688c,
+  0xfb41bd6b, 0x1f83d9ab, 0x137e2179, 0x5be0cd19,
+]
+# RFC 7693 2.7: the message schedule, one row per round. Twelve rounds; rows
+# 10 and 11 repeat rows 0 and 1.
+sigma = [
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  [14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3],
+  [11, 8, 12, 0, 5, 2, 15, 13, 10, 14, 3, 6, 7, 1, 9, 4],
+  [7, 9, 3, 1, 13, 12, 11, 14, 2, 6, 5, 10, 4, 0, 15, 8],
+  [9, 0, 5, 7, 2, 4, 10, 15, 14, 1, 11, 12, 6, 8, 3, 13],
+  [2, 12, 6, 10, 0, 11, 8, 3, 4, 13, 7, 5, 15, 14, 1, 9],
+  [12, 5, 1, 15, 14, 13, 4, 10, 0, 7, 6, 3, 9, 2, 8, 11],
+  [13, 11, 7, 14, 12, 1, 3, 9, 5, 0, 15, 4, 8, 6, 2, 10],
+  [6, 15, 14, 9, 11, 3, 0, 8, 12, 2, 13, 7, 1, 4, 10, 5],
+  [10, 2, 8, 4, 7, 6, 1, 5, 15, 11, 9, 14, 3, 12, 13, 0],
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  [14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3],
+]
+
+[ranking]
+# The sort key's resolution: every score is round(x, score_digits) before it
+# orders anything (SR-RANKING decision 8a). A different resolution resolves a
+# near-tie the other way -- a different ORDER in both planes.
+score_digits = 9
+
+[pyfloat]
+# CPython float semantics the Node plane reproduces (node/src/compat/pyfloat.mjs).
+# Digits asked of toFixed to see whether a value sits exactly on a rounding tie.
+tie_digits = 20
+# repr() switches to exponent form when the decimal exponent is below
+# repr_exp_min or at least repr_exp_max, and pads the exponent to this width.
+repr_exp_min = -4
+repr_exp_max = 16
+repr_exp_width = 2
+
+[frontmatter]
+# One nesting level of the YAML front matter fux writes (frontmatter.py dumps).
+indent = 2
+
+[confidence]
+# The digits coverage, doc_coverage and separation are rounded to before they
+# are published (query/confidence.*). They are JSON output in both planes.
+signal_digits = 4
+
+# The numbers PNG, JPEG/EXIF and GIF fix (decode/image.py; SR-LAW-12 decision
+# 6a). A byte string is written as latin-1 text and encoded back; a record
+# layout is a Python `struct` format, whose size is the offset the walk takes.
+[decoders.image.format]
+png_signature  = "\u0089PNG\r\n\u001a\n"
+png_chunk_head = ">I4s"   # length, chunk type
+png_chunk_crc  = ">I"
+itxt_flags     = "BB"     # compression flag, compression method
+jpeg_soi       = "ÿØ"
+jpeg_marker    = "BB"     # 0xFF, marker code
+jpeg_length    = ">H"     # a segment's length counts these two bytes
+jpeg_prefix    = 0xFF
+# RST0-RST7, SOI and EOI carry no length field.
+jpeg_standalone_first = 0xD0
+jpeg_standalone_last  = 0xD9
+jpeg_app1 = 0xE1
+jpeg_com  = 0xFE
+jpeg_sos  = 0xDA
+exif_header      = "Exif\u0000\u0000"
+tiff_byte_orders = { II = "<", MM = ">" }
+tiff_header      = "2sHI"  # byte-order mark, magic, IFD0 offset
+tiff_magic       = 42
+ifd_count        = "H"
+ifd_entry        = "HHI4s" # tag, type, count, value or offset
+ifd_offset       = "I"
+exif_ascii_type  = 2
+exif_ascii_tags  = [[0x010E, "ImageDescription"], [0x013B, "Artist"], [0x8298, "Copyright"]]
+gif_signatures   = ["GIF87a", "GIF89a"]
+gif_screen       = "<6sHHBBB" # signature, width, height, packed, background, aspect
+gif_extension    = "BB"       # introducer, label
+gif_image        = "<BHHHHB"  # separator, left, top, width, height, packed
+gif_table_flag   = 0x80
+gif_table_bits   = 0x07
+gif_rgb_bytes    = 3
+gif_trailer      = 0x3B
+gif_extension_introducer = 0x21
+gif_comment_label        = 0xFE
+gif_image_separator      = 0x2C
+
+[decoders.pdf.format]
+# The numbers PDF fixes (decode/pdf.py; SR-LAW-12 decision 6a).
+# A literal string octal escape carries at most three digits.
+octal_escape_digits = 3
+# A bfrange wider than a two-byte code space is refused, not expanded.
+max_bfrange_span    = 65535
+# The longest character code looked up in a ToUnicode CMap.
+max_code_bytes      = 2
+
+[radix]
+# Bases a text format spells its numbers in (decode/pdf.py, decode/rtf.py).
+hex                 = 16
+octal               = 8
+hex_digits_per_byte = 2
+
+[markdown]
+# Markdown has six heading levels; a deeper one is clamped, never invented.
+max_heading  = 6
+# A record's heading inside a multi-record document (a JSON array, a JSONL
+# line, a mailbox message): one level below the document's H1.
+record_level = 2
+
+[decoders.rtf.format]
+# RTF's \uN is a signed 16-bit value; a code point above 32767 is written as
+# N - unicode_wrap (decode/rtf.py).
+unicode_wrap = 65536
+
+[ooxml]
+# Word's built-in paragraph styles as Markdown levels (decode/_ooxml.py):
+# Title, Subtitle, and a heading style that carries no number. HeadingN is N+1.
+title_level      = 1
+subtitle_level   = 2
+unnumbered_level = 2

@@ -7,10 +7,10 @@ description: "BM25F is a bag of words and cannot see where terms are. The rerank
 status: accepted
 date: 2026-08-24
 feature: proximity reranking over the refer plane's passages, and the refusal that bounds it
-owns: [src/fux/query/rerank.py@889da1adc179, node/src/query/rerank.mjs@03c58b47b2e8]
+owns: [src/fux/query/rerank.py@37caf0847999, node/src/query/rerank.mjs@813bbbc1359f]
 laws: [L1, L3, L4]
 timestamp: 2026-08-24T00:00:00Z
-content_sha: bf14c000ee5e9e59d0b8186dfb8588f943211c3cac86c7b021c416bac1f48dad
+content_sha: e86248600bc2519c09991c536b7f45c3660d56490eed4a1c57383e884af9a3c3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -260,6 +260,8 @@ honest alternative to making somebody infer it.**
 caller is unchanged, the differential law's two paths keep one signature, the
 dict is the caller's rather than this module's (fux runs threads), and nothing
 read back out of it can reach a score or an ordering.
+
+**The reranker holds no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `_MIN_TERMS = 2` became the test it stood for (`<= 1` distinct terms has no proximity), and the sort key reads `constants.toml [ranking] score_digits`. No order moved.
 
 ### Consequences — the measurement
 

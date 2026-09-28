@@ -27,7 +27,7 @@
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { FuxError } from "../errors.mjs";
-import { parseToml, wasFloat } from "./toml.mjs";
+import { BOM, parseToml, wasFloat } from "./toml.mjs";
 import { fixed } from "./constants.mjs";
 
 export const OUTPUT_NAME = fixed("files", "output");
@@ -349,7 +349,7 @@ export function loadOutput(root, { enabled }) {
       "restores a deleted one. fux holds no copy of its values in code",
     );
   }
-  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
+  if (text.startsWith(BOM)) text = text.slice(BOM.length);
   rejectConflictMarkers(label, text);
   return parse(parseToml(text, label), label);
 }

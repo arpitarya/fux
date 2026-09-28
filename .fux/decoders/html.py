@@ -20,9 +20,11 @@ belong in their own change, with the goldens re-blessed on purpose.
 
 from __future__ import annotations
 
+import codecs
 import re
 from html.parser import HTMLParser
 from fux.constants import fixed
+from fux.decode._limits import limit
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -30,7 +32,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.html", "version")
+VERSION = fixed("decoders.html", "version")  # not bumped by W-225 5b: the charset window moved to formats.toml at the same value
 
 EXTENSIONS = tuple(fixed("decoders.html", "extensions"))
 
@@ -72,9 +74,9 @@ def _charset(raw: bytes) -> str:
     caller passes `errors="replace"`, so a wrong guess costs a few characters
     and never the document.
     """
-    if raw[:3] == b"\xef\xbb\xbf":
+    if raw.startswith(codecs.BOM_UTF8):
         return "utf-8-sig"
-    match = _CHARSET_RE.search(raw[:4096])
+    match = _CHARSET_RE.search(raw[: limit("html", "charset_scan_bytes")])
     if match:
         label = match.group(1).decode("ascii", errors="replace").strip().lower()
         try:

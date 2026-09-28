@@ -19,7 +19,13 @@ import json
 import re
 from dataclasses import dataclass
 
+from .constants import fixed
+
 _DELIM = "---"
+#: One nesting level of the emitted YAML -- `fux correct` rewrites committed
+#: files through `dumps`, so a different step rewrites their bytes.
+_INDENT = fixed("frontmatter", "indent")
+_PAD = " " * _INDENT
 _INT_RE = re.compile(r"^-?\d+$")
 _FLOAT_RE = re.compile(r"^-?\d+\.\d+([eE][+-]?\d+)?$")
 # Values that would parse back as something other than a plain string must be
@@ -49,8 +55,9 @@ def parse(text: str) -> Frontmatter:
     if close is None:  # no closing delimiter: treat everything as body
         return Frontmatter({}, text, 1)
     meta, _ = _parse_mapping(lines[1:close], 0, 0)
-    body = "\n".join(lines[close + 1 :])
-    return Frontmatter(meta, body, close + 2)
+    first = close + 1  # the body's first line, 0-based
+    body = "\n".join(lines[first:])
+    return Frontmatter(meta, body, first + 1)
 
 
 def dumps(meta: dict, body: str) -> str:
@@ -119,7 +126,7 @@ def _parse_list(lines: list[str], i: int, indent: int) -> tuple[list, int]:
             continue
         if _indent_of(lines[i]) < indent or not stripped.startswith("- "):
             break
-        out.append(_parse_scalar(stripped[2:].strip()))
+        out.append(_parse_scalar(stripped.removeprefix("- ").strip()))
         i += 1
     return out, i
 
@@ -145,12 +152,12 @@ def _collect_literal(lines: list[str], i: int, indent: int) -> tuple[str, int]:
 
 
 def _parse_scalar(token: str):
-    if token.startswith('"') and token.endswith('"') and len(token) >= 2:
+    if token.startswith('"') and token.endswith('"') and len(token) > 1:
         try:
             return json.loads(token)
         except ValueError:
             return token[1:-1]
-    if token.startswith("'") and token.endswith("'") and len(token) >= 2:
+    if token.startswith("'") and token.endswith("'") and len(token) > 1:
         return token[1:-1].replace("''", "'")
     if " #" in token:  # unquoted inline comment
         token = token.split(" #", 1)[0].rstrip()
@@ -198,18 +205,18 @@ def _emit(lines: list[str], key: str, value, indent: int) -> None:
     if isinstance(value, dict):
         lines.append(f"{pad}{key}:")
         for k, v in value.items():
-            _emit(lines, k, v, indent + 2)
+            _emit(lines, k, v, indent + _INDENT)
     elif isinstance(value, list):
         if not value:
             lines.append(f"{pad}{key}: []")
         else:
             lines.append(f"{pad}{key}:")
             for item in value:
-                lines.append(f"{pad}  - {_fmt_scalar(item)}")
+                lines.append(f"{pad}{_PAD}- {_fmt_scalar(item)}")
     elif isinstance(value, str) and "\n" in value:
         lines.append(f"{pad}{key}: |")
         for ln in value.split("\n"):
-            lines.append(f"{pad}  {ln}" if ln else "")
+            lines.append(f"{pad}{_PAD}{ln}" if ln else "")
     else:
         lines.append(f"{pad}{key}: {_fmt_scalar(value)}")
 

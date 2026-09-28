@@ -102,7 +102,7 @@ def split_identifier(raw: str) -> list[str]:
     characters are dropped: the `F` in `BM25F` is noise as a standalone term.
     """
     parts = [p for p in _BOUNDARY_RE.split(raw) if p]
-    if len(parts) < 2:
+    if len(parts) <= 1:
         return []
     return [p for p in parts if len(p) > 1]
 

@@ -43,13 +43,18 @@ from fux.decode._limits import limit
 from fux.decode.html import decode as decode_html
 from fux.constants import fixed
 
+#: Markdown has six heading levels; a deeper one is clamped, never invented.
+_MAX_HEADING = fixed("markdown", "max_heading")
+#: A message in a mailbox is one level below the file's H1.
+_RECORD_LEVEL = fixed("markdown", "record_level")
+
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
 #: `fux ingest` re-extracts the documents bound to THIS decoder and no others.
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.mail", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
+VERSION = fixed("decoders.mail", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
 
 EXTENSIONS = tuple(fixed("decoders.mail", "extensions"))
 
@@ -90,7 +95,7 @@ def _mbox(raw: bytes, rel_path: str) -> str | None:
     """
     blocks = [f"# {rel_path.rsplit('/', 1)[-1]}"]
     for part in _messages(raw)[:limit("mail", "max_messages")]:
-        block = _message(part, level=2)
+        block = _message(part, level=_RECORD_LEVEL)
         if block:
             blocks.append(block)
     if len(blocks) == 1:
@@ -211,5 +216,5 @@ def _demote(body: str) -> str:
     out = []
     for lineno, line in enumerate(body.split("\n"), start=1):
         level = levels.get(lineno)
-        out.append("#" * min(level + 2, 6) + line[level:] if level else line)
+        out.append("#" * min(level + _RECORD_LEVEL, _MAX_HEADING) + line[level:] if level else line)
     return "\n".join(out)

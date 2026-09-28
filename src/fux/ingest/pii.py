@@ -85,6 +85,7 @@ import json
 import re
 import tomllib
 from collections.abc import Callable
+from itertools import cycle
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -112,6 +113,7 @@ _FLAGS: dict[str, int] = {
 # out (SR-PII decision 12).
 
 _ASCII_DIGITS = "0123456789"
+_JSON_INDENT = fixed("json", "indent")
 
 
 def _digits(text: str) -> list[int]:
@@ -121,7 +123,12 @@ def _digits(text: str) -> list[int]:
     non-ASCII digit (`²`, `٣`) is not a digit here: neither scheme is defined
     over one, and `str.isdigit` would quietly let it in.
     """
-    return [ord(ch) - 48 for ch in text if ch in _ASCII_DIGITS]
+    return [int(ch) for ch in text if ch in _ASCII_DIGITS]
+
+
+#: Luhn's doubled digit, digit-summed: 2d for d < 5, 2d - 9 above.
+_LUHN_DOUBLED = tuple(fixed("pii.luhn", "doubled"))
+_LUHN_MODULUS = fixed("pii.luhn", "modulus")
 
 
 def luhn(text: str) -> bool:
@@ -132,43 +139,20 @@ def luhn(text: str) -> bool:
     payload to check.
     """
     digits = _digits(text)
-    if len(digits) < 2:
+    if not digits[:-1]:
         return False
     total = 0
-    for position, digit in enumerate(reversed(digits)):
-        if position % 2:
-            digit *= 2
-            if digit > 9:
-                digit -= 9
-        total += digit
-    return total % 10 == 0
+    # From the right: the check digit as it is, then every other digit doubled.
+    for digit, doubled in zip(reversed(digits), cycle((False, True))):
+        total += _LUHN_DOUBLED[digit] if doubled else digit
+    return total % _LUHN_MODULUS == 0
 
 
 #: Verhoeff's multiplication table for the dihedral group D5.
-_VERHOEFF_D = (
-    (0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-    (1, 2, 3, 4, 0, 6, 7, 8, 9, 5),
-    (2, 3, 4, 0, 1, 7, 8, 9, 5, 6),
-    (3, 4, 0, 1, 2, 8, 9, 5, 6, 7),
-    (4, 0, 1, 2, 3, 9, 5, 6, 7, 8),
-    (5, 9, 8, 7, 6, 0, 4, 3, 2, 1),
-    (6, 5, 9, 8, 7, 1, 0, 4, 3, 2),
-    (7, 6, 5, 9, 8, 2, 1, 0, 4, 3),
-    (8, 7, 6, 5, 9, 3, 2, 1, 0, 4),
-    (9, 8, 7, 6, 5, 4, 3, 2, 1, 0),
-)
+_VERHOEFF_D = tuple(tuple(row) for row in fixed("pii.verhoeff", "d"))
 
 #: Verhoeff's position permutation; row `i` is applied at position `i mod 8`.
-_VERHOEFF_P = (
-    (0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-    (1, 5, 7, 6, 2, 8, 3, 0, 9, 4),
-    (5, 8, 0, 3, 7, 9, 6, 1, 4, 2),
-    (8, 9, 1, 6, 0, 4, 3, 5, 2, 7),
-    (9, 4, 5, 3, 1, 2, 7, 6, 8, 0),
-    (4, 2, 8, 6, 5, 7, 3, 9, 0, 1),
-    (2, 7, 9, 3, 8, 0, 6, 4, 1, 5),
-    (7, 0, 4, 6, 9, 1, 3, 2, 5, 8),
-)
+_VERHOEFF_P = tuple(tuple(row) for row in fixed("pii.verhoeff", "p"))
 
 
 def verhoeff(text: str) -> bool:
@@ -179,11 +163,11 @@ def verhoeff(text: str) -> bool:
     never valid, for the same reason as `luhn`.
     """
     digits = _digits(text)
-    if len(digits) < 2:
+    if not digits[:-1]:
         return False
     check = 0
     for position, digit in enumerate(reversed(digits)):
-        check = _VERHOEFF_D[check][_VERHOEFF_P[position % 8][digit]]
+        check = _VERHOEFF_D[check][_VERHOEFF_P[position % len(_VERHOEFF_P)][digit]]
     return check == 0
 
 
@@ -581,7 +565,8 @@ def record_counts(
         fuxdir.derived_dir(root, "runtime")
         payload = Counts(body=body, enrichment=enrichment, partial=partial, documents=documents)
         counts_path(root).write_text(
-            json.dumps(payload.as_json(), indent=2, sort_keys=True) + "\n", encoding="utf-8"
+            json.dumps(payload.as_json(), indent=_JSON_INDENT, sort_keys=True) + "\n",
+            encoding="utf-8",
         )
     except (OSError, TypeError, ValueError):
         # A counter that could fail an ingest is worse than a missing counter.

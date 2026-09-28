@@ -52,21 +52,57 @@ from fux.decode._limits import limit
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.image", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
+VERSION = fixed("decoders.image", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
 
 EXTENSIONS = tuple(fixed("decoders.image", "extensions"))
 
 #: ⚠ **`MAX_INFLATED` is `[limits.image] max_inflated` in .fux/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
-_PNG_SIG = b"\x89PNG\r\n\x1a\n"
-_JPEG_SOI = b"\xff\xd8"
-_GIF_SIGS = (b"GIF87a", b"GIF89a")
+# Every number the three formats fix -- a signature, a marker, a record layout --
+# is `constants.toml [decoders.image]` (SR-LAW-12 decision 6a). A layout is a
+# `struct` format, so its size is the offset the walk advances by.
+_C = "decoders.image.format"
 
-_JPEG_APP1 = 0xE1
-_JPEG_COM = 0xFE
-_JPEG_SOS = 0xDA
-_JPEG_ASCII_TAGS = {0x010E: "ImageDescription", 0x013B: "Artist", 0x8298: "Copyright"}
+
+def _bytes(key: str) -> bytes:
+    return fixed(_C, key).encode("latin-1")
+
+
+_PNG_SIG = _bytes("png_signature")
+_PNG_HEAD = struct.Struct(fixed(_C, "png_chunk_head"))  # length, type
+_PNG_CRC = struct.calcsize(fixed(_C, "png_chunk_crc"))
+_ITXT_FLAGS = struct.Struct(fixed(_C, "itxt_flags"))  # compressed, method
+
+_JPEG_SOI = _bytes("jpeg_soi")
+_JPEG_MARKER = struct.Struct(fixed(_C, "jpeg_marker"))  # 0xFF, code
+_JPEG_LENGTH = struct.Struct(fixed(_C, "jpeg_length"))  # counts itself
+_JPEG_PREFIX = fixed(_C, "jpeg_prefix")
+_JPEG_STANDALONE = range(fixed(_C, "jpeg_standalone_first"), fixed(_C, "jpeg_standalone_last") + 1)
+_JPEG_APP1 = fixed(_C, "jpeg_app1")
+_JPEG_COM = fixed(_C, "jpeg_com")
+_JPEG_SOS = fixed(_C, "jpeg_sos")
+_EXIF_HEADER = _bytes("exif_header")
+_TIFF_ORDERS = {mark.encode("latin-1"): endian for mark, endian in fixed(_C, "tiff_byte_orders").items()}
+_TIFF_HEAD = fixed(_C, "tiff_header")  # order mark, magic, IFD0 offset
+_TIFF_MAGIC = fixed(_C, "tiff_magic")
+_IFD_COUNT = fixed(_C, "ifd_count")
+_IFD_ENTRY = fixed(_C, "ifd_entry")  # tag, type, count, value-or-offset
+_IFD_OFFSET = fixed(_C, "ifd_offset")
+_EXIF_ASCII = fixed(_C, "exif_ascii_type")
+_JPEG_ASCII_TAGS = {tag: name for tag, name in fixed(_C, "exif_ascii_tags")}
+
+_GIF_SIGS = tuple(sig.encode("latin-1") for sig in fixed(_C, "gif_signatures"))
+_GIF_HEAD = struct.Struct(fixed(_C, "gif_screen"))  # logical screen descriptor
+_GIF_EXT = struct.Struct(fixed(_C, "gif_extension"))  # introducer, label
+_GIF_IMAGE = struct.Struct(fixed(_C, "gif_image"))  # image descriptor
+_GIF_TABLE_FLAG = fixed(_C, "gif_table_flag")
+_GIF_TABLE_BITS = fixed(_C, "gif_table_bits")
+_GIF_RGB = fixed(_C, "gif_rgb_bytes")
+_GIF_TRAILER = fixed(_C, "gif_trailer")
+_GIF_EXTENSION = fixed(_C, "gif_extension_introducer")
+_GIF_COMMENT = fixed(_C, "gif_comment_label")
+_GIF_DESCRIPTOR = fixed(_C, "gif_image_separator")
 
 
 def decode(raw: bytes, rel_path: str) -> str | None:
@@ -74,7 +110,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
         fields = _png_text(raw)
     elif raw.startswith(_JPEG_SOI):
         fields = _jpeg_text(raw)
-    elif raw[:6] in _GIF_SIGS:
+    elif raw.startswith(_GIF_SIGS):
         fields = _gif_text(raw)
     else:
         return None
@@ -94,14 +130,13 @@ def decode(raw: bytes, rel_path: str) -> str | None:
 def _png_chunks(data: bytes):
     pos = len(_PNG_SIG)
     n = len(data)
-    while pos + 8 <= n:
-        length = int.from_bytes(data[pos : pos + 4], "big")
-        ctype = data[pos + 4 : pos + 8]
-        pos += 8
-        if length < 0 or pos + length + 4 > n:
+    while pos + _PNG_HEAD.size <= n:
+        length, ctype = _PNG_HEAD.unpack_from(data, pos)
+        pos += _PNG_HEAD.size
+        if pos + length + _PNG_CRC > n:
             break
         yield ctype, data[pos : pos + length]
-        pos += length + 4  # skip the trailing CRC
+        pos += length + _PNG_CRC  # skip the trailing CRC
         if ctype == b"IEND":
             break
 
@@ -128,10 +163,10 @@ def _png_text(data: bytes) -> dict[str, str]:
 
 def _itxt(payload: bytes) -> dict[str, str]:
     keyword, _, rest = payload.partition(b"\x00")
-    if len(rest) < 2:
+    if len(rest) < _ITXT_FLAGS.size:
         return {}
-    compressed, method = rest[0], rest[1]
-    rest = rest[2:]
+    compressed, method = _ITXT_FLAGS.unpack_from(rest)
+    rest = rest[_ITXT_FLAGS.size :]
     _lang, _, rest = rest.partition(b"\x00")
     _translated, _, text_bytes = rest.partition(b"\x00")
     if compressed:
@@ -145,25 +180,26 @@ def _itxt(payload: bytes) -> dict[str, str]:
 
 
 def _jpeg_segments(data: bytes):
-    pos = 2  # past the SOI marker
+    pos = len(_JPEG_SOI)
     n = len(data)
-    while pos + 1 < n:
-        if data[pos] != 0xFF:
+    head = _JPEG_MARKER.size
+    while pos + head <= n:
+        prefix, marker = _JPEG_MARKER.unpack_from(data, pos)
+        if prefix != _JPEG_PREFIX:
             pos += 1
             continue
-        marker = data[pos + 1]
-        if marker == 0 or 0xD0 <= marker <= 0xD9:  # no length field on these
-            pos += 2
+        if marker == 0 or marker in _JPEG_STANDALONE:  # no length field on these
+            pos += head
             if marker == _JPEG_SOS:
                 break  # compressed scan data follows; nothing after is a segment
             continue
-        if pos + 4 > n:
+        if pos + head + _JPEG_LENGTH.size > n:
             break
-        length = int.from_bytes(data[pos + 2 : pos + 4], "big")
-        if length < 2 or pos + 2 + length > n:
+        (length,) = _JPEG_LENGTH.unpack_from(data, pos + head)
+        if length < _JPEG_LENGTH.size or pos + head + length > n:
             break
-        yield marker, data[pos + 4 : pos + 2 + length]
-        pos += 2 + length
+        yield marker, data[pos + head + _JPEG_LENGTH.size : pos + head + length]
+        pos += head + length
 
 
 def _jpeg_text(data: bytes) -> dict[str, str]:
@@ -182,40 +218,40 @@ def _jpeg_text(data: bytes) -> dict[str, str]:
 
 
 def _exif_ascii(payload: bytes) -> dict[str, str]:
-    if not payload.startswith(b"Exif\x00\x00"):
+    if not payload.startswith(_EXIF_HEADER):
         return {}
-    tiff = payload[6:]
-    if len(tiff) < 8 or tiff[:2] not in (b"II", b"MM"):
+    tiff = payload[len(_EXIF_HEADER) :]
+    endian = next((e for mark, e in _TIFF_ORDERS.items() if tiff.startswith(mark)), None)
+    if endian is None or len(tiff) < struct.calcsize(endian + _TIFF_HEAD):
         return {}
-    endian = "<" if tiff[:2] == b"II" else ">"
-    if struct.unpack_from(endian + "H", tiff, 2)[0] != 42:
+    _order, magic, ifd_offset = struct.unpack_from(endian + _TIFF_HEAD, tiff)
+    if magic != _TIFF_MAGIC:
         return {}
-    (ifd_offset,) = struct.unpack_from(endian + "I", tiff, 4)
     return _read_ifd0(tiff, ifd_offset, endian)
 
 
 def _read_ifd0(tiff: bytes, offset: int, endian: str) -> dict[str, str]:
     out: dict[str, str] = {}
-    if offset + 2 > len(tiff):
+    count_fmt, entry = endian + _IFD_COUNT, struct.Struct(endian + _IFD_ENTRY)
+    if offset + struct.calcsize(count_fmt) > len(tiff):
         return out
-    (count,) = struct.unpack_from(endian + "H", tiff, offset)
-    pos = offset + 2
+    (count,) = struct.unpack_from(count_fmt, tiff, offset)
+    pos = offset + struct.calcsize(count_fmt)
     for _ in range(count):
-        if pos + 12 > len(tiff):
+        if pos + entry.size > len(tiff):
             break
-        tag, typ, cnt = struct.unpack_from(endian + "HHI", tiff, pos)
+        tag, typ, cnt, value = entry.unpack_from(tiff, pos)
         name = _JPEG_ASCII_TAGS.get(tag)
-        if name and typ == 2:  # type 2 == ASCII, the only encoding read here
-            value_off = pos + 8
-            if cnt <= 4:
-                raw = tiff[value_off : value_off + cnt]
+        if name and typ == _EXIF_ASCII:  # the only encoding read here
+            if cnt <= len(value):  # short enough to sit in the entry itself
+                raw = value[:cnt]
             else:
-                (data_off,) = struct.unpack_from(endian + "I", tiff, value_off)
+                (data_off,) = struct.unpack(endian + _IFD_OFFSET, value)
                 raw = tiff[data_off : data_off + cnt]
-            text = raw.split(b"\x00", 1)[0].decode("ascii", errors="replace").strip()
+            text = raw.partition(b"\x00")[0].decode("ascii", errors="replace").strip()
             if text:
                 out[name] = text
-        pos += 12
+        pos += entry.size
     return out
 
 
@@ -224,35 +260,33 @@ def _read_ifd0(tiff: bytes, offset: int, endian: str) -> dict[str, str]:
 
 def _gif_text(data: bytes) -> dict[str, str]:
     n = len(data)
-    if len(data) < 13:
+    if len(data) < _GIF_HEAD.size:
         return {}
-    packed = data[10]
-    pos = 13
-    if packed & 0x80:
-        pos += 3 * (2 ** ((packed & 0x07) + 1))
+    _sig, _width, _height, packed, _background, _aspect = _GIF_HEAD.unpack_from(data)
+    pos = _GIF_HEAD.size
+    pos += _color_table(packed)
     comments: list[str] = []
     while pos < n:
         marker = data[pos]
-        if marker == 0x3B:  # trailer
+        if marker == _GIF_TRAILER:
             break
-        if marker == 0x21:  # extension
-            if pos + 2 > n:
+        if marker == _GIF_EXTENSION:
+            if pos + _GIF_EXT.size > n:
                 break
-            label = data[pos + 1]
-            pos += 2
+            _introducer, label = _GIF_EXT.unpack_from(data, pos)
+            pos += _GIF_EXT.size
             pos, chunk = _skip_subblocks(data, pos)
-            if label == 0xFE:
+            if label == _GIF_COMMENT:
                 text = " ".join(bytes(chunk).decode("ascii", errors="replace").split())
                 if text:
                     comments.append(text)
             continue
-        if marker == 0x2C:  # image descriptor
-            if pos + 10 > n:
+        if marker == _GIF_DESCRIPTOR:
+            if pos + _GIF_IMAGE.size > n:
                 break
-            local_packed = data[pos + 9]
-            pos += 10
-            if local_packed & 0x80:
-                pos += 3 * (2 ** ((local_packed & 0x07) + 1))
+            local_packed = _GIF_IMAGE.unpack_from(data, pos)[-1]
+            pos += _GIF_IMAGE.size
+            pos += _color_table(local_packed)
             if pos >= n:
                 break
             pos += 1  # LZW minimum code size
@@ -260,6 +294,13 @@ def _gif_text(data: bytes) -> dict[str, str]:
             continue
         break  # an unrecognised byte here means the walk has lost sync
     return {("Comment" if i == 0 else f"Comment {i + 1}"): c for i, c in enumerate(comments)}
+
+
+def _color_table(packed: int) -> int:
+    """Bytes of the colour table a packed field declares; 0 when it declares none."""
+    if not packed & _GIF_TABLE_FLAG:
+        return 0
+    return _GIF_RGB * (1 << ((packed & _GIF_TABLE_BITS) + 1))
 
 
 def _skip_subblocks(data: bytes, pos: int) -> tuple[int, bytearray]:

@@ -25,9 +25,9 @@ export function headingsFor(record, query, limit) {
     if (typeof phrase !== "string") continue;   // a record is data, not a promise
     let matches = 0;
     for (const t of new Set(tokenize(phrase))) if (wanted.has(t)) matches++;
-    if (matches) scored.push([-matches, position, phrase]);
+    if (matches) scored.push({ matches, position, phrase });
   }
-  // `position` ascending is the tie-break, so the key sorts directly.
-  scored.sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]));
-  return scored.slice(0, limit).map((s) => s[2]);
+  // Most matches first; `position` ascending is the tie-break.
+  scored.sort((a, b) => (b.matches - a.matches) || (a.position - b.position));
+  return scored.slice(0, limit).map((s) => s.phrase);
 }

@@ -37,7 +37,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.drawio", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
+VERSION = fixed("decoders.drawio", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
 
 EXTENSIONS = tuple(fixed("decoders.drawio", "extensions"))
 
@@ -86,9 +86,12 @@ def _model(diagram):
         return None
     try:
         compressed = base64.b64decode(payload, validate=True)
-        # -15: raw deflate, no zlib header. draw.io writes it this way and a
-        # default-window inflate simply fails, which reads as "not a diagram".
-        inflated = zlib.decompressobj(-15).decompress(compressed, limit("drawio", "max_inflated"))
+        # Negative window bits: raw deflate, no zlib header. draw.io writes it
+        # this way and a default-window inflate simply fails, which reads as
+        # "not a diagram".
+        inflated = zlib.decompressobj(-zlib.MAX_WBITS).decompress(
+            compressed, limit("drawio", "max_inflated")
+        )
     except (ValueError, zlib.error):
         return None
     try:

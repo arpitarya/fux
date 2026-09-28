@@ -12,6 +12,10 @@
 import { idf } from "./bm25f.mjs";
 import { termHash } from "../store/format.mjs";
 import { tokenizePairs } from "./tokenize.mjs";
+import { fixed } from "../config/constants.mjs";
+
+/** The digits every published signal is rounded to — they are JSON output. */
+const SCALE = Number(`1e${fixed("confidence", "signal_digits")}`);
 
 export const GROUNDED = "grounded";
 export const WEAK = "weak";
@@ -22,7 +26,7 @@ export const NONE = "none";
 //: caller (L12). ⚠ `weak` is a SIGNAL, not a refusal (Arpit 2026-09-22,
 //: W-214) — the label is published, nothing abstains on it.
 
-function round4(x) { return Math.round(x * 1e4) / 1e4; }
+function round4(x) { return Math.round(x * SCALE) / SCALE; }
 function clamp01(x) { return Math.max(0.0, Math.min(1.0, x)); }
 
 export class Confidence {
@@ -188,7 +192,7 @@ export function signals(
 
   // One result separates perfectly: there is no runner-up to confuse it with.
   let separation;
-  if (scores.length >= 2 && scores[0] > 0) separation = (scores[0] - scores[1]) / scores[0];
+  if (scores.length > 1 && scores[0] > 0) separation = (scores[0] - scores[1]) / scores[0];
   else if (scores.length === 1) separation = 1.0;
   else separation = 0.0;
 

@@ -653,18 +653,18 @@ def _translate(glob: str) -> str:
     while i < n:
         ch = glob[i]
         if ch == "\\" and i + 1 < n:
-            out.append(re.escape(glob[i + 1]))
-            i += 2
+            i += 1  # past the backslash; the next character is literal
+            out.append(re.escape(glob[i]))
+            i += 1
+        elif glob.startswith("**/", i):
+            out.append(r"(?:.*/)?")  # zero or more directories, git's reading
+            i += len("**/")
+        elif glob.startswith("**", i):
+            out.append(r".*")
+            i += len("**")
         elif ch == "*":
-            if glob[i : i + 3] == "**/":
-                out.append(r"(?:.*/)?")  # zero or more directories, git's reading
-                i += 3
-            elif glob[i : i + 2] == "**":
-                out.append(r".*")
-                i += 2
-            else:
-                out.append(r"[^/]*")
-                i += 1
+            out.append(r"[^/]*")
+            i += 1
         elif ch == "?":
             out.append(r"[^/]")
             i += 1

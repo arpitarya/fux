@@ -43,6 +43,9 @@ __all__ = ["K", "rrf", "fuse_results"]
 #: under L12 it is FIXED: `constants.toml [fuse] rrf_k`.
 K = fixed("fuse", "rrf_k")
 
+#: The sort key's resolution (SR-RANKING decision 8a): `round(x, score_digits)`.
+_SCORE_DIGITS = fixed("ranking", "score_digits")
+
 
 def rrf(rank_lists: list[list[str]]) -> dict[str, float]:
     """`id -> fused score`, from ranked id lists. Rank 0 is best.
@@ -86,7 +89,7 @@ def fuse_results(result_lists: list[list], top: int) -> list:
             if current is None or i < current[0]:
                 best_seen[result.id] = (i, result)
 
-    ordered = sorted(scores, key=lambda doc_id: (-round(scores[doc_id], 9), doc_id))
+    ordered = sorted(scores, key=lambda doc_id: (-round(scores[doc_id], _SCORE_DIGITS), doc_id))
     return [
         dataclasses.replace(best_seen[doc_id][1], score=scores[doc_id])
         for doc_id in ordered[:top]

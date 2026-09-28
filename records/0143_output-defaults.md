@@ -10,10 +10,10 @@ amended: 2026-08-28
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@988bd2d3cdfb, src/fux/templates/output.toml.txt@7251f3203770, .fux/output.toml@7251f3203770, node/src/config/output.mjs@23ce57d18a76]
+owns: [src/fux/output_config.py@988bd2d3cdfb, src/fux/templates/output.toml.txt@7251f3203770, .fux/output.toml@7251f3203770, node/src/config/output.mjs@850e35e36742]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: d3ed19b5536408aa6d328cf74af19b8726db1f14ce5691e6a164df74ded35f18
+content_sha: 33deb66c67a7582c4bff151de676a2ed62548d6a36a79f0dbeb0e2b6cbc92029
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -794,6 +794,8 @@ this moved where they are written, not what they are.
 **No output key changed** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `cli.py`'s observer hook no longer runs observers on a `50` ms bound held in code when `fux.toml` does not load ([SR-OBSERVE](0157_observe.md)); `node/test/config.test.mjs` gained the `dirs_file` cases.
 
 **`fux inspect --top` reads `.fux/inspect.toml [report] top`, not `output.toml`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): it sizes a report's lists, which is SR-INSPECT's, and no output key changed.
+
+**No output key changed** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/output.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
 
 ### Consequences
 

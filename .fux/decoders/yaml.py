@@ -45,7 +45,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.yaml", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
+VERSION = fixed("decoders.yaml", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
 
 EXTENSIONS = tuple(fixed("decoders.yaml", "extensions"))
 
@@ -117,12 +117,12 @@ def decode(raw: bytes, rel_path: str) -> str | None:
             block_lines_indent[0] = None
             continue
         value = _clean(value)
-        depth = _indent(line) // 2 + 1
+        depth = _indent(line) // limit("yaml", "indent_step") + 1
         if not value:
             if key:
                 out.append(_label(key, min(depth, limit("yaml", "max_depth"))))
         else:
-            prose = _prose(value) or value if len(value) >= 3 else ""
+            prose = _prose(value) or value if len(value) >= limit("yaml", "min_value_len") else ""
             if prose:
                 out.append(f"**{key}:** {prose}")
 

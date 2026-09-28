@@ -90,7 +90,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 
+from ..constants import fixed
 from .bm25f import idf
+
+#: The digits every published signal is rounded to -- they are JSON output.
+_DIGITS = fixed("confidence", "signal_digits")
 
 __all__ = [
     "BANDS",
@@ -456,7 +460,7 @@ def signals(
         doc_coverage = 1.0
 
     # One result separates perfectly: there is no runner-up to be confused with.
-    if len(scores) >= 2 and scores[0] > 0:
+    if len(scores) > 1 and scores[0] > 0:
         separation = (scores[0] - scores[1]) / scores[0]
     elif len(scores) == 1:
         separation = 1.0
@@ -464,9 +468,9 @@ def signals(
         separation = 0.0
 
     return Confidence(
-        coverage=round(max(0.0, min(1.0, coverage)), 4),
-        doc_coverage=round(max(0.0, min(1.0, doc_coverage)), 4),
-        separation=round(max(0.0, min(1.0, separation)), 4),
+        coverage=round(max(0.0, min(1.0, coverage)), _DIGITS),
+        doc_coverage=round(max(0.0, min(1.0, doc_coverage)), _DIGITS),
+        separation=round(max(0.0, min(1.0, separation)), _DIGITS),
         support=len(scores),
         verified=verified,
         missing=tuple(missing),

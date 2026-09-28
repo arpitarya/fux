@@ -12,165 +12,147 @@
  * correct and roughly an order of magnitude slower on the hot path, and the
  * hot path is every term of every query.
  *
- * Transcribed from RFC 7693 §3.1–§3.3. Pinned in `test/blake2b.test.mjs`
- * against RFC 7693 Appendix A and against Python `hashlib` at digest sizes
- * 1, 8 and 20 — the three fux uses (shard bucket, term key, content sha).
+ * **Every number the RFC fixes is read from `src/fux/constants.toml
+ * [blake2b]`** (SR-LAW-12 decision 6a, R7) — the IV, the message schedule, the
+ * G steps, the rotations, the block and parameter-block layout. What is left
+ * here is the arithmetic: a carry, a rotation, a little-endian read.
+ *
+ * Transcribed from RFC 7693 §3.1–§3.3. Pinned in `test/pins.test.mjs` against
+ * RFC 7693 Appendix A and against Python `hashlib` at digest sizes 1, 8 and 20
+ * — the three fux uses (shard bucket, term key, content sha).
  */
+import { Buffer } from "node:buffer";
+import { fixed } from "../config/constants.mjs";
 
-// IV — RFC 7693 §2.6, the SHA-512 IV. lo, hi per word.
-const IV32 = new Uint32Array([
-  0xf3bcc908, 0x6a09e667, 0x84caa73b, 0xbb67ae85,
-  0xfe94f82b, 0x3c6ef372, 0x5f1d36f1, 0xa54ff53a,
-  0xade682d1, 0x510e527f, 0x2b3e6c1f, 0x9b05688c,
-  0xfb41bd6b, 0x1f83d9ab, 0x137e2179, 0x5be0cd19,
-]);
+/** Bytes in one 32-bit half, and halves in one 64-bit word. */
+const HALF_BYTES = Uint32Array.BYTES_PER_ELEMENT;
+const HALVES = BigUint64Array.BYTES_PER_ELEMENT / HALF_BYTES;
+const HALF_BITS = fixed("blake2b", "word_bits") / HALVES;
 
-// SIGMA — RFC 7693 §2.7, ten permutations, rounds 11/12 reuse 0/1.
-// Pre-doubled: these index the 32-bit halves directly.
-const SIGMA82 = new Uint8Array([
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-  14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3,
-  11, 8, 12, 0, 5, 2, 15, 13, 10, 14, 3, 6, 7, 1, 9, 4,
-  7, 9, 3, 1, 13, 12, 11, 14, 2, 6, 5, 10, 4, 0, 15, 8,
-  9, 0, 5, 7, 2, 4, 10, 15, 14, 1, 11, 12, 6, 8, 3, 13,
-  2, 12, 6, 10, 0, 11, 8, 3, 4, 13, 7, 5, 15, 14, 1, 9,
-  12, 5, 1, 15, 14, 13, 4, 10, 0, 7, 6, 3, 9, 2, 8, 11,
-  13, 11, 7, 14, 12, 1, 3, 9, 5, 0, 15, 4, 8, 6, 2, 10,
-  6, 15, 14, 9, 11, 3, 0, 8, 12, 2, 13, 7, 1, 4, 10, 5,
-  10, 2, 8, 4, 7, 6, 1, 5, 15, 11, 9, 14, 3, 12, 13, 0,
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-  14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3,
-].map((x) => x * 2));
+// IV — RFC 7693 §2.6, the SHA-512 IV, lo then hi per word.
+const IV32 = Uint32Array.from(fixed("blake2b", "iv"));
 
-const v = new Uint32Array(32);
-const m = new Uint32Array(32);
+// SIGMA — RFC 7693 §2.7, one row per round; indexes MESSAGE WORDS.
+const SIGMA = fixed("blake2b", "sigma");
 
-/** v[a] += v[b], 64-bit, carrying lo into hi. */
-function add64AA(dst, a, b) {
-  const o0 = dst[a] + dst[b];
-  let o1 = dst[a + 1] + dst[b + 1];
-  if (o0 >= 0x100000000) o1++;
-  dst[a] = o0;
-  dst[a + 1] = o1;
+// The eight G applications of a round, (a, b, c, d) as indexes into the halves.
+const G_STEPS = fixed("blake2b", "g_steps").map((step) => step.map((w) => w * HALVES));
+
+const [R0, R1, R2, R3] = fixed("blake2b", "rotations");
+const BLOCK_BYTES = fixed("blake2b", "block_bytes");
+const MAX_DIGEST = fixed("blake2b", "max_digest_bytes");
+const MAX_KEY = fixed("blake2b", "max_key_bytes");
+const PARAM_BLOCK = fixed("blake2b", "param_block");
+const KEY_SHIFT = fixed("blake2b", "key_length_shift");
+const COUNTER = fixed("blake2b", "counter_word") * HALVES;
+const FINAL = fixed("blake2b", "final_word") * HALVES;
+
+// v = h ‖ IV (RFC 7693 §3.2); m is one block.
+const v = new Uint32Array(IV32.length + IV32.length);
+const m = new Uint32Array(BLOCK_BYTES / HALF_BYTES);
+
+/** v[a] += (hi << 32) | lo, 64-bit: the lo half's overflow carries into hi. */
+function add64(a, lo, hi) {
+  const o = (v[a] + lo) >>> 0;
+  v[a + 1] = v[a + 1] + hi + (o < v[a] ? 1 : 0);
+  v[a] = o;
 }
 
-/** v[a] += (b1 << 32) | b0. `b0 < 0` is a sign-extended 32-bit value. */
-function add64AC(dst, a, b0, b1) {
-  let o0 = dst[a] + b0;
-  if (b0 < 0) o0 += 0x100000000;
-  let o1 = dst[a + 1] + b1;
-  if (o0 >= 0x100000000) o1++;
-  dst[a] = o0;
-  dst[a + 1] = o1;
+/** v[x] = rotr64(v[x] ^ v[y], n). A rotation by a whole half is a swap. */
+function xorRotr(x, y, n) {
+  const lo = v[x] ^ v[y];
+  const hi = v[x + 1] ^ v[y + 1];
+  const low = n < HALF_BITS;
+  const p = low ? lo : hi;
+  const q = low ? hi : lo;
+  const k = low ? n : n - HALF_BITS;
+  if (!k) {
+    v[x] = p;
+    v[x + 1] = q;
+    return;
+  }
+  v[x] = (p >>> k) ^ (q << (HALF_BITS - k));
+  v[x + 1] = (q >>> k) ^ (p << (HALF_BITS - k));
 }
 
-function get32(arr, i) {
-  return (arr[i] ^ (arr[i + 1] << 8) ^ (arr[i + 2] << 16) ^ (arr[i + 3] << 24));
-}
-
-/** The G mixing function — RFC 7693 §3.1. Rotations 32, 24, 16, 63. */
+/** The G mixing function — RFC 7693 §3.1. `ix`, `iy` index message words. */
 function g(a, b, c, d, ix, iy) {
-  const x0 = m[ix], x1 = m[ix + 1];
-  const y0 = m[iy], y1 = m[iy + 1];
-
-  add64AA(v, a, b);
-  add64AC(v, a, x0, x1);
-
-  // rotr 32 — a whole-word swap, so it is free
-  let xor0 = v[d] ^ v[a];
-  let xor1 = v[d + 1] ^ v[a + 1];
-  v[d] = xor1;
-  v[d + 1] = xor0;
-
-  add64AA(v, c, d);
-
-  // rotr 24
-  xor0 = v[b] ^ v[c];
-  xor1 = v[b + 1] ^ v[c + 1];
-  v[b] = (xor0 >>> 24) ^ (xor1 << 8);
-  v[b + 1] = (xor1 >>> 24) ^ (xor0 << 8);
-
-  add64AA(v, a, b);
-  add64AC(v, a, y0, y1);
-
-  // rotr 16
-  xor0 = v[d] ^ v[a];
-  xor1 = v[d + 1] ^ v[a + 1];
-  v[d] = (xor0 >>> 16) ^ (xor1 << 16);
-  v[d + 1] = (xor1 >>> 16) ^ (xor0 << 16);
-
-  add64AA(v, c, d);
-
-  // rotr 63
-  xor0 = v[b] ^ v[c];
-  xor1 = v[b + 1] ^ v[c + 1];
-  v[b] = (xor1 >>> 31) ^ (xor0 << 1);
-  v[b + 1] = (xor0 >>> 31) ^ (xor1 << 1);
+  const x = ix * HALVES;
+  const y = iy * HALVES;
+  add64(a, v[b], v[b + 1]);
+  add64(a, m[x], m[x + 1]);
+  xorRotr(d, a, R0);
+  add64(c, v[d], v[d + 1]);
+  xorRotr(b, c, R1);
+  add64(a, v[b], v[b + 1]);
+  add64(a, m[y], m[y + 1]);
+  xorRotr(d, a, R2);
+  add64(c, v[d], v[d + 1]);
+  xorRotr(b, c, R3);
 }
 
 /** The compression function F — RFC 7693 §3.2. */
 function compress(ctx, last) {
-  let i = 0;
-  for (i = 0; i < 16; i++) {
-    v[i] = ctx.h[i];
-    v[i + 16] = IV32[i];
-  }
+  v.set(ctx.h);
+  v.set(IV32, ctx.h.length);
 
-  // v[12,13] ^= t (the byte counter); v[14,15] ^= 0xff.. on the final block
-  v[24] = v[24] ^ ctx.t;
-  v[25] = v[25] ^ (ctx.t / 0x100000000);
+  // v[12] ^= t (the byte counter); v[14] = ~v[14] on the final block
+  v[COUNTER] ^= ctx.tLo;
+  v[COUNTER + 1] ^= ctx.tHi;
   if (last) {
-    v[28] = ~v[28];
-    v[29] = ~v[29];
+    v[FINAL] = ~v[FINAL];
+    v[FINAL + 1] = ~v[FINAL + 1];
   }
 
-  for (i = 0; i < 32; i++) m[i] = get32(ctx.b, 4 * i);
+  for (let i = 0; i < m.length; i++) m[i] = ctx.view.getUint32(i * HALF_BYTES, true);
 
-  for (i = 0; i < 12; i++) {
-    const s = SIGMA82.subarray(i * 16, i * 16 + 16);
-    g(0, 8, 16, 24, s[0], s[1]);
-    g(2, 10, 18, 26, s[2], s[3]);
-    g(4, 12, 20, 28, s[4], s[5]);
-    g(6, 14, 22, 30, s[6], s[7]);
-    g(0, 10, 20, 30, s[8], s[9]);
-    g(2, 12, 22, 24, s[10], s[11]);
-    g(4, 14, 16, 26, s[12], s[13]);
-    g(6, 8, 18, 28, s[14], s[15]);
+  for (const row of SIGMA) {
+    let s = 0;
+    for (const [a, b, c, d] of G_STEPS) g(a, b, c, d, row[s++], row[s++]);
   }
 
-  for (i = 0; i < 16; i++) ctx.h[i] = ctx.h[i] ^ v[i] ^ v[i + 16];
+  for (let i = 0; i < ctx.h.length; i++) ctx.h[i] = ctx.h[i] ^ v[i] ^ v[i + ctx.h.length];
+}
+
+/** t += n, carried across the two halves. */
+function count(ctx, n) {
+  const lo = (ctx.tLo + n) >>> 0;
+  ctx.tHi += lo < ctx.tLo ? 1 : 0;
+  ctx.tLo = lo;
 }
 
 /** Init — RFC 7693 §3.3. The parameter block is why truncation is wrong. */
 function init(outlen, key) {
-  if (!Number.isInteger(outlen) || outlen < 1 || outlen > 64) {
-    throw new RangeError(`blake2b digest size must be 1..64, got ${outlen}`);
+  if (!Number.isInteger(outlen) || outlen < 1 || outlen > MAX_DIGEST) {
+    throw new RangeError(`blake2b digest size must be 1..${MAX_DIGEST}, got ${outlen}`);
   }
   const keylen = key ? key.length : 0;
-  if (keylen > 64) throw new RangeError("blake2b key must be <= 64 bytes");
+  if (keylen > MAX_KEY) throw new RangeError(`blake2b key must be <= ${MAX_KEY} bytes`);
 
+  const b = new Uint8Array(BLOCK_BYTES);
   const ctx = {
-    b: new Uint8Array(128),
-    h: new Uint32Array(16),
-    t: 0,   // bytes compressed
-    c: 0,   // bytes in the buffer
+    b,
+    view: new DataView(b.buffer),
+    h: Uint32Array.from(IV32),
+    tLo: 0, // bytes compressed, lo half
+    tHi: 0, // bytes compressed, hi half
+    c: 0, // bytes in the buffer
     outlen,
   };
-  for (let i = 0; i < 16; i++) ctx.h[i] = IV32[i];
-  // h[0] ^= 0x01010000 ^ (keylen << 8) ^ outlen
-  ctx.h[0] ^= 0x01010000 ^ (keylen << 8) ^ outlen;
+  // h[0] ^= 0x0101kknn — fanout 1, depth 1, key length, digest length
+  ctx.h[0] ^= PARAM_BLOCK ^ (keylen << KEY_SHIFT) ^ outlen;
 
   if (keylen > 0) {
     update(ctx, key);
-    ctx.c = 128;
+    ctx.c = BLOCK_BYTES;
   }
   return ctx;
 }
 
 function update(ctx, input) {
   for (let i = 0; i < input.length; i++) {
-    if (ctx.c === 128) {
-      ctx.t += ctx.c;
+    if (ctx.c === BLOCK_BYTES) {
+      count(ctx, ctx.c);
       compress(ctx, false);
       ctx.c = 0;
     }
@@ -180,29 +162,24 @@ function update(ctx, input) {
 }
 
 function final(ctx) {
-  ctx.t += ctx.c;
-  while (ctx.c < 128) ctx.b[ctx.c++] = 0;
+  count(ctx, ctx.c);
+  ctx.b.fill(0, ctx.c);
+  ctx.c = BLOCK_BYTES;
   compress(ctx, true);
 
-  const out = new Uint8Array(ctx.outlen);
-  for (let i = 0; i < ctx.outlen; i++) {
-    out[i] = (ctx.h[i >> 2] >> (8 * (i & 3))) & 0xff;
-  }
-  return out;
+  // h, little-endian, cut to the digest size
+  const out = new Uint8Array(ctx.h.length * HALF_BYTES);
+  const view = new DataView(out.buffer);
+  ctx.h.forEach((w, i) => view.setUint32(i * HALF_BYTES, w, true));
+  return out.slice(0, ctx.outlen);
 }
 
-const HEX = [];
-for (let i = 0; i < 256; i++) HEX.push(i.toString(16).padStart(2, "0"));
-
 /** `blake2b(bytes, digestSize)` -> Uint8Array. */
-export function blake2b(input, digestSize = 64, key = null) {
+export function blake2b(input, digestSize, key) {
   return final(update(init(digestSize, key), input));
 }
 
 /** `blake2b(bytes, digestSize)` -> lowercase hex, like Python's `.hexdigest()`. */
-export function blake2bHex(input, digestSize = 64, key = null) {
-  const out = blake2b(input, digestSize, key);
-  let s = "";
-  for (let i = 0; i < out.length; i++) s += HEX[out[i]];
-  return s;
+export function blake2bHex(input, digestSize, key) {
+  return Buffer.from(blake2b(input, digestSize, key)).toString("hex");
 }

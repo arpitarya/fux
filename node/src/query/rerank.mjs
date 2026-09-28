@@ -58,10 +58,6 @@ export class Proximity {
   }
 }
 
-//: Below two distinct query terms there is no proximity to measure — one term
-//: is always perfectly covered, adjacent to nothing, and spans itself.
-const MIN_TERMS = 2;
-
 /** Distinct, in query order — Python's `dict.fromkeys`. */
 function distinct(terms) { return [...new Set(terms)]; }
 
@@ -82,7 +78,7 @@ export function signals(queryTerms, docTerms) {
 
   const present = wanted.filter((t) => positions.has(t));
   const coverage = present.length / wanted.length;
-  if (present.length < MIN_TERMS) {
+  if (present.length <= 1) {
     // One term (or none) — coverage is the only honest signal, and there is no
     // window to measure. A span here would reward a single-term document for a
     // proximity it never demonstrated.
@@ -212,10 +208,12 @@ export function readLocalText(root, docId, loc) {
 export function rerank(root, query, results, { tune, read = null }) {
   const depth = tune.rerankDepth;
   const weight = tune.rerankWeight;
-  if (weight <= 0 || depth <= 0 || results.length < 2) return [...results];
+  if (weight <= 0 || depth <= 0 || results.length <= 1) return [...results];
 
   const queryTerms = analyze(query);
-  if (distinct(queryTerms).length < MIN_TERMS) {
+  if (distinct(queryTerms).length <= 1) {
+    // Below two distinct terms there is no proximity to measure: one term is
+    // always perfectly covered, adjacent to nothing, and spans itself.
     // A one-term query has no proximity. Reranking it would be arithmetic on a
     // signal that is constant across every candidate.
     return [...results];

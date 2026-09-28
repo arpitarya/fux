@@ -97,7 +97,7 @@ _ITEM = re.compile(rf"^\s*({_STRING})\s*,?\s*(?:#.*)?$")
 _TABLE = re.compile(r"^\s*\[")
 _DECODERS_HEADER = re.compile(r"^\s*\[\s*decoders\s*\]\s*(?:#.*)?$")
 _META_HEADER = re.compile(r"^\s*\[\s*meta\s*\]\s*(?:#.*)?$")
-_KV = re.compile(rf"^\s*({_STRING}|[A-Za-z0-9_\-]+)\s*=\s*({_STRING})\s*(?:#.*)?$")
+_KV = re.compile(rf"^\s*(?P<key>{_STRING}|[A-Za-z0-9_\-]+)\s*=\s*(?P<value>{_STRING})\s*(?:#.*)?$")
 
 
 @dataclass(frozen=True)
@@ -142,7 +142,7 @@ def pattern_extension(glob: str) -> str | None:
     """
     if not glob.startswith("*.") or "/" in glob:
         return None
-    ext = glob[2:].lower()
+    ext = glob.removeprefix("*.").lower()
     if not ext or any(ch in ext for ch in "*?[]"):
         return None
     return ext
@@ -387,7 +387,7 @@ def quote(value: str) -> str:
             out.append("\\t")
         elif ch == "\n":
             out.append("\\n")
-        elif ord(ch) < 0x20 or ord(ch) == 0x7F:
+        elif ch < " " or ch == "\x7f":  # a C0 control or DEL
             out.append(f"\\u{ord(ch):04x}")
         else:
             out.append(ch)
@@ -509,7 +509,7 @@ def _pairs(lines: list[str], start: int, stop: int) -> list[tuple[int, str, str]
     for i in range(start, stop):
         m = _KV.match(lines[i])
         if m and not lines[i].strip().startswith("#"):
-            out.append((i, _key_name(m.group(1)), _unquote(m.group(2))))
+            out.append((i, _key_name(m.group("key")), _unquote(m.group("value"))))
     return out
 
 
@@ -577,7 +577,7 @@ def set_decoder(text: str, ext: str, name: str, *, origin: str) -> tuple[str, st
         same = [i for i, k, _ in pairs if k == ext]
         if same:
             m = _KV.match(lines[same[0]])
-            comment = lines[same[0]][m.end(2):].strip()
+            comment = lines[same[0]][m.end("value"):].strip()
             lines[same[0]] = entry + (f"  {comment}" if comment else "")
         else:
             group = [i for i, _, v in pairs if v == name]

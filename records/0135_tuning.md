@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-24
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@51540f8551a4, .fux/tune.toml@1f2f7240794e, node/src/config/tune.mjs@1adf99bbe934]
+owns: [src/fux/tune.py@51540f8551a4, .fux/tune.toml@1f2f7240794e, node/src/config/tune.mjs@90294c362ca0]
 laws: [L1, L3, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: ac68f7b2f35e87ed3f67aaf9ac27c4d3996d740228fac1eb9b33972f92679f27
+content_sha: c1b48b04662c74dbfe2e8a1fb5021dfc470d70d5df0962cd59786c073af0cc50
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1031,6 +1031,8 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **No tune key changed** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `fux.toml` joined `tune.toml` and `output.toml` as a file `fux doctor --fix` fills key by key; `node/test/config.test.mjs` gained `fux.toml`'s `dirs_file` cases ([SR-CONFIG](0113_config.md) decision 17).
+
+**No tune key changed** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/tune.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
 
 ### Consequences
 

@@ -40,7 +40,7 @@
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { FuxError } from "../errors.mjs";
-import { parseToml, wasFloat } from "./toml.mjs";
+import { BOM, parseToml, wasFloat } from "./toml.mjs";
 import { Scoring } from "../query/bm25f.mjs";
 import { Proximity } from "../query/rerank.mjs";
 import { TF_FIELDS } from "../store/format.mjs";
@@ -360,7 +360,7 @@ export function loadTune(root, { enabled }) {
       "restores a deleted one. fux holds no copy of its values in code",
     );
   }
-  if (raw.charCodeAt(0) === 0xfeff) raw = raw.slice(1);
+  if (raw.startsWith(BOM)) raw = raw.slice(BOM.length);
   rejectConflictMarkers(label, raw);
   return resolve(parseToml(raw, label), label);
 }

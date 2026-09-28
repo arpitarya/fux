@@ -22,6 +22,11 @@ from fux.decode import claims, decode, registry
 from fux.decode.html import html_to_markdown
 from fux.errors import FuxError
 from fux.ingest.parse import parse_document
+from l12_fixtures import configured_root
+
+#: The html decoder reads `[limits.html] charset_scan_bytes` (W-225 stage 5b),
+#: so a call names a repository, as every production caller does.
+ROOT = configured_root()
 
 HTML = b"""<!doctype html>
 <html><head><title>Runbook</title><style>b{}</style></head>
@@ -40,7 +45,7 @@ HTML = b"""<!doctype html>
 
 def test_html_is_claimed_and_markdown_comes_out():
     assert claims("docs/runbook.html")
-    out = decode(HTML, "docs/runbook.html")
+    out = decode(HTML, "docs/runbook.html", ROOT)
     assert out is not None
     assert "# Restarting the broker" in out
     assert "- stop consumers" in out
@@ -71,7 +76,7 @@ def test_a_dotfile_with_no_extension_is_not_a_format():
 def test_empty_output_reads_as_none_not_as_an_empty_document():
     # A page of nothing but chrome has no prose. Indexing it as a zero-term
     # document would put an empty record in the index and distort `df`.
-    assert decode(b"<html><body><style>x{}</style></body></html>", "a.html") is None
+    assert decode(b"<html><body><style>x{}</style></body></html>", "a.html", ROOT) is None
 
 
 # -- determinism (L3) -------------------------------------------------------
@@ -85,9 +90,10 @@ def test_decoding_is_byte_identical_across_processes():
     script = textwrap.dedent(
         """
         import sys, hashlib
+        from pathlib import Path
         from fux.decode import decode
         raw = sys.stdin.buffer.read()
-        out = decode(raw, "x.html")
+        out = decode(raw, "x.html", Path(sys.argv[1]))
         sys.stdout.write(hashlib.sha256(out.encode()).hexdigest())
         """
     )
@@ -102,7 +108,7 @@ def test_decoding_is_byte_identical_across_processes():
             p for p in (_src(), env.get("PYTHONPATH", "")) if p
         )
         result = subprocess.run(
-            [sys.executable, "-c", script], input=HTML, capture_output=True, env=env
+            [sys.executable, "-c", script, str(ROOT)], input=HTML, capture_output=True, env=env
         )
         assert result.returncode == 0, result.stderr.decode()[-2000:]
         digests.add(result.stdout.decode())
@@ -297,7 +303,7 @@ def test_decoded_output_is_not_re_read_as_frontmatter():
     """An `<hr>` converts to `---`. If the frontmatter parser ran over decoded
     Markdown it would swallow that as a delimiter and eat the document's head.
     """
-    doc = parse_document(b"<html><body><hr><p>real content here</p></body></html>", "a.html")
+    doc = parse_document(b"<html><body><hr><p>real content here</p></body></html>", "a.html", ROOT)
     assert doc is not None
     assert doc.meta == {}
     assert "real content here" in doc.body

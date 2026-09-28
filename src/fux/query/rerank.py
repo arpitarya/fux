@@ -67,7 +67,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from ..constants import fixed
 from .analyzer import analyze
+
+#: The sort key's resolution (SR-RANKING decision 8a): `round(x, score_digits)`.
+_SCORE_DIGITS = fixed("ranking", "score_digits")
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from ..tune import Tune
@@ -96,10 +100,6 @@ class Proximity:
     adjacency: float
 
 
-#: Below two distinct query terms there is no proximity to measure -- one term
-#: is always perfectly covered, adjacent to nothing, and spans itself.
-_MIN_TERMS = 2
-
 
 def signals(query_terms: list[str], doc_terms: list[str]) -> tuple[float, float, float]:
     """`(coverage, span, adjacency)`, each in `[0, 1]`.
@@ -118,7 +118,7 @@ def signals(query_terms: list[str], doc_terms: list[str]) -> tuple[float, float,
 
     present = [t for t in wanted if t in positions]
     coverage = len(present) / len(wanted)
-    if len(present) < _MIN_TERMS:
+    if len(present) <= 1:
         # One term (or none) -- coverage is the only honest signal, and there
         # is no window to measure. Returning a span here would reward a
         # single-term document for a proximity it never demonstrated.
@@ -287,11 +287,13 @@ def rerank(
     """
     depth = tune.rerank_depth
     weight = tune.rerank_weight
-    if weight <= 0 or depth <= 0 or len(results) < 2:
+    if weight <= 0 or depth <= 0 or len(results) <= 1:
         return list(results)
 
     query_terms = analyze(query)
-    if len(dict.fromkeys(query_terms)) < _MIN_TERMS:
+    if len(dict.fromkeys(query_terms)) <= 1:
+        # Below two distinct terms there is no proximity to measure: one term is
+        # always perfectly covered, adjacent to nothing, and spans itself.
         # A one-term query has no proximity. Reranking it would be arithmetic
         # on a signal that is constant across every candidate.
         return list(results)
@@ -317,7 +319,7 @@ def rerank(
             uplift_out[result.id] = uplift
         rescored.append((result.score * uplift, result))
 
-    rescored.sort(key=lambda pair: (-round(pair[0], 9), pair[1].id))
+    rescored.sort(key=lambda pair: (-round(pair[0], _SCORE_DIGITS), pair[1].id))
     import dataclasses
 
     return [dataclasses.replace(r, score=s) for s, r in rescored] + tail

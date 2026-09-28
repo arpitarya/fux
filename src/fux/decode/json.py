@@ -33,13 +33,18 @@ import re
 from fux.constants import fixed
 from fux.decode._limits import limit
 
+#: Markdown has six heading levels; a deeper one is clamped, never invented.
+_MAX_HEADING = fixed("markdown", "max_heading")
+#: A record's fields in a multi-record file start one level below the file's H1.
+_RECORD_LEVEL = fixed("markdown", "record_level")
+
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
 #: `fux ingest` re-extracts the documents bound to THIS decoder and no others.
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.json", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
+VERSION = fixed("decoders.json", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
 
 EXTENSIONS = tuple(fixed("decoders.json", "extensions"))
 
@@ -166,7 +171,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
         # a nested array of scalars is untouched.
         for index, item in enumerate(data[:limit("json", "max_items")], start=1):
             block: list[str] = []
-            _walk(item, block, depth=2, label=None)
+            _walk(item, block, depth=_RECORD_LEVEL, label=None)
             if not block:
                 continue
             lines.append(f"## Item {index}")
@@ -221,7 +226,7 @@ def _label(label: str, depth: int) -> str:
     covers every nested key/value format fux reads.
     """
     if depth <= limit("json", "max_heading_depth"):
-        return "#" * min(depth, 6) + " " + label
+        return "#" * min(depth, _MAX_HEADING) + " " + label
     return f"**{label}**"
 
 

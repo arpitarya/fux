@@ -21,8 +21,12 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from .. import store as store_mod
+from ..constants import fixed
 from ..ingest.gitdir import is_archived_loc
 from .bm25f import Scoring, score_record
+
+#: The sort key's resolution (SR-RANKING decision 8a): `round(x, score_digits)`.
+_SCORE_DIGITS = fixed("ranking", "score_digits")
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from .expand import Expansion
@@ -417,7 +421,7 @@ def rank(
     # document is.
     scored.sort(
         key=lambda pair: (
-            -round(pair[1], 9),
+            -round(pair[1], _SCORE_DIGITS),
             bool(pair[0].get("superseded", False)),
             -int(pair[0].get("mtime") or 0),
             -weighting.priority_for(pair[0].get("loc", "")),
@@ -429,7 +433,7 @@ def rank(
     # one most likely to have been decided by a coin-toss.
     tied: set[int] = set()
     for i in range(len(scored) - 1):
-        if round(scored[i][1], 9) == round(scored[i + 1][1], 9):
+        if round(scored[i][1], _SCORE_DIGITS) == round(scored[i + 1][1], _SCORE_DIGITS):
             tied.add(i)
             tied.add(i + 1)
 

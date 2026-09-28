@@ -10,7 +10,15 @@
  * 1980. Step numbering follows the paper, as it does on the Python side.
  */
 
+import { fixed } from "../config/constants.mjs";
+
 const VOWELS = new Set(["a", "e", "i", "o", "u"]);
+
+/** fux's departure from the textbook: shorter tokens are never stemmed. */
+const MIN_CHARS = fixed("stem", "min_chars");
+
+/** Porter's *o condition as a shape: consonant, vowel, consonant. */
+const CVC = [true, false, true];
 
 function isConsonant(word, i) {
   const ch = word[i];
@@ -40,26 +48,30 @@ function hasVowel(stemStr) {
 }
 
 function doubleConsonantSuffix(word) {
-  return word.length >= 2
-    && word[word.length - 1] === word[word.length - 2]
-    && isConsonant(word, word.length - 1);
+  const last = word.slice(-1);
+  return last !== "" && word.slice(0, -1).endsWith(last) && isConsonant(word, word.length - 1);
 }
 
 /** consonant-vowel-consonant where the final one is not w, x or y. */
 function cvc(word) {
-  if (word.length < 3) return false;
-  const n = word.length;
-  if (!(isConsonant(word, n - 3) && !isConsonant(word, n - 2) && isConsonant(word, n - 1))) {
-    return false;
-  }
-  return !"wxy".includes(word[n - 1]);
+  const start = word.length - CVC.length;
+  if (start < 0) return false;
+  if (CVC.some((c, i) => isConsonant(word, start + i) !== c)) return false;
+  return !"wxy".includes(word[word.length - 1]);
+}
+
+/** `word` without `suffix` -- which the caller has checked it ends with. */
+function base(word, suffix) {
+  return word.slice(0, word.length - suffix.length);
 }
 
 function replace(word, suffix, repl, minM) {
   if (!word.endsWith(suffix)) return null;
-  const s = word.slice(0, word.length - suffix.length);
+  const s = base(word, suffix);
   return measure(s) > minM ? s + repl : null;
 }
+
+const STEP1A = [["sses", "ss"], ["ies", "i"], ["ss", "ss"], ["s", ""]];
 
 const STEP2 = [
   ["ational", "ate"], ["tional", "tion"], ["enci", "ence"], ["anci", "ance"],
@@ -91,7 +103,7 @@ const ALPHA_RE = /^\p{Alphabetic}+$/u;
 
 /** Words only: no digits, no underscores, at least three characters. */
 export function shouldStem(token) {
-  if (token.length < 3) return false;
+  if (token.length < MIN_CHARS) return false;
   return ALPHA_RE.test(token);
 }
 
@@ -100,20 +112,19 @@ export function stem(word) {
   if (!shouldStem(word)) return word;
 
   // Step 1a — plurals
-  if (word.endsWith("sses")) word = word.slice(0, -2);
-  else if (word.endsWith("ies")) word = word.slice(0, -2);
-  else if (word.endsWith("ss")) { /* unchanged */ }
-  else if (word.endsWith("s")) word = word.slice(0, -1);
+  for (const [suffix, repl] of STEP1A) {
+    if (word.endsWith(suffix)) { word = base(word, suffix) + repl; break; }
+  }
 
   // Step 1b — -ed / -ing
   let secondPass = false;
   if (word.endsWith("eed")) {
-    if (measure(word.slice(0, -3)) > 0) word = word.slice(0, -1);
-  } else if (word.endsWith("ed") && hasVowel(word.slice(0, -2))) {
-    word = word.slice(0, -2);
+    if (measure(base(word, "eed")) > 0) word = base(word, "eed") + "ee";
+  } else if (word.endsWith("ed") && hasVowel(base(word, "ed"))) {
+    word = base(word, "ed");
     secondPass = true;
-  } else if (word.endsWith("ing") && hasVowel(word.slice(0, -3))) {
-    word = word.slice(0, -3);
+  } else if (word.endsWith("ing") && hasVowel(base(word, "ing"))) {
+    word = base(word, "ing");
     secondPass = true;
   }
   if (secondPass) {
@@ -130,8 +141,8 @@ export function stem(word) {
   }
 
   // Step 1c — terminal y
-  if (word.endsWith("y") && hasVowel(word.slice(0, -1))) {
-    word = word.slice(0, -1) + "i";
+  if (word.endsWith("y") && hasVowel(base(word, "y"))) {
+    word = base(word, "y") + "i";
   }
 
   // Step 2 / 3 — derivational suffixes
@@ -149,7 +160,7 @@ export function stem(word) {
   let matched = false;
   for (const suffix of STEP4) {
     if (word.endsWith(suffix)) {
-      const s = word.slice(0, word.length - suffix.length);
+      const s = base(word, suffix);
       matched = true;
       if (suffix === "ion" && !(s.endsWith("s") || s.endsWith("t"))) continue;
       if (measure(s) > 1) word = s;
@@ -157,7 +168,7 @@ export function stem(word) {
     }
   }
   if (!matched && word.endsWith("ion")) {
-    const s = word.slice(0, -3);
+    const s = base(word, "ion");
     if (measure(s) > 1 && (s.endsWith("s") || s.endsWith("t"))) word = s;
   }
 

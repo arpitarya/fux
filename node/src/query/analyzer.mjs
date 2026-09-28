@@ -46,7 +46,7 @@ const STOPWORDS = new Set(
 /** The parts of one raw token, or `[]` when there is no boundary in it. */
 export function splitIdentifier(raw) {
   const parts = raw.split(BOUNDARY_RE).filter((p) => p);
-  if (parts.length < 2) return [];
+  if (parts.length <= 1) return [];
   return parts.filter((p) => p.length > 1);
 }
 

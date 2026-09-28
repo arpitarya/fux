@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@bea4b6fe2218]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@660979af88ee, src/fux/constants.toml@a06064d9d8d7]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 8b49a14d532fa6b9f677e5f778226a977f6476a7668be9a44a989c1ab1b0da62
+content_sha: abd369ed42b338069671d6e27aa87acabac76848afab356452d6043263f27914
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -156,6 +156,10 @@ decisions 3 and 17; SR-LAW-12 decision 9a).
 **W-225 stage 4c (2026-09-28)** added `[templates] inspect` and `[files] inspect` — the template's name and `.fux/inspect.toml`'s path.
 
 **W-228 (2026-09-28)** bumped `[inspect] facts_schema` to `fux.inspect.facts.v2`: pass A now records each document's front-matter key names (`meta_keys`), so every cached facts entry is recomputed once ([SR-INSPECT](0156_inspect.md) decision 24).
+
+**W-225 stage 5a (2026-09-28)** added the numbers an algorithm fixes ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, R7): `[stem]`, `[json] indent`, `[pii.luhn]`, `[pii.verhoeff]`, `[blake2b]`, `[ranking] score_digits`, `[pyfloat]`, `[frontmatter] indent` and `[confidence] signal_digits`. Where a refactor removed a literal outright (a suffix's own length, a named regex group, tuple unpacking), no key was added. ⚠ `node/src/config/toml.mjs` is the reader of this file and cannot depend on it; it holds no numeral either.
+
+**W-225 stage 5b (2026-09-28)** added the decoders' format numbers: `[decoders.image.format]`, `[decoders.pdf.format]`, `[decoders.rtf.format]`, `[radix]`, `[markdown]` and `[ooxml]`. A byte string is stored as latin-1 text, and a record layout as a Python `struct` format.
 
 ### Consequences
 

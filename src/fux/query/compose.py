@@ -76,6 +76,11 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from pathlib import Path
 
+from ..constants import fixed
+
+#: The sort key's resolution (SR-RANKING decision 8a): `round(x, score_digits)`.
+_SCORE_DIGITS = fixed("ranking", "score_digits")
+
 __all__ = ["Related", "Tiers", "tiers"]
 
 
@@ -244,7 +249,7 @@ def _boost(ordered: list, boosted_ids: list[str], top: int, in_window: dict[str,
 
     fused = rrf([[r.id for r in ordered], boosted_ids])
     moved = set(boosted_ids)
-    reordered = sorted(ordered, key=lambda r: (-round(fused[r.id], 9), r.id))
+    reordered = sorted(ordered, key=lambda r: (-round(fused[r.id], _SCORE_DIGITS), r.id))
     out = []
     for i, r in enumerate(reordered[:top]):
         was = in_window[r.id]

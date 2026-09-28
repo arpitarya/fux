@@ -32,7 +32,16 @@ Reference: M.F. Porter, "An algorithm for suffix stripping", Program 14(3),
 
 from __future__ import annotations
 
+from ..constants import fixed
+
 _VOWELS = frozenset("aeiou")
+
+#: fux's departure from the textbook: shorter tokens are never stemmed. Fixed,
+#: not tunable -- a different floor writes different postings (SR-LAW-12 6a).
+_MIN_CHARS = fixed("stem", "min_chars")
+
+#: Porter's *o condition as a shape: consonant, vowel, consonant.
+_CVC = (True, False, True)
 
 
 def _is_consonant(word: str, i: int) -> bool:
@@ -68,32 +77,33 @@ def _has_vowel(stem: str) -> bool:
 
 
 def _double_consonant_suffix(word: str) -> bool:
-    return (
-        len(word) >= 2
-        and word[-1] == word[-2]
-        and _is_consonant(word, len(word) - 1)
-    )
+    last = word[-1:]
+    return bool(last) and word[:-1].endswith(last) and _is_consonant(word, len(word) - 1)
 
 
 def _cvc(word: str) -> bool:
     """consonant-vowel-consonant where the final one is not w, x or y."""
-    if len(word) < 3:
+    start = len(word) - len(_CVC)
+    if start < 0:
         return False
-    if not (
-        _is_consonant(word, len(word) - 3)
-        and not _is_consonant(word, len(word) - 2)
-        and _is_consonant(word, len(word) - 1)
-    ):
+    if any(_is_consonant(word, start + i) != c for i, c in enumerate(_CVC)):
         return False
     return word[-1] not in "wxy"
+
+
+def _base(word: str, suffix: str) -> str:
+    """`word` without `suffix` -- which the caller has checked it ends with."""
+    return word[: len(word) - len(suffix)]
 
 
 def _replace(word: str, suffix: str, repl: str, min_m: int) -> str | None:
     if not word.endswith(suffix):
         return None
-    stem = word[: len(word) - len(suffix)]
+    stem = _base(word, suffix)
     return stem + repl if _measure(stem) > min_m else None
 
+
+_STEP1A = (("sses", "ss"), ("ies", "i"), ("ss", "ss"), ("s", ""))
 
 _STEP2 = (
     ("ational", "ate"), ("tional", "tion"), ("enci", "ence"), ("anci", "ance"),
@@ -122,7 +132,7 @@ def should_stem(token: str) -> bool:
     and Porter's rules strip characters that were carrying meaning in it.
     Two-character tokens have nothing to strip.
     """
-    if len(token) < 3:
+    if len(token) < _MIN_CHARS:
         return False
     return token.isalpha()
 
@@ -134,25 +144,21 @@ def stem(word: str) -> str:
         return word
 
     # Step 1a — plurals
-    if word.endswith("sses"):
-        word = word[:-2]
-    elif word.endswith("ies"):
-        word = word[:-2]
-    elif word.endswith("ss"):
-        pass
-    elif word.endswith("s"):
-        word = word[:-1]
+    for suffix, repl in _STEP1A:
+        if word.endswith(suffix):
+            word = _base(word, suffix) + repl
+            break
 
     # Step 1b — -ed / -ing
     second_pass = False
     if word.endswith("eed"):
-        if _measure(word[:-3]) > 0:
-            word = word[:-1]
-    elif word.endswith("ed") and _has_vowel(word[:-2]):
-        word = word[:-2]
+        if _measure(_base(word, "eed")) > 0:
+            word = _base(word, "eed") + "ee"
+    elif word.endswith("ed") and _has_vowel(_base(word, "ed")):
+        word = _base(word, "ed")
         second_pass = True
-    elif word.endswith("ing") and _has_vowel(word[:-3]):
-        word = word[:-3]
+    elif word.endswith("ing") and _has_vowel(_base(word, "ing")):
+        word = _base(word, "ing")
         second_pass = True
     if second_pass:
         if word.endswith(("at", "bl", "iz")):
@@ -163,8 +169,8 @@ def stem(word: str) -> str:
             word += "e"
 
     # Step 1c — terminal y
-    if word.endswith("y") and _has_vowel(word[:-1]):
-        word = word[:-1] + "i"
+    if word.endswith("y") and _has_vowel(_base(word, "y")):
+        word = _base(word, "y") + "i"
 
     # Step 2 / 3 — derivational suffixes
     for suffix, repl in _STEP2:
@@ -181,7 +187,7 @@ def stem(word: str) -> str:
     # Step 4 — strip when m > 1
     for suffix in _STEP4:
         if word.endswith(suffix):
-            stem_ = word[: len(word) - len(suffix)]
+            stem_ = _base(word, suffix)
             if suffix in ("ion",) and not stem_.endswith(("s", "t")):
                 continue
             if _measure(stem_) > 1:
@@ -189,7 +195,7 @@ def stem(word: str) -> str:
             break
     else:
         if word.endswith("ion"):
-            stem_ = word[:-3]
+            stem_ = _base(word, "ion")
             if _measure(stem_) > 1 and stem_.endswith(("s", "t")):
                 word = stem_
 

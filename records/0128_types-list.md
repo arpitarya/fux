@@ -7,10 +7,10 @@ description: "Prose plus every format a built-in decoder reads is compiled in as
 status: accepted
 date: 2026-08-20
 feature: the file-type allowlist and `.fux/formats.toml`
-owns: [src/fux/ingest/typesfile.py@0fc3684e7787, .fux/formats.toml@645d9086ac23]
+owns: [src/fux/ingest/typesfile.py@d9192d085dcb, .fux/formats.toml@05666c969b79]
 laws: [L1, L3]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 0151a1e02fbbddfd1f2df689280f43bd32deb849a7a02f062fe86ea4e5ec9936
+content_sha: 0939327a4056203f9645dabe70317f58f5c86f54fa457b2c8bf0777e6d9edded
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -539,6 +539,10 @@ carries them.
   never written into.
 - **A changed cap re-extracts the corpus** at the next `fux ingest`: the caps
   are in the extract-config digest ([SR-INGEST](0106_ingest.md)).
+
+**`typesfile.py` holds no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `[decoders]` lines are matched by named groups (`key`, `value`), `*.` is removed with `removeprefix`, and a control character is recognised by comparison rather than by code point. The file it writes is unchanged.
+
+**Decision 14's caps are twenty-four now** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5b, 2026-09-28): `[limits.html] charset_scan_bytes`, `[limits.xml] prolog_bytes`, and `[limits.yaml] indent_step` and `min_value_len` joined them. Each is a whole number `>= 1`, and what each means is [SR-DECODE](0139_decode.md)'s. A `formats.toml` that lacks one stops `fux ingest` until `fux doctor --fix` writes it.
 
 ### Consequences
 

@@ -7,11 +7,11 @@ description: "`--expand` scores agent-supplied terms at a lower weight beside th
 status: accepted
 date: 2026-09-05
 feature: agent-side query expansion and multi-query fusion
-owns: [src/fux/query/expand.py@3eb9647e4be9, src/fux/query/fuse.py@3d73e2f2638a, node/src/query/expand.mjs@fd39cfaf8fa1, node/src/query/fuse.mjs@580e525266c8]
+owns: [src/fux/query/expand.py@3eb9647e4be9, src/fux/query/fuse.py@ca1f9d50d93c, node/src/query/expand.mjs@fd39cfaf8fa1, node/src/query/fuse.mjs@580e525266c8]
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: a7e31ae03977a84a6b6e7fbab0c00ba27c2197a9b4afaa955621d1a4cd6def23
+content_sha: 6cbe6f548faaac7f9695628d7f7c0b107df2a3b5d32ad1b6984263d6f8c4cc32
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -366,6 +366,8 @@ this moved where they are written, not what they are.
 - `src/fux/query/fuse.py` — `K` ← `[fuse] rrf_k`
 
 <!-- L12-VALUES-END -->
+
+**`fuse.py`'s sort key reads `constants.toml [ranking] score_digits`** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). RRF's `k` was already `[fuse] rrf_k`. No order moved.
 
 ### Consequences
 

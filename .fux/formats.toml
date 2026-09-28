@@ -132,6 +132,9 @@ max_cell_chars = 500
 [limits.drawio]
 max_inflated = 16777216
 
+[limits.html]
+charset_scan_bytes = 4096
+
 [limits.image]
 max_inflated = 1048576
 
@@ -161,6 +164,9 @@ max_cols = 40
 
 [limits.xml]
 min_attr_len = 12
+prolog_bytes = 8192
 
 [limits.yaml]
-max_depth = 6
+max_depth     = 6
+indent_step   = 2
+min_value_len = 3

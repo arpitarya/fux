@@ -65,7 +65,7 @@ from fux.decode._limits import limit
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.pdf", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
+VERSION = fixed("decoders.pdf", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
 
 EXTENSIONS = tuple(fixed("decoders.pdf", "extensions"))
 
@@ -89,6 +89,14 @@ _BFCHAR_RE = re.compile(rb"beginbfchar(.*?)endbfchar", re.DOTALL)
 _BFRANGE_RE = re.compile(rb"beginbfrange(.*?)endbfrange", re.DOTALL)
 _HEX_RE = re.compile(rb"<([0-9A-Fa-f]+)>")
 
+# The numbers PDF fixes (SR-LAW-12 decision 6a) -- `constants.toml [decoders.pdf.format]`.
+_HEX = fixed("radix", "hex")
+_HEX_PER_BYTE = fixed("radix", "hex_digits_per_byte")
+_OCTAL = fixed("radix", "octal")
+_OCTAL_DIGITS = fixed("decoders.pdf.format", "octal_escape_digits")
+_MAX_RANGE = fixed("decoders.pdf.format", "max_bfrange_span")
+_MAX_CODE = fixed("decoders.pdf.format", "max_code_bytes")
+
 _ESCAPES = {
     b"n": "\n", b"r": "\r", b"t": "\t", b"b": "\b", b"f": "\f",
     b"(": "(", b")": ")", b"\\": "\\",
@@ -100,7 +108,7 @@ class NotAPdf(ValueError):
 
 
 def decode(raw: bytes, rel_path: str) -> str | None:
-    if not raw.lstrip()[:5].startswith(b"%PDF-"):
+    if not raw.lstrip().startswith(b"%PDF-"):
         return None
     streams = _streams(raw)
     cmap = _to_unicode(streams)
@@ -162,24 +170,22 @@ def _to_unicode(streams: list[bytes]) -> dict[bytes, str]:
         if b"beginbfchar" not in data and b"beginbfrange" not in data:
             continue
         for block in _BFCHAR_RE.findall(data):
-            hexes = _HEX_RE.findall(block)
-            for i in range(0, len(hexes) - 1, 2):
-                src, dst = hexes[i], hexes[i + 1]
+            pairs = iter(_HEX_RE.findall(block))
+            for src, dst in zip(pairs, pairs):
                 cmap.setdefault(_unhex(src), _utf16(dst))
         for block in _BFRANGE_RE.findall(data):
-            hexes = _HEX_RE.findall(block)
-            for i in range(0, len(hexes) - 2, 3):
-                low, high, dst = hexes[i], hexes[i + 1], hexes[i + 2]
+            triples = iter(_HEX_RE.findall(block))
+            for low, high, dst in zip(triples, triples, triples):
                 try:
-                    start, end = int(low, 16), int(high, 16)
+                    start, end = int(low, _HEX), int(high, _HEX)
                 except ValueError:
                     continue
-                if end - start > 65535:
+                if end - start > _MAX_RANGE:
                     continue
                 base = _utf16(dst)
                 if len(base) != 1:
                     continue
-                width = len(low) // 2
+                width = len(low) // _HEX_PER_BYTE
                 for offset in range(end - start + 1):
                     key = (start + offset).to_bytes(width, "big")
                     cmap.setdefault(key, chr(ord(base) + offset))
@@ -239,21 +245,21 @@ def _literal(body: bytes, cmap: dict[bytes, str]) -> str:
     while index < len(body):
         char = body[index : index + 1]
         if char == b"\\" and index + 1 < len(body):
-            nxt = body[index + 1 : index + 2]
+            nxt = bytes((body[index + 1],))
             if nxt in _ESCAPES:
                 out.append(_ESCAPES[nxt])
-                index += 2
+                index += 1 + len(nxt)
                 continue
             if nxt.isdigit():  # octal
-                digits = body[index + 1 : index + 4]
-                octal = bytes(c for c in digits if 48 <= c <= 55)
+                digits = body[index + 1 : index + 1 + _OCTAL_DIGITS]
+                octal = bytes(c for c in digits if c in b"01234567")
                 try:
-                    out.append(chr(int(octal, 8)))
+                    out.append(chr(int(octal, _OCTAL)))
                 except ValueError:
                     pass
                 index += 1 + len(octal)
                 continue
-            index += 2
+            index += 1 + len(nxt)
             continue
         out.append(_mapped(char, cmap))
         index += 1
@@ -267,11 +273,11 @@ def _mapped(raw: bytes, cmap: dict[bytes, str]) -> str:
         out: list[str] = []
         index = 0
         while index < len(raw):
-            two = raw[index : index + 2]
+            two = raw[index : index + _MAX_CODE]
             one = raw[index : index + 1]
             if two in cmap:
                 out.append(cmap[two])
-                index += 2
+                index += _MAX_CODE
             elif one in cmap:
                 out.append(cmap[one])
                 index += 1

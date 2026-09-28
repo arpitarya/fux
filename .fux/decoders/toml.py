@@ -21,13 +21,16 @@ from fux.decode._limits import limit
 from fux.decode.json import _prose
 from fux.constants import fixed
 
+#: Markdown has six heading levels; a deeper one is clamped, never invented.
+_MAX_HEADING = fixed("markdown", "max_heading")
+
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
 #: `fux ingest` re-extracts the documents bound to THIS decoder and no others.
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.toml", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
+VERSION = fixed("decoders.toml", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
 
 EXTENSIONS = tuple(fixed("decoders.toml", "extensions"))
 
@@ -48,13 +51,13 @@ def _walk(node, out: list[str], *, depth: int, label: str | None) -> None:
         return
     if isinstance(node, dict):
         if label:
-            out.append("#" * min(depth, 6) + " " + label)
+            out.append("#" * min(depth, _MAX_HEADING) + " " + label)
         for key in sorted(node, key=str):
             _walk(node[key], out, depth=depth + 1, label=str(key))
         return
     if isinstance(node, list):
         if label:
-            out.append("#" * min(depth, 6) + " " + label)
+            out.append("#" * min(depth, _MAX_HEADING) + " " + label)
         for item in node:
             _walk(item, out, depth=depth + 1, label=None)
         return

@@ -29,13 +29,16 @@ from fux.decode._limits import limit
 from fux.decode.json import _label, _prose
 from fux.constants import fixed
 
+#: A record's fields start one level below the file's H1.
+_RECORD_LEVEL = fixed("markdown", "record_level")
+
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
 #: `fux ingest` re-extracts the documents bound to THIS decoder and no others.
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.jsonl", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
+VERSION = fixed("decoders.jsonl", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
 
 EXTENSIONS = tuple(fixed("decoders.jsonl", "extensions"))
 
@@ -76,7 +79,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
     lines: list[str] = [f"# {rel_path.rsplit('/', 1)[-1]}"]
     for index, record in enumerate(records, start=1):
         block: list[str] = []
-        _walk(record, block, depth=2, label=None)
+        _walk(record, block, depth=_RECORD_LEVEL, label=None)
         if not block:
             continue
         # ⚠ **The record boundary is the chunk boundary, and it used to be

@@ -1,7 +1,17 @@
 /** Python float semantics JS does not share. No Python twin — declared exempt.
  *
  * Two of them reach the sort key, so both are correctness, not cosmetics.
+ * The numbers CPython fixes — `repr`'s exponent thresholds and width — are
+ * read from `src/fux/constants.toml [pyfloat]` (SR-LAW-12 decision 6a).
  */
+import { fixed } from "../config/constants.mjs";
+
+const TIE_DIGITS = fixed("pyfloat", "tie_digits");
+const SORT_DIGITS = fixed("ranking", "score_digits");
+const EXP_MIN = fixed("pyfloat", "repr_exp_min");
+const EXP_MAX = fixed("pyfloat", "repr_exp_max");
+const EXP_WIDTH = fixed("pyfloat", "repr_exp_width");
+const INTEGRAL_BELOW = Number(`1e${EXP_MAX}`);
 
 /** Python's `round(x, ndigits)` — round-HALF-EVEN on the exact binary value.
  *
@@ -22,7 +32,7 @@
  */
 export function pyRound(x, ndigits) {
   if (!Number.isFinite(x)) return x;
-  const s = x.toFixed(20);                        // enough digits to see the tie
+  const s = x.toFixed(TIE_DIGITS);                // enough digits to see the tie
   const dot = s.indexOf(".");
   const tail = s.slice(dot + 1 + ndigits);        // digits past the nth decimal
   const naive = Number(x.toFixed(ndigits));
@@ -34,14 +44,13 @@ export function pyRound(x, ndigits) {
   // even. Python's `round(0.5)` is `0`.
   const keep = ndigits === 0 ? s.slice(0, dot) : s.slice(0, dot + 1 + ndigits);
   const lower = Number(keep);
-  const step = 10 ** -ndigits;
-  const lastDigit = Number(keep[keep.length - 1]);
-  if (lastDigit % 2 === 0) return lower;
+  const step = Number(`1e-${ndigits}`);
+  if ("02468".includes(keep[keep.length - 1])) return lower;
   return Number((lower + (x < 0 ? -step : step)).toFixed(ndigits));
 }
 
 /** `round(x, 9)` — the sort key's own resolution, and the overwhelming caller. */
-export function pyRound9(x) { return pyRound(x, 9); }
+export function pyRound9(x) { return pyRound(x, SORT_DIGITS); }
 
 /** Python's `repr(float)` layout, which differs from `String(Number)`.
  *
@@ -59,18 +68,18 @@ export function pyRepr(x) {
   if (Number.isNaN(x)) return "nan";
   if (x === Infinity) return "inf";
   if (x === -Infinity) return "-inf";
-  if (Number.isInteger(x) && Math.abs(x) < 1e16) {
+  if (Number.isInteger(x) && Math.abs(x) < INTEGRAL_BELOW) {
     return Object.is(x, -0) ? "-0.0" : `${x}.0`;
   }
   const sign = x < 0 ? "-" : "";
   const a = Math.abs(x);
   const e = Math.floor(Math.log10(a));
-  if (e < -4 || e >= 16) {
+  if (e < EXP_MIN || e >= EXP_MAX) {
     // ⚠ Python does NOT pad the mantissa here: repr(1e-5) is "1e-05", not
     // "1.0e-05". The ".0" padding applies only to the integral form above.
     const [mant, exp] = a.toExponential().split("e");
     const n = Number(exp);
-    const es = (n < 0 ? "-" : "+") + String(Math.abs(n)).padStart(2, "0");
+    const es = (n < 0 ? "-" : "+") + String(Math.abs(n)).padStart(EXP_WIDTH, "0");
     return `${sign}${mant}e${es}`;
   }
   return `${sign}${String(a)}`;

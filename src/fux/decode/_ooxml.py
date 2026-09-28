@@ -19,7 +19,15 @@ from __future__ import annotations
 # `from . import _xml` raises `attempted relative import with no known parent
 # package` — the copy would be dead on arrival. Absolute imports mean the file
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
+from fux.constants import fixed
 from fux.decode import _xml
+
+#: Word's built-in style names to Markdown levels: Title, Subtitle, HeadingN,
+#: and a heading style with no number (`constants.toml [ooxml]`).
+_TITLE_LEVEL = fixed("ooxml", "title_level")
+_SUBTITLE_LEVEL = fixed("ooxml", "subtitle_level")
+_UNNUMBERED_LEVEL = fixed("ooxml", "unnumbered_level")
+_MAX_HEADING = fixed("markdown", "max_heading")
 
 #: Word/PowerPoint mark a paragraph's style by name. Matching on the *name*
 #: rather than an outline level is deliberate: the level lives in the styles
@@ -61,13 +69,13 @@ def heading_level(style: str | None) -> int | None:
     if not any(name in lowered for name in _HEADING_NAMES):
         return None
     if "title" in lowered:
-        return 1
+        return _TITLE_LEVEL
     if "subtitle" in lowered:
-        return 2
+        return _SUBTITLE_LEVEL
     digits = "".join(c for c in lowered if c.isdigit())
     if digits:
-        return min(int(digits) + 1, 6)
-    return 2
+        return min(int(digits) + 1, _MAX_HEADING)
+    return _UNNUMBERED_LEVEL
 
 
 def table_markdown(rows: list[list[str]]) -> str:

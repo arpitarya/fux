@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7628e166356, src/fux/ingest@22a1d49cba7e, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@1420b552a4c5, node/src/ingest/priors.mjs@11df69775da1]
+owns: [src/fux/ingest/ingestlog.py@f7628e166356, src/fux/ingest@299733a41fad, src/fux/ingest/priors.py@8ffcc632a4be, node/src/ingest/gitdir.mjs@1420b552a4c5, node/src/ingest/priors.mjs@11df69775da1]
 laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 1ac4cf94d1baa4c54f4643344da261fd29b890e88a216718a48dd07d31dd5916
+content_sha: bd02d6c180ceca9af4a1954fd847efca31770eee32059a7c606567c74573933c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -984,6 +984,8 @@ The Node reader's `dirsFile` no longer falls back to `.fux/sources/dirs`.
 **Every decoder cap is in the extract-config digest** ([L12](0013_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `_extract_config_digest` appends `limits.<decoder>.<key>=<value>` for every cap the built-ins read, so an edited cap re-extracts the corpus at the next `fux ingest`; a consumer's extra `[limits]` table changes nothing fux extracts and is left out. `fux ingest` checks every cap before any decoder runs. ⚠ **`fux ingest --check` still compares content shas only** and does not see a changed cap — the same as a changed `tune.toml [index]` today; the digest lives in gitignored runtime, so a fresh clone has none to compare. Open for Arpit (W-225).
 
 **The refusal scan's bounds are `.fux/refusals.toml [scan]`** ([L12](0013_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27); `refusals.load` returns them on the `RuleSet` the fetch path already passes ([SR-REFUSAL](0146_refusals.md) decision 9a).
+
+**Ingest's parsers hold no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `pii.py`'s checksum tables are `constants.toml [pii.luhn]` and `[pii.verhoeff]`; `fuxignore.py` and `typesfile.py` measure their own tokens (`len("**/")`, named regex groups). Every extracted byte is unchanged.
 
 ### Consequences
 

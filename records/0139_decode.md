@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@e372d743b2ae, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@3bf5fceb872a, node/src/decode/markdown.mjs@cf8853e196d1, node/src/decode/registry.mjs@7fbba8463f4b]
+owns: [src/fux/decode@f7ab2ca3e7f4, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@b8161299e493, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@68625dfbd069]
 laws: [L1, L2, L3, L4]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 4fe062dd189ab270004984e40b761e8f72cdb3595e9f854a1a5404a18f486e0d
+content_sha: b66d67ca3dfe6cba6342cc58258c139787ca04712bc1b8376b33f9980a196135
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -798,6 +798,10 @@ changed decoder's `VERSION` line says so.
 - **A decoder with no repository bound, or a repo with no `formats.toml`, asks
   for a cap and gets a named error** — there is no value to fall back to.
   `fux ingest` checks every cap up front (`_limits.check`), so a walk stops once.
+
+**The Markdown grammar and the glob matcher hold no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `markdown.mjs` reads its fence and heading by named regex groups, and `registry.mjs` tests `**` with `startsWith`. Twin behaviour is unchanged.
+
+**The decoders hold no numeral** ([L12](0013_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5b, 2026-09-28). What a format fixes went to `constants.toml`: PNG/JPEG/EXIF/GIF signatures, markers and record layouts in `[decoders.image.format]` (each layout is a `struct` format, and its size is the offset the walk advances by); PDF's octal-escape width, bfrange span and code length in `[decoders.pdf.format]`; RTF's `\uN` wrap in `[decoders.rtf.format]`; the bases in `[radix]`; Markdown's six levels and a record's level in `[markdown]`; Word's style levels in `[ooxml]`. drawio's raw-deflate window is `-zlib.MAX_WBITS`, and HTML's BOM is `codecs.BOM_UTF8`. **Four scan windows are caps, not format facts, and joined `[limits]`** — the same call as the stage-4a caps: `[limits.html] charset_scan_bytes` (4096), `[limits.xml] prolog_bytes` (8192, the shared XML reader's DOCTYPE window), and `[limits.yaml] indent_step` (2) and `min_value_len` (3). They enter the extract-config digest with the rest. A decoder called with no repository bound now needs one for `html` too; every production caller already passes it. `VERSION` was not bumped, and each changed decoder's `VERSION` line says so. HEAD's and the new decoders return the same result on 17 147 inputs: every tracked file of each type, crafted files for each format, and every prefix of each crafted file.
 
 ### Consequences
 

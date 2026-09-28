@@ -25,12 +25,14 @@ from __future__ import annotations
 
 import re
 import xml.etree.ElementTree as ET
+from fux.decode._limits import limit
 
 #: Only the head is searched: a DOCTYPE is legal only in the prolog, so a match
 #: further down is content rather than a declaration, and scanning a whole
 #: document for it would turn a cheap check into a linear one.
 _DOCTYPE_RE = re.compile(rb"<!DOCTYPE", re.IGNORECASE)
-_PROLOG_BYTES = 8192
+#: How much of the head counts as the prolog is `.fux/formats.toml [limits.xml]
+#: prolog_bytes` (W-225 stage 5b), read per call like every other cap.
 
 
 class UnsafeXml(ValueError):
@@ -39,7 +41,7 @@ class UnsafeXml(ValueError):
 
 def parse(raw: bytes) -> ET.Element:
     """Bytes -> root element, with entity declarations refused outright."""
-    if _DOCTYPE_RE.search(raw[:_PROLOG_BYTES]):
+    if _DOCTYPE_RE.search(raw[: limit("xml", "prolog_bytes")]):
         raise UnsafeXml(
             "document declares a DOCTYPE; entity expansion is refused "
             "(billion-laughs / XXE). See records/0139_decode.md"

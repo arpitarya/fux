@@ -59,7 +59,7 @@ export function globMatch(pattern, path) {
   for (let i = 0; i < pattern.length; i++) {
     const ch = pattern[i];
     if (ch === "*") {
-      if (pattern.slice(i, i + 2) === "**") { out += ".*"; i++; continue; }
+      if (pattern.startsWith("**", i)) { out += ".*"; i++; continue; }
       out += "[^/]*";
     } else if (ch === "?") {
       out += "[^/]";

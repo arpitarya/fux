@@ -136,7 +136,7 @@ def test_the_line_is_the_only_layer():
 def test_the_declared_stem_decides_and_the_header_is_not_consulted():
     """Edge case 5: *the header loses, silently.* The line is the human's word."""
     html = b"<html><body><h1>T</h1><p>Body text here.</p></body></html>"
-    as_html, why = urlsrc._decode_fetched(html, "html", "https://x.test/p")
+    as_html, why = urlsrc._decode_fetched(html, "html", "https://x.test/p", configured_root())
     assert why == "" and as_html and "<h1>" not in as_html
 
     # Same bytes, same (imaginary) response, a different line.

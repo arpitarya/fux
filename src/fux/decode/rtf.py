@@ -40,7 +40,7 @@ from fux.decode._limits import limit
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.rtf", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
+VERSION = fixed("decoders.rtf", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
 
 EXTENSIONS = tuple(fixed("decoders.rtf", "extensions"))
 
@@ -50,7 +50,10 @@ _BREAKS = {"par", "line", "sect", "page"}
 #: `\outlinelevelN`: 0-5 become Markdown levels 1-6. Word writes 9 for "body
 #: text", and anything past 5 has no Markdown level to map onto, so both are
 #: read as "not a heading" rather than clamped into one.
-_MAX_OUTLINE = 5
+_MAX_HEADING = fixed("markdown", "max_heading")
+#: `\uN` is a signed 16-bit value: a code point above 32767 is written negative.
+_UNICODE_WRAP = fixed("decoders.rtf.format", "unicode_wrap")
+_HEX = fixed("radix", "hex")
 #: Groups whose entire contents are metadata, never prose.
 _SKIP_DESTINATIONS = {
     "fonttbl", "colortbl", "stylesheet", "info", "pict", "object",
@@ -109,7 +112,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
                 except ValueError:
                     level = None
                 else:
-                    level = outline + 1 if 0 <= outline <= _MAX_OUTLINE else None
+                    level = outline + 1 if 0 <= outline < _MAX_HEADING else None
                 continue
             if word == "ansicpg" and param:
                 codepage = f"cp{param}"
@@ -120,7 +123,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
                 except ValueError:
                     continue
                 # RTF writes negative values for code points above 32767.
-                line.append(chr(code + 65536 if code < 0 else code))
+                line.append(chr(code + _UNICODE_WRAP if code < 0 else code))
                 skip_next_unicode = 1
                 continue
             if word == "tab":
@@ -132,9 +135,9 @@ def decode(raw: bytes, rel_path: str) -> str | None:
                 skip_next_unicode = 0
                 continue
             try:
-                line.append(bytes([int(hexchar, 16)]).decode(codepage, errors="replace"))
+                line.append(bytes([int(hexchar, _HEX)]).decode(codepage, errors="replace"))
             except LookupError:
-                line.append(bytes([int(hexchar, 16)]).decode("cp1252", errors="replace"))
+                line.append(bytes([int(hexchar, _HEX)]).decode("cp1252", errors="replace"))
             continue
 
         if escaped:
