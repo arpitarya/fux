@@ -23,6 +23,20 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-09-29 — CI rewritten: one workflow, FAST in ~1m45s, FULL ~11 min (was 14–15)  ·  Cowork → cloud session (Opus)
+- **Asked:** *"Pipeline takes 14 to 15 minutes. I want it under or maximum 2 minutes"*, then *"drop the existing workflows and rewrite them"*, *"what if there are no PRs… merging into main directly"*, *"implement it."* Arpit overrode the Cowork ratify-only default for this one.
+- **Did:**
+  - `ci.yml` rewritten as two stages; `node-arm.yml` folded in; `publish.yml` waits on `ci.yml` alone and **keeps its name** (trusted publishers are bound to it). Decision 13 added to [SR-WORK-RELEASE](../records/0063_WORK-release.md), 11a restated.
+  - FAST (every push, `main` included; fork PRs): Linux · py3.12 · Node 22, `pytest -n auto`, build + Node units, the arm's repo pass over 10 `--shard` runners. **Measured 102 s wall** on a branch push.
+  - FULL (`main`, nightly, dispatch; `needs:` FAST): 6 Python cells, arm on 3 OSes × Node 22/24 × 3 shards with both passes, ladder. **Measured 645 s** end to end on a scratch branch, all green.
+  - `node_arm.py --shard K/N` + tests; `pytest-xdist` in the dev extra; `test_doctor`'s python-version test no longer walks the repo (~35 s → ~0.1 s).
+  - `.github/actions/setup-fux` and `.github/actions/pytest-annotate` (one `::error::` per failed test — run logs were not readable from this session, annotations were).
+- **Found:**
+  - 🔴 **The arm's cost is the Node reader, not process start-up.** A Node `find` here is ~1.2 s, mostly `compose.allRecords` rebuilding the graph plane plus GC; Python answers the same query in ~0.26 s. Batching Node calls would save under a tenth — my earlier estimate (5 min → 20–40 s) was wrong and was corrected before building. This is also what every consumer's `fux find` on Node pays per call.
+  - **Two workflows starved each other.** As `fast.yml` + `main.yml`, a push to `main` started both; FULL took the account's runner slots (20 jobs, 5 on macOS) and FAST went from 1m46s to 6 min. Hence one file with `needs:`.
+  - macOS is FULL's tail: 5 concurrent jobs for 8 macOS jobs.
+- **Watch:** a newer push now cancels an older run on the same ref, `main` included — a superseded sha has no completed run and cannot be released. The scratch branch `ci/two-lanes-trial` could not be deleted from this session (the proxy refuses ref deletion); delete it by hand.
+
 ## 2026-09-29 — 3.0.0-alpha.6 released: three reds cleared on the way  ·  Claude Code (Opus)
 - **Asked:** *"push and release a new alpha version"*, then *"commit everything"*, *"move baseline"*.
 - **Did:**
