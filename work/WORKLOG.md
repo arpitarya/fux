@@ -23,6 +23,16 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-09-29 — 3.0.0-alpha.6 released: three reds cleared on the way  ·  Claude Code (Opus)
+- **Asked:** *"push and release a new alpha version"*, then *"commit everything"*, *"move baseline"*.
+- **Did:**
+  - Committed the concurrent sessions' tree (`b45c7ed3`) and the bump (`0db2be04`); pushed 72 commits.
+  - Moved the freshness baseline past `999c19761` on Arpit's ruling (`d1a23108`). Same cause as 2026-09-11: ownership is per file, and the commit changed only the output tests in `config.test.mjs`, a file SR-TUNE owns.
+  - node-arm was red: `tools/differential/` still called functions whose defaults W-225 stage 6 removed. Fixed in `151daf72`.
+  - ci.yml was red on Windows only. `setup.fill_missing` wrote CRLF config back as `\r\r\n` (a product bug, about 45 tests); four tests assumed POSIX. Fixed in `07aee35e`.
+  - Released `v3.0.0-alpha.6` on `07aee35e` once both workflows were green. PyPI `3.0.0a6` and npm `alpha` = `3.0.0-alpha.6` are both live.
+- **Watch:** `main` had no Windows run between alpha.5 and this push, so two days of Windows breakage went unseen. It surfaced only at release.
+
 ## 2026-09-28 — W-168: L11 13b landed, step 7 STOPS, step 8 ruled and pre-registered  ·  Claude Code (Opus)
 - **Asked:** *"implement w-168"*, i.e. the Cowork ruling's order (1) L11 13b + scorer, (2) step 8's compare doc, (3) steps 7 and 8 pre-register.
 - **Did:**
