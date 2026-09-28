@@ -39,7 +39,7 @@ def load_on(root) -> Tune:
 
 def test_no_file_is_an_error_that_names_the_file(tmp_path):
     """L12 decision 3: fux holds no copy of these values, so absent is loud."""
-    with pytest.raises(FuxError, match=r"\.fux/tune\.toml is missing") as exc:
+    with pytest.raises(FuxError, match=r"\.fux[/\\]tune\.toml is missing") as exc:
         load_on(tmp_path)
     assert "fux doctor --fix" in str(exc.value)
 

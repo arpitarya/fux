@@ -33,14 +33,16 @@ HOOK = ROOT / ".claude" / "hooks" / "guard-golden-traversal.sh"
 
 def run(command: str, cwd_rel: str = "") -> int:
     cwd = ROOT / cwd_rel if cwd_rel else ROOT
-    payload = {"tool_name": "Bash", "tool_input": {"command": command}, "cwd": str(cwd)}
+    # POSIX spelling on every OS: the hook compares with `/`, and a Windows
+    # backslash path fails it closed (safe, but not what this pins).
+    payload = {"tool_name": "Bash", "tool_input": {"command": command}, "cwd": cwd.as_posix()}
     proc = subprocess.run(
         hook_argv(HOOK),
         input=json.dumps(payload),
         capture_output=True,
         text=True,
         cwd=ROOT,
-        env={"CLAUDE_PROJECT_DIR": str(ROOT), "PATH": __import__("os").environ.get("PATH", "")},
+        env={"CLAUDE_PROJECT_DIR": ROOT.as_posix(), "PATH": __import__("os").environ.get("PATH", "")},
     )
     return proc.returncode
 

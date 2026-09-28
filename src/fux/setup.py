@@ -1054,7 +1054,7 @@ def fill_missing(root: Path) -> "list[str]":
             if not whole_file:
                 continue
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(template, encoding="utf-8")
+            path.write_text(template, encoding="utf-8", newline="\n")
             changed.append(f"{rel}: written")
             continue
         text = path.read_bytes().decode("utf-8-sig")
@@ -1066,7 +1066,12 @@ def fill_missing(root: Path) -> "list[str]":
             continue
         if not missing:
             continue
-        path.write_text(fill_config_text(text, template, present_only, never), encoding="utf-8")
+        # `newline="\n"`: `text` came from raw bytes, so a CRLF file keeps its
+        # `\r\n`; text-mode translation would turn each into `\r\r\n`, which no
+        # TOML parser reads (Windows, 2026-09-28).
+        path.write_text(
+            fill_config_text(text, template, present_only, never), encoding="utf-8", newline="\n"
+        )
         changed += [f"{rel}: [{table}] {key}" for table, key in missing]
     return changed
 

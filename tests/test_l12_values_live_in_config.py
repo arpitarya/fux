@@ -88,6 +88,6 @@ def test_both_planes_read_the_same_constants():
         "})"
     )
     out = subprocess.run(
-        ["node", "-e", script], cwd=ROOT, capture_output=True, text=True, check=True
+        ["node", "-e", script], cwd=ROOT, capture_output=True, text=True, encoding="utf-8", check=True
     ).stdout
     assert json.loads(out) == json.loads(json.dumps(py))

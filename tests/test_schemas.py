@@ -76,7 +76,7 @@ def test_every_schema_has_its_own_ownership_row(path):
     from sr_lib import ownership_table
 
     table = ownership_table()
-    component = str(path.relative_to(SRC.parents[1]))
+    component = path.relative_to(SRC.parents[1]).as_posix()
     assert component in table, (
         f"{component} has no file-level row in records/README.md §OWNERSHIP — it "
         "would fall to SR-LAWS, the directory's owner. Add a row naming the record "
