@@ -22,6 +22,29 @@ play: the worklog is the granular, per-exchange trail.
 **Entry format:**
 
 ```
+## 2026-09-28 — W-232: the shipped anchor + mined pair, two bars, one STOP, three arms captured on set-3-claude  ·  Claude Code (Opus)
+- **Asked:** *"implement w-232"*.
+- **Did:**
+  - Asked Arpit the keep-rule before freezing. His answer: **significance**. A comparator beats the shipped pair only through `verdict.rule` at the observed discordant count, and a loss below the floor is INCONCLUSIVE.
+  - `641ee38a`: first bar on set-4-claude, with `decide.py` frozen by hash. `d3139fdb`: its capture. **STOP**: `am-B` (mined off) = `am-A` on all 125, because no set-4-claude question carries any of the rung's 9 `Term (ABBR)` forms. The fold is live on probes. So step 4 is inert on set-4-claude.
+  - Arpit: *re-run on set-3-u* (now `set-3-claude`). `9cdde333` is gone from the rung's history, so the source is step 4's own `arms/runs/mx-base` copy, which is cp'd and never written.
+  - `d30783c5`: second bar. Capture at the same commit: B moves 20 orders, C 35; `am3-C` reproduces step 4's `mx-0.5` 80/80.
+- **Next:** Arpit runs `just golden-score work/regression/2026-09-28-anchor-mined-set3`. Then a session that did **not** capture runs `evidence/decide.py`.
+- **Watch:** a new set that should exercise step 4 needs questions carrying a mined form. Set-4-claude has none.
+
+## 2026-09-28 — Committed the tree; W-168 steps 7 and 8 blocked on their endpoints  ·  Claude Code (Opus)
+- **Asked:** *"commit everything and then implement w-168"*.
+- **Did:**
+  - `0120bb09`: W-228's families work. SR-AGENT-POLICY's hash had been restamped but not staged, and the guard caught it.
+  - `a5c3f085`: W-168 step 9's ship and verdict, plus the logs. SR-FETCHER's `templates/` hash was stale, so I restamped it.
+  - Left the concurrent W-232 session's untracked `doctor-fix.diff` alone.
+- **Decided / open:**
+  - Step 7 (MMR) cannot be judged on its pool of 8, which is counted at `hit@1`: MMR swaps rank 5 only.
+  - Its ruled endpoint, coverage in the top k, needs the key's `facets`, and L11 d13a allows only pool counts. That needs a Law amendment, which is Arpit's.
+  - Step 8 has no ruled endpoint.
+  - Both are filed in `BLOCKED.json` and the inbox, each with a recommendation. Nothing was pre-registered or built.
+- **Next:** Arpit rules. Meanwhile step 8's compare doc is agent-closable.
+
 ## 2026-09-28 — W-225 stage 7: the L12 veto test and its allow-list; the CHANGELOG's 3.0 lines  ·  Claude Code (Opus)
 - **Asked:** *"continue"* (W-225).
 - **Did:**

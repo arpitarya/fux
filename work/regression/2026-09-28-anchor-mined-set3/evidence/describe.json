@@ -1,0 +1,61 @@
+{
+ "arms": {
+  "am3-A": {
+   "ask_ms_median": 172.2,
+   "bands": {
+    "grounded": 24,
+    "partial": 48,
+    "weak": 8
+   },
+   "engine_commits": [
+    "d30783c5"
+   ],
+   "gates_captured": 80,
+   "n": 80
+  },
+  "am3-B": {
+   "ask_ms_median": 163.4,
+   "bands": {
+    "grounded": 25,
+    "partial": 48,
+    "weak": 7
+   },
+   "engine_commits": [
+    "d30783c5"
+   ],
+   "gates_captured": 80,
+   "n": 80
+  },
+  "am3-C": {
+   "ask_ms_median": 170.8,
+   "bands": {
+    "grounded": 22,
+    "partial": 48,
+    "weak": 10
+   },
+   "engine_commits": [
+    "d30783c5"
+   ],
+   "gates_captured": 80,
+   "n": 80
+  }
+ },
+ "build_check_vs_step4_mx_0_5": {
+  "band_equal": 80,
+  "n": 80,
+  "ranked_equal": 80
+ },
+ "stop": [],
+ "vs_shipped": {
+  "am3-B": {
+   "membership_changed": 10,
+   "order_changed": 20,
+   "top1_changed": 7
+  },
+  "am3-C": {
+   "membership_changed": 24,
+   "order_changed": 35,
+   "top1_changed": 14
+  }
+ }
+}

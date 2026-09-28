@@ -58,3 +58,9 @@ open warning.
 - **2026-09-28 · Arpit: re-run on set-3-claude** (was `set-3-u`, 22
   `expansion_form` questions), at a copy of step 4's own `mx-base` (the gen-2
   `9cdde333` corpus, re-ingested `v5`). This needs a new pre-registration.
+- **2026-09-28 · captured on set-3-claude** (same session). [Bar](../regression/2026-09-28-anchor-mined-set3/PRE-REGISTRATION.md)
+  `d30783c5` · [report](../regression/2026-09-28-anchor-mined-set3/report.md).
+  Precondition held: B moves 20 orders and C 35. `am3-C` reproduces step 4's
+  `mx-0.5` 80/80. **Next:** Arpit runs
+  `just golden-score work/regression/2026-09-28-anchor-mined-set3`. Then a session
+  that did not capture runs `evidence/decide.py`.
