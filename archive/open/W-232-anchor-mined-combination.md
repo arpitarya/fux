@@ -64,3 +64,9 @@ open warning.
   `mx-0.5` 80/80. **Next:** Arpit runs
   `just golden-score work/regression/2026-09-28-anchor-mined-set3`. Then a session
   that did not capture runs `evidence/decide.py`.
+- **2026-09-28 · PASS, closed** (Claude Code, Opus; a session that did not
+  capture). Arpit scored the arms. The frozen decider: `am-A` beats `am-B` 6/0
+  (p = 0.031) and `am-C` 7/0 (p = 0.016), with 0 losses. `hit@1` is 54 / 48 / 47
+  of 80. The decider was run unedited from a scratch mirror, because it reads
+  `am-X` and the capture wrote `am3-X` (declared in the verdict). W-168's two
+  warnings are closed. [Verdict](../regression/2026-09-28-anchor-mined-set3/VERDICT.md).
