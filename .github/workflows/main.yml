@@ -4,6 +4,7 @@
 # code reaches `main` (PR merge or direct push), nightly, and by hand.
 # 🔴 **publish.yml refuses a release unless THIS workflow completed green on the
 # exact sha** — that, not a branch check, is the gate (SR-WORK-RELEASE 11a).
+# The workflow's own conclusion is the aggregate, so there is no gate job.
 name: main
 
 on:
@@ -46,23 +47,32 @@ jobs:
         with:
           python: ${{ matrix.python }}
       - name: Unit suite
-        run: pytest -q -n auto --durations=10 tests
+        run: pytest -q -n auto --durations=10 --junitxml=junit-unit.xml tests
       - name: End-to-end suite
-        run: pytest -q -n auto --durations=10 tests_e2e
+        if: success() || failure()
+        run: pytest -q -n auto --durations=10 --junitxml=junit-e2e.xml tests_e2e
+      - if: failure()
+        uses: ./.github/actions/pytest-annotate
+        with:
+          junit: junit-unit.xml
+      - if: failure()
+        uses: ./.github/actions/pytest-annotate
+        with:
+          junit: junit-e2e.xml
 
   node-arm:
     # 🔴 **A green arm on ONE OS is not a green arm.** Two libms disagree in the
     # last ulp (PRE-REGISTRATION-NODE); the OS x Node matrix is the point.
-    # Each cell is split into four shards; every shard runs its quarter of BOTH
+    # Each cell is split into three shards; every shard runs its third of BOTH
     # passes — this repo's index, then the adversarial corpus.
-    name: ${{ matrix.os }} · node ${{ matrix.node }} · ${{ matrix.shard }}/4
+    name: ${{ matrix.os }} · node ${{ matrix.node }} · ${{ matrix.shard }}/3
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         node: ["22", "24"]
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-fux
@@ -81,7 +91,7 @@ jobs:
       - run: fux build
 
       - name: the differential arm — TRANSCRIPTION (this repo)
-        run: python tools/differential/node_arm.py . --python-tune off --shard ${{ matrix.shard }}/4
+        run: python tools/differential/node_arm.py . --python-tune off --shard ${{ matrix.shard }}/3
 
       - name: the adversarial corpus, then the arm again
         # W-107 H1/H2 are invisible on ordinary data: H1 needs tied scores whose
@@ -91,7 +101,7 @@ jobs:
         run: |
           python tools/differential/adversarial_corpus.py .
           fux build
-          python tools/differential/node_arm.py . --python-tune off --shard ${{ matrix.shard }}/4
+          python tools/differential/node_arm.py . --python-tune off --shard ${{ matrix.shard }}/3
 
       - name: N2 — the graph plane digest (adversarial index)
         if: matrix.shard == 1
@@ -109,18 +119,3 @@ jobs:
           python: "3.13"
           extras: ""
       - run: python tools/differential/ladder_check.py
-
-  gate:
-    name: main gate
-    needs: [python, node-arm, ladder]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Every job must have succeeded
-        env:
-          NEEDS: ${{ toJSON(needs) }}
-        run: |
-          echo "$NEEDS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
-          echo "$NEEDS" | jq -e 'all(.[]; .result == "success")' >/dev/null \
-            || { echo "✗ main gate: a job did not succeed" >&2; exit 1; }
-          echo "✔ main gate green — full matrix and both arms"

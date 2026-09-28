@@ -9,6 +9,10 @@
 # ships. main.yml runs the full OS matrix beside it on `main`; publish.yml is
 # the only thing either lane gates (SR-WORK-RELEASE decisions 10-11a).
 #
+# No aggregator job: `main` has no required checks, so the workflow's own
+# conclusion IS the aggregate, and a gate job only added a runner pick-up
+# (~30 s) after the last real job.
+#
 # ⚠ **This lane is a SIGNAL, not a wall.** `main` has no required status
 # checks (.github/branch-protection.json), so a red here blocks nothing by
 # itself. What it buys is that the author knows in two minutes, not fifteen.
@@ -41,7 +45,11 @@ jobs:
       - uses: ./.github/actions/setup-fux
         with:
           python: "3.12"
-      - run: pytest -q -n auto --durations=10 tests
+      - run: pytest -q -n auto --durations=10 --junitxml=junit-unit.xml tests
+      - if: failure()
+        uses: ./.github/actions/pytest-annotate
+        with:
+          junit: junit-unit.xml
 
   e2e:
     if: github.event_name == 'push' || github.event.pull_request.head.repo.fork
@@ -52,7 +60,11 @@ jobs:
       - uses: ./.github/actions/setup-fux
         with:
           python: "3.12"
-      - run: pytest -q -n auto --durations=10 tests_e2e
+      - run: pytest -q -n auto --durations=10 --junitxml=junit-e2e.xml tests_e2e
+      - if: failure()
+        uses: ./.github/actions/pytest-annotate
+        with:
+          junit: junit-e2e.xml
 
   build:
     # Packaging + the Node reader's own units. Metadata validation before a
@@ -91,19 +103,19 @@ jobs:
 
   arm:
     # The differential arm (W-107), transcription pass on this repo, spread over
-    # six runners. `--shard` splits the job list by position; the six together
+    # ten runners. `--shard` splits the job list by position; the ten together
     # are exactly the unsharded run (tests/test_differential_arm.py).
     #
     # ⚠ The per-query cost is the Node reader's own scan (~1.2 s, measured
     # 2026-09-29), not process start-up — so sharding, not batching, is what
     # shortens it. The adversarial corpus and the other OSes run in main.yml.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.fork
-    name: arm ${{ matrix.shard }}/6 · linux · node 22
+    name: arm ${{ matrix.shard }}/10 · linux · node 22
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-fux
@@ -117,20 +129,4 @@ jobs:
       - run: fux build
       # `--python-tune off` is the transcription arm: `--no-tune` on both
       # sides, so a discordance is attributable (node_arm.py's docstring).
-      - run: python tools/differential/node_arm.py . --python-tune off --shard ${{ matrix.shard }}/6
-
-  gate:
-    # `if: always()` + explicit results: a skipped job must never read as green.
-    name: fast gate
-    needs: [unit, e2e, build, arm]
-    if: always() && (github.event_name == 'push' || github.event.pull_request.head.repo.fork)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Every job must have succeeded
-        env:
-          NEEDS: ${{ toJSON(needs) }}
-        run: |
-          echo "$NEEDS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
-          echo "$NEEDS" | jq -e 'all(.[]; .result == "success")' >/dev/null \
-            || { echo "✗ fast gate: a job did not succeed" >&2; exit 1; }
-          echo "✔ fast gate green"
+      - run: python tools/differential/node_arm.py . --python-tune off --shard ${{ matrix.shard }}/10

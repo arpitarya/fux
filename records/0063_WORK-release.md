@@ -10,7 +10,7 @@ feature: how a release reaches two registries, how the version stays equal acros
 owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: b5cd5f22f6e8686f102e95e35448c4bf24f24f0c283c4336ab8f1feb3849fa30
+content_sha: 70728996a28798c8b6c6eb8d0c1b83eda577d11c88a584681734fd205a3c30b4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -214,12 +214,12 @@ rather than a string somebody might forget to edit.
     - [`fast.yml`](../.github/workflows/fast.yml) runs on **every push, `main`
       included**, and on fork PRs: Linux, Python 3.12, Node 22 — both suites
       under `pytest -n auto`, packaging, the Node units, and the differential
-      arm's repo pass spread over six `--shard` runners. It is the two-minute
+      arm's repo pass spread over ten `--shard` runners. It is the two-minute
       **signal**, and it gates nothing.
     - [`main.yml`](../.github/workflows/main.yml) runs on push to `main`,
       nightly and by hand: the full Python matrix (3 OSes, 3.12–3.14), the arm
       on 3 OSes × Node 22/24 with **both** passes (this repo and the adversarial
-      corpus) in four shards per cell, and the ladder manifests. **It is what
+      corpus) in three shards per cell, and the ladder manifests. **It is what
       decision 11a waits on.**
     - ⚠ **`publish.yml` keeps its file name.** The PyPI and npm trusted
       publishers are bound to it; a rename would fail the next release at the

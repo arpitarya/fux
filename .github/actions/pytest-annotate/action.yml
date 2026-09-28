@@ -1,0 +1,40 @@
+# Turn a pytest junit file into one `::error::` annotation per failed test.
+#
+# Why (2026-09-29): run logs are not always reachable — a session reading CI
+# through the API sees annotations and nothing else, and "exit code 1" names no
+# test. An annotation carries the test id and the first lines of the failure to
+# every surface that shows a check. Called with `if: failure()`.
+name: pytest-annotate
+description: One error annotation per failed test in a junit XML file
+inputs:
+  junit:
+    description: path to the junit XML pytest wrote
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        JUNIT: ${{ inputs.junit }}
+      run: |
+        python - <<'PY'
+        import os, xml.etree.ElementTree as ET
+        path = os.environ["JUNIT"]
+        if not os.path.exists(path):
+            print(f"::warning::{path} not written — pytest failed before collection finished")
+            raise SystemExit(0)
+        n = 0
+        for case in ET.parse(path).iter("testcase"):
+            for kind in ("failure", "error"):
+                el = case.find(kind)
+                if el is None:
+                    continue
+                n += 1
+                if n > 20:
+                    continue
+                name = f"{case.get('classname')}::{case.get('name')}"
+                body = (el.get("message") or "") + "\n" + (el.text or "")
+                body = body.strip()[-1500:].replace("%", "%25").replace("\r", "").replace("\n", "%0A")
+                print(f"::error title={kind}: {name}::{body}")
+        print(f"{n} failed test(s)")
+        PY
