@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L3, L5, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 3f65b2b8b11b26960735d33c833d0855c3e29574e391c0f1895890f67e20d0d5
+content_sha: 9957773e4ea6601ed0fc896e18cdd36e3ee1cde2caf825fbea3b739b10f2c0c5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -352,6 +352,8 @@ added nothing of its own.
 **A fetched document's decoder reads its caps from `.fux/formats.toml [limits.<decoder>]`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27), under the root the registry binds, like a walked one ([SR-DECODE](0139_decode.md)).
 
 **The thin-page note, the failing streak and the parallelism note read `fux.toml [sources.url]`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): `thin_words`, `thin_words_per_kb`, `failing_streak`, `parallel_warn_at` ([SR-CONFIG](0113_config.md) decision 18). The rate-limit retries and backoff stay NOT configurable, by ruling 12, and are `constants.toml [fetch]`. Every value is unchanged.
+
+**`resolve_urls` reads `[sources.url] keep`, `ttl` and `update` directly** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28), where it fell back through `getattr(source, "ttl", "24h")` and its siblings: the template is their one home. `UrlEntry.ttl` has no default.
 
 ### Consequences
 

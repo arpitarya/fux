@@ -42,7 +42,7 @@ def corpus(tmp_path):
     _init(tmp_path)
     for i in range(6):
         (tmp_path / "docs" / f"doc-{i}.md").write_text(_doc(i), encoding="utf-8")
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     return tmp_path
 
 
@@ -54,18 +54,18 @@ def _digest(root) -> dict[str, str]:
 
 
 def test_a_delta_run_is_byte_identical_to_a_full_run(corpus):
-    run(corpus, full=True)
+    run(corpus, full=True, refresh_urls=False)
     full = _digest(corpus)
-    report = run(corpus)
+    report = run(corpus, refresh_urls=False, full=False)
     assert report.reused_count == 6
     assert _digest(corpus) == full
 
 
 def test_byte_identical_after_an_edit_too(corpus):
     (corpus / "docs" / "doc-2.md").write_text(_doc(2, 9), encoding="utf-8")
-    delta = run(corpus)
+    delta = run(corpus, refresh_urls=False, full=False)
     after_delta = _digest(corpus)
-    run(corpus, full=True)
+    run(corpus, full=True, refresh_urls=False)
     assert _digest(corpus) == after_delta
     assert delta.reused_count == 5      # everything but the one that changed
 
@@ -73,9 +73,9 @@ def test_byte_identical_after_an_edit_too(corpus):
 def test_byte_identical_after_an_addition(corpus):
     """An added document can resolve a link that dangled — edges must re-resolve."""
     (corpus / "docs" / "doc-6.md").write_text(_doc(6), encoding="utf-8")
-    run(corpus)
+    run(corpus, refresh_urls=False, full=False)
     after_delta = _digest(corpus)
-    run(corpus, full=True)
+    run(corpus, full=True, refresh_urls=False)
     assert _digest(corpus) == after_delta
 
 
@@ -83,16 +83,16 @@ def test_an_addition_repairs_a_dangling_edge_in_an_unchanged_document(corpus):
     """The reason `edges` is never carried forward, asserted rather than argued."""
     before = read_index(corpus)["file:docs/doc-5.md"]["edges"]
     (corpus / "docs" / "doc-6.md").write_text(_doc(6), encoding="utf-8")
-    run(corpus)
+    run(corpus, refresh_urls=False, full=False)
     after = read_index(corpus)["file:docs/doc-5.md"]["edges"]
     assert after != before, "doc-5's link to doc-6 should have resolved"
 
 
 def test_byte_identical_after_a_deletion(corpus):
     (corpus / "docs" / "doc-3.md").unlink()
-    run(corpus)
+    run(corpus, refresh_urls=False, full=False)
     after_delta = _digest(corpus)
-    run(corpus, full=True)
+    run(corpus, full=True, refresh_urls=False)
     assert _digest(corpus) == after_delta
 
 
@@ -100,7 +100,7 @@ def test_byte_identical_after_a_deletion(corpus):
 
 
 def test_a_run_that_drops_nothing_counts_no_deletions(corpus):
-    assert run(corpus).deleted_count == 0
+    assert run(corpus, refresh_urls=False, full=False).deleted_count == 0
 
 
 def test_a_deleted_document_is_counted(corpus):
@@ -113,18 +113,18 @@ def test_a_deleted_document_is_counted(corpus):
     happened goes unnamed. SR-INGEST Consequences.
     """
     (corpus / "docs" / "doc-3.md").unlink()
-    assert run(corpus).deleted_count == 1
+    assert run(corpus, refresh_urls=False, full=False).deleted_count == 1
 
 
 def test_deletions_are_counted_across_a_whole_directory(corpus):
     for i in (0, 1, 2):
         (corpus / "docs" / f"doc-{i}.md").unlink()
-    assert run(corpus).deleted_count == 3
+    assert run(corpus, refresh_urls=False, full=False).deleted_count == 3
 
 
 def test_an_addition_is_not_a_deletion(corpus):
     (corpus / "docs" / "doc-9.md").write_text(_doc(9), encoding="utf-8")
-    report = run(corpus)
+    report = run(corpus, refresh_urls=False, full=False)
     assert report.deleted_count == 0
     assert report.changed_count >= 1
 
@@ -135,7 +135,7 @@ def test_a_full_run_on_an_unchanged_corpus_counts_no_deletions(corpus):
     The diff is against the prior index's ids, which `--full` still reads for a
     corpus this reader wrote — so re-extraction moves `changed`, never this.
     """
-    assert run(corpus, full=True).deleted_count == 0
+    assert run(corpus, full=True, refresh_urls=False).deleted_count == 0
 
 
 # -- what reuse is gated on -------------------------------------------------
@@ -143,10 +143,10 @@ def test_a_full_run_on_an_unchanged_corpus_counts_no_deletions(corpus):
 
 def test_ver_still_bumps_only_on_this_documents_own_sha(corpus):
     before = read_index(corpus)["file:docs/doc-0.md"]["ver"]
-    run(corpus)
+    run(corpus, refresh_urls=False, full=False)
     assert read_index(corpus)["file:docs/doc-0.md"]["ver"] == before
     (corpus / "docs" / "doc-0.md").write_text(_doc(0, 1), encoding="utf-8")
-    report = run(corpus)
+    report = run(corpus, refresh_urls=False, full=False)
     assert read_index(corpus)["file:docs/doc-0.md"]["ver"] == before + 1
     assert report.changed_count == 1
 
@@ -171,7 +171,7 @@ def test_an_analyzer_bump_can_never_be_silently_carried_forward(corpus):
     shard.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     with pytest.raises(FuxError, match="analyzer"):
-        run(corpus)
+        run(corpus, refresh_urls=False, full=False)
 
 
 def test_reusable_refuses_a_header_that_is_not_the_current_one(corpus, monkeypatch):
@@ -182,17 +182,17 @@ def test_reusable_refuses_a_header_that_is_not_the_current_one(corpus, monkeypat
     # sys.modules under the same dotted path.
     run_mod = sys.modules["fux.ingest.run"]
     monkeypatch.setattr(run_mod.store_mod, "HEADER", dict(HEADER, tf_fields=["body"]))
-    assert run(corpus).reused_count == 0
+    assert run(corpus, refresh_urls=False, full=False).reused_count == 0
 
 
 def test_full_forces_re_extraction(corpus):
-    assert run(corpus, full=True).reused_count == 0
+    assert run(corpus, full=True, refresh_urls=False).reused_count == 0
 
 
 def test_a_first_ingest_reuses_nothing(tmp_path):
     _init(tmp_path)
     (tmp_path / "docs" / "a.md").write_text(_doc(0), encoding="utf-8")
-    assert run(tmp_path).reused_count == 0
+    assert run(tmp_path, refresh_urls=False, full=False).reused_count == 0
 
 
 # -- tune.toml [index]: committed inputs extraction reads (2026-09-11) -------
@@ -215,28 +215,28 @@ def test_changing_max_phrases_is_not_carried_forward(corpus):
     """`max_phrases` moves no document's sha, so a sha-keyed reuse would keep
     the old `phrases` — and a delta run would stop matching a full one (L4)."""
     _with_headings(corpus, 20, cap=4)
-    run(corpus)
+    run(corpus, refresh_urls=False, full=False)
     assert len(read_index(corpus)["file:docs/long.md"]["phrases"]) == 4
 
     _with_headings(corpus, 20, cap=10)  # same bytes for every document
-    report = run(corpus)
+    report = run(corpus, refresh_urls=False, full=False)
     after_delta = _digest(corpus)
     assert report.reused_count == 0
     assert len(read_index(corpus)["file:docs/long.md"]["phrases"]) == 10
-    run(corpus, full=True)
+    run(corpus, full=True, refresh_urls=False)
     assert _digest(corpus) == after_delta
 
 
 def test_an_unchanged_cap_still_reuses(corpus):
     _with_headings(corpus, 20, cap=4)
-    run(corpus)
-    assert run(corpus).reused_count == 7
+    run(corpus, refresh_urls=False, full=False)
+    assert run(corpus, refresh_urls=False, full=False).reused_count == 7
 
 
 def test_a_ranking_knob_change_still_reuses(corpus):
     """Only `[index]` is an extraction input; the rest of tune.toml is not."""
     _tune(corpus, "[bm25f]\nk1 = 2.0\n")
-    assert run(corpus).reused_count == 6
+    assert run(corpus, refresh_urls=False, full=False).reused_count == 6
 
 
 def test_a_stopped_run_does_not_record_the_new_cap(corpus):
@@ -244,10 +244,10 @@ def test_a_stopped_run_does_not_record_the_new_cap(corpus):
     earlier left the OLD records in the shards, so the next run must still see
     the cap as moved."""
     _with_headings(corpus, 20, cap=4)
-    run(corpus)
+    run(corpus, refresh_urls=False, full=False)
     _with_headings(corpus, 20, cap=10)
-    assert run(corpus, should_stop=lambda: True) is None
-    assert run(corpus).reused_count == 0
+    assert run(corpus, should_stop=lambda: True, refresh_urls=False, full=False) is None
+    assert run(corpus, refresh_urls=False, full=False).reused_count == 0
     assert len(read_index(corpus)["file:docs/long.md"]["phrases"]) == 10
 
 
@@ -257,13 +257,13 @@ def test_changing_max_table_rows_is_not_carried_forward(corpus):
     rows = "col\n" + "".join(f"rowword{i}\n" for i in range(12))
     (corpus / "docs" / "t.csv").write_text(rows, encoding="utf-8")
     _tune(corpus, "[index]\nmax_table_rows = 3\n")
-    run(corpus)
+    run(corpus, refresh_urls=False, full=False)
     assert "file:docs/t.csv" in read_index(corpus), ".csv must be an admitted type here"
     before = read_index(corpus)["file:docs/t.csv"]["flen"]
 
     _tune(corpus, "[index]\nmax_table_rows = 12\n")
-    run(corpus)
+    run(corpus, refresh_urls=False, full=False)
     after_delta = _digest(corpus)
     assert read_index(corpus)["file:docs/t.csv"]["flen"] != before
-    run(corpus, full=True)
+    run(corpus, full=True, refresh_urls=False)
     assert _digest(corpus) == after_delta

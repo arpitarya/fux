@@ -87,7 +87,7 @@ def ppr(
     iterations: int,
     laziness: float,
     kinds: frozenset[str] | None = ALL_KINDS,
-    link_idf_on: bool = False,
+    link_idf_on: bool,
     max_hops: int | None = None,
 ) -> dict[str, float]:
     """Personalized PageRank, lite — power iteration over the seed neighbourhood.
@@ -174,7 +174,7 @@ def expand(
     iterations: int,
     laziness: float,
     kinds: frozenset[str] | None = ALL_KINDS,
-    link_idf_on: bool = False,
+    link_idf_on: bool,
     max_hops: int | None = None,
 ) -> list[tuple[str, float]]:
     """Top non-seed nodes by PPR score. Ties break on id, as everywhere.

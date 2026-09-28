@@ -65,16 +65,27 @@ def test_it_reads_the_list_without_a_sources_url_block(tmp_path):
 # -- the resolved entry -----------------------------------------------------
 
 
+def _url_source():
+    """A `UrlSource` as the template's `[sources.url]` states it (SR-LAW-12)."""
+    from fux.config import UrlSource
+    from l12_fixtures import template_fux_toml
+
+    shipped = template_fux_toml()["sources"]
+    base = {k: v for k, v in shipped["url"].items() if not isinstance(v, dict)}
+    base.update(routes={}, config={}, urls_file=shipped["urls_file"])
+    return UrlSource(**base)
+
+
 def test_resolve_urls_carries_the_flag():
     entries = parse("https://x.test/old archived=true fetch=mw decoder=prose\n", URLS, origin="t")
-    source = SimpleNamespace(fetcher=".fux/fetchers/http.py", keep=True, ttl="24h")
+    source = _url_source()
     (resolved,) = resolve_urls(entries, source)
     assert resolved.archived is True
 
 
 def test_an_undeclared_line_resolves_to_not_archived():
     entries = parse("https://x.test/a fetch=mw decoder=prose\n", URLS, origin="t")
-    source = SimpleNamespace(fetcher=".fux/fetchers/http.py", keep=True, ttl="24h")
+    source = _url_source()
     (resolved,) = resolve_urls(entries, source)
     assert resolved.archived is False
 

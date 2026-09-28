@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 6c5e17f3b42ab6d1b51110fca4057cf688fb7c83382da4834334a830280ce3dd
+content_sha: 964f0cbe817e9b9c045474fd3d78398c530bd02894ed0f686f179c19e8e85512
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -480,6 +480,8 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

@@ -191,13 +191,13 @@ def _top_help() -> str:
     """
     from .output_config import template
 
-    return f"max results ({template().resolve('ask', 'top')} as shipped; .fux/output.toml sets it)"
+    return f"max results ({template().resolve('ask', 'top', as_json=False)} as shipped; .fux/output.toml sets it)"
 
 
 def _hops_help() -> str:
     from .output_config import template
 
-    return f"max edges in a route ({template().resolve('path', 'hops')} as shipped; .fux/output.toml sets it)"
+    return f"max edges in a route ({template().resolve('path', 'hops', as_json=False)} as shipped; .fux/output.toml sets it)"
 
 
 def _apply_output_defaults(args) -> None:
@@ -297,7 +297,7 @@ def _cmd_output(args) -> int:
     return 0
 
 
-def _add_output_flags(parser: argparse.ArgumentParser, *, band: bool = False) -> None:
+def _add_output_flags(parser: argparse.ArgumentParser, *, band: bool) -> None:
     """`--no-output-config`, and `--band` where the verb has a band.
 
     ⚠ **Every flag `.fux/output.toml` can default is declared `default=None`,
@@ -357,7 +357,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="write every missing config file and key from its template, then check",
     )
-    _add_output_flags(p_doctor)
+    _add_output_flags(p_doctor, band=False)
     p_doctor.set_defaults(func=_cmd_doctor)
 
     # `inspect` reads the INDEX; `doctor` checks the ENVIRONMENT (SR-INSPECT
@@ -408,7 +408,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="re-tokenise the sources even when the cached hash-to-word dictionary is current",
     )
     _add_progress_flags(p_inspect)
-    _add_output_flags(p_inspect)
+    _add_output_flags(p_inspect, band=False)
     p_inspect.set_defaults(func=_cmd_inspect)
 
     # **The one verb over the corpus** (W-177, Arpit 2026-09-15). `fux update`
@@ -509,7 +509,7 @@ def build_parser() -> argparse.ArgumentParser:
     # verb that used to own it, and moved here whole with W-177 — the escape
     # hatch is how *is it me or the config?* stays one flag rather than an
     # experiment.
-    _add_output_flags(p_ingest)
+    _add_output_flags(p_ingest, band=False)
     p_ingest.set_defaults(func=_cmd_ingest)
 
     p_build = sub.add_parser(
@@ -518,7 +518,7 @@ def build_parser() -> argparse.ArgumentParser:
     _add_progress_flags(p_build)
     # L12: `[cli] progress_threshold` is read from .fux/output.toml, so this
     # verb can bisect the file like every other verb that reads it (decision 15).
-    _add_output_flags(p_build)
+    _add_output_flags(p_build, band=False)
     p_build.set_defaults(func=_cmd_build)
 
     # The source group. Flat verbs over all three lists, dispatching on the
@@ -570,7 +570,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="URLs: record the line and ingest offline, without fetching this URL",
     )
     _add_progress_flags(p_add)
-    _add_output_flags(p_add)
+    _add_output_flags(p_add, band=False)
     p_add.set_defaults(func=_cmd_add)
 
     p_remove = sub.add_parser(
@@ -581,7 +581,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_remove.add_argument("--dry-run", action="store_true", help="say which branch it would take; write nothing")
     p_remove.add_argument("--no-ingest", action="store_true", help="edit the line only; do not re-ingest")
     _add_progress_flags(p_remove)
-    _add_output_flags(p_remove)
+    _add_output_flags(p_remove, band=False)
     p_remove.set_defaults(func=_cmd_remove)
 
 
@@ -857,7 +857,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_correct.add_argument("--list", action="store_true", help="every filed correction, and any suspended pin")
     p_correct.add_argument("--json", action="store_true", default=None, help="machine-readable output")
-    _add_output_flags(p_correct)
+    _add_output_flags(p_correct, band=False)
     p_correct.set_defaults(func=_cmd_correct)
 
     p_mcp = sub.add_parser(
@@ -887,7 +887,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_serve.add_argument(
         "--open", action="store_true", help="open the page in a browser once the server is up"
     )
-    _add_output_flags(p_serve)
+    _add_output_flags(p_serve, band=False)
     p_serve.set_defaults(func=_cmd_serve)
 
     p_hooks = sub.add_parser("hooks", help="install the git hooks and the index merge driver")
@@ -895,7 +895,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_hooks.add_argument("--status", action="store_true", help="report what is wired")
     p_hooks.add_argument("--uninstall", action="store_true", help="remove only what fux wrote")
     p_hooks.add_argument("--json", action="store_true", default=None, help="machine-readable status")
-    _add_output_flags(p_hooks)
+    _add_output_flags(p_hooks, band=False)
     p_hooks.set_defaults(func=_cmd_hooks)
 
     # W-82 ruling 10 (Arpit, 2026-08-27). A verb, like `mcp`, for the same
@@ -919,7 +919,7 @@ def build_parser() -> argparse.ArgumentParser:
     # flag that runs the loop in the foreground would invite someone to wire it
     # into a supervisor, which is the global install this verb exists to avoid.
     p_daemon.add_argument("--serve", action="store_true", help=argparse.SUPPRESS)
-    _add_output_flags(p_daemon)
+    _add_output_flags(p_daemon, band=False)
     p_daemon.set_defaults(func=_cmd_daemon)
 
     # The graph group. Flat, like every other verb — `fux graph path` would be
@@ -928,7 +928,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_explain = sub.add_parser("explain", help="one document's outbound edges and its community")
     p_explain.add_argument("doc", help="a doc id or the loc `find` printed")
     p_explain.add_argument("--json", action="store_true", default=None, help="machine-readable output")
-    _add_output_flags(p_explain)
+    _add_output_flags(p_explain, band=False)
     p_explain.set_defaults(func=_cmd_explain)
 
     p_graph = sub.add_parser(
@@ -989,7 +989,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="refuse mass to a node further than N hops from any seed. Default: unbounded (the walk's own iteration count already reaches three)",
     )
     _add_tune_flag(p_graph)
-    _add_output_flags(p_graph)
+    _add_output_flags(p_graph, band=False)
     p_graph.set_defaults(func=_cmd_graph)
 
     p_path = sub.add_parser("path", help="how two documents are connected, most reliable route first")
@@ -998,7 +998,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_path.add_argument("--hops", type=int, default=None, metavar="N", help=_hops_help())
     p_path.add_argument("--json", action="store_true", default=None, help="machine-readable output")
     _add_tune_flag(p_path)
-    _add_output_flags(p_path)
+    _add_output_flags(p_path, band=False)
     p_path.set_defaults(func=_cmd_path)
 
     # A flat verb with no arguments at all: it neither reads the repo nor

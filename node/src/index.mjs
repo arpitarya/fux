@@ -25,6 +25,7 @@
  * 6, not smoothed over here.
  */
 import { findRoot } from "./config/root.mjs";
+import { FuxError } from "./errors.mjs";
 import { runQuery, runFused } from "./query/run.mjs";
 import { headingsFor } from "./query/headings.mjs";
 import { recordFor, iterShardPaths, rawRecordLines } from "./store/reader.mjs";
@@ -64,8 +65,9 @@ class Index {
 
   /** Ranked document locations. The cheapest verb: no band, no headings. */
   async find(query, { top = null, under = null } = {}) {
-    if (top === null) top = Number(this._output().resolve("find", "top"));
-    let results = runQuery(this.root, query, top).results.map((r) => result(r));
+    if (top === null) top = Number(this._output().resolve("find", "top", null, { asJson: false }));
+    let results = runQuery(this.root, query, top, { useTune: true, wantConfidence: false, compose: true })
+      .results.map((r) => result(r));
     if (under !== null) {
       const prefix = under.endsWith("/") ? under : `${under}/`;
       results = results.filter((r) => r.loc === under || r.loc.startsWith(prefix));
@@ -78,15 +80,17 @@ class Index {
    * `band` defaults TRUE here and false on the CLI, deliberately: a caller in
    * code has already decided to read the object, and the block is the part
    * that says whether to trust it. */
-  async ask(query, { top = null, band = true, queries = null, sections = true } = {}) {
+  async ask(query, { top = null, band = null, queries = null, sections = null } = {}) {
     const output = this._output();
-    if (top === null) top = Number(output.resolve("ask", "top"));
-    const maxHeadings = Number(output.resolve("ask", "max_headings"));
+    band = Boolean(output.resolveApi("band", band));
+    sections = Boolean(output.resolveApi("sections", sections));
+    if (top === null) top = Number(output.resolve("ask", "top", null, { asJson: false }));
+    const maxHeadings = Number(output.resolve("ask", "max_headings", null, { asJson: false }));
     // Loaded once and handed to every arm, so a band cannot be explained by a
     // different floor than the one that produced the ranking beside it.
     const tune = loadTune(this.root, { enabled: true });
     const { results, confidence, fused } = runFused(
-      this.root, [query, ...(queries ?? [])], top, { tune, wantConfidence: band },
+      this.root, [query, ...(queries ?? [])], top, { tune, useTune: true, wantConfidence: band, compose: true },
     );
     const rows = results.map((r) => result(
       r, sections ? headingsFor(recordFor(this.root, r.id), query, maxHeadings) : [],
@@ -111,7 +115,11 @@ class Index {
    *
    * ⚠ **Read the verdict.** A caller that ignores it has thrown away the only
    * thing separating fux from a stale cache with good manners. */
-  async answer(query, { band = true, noRefer = false, audit = false } = {}) {
+  async answer(query, { band = null, noRefer = null, audit } = {}) {
+    if (audit !== true && audit !== false) throw new FuxError("answer: `audit` is required (true or false)");
+    const output = this._output();
+    band = Boolean(output.resolveApi("band", band));
+    noRefer = Boolean(output.resolveApi("no_refer", noRefer));
     const { payload } = answerPayload(this.root, {
       _: [query], band, noRefer, audit, json: true,
     });
@@ -181,7 +189,7 @@ class Index {
    * through strong ones. */
   async path(src, dst, { hops = null } = {}) {
     // R4 (Arpit, 2026-09-27): read `[cli.path] hops` like the CLI.
-    if (hops === null) hops = Number(this._output().resolve("path", "hops"));
+    if (hops === null) hops = Number(this._output().resolve("path", "hops", null, { asJson: false }));
     const plane = this._plane();
     let best = null;
     const queue = [[src, [src], 0]];

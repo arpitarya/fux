@@ -146,9 +146,9 @@ def run_query(
     query: str,
     top: int,
     *,
-    force_scan: bool = True,
+    force_scan: bool,
     tune: "Tune | None" = None,
-    use_tune: bool = True,
+    use_tune: bool,
     confidence_out: dict | None = None,
     trace_out: dict | None = None,
     expand: str = "",
@@ -461,7 +461,7 @@ def _result_for_pin(root: Path, doc_id: str):
         title=store_mod.display_title(record),
         loc=record.get("loc", ""),
         score=0.0,
-        archived=bool(record.get("archived", False)),
+        archived=bool(record.get("archived")),
         tie=False,
         mtime=record.get("mtime"),
         pinned=True,
@@ -559,7 +559,7 @@ def _maybe_rerank(root: Path, query: str, results, tune: "Tune", top: int, uplif
 OUTPUT_SCHEMA = fixed("schema_files", "output")
 
 
-def _emit(payload: dict, shape: str, *, band_requested: bool = False) -> None:
+def _emit(payload: dict, shape: str, *, band_requested: bool) -> None:
     """Validate against the output contract, then print.
 
     **Fux cannot emit JSON that violates its own contract**, and that is worth
@@ -643,7 +643,7 @@ def _tune_for(root: Path, args) -> "Tune":
 _FLOOR_NOTE_SAID = False
 
 
-def _declare_floor_off(root: Path, tune, *, quiet: bool = False) -> None:
+def _declare_floor_off(root: Path, tune, *, quiet: bool) -> None:
     """Say once, on stderr, that `separation_floor = 0.0` turned `weak` off.
 
     🔴 **SR-CONFIDENCE decision 13 says of itself that nothing mechanical catches
@@ -907,7 +907,7 @@ def _decline() -> None:
     print(NO_MATCHES, file=sys.stderr)
 
 
-def _declare_confidence(block, show: bool = False) -> None:
+def _declare_confidence(block, show: bool) -> None:
     """SR-CONFIDENCE decision 4, as amended: the band on stderr, never stdout.
 
     Same contract as `_declare_archived` and `_declare_pending`, for the same
@@ -966,6 +966,7 @@ def _run_fused(root, args, top, *, tune, confidence_out, trace_out=None, related
         root, queries[0], top, force_scan=_force_scan(args), tune=tune,
         confidence_out=confidence_out, trace_out=trace_out, expand=expand,
         related_out=related_out,
+        use_tune=True,
     )
     if len(queries) == 1:
         return results, path, False
@@ -988,6 +989,7 @@ def _run_fused(root, args, top, *, tune, confidence_out, trace_out=None, related
     for q in queries[1:]:
         more, _ = run_query(
             root, q, top, force_scan=_force_scan(args), tune=tune, expand=expand,
+            use_tune=True,
         )
         arms.append(more)
     return fuse_results(arms, top), path, True
@@ -1502,6 +1504,7 @@ def cmd_answer(args) -> int:
     results, _ = run_query(
         root, args.query, ANSWER_TOP, force_scan=_force_scan(args), tune=tune,
         confidence_out=signals, expand=_expand_of(args), related_out=related,
+        use_tune=True,
     )
     block = signals.get("confidence")
     if block is None:
@@ -1701,6 +1704,7 @@ def cmd_verify(args) -> int:
             # machine — which is the property decision 14 exists to protect.
             results, _ = run_query(
                 root, query, ANSWER_TOP, force_scan=_force_scan(args), expand=replay_expand,
+                use_tune=True,
             )
             if not results:
                 return []
@@ -1877,7 +1881,7 @@ def _gated(payload: dict, show: bool) -> dict:
     return payload
 
 
-def _print_refer_answer(bundle, as_json: bool, block=None, extra=None, show_band: bool = False) -> None:
+def _print_refer_answer(bundle, as_json: bool, block=None, extra=None, *, show_band: bool) -> None:
     """The fetched, re-scored answer — and the one path where `verified` is real.
 
     **This is where the fourth signal stops being a placeholder.** `ask` and
@@ -1956,7 +1960,7 @@ def _print_refer_answer(bundle, as_json: bool, block=None, extra=None, show_band
 
 def _print_index_answer(
     root: Path, best: AskResult, as_json: bool, *, requested: bool, block=None, extra=None,
-    show_band: bool = False,
+    show_band: bool,
 ) -> int:
     """The M2 path: the winning record's own extracted structure — no fetch.
 

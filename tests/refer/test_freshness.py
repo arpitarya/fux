@@ -10,28 +10,31 @@ import pytest
 from fux.errors import FuxError
 from fux.refer import freshness
 from fux.refer.freshness import ALWAYS, NEVER, Policy, decide, verify
+from l12_fixtures import template_fux_toml
+
+_TIMEOUT = template_fux_toml()["refer"]["timeout_seconds"]
 
 
 def test_never_is_the_default():
     """Offline by default (L5) means the default policy does not go out."""
-    assert Policy().mode == NEVER
-    assert Policy().forbids_fetch
+    assert Policy(timeout_seconds=_TIMEOUT).mode == NEVER
+    assert Policy(timeout_seconds=_TIMEOUT).forbids_fetch
 
 
 def test_never_forbids_the_fetch_and_says_why():
-    decision = decide(Policy(mode=NEVER))
+    decision = decide(Policy(mode=NEVER, timeout_seconds=_TIMEOUT))
     assert not decision and decision.reason == "policy:never"
 
 
 def test_always_permits_the_fetch():
-    assert decide(Policy(mode=ALWAYS))
+    assert decide(Policy(mode=ALWAYS, timeout_seconds=_TIMEOUT))
 
 
 def test_an_age_based_mode_is_refused_with_the_reason():
     """W-58: the record carries no ingest time, so an age bound could not be
     honoured. Refusing loudly beats accepting a knob that does nothing."""
     with pytest.raises(FuxError, match="no ingest time"):
-        Policy(mode="max_age")
+        Policy(mode="max_age", timeout_seconds=_TIMEOUT)
 
 
 @pytest.mark.parametrize("bad", [0, -1, "5", 1.5, True])

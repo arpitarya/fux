@@ -314,7 +314,7 @@ def _rule(entry, *, origin: str, index: int, seen: set[str]) -> Rule:
     return Rule(
         name=name,
         reason=entry["reason"],
-        content_type=_strs(entry, "content_type", where, lower=True),
+        content_type=_strs(entry, "content_type", where, lower=True, allow_empty=False),
         # ⚠ `allow_empty` on the suffix lists only. `""` is a REAL suffix — it
         # is how a rule says "a URL that names no extension", and the shipped
         # starter depends on it so that a bare wiki URL returning HTML is not
@@ -325,14 +325,14 @@ def _rule(entry, *, origin: str, index: int, seen: set[str]) -> Rule:
         requested_suffix_not=_strs(
             entry, "requested_suffix_not", where, lower=True, allow_empty=True
         ),
-        body_contains=_strs(entry, "body_contains", where),
+        body_contains=_strs(entry, "body_contains", where, lower=False, allow_empty=False),
         body_starts_with=_hex(entry, "body_starts_with", where),
         max_bytes=_positive_int(entry, "max_bytes", where),
     )
 
 
 def _strs(
-    entry: dict, key: str, where: str, *, lower: bool = False, allow_empty: bool = False
+    entry: dict, key: str, where: str, *, lower: bool, allow_empty: bool
 ) -> tuple[str, ...]:
     if key not in entry:
         return ()

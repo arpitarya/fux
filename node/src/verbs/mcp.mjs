@@ -129,7 +129,7 @@ function fuxSearch(root, args, top, maxHeadings) {
   // person can, and `next` has been telling it to call `fux_related` for
   // neighbours since the tool existed.
   const { results, related, confidence } = runQuery(root, query, k, {
-    wantConfidence: true, expand,
+    useTune: true, wantConfidence: true, compose: true, expand,
   });
   const records = results.length ? recordsById(root) : new Map();
   const out = results.map((r) => {

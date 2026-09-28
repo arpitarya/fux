@@ -12,6 +12,9 @@ from fux.refer import Policy, refer
 from fux.refer.arc import ARC
 from fux.refer.freshness import ALWAYS, NEVER
 from l12_fixtures import template_tune, write_config
+from l12_fixtures import template_fux_toml
+
+_TIMEOUT = template_fux_toml()["refer"]["timeout_seconds"]
 
 DOC = """# Rollback runbook
 
@@ -62,7 +65,7 @@ def _candidates(text: str = DOC):
 
 
 def test_it_cites_a_verbatim_span_of_the_real_document(repo):
-    bundle = refer(repo, "restore the previous release", _candidates(), tune=template_tune(), policy=Policy())
+    bundle = refer(repo, "restore the previous release", _candidates(), tune=template_tune(), policy=Policy(timeout_seconds=_TIMEOUT))
     assert bundle.assembled.citations
     for citation in bundle.assembled.citations:
         assert citation.text in DOC, "a citation must be bytes that came from the source"
@@ -74,7 +77,7 @@ def test_a_git_source_keeps_full_function_with_the_never_policy(repo):
     `never` forbids going *out*. Refusing to read the local repository would
     make an audit unable to quote the repository it is auditing.
     """
-    bundle = refer(repo, "telemetry", _candidates(), policy=Policy(mode=NEVER), tune=template_tune())
+    bundle = refer(repo, "telemetry", _candidates(), policy=Policy(mode=NEVER, timeout_seconds=_TIMEOUT), tune=template_tune())
     assert bundle.assembled.citations
     assert bundle.documents[0].verdict.label == "current"
 
@@ -94,7 +97,7 @@ def test_the_policy_is_recorded_in_the_bundle(repo):
 
 def test_a_changed_document_is_reported_stale_not_silently_used(repo):
     """The index says one sha; the working tree says another."""
-    bundle = refer(repo, "telemetry", [("file:runbook.md", "runbook.md", "a" * 64)], tune=template_tune(), policy=Policy())
+    bundle = refer(repo, "telemetry", [("file:runbook.md", "runbook.md", "a" * 64)], tune=template_tune(), policy=Policy(timeout_seconds=_TIMEOUT))
     assert bundle.documents[0].verdict.label == "stale"
     assert bundle.documents[0].verdict.fetched_sha == _sha(DOC)
 
@@ -108,7 +111,7 @@ def test_an_unreachable_url_declares_staleness_rather_than_serving_stale_bytes(r
         repo,
         "telemetry",
         [("url:https://x.test/page", "https://x.test/page", "b" * 64)],
-        policy=Policy(mode=ALWAYS),
+        policy=Policy(mode=ALWAYS, timeout_seconds=_TIMEOUT),
         fetcher=broken, tune=template_tune()
     )
     cited = bundle.documents[0]
@@ -127,7 +130,7 @@ def test_never_does_not_reach_out_for_a_url_document(repo):
         repo,
         "telemetry",
         [("url:https://x.test/page", "https://x.test/page", "b" * 64)],
-        policy=Policy(mode=NEVER),
+        policy=Policy(mode=NEVER, timeout_seconds=_TIMEOUT),
         fetcher=forbidden, tune=template_tune()
     )
     assert bundle.documents[0].verdict.label == "unverified"
@@ -140,7 +143,7 @@ def test_a_url_document_verifies_through_the_injected_fetcher(repo):
         repo,
         "telemetry rota",
         [("url:https://x.test/p", "https://x.test/p", _sha(page))],
-        policy=Policy(mode=ALWAYS),
+        policy=Policy(mode=ALWAYS, timeout_seconds=_TIMEOUT),
         fetcher=lambda url: page, tune=template_tune()
     )
     assert bundle.documents[0].verdict.label == "current"
@@ -148,7 +151,7 @@ def test_a_url_document_verifies_through_the_injected_fetcher(repo):
 
 
 def test_a_deleted_document_is_a_dead_citation_not_a_crash(repo):
-    bundle = refer(repo, "telemetry", [("file:gone.md", "gone.md", "c" * 64)], tune=template_tune(), policy=Policy())
+    bundle = refer(repo, "telemetry", [("file:gone.md", "gone.md", "c" * 64)], tune=template_tune(), policy=Policy(timeout_seconds=_TIMEOUT))
     assert bundle.documents[0].verdict.label == "unverified"
     assert "no longer in the working tree" in bundle.documents[0].note
 
@@ -165,11 +168,11 @@ def test_cached_and_uncached_answers_are_byte_identical(repo):
     """
     import json
 
-    uncached = json.dumps(refer(repo, "restore telemetry", _candidates(), tune=template_tune(), policy=Policy()).as_record(), indent=2)
+    uncached = json.dumps(refer(repo, "restore telemetry", _candidates(), tune=template_tune(), policy=Policy(timeout_seconds=_TIMEOUT)).as_record(), indent=2)
 
     cache = ARC(100_000)
-    cold = json.dumps(refer(repo, "restore telemetry", _candidates(), cache=cache, tune=template_tune(), policy=Policy()).as_record(), indent=2)
-    warm = json.dumps(refer(repo, "restore telemetry", _candidates(), cache=cache, tune=template_tune(), policy=Policy()).as_record(), indent=2)
+    cold = json.dumps(refer(repo, "restore telemetry", _candidates(), cache=cache, tune=template_tune(), policy=Policy(timeout_seconds=_TIMEOUT)).as_record(), indent=2)
+    warm = json.dumps(refer(repo, "restore telemetry", _candidates(), cache=cache, tune=template_tune(), policy=Policy(timeout_seconds=_TIMEOUT)).as_record(), indent=2)
 
     assert cold == uncached, "the cold cache path changed the answer"
     assert warm == uncached, "the warm cache path changed the answer"
@@ -178,11 +181,11 @@ def test_cached_and_uncached_answers_are_byte_identical(repo):
 
 def test_the_cache_is_keyed_by_content_so_a_changed_source_is_never_served_stale(repo):
     cache = ARC(100_000)
-    refer(repo, "telemetry", _candidates(), cache=cache, tune=template_tune(), policy=Policy())
+    refer(repo, "telemetry", _candidates(), cache=cache, tune=template_tune(), policy=Policy(timeout_seconds=_TIMEOUT))
 
     changed = DOC.replace("Monday", "Thursday")
     (repo / "runbook.md").write_text(changed, encoding="utf-8", newline="\n")
-    bundle = refer(repo, "telemetry", _candidates(changed), cache=cache, tune=template_tune(), policy=Policy())
+    bundle = refer(repo, "telemetry", _candidates(changed), cache=cache, tune=template_tune(), policy=Policy(timeout_seconds=_TIMEOUT))
 
     assert bundle.documents[0].verdict.label == "current"
     for citation in bundle.assembled.citations:
@@ -195,8 +198,8 @@ def test_the_cache_is_keyed_by_content_so_a_changed_source_is_never_served_stale
 def test_the_same_query_twice_is_the_same_bytes(repo):
     import json
 
-    first = json.dumps(refer(repo, "restore telemetry", _candidates(), tune=template_tune(), policy=Policy()).as_record())
-    assert json.dumps(refer(repo, "restore telemetry", _candidates(), tune=template_tune(), policy=Policy()).as_record()) == first
+    first = json.dumps(refer(repo, "restore telemetry", _candidates(), tune=template_tune(), policy=Policy(timeout_seconds=_TIMEOUT)).as_record())
+    assert json.dumps(refer(repo, "restore telemetry", _candidates(), tune=template_tune(), policy=Policy(timeout_seconds=_TIMEOUT)).as_record()) == first
 
 
 def test_no_module_in_the_plane_imports_a_network_library():

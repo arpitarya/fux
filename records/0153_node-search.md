@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@089b9df4718b, src/fux/store/nodebundle.py@005723cb4f3c]
+owns: [node@34c7f00d297d, src/fux/store/nodebundle.py@005723cb4f3c]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 1b09222de2326d643a4818c8b74ff863b20171223fae5766e7d71fc8c32ac9f7
+content_sha: e3904bb6958bad33af0aff97a1ac52343da5401c39291220ca30a4ac2f39ba91
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -914,6 +914,8 @@ this moved where they are written, not what they are.
 **The bundler holds no numeral**: its banner rules are `constants.toml [bundle] module_banner_width` and `surface_rule_width`, the import walk marks modules with two sets instead of `0/1/2`, and the checkout root is four `.parent`s up. HEAD's bundler and this one produce the same `fux.mjs` byte for byte. Node's verbs indent `--json` by `[json] indent`, and `store/reader.mjs`, `query/scan.mjs`, `refer/chunk.mjs`, `refer/source.mjs`, `correct.mjs` and `query/bm25f.mjs` lost their numerals as their Python twins did. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
+
+**Node's boolean defaults went with Python's** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28): `runQuery`, `runAsk`, `tiers`, `expand`/`ppr` and `OutputDefaults.resolve` take them explicitly, and `runQuery` throws on a missing one. `Index.ask`/`answer` read `.fux/output.toml [api]` ([SR-OUTPUT](0143_output-defaults.md) decision 25).
 
 ### Consequences
 

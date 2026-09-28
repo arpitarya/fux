@@ -119,12 +119,18 @@ def answer_via_refer(
             "     so no fetch happens and there is nothing to cache.",
             file=sys.stderr,
         )
+    from ..config import load as load_config
+
     try:
         bundle = refer(
             root,
             query,
             list(citations),
-            policy=Policy(mode=mode, cache_ttl_seconds=cache_ttl_seconds),
+            policy=Policy(
+                mode=mode,
+                timeout_seconds=load_config(root).refer_timeout_seconds,
+                cache_ttl_seconds=cache_ttl_seconds,
+            ),
             tune=tune,
             fetcher=fetch,
         )

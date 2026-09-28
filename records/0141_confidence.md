@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: e30962f0e84dd188ea5298225f6e01072e1cd2412cbddc03d4d9ef4983d91efa
+content_sha: 1a60bb50c8d078dbeeb42e49f775641e84680757ac83a21a61af89b9a3ab830f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -866,6 +866,8 @@ block is built on the ORIGINAL query, as decision 16's neighbour says of
 when it runs it can move `separation`, and with it the band, **of the list the
 reader is shown**, which is what this record requires. Off by default, and then
 nothing here changes.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

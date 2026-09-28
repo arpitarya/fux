@@ -113,7 +113,7 @@ function hopsFromSeeds(graph, seeds, maxHops) {
 
 export function ppr(graph, seeds, {
   damping, iterations, laziness,
-  kinds = ALL_KINDS, linkIdfOn = false, maxHops = null,
+  kinds = ALL_KINDS, linkIdfOn, maxHops = null,
 }) {
   if (!seeds.length || !graph.edges.length) return new Map();
   const hopOf = maxHops !== null && maxHops !== undefined
@@ -162,7 +162,7 @@ export function ppr(graph, seeds, {
  * many nodes come back, `ppr` decides what the numbers mean. */
 export function expand(graph, seeds, {
   limit, minScore = 0.0, damping, iterations, laziness,
-  kinds = ALL_KINDS, linkIdfOn = false, maxHops = null,
+  kinds = ALL_KINDS, linkIdfOn, maxHops = null,
 }) {
   const seedSet = new Set(seeds);
   const walked = ppr(graph, seeds, {

@@ -35,7 +35,7 @@ def test_refetch_all_forces_the_full_sweep(tmp_path):
     """⚠ **`--all` until W-177 renamed it.** Beside `--full` on `ingest` the old
     name read as its synonym, and the two are unrelated: `--full` re-extracts
     every document, `--refetch-all` fetches every URL."""
-    targeted, why = _narrow(tmp_path, LISTED, all_urls=True)
+    targeted, why = _narrow(tmp_path, LISTED, all_urls=True, failed_only=False)
     assert targeted is None, "None means every listed URL, not zero of them"
     assert "--refetch-all" in why
     assert "`--all`" not in why, "the announcement must not name a flag that is gone"
@@ -55,7 +55,7 @@ def test_an_absent_dirty_list_sweeps_everything(tmp_path):
     arriving through a file's tolerance rather than through the ruling.
     """
     assert not dirty.is_readable(tmp_path)
-    targeted, why = _narrow(tmp_path, LISTED, all_urls=False)
+    targeted, why = _narrow(tmp_path, LISTED, all_urls=False, failed_only=False)
     assert targeted is None, "absent must mean SWEEP EVERYTHING, never fetch nothing"
     assert "no dirty list" in why
 
@@ -69,7 +69,7 @@ def test_a_present_empty_dirty_list_fetches_nothing(tmp_path):
     (tmp_path / ".fux" / "runtime").mkdir(parents=True)
     (tmp_path / ".fux" / "runtime" / "dirty").write_text("", encoding="utf-8")
 
-    targeted, why = _narrow(tmp_path, LISTED, all_urls=False)
+    targeted, why = _narrow(tmp_path, LISTED, all_urls=False, failed_only=False)
     assert targeted == set(), "present-and-empty is not absent"
     assert "0 known stale" in why
 
@@ -80,7 +80,7 @@ def test_only_the_stale_urls_are_fetched(tmp_path):
         "url:https://b.test/y\nfile:docs/a.md\n", encoding="utf-8"
     )
 
-    targeted, why = _narrow(tmp_path, LISTED, all_urls=False)
+    targeted, why = _narrow(tmp_path, LISTED, all_urls=False, failed_only=False)
     assert targeted == {"https://b.test/y"}
     assert "1 known stale" in why
 
@@ -96,7 +96,7 @@ def test_a_dirty_url_that_is_no_longer_listed_is_not_fetched(tmp_path):
         "url:https://gone.test/old\nurl:https://a.test/x\n", encoding="utf-8"
     )
 
-    targeted, _ = _narrow(tmp_path, LISTED, all_urls=False)
+    targeted, _ = _narrow(tmp_path, LISTED, all_urls=False, failed_only=False)
     assert targeted == {"https://a.test/x"}
 
 
@@ -105,7 +105,7 @@ def test_an_excluded_entry_is_never_a_target(tmp_path):
     (tmp_path / ".fux" / "runtime" / "dirty").write_text("url:https://a.test/x\n", encoding="utf-8")
 
     listed = [Entry("https://a.test/x", exclude=True)]
-    targeted, _ = _narrow(tmp_path, listed, all_urls=False)
+    targeted, _ = _narrow(tmp_path, listed, all_urls=False, failed_only=False)
     assert targeted == set()
 
 

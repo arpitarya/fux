@@ -211,6 +211,7 @@ def _search(root: Path, args: dict, *, top: int, max_headings: int) -> dict:
     results, path = run_query(
         root, query, k, force_scan=False, confidence_out=signals, expand=expand,
         related_out=related,
+        use_tune=True,
     )
     block = signals.get("confidence")
     records = read_index(root) if results else {}
@@ -228,7 +229,7 @@ def _search(root: Path, args: dict, *, top: int, max_headings: int) -> dict:
                 # premise of ranking from an index and fetching from the owner.
                 "sha": record.get("sha", ""),
                 "archived": r.archived,
-                "superseded": bool(record.get("superseded", False)),
+                "superseded": bool(record.get("superseded")),
                 # W-153 -- the committed git commit timestamp in whole unix
                 # seconds, or `None` for a document outside git history. Always
                 # present; `None` is the claim *no committed date*, never "this
@@ -381,8 +382,8 @@ def _related(root: Path, args: dict) -> dict:
     return {
         "path": record["loc"],
         "title": record.get("title", ""),
-        "archived": bool(record.get("archived", False)),
-        "superseded": bool(record.get("superseded", False)),
+        "archived": bool(record.get("archived")),
+        "superseded": bool(record.get("superseded")),
         "outbound": [
             {"path": e["dst"].removeprefix("file:"), "kind": e["kind"]}
             for e in record.get("edges", ())
@@ -454,7 +455,7 @@ def _err(msg_id, code: int, message: str) -> dict:
     return {"jsonrpc": "2.0", "id": msg_id, "error": {"code": code, "message": message}}
 
 
-def serve(stdin=None, stdout=None, root: Path | None = None, *, enabled: bool = True) -> int:
+def serve(stdin=None, stdout=None, root: Path | None = None, *, enabled: bool) -> int:
     """Read newline-delimited JSON-RPC from stdin until EOF.
 
     `stdin`/`stdout` are injectable so the loop is testable without a

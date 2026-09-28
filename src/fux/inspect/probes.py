@@ -130,7 +130,7 @@ def _ask(root: Path, text: str, rank: int) -> list[str]:
     from ..query import run_query
 
     try:
-        results, _ = run_query(root, text, rank, force_scan=False)
+        results, _ = run_query(root, text, rank, force_scan=False, use_tune=True)
     except Exception:  # pragma: no cover - a report must not fail a command
         return []
     return [r.id for r in results]

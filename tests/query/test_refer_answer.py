@@ -79,6 +79,7 @@ def _init_url_repo(tmp_path, *, url="https://x.test/a", config_table=""):
 
 
 def test_file_document_needs_no_fetcher(tmp_path):
+    write_config(tmp_path)  # `[refer] timeout_seconds` (SR-LAW-12)
     (tmp_path / "runbook.md").write_text("# R\n\nthe rota hands over Monday\n", encoding="utf-8")
     bundle = answer_via_refer(
         tmp_path, "rota",
@@ -91,6 +92,7 @@ def test_file_document_needs_no_fetcher(tmp_path):
 
 def test_file_document_missing_from_the_working_tree_degrades_to_none(tmp_path):
     """Indexed once, gone now — a real fact about the corpus, not a crash."""
+    write_config(tmp_path)  # `[refer] timeout_seconds` (SR-LAW-12)
     bundle = answer_via_refer(tmp_path, "rota", [("file:gone.md", "gone.md", "deadbeef")], tune=template_tune(), cache_ttl_seconds=0)
     assert bundle is None
 
@@ -184,6 +186,7 @@ def test_three_documents_are_referred_in_one_call(tmp_path):
     so `_rescore` computes passage `df` across all of them and the contest is
     fair. Three separate calls would score each document's passages against
     only its own siblings, which is a different — and wrong — question."""
+    write_config(tmp_path)  # `[refer] timeout_seconds` (SR-LAW-12)
     pad = " ".join(f"pad{i}" for i in range(40))
     a = _write(tmp_path, "a.md", f"# A\n\nthe rota {pad}\n")
     b = _write(tmp_path, "b.md", f"# B\n\nthe rota hands over on Monday {pad}\n")
@@ -206,6 +209,7 @@ def test_the_assembled_answer_never_exceeds_the_budget(tmp_path):
     bound the caller declared is what holds; the bytes actually spent go up,
     which is the price of the recall and is reported rather than asserted away.
     """
+    write_config(tmp_path)  # `[refer] timeout_seconds` (SR-LAW-12)
     pad = " ".join(f"pad{i}" for i in range(400))
     docs = [_write(tmp_path, f"{n}.md", f"# {n}\n\nthe rota hands over {pad}\n") for n in "abc"]
     bundle = answer_via_refer(tmp_path, "rota hands over", docs, tune=template_tune(), cache_ttl_seconds=0)
@@ -216,6 +220,7 @@ def test_the_assembled_answer_never_exceeds_the_budget(tmp_path):
 def test_one_unreachable_document_costs_its_own_citation_and_no_more(tmp_path):
     """Per-document degradation. A `url:` citation with no fetcher configured
     drops out; the `file:` documents beside it still answer."""
+    write_config(tmp_path)  # `[refer] timeout_seconds` (SR-LAW-12)
     pad = " ".join(f"pad{i}" for i in range(40))
     good = _write(tmp_path, "good.md", f"# G\n\nthe rota hands over {pad}\n")
     bundle = answer_via_refer(
@@ -230,6 +235,7 @@ def test_one_unreachable_document_costs_its_own_citation_and_no_more(tmp_path):
 def test_every_document_failing_is_the_only_none(tmp_path):
     """`None` is reserved for *nothing usable at all* — the caller's signal to
     fall back to the index path. One survivor is not that case."""
+    write_config(tmp_path)  # `[refer] timeout_seconds` (SR-LAW-12)
     assert answer_via_refer(
         tmp_path, "rota", [("file:gone.md", "gone.md", "x"), ("file:also-gone.md", "also-gone.md", "y")], tune=template_tune(), cache_ttl_seconds=0
     ) is None

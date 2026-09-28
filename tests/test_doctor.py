@@ -913,7 +913,7 @@ def test_a_generated_binding_that_matches_nothing_is_not_reported(tmp_path):
     bindings = {ext.lstrip("."): name for ext, name in decode.builtin_bindings().items()}
     types = tmp_path / ".fux" / "formats.toml"
     types.parent.mkdir(parents=True, exist_ok=True)
-    types.write_text(typesfile.render(["*.md"], bindings), encoding="utf-8")
+    types.write_text(typesfile.render(["*.md"], bindings, grouped=True), encoding="utf-8")
     write_index(tmp_path, [_record()])
     write_config(tmp_path)
     check = _check(doctor.run(tmp_path), "decoder bindings")

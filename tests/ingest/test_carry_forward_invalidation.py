@@ -50,7 +50,7 @@ def mixed(tmp_path):
     _init(tmp_path)
     (tmp_path / "docs" / "people.csv").write_text(CSV, encoding="utf-8")
     (tmp_path / "docs" / "handbook.md").write_text(MD, encoding="utf-8")
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     return tmp_path
 
 
@@ -64,15 +64,15 @@ def test_a_no_op_delta_re_extracts_nothing(mixed):
     this ever goes red, the decoder digest is scoped wrong and the item is
     re-measured before it ships — it is not adjudicated by loosening the test.
     """
-    report = run(mixed)
+    report = run(mixed, refresh_urls=False, full=False)
     assert report.changed_count == 0
     assert report.reused_count == 2
 
 
 def test_a_second_no_op_delta_also_re_extracts_nothing(mixed):
     """Twice, because a digest written in the wrong place converges on run two."""
-    run(mixed)
-    assert run(mixed).changed_count == 0
+    run(mixed, refresh_urls=False, full=False)
+    assert run(mixed, refresh_urls=False, full=False).changed_count == 0
 
 
 # -- 1. the decoder digest --------------------------------------------------
@@ -83,7 +83,7 @@ def test_a_decoder_bump_re_extracts_exactly_its_bindings(mixed, monkeypatch):
     import fux.decode.csv as csv_mod
 
     monkeypatch.setattr(csv_mod, "VERSION", csv_mod.VERSION + 1)
-    report = run(mixed)
+    report = run(mixed, refresh_urls=False, full=False)
     # ⚠ **`reused_count`, not `changed_count`.** `changed` counts documents whose
     # SHA moved, and a decoder bump moves no source byte — so the natural-looking
     # assertion is green on a broken reuse key and on a fixed one alike. The
@@ -97,7 +97,7 @@ def test_a_decoder_bump_for_a_format_the_corpus_lacks_changes_nothing(mixed, mon
     import fux.decode.pptx as pptx_mod
 
     monkeypatch.setattr(pptx_mod, "VERSION", pptx_mod.VERSION + 1)
-    assert run(mixed).reused_count == 2
+    assert run(mixed, refresh_urls=False, full=False).reused_count == 2
 
 
 def test_a_consumer_decoder_appearing_re_extracts_that_extension(mixed):
@@ -113,7 +113,7 @@ def test_a_consumer_decoder_appearing_re_extracts_that_extension(mixed):
         '    return "# people\\n\\nconsumer decoded\\n"\n',
         encoding="utf-8",
     )
-    report = run(mixed)
+    report = run(mixed, refresh_urls=False, full=False)
     assert report.reused_count == 1
     assert report.doc_count - report.reused_count == 1
 
@@ -127,11 +127,11 @@ def test_a_consumer_decoder_disappearing_re_extracts_too(mixed):
         '    return "# people\\n\\nconsumer decoded\\n"\n',
         encoding="utf-8",
     )
-    run(mixed)
-    assert run(mixed).reused_count == 2  # settled
+    run(mixed, refresh_urls=False, full=False)
+    assert run(mixed, refresh_urls=False, full=False).reused_count == 2  # settled
 
     (decoders / "csv.py").unlink()
-    assert run(mixed).reused_count == 1
+    assert run(mixed, refresh_urls=False, full=False).reused_count == 1
 
 
 def test_editing_a_consumer_decoder_re_extracts_it(mixed):
@@ -143,14 +143,14 @@ def test_editing_a_consumer_decoder_re_extracts_it(mixed):
         'EXTENSIONS = (".csv",)\n\n\ndef decode(raw, rel_path):\n    return "# a\\n\\none\\n"\n',
         encoding="utf-8",
     )
-    run(mixed)
-    assert run(mixed).reused_count == 2
+    run(mixed, refresh_urls=False, full=False)
+    assert run(mixed, refresh_urls=False, full=False).reused_count == 2
 
     path.write_text(
         'EXTENSIONS = (".csv",)\n\n\ndef decode(raw, rel_path):\n    return "# a\\n\\ntwo\\n"\n',
         encoding="utf-8",
     )
-    assert run(mixed).reused_count == 1
+    assert run(mixed, refresh_urls=False, full=False).reused_count == 1
 
 
 def test_the_new_text_actually_reaches_the_index(mixed):
@@ -168,7 +168,7 @@ def test_the_new_text_actually_reaches_the_index(mixed):
         '    return "# people\\n\\nzarquon zarquon\\n"\n',
         encoding="utf-8",
     )
-    run(mixed)
+    run(mixed, refresh_urls=False, full=False)
     record = read_index(mixed)["file:docs/people.csv"]
     assert record["title"] == "people"
     # `ada` came from the built-in decoder's table; the consumer's does not emit it.
@@ -188,7 +188,7 @@ def test_an_extraction_rule_bump_re_extracts_the_whole_corpus(mixed, monkeypatch
     from fux.ingest import extract as extract_mod
 
     monkeypatch.setattr(extract_mod, "RULES_VERSION", extract_mod.RULES_VERSION + 1)
-    report = run(mixed)
+    report = run(mixed, refresh_urls=False, full=False)
     assert report.reused_count == 0
     assert report.doc_count == 2  # both re-extracted
 
@@ -214,9 +214,9 @@ def test_a_delta_run_is_still_byte_identical_to_a_full_run(mixed, monkeypatch):
         return h.hexdigest()
 
     monkeypatch.setattr(csv_mod, "VERSION", csv_mod.VERSION + 1)
-    run(mixed)
+    run(mixed, refresh_urls=False, full=False)
     after_delta = digest()
-    run(mixed, full=True)
+    run(mixed, full=True, refresh_urls=False)
     assert digest() == after_delta
 
 

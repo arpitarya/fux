@@ -70,7 +70,7 @@ def _seed(tmp_path, *, keep=True, retain=True):
     root = _repo(tmp_path, keep=keep)
     if retain:
         _retain(root)
-    run(root)  # offline: indexes docs/, no url record yet
+    run(root, refresh_urls=False, full=False)  # offline: indexes docs/, no url record yet
     return root
 
 
@@ -122,7 +122,7 @@ def seeded(tmp_path, monkeypatch):
     _retain(root)
 
     monkeypatch.setattr(urlsrc, "fetch_all", _fake_fetch_all)
-    run(root, refresh_urls=True)
+    run(root, refresh_urls=True, full=False)
     monkeypatch.undo()
     return root
 
@@ -135,7 +135,7 @@ def test_the_seed_actually_indexed_the_url(seeded):
 def test_an_offline_run_carries_it_forward_unchanged(seeded):
     """The behaviour that was always right, and must stay right."""
     before = _url_record(seeded)
-    run(seeded)
+    run(seeded, refresh_urls=False, full=False)
     assert _url_record(seeded) == before
 
 
@@ -145,7 +145,7 @@ def test_a_new_pii_rule_re_extracts_the_url_from_retained_bytes(seeded):
     (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
     write_config(seeded)
 
-    run(seeded)  # offline
+    run(seeded, refresh_urls=False, full=False)  # offline
     after = _url_record(seeded)
     assert after is not None, "the document must never be dropped by a policy change"
     assert after != before, "the record carried forward verbatim — the W-166 defect"
@@ -158,7 +158,7 @@ def test_the_redacted_term_actually_leaves_the_index(seeded):
 
     (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
     write_config(seeded)
-    run(seeded)
+    run(seeded, refresh_urls=False, full=False)
 
     record = _url_record(seeded)
     secret = next(iter(tokenize("zarquon4242")), "zarquon4242")
@@ -171,7 +171,7 @@ def test_the_file_half_of_the_corpus_is_re_extracted_too(seeded):
     """A policy change is corpus-wide; the url path is an addition, not a swap."""
     (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
     write_config(seeded)
-    assert run(seeded).reused_count == 0
+    assert run(seeded, refresh_urls=False, full=False).reused_count == 0
 
 
 def test_a_decoder_bump_also_reaches_a_retained_url(seeded, monkeypatch):
@@ -180,7 +180,7 @@ def test_a_decoder_bump_also_reaches_a_retained_url(seeded, monkeypatch):
 
     before = _url_record(seeded)
     monkeypatch.setattr(html_mod, "VERSION", html_mod.VERSION + 1)
-    run(seeded)
+    run(seeded, refresh_urls=False, full=False)
     # The bytes and the rules are unchanged, so the record is identical -- what
     # is asserted is that it was RE-DERIVED and still agrees, which is L4.
     assert _url_record(seeded) == before
@@ -197,7 +197,7 @@ def test_a_url_with_no_retained_blob_is_stranded_not_dropped(seeded):
 
     (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
     write_config(seeded)
-    run(seeded)
+    run(seeded, refresh_urls=False, full=False)
 
     assert _url_record(seeded) == before, "unchanged, and still present"
 
@@ -206,7 +206,7 @@ def test_a_stranded_url_is_recorded_for_doctor(seeded):
     acquired.write_manifest(seeded, {})
     (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
     write_config(seeded)
-    run(seeded)
+    run(seeded, refresh_urls=False, full=False)
 
     path = seeded / ".fux" / "runtime" / STALE_REDACTION_FILE
     assert json.loads(path.read_text(encoding="utf-8")) == [LOC]
@@ -217,7 +217,7 @@ def test_a_stranded_url_is_warned_about_on_the_run_that_strands_it(seeded):
     (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
     write_config(seeded)
 
-    warnings = "\n".join(run(seeded).warnings)
+    warnings = "\n".join(run(seeded, refresh_urls=False, full=False).warnings)
     assert LOC in warnings
     assert "OLD rules" in warnings
     assert warnings.isascii()  # printed, and a Windows console must encode it
@@ -228,13 +228,13 @@ def test_the_stranded_state_clears_once_the_bytes_are_back(seeded):
     acquired.write_manifest(seeded, {})
     (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
     write_config(seeded)
-    run(seeded)
+    run(seeded, refresh_urls=False, full=False)
     assert (seeded / ".fux" / "runtime" / STALE_REDACTION_FILE).is_file()
 
     _retain(seeded)
     (seeded / ".fux" / "pii.toml").write_text(RULE + "\n# touched\n", encoding="utf-8")
     write_config(seeded)
-    run(seeded)
+    run(seeded, refresh_urls=False, full=False)
     assert not (seeded / ".fux" / "runtime" / STALE_REDACTION_FILE).is_file()
 
 
@@ -244,7 +244,7 @@ def test_doctor_names_a_stranded_url(seeded):
     acquired.write_manifest(seeded, {})
     (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
     write_config(seeded)
-    run(seeded)
+    run(seeded, refresh_urls=False, full=False)
 
     row = next(c for c in doctor.run(seeded) if c.name == "url redaction current")
     assert not row.ok
@@ -256,7 +256,7 @@ def test_doctor_names_a_stranded_url(seeded):
 def test_doctor_is_clean_when_nothing_is_stranded(seeded):
     (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
     write_config(seeded)
-    run(seeded)
+    run(seeded, refresh_urls=False, full=False)
 
     from fux import doctor
 
@@ -278,9 +278,9 @@ def test_re_derivation_is_byte_identical_to_what_a_fetch_would_produce(seeded, m
 
     (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
     write_config(seeded)
-    run(seeded)
+    run(seeded, refresh_urls=False, full=False)
     offline = _url_record(seeded)
 
     monkeypatch.setattr(urlsrc, "fetch_all", _fake_fetch_all)
-    run(seeded, refresh_urls=True)
+    run(seeded, refresh_urls=True, full=False)
     assert _url_record(seeded) == offline

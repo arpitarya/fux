@@ -50,7 +50,7 @@ import sys
 
 import hashlib
 import importlib.util
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path, PurePosixPath
 
@@ -98,7 +98,9 @@ class UrlEntry:
     #: SR-URL-FRESHNESS: how long a citation may go unchecked at ask time,
     #: **verbatim** as written ("15m", not 900). Resolved to seconds only at
     #: the point of use, so config order never changes a committed byte.
-    ttl: str = "24h"
+    #: No default (W-225 stage 6): `resolve_urls` always states it, from the
+    #: line or from `[sources.url] ttl`; the template is its one home.
+    ttl: str = field(kw_only=True)
     #: SR-ARCHIVED-CONTENT: this URL points at a retired document. **Declared,
     #: never inferred** -- inference from retirement prose is refused and was
     #: measured to invert. Line-level only: there is no `[sources.url] archived`
@@ -241,7 +243,7 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
                 keep=(
                     entry.attrs["keep"] == "true"
                     if "keep" in entry.declared
-                    else getattr(source, "keep", True)
+                    else source.keep
                 ),
                 # Same three layers again. Kept as text, not seconds: the
                 # value round-trips back into the file on `fux ingest`, and a
@@ -250,7 +252,7 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
                 ttl=(
                     entry.attrs["ttl"]
                     if "ttl" in entry.declared
-                    else getattr(source, "ttl", "24h")
+                    else source.ttl
                 ),
                 # TWO layers, not three, and that is the decision: the built-in
                 # default and the line. `keep`/`ttl`/`enrich` have a
@@ -264,7 +266,7 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
                 update=(
                     entry.attrs["update"]
                     if "update" in entry.declared
-                    else getattr(source, "update", "auto")
+                    else source.update
                 ),
             )
         )

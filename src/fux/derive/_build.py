@@ -194,11 +194,11 @@ def _read_committed(root: Path, progress=None):
             "loc": r["loc"],
             "title": store_mod.display_title(r),
             "flen": list(r.get("flen", [])),
-            "archived": bool(r.get("archived", False)),
+            "archived": bool(r.get("archived")),
             # W-76 Phase 2, same reasoning as `archived` above: a fact the
             # scan reads off the record must be CARRIED here, not re-derived,
             # or the two paths weight the same document differently.
-            "superseded": bool(r.get("superseded", False)),
+            "superseded": bool(r.get("superseded")),
             "mtime": r.get("mtime"),
         }
         for r in records

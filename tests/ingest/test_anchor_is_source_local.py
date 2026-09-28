@@ -65,7 +65,7 @@ def test_edge_text_is_a_function_of_its_source_alone(tmp_path):
             "docs/b.md": "# Beta\n\nSee [the alpha document](a.md).\n",
         },
     )
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     a_before = _line_of(tmp_path, "file:docs/a.md")
     b_before = _line_of(tmp_path, "file:docs/b.md")
 
@@ -73,7 +73,7 @@ def test_edge_text_is_a_function_of_its_source_alone(tmp_path):
     (tmp_path / "docs" / "b.md").write_text(
         "# Beta\n\nSee [the ranking runbook](a.md).\n", encoding="utf-8"
     )
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
 
     assert _line_of(tmp_path, "file:docs/a.md") == a_before, (
         "editing B moved A's committed bytes. The anchor words have drifted "
@@ -100,7 +100,7 @@ def test_anchor_terms_are_not_in_the_targets_postings(tmp_path):
             "docs/b.md": "# Beta\n\nSee [the zarquon runbook](a.md).\n",
         },
     )
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     index = store.read_index(tmp_path)
     assert store.term_hash("zarquon") not in index["file:docs/a.md"]["terms"], (
         "an anchor term reached the target's committed postings"
@@ -114,11 +114,11 @@ def test_the_targets_bytes_do_not_move_when_a_NEW_linker_appears(tmp_path):
     """The same invariant, from the other direction: adding a document that
     links to A must not rewrite A either."""
     _init(tmp_path, {"docs/a.md": "# Alpha\n\nthe alpha document body\n"})
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     a_before = _line_of(tmp_path, "file:docs/a.md")
 
     (tmp_path / "docs" / "c.md").write_text(
         "# Gamma\n\nSee [the alpha document](a.md).\n", encoding="utf-8"
     )
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     assert _line_of(tmp_path, "file:docs/a.md") == a_before

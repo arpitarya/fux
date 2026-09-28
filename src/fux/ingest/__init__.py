@@ -68,7 +68,7 @@ def cmd_ingest(args) -> int:
         # The hook's whole job. Constant time in the corpus — one dirty-list
         # write plus one spawn — which is SR-MAINTENANCE veto condition 5.
         pending = runner_mod.record_head(root)
-        if runner_mod.spawn(root):
+        if runner_mod.spawn(root, handoff=False):
             print(f"fux: re-indexing in the background ({pending} changed path(s) pending)", file=sys.stderr)
         else:
             print(f"fux: a re-index is already running ({pending} changed path(s) pending)", file=sys.stderr)
@@ -130,7 +130,7 @@ def cmd_ingest(args) -> int:
     return 0
 
 
-def ingest_and_report(args_root, args, *, refresh_urls: bool = False, only_urls=None, first_fetch=None):
+def ingest_and_report(args_root, args, *, refresh_urls: bool, only_urls=None, first_fetch=None):
     """Run one ingest and print its summary. **The only ingest the verbs call.**
 
     `fux ingest`, `fux add` and `fux remove` all end here rather than each

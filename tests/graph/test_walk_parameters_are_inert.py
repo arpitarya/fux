@@ -25,7 +25,7 @@ from fux.graph.walk import ALL_KINDS, link_idf
 
 #: The template's `[graph]` walk — the walk has no defaults of its own (L12).
 _T = template_tune()
-_WALK = {"damping": _T.damping, "iterations": _T.iterations, "laziness": _T.laziness}
+_WALK = {"damping": _T.damping, "iterations": _T.iterations, "laziness": _T.laziness, "link_idf_on": False}
 
 
 def ppr(graph, seeds, **kw):

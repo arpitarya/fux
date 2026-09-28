@@ -102,7 +102,7 @@ function allRecords(root) {
  * already been computed in full; a corpus with no edges, an unreadable shard or
  * a record that left between two reads all degrade to *no tier*.
  */
-export function tiers(root, query, ordered, top, tune, { wantRelated = true } = {}) {
+export function tiers(root, query, ordered, top, tune, { wantRelated }) {
   const relatedOn = tune.askRelated && wantRelated;
   const on = tune.askBoost || relatedOn;
   if (ordered.length === 0 || !on) return { results: ordered.slice(0, top), related: [] };

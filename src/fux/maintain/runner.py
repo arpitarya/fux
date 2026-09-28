@@ -214,7 +214,7 @@ def holder(root: Path) -> int | None:
         return -1
 
 
-def acquire(root: Path, *, required: bool = False) -> bool:
+def acquire(root: Path, *, required: bool) -> bool:
     """Claim the write lock atomically. `False` means somebody else holds it.
 
     `O_CREAT|O_EXCL` is the whole mechanism — one syscall, no read-then-write
@@ -504,7 +504,7 @@ HANDOFF_ENV = fixed("env", "runner_handoff")
 NO_SPAWN_ENV = fixed("env", "no_spawn")
 
 
-def spawn(root: Path, *, handoff: bool = False) -> bool:
+def spawn(root: Path, *, handoff: bool) -> bool:
     """Start a detached one-shot re-index. `False` if one is already live.
 
     Checked before spawning as a courtesy only — the spawned process races for
@@ -560,7 +560,7 @@ def run_once(root: Path) -> str:
     """
     from ..ingest.run import run as ingest_run
 
-    if not acquire(root):
+    if not acquire(root, required=False):
         return "busy"  # the live runner will pick up our additions: the list is a union
     pid = os.getpid()
     seen: set[str] | None = None
@@ -592,7 +592,9 @@ def run_once(root: Path) -> str:
             passes += 1
             seen.update(dirty.read(root))
             try:
-                report = ingest_run(root, should_stop=lambda: stop_requested(root, pid))
+                report = ingest_run(
+                    root, refresh_urls=False, full=False, should_stop=lambda: stop_requested(root, pid)
+                )
             except Exception as exc:  # noqa: BLE001 - recorded, not swallowed; see below
                 # A detached process has no stderr anyone reads, so an
                 # unrecorded exception is an invisible failure. It is written

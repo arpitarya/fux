@@ -121,12 +121,23 @@ def test_the_shape_is_checked_and_existence_is_not():
     assert entry.attrs["decoder"] == "xlxs"
 
 
+def _url_source():
+    """A `UrlSource` as the template's `[sources.url]` states it (SR-LAW-12)."""
+    from fux.config import UrlSource
+    from l12_fixtures import template_fux_toml
+
+    shipped = template_fux_toml()["sources"]
+    base = {k: v for k, v in shipped["url"].items() if not isinstance(v, dict)}
+    base.update(routes={}, config={}, urls_file=shipped["urls_file"])
+    return UrlSource(**base)
+
+
 def test_the_line_is_the_only_layer():
     """⚠ **No `[sources.url] decoder`, by decision.** `keep`/`ttl`/`enrich`/
     `update` have a source-wide middle layer because each is a policy about
     REACHING a source; a decoder is a fact about one document's format."""
     entries = _parse("https://x.test/a fetch=http decoder=csv")
-    (resolved,) = urlsrc.resolve_urls(entries, object())
+    (resolved,) = urlsrc.resolve_urls(entries, _url_source())
     assert resolved.decoder == "csv"
 
 
@@ -304,7 +315,7 @@ def test_the_line_decides_what_lands_in_the_index(tmp_path):
             f'def fetch(url):\n    return ({body!r}.encode(), "text/html")\n',
             encoding="utf-8",
         )
-        run(root, refresh_urls=True)
+        run(root, refresh_urls=True, full=False)
         written[stem] = store.read_index(root)["url:https://x.test/export"]
 
     assert written["json"]["sha"] != written["prose"]["sha"], (

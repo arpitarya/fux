@@ -263,7 +263,7 @@ class Ignores:
     def __bool__(self) -> bool:
         return bool(self.rules) or bool(self.generated)
 
-    def decide(self, rel_path: str, *, is_dir: bool = False, hand_only: bool = False) -> Verdict:
+    def decide(self, rel_path: str, *, is_dir: bool, hand_only: bool) -> Verdict:
         """The verdict for one repo-relative path.
 
         **Ancestors first, shallowest to deepest.** Git's rule is that a file

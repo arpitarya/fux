@@ -56,19 +56,19 @@ from fux.ingest.gitdir import read_types, source_dirs, source_excludes, walk_sou
     ],
 )
 def test_git_glob_semantics(pattern, path, ignored):
-    assert fuxignore.parse(pattern + "\n").decide(path).ignored is ignored
+    assert fuxignore.parse(pattern + "\n").decide(path, is_dir=False, hand_only=False).ignored is ignored
 
 
 def test_last_match_wins_which_makes_order_semantic_here_and_nowhere_else():
     """Every other list fux reads is loader-sorted. This one is not, on purpose."""
-    assert fuxignore.parse("*.log\n!keep.log\n").decide("keep.log").ignored is False
-    assert fuxignore.parse("!keep.log\n*.log\n").decide("keep.log").ignored is True
+    assert fuxignore.parse("*.log\n!keep.log\n").decide("keep.log", is_dir=False, hand_only=False).ignored is False
+    assert fuxignore.parse("!keep.log\n*.log\n").decide("keep.log", is_dir=False, hand_only=False).ignored is True
 
 
 def test_a_file_under_an_ignored_directory_cannot_be_re_included():
     """Git's rule, and the reason `.fux/**` + `!.fux/decoders/*.py` disappoints."""
     ignores = fuxignore.parse("build/\n!build/keep.md\n")
-    assert ignores.decide("build/keep.md").ignored is True
+    assert ignores.decide("build/keep.md", is_dir=False, hand_only=False).ignored is True
 
 
 def test_a_trailing_comment_after_whitespace_is_a_comment():
@@ -77,8 +77,8 @@ def test_a_trailing_comment_after_whitespace_is_a_comment():
     Git reads `*.log   # noisy` as a literal pattern that matches nothing.
     """
     ignores = fuxignore.parse("*.log   # noisy\n")
-    assert ignores.decide("a.log").ignored is True
-    assert ignores.decide("a.log   # noisy").ignored is False
+    assert ignores.decide("a.log", is_dir=False, hand_only=False).ignored is True
+    assert ignores.decide("a.log   # noisy", is_dir=False, hand_only=False).ignored is False
 
 
 def test_a_full_line_comment_and_a_blank_line_are_not_rules():
@@ -89,7 +89,7 @@ def test_an_absent_file_ignores_nothing(tmp_path):
     """Empty is legal here, unlike `types`: this file only ever subtracts."""
     ignores = fuxignore.read(tmp_path)
     assert not ignores
-    assert ignores.decide("anything/at/all.md").rule is None
+    assert ignores.decide("anything/at/all.md", is_dir=False, hand_only=False).rule is None
 
 
 def test_a_bare_bang_is_a_loud_error():
@@ -103,7 +103,7 @@ def test_an_unmentioned_path_has_no_opinion_rather_than_a_re_include():
     If "not ignored" and "explicitly re-included" were one state, an empty
     `.fuxignore` would index every file in the tree.
     """
-    verdict = fuxignore.parse("*.log\n").decide("src/app.py")
+    verdict = fuxignore.parse("*.log\n").decide("src/app.py", is_dir=False, hand_only=False)
     assert verdict.ignored is False
     assert verdict.reincluded is False
 
@@ -273,19 +273,19 @@ def test_a_generated_verdict_reports_the_reason_that_put_it_there():
     the line as the reason would make the second run's answer *"because the
     first run said so"*, and the real reason would be lost after one ingest.
     """
-    assert fuxignore.parse(BLOCKED).decide("a/b.py").reason() == "not an indexed file type"
+    assert fuxignore.parse(BLOCKED).decide("a/b.py", is_dir=False, hand_only=False).reason() == "not an indexed file type"
 
 
 def test_anything_you_write_outranks_anything_fux_generated():
     text = BLOCKED + "!a/b.py\n"
-    assert fuxignore.parse(text).decide("a/b.py").reincluded
+    assert fuxignore.parse(text).decide("a/b.py", is_dir=False, hand_only=False).reincluded
 
 
 def test_hand_only_asks_what_the_file_would_say_with_the_blocks_deleted():
     ignores = fuxignore.parse(BLOCKED)
-    assert ignores.decide("a/b.py").ignored
-    assert not ignores.decide("a/b.py", hand_only=True).ignored
-    assert ignores.decide("x/y.log", hand_only=True).ignored
+    assert ignores.decide("a/b.py", is_dir=False, hand_only=False).ignored
+    assert not ignores.decide("a/b.py", hand_only=True, is_dir=False).ignored
+    assert ignores.decide("x/y.log", hand_only=True, is_dir=False).ignored
 
 
 def test_an_unclosed_block_swallows_the_rest_of_the_file():

@@ -268,6 +268,7 @@ def _seeds_of(root: Path, args, plane, tune):
         tune.seed_depth,
         force_scan=not getattr(args, "fast", False),
         tune=dataclasses.replace(tune, ask_boost=False, ask_related=False),
+        use_tune=True,
     )
     rows = [
         {"path": _loc_of(r.id), "id": r.id, "role": "seed", "score": r.score}

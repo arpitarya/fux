@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@7c0c132cc246, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@4828d8b0b5f3]
+owns: [src/fux/store@32ca5c1d1cff, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@4828d8b0b5f3]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 4ae9805766b78658e380094b81052ed1fe2567b3f4ef1853f211f25b342c4d83
+content_sha: d5342b000b442e887f663beb22ca2206af1dc9f7cbecfc456d5cfd7f9b2dfda9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -562,6 +562,8 @@ the three to be merged, did not.
 **`acquired.DEFAULT_MAX_BYTES` is deleted** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `evict` takes `max_bytes` as a required argument, read from `[sources.url] acquired_max_bytes` ([SR-ACQUIRED](0145_acquired-plane.md) decision 8, [SR-CONFIG](0113_config.md) decision 17).
 
 **A shard's one header line is `constants.toml [index] shard_header_lines`**, which every reader that numbers record lines now counts from; the writer's shard set is `range([index] shards)`, and Node's newline byte is `"\n".charCodeAt(0)`. No committed byte moved. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

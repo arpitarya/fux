@@ -69,7 +69,7 @@ def _corpus(tmp_path: Path, tune: str | None = TUNES["two"]) -> Path:
         path = tmp_path / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     build(tmp_path)
     if tune is not None:
         (tmp_path / ".fux" / "tune.toml").write_text(tune, encoding="utf-8")

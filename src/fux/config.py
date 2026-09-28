@@ -45,7 +45,7 @@ REQUIRED_KEYS: dict[str, tuple[str, ...]] = {
         "last_cited_max",
         "stop_every_docs",
     ),
-    "refer": ("fetch_cache_max_bytes",),
+    "refer": ("fetch_cache_max_bytes", "timeout_seconds"),
     "doctor": ("thin_url_share", "thin_url_chars", "acquired_warn_share"),
 }
 REQUIRED_URL_KEYS: tuple[str, ...] = (
@@ -106,6 +106,7 @@ KNOWN_KEYS: tuple[str, ...] = (
     "maintain.last_cited_max",
     "maintain.stop_every_docs",
     "refer.fetch_cache_max_bytes",
+    "refer.timeout_seconds",
     "doctor.thin_url_share",
     "doctor.thin_url_chars",
     "doctor.acquired_warn_share",
@@ -391,6 +392,9 @@ class Config:
     maintain: "Maintain"
     #: `[refer] fetch_cache_max_bytes` -- the fetch cache's disk bound.
     fetch_cache_max_bytes: int
+    #: `[refer] timeout_seconds` -- how long `fux answer` waits for one fetch
+    #: under the ALWAYS freshness policy (W-225 stage 6).
+    refer_timeout_seconds: int
     #: `[doctor]` -- the thresholds its advisory checks warn at.
     doctor: "Doctor"
 
@@ -559,6 +563,9 @@ def load(root: Path) -> Config:
             path, "[refer] fetch_cache_max_bytes", data["refer"]["fetch_cache_max_bytes"], whole=True, positive=True
         ),
         doctor=doctor,
+        refer_timeout_seconds=_number(
+            path, "[refer] timeout_seconds", data["refer"]["timeout_seconds"], whole=True, positive=True
+        ),
     )
 
 

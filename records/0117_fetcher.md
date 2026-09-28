@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@10cfc57f4793, src/fux/templates@d17a8c5bf886]
+owns: [src/fux/ingest/urlsrc.py@80b919e8f56c, src/fux/templates@af5cfe303c80]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 1787bce6efa8933ce50eb8fdccfa52981255ae90b4cb13d6956d30a6e02c3f49
+content_sha: 1a1b1f229ebb3d4f8bbd4334931ba9ab470c9bd4a88f20c346fcc5c684119306
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -671,6 +671,8 @@ copied out, never imported.
 **An undeclared fetcher's parallelism is `constants.toml [fetch] undeclared_max_parallel`** (1) ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28), fixed by decision 5's *declared, never detected*; the "that is a lot of connections" note fires at `fux.toml [sources.url] parallel_warn_at`.
 
 **No fetcher decision moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `src/fux/templates/fux.toml.txt`, under this record's claim on `templates/`, gained `[doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18).
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

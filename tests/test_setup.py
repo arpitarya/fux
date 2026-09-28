@@ -279,8 +279,8 @@ def test_bang_lines_move_to_fuxignore_above_the_first_hand_pattern(tmp_path):
     from fux.ingest import fuxignore
 
     ignores = fuxignore.read(tmp_path)
-    assert ignores.decide("docs/a.min.md").ignored
-    assert not ignores.decide("docs/keep.min.md").ignored
+    assert ignores.decide("docs/a.min.md", is_dir=False, hand_only=False).ignored
+    assert not ignores.decide("docs/keep.min.md", is_dir=False, hand_only=False).ignored
 
 
 def test_setup_leaves_both_files_alone_when_the_new_one_exists(tmp_path):
@@ -466,7 +466,7 @@ def test_a_plain_ingest_puts_no_code_in_the_repo(tmp_path):
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     write_config(tmp_path)
 
-    ingest(tmp_path)
+    ingest(tmp_path, refresh_urls=False, full=False)
     assert not (tmp_path / ".fux" / "fetchers").exists()
 
 

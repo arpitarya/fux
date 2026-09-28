@@ -64,7 +64,7 @@ Nothing in this module imports `time`.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ..errors import FuxError
 
@@ -86,7 +86,9 @@ class Policy:
     """What the caller will tolerate. Immutable, and carried into the answer."""
 
     mode: str = NEVER
-    timeout_seconds: int = 5
+    #: How long `ALWAYS` waits for one fetch: `fux.toml [refer] timeout_seconds`
+    #: (W-225 stage 6), passed by the caller -- no default of its own.
+    timeout_seconds: int = field(kw_only=True)
     #: Serve a previously fetched copy for this many seconds before going out
     #: again. **0 disables the cache**, and that is the default: a caller who
     #: never opted in can never be served a cached byte (W-60, verdict F).

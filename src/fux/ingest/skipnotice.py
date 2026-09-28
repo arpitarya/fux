@@ -131,7 +131,7 @@ def unseen(root: Path, skipped) -> list[Skipped]:
         # generated line (one line beats many), so without this it would have
         # nothing recording it and would print on every run forever — W-88's
         # wall, rebuilt by the fix for W-93.
-        if ignores.decide(skip.rel_path, hand_only=True).ignored:
+        if ignores.decide(skip.rel_path, hand_only=True, is_dir=False).ignored:
             continue
         out.append(skip)
     return out
@@ -145,7 +145,7 @@ def write(root: Path, skipped) -> None:
     for skip in skipped:
         if not fuxignore.writable(skip.rel_path) or _SCHEME.match(skip.rel_path):
             continue
-        if ignores.decide(skip.rel_path, hand_only=True).ignored:
+        if ignores.decide(skip.rel_path, hand_only=True, is_dir=False).ignored:
             continue  # a pattern you wrote already covers it; one line beats many
         name = fuxignore.BLOCK_NOT_INDEXED if skip.kind == POLICY else fuxignore.BLOCK_SKIPPED
         blocks[name].append((skip.rel_path, skip.reason))
@@ -176,7 +176,7 @@ def stale_warnings(root: Path, *, types, excludes) -> list[str]:
     ignores = fuxignore.read(root)
     warnings = []
     for g in sorted(ignores.generated.values(), key=lambda g: g.path):
-        if ignores.decide(g.path, hand_only=True).ignored:
+        if ignores.decide(g.path, hand_only=True, is_dir=False).ignored:
             continue  # your own rule covers it; the generated line is not what holds it out
         if not would_index(root, g.path, excludes=excludes, types=types):
             continue

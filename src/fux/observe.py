@@ -160,7 +160,7 @@ def _record_from(verb: str, argv: list[str], ms: int, version: str) -> Record:
         n_related=int(noted.get("n_related", 0)),
         refer_verdicts=dict(noted.get("refer_verdicts", {})),
         ms=ms,
-        expand_used=bool(noted.get("expand_used", False)),
+        expand_used=bool(noted.get("expand_used")),
         q_arms=int(noted.get("q_arms", 1)),
         fux_version=version,
     )

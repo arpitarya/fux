@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@4b515e855808, src/fux/query/intent.py@fa4902c6d3fe, node/src/query/intent.mjs@9a38066c345a, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@37bde1db316b, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@891b8d0b9794, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@1a1dd7794ab6, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
+owns: [src/fux/query/rank.py@232892e6641d, src/fux/query/intent.py@fa4902c6d3fe, node/src/query/intent.mjs@9a38066c345a, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@1d8ff4a42048, src/fux/query/analyzer.py@37bde1db316b, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@891b8d0b9794, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@1a1dd7794ab6, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@38c8b15c5197, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5773a10ef1474fca9c5285185442f6430e4fc192d448bf2b02d0e8e4a19a7d8e
+content_sha: 73d26108ab392e9ba6276e8bd7216d24ff4b1cdc63efafc16a68e958bd2c0c33
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -612,6 +612,8 @@ intent_weight`. `of(record)` is `priority_for(loc) × intent_for(loc)`, and
   intent, which type. Its three parity rules with Node (ASCII-only case and
   whitespace, `.` over every character, globs over code points) are stated
   there.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

@@ -33,7 +33,7 @@ import { fixed } from "./constants.mjs";
 export const OUTPUT_NAME = fixed("files", "output");
 
 const MAX_REPORTED = 10;
-const ROOTS = ["cli", "mcp"];
+const ROOTS = ["cli", "mcp", "api"];
 
 //: The closed key set per verb. ⚠ **`graph` has no `top` key** — it has no
 //: `--top` flag and reads `seed_depth`/`expand_limit` from `.fux/tune.toml`
@@ -107,6 +107,10 @@ export function subtableFor(verb) {
 //: JSON) and no `band` (the confidence block is unconditional there).
 export const MCP_KEYS = ["top", "max_headings"];
 
+//: `[api]`'s closed key set -- the library defaults a caller did not pass
+//: (W-225 stage 6, L12 R8). Twin of `output_config.py::API_KEYS`.
+export const API_KEYS = ["band", "sections", "no_refer"];
+
 /** Every key more than one SUBTABLE declares — what a SHARED table may hold.
  *  A key unique to one subtable is refused at the shared level by name.
  *  **By subtable, not by verb** — `output_config.py`'s rule: `lexical` reads
@@ -179,8 +183,8 @@ class Collector {
 /** Resolved output defaults. Frozen, like `Tune`, so a caller can never hand
  *  two code paths a block that drifted between them. */
 export class OutputDefaults {
-  constructor({ cliShared, cliVerb, jsonShared, jsonVerb, mcp, source }) {
-    Object.assign(this, { cliShared, cliVerb, jsonShared, jsonVerb, mcp, source });
+  constructor({ cliShared, cliVerb, jsonShared, jsonVerb, mcp, api, source }) {
+    Object.assign(this, { cliShared, cliVerb, jsonShared, jsonVerb, mcp, api, source });
     Object.freeze(this);
   }
 
@@ -200,7 +204,7 @@ export class OutputDefaults {
   /** One precedence chain: **flag → json-verb → json-shared → cli-verb →
    *  cli-shared → bypass → error.** Raises on a verb/key pair `CLI_VERBS` does
    *  not grant, so a typo in a CALLER is caught too. */
-  resolve(verb, key, cliValue = null, { asJson = false } = {}) {
+  resolve(verb, key, cliValue, { asJson }) {
     const allowed = CLI_VERBS[verb];
     if (allowed === undefined) {
       throw new FuxError(`no output defaults are declared for \`${verb}\` — known: ${Object.keys(CLI_VERBS).sort().join(", ")}`);
@@ -231,6 +235,17 @@ export class OutputDefaults {
     if (toolValue !== null && toolValue !== undefined) return toolValue;
     if (key in this.mcp) return this.mcp[key];
     throw new FuxError(`${this.source}:\n  [mcp] ${key} is missing\n  ${FIX_HINT}`);
+  }
+
+  /** `[api]`'s own chain: **argument → `[api]` → error.** Twin of
+   *  `resolve_api`; inherits nothing from `[cli]`, for `[mcp]`'s reason. */
+  resolveApi(key, argValue) {
+    if (!API_KEYS.includes(key)) {
+      throw new FuxError(`\`${key}\` is not an output key for \`api\` — it has: ${[...API_KEYS].sort().join(", ")}`);
+    }
+    if (argValue !== null && argValue !== undefined) return argValue;
+    if (key in this.api) return this.api[key];
+    throw new FuxError(`${this.source}:\n  [api] ${key} is missing\n  ${FIX_HINT}`);
   }
 }
 
@@ -423,8 +438,25 @@ function parse(data, label) {
     }
   }
 
+  const apiOut = {};
+  const apiTable = data.api;
+  if (apiTable !== undefined) {
+    if (!isTable(apiTable)) {
+      c.add("`api` must be a table — write `[api]`, not `api = ...`");
+    } else {
+      for (const [key, value] of Object.entries(apiTable)) {
+        if (!API_KEYS.includes(key)) {
+          c.add(`[api] unknown key \`${key}\` — known: ${[...API_KEYS].sort().join(", ")}`);
+          continue;
+        }
+        const value2 = checked(c, "api", key, value, apiTable);
+        if (value2 !== undefined) apiOut[key] = value2;
+      }
+    }
+  }
+
   c.raiseIfAny();
-  return new OutputDefaults({ cliShared, cliVerb, jsonShared, jsonVerb, mcp: mcpOut, source: label });
+  return new OutputDefaults({ cliShared, cliVerb, jsonShared, jsonVerb, mcp: mcpOut, api: apiOut, source: label });
 }
 
 /** Fold the resolved defaults into `args`, ONCE, before dispatch.

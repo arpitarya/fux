@@ -143,7 +143,7 @@ def test_two_foreground_writers_actually_race_without_it(repo):
     script = (
         "import sys,pathlib,os;from fux.maintain import runner;"
         "root=pathlib.Path(sys.argv[1]);"
-        "print('GOT' if runner.acquire(root) else 'REFUSED')"
+        "print('GOT' if runner.acquire(root, required=False) else 'REFUSED')"
     )
     env = dict(os.environ)
     env["PYTHONPATH"] = os.pathsep.join(
@@ -162,7 +162,7 @@ def test_the_runner_may_re_enter_its_own_lock(repo):
     """A runner acquires the lock itself and then calls into the shared write
     path. Without re-entry it would deadlock against itself.
     """
-    assert runner.acquire(repo) is True
+    assert runner.acquire(repo, required=False) is True
     try:
         with runner.write_lock(repo):
             pass  # must not raise

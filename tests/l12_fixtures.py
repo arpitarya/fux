@@ -147,7 +147,7 @@ def shipped_output() -> dict:
     out: dict = {"json": t.resolve_json("ask")}
     for verb, keys in output_config.CLI_VERBS.items():
         for key in keys:
-            out.setdefault(key, t.resolve(verb, key))
+            out.setdefault(key, t.resolve(verb, key, as_json=False))
     return out
 
 

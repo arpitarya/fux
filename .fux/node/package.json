@@ -3,7 +3,7 @@
   "version": "3.0.0-alpha.5",
   "description": "Read a fux index from Node. Ranked, cited answers from a small index committed to git — no server, no model, no Python.",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": { "node": ">=22" },
   "bin": { "fux": "./fux.mjs" },
   "exports": { ".": "./fux.mjs" },
   "files": ["fux.mjs", "mcp-tools.json", "README.md"],

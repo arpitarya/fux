@@ -7,10 +7,10 @@ description: "A declarative refusal table, every condition pure over the respons
 status: accepted
 date: 2026-09-01
 feature: refusal detection before decode
-owns: [src/fux/ingest/refusals.py@c2842b4b4bb0, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@5fdc90fab388]
+owns: [src/fux/ingest/refusals.py@e984db83cf94, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@5fdc90fab388]
 laws: [L2, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: eab7765afe2cc7acbb7bc35e17e319204a9132ad2e52d85d75a50704b425ab01
+content_sha: 0dd2fb650a7e24d11bd495b2ab9201e57d3290ecfc1aeaffbae3e304c3c33034
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -469,6 +469,8 @@ the rules carrying the two bounds — so every caller that iterates is unchanged
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

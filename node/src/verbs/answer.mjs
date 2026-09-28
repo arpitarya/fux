@@ -95,7 +95,7 @@ export function answerPayload(root, args) {
   // text and has no idea which tier a candidate came from. That is the point —
   // Tier B's weakness is that no query word matched the INDEX.
   const { results, related, confidence, tune } = runQuery(root, query, ANSWER_TOP, {
-    useTune: args.noTune !== true, wantConfidence: true, expand: args.expand ?? "",
+    useTune: args.noTune !== true, wantConfidence: true, compose: true, expand: args.expand ?? "",
   });
   declareFloorOff(tune, Boolean(args.json));
   const band = (block, freshness) => {

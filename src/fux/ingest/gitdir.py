@@ -377,7 +377,7 @@ def walk_sources(
             # An explicit `!` re-include is the one thing that outranks the
             # type allowlist, which is why `reincluded` is a distinct state
             # from "no rule matched" rather than a bool for "not ignored".
-            verdict = ignores.decide(rel)
+            verdict = ignores.decide(rel, is_dir=False, hand_only=False)
             if verdict.ignored:
                 # A fux-written block line carries BOTH halves forward: its
                 # note is the reason that put it there, and which block it

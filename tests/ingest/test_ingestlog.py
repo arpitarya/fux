@@ -95,7 +95,7 @@ def test_one_row_per_document_naming_its_decoder(tmp_path):
         tmp_path,
         files={"docs/a.md": "# A\n\nbody\n", "docs/t.csv": "name,qty\nbolt,4\n"},
     )
-    run(root)
+    run(root, refresh_urls=False, full=False)
     rows = _rows(root)
     assert set(rows) == {"file:docs/a.md", "file:docs/t.csv"}
     # Markdown carries no binding — W-166 says so, and `prose` is minted here
@@ -116,7 +116,7 @@ def test_rows_are_sorted_by_id_with_sorted_keys(tmp_path):
         tmp_path,
         files={f"docs/{n}.md": f"# {n}\n\nbody\n" for n in ("c", "a", "b")},
     )
-    run(root)
+    run(root, refresh_urls=False, full=False)
     lines = provenance.path_for(root).read_text(encoding="utf-8").splitlines()
     ids = [json.loads(line)["id"] for line in lines]
     assert ids == sorted(ids)
@@ -130,7 +130,7 @@ def test_a_file_row_carries_no_fetcher_key(tmp_path):
     only ever be null for it — an absent key and a null one read differently to
     every consumer, and only one of them is true here."""
     root = _repo(tmp_path)
-    run(root)
+    run(root, refresh_urls=False, full=False)
     assert "fetcher" not in _rows(root)["file:docs/a.md"]
 
 
@@ -145,7 +145,7 @@ def test_no_row_carries_a_clock(tmp_path):
     manifest already made.
     """
     root = _repo(tmp_path)
-    run(root)
+    run(root, refresh_urls=False, full=False)
     for row in _rows(root).values():
         assert "run_seq" in row
         for key in ("time", "timestamp", "ts", "at", "when", "mtime", "date"):
@@ -162,7 +162,7 @@ def test_no_row_carries_a_query_field(tmp_path):
     that would have to be deleted first.
     """
     root = _repo(tmp_path)
-    run(root)
+    run(root, refresh_urls=False, full=False)
     for row in _rows(root).values():
         for key in ("query", "q", "asked", "question", "answer", "results", "hits"):
             assert key not in row
@@ -181,11 +181,11 @@ def test_a_reused_row_carries_the_decoder_that_made_the_record(tmp_path):
     population the finding is about.
     """
     root = _repo(tmp_path, files={"docs/t.csv": "name,qty\nbolt,4\n"})
-    run(root)
+    run(root, refresh_urls=False, full=False)
     first = _rows(root)["file:docs/t.csv"]
     assert first["outcome"] == "indexed"
 
-    report = run(root)
+    report = run(root, refresh_urls=False, full=False)
     assert report.reused_count == 1, "the delta path must actually have reused it"
     second = _rows(root)["file:docs/t.csv"]
     assert second["outcome"] == "reused"
@@ -196,9 +196,9 @@ def test_a_reused_row_with_no_prior_ledger_reads_unknown(tmp_path):
     """Absent and unknown are different, and only one means *"this predates the
     ledger"*. `null` would be read as *"no decoder"*, which is `prose`."""
     root = _repo(tmp_path, files={"docs/t.csv": "name,qty\nbolt,4\n"})
-    run(root)
+    run(root, refresh_urls=False, full=False)
     provenance.path_for(root).unlink()  # simulate a repo that ingested before W-200
-    run(root)
+    run(root, refresh_urls=False, full=False)
     assert _rows(root)["file:docs/t.csv"]["decoder"] == provenance.UNKNOWN
 
 
@@ -212,14 +212,14 @@ def test_an_unwritable_ledger_is_a_note_not_a_failure(tmp_path):
     derived file must never be able to stop an ingest that otherwise succeeded.
     """
     root = _repo(tmp_path)
-    run(root)
+    run(root, refresh_urls=False, full=False)
     target = provenance.path_for(root)
     target.write_text("{}\n", encoding="utf-8")
     runtime = target.parent
     mode = runtime.stat().st_mode
     os.chmod(runtime, mode & ~stat.S_IWUSR)
     try:
-        report = run(root, full=True)  # must not raise
+        report = run(root, full=True, refresh_urls=False)  # must not raise
     finally:
         os.chmod(runtime, mode)
     assert report.doc_count == 1
@@ -229,10 +229,10 @@ def test_a_corrupt_ledger_reads_as_no_prior_run(tmp_path):
     """One bad line loses one row, never the file, and an unparseable file
     loses the run's history rather than the run."""
     root = _repo(tmp_path)
-    run(root)
+    run(root, refresh_urls=False, full=False)
     provenance.path_for(root).write_text("not json\n{\n", encoding="utf-8")
     assert provenance.read(root) == {}
-    run(root)  # must not raise
+    run(root, refresh_urls=False, full=False)  # must not raise
 
 
 # --- decision 1: runtime, never committed ---------------------------------
@@ -244,7 +244,7 @@ def test_the_ledger_is_under_the_derived_directory(tmp_path):
     blob sha off the record (SR-ACQUIRED). `.gitignore` already covers
     `.fux/runtime/`, which is why no new ignore line was needed."""
     root = _repo(tmp_path)
-    run(root)
+    run(root, refresh_urls=False, full=False)
     rel = provenance.path_for(root).relative_to(root).as_posix()
     assert rel == ".fux/runtime/ingest-log.jsonl"
 
@@ -266,7 +266,7 @@ def test_the_ledger_is_not_the_answer_journal(tmp_path):
     from fux.query.provenance import JOURNAL_NAME
 
     root = _repo(tmp_path)
-    run(root)
+    run(root, refresh_urls=False, full=False)
     assert provenance.path_for(root).name != JOURNAL_NAME
     assert not (root / ".fux" / "runtime" / JOURNAL_NAME).exists()
 
@@ -276,7 +276,7 @@ def test_the_ledger_is_not_the_answer_journal(tmp_path):
 
 def test_a_url_row_carries_its_fetcher_and_decoder(tmp_path):
     root = _repo(tmp_path, urls=["https://x.test/a fetch=mw decoder=prose"])
-    run(root, refresh_urls=True)
+    run(root, refresh_urls=True, full=False)
     row = _rows(root)["url:https://x.test/a"]
     assert row["kind"] == "url"
     assert row["loc"] == "https://x.test/a"
@@ -302,7 +302,7 @@ def test_a_skipped_url_gets_a_row_saying_why(tmp_path):
     _write_fetcher(root, 
         "def fetch(url):\n    raise RuntimeError('404 not found')\n", encoding="utf-8"
     )
-    run(root, refresh_urls=True)
+    run(root, refresh_urls=True, full=False)
     rows = _rows(root)
     row = rows["url:https://x.test/gone"]
     assert row["outcome"].startswith("skipped:")

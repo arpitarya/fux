@@ -114,6 +114,7 @@ stop_every_docs = 64
 
 [refer]
 fetch_cache_max_bytes = 524288000
+timeout_seconds = 5
 
 [doctor]
 thin_url_share         = 0.01

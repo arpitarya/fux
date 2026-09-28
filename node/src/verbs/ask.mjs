@@ -73,10 +73,10 @@ export function declareRelated(related) {
   }
 }
 
-export function runAsk(root, args, { compose = true } = {}) {
+export function runAsk(root, args, { compose }) {
   const query = args._.join(" ");
   const queries = [query, ...(args.q || [])];
-  const top = args.top ?? 5;
+  const top = args.top; // `.fux/output.toml`, resolved before dispatch
 
   const { results, related, confidence, fused, tune } = runFused(root, queries, top, {
     useTune: args.noTune !== true,

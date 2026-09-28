@@ -22,7 +22,7 @@ def _init(tmp_path, files: dict[str, str], toml: str = "[sources]\n", dirs=("doc
 
 def test_ingest_produces_readable_index(tmp_path):
     _init(tmp_path, {"docs/a.md": "# Title A\n\nsome body text\n"})
-    report = run(tmp_path)
+    report = run(tmp_path, refresh_urls=False, full=False)
     assert report.doc_count == 1
     assert report.changed_count == 1
     index = store.read_index(tmp_path)
@@ -31,9 +31,9 @@ def test_ingest_produces_readable_index(tmp_path):
 
 def test_double_ingest_is_byte_identical_and_zero_changed(tmp_path):
     _init(tmp_path, {"docs/a.md": "# A\n\nbody\n", "docs/b.md": "# B\n\nother body\n"})
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     before = {p: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
-    report2 = run(tmp_path)
+    report2 = run(tmp_path, refresh_urls=False, full=False)
     after = {p: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
     assert before == after
     assert report2.changed_count == 0
@@ -42,7 +42,7 @@ def test_double_ingest_is_byte_identical_and_zero_changed(tmp_path):
 def test_a_completed_run_clears_the_dirty_list(tmp_path):
     _init(tmp_path, {"docs/a.md": "# A\n\nbody\n"})
     dirty.record(tmp_path, ["file:docs/a.md"])
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     assert dirty.read(tmp_path) == []
 
 
@@ -51,51 +51,51 @@ def test_ingest_is_byte_identical_regardless_of_the_dirty_list(tmp_path):
     corrupt must never change what a run indexes — it may only be cleared."""
     _init(tmp_path, {"docs/a.md": "# A\n\nbody\n", "docs/b.md": "# B\n\nother\n"})
 
-    run(tmp_path)  # absent
+    run(tmp_path, refresh_urls=False, full=False)  # absent
     baseline = {p.name: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
 
     dirty.record(tmp_path, ["file:docs/a.md"])  # present, correct
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     assert {p.name: p.read_bytes() for p in store.iter_shard_paths(tmp_path)} == baseline
 
     dirty.record(tmp_path, ["file:no-such-doc.md", "url:https://stale.example/x"])  # stale
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     assert {p.name: p.read_bytes() for p in store.iter_shard_paths(tmp_path)} == baseline
 
     (tmp_path / ".fux" / "runtime" / "dirty").write_bytes(b"\xff\xfe not even lines")  # corrupt
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     assert {p.name: p.read_bytes() for p in store.iter_shard_paths(tmp_path)} == baseline
 
 
 def test_ver_starts_at_1_and_bumps_only_on_content_change(tmp_path):
     _init(tmp_path, {"docs/a.md": "# A\n\nv1\n"})
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     assert store.read_index(tmp_path)["file:docs/a.md"]["ver"] == 1
 
-    run(tmp_path)  # unchanged
+    run(tmp_path, refresh_urls=False, full=False)  # unchanged
     assert store.read_index(tmp_path)["file:docs/a.md"]["ver"] == 1
 
     (tmp_path / "docs" / "a.md").write_text("# A\n\nv2\n", encoding="utf-8")
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     assert store.read_index(tmp_path)["file:docs/a.md"]["ver"] == 2
 
 
 def test_deleted_source_disappears_from_index(tmp_path):
     _init(tmp_path, {"docs/a.md": "# A\n\nbody\n", "docs/b.md": "# B\n\nbody\n"})
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     (tmp_path / "docs" / "b.md").unlink()
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     index = store.read_index(tmp_path)
     assert set(index) == {"file:docs/a.md"}
 
 
 def test_new_doc_resolves_previously_dangling_ref(tmp_path):
     _init(tmp_path, {"docs/a.md": "# A\n\nsee [it](b.md)\n"})
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     assert store.read_index(tmp_path)["file:docs/a.md"]["edges"] == []
 
     (tmp_path / "docs" / "b.md").write_text("# B\n\nbody\n", encoding="utf-8")
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     edges = store.read_index(tmp_path)["file:docs/a.md"]["edges"]
     assert {"kind": "ref", "dst": "file:docs/b.md", "grade": 10} in edges
 
@@ -103,7 +103,7 @@ def test_new_doc_resolves_previously_dangling_ref(tmp_path):
 def test_skipped_files_reported_not_crashed(tmp_path):
     _init(tmp_path, {"docs/a.md": "# A\n\nbody\n"})
     (tmp_path / "docs" / "empty.md").write_text("", encoding="utf-8")
-    report = run(tmp_path)
+    report = run(tmp_path, refresh_urls=False, full=False)
     assert report.doc_count == 1
     assert [s.rel_path for s in report.skipped] == ["docs/empty.md"]
 
@@ -113,7 +113,7 @@ def test_terms_are_real_16_hex_hashes(tmp_path):
     from fux.store.format import term_hash
 
     _init(tmp_path, {"docs/a.md": "# A\n\npruning gate\n"})
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     record = store.read_index(tmp_path)["file:docs/a.md"]
     # v2 hashes the ANALYZED term, not the raw word — "pruning" stems to "prune"
     assert term_hash(tokenize("pruning")[0]) in record["terms"]

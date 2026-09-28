@@ -7,10 +7,10 @@ description: The single best answer the index can give — a fetched, re-scored 
 status: accepted
 date: 2026-08-18
 feature: "`fux answer` — one answer, its footing stated, and the report of what changed since the question was last asked"
-owns: [src/fux/query/refer_answer.py@daff7fd90df1]
+owns: [src/fux/query/refer_answer.py@7d111b045e0c]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: d430d57b86f06cabf56586d05660eabd7632211f3bc89347c3f43b6a2f4f97bb
+content_sha: f6802b4aa35e772767aa58395c0af6aa7621bb20f0df64644f25a71236c369ff
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -503,6 +503,8 @@ read and `answer` is byte-identical.
 2026-09-28; [SR-RANKING](0111_ranking.md) decision 13). When `intent_weight > 0`
 and `[doctype]` declares types, the candidate list `answer` cites from is the
 re-ordered one. Off by default, and then nothing here changes.
+
+**`fux answer` passes `fux.toml [refer] timeout_seconds` into its freshness `Policy`** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28); `Policy` holds no timeout of its own ([SR-CONFIG](0113_config.md) decision 18).
 
 ### Consequences
 

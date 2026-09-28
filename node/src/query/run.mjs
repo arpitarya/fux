@@ -25,6 +25,7 @@
  * precisely to change which document is first.
  */
 import { ask as scanAsk, queryTermHashes } from "./scan.mjs";
+import { FuxError } from "../errors.mjs";
 import { fold as minedFold, tableFromShards } from "./mined.mjs";
 import { rank, Weighting } from "./rank.mjs";
 import { signals } from "./confidence.mjs";
@@ -145,9 +146,14 @@ function withTier(tune, overrides) {
  * answer is the engine's own (SR-TUNE decision 11). A caller that has already
  * loaded a `Tune` passes it as `tune` rather than paying for a second parse. */
 export function runQuery(root, query, top, {
-  tune = null, useTune = true, expand = "", wantConfidence = false,
-  compose = true, related: wantRelated = true,
-} = {}) {
+  tune = null, useTune, expand = "", wantConfidence,
+  compose, related: wantRelated,
+}) {
+  // Required, and a JS destructure cannot say so: a missing `compose` would read
+  // as `fux lexical` and silently drop the graph tier (W-225 stage 6, L12 R8).
+  for (const [name, value] of [["useTune", useTune], ["wantConfidence", wantConfidence], ["compose", compose]]) {
+    if (value !== true && value !== false) throw new FuxError(`runQuery: \`${name}\` is required (true or false)`);
+  }
   let resolved = tune ?? loadTune(root, { enabled: useTune });
   // 🔴 **The freeze, enforced on the one line where it could be lost.**
   // `compose: false` is `fux lexical`, which has no graph tier by definition;
@@ -221,7 +227,7 @@ export function runQuery(root, query, top, {
   // optimisation on this reader: `related` costs a `recordFor` per candidate on
   // top of a plane rebuild that already parses every committed record.
   const split = graphOn
-    ? tiers(root, query, ordered, top, resolved, { wantRelated })
+    ? tiers(root, query, ordered, top, resolved, { wantRelated: wantRelated !== false }) // undefined: the tune decides
     : { results: ordered.slice(0, top), related: [] };
   const results = split.results;
   bandGuard(root, query, statsOut, results);

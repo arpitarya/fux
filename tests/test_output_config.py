@@ -61,8 +61,8 @@ def test_a_present_but_incomplete_file_still_raises(tmp_path):
 def test_no_output_config_reads_the_template(tmp_path):
     """`--no-output-config` reads what `fux setup` would write (L12 decision 7)."""
     cfg = load(tmp_path, enabled=False)
-    assert cfg.resolve("ask", "top") == template().resolve("ask", "top")
-    assert load(None, enabled=True).resolve("ask", "top") == cfg.resolve("ask", "top")
+    assert cfg.resolve("ask", "top", as_json=False) == template().resolve("ask", "top", as_json=False)
+    assert load(None, enabled=True).resolve("ask", "top", as_json=False) == cfg.resolve("ask", "top", as_json=False)
 
 
 def test_empty_file_loads_but_every_key_still_errors(tmp_path):
@@ -82,14 +82,14 @@ def test_all_commented_is_the_same_as_empty(tmp_path):
 def test_disabled_does_not_read_the_file_and_never_raises(tmp_path):
     write(tmp_path, "not even valid toml [[[")
     cfg = load(tmp_path, enabled=False)
-    assert cfg.resolve("ask", "top") == BUILT_IN["top"]
+    assert cfg.resolve("ask", "top", as_json=False) == BUILT_IN["top"]
 
 
 def test_disabled_does_not_even_parse_a_broken_file(tmp_path):
     # `--no-output-config` has to work when the file is what is wrong; that is
     # the entire point of the switch.
     write(tmp_path, "this is not toml at all [[[")
-    assert load(tmp_path, enabled=False).resolve("ask", "top") == BUILT_IN["top"]
+    assert load(tmp_path, enabled=False).resolve("ask", "top", as_json=False) == BUILT_IN["top"]
 
 
 # --------------------------------------------------------------------------

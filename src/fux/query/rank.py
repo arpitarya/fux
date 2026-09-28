@@ -452,7 +452,7 @@ def rank(
     scored.sort(
         key=lambda pair: (
             -round(pair[1], _SCORE_DIGITS),
-            bool(pair[0].get("superseded", False)),
+            bool(pair[0].get("superseded")),
             -int(pair[0].get("mtime") or 0),
             -weighting.priority_for(pair[0].get("loc", "")),
             pair[0]["id"],

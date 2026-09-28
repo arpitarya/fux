@@ -236,12 +236,12 @@ class Index:
         from .query import run_query
 
         if top is None:
-            top = int(self._output().resolve("find", "top"))
+            top = int(self._output().resolve("find", "top", as_json=False))
         results = [
             Result(id=r.id, loc=r.loc, title=r.title, score=r.score,
                    archived=r.archived, tie=r.tie, mtime=r.mtime, pinned=r.pinned,
                    boosted=r.boosted, route=r.route)
-            for r in run_query(self.root, query, top)[0]
+            for r in run_query(self.root, query, top, force_scan=True, use_tune=True)[0]
         ]
         if under is not None:
             prefix = under if under.endswith("/") else under + "/"
@@ -249,23 +249,26 @@ class Index:
         return results
 
     def ask(
-        self, query: str, *, top: int | None = None, band: bool = True,
-        queries: list[str] | None = None, sections: bool = True,
+        self, query: str, *, top: int | None = None, band: bool | None = None,
+        queries: list[str] | None = None, sections: bool | None = None,
     ) -> AskAnswer:
         """A ranked list with scores — what you want when judging the engine.
 
-        `band=True` by default here and `False` on the CLI, deliberately: a
-        caller in Python has already decided to read the object, and the block
-        is the part that says whether to trust it.
+        `band` and `sections` a caller does not pass come from `.fux/output.toml
+        [api]`, which ships them ON where `[cli]` ships `band` off, deliberately:
+        a caller in Python has already decided to read the object, and the block
+        is the part that says whether to trust it (W-225 stage 6, L12 R8).
         """
         from .query import run_query
         from .query.headings import headings_for
         from .tune import load as load_tune
 
         output = self._output()
+        band = bool(output.resolve_api("band", band))
+        sections = bool(output.resolve_api("sections", sections))
         if top is None:
-            top = int(output.resolve("ask", "top"))
-        max_headings = int(output.resolve("ask", "max_headings"))
+            top = int(output.resolve("ask", "top", as_json=False))
+        max_headings = int(output.resolve("ask", "max_headings", as_json=False))
         arms = list(dict.fromkeys([query, *(queries or [])]))
         # 🔴 `run_query`, not `scan_ask` — see `find`. Loaded ONCE and handed to
         # every arm, the same discipline `_run_fused` applies: two loads could
@@ -275,6 +278,7 @@ class Index:
         signals: dict = {}
         first, _path = run_query(
             self.root, arms[0], top, tune=tune, confidence_out=signals,
+            force_scan=True, use_tune=True,
         )
 
         fused = False
@@ -282,7 +286,7 @@ class Index:
         if len(arms) > 1:
             from .query.fuse import fuse_results
 
-            others = [run_query(self.root, q, top, tune=tune)[0] for q in arms[1:]]
+            others = [run_query(self.root, q, top, tune=tune, force_scan=True, use_tune=True)[0] for q in arms[1:]]
             results = fuse_results([first, *others], top)
             fused = True
 
@@ -323,8 +327,8 @@ class Index:
         return None
 
     def answer(
-        self, query: str, *, band: bool = True, no_refer: bool = False,
-        audit: bool = False, receipt: bool = False,
+        self, query: str, *, audit: bool, receipt: bool, band: bool | None = None,
+        no_refer: bool | None = None,
     ) -> Answer:
         """One passage, cited, with a freshness verdict on the bytes behind it.
 
@@ -333,6 +337,9 @@ class Index:
         """
         from . import query as query_mod
 
+        output = self._output()
+        band = bool(output.resolve_api("band", band))
+        no_refer = bool(output.resolve_api("no_refer", no_refer))
         args = _Args(
             query=query, json=True, band=band, no_refer=no_refer,
             audit=audit, receipt=receipt, top=None,
@@ -391,7 +398,7 @@ class Index:
         if hops is None:
             # R4 (Arpit, 2026-09-27): the API reads `[cli.path] hops` like the
             # CLI; its own `6` is gone.
-            hops = int(self._output().resolve("path", "hops"))
+            hops = int(self._output().resolve("path", "hops", as_json=False))
         plane = self._plane()
         best: tuple[list[str], int] | None = None
         queue: list[tuple[str, list[str], int]] = [(src, [src], 0)]
@@ -443,7 +450,7 @@ class Index:
         return f"<fux.Index {self.root}>"
 
 
-def open(root: str | Path = ".") -> Index:  # noqa: A001 - the name is the API
+def open(root: str | Path) -> Index:  # noqa: A001 - the name is the API
     """Open the index at `root`, or at the first fux root above it.
 
     Resolves the root, then enforces the same PII gate every non-exempt verb

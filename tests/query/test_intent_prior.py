@@ -77,7 +77,7 @@ def _corpus(root: Path, tune: str | None = None) -> Path:
         path = root / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
-    run(root)
+    run(root, refresh_urls=False, full=False)
     build(root)
     if tune is not None:
         (root / ".fux" / "tune.toml").write_text(tune, encoding="utf-8")
@@ -192,7 +192,7 @@ def test_off_never_consults_the_lexicon(corpus, monkeypatch):
     for tune in (tuned(intent_weight=0.0, doctype=DOCTYPE), tuned(intent_weight=0.5)):
         for q in QUESTIONS:
             for force_scan in (True, False):
-                results, _ = run_query(corpus, q, 10, force_scan=force_scan, tune=tune)
+                results, _ = run_query(corpus, q, 10, force_scan=force_scan, tune=tune, use_tune=True)
                 assert _payload(results) == _payload(scan_ask(corpus, q, top=10, scoring=scoring()))
 
 
@@ -202,8 +202,8 @@ def test_off_never_consults_the_lexicon(corpus, monkeypatch):
     ("what is dry ice", "docs/42-reference-dry-ice.md"),
 ])
 def test_on_scales_the_preferred_type_by_exactly_one_plus_w(corpus, q, preferred):
-    off = {r.loc: r.score for r in run_query(corpus, q, 20, tune=tuned(intent_weight=0.0, doctype=DOCTYPE))[0]}
-    on = {r.loc: r.score for r in run_query(corpus, q, 20, tune=_on(0.3))[0]}
+    off = {r.loc: r.score for r in run_query(corpus, q, 20, tune=tuned(intent_weight=0.0, doctype=DOCTYPE), force_scan=True, use_tune=True)[0]}
+    on = {r.loc: r.score for r in run_query(corpus, q, 20, tune=_on(0.3), force_scan=True, use_tune=True)[0]}
     assert set(on) == set(off), "a prior re-orders; it never adds or drops a document"
     for loc, score in off.items():
         expected = score * 1.3 if loc == preferred else score
@@ -212,8 +212,8 @@ def test_on_scales_the_preferred_type_by_exactly_one_plus_w(corpus, q, preferred
 
 def test_a_question_with_no_cue_is_untouched(corpus):
     q = "dry ice chest"
-    off, _ = run_query(corpus, q, 10, tune=tuned(intent_weight=0.0, doctype=DOCTYPE))
-    on, _ = run_query(corpus, q, 10, tune=_on(0.5))
+    off, _ = run_query(corpus, q, 10, tune=tuned(intent_weight=0.0, doctype=DOCTYPE), force_scan=True, use_tune=True)
+    on, _ = run_query(corpus, q, 10, tune=_on(0.5), force_scan=True, use_tune=True)
     assert _payload(on) == _payload(off)
 
 
@@ -233,8 +233,8 @@ def test_the_supremum_is_the_product_of_both_multipliers():
 @pytest.mark.parametrize("priority", [(), (("docs/41", 0.5), ("docs/4", 2.0))])
 def test_the_scan_and_the_accelerator_agree(corpus, q, weight, priority):
     tune = _on(weight, priority=priority)
-    scan_results, path_a = run_query(corpus, q, 10, force_scan=True, tune=tune)
-    fast_results, path_b = run_query(corpus, q, 10, force_scan=False, tune=tune)
+    scan_results, path_a = run_query(corpus, q, 10, force_scan=True, tune=tune, use_tune=True)
+    fast_results, path_b = run_query(corpus, q, 10, force_scan=False, tune=tune, use_tune=True)
     assert (path_a, path_b) == ("scan", "accelerator")
     assert _payload(fast_results) == _payload(scan_results)
 

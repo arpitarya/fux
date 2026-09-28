@@ -283,7 +283,7 @@ def test_ingest_skips_a_pinned_url_without_importing_the_fetcher(tmp_path):
     from fux.ingest.run import run
 
     _repo(tmp_path, ["https://x.test/pinned update=never fetch=mw decoder=prose"], fetcher=EXPLODING)
-    report = run(tmp_path, refresh_urls=True)
+    report = run(tmp_path, refresh_urls=True, full=False)
     pinned = [s for s in report.skipped if s.rel_path == "https://x.test/pinned"]
     assert len(pinned) == 1
     assert "update=never" in pinned[0].reason
@@ -295,7 +295,7 @@ def test_a_mixed_list_fetches_the_live_line_and_pins_the_other(tmp_path):
     from fux.ingest.run import run
 
     _repo(tmp_path, ["https://x.test/live fetch=mw decoder=prose", "https://x.test/pinned update=never fetch=mw decoder=prose"])
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     index = store.read_index(tmp_path)
     assert "url:https://x.test/live" in index
     # The pinned line was never fetched, so it has no record to carry forward
@@ -314,14 +314,14 @@ def test_pinning_a_url_AFTER_it_was_indexed_keeps_its_record(tmp_path):
     from fux.ingest.run import run
 
     root = _repo(tmp_path, ["https://x.test/doc fetch=mw decoder=prose"])
-    run(root, refresh_urls=True)
+    run(root, refresh_urls=True, full=False)
     assert "url:https://x.test/doc" in store.read_index(root)
 
     (root / ".fux" / "sources" / "urls").write_text(
         "https://x.test/doc update=never fetch=mw decoder=prose\n", encoding="utf-8"
     )
     _write_fetcher(root, EXPLODING)
-    run(root, refresh_urls=True)
+    run(root, refresh_urls=True, full=False)
     assert "url:https://x.test/doc" in store.read_index(root)
 
 
@@ -333,8 +333,8 @@ def test_a_corpus_that_declares_nothing_is_byte_identical(tmp_path):
 
     a = _repo(tmp_path / "a", ["https://x.test/doc fetch=mw decoder=prose"])
     b = _repo(tmp_path / "b", ["https://x.test/doc update=auto fetch=mw decoder=prose"])
-    run(a, refresh_urls=True)
-    run(b, refresh_urls=True)
+    run(a, refresh_urls=True, full=False)
+    run(b, refresh_urls=True, full=False)
     assert store.read_index(a) == store.read_index(b)
 
 
@@ -354,7 +354,7 @@ def test_the_add_that_writes_a_pinned_line_still_fetches_it_once(tmp_path):
     from fux.ingest.run import run
 
     _repo(tmp_path, ["https://x.test/pinned update=never fetch=mw decoder=prose"])
-    report = run(tmp_path, refresh_urls=True, first_fetch={"https://x.test/pinned"})
+    report = run(tmp_path, refresh_urls=True, first_fetch={"https://x.test/pinned"}, full=False)
 
     assert "url:https://x.test/pinned" in store.read_index(tmp_path)
     assert not [s for s in report.skipped if s.rel_path == "https://x.test/pinned"]
@@ -369,7 +369,7 @@ def test_the_exemption_is_that_url_and_no_other(tmp_path):
         tmp_path,
         ["https://x.test/added update=never fetch=mw decoder=prose", "https://x.test/other update=never fetch=mw decoder=prose"],
     )
-    run(tmp_path, refresh_urls=True, first_fetch={"https://x.test/added"})
+    run(tmp_path, refresh_urls=True, first_fetch={"https://x.test/added"}, full=False)
 
     index = store.read_index(tmp_path)
     assert "url:https://x.test/added" in index
@@ -381,7 +381,7 @@ def test_a_later_run_pins_the_line_the_add_fetched(tmp_path):
     from fux.ingest.run import run
 
     _repo(tmp_path, ["https://x.test/pinned update=never fetch=mw decoder=prose"])
-    run(tmp_path, refresh_urls=True, first_fetch={"https://x.test/pinned"})
+    run(tmp_path, refresh_urls=True, first_fetch={"https://x.test/pinned"}, full=False)
 
     report = run(tmp_path, refresh_urls=True, full=True)
     pinned = [s for s in report.skipped if s.rel_path == "https://x.test/pinned"]

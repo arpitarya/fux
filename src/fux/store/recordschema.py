@@ -79,8 +79,8 @@ class Field:
         self.required = spec.get("required", "never")
         self.default = spec.get("default")
         self.enum = tuple(spec["enum"]) if "enum" in spec else None
-        self.display = bool(spec.get("display", False))
-        self.carried = bool(spec.get("carried", False))
+        self.display = bool(spec.get("display"))
+        self.carried = bool(spec.get("carried"))
         #: Sentinel-free on purpose: `omit_when` is only ever `false` today, and
         #: a `has_omit` flag beats a magic value that could collide with a
         #: legitimate one.

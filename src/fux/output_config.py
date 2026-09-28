@@ -82,6 +82,7 @@ __all__ = [
     "OutputDefaults",
     "CLI_VERBS",
     "MCP_KEYS",
+    "API_KEYS",
     "load",
     "specimen",
     "template",
@@ -95,7 +96,7 @@ OUTPUT_NAME = fixed("files", "output")
 _MAX_REPORTED = 10
 
 #: The two top-level roots. Anything else at the top of the file is unknown.
-_ROOTS = ("cli", "mcp")
+_ROOTS = ("cli", "mcp", "api")
 
 #: The closed key set for the `[cli]` / `[cli.json]` roots, per verb. A key
 #: here reaches a verb through `[cli.<verb>]` / `[cli.json.<verb>]`, or
@@ -198,6 +199,14 @@ def subtable_for(verb: str) -> str:
 #: (SR-CONFIDENCE decision 11 makes the confidence block unconditional over
 #: MCP precisely because a tool call cannot pass a flag).
 MCP_KEYS: tuple[str, ...] = ("top", "max_headings")
+
+#: `[api]`'s closed key set -- the Python `fux.open()` and Node `Index` library
+#: defaults a caller did not pass (W-225 stage 6, SR-LAW-12 decision 6a R8:
+#: where the CLI reads a flag's default from this file, the API reads it here
+#: too). Its own root, like `[mcp]`: the library ships `band` and `sections`
+#: ON where the CLI ships them off, deliberately -- a caller in code has already
+#: decided to read the object, and the block says whether to trust it.
+API_KEYS: tuple[str, ...] = ("band", "sections", "no_refer")
 
 
 #: Every key `[cli]` / `[cli.json]` may carry at the shared (non-per-verb)
@@ -324,6 +333,8 @@ class OutputDefaults:
     json_verb: dict[str, dict[str, object]] = field(default_factory=dict)
     #: `[mcp]`'s scalars.
     mcp: dict[str, object] = field(default_factory=dict)
+    #: `[api]`'s scalars.
+    api: dict[str, object] = field(default_factory=dict)
     #: Where these values were read from — the repo's file, or the packaged
     #: template (`--no-output-config`, or no repo root). Named in every error.
     source: str = ""
@@ -350,7 +361,7 @@ class OutputDefaults:
             f"{self.source}:\n  [cli.json] enabled is missing\n  {_FIX_HINT}"
         )
 
-    def resolve(self, verb: str, key: str, cli_value: object = None, *, as_json: bool = False) -> object:
+    def resolve(self, verb: str, key: str, cli_value: object = None, *, as_json: bool) -> object:
         """One precedence chain: **flag → json-verb → json-shared →
         cli-verb → cli-shared → bypass → error.**
 
@@ -394,6 +405,17 @@ class OutputDefaults:
         if key in self.mcp:
             return self.mcp[key]
         raise FuxError(f"{self.source}:\n  [mcp] {key} is missing\n  {_FIX_HINT}")
+
+    def resolve_api(self, key: str, arg_value: object) -> object:
+        """`[api]`'s own chain: **argument -> `[api]` -> error.** It inherits
+        nothing from `[cli]`, for `[mcp]`'s reason."""
+        if key not in API_KEYS:
+            raise FuxError(f"`{key}` is not an output key for `api` — it has: {sorted(API_KEYS)}")
+        if arg_value is not None:
+            return arg_value
+        if key in self.api:
+            return self.api[key]
+        raise FuxError(f"{self.source}:\n  [api] {key} is missing\n  {_FIX_HINT}")
 
 
 #: What a missing key's error tells the reader to do — `tune.py`'s sentence.
@@ -581,6 +603,20 @@ def _parse(path: Path, data: dict) -> OutputDefaults:
                 if checked is not None:
                     mcp_out[key] = checked
 
+    api_out: dict[str, object] = {}
+    api_table = data.get("api")
+    if api_table is not None:
+        if not isinstance(api_table, dict):
+            c.add("`api` must be a table — write `[api]`, not `api = ...`")
+        else:
+            for key, value in api_table.items():
+                if key not in API_KEYS:
+                    c.add(f"[api] unknown key `{key}` — known: {sorted(API_KEYS)}")
+                    continue
+                checked = _checked(c, "api", key, value)
+                if checked is not None:
+                    api_out[key] = checked
+
     c.raise_if_any()
     return OutputDefaults(
         cli_shared=cli_shared,
@@ -588,6 +624,7 @@ def _parse(path: Path, data: dict) -> OutputDefaults:
         json_shared=json_shared,
         json_verb=json_verb,
         mcp=mcp_out,
+        api=api_out,
         source=str(path),
     )
 

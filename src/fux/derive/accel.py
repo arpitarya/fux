@@ -378,8 +378,8 @@ def accel_candidates(
             "loc": docs[docidx]["loc"],
             "title": docs[docidx]["title"],
             "flen": docs[docidx]["flen"],
-            "archived": docs[docidx].get("archived", False),
-            "superseded": docs[docidx].get("superseded", False),
+            "archived": bool(docs[docidx].get("archived")),
+            "superseded": bool(docs[docidx].get("superseded")),
             "mtime": docs[docidx].get("mtime"),
             "terms": {term: list(tf) for term, tf in terms.items()},
         }

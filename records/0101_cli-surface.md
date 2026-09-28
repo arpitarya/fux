@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@121a83cd295d, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@68155c41018a, src/fux/progress.py@10364bd02e0a, tests_e2e@db68fd0c4d9f, node/fux.mjs@3015d7cc4305]
+owns: [src/fux/cli.py@dc8075fff435, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@640f6d6d0116, src/fux/progress.py@10364bd02e0a, tests_e2e@db68fd0c4d9f, node/fux.mjs@3015d7cc4305]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d315761a3218f6d8b61ef7ed1ea9b5dda6c8a13930b47f1a63ccb7e3aefaf567
+content_sha: 2c5cddc8f4fe4ba93e7df76d3fdb9196a7825eab3135b9aec0f3dbe1b3ad0798
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1310,6 +1310,8 @@ nobody wrote.
 **`fux inspect --top` no longer defaults to 20 in the parser** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): absent, it is `.fux/inspect.toml [report] top` ([SR-INSPECT](0156_inspect.md) decision 23).
 
 **Decision 5's two process codes are `constants.toml [exit]`** — `usage = 2` (argparse's, and the merge driver's) and `interrupted = 130` (Ctrl-C); `FuxError`'s `1` is unchanged. `--diff`'s arity is its metavar's length, and a verb's elapsed milliseconds are `timedelta` arithmetic. Every `--json` payload is indented by `[json] indent`. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+**No verb's behaviour moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). Internal helpers (`_add_output_flags`, `sources._ingest`, `check_drift`, `_narrow`, `_check`) lost their boolean defaults and are passed their values; `OutputDefaults.resolve` requires `as_json`.
 
 ### Consequences
 

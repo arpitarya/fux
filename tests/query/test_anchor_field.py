@@ -74,7 +74,7 @@ def corpus(tmp_path):
     for i in range(30):
         files[f"docs/filler-{i:02d}.md"] = f"# Filler {i}\n\nfiller body text number {i}\n"
     _init(tmp_path, files)
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     build(tmp_path)
     return tmp_path
 

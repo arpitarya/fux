@@ -343,7 +343,7 @@ def _sweep(root: Path) -> dict:
     outcome — an `"ok"` with `skipped: 2` is the case the old shape could not
     express at all. Ruled by Arpit 2026-08-28.
     """
-    if not runner.acquire(root):
+    if not runner.acquire(root, required=False):
         return {"outcome": "busy"}
     try:
         # ⚠ `import_module` rather than `from ..ingest import run`. The
@@ -354,7 +354,7 @@ def _sweep(root: Path) -> dict:
         from importlib import import_module
 
         ingest_run = import_module("fux.ingest.run")
-        report = ingest_run.run(root, refresh_urls=True)
+        report = ingest_run.run(root, refresh_urls=True, full=False)
     except Exception as exc:  # noqa: BLE001 - a daemon must outlive one bad sweep
         # The type is carried as well as the message: a `FuxError` is the repo's
         # own refusal (fix your config), anything else is a surprise (fix fux).

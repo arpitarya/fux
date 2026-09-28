@@ -434,7 +434,7 @@ def _self_rank(root, doc_id: str, query: str, findable_rank: int, cache: dict | 
     ids = cache.get(key) if cache is not None else None
     if ids is None:
         try:
-            results, _ = run_query(root, query, findable_rank, force_scan=False)
+            results, _ = run_query(root, query, findable_rank, force_scan=False, use_tune=True)
         except Exception:  # pragma: no cover - a report must not fail a command
             return None
         ids = [result.id for result in results]

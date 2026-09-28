@@ -265,7 +265,7 @@ def test_ingest_refuses_a_repo_with_no_pii_file(tmp_path):
     (tmp_path / "docs" / "a.md").write_text("# a\n\nmail a@b.com\n", encoding="utf-8")
     write_config(tmp_path)  # every OTHER file present, so pii.toml is the one missing
     with pytest.raises(FuxError, match="pii.toml is missing"):
-        run(tmp_path)
+        run(tmp_path, refresh_urls=False, full=False)
     assert not (tmp_path / ".fux" / "index").exists() or not any(
         (tmp_path / ".fux" / "index").iterdir()
     ), "nothing may reach the committed index before the refusal"
@@ -306,7 +306,7 @@ def test_a_frontmatter_title_is_redacted_like_the_body(tmp_path):
         tmp_path,
         {"docs/handover.md": "---\ntitle: Escalate to jane.roe@acme.example\n---\n\nAlso jane.roe@acme.example.\n"},
     )
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     record = store.read_index(tmp_path)["file:docs/handover.md"]
 
     assert record["title"] == "Escalate to [PII:email]"
@@ -328,7 +328,7 @@ def test_a_path_that_matches_a_rule_is_reported_because_it_cannot_be_redacted(tm
     from fux.ingest.run import run
 
     _repo_with_rule(tmp_path, {"docs/contact-john.doe@acme.example.md": "# Notes\n\nplain\n"})
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
 
     note = capsys.readouterr().err
     assert "document path(s) match a pii.toml rule" in note
@@ -343,5 +343,5 @@ def test_a_clean_corpus_says_nothing_about_paths(tmp_path, capsys):
     from fux.ingest.run import run
 
     _repo_with_rule(tmp_path, {"docs/a.md": "# A\n\nplain body\n"})
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     assert "document path(s) match" not in capsys.readouterr().err

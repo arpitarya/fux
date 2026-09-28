@@ -1172,6 +1172,7 @@ def _seed_types() -> bytes:
         include_note=_TYPES_INCLUDE_NOTE,
         decoders_note=_TYPES_DECODERS_NOTE,
         footer=_TYPES_OPT_IN,
+        grouped=True,
     )
     # W-225 stage 4a: the decoders' caps, from their one home (SR-LAW-12 9b).
     from .decode import _limits
@@ -1205,6 +1206,7 @@ def _convert_legacy_types(root: Path, report: "SetupReport") -> None:
         header=_TYPES_CONVERTED_HEADER,
         include_note=_TYPES_INCLUDE_NOTE,
         decoders_note=_TYPES_DECODERS_NOTE,
+        grouped=True,
     )
     # Prove the converted file loads before it lands: a conversion that wrote a
     # file fux then refuses would trade one loud error for another.

@@ -10,7 +10,7 @@ feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted fr
 owns: []
 laws: [L4, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 7773736fcf0f0d176137b89c8cdd6771ceacd2f77e72e1c370dc192172b19168
+content_sha: 1427a7aa70a002ffd0063ba3b9ca9c0f1f42dda61178e01241e3df3e6f1b843f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -274,6 +274,8 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **No dirs-list rule changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `gitdir.read_types` no longer falls back to `DEFAULT_TYPES` for an absent `formats.toml` ([SR-TYPES](0128_types-list.md) decision 14).
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

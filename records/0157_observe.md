@@ -7,10 +7,10 @@ description: "After a verb has fully rendered, fux hands every file in `.fux/obs
 status: accepted
 date: 2026-09-14
 feature: the observer hook — the extension point a consumer's analytics subscribe to
-owns: [src/fux/observe.py@05c7f57abeb8, tools/observer-bench@e12d60cca125]
+owns: [src/fux/observe.py@16cce34173d9, tools/observer-bench@e12d60cca125]
 laws: [L2, L3, L4, L5, L9, L10]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: d3bd3390ec32864c7d1116a66681355944423bfe24d016c3127fb625d33e2efa
+content_sha: 5e33e7faecae8ade0108f30b1c2747083e9b306c5c555a1a65b6bf210bce65d6
 ratifies: W-170
 ---
 
@@ -257,6 +257,8 @@ bound is the guarantee that a consumer's analytics cannot slow a verb, and
 running them without it would drop the guarantee rather than the observers.
 
 **An observer call's argument hash is `constants.toml [observe] args_hash_hex` hex digits** (16), and its time budget converts through `timedelta`. The liveness file is indented by `[json] indent`. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

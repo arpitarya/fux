@@ -849,7 +849,7 @@ def _check_repo(tmp_path):
     docs.mkdir(exist_ok=True)
     (docs / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     (docs / "b.md").write_text("# B\n\nother\n", encoding="utf-8")
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     return tmp_path
 
 

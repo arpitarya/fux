@@ -811,7 +811,7 @@ def _rel(root: Path, path: Path) -> str:
         return str(path)
 
 
-def _ingest(root: Path, args, *, refresh_urls: bool = False, only_urls=None, first_fetch=None):
+def _ingest(root: Path, args, *, refresh_urls: bool, only_urls=None, first_fetch=None):
     """Every verb's single way into the index (L4). Imported lazily (SR-CLI 7)."""
     from .ingest import ingest_and_report
 
@@ -1065,7 +1065,7 @@ def _seed_types(path: Path) -> None:
             "# document. Nothing here subtracts: exclusions live in .fux/.fuxignore.",
         ]
     )
-    text = typesfile.render(prose, bindings, header=header)
+    text = typesfile.render(prose, bindings, header=header, grouped=True)
     path.write_text(text, encoding="utf-8", newline="\n")
 
 
@@ -1151,7 +1151,7 @@ def cmd_remove(args) -> int:
     if getattr(args, "no_ingest", False):
         return 0
 
-    _ingest(root, args)
+    _ingest(root, args, refresh_urls=False)
 
     dropped = before - _index_ids(root)
     if not dropped:
@@ -1285,12 +1285,12 @@ def report_url_outcomes(report) -> None:
             print(f"  ! {s.rel_path} — {s.reason}; prior record kept", file=sys.stderr)
 
 
-def check_drift(root: Path, entry: str | None, *, as_json: bool = False) -> int:
+def check_drift(root: Path, entry: str | None, *, as_json: bool) -> int:
     """`fux ingest --check` — what has drifted, writing nothing. See `_check`."""
     return _check(root, entry, as_json=as_json)
 
 
-def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool = False):
+def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool):
     """Which URLs `fux ingest` fetches, and one line saying why.
 
     **W-82 ruling 3, landed 2026-08-28:** narrow is the DEFAULT and
@@ -1371,7 +1371,7 @@ def _locate(root: Path, entry: str) -> sourcelist.ListSpec:
 # -- `fux ingest --check` --------------------------------------------------
 
 
-def _check(root: Path, entry: str | None, *, as_json: bool = False) -> int:
+def _check(root: Path, entry: str | None, *, as_json: bool) -> int:
     """What has drifted, writing nothing.
 
     **Offline for the `dirs` half**, which is most of it: a file's freshness is

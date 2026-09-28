@@ -216,7 +216,7 @@ def _filter_corpus(root):
         encoding="utf-8")
     (root / "docs" / "other.md").write_text(
         "# Other\n\nA release note with nothing else in it.\n", encoding="utf-8")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
     return root
 
 
@@ -224,7 +224,7 @@ def test_under_keeps_only_a_path_prefix(tmp_path):
     from fux.query import _filtered, run_query
 
     root = _filter_corpus(tmp_path)
-    results, _ = run_query(root, "release", 10, force_scan=True)
+    results, _ = run_query(root, "release", 10, force_scan=True, use_tune=True)
     kept, dropped = _filtered(root, results, _Args(query="release", under="docs/runbooks"))
     assert [r.loc for r in kept] == ["docs/runbooks/roll.md"]
     assert dropped == len(results) - 1
@@ -235,7 +235,7 @@ def test_all_requires_every_query_term(tmp_path):
 
     root = _filter_corpus(tmp_path)
     q = "release sidecar"
-    results, _ = run_query(root, q, 10, force_scan=True)
+    results, _ = run_query(root, q, 10, force_scan=True, use_tune=True)
     assert len(results) > 1, "precondition: more than one document matches SOME term"
     kept, _ = _filtered(root, results, _Args(query=q, require_all=True))
     assert [r.loc for r in kept] == ["docs/runbooks/roll.md"]
@@ -247,7 +247,7 @@ def test_phrase_requires_adjacency_and_order(tmp_path):
     from fux.query import _filtered, run_query
 
     root = _filter_corpus(tmp_path)
-    results, _ = run_query(root, "roll back", 10, force_scan=True)
+    results, _ = run_query(root, "roll back", 10, force_scan=True, use_tune=True)
     assert {r.loc for r in results} >= {"docs/runbooks/roll.md", "docs/notes.md"}
     kept, _ = _filtered(root, results, _Args(query="roll back", phrase="roll back"))
     assert [r.loc for r in kept] == ["docs/runbooks/roll.md"]
@@ -257,7 +257,7 @@ def test_no_filter_is_the_identity(tmp_path):
     from fux.query import _filtered, run_query
 
     root = _filter_corpus(tmp_path)
-    results, _ = run_query(root, "release", 10, force_scan=True)
+    results, _ = run_query(root, "release", 10, force_scan=True, use_tune=True)
     kept, dropped = _filtered(root, results, _Args(query="release"))
     assert kept == list(results) and dropped == 0
 

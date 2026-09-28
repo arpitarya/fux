@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@7370e58c825d, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@2a75560cd349]
+owns: [src/fux/config.py@95f051554b6b, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@6980bf8407fe]
 laws: [L5, ex-L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 31697477306bcd3aedbe54d22cfc2116fc9164f378840136ed729048581c9fb2
+content_sha: 45be2b94a07f80b06e17cbf6728d2c02187f0f584e61084e5d4e6ca1b33acfd1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -121,7 +121,7 @@ flowchart TD
      |
      +-- [maintain]   daemon_poll_s, runner_poll_s, stop_timeout_s,
      |                last_cited_max, stop_every_docs     every key REQUIRED
-     +-- [refer]      fetch_cache_max_bytes               REQUIRED
+     +-- [refer]      fetch_cache_max_bytes, timeout_seconds  REQUIRED
      +-- [doctor]     thin_url_share, thin_url_chars,
      |                acquired_warn_share                 every key REQUIRED
      |
@@ -180,6 +180,7 @@ stop_every_docs = 64                    # ingest checks for `stop` per this many
 
 [refer]
 fetch_cache_max_bytes = 524288000       # the fetch cache's disk bound
+timeout_seconds       = 5               # how long `fux answer` waits for one fetch
 
 [doctor]
 thin_url_share = 0.01                   # extracted/retained below this is thin ...
@@ -558,6 +559,7 @@ at any value, with an error naming the new home.
 + maintain.last_cited_max
 + maintain.stop_every_docs
 + refer.fetch_cache_max_bytes
++ refer.timeout_seconds
 + doctor.thin_url_share
 + doctor.thin_url_chars
 + doctor.acquired_warn_share
@@ -723,7 +725,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**18. Fourteen values that sat in code joined this file** ([SR-LAW-12](0014_LAW-12-values-live-in-config.md);
+**18. Fifteen values that sat in code joined this file** ([SR-LAW-12](0014_LAW-12-values-live-in-config.md);
 W-225 stage 5e, 2026-09-28). The L12 classification homed each one here, and
 each keeps the number it had in code; the template writes it and `fux doctor
 --fix` fills it in an existing repo.
@@ -737,6 +739,7 @@ each keeps the number it had in code; the template writes it and `fux doctor
 | `[maintain] daemon_poll_s`, `runner_poll_s`, `stop_timeout_s` | how often and how long `stop` waits | `daemon.POLL_S`, `runner._POLL_S`, `STOP_TIMEOUT_S` |
 | `[maintain] last_cited_max`, `stop_every_docs` | remembered questions; documents between stop checks | `lastcited.MAX_QUESTIONS`, `run._STOP_EVERY` |
 | `[refer] fetch_cache_max_bytes` | the fetch cache's disk bound | `fetchcache.DEFAULT_MAX_BYTES` |
+| `[refer] timeout_seconds` | how long `fux answer` waits for one fetch under the `always` freshness policy | `Policy.timeout_seconds = 5` (stage 6) |
 | `[doctor] thin_url_share`, `thin_url_chars` | where the url-extraction-depth row warns | `doctor.THIN_URL_SHARE`, `THIN_URL_CHARS` |
 | `[doctor] acquired_warn_share` | the share of `acquired_max_bytes` at which the acquired-plane row warns | an inline `0.8` (stage 5f) |
 

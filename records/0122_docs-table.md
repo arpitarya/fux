@@ -10,7 +10,7 @@ feature: "`.fux/runtime/docs.jsonl` — the derived doc table and the join key i
 owns: []
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 58ad5d3e5448f162a85337851eb3febaf18a48fd0f7b3dbe54908ac73f918029
+content_sha: 7cc189acc11323e248f255eeeec19895e82cca6c22929c3b442dcb2035274b6a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -170,6 +170,8 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28). A component this record owns or describes lost a numeral — to `constants.toml` ([SR-CONSTANTS](0159_constants.md)) or to a refactor that removed it — and behaves byte-identically; JSON it prints is indented by `[json] indent`.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

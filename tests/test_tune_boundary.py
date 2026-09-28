@@ -281,10 +281,10 @@ def test_an_index_key_does_change_the_index(tmp_path, key, value):
         "# A\n\n## One\n\nx\n\n## Two\n\ny\n", encoding="utf-8"
     )
     (tmp_path / "docs" / "t.csv").write_text("col\nrowa\nrowb\nrowc\n", encoding="utf-8")
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     before = _index_bytes(tmp_path)
     _write_tune(tmp_path, INDEX_TABLE, key, value)
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     assert _index_bytes(tmp_path) != before, f"[{INDEX_TABLE}] {key} moved no committed byte"
 
 

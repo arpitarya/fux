@@ -295,13 +295,13 @@ def test_run_query_fills_confidence_only_when_a_caller_asks(tmp_path, monkeypatc
     monkeypatch.chdir(tmp_path)
 
     out: dict = {}
-    results, _ = run_query(tmp_path, "rollback", 5, confidence_out=out)
+    results, _ = run_query(tmp_path, "rollback", 5, confidence_out=out, force_scan=True, use_tune=True)
     assert results
     assert out["confidence"].band in BANDS
 
     # The additive-keyword contract: a caller that does not ask is unchanged
     # and pays only a `None` check.
-    again, _ = run_query(tmp_path, "rollback", 5)
+    again, _ = run_query(tmp_path, "rollback", 5, force_scan=True, use_tune=True)
     assert [r.id for r in again] == [r.id for r in results]
 
 
@@ -357,7 +357,7 @@ def test_the_cli_emits_nothing_without_band_and_still_computes_it(
 
     # ... and it was computed all the same.
     out: dict = {}
-    run_query(tmp_path, "rollback pgbouncer", 5, confidence_out=out)
+    run_query(tmp_path, "rollback pgbouncer", 5, confidence_out=out, force_scan=True, use_tune=True)
     assert out["confidence"].band == PARTIAL
 
 
@@ -390,9 +390,9 @@ def test_the_block_cannot_reach_a_score_or_an_ordering(tmp_path, monkeypatch):
     write_config(tmp_path)
     monkeypatch.chdir(tmp_path)
 
-    plain, _ = run_query(tmp_path, "rollback procedure", 5)
+    plain, _ = run_query(tmp_path, "rollback procedure", 5, force_scan=True, use_tune=True)
     out: dict = {}
-    withsig, _ = run_query(tmp_path, "rollback procedure", 5, confidence_out=out)
+    withsig, _ = run_query(tmp_path, "rollback procedure", 5, confidence_out=out, force_scan=True, use_tune=True)
 
     assert [(r.id, r.score) for r in plain] == [(r.id, r.score) for r in withsig]
 
@@ -535,7 +535,7 @@ def test_a_tuned_floor_cannot_reach_a_score_or_an_ordering(tmp_path, monkeypatch
     (tmp_path / ".fux").mkdir(exist_ok=True)
 
     out_default: dict = {}
-    base, _ = run_query(tmp_path, "rollback", 5, confidence_out=out_default)
+    base, _ = run_query(tmp_path, "rollback", 5, confidence_out=out_default, force_scan=True, use_tune=True)
 
     (tmp_path / ".fux" / "tune.toml").write_text(
         "[confidence]\nseparation_floor = 0.0\ndoc_coverage_floor = 1.0\n",
@@ -543,7 +543,7 @@ def test_a_tuned_floor_cannot_reach_a_score_or_an_ordering(tmp_path, monkeypatch
     )
     write_config(tmp_path)
     out_tuned: dict = {}
-    tuned, _ = run_query(tmp_path, "rollback", 5, confidence_out=out_tuned)
+    tuned, _ = run_query(tmp_path, "rollback", 5, confidence_out=out_tuned, force_scan=True, use_tune=True)
 
     assert [(r.id, r.score) for r in tuned] == [(r.id, r.score) for r in base]
     assert out_tuned["confidence"].separation_floor == 0.0

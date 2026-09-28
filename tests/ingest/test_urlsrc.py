@@ -6,7 +6,7 @@ into the tmp repo, which is exactly the trust boundary the design draws."""
 
 from __future__ import annotations
 
-from l12_fixtures import configured_root, scoring, url_limits, write_config
+from l12_fixtures import configured_root, scoring, template_fux_toml, url_limits, write_config
 import pytest
 
 from fux import store
@@ -16,6 +16,8 @@ from fux.ingest.run import run
 from fux.ingest.urlsrc import UrlEntry, fetch_all, load_fetcher, read_urls
 from fux.query.tokenize import tokenize
 from fux.store.format import term_hash
+
+_TTL = template_fux_toml()["sources"]["url"]["ttl"]
 
 
 def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
@@ -67,7 +69,8 @@ def _entries(urls, fetcher=".fux/fetchers/mw.py", decoder="prose"):
     is the path `fetcher_for("mw")` would produce.
     """
     return [
-        UrlEntry(url=u, fetch="mw", fetcher_path=fetcher, decoder=decoder) for u in urls
+        UrlEntry(url=u, fetch="mw", fetcher_path=fetcher, decoder=decoder, ttl=_TTL)
+        for u in urls
     ]
 
 
@@ -237,9 +240,9 @@ def test_a_missing_urls_file_is_ignored_while_there_is_nothing_to_reconcile(tmp_
     """
     _init(tmp_path, urls=["https://x.test/a"])
     (tmp_path / URLS_FILE).unlink()
-    run(tmp_path)  # no url: records exist, so no list is needed or read
+    run(tmp_path, refresh_urls=False, full=False)  # no url: records exist, so no list is needed or read
     with pytest.raises(FuxError, match=r"\.fux/sources/urls not found"):
-        run(tmp_path, refresh_urls=True)
+        run(tmp_path, refresh_urls=True, full=False)
 
 
 # -- fetcher loading ----------------------------------------------------
@@ -361,7 +364,7 @@ def test_refresh_ingests_urls_with_plain_display_text(tmp_path):
     exactly as a git record does. **The ACL-mismatch leak it prevented is
     accepted, not closed** (ex-SR-LAW-5, superseded)."""
     _init(tmp_path, urls=["https://x.test/a"])
-    report = run(tmp_path, refresh_urls=True)
+    report = run(tmp_path, refresh_urls=True, full=False)
     assert report.doc_count == 2
     record = store.read_index(tmp_path)["url:https://x.test/a"]
     assert record["src"] == "url"
@@ -375,11 +378,11 @@ def test_refresh_ingests_urls_with_plain_display_text(tmp_path):
 
 def test_plain_ingest_is_offline_and_carries_urls_forward(tmp_path):
     _init(tmp_path, urls=["https://x.test/a"])
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     before = {p: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
 
     _write_fetcher(tmp_path, "def fetch(url):\n    raise AssertionError('network on offline run')\n", encoding="utf-8")
-    report = run(tmp_path)  # no flag: must not import or call the fetcher
+    report = run(tmp_path, refresh_urls=False, full=False)  # no flag: must not import or call the fetcher
     after = {p: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
     assert before == after
     assert report.changed_count == 0
@@ -387,9 +390,9 @@ def test_plain_ingest_is_offline_and_carries_urls_forward(tmp_path):
 
 def test_double_refresh_is_byte_identical(tmp_path):
     _init(tmp_path, urls=["https://x.test/a", "https://x.test/b"])
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     before = {p: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
-    report = run(tmp_path, refresh_urls=True)
+    report = run(tmp_path, refresh_urls=True, full=False)
     after = {p: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
     assert before == after
     assert report.changed_count == 0
@@ -397,11 +400,11 @@ def test_double_refresh_is_byte_identical(tmp_path):
 
 def test_failed_refresh_keeps_prior_record(tmp_path):
     _init(tmp_path, urls=["https://x.test/a"])
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     prior = store.read_index(tmp_path)["url:https://x.test/a"]
 
     _write_fetcher(tmp_path, "def fetch(url):\n    raise RuntimeError('site down')\n", encoding="utf-8")
-    report = run(tmp_path, refresh_urls=True)
+    report = run(tmp_path, refresh_urls=True, full=False)
     assert store.read_index(tmp_path)["url:https://x.test/a"] == prior
     assert any("site down" in s.reason for s in report.skipped)
 
@@ -419,14 +422,14 @@ def test_a_delisted_url_disappears_on_an_offline_run(tmp_path):
     asserted rather than assumed.
     """
     _init(tmp_path, urls=["https://x.test/a", "https://x.test/b"])
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     assert "url:https://x.test/b" in store.read_index(tmp_path)
 
     _write_urls(tmp_path, ["https://x.test/a"])  # b de-listed; nothing else changes
     _write_fetcher(tmp_path, 
         "def fetch(url):\n    raise AssertionError('network on an offline run')\n", encoding="utf-8"
     )
-    run(tmp_path)  # no flag, no fetcher call
+    run(tmp_path, refresh_urls=False, full=False)  # no flag, no fetcher call
 
     index = store.read_index(tmp_path)
     assert "url:https://x.test/b" not in index
@@ -442,16 +445,16 @@ def test_a_still_listed_url_whose_fetch_fails_keeps_its_record(tmp_path):
     tighten this with it.
     """
     _init(tmp_path, urls=["https://x.test/a"])
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     prior = store.read_index(tmp_path)["url:https://x.test/a"]
 
     _write_fetcher(tmp_path, 
         "def fetch(url):\n    raise RuntimeError('site down')\n", encoding="utf-8"
     )
-    run(tmp_path, refresh_urls=True)  # networked, and the fetch fails
+    run(tmp_path, refresh_urls=True, full=False)  # networked, and the fetch fails
     assert store.read_index(tmp_path)["url:https://x.test/a"] == prior
 
-    run(tmp_path)  # offline, still listed
+    run(tmp_path, refresh_urls=False, full=False)  # offline, still listed
     assert store.read_index(tmp_path)["url:https://x.test/a"] == prior
 
 
@@ -463,11 +466,11 @@ def test_an_offline_run_with_url_records_and_no_list_fails_loudly(tmp_path):
     above. `dirs` already fails loudly on exactly this condition.
     """
     _init(tmp_path, urls=["https://x.test/a"])
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
 
     (tmp_path / URLS_FILE).unlink()
     with pytest.raises(FuxError, match="which URLs belong"):
-        run(tmp_path)
+        run(tmp_path, refresh_urls=False, full=False)
 
 
 def test_a_repo_with_no_url_records_never_reads_the_list(tmp_path):
@@ -476,17 +479,17 @@ def test_a_repo_with_no_url_records_never_reads_the_list(tmp_path):
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
 
-    run(tmp_path)  # no urls file exists at all, and none is looked for
+    run(tmp_path, refresh_urls=False, full=False)  # no urls file exists at all, and none is looked for
     assert set(store.read_index(tmp_path)) == {"file:docs/a.md"}
 
 
 def test_ver_bumps_when_fetched_content_changes(tmp_path):
     _init(tmp_path, urls=["https://x.test/a"])
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     assert store.read_index(tmp_path)["url:https://x.test/a"]["ver"] == 1
 
     _write_fetcher(tmp_path, 'def fetch(url):\n    return "# Page a\\n\\nnew body\\n"\n', encoding="utf-8")
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     assert store.read_index(tmp_path)["url:https://x.test/a"]["ver"] == 2
 
 
@@ -495,7 +498,7 @@ def test_refresh_without_url_config_fails_loudly(tmp_path):
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     with pytest.raises(FuxError, match="no \\[sources.url\\]"):
-        run(tmp_path, refresh_urls=True)
+        run(tmp_path, refresh_urls=True, full=False)
 
 
 def test_file_doc_gets_ref_edge_to_ingested_url(tmp_path):
@@ -504,7 +507,7 @@ def test_file_doc_gets_ref_edge_to_ingested_url(tmp_path):
         urls=["https://x.test/a"],
         files={"docs/a.md": "# Doc A\n\nsee [the page](https://x.test/a) and [gone](https://x.test/other)\n"},
     )
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     edges = store.read_index(tmp_path)["file:docs/a.md"]["edges"]
     # The anchor keys ride along on a `ref` edge (W-168 step 1); this test is
     # about which URL resolves, so they are stripped rather than asserted.
@@ -585,7 +588,7 @@ def test_a_line_attribute_beats_the_source_wide_setting(tmp_path):
     layers. A line that declares one wins for its own URL and no other."""
     _init(tmp_path, urls=["https://x.test/a fetch=cdp", "https://x.test/b"])
     _write_fetcher(tmp_path, CDP_FETCHER, name="cdp.py")
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     index = store.read_index(tmp_path)
     assert index["url:https://x.test/a"]["title"] == "Rendered"   # the line's fetcher
     assert index["url:https://x.test/b"]["title"] == "Page b"     # the source-wide one
@@ -604,7 +607,7 @@ def test_fetch_routes_per_line_and_only_loads_what_it_needs(tmp_path):
         "raise AssertionError('a fetcher no line names must never be imported')",
         encoding="utf-8",
     )
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     index = store.read_index(tmp_path)
     assert index["url:https://x.test/a"]["title"] == "Page a"
     assert index["url:https://x.test/b"]["title"] == "Rendered"
@@ -620,7 +623,7 @@ def test_a_missing_fetcher_names_setup_when_nothing_is_beside_it(tmp_path):
     (tmp_path / "docs" / "a.md").write_text("# Doc A\n\nrepo body\n", encoding="utf-8")
     _write_urls(tmp_path, ["https://x.test/a fetch=cdp"])
     with pytest.raises(FuxError, match=r"fetcher not found: \.fux/fetchers/cdp\.py.*fux setup"):
-        run(tmp_path, refresh_urls=True)
+        run(tmp_path, refresh_urls=True, full=False)
 
 
 def test_a_missing_fetcher_names_ITS_SIBLINGS_when_there_are_any(tmp_path):
@@ -650,7 +653,7 @@ def test_a_missing_fetcher_names_ITS_SIBLINGS_when_there_are_any(tmp_path):
         (fetchers / f"{stem}.py").write_text("def fetch(url):\n    return ''\n", encoding="utf-8")
 
     with pytest.raises(FuxError) as exc:
-        run(tmp_path, refresh_urls=True)
+        run(tmp_path, refresh_urls=True, full=False)
     message = str(exc.value)
     assert "glassbox" in message, "the file that IS there must be named"
     assert "fux setup" not in message, "setup does not write the module being asked for"
@@ -678,7 +681,7 @@ def test_a_url_ingest_produces_an_index_the_build_accepts(tmp_path):
     from fux.derive import build
 
     _init(tmp_path, urls=["https://x.test/a", "https://x.test/b"])
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     report = build(tmp_path)  # must not raise
     assert report.docs == 3
 
@@ -691,7 +694,7 @@ def test_a_url_record_carries_no_bare_16_hex_token(tmp_path):
     import re
 
     _init(tmp_path, urls=["https://x.test/a"])
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     for path in store.iter_shard_paths(tmp_path):
         for line in path.read_bytes().split(chr(10).encode()):
             record = line.decode("utf-8") if line else ""
@@ -708,7 +711,7 @@ def test_a_url_record_shows_its_real_title(tmp_path):
     from fux.query import scan
 
     _init(tmp_path, urls=["https://x.test/a"])
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     (result,) = [r for r in scan.ask(tmp_path, "rendered", top=5, scoring=scoring()) if r.id.startswith("url:")]
     assert result.title == "Page a"
 
@@ -742,12 +745,12 @@ def test_a_carried_url_record_drops_its_edge_to_a_delisted_document(tmp_path):
         files={"docs/keep.md": "# Keep\n\nbody\n"},
         fetcher=LINKING_FETCHER,
     )
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
     edges = store.read_index(tmp_path)["url:https://x.test/a"]["edges"]
     assert {e["dst"] for e in edges} == {"url:https://x.test/b", "file:docs/keep.md"}
 
     _write_urls(tmp_path, ["https://x.test/a"])  # b de-listed
-    run(tmp_path)  # offline: a is carried, but its edges are not trusted
+    run(tmp_path, refresh_urls=False, full=False)  # offline: a is carried, but its edges are not trusted
 
     index = store.read_index(tmp_path)
     assert "url:https://x.test/b" not in index
@@ -772,11 +775,11 @@ def test_no_surviving_record_points_at_an_id_this_run_does_not_hold(tmp_path):
         },
         fetcher=LINKING_FETCHER,
     )
-    run(tmp_path, refresh_urls=True)
+    run(tmp_path, refresh_urls=True, full=False)
 
     (tmp_path / "docs" / "gone.md").unlink()
     _write_urls(tmp_path, ["https://x.test/a"])
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
 
     index = store.read_index(tmp_path)
     assert "url:https://x.test/b" not in index and "file:docs/gone.md" not in index

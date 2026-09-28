@@ -54,7 +54,7 @@ def repo(tmp_path, monkeypatch):
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nsweepterm body\n", encoding="utf-8")
 
-    monkeypatch.setattr(runner, "acquire", lambda _root: True)
+    monkeypatch.setattr(runner, "acquire", lambda _root, **_kw: True)
     monkeypatch.setattr(runner, "release", lambda _root: None)
     return tmp_path
 

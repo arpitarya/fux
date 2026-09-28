@@ -16,6 +16,9 @@ import pytest
 from fux import refer as refer_mod
 from fux.refer.freshness import Policy
 from l12_fixtures import write_config
+from l12_fixtures import template_fux_toml
+
+_TIMEOUT = template_fux_toml()["refer"]["timeout_seconds"]
 
 
 def eff(loc, policy, declared):
@@ -26,16 +29,16 @@ def eff(loc, policy, declared):
 
 
 def test_an_undeclared_url_takes_the_policy_unchanged():
-    assert eff("https://x/a", Policy(cache_ttl_seconds=300), {}) == 300
+    assert eff("https://x/a", Policy(cache_ttl_seconds=300, timeout_seconds=_TIMEOUT), {}) == 300
 
 
 def test_a_line_may_narrow_the_policy():
-    assert eff("https://x/a", Policy(cache_ttl_seconds=3600), {"https://x/a": 900}) == 900
+    assert eff("https://x/a", Policy(cache_ttl_seconds=3600, timeout_seconds=_TIMEOUT), {"https://x/a": 900}) == 900
 
 
 def test_a_line_may_NOT_widen_the_policy():
     """The whole reason the rule is `min` and not "the line wins"."""
-    assert eff("https://x/a", Policy(cache_ttl_seconds=300), {"https://x/a": 86400}) == 300
+    assert eff("https://x/a", Policy(cache_ttl_seconds=300, timeout_seconds=_TIMEOUT), {"https://x/a": 86400}) == 300
 
 
 def test_the_default_policy_can_never_be_widened_by_any_line():
@@ -45,7 +48,7 @@ def test_the_default_policy_can_never_be_widened_by_any_line():
     `ttl=` defaults to 24h on every line, so if the line could widen, adding a
     URL would silently switch caching on for a caller who did not ask.
     """
-    default = Policy()
+    default = Policy(timeout_seconds=_TIMEOUT)
     assert default.cache_ttl_seconds == 0
     for declared in (0, 900, 86400, 10**9):
         assert eff("https://x/a", default, {"https://x/a fetch=http decoder=prose": declared}) == 0
@@ -54,7 +57,7 @@ def test_the_default_policy_can_never_be_widened_by_any_line():
 def test_ttl_zero_on_a_line_opts_that_url_out_entirely():
     # The case a per-URL attribute exists for: one runbook that must always be
     # checked, in a corpus the caller is otherwise happy to cache.
-    p = Policy(cache_ttl_seconds=3600)
+    p = Policy(cache_ttl_seconds=3600, timeout_seconds=_TIMEOUT)
     assert eff("https://x/runbook fetch=http decoder=prose", p, {"https://x/runbook fetch=http decoder=prose": 0}) == 0
     assert eff("https://x/spec fetch=http decoder=prose", p, {"https://x/runbook fetch=http decoder=prose": 0}) == 3600
 

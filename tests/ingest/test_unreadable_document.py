@@ -57,7 +57,7 @@ def test_an_undecodable_document_does_not_end_the_ingest(tmp_path):
     _corpus(tmp_path)
     _unreadable(tmp_path)
 
-    report = run_mod.run(tmp_path)
+    report = run_mod.run(tmp_path, refresh_urls=False, full=False)
 
     assert report is not None, "the run completed rather than raising"
     assert report.doc_count == 1, "the readable document is still indexed"
@@ -71,7 +71,7 @@ def test_the_undecodable_document_gets_no_record(tmp_path):
     """
     _corpus(tmp_path)
     _unreadable(tmp_path)
-    run_mod.run(tmp_path)
+    run_mod.run(tmp_path, refresh_urls=False, full=False)
 
     ids = _indexed_ids(tmp_path)
     assert "file:docs/pruning.md" in ids
@@ -82,7 +82,7 @@ def test_it_is_written_to_the_queue_instead(tmp_path):
     """Dropped, not forgotten. The queue is the record that a model is owed."""
     _corpus(tmp_path)
     _unreadable(tmp_path)
-    run_mod.run(tmp_path)
+    run_mod.run(tmp_path, refresh_urls=False, full=False)
 
     entries = {entry.doc_id: entry for entry in read_queue(tmp_path)}
     assert "file:docs/architecture.pdf" in entries
@@ -100,7 +100,7 @@ def test_a_corpus_that_is_ENTIRELY_unreadable_still_completes(tmp_path):
     _unreadable(tmp_path, "a.pdf")
     _unreadable(tmp_path, "b.pdf")
 
-    report = run_mod.run(tmp_path)
+    report = run_mod.run(tmp_path, refresh_urls=False, full=False)
 
     assert report is not None
     assert report.doc_count == 0
@@ -118,7 +118,7 @@ def test_the_record_loop_never_indexes_more_than_the_parse_plane_kept(tmp_path):
     _corpus(tmp_path)
     for n in range(3):
         _unreadable(tmp_path, f"scan{n}.pdf")
-    run_mod.run(tmp_path)
+    run_mod.run(tmp_path, refresh_urls=False, full=False)
 
     assert _indexed_ids(tmp_path) == {"file:docs/pruning.md"}
 

@@ -8,10 +8,10 @@ amended: 2026-09-27
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@b64cf413afd1, .fux/inspect.toml@28f3b6494463]
+owns: [src/fux/inspect@66e83d9d7b80, .fux/inspect.toml@28f3b6494463]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: e324cc49159e68f56465f8ecc95f1a3eeecae1990c0316cbd5835fd419826d3c
+content_sha: 84eedc2c6f7bbee61661a77bfdb81446ee2ea8ab88c4704264f39ab7bbae20f8
 ratifies: W-169
 ---
 
@@ -434,6 +434,8 @@ placed inside `inspect` by the W-220 ruling — a lens, never a verb).
   families gained, lost and renamed (same members, new name) among those each
   report lists; the explorer renders it as the *families* card (SR-SERVE decision
   16). `duplication()`'s exact heading-SET families are unchanged, name and shape.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). `probes` and the findability lens pass `use_tune=True` to `run_query`, which no longer defaults it.
 
 ### Consequences
 

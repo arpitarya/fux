@@ -175,10 +175,10 @@ export function declareFloorOff(tune, quiet) {
 export function runFind(root, args) {
   const query = args._.join(" ");
   const queries = [query, ...(args.q || [])];
-  const top = args.top ?? 5;
+  const top = args.top; // `.fux/output.toml`, resolved before dispatch
 
   const { results: ranked, confidence, fused, tune } = runFused(root, queries, top, {
-    useTune: args.noTune !== true, wantConfidence: true, expand: args.expand ?? "",
+    useTune: args.noTune !== true, wantConfidence: true, compose: true, expand: args.expand ?? "",
     // W-161 — **Tier A yes, Tier B never.** `find` is `ask`'s terse sibling and
     // must rank the same corpus the same way, or the two verbs disagree; but it
     // is also the verb for piping bare paths, so a labelled second block would

@@ -156,7 +156,7 @@ def test_the_register_row_reports_drift_against_the_index(tmp_path):
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     (tmp_path / ".git").mkdir()
-    run(tmp_path)
+    run(tmp_path, refresh_urls=False, full=False)
     assert _row(tmp_path, "register").ok
 
     # A register committed from a different ingest than the index beside it —

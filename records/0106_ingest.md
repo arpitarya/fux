@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@d00208c1eb9b, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@1420b552a4c5, node/src/ingest/priors.mjs@d8d4691d7e49]
+owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@39d5e17e260d, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@1420b552a4c5, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: da1439fa620a31005b291df83255286ae7b7a243edeb824357c58c7321ca1b05
+content_sha: 60369b0e3a9654c6fe7d7a8bd0649acf16e1949fb9915e330b44b305fabc27ff
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -990,6 +990,8 @@ The Node reader's `dirsFile` no longer falls back to `.fux/sources/dirs`.
 **Ingest's line formats are read by unpacking, not by index**: `REGISTER`'s five columns, the queue's two-or-three, a link's text and target by named regex groups. A consumer decoder's or fetcher's digest keeps 16 hex digits of its sha256 through `constants.toml [decoders] digest_hex`. REGISTER's bytes are unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 **Two ingest bounds are `fux.toml` keys** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28): the cooperative stop is polled every `[maintain] stop_every_docs` documents, and the recency-prior `git log` is bounded by `[index] git_timeout_s` ([SR-CONFIG](0113_config.md) decision 18). The values are unchanged.
+
+**`run()` requires `refresh_urls` and `full`, `ingest_and_report` requires `refresh_urls`** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28); every caller — the verbs, the runner, the daemon, `fux setup` — states them. `Ignores.decide`, `typesfile.render` and `_strs` lost their boolean defaults the same way.
 
 ### Consequences
 

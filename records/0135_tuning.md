@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@5a70322d785f, .fux/tune.toml@dd3f734abecc, node/src/config/tune.mjs@1fff66045a71]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 95c0ed5b99738ea3e0fb1d4392f199b7b050ac93031d2db57e8894fc39343664
+content_sha: a46deee2edf6ffe7fae79aa65f219e39116d2999b503f3a381f30082069d1c39
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1061,6 +1061,8 @@ this moved where they are written, not what they are.
 **No tune key changed** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `fux.toml` joined `tune.toml` and `output.toml` as a file `fux doctor --fix` fills key by key; `node/test/config.test.mjs` gained `fux.toml`'s `dirs_file` cases ([SR-CONFIG](0113_config.md) decision 17).
 
 **No tune key changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/tune.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

@@ -7,10 +7,10 @@ description: "Prose plus every format a built-in decoder reads is compiled in as
 status: accepted
 date: 2026-08-20
 feature: the file-type allowlist and `.fux/formats.toml`
-owns: [src/fux/ingest/typesfile.py@df33d92cadbd, .fux/formats.toml@05666c969b79]
+owns: [src/fux/ingest/typesfile.py@cba4e18abe52, .fux/formats.toml@05666c969b79]
 laws: [L2, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: b0fff5411d82aa9b6d85be9b578acce0f62e3d67b5b23f550db3441c1bd13ccb
+content_sha: 5039f61312df01311fd3393c7888ea975f032ccd446dfac02b93821eb287aca1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -543,6 +543,8 @@ carries them.
 **`typesfile.py` holds no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `[decoders]` lines are matched by named groups (`key`, `value`), `*.` is removed with `removeprefix`, and a control character is recognised by comparison rather than by code point. The file it writes is unchanged.
 
 **Decision 14's caps are twenty-four now** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5b, 2026-09-28): `[limits.html] charset_scan_bytes`, `[limits.xml] prolog_bytes`, and `[limits.yaml] indent_step` and `min_value_len` joined them. Each is a whole number `>= 1`, and what each means is [SR-DECODE](0139_decode.md)'s. A `formats.toml` that lacks one stops `fux ingest` until `fux doctor --fix` writes it.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

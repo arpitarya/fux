@@ -408,7 +408,7 @@ def render(
     include_note: str = "",
     decoders_note: str = "",
     footer: str = "",
-    grouped: bool = True,
+    grouped: bool,
 ) -> str:
     """A whole file in the canonical layout. Sorted (L4); decoders grouped by module
     when `grouped`, so `htm`/`html`/`xhtml` sit together as the map they are."""

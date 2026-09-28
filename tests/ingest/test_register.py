@@ -34,7 +34,7 @@ def _repo(tmp_path: Path) -> Path:
 def _ingest(root: Path) -> None:
     from fux.ingest.run import run
 
-    run(root)
+    run(root, refresh_urls=False, full=False)
 
 
 # --- the rule ---------------------------------------------------------------

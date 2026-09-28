@@ -7,10 +7,10 @@ description: "How fresh a url: citation is, said in six positions that never col
 status: accepted
 date: 2026-09-01
 feature: the freshness verdict vocabulary and the per-URL check interval
-owns: [src/fux/refer/freshness.py@b4fa22361e9f, node/src/refer/freshness.mjs@f44c2c09f8f9]
+owns: [src/fux/refer/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: edbe42b83ae351a780a193ce53ee77957b8ff83a008fa728a85d6c304e353e4b
+content_sha: 1fc7cf871d9dee36647aaa47ed2b8bc264c6fd9a63028f0dfc3b24b2c2b9227d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -572,6 +572,8 @@ this moved where they are written, not what they are.
 **This record's reopen share (0.25) is `constants.toml [doctor] as_ingested_veto_share`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) — fixed, so no consumer's `fux.toml` can move it. `fux doctor` quotes it from there.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `fux doctor`, which this record's checks run through, reads its acquired-plane warning share from `fux.toml [doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18); every threshold is unchanged.
+
+**`Policy.timeout_seconds` has no default** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28): it is `fux.toml [refer] timeout_seconds`, passed by `fux answer`.
 
 ### Consequences
 

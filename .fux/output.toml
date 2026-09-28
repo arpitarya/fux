@@ -63,3 +63,10 @@ enabled = false   # emit --json by default; per-verb: [cli.json.<verb>] enabled 
 top = 5            # ⚠ no `band` here: the MCP confidence block is
                #   UNCONDITIONAL (SR-CONFIDENCE decision 11), refused by name.
 max_headings = 3   # the matched headings each `fux_search` hit carries
+
+[api]                # the fux.open() / Node Index library defaults a caller does not pass.
+                     # ON where [cli] ships off, deliberately: a caller in code has
+                     # already decided to read the object (W-225 stage 6).
+band = true        # the confidence block on ask/answer results
+sections = true    # the matched `§ heading` lines under each ask hit
+no_refer = false   # answer from the index alone, without fetching the source

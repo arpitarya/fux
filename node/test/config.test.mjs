@@ -157,15 +157,15 @@ test("tune: [priority] is sorted longest-key-first so the first match wins", () 
 test("output: an ABSENT file is an error naming it; --no-output-config reads the template", () => {
   const root = repo({});
   assert.throws(() => loadOutput(root, { enabled: true }), /\.fux\/output\.toml is missing/);
-  assert.equal(loadOutput(root, { enabled: false }).resolve("find", "top"), template().resolve("find", "top"));
+  assert.equal(loadOutput(root, { enabled: false }).resolve("find", "top", null, { asJson: false }), template().resolve("find", "top", null, { asJson: false }));
 });
 
 test("output: a PRESENT file that omits a key REFUSES — it is the sole source", () => {
   const root = repo({ ".fux/output.toml": "[cli]\nband = false\n" });
   const cfg = loadOutput(root, { enabled: true });
-  assert.equal(cfg.resolve("find", "band"), false);
-  assert.throws(() => cfg.resolve("find", "top"), /\[cli\] top is missing/);
-  assert.throws(() => cfg.resolve("find", "top"), /fux doctor --fix/);
+  assert.equal(cfg.resolve("find", "band", null, { asJson: false }), false);
+  assert.throws(() => cfg.resolve("find", "top", null, { asJson: false }), /\[cli\] top is missing/);
+  assert.throws(() => cfg.resolve("find", "top", null, { asJson: false }), /fux doctor --fix/);
 });
 
 test("output: the precedence chain is flag -> json.verb -> json -> verb -> cli", () => {
@@ -174,9 +174,9 @@ test("output: the precedence chain is flag -> json.verb -> json -> verb -> cli",
       "[cli]\nband = false\ntop = 5\n[cli.find]\ntop = 7\n[cli.json]\nenabled = false\ntop = 9\n",
   });
   const cfg = loadOutput(root, { enabled: true });
-  assert.equal(cfg.resolve("find", "top"), 7);                      // per-verb
+  assert.equal(cfg.resolve("find", "top", null, { asJson: false }), 7);                      // per-verb
   assert.equal(cfg.resolve("find", "top", null, { asJson: true }), 9);  // json wins
-  assert.equal(cfg.resolve("find", "top", 3), 3);                   // a flag wins
+  assert.equal(cfg.resolve("find", "top", 3, { asJson: false }), 3);                   // a flag wins
 });
 
 test("output: a verb-only key is refused at the SHARED level, by name", () => {

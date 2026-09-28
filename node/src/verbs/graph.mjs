@@ -187,7 +187,7 @@ function seedsOf(root, args, records, plane, tune) {
   // walk already re-ordered would make `fux graph "<q>"` a walk over its own
   // output: the seeds would move when the tier moved, and the orientation verb
   // would quietly become path-dependent. SR-GRAPH decision 13.
-  const { results } = runQuery(root, query, tune.seedDepth, { tune, compose: false });
+  const { results } = runQuery(root, query, tune.seedDepth, { tune, useTune: true, wantConfidence: false, compose: false });
   return [
     results.map((r) => ({ path: locOf(r.id), id: r.id, role: "seed", score: r.score })),
     results.map((r) => r.id),
@@ -251,7 +251,7 @@ export function runPath(root, args) {
   refuseUnknown(records, plane, src, " (FROM)");
   refuseUnknown(records, plane, dst, " (TO)");
 
-  const hops = args.hops ?? 2;
+  const hops = args.hops; // `.fux/output.toml [cli.path] hops`, resolved before dispatch
   // `--hops` bounds the search and stays a CLI argument; `hop_decay` only
   // orders what the search found.
   const tune = loadTune(root, { enabled: args.noTune !== true });

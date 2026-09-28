@@ -17,7 +17,7 @@ ORIGIN = ".fux/formats.toml"
 
 
 def test_render_then_parse_is_the_identity_on_the_model():
-    text = typesfile.render(["*.md", "docs/*.txt", "*.md"], {"tar.gz": "zip", "csv": "csv"})
+    text = typesfile.render(["*.md", "docs/*.txt", "*.md"], {"tar.gz": "zip", "csv": "csv"}, grouped=True)
     listed = typesfile.parse(text, origin=ORIGIN)
     assert listed.include == ("*.md", "docs/*.txt"), "sorted and deduped (L4)"
     assert listed.decoders == {"csv": "csv", "tar.gz": "zip"}
@@ -25,8 +25,8 @@ def test_render_then_parse_is_the_identity_on_the_model():
 
 
 def test_render_is_a_pure_function_of_its_input():
-    a = typesfile.render(["*.txt", "*.md"], {"tsv": "csv", "csv": "csv", "pdf": "pdf"})
-    b = typesfile.render(["*.md", "*.txt"], {"pdf": "pdf", "csv": "csv", "tsv": "csv"})
+    a = typesfile.render(["*.txt", "*.md"], {"tsv": "csv", "csv": "csv", "pdf": "pdf"}, grouped=True)
+    b = typesfile.render(["*.md", "*.txt"], {"pdf": "pdf", "csv": "csv", "tsv": "csv"}, grouped=True)
     assert a == b
 
 
@@ -58,7 +58,7 @@ def test_add_include_creates_the_array_above_the_first_table():
 
 
 def test_set_decoder_joins_the_group_of_its_module():
-    text = typesfile.render([], {"htm": "html", "html": "html", "pdf": "pdf"})
+    text = typesfile.render([], {"htm": "html", "html": "html", "pdf": "pdf"}, grouped=True)
     after, action, previous = typesfile.set_decoder(text, "xhtml", "html", origin=ORIGIN)
     assert (action, previous) == ("added", "")
     lines = after.splitlines()
@@ -66,7 +66,7 @@ def test_set_decoder_joins_the_group_of_its_module():
 
 
 def test_set_decoder_starts_a_new_group_for_a_new_module():
-    text = typesfile.render([], {"pdf": "pdf"})
+    text = typesfile.render([], {"pdf": "pdf"}, grouped=True)
     after, _, _ = typesfile.set_decoder(text, "geojson", "json", origin=ORIGIN)
     assert after.endswith('pdf = "pdf"\n\ngeojson = "json"\n')
 
@@ -84,7 +84,7 @@ def test_set_decoder_creates_the_table_when_there_is_none():
 
 
 def test_remove_deletes_exactly_one_line_from_either_key():
-    text = typesfile.render(["*.md", "*.txt"], {"pdf": "pdf"})
+    text = typesfile.render(["*.md", "*.txt"], {"pdf": "pdf"}, grouped=True)
     after, removed = typesfile.remove(text, "*.txt", origin=ORIGIN)
     assert removed == "*.txt" and after == text.replace('  "*.txt",\n', "")
     after, removed = typesfile.remove(after, "*.pdf", origin=ORIGIN)

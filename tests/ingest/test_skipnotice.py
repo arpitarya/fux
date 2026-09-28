@@ -83,14 +83,14 @@ def _ignore_text(root) -> str:
 
 
 def test_the_first_run_reports_every_skip(corpus, capsys):
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert len(_skips(capsys.readouterr().out)) == 3
 
 
 def test_the_second_run_reports_none_of_them_and_says_so(corpus, capsys):
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     capsys.readouterr()
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     out = capsys.readouterr().out
     assert _skips(out) == []
     assert "3 already recorded in" in out
@@ -98,17 +98,17 @@ def test_the_second_run_reports_none_of_them_and_says_so(corpus, capsys):
 
 
 def test_a_new_skip_is_reported_and_the_rest_are_counted(corpus, capsys):
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     capsys.readouterr()
     (corpus / "docs" / "late.md").write_text("", encoding="utf-8")
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     out = capsys.readouterr().out
     assert _skips(out) == ["  skip docs/late.md: empty"]
     assert "3 more already recorded in" in out
 
 
 def test_a_changed_reason_is_news_again(corpus):
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     skipnotice.write(corpus, [Skipped("docs/empty.md", "not an indexed file type")])
     assert skipnotice.unseen(corpus, [Skipped("docs/empty.md", "empty")]) != []
 
@@ -120,18 +120,18 @@ def test_a_pattern_you_wrote_is_not_news_either(corpus, capsys):
     beats many — so nothing records it, and without this rule it would print on
     every single run forever.
     """
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     skipnotice.path(corpus).write_text("*.md\n", encoding="utf-8")
     capsys.readouterr()
-    ingest_and_report(corpus, _args())
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert _skips(capsys.readouterr().out) == []
 
 
 def test_suppression_never_moves_a_committed_index_byte(corpus):
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     before = _digest(corpus)
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert _digest(corpus) == before
 
 
@@ -139,7 +139,7 @@ def test_suppression_never_moves_a_committed_index_byte(corpus):
 
 
 def test_the_record_is_fuxignore_and_nothing_lands_under_runtime(corpus):
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert skipnotice.path(corpus) == corpus / fuxignore.IGNORE_FILE
     assert skipnotice.path(corpus).is_file()
     assert not skipnotice.legacy_path(corpus).exists()
@@ -154,7 +154,7 @@ def test_a_legacy_runtime_notice_is_deleted_on_the_next_run(corpus):
     legacy = skipnotice.legacy_path(corpus)
     legacy.parent.mkdir(parents=True, exist_ok=True)
     legacy.write_text("docs/gone.md: empty\n", encoding="utf-8")
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert not legacy.exists()
 
 
@@ -162,7 +162,7 @@ def test_the_two_blocks_carry_the_class_structurally(corpus):
     """Which block a line is in **is** its class — never parsed from the note."""
     _typed(corpus)
     (corpus / "docs" / "tool.py").write_text("x = 1\n", encoding="utf-8")
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     generated = fuxignore.read(corpus).generated
     assert generated["docs/tool.py"].block == fuxignore.BLOCK_NOT_INDEXED
     assert generated["docs/empty.md"].block == fuxignore.BLOCK_SKIPPED
@@ -177,9 +177,9 @@ def test_the_counts_survive_the_round_trip(corpus, capsys):
     """
     _typed(corpus)
     (corpus / "docs" / "tool.py").write_text("x = 1\n", encoding="utf-8")
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     first = _summary(capsys.readouterr().out)
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     second = _summary(capsys.readouterr().out)
     counts = "1 not indexed, 3 skipped,"
     assert counts in first and counts in second
@@ -187,15 +187,15 @@ def test_the_counts_survive_the_round_trip(corpus, capsys):
 
 def test_the_block_is_byte_stable_after_the_first_run(corpus):
     """L4: same corpus, same bytes. A committed file may not churn."""
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     after_first = _ignore_text(corpus)
-    ingest_and_report(corpus, _args())
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert _ignore_text(corpus) == after_first
 
 
 def test_the_block_carries_no_wall_clock(corpus):
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     body = [ln for ln in _ignore_text(corpus).splitlines() if not ln.startswith("#")]
     assert [ln for ln in body if ln.strip()] == [
         "docs/also-empty.md    # empty",
@@ -210,50 +210,50 @@ def test_the_blocks_are_written_above_everything_you_wrote(corpus):
     machine edit a `.gitignore`-shaped file, closed by ordering.
     """
     skipnotice.path(corpus).write_text("# mine\n!docs/empty.md\n", encoding="utf-8")
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     text = _ignore_text(corpus)
     assert text.startswith("# >>> fux")
     assert text.index("# >>> fux") < text.index("!docs/empty.md")
 
 
 def test_a_bang_line_you_wrote_beats_a_generated_line(corpus, capsys):
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     with skipnotice.path(corpus).open("a", encoding="utf-8") as fh:
         fh.write("\n!docs/empty.md\n")
     (corpus / "docs" / "empty.md").write_text("---\ntitle: Back\n---\n\nwidget\n", encoding="utf-8")
     capsys.readouterr()
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert "ingested 2 docs" in _summary(capsys.readouterr().out)
 
 
 def test_deleting_a_line_indexes_the_document_again(corpus, capsys):
     """The escape hatch, and the whole reason the freeze is survivable."""
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     (corpus / "docs" / "empty.md").write_text("---\ntitle: Back\n---\n\nwidget\n", encoding="utf-8")
     text = "\n".join(
         ln for ln in _ignore_text(corpus).splitlines() if not ln.startswith("docs/empty.md")
     )
     skipnotice.path(corpus).write_text(text + "\n", encoding="utf-8")
     capsys.readouterr()
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert "ingested 2 docs" in _summary(capsys.readouterr().out)
 
 
 def test_a_hand_written_pattern_collapses_many_generated_lines(corpus):
     """Write `*.md` yourself and three generated lines become none."""
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert len(fuxignore.read(corpus).generated) == 3
     skipnotice.path(corpus).write_text("*.md\n", encoding="utf-8")
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert fuxignore.read(corpus).generated == {}
 
 
 def test_the_last_skip_going_away_empties_the_blocks(corpus):
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert fuxignore.read(corpus).generated
     for name in ("empty.md", "also-empty.md", "third-empty.md"):
         (corpus / "docs" / name).unlink()
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert fuxignore.read(corpus).generated == {}
     assert "# >>> fux" not in _ignore_text(corpus)
 
@@ -284,29 +284,29 @@ def test_a_frozen_line_that_stopped_being_true_warns_loudly(corpus, capsys):
     frozen line that is also wrong is an invisible filter, which is the failure
     SR-FUXIGNORE exists to abolish.
     """
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     capsys.readouterr()
     (corpus / "docs" / "empty.md").write_text("---\ntitle: Back\n---\n\nwidget\n", encoding="utf-8")
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     err = capsys.readouterr().err
     assert "docs/empty.md" in err and "no longer true" in err
     assert "Delete it to index the document." in err
 
 
 def test_the_warning_is_stderr_so_a_piped_ingest_is_unchanged(corpus, capsys):
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     capsys.readouterr()
     (corpus / "docs" / "empty.md").write_text("---\ntitle: Back\n---\n\nwidget\n", encoding="utf-8")
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     captured = capsys.readouterr()
     assert "no longer true" in captured.err
     assert "no longer true" not in captured.out
 
 
 def test_nothing_warns_while_every_line_is_still_true(corpus, capsys):
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     capsys.readouterr()
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert "no longer true" not in capsys.readouterr().err
 
 
@@ -314,12 +314,12 @@ def test_a_line_your_own_pattern_also_covers_never_warns(corpus, capsys):
     """The generated line is not what holds the file out, so it is not fux's
     claim to be wrong about.
     """
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     with skipnotice.path(corpus).open("a", encoding="utf-8") as fh:
         fh.write("\n*.md\n")
     (corpus / "docs" / "empty.md").write_text("---\ntitle: Back\n---\n\nwidget\n", encoding="utf-8")
     capsys.readouterr()
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     assert "no longer true" not in capsys.readouterr().err
 
 
@@ -329,7 +329,7 @@ def test_stale_warnings_read_bytes_only_for_a_path_that_passed_both_lists(corpus
     """
     _typed(corpus)
     (corpus / "docs" / "tool.py").write_text("x = 1\n", encoding="utf-8")
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     opened: list[str] = []
     original = type(corpus).read_bytes
 
@@ -358,7 +358,7 @@ def test_list_skipped_output_is_unprefixed_and_sorted(corpus, capsys, monkeypatc
     """
     _typed(corpus)
     (corpus / "docs" / "tool.py").write_text("x = 1\n", encoding="utf-8")
-    ingest_and_report(corpus, _args())
+    ingest_and_report(corpus, _args(), refresh_urls=False)
     capsys.readouterr()
     monkeypatch.chdir(corpus)
     cmd_ingest(SimpleNamespace(list_skipped=True))

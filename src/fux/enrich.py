@@ -396,7 +396,7 @@ def _unretrievable(root: Path, path: Path, record: dict, k: int) -> list[tuple[s
     failures: list[tuple[str, int | None, bool]] = []
     for question in questions:
         try:
-            results, _ = run_query(root, question, k, force_scan=False, tune=tune)
+            results, _ = run_query(root, question, k, force_scan=False, tune=tune, use_tune=True)
         except Exception:  # pragma: no cover - a report must not fail a command
             return []
         ids = [r.id for r in results]

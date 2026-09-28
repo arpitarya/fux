@@ -68,7 +68,7 @@ def _corpus(root: Path, tune: str | None = None) -> Path:
         path = root / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
-    run(root)
+    run(root, refresh_urls=False, full=False)
     build(root)
     if tune is not None:
         (root / ".fux" / "tune.toml").write_text(tune, encoding="utf-8")
@@ -196,7 +196,7 @@ def test_off_reads_no_pair_and_is_the_engine_before_the_key(corpus, monkeypatch)
     monkeypatch.setattr(accel, "mined_table", boom)
     for q in ("mkt excursion", "mean kinetic temperature", "excursion"):
         for force_scan in (True, False):
-            results, _ = run_query(corpus, q, 10, force_scan=force_scan, tune=tuned(mined_weight=0.0))
+            results, _ = run_query(corpus, q, 10, force_scan=force_scan, tune=tuned(mined_weight=0.0), use_tune=True)
             expected = _payload(results)
             from fux.query.scan import ask as scan_ask
 
@@ -207,8 +207,8 @@ def test_off_reads_no_pair_and_is_the_engine_before_the_key(corpus, monkeypatch)
 @pytest.mark.parametrize("q", ["mkt excursion", "mean kinetic temperature excursion", "sop"])
 def test_the_scan_and_the_accelerator_fold_identically(corpus, q, weight):
     tune = tuned(mined_weight=weight)
-    scan_results, path_a = run_query(corpus, q, 10, force_scan=True, tune=tune)
-    fast_results, path_b = run_query(corpus, q, 10, force_scan=False, tune=tune)
+    scan_results, path_a = run_query(corpus, q, 10, force_scan=True, tune=tune, use_tune=True)
+    fast_results, path_b = run_query(corpus, q, 10, force_scan=False, tune=tune, use_tune=True)
     assert (path_a, path_b) == ("scan", "accelerator")
     assert _payload(fast_results) == _payload(scan_results)
 
@@ -224,8 +224,8 @@ def test_the_default_is_the_measured_value_and_is_on(corpus):
 
 
 def test_on_lifts_the_document_that_spells_it_the_other_way(corpus):
-    off, _ = run_query(corpus, "mkt excursion", 10, tune=tuned(mined_weight=0.0))
-    on, _ = run_query(corpus, "mkt excursion", 10, tune=template_tune())
+    off, _ = run_query(corpus, "mkt excursion", 10, tune=tuned(mined_weight=0.0), force_scan=True, use_tune=True)
+    on, _ = run_query(corpus, "mkt excursion", 10, tune=template_tune(), force_scan=True, use_tune=True)
     score = lambda rs, loc: next(r.score for r in rs if r.loc == loc)  # noqa: E731
     assert score(on, "docs/long.md") > score(off, "docs/long.md")
     # The guard: nothing matching none of the user's own words is returned.

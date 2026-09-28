@@ -182,7 +182,7 @@ def _node_output(root, enabled: bool) -> dict:
         f"import({json.dumps(url)}).then(m => {{ const c = m.loadOutput("
         f"{json.dumps(str(root) if root else None)}, {{ enabled: {'true' if enabled else 'false'} }});"
         " const out = { json: c.resolveJson('ask') };"
-        " for (const [v, ks] of Object.entries(m.CLI_VERBS)) for (const k of ks) out[`${v}.${k}`] = c.resolve(v, k);"
+        " for (const [v, ks] of Object.entries(m.CLI_VERBS)) for (const k of ks) out[`${v}.${k}`] = c.resolve(v, k, undefined, { asJson: false });"
         " for (const k of m.MCP_KEYS) out[`mcp.${k}`] = c.resolveMcp(k);"
         " process.stdout.write(JSON.stringify(out)); })"
     )
@@ -197,7 +197,7 @@ def _python_output(root, enabled: bool) -> dict:
     out: dict = {"json": c.resolve_json("ask")}
     for verb, keys in CLI_VERBS.items():
         for key in keys:
-            out[f"{verb}.{key}"] = c.resolve(verb, key)
+            out[f"{verb}.{key}"] = c.resolve(verb, key, as_json=False)
     for key in MCP_KEYS:
         out[f"mcp.{key}"] = c.resolve_mcp(key)
     return out
@@ -228,7 +228,7 @@ def test_the_journal_key_is_bound_on_BOTH_runtimes_by_name():
     from fux.output_config import CLI_VERBS, template
 
     assert "journal" in CLI_VERBS["answer"], "the Python side lost the key"
-    assert template().resolve("answer", "journal") is False, "journalling must never ship ON"
+    assert template().resolve("answer", "journal", as_json=False) is False, "journalling must never ship ON"
 
     source = _source("config/output.mjs")
     assert re.search(r'answer: \[[^\]]*"journal"', source), (

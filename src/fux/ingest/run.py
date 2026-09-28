@@ -140,10 +140,10 @@ class IngestReport:
 def run(
     root: Path,
     *,
-    refresh_urls: bool = False,
+    refresh_urls: bool,
     only_urls: set[str] | None = None,
     first_fetch: set[str] | None = None,
-    full: bool = False,
+    full: bool,
     progress=None,
     should_stop=None,
 ) -> IngestReport | None:

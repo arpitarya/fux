@@ -94,7 +94,7 @@ def test_a_question_that_retrieves_its_document_passes(tmp_path):
     _doc(root, "rollback.md", "Gateway rollback",
          "Drain the sidecar, then revert the release. The freeze must be lifted first.")
     _doc(root, "catering.md", "Catering", "The espresso beans arrive on Tuesdays.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
     build(root)
 
     _enrich(root, _sha_of(root, "docs/rollback.md"), "docs/rollback.md",
@@ -114,7 +114,7 @@ def test_a_question_that_retrieves_ANOTHER_document_is_refused(tmp_path):
     _doc(root, "rollback.md", "Gateway rollback",
          "Drain the sidecar, then revert the release. The freeze must be lifted first.")
     _doc(root, "catering.md", "Catering", "The espresso beans arrive on Tuesdays.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
     build(root)
 
     # A question about coffee, attached to the rollback runbook.
@@ -136,7 +136,7 @@ def _retrieves(root, question: str, loc: str, weights) -> bool:
     from fux.query import run_query
 
     tune = dataclasses.replace(template_tune(), field_weights=weights)
-    results, _ = run_query(root, question, SELF_RETRIEVAL_K, force_scan=True, tune=tune)
+    results, _ = run_query(root, question, SELF_RETRIEVAL_K, force_scan=True, tune=tune, use_tune=True)
     return loc in [r.loc for r in results]
 
 
@@ -164,7 +164,7 @@ def test_the_title_field_is_what_the_zeroing_removes(tmp_path):
         encoding="utf-8",
     )
     _doc(root, "other.md", "Catering", "The espresso beans arrive on Tuesdays.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
 
     q = "What is the Quokka Vandelay Protocol?"
     assert _retrieves(root, q, "docs/zeta.md", FIELD_WEIGHTS), (
@@ -196,12 +196,12 @@ def test_the_ctx_field_is_what_stops_an_enrichment_vouching_for_itself(tmp_path)
     _doc(root, "rollback.md", "Gateway rollback",
          "Drain the sidecar, then revert the release.")
     _doc(root, "catering.md", "Catering", "The espresso beans arrive on Tuesdays.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
 
     q = "When do the espresso beans arrive?"
     sha = _sha_of(root, "docs/rollback.md")
     _enrich(root, sha, "docs/rollback.md", q + "\n")
-    ingest_run.run(root)  # the enrichment is now this document's `ctx`
+    ingest_run.run(root, refresh_urls=False, full=False)  # the enrichment is now this document's `ctx`
 
     assert _retrieves(root, q, "docs/rollback.md", FIELD_WEIGHTS), (
         "precondition: with `ctx` scored, the enrichment vouches for itself"
@@ -220,7 +220,7 @@ def test_the_filter_does_not_run_without_a_k(tmp_path):
     root = _repo(tmp_path)
     _doc(root, "rollback.md", "Gateway rollback", "Drain the sidecar, then revert.")
     _doc(root, "catering.md", "Catering", "The espresso beans arrive on Tuesdays.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
     _enrich(root, _sha_of(root, "docs/rollback.md"), "docs/rollback.md",
             "When do the espresso beans arrive?\n")
 
@@ -235,7 +235,7 @@ def test_a_prose_body_written_under_the_old_skill_still_passes(tmp_path):
     enrichment written before 2026-09-05 stays valid."""
     root = _repo(tmp_path)
     _doc(root, "rollback.md", "Gateway rollback", "Drain the sidecar, then revert.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
     build(root)
     _enrich(root, _sha_of(root, "docs/rollback.md"), "docs/rollback.md",
             "Sets the release rollback policy. Covers the freeze and the drain order.\n")
@@ -259,11 +259,11 @@ def test_an_enrichments_superseded_by_retires_its_document(tmp_path):
     root = _repo(tmp_path)
     _doc(root, "old.md", "Helix mesh", "The mesh handles east-west traffic.")
     _doc(root, "new.md", "Calder gateway", "The gateway handles east-west traffic.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
 
     _enrich(root, _sha_of(root, "docs/old.md"), "docs/old.md",
             "How did east-west traffic work before?\n", superseded_by="docs/new.md")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
 
     records = {r["loc"]: r for r in read_index(root).values()}
     assert records["docs/old.md"].get("superseded") is True
@@ -275,10 +275,10 @@ def test_a_superseded_by_naming_nothing_retires_nothing(tmp_path):
     would then rank lower with no successor for a reader to go to."""
     root = _repo(tmp_path)
     _doc(root, "old.md", "Helix mesh", "The mesh handles east-west traffic.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
     _enrich(root, _sha_of(root, "docs/old.md"), "docs/old.md",
             "How does east-west traffic work?\n", superseded_by="docs/does-not-exist.md")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
 
     records = {r["loc"]: r for r in read_index(root).values()}
     assert records["docs/old.md"].get("superseded") is not True
@@ -287,10 +287,10 @@ def test_a_superseded_by_naming_nothing_retires_nothing(tmp_path):
 def test_a_self_reference_retires_nothing(tmp_path):
     root = _repo(tmp_path)
     _doc(root, "old.md", "Helix mesh", "The mesh handles east-west traffic.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
     _enrich(root, _sha_of(root, "docs/old.md"), "docs/old.md",
             "How does east-west traffic work?\n", superseded_by="docs/old.md")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
 
     records = {r["loc"]: r for r in read_index(root).values()}
     assert records["docs/old.md"].get("superseded") is not True
@@ -301,13 +301,13 @@ def test_a_malformed_enrichment_retires_nothing(tmp_path):
     root = _repo(tmp_path)
     _doc(root, "old.md", "Helix mesh", "The mesh handles east-west traffic.")
     _doc(root, "new.md", "Calder gateway", "The gateway handles east-west traffic.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
     sha = _sha_of(root, "docs/old.md")
     path = enrich_path(root, sha)
     path.parent.mkdir(parents=True, exist_ok=True)
     # `superseded_by` present, but the required keys are not.
     path.write_text(f"---\nsuperseded_by: docs/new.md\n---\nbody\n", encoding="utf-8")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
 
     records = {r["loc"]: r for r in read_index(root).values()}
     assert records["docs/old.md"].get("superseded") is not True
@@ -328,15 +328,15 @@ def test_a_new_enrichment_is_indexed_on_the_NEXT_ingest(tmp_path):
     root = _repo(tmp_path)
     _doc(root, "rollback.md", "Gateway rollback", "Drain the sidecar, then revert.")
     _doc(root, "catering.md", "Catering", "The espresso beans arrive on Tuesdays.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
 
     sha = _sha_of(root, "docs/rollback.md")
     _enrich(root, sha, "docs/rollback.md", "How do I quiesce the ingress before a cutover?\n")
-    ingest_run.run(root)  # the document did NOT change
+    ingest_run.run(root, refresh_urls=False, full=False)  # the document did NOT change
 
     from fux.query import run_query
 
-    results, _ = run_query(root, "quiesce the ingress before a cutover", 3, force_scan=True)
+    results, _ = run_query(root, "quiesce the ingress before a cutover", 3, force_scan=True, use_tune=True)
     assert "docs/rollback.md" in [r.loc for r in results], (
         "the enrichment was written and never indexed — reuse is keyed on the "
         "document's sha and does not see its enrichment change"
@@ -352,17 +352,17 @@ def test_a_DELETED_enrichment_is_removed_from_the_index(tmp_path):
     root = _repo(tmp_path)
     _doc(root, "rollback.md", "Gateway rollback", "Drain the sidecar, then revert.")
     _doc(root, "catering.md", "Catering", "The espresso beans arrive on Tuesdays.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
 
     sha = _sha_of(root, "docs/rollback.md")
     _enrich(root, sha, "docs/rollback.md", "How do I quiesce the ingress before a cutover?\n")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
     enrich_path(root, sha).unlink()
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
 
     from fux.query import run_query
 
-    results, _ = run_query(root, "quiesce the ingress before a cutover", 3, force_scan=True)
+    results, _ = run_query(root, "quiesce the ingress before a cutover", 3, force_scan=True, use_tune=True)
     assert "docs/rollback.md" not in [r.loc for r in results], (
         "the deleted enrichment's vocabulary is still indexed"
     )
@@ -374,12 +374,12 @@ def test_an_unchanged_enrichment_does_not_force_re_extraction(tmp_path):
     is the delta-ingest guarantee gone."""
     root = _repo(tmp_path)
     _doc(root, "rollback.md", "Gateway rollback", "Drain the sidecar, then revert.")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
     _enrich(root, _sha_of(root, "docs/rollback.md"), "docs/rollback.md",
             "How do I drain the sidecar?\n")
-    ingest_run.run(root)
+    ingest_run.run(root, refresh_urls=False, full=False)
 
-    stats = ingest_run.run(root)  # third run: nothing moved
+    stats = ingest_run.run(root, refresh_urls=False, full=False)  # third run: nothing moved
     assert stats.reused_count >= 1, (
         "an unchanged enrichment forced a re-extraction — the digest is keyed on "
         "presence rather than on content"

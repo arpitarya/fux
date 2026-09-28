@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@c742770c0d4c, src/fux/setup.py@b3036b8d33a0, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@c742770c0d4c, src/fux/setup.py@038bbd5962ff, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 92a0266811eb1ebb68e912c82e50dfb9337f95364be524d441c0b0a1c6e84d5e
+content_sha: dd0e564373fcc543ab5316ca0812b1484244b92f8ed7e867a6a1c4404fc75dcf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -925,6 +925,8 @@ line raises names the fix itself rather than pointing at the header.
 **`setup.Mandatory` gained `whole_file`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27): `.fux/refusals.toml` gains missing `[scan]` keys when present and is never written when absent, because its absence means *no rules* ([SR-REFUSAL](0146_refusals.md) decision 9a).
 
 **The `fux` shim's chmod bits are `constants.toml [bundle] shim_mode`** (`0o755`), and the manifest `fux setup` writes is indented by `[json] indent`. Nothing written into `.fux/` changed. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

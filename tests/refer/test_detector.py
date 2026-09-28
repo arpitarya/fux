@@ -14,6 +14,9 @@ from fux import refer as refer_mod
 from fux.maintain import dirty
 from fux.refer import Cited
 from fux.refer.freshness import Policy, verify
+from l12_fixtures import template_fux_toml
+
+_TIMEOUT = template_fux_toml()["refer"]["timeout_seconds"]
 
 
 @pytest.fixture
@@ -116,7 +119,7 @@ def test_a_cached_verdict_that_is_definitively_stale_still_counts(root):
 def test_policy_that_forbids_fetching_yields_nothing_to_detect(root):
     """`never` produces `unverified` for every external document, so the
     detector is silent by construction rather than by a special case."""
-    policy = Policy(mode="never")
+    policy = Policy(mode="never", timeout_seconds=_TIMEOUT)
     decision = refer_mod.freshness_mod.decide(policy)
     assert not decision.fetch
     documents = [_cited("url:https://a", indexed="old", fetched=None, note=decision.reason)]

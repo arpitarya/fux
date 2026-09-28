@@ -23,6 +23,8 @@ from fux.refer.fetchcache import FetchCache
 from fux.refer.freshness import ALWAYS, NEVER, cached, verify
 from l12_fixtures import template_fux_toml, template_tune, write_config
 
+_TIMEOUT = template_fux_toml()["refer"]["timeout_seconds"]
+
 #: The template's `[refer] fetch_cache_max_bytes` (W-225 stage 5e).
 _MAX = template_fux_toml()["refer"]["fetch_cache_max_bytes"]
 
@@ -193,21 +195,21 @@ def test_the_cache_lives_under_the_gitignored_runtime_plane(tmp_path):
 
 
 def test_caching_is_off_by_default():
-    assert Policy().cache_ttl_seconds == 0 and not Policy().caches
+    assert Policy(timeout_seconds=_TIMEOUT).cache_ttl_seconds == 0 and not Policy(timeout_seconds=_TIMEOUT).caches
 
 
 def test_no_cache_beats_a_ttl():
     """The escape hatch for access-controlled sources, honoured regardless."""
-    assert not Policy(mode=ALWAYS, cache_ttl_seconds=300, no_cache=True).caches
+    assert not Policy(mode=ALWAYS, cache_ttl_seconds=300, no_cache=True, timeout_seconds=_TIMEOUT).caches
 
 
 def test_a_negative_ttl_is_refused():
     with pytest.raises(FuxError, match="cache_ttl_seconds"):
-        Policy(cache_ttl_seconds=-1)
+        Policy(cache_ttl_seconds=-1, timeout_seconds=_TIMEOUT)
 
 
 def test_the_ttl_travels_in_the_bundle():
-    record = Policy(mode=ALWAYS, cache_ttl_seconds=300).as_record()
+    record = Policy(mode=ALWAYS, cache_ttl_seconds=300, timeout_seconds=_TIMEOUT).as_record()
     assert record["cache_ttl_seconds"] == 300 and record["no_cache"] is False
 
 
@@ -269,7 +271,7 @@ def test_a_ttl_hit_returns_what_a_live_fetch_would_have(repo):
         calls.append(url)
         return PAGE
 
-    policy = Policy(mode=ALWAYS, cache_ttl_seconds=300)
+    policy = Policy(mode=ALWAYS, cache_ttl_seconds=300, timeout_seconds=_TIMEOUT)
     clock = Clock()
     fc = FetchCache(repo, clock=clock, max_bytes=_MAX)
 
@@ -286,7 +288,7 @@ def test_a_ttl_hit_returns_what_a_live_fetch_would_have(repo):
 
 def test_the_cache_is_bypassed_entirely_when_the_ttl_is_zero(repo):
     calls = []
-    policy = Policy(mode=ALWAYS)  # ttl 0
+    policy = Policy(mode=ALWAYS, timeout_seconds=_TIMEOUT)  # ttl 0
     fc = FetchCache(repo, clock=Clock(), max_bytes=_MAX)
     for _ in range(3):
         bundle = refer(
@@ -298,7 +300,7 @@ def test_the_cache_is_bypassed_entirely_when_the_ttl_is_zero(repo):
 
 
 def test_no_cache_prevents_a_cached_verdict_even_with_a_ttl(repo):
-    policy = Policy(mode=ALWAYS, cache_ttl_seconds=300, no_cache=True)
+    policy = Policy(mode=ALWAYS, cache_ttl_seconds=300, no_cache=True, timeout_seconds=_TIMEOUT)
     fc = FetchCache(repo, clock=Clock(), max_bytes=_MAX)
     for _ in range(2):
         bundle = refer(repo, "telemetry", url_candidates(), policy=policy,
@@ -313,7 +315,7 @@ def test_a_git_document_is_never_ttl_cached(repo):
     candidates = [("file:runbook.md", "runbook.md", sha_of("# R\n\nlocal content\n"))]
     for _ in range(2):
         bundle = refer(repo, "local", candidates,
-                       policy=Policy(mode=ALWAYS, cache_ttl_seconds=300), fetch_cache=fc, tune=template_tune())
+                       policy=Policy(mode=ALWAYS, cache_ttl_seconds=300, timeout_seconds=_TIMEOUT), fetch_cache=fc, tune=template_tune())
         assert bundle.documents[0].verdict.label == "current"
     assert not list(fc.directory.glob("*.json")) if fc.directory.exists() else True
 
@@ -324,7 +326,7 @@ def test_never_still_never_fetches_and_never_serves_a_cached_url(repo):
     fc = FetchCache(repo, clock=Clock(), max_bytes=_MAX)
     fc.put("https://x.test/p", sha_of(PAGE), PAGE.encode())
     bundle = refer(repo, "telemetry", url_candidates(),
-                   policy=Policy(mode=NEVER, cache_ttl_seconds=300), fetch_cache=fc, tune=template_tune())
+                   policy=Policy(mode=NEVER, cache_ttl_seconds=300, timeout_seconds=_TIMEOUT), fetch_cache=fc, tune=template_tune())
     assert bundle.documents[0].verdict.label == "unverified"
 
 
@@ -333,7 +335,7 @@ def test_the_ttl_store_is_not_arcs_store(repo):
     entry is served before the sha is confirmed. Two stores, provably apart."""
     arc = ARC(100_000)
     fc = FetchCache(repo, clock=Clock(), max_bytes=_MAX)
-    refer(repo, "telemetry", url_candidates(), policy=Policy(mode=ALWAYS, cache_ttl_seconds=300),
+    refer(repo, "telemetry", url_candidates(), policy=Policy(mode=ALWAYS, cache_ttl_seconds=300, timeout_seconds=_TIMEOUT),
           fetcher=lambda u: PAGE, cache=arc, fetch_cache=fc, tune=template_tune())
 
     assert ("https://x.test/p", sha_of(PAGE)) in arc          # ARC keyed by (loc, sha)

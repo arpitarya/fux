@@ -124,7 +124,7 @@ class Tiers:
 
 
 def tiers(root: Path, query: str, ordered: list, top: int, tune, *,
-          want_related: bool = True) -> Tiers:
+          want_related: bool) -> Tiers:
     """Split the lexical window into the boosted tier and the related tier.
 
     `ordered` is the lexical core's output over the **window**, not over
@@ -294,7 +294,7 @@ def _related(root: Path, plane, query: str, walked, in_window: dict[str, int], t
                 title=_display_title(record),
                 loc=record.get("loc", node),
                 mass=mass,
-                archived=bool(record.get("archived", False)),
+                archived=bool(record.get("archived")),
                 route=_route(plane, node, in_window, kinds),
             )
         )

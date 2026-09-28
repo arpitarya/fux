@@ -179,13 +179,13 @@ def test_the_lock_is_released_between_sweeps():
 
 def test_a_busy_lock_is_not_a_failure(root, monkeypatch):
     """A human's `fux ingest` outranks a clock. The sweep comes round again."""
-    monkeypatch.setattr(runner, "acquire", lambda _root: False)
+    monkeypatch.setattr(runner, "acquire", lambda _root, **_kw: False)
     assert daemon._sweep(root)["outcome"] == "busy"
 
 
 def test_one_bad_sweep_does_not_end_the_daemon(root, monkeypatch):
     """A dev server that dies on one failed request is not a dev server."""
-    monkeypatch.setattr(runner, "acquire", lambda _root: True)
+    monkeypatch.setattr(runner, "acquire", lambda _root, **_kw: True)
     monkeypatch.setattr(runner, "release", lambda _root: None)
 
     def _boom(*_a, **_k):

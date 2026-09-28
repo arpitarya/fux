@@ -38,14 +38,14 @@ def _corpus(root: Path, docs: int = 3) -> None:
 
 
 def test_the_lock_is_exclusive(tmp_path):
-    assert runner.acquire(tmp_path) is True
-    assert runner.acquire(tmp_path) is False, "two runners must never both hold it"
+    assert runner.acquire(tmp_path, required=False) is True
+    assert runner.acquire(tmp_path, required=False) is False, "two runners must never both hold it"
     runner.release(tmp_path)
-    assert runner.acquire(tmp_path) is True
+    assert runner.acquire(tmp_path, required=False) is True
 
 
 def test_the_lock_records_this_process(tmp_path):
-    runner.acquire(tmp_path)
+    runner.acquire(tmp_path, required=False)
     assert runner.holder(tmp_path) == os.getpid()
 
 
@@ -168,7 +168,7 @@ def test_run_once_indexes_and_releases(tmp_path):
 
 def test_run_once_exits_quietly_when_another_runner_holds_the_lock(tmp_path):
     _corpus(tmp_path)
-    runner.acquire(tmp_path)
+    runner.acquire(tmp_path, required=False)
     assert runner.run_once(tmp_path) == "busy"
 
 
@@ -265,7 +265,7 @@ def test_a_stopped_run_writes_no_index_and_keeps_the_dirty_list(tmp_path):
     _corpus(tmp_path)
     dirty.record(tmp_path, ["file:docs/d0.md"])
 
-    report = run(tmp_path, should_stop=lambda: True)
+    report = run(tmp_path, should_stop=lambda: True, refresh_urls=False, full=False)
     assert report is None
     assert not list((tmp_path / ".fux" / "index").glob("*.jsonl")) if (
         tmp_path / ".fux" / "index"
@@ -288,7 +288,7 @@ def test_a_completed_run_subtracts_only_its_start_time_snapshot(tmp_path):
             dirty.record(tmp_path, ["file:docs/late.md"])
         return False
 
-    run(tmp_path, should_stop=mid_run_commit)
+    run(tmp_path, should_stop=mid_run_commit, refresh_urls=False, full=False)
     assert dirty.read(tmp_path) == ["file:docs/late.md"]
 
 
@@ -296,7 +296,7 @@ def test_run_without_should_stop_can_never_return_none(tmp_path):
     from fux.ingest.run import run
 
     _corpus(tmp_path)
-    assert run(tmp_path) is not None
+    assert run(tmp_path, refresh_urls=False, full=False) is not None
 
 
 # -- record_head ------------------------------------------------------------
@@ -368,7 +368,7 @@ def test_a_wedged_runner_refuses_the_write_rather_than_racing_it(tmp_path, monke
         progress = None
 
     with pytest.raises(FuxError, match="did not stop when asked"):
-        ingest_and_report(tmp_path, Args())
+        ingest_and_report(tmp_path, Args(), refresh_urls=False)
 
 
 # -- W-140 row 11: the background pass left the derived plane behind ---------
@@ -567,7 +567,7 @@ def test_no_spawn_makes_every_spawn_a_no_op(tmp_path, monkeypatch):
     dirty.record(tmp_path, ["file:docs/d0.md"])
     monkeypatch.setenv(runner.NO_SPAWN_ENV, "1")
 
-    assert runner.spawn(tmp_path) is False
+    assert runner.spawn(tmp_path, handoff=False) is False
     assert dirty.read(tmp_path) == ["file:docs/d0.md"], "the list must survive a refused spawn"
 
 
@@ -578,5 +578,5 @@ def test_without_the_switch_a_spawn_is_attempted(tmp_path, monkeypatch):
     started = []
     monkeypatch.setattr(runner.subprocess, "Popen", lambda *a, **kw: started.append(a) or None)
 
-    assert runner.spawn(tmp_path) is True
+    assert runner.spawn(tmp_path, handoff=False) is True
     assert started, "no process was started"

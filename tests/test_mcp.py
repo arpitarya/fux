@@ -101,7 +101,7 @@ def repo(tmp_path):
 def _exchange(repo, *messages) -> list[dict]:
     stdin = io.StringIO("\n".join(json.dumps(m) for m in messages) + "\n")
     stdout = io.StringIO()
-    serve(stdin=stdin, stdout=stdout, root=repo)
+    serve(stdin=stdin, stdout=stdout, root=repo, enabled=True)
     return [json.loads(line) for line in stdout.getvalue().splitlines() if line.strip()]
 
 
@@ -255,7 +255,7 @@ def test_an_unknown_tool_is_a_jsonrpc_error(repo):
 def test_malformed_json_does_not_kill_the_server(repo):
     stdin = io.StringIO('not json\n{"jsonrpc":"2.0","id":4,"method":"tools/list"}\n')
     stdout = io.StringIO()
-    serve(stdin=stdin, stdout=stdout, root=repo)
+    serve(stdin=stdin, stdout=stdout, root=repo, enabled=True)
     responses = [json.loads(line) for line in stdout.getvalue().splitlines() if line.strip()]
     assert responses[0]["error"]["code"] == -32700
     assert responses[1]["id"] == 4, "the server must keep serving after a parse error"

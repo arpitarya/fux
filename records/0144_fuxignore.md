@@ -7,10 +7,10 @@ description: "Exclusion moves out of the source lists into one .gitignore-shaped
 status: accepted
 date: 2026-08-27
 feature: the `.fux/.fuxignore` exclusion file
-owns: [src/fux/ingest/fuxignore.py@f9b13eeb8de7]
+owns: [src/fux/ingest/fuxignore.py@286e1f84fe6a]
 laws: [L2, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: f818a6a4a2c48b8c1efc420845b5a4c1b7fb63017e73dce431d4548083f3de53
+content_sha: f5c4ce78236b2ad554ecf61aba3fc45b3c86b8e9630a02ec2a861ba654bd72e9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -392,6 +392,8 @@ this moved where they are written, not what they are.
 **No `.fuxignore` rule changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `gitdir.read_types` no longer falls back to `DEFAULT_TYPES` for an absent `formats.toml`; `.fuxignore` is still read first and outranks it ([SR-TYPES](0128_types-list.md) decision 14).
 
 **The glob translator holds no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): it advances by the length of the token it matched (`**/`, `**`, an escaped character). Every pattern compiles to the same regex.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

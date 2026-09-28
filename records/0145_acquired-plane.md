@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@aa145d42bb5d]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: bd74e48761fea7866104386dc060e3cbb456c65d394c7af5fc2f1285b526c5c3
+content_sha: 34eaec8ed913c3e9c726c233a38f15ae1b9d7ec892b481e7dee34d8eece48c0a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -315,6 +315,8 @@ this moved where they are written, not what they are.
 **This record's reopen share (0.25) is `constants.toml [doctor] as_ingested_veto_share`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28) — fixed, so no consumer's `fux.toml` can move the condition this record states. `fux doctor` quotes it from there.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5f, 2026-09-28). `fux doctor`, which this record's checks run through, reads its acquired-plane warning share from `fux.toml [doctor] acquired_warn_share` ([SR-CONFIG](0113_config.md) decision 18); every threshold is unchanged.
+
+**No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 ### Consequences
 

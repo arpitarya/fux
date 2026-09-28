@@ -35,7 +35,7 @@ def repo(tmp_path: Path) -> Path:
 def _types(root: Path, include=(), **decoders: str) -> None:
     """Write `.fux/formats.toml` in the canonical layout fux itself writes."""
     (root / ".fux" / "formats.toml").write_text(
-        typesfile.render(list(include), decoders), encoding="utf-8"
+        typesfile.render(list(include), decoders, grouped=True), encoding="utf-8"
     )
 
 

@@ -10,10 +10,10 @@ amended: 2026-08-28
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@daa8822237b1, src/fux/templates/output.toml.txt@a3ffe1caa9d9, .fux/output.toml@a3ffe1caa9d9, node/src/config/output.mjs@850e35e36742]
+owns: [src/fux/output_config.py@6e170ba237d7, src/fux/templates/output.toml.txt@38f72dd71a22, .fux/output.toml@38f72dd71a22, node/src/config/output.mjs@e71c6b866b06]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 241ad2ce6287424a203002047f1c1d6141ad69e374f7132c416cfac30dc94d82
+content_sha: 58bdb83b3cd6d2005c0f0bf4914453cbc45401aee37b0c721acd5868b107ed63
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -803,6 +803,17 @@ this moved where they are written, not what they are.
 `query/__init__.py` gained `_intent_prior` and `--why`'s `intent` block; the
 prior's switches live in `.fux/tune.toml` ([SR-TUNE](0135_tuning.md) decision
 20), not here.
+
+**25. A fourth root, `[api]`, holds the library's defaults** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8; W-225
+stage 6, 2026-09-28). R8 removed every boolean parameter default and said the
+API reads a flag's default *"where the CLI reads it"*. `fux.open(root)`'s `Index`
+and Node's `Index` ship `band` and `sections` **on** where `[cli]` ships `band`
+off, deliberately (a caller in code has already chosen to read the object). So
+they read `[api]`, not `[cli]`: `band = true`, `sections = true`, `no_refer =
+false`, with the chain **argument → `[api]` → error**. Like `[mcp]`, it inherits
+nothing from `[cli]`, for decision 3's reason. `API_KEYS` is closed in both
+readers. `audit` and `receipt` have no CLI key to mirror, so they carry no default
+anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
 
 ### Consequences
 
