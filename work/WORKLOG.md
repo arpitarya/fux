@@ -23,6 +23,18 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-09-29 — 3.0.0-alpha.8 released: the Node reader ~3× faster  ·  Claude Code (Opus)
+- **Asked:** *"delete the feature branches … pull … commit everything"*, then *"commit everything and publish a new version"*.
+- **Did:**
+  - Deleted the three remote `ci/*` branches. Two were merged; `ci/two-lanes-trial` held only its "never merge" trial commit. There were no local feature branches.
+  - Pulled the two npm-environment commits. The WORKLOG and registry conflicts were resolved by keeping both sides.
+  - `0d9b5a19`: committed W-235 and the Cowork compare sweep, and closed the gate gaps W-235 had left. Its literals went under the `grammar` category, the run report declares *not a paired run* / *no per-query rows*, SR-INDEX-LIFECYCLE, SR-GRAPH and SR-API each gained a *no decision here moved* line, and seven records were re-stamped. It also carries Arpit's re-ingest of `.fux/`, which rewrote `identifiers.toml [detected]`.
+  - `7487f509` release: 4 version sites → `3.0.0-alpha.8`. SR-LAWS, SR-CLI, SR-MCP and SR-NODE-SEARCH were re-stamped for the bump only. Unit tests were green apart from the freshness gate the message exempts; e2e 154 passed; Node 202/202. `ci.yml` was green on the sha before the release was created.
+  - Publish run `36535180672`: build, PyPI and npm all green. PyPI has `3.0.0a8`; npm logged `+ fux-engine@3.0.0-alpha.8` on tag `alpha`. **npm now appears as a GitHub Deployment**, the first release to do so.
+- **Found:** `scripts/sr-owns.py --write` given several records stamped only the last one, twice this session. Each record was stamped on its own instead. It was not investigated.
+- **Watch:** `identifiers.toml [detected]` now lists families such as `BWD-`, `CDM-` and `NRL-`, which are not fux's identifiers. Confirm the re-ingest read the intended corpus.
+- **Next:** unchanged. W-168 step 8 build (Opus).
+
 ## 2026-09-29 — W-235: the Node reader's per-call cost, ~0.50 s → ~0.15 s  ·  Claude Code (Opus)
 - **Asked:** *"implement w-235"*.
 - **Did:**
