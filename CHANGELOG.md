@@ -8,6 +8,22 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.0-alpha.8] - 2026-09-29
+
+**The Node reader answers ~3× faster; output is byte-identical.** The index
+format, ranking and every verb's output are alpha.7's.
+
+### Changed
+
+- **Node `find`, `ask` and `answer` take ~0.15 s instead of ~0.50 s** per call
+  (W-235). The graph plane was rebuilt by `JSON.parse`-ing every record, which
+  is mostly term statistics it never reads; it now parses only `id` and `edges`,
+  and shards are split natively. Measured on this repo and a 10 000-document
+  corpus, with stdout byte-equal and the differential arm 0 of 225 discordant —
+  `work/regression/2026-09-29-node-reader-per-call/`.
+- **The npm publish job runs in the `npm` GitHub environment**, so npm releases
+  show under the repository's Deployments.
+
 ## [3.0.0-alpha.7] - 2026-09-29
 
 **No engine change — CI rewritten.** The index, ranking and every verb are
