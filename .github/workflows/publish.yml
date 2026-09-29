@@ -123,11 +123,15 @@ jobs:
     permissions:
       id-token: write     # OIDC trusted publishing; no NPM_TOKEN exists anywhere
       contents: read
-    # No `environment:` here, deliberately, unlike publish-pypi. The trusted
-    # publisher on npmjs.com was saved with its *Environment name* field blank,
-    # and the OIDC token's environment claim has to match what is configured
-    # there. A GitHub environment on this job would put a claim in the token
-    # that npm's config does not name. Add both together or neither.
+    # `environment: npm` — and the `fux-engine` trusted publisher on npmjs.com
+    # names the SAME environment (Arpit, 2026-09-29). The OIDC token's
+    # environment claim has to match what npm has saved, so the two change
+    # together or not at all: rename one and the next publish is refused at
+    # the registry. Until 2026-09-29 both were blank, and npm releases never
+    # appeared under the repository's Deployments; this is what shows them.
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/fux-engine
 
     steps:
       - uses: actions/checkout@v5
