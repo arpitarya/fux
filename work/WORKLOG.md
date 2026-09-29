@@ -23,6 +23,15 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-09-29 — CI on `main` for the first time: FAST 105 s, FULL red on one Windows flake, fixed  ·  cloud session (Opus)
+- **Asked:** *"yes"* — fast-forward `main` to `ci/two-lanes` and file the Node-reader item.
+- **Did:**
+  - Filed [W-235](open/W-235-node-reader-per-call-cost.md) (🟢, Opus) and fast-forwarded `main` to `8a7c561e`.
+  - First run on `main`: **FAST finished in ~105 s**, green. FULL took 537 s and went red on `windows · py3.12` only.
+  - The annotation action named the test on its first real use: `test_observe::test_observers_run_in_sorted_filename_order`. The template's `[observe] max_ms = 50` is a latency budget; under `pytest -n auto` on Windows, three observers could not be imported inside 50 ms, were abandoned, and the test read a half-written file. The same job failed on the scratch branch earlier today with no name attached; this is that failure.
+  - Fix, in the test only: `test_observe.py`'s fixture raises its repo's budget to 3 000 ms. That is still under the hostile observer's 5 s sleep, which must stay abandoned. The engine and the template are unchanged.
+- **Watch:** other tests that assume a fast machine may surface under xdist on Windows. The annotations will name them.
+
 ## 2026-09-29 — CI rewritten: one workflow, FAST in ~1m45s, FULL ~11 min (was 14–15)  ·  Cowork → cloud session (Opus)
 - **Asked:** *"Pipeline takes 14 to 15 minutes. I want it under or maximum 2 minutes"*, then *"drop the existing workflows and rewrite them"*, *"what if there are no PRs… merging into main directly"*, *"implement it."* Arpit overrode the Cowork ratify-only default for this one.
 - **Did:**

@@ -9,6 +9,7 @@ code cannot reach an answer even when it is actively trying to.
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -144,6 +145,17 @@ def _repo(tmp_path: Path) -> Path:
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     (fux / "pii.toml").write_text("", encoding="utf-8")
     write_config((fux).parent)
+    # The template's `[observe] max_ms = 50` is a latency budget, and a loaded
+    # runner blows it: on Windows under `pytest -n auto` (2026-09-29, the CI
+    # rewrite) three observers could not even be imported inside 50 ms, were
+    # abandoned, and `test_observers_run_in_sorted_filename_order` read a
+    # half-written file. These tests are about order, isolation and fail-open,
+    # not about the budget, so they get one a busy machine cannot miss — still
+    # shorter than the hostile observer's 5 s sleep, which must stay abandoned.
+    cfg = tmp_path / "fux.toml"
+    text, n = re.subn(r"(?m)^max_ms = 50$", "max_ms = 3000", cfg.read_text(encoding="utf-8"))
+    assert n == 1, "the template's [observe] budget moved; re-check this override"
+    cfg.write_text(text, encoding="utf-8")
     docs = tmp_path / "docs"
     docs.mkdir(exist_ok=True)
     (docs / "rollback.md").write_text(
