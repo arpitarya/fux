@@ -10,7 +10,7 @@ feature: how a release reaches two registries, how the version stays equal acros
 owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 48bbbb6afbed0dd3fc80261bd0fdde2017aa192b578696820c538cc051a0c09b
+content_sha: 0bed4a3f150945f1ed5a5526e62bebe266c86e0d8f925eacf2712af273d38f6f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -163,9 +163,14 @@ rather than a string somebody might forget to edit.
    OIDC and is unchanged, so the attestation the staged tarball carried is the
    attestation the published one carries.
 
-   ⚠ **A precondition of a release now lives outside this repository.** The
+   ⚠ **Two preconditions of a release now live outside this repository.** The
    direct publish works only while **`Allow npm publish` is ticked on the
-   `fux-engine` trusted publisher at npmjs.com**. Untick it and the npm job
+   `fux-engine` trusted publisher at npmjs.com**, and only while that
+   publisher's **Environment name reads `npm`** — the same name as
+   `publish-npm`'s `environment:` in `publish.yml` (Arpit, 2026-09-29; blank on
+   both sides before, so npm releases never appeared under the repository's
+   Deployments). The OIDC token carries the job's environment and npm refuses a
+   claim it has not saved, so the two names change together or not at all. Untick it and the npm job
    fails with a registry refusal that no diff in this tree explains. It cannot
    be asserted from here, and the only written trace is this paragraph,
    [SR-NODE-SEARCH](0153_node-search.md) decision 14, and the comment beside

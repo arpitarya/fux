@@ -23,6 +23,13 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-09-29 — npm publish job gets `environment: npm`, matched on npmjs.com  ·  cloud session + Chrome (Opus)
+- **Asked:** *"set it up"* — make npm releases show under GitHub Deployments.
+- **Did:**
+  - On npmjs.com, through Arpit's Chrome (he signed in and tapped his security key), set the `fux-engine` trusted publisher's **Environment name** to `npm`. Checked it after a reload. The label, repo, workflow and `Allow npm publish` are unchanged.
+  - Only then merged `publish-npm`'s `environment: { name: npm, url: npmjs.com/package/fux-engine }`. [SR-WORK-RELEASE](../records/0063_WORK-release.md) decision 8 now names both off-repo preconditions.
+- **Watch:** the next release is the first npm publish to carry an environment claim. If npm refuses it, compare the two names before anything else. GitHub creates the `npm` environment on first use; add protection rules there only on purpose.
+
 ## 2026-09-29 — 3.0.0-alpha.7 released (no engine change); why npm has no GitHub deployment  ·  Claude Code (Opus)
 - **Asked:** *"pull the latest changes and commit everything"*, then *"release a new alpha version"* and *"why am I not seeing deployments for npm… it's only showing PyPI in git"*.
 - **Did:**
