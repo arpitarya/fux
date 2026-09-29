@@ -8,6 +8,24 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.0-alpha.7] - 2026-09-29
+
+**No engine change — CI rewritten.** The index, ranking and every verb are
+byte-for-byte alpha.6; upgrading changes nothing on a corpus.
+
+### Changed
+
+- **CI is one workflow in two stages** (SR-WORK-RELEASE decision 13). FAST runs
+  on every push in about two minutes; FULL (every OS, both differential passes,
+  the ladder) waits on it and gates a release. `node-arm.yml` is folded into
+  `ci.yml`, and failed tests surface as run annotations.
+- **`pytest-xdist` joins the `dev` extra**; the suites run under `-n auto`.
+
+### Fixed
+
+- `test_observe`'s ordering test no longer races its own 50 ms observer budget
+  on a loaded Windows runner.
+
 ## [3.0.0-alpha.6] - 2026-09-28
 
 **Identifier families, corpus-mined expansion and an intent prior — and three
