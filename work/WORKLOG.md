@@ -23,6 +23,15 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-09-29 — 3.0.0-alpha.7 released (no engine change); why npm has no GitHub deployment  ·  Claude Code (Opus)
+- **Asked:** *"pull the latest changes and commit everything"*, then *"release a new alpha version"* and *"why am I not seeing deployments for npm… it's only showing PyPI in git"*.
+- **Did:**
+  - Pulled, then committed Cowork's uncommitted W-168 edits (U2 ruling, `rm3-selective` ruled R0). Two worklog/registry conflicts were resolved by keeping both sides.
+  - `6804f5ca` release: 4 version sites → `3.0.0-alpha.7`, SR-LAWS/CLI/MCP/NODE-SEARCH re-stamped for the bump only. SR-WORK-REGISTRY's `content_sha` had gone stale in the merge and was re-stamped. Both suites and the Node units passed locally; `ci.yml` was green on the sha (FAST + FULL) before the release was created.
+  - Publish run `36525579873`: build, PyPI and npm all green. PyPI has `3.0.0a7`; npm `alpha` → `3.0.0-alpha.7`.
+- **Found:** npm has been publishing all along; GitHub lists a Deployment only for a job with `environment:`. `publish-npm` has none on purpose, because the npm trusted publisher was saved with a blank environment name and the OIDC claim must match. To show npm there: set an environment name on the npmjs.com trusted publisher (Arpit's hand) **and** add it to the job, together.
+- **Next:** unchanged. W-168 step 8 build (Opus).
+
 ## 2026-09-29 — W-168: step 10 re-ruled U2; RM3's selective-expansion compare doc  ·  Cowork (Opus)
 - **Asked:** a status walk of W-168's ten steps (text and voice), W-168 kept readable on mobile, then *"create items that were pending"*. These were the compare docs promised on voice while the laptop was out of reach.
 - **Did:**
