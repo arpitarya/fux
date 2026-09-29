@@ -35,7 +35,7 @@ Rules:
 | **the record** | [SR-WORK-RELEASE](../records/0063_WORK-release.md) decision 13 (new) and 11a; CI mentions in SR-LAW-8, SR-T1-ACCELERATOR, SR-NODE-SEARCH, SR-WORK-REGISTRY |
 | **measured** | FAST **102 s** wall (branch push, run 36475375289); FULL **645 s** end to end, all green (scratch branch, run 36475380160). Before: 14–15 min (run 36464764217/206) |
 | **verified** | unit 6199 passed under `-n 2`; e2e 155 passed under `-n 2`; actionlint clean |
-| **not done** | the Node reader's per-call cost (~1.2 s, `compose.allRecords`) — the real lever on FULL's time and on every Node `fux find`; not filed as an item |
+| **not done** | the Node reader's per-call cost (~1.2 s, `compose.allRecords`) — the real lever on FULL's time and on every Node `fux find`; filed as [W-235](open/W-235-node-reader-per-call-cost.md) |
 
 ## 2026-09-28 — **W-225 R13 built: the sixteen `for-arpit` sites, sorted as ruled**
 

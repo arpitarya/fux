@@ -35,6 +35,7 @@ here. Read that record before changing anything below it.
 - 🟢 **W-168** · `agent` — the ranking ideas. Steps 6, 7 and 10 stop; 9 shipped. **Step 8 (authority prior) is ruled A3 · S2 · L1 and [pre-registered](regression/2026-09-28-authority-prior/PRE-REGISTRATION.md); the build is next. Opus.** [detail](open/W-168-search-improvements.md)
 - 🟡 **W-225** · `agent` — L12 migration: no values hidden in code. Stages 1–7 and the 16 odd sites landed. Left: stage 5f `inspect`, **waiting on W-228**, then stage 8. **Opus.** [detail](open/W-225-values-live-in-config.md)
 - 🟡 **W-228** · `agent` — document families. The lens is built; its misfit flag's threshold is still a placeholder. Arpit ruled (not built): plant known misfits in the seed once steps 7 and 8 file verdicts — waiting on W-168. [detail](open/W-228-document-families.md)
+- 🟢 **W-235** · `agent` — a Node `find` costs ~1.2 s, ~80 % of it rebuilding the graph plane per call (Python: 0.26 s). Profile, compare the fixes; a change to SR-NODE-SEARCH d9 is Arpit's. **Opus.** [detail](open/W-235-node-reader-per-call-cost.md)
 
 
 ### testing
