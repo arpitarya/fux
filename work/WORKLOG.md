@@ -29,7 +29,7 @@ play: the worklog is the granular, per-exchange trail.
   - Copied W-168 to the fux Project as `claude/W-168-search-improvements.md` (a snapshot). Added a status note in memory.
   - [`compare/section-units`](compare/section-units.compare.md): **Arpit ruled U2 · B2 · E1**, superseding U0. The voice session had called section records "U1", and that label clashes with the doc's refused U1, so he was asked and confirmed U2. Not built; the pool is 1.
   - +[`compare/rm3-selective`](compare/rm3-selective.compare.md): R0 recommended. It joins each RM3 run's `0.0` hand-off `band` to its committed per-query rows (no key read). Losses sit in `partial` (10 of 11 at 0.5), but every gate still loses `s2u-099`, and the best tagged net is +4.
-- **Decided / open:** 🔴 Arpit rules R0 or R1 on `rm3-selective`. Voice claims made without tools were corrected here: "expand when confident" is gate G3, which is the safest and gains the least.
+- **Decided / open:** ✅ Arpit ruled **R0** on `rm3-selective` (RM3 stays removed). Voice claims made without tools were corrected here: "expand when confident" is gate G3, which is the safest and gains the least.
 - **Next:** unchanged. W-168 step 8 build (Opus).
 
 ## 2026-09-29 — CI on `main` for the first time: FAST 105 s, FULL red on one Windows flake, fixed  ·  cloud session (Opus)

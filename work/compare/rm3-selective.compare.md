@@ -1,11 +1,15 @@
 ---
 type: Compare
-description: "Whether RM3 comes back as SELECTIVE expansion (expand only when the first pass's band says it is safe) after SR-EXPAND decision 17 removed it. Options: stay removed, gate by band (three gates), or leave expansion to the caller's --expand. Measured post hoc on the two filed RM3 runs; no gate clears the drift bound."
+description: "RULED R0 2026-09-29 (Arpit): RM3 stays removed. Whether RM3 comes back as SELECTIVE expansion (expand only when the first pass's band says it is safe) after SR-EXPAND decision 17 removed it. Options: stay removed, gate by band (three gates), or leave expansion to the caller's --expand. Measured post hoc on the two filed RM3 runs; no gate clears the drift bound."
 ---
 
 # RM3, selectively — does gated expansion reopen W-168 step 5?
 
-> **Verdict:** ⏳ **PROPOSED 2026-09-29 (Cowork), Arpit rules.** Arpit asked on
+> **Verdict:** ✅ **RULED 2026-09-29 (Arpit, Cowork): R0, RM3 stays removed.**
+> SR-EXPAND decision 17 stands unchanged. Selective expansion is recorded as
+> the only form RM3 may return in, behind the reopen-trigger below.
+>
+> *As proposed:* Arpit asked on
 > 2026-09-29 for this doc to record *"selective expansion rather than every
 > time"* as the reopen path for RM3, written with a recommendation for him to
 > rule on. **Recommendation: R0, RM3 stays removed.** Every band gate, applied
@@ -16,8 +20,8 @@ description: "Whether RM3 comes back as SELECTIVE expansion (expand only when th
 
 | | |
 |---|---|
-| **status** | ⏳ proposed, Arpit rules. Nothing built. [SR-EXPAND](../../records/0149_expand.md) decision 17 stands until he rules otherwise |
-| **the call** | **R0**: stay removed. Selective expansion (R1–R3) is recorded as the only reopen form |
+| **status** | ✅ **ruled R0**, Arpit, 2026-09-29. Nothing built, nothing to build. [SR-EXPAND](../../records/0149_expand.md) decision 17 stands |
+| **the call** | ✅ **R0**: stay removed (Arpit, 2026-09-29). Selective expansion (gated by band) is recorded as the only reopen form |
 | **confidence** | **high** that no band gate passes on the filed evidence (the best gate still fails the drift clause). **Low** on what a fresh set would show: the split below is post hoc, `informed`, and one set |
 | **reopen-trigger** | a gate chosen **before** any score, measured on a set that has **not** been scored with RM3, clears both frozen clauses of [`2026-09-23-rm3`](../regression/2026-09-23-rm3/PRE-REGISTRATION.md): net ≥ the gain bar on the tagged pool **and** zero baseline rank-1 hits lost set-wide. ⚠ Reopening also needs Arpit to amend SR-EXPAND d17, which says RM3 *"does not come back as a tunable"* |
 
@@ -100,7 +104,7 @@ the trigger above says what would bring it back.
 
 - Nothing changes in the engine. `rm3_weight` stays refused by name (SR-TUNE d15).
 - W-168 step 5 stays **failed**. This doc is its reopen-trigger, not a new step.
-- If Arpit rules **R1** instead: amend SR-EXPAND d17 first. Then pre-register
+- If the trigger fires and R1 is ever taken: amend SR-EXPAND d17 first. Then pre-register
   one gate, chosen before any score, on a set that has **not** been scored with
   RM3 (`set-2-u` is spent for this). Then build it off at `0.0`, in both
   readers. **Opus.**
