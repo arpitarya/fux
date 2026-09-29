@@ -5,19 +5,54 @@ description: "W-168 step 10 starts as a compare doc (proposal §2). Three forks:
 
 # Section-level units — W-168 step 10
 
-> **Verdict:** ✅ **RULED 2026-09-27 (Arpit, Cowork): U0 · B2 · E1** — *"W168 go
-> with the recommendation"*. The recommendation as written: **U0 · B2 ·
-> E1**: re-rank the top documents by their best **section**, scored at query
-> time by the passages `refer` already cuts — **no index change** — behind a
-> tunable at `0.0`. The two plane changes (U2, U3) are built only if U0's misses
-> turn out to sit **outside** the top-k it can re-rank.
+> **Verdict:** ✅ **RULED 2026-09-29 (Arpit, Cowork): U2 · B2 · E1** — *"I want
+> to go with U1"*, where "U1" was the voice session's name for section records;
+> asked which option he meant, he chose **U2** in this doc's lettering. Fork 1
+> moves from **U0** (a query-time re-rank) to **U2** (`doc#section` records in
+> the index). Forks 2 and 3 stay as ruled on 2026-09-27. **Nothing is built:**
+> the step is still stopped on its pool (1, floor 6), and U2 is what a
+> qualifying set builds. ⚠ **Superseded:** the 2026-09-27 ruling, **U0 · B2 ·
+> E1** (*"W168 go with the recommendation"*), is kept below as history.
 
 | | |
 |---|---|
-| **status** | ⏸ **parked 2026-09-28**: the `step10_section` pool on set-4-claude is **1** at rank 1, counted from the key's tag ([pools](../regression/2026-09-27-golden-set-4-rung-01000/report.md)). By W-219's rule the step stops before any build. U0 · B2 · E1 stay ruled (2026-09-27), deferred and not refused; a set whose `step10_section` pool is ≥ 6 starts the build from them |
-| **the call** | ✅ **U0 · B2 · E1**, Arpit, 2026-09-27 |
-| **confidence** | medium that U0 is the right first arm; **low that step 10 clears the floor at all** — see *Headroom* |
-| **reopen-trigger** | **either** a scored U0 run shows ≥ 6 `step10_section` misses whose primary document is **outside** the re-ranked top-k (the case only a plane change can reach) — **or** `[bm25f] b` is raised back above `0.5`, which restores the long-document dilution this step exists for |
+| **status** | ⏸ **parked 2026-09-28**: the `step10_section` pool on set-4-claude is **1** at rank 1, counted from the key's tag ([pools](../regression/2026-09-27-golden-set-4-rung-01000/report.md)). By W-219's rule the step stops before any build. **U2 · B2 · E1 ruled 2026-09-29**, deferred and not refused; a set whose `step10_section` pool is ≥ 6 starts the build from them |
+| **the call** | ✅ **U2 · B2 · E1**, Arpit, 2026-09-29 (supersedes U0 · B2 · E1, 2026-09-27) |
+| **confidence** | medium that U2 reaches what U0 cannot; **low that step 10 clears the floor at all** — see *Headroom*; unmeasured on size — see *What U2 owes* |
+| **reopen-trigger** | **either** a set whose `step10_section` pool is ≥ 6 (starts the U2 build) — **or** U2's measured index growth fails SR-WORK-SCALE at `rung-10000` (U3 is the fallback plane) — **or** `[bm25f] b` is raised back above `0.5`, which changes the dilution this step exists for |
+
+## ✅ RULED 2026-09-29 — U2 replaces U0; nothing built
+
+**Why U2 over U0** (the argument the ruling took, from the Fork 1 table):
+U0 only reorders the top-k the first pass already returned. A long document
+whose query terms are diluted across unrelated sections may never enter that
+top-k, and **no re-rank rescues a document that was never a candidate**. U2
+indexes each section as its own record, so a section can be retrieved on its
+own, with its own length normalisation. That fixes both halves of the break:
+retrieval and scoring.
+
+**What U2 costs, stated so nobody builds it by surprise:**
+
+- a new record kind in every plane, so a **`_format` bump** and a **full
+  re-ingest** for every consumer ([SR-INDEX-LIFECYCLE](../../records/0108_index-lifecycle.md));
+- the Node reader transcribes it (differential law);
+- index size grows with records × sections per document, and that is **unmeasured**;
+- ⚠ **the plane change needs its own record.** This doc names the direction.
+  The format, the section id, and how `doc#section` folds back to one result
+  per document are for an SR written before the build, not decided here.
+
+**What U2 owes before any arm runs:**
+
+1. A pool ≥ 6 on a scored set. Below that the step stays stopped, as before (W-219).
+2. A size measurement on the ladder, reported against [SR-WORK-SCALE](../../records/0057_WORK-scale.md).
+3. B2 under U2: `best_section` comes from the section records in the index,
+   not from `refer`'s passages. `section_weight` still defaults to `0.0`, and a
+   U2 index at `0.0` must rank byte-identically to today.
+4. **Opus**: a plane change (W-168's model line).
+
+⚠ **U1 stays refused**, for the reason given below: a section index built from
+fetched content would make the runtime depend on something other than the
+committed index.
 
 ## Context
 
@@ -53,7 +88,7 @@ description: "W-168 step 10 starts as a compare doc (proposal §2). Three forks:
 | laws | L3 ✅ (nothing stored) · L4 ✅ · L5 ⚠ URL sources fetch | L3 ✅ statistics only · L4 ✅ the fold is deterministic | same as U2 |
 | precedent | 🔴 **exact**: [SR-RERANK](../../records/0138_rerank.md) already scores the top-20 over the refer plane's own passages (coverage, span, adjacency) | none — the index has never held a sub-document record | `alen`/`at` — per-document statistics that fold at read time (step 1) |
 
-**Recommend U0, built as a TERM inside the existing rerank stage — never a
+**Recommended on 2026-09-25 (ruled 2026-09-27, superseded 2026-09-29 by U2): U0, built as a TERM inside the existing rerank stage — never a
 second stage.** SR-RANKING allows *exactly one* post-ranking stage, and bounds
 it: it **never retrieves**, and it ships off. U0 inherits both limits for free,
 and the second one is its blind spot. ⚠ **Step 6 (SDM) is also a term in that
@@ -100,7 +135,7 @@ the pre-registration, before any arm.
 - ⚠ **The pool needs a scored baseline on the rebuilt ladder**, like every step
   before it. That score is Arpit's (`just golden-score`).
 
-## Consequences of the recommendation
+## Consequences of the 2026-09-27 recommendation (U0) — history
 
 - One new key, `[ranking] section_weight` (SR-TUNE, SR-RERANK and SR-RANKING
   amended when built). **No** `.fux/index/` change, **no** re-ingest, **no** format bump.

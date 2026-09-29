@@ -7,6 +7,16 @@ filed: 2026-09-14
 ball: agent
 ---
 
+## ✅ STEP 10 RE-RULED U2 · STEP 5 GETS ITS REOPEN DOC — 2026-09-29 (Arpit, Cowork) · ratified, NOT built
+
+- **Step 10: U2 · B2 · E1** ([`compare/section-units`](../compare/section-units.compare.md)). Arpit, on voice: *"I want to go with U1"*. That was the voice session's name for section records, and he confirmed **U2** in the doc's lettering. It supersedes U0 (2026-09-27): a query-time re-rank cannot reach a long document that never became a candidate.
+  - **Still stopped:** the pool is 1, against a floor of 6. U2 is what a qualifying set builds, and the doc lists what the plane change owes (an SR, a format bump, a size measurement, Opus).
+- **Step 5 (RM3):** [`compare/rm3-selective`](../compare/rm3-selective.compare.md), at Arpit's ask (*"selective expansion rather than every time"*), recommendation first and his ruling after.
+  - **Recommends R0, stay removed.** Post hoc on both filed runs, no band gate clears the drift clause. The best nets +4 tagged, where 7–10 were needed.
+  - Selective expansion is recorded as the only form RM3 may return in.
+  - 🔴 **Arpit rules R0 or R1.** R1 would amend SR-EXPAND d17.
+- **Unchanged:** step 8 is still the next build.
+
 ## ✅ STEPS 1 + 4 MEASURED TOGETHER — 2026-09-28 (Claude Code, Opus; a non-capturing session), W-232 PASS
 
 [Verdict](../regression/2026-09-28-anchor-mined-set3/VERDICT.md). The shipped pair `anchor = 1.0` + `mined_weight = 0.5` beats mined-off 6/0 and anchor-off 7/0 at rank 1 on `set-3-claude`, with **0 losses**. All six wins over mined-off are step 4's tagged questions, which is its own 6/0 reproduced at `anchor = 1.0`. **Both steps' *combination unmeasured* warnings below are closed.** `informed`.
