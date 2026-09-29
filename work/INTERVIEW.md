@@ -35,7 +35,13 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-28** (Claude Code, Opus — W-233 shipped; W-228 DoD 11 rung; W-168 pools).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-09-28 (latest) — W-232 PASS: THE SHIPPED ANCHOR + MINED PAIR LOSES NOTHING
+### 🟢 2026-09-29 (latest) — W-235 BUILT: A NODE QUERY IS ~3× CHEAPER, NO CONTRACT CHANGE
+
+- The Node graph plane now parses only `id` and `edges` from each record (`graphRecords`). `find`/`ask`/`answer` went ~0.50 s → ~0.15 s, output byte-identical ([run](regression/2026-09-29-node-reader-per-call/report.md), [compare](compare/node-plane-rebuild.compare.md)).
+- SR-NODE-SEARCH decision 9 is unchanged: reading Python's `graph.json` (O3) would save ~20 ms at most.
+- **Next:** W-168 step 8 build (Opus).
+
+### 🟢 2026-09-28 — W-232 PASS: THE SHIPPED ANCHOR + MINED PAIR LOSES NOTHING
 
 - [Verdict](regression/2026-09-28-anchor-mined-set3/VERDICT.md): `anchor 1.0 + mined 0.5` beats mined-off 6/0 and anchor-off 7/0 at rank 1 on `set-3-claude`, with 0 losses. `hit@1` is 54 / 48 / 47. W-168 steps 1 and 4's *combination unmeasured* warnings are closed.
 - ⚠ The frozen decider reads `am-X` and the capture wrote `am3-X`. It was run unedited through a scratch symlink mirror, which the verdict declares.

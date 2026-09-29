@@ -26,6 +26,16 @@ Rules:
 
 ---
 
+## 2026-09-29 — **W-235: the Node reader's per-call cost, ~0.50 s → ~0.15 s**
+
+| what | evidence |
+|---|---|
+| **the build** | `graphRecords()` in `node/src/store/reader.mjs` parses only `id` and `edges` per record for the graph plane; `rawRecordLines` splits with `Buffer.indexOf`. Used by `compose.mjs`, `index.mjs` and `verbs/graph.mjs` (three `allRecords` copies gone). Option 1 of [`node-plane-rebuild`](compare/node-plane-rebuild.compare.md); no contract change |
+| **the record** | [SR-NODE-SEARCH](../records/0153_node-search.md) decision 9 — unchanged, a cost note added |
+| **measured** | [`2026-09-29-node-reader-per-call`](regression/2026-09-29-node-reader-per-call/report.md): `find`/`ask`/`answer` medians 0.49–0.53 s → 0.14–0.16 s on this repo and `rung-10000`, stdout byte-identical |
+| **verified** | arm 0 of 225 discordant on both passes; N2 IDENTICAL; `node/test/graph-records.test.mjs`; both suites and `node --test` |
+| **not done** | the CI cells' speed-up is expected, not measured — the next FULL run's wall time shows it |
+
 ## 2026-09-29 — **CI rewritten: one workflow in two stages**
 
 | what | evidence |
@@ -35,7 +45,7 @@ Rules:
 | **the record** | [SR-WORK-RELEASE](../records/0063_WORK-release.md) decision 13 (new) and 11a; CI mentions in SR-LAW-8, SR-T1-ACCELERATOR, SR-NODE-SEARCH, SR-WORK-REGISTRY |
 | **measured** | FAST **102 s** wall (branch push, run 36475375289); FULL **645 s** end to end, all green (scratch branch, run 36475380160). Before: 14–15 min (run 36464764217/206) |
 | **verified** | unit 6199 passed under `-n 2`; e2e 155 passed under `-n 2`; actionlint clean |
-| **not done** | the Node reader's per-call cost (~1.2 s, `compose.allRecords`) — the real lever on FULL's time and on every Node `fux find`; filed as [W-235](open/W-235-node-reader-per-call-cost.md) |
+| **not done** | the Node reader's per-call cost (~1.2 s, `compose.allRecords`) — the real lever on FULL's time and on every Node `fux find`; filed as [W-235](../archive/open/W-235-node-reader-per-call-cost.md) |
 
 ## 2026-09-28 — **W-225 R13 built: the sixteen `for-arpit` sites, sorted as ruled**
 
@@ -53,7 +63,7 @@ Rules:
 | what | evidence |
 |---|---|
 | **the ruling** | Arpit, Cowork, 2026-09-28, F1–F5: a verb writes `[detected]`; refresh on demand with a doctor warning; templates by default and a guarded regex in `[user]` only; whole form unstemmed + parts; `[detected]` applies once written, `[user]` overrides |
-| **the research** | [fixture run](regression/2026-09-28-identifier-fixture/report.md): after v3 the break is spelling (`RF 118`, `rf118`, `ADR-4`), not scoring; [compare doc](compare/identifiers-whole.compare.md) S1–S8 |
+| **the research** | [fixture run](regression/2026-09-28-identifier-fixture/report.md): after v3 the break is spelling (`RF 118`, `rf118`, `ADR-4`), not scoring; [compare doc](../archive/compare/identifiers-whole.compare.md) S1–S8 (archived 2026-09-29) |
 | **the record** | [SR-IDENTIFIERS](../records/0160_identifiers.md), accepted; SR-RANKING, SR-INGEST, SR-INDEX-LIFECYCLE, SR-INSPECT, SR-DOCTOR, SR-SERVE, SR-CLI, SR-DOTFUX, SR-CONSTANTS and the describing records amended in the same change |
 | **the build** | `query/identifiers.py` + `node/src/query/identifiers.mjs` (one shared fixture); `analyze(text, ids)` threaded on every index-matching path, held by `tests/query/test_identifiers_threaded.py`; the digest in every shard header; `fux identifiers [--write]`; four doctor rows; `ingest --check` families drift; inspect §12; the serve Identifiers tab |
 | **the measurement** | [PASS](regression/2026-09-28-identifier-families/VERDICT.md) on the frozen table: net **+25 / +88 / +105, 0 broken**; exact 100 % both arms; 0 of 60 prose questions moved; G1–G3 hold; index +0.3 % at rung-10000 |
@@ -500,7 +510,7 @@ titles, and 16 202 word-cut passages.
 **Also 2026-09-24, and not a milestone:**
 - the [generation-2 baseline capture](regression/2026-09-24-golden-gen2-rung-01000/report.md),
   which waits on Arpit's score;
-- the W-168 step 9 [compare doc](compare/intent-doctype-prior.compare.md), which
+- the W-168 step 9 [compare doc](../archive/compare/intent-doctype-prior.compare.md) (archived 2026-09-29), which
   waits on his rulings.
 
 ---

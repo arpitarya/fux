@@ -23,22 +23,13 @@
 import { buildPlane } from "../graph/plane.mjs";
 import { TAG_PREFIX } from "../graph/model.mjs";
 import { ALL_KINDS, EDGE_KINDS, EXPANSION_BUDGET, expand, routes } from "../graph/walk.mjs";
-import { iterShardPaths, rawRecordLines } from "../store/reader.mjs";
+import { graphRecords } from "../store/reader.mjs";
 import { runQuery } from "../query/run.mjs";
 import { loadTune } from "../config/tune.mjs";
 import { FuxError } from "../errors.mjs";
 import { fixed } from "../config/constants.mjs";
 
 const JSON_INDENT = fixed("json", "indent");
-
-function allRecords(root) {
-  const out = [];
-  for (const path of iterShardPaths(root)) {
-    const [, lines] = rawRecordLines(path);
-    for (const line of lines) out.push(JSON.parse(line.toString("utf8")));
-  }
-  return out;
-}
 
 /** Accept either a doc id (`file:docs/a.md`) or the `loc` a human types.
  *  A user reads `docs/a.md` out of `find` and types it back; requiring the
@@ -84,7 +75,7 @@ function locOf(nodeId) {
 /** One document's outbound edges and its community. */
 export function runExplain(root, args) {
   if (!args._[0]) { process.stderr.write("error: explain needs a document id\n"); return 1; }
-  const records = allRecords(root);
+  const records = graphRecords(root);
   const plane = buildPlane(records);
   const docId = resolveDoc(args._[0]);
 
@@ -196,7 +187,7 @@ function seedsOf(root, args, records, plane, tune) {
 
 /** The neighbourhood around a query's best answers, or around named seeds. */
 export function runGraph(root, args) {
-  const records = allRecords(root);
+  const records = graphRecords(root);
   const plane = buildPlane(records);
   // Loaded ONCE and used twice — for the seed query and for the walk. Two loads
   // could disagree if the file changed between them, producing a neighbourhood
@@ -242,7 +233,7 @@ export function runPath(root, args) {
     process.stderr.write("error: path needs two document ids\n");
     return 1;
   }
-  const records = allRecords(root);
+  const records = graphRecords(root);
   const plane = buildPlane(records);
   const src = resolveDoc(args._[0]);
   const dst = resolveDoc(args._[1]);

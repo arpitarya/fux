@@ -1,0 +1,97 @@
+11:31  up 1 day, 22:28, 4 users, load averages: 5.90 4.14 3.36
+### fux · find · before
+total ms 478.875
+180 ('allRecords', 'compose.mjs', 86)
+112 ('rawRecordLines', 'reader.mjs', 58)
+56 ('(garbage collector)', '', 0)
+14 ('indexOfBuffer', '', 0)
+12 ('read', '', 0)
+10 ('RegExp: "al":(?<len>\\d+),"at":\\{[^}]*\\},"dst":"(?<dst>[^"]+)"', '', 0)
+### fux · find · after
+total ms 132.542
+12 ('indexOfBuffer', '', 0)
+11 ('scanCandidates', 'scan.mjs', 56)
+9 ('(garbage collector)', '', 0)
+8 ('cmpCodePoints', 'pyfloat.mjs', 100)
+8 ('open', '', 0)
+8 ('read', '', 0)
+### fux · ask · before
+total ms 465.583
+186 ('allRecords', 'compose.mjs', 86)
+103 ('rawRecordLines', 'reader.mjs', 58)
+41 ('(garbage collector)', '', 0)
+16 ('RegExp: "al":(?<len>\\d+),"at":\\{[^}]*\\},"dst":"(?<dst>[^"]+)"', '', 0)
+15 ('scanCandidates', 'scan.mjs', 56)
+13 ('slice', 'node:buffer', 650)
+### fux · ask · after
+total ms 132.958
+16 ('scanCandidates', 'scan.mjs', 56)
+11 ('RegExp: "al":(?<len>\\d+),"at":\\{[^}]*\\},"dst":"(?<dst>[^"]+)"', '', 0)
+8 ('indexOfBuffer', '', 0)
+8 ('open', '', 0)
+7 ('(garbage collector)', '', 0)
+6 ('assign', 'community.mjs', 33)
+### fux · answer · before
+total ms 466.208
+179 ('allRecords', 'compose.mjs', 86)
+107 ('rawRecordLines', 'reader.mjs', 58)
+52 ('(garbage collector)', '', 0)
+18 ('slice', 'node:buffer', 650)
+13 ('scanCandidates', 'scan.mjs', 56)
+12 ('RegExp: "al":(?<len>\\d+),"at":\\{[^}]*\\},"dst":"(?<dst>[^"]+)"', '', 0)
+### fux · answer · after
+total ms 133.042
+19 ('scanCandidates', 'scan.mjs', 56)
+11 ('RegExp: "al":(?<len>\\d+),"at":\\{[^}]*\\},"dst":"(?<dst>[^"]+)"', '', 0)
+9 ('read', '', 0)
+8 ('indexOfBuffer', '', 0)
+8 ('skimGraphFields', 'reader.mjs', 135)
+7 ('(garbage collector)', '', 0)
+### rung-10000 · find · before
+total ms 540.958
+265 ('allRecords', 'compose.mjs', 86)
+87 ('rawRecordLines', 'reader.mjs', 58)
+39 ('(garbage collector)', '', 0)
+27 ('scanCandidates', 'scan.mjs', 56)
+23 ('tableFromShards', 'mined.mjs', 43)
+22 ('read', '', 0)
+### rung-10000 · find · after
+total ms 123.292
+22 ('scanCandidates', 'scan.mjs', 56)
+14 ('open', '', 0)
+14 ('(garbage collector)', '', 0)
+6 ('(program)', '', 0)
+6 ('indexOfBuffer', '', 0)
+4 ('RegExp: "al":(?<len>\\d+),"at":\\{[^}]*\\},"dst":"(?<dst>[^"]+)"', '', 0)
+### rung-10000 · ask · before
+total ms 480.667
+252 ('allRecords', 'compose.mjs', 86)
+75 ('rawRecordLines', 'reader.mjs', 58)
+42 ('(garbage collector)', '', 0)
+26 ('scanCandidates', 'scan.mjs', 56)
+11 ('slice', 'node:buffer', 650)
+10 ('read', '', 0)
+### rung-10000 · ask · after
+total ms 122.75
+22 ('scanCandidates', 'scan.mjs', 56)
+9 ('indexOfBuffer', '', 0)
+7 ('(garbage collector)', '', 0)
+7 ('open', '', 0)
+6 ('RegExp: "al":(?<len>\\d+),"at":\\{[^}]*\\},"dst":"(?<dst>[^"]+)"', '', 0)
+6 ('(program)', '', 0)
+### rung-10000 · answer · before
+total ms 500.625
+261 ('allRecords', 'compose.mjs', 86)
+82 ('rawRecordLines', 'reader.mjs', 58)
+41 ('(garbage collector)', '', 0)
+15 ('scanCandidates', 'scan.mjs', 56)
+14 ('tableFromShards', 'mined.mjs', 43)
+13 ('open', '', 0)
+### rung-10000 · answer · after
+total ms 130.417
+17 ('scanCandidates', 'scan.mjs', 56)
+12 ('indexOfBuffer', '', 0)
+8 ('(garbage collector)', '', 0)
+7 ('RegExp: "al":(?<len>\\d+),"at":\\{[^}]*\\},"dst":"(?<dst>[^"]+)"', '', 0)
+5 ('open', '', 0)
+5 ('compileForInternalLoader', 'realm', 383)

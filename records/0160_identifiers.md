@@ -7,10 +7,10 @@ description: "A committed .fux/identifiers.toml names ID families (RF-{n}); both
 status: accepted
 date: 2026-09-28
 feature: "identifier families — `.fux/identifiers.toml`, its matcher on both readers, the lens, `fux identifiers`, the doctor rows and the serve Identifiers tab"
-owns: [.fux/identifiers.toml@b595944e4c27, node/src/query/identifiers.mjs@d9fcbed75730, node/test/identifiers.test.mjs@69bcab39922f, src/fux/identifiers_cmd.py@76f2087bb2bb, src/fux/query/identifiers.py@a1dad759d69f]
+owns: [.fux/identifiers.toml@457cfe1314bb, node/src/query/identifiers.mjs@d9fcbed75730, node/test/identifiers.test.mjs@69bcab39922f, src/fux/identifiers_cmd.py@76f2087bb2bb, src/fux/query/identifiers.py@a1dad759d69f]
 laws: [L2, L4, L10, L12]
 timestamp: 2026-09-28T00:00:00Z
-content_sha: 369a53ed4a71955ed8cdb4821d14412675afd680fc9200839e738f19ddbbe666
+content_sha: 69a530dbbbc9ec2c21d2083c05987fa22632b40544529a493e8ecf124a254c3a
 ratifies: "W-233 — Arpit, 2026-09-28 (Cowork), F1–F5: a verb writes [detected]; refresh on demand with a doctor warning; templates by default and a guarded regex in [user] only; the whole form unstemmed plus its parts; [detected] applies once written and [user] overrides it"
 ---
 
@@ -67,8 +67,9 @@ rollback.
 - **The measurement:**
   [fixture](../work/regression/2026-09-28-identifier-fixture/report.md) and
   [ANALYSIS](../work/regression/2026-09-28-identifier-fixture/ANALYSIS.md).
-- **The design and its alternatives:**
-  [compare doc](../work/compare/identifiers-whole.compare.md) S1–S8.
+- **The design and its alternatives:** `identifiers-whole.compare.md` S1–S8,
+  archived 2026-09-29 once its matrix and reopen-triggers were ported into
+  decision 12 and §Alternatives below.
 - **The forks:** Arpit's F1–F5, in
   [W-233](../archive/open/W-233-identifiers-retained-whole.md).
 - **The shared analyzer:** stated in [SR-RANKING](0111_ranking.md) decision 9.
@@ -181,13 +182,18 @@ rollback.
     - a refusal with its reason;
     - the line to paste;
     - the detected families.
-12. **Not built, each with the condition that reopens it** (compare doc
-    verdict block):
-    - a separate exact field;
-    - a sha/UUID prefix index;
-    - a global Unicode-dash fold (662 rung documents carry it only in numeric
-      ranges);
-    - a bare `2.3.1` for `v2.3.1`.
+12. **Not built, each with the condition that reopens it** (ported
+    2026-09-29 from the archived compare doc's verdict block):
+    - **a separate exact field** — reopens on a case, on any rung, where the
+      query and the document share the canonical term and a neighbour that
+      shares only the parts still ranks above the document;
+    - **a sha/UUID prefix index** — reopens on a rung or a consumer corpus with
+      ≥ 6 documents citing a 7–40-character hex id by prefix;
+    - **a global Unicode-dash fold** (662 rung documents carry the dash only in
+      numeric ranges) — reopens on a letter-prefixed ID written with a Unicode
+      dash that no detected family covers, found by the lens on a real corpus;
+    - **a bare `2.3.1` for `v2.3.1`** — reopens, as a `{ver}` placeholder that
+      canonicalizes without its `v`, if a corpus shows the need.
 
 ### Consequences
 
@@ -212,10 +218,19 @@ rollback.
 
 ### Alternatives considered
 
-The rejected mechanisms (the exact field, a global fold, the prefix index, and
-restricting the whole form to digits) and the reasons are in the
-[compare doc](../work/compare/identifiers-whole.compare.md)'s matrix. Three
-further alternatives were weighed:
+The mechanisms weighed against the six measured breaks (B1 `RF 118` / `RF–118`
+/ `RF_118`, B2 `rf118`, B3 `ADR-4` vs `ADR-0004`, B4 an ID inside a URL or path,
+B5 `2.3.1` vs `v2.3.1`, B6 a sha prefix), ported from the archived compare doc:
+
+| mechanism | fixes | why not |
+|---|---|---|
+| a separate exact field | none of B1–B6 | an exact whole-form query already ranks first (7 of 7), and stemming breaks 0 of 7 862 whole terms; a new field and a `_format` bump for nothing measured |
+| the whole form only when it has a digit | none | a cost lever (≈ −4.2 % postings at `rung-10000`), not a fix |
+| a global query-side normalizer | B1 | alone it rewrites prose (`step 4` → `step-4`), and leading zeros need a template |
+| a prefix lookup for shas / UUIDs | B6 | 0 hex documents on every rung |
+| **families + a per-family canonical form (built)** | B1–B4 | — |
+
+Three further alternatives were weighed:
 
 - **Detection inside `fux ingest`.** Refused by F2: it is deterministic, but
   one added document can re-analyse the corpus.
@@ -260,6 +275,5 @@ node --test node/test/identifiers.test.mjs
 [SR-INGEST](0106_ingest.md) · [SR-INDEX-LIFECYCLE](0108_index-lifecycle.md)
 
 **Work** — [W-233](../archive/open/W-233-identifiers-retained-whole.md) ·
-[compare](../work/compare/identifiers-whole.compare.md) ·
 [fixture](../work/regression/2026-09-28-identifier-fixture/report.md) ·
 [pre-registration](../work/regression/2026-09-28-identifier-families/PRE-REGISTRATION.md)

@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@f5d01399a292, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@4828d8b0b5f3]
+owns: [src/fux/store@f5d01399a292, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@24ad7507e350]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 750d4f1571552353c00d17ad154ca9db4b9e4848b0f02c5436d446cb0bcaf9f6
+content_sha: 1deabbf0af6a4e924180f13871938d314c6d7cdd4667cd9d644f0dfe02950985
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -566,6 +566,8 @@ the three to be merged, did not.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+**No decision here moved** (W-235, 2026-09-29). `node/src/store/reader.mjs` splits a shard with `Buffer.indexOf` and gains `graphRecords`, which parses only `id` and `edges`; what it returns is equal to a full parse. The cost note is [SR-NODE-SEARCH](0153_node-search.md) decision 9's.
 
 
 **The shard header may carry `identifiers`** — the effective identifier-family digest, written by `store.header_for` only when the repo declares families ([SR-IDENTIFIERS](0160_identifiers.md) decision 8). Absent means none, which is true of every earlier index, so `_format` does not move; both readers check `_format`, `analyzer` and `tf_fields` by name and ignore it, and ingest's reuse gate compares the whole expected header.

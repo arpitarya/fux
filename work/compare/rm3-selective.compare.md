@@ -1,13 +1,28 @@
 ---
 type: Compare
-description: "RULED R0 2026-09-29 (Arpit): RM3 stays removed. Whether RM3 comes back as SELECTIVE expansion (expand only when the first pass's band says it is safe) after SR-EXPAND decision 17 removed it. Options: stay removed, gate by band (three gates), or leave expansion to the caller's --expand. Measured post hoc on the two filed RM3 runs; no gate clears the drift bound."
+description: "RULED R1 · G3 2026-09-29 (Arpit; superseded his R0 the same day): RM3 returns expanding only on grounded first passes, filed as W-237. Whether RM3 comes back as SELECTIVE expansion (expand only when the first pass's band says it is safe) after SR-EXPAND decision 17 removed it. Options: stay removed, gate by band (three gates), or leave expansion to the caller's --expand. Measured post hoc on the two filed RM3 runs; no gate clears the drift bound."
 ---
 
 # RM3, selectively — does gated expansion reopen W-168 step 5?
 
-> **Verdict:** ✅ **RULED 2026-09-29 (Arpit, Cowork): R0, RM3 stays removed.**
-> SR-EXPAND decision 17 stands unchanged. Selective expansion is recorded as
-> the only form RM3 may return in, behind the reopen-trigger below.
+> **Verdict:** ✅ **RE-RULED 2026-09-29, 11:25 (Arpit, Cowork): R1 with gate G3 —
+> RM3 comes back, expanding ONLY when the first pass's band is `grounded`.**
+> *"If documents are with high confidence, then only we should run RM3 …
+> That's what I want."* It supersedes his R0 of 10:35 the same day, and it
+> amends [SR-EXPAND](../../records/0149_expand.md) decision 17 (*"does not come
+> back as a tunable"*). The amendment lands in the same change as the build.
+> **Filed as [W-237](../open/W-237-rm3-grounded-gate.md).** Nothing is built yet.
+>
+> ⚠ **What the evidence says about G3, stated before any run:** on `set-2-u` it
+> was the safest gate and the weakest. It lost nothing on the lexical run, and
+> it gained **+3 at most**, below the floor of 6. On `set-4-claude`, which has
+> never been scored with RM3, **20** `grounded` questions miss rank 1 with the
+> primary in the top 10. That is enough for a decidable run. **40** `grounded`
+> rank-1 hits can only be lost.
+>
+> *Superseded, 10:35:* **R0, RM3 stays removed.** SR-EXPAND decision 17 stands
+> unchanged. Selective expansion is recorded as the only form RM3 may return
+> in, behind the reopen-trigger below.
 >
 > *As proposed:* Arpit asked on
 > 2026-09-29 for this doc to record *"selective expansion rather than every
@@ -20,8 +35,8 @@ description: "RULED R0 2026-09-29 (Arpit): RM3 stays removed. Whether RM3 comes 
 
 | | |
 |---|---|
-| **status** | ✅ **ruled R0**, Arpit, 2026-09-29. Nothing built, nothing to build. [SR-EXPAND](../../records/0149_expand.md) decision 17 stands |
-| **the call** | ✅ **R0**: stay removed (Arpit, 2026-09-29). Selective expansion (gated by band) is recorded as the only reopen form |
+| **status** | ✅ **ruled R1 · G3**, Arpit, 2026-09-29 (supersedes R0, same day). Filed as W-237; not built |
+| **the call** | ✅ **R1 · G3**: RM3 behind a `grounded`-only gate, measured on `set-4-claude` against a fresh pre-registration (Arpit, 2026-09-29) |
 | **confidence** | **high** that no band gate passes on the filed evidence (the best gate still fails the drift clause). **Low** on what a fresh set would show: the split below is post hoc, `informed`, and one set |
 | **reopen-trigger** | a gate chosen **before** any score, measured on a set that has **not** been scored with RM3, clears both frozen clauses of [`2026-09-23-rm3`](../regression/2026-09-23-rm3/PRE-REGISTRATION.md): net ≥ the gain bar on the tagged pool **and** zero baseline rank-1 hits lost set-wide. ⚠ Reopening also needs Arpit to amend SR-EXPAND d17, which says RM3 *"does not come back as a tunable"* |
 

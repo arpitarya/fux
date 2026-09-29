@@ -7,6 +7,8 @@ timestamp: 2026-09-24T00:00:00Z
 filed: 2026-09-24
 ---
 
+> **ARCHIVED 2026-09-29** — built and measured PASS; the verdict and every live reopen-trigger now live in [SR-TUNE](../../records/0135_tuning.md) decision 20. Named here, never cited ([SR-WORK-ARCHIVE](../../records/0062_WORK-archive.md)).
+
 # The intent → doc-type prior — W-168 step 9
 
 **Model: Opus** — a prior that moves rank 1 on a class of question is a

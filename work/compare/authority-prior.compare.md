@@ -172,7 +172,7 @@ clause above is what tests it.
 - [SR-TUNE](../../records/0135_tuning.md) decisions 1, 13, 15, 15b: the removed priors and why
 - [SR-T1-ACCELERATOR](../../records/0110_accelerator.md) veto 5: any multiplier reaches the bound
 - [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md) R9 / T11: the authority pairs and the history
-- [intent-doctype-prior](intent-doctype-prior.compare.md): the step-9 shape this follows
+- `intent-doctype-prior.compare.md` (archived 2026-09-29; the ruling lives in [SR-TUNE](../../records/0135_tuning.md) decision 20): the step-9 shape this follows
 - Kleinberg, *Authoritative sources in a hyperlinked environment*, JACM 1999: the canonical case that
   authority is a document property distinct from topical match. Here it is read from maintenance, not links
 

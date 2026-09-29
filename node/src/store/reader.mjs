@@ -58,12 +58,12 @@ export function checkHeader(header, path) {
 export function rawRecordLines(path) {
   const buf = readFileSync(path);
   const lines = [];
+  // `indexOf`, not a JS loop over every byte: native, and on this repo's index
+  // the loop was ~120 ms of every query (W-235).
   let start = 0;
-  for (let i = 0; i < buf.length; i++) {
-    if (buf[i] === NL) {
-      if (i > start) lines.push(buf.subarray(start, i));
-      start = i + 1;
-    }
+  for (let i = buf.indexOf(NL, start); i !== -1; i = buf.indexOf(NL, start)) {
+    if (i > start) lines.push(buf.subarray(start, i));
+    start = i + 1;
   }
   if (start < buf.length) lines.push(buf.subarray(start));
   if (!lines.length) throw new IndexFormatError(`${path}: empty shard, no header line`);
@@ -86,4 +86,99 @@ export function recordFor(root, docId) {
     if (record.id === docId) return record;
   }
   return null;
+}
+
+const QUOTE = 0x22, BACKSLASH = 0x5c, COLON = 0x3a, COMMA = 0x2c;
+const LBRACE = 0x7b, RBRACE = 0x7d, LBRACK = 0x5b, RBRACK = 0x5d;
+const WANTED = new Set(["id", "edges"]);
+
+function skipWs(buf, i) {
+  while (i < buf.length && (buf[i] === 0x20 || buf[i] === 0x09 || buf[i] === 0x0a || buf[i] === 0x0d)) i++;
+  return i;
+}
+
+/** Index of the quote that closes the string opening at `i`. */
+function stringEnd(buf, i) {
+  let j = i + 1;
+  for (;;) {
+    const k = buf.indexOf(QUOTE, j);
+    if (k === -1) throw new IndexFormatError("unterminated string");
+    let slashes = 0;
+    while (buf[k - 1 - slashes] === BACKSLASH) slashes++;
+    if (slashes % 2 === 0) return k;
+    j = k + 1;
+  }
+}
+
+/** Index just past the JSON value starting at `i`. */
+function valueEnd(buf, i) {
+  let depth = 0;
+  for (; i < buf.length; i++) {
+    const c = buf[i];
+    if (c === QUOTE) {
+      i = stringEnd(buf, i);
+      if (depth === 0) return i + 1;
+    } else if (c === LBRACE || c === LBRACK) {
+      depth++;
+    } else if (c === RBRACE || c === RBRACK) {
+      if (depth === 0) return i;
+      if (--depth === 0) return i + 1;
+    } else if (depth === 0 && c === COMMA) {
+      return i;
+    }
+  }
+  return i;
+}
+
+/** `{id, edges}` from one raw record line, parsing those two values alone.
+ *  Returns `null` when the line is not the flat object this expects. */
+function skimGraphFields(line) {
+  const out = {};
+  let found = 0;
+  let i = skipWs(line, 0);
+  if (line[i] !== LBRACE) return null;
+  i = skipWs(line, i + 1);
+  while (i < line.length && line[i] !== RBRACE) {
+    if (line[i] !== QUOTE) return null;
+    const keyEnd = stringEnd(line, i);
+    const key = JSON.parse(line.toString("utf8", i, keyEnd + 1));
+    i = skipWs(line, keyEnd + 1);
+    if (line[i] !== COLON) return null;
+    const start = skipWs(line, i + 1);
+    const end = valueEnd(line, start);
+    if (WANTED.has(key)) {
+      out[key] = JSON.parse(line.toString("utf8", start, end));
+      if (++found === WANTED.size) return out;
+    }
+    i = skipWs(line, end);
+    if (line[i] === COMMA) i = skipWs(line, i + 1);
+  }
+  return "id" in out ? out : null;
+}
+
+/** Every committed record, reduced to the two fields the graph plane reads:
+ *  `id` and `edges`.
+ *
+ * 🔴 **Why not `JSON.parse` every line.** The plane needs every record, and a
+ * record is ~95 % `terms` by bytes. Materialising those maps for 13 000
+ * records, then collecting them, was ~80 % of a Node `find` on this repo
+ * (W-235). The writer sorts keys, so `edges` and `id` sit before `terms` and
+ * the skim stops there; an unsorted line is still read correctly, only slower.
+ * A line the skim does not recognise falls back to a full parse, so the result
+ * never differs from `JSON.parse` — only its cost does. */
+export function graphRecords(root) {
+  const out = [];
+  for (const path of iterShardPaths(root)) {
+    const [, lines] = rawRecordLines(path);
+    for (const line of lines) {
+      let record = null;
+      try { record = skimGraphFields(line); } catch { record = null; }
+      if (record === null) {
+        const full = JSON.parse(line.toString("utf8"));
+        record = { id: full.id, edges: full.edges };
+      }
+      out.push(record);
+    }
+  }
+  return out;
 }

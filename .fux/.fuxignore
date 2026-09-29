@@ -34,9 +34,9 @@ docs/paper/figures/src/fig-20-verbs.mmd                                         
 records/RULE-SINCE                                                                                     # not an indexed file type
 tools/vector-gate/embed_node.mjs                                                                       # not an indexed file type
 work/golden/README.md                                                                                  # excluded by !work/golden
-work/golden/golden-answers/set-2-u.jsonl                                                               # excluded by !work/golden
-work/golden/golden-answers/set-3-u.jsonl                                                               # excluded by !work/golden
-work/golden/golden-answers/set-4-u.jsonl                                                               # excluded by !work/golden
+work/golden/golden-answers/set-2-claude.jsonl                                                          # excluded by !work/golden
+work/golden/golden-answers/set-3-claude.jsonl                                                          # excluded by !work/golden
+work/golden/golden-answers/set-4-claude.jsonl                                                          # excluded by !work/golden
 work/golden/ladder/rung-00100.coverage                                                                 # excluded by !work/golden
 work/golden/ladder/rung-00100.index                                                                    # excluded by !work/golden
 work/golden/ladder/rung-00100.sha256                                                                   # excluded by !work/golden
@@ -230,6 +230,10 @@ work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/run
 work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-seed.coverage        # not an indexed file type
 work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-seed.index           # not an indexed file type
 work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-seed.sha256          # not an indexed file type
+work/regression/2026-09-28-anchor-mined-set3/evidence/doctor-fix.diff                                  # not an indexed file type
+work/regression/2026-09-28-anchor-mined/evidence/doctor-fix.diff                                       # not an indexed file type
+work/regression/2026-09-28-intent-prior/evidence/doctor-fix.diff                                       # not an indexed file type
+work/regression/2026-09-29-node-reader-per-call/evidence/equal.mjs                                     # not an indexed file type
 # <<< fux: not indexed <<<
 
 # >>> fux: skipped >>>

@@ -28,7 +28,7 @@ import { findRoot } from "./config/root.mjs";
 import { FuxError } from "./errors.mjs";
 import { runQuery, runFused } from "./query/run.mjs";
 import { headingsFor } from "./query/headings.mjs";
-import { recordFor, iterShardPaths, rawRecordLines } from "./store/reader.mjs";
+import { recordFor, graphRecords } from "./store/reader.mjs";
 import { buildPlane } from "./graph/plane.mjs";
 import { loadTune } from "./config/tune.mjs";
 import { loadOutput } from "./config/output.mjs";
@@ -223,12 +223,7 @@ class Index {
    * CLI REFUSES there while this answers (SR-NODE-SEARCH decision 9). */
   _plane() {
     if (this._planeCache === null) {
-      const records = [];
-      for (const path of iterShardPaths(this.root)) {
-        const [, lines] = rawRecordLines(path);
-        for (const line of lines) records.push(JSON.parse(line.toString("utf8")));
-      }
-      this._planeCache = buildPlane(records);
+      this._planeCache = buildPlane(graphRecords(this.root));
     }
     return this._planeCache;
   }

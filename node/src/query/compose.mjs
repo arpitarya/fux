@@ -39,17 +39,16 @@
  * `fux build` before both arms now, and a STALE plane counts as absent, which is
  * why the adversarial step rebuilds too.
  *
- * ⚠ **And it is not free.** Rebuilding the plane parses every committed record,
- * which is the work the B2 prefilter exists to avoid — so a Node `ask` with the
- * tier on pays a full parse the lexical answer alone does not. Node's latency
- * is unmeasured (W-148 row 2) and this is now one more reason it should not
- * stay that way. `ask_boost = false` and `ask_related = false` are what turn it
- * off.
+ * ⚠ **And it is not free.** Rebuilding the plane reads every committed record,
+ * which is the work the B2 prefilter exists to avoid. Until W-235 it also
+ * `JSON.parse`d every one — ~80 % of a Node `find` — and `graphRecords` now
+ * parses only `id` and `edges`. `ask_boost = false` and `ask_related = false`
+ * are what turn the read off.
  */
 
 import { buildPlane } from "../graph/plane.mjs";
 import { ppr } from "../graph/walk.mjs";
-import { iterShardPaths, rawRecordLines, recordFor } from "../store/reader.mjs";
+import { graphRecords, recordFor } from "../store/reader.mjs";
 import { displayTitle } from "../store/format.mjs";
 import { rrf } from "./fuse.mjs";
 import { queryTermHashes } from "./scan.mjs";
@@ -79,19 +78,6 @@ export class Related {
   }
 }
 
-/** Every committed record. The plane needs all of them: edges live on the
- *  documents that declare them, and a candidate set is by definition a subset
- *  that shares the query's vocabulary — which is exactly the wrong subset for
- *  finding what the vocabulary missed. */
-function allRecords(root) {
-  const out = [];
-  for (const path of iterShardPaths(root)) {
-    const [, lines] = rawRecordLines(path);
-    for (const line of lines) out.push(JSON.parse(line.toString("utf8")));
-  }
-  return out;
-}
-
 /**
  * Split the lexical window into the boosted tier and the related tier.
  *
@@ -110,7 +96,11 @@ export function tiers(root, query, ordered, top, tune, { wantRelated }) {
 
   let plane;
   try {
-    plane = buildPlane(allRecords(root));
+    // Every committed record, not the candidates: edges live on the documents
+    // that declare them, and a candidate set is by definition a subset that
+    // shares the query's vocabulary — exactly the wrong subset for finding what
+    // the vocabulary missed.
+    plane = buildPlane(graphRecords(root));
   } catch {
     return { results: ordered.slice(0, top), related: [] };
   }

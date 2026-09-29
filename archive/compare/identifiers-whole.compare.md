@@ -4,6 +4,8 @@ description: "W-233 — how an identifier is kept whole after analyzer v3. Arpit
 item: W-233
 ---
 
+> **ARCHIVED 2026-09-29** — built and measured PASS; the verdict and every live reopen-trigger now live in [SR-IDENTIFIERS](../../records/0160_identifiers.md) decision 12 and §Alternatives. Named here, never cited ([SR-WORK-ARCHIVE](../../records/0062_WORK-archive.md)).
+
 # Identifiers retained whole — W-233
 
 > **Verdict:** ✅ **BUILT and measured PASS 2026-09-28** ([verdict](../regression/2026-09-28-identifier-families/VERDICT.md); [SR-IDENTIFIERS](../../records/0160_identifiers.md)), inside Arpit's F1–F5 ruling; S1–S8 as proposed below, except S4, where the digest went into the shard header. **Build

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@232892e6641d, src/fux/query/intent.py@fa4902c6d3fe, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@63f4c4872bd7, src/fux/query/analyzer.py@8f02dd1c4e44, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@71890f0ff70a, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@1a1dd7794ab6, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@352450f33e0c, node/test/analyzer.test.mjs@2d0342e628a6]
+owns: [src/fux/query/rank.py@232892e6641d, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@63f4c4872bd7, src/fux/query/analyzer.py@8f02dd1c4e44, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@71890f0ff70a, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@1a1dd7794ab6, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@352450f33e0c, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5ee78cde411e905f8823f63ab4a6901445164b057a584060d6e5512b55a48d46
+content_sha: 0eca316cadba8608ba225519a0f6cfdcee7bc6fdf886938387f50e9af757d7f5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

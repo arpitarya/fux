@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@a295ff90aabb, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@f51c8c2f9f58, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: c04f3453a003de4e317633b84e3e2149f7622630a0ba46c885b2325e74c114cb
+content_sha: 01c891c182b4bcc35aa0cb237f8d7ed8bf4080b9da7bf0adb21aeda7cd82205b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -285,6 +285,11 @@ from the committed records and answers either way.
 exists for a clone with no Python; `.fux/runtime/` is gitignored and is written
 by `fux build`, which is Python — so requiring it would make the Node reader
 refuse precisely where it is the only reader present.
+
+**The rebuild reads two fields of each record, `id` and `edges`, and parses
+nothing else** (W-235, 2026-09-29). Parsing whole records was ~80 % of a Node
+query; the options, and why this decision did not have to move, are
+[`node-plane-rebuild`](../work/compare/node-plane-rebuild.compare.md)'s.
 
 ⚠ **It follows that `explain`, `graph` and `path` cannot be compared on a
 corpus with no fresh build**, and the harness says so out loud rather than

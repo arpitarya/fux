@@ -7,7 +7,7 @@ filed: 2026-09-14
 ball: agent
 ---
 
-## ✅ STEP 10 RE-RULED U2 · STEP 5 REOPEN DOC RULED R0 — 2026-09-29 (Arpit, Cowork) · ratified, NOT built
+## ✅ STEP 10 RE-RULED U2 → W-236 · STEP 5 RULED R1 · G3 → W-237 — 2026-09-29 (Arpit, Cowork) · ratified, NOT built
 
 - **Step 10: U2 · B2 · E1** ([`compare/section-units`](../compare/section-units.compare.md)). Arpit, on voice: *"I want to go with U1"*. That was the voice session's name for section records, and he confirmed **U2** in the doc's lettering. It supersedes U0 (2026-09-27): a query-time re-rank cannot reach a long document that never became a candidate.
   - **Still stopped:** the pool is 1, against a floor of 6. U2 is what a qualifying set builds, and the doc lists what the plane change owes (an SR, a format bump, a size measurement, Opus).
@@ -15,6 +15,8 @@ ball: agent
   - **Recommends R0, stay removed.** Post hoc on both filed runs, no band gate clears the drift clause. The best nets +4 tagged, where 7–10 were needed.
   - Selective expansion is recorded as the only form RM3 may return in.
   - ✅ **Ruled R0 the same day (Arpit):** RM3 stays removed and SR-EXPAND d17 is unchanged. Step 5 stays failed.
+- ✅ **Re-ruled 11:25 (Arpit):** R1 · G3 supersedes R0. RM3 returns, expanding only on a `grounded` first pass. **Filed as [W-237](W-237-rm3-grounded-gate.md).**
+- **Step 10 filed as [W-236](W-236-section-records.md)** (Arpit's ask): the design record and a size measurement now, then the build once a pool of 6 or more exists.
 - **Unchanged:** step 8 is still the next build.
 
 ## ✅ STEPS 1 + 4 MEASURED TOGETHER — 2026-09-28 (Claude Code, Opus; a non-capturing session), W-232 PASS
@@ -489,7 +491,7 @@ The tags come from question text and `seed/` alone
 
 ## 🔴 STEP 9 IS A COMPARE DOC — 2026-09-24 (Claude Code, Opus); three forks are Arpit's
 
-[`compare/intent-doctype-prior`](../compare/intent-doctype-prior.compare.md) —
+[`compare/intent-doctype-prior`](../../archive/compare/intent-doctype-prior.compare.md) (archived 2026-09-29) —
 the proposal's *"starts as a compare doc"*, done.
 
 - **Measured first:** 0 of 32 seed front-matters declare a type, and every seed

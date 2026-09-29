@@ -23,6 +23,37 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-09-29 — W-235: the Node reader's per-call cost, ~0.50 s → ~0.15 s  ·  Claude Code (Opus)
+- **Asked:** *"implement w-235"*.
+- **Did:**
+  - Profiled: ~70 % of a Node `find` was `JSON.parse` of every record for the graph plane, plus GC, plus a JS byte loop splitting shards. The plane reads only `id` and `edges`; `terms` is ~95 % of a record.
+  - Built option 1 of [`node-plane-rebuild`](compare/node-plane-rebuild.compare.md): `graphRecords()` skims top-level keys on raw bytes and parses only those two fields; the shard split uses `Buffer.indexOf`. The four plane builders use it. +`node/test/graph-records.test.mjs`.
+  - [Filed run](regression/2026-09-29-node-reader-per-call/report.md): `find`/`ask`/`answer` ~0.50 s → ~0.15 s on this repo and a scratch copy of `rung-10000`, stdout byte-identical; arm 0 of 225 on both passes; N2 IDENTICAL. W-235 archived.
+- **Decided:** O2 (lazy) has ~20 ms left to save; O3 isn't needed. SR-NODE-SEARCH d9 is unchanged, so nothing goes to Arpit.
+- **Found:** `rung-10000`'s `output.toml` lacks `[cli] max_headings`, so the current engine refuses it. Measured on a copy; the kept rung was not touched.
+- **Next:** unchanged. W-168 step 8 build (Opus).
+
+## 2026-09-29 — W-236 and W-237 filed; RM3 re-ruled R1 · G3  ·  Cowork (Opus)
+- **Asked:** *"create work items for RM3 and section units"*. On RM3: *"if documents are with high confidence, then only we should run RM3 … That's what I want."*
+- **Did:**
+  - **W-236** (step 10, U2). Part A is agent-closable now: a design record and a size measurement. Part B (build) waits for a `step10_section` pool of 6 or more.
+  - **W-237** (RM3 behind a `grounded`-only gate). `rm3-selective` re-ruled **R1 · G3**, superseding R0 from the same morning. Arpit was told first that R0 had nothing to build and that G3 was the weakest gate on `set-2-u` (+3).
+  - Key-free check from `set-4-claude`'s committed scores: **20** grounded questions miss rank 1 with the primary in the top 10, so the run is decidable. **40** grounded rank-1 hits are at risk.
+- **Decided / open:** SR-EXPAND d17 is amended in W-237's build change, not before (records change with the code).
+- **Next:** W-168 step 8 is still first. W-236 Part A and W-237's pre-registration are 🟢.
+
+## 2026-09-29 — compare sweep: two built forks archived, triggers ported first  ·  Cowork (Opus)
+- **Asked:** *"review all the compare docs archive the ones that are not needed anymore"*.
+- **Did:**
+  - Reviewed all seven against `archive/compare/README.md`'s rule. A doc moves only when its trigger cannot fire or lives in the owning record.
+  - **Archived `intent-doctype-prior`** (step 9 shipped at `0.1`, PASS). SR-TUNE d20 already had the verdict's trigger; the per-folder/per-document types trigger and S1 were ported.
+  - **Archived `identifiers-whole`** (W-233 PASS). The four reopen-triggers went into SR-IDENTIFIERS d12, which had pointed back at the doc, and the candidates matrix went into its §Alternatives, which had also leaned on the doc.
+  - Repointed `intent.py`'s docstring (to SR-TUNE d20), `authority-prior`, W-168 and IMPLEMENTATION. Restamped owns and content hashes (0103, 0111, 0135, 0160).
+  - Added the missing `l12-classify` row to `compare/README.md`.
+- **Kept live (5):** `authority-prior` and `section-units` (ruled, unbuilt). `rm3-selective` (R0; its post-hoc gate table is the only statement of that evidence, and archiving would make it uncitable). `l12-classify` (W-225's working table). `abstention-gates` (gates ruled, floors unmeasured).
+- **Watch:** `abstention-gates` names W-176 → W-204, and both are archived. No open item carries its unbuilt gates, so it may be orphaned. That is Arpit's call, not an archive move.
+- **Next:** unchanged. W-168 step 8 build (Opus).
+
 ## 2026-09-29 — npm publish job gets `environment: npm`, matched on npmjs.com  ·  cloud session + Chrome (Opus)
 - **Asked:** *"set it up"* — make npm releases show under GitHub Deployments.
 - **Did:**

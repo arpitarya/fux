@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@5a70322d785f, .fux/tune.toml@fbc012c8ee4f, node/src/config/tune.mjs@1fff66045a71]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 2dd4cd15638cbb1d76595b270655d7496917e2f25d167c8636296500a43bfb18
+content_sha: 4f107adcc2cb9a2ab70edc76921a94474ba6657a6953715675d4685deebb1d99
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1020,8 +1020,8 @@ may.
   costs a baseline rank-1 hit reopens step 4.
 
 **20. `[ranking] intent_weight`, default `0.1`, and `[doctype]`, empty** (W-168
-step 9, 2026-09-28; ruled D2 · I1 · M1 · S1 on 2026-09-24,
-[compare doc](../work/compare/intent-doctype-prior.compare.md); [frozen bar](../work/regression/2026-09-28-intent-prior/PRE-REGISTRATION.md)). The intent → doc-type prior.
+step 9, 2026-09-28; ruled D2 · I1 · M1 · S1 on 2026-09-24 in
+`intent-doctype-prior.compare.md`, archived 2026-09-29; [frozen bar](../work/regression/2026-09-28-intent-prior/PRE-REGISTRATION.md)). The intent → doc-type prior.
 
 - **`[doctype]` is the second open table**, beside `[priority]`: a key is a glob
   over the consumer's own paths, a value is one of `procedure`, `decision` or
@@ -1052,6 +1052,15 @@ step 9, 2026-09-28; ruled D2 · I1 · M1 · S1 on 2026-09-24,
   consumer until that consumer declares types. `informed`, one Claude-authored set.
 - **Reopen-trigger** (the verdict's): any later run in which the prior costs a
   baseline rank-1 hit reopens step 9.
+- **Reopen-trigger** (ported 2026-09-29 from the archived compare doc): a
+  corpus arrives whose types are declared **per folder or per document**. Then
+  D1 (a type per source) or D3 (a front-matter key) is re-weighed as an
+  **additional** source of type, never as a replacement for the `[doctype]`
+  table (D2).
+- **Ruled out and kept out (S1):** step 3's history/current intent is not part
+  of this prior. Supersession belongs to the query's intent, not the document
+  ([SR-RANKING](0111_ranking.md)); joining it here reopens step 3, which is
+  Arpit's call.
 
 <!-- L12-VALUES-START -->
 

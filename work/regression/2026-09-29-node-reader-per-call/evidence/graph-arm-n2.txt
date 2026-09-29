@@ -1,0 +1,7 @@
+corpus       : /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/58a15a7c-e08c-4d32-a1a8-1b483113d622/scratchpad/wt
+records      : 1857
+nodes/edges  : 1152 / 8079
+communities  : 19
+python digest: aa82d4dec25f1d3b1e72eb01546ad0fc68d077e093ff23e63c452ecf3214f4d8
+node digest  : aa82d4dec25f1d3b1e72eb01546ad0fc68d077e093ff23e63c452ecf3214f4d8
+N2           : IDENTICAL

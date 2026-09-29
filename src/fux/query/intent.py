@@ -1,7 +1,7 @@
 """W-168 step 9 — a question's intent, and the document type it prefers.
 
 Three pieces, ruled D2 · I1 · M1 on 2026-09-24
-([`compare/intent-doctype-prior`](../../../work/compare/intent-doctype-prior.compare.md)):
+([SR-TUNE](../../../records/0135_tuning.md) decision 20):
 
 - **I1, the cue lexicon** — `[intent]` in `constants.toml`. A fixed engine
   value, not a tunable: the pre-registration froze it, and a test holds it

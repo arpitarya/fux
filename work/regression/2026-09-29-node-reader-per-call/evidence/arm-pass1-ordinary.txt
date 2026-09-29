@@ -1,0 +1,6 @@
+corpus   : /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/58a15a7c-e08c-4d32-a1a8-1b483113d622/scratchpad/wt
+arm      : transcription (--no-tune)
+tune     : all defaults — the contract and transcription arms are the same run
+queries  : 29 (fixed) x tops [1, 5, 20] x 2 verbs = 174 ranking comparisons
+bundle   : 8 queries x 3 verbs through the published artefact as well as the tree
+discordant: 0 of 225
