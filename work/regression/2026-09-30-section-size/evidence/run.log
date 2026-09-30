@@ -1,0 +1,8 @@
+rung-seed: docs 68, multi 64, sections 403, +474684 B (124.1 %), largest file 41427 B, totality misses 0
+rung-00100: docs 100, multi 93, sections 550, +591397 B (118.5 %), largest file 41427 B, totality misses 0
+rung-00200: docs 200, multi 191, sections 949, +841006 B (111.8 %), largest file 41427 B, totality misses 0
+rung-00500: docs 500, multi 481, sections 2130, +1591286 B (105.0 %), largest file 42931 B, totality misses 0
+rung-01000: docs 1000, multi 963, sections 4084, +2823081 B (101.7 %), largest file 48076 B, totality misses 0
+rung-02000: docs 2000, multi 1931, sections 8017, +5285025 B (100.0 %), largest file 63583 B, totality misses 0
+rung-05000: docs 5000, multi 4831, sections 19797, +12670439 B (98.8 %), largest file 112074 B, totality misses 0
+rung-10000: docs 10000, multi 9663, sections 39417, +24971205 B (98.4 %), largest file 168451 B, totality misses 0

@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@9590375d14b3, tools/vector-gate@0023bff0cdef]
+owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@9590375d14b3, tools/vector-gate@0023bff0cdef, tools/section-size@25bfc75777a6]
 laws: [L4]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 881f688da6f6e52131109601c3a416872226c9c3d68f7c8aaa01a4216dce13c5
+content_sha: a0d5c8c11f1d6c77b098516423cd4c8363fd13732c3c7b79ac592d16c33cf4ff
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -19,6 +19,7 @@ content_sha: 881f688da6f6e52131109601c3a416872226c9c3d68f7c8aaa01a4216dce13c5
 
 - [`tests/test_regression_runs.py`](../tests/test_regression_runs.py) · file
 - [`tools/quality-controls/`](../tools/quality-controls) · dir
+- [`tools/section-size/`](../tools/section-size) · dir
 - [`tools/t2-eval/`](../tools/t2-eval) · dir
 - [`tools/vector-gate/`](../tools/vector-gate) · dir
 
@@ -847,6 +848,12 @@ result is what closes W-112.
 same both times**: a measurement outliving, or preceding, the feature record it
 belongs to. That is not a defect in the fallback — it is what a build gated on
 falsifiable predictions looks like from the ownership table's side.
+
+**20a. `tools/section-size/` is the third, and the shape is the same again.**
+W-236's size instrument projects the section plane of
+[SR-SECTIONS](0161_sections.md), a record that is `proposed` and unbuilt, so it
+cannot own anything yet. It sits here and **moves to SR-SECTIONS in the change
+that accepts it**.
 
 
 **21. Four facts about measurement that are RECORDED rather than actioned.**
