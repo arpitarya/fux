@@ -4,12 +4,12 @@ name: W-237
 description: "RM3 returns behind a grounded-only gate (Arpit, 2026-09-29, R1 · G3 in compare/rm3-selective, superseding R0): expand only when the un-expanded first pass's band is grounded. Pre-register on set-4-claude (never scored with RM3), amend SR-EXPAND d17, rebuild RM3 off at 0.0 in both readers, capture the arms; Arpit scores."
 item: W-237
 filed: 2026-09-29
-ball: agent
+ball: arpit
 ---
 
 # W-237 — RM3, only when the first pass is `grounded`
 
-**Status: filed 2026-09-29, not started.** Arpit, 2026-09-29: *"if documents
+**Status: built and captured 2026-09-30, not scored** — [pre-registration](../regression/2026-09-30-rm3-grounded/PRE-REGISTRATION.md) · [report](../regression/2026-09-30-rm3-grounded/report.md). Feedback set: the lexical window. 🔴 Arpit scores; a session that did not capture runs `evidence/decide.py`. Filed 2026-09-29. Arpit, 2026-09-29: *"if documents
 are with high confidence, then only we should run RM3 … That's what I want."*
 It supersedes his R0 of the same morning.
 Ruling and evidence: [`compare/rm3-selective`](../compare/rm3-selective.compare.md) (R1 · G3).

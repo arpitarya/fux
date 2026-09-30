@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@89166e7718bc]
+owns: [src/fux/query/provenance.py@4383bade1816]
 laws: [L2, L4, L5, L9]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 1efc74ee38f40dd624679294fc85cb4bed4c88071a7e5fcd7f3153af1bb49830
+content_sha: f0459512627cdbec470aa679aadf16017f689c8a5fbed9b4d1679c282f997221
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -501,6 +501,15 @@ documents' edges, so it is not on the committed record this pass re-reads. With
 it on, the identity loses the anchor share. **Named, not hidden**, and the fix
 when somebody needs it is to hand the fold through the same seam rather than to
 recompute it here.
+
+**The block names RM3's gate when it FIRED** (W-237, 2026-09-30;
+[SR-EXPAND](0149_expand.md) decision 17). `rm3` is `{gate, weight, terms}`: the
+first pass's band that opened it (`grounded`, the only value), `rm3_weight`, and
+how many feedback hashes were stacked; the text form prints one `[why] rm3:`
+line on stderr. **Absent when it did not fire** — off, a caller's `--expand`, or
+any other band — so a block at `rm3_weight = 0.0` is byte-identical to one
+written before RM3 returned. The per-document rows describe the **second**
+pass, which is the answer. The untuned comparison runs at the template's `0.0`.
 
 ⚠ **The intent prior is a factor on the right when it ran** (W-168 step 9,
 2026-09-28; [SR-RANKING](0111_ranking.md) decision 13). `intent_factor` is `1 +

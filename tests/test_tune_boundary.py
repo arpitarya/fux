@@ -63,6 +63,9 @@ MUTATIONS: dict[str, dict[str, str]] = {
         "expand_weight": "0.75",
         # W-168 step 4: off by default, and nothing ingest does reads it.
         "mined_weight": "0.3",
+        # W-237. Read only at query time, after a first pass over the committed
+        # index, so it cannot move a committed byte either.
+        "rm3_weight": "0.3",
         "intent_weight": "0.3",
     },
     "graph": {

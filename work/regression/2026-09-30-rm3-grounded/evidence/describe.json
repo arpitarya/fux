@@ -1,0 +1,137 @@
+{
+ "rg-0.0": {
+  "answer_citations_changed_vs_baseline": 0,
+  "ask_ms_median": {
+   "tagged": 253.4,
+   "untagged": 265.5
+  },
+  "bands": {
+   "grounded": 69,
+   "partial": 24,
+   "weak": 32
+  },
+  "engine_commits": [
+   "ee00d0cd+82f0014c"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 0,
+  "n": 125,
+  "order_changed_vs_baseline": {
+   "all": 0,
+   "tagged": 0
+  },
+  "top1_changed_vs_baseline": {
+   "all": 0,
+   "tagged": 0
+  },
+  "untagged_moved": []
+ },
+ "rg-0.1": {
+  "answer_citations_changed_vs_baseline": 20,
+  "ask_ms_median": {
+   "tagged": 286.8,
+   "untagged": 227.3
+  },
+  "bands": {
+   "grounded": 63,
+   "partial": 24,
+   "weak": 38
+  },
+  "engine_commits": [
+   "ee00d0cd+82f0014c"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 41,
+  "n": 125,
+  "order_changed_vs_baseline": {
+   "all": 65,
+   "tagged": 65
+  },
+  "top1_changed_vs_baseline": {
+   "all": 0,
+   "tagged": 0
+  },
+  "untagged_moved": []
+ },
+ "rg-0.2": {
+  "answer_citations_changed_vs_baseline": 26,
+  "ask_ms_median": {
+   "tagged": 231.6,
+   "untagged": 183.7
+  },
+  "bands": {
+   "grounded": 57,
+   "partial": 24,
+   "weak": 44
+  },
+  "engine_commits": [
+   "ee00d0cd+82f0014c"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 48,
+  "n": 125,
+  "order_changed_vs_baseline": {
+   "all": 67,
+   "tagged": 67
+  },
+  "top1_changed_vs_baseline": {
+   "all": 2,
+   "tagged": 2
+  },
+  "untagged_moved": []
+ },
+ "rg-0.3": {
+  "answer_citations_changed_vs_baseline": 33,
+  "ask_ms_median": {
+   "tagged": 232.0,
+   "untagged": 186.8
+  },
+  "bands": {
+   "grounded": 51,
+   "partial": 24,
+   "weak": 50
+  },
+  "engine_commits": [
+   "ee00d0cd+82f0014c"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 57,
+  "n": 125,
+  "order_changed_vs_baseline": {
+   "all": 68,
+   "tagged": 68
+  },
+  "top1_changed_vs_baseline": {
+   "all": 6,
+   "tagged": 6
+  },
+  "untagged_moved": []
+ },
+ "rg-0.5": {
+  "answer_citations_changed_vs_baseline": 42,
+  "ask_ms_median": {
+   "tagged": 226.8,
+   "untagged": 183.6
+  },
+  "bands": {
+   "grounded": 45,
+   "partial": 24,
+   "weak": 56
+  },
+  "engine_commits": [
+   "ee00d0cd+82f0014c"
+  ],
+  "gates_captured": 125,
+  "membership_changed_vs_baseline": 63,
+  "n": 125,
+  "order_changed_vs_baseline": {
+   "all": 68,
+   "tagged": 68
+  },
+  "top1_changed_vs_baseline": {
+   "all": 13,
+   "tagged": 13
+  },
+  "untagged_moved": []
+ }
+}

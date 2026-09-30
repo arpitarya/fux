@@ -1067,7 +1067,8 @@ flowchart LR
   golden questions, which are Codex's to write.
 - 🟢 **W-168 — ten search improvements, one program.** Anchor text as a field;
   corpus-mined expansion; an unstemmed identifier field; RM3 pseudo-relevance
-  feedback (built, failed twice on drift, removed 2026-09-27); supersession-aware ranking; SDM passage proximity; community
+  feedback (built, failed twice on drift, removed 2026-09-27; back 2026-09-30
+  behind a `grounded`-only gate, off, W-237); supersession-aware ranking; SDM passage proximity; community
   diversification (MMR); a git authority prior; an intent → document-type
   prior; section-level units. Each step is its own golden question →
   pre-registration → build → measure → keep/remove; never two in one arm.

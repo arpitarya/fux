@@ -133,6 +133,7 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "rerank_adjacency",
         "expand_weight",
         "mined_weight",
+        "rm3_weight",
         "intent_weight",
     ),
     "graph": (
@@ -225,15 +226,6 @@ _REMOVED_KEYS: dict[tuple[str, str], str] = {
         "the graph edge, `fux explain`, and the declared tie-break that puts a live "
         "document above a retired one at an equal score. " + _PRIORS_REMOVED
     ),
-    ("ranking", "rm3_weight"): (
-        "was REMOVED on 2026-09-27 (W-224). RM3 -- ten feedback terms borrowed "
-        "from fux's own top ten -- FAILED its pre-registered run twice, on drift: "
-        "every weight lost 6 to 13 questions that were right at rank 1 "
-        "(work/regression/2026-09-23-rm3/VERDICT.md, "
-        "work/regression/2026-09-25-rm3-boosted/VERDICT.md). Delete the key; "
-        "ranking is unchanged, because it shipped at 0.0 (off). Supplying the "
-        "words yourself is untouched: `--expand`, weighted by `expand_weight`."
-    ),
 }
 
 
@@ -275,6 +267,10 @@ class Tune:
     #: `expand_weight`, because a sweep of `expand_weight` would move every
     #: caller's `--expand` too.
     mined_weight: float
+    #: W-237 — RM3's ten borrowed terms, stacked at this weight **only when the
+    #: first pass's band is `grounded`**. `0.0` runs no first pass
+    #: ([SR-EXPAND](../../records/0149_expand.md) decision 17).
+    rm3_weight: float
     #: W-168 step 9 — the intent → doc-type prior. A document whose `[doctype]`
     #: type is the one the question's cue prefers is scaled by
     #: `1 + intent_weight`. ⚠ **Inert without a `[doctype]` table**, whatever
@@ -658,6 +654,7 @@ def _resolve(data: dict, label: "Path | str") -> Tune:
         "rerank_adjacency": read("ranking", "rerank_adjacency", _fraction),
         "expand_weight": read("ranking", "expand_weight", _non_negative),
         "mined_weight": read("ranking", "mined_weight", _non_negative),
+        "rm3_weight": read("ranking", "rm3_weight", _non_negative),
         "intent_weight": read("ranking", "intent_weight", _non_negative),
         "damping": read("graph", "damping", _fraction),
         "iterations": read("graph", "iterations", _whole),

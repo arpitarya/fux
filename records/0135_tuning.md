@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-24
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@5a70322d785f, .fux/tune.toml@fbc012c8ee4f, node/src/config/tune.mjs@1fff66045a71]
+owns: [src/fux/tune.py@c6f102d1a813, .fux/tune.toml@8bf8597cf48c, node/src/config/tune.mjs@2404b6b39708]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 4f107adcc2cb9a2ab70edc76921a94474ba6657a6953715675d4685deebb1d99
+content_sha: 9ad5786b1b7a1712ed21102540c1d6553801bf357f61f3a112796cd1903ff449
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -758,6 +758,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + ranking.rerank_adjacency
 + ranking.expand_weight
 + ranking.mined_weight
++ ranking.rm3_weight
 + ranking.intent_weight
 + graph.damping
 + graph.iterations
@@ -973,13 +974,27 @@ table `_readme()` writes, which gained `fux serve`
 file**, and saying so is the point of the freshness gate — the prompt is *re-read
 the record*, and the honest outcome of re-reading it can be *nothing moved*.
 
-**18. ~~`[ranking] rm3_weight`~~ — REMOVED 2026-09-27** (W-224;
-[SR-EXPAND](0149_expand.md) decision 17). RM3 failed its pre-registered run
-twice, on drift, and the key left the schema. **It arrived in `_REMOVED_KEYS`
-and its Node twin in the same change**, as decision 15 requires: `fux setup`
-wrote it into every `.fux/tune.toml` from 3.0.0-alpha.3 on, so a file that still
-sets it is refused with an error that names the removal, never a bare *"unknown
-key"*. Ranking is unchanged, because it shipped at `0.0` and `0.0` ran nothing.
+**18. `[ranking] rm3_weight`, default `0.0` — RM3 behind a `grounded`-only
+gate** (W-237, 2026-09-30; [SR-EXPAND](0149_expand.md) decision 17). The weight
+of the ten feedback terms RM3 stacks onto a query, **only when the un-expanded
+first pass's band is `grounded`**.
+
+- **No longer refused by name.** Ungated RM3 failed twice on drift and the key
+  was removed on 2026-09-27 (W-224) with a refusal in `_REMOVED_KEYS`. Arpit
+  ruled the gated form on 2026-09-29, so the key left `_REMOVED_KEYS` and its
+  Node twin and re-entered the schema **in the same change**, as decision 15
+  requires of the reverse move.
+- **`0.0` is off, and off runs no first pass**: `run_query` reads no band and no
+  record, so the default is byte-identical to the engine without RM3.
+- **Unmeasured.** Its frozen bar is
+  [`2026-09-30-rm3-grounded`](../work/regression/2026-09-30-rm3-grounded/PRE-REGISTRATION.md);
+  only a PASS there may move the default, and a FAIL removes the key again.
+- **Inside decision 1's boundary.** Read at query time; no committed byte moves.
+- **`fux lexical` forces it to `0.0`**, in both readers, and a caller's
+  `--expand` suppresses it. The feedback counts are fixed values
+  (`constants.toml [rm3]`), not keys.
+- ⚠ **A `tune.toml` written before 2026-09-30 lacks the key** and stops with the
+  usual missing-key error; `fux doctor --fix` writes `rm3_weight = 0.0`.
 
 **19. `[ranking] mined_weight`, default `0.5`** (W-168 step 4, 2026-09-27;
 defaulted on the same day — decision 19a; [SR-EXPAND](0149_expand.md) decision 18) — the weight of a spelling the CORPUS

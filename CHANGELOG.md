@@ -8,6 +8,14 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **`[ranking] rm3_weight` is accepted again** (default `0.0`, off): RM3
+  pseudo-relevance feedback runs only when the un-expanded first pass's band is
+  `grounded` (W-237), in both readers. Unmeasured until scored. A `tune.toml`
+  without the key stops with the missing-key error; `fux doctor --fix` adds
+  `rm3_weight = 0.0`.
+
 ## [3.0.0-alpha.9] - 2026-09-30
 
 **`fux ingest` is ~7× faster at 10 000 documents; the index is byte-identical.**

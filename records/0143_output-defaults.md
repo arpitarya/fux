@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@dbd9fda25aa9, src/fux/templates/output.toml.txt@ee3226cd6dcd, .fux/output.toml@38f72dd71a22, node/src/config/output.mjs@ae4f709222ac]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: d17ef927ecf1ddd9febe7217f2a561952ba532683e54656086808fae2d676373
+content_sha: 5586826b195d2d3d10c24c2bf6d5243d24e296bb8bc865f9f404a8ec745f77b0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -824,6 +824,11 @@ anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
 
 ### Consequences
 
+- ⚠ **W-237 (2026-09-30) put RM3's gated first pass back in `run_query`**
+  ([SR-EXPAND](0149_expand.md) decision 17). When the gate fires, the graph
+  tier's note is printed by the first pass only (`_compose(quiet=True)` on the
+  second), so it still appears once per query. **This record's decisions are
+  unaffected.**
 - ⚠ **W-224 (2026-09-27) moved a component this record describes, and changed
   nothing it decides.** `run_query` lost RM3's first pass
   ([SR-EXPAND](0149_expand.md) decision 17); the tier note is printed once per
