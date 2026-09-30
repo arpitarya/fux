@@ -23,7 +23,7 @@ import { fileURLToPath } from "node:url";
 import { createInterface } from "node:readline";
 import { runQuery } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";
-import { iterShardPaths, rawRecordLines } from "../store/reader.mjs";
+import { Shards, shardsFor } from "../store/reader.mjs";
 import { contentSha } from "../store/format.mjs";
 import { cmpCodePoints, pyRound } from "../compat/pyfloat.mjs";
 import { loadOutput } from "../config/output.mjs";
@@ -90,10 +90,11 @@ const ok = (id, result) => ({ jsonrpc: JSONRPC, id, result });
 const err = (id, code, message) => ({ jsonrpc: JSONRPC, id, error: { code, message } });
 
 /** Every committed record, keyed by id — `store.read_index`'s shape. */
-function recordsById(root) {
+function recordsById(root, shards = null) {
   const out = new Map();
-  for (const path of iterShardPaths(root)) {
-    const [, lines] = rawRecordLines(path);
+  const set = shardsFor(root, shards);
+  for (const path of set.paths()) {
+    const lines = set.lines(path);
     for (const line of lines) {
       const record = JSON.parse(line.toString("utf8"));
       out.set(record.id, record);
@@ -130,10 +131,13 @@ function fuxSearch(root, args, top, maxHeadings) {
   // tier was built for: it cannot run `fux graph` as a follow-up the way a
   // person can, and `next` has been telling it to call `fux_related` for
   // neighbours since the tool existed.
+  // W-242 Tier 0 — ONE tool call's read of each shard, never kept past it:
+  // this server is long-lived, and `ingest` rewrites the index under it.
+  const shards = new Shards(root);
   const { results, related, confidence } = runQuery(root, query, k, {
-    useTune: true, wantConfidence: true, compose: true, expand,
+    useTune: true, wantConfidence: true, compose: true, expand, shards,
   });
-  const records = results.length ? recordsById(root) : new Map();
+  const records = results.length ? recordsById(root, shards) : new Map();
   const out = results.map((r) => {
     const record = records.get(r.id) ?? {};
     return {

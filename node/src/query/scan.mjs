@@ -9,7 +9,7 @@
  * against; the prior went (W-152) and the regex with it. A candidate's own
  * `mtime` comes off the parsed record, like every other per-document fact.)
  */
-import { rawRecordLines, iterShardPaths, recordFor } from "../store/reader.mjs";
+import { recordFor, shardsFor } from "../store/reader.mjs";
 import { termHash, TF_FIELDS } from "../store/format.mjs";
 import { deriveWlen } from "./bm25f.mjs";
 import { Corpus, rank } from "./rank.mjs";
@@ -53,7 +53,10 @@ export function queryTermHashes(query, ids = EMPTY) {
 }
 
 /** The B2 pass: candidate records, `df`, and the corpus statistics. */
-export function scanCandidates(root, queryHashes, { scoring }) {
+export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
+  // W-242 Tier 0: the call's shard set, so this pass, the graph plane and the
+  // mined table read each shard once between them.
+  const set = shardsFor(root, shards);
   const patterns = queryHashes.map((h) => Buffer.from(`"${h}"`, "ascii"));
   // W-168 step 1. Nothing below costs anything when the field is off, which
   // is the default: the three `anchorOn` branches are not taken and this
@@ -74,8 +77,8 @@ export function scanCandidates(root, queryHashes, { scoring }) {
   for (const h of queryHashes) df[h] = 0;
   const candidates = [];
 
-  for (const path of iterShardPaths(root)) {
-    const [, lines] = rawRecordLines(path);
+  for (const path of set.paths()) {
+    const lines = set.lines(path);
     for (const line of lines) {
       totalDocs++;
       // latin1 keeps this a byte view: the regexes are ASCII-only and this
@@ -136,7 +139,7 @@ export function scanCandidates(root, queryHashes, { scoring }) {
     const seen = new Set(candidates.map((r) => r.id));
     for (const docId of [...anchorTf.keys()].sort()) {
       if (seen.has(docId)) continue;
-      const record = recordFor(root, docId);
+      const record = recordFor(root, docId, set);
       // ⚠ `df` is deliberately NOT counted here: a document whose own `terms`
       // carry the hash was already counted above, and one that does not carry
       // it must not be — anchor terms are in no committed posting, so they are
@@ -158,7 +161,7 @@ export function scanCandidates(root, queryHashes, { scoring }) {
 
 /** The reference path. */
 export function ask(root, query, top, opts) {
-  const { weighting = null, scoring, statsOut = null, expansion = null } = opts;
+  const { weighting = null, scoring, statsOut = null, expansion = null, shards = null } = opts;
   const queryHashes = queryTermHashes(query, identifiersFor(root));
   if (!queryHashes.length) {
     // A query that tokenizes to nothing still owes the caller its corpus
@@ -170,7 +173,7 @@ export function ask(root, query, top, opts) {
     return [];
   }
   const collect = expansion ? expansion.hashes : queryHashes;
-  const [candidates, df, corpus] = scanCandidates(root, collect, { scoring });
+  const [candidates, df, corpus] = scanCandidates(root, collect, { scoring, shards });
   if (statsOut !== null) { statsOut.df = df; statsOut.n = corpus.n; }
   return rank(candidates, collect, df, corpus, top, { weighting, scoring, statsOut, expansion });
 }

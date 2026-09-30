@@ -14,7 +14,7 @@
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { tokenize } from "./query/tokenize.mjs";
-import { iterShardPaths, rawRecordLines } from "./store/reader.mjs";
+import { shardsFor } from "./store/reader.mjs";
 import { fixed } from "./config/constants.mjs";
 
 export const CORRECTIONS_FILE = fixed("files", "corrections");
@@ -62,12 +62,12 @@ export function loadCorrections(root) {
  * silently and says nothing, exactly as Python's query path does.
  *
  * Twin of `correct.py::pinned_for`. */
-export function pinnedFor(root, query, records = null) {
+export function pinnedFor(root, query, records = null, shards = null) {
   const pins = loadCorrections(root).filter((c) => c.pin);
   if (!pins.length) return null;
   const wanted = normalise(query);
   if (!wanted) return null;
-  const byId = records ?? recordsById(root);
+  const byId = records ?? recordsById(root, shards);
   for (const correction of pins) {
     if (normalise(correction.question) !== wanted) continue;
     const record = byId.get(correction.docId);
@@ -79,11 +79,12 @@ export function pinnedFor(root, query, records = null) {
 }
 
 /** Every committed record, keyed by id. Read only when a pin might apply. */
-function recordsById(root) {
+function recordsById(root, shards = null) {
   const out = new Map();
   try {
-    for (const path of iterShardPaths(root)) {
-      const [, lines] = rawRecordLines(path);
+    const set = shardsFor(root, shards);
+    for (const path of set.paths()) {
+      const lines = set.lines(path);
       for (const line of lines) {
         const record = JSON.parse(line.toString("utf8"));
         out.set(record.id, record);
@@ -102,10 +103,10 @@ function recordsById(root) {
  * is INSERTED with `score: 0` — the honest number, because the ranking never
  * scored it — and the list is re-truncated. Twin of
  * `query/__init__.py::_apply_pin`. */
-export function applyPin(root, query, results, top) {
+export function applyPin(root, query, results, top, shards = null) {
   let docId;
   try {
-    docId = pinnedFor(root, query);
+    docId = pinnedFor(root, query, null, shards);
   } catch {
     return results;
   }
@@ -113,7 +114,7 @@ export function applyPin(root, query, results, top) {
   const kept = results.filter((r) => r.id !== docId);
   let found = results.find((r) => r.id === docId);
   if (found === undefined) {
-    const record = recordsById(root).get(docId);
+    const record = recordsById(root, shards).get(docId);
     if (record === undefined) return results;
     found = {
       id: docId,

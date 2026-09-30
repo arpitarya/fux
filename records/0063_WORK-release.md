@@ -10,7 +10,7 @@ feature: how a release reaches two registries, how the version stays equal acros
 owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 13b8e078dadca3b611ccab8849c0ed9bebd4bf166f207982622ca2cfd20fc819
+content_sha: c4712b25dd4ff11d056fb1d3b7b61cd651df2c7f0466720b0d9fda66e21b4039
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,8 +18,8 @@ content_sha: 13b8e078dadca3b611ccab8849c0ed9bebd4bf166f207982622ca2cfd20fc819
 **Owns** — the components this record decides:
 
 - [`scripts/check-version-parity.py`](../scripts/check-version-parity.py) · file
-- `scripts/ci-key.py` · file
-- `tests/test_ci_key.py` · file
+- [`scripts/ci-key.py`](../scripts/ci-key.py) · file
+- [`tests/test_ci_key.py`](../tests/test_ci_key.py) · file
 - [`tests/test_version_parity.py`](../tests/test_version_parity.py) · file
 
 **Describes** — reaches into, does not own:

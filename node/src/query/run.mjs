@@ -39,7 +39,7 @@ import { applyPin } from "../correct.mjs";
 import { loadTune } from "../config/tune.mjs";
 import { archivedDirSet } from "../ingest/gitdir.mjs";
 import { tiers } from "./compose.mjs";
-import { recordFor } from "../store/reader.mjs";
+import { recordFor, shardsFor } from "../store/reader.mjs";
 import { idf } from "./bm25f.mjs";
 import { intentOf, typeOfIntent } from "./intent.mjs";
 import { FB_DOCS, feedbackTerms } from "./rm3.mjs";
@@ -121,12 +121,12 @@ function buildConfidence(query, stats, results, tune, ids) {
  * would let three stopwords outrank one rare term and reverse the guard on
  * exactly the queries it matters for. **Never throws.**
  */
-function bandGuard(root, query, statsOut, results) {
+function bandGuard(root, query, statsOut, results, shards) {
   if (!results.length || !results[0].boosted) return;
   try {
     const lexical = statsOut.top_doc_hashes;
     if (lexical === null || lexical === undefined) return;
-    const record = recordFor(root, results[0].id);
+    const record = recordFor(root, results[0].id, shards);
     if (record === null || record === undefined) return;
     const terms = record.terms ?? {};
     const shown = queryTermHashes(query, identifiersFor(root)).filter((h) => h in terms);
@@ -148,16 +148,22 @@ function withTier(tune, overrides) {
  *
  * `useTune=false` is `--no-tune`: `.fux/tune.toml` is not read at all, so the
  * answer is the engine's own (SR-TUNE decision 11). A caller that has already
- * loaded a `Tune` passes it as `tune` rather than paying for a second parse. */
+ * loaded a `Tune` passes it as `tune` rather than paying for a second parse.
+ *
+ * `shards` is the caller's `Shards` (W-242 Tier 0): the scan, the mined table,
+ * the pin, the graph tier and the band guard all read it, so a query opens each
+ * committed shard once. A caller that brings none gets one for this call only;
+ * a verb brings its own so its display reads (`headings`) share it too. */
 export function runQuery(root, query, top, {
   tune = null, useTune, expand = "", wantConfidence,
-  compose, related: wantRelated,
+  compose, related: wantRelated, shards = null,
 }) {
   // Required, and a JS destructure cannot say so: a missing `compose` would read
   // as `fux lexical` and silently drop the graph tier (W-225 stage 6, L12 R8).
   for (const [name, value] of [["useTune", useTune], ["wantConfidence", wantConfidence], ["compose", compose]]) {
     if (value !== true && value !== false) throw new FuxError(`runQuery: \`${name}\` is required (true or false)`);
   }
+  const set = shardsFor(root, shards);
   let resolved = tune ?? loadTune(root, { enabled: useTune });
   // 🔴 **The freeze, enforced on the one line where it could be lost.**
   // `compose: false` is `fux lexical`, which has no graph tier by definition;
@@ -209,7 +215,7 @@ export function runQuery(root, query, top, {
   // the caller's weight. Twin of `run_query`'s block.
   if (resolved.minedWeight > 0 && queryHashes.length) {
     expansion = expandMod.stack(
-      expansion, minedFold(tableFromShards(root), queryHashes), resolved.minedWeight,
+      expansion, minedFold(tableFromShards(root, set), queryHashes), resolved.minedWeight,
     );
   }
 
@@ -218,7 +224,7 @@ export function runQuery(root, query, top, {
   // gate fires.
   const onePass = (exp) => {
     const statsOut = {};
-    const window = scanAsk(root, query, depth, { weighting, scoring, statsOut, expansion: exp });
+    const window = scanAsk(root, query, depth, { weighting, scoring, statsOut, expansion: exp, shards: set });
     // W-162. **After the reranker, and the confidence block is built from the
     // PINNED list** — the band describes the answer the reader was shown, so a
     // pinned #1 the corpus barely supports must still say `weak`.
@@ -233,7 +239,7 @@ export function runQuery(root, query, top, {
     // signal. Letting the walk re-order a pinned document off the top would mean
     // a person's explicit intervention could be overruled, silently, by a link
     // somebody else drew.
-    const ordered = applyPin(root, query, maybeRerank(root, query, window, resolved, depth), depth);
+    const ordered = applyPin(root, query, maybeRerank(root, query, window, resolved, depth), depth, set);
     // 🔴 **`find` shares Tier A and never computes Tier B.** `find` is `ask`'s
     // terse sibling — both are *ranked documents* — so a boost that moved one and
     // not the other would make the two verbs rank the same corpus differently,
@@ -242,9 +248,9 @@ export function runQuery(root, query, top, {
     // optimisation on this reader: `related` costs a `recordFor` per candidate on
     // top of a plane rebuild that already parses every committed record.
     const split = graphOn
-      ? tiers(root, query, ordered, top, resolved, { wantRelated: wantRelated !== false }) // undefined: the tune decides
+      ? tiers(root, query, ordered, top, resolved, { wantRelated: wantRelated !== false, shards: set }) // undefined: the tune decides
       : { results: ordered.slice(0, top), related: [] };
-    bandGuard(root, query, statsOut, split.results);
+    bandGuard(root, query, statsOut, split.results, set);
     return { statsOut, window, split };
   };
 
@@ -259,10 +265,10 @@ export function runQuery(root, query, top, {
     confidence = buildConfidence(query, pass.statsOut, pass.split.results, resolved, ids);
     if (confidence !== null && confidence.band === "grounded") {
       const feedback = depth < FB_DOCS
-        ? scanAsk(root, query, FB_DOCS, { weighting, scoring, expansion })
+        ? scanAsk(root, query, FB_DOCS, { weighting, scoring, expansion, shards: set })
         : pass.window;
       const fed = expandMod.stack(
-        expansion, feedbackTerms(root, feedback, [...expansion.required], scoring), resolved.rm3Weight,
+        expansion, feedbackTerms(root, feedback, [...expansion.required], scoring, set), resolved.rm3Weight,
       );
       if (fed !== expansion) {
         rm3 = { gate: confidence.band, weight: resolved.rm3Weight, terms: fed.hashes.length - expansion.hashes.length };
@@ -307,6 +313,9 @@ export function runFused(root, queries, top, opts = {}) {
   // positional query first and present whatever it is, which is what lets the
   // confidence block name one query rather than a set.
   const unique = [...new Set(queries)];
+  // W-242 Tier 0: every arm reads the same shards — a second phrasing is a
+  // second query over the same index, not a second read of it.
+  opts = { ...opts, shards: shardsFor(root, opts.shards ?? null) };
   const first = runQuery(root, unique[0] ?? "", top, opts);
   if (unique.length <= 1) return { ...first, fused: false };
 

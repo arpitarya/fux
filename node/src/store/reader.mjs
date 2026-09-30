@@ -8,11 +8,17 @@
  *
  * Owned, with its Python twin, by [SR-INDEX-LIFECYCLE](../../../records/0108_index-lifecycle.md).
  */
-import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { INDEX_DIR, SCHEMA_ID, ANALYZER_VERSION, TF_FIELDS, shardFor } from "./format.mjs";
 
 const NL = "\n".charCodeAt(0);
+
+//: The whole shard-name grammar, suffix included — `reader.py::_SHARD_NAME_RE`.
+//: ⚠ Was `endsWith(".jsonl")` until W-242: a stray `notes.jsonl` beside the
+//: shards was scanned here and not by Python, and the derived plane's stamp
+//: counts shards, so the two runtimes must agree on WHICH files are shards.
+const SHARD_NAME_RE = /^[0-9a-f]{2}\.jsonl$/;
 
 export function indexDir(root) { return join(root, INDEX_DIR); }
 
@@ -20,7 +26,57 @@ export function indexDir(root) { return join(root, INDEX_DIR); }
 export function iterShardPaths(root) {
   const dir = indexDir(root);
   if (!existsSync(dir)) return [];
-  return readdirSync(dir).filter((f) => f.endsWith(".jsonl")).sort().map((f) => join(dir, f));
+  return readdirSync(dir)
+    .filter((f) => SHARD_NAME_RE.test(f) && statSync(join(dir, f)).isFile())
+    .sort()
+    .map((f) => join(dir, f));
+}
+
+/** The committed shards, each read AT MOST ONCE, for the life of ONE call.
+ *
+ * 🔴 **W-242 Tier 0.** A Node query read every shard three times — the scan,
+ * `graphRecords` and `tableFromShards` each opened all of them, and every
+ * `recordFor` opened one more (769 opens for 257 shards on this repo). One of
+ * these is made where a call starts — a verb, a library method, one MCP tool
+ * call — and handed down, so every consumer reads the same Buffers.
+ *
+ * ⚠ **Never module-level, and never outliving the call that made it.**
+ * `fux mcp` is long-lived and `ingest` rewrites the index under it; a set kept
+ * across calls would answer from an index that no longer exists. This is one
+ * call reading its input once, not a cache in SR-CACHE's sense. Lines stay raw
+ * Buffers (see the header above), and `recordFor` re-parses on every call, so
+ * no caller can mutate a record another caller holds.
+ *
+ * Node-only: `reader.py` has no twin because Python's graph lane reads
+ * `graph.json` and its mined table has one reader per path, so it never had
+ * the three-pass shape this removes (SR-NODE-SEARCH decision 24). */
+export class Shards {
+  constructor(root) {
+    this.root = root;
+    this._paths = null;
+    this._lines = new Map();
+  }
+
+  /** `iterShardPaths(root)`, listed once. */
+  paths() {
+    if (this._paths === null) this._paths = iterShardPaths(this.root);
+    return this._paths;
+  }
+
+  /** `rawRecordLines(path)[1]`, read once per path. */
+  lines(path) {
+    let entry = this._lines.get(path);
+    if (entry === undefined) {
+      entry = rawRecordLines(path);
+      this._lines.set(path, entry);
+    }
+    return entry[1];
+  }
+}
+
+/** The caller's shard set, or a fresh one for a caller that brought none. */
+export function shardsFor(root, shards) {
+  return shards ?? new Shards(root);
 }
 
 export class IndexFormatError extends Error {}
@@ -73,12 +129,13 @@ export function rawRecordLines(path) {
 
 /** One record by id, from its own shard. Display-time only — `rank()` never
  *  calls this, because ranking must stay a pure function of the record it was
- *  already handed. */
-export function recordFor(root, docId) {
+ *  already handed. `shards` is the call's `Shards` (W-242 Tier 0). */
+export function recordFor(root, docId, shards = null) {
   const shard = shardFor(docId);
   const path = join(indexDir(root), `${shard}.jsonl`);
-  if (!existsSync(path)) return null;
-  const [, lines] = rawRecordLines(path);
+  const set = shardsFor(root, shards);
+  if (!set.paths().includes(path)) return null;
+  const lines = set.lines(path);
   const needle = Buffer.from(JSON.stringify(docId), "utf8");
   for (const line of lines) {
     if (!line.includes(needle)) continue;
@@ -166,10 +223,11 @@ function skimGraphFields(line) {
  * the skim stops there; an unsorted line is still read correctly, only slower.
  * A line the skim does not recognise falls back to a full parse, so the result
  * never differs from `JSON.parse` — only its cost does. */
-export function graphRecords(root) {
+export function graphRecords(root, shards = null) {
   const out = [];
-  for (const path of iterShardPaths(root)) {
-    const [, lines] = rawRecordLines(path);
+  const set = shardsFor(root, shards);
+  for (const path of set.paths()) {
+    const lines = set.lines(path);
     for (const line of lines) {
       let record = null;
       try { record = skimGraphFields(line); } catch { record = null; }

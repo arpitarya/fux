@@ -10,7 +10,7 @@ feature: "`.fux/runtime/` — the derived index, `fux build`, and the block boun
 owns: [src/fux/derive@f143d7fab874, tools/differential@5f789d2db31b, src/fux/schemas/runtime.schema.json@f9a25a4fcdb1]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: dfb6af53ef3ff0a72c351529fb10f18261fd03fdd338ecc16662cae21a3a8f6a
+content_sha: 77f645ced367332ab7444395edb9ccdea0fb512632643b8d59dda0f3abb11b24
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

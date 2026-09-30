@@ -29,7 +29,7 @@
  */
 import { runFused } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";
-import { recordFor } from "../store/reader.mjs";
+import { recordFor, Shards } from "../store/reader.mjs";
 import { queryTermHashes } from "../query/scan.mjs";
 import { identifiersFor } from "../query/identifiers.mjs";
 import { analyze } from "../query/analyzer.mjs";
@@ -49,7 +49,7 @@ const JSON_INDENT = fixed("json", "indent");
  * ⚠ **The band is computed on the UNFILTERED ranking**, because it is a claim
  * about the corpus's answer to the question, not about the subset a caller
  * asked to see. */
-function filtered(root, results, query, args) {
+function filtered(root, results, query, args, shards) {
   const { under, phrase } = args;
   const requireAll = Boolean(args.all);
   if (!under && !phrase && !requireAll) return [results, 0];
@@ -70,7 +70,7 @@ function filtered(root, results, query, args) {
     // offline verb and the whole point of `--all` is that it is cheap.
     const wanted = queryTermHashes(query, identifiersFor(root));
     kept = kept.filter((r) => {
-      const terms = recordFor(root, r.id)?.terms ?? {};
+      const terms = recordFor(root, r.id, shards)?.terms ?? {};
       return wanted.every((h) => h in terms);
     });
   }
@@ -178,9 +178,13 @@ export function runFind(root, args) {
   const query = args._.join(" ");
   const queries = [query, ...(args.q || [])];
   const top = args.top; // `.fux/output.toml`, resolved before dispatch
+  // W-242 Tier 0 — this verb's one read of each shard, shared by the ranking
+  // and the display reads below.
+  const shards = new Shards(root);
 
   const { results: ranked, confidence, fused, tune } = runFused(root, queries, top, {
     useTune: args.noTune !== true, wantConfidence: true, compose: true, expand: args.expand ?? "",
+    shards,
     // W-161 — **Tier A yes, Tier B never.** `find` is `ask`'s terse sibling and
     // must rank the same corpus the same way, or the two verbs disagree; but it
     // is also the verb for piping bare paths, so a labelled second block would
@@ -190,13 +194,13 @@ export function runFind(root, args) {
     related: false,
   });
   declareFloorOff(tune, Boolean(args.json));
-  const [results, dropped] = filtered(root, ranked, query, args);
+  const [results, dropped] = filtered(root, ranked, query, args, shards);
   declareFilters(args, dropped);
 
   if (args.json) {
     const payload = {
       results: results.map((r) => ({
-        ...r, headings: headingsFor(recordFor(root, r.id), query, args.maxHeadings),
+        ...r, headings: headingsFor(recordFor(root, r.id, shards), query, args.maxHeadings),
       })),
     };
     if (fused) payload.fused = true;

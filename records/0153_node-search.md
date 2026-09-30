@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@ed40fd6015b5, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@de3dc4f589f9, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 5c1010184103664fe333bcf99f442c4ee948ae80f8d81cfb1bc2cadfaa406315
+content_sha: 548ada7170c47acc2eaae0074a057f1e3c03df8e15faa31ee3f7a0c441052075
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -953,13 +953,34 @@ weights. `--why` has no Node twin, as for step 9. Off at `0.0` pending the
 verdict.
 
 **24. 🟠 Node joins the derived plane — as a reader and as a builder.
-Ratified 2026-09-30 (Arpit), NOT BUILT** ([W-242](../work/open/W-242-shared-runtime.md);
+Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1–2 not built**
+([W-242](../work/open/W-242-shared-runtime.md);
 [`compare/shared-runtime`](../work/compare/shared-runtime.compare.md);
 [SR-T1-ACCELERATOR](0110_accelerator.md) decision 18 owns the plane).
 
-- **Tier 0.** A Node query reads each committed shard **once**. Today it reads
-  each three times — `scan.mjs`, `graphRecords` and `tableFromShards` — 769
-  opens for 257 shards on this repo, 207 of a 383 ms profile.
+- **Tier 0 — ✅ built.** A Node query reads each committed shard **once**. It
+  read each three times — `scan.mjs`, `graphRecords` and `tableFromShards` —
+  plus one more per `recordFor`: 769 opens for 257 shards on this repo.
+  - **The mechanism is `store/reader.mjs::Shards`**, a per-call object: a verb,
+    a library method or one MCP tool call makes one and hands it down to the
+    scan, the mined table, the pin, the graph tier, the band guard, RM3's
+    feedback reads and every display `recordFor`. `-q` arms share their
+    caller's. A function called without one makes its own, so no public
+    signature changed meaning.
+  - 🔴 **It is never module-level and never kept on a long-lived object** —
+    `fux mcp` and a library `Index` outlive the index they read, and `ingest`
+    rewrites it under them. That is the one design constraint the item fixed.
+  - **Held by `node/test/shard-reads.test.mjs`**, which spies on
+    `fs.readFileSync` (not on the reader, so a pass that bypasses `Shards` is
+    counted like one that uses it) and fails above one read per shard on
+    `find`, `ask`, `answer` and `ask -q`; it failed at 3 on the pre-Tier-0
+    reader, and it also asserts two calls read twice — the cross-call cache
+    this rule forbids.
+  - `iterShardPaths` now takes Python's shard-name grammar (`[0-9a-f]{2}.jsonl`,
+    files only) instead of any `*.jsonl` — the two readers must agree on which
+    files ARE shards once a plane's stamp counts them.
+  - Stdout byte-identical to the pre-Tier-0 reader on all nine pre-registered
+    cells ([`2026-09-30-shared-runtime`](../work/regression/2026-09-30-shared-runtime/)).
 - **Tier 1.** Node answers from Python's `.fux/runtime/` when it is fresh, and
   from its scan otherwise. **Decision 10's asymmetry disappears on a fresh
   plane** — both runtimes report `"accelerator"` — and remains, truthfully, on

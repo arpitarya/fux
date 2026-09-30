@@ -11,7 +11,7 @@
  *
  * Owned, with its Python twin, by [SR-EXPAND](../../../records/0149_expand.md).
  */
-import { rawRecordLines, iterShardPaths } from "../store/reader.mjs";
+import { shardsFor } from "../store/reader.mjs";
 
 //: `abbr` sorts first among a record's keys, so it can only open the line.
 //: Latin-1 view of the raw bytes; every element is a quoted 16-hex hash.
@@ -39,11 +39,13 @@ export function pairsFromLine(line) {
   return m ? JSON.parse(m[1]) : [];
 }
 
-/** The corpus table, de-duplicated and sorted exactly as `table_from_shards`. */
-export function tableFromShards(root) {
+/** The corpus table, de-duplicated and sorted exactly as `table_from_shards`.
+ *  `shards` is the call's `Shards` (W-242 Tier 0). */
+export function tableFromShards(root, shards = null) {
+  const set = shardsFor(root, shards);
   const seen = new Map();
-  for (const path of iterShardPaths(root)) {
-    const [, lines] = rawRecordLines(path);
+  for (const path of set.paths()) {
+    const lines = set.lines(path);
     for (const line of lines) {
       for (const pair of pairsFromLine(line)) seen.set(JSON.stringify(pair), pair);
     }
