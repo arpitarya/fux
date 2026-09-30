@@ -23,6 +23,14 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-09-30 — 3.0.0-alpha.9 released: ingest extract ~7× faster at 10k docs  ·  Claude Code (Opus)
+- **Asked:** *"commit everything and publish a new version"*.
+- **Did:**
+  - Ran both suites whole before committing: unit 6270 passed, with one failure, e2e 158 passed, Node 202/202. The failure was `test_node_twins`' working-tree guard, raised because W-239 changed `decode/__init__.py` and `query/identifiers.py` without touching their Node twins. The Node side is unaffected, for two reasons. Node has no per-document decoder re-import to cache. And it matches questions with the combined pattern, which returns what the gated scan returns (`IdentifierRules.matches`). `3f902838` states this in its message.
+  - `9989c7c5` release: 4 version sites → `3.0.0-alpha.9`, and parity is green. SR-LAWS, SR-CLI, SR-MCP and SR-NODE-SEARCH were re-stamped for the bump only. `sr-owns.py --write` given four records stamped all four this time. After that the unit suite had no failures: 6271 passed.
+  - CI run `36666260696` (FAST + FULL) was green on the sha before the release was created. Publish run `36667093740`: build, PyPI and npm were all green. PyPI has `3.0.0a9`. npm logged `+ fux-engine@3.0.0-alpha.9` with provenance, and the registry now serves `alpha` → `3.0.0-alpha.9` after a few minutes of read lag. `latest` stays `2.0.1`.
+- **Next:** unchanged. W-168 step 8 build (Opus).
+
 ## 2026-09-29 — W-238 and W-239: progress on slow verbs; ingest extract ~7× faster  ·  Claude Code (Opus)
 - **Asked:** *"implement W-238, W-239"*.
 - **Did:**
