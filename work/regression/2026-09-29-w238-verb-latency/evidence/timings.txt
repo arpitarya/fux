@@ -1,0 +1,24 @@
+# rung-10000 scratch copy (fux-lab/scratch/w239/rung-10000), after `fux build`.
+# Best of three whole CLI processes, stdout and stderr to /dev/null. Load average ~3.0.
+  2.02s rc=0 identifiers
+  0.13s rc=0 enrich --plan        (no scope declared: the verb exits after printing the hint)
+  0.13s rc=0 enrich --check       (same)
+  0.13s rc=0 explain seed/01-sop-temperature-excursion.md
+  0.35s rc=0 graph vaccine excursion
+  0.40s rc=0 graph --seed seed/01-sop-temperature-excursion.md
+  0.63s rc=0 path seed/01-sop-temperature-excursion.md seed/03-postmortem-nagpur-vaccine-excursion.md
+  0.39s rc=0 ask vaccine temperature excursion
+  0.33s rc=0 find excursion
+  0.38s rc=0 answer vaccine temperature excursion --no-refer
+  3.08s rc=0 doctor
+# one run, before the change, same copy: inspect 86.39s rc=0 (already barred)
+
+# the same copy with `ext  enrich=true` declared (9 958 documents in scope), one run each
+  0.91s enrich --plan   (0 enrichment files)
+  0.91s enrich --check  (0 enrichment files)
+  104.81s enrich --check (300 synthetic enrichment files, 5 questions each = 1 500 ranked queries)
+# the synthetic files and the enrich=true line were removed afterwards
+
+# this repo (1 851 records), one run each, /usr/bin/time real
+  13.06s identifiers
+  14.23s doctor

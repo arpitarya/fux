@@ -9,7 +9,7 @@ ball: agent
 
 # W-238 — a progress bar on every verb that takes time
 
-**Status: ratified 2026-09-29, not built.** Arpit, 2026-09-29: *"fux cli verbs
+**Status: BUILT 2026-09-29 (Claude Code, Opus); archived.** `identifiers`, `doctor` and `enrich --check` paint; the read verbs measured under a second and do not ([run](../../work/regression/2026-09-29-w238-verb-latency/report.md), [SR-CLI](../../records/0101_cli-surface.md) decision 17). SR-CLI had no list of barred verbs to amend — decision 17 is that list now. *Was:* ratified 2026-09-29, not built. Arpit, 2026-09-29: *"fux cli verbs
 which are suppose to take time add progress bar so that end user knows
 something is happening."*
 

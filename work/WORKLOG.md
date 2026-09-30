@@ -23,6 +23,17 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-09-29 — W-238 and W-239: progress on slow verbs; ingest extract ~7× faster  ·  Claude Code (Opus)
+- **Asked:** *"implement W-238, W-239"*.
+- **Did:**
+  - **W-239.** Measured first on scratch copies of `golden-gen2/rung-01000` and `rung-10000` carrying this repo's 103 families. At 1 000 docs, three costs were 9.7 s of a 13.8 s profiled ingest: `registry()` re-importing 17 consumer decoders on each of 3 410 calls, the combined family regex, and `formats.toml` re-parsed per doc. Built a stat-keyed cache for both decode functions and a first-letter gate for the matcher. Extract at 10 000 went 45.6 → 6.5 s back to back, and the index sha-256 was identical on both rungs. The gated scan matches the combined one on all 1 213 tracked `.md` files. [Run](regression/2026-09-29-w239-extract-speed/report.md), SR-IDENTIFIERS d13, SR-DECODE d22.
+  - **W-238.** Timed every candidate verb at `rung-10000` and on this repo. `identifiers` (13 s here), `doctor` (14 s here; 45 of its 48 profiled seconds are the identifier lens) and `enrich --check` (105 s for 300 synthetic files) paint now. The read verbs (≤ 0.63 s) and `enrich --plan` (0.9 s) do not. SR-CLI had no list of barred verbs, so decision 17 is it. `progress_threshold` added for three verbs on both `CLI_VERBS` tables. Skills (INDEX, ENRICH) say so. [Run](regression/2026-09-29-w238-verb-latency/report.md).
+  - Both items archived. `tests/l12_allow.toml`: `_PROGRESS_COMMANDS`'s site key updated.
+- **Found:**
+  - `pytest -n auto` cannot collect this suite: xdist reports *"different tests were collected"* because of `test_formats.py`'s byte-literal param ids. Serial takes 1:43.
+  - Another session's staged `.fux/index/*` sat in the index throughout, and two of my files turned up staged too. `fux-cd` says it staged neither and unstaged them. The index shards were left alone.
+- **Next:** unchanged. W-168 step 8 build (Opus).
+
 ## 2026-09-29 — 3.0.0-alpha.8 released: the Node reader ~3× faster  ·  Claude Code (Opus)
 - **Asked:** *"delete the feature branches … pull … commit everything"*, then *"commit everything and publish a new version"*.
 - **Did:**

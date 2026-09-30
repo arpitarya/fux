@@ -1,0 +1,36 @@
+Tue Sep 29 12:54:13 2026    ~/my_programs/fux-lab/scratch/w239/after-1k.prof
+
+         28981102 function calls (28697319 primitive calls) in 4.611 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1169 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.008    0.008    4.615    4.615 ~/my_programs/fux/src/fux/ingest/run.py:141(run)
+     1000    0.007    0.000    3.054    0.003 ~/my_programs/fux/src/fux/ingest/extract.py:166(extract_fields)
+     4232    0.001    0.000    2.775    0.001 ~/my_programs/fux/src/fux/query/tokenize.py:26(tokenize)
+     4232    0.009    0.000    2.774    0.001 ~/my_programs/fux/src/fux/query/analyzer.py:110(analyze)
+     4214    0.186    0.000    2.765    0.001 ~/my_programs/fux/src/fux/query/analyzer.py:133(_with_families)
+   249899    0.872    0.000    2.168    0.000 ~/my_programs/fux/src/fux/query/stem.py:140(stem)
+  5642566    0.454    0.000    0.706    0.000 ~/my_programs/fux/src/fux/query/stem.py:99(_replace)
+ 11193467    0.502    0.000    0.502    0.000 {method 'endswith' of 'str' objects}
+        1    0.001    0.001    0.423    0.423 ~/my_programs/fux/src/fux/ingest/priors.py:40(git_commit_times)
+        1    0.000    0.000    0.422    0.422 ~/.local/share/uv/python/cpython-3.14.3-macos-aarch64-none/lib/python3.14/subprocess.py:512(run)
+        1    0.000    0.000    0.420    0.420 ~/.local/share/uv/python/cpython-3.14.3-macos-aarch64-none/lib/python3.14/subprocess.py:1176(communicate)
+        1    0.001    0.001    0.420    0.420 ~/.local/share/uv/python/cpython-3.14.3-macos-aarch64-none/lib/python3.14/subprocess.py:2092(_communicate)
+      823    0.001    0.000    0.417    0.001 ~/.local/share/uv/python/cpython-3.14.3-macos-aarch64-none/lib/python3.14/selectors.py:385(select)
+      823    0.417    0.001    0.417    0.001 {method 'poll' of 'select.poll' objects}
+     3410    0.003    0.000    0.270    0.000 ~/my_programs/fux/src/fux/decode/__init__.py:353(registry)
+     3410    0.065    0.000    0.256    0.000 ~/my_programs/fux/src/fux/decode/__init__.py:330(_registry_key)
+     4214    0.055    0.000    0.235    0.000 ~/my_programs/fux/src/fux/query/identifiers.py:340(matches)
+        1    0.001    0.001    0.232    0.232 ~/my_programs/fux/src/fux/store/writer.py:57(write_index)
+     1000    0.001    0.000    0.222    0.000 ~/my_programs/fux/src/fux/ingest/parse.py:23(parse_document)
+      255    0.000    0.000    0.222    0.001 {method 'join' of 'bytes' objects}
+     1253    0.000    0.000    0.222    0.000 ~/my_programs/fux/src/fux/store/writer.py:95(<genexpr>)
+     1001    0.001    0.000    0.222    0.000 ~/my_programs/fux/src/fux/store/canonical.py:27(canonical_dumps)
+        1    0.003    0.003    0.217    0.217 ~/my_programs/fux/src/fux/ingest/gitdir.py:335(walk_sources)
+248016/1001    0.126    0.000    0.193    0.000 ~/my_programs/fux/src/fux/store/canonical.py:34(_validate)
+     1000    0.018    0.000    0.158    0.000 ~/my_programs/fux/src/fux/store/writer.py:126(hash_terms)
+
+
+

@@ -335,40 +335,88 @@ class IdentifierRules:
         return hashlib.blake2b(blob.encode("utf-8"), digest_size=_DIGEST_BYTES).hexdigest()
 
     def combined_source(self) -> str:
-        alts = []
-        for r in self.rules:
-            alts.append(f"({r.pattern})" if r.kind == "regex" else f"({r.pattern})")
-        return _LEAD + "(?:" + "|".join(alts) + ")" + _TRAIL
+        return _LEAD + "(?:" + "|".join(f"({r.pattern})" for r in self.rules) + ")" + _TRAIL
 
     def matches(self, text: str) -> list[tuple[int, int, str]]:
         """`(start, end, canonical)` for every match, in text order."""
         if not self.rules:
             return []
-        rx, groups = _compiled(self)
+        rx, groups, gated = _compiled(self)
+        if gated is None:
+            return [_found(m, groups) for m in rx.finditer(text)]
+        # 🔴 **The gated scan (W-239), and why it returns exactly what the
+        # `finditer` above would.** Every template starts with a literal letter
+        # (`parse_template` refuses anything else), so a match can only start on
+        # one of those letters where the leading boundary holds — `gate` finds
+        # exactly those positions, cheaply. At such a position every family
+        # whose first letter differs fails on its first character, so trying
+        # only the families that share it, IN THEIR ORIGINAL ORDER, picks the
+        # same alternative leftmost-first alternation would. Scanning resumes
+        # at a match's end, as `finditer` does. The combined pattern tried 103
+        # alternatives behind two lookbehinds at every character; this was
+        # 2 ms/KB of every ingested document.
+        #
+        # The Node reader keeps the combined pattern: it matches questions, not
+        # documents, and the two give the same answer.
+        gate, by_letter = gated
         out = []
-        for m in rx.finditer(text):
-            for ridx, (rule, g0, ng) in enumerate(groups):
-                if m.group(g0) is None:
-                    continue
-                out.append((m.start(), m.end(), canonical(rule, m.group(g0), [m.group(g0 + 1 + k) for k in range(ng)])))
-                break
-        return out
+        pos = 0
+        while True:
+            g = gate.search(text, pos)
+            if g is None:
+                return out
+            start = g.start()
+            sub_rx, sub_groups = by_letter[text[start].lower()]
+            m = sub_rx.match(text, start)
+            if m is None:
+                pos = start + 1
+                continue
+            out.append(_found(m, sub_groups))
+            pos = m.end()
+
+
+def _found(m: re.Match, groups: list[tuple]) -> tuple[int, int, str]:
+    for rule, g0, ng in groups:
+        if m.group(g0) is not None:
+            return (m.start(), m.end(), canonical(rule, m.group(g0), [m.group(g0 + 1 + k) for k in range(ng)]))
+    raise AssertionError("a combined match with no alternative group")  # unreachable
 
 
 _CACHE: dict[tuple, tuple] = {}
+_FLAGS = re.ASCII | re.IGNORECASE
+
+
+def _alternation(rules: list[Rule]) -> tuple[re.Pattern, list[tuple]]:
+    """`LEAD(?:(r1)|(r2)|…)TRAIL` and, per rule, `(rule, its group, its group count)`."""
+    groups = []
+    g = 1
+    for r in rules:
+        n = re.compile(r.pattern).groups
+        groups.append((r, g, n))
+        g += 1 + n
+    return re.compile(IdentifierRules(rules=tuple(rules)).combined_source(), _FLAGS), groups
 
 
 def _compiled(rules: IdentifierRules):
     key = tuple((r.kind, r.source) for r in rules.rules)
     hit = _CACHE.get(key)
     if hit is None:
-        groups = []
-        g = 1
-        for r in rules.rules:
-            n = re.compile(r.pattern).groups
-            groups.append((r, g, n))
-            g += 1 + n
-        hit = (re.compile(rules.combined_source(), re.ASCII | re.IGNORECASE), groups)
+        rx, groups = _alternation(list(rules.rules))
+        gated = None
+        # A [user] regex may start with anything, so it has no first letter to
+        # gate on; a file holding one keeps the combined scan.
+        if all(r.kind == "template" for r in rules.rules):
+            by_letter: dict[str, list[Rule]] = {}
+            for r in rules.rules:  # file order, which is the alternation order
+                by_letter.setdefault(r.source[0].lower(), []).append(r)
+            letters = "".join(sorted(by_letter))
+            # The consumed letter is the candidate; the two lookbehinds are
+            # `_LEAD`'s, shifted one character left to sit before it.
+            gate = re.compile(
+                f"[{letters}](?<!{_EDGE}.)(?<![A-Za-z0-9]\\..)", _FLAGS
+            )
+            gated = (gate, {ch: _alternation(rs) for ch, rs in by_letter.items()})
+        hit = (rx, groups, gated)
         _CACHE[key] = hit
     return hit
 

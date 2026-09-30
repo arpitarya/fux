@@ -129,7 +129,7 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
     "explain": (),
     "graph": (),
     "path": ("hops",),
-    "doctor": (),
+    "doctor": ("progress_threshold",),
     "hooks": (),
     "daemon": (),
     # `ingest` has no `[cli.ingest]` key of its own — only `--json` to resolve,
@@ -159,6 +159,9 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
     "build": ("progress_threshold",),
     "add": ("progress_threshold",),
     "remove": ("progress_threshold",),
+    # W-238: three more verbs that paint progress, each measured slow first.
+    "identifiers": ("progress_threshold",),
+    "enrich": ("progress_threshold",),
     # `fux serve`'s port. The host is fixed (`constants.toml [serve] host`).
     "serve": ("port",),
 }

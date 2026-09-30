@@ -72,7 +72,11 @@ def repo(tmp_path: Path) -> Path:
 #: hang, and it is bound by the same invariant as the rest: **stdout must be
 #: byte-identical with the bar on or off**, because its `--json` is what an
 #: agent parses.
-WRITE_VERBS = ["ingest", "build", "add", "remove", "inspect"]
+#:
+#: `identifiers`, `doctor` and `enrich` joined in W-238, each measured slow
+#: first: the first two re-read every document to detect identifier families,
+#: and `enrich --check` ranks one query per enrichment question.
+WRITE_VERBS = ["ingest", "build", "add", "remove", "inspect", "identifiers", "doctor", "enrich"]
 
 #: The one argument each verb needs to do real work on the fixture. `ingest`
 #: with no entry re-reads everything; `add`/`remove` need something to act on.
@@ -91,7 +95,15 @@ VERB_ARGS = {
     "add": ("docs",),
     "remove": ("docs/doc0000.md",),
     "inspect": ("--retrieval-sample", "0"),
+    # Only `--check` paints: it is the half that ranks queries.
+    "enrich": ("--check",),
 }
+
+#: Verbs whose exit code is a REPORT — `1` means *something to look at*, not a
+#: failed command — so the two arms must agree on it rather than both be `0`.
+#: The fixture's synthetic questions do not all retrieve their documents, and
+#: `doctor` grades a scratch repo; neither is what this file tests.
+REPORT_VERBS = {"doctor", "enrich"}
 
 #: The contents of `.fux/sources/dirs` each verb needs **before each arm**, so
 #: both arms start from the same state. A mutating verb is not idempotent and
@@ -101,12 +113,32 @@ VERB_ARGS = {
 VERB_PREPARE = {
     "add": "",  # `docs` not listed yet, so `add docs` has real work to do
     "remove": "docs\n",  # listed and nothing excluded, so `!` is a fresh line
+    # A declared scope, so `enrich --check` has files to rank (`_enrich_all`).
+    "enrich": "docs enrich=true\n",
 }
 
 #: Verbs whose fixture is large enough that a bar **must** appear. Asserting
 #: this is what stops the parametrization above from passing vacuously if a
 #: verb silently stops inheriting the plane.
-VERBS_THAT_MUST_PAINT = {"ingest", "build", "add", "remove", "inspect"}
+VERBS_THAT_MUST_PAINT = {"ingest", "build", "add", "remove", "inspect", "identifiers", "doctor", "enrich"}
+
+
+def _enrich_all(repo: Path, limit: int | None = None) -> int:
+    """Write a well-formed enrichment file for each MISSING document `fux enrich`
+    plans (the first `limit` of them), so `--check` has questions to rank.
+    Returns how many exist afterwards."""
+    plan = _run(repo, "enrich").stdout
+    rows = [line.split() for line in plan.splitlines() if line.rstrip().endswith("MISSING")]
+    out = repo / ".fux" / "enrich"
+    out.mkdir(parents=True, exist_ok=True)
+    for row in rows[:limit]:
+        loc, sha = row[0], row[2]
+        (out / f"{sha}.md").write_text(
+            f"---\nsource: {loc}\nsource_sha: {sha}\nchunks: 1\nmodel: fixture\n"
+            f"generated: 2026-09-29\nskill: test\n---\nWhat does {loc} say about pruning?\n",
+            encoding="utf-8",
+        )
+    return len(list(out.glob("*.md")))
 
 
 def test_every_progress_verb_is_covered():
@@ -153,13 +185,16 @@ def test_stdout_is_byte_identical_with_the_bar_on_or_off(repo: Path, verb: str):
         if fuxignore.exists():
             fuxignore.unlink()
         _run(repo, "ingest")  # settle the index against that listing
+        if verb == "enrich" and not list((repo / ".fux" / "enrich").glob("*.md")):
+            assert _enrich_all(repo) > THRESHOLD
 
     prepare()
     with_bar = _run(repo, verb, *args, "--progress")
     prepare()
     without = _run(repo, verb, *args, "--no-progress")
 
-    assert with_bar.returncode == without.returncode == 0, (
+    expected = (without.returncode,) if verb in REPORT_VERBS else (0,)
+    assert with_bar.returncode == without.returncode and without.returncode in expected, (
         f"{verb} did not succeed in both arms:\n"
         f"--- with --progress (rc={with_bar.returncode})\n{with_bar.stderr}\n"
         f"--- with --no-progress (rc={without.returncode})\n{without.stderr}"
@@ -177,6 +212,16 @@ def test_stdout_is_byte_identical_with_the_bar_on_or_off(repo: Path, verb: str):
             "stopped inheriting the progress plane, or its fixture fell under "
             "the count threshold."
         )
+
+
+def test_a_below_threshold_phase_paints_nothing_even_when_forced(repo: Path):
+    """W-238: the threshold is a COUNT, read from `.fux/output.toml`. Five
+    enrichment files is a `check` phase of five, so `--progress` forces the bar
+    on and it still stays silent."""
+    (repo / ".fux" / "sources" / "dirs").write_text("docs enrich=true\n", encoding="utf-8")
+    _run(repo, "ingest")
+    assert _enrich_all(repo, limit=5) == 5
+    assert _run(repo, "enrich", "--check", "--progress").stderr == ""
 
 
 def test_the_bar_is_off_when_stdout_is_piped_and_nothing_is_forced(repo: Path):

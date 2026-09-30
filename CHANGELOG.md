@@ -8,6 +8,19 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed
+
+- **`fux ingest` extracts ~7× faster at 10 000 documents** (45.6 s → 6.5 s),
+  and the committed index is byte-identical (W-239). Identifier families are
+  matched through a first-letter gate instead of one 103-way pattern at every
+  character; the decoder registry no longer re-imports every
+  `.fux/decoders/*.py` for each document; `.fux/formats.toml [meta]` is read
+  once per file state.
+- **`fux identifiers`, `fux doctor` and `fux enrich --check` show a progress
+  bar** on stderr (W-238) — each was measured silent for seconds to minutes.
+  `--no-progress` / `--progress` on all three; `identifiers` and `enrich`
+  gain `--no-output-config`. Stdout, including `--json`, is unchanged.
+
 ## [3.0.0-alpha.8] - 2026-09-29
 
 **The Node reader answers ~3× faster; output is byte-identical.** The index

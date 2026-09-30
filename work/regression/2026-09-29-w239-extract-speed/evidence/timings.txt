@@ -1,0 +1,11 @@
+# rung-01000, one run each (before at load ~7.7, after at ~2.3)
+before 14.04 [('walk', 0.0), ('redact', 0.12), ('extract', 8.45), ('edges', 0.0), ('write', 0.3)] 678cf6eb4bb63f0637a8c6c9ac5d285e529dff89119a027be94e5c8fa850a69a
+after  4.63 [('walk', 0.0), ('redact', 0.12), ('extract', 3.07), ('edges', 0.0), ('write', 0.23)] 678cf6eb4bb63f0637a8c6c9ac5d285e529dff89119a027be94e5c8fa850a69a
+
+# rung-10000, first pair (before at load ~5.9, after at ~2.6)
+before 71.75 [('walk', 0.0), ('redact', 0.96), ('extract', 45.22), ('edges', 0.01), ('write', 0.85)] 9f415b2e1aa97fec5e9ecacf45958305c95cac03682f89839c30eb65e42466ba
+after  12.95 [('walk', 0.0), ('redact', 0.96), ('extract', 6.54), ('edges', 0.01), ('write', 0.81)] 9f415b2e1aa97fec5e9ecacf45958305c95cac03682f89839c30eb65e42466ba
+
+# rung-10000, back-to-back pair (load ~2.5 and ~2.2) -- the pair the report quotes
+before 73.46 [('walk', 0.0), ('redact', 0.99), ('extract', 45.59), ('edges', 0.02), ('write', 0.82)] 9f415b2e1aa97fec5e9ecacf45958305c95cac03682f89839c30eb65e42466ba
+after 12.84 [('walk', 0.0), ('redact', 0.97), ('extract', 6.5), ('edges', 0.01), ('write', 0.81)] 9f415b2e1aa97fec5e9ecacf45958305c95cac03682f89839c30eb65e42466ba

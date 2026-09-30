@@ -35,7 +35,13 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-28** (Claude Code, Opus — W-233 shipped; W-228 DoD 11 rung; W-168 pools).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-09-29 (latest) — W-235 BUILT: A NODE QUERY IS ~3× CHEAPER, NO CONTRACT CHANGE
+### 🟢 2026-09-29 (latest) — W-238 + W-239 BUILT: INGEST ~6× FASTER, SLOW VERBS NOW SHOW PROGRESS
+
+- W-239: ingest's `extract` at 10 000 documents 45.6 s → 6.5 s with the committed index byte-identical — a gated identifier scan and two per-process caches ([run](regression/2026-09-29-w239-extract-speed/report.md)).
+- W-238: `identifiers`, `doctor` and `enrich --check` paint the bar; the read verbs were measured under a second and do not ([SR-CLI](../records/0101_cli-surface.md) d17).
+- **Next:** W-168 step 8 build (Opus).
+
+### 🟢 2026-09-29 — W-235 BUILT: A NODE QUERY IS ~3× CHEAPER, NO CONTRACT CHANGE
 
 - The Node graph plane now parses only `id` and `edges` from each record (`graphRecords`). `find`/`ask`/`answer` went ~0.50 s → ~0.15 s, output byte-identical ([run](regression/2026-09-29-node-reader-per-call/report.md), [compare](compare/node-plane-rebuild.compare.md)).
 - SR-NODE-SEARCH decision 9 is unchanged: reading Python's `graph.json` (O3) would save ~20 ms at most.

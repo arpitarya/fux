@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@6cc9fb2e9310]
+owns: [src/fux/templates/agents@261977d5386f]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: cd6049ebbf470cc4ea147f3602d61d9c3977b002e4782917b3bdc96663b908bf
+content_sha: a89fe353e45bdcb55a8c63ccba8ce58c3aa38efb702568c47ae2dedd3f02e52c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -797,6 +797,8 @@ gate, and it is the trap that decision warns about.
 
 
 The shipped `fux-inspect`, `fux-serve` and `fux-config` skills name identifier families ([SR-IDENTIFIERS](0160_identifiers.md)): the `identifiers` lens, the explorer's sixth tab, and `.fux/identifiers.toml` with its `fux identifiers --write` verb — each marked as an index change an agent proposes and never runs unasked.
+
+**The INDEX and ENRICH skills name the new progress bars** (W-238, 2026-09-29): `doctor` and `identifiers` paint `read`/`detect`, and `enrich --check` paints `check`, all on stderr and silenced by `--no-progress` ([SR-CLI](0101_cli-surface.md) decision 17). One line each, in the templates and in this repo's three installed copies. No policy moved.
 
 ### Consequences
 

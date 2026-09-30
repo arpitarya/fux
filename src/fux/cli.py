@@ -170,7 +170,13 @@ def _cmd_tune(args) -> int:
 #: `inspect` joins these because its retrieval half is one full query per
 #: sampled document and its dictionary half re-tokenises the whole corpus —
 #: both are long enough that silence reads as a hang.
-_PROGRESS_COMMANDS = ("ingest", "build", "add", "remove", "inspect")
+#: `identifiers`, `doctor` and `enrich` joined in W-238 (2026-09-29), each
+#: MEASURED silent long enough to notice at `rung-10000` and on this repo:
+#: `identifiers` and `doctor` both re-read every document to detect identifier
+#: families (13 s and 14 s here), and `enrich --check` ranks one query per
+#: enrichment question (105 s for 300 files). The read verbs measured under
+#: 0.7 s there, and a bar that flashes is noise — they get none.
+_PROGRESS_COMMANDS = ("ingest", "build", "add", "remove", "inspect", "identifiers", "doctor", "enrich")
 
 
 def _add_progress_flags(parser: argparse.ArgumentParser) -> None:
@@ -363,6 +369,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="write every missing config file and key from its template, then check",
     )
+    _add_progress_flags(p_doctor)
     _add_output_flags(p_doctor, band=False)
     p_doctor.set_defaults(func=_cmd_doctor)
 
@@ -830,6 +837,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="one loc or URL, exactly as the index spells it; without it, every "
              "declared scope",
     )
+    # W-238: `--check` paints a bar — one ranked query per question.
+    _add_progress_flags(p_enrich)
+    _add_output_flags(p_enrich, band=False)
     p_enrich.set_defaults(func=_cmd_enrich)
 
     # W-76 Phase 5. A verb rather than a flag on `ask`: it is a long-running
@@ -1015,7 +1025,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_ids.add_argument("--write", action="store_true",
                        help="rewrite .fux/identifiers.toml [detected]; [user] is kept byte for byte")
-    p_ids.add_argument("--json", action="store_true", help="machine-readable output")
+    p_ids.add_argument("--json", action="store_true", default=None, help="machine-readable output")
+    _add_progress_flags(p_ids)
+    _add_output_flags(p_ids, band=False)
     p_ids.set_defaults(func=_cmd_identifiers)
 
     # A flat verb with no arguments at all: it neither reads the repo nor

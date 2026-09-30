@@ -7,10 +7,10 @@ description: "A committed .fux/identifiers.toml names ID families (RF-{n}); both
 status: accepted
 date: 2026-09-28
 feature: "identifier families — `.fux/identifiers.toml`, its matcher on both readers, the lens, `fux identifiers`, the doctor rows and the serve Identifiers tab"
-owns: [.fux/identifiers.toml@457cfe1314bb, node/src/query/identifiers.mjs@d9fcbed75730, node/test/identifiers.test.mjs@69bcab39922f, src/fux/identifiers_cmd.py@76f2087bb2bb, src/fux/query/identifiers.py@a1dad759d69f]
+owns: [.fux/identifiers.toml@457cfe1314bb, node/src/query/identifiers.mjs@d9fcbed75730, node/test/identifiers.test.mjs@69bcab39922f, src/fux/identifiers_cmd.py@9d4f2385d3e1, src/fux/query/identifiers.py@e4a09d574a3e]
 laws: [L2, L4, L10, L12]
 timestamp: 2026-09-28T00:00:00Z
-content_sha: 69a530dbbbc9ec2c21d2083c05987fa22632b40544529a493e8ecf124a254c3a
+content_sha: fa476651cb602f24fecf7974cec55cfd7927f6aff7661b812bcd728abcaf2c7a
 ratifies: "W-233 — Arpit, 2026-09-28 (Cowork), F1–F5: a verb writes [detected]; refresh on demand with a doctor warning; templates by default and a guarded regex in [user] only; the whole form unstemmed plus its parts; [detected] applies once written and [user] overrides it"
 ---
 
@@ -194,6 +194,27 @@ rollback.
       dash that no detected family covers, found by the lens on a real corpus;
     - **a bare `2.3.1` for `v2.3.1`** — reopens, as a `{ver}` placeholder that
       canonicalizes without its `v`, if a corpus shows the need.
+13. **Python scans a document through a gate, and returns exactly what the
+    combined pattern would** (W-239, 2026-09-29). The combined alternation
+    tried every family behind two lookbehinds at every character — 2 ms/KB,
+    the single largest cost of an ingest under the repo's 103 families.
+    - Every template starts with a literal letter (decision 1), so a match
+      can only start on one of those letters where the leading boundary
+      holds. One cheap gate pattern finds exactly those positions.
+    - At a candidate, only the families sharing its first letter are tried,
+      **in their original order**. Every other family fails on its first
+      character there, so leftmost-first picks the same alternative. The
+      scan resumes at a match's end, as `finditer` does.
+    - **A file holding a `[user]` regex keeps the combined scan**: a regex
+      may start with anything, so there is no letter to gate on.
+    - **The Node reader keeps the combined pattern.** It analyzes questions,
+      not documents, and the two scans return the same spans.
+    - Held by `tests/query/test_identifiers_gated.py`, and swept once over
+      all 1 213 tracked Markdown files with 0 differences. It is 36× faster
+      on that sweep, the ingest root hash is unchanged, and `extract` at
+      `rung-10000` drops from 45.6 s to 6.5 s together with
+      [SR-DECODE](0139_decode.md) decision 22
+      ([filed](../work/regression/2026-09-29-w239-extract-speed/report.md)).
 
 ### Consequences
 

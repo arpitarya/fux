@@ -8,10 +8,10 @@ amended: 2026-09-28
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@ed7a96992226, .fux/inspect.toml@c0b3ac0911f7]
+owns: [src/fux/inspect@c13d7f7f3f97, .fux/inspect.toml@c0b3ac0911f7]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: f017334b63e30f0e503d4cff511a27287238722c07f32c6906076a8a9e67bdf9
+content_sha: db710cafcfba3a6f727ce6f937a5ee27992bfcdb5bc76992f72a57f91d446caf
 ratifies: W-169
 ---
 
@@ -449,6 +449,8 @@ placed inside `inspect` by the W-220 ruling — a lens, never a verb).
 
 
 **The identifier lens** ([SR-IDENTIFIERS](0160_identifiers.md) decision 9, W-233). `inspect/idfamilies.py` groups every raw analyzer token that starts with a letter, carries a digit and a `-` or `_`, and is not a path, a file name (`.md`), a decimal or version (`0.5`) or a same-prefix range (`L0-L12`), by its literal letter prefix plus the kinds of its later segments; a later letter run stays literal when every member shares it, a digit run is `{n}`. A family qualifies at `inspect.toml [identifiers] min_values` distinct values across `min_docs` documents, and only if its template parses. It is section 12 of the report, the `identifiers` key of `--json`, and the only source `fux identifiers --write` writes from. **Read-only like every lens**: it names the lever and applies none. `[identifiers] parity_sample` is the document count `doctor`'s and the explorer's regex parity reads.
+
+**`identifier_families(progress=)` opens a `detect` phase** over every indexed document, readable or not (W-238, 2026-09-29). `fux identifiers` and `fux doctor` pass the invocation's `Progress`; `inspect` passes none, and nothing it reports changed. `corpus_texts(tick=)` is the per-document hook. `regex_parity` still runs the combined pattern, which is what the Node reader runs ([SR-IDENTIFIERS](0160_identifiers.md) decision 13).
 
 ### Consequences
 

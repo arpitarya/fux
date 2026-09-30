@@ -161,11 +161,17 @@ def detect(texts, *, min_values: int, min_docs: int, examples: int) -> Detection
     return out
 
 
-def corpus_texts(root: Path, view):
-    """`(doc_id, text)` for every indexed document whose bytes are on this disk."""
+def corpus_texts(root: Path, view, *, tick=None):
+    """`(doc_id, text)` for every indexed document whose bytes are on this disk.
+
+    `tick(loc)` is called once per indexed document, readable or not — the
+    progress count (W-238) is of the index, not of what this disk still holds.
+    """
     from .facts import readable_text, source_bytes
 
     for doc in view.docs:
+        if tick is not None:
+            tick(doc.loc)
         raw = source_bytes(root, doc.id, doc.loc)
         if raw is None:
             continue
@@ -173,14 +179,22 @@ def corpus_texts(root: Path, view):
         yield doc.id, text
 
 
-def identifier_families(root: Path, view, *, examples: int) -> Detection:
-    """The lens: `detect` over the indexed corpus, at `inspect.toml`'s floors."""
-    return detect(
-        corpus_texts(root, view),
-        min_values=view.config.min_values,
-        min_docs=view.config.min_docs,
-        examples=examples,
-    )
+def identifier_families(root: Path, view, *, examples: int, progress=None) -> Detection:
+    """The lens: `detect` over the indexed corpus, at `inspect.toml`'s floors.
+
+    It re-reads and re-decodes every document, which is why `fux identifiers`
+    and `fux doctor` show a `detect` bar (W-238) when handed a `progress`.
+    """
+    from ..progress import NULL as _NULL_PROGRESS
+
+    progress = progress or _NULL_PROGRESS
+    with progress.phase("detect", len(view.docs)) as p:
+        return detect(
+            corpus_texts(root, view, tick=lambda loc: p.update(1, detail=loc)),
+            min_values=view.config.min_values,
+            min_docs=view.config.min_docs,
+            examples=examples,
+        )
 
 
 # ---- regex parity (F3) --------------------------------------------------------
@@ -229,7 +243,7 @@ def regex_parity(rules, texts: list[tuple[str, str]]) -> Parity:
     node = shutil.which("node")
     if node is None or not rules.rules:
         return Parity(ran=False, agree=True, documents=len(texts), matches=0)
-    rx, _ = _compiled(rules)
+    rx, _groups, _gated = _compiled(rules)  # the combined scan: what Node runs
     py = [[(_utf16(t, m.start()), _utf16(t, m.end())) for m in rx.finditer(t)] for _, t in texts]
     out = subprocess.run(
         [node, "-e", _NODE_SPANS],

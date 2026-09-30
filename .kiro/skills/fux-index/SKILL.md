@@ -72,6 +72,9 @@ A repo still holding `.fux/sources/types` gets it **converted** into
 ## 3 · `fux doctor` — diagnose before touching anything
 
 **Read-only, offline, never repairs.** Each failing row's `detail` names the fix.
+It re-reads every document to check the identifier families, so on a large
+corpus it takes seconds and paints a `read` / `detect` bar on stderr; `--json`
+stays clean, and `--no-progress` silences it (so does `fux identifiers`).
 
 ```bash
 fux doctor --json

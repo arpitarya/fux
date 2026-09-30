@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@311436f30225, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@7a5371c09e45, src/fux/progress.py@10364bd02e0a, tests_e2e@9fae3be19870, node/fux.mjs@6365d89ea679]
+owns: [src/fux/cli.py@ddb92edd72fe, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@7a5371c09e45, src/fux/progress.py@10364bd02e0a, tests_e2e@60bd0dcdc3ca, node/fux.mjs@6365d89ea679]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 95b9c084d17b825eaf47608f49af6121a2b9ee6d004ec3d73887c66c8d3e3d81
+content_sha: 2ecdf637a8cd4702bf003020fd382b1bdfbbdcd0dd77492d824cdc8ef9ffad8c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1317,6 +1317,30 @@ nobody wrote.
 
 
 **`fux identifiers [--write] [--json]`** ([SR-IDENTIFIERS](0160_identifiers.md)) proposes identifier families from the index and, with `--write`, replaces only `.fux/identifiers.toml [detected]`; it is gated by `pii.toml` like every non-exempt verb. **`fux ingest --check` reports one index-level drift no document sha shows** — an index built under other identifier families than the file holds (`"state": "identifiers"`), exit 0 like every other drift.
+
+**17. A verb paints the progress bar only when it was MEASURED slow** (Arpit,
+2026-09-29: *"verbs which are supposed to take time add progress bar so that
+end user knows something is happening"*; W-238). The verbs that construct a
+`Progress` are `cli._PROGRESS_COMMANDS`, and this is the list:
+
+| verb | phases | why it is slow |
+|---|---|---|
+| `ingest` · `add` · `remove` | `walk` `redact` `extract` `edges` `write` … | the corpus walk (W-64, W-63) |
+| `build` | the accelerator's phases | every posting (W-64) |
+| `inspect` | `read` `dictionary` `retrieval` `facts` `probes` | one query per sampled document ([SR-INSPECT](0156_inspect.md)) |
+| `identifiers` · `doctor` | `read` (shards) · `detect` (documents) | both re-read and re-decode every document to detect identifier families — 13 s and 14 s on this repo ([SR-IDENTIFIERS](0160_identifiers.md)) |
+| `enrich` | `check` (files), **under `--check` only** | one ranked query per enrichment question — 105 s for 300 files at `rung-10000` |
+
+**Measured first, in `fux-lab`, and a verb that is not slow gets no bar** — a
+bar that flashes is noise. At `rung-10000` `explain`, `graph`, `path`, `ask`,
+`find`, `answer` and `enrich --plan` all finished in 0.13–0.9 s and are
+deliberately absent ([measurement](../work/regression/2026-09-29-w238-verb-latency/report.md)).
+Each verb on the list takes `--progress` / `--no-progress` and reads
+`[cli] progress_threshold`, so `identifiers` and `enrich` gained
+`--no-output-config` with it ([SR-OUTPUT](0143_output-defaults.md) decision 15).
+W-64's four rules hold unchanged for every one: stdout byte-identical with the
+bar on or off, `--json` untouched, off when stderr is not a TTY, no clock.
+`tests_e2e/test_progress_surface.py` holds the list equal to its own.
 
 ### Consequences
 

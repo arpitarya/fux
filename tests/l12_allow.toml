@@ -243,7 +243,7 @@ basis = "decision 6, R2"
 why = "a closed vocabulary: the set of names a format or a choice admits"
 sites = [
   "src/fux/cli.py::PII_EXEMPT::module::frozenset({'setup', 'tune', 'output', 'doctor'})",
-  "src/fux/cli.py::_PROGRESS_COMMANDS::module::('ingest', 'build', 'add', 'remove', 'inspect')",
+  "src/fux/cli.py::_PROGRESS_COMMANDS::module::('ingest', 'build', 'add', 'remove', 'inspect', 'identifi...",
   "src/fux/config.py::KNOWN_AGENTS::module::('claude', 'codex', 'copilot', 'kiro')",
   "src/fux/decode/_ooxml.py::_HEADING_NAMES::module::('heading', 'title', 'subtitle', 'berschrift')",
   "src/fux/decode/html.py::_BLOCK_BREAK::module::{'p', 'div', 'section', 'article', 'main', 'header', 'foo...",

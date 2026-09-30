@@ -26,6 +26,26 @@ Rules:
 
 ---
 
+## 2026-09-29 — **W-239: ingest's `extract` phase ~7× faster, index byte-identical**
+
+| what | evidence |
+|---|---|
+| **the build** | `IdentifierRules.matches()` scans through a first-letter gate and tries only the families sharing it, in order (`query/identifiers.py`); `decode.registry()` and `decode.meta_bindings()` cached per process on the stat of the files they read (`decode/__init__.py`) |
+| **the records** | [SR-IDENTIFIERS](../records/0160_identifiers.md) decision 13 · [SR-DECODE](../records/0139_decode.md) decision 22 |
+| **measured** | [`2026-09-29-w239-extract-speed`](regression/2026-09-29-w239-extract-speed/report.md): `rung-10000` extract 45.6 → 6.5 s, total 73.5 → 12.8 s; `rung-01000` extract 8.45 → 3.07 s; index sha-256 unchanged on both |
+| **verified** | 0 of 1 213 tracked Markdown files differ between the gated and combined scans; `tests/query/test_identifiers_gated.py`, `tests/decode/test_registry_cache.py`; both suites and `node --test` |
+| **not done** | `stem()` is now the largest ingest cost (2.2 s of 4.6 s at 1 000 docs) — not filed |
+
+## 2026-09-29 — **W-238: a progress bar on the three verbs measured slow**
+
+| what | evidence |
+|---|---|
+| **the build** | `identifiers`, `doctor` (`read`, `detect`) and `enrich --check` (`check` over enrichment files) join `_PROGRESS_COMMANDS`; `progress_threshold` declared for them on both readers' `CLI_VERBS`; `identifiers`/`enrich` gain `--no-output-config` |
+| **the record** | [SR-CLI](../records/0101_cli-surface.md) decision 17 — the list of verbs that paint, and the measured-first rule |
+| **measured** | [`2026-09-29-w238-verb-latency`](regression/2026-09-29-w238-verb-latency/report.md): the read verbs 0.13–0.63 s at `rung-10000` — no bar |
+| **verified** | `tests_e2e/test_progress_surface.py` — stdout byte-identical with the bar on/off for all eight verbs, a below-threshold `check` paints nothing |
+| **not done** | `doctor`'s own speed (it runs the identifier lens) and `enrich --check`'s per-question index load — noted in the run's analysis, not filed |
+
 ## 2026-09-29 — **W-235: the Node reader's per-call cost, ~0.50 s → ~0.15 s**
 
 | what | evidence |

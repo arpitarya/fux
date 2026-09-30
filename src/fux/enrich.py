@@ -223,6 +223,7 @@ def plan(
     pii_rules: tuple = (),
     self_retrieval_k: int = 0,
     chunk_bounds: dict[str, int],
+    progress=None,
 ) -> list[ScopeReport]:
     """The worklist, per declared scope.
 
@@ -243,7 +244,29 @@ def plan(
 
     `total` still counts the whole scope and `filtered` counts what the
     selector excluded, so a single-target run cannot be read as `n/n`.
+
+    ## `progress` — under `--check` only (W-238)
+
+    One `check` phase over every enrichment FILE the run will open, because
+    that is where the time goes: `--check` ranks a query per question, 105 s
+    for 300 files at `rung-10000`. A document with no file costs a `stat`, so
+    it is not counted, and `--plan` (no ranking) paints nothing.
     """
+    from .progress import NULL as _NULL_PROGRESS
+
+    progress = progress if (progress is not None and self_retrieval_k > 0) else _NULL_PROGRESS
+    files = sum(
+        1
+        for records in scopes.values()
+        for record in records
+        if (target is None or record.get("loc") == target)
+        and enrich_path(root, record.get("sha", "")).is_file()
+    ) if progress is not _NULL_PROGRESS else 0
+    with progress.phase("check", files, "files") as bar:
+        return _plan(root, scopes, target, pii_rules, self_retrieval_k, chunk_bounds, bar)
+
+
+def _plan(root, scopes, target, pii_rules, self_retrieval_k, chunk_bounds, bar) -> list[ScopeReport]:
     reports: list[ScopeReport] = []
     for scope in sorted(scopes):
         records = scopes[scope]
@@ -277,6 +300,7 @@ def plan(
                         PlanItem(record["loc"], sha, chunks, "missing", enrich_target)
                     )
                 continue
+            bar.update(1, detail=record["loc"])
             problem = validate(path, expected_sha=sha)
             if problem:
                 malformed.append((_shown(path, root), problem))
@@ -576,6 +600,7 @@ def cmd_enrich(args) -> int:
         root, scopes, target=target, pii_rules=pii_rules,
         self_retrieval_k=k if getattr(args, "check", False) else 0,
         chunk_bounds=tune.chunk_bounds(),
+        progress=getattr(args, "progress", None),
     )
     if getattr(args, "check", False):
         return _render_check(reports, target=target, k=k)

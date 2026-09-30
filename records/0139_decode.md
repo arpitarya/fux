@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@8e416e50936e, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@cbec8e165dca, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@6748ca720ca3]
+owns: [src/fux/decode@4c3f0409c601, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@cbec8e165dca, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@6748ca720ca3]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 62b9c8a080463a064d083944f4f3c7f6e2b6d259e6eab8c74c33805e20f6cd22
+content_sha: 97ab99206f6f6cd9c6cefa0dd39de0ec662ed1badfbee36d12156d3931c12925
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -749,6 +749,30 @@ by name and calls it. Two copies of that body would diverge in the way that
 makes one plane's malformed document a crash and the other's a skip — the
 `DecodeFailed`/`FuxError` split of decision 7 is exactly what must not be
 reimplemented twice.
+
+**22. `registry()` and `meta_bindings()` are cached per process, keyed on the
+files they read** (W-239, 2026-09-29). `registry()` runs two or three times per
+document (`decode`, `claims`, extraction's `META_FIELDS` lookup), and until
+this change each call re-executed every `.fux/decoders/*.py`. On a
+1 000-document corpus that was 58 000 imports and 35% of the ingest.
+`meta_bindings()` re-parsed `.fux/formats.toml` per document, which was
+another 13%.
+
+- **The key is everything the result depends on:**
+  - the repo;
+  - `(name, mtime_ns, size, inode)` of every `.py` in `.fux/decoders/`,
+    helpers included, because a decoder may import one;
+  - the stat of `.fux/formats.toml`;
+  - whether the legacy types file exists.
+
+  An edit, an addition or a removal is seen in the same process, which is
+  what a long-lived `serve` or `mcp` needs.
+- **A failure is never cached**, so a broken decoder or binding raises on
+  every call, exactly as before. Each caller gets its own copy of the map.
+- ⚠ **A consumer decoder now keeps its module state between documents.**
+  Decision 1 already makes a decoder a function of `(raw, rel_path)`. The
+  per-call re-import used to hide a decoder that mutates a module global,
+  and no longer does.
 
 <!-- L12-VALUES-START -->
 

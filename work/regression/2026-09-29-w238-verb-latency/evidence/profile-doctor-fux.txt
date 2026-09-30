@@ -1,0 +1,27 @@
+Tue Sep 29 13:05:39 2026    /tmp/claude-501/doctor.prof
+
+         391535314 function calls (389545977 primitive calls) in 47.830 seconds
+
+   Ordered by: cumulative time
+   List reduced from 2325 to 16 due to restriction <16>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    296/1    0.017    0.000   47.837   47.837 {built-in method builtins.exec}
+        1    0.000    0.000   47.837   47.837 <frozen runpy>:201(run_module)
+        1    0.000    0.000   47.822   47.822 <frozen runpy>:65(_run_code)
+        1    0.000    0.000   47.822   47.822 ~/my_programs/fux/src/fux/__main__.py:1(<module>)
+        1    0.000    0.000   47.821   47.821 ~/my_programs/fux/src/fux/cli.py:1095(main)
+        1    0.000    0.000   47.806   47.806 ~/my_programs/fux/src/fux/cli.py:28(_cmd_doctor)
+        1    0.000    0.000   47.797   47.797 ~/my_programs/fux/src/fux/doctor.py:3196(cmd_doctor)
+        1    0.000    0.000   47.797   47.797 ~/my_programs/fux/src/fux/doctor.py:71(run)
+        1    0.000    0.000   47.797   47.797 ~/my_programs/fux/src/fux/doctor.py:195(_repo_root)
+        1    0.026    0.026   47.757   47.757 ~/my_programs/fux/src/fux/doctor.py:268(_layout)
+        1    0.003    0.003   46.626   46.626 ~/my_programs/fux/src/fux/doctor.py:1755(_identifiers)
+        1    0.035    0.035   46.617   46.617 ~/my_programs/fux/src/fux/doctor.py:1805(_identifier_families_current)
+        1    0.000    0.000   45.207   45.207 ~/my_programs/fux/src/fux/inspect/idfamilies.py:176(identifier_families)
+        1    2.303    2.303   45.207   45.207 ~/my_programs/fux/src/fux/inspect/idfamilies.py:127(detect)
+ 25051208   13.021    0.000   30.009    0.000 ~/my_programs/fux/src/fux/inspect/idfamilies.py:77(_is_candidate)
+133239836    9.858    0.000   14.280    0.000 ~/my_programs/fux/src/fux/inspect/idfamilies.py:86(<genexpr>)
+
+
+

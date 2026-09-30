@@ -1,0 +1,36 @@
+Tue Sep 29 12:48:38 2026    ~/my_programs/fux-lab/scratch/w239/before-1k.prof
+
+         48450516 function calls (48163562 primitive calls) in 13.755 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1196 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.011    0.011   13.873   13.873 ~/my_programs/fux/src/fux/ingest/run.py:141(run)
+     1000    0.008    0.000    8.429    0.008 ~/my_programs/fux/src/fux/ingest/extract.py:166(extract_fields)
+     4232    0.001    0.000    5.408    0.001 ~/my_programs/fux/src/fux/query/tokenize.py:26(tokenize)
+     4232    0.009    0.000    5.407    0.001 ~/my_programs/fux/src/fux/query/analyzer.py:110(analyze)
+     4214    0.193    0.000    5.397    0.001 ~/my_programs/fux/src/fux/query/analyzer.py:133(_with_families)
+     3410    0.030    0.000    4.943    0.001 ~/my_programs/fux/src/fux/decode/__init__.py:313(registry)
+     3410    0.066    0.000    4.788    0.001 ~/my_programs/fux/src/fux/decode/__init__.py:521(_consumer_decoders)
+    57970    0.066    0.000    4.014    0.000 ~/my_programs/fux/src/fux/decode/__init__.py:226(_load_consumer)
+57984/57978    0.037    0.000    2.949    0.000 <frozen importlib._bootstrap_external>:753(exec_module)
+     4214    2.785    0.001    2.869    0.001 ~/my_programs/fux/src/fux/query/identifiers.py:343(matches)
+     1000    0.002    0.000    2.692    0.003 ~/my_programs/fux/src/fux/ingest/parse.py:23(parse_document)
+     1803    0.003    0.000    2.562    0.001 ~/my_programs/fux/src/fux/decode/__init__.py:620(claims)
+    57984    0.118    0.000    2.544    0.000 <frozen importlib._bootstrap_external>:826(get_code)
+   249899    0.864    0.000    2.156    0.000 ~/my_programs/fux/src/fux/query/stem.py:140(stem)
+     1000    0.002    0.000    1.871    0.002 ~/my_programs/fux/src/fux/ingest/parse.py:74(meta_fields)
+     1000    0.003    0.000    1.868    0.002 ~/my_programs/fux/src/fux/decode/__init__.py:485(meta_bindings)
+     1005    0.002    0.000    1.865    0.002 ~/my_programs/fux/src/fux/ingest/typesfile.py:176(read)
+     1005    0.028    0.000    1.822    0.002 ~/my_programs/fux/src/fux/ingest/typesfile.py:199(parse)
+        1    0.004    0.004    1.558    1.558 ~/my_programs/fux/src/fux/ingest/gitdir.py:335(walk_sources)
+     1000    0.002    0.000    1.520    0.002 ~/my_programs/fux/src/fux/decode/__init__.py:645(decode)
+     1000    0.001    0.000    1.415    0.001 ~/my_programs/fux/src/fux/ingest/gitdir.py:443(_skip_reason)
+    37216    0.422    0.000    1.157    0.000 ~/my_programs/fux/src/fux/ingest/typesfile.py:316(_line_of)
+    57984    0.359    0.000    1.057    0.000 <frozen importlib._bootstrap_external>:509(_compile_bytecode)
+    31155    0.027    0.000    1.008    0.000 ~/my_programs/fux/src/fux/ingest/typesfile.py:286(_check_binding)
+    31186    0.018    0.000    0.959    0.000 ~/my_programs/fux/src/fux/ingest/typesfile.py:365(_where_decoder)
+
+
+

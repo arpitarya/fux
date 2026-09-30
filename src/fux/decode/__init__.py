@@ -310,8 +310,52 @@ def _meta_fields_of(module, name: str, origin: str) -> dict[str, str]:
     return dict(sorted(out.items()))
 
 
+#: `registry()`'s cache (W-239). Keyed on everything the map is a function of —
+#: the repo, the stat of every `.py` in `.fux/decoders/` (helpers included, since
+#: a decoder may import one), the stat of `.fux/formats.toml` and the legacy
+#: file's presence — so an edit is seen in the same process while a walk over
+#: 10 000 documents imports each consumer decoder ONCE. Until 2026-09-29 every
+#: call re-ran `exec_module` on every consumer file, and `registry()` is called
+#: two or three times per document (`decode`, `claims`, `extract._decoder_for`):
+#: 58 000 imports, 35% of a 1 000-document ingest.
+#:
+#: ⚠ **A consumer decoder now keeps its module state between documents.** One
+#: that mutates a module global while decoding could make a document's output
+#: depend on the documents decoded before it. A decoder is a function of
+#: `(raw, rel_path)` (SR-DECODE decision 1); the per-call re-import used to hide
+#: a decoder that is not, and no longer does.
+_REGISTRY: dict[tuple, dict[str, "Decoder"]] = {}
+
+
+def _registry_key(root: Path | None) -> tuple:
+    if root is None:
+        return (None,)
+    from ..config import LEGACY_TYPES_FILE
+
+    files: list[tuple] = []
+    try:
+        with os.scandir(root / CONSUMER_DIR) as entries:
+            for entry in entries:
+                if entry.name.endswith(".py") and entry.is_file():
+                    st = entry.stat()
+                    files.append((entry.name, st.st_mtime_ns, st.st_size, st.st_ino))
+    except OSError:
+        pass  # no directory: no consumer decoders, as in `_consumer_decoders`
+    try:
+        st = (root / TYPES_FILE).stat()
+        types = (st.st_mtime_ns, st.st_size, st.st_ino)
+    except OSError:
+        types = None
+    legacy = (root / LEGACY_TYPES_FILE).is_file()
+    return (os.path.abspath(root), tuple(sorted(files)), types, legacy)
+
+
 def registry(root: Path | None = None) -> dict[str, Decoder]:
     """Extension -> decoder: the committed binding first, module tuples second.
+
+    **Cached per process on `_registry_key`** (W-239). A failure is never
+    cached, so a broken decoder or binding raises on every call as it always
+    did, and each caller gets its own copy of the map.
 
     Precedence, in the order it is applied:
 
@@ -334,6 +378,14 @@ def registry(root: Path | None = None) -> dict[str, Decoder]:
     machine"*; step 3 answers *"which decoder this repo has agreed reads
     `.csv`"*, and only the second survives a teammate adding a module.
     """
+    key = _registry_key(root)
+    hit = _REGISTRY.get(key)
+    if hit is None:
+        hit = _REGISTRY[key] = _build_registry(root)
+    return dict(hit)
+
+
+def _build_registry(root: Path | None) -> dict[str, Decoder]:
     decoders: dict[str, Decoder] = {}
     #: Module name -> decoder, which is the key a binding names. Built in the
     #: same pass as `decoders` because an extension collision can drop a
@@ -499,9 +551,20 @@ def meta_bindings(root: Path | None) -> dict[str, str]:
     # Dispatch, not policy: an absent file binds nothing here. That the file
     # must exist is `read_types`'s (ingest) and `_limits`'s (every capped
     # decoder) to say, once, with the remedy.
-    if not (root / TYPES_FILE).is_file():
+    path = root / TYPES_FILE
+    if not path.is_file():
         return {}
-    return dict(typesfile.read(root, TYPES_FILE).meta)
+    st = path.stat()
+    # Cached on the file's stat, like `_BINDINGS` (W-239): this runs once per
+    # document, and re-parsing the types file each time was 13% of an ingest.
+    key = (str(path), st.st_mtime_ns, st.st_size, st.st_ino)
+    hit = _META.get(key)
+    if hit is None:
+        hit = _META[key] = dict(typesfile.read(root, TYPES_FILE).meta)
+    return dict(hit)
+
+
+_META: dict[tuple[str, int, int, int], dict[str, str]] = {}
 
 
 def declared_bindings(root: Path | None) -> dict[str, str]:

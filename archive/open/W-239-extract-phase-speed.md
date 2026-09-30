@@ -9,7 +9,7 @@ ball: agent
 
 # W-239 — make the ingest `extract` phase fast again
 
-**Status: filed 2026-09-29, not built.** Arpit, 2026-09-29: *"fux ingest
+**Status: BUILT 2026-09-29 (Claude Code, Opus); archived.** All three fixes; index byte-identical on `rung-01000` and `rung-10000`; `extract` at 10 000 documents 45.6 s → 6.5 s ([run](../../work/regression/2026-09-29-w239-extract-speed/report.md), SR-IDENTIFIERS d13, SR-DECODE d22). *Was:* filed 2026-09-29, not built. Arpit, 2026-09-29: *"fux ingest
 extraction step has slowed down how to improve it performance."*
 
 **Model:** Claude Code, **Opus** — fix 1 touches the analyzer, which both

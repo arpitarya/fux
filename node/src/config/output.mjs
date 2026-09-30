@@ -53,7 +53,7 @@ export const CLI_VERBS = {
   explain: [],
   graph: [],
   path: ["hops"],
-  doctor: [],
+  doctor: ["progress_threshold"],
   hooks: [],
   daemon: [],
   //: `ingest` is PYTHON-ONLY as a verb (this reader never writes an index) and
@@ -82,6 +82,9 @@ export const CLI_VERBS = {
   build: ["progress_threshold"],
   add: ["progress_threshold"],
   remove: ["progress_threshold"],
+  //: W-238: PYTHON-ONLY verbs that paint progress, declared for the same reason.
+  identifiers: ["progress_threshold"],
+  enrich: ["progress_threshold"],
   serve: ["port"],
 };
 

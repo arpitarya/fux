@@ -68,10 +68,20 @@ def _records(root: Path) -> dict[str, dict]:
     return _RECORDS
 
 
-def run(start: Path | None = None) -> list[Check]:
-    global _RECORDS
+#: The invocation's `Progress`, held for the run like `_RECORDS` rather than
+#: threaded through every check (W-238). Only the identifier-family check reads
+#: it: it re-reads every document, and it is nearly all of doctor's time.
+_PROGRESS = None
+
+
+def run(start: Path | None = None, *, progress=None) -> list[Check]:
+    global _RECORDS, _PROGRESS
     _RECORDS = None
-    checks = [_python_version(), *_repo_root(start)]
+    _PROGRESS = progress
+    try:
+        checks = [_python_version(), *_repo_root(start)]
+    finally:
+        _PROGRESS = None
     return checks
 
 
@@ -1811,8 +1821,8 @@ def _identifier_families_current(root: Path) -> Check:
     from .query import identifiers as ids_mod
 
     try:
-        view = read_index_view(root)
-        found = {f.template for f in identifier_families(root, view, examples=0).families}
+        view = read_index_view(root, progress=_PROGRESS)
+        found = {f.template for f in identifier_families(root, view, examples=0, progress=_PROGRESS).families}
         data = tomllib.loads(ids_mod.path(root).read_bytes().decode("utf-8-sig"))
     except (FuxError, OSError) as exc:
         return Check("identifier families current", True, f"skipped: {exc}", level="warn")
@@ -3196,7 +3206,7 @@ def _fix() -> None:
 def cmd_doctor(args) -> int:
     if getattr(args, "fix", False):
         _fix()
-    checks = run()
+    checks = run(progress=getattr(args, "progress", None))
     exit_code = 0 if all(c.ok for c in checks if c.level == "error") else 1
 
     if getattr(args, "json", False):

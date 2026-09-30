@@ -69,11 +69,12 @@ def cmd_identifiers(args) -> int:
     if root is None:
         raise FuxError("not inside a fux repository (no .fux/ found up the tree)")
     current = ids_mod.load(root)  # a malformed file is refused before anything else
-    view = read_index_view(root)
+    progress = getattr(args, "progress", None)  # W-238: `read` then `detect`
+    view = read_index_view(root, progress=progress)
     if not view.docs:
         raise FuxError("the index is empty — run `fux ingest` first; families are detected "
                        "from the indexed documents")
-    detection = identifier_families(root, view, examples=3)
+    detection = identifier_families(root, view, examples=3, progress=progress)
     found = [f.template for f in detection.families]
     on_disk = _file_detected(root)
     new = sorted(set(found) - set(on_disk))

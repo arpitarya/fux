@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@2ebac9d184f2, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@aacd745f031f, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: b3853b8141e000323faa940dedde94adf2e3b22b5518ef63242a323f91e757bd
+content_sha: 832e8ed3bbed37dab6fd01401d16156a7fefcdd9b16235d8263385096de421fa
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -930,6 +930,8 @@ this moved where they are written, not what they are.
 
 
 **The Node reader analyzes every question with the repo's identifier families**, loaded by `identifiersFor(root)` from `.fux/identifiers.toml`, exactly as Python does; the twin is `node/src/query/identifiers.mjs`, held to Python's by one shared fixture ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+**`node/src/config/output.mjs`'s `CLI_VERBS` gains `identifiers` and `enrich`, and `doctor` gains `progress_threshold`** (W-238, 2026-09-29). All three are Python-only verbs, declared so that one committed `output.toml` validates the same way on both readers ([SR-OUTPUT](0143_output-defaults.md)). No Node verb's behaviour changed.
 
 ### Consequences
 

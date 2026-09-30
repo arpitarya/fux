@@ -1,0 +1,225 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 1950" width="1180" height="1950" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTpkODg5NmZmOC04OTg4LTQyZTItOThiMC01YmUwNTgwYmRkOGYAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaId8L5oEZ23o/30khmERmtwAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDpkNWExNjhiMy1kMTVkLTQ0NmQtOTE1OC03ZDk3N2FiZDJkNThscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoqEbIzdxm96CVq5fqkJaVZAAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFgg4x2+/tLeRYGoNXzONmz9Wl758xi07n9cAvMtnSKbj4OkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaK6018xK6Z3L6tv2jV+kwncAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCAIjfxuJX4hKYU8jPAQpBETSOs7wBwfuNF7anxSzx8RKGRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBjhZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOmQ4ODk2ZmY4LTg5ODgtNDJlMi05OGIwLTViZTA1ODBiZGQ4Zi9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOmE3NDg3MDMyLTg2YjAtNGY3ZS1iZjhiLWM5YjRiMmQ0MjAwN3JjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCDjHb7+0t5Fgag1fM42bP1aXvnzGLTuf1wC8y2dIpuPg6JjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggqdm3ENMKIqzWUesAkjAOx7W+d+VehcI38cc4omkUll2iY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggN8ihBHnEZmaRbtoJQ2zvdmFBwf2NkDcMdS91bqnSESx0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQPlfaUP1VjLCqj/uSQ4EaBLh1U7vEgJbTwqi1NFXKr9yn/rlY2hnuPXkSKZHWaG/4ovXcaUD0/Bw7U4e6skOSSg=</c2pa:manifest></metadata>
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#3d6df2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<rect width="1180" height="1950" fill="#fcfcfb"/>
+<text x="46" y="52" font-size="23" fill="#14181f" font-weight="600">The algorithms inside fux</text>
+<text x="46" y="76" font-size="13" fill="#626b78">Every indexing, scoring and graph algorithm that ships today — where it runs, what it computes, and which are on by default.</text>
+<rect x="850" y="26" width="290" height="74" rx="8" fill="#fcfcfb" stroke="#e4e4e0" stroke-width="1.2"/>
+<rect x="862" y="36" width="11" height="11" rx="2.5" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="880" y="45" font-size="10.5" fill="#626b78">committed — written at ingest</text>
+<rect x="862" y="51" width="11" height="11" rx="2.5" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.4"/>
+<text x="880" y="60" font-size="10.5" fill="#626b78">derived — fux build, rebuildable</text>
+<rect x="862" y="66" width="11" height="11" rx="2.5" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="880" y="75" font-size="10.5" fill="#626b78">query time — nothing stored</text>
+<rect x="862" y="81" width="11" height="11" rx="2.5" fill="#fff4ec" stroke="#c2410c" stroke-width="1.4" stroke-dasharray="3 2"/>
+<text x="880" y="90" font-size="10.5" fill="#626b78">shipped, but OFF by default</text>
+<text x="46" y="126" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">1 - INGEST: EACH DOCUMENT BECOMES STATISTICS, NEVER TEXT</text>
+<line x1="46" y1="136" x2="1136" y2="136" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="146" width="206" height="178" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
+<text x="62" y="172" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">analyzer v3</text>
+<text x="62" y="194" font-size="10.5" fill="#4a5260">split ids → lower → stopwords</text>
+<text x="62" y="209.5" font-size="10.5" fill="#4a5260">→ Porter stem → blake2b-8 hash</text>
+<text x="62" y="225.0" font-size="10.5" fill="#4a5260">Split BEFORE lowercasing:</text>
+<text x="62" y="240.5" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">getUserName →</text>
+<text x="62" y="256.0" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">  getusername get user name</text>
+<text x="62" y="271.5" font-size="10" fill="#8a93a0">whole + parts both emitted</text>
+<text x="62" y="287.0" font-size="10" fill="#8a93a0">ingest and query share one module</text>
+<text x="62" y="302.5" font-size="10" fill="#8a93a0">— one hash currency, both sides</text>
+<rect x="267" y="146" width="206" height="178" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
+<text x="283" y="172" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">identifier families</text>
+<text x="283" y="194" font-size="10.5" fill="#4a5260">Templates in identifiers.toml,</text>
+<text x="283" y="209.5" font-size="10.5" fill="#4a5260">e.g. RF-{n}, matched on the text:</text>
+<text x="283" y="225.0" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">RF 118 · rf118 · RF–118</text>
+<text x="283" y="240.5" font-size="10.5" fill="#4a5260">→ adds ONE canonical term</text>
+<text x="283" y="256.0" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">  rf-118</text>
+<text x="283" y="271.5" font-size="10" fill="#8a93a0">beside v3&#x27;s terms, never instead</text>
+<text x="283" y="287.0" font-size="10" fill="#8a93a0">empty file = byte-identical</text>
+<text x="283" y="302.5" font-size="10" fill="#8a93a0">to no feature at all  (W-233)</text>
+<rect x="488" y="146" width="206" height="178" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
+<text x="504" y="172" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">5-field extraction</text>
+<text x="504" y="194" font-size="10.5" fill="#4a5260">tf per field, in this order:</text>
+<text x="504" y="209.5" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">body heading title path ctx</text>
+<text x="504" y="225.0" font-size="10.5" fill="#4a5260">Commits raw flen per field,</text>
+<text x="504" y="240.5" font-size="10.5" fill="#4a5260">never wlen — wlen depends on</text>
+<text x="504" y="256.0" font-size="10.5" fill="#4a5260">tunable weights, so it is</text>
+<text x="504" y="271.5" font-size="10.5" fill="#4a5260">derived at query time.</text>
+<text x="504" y="287.0" font-size="10" fill="#8a93a0">headings → phrases (≤ 32)</text>
+<text x="504" y="302.5" font-size="10" fill="#8a93a0">no vectors, no model</text>
+<rect x="709" y="146" width="206" height="178" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
+<text x="725" y="172" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">edges + anchors</text>
+<text x="725" y="194" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">ref · tag · code · supersedes</text>
+<text x="725" y="209.5" font-size="10.5" fill="#4a5260">grade = edge weight:</text>
+<text x="725" y="225.0" font-size="10.5" fill="#4a5260">EXTRACTED 10 · AMBIG 8 ·</text>
+<text x="725" y="240.5" font-size="10.5" fill="#4a5260">INFERRED 6</text>
+<text x="725" y="256.0" font-size="10.5" fill="#4a5260">A ref edge carries its link</text>
+<text x="725" y="271.5" font-size="10.5" fill="#4a5260">text as term hashes (at, al),</text>
+<text x="725" y="287.0" font-size="10" fill="#8a93a0">on the LINKER&#x27;s record; folded</text>
+<text x="725" y="302.5" font-size="10" fill="#8a93a0">into the target at read time</text>
+<rect x="930" y="146" width="206" height="178" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
+<text x="946" y="172" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">abbr mining + facts</text>
+<text x="946" y="194" font-size="10.5" fill="#4a5260">Regex on the doc&#x27;s own text:</text>
+<text x="946" y="209.5" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">Long Form (ABBR)</text>
+<text x="946" y="225.0" font-size="10.5" fill="#4a5260">→ pair hashes on the record</text>
+<text x="946" y="240.5" font-size="10.5" fill="#4a5260">mtime = git commit time</text>
+<text x="946" y="256.0" font-size="10.5" fill="#4a5260">superseded = declared edge</text>
+<text x="946" y="271.5" font-size="10" fill="#8a93a0">both reach ranking ONLY as a</text>
+<text x="946" y="287.0" font-size="10" fill="#8a93a0">tie-break, never a multiplier</text>
+<text x="946" y="302.5" font-size="10" fill="#8a93a0">PII: regex + Luhn/Verhoeff</text>
+<path d="M149.0,326 L149.0,348" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M370.0,326 L370.0,348" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M591.0,326 L591.0,348" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M812.0,326 L812.0,348" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1033.0,326 L1033.0,348" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="46" y="350" width="1090" height="74" rx="8" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
+<text x="66" y="374" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">The committed store  .fux/index/  —  the postings</text>
+<text x="66" y="394" font-size="11" fill="#4a5260">256 shards, shard = blake2b(id, 1 byte). One canonical JSONL line per document (sorted keys, no floats, no nulls, NFC). Postings: term hash → per-field tf vector.</text>
+<text x="66" y="412" font-size="10.5" fill="#8a93a0">A committed per-document byte is a function of that document alone. Everything corpus-wide — df, n, avg_wlen, anchor terms, the abbr table — is a read-time fold.</text>
+<text x="46" y="460" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">2 - DERIVED PLANE: fux build, GITIGNORED, REBUILT FROM THE SHARDS ALONE</text>
+<line x1="46" y1="470" x2="1136" y2="470" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46.0" y="480" width="350.0" height="130" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="62.0" y="506" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">T1 accelerator — postings blocks</text>
+<text x="62.0" y="528" font-size="10.5" fill="#4a5260">Postings grouped into blocks. A 62-byte binary offset table</text>
+<text x="62.0" y="543.5" font-size="10.5" fill="#4a5260">holds each block&#x27;s max weighted tf (mx) and min wlen (mnw):</text>
+<text x="62.0" y="559.0" font-size="10.5" fill="#4a5260">an exact per-block score ceiling, read without the block.</text>
+<text x="62.0" y="574.5" font-size="10" fill="#8a93a0">Law: results byte-identical to the scan.</text>
+<text x="62.0" y="590.0" font-size="10" fill="#8a93a0">Proven by tools/differential/, not hoped for.</text>
+<rect x="416.0" y="480" width="350.0" height="130" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="432.0" y="506" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">graph plane — label propagation</text>
+<text x="432.0" y="528" font-size="10.5" fill="#4a5260">Communities on the undirected edge graph (Raghavan 2007).</text>
+<text x="432.0" y="543.5" font-size="10.5" fill="#4a5260">No randomness: visit sorted(nodes), ties → smallest label,</text>
+<text x="432.0" y="559.0" font-size="10.5" fill="#4a5260">≤ 20 sweeps, stop when a sweep changes nothing.</text>
+<text x="432.0" y="574.5" font-size="10" fill="#8a93a0">Renamed c0, c1 … by size, then smallest member id,</text>
+<text x="432.0" y="590.0" font-size="10" fill="#8a93a0">so a label names the partition, not the traversal.</text>
+<rect x="786.0" y="480" width="350.0" height="130" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="802.0" y="506" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">mined.json — abbreviation table</text>
+<text x="802.0" y="528" font-size="10.5" fill="#4a5260">Union of every record&#x27;s (long form, ABBR) pairs,</text>
+<text x="802.0" y="543.5" font-size="10.5" fill="#4a5260">folded corpus-wide. Committed nowhere.</text>
+<text x="802.0" y="559.0" font-size="10.5" fill="#4a5260">The scan rebuilds the same table from the shards,</text>
+<text x="802.0" y="574.5" font-size="10.5" fill="#4a5260">so --fast and --scan fold identically.</text>
+<text x="802.0" y="590.0" font-size="10" fill="#8a93a0">Edges are copied into graph.json too — speed only.</text>
+<text x="46" y="646" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">3 - fux ask: THE QUERY PIPELINE, TOP TO BOTTOM</text>
+<line x1="46" y1="656" x2="1136" y2="656" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="666" width="1090" height="64" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="691" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">① analyze the question</text>
+<text x="1116" y="691" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">always</text>
+<text x="66" y="712" font-size="11" fill="#4a5260">Same analyzer v3 + identifier families → the REQUIRED hashes. Expansion stacks extra hashes at a lower weight: --expand (agent-written, × 0.2) and mined abbreviations (× 0.5).</text>
+<path d="M590,732 L590,752" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="46" y="754" width="535" height="118" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="779" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">② candidates — the scan (reference)</text>
+<text x="66" y="802" font-size="11" fill="#4a5260">B2 byte prefilter: each shard line is read as raw bytes and</text>
+<text x="66" y="819" font-size="11" fill="#4a5260">json.loads&#x27;d only if a query hash appears as a substring.</text>
+<text x="66" y="836" font-size="11" fill="#4a5260">df, n and avg_wlen fall out of the SAME pass — never stored.</text>
+<text x="66" y="853" font-size="11" fill="#4a5260">Answers a fresh clone with no build step.</text>
+<text x="66" y="864" font-size="10.5" fill="#8a93a0">When the two disagree, this one is right by definition.</text>
+<rect x="601" y="754" width="535" height="118" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="621" y="779" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">② candidates — the accelerator (--fast)</text>
+<text x="621" y="802" font-size="11" fill="#4a5260">Terms opened rarest-first. After each term, the k-th score θ</text>
+<text x="621" y="819" font-size="11" fill="#4a5260">is exact. If Σ (deferred terms&#x27; block ceilings) cannot reach θ,</text>
+<text x="621" y="836" font-size="11" fill="#4a5260">every unopened block is skipped — block-max pruning.</text>
+<text x="621" y="853" font-size="11" fill="#4a5260">Rounding-aware: skip only if round(bound,9) &lt; round(θ,9).</text>
+<text x="621" y="864" font-size="10.5" fill="#8a93a0">Generates candidates + statistics only. Never scores, never sorts.</text>
+<path d="M590,874 L590,894" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="46" y="896" width="1090" height="132" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="921" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">③ BM25F — rank(), the one scorer both paths call</text>
+<text x="1116" y="921" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">always</text>
+<text x="66" y="942" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">wtf = Σf wf·tff (+ anchor·tf_anchor)     score = Σt idf(t) · wtf·(k1+1) / (wtf + k1·(1 − b + b·wlen/avg_wlen))</text>
+<text x="66" y="960" font-size="11" fill="#4a5260">Weight-then-saturate ONCE — never per-field BM25 summed.  k1 1.2 · b 0.15 · body 1 · heading 3 · title 2 · path 1.5 · ctx 1 · anchor 1</text>
+<text x="66" y="978" font-size="11" fill="#4a5260">wlen = Σ wf·flenf at query time. One Weighting for both paths: intent prior × 1.1 when the doc type matches the question&#x27;s cue; [priority].</text>
+<text x="66" y="996" font-size="10.5" fill="#8a93a0">Sort key (−round(score,9), superseded, −mtime, −priority, id) — total and machine-independent. Equal rounded scores are flagged tie.</text>
+<path d="M590,1030 L590,1050" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="46" y="1052" width="1090" height="64" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.6" stroke-dasharray="5 3"/>
+<text x="66" y="1077" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">④ proximity rerank</text>
+<text x="1116" y="1077" font-size="10.5" fill="#c2410c" font-weight="600" text-anchor="end">OFF — rerank_weight 0</text>
+<text x="66" y="1098" font-size="11" fill="#4a5260">Top 20, scored by each doc&#x27;s BEST passage: coverage² × 0.55 + minimum span × 0.30 + bigram adjacency × 0.15. Re-orders, never retrieves.</text>
+<path d="M590,1118 L590,1138" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="46" y="1140" width="1090" height="46" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="1165" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">⑤ pin</text>
+<text x="1116" y="1165" font-size="10.5" fill="#8a93a0" font-weight="600" text-anchor="end">only with fux correct --pin</text>
+<text x="200" y="1165" font-size="11" fill="#4a5260">A human-pinned doc for this exact question moves to #1 AFTER ranking. Never a score.</text>
+<path d="M590,1188 L590,1208" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="46" y="1210" width="1090" height="100" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="66" y="1235" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">⑥ graph compose — lazy PPR + RRF</text>
+<text x="1116" y="1235" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">on — ask_boost, ask_related</text>
+<text x="66" y="1256" font-size="11" fill="#4a5260">Seeds = the lexical window. Lazy personalised PageRank over ref edges only: damping 0.85, laziness 0.5, 3 fixed iterations, 1 hop, weight = grade.</text>
+<text x="66" y="1274" font-size="11" fill="#4a5260">Tier A: re-order the window by RRF(lexical rank, PPR rank) = Σ 1/(60 + rank). The BM25F score is kept; the row says boosted and shows its route.</text>
+<text x="66" y="1292" font-size="11" fill="#4a5260">Tier B: walked docs holding NONE of the query&#x27;s hashes → a labelled related list (≤ 5). Never scored, never in the band.</text>
+<path d="M590,1312 L590,1332" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="46" y="1334" width="1090" height="100" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="1359" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">⑦ confidence band</text>
+<text x="1116" y="1359" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">always</text>
+<text x="66" y="1380" font-size="11" fill="#4a5260">coverage = idf-weighted share of query terms the corpus holds · separation = (s1 − s2) / s1 · support = result count · verified</text>
+<text x="66" y="1398" font-size="11" fill="#4a5260">none: nothing scored · partial: a term matches no doc, or cited bytes changed · weak / grounded: separation against floor 0.1</text>
+<text x="66" y="1416" font-size="10.5" fill="#8a93a0">weak is a signal, not a refusal. missing names every absent term — the field an agent should read first.</text>
+<text x="46" y="1458" font-size="10.5" fill="#8a93a0">Also at query time:  -q fuses several questions by RRF (k = 60), and score becomes an RRF score.  Matched headings are a display-only pick from phrases.</text>
+<text x="46" y="1494" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">4 - fux answer: RANK LIKE ASK (TOP 3), THEN RE-SCORE THE FETCHED BYTES</text>
+<line x1="46" y1="1504" x2="1136" y2="1504" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46.0" y="1514" width="251.5" height="124" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="62.0" y="1540" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fetch + sha verdict</text>
+<text x="62.0" y="1562" font-size="10.5" fill="#4a5260">file: reads the working tree;</text>
+<text x="62.0" y="1577" font-size="10.5" fill="#4a5260">url: fetch, TTL cache, or</text>
+<text x="62.0" y="1592" font-size="10.5" fill="#4a5260">.fux/acquired/ bytes.</text>
+<text x="62.0" y="1607" font-size="10.5" fill="#4a5260">sha(raw bytes) vs indexed sha</text>
+<text x="62.0" y="1622" font-size="10" fill="#8a93a0">current·stale·cached·as-ingested·unverified</text>
+<rect x="325.5" y="1514" width="251.5" height="124" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="341.5" y="1540" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">chunk</text>
+<text x="341.5" y="1562" font-size="10.5" fill="#4a5260">Heading-aware, from the</text>
+<text x="341.5" y="1577" font-size="10.5" fill="#4a5260">author&#x27;s own headings.</text>
+<text x="341.5" y="1592" font-size="10.5" fill="#4a5260">Tables: 1 row per passage.</text>
+<text x="341.5" y="1607" font-size="10.5" fill="#4a5260">Transient — never written (L3).</text>
+<text x="341.5" y="1622" font-size="10" fill="#8a93a0">same chunker the reranker uses</text>
+<rect x="605.0" y="1514" width="251.5" height="124" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="621.0" y="1540" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">rescore</text>
+<text x="621.0" y="1562" font-size="10.5" fill="#4a5260">The SAME BM25F scorer, with</text>
+<text x="621.0" y="1577" font-size="10.5" fill="#4a5260">the passage set&#x27;s own df and n.</text>
+<text x="621.0" y="1592" font-size="10.5" fill="#4a5260">A passage is a two-field</text>
+<text x="621.0" y="1607" font-size="10.5" fill="#4a5260">document: heading + body.</text>
+<text x="621.0" y="1622" font-size="10" fill="#8a93a0">one scorer, never two</text>
+<rect x="884.5" y="1514" width="251.5" height="124" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="900.5" y="1540" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">assemble</text>
+<text x="900.5" y="1562" font-size="10.5" fill="#4a5260">8000-byte budget — bytes,</text>
+<text x="900.5" y="1577" font-size="10.5" fill="#4a5260">never tokens. Best passage is</text>
+<text x="900.5" y="1592" font-size="10.5" fill="#4a5260">seated FIRST, then greedy</text>
+<text x="900.5" y="1607" font-size="10.5" fill="#4a5260">score-per-byte fills the rest.</text>
+<text x="900.5" y="1622" font-size="10" fill="#8a93a0">locator: loc:L41-L58 or loc#p3</text>
+<path d="M299.5,1576.0 L323.5,1576.0" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M579.0,1576.0 L603.0,1576.0" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M858.5,1576.0 L882.5,1576.0" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="46" y="1674" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">5 - GRAPH VERBS AND INSPECTION: READ-ONLY, OUTSIDE ask&#x27;s RANKING</text>
+<line x1="46" y1="1684" x2="1136" y2="1684" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46.0" y="1694" width="251.5" height="124" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="62.0" y="1720" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fux explain</text>
+<text x="62.0" y="1742" font-size="10.5" fill="#4a5260">A doc&#x27;s outbound edges</text>
+<text x="62.0" y="1757" font-size="10.5" fill="#4a5260">(ref, tag, code, supersedes)</text>
+<text x="62.0" y="1772" font-size="10.5" fill="#4a5260">and its community label</text>
+<text x="62.0" y="1787" font-size="10.5" fill="#4a5260">from label propagation.</text>
+<text x="62.0" y="1802" font-size="10" fill="#8a93a0">no walk, no score</text>
+<rect x="325.5" y="1694" width="251.5" height="124" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="341.5" y="1720" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fux graph</text>
+<text x="341.5" y="1742" font-size="10.5" fill="#4a5260">Seeds from ranking or --seed</text>
+<text x="341.5" y="1757" font-size="10.5" fill="#4a5260">→ the same lazy PPR walk.</text>
+<text x="341.5" y="1772" font-size="10.5" fill="#4a5260">Optional hub damping:</text>
+<text x="341.5" y="1787" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">1 / (1 + ln(1 + in-degree))</text>
+<text x="341.5" y="1802" font-size="10" fill="#8a93a0">link_idf — off by default here</text>
+<rect x="605.0" y="1694" width="251.5" height="124" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="621.0" y="1720" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fux path</text>
+<text x="621.0" y="1742" font-size="10.5" fill="#4a5260">Every simple DIRECTED route</text>
+<text x="621.0" y="1757" font-size="10.5" fill="#4a5260">A → B, most reliable first.</text>
+<text x="621.0" y="1772" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">Π(grade/10) · 0.5^(hops−1)</text>
+<text x="621.0" y="1787" font-size="10.5" fill="#4a5260">Bounded: 200k expansions,</text>
+<text x="621.0" y="1802" font-size="10" fill="#8a93a0">exceeding it is reported</text>
+<rect x="884.5" y="1694" width="251.5" height="124" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="900.5" y="1720" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fux inspect</text>
+<text x="900.5" y="1742" font-size="10.5" fill="#4a5260">Near-duplicates: MinHash</text>
+<text x="900.5" y="1757" font-size="10.5" fill="#4a5260">over each doc&#x27;s term-hash</text>
+<text x="900.5" y="1772" font-size="10.5" fill="#4a5260">set → Jaccard ≥ a floor.</text>
+<text x="900.5" y="1787" font-size="10.5" fill="#4a5260">Boilerplate by df; probes.</text>
+<text x="900.5" y="1802" font-size="10" fill="#8a93a0">computed on the fly by fux serve</text>
+<text x="46" y="1854" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">NOT IN THE ENGINE — SO DO NOT LOOK FOR THEM</text>
+<line x1="46" y1="1864" x2="1136" y2="1864" stroke="#e4e4e0" stroke-width="1"/>
+<text x="46" y="1878" font-size="10.5" fill="#c2410c">Deleted: the dense/embedding lane and its score fusion (2026-08-25) · recency, superseded and archived multipliers (W-151, W-152) · RM3 — failed twice, code removed (W-224).</text>
+<text x="46" y="1896" font-size="10.5" fill="#8a93a0">Stopped at the pre-registration gate: SDM proximity, MMR, section units. A separate exact-identifier field was never built — families replaced it. Git authority prior: ruled, not built.</text>
+<line x1="46" y1="1914" x2="1136" y2="1914" stroke="#e4e4e0" stroke-width="1"/>
+<text x="46" y="1930" font-size="10.5" fill="#8a93a0">Drawn from src/fux/query/, derive/, graph/, ingest/, refer/, inspect/ and templates/tune.toml.txt defaults, 2026-09-29. SR-ASK · SR-TUNE · SR-CONFIDENCE · SR-GRAPH · SR-T1-ACCELERATOR.</text>
+</svg>

@@ -182,6 +182,9 @@ refuses the file if a question does not place its own document in the **top
 3**. A question that retrieves something else is not neutral — it adds terms
 that pull *other* documents up.
 
+One search per question is slow over many files, so `--check` paints a
+`check N/M files` bar on stderr; `--no-progress` silences it.
+
 ⚠ **Scored with `title` and `ctx` zeroed.** `title`, so echoing the heading
 cannot pass; `ctx`, because enrichment text is itself indexed as `ctx` and a
 question would otherwise retrieve its document *through itself* — passing on

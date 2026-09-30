@@ -32,7 +32,7 @@ top = 5            # ask/find. ⚠ also bounds `confidence.support`,
                #   which is a REPORTED signal — the one key here that
                #   changes a number an agent reads, admitted rather than hidden.
 max_headings = 3   # ask/find: the matched `§ heading` lines shown under each hit
-progress_threshold = 200   # ingest/build/add/remove/inspect: a phase paints a
+progress_threshold = 200   # ingest/build/add/remove/inspect/identifiers/doctor/enrich: a phase paints a
                            #   progress bar only once its total exceeds this
 
 [cli.ask]
