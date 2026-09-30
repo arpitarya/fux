@@ -86,7 +86,7 @@ to** (Arpit, 2026-09-13). It is the answer to one question:
 | `kind` | becomes wrong when | today | the gate the kind selects |
 |---|---|---|---|
 | `law` | **Arpit rules differently** | 14 — SR-LAWS + SR-LAW-0…SR-LAW-12 | [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) holds `CLAUDE.md`'s generated block byte-equal to the record; a record conflicting with a law is void in the conflicting part |
-| `component` | **the code changes** | 52 | [`tests/test_sr_freshness.py`](../tests/test_sr_freshness.py) and [`scripts/sr-guard.sh`](../scripts/sr-guard.sh) — the owning record is touched in the same change |
+| `component` | **the code changes** | 58 | [`tests/test_sr_freshness.py`](../tests/test_sr_freshness.py) and [`scripts/sr-guard.sh`](../scripts/sr-guard.sh) — the owning record is touched in the same change |
 | `process` | **the way work is done changes**, with no code behind it | 21 — SR-RS, SR-PORT-LIST, SR-AGENT-SURFACES, and the eighteen WORK records SR-WORK-OPEN-QUEUE, SR-WORK-ENVIRONMENTS, SR-WORK-BENCHMARK, SR-WORK-OWNERSHIP, SR-WORK-BACKLOG, SR-WORK-QUALITY, SR-WORK-SCALE, SR-WORK-LIFECYCLE, SR-WORK-DOCS, SR-WORK-SESSION, SR-WORK-OKF, SR-WORK-ARCHIVE, SR-WORK-RELEASE, SR-WORK-BLOCKERS, SR-WORK-GOVERNANCE, SR-WORK-GOLDEN, SR-WORK-REGISTRY, SR-WORK-TESTDATA | its enforcement is a test, so it **owns that test** |
 
 **The kind selects an *additional* gate; it never switches one off.** The
@@ -101,9 +101,9 @@ SR-WORK-QUALITY owns `tools/quality` and is a process one** — identical shape,
 opposite kind. A derived field would have to guess, and a guess in this position
 reads as authority.
 
-### 🔴 What the kind made visible: nine ungated component records
+### 🔴 What the kind made visible: ten ungated component records
 
-**21 of 85 records carry `owns: []`, and every one of them is now reachable by
+**22 of 93 records carry `owns: []`, and every one of them is now reachable by
 the freshness gate or stated as unreachable on purpose.** Ten are law records,
 which is correct — a law governs conduct, not components. **Two are `process`
 records that name their own hole out loud**, each in its own decision and never
@@ -112,25 +112,27 @@ by omission: [SR-WORK-SCALE](0057_WORK-scale.md) decision 15 and
 and where the boundary with the archived engine runs — neither of which a
 checker can grade without grading it wrongly.
 
-**The other nine are `component` records that own no component**, and since
+**The other ten are `component` records that own no component**, and since
 2026-09-21 (W-208) **each one carries `describes` rows instead**, so a change to
 the code its subject lives in does open it:
 
 `SR-FIND` · `SR-URL-INGEST` · `SR-DIR-LIST` · `SR-CACHEDIR-TAG` ·
 `SR-DOCS-TABLE` · `SR-RUNTIME-MANIFEST` · `SR-RUNTIME-STAMP` ·
-`SR-RUNTIME-STATS` · `SR-LOCKS`
+`SR-RUNTIME-STATS` · `SR-LOCKS` · `SR-SECTIONS`
+
+⚠ **SR-SECTIONS is the tenth for a different reason**: it is `proposed` and unbuilt, so there is nothing yet to own. Its `describes` row on the chunker's two section functions keeps it reachable until the build gives it its components.
 
 ⚠ **Four left that list by gaining the component they were always the record
 for** — `SR-ANSWER`, `SR-RECORD`, `SR-CDP-FETCHER` and `SR-HTTP-FETCHER`, each
 by a carve-out from a directory claim rather than an invention. **`describes`
-never substitutes for `owns`**: the nine above are gate-*reachable*, not owners,
+never substitutes for `owns`**: the ten above are gate-*reachable*, not owners,
 and the question each still faces is whether it should own its component, be
 re-kinded, or earn a stated exemption. **That is Arpit's call, one record at a
 time**, and inventing an owner to satisfy a check would be the moving-threshold
 failure wearing a helpful face.
 
 **The rule that would close it — *a `kind: component` record must have a
-non-empty `owns`* — is still NOT in force**, and the nine would still turn red
+non-empty `owns`* — is still NOT in force**, and the ten would still turn red
 on the day it lands.
 
 ⚠ **This section read *thirteen ungated component records* and *30 of 80* until
@@ -423,6 +425,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0158](0158_serve.md) | **SR-SERVE** | `fux serve` — the explorer. A stdlib server bound to **`127.0.0.1` with no `--host`** (a contract, not a default) serving ONE self-contained page, and `GET /ask` answering with the **byte-identical stdout of `fux ask --json --why --band`** — because the route runs that command rather than rebuilding its payload. 🔴 **The page computes no score, no band and no rank**: a second ranker in a browser is a restatement in the L0 sense, and the three sample pages this was designed from had one. Lever cards are a rule per condition over the JSON, the two untuned thresholds print the word *provisional* **to the reader**, no route writes anything and `POST` is a 405 with a sentence. Rungs 2–4 (`ask --html`, the per-document findability card, `/docs`) are filed, not built | accepted | yes |
 | [0159](0159_constants.md) | **SR-CONSTANTS** | `src/fux/constants.toml` — the engine's FIXED values (schema ids, format and rules versions, artefact names, decoder versions, and the numbers a format or protocol defines), read by one Python and one Node loader through `fixed(table, key)`. **The Node bundle carries the file inlined** (`@fux-inline`, L10). A missing table or key raises the same sentence in both runtimes; nothing in code supplies a fallback (L12) | accepted | yes |
 | [0160](0160_identifiers.md) | **SR-IDENTIFIERS** | identifier families — `.fux/identifiers.toml` (`[user]` hand-written and winning, `[detected]` written only by `fux identifiers --write`), matched against the text on BOTH readers at ingest and query; each match adds ONE canonical term beside analyzer v3 (`RF 118`, `rf118`, `RF–118` → `rf-118`). Templates by default, a statically guarded `[user]` regex for experts; the effective digest stamped in every shard header. **An empty file is byte-identical to no feature**. Measured PASS (W-233, 2026-09-28) | accepted | yes |
+| [0161](0161_sections.md) | **SR-SECTIONS** | section records (W-168 step 10, ruled U2 · B2 · E1): each heading section of a multi-section document is a committed `doc#s<k>` record in its own plane, `.fux/index/sections/`, cut by a TUNABLE-FREE rule (bodiless headings fold forward; table rows never make a section), with `nsec` on the parent; the best section adds `[ranking] section_weight` × its score inside `rank()`, one result per document, and at `0.0` the plane is never opened. `_format` bump + `ingest --full`. **Measured: about doubles the index** (+98.4 % at rung-10000, 50.4 MB, both commit limits pass). The build waits for a `step10_section` pool ≥ 6 | proposed | **no** |
 | [0002](0002_LAW-0-authority.md) | **SR-LAW-0** | L0 — a rule is stated in exactly one SR and every other artifact links to it; the Law records outrank every other record and a conflicting record is void in the conflicting part; a Law changes only on Arpit's ruling | accepted | yes |
 
 > ## Renumbered again on 2026-09-13 — the quality contract became a WORK record
@@ -717,6 +720,7 @@ table does not grant.
 | `tools/quality/` | SR-WORK-QUALITY | the frozen quality contract — the declared query mix and the published cost of an error — **and `goldens.py`, the schema that keeps the rank contract and the relevance set apart** (decision 12). The mix and the cost are a **frozen instrument, not a harness**; `goldens.py` is the one executable thing here, and it exists because decision 12's rules are mechanical: an undeclared relevance list, or a `doc` outside its own relevance set, is refused rather than trusted |
 | `tools/vector-gate/` | SR-RS | W-106's instrument — does a **contextual** embedder fused by RRF reach DENSE-CHUNK's frozen bar, and **do two implementations of one model produce the same vector**. ⚠ Held here by **decision 10's fallback**, the `tools/t2-eval/` precedent: the record it belongs to (`SR-VECTORS`) **does not exist** — W-112 is blocked on this instrument's own result, and a proposal is not a valid owner. It moves to `SR-VECTORS` if and when that record is accepted |
 | `tools/t2-eval/` | SR-RS | a harness whose feature record was retired, held here by SR-RS decision 10's fallback. **A retired record cannot own anything, and a proposal is not a valid owner** |
+| `tools/section-size/` | SR-RS | W-236's instrument — projects the section plane [SR-SECTIONS](0161_sections.md) would write, on the golden ladder, and is that record's veto check. Held here by **decision 10's fallback**, the `tools/vector-gate/` precedent: SR-SECTIONS is `proposed`, and a proposed record is not a valid owner. It moves to SR-SECTIONS when that record is accepted |
 | `node/` | SR-NODE-SEARCH | the Node read plane — 47 `.mjs` files as AUTHORED, shipped as ONE bundled file (L10, decision 13); no `dependencies` key, and no build step **for the consumer**. **The only owned component outside `src/` and `tools/`**, so `test_sr_ownership.py::components()` does not demand it; 🔴 **Since 2026-09-23 (Arpit) this row owns only what no other record does.** Every `.mjs` file with a Python twin is OWNED by the record that owns the twin, in the rows below — longest prefix wins — so a change to `config/tune.mjs` opens SR-TUNE, not this record. What stays here: `compat/`, `hash/` and `config/toml.mjs` (no Python twin, exempt by decision), `package.json` and the rest of the tree. This record is still re-read on every Node change, because the `node` hash in its `owns:` moves with any tracked file under it |
 | `node/fux.mjs` | SR-CLI | the Node CLI boundary — argument parsing, `--no-tune`, and the one place `FuxError` is rendered. Twin of `src/fux/cli.py` |
 | `node/src/config/constants.mjs` | SR-CONSTANTS | the Node loader of `src/fux/constants.toml` — read in a checkout, inlined by the bundler |
@@ -943,5 +947,6 @@ rows narrowed so far were each verified by reading every mention in the file
 | `node/dist/fux.mjs` | SR-WORK-RELEASE | the ONE bundled file a consumer is served ([L10](0012_LAW-10-bundled-output.md)), built at publish. ⚠ **Named, never owned, and GITIGNORED** — it is build output, so the gate can never fire on it and the generated Components block renders it without a link. The row exists so the record that decides how a release reaches npm names the artefact that goes there |
 | `node/test/config.test.mjs` | SR-TUNE | `.fux/tune.toml` as the Node reader loads it — the header names it first |
 | `node/test/config.test.mjs` | SR-OUTPUT | `.fux/output.toml` as the Node reader loads it |
+| `src/fux/refer/_chunk.py::_sections,_title_index` | SR-SECTIONS | the index section rule (decision 2) cuts with `_sections` and folds the title `_title_index` names; a change to either changes what a section record would be. Narrowed because the rest of the file (`_fold`, the table bands, the ladder) is passage policy the rule deliberately does not reuse |
 <!-- DESCRIBES-TABLE-END -->
 

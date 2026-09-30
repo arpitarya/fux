@@ -35,7 +35,8 @@ here. Read that record before changing anything below it.
 - 🔴 **W-168** · `arpit` — ranking ideas. 6, 7 stop; 9 shipped; 10 → W-236, 5 → W-237. **Step 8 (authority prior) built off at `0.0` (`fux.index.v6`) and captured; Arpit scores.** [detail](open/W-168-search-improvements.md)
 - 🔴 **W-225** · `agent` — L12 migration: no values hidden in code. Stages 1–7 and the 16 odd sites landed. Left: stage 5f `inspect`, **waiting on W-228**, then stage 8. **Opus.** [detail](open/W-225-values-live-in-config.md)
 - 🔴 **W-228** · `agent` — document families. The lens is built; its misfit flag's threshold is still a placeholder. Arpit ruled (not built): plant known misfits in the seed once steps 7 and 8 file verdicts — waiting on W-168. [detail](open/W-228-document-families.md)
-- 🟢 **W-236** · `agent` — W-168 step 10 as ruled U2: section records in the index. First the design record and a size measurement; the build waits for a `step10_section` pool ≥ 6. **Opus.** [detail](open/W-236-section-records.md)
+- 🟡 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)
+- 🟢 **W-240** · `agent` — a scored set with a `step10_section` pool ≥ 6 (set-4-claude: 1): recipe R10 seed, `set-5-claude`, rung rebuild, then 🔴 Arpit scores. **Opus.** [detail](open/W-240-section-pool-set.md)
 - 🟢 **W-237** · `agent` — RM3 back behind a `grounded`-only gate (R1 · G3, 2026-09-29). Pre-register on `set-4-claude` (pool 20), amend SR-EXPAND d17, build off at `0.0`; Arpit scores. **Opus.** [detail](open/W-237-rm3-grounded-gate.md)
 
 

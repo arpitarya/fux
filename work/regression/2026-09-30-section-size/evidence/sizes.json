@@ -1,0 +1,258 @@
+{
+ "rung-00100": {
+  "added_bytes": 591397,
+  "doc_plane_bytes": 499137,
+  "doc_plane_zlib": 240687,
+  "documents": 100,
+  "empty_section_records": 0,
+  "growth_pct": 118.5,
+  "largest_doc_shard_bytes": 26731,
+  "largest_file_bytes": 41427,
+  "largest_section_shard_bytes": 41427,
+  "multi_section_documents": 93,
+  "nsec_bytes": 845,
+  "projected_total_bytes": 1090534,
+  "section_plane_bytes": 590552,
+  "section_plane_zlib": 216135,
+  "section_records": 550,
+  "section_records_by_extension": {
+   ".html": 33,
+   ".md": 490,
+   ".yaml": 27
+  },
+  "sections_per_multi_doc": {
+   "max": 25,
+   "mean": 5.91,
+   "p50": 5,
+   "p90": 8
+  },
+  "totality_miss_ids": [],
+  "totality_misses": 0,
+  "unreadable": 0,
+  "zlib_growth_pct": 89.8
+ },
+ "rung-00200": {
+  "added_bytes": 841006,
+  "doc_plane_bytes": 752058,
+  "doc_plane_zlib": 358563,
+  "documents": 200,
+  "empty_section_records": 0,
+  "growth_pct": 111.8,
+  "largest_doc_shard_bytes": 26731,
+  "largest_file_bytes": 41427,
+  "largest_section_shard_bytes": 41427,
+  "multi_section_documents": 191,
+  "nsec_bytes": 1727,
+  "projected_total_bytes": 1593064,
+  "section_plane_bytes": 839279,
+  "section_plane_zlib": 314928,
+  "section_records": 949,
+  "section_records_by_extension": {
+   ".html": 63,
+   ".md": 799,
+   ".yaml": 87
+  },
+  "sections_per_multi_doc": {
+   "max": 25,
+   "mean": 4.97,
+   "p50": 4,
+   "p90": 6
+  },
+  "totality_miss_ids": [],
+  "totality_misses": 0,
+  "unreadable": 0,
+  "zlib_growth_pct": 87.8
+ },
+ "rung-00500": {
+  "added_bytes": 1591286,
+  "doc_plane_bytes": 1515741,
+  "doc_plane_zlib": 680440,
+  "documents": 500,
+  "empty_section_records": 0,
+  "growth_pct": 105.0,
+  "largest_doc_shard_bytes": 28461,
+  "largest_file_bytes": 42931,
+  "largest_section_shard_bytes": 42931,
+  "multi_section_documents": 481,
+  "nsec_bytes": 4337,
+  "projected_total_bytes": 3107027,
+  "section_plane_bytes": 1586949,
+  "section_plane_zlib": 585999,
+  "section_records": 2130,
+  "section_records_by_extension": {
+   ".html": 138,
+   ".md": 1725,
+   ".yaml": 267
+  },
+  "sections_per_multi_doc": {
+   "max": 25,
+   "mean": 4.43,
+   "p50": 4,
+   "p90": 6
+  },
+  "totality_miss_ids": [],
+  "totality_misses": 0,
+  "unreadable": 0,
+  "zlib_growth_pct": 86.1
+ },
+ "rung-01000": {
+  "added_bytes": 2823081,
+  "doc_plane_bytes": 2775697,
+  "doc_plane_zlib": 1118548,
+  "documents": 1000,
+  "empty_section_records": 0,
+  "growth_pct": 101.7,
+  "largest_doc_shard_bytes": 35181,
+  "largest_file_bytes": 48076,
+  "largest_section_shard_bytes": 48076,
+  "multi_section_documents": 963,
+  "nsec_bytes": 8675,
+  "projected_total_bytes": 5598778,
+  "section_plane_bytes": 2814406,
+  "section_plane_zlib": 952515,
+  "section_records": 4084,
+  "section_records_by_extension": {
+   ".html": 258,
+   ".md": 3259,
+   ".yaml": 567
+  },
+  "sections_per_multi_doc": {
+   "max": 25,
+   "mean": 4.24,
+   "p50": 4,
+   "p90": 6
+  },
+  "totality_miss_ids": [],
+  "totality_misses": 0,
+  "unreadable": 0,
+  "zlib_growth_pct": 85.2
+ },
+ "rung-02000": {
+  "added_bytes": 5285025,
+  "doc_plane_bytes": 5285113,
+  "doc_plane_zlib": 1812096,
+  "documents": 2000,
+  "empty_section_records": 0,
+  "growth_pct": 100.0,
+  "largest_doc_shard_bytes": 49127,
+  "largest_file_bytes": 63583,
+  "largest_section_shard_bytes": 63583,
+  "multi_section_documents": 1931,
+  "nsec_bytes": 17387,
+  "projected_total_bytes": 10570138,
+  "section_plane_bytes": 5267638,
+  "section_plane_zlib": 1526579,
+  "section_records": 8017,
+  "section_records_by_extension": {
+   ".html": 513,
+   ".md": 6337,
+   ".yaml": 1167
+  },
+  "sections_per_multi_doc": {
+   "max": 25,
+   "mean": 4.15,
+   "p50": 4,
+   "p90": 5
+  },
+  "totality_miss_ids": [],
+  "totality_misses": 0,
+  "unreadable": 0,
+  "zlib_growth_pct": 84.2
+ },
+ "rung-05000": {
+  "added_bytes": 12670439,
+  "doc_plane_bytes": 12822298,
+  "doc_plane_zlib": 3280258,
+  "documents": 5000,
+  "empty_section_records": 0,
+  "growth_pct": 98.8,
+  "largest_doc_shard_bytes": 98744,
+  "largest_file_bytes": 112074,
+  "largest_section_shard_bytes": 112074,
+  "multi_section_documents": 4831,
+  "nsec_bytes": 43487,
+  "projected_total_bytes": 25492737,
+  "section_plane_bytes": 12626952,
+  "section_plane_zlib": 2705690,
+  "section_records": 19797,
+  "section_records_by_extension": {
+   ".html": 1263,
+   ".md": 15567,
+   ".yaml": 2967
+  },
+  "sections_per_multi_doc": {
+   "max": 25,
+   "mean": 4.1,
+   "p50": 4,
+   "p90": 5
+  },
+  "totality_miss_ids": [],
+  "totality_misses": 0,
+  "unreadable": 0,
+  "zlib_growth_pct": 82.5
+ },
+ "rung-10000": {
+  "added_bytes": 24971205,
+  "doc_plane_bytes": 25380579,
+  "doc_plane_zlib": 5097740,
+  "documents": 10000,
+  "empty_section_records": 0,
+  "growth_pct": 98.4,
+  "largest_doc_shard_bytes": 155602,
+  "largest_file_bytes": 168451,
+  "largest_section_shard_bytes": 168451,
+  "multi_section_documents": 9663,
+  "nsec_bytes": 86975,
+  "projected_total_bytes": 50351784,
+  "section_plane_bytes": 24884230,
+  "section_plane_zlib": 4059365,
+  "section_records": 39417,
+  "section_records_by_extension": {
+   ".html": 2508,
+   ".md": 30942,
+   ".yaml": 5967
+  },
+  "sections_per_multi_doc": {
+   "max": 25,
+   "mean": 4.08,
+   "p50": 4,
+   "p90": 5
+  },
+  "totality_miss_ids": [],
+  "totality_misses": 0,
+  "unreadable": 0,
+  "zlib_growth_pct": 79.6
+ },
+ "rung-seed": {
+  "added_bytes": 474684,
+  "doc_plane_bytes": 382451,
+  "doc_plane_zlib": 184171,
+  "documents": 68,
+  "empty_section_records": 0,
+  "growth_pct": 124.1,
+  "largest_doc_shard_bytes": 23092,
+  "largest_file_bytes": 41427,
+  "largest_section_shard_bytes": 41427,
+  "multi_section_documents": 64,
+  "nsec_bytes": 583,
+  "projected_total_bytes": 857135,
+  "section_plane_bytes": 474101,
+  "section_plane_zlib": 169334,
+  "section_records": 403,
+  "section_records_by_extension": {
+   ".html": 13,
+   ".md": 377,
+   ".yaml": 13
+  },
+  "sections_per_multi_doc": {
+   "max": 25,
+   "mean": 6.3,
+   "p50": 5,
+   "p90": 10
+  },
+  "totality_miss_ids": [],
+  "totality_misses": 0,
+  "unreadable": 0,
+  "zlib_growth_pct": 91.9
+ }
+}
