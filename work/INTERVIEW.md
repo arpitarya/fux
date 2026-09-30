@@ -32,10 +32,17 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-28** (Claude Code, Opus — W-233 shipped; W-228 DoD 11 rung; W-168 pools).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-30** (Claude Code, Opus 5.5 — W-168 step 8 + W-237 captured; W-236 Part A).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-09-29 (latest) — W-238 + W-239 BUILT: INGEST ~6× FASTER, SLOW VERBS NOW SHOW PROGRESS
+### 🔴 2026-09-30 (latest) — W-168 STEP 8 AND W-237 CAPTURED FOR ARPIT; W-236 PART A DESIGNED
+
+- **W-168 step 8** (authority prior) and **W-237** (RM3, grounded-gated) are built off at `0.0` in both readers, and five arms of each are captured on `set-4-claude`, not scored ([step 8](regression/2026-09-28-authority-prior/report.md) · [W-237](regression/2026-09-30-rm3-grounded/report.md)).
+- ⚠ **The index format is now `fux.index.v6`** (step 8's two `M/` counts): every v5 index needs `fux ingest --full`, including ladder rungs. It is unreleased.
+- **W-236 Part A:** [SR-SECTIONS](../records/0161_sections.md) proposed; section records would roughly **double the index** (+98.4 % at rung-10000). Part B waits on W-240.
+- **Next:** 🔴 Arpit's two `just golden-score` runs; then a non-capturing session decides each (step 8 still needs its `decide.py`).
+
+### 🟢 2026-09-29 — W-238 + W-239 BUILT: INGEST ~6× FASTER, SLOW VERBS NOW SHOW PROGRESS
 
 - W-239: ingest's `extract` at 10 000 documents 45.6 s → 6.5 s with the committed index byte-identical — a gated identifier scan and two per-process caches ([run](regression/2026-09-29-w239-extract-speed/report.md)).
 - W-238: `identifiers`, `doctor` and `enrich --check` paint the bar; the read verbs were measured under a second and do not ([SR-CLI](../records/0101_cli-surface.md) d17).

@@ -23,6 +23,17 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-09-30 — W-168 step 8, W-237 and W-236 Part A in parallel: two captures for Arpit, one design record  ·  Claude Code (Opus 5.5)
+- **Asked:** *"review open work file and implement everything in parallel"*.
+- **Did:**
+  - Three 🟢 items went to three worktree agents (Opus). W-225 and W-228 did not run: they wait on W-168's step 8 verdict.
+  - **W-168 step 8:** the authority prior is built, off at `0.0`, in both readers. `_format` moves to `fux.index.v6` by SR-INDEX-LIFECYCLE d9.1, which the pre-registration had not decided. Five arms are captured, and the precondition holds: `au-0.0` = `ip-0.1` on 125/125, re-checked independently. The agent's harness refused its `report.md`/`ANALYSIS.md`. No repo hook covers those paths, so this session filed both from the evidence. The disclosure: the agent saw `.fux/.fuxignore` lines naming files under the key directory, names only.
+  - **W-237:** pre-registered before the build (lexical feedback window; pool 20). RM3 is restored behind the `grounded` gate, off at `0.0`, in both readers; SR-EXPAND d17 and SR-TUNE d18 are amended. Five arms are captured; `rg-0.0` = the 2026-09-27 capture 125/125. Found **W-241**: `doctor --fix` cannot add a missing `[cli] progress_threshold`.
+  - **W-236 Part A:** SR-SECTIONS (0161, proposed) and a size run: PASS on both commit limits, but **+98.4 % index at rung-10000**, which no record grades. Part B waits on **W-240** (a set with a `step10_section` pool ≥ 6).
+  - Merged all three (`8c7fa45c`). 19 conflicts, all additive; no decision-number collision. One source-text test was made order-free. The bundle is rebuilt and the index re-ingested. Unit 6452, e2e 158, Node 202.
+- **Open:** two 🔴 inbox rows, both Arpit's `just golden-score`. The hook `inject-inbox.sh` reads NOW.md's frontmatter `---` as the in-flight line; not fixed, because it is a steering file.
+- **Next:** Arpit scores step 8 and W-237; then a session that did not capture decides each.
+
 ## 2026-09-30 — 3.0.0-alpha.9 released: ingest extract ~7× faster at 10k docs  ·  Claude Code (Opus)
 - **Asked:** *"commit everything and publish a new version"*.
 - **Did:**
