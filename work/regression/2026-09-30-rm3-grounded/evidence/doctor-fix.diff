@@ -1,0 +1,220 @@
+diff -ru --exclude=runtime --exclude=.git ../../corpora/golden/rung-01000/.fux/formats.toml rg-base/rung-01000/.fux/formats.toml
+--- ../../corpora/golden/rung-01000/.fux/formats.toml	2026-09-27 20:55:55
++++ rg-base/rung-01000/.fux/formats.toml	2026-09-30 10:02:14
+@@ -120,3 +120,53 @@
+ # Listing "*.log" under `include` instead indexes it as RAW BYTES.
+ #
+ # log = "<your module>"
++
++[limits.zip]
++max_uncompressed = 67108864
++max_members      = 4096
++max_member_bytes = 33554432
++
++[limits.csv]
++max_cell_chars = 500
++
++[limits.drawio]
++max_inflated = 16777216
++
++[limits.html]
++charset_scan_bytes = 4096
++
++[limits.image]
++max_inflated = 1048576
++
++[limits.json]
++max_depth         = 6
++max_heading_depth = 2
++min_prose_len     = 3
++max_items         = 500
++
++[limits.jsonl]
++max_records = 500
++
++[limits.mail]
++max_body_chars = 200000
++max_messages   = 500
++
++[limits.pdf]
++max_streams    = 5000
++max_inflated   = 67108864
++max_text_chars = 2000000
++
++[limits.rtf]
++max_chars = 2000000
++
++[limits.xlsx]
++max_cols = 40
++
++[limits.xml]
++min_attr_len = 12
++prolog_bytes = 8192
++
++[limits.yaml]
++max_depth     = 6
++indent_step   = 2
++min_value_len = 3
+Only in rg-base/rung-01000/.fux: identifiers.toml
+Only in rg-base/rung-01000/.fux: inspect.toml
+diff -ru --exclude=runtime --exclude=.git ../../corpora/golden/rung-01000/.fux/output.toml rg-base/rung-01000/.fux/output.toml
+--- ../../corpora/golden/rung-01000/.fux/output.toml	2026-09-27 20:55:55
++++ rg-base/rung-01000/.fux/output.toml	2026-09-30 10:02:14
+@@ -33,6 +33,11 @@
+                #   which is a REPORTED signal — the one key here that
+                #   changes a number an agent reads, admitted rather than hidden.
+ 
++progress_threshold = 200
++               #   which is a REPORTED signal — the one key here that
++               #   changes a number an agent reads, admitted rather than hidden.
++max_headings = 3   # ask/find: the matched `§ heading` lines shown under each hit
++
+ [cli.ask]
+ explain = false    # report which path answered
+ sections = true    # the matched `§ heading` lines under each hit.
+@@ -48,6 +53,10 @@
+                      #   a file: .fux/runtime/provenance.jsonl, gitignored,
+                      #   never committed. Consent, either here or per-call
+                      #   with `fux answer --journal` -- both are explicit.
++journal_max = 1000   # the most receipts that journal keeps (L9: gitignored, never committed)
++                     #   a file: .fux/runtime/provenance.jsonl, gitignored,
++                     #   never committed. Consent, either here or per-call
++                     #   with `fux answer --journal` -- both are explicit.
+ 
+ [cli.json]
+ enabled = false   # emit --json by default; per-verb: [cli.json.<verb>] enabled = true
+@@ -56,4 +65,15 @@
+                      # this table is the only way to configure it.
+ top = 5            # ⚠ no `band` here: the MCP confidence block is
+                #   UNCONDITIONAL (SR-CONFIDENCE decision 11), refused by name.
++max_headings = 3   # the matched headings each `fux_search` hit carries
++               #   UNCONDITIONAL (SR-CONFIDENCE decision 11), refused by name.
+ 
++[cli.serve]
++port = 7337        # `fux serve` binds 127.0.0.1 only; this is the port
++
++[api]                # the fux.open() / Node Index library defaults a caller does not pass.
++                     # ON where [cli] ships off, deliberately: a caller in code has
++                     # already decided to read the object (W-225 stage 6).
++band = true        # the confidence block on ask/answer results
++sections = true    # the matched `§ heading` lines under each ask hit
++no_refer = false   # answer from the index alone, without fetching the source
+diff -ru --exclude=runtime --exclude=.git ../../corpora/golden/rung-01000/.fux/refusals.toml rg-base/rung-01000/.fux/refusals.toml
+--- ../../corpora/golden/rung-01000/.fux/refusals.toml	2026-09-27 20:55:55
++++ rg-base/rung-01000/.fux/refusals.toml	2026-09-30 10:02:14
+@@ -237,3 +237,7 @@
+ # reason = "this document is behind a paywall on the current plan"
+ # content_type  = ["text/html"]
+ # body_contains = ["upgrade-your-plan", "subscription-required"]
++
++[scan]
++body_scan_bytes   = 1048576
++always_scan_under = 8192
+diff -ru --exclude=runtime --exclude=.git ../../corpora/golden/rung-01000/.fux/tune.toml rg-base/rung-01000/.fux/tune.toml
+--- ../../corpora/golden/rung-01000/.fux/tune.toml	2026-09-27 20:55:55
++++ rg-base/rung-01000/.fux/tune.toml	2026-09-30 10:02:14
+@@ -38,6 +38,27 @@
+ # weight. 0 = OFF. The default 0.5 is MEASURED: it passed its pre-registered run
+ # on 2026-09-27.
+ mined_weight            = 0.5
++# How far down the ranking the reranker (and the graph tier) reorders.
++rerank_depth            = 20
++# How hard a MISSING query term is punished: coverage is raised to this power.
++# At 2, a passage covering 4 of 5 terms keeps 64 % of its proximity, not 80 %.
++rerank_coverage_power   = 2
++# The proximity mix -- base + span + adjacency, each scaled by coverage.
++rerank_base             = 0.55
++rerank_span             = 0.30
++rerank_adjacency        = 0.15
++# RM3: ten words fux borrows from its own top ten documents, re-queried once at
++# this weight -- and ONLY when the first answer's band is `grounded`. 0 = OFF,
++# and off runs no first pass. It failed twice ungated, on drift; the gated form
++# is measured by work/regression/2026-09-30-rm3-grounded. Never runs when a
++# caller passes `--expand`, and `fux lexical` never runs it.
++rm3_weight              = 0.0
++# Prefer the kind of document a question asks for: "how do I" -> a procedure,
++# "why did we" -> a decision, "what is" -> a reference. A document whose
++# [doctype] type matches is scaled by 1 + this. 0 = OFF, and without a
++# [doctype] table it does nothing at any value. The default 0.1 is MEASURED: it
++# passed its pre-registered run on 2026-09-28.
++intent_weight           = 0.1
+ 
+ [graph]                         # explain / graph / path
+ damping      = 0.85
+@@ -54,12 +75,20 @@
+ ask_link_idf      = true   # hub damping, ON here and off for `fux graph`
+ ask_max_hops      = 1      # one hop; a second-hop document is a guess
+ ask_related_limit = 5
++path_limit   = 10     # routes `fux path` returns, most reliable first
+ 
+ [refer]                         # answer, and the refer plane
+ budget            = 8000       # bytes of assembled passage
+ per_doc_fraction  = 0.5
+ min_passage_bytes = 120
+ max_passage_bytes = 4000
++# Bytes charged per citation for its header line, so the budget is honest.
++citation_overhead = 80
++# Data rows per passage when refer splits a table. ONE, ruled 2026-09-06 on a
++# measurement (work/regression/2026-09-06-csv-chunk-granularity/): on 48
++# ambiguous queries over 6 998 rows, hit@1 went 0.229 (58 rows) -> 0.292
++# (11 rows) -> 0.875 (1 row). The cost: rescore is O(passages).
++table_rows_per_passage = 1
+ 
+ [confidence]                    # the BAND -- what fux says ABOUT an answer
+ # Neither key can move a score or an ordering. They move the band only, so
+@@ -111,3 +140,8 @@
+ # home, the `!` prefix in .fux/sources/.
+ #"docs/"   = 1.5
+ #"vendor/" = 0.3
++
++[enrich]                        # `fux enrich --check`
++# A generated question passes the self-retrieval check when its own document
++# ranks in the top this-many.
++self_retrieval_k = 3
+--- ../../corpora/golden/rung-01000/fux.toml	2026-09-27 20:55:55
++++ rg-base/rung-01000/fux.toml	2026-09-30 10:02:14
+@@ -33,6 +33,13 @@
+ # REQUIRED, and may not be commented out: a repo that CAN fetch has to say how
+ # hard, in a number a person can read. Comment it out and fux refuses to load.
+ max_parallel = 4
++ttl             = "24h"
++sweep_minutes   = 60
++acquired_max_bytes = 2147483648
++thin_words           = 50
++thin_words_per_kb    = 2.0
++failing_streak       = 5
++parallel_warn_at     = 16
+ 
+ # A host map: which fetcher retrieves which host, consulted by `fux add` when
+ # no --fetch was given. fux READS every key here -- unlike [sources.url.config]
+@@ -85,6 +92,7 @@
+ 
+ [index]
+ shards = 256
++git_timeout_s = 120
+ 
+ # Which agent vendors `fux setup` writes archived-results policy for. These
+ # files land OUTSIDE .fux/ -- in .claude/, .github/, .kiro/ and AGENTS.md at the
+@@ -92,3 +100,22 @@
+ # implicit. Delete a name to stop installing it; [] installs none.
+ [agents]
+ install = ["claude", "codex", "copilot", "kiro"]
++
++[observe]
++max_ms = 50
++
++[maintain]
++daemon_poll_s   = 1.0
++runner_poll_s   = 0.05
++stop_timeout_s  = 30.0
++last_cited_max  = 256
++stop_every_docs = 64
++
++[refer]
++fetch_cache_max_bytes = 524288000
++timeout_seconds       = 5
++
++[doctor]
++thin_url_share         = 0.01
++thin_url_chars         = 200
++acquired_warn_share    = 0.8

@@ -691,10 +691,11 @@ audit are all one hash compare.
 
 **RM3 (pseudo-relevance feedback)** — An expansion the engine writes itself:
 the top documents of a first pass give up the terms most typical of them, and
-the query runs once more with those added. **Built, measured twice, FAILED on
-drift and REMOVED on 2026-09-27** (W-168 step 5, W-224): every weight lost
-questions that were right at rank 1. `rm3_weight` in a `tune.toml` is now
-refused by name. See [SR-EXPAND](../records/0149_expand.md) decision 17.
+the query runs once more with those added. **Ungated, it FAILED twice on drift
+and was removed on 2026-09-27** (W-168 step 5, W-224). **Since 2026-09-30 it
+returns behind a gate** (W-237): it runs only when the first pass's band is
+`grounded`, at `[ranking] rm3_weight`, **off at `0.0`** and unmeasured until its
+frozen bar is scored. See [SR-EXPAND](../records/0149_expand.md) decision 17.
 
 **RRF (Reciprocal Rank Fusion)** — How lexical, dense and graph rankings
 combine: each contributes `1/(k + rank)`, k=60, summed — ranks, not scores, so

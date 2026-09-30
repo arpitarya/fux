@@ -26,6 +26,14 @@ Rules:
 
 ---
 
+## 2026-09-30 — **W-237: RM3 returns behind a `grounded`-only gate, off at `0.0`**
+
+| what | evidence |
+|---|---|
+| **the build** | `query/rm3.py` and `node/src/query/rm3.mjs` restored from `363a8b8c^`; `_run_rm3` expands only when the `0.0` pass's band is `grounded`, feeding back the lexical window; `fux lexical` forces it off; `--why` names the gate when it fires; `constants.toml [rm3]` |
+| **the records** | [SR-EXPAND](../records/0149_expand.md) d16/d17 · [SR-TUNE](../records/0135_tuning.md) d18 · [SR-CONFIDENCE](../records/0141_confidence.md) d18 · [SR-NODE-SEARCH](../records/0153_node-search.md) d20 |
+| **verified** | `tests/query/test_rm3.py` (50): `0.0` byte-identical with no first pass, scan = accelerator at every arm, Node parity; both suites and `node --test` |
+| **captured** | [`2026-09-30-rm3-grounded`](regression/2026-09-30-rm3-grounded/report.md): five arms on `set-4-claude`, `rg-0.0` = the 2026-09-27 capture 125/125; pool 20. **Not scored** |
 ## 2026-09-30 — **W-168 step 8: the git authority prior, off at `0.0`; index format v6**
 
 | what | evidence |

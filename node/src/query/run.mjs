@@ -42,6 +42,7 @@ import { tiers } from "./compose.mjs";
 import { recordFor } from "../store/reader.mjs";
 import { idf } from "./bm25f.mjs";
 import { intentOf, typeOfIntent } from "./intent.mjs";
+import { FB_DOCS, feedbackTerms } from "./rm3.mjs";
 
 
 /** The document-level multipliers and the directories they apply to.
@@ -171,9 +172,11 @@ export function runQuery(root, query, top, {
   // default weights, on the frozen baseline verb, with nothing failing.
   // W-168 step 4: the frozen baseline never folds mined pairs either.
   // W-168 step 9: nor applies the intent prior. W-168 step 8: nor the authority prior.
+  // W-237: nor RM3 — feedback terms are words the engine chose.
   if (!compose) {
     resolved = withTier(resolved, {
       askBoost: false, askRelated: false, minedWeight: 0.0, intentWeight: 0.0, authorityWeight: 0.0,
+      rm3Weight: 0.0,
     });
   } else if (wantRelated === false) resolved = withTier(resolved, { askRelated: false });
   // After the two lines above, `wantRelated` and `resolved.askRelated` agree, so
@@ -210,35 +213,67 @@ export function runQuery(root, query, top, {
     );
   }
 
-  const statsOut = {};
-  const window = scanAsk(root, query, depth, { weighting, scoring, statsOut, expansion });
-  // W-162. **After the reranker, and the confidence block is built from the
-  // PINNED list** — the band describes the answer the reader was shown, so a
-  // pinned #1 the corpus barely supports must still say `weak`.
-  //
-  // ⚠ **The lexical core runs over the WINDOW, not over `top`**, so the graph
-  // stage has something to promote from. The two agree exactly when the tier is
-  // off: `rerank(window)[:depth][:top] === rerank(window)[:top]`, and
-  // `applyPin` puts a pinned document at position 0 under either truncation.
-  //
-  // ⚠ **The pin goes in BEFORE the walk, and the order is a decision.** A pin
-  // is an editorial override for one exact question; a walk is a corpus-wide
-  // signal. Letting the walk re-order a pinned document off the top would mean
-  // a person's explicit intervention could be overruled, silently, by a link
-  // somebody else drew.
-  const ordered = applyPin(root, query, maybeRerank(root, query, window, resolved, depth), depth);
-  // 🔴 **`find` shares Tier A and never computes Tier B.** `find` is `ask`'s
-  // terse sibling — both are *ranked documents* — so a boost that moved one and
-  // not the other would make the two verbs rank the same corpus differently,
-  // which is a worse defect than the one the tier is for. But `find` pipes bare
-  // paths and has no `related` rendering, and skipping the work here is not an
-  // optimisation on this reader: `related` costs a `recordFor` per candidate on
-  // top of a plane rebuild that already parses every committed record.
-  const split = graphOn
-    ? tiers(root, query, ordered, top, resolved, { wantRelated: wantRelated !== false }) // undefined: the tune decides
-    : { results: ordered.slice(0, top), related: [] };
+  // One pass of the pipeline over `exp`: scan at DEPTH, rank, rerank, pin,
+  // tier, band guard. `runQuery` runs it once — twice only when W-237's RM3
+  // gate fires.
+  const onePass = (exp) => {
+    const statsOut = {};
+    const window = scanAsk(root, query, depth, { weighting, scoring, statsOut, expansion: exp });
+    // W-162. **After the reranker, and the confidence block is built from the
+    // PINNED list** — the band describes the answer the reader was shown, so a
+    // pinned #1 the corpus barely supports must still say `weak`.
+    //
+    // ⚠ **The lexical core runs over the WINDOW, not over `top`**, so the graph
+    // stage has something to promote from. The two agree exactly when the tier is
+    // off: `rerank(window)[:depth][:top] === rerank(window)[:top]`, and
+    // `applyPin` puts a pinned document at position 0 under either truncation.
+    //
+    // ⚠ **The pin goes in BEFORE the walk, and the order is a decision.** A pin
+    // is an editorial override for one exact question; a walk is a corpus-wide
+    // signal. Letting the walk re-order a pinned document off the top would mean
+    // a person's explicit intervention could be overruled, silently, by a link
+    // somebody else drew.
+    const ordered = applyPin(root, query, maybeRerank(root, query, window, resolved, depth), depth);
+    // 🔴 **`find` shares Tier A and never computes Tier B.** `find` is `ask`'s
+    // terse sibling — both are *ranked documents* — so a boost that moved one and
+    // not the other would make the two verbs rank the same corpus differently,
+    // which is a worse defect than the one the tier is for. But `find` pipes bare
+    // paths and has no `related` rendering, and skipping the work here is not an
+    // optimisation on this reader: `related` costs a `recordFor` per candidate on
+    // top of a plane rebuild that already parses every committed record.
+    const split = graphOn
+      ? tiers(root, query, ordered, top, resolved, { wantRelated: wantRelated !== false }) // undefined: the tune decides
+      : { results: ordered.slice(0, top), related: [] };
+    bandGuard(root, query, statsOut, split.results);
+    return { statsOut, window, split };
+  };
+
+  let pass = onePass(expansion);
+  let confidence = null;
+  let rm3 = null;
+  // W-237 — RM3 behind a `grounded`-only gate. Twin of `_run_rm3`. Off at 0.0,
+  // and off runs no first pass: the block above IS the engine without it. The
+  // first pass is the answer at 0.0; only its band opens the gate, and the
+  // feedback set is its LEXICAL window (before rerank, pin and tier).
+  if (resolved.rm3Weight > 0 && !expand && queryHashes.length) {
+    confidence = buildConfidence(query, pass.statsOut, pass.split.results, resolved, ids);
+    if (confidence !== null && confidence.band === "grounded") {
+      const feedback = depth < FB_DOCS
+        ? scanAsk(root, query, FB_DOCS, { weighting, scoring, expansion })
+        : pass.window;
+      const fed = expandMod.stack(
+        expansion, feedbackTerms(root, feedback, [...expansion.required], scoring), resolved.rm3Weight,
+      );
+      if (fed !== expansion) {
+        rm3 = { gate: confidence.band, weight: resolved.rm3Weight, terms: fed.hashes.length - expansion.hashes.length };
+        pass = onePass(fed);
+        confidence = null;
+      }
+    }
+  }
+  const { statsOut, window, split } = pass;
   const results = split.results;
-  bandGuard(root, query, statsOut, results);
+  if (confidence === null && wantConfidence) confidence = buildConfidence(query, statsOut, results, resolved, ids);
 
   return {
     results,
@@ -246,11 +281,14 @@ export function runQuery(root, query, top, {
     // or NOT AVAILABLE, and `[]` means *no neighbours*. The `--json` key is
     // omitted on `null`, which is the distinction the schema declares.
     related: resolved.askRelated ? split.related : null,
-    confidence: wantConfidence ? buildConfidence(query, statsOut, results, resolved, ids) : null,
+    confidence: wantConfidence ? confidence : null,
     queryHashes,
     stats: statsOut,
     window,
     tune: resolved,
+    // W-237: present only when the RM3 gate fired, so a `0.0` result object
+    // carries exactly the keys it carried before the key returned.
+    ...(rm3 === null ? {} : { rm3 }),
   };
 }
 

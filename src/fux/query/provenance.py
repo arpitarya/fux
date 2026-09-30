@@ -485,6 +485,10 @@ class Derivation:
     #: this query: the intent the lexicon read, the document type it prefers,
     #: and `intent_weight`. Absent when it did not run (see `intent_factor`).
     intent: dict | None = None
+    #: W-237 — `{"gate", "weight", "terms"}` when RM3's `grounded` gate FIRED on
+    #: this query: the band that opened it, `rm3_weight`, and how many feedback
+    #: terms were added. Absent when it did not fire, which includes off.
+    rm3: dict | None = None
 
     def as_dict(self) -> dict:
         out = {
@@ -495,6 +499,8 @@ class Derivation:
         }
         if self.intent is not None:
             out["intent"] = dict(self.intent)
+        if self.rm3 is not None:
+            out["rm3"] = dict(self.rm3)
         return out
 
 
@@ -599,6 +605,7 @@ def derive(
     rerank_uplift: dict | None = None,
     intent: dict | None = None,
     authority: float | None = None,
+    rm3: dict | None = None,
 ) -> Derivation:
     """Build the derivation for a result list. **Never raises.**
 
@@ -753,7 +760,10 @@ def derive(
         cut_score=cut,
     )
     shown = None if intent is None else {k: intent[k] for k in ("cue", "type", "weight")}
-    return Derivation(query=query, path=path, gates=gates, documents=docs, intent=shown)
+    return Derivation(
+        query=query, path=path, gates=gates, documents=docs, intent=shown,
+        rm3=None if rm3 is None else dict(rm3),
+    )
 
 
 # -- the receipt ---------------------------------------------------------------

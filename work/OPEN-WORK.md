@@ -25,6 +25,8 @@ here. Read that record before changing anything below it.
 |---|---|---|
 | 🔴 **W-168** — score step 8's five captured arms (authority prior): `just golden-score work/regression/2026-09-28-authority-prior`, in your shell. A session that did not capture then decides. [report](regression/2026-09-28-authority-prior/report.md) | 2026-09-30 | 0d |
 | ↳ **blocks:** W-228 (waits on steps 7 and 8's verdicts), and W-225 through it | | |
+| 🔴 **W-237** — score RM3's five captured arms: `just golden-score work/regression/2026-09-30-rm3-grounded`, in your shell. A session that did not capture then runs the frozen `decide.py`. [report](regression/2026-09-30-rm3-grounded/report.md) | 2026-09-30 | 0d |
+| ↳ **blocks:** nothing else in the queue | | |
 
 ---
 
@@ -37,7 +39,8 @@ here. Read that record before changing anything below it.
 - 🔴 **W-228** · `agent` — document families. The lens is built; its misfit flag's threshold is still a placeholder. Arpit ruled (not built): plant known misfits in the seed once steps 7 and 8 file verdicts — waiting on W-168. [detail](open/W-228-document-families.md)
 - 🟡 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)
 - 🟢 **W-240** · `agent` — a scored set with a `step10_section` pool ≥ 6 (set-4-claude: 1): recipe R10 seed, `set-5-claude`, rung rebuild, then 🔴 Arpit scores. **Opus.** [detail](open/W-240-section-pool-set.md)
-- 🟢 **W-237** · `agent` — RM3 back behind a `grounded`-only gate (R1 · G3, 2026-09-29). Pre-register on `set-4-claude` (pool 20), amend SR-EXPAND d17, build off at `0.0`; Arpit scores. **Opus.** [detail](open/W-237-rm3-grounded-gate.md)
+- 🔴 **W-237** · `arpit` — RM3 behind the `grounded` gate: built off at `0.0` in both readers, five arms captured on `set-4-claude` (pool 20). Arpit scores; a session that did not capture decides. [detail](open/W-237-rm3-grounded-gate.md)
+- 🟢 **W-241** · `agent` — 🧨 `fux doctor --fix` cannot repair an `output.toml` missing `[cli] progress_threshold`: it reads the key before it starts (since W-238/W-239). **Sonnet.** [detail](open/W-241-doctor-fix-progress-threshold.md)
 
 
 ### testing

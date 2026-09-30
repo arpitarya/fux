@@ -82,7 +82,7 @@ const SCHEMA = {
   bm25f: ["k1", "b", ...FIELD_KEYS, "anchor"],
   ranking: [
     "rerank_weight", "rerank_depth", "rerank_coverage_power", "rerank_base", "rerank_span",
-    "rerank_adjacency", "expand_weight", "mined_weight", "intent_weight", "authority_weight",
+    "rerank_adjacency", "expand_weight", "mined_weight", "rm3_weight", "intent_weight", "authority_weight",
   ],
   // The six `ask_*` keys are W-161's graph tier. They are parsed and carried
   // here so a consumer's committed `tune.toml` is accepted identically by both
@@ -151,14 +151,6 @@ const REMOVED_KEYS = new Map([
     "untouched: `supersedes:` in frontmatter, the `superseded` record property, " +
     "the graph edge, `fux explain`, and the declared tie-break that puts a live " +
     "document above a retired one at an equal score"],
-  ["ranking.rm3_weight",
-    "was REMOVED on 2026-09-27 (W-224). RM3 -- ten feedback terms borrowed " +
-    "from fux's own top ten -- FAILED its pre-registered run twice, on drift: " +
-    "every weight lost 6 to 13 questions that were right at rank 1 " +
-    "(work/regression/2026-09-23-rm3/VERDICT.md, " +
-    "work/regression/2026-09-25-rm3-boosted/VERDICT.md). Delete the key; " +
-    "ranking is unchanged, because it shipped at 0.0 (off). Supplying the " +
-    "words yourself is untouched: `--expand`, weighted by `expand_weight`."],
 ]);
 
 /** Every tunable, resolved. Build it with `loadTune` — there are no defaults (L12). */
@@ -193,7 +185,7 @@ export class Tune {
 const TUNE_FIELDS = [
   "k1", "b", "fieldWeights", "anchorWeight",
   "rerankWeight", "rerankDepth", "rerankCoveragePower", "rerankBase", "rerankSpan",
-  "rerankAdjacency", "expandWeight", "minedWeight", "intentWeight", "authorityWeight",
+  "rerankAdjacency", "expandWeight", "minedWeight", "rm3Weight", "intentWeight", "authorityWeight",
   "damping", "iterations", "laziness", "hopDecay", "expandLimit", "seedDepth", "pathLimit",
   "askBoost", "askRelated", "askKinds", "askLinkIdf", "askMaxHops", "askRelatedLimit",
   "separationFloor", "docCoverageFloor",
@@ -441,6 +433,7 @@ function resolve(data, label) {
     rerankAdjacency: r("ranking", "rerank_adjacency", fraction),
     expandWeight: r("ranking", "expand_weight", nonNegative),
     minedWeight: r("ranking", "mined_weight", nonNegative),
+    rm3Weight: r("ranking", "rm3_weight", nonNegative),
     intentWeight: r("ranking", "intent_weight", nonNegative),
     authorityWeight: r("ranking", "authority_weight", nonNegative),
     damping: r("graph", "damping", fraction),

@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@204fe34b64f8, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@ed40fd6015b5, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 1cf024c6e5110c56f145f22d0e5c9e2fa191f7e43a133299b47eddcb63cd9c41
+content_sha: 5c1010184103664fe333bcf99f442c4ee948ae80f8d81cfb1bc2cadfaa406315
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -871,12 +871,16 @@ unported. ⚠ **`fux serve` is Python-only for the same reason `fux observe` is*
 ([SR-SERVE](0158_serve.md)): it is a surface, not a reader, and the differential
 law reaches readers.
 
-**20. ~~RM3 is transcribed, not diverged~~ — SUPERSEDED 2026-09-27.**
-`query/rm3.mjs` and `rm3.py` were deleted in one change
-([SR-EXPAND](0149_expand.md) decision 17), and `runQuery` and `run_query`
-lost the RM3 block together, so the differential law is held by the deletion
-itself. The loader refuses `rm3_weight` by name in both readers, with the same
-sentence.
+**20. Gated RM3 is transcribed, not diverged** (W-237, 2026-09-30;
+[SR-EXPAND](0149_expand.md) decision 17). `node/src/query/rm3.mjs` is
+`rm3.py`'s twin, restored from before the 2026-09-27 removal: the same RM1 sum
+in the same order, the counts from `constants.toml [rm3]`. `runQuery` runs the
+same gate as `run_query` — the `0.0` pass, its band, feedback from its lexical
+window only when `grounded`, `expand.stack` at `tune.rm3Weight` — and
+`lexical` forces the weight to `0.0`. Both loaders accept the key again.
+`tests/query/test_rm3.py` compares the readers through their own loaders at
+`0.0` and `0.3`, on a query the gate opens and one it keeps shut, to nine
+digits (W-222's last-bit gap on an expanded score).
 
 **21. Mined expansion is transcribed, not diverged** (W-168 step 4,
 2026-09-27). `node/src/query/mined.mjs` builds the table from the shards,

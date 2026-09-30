@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@80b919e8f56c, src/fux/templates@954f24ece2af]
+owns: [src/fux/ingest/urlsrc.py@80b919e8f56c, src/fux/templates@82f70fe997b2]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: c7216270be1e48287439d1cc26181251138046750ec1682ca97dd9bc3f65bd28
+content_sha: a4a680ba6dacb82882187f54fc79ad47a70fa252a867dfdcdc0081bc98f08e83
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -680,6 +680,8 @@ copied out, never imported.
 **No decision here moved** (W-168 step 8, 2026-09-30). This record owns
 `src/fux/templates/`, and `tune.toml.txt` gained `[ranking] authority_weight =
 0.0` ([SR-TUNE](0135_tuning.md) decision 21).
+
+**No fetcher decision moved** (W-237, 2026-09-30). `src/fux/templates/tune.toml.txt`, under this record's claim on `templates/`, gained `[ranking] rm3_weight = 0.0` ([SR-TUNE](0135_tuning.md) decision 18).
 
 ### Consequences
 

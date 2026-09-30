@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@7d111b045e0c]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 2a6c59d6227d496da4b3b836b625ae5392421b4ef468fa09f38179ffbdf1364a
+content_sha: cdbacfcabe2d71a73c8d58d7d04067b0dfff5be4037db7c60d2b8910d2d7ba3b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -486,9 +486,10 @@ proximity reranker's per-document uplift through the caller's **trace** dict for
 and no gate moved. Recorded because the freshness rule asked, and *nothing moved*
 is a legitimate answer to it.
 
-**15. ~~`answer` ranks with RM3 exactly when `ask` does~~ — SUPERSEDED
-2026-09-27.** RM3 was removed ([SR-EXPAND](0149_expand.md) decision 17). It
-shipped at `0.0`, so `answer` cites what it cited before the key existed.
+**15. `answer` ranks with RM3 exactly when `ask` does** (W-237, 2026-09-30).
+Both reach `run_query`, so gated RM3 ([SR-EXPAND](0149_expand.md) decision 17)
+moves the document `answer` cites as it moves `ask`'s #1. At the default `0.0`
+nothing runs and `answer` is byte-identical.
 
 **16. `answer` folds mined spellings exactly when `ask` does** (W-168 step 4,
 2026-09-27). Both reach `run_query`, so `[ranking] mined_weight` moves the

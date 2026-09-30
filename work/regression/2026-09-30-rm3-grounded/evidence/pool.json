@@ -1,0 +1,8 @@
+{
+ "pool_miss@1_hit@10": 20,
+ "pool_miss@1_primary_in_top10": 18,
+ "questions": 125,
+ "set_hit@1": 66,
+ "tagged": 69,
+ "tagged_hit@1": 40
+}
