@@ -4,12 +4,12 @@ name: W-240
 description: "The data item W-236 Part B waits on: a scored question set whose step10_section pool is ≥ 6 (set-4-claude has 1). Recipe R10 in the seed, one designated Claude session authors set-5-claude under the L11 carve-out, a rung rebuild, then Arpit scores the baseline."
 item: W-240
 filed: 2026-09-30
-ball: agent
+ball: arpit
 ---
 
 # W-240 — a set that can measure section records
 
-**Status: filed 2026-09-30, not started.** Filed by the session that closed
+**Status: prompt written 2026-09-30, not run.** [Prompt 12](../golden/prompts/12-claude-gen4-section-seed.md) covers steps 1–2 in one fresh claude.ai chat. ⚠ **A Claude Code session cannot author it:** SR-WORK-TESTDATA A1 bars any session that has run a rung or seen a score, and step 1's documents are the author's block 1. R10 was amended the same day: the competitor carries the question's words in its title or a heading, and the key row names it as `competitor`. 🔴 **Next: Arpit runs prompt 12** and commits blocks 1–3. Then a session rebuilds the ladder (step 3). Filed by the session that closed
 [W-236](W-236-section-records.md) Part A, under
 [SR-WORK-OPEN-QUEUE](../../records/0051_WORK-open-queue.md) rules 23a/23b: W-236's
 build waits for a scored set whose `step10_section` pool is ≥ 6, and

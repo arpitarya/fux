@@ -7,6 +7,15 @@ filed: 2026-09-14
 ball: arpit
 ---
 
+## 🔴 STEP 8 DECIDED: INCONCLUSIVE BY THE TABLE — 2026-09-30 (Claude Code, Opus; a non-capturing session)
+
+[Verdict](../regression/2026-09-28-authority-prior/VERDICT.md). Every arm has a positive net below the floor on the 101 tagged questions (+1, +1, +3, +2), and **every arm loses baseline rank-1 hits: 2, 4, 4 and 10.** The table defines *FAIL: drift* only for values that clear the gain bar, so this shape falls to its INCONCLUSIVE catch-all.
+
+- **No value can be admitted under any reading.** `authority_weight` stays `0.0`.
+- ⚠ No decider was committed before scoring. This session wrote `decide.py` from step 9's after the score files existed and before reading a row; the verdict says so.
+- 🔴 **Arpit rules:** FAIL (drift)? (recommended, as for RM3 on 2026-09-27). And on FAIL, do the `M/` counts and the code stay (off at `0.0`) or go?
+- **Blocks:** W-228 (waits on steps 7 and 8's verdicts), and W-225 through it.
+
 ## ✅ STEP 10 RE-RULED U2 → W-236 · STEP 5 RULED R1 · G3 → W-237 — 2026-09-29 (Arpit, Cowork) · ratified, NOT built
 
 - **Step 10: U2 · B2 · E1** ([`compare/section-units`](../compare/section-units.compare.md)). Arpit, on voice: *"I want to go with U1"*. That was the voice session's name for section records, and he confirmed **U2** in the doc's lettering. It supersedes U0 (2026-09-27): a query-time re-rank cannot reach a long document that never became a candidate.
@@ -28,7 +37,8 @@ ball: arpit
 - **Built per the frozen bar**, off at `authority_weight = 0.0`, in both readers: `authors` and `commits` on each git-sourced `M/` record from the one `git log` walk (counts only; no name or email is written), the multiplicative prior, the accelerator bound `1 + w`, `fux lexical` forced off, `--why` `authority`. `tests/query/test_authority_prior.py` (80).
 - ⚠ **Index format `fux.index.v6` / runtime `fux.runtime.v8`**, by SR-INDEX-LIFECYCLE d9.1 (a new record property bumps `_format`; step 4's `abbr` is the precedent). The pre-registration did not decide it. Every v5 index needs `fux ingest --full`, even with the key off.
 - **Captured** `au-0.0 … au-0.5`: [report](../regression/2026-09-28-authority-prior/report.md). The precondition holds: `au-0.0` = `ip-0.1` on 125/125. Rank 1 moves on 0 / 7 / 12 / 17 / 29 questions.
-- **Next:** 🔴 Arpit scores; then a session that did not capture writes `decide.py` from step 9's and applies the table.
+- ✅ **Scored by Arpit 2026-09-30** — [`scores/`](../regression/2026-09-28-authority-prior/scores/), five arms on `set-4-claude`.
+- **Decided 2026-09-30:** INCONCLUSIVE by the table; see the entry at the top.
 
 ## ✅ L11 13b LANDED · STEP 7 STOPS · STEP 8 RULED AND PRE-REGISTERED — 2026-09-28 (Claude Code, Opus)
 

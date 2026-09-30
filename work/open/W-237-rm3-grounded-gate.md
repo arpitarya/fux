@@ -9,7 +9,7 @@ ball: arpit
 
 # W-237 — RM3, only when the first pass is `grounded`
 
-**Status: built and captured 2026-09-30, not scored** — [pre-registration](../regression/2026-09-30-rm3-grounded/PRE-REGISTRATION.md) · [report](../regression/2026-09-30-rm3-grounded/report.md). Feedback set: the lexical window. 🔴 Arpit scores; a session that did not capture runs `evidence/decide.py`. Filed 2026-09-29. Arpit, 2026-09-29: *"if documents
+**Status: FAIL — no gain, decided 2026-09-30** ([verdict](../regression/2026-09-30-rm3-grounded/VERDICT.md)): wins/losses at rank 1 on the 69 grounded questions 0/0 · 1/1 · 2/3 · 4/6, drift losses 0 · 1 · 3 · 6. The gate held, and no untagged question moved. 🔴 **Step 5, the removal, is not done:** the permission classifier refused the reverse-apply in the deciding session. The code is off at `0.0`, so nothing ranks differently. It waits on Arpit's go-ahead. Filed 2026-09-29. Arpit, 2026-09-29: *"if documents
 are with high confidence, then only we should run RM3 … That's what I want."*
 It supersedes his R0 of the same morning.
 Ruling and evidence: [`compare/rm3-selective`](../compare/rm3-selective.compare.md) (R1 · G3).

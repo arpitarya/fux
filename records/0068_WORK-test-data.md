@@ -6,12 +6,12 @@ title: "SR-WORK-TESTDATA (0068) — the source of what test data must carry and 
 description: "The one maintained source for golden test data — what every seed document, question set and rung must carry (T1–T14), how it is authored (A1–A24), and the input each ranking feature needs (R1–R10). Prompts are written from it when new data is needed, link it, and are deleted once their data lands."
 status: accepted
 date: 2026-09-22
-amended: 2026-09-27
+amended: 2026-09-30
 feature: the test-data source — what a seed document, a question set or a rung must contain, how it is authored, and the input each ranking feature needs
 owns: [tests/test_test_data_prompts.py@a84a10681d8b, tools/golden-history@b6156bbc0ceb, tests/test_golden_history.py@ffae3050d744]
 laws: [L0, L11]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: 8abbeeb3fbdc4d009dd04945cd88f25bbea467a6e2462e4be3c8cc4e2dabdccb
+content_sha: 0afe3bd869ee15f8e0b5f29463c336ce6eaeacd0c77df7d080ee868efe8db475
 ratifies: "Arpit, 2026-09-22 — 'note it down that this is also one of the cases that need to be tested. So in future, the prompt or test data creation should account for this use case … create a work document which will just have pointers what all things test data creation should have … keep everything precise … I was talking about SR work document' · Arpit, 2026-09-27 — 'prompts can have copy of those but sr should be the source and should be maintained … delete them and when a new test data needs to be created create new prompts'\"
 ---
 
@@ -207,7 +207,7 @@ the checklist on 2026-09-22; on 2026-09-27 it absorbed the prompts too.
    | **R7** | term proximity · `step6_proximity` | ≥ 8 docs where one passage holds 3–4 key words **together** and answers, and another passage scatters the same words over something else | ≥ 20 using those words; the row carries `"scattered": {"doc", "section"}` |
    | **R8** | diversity · `step7_diversity` | ≥ 3 facet clusters, each ≥ 3 facets; one facet **crowded** with 3–4 near-duplicate docs (none superseded or archived), the rest one doc each | ≥ 15 about the topic **as a whole**; the row carries `"facets": [[…], […]]`, every relevant doc in exactly one group |
    | **R9** | git authority · `step8_authority` (T11) | ≥ 12 docs with history, ≥ 5 authors on the company domain; ≥ 5 **authority pairs** — a maintained doc (≥ 3 authors, ≥ 4 commits, correct) and a one-person doc (1 author, 1 commit, plausible but wrong), same `status`, neither superseded nor archived, no *draft / unofficial / old* wording; in ≥ half, the one-person doc is **newer**. Revisions are full text, consecutive ones differ, the final is the committed text; `seed-history.tsv` rows `path · date · Name <email> · revision` with exactly one `final` per doc, dated as in `seed-dates.tsv` | ≥ 15 answered by the maintained doc, quoted from its final text |
-   | **R10** | section scoring · `step10_section` | ≥ 4 long docs (≥ 3 000 words, ≥ 8 headed sections, most sections off-question); ≥ 2 short (< 400 words) wrong competitors per long doc; the answering section's heading does not repeat the question's words | ≥ 15 answered by one section of a long doc |
+   | **R10** | section scoring · `step10_section` | ≥ 4 long docs (≥ 3 000 words, ≥ 8 headed sections, most sections off-question); ≥ 2 short (< 400 words) wrong competitors per long doc; the answering section's heading does not repeat the question's words. ⚠ **The competitor must be able to win at document level:** it carries the question's distinctive words in its **title or a heading**, while the long doc carries them in the answering section's **body** and elsewhere only scattered. A long doc that also matches in its title or headings ranks first on its own and the question never enters the pool (set-4-claude: 1 of 15, 2026-09-28) | ≥ 15 answered by one section of a long doc; the row carries `"competitor": "seed/…"`, the short doc built to beat it, never in `relevant` |
 
 ### Consequences
 

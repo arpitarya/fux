@@ -26,6 +26,12 @@ Rules:
 
 ---
 
+## 2026-09-30 — **W-237 FAIL (no gain) · W-168 step 8 INCONCLUSIVE by the table · R10 tightened**
+
+- **W-237, RM3 behind the `grounded` gate: FAIL — no gain.** The frozen decider reproduced byte for byte: rank-1 wins/losses on 69 grounded questions were 0/0 · 1/1 · 2/3 · 4/6. The gate held (0 untagged moves). Evidence: [VERDICT](regression/2026-09-30-rm3-grounded/VERDICT.md). ⚠ **The code removal (step 5) is NOT done**: it was refused in-session and waits on Arpit. RM3 stays off at `0.0`.
+- **W-168 step 8, git authority prior: INCONCLUSIVE by the table.** Nets on 101 tagged questions were +1 · +1 · +3 · +2, all below the floor, and every arm lost baseline rank-1 hits (2 · 4 · 4 · 10). `authority_weight` stays `0.0`. Evidence: [VERDICT](regression/2026-09-28-authority-prior/VERDICT.md), `decide.py` written post-scoring and disclosed as such. Arpit rules.
+- **SR-WORK-TESTDATA R10 amended**: a competitor matches in its title or a heading, and the key row names it. **Prompt 12** was written for W-240 and is not run yet.
+
 ## 2026-09-30 — **W-241: `fux doctor --fix` repairs an `output.toml` missing a key doctor reads**
 
 | what | evidence |

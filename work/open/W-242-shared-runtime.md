@@ -9,7 +9,7 @@ ball: agent
 
 # W-242 — one runtime, two writers, two readers
 
-**Status: ratified 2026-09-30, not built.** Arpit, 2026-09-30: *"I agree to
+**Status: ratified 2026-09-30; step 0 pre-registered 2026-09-30 ([run](../regression/2026-09-30-shared-runtime/PRE-REGISTRATION.md)), no code yet.** Arpit, 2026-09-30: *"I agree to
 building tier zero, agree to building tier one, and agree to build tier two.
 That means Node will also write."* Research, options and the refused T3:
 [`compare/shared-runtime`](../compare/shared-runtime.compare.md). Diagram:
