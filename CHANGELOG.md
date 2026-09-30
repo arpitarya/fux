@@ -27,6 +27,10 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   without the key stops with the missing-key error; `fux doctor --fix` adds
   `rm3_weight = 0.0`.
 
+### Fixed
+
+- **`fux doctor --fix` repairs an `output.toml` that lacks `[cli] progress_threshold`** (or `[cli.json] enabled`). It used to stop with the missing-key error before it could write the key (W-241).
+
 ## [3.0.0-alpha.9] - 2026-09-30
 
 **`fux ingest` is ~7× faster at 10 000 documents; the index is byte-identical.**

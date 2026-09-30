@@ -268,6 +268,19 @@ def _apply_output_defaults(args) -> None:
 
         cfg = template()
 
+    def resolved(resolve):
+        """One key through `cfg` — and, for `doctor` alone, through the template
+        when the file loaded but never set it (SR-OUTPUT decision 20b, W-241):
+        `--fix` is what writes that key, so the verb may not need it to start."""
+        try:
+            return resolve(cfg)
+        except FuxError:
+            if verb != "doctor":
+                raise
+            from .output_config import template
+
+            return resolve(template())
+
     if hasattr(args, "json"):
         # ⚠ **A rendering default may never change WHAT a command does**, and
         # on one verb it did (W-140 row 10, 2026-09-11). `fux hooks` selected
@@ -280,11 +293,12 @@ def _apply_output_defaults(args) -> None:
         # this docstring's own promise is that a rendering config's blast
         # radius is this function.
         args.json_explicit = args.json is True
-        args.json = cfg.resolve_json(verb, args.json)
+        args.json = resolved(lambda c: c.resolve_json(verb, args.json))
     as_json = bool(getattr(args, "json", False))
 
     for key in keys:
-        setattr(args, key, cfg.resolve(verb, key, getattr(args, key, None), as_json=as_json))
+        value = getattr(args, key, None)
+        setattr(args, key, resolved(lambda c: c.resolve(verb, key, value, as_json=as_json)))
 
 
 def _add_tune_flag(parser: argparse.ArgumentParser) -> None:

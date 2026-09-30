@@ -6,14 +6,14 @@ title: SR-OUTPUT (0143) — output defaults are configurable, in a third file
 description: "`.fux/output.toml` sets the default SHAPE of every verb's output — and of the MCP surface, which has no flags at all. A third file because it has a third boundary: it changes how a result is shown, never which documents come back."
 status: accepted
 built: 2026-08-28
-amended: 2026-08-28
+amended: 2026-09-30
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
 owns: [src/fux/output_config.py@dbd9fda25aa9, src/fux/templates/output.toml.txt@ee3226cd6dcd, .fux/output.toml@38f72dd71a22, node/src/config/output.mjs@ae4f709222ac]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 2bd0bd7809cfc74022d255b762b0fca5dd82ad63ee9eb8fb8e0490fc1d253e06
+content_sha: 5ab6761921f536797863bb681fced909c677b81d143dfc747904e70d210aaedc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -403,6 +403,19 @@ null
     `fux doctor --fix` writes the file (and any missing key) from the template.
     Every other verb refuses. A repo upgraded to 3.0 runs `fux doctor --fix`
     once — the CHANGELOG's migration line.
+
+20b. **A file that loads but lacks a key `doctor` resolves is the same fault,
+    and gets the same exemption — per key** (W-241, 2026-09-30). Decision 20
+    covered a file that cannot be *loaded*; a file that loads and never set
+    `[cli] progress_threshold` (added for `doctor`'s own progress bar, W-238)
+    or `[cli.json] enabled` still stopped `doctor` before `--fix` ran — **the
+    repair verb refused the one file it exists to repair**, found on an older
+    `fux-lab` rung copy by the W-237 capture. `doctor` now takes each such key
+    from the packaged template, **the file `--fix` writes it from**, and every
+    key the file does set is still the file's. It is not a code default (L12):
+    the value comes from the template, and `output.toml current` reports the
+    missing key as an error row until `--fix` writes it. Every other verb still
+    refuses.
 
 20a. ⚠ **Decision 20's lesson was applied by a DIFFERENT record on
     2026-09-11, and the evidence it was learned is an exemption list.**

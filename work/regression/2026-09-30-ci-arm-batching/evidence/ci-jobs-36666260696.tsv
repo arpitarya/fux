@@ -1,0 +1,40 @@
+# ci.yml run 36666260696, push to main at 9989c7c5, 2026-09-30. From GET /actions/runs/{id}/jobs.
+job	queued_s	ran_s	steps_over_10s
+unit · linux · py3.12	3	91	{"Run pytest -q -n auto --durations=10 --junitxml=junit-unit.xml tests": 75}
+arm 3/10 · linux · node 22	3	82	{"Run fux build": 10, "Run python tools/differential/node_arm.py . --python-tune off --shard 3/10": 56}
+build · node units	3	45	{"Run pip install build twine && python -m build && twine check --strict dist/*": 26}
+arm 9/10 · linux · node 22	2	51	{"Run python tools/differential/node_arm.py . --python-tune off --shard 9/10": 24}
+arm 5/10 · linux · node 22	2	48	{"Run python tools/differential/node_arm.py . --python-tune off --shard 5/10": 25}
+e2e · linux · py3.12	2	55	{"Run pytest -q -n auto --durations=10 --junitxml=junit-e2e.xml tests_e2e": 37}
+arm 1/10 · linux · node 22	2	52	{"Run python tools/differential/node_arm.py . --python-tune off --shard 1/10": 24}
+arm 7/10 · linux · node 22	2	56	{"Run ./.github/actions/setup-fux": 12, "Run python tools/differential/node_arm.py . --python-tune off --shard 7/10": 25}
+arm 10/10 · linux · node 22	2	50	{"Run python tools/differential/node_arm.py . --python-tune off --shard 10/10": 23}
+arm 2/10 · linux · node 22	2	86	{"Run python tools/differential/node_arm.py . --python-tune off --shard 2/10": 58}
+arm 8/10 · linux · node 22	2	39	{"Run python tools/differential/node_arm.py . --python-tune off --shard 8/10": 19}
+arm 6/10 · linux · node 22	3	53	{"Run python tools/differential/node_arm.py . --python-tune off --shard 6/10": 25}
+arm 4/10 · linux · node 22	3	57	{"Run python tools/differential/node_arm.py . --python-tune off --shard 4/10": 30}
+golden ladder manifests (the corpus is local-only)	3	17	{}
+linux · py3.13	3	148	{"Unit suite": 73, "End-to-end suite": 61}
+windows · py3.14	3	305	{"Run actions/checkout@v5": 11, "Run ./.github/actions/setup-fux": 15, "Unit suite": 180, "End-to-end suite": 95}
+windows · py3.12	3	366	{"Run actions/checkout@v5": 12, "Run ./.github/actions/setup-fux": 16, "Unit suite": 221, "End-to-end suite": 111}
+ubuntu-latest · node 24 · 3/3	3	248	{"the differential arm — TRANSCRIPTION (this repo)": 108, "the adversarial corpus, then the arm again": 115}
+ubuntu-latest · node 22 · 1/3	3	244	{"the differential arm — TRANSCRIPTION (this repo)": 101, "the adversarial corpus, then the arm again": 109}
+windows-latest · node 22 · 2/3	3	240	{"Run actions/checkout@v5": 11, "Run ./.github/actions/setup-fux": 16, "the differential arm — TRANSCRIPTION (this repo)": 96, "the adversarial corpus, then the arm again": 102}
+ubuntu-latest · node 24 · 1/3	4	206	{"the differential arm — TRANSCRIPTION (this repo)": 86, "the adversarial corpus, then the arm again": 92}
+ubuntu-latest · node 22 · 2/3	4	207	{"the differential arm — TRANSCRIPTION (this repo)": 85, "the adversarial corpus, then the arm again": 95}
+windows-latest · node 24 · 1/3	4	316	{"Run actions/checkout@v5": 11, "Run ./.github/actions/setup-fux": 25, "the differential arm — TRANSCRIPTION (this repo)": 127, "the adversarial corpus, then the arm again": 128}
+ubuntu-latest · node 22 · 3/3	4	248	{"the differential arm — TRANSCRIPTION (this repo)": 108, "the adversarial corpus, then the arm again": 115}
+windows-latest · node 24 · 3/3	4	313	{"Run ./.github/actions/setup-fux": 18, "the differential arm — TRANSCRIPTION (this repo)": 123, "the adversarial corpus, then the arm again": 149}
+windows-latest · node 22 · 1/3	5	296	{"Run ./.github/actions/setup-fux": 18, "Run fux build": 10, "the differential arm — TRANSCRIPTION (this repo)": 117, "the adversarial corpus, then the arm again": 128}
+windows-latest · node 24 · 2/3	5	256	{"Run actions/checkout@v5": 14, "Run ./.github/actions/setup-fux": 20, "Run fux build": 11, "the differential arm — TRANSCRIPTION (this repo)": 98, "the adversarial corpus, then the arm again": 107}
+windows-latest · node 22 · 3/3	5	294	{"Run actions/checkout@v5": 15, "Run ./.github/actions/setup-fux": 17, "the differential arm — TRANSCRIPTION (this repo)": 119, "the adversarial corpus, then the arm again": 127}
+macos-latest · node 22 · 2/3	8	156	{"the differential arm — TRANSCRIPTION (this repo)": 63, "the adversarial corpus, then the arm again": 71}
+macos · py3.14	9	197	{"Unit suite": 104, "End-to-end suite": 68}
+macos-latest · node 24 · 2/3	9	181	{"the differential arm — TRANSCRIPTION (this repo)": 82, "the adversarial corpus, then the arm again": 73}
+macos-latest · node 22 · 3/3	9	305	{"Run ./.github/actions/setup-fux": 10, "Run fux build": 12, "the differential arm — TRANSCRIPTION (this repo)": 121, "the adversarial corpus, then the arm again": 147}
+macos-latest · node 24 · 3/3	11	240	{"Run fux build": 11, "the differential arm — TRANSCRIPTION (this repo)": 115, "the adversarial corpus, then the arm again": 94}
+linux · py3.14	22	130	{"Unit suite": 62, "End-to-end suite": 48}
+ubuntu-latest · node 24 · 2/3	158	205	{"the differential arm — TRANSCRIPTION (this repo)": 84, "the adversarial corpus, then the arm again": 93}
+macos · py3.12	174	137	{"Unit suite": 78, "End-to-end suite": 42}
+macos-latest · node 24 · 1/3	200	326	{"the differential arm — TRANSCRIPTION (this repo)": 150, "the adversarial corpus, then the arm again": 139}
+macos-latest · node 22 · 1/3	214	214	{"the differential arm — TRANSCRIPTION (this repo)": 96, "the adversarial corpus, then the arm again": 86}

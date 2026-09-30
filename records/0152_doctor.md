@@ -11,7 +11,7 @@ owns: [src/fux/doctor.py@d067ee51fb66, tests/test_doctor_register_is_complete.py
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 1652f3ca3f65e7a8c4a4875a943befc99b12bb20b65995d54ea1bba31d05caf6
+content_sha: bbe4bd68c1e005f8061d5c21995e1c9bf9090a52d8189adbeaf67dd6992b4c2f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -432,7 +432,8 @@ acquired-plane row's cap is `[sources.url] acquired_max_bytes`; each says *not
 checked* when `fux.toml` does not load, which its own row reports. `output.toml present`
 is an error row, not a warning: every other verb refuses without the file, and
 this row is where that refusal is explained. `doctor` itself runs without the
-file, from the template ([SR-OUTPUT](0143_output-defaults.md) decision 20).
+file, or without any key of it that `doctor` resolves, from the template
+([SR-OUTPUT](0143_output-defaults.md) decisions 20 and 20b).
 
 <!-- L12-NOTE-END -->
 

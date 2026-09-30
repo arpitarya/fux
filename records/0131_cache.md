@@ -257,6 +257,19 @@ this moved where they are written, not what they are.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
+**13. This record's two caches cache FETCHES. The query side's cache is the
+derived plane, and it is not this record's** (2026-09-30,
+[W-242](../work/open/W-242-shared-runtime.md)). A reader looking for "fux's
+cache" for `ask`/`find`/`answer` wants [SR-T1-ACCELERATOR](0110_accelerator.md):
+`.fux/runtime/`, built from the committed index, and — once W-242 lands — read
+and built by both runtimes (its decision 18, ratified, not built). **A cache of
+query RESULTS was considered and refused** in
+[`compare/shared-runtime`](../work/compare/shared-runtime.compare.md) (T3), for
+the reason decision 2 states: a hit is safe only when its key proves it
+identical, and a result's key — query, flags, shard digests, tune, output,
+enrich, versions, runtime — is too long to keep complete. **Neither cache here
+changes**: ARC and the TTL store stay Python's, and Node still never fetches.
+
 ### Consequences
 
 - **ARC is in-memory and per-process; the TTL store is on disk and outlives

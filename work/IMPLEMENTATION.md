@@ -26,6 +26,15 @@ Rules:
 
 ---
 
+## 2026-09-30 — **W-241: `fux doctor --fix` repairs an `output.toml` missing a key doctor reads**
+
+| what | evidence |
+|---|---|
+| **the build** | `cli._apply_output_defaults`: for `doctor` alone, a key the loaded file lacks resolves through the packaged template, per key; every key the file sets is still the file's, and every other verb still refuses |
+| **the records** | [SR-OUTPUT](../records/0143_output-defaults.md) d20b · [SR-DOCTOR](../records/0152_doctor.md) L12 note |
+| **verified** | `tests/test_output_config.py`: two tests, both red before the fix (`[cli] progress_threshold is missing`); both suites |
+| **audit** | the only repo-config keys read before `--fix` are `[cli] progress_threshold` and `[cli.json] enabled`, both covered |
+
 ## 2026-09-30 — **W-237: RM3 returns behind a `grounded`-only gate, off at `0.0`**
 
 | what | evidence |

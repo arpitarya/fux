@@ -96,22 +96,79 @@ def _git(*args: str) -> str:
     return out.stdout
 
 
+# 🔴 **One `git` process per object, not one per question** (W-243 step 3,
+# 2026-09-30). This file started ~1 500 `git` processes per run — 54 % of every
+# process the unit suite starts — which cost 10 s on Linux and 72 s on Windows,
+# where a process start is several times dearer. Blobs now come through ONE
+# long-lived `git cat-file --batch`, and each commit's patch is read ONCE and
+# split by file. The questions asked of git, and their answers, are unchanged.
+
+
+class _Blobs:
+    """`git cat-file --batch`, started on first use and kept for the session."""
+
+    def __init__(self) -> None:
+        self._proc: subprocess.Popen | None = None
+
+    def read(self, spec: str) -> str | None:
+        """The text of `<rev>:<path>`, or `None` when git has no such object."""
+        if self._proc is None:
+            self._proc = subprocess.Popen(
+                ["git", "--no-optional-locks", "cat-file", "--batch"],
+                cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+            )
+        assert self._proc.stdin and self._proc.stdout
+        self._proc.stdin.write(spec.encode("utf-8") + b"\n")
+        self._proc.stdin.flush()
+        header = self._proc.stdout.readline().decode("utf-8").split()
+        if len(header) != 3:  # `<spec> missing`, `ambiguous`, …
+            return None
+        body = self._proc.stdout.read(int(header[2]))
+        self._proc.stdout.read(1)  # the LF git writes after every object
+        if header[1] != "blob":
+            return None
+        # `text=True`'s universal newlines — what `git show` via `_git` returned.
+        return body.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
+
+
+_BLOBS = _Blobs()
+
+
 @lru_cache(maxsize=None)
 def _register_at(sha: str) -> str | None:
-    """`records/README.md` as it stood at `sha`, or `None` if it was not there.
+    """`records/README.md` as it stood at `sha`, or `None` if it was not there."""
+    return _BLOBS.read(f"{sha}:records/README.md")
 
-    Cached because the register is unchanged across most commits and a `git
-    show` per commit would otherwise dominate the check's runtime.
+
+@lru_cache(maxsize=None)
+def _patch(sha: str) -> dict[str, str]:
+    """`sha`'s zero-context patch, split into one section per file path.
+
+    `--no-renames` because a pathspec'd `git show sha -- path` — what this
+    replaced — never detects a rename across the pathspec either: a moved file
+    is all-added there, and it must be all-added here. A merge is `--cc`, which
+    is `git show`'s own default for one.
     """
-    out = subprocess.run(
-        ["git", "--no-optional-locks", "show", f"{sha}:records/README.md"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        encoding="utf-8",
-        check=False,
-    )
-    return out.stdout if out.returncode == 0 else None
+    sections: dict[str, list[str]] = {}
+    current: list[str] | None = None
+    in_header = False
+    for line in _git("show", "--no-renames", "--unified=0", "--format=", sha).splitlines():
+        if line.startswith(("diff --git ", "diff --cc ", "diff --combined ")):
+            current, in_header = [line], True
+            if not line.startswith("diff --git "):
+                sections[line.split(" ", 2)[2]] = current
+            continue
+        if current is None:
+            continue
+        current.append(line)
+        if line.startswith("@@"):
+            in_header = False
+        # `--no-renames` makes `a/X b/X` one path; the `+++`/`---` line names
+        # it unambiguously, including a deletion's `+++ /dev/null`. Header
+        # lines only: past the first hunk, `--- a/x` is a removed `-- a/x`.
+        elif in_header and line.startswith(("+++ b/", "--- a/")) and current[0].startswith("diff --git "):
+            sections.setdefault(line[6:], current)
+    return {path: "\n".join(lines) for path, lines in sections.items()}
 
 
 def _git_available() -> bool:
@@ -135,13 +192,12 @@ def changed_symbols(path: str, *, sha: str | None = None) -> set[str] | None:
     """
     if not path.endswith(".py"):
         return None
-    args = (
-        ["show", "--unified=0", "--format=", sha, "--", path]
-        if sha
-        else ["diff", "--unified=0", "HEAD", "--", path]
-    )
     try:
-        diff = _git(*args)
+        diff = (
+            _patch(sha).get(path, "")
+            if sha
+            else _git("diff", "--unified=0", "HEAD", "--", path)
+        )
     except RuntimeError:
         return None
     lines: set[int] = set()
@@ -162,11 +218,13 @@ def changed_symbols(path: str, *, sha: str | None = None) -> set[str] | None:
         return None
     try:
         source = (
-            _git("show", f"{sha}:{path}")
+            _BLOBS.read(f"{sha}:{path}")
             if sha
             else (ROOT / path).read_text(encoding="utf-8", errors="replace")
         )
     except (RuntimeError, OSError):
+        return None
+    if source is None:
         return None
     try:
         tree = ast.parse(source)

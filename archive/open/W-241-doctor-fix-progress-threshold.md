@@ -9,7 +9,18 @@ ball: agent
 
 # W-241 — `doctor --fix` cannot add `progress_threshold`
 
-**Status: filed 2026-09-30, not started.** Found by the W-237 capture: an
+**Status: closed 2026-09-30 — built as specified.** `doctor` takes any
+`output.toml` key the file lacks from the template, per key, so `--fix` starts
+and writes it ([SR-OUTPUT](../../records/0143_output-defaults.md) decision 20b,
+`cli._apply_output_defaults`). Two tests in `tests/test_output_config.py`
+reproduced the refusal first. The audit (3) found one other key read before
+`--fix`: `[cli.json] enabled`, which the same fallback covers. PII is exempt for
+`doctor`, and `fill_missing`, `Progress` and the fail-open observer read no
+repo config. ⚠ The fallback is recorded in SR-OUTPUT, not SR-DOCTOR as step 1
+said, because SR-OUTPUT decision 20 already owns `doctor`'s template fallback
+(L0: stated once). SR-DOCTOR's L12 note points at it.
+
+~~Status: filed 2026-09-30, not started.~~ Found by the W-237 capture: an
 older `fux-lab` rung copy's `.fux/output.toml` had no `[cli] progress_threshold`,
 and `fux doctor --fix` stopped with the L12 missing-key error instead of
 writing it. The capture added `progress_threshold = 200` (the template's value)

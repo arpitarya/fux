@@ -9,11 +9,11 @@ amended: 2026-09-13
 date: 2026-08-27
 ratified: 2026-08-27
 feature: the record-to-component model, and the `describes` relation W-82 ruling 4 added to it
-owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@eca3c3cfd2b3, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@39e5349eef5f, tests/test_sr_frontmatter.py@5ba563cc5d37, tests/test_sr_ownership.py@9d9ddd14cbfd, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@660b91e77f7f, tests/test_sr_register_status.py@acae7406d76c]
+owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@eca3c3cfd2b3, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@e3d2172d0b11, tests/test_sr_frontmatter.py@5ba563cc5d37, tests/test_sr_ownership.py@9d9ddd14cbfd, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@660b91e77f7f, tests/test_sr_register_status.py@acae7406d76c]
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 9612bce5071ddbb1013c49a90be6c69648a66cb4586658bd661de39fd0e0cfe3
+content_sha: b4f33da715ced26499349de07c036c13250e5ba17438a10420b988d88410f64d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -499,9 +499,14 @@ top-level definitions.
   widened rule** — see decision 9. Widening the gate over history is not
   strictness, it is a false positive that trains people to reach for the escape
   hatch.
-- **The register is now read from git history, not just the working tree.** One
-  `git show` per commit, cached; the check stays sub-second on this repo's
-  history and needs `fetch-depth: 0`, which CI already sets.
+- **The register is now read from git history, not just the working tree.** It
+  needs `fetch-depth: 0`, which CI already sets. ⚠ **"Sub-second" stopped being
+  true as history grew**: by 2026-09-30 the gate started ~1 500 `git` processes
+  per run — 54 % of every process the unit suite starts — and took 10 s on
+  Linux and 72 s on Windows. Since W-243 step 3 every blob comes through one
+  `git cat-file --batch` and each commit's patch is read once and split by
+  file; the answers were checked identical on 166 commits and 1 165
+  (commit, file) pairs before the change landed.
 - **Carve-outs stay preferable where they fit.** If a record's subject IS a
   file, own it. `describes` is for a subject that *reaches into* a component
   another record legitimately owns.

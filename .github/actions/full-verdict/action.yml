@@ -1,0 +1,69 @@
+# Has THIS FULL cell already gone green on this code? — W-243 step 2,
+# SR-WORK-RELEASE decision 14.
+#
+# The key is `scripts/ci-key.py cell`: the tree digest of every non-inert path,
+# plus this runner's OS, image and resolved Python/Node versions. A hit means
+# the calling job skips its work; the job saves the key itself, and only after
+# every one of its steps went green.
+#
+# 🔴 **Only a push reads.** The nightly run and a manual dispatch always run
+# FULL fresh: they are the backstop for what the key cannot see — a floating
+# dependency (CI installs with `pip install -e`, not from `uv.lock`) and a
+# runner-image change that has not reached `ImageVersion` yet.
+name: full-verdict
+description: Compute this FULL cell's verdict key and look it up in the Actions cache
+inputs:
+  cell:
+    description: the matrix cell's name — part of the key
+    required: true
+  python:
+    description: the cell's Python version (resolved before the key is computed)
+    required: true
+  node:
+    description: the cell's Node version, or empty for none
+    required: false
+    default: ""
+outputs:
+  hit:
+    description: "'true' when a green verdict exists for this key and the job may skip"
+    value: ${{ steps.lookup.outputs.cache-hit == 'true' && 'true' || 'false' }}
+  key:
+    description: the verdict key, for the calling job's save step
+    value: ${{ steps.key.outputs.key }}
+  path:
+    description: the one-line verdict file the key is stored against
+    value: ${{ steps.key.outputs.path }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python }}
+
+    - if: inputs.node != ''
+      uses: actions/setup-node@v5
+      with:
+        node-version: ${{ inputs.node }}
+
+    - id: key
+      shell: bash
+      env:
+        CELL: ${{ inputs.cell }}
+        VERDICT_DIR: ${{ runner.temp }}/ci-verdict
+      run: |
+        key="$(python scripts/ci-key.py cell "$CELL")"
+        # Written by Python, not bash: on Windows `$RUNNER_TEMP` is a `D:\…`
+        # path that Git Bash and the cache action would each read differently.
+        python -c "import os,sys; d=os.environ['VERDICT_DIR']; os.makedirs(d, exist_ok=True); open(os.path.join(d, 'verdict.txt'), 'w').write(' '.join(sys.argv[1:]) + '\n')" \
+          "$key" "$GITHUB_SHA" "$GITHUB_RUN_ID"
+        echo "key=$key" >> "$GITHUB_OUTPUT"
+        echo "path=$VERDICT_DIR" >> "$GITHUB_OUTPUT"
+        echo "verdict key: $key"
+
+    - id: lookup
+      if: github.event_name == 'push'
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ steps.key.outputs.path }}
+        key: ${{ steps.key.outputs.key }}
+        lookup-only: true

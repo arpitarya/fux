@@ -20,6 +20,15 @@ inputs:
 runs:
   using: composite
   steps:
+    # W-243 step 3: on Windows the default temp dir is on C:, the OS drive;
+    # the workspace and `$RUNNER_TEMP` are on D:. pip's own CI measured 10-28 %
+    # from moving temp alone. First, so pip's build dirs land there too.
+    - if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        echo "TMP=$RUNNER_TEMP" >> "$GITHUB_ENV"
+        echo "TEMP=$RUNNER_TEMP" >> "$GITHUB_ENV"
+
     - uses: actions/setup-python@v6
       with:
         python-version: ${{ inputs.python }}

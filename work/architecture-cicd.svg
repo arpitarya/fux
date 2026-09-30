@@ -1,0 +1,330 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1182 2108" width="1182" height="2108" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTo2ZDI1NDQ3My1iZDc2LTRhZTctOTI3YS01YWRhZWI1MzMxOWMAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaF/Rj1CHQFaZO7xoH8oVvI4AAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDo3MTNlOWFiNy01NjEyLTRjMGUtOGI2ZC1jNGEyZjBiNzdjN2VscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNocBxx02erxG3Q1Y0Wgvf+9wAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggtDHyjylEgsTNXh7BSV5EgQQVThfrxJSsjOJxpDybE8ukZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaAYdRRy1qVPcpvAPnKw4YyMAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCD05diNeRizD9zezX60jDXQWk8OZXISHVf1kN7PjLe4DGRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBjhZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjZkMjU0NDczLWJkNzYtNGFlNy05MjdhLTVhZGFlYjUzMzE5Yy9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjYxMmQyY2Q2LWJiODUtNGFlNS05NzZiLTA2Njc2MWMwYmFlM3JjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCC0MfKPKUSCxM1eHsFJXkSBBBVOF+vElKyM4nGkPJsTy6JjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggewneuv3MDxj4IKJQecfe6KQGAdiIKV12ZQ7O9svL7e2iY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFgg+ROItkke1TMyCijDI25y14kJLoWwyNCMk6aTfV2ffyt0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQH4AvDNvZMhZQlwsjaBnvVqOivdkEW90pd9/ShKogC2CaFEsn8crQ0IyOTnpqt8SIuf585D+A0c3/oeXBJib1BA=</c2pa:manifest></metadata>
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#3d6df2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#1d8a5e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#8a93a0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<rect width="1182" height="2108" fill="#fcfcfb"/>
+<text x="46" y="52" font-size="23" fill="#14181f" font-weight="600">CI/CD, from a push to two registries</text>
+<text x="46" y="76" font-size="13" fill="#626b78">One CI workflow in two stages, one publish workflow behind a gate. Nothing ships unless ci.yml finished green on that exact sha.</text>
+<rect x="900" y="96" width="11" height="11" rx="2.5" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="918" y="105" font-size="10.5" fill="#626b78">FAST stage — every push, ~2 min</text>
+<rect x="900" y="111" width="11" height="11" rx="2.5" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.4"/>
+<text x="918" y="120" font-size="10.5" fill="#626b78">FULL stage — main, nightly, dispatch</text>
+<rect x="900" y="126" width="11" height="11" rx="2.5" fill="#fff4ec" stroke="#c2410c" stroke-width="1.4" stroke-dasharray="3 2"/>
+<text x="918" y="135" font-size="10.5" fill="#626b78">a gate — refuses, never warns</text>
+<rect x="900" y="141" width="11" height="11" rx="2.5" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="918" y="150" font-size="10.5" fill="#626b78">outside the pipeline</text>
+<text x="46" y="170" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">1 - TRIGGERS  --  .github/workflows/ci.yml</text>
+<line x1="46" y1="180" x2="1136" y2="180" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="190" width="260" height="118" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="62" y="215" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">push</text>
+<text x="62" y="237" font-size="10.5" fill="#4a5260">any branch, any sha</text>
+<text x="62" y="260.5" font-size="10.5" fill="#14181f">runs FAST everywhere</text>
+<text x="62" y="276.0" font-size="10.5" fill="#14181f">FULL only when the ref is main</text>
+<rect x="322" y="190" width="260" height="118" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="338" y="215" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">pull_request</text>
+<text x="338" y="237" font-size="10.5" fill="#4a5260">only a FORK's PR runs anything.</text>
+<text x="338" y="252.5" font-size="10.5" fill="#4a5260">A same-repo PR is the sha its</text>
+<text x="338" y="268.0" font-size="10.5" fill="#4a5260">branch push already ran — skipped.</text>
+<rect x="599" y="190" width="260" height="118" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="615" y="215" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">schedule</text>
+<text x="615" y="237" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">cron 30 20 * * *</text>
+<text x="615" y="252.5" font-size="10.5" fill="#4a5260">20:30 UTC = 02:00 IST nightly.</text>
+<text x="615" y="268.0" font-size="10.5" fill="#4a5260">Catches a runner-image or toolchain</text>
+<text x="615" y="283.5" font-size="10.5" fill="#4a5260">break with no commit to blame.</text>
+<rect x="876" y="190" width="260" height="118" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="892" y="215" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">workflow_dispatch</text>
+<text x="892" y="237" font-size="10.5" fill="#4a5260">by hand, from the Actions tab.</text>
+<text x="892" y="252.5" font-size="10.5" fill="#4a5260">Runs FAST, then FULL.</text>
+<text x="892" y="276.0" font-size="10.5" fill="#8a93a0">no inputs</text>
+<rect x="46" y="322" width="1090" height="44" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="341" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">concurrency</text>
+<text x="160" y="341" font-size="10.5" fill="#4a5260">group ci-&lt;ref&gt;-&lt;event&gt;, cancel-in-progress: true — a newer push supersedes an older run on the same ref, main included.</text>
+<text x="160" y="357" font-size="10" fill="#8a93a0">⚠ A sha superseded mid-run has no completed run, so it cannot be released — release the newer one. Nightly and push never cancel each other.</text>
+<path d="M591,366 L591,420" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)" stroke-linejoin="round"/>
+<rect x="456.0" y="386" width="270" height="17" rx="5" fill="#fcfcfb" stroke="none"/>
+<text x="591" y="398" font-size="10.5" fill="#626b78" text-anchor="middle">every push · fork PRs · nightly · dispatch</text>
+<text x="46" y="436" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">2 - FAST  --  linux · py3.12 · node 22 · 13 jobs in parallel · ~2 min, the signal</text>
+<line x1="46" y1="446" x2="1136" y2="446" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="456" width="260" height="212" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
+<text x="62" y="481" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">unit</text>
+<text x="292" y="481" font-size="10.5" fill="#3d6df2" font-weight="600" text-anchor="end">1 job</text>
+<text x="62" y="503" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">checkout fetch-depth: 0</text>
+<text x="62" y="518.5" font-size="10" fill="#4a5260">test_sr_freshness.py audits every</text>
+<text x="62" y="534.0" font-size="10" fill="#8a93a0">commit since RULE-SINCE; a shallow</text>
+<text x="62" y="549.5" font-size="10" fill="#8a93a0">clone gives it zero — a silent pass</text>
+<text x="62" y="573.0" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">pytest -q -n auto tests</text>
+<text x="62" y="588.5" font-size="10.5" fill="#8a93a0" font-family="ui-monospace, Menlo, monospace">--durations=10 --junitxml</text>
+<text x="62" y="612.0" font-size="10.5" fill="#14181f">on failure → pytest-annotate</text>
+<rect x="322" y="456" width="260" height="212" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
+<text x="338" y="481" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">e2e</text>
+<text x="568" y="481" font-size="10.5" fill="#3d6df2" font-weight="600" text-anchor="end">1 job</text>
+<text x="338" y="503" font-size="10.5" fill="#4a5260">the package as a user sees it</text>
+<text x="338" y="526.5" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">pytest -q -n auto tests_e2e</text>
+<text x="338" y="542.0" font-size="10.5" fill="#8a93a0" font-family="ui-monospace, Menlo, monospace">--durations=10 --junitxml</text>
+<text x="338" y="565.5" font-size="10.5" fill="#14181f">on failure → pytest-annotate</text>
+<rect x="599" y="456" width="260" height="212" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
+<text x="615" y="481" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">build</text>
+<text x="845" y="481" font-size="10.5" fill="#3d6df2" font-weight="600" text-anchor="end">1 job</text>
+<text x="615" y="503" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">cd node &amp;&amp; node --test</text>
+<text x="615" y="518.5" font-size="10.5" fill="#8a93a0">   the Node reader's own units</text>
+<text x="615" y="534.0" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">check-version-parity.py</text>
+<text x="615" y="549.5" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">python -m build</text>
+<text x="615" y="565.0" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">twine check --strict dist/*</text>
+<text x="615" y="580.5" font-size="10.5" fill="#8a93a0">   what PyPI only reveals after publish</text>
+<text x="615" y="596.0" font-size="10.5" fill="#14181f">sdist must NOT ship</text>
+<text x="615" y="611.5" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">archive/  uv.lock  .github/</text>
+<rect x="882" y="446" width="260" height="212" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.0"/>
+<rect x="879" y="451" width="260" height="212" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.0"/>
+<rect x="876" y="456" width="260" height="212" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
+<text x="892" y="481" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">arm  1/10 … 10/10</text>
+<text x="1122" y="481" font-size="10.5" fill="#3d6df2" font-weight="600" text-anchor="end">10 jobs</text>
+<text x="892" y="503" font-size="10.5" fill="#4a5260">the differential arm, W-107 —</text>
+<text x="892" y="518.5" font-size="10.5" fill="#4a5260">Python and Node must rank the same</text>
+<text x="892" y="542.0" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">fux build</text>
+<text x="892" y="557.5" font-size="10.5" fill="#8a93a0">   no .fux/runtime/ → 44/202 discordant</text>
+<text x="892" y="573.0" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">node_arm.py . \</text>
+<text x="892" y="588.5" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">  --python-tune off --shard i/10</text>
+<text x="892" y="612.0" font-size="10" fill="#4a5260">cost is Node's scan (~1.2 s/query):</text>
+<text x="892" y="627.5" font-size="10" fill="#8a93a0">sharding, not batching, shortens it</text>
+<path d="M176,668 L176,698" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)" stroke-linejoin="round"/>
+<path d="M453,668 L453,698" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)" stroke-linejoin="round"/>
+<path d="M729,668 L729,698" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)" stroke-linejoin="round"/>
+<path d="M1006,668 L1006,698" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)" stroke-linejoin="round"/>
+<rect x="46" y="704" width="1090" height="74" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="66" y="727" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">needs: [unit, e2e, build, arm]   if: always() &amp;&amp; !cancelled()</text>
+<text x="66" y="747" font-size="10.5" fill="#4a5260">FULL waits for FAST to FINISH, whatever it concluded — a red unit test says nothing about Windows — but not after a newer push cancelled the run.</text>
+<text x="66" y="764" font-size="10" fill="#8a93a0">Why one file, not two: as two workflows, a push to main started both at once, FULL took the runner slots and FAST's 2-minute verdict took 6 (measured 2026-09-29).</text>
+<path d="M591,778 L591,816" fill="none" stroke="#1d8a5e" stroke-width="1.6" marker-end="url(#g)" stroke-linejoin="round"/>
+<rect x="381.0" y="782" width="420" height="17" rx="5" fill="#fcfcfb" stroke="none"/>
+<text x="591" y="794" font-size="10.5" fill="#626b78" text-anchor="middle">push to main · nightly · dispatch — never a PR, never another branch</text>
+<text x="46" y="832" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">3 - FULL  --  3 OSes · py3.12-3.14 · node 22/24 · 25 jobs · the release proof</text>
+<line x1="46" y1="842" x2="1136" y2="842" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="852" width="350" height="300" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="62" y="877" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">python</text>
+<text x="382" y="877" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">6 jobs</text>
+<text x="62" y="897" font-size="10.5" fill="#4a5260">L7: Python ≥ 3.12 on Linux, macOS, Windows. The wheel</text>
+<text x="62" y="912" font-size="10.5" fill="#4a5260">is pure Python — these runners prove it.</text>
+<text x="171.0" y="926" font-size="10.5" fill="#626b78" font-weight="600" font-family="ui-monospace, Menlo, monospace" text-anchor="middle">3.12</text>
+<text x="239.0" y="926" font-size="10.5" fill="#626b78" font-weight="600" font-family="ui-monospace, Menlo, monospace" text-anchor="middle">3.13</text>
+<text x="307.0" y="926" font-size="10.5" fill="#626b78" font-weight="600" font-family="ui-monospace, Menlo, monospace" text-anchor="middle">3.14</text>
+<text x="62" y="948" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">linux</text>
+<rect x="140" y="932" width="62" height="24" rx="5" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.2"/>
+<text x="171.0" y="948" font-size="10" fill="#3d6df2" font-weight="600" text-anchor="middle">FAST's</text>
+<rect x="208" y="932" width="62" height="24" rx="5" fill="#ffffff" stroke="#1d8a5e" stroke-width="1.2"/>
+<text x="239.0" y="948" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">✓ runs</text>
+<rect x="276" y="932" width="62" height="24" rx="5" fill="#ffffff" stroke="#1d8a5e" stroke-width="1.2"/>
+<text x="307.0" y="948" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">✓ runs</text>
+<text x="62" y="978" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">macos</text>
+<rect x="140" y="962" width="62" height="24" rx="5" fill="#ffffff" stroke="#1d8a5e" stroke-width="1.2"/>
+<text x="171.0" y="978" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">✓ runs</text>
+<rect x="208" y="962" width="62" height="24" rx="5" fill="#f3f4f2" stroke="#c9cfd8" stroke-width="1.0"/>
+<text x="239.0" y="978" font-size="10" fill="#9aa3af" text-anchor="middle">excluded</text>
+<rect x="276" y="962" width="62" height="24" rx="5" fill="#ffffff" stroke="#1d8a5e" stroke-width="1.2"/>
+<text x="307.0" y="978" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">✓ runs</text>
+<text x="62" y="1008" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">windows</text>
+<rect x="140" y="992" width="62" height="24" rx="5" fill="#ffffff" stroke="#1d8a5e" stroke-width="1.2"/>
+<text x="171.0" y="1008" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">✓ runs</text>
+<rect x="208" y="992" width="62" height="24" rx="5" fill="#f3f4f2" stroke="#c9cfd8" stroke-width="1.0"/>
+<text x="239.0" y="1008" font-size="10" fill="#9aa3af" text-anchor="middle">excluded</text>
+<rect x="276" y="992" width="62" height="24" rx="5" fill="#ffffff" stroke="#1d8a5e" stroke-width="1.2"/>
+<text x="307.0" y="1008" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">✓ runs</text>
+<text x="62" y="1040" font-size="10.5" fill="#4a5260">each cell, fetch-depth: 0:</text>
+<text x="62" y="1055.5" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">pytest -n auto tests</text>
+<text x="62" y="1071.0" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">pytest -n auto tests_e2e</text>
+<text x="62" y="1086.5" font-size="10.5" fill="#8a93a0">e2e runs even when unit failed</text>
+<text x="62" y="1102.0" font-size="10.5" fill="#14181f">both junit files → pytest-annotate</text>
+<rect x="412" y="852" width="470" height="300" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="428" y="877" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">node-arm</text>
+<text x="868" y="877" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">18 jobs</text>
+<text x="428" y="897" font-size="10.5" fill="#14181f">A green arm on ONE OS is not a green arm — two libms disagree</text>
+<text x="428" y="912" font-size="10.5" fill="#14181f">in the last ulp. The OS × Node matrix is the point.</text>
+<text x="563.0" y="926" font-size="10.5" fill="#626b78" font-weight="600" font-family="ui-monospace, Menlo, monospace" text-anchor="middle">node 22</text>
+<text x="679.0" y="926" font-size="10.5" fill="#626b78" font-weight="600" font-family="ui-monospace, Menlo, monospace" text-anchor="middle">node 24</text>
+<text x="428" y="948" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">ubuntu</text>
+<rect x="508" y="932" width="110" height="24" rx="5" fill="#ffffff" stroke="#1d8a5e" stroke-width="1.2"/>
+<text x="563.0" y="948" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">✓ shards 1 · 2 · 3</text>
+<rect x="624" y="932" width="110" height="24" rx="5" fill="#ffffff" stroke="#1d8a5e" stroke-width="1.2"/>
+<text x="679.0" y="948" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">✓ shards 1 · 2 · 3</text>
+<text x="428" y="978" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">macos</text>
+<rect x="508" y="962" width="110" height="24" rx="5" fill="#ffffff" stroke="#1d8a5e" stroke-width="1.2"/>
+<text x="563.0" y="978" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">✓ shards 1 · 2 · 3</text>
+<rect x="624" y="962" width="110" height="24" rx="5" fill="#ffffff" stroke="#1d8a5e" stroke-width="1.2"/>
+<text x="679.0" y="978" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">✓ shards 1 · 2 · 3</text>
+<text x="428" y="1008" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">windows</text>
+<rect x="508" y="992" width="110" height="24" rx="5" fill="#ffffff" stroke="#1d8a5e" stroke-width="1.2"/>
+<text x="563.0" y="1008" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">✓ shards 1 · 2 · 3</text>
+<rect x="624" y="992" width="110" height="24" rx="5" fill="#ffffff" stroke="#1d8a5e" stroke-width="1.2"/>
+<text x="679.0" y="1008" font-size="10" fill="#1d8a5e" font-weight="600" text-anchor="middle">✓ shards 1 · 2 · 3</text>
+<text x="744" y="948" font-size="10" fill="#8a93a0" font-family="ui-monospace, Menlo, monospace">py 3.13</text>
+<text x="744" y="963" font-size="10" fill="#8a93a0">on every</text>
+<text x="744" y="978" font-size="10" fill="#8a93a0">cell</text>
+<text x="428" y="1040" font-size="10.5" fill="#4a5260">each shard runs its third of BOTH passes:</text>
+<text x="428" y="1057" font-size="10.5" fill="#1d8a5e" font-weight="600">a</text>
+<text x="442" y="1057" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">node --test</text>
+<text x="668" y="1057" font-size="10" fill="#8a93a0">shard 1 only — the Node pins</text>
+<text x="428" y="1072.5" font-size="10.5" fill="#1d8a5e" font-weight="600">b</text>
+<text x="442" y="1072.5" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">fux build</text>
+<text x="668" y="1072.5" font-size="10" fill="#8a93a0">or Python has no graph tier</text>
+<text x="428" y="1088.0" font-size="10.5" fill="#1d8a5e" font-weight="600">c</text>
+<text x="442" y="1088.0" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">node_arm.py --shard i/3</text>
+<text x="668" y="1088.0" font-size="10" fill="#8a93a0">TRANSCRIPTION pass — this repo</text>
+<text x="428" y="1103.5" font-size="10.5" fill="#1d8a5e" font-weight="600">d</text>
+<text x="442" y="1103.5" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">adversarial_corpus.py → fux build</text>
+<text x="668" y="1103.5" font-size="10" fill="#8a93a0">rewrites .fux/index/, so rebuild</text>
+<text x="428" y="1119.0" font-size="10.5" fill="#1d8a5e" font-weight="600">e</text>
+<text x="442" y="1119.0" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">node_arm.py --shard i/3</text>
+<text x="668" y="1119.0" font-size="10" fill="#8a93a0">again — ties across U+FFFF</text>
+<text x="428" y="1134.5" font-size="10.5" fill="#1d8a5e" font-weight="600">f</text>
+<text x="442" y="1134.5" font-size="10.5" fill="#14181f" font-family="ui-monospace, Menlo, monospace">graph_arm.py</text>
+<text x="668" y="1134.5" font-size="10" fill="#8a93a0">shard 1 only — N2, graph plane digest</text>
+<rect x="898" y="852" width="238" height="300" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="914" y="877" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">ladder</text>
+<text x="1122" y="877" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">1 job</text>
+<text x="914" y="899" font-size="10.5" fill="#14181f">golden ladder manifests</text>
+<text x="914" y="922.5" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">ladder_check.py</text>
+<text x="914" y="938.0" font-size="10.5" fill="#4a5260">checks the manifests</text>
+<text x="914" y="953.5" font-size="10.5" fill="#4a5260">and nothing else.</text>
+<text x="914" y="977.0" font-size="10.5" fill="#c2410c">THE GOLDEN CORPUS IS</text>
+<text x="914" y="992.5" font-size="10.5" fill="#c2410c">NOT FOR CI.</text>
+<text x="914" y="1008.0" font-size="10.5" fill="#8a93a0">It runs local-only, in fux-lab</text>
+<text x="914" y="1023.5" font-size="10.5" fill="#8a93a0">(W-148 row 1, 2026-09-14).</text>
+<text x="46" y="1178" font-size="11" fill="#8a93a0">Per push to main: 13 FAST + 25 FULL = 38 jobs. fail-fast: false everywhere — one red cell never hides another. No gate job: the run's own conclusion IS the verdict.</text>
+<text x="46" y="1222" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">4 - SHARED STEPS  --  .github/actions/, used by every job above</text>
+<line x1="46" y1="1232" x2="1136" y2="1232" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="1242" width="537" height="108" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="62" y="1267" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">setup-fux</text>
+<text x="62" y="1289" font-size="10.5" fill="#4a5260">setup-python (pip cache) → setup-node if asked → pip install -e .[extras]</text>
+<text x="62" y="1304.5" font-size="10.5" fill="#8a93a0">inputs: python (L7 floor 3.12) · node (L8 floor 22, empty = none) · extras (default dev)</text>
+<text x="62" y="1320.0" font-size="10.5" fill="#8a93a0">shell: bash on every step — Windows pwsh would read the install line differently.</text>
+<text x="62" y="1335.5" font-size="10.5" fill="#8a93a0">checkout stays in the job: a composite action cannot check out its own repo.</text>
+<rect x="599" y="1242" width="537" height="108" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="615" y="1267" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">pytest-annotate</text>
+<text x="615" y="1289" font-size="10.5" fill="#4a5260">junit XML → one ::error:: annotation per failed test (first 20)</text>
+<text x="615" y="1304.5" font-size="10.5" fill="#8a93a0">carries the test id + the failure's tail to every surface that shows a check.</text>
+<text x="615" y="1320.0" font-size="10.5" fill="#8a93a0">Why: a session reading CI through the API sees annotations, not logs —</text>
+<text x="615" y="1335.5" font-size="10.5" fill="#8a93a0">and "exit code 1" names no test.</text>
+<text x="46" y="1392" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">5 - RELEASE  --  .github/workflows/publish.yml, on: release published</text>
+<line x1="46" y1="1402" x2="1136" y2="1402" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="1412" width="196" height="128" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="62" y="1437" font-size="12.5" fill="#14181f" font-weight="600">You publish a release</text>
+<text x="62" y="1459" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">on GitHub, tag vX.Y.Z</text>
+<text x="62" y="1482.5" font-size="10" fill="#4a5260">create it only AFTER ci.yml's</text>
+<text x="62" y="1498.0" font-size="10" fill="#4a5260">FULL stage is green on the</text>
+<text x="62" y="1513.5" font-size="10" fill="#4a5260">exact commit</text>
+<rect x="46" y="1556" width="196" height="248" rx="10" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="62" y="1581" font-size="12.5" fill="#14181f" font-weight="600">why one bundle</text>
+<text x="62" y="1603" font-size="10" fill="#4a5260">Two jobs run on two</text>
+<text x="62" y="1618.5" font-size="10" fill="#4a5260">runners. A bundle built</text>
+<text x="62" y="1634.0" font-size="10" fill="#4a5260">per job could ship two</text>
+<text x="62" y="1649.5" font-size="10" fill="#4a5260">registries disagreeing</text>
+<text x="62" y="1665.0" font-size="10" fill="#4a5260">about what a version is.</text>
+<text x="62" y="1688.5" font-size="10" fill="#14181f">Built ONCE in build,</text>
+<text x="62" y="1704.0" font-size="10" fill="#4a5260">downloaded by npm. The</text>
+<text x="62" y="1719.5" font-size="10" fill="#4a5260">wheel gets the same bytes</text>
+<text x="62" y="1735.0" font-size="10" fill="#4a5260">via hatch_build.py.</text>
+<text x="62" y="1750.5" font-size="10" fill="#8a93a0">(SR-NODE-SEARCH d14)</text>
+<rect x="262" y="1412" width="560" height="392" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="278" y="1437" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">build</text>
+<text x="808" y="1437" font-size="10.5" fill="#626b78" text-anchor="end">ubuntu · py3.12 · permissions: actions: read</text>
+<path d="M242,1476 L256,1476" fill="none" stroke="#8a93a0" stroke-width="1.6" marker-end="url(#m)" stroke-linejoin="round"/>
+<rect x="272" y="1452" width="540" height="66" rx="8" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="5 3"/>
+<circle cx="292" cy="1464" r="11" fill="#c2410c"/>
+<text x="292" y="1468" font-size="11.5" fill="#ffffff" font-weight="600" text-anchor="middle">1</text>
+<text x="312" y="1468" font-size="11.5" fill="#14181f" font-weight="600">CI must be green on this exact commit</text>
+<text x="312" y="1483" font-size="10" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">gh api ci.yml/runs?head_sha=$SHA&amp;event=push&amp;branch=main</text>
+<text x="312" y="1498" font-size="10" fill="#c2410c">Must read "completed success" — running, red or superseded → ✗ refuse.</text>
+<text x="312" y="1512" font-size="10" fill="#8a93a0">Two strikes made it a gate: alpha.2 and alpha.3 shipped on red.</text>
+<circle cx="292" cy="1532" r="11" fill="#c9cfd8"/>
+<text x="292" y="1536" font-size="11.5" fill="#4a5260" font-weight="600" text-anchor="middle">2</text>
+<text x="312" y="1536" font-size="11.5" fill="#14181f" font-weight="600">Every version site must agree</text>
+<text x="312" y="1551" font-size="10" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">check-version-parity.py — src/fux/__init__.py + Node's three copies</text>
+<rect x="272" y="1560" width="540" height="36" rx="8" fill="#fff4ec" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="3 2"/>
+<circle cx="292" cy="1572" r="11" fill="#c2410c"/>
+<text x="292" y="1576" font-size="11.5" fill="#ffffff" font-weight="600" text-anchor="middle">3</text>
+<text x="312" y="1576" font-size="11.5" fill="#14181f" font-weight="600">Release tag must match the package</text>
+<text x="312" y="1591" font-size="10" fill="#4a5260">v$tag == fux.__version__ — else skip-existing would "publish" nothing, green</text>
+<circle cx="292" cy="1612" r="11" fill="#c9cfd8"/>
+<text x="292" y="1616" font-size="11.5" fill="#4a5260" font-weight="600" text-anchor="middle">4</text>
+<text x="312" y="1616" font-size="11.5" fill="#14181f" font-weight="600">Bundle the Node read plane — ONCE</text>
+<text x="312" y="1631" font-size="10" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">python -m fux.store.nodebundle node node/dist</text>
+<circle cx="292" cy="1652" r="11" fill="#c9cfd8"/>
+<text x="292" y="1656" font-size="11.5" fill="#4a5260" font-weight="600" text-anchor="middle">5</text>
+<text x="312" y="1656" font-size="11.5" fill="#14181f" font-weight="600">The bundle's version is the engine's</text>
+<text x="312" y="1671" font-size="10" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">check-version-parity.py --with-bundle node/dist/fux.mjs</text>
+<circle cx="292" cy="1692" r="11" fill="#c9cfd8"/>
+<text x="292" y="1696" font-size="11.5" fill="#4a5260" font-weight="600" text-anchor="middle">6</text>
+<text x="312" y="1696" font-size="11.5" fill="#14181f" font-weight="600">upload-artifact  node-bundle</text>
+<circle cx="292" cy="1720" r="11" fill="#c9cfd8"/>
+<text x="292" y="1724" font-size="11.5" fill="#4a5260" font-weight="600" text-anchor="middle">7</text>
+<text x="312" y="1724" font-size="11.5" fill="#14181f" font-weight="600">python -m build  →  twine check --strict</text>
+<text x="312" y="1739" font-size="10" fill="#4a5260">sdist + wheel, metadata validated</text>
+<circle cx="292" cy="1760" r="11" fill="#c9cfd8"/>
+<text x="292" y="1764" font-size="11.5" fill="#4a5260" font-weight="600" text-anchor="middle">8</text>
+<text x="312" y="1764" font-size="11.5" fill="#14181f" font-weight="600">upload-artifact  dist</text>
+<rect x="846" y="1412" width="290" height="130" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="862" y="1437" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">publish-pypi</text>
+<text x="1122" y="1437" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">→ PyPI</text>
+<text x="862" y="1459" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">environment: pypi · id-token: write</text>
+<text x="862" y="1474.5" font-size="10.5" fill="#8a93a0">OIDC trusted publishing, no token</text>
+<text x="862" y="1498.0" font-size="10.5" fill="#4a5260">download dist → gh-action-pypi-publish</text>
+<text x="862" y="1513.5" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">skip-existing: true</text>
+<rect x="846" y="1558" width="290" height="246" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+<text x="862" y="1583" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">publish-npm</text>
+<text x="1122" y="1583" font-size="10.5" fill="#1d8a5e" font-weight="600" text-anchor="end">→ npm</text>
+<text x="862" y="1605" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">environment: npm · id-token: write</text>
+<text x="862" y="1620.5" font-size="10.5" fill="#8a93a0">npm's publisher names the SAME env</text>
+<text x="862" y="1644.0" font-size="10.5" fill="#4a5260">download node-bundle — never rebuild</text>
+<text x="862" y="1659.5" font-size="10.5" fill="#4a5260">assert fux.mjs, package.json,</text>
+<text x="862" y="1675.0" font-size="10.5" fill="#4a5260">mcp-tools.json, README; no src/ (L10)</text>
+<text x="862" y="1690.5" font-size="10.5" fill="#4a5260">npm ≥ 11.5.1 (the OIDC floor)</text>
+<text x="862" y="1706.0" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">npm publish --provenance</text>
+<text x="862" y="1721.5" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">  --tag alpha if x-y, else latest</text>
+<text x="862" y="1737.0" font-size="10" fill="#8a93a0">DIRECT, not staged: staging cost 2 releases</text>
+<path d="M822,1472 L840,1472" fill="none" stroke="#1d8a5e" stroke-width="1.6" marker-end="url(#g)" stroke-linejoin="round"/>
+<path d="M832,1472 L832,1612 L840,1612" fill="none" stroke="#1d8a5e" stroke-width="1.6" marker-end="url(#g)" stroke-linejoin="round"/>
+<rect x="814.0" y="1530" width="40" height="17" rx="5" fill="#fcfcfb" stroke="none"/>
+<text x="834" y="1542" font-size="10.5" fill="#626b78" text-anchor="middle">needs</text>
+<text x="846" y="1824" font-size="10" fill="#8a93a0">Both publish fux-engine. Both trusted</text>
+<text x="846" y="1838" font-size="10" fill="#8a93a0">publishers are bound to the file NAME</text>
+<text x="846" y="1852" font-size="10" fill="#8a93a0">publish.yml — rename it and the next</text>
+<text x="846" y="1866" font-size="10" fill="#8a93a0">release fails at the registry.</text>
+<text x="46" y="1900" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">6 - OUTSIDE THE PIPELINE  --  named so that absence is not mistaken for coverage</text>
+<line x1="46" y1="1910" x2="1136" y2="1910" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="1920" width="260" height="118" rx="10" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="62" y="1945" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">branch protection</text>
+<text x="62" y="1967" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">required_status_checks: []</text>
+<text x="62" y="1982.5" font-size="10.5" fill="#4a5260">no required checks on main.</text>
+<text x="62" y="1998.0" font-size="10.5" fill="#4a5260">The gate lives in publish.yml,</text>
+<text x="62" y="2013.5" font-size="10.5" fill="#4a5260">not in a branch rule.</text>
+<text x="62" y="2029.0" font-size="10.5" fill="#8a93a0">force-push + delete: off</text>
+<rect x="322" y="1920" width="260" height="118" rx="10" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="338" y="1945" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">log-probe.yml</text>
+<text x="338" y="1967" font-size="10.5" fill="#14181f">workflow_dispatch ONLY</text>
+<text x="338" y="1982.5" font-size="10.5" fill="#4a5260">W-107 Phase 0 — glibc log()</text>
+<text x="338" y="1998.0" font-size="10.5" fill="#4a5260">evidence on node 22/24.</text>
+<text x="338" y="2013.5" font-size="10.5" fill="#4a5260">Evidence, not a gate: it measures</text>
+<text x="338" y="2029.0" font-size="10.5" fill="#4a5260">the runner's libm, not a diff.</text>
+<rect x="599" y="1920" width="260" height="118" rx="10" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="615" y="1945" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">the golden corpus</text>
+<text x="615" y="1967" font-size="10.5" fill="#4a5260">local-only, in fux-lab.</text>
+<text x="615" y="1982.5" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">just golden-score</text>
+<text x="615" y="1998.0" font-size="10.5" fill="#4a5260">Arpit's own shell only —</text>
+<text x="615" y="2013.5" font-size="10.5" fill="#4a5260">no agent, no CI (L11).</text>
+<text x="615" y="2029.0" font-size="10.5" fill="#8a93a0">CI checks manifests only</text>
+<rect x="876" y="1920" width="260" height="118" rx="10" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="892" y="1945" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">before you push</text>
+<text x="892" y="1967" font-size="10.5" fill="#4a5260" font-family="ui-monospace, Menlo, monospace">just test-all</text>
+<text x="892" y="1982.5" font-size="10.5" fill="#4a5260">= test · test-e2e · test-node</text>
+<text x="892" y="1998.0" font-size="10.5" fill="#4a5260">A red test on an uncommitted</text>
+<text x="892" y="2013.5" font-size="10.5" fill="#4a5260">tree is invisible to every</text>
+<text x="892" y="2029.0" font-size="10.5" fill="#8a93a0">mechanism above (LESSONS.md)</text>
+<line x1="46" y1="2068" x2="1136" y2="2068" stroke="#e4e4e0" stroke-width="1"/>
+<text x="46" y="2084" font-size="10.5" fill="#8a93a0">Drawn from .github/ on 2026-09-30, at 9989c7c5 (3.0.0-alpha.9). Authority: SR-WORK-RELEASE d10, d13. What the arm compares: architecture-two-readers.svg.</text>
+</svg>

@@ -1,0 +1,150 @@
+{
+ "arms": {
+  "rg-0.1": {
+   "clears_gain": false,
+   "drift_losses": [],
+   "gain": {
+    "alpha": 0.05,
+    "b": 0,
+    "c": 0,
+    "discordant": 0,
+    "net": 0,
+    "net_needed": null,
+    "outcome": "inconclusive",
+    "p": 1.0
+   },
+   "gain_line": "b=0 c=0 discordant=0 net=0 p=1.0000 (no net difference can clear alpha at this count, alpha=0.05) -> INCONCLUSIVE",
+   "hit@10_total": {
+    "baseline": 110,
+    "treatment": 109
+   },
+   "hit@1_untagged": [
+    0,
+    0
+   ],
+   "holds_drift": true,
+   "primary@1_tagged": [
+    0,
+    0
+   ],
+   "primary@1_untagged": [
+    0,
+    0
+   ]
+  },
+  "rg-0.2": {
+   "clears_gain": false,
+   "drift_losses": [
+    "s4u-009"
+   ],
+   "gain": {
+    "alpha": 0.05,
+    "b": 1,
+    "c": 1,
+    "discordant": 2,
+    "net": 0,
+    "net_needed": null,
+    "outcome": "no detected change",
+    "p": 1.0
+   },
+   "gain_line": "b=1 c=1 discordant=2 net=0 p=1.0000 (no net difference can clear alpha at this count, alpha=0.05) -> NO DETECTED CHANGE",
+   "hit@10_total": {
+    "baseline": 110,
+    "treatment": 109
+   },
+   "hit@1_untagged": [
+    0,
+    0
+   ],
+   "holds_drift": false,
+   "primary@1_tagged": [
+    1,
+    1
+   ],
+   "primary@1_untagged": [
+    0,
+    0
+   ]
+  },
+  "rg-0.3": {
+   "clears_gain": false,
+   "drift_losses": [
+    "s4u-009",
+    "s4u-052",
+    "s4u-077"
+   ],
+   "gain": {
+    "alpha": 0.05,
+    "b": 2,
+    "c": 3,
+    "discordant": 5,
+    "net": 1,
+    "net_needed": null,
+    "outcome": "no detected change",
+    "p": 1.0
+   },
+   "gain_line": "b=2 c=3 discordant=5 net=1 p=1.0000 (no net difference can clear alpha at this count, alpha=0.05) -> NO DETECTED CHANGE",
+   "hit@10_total": {
+    "baseline": 110,
+    "treatment": 108
+   },
+   "hit@1_untagged": [
+    0,
+    0
+   ],
+   "holds_drift": false,
+   "primary@1_tagged": [
+    2,
+    3
+   ],
+   "primary@1_untagged": [
+    0,
+    0
+   ]
+  },
+  "rg-0.5": {
+   "clears_gain": false,
+   "drift_losses": [
+    "s4u-009",
+    "s4u-021",
+    "s4u-045",
+    "s4u-052",
+    "s4u-077",
+    "s4u-082"
+   ],
+   "gain": {
+    "alpha": 0.05,
+    "b": 4,
+    "c": 6,
+    "discordant": 10,
+    "net": 2,
+    "net_needed": 8,
+    "outcome": "no detected change",
+    "p": 0.753906
+   },
+   "gain_line": "b=4 c=6 discordant=10 net=2 p=0.7539 (net needed 8, alpha=0.05) -> NO DETECTED CHANGE",
+   "hit@10_total": {
+    "baseline": 110,
+    "treatment": 108
+   },
+   "hit@1_untagged": [
+    0,
+    0
+   ],
+   "holds_drift": false,
+   "primary@1_tagged": [
+    4,
+    6
+   ],
+   "primary@1_untagged": [
+    0,
+    0
+   ]
+  }
+ },
+ "headroom": {
+  "improvement_pool": 20,
+  "regression_exposed": 66
+ },
+ "outcome_by_the_table": "FAIL \u2014 no gain"
+}

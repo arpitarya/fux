@@ -1,24 +1,37 @@
-# CI — one workflow, two stages. Rewritten 2026-09-29 (SR-WORK-RELEASE d13).
+# CI — one workflow, two stages. Rewritten 2026-09-29 (SR-WORK-RELEASE d13);
+# FULL made skippable 2026-09-30 (W-243, SR-WORK-RELEASE d14).
 #
 # Arpit: the pipeline took 14-15 min; he asked for <= 2. Work reaches `main`
 # both by PR and by direct push, so the fast verdict has to cover both.
 #
 #   FAST  (every push, fork PRs)  Linux · py3.12 · Node 22. unit + e2e under
-#         `pytest -n auto`, packaging + Node units, and the differential arm's
-#         repo pass over ten `--shard` runners. ~2 min — the signal.
+#         `pytest -n auto`, packaging + Node units + the ladder manifests, and
+#         the differential arm's repo pass over ten `--shard` runners. ~2 min —
+#         the signal. ALWAYS runs.
 #   FULL  (push to main, nightly, dispatch)  3 OSes x py3.12-3.14, the arm on
-#         3 OSes x Node 22/24 with BOTH passes, the ladder manifests. Starts
-#         only when FAST has finished, whatever FAST concluded.
+#         3 OSes x Node 22/24 with BOTH passes. Starts only when FAST has
+#         finished, whatever FAST concluded.
+#
+# 🔴 **A FULL cell skips its work when its verdict is already known** (d14).
+# Each cell's key is `scripts/ci-key.py cell`: the tree digest of every path
+# that can change a verdict — an EXCLUDE list, so a new folder counts as code —
+# plus the runner's OS, image and resolved Python/Node versions. A cell that
+# went green saves its key; a later push with the same key skips. ⚠ **Only a
+# push reads a verdict.** Nightly and dispatch always run FULL fresh — the
+# backstop for floating dependencies and runner drift the key cannot see.
 #
 # 🔴 **Why one file and not two** (measured 2026-09-29 on a scratch branch):
 # as two workflows, a push to `main` started both at once, the full lane took
 # the account's runner slots (20 jobs, 5 on macOS), and the fast lane's
-# two-minute verdict took six. `needs:` gives FAST the runners first.
+# two-minute verdict took six. `needs:` gives FAST the runners first. ⚠ It
+# stays (W-243 step 4, 2026-09-30): the run is 38 jobs against the cap of 20,
+# so dropping `needs:` would bring the starvation straight back.
 #
-# 🔴 **publish.yml refuses a release unless THIS workflow completed green on
-# the exact sha, as a push to main** — that, not a branch check, is the gate.
-# `main` has no required status checks (.github/branch-protection.json), so the
-# run's own conclusion is the aggregate and there is no gate job.
+# 🔴 **publish.yml refuses a release unless `verdict` below saved a green
+# verdict for the release commit's tree key** — every FAST job and every FULL
+# cell green, each FULL cell fresh or on its own saved verdict. `main` has no
+# required status checks (.github/branch-protection.json), so that verdict,
+# not a branch check, is the gate.
 name: CI
 
 on:
@@ -82,10 +95,11 @@ jobs:
           junit: junit-e2e.xml
 
   build:
-    # Packaging + the Node reader's own units. Metadata validation before a
-    # release ever happens: twine catches what PyPI only reveals after publish.
+    # Packaging, the Node reader's own units and the ladder manifests.
+    # Metadata validation before a release ever happens: twine catches what
+    # PyPI only reveals after publish.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork
-    name: build · node units
+    name: build · node units · ladder
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -101,6 +115,10 @@ jobs:
         working-directory: node
         run: node --test
       - run: python scripts/check-version-parity.py
+      # 🔴 THE GOLDEN CORPUS IS NOT FOR CI (Arpit, 2026-09-14, W-148 row 1): it
+      # runs local-only, in fux-lab. This checks the manifests and nothing
+      # else. Its own job until 2026-09-30; folded here to save a runner (W-243).
+      - run: python tools/differential/ladder_check.py
       - run: pip install build twine && python -m build && twine check --strict dist/*
       - name: sdist must not ship the archived old build
         run: |
@@ -171,14 +189,23 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - uses: ./.github/actions/setup-fux
+      - id: verdict
+        uses: ./.github/actions/full-verdict
+        with:
+          cell: py-${{ matrix.os }}-${{ matrix.python }}
+          python: ${{ matrix.python }}
+      - if: steps.verdict.outputs.hit != 'true'
+        uses: ./.github/actions/setup-fux
         with:
           python: ${{ matrix.python }}
+      # `--durations=30`: W-243 step 3's profile — the Windows cells are ~3x
+      # Linux, and the slowest thirty are where the next cut comes from.
       - name: Unit suite
-        run: pytest -q -n auto --durations=10 --junitxml=junit-unit.xml tests
+        if: steps.verdict.outputs.hit != 'true'
+        run: pytest -q -n auto --durations=30 --junitxml=junit-unit.xml tests
       - name: End-to-end suite
-        if: success() || failure()
-        run: pytest -q -n auto --durations=10 --junitxml=junit-e2e.xml tests_e2e
+        if: steps.verdict.outputs.hit != 'true' && (success() || failure())
+        run: pytest -q -n auto --durations=30 --junitxml=junit-e2e.xml tests_e2e
       - if: failure()
         uses: ./.github/actions/pytest-annotate
         with:
@@ -187,6 +214,11 @@ jobs:
         uses: ./.github/actions/pytest-annotate
         with:
           junit: junit-e2e.xml
+      - if: steps.verdict.outputs.hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.verdict.outputs.path }}
+          key: ${{ steps.verdict.outputs.key }}
 
   node-arm:
     # 🔴 **A green arm on ONE OS is not a green arm.** Two libms disagree in the
@@ -205,28 +237,38 @@ jobs:
         shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v5
-      - uses: ./.github/actions/setup-fux
+      - id: verdict
+        uses: ./.github/actions/full-verdict
+        with:
+          cell: arm-${{ matrix.os }}-node${{ matrix.node }}-${{ matrix.shard }}of3
+          python: "3.13"
+          node: ${{ matrix.node }}
+      - if: steps.verdict.outputs.hit != 'true'
+        uses: ./.github/actions/setup-fux
         with:
           python: "3.13"
           node: ${{ matrix.node }}
           extras: ""
 
       - name: node pins
-        if: matrix.shard == 1
+        if: steps.verdict.outputs.hit != 'true' && matrix.shard == 1
         working-directory: node
         run: node --test
 
       # 🔴 Build the derived plane first — without it Python has no graph tier
       # and Node does, and the two disagree by ratified design.
-      - run: fux build
+      - if: steps.verdict.outputs.hit != 'true'
+        run: fux build
 
       - name: the differential arm — TRANSCRIPTION (this repo)
+        if: steps.verdict.outputs.hit != 'true'
         run: python tools/differential/node_arm.py . --python-tune off --shard ${{ matrix.shard }}/3
 
       - name: the adversarial corpus, then the arm again
         # W-107 H1/H2 are invisible on ordinary data: H1 needs tied scores whose
         # ids straddle U+FFFF. `adversarial_corpus.py` REWRITES .fux/index/, so
         # the plane built above goes stale — hence `fux build` again.
+        if: steps.verdict.outputs.hit != 'true'
         shell: bash
         run: |
           python tools/differential/adversarial_corpus.py .
@@ -234,20 +276,34 @@ jobs:
           python tools/differential/node_arm.py . --python-tune off --shard ${{ matrix.shard }}/3
 
       - name: N2 — the graph plane digest (adversarial index)
-        if: matrix.shard == 1
+        if: steps.verdict.outputs.hit != 'true' && matrix.shard == 1
         run: python tools/differential/graph_arm.py .
 
-  ladder:
-    # 🔴 THE GOLDEN CORPUS IS NOT FOR CI (Arpit, 2026-09-14, W-148 row 1): it
-    # runs local-only, in fux-lab. This checks the manifests and nothing else.
-    needs: [unit, e2e, build, arm]
-    if: always() && !cancelled() && (github.event_name != 'push' || github.ref == 'refs/heads/main') && github.event_name != 'pull_request'
-    name: golden ladder manifests (the corpus is local-only)
+      - if: steps.verdict.outputs.hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.verdict.outputs.path }}
+          key: ${{ steps.verdict.outputs.key }}
+
+  verdict:
+    # 🔴 **The one thing publish.yml reads** (SR-WORK-RELEASE d14). Saved only
+    # when EVERY job above is green — FAST fresh, each FULL cell fresh or on its
+    # own saved verdict — under `ci-key.py verdict`, which is the tree digest
+    # alone: every cell's runtime half is already inside its own key.
+    needs: [unit, e2e, build, arm, python, node-arm]
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    name: verdict · save the green tree key
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: ./.github/actions/setup-fux
+      - id: key
+        run: |
+          key="$(python3 scripts/ci-key.py verdict)"
+          mkdir -p "$RUNNER_TEMP/ci-verdict"
+          echo "$key $GITHUB_SHA $GITHUB_RUN_ID" > "$RUNNER_TEMP/ci-verdict/verdict.txt"
+          echo "key=$key" >> "$GITHUB_OUTPUT"
+          echo "verdict key: $key"
+      - uses: actions/cache/save@v4
         with:
-          python: "3.13"
-          extras: ""
-      - run: python tools/differential/ladder_check.py
+          path: ${{ runner.temp }}/ci-verdict
+          key: ${{ steps.key.outputs.key }}

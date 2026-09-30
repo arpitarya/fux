@@ -23,6 +23,28 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-09-30 — W-243 built: FULL skips on a known verdict, the Windows hot spot batched; step 1 stopped at 1.4x  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement W-243"*.
+- **Step 1, spike first, as the item says:** one Node process was **1.11–1.44x** faster than one process per comparison, not ~5x. In-process calls still cost 110–700 ms each (the reader re-reads the index), so it **stops** until W-242 T0/T1 land. Filed [`2026-09-30-ci-arm-batching`](regression/2026-09-30-ci-arm-batching/report.md). `node_arm.py`'s *"well under a tenth"* is stale (now 10–30 %). It is recorded in the ANALYSIS, not edited, because its owner record carried another session's edits.
+- **Step 2, built:** `scripts/ci-key.py` (an exclude-list tree digest plus the runner half), `.github/actions/full-verdict`, per-cell skip on both FULL jobs, a `verdict` job saving the aggregate key, and `publish.yml` reading that key instead of *"green on this sha"*. SR-WORK-RELEASE d14, with 11a and 13 amended; `tests/test_ci_key.py` (27). **17 of 40, not 22**: five "docs" commits re-ingest `.fux/index/`, which is the arm's corpus and so code.
+- **Step 3, partly:** profiled locally. 54 % of the unit suite's spawns were `test_sr_freshness.py` (72 s on Windows, 10 s on Linux). It is batched through `git cat-file --batch` plus one patch per commit, and its answers were checked identical on 166 commits / 1 165 pairs (23.7 s → 5.9 s here). Windows `TMP`/`TEMP` now point at `$RUNNER_TEMP`, and FULL prints `--durations=30`. In-process CLI tests and a second shard wait on that profile.
+- **Step 4:** `ladder` is folded into `build`. **`needs:` stays**: 38 jobs against a cap of 20.
+- **Hazard:** seven sessions share this tree, and `OPEN-WORK.md`, `WORKLOG.md`, `0067` and `W-243`'s own file hold another session's staged changes. **Nothing was committed or pushed.** My paths are listed in the handoff message.
+- **Next:** Arpit commits and pushes; the first `main` run is then read for the `verdict` save, a docs-only skip and the Windows durations.
+
+## 2026-09-30 — W-241 closed: `doctor --fix` repairs an `output.toml` missing a key doctor reads  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement W-241"*.
+- **Did:** Two tests in `tests/test_output_config.py` reproduced the refusal first. `cli._apply_output_defaults` now resolves each key for `doctor` through the template when the loaded file lacks it. Every key the file sets is still the file's, and every other verb still refuses. The rule is SR-OUTPUT d20b, beside d20, which already owned `doctor`'s template fallback; SR-DOCTOR's L12 note points at it. SR-CLI `owns` is restamped. The audit found one more key read before `--fix`: `[cli.json] enabled`, which the same fallback covers. The detail file is archived.
+- **Hazard:** a concurrent session staged its files together with my `tests/test_output_config.py`. W-241 is left uncommitted in the working tree; the tree carries two other live sessions' work.
+- **Next:** nothing from W-241.
+
+## 2026-09-30 — W-242 ruled: one derived plane, both readers; Node will read AND build `.fux/runtime/`  ·  Cowork (Opus 5.5)
+- **Asked:** *"Research and propose how can we implement caching in fux. Python arm as well as the node arm both should use common files"*; then *"I agree to building tier zero, agree to building tier one, and agree to build tier two. That means Node will also write."*
+- **Found:** Node has no accelerator and reads every shard **three times** per query (scan, `graphRecords`, `tableFromShards`): 769 opens for 257 shards; `rawRecordLines` is 207 of a 383 ms profile (through the Cowork VM's mount — ratios, not absolutes). Python's `is_fresh` is a stat check against `stamp.json`, which Node can transcribe — with a BigInt stat, since `mtime_ns` is past 2⁵³. `graph.json` is serialized with `ensure_ascii` on and unsorted keys, unlike every other plane file.
+- **Ruled (Arpit), ratified, not built:** T0 read each shard once · T1 Node reads the plane when fresh · T2 Node builds it byte-identically. T3 (query-result cache) refused. Fork A (Node reads `graph.json`) and auto-build-on-read left open, neither blocking.
+- **Filed:** [`compare/shared-runtime`](compare/shared-runtime.compare.md) · [W-242](open/W-242-shared-runtime.md) + OPEN-WORK row · [`architecture-caching.svg`](architecture-caching.svg) · SR-T1-ACCELERATOR d18, SR-NODE-SEARCH d24 (+ pointers on d9, d10), SR-CACHE d13 · SR-WORK-REGISTRY rows. No `src/`, `node/` or `tests/` change.
+- **Next:** Claude Code (Opus) builds W-242 tier by tier; Arpit rules Fork A when convenient.
+
 ## 2026-09-30 — W-168 step 8, W-237 and W-236 Part A in parallel: two captures for Arpit, one design record  ·  Claude Code (Opus 5.5)
 - **Asked:** *"review open work file and implement everything in parallel"*.
 - **Did:**

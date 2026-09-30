@@ -40,10 +40,11 @@ here. Read that record before changing anything below it.
 - 🟡 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)
 - 🟢 **W-240** · `agent` — a scored set with a `step10_section` pool ≥ 6 (set-4-claude: 1): recipe R10 seed, `set-5-claude`, rung rebuild, then 🔴 Arpit scores. **Opus.** [detail](open/W-240-section-pool-set.md)
 - 🔴 **W-237** · `arpit` — RM3 behind the `grounded` gate: built off at `0.0` in both readers, five arms captured on `set-4-claude` (pool 20). Arpit scores; a session that did not capture decides. [detail](open/W-237-rm3-grounded-gate.md)
-- 🟢 **W-241** · `agent` — 🧨 `fux doctor --fix` cannot repair an `output.toml` missing `[cli] progress_threshold`: it reads the key before it starts (since W-238/W-239). **Sonnet.** [detail](open/W-241-doctor-fix-progress-threshold.md)
+- 🟢 **W-242** · `agent` — one derived plane, both readers: Node reads each shard once (T0), reads `.fux/runtime/` when fresh (T1), builds it byte-identically (T2). Ratified 2026-09-30, not built. **Opus.** [detail](open/W-242-shared-runtime.md)
 
 
 ### testing
 
+- 🟡 **W-243** · `agent` — CI in ~2 min. Built, uncommitted: FULL skips a cell whose code went green, Windows hot spot batched; step 1 stopped until W-242. Waiting on a push to `main` to read its first run — not a queue item. **Opus.** [detail](open/W-243-ci-two-minutes.md)
 
 ---

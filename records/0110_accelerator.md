@@ -673,6 +673,37 @@ multiplies in `1 + authority_weight`, a supremum because `f < 1`. Nothing else
 in the candidate or bound code moved. `RUNTIME_SCHEMA` is v8, so a v7 plane is
 refused and rebuilt rather than read as "no history".
 
+**18. 🟠 The plane has two writers and two readers — ratified 2026-09-30
+(Arpit), NOT BUILT** ([W-242](../work/open/W-242-shared-runtime.md);
+[`compare/shared-runtime`](../work/compare/shared-runtime.compare.md)). Arpit:
+*"I agree to building tier zero, agree to building tier one, and agree to build
+tier two. That means Node will also write."*
+
+- **The layout this record already states is the contract, unchanged.** No
+  file, field, schema string or binary shape moves. `.fux/runtime/` is the one
+  query cache fux has, and both runtimes use the same one.
+- **Node reads it** (Tier 1) when a transcription of `is_fresh` says it is
+  fresh, and answers from its own scan otherwise — never an error, as here.
+  Decisions 1–7 and 15–17 bind the Node reader exactly as they bind this one:
+  candidates and statistics only, the rounding-aware skip, the anchor seed.
+  ⚠ `stamp.json`'s `mtime_ns` exceeds 2⁵³ — the Node stat must be BigInt.
+- **Node builds it** (Tier 2) with its own `fux build`, from the committed
+  shards alone (d1), refusing on the same invariants (d7), under the same
+  `write.lock` ([SR-LOCKS](0140_locks.md)). **The output must equal this
+  build's byte for byte** on every file but `stamp.json` — which extends
+  `DETERMINISTIC_FILES`' existing two-builds claim to two builders.
+- **The differential law gains a build lane** (Node-built vs Python-built,
+  `diff -r` excluding `stamp.json`, then each runtime reading the other's
+  plane) beside the query lanes, which become Node-plane = Node-scan =
+  Python-plane.
+- **A query-result cache is refused** (the compare doc's T3): a key long enough
+  to prove a hit identical is too long to keep complete, and a cross-runtime
+  hit would let the differential arm compare Python with itself.
+- **Until W-242 lands, nothing above is true of the code**: Node has no plane
+  reader and no builder, and [SR-NODE-SEARCH](0153_node-search.md) decision 10
+  describes today. The Node twins (`node/src/derive/`) join this record's
+  ownership in the change that creates them.
+
 ### Consequences
 
 - ⚠ **`tools/differential/` also carries the golden ladder's custody, and

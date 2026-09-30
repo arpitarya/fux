@@ -1,0 +1,47 @@
+W-243 step 3 profile: which unit tests start a subprocess. macOS, pytest -n auto, tests/,
+working tree of 2026-09-30 before the test_sr_freshness change. Test CALL time only.
+Method: a -p plugin wrapping subprocess.Popen.__init__, counting per test.
+
+tests run: 6462   total call time: 338 s
+tests that spawn: 554   their call time: 170 s (50 %)   spawns: 2879
+
+spawns  tests  call_s  file
+  1551      6    29.3  tests/test_sr_freshness.py
+   264     98    12.0  tests/test_doctor.py
+   189     10    16.4  tests/query/test_authority_prior.py
+   112      5     2.7  tests/test_sr_owns_hash.py
+    51     10    11.1  tests/query/test_mined.py
+    47      7    11.6  tests/query/test_intent_prior.py
+    47     47     3.0  tests/test_golden_traversal_guard.py
+    39     12     2.0  tests/maintain/test_hooks.py
+    35     32     1.8  tests/test_golden_key_guards.py
+    35     23     3.5  tests/ingest/test_skipnotice.py
+    34     20     2.4  tests/ingest/test_delta.py
+    33     11     6.2  tests/query/test_anchor_node_twin.py
+    31     11     1.5  tests/test_doctor_url_decoders.py
+    29     16     3.9  tests/maintain/test_runner.py
+    27     18     3.3  tests/ingest/test_urlsrc.py
+    27     12     2.1  tests/test_doctor_fetcher_routes.py
+    23     13     2.1  tests/enrich/test_doc2query.py
+    20     12     1.6  tests/ingest/test_url_reredaction.py
+    20      9     2.6  tests/test_confidence_floor_off.py
+    18     18     1.1  tests/test_golden_hook_prose.py
+    18      8     2.9  tests/test_commit_paths.py
+    17      9     1.2  tests/ingest/test_run.py
+    17     13     1.7  tests/ingest/test_ingestlog.py
+    17     10     2.0  tests/test_node_bundle.py
+    16     10     0.8  tests/ingest/test_carry_forward_invalidation.py
+    11      1     2.6  tests/test_golden_history.py
+    11      6     2.8  tests/query/test_rm3.py
+    10      9     0.6  tests/test_record_components.py
+    10      7     1.2  tests/test_url_update_policy.py
+     9      1     0.2  tests/test_golden_switch.py
+
+Windows (CI job 109731811596, py3.12): unit 218 s for 6 269 tests; slowest was
+tests/test_sr_freshness.py::test_no_behaviour_change_landed_without_its_adr at 71.92 s
+(Linux py3.13 in the same run: 10.37 s).
+
+test_sr_freshness.py git spawns by command, one run of the history test:
+  before: rev-parse 2, log 87, show <blob> 724, show --name-only 63, show --unified=0 663
+  after:  rev-parse 3, log 88, show --name-only 63, show --unified=0 41, + one cat-file --batch
+  the history test alone, locally, same loaded machine: 23.65 s before, 5.91 s after

@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 1734" width="1180" height="1734" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#3d6df2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#1d8a5e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#8a93a0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<rect width="1180" height="1734" fill="#fcfcfb"/>
+<text x="46" y="52" font-size="23" fill="#14181f" font-weight="600">Caching in fux -- one plane, two writers, two readers</text>
+<text x="46" y="76" font-size="13" fill="#626b78">No new cache. Python's .fux/runtime/ IS the shared cache;</text>
+<text x="46" y="94" font-size="13" fill="#626b78">Node learns to read it, and to build it byte for byte.</text>
+<rect x="800" y="34" width="340" height="68" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<rect x="812" y="44" width="11" height="11" rx="2.5" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="830" y="53" font-size="10.5" fill="#626b78">built today -- both runtimes</text>
+<rect x="812" y="59" width="11" height="11" rx="2.5" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.4"/>
+<text x="830" y="68" font-size="10.5" fill="#626b78">built today -- PYTHON ONLY</text>
+<rect x="812" y="74" width="11" height="11" rx="2.5" fill="#fff4ec" stroke="#c2410c" stroke-width="1.4" stroke-dasharray="3 2"/>
+<text x="830" y="83" font-size="10.5" fill="#626b78">ratified 2026-09-30, NOT BUILT (W-242)</text>
+<rect x="812" y="89" width="11" height="11" rx="2.5" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="830" y="98" font-size="10.5" fill="#626b78">refused, parked, or open</text>
+<text x="46" y="126" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">0 - THE ONLY INPUT: THE COMMITTED INDEX. NOTHING IN .fux/runtime/ FEEDS ANYTHING BUT A QUERY.</text>
+<line x1="46" y1="136" x2="1136" y2="136" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="146" width="700" height="74" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="62" y="168" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">.fux/index/*.jsonl  --  doc-major, COMMITTED</text>
+<text x="62" y="186" font-size="10.5" fill="#4a5260">257 shards, 38 MB on this repo. One line per document: right for git, wrong for querying.</text>
+<text x="62" y="201" font-size="10.5" fill="#4a5260">The build reads these and nothing else, so the plane is deletable at any moment.</text>
+<text x="46" y="262" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">1 - TWO WRITERS, ONE LOCK, ONE OUTPUT</text>
+<line x1="46" y1="272" x2="1136" y2="272" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="284" width="520" height="80" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="62" y="306" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Python  fux build / fux ingest</text>
+<text x="62" y="324" font-size="10.5" fill="#4a5260">derive/_build.py -- the reference writer, today.</text>
+<text x="62" y="339" font-size="10.5" fill="#4a5260">Asserts both raw-byte invariants per record; refuses to build.</text>
+<rect x="616" y="284" width="520" height="80" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="632" y="306" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Node  fux build          (W-242 Tier 2)</text>
+<text x="632" y="324" font-size="10.5" fill="#4a5260">node/src/derive/build.mjs -- a twin of _build.py.</text>
+<text x="632" y="339" font-size="10.5" fill="#4a5260">Same input, same invariants, same refusals. No read verb ever builds.</text>
+<path d="M396,222 L396,282" fill="none" stroke="#8a93a0" stroke-width="1.6" marker-end="url(#m)" stroke-linecap="round"/>
+<path d="M746,185 L880,185 L880,282" fill="none" stroke="#8a93a0" stroke-width="1.6" marker-end="url(#m)" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="330" y="394" width="520" height="62" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="346" y="416" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">.fux/runtime/write.lock</text>
+<text x="346" y="434" font-size="10.5" fill="#4a5260">O_CREAT|O_EXCL, pid JSON (SR-LOCKS). One writer at a time, whichever runtime.</text>
+<path d="M306,364 L400,392" fill="none" stroke="#1d8a5e" stroke-width="1.8" marker-end="url(#g)" stroke-linecap="round"/>
+<path d="M876,364 L780,392" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#o)" stroke-linecap="round"/>
+<text x="876" y="424" font-size="10.5" fill="#c2410c">Node-built = Python-built, byte for byte,</text>
+<text x="876" y="439" font-size="10.5" fill="#c2410c">every file except stamp.json</text>
+<path d="M590,456 L590,490" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<text x="46" y="510" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">2 - THE PLANE: .fux/runtime/  --  GITIGNORED, DISPOSABLE. PYTHON'S LAYOUT IS THE CONTRACT; NO FILE CHANGES.</text>
+<line x1="46" y1="520" x2="1136" y2="520" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="532" width="1090" height="266" rx="10" fill="#fcfdff" stroke="#3d6df2" stroke-width="1.8"/>
+<rect x="62" y="548" width="344" height="64" rx="8" fill="#ffffff" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="76" y="572" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">postings/xx.jsonl</text>
+<text x="76" y="592" font-size="10.5" fill="#4a5260">term-major postings, blocks of 128</text>
+<rect x="419" y="548" width="344" height="64" rx="8" fill="#ffffff" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="433" y="572" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">postings/xx.idx</text>
+<text x="433" y="592" font-size="10.5" fill="#4a5260">62-byte entries: &lt;8sHQI 5H 5I IIH -- offset, mx, mnw</text>
+<rect x="776" y="548" width="344" height="64" rx="8" fill="#ffffff" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="790" y="572" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">anchors/xx.json</text>
+<text x="790" y="592" font-size="10.5" fill="#4a5260">anchor-text postings (W-168 step 1)</text>
+<rect x="62" y="624" width="344" height="64" rx="8" fill="#ffffff" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="76" y="648" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">docs.jsonl</text>
+<text x="76" y="668" font-size="10.5" fill="#4a5260">id -&gt; loc, title, flen, archived, mtime, alen</text>
+<rect x="419" y="624" width="344" height="64" rx="8" fill="#ffffff" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="433" y="648" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">stats.json</text>
+<text x="433" y="668" font-size="10.5" fill="#4a5260">n and RAW total_flen -- never weighted</text>
+<rect x="776" y="624" width="344" height="64" rx="8" fill="#ffffff" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="790" y="648" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">mined.json</text>
+<text x="790" y="668" font-size="10.5" fill="#4a5260">the corpus pair table (W-168 step 4)</text>
+<rect x="62" y="700" width="344" height="64" rx="8" fill="#ffffff" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="76" y="724" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">graph.json</text>
+<text x="76" y="744" font-size="10.5" fill="#4a5260">the graph plane. Node rebuilds it instead -- Fork A</text>
+<rect x="419" y="700" width="344" height="64" rx="8" fill="#ffffff" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="433" y="724" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">manifest.json</text>
+<text x="433" y="744" font-size="10.5" fill="#4a5260">schema, docs_fields, a sha per committed shard</text>
+<rect x="776" y="700" width="344" height="64" rx="8" fill="#ffffff" stroke="#3d6df2" stroke-width="1.4"/>
+<text x="790" y="724" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">stamp.json</text>
+<text x="790" y="744" font-size="10.5" fill="#4a5260">[size, mtime_ns] per shard. WRITTEN LAST. The freshness key</text>
+<text x="62" y="786" font-size="10.5" fill="#8a93a0">Candidates and statistics only -- never a score. Both readers hand what they read to the same rank(), so the plane can make a query fast and cannot make it different.</text>
+<text x="46" y="824" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">3 - TWO READERS, ONE FRESHNESS TEST</text>
+<line x1="46" y1="834" x2="1136" y2="834" stroke="#e4e4e0" stroke-width="1"/>
+<text x="306" y="856" font-size="11.5" fill="#1d8a5e" font-weight="600" text-anchor="middle">PYTHON  (today)</text>
+<text x="876" y="856" font-size="11.5" fill="#c2410c" font-weight="600" text-anchor="middle">NODE  (W-242 Tiers 0 + 1)</text>
+<rect x="46" y="868" width="520" height="78" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="62" y="890" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">accel.py :: is_fresh</text>
+<text x="62" y="908" font-size="10.5" fill="#4a5260">schema and docs_fields match, shard count matches, and every</text>
+<text x="62" y="923" font-size="10.5" fill="#4a5260">shard's [size, mtime_ns] equals stamp.json. Stat only -- no hashing.</text>
+<rect x="616" y="868" width="520" height="78" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="632" y="890" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">accel.mjs :: isFresh          (Tier 1)</text>
+<text x="632" y="908" font-size="10.5" fill="#4a5260">The same test, transcribed. mtime_ns is ~1.79e18, past 2^53:</text>
+<text x="632" y="923" font-size="10.5" fill="#4a5260">statSync(p, {bigint: true}) or it never matches -- silently.</text>
+<rect x="46" y="986" width="250" height="92" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="62" y="1008" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">accel.py</text>
+<text x="62" y="1026" font-size="10.5" fill="#4a5260">fresh: rarest term first,</text>
+<text x="62" y="1041" font-size="10.5" fill="#4a5260">exact theta, block bound,</text>
+<text x="62" y="1056" font-size="10.5" fill="#4a5260">round(9)-aware skip.</text>
+<rect x="316" y="986" width="250" height="92" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="332" y="1008" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">scan.py</text>
+<text x="332" y="1026" font-size="10.5" fill="#4a5260">stale or missing:</text>
+<text x="332" y="1041" font-size="10.5" fill="#4a5260">every shard, raw bytes.</text>
+<text x="332" y="1056" font-size="10.5" fill="#4a5260">The oracle.</text>
+<rect x="616" y="986" width="250" height="92" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="632" y="1008" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">accel.mjs     (Tier 1)</text>
+<text x="632" y="1026" font-size="10.5" fill="#4a5260">fresh: the same skip loop,</text>
+<text x="632" y="1041" font-size="10.5" fill="#4a5260">.idx via DataView, one</text>
+<text x="632" y="1056" font-size="10.5" fill="#4a5260">fixture read by both suites.</text>
+<rect x="886" y="986" width="250" height="92" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="902" y="1008" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">scan.mjs     (Tier 0)</text>
+<text x="902" y="1026" font-size="10.5" fill="#4a5260">today: 769 opens / 257 shards</text>
+<text x="902" y="1041" font-size="10.5" fill="#4a5260">(scan + graph + mined).</text>
+<text x="902" y="1056" font-size="10.5" fill="#4a5260">Tier 0: each shard ONCE.</text>
+<path d="M260,946 L171,984" fill="none" stroke="#1d8a5e" stroke-width="1.8" marker-end="url(#g)" stroke-linecap="round"/>
+<path d="M352,946 L441,984" fill="none" stroke="#1d8a5e" stroke-width="1.8" marker-end="url(#g)" stroke-linecap="round"/>
+<path d="M830,946 L741,984" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#o)" stroke-linecap="round"/>
+<path d="M922,946 L1011,984" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#o)" stroke-linecap="round"/>
+<text x="210" y="960" font-size="10.5" fill="#8a93a0" text-anchor="end">fresh</text>
+<text x="398" y="960" font-size="10.5" fill="#8a93a0">not fresh</text>
+<text x="780" y="960" font-size="10.5" fill="#8a93a0" text-anchor="end">fresh</text>
+<text x="968" y="960" font-size="10.5" fill="#8a93a0">not fresh</text>
+<rect x="46" y="1118" width="520" height="62" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="62" y="1140" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">rank.py  --  guard -&gt; BM25F -&gt; multipliers -&gt; sort</text>
+<text x="62" y="1158" font-size="10.5" fill="#4a5260">ranked_by: accelerator | scan</text>
+<rect x="616" y="1118" width="520" height="62" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="632" y="1140" font-size="11.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">rank.mjs  --  the same pipeline, transcribed</text>
+<text x="632" y="1158" font-size="10.5" fill="#4a5260">ranked_by: scan today; accelerator once Tier 1 lands</text>
+<path d="M171,1078 L171,1116" fill="none" stroke="#1d8a5e" stroke-width="1.8" marker-end="url(#g)" stroke-linecap="round"/>
+<path d="M441,1078 L441,1116" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<path d="M741,1078 L741,1116" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#o)" stroke-linecap="round"/>
+<path d="M1011,1078 L1011,1116" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<text x="591" y="1208" font-size="11.5" fill="#14181f" font-weight="600" text-anchor="middle">same ids, same order, scores equal after round(9) -- in all four paths.  Not fresh is never an error.</text>
+<path d="M470,798 L470,866" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<path d="M1040,798 L1040,866" fill="none" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)" stroke-linecap="round"/>
+<text x="46" y="1238" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">4 - THE REFER PLANE'S CACHES  --  SR-CACHE, UNCHANGED. THEY CACHE FETCHES, NOT QUERIES.</text>
+<line x1="46" y1="1248" x2="1136" y2="1248" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="1260" width="348" height="92" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="62" y="1282" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">ARC  (loc, sha)</text>
+<text x="62" y="1300" font-size="10.5" fill="#4a5260">In memory, one process. The content</text>
+<text x="62" y="1315" font-size="10.5" fill="#4a5260">address is IN the key, so a hit is the</text>
+<text x="62" y="1330" font-size="10.5" fill="#4a5260">fetch's own bytes or it is not a hit.</text>
+<rect x="410" y="1260" width="348" height="92" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="426" y="1282" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">TTL store  runtime/fetch-cache/</text>
+<text x="426" y="1300" font-size="10.5" fill="#4a5260">Opt-in (ttl 0 = off), no_cache wins,</text>
+<text x="426" y="1315" font-size="10.5" fill="#4a5260">answers labelled `cached`, never</text>
+<text x="426" y="1330" font-size="10.5" fill="#4a5260">`current`. Node never fetches.</text>
+<rect x="774" y="1260" width="362" height="92" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="790" y="1282" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">acquired/objects/</text>
+<text x="790" y="1300" font-size="10.5" fill="#4a5260">Retained URL bytes. Node reads them</text>
+<text x="790" y="1315" font-size="10.5" fill="#4a5260">for `as-ingested`; nothing re-fetches.</text>
+<text x="790" y="1330" font-size="10.5" fill="#4a5260">Not rebuildable -- only re-acquirable.</text>
+<text x="46" y="1382" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">5 - REFUSED, PARKED, OR OPEN  --  named so that an absence is not mistaken for a plan</text>
+<line x1="46" y1="1392" x2="1136" y2="1392" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="1404" width="262" height="118" rx="10" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="62" y="1426" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">T3  query-result cache</text>
+<text x="62" y="1444" font-size="10.5" fill="#4a5260">REFUSED. Few exact repeats; a</text>
+<text x="62" y="1459" font-size="10.5" fill="#4a5260">long key where one missing input</text>
+<text x="62" y="1474" font-size="10.5" fill="#4a5260">is a silent wrong answer; would</text>
+<text x="62" y="1489" font-size="10.5" fill="#4a5260">make Node serve Python's bits.</text>
+<rect x="322" y="1404" width="262" height="118" rx="10" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="338" y="1426" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">in-memory memo</text>
+<text x="338" y="1444" font-size="10.5" fill="#4a5260">PARKED. Per process, in fux mcp</text>
+<text x="338" y="1459" font-size="10.5" fill="#4a5260">and fux serve only, one per</text>
+<text x="338" y="1474" font-size="10.5" fill="#4a5260">runtime, dropped on a new stamp.</text>
+<text x="338" y="1489" font-size="10.5" fill="#4a5260">Reopen: repeats &gt; 1/4 of calls.</text>
+<rect x="598" y="1404" width="262" height="118" rx="10" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="614" y="1426" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">auto-build on read</text>
+<text x="614" y="1444" font-size="10.5" fill="#4a5260">NOT PROPOSED. A read verb that</text>
+<text x="614" y="1459" font-size="10.5" fill="#4a5260">builds is a writer: SR-LOCKS d2.</text>
+<text x="614" y="1474" font-size="10.5" fill="#4a5260">doctor already says `fux build`.</text>
+<text x="614" y="1489" font-size="10.5" fill="#4a5260">Arpit's, open question 2.</text>
+<rect x="874" y="1404" width="262" height="118" rx="10" fill="#f3f4f2" stroke="#8a93a0" stroke-width="1.4"/>
+<text x="890" y="1426" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Fork A  graph.json in Node</text>
+<text x="890" y="1444" font-size="10.5" fill="#4a5260">OPEN -- Arpit's. ~55 ms of 383.</text>
+<text x="890" y="1459" font-size="10.5" fill="#4a5260">Until ruled, Node rebuilds the</text>
+<text x="890" y="1474" font-size="10.5" fill="#4a5260">plane in memory (SR-NODE-SEARCH</text>
+<text x="890" y="1489" font-size="10.5" fill="#4a5260">d9) even when it built the file.</text>
+<text x="46" y="1552" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">6 - WHAT HOLDS THEM EQUAL  --  a second writer is a second thing to keep true</text>
+<line x1="46" y1="1562" x2="1136" y2="1562" stroke="#e4e4e0" stroke-width="1"/>
+<rect x="46" y="1574" width="1090" height="90" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="62" y="1596" font-size="12" fill="#14181f" font-weight="600">The differential law, extended by W-242</text>
+<text x="62" y="1614" font-size="11" fill="#4a5260">query lanes:  Node-plane  =  Node-scan  =  Python-plane  on candidates, (n, total_wlen, df) and ordering  --  this repo, rung-10000, the adversarial index</text>
+<text x="62" y="1629" font-size="11" fill="#4a5260">build lane:   diff -r  Node-built  vs  Python-built, excluding stamp.json  --  then each runtime answers from the OTHER's plane at 0 discordant</text>
+<text x="62" y="1644" font-size="11" fill="#4a5260">unit binds:   one .idx fixture read by both suites  ·  a shard-read counter (Tier 0)  ·  graph.json keeps ensure_ascii + insertion order; the rest sort keys</text>
+<text x="46" y="1694" font-size="11" fill="#8a93a0">Drawn 2026-09-30 from derive/_build.py, derive/accel.py, node/src/store/reader.mjs and one CPU profile.  Dashed orange is ratified, not built.</text>
+<text x="46" y="1711" font-size="11" fill="#8a93a0">Authority: records/0110_accelerator.md (SR-T1-ACCELERATOR) d18 · records/0153_node-search.md (SR-NODE-SEARCH) d24 · records/0131_cache.md (SR-CACHE) d13 · work/open/W-242.</text>
+</svg>

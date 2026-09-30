@@ -7,10 +7,10 @@ description: "fux-engine ships to PyPI and npm from one release trigger — PyPI
 status: accepted
 date: 2026-09-14
 feature: how a release reaches two registries, how the version stays equal across its sites, and what the branch wall does not do
-owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea]
+owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 0bed4a3f150945f1ed5a5526e62bebe266c86e0d8f925eacf2712af273d38f6f
+content_sha: 13b8e078dadca3b611ccab8849c0ed9bebd4bf166f207982622ca2cfd20fc819
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,6 +18,8 @@ content_sha: 0bed4a3f150945f1ed5a5526e62bebe266c86e0d8f925eacf2712af273d38f6f
 **Owns** — the components this record decides:
 
 - [`scripts/check-version-parity.py`](../scripts/check-version-parity.py) · file
+- `scripts/ci-key.py` · file
+- `tests/test_ci_key.py` · file
 - [`tests/test_version_parity.py`](../tests/test_version_parity.py) · file
 
 **Describes** — reaches into, does not own:
@@ -197,9 +199,12 @@ rather than a string somebody might forget to edit.
 
 11a. **A release, unlike a merge, IS gated on CI** (2026-09-23). The publish
     workflow's first step refuses unless [`ci.yml`](../.github/workflows/ci.yml)
-    completed green on the exact commit being released, as a push to `main`
-    — every stage of it, FULL included (`ci.yml` and `node-arm.yml` both,
-    until decision 13 merged them on 2026-09-29). **So create the GitHub release only after it finishes.** Created earlier,
+    holds a green verdict for the code being released — every stage of it,
+    FULL included (`ci.yml` and `node-arm.yml` both, until decision 13 merged
+    them on 2026-09-29). ⚠ **Until 2026-09-30 this read *"green on the exact
+    commit, as a push to `main`"*; decision 14 keys it by the tree instead**,
+    because a FULL cell may now skip on a verdict an earlier commit with the
+    same code earned. **So create the GitHub release only after it finishes.** Created earlier,
     the gate fails, and re-running the job once CI is green publishes it. This
     is two strikes made into a gate
     ([SR-WORK-SESSION](0060_WORK-session.md) d13): `3.0.0-alpha.2` and
@@ -225,12 +230,16 @@ rather than a string somebody might forget to edit.
     - **FULL** runs on push to `main`, nightly and by hand, and **starts only
       when FAST has finished**, whatever FAST concluded: the Python matrix on
       3 OSes (3.12–3.14; Linux 3.12 is FAST's), the arm on 3 OSes × Node 22/24
-      with **both** passes in three shards per cell, and the ladder manifests.
-      **Decision 11a waits on the run as a whole.**
+      with **both** passes in three shards per cell. The ladder manifests
+      moved into FAST's `build` job on 2026-09-30 (W-243). **Decision 11a
+      waits on the verdict decision 14 saves.**
     - 🔴 **One file, not two, and that is measured, not taste.** As
       `fast.yml` + `main.yml`, a push to `main` started both at once; the full
       lane took the account's runner slots (20 jobs, 5 on macOS) and FAST's
       two-minute verdict took six. `needs:` gives FAST the runners first.
+      ⚠ **It stays** (W-243 step 4, 2026-09-30): the run is 38 jobs against
+      the plan's cap of 20 and 8 macOS jobs against 5, so the condition for
+      dropping it — every job fits under the cap — does not hold.
     - ⚠ **A newer push cancels an older run on the same ref, `main`
       included**, so the old FULL stage never holds the runners the new FAST
       stage needs. The cost: a sha superseded mid-run has no completed run and
@@ -241,6 +250,46 @@ rather than a string somebody might forget to edit.
     - ⚠ **What this trades away:** a Windows- or macOS-only break is found
       minutes after it lands, not before. Decision 10 already meant CI blocked
       no merge; the change is how fast the author hears, not what is blocked.
+
+14. **FULL skips a cell whose verdict is already known; FAST never skips**
+    (Arpit, 2026-09-30, W-243 step 2: *"Hash one makes sense"*).
+    - **The key** is [`scripts/ci-key.py`](../scripts/ci-key.py): a digest of
+      every path that can change a FULL verdict, plus — per cell — the OS,
+      the runner image (`ImageOS`, `ImageVersion`) and the resolved Python and
+      Node versions. A cell that goes green saves its key in the Actions
+      cache; a later push with the same key skips that cell's work.
+    - 🔴 **An EXCLUDE list, never an include list.** Everything counts as code
+      unless the script names it inert, so a new top-level folder is code by
+      default: a wrong exclusion costs speed, never correctness. **What is
+      inert is decided by the script and nowhere else**; the rule it follows
+      is `work/`, `docs/`, `CHANGELOG.md`, and Markdown outside the four code
+      roots (`src/`, `node/`, `tests/`, `tests_e2e/`). The committed
+      `.fux/index/` is code — it is the arm's own corpus.
+    - ⚠ **`records/` is inert, checked rather than assumed.** Two thirds of
+      the unit suite reads `records/`, `work/` or `docs/`, so a documentation
+      change CAN redden a test. It is inert anyway because FAST runs the whole
+      suite on every push, and what the exclusion can delay is only an
+      OS-specific break caused by prose — until the nightly run, never past a
+      release.
+    - 🔴 **Only a push reads a verdict.** The nightly run and a manual dispatch
+      run FULL whole — the backstop for what the key cannot see: dependencies
+      CI installs unpinned (`pip install -e`, not `uv.lock`) and runner drift.
+    - **The store is the Actions cache, not a commit status**, because a
+      status is attached to a sha and the question is asked of a key; the
+      cache answers *"does this key exist"* in one lookup (`lookup-only`), and
+      an entry is written once and never changed.
+    - **The release gate (11a) reads one aggregate key**, `ci-key.py
+      verdict` — the tree digest alone — which `ci.yml`'s `verdict` job saves
+      only when every FAST job and every FULL cell is green, each cell fresh or
+      on its own saved key. Still running, red and missing all refuse, with
+      the old wording. **A release commit bumps the version in `node/`, so its
+      key is always new and its FULL run always fresh.**
+    - ⚠ **What this trades away.** Measured over the last 40 commits on
+      2026-09-30: **17 would have skipped FULL**, not the 22 estimated when it
+      was ruled — five more re-ingest the committed index, which is code by
+      the rule above. And an Actions cache entry unused for seven days is
+      evicted: a release cut later than that is refused until a dispatched
+      run re-earns the key.
 
 ### Consequences
 
@@ -277,7 +326,12 @@ rather than a string somebody might forget to edit.
 - [`.github/workflows/publish.yml`](../.github/workflows/publish.yml) — one
   trigger, two jobs, and the staged npm approval.
 - [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — the two stages
-  of decision 13.
+  of decision 13, and the per-cell and aggregate verdicts of decision 14.
+- [`scripts/ci-key.py`](../scripts/ci-key.py) and
+  [`tests/test_ci_key.py`](../tests/test_ci_key.py) — decision 14's key, its
+  exclude list, and the wiring that makes the gate read what CI saves.
+- [`.github/actions/full-verdict/action.yml`](../.github/actions/full-verdict/action.yml)
+  — the per-cell lookup, and the rule that only a push reads.
 - [`.github/branch-protection.json`](../.github/branch-protection.json) — the
   merge wall, exactly as configured.
 

@@ -594,6 +594,58 @@ def test_apply_output_defaults_falls_back_when_the_file_is_missing_entirely(tmp_
         _apply_output_defaults(build_parser().parse_args(["ask", "rollback"]))
 
 
+def test_doctor_falls_back_per_key_when_the_file_lacks_one(tmp_path, monkeypatch):
+    """W-241 (SR-OUTPUT decision 20b): a file that LOADS but lacks a key
+    `doctor` resolves is the same fault as a missing file — `doctor` takes that
+    key from the template, and every other key it resolves still comes from the
+    file. Before the fix this raised `[cli] progress_threshold is missing`."""
+    from fux.cli import _apply_output_defaults, build_parser
+
+    (tmp_path / "fux.toml").write_text("[fux]\nversion = 1\n", encoding="utf-8")
+    write(tmp_path, "[cli]\ntop = 3\n\n[cli.json]\nenabled = true\n")  # no progress_threshold
+    monkeypatch.chdir(tmp_path)
+
+    args = build_parser().parse_args(["doctor"])
+    _apply_output_defaults(args)
+    assert args.progress_threshold == BUILT_IN["progress_threshold"]
+    assert args.json is True  # the file's own value, not the template's
+
+    write(tmp_path, "[cli]\nprogress_threshold = 7\n")  # no `[cli.json] enabled`
+    args = build_parser().parse_args(["doctor"])
+    _apply_output_defaults(args)
+    assert args.json is BUILT_IN["json"]
+    assert args.progress_threshold == 7
+
+    # Every other verb still refuses.
+    with pytest.raises(FuxError, match=r"\[cli\.json\] enabled is missing"):
+        _apply_output_defaults(build_parser().parse_args(["ingest"]))
+
+
+def test_doctor_fix_repairs_a_missing_progress_threshold(tmp_path, monkeypatch, capsys):
+    """W-241, end to end: `fux doctor --fix` on an `output.toml` without
+    `[cli] progress_threshold` writes the key instead of refusing to start."""
+    import tomllib
+
+    from fux import setup as setup_mod
+    from fux.cli import main
+
+    (tmp_path / "fux.toml").write_text("[fux]\nversion = 1\n", encoding="utf-8")
+    setup_mod.fill_missing(tmp_path)
+    path = tmp_path / OUTPUT_NAME
+    text = path.read_text(encoding="utf-8")
+    stripped = "\n".join(line for line in text.splitlines() if not line.startswith("progress_threshold"))
+    assert stripped != text
+    path.write_text(stripped + "\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    main(["doctor", "--fix", "--no-progress"])
+    err = capsys.readouterr().err
+    assert "progress_threshold is missing" not in err
+    assert "[cli] progress_threshold" in err  # the `fixed:` line
+    written = tomllib.loads(path.read_text(encoding="utf-8"))
+    assert written["cli"]["progress_threshold"] == BUILT_IN["progress_threshold"]
+
+
 def test_no_output_config_bypasses_an_incomplete_file(tmp_path, monkeypatch):
     from fux.cli import _apply_output_defaults, build_parser
 

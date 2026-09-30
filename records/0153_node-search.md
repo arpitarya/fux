@@ -281,6 +281,8 @@ Found 2026-09-12.
 **refuses** when it is absent or stale. Node rebuilds the same plane in memory
 from the committed records and answers either way.
 
+⚠ *Read with decision 24 (2026-09-30, ratified, not built): Node will build the plane too; this decision is unchanged until Arpit rules on Fork A.*
+
 **Node's behaviour is the right one for its audience and is kept.** The reader
 exists for a clone with no Python; `.fux/runtime/` is gitignored and is written
 by `fux build`, which is Python — so requiring it would make the Node reader
@@ -298,6 +300,8 @@ not run is how `find` went a month without its tune file.
 
 **10. `ranked_by` names the candidate path, and the two runtimes differ there —
 which is honest, not a defect.**
+
+⚠ *Superseded on a fresh plane by decision 24 (2026-09-30, ratified, not built): Node will read the plane and report `"accelerator"` too.*
 
 `mcp.py::_search` passes `force_scan=False` and reports `"accelerator"` when a
 fresh build exists. Node has no accelerator and reports `"scan"`. The
@@ -947,6 +951,29 @@ record like `mtime`, so nothing new is read. **A test compares both readers'
 `ask` and `lexical` at `0.0` and `0.3`**, and the factor itself at four
 weights. `--why` has no Node twin, as for step 9. Off at `0.0` pending the
 verdict.
+
+**24. 🟠 Node joins the derived plane — as a reader and as a builder.
+Ratified 2026-09-30 (Arpit), NOT BUILT** ([W-242](../work/open/W-242-shared-runtime.md);
+[`compare/shared-runtime`](../work/compare/shared-runtime.compare.md);
+[SR-T1-ACCELERATOR](0110_accelerator.md) decision 18 owns the plane).
+
+- **Tier 0.** A Node query reads each committed shard **once**. Today it reads
+  each three times — `scan.mjs`, `graphRecords` and `tableFromShards` — 769
+  opens for 257 shards on this repo, 207 of a 383 ms profile.
+- **Tier 1.** Node answers from Python's `.fux/runtime/` when it is fresh, and
+  from its scan otherwise. **Decision 10's asymmetry disappears on a fresh
+  plane** — both runtimes report `"accelerator"` — and remains, truthfully, on
+  a scan.
+- **Tier 2.** Node gains `fux build` — **its first write verb.** It writes the
+  plane Python writes, byte for byte, under the same lock. `ingest` stays
+  Python's (decision 11: Node has no decoders). **No read verb builds**; a
+  missing plane is a scan, not a side effect. Decision 3 is untouched: a build
+  reads committed shards and fetches nothing.
+- **Decision 9 is NOT amended.** Whether Node reads `graph.json` instead of
+  rebuilding the graph plane (Fork A) is Arpit's and open; until he rules, Node
+  rebuilds in memory even when it wrote the file itself. Decision 9's reason —
+  a Node reader must answer where no Python has run — is what Tier 2 now also
+  serves.
 
 ### Consequences
 
