@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@675afdc8be43]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@e7f0b058df4b]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: dfb1228dbeaf7b57b1ca6ab10260619d04f0c9bc49514e1d2bb404828eba4d6b
+content_sha: e25882979342748b5c0c345d2e86abdecaf67f71361e04cdb7aadb6d86b40107
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -179,6 +179,12 @@ pattern. A consumer who wants other cues is I2, which is not built.
 
 
 **`[identifiers]`** holds the identifier-family constants — `flexible_separators`, the shard-header key and the digest's width — and `[files] identifiers` and `[templates] identifiers` name the file and its template ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+**`[index] schema` is `fux.index.v6` and `[runtime] schema` `fux.runtime.v8`
+since 2026-09-30** (W-168 step 8), and `[runtime] docs_fields` gained `authors`
+and `commits` ([SR-INDEX-LIFECYCLE](0108_index-lifecycle.md) decision 16,
+[SR-DOCS-TABLE](0122_docs-table.md) decision 7). The weight is a tunable and
+lives in `.fux/tune.toml` ([SR-TUNE](0135_tuning.md) decision 21), not here.
 
 ### Consequences
 

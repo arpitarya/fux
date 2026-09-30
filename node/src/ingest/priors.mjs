@@ -1,6 +1,6 @@
 /** The committed FACTS ranking reads. Twin of `src/fux/ingest/priors.py`.
  *
- * Only `supersededIds` has a Node twin: the git half (`git_commit_times`) is an
+ * Only `supersededIds` has a Node twin: the git half (`git_history`) is an
  * INGEST concern, and Node does not ingest. `mtime` and `superseded` arrive as
  * committed facts on the record, which is the whole reason they are committed —
  * a derivation from local filesystem state would differ per machine and break L4.

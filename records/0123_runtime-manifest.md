@@ -10,7 +10,7 @@ feature: "`.fux/runtime/manifest.json` — the derived plane's freshness contrac
 owns: []
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: f16750e9ba2664229d7df0d5d8c525281fa8a2c54728efdcb07d1b5a02d5659f
+content_sha: 918375407c38825ba50b0db6284656f65f8bca6a3806014c41f57b6a260e2916
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -175,6 +175,10 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+**6. `schema` is `fux.runtime.v8` since 2026-09-30** (W-168 step 8): the doc
+table gained `authors` and `commits`. A v7 plane is refused and rebuilt, not read
+as "no history"; `docs_fields` moves with it.
 
 ### Consequences
 

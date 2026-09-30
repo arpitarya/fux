@@ -26,6 +26,15 @@ Rules:
 
 ---
 
+## 2026-09-30 — **W-168 step 8: the git authority prior, off at `0.0`; index format v6**
+
+| what | evidence |
+|---|---|
+| **the build** | `ingest/priors.py::git_history` (one `git log`, `%aE` case-folded, in memory only) → `authors`/`commits` on `M/`; `Weighting.authority_weight`, `authority_for`, `authority_product` in `query/rank.py`; the accelerator `maximum` includes `1 + w`; `--why` `authority` block; Node twin in `rank.mjs`/`run.mjs`/`tune.mjs`; `fux.index.v6` / `fux.runtime.v8` |
+| **the records** | [SR-RANKING](../records/0111_ranking.md) d14 · [SR-TUNE](../records/0135_tuning.md) d21 · [SR-INGEST](../records/0106_ingest.md) d24 · [SR-ASK](../records/0103_ask.md) d16 · [SR-NODE-SEARCH](../records/0153_node-search.md) d23 · [SR-INDEX-LIFECYCLE](../records/0108_index-lifecycle.md) d16 · SR-T1-ACCELERATOR d17 · SR-PROVENANCE d18 |
+| **verified** | `tests/query/test_authority_prior.py` (80): `0.0` byte-identical, scan = accelerator at every arm, Node parity; both suites and `node --test` |
+| **captured** | [`2026-09-28-authority-prior`](regression/2026-09-28-authority-prior/report.md): five arms, precondition 125/125. **Not scored** |
+
 ## 2026-09-29 — **W-239: ingest's `extract` phase ~7× faster, index byte-identical**
 
 | what | evidence |

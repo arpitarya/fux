@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@89166e7718bc]
+owns: [src/fux/query/provenance.py@b7acf02a4c94]
 laws: [L2, L4, L5, L9]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 1efc74ee38f40dd624679294fc85cb4bed4c88071a7e5fcd7f3153af1bb49830
+content_sha: 0a72abb159975d50a3bb160e183ed40af42f2a3b3c421ceca41e4d55a072cff8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -555,6 +555,15 @@ this moved where they are written, not what they are.
 
 
 Provenance analyzes the question with the repo's identifier families, as the ranking did, so its terms align with the ranked hashes; a failure to load them yields no families, never an exception, because this path never raises ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+**18. The authority prior is named on a document it moved** (W-168 step 8,
+2026-09-30; [SR-RANKING](0111_ranking.md) decision 14). A document's entry
+carries `authority`: `{authors, commits, factor}`, the two committed counts and
+`Weighting.authority_for`'s factor, **only when that factor is not `1.0`**. It
+is absent when the prior is off, when the record has no counts, and on a 1 · 1
+document, so a `--why` block at the default is byte-identical to one written
+before the prior existed. Counts, never an identity. ⚠ **`multiplier` still
+reports the archived fact only**, as decision 17's intent note says.
 
 ### Consequences
 

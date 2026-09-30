@@ -1,6 +1,8 @@
 /** `fux ask` — a ranked list with scores, which is what you want when you are
  *  judging the engine. A projection of `runQuery`, never a second strategy.
  *  Twin of `src/fux/query/__init__.py`'s `ask` half (R4's one-to-many).
+ *  The priors (W-168 steps 8 and 9) reach it only through `runQuery`, and the
+ *  `--why` block that names them has no Node twin (SR-NODE-SEARCH).
  *
  * 🔴 **This is also `fux lexical`'s handler, and on this reader that is one
  * FUNCTION rather than one test.** `fux lexical` is BM25F alone, frozen

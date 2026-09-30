@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@de9c4a5cc775, tools/differential@5f789d2db31b, src/fux/schemas/runtime.schema.json@f83e87676ef8]
+owns: [src/fux/derive@f143d7fab874, tools/differential@5f789d2db31b, src/fux/schemas/runtime.schema.json@f9a25a4fcdb1]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 1141d69c6133eb0fd65514a562ac8fe83e96fd441f3b8a6e759d01ae47cfd66b
+content_sha: dfb6af53ef3ff0a72c351529fb10f18261fd03fdd338ecc16662cae21a3a8f6a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -664,6 +664,14 @@ payloads at every arm weight in `tests/query/test_mined.py`.
 
 
 `accel.ask` analyzes the question with the repo's identifier families exactly as the scan does, so `--fast` and `--scan` hash the same terms ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+**17. Veto 5 binds the authority prior, and the bound carries `1 + w`**
+(W-168 step 8, 2026-09-30; [SR-RANKING](0111_ranking.md) decision 14). The
+candidate dicts carry `authors` and `commits` from the doc table, so
+`Weighting.of` reads the same counts on both paths, and `weighting.maximum`
+multiplies in `1 + authority_weight`, a supremum because `f < 1`. Nothing else
+in the candidate or bound code moved. `RUNTIME_SCHEMA` is v8, so a v7 plane is
+refused and rebuilt rather than read as "no history".
 
 ### Consequences
 

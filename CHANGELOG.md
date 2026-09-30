@@ -8,6 +8,20 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed
+
+- ⚠ **Breaking: index format `fux.index.v6`** (runtime `fux.runtime.v8`).
+  Git-sourced documents carry two counts, `authors` and `commits`, from ingest's
+  existing `git log` walk. No name or email is written. A v5 index is refused
+  until `fux ingest --full`, and every git-sourced index root moves once
+  (W-168 step 8).
+
+### Added
+
+- **`[ranking] authority_weight`** (default `0.0`, off, unmeasured): a
+  multiplicative git authority prior, `1 + w · (1 − 1/(authors × commits))`, in
+  both readers. `fux lexical` never applies it.
+
 ## [3.0.0-alpha.9] - 2026-09-30
 
 **`fux ingest` is ~7× faster at 10 000 documents; the index is byte-identical.**

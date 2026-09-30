@@ -64,6 +64,9 @@ MUTATIONS: dict[str, dict[str, str]] = {
         # W-168 step 4: off by default, and nothing ingest does reads it.
         "mined_weight": "0.3",
         "intent_weight": "0.3",
+        # W-168 step 8: the counts are ingest facts; the WEIGHT is read at query
+        # time only, so moving it moves no committed byte.
+        "authority_weight": "0.3",
     },
     "graph": {
         "damping": "0.25",

@@ -199,6 +199,31 @@ class Weighting:
     doctype: tuple[tuple[str, str], ...] = ()
     intent_type: str | None = None
     intent_factor: float = 1.0
+    #: W-168 step 8 — the git authority prior (A3 · S2). `[ranking]
+    #: authority_weight`, per corpus rather than per query. `0.0` is the prior
+    #: switched off: `authority_active` is false, the record's `authors` and
+    #: `commits` are never read, and nothing below changes.
+    authority_weight: float = 0.0
+
+    @property
+    def authority_active(self) -> bool:
+        """The prior can scale some document."""
+        return self.authority_weight > 0
+
+    def authority_for(self, record: dict) -> float:
+        """`1 + authority_weight * (1 - 1/(authors * commits))`, else `1.0`.
+
+        **No counts is `f = 0`** — a url record, a corpus with no git history,
+        a shallow clone — exactly as off. A 1 · 1 document is `f = 0` too, and
+        `1 + w * 0.0` is exactly `1.0`, so it is untouched rather than merely
+        close. `f < 1` always, which is what makes `1 + w` a supremum.
+        """
+        if not self.authority_active:
+            return 1.0
+        product = authority_product(record)
+        if product is None:
+            return 1.0
+        return 1.0 + self.authority_weight * (1.0 - 1.0 / product)
 
     @property
     def intent_active(self) -> bool:
@@ -252,7 +277,7 @@ class Weighting:
         property it guards is the one the accelerator's bound rests on, and
         `[priority]` can still make it false.
         """
-        return not self.priority and not self.intent_active
+        return not self.priority and not self.intent_active and not self.authority_active
 
     @property
     def maximum(self) -> float:
@@ -273,17 +298,47 @@ class Weighting:
         ⚠ **Restored 2026-09-28 (W-168 step 9)**: the intent prior is the second
         multiplier, and it can land on a document `[priority]` also scales. So
         the supremum is the product of the two, never the larger.
+
+        W-168 step 8 is the third, and it multiplies in the same way:
+        `1 + authority_weight` bounds `1 + w * f` because `f < 1`
+        ([SR-T1-ACCELERATOR](../../../records/0110_accelerator.md) veto 5).
         """
         top = max([1.0, *(w for _, w in self.priority)])
-        return top * self.intent_factor if self.intent_active else top
+        if self.intent_active:
+            top = top * self.intent_factor
+        if self.authority_active:
+            top = top * (1.0 + self.authority_weight)
+        return top
 
     def of(self, record: dict) -> float:
-        """The multiplier for one record: per-source priority times the intent prior."""
+        """The multiplier for one record: per-source priority, times the
+        intent prior, times the authority prior — in that order, on both
+        candidate paths and in the Node twin, so the product rounds alike."""
         if self.trivial:
             return 1.0
         loc = record.get("loc", "")
         weight = self.priority_for(loc)
-        return weight * self.intent_for(loc) if self.intent_active else weight
+        if self.intent_active:
+            weight = weight * self.intent_for(loc)
+        if self.authority_active:
+            weight = weight * self.authority_for(record)
+        return weight
+
+
+def authority_product(record: dict | None) -> int | None:
+    """`authors * commits` off a committed record, or `None` without both.
+
+    One reading for the ranking and for `--why`, so the two cannot disagree
+    about which document the prior moved. A value that is not a positive int
+    (a bool is not one) reads as no counts.
+    """
+    if not isinstance(record, dict):
+        return None
+    authors, commits = record.get("authors"), record.get("commits")
+    for value in (authors, commits):
+        if type(value) is not int or value < 1:
+            return None
+    return authors * commits
 
 
 def rank(

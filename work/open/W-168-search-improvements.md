@@ -4,7 +4,7 @@ name: W-168
 description: "The ten ranking improvements of proposals/search-improvements-v3.md, promoted as one program with ten gated steps: anchor text, corpus-mined expansion, unstemmed identifier field, RM3, supersession-aware ranking, SDM proximity, MMR diversification, git authority prior, intent → doc-type prior, section-level units. Each step is its own golden question → pre-registration → build → measure → keep/remove; never two in one arm."
 item: W-168
 filed: 2026-09-14
-ball: agent
+ball: arpit
 ---
 
 ## ✅ STEP 10 RE-RULED U2 → W-236 · STEP 5 RULED R1 · G3 → W-237 — 2026-09-29 (Arpit, Cowork) · ratified, NOT built
@@ -22,6 +22,13 @@ ball: agent
 ## ✅ STEPS 1 + 4 MEASURED TOGETHER — 2026-09-28 (Claude Code, Opus; a non-capturing session), W-232 PASS
 
 [Verdict](../regression/2026-09-28-anchor-mined-set3/VERDICT.md). The shipped pair `anchor = 1.0` + `mined_weight = 0.5` beats mined-off 6/0 and anchor-off 7/0 at rank 1 on `set-3-claude`, with **0 losses**. All six wins over mined-off are step 4's tagged questions, which is its own 6/0 reproduced at `anchor = 1.0`. **Both steps' *combination unmeasured* warnings below are closed.** `informed`.
+
+## ✅ STEP 8 BUILT AND CAPTURED — 2026-09-30 (Claude Code, Opus)
+
+- **Built per the frozen bar**, off at `authority_weight = 0.0`, in both readers: `authors` and `commits` on each git-sourced `M/` record from the one `git log` walk (counts only; no name or email is written), the multiplicative prior, the accelerator bound `1 + w`, `fux lexical` forced off, `--why` `authority`. `tests/query/test_authority_prior.py` (80).
+- ⚠ **Index format `fux.index.v6` / runtime `fux.runtime.v8`**, by SR-INDEX-LIFECYCLE d9.1 (a new record property bumps `_format`; step 4's `abbr` is the precedent). The pre-registration did not decide it. Every v5 index needs `fux ingest --full`, even with the key off.
+- **Captured** `au-0.0 … au-0.5`: [report](../regression/2026-09-28-authority-prior/report.md). The precondition holds: `au-0.0` = `ip-0.1` on 125/125. Rank 1 moves on 0 / 7 / 12 / 17 / 29 questions.
+- **Next:** 🔴 Arpit scores; then a session that did not capture writes `decide.py` from step 9's and applies the table.
 
 ## ✅ L11 13b LANDED · STEP 7 STOPS · STEP 8 RULED AND PRE-REGISTERED — 2026-09-28 (Claude Code, Opus)
 

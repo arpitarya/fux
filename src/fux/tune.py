@@ -134,6 +134,7 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "expand_weight",
         "mined_weight",
         "intent_weight",
+        "authority_weight",
     ),
     "graph": (
         "damping",
@@ -280,6 +281,11 @@ class Tune:
     #: `1 + intent_weight`. ⚠ **Inert without a `[doctype]` table**, whatever
     #: its value.
     intent_weight: float
+    #: W-168 step 8 — the authority prior. A document whose committed record
+    #: carries `authors` and `commits` is scaled by
+    #: `1 + authority_weight * (1 - 1/(authors * commits))`. `0.0` never reads
+    #: the counts.
+    authority_weight: float
 
     # [graph]
     damping: float
@@ -659,6 +665,7 @@ def _resolve(data: dict, label: "Path | str") -> Tune:
         "expand_weight": read("ranking", "expand_weight", _non_negative),
         "mined_weight": read("ranking", "mined_weight", _non_negative),
         "intent_weight": read("ranking", "intent_weight", _non_negative),
+        "authority_weight": read("ranking", "authority_weight", _non_negative),
         "damping": read("graph", "damping", _fraction),
         "iterations": read("graph", "iterations", _whole),
         "laziness": read("graph", "laziness", _fraction),

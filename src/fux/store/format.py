@@ -41,6 +41,12 @@ INDEX_DIR = fixed("index", "dir")
 # reader could not tell "this corpus declares no abbreviations" from "this
 # index predates the miner". `analyzer` is UNTOUCHED: the pairs go through the
 # same analyzer and the same hash as `terms`. **v4 indexes must be rebuilt.**
+# v6 (W-168 step 8, 2026-09-30): a git-sourced record may carry `authors` and
+# `commits`, two counts from ingest's one history walk. **A property appeared**
+# (SR-INDEX-LIFECYCLE decision 9.1): a v5 index has neither anywhere, and a
+# reader could not tell "this document has no history" from "this index
+# predates the counts". `analyzer` is UNTOUCHED: no term changes. **v5 indexes
+# must be rebuilt** — `fux ingest --full`.
 SCHEMA_ID = fixed("index", "schema")
 # v2 (W-76 Phase 1, 2026-08-23): identifier splitting before lowercasing,
 # plus Porter stemming before hashing. A v1 shard is refused by

@@ -36,6 +36,7 @@ export class Weighting {
   constructor({
     archivedDirs = new Set(), priority = [],
     doctype = [], intentType = null, intentFactor = 1.0,
+    authorityWeight = 0.0,
   } = {}) {
     // 🔴 The three DOCUMENT priors were REMOVED on 2026-09-13 (W-151, W-152):
     // supersession, retirement and age are FACTS, not weights. `archivedDirs`
@@ -47,7 +48,20 @@ export class Weighting {
     this.doctype = doctype;
     this.intentType = intentType;
     this.intentFactor = intentFactor;
+    // W-168 step 8 — the authority prior, per corpus. Twin of `rank.py`: at
+    // 0 the record's `authors`/`commits` are never read.
+    this.authorityWeight = authorityWeight;
     Object.freeze(this);
+  }
+  get authorityActive() {
+    return this.authorityWeight > 0;
+  }
+  /** `1 + w * (1 - 1/(authors * commits))`, else 1 — `authority_for`. */
+  authorityFor(record) {
+    if (!this.authorityActive) return 1.0;
+    const product = authorityProduct(record);
+    if (product === null) return 1.0;
+    return 1.0 + this.authorityWeight * (1.0 - 1.0 / product);
   }
   get intentActive() {
     return this.doctype.length > 0 && this.intentType !== null && this.intentFactor !== 1.0;
@@ -57,7 +71,7 @@ export class Weighting {
     return typeFor(loc, this.doctype) === this.intentType ? this.intentFactor : 1.0;
   }
   get trivial() {
-    return this.priority.length === 0 && !this.intentActive;
+    return this.priority.length === 0 && !this.intentActive && !this.authorityActive;
   }
   priorityFor(loc) {
     let best = 1.0, bestLen = -1;
@@ -68,13 +82,29 @@ export class Weighting {
     }
     return best;
   }
-  /** The multiplier for one record: per-source priority times the intent prior. */
+  /** The multiplier for one record: per-source priority, times the intent
+   *  prior, times the authority prior — `rank.py`'s order, so the product
+   *  rounds alike in both readers. */
   of(record) {
     if (this.trivial) return 1.0;
     const loc = record.loc || "";
-    const weight = this.priorityFor(loc);
-    return this.intentActive ? weight * this.intentFor(loc) : weight;
+    let weight = this.priorityFor(loc);
+    if (this.intentActive) weight = weight * this.intentFor(loc);
+    if (this.authorityActive) weight = weight * this.authorityFor(record);
+    return weight;
   }
+}
+
+/** `authors * commits` off a committed record, or null without both — twin of
+ *  `rank.py::authority_product`. A value that is not a positive integer reads
+ *  as no counts. */
+export function authorityProduct(record) {
+  if (record === null || typeof record !== "object") return null;
+  const { authors, commits } = record;
+  for (const value of [authors, commits]) {
+    if (typeof value !== "number" || !Number.isInteger(value) || value < 1) return null;
+  }
+  return authors * commits;
 }
 
 /** Rank candidates. `expansion` is `{hashes, required, weights}` or null. */

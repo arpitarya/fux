@@ -1,0 +1,183 @@
+{
+ "arms": {
+  "au-0.0": {
+   "ask_ms_median": 166.4,
+   "bands": {
+    "grounded": 67,
+    "partial": 24,
+    "weak": 34
+   },
+   "engine_commits": [
+    "ee00d0cd+uncommitted.8f5b5d75"
+   ],
+   "gates_captured": 125,
+   "membership_changed_vs_baseline": 0,
+   "n": 125,
+   "order_changed_vs_baseline": 0,
+   "top1_changed_ids": [],
+   "top1_changed_vs_baseline": {
+    "all": 0,
+    "tagged": 0
+   }
+  },
+  "au-0.1": {
+   "ask_ms_median": 166.9,
+   "bands": {
+    "grounded": 73,
+    "partial": 24,
+    "weak": 28
+   },
+   "engine_commits": [
+    "ee00d0cd+uncommitted.8f5b5d75"
+   ],
+   "gates_captured": 125,
+   "membership_changed_vs_baseline": 16,
+   "n": 125,
+   "order_changed_vs_baseline": 71,
+   "top1_changed_ids": [
+    "s4u-024",
+    "s4u-025",
+    "s4u-039",
+    "s4u-044",
+    "s4u-048",
+    "s4u-116",
+    "s4u-120"
+   ],
+   "top1_changed_vs_baseline": {
+    "all": 7,
+    "tagged": 7
+   }
+  },
+  "au-0.2": {
+   "ask_ms_median": 172.5,
+   "bands": {
+    "grounded": 79,
+    "partial": 24,
+    "weak": 22
+   },
+   "engine_commits": [
+    "ee00d0cd+uncommitted.8f5b5d75"
+   ],
+   "gates_captured": 125,
+   "membership_changed_vs_baseline": 34,
+   "n": 125,
+   "order_changed_vs_baseline": 89,
+   "top1_changed_ids": [
+    "s4u-005",
+    "s4u-024",
+    "s4u-025",
+    "s4u-028",
+    "s4u-039",
+    "s4u-041",
+    "s4u-044",
+    "s4u-048",
+    "s4u-072",
+    "s4u-104",
+    "s4u-116",
+    "s4u-120"
+   ],
+   "top1_changed_vs_baseline": {
+    "all": 12,
+    "tagged": 12
+   }
+  },
+  "au-0.3": {
+   "ask_ms_median": 171.1,
+   "bands": {
+    "grounded": 75,
+    "partial": 24,
+    "weak": 26
+   },
+   "engine_commits": [
+    "ee00d0cd+uncommitted.8f5b5d75"
+   ],
+   "gates_captured": 125,
+   "membership_changed_vs_baseline": 44,
+   "n": 125,
+   "order_changed_vs_baseline": 97,
+   "top1_changed_ids": [
+    "s4u-005",
+    "s4u-016",
+    "s4u-024",
+    "s4u-025",
+    "s4u-028",
+    "s4u-039",
+    "s4u-041",
+    "s4u-044",
+    "s4u-048",
+    "s4u-072",
+    "s4u-089",
+    "s4u-104",
+    "s4u-114",
+    "s4u-116",
+    "s4u-120",
+    "s4u-121",
+    "s4u-123"
+   ],
+   "top1_changed_vs_baseline": {
+    "all": 17,
+    "tagged": 17
+   }
+  },
+  "au-0.5": {
+   "ask_ms_median": 200.4,
+   "bands": {
+    "grounded": 69,
+    "partial": 24,
+    "weak": 32
+   },
+   "engine_commits": [
+    "ee00d0cd+uncommitted.8f5b5d75"
+   ],
+   "gates_captured": 125,
+   "membership_changed_vs_baseline": 70,
+   "n": 125,
+   "order_changed_vs_baseline": 108,
+   "top1_changed_ids": [
+    "s4u-005",
+    "s4u-009",
+    "s4u-011",
+    "s4u-016",
+    "s4u-020",
+    "s4u-024",
+    "s4u-025",
+    "s4u-028",
+    "s4u-032",
+    "s4u-039",
+    "s4u-041",
+    "s4u-044",
+    "s4u-045",
+    "s4u-048",
+    "s4u-052",
+    "s4u-058",
+    "s4u-059",
+    "s4u-062",
+    "s4u-072",
+    "s4u-078",
+    "s4u-089",
+    "s4u-092",
+    "s4u-104",
+    "s4u-114",
+    "s4u-116",
+    "s4u-117",
+    "s4u-120",
+    "s4u-121",
+    "s4u-123"
+   ],
+   "top1_changed_vs_baseline": {
+    "all": 29,
+    "tagged": 29
+   }
+  }
+ },
+ "precondition": {
+  "band_identical": 125,
+  "band_moved_ids": [],
+  "moved_ids": [],
+  "n": 125,
+  "ranked_identical": 125,
+  "reference": "regression/2026-09-28-intent-prior/evidence/ip-0.1/rung-01000/handoff-set-4-claude.jsonl",
+  "reference_sha256": "6207c88e32a9946693b3f685525db80efc0371ae845029bc9a3453202a445de6",
+  "reference_sha256_is_the_frozen_one": true
+ }
+}

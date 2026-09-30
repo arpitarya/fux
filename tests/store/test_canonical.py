@@ -94,5 +94,5 @@ def test_golden_header_line():
     # appeared and no field changed meaning. `_format` moved v4 -> **v5** with
     # W-168 step 4 on 2026-09-27, because `abbr` appeared.
     assert canonical_dumps(HEADER) == (
-        b'{"_format":"fux.index.v5","analyzer":"v3","tf_fields":["body","heading","title","path","ctx"]}\n'
+        b'{"_format":"fux.index.v6","analyzer":"v3","tf_fields":["body","heading","title","path","ctx"]}\n'
     )

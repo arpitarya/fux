@@ -102,7 +102,7 @@ def test_every_field_ingest_writes_is_declared():
     written = {
         "id", "src", "loc", "sha", "ver", "mode",
         "title", "phrases", "terms", "flen", "abbr", "edges",
-        "archived", "superseded", "mtime",
+        "archived", "superseded", "mtime", "authors", "commits",
     }
     assert written == set(recordschema.shape().fields)
 

@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@e335950553e2, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@204fe34b64f8, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 583229097629a6f62d45528409547106d1e92ba659d14fa5825105d94c156585
+content_sha: 1cf024c6e5110c56f145f22d0e5c9e2fa191f7e43a133299b47eddcb63cd9c41
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -932,6 +932,17 @@ this moved where they are written, not what they are.
 **The Node reader analyzes every question with the repo's identifier families**, loaded by `identifiersFor(root)` from `.fux/identifiers.toml`, exactly as Python does; the twin is `node/src/query/identifiers.mjs`, held to Python's by one shared fixture ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 **`node/src/config/output.mjs`'s `CLI_VERBS` gains `identifiers` and `enrich`, and `doctor` gains `progress_threshold`** (W-238, 2026-09-29). All three are Python-only verbs, declared so that one committed `output.toml` validates the same way on both readers ([SR-OUTPUT](0143_output-defaults.md)). No Node verb's behaviour changed.
+
+**23. The authority prior is transcribed, not diverged** (W-168 step 8,
+2026-09-30). `Weighting` in `rank.mjs` carries `authorityWeight` and
+`authorityFor`, `authorityProduct` twins `rank.py::authority_product`,
+`archivedRanking` passes the weight, `tune.mjs` reads the key, and `fux lexical`
+forces it to `0` in `runQuery`. The multiplication order is Python's — priority,
+intent, authority — so the product rounds alike; the counts come off the parsed
+record like `mtime`, so nothing new is read. **A test compares both readers'
+`ask` and `lexical` at `0.0` and `0.3`**, and the factor itself at four
+weights. `--why` has no Node twin, as for step 9. Off at `0.0` pending the
+verdict.
 
 ### Consequences
 

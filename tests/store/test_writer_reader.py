@@ -154,10 +154,10 @@ def test_read_shard_rejects_wrong_analyzer(tmp_path):
     directory = tmp_path / ".fux" / "index"
     directory.mkdir(parents=True)
     bad = directory / "00.jsonl"
-    # _format must be "fux.index.v5" here so this shard clears the _format
+    # _format must be "fux.index.v6" here so this shard clears the _format
     # check and actually exercises the analyzer-version check under test.
     bad.write_bytes(
-        b'{"_format":"fux.index.v5","analyzer":"v99","tf_fields":["body","heading","title","path","ctx"]}\n'
+        b'{"_format":"fux.index.v6","analyzer":"v99","tf_fields":["body","heading","title","path","ctx"]}\n'
     )
     with pytest.raises(FuxError, match="analyzer"):
         read_shard(bad)
@@ -176,7 +176,7 @@ def test_read_shard_rejects_reversed_tf_fields(tmp_path):
     # test asserting the wrong refusal: W-205's v2 -> v3 made the reader reject
     # the shard on `analyzer` and never reach `tf_fields` at all.
     bad.write_bytes(
-        b'{"_format":"fux.index.v5","analyzer":"'
+        b'{"_format":"fux.index.v6","analyzer":"'
         + ANALYZER_VERSION.encode()
         + b'","tf_fields":["ctx","path","title","heading","body"]}\n'
     )
@@ -248,7 +248,7 @@ def test_a_version_skew_names_both_versions_and_the_way_out(tmp_path):
         read_shard(shard)
     message = str(exc.value)
     assert "fux.index.v1" in message, "must name what it FOUND"
-    assert "fux.index.v5" in message, "must name what it EXPECTED"
+    assert "fux.index.v6" in message, "must name what it EXPECTED"
     assert "fux ingest" in message, "must name the way out — there is no migrate verb"
 
 

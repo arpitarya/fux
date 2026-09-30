@@ -6,6 +6,8 @@ import { blake2bHex } from "../hash/blake2b.mjs";
 import { fixed } from "../config/constants.mjs";
 
 export const INDEX_DIR = fixed("index", "dir");
+//: The bump history is `store/format.py`'s; v6 (W-168 step 8) added `authors`
+//: and `commits`, which this reader takes off the parsed record like `mtime`.
 export const SCHEMA_ID = fixed("index", "schema");
 export const ANALYZER_VERSION = fixed("index", "analyzer");
 

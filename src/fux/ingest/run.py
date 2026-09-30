@@ -753,7 +753,7 @@ def run(
     # The weights that read these are tunable; these values are not. That is
     # SR-TUNE decision 1's split, and it is why they can live in the
     # committed index at all.
-    from .priors import git_commit_times, superseded_ids
+    from .priors import git_history, superseded_ids
 
     retired = superseded_ids(records)
     # W-110 — the DECLARED path a retired document cannot take itself.
@@ -762,15 +762,25 @@ def run(
     # file is written later, so its `superseded_by:` can — and it is the only
     # key in that frontmatter that reaches the ranking rather than a report.
     retired |= _superseded_by_enrichment(root, records, file_shas)
-    commit_times = git_commit_times(
+    history = git_history(
         root, [r["loc"] for r in records if r.get("src") == "git"], timeout_s=config.git_timeout_s
     )
     for record in records:
         if record["id"] in retired:
             record["superseded"] = True
-        mtime = commit_times.get(record.get("loc"))
+        mtime = history.mtime.get(record.get("loc"))
         if mtime is not None:
             record["mtime"] = mtime
+        # W-168 step 8 (L1): two counts, never an identity. With no history
+        # the record carries NEITHER, which the authority prior reads as
+        # `f = 0` — and popping a stale pair keeps a delta run equal to a
+        # full one when the history disappears (a shallow re-clone).
+        counts = history.counts.get(record.get("loc")) if record.get("src") == "git" else None
+        if counts is not None:
+            record["authors"], record["commits"] = counts
+        else:
+            record.pop("authors", None)
+            record.pop("commits", None)
 
     shard_total = len({store_mod.shard_for(r["id"]) for r in records})
     # **The last stop point, and it is here on purpose.** Past this line the

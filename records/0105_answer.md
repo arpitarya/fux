@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@7d111b045e0c]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: c406920caad7efb9cfef841b3cf3974c32b1933c01479951dd6dae51af375797
+content_sha: 2a6c59d6227d496da4b3b836b625ae5392421b4ef468fa09f38179ffbdf1364a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -509,6 +509,11 @@ ships empty, so by default nothing here changes.
 
 
 The question `fux answer` ranks is analyzed with the repo's identifier families, as `ask`'s is ([SR-IDENTIFIERS](0160_identifiers.md)); refer's passage re-score is not — it analyzes the question and the passage in one function, on analyzer v3's terms, and is self-consistent either way.
+
+**17. The authority prior reaches `answer` through `run_query`** (W-168 step 8,
+2026-09-30; [SR-RANKING](0111_ranking.md) decision 14). When `authority_weight >
+0` the candidate list `answer` cites from is the re-ordered one. Off by default,
+and then nothing here changes.
 
 ### Consequences
 

@@ -140,10 +140,10 @@ def test_the_pairs_ride_the_declaring_documents_own_record(corpus):
             assert "abbr" not in record, f"{loc}: absent when there is none"
 
 
-def test_the_index_is_v5(corpus):
+def test_the_index_is_the_current_format(corpus):
     shard = list(store_mod.iter_shard_paths(corpus))[0]
     header = json.loads(shard.read_text(encoding="utf-8").splitlines()[0])
-    assert header["_format"] == "fux.index.v5"
+    assert header["_format"] == "fux.index.v6"
 
 
 def test_the_table_is_the_same_from_the_shards_and_from_the_plane(corpus):

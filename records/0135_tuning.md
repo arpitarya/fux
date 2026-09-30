@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-24
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@5a70322d785f, .fux/tune.toml@fbc012c8ee4f, node/src/config/tune.mjs@1fff66045a71]
+owns: [src/fux/tune.py@5ee79d5570c6, .fux/tune.toml@f362563f7aa3, node/src/config/tune.mjs@42f0419c3c37]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 4f107adcc2cb9a2ab70edc76921a94474ba6657a6953715675d4685deebb1d99
+content_sha: b378152bb5e60f34bf280ba92e8c8ad9d9cb6f9f702bcf27eadea581fe2dee07
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -759,6 +759,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + ranking.expand_weight
 + ranking.mined_weight
 + ranking.intent_weight
++ ranking.authority_weight
 + graph.damping
 + graph.iterations
 + graph.laziness
@@ -1080,6 +1081,25 @@ this moved where they are written, not what they are.
 **No tune key changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/tune.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+**21. `[ranking] authority_weight`, default `0.0`** (W-168 step 8, 2026-09-30;
+ruled A3 · S2 · L1 by Arpit on 2026-09-28, [compare doc](../work/compare/authority-prior.compare.md);
+[frozen bar](../work/regression/2026-09-28-authority-prior/PRE-REGISTRATION.md)). The git authority prior.
+
+- **It scales a git-sourced document by `1 + authority_weight × (1 −
+  1/(authors × commits))`**, from the two counts ingest commits on its record
+  ([SR-INGEST](0106_ingest.md) decision 24). No corpus coupling and no second
+  key (S2): a one-person, one-commit document gets exactly `1.0`.
+- **`0.0` is off, and off reads no count.** The facts are committed and the
+  weight is tunable — decision 1's split, the one `mtime` sits on.
+- **Inside decision 1's boundary.** Read at query time; moving it moves no
+  committed byte and needs no re-ingest.
+- **`fux lexical` forces it to `0.0`**, in both readers, as it does
+  `mined_weight` and `intent_weight`.
+- ⚠ **UNMEASURED, and off pending the verdict.** The five arms are captured and
+  not scored. A PASS would move the default, and — unlike step 9's — it would
+  move every git-sourced consumer's ranking on upgrade, because the counts need
+  no declaration.
 
 ### Consequences
 

@@ -7,10 +7,10 @@ description: What every property of a committed JSONL record is for, why it is i
 status: accepted
 date: 2026-08-18
 feature: the committed record schema — `fux.index.v2`
-owns: [src/fux/schemas/index-record.schema.json@0caa1702ac5e]
+owns: [src/fux/schemas/index-record.schema.json@c1e3c6c8cebf]
 laws: [L3, L4, ex-L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 4dcafb5e94e3c5011f07c7fa8aece23008e767143eb67b0378c73c50479ecb88
+content_sha: 9ab911470b6ca58adde36ca1f28f630ba956f9e732df85f1d7d145f3f274b519
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -325,6 +325,14 @@ this moved where they are written, not what they are.
 
 
 The record's shape is unchanged by identifier families; only the shard header gains an optional `identifiers` field ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+**`authors` and `commits` joined the record on 2026-09-30** (W-168 step 8,
+`_format` v6; [SR-INDEX-LIFECYCLE](0108_index-lifecycle.md) decision 16). Two
+optional ints on a git-sourced record — the distinct author count and the
+commit count from ingest's one history walk ([SR-INGEST](0106_ingest.md)
+decision 24). **Counts only**: no name, email or hash of either is a field.
+Absent when there is no history, never written as `0`. Not `carried`: like
+`mtime`, recomputed every run.
 
 ### Consequences
 

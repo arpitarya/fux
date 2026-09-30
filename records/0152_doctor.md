@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@12a43ca94721, tests/test_doctor_register_is_complete.py@dff0d535b078]
+owns: [src/fux/doctor.py@d067ee51fb66, tests/test_doctor_register_is_complete.py@dff0d535b078]
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: eb7219d54e86fe9fbfdf4d8ba1fa1d7e8a6e22451aa4ca36b092971689618dc9
+content_sha: 1652f3ca3f65e7a8c4a4875a943befc99b12bb20b65995d54ea1bba31d05caf6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -463,6 +463,11 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 **`doctor` paints a progress bar** (W-238, 2026-09-29; [SR-CLI](0101_cli-surface.md) decision 17). `identifier families current` re-runs the identifier lens over every document, which is 45 of 48 s of `doctor` on this repo. The run therefore holds the invocation's `Progress` (in a module global beside `_RECORDS`), and that check paints `read` then `detect`. `doctor` now takes `--progress` / `--no-progress` and reads `[cli] progress_threshold`. No row, level or exit code changed, and stdout is byte-identical with the bar on or off.
+
+**No decision here moved** (W-168 step 8, 2026-09-30). The `mtime` row's
+docstring names `ingest/priors.py::git_history`, the renamed walk; the check is
+unchanged. `fux doctor --fix` writes the new `authority_weight` key from the
+template like any other missing key.
 
 ### Consequences
 

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@232892e6641d, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@63f4c4872bd7, src/fux/query/analyzer.py@8f02dd1c4e44, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@71890f0ff70a, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@1a1dd7794ab6, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@352450f33e0c, node/test/analyzer.test.mjs@2d0342e628a6]
+owns: [src/fux/query/rank.py@4462fab3b47c, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@63f4c4872bd7, src/fux/query/analyzer.py@8f02dd1c4e44, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@71890f0ff70a, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@2b9940aa0a15, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@352450f33e0c, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 0eca316cadba8608ba225519a0f6cfdcee7bc6fdf886938387f50e9af757d7f5
+content_sha: c07df1dc90cd4e9cce9184310fccf2952fa3c4f90f4cc253cf333d477176c29a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -622,6 +622,31 @@ intent_weight`. `of(record)` is `priority_for(loc) × intent_for(loc)`, and
 
 
 **The analyzer takes one more input: the repo's identifier families** ([SR-IDENTIFIERS](0160_identifiers.md)). Each match adds one canonical term beside the pipeline above and changes none of its steps; with no families the output is analyzer v3's, byte for byte, and `ANALYZER_VERSION` stays `v3` because the engine's pipeline did not change.
+
+**14. The authority prior is `Weighting`'s THIRD multiplier** (W-168 step 8,
+2026-09-30; ruled A3 · S2 · L1, [compare doc](../work/compare/authority-prior.compare.md); [frozen bar](../work/regression/2026-09-28-authority-prior/PRE-REGISTRATION.md);
+[SR-TUNE](0135_tuning.md) decision 21). `Weighting` carries `authority_weight`,
+and `authority_for(record)` is `1 + authority_weight × (1 − 1/(authors ×
+commits))` off the record's two committed counts
+([SR-INGEST](0106_ingest.md) decision 24). `of(record)` is `priority_for(loc) ×
+intent_for(loc) × authority_for(record)`, **in that order on both candidate
+paths and in the Node twin**, so the product rounds alike; `maximum` is the
+priority supremum × the intent factor × `(1 + authority_weight)`.
+
+- **`1 + w` is a supremum because `f < 1`** for every finite count, so the
+  accelerator's bound survives an unseen document of any history
+  ([SR-T1-ACCELERATOR](0110_accelerator.md) veto 5). A test sweeps scan =
+  accelerator at `0.0`–`0.5`, with `[priority]` and the intent prior stacked,
+  and at `top = 1`.
+- **No counts is `f = 0`**, and so is a 1 · 1 document: `1 + w × 0.0` is exactly
+  `1.0`, so it is untouched rather than merely close. A value that is not a
+  positive integer reads as no counts (`rank.py::authority_product`, the one
+  reading `--why` shares).
+- **Off is `trivial`.** At `authority_weight = 0.0` `authority_active` is false,
+  the counts are never read, and a test holds the ranking byte-identical to the
+  scan before the key existed. The prior is per corpus, not per question: it
+  reads no cue.
+- ⚠ **Off at `0.0` pending the verdict.** The arms are captured and not scored.
 
 ### Consequences
 

@@ -200,6 +200,10 @@ def _read_committed(root: Path, progress=None):
             # or the two paths weight the same document differently.
             "superseded": bool(r.get("superseded")),
             "mtime": r.get("mtime"),
+            # W-168 step 8, for the same reason: the authority prior reads
+            # these off the record on the scan, so they are carried here.
+            "authors": r.get("authors"),
+            "commits": r.get("commits"),
         }
         for r in records
     ]

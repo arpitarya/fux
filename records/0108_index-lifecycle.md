@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@f5d01399a292, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@24ad7507e350]
+owns: [src/fux/store@d6b05931e051, node/src/store/format.mjs@e5bfa485065c, node/src/store/reader.mjs@24ad7507e350]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 1deabbf0af6a4e924180f13871938d314c6d7cdd4667cd9d644f0dfe02950985
+content_sha: e96543c33d0035a144f190e11b5c3d570e7014c91a54c12601195bf9869d2119
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -571,6 +571,21 @@ the three to be merged, did not.
 
 
 **The shard header may carry `identifiers`** — the effective identifier-family digest, written by `store.header_for` only when the repo declares families ([SR-IDENTIFIERS](0160_identifiers.md) decision 8). Absent means none, which is true of every earlier index, so `_format` does not move; both readers check `_format`, `analyzer` and `tf_fields` by name and ignore it, and ingest's reuse gate compares the whole expected header.
+
+**16. `_format` bumped to `fux.index.v6` on 2026-09-30** (W-168 step 8), by
+decision 9.1 again: a git-sourced record may now carry `authors` and `commits`
+([SR-RECORD](0109_index-record.md), [SR-INGEST](0106_ingest.md) decision 24).
+**A property appeared**, and a v5 index could not say whether a document has no
+history or the index predates the counts.
+
+- **`analyzer` and `tf_fields` are untouched.** Two ints enter no posting and no
+  `flen`.
+- **The migration is decision 10a's**: `fux ingest --full`. This repo's own
+  index was re-ingested in the same change.
+- ⚠ **Every v5 index is refused by this engine, including the ladder rungs.**
+  Step 8's arms run on a re-ingested copy, never on a rung (the bar, step 3 of
+  its arms). ⚠ **Every git-sourced index root moves once on upgrade**, whatever
+  `authority_weight` is — the counts are facts, written at `0.0` too.
 
 ### Consequences
 

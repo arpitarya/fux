@@ -419,6 +419,12 @@ class DocDerivation:
     #: the prior did not run on this query, so a `--why` block at the default is
     #: byte-identical to one written before the prior existed.
     intent_factor: float | None = None
+    #: W-168 step 8 — `{"authors", "commits", "factor"}` when the authority
+    #: prior MOVED this document: it ran, and the record's counts give
+    #: `factor != 1.0`. ABSENT otherwise — off, no counts, or a 1 · 1 document
+    #: — so a `--why` block at the default is byte-identical to one written
+    #: before the prior existed. Two counts, never an identity.
+    authority: dict | None = None
 
     def as_dict(self) -> dict:
         out = {
@@ -442,6 +448,8 @@ class DocDerivation:
             out["rank_untuned"] = self.rank_untuned
         if self.intent_factor is not None:
             out["intent_factor"] = self.intent_factor
+        if self.authority is not None:
+            out["authority"] = dict(self.authority)
         return out
 
 
@@ -497,6 +505,22 @@ def _intent_factor(intent: dict | None, loc: str) -> float | None:
     from .intent import type_for
 
     return 1.0 + intent["weight"] if type_for(loc, intent["doctype"]) == intent["type"] else 1.0
+
+
+def _authority(weight: float | None, record: dict | None) -> dict | None:
+    """The authority prior's entry for one document, or `None` when it did not
+    move it. The factor is `Weighting.authority_for`'s, so `--why` and the
+    ranking cannot disagree about which document the prior touched."""
+    if weight is None:
+        return None
+    from .rank import Weighting, authority_product
+
+    if authority_product(record) is None:
+        return None
+    factor = Weighting(authority_weight=weight).authority_for(record)
+    if factor == 1.0:
+        return None
+    return {"authors": record["authors"], "commits": record["commits"], "factor": factor}
 
 
 def _record_terms(record: dict | None) -> dict:
@@ -574,6 +598,7 @@ def derive(
     expand: str = "",
     rerank_uplift: dict | None = None,
     intent: dict | None = None,
+    authority: float | None = None,
 ) -> Derivation:
     """Build the derivation for a result list. **Never raises.**
 
@@ -714,6 +739,7 @@ def derive(
                 rank_untuned=untuned_rank.get(result.id),
                 rerank_uplift=uplift_map.get(result.id),
                 intent_factor=_intent_factor(intent, result.loc),
+                authority=_authority(authority, record),
             )
         )
 

@@ -86,6 +86,7 @@ sites = [
   "src/fux/query/provenance.py::derive(multiplier)::param::1.0",
   "src/fux/query/provenance.py::receipt(expand)::param::''",
   "src/fux/query/rank.py::Weighting.intent_factor::class::1.0",
+  "src/fux/query/rank.py::Weighting.authority_weight::class::0.0",
   "src/fux/refer/__init__.py::Cited.note::class::''",
   "src/fux/refer/_assemble.py::Citation.ordinal::class::-1",
   "src/fux/refer/_assemble.py::assemble(overhead)::param::0",
@@ -335,6 +336,7 @@ why = "parsing logic: a regex, an algorithm's rule table, a character class, a s
 sites = [
   "src/fux/inspect/idfamilies.py::_NODE_SPANS::module::\"let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{...",
   "src/fux/inspect/idfamilies.py::_utf16::inline::2",
+  "src/fux/ingest/priors.py::_MARK::module::'\\x00'",
   "src/fux/inspect/idfamilies.py::regex_parity::inline::2",
   "node/src/query/analyzer.mjs::withFamilies::inline::2",
   "node/src/query/identifiers.mjs::CLASS_ESC::module::\"0-9\"",

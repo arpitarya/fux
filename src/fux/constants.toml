@@ -22,7 +22,7 @@ dir              = ".fux/index"
 # refuses any other number (SR-CONFIG decision 3), never a setting.
 shards           = 256
 # Bump history and why each bump was a _format bump: store/format.py.
-schema           = "fux.index.v5"
+schema           = "fux.index.v6"
 # An ANALYZER bump, not a _format bump -- see store/format.py.
 analyzer         = "v3"
 # ORDER IS LOAD-BEARING: body first, trailing zeros omitted on the wire.
@@ -191,9 +191,9 @@ header = "# loc\tkind\tsha\tdecoder\tfetcher"
 
 [runtime]
 dir          = "runtime"
-schema       = "fux.runtime.v7"
+schema       = "fux.runtime.v8"
 block_size   = 128
-docs_fields  = ["id", "loc", "title", "flen", "archived", "superseded", "mtime", "alen"]
+docs_fields  = ["id", "loc", "title", "flen", "archived", "superseded", "mtime", "alen", "authors", "commits"]
 docs         = "docs.jsonl"
 anchors_dir  = "anchors"
 stats        = "stats.json"

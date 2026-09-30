@@ -1,0 +1,49 @@
+--- before/.fux/inspect.toml
++++ after/.fux/inspect.toml
+@@ -59,3 +59,8 @@
+ triage_rows    = 200
+ words_page     = 200
+ words_page_max = 1000
++
++[identifiers]
++min_values    = 3
++min_docs      = 2
++parity_sample = 500
+--- before/.fux/output.toml
++++ after/.fux/output.toml
+@@ -69,3 +69,10 @@
+ 
+ [cli.serve]
+ port = 7337        # `fux serve` binds 127.0.0.1 only; this is the port
++
++[api]                # the fux.open() / Node Index library defaults a caller does not pass.
++                     # ON where [cli] ships off, deliberately: a caller in code has
++                     # already decided to read the object (W-225 stage 6).
++band = true        # the confidence block on ask/answer results
++sections = true    # the matched `§ heading` lines under each ask hit
++no_refer = false   # answer from the index alone, without fetching the source
+--- before/.fux/tune.toml
++++ after/.fux/tune.toml
+@@ -53,6 +53,12 @@
+ # [doctype] table it does nothing at any value. UNMEASURED until W-168 step 9's
+ # pre-registered run.
+ intent_weight           = 0.1
++# Prefer a document many people maintained over one person's single draft: a
++# document with A distinct authors over C commits in its history is scaled by
++# 1 + this * (1 - 1/(A * C)), so a one-person, one-commit document is untouched.
++# 0 = OFF, and the counts are never read. UNMEASURED: its pre-registered run is
++# not decided, so it ships off.
++authority_weight        = 0.0
+ 
+ [graph]                         # explain / graph / path
+ damping      = 0.85
+--- before/fux.toml
++++ after/fux.toml
+@@ -113,6 +113,7 @@
+ 
+ [refer]
+ fetch_cache_max_bytes = 524288000
++timeout_seconds       = 5
+ 
+ [doctor]
+ thin_url_share         = 0.01

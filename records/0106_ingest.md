@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@cade968c2c2d, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@a6b1bb5f5517, node/src/ingest/priors.mjs@d8d4691d7e49]
+owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@d23a59b63e29, src/fux/ingest/priors.py@2a3633db3249, node/src/ingest/gitdir.mjs@a6b1bb5f5517, node/src/ingest/priors.mjs@4b9701c6d070]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 746a3108eb7d921f25b9c246bd304011206ca5834ebbac87b05293f22624784f
+content_sha: 7bfab227012e33529ba747d558c9c3313538211996adb5dc44faea1098fe3f71
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -997,6 +997,31 @@ The Node reader's `dirsFile` no longer falls back to `.fux/sources/dirs`.
 
 
 **`.fux/identifiers.toml` is an input to extraction** ([SR-IDENTIFIERS](0160_identifiers.md)). Ingest loads it once, passes it to every field's analysis and to anchor text, and stamps its effective digest into every shard header; a record is reused only when the whole expected header matches, so an edited file re-analyses the corpus, and a moved digest re-derives carried `url:` records.
+
+**24. The one `git log` walk also counts authors and commits** (W-168 step 8,
+2026-09-30; L1 of the [compare doc](../work/compare/authority-prior.compare.md); [frozen bar](../work/regression/2026-09-28-authority-prior/PRE-REGISTRATION.md)).
+`ingest/priors.py::git_history` replaces `git_commit_times` and is still **one
+subprocess for the corpus**: `--format=%x00%ct%x00%aE --name-only
+--no-renames`. It writes `mtime` exactly as before, and on each git-sourced
+record two ints ([SR-RECORD](0109_index-record.md)):
+
+- **`commits`** — the commits in the walk that list the path. A merge lists no
+  path in this form, so it counts 0, the `mtime` semantics.
+- **`authors`** — the distinct author emails among them: `%aE` is
+  mailmap-aware, and it is case-folded. 🔴 **The emails live in the walk's memory
+  only.** No name, email or hash of either reaches a record, a log or an error;
+  a test greps every shard for the fixture's addresses.
+- **No history, no counts**: a url record, no repository, a failed walk, and a
+  **shallow clone** (`git rev-parse --is-shallow-repository`, a second process
+  that walks nothing). A shallow clone keeps `mtime`, because its newest commit
+  is present, and loses the counts, because a truncated count would differ
+  between two clones of one repository (L4).
+- **Recomputed every run and never carried**, like `mtime`; a record whose
+  history disappeared loses both fields, so a delta run equals a full one.
+- **No weight reaches ingest**: `authority_weight` is read at query time only.
+  The fields appearing is a property change, so `_format` moved to v6
+  ([SR-INDEX-LIFECYCLE](0108_index-lifecycle.md) decision 16), and this repo's
+  own index was re-ingested `--full` in the same change.
 
 ### Consequences
 

@@ -1610,7 +1610,7 @@ def _recency_prior(root: Path) -> Check:
 
     **Filed 2026-09-05 while checking W-111's tie-break, and it is a silent
     total loss.** `mtime` is written by `ingest/priors.py` from
-    `git_commit_times`, which walks git. A corpus **copied out of** its
+    `git_history`, which walks git. A corpus **copied out of** its
     repository is a plain directory, so **every** document loses its `mtime`
     and the whole recency prior switches off with nothing anywhere reporting
     it. `fux-benchmark`'s 10 000-document corpus is exactly that, and every

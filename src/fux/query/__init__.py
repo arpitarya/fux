@@ -113,7 +113,15 @@ def _archived_ranking(
         except FuxError:
             dirs = frozenset()
     return (
-        Weighting(archived_dirs=dirs, priority=tune.priority, **_intent_prior(tune, query)),
+        Weighting(
+            archived_dirs=dirs,
+            priority=tune.priority,
+            # W-168 step 8. `0.0` leaves `Weighting` exactly as it was before
+            # the key existed: `authority_active` is false and no record's
+            # counts are read.
+            authority_weight=tune.authority_weight,
+            **_intent_prior(tune, query),
+        ),
         dirs,
     )
 
@@ -1058,8 +1066,14 @@ def _ask_shaped(args, *, compose: bool) -> int:
         # W-168 step 4: the frozen baseline never folds mined pairs — it is the
         # words the user typed (SR-CLI decision 12).
         # W-168 step 9: nor applies the intent prior (SR-CLI decision 12).
+        # W-168 step 8: nor the authority prior (SR-CLI decision 12).
         tune = dataclasses.replace(
-            tune, ask_boost=False, ask_related=False, mined_weight=0.0, intent_weight=0.0
+            tune,
+            ask_boost=False,
+            ask_related=False,
+            mined_weight=0.0,
+            intent_weight=0.0,
+            authority_weight=0.0,
         )
     elif getattr(args, "related", None) is False:
         import dataclasses
@@ -1245,6 +1259,7 @@ def _derivation_for(root: Path, args, results, path, signals, trace, tune):
             expand=_expand_of(args),
             rerank_uplift=(trace or {}).get("rerank_uplift"),
             intent=_intent_shown(tune, args.query),
+            authority=_authority_shown(tune),
         )
     except Exception:  # pragma: no cover - a diagnostic must not break an answer
         return None
@@ -1266,6 +1281,14 @@ def _intent_shown(tune, query: str) -> dict | None:
         "weight": tune.intent_weight,
         "doctype": prior["doctype"],
     }
+
+
+def _authority_shown(tune) -> float | None:
+    """What `--why` needs about W-168 step 8's prior: its weight when it ran,
+    `None` when it did not — so a block at `0.0` is the block before the key."""
+    if tune is None or not tune.authority_weight > 0:
+        return None
+    return tune.authority_weight
 
 
 def _declare_derivation(why) -> None:

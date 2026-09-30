@@ -232,9 +232,9 @@ def test_a_stale_runtime_is_refused_rather_than_read(corpus):
 
     manifest_path = fmt.runtime_dir(corpus) / fmt.MANIFEST_NAME
     manifest = json.loads(manifest_path.read_bytes())
-    assert manifest["schema"] == "fux.runtime.v7"
-    assert manifest["docs_fields"][-1] == "alen"
-    manifest["schema"] = "fux.runtime.v6"
+    assert manifest["schema"] == "fux.runtime.v8"
+    assert "alen" in manifest["docs_fields"]
+    manifest["schema"] = "fux.runtime.v7"
     manifest_path.write_bytes(json.dumps(manifest).encode("utf-8"))
     assert not accel.is_fresh(corpus)
 

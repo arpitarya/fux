@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 549502a66b32408f60d776198d598a5d042670fe21ad2c9f8aed94161b9f4fdd
+content_sha: 2ae4f2f3ec147b84f98245e34f24976164f2b94704a87c27989594fc795a15e7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -871,6 +871,11 @@ nothing here changes.
 
 
 The confidence block's pairs and hashes are both analyzed with the repo's identifier families, together, so they stay aligned by hash ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+**20. The band is computed after the authority prior** (W-168 step 8,
+2026-09-30; [SR-RANKING](0111_ranking.md) decision 14). The prior scales final
+scores, so when it runs it can move `separation`, and with it the band, of the
+list the reader is shown. Off by default, and then nothing here changes.
 
 ### Consequences
 

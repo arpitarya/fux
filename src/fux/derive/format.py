@@ -102,6 +102,10 @@ BLOCK_SIZE = fixed("runtime", "block_size")
 #: sorted. Derived for step 1's reason: the table is corpus-wide, so committing
 #: it would make one document's bytes a function of every other's. A v6 plane
 #: has no such file and is refused and rebuilt rather than read as "no pairs".
+#: v8 (2026-09-30, W-168 step 8): `docs.jsonl` carries `authors` and `commits`,
+#: copied from the committed record, so the accelerator's `Weighting.of` reads
+#: the same counts the scan reads off the line. A v7 plane has neither and is
+#: refused and rebuilt rather than read as "no history".
 RUNTIME_SCHEMA = fixed("runtime", "schema")
 
 #: v3 (W-76 Phase 1 record half): `mx` and `mnw` become PER-FIELD arrays.
