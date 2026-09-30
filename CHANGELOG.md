@@ -8,6 +8,11 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.0-alpha.9] - 2026-09-30
+
+**`fux ingest` is ~7× faster at 10 000 documents; the index is byte-identical.**
+Ranking and every verb's stdout are alpha.8's.
+
 ### Changed
 
 - **`fux ingest` extracts ~7× faster at 10 000 documents** (45.6 s → 6.5 s),
