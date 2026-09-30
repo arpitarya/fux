@@ -19,7 +19,7 @@
  * and not its Node runs**, which is this decision rather than a bug.
  */
 import { runQuery } from "../query/run.mjs";
-import { recordFor } from "../store/reader.mjs";
+import { recordFor, Shards } from "../store/reader.mjs";
 import { chunk } from "../refer/chunk.mjs";
 import { rescore } from "../refer/rescore.mjs";
 import { assemble } from "../refer/assemble.mjs";
@@ -95,8 +95,13 @@ export function answerPayload(root, args) {
   // nothing in it survives nowhere: the refer plane re-scores on the fetched
   // text and has no idea which tier a candidate came from. That is the point —
   // Tier B's weakness is that no query word matched the INDEX.
+  //
+  // W-242 Tier 0 — this verb's one read of each shard, shared by the ranking
+  // and the record reads below.
+  const shards = new Shards(root);
   const { results, related, confidence, tune } = runQuery(root, query, ANSWER_TOP, {
     useTune: args.noTune !== true, wantConfidence: true, compose: true, expand: args.expand ?? "",
+    shards,
   });
   declareFloorOff(tune, Boolean(args.json));
   const band = (block, freshness) => {
@@ -122,7 +127,7 @@ export function answerPayload(root, args) {
   // "unverified" — deliberately not upgraded, because nothing was checked.
   if (args.noRefer) {
     const top = results[0];
-    const record = recordFor(root, top.id);
+    const record = recordFor(root, top.id, shards);
     const payload = {
       answer: { passages: [{ id: top.id, loc: top.loc, heading: top.title,
                              text: (record?.phrases || []).join("\n"), score: top.score }] },
@@ -144,7 +149,7 @@ export function answerPayload(root, args) {
   // separate two, and a document the words found should win that tie against
   // one only a link reached.
   for (const r of [...results, ...(related ?? [])]) {
-    const record = recordFor(root, r.id);
+    const record = recordFor(root, r.id, shards);
     if (!record) continue;
     const got = obtain(root, record, textGlobs);
     verdicts.set(r.id, got.verdict);

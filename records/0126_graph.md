@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@a32ab4cc2604, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@61ee1cbb84df, node/src/verbs/graph.mjs@f1ab9ef2957a, src/fux/schemas/graph.schema.json@19bd4c486035]
+owns: [src/fux/graph@a32ab4cc2604, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@61ee1cbb84df, node/src/verbs/graph.mjs@9567daf3e79e, src/fux/schemas/graph.schema.json@19bd4c486035]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 2083ad2f78a148c836791b2aea173fac72bb90a5fec514528f6030c2c193de26
+content_sha: 545ef48553b0dc97af4b5b8f8db56132798d17581778fe22a1c6c0c55fa09c5e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -488,6 +488,8 @@ this moved where they are written, not what they are.
 **`ppr` and `expand` require `link_idf_on`** in both planes ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28).
 
 **No decision here moved** (W-235, 2026-09-29). `node/src/verbs/graph.mjs` builds the plane from `graphRecords`, which parses only `id` and `edges`; the plane is byte-identical. The cost note is [SR-NODE-SEARCH](0153_node-search.md) decision 9's.
+
+**No decision here moved** ([W-242](../work/open/W-242-shared-runtime.md) Tier 0, 2026-09-30; [SR-NODE-SEARCH](0153_node-search.md) decision 24): Node's `fux graph` reads its plane records and its seed query from one `Shards`, so each committed shard is read once per call; the plane it builds is unchanged. Output is byte-identical.
 
 ### Consequences
 

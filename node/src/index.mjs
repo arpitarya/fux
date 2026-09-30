@@ -28,7 +28,7 @@ import { findRoot } from "./config/root.mjs";
 import { FuxError } from "./errors.mjs";
 import { runQuery, runFused } from "./query/run.mjs";
 import { headingsFor } from "./query/headings.mjs";
-import { recordFor, graphRecords } from "./store/reader.mjs";
+import { recordFor, graphRecords, Shards } from "./store/reader.mjs";
 import { buildPlane } from "./graph/plane.mjs";
 import { loadTune } from "./config/tune.mjs";
 import { loadOutput } from "./config/output.mjs";
@@ -66,7 +66,7 @@ class Index {
   /** Ranked document locations. The cheapest verb: no band, no headings. */
   async find(query, { top = null, under = null } = {}) {
     if (top === null) top = Number(this._output().resolve("find", "top", null, { asJson: false }));
-    let results = runQuery(this.root, query, top, { useTune: true, wantConfidence: false, compose: true })
+    let results = runQuery(this.root, query, top, { useTune: true, wantConfidence: false, compose: true, shards: new Shards(this.root) })
       .results.map((r) => result(r));
     if (under !== null) {
       const prefix = under.endsWith("/") ? under : `${under}/`;
@@ -89,11 +89,14 @@ class Index {
     // Loaded once and handed to every arm, so a band cannot be explained by a
     // different floor than the one that produced the ranking beside it.
     const tune = loadTune(this.root, { enabled: true });
+    // W-242 Tier 0 — this call's one read of each shard, never kept on `this`:
+    // an `Index` may live as long as its caller, and the index may not.
+    const shards = new Shards(this.root);
     const { results, confidence, fused } = runFused(
-      this.root, [query, ...(queries ?? [])], top, { tune, useTune: true, wantConfidence: band, compose: true },
+      this.root, [query, ...(queries ?? [])], top, { tune, useTune: true, wantConfidence: band, compose: true, shards },
     );
     const rows = results.map((r) => result(
-      r, sections ? headingsFor(recordFor(this.root, r.id), query, maxHeadings) : [],
+      r, sections ? headingsFor(recordFor(this.root, r.id, shards), query, maxHeadings) : [],
     ));
     return {
       results: rows,

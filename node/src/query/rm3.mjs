@@ -22,7 +22,7 @@ import { fixed } from "../config/constants.mjs";
 export const FB_DOCS = fixed("rm3", "fb_docs");
 export const FB_TERMS = fixed("rm3", "fb_terms");
 
-export function feedbackTerms(root, firstPass, queryHashes, scoring) {
+export function feedbackTerms(root, firstPass, queryHashes, scoring, shards = null) {
   const docs = firstPass.slice(0, FB_DOCS).filter((r) => r.score > 0);
   let total = 0.0;
   for (const r of docs) total += r.score;
@@ -30,7 +30,7 @@ export function feedbackTerms(root, firstPass, queryHashes, scoring) {
   const exclude = new Set(queryHashes);
   const weight = new Map();
   for (const r of docs) {
-    const record = recordFor(root, r.id);
+    const record = recordFor(root, r.id, shards);
     if (record === null || record === undefined) continue;
     const wlen = deriveWlen(record.flen ?? [], scoring, 0);
     if (wlen <= 0) continue;

@@ -9,7 +9,7 @@ ball: agent
 
 # W-242 — one runtime, two writers, two readers
 
-**Status: ratified 2026-09-30, not built.** Arpit, 2026-09-30: *"I agree to
+**Status: Tier 0 built and PASS 2026-09-30** ([report](../regression/2026-09-30-shared-runtime/report.md)): stdout byte-identical on 9/9 cells × 5 runs, one read per shard held by `node/test/shard-reads.test.mjs`, speed not separable on a shared machine. **Tiers 1 and 2 not built.** A Tier 1 draft (`node/src/derive/format.mjs`, `accel.mjs`, `Weighting.maximum`) was set aside uncommitted, untested and failing L12's scanner on three literals; the next session starts Tier 1 from step 5, not from that draft. Arpit, 2026-09-30: *"I agree to
 building tier zero, agree to building tier one, and agree to build tier two.
 That means Node will also write."* Research, options and the refused T3:
 [`compare/shared-runtime`](../compare/shared-runtime.compare.md). Diagram:

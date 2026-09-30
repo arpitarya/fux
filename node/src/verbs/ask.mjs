@@ -29,7 +29,7 @@
  */
 import { runFused } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";
-import { recordFor } from "../store/reader.mjs";
+import { recordFor, Shards } from "../store/reader.mjs";
 import { declareArchived, declareConfidence, declareFloorOff, decline } from "./find.mjs";
 import { fixed } from "../config/constants.mjs";
 
@@ -79,8 +79,11 @@ export function runAsk(root, args, { compose }) {
   const query = args._.join(" ");
   const queries = [query, ...(args.q || [])];
   const top = args.top; // `.fux/output.toml`, resolved before dispatch
+  // W-242 Tier 0 — this verb's one read of each shard.
+  const shards = new Shards(root);
 
   const { results, related, confidence, fused, tune } = runFused(root, queries, top, {
+    shards,
     useTune: args.noTune !== true,
     wantConfidence: true,
     expand: args.expand ?? "",
@@ -96,7 +99,7 @@ export function runAsk(root, args, { compose }) {
   const showSections = args.sections !== false;
   const rows = results.map((r) => {
     const out = { ...r };
-    if (showSections) out.headings = headingsFor(recordFor(root, r.id), query, args.maxHeadings);
+    if (showSections) out.headings = headingsFor(recordFor(root, r.id, shards), query, args.maxHeadings);
     return out;
   });
 

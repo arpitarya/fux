@@ -10,6 +10,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
+- **The Node reader reads each index shard once per query** (W-242 Tier 0). It used to read each one three or four times: in the scan, the mined-pair table, the graph tier and every display lookup. Output is byte-identical. Nothing is cached between calls, so `fux mcp` and a library `Index` still see an index that changes under them.
 - ⚠ **Breaking: index format `fux.index.v6`** (runtime `fux.runtime.v8`).
   Git-sourced documents carry two counts, `authors` and `commits`, from ingest's
   existing `git log` walk. No name or email is written. A v5 index is refused

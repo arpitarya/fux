@@ -89,7 +89,7 @@ export class Related {
  * already been computed in full; a corpus with no edges, an unreadable shard or
  * a record that left between two reads all degrade to *no tier*.
  */
-export function tiers(root, query, ordered, top, tune, { wantRelated }) {
+export function tiers(root, query, ordered, top, tune, { wantRelated, shards = null }) {
   const relatedOn = tune.askRelated && wantRelated;
   const on = tune.askBoost || relatedOn;
   if (ordered.length === 0 || !on) return { results: ordered.slice(0, top), related: [] };
@@ -100,7 +100,7 @@ export function tiers(root, query, ordered, top, tune, { wantRelated }) {
     // that declare them, and a candidate set is by definition a subset that
     // shares the query's vocabulary — exactly the wrong subset for finding what
     // the vocabulary missed.
-    plane = buildPlane(graphRecords(root));
+    plane = buildPlane(graphRecords(root, shards));
   } catch {
     return { results: ordered.slice(0, top), related: [] };
   }
@@ -139,7 +139,7 @@ export function tiers(root, query, ordered, top, tune, { wantRelated }) {
 
   return {
     results: tune.askBoost ? boost(ordered, boostedIds, top, inWindow) : ordered.slice(0, top),
-    related: relatedOn ? related(root, plane, query, walked, inWindow, tune) : [],
+    related: relatedOn ? related(root, plane, query, walked, inWindow, tune, shards) : [],
   };
 }
 
@@ -187,13 +187,13 @@ function boost(ordered, boostedIds, top, inWindow) {
  * refusal reaching this tier: a document matching only words a model invented
  * is not `related` to a question nobody asked.
  */
-function related(root, plane, query, walked, inWindow, tune) {
+function related(root, plane, query, walked, inWindow, tune, shards) {
   const hashes = new Set(queryTermHashes(query, identifiersFor(root)));
   const kinds = new Set(tune.askKinds.split(","));
   const out = [];
   for (const [node, mass] of walked) {
     if (inWindow.has(node) || out.length >= tune.askRelatedLimit) continue;
-    const record = recordFor(root, node);
+    const record = recordFor(root, node, shards);
     if (record === null || record === undefined) continue;
     const terms = record.terms ?? {};
     if (Object.keys(terms).some((h) => hashes.has(h))) continue;

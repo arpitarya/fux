@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@d6b05931e051, node/src/store/format.mjs@e5bfa485065c, node/src/store/reader.mjs@24ad7507e350]
+owns: [src/fux/store@d6b05931e051, node/src/store/format.mjs@e5bfa485065c, node/src/store/reader.mjs@e0f7a8fcc41e]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: e96543c33d0035a144f190e11b5c3d570e7014c91a54c12601195bf9869d2119
+content_sha: e3bd1d17446ce80c0e2a9026abca8f819bec592af9968c5b56fb60ce3d0018bb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -586,6 +586,8 @@ history or the index predates the counts.
   Step 8's arms run on a re-ingested copy, never on a rung (the bar, step 3 of
   its arms). ⚠ **Every git-sourced index root moves once on upgrade**, whatever
   `authority_weight` is — the counts are facts, written at `0.0` too.
+
+**No decision here moved** ([W-242](../work/open/W-242-shared-runtime.md) Tier 0, 2026-09-30; [SR-NODE-SEARCH](0153_node-search.md) decision 24): `node/src/store/reader.mjs` gains `Shards`, a per-call set that reads each committed shard once, and `iterShardPaths` now uses `reader.py`'s shard-name grammar (`[0-9a-f]{2}.jsonl`, files only) rather than any `*.jsonl`. Output is byte-identical.
 
 ### Consequences
 

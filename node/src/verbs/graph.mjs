@@ -23,7 +23,7 @@
 import { buildPlane } from "../graph/plane.mjs";
 import { TAG_PREFIX } from "../graph/model.mjs";
 import { ALL_KINDS, EDGE_KINDS, EXPANSION_BUDGET, expand, routes } from "../graph/walk.mjs";
-import { graphRecords } from "../store/reader.mjs";
+import { graphRecords, Shards } from "../store/reader.mjs";
 import { runQuery } from "../query/run.mjs";
 import { loadTune } from "../config/tune.mjs";
 import { FuxError } from "../errors.mjs";
@@ -142,7 +142,7 @@ function walkParameters(args) {
  * why both come back through one function: two code paths would be free to
  * disagree about `seedDepth`, about mass order, or about which candidate
  * generator ran. Twin of `graph/__init__.py::_seeds_of`. */
-function seedsOf(root, args, records, plane, tune) {
+function seedsOf(root, args, records, plane, tune, shards) {
   const given = args.seed ?? [];
   const query = args._.join(" ");
   if (given.length && query) {
@@ -178,7 +178,9 @@ function seedsOf(root, args, records, plane, tune) {
   // walk already re-ordered would make `fux graph "<q>"` a walk over its own
   // output: the seeds would move when the tier moved, and the orientation verb
   // would quietly become path-dependent. SR-GRAPH decision 13.
-  const { results } = runQuery(root, query, tune.seedDepth, { tune, useTune: true, wantConfidence: false, compose: false });
+  const { results } = runQuery(root, query, tune.seedDepth, {
+    tune, useTune: true, wantConfidence: false, compose: false, shards,
+  });
   return [
     results.map((r) => ({ path: locOf(r.id), id: r.id, role: "seed", score: r.score })),
     results.map((r) => r.id),
@@ -187,14 +189,16 @@ function seedsOf(root, args, records, plane, tune) {
 
 /** The neighbourhood around a query's best answers, or around named seeds. */
 export function runGraph(root, args) {
-  const records = graphRecords(root);
+  // W-242 Tier 0 — one read of each shard, for the plane AND the seed query.
+  const shards = new Shards(root);
+  const records = graphRecords(root, shards);
   const plane = buildPlane(records);
   // Loaded ONCE and used twice — for the seed query and for the walk. Two loads
   // could disagree if the file changed between them, producing a neighbourhood
   // around seeds that were ranked under different weights.
   const tune = loadTune(root, { enabled: args.noTune !== true });
 
-  const [seedRows, seeds] = seedsOf(root, args, records, plane, tune);
+  const [seedRows, seeds] = seedsOf(root, args, records, plane, tune, shards);
 
   // `seedDepth` and `expandLimit` are separately tunable because they answer
   // different questions: how much of the ranking to trust as a starting point,
