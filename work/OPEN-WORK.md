@@ -42,7 +42,7 @@ here. Read that record before changing anything below it.
 - 🔴 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)
 - 🔴 **W-240** · `arpit` — a scored set with a `step10_section` pool ≥ 6 (set-4-claude: 1). [Prompt 12](golden/prompts/12-claude-gen4-section-seed.md) written; Arpit runs it, then a rung rebuild (**Opus**), then 🔴 Arpit scores. [detail](open/W-240-section-pool-set.md)
 - 🔴 **W-237** · `arpit` — RM3 behind the `grounded` gate: **FAIL (no gain)** 2026-09-30. The removal (step 5) waits on Arpit's go-ahead; it is off at `0.0` meanwhile. [detail](open/W-237-rm3-grounded-gate.md)
-- 🟢 **W-242** · `agent` — one derived plane, both readers: Node reads each shard once (T0), reads `.fux/runtime/` when fresh (T1), builds it byte-identically (T2). Step 0 pre-registered; no code yet. **Opus.** [detail](open/W-242-shared-runtime.md)
+- 🟢 **W-242** · `agent` — one derived plane, both readers. **Tier 0 PASS** ([report](regression/2026-09-30-shared-runtime/report.md)). Next: Tier 1 (Node reads `.fux/runtime/`), then Tier 2. **Opus.** [detail](open/W-242-shared-runtime.md)
 
 
 ### testing

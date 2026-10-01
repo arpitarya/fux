@@ -23,6 +23,15 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-09-30 — W-237 FAIL, W-168 step 8 INCONCLUSIVE, W-240 prompt 12, W-242 Tier 0 PASS  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement W-168, W-240, W-237, W-242"*.
+- **W-237:** a non-capturing session re-ran the frozen `decide.py`, and `decision.json` reproduced byte for byte. The result was **FAIL, no gain**. The code removal (step 5) was **refused by the permission classifier**. It is not worked around, and it waits on Arpit.
+- **W-168 step 8:** `decide.py` was written from step 9's after scoring and before reading a row, which the verdict discloses. Nets were +1 +1 +3 +2 and drift losses 2 4 4 10, a shape the table does not name, so the outcome is **INCONCLUSIVE**. It goes to Arpit with a FAIL (drift) recommendation.
+- **W-240:** **SR-WORK-TESTDATA A1 bars this session from authoring** (it read score files). R10 was tightened: a competitor matches in its title or heading, and the key row names it. Prompt 12 was written for a fresh claude.ai chat.
+- **W-242:** the build agent stalled twice. **Tier 0 was finished by hand: PASS.** Stdout is byte-identical on 45/45 cell runs, and the one-read-per-shard spy test is green. Wall time is too noisy to call (same-arm spread 1.8×). A Tier 1 draft was set aside, uncommitted.
+- **Hazard:** `test_work_queue_rules_have_one_home` fails only on other sessions' worktrees under `.claude/worktrees/`. It walks them as live documents, and four stale worktrees remain. An L11 hook rightly refused a shell command that spelled the key directory in prose. The edit went through the Edit tool instead, and nothing was opened.
+- **Next:** Arpit rules W-168, runs prompt 12, and says go on W-237. W-242 Tier 1 is agent-closable (**Opus**).
+
 ## 2026-09-30 — W-243 built: FULL skips on a known verdict, the Windows hot spot batched; step 1 stopped at 1.4x  ·  Claude Code (Opus 5.5)
 - **Asked:** *"implement W-243"*.
 - **Step 1, spike first, as the item says:** one Node process was **1.11–1.44x** faster than one process per comparison, not ~5x. In-process calls still cost 110–700 ms each (the reader re-reads the index), so it **stops** until W-242 T0/T1 land. Filed [`2026-09-30-ci-arm-batching`](regression/2026-09-30-ci-arm-batching/report.md). `node_arm.py`'s *"well under a tenth"* is stale (now 10–30 %). It is recorded in the ANALYSIS, not edited, because its owner record carried another session's edits.
