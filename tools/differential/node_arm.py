@@ -412,7 +412,14 @@ print(json.dumps({
                 # a weaker check, it would be a meaningless one.
                 if self._decoded_citations(py_v):
                     continue
-            if py_v != nd_v:
+            # SR-RANKING decision 8a, as every other lane applies it. Until
+            # 2026-10-03 this lane compared raw floats, the second lane held to
+            # a stricter contract than the ruling (the first was `graph`, fixed
+            # by `_scores_at_round9`). Re-ingesting this repo then put a 2-ulp
+            # difference on a graph-boosted score at rank 3 and failed every
+            # OS x Node cell on a difference the ruling accepts.
+            # `tests/test_node_arm_tolerance.py` holds the lane to it.
+            if _scores_at_round9(py_v) != _scores_at_round9(nd_v):
                 out.append(f"api {method}: python={json.dumps(py_v, sort_keys=True)[:300]} "
                            f"node={json.dumps(nd_v, sort_keys=True)[:300]}")
         return out

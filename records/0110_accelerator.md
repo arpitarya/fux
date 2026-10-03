@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@561b2311a763, node/src/derive@0b3875f3aa7b, tools/differential@428da9044f96, src/fux/schemas/runtime.schema.json@9559934cb843]
+owns: [src/fux/derive@561b2311a763, node/src/derive@0b3875f3aa7b, tools/differential@0356db55374a, src/fux/schemas/runtime.schema.json@9559934cb843]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 4c2a1da08389f4409f1732bc16d0350b512eb4af87dedd2b749a30997294860f
+content_sha: 5029949c81639a76481b4c40d5908feb86f6b13f930745cb7b3c7b91e6f0a916
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -711,6 +711,8 @@ tier two. That means Node will also write."*
   `compat/pyjson.mjs`: code-point key order, `ensure_ascii` for `graph.json`
   alone, and exact integers. Decision 7's two invariants refuse a Node build as
   they refuse a Python one.
+
+**No decision here moved** (2026-10-03, the alpha.10 release CI): `tools/differential/node_arm.py`'s `api` lane now compares scores at `round(9)`, through the `_scores_at_round9` the `graph` lane already used. That is [SR-RANKING](0111_ranking.md) decision 8a's resolution, applied in every lane. A 2-ulp difference on a graph-boosted score failed all six OS x Node cells of shard 2/3, and the ruling accepts it. It is the second lane found stricter than the ruling, so `tests/test_node_arm_tolerance.py` is the gate (SR-WORK-SESSION decision 13).
 
 ### Consequences
 

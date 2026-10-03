@@ -11,7 +11,7 @@ owns: [node@f93121cd85d8, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: aaf01ffac8cf4c08bc7dce2fd424e58e3ab8597fcdf3849bb0849d59f99989ef
+content_sha: cd12f9cbb2fb1e10b49fa300a8276776ac585f65f1d1eb7ce302357150e8134c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -996,6 +996,8 @@ Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1 and 2 BUILT 2026-1
   rebuilds in memory even when it wrote the file itself. Decision 9's reason —
   a Node reader must answer where no Python has run — is what Tier 2 now also
   serves.
+
+**No decision here moved** (2026-10-03): the arm's `api` lane compares scores at `round(9)` like every other lane, under [SR-RANKING](0111_ranking.md) decision 8a. That lane exercises this record's library surface, `index.mjs` against `api.py`. See [SR-T1-ACCELERATOR](0110_accelerator.md)'s note of the same date.
 
 ### Consequences
 
