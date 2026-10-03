@@ -23,7 +23,7 @@
     "above, in a new costume."
   ],
 
-  "schema": "fux.runtime.v8",
+  "schema": "fux.runtime.v9",
 
   "postings_block_line": {
     "_doc": [
@@ -117,12 +117,10 @@
       "archived":   { "type": "bool" },
       "superseded": { "type": "bool" },
       "mtime":      { "type": "int",  "doc": "git commit time -- NOT wall clock at build time" },
-      "alen":       { "type": "int",  "doc": "anchor token total -- the words OTHER documents use to link here (W-168 step 1)" },
-      "authors":    { "type": "int",  "doc": "distinct author count from the committed record, or null with no history (W-168 step 8). A count, never an identity" },
-      "commits":    { "type": "int",  "doc": "commit count from the committed record, or null with no history (W-168 step 8)" }
+      "alen":       { "type": "int",  "doc": "anchor token total -- the words OTHER documents use to link here (W-168 step 1)" }
     },
     "example": {
-      "alen": 3, "archived": false, "authors": 2, "commits": 5, "flen": [990, 6, 1, 2], "id": "file:README.md",
+      "alen": 3, "archived": false, "flen": [990, 6, 1, 2], "id": "file:README.md",
       "loc": "README.md", "mtime": 1787688862, "superseded": false, "title": "Fux"
     }
   },

@@ -155,4 +155,4 @@ the pre-registration, before any arm.
   time.
 - [SR-RERANK](../../records/0138_rerank.md) — the one post-ranking stage U0
   joins; [SR-RANKING](../../records/0111_ranking.md) — the limits on it.
-- [W-168](../open/W-168-search-improvements.md) — the 2026-09-23 endpoint ruling.
+- W-168 (closed 2026-10-03) — the 2026-09-23 endpoint ruling.

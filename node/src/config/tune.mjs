@@ -82,7 +82,7 @@ const SCHEMA = {
   bm25f: ["k1", "b", ...FIELD_KEYS, "anchor"],
   ranking: [
     "rerank_weight", "rerank_depth", "rerank_coverage_power", "rerank_base", "rerank_span",
-    "rerank_adjacency", "expand_weight", "mined_weight", "intent_weight", "authority_weight",
+    "rerank_adjacency", "expand_weight", "mined_weight", "intent_weight",
   ],
   // The six `ask_*` keys are W-161's graph tier. They are parsed and carried
   // here so a consumer's committed `tune.toml` is accepted identically by both
@@ -196,7 +196,7 @@ export class Tune {
 const TUNE_FIELDS = [
   "k1", "b", "fieldWeights", "anchorWeight",
   "rerankWeight", "rerankDepth", "rerankCoveragePower", "rerankBase", "rerankSpan",
-  "rerankAdjacency", "expandWeight", "minedWeight", "intentWeight", "authorityWeight",
+  "rerankAdjacency", "expandWeight", "minedWeight", "intentWeight",
   "damping", "iterations", "laziness", "hopDecay", "expandLimit", "seedDepth", "pathLimit",
   "askBoost", "askRelated", "askKinds", "askLinkIdf", "askMaxHops", "askRelatedLimit",
   "separationFloor", "docCoverageFloor",
@@ -445,7 +445,6 @@ function resolve(data, label) {
     expandWeight: r("ranking", "expand_weight", nonNegative),
     minedWeight: r("ranking", "mined_weight", nonNegative),
     intentWeight: r("ranking", "intent_weight", nonNegative),
-    authorityWeight: r("ranking", "authority_weight", nonNegative),
     damping: r("graph", "damping", fraction),
     iterations: r("graph", "iterations", whole),
     laziness: r("graph", "laziness", fraction),

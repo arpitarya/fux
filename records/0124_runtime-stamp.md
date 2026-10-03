@@ -10,7 +10,7 @@ feature: "`.fux/runtime/stamp.json` — the cheap staleness pre-filter, and its 
 owns: []
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 8861db29bea6521505381f10e4aa4e33cf42084ab530237a9466b3819ac6eaba
+content_sha: 0238d83a701a774e9f922bbf55480d4d00fc4b2d721c7bcc93aa2685b5201315
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -141,9 +141,6 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
-
-**5. Unchanged by W-168 step 8 (2026-09-30).** The doc table's two new fields
-are covered by the same staleness check.
 
 ### Consequences
 

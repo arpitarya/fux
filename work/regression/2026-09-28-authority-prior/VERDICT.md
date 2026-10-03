@@ -2,9 +2,9 @@
 type: Verdict
 name: W-168-STEP-8-AUTHORITY-PRIOR
 description: "W-168 step 8, the git authority prior (authors × commits): INCONCLUSIVE by the frozen table and handed to Arpit. Every arm carries a positive sub-floor net on the 101 tagged questions (+1, +1, +3, +2) and every arm breaks the no-new-misses clause (2, 4, 4, 10 baseline rank-1 hits lost) — a case the table does not name. No value can be admitted, so `authority_weight` stays 0.0 whatever the ruling."
-verdict: INCONCLUSIVE
+verdict: FAIL
 verdict_by_table: INCONCLUSIVE
-ruled_by: "pending — Arpit"
+ruled_by: "Arpit, 2026-10-03 (Cowork): FAIL (drift); option (c) — remove the prior code and the M/ count fields"
 prediction: W-168-STEP-8-AUTHORITY-PRIOR
 pre_registration: work/regression/2026-09-28-authority-prior/PRE-REGISTRATION.md
 run: 2026-09-28-authority-prior
@@ -14,6 +14,14 @@ classification: informed
 ---
 
 # VERDICT: INCONCLUSIVE by the table — the call is Arpit's
+
+✅ **Ruled FAIL (drift), 2026-10-03 (Arpit, Cowork): *"For 168, go with C."*** The
+prior's code and the two `M/` counts are removed, and the index moves to
+`fux.index.v7`. **Built the same day** (Claude Code, Opus). `ask`/`find --json`
+are unchanged at the shipped `authority_weight = 0.0`, which no longer exists.
+[SR-TUNE](../../../records/0135_tuning.md) d15d and
+[SR-INDEX-LIFECYCLE](../../../records/0108_index-lifecycle.md) d17 hold the
+outcome. The text below is the decision as filed.
 
 Judged against [`PRE-REGISTRATION.md`](PRE-REGISTRATION.md) §"The decision rule,
 frozen". No threshold moved.

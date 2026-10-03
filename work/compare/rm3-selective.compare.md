@@ -137,5 +137,5 @@ the trigger above says what would bring it back.
 - [SR-EXPAND](../../records/0149_expand.md) decisions 16 (as built) and 17 (removal).
 - [`2026-09-23-rm3`](../regression/2026-09-23-rm3/VERDICT.md) and [`2026-09-25-rm3-boosted`](../regression/2026-09-25-rm3-boosted/VERDICT.md): the verdicts, the frozen `decide.py`, and the per-query rows this doc's table recomputes.
 - [SR-CONFIDENCE](../../records/0141_confidence.md): the band.
-- [W-168](../open/W-168-search-improvements.md) step 5.
+- W-168 (closed 2026-10-03) step 5.
 - Lavrenko & Croft (SIGIR 2001): relevance models. Abdul-Jaleel et al. (TREC 2004): RM3.

@@ -382,9 +382,6 @@ def accel_candidates(
             "archived": bool(docs[docidx].get("archived")),
             "superseded": bool(docs[docidx].get("superseded")),
             "mtime": docs[docidx].get("mtime"),
-            # W-168 step 8 — `Weighting.of` reads these on both paths.
-            "authors": docs[docidx].get("authors"),
-            "commits": docs[docidx].get("commits"),
             "terms": {term: list(tf) for term, tf in terms.items()},
         }
         for docidx, terms in hits.items()

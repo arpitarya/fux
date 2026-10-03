@@ -11,17 +11,11 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 ### Changed
 
 - **The Node reader reads each index shard once per query** (W-242 Tier 0). It used to read each one three or four times: in the scan, the mined-pair table, the graph tier and every display lookup. Output is byte-identical. Nothing is cached between calls, so `fux mcp` and a library `Index` still see an index that changes under them.
-- ⚠ **Breaking: index format `fux.index.v6`** (runtime `fux.runtime.v8`).
-  Git-sourced documents carry two counts, `authors` and `commits`, from ingest's
-  existing `git log` walk. No name or email is written. A v5 index is refused
-  until `fux ingest --full`, and every git-sourced index root moves once
-  (W-168 step 8).
-
-### Added
-
-- **`[ranking] authority_weight`** (default `0.0`, off, unmeasured): a
-  multiplicative git authority prior, `1 + w · (1 − 1/(authors × commits))`, in
-  both readers. `fux lexical` never applies it.
+- ⚠ **Breaking: index format `fux.index.v7`** (runtime `fux.runtime.v9`). A v5
+  index is refused until `fux ingest --full`. v7 has the same record shape as
+  v5; the number moves forward because an unreleased v6 carried two git counts
+  for an authority prior that failed its measurement and was removed (W-168
+  step 8). Every index root moves once on upgrade.
 
 ### Removed
 
@@ -30,6 +24,10 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   pre-registered run with no gain
   ([verdict](work/regression/2026-09-30-rm3-grounded/VERDICT.md)). Nothing
   changes for a released `tune.toml`; the refusal now names both removals.
+- **The git authority prior never ships** (W-168 step 8). It was built at `0.0`,
+  measured, and lost rank-1 answers at every weight
+  ([verdict](work/regression/2026-09-28-authority-prior/VERDICT.md)). No release
+  carried `authority_weight`.
 
 ### Fixed
 

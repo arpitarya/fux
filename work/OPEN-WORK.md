@@ -34,7 +34,6 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-168** · `agent` — ranking ideas. 10 → W-236; 5 (RM3) removed. **Step 8 ruled 2026-10-03: delete it all (index v7). Built in the tree with a v7 index; records and close left.** **Opus.** [detail](open/W-168-search-improvements.md)
 - 🔴 **W-225** · `agent` — L12 migration: no values hidden in code. Stages 1–7 and the 16 odd sites landed. Left: stage 5f `inspect`, **waiting on W-228**, then stage 8. **Opus.** [detail](open/W-225-values-live-in-config.md)
 - 🔴 **W-228** · `arpit` — document families. The lens is built, but its misfit threshold is a placeholder: no known misfits exist yet. Arpit runs prompt 13 to plant 3, riding in gen 4 with W-240. [detail](open/W-228-document-families.md)
 - 🔴 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)

@@ -10,7 +10,7 @@ feature: "`.fux/runtime/manifest.json` — the derived plane's freshness contrac
 owns: []
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 918375407c38825ba50b0db6284656f65f8bca6a3806014c41f57b6a260e2916
+content_sha: 7c1eee2ebf442443445198e02c55df2a2cf7f78249ccc406c811a9544b7c3b10
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -155,8 +155,12 @@ accelerator directly comparable to a local one.
 only; **`manifest.json`'s content hashes are what a reader trusts when it needs
 to know, not guess.**
 
-**5. `schema` is `fux.runtime.v7` since 2026-09-27** (W-168 step 4): the plane
-gained `mined.json`. A v6 plane is refused and rebuilt, not read as "no pairs".
+**5. `schema` is `fux.runtime.v9` since 2026-10-03.** v7 (2026-09-27, W-168
+step 4): the plane gained `mined.json`, and a v6 plane is refused and rebuilt,
+not read as "no pairs". v8 (2026-09-30, W-168 step 8): `docs.jsonl` gained
+`authors` and `commits`. v9 (2026-10-03): those two left with the authority prior
+([verdict](../work/regression/2026-09-28-authority-prior/VERDICT.md)). `docs_fields` is v7's again, and the number moves
+forward so that a v8 plane is refused rather than read.
 
 <!-- L12-VALUES-START -->
 
@@ -175,10 +179,6 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
-
-**6. `schema` is `fux.runtime.v8` since 2026-09-30** (W-168 step 8): the doc
-table gained `authors` and `commits`. A v7 plane is refused and rebuilt, not read
-as "no history"; `docs_fields` moves with it.
 
 ### Consequences
 

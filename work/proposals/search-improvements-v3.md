@@ -7,7 +7,7 @@ timestamp: 2026-09-13T00:00:00Z
 filed: 2026-09-13
 ---
 
-**Graduated 2026-09-14 → [W-168](../open/W-168-search-improvements.md)** (Arpit). This file stays the spec the item points at.
+**Graduated 2026-09-14 → W-168 (closed 2026-10-03)** (Arpit). This file stays the spec the item points at.
 
 # Ten ways to rank better — the 3.0 search backlog
 
@@ -104,7 +104,7 @@ the gain on the target questions **and** zero new misses elsewhere.
 | 9 intent prior | declared, not inferred; an undeclared repo is byte-identical | intent-labelled questions | gain clears the floor | fails → the declaration key stays, weight 0 |
 | 10 section units | a plane change — its own compare doc before any test | long-document questions | its own pre-registration | its own doc decides |
 
-⚠ **Endpoints, ruled 2026-09-23 (Arpit, [W-168](../open/W-168-search-improvements.md)):** RM3 and the intent prior are judged at **rank 1** (`hit@1`, with `primary@1` beside it); SDM, MMR and section units keep the measures in this table. ⚠ **This table numbers the ideas differently from W-168's steps** — RM3 is `#4` here and step 5 there; W-168's numbering is the one the queue uses.
+⚠ **Endpoints, ruled 2026-09-23 (Arpit, W-168 (closed 2026-10-03)):** RM3 and the intent prior are judged at **rank 1** (`hit@1`, with `primary@1` beside it); SDM, MMR and section units keep the measures in this table. ⚠ **This table numbers the ideas differently from W-168's steps** — RM3 is `#4` here and step 5 there; W-168's numbering is the one the queue uses.
 
 - **"Remove" means the default is off and the record says why**, not that
   the code is deleted in the same change — a measured negative is evidence

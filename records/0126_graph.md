@@ -10,7 +10,7 @@ feature: the graph lane — three relational verbs, a derived plane, and a lazy 
 owns: [src/fux/graph@a32ab4cc2604, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@61ee1cbb84df, node/src/verbs/graph.mjs@9567daf3e79e, src/fux/schemas/graph.schema.json@19bd4c486035]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 545ef48553b0dc97af4b5b8f8db56132798d17581778fe22a1c6c0c55fa09c5e
+content_sha: b36bc4525facb6ce146f378b603262710df2d116811a90648b77b95611c76a0b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -459,7 +459,7 @@ contributes to it — so it is folded at read time, which is what keeps a
 one-file commit from producing a corpus-wide diff and what kept
 [L4](0006_LAW-4-deterministic.md) out of the conversation entirely.
 
-⚠ **Step 5 of [W-168](../work/open/W-168-search-improvements.md) —
+⚠ **Step 5 of W-168 (closed 2026-10-03) —
 supersession-aware ranking — reads this same in-edge map.** *"The successor
 inherits the target's anchor text"* is a second read-time fold over one
 structure, not a second cross-document committed byte. Nothing about it is built

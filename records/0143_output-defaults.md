@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@dbd9fda25aa9, src/fux/templates/output.toml.txt@ee3226cd6dcd, .fux/output.toml@38f72dd71a22, node/src/config/output.mjs@ae4f709222ac]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 2510cc362f26c3e0eebcb7564a500858e22ed41c4db163cc93eec25f0a28f2d5
+content_sha: d1bc4f65b0d6796cf8b4a3b2876f7236246be12acae107135d89ee4cc1ea53d3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -834,11 +834,6 @@ anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
 `fux identifiers`'s `--json` and `--write` are not output-gated: the verb has no `.fux/output.toml` table, so both default to off rather than to `None` ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 **`doctor`, `identifiers` and `enrich` declare `progress_threshold`** in `CLI_VERBS`, on both readers (W-238, 2026-09-29; [SR-CLI](0101_cli-surface.md) decision 17). They now paint the bar, and the one `Progress` a verb builds reads its threshold from this file (L12). `identifiers` and `enrich` gained `--no-output-config` (decision 15), and `identifiers --json` defaults to `None` (decision 10). As a result `[cli.json] identifiers` is now a key a file may set. The template's comment names the three verbs.
-
-**No output default changed with the authority prior** (W-168 step 8,
-2026-09-30). `query/__init__.py` passes `authority_weight` to `Weighting` and
-`--why`; the switch lives in `.fux/tune.toml` ([SR-TUNE](0135_tuning.md)
-decision 21), not here.
 
 ### Consequences
 

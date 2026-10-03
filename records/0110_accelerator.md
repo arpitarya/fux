@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@f143d7fab874, tools/differential@5f789d2db31b, src/fux/schemas/runtime.schema.json@f9a25a4fcdb1]
+owns: [src/fux/derive@561b2311a763, tools/differential@5f789d2db31b, src/fux/schemas/runtime.schema.json@9559934cb843]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 77f645ced367332ab7444395edb9ccdea0fb512632643b8d59dda0f3abb11b24
+content_sha: ce5f629d8470c96b4f8e14668e2a10b049ab6a28520f42cd9119caf3eb0e41dc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -665,13 +665,11 @@ payloads at every arm weight in `tests/query/test_mined.py`.
 
 `accel.ask` analyzes the question with the repo's identifier families exactly as the scan does, so `--fast` and `--scan` hash the same terms ([SR-IDENTIFIERS](0160_identifiers.md)).
 
-**17. Veto 5 binds the authority prior, and the bound carries `1 + w`**
-(W-168 step 8, 2026-09-30; [SR-RANKING](0111_ranking.md) decision 14). The
-candidate dicts carry `authors` and `commits` from the doc table, so
-`Weighting.of` reads the same counts on both paths, and `weighting.maximum`
-multiplies in `1 + authority_weight`, a supremum because `f < 1`. Nothing else
-in the candidate or bound code moved. `RUNTIME_SCHEMA` is v8, so a v7 plane is
-refused and rebuilt rather than read as "no history".
+**17. ~~Veto 5 binds the authority prior, and the bound carries `1 + w`~~ —
+REMOVED 2026-10-03** (W-168 step 8, [verdict](../work/regression/2026-09-28-authority-prior/VERDICT.md)). The
+prior and its counts are gone, so the doc table and `weighting.maximum` are as
+they were before it. `RUNTIME_SCHEMA` moves forward to **v9**, not back to v7,
+so that a v8 plane, which carries the counts, is refused and rebuilt.
 
 **18. 🟠 The plane has two writers and two readers — ratified 2026-09-30
 (Arpit), NOT BUILT** ([W-242](../work/open/W-242-shared-runtime.md);

@@ -11,7 +11,7 @@ feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule
 owns: []
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: f486ec9151c063bddf7b75dd978a2dd1608e880eecbb3c0aff12acfb343a38b3
+content_sha: 3d312aaf4d7bf4e06e434d9198d594c29043709394aeb2d214bc87f8b737752f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -226,10 +226,6 @@ this moved where they are written, not what they are.
 
 
 The stats plane is unchanged by identifier families; the scan and the accelerator analyze the question with them identically, so `df` and `n` stay one pair ([SR-IDENTIFIERS](0160_identifiers.md)).
-
-**8. Unchanged by W-168 step 8 (2026-09-30).** The authority counts live on the
-doc table ([SR-DOCS-TABLE](0122_docs-table.md) decision 7) and add nothing to
-`stats.json`: the prior needs no corpus statistic, which is S2's point.
 
 ### Consequences
 

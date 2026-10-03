@@ -10,7 +10,7 @@ feature: "`.fux/runtime/docs.jsonl` — the derived doc table and the join key i
 owns: []
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 9f7dc406cfc4d3cee586752cacab118ddd28d7c891a234d7ab7dff6f05a6c532
+content_sha: 08519da83eef27b8387d88ee2c4ea422a4a9bbe2257004900b2abc3da6852169
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -174,12 +174,6 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
-
-**7. `authors` and `commits` joined the table on 2026-09-30** (W-168 step 8,
-`RUNTIME_SCHEMA` v8). Copied from the committed record, `null` with no history,
-for the reason `superseded` and `mtime` are: the scan reads them off the line,
-so the accelerator must read the same numbers here or the two paths weight one
-document differently.
 
 ### Consequences
 

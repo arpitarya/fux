@@ -10,7 +10,7 @@ feature: section records — the committed section plane, the index section rule
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: 684d6416d329933978b3d22a24ad87fbff6aac76907baa7eeb959b0b6cf54925
+content_sha: 37dc9ae52213f6236440d6b89b7fb65b58905752c902a4856e561a1175d07d68
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -239,8 +239,8 @@ decision 9.1, and `fux ingest --full` is the migration.**
 
 - A plane and a property appear, and an older index could not say *no
   multi-section documents* versus *predates section records*. That is the
-  W-48 trap. So `_format` moves to the next version (`fux.index.v6` if nothing
-  else bumps first). `analyzer` and `tf_fields` are untouched.
+  W-48 trap. So `_format` moves to the next version (`fux.index.v8` if nothing
+  else bumps first; v6 and v7 were spent by W-168 step 8 and its removal). `analyzer` and `tf_fields` are untouched.
 - The migration is decision 10a's `--full` through the foreign-index seam.
   Section records are `carried` with their document when the document's sha is
   unchanged, and `extract.RULES_VERSION` bumps with the rule.

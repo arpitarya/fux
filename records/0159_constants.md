@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@e7f0b058df4b]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@00fd3b21a884]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: e25882979342748b5c0c345d2e86abdecaf67f71361e04cdb7aadb6d86b40107
+content_sha: e8453fbb2775315f6d8874e92d4611dcd3f249810c6a8e2b5cb9527dbfd94570
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -31,7 +31,7 @@ ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-
 **Law [L12](0014_LAW-12-values-live-in-config.md) gives every value one home.**
 A *tunable* value — one a person could choose differently — lives in the
 consumer's own TOML. A *fixed* value is different: changing it changes what a
-committed byte means. `fux.index.v5`, the name `graph.json`, a decoder's
+committed byte means. `fux.index.v7`, the name `graph.json`, a decoder's
 `VERSION`, the eight bytes of a PNG chunk header. Nobody should edit those per
 repository, and both runtimes must agree on every one.
 
@@ -179,12 +179,6 @@ pattern. A consumer who wants other cues is I2, which is not built.
 
 
 **`[identifiers]`** holds the identifier-family constants — `flexible_separators`, the shard-header key and the digest's width — and `[files] identifiers` and `[templates] identifiers` name the file and its template ([SR-IDENTIFIERS](0160_identifiers.md)).
-
-**`[index] schema` is `fux.index.v6` and `[runtime] schema` `fux.runtime.v8`
-since 2026-09-30** (W-168 step 8), and `[runtime] docs_fields` gained `authors`
-and `commits` ([SR-INDEX-LIFECYCLE](0108_index-lifecycle.md) decision 16,
-[SR-DOCS-TABLE](0122_docs-table.md) decision 7). The weight is a tunable and
-lives in `.fux/tune.toml` ([SR-TUNE](0135_tuning.md) decision 21), not here.
 
 ### Consequences
 

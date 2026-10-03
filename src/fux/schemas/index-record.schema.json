@@ -46,18 +46,10 @@
     "declares in its own text, analyzed and hashed like `terms`. Absent when",
     "there is none (omit_when). It is a function of THIS document's bytes, so",
     "it is carried; the corpus-wide table is a read-time fold of every record's",
-    "pairs (query/mined.py) and is committed nowhere. Hashes, not text (L3).",
-    "",
-    "AUTHORS and COMMITS, W-168 step 8 (2026-09-30, _format v6). Two ints on a",
-    "git-sourced record from ingest's one history walk: `commits` is how many",
-    "commits list the path, `authors` how many distinct case-folded author",
-    "emails those commits carry. Absent when there is no history (a url record,",
-    "no repository, a shallow clone, a failed walk). COUNTS ONLY: no name, email",
-    "or hash of either is ever written. Like `mtime`, recomputed every run and",
-    "never carried."
+    "pairs (query/mined.py) and is committed nowhere. Hashes, not text (L3)."
   ],
 
-  "schema": "fux.index.v6",
+  "schema": "fux.index.v7",
 
   "fields": {
     "id":         { "type": "str",  "required": "always" },
@@ -78,9 +70,7 @@
 
     "archived":   { "type": "bool", "required": "never", "omit_when": false },
     "superseded": { "type": "bool", "required": "never", "omit_when": false },
-    "mtime":      { "type": "int",  "required": "never" },
-    "authors":    { "type": "int",  "required": "never" },
-    "commits":    { "type": "int",  "required": "never" }
+    "mtime":      { "type": "int",  "required": "never" }
   },
 
   "_examples_doc": [
@@ -113,9 +103,7 @@
         { "al": 2, "at": { "000219ac0fa26dbb": 1, "8f1c2d3e4a5b6071": 1 },
           "dst": "file:docs/adr-storage.md", "grade": 10, "kind": "ref" }
       ],
-      "mtime": 1787688862,
-      "authors": 3,
-      "commits": 4
+      "mtime": 1787688862
     },
 
     "url": {

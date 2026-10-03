@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-24
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@d14a1d08f380, .fux/tune.toml@f362563f7aa3, node/src/config/tune.mjs@691bd1c8bc7d]
+owns: [src/fux/tune.py@f5fe482723d1, .fux/tune.toml@fbc012c8ee4f, node/src/config/tune.mjs@d9a132c42f83]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 8fe88455755c7e208d4a7a59ec5f6ca65c8992afad9dca9b9ed2fe5d0b38e251
+content_sha: 5d70ab573864bf84a832e3801292f549ba41d4d4a9bdbd4a2b643bd2beb7b35d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -759,7 +759,6 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + ranking.expand_weight
 + ranking.mined_weight
 + ranking.intent_weight
-+ ranking.authority_weight
 + graph.damping
 + graph.iterations
 + graph.laziness
@@ -883,6 +882,24 @@ next.
 the query-side mechanism — an `--intent` flag, an `--as-of` date lens, or
 surfacing the supersession chain instead of ranking for it. It is an **unopened
 fork with no compare doc.**
+
+**15d. The git authority prior was measured and never shipped** (Arpit,
+2026-10-03, W-168 step 8: *"For 168, go with C."*). `authority_weight`
+multiplied a document's score by `1 + w · (1 − 1/(authors × commits))`, from two
+counts on `M/` ([`compare/authority-prior`](../work/compare/authority-prior.compare.md),
+A3 · S2 · L1). Against [the frozen bar](../work/regression/2026-09-28-authority-prior/PRE-REGISTRATION.md)
+every weight netted +1 to +3 at rank 1, below the floor, and every weight lost
+baseline rank-1 hits (2 · 4 · 4 · 10;
+[verdict](../work/regression/2026-09-28-authority-prior/VERDICT.md)). The table
+has no row for that shape. Arpit ruled it **FAIL (drift)** and chose option (c):
+**remove the code and the counts**, at the price of the index-format bump to v7
+([SR-INDEX-LIFECYCLE](0108_index-lifecycle.md) decision 17).
+
+- **It is not in decision 15's refused table.** No release carried the key
+  (`v3.0.0-alpha.9` predates it), so no `fux setup` wrote it into a consumer's
+  `tune.toml`, and an unknown key is already an error that names the file.
+- **It is decision 15's structural failure again, from a different input**: a
+  per-document number cannot carry which document a question wants.
 
 **16. `[graph]`'s six `ask_*` keys — the graph tier's, and the two booleans
 exist so the arms can be withdrawn separately** (W-161, 2026-09-14).
@@ -1085,25 +1102,6 @@ this moved where they are written, not what they are.
 **No tune key changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/tune.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
-
-**21. `[ranking] authority_weight`, default `0.0`** (W-168 step 8, 2026-09-30;
-ruled A3 · S2 · L1 by Arpit on 2026-09-28, [compare doc](../work/compare/authority-prior.compare.md);
-[frozen bar](../work/regression/2026-09-28-authority-prior/PRE-REGISTRATION.md)). The git authority prior.
-
-- **It scales a git-sourced document by `1 + authority_weight × (1 −
-  1/(authors × commits))`**, from the two counts ingest commits on its record
-  ([SR-INGEST](0106_ingest.md) decision 24). No corpus coupling and no second
-  key (S2): a one-person, one-commit document gets exactly `1.0`.
-- **`0.0` is off, and off reads no count.** The facts are committed and the
-  weight is tunable — decision 1's split, the one `mtime` sits on.
-- **Inside decision 1's boundary.** Read at query time; moving it moves no
-  committed byte and needs no re-ingest.
-- **`fux lexical` forces it to `0.0`**, in both readers, as it does
-  `mined_weight` and `intent_weight`.
-- ⚠ **UNMEASURED, and off pending the verdict.** The five arms are captured and
-  not scored. A PASS would move the default, and — unlike step 9's — it would
-  move every git-sourced consumer's ranking on upgrade, because the counts need
-  no declaration.
 
 ### Consequences
 

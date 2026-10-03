@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@d6b05931e051, node/src/store/format.mjs@e5bfa485065c, node/src/store/reader.mjs@e0f7a8fcc41e]
+owns: [src/fux/store@75e6630e087e, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@e0f7a8fcc41e]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: e3bd1d17446ce80c0e2a9026abca8f819bec592af9968c5b56fb60ce3d0018bb
+content_sha: 261f5d4ceb83cf313447c4427935824a71950e4bc692655373f82c195bf9ae66
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -586,6 +586,21 @@ history or the index predates the counts.
   Step 8's arms run on a re-ingested copy, never on a rung (the bar, step 3 of
   its arms). ⚠ **Every git-sourced index root moves once on upgrade**, whatever
   `authority_weight` is — the counts are facts, written at `0.0` too.
+
+**17. `_format` bumped to `fux.index.v7` on 2026-10-03** (W-168 step 8 removed),
+by decision 9.1 in the other direction: **a property left.** The authority prior
+failed its frozen bar ([verdict](../work/regression/2026-09-28-authority-prior/VERDICT.md)), and Arpit
+ruled option (c): remove the prior's code **and** the two counts. A v7 record has
+exactly v5's property set.
+
+- **The number moves forward, never back to v5.** A v6 index holds `authors` and
+  `commits`, which a v7 reader has no rule for. Calling the new shape v5 would
+  give two different shapes on disk the same name, which is the trap
+  [SR-RECORD](0109_index-record.md) names.
+- **`analyzer` and `tf_fields` are untouched.** The migration is decision 10a's
+  `fux ingest --full`, and this repo's own index was re-ingested in the same
+  change. v5 and v6 indexes are refused.
+- Decision 16 stays as the record of v6. v6 was never in a release.
 
 **No decision here moved** ([W-242](../work/open/W-242-shared-runtime.md) Tier 0, 2026-09-30; [SR-NODE-SEARCH](0153_node-search.md) decision 24): `node/src/store/reader.mjs` gains `Shards`, a per-call set that reads each committed shard once, and `iterShardPaths` now uses `reader.py`'s shard-name grammar (`[0-9a-f]{2}.jsonl`, files only) rather than any `*.jsonl`. Output is byte-identical.
 

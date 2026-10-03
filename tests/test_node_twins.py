@@ -63,7 +63,7 @@ NARROWED = {
     # functions the QUERY plane calls, and the walk moves constantly for
     # reasons `archived_dirs` never sees.
     "ingest/gitdir.mjs": "archived_dirs",
-    # `priors.py` carries the git half (`git_history`) as well, which is
+    # `priors.py` carries the git half (`git_commit_times`) as well, which is
     # an ingest concern with no Node twin. `recency_multiplier` was the narrowed
     # symbol until 2026-09-13, when it was deleted with the knob it served
     # (W-152); `superseded_ids` is what is left on both sides.

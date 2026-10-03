@@ -2,12 +2,19 @@
 type: Compare Doc
 title: "W-168 step 8 — the git authority prior: which statistic, how it is scaled, where it lives, and the recency trap"
 description: "Step 8 prefers a document many people maintain over one person's single draft. Three forks decide its shape before a pre-registration can be written: the statistic (distinct authors, commits, or their product), its scaling (normalised to the corpus maximum, a keyless saturating form, or a log with a cap key), and where the counts live (two integers on each M/ record, a separate plane, or written only when the weight is on). The trap is recency: authority grows with age, and SR-TUNE decision 15 removed three document priors for failing exactly this way. Endpoint already ruled: hit@1, primary@1 beside it. Forks ruled A3 · S2 · L1 by Arpit on 2026-09-28; pre-registered the same day."
-status: ruled 2026-09-28 (Arpit) — A3 · S2 · L1; pre-registered, not built
+status: CLOSED 2026-10-03 — measured, ruled FAIL (drift) by Arpit, removed with its counts (option c, index v7)
 timestamp: 2026-09-28T00:00:00Z
 filed: 2026-09-28
 ---
 
 # The git authority prior — W-168 step 8
+
+> 🔴 **OUTCOME, 2026-10-03: FAIL (drift), removed.** Every weight netted +1 to +3
+> at rank 1 and lost 2 · 4 · 4 · 10 baseline rank-1 hits ([verdict](../regression/2026-09-28-authority-prior/VERDICT.md)).
+> Arpit ruled option (c): the prior's code and the two `M/` counts are gone, and
+> the index format moved to `fux.index.v7`
+> ([SR-TUNE](../../records/0135_tuning.md) d15d). The document below is the
+> ruling as it was made.
 
 **Model: Opus.** A document prior moves rank 1 on every question it touches,
 and this repo has already removed three of them.
@@ -19,7 +26,7 @@ derived from commit metadata, never wall-clock; **recency bias is the trap**"*.
 [SR-TUNE](../../records/0135_tuning.md), [SR-INGEST](../../records/0106_ingest.md)
 (the `M/` fact), [SR-T1-ACCELERATOR](../../records/0110_accelerator.md) (veto 5),
 [SR-RS](../../records/0133_predictions.md) (the measurement).
-**Item:** [W-168](../open/W-168-search-improvements.md) step 8.
+**Item:** W-168 (closed 2026-10-03) step 8.
 
 ---
 
@@ -168,7 +175,7 @@ clause above is what tests it.
 ## References
 
 - [`proposals/search-improvements-v3.md`](../proposals/search-improvements-v3.md) §1 idea #8, §3b
-- [W-168](../open/W-168-search-improvements.md) §STEPS 7 AND 8 ENDPOINTS RULED (2026-09-28)
+- W-168 (closed 2026-10-03) §STEPS 7 AND 8 ENDPOINTS RULED (2026-09-28)
 - [SR-TUNE](../../records/0135_tuning.md) decisions 1, 13, 15, 15b: the removed priors and why
 - [SR-T1-ACCELERATOR](../../records/0110_accelerator.md) veto 5: any multiplier reaches the bound
 - [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md) R9 / T11: the authority pairs and the history

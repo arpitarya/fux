@@ -56,8 +56,6 @@ export function archivedRanking(root, tune, query = "") {
     archivedWeight: tune.archivedWeight,
     archivedDirs: dirs,
     priority: tune.priority,
-    // W-168 step 8. 0 leaves `Weighting` as it was before the key existed.
-    authorityWeight: tune.authorityWeight,
     ...intentPrior(tune, query),
   });
 }
@@ -176,12 +174,9 @@ export function runQuery(root, query, top, {
   // below would then be `undefined` and every score would be computed at
   // default weights, on the frozen baseline verb, with nothing failing.
   // W-168 step 4: the frozen baseline never folds mined pairs either.
-  // W-168 step 9: nor applies the intent prior. W-168 step 8: nor the authority prior.
-  if (!compose) {
-    resolved = withTier(resolved, {
-      askBoost: false, askRelated: false, minedWeight: 0.0, intentWeight: 0.0, authorityWeight: 0.0,
-    });
-  } else if (wantRelated === false) resolved = withTier(resolved, { askRelated: false });
+  // W-168 step 9: nor applies the intent prior.
+  if (!compose) resolved = withTier(resolved, { askBoost: false, askRelated: false, minedWeight: 0.0, intentWeight: 0.0 });
+  else if (wantRelated === false) resolved = withTier(resolved, { askRelated: false });
   // After the two lines above, `wantRelated` and `resolved.askRelated` agree, so
   // the tier reads one of them and the verb reads the other without either
   // having to know about the flag that set it.

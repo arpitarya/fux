@@ -7,7 +7,19 @@ filed: 2026-09-14
 ball: agent
 ---
 
-## ✅ STEP 8 RULED: FAIL (drift), REMOVE ALL — 2026-10-03 (Arpit, Cowork) · ratified, NOT built
+## ✅ CLOSED 2026-10-03 — every step resolved (Claude Code, Opus)
+
+Steps 1, 4 and 9 shipped. Steps 2, 3, 6 and 7 stopped. Step 5 (RM3) and step 8
+(the authority prior) were measured, failed and were removed. Step 10 lives on
+as W-236. **Step 8's removal is built**: the prior's code and the two `M/` counts
+are gone in both readers, and the index is `fux.index.v7` / runtime `v9`,
+re-ingested. On a copy of rung-01000 with git history, the step-8 code (v6, at
+`0.0`) and this tree (v7) gave byte-identical `ask`/`find --json`, 120/120 in
+Python and Node. Live successors: [SR-TUNE](../../records/0135_tuning.md) d15d,
+[SR-INDEX-LIFECYCLE](../../records/0108_index-lifecycle.md) d17, and the
+[proposal](../proposals/search-improvements-v3.md) the item graduated from.
+
+## ✅ STEP 8 RULED: FAIL (drift), REMOVE ALL — 2026-10-03 (Arpit, Cowork) · ratified; built the same day
 
 **Arpit, 2026-10-03:** *"For 168, go with C."* — on the question below: verdict **FAIL (drift)** (recommended), and option **(c)**: remove the prior's code **and** the two `M/` count fields, accepting an index-format bump (`fux.index.v6` → `v7`) and a re-ingest. He chose (c) over (b) "keep the counts, drop the code" and (a) "keep all off at `0.0`".
 

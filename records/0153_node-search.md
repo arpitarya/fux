@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@ecc6f0704921, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@0cf84795530a, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: c988aa83f5e2a7a6b397e12df26672feb7115f5322cff241cc542c0ea7077d6e
+content_sha: 386f5e077af01d52325f95a4fc9c0de3b12de73cf030cc87408976ff51fde713
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -937,16 +937,10 @@ this moved where they are written, not what they are.
 
 **`node/src/config/output.mjs`'s `CLI_VERBS` gains `identifiers` and `enrich`, and `doctor` gains `progress_threshold`** (W-238, 2026-09-29). All three are Python-only verbs, declared so that one committed `output.toml` validates the same way on both readers ([SR-OUTPUT](0143_output-defaults.md)). No Node verb's behaviour changed.
 
-**23. The authority prior is transcribed, not diverged** (W-168 step 8,
-2026-09-30). `Weighting` in `rank.mjs` carries `authorityWeight` and
-`authorityFor`, `authorityProduct` twins `rank.py::authority_product`,
-`archivedRanking` passes the weight, `tune.mjs` reads the key, and `fux lexical`
-forces it to `0` in `runQuery`. The multiplication order is Python's — priority,
-intent, authority — so the product rounds alike; the counts come off the parsed
-record like `mtime`, so nothing new is read. **A test compares both readers'
-`ask` and `lexical` at `0.0` and `0.3`**, and the factor itself at four
-weights. `--why` has no Node twin, as for step 9. Off at `0.0` pending the
-verdict.
+**23. ~~The authority prior is transcribed, not diverged~~ — REMOVED
+2026-10-03** (W-168 step 8, [verdict](../work/regression/2026-09-28-authority-prior/VERDICT.md)). `Weighting`
+lost `authorityWeight` and `authorityFor` in `rank.mjs`, in the same change as
+`rank.py`, so the differential law is held by the deletion itself.
 
 **24. 🟠 Node joins the derived plane — as a reader and as a builder.
 Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1–2 not built**
