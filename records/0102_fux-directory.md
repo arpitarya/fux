@@ -8,16 +8,17 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@e9806d6c1a60, src/fux/setup.py@347155bc8be7, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@e9806d6c1a60, node/src/store/fuxdir.mjs@40b2788b27f9, src/fux/setup.py@347155bc8be7, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5a2ffdd2a68da7bbf4e0f870563a7fb62fe8123044e2ac9bcaa4ace3f9d9c8f3
+content_sha: 466592b0fa65a9e09c5f94784256347bf6694db64a4f7b79039ab98085ca77ab
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/store/fuxdir.mjs`](../node/src/store/fuxdir.mjs) · file
 - [`src/fux/setup.py`](../src/fux/setup.py) · file
 - [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) · file
 - [`tests/test_verb_table_agreement.py`](../tests/test_verb_table_agreement.py) · file
@@ -932,6 +933,8 @@ line raises names the fix itself rather than pointing at the header.
 
 
 **`identifiers.toml` and `inspect.toml` are declared committed files** (`COMMITTED_FILES`). `fux setup` and `fux doctor --fix` write `identifiers.toml` whole from its template when it is absent, and both of its tables are the consumer's (`never`), so only the file's existence is enforced ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+**No decision here moved** (W-242 Tier 2, 2026-10-03): `node/src/store/fuxdir.mjs` is a narrow twin of `fuxdir.py`, `derived_dir` alone, owned here with its Python half. The layout is unchanged; a second runtime now creates `runtime/`.
 
 ### Consequences
 

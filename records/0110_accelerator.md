@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@561b2311a763, node/src/derive@ae72ed160f6d, tools/differential@428da9044f96, src/fux/schemas/runtime.schema.json@9559934cb843]
+owns: [src/fux/derive@561b2311a763, node/src/derive@0b3875f3aa7b, tools/differential@428da9044f96, src/fux/schemas/runtime.schema.json@9559934cb843]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 6ba5063b7c92f3cf8c592967c20bbc0123ed2f78393bfbd7c602ef4085e8b9d6
+content_sha: 4c2a1da08389f4409f1732bc16d0350b512eb4af87dedd2b749a30997294860f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -673,7 +673,7 @@ they were before it. `RUNTIME_SCHEMA` moves forward to **v9**, not back to v7,
 so that a v8 plane, which carries the counts, is refused and rebuilt.
 
 **18. 🟠 The plane has two writers and two readers — ratified 2026-09-30
-(Arpit); the second READER built 2026-10-03, the second writer not built** ([W-242](../work/open/W-242-shared-runtime.md);
+(Arpit); the second reader and the second writer both BUILT 2026-10-03** (W-242 (closed 2026-10-03);
 [`compare/shared-runtime`](../work/compare/shared-runtime.compare.md)). Arpit:
 *"I agree to building tier zero, agree to building tier one, and agree to build
 tier two. That means Node will also write."*
@@ -701,8 +701,16 @@ tier two. That means Node will also write."*
 - **Tier 1 is built** (2026-10-03): `node/src/derive/format.mjs` and
   `accel.mjs` are this record's, beside `format.py` and `accel.py`, and decisions
   1–7 and 15–16 bind them line for line. One committed fixture,
-  `tests/derive/idx-fixture.*`, is decoded by both suites. **Node does not build
-  yet**: until Tier 2, only Python writes the plane.
+  `tests/derive/idx-fixture.*`, is decoded by both suites.
+- **Tier 2 is built** (2026-10-03): `node/src/derive/build.mjs` is `_build.py`'s
+  twin, and `node fux.mjs build` writes the plane. **A Node-built and a
+  Python-built plane are byte-identical** on every file but `stamp.json`, on
+  this repo, rung-01000, rung-10000 and the adversarial index
+  ([report](../work/regression/2026-09-30-shared-runtime/report.md) §Tier 2). Each runtime reads the other's plane
+  at 0 discordant. The serializers are `json.dumps`'s, reproduced in
+  `compat/pyjson.mjs`: code-point key order, `ensure_ascii` for `graph.json`
+  alone, and exact integers. Decision 7's two invariants refuse a Node build as
+  they refuse a Python one.
 
 ### Consequences
 

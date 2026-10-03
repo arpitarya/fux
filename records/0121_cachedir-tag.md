@@ -10,13 +10,14 @@ feature: the `CACHEDIR.TAG` file written into every derived `.fux/` subdirectory
 owns: []
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 4003f84ac35113e5d4e2e53c107bd57631bb444b6e8f60bbf083e2c119fba073
+content_sha: e4950bcff8a99e63aa2169c845320d725197bc25de790f09d9b2f87967484037
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Describes** — reaches into, does not own:
 
+- [`node/src/store/fuxdir.mjs`](../node/src/store/fuxdir.mjs) · owned by [SR-DOTFUX](0102_fux-directory.md)
 - [`src/fux/store/fuxdir.py::derived_dir`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
 
 <!-- COMPONENTS-END -->
@@ -147,6 +148,8 @@ this moved where they are written, not what they are.
 
 
 `fuxdir.py`'s committed-file table gained `identifiers.toml` and `inspect.toml` ([SR-IDENTIFIERS](0160_identifiers.md)); `derived_dir` and the tag it writes are unchanged.
+
+**No decision here moved** (W-242 Tier 2, 2026-10-03): `node/src/store/fuxdir.mjs::derivedDir` is `derived_dir`'s twin, because Node's `fux build` now creates `.fux/runtime/`. It writes the same bytes from the same template, which is inlined in the bundle, and never overwrites an existing tag.
 
 ### Consequences
 

@@ -10,7 +10,7 @@ feature: generation and update of the committed index, and the refusal that keep
 owns: [src/fux/store@75e6630e087e, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@e0f7a8fcc41e]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 261f5d4ceb83cf313447c4427935824a71950e4bc692655373f82c195bf9ae66
+content_sha: 086d83f7bced63c4b00926ebc4493518a319001e541c9b9b08b95ddf809631cf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -602,7 +602,7 @@ exactly v5's property set.
   change. v5 and v6 indexes are refused.
 - Decision 16 stays as the record of v6. v6 was never in a release.
 
-**No decision here moved** ([W-242](../work/open/W-242-shared-runtime.md) Tier 0, 2026-09-30; [SR-NODE-SEARCH](0153_node-search.md) decision 24): `node/src/store/reader.mjs` gains `Shards`, a per-call set that reads each committed shard once, and `iterShardPaths` now uses `reader.py`'s shard-name grammar (`[0-9a-f]{2}.jsonl`, files only) rather than any `*.jsonl`. Output is byte-identical.
+**No decision here moved** (W-242 (closed 2026-10-03) Tier 0, 2026-09-30; [SR-NODE-SEARCH](0153_node-search.md) decision 24): `node/src/store/reader.mjs` gains `Shards`, a per-call set that reads each committed shard once, and `iterShardPaths` now uses `reader.py`'s shard-name grammar (`[0-9a-f]{2}.jsonl`, files only) rather than any `*.jsonl`. Output is byte-identical.
 
 ### Consequences
 

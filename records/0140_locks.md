@@ -10,13 +10,14 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L2, L3, L4, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: e2a7f1542c6fec0339a1780b8417aded85f02eb27be3ffd6791e9a5d38a95ae6
+content_sha: 1f9dc6b222c8a92906ae8a46496b419a8a54ddcb638ee3db5d9269474c16d25c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Describes** — reaches into, does not own:
 
+- [`node/src/maintain/runner.mjs`](../node/src/maintain/runner.mjs) · owned by [SR-MAINTENANCE](0129_hooks.md)
 - [`src/fux/maintain/daemon.py`](../src/fux/maintain/daemon.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
 - [`src/fux/maintain/runner.py`](../src/fux/maintain/runner.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
 - [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
@@ -119,7 +120,12 @@ nothing on purpose.
 **1. One mutex per resource, and the committed index has exactly one.**
 `.fux/runtime/write.lock` is it. `ingest`, `build`, `add`, `remove` and
 `update` reach it through `runner.write_lock()`; the spawned one-shot runner
-and the daemon sweep call `runner.acquire()` directly. The daemon does **not**
+and the daemon sweep call `runner.acquire()` directly. **Since W-242 Tier 2
+(2026-10-03) the Node `build` takes the same file** through
+`node/src/maintain/runner.mjs`: `openSync(path, "wx")`, `json.dump`'s
+`{"pid": N}` body, a malformed lock read as held, and nothing broken
+automatically. A Python writer and a Node writer exclude each other through the
+file alone, asserted both ways by `tests/derive/test_node_build.py`. The daemon does **not**
 get its own lock — two locks guarding one resource is two locks.
 
 **2. Read verbs hold nothing.** `ask`, `find`, `answer`, `explain`, `graph` and

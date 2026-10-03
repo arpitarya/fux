@@ -160,3 +160,69 @@ on a shared machine, which is real by the bar's wording and nothing more.** At
 
 See the commit message. The new tests are `tests/derive/test_node_accel.py`
 (10), `tests/derive/test_idx_fixture.py` (2) and `node/test/accel.test.mjs` (4).
+
+---
+
+# Tier 2 — Node builds the plane (2026-10-03, Claude Code, Opus)
+
+## Decision 5 — byte identity: ✅ every file, four corpora
+
+`evidence/t2_identity.py` copies a corpus's `fux.toml` and `.fux/` (without
+`runtime/`) twice. It builds one copy with Python's `fux build` and the other
+with `node fux.mjs build`, then compares every file the build writes, byte for
+byte: `CACHEDIR.TAG`, every `DETERMINISTIC_FILES` member, every
+`postings/*.jsonl` and `*.idx`, and every `anchors/*.json`. `stamp.json` is
+excluded by the bar, and its shard sets are compared instead. The report line on
+stdout is compared too.
+
+| corpus | files compared | differing | report line |
+|---|---|---|---|
+| rung-01000-v7 | 595 | **0** | 1000 docs, 6774 terms, 7085 blocks, 98763 postings |
+| rung-10000-v7 | 595 | **0** | 10000 docs, 30841 terms, 36999 blocks, 902972 postings |
+| fux (this repo's committed index) | 774 | **0** | 2080 docs, 103347 terms, 109444 blocks, 1596473 postings |
+| adversarial (this index + the H1/H2 documents) | 774 | **0** | 2086 docs, 103347 terms, 109444 blocks, 1596480 postings |
+
+Rows: `evidence/t2-identity.jsonl`.
+The adversarial index carries ids whose characters straddle U+FFFF, and
+`tests/derive/test_node_build.py` adds an astral id that reaches `graph.json`.
+That file alone keeps `ensure_ascii=True`, so it is where `JSON.stringify` and
+`json.dumps` part.
+
+## Decision 6 — the cross-read: ✅ 0 discordant
+
+On each pair of copies, Python `ask --fast` and Node `ask --fast` were run on
+three queries per corpus, against both the Python-built and the Node-built
+plane. All four answers agree on ids, order and `round(9)` score: 12 per corpus,
+48 in all.
+
+## Stdout and timing, `t2-plane` (Node reading a NODE-built plane)
+
+The first run was at a 1-minute load of **7.8**, above the bar's 6, so it was
+re-run, and both are kept (`bench-t2-plane.jsonl`,
+`bench-t2-plane-rerun.jsonl`). Both runs were **stdout-identical to `t1-base`
+on 9/9 cells**. The re-run, at load 4.1–4.4, warm medians in seconds:
+
+| corpus | find | ask | answer |
+|---|---|---|---|
+| fux | 0.107 | 0.108 | 0.108 |
+| rung-01000 | 0.053 | 0.056 | 0.061 |
+| rung-10000 | 0.091 | 0.090 | 0.093 |
+
+That is the Tier 1 plane arm's timing, as it should be: the bytes read are the
+same bytes.
+
+## The lock, and the invariants
+
+`tests/derive/test_node_build.py`:
+
+- a lock Python holds stops a Node build, and the refused build writes no plane;
+- a lock Node writes is one Python's `holder()` parses, and Python then refuses;
+- a malformed lock reads as held;
+- a stray quoted 16-hex token stops the build in both runtimes, with the same
+  sentence.
+
+## Verdict
+
+**Tiers 0, 1 and 2 PASS by the frozen bar.** No threshold moved. The one
+deviation is the Tier 1 base, re-pointed because of the format change and
+stated above. The speed trigger did not fire.

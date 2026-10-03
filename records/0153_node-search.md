@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@abc1ada64ba0, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@906cdb6c7fa0, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: adb148ccdf7eef5ea0132dae5be20d6c64b0a377d2c19daaae6a3384b1534076
+content_sha: d9b97bcb6b06e59763500b1f0d5c140ec8ce4a4a756dd0b8ecfd954e6f48ed55
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -943,8 +943,8 @@ lost `authorityWeight` and `authorityFor` in `rank.mjs`, in the same change as
 `rank.py`, so the differential law is held by the deletion itself.
 
 **24. 🟠 Node joins the derived plane — as a reader and as a builder.
-Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tier 1 BUILT 2026-10-03, Tier 2 not built**
-([W-242](../work/open/W-242-shared-runtime.md);
+Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1 and 2 BUILT 2026-10-03**
+(W-242 (closed 2026-10-03);
 [`compare/shared-runtime`](../work/compare/shared-runtime.compare.md);
 [SR-T1-ACCELERATOR](0110_accelerator.md) decision 18 owns the plane).
 
@@ -984,8 +984,10 @@ Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tier 1 BUILT 2026-10-03, T
   - Measured ([report](../work/regression/2026-09-30-shared-runtime/report.md)): Node-plane = Node-scan = Python-plane on
     candidates, `(n, total_wlen, df)` and order, 0 discordant on this repo,
     rung-10000 and the adversarial index; stdout identical on all nine cells.
-- **Tier 2.** Node gains `fux build` — **its first write verb.** It writes the
-  plane Python writes, byte for byte, under the same lock. `ingest` stays
+- **Tier 2 — ✅ built 2026-10-03.** Node gains `fux build` — **its first write
+  verb**, and it has left the list of refused write verbs. It writes the plane
+  Python writes, byte for byte, under the same lock
+  (`maintain/runner.mjs`, [SR-LOCKS](0140_locks.md)). `ingest` stays
   Python's (decision 11: Node has no decoders). **No read verb builds**; a
   missing plane is a scan, not a side effect. Decision 3 is untouched: a build
   reads committed shards and fetches nothing.

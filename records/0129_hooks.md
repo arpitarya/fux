@@ -7,16 +7,17 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@514ae1424ef7, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
+owns: [src/fux/maintain@514ae1424ef7, node/src/maintain@74ced4c72392, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 5ecbe8fd68e6cd5cb5e0d82f590ba1b526ac8e978e9e77951474f19cfe651c6e
+content_sha: 5df2bd1847a0b96077296d01ac86022dba08a630b42d63a661e47afbcbcd3745
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`node/src/maintain/`](../node/src/maintain) · dir
 - [`src/fux/maintain/`](../src/fux/maintain) · dir
 - [`src/fux/schemas/state.schema.json`](../src/fux/schemas/state.schema.json) · file
 - [`tools/maintenance-bench/`](../tools/maintenance-bench) · dir
@@ -623,6 +624,8 @@ this moved where they are written, not what they are.
 **`runner.acquire` requires `required` and `runner.spawn` requires `handoff`** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28); the runner and the daemon pass `refresh_urls` and `full` to `run()`.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+**No decision here moved** (W-242 Tier 2, 2026-10-03): `node/src/maintain/runner.mjs` is a narrow twin of `runner.py`, the write lock alone, for Node's `fux build`. Node runs no hook, runner or daemon.
 
 ### Consequences
 

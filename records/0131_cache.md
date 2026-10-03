@@ -10,7 +10,7 @@ feature: the refer plane's two caches, and the wall between them
 owns: [src/fux/refer/arc.py@838fb07d8fc5, src/fux/refer/fetchcache.py@0946b328bf10]
 laws: [L2, L3, L4, ex-L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: f747a66a8bfa42692a390f32dcb4d828d1bd961bb936b1db2328a3bcf2687574
+content_sha: 079b7d23649d8877987bdd25140e5253da05d12167f425d95292ca2be10a935d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -259,7 +259,7 @@ this moved where they are written, not what they are.
 
 **13. This record's two caches cache FETCHES. The query side's cache is the
 derived plane, and it is not this record's** (2026-09-30,
-[W-242](../work/open/W-242-shared-runtime.md)). A reader looking for "fux's
+W-242 (closed 2026-10-03)). A reader looking for "fux's
 cache" for `ask`/`find`/`answer` wants [SR-T1-ACCELERATOR](0110_accelerator.md):
 `.fux/runtime/`, built from the committed index, and — once W-242 lands — read
 and built by both runtimes (its decision 18, ratified, not built). **A cache of

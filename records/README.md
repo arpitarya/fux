@@ -762,6 +762,8 @@ table does not grant.
 | `node/src/refer/source.mjs` | SR-REFER | where a document's bytes come from. Twin of `src/fux/refer/source.py`, which SR-REFER owns; SR-URL-FRESHNESS's row covers only the `as-ingested` fallback |
 | `node/src/store/format.mjs` | SR-INDEX-LIFECYCLE | the Node twin of `src/fux/store/format.py` — the wire format, decoded |
 | `node/src/store/reader.mjs` | SR-INDEX-LIFECYCLE | the Node twin of `src/fux/store/reader.py` |
+| `node/src/store/fuxdir.mjs` | SR-DOTFUX | the Node twin of `fuxdir.py`, narrowed to `derived_dir` (W-242 Tier 2) |
+| `node/src/maintain/` | SR-MAINTENANCE | the Node twin of `runner.py`'s write lock, narrowed to `acquire` (W-242 Tier 2) |
 | `node/src/verbs/answer.mjs` | SR-ASK | `fux answer` on the Node reader. Twin of `src/fux/query/__init__.py`'s `answer` half |
 | `node/src/verbs/ask.mjs` | SR-ASK | `fux ask` (and `fux lexical`) on the Node reader. Twin of `src/fux/query/__init__.py`'s `ask` half |
 | `node/src/verbs/find.mjs` | SR-ASK | `fux find` on the Node reader. Twin of `src/fux/query/__init__.py`'s `find` half |
@@ -927,6 +929,7 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/ingest/gitdir.py` | SR-DIR-LIST | `read_dirs`, `source_dirs`, `source_excludes`, `archived_dirs` — where the `dirs` list becomes a walk. Owned by SR-INGEST. ⚠ **Added 2026-09-21; this record owned nothing** |
 | `src/fux/ingest/sourcelist.py::_dir_reason` | SR-DIR-LIST | the `dirs` grammar's own validator — the `!` subtraction and the trailing-slash rule are this record's, in a file SR-URL-LIST owns for the grammar machinery |
 | `src/fux/store/fuxdir.py::derived_dir` | SR-CACHEDIR-TAG | every derived directory is created here and tagged here — `CACHEDIR_TAG` written byte-exact per the spec. Owned by SR-DOTFUX for the layout. ⚠ **Added 2026-09-21; this record owned nothing** |
+| `node/src/store/fuxdir.mjs` | SR-CACHEDIR-TAG | Node's `derivedDir` writes the same tag from the same template (W-242 Tier 2). Owned by SR-DOTFUX |
 | `src/fux/derive/_build.py` | SR-DOCS-TABLE | the runtime companion that writes the docs table — this record specifies one file `_build.py` already generates, which is decision 7's honest case (a). Owned by SR-T1-ACCELERATOR |
 | `src/fux/derive/format.py` | SR-DOCS-TABLE | the encoder that decides the table's bytes |
 | `src/fux/derive/_build.py` | SR-RUNTIME-MANIFEST | the manifest is written here; case (a), stated in this record's body |
@@ -939,6 +942,7 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/query/bm25f.py` | SR-RUNTIME-STATS | the scorer is the consumer — a statistic this plane stops carrying is a scorer that silently changes its answer |
 | `src/fux/store/fuxdir.py` | SR-LOCKS | where the lock paths live in the `.fux/` layout. Owned by SR-DOTFUX. ⚠ **Added 2026-09-21**: this record states case (b) — a mechanism spread across components each already claimed — and until now that left it with no way to be opened at all |
 | `src/fux/maintain/runner.py` | SR-LOCKS | the runner takes the lock and is where a stale one is broken. Owned by SR-MAINTENANCE |
+| `node/src/maintain/runner.mjs` | SR-LOCKS | Node's `fux build` takes the same `write.lock` by the same protocol (W-242 Tier 2). Owned by SR-MAINTENANCE |
 | `src/fux/maintain/daemon.py` | SR-LOCKS | the daemon's single-instance guarantee IS a lock, and its failure mode is two daemons rather than none |
 | `src/fux/query/scan.py` | SR-RUNTIME-STATS | the scan reads the plane's `df`/`n` on the non-accelerated path — the other half of the differential pair |
 | `src/fux/query/scan.py` | SR-PROVENANCE | what a receipt must be able to say about a hit is decided here, where the hit is produced. Owned by SR-ASK |

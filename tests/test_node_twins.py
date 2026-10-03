@@ -47,6 +47,7 @@ EXEMPT = {
     "compat/pyfloat.mjs",  # Python's repr layout + round-half-even; CPython IS the twin
     "hash/blake2b.mjs",  # RFC 7693 by hand, because hashlib is not there
     "config/toml.mjs",  # CPython's `tomllib` IS the twin, and it is stdlib (W-107 R4)
+    "compat/pyjson.mjs",  # CPython's `json.dumps` IS the twin, and it is stdlib (W-242 Tier 2)
 }
 
 #: NARROWED twins — the Node file mirrors ONE symbol of a much larger Python
@@ -110,6 +111,11 @@ NARROWED = {
     # holds the two tuples equal, which is the stronger check anyway — it
     # asserts the fact rather than asserting that somebody edited a file.
     "ingest/sourcelist.mjs": "parse",
+    # W-242 Tier 2 — Node writes one derived directory and takes one lock.
+    # `fuxdir.py` is the whole `.fux/` layout and `runner.py` the whole
+    # maintenance runner; what crosses is `derived_dir` and the lock's `acquire`.
+    "store/fuxdir.mjs": "derived_dir",
+    "maintain/runner.mjs": "acquire",
 }
 
 _DECLARED = re.compile(r"`?(src/fux/[A-Za-z0-9_/]+\.py)`?")

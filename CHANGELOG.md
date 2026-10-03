@@ -15,6 +15,10 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   the scan otherwise, as Python does. Output is byte-identical; at 10 000
   documents `find` and `ask` drop from ~0.13 s to ~0.09 s. `--fast` and `--scan`
   now work on the Node CLI too, and Node's MCP reports `ranked_by` truthfully.
+- **`fux build` in the Node reader** (W-242 Tier 2). It rebuilds `.fux/runtime/`
+  from the committed index, byte-identical to Python's build, under the same
+  `write.lock`, so a repository with only the npm package can use `--fast`.
+  `ingest` stays Python's.
 
 ### Changed
 

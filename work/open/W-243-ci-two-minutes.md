@@ -51,7 +51,7 @@ Where the 10 minutes go:
    101–147 s in its two `node_arm.py` passes; setup is 15–25 s. `node_arm.py`
    spawns **one `node` process per comparison** (`subprocess.run(["node", …,
    verb, query])`), and each one re-reads the committed index. Per-query cost
-   and its split are in [W-242](W-242-shared-runtime.md)'s compare doc.
+   and its split are in W-242 (closed 2026-10-03)'s compare doc.
 2. **Windows runs the same tests ~3× slower.** Unit is 219–221 s on Windows
    against 67–75 s on Linux.
 3. **Queueing.** 38 jobs against the plan's 20-concurrent cap, and 8 macOS jobs
@@ -61,7 +61,7 @@ Where the 10 minutes go:
 
 ## Relation to W-242 — do not duplicate it
 
-[W-242](W-242-shared-runtime.md) (ratified the same day) makes **each Node
+W-242 (closed 2026-10-03) (ratified the same day) makes **each Node
 query** cheaper: T0 reads each shard once, T1 reads Python's `.fux/runtime/`,
 T2 lets Node build it. **This item does not re-do any of that.** Step 1 below
 is the **harness** half — how many Node processes the arm starts — and it

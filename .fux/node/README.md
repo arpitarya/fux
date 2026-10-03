@@ -75,9 +75,12 @@ it, and the two are held byte-equal by a differential law.**
   generated file, so a fux upgrade is a one-file diff and a tampered reader is
   detectable by rebuilding it. Before 2026-09-12 it was 47 of fux's own `.mjs`
   files in your tree; `fux setup` deletes them when it upgrades you.
-- **It never writes and never fetches.** `ingest`, `build`, `add`, `enrich`
-  and every other write verb belongs to Python fux, and typing one here tells
-  you so rather than saying *unknown command*.
+- **It never fetches, and it writes one thing: the derived plane.** `fux
+  build` rebuilds the gitignored `.fux/runtime/` from the committed index,
+  byte-identical to Python's build, under the same write lock, and `--fast`
+  then answers from it. `ingest`, `add`, `enrich` and every other write verb
+  belongs to Python fux, and typing one here tells you so rather than saying
+  *unknown command*.
 - **Same answers as Python.** Same ids, same order, same locators, same band;
   scores equal after `round(9)`, which is the sort key's own resolution.
 - **Two things it deliberately does not do.** It cannot read a document that

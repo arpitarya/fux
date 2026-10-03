@@ -31,13 +31,13 @@
 <path d="M880,224 L880,250" fill="none" stroke="#8a93a0" stroke-width="1.6" marker-end="url(#m)" stroke-linecap="round"/>
 <rect x="46" y="254" width="520" height="96" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
 <text x="66" y="280" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Python  `fux`   --   pip install fux-engine</text>
-<text x="66" y="300" font-size="11.5" fill="#4a5260">32 094 lines. 20 verbs; Node implements 7 of them.</text>
+<text x="66" y="300" font-size="11.5" fill="#4a5260">32 094 lines. 20 verbs; Node implements 8 of them.</text>
 <text x="66" y="317" font-size="11.5" fill="#4a5260">THE REFERENCE IMPLEMENTATION: when the two disagree,</text>
 <text x="66" y="334" font-size="11.5" fill="#4a5260">this one is right by definition.</text>
 <rect x="616" y="254" width="520" height="96" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
 <text x="636" y="280" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Node  `fux`   --   npm i fux-engine, vendored to .fux/node/</text>
-<text x="636" y="300" font-size="11.5" fill="#4a5260">7 read verbs: find ask answer explain graph path mcp.</text>
-<text x="636" y="317" font-size="11.5" fill="#4a5260">The other 13 REFUSE BY NAME and say who owns them.</text>
+<text x="636" y="300" font-size="11.5" fill="#4a5260">7 read verbs, and build: the one thing Node writes.</text>
+<text x="636" y="317" font-size="11.5" fill="#4a5260">The other 12 REFUSE BY NAME and say who owns them.</text>
 <text x="636" y="334" font-size="11" fill="#8a93a0">Zero dependencies, no build step. Answers a clone with no Python.</text>
 <text x="46" y="384" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">1 - THE SHARED QUERY PIPELINE: TEN TWINS, ONE PER MODULE, AT THE SAME RELATIVE PATH  (x/y.mjs -&gt; src/fux/x/y.py)</text>
 <line x1="46" y1="394" x2="1136" y2="394" stroke="#e4e4e0" stroke-width="1"/>
@@ -99,15 +99,15 @@
 <text x="852" y="483" font-size="11" fill="#4a5260">PII_EXEMPT and none is needed: all four</text>
 <text x="852" y="498" font-size="11" fill="#4a5260">exempt verbs are write verbs here.</text>
 <path d="M832,460 L812,434" fill="none" stroke="#c2410c" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#o)"/>
-<rect x="46" y="618" width="300" height="132" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
-<text x="64" y="642" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">derive/accel.py  (520 lines)</text>
-<text x="64" y="661" font-size="11.5" fill="#4a5260">THE ACCELERATOR, and it has no Node twin.</text>
+<rect x="46" y="618" width="300" height="132" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="64" y="642" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">derive/accel + format + build</text>
+<text x="64" y="661" font-size="11.5" fill="#4a5260">THE ACCELERATOR -- twins since W-242.</text>
 <text x="64" y="679" font-size="11" fill="#4a5260">.fux/runtime/ postings, rarest-first, exact</text>
 <text x="64" y="695" font-size="11" fill="#4a5260">theta, block-max bound, skip test. Taken only</text>
 <text x="64" y="711" font-size="11" fill="#4a5260">on --fast AND a fresh stamp; else it falls</text>
 <text x="64" y="727" font-size="11" fill="#4a5260">through to the scan -- never a wrong answer.</text>
-<text x="64" y="744" font-size="10.5" fill="#8a93a0" font-family="ui-monospace, Menlo, monospace">measured: 4.2 s scan -&gt; 27.2 ms warm p95</text>
-<path d="M346,684 L368,648" fill="none" stroke="#1d8a5e" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#g)"/>
+<text x="64" y="744" font-size="10.5" fill="#8a93a0" font-family="ui-monospace, Menlo, monospace">Node at 10k docs: 0.13 s scan -&gt; 0.09 s</text>
+<path d="M346,684 L368,648" fill="none" stroke="#3d6df2" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#m)"/>
 <rect x="46" y="908" width="300" height="114" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
 <text x="64" y="932" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">query/provenance.py  (771 lines)</text>
 <text x="64" y="951" font-size="11.5" fill="#4a5260">--why, --receipt, --journal, and the whole</text>
@@ -116,15 +116,15 @@
 <text x="64" y="1004" font-size="11" fill="#8a93a0">A stated absence (W-107 R6) -- these four</text>
 <text x="64" y="1018" font-size="11" fill="#8a93a0">surfaces are uncovered by the arm, openly.</text>
 <path d="M346,954 L368,936" fill="none" stroke="#1d8a5e" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#g)"/>
-<rect x="834" y="618" width="302" height="132" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8"/>
-<text x="852" y="642" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Node ALWAYS scans.</text>
-<text x="852" y="661" font-size="11.5" fill="#4a5260">There is no accelerator and no --fast/--scan</text>
-<text x="852" y="678" font-size="11.5" fill="#4a5260">flag to choose one. Python's MCP reports</text>
-<text x="852" y="695" font-size="11.5" fill="#4a5260">ranked_by: "accelerator" on a fresh build;</text>
-<text x="852" y="712" font-size="11.5" fill="#4a5260">Node reports "scan".</text>
-<text x="852" y="731" font-size="11" fill="#8a93a0">Same documents, same order -- the LABEL is the</text>
-<text x="852" y="745" font-size="11" fill="#8a93a0">only difference; the arm excludes it BY NAME.</text>
-<path d="M832,684 L812,648" fill="none" stroke="#c2410c" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#o)"/>
+<rect x="834" y="618" width="302" height="132" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="852" y="642" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Node reads AND builds the plane.</text>
+<text x="852" y="661" font-size="11.5" fill="#4a5260">--fast/--scan in both runtimes. `fux build`</text>
+<text x="852" y="678" font-size="11.5" fill="#4a5260">in Node writes Python's bytes exactly, under</text>
+<text x="852" y="695" font-size="11.5" fill="#4a5260">the same write.lock; each reads the other's.</text>
+<text x="852" y="712" font-size="11.5" fill="#4a5260">Both MCPs report the path that answered.</text>
+<text x="852" y="731" font-size="11" fill="#8a93a0">W-242, 2026-10-03. ranked_by is now compared</text>
+<text x="852" y="745" font-size="11" fill="#8a93a0">by the arm, not excluded by name.</text>
+<path d="M832,684 L812,648" fill="none" stroke="#3d6df2" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#m)"/>
 <rect x="834" y="908" width="302" height="114" rx="10" fill="#fff4ec" stroke="#c2410c" stroke-width="1.8"/>
 <text x="852" y="932" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">Node reads tune.toml + output.toml.</text>
 <text x="852" y="951" font-size="11.5" fill="#4a5260">Closed 2026-09-12. Before it, a tuned repo</text>
@@ -152,8 +152,8 @@
 <text x="792" y="1148" font-size="10.5" fill="#4a5260">UTF-16 code UNIT. The sort key ends in id,</text>
 <text x="792" y="1163" font-size="10.5" fill="#4a5260">so one emoji reorders results: 30 of 324</text>
 <text x="792" y="1178" font-size="10.5" fill="#4a5260">ordered pairs disagreed, measured.</text>
-<text x="46" y="1216" font-size="11" fill="#8a93a0">Three Node files therefore have NO Python twin, and the exemption list is short on purpose -- it is exactly where divergence risk concentrates:</text>
-<text x="46" y="1232" font-size="11" fill="#8a93a0">hash/blake2b.mjs (hashlib cannot be reached from node:crypto)  |  compat/pyfloat.mjs  |  config/toml.mjs (CPython tomllib IS the twin, and it is stdlib).</text>
+<text x="46" y="1216" font-size="11" fill="#8a93a0">Four Node files therefore have NO Python twin, and the exemption list is short on purpose -- it is exactly where divergence risk concentrates:</text>
+<text x="46" y="1232" font-size="11" fill="#8a93a0">hash/blake2b.mjs (hashlib is out of reach)  |  compat/pyfloat.mjs  |  compat/pyjson.mjs (json.dumps, byte for byte)  |  config/toml.mjs (tomllib IS the twin).</text>
 <text x="46" y="1264" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">3 - THE REFER PLANE (`fux answer`)  --  where the two readers genuinely part company</text>
 <line x1="46" y1="1274" x2="1136" y2="1274" stroke="#e4e4e0" stroke-width="1"/>
 <text x="46" y="1298" font-size="11.5" fill="#4a5260">Shared twins -- ranking has already chosen the documents before any of this runs, so nothing here changes WHICH document is cited, only which passage:</text>

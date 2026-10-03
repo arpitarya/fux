@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@eafa474928d8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@7a5371c09e45, src/fux/progress.py@10364bd02e0a, tests_e2e@60bd0dcdc3ca, node/fux.mjs@d9baa7f51a1d]
+owns: [src/fux/cli.py@eafa474928d8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@7a5371c09e45, src/fux/progress.py@10364bd02e0a, tests_e2e@60bd0dcdc3ca, node/fux.mjs@4adf69162cc6]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d0c681a56288d17f4bf94f59e4005df511c30ca31d82406efe5bdb5b8e286ebc
+content_sha: ad0592d39e252b1d73eb92ce72d40155f12cf8dbb075d936ae546432814e629e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1342,6 +1342,8 @@ Each verb on the list takes `--progress` / `--no-progress` and reads
 W-64's four rules hold unchanged for every one: stdout byte-identical with the
 bar on or off, `--json` untouched, off when stderr is not a TTY, no clock.
 `tests_e2e/test_progress_surface.py` holds the list equal to its own.
+
+**No decision here moved** (W-242 Tier 2, 2026-10-03): the Node reader's `fux build` prints `cmd_build`'s report line and takes the same write lock, and `build` left Node's list of refused write verbs. `ingest` stays Python's.
 
 ### Consequences
 

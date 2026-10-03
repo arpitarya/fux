@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** `fux` — the Node read plane. Reads an index Python wrote; never writes.
+/** `fux` — the Node read plane. Reads an index Python wrote; writes only the derived plane (`build`).
  *
  * npm package `fux-engine`, command `fux`, vendored by `fux setup` into
  * `.fux/fux.mjs` so a clone with no Python still answers (W-107 R1/R2).
@@ -13,6 +13,18 @@ import { runAsk } from "./src/verbs/ask.mjs";
 import { runAnswer } from "./src/verbs/answer.mjs";
 import { runExplain, runGraph, runPath } from "./src/verbs/graph.mjs";
 import { runMcp } from "./src/verbs/mcp.mjs";
+import { build as buildPlane } from "./src/derive/build.mjs";
+import { withWriteLock } from "./src/maintain/runner.mjs";
+
+/** `fux build` — `ingest/__init__.py::cmd_build`: the same lock, the same line. */
+function runBuild(root) {
+  const report = withWriteLock(root, () => buildPlane(root));
+  process.stdout.write(
+    `accelerator rebuilt from the committed index: ${report.docs} docs, ` +
+    `${report.terms} terms, ${report.blocks} blocks, ${report.postings} postings\n`,
+  );
+  return 0;
+}
 import { FuxError } from "./src/errors.mjs";
 import { applyOutputDefaults, loadOutput } from "./src/config/output.mjs";
 // 🔴 **The library surface travels with the CLI, and that is what makes ONE
@@ -57,7 +69,9 @@ function requirePiiRules(root) {
 /** Verbs that exist in Python fux and deliberately not here. A person typing
  *  one has a specific wrong model and deserves the specific correction. */
 const WRITE_VERBS = {
-  ingest: "writes the index", build: "writes the derived accelerator",
+  // `build` left this list with W-242 Tier 2: Node writes the derived plane,
+  // byte-identical to Python's, from the committed shards alone.
+  ingest: "writes the index",
   add: "writes a source line", remove: "writes a source line",
   update: "re-fetches sources", enrich: "writes enrichment",
   setup: "writes .fux/", doctor: "reports on a tree Node cannot fully see",
@@ -123,8 +137,9 @@ function main(argv) {
       `fux ${VERSION} (node ${process.versions.node}) — the read plane\n\n` +
       `  fux find <query> [--json] [--top N] [--under DIR] [--phrase P] [--all]\n` +
       `  fux ask|lexical|answer|explain|graph|path|mcp      (Phases 2-3)\n` +
-      `  fux graph --seed <id> [--seed <id>...]     walk from documents you name\n\n` +
-      `Reads an index Python wrote. It never writes and never fetches.\n`,
+      `  fux graph --seed <id> [--seed <id>...]     walk from documents you name\n` +
+      `  fux build                                   rebuild .fux/runtime/ for --fast\n\n` +
+      `Reads an index Python wrote; writes only the derived plane. It never fetches.\n`,
     );
     return verb ? 0 : 1;
   }
@@ -194,6 +209,8 @@ function main(argv) {
         return runPath(root, args);
       case "mcp":
         return runMcp(root, args);
+      case "build":
+        return runBuild(root);
       default:
         process.stderr.write(`error: unknown verb \`${verb}\`. Try \`fux --help\`.\n`);
         return 1;

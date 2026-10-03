@@ -26,6 +26,14 @@ Rules:
 
 ---
 
+## 2026-10-03 — **W-242 Tier 2: Node builds the plane, byte-identical; W-242 closed**
+
+| what | evidence |
+|---|---|
+| **the build** | `node/src/derive/build.mjs` (the `_build.py` twin: one pass, the two invariants, docs/stats/mined/graph/postings/anchors/manifest, then the stamp last), `compat/pyjson.mjs` (`json.dumps`: code-point keys, `ensure_ascii`, exact ints), `store/fuxdir.mjs` (`derived_dir` + `CACHEDIR.TAG`, inlined in the bundle), `maintain/runner.mjs` (`write.lock` by SR-LOCKS' protocol); `node fux.mjs build` |
+| **the records** | SR-T1-ACCELERATOR d18 · SR-NODE-SEARCH d24 · SR-LOCKS d1 · SR-CACHEDIR-TAG · SR-DOTFUX · SR-MAINTENANCE · SR-CLI · ownership + describes rows · `architecture-two-readers.svg` redrawn · node README |
+| **verified** | [report](regression/2026-09-30-shared-runtime/report.md) §Tier 2: Node-built = Python-built on every file but `stamp.json` — 595/595 (rung-01000, rung-10000), 774/774 (this repo, adversarial); cross-read 48/48; `t2-plane` stdout 9/9 = base (re-run at load 4.2 after one at 7.8, both kept); `tests/derive/test_node_build.py` (6, the lock both ways, malformed lock, invariant refusal), `node/test/pyjson.test.mjs` (4) |
+
 ## 2026-10-03 — **W-242 Tier 1: the Node reader answers from `.fux/runtime/`**
 
 | what | evidence |

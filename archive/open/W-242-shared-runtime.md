@@ -9,6 +9,15 @@ ball: agent
 
 # W-242 — one runtime, two writers, two readers
 
+**✅ CLOSED 2026-10-03 — all three tiers built and PASS** (Claude Code, Opus):
+[report](../regression/2026-09-30-shared-runtime/report.md) §Tier 1 and §Tier 2.
+Node reads `.fux/runtime/` under `--fast` and on `fux mcp`, and builds it with
+`fux build`. A Node-built plane is byte-identical to Python's on four corpora,
+and each runtime reads the other's at 0 discordant. Open questions 1 (Fork A)
+and 2 (auto-build) are unchanged and Arpit's. Live successors:
+[SR-T1-ACCELERATOR](../../records/0110_accelerator.md) d18 and
+[SR-NODE-SEARCH](../../records/0153_node-search.md) d24.
+
 **Status: Tier 0 built and PASS 2026-09-30** ([pre-registration](../regression/2026-09-30-shared-runtime/PRE-REGISTRATION.md) · [report](../regression/2026-09-30-shared-runtime/report.md)): stdout byte-identical on 9/9 cells × 5 runs, one read per shard held by `node/test/shard-reads.test.mjs`, speed not separable on a shared machine. **Tier 1 built and PASS 2026-10-03** ([report](../regression/2026-09-30-shared-runtime/report.md) §Tier 1): stdout 9/9 identical across base, plane and scan; the arm at 0 discordant on this repo, rung-10000 and the adversarial index; the plane faster on both rungs. ⚠ The byte-identity base moved to `a62409ed` because the index went to v7 between tiers, stated in the report. **Tier 2 not built.** Arpit, 2026-09-30: *"I agree to
 building tier zero, agree to building tier one, and agree to build tier two.
 That means Node will also write."* Research, options and the refused T3:

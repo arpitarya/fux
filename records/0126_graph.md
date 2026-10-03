@@ -10,7 +10,7 @@ feature: the graph lane — three relational verbs, a derived plane, and a lazy 
 owns: [src/fux/graph@a32ab4cc2604, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@61ee1cbb84df, node/src/verbs/graph.mjs@8683c9e4b2e6, src/fux/schemas/graph.schema.json@19bd4c486035]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: f4958e1d41c414beab87b1f15d2133a2fc03892f2e9a5feb14533bb6e4446ab4
+content_sha: a16cf2dd84ee66b291b8ce893b44103c38c35c79d5338bcf4912a1f908bccd43
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -489,7 +489,7 @@ this moved where they are written, not what they are.
 
 **No decision here moved** (W-235, 2026-09-29). `node/src/verbs/graph.mjs` builds the plane from `graphRecords`, which parses only `id` and `edges`; the plane is byte-identical. The cost note is [SR-NODE-SEARCH](0153_node-search.md) decision 9's.
 
-**No decision here moved** ([W-242](../work/open/W-242-shared-runtime.md) Tier 0, 2026-09-30; [SR-NODE-SEARCH](0153_node-search.md) decision 24): Node's `fux graph` reads its plane records and its seed query from one `Shards`, so each committed shard is read once per call; the plane it builds is unchanged. Output is byte-identical.
+**No decision here moved** (W-242 (closed 2026-10-03) Tier 0, 2026-09-30; [SR-NODE-SEARCH](0153_node-search.md) decision 24): Node's `fux graph` reads its plane records and its seed query from one `Shards`, so each committed shard is read once per call; the plane it builds is unchanged. Output is byte-identical.
 
 **No decision here moved** (W-242 Tier 1, 2026-10-03): Node's `fux graph --fast` seeds from the derived plane when it is fresh, as Python's does; the seeds are the same documents either way.
 

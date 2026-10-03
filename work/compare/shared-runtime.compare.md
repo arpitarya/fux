@@ -5,8 +5,10 @@ description: "W-242 — how fux gets faster in BOTH readers from ONE set of file
 
 # One runtime, both readers — the shared derived plane as fux's query cache
 
+> ✅ **OUTCOME, 2026-10-03: T0 · T1 · T2 all BUILT and PASS** ([report](../regression/2026-09-30-shared-runtime/report.md)). Node reads the plane under `--fast` and builds it byte-identically with `fux build`. 0 discordant on four corpora, and at 10 000 documents Node `find`/`ask` drop from 0.13 s to 0.09 s. Fork A (Node reading `graph.json`) and auto-build stay Arpit's open questions. The text below is the ruling as made.
+>
 > **Verdict:** ✅ **ruled 2026-09-30 (Arpit): T0 · T1 · T2 — ratified, not built**
-> ([W-242](../open/W-242-shared-runtime.md)). There is no new cache. The
+> (W-242 (closed 2026-10-03)). There is no new cache. The
 > "common file" both arms use is the plane Python already writes,
 > `.fux/runtime/`, in its existing layout. Node learns to **read** it (T1) and
 > to **build** it byte-identically (T2), and stops reading every shard three
@@ -17,7 +19,7 @@ description: "W-242 — how fux gets faster in BOTH readers from ONE set of file
 
 | | |
 |---|---|
-| **status** | ✅ ruled T0 · T1 · T2 (Arpit, 2026-09-30), **not built** — [W-242](../open/W-242-shared-runtime.md). T3 refused. Fork A open |
+| **status** | ✅ ruled T0 · T1 · T2 (Arpit, 2026-09-30), **not built** — W-242 (closed 2026-10-03). T3 refused. Fork A open |
 | **the call** | one plane, one file layout (Python's, unchanged), **two writers, two readers**; freshness is `stamp.json` for both; answers unchanged because the plane supplies candidates and statistics, never scores |
 | **confidence** | **high** on the shape: it is SR-T1-ACCELERATOR's existing contract with a second implementation on each side. **medium** on the saving: one machine, one query, measured through the Cowork VM's mount of the repo (below) |
 | **reopen-trigger** | (1) a Node-built and a Python-built plane differ on any byte outside `stamp.json`, on any corpus, and the cause cannot be fixed in the Node writer; **or** (2) on a filed fux-lab run, Node `find`/`ask` with a fresh plane is not faster than Node's own scan at rung-01000 and above; **or** (3) for T3 — `fux mcp` logs show the same (query, flags) repeated within one index state on more than a quarter of calls |
@@ -114,7 +116,7 @@ when the stamp changes. Reopen-trigger (3) above.
 
 ## References
 
-- [W-242](../open/W-242-shared-runtime.md) — the item.
+- W-242 (closed 2026-10-03) — the item.
 - [SR-T1-ACCELERATOR](../../records/0110_accelerator.md) decision 18 ·
   [SR-NODE-SEARCH](../../records/0153_node-search.md) decision 24 ·
   [SR-CACHE](../../records/0131_cache.md) decision 13 — the ruling, recorded.
