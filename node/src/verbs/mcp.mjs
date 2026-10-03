@@ -275,7 +275,7 @@ export function handle(root, message, top, maxHeadings) {
     return ok(id, {
       protocolVersion: PROTOCOL_VERSION,
       capabilities: { tools: {} },
-      serverInfo: { name: "fux", version: "3.0.0-alpha.9" },
+      serverInfo: { name: "fux", version: "3.0.0-alpha.10" },
     });
   }
   if (method === "tools/list") return ok(id, { tools: tools(top) });

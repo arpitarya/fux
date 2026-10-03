@@ -8,6 +8,12 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.0-alpha.10] - 2026-10-03
+
+**The Node reader gets the accelerator: `--fast`, and its own `fux build`, both
+byte-identical to Python. ⚠ The index format moves to `fux.index.v7`; run
+`fux ingest --full` once.** Ranking and every verb's stdout are alpha.9's.
+
 ### Added
 
 - **The Node reader answers from `.fux/runtime/`** under `--fast`, and on `fux
