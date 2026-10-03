@@ -22,11 +22,14 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 - **`[ranking] authority_weight`** (default `0.0`, off, unmeasured): a
   multiplicative git authority prior, `1 + w · (1 − 1/(authors × commits))`, in
   both readers. `fux lexical` never applies it.
-- **`[ranking] rm3_weight` is accepted again** (default `0.0`, off): RM3
-  pseudo-relevance feedback runs only when the un-expanded first pass's band is
-  `grounded` (W-237), in both readers. Unmeasured until scored. A `tune.toml`
-  without the key stops with the missing-key error; `fux doctor --fix` adds
-  `rm3_weight = 0.0`.
+
+### Removed
+
+- **RM3 stays removed, now for good, and `rm3_weight` is still refused** (W-237).
+  It was rebuilt behind a `grounded`-only gate, never released, and failed its
+  pre-registered run with no gain
+  ([verdict](work/regression/2026-09-30-rm3-grounded/VERDICT.md)). Nothing
+  changes for a released `tune.toml`; the refusal now names both removals.
 
 ### Fixed
 

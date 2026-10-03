@@ -51,6 +51,9 @@ ROOT = Path(__file__).resolve().parents[1]
 _SKIP_DIRS = {
     ".git", ".venv", "venv", "node_modules", "__pycache__",
     ".pytest_cache", ".mypy_cache", "dist", "build", ".fux", "_to_delete",
+    # `.claude/worktrees/` holds subagent worktrees: whole second checkouts of
+    # this repo, often of an older commit. Walking them checks a stale tree.
+    "worktrees",
 }
 
 # Frozen-by-law trees: never edited, so never repaired.

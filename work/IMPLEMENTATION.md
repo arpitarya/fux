@@ -26,6 +26,16 @@ Rules:
 
 ---
 
+## 2026-10-03 — **W-237: RM3 removed a second time, as ruled; the item is closed**
+
+| what | evidence |
+|---|---|
+| **the ruling** | Arpit (Cowork, 2026-10-03): *"W237 remove everything related to RM3."* |
+| **the build** | `query/rm3.py`, `node/src/query/rm3.mjs`, `tests/query/test_rm3.py` and the gate in both readers are deleted; `constants.toml [rm3]` is gone; `rm3_weight` goes back into `_REMOVED_KEYS` and its Node twin, and the refusal names both removals (W-224, W-237); both bundles are rebuilt |
+| **the records** | [SR-EXPAND](../records/0149_expand.md) d16/d17 (both removals, RM3 closed) · [SR-TUNE](../records/0135_tuning.md) d18 · the W-237 merge's edits to SR-CLI, SR-ASK, SR-FIND, SR-ANSWER, SR-FETCHER, SR-CONFIDENCE, SR-PROVENANCE, SR-OUTPUT, SR-NODE-SEARCH and SR-CONSTANTS are reversed · GLOSSARY · BIBLIOGRAPHY · the paper |
+| **verified** | `ask`/`find --json` on 12 queries are byte-identical before and after, 24/24 in Python and 24/24 in Node; both suites; `node --test` |
+| **also** | six repo-walking tests now skip `.claude/worktrees/`: three leftover subagent checkouts of older commits were failing them |
+
 ## 2026-09-30 — **W-237 FAIL (no gain) · W-168 step 8 INCONCLUSIVE by the table · R10 tightened**
 
 - **W-237, RM3 behind the `grounded` gate: FAIL — no gain.** The frozen decider reproduced byte for byte: rank-1 wins/losses on 69 grounded questions were 0/0 · 1/1 · 2/3 · 4/6. The gate held (0 untagged moves). Evidence: [VERDICT](regression/2026-09-30-rm3-grounded/VERDICT.md). ⚠ **The code removal (step 5) is NOT done**: it was refused in-session and waits on Arpit. RM3 stays off at `0.0`.

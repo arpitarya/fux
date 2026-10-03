@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: e9d5109cfb98fe3bff3c56e76e5ce9e9b31e6589394f66e88038b96f532a1da4
+content_sha: 2ae4f2f3ec147b84f98245e34f24976164f2b94704a87c27989594fc795a15e7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -845,19 +845,10 @@ which is much nearer to correctness than separation is, and **it was not in
 W-213's grid**. That is a lead and a new pre-registration, never an extension of
 this one.
 
-**18. RM3's gate READS the band; the band describes the list shown** (W-237,
-2026-09-30; [SR-EXPAND](0149_expand.md) decision 17). With `rm3_weight > 0`,
-`run_query` runs the answer at `0.0` first and computes its band exactly as
-this record does, at the tune's own floors. **Only `grounded` opens the gate.**
-
-- **Closed**, the first pass is the answer and its block is the block: no
-  second computation, byte-identical to `0.0`.
-- **Open**, the expanded second pass is the answer, and the block is built from
-  **it** — on the original query, as decision 16's neighbour requires, so a
-  feedback term cannot raise a band. The gate's band is not published; `--why`
-  names it ([SR-PROVENANCE](0142_provenance.md)).
-- **At `0.0` nothing here runs**, and the band is the one pass's, as it was
-  before 2026-09-23.
+**18. ~~RM3's first pass writes nothing into the band~~ — SUPERSEDED
+2026-09-27.** RM3 and its first pass were removed ([SR-EXPAND](0149_expand.md)
+decision 17). The band is built from the one pass there is, as it was before
+2026-09-23.
 
 **19. A mined spelling cannot raise a band** (W-168 step 4, 2026-09-27). The
 block is built on the ORIGINAL query, as decision 16's neighbour says of

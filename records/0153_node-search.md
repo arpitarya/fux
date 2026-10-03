@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@33ae0df1a5e0, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@ecc6f0704921, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: aae30a94da6dcdf91385d41c73a1bad18ce793b2eaf699509177f463c0745741
+content_sha: c988aa83f5e2a7a6b397e12df26672feb7115f5322cff241cc542c0ea7077d6e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -875,16 +875,12 @@ unported. ⚠ **`fux serve` is Python-only for the same reason `fux observe` is*
 ([SR-SERVE](0158_serve.md)): it is a surface, not a reader, and the differential
 law reaches readers.
 
-**20. Gated RM3 is transcribed, not diverged** (W-237, 2026-09-30;
-[SR-EXPAND](0149_expand.md) decision 17). `node/src/query/rm3.mjs` is
-`rm3.py`'s twin, restored from before the 2026-09-27 removal: the same RM1 sum
-in the same order, the counts from `constants.toml [rm3]`. `runQuery` runs the
-same gate as `run_query` — the `0.0` pass, its band, feedback from its lexical
-window only when `grounded`, `expand.stack` at `tune.rm3Weight` — and
-`lexical` forces the weight to `0.0`. Both loaders accept the key again.
-`tests/query/test_rm3.py` compares the readers through their own loaders at
-`0.0` and `0.3`, on a query the gate opens and one it keeps shut, to nine
-digits (W-222's last-bit gap on an expanded score).
+**20. ~~RM3 is transcribed, not diverged~~ — SUPERSEDED 2026-09-27.**
+`query/rm3.mjs` and `rm3.py` were deleted in one change
+([SR-EXPAND](0149_expand.md) decision 17), and `runQuery` and `run_query`
+lost the RM3 block together, so the differential law is held by the deletion
+itself. The loader refuses `rm3_weight` by name in both readers, with the same
+sentence.
 
 **21. Mined expansion is transcribed, not diverged** (W-168 step 4,
 2026-09-27). `node/src/query/mined.mjs` builds the table from the shards,
@@ -963,8 +959,8 @@ Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1–2 not built**
   plus one more per `recordFor`: 769 opens for 257 shards on this repo.
   - **The mechanism is `store/reader.mjs::Shards`**, a per-call object: a verb,
     a library method or one MCP tool call makes one and hands it down to the
-    scan, the mined table, the pin, the graph tier, the band guard, RM3's
-    feedback reads and every display `recordFor`. `-q` arms share their
+    scan, the mined table, the pin, the graph tier, the band guard and every
+    display `recordFor`. `-q` arms share their
     caller's. A function called without one makes its own, so no public
     signature changed meaning.
   - 🔴 **It is never module-level and never kept on a long-lived object** —

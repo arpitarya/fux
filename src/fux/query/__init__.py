@@ -273,14 +273,6 @@ def run_query(
         table = accel.mined_table(root) if use_accel else mined_mod.table_from_shards(root)
         expansion = stack(expansion, mined_mod.fold(table, query_hashes), tune.mined_weight)
 
-    # W-237 — RM3 behind a `grounded`-only gate. **Off at `0.0`, and off runs
-    # no first pass**, so the default is the engine before the key returned.
-    if tune.rm3_weight > 0 and not expand and query_hashes:
-        return _run_rm3(
-            root, query, top, depth, tune, weighting, dirs, scoring, expansion,
-            use_accel, ids, confidence_out, trace_out, related_out,
-        )
-
     if use_accel:
         results = accel.ask(
             root, query, top=depth, skipping=True, weighting=weighting, archived_dirs=dirs,
@@ -288,7 +280,7 @@ def run_query(
         )
         final = _compose(
             root, query, results, rerank_weight, top, depth, tune, stats, related_out,
-            trace_out, quiet=False,
+            trace_out,
         )
         _fill_trace(trace_out, results, rerank_weight)
         _fill_confidence(confidence_out, stats, query, final, tune, ids)
@@ -298,114 +290,14 @@ def run_query(
         scoring=scoring, stats_out=stats, expansion=expansion,
     )
     final = _compose(
-        root, query, results, rerank_weight, top, depth, tune, stats, related_out, trace_out,
-        quiet=False,
+        root, query, results, rerank_weight, top, depth, tune, stats, related_out, trace_out
     )
     _fill_trace(trace_out, results, rerank_weight)
     _fill_confidence(confidence_out, stats, query, final, tune, ids)
     return final, "scan"
 
 
-def _run_rm3(
-    root, query, top, depth, tune, weighting, dirs, scoring, expansion, use_accel, ids,
-    confidence_out, trace_out, related_out,
-):
-    """W-237 — RM3, only when the first pass is `grounded`. Returns `run_query`'s tuple.
-
-    The frozen mechanism is [`2026-09-30-rm3-grounded`](../../../work/regression/2026-09-30-rm3-grounded/PRE-REGISTRATION.md)'s:
-
-    1. **The first pass is the answer at `rm3_weight = 0.0`, exactly** — the
-       same window, rerank, pin, graph tier and band guard. Its outputs go to
-       local containers, never the caller's, until the gate has decided.
-    2. **The gate reads its band** ([SR-CONFIDENCE](../../../records/0141_confidence.md),
-       at the tune's own floors). Anything but `grounded`, or feedback that adds
-       no hash, and **the first pass is handed back as the answer**: no second
-       pass runs.
-    3. **The feedback set is the first pass's LEXICAL window**, top `FB_DOCS`,
-       before rerank, pin and tier — the pre-registration's one choice. A window
-       shallower than `FB_DOCS` is re-retrieved silently for feedback only.
-    4. The terms stack onto the first pass's expansion (the mined fold) at
-       `rm3_weight`; `required` stays the user's hashes. **The second pass is
-       the answer**, and the band, the trace and `--why` describe it, with a
-       `rm3` entry naming the gate.
-
-    ⚠ **The graph tier's stderr note is printed by the first pass only**: both
-    passes read the same plane, so a second print would repeat it.
-    """
-    from . import rm3 as rm3_mod
-    from .expand import stack
-
-    def one_pass(exp, stats, related, trace, quiet):
-        if use_accel:
-            from ..derive import accel
-
-            window = accel.ask(
-                root, query, top=depth, skipping=True, weighting=weighting, archived_dirs=dirs,
-                scoring=scoring, stats_out=stats, expansion=exp,
-            )
-        else:
-            window = scan_ask(
-                root, query, top=depth, weighting=weighting, archived_dirs=dirs,
-                scoring=scoring, stats_out=stats, expansion=exp,
-            )
-        final = _compose(
-            root, query, window, tune.rerank_weight, top, depth, tune, stats, related, trace,
-            quiet=quiet,
-        )
-        _fill_trace(trace, window, tune.rerank_weight)
-        return window, final
-
-    path = "accelerator" if use_accel else "scan"
-    stats1: dict = {}
-    related1: list | None = [] if related_out is not None else None
-    trace1: dict | None = {} if trace_out is not None else None
-    window, final = one_pass(expansion, stats1, related1, trace1, False)
-    gate: dict = {}
-    _fill_confidence(gate, stats1, query, final, tune, ids)
-    band = getattr(gate.get("confidence"), "band", None)
-
-    fed = expansion
-    if band == "grounded":
-        feedback = window
-        if depth < rm3_mod.FB_DOCS:
-            if use_accel:
-                from ..derive import accel
-
-                feedback = accel.ask(
-                    root, query, top=rm3_mod.FB_DOCS, skipping=True, weighting=weighting,
-                    archived_dirs=dirs, scoring=scoring, expansion=expansion,
-                )
-            else:
-                feedback = scan_ask(
-                    root, query, top=rm3_mod.FB_DOCS, weighting=weighting, archived_dirs=dirs,
-                    scoring=scoring, expansion=expansion,
-                )
-        terms = rm3_mod.feedback_terms(root, feedback, list(expansion.required), scoring)
-        fed = stack(expansion, terms, tune.rm3_weight)
-
-    if fed is expansion:
-        # The gate did not fire: the first pass IS the answer, byte for byte.
-        if confidence_out is not None:
-            confidence_out.update(gate)
-        if related_out is not None and related1:
-            related_out.extend(related1)
-        if trace_out is not None and trace1:
-            trace_out.update(trace1)
-        return final, path
-
-    stats2: dict | None = {} if confidence_out is not None else None
-    _, final2 = one_pass(fed, stats2, related_out, trace_out, True)
-    if trace_out is not None:
-        trace_out["rm3"] = {
-            "gate": band,
-            "weight": tune.rm3_weight,
-            "terms": len(fed.hashes) - len(expansion.hashes),
-        }
-    _fill_confidence(confidence_out, stats2, query, final2, tune, ids)
-    return final2, path
-
-
-def _compose(root, query, window, rerank_weight, top, depth, tune, stats, related_out, trace_out=None, *, quiet):
+def _compose(root, query, window, rerank_weight, top, depth, tune, stats, related_out, trace_out=None):
     """The lexical core, then W-161's graph stage. Returns the final list.
 
     **The lexical core is `rerank` → `pin`, and it runs over the WINDOW, not
@@ -457,7 +349,7 @@ def _compose(root, query, window, rerank_weight, top, depth, tune, stats, relate
     # optimisation on the Node reader — there it is a whole extra parse of
     # every committed record (SR-NODE-SEARCH decision 17a).
     split = tiers(root, query, ordered, top, tune, want_related=related_out is not None)
-    if split.note and not quiet:
+    if split.note:
         print(split.note, file=sys.stderr)
     if related_out is not None:
         related_out.extend(split.related)
@@ -1175,7 +1067,6 @@ def _ask_shaped(args, *, compose: bool) -> int:
         # words the user typed (SR-CLI decision 12).
         # W-168 step 9: nor applies the intent prior (SR-CLI decision 12).
         # W-168 step 8: nor the authority prior (SR-CLI decision 12).
-        # W-237: nor RM3 — feedback terms are words the engine chose.
         tune = dataclasses.replace(
             tune,
             ask_boost=False,
@@ -1183,7 +1074,6 @@ def _ask_shaped(args, *, compose: bool) -> int:
             mined_weight=0.0,
             intent_weight=0.0,
             authority_weight=0.0,
-            rm3_weight=0.0,
         )
     elif getattr(args, "related", None) is False:
         import dataclasses
@@ -1370,7 +1260,6 @@ def _derivation_for(root: Path, args, results, path, signals, trace, tune):
             rerank_uplift=(trace or {}).get("rerank_uplift"),
             intent=_intent_shown(tune, args.query),
             authority=_authority_shown(tune),
-            rm3=(trace or {}).get("rm3"),
         )
     except Exception:  # pragma: no cover - a diagnostic must not break an answer
         return None
@@ -1417,14 +1306,6 @@ def _declare_derivation(why) -> None:
         + (f" (cut at {g.cut_score:.4f})" if g.cut_score is not None else ""),
         file=sys.stderr,
     )
-    rm3 = getattr(why, "rm3", None)
-    if rm3:
-        # W-237: the gate is named when it FIRES, and only then.
-        print(
-            f"[why] rm3: first pass {rm3['gate']} -> {rm3['terms']} feedback term(s) "
-            f"added at weight {rm3['weight']}",
-            file=sys.stderr,
-        )
     for doc in why.documents:
         bits = [f"#{doc.rank + 1} {doc.loc} {doc.score:.4f}"]
         # **First, before any other bit.** Every number on this line describes

@@ -1,7 +1,7 @@
 ---
 type: Verdict
 name: W-237-RM3-GROUNDED
-description: "W-237, RM3 behind a `grounded`-only gate: FAIL — no gain, by the frozen table. On the 69 `grounded` questions of set-4-claude no arm's net is positive (0/0, 1/1, 2/3, 4/6 wins/losses at rank 1), and from 0.2 up every arm also loses baseline rank-1 hits (1, 3, 6). The table's consequence is W-237 step 5: the code is removed again and SR-EXPAND d17 records both removals — not yet done; see §What is still owed."
+description: "W-237, RM3 behind a `grounded`-only gate: FAIL — no gain, by the frozen table. On the 69 `grounded` questions of set-4-claude no arm's net is positive (0/0, 1/1, 2/3, 4/6 wins/losses at rank 1), and from 0.2 up every arm also loses baseline rank-1 hits (1, 3, 6). The table's consequence is W-237 step 5: the code is removed again and SR-EXPAND d17 records both removals — done 2026-10-03 on Arpit's ruling; see §What is still owed."
 verdict: FAIL
 verdict_by_table: "FAIL — no gain"
 ruled_by: "the frozen table (PRE-REGISTRATION §The decision rule); no ruling needed for the outcome"
@@ -76,6 +76,13 @@ tagged questions.
 - ⚠ `informed`, on one Claude-authored set and the 1 000-document rung.
 
 ## What is still owed — the table's consequence, not yet done
+
+✅ **Done 2026-10-03** (Claude Code, Opus). Arpit (Cowork, 2026-10-03): *"W237
+remove everything related to RM3."* Code, records, CHANGELOG and both bundles
+are removed in one change. SR-EXPAND d17 records both removals, and `rm3_weight`
+is refused naming both. `ask`/`find --json` were byte-identical before and after,
+24/24 in each reader. The paragraphs below are kept as written.
+
 
 Per the bar's table and [W-237](../../open/W-237-rm3-grounded-gate.md) step 5,
 **FAIL removes the code again, and [SR-EXPAND](../../../records/0149_expand.md)

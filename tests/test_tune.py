@@ -328,29 +328,33 @@ def test_a_removed_key_is_named_even_beside_a_genuine_typo(tmp_path):
         load_on(tmp_path)
 
 
-def test_rm3_weight_is_accepted_again_by_both_readers_and_ships_off(tmp_path):
-    """W-237: RM3 returned behind a `grounded`-only gate (Arpit, 2026-09-30,
-    R1 · G3), so `rm3_weight` left `_REMOVED_KEYS` and is a live key again
-    (SR-TUNE decision 18). It ships at `0.0`, and both readers read the same
-    value from the same file — one refusing a line the other accepts is the
-    asymmetry the differential law forbids.
-    """
-    from fux.tune import _REMOVED_KEYS
+def test_rm3_weight_is_refused_by_both_readers(tmp_path):
+    """🔴 W-224: RM3 FAILED twice on drift and was removed on 2026-09-27; W-237:
+    gated on a `grounded` first pass it FAILED again, and was removed a second
+    time on 2026-10-03. The one refusal names both removals.
 
-    assert ("ranking", "rm3_weight") not in _REMOVED_KEYS
-    assert template_tune().rm3_weight == 0.0
-    assert re.search(r"^rm3_weight\s*=\s*0\.0$", specimen(), re.M)
-    _write(tmp_path, tune_text(ranking={"rm3_weight": 0.3}))
-    assert load_on(tmp_path).rm3_weight == 0.3
+    `fux setup` wrote `rm3_weight` into every `.fux/tune.toml` from 3.0.0-alpha.3
+    on, so the refusal names the removal (SR-TUNE decision 15) — never a silent
+    ignore, never an alias. Both readers refuse the same file, or one of them
+    shrugs at a line the other stops on.
+    """
+    _write(tmp_path, "[ranking]\nrm3_weight = 0.0\n")
+    with pytest.raises(FuxError, match=r"`rm3_weight` was REMOVED on 2026-09-27 \(W-224\)") as caught:
+        load_on(tmp_path)
+    assert "second time on 2026-10-03 (W-237)" in str(caught.value)
+    assert not hasattr(template_tune(), "rm3_weight")
+    assert "rm3_weight" not in specimen()
 
     if shutil.which("node") is None:
         pytest.skip("node is not on PATH")
     script = (
         f"import {{ loadTune }} from {json.dumps((ENGINE / 'node/src/config/tune.mjs').as_uri())};"
-        f"console.log(loadTune({json.dumps(str(tmp_path))}, {{ enabled: true }}).rm3Weight);"
+        f"try {{ loadTune({json.dumps(str(tmp_path))}, {{ enabled: true }}); console.log('LOADED'); }}"
+        "catch (e) { console.log(e.message); }"
     )
     out = subprocess.run(["node", "--input-type=module", "-e", script], capture_output=True, text=True)
-    assert out.stdout.strip() == "0.3", out.stdout + out.stderr
+    assert "`rm3_weight` was REMOVED on 2026-09-27 (W-224)" in out.stdout, out.stdout + out.stderr
+    assert "second time on 2026-10-03 (W-237)" in out.stdout, out.stdout + out.stderr
 
 
 def test_a_removed_key_is_gone_from_the_closed_key_set(tmp_path):

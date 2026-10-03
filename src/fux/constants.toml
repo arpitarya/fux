@@ -351,15 +351,6 @@ hook_preamble = "preamble.sh.txt"
 # deliberately not a tune key.
 rrf_k = 60
 
-[rm3]
-# RM3's feedback counts (query/rm3.*, W-237): the top fb_docs documents of the
-# first pass give up their fb_terms highest-RM1 terms. Anserini's defaults,
-# frozen by work/regression/2026-09-30-rm3-grounded/PRE-REGISTRATION.md --
-# deliberately not tune keys: a second lever beside rm3_weight is one the bar
-# forbids sweeping.
-fb_docs = 10
-fb_terms = 10
-
 [versions]
 # ingest/extract.py's RULES_VERSION -- bump when what extraction RETURNS moves;
 # the next `fux ingest` then re-extracts the corpus. History: ingest/extract.py.

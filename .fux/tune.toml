@@ -60,12 +60,6 @@ expand_weight           = 0.2   # Query2doc's 1:5; unmeasured on your corpus
 # weight. 0 = OFF. The default 0.5 is MEASURED: it passed its pre-registered run
 # on 2026-09-27.
 mined_weight            = 0.5
-# RM3: ten words fux borrows from its own top ten documents, re-queried once at
-# this weight -- and ONLY when the first answer's band is `grounded`. 0 = OFF,
-# and off runs no first pass. It failed twice ungated, on drift; the gated form
-# is measured by work/regression/2026-09-30-rm3-grounded. Never runs when a
-# caller passes `--expand`, and `fux lexical` never runs it.
-rm3_weight              = 0.0
 # Prefer the kind of document a question asks for: "how do I" -> a procedure,
 # "why did we" -> a decision, "what is" -> a reference. A document whose
 # [doctype] type matches is scaled by 1 + this. 0 = OFF, and without a

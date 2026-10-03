@@ -92,7 +92,9 @@ _FINGERPRINTS = (
 #: wording, and rewriting history to satisfy a duplication rule is exactly what
 #: the archive exists to prevent. `WORKLOG.md` is append-only for the same reason.
 _SKIP_PARTS = frozenset(
-    {"archive", ".venv", "node_modules", ".git", "site-packages", "regression", "__pycache__"}
+    {"archive", ".venv", "node_modules", ".git", "site-packages", "regression", "__pycache__",
+     # `.claude/worktrees/`: subagent checkouts of older commits.
+     "worktrees"}
 )
 _EXEMPT = {RECORD, ROOT / "work" / "WORKLOG.md", Path(__file__)}
 

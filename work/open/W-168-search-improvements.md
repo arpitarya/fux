@@ -4,16 +4,24 @@ name: W-168
 description: "The ten ranking improvements of proposals/search-improvements-v3.md, promoted as one program with ten gated steps: anchor text, corpus-mined expansion, unstemmed identifier field, RM3, supersession-aware ranking, SDM proximity, MMR diversification, git authority prior, intent → doc-type prior, section-level units. Each step is its own golden question → pre-registration → build → measure → keep/remove; never two in one arm."
 item: W-168
 filed: 2026-09-14
-ball: arpit
+ball: agent
 ---
 
-## 🔴 STEP 8 DECIDED: INCONCLUSIVE BY THE TABLE — 2026-09-30 (Claude Code, Opus; a non-capturing session)
+## ✅ STEP 8 RULED: FAIL (drift), REMOVE ALL — 2026-10-03 (Arpit, Cowork) · ratified, NOT built
+
+**Arpit, 2026-10-03:** *"For 168, go with C."* — on the question below: verdict **FAIL (drift)** (recommended), and option **(c)**: remove the prior's code **and** the two `M/` count fields, accepting an index-format bump (`fux.index.v6` → `v7`) and a re-ingest. He chose (c) over (b) "keep the counts, drop the code" and (a) "keep all off at `0.0`".
+
+- **Build (Claude Code, Opus):** remove the authority prior from both readers, the `authority_weight` key from tune/constants/templates, the two ints from `M/` and their `git log` walk; bump the index format; tests follow. Records amended in the same change: the compare doc's outcome, SR-TUNE, the index-format record, CHANGELOG. The step's run folder and verdict stay as evidence.
+- **Unblocks now:** W-228 (its wait was steps 7 and 8's verdicts — both filed). W-225 still waits on W-228.
+- The ruling is recorded in the [verdict](../regression/2026-09-28-authority-prior/VERDICT.md) `ruled_by`.
+
+## STEP 8 DECIDED: INCONCLUSIVE BY THE TABLE — 2026-09-30 (Claude Code, Opus; a non-capturing session)
 
 [Verdict](../regression/2026-09-28-authority-prior/VERDICT.md). Every arm has a positive net below the floor on the 101 tagged questions (+1, +1, +3, +2), and **every arm loses baseline rank-1 hits: 2, 4, 4 and 10.** The table defines *FAIL: drift* only for values that clear the gain bar, so this shape falls to its INCONCLUSIVE catch-all.
 
 - **No value can be admitted under any reading.** `authority_weight` stays `0.0`.
 - ⚠ No decider was committed before scoring. This session wrote `decide.py` from step 9's after the score files existed and before reading a row; the verdict says so.
-- 🔴 **Arpit rules:** FAIL (drift)? (recommended, as for RM3 on 2026-09-27). And on FAIL, do the `M/` counts and the code stay (off at `0.0`) or go?
+- ✅ **Arpit ruled 2026-10-03:** FAIL (drift), option (c) — see above.
 - **Blocks:** W-228 (waits on steps 7 and 8's verdicts), and W-225 through it.
 
 ## ✅ STEP 10 RE-RULED U2 → W-236 · STEP 5 RULED R1 · G3 → W-237 — 2026-09-29 (Arpit, Cowork) · ratified, NOT built
@@ -24,7 +32,7 @@ ball: arpit
   - **Recommends R0, stay removed.** Post hoc on both filed runs, no band gate clears the drift clause. The best nets +4 tagged, where 7–10 were needed.
   - Selective expansion is recorded as the only form RM3 may return in.
   - ✅ **Ruled R0 the same day (Arpit):** RM3 stays removed and SR-EXPAND d17 is unchanged. Step 5 stays failed.
-- ✅ **Re-ruled 11:25 (Arpit):** R1 · G3 supersedes R0. RM3 returns, expanding only on a `grounded` first pass. **Filed as [W-237](W-237-rm3-grounded-gate.md).**
+- ✅ **Re-ruled 11:25 (Arpit):** R1 · G3 supersedes R0. RM3 returns, expanding only on a `grounded` first pass. **Filed as W-237** — measured FAIL (no gain) and removed 2026-10-03 ([verdict](../regression/2026-09-30-rm3-grounded/VERDICT.md)).
 - **Step 10 filed as [W-236](W-236-section-records.md)** (Arpit's ask): the design record and a size measurement now, then the build once a pool of 6 or more exists.
 - **Unchanged:** step 8 is still the next build.
 

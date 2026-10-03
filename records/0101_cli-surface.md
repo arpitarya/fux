@@ -10,7 +10,7 @@ feature: the `fux` command-line interface — every verb, its flags, its exit co
 owns: [src/fux/cli.py@eafa474928d8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@7a5371c09e45, src/fux/progress.py@10364bd02e0a, tests_e2e@60bd0dcdc3ca, node/fux.mjs@45c2606b2e73]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 4e2e51e59c151c79357a246fb91ad9a15e892924f13e2fe54d1cc76b8562c972
+content_sha: 80fdae83edae1164fbee550665dc1a6720624bfc93dd443ead9c00c393275b7d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -415,11 +415,9 @@ is FROZEN.** (W-160.)
 `ask --scan` already computed BM25F alone. What this adds is a **contract**:
 
 - **`lexical` is BM25F → rerank → RRF over `-q`. No graph stage, ever.**
-- **And no engine-written expansion, ever.** Gated RM3 ([SR-EXPAND](0149_expand.md)
-  decision 17, W-237) is forced to `rm3_weight = 0.0` here in both readers, as
-  it was before its 2026-09-27 removal, and as `mined_weight` and
-  `intent_weight` are. `ask --why` names the RM3 gate when it fires
-  ([SR-PROVENANCE](0142_provenance.md)).
+- **And no engine-written expansion, ever.** RM3 was forced off here while it
+  existed; it was removed on 2026-09-27 ([SR-EXPAND](0149_expand.md) decision
+  17), so there is nothing left to force.
 - **A future component added to the lexical core is a NEW VERB or a TUNABLE,
   never a change to this one.** That sentence is the whole decision; everything
   else here is what makes it hold.

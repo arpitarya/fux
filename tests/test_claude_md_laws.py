@@ -42,7 +42,8 @@ GENERATOR = ROOT / "scripts" / "gen-laws.py"
 #: Directories that are not live documents. `archive/` above all: an archived
 #: doc may carry a law's old wording, and rewriting history to satisfy a
 #: freshness rule is what the archive exists to prevent.
-_SKIP_PARTS = frozenset({"archive", ".venv", "node_modules", ".git", "site-packages"})
+# `worktrees`: `.claude/worktrees/` holds subagent checkouts of older commits.
+_SKIP_PARTS = frozenset({"archive", ".venv", "node_modules", ".git", "site-packages", "worktrees"})
 
 
 def _gen():

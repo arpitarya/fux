@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@8a99860bf5be]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@e7f0b058df4b]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 98d205e66da20927614594ba37279193fa4a433a65c9aa5442c85e164ce041ca
+content_sha: e25882979342748b5c0c345d2e86abdecaf67f71361e04cdb7aadb6d86b40107
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -177,8 +177,6 @@ pattern. A consumer who wants other cues is I2, which is not built.
 
 **W-225 stage 7 (2026-09-28)** added `[analyzer] stopwords`, `[mcp] jsonrpc`, `[maintain] url_shas`, `[fuxdir] readme`, `[bundle] package` and `mcp_tools`, `[receipt] loc_annotation`, `[index] shard_suffix` and `[refer] cache_suffix`. With them in place, the veto test `tests/test_l12_values_live_in_config.py` checks the remaining literals against `tests/l12_allow.toml`, each under its decision-6 category.
 
-
-**`[rm3]` returned on 2026-09-30** (W-237; [SR-EXPAND](0149_expand.md) decision 17): `fb_docs` and `fb_terms`, RM3's two feedback counts. FIXED, not tunable: the frozen bar [`2026-09-30-rm3-grounded`](../work/regression/2026-09-30-rm3-grounded/PRE-REGISTRATION.md) fixed them, and a second lever beside `rm3_weight` is one it forbids sweeping.
 
 **`[identifiers]`** holds the identifier-family constants — `flexible_separators`, the shard-header key and the digest's width — and `[files] identifiers` and `[templates] identifiers` name the file and its template ([SR-IDENTIFIERS](0160_identifiers.md)).
 

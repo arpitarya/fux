@@ -23,12 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-168** — step 8 is INCONCLUSIVE by the table; every arm loses 2–10 rank-1 hits. Rule FAIL (drift)? (recommended) — and do the `M/` counts and code stay off at `0.0` or go? [verdict](regression/2026-09-28-authority-prior/VERDICT.md) | 2026-09-30 | 0d |
-| ↳ **blocks:** W-228 (waits on steps 7 and 8's verdicts), and W-225 through it | | |
-| 🔴 **W-240** — run [prompt 12](golden/prompts/12-claude-gen4-section-seed.md) in a fresh claude.ai chat (A1 bars any Claude Code session that has seen a score), commit blocks 1–3, and put block 4 in `golden-answers/` yourself | 2026-09-30 | 0d |
-| ↳ **blocks:** W-236 Part B | | |
-| 🔴 **W-237** — FAIL (no gain) by the table. Say go to remove the RM3 code again (step 5): the permission classifier refused the reverse-apply in-session. It is off at `0.0` meanwhile. [verdict](regression/2026-09-30-rm3-grounded/VERDICT.md) | 2026-09-30 | 0d |
-| ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-228** — run [prompt 13](golden/prompts/13-claude-gen4-planted-misfits.md) in a fresh claude.ai chat (6 short docs, 3 planted misfits) and commit its three blocks. No key this time | 2026-10-03 | 0d |
+| ↳ **blocks:** W-240, W-236, W-225 | | |
 
 ---
 
@@ -36,12 +32,11 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-168** · `arpit` — ranking ideas. 6, 7 stop; 9 shipped; 10 → W-236, 5 → W-237. **Step 8 (authority prior) decided INCONCLUSIVE by the table 2026-09-30; every arm broke the drift clause. Arpit rules.** [detail](open/W-168-search-improvements.md)
+- 🟢 **W-168** · `agent` — ranking ideas. 6, 7 stop; 9 shipped; 10 → W-236; 5 (RM3) removed. **Step 8 (authority prior) failed: it knocked right answers off the top. Ruled 2026-10-03: delete it all (index v7); not built.** **Opus.** [detail](open/W-168-search-improvements.md)
 - 🔴 **W-225** · `agent` — L12 migration: no values hidden in code. Stages 1–7 and the 16 odd sites landed. Left: stage 5f `inspect`, **waiting on W-228**, then stage 8. **Opus.** [detail](open/W-225-values-live-in-config.md)
-- 🔴 **W-228** · `agent` — document families. The lens is built; its misfit flag's threshold is still a placeholder. Arpit ruled (not built): plant known misfits in the seed once steps 7 and 8 file verdicts — waiting on W-168. [detail](open/W-228-document-families.md)
+- 🔴 **W-228** · `arpit` — document families. The lens is built, but its misfit threshold is a placeholder: no known misfits exist yet. Arpit runs prompt 13 to plant 3, riding in gen 4 with W-240. [detail](open/W-228-document-families.md)
 - 🔴 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)
-- 🔴 **W-240** · `arpit` — a scored set with a `step10_section` pool ≥ 6 (set-4-claude: 1). [Prompt 12](golden/prompts/12-claude-gen4-section-seed.md) written; Arpit runs it, then a rung rebuild (**Opus**), then 🔴 Arpit scores. [detail](open/W-240-section-pool-set.md)
-- 🔴 **W-237** · `arpit` — RM3 behind the `grounded` gate: **FAIL (no gain)** 2026-09-30. The removal (step 5) waits on Arpit's go-ahead; it is off at `0.0` meanwhile. [detail](open/W-237-rm3-grounded-gate.md)
+- 🔴 **W-240** · `agent` — a question set that can test section scoring. Prompt 12's docs and 90 questions are in (ruled: accept). Ladder rebuild waits on W-228, then 🔴 Arpit scores. **Opus.** [detail](open/W-240-section-pool-set.md)
 - 🟢 **W-242** · `agent` — one derived plane, both readers. **Tier 0 PASS** ([report](regression/2026-09-30-shared-runtime/report.md)). Next: Tier 1 (Node reads `.fux/runtime/`), then Tier 2. **Opus.** [detail](open/W-242-shared-runtime.md)
 
 

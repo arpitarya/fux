@@ -1,9 +1,17 @@
 ---
 type: Compare
-description: "RULED R1 · G3 2026-09-29 (Arpit; superseded his R0 the same day): RM3 returns expanding only on grounded first passes, filed as W-237. Whether RM3 comes back as SELECTIVE expansion (expand only when the first pass's band says it is safe) after SR-EXPAND decision 17 removed it. Options: stay removed, gate by band (three gates), or leave expansion to the caller's --expand. Measured post hoc on the two filed RM3 runs; no gate clears the drift bound."
+description: "CLOSED 2026-10-03: G3 measured FAIL (no gain) and RM3 removed a second time (SR-EXPAND d17). RULED R1 · G3 2026-09-29 (Arpit; superseded his R0 the same day): RM3 returns expanding only on grounded first passes, filed as W-237. Whether RM3 comes back as SELECTIVE expansion (expand only when the first pass's band says it is safe) after SR-EXPAND decision 17 removed it. Options: stay removed, gate by band (three gates), or leave expansion to the caller's --expand. Measured post hoc on the two filed RM3 runs; no gate clears the drift bound."
 ---
 
 # RM3, selectively — does gated expansion reopen W-168 step 5?
+
+> 🔴 **OUTCOME, 2026-10-03: FAIL (no gain), and RM3 is removed for the second
+> time.** G3 was measured on `set-4-claude` against its frozen bar
+> ([verdict](../regression/2026-09-30-rm3-grounded/VERDICT.md)): wins/losses at rank 1 of 0/0 · 1/1 · 2/3 · 4/6. Arpit
+> ruled *"remove everything related to RM3"*, and
+> [SR-EXPAND](../../records/0149_expand.md) decision 17 records both removals.
+> RM3 returns only through a new design record. Everything below is the ruling
+> as it was made.
 
 > **Verdict:** ✅ **RE-RULED 2026-09-29, 11:25 (Arpit, Cowork): R1 with gate G3 —
 > RM3 comes back, expanding ONLY when the first pass's band is `grounded`.**
@@ -11,7 +19,7 @@ description: "RULED R1 · G3 2026-09-29 (Arpit; superseded his R0 the same day):
 > That's what I want."* It supersedes his R0 of 10:35 the same day, and it
 > amends [SR-EXPAND](../../records/0149_expand.md) decision 17 (*"does not come
 > back as a tunable"*). The amendment lands in the same change as the build.
-> **Filed as [W-237](../open/W-237-rm3-grounded-gate.md).** Nothing is built yet.
+> **Filed as W-237** (closed 2026-10-03; outcome above).
 >
 > ⚠ **What the evidence says about G3, stated before any run:** on `set-2-u` it
 > was the safest gate and the weakest. It lost nothing on the lexical run, and

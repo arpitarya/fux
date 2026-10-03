@@ -20,6 +20,9 @@ ARCHIVE = ROOT / "archive"
 _SKIP = {
     ".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache",
     ".mypy_cache", "_to_delete",
+    # `.claude/worktrees/` holds subagent worktrees: whole second checkouts of
+    # this repo, often of an older commit. Walking them checks a stale tree.
+    "worktrees",
 }
 
 # `work/WORKLOG.md` is append-only history: its old entries describe a tree that

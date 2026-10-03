@@ -81,6 +81,9 @@ _TEXT_SUFFIXES = {
 _SKIP_DIRS = {
     ".git", ".venv", "venv", "node_modules", "__pycache__",
     ".pytest_cache", ".mypy_cache", "_to_delete", "dist", "build",
+    # `.claude/worktrees/` holds subagent worktrees: whole second checkouts of
+    # this repo, often of an older commit. Walking them checks a stale tree.
+    "worktrees",
 }
 
 _REF = re.compile(r"((?:\.\./)*(?:records/)?)(\d{4})_([A-Za-z0-9._-]+\.md)")
@@ -109,7 +112,7 @@ def _candidate_files() -> list[Path]:
     for path in ROOT.rglob("*"):
         if not path.is_file() or path.suffix not in _TEXT_SUFFIXES:
             continue
-        if any(part in _SKIP_DIRS for part in path.parts):
+        if any(part in _SKIP_DIRS for part in path.relative_to(ROOT).parts):
             continue
         rel = path.relative_to(ROOT).as_posix()
         if _is_frozen(rel):

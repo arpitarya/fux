@@ -11,7 +11,7 @@ owns: [src/fux/query/expand.py@fe8364556021, src/fux/query/fuse.py@ca1f9d50d93c,
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: c0fb09096719b5d57a43de45cc47ceb452fcd2467e963b91af93693404a23bd9
+content_sha: 07317e1d06d624aff466056fc538ab13a9c82b3e2881725e1078c10793aec932
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -146,11 +146,10 @@ are the measured form of that idea; RRF is Cormack, Clarke & Buettcher 2009.
 is a *term slot*. The text arrives from the caller, is analyzed by
 `query/analyzer.py` — the analyzer the index was built with — and is hashed.
 Nothing in `src/fux/` generates, rewrites or suggests one. L4 is why, and the
-slot is what makes the law survivable rather than merely obeyed. **The two
-additions fux makes are not written expansions in this sense**: decision 18's
-fold adds a spelling the corpus itself DECLARED, and decision 17's gated RM3
-adds hashes read deterministically from committed records, off by default.
-Neither generates text, and a model is in neither.
+slot is what makes the law survivable rather than merely obeyed. **The one
+addition fux makes is not a written expansion in this sense**: decision 18's
+fold adds a spelling the corpus itself DECLARED, deterministically, and is off
+by default.
 
 **2. Supplied terms are scored, never trusted.** Each expansion hash's BM25F
 contribution is multiplied by `[ranking] expand_weight` inside
@@ -286,56 +285,49 @@ committed document, pointing at this one. `required` is still the user's own
 hashes in both cases — what changed is where a match may be found, not what
 counts as one.
 
-**16. ~~RM3 is an expansion the ENGINE writes~~ — SUPERSEDED by decision 17.**
-It was built ungated on 2026-09-23 (W-168 step 5), removed on 2026-09-27, and
-returned gated on 2026-09-30; decision 17 is the form in force.
+**16. ~~RM3 is an expansion the ENGINE writes~~ — SUPERSEDED 2026-09-27 by
+decision 17.** It was built ungated on 2026-09-23 (W-168 step 5), and built a
+second time behind a `grounded` gate on 2026-09-30 (W-237). Both builds were
+removed on the rulings decision 17 records.
 
-**17. 🔴 RM3 runs ONLY when the first pass is `grounded`, and ships OFF**
-(Arpit, 2026-09-29, R1 · G3 in
-[`compare/rm3-selective`](../work/compare/rm3-selective.compare.md); built
-2026-09-30, W-237). Ungated RM3 was **removed** on 2026-09-27 (W-224: *"mark RM3
-as fail. and remove all the RM3 related code"*) and **returns in exactly one
-form**: the engine borrows ten words from its own ranking only when that ranking
-is already confident. Everything else in this record is unchanged: the caller's
-own `--expand` at `expand_weight`, and the corpus's declared spellings
-(decision 18).
+**17. 🔴 RM3 is REMOVED — twice — and `rm3_weight` is refused by name.**
+First removal: Arpit, 2026-09-27, W-224: *"mark RM3 as fail. and remove all the
+RM3 related code"*. Second removal: Arpit, 2026-10-03, W-237: *"remove
+everything related to RM3."* **Fux borrows no words from its own ranking, in any
+form, gated or not.** What remains is the caller's own `--expand`, at
+`expand_weight`, and the spellings the corpus declares (decision 18).
 
-- **Why it was removed: two runs, two first passes, one failure — drift.**
-  Against [`2026-09-23-rm3`](../work/regression/2026-09-23-rm3/PRE-REGISTRATION.md),
-  feedback from the lexical first pass lost 6 → 11 baseline rank-1 hits and no
-  weight cleared the gain bar ([verdict](../work/regression/2026-09-23-rm3/VERDICT.md)).
-  The W-221 re-run, feedback from the list `ask` shows
-  ([`2026-09-25-rm3-boosted`](../work/regression/2026-09-25-rm3-boosted/PRE-REGISTRATION.md)),
-  lost 6 → 13 and cleared nothing ([verdict](../work/regression/2026-09-25-rm3-boosted/VERDICT.md)).
-- **Why it may return gated.** Post hoc on those rows, the `grounded` gate lost
-  no rank-1 hit on the lexical run and gained +3 at most; the compare doc records
-  the split. That choice was made after the rows were seen, so it is measured
-  only on a set RM3 never ran on: `set-4-claude`, against the frozen bar
+- **The gated form failed too: no gain.** RM3 expanding only when the
+  un-expanded first pass's band is `grounded` (R1 · G3 in
+  [`compare/rm3-selective`](../work/compare/rm3-selective.compare.md)) was
+  measured on `set-4-claude`, a set RM3 had never run on, against
   [`2026-09-30-rm3-grounded`](../work/regression/2026-09-30-rm3-grounded/PRE-REGISTRATION.md).
-- **The mechanism is that bar's**, in both readers (`query/rm3.py`,
-  `node/src/query/rm3.mjs`, the gate in `run_query` / `runQuery`):
-  - **the first pass is the answer at `rm3_weight = 0.0`, exactly**, and the
-    gate reads its band ([SR-CONFIDENCE](0141_confidence.md) decision 18). Any
-    band but `grounded`, and that pass **is** the answer;
-  - **the feedback set is that pass's lexical window**, top
-    `constants.toml [rm3] fb_docs`, before rerank, pin and graph tier;
-    `[rm3] fb_terms` terms by RM1, the user's own terms excluded, ties by hash;
-  - the terms **stack** onto the first pass's expansion at `rm3_weight`
-    (`expand.stack`), so decision 3's refusal holds: a document matching only
-    feedback terms is dropped;
-  - the second pass is the answer; its band and `--why` describe it, and `--why`
-    names the gate when it fired ([SR-PROVENANCE](0142_provenance.md)).
-- **`0.0` runs no first pass**, reads no band and no record, so every `ask`,
-  `find` and `answer` at the default is byte-identical to the engine with no
-  RM3 at all, asserted by `tests/query/test_rm3.py`.
-- **A caller's `--expand` wins** (RM3 does not run beside one), and **`fux
-  lexical` forces it off** in both readers ([SR-CLI](0101_cli-surface.md)
-  decision 12).
-- **`rm3_weight` is a live key again** ([SR-TUNE](0135_tuning.md) decision 18);
-  it left `_REMOVED_KEYS` and its Node twin in the same change.
-- 🔴 **If the bar FAILs, the code is removed again** (W-237 step 5) and this
-  decision records **both** removals. A PASS ships the first weight that clears,
-  and nothing else may turn it on.
+  On the 69 `grounded` questions, wins/losses at rank 1 were 0/0 · 1/1 · 2/3 ·
+  4/6 at weights 0.1 · 0.2 · 0.3 · 0.5, and from 0.2 up every arm also lost
+  baseline rank-1 hits (1 · 3 · 6)
+  ([verdict](../work/regression/2026-09-30-rm3-grounded/VERDICT.md)). The gate
+  held: no untagged question moved. Gating it only stopped the losses from
+  spreading.
+- **Three runs, three FAILs, so RM3 is closed.** It comes back only through a
+  new design record, never by reopening this decision.
+- **The ungated form failed on drift, with two different first passes.** Against the frozen bar in
+  [`2026-09-23-rm3`](../work/regression/2026-09-23-rm3/PRE-REGISTRATION.md),
+  feedback from the lexical first pass lost 6 → 11 baseline rank-1 hits and no
+  weight cleared the gain bar
+  ([verdict](../work/regression/2026-09-23-rm3/VERDICT.md)). The W-221 re-run,
+  with feedback from the list `ask` shows,
+  [`2026-09-25-rm3-boosted`](../work/regression/2026-09-25-rm3-boosted/PRE-REGISTRATION.md),
+  lost 6 → 13 and cleared nothing
+  ([verdict](../work/regression/2026-09-25-rm3-boosted/VERDICT.md)).
+- **It does not come back as a tunable.** Both first passes are gone, so the
+  ruling settles the boosted-versus-lexical question too.
+- **Removing it moves no ranking.** The key shipped at `0.0`, and `0.0` ran no
+  first pass, so every `ask`, `find` and `answer` on a config without the key is
+  byte-identical to the engine before it existed.
+- **A `tune.toml` that still sets `rm3_weight` is refused**, and the error
+  names the removal ([SR-TUNE](0135_tuning.md) decision 15's table), because
+  `fux setup` wrote the key into every file it created from 3.0.0-alpha.3 on.
+  There is no alias and no silent ignore.
 - **The evidence stays.** All three regression directories, and their frozen
   `decide.py`, are history and are not engine code.
 
@@ -352,7 +344,7 @@ scored through `Expansion` at `[ranking] mined_weight`
   distinction, applied again: the words are ones a **person wrote** in a
   committed document, found by a fixed regular expression and the one shared
   analyzer. Nothing is generated, and nothing is borrowed from fux's own
-  ranking, which is what RM3 does, and only behind decision 17's gate.
+  ranking, which is what RM3 did and what decision 17 removed.
 - **One family.** `Long Form (ABBR)`, by the tag's own pattern
   (`mined.PATTERN`, held equal by a test). Glossary lines and `aliases:` are
   not built: a glossary line pairs a term with a definition, and expanding by a
@@ -436,9 +428,9 @@ this moved where they are written, not what they are.
 ### Alternatives considered
 
 - **Fux writes the expansion** (PRF/RM3, or a model). A model is refused by L4
-  outright. Ungated PRF was measured as an arm, twice, and **refused on the
-  measurement**: it drifted at every weight. It survives only behind decision
-  17's `grounded` gate, off until a frozen bar says otherwise.
+  outright. PRF was measured three times, and **refused on the
+  measurement** (decision 17): ungated, it drifted at every weight, and
+  gated on a `grounded` first pass, it gained nothing.
 - **Score-space fusion**, as the deleted dense lane did. Refused: decision 8.
 - **An `[expand]` table with its own weight, boost and depth keys.** Refused —
   one knob, on the table the ranking already reads. A second table is how

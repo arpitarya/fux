@@ -7,10 +7,10 @@ description: "The prohibition is law L11 and this record states none of it; what
 status: accepted
 date: 2026-09-28
 feature: the golden benchmark — its two question sets, the key's custody, its guards, what Claude may read, and where the prohibition is stated
-owns: [.claude/hooks/guard-golden-answer.sh@de3c4f5d5725, .claude/hooks/guard-sealed-key.sh@85f6df22a301, tests/test_golden_key_guards.py@280935f6475f, tests/test_settings_never_committed_unlocked.py@df702e8bb51c, tests/test_golden_hook_prose.py@5cf50353a104, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@49db9e6261d8, tools/golden-difficulty@d4b84445ced3]
+owns: [.claude/hooks/guard-golden-answer.sh@de3c4f5d5725, .claude/hooks/guard-sealed-key.sh@85f6df22a301, tests/test_golden_key_guards.py@280935f6475f, tests/test_settings_never_committed_unlocked.py@df702e8bb51c, tests/test_golden_hook_prose.py@5cf50353a104, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@46fc76cfc8f0, tools/golden-difficulty@d4b84445ced3]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: 73e280df24a7f84e56a48b72755632ff8ac42b382b6fc8136ad24ab4171667bf
+content_sha: 4727a393aa65709af2016a92b5cd72e5cb8c698f98e0cbe0f75707b4e4c29aa2
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 

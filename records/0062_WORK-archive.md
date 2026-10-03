@@ -7,10 +7,10 @@ description: "There is exactly one archive, at the repo root, and anything retir
 status: accepted
 date: 2026-09-14
 feature: the one archive, and the line between naming a retired document and grounding a claim in one
-owns: [tests/test_archive_law.py@0bcf319c1b1a]
+owns: [tests/test_archive_law.py@1ae2c7772c97]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: ff0d9b68128c169fe78be0d8f39e5959176a755579ea34f2a7e5a33747bacf6f
+content_sha: dae3c21a38795e694c22ffd9c84c284898c231077b2683d80ad78650d3d22c21
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
