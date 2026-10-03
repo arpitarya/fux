@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@0cf84795530a, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@abc1ada64ba0, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 386f5e077af01d52325f95a4fc9c0de3b12de73cf030cc87408976ff51fde713
+content_sha: adb148ccdf7eef5ea0132dae5be20d6c64b0a377d2c19daaae6a3384b1534076
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -301,7 +301,7 @@ not run is how `find` went a month without its tune file.
 **10. `ranked_by` names the candidate path, and the two runtimes differ there —
 which is honest, not a defect.**
 
-⚠ *Superseded on a fresh plane by decision 24 (2026-09-30, ratified, not built): Node will read the plane and report `"accelerator"` too.*
+⚠ *Superseded on a fresh plane by decision 24's Tier 1 (built 2026-10-03): Node reads the plane on its MCP surface and reports `"accelerator"` too. What follows is true of a missing or stale plane only.*
 
 `mcp.py::_search` passes `force_scan=False` and reports `"accelerator"` when a
 fresh build exists. Node has no accelerator and reports `"scan"`. The
@@ -943,7 +943,7 @@ lost `authorityWeight` and `authorityFor` in `rank.mjs`, in the same change as
 `rank.py`, so the differential law is held by the deletion itself.
 
 **24. 🟠 Node joins the derived plane — as a reader and as a builder.
-Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1–2 not built**
+Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tier 1 BUILT 2026-10-03, Tier 2 not built**
 ([W-242](../work/open/W-242-shared-runtime.md);
 [`compare/shared-runtime`](../work/compare/shared-runtime.compare.md);
 [SR-T1-ACCELERATOR](0110_accelerator.md) decision 18 owns the plane).
@@ -971,10 +971,19 @@ Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1–2 not built**
     files ARE shards once a plane's stamp counts them.
   - Stdout byte-identical to the pre-Tier-0 reader on all nine pre-registered
     cells ([`2026-09-30-shared-runtime`](../work/regression/2026-09-30-shared-runtime/)).
-- **Tier 1.** Node answers from Python's `.fux/runtime/` when it is fresh, and
-  from its scan otherwise. **Decision 10's asymmetry disappears on a fresh
-  plane** — both runtimes report `"accelerator"` — and remains, truthfully, on
-  a scan.
+- **Tier 1 — ✅ built 2026-10-03.** Node answers from Python's `.fux/runtime/`
+  under `--fast` (and on `fux mcp`, as `mcp.py` does) when it is fresh, and from
+  its scan otherwise — never an error. The scan stays the default, as in Python.
+  - `node/src/derive/format.mjs` and `accel.mjs` transcribe `format.py` and
+    `accel.py` ([SR-T1-ACCELERATOR](0110_accelerator.md) owns both twins): the
+    62-byte entry by `DataView`, `isFresh` with the stamp read as BigInt, and
+    the skip loop in `accel.py`'s order. `Weighting.maximum` joins `rank.mjs`.
+  - **Decision 10's asymmetry is gone on a fresh plane**: Node's MCP reports
+    `ranked_by` from the path that answered, so the differential arm compares
+    the key instead of excluding it.
+  - Measured ([report](../work/regression/2026-09-30-shared-runtime/report.md)): Node-plane = Node-scan = Python-plane on
+    candidates, `(n, total_wlen, df)` and order, 0 discordant on this repo,
+    rung-10000 and the adversarial index; stdout identical on all nine cells.
 - **Tier 2.** Node gains `fux build` — **its first write verb.** It writes the
   plane Python writes, byte for byte, under the same lock. `ingest` stays
   Python's (decision 11: Node has no decoders). **No read verb builds**; a

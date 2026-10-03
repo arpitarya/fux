@@ -134,8 +134,11 @@ function fuxSearch(root, args, top, maxHeadings) {
   // W-242 Tier 0 — ONE tool call's read of each shard, never kept past it:
   // this server is long-lived, and `ingest` rewrites the index under it.
   const shards = new Shards(root);
-  const { results, related, confidence } = runQuery(root, query, k, {
+  const { results, related, confidence, path } = runQuery(root, query, k, {
     useTune: true, wantConfidence: true, compose: true, expand, shards,
+    // `mcp.py::_search` passes `force_scan=False`: the plane answers when it is
+    // fresh, and the scan when it is not (W-242 Tier 1).
+    fast: true,
   });
   const records = results.length ? recordsById(root, shards) : new Map();
   const out = results.map((r) => {
@@ -176,9 +179,9 @@ function fuxSearch(root, args, top, maxHeadings) {
       path: r.loc, title: r.title, mass: pyRound(r.mass, SCORE_DIGITS),
       archived: r.archived, route: r.route,
     })),
-    // Node has no accelerator; the scan is the only path, and saying anything
-    // else would be a lie about which one answered.
-    ranked_by: "scan",
+    // Which candidate path answered — `"accelerator"` on a fresh plane, `"scan"`
+    // otherwise — exactly as `mcp.py` reports it (W-242 Tier 1).
+    ranked_by: path,
     // **The single most important key on this surface**: an agent handed a
     // ranked list cannot otherwise tell "these documents answer your question"
     // from "these are the closest things in a corpus that never discusses it".

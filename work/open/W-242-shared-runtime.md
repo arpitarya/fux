@@ -9,7 +9,7 @@ ball: agent
 
 # W-242 — one runtime, two writers, two readers
 
-**Status: Tier 0 built and PASS 2026-09-30** ([pre-registration](../regression/2026-09-30-shared-runtime/PRE-REGISTRATION.md) · [report](../regression/2026-09-30-shared-runtime/report.md)): stdout byte-identical on 9/9 cells × 5 runs, one read per shard held by `node/test/shard-reads.test.mjs`, speed not separable on a shared machine. **Tiers 1 and 2 not built.** A Tier 1 draft (`node/src/derive/format.mjs`, `accel.mjs`, `Weighting.maximum`) was set aside uncommitted, untested and failing L12's scanner on three literals; the next session starts Tier 1 from step 5, not from that draft. Arpit, 2026-09-30: *"I agree to
+**Status: Tier 0 built and PASS 2026-09-30** ([pre-registration](../regression/2026-09-30-shared-runtime/PRE-REGISTRATION.md) · [report](../regression/2026-09-30-shared-runtime/report.md)): stdout byte-identical on 9/9 cells × 5 runs, one read per shard held by `node/test/shard-reads.test.mjs`, speed not separable on a shared machine. **Tier 1 built and PASS 2026-10-03** ([report](../regression/2026-09-30-shared-runtime/report.md) §Tier 1): stdout 9/9 identical across base, plane and scan; the arm at 0 discordant on this repo, rung-10000 and the adversarial index; the plane faster on both rungs. ⚠ The byte-identity base moved to `a62409ed` because the index went to v7 between tiers, stated in the report. **Tier 2 not built.** Arpit, 2026-09-30: *"I agree to
 building tier zero, agree to building tier one, and agree to build tier two.
 That means Node will also write."* Research, options and the refused T3:
 [`compare/shared-runtime`](../compare/shared-runtime.compare.md). Diagram:

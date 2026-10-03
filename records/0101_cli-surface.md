@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@eafa474928d8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@7a5371c09e45, src/fux/progress.py@10364bd02e0a, tests_e2e@60bd0dcdc3ca, node/fux.mjs@45c2606b2e73]
+owns: [src/fux/cli.py@eafa474928d8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@7a5371c09e45, src/fux/progress.py@10364bd02e0a, tests_e2e@60bd0dcdc3ca, node/fux.mjs@d9baa7f51a1d]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 80fdae83edae1164fbee550665dc1a6720624bfc93dd443ead9c00c393275b7d
+content_sha: d0c681a56288d17f4bf94f59e4005df511c30ca31d82406efe5bdb5b8e286ebc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -77,7 +77,8 @@ you locations and stays out of the way. `ask` gives you a ranked list with
 scores, which is what you want when you are judging the engine. `answer`
 commits to one result, which is what an agent wants when it needs a value, not
 a menu. All three take the same query, the same `--json`, the same
-`--fast`/`--scan` pair, and the same `--no-tune`.
+`--fast`/`--scan` pair, and the same `--no-tune` — in both readers since
+W-242 Tier 1 (2026-10-03).
 
 Everything that can fail renders as `error: <message>` on stderr and exits
 non-zero. **`main` is the only place that catches** — internals raise, and a

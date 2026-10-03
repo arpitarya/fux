@@ -8,6 +8,14 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **The Node reader answers from `.fux/runtime/`** under `--fast`, and on `fux
+  mcp`, when the plane Python built is fresh (W-242 Tier 1). It falls back to
+  the scan otherwise, as Python does. Output is byte-identical; at 10 000
+  documents `find` and `ask` drop from ~0.13 s to ~0.09 s. `--fast` and `--scan`
+  now work on the Node CLI too, and Node's MCP reports `ranked_by` truthfully.
+
 ### Changed
 
 - **The Node reader reads each index shard once per query** (W-242 Tier 0). It used to read each one three or four times: in the scan, the mined-pair table, the graph tier and every display lookup. Output is byte-identical. Nothing is cached between calls, so `fux mcp` and a library `Index` still see an index that changes under them.

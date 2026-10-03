@@ -26,6 +26,15 @@ Rules:
 
 ---
 
+## 2026-10-03 — **W-242 Tier 1: the Node reader answers from `.fux/runtime/`**
+
+| what | evidence |
+|---|---|
+| **the build** | `node/src/derive/format.mjs` (the 62-byte entry by `DataView`, paths, `packEntry`) and `accel.mjs` (`Runtime`, `blockBound`, `isFresh` with the stamp read as BigInt, the skip loop, `fillDeferred`, `ask`), twins of `format.py`/`accel.py`; `Weighting.maximum` in `rank.mjs`; `runQuery({fast})` with `path`; `--fast`/`--scan` on the Node CLI; Node MCP opts in, as `mcp.py` does, and reports `ranked_by` truthfully |
+| **the records** | [SR-T1-ACCELERATOR](../records/0110_accelerator.md) d18 (owns `node/src/derive/`) · [SR-NODE-SEARCH](../records/0153_node-search.md) d10, d24 · [SR-MCP](../records/0136_mcp.md) (`ranked_by` compared) · SR-CLI · notes in SR-ASK, SR-RANKING, SR-GRAPH |
+| **verified** | [report](regression/2026-09-30-shared-runtime/report.md) §Tier 1: stdout 9/9 cells identical across base/plane/scan; candidates, `(n, total_wlen, df)` and order 0 discordant on this repo (98 q), rung-10000 (134 q) and the adversarial index; `node_arm.py` 0/225 on rung-01000; `tests/derive/test_node_accel.py` (10), `test_idx_fixture.py` (2), `node/test/accel.test.mjs` (4) |
+| **speed** | rung-10000 `find`/`ask` 0.129/0.133 s → 0.090/0.090 s warm; rung-01000 2–4 ms, real by the bar and nothing more |
+
 ## 2026-10-03 — **W-168 step 8 removed as ruled (index v7); W-168 closed**
 
 | what | evidence |

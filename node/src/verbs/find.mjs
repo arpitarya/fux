@@ -183,7 +183,7 @@ export function runFind(root, args) {
 
   const { results: ranked, confidence, fused, tune } = runFused(root, queries, top, {
     useTune: args.noTune !== true, wantConfidence: true, compose: true, expand: args.expand ?? "",
-    shards,
+    shards, fast: args.fast === true,
     // W-161 — **Tier A yes, Tier B never.** `find` is `ask`'s terse sibling and
     // must rank the same corpus the same way, or the two verbs disagree; but it
     // is also the verb for piping bare paths, so a labelled second block would

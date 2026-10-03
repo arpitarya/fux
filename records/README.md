@@ -654,6 +654,7 @@ table does not grant.
 | `src/fux/decode/xlsx.py` | SR-TABULAR | the same limit, applied per SHEET — a sheet is the workbook's own division, so truncating the fifth because the first four were long would be arbitrary |
 | `src/fux/decode/_limits.py` | SR-TABULAR | the `ContextVar` seam that lets a two-name decoder read committed config without the protocol growing a third parameter (decision 5) |
 | `src/fux/derive/` | SR-T1-ACCELERATOR | T1 build, block maxima and skipping — the declared runtime shapes are `schemas/runtime.schema.json`, carved out to this record |
+| `node/src/derive/` | SR-T1-ACCELERATOR | the Node twins of `format.py` and `accel.py` (W-242 Tier 1): the plane, read by the second runtime under the same contract |
 | `src/fux/query/` | SR-ASK | the scan, unification, and the display-only resolution after it — bound by the differential law |
 | `src/fux/query/rank.py` | SR-RANKING | the one scorer and the one sort, and `Weighting`, which is where every document multiplier must travel to reach the pruning bound |
 | `src/fux/query/bm25f.py` | SR-RANKING | BM25F, `Scoring`, and `derive_wlen` — the one place the weighting arithmetic exists |

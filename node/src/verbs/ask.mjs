@@ -82,6 +82,7 @@ export function runAsk(root, args, { compose }) {
 
   const { results, related, confidence, fused, tune } = runFused(root, queries, top, {
     shards,
+    fast: args.fast === true,
     useTune: args.noTune !== true,
     wantConfidence: true,
     expand: args.expand ?? "",

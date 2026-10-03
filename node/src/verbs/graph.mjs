@@ -180,6 +180,8 @@ function seedsOf(root, args, records, plane, tune, shards) {
   // would quietly become path-dependent. SR-GRAPH decision 13.
   const { results } = runQuery(root, query, tune.seedDepth, {
     tune, useTune: true, wantConfidence: false, compose: false, shards,
+    // `--fast` for the seed query, as `fux graph --fast` in Python (W-242 Tier 1).
+    fast: args.fast === true,
   });
   return [
     results.map((r) => ({ path: locOf(r.id), id: r.id, role: "seed", score: r.score })),

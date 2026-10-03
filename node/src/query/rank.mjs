@@ -59,6 +59,14 @@ export class Weighting {
   get trivial() {
     return this.priority.length === 0 && !this.intentActive;
   }
+  /** `sup_d w(d)` over every document the configuration can produce — the
+   *  accelerator's ceiling scale (W-242 Tier 1). Twin of `Weighting.maximum`:
+   *  `1.0` is always attainable, and the two multipliers can land on one
+   *  document, so the supremum is their PRODUCT, never the larger. */
+  get maximum() {
+    const top = Math.max(1.0, ...this.priority.map(([, w]) => w));
+    return this.intentActive ? top * this.intentFactor : top;
+  }
   priorityFor(loc) {
     let best = 1.0, bestLen = -1;
     for (const [prefix, w] of this.priority) {

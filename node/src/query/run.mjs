@@ -42,6 +42,7 @@ import { tiers } from "./compose.mjs";
 import { recordFor, shardsFor } from "../store/reader.mjs";
 import { idf } from "./bm25f.mjs";
 import { intentOf, typeOfIntent } from "./intent.mjs";
+import * as accel from "../derive/accel.mjs";
 
 
 /** The document-level multipliers and the directories they apply to.
@@ -150,10 +151,14 @@ function withTier(tune, overrides) {
  * `shards` is the caller's `Shards` (W-242 Tier 0): the scan, the mined table,
  * the pin, the graph tier and the band guard all read it, so a query opens each
  * committed shard once. A caller that brings none gets one for this call only;
- * a verb brings its own so its display reads (`headings`) share it too. */
+ * a verb brings its own so its display reads (`headings`) share it too.
+ *
+ * `fast` is `--fast` (W-242 Tier 1): read `.fux/runtime/` when it exists and is
+ * fresh, exactly as `run_query` does, and scan otherwise — never an error. The
+ * scan stays the default. `path` in the result says which one answered. */
 export function runQuery(root, query, top, {
   tune = null, useTune, expand = "", wantConfidence,
-  compose, related: wantRelated, shards = null,
+  compose, related: wantRelated, shards = null, fast = false,
 }) {
   // Required, and a JS destructure cannot say so: a missing `compose` would read
   // as `fux lexical` and silently drop the graph tier (W-225 stage 6, L12 R8).
@@ -202,17 +207,23 @@ export function runQuery(root, query, top, {
   let expansion = expandMod.build(
     queryHashes, expand ? queryTermHashes(expand, ids) : [], resolved.expandWeight,
   );
+  // W-242 Tier 1 — the plane answers only when asked AND fresh; anything else
+  // (missing, stale, an unknown schema) is the scan, as in Python.
+  const useAccel = fast === true && accel.usable(root);
+
   // W-168 step 4 — corpus-mined expansion. Off at 0.0, and off reads no pair.
   // Folded over the user's words only; stacks on `--expand`, whose hashes keep
-  // the caller's weight. Twin of `run_query`'s block.
+  // the caller's weight. Twin of `run_query`'s block. The table comes from the
+  // path that will answer, so `--fast` and `--scan` fold identically.
   if (resolved.minedWeight > 0 && queryHashes.length) {
-    expansion = expandMod.stack(
-      expansion, minedFold(tableFromShards(root, set), queryHashes), resolved.minedWeight,
-    );
+    const table = useAccel ? accel.minedTable(root) : tableFromShards(root, set);
+    expansion = expandMod.stack(expansion, minedFold(table, queryHashes), resolved.minedWeight);
   }
 
   const statsOut = {};
-  const window = scanAsk(root, query, depth, { weighting, scoring, statsOut, expansion, shards: set });
+  const window = useAccel
+    ? accel.ask(root, query, depth, { skipping: true, weighting, scoring, statsOut, expansion })
+    : scanAsk(root, query, depth, { weighting, scoring, statsOut, expansion, shards: set });
   // W-162. **After the reranker, and the confidence block is built from the
   // PINNED list** — the band describes the answer the reader was shown, so a
   // pinned #1 the corpus barely supports must still say `weak`.
@@ -252,6 +263,7 @@ export function runQuery(root, query, top, {
     stats: statsOut,
     window,
     tune: resolved,
+    path: useAccel ? "accelerator" : "scan",
   };
 }
 

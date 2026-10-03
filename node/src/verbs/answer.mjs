@@ -100,7 +100,7 @@ export function answerPayload(root, args) {
   const shards = new Shards(root);
   const { results, related, confidence, tune } = runQuery(root, query, ANSWER_TOP, {
     useTune: args.noTune !== true, wantConfidence: true, compose: true, expand: args.expand ?? "",
-    shards,
+    shards, fast: args.fast === true,
   });
   declareFloorOff(tune, Boolean(args.json));
   const band = (block, freshness) => {

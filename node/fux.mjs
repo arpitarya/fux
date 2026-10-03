@@ -89,6 +89,11 @@ function parseArgs(argv) {
     else if (a === "-q") (out.q ||= []).push(argv[++i]);
     else if (a === "--expand") out.expand = argv[++i];
     else if (a === "--no-refer") out.noRefer = true;
+    // W-242 Tier 1 — `cli.py`'s pair. `--fast` reads `.fux/runtime/` when it is
+    // fresh and scans when it is not; `--scan` is the default, kept for a bug
+    // report to name explicitly. Only speed may differ, by law.
+    else if (a === "--fast") out.fast = true;
+    else if (a === "--scan") out.scan = true;
     else if (a === "--audit") out.audit = true;
     else if (a === "--hops") out.hops = parseInt(argv[++i], 10);
     // W-160's second atom. Repeatable, and ARGUMENT ORDER is the mass order —
@@ -132,6 +137,11 @@ function main(argv) {
   }
 
   const args = parseArgs(rest);
+  if (args.fast && args.scan) {
+    // argparse's mutually exclusive group, and its exit code.
+    process.stderr.write("error: argument --scan: not allowed with argument --fast\n");
+    return 2;
+  }
   const root = findRoot(process.cwd());
   if (root === null) {
     process.stderr.write("error: no fux root here — no fux.toml and no .git above this directory.\n");

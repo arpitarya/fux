@@ -293,12 +293,11 @@ class Arm:
     # package already on npm. Nothing could have caught it except comparing the
     # two servers, because each was internally consistent.
 
-    #: `ranked_by` names WHICH candidate path answered, and the two runtimes
-    #: legitimately differ: Python's MCP surface opts into the accelerator and
-    #: Node has none (SR-NODE-SEARCH decision 10). The differential law says
-    #: the two paths return the same documents, so the label is the only honest
-    #: difference — excluded by name, never by a loosened comparison.
-    MCP_EXCLUDE = ("ranked_by",)
+    #: `ranked_by` was excluded here by name until W-242 Tier 1 (2026-10-03),
+    #: while Node had no accelerator and always said `"scan"`. Both MCP surfaces
+    #: now read the same plane under the same freshness check, so the label is
+    #: compared like every other key (SR-NODE-SEARCH decision 10).
+    MCP_EXCLUDE: tuple[str, ...] = ()
 
     def mcp(self, runner: list[str], calls: list[dict]) -> list[dict]:
         lines = "\n".join(json.dumps(c) for c in calls) + "\n"

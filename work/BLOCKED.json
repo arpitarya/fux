@@ -4,7 +4,7 @@
  "questions": [
   "W-244: is the cost `informed`-only, and may ingest prune a `!`-excluded directory instead of enumerating it (recommended), so `fux ingest` can run at this repo's root again?"
  ],
- "safe_alternative": "Anything that does not run `fux ingest` at this repo's root: W-242 Tiers 1-2 (fux build, queries, fux-lab rungs). W-168 step 8's removal is built in the working tree, uncommitted, with a v7 index; it can commit with HEAD's .fuxignore once the ruling lands.",
+ "safe_alternative": "Anything that does not run `fux ingest` at this repo's root: W-242 Tiers 1-2 (fux build, queries, ingests of corpora outside this repo). W-168 step 8's removal is committed (a62409ed) with a v7 index and HEAD's .fuxignore.",
  "surfaced": true,
  "filed": "2026-10-03"
 }

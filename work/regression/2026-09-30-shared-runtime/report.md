@@ -80,3 +80,83 @@ Node **209/209**. e2e **158 passed, 1 skipped**. Unit: green except
 `.claude/worktrees/` as if they were live documents. Two failures inherited from
 `6744cb78` (the 0063 Components block and the 0110/0131 content hashes) were
 restamped in the same commit.
+
+---
+
+# Tier 1 — Node reads the plane (2026-10-03, Claude Code, Opus)
+
+## ⚠ Deviation, stated before the numbers: the byte-identity base moved
+
+The frozen `base` arm is Node at `5aaf3969`, and the frozen corpora are the
+`fux.index.v6` copies. **Between Tier 0 and Tier 1 the index format moved to
+`fux.index.v7`** (W-168 step 8's removal, Arpit's option (c)). `base` cannot read
+v7, and this engine refuses v6. So, for Tier 1 only:
+
+- **corpora**: `rung-01000-v7` and `rung-10000-v7`, new copies of the scratch
+  copies, re-ingested at v7 beside them. The v6 copies are untouched. `fux` is
+  this repo at its committed v7 index.
+- **base**: `t1-base`, Node at `a62409ed`. That is Tier 0 plus the step-8
+  removal, which was itself shown byte-identical, 120/120, before and after on a
+  copy of rung-01000 with git history.
+
+`bench.py` is unchanged. It takes the entry point and the corpora as arguments.
+No threshold moved.
+
+## Decision 1 — stdout byte-identical: ✅ 9/9 cells, all three arms
+
+| corpus | verb | `t1-base` | `t1-plane` (`--fast`) | `t1-scan` (`--scan`) |
+|---|---|---|---|---|
+| fux | find | `a4d88dac9cdc` | same | same |
+| fux | ask | `6542cb63c8fc` | same | same |
+| fux | answer | `e3a17bf668da` | same | same |
+| rung-01000 | find | `446c55c2b034` | same | same |
+| rung-01000 | ask | `fc3ee40552f6` | same | same |
+| rung-01000 | answer | `bff630406c2d` | same | same |
+| rung-10000 | find | `d079a959b4d7` | same | same |
+| rung-10000 | ask | `f93ac8249751` | same | same |
+| rung-10000 | answer | `829258979d2e` | same | same |
+
+Rows: `evidence/bench-t1-base.jsonl`, `bench-t1-plane.jsonl`,
+`bench-t1-scan.jsonl`. Every cell had rc 0 and was stable over 8 runs.
+
+## Decision 3 — the arm: ✅ 0 discordant everywhere
+
+`evidence/t1_arm.py` checks three things on every query:
+
+- Node scan, Node plane and Python plane have the same **candidates**, `n`,
+  `total_wlen` and `df`, at `skipping=False`, so the plane's set is complete.
+- Node plane at `skipping=True` gives the same **ranking** as Node scan at tops
+  1, 5 and 20.
+- Node `--fast` gives the same **stdout** as the scan for `find`, `ask` and
+  `answer`.
+
+| corpus | queries | candidate checks | ranking checks | stdout checks | discordant |
+|---|---|---|---|---|---|
+| fux (record titles; no source walk, W-244) | 98 | 196 | 294 | 120 | **0** |
+| rung-10000-v7 (`queryset.generate`) | 134 | 260 | 390 | 90 | **0** |
+| adversarial (this index + `adversarial_corpus.py`, `fux build`) | 98 | 196 | 294 | 60 | **0** |
+
+`tools/differential/node_arm.py` on `rung-01000-v7` gave **0 of 225**, with
+`ranked_by` now compared rather than excluded.
+
+## Decision 4 — speed: the trigger did NOT fire
+
+Warm medians in seconds, 1-minute load 2.5–2.8:
+
+| corpus | verb | plane | scan | base |
+|---|---|---|---|---|
+| rung-01000 | find | 0.052 | 0.056 | 0.055 |
+| rung-01000 | ask | 0.055 | 0.057 | 0.057 |
+| rung-10000 | find | **0.090** | 0.129 | 0.127 |
+| rung-10000 | ask | **0.090** | 0.133 | 0.126 |
+| fux | find | **0.107** | 0.161 | 0.149 |
+
+The plane is below the scan on both rungs. **On rung-01000 the margin is 2–4 ms
+on a shared machine, which is real by the bar's wording and nothing more.** At
+1 000 documents the remaining cost is the graph-plane rebuild, which Fork A
+(Arpit's, open) would remove.
+
+## Suites at the Tier 1 commit
+
+See the commit message. The new tests are `tests/derive/test_node_accel.py`
+(10), `tests/derive/test_idx_fixture.py` (2) and `node/test/accel.test.mjs` (4).
