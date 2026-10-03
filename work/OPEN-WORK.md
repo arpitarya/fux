@@ -25,6 +25,8 @@ here. Read that record before changing anything below it.
 |---|---|---|
 | 🔴 **W-228** — run [prompt 13](golden/prompts/13-claude-gen4-planted-misfits.md) in a fresh claude.ai chat (6 short docs, 3 planted misfits) and commit its three blocks. No key this time | 2026-10-03 | 0d |
 | ↳ **blocks:** W-240, W-236, W-225 | | |
+| 🔴 **W-244** — L11 event: `fux ingest` listed the locked key directory's file names (contained, never committed). Rule the cost; may ingest prune `!`-excluded dirs? [detail](open/W-244-l11-ingest-walk-2026-10-03.md) | 2026-10-03 | 0d |
+| ↳ **blocks:** nothing else in the queue | | |
 
 ---
 
@@ -32,13 +34,13 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-168** · `agent` — ranking ideas. 6, 7 stop; 9 shipped; 10 → W-236; 5 (RM3) removed. **Step 8 (authority prior) failed: it knocked right answers off the top. Ruled 2026-10-03: delete it all (index v7); not built.** **Opus.** [detail](open/W-168-search-improvements.md)
+- 🟢 **W-168** · `agent` — ranking ideas. 10 → W-236; 5 (RM3) removed. **Step 8 ruled 2026-10-03: delete it all (index v7). Built in the tree with a v7 index; records and close left.** **Opus.** [detail](open/W-168-search-improvements.md)
 - 🔴 **W-225** · `agent` — L12 migration: no values hidden in code. Stages 1–7 and the 16 odd sites landed. Left: stage 5f `inspect`, **waiting on W-228**, then stage 8. **Opus.** [detail](open/W-225-values-live-in-config.md)
 - 🔴 **W-228** · `arpit` — document families. The lens is built, but its misfit threshold is a placeholder: no known misfits exist yet. Arpit runs prompt 13 to plant 3, riding in gen 4 with W-240. [detail](open/W-228-document-families.md)
 - 🔴 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)
 - 🔴 **W-240** · `agent` — a question set that can test section scoring. Prompt 12's docs and 90 questions are in (ruled: accept). Ladder rebuild waits on W-228, then 🔴 Arpit scores. **Opus.** [detail](open/W-240-section-pool-set.md)
 - 🟢 **W-242** · `agent` — one derived plane, both readers. **Tier 0 PASS** ([report](regression/2026-09-30-shared-runtime/report.md)). Next: Tier 1 (Node reads `.fux/runtime/`), then Tier 2. **Opus.** [detail](open/W-242-shared-runtime.md)
-
+- 🔴 **W-244** · `arpit` — L11 event 2026-10-03: ingest's `rglob` enumerates `work/golden/` and names its files in `.fux/.fuxignore`. Contained; Arpit rules cost and fix. [detail](open/W-244-l11-ingest-walk-2026-10-03.md)
 
 ### testing
 
