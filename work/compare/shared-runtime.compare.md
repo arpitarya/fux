@@ -5,7 +5,7 @@ description: "W-242 — how fux gets faster in BOTH readers from ONE set of file
 
 # One runtime, both readers — the shared derived plane as fux's query cache
 
-> ✅ **OUTCOME, 2026-10-03: T0 · T1 · T2 all BUILT and PASS** ([report](../regression/2026-09-30-shared-runtime/report.md)). Node reads the plane under `--fast` and builds it byte-identically with `fux build`. 0 discordant on four corpora, and at 10 000 documents Node `find`/`ask` drop from 0.13 s to 0.09 s. Fork A (Node reading `graph.json`) and auto-build stay Arpit's open questions. The text below is the ruling as made.
+> ✅ **OUTCOME, 2026-10-03: T0 · T1 · T2 all BUILT and PASS** ([report](../regression/2026-09-30-shared-runtime/report.md)). Node reads the plane under `--fast` and builds it byte-identically with `fux build`. 0 discordant on four corpora, and at 10 000 documents Node `find`/`ask` drop from 0.13 s to 0.09 s. ✅ **Fork A ruled YES 2026-10-04 (Arpit)**, with the arm forcing a rebuild (N2) and d9's never-requires kept; build is [W-259](../open/W-259-node-reads-graph-json.md). Auto-build stays Arpit's open question. The text below is the ruling as made.
 >
 > **Verdict:** ✅ **ruled 2026-09-30 (Arpit): T0 · T1 · T2 — ratified, not built**
 > (W-242 (closed 2026-10-03)). There is no new cache. The
