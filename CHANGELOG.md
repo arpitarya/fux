@@ -62,6 +62,11 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- **`fux inspect --json` no longer moves with `PYTHONHASHSEED`.** A misfit's
+  `missing` list broke ties in set order when the family's first member lacked
+  two core headings; the heading now breaks the tie. Found by W-249's surface
+  capture of `fux serve`'s Index tab.
+
 - **`fux ingest` no longer walks into a `!`-excluded directory** (W-244). It used
   to list every file there and skip each one, so `.fuxignore` named every file
   in a tree you had excluded. The directory is now pruned and recorded once, as

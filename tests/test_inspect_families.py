@@ -176,3 +176,51 @@ def test_diff_names_families_gained_lost_and_renamed():
         "lost": ["Old"],
         "renamed": [["ADRs", "ADR · Decision"]],
     }
+
+
+_SEED_PROBE = r'''
+import json, sys
+sys.path[:0] = [sys.argv[1], sys.argv[2]]
+from array import array
+from types import SimpleNamespace
+from fux.inspect import _scan, lenses
+from l12_fixtures import inspect_template
+FULL = ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel"]
+plant = {"file:f/0.md": FULL[:6]} | {f"file:f/{i}.md": FULL for i in range(1, 6)}
+view = _scan.IndexView(config=inspect_template())
+for doc_id, heads in sorted(plant.items()):
+    view.docs.append(_scan.Doc(
+        id=doc_id, loc=doc_id.split(":", 1)[1], title=doc_id, sha="0" * 40, src="git",
+        mode="extracted", archived=False, superseded=False, flen=(500, len(heads), 1, 1),
+        nterms=0, phrases=tuple(heads), edges_out=0,
+    ))
+    view.doc_terms.append(array("q"))
+facts = SimpleNamespace(by_id={i: {"meta_keys": []} for i in plant})
+out = lenses.families(view, facts, top_lists=50)
+print(json.dumps(out.misfits))
+'''
+
+
+def test_a_misfits_missing_list_does_not_move_with_the_hash_seed():
+    """The family's FIRST member lacks two core headings, so neither is in
+    `order` and their sort keys tie. A tie fell back to set order, which moves
+    with PYTHONHASHSEED — found by W-249's surface capture on this repository's
+    Index tab, and fixed by letting the heading break the tie."""
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    here = Path(__file__).resolve().parent
+    src = here.parent / "src"
+    outs = set()
+    for seed in ("1", "2", "3", "4", "5"):
+        run = subprocess.run(
+            [sys.executable, "-c", _SEED_PROBE, str(src), str(here)],
+            capture_output=True, text=True, env={"PYTHONHASHSEED": seed, "PATH": "/usr/bin:/bin"},
+        )
+        assert run.returncode == 0, run.stderr
+        outs.add(run.stdout)
+    assert len(outs) == 1, outs
+    rows = json.loads(outs.pop())
+    first = next(r for r in rows if r["id"] == "file:f/0.md")
+    assert first["missing"] == ["Golf", "Hotel"]

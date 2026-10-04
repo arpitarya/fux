@@ -8,10 +8,10 @@ amended: 2026-09-28
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@fa80cf7473e1, .fux/inspect.toml@a2b927adc116]
+owns: [src/fux/inspect@776eab8447d3, .fux/inspect.toml@a2b927adc116]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: e79ff81834c49c4d91d14c0cd39d4175ebd6761fb0701119e599df1f704424ae
+content_sha: 66aa42e0255cbd80ad2bea4dbaaed5290f2e12cc599c3aa15a5dfdf0fb6a356a
 ratifies: W-169
 ---
 
@@ -471,6 +471,8 @@ evidence (`work/regression/2026-09-14-inspect-floors/`) are unchanged.
   error until `fux doctor --fix` (R9), checked on a copy.
 
 **No decision here moved** (W-254, 2026-10-04): `inspect/facts.py` and `xray.py` pass `frontmatter=` to the chunker so the passage counts they report match `answer`'s.
+
+**No decision here moved** (2026-10-04, found by W-249's capture): the families lens's misfit `missing` list now breaks a tied sort key by the heading, so `fux inspect --json` no longer moves with `PYTHONHASHSEED` (L4's no-set-iteration-order clause); `tests/test_inspect_families.py::test_a_misfits_missing_list_does_not_move_with_the_hash_seed`.
 
 ### Consequences
 

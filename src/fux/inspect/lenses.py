@@ -847,7 +847,9 @@ def families(view, facts, *, top_lists: int) -> Families:
             "length_bands": bands,
         })
         for m, d in zip(members, docs):
-            missing = sorted(core - set(shaped[m][-1]), key=lambda h: order.index(h) if h in order else len(order))
+            # The heading itself breaks ties: a key that ties falls back to SET
+            # order, which moves with PYTHONHASHSEED (found by W-249's capture).
+            missing = sorted(core - set(shaped[m][-1]), key=lambda h: (order.index(h) if h in order else len(order), h))
             if missing:
                 misfits.append({"id": d.id, "family": name or "(no shared heading)",
                                 "missing": [originals[h] for h in missing]})
