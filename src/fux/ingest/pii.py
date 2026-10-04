@@ -72,10 +72,14 @@ bytes did not change keep terms built under the OLD rules. `digest()` is what
 `run.py` compares to detect that; it is not decoration.
 
 ⚠ **A pathological regex can hang an ingest.** Python's `re` has no timeout,
-so a pattern with nested quantifiers over a long line is the one failure this
-module cannot defend against. Patterns that can match the empty string are
-refused (they are the common accident), `fux doctor` compiles every pattern
-offline, and beyond that a consumer's regex is a consumer's regex.
+and a clock in this module would make committed bytes a function of CPU speed
+(L4). So the bound is a predicate on the pattern string: `_lint` refuses, at
+load, the shapes that backtrack exponentially (a repeat nested in an unbounded
+repeat, overlapping alternation under one, a backreference under one). It is
+conservative by design and says so. The polynomial class it cannot see is
+`fux doctor`'s `pii timing` row, where a clock is legal because doctor output
+is never a committed byte. Patterns that can match the empty string are refused
+too (they are the common accident).
 """
 
 from __future__ import annotations
@@ -254,9 +258,162 @@ def _compile(rule: Rule) -> re.Pattern:
     for name in rule.flags:
         flags |= _FLAGS[name]
     try:
-        return re.compile(rule.pattern, flags)
+        rx = re.compile(rule.pattern, flags)
     except re.error as exc:
         raise FuxError(f"pii rule {rule.name!r}: invalid regex ({exc})") from exc
+    refused = _lint(rule.pattern, flags)
+    if refused is not None:
+        raise FuxError(
+            f"pii rule {rule.name!r}: {refused}. That shape can backtrack "
+            "exponentially and hang an ingest on a long line. Make the inner repeat "
+            "possessive (`*+`, `++`) or the group atomic (`(?>...)`), or restructure "
+            "the pattern. The check is conservative: a nested repeat that is in fact "
+            "safe is refused too, and the fix above admits it"
+        )
+    return rx
+
+
+# -- the ReDoS linter ---------------------------------------------------------
+#
+# A predicate on the pattern string and nothing else: same answer on every
+# machine, so it may decide an ingest (L4). Wall-clock lives in `fux doctor`.
+
+
+def _parse(pattern: str, flags: int):
+    """`pattern` as `re`'s parser sees it, and the parser's `MAXREPEAT`.
+
+    ⚠ **The only place this module touches stdlib-private `re._parser`**, so a
+    rename in a future Python is one edit here. It is stable since 3.11, and
+    L7 floors us at 3.12.
+    """
+    from re import _constants, _parser
+
+    return _parser.parse(pattern, flags), _constants.MAXREPEAT
+
+
+def _lint(pattern: str, flags: int) -> str | None:
+    """Why `pattern` is refused, or `None` when it passes.
+
+    Refused, inside an unbounded repeat (`*`, `+`, `{n,}`): another repeat that
+    can vary in length (`(a+)+`, `(\\w*\\s?)*`), an alternation whose branches
+    can start with the same character (`(a|aa)*`), and a backreference.
+
+    Only MAX_REPEAT and MIN_REPEAT bodies are descended into. A
+    POSSESSIVE_REPEAT and an ATOMIC_GROUP never give back what they matched:
+    they are the fix the error names.
+    """
+    tree, maxrepeat = _parse(pattern, flags)
+    return _walk(tree, maxrepeat, nested=False)
+
+
+def _walk(items, maxrepeat: int, *, nested: bool) -> str | None:
+    for op, arg in items:
+        name = str(op)
+        found = None
+        if name in ("MAX_REPEAT", "MIN_REPEAT"):
+            low, high, body = arg
+            if nested and high > low:
+                return "a repeat that can vary in length sits inside an unbounded repeat"
+            found = _walk(body, maxrepeat, nested=nested or high == maxrepeat)
+        elif name == "GROUPREF":
+            if nested:
+                return "a backreference sits inside an unbounded repeat"
+        elif name == "BRANCH":
+            branches = arg[1]
+            if nested and _branches_overlap(branches):
+                return (
+                    "alternation branches that can start with the same character "
+                    "sit inside an unbounded repeat"
+                )
+            found = next(
+                (r for b in branches if (r := _walk(b, maxrepeat, nested=nested))), None
+            )
+        elif name == "SUBPATTERN":
+            found = _walk(arg[-1], maxrepeat, nested=nested)
+        elif name in ("ASSERT", "ASSERT_NOT"):
+            found = _walk(arg[1], maxrepeat, nested=nested)
+        elif name == "GROUPREF_EXISTS":
+            found = next(
+                (r for b in arg[1:] if b and (r := _walk(b, maxrepeat, nested=nested))),
+                None,
+            )
+        if found:
+            return found
+    return None
+
+
+def _branches_overlap(branches) -> bool:
+    """Can two branches begin with the same character?  Unknown counts as yes."""
+    seen: set[int] = set()
+    for branch in branches:
+        chars = _first_chars(branch)
+        if chars is None or seen & chars:
+            return True
+        seen |= chars
+    return False
+
+
+def _first_chars(items) -> frozenset[int] | None:
+    """The code points a branch can start with, or `None` when it cannot be said."""
+    if not items:
+        return None
+    op, arg = items[0]
+    name = str(op)
+    if name == "LITERAL":
+        return frozenset({min(arg, fixed("pii", "lint_alphabet"))})
+    if name == "SUBPATTERN":
+        return _first_chars(arg[-1])
+    if name == "IN":
+        return _class_chars(arg)
+    return None
+
+
+def _class_chars(members) -> frozenset[int] | None:
+    """A `[...]` class as code points, `None` if unsure.
+
+    Code points below `[pii] lint_alphabet` are compared exactly; every code
+    point at or above it is folded into ONE sentinel, `lint_alphabet` itself.
+    A negated class and `\\d \\w \\s` (and their negations) all reach above
+    the limit, so they carry the sentinel and two of them always overlap. The
+    fold can only add overlap, never hide it: the check stays conservative.
+    """
+    limit = fixed("pii", "lint_alphabet")
+    out: set[int] = set()
+    negate = False
+    for op, arg in members:
+        name = str(op)
+        if name == "NEGATE":
+            negate = True
+        elif name == "LITERAL":
+            out.add(min(arg, limit))
+        elif name == "RANGE":
+            out.update(range(min(arg[0], limit), min(arg[1], limit) + 1))
+        elif name == "CATEGORY":
+            out.update(c for c in range(limit) if _in_category(str(arg), c))
+            out.add(limit)
+        else:
+            return None
+    if negate:
+        return frozenset((set(range(limit)) - out) | {limit})
+    return frozenset(out)
+
+
+def _in_category(category: str, code: int) -> bool:
+    """`\\d \\w \\s` (and their negations) for one code point, as `re` defines them."""
+    ch = chr(code)
+    word = ch.isalnum() or ch == "_"
+    table = {
+        "CATEGORY_DIGIT": ch.isdigit(),
+        "CATEGORY_NOT_DIGIT": not ch.isdigit(),
+        "CATEGORY_WORD": word,
+        "CATEGORY_NOT_WORD": not word,
+        "CATEGORY_SPACE": ch.isspace(),
+        "CATEGORY_NOT_SPACE": not ch.isspace(),
+    }
+    # An unrecognised category is assumed to match: unknown counts as overlap.
+    if category not in table:
+        return True
+    return table[category]
 
 
 def rules_path(root: Path) -> Path:

@@ -26,6 +26,14 @@ Rules:
 
 ---
 
+## 2026-10-04 — **W-255: the PII regex bound — a static linter at load, the clock in `doctor`**
+
+| what | evidence |
+|---|---|
+| **linter** | `ingest/pii._lint` over `re._parser`: nested variable repeat, overlapping alternation, backreference — each inside an unbounded repeat — refused at load, naming the rule and the fix ([SR-PII](../records/0148_pii.md) d23); `tests/test_pii_regex_bound.py` (20) |
+| **doctor** | `pii timing`: per-rule worst time on `constants.toml [pii]` stress strings, warn above `fux.toml [doctor] pii_rule_budget_ms` = 100 ([SR-DOCTOR](../records/0152_doctor.md), [SR-CONFIG](../records/0113_config.md)); this repo: email 68 ms, the rest ≤ 0.2 ms |
+| **L4** | an AST test holds `ingest/pii.py` and `ingest/run.py` free of any clock |
+
 ## 2026-10-04 — **W-254: the frontmatter block is its own passage**
 
 | what | evidence |

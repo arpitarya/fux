@@ -391,6 +391,18 @@ min_chars = 3
 # segment, a report, a manifest. A different indent rewrites those bytes.
 indent = 2
 
+[pii]
+# `fux doctor`'s `pii timing` row (SR-PII decision 23). Each rule is run over
+# strings made of `stress_units`, each repeated up to `stress_len` characters.
+# `a` and `1` are the classic quadratic runs (the shipped email rule is one on a
+# long run with no `@`); the third is prose.
+stress_len = 10000
+stress_units = ["a", "1", "the quick brown fox, jumps over a lazy dog. "]
+# The linter compares character classes below this code point (SR-PII decision 23).
+lint_alphabet = 768
+# Milliseconds in a second, for the timing row.
+ms_per_s = 1000
+
 [pii.luhn]
 # ISO/IEC 7812-1 Annex B (ingest/pii.py). `doubled[d]` is 2d with its digits
 # summed; the check passes when the total is a multiple of `modulus`.

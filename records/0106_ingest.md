@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@91bd73077dd5, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@a6b1bb5f5517, node/src/ingest/priors.mjs@d8d4691d7e49]
+owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@36c3e51913e7, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@a6b1bb5f5517, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 277950c756c37f21e0ac059f8658b2975924b8b58d777f59a3cd4019c4e78369
+content_sha: 7d1fd5bb122b64ae667b224a6cfd7240bd3015b94068d458c2832293aa15c4df
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1016,6 +1016,8 @@ descent before listing it, and records it once as `dir/`.
 - Held by `tests/ingest/test_source_filters.py`: a spy on `os.scandir` proves
   the directory is never scanned. The repo tests that walk the root go through
   `tests/walk_lib.py`, gated by `tests/test_walks_skip_golden.py`.
+
+**No decision here moved** (W-255, 2026-10-04): `ingest/pii.py` gained a load-time ReDoS linter ([SR-PII](0148_pii.md) decision 23); the ingest path is otherwise unchanged and still reads no clock.
 
 ### Consequences
 

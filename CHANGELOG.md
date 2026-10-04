@@ -58,6 +58,15 @@ byte-identical to Python. ⚠ The index format moves to `fux.index.v7`; run
 
 ### Added
 
+- **A PII rule that can backtrack exponentially is refused at load** (W-255). A
+  `pii.toml` pattern with a variable-length repeat, overlapping alternation or a
+  backreference inside an unbounded repeat (`(a+)+`, `(a|aa)*`, `(\w*\s?)*`)
+  stops with the rule named and the fix: a possessive repeat (`*+`) or an atomic
+  group. The check is conservative and reads only the pattern, so it gives the
+  same answer on every machine. `fux doctor` gains a `pii timing` row that times
+  each rule on long adversarial strings and warns above `fux.toml [doctor]
+  pii_rule_budget_ms`; `fux doctor --fix` writes the new key.
+
 - **The Node reader answers from `.fux/runtime/`** under `--fast`, and on `fux
   mcp`, when the plane Python built is fresh (W-242 Tier 1). It falls back to
   the scan otherwise, as Python does. Output is byte-identical; at 10 000

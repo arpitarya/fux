@@ -347,6 +347,7 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_suspended_pins(root))
     checks.append(_observers(root))
     checks.append(_pii_health(root))
+    checks.append(_pii_timing(root))
     checks.append(_refusal_health(root))
     checks.append(_decoder_bindings(root))
     checks.append(_meta_fields(root))
@@ -517,6 +518,60 @@ def _pii_health(root: Path) -> Check:
         f".fux/index/ only - acquired bytes and answer quotes are unredacted"
     )
     return Check("pii rules", True, f"{detail}. {_redaction_note(root, rules)}")
+
+
+def _pii_timing(root: Path) -> Check:
+    """`pii timing` -- each rule over fixed adversarial strings, worst time per rule.
+
+    **This is where the wall-clock lives** (SR-PII decision 23). The load-time
+    linter refuses the exponential shapes by reading the pattern; it cannot see
+    the polynomial class (the shipped email rule is quadratic on a long run with
+    no `@`). Timing it here is legal because a doctor row is never a committed
+    byte, and nothing on the ingest path reads a clock.
+
+    ⚠ **Advisory, and machine-dependent by nature.** A slow machine warns on a
+    rule a fast one does not. It never fails the run and never repairs a rule.
+    """
+    from time import perf_counter
+
+    from .constants import fixed
+    from .ingest import pii
+
+    name = "pii timing"
+    try:
+        rules = pii.load(root)
+    except FuxError:
+        return Check(name, True, "skipped (the pii rules row owns that)", level="warn")
+    if not rules:
+        return Check(name, True, "no rules to time")
+    try:
+        budget = config_mod.load(root).doctor.pii_rule_budget_ms
+    except FuxError:
+        return Check(name, True, "skipped (fux.toml does not load - see that row)", level="warn")
+    length = fixed("pii", "stress_len")
+    strings = [(unit * length)[:length] for unit in fixed("pii", "stress_units")]
+    ms = fixed("pii", "ms_per_s")
+    worst: list[tuple[float, str]] = []
+    for rule in rules:
+        slowest = 0.0
+        for text in strings:
+            start = perf_counter()
+            rule.apply(text)
+            slowest = max(slowest, (perf_counter() - start) * ms)
+        worst.append((slowest, rule.name))
+    slow = [f"{n} {t:.0f} ms" for t, n in sorted(worst, reverse=True) if t > budget]
+    per_rule = ", ".join(f"{n} {t:.1f}" for t, n in worst)
+    detail = f"worst of {len(strings)} stress strings of {length} chars, ms per rule: {per_rule}"
+    if slow:
+        return Check(
+            name,
+            True,
+            f"over the {budget:g} ms budget ([doctor] pii_rule_budget_ms): "
+            f"{', '.join(slow)}. {detail}. A rule this slow on a long line can stall "
+            "an ingest; anchor it or bound its repeats",
+            level="warn",
+        )
+    return Check(name, True, f"{detail}; all within {budget:g} ms")
 
 
 def _redaction_note(root: Path, rules) -> str:

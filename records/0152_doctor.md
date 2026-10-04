@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@12a43ca94721, tests/test_doctor_register_is_complete.py@dff0d535b078]
+owns: [src/fux/doctor.py@a522f88f9a15, tests/test_doctor_register_is_complete.py@dff0d535b078]
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: df900e08919baaaf8accfd19b66d0b4c5943b1fb62a8fe42439ecbc90a632ee5
+content_sha: 5d77009c7936dce23265dda577f959b517589ae02b15325ea4b6dd0acaa37dad
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -168,6 +168,7 @@ authoritative about the row.**
 | `.fux/ layout declared` | warn | undeclared entries at `.fux/`'s top level | [SR-DOTFUX](0102_fux-directory.md) |
 | `index temp files ignored` | warn | `.fux/index/<shard>.jsonl.tmp` not gitignored — a background re-index leaves it in the **committed** index plane for the duration of a rename, and a `git add -A` running at that moment dies `unable to stat`. ⚠ **The row exists because the fix cannot reach the repos that need it**: `.fux/.gitignore` is write-if-missing (decision 11) | [SR-DOTFUX](0102_fux-directory.md) decision 6c |
 | `pii rules` | **error** when absent | a missing `.fux/pii.toml`; otherwise compiles every pattern offline and states the scope. ⚠ It cannot see an over-broad rule and says so — only [`tools/pii-probe/`](../tools/pii-probe/) can | [SR-PII](0148_pii.md) decision 17 |
+| `pii timing` | warn | each PII rule run over the fixed stress strings (`constants.toml [pii]`), the worst time per rule; warns, naming the rule, above `fux.toml [doctor] pii_rule_budget_ms`. **Advisory and machine-dependent, never an error**: it is where the wall-clock lives so that nothing on the ingest path reads one. It shows the polynomial blow-up the load-time linter cannot see | [SR-PII](0148_pii.md) decision 23 |
 | `acquired plane` | warn, **error** on gitignore | blob count, total bytes, the 80 %-of-cap warning, and the gitignore assertion | [SR-ACQUIRED](0145_acquired-plane.md) |
 | `pinned url bytes` | warn | with `[sources.url] fetch_at_answer = false`, the listed urls with no retained bytes — every citation from those is `unverified` | [SR-URL-FRESHNESS](0147_url-freshness.md) decision 16 |
 | `fetcher config tables` | **error** | a `[sources.url.config.<name>]` sub-table naming no `.py` in the fetchers directory — its keys reach no fetcher at all | [SR-CONFIG](0113_config.md) decision 8a |

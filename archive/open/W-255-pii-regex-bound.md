@@ -9,10 +9,16 @@ ball: agent
 
 # W-255 — the PII regex bound: lint at load, time in `doctor`
 
+**✅ CLOSED 2026-10-04 — built as ruled** (Claude Code; Sonnet built, Opus 5.5 reviewed):
+- **(a) linter:** `ingest/pii._lint` walks the `re._parser` AST (pinned behind `_parse`) from `_compile` and refuses, inside an unbounded repeat, a variable-length repeat, overlapping alternation and a backreference; the error names the rule, the construct and the fix (possessive / atomic) and says it is conservative. Review fix: code points at or above `[pii] lint_alphabet` fold into one sentinel, so a negated class or `\w` can no longer hide an overlap above the compared alphabet.
+- **(e) doctor:** `pii timing` — every rule over `constants.toml [pii] stress_units` at `stress_len` (10 000) chars; warns above `fux.toml [doctor] pii_rule_budget_ms` (100, a design default). On this repo: email 68 ms (quadratic: 10 / 65 / 260 / 1 065 ms at 4k / 10k / 20k / 40k chars), every other rule ≤ 0.2 ms.
+- The starter, this repo's `pii.toml` and all 14 commented opt-in starter patterns pass the linter; an AST test holds `ingest/pii.py` and `ingest/run.py` free of any clock (`urlsrc.py` imports `time` for fetching and is out of its scope).
+- Live successors: [SR-PII](../../records/0148_pii.md) d23, [SR-DOCTOR](../../records/0152_doctor.md) check table, [SR-CONFIG](../../records/0113_config.md) `[doctor] pii_rule_budget_ms`.
+
 **Model:** Claude Code, **Sonnet** — a parser walk over `re._parser`'s AST and
 one doctor row; the design is settled in
-[`compare/pii-regex-bound`](../compare/pii-regex-bound.compare.md). **Ratified
-2026-10-04 by delegation ([W-251](W-251-backlog-audit-rulings.md) §4, row
+[`compare/pii-regex-bound`](../../work/compare/pii-regex-bound.compare.md). **Ratified
+2026-10-04 by delegation ([W-251](../../work/open/W-251-backlog-audit-rulings.md) §4, row
 B-260), not built.**
 
 ## The ruling

@@ -2,7 +2,7 @@
 type: Compare Doc
 title: "The PII regex bound — how an ingest is kept from hanging on a consumer's pattern without a clock in the write path"
 description: "Backlog B-260 (ex-B-232) as a fork: SR-PII owes a bound on a pathological regex and Python's `re` has no timeout. Five options — a stdlib static linter at load, a wall-clock timeout, a deterministic span window, the `regex` module with `timeout=`, and a `doctor` stress-timing row. Ruled 2026-10-04 by delegation: the linter decides the ingest (the only option that is the same on every machine), the doctor row carries the clock; the `regex` dependency is the reopen trigger."
-status: ruled 2026-10-04 by delegation (W-251 §4, B-260) — (a) + (e); built as W-255
+status: ruled 2026-10-04 by delegation (W-251 §4, B-260) — (a) + (e); built 2026-10-04 (W-255, SR-PII decision 23)
 timestamp: 2026-10-04T00:00:00Z
 filed: 2026-10-04
 ---
@@ -27,7 +27,7 @@ filed: 2026-10-04
 > ingest that (a) admitted — then option (d), the `regex` dependency, goes to a
 > record as fux's first runtime dependency.
 
-**Model: Sonnet** — [W-255](../open/W-255-pii-regex-bound.md).
+**Model: Sonnet** — W-255.
 
 ## Context
 

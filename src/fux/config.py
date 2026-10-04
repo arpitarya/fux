@@ -46,7 +46,12 @@ REQUIRED_KEYS: dict[str, tuple[str, ...]] = {
         "stop_every_docs",
     ),
     "refer": ("fetch_cache_max_bytes", "timeout_seconds"),
-    "doctor": ("thin_url_share", "thin_url_chars", "acquired_warn_share"),
+    "doctor": (
+        "thin_url_share",
+        "thin_url_chars",
+        "acquired_warn_share",
+        "pii_rule_budget_ms",
+    ),
 }
 REQUIRED_URL_KEYS: tuple[str, ...] = (
     "keep",
@@ -110,6 +115,7 @@ KNOWN_KEYS: tuple[str, ...] = (
     "doctor.thin_url_share",
     "doctor.thin_url_chars",
     "doctor.acquired_warn_share",
+    "doctor.pii_rule_budget_ms",
 )
 
 #: Tables fux accepts and does not look inside. **One entry, and it stays one.**
@@ -424,6 +430,9 @@ class Doctor:
     #: The acquired-plane row warns once `.fux/acquired/` passes this share of
     #: `[sources.url] acquired_max_bytes`.
     acquired_warn_share: float
+    #: The `pii timing` row warns when one rule takes longer than this on a
+    #: stress string (SR-PII decision 18).
+    pii_rule_budget_ms: float
 
 
 def _number(path: Path, where: str, value, *, whole: bool, positive: bool):
@@ -546,6 +555,9 @@ def load(root: Path) -> Config:
         thin_url_chars=_number(path, "[doctor] thin_url_chars", d["thin_url_chars"], whole=True, positive=False),
         acquired_warn_share=_number(
             path, "[doctor] acquired_warn_share", d["acquired_warn_share"], whole=False, positive=True
+        ),
+        pii_rule_budget_ms=_number(
+            path, "[doctor] pii_rule_budget_ms", d["pii_rule_budget_ms"], whole=False, positive=True
         ),
     )
 

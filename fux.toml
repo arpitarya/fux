@@ -120,3 +120,4 @@ timeout_seconds = 5
 thin_url_share         = 0.01
 thin_url_chars         = 200
 acquired_warn_share = 0.8
+pii_rule_budget_ms = 100.0

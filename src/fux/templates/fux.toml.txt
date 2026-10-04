@@ -89,6 +89,7 @@ timeout_seconds       = 5
 thin_url_share         = 0.01
 thin_url_chars         = 200
 acquired_warn_share    = 0.8
+pii_rule_budget_ms     = 100.0
 
 # Which agent vendors `fux setup` writes archived-results policy for. These
 # files land OUTSIDE .fux/ -- in .claude/, .github/, .kiro/ and AGENTS.md at the

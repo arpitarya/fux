@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@95f051554b6b, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@6980bf8407fe]
+owns: [src/fux/config.py@d64c7c3d26b9, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@6980bf8407fe]
 laws: [L5, ex-L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 45be2b94a07f80b06e17cbf6728d2c02187f0f584e61084e5d4e6ca1b33acfd1
+content_sha: 88cce8015a86764f2e4dbbf9c231be20aee05ef4c07ceff0e0982b2f52d679a6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -123,7 +123,8 @@ flowchart TD
      |                last_cited_max, stop_every_docs     every key REQUIRED
      +-- [refer]      fetch_cache_max_bytes, timeout_seconds  REQUIRED
      +-- [doctor]     thin_url_share, thin_url_chars,
-     |                acquired_warn_share                 every key REQUIRED
+     |                acquired_warn_share, pii_rule_budget_ms
+     |                                                    every key REQUIRED
      |
      +-- [agents]
      |     +-- install        REQUIRED; [] = none
@@ -186,6 +187,7 @@ timeout_seconds       = 5               # how long `fux answer` waits for one fe
 thin_url_share = 0.01                   # extracted/retained below this is thin ...
 thin_url_chars = 200                    # ... unless it extracted at least this much
 acquired_warn_share = 0.8               # warn once .fux/acquired/ passes this share of its bound
+pii_rule_budget_ms = 100.0              # warn when one PII rule takes longer than this on a stress string
 
 [agents]
 install = ["claude", "codex", "copilot", "kiro"]  # [] = none
@@ -563,6 +565,7 @@ at any value, with an error naming the new home.
 + doctor.thin_url_share
 + doctor.thin_url_chars
 + doctor.acquired_warn_share
++ doctor.pii_rule_budget_ms
 - sources.dirs
 - sources.types_file
 - sources.url.urls
@@ -742,6 +745,7 @@ each keeps the number it had in code; the template writes it and `fux doctor
 | `[refer] timeout_seconds` | how long `fux answer` waits for one fetch under the `always` freshness policy | `Policy.timeout_seconds = 5` (stage 6) |
 | `[doctor] thin_url_share`, `thin_url_chars` | where the url-extraction-depth row warns | `doctor.THIN_URL_SHARE`, `THIN_URL_CHARS` |
 | `[doctor] acquired_warn_share` | the share of `acquired_max_bytes` at which the acquired-plane row warns | an inline `0.8` (stage 5f) |
+| `[doctor] pii_rule_budget_ms` | the milliseconds one PII rule may take on a stress string before the `pii timing` row warns | none (W-255, 2026-10-04). ⚠ **A design default, not a measurement**: 100 ms is a hair above the shipped email rule's measured ~65 ms on a 10 000-character run on one developer machine, so the starter stays quiet on a normal machine and a rule roughly twice as slow warns. A different machine moves the number, which is why it is a tunable and the row is advisory |
 
 - **The `[sources.url]` four are required only with the table**, like the rest
   of it: without `[sources.url]` nothing is fetched, so nothing is thin or fails.

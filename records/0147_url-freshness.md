@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 9be5fde569f0e3ce442f19ecfbddfb8eb23dfdf0ea1d0daa3759d178eb8f5430
+content_sha: e93fdf1968abd88a105f57c201b5e5e5690811ee8a66d51781ead0456c1e3a8e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -580,6 +580,8 @@ this moved where they are written, not what they are.
 **No decision here moved** (W-253, 2026-10-04): A bare-`str` fetcher return is refused at verify time too (`_unpack` is shared with ingest), per [SR-FETCHER](0117_fetcher.md) decision 2.
 
 **No decision here moved** (W-254, 2026-10-04): the refer seam passes the undecoded flag to the chunker; freshness decisions are untouched.
+
+**No decision here moved** (W-255, 2026-10-04): `fux.toml` and its template gained `[doctor] pii_rule_budget_ms` ([SR-CONFIG](0113_config.md), [SR-PII](0148_pii.md) decision 23); no other key moved.
 
 ### Consequences
 
