@@ -171,3 +171,24 @@ def test_every_link_in_a_block_resolves(gen) -> None:
         "these Components links point at nothing:\n  " + "\n  ".join(broken)
         + "\n\nA path that moved must move in records/README.md's table first."
     )
+
+
+def test_write_refuses_while_a_named_component_holds_an_untracked_file(monkeypatch, capsys):
+    """**SR-WORK-OWNERSHIP decision 13b, in the generator.** `_link` decides what
+    is real from `git ls-files`, so a block written while a new file is
+    untracked renders it as a bare span and goes stale on commit — met on
+    2026-10-04 with W-249's `store/resident.py`. Faked at the module's
+    boundaries so no file in the real tree is created or rewritten.
+    """
+    mod = _gen()
+
+    class _Run:
+        stdout = b"src/fux/store/new_module.py\0node/dist/ignored-is-not-listed.mjs\0"
+
+    monkeypatch.setattr(mod.subprocess, "run", lambda *a, **k: _Run())
+    monkeypatch.setattr(mod, "ownership_table", lambda: {"src/fux/store": "SR-X"})
+    monkeypatch.setattr(mod, "describes_by_record", lambda: {})
+    assert mod.untracked_components() == ["src/fux/store"]
+    monkeypatch.setattr(mod, "blocks", lambda: {})
+    assert mod.main(["--write"]) == 2
+    assert "git add" in capsys.readouterr().err

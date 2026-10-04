@@ -4,9 +4,13 @@
 an agent calls a retrieval tool many times per task. A CLI spawn costs
 ~50-150 ms of Python start-up *before any ranking happens*, which is more than
 the ranking itself (warm p95: 27 ms measured at 8 870 documents, 64 ms at
-10 000). A warm process pays that once. What stays resident is the process;
-the index is re-read from the path on every request, so a rebuilt accelerator
-is picked up mid-session (SR-MCP Consequences; holding it open is W-249).
+10 000). A warm process pays that once. **The loaded index is resident too,
+keyed on the stamp** (W-249, SR-MCP decision 13): the committed shards are read
+and parsed once per index state, and before every tool call the key — the
+digest of `.fux/runtime/stamp.json` plus every shard's size and mtime — is
+re-read, so an ingest or a rebuild is picked up on the next call without a
+restart. It holds the index, never an answer: every call still ranks from
+scratch (`store/resident.py` says why that is not W-242's refused T3).
 
 **Stdlib only.** No `mcp` package, no `pydantic`, no framework. MCP over stdio
 is newline-delimited JSON-RPC 2.0, which is `json` and `sys.stdin` — adopting
@@ -397,12 +401,18 @@ def _related(root: Path, args: dict) -> dict:
 _HANDLERS = {"fux_search": _search, "fux_passage": _passage, "fux_related": _related}
 
 
-def _handle(root: Path, message: dict, *, top: int, max_headings: int) -> dict | None:
+def _handle(
+    root: Path, message: dict, *, top: int, max_headings: int, holder=None
+) -> dict | None:
     """One JSON-RPC message in, one response out (or `None` for a notification).
 
     `top` is the `[mcp] top` this connection resolved ONCE at `serve()`
     start-up (decision 17) — threaded through rather than re-read, so a
     warm process never pays a TOML read per search.
+
+    `holder` is the connection's `store.resident.Holder` (W-249): a tool call
+    runs inside `holder.call()`, which re-keys on the stamp first. `None` reads
+    the index from disk, as a one-shot caller does.
     """
     method = message.get("method")
     msg_id = message.get("id")
@@ -435,7 +445,11 @@ def _handle(root: Path, message: dict, *, top: int, max_headings: int) -> dict |
         if handler is None:
             return _err(msg_id, _INVALID_PARAMS, f"unknown tool {name!r}")
         try:
-            payload = handler(root, params.get("arguments") or {})
+            if holder is None:
+                payload = handler(root, params.get("arguments") or {})
+            else:
+                with holder.call():
+                    payload = handler(root, params.get("arguments") or {})
         except FuxError as exc:
             # A tool-level failure is reported INSIDE the result with
             # `isError`, not as a JSON-RPC error: the agent should see it as a
@@ -468,12 +482,18 @@ def serve(stdin=None, stdout=None, root: Path | None = None, *, enabled: bool) -
     and threaded into every message handled on this connection — never
     re-read per search. `enabled=False` is `--no-output-config`: `.fux/
     output.toml` is not read at all and `[mcp]` resolves from the template.
+
+    The index is the other thing held for the connection — one
+    `store.resident.Holder`, re-keyed before every tool call (W-249).
     """
     stdin = stdin or sys.stdin
     stdout = stdout or sys.stdout
     root = root or _root()
 
     from .output_config import load as load_output
+    from .store.resident import Holder
+
+    holder = Holder(root)
 
     cfg = load_output(root, enabled=enabled)
     top = int(cfg.resolve_mcp("top"))
@@ -489,7 +509,7 @@ def serve(stdin=None, stdout=None, root: Path | None = None, *, enabled: bool) -
             stdout.write(json.dumps(_err(None, _PARSE_ERROR, "parse error")) + "\n")
             stdout.flush()
             continue
-        response = _handle(root, message, top=top, max_headings=max_headings)
+        response = _handle(root, message, top=top, max_headings=max_headings, holder=holder)
         if response is not None:
             stdout.write(json.dumps(response) + "\n")
             stdout.flush()

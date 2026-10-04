@@ -6,12 +6,12 @@ title: "SR-SERVE (0158) — `fux serve`, the explorer: a local page that renders
 description: "Arpit's framing, 2026-09-22 — fux is like Google: if the ten documents an agent is handed are the right ten, the answer is mostly right. So the inspection surface is question-first. `fux serve` starts a stdlib server bound to 127.0.0.1 with no --host, serves one self-contained page, and answers GET /ask with the byte-identical stdout of `fux ask --json --why --band`. The page is a RENDERER: it computes no score, no band and no rank, because a second ranker in a browser is a restatement in the L0 sense. Every lever it prints is a proposal; no route writes a committed byte. Since W-220 (2026-09-23) the page has tabs — Ask, Answer (2026-09-27: the one passage `fux answer --json --band` would cite, byte-identical too), Documents, Words (2026-09-27: the vocabulary, a question as the analyzer reads it, where a term lives), Index — and the server calls fux.inspect in-process for the last two, on demand and cached under .fux/runtime/inspect/; the browser still computes nothing."
 status: accepted
 date: 2026-09-22
-amended: 2026-09-27
+amended: 2026-10-04
 feature: the explorer — a local page over the real ask
-owns: [src/fux/serve@4d747b20912e]
+owns: [src/fux/serve@f307aa0daa79]
 laws: [L2, L3, L5, L6, L9, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: eed6565b82037ef0e1907154512933c6953007e684a68a9420a44385737b261d
+content_sha: 7644d6335725e6f312390e823a45aca2c5ea77d526308445997b3a80720719bf
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
@@ -109,7 +109,12 @@ builder would be a second contract, free to drift one key at a time with nothing
 to notice, and the page would quietly begin describing a ranking fux did not do.
 ⚠ **The cost is an argparse parse and an output-config read per request**, on a
 localhost tool a person types into. The alternative buys microseconds and sells
-the one property the page exists to have.
+the one property the page exists to have. **The index is NOT re-read per
+request** (W-249, 2026-10-04): `/ask`, `/answer` and `/graph` run inside the
+server's one resident `Holder`, the loader `fux mcp` shares, keyed on
+`stamp.json` plus the shards and re-keyed before every request
+([SR-MCP](0136_mcp.md) decision 13) — the command still runs whole, so the
+bytes are still its stdout.
 `tests/serve/test_routes.py::test_ask_is_byte_identical_to_the_cli` pins it,
 including on a query that matches nothing — the shape a page is likeliest to
 special-case.

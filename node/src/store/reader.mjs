@@ -40,12 +40,15 @@ export function iterShardPaths(root) {
  * these is made where a call starts — a verb, a library method, one MCP tool
  * call — and handed down, so every consumer reads the same Buffers.
  *
- * ⚠ **Never module-level, and never outliving the call that made it.**
- * `fux mcp` is long-lived and `ingest` rewrites the index under it; a set kept
- * across calls would answer from an index that no longer exists. This is one
- * call reading its input once, not a cache in SR-CACHE's sense. Lines stay raw
- * Buffers (see the header above), and `recordFor` re-parses on every call, so
- * no caller can mutate a record another caller holds.
+ * ⚠ **Never module-level, and never outliving the call that made it — with
+ * one owner who re-keys it.** `fux mcp` is long-lived and `ingest` rewrites the
+ * index under it, so a set kept across calls would answer from an index that
+ * no longer exists. Since W-249 the MCP server keeps ONE set across tool calls
+ * through `verbs/mcp.mjs::Resident`, which re-keys it on `stamp.json` and every
+ * shard's size and mtime before each call and drops it when either moves
+ * (SR-MCP decision 13). Nothing else does. Lines stay raw Buffers (see the
+ * header above), and `recordFor` re-parses on every call, so no caller can
+ * mutate a record another caller holds.
  *
  * Node-only: `reader.py` has no twin because Python's graph lane reads
  * `graph.json` and its mined table has one reader per path, so it never had
@@ -55,11 +58,17 @@ export class Shards {
     this.root = root;
     this._paths = null;
     this._lines = new Map();
+    /** Disk reads made filling this set — a long-lived owner re-keys after a
+     *  call that moved it (W-249). */
+    this.reads = 0;
   }
 
   /** `iterShardPaths(root)`, listed once. */
   paths() {
-    if (this._paths === null) this._paths = iterShardPaths(this.root);
+    if (this._paths === null) {
+      this._paths = iterShardPaths(this.root);
+      this.reads += 1;
+    }
     return this._paths;
   }
 
@@ -69,6 +78,7 @@ export class Shards {
     if (entry === undefined) {
       entry = rawRecordLines(path);
       this._lines.set(path, entry);
+      this.reads += 1;
     }
     return entry[1];
   }

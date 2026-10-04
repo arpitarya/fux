@@ -13,7 +13,7 @@ owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, script
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 966366d42a0a0618920dca4c795eb6cb748ae02f2013b19343e4214b0bc9fd7f
+content_sha: 2f522de98b9dc746c42752325ffe2ade1473786c1f145be7f47055c49c5dcbe3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -421,6 +421,13 @@ top-level definitions.
     ⚠ **What it does not stop:** a session that stamps, *then* creates the file.
     The gate fires on the next run of the suite after `git add`, which is where
     it fired before.
+    **The same refusal in the generator** (2026-10-04, W-249's session, the
+    fourth meeting of the class): `scripts/gen-components.py --write` reads
+    *real* from `git ls-files` too, so a block written while W-249's
+    `store/resident.py` was untracked rendered it as a bare span. It now exits
+    `2` naming any component the register's tables name that is, or holds, an
+    untracked non-ignored file —
+    `tests/test_record_components.py::test_write_refuses_while_a_named_component_holds_an_untracked_file`.
 
 
 14. **This is a WORK record** (Arpit, 2026-09-13). Who owns which component, and

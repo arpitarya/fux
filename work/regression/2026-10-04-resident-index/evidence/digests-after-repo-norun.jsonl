@@ -1,0 +1,67 @@
+{"surface": "mcp", "n": 0, "id": 1, "sha256": "16f05f3d7b41890a088c43a44f56bccfb75b908fc77b10a1d600facf61096a3d"}
+{"surface": "mcp", "n": 1, "id": 2, "sha256": "92df8c6b6ab0fb7edc2db594f7e749ea644b39a610088a57bc7a51e5a1ddefa7"}
+{"surface": "mcp", "n": 2, "id": 3, "sha256": "e1506e9556352f0f505b68fcb40eb14ea9c31facd8f385156941fe1252064001"}
+{"surface": "mcp", "n": 3, "id": 4, "sha256": "9d3aaea86e2c0e8fcb5aa1fc716f9585f2b71e35fe49e95cb3b548422f43a74f"}
+{"surface": "mcp", "n": 4, "id": 5, "sha256": "d76c1fa3e2049fc1469fbc9aaf5ac6743d53b5afac4f25303c7bc868cea32e38"}
+{"surface": "mcp", "n": 5, "id": 6, "sha256": "c5861a9e82e1b879b2e4d020b5284fbe2c904f19f81946e1ce422798307ecade"}
+{"surface": "mcp", "n": 6, "id": 7, "sha256": "ca2f8bb222368569fcc87470b44561218f7d2e96eea3e7b86eb00d81576dd275"}
+{"surface": "mcp", "n": 7, "id": 8, "sha256": "f504b8c3cfbb6a1950ab76eb83e2ba932e40ac1c77d6b727079456dcb258db85"}
+{"surface": "mcp", "n": 8, "id": 9, "sha256": "4325f2baa1274a7d2f52a56735bbbcbdb28cd950b058495cf4f2a9870bde460b"}
+{"surface": "mcp", "n": 9, "id": 10, "sha256": "85f581261283a444f0f7f427510bddc9ba79aca0a3a64886f9c5d361741798fe"}
+{"surface": "mcp", "n": 10, "id": 11, "sha256": "25ee36b3aac7bacfb070bf03afef552b30e27d414be920bd9b340d1e810a0dfa"}
+{"surface": "mcp", "n": 11, "id": 12, "sha256": "4ae6dc3736a277d5f1c8974295ea852062b0f32b05cee2abbb13fc73dc3ece51"}
+{"surface": "mcp", "n": 12, "id": 13, "sha256": "f9e86e709b25109836f4af8e259065ac4032ece8ad5eef35fbe33b11f59fdbef"}
+{"surface": "mcp", "n": 13, "id": 14, "sha256": "4ef90b39f5386f6e7b7458ce8d0218d368e5cf9fcf84eaa5ad7d7c1d8fe4f6a7"}
+{"surface": "mcp", "n": 14, "id": 15, "sha256": "3fe43f50e42f8bbcb532be7d410e5d306cfe309d5045e1860092b33237f96b50"}
+{"surface": "mcp", "n": 15, "id": 16, "sha256": "4a65b4d2d549bcb24d8491a9f1ed2583b442633625a8c2ed5a650ecf9d3379e6"}
+{"surface": "mcp", "n": 16, "id": 17, "sha256": "950085184939b17a43c1508e0fbf52e1efd8b6fdd9cd55a8b11cc38700b23ea0"}
+{"surface": "mcp", "n": 17, "id": 18, "sha256": "d3702292a3ffe5d91a144054ddf75f59f833bf9b659a43ef0e8592c25dbbdb1c"}
+{"surface": "mcp", "n": 18, "id": 19, "sha256": "e19053b34c5b2d6c55fc163bdf2451e334289249e3c354bf024e0d50586eb846"}
+{"surface": "mcp", "n": 19, "id": 20, "sha256": "34615c25b734eeaa339e0a5c8ec30b1e9d27e5ab4d7f9d6e4ac0e9dd340efcc9"}
+{"surface": "mcp", "n": 20, "id": 21, "sha256": "704d4cbbf3ecc98c84463b4339b087aafb3fca96ad3ab23cb07884a586dcf222"}
+{"surface": "mcp", "n": 21, "id": 22, "sha256": "e1b6563e097798bb7631d8ee35b52a35fb63fe4cd607533c1234c684c57df4a3"}
+{"surface": "mcp", "n": 22, "id": 23, "sha256": "8991d856176939efea1892435c602d24d3a156940bbd4df18a0c1c3d8241b01b"}
+{"surface": "mcp", "n": 23, "id": 24, "sha256": "10e0be825983d722fc18163a1b5c77fd913f28ad1d9da5dd4618cbbcec572892"}
+{"surface": "mcp", "n": 24, "id": 25, "sha256": "4b10db20b0d1f9e04b8a1db36710ce5e92e76fe029f1b36ca863c6045ae58ce2"}
+{"surface": "mcp", "n": 25, "id": 26, "sha256": "b35e6f3702e55f7eaa3a3f03c2f0b328c4a1693b62e5a840e38ba4bbe169c9e4"}
+{"surface": "mcp", "n": 26, "id": 27, "sha256": "bccc64e734eb11afba683aa2999d26f1a48be2accb0defb91bdcd7457e0660da"}
+{"surface": "mcp", "n": 27, "id": 28, "sha256": "aa7a09ba733aea33f5dccbeb799e224c1eb33c8ce0ff05b149ad37697a724011"}
+{"surface": "mcp", "n": 28, "id": 29, "sha256": "6928765ac1e80d31e756e8f9eddbdcced6122f33a32f1265e3035ebbf819e76e"}
+{"surface": "mcp", "n": 29, "id": 30, "sha256": "8483a536e88670553a5683d54fc716194f5f2c45e6a845a227fbbbdd7bf81a02"}
+{"surface": "mcp", "n": 30, "id": null, "sha256": "7192e8940715f78b406bca494948e9ed4a334868c1a51ad8230ef5a46cfe8904"}
+{"surface": "mcp-stderr", "sha256": "864340c664ff427d395724d3a48ad343a7434ec2ada7fa9ee18832c038f12ec5"}
+{"surface": "mcp-rc", "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"}
+{"surface": "serve", "n": 0, "method": "GET", "path": "/", "status": 200, "content_type": "text/html; charset=utf-8", "sha256": "a9dc446fb0572af40ea929548f687d7fdc55bfd4a87768bb9e41900ac4997b71"}
+{"surface": "serve", "n": 1, "method": "GET", "path": "/health", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "d5decdbf9428b907ba39d948f70746870ff8dbb07b5a105bdd2342caf93d3277"}
+{"surface": "serve", "n": 2, "method": "GET", "path": "/ask?q=how%20does%20the%20accelerator%20detect%20staleness", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "c6c10d53e332cf837f3b3ee1475a519ea48833385de420da326bde62edb4a91b"}
+{"surface": "serve", "n": 3, "method": "GET", "path": "/ask?q=mcp%20tool%20descriptions", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "83d07ae5ecd765d1c81d2d40ce4597ab825457c942506c4ffa6b7900af2b885e"}
+{"surface": "serve", "n": 4, "method": "GET", "path": "/ask?q=zzqx%20flurbnog", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "d2063b83261fb928402b305cc742c9e2bce25ce3109ab5b209181f0c09620f3c"}
+{"surface": "serve", "n": 5, "method": "GET", "path": "/ask?q=serve%20page%20computes%20nothing", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "b1206412d3eb6057352830f3f5e85e6c9f94f7e3cca7e449993c75dd9ffd664a"}
+{"surface": "serve", "n": 6, "method": "GET", "path": "/ask?q=how%20does%20the%20accelerator%20detect%20staleness&top=3", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "e9a3d739d436bb54597fbeb2c428753ecfe5c8a26dddc298513132676bcf7ceb"}
+{"surface": "serve", "n": 7, "method": "GET", "path": "/ask?q=", "status": 400, "content_type": "application/json; charset=utf-8", "sha256": "19170e7f3a6bd04600bec08bec24afb24cdc63c92472bdcd236ccb9bec50fd58"}
+{"surface": "serve", "n": 8, "method": "GET", "path": "/ask?q=x&top=zero", "status": 400, "content_type": "application/json; charset=utf-8", "sha256": "f48575b4a159d7f2438800b30f6319b25f21ccd527ae7d84899e7450484118d2"}
+{"surface": "serve", "n": 9, "method": "GET", "path": "/answer?q=how%20does%20the%20accelerator%20detect%20staleness&no_refer=1", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "7303d0973ae6fcac32c20642fa9420d29c95cf41ff7eeae278525a042cb669f4"}
+{"surface": "serve", "n": 10, "method": "GET", "path": "/answer?q=mcp%20tool%20descriptions&no_refer=1", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "069922d4de3c98759c5a4651e3c523f6161908dc23025bcbbb5c008fe1da3ffe"}
+{"surface": "serve", "n": 11, "method": "GET", "path": "/answer?q=zzqx%20flurbnog&no_refer=1", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "0b8fa2ccb10bc123dd1350382562946f21b07a9ebbebe62dadf088f5ed7f544c"}
+{"surface": "serve", "n": 12, "method": "GET", "path": "/answer?q=how%20does%20the%20accelerator%20detect%20staleness", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "85de4bd88e20a539d5118c370e343090ddcaf6917d909a589592e6dbb4a3d322"}
+{"surface": "serve", "n": 13, "method": "GET", "path": "/graph?seed=records/0136_mcp.md", "status": 400, "content_type": "application/json; charset=utf-8", "sha256": "7261000813a2bac3ad87197806f2fc77353e3a30a7520d0fa32e33dcca3d3f6f"}
+{"surface": "serve", "n": 14, "method": "GET", "path": "/graph?seed=src/fux/mcp.py", "status": 400, "content_type": "application/json; charset=utf-8", "sha256": "7261000813a2bac3ad87197806f2fc77353e3a30a7520d0fa32e33dcca3d3f6f"}
+{"surface": "serve", "n": 15, "method": "GET", "path": "/graph?seed=no/such/doc.md", "status": 400, "content_type": "application/json; charset=utf-8", "sha256": "7261000813a2bac3ad87197806f2fc77353e3a30a7520d0fa32e33dcca3d3f6f"}
+{"surface": "serve", "n": 16, "method": "GET", "path": "/inspect/documents", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "1405592bf9f79e0ca6209924781d8eca34384a9a4775d572f5574faea8e4881a"}
+{"surface": "serve", "n": 17, "method": "GET", "path": "/inspect/document?loc=records/0136_mcp.md", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "e528b3ad71d078c001c157c633ba4af50caf8c991adad9d78199c0052599a8c3"}
+{"surface": "serve", "n": 18, "method": "GET", "path": "/inspect/document/probes?loc=records/0136_mcp.md", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "86400562b2548f1df4e15e105b635cfc32b3188712c8697e8f9bf5fc155ec7de"}
+{"surface": "serve", "n": 19, "method": "GET", "path": "/inspect/words?limit=50", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "401fba3699ec10528e8fb22bd63bc8037e11d25ee0ade23cfba2c3cb5bb52b81"}
+{"surface": "serve", "n": 20, "method": "GET", "path": "/inspect/words?sort=idf&order=asc&limit=20&offset=5", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "f1d2e6498cfc2cdd6a5cd9ecc3d5e6304f0f4ba361e30d4047c274da680a64cc"}
+{"surface": "serve", "n": 21, "method": "GET", "path": "/inspect/analyze?q=how%20does%20the%20accelerator%20detect%20staleness", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "0afd8e5a912c7e29564ac47dea6ad1381e650037ee729f254cd98fca1d260692"}
+{"surface": "serve", "n": 22, "method": "GET", "path": "/inspect/word?term=stamp", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "dc5f55c5078b5bcce1059c759be0e41146fedc8b51b7c7870e6eea8f0133d221"}
+{"surface": "serve", "n": 23, "method": "GET", "path": "/inspect/identifiers?p=TMS-%7Bn%7D", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "af576499e87e2737ced187135ef1d665aa21254d1f0f2a528914d06a877aad30"}
+{"surface": "serve", "n": 24, "method": "GET", "path": "/inspect/index", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "1d5cdb3b214e793078c5e0289295591b89d7afdcc91dbccd32e31cd802baef2b", "sha256_tie_normalised": "ba13629d13fd7343e06447e6e991802b035f0cd10490e4e3701c8633dbdd44b0"}
+{"surface": "serve", "n": 25, "method": "GET", "path": "/inspect/diff", "status": 404, "content_type": "application/json; charset=utf-8", "sha256": "14d782018a490c5e062f2096bec29988735682c90a30cc2f22e95f98e90d8316"}
+{"surface": "serve", "n": 26, "method": "POST", "path": "/ask?q=x", "status": 405, "content_type": "application/json; charset=utf-8", "sha256": "c4664f78551908a246583acbe170b563e791a103f959af1e2b1addd29f534fa4"}
+{"surface": "serve", "n": 27, "method": "GET", "path": "/nope", "status": 404, "content_type": "application/json; charset=utf-8", "sha256": "68f57e43c539299ab0c0d51265da7e0b94eea24a43c0cb80d4fa3f9ae991db7f"}
+{"surface": "serve", "n": 28, "method": "GET", "path": "/ask?q=how%20does%20the%20accelerator%20detect%20staleness", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "c6c10d53e332cf837f3b3ee1475a519ea48833385de420da326bde62edb4a91b"}
+{"surface": "serve", "n": 29, "method": "GET", "path": "/ask?q=mcp%20tool%20descriptions", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "83d07ae5ecd765d1c81d2d40ce4597ab825457c942506c4ffa6b7900af2b885e"}
+{"surface": "serve", "n": 30, "method": "GET", "path": "/ask?q=zzqx%20flurbnog", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "d2063b83261fb928402b305cc742c9e2bce25ce3109ab5b209181f0c09620f3c"}
+{"surface": "serve", "n": 31, "method": "GET", "path": "/ask?q=serve%20page%20computes%20nothing", "status": 200, "content_type": "application/json; charset=utf-8", "sha256": "b1206412d3eb6057352830f3f5e85e6c9f94f7e3cca7e449993c75dd9ffd664a"}
+{"surface": "serve", "n": 32, "method": "GET", "path": "/graph?seed=records/0136_mcp.md", "status": 400, "content_type": "application/json; charset=utf-8", "sha256": "7261000813a2bac3ad87197806f2fc77353e3a30a7520d0fa32e33dcca3d3f6f"}
+{"surface": "serve", "n": 33, "method": "GET", "path": "/graph?seed=src/fux/mcp.py", "status": 400, "content_type": "application/json; charset=utf-8", "sha256": "7261000813a2bac3ad87197806f2fc77353e3a30a7520d0fa32e33dcca3d3f6f"}

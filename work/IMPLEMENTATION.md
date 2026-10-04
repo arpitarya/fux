@@ -26,6 +26,16 @@ Rules:
 
 ---
 
+## 2026-10-04 — **W-249: `fux mcp` and `fux serve` keep the loaded index resident**
+
+| what | evidence |
+|---|---|
+| **residency** | `store/resident.py`; key = stamp digest + every shard's (name, size, mtime_ns); input held, never an output memo — W-242's T3 not reopened ([SR-MCP](../records/0136_mcp.md) d13, [SR-SERVE](../records/0158_serve.md) d3); Node `fux mcp` keeps its `Shards` ([SR-NODE-SEARCH](../records/0153_node-search.md) d24) |
+| **staleness** | `tests/test_resident.py` (12), `node/test/resident.test.mjs` (4): stamp moves, `--no-accelerator`, no runtime, identical rewrite, mid-call change — each fails with a stamp-only key |
+| **surface** | 228/229 rows byte-identical on three roots; the 1 is a pre-existing hash-seed tie in `inspect/lenses.py`, fixed in the next commit — [run](regression/2026-10-04-resident-index/report.md) |
+| **cost, reported** | +184 MB RSS at rung-10000 (+296 MB this repo); warm `fux_search` 342 → 48 ms |
+| **gate** | `gen-components.py --write` refuses over untracked components too ([SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) d13b) |
+
 ## 2026-10-04 — **W-248: `fux enrich` consumes the decoder queue**
 
 | what | evidence |

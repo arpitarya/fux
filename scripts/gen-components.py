@@ -242,6 +242,27 @@ def current(path: Path) -> str | None:
     return None if found is None else found[1]
 
 
+def untracked_components() -> list[str]:
+    """Components the tables name that are, or hold, an untracked, non-ignored file.
+
+    `_link` decides *real* from `git ls-files`, so a block written while a new
+    file is untracked renders it as a bare span and goes stale the moment the
+    file is committed — the class SR-WORK-OWNERSHIP decision 13b gates in
+    `sr-owns.py`, met here on 2026-10-04 (W-249's `store/resident.py`).
+    """
+    out = subprocess.run(
+        ["git", "ls-files", "-z", "--others", "--exclude-standard"],
+        cwd=ROOT, capture_output=True, check=True,
+    ).stdout
+    loose = [n.decode("utf-8") for n in out.split(b"\0") if n]
+    named = set(ownership_table()) | {
+        c for rows in describes_by_record().values() for c, _ in rows
+    }
+    return sorted(
+        c for c in named if any(f == c or f.startswith(c + "/") for f in loose)
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--check", action="store_true", help="exit 1 if any record is stale")
@@ -250,6 +271,15 @@ def main(argv: list[str] | None = None) -> int:
 
     expected = blocks()
     if args.write:
+        loose = untracked_components()
+        if loose:
+            print("refusing --write: the register names these, they exist, and git "
+                  "does not track them, so their links would render as bare spans "
+                  "and go stale on commit. `git add` them first "
+                  "(SR-WORK-OWNERSHIP decision 13b):", file=sys.stderr)
+            for c in loose:
+                print(f"  {c}", file=sys.stderr)
+            return 2
         changed = 0
         for path, body in expected.items():
             text = path.read_text(encoding="utf-8")

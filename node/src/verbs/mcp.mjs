@@ -18,13 +18,14 @@
  * unguarded once this file ships to npm on its own.
  */
 import { readFileSync, statSync } from "node:fs";
-import { dirname, isAbsolute, join, relative, resolve as resolvePath, sep } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve as resolvePath, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createInterface } from "node:readline";
 import { runQuery } from "../query/run.mjs";
 import { headingsFor } from "../query/headings.mjs";
-import { Shards, shardsFor } from "../store/reader.mjs";
+import { Shards, shardsFor, iterShardPaths } from "../store/reader.mjs";
 import { contentSha } from "../store/format.mjs";
+import { runtimeDir, STAMP_NAME } from "../derive/format.mjs";
 import { cmpCodePoints, pyRound } from "../compat/pyfloat.mjs";
 import { loadOutput } from "../config/output.mjs";
 import { Graph, edgesFromRecords } from "../graph/model.mjs";
@@ -89,6 +90,75 @@ function tools(top) {
 const ok = (id, result) => ({ jsonrpc: JSONRPC, id, result });
 const err = (id, code, message) => ({ jsonrpc: JSONRPC, id, error: { code, message } });
 
+/** `store/resident.py::state_key` — the stamp's digest (or `null` with no
+ *  `.fux/runtime/`) and every shard's name, size and mtime_ns, as one string.
+ *  Throws when a shard vanishes between the listing and its `stat`. */
+export function stateKey(root) {
+  let digest = null;
+  try {
+    digest = contentSha(readFileSync(join(runtimeDir(root), STAMP_NAME)));
+  } catch (e) {
+    if (e.code !== "ENOENT") throw e;
+  }
+  const shards = iterShardPaths(root).map((path) => {
+    // BigInt: `mtime_ns` is past 2^53, and a rounded one would key two
+    // different writes the same.
+    const st = statSync(path, { bigint: true });
+    return `${basename(path)}:${st.size}:${st.mtimeNs}`;
+  });
+  return `${digest}|${shards.join(",")}`;
+}
+
+/** The loaded index, held across tool calls — `store/resident.py::Holder`'s
+ *  twin, for the one long-lived Node verb (W-249, SR-MCP decision 13).
+ *
+ * What is held is the call's `Shards` — each committed shard's raw lines, read
+ * once per index state. Records are still parsed per call (Node's parse is
+ * cheap and a parsed record shared between calls could be mutated), and the
+ * derived plane is read per call for `store/resident.py`'s reason.
+ *
+ * 🔴 **The input, never an output**: no result is kept, so this is not W-242's
+ * refused T3. The key is re-read before every call; a call that read from disk
+ * re-reads it after, and drops the set if the index moved under it. */
+export class Resident {
+  constructor(root) {
+    this.root = root;
+    this.key = null;
+    this.shards = null;
+    /** Index states started — one per distinct key. */
+    this.loads = 0;
+  }
+
+  /** `fn(shards)` as one call. */
+  call(fn) {
+    let key;
+    try {
+      key = stateKey(this.root);
+    } catch {
+      return fn(new Shards(this.root)); // the index is being rewritten: read it, keep nothing
+    }
+    if (this.shards === null || this.key !== key) {
+      this.shards = new Shards(this.root);
+      this.key = key;
+      this.loads += 1;
+    }
+    const shards = this.shards;
+    const before = shards.reads;
+    try {
+      return fn(shards);
+    } finally {
+      if (shards.reads !== before) {
+        let moved;
+        try { moved = stateKey(this.root) !== key; } catch { moved = true; }
+        if (moved && this.shards === shards) {
+          this.shards = null;
+          this.key = null;
+        }
+      }
+    }
+  }
+}
+
 /** Every committed record, keyed by id — `store.read_index`'s shape. */
 function recordsById(root, shards = null) {
   const out = new Map();
@@ -118,7 +188,7 @@ function splitLines(text) {
  *  advertises `path`, so every conformant client got an empty answer from a
  *  server that reported success — shipped to npm and caught by comparing the
  *  handlers with `src/fux/mcp.py` rather than by a client complaining. */
-function fuxSearch(root, args, top, maxHeadings) {
+function fuxSearch(root, args, top, maxHeadings, held = null) {
   const query = args.query ?? "";
   // `[mcp] top` is this surface's default, because a tool call has no flags.
   // An explicit `k` still wins, exactly as a CLI flag does. ⚠ There is no
@@ -131,9 +201,10 @@ function fuxSearch(root, args, top, maxHeadings) {
   // tier was built for: it cannot run `fux graph` as a follow-up the way a
   // person can, and `next` has been telling it to call `fux_related` for
   // neighbours since the tool existed.
-  // W-242 Tier 0 — ONE tool call's read of each shard, never kept past it:
-  // this server is long-lived, and `ingest` rewrites the index under it.
-  const shards = new Shards(root);
+  // W-242 Tier 0 — ONE tool call's read of each shard. Kept past the call
+  // only as `Resident`'s set (W-249), which re-keys before every call because
+  // this server is long-lived and `ingest` rewrites the index under it.
+  const shards = held ?? new Shards(root);
   const { results, related, confidence, path } = runQuery(root, query, k, {
     useTune: true, wantConfidence: true, compose: true, expand, shards,
     // `mcp.py::_search` passes `force_scan=False`: the plane answers when it is
@@ -240,10 +311,10 @@ function fuxPassage(root, args) {
  * beside the plane and the verbs. Twin of `mcp.py::_related`; built in memory,
  * never from `.fux/runtime/graph.json`, because MCP answers in a clone with no
  * build. */
-function fuxRelated(root, args) {
+function fuxRelated(root, args, held = null) {
   const rel = args.path ?? "";
   const docId = rel.startsWith("file:") || rel.startsWith("url:") ? rel : `file:${rel}`;
-  const records = recordsById(root);
+  const records = recordsById(root, held);
   const record = records.get(docId);
   if (record === undefined) throw new FuxError(`'${rel}' is not in the index`);
 
@@ -265,7 +336,9 @@ function fuxRelated(root, args) {
   };
 }
 
-export function handle(root, message, top, maxHeadings) {
+/** `resident` is the connection's `Resident` (W-249); `null` reads the index
+ *  from disk for this call alone. */
+export function handle(root, message, top, maxHeadings, resident = null) {
   const method = message.method;
   const id = message.id;
   // A notification has no id and MUST NOT be answered.
@@ -282,14 +355,15 @@ export function handle(root, message, top, maxHeadings) {
   if (method === "tools/call") {
     const params = message.params || {};
     const handlers = {
-      fux_search: (r, a) => fuxSearch(r, a, top, maxHeadings),
-      fux_passage: fuxPassage,
+      fux_search: (r, a, held) => fuxSearch(r, a, top, maxHeadings, held),
+      fux_passage: (r, a) => fuxPassage(r, a),
       fux_related: fuxRelated,
     };
     const handler = handlers[params.name];
     if (handler === undefined) return err(id, INVALID_PARAMS, `unknown tool ${JSON.stringify(params.name)}`);
+    const run = (held) => handler(root, params.arguments || {}, held);
     let payload;
-    try { payload = handler(root, params.arguments || {}); }
+    try { payload = resident === null ? run(null) : resident.call(run); }
     catch (e) {
       // A tool-level failure is reported INSIDE the result with `isError`, not
       // as a JSON-RPC error: the agent should see it as a tool that answered
@@ -314,13 +388,15 @@ export function runMcp(root, args) {
   const cfg = args.outputConfig ?? loadOutput(root, { enabled: args.noOutputConfig !== true });
   const top = Number(cfg.resolveMcp("top", args.top ?? null));
   const maxHeadings = Number(cfg.resolveMcp("max_headings"));
+  // The loaded index is the other thing held for the connection (W-249).
+  const resident = new Resident(root);
   const rl = createInterface({ input: process.stdin, terminal: false });
   rl.on("line", (line) => {
     if (!line.trim()) return;
     let message;
     try { message = JSON.parse(line); }
     catch { process.stdout.write(JSON.stringify(err(null, PARSE_ERROR, "parse error")) + "\n"); return; }
-    const response = handle(root, message, top, maxHeadings);
+    const response = handle(root, message, top, maxHeadings, resident);
     if (response !== null) process.stdout.write(JSON.stringify(response) + "\n");
   });
   return 0;

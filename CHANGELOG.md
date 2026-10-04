@@ -28,6 +28,13 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
+- **`fux mcp` and `fux serve` keep the loaded index resident** (W-249, SR-MCP decision 13). One
+  loader, `fux.store.resident`, holds each committed shard's lines and the parsed records for the
+  life of the process, keyed on the digest of `.fux/runtime/stamp.json` plus every shard's size and
+  mtime, re-read before every tool call and every `/ask`, `/answer` and `/graph`; an ingest or a
+  rebuild is answered by the next call without a restart, including `ingest --no-accelerator`, which
+  leaves the stamp alone. It holds the index, never a result — no query-result cache (W-242's T3
+  stays refused). The Node `fux mcp` holds its `Shards` the same way. Output is byte-identical.
 - **`fux enrich` reads the decoder queue** (W-248). Its worklist is declared scope plus the
   `.fux/enrich/queue.tsv` rows whose reason is *nothing readable* (a model is needed); `--plan` and
   `--check` report the queued origin apart from the declared one. Rows saying *no decoder for X* are

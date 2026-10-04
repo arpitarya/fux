@@ -19,6 +19,7 @@ from pathlib import Path
 
 from ..errors import FuxError
 from .format import HEADER, index_dir, shard_for
+from .resident import held_lines, held_records
 from ..constants import fixed
 
 _HEADER_LINES = fixed("index", "shard_header_lines")
@@ -38,7 +39,20 @@ def raw_record_lines(path: Path) -> tuple[dict, list[bytes]]:
     """Header-validated record lines, NOT JSON-parsed — for the B2 byte-level
     prefilter scan (`query/`), which must avoid `json.loads` on every line;
     only lines that pass the prefilter get parsed by the caller.
+
+    Inside a call that `fux mcp` or `fux serve` bracketed with
+    `resident.Holder`, the lines come from the index state that process holds
+    and each shard is read once per state (W-249, SR-MCP decision 13).
+    Anywhere else this is the disk read below, unchanged.
     """
+    held = held_lines(path, _raw_record_lines)
+    if held is not None:
+        return held
+    return _raw_record_lines(path)
+
+
+def _raw_record_lines(path: Path) -> tuple[dict, list[bytes]]:
+    """`raw_record_lines`, read from disk."""
     # Split on `\n` only — `str.splitlines()` also breaks on U+2028/2029/0085,
     # which `json.dumps(ensure_ascii=False)` writes raw inside a string value;
     # splitting on those would corrupt a legal record. Read bytes, not text,
@@ -151,7 +165,21 @@ def read_index(root: Path) -> dict[str, dict]:
     Raises loudly on a doc id appearing more than once, or in a shard other
     than the one `shard_for(id)` assigns it to — both are impossible by
     construction (handoff §8) but a merge gone wrong could produce either.
+
+    Inside a call that `fux mcp` or `fux serve` bracketed with
+    `resident.Holder`, the records are parsed once per index state and shared
+    by the calls that follow (W-249) — so a caller there must not mutate a
+    record it is handed.
     """
+    held = held_records(root, _read_index)
+    if held is not None:
+        return held
+    return _read_index(root)
+
+
+def _read_index(root: Path) -> dict[str, dict]:
+    """`read_index` built from the shards — through `read_shard`, so a held
+    state's lines are parsed rather than re-read."""
     out: dict[str, dict] = {}
     for path in iter_shard_paths(root):
         expected_shard = path.stem

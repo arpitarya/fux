@@ -24,7 +24,12 @@ that test is cheap only because this module refused to build a second payload.
 
 ⚠ **The cost is honest and small**: an argparse parse and an output-config read
 per request, on a localhost tool a person types into. The alternative buys
-microseconds and sells the one property the page exists to have.
+microseconds and sells the one property the page exists to have. **The index
+is not re-read per request** (W-249): `/ask`, `/answer` and `/graph` run inside
+the server's one `store.resident.Holder`, which reads the committed shards once
+per index state and re-keys on `.fux/runtime/stamp.json` before every request —
+the same loader `fux mcp` holds. The command still runs; only its disk read is
+shared.
 
 ## The fences
 
@@ -229,7 +234,8 @@ class _Handler(BaseHTTPRequestHandler):
                 self._json_error(HTTPStatus.BAD_REQUEST, f"top must be a positive integer, not {top!r}")
                 return
             argv += ["--top", top]
-        code, out = _run_cli(argv)
+        with self.server.state.held():
+            code, out = _run_cli(argv)
         if not out.strip():
             self._json_error(HTTPStatus.BAD_REQUEST, f"fux ask exited {code} and printed nothing")
             return
@@ -249,7 +255,8 @@ class _Handler(BaseHTTPRequestHandler):
         argv = ["answer", query, "--json", "--band"]
         if _first(params, "no_refer") in ("1", "true", "yes"):
             argv.append("--no-refer")
-        code, out = _run_cli(argv)
+        with self.server.state.held():
+            code, out = _run_cli(argv)
         if not out.strip():
             self._json_error(HTTPStatus.BAD_REQUEST, f"fux answer exited {code} and printed nothing")
             return
@@ -263,7 +270,8 @@ class _Handler(BaseHTTPRequestHandler):
         argv = ["graph", "--json"]
         for seed in seeds:
             argv += ["--seed", seed]
-        code, out = _run_cli(argv)
+        with self.server.state.held():
+            code, out = _run_cli(argv)
         if not out.strip():
             self._json_error(HTTPStatus.BAD_REQUEST, f"fux graph exited {code} and printed nothing")
             return
@@ -502,15 +510,21 @@ class _JobProgress:
 
 
 class _State:
-    """What the server keeps between requests: the root, one `IndexView`, the jobs.
+    """What the server keeps between requests: the root, the loaded index, one
+    `IndexView`, the jobs.
 
-    The view is re-read when the committed shards change, so a re-ingest while
-    the page is open is picked up on the next click rather than served stale.
-    Jobs are keyed by kind and by the shards they read, so reopening a tab on an
-    unchanged index returns the finished report and recomputes nothing.
+    The loaded index is `store.resident.Holder`'s — the committed shards and
+    their parsed records, keyed on the stamp and the shards, re-keyed before
+    every `/ask`, `/answer` and `/graph` (W-249). The view is re-read when the
+    committed shards change, so a re-ingest while the page is open is picked up
+    on the next click rather than served stale. Jobs are keyed by kind and by
+    the shards they read, so reopening a tab on an unchanged index returns the
+    finished report and recomputes nothing.
     """
 
     def __init__(self, root=None) -> None:
+        from ..store.resident import Holder
+
         self._lock = threading.Lock()
         self._root = root
         self._view = None
@@ -518,6 +532,7 @@ class _State:
         self._dictionary = None
         self._dictionary_key = None
         self._jobs: dict = {}
+        self.resident = Holder(self.root)
 
     def root(self):
         if self._root is None:
@@ -529,12 +544,25 @@ class _State:
             self._root = root
         return self._root
 
-    def _shard_key(self):
-        from .. import store as store_mod
+    @contextlib.contextmanager
+    def held(self):
+        """One request inside the resident holder — or outside it, when there is
+        no repository to hold, so the command reports that exactly as it would
+        have."""
+        try:
+            self.root()
+        except FuxError:
+            yield
+            return
+        with self.resident.call():
+            yield
 
-        return tuple(
-            (p.name, p.stat().st_size, p.stat().st_mtime_ns) for p in store_mod.iter_shard_paths(self.root())
-        )
+    def _shard_key(self):
+        from ..store.resident import state_key
+
+        # The shard half of the resident key: one definition of "the shards
+        # changed" for the view, the jobs and the loaded index.
+        return state_key(self.root())[1]
 
     def texts(self):
         """Every indexed document's text, read once per index state — the

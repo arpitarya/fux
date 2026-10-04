@@ -1,0 +1,2 @@
+{"root": "rung-10000", "per_call_median_ms": {"ask": 442.4, "graph": 343.9}, "held_median_ms": {"ask": 329.7, "graph": 13.3}}
+{"root": "repo", "per_call_median_ms": {"ask": 1037.6, "graph": 467.2}, "held_median_ms": {"ask": 900.0, "graph": 26.0}}

@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@75e6630e087e, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@e0f7a8fcc41e]
+owns: [src/fux/store@6c075fc18004, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@6ae66cb599c3]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 086d83f7bced63c4b00926ebc4493518a319001e541c9b9b08b95ddf809631cf
+content_sha: 67ac90159fb5c5814a26ebb5be183d780a096d1aedb89d0f96f9d6ae15170dc4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -603,6 +603,8 @@ exactly v5's property set.
 - Decision 16 stays as the record of v6. v6 was never in a release.
 
 **No decision here moved** (W-242 (closed 2026-10-03) Tier 0, 2026-09-30; [SR-NODE-SEARCH](0153_node-search.md) decision 24): `node/src/store/reader.mjs` gains `Shards`, a per-call set that reads each committed shard once, and `iterShardPaths` now uses `reader.py`'s shard-name grammar (`[0-9a-f]{2}.jsonl`, files only) rather than any `*.jsonl`. Output is byte-identical.
+
+**No decision here moved** (W-249, 2026-10-04): `store/reader.py`'s `raw_record_lines` and `read_index` answer from the index state a long-running server holds when a call is bound to one, and from disk otherwise; Node's `Shards` counts its disk reads and its comment names its one cross-call owner. The decision is [SR-MCP](0136_mcp.md)'s 13, and every byte read is unchanged.
 
 ### Consequences
 

@@ -7,10 +7,10 @@ description: "The constitutional law. A rule is stated in exactly one SR and eve
 status: accepted
 date: 2026-09-06
 feature: the authority of records — where a rule lives, which record wins, and who may amend one
-owns: [scripts/gen-laws.py@e827930d1ffc, scripts/gen-components.py@cc4278e50ba4, tests/test_claude_md_laws.py@d5a71ea8bd15, tests/test_record_components.py@44f91ccdd550]
+owns: [scripts/gen-laws.py@e827930d1ffc, scripts/gen-components.py@d146ee4a28b1, tests/test_claude_md_laws.py@d5a71ea8bd15, tests/test_record_components.py@5559f217ae22]
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 19cdd42627d57284363e32a4c393657cc54573cdafa78eedaea3e4b247b517f3
+content_sha: 6db6a52adcc95be64ef5bd11e5dfb80225f5d9d0cc6b9129fd6464d643706451
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

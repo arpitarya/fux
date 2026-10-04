@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@5c4f7e0da66d, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@c264b85831f7, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 20c67ba91a5edc67edc0fc9b746206d62415776b79206c7ce9ebfd1cdfd4912d
+content_sha: 84375aac2b64dc5e911a64a7794fa4a7a602e0256b272cb3fba50c7f6cc4785b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -957,9 +957,16 @@ Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1 and 2 BUILT 2026-1
     display `recordFor`. `-q` arms share their
     caller's. A function called without one makes its own, so no public
     signature changed meaning.
-  - 🔴 **It is never module-level and never kept on a long-lived object** —
-    `fux mcp` and a library `Index` outlive the index they read, and `ingest`
-    rewrites it under them. That is the one design constraint the item fixed.
+  - 🔴 **It is never module-level and never kept on a long-lived object
+    without a key** — `fux mcp` and a library `Index` outlive the index they
+    read, and `ingest` rewrites it under them. That is the one design
+    constraint the item fixed. ⚠ **Amended 2026-10-04 (W-249,
+    [SR-MCP](0136_mcp.md) decision 13):** `fux mcp`'s `Resident` keeps ONE set
+    per connection, re-keyed on `stamp.json` plus every shard's size and mtime
+    before each tool call and dropped when either moves — the constraint's
+    reason, met by a key instead of by discarding the set. A verb and a library
+    `Index` still make one per call, and `node/test/resident.test.mjs` holds
+    the key.
   - **Held by `node/test/shard-reads.test.mjs`**, which spies on
     `fs.readFileSync` (not on the reader, so a pass that bypasses `Shards` is
     counted like one that uses it) and fails above one read per shard on

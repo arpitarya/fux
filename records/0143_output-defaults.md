@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@dbd9fda25aa9, src/fux/templates/output.toml.txt@ee3226cd6dcd, .fux/output.toml@38f72dd71a22, node/src/config/output.mjs@ae4f709222ac]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 8cfa408b944b06dd52f8130bdebc53e117c3696b9aee92bce31dfa74ecf464f4
+content_sha: e92b5af00274470bab9b7bc20bd189e67152db83de82161f91adfb9ef8ed6579
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -840,6 +840,8 @@ anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
 **No decision here moved** (W-245, 2026-10-04): `src/fux/mcp.py`'s module docstring said the index and postings mmaps stay resident across calls; it now says the process is resident and the index is re-read per request, as [SR-MCP](0136_mcp.md) states.
 
 **No decision here moved** (W-247, 2026-10-04): `query/__init__.py` reads the resolved `args` in `build_ask`, `build_find` and `build_answer` instead of in each `cmd_*` body; every output is byte-identical.
+
+**No decision here moved** (W-249, 2026-10-04): `src/fux/mcp.py` holds the loaded index across tool calls ([SR-MCP](0136_mcp.md) decision 13); `[mcp]` is still read once at start-up, and its keys and defaults are unchanged.
 
 ### Consequences
 

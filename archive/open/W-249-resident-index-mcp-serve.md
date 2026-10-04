@@ -9,6 +9,12 @@ ball: agent
 
 # W-249 — the long-running surfaces keep the index open
 
+**✅ CLOSED 2026-10-04 — built, byte-identical** (Claude Code; an Opus subagent built, Opus 5.5 reviewed):
+- `src/fux/store/resident.py`: one `Holder` per process keeps each shard's record lines and the parsed records; `fux mcp` brackets every `tools/call` and `fux serve` its `/ask`, `/answer`, `/graph` with `Holder.call()`. **Residency of the input, never a memo of an output** — W-242's T3 stays refused. Node's `fux mcp` keeps its `Shards` the same way.
+- **The key is the stamp digest plus every shard's name, size and mtime_ns**, recomputed before each call: the stamp alone is not enough, since `ingest --no-accelerator`, a pull, a checkout or a merge move the shards and not the stamp (each test fails with the key cut to the stamp). Absent `.fux/runtime/` is a `None` half, never an error. The derived plane and committed config are NOT held — `fux build` rewrites the former in place, the latter changes with no key moving.
+- **Gate:** 228 of 229 surface rows byte-identical on three roots (this repo, the same without runtime, a migrated copy of rung-10000); the one difference is a pre-existing `PYTHONHASHSEED` tie order in `inspect/lenses.py`, fixed in the next commit. Differential arm 0/225. Memory, reported: +184 MB at rung-10000, +296 MB on this repo; warm `fux_search` 342 → 48 ms and 499 → 93 ms. [Run](../../work/regression/2026-10-04-resident-index/report.md).
+- Live successors: [SR-MCP](../../records/0136_mcp.md) d13, [SR-SERVE](../../records/0158_serve.md) d3, [SR-NODE-SEARCH](../../records/0153_node-search.md) d24.
+
 **Model:** Claude Code, **Opus** — it decides when a resident index is stale,
 and a wrong answer there is a correct-looking answer from the wrong index.
 
