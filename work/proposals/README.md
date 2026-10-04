@@ -83,7 +83,7 @@ the defect this ordering exists to make visible.*
   rows stay blocked and the file says on what. **Graduates per section** —
   its data in hand *and* a ranking or design decision waiting on the number.
   ⚠ **2026-10-04 (W-251 §4):** §2, §4-lab and §8 graduated into
-  [W-256](../open/W-256-no-key-measurements.md), §7 into
+  W-256, §7 into
   [W-257](../open/W-257-enriched-rung.md), §4-live into
   [W-258](../open/W-258-live-network-captures.md); §5's *"tabular seed documents
   SR-WORK-TESTDATA T-rows describe"* was wrong — no T-row names tabular documents,

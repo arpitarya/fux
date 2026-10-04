@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@54b4e504214f]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: e0ebc7f4fc80d71d86194f76d6e25a68fe868b7f5c0a35c30a09b73d7b77649c
+content_sha: 80bebe14156bfaf192ac3a395c878a1f59f5d2072dddfb4a24e14ee30236c7d2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -376,7 +376,9 @@ this moved where they are written, not what they are.
 
 **The last owed item closed 2026-09-05 (W-101).** `fux doctor` now reports the `as-ingested` share — `doctor.freshness_counts()`, rendered as the `freshness verdicts` check and, machine-readably, as `fux doctor --json`'s `freshness` block. **The veto below can be run.**
 
-⚠ **What it can be run *against* is narrower than the veto's wording, and that limit is stated rather than hidden.** A freshness verdict exists only at answer time, and the only thing that persists one is the **opt-in** receipt journal (`--journal`, `.fux/runtime/ingest-log.jsonl`, gitignored — L9). So the share is computed over **journalled answers**, not over every answer ever given, and a repo that has never journalled reports **unknown** rather than a zero share. Collapsing those two would let a repo that never looked read as one that looked and found nothing. **Nothing new is retained to make this work**: the journal already existed, and if it is off there is no number.
+⚠ **What it can be run *against* is narrower than the veto's wording, and that limit is stated rather than hidden.** A freshness verdict exists only at answer time, and the only thing that persists one is the **opt-in** receipt journal (`--journal`, `.fux/runtime/provenance.jsonl`, gitignored — L9; ⚠ this sentence named `ingest-log.jsonl`, which is the unrelated ingest ledger of the first bullet above, until 2026-10-04). So the share is computed over **journalled answers**, not over every answer ever given, and a repo that has never journalled reports **unknown** rather than a zero share. Collapsing those two would let a repo that never looked read as one that looked and found nothing. **Nothing new is retained to make this work**: the journal already existed, and if it is off there is no number.
+
+⚠ **The veto's instrument has now been exercised, on loopback only** (W-256, 2026-10-04, [`2026-10-04-loopback-network`](../work/regression/2026-10-04-loopback-network/VERDICT.md), `informed`). Until then `freshness_counts()` and the `freshness verdicts` row had only ever been run against an empty journal — the captured output below is `{}`. On eight `keep=true` documents served from `127.0.0.1`, with the server up every journalled verdict was `current`; with it taken down every verdict was `as-ingested` and carried `fetched_sha == indexed_sha` (the retained bytes agree with the index); `fux doctor --json`'s `freshness` block equalled an independent count of the journal at every stage, and the row warned if and only if the share exceeded the quarter (20 % silent, 33 % warning). **This shows the mechanism is wired end to end and nothing more**: no real host, no real outage and no real corpus has been measured, so the veto itself — whether `as-ingested` exceeds a quarter *on a corpus whose sources are all reachable* — is still unruled, and that live half is [W-258](../work/open/W-258-live-network-captures.md)'s.
 
 ### Alternatives considered
 

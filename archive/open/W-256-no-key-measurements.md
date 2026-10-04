@@ -9,11 +9,16 @@ ball: agent
 
 # W-256 — the no-key measurements
 
+**✅ CLOSED 2026-10-04 — three runs filed; one PASS, two handed to Arpit as their frozen rules require** (Claude Code; a Sonnet subagent pre-registered — frozen alone at `a935d511` — and ran, Opus 5.5 reviewed):
+- **§2 `doc_coverage` replay — INCONCLUSIVE.** 374 rows, 21 reachable unanswerables (the item's 340 answerable was 338); floor 0.80 alone meets the point criteria, p = 0.35 against 0.00625, consistent in one set of three. `doc_coverage_floor` stays 0.0; SR-CONFIDENCE d12 carries a pointer. → W-260 §1.
+- **§8 ingest split — a split result.** Delta median 10.39 s at rung-10000, full 15.11 s (1.45×; SR-INGEST's 23× rewritten); walk+parse 24–30 %, `redact` ~57 % — 6 s against W-239's 0.97 s, unexplained. B-002 neither closes nor promotes. → W-260 §2. W-239's `phase_times.py` could not give this split (its walk read 0 s); `ingest_split.py` names every gap.
+- **§4 loopback — PASS.** B-102 14/14 (3, 3, 4, 1 requests; backoff 1.01/2.01/4.01 s; `rate_limited[host]` = 8; doctor names the host — two script defects fixed in-run and disclosed, all attempts kept); B-124 13/13 (current while up; `as-ingested` with `fetched_sha == indexed_sha` once down; the quarter veto silent at 20 %, warning at 33 %). SR-ACQUIRED now says the instrument was exercised on loopback, and its journal path is corrected (`provenance.jsonl`). **B-103 (Windows daemon e2e) excluded**: it needs a `windows-latest` CI run, and `main` carries an unpushed local commit that reds CI until W-240.
+
 **Model:** Claude Code, **Sonnet** — each section is a pre-registration written
 in the plan plus a script in `tools/`; the bars are stated before any number
-exists. **Ratified 2026-10-04 by delegation ([W-251](W-251-backlog-audit-rulings.md)
+exists. **Ratified 2026-10-04 by delegation ([W-251](../../work/open/W-251-backlog-audit-rulings.md)
 §4), not run.** Three sections of
-[`measurement-plan-2026-10`](../proposals/measurement-plan-2026-10.md) graduate
+[`measurement-plan-2026-10`](../../work/proposals/measurement-plan-2026-10.md) graduate
 here because each now has **a decision waiting on its number** (the plan's own
 trigger); the rest of the plan stays parked.
 
@@ -67,7 +72,7 @@ retired sets are open and every number on them is `informed`).
 - **B-102 loopback:** a local server emitting 429 exercises `is_rate_limited` →
   `RATE_LIMIT_RETRIES`/`RATE_LIMIT_BACKOFF_BASE` and `url-state.json
   rate_limited[host]`; `fux doctor` names the host. The *real-network* half is
-  [W-258](W-258-live-network-captures.md).
+  [W-258](../../work/open/W-258-live-network-captures.md).
 - **B-124 loopback:** a `url:` corpus with `keep=true`; `fux answer --journal`
   N times; the server taken down; `as-ingested` share against `doctor`'s
   quarter veto, and the taken-down document reports `as-ingested` with

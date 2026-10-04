@@ -14,7 +14,7 @@ Chrome and his credentials; an agent writes the harness and reads the result,
 and does neither of those. Filed 2026-10-04 by delegation
 ([W-251](W-251-backlog-audit-rulings.md) §3 #24). The loopback halves of B-102
 and B-124 and the Windows daemon e2e (B-103) are **agent** work and live in
-[W-256](W-256-no-key-measurements.md).
+W-256.
 
 **Order, by cost to him:** B-124 live (≈ 20 min, no credentials) → B-102 (a
 public rate-limiting host) → B-101 (Chrome signed in; the long one).

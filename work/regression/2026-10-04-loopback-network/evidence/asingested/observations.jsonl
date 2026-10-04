@@ -1,0 +1,13 @@
+{"arm": "keep=true", "expected": ">= 8 retained files", "id": "A1-kept", "observed": 10, "ok": true}
+{"arm": "no as-ingested while reachable", "expected": "{current} only", "id": "A2-up", "observed": ["current"], "ok": true}
+{"arm": "as-ingested", "expected": "{'as-ingested'}", "id": "A3-down-1-label", "observed": ["as-ingested"], "ok": true}
+{"arm": "fetched_sha == indexed_sha (match=True)", "expected": true, "id": "A3-down-1-match", "observed": true, "ok": true}
+{"arm": "as-ingested", "expected": "{'as-ingested'}", "id": "A3-down-2-label", "observed": ["as-ingested"], "ok": true}
+{"arm": "fetched_sha == indexed_sha (match=True)", "expected": true, "id": "A3-down-2-match", "observed": true, "ok": true}
+{"arm": "doctor == journal", "expected": {"current": 48}, "id": "A4-up-counts", "observed": {"current": 48}, "ok": true}
+{"arm": "doctor == journal", "expected": {"as-ingested": 12, "current": 48}, "id": "A4-down-1-counts", "observed": {"as-ingested": 12, "current": 48}, "ok": true}
+{"arm": "doctor == journal", "expected": {"as-ingested": 24, "current": 48}, "id": "A4-down-2-counts", "observed": {"as-ingested": 24, "current": 48}, "ok": true}
+{"arm": "warn iff share 0.000 > 0.25", "expected": false, "id": "A5-up-veto", "observed": false, "ok": true}
+{"arm": "warn iff share 0.200 > 0.25", "expected": false, "id": "A5-down-1-veto", "observed": false, "ok": true}
+{"arm": "warn iff share 0.333 > 0.25", "expected": true, "id": "A5-down-2-veto", "observed": true, "ok": true}
+{"arm": "the veto fires at least once, in a down stage", "expected": "subset of down-1/down-2, non-empty", "id": "A5-fires", "observed": ["down-2"], "ok": true}

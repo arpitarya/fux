@@ -1,0 +1,14 @@
+{"arm": "retry", "expected": 3, "id": "R1-flaky-1", "observed": 3, "ok": true}
+{"arm": "retry", "expected": 3, "id": "R1-flaky-2", "observed": 3, "ok": true}
+{"arm": "retry", "expected": 4, "id": "R1-always", "observed": 4, "ok": true}
+{"arm": "control", "expected": 1, "id": "R1-ok", "observed": 1, "ok": true}
+{"arm": "isolation", "expected": 0, "id": "R2-exit", "observed": 0, "ok": true}
+{"arm": "indexed", "expected": true, "id": "R2-flaky-1", "observed": "/flaky-1 in index", "ok": true}
+{"arm": "indexed", "expected": true, "id": "R2-flaky-2", "observed": "/flaky-2 in index", "ok": true}
+{"arm": "indexed", "expected": true, "id": "R2-ok", "observed": "/ok in index", "ok": false}
+{"arm": "not indexed", "expected": false, "id": "R2-always", "observed": "/always in index", "ok": false}
+{"arm": "backoff", "expected": "gap_i in [1.0*2^i, +1.5]", "id": "R3-flaky-1", "observed": [1.01, 2.01], "ok": true}
+{"arm": "backoff", "expected": "gap_i in [1.0*2^i, +1.5]", "id": "R3-flaky-2", "observed": [1.01, 2.01], "ok": true}
+{"arm": "backoff", "expected": "gap_i in [1.0*2^i, +1.5]", "id": "R3-always", "observed": [1.01, 2.01, 4.01], "ok": true}
+{"arm": "url-state.json", "expected": {"127.0.0.1:56858": 8}, "id": "R4-count", "observed": {"127.0.0.1:56858": 8}, "ok": true}
+{"arm": "fux doctor", "expected": "rate-limited by 127.0.0.1:56858 x8", "id": "R5-doctor", "observed": "2 url: record(s), 2 confirmed by the last run, fetches <= 4 at a time (max_parallel; also capped by your fetcher's MAX_PARALLEL); fetchers declaring MAX_PARALLEL > 1 (each claims its fetch() is reentr", "ok": true}

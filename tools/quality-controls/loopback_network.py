@@ -98,7 +98,7 @@ class Server:
 
 def document(name: str) -> bytes:
     """Deterministic, distinct, above the thin-page word floor."""
-    words = " ".join(f"{name}-term{i}" for i in range(80))
+    words = " ".join(f"{name}-term{i}" for i in range(200))
     return f"# Loopback {name}\n\nThe {name} runbook. {words}\n".encode()
 
 
@@ -174,8 +174,14 @@ def ratelimit(out: Path) -> int:
             raw["url_state"] = state
             doctor = json.loads(fux(repo, "doctor", "--json", check=False).stdout or "{}")
             raw["doctor_url_row"] = [c for c in doctor.get("checks", []) if c.get("name") == "url sources"]
-            index_text = "".join(p.read_text(errors="ignore")
-                                 for p in (repo / ".fux" / "index").glob("*.jsonl"))
+            ids = []
+            for shard in (repo / ".fux" / "index").glob("*.jsonl"):
+                for line in shard.read_text(errors="ignore").splitlines():
+                    try:
+                        ids.append(json.loads(line).get("id") or "")
+                    except ValueError:
+                        pass
+            raw["indexed_ids"] = sorted(i for i in ids if i)
     finally:
         server.stop()
 
@@ -188,8 +194,8 @@ def ratelimit(out: Path) -> int:
     # R2 - the run survives the refused URL, indexes the recovered ones
     obs(rows, "R2-exit", "isolation", 0, raw["ingest"]["returncode"], raw["ingest"]["returncode"] == 0)
     for p in (*FLAKY_PATHS, OK_PATH):
-        obs(rows, f"R2-{p}", "indexed", True, f"/{p} in index", f"/{p}" in index_text)
-    obs(rows, "R2-always", "not indexed", False, f"/{ALWAYS_PATH} in index", f"/{ALWAYS_PATH}" in index_text)
+        obs(rows, f"R2-{p}", "indexed", True, f"/{p} in index", any(i.endswith(f"/{p}") for i in raw["indexed_ids"]))
+    obs(rows, "R2-always", "not indexed", False, f"/{ALWAYS_PATH} in index", not any(i.endswith(f"/{ALWAYS_PATH}") for i in raw["indexed_ids"]))
     # R3 - the doubling backoff, from the server's own timestamps
     for p in (*FLAKY_PATHS, ALWAYS_PATH):
         ts = [r["t"] for r in server.log if r["path"] == p]

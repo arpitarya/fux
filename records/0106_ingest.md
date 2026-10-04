@@ -11,7 +11,7 @@ feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@577ebf850a7e, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@a6b1bb5f5517, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 008cacdc23a00b8c89c49c2edc2316b2400ac7cf715f3ea9309a5c5f1fd1b507
+content_sha: e3790d46227543318bdf9971002e9f8d52e9ce60f6011484d29cf665612fc99a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -53,9 +53,14 @@ says so rather than reusing the number.** 92 % of that full ingest sat in a
 dense embedding pass which has since been deleted
 ([SR-ASK](0103_ask.md) decision 9). What carry-forward saves today is the
 difference between re-tokenising a corpus and re-tokenising a commit — still
-worth having, still what makes the hook path affordable, but **nobody has
-re-measured the split**, and this record does not claim a number it does not
-have.
+worth having, still what makes the hook path affordable. **Re-measured
+2026-10-04 (W-256 §8)**: on an unchanged rung-10000 a full ingest takes a
+median 15.11 s and a delta 10.39 s with zero documents re-extracted — a
+full/delta ratio of **1.45×**, not 23× — and the largest delta segment is
+`redact` (~57 %), not walk or parse
+([run](../work/regression/2026-10-04-ingest-split/VERDICT.md), `informed`).
+What that number licenses for the dirty list (B-002) is Arpit's: the frozen
+rule read it as a split result.
 
 The **write** is incremental too: a shard whose bytes come out identical is left
 untouched on disk, so git sees nothing. Re-running ingest on an unchanged corpus

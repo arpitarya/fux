@@ -25,7 +25,7 @@ to pick would not be.
 B-100 + B-146 + B-151 → W-253 ·
 B-150 → W-254 ·
 B-260 → W-255 ([compare](../compare/pii-regex-bound.compare.md)) ·
-B-002/B-098, B-113/B-261 gate 2, B-103 → [W-256](../open/W-256-no-key-measurements.md).
+B-002/B-098, B-113/B-261 gate 2, B-103 → W-256.
 
 **Every section inherits:** L2 (no new dependency without a record naming it),
 L4 (pure functions of the bytes), L5 (offline), L10 (Node ships one bundle),

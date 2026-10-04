@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@5d8ba6a4bdcd, tools/t2-eval@cc5410393ce4, tools/quality-controls@f9821a8598d0, tools/vector-gate@0023bff0cdef, tools/section-size@25bfc75777a6]
+owns: [tests/test_regression_runs.py@5d8ba6a4bdcd, tools/t2-eval@cc5410393ce4, tools/quality-controls@d17195b576fa, tools/vector-gate@0023bff0cdef, tools/section-size@25bfc75777a6]
 laws: [L4]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: d8dde29d448b6307e387a6e7b8e59b1564fd0ceb9b77d5b61cb1fd76eaa4cb72
+content_sha: 1779717815d3db55396221aa2277123387e978c6d49439b4d1befb1bed01e0e3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1381,6 +1381,8 @@ the second filed run to lack an input one of its own metrics acts on.**
 ⚠ **The funnel is still UNMEASURED, and the fix does not change that.** These
 three generation-1 sets retired on 2026-09-22 and no arm re-ran; the first funnel
 is the next generation's, and **no document may state one before it exists.**
+
+**No decision here moved** (W-256, 2026-10-04): `tools/quality-controls/loopback_network.py` was repaired after its pre-registration froze (a fixture below the small-document cap, a substring index check and an inverted negative check), each disclosed in the run's report; no pre-registered observation or bar changed.
 
 ### Consequences
 

@@ -57,7 +57,7 @@ link-bearing questions (sets 3/4 carry `ref` edges, 82 per rung).
 
 ## 2 · Confidence and abstention — B-113 (+B-130), B-114, B-261's gates
 
-✅ **Graduated 2026-10-04 → [W-256](../open/W-256-no-key-measurements.md) §2** (W-251 §4); B-114 was ruled, not measured (`cost` B-266).
+✅ **Graduated 2026-10-04 → W-256 §2** (W-251 §4); B-114 was ruled, not measured (`cost` B-266).
 
 **Rows:** the `doc_coverage` gate is off because *"the two populations
 overlap"* ([SR-CONFIDENCE](../../records/0141_confidence.md) d12); the fusion
@@ -90,7 +90,7 @@ used) stays **blocked**: it needs consumer repos that do not exist.
 
 ## 4 · Fetch and daemon, real network — B-092, B-093, B-101, B-102, B-103, B-124
 
-✅ **Graduated 2026-10-04:** the lab-side half → [W-256](../open/W-256-no-key-measurements.md) §4; his-hands half → [W-258](../open/W-258-live-network-captures.md). B-092 was ruled (`cost` B-265); B-093 stays blocked on B-268.
+✅ **Graduated 2026-10-04:** the lab-side half → W-256 §4; his-hands half → [W-258](../open/W-258-live-network-captures.md). B-092 was ruled (`cost` B-265); B-093 stays blocked on B-268.
 
 **Lab-side, now:** B-103 — a daemon start → sweep → stop e2e on
 `windows-latest` with the 2026-08-27 positive control (term absent before,
@@ -133,7 +133,7 @@ when this ceiling **and** a rank-contract corpus both exist.
 
 ## 8 · Ingest cost — B-098
 
-✅ **Graduated 2026-10-04 → [W-256](../open/W-256-no-key-measurements.md) §8**, which rules B-002 on the number.
+✅ **Graduated 2026-10-04 → W-256 §8**, which rules B-002 on the number.
 
 Re-run `evidence/phase_times.py` with `full=True` against a delta on an
 unchanged rung-10000; endpoint = the ratio, three repeats, identical sha. W-239

@@ -1,0 +1,123 @@
+{
+ "backoff_s": 1.0,
+ "doctor_url_row": [
+  {
+   "detail": "3 url: record(s), 3 confirmed by the last run, fetches <= 4 at a time (max_parallel; also capped by your fetcher's MAX_PARALLEL); fetchers declaring MAX_PARALLEL > 1 (each claims its fetch() is reentrant): http=8, 1 listed URL(s) have never been fetched, so they are not in the index at all: http://127.0.0.1:56918/always - run `fux ingest` (no hook will do it: SR-MAINTENANCE decision 5a), rate-limited by 127.0.0.1:56918 x8",
+   "level": "warn",
+   "name": "url sources",
+   "ok": true
+  }
+ ],
+ "indexed_ids": [
+  "url:http://127.0.0.1:56918/flaky-1",
+  "url:http://127.0.0.1:56918/flaky-2",
+  "url:http://127.0.0.1:56918/ok"
+ ],
+ "ingest": {
+  "returncode": 0,
+  "stderr": "fetching  4 listed URL(s) (network) \u2014 no dirty list yet, so nothing is known to be stale\nnote: 127.0.0.1:56918 rate-limited this run 8 times; fux backed off and retried. If it keeps happening, lower [sources.url] max_parallel - fux will not change it for you\n  ! http://127.0.0.1:56918/always \u2014 fetch failed: HTTPError: HTTP Error 429: Too Many Requests; prior record kept\n",
+  "stdout": "ingested 3 docs (3 changed, 0 carried forward), 0 not indexed, 1 skipped, 3 shards written\n  skip http://127.0.0.1:56918/always: fetch failed: HTTPError: HTTP Error 429: Too Many Requests\naccelerator: 811 terms, 811 blocks, 1226 postings (derived, not committed)\n"
+ },
+ "requests": [
+  {
+   "n": 1,
+   "path": "flaky-2",
+   "status": 429,
+   "t": 228501.386280166
+  },
+  {
+   "n": 1,
+   "path": "always",
+   "status": 429,
+   "t": 228501.386381291
+  },
+  {
+   "n": 1,
+   "path": "flaky-1",
+   "status": 429,
+   "t": 228501.386484541
+  },
+  {
+   "n": 1,
+   "path": "ok",
+   "status": 200,
+   "t": 228501.386611833
+  },
+  {
+   "n": 2,
+   "path": "flaky-2",
+   "status": 429,
+   "t": 228502.393314458
+  },
+  {
+   "n": 2,
+   "path": "always",
+   "status": 429,
+   "t": 228502.393865583
+  },
+  {
+   "n": 2,
+   "path": "flaky-1",
+   "status": 429,
+   "t": 228502.394371416
+  },
+  {
+   "n": 3,
+   "path": "flaky-1",
+   "status": 200,
+   "t": 228504.397647916
+  },
+  {
+   "n": 3,
+   "path": "flaky-2",
+   "status": 200,
+   "t": 228504.399942875
+  },
+  {
+   "n": 3,
+   "path": "always",
+   "status": 429,
+   "t": 228504.400477041
+  },
+  {
+   "n": 4,
+   "path": "always",
+   "status": 429,
+   "t": 228508.40757725
+  }
+ ],
+ "retries": 3,
+ "url_state": {
+  "rate_limited": {
+   "127.0.0.1:56918": 8
+  },
+  "refused": {},
+  "run_seq": 1,
+  "urls": {
+   "http://127.0.0.1:56918/always": {
+    "fail_streak": 1,
+    "last_changed_run": null,
+    "last_seen_run": null,
+    "token_sha": null
+   },
+   "http://127.0.0.1:56918/flaky-1": {
+    "fail_streak": 0,
+    "last_changed_run": null,
+    "last_seen_run": 1,
+    "token_sha": null
+   },
+   "http://127.0.0.1:56918/flaky-2": {
+    "fail_streak": 0,
+    "last_changed_run": null,
+    "last_seen_run": 1,
+    "token_sha": null
+   },
+   "http://127.0.0.1:56918/ok": {
+    "fail_streak": 0,
+    "last_changed_run": null,
+    "last_seen_run": 1,
+    "token_sha": null
+   }
+  }
+ }
+}

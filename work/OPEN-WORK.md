@@ -31,6 +31,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-258** — twenty minutes at his own machine for the three captures only a real network gives ([the item](open/W-258-live-network-captures.md) is the checklist); nothing else in the queue waits on it | 2026-10-04 | 0d |
 | ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-260** — two W-256 results only he rules: the `doc_coverage` floor came back INCONCLUSIVE, and a no-change ingest costs 10 s with `redact` carrying it. [The item](open/W-260-w256-results-to-rule.md) has one line each, with a recommendation | 2026-10-04 | 0d |
+| ↳ **blocks:** nothing else in the queue | | |
 
 ---
 
@@ -47,9 +49,9 @@ here. Read that record before changing anything below it.
 ### testing
 
 - 🟡 **W-243** · `agent` — CI in ~2 min. On `main`: the key saves ✅, a docs-only push skips FULL ✅. DoD 1 (FAST ≤ 2 min) needs step 1, which waits on W-259. **Opus.** [detail](open/W-243-ci-two-minutes.md)
-- 🟢 **W-256** · `agent` — three measurements needing no key and no hands: how much of an ingest is the walk vs the extract; whether `doc_coverage` spots an unanswerable question; the daemon on Windows and on a loopback 429. **Sonnet.** [detail](open/W-256-no-key-measurements.md)
 - 🔴 **W-257** · `arpit` — an enriched rung: an agent writes questions over rung-01000 so doc2query can finally be measured; the author must be blind to the question sets or the numbers prove nothing. Arpit launches it (his tokens). **Opus.** [detail](open/W-257-enriched-rung.md)
 - 🔴 **W-258** · `arpit` — one hands-on session on his machine: a journalled answer whose source then vanishes, a real 429 from a real host, and parallel CDP fetches in signed-in Chrome. Checklist and bars are written. [detail](open/W-258-live-network-captures.md)
+- 🔴 **W-260** · `arpit` — W-256's two results his by their frozen rules: `doc_coverage_floor` INCONCLUSIVE (recommended: *off* stands); the delta ingest a split result (recommended: explain `redact`'s 6 s first). [detail](open/W-260-w256-results-to-rule.md)
 
 ### adr update
 

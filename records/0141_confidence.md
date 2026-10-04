@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 518c3cefc8127de3905858972995e184481b5900f936fadee0ebdae668d26d74
+content_sha: 4eed228393fa63800a78d93a4837f25366ba4131c69b5030d803be7d23f706e9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -665,6 +665,15 @@ golden rung in `fux-lab`**, not a re-run of this one:
 - **So the module now REPORTS the case rather than claiming to catch it.** An
   agent gets `doc_coverage: 0.42` beside `band: grounded` and can act on it.
 
+⚠ **Replayed on a golden rung, 2026-10-04 (W-256, `informed`): INCONCLUSIVE, so
+the gate stays off and this decision is not ruled by it.** On the W-213 captures
+at `rung-01000` (three retired sets, 374 rows, 36 unanswerable of which 21 reach
+this clause) one floor of the fixed grid, `0.80`, met the bar's point criteria
+(12 of 21 caught; 61 correct answers demoted against a rate-matched coin's 64.1)
+and was nowhere near distinguishable from chance (p = 0.35 against 0.00625) and
+held in one set of three. The question is with Arpit; see
+[the run](../work/regression/2026-10-04-doc-coverage-replay/VERDICT.md).
+
 **What would change this:** a decoy set large enough for the two distributions
 to be estimated rather than sampled, and a pre-registration that fixes the floor
 before any score exists under it. **Not a number picked from this table.**
@@ -890,7 +899,7 @@ The confidence block's pairs and hashes are both analyzed with the repo's identi
   not for any arm** (W-251 §4 #11). Decision 17 measured that it does not carry
   correctness, so a calibrated floor on it would be a calibrated non-predictor.
   The next lever is `doc_coverage_floor`
-  ([W-256](../work/open/W-256-no-key-measurements.md) §2).
+  (W-256 §2).
 
 - ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
   nothing it decides.** Hashed display meta was deleted outright: `meta` and
