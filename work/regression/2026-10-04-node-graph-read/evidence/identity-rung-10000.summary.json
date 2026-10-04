@@ -1,0 +1,69 @@
+{
+ "corpus": "rung-10000-v7",
+ "root": "/private/tmp/claude-501/-Users-arpitarya-my-programs-fux/6d142bd2-57fe-4ea5-9fdb-9a1d4568e0f7/scratchpad/w259/rung-10000",
+ "fresh_before": true,
+ "fresh_after": true,
+ "queries": 40,
+ "docs": 8,
+ "cells": 192,
+ "identical": 192,
+ "read_arm_read_graph_json": 189,
+ "rebuild_arm_read_graph_json": 0,
+ "nonzero_exit": 0,
+ "per_verb": {
+  "find --json": {
+   "cells": 40,
+   "identical": 40,
+   "read_arm_read": 39,
+   "rebuild_arm_read": 0
+  },
+  "ask --json --band": {
+   "cells": 40,
+   "identical": 40,
+   "read_arm_read": 39,
+   "rebuild_arm_read": 0
+  },
+  "ask (text)": {
+   "cells": 40,
+   "identical": 40,
+   "read_arm_read": 39,
+   "rebuild_arm_read": 0
+  },
+  "graph --json": {
+   "cells": 40,
+   "identical": 40,
+   "read_arm_read": 40,
+   "rebuild_arm_read": 0
+  },
+  "explain --json": {
+   "cells": 8,
+   "identical": 8,
+   "read_arm_read": 8,
+   "rebuild_arm_read": 0
+  },
+  "explain (text)": {
+   "cells": 8,
+   "identical": 8,
+   "read_arm_read": 8,
+   "rebuild_arm_read": 0
+  },
+  "graph --seed --json": {
+   "cells": 8,
+   "identical": 8,
+   "read_arm_read": 8,
+   "rebuild_arm_read": 0
+  },
+  "path --json": {
+   "cells": 7,
+   "identical": 7,
+   "read_arm_read": 7,
+   "rebuild_arm_read": 0
+  },
+  "mcp fux_search + fux_related": {
+   "cells": 1,
+   "identical": 1,
+   "read_arm_read": 1,
+   "rebuild_arm_read": 0
+  }
+ }
+}

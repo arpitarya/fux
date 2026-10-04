@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@9c8fc34d2e59, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@82eca18314bc, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: c858f5778515a54b3250984a158a5cb6712ca32602bb8fe002ee87b3cc0f1b45
+content_sha: bb3c2a14663185d153385abc5599ea37dde3688c9cad01e2c94c91bcc8104e3f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -281,7 +281,38 @@ Found 2026-09-12.
 **refuses** when it is absent or stale. Node rebuilds the same plane in memory
 from the committed records and answers either way.
 
-⚠ *Read with decision 24 (2026-09-30, ratified, not built): Node will build the plane too; this decision is unchanged until Arpit rules on Fork A.*
+✅ **Amended 2026-10-04 — Fork A, ruled by Arpit and BUILT (W-259): Node MAY
+read `graph.json` when it is fresh; it NEVER requires it.** *"go with the
+recommendation"* ([`compare/shared-runtime`](../work/compare/shared-runtime.compare.md)
+Fork A). `graph/plane.mjs::planeFor` reads `.fux/runtime/graph.json` when the
+accelerator's freshness test (`derive/accel.mjs::isFresh`, the transcription of
+the `accel.is_fresh` that `plane.py::load` reuses) says the plane is current,
+and rebuilds in memory exactly as below otherwise. The compose tier of
+`find`/`ask` (and so `fux_search`), `explain`, `graph` and `path` all take it.
+
+- **What did not move:** absent, stale, torn, unreadable or foreign-schema is a
+  rebuild and never an error. Python still refuses there; that asymmetry is
+  this decision and stays.
+- 🔴 **The differential arm never takes the read.** Both builders write the
+  file, so Node reading it inside the arm compares Python with Python and
+  passes. `FUX_GRAPH_REBUILD=1` (`constants.toml [env] graph_rebuild`) forces
+  the rebuild, and the harness sets it on every Node process it starts
+  ([SR-T1-ACCELERATOR](0110_accelerator.md) decision 19).
+  `node/test/graph-read.test.mjs` and `tests/test_differential_arm.py` hold the
+  switch on both sides.
+- **A mid-rewrite read is a rebuild.** Both builds rewrite `graph.json` in
+  place and write `stamp.json` after it. Under a stamp that matches the shards,
+  the bytes being written are the ones already there (L4), so a concurrent
+  reader can only see a prefix, which does not parse, and a failed parse is a
+  rebuild. Under a stamp that does not match, nothing is read.
+- **Not taken:** `fux_related` builds a `Graph` from the records it already
+  parsed and runs no community pass, so it has nothing to gain. The library's
+  `Index._plane` is cached per `Index` and was never per query. Both match
+  their Python twins.
+- Byte-identity, read against rebuild, on this repo and both rungs:
+  [`2026-10-04-node-graph-read`](../work/regression/2026-10-04-node-graph-read/report.md).
+  Whether the read is FASTER is pre-registered and not yet measured:
+  [`2026-10-04-node-graph-speed`](../work/regression/2026-10-04-node-graph-speed/PRE-REGISTRATION.md).
 
 **Node's behaviour is the right one for its audience and is kept.** The reader
 exists for a clone with no Python; `.fux/runtime/` is gitignored and is written
@@ -651,6 +682,10 @@ that behaviour *"the right one for its audience"*: this reader exists for a
 clone with no Python, and `.fux/runtime/` is written by `fux build`, which is
 Python.
 
+⚠ *Amended 2026-10-04 by decision 9 (Fork A, W-259): Node now READS a fresh
+`graph.json` and rebuilds only when there is none. The asymmetry below is
+unchanged, because it lives where no fresh plane exists.*
+
 **So the two readers are byte-equal wherever Python has a fresh plane**, **and
 diverge on a corpus with no fresh build**, where Python has no tier and Node has
 one. That is decision 9's existing asymmetry showing through a new surface.
@@ -998,11 +1033,10 @@ Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1 and 2 BUILT 2026-1
   Python's (decision 11: Node has no decoders). **No read verb builds**; a
   missing plane is a scan, not a side effect. Decision 3 is untouched: a build
   reads committed shards and fetches nothing.
-- **Decision 9 is NOT amended.** Whether Node reads `graph.json` instead of
-  rebuilding the graph plane (Fork A) is Arpit's and open; until he rules, Node
-  rebuilds in memory even when it wrote the file itself. Decision 9's reason —
-  a Node reader must answer where no Python has run — is what Tier 2 now also
-  serves.
+- ~~**Decision 9 is NOT amended.**~~ **Amended 2026-10-04 (W-259):** Arpit ruled
+  Fork A yes, and decision 9 now carries it. Node reads a fresh `graph.json`, its own or Python's, and
+  rebuilds otherwise. Decision 9's reason, that a Node reader must answer where
+  no Python has run, is what Tier 2 now also serves.
 
 **25. `verify`, `--why`, `--receipt` and `--journal` are OUT OF SCOPE ON THIS
 READER, declared rather than missing** (W-251 §4 #6, 2026-10-04), in decision

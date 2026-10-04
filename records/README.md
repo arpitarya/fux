@@ -735,7 +735,7 @@ table does not grant.
 | `node/src/errors.mjs` | SR-LAWS | the Node twin of `src/fux/errors.py` — the single flat `FuxError`, no subclass hierarchy |
 | `node/src/graph/community.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/community.py` |
 | `node/src/graph/model.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/model.py` |
-| `node/src/graph/plane.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/plane.py` — rebuilt in memory rather than read from `graph.json` (SR-NODE-SEARCH decision 9) |
+| `node/src/graph/plane.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/plane.py` — read from `graph.json` when fresh, rebuilt in memory otherwise and whenever `FUX_GRAPH_REBUILD=1` (SR-NODE-SEARCH decision 9, W-259) |
 | `node/src/graph/walk.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/walk.py` |
 | `node/src/index.mjs` | SR-API | the Node twin of `from fux import open`, method for method. The register's own note on `src/fux/api.py` already says the two are one shape |
 | `node/src/ingest/gitdir.mjs` | SR-INGEST | the Node twin of `src/fux/ingest/gitdir.py` — the live `archived=true` read |

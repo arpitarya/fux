@@ -14,13 +14,13 @@
  *
  * 🔴 **Where this reader legitimately differs from Python, and why.**
  * Python's `compose.py` reads the derived `.fux/runtime/graph.json` and has no
- * tier when that file is absent or stale. **Node rebuilds the plane in memory
- * from the committed records instead**, exactly as `verbs/graph.mjs` already
- * does — SR-NODE-SEARCH decision 9, which ruled that behaviour *"the right one
- * for its audience"*: this reader exists for a clone with no Python, and
- * `.fux/runtime/` is written by `fux build`, which is Python. Requiring it
- * would make the tier absent precisely where this reader is the only one
- * present.
+ * tier when that file is absent or stale. **Node reads the same file when it is
+ * fresh and rebuilds the plane in memory from the committed records when it is
+ * not** (`graph/plane.mjs::planeFor`) — SR-NODE-SEARCH decision 9, which ruled
+ * the rebuild *"the right one for its audience"*: this reader exists for a clone
+ * with no build, so requiring the file would make the tier absent precisely
+ * where this reader is the only one present. Fork A (W-259, 2026-10-04) added
+ * the read; it never made the file a requirement.
  *
  * **So the two readers are byte-equal wherever Python has a fresh plane**, and
  * diverge only on a corpus with no fresh build, where Python has no tier and
@@ -39,16 +39,16 @@
  * `fux build` before both arms now, and a STALE plane counts as absent, which is
  * why the adversarial step rebuilds too.
  *
- * ⚠ **And it is not free.** Rebuilding the plane reads every committed record,
- * which is the work the B2 prefilter exists to avoid. Until W-235 it also
+ * ⚠ **And the rebuild is not free.** It reads every committed record, which is
+ * the work the B2 prefilter exists to avoid. Until W-235 it also
  * `JSON.parse`d every one — ~80 % of a Node `find` — and `graphRecords` now
- * parses only `id` and `edges`. `ask_boost = false` and `ask_related = false`
- * are what turn the read off.
+ * parses only `id` and `edges`. With a fresh plane it is skipped entirely
+ * (W-259). `ask_boost = false` and `ask_related = false` turn the tier off.
  */
 
-import { buildPlane } from "../graph/plane.mjs";
+import { planeFor } from "../graph/plane.mjs";
 import { ppr } from "../graph/walk.mjs";
-import { graphRecords, recordFor } from "../store/reader.mjs";
+import { recordFor } from "../store/reader.mjs";
 import { displayTitle } from "../store/format.mjs";
 import { rrf } from "./fuse.mjs";
 import { queryTermHashes } from "./scan.mjs";
@@ -99,8 +99,9 @@ export function tiers(root, query, ordered, top, tune, { wantRelated, shards = n
     // Every committed record, not the candidates: edges live on the documents
     // that declare them, and a candidate set is by definition a subset that
     // shares the query's vocabulary — exactly the wrong subset for finding what
-    // the vocabulary missed.
-    plane = buildPlane(graphRecords(root, shards));
+    // the vocabulary missed. Read from a fresh `graph.json`, which `fux build`
+    // derived from those same records, or rebuilt from them (W-259).
+    plane = planeFor(root, shards);
   } catch {
     return { results: ordered.slice(0, top), related: [] };
   }

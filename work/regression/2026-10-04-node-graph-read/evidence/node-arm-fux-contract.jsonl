@@ -1,0 +1,226 @@
+{"_condition": {"corpus": "/Users/arpitarya/my_programs/fux", "rung": null, "arm": "contract", "tune_vs_defaults": "all defaults \u2014 the contract and transcription arms are the same run", "queries": "fixed", "node_entry": "/Users/arpitarya/my_programs/fux/node/fux.mjs"}}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "rollback", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "rollback", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "rollback", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "rollback", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "rollback", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "rollback", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "ranking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "ranking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "ranking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "ranking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "ranking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "ranking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "index format", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "index format", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "index format", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "index format", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "index format", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "index format", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "confidence band", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "confidence band", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "confidence band", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "confidence band", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "confidence band", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "confidence band", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "the", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "the", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "the", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "the", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "the", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "the", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "decoder", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "decoder", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "decoder", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "decoder", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "decoder", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "decoder", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "pii redaction", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "pii redaction", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "pii redaction", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "pii redaction", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "pii redaction", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "pii redaction", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "graph plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "graph plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "graph plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "graph plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "graph plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "graph plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "accelerator", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "accelerator", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "accelerator", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "accelerator", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "accelerator", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "accelerator", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "refer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "refer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "refer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "refer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "refer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "refer", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "getUserName", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "getUserName", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "getUserName", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "getUserName", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "getUserName", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "getUserName", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "BM25F", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "BM25F", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "BM25F", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "BM25F", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "BM25F", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "BM25F", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "sha256", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "sha256", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "sha256", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "sha256", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "sha256", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "sha256", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "fux-engine", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "fux-engine", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "fux-engine", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "fux-engine", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "fux-engine", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "fux-engine", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "archived results", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "archived results", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "archived results", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "archived results", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "archived results", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "archived results", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "how do we roll back a release", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "how do we roll back a release", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "how do we roll back a release", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "how do we roll back a release", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "how do we roll back a release", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "how do we roll back a release", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "L1 zero cost", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "L1 zero cost", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "L1 zero cost", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "L1 zero cost", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "L1 zero cost", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "L1 zero cost", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "tune.toml", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "tune.toml", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "tune.toml", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "tune.toml", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "tune.toml", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "tune.toml", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "chunking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "chunking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "chunking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "chunking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "chunking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "chunking", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "regression evidence", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "regression evidence", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "regression evidence", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "regression evidence", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "regression evidence", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "regression evidence", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "supersedes", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "supersedes", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "supersedes", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "supersedes", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "supersedes", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "supersedes", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "node read plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "node read plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "node read plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "node read plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "node read plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "node read plane", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "docs/adr", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "docs/adr", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "docs/adr", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "docs/adr", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "docs/adr", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "docs/adr", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "answer verdict freshness", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "answer verdict freshness", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "answer verdict freshness", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "answer verdict freshness", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "answer verdict freshness", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "answer verdict freshness", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 1, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 1, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 5, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 5, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "find", "top": 20, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "ask", "top": 20, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:CHANGELOG.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:archive/proposals/architecture-review-2026-08-28.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:archive/v0.26/conformance/README.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:work/regression/2026-08-18-query-verbs/report.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:work/regression/2026-09-02-enrich-pii-leak/evidence/arm-head.txt"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:work/regression/2026-09-15-anchor-text/VERDICT.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:work/regression/2026-09-21-golden-ladder-outputs-set-3/evidence/rung-seed/predictions-set-3.jsonl"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "explain", "top": null, "query": ["file:work/regression/2026-09-27-mined-expansion/evidence/pool.json"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["rollback"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["ranking"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["index format"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["confidence band"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["the"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["decoder"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["pii redaction"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "graph", "top": null, "query": ["graph plane"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:CHANGELOG.md", "file:archive/proposals/architecture-review-2026-08-28.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:archive/proposals/architecture-review-2026-08-28.md", "file:archive/v0.26/conformance/README.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:archive/v0.26/conformance/README.md", "file:work/regression/2026-08-18-query-verbs/report.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:work/regression/2026-08-18-query-verbs/report.md", "file:work/regression/2026-09-02-enrich-pii-leak/evidence/arm-head.txt"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:work/regression/2026-09-02-enrich-pii-leak/evidence/arm-head.txt", "file:work/regression/2026-09-15-anchor-text/VERDICT.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:work/regression/2026-09-15-anchor-text/VERDICT.md", "file:work/regression/2026-09-21-golden-ladder-outputs-set-3/evidence/rung-seed/predictions-set-3.jsonl"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "path", "top": null, "query": ["file:work/regression/2026-09-21-golden-ladder-outputs-set-3/evidence/rung-seed/predictions-set-3.jsonl", "file:work/regression/2026-09-27-mined-expansion/evidence/pool.json"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["find", "rollback"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["ask", "rollback"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["answer", "rollback"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["find", "ranking"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["ask", "ranking"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["answer", "ranking"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["find", "index format"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["ask", "index format"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["answer", "index format"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["find", "confidence band"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["ask", "confidence band"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["answer", "confidence band"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["find", "the"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["ask", "the"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["answer", "the"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["find", "decoder"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["ask", "decoder"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["answer", "decoder"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["find", "pii redaction"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["ask", "pii redaction"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["answer", "pii redaction"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["find", "graph plane"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["ask", "graph plane"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle", "top": 1, "query": ["answer", "graph plane"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "mcp", "top": null, "query": ["{\"jsonrpc\": \"2.0\", \"id\": 0, \"method\": \"tools/list\"}", "{\"jsonrpc\": \"2.0\", \"id\": 1, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"rollback\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 2, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"ranking\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 3, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"index format\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 4, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"confidence band\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 5, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"the\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 6, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"decoder\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 7, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"pii redaction\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 8, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"graph plane\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 9, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"CHANGELOG.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 10, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"CHANGELOG.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 11, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"archive/proposals/architecture-review-2026-08-28.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 12, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"archive/proposals/architecture-review-2026-08-28.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 13, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"archive/v0.26/conformance/README.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 14, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"archive/v0.26/conformance/README.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 15, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-08-18-query-verbs/report.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 16, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-08-18-query-verbs/report.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 17, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-09-02-enrich-pii-leak/evidence/arm-head.txt\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 18, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-09-02-enrich-pii-leak/evidence/arm-head.txt\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 19, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-09-15-anchor-text/VERDICT.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 20, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-09-15-anchor-text/VERDICT.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 21, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-09-21-golden-ladder-outputs-set-3/evidence/rung-seed/predictions-set-3.jsonl\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 22, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-09-21-golden-ladder-outputs-set-3/evidence/rung-seed/predictions-set-3.jsonl\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 23, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-09-27-mined-expansion/evidence/pool.json\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 24, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-09-27-mined-expansion/evidence/pool.json\", \"line_start\": 1, \"line_end\": 20}}}"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle-mcp", "top": null, "query": ["{\"jsonrpc\": \"2.0\", \"id\": 0, \"method\": \"tools/list\"}", "{\"jsonrpc\": \"2.0\", \"id\": 1, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"rollback\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 2, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"ranking\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 3, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"index format\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 4, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"confidence band\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 5, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"the\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 6, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"decoder\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 7, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"pii redaction\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 8, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"graph plane\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 9, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"CHANGELOG.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 10, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"CHANGELOG.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 11, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"archive/proposals/architecture-review-2026-08-28.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 12, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"archive/proposals/architecture-review-2026-08-28.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 13, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"archive/v0.26/conformance/README.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 14, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"archive/v0.26/conformance/README.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 15, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-08-18-query-verbs/report.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 16, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-08-18-query-verbs/report.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 17, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-09-02-enrich-pii-leak/evidence/arm-head.txt\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 18, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-09-02-enrich-pii-leak/evidence/arm-head.txt\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 19, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-09-15-anchor-text/VERDICT.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 20, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-09-15-anchor-text/VERDICT.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 21, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-09-21-golden-ladder-outputs-set-3/evidence/rung-seed/predictions-set-3.jsonl\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 22, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-09-21-golden-ladder-outputs-set-3/evidence/rung-seed/predictions-set-3.jsonl\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 23, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"work/regression/2026-09-27-mined-expansion/evidence/pool.json\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 24, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"work/regression/2026-09-27-mined-expansion/evidence/pool.json\", \"line_start\": 1, \"line_end\": 20}}}"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "api", "top": null, "query": ["rollback", "file:CHANGELOG.md", "file:archive/proposals/architecture-review-2026-08-28.md"], "status": "pass", "discordances": 0, "detail": []}
+{"rung": "corpus", "verb": "bundle-api", "top": null, "query": ["rollback", "file:CHANGELOG.md", "file:archive/proposals/architecture-review-2026-08-28.md"], "status": "pass", "discordances": 0, "detail": []}

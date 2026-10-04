@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@7a65bb22b995]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@946e2f282b1f]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 0f34789ef5dad0eb423e8f7195916610be02f84ef3f1b6140239ad8557e3197b
+content_sha: ca7ac35bd5ffc4c657bf3bb08e53ca25d89b7710744e9c388c62d67c6825ddcf
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -187,6 +187,8 @@ pattern. A consumer who wants other cues is I2, which is not built.
 **No decision here moved** (W-248, 2026-10-04): two keys, `decoders.reason_no_decoder` and `decoders.reason_nothing_readable`, spell the queue reasons `decode.reason()` writes.
 
 **No decision here moved** (W-246, 2026-10-04): `[doctor] decoder_network_modules` joined constants.toml, the module list the `decoder imports` row scans for.
+
+**No decision here moved** (W-259, 2026-10-04): `[env] graph_rebuild` names `FUX_GRAPH_REBUILD`, the switch that makes the Node reader rebuild the graph plane even when `graph.json` is fresh ([SR-NODE-SEARCH](0153_node-search.md) decision 9).
 
 ### Consequences
 

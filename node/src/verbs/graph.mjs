@@ -15,12 +15,18 @@
  * **Emptiness is an answer here.** `path` returning no route is a fact about
  * the corpus, not a failure to search hard enough.
  *
- * 🔴 Node rebuilds the plane in memory from the committed records; it does not
- * read Python's derived `.fux/runtime/graph.json` (SR-NODE-SEARCH decision 6's
- * reasoning applied to the graph plane — the digest must EQUAL Python's, and
- * reading Python's file would prove nothing).
+ * 🔴 Node reads `.fux/runtime/graph.json` when it is fresh and rebuilds the
+ * plane in memory from the committed records when it is not (W-259,
+ * SR-NODE-SEARCH decision 9) — `graph/plane.mjs::planeFor`. The differential
+ * arm forces the rebuild: the digest must EQUAL Python's, and Node reading
+ * Python's file would prove nothing.
+ *
+ * **The records are read only when a refusal needs them.** A plane read from
+ * `graph.json` needs no pass over the shards, and the one question it cannot
+ * answer — *is this id a document at all?* — is asked of the records, lazily,
+ * exactly as before.
  */
-import { buildPlane } from "../graph/plane.mjs";
+import { planeFor } from "../graph/plane.mjs";
 import { TAG_PREFIX } from "../graph/model.mjs";
 import { ALL_KINDS, EDGE_KINDS, EXPANSION_BUDGET, expand, routes } from "../graph/walk.mjs";
 import { graphRecords, Shards } from "../store/reader.mjs";
@@ -41,13 +47,20 @@ function resolveDoc(given) {
   return `file:${given}`;
 }
 
+/** The committed records' `{id, edges}`, read on first use through the call's
+ *  `Shards` — never when the plane came from `graph.json` and nothing asks. */
+function lazyRecords(root, shards) {
+  let records = null;
+  return () => (records ??= graphRecords(root, shards));
+}
+
 /** Refuse a node nothing knows about, naming which kind it was.
  *
  * ⚠ **Three states, not two.** *No route* and *no such document* are different
  * answers, and reporting the first for the second is a true sentence about a
  * document that does not exist. A tag is a node in the plane rather than a
  * record in the index, so the plane is what knows it. */
-function refuseUnknown(records, plane, nodeId, flag) {
+function refuseUnknown(recordsOf, plane, nodeId, flag) {
   if (nodeId.startsWith(TAG_PREFIX)) {
     if (!plane.graph.nodes.includes(nodeId)) {
       throw new FuxError(
@@ -57,7 +70,7 @@ function refuseUnknown(records, plane, nodeId, flag) {
     }
     return;
   }
-  if (!records.some((r) => r.id === nodeId)) {
+  if (!recordsOf().some((r) => r.id === nodeId)) {
     throw new FuxError(
       `${nodeId} is not in the index${flag}. \`fux find\` locates a document; ` +
       "`fux add` puts one in",
@@ -75,8 +88,9 @@ function locOf(nodeId) {
 /** One document's outbound edges and its community. */
 export function runExplain(root, args) {
   if (!args._[0]) { process.stderr.write("error: explain needs a document id\n"); return 1; }
-  const records = graphRecords(root);
-  const plane = buildPlane(records);
+  const shards = new Shards(root);
+  const recordsOf = lazyRecords(root, shards);
+  const plane = planeFor(root, shards);
   const docId = resolveDoc(args._[0]);
 
   const edges = plane.graph.outEdges(docId);
@@ -85,7 +99,7 @@ export function runExplain(root, args) {
   if (!edges.length && label === null) {
     // **Three states, not two** (W-63): a `fux remove`d document answering as
     // though it were still indexed is the case that made it visible.
-    refuseUnknown(records, plane, docId, "");
+    refuseUnknown(recordsOf, plane, docId, "");
     if (args.json) {
       process.stdout.write(JSON.stringify({ doc: docId, edges: [], community: null }, null, JSON_INDENT) + "\n");
     } else {
@@ -142,7 +156,7 @@ function walkParameters(args) {
  * why both come back through one function: two code paths would be free to
  * disagree about `seedDepth`, about mass order, or about which candidate
  * generator ran. Twin of `graph/__init__.py::_seeds_of`. */
-function seedsOf(root, args, records, plane, tune, shards) {
+function seedsOf(root, args, recordsOf, plane, tune, shards) {
   const given = args.seed ?? [];
   const query = args._.join(" ");
   if (given.length && query) {
@@ -154,7 +168,7 @@ function seedsOf(root, args, records, plane, tune, shards) {
   }
   if (given.length) {
     const seeds = given.map(resolveDoc);
-    for (const seed of seeds) refuseUnknown(records, plane, seed, " (--seed)");
+    for (const seed of seeds) refuseUnknown(recordsOf, plane, seed, " (--seed)");
     // 🔴 **`score` is `null` and `rank` carries the order.** A seed named by
     // hand has a rank and not a ranking, and the walk's internal `1/(i+1)`
     // mass would be a third incomparable number in that column. It would also
@@ -193,14 +207,14 @@ function seedsOf(root, args, records, plane, tune, shards) {
 export function runGraph(root, args) {
   // W-242 Tier 0 — one read of each shard, for the plane AND the seed query.
   const shards = new Shards(root);
-  const records = graphRecords(root, shards);
-  const plane = buildPlane(records);
+  const recordsOf = lazyRecords(root, shards);
+  const plane = planeFor(root, shards);
   // Loaded ONCE and used twice — for the seed query and for the walk. Two loads
   // could disagree if the file changed between them, producing a neighbourhood
   // around seeds that were ranked under different weights.
   const tune = loadTune(root, { enabled: args.noTune !== true });
 
-  const [seedRows, seeds] = seedsOf(root, args, records, plane, tune, shards);
+  const [seedRows, seeds] = seedsOf(root, args, recordsOf, plane, tune, shards);
 
   // `seedDepth` and `expandLimit` are separately tunable because they answer
   // different questions: how much of the ranking to trust as a starting point,
@@ -239,14 +253,15 @@ export function runPath(root, args) {
     process.stderr.write("error: path needs two document ids\n");
     return 1;
   }
-  const records = graphRecords(root);
-  const plane = buildPlane(records);
+  const shards = new Shards(root);
+  const recordsOf = lazyRecords(root, shards);
+  const plane = planeFor(root, shards);
   const src = resolveDoc(args._[0]);
   const dst = resolveDoc(args._[1]);
   // Both ends, BEFORE the search: *no route* and *no such document* are
   // different answers and `path` gave the first one for both.
-  refuseUnknown(records, plane, src, " (FROM)");
-  refuseUnknown(records, plane, dst, " (TO)");
+  refuseUnknown(recordsOf, plane, src, " (FROM)");
+  refuseUnknown(recordsOf, plane, dst, " (TO)");
 
   const hops = args.hops; // `.fux/output.toml [cli.path] hops`, resolved before dispatch
   // `--hops` bounds the search and stays a CLI argument; `hop_decay` only

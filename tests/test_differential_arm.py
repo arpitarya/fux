@@ -148,3 +148,97 @@ def test_a_wellformed_shard_parses():
 
     assert node_arm._parse_shard(argparse.ArgumentParser(), "2/4") == (2, 4)
     assert node_arm._parse_shard(argparse.ArgumentParser(), None) is None
+
+
+# -- W-259: the arm never lets Node read graph.json ---------------------------
+#
+# Fork A (Arpit, 2026-10-04): the Node reader reads `.fux/runtime/graph.json`
+# when it is fresh. The arm runs where the plane IS fresh (`graph_lane_ready`
+# demands it), so a Node child that took the read would compare Python's plane
+# with itself and pass — N2 proving nothing, silently. Two halves, because
+# either alone has a hole: the structural check catches a NEW spawn site that
+# forgot `env=`, the runtime check catches a site whose `env` lacks the switch.
+# The Node side — that the switch really skips the read in every verb — is
+# `node/test/graph-read.test.mjs`.
+
+import ast  # noqa: E402
+import subprocess  # noqa: E402
+
+DIFF = ROOT / "tools" / "differential"
+SWITCH = node_arm.GRAPH_REBUILD_ENV
+
+
+@pytest.mark.parametrize("arm", ["node_arm.py", "graph_arm.py"])
+def test_every_spawn_in_the_arm_names_its_env(arm):
+    """No child inherits the parent's environment by default — each says what it gets."""
+    tree = ast.parse((DIFF / arm).read_text(encoding="utf-8"))
+    runs = [
+        n for n in ast.walk(tree)
+        if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
+        and n.func.attr == "run" and getattr(n.func.value, "id", None) == "subprocess"
+    ]
+    assert runs, f"{arm}: no subprocess.run found — the check is looking at the wrong file"
+    bare = [n.lineno for n in runs if not any(k.arg == "env" for k in n.keywords)]
+    assert not bare, f"{arm}: subprocess.run without env= at lines {bare} (W-259)"
+
+
+def test_the_switch_reaches_every_node_child(monkeypatch, tmp_path):
+    """Every Node process the arm starts carries `FUX_GRAPH_REBUILD=1`."""
+    seen: list[tuple[list[str], dict | None]] = []
+
+    def fake_run(argv, **kw):
+        seen.append((list(argv), kw.get("env")))
+        return subprocess.CompletedProcess(argv, 0, stdout="{}\n", stderr="")
+
+    monkeypatch.setattr(node_arm.subprocess, "run", fake_run)
+    monkeypatch.setattr(node_arm, "bundle_entry", lambda: tmp_path / "fux.mjs")
+    arm = node_arm.Arm.__new__(node_arm.Arm)
+    arm.root, arm.use_tune, arm.records, arm.max_headings = tmp_path, True, {}, 3
+
+    calls = [{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}]
+    for fn in (
+        lambda: arm.node("find", "q", 5),
+        lambda: arm.node("explain", "a.md", None),
+        lambda: arm.compare_mcp(calls),
+        lambda: arm.compare_api("q", "file:a.md", "file:b.md"),
+        lambda: arm.compare_bundle("ask", "q", 5),
+        lambda: arm.compare_bundle_api("q", "file:a.md", "file:b.md"),
+        lambda: arm.compare_bundle_mcp(calls),
+    ):
+        try:
+            fn()
+        except Exception:  # the fake payloads compare as nothing; only the spawns matter
+            pass
+
+    node_children = [(argv, env) for argv, env in seen if argv and argv[0] == "node"]
+    assert len(node_children) >= 9, f"too few Node spawns recorded ({len(node_children)}) — vacuous"
+    missing = [argv[:3] for argv, env in node_children if (env or {}).get(SWITCH) != "1"]
+    assert not missing, f"Node started without {SWITCH}=1: {missing}"
+
+
+def test_graph_arm_starts_node_with_the_switch(monkeypatch, tmp_path):
+    """N2 itself — `graph_arm.py` — on a one-shard corpus, with Node faked."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("_w259_graph_arm", DIFF / "graph_arm.py")
+    graph_arm = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(graph_arm)
+
+    from fux.store import reader
+
+    index = tmp_path / ".fux" / "index"
+    index.mkdir(parents=True)
+    shard = reader.iter_shard_paths(ROOT)[0]
+    (index / shard.name).write_bytes(shard.read_bytes())
+
+    seen = []
+
+    def fake_run(argv, **kw):
+        seen.append((list(argv), kw.get("env")))
+        return subprocess.CompletedProcess(argv, 0, stdout="", stderr="")
+
+    monkeypatch.setattr(graph_arm.subprocess, "run", fake_run)
+    monkeypatch.setattr(sys, "argv", ["graph_arm.py", str(tmp_path)])
+    graph_arm.main()
+    assert [argv[0] for argv, _ in seen] == ["node"]
+    assert seen[0][1][SWITCH] == "1"

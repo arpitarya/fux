@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 """N2: Node's in-memory graph plane against Python's `graph.json` bytes.
 
-W-107 Phase 3. **Node does not read Python's `.fux/runtime/graph.json`** — it
-is a derived file, and Node's contract is the committed plane. Both sides
-rebuild the same graph from the same records, and the digests must be equal.
-Reading the derived file instead would prove nothing about whether the two
+W-107 Phase 3. **Node does not read Python's `.fux/runtime/graph.json` here** —
+both sides rebuild the same graph from the same records, and the digests must be
+equal. Reading the derived file instead would prove nothing about whether the two
 implementations agree.
+
+⚠ **Since W-259 (2026-10-04) the Node READER does read that file when it is
+fresh** (`graph/plane.mjs::planeFor`). This arm calls `buildPlane` directly, so
+it never reaches the read, and it still starts Node with `FUX_GRAPH_REBUILD=1`
+(`[env] graph_rebuild`) so that a later edit routing the snippet through
+`planeFor` cannot quietly turn N2 into Python against Python.
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -27,6 +33,7 @@ sys.path.insert(0, str(ENGINE / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import rungs  # noqa: E402
+from fux.constants import fixed  # noqa: E402
 from fux.graph import community as community_mod  # noqa: E402
 from fux.graph import plane as plane_mod  # noqa: E402
 from fux.graph.model import Graph, edges_from_records  # noqa: E402
@@ -88,6 +95,7 @@ def main() -> int:
         # ERR_UNSUPPORTED_ESM_URL_SCHEME, protocol 'd:'.
         ["node", "-e", NODE_SNIPPET % (NODE_DIR / "src" / "graph" / "plane.mjs").as_uri(), records_path],
         capture_output=True, text=True, encoding="utf-8",
+        env=dict(os.environ, **{fixed("env", "graph_rebuild"): "1"}),
     )
     if proc.returncode != 0:
         print(f"node exited {proc.returncode}: {proc.stderr.strip()}")

@@ -51,6 +51,17 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
+- **The Node reader reads a fresh `.fux/runtime/graph.json`** (W-259, Fork A,
+  SR-NODE-SEARCH decision 9). It no longer rebuilds the graph plane on every
+  query. `ask`'s graph tier (and so `find` and `fux_search`), `explain`, `graph`
+  and `path` read the plane when the accelerator's freshness check passes. They
+  rebuild in memory exactly as before when the plane is stale, absent, torn or
+  of another schema, so Node still never requires `fux build`. Output is
+  byte-identical: 512 of 512 invocations on this repo and two rungs. The new
+  `FUX_GRAPH_REBUILD=1` forces the rebuild. The differential arm sets it on
+  every Node process, so N2 still compares two builders and never Python with
+  itself. Whether the read is faster is pre-registered and not yet measured.
+
 - **`fux mcp` and `fux serve` keep the loaded index resident** (W-249, SR-MCP decision 13). One
   loader, `fux.store.resident`, holds each committed shard's lines and the parsed records for the
   life of the process, keyed on the digest of `.fux/runtime/stamp.json` plus every shard's size and

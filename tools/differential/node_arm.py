@@ -79,9 +79,31 @@ sys.path.insert(0, str(ENGINE / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import rungs  # noqa: E402
+from fux.constants import fixed  # noqa: E402
 from fux.query import run_query  # noqa: E402
 from fux.query.headings import headings_for  # noqa: E402
 from fux.store import reader as py_reader  # noqa: E402
+
+#: 🔴 **The arm never lets Node read `.fux/runtime/graph.json`** (W-259, Fork A).
+#: Since 2026-10-04 the Node reader reads that file when it is fresh instead of
+#: rebuilding the graph plane — and the arm runs on corpora whose plane is fresh
+#: by construction (`graph_lane_ready` demands it). A Node graph lane that read
+#: Python's file would compare Python with Python and pass, which is W-107's N2
+#: gate proving nothing. So EVERY child this harness starts gets
+#: `FUX_GRAPH_REBUILD=1` through `node_env()`, and
+#: `tests/test_differential_arm.py` holds both halves: each spawn site passes an
+#: explicit `env`, and every Node child's env carries the switch.
+GRAPH_REBUILD_ENV = fixed("env", "graph_rebuild")
+
+
+def node_env() -> dict[str, str]:
+    """The environment every child process of the arm runs under.
+
+    Python children ignore the switch; it is set on them too so that no spawn
+    site has to decide which runtime it is starting — `mcp()` starts both.
+    """
+    return dict(os.environ, PYTHONPATH=str(ENGINE / "src"), **{GRAPH_REBUILD_ENV: "1"})
+
 
 #: Fields compared byte-equal. `score` is handled separately — SR-RANKING 8a.
 EXACT = ("id", "loc", "title", "archived", "tie")
@@ -166,7 +188,7 @@ class Arm:
         no_tune = () if (self.use_tune or top is None) else ("--no-tune",)
         proc = subprocess.run(
             ["node", str(entry or NODE_ENTRY), verb, query, "--json", *depth, *no_tune, *extra],
-            capture_output=True, text=True, encoding="utf-8", cwd=self.root,
+            capture_output=True, text=True, encoding="utf-8", cwd=self.root, env=node_env(),
         )
         if proc.returncode != 0:
             raise RuntimeError(f"node exited {proc.returncode}: {proc.stderr.strip()}")
@@ -301,9 +323,8 @@ class Arm:
 
     def mcp(self, runner: list[str], calls: list[dict]) -> list[dict]:
         lines = "\n".join(json.dumps(c) for c in calls) + "\n"
-        env = dict(os.environ, PYTHONPATH=str(ENGINE / "src"))
         proc = subprocess.run(runner, input=lines, capture_output=True, text=True, encoding="utf-8",
-                              cwd=self.root, env=env)
+                              cwd=self.root, env=node_env())
         if proc.returncode != 0:
             raise RuntimeError(f"{runner[0]} exited {proc.returncode}: {proc.stderr.strip()}")
         return [json.loads(line) for line in proc.stdout.splitlines() if line.strip()]
@@ -376,7 +397,7 @@ print(json.dumps({
         }
         env = dict(os.environ, PYTHONPATH=str(ENGINE / "src"))
         runs = {
-            "node": (["node", "--input-type=module", "-e", self.API_JS % subs], None),
+            "node": (["node", "--input-type=module", "-e", self.API_JS % subs], node_env()),
             "python": ([sys.executable, "-c", self.API_PY % subs], env),
         }
         got = {}
@@ -463,7 +484,7 @@ print(json.dumps({
             }
             proc = subprocess.run(
                 ["node", "--input-type=module", "-e", self.API_JS % subs],
-                capture_output=True, text=True, encoding="utf-8", cwd=self.root,
+                capture_output=True, text=True, encoding="utf-8", cwd=self.root, env=node_env(),
             )
             if proc.returncode != 0:
                 return [f"bundle api ({entry.name}) exited {proc.returncode}: "
@@ -571,7 +592,9 @@ def graph_lane_ready(root: Path) -> bool:
     🔴 **They are ASYMMETRIC and only one side is gated.** Python's
     `graph.plane.load` reads the derived `.fux/runtime/graph.json` and REFUSES
     when it is absent or stale; Node rebuilds the plane in memory from the
-    committed records and answers either way (SR-NODE-SEARCH decision 9).
+    committed records and answers either way (SR-NODE-SEARCH decision 9). It
+    would READ that file when fresh (W-259) — this harness forbids it through
+    `node_env()`, so a ready lane still compares two builders.
 
     So a corpus with no fresh build is one where the two readers *legitimately*
     differ, and running the comparison there would file Python's refusal as a

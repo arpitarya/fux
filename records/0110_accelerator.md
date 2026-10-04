@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@158673d75847, node/src/derive@0b3875f3aa7b, tools/differential@b3bae4476534, src/fux/schemas/runtime.schema.json@9559934cb843]
+owns: [src/fux/derive@158673d75847, node/src/derive@0b3875f3aa7b, tools/differential@867e447d74ee, src/fux/schemas/runtime.schema.json@9559934cb843]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: b3bd8b33b58b32adf6ddb957431edc171c21de9235d8ee3ccbd089dbd80bfd17
+content_sha: 6e1f11bc0d9b1b7f1a3fbc532ce004a2bd51479e57de413c3eb07dfd3d642466
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -711,6 +711,32 @@ tier two. That means Node will also write."*
   `compat/pyjson.mjs`: code-point key order, `ensure_ascii` for `graph.json`
   alone, and exact integers. Decision 7's two invariants refuse a Node build as
   they refuse a Python one.
+
+**19. `is_fresh` decides the graph plane too, in both runtimes, and the
+differential arm is forbidden the shortcut it now offers.** Fork A was ruled yes
+on 2026-10-04 (Arpit) and BUILT the same day (W-259;
+[SR-NODE-SEARCH](0153_node-search.md) decision 9 carries the reader's half).
+
+- **One freshness test, three consumers.** `graph/plane.py::load` already
+  reused `accel.is_fresh` rather than a second staleness rule; Node's
+  `graph/plane.mjs::loadFresh` reuses its transcription, `accel.mjs::isFresh`,
+  the same way. A plane this record calls fresh is fresh for the accelerator,
+  for Python's graph lane and for Node's graph read. A plane it calls stale is
+  stale for all three. **No new staleness rule exists**, and none may: a second
+  rule is a second thing to drift.
+- 🔴 **The harness forces the rebuild on every Node child** — `node_arm.py`'s
+  `node_env()` and `graph_arm.py` set `FUX_GRAPH_REBUILD=1` (`[env]
+  graph_rebuild`). The arm runs where the plane IS fresh (`graph_lane_ready`
+  requires it), so without the switch the graph lane would compare Python's
+  `graph.json` with itself and pass. `tests/test_differential_arm.py` fails on a
+  spawn site with no explicit `env=` and on a Node child that lacks the switch.
+  The read's own correctness, read against rebuild byte for byte, is filed
+  separately ([`2026-10-04-node-graph-read`](../work/regression/2026-10-04-node-graph-read/report.md)),
+  never inferred from the arm.
+- ⚠ **What this costs the arm:** it measures the rebuild path only, so a
+  defect in the read path is invisible to it by construction. A read that
+  disagrees with the rebuild is what `node/test/graph-read.test.mjs` and the
+  capture above exist to catch.
 
 **No decision here moved** (2026-10-03, the alpha.10 release CI): `tools/differential/node_arm.py`'s `api` lane now compares scores at `round(9)`, through the `_scores_at_round9` the `graph` lane already used. That is [SR-RANKING](0111_ranking.md) decision 8a's resolution, applied in every lane. A 2-ulp difference on a graph-boosted score failed all six OS x Node cells of shard 2/3, and the ruling accepts it. It is the second lane found stricter than the ruling, so `tests/test_node_arm_tolerance.py` is the gate (SR-WORK-SESSION decision 13).
 

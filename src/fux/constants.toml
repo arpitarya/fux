@@ -323,6 +323,10 @@ names        = ["post-commit", "post-merge", "post-checkout"]
 [env]
 runner_handoff = "FUX_RUNNER_HANDOFF"
 no_spawn       = "FUX_NO_SPAWN"
+# Set to `1` and the Node reader rebuilds the graph plane in memory even when
+# `.fux/runtime/graph.json` is fresh (W-259). The differential arm sets it on
+# every Node process, so N2 compares two builders and never Python with Python.
+graph_rebuild  = "FUX_GRAPH_REBUILD"
 
 # -- Wire formats fux speaks --------------------------------------------------
 
