@@ -114,7 +114,7 @@ def test_the_index_tab_is_the_library_report_without_probes(server, corpus):
     """The same numbers `fux inspect --json` prints — one engine, two front doors."""
     report = wait(server, "/inspect/index")
     assert report["probes"] is None
-    direct = as_dict(inspect_index(corpus, probe_sample=None, retrieval_sample=None, top=inspect_template().triage_rows))
+    direct = as_dict(inspect_index(corpus, rebuild_dictionary=False, probe_sample=None, retrieval_sample=None, top=inspect_template().triage_rows))
     assert report["checks"] == direct["checks"]
     assert report["documents"] == direct["documents"]
 
@@ -195,7 +195,7 @@ def test_the_diff_route_compares_the_last_cli_report_with_the_index_tab(server, 
     status, payload = get(server, "/inspect/diff")
     assert status == 404 and "fux inspect" in payload["error"]
 
-    report = as_dict(inspect_index(corpus, probe_sample=None, retrieval_sample=None, top=inspect_template().triage_rows))
+    report = as_dict(inspect_index(corpus, rebuild_dictionary=False, probe_sample=None, retrieval_sample=None, top=inspect_template().triage_rows))
     previous.write_text(json.dumps(report), encoding="utf-8")
     diff = wait(server, "/inspect/diff")
     assert diff == diff_mod.compare(report, wait(server, "/inspect/index"))

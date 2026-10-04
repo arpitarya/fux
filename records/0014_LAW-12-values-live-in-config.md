@@ -10,7 +10,7 @@ feature: the rationale, scope, exceptions and reopen-trigger of L12
 owns: []
 laws: [L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: f750fae40cf800aa4afa6b866a9dfdd8f81a7da74c58b09872d1b7d2d5a9ed66
+content_sha: bfabf808c5655acdf7a9aa06a403523ecf5df7d33f5c19abbe1f43766613dc53
 ratifies: "Arpit, 2026-09-27 — 'every const or default value will only and only be defined in tune.toml or fux.toml or in one of the other config files, or maybe create a new config file; if the value is missing throw an error, but there shouldn't be any default value within the functions … be it node or python it should always be read from one of the toml files; exception is the files used for setup.' Asked the scope the same day, he ruled: tunable values only in the TOML config, and 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; a missing file or key is a hard error naming the key; setup.py and templates/, tests/ and tests_e2e/, tools/ and scripts/ are exempt. Ratified by Arpit the same day on the W-225 step 1 classification (work/compare/l12-classify.compare.md), 'I accept the recommendation': enum tags, closed vocabularies and presentation counts are not values; the six two-home conflicts resolve to one home each, keeping today's behaviour; the veto check becomes one AST-based test because the greps reach about 60 % of what the law forbids; inspect thresholds get a new .fux/inspect.toml; and every decoder cap enters the extract-config digest. On the R5 scan the same day he ruled R7–R10: a number fixed by a format, protocol or algorithm is a fixed value for constants.toml; every boolean parameter default is a value and goes; the release is 3.0, breaking, with no automatic --fix; __version__ stays in src/fux/__init__.py"
 ---
 
@@ -284,10 +284,14 @@ a consumer can edit it in `formats.toml [limits.<decoder>]`, no hand-bumped
 decoder `VERSION` follows the edit — so the digest must, or a changed cap
 leaves an index that `fux ingest --check` still calls current.
 
-**9. ⚠ This law is NOT satisfied today.** The migration is
-[W-225](../work/open/W-225-values-live-in-config.md), ratified and not built.
-Until it lands, every literal in `src/fux/**` and `node/src/**` is a named
-violation, and new code may not add one.
+**9. ✅ This law is satisfied as of 2026-10-04** (W-225 stage 8). The migration
+W-225 ran in eight stages from 2026-09-27; its last, 5f, moved `src/fux/inspect/`.
+Every literal left in `src/fux/**` and `node/src/**` is either read from a TOML
+file or listed in `tests/l12_allow.toml` under one of decision 6's categories.
+No category waits on a decision (`pending-w228` and `for-arpit` are empty and
+gone). New code may not add an unlisted literal, and
+`tests/test_l12_values_live_in_config.py` fails on one.
+**Until 2026-10-04 this decision read "NOT satisfied today."**
 
 ### Consequences
 
@@ -329,7 +333,7 @@ violation, and new code may not add one.
 ### Reference (required)
 
 - `CLAUDE.md` §Non-negotiable constraints — the generated view. Repo path: [`../../CLAUDE.md`](../CLAUDE.md)
-- [W-225 — every value lives in a config file](../work/open/W-225-values-live-in-config.md) — the migration
+- W-225 — every value lives in a config file (closed 2026-10-04) — the migration
 - [SR-TUNE](0135_tuning.md) · [SR-CONFIG](0113_config.md) — the two records L12 overrides in part
 - [SR-LAW-10](0012_LAW-10-bundled-output.md) — why the internal constants file ships inside the bundle
 - [`src/fux/tune.py`](../src/fux/tune.py) · [`node/src/config/tune.mjs`](../node/src/config/tune.mjs) — the loaders that fall back today

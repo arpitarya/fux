@@ -86,7 +86,7 @@ def probe_texts(doc, kind: str) -> list[str]:
 
 
 def ranking_key(root: Path, view) -> str:
-    tune = root / ".fux" / "tune.toml"
+    tune = root / fixed("files", "tune")
     try:
         tune_bytes = tune.read_bytes()
     except OSError:

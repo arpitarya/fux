@@ -73,7 +73,7 @@ def corpus(tmp_path_factory) -> Path:
 
 @pytest.fixture(scope="module")
 def report(corpus):
-    return inspect_index(corpus, probe_sample=0, retrieval_sample=0, top=inspect_template().top)
+    return inspect_index(corpus, rebuild_dictionary=False, probe_sample=0, retrieval_sample=0, top=inspect_template().top)
 
 
 # --------------------------------------------------------------------------
@@ -81,7 +81,7 @@ def report(corpus):
 
 
 def test_the_report_is_byte_identical_on_an_unchanged_index(corpus, report) -> None:
-    again = inspect_index(corpus, probe_sample=0, retrieval_sample=0, top=inspect_template().top)
+    again = inspect_index(corpus, rebuild_dictionary=False, probe_sample=0, retrieval_sample=0, top=inspect_template().top)
     assert render_markdown(again) == render_markdown(report)
     assert json.dumps(as_dict(again), sort_keys=True) == json.dumps(as_dict(report), sort_keys=True)
 
@@ -92,7 +92,7 @@ def test_the_report_carries_no_timestamp(report) -> None:
 
 
 def test_every_capped_list_ships_its_full_count(corpus) -> None:
-    capped = as_dict(inspect_index(corpus, probe_sample=0, retrieval_sample=0, top=1))
+    capped = as_dict(inspect_index(corpus, rebuild_dictionary=False, probe_sample=0, retrieval_sample=0, top=1))
     assert capped["identity"]["groups"] >= len(capped["identity"]["top"])
     assert capped["triage_count"] >= len(capped["triage"])
     assert len(capped["triage"]) <= 1 < capped["triage_count"]
@@ -153,7 +153,7 @@ def test_the_headline_row_is_title_probe_reach_and_is_descriptive(report) -> Non
 
 
 def test_the_probe_sample_is_evenly_spaced_and_labelled_an_estimate(corpus) -> None:
-    sampled = inspect_index(corpus, probe_sample=2, retrieval_sample=0, top=inspect_template().top)
+    sampled = inspect_index(corpus, rebuild_dictionary=False, probe_sample=2, retrieval_sample=0, top=inspect_template().top)
     probes = as_dict(sampled)["probes"]
     assert probes["sampled"] == 2 and probes["estimate"] is True
     assert "ESTIMATE" in render_markdown(sampled)
@@ -165,7 +165,7 @@ def test_the_probe_sample_is_evenly_spaced_and_labelled_an_estimate(corpus) -> N
 
 
 def test_skipping_probes_reports_n_a_never_a_pass(corpus) -> None:
-    skipped = as_dict(inspect_index(corpus, probe_sample=None, retrieval_sample=0, top=inspect_template().top))
+    skipped = as_dict(inspect_index(corpus, rebuild_dictionary=False, probe_sample=None, retrieval_sample=0, top=inspect_template().top))
     row = next(c for c in skipped["checks"] if c["name"] == "title-probe reach")
     assert row["status"] == "n/a" and skipped["probes"] is None
 

@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@80b919e8f56c, src/fux/templates@c60eb5024858]
+owns: [src/fux/ingest/urlsrc.py@80b919e8f56c, src/fux/templates@f8f2f2542fe2]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 9d97cbd3ff44bde0e44ee51cd12c47f09668771a0f62bc55de891a2b66b650a5
+content_sha: 3e2cb26aa290207c6eedfb624180ae4d9260f8979cd5f4f541a57ee6bec52c46
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -676,6 +676,8 @@ copied out, never imported.
 
 
 `src/fux/templates/` also carries `identifiers.toml.txt` ([SR-IDENTIFIERS](0160_identifiers.md)), and `inspect.toml.txt` gained `[identifiers]`; no fetcher template changed.
+
+**No decision here moved** (W-225 stage 5f, 2026-10-04): `templates/inspect.toml.txt` gains `[floors]` ([SR-INSPECT](0156_inspect.md) decision 23a). This record owns `src/fux/templates/` by path, not by subject.
 
 ### Consequences
 

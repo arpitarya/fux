@@ -287,7 +287,7 @@ def save(root: Path, dictionary: Dictionary) -> Path:
         "undecodable": sorted(dictionary.undecodable),
         "token_counts": {k: list(v) for k, v in sorted(dictionary.token_counts.items())},
     }
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(payload, indent=fixed("json", "indent"), sort_keys=True) + "\n", encoding="utf-8")
     return path
 
 
@@ -310,7 +310,8 @@ def load(root: Path, view) -> Dictionary | None:
         return None
     out = Dictionary(shards=payload.get("shards", {}))
     for h, pair in payload.get("terms", {}).items():
-        analyzed, surface = (pair + ["", ""])[:2] if isinstance(pair, list) else (pair, "")
+        # A `[analyzed, surface]` pair, or a bare analyzed string from an older file.
+        analyzed, surface = (pair[0], pair[-1] if len(pair) > 1 else "") if isinstance(pair, list) else (pair, "")
         out.terms[h] = analyzed
         if surface:
             out.surfaces[h] = surface
@@ -320,7 +321,7 @@ def load(root: Path, view) -> Dictionary | None:
     return out
 
 
-def load_or_build(root: Path, view, *, rebuild: bool = False, progress=None) -> Dictionary:
+def load_or_build(root: Path, view, *, rebuild: bool, progress=None) -> Dictionary:
     if not rebuild:
         cached = load(root, view)
         if cached is not None:

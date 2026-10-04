@@ -226,6 +226,20 @@ probes_schema     = "fux.inspect.probes.v1"
 # Inspect's definition of a DATA file -- fixed (R4), not a knob.
 data_suffixes     = [".json", ".jsonl", ".csv", ".toml", ".yaml", ".yml"]
 
+[inspect.minhash]
+# Seed i of the near-duplicate lens's permutations is (gamma * (i + 1)) mod
+# 2^bits (inspect/lenses.py::_seeds): Fibonacci hashing's multiplier, 2^64 / phi.
+# A hex STRING because it exceeds TOML's signed 64-bit integer.
+gamma = "9e3779b97f4a7c15"
+bits  = 64
+
+[inspect.fits]
+# A least-squares fit (Zipf's slope, Heaps' law) over fewer points than this is
+# not reported.
+min_points = 10
+# Zipf is fitted over the top ranks only: the hapax tail flattens every corpus.
+zipf_ranks = 1000
+
 # -- The .fux/ directory and what fux setup vendors into it ------------------
 
 [fuxdir]

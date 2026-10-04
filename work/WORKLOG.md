@@ -23,6 +23,22 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-04 — alpha.10 published (PyPI + npm), W-244 closed, xdist collection flake fixed, W-243's skip confirmed  ·  Claude Code (Opus 5.5)
+- **Asked:** *"continue"* (after *"commit everything, and release a new version"*).
+- **Release done:** `v3.0.0-alpha.10` is on `30429df1`, cut only after its CI went green. PyPI serves `3.0.0a10`; npm serves `3.0.0-alpha.10` on `alpha` with provenance (after ~5 min of registry processing).
+- **Committed the Cowork 2026-10-03 batch** (`b2ee1789`) verbatim, after it sat 13 h idle.
+- **W-244 closed (`072abaf8`), under Cowork's delegated ruling:**
+  - The ingest walk prunes `!`-excluded directories.
+  - This repo's index is byte-identical with the old and new walk, 257/257.
+  - `.fuxignore` now has one `work/golden/` line where it had 132 per-file lines.
+  - Seven root-walking tests go through `tests/walk_lib.py`, gated by `tests/test_walks_skip_golden.py`.
+  - **`fux ingest` at the repo root is safe again.**
+- **W-225 closed, and law L12 is satisfied:** stage 5f moved 34 of `src/fux/inspect/`'s 101 pending literals into config (`.fux/inspect.toml [floors]`, `constants.toml [inspect.*]`, `[json] indent`, R8 defaults removed) and recategorised the other 67 by decision 6. `fux inspect --json` is byte-identical before and after (this repo, rung-01000). An `inspect.toml` without `[floors]` stops until `fux doctor --fix`. SR-LAW-12 d9 now reads *satisfied*.
+- **Flake fixed:** `tests/decode/test_formats.py` stamped wall-clock time into zip fixtures that are pytest ids, so xdist workers disagreed on collection about half the time locally. It now uses a fixed `date_time`.
+- **W-243:** a docs-only push (`2928b775`) skipped every FULL cell (7–34 s each). `test_node_accel`'s CLI test was trimmed from 128 Node processes to 32, which was about 40 s on Windows. DoD 1 (FAST ≤ 2 min) still needs step 1, which is STOP until Arpit rules **Fork A**. That question is now W-243's inbox row.
+- **Hazard:** the guard hook rightly refused a `test -e` on a key-path name inside a scratch worktree. Nothing ran.
+- **Next:** Arpit answers W-251's forks, rules Fork A (W-243), and runs prompt 13 (W-228). The prompt-12 seed batch is committed locally as this session's last commit and **NOT pushed**: on `main` it reds the ladder until W-240 rebuilds it.
+
 ## 2026-10-03 — W-237 + W-168 closed (index v7), W-242 Tiers 1–2 PASS and closed, W-244 L11 event filed, 3.0.0-alpha.10 released  ·  Claude Code (Opus 5.5)
 - **Asked:** *"implement W-168, W-228, W-225, W-237, W-242, W-243 … if any of them gets blocked move on … till the closure"*; mid-session: *"Once done, commit everything. And release a new version."*
 - **W-237 closed (`0166d157`):** the 2026-10-01 half-removal was checked against the pre-W-237 tree, then finished. The refusal now names both removals; SR-EXPAND d17 records them. `ask`/`find --json` are byte-identical before and after, 24/24 per reader.

@@ -8,10 +8,10 @@ amended: 2026-09-28
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@c13d7f7f3f97, .fux/inspect.toml@c0b3ac0911f7]
+owns: [src/fux/inspect@f7a9ffa5df4a, .fux/inspect.toml@a2b927adc116]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: db710cafcfba3a6f727ce6f937a5ee27992bfcdb5bc76992f72a57f91d446caf
+content_sha: b52e4e253f05e40c92750e6930d6b80b8685c4501aeb9353567d6e41aeb1cd86
 ratifies: W-169
 ---
 
@@ -451,6 +451,24 @@ placed inside `inspect` by the W-220 ruling — a lens, never a verb).
 **The identifier lens** ([SR-IDENTIFIERS](0160_identifiers.md) decision 9, W-233). `inspect/idfamilies.py` groups every raw analyzer token that starts with a letter, carries a digit and a `-` or `_`, and is not a path, a file name (`.md`), a decimal or version (`0.5`) or a same-prefix range (`L0-L12`), by its literal letter prefix plus the kinds of its later segments; a later letter run stays literal when every member shares it, a digit run is `{n}`. A family qualifies at `inspect.toml [identifiers] min_values` distinct values across `min_docs` documents, and only if its template parses. It is section 12 of the report, the `identifiers` key of `--json`, and the only source `fux identifiers --write` writes from. **Read-only like every lens**: it names the lever and applies none. `[identifiers] parity_sample` is the document count `doctor`'s and the explorer's regex parity reads.
 
 **`identifier_families(progress=)` opens a `detect` phase** over every indexed document, readable or not (W-238, 2026-09-29). `fux identifiers` and `fux doctor` pass the invocation's `Progress`; `inspect` passes none, and nothing it reports changed. `corpus_texts(tick=)` is the per-document hook. `regex_parity` still runs the combined pattern, which is what the Node reader runs ([SR-IDENTIFIERS](0160_identifiers.md) decision 13).
+
+**23a. `[floors]` joins `.fux/inspect.toml` — the headline checks' bounds** (W-225 stage 5f, 2026-10-04).
+`checks.FLOORS` held the three measured bounds as module literals. It is now
+`checks.floors(config)`, reading `unreachable_share`, `boilerplate_share` and
+`near_duplicate_share` from the file. The values (0.01, 0.60, 0.20) and their
+evidence (`work/regression/2026-09-14-inspect-floors/`) are unchanged.
+
+- **What else moved in 5f:** the minhash seed multiplier and mask, and the fit
+  bounds, went to `constants.toml [inspect.minhash]` / `[inspect.fits]` (fixed
+  engine values, R7). The report's JSON indent reads `[json] indent`. The
+  `rebuild_dictionary`, `rebuild` and `vocabulary(...)` defaults went (R8);
+  callers pass them. Index positions in fixed-shape rows are named or `[-1]`.
+- **Every other literal in `src/fux/inspect/` is a decision-6 site**, recorded
+  by category in `tests/l12_allow.toml`. The `pending-w228` category is gone.
+- **Byte-identical:** `fux inspect --json` with the pre-5f code and this code is
+  identical on this repo (2.69 MB) and on rung-01000 (841 KB).
+- ⚠ **A consumer `inspect.toml` without `[floors]` stops** with the missing-key
+  error until `fux doctor --fix` (R9), checked on a copy.
 
 ### Consequences
 

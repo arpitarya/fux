@@ -71,8 +71,8 @@ def _id_index(view) -> dict[str, int]:
 
 
 def vocabulary(
-    view, dictionary, *, sort: str = "df", ascending: bool = False, query: str = "",
-    klass: str = "", limit: int = 200, offset: int = 0,
+    view, dictionary, *, sort: str, ascending: bool, query: str,
+    klass: str, limit: int, offset: int,
 ) -> dict:
     """The vocabulary, sorted and paged on the server.
 

@@ -30,6 +30,7 @@ from pathlib import Path
 
 from .. import store as store_mod
 from ..query.bm25f import idf as _idf
+from ..constants import fixed
 
 __all__ = [
     "Doc",
@@ -52,6 +53,10 @@ __all__ = [
 #: corpus small enough that 10 % rounds below one document.
 #: ⚠ **`[thresholds] distinctive_df_share`** since W-225 stage 4c.
 
+
+
+#: The term hash is hex (`[radix] hex`); minhash permutes its 64-bit value.
+_HEX = fixed("radix", "hex")
 
 @dataclass(frozen=True)
 class Doc:
@@ -175,7 +180,7 @@ def read_index_view(root: Path, *, progress=None) -> IndexView:
                         view.term_of.append(term)
                         view.df.append(0)
                         view.cf.append(0)
-                        view.term_value.append(int(term, 16))
+                        view.term_value.append(int(term, _HEX))
                     view.df[term_id] += 1
                     view.cf[term_id] += sum(tf)
                     ids.append(term_id)
@@ -205,8 +210,8 @@ def read_index_view(root: Path, *, progress=None) -> IndexView:
                 sha=record.get("sha", ""),
                 src=record.get("src", ""),
                 mode=record.get("mode", ""),
-                archived=bool(record.get("archived", False)),
-                superseded=bool(record.get("superseded", False)),
+                archived=bool(record.get("archived")),
+                superseded=bool(record.get("superseded")),
                 flen=tuple(record.get("flen", [])),
                 nterms=len(ids),
                 phrases=tuple(record.get("phrases", []) or ()),

@@ -22,6 +22,8 @@ import math
 import re
 from dataclasses import dataclass, field
 
+from ..constants import fixed
+
 __all__ = [
     "LEVERS",
     "Boilerplate",
@@ -76,6 +78,22 @@ LEVERS: dict[str, str] = {
 #: vocabulary while differing in the part that matters.
 #: ⚠ **`[thresholds] near_duplicate_jaccard`** since W-225 stage 4c.
 
+#: W-225 stage 5f — the near-duplicate lens's seed multiplier and mask, and the
+#: two fit bounds, from `constants.toml [inspect.minhash]` / `[inspect.fits]`.
+_GAMMA = int(fixed("inspect.minhash", "gamma"), fixed("radix", "hex"))
+_BITS = fixed("inspect.minhash", "bits")
+_MIN_POINTS = fixed("inspect.fits", "min_points")
+_ZIPF_RANKS = fixed("inspect.fits", "zipf_ranks")
+_TF_FIELDS = tuple(fixed("index", "tf_fields"))
+
+
+def _field(flen, name: str) -> int:
+    """A document's token count in one tf field, by NAME (`[index] tf_fields`);
+    trailing zeros are omitted on the wire, so a short `flen` reads as 0."""
+    i = _TF_FIELDS.index(name)
+    return flen[i] if len(flen) > i else 0
+
+
 #: Fixed permutation seeds — `min(x ^ seed)` over a document's term hashes.
 #: XOR with a constant is a bijection on the 64-bit space, so each seed is a
 #: genuine permutation and the minimum under it is a genuine minhash. Fixed
@@ -83,7 +101,8 @@ LEVERS: dict[str, str] = {
 @lru_cache(maxsize=4)
 def _seeds(size: int) -> tuple[int, ...]:
     """`size` permutation seeds — a pure function of the configured length."""
-    return tuple((0x9E3779B97F4A7C15 * (i + 1)) & 0xFFFFFFFFFFFFFFFF for i in range(size))
+    mask = (1 << _BITS) - 1
+    return tuple((_GAMMA * (i + 1)) & mask for i in range(size))
 
 
 @dataclass
@@ -267,9 +286,9 @@ def _zipf_slope(view) -> float | None:
     drag the slope toward zero on every corpus, telling the reader nothing
     about their own.
     """
-    frequencies = sorted((int(c) for c in view.cf), reverse=True)[:1000]
+    frequencies = sorted((int(c) for c in view.cf), reverse=True)[:_ZIPF_RANKS]
     frequencies = [f for f in frequencies if f > 0]
-    if len(frequencies) < 10:
+    if len(frequencies) < _MIN_POINTS:
         return None
     xs = [math.log(r) for r in range(1, len(frequencies) + 1)]
     ys = [math.log(f) for f in frequencies]
@@ -284,7 +303,7 @@ def _heaps_fit(view) -> tuple[float | None, float | None]:
     out LOW, because each new document brings almost no new words.
     """
     points = [(t, v) for t, v in view.heaps if t > 0 and v > 0]
-    if len(points) < 10:
+    if len(points) < _MIN_POINTS:
         return None, None
     xs = [math.log(t) for t, _ in points]
     ys = [math.log(v) for _, v in points]
@@ -300,7 +319,7 @@ def _slope(xs: list[float], ys: list[float]) -> float | None:
     n = len(xs)
     mean_x = sum(xs) / n
     mean_y = sum(ys) / n
-    denominator = sum((x - mean_x) ** 2 for x in xs)
+    denominator = sum((x - mean_x) * (x - mean_x) for x in xs)
     if denominator == 0:
         return None
     return sum((x - mean_x) * (y - mean_y) for x, y in zip(xs, ys)) / denominator
@@ -460,9 +479,9 @@ def lengths(view, *, top_lists: int) -> Lengths:
     out.body_percentiles = _percentiles(body)
     out.vocabulary_percentiles = _percentiles([doc.nterms for doc in view.docs])
     for doc in view.docs:
-        title_tokens = doc.flen[2] if len(doc.flen) > 2 else 0
+        title_tokens = _field(doc.flen, "title")
         heading_tokens = doc.flen[1] if len(doc.flen) > 1 else 0
-        ctx_tokens = doc.flen[4] if len(doc.flen) > 4 else 0
+        ctx_tokens = _field(doc.flen, "ctx")
         body_tokens = doc.flen[0] if doc.flen else 0
         if title_tokens == 0:
             out.empty_title.append(doc.id)
@@ -521,7 +540,7 @@ def duplication(view, *, top_lists: int) -> Duplication:
                 continue
             buckets.setdefault(tuple(signature[lo : lo + rows]), []).append(index)
         for members in buckets.values():
-            if len(members) < 2:
+            if len(members) <= 1:
                 continue
             for i, a in enumerate(members):
                 for b in members[i + 1 :]:
@@ -547,7 +566,7 @@ def duplication(view, *, top_lists: int) -> Duplication:
     out.pair_count = len(pairs)
     # Strongest resemblance first; the id pair breaks ties so the list is a
     # function of the corpus and not of set iteration order.
-    out.near_duplicates = sorted(pairs, key=lambda row: (-row[2], row[0], row[1]))[:top_lists]
+    out.near_duplicates = sorted(pairs, key=lambda row: (-row[-1], row[0], row[1]))[:top_lists]
 
     families: dict[tuple[str, ...], list[str]] = {}
     for doc in view.docs:
@@ -555,13 +574,13 @@ def duplication(view, *, top_lists: int) -> Duplication:
         # (`## Context` is in every record here), a whole shared heading SET is
         # a template. The set, not the sequence — a filled-in template
         # reorders sections and is still the same template.
-        if len(doc.phrases) < 2:
+        if len(doc.phrases) <= 1:
             continue
         families.setdefault(tuple(sorted(doc.phrases)), []).append(doc.id)
     in_a_family: set[str] = set()
     named: list[tuple[str, list[str]]] = []
     for headings, members in families.items():
-        if len(members) < 2:
+        if len(members) <= 1:
             continue
         in_a_family.update(members)
         named.append((" · ".join(headings[:4]), sorted(members)))
@@ -606,7 +625,7 @@ def coverage(root, view, dictionary) -> Coverage:
     for doc in view.docs:
         body = doc.flen[0] if doc.flen else 0
         heading = doc.flen[1] if len(doc.flen) > 1 else 0
-        ctx = doc.flen[4] if len(doc.flen) > 4 else 0
+        ctx = _field(doc.flen, "ctx")
         if body + heading + ctx == 0:
             out.no_content.append(doc.id)
     out.undecodable = sorted(dictionary.undecodable)
@@ -623,7 +642,7 @@ def _queue(root) -> list[tuple[str, str]]:
     (SR-ENRICH), and a second opinion about which documents are unreadable is
     exactly the drift this lens exists to surface.
     """
-    path = root / ".fux" / "enrich" / "queue.tsv"
+    path = root / fixed("files", "enrich_queue")
     if not path.is_file():
         return []
     rows: list[tuple[str, str]] = []
@@ -634,9 +653,9 @@ def _queue(root) -> list[tuple[str, str]]:
     for line in text.splitlines():
         if not line.strip() or line.startswith("#"):
             continue
-        parts = line.split("\t")
-        if len(parts) >= 2:
-            rows.append((parts[0], parts[1]))
+        loc, sep, rest = line.partition("\t")
+        if sep:
+            rows.append((loc, rest.split("\t")[0]))
     return sorted(rows)
 
 
@@ -801,16 +820,16 @@ def families(view, facts, *, top_lists: int) -> Families:
     misfits: list[dict] = []
     for members in groups:
         docs = [view.docs[shaped[m][0]] for m in members]
-        if len(members) < 2:
+        if len(members) <= 1:
             out.singletons.append(docs[0].id)
             continue
         out.documents_in_a_family += len(members)
         counts: dict[str, int] = {}
         for m in members:
-            for h in set(shaped[m][2]):
+            for h in set(shaped[m][-1]):
                 counts[h] = counts.get(h, 0) + 1
         core = {h for h, c in counts.items() if c / len(members) >= config.core_share}
-        order = [h for h in shaped[members[0]][2] if h in core]
+        order = [h for h in shaped[members[0]][-1] if h in core]
         # Named by its shared skeleton — the first four core headings, in the
         # first member's order, as the exact-set families are named.
         name = " · ".join(originals[h] for h in list(dict.fromkeys(order))[:4])
@@ -828,7 +847,7 @@ def families(view, facts, *, top_lists: int) -> Families:
             "length_bands": bands,
         })
         for m, d in zip(members, docs):
-            missing = sorted(core - set(shaped[m][2]), key=lambda h: order.index(h) if h in order else len(order))
+            missing = sorted(core - set(shaped[m][-1]), key=lambda h: order.index(h) if h in order else len(order))
             if missing:
                 misfits.append({"id": d.id, "family": name or "(no shared heading)",
                                 "missing": [originals[h] for h in missing]})

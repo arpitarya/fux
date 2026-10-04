@@ -583,7 +583,7 @@ class _State:
             cached = getattr(self, "_dictionary", None)
             if cached is not None and self._dictionary_key == self._view_key:
                 return cached
-        built = dictionary_mod.load_or_build(self.root(), view)
+        built = dictionary_mod.load_or_build(self.root(), view, rebuild=False)
         with self._lock:
             self._dictionary, self._dictionary_key = built, self._view_key
         return built
@@ -618,6 +618,7 @@ class _State:
             report = inspect_index(
                 self.root(), probe_sample=probe_sample, retrieval_sample=retrieval_sample,
                 progress=job["progress"], view=view, top=view.config.triage_rows,
+                rebuild_dictionary=False,
             )
             job["result"] = as_dict(report)
             job["state"] = "done"

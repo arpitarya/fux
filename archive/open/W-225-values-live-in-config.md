@@ -9,6 +9,19 @@ ball: agent
 
 # W-225 — every value lives in a config file (the L12 migration)
 
+**✅ CLOSED 2026-10-04 — stages 5f and 8 built** (Claude Code, Opus):
+- **5f:** `src/fux/inspect/`'s 101 `pending-w228` sites were handled two ways.
+  34 left the code: `[floors]` moved to `.fux/inspect.toml`; the minhash and fit
+  constants went to `constants.toml [inspect.*]`; the JSON indent reads
+  `[json] indent`; the R8 parameter defaults went; fixed-shape indexes are named
+  or `[-1]`. The other 67 are decision-6 sites, filed by category.
+- **8:** `fux inspect --json` is byte-identical before and after on this repo and
+  on rung-01000. SR-LAW-12 decision 9 now reads *satisfied*.
+- Both suites pass, except the eight ladder-seed cases (the uncommitted prompt-12
+  batch, W-240). Live successors:
+  [SR-LAW-12](../../records/0014_LAW-12-values-live-in-config.md) d9 and
+  [SR-INSPECT](../../records/0156_inspect.md) d23a.
+
 **Status: building — stages 1–4 of 8 landed 2026-09-27/28 (3a `output.toml`, 3b `fux.toml`, 4a decoder caps in `formats.toml`, 4b `refusals.toml [scan]`, 4c `.fux/inspect.toml`); stage 5 (R7 structural numerals → `constants.toml`) is in progress: 5a (hashes, parsers, the analyzer), 5b (decoders), 5c/5d (wire, store, protocols, CLI) and 5e (13 leftover tunables → `fux.toml`, SR-CONFIG decision 18) landed 2026-09-28; 5f `doctor` landed too. Stage 6 landed 2026-09-28 (`4d63291e`: parameter defaults removed, the library reads `output.toml [api]`, `[refer] timeout_seconds`). Stage 7 landed 2026-09-28 (`dad6c5fa`: the AST veto test, `tests/l12_allow.toml`), and the CHANGELOG's 3.0 lines. Arpit ruled the open calls (R11–R13) and R13 is built (2026-09-28). Left: 5f `inspect` (after W-228) and stage 8's flip of SR-LAW-12 decision 9.** Stage 3b's four behaviour changes are listed for Arpit in the compare doc §"Where the build departed". (Stage 7's `doctor --fix` writer landed early, with stage 2: every later stage needs it.) Stages, in order: 1 `constants.toml` + the fixed names · 2 `tune.toml`, no fallback · 3 `fux.toml` + `output.toml` · 4 the other `.fux/*.toml` (formats limits + digest, refusals, `inspect.toml`) · 5 R7 structural numerals · 6 R8 bool and every parameter default · 7 `doctor --fix`/`setup` + the AST test · 8 records, CHANGELOG, byte-equality run. The law is [SR-LAW-12](../../records/0014_LAW-12-values-live-in-config.md);
 this item makes it true.
 

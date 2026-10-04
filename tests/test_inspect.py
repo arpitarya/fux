@@ -158,7 +158,7 @@ def test_a_check_with_no_value_is_n_a_and_never_a_pass() -> None:
     """Treating an absent number as a pass is how a broken instrument reads as
     a healthy corpus."""
     check = checks_mod.Check(
-        name="x", value=None, floor=checks_mod.FLOORS["unreachable share"], detail=""
+        name="x", value=None, floor=checks_mod.floors(inspect_template())["unreachable share"], detail=""
     )
     assert check.status == "n/a"
     assert check.flagged is False
@@ -177,19 +177,19 @@ def test_findable_share_is_reported_and_carries_no_floor() -> None:
     """Decision 9a. Measured at 1.000 on every golden rung AND on the
     planted-bad corpus, so no bound separates them — the number prints and the
     flag does not."""
-    assert "findable share" not in checks_mod.FLOORS
+    assert "findable share" not in checks_mod.floors(inspect_template())
 
 
 def test_every_floor_says_it_is_provisional() -> None:
-    for name, floor in checks_mod.FLOORS.items():
+    for name, floor in checks_mod.floors(inspect_template()).items():
         assert floor.provisional is True, name
         assert floor.source, name
 
 
 def test_a_max_floor_flags_above_and_not_below() -> None:
-    boiler = checks_mod.FLOORS["boilerplate share"]
+    boiler = checks_mod.floors(inspect_template())["boilerplate share"]
     assert boiler.flags(0.9) and not boiler.flags(0.01)
-    unreachable = checks_mod.FLOORS["unreachable share"]
+    unreachable = checks_mod.floors(inspect_template())["unreachable share"]
     assert unreachable.flags(0.05) and not unreachable.flags(0.0)
 
 
@@ -202,7 +202,7 @@ def test_a_min_floor_flags_below_and_not_above() -> None:
 
 def test_the_three_checks_are_three() -> None:
     """Decision 9: exactly three numbers carry a flag, and only three."""
-    assert sorted(checks_mod.FLOORS) == [
+    assert sorted(checks_mod.floors(inspect_template())) == [
         "boilerplate share",
         "near-duplicate share",
         "unreachable share",

@@ -25,9 +25,12 @@ ball: agent
   key for the same tree.
 - **Windows (py3.14) slowest test:** `test_sr_freshness` at **29.5 s**, down
   from 72 s before step 3's batching.
-- ⚠ **A new cost, from W-242's tests:** `tests/derive/test_node_accel.py` adds
-  ~40 s on Windows: 128 Node processes across four `top` values. Batching it in
-  one Node process is the cheap fix, and it is not done.
+- ✅ **The new cost from W-242's tests is cut**: `test_node_accel`'s CLI test went
+  from 128 Node processes (~40 s on Windows) to 32. The `top` sweep stays below
+  the CLI. 2026-10-04.
+- 🔴 **DoD 1 cannot be met yet**: FAST's unit job is 133 s, against a target of
+  2 min or less. Steps 1 and 4 are the levers, and step 1 is STOP until **Fork A**
+  (W-242's open question: Node reads `graph.json`) is ruled. It is in the inbox.
 - ✅ **A docs-only push skips FULL** — `2928b775`, run `37181568144`: every FULL
   cell finished in 7–34 s against 3–5 min on a code push, with the `verdict` step
   resolving the saved key. The FAST stage (unit 133 s) is now the wall clock.

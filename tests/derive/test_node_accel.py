@@ -127,10 +127,18 @@ def test_the_plane_is_what_answers_under_fast(corpus):
     assert _node_path(corpus, "zarquon protocol", fast=False) == "scan"
 
 
-@pytest.mark.parametrize("top", TOPS)
+#: The CLI test proves the VERB seam (argv, rendering), so it needs two depths,
+#: not four. The bound's `top` sweep is held below the CLI, at every `TOPS`
+#: value with skipping on and off (`test_skipping_and_expansion_agree…`). It
+#: was 128 Node processes and ~40 s on Windows CI (W-243); now it is 32.
+CLI_TOPS = (5, 50)
+CLI_QUERIES = QUERIES[:3] + QUERIES[-1:]
+
+
+@pytest.mark.parametrize("top", CLI_TOPS)
 def test_node_fast_prints_exactly_what_node_scan_prints(corpus, top):
     for verb in ("ask", "find"):
-        for query in QUERIES:
+        for query in CLI_QUERIES:
             scan = _node_cli(corpus, verb, query, "--json", "--top", str(top))
             fast = _node_cli(corpus, verb, query, "--json", "--top", str(top), "--fast")
             assert fast == scan, f"{verb} {query!r} --top {top}"

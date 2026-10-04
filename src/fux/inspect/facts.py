@@ -32,6 +32,8 @@ X-ray (`xray.document`), computed on demand and never cached.
 
 from __future__ import annotations
 
+import statistics
+
 import json
 import re
 from dataclasses import dataclass, field
@@ -207,7 +209,7 @@ def compute(root: Path, doc, *, decoder: str, bounds: dict[str, int]) -> dict:
         out["cuts"][p.cut or "author"] = out["cuts"].get(p.cut or "author", 0) + 1
     sizes = sorted(p.nbytes for p in passages)
     if sizes:
-        out["passage_bytes"] = {"min": sizes[0], "p50": sizes[len(sizes) // 2], "max": sizes[-1]}
+        out["passage_bytes"] = {"min": sizes[0], "p50": statistics.median_high(sizes), "max": sizes[-1]}
     return out
 
 

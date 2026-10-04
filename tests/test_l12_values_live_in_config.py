@@ -34,7 +34,7 @@ ALLOW = Path(__file__).with_name("l12_allow.toml")
 #: permission: stage 5f's remaining `inspect` work and the open questions.
 CATEGORIES = {
     "identity", "key-name", "enum-tag", "vocabulary", "message", "grammar",
-    "presentation", "bootstrap", "pending-w228", "for-arpit",
+    "presentation", "bootstrap", "for-arpit",
 }
 
 

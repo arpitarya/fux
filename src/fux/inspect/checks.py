@@ -44,7 +44,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-__all__ = ["Check", "FLOORS", "Floor", "run_checks"]
+__all__ = ["Check", "Floor", "floors", "run_checks"]
 
 
 @dataclass(frozen=True)
@@ -77,38 +77,33 @@ _SOURCE = "work/regression/2026-09-14-inspect-floors/"
 #: flag any golden rung, and it does flag a corpus that is bad in that bound's
 #: own dimension. A bound that cannot do both is not a floor, and its number
 #: ships as description alone — `findable share` is the one that failed it.
-FLOORS: dict[str, Floor] = {
-    "unreachable share": Floor(
-        name="unreachable share",
-        bound=0.01,
-        direction="max",
-        provisional=True,
-        source=_SOURCE,
-    ),
-    "boilerplate share": Floor(
-        name="boilerplate share",
-        #: ⚠ **0.60, and the gap to it is the finding.** Every golden rung sits
-        #: at **0.47** — they are generated from one template, so half of every
-        #: posting is a term on half the corpus — while this repository sits at
-        #: **0.072**. A bound anywhere near the honest-looking 0.25 would flag
-        #: all seven rungs, which the pre-registered rule forbids, so the bound
-        #: sits above them and catches only the pathological case (planted-bad:
-        #: 0.985). **That makes this the weakest of the three and it says so.**
-        bound=0.60,
-        direction="max",
-        provisional=True,
-        source=_SOURCE,
-    ),
-    "near-duplicate share": Floor(
-        name="near-duplicate share",
-        #: The cleanest separation of the three: every golden rung is 0.000 and
-        #: planted-bad is 1.000.
-        bound=0.20,
-        direction="max",
-        provisional=True,
-        source=_SOURCE,
-    ),
-}
+def floors(config) -> dict[str, Floor]:
+    """The three measured floors, their bounds read from `.fux/inspect.toml
+    [floors]` (W-225 stage 5f). The NUMBERS were module literals until
+    2026-10-04; what they mean, and why each bound sits where it does, is
+    unchanged and stated in `work/regression/2026-09-14-inspect-floors/`:
+
+    - **unreachable share** — a document no query term can reach.
+    - **boilerplate share** — ⚠ the weakest of the three, and it says so: every
+      golden rung sits at 0.47, this repository at 0.072, so the bound sits
+      above the rungs and catches only the pathological case (planted-bad 0.985).
+    - **near-duplicate share** — the cleanest separation: every rung 0.000,
+      planted-bad 1.000.
+    """
+    return {
+        "unreachable share": Floor(
+            name="unreachable share", bound=config.unreachable_share,
+            direction="max", provisional=True, source=_SOURCE,
+        ),
+        "boilerplate share": Floor(
+            name="boilerplate share", bound=config.boilerplate_share,
+            direction="max", provisional=True, source=_SOURCE,
+        ),
+        "near-duplicate share": Floor(
+            name="near-duplicate share", bound=config.near_duplicate_share,
+            direction="max", provisional=True, source=_SOURCE,
+        ),
+    }
 
 
 @dataclass
@@ -146,7 +141,7 @@ class Check:
         return "attention" if self.flagged else "ok"
 
 
-def run_checks(boilerplate, findability, duplication, *, documents: int, probes=None) -> list[Check]:
+def run_checks(boilerplate, findability, duplication, *, documents: int, probes=None, floors: dict[str, Floor]) -> list[Check]:
     """The four numbers the report leads with — three floored, one descriptive.
 
     🔴 **The descriptive headline is TITLE-PROBE REACH since W-220 (2026-09-23),
@@ -175,7 +170,7 @@ def run_checks(boilerplate, findability, duplication, *, documents: int, probes=
         Check(
             name="unreachable share",
             value=unreachable,
-            floor=FLOORS["unreachable share"],
+            floor=floors["unreachable share"],
             detail=(
                 f"{len(findability.unfindable)} of {documents} documents carry no distinctive term "
                 f"at all, so no query can select them (EXHAUSTIVE - every document was checked)"
@@ -184,7 +179,7 @@ def run_checks(boilerplate, findability, duplication, *, documents: int, probes=
         Check(
             name="boilerplate share",
             value=boilerplate.boilerplate_share,
-            floor=FLOORS["boilerplate share"],
+            floor=floors["boilerplate share"],
             detail=(
                 f"{boilerplate.boilerplate_postings} of {boilerplate.postings} postings carry one of "
                 f"{boilerplate.boilerplate_terms} term(s) on half the corpus or more"
@@ -193,7 +188,7 @@ def run_checks(boilerplate, findability, duplication, *, documents: int, probes=
         Check(
             name="near-duplicate share",
             value=duplication.near_duplicate_share,
-            floor=FLOORS["near-duplicate share"],
+            floor=floors["near-duplicate share"],
             detail=(
                 f"{duplication.documents_in_a_pair} of {duplication.docs} documents are one half of a "
                 f"near-duplicate pair (Jaccard >= 0.80); {duplication.pair_count} pair(s)"

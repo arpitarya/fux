@@ -208,7 +208,11 @@ def inspect_template():
 
 
 def inspect_args(**given) -> dict:
-    """`inspect_index`'s three required values as `fux inspect` resolves them with no
+    """`inspect_index`'s four required values as `fux inspect` resolves them with no
     flags: the template's samples and `[report] top`, unless the test names one."""
     t = inspect_template()
-    return {"retrieval_sample": t.retrieval_sample, "probe_sample": t.probe_sample, "top": t.top, **given}
+    return {
+        "retrieval_sample": t.retrieval_sample, "probe_sample": t.probe_sample, "top": t.top,
+        # W-225 stage 5f (R8): the flag has no default; `fux inspect` passes False.
+        "rebuild_dictionary": False, **given,
+    }

@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@00fd3b21a884]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@7ad60c1baf50]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: e8453fbb2775315f6d8874e92d4611dcd3f249810c6a8e2b5cb9527dbfd94570
+content_sha: 0af98263969f75cba5cf8b7c3cd1e8bcf8460988da5e0ab097dc2b1ad81245d8
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -180,6 +180,8 @@ pattern. A consumer who wants other cues is I2, which is not built.
 
 **`[identifiers]`** holds the identifier-family constants — `flexible_separators`, the shard-header key and the digest's width — and `[files] identifiers` and `[templates] identifiers` name the file and its template ([SR-IDENTIFIERS](0160_identifiers.md)).
 
+**No decision here moved** (W-225 stage 5f, 2026-10-04): `[inspect.minhash]` (`gamma` as a hex string, since it exceeds TOML's signed 64-bit integer, and `bits`) and `[inspect.fits]` (`min_points`, `zipf_ranks`) hold `fux inspect`'s algorithm constants, read through `fixed()` like every other table here.
+
 ### Consequences
 
 - **Parity between the runtimes holds by construction** for every shared fixed
@@ -206,7 +208,7 @@ pattern. A consumer who wants other cues is I2, which is not built.
 ### Reference (required)
 
 - [SR-LAW-12](0014_LAW-12-values-live-in-config.md) decisions 2, 4, 6a — the law this implements.
-- [W-225](../work/open/W-225-values-live-in-config.md) — the migration.
+- W-225 (closed 2026-10-04) — the migration.
 - [L12 classify](../work/compare/l12-classify.compare.md) — which values are fixed, and R7–R10.
 - [SR-LAW-10](0012_LAW-10-bundled-output.md) — why the bundle carries the file inlined.
 
@@ -230,5 +232,5 @@ different sentences for the same missing key.
 **Records** — [SR-LAW-10](0012_LAW-10-bundled-output.md) ·
 [SR-LAW-12](0014_LAW-12-values-live-in-config.md) · [SR-DECODE](0139_decode.md)
 
-**Work** — [W-225](../work/open/W-225-values-live-in-config.md) ·
+**Work** — W-225 (closed 2026-10-04) ·
 [L12 classify](../work/compare/l12-classify.compare.md)

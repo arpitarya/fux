@@ -58,6 +58,9 @@ class InspectConfig:
     min_values: int
     min_docs: int
     parity_sample: int
+    unreachable_share: float
+    boilerplate_share: float
+    near_duplicate_share: float
 
 
 #: `field -> (table, kind)`. `share` is a number in (0, 1]; `count` a whole number
@@ -88,6 +91,9 @@ _SCHEMA: dict[str, tuple[str, str]] = {
     "min_values": ("identifiers", "count"),
     "min_docs": ("identifiers", "count"),
     "parity_sample": ("identifiers", "count"),
+    "unreachable_share": ("floors", "share"),
+    "boilerplate_share": ("floors", "share"),
+    "near_duplicate_share": ("floors", "share"),
 }
 assert set(_SCHEMA) == {f.name for f in fields(InspectConfig)}
 

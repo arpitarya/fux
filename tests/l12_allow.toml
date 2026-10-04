@@ -474,43 +474,28 @@ sites = [
   "src/fux/serve/__init__.py::PAGE::module::Path(__file__).resolve().parent / 'page.html'",
 ]
 
+
 [[allow]]
-category = "pending-w228"
-basis = "stage 5f"
-why = "src/fux/inspect/: its numerals and defaults move in 5f, after W-228 commits the files it holds open"
+category = "grammar"
+basis = "decision 6b, R13"
+why = "the source-list grammar: which attributes a `dirs`/`types`/`urls` line takes -- reopened only if a consumer should be able to add an attribute"
 sites = [
-  "src/fux/inspect/__init__.py::_cmd_diff::inline::2",
-  "src/fux/inspect/__init__.py::_number(digits)::param::3",
-  "src/fux/inspect/__init__.py::_number::path::'n/a'",
-  "src/fux/inspect/__init__.py::_percentile_line::path::'n/a'",
-  "src/fux/inspect/__init__.py::_share::inline::100",
-  "src/fux/inspect/__init__.py::_share::path::'n/a'",
-  "src/fux/inspect/__init__.py::cmd_inspect::inline::2",
-  "src/fux/inspect/__init__.py::inspect_index(rebuild_dictionary)::param::False",
-  "src/fux/inspect/__init__.py::render_markdown::inline::100",
-  "src/fux/inspect/__init__.py::render_markdown::inline::12",
-  "src/fux/inspect/__init__.py::render_markdown::inline::20",
-  "src/fux/inspect/__init__.py::render_markdown::inline::4",
+  "src/fux/ingest/sourcelist.py::DIRS::module::ListSpec(kind='dirs', attributes=(Attribute('archived', (...",
+  "src/fux/ingest/sourcelist.py::TYPES::module::ListSpec(kind='types', attributes=(Attribute('decoder', (...",
+  "src/fux/ingest/sourcelist.py::URLS::module::ListSpec(kind='urls', attributes=(Attribute('fetch', (), ...",
+]
+
+[[allow]]
+category = "identity"
+basis = "decision 6 (W-225 stage 5f, 2026-10-04)"
+why = "a zero-count start or an empty value in an `inspect` record type: the lens fills it"
+sites = [
   "src/fux/inspect/_scan.py::IndexView.cf::class::field(default_factory=lambda: array('q'))",
   "src/fux/inspect/_scan.py::IndexView.df::class::field(default_factory=lambda: array('i'))",
   "src/fux/inspect/_scan.py::IndexView.postings::class::0",
   "src/fux/inspect/_scan.py::IndexView.term_value::class::field(default_factory=lambda: array('Q'))",
-  "src/fux/inspect/_scan.py::read_index_view::get::False",
-  "src/fux/inspect/_scan.py::read_index_view::inline::16",
-  "src/fux/inspect/checks.py::Check.status::path::'n/a'",
-  "src/fux/inspect/checks.py::FLOORS::module::{'unreachable share': Floor(name='unreachable share', bou...",
-  "src/fux/inspect/checks.py::_SOURCE::module::'work/regression/2026-09-14-inspect-floors/'",
-  "src/fux/inspect/config.py::_FIX_HINT::module::'`fux doctor --fix` writes every missing key from the tem...",
-  "src/fux/inspect/config.py::_SCHEMA::module::{'skeleton_jaccard': ('families', 'share'), 'core_share':...",
-  "src/fux/inspect/dictionary.py::load::inline::2",
-  "src/fux/inspect/dictionary.py::load_or_build(rebuild)::param::False",
-  "src/fux/inspect/dictionary.py::save::inline::2",
-  "src/fux/inspect/diff.py::_FIELDS::module::(('nterms', 'distinct terms'), ('flen', 'field tokens'), ...",
-  "src/fux/inspect/diff.py::render_markdown::inline::5",
   "src/fux/inspect/facts.py::Facts.cached::class::0",
   "src/fux/inspect/facts.py::Facts.computed::class::0",
-  "src/fux/inspect/facts.py::_key_and_decoder::get::'prose'",
-  "src/fux/inspect/facts.py::compute::inline::2",
   "src/fux/inspect/lenses.py::Boilerplate.boilerplate_postings::class::0",
   "src/fux/inspect/lenses.py::Boilerplate.boilerplate_terms::class::0",
   "src/fux/inspect/lenses.py::Boilerplate.hapax::class::0",
@@ -539,55 +524,72 @@ sites = [
   "src/fux/inspect/lenses.py::GraphShape.nodes::class::0",
   "src/fux/inspect/lenses.py::GraphShape.orphan_count::class::0",
   "src/fux/inspect/lenses.py::GraphShape.singleton_communities::class::0",
-  "src/fux/inspect/lenses.py::LEVERS::module::{'boilerplate term': '`[index]` stopwords, or an analyzer...",
-  "src/fux/inspect/lenses.py::_heaps_fit::inline::10",
-  "src/fux/inspect/lenses.py::_percentiles::inline::0.1",
-  "src/fux/inspect/lenses.py::_percentiles::inline::0.5",
-  "src/fux/inspect/lenses.py::_percentiles::inline::0.9",
-  "src/fux/inspect/lenses.py::_queue::inline::2",
-  "src/fux/inspect/lenses.py::_queue::path::'.fux'",
-  "src/fux/inspect/lenses.py::_queue::path::'queue.tsv'",
-  "src/fux/inspect/lenses.py::_seeds::inline::11400714819323198485",
-  "src/fux/inspect/lenses.py::_seeds::inline::18446744073709551615",
-  "src/fux/inspect/lenses.py::_slope::inline::2",
-  "src/fux/inspect/lenses.py::_zipf_slope::inline::10",
-  "src/fux/inspect/lenses.py::_zipf_slope::inline::1000",
-  "src/fux/inspect/lenses.py::coverage::inline::4",
-  "src/fux/inspect/lenses.py::duplication::inline::2",
-  "src/fux/inspect/lenses.py::duplication::inline::4",
-  "src/fux/inspect/lenses.py::families::inline::2",
-  "src/fux/inspect/lenses.py::families::inline::4",
-  "src/fux/inspect/lenses.py::lengths::inline::2",
-  "src/fux/inspect/lenses.py::lengths::inline::4",
   "src/fux/inspect/probes.py::Probes.documents::class::0",
   "src/fux/inspect/probes.py::Probes.queries::class::0",
   "src/fux/inspect/probes.py::Probes.sampled::class::0",
-  "src/fux/inspect/probes.py::ranking_key::path::'.fux'",
-  "src/fux/inspect/probes.py::ranking_key::path::'tune.toml'",
-  "src/fux/inspect/words.py::SORTS::module::('df', 'cf', 'idf', 'word')",
-  "src/fux/inspect/words.py::vocabulary(ascending)::param::False",
-  "src/fux/inspect/words.py::vocabulary(klass)::param::''",
-  "src/fux/inspect/words.py::vocabulary(limit)::param::200",
-  "src/fux/inspect/words.py::vocabulary(offset)::param::0",
-  "src/fux/inspect/words.py::vocabulary(query)::param::''",
-  "src/fux/inspect/words.py::vocabulary(sort)::param::'df'",
-  "src/fux/inspect/xray.py::FINDINGS::module::('unreadable', 'no text', 'no distinctive term', 'shared ...",
   "src/fux/inspect/xray.py::Fold.triage_count::class::0",
-  "src/fux/inspect/xray.py::_named_terms::inline::2",
-  "src/fux/inspect/xray.py::_probe_lens::get::'prose'",
+]
+
+[[allow]]
+category = "presentation"
+basis = "decision 6 (W-225 stage 5f, 2026-10-04)"
+why = "how the `inspect` report prints: display digits, a percent, the first N rows, a short sha, the percentiles a line names"
+sites = [
+  "src/fux/inspect/__init__.py::_number(digits)::param::3",
+  "src/fux/inspect/__init__.py::_share::inline::100",
+  "src/fux/inspect/__init__.py::render_markdown::inline::100",
+  "src/fux/inspect/__init__.py::render_markdown::inline::12",
+  "src/fux/inspect/__init__.py::render_markdown::inline::20",
+  "src/fux/inspect/__init__.py::render_markdown::inline::4",
+  "src/fux/inspect/diff.py::render_markdown::inline::5",
+  "src/fux/inspect/lenses.py::_percentiles::inline::0.1",
+  "src/fux/inspect/lenses.py::_percentiles::inline::0.5",
+  "src/fux/inspect/lenses.py::_percentiles::inline::0.9",
+  "src/fux/inspect/lenses.py::duplication::inline::4",
+  "src/fux/inspect/lenses.py::families::inline::4",
   "src/fux/inspect/xray.py::document::inline::20",
-  "src/fux/inspect/xray.py::fold::get::'?'",
-  "src/fux/inspect/xray.py::fold::get::'prose'",
-  "src/fux/inspect/xray.py::fold::inline::2",
   "src/fux/inspect/xray.py::fold::inline::5",
 ]
 
 [[allow]]
-category = "grammar"
-basis = "decision 6b, R13"
-why = "the source-list grammar: which attributes a `dirs`/`types`/`urls` line takes -- reopened only if a consumer should be able to add an attribute"
+category = "message"
+basis = "decision 6 (W-225 stage 5f, 2026-10-04)"
+why = "user-facing text in `inspect`: the `n/a` marker, a placeholder, a citation, the fix hint, the lever advice"
 sites = [
-  "src/fux/ingest/sourcelist.py::DIRS::module::ListSpec(kind='dirs', attributes=(Attribute('archived', (...",
-  "src/fux/ingest/sourcelist.py::TYPES::module::ListSpec(kind='types', attributes=(Attribute('decoder', (...",
-  "src/fux/ingest/sourcelist.py::URLS::module::ListSpec(kind='urls', attributes=(Attribute('fetch', (), ...",
+  "src/fux/inspect/__init__.py::_number::path::'n/a'",
+  "src/fux/inspect/__init__.py::_percentile_line::path::'n/a'",
+  "src/fux/inspect/__init__.py::_share::path::'n/a'",
+  "src/fux/inspect/checks.py::Check.status::path::'n/a'",
+  "src/fux/inspect/checks.py::_SOURCE::module::'work/regression/2026-09-14-inspect-floors/'",
+  "src/fux/inspect/config.py::_FIX_HINT::module::'`fux doctor --fix` writes every missing key from the tem...",
+  "src/fux/inspect/lenses.py::LEVERS::module::{'boilerplate term': '`[index]` stopwords, or an analyzer...",
+  "src/fux/inspect/xray.py::fold::get::'?'",
+]
+
+[[allow]]
+category = "key-name"
+basis = "decision 6 (W-225 stage 5f, 2026-10-04)"
+why = "the names of `.fux/inspect.toml`'s keys and tables"
+sites = [
+  "src/fux/inspect/config.py::_SCHEMA::module::{'skeleton_jaccard': ('families', 'share'), 'core_share':...",
+]
+
+[[allow]]
+category = "vocabulary"
+basis = "decision 6 (W-225 stage 5f, 2026-10-04)"
+why = "a closed vocabulary `inspect` admits: the word-table sorts, the x-ray findings, the diff fields"
+sites = [
+  "src/fux/inspect/diff.py::_FIELDS::module::(('nterms', 'distinct terms'), ('flen', 'field tokens'), ...",
+  "src/fux/inspect/words.py::SORTS::module::('df', 'cf', 'idf', 'word')",
+  "src/fux/inspect/xray.py::FINDINGS::module::('unreadable', 'no text', 'no distinctive term', 'shared ...",
+]
+
+[[allow]]
+category = "enum-tag"
+basis = "decision 6 (W-225 stage 5f, 2026-10-04)"
+why = "the document kind (`prose`/`data`) compared by name and emitted in the report"
+sites = [
+  "src/fux/inspect/facts.py::_key_and_decoder::get::'prose'",
+  "src/fux/inspect/xray.py::_probe_lens::get::'prose'",
+  "src/fux/inspect/xray.py::fold::get::'prose'",
 ]

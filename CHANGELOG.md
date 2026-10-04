@@ -8,6 +8,15 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed
+
+- ⚠ **`.fux/inspect.toml` gains a required `[floors]` table** (W-225 stage 5f):
+  the bounds of `fux inspect`'s three headline checks, which were constants in
+  code. The values are unchanged (0.01, 0.60, 0.20). An `inspect.toml` without
+  the table stops with the missing-key error; run `fux doctor --fix` once.
+  `fux inspect` output is byte-identical. **Law L12 is now satisfied**: every
+  value lives in a config file.
+
 ### Fixed
 
 - **`fux ingest` no longer walks into a `!`-excluded directory** (W-244). It used

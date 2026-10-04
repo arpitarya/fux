@@ -106,7 +106,7 @@ def fold(view, facts, findability, probes, *, top: int) -> Fold:
         f = facts.by_id.get(doc.id) or {}
         key = (f.get("decoder", "?"), _folder(doc.loc, doc.id), bool(doc.archived))
         card = cards.setdefault(key, {
-            "decoder": key[0], "folder": key[1], "archived": key[2], "documents": 0,
+            "decoder": key[0], "folder": key[1], "archived": key[-1], "documents": 0,
             "unreadable": 0, "passages": 0, "word_cut_passages": 0, "body_tokens": 0,
             "link_target_tokens": 0, "chrome_tokens": 0, "shared_title": 0,
             "probed": 0, "title_in_top10": 0,
@@ -355,7 +355,7 @@ def _named_terms(root: Path, view, doc, raw: bytes, *, words: int) -> dict[str, 
         for surface, analyzed in tokenize_pairs(text or "", ids):
             h = term_hash(analyzed)
             row = counts.setdefault(h, [surface, analyzed, 0])
-            row[2] += 1
+            row[-1] += 1
         rows = [
             {"word": s, "term": a, "tf": tf, "df": df_of.get(h, 0)}
             for h, (s, a, tf) in counts.items()

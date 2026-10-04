@@ -26,6 +26,14 @@ Rules:
 
 ---
 
+## 2026-10-04 — **W-225 closed: law L12 is satisfied (stages 5f and 8)**
+
+| what | evidence |
+|---|---|
+| **5f** | `src/fux/inspect/`'s 101 pending sites. 34 left the code: `.fux/inspect.toml [floors]` (0.01/0.60/0.20, unchanged); `constants.toml [inspect.minhash]` (gamma as a hex string: it exceeds TOML int64) and `[inspect.fits]`; `[json] indent`; the R8 defaults on `inspect_index`, `load_or_build` and `vocabulary`; fixed-shape indexes named or `[-1]`; median via `statistics.median_high`. 67 recategorised by decision 6 |
+| **8** | `fux inspect --json` byte-identical, pre-5f code vs this code, on this repo (2.69 MB) and on rung-01000 (841 KB); SR-LAW-12 d9 now reads *satisfied* |
+| **migration** | an `inspect.toml` without `[floors]` stops with the missing-key error and `fux doctor --fix` restores it, checked on a copy |
+
 ## 2026-10-04 — **W-244: the ingest walk prunes excluded directories; test walks never enter `work/golden`**
 
 | what | evidence |

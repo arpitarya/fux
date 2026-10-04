@@ -13,6 +13,16 @@ distinctive_df_share   = 0.10
 near_duplicate_jaccard = 0.80
 link_target_share      = 0.10
 
+[floors]
+# The three headline checks' bounds: a share above its floor reads "attention",
+# at or below it "ok" (`fux inspect` §checks). MEASURED, not chosen
+# (work/regression/2026-09-14-inspect-floors): each bound flags no golden rung
+# and does flag a corpus bad in its own dimension. boilerplate_share is the
+# weakest of the three: every rung sits at 0.47, so its bound sits above them.
+unreachable_share    = 0.01
+boilerplate_share    = 0.60
+near_duplicate_share = 0.20
+
 # The near-duplicate lens's minhash: signature length and rows per band.
 [minhash]
 signature_size = 64

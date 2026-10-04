@@ -70,13 +70,17 @@ class Report:
     fold: object = None
 
 
+
+#: W-225 stage 5f — `[json] indent`, as every other report fux writes for a person.
+_JSON_INDENT = fixed("json", "indent")
+
 def inspect_index(
     root: Path,
     *,
     retrieval_sample: int | None,
     probe_sample: int | None,
     top: int,
-    rebuild_dictionary: bool = False,
+    rebuild_dictionary: bool,
     progress=None,
     view=None,
 ) -> Report:
@@ -134,7 +138,8 @@ def inspect_index(
         coverage=coverage,
         graph=graph,
         checks=checks_mod.run_checks(
-            boilerplate, findability, duplication, documents=view.n, probes=fold.probes
+            boilerplate, findability, duplication, documents=view.n, probes=fold.probes,
+            floors=checks_mod.floors(view.config),
         ),
         facts=facts,
         probes=probes,
@@ -673,7 +678,7 @@ def cmd_inspect(args) -> int:
     )
     directory = dictionary_mod.inspect_dir(root)
     markdown = render_markdown(report)
-    payload = json_mod.dumps(as_dict(report), indent=2, sort_keys=True) + "\n"
+    payload = json_mod.dumps(as_dict(report), indent=_JSON_INDENT, sort_keys=True) + "\n"
     (directory / REPORT_NAME).write_text(markdown, encoding="utf-8")
     (directory / JSON_NAME).write_text(payload, encoding="utf-8")
     if getattr(args, "json", False):
@@ -701,7 +706,7 @@ def _cmd_diff(args, paths) -> int:
     a_path, b_path = paths
     diff = diff_mod.compare(diff_mod.load_report(Path(a_path)), diff_mod.load_report(Path(b_path)))
     if getattr(args, "json", False):
-        print(json_mod.dumps(diff, indent=2, sort_keys=True))
+        print(json_mod.dumps(diff, indent=_JSON_INDENT, sort_keys=True))
     else:
         print(diff_mod.render_markdown(diff, a=a_path, b=b_path, top=_diff_top(args)), end="")
     return 0
