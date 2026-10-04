@@ -458,7 +458,7 @@ body.present #progress{display:block}
   </ul>
 
   <div class="note key">
-    <strong>What falls out of the bet.</strong> $0 by default · a stdlib-only runtime · offline
+    <strong>What falls out of the bet.</strong> $0 by default · no runtime dependency today · offline
     unless a line asks for the network · byte-deterministic, so the same corpus and the same question
     produce the same bytes on any machine.
   </div>
@@ -2630,8 +2630,10 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
   <p class="lede">Not guidelines. Every record cites them by number and none restates them — a
   paraphrase drifts, and a drifted paraphrase in an accepted record reads as authority.</p>
 
-  <div class="law"><b>L2</b><span><strong>$0, stdlib-only runtime.</strong> No third-party runtime
-    dependency. The frontmatter parser and every codec are hand-rolled on purpose.</span></div>
+  <div class="law"><b>L2</b><span><strong>$0, FOSS-only.</strong> No commercial licence, paid API or
+    hosted model, ever; every dependency is OSI-licensed and ships packaged, and each runtime one is
+    named by an accepted record. None is named today (amended 2026-09-06: the zero-dependency
+    promise was withdrawn, not the $0 one).</span></div>
   <div class="law"><b>L3</b><span><strong>Content is never durable outside its source system.</strong>
     The index holds statistics, never content. The single exception is an explicit per-source
     <code>snapshot</code> policy. The whole architecture rests on this.</span></div>

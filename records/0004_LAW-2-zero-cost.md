@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L2
 owns: []
 laws: [L2]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 9c5d87cd036b75b7f81fba2bab3e4f56ceaabc9b0d9b5e35d3345eacb9032583
+content_sha: 31ecf553ef11b69265302469668b3c676fd9491372737483d2a0265954758387
 ---
 
 # SR-LAW-2 — L2 — $0, FOSS-only
@@ -167,6 +167,7 @@ Two of them are worse than that: **BSL and SSPL convert on a timer or on a use c
 
 ### Consequences
 
+- **Veto commands are tests** (W-246, 2026-10-04): both of the commands above, and the Node twin (no `dependencies` in `node/package.json`), run as `tests/test_l2_dependencies.py`; they hold vacuously while `dependencies = []` and bite on the first dependency that arrives.
 - **Easier:** a capability that needs a library is now reachable — legacy Office formats, OCR, a stronger PDF, and any harness that wanted a dataframe.
 - **Harder:** every dependency is now a decision with a record, and the first one will cost more process than writing the code did.
 - ⚠ **Unguarded until the pin question is answered.** Byte-identity across machines now depends on version resolution on the ingest path, and **the differential harness will not catch a drift** — it compares scan against accelerator *on one machine*. The failure mode is two developers, same commit, different root hash, discovered weeks later.

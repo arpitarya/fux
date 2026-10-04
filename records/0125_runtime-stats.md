@@ -11,7 +11,7 @@ feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule
 owns: []
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 378efc75ab26af8b97c041bc9b8e2d7eb68e99a136e437a2a017b65ea6e02404
+content_sha: dc52f5680a0ff65ec0d343441d8a6e70a5d03744b83161d2cd83e5f5e1c0ec23
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -226,6 +226,8 @@ this moved where they are written, not what they are.
 
 
 The stats plane is unchanged by identifier families; the scan and the accelerator analyze the question with them identically, so `df` and `n` stay one pair ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+**No decision here moved** (W-246, 2026-10-04): `derive/accel.py`'s `is_fresh` docstring now says the deep shard re-hash lives in `doctor`, not that it is owed.
 
 ### Consequences
 

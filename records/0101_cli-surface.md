@@ -10,7 +10,7 @@ feature: the `fux` command-line interface — every verb, its flags, its exit co
 owns: [src/fux/cli.py@eafa474928d8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@de55b440c56a, node/fux.mjs@b8ee2d6ca979]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 6dd6da24df5e65751a5f141df6d4423829e870b272bb69b23217cb4458cdd0bb
+content_sha: 97ad1206933e8de91313cedc2427e405d116736d0c4c5ef4e58c240fd1d79e03
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1103,7 +1103,7 @@ wider sweep is the same defect wearing a different hat.
 
 **What this costs the capture:** a verbatim capture proves a flag is *accepted*,
 never that it is *read*. The gap is closed for this flag by a test that asserts
-the selection, not the output.
+the selection, not the output. **The general floor exists** (W-246, 2026-10-04): `tests/test_cli.py::test_every_accepted_flag_is_read_somewhere` fails on any `add_argument` dest that nothing under `src/fux` reads; it is a floor, since a quoted name elsewhere can satisfy it falsely.
 
 ⚠ **And the mirror of it: a flag that IS read, for something it should not
 decide.** `fux hooks` selected report-instead-of-install from `args.json` — the

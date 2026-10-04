@@ -10,7 +10,7 @@ feature: the agent-facing policy and skill artifacts Fux ships, and their instal
 owns: [src/fux/templates/agents@261977d5386f]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 95bbddd2909e0b41dc263e74c27ab92245375dc82072c8633e4097b12f24b41a
+content_sha: 9ca63221d3b1ce4ed345beae7e578ab98c78da1d12c602b45da35511a4b67787
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -619,7 +619,7 @@ disagreements between records and code, and defects in the code, filed in
 workaround for a defect (`fux add <URL> --no-update`, `fux ingest --failed`, a
 URL citation the shipped fetchers cannot verify), **fixing the defect must edit
 the guide in the same change** — the templates ship in the same wheel as the
-code. Nothing enforces that; this sentence is the guard.
+code. `tests/test_guide_flags_exist.py` now enforces the flag half (W-246, 2026-10-04): every `fux <verb> --flag` a guide names must parse against the real argparse parser, so a removed workaround flag reddens the guide. It proves the token exists, not that the prose around it is still true; that sentence stays the guard.
 
 ⚠ **Exercised for the first time on 2026-09-11**, the day the guides shipped.
 W-140 row 1 — the refer plane rejecting the fetcher contract's tuple — was

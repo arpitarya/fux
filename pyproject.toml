@@ -74,3 +74,7 @@ exclude = ["/archive", "/uv.lock", "/.github", "/scripts", "/.DS_Store", "**/.DS
 
 [tool.ruff]
 line-length = 100
+# The consumer-copy dotdirs (fetchers, decoders) are Python a hidden path hides
+# from a glob; ruff is not a dev dependency (stdlib-only gate in
+# tests/test_dotdir_hygiene.py), this is for whoever runs it.
+extend-include = [".fux/fetchers/*.py", ".fux/decoders/*.py"]

@@ -7,16 +7,22 @@ ordinary data — H1 needs two documents whose scores tie exactly AND whose ids
 straddle U+FFFF, and no real corpus has been written to contain one.
 
     python tools/differential/adversarial_corpus.py <corpus-root>
+
+**The root is required, and a live tree is refused** (SR-T1-ACCELERATOR
+Consequences, W-246 B-077): the script REWRITES `.fux/index/`, so it refuses a
+root that is the engine checkout or that holds a `.git`, unless `CI` is set --
+CI's checkout is disposable, a developer's is not.
 """
 from __future__ import annotations
 
+import argparse
+import os
 import pathlib
 import sys
 
-#: The corpus the documents are written into — an argument, and never where
-#: the engine is imported from. Both were `sys.argv[1]` until 2026-09-12, which
-#: meant this script could only ever run on the fux checkout itself.
-ROOT = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
+#: Where the engine is imported from -- never the corpus. The root the documents
+#: are written into is an argument, parsed in `main`, so importing this module
+#: reads no `sys.argv`.
 ENGINE = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ENGINE / "src"))
 
@@ -73,5 +79,30 @@ def install(root: pathlib.Path) -> int:
     return sum(len(v) for v in by_shard.values())
 
 
+def refusal(root: pathlib.Path, env: dict[str, str] | None = None) -> str | None:
+    """Why `root` may not be written into, or None. A live tree is refused unless `CI` is set."""
+    env = os.environ if env is None else env
+    if env.get("CI"):
+        return None
+    root = root.resolve()
+    if root == ENGINE:
+        return f"{root} is the engine checkout"
+    if (root / ".git").exists():
+        return f"{root} holds a .git (a live repository)"
+    return None
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description="write the W-107 H1/H2 adversarial documents into a corpus copy")
+    ap.add_argument("root", type=pathlib.Path, help="the corpus root to write into (REQUIRED; a copy, never a live tree)")
+    root = ap.parse_args(argv).root.resolve()
+    why = refusal(root)
+    if why:
+        print(f"refused: {why}. Run it in a throwaway copy, or set CI.", file=sys.stderr)
+        return 1
+    print(f"installed {install(root)} adversarial documents into {root}/.fux/index/")
+    return 0
+
+
 if __name__ == "__main__":
-    print(f"installed {install(ROOT)} adversarial documents into {ROOT}/.fux/index/")
+    sys.exit(main())

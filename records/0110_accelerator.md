@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@6cb603c6640c, node/src/derive@0b3875f3aa7b, tools/differential@0356db55374a, src/fux/schemas/runtime.schema.json@9559934cb843]
+owns: [src/fux/derive@158673d75847, node/src/derive@0b3875f3aa7b, tools/differential@b3bae4476534, src/fux/schemas/runtime.schema.json@9559934cb843]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 4c0b3ca2b54ebc4cc6ae727d74523c9470e9d7bbbd1f5d39b0d8d72feacb03f0
+content_sha: b3bd8b33b58b32adf6ddb957431edc171c21de9235d8ee3ccbd089dbd80bfd17
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -716,6 +716,7 @@ tier two. That means Node will also write."*
 
 ### Consequences
 
+- **The differential arms import, and the adversarial corpus refuses a live tree** (W-246, 2026-10-04): `tests/test_differential_arms_import.py` imports `graph_arm.py`, `goldens_grade.py` and `adversarial_corpus.py`; and `adversarial_corpus.py` now requires its root argument and refuses the engine checkout or any root holding a `.git` unless `CI` is set. Making the import a required check on `main` is Arpit's (W-251 §3 #22).
 - ⚠ **`tools/differential/` also carries the golden ladder's custody, and
   that is an accident of location rather than a decision of this record**
   (2026-09-15, W-136 prompt 4). `rungs.py` and `ladder_check.py` resolve and

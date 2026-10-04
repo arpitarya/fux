@@ -1972,3 +1972,57 @@ def test_pinned_row_never_raises_on_an_unreadable_repo(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources\n", encoding="utf-8")  # invalid TOML
     row = _row(tmp_path, "pinned url bytes")
     assert row.ok
+
+
+def test_doctor_names_a_fetcher_that_declares_parallelism(tmp_path):
+    """SR-LAW-4 Consequences: the defence against a non-reentrant fetcher is the DECLARED
+    `MAX_PARALLEL`, so `doctor` names every fetcher declaring more than 1 -- read with
+    `ast`, never imported (the fetcher below would raise if it were). W-246 (B-084)."""
+    _git_repo(tmp_path)
+    _url_index(tmp_path, ["https://a"])
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\nmax_parallel = 3\n", encoding="utf-8")
+    write_config(tmp_path)
+    fetchers = tmp_path / ".fux" / "fetchers"
+    fetchers.mkdir(parents=True, exist_ok=True)
+    (fetchers / "wiki.py").write_text("raise RuntimeError('imported')\nMAX_PARALLEL = 6\n", encoding="utf-8")
+    (fetchers / "serial.py").write_text("MAX_PARALLEL = 1\n", encoding="utf-8")
+    (fetchers / "bare.py").write_text("def fetch(url): ...\n", encoding="utf-8")
+    detail = _check(doctor.run(tmp_path), "url sources").detail
+    assert "wiki=6" in detail
+    assert "serial" not in detail and "bare" not in detail
+
+
+def test_accelerator_warns_on_a_same_size_same_mtime_byte_flip(tmp_path):
+    """SR-RUNTIME-STAMP Consequences: `is_fresh` compares size and mtime and a byte flip that
+    preserves both defeats it -- the content-sha is 'the real guarantee', and `doctor` (off the
+    query path) now checks it against the sha the build recorded. W-246 (B-086)."""
+    import os
+
+    from fux.derive import build
+    from fux.derive.accel import is_fresh
+    from fux.store import iter_shard_paths, term_hash, write_index
+
+    _git_repo(tmp_path)
+    write_index(
+        tmp_path,
+        [{"id": "file:a.md", "src": "git", "loc": "a.md", "mode": "extracted", "title": "Alpha",
+          "phrases": [], "terms": {term_hash("alpha"): [1, 0]}, "wlen": 4, "edges": []}],
+    )
+    write_config(tmp_path)
+    build(tmp_path)
+    assert "fresh" in _check(doctor.run(tmp_path), "accelerator").detail
+
+    (shard,) = iter_shard_paths(tmp_path)
+    before = shard.stat()
+    raw = bytearray(shard.read_bytes())
+    i = raw.index(b"Alpha")
+    raw[i] = ord("B")  # same length: "Blpha"
+    shard.write_bytes(bytes(raw))
+    os.utime(shard, ns=(before.st_atime_ns, before.st_mtime_ns))
+    after = shard.stat()
+    assert (after.st_size, after.st_mtime_ns) == (before.st_size, before.st_mtime_ns)
+    assert is_fresh(tmp_path), "the cheap check is blind to this, which is the point"
+
+    check = _check(doctor.run(tmp_path), "accelerator")
+    assert not check.ok and check.level == "warn"
+    assert "do not match the sha" in check.detail

@@ -480,11 +480,16 @@ class _Conn:
     there is nothing to clear and nothing to race on.
     """
 
-    __slots__ = ("ws", "msg_id", "results", "events")
+    __slots__ = ("ws", "msg_id", "results", "events", "paused", "resolved")
 
     def __init__(self, ws: "WebSocket") -> None:
         self.ws = ws
         self.msg_id = 0
+        #: How many `Fetch.requestPaused` this fetch has taken off the pump, and how
+        #: many it has resolved. Equal whenever the loop is about to wait again --
+        #: `_check_balanced` raises the moment they are not (SR-CDP-FETCHER).
+        self.paused = 0
+        self.resolved = 0
         #: Command replies by id, and events in arrival order. See the event
         #: pump below — these two exist because one queue loses messages.
         self.results: dict[int, dict] = {}
@@ -716,7 +721,9 @@ class CdpSession:
         #: and blamed a sign-in loop for it. See the note on MAX_REDIRECTS.
         hops = 0
         while hops <= MAX_REDIRECTS:
+            self._check_balanced(ws, url)
             paused = self._wait_event(ws, "Fetch.requestPaused", deadline, url)
+            ws.paused += 1
             request_id = paused["requestId"]
             status = int(paused.get("responseStatusCode") or 0)
             is_document = paused.get("resourceType") == "Document"
@@ -742,6 +749,7 @@ class CdpSession:
                 # invariant, not which way it resolves.
                 self._resolve(ws, request_id, abort=True)
 
+            self._check_balanced(ws, url)
             return Resource(
                 url=url,
                 final_url=str(paused.get("request", {}).get("url") or url),
@@ -812,8 +820,24 @@ class CdpSession:
                 pass
         return b"".join(pieces)
 
+    def _check_balanced(self, ws: "_Conn", url: str) -> None:
+        """Raise, naming the URL, if a paused request was taken and never resolved.
+
+        An unresolved paused request does not fail: it wedges the page, and the
+        symptom is a `LOAD_TIMEOUT_S` stall that reads as a slow site. This turns
+        that wait into an immediate statement of which fetch broke the invariant.
+        """
+        if ws.paused != ws.resolved:
+            raise FetcherError(
+                f"CDP: {ws.paused} request(s) paused but {ws.resolved} resolved while "
+                f"fetching {url} - an unresolved paused request wedges the page until "
+                f"LOAD_TIMEOUT_S ({LOAD_TIMEOUT_S:.0f}s). This is a bug in this file, "
+                "not a slow site"
+            )
+
     def _resolve(self, ws: "_Conn", request_id: str, *, abort: bool) -> None:
         """Every paused request gets exactly one of these. Never skip it."""
+        ws.resolved += 1
         method = "Fetch.failRequest" if abort else "Fetch.continueRequest"
         params = {"requestId": request_id}
         if abort:

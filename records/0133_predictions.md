@@ -7,10 +7,10 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@30c31f7fb9b1, tools/t2-eval@cc5410393ce4, tools/quality-controls@9590375d14b3, tools/vector-gate@0023bff0cdef, tools/section-size@25bfc75777a6]
+owns: [tests/test_regression_runs.py@5d8ba6a4bdcd, tools/t2-eval@cc5410393ce4, tools/quality-controls@9590375d14b3, tools/vector-gate@0023bff0cdef, tools/section-size@25bfc75777a6]
 laws: [L4]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: a0d5c8c11f1d6c77b098516423cd4c8363fd13732c3c7b79ac592d16c33cf4ff
+content_sha: c15b4b9023d398a213ef06041b007c9420c6e4bfbaca4a8ccad5655ef2b4cb94
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -881,7 +881,7 @@ satisfied it on a **copy of the goldens file**, before its real rows were
 written. 🔴 **This is the W-83 shape again**: a check that proves a file exists,
 never that it is the right file.
 
-⚠ **Recorded rather than patched, deliberately.** A cleverer check — *is it one
+⚠ **Partly gated since 2026-10-04** (W-246, ruled *fires* in W-251 §2): `tests/test_regression_runs.py` now fails a rows file that is byte-identical to a released question set, and, for runs filed from that date, a row without `id` and `rank` or `arm`. Earlier evidence is frozen and exempt by baseline. ⚠ **Recorded rather than patched, deliberately,** for the rest of the check: A cleverer check — *is it one
 row per query? per arm?* — cannot be written without knowing each run's arm
 structure in advance, and shipping an approximation that passes is the
 moving-threshold failure in another costume. **Whether a second recorded

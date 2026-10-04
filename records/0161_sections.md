@@ -10,7 +10,7 @@ feature: section records — the committed section plane, the index section rule
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: ca65cd514fc4184b86535a75457311dd1a84e5830b97acc2210e90121c678e2c
+content_sha: 7a9e17949dc9c2b920cb18d60bf7ff6ff24adf47fa6615f663332d006177e3ea
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -38,6 +38,8 @@ section is cut by **heading depth alone, with no tunable**. A document keeps
 **one result**: its score gains `section_weight` × its best section's score
 (B2). At the default `0.0` nothing reads the plane, so the ranking is
 byte-identical to an index without it.
+
+**Owns nothing yet.** Neither case (a) nor case (b) of [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7 fits this record: it is `proposed` and unbuilt, so there is no component of its own to own, and its `describes` row on the chunker's two section functions keeps it reachable until the build gives it components.
 
 **What it costs.** On the golden ladder the plane **roughly doubles the
 committed index** (+98.4 % at rung-10000, 50.4 MB in total). That passes both

@@ -420,3 +420,47 @@ def test_a_blocks_subrow_names_exactly_the_waiting_items() -> None:
         if not named and not owed and "nothing else" not in sub:
             bad.append(f"L{line}: {wid}'s sub-row names nothing; write `nothing else in the queue`.")
     assert not bad, "OPEN-WORK rule 10:\n  " + "\n  ".join(bad)
+
+
+# --- B-047: three more rules of SR-WORK-OPEN-QUEUE, promoted from judgement ----
+# W-246. The remaining conduct rules (1, 5, 11, 12, 29, 30, 32, 33, 35, 36, 48, 50,
+# 53) are judgement, permanently: no parser can tell whether a row's priority was
+# honest or whether a session reconciled before it reported.
+
+OPEN_DIR = WORK / "open"
+GROUPS = ("### fux build", "### testing", "### adr update")
+#: Rule 47's own words: what is or is not committed, staged, pushed or unpushed.
+#: The *verb* ("commit its three blocks") and the CI noun ("a docs-only push") are
+#: instructions and events, not a statement of repository state, and are legal.
+_GIT_STATE = re.compile(
+    r"\b(?:un)?(?:committed|staged|pushed)\b|\bunpushed\b|\bgit status\b", re.IGNORECASE
+)
+
+
+def test_rule_37_the_open_items_are_grouped_by_what_closing_them_takes() -> None:
+    """SR-WORK-OPEN-QUEUE rule 37: the three group headers are present under `## Open items`."""
+    headers = {l.strip() for _, l in _section("## Open items", "# The rules") if l.startswith("### ")}
+    missing = [g for g in GROUPS if g not in headers]
+    assert not missing, f"rule 37: group header(s) missing from OPEN-WORK: {missing}"
+
+
+def test_rule_38_every_item_file_names_the_record_it_updates() -> None:
+    """SR-WORK-OPEN-QUEUE rule 38: each `work/open/W-*.md` names an `SR-` record, or says
+    *no SR affected* out loud."""
+    bad = [
+        p.name
+        for p in sorted(OPEN_DIR.glob("W-*.md"))
+        if not re.search(r"\bSR-[A-Z0-9]|no SR affected", p.read_text(encoding="utf-8"))
+    ]
+    assert not bad, f"rule 38: these items name no SR- record and do not say 'no SR affected': {bad}"
+
+
+def test_rule_47_the_queue_says_nothing_about_git_state() -> None:
+    """SR-WORK-OPEN-QUEUE rule 47 (Arpit's standing rule): nothing in the queue says what is or
+    is not committed, staged, pushed or unpushed. If git state blocks work, name what the work needs."""
+    bad = [
+        f"L{n}: {l.strip()[:90]}"
+        for n, l in enumerate(QUEUE.read_text(encoding="utf-8").splitlines(), 1)
+        if _GIT_STATE.search(l)
+    ]
+    assert not bad, "rule 47: git housekeeping in the queue:\n  " + "\n  ".join(bad)

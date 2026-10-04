@@ -10,7 +10,7 @@ feature: the postings — `terms` in the committed record, `postings/` in the de
 owns: [tools/pruning-eval@f132f4ab7e46]
 laws: [L3, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a46641d9d4a4776ae412dc09c1c24d7800109b66ee468613e33f3fc5905396a9
+content_sha: 9c98c7958024043cfd4e774c82b96f4f7a6d573fb2b8b19d1e362e43a2cc58d6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -223,6 +223,7 @@ time ([SR-RANKING](0111_ranking.md)).
 
 ### Consequences
 
+- **Full postings are asserted, not remembered** (W-246, 2026-10-04): `tests/test_postings_are_full.py` ingests a fixture through the real pipeline and requires every analyzer term of every document to have a committed posting and to be found by a one-word query on both read paths. A pruning change reddens it whatever metric it claims to win on.
 - ⚠ **Pruning work is forbidden outside a dedicated, signed-off item, and this
   is a consequence of a measurement rather than a preference.**
   [P1-RERUN](../work/regression/2026-08-09-pruning-rerun/VERDICT.md) measured

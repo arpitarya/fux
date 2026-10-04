@@ -452,3 +452,38 @@ def test_no_fux_error_site_passes_exit_code_2():
         if "exit_code=2" in line.replace(" ", "")
     ]
     assert not offenders, f"a FuxError site passes exit_code=2: {offenders}"
+
+
+def test_every_accepted_flag_is_read_somewhere():
+    """SR-CLI §What this costs the capture: a verbatim capture proves a flag is *accepted*,
+    never that it does anything. This is the floor under that sentence -- every
+    `add_argument` dest on every verb is read under `src/fux` as `<ns>.<dest>`,
+    `getattr(<ns>, "<dest>")`, or -- for the source group's attribute flags, which
+    `sources.py` reads from a table of dest names -- as a quoted name outside
+    `cli.py`; an accepted-but-unread flag (a dead knob that still parses) fails
+    here. It is a floor: a quoted name elsewhere can satisfy it falsely. W-246 (B-075).
+    """
+    import argparse
+    import re
+
+    skip = {"help", "command", "func", "version"}
+
+    def walk(parser, trail):
+        for action in parser._actions:
+            if isinstance(action, argparse._SubParsersAction):
+                for name, sub in action.choices.items():
+                    yield from walk(sub, trail + (name,))
+            elif action.dest not in skip:
+                yield trail, action.dest
+
+    dests = {d: t for t, d in walk(build_parser(), ())}
+    files = sorted((Path(__file__).resolve().parents[1] / "src" / "fux").rglob("*.py"))
+    src = "\n".join(p.read_text(encoding="utf-8") for p in files)
+    elsewhere = "\n".join(p.read_text(encoding="utf-8") for p in files if p.name != "cli.py")
+    unread = sorted(
+        f"{' '.join(t)}: {d}"
+        for d, t in dests.items()
+        if not re.search(rf"\.{re.escape(d)}\b|getattr\(\s*\w+\s*,\s*[\"']{re.escape(d)}[\"']", src)
+        and not re.search(rf"[\"']{re.escape(d)}[\"']", elsewhere)
+    )
+    assert not unread, f"accepted but never read under src/fux: {unread}"

@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 7dd9656af87697220be825ee107bfd93b9f3bb461da54a5bf1f785dcc102a39e
+content_sha: 518c3cefc8127de3905858972995e184481b5900f936fadee0ebdae668d26d74
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -880,6 +880,8 @@ The confidence block's pairs and hashes are both analyzed with the repo's identi
 **No decision here moved** (W-253, 2026-10-04): `find --under` became a component boundary and `find --json` now writes `confidence` before `fused`, per [SR-FIND](0104_find.md) decisions 7 and Consequences and [SR-CLI](0101_cli-surface.md).
 
 **No decision here moved** (W-247, 2026-10-04): `query/__init__.py` builds the band through `build_ask`, `build_find` and `build_answer` instead of inside each `cmd_*` body; every block is byte-identical.
+
+**No decision here moved** (W-246, 2026-10-04): `derive/accel.py`'s `is_fresh` docstring now says the deep shard re-hash lives in `doctor`, not that it is owed.
 
 ### Consequences
 

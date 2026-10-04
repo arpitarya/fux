@@ -11,7 +11,7 @@ feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants
 owns: [src/fux/store/fuxdir.py@e9806d6c1a60, node/src/store/fuxdir.mjs@40b2788b27f9, src/fux/setup.py@347155bc8be7, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 466592b0fa65a9e09c5f94784256347bf6694db64a4f7b79039ab98085ca77ab
+content_sha: 30e7074a4998302e414eef4a00629f61421a558486f8e74b5fd19b5095f081d3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -938,6 +938,7 @@ line raises names the fix itself rather than pointing at the header.
 
 ### Consequences
 
+- **Dotdir Python at least compiles** (W-246, 2026-10-04): `tests/test_dotdir_hygiene.py` `ast.parse`s and `compile`s every `templates/*.py.txt` and this repository's own `.fux/{fetchers,decoders}/*.py`, files no default tool looks at; `[tool.ruff] extend-include` names the same dotdirs for whoever runs ruff (not a dev dependency).
 - **`.fux/observers/` is the third committed consumer-owned directory**
   (W-170, 2026-09-15), beside `fetchers/` and `decoders/`, and it is listed in
   the generated `.fux/README` with the others.

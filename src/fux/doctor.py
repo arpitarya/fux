@@ -2959,10 +2959,55 @@ def _parallel_policy(root: Path) -> str | None:
     # No "unset" branch since W-85: `max_parallel` is required, so a loaded
     # `UrlSource` always carries a real number. A fallback here would be dead
     # code that reads like reassurance.
+    named = _fetchers_declaring_parallelism(root)
     return (
         f"fetches <= {url.max_parallel} at a time "
         "(max_parallel; also capped by your fetcher's MAX_PARALLEL)"
+        + (
+            "; fetchers declaring MAX_PARALLEL > 1 (each claims its fetch() is reentrant): "
+            + ", ".join(f"{stem}={n}" for stem, n in named)
+            if named
+            else ""
+        )
     )
+
+
+def _fetchers_declaring_parallelism(root: Path) -> list[tuple[str, int]]:
+    """`(stem, N)` for every `.fux/fetchers/*.py` whose module-level `MAX_PARALLEL` is a literal > 1.
+
+    [SR-LAW-4](../../records/0006_LAW-4-deterministic.md) Consequences: the laws do not
+    protect against a non-reentrant fetcher, and the defence is the *declared*
+    `MAX_PARALLEL`, so `doctor` names who declared one. **Read with `ast`, never
+    imported** -- for the reason `_parallel_policy` gives: a fetcher is consumer
+    Python and `doctor` may not execute it. A non-literal declaration is not
+    named (it cannot be read without running it), and a file that does not parse
+    is `fetcher optional functions`' business.
+    """
+    import ast
+
+    out: list[tuple[str, int]] = []
+    try:
+        paths = sorted((root / FETCHERS_DIR).glob("*.py"))
+    except OSError:
+        return out
+    for path in paths:
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+        except (OSError, SyntaxError, ValueError):
+            continue
+        for node in tree.body:
+            if isinstance(node, ast.Assign) and any(
+                isinstance(t, ast.Name) and t.id == "MAX_PARALLEL" for t in node.targets
+            ):
+                value = node.value
+                if (
+                    isinstance(value, ast.Constant)
+                    and isinstance(value.value, int)
+                    and not isinstance(value.value, bool)
+                    and value.value > fixed("fetch", "undeclared_max_parallel")
+                ):
+                    out.append((path.stem, value.value))
+    return out
 
 
 def _node_reader(root: Path) -> Check:
@@ -3198,7 +3243,47 @@ def _accelerator(root: Path) -> Check:
             "to the scan; run `fux build`",
             level="warn",
         )
+    drifted = _shards_drifted(root, directory)
+    if drifted:
+        return Check(
+            "accelerator",
+            False,
+            f"{len(drifted)} committed shard(s) do not match the sha the build recorded "
+            f"(first: {drifted[0]}) although size and mtime "
+            "agree - a byte edit that preserved both; `ask` may read a plane built from other "
+            "bytes. Run `fux build`",
+            level="warn",
+        )
     return Check("accelerator", True, f"fresh, derived, untracked ({directory})", level="warn")
+
+
+def _shards_drifted(root: Path, directory: Path) -> list[str]:
+    """Shards whose bytes no longer hash to the sha `manifest.json` recorded at build time.
+
+    **The deep check `accel.is_fresh` deliberately does not do**
+    ([SR-RUNTIME-STAMP](../../records/0124_runtime-stamp.md) Consequences): `is_fresh`
+    compares size and mtime, which a byte flip that preserves both defeats, and a
+    re-hash on the query path would land inside R3's budget. `doctor` is not on that
+    path, so it can afford the content-hash that is the real guarantee. A manifest
+    that cannot be read is another row's finding, not drift. W-246 (B-086).
+    """
+    from . import store as store_mod
+    from .derive import format as derive_fmt
+
+    try:
+        recorded = json.loads((directory / derive_fmt.MANIFEST_NAME).read_bytes())["shards"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return []
+    drifted = []
+    for path in store_mod.iter_shard_paths(root):
+        want = recorded.get(path.name)
+        try:
+            have = store_mod.content_sha(path.read_bytes())
+        except OSError:
+            continue
+        if want is not None and want != have:
+            drifted.append(path.name)
+    return sorted(drifted)
 
 
 def _is_git_tracked(root: Path, path: Path) -> bool:

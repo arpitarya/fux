@@ -338,3 +338,32 @@ def test_a_configured_ceiling_is_what_resolve_parallel_uses():
     assert urlsrc.resolve_parallel(module, 8, _WARN) == 1
     module.MAX_PARALLEL = 4  # what configure() does
     assert urlsrc.resolve_parallel(module, 8, _WARN) == 4
+
+
+def test_a_fetcher_file_without_max_parallel_runs_serial_end_to_end(tmp_path):
+    """SR-LAW-4 Consequences: the fail-safe is exercised through a real module loaded from
+    a file (not a namespace), with a live in-flight counter -- an absent declaration is one
+    URL at a time whatever the consumer configured. W-246 (B-084)."""
+    import importlib.util
+
+    source = tmp_path / "bare.py"
+    source.write_text(
+        "import threading, time\n"
+        "peak = 0\n_in = 0\n_lock = threading.Lock()\n"
+        "def fetch(url):\n"
+        "    global peak, _in\n"
+        "    with _lock:\n        _in += 1\n        peak = max(peak, _in)\n"
+        "    time.sleep(0.01)\n"
+        "    with _lock:\n        _in -= 1\n"
+        "    return f'# {url}\\n'\n",
+        encoding="utf-8",
+    )
+    spec = importlib.util.spec_from_file_location("bare_fetcher", source)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    assert not hasattr(module, "MAX_PARALLEL")
+    urls = [f"https://x/{n}" for n in range(8)]
+    workers = urlsrc.resolve_parallel(module, 16, _WARN)
+    assert workers == 1
+    list(urlsrc._fetch_group(module, urls, workers))
+    assert module.peak == 1

@@ -7,11 +7,11 @@ description: "The live queue's discipline has one home, and this is it. Fifty-ei
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@51da5a4571e6, tests/test_no_work_item_is_lost.py@9b0527556e40, scripts/check-open-work-inbox.py@0eee6f43e26c, .claude/hooks/guard-open-work-inbox.sh@1b479b74cb33]
+owns: [tests/test_open_work_rows_are_short.py@473adaf7624c, tests/test_open_work_is_not_stale.py@51da5a4571e6, tests/test_no_work_item_is_lost.py@9b0527556e40, scripts/check-open-work-inbox.py@0eee6f43e26c, .claude/hooks/guard-open-work-inbox.sh@1b479b74cb33]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 0dbc97ad9698a69f80b384751499ff13d7a33e624122c5c67e442ff177e252c1
+content_sha: 6ae11ca2fb6b483b23111e0311683e31fe5ca842d4d8bd9ce19980029be7cfe3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -441,6 +441,7 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
 
 ### Consequences
 
+- **Rules 37, 38 and 47 are gated** (W-246, 2026-10-04) by `tests/test_open_work_rows_are_short.py`: the three group headers are present, every `work/open/W-*.md` names an `SR-` record or says *no SR affected*, and the queue states no git state (committed, staged, pushed, unpushed). **The thirteen conduct rules (1, 5, 11, 12, 29, 30, 32, 33, 35, 36, 48, 50, 53) are judgement, permanently** — no parser can tell whether a session reconciled before it reported or whether a priority was honest, and a gate that pretended to would be coverage in name only.
 - **A rule changes in exactly one place and appears in exactly one place.**
   Nothing to regenerate, nothing to hold equal, and no second thing a reader can
   quote. The cost is the extra hop from the queue to this record.

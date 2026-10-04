@@ -26,6 +26,27 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 - **`find --json` writes `confidence` before `fused`** (W-253), as `ask` and
   `fux.api` do. Only a payload carrying both (`-q` with `--band`) differs.
 
+### Added
+
+- **A PII rule that can backtrack exponentially is refused at load** (W-255). A
+  `pii.toml` pattern with a variable-length repeat, overlapping alternation or a
+  backreference inside an unbounded repeat (`(a+)+`, `(a|aa)*`, `(\w*\s?)*`)
+  stops with the rule named and the fix: a possessive repeat (`*+`) or an atomic
+  group. The check is conservative and reads only the pattern, so it gives the
+  same answer on every machine. `fux doctor` gains a `pii timing` row that times
+  each rule on long adversarial strings and warns above `fux.toml [doctor]
+  pii_rule_budget_ms`; `fux doctor --fix` writes the new key.
+
+- **`fux doctor` checks the accelerator's shards by content** (W-246). The
+  `accelerator` row compares each shard's bytes to the manifest's sha, so a
+  same-size, same-mtime edit that the cheap freshness check cannot see now
+  warns. The `url sources` row also names a fetcher that declares
+  `MAX_PARALLEL` above one.
+- **The shipped `cdp.py` fetcher template counts paused against resolved
+  requests** (W-246) and raises naming the URL when one is left unresolved,
+  before its load timeout. Existing `.fux/fetchers/cdp.py` copies are yours
+  and unchanged.
+
 ### Changed
 
 - **`fux mcp` and `fux serve` keep the loaded index resident** (W-249, SR-MCP decision 13). One
@@ -80,15 +101,6 @@ byte-identical to Python. ⚠ The index format moves to `fux.index.v7`; run
 `fux ingest --full` once.** Ranking and every verb's stdout are alpha.9's.
 
 ### Added
-
-- **A PII rule that can backtrack exponentially is refused at load** (W-255). A
-  `pii.toml` pattern with a variable-length repeat, overlapping alternation or a
-  backreference inside an unbounded repeat (`(a+)+`, `(a|aa)*`, `(\w*\s?)*`)
-  stops with the rule named and the fix: a possessive repeat (`*+`) or an atomic
-  group. The check is conservative and reads only the pattern, so it gives the
-  same answer on every machine. `fux doctor` gains a `pii timing` row that times
-  each rule on long adversarial strings and warns above `fux.toml [doctor]
-  pii_rule_budget_ms`; `fux doctor --fix` writes the new key.
 
 - **The Node reader answers from `.fux/runtime/`** under `--fast`, and on `fux
   mcp`, when the plane Python built is fresh (W-242 Tier 1). It falls back to

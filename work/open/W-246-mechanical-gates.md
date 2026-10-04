@@ -9,6 +9,8 @@ ball: agent
 
 # W-246 — the mechanical gates the backlog named
 
+**Status 2026-10-04: §A and §B landed (17 of 17), §C next.** Red on the live tree, as findings: `stdlib-only runtime` in `refer/source.py` and `docs/handbook.html` (fixed — L2 as amended); `zero-dependency guarantee` in SR-LAWS d7 (a Law record — `xfail(strict)`, B-271, Arpit's word); SR-SECTIONS lacked its d7 case sentence (written). Judgement calls: B-047's rule-47 words narrowed to the rule's own state words (`committed`, `staged`, `pushed`, `unpushed`, `git status`) because `commit`/`push` hit two legitimate rows; B-156's row-shape check binds runs from 2026-10-04 on.
+
 **Model:** Claude Code, **Sonnet** — every gate below is written against a
 sentence in a record that already says what it asserts; none needs a design.
 Land them in small commits grouped as the table groups them; a gate that goes

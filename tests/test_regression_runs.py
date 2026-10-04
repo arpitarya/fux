@@ -490,3 +490,78 @@ def test_a_conforming_paired_report_passes(tmp_path: Path) -> None:
     text = report_of(run).read_text(encoding="utf-8").lower()
     assert "headroom" in text
     assert all(d in text for d in HEADROOM_DIRECTIONS)
+
+
+# --- B-156: the per-query rows file is rows, and is not the question set -------
+# SR-RS decision 21b (ruled *fires*, W-251 section 2). The old gate passed on ANY
+# `.jsonl` -- `2026-09-05-answer-top3` satisfied it on a copy of the goldens file.
+# W-246.
+
+#: Every `.jsonl` under a run's `evidence/` must not be byte-identical to a released
+#: question set (the W-83 shape: a file that exists, standing in for rows). Applies to
+#: every filed run -- no run today trips it.
+QUESTION_SETS = ROOT / "work" / "golden" / "questions"
+
+#: The row-SHAPE rule (`id`, and `rank` or `arm`) is baselined, like the two rules
+#: above it: filed reports are frozen, and 2026-08-29..2026-10-03 evidence carries a dozen
+#: shapes (`query_id`, `q`, `url`, ...) the rule was never written against. SR-RS d21b
+#: says a cleverer check "cannot be written without knowing each run's arm structure in
+#: advance"; the minimum it CAN say -- every row names its query and says which rank or
+#: which arm it measured -- binds from the day it was ruled to fire.
+ROW_SHAPE_SINCE = "2026-10-04"
+
+
+def _evidence_jsonl(run: Path) -> list[Path]:
+    return sorted((run / "evidence").rglob("*.jsonl")) if (run / "evidence").is_dir() else []
+
+
+def _question_set_digests() -> set[str]:
+    import hashlib
+
+    return {hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(QUESTION_SETS.glob("set-*.jsonl"))}
+
+
+def _row_problems(path: Path) -> list[str]:
+    import json
+
+    bad = []
+    for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            bad.append(f"{path.name}:{n}: not JSON")
+            continue
+        if not (isinstance(row, dict) and "id" in row and ("rank" in row or "arm" in row)):
+            bad.append(f"{path.name}:{n}: a row needs `id` and `rank` or `arm`")
+    return bad
+
+
+@pytest.mark.parametrize("run", row_runs(), ids=lambda p: p.name)
+def test_a_rows_file_is_not_a_question_set(run: Path) -> None:
+    """SR-RS d21b: a `.jsonl` under evidence/ is not byte-identical to any released
+    `questions/set-N.jsonl` -- the file existing is not the rows existing."""
+    import hashlib
+
+    sets = _question_set_digests()
+    same = [p.name for p in _evidence_jsonl(run) if hashlib.sha256(p.read_bytes()).hexdigest() in sets]
+    assert not same, f"{run.name}: {same} is a copy of a question set, not per-query rows"
+
+
+@pytest.mark.parametrize(
+    "run", [r for r in row_runs() if r.name[:10] >= ROW_SHAPE_SINCE], ids=lambda p: p.name
+)
+def test_every_row_names_its_query_and_its_rank_or_arm(run: Path) -> None:
+    """SR-RS d21b: every row of a run filed from the ruling on carries `id` and `rank` or `arm`."""
+    bad = [m for p in _evidence_jsonl(run) for m in _row_problems(p)]
+    assert not bad, f"{run.name}:\n  " + "\n  ".join(bad[:10])
+
+
+def test_the_row_checks_catch_a_copied_question_set_and_a_shapeless_row(tmp_path: Path) -> None:
+    """The gate's own test: a rows file with no `id`/`rank`/`arm` is a problem; a good one is not."""
+    good, bad = tmp_path / "good.jsonl", tmp_path / "bad.jsonl"
+    good.write_text('{"id": "q1", "arm": "a", "hit": true}\n{"id": "q1", "rank": 2}\n', encoding="utf-8")
+    bad.write_text('{"q": "text only"}\nnot json\n', encoding="utf-8")
+    assert _row_problems(good) == []
+    assert len(_row_problems(bad)) == 2

@@ -7,10 +7,10 @@ description: "The browser fetcher, for documents a plain GET cannot read. Drives
 status: accepted
 date: 2026-08-19
 feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind a session a headless client does not have: it borrows your browser's and hands fux the bytes"
-owns: [.fux/fetchers/cdp.py@8af9ecc6bffd, src/fux/templates/cdp.py.txt@079a02043017]
+owns: [.fux/fetchers/cdp.py@8af9ecc6bffd, src/fux/templates/cdp.py.txt@2534b0cf35c5]
 laws: [L2, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 7b67f462068d59697894c5e5899a8f59e8e00e21258cd448b06f747354649ad5
+content_sha: 62a20bb0799d834289788c0cb967507cde4afc64ead7826511b42cf658b82731
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -609,6 +609,7 @@ constraint and `MAX_PARALLEL = 1` are all untouched.
 
 ### Consequences
 
+- **A paused request left unresolved raises at once** (W-246, 2026-10-04): the fetch counts requests paused against requests resolved and raises, naming the URL, the moment they differ, instead of waiting out `LOAD_TIMEOUT_S`; `tests/ingest/test_cdp_fetcher.py` skips one resolution to prove it.
 - **A browser must exist on the machine that ingests.** Fine for a developer
   laptop and for most CI, and it is the price of reading pages that only exist
   after JavaScript. A URL that does not need it should not declare `fetch=cdp`.

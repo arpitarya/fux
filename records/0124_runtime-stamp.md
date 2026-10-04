@@ -10,7 +10,7 @@ feature: "`.fux/runtime/stamp.json` — the cheap staleness pre-filter, and its 
 owns: []
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 0238d83a701a774e9f922bbf55480d4d00fc4b2d721c7bcc93aa2685b5201315
+content_sha: 05c6d0424d2997b7d383201803978f4bb4230718502fcb75f7322412d7a85b85
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -144,6 +144,7 @@ this moved where they are written, not what they are.
 
 ### Consequences
 
+- **The deep check exists in `doctor`** (W-246, 2026-10-04): the `accelerator` row re-hashes each committed shard against the sha `manifest.json` recorded at build time, so a same-size, same-mtime byte flip warns even though `is_fresh` cannot see it. It runs off the query path, which is why R3's budget is untouched.
 - The common case — nothing changed since the last build — is answered by an
   `os.stat()` per shard instead of a content hash per shard, which is
   materially cheaper at corpus scale.

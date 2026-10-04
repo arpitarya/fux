@@ -509,3 +509,36 @@ def test_no_dotenv_at_all_is_not_an_error(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     module = _fresh()
     assert module._dotenv_values() == {}
+
+
+def test_a_paused_request_left_unresolved_raises_naming_the_url_not_a_timeout(mw, monkeypatch):
+    """SR-CDP-FETCHER Consequences: the invariant that every paused request is resolved had no
+    guard inside Chrome -- forget one and the page waits out `LOAD_TIMEOUT_S`. The fetch counts
+    paused against resolved and raises at once, naming the URL. W-246 (B-085)."""
+    peer = FakeChrome(
+        events=[
+            ("Page.navigate", _paused("SUB", "https://s.test/app.js", resource_type="Script")),
+            ("Fetch.continueRequest", _paused("DOC", "https://s.test/d", headers=[("content-type", "text/html")])),
+        ],
+        bodies={"DOC": _body(b"<html></html>")},
+    )
+    session = _session_on(mw, monkeypatch, peer)
+    real = session._resolve
+    # The regression: a refactor that skips the resolution of a subresource.
+    monkeypatch.setattr(
+        session, "_resolve", lambda ws, rid, *, abort: None if rid == "SUB" else real(ws, rid, abort=abort)
+    )
+    with pytest.raises(mw.FetcherError) as caught:
+        session.fetch_resource("https://s.test/d")
+    assert "https://s.test/d" in str(caught.value)
+    assert "paused" in str(caught.value) and "resolved" in str(caught.value)
+    assert peer.params_for("Fetch.failRequest") == [], "it raised before waiting for another event"
+
+
+def test_a_balanced_fetch_does_not_trip_the_counter(mw, monkeypatch):
+    peer = FakeChrome(
+        events=[("Page.navigate", _paused("DOC", "https://s.test/d", headers=[("content-type", "text/html")]))],
+        bodies={"DOC": _body(b"<html></html>")},
+    )
+    session = _session_on(mw, monkeypatch, peer)
+    assert session.fetch_resource("https://s.test/d").body == b"<html></html>"

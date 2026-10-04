@@ -682,3 +682,19 @@ def test_no_fetcher_receives_another_fetchers_keys(tmp_path):
     assert "cdp_port" not in http_keys
     assert "timeout_s" not in cdp_keys
     assert "cdp_port" in cdp_keys
+
+
+def test_every_template_pii_rule_exists_in_this_repos_pii_toml():
+    """SR-PII d17: this repo's `.fux/pii.toml` is a consumer copy and may carry more rules
+    or different bodies than the template -- but a rule the template ships and the copy has
+    lost is a hole nobody sees. Subset by rule NAME, never byte-equal. W-246 (B-073)."""
+    import tomllib
+
+    root = Path(__file__).resolve().parents[1]
+    from importlib import resources
+
+    template = (resources.files("fux") / "templates" / "pii.toml.txt").read_text(encoding="utf-8")
+    shipped = {r["name"] for r in tomllib.loads(template)["rule"]}
+    mine = {r["name"] for r in tomllib.loads((root / ".fux" / "pii.toml").read_text(encoding="utf-8"))["rule"]}
+    assert shipped, "the template parsed to no rules"
+    assert shipped <= mine, f".fux/pii.toml lost template rule(s): {sorted(shipped - mine)}"

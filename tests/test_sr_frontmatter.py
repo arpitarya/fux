@@ -263,3 +263,32 @@ def test_the_h1_agrees_with_the_name(path: Path) -> None:
         f"{path.name}: heading says {m.group(1)!r}, frontmatter name is "
         f"{meta_of(path)['name']!r}"
     )
+
+
+#: `kind: process` records that own nothing, each by a stated decision of its own.
+#: [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) veto 6 names exactly
+#: these two. An entry is a claim: delete it the day the record gains a test.
+PROCESS_OWNS_NOTHING = {
+    "SR-WORK-SCALE": "decision 7 case (a|b) -- its own decisions say which (veto 6 names it)",
+    "SR-PORT-LIST": "decision 7 case (a|b) -- its own decisions say which (veto 6 names it)",
+}
+
+
+@pytest.mark.parametrize("path", records(), ids=lambda p: p.name)
+def test_a_process_record_owns_its_enforcement(path: Path) -> None:
+    """[SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) veto 6: a `kind: process`
+    record owns a test -- the kind's only enforcement is that its rule has one.
+    The exemption list names each exempt record and its stated decision. W-246 (B-056).
+    """
+    meta = meta_of(path)
+    if meta["kind"] != "process":
+        return
+    if meta["owns"]:
+        assert meta["name"] not in PROCESS_OWNS_NOTHING, (
+            f"{meta['name']} now owns {meta['owns']}: delete its PROCESS_OWNS_NOTHING entry"
+        )
+        return
+    assert meta["name"] in PROCESS_OWNS_NOTHING, (
+        f"{path.name}: kind: process with `owns: []` -- a drawer. Own the test that "
+        "enforces its rule, or add it to PROCESS_OWNS_NOTHING naming the stated decision."
+    )

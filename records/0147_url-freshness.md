@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: ba70c98b41524785b0be9927fa10c856448d0a38d5f8f7a2175729a871900dd6
+content_sha: 58fee21fea9cab95b6184430ab3c759e46afbcebdb1bc826fe13327a2d58ed6c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -584,6 +584,8 @@ this moved where they are written, not what they are.
 **No decision here moved** (W-255, 2026-10-04): `fux.toml` and its template gained `[doctor] pii_rule_budget_ms` ([SR-CONFIG](0113_config.md), [SR-PII](0148_pii.md) decision 23); no other key moved.
 
 **No decision here moved** (W-248, 2026-10-04): in `urlsrc.py` the "nothing readable" skip reason is spelled from `decoders.reason_nothing_readable`; nothing this record decides moved.
+
+**No decision here moved** (W-246, 2026-10-04): `refer/source.py`'s module docstring states L2 as amended on 2026-09-06; no code moved.
 
 ### Consequences
 

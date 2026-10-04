@@ -584,3 +584,64 @@ def test_archived_content_is_reachable_now() -> None:
     The record was unreachable while the change amending it was being written.
     """
     assert "SR-ARCHIVED-CONTENT" not in _records_with_no_src_component()
+
+
+# --- B-055: a component record that owns nothing says which case it is ---------
+
+#: The ten `kind: component` records with `owns: []`, by name -- never a range.
+#: Each is one of [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision
+#: 7's two honest cases. The list is asserted equal to disk, so an eleventh
+#: record arriving (or one gaining an `owns`) is seen, not inferred.
+COMPONENT_RECORDS_THAT_OWN_NOTHING = {
+    "SR-FIND",
+    "SR-URL-INGEST",
+    "SR-DIR-LIST",
+    "SR-CACHEDIR-TAG",
+    "SR-DOCS-TABLE",
+    "SR-RUNTIME-MANIFEST",
+    "SR-RUNTIME-STAMP",
+    "SR-RUNTIME-STATS",
+    "SR-LOCKS",
+    "SR-SECTIONS",
+}
+
+
+def _component_records_owning_nothing() -> dict[str, str]:
+    from fux import frontmatter as fm
+
+    out = {}
+    for path in sorted(SR_DIR.glob("[0-9][0-9][0-9][0-9]_*.md")):
+        parsed = fm.parse(path.read_text(encoding="utf-8"))
+        if parsed.meta.get("kind") == "component" and not parsed.meta.get("owns"):
+            out[parsed.meta["name"]] = parsed.body
+    return out
+
+
+def test_the_component_records_owning_nothing_are_exactly_these_ten() -> None:
+    """SR-WORK-OWNERSHIP d7: the owns-nothing set is pinned by name. W-246 (B-055)."""
+    actual = set(_component_records_owning_nothing())
+    assert actual == COMPONENT_RECORDS_THAT_OWN_NOTHING, (
+        f"newly owning nothing: {sorted(actual - COMPONENT_RECORDS_THAT_OWN_NOTHING)}; "
+        f"gained an owns: {sorted(COMPONENT_RECORDS_THAT_OWN_NOTHING - actual)}"
+    )
+
+
+@pytest.mark.parametrize("name", sorted(COMPONENT_RECORDS_THAT_OWN_NOTHING))
+def test_a_component_record_owning_nothing_is_reachable_and_says_its_case(name: str) -> None:
+    """SR-WORK-OWNERSHIP d7 (weak rule, W-251 ruling 16): `kind: component` with `owns: []`
+    has a `describes` row on a `src/` component -- else no change can ever demand it --
+    AND a sentence naming *decision 7* / *d7* and which *case* it is. The strong rule
+    (every record owns something) stays Arpit's. W-246 (B-055).
+    """
+    from sr_lib import describes_table
+
+    records = _component_records_owning_nothing()
+    assert name in records, f"{name} no longer owns nothing (see the pinned-set test)"
+    rows = [c for c, rs in describes_table().items() if name in rs and c.startswith("src/")]
+    assert rows, f"{name}: owns nothing and describes no src/ component -- unreachable by the gate"
+    body = re.sub(r"\s+", " ", records[name])
+    sentences = re.split(r"(?<=[.!?])\s+", body)
+    assert any(
+        re.search(r"decision 7|\bd7\b", s, re.I) and re.search(r"\bcase\b", s, re.I)
+        for s in sentences
+    ), f"{name}: no sentence names SR-WORK-OWNERSHIP decision 7 and which case this record is"

@@ -417,3 +417,30 @@ def test_the_node_tool_file_matches_the_python_literal():
         "node/mcp-tools.json and fux.mcp.TOOLS have drifted — the two halves "
         "of one product would describe themselves differently to an agent"
     )
+
+
+@pytest.mark.parametrize(
+    ("tool", "arguments"),
+    [
+        ("fux_passage", {"path": "docs/retry.md", "line_start": 3, "line_end": 4}),
+        ("fux_related", {"path": "docs/retry.md"}),
+    ],
+)
+def test_every_field_a_handler_emits_is_named_in_its_description_and_vice_versa(repo, tool, arguments):
+    """SR-MCP Consequences: a description is what an agent reads to decide how to use a result,
+    so the fields a handler emits and the fields its description names are one set -- for
+    `fux_passage` and `fux_related`, as the `fux_search` tests do for theirs. W-246 (B-065).
+
+    **Completeness in general stays judgement**: this proves the two lists agree, not that the
+    prose says anything useful about what each field means. Every backticked token in these two
+    descriptions is a field name by construction, which is what keeps `vice versa` checkable.
+    """
+    import re
+
+    emitted = set(_call(repo, tool, arguments)["structuredContent"])
+    (spec,) = [t for t in TOOLS if t["name"] == tool]
+    named = set(re.findall(r"`([A-Za-z_]+)`", spec["description"]))
+    assert emitted == named, (
+        f"{tool}: emitted but not named {sorted(emitted - named)}; "
+        f"named but not emitted {sorted(named - emitted)}"
+    )

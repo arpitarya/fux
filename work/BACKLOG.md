@@ -123,6 +123,7 @@ with its proposal.
 | B-268 | A query log, parked — "legal to collect and still not collected"; the opt-in journal (SR-PROVENANCE d10) is the only lawful collector and none runs; ruled *not now* 2026-10-04 (ex-B-137) | [SR-LAWS](../records/0001_LAWS.md) decision 8 · [SR-LAW-9](../records/0011_LAW-9-use-record.md) Consequences | Arpit: a consumer whose journal may be graded (`informed`, SR-RS d11) |
 | B-269 | The build plan — the `unbuilt`/`ungated` rows whose approach was ruled 2026-10-04 and whose build nobody is about to start (B-031, B-041, B-259): key files, DoD, size, model, the law each must respect | [`build-plan-2026-10.md`](proposals/build-plan-2026-10.md) | Per section: its own trigger fires, or a session is about to build it — then a `W-nn` |
 | B-270 | `fux enrich` plans the queue's *nothing readable* documents (W-248), but nothing indexes what it writes for them: ingest drops an unreadable document before extraction | [SR-ENRICH](../records/0137_enrich.md) d4 | the `enriched` mode ruling (W-251 §3 #1) |
+| B-271 | SR-LAWS decision 7 still says `concurrent.futures` keeps *"the zero-dependency guarantee untouched"* — a guarantee L2's 2026-09-06 amendment withdrew; a Law record changes only on Arpit's word, so `tests/test_withdrawn_claims.py` holds it `xfail(strict)` | [SR-LAWS](../records/0001_LAWS.md) d7 | Arpit's word on one sentence (e.g. *"…so no runtime dependency is added"*) |
 
 ---
 

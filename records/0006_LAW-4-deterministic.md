@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L4
 owns: []
 laws: [L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 34e55759625234451dc5ee720617c573942d7c5d47eb70c290d02ddb0cad7e4e
+content_sha: 364a632157e5edbee4d0f112661221c69015d30ce728858204cd8c27a937fc8f
 ---
 
 # SR-LAW-4 — L4 — deterministic; no model in the maintenance path
@@ -131,6 +131,7 @@ on 2026-09-06 at Arpit's ruling.
 
 ### Consequences
 
+- **The default is tested end to end, and `doctor` names the opt-ins** (W-246, 2026-10-04): a fetcher file with no `MAX_PARALLEL` runs one URL at a time (`tests/ingest/test_url_parallel.py`), and the `url sources` row of `fux doctor` lists every `.fux/fetchers/*.py` declaring `MAX_PARALLEL` above 1, read with `ast` and never imported.
 - **Easier:** review. A reviewer diffs the index and sees exactly what changed.
 - **Easier:** the compliance story — reproducibility is a regulatory word, and fux gets it for free.
 - **Harder:** every ranking improvement must be arithmetic somebody can read, not a model somebody trusts.

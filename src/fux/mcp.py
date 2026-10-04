@@ -136,7 +136,7 @@ def _tools(top: int) -> list[dict]:
             "Read the verbatim text of a cited span, addressed as returned by "
             "fux_search. Use this instead of reading a whole file when you already "
             "have a citation: it returns only the cited lines and the hash they were "
-            "read at."
+            "read at, as `path`, `line_start`, `line_end`, `sha` and `text`."
         ),
         "inputSchema": {
             "type": "object",
@@ -153,7 +153,8 @@ def _tools(top: int) -> list[dict]:
         "description": (
             "The neighbourhood around a document: what it links to, what links to it, "
             "what it supersedes or is superseded by, and whether it is archived. Use "
-            "when a result raises 'what else was decided with this?'"
+            "when a result raises 'what else was decided with this?' It returns `path`, "
+            "`title`, `archived`, `superseded`, `outbound` and `inbound`."
         ),
         "inputSchema": {
             "type": "object",

@@ -9,11 +9,11 @@ amended: 2026-09-13
 date: 2026-08-27
 ratified: 2026-08-27
 feature: the record-to-component model, and the `describes` relation W-82 ruling 4 added to it
-owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@1eba43715793, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@e3d2172d0b11, tests/test_sr_frontmatter.py@5ba563cc5d37, tests/test_sr_ownership.py@9d9ddd14cbfd, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@8124ebcad40e, tests/test_sr_register_status.py@acae7406d76c]
+owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@1eba43715793, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@e3d2172d0b11, tests/test_sr_frontmatter.py@c8c81b4b394a, tests/test_sr_ownership.py@2e28ba0be70e, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@8124ebcad40e, tests/test_sr_register_status.py@acae7406d76c]
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 2f522de98b9dc746c42752325ffe2ade1473786c1f145be7f47055c49c5dcbe3
+content_sha: 3278de007dff54f9708febe1ea0275ca22070a2e9df561fef1f7442ab7f23da3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -191,7 +191,7 @@ src/fux/query/rank.py        SR-RANKING         SR-TUNE
    runtime-plane companions. Case (b): it states a mechanism spread across
    components each already claimed by the record carrying its decisions. ⚠ **In
    both, the freshness gate cannot demand that record**, so nothing mechanical
-   catches it going stale.
+   catches it going stale. ⚠ **Weakly gated since 2026-10-04** (W-246, W-251 ruling 16): `tests/test_sr_ownership.py` pins the ten `component` records with `owns: []` by name and requires each to carry a `describes` row on a `src/` component and a sentence naming this decision and which case it is. The strong rule, that every record owns something, stays Arpit's.
 
    ⚠ **THIS record's own case-(b) claim is RETRACTED** (2026-09-21, W-208). It
    read *"this record owns nothing … it is the exact hole this record is about,
@@ -599,7 +599,7 @@ top-level definitions.
    `test_a_row_written_after_a_commit_does_not_convict_it`.
 6. **A `kind: process` record owns no test.** The kind's only enforcement is
    that its rule has one; a process record owning nothing is the drawer this
-   record warned about, open. ⚠ **Not gated today.** **This record left that
+   record warned about, open. ⚠ **Gated since 2026-10-04** (W-246): `tests/test_sr_frontmatter.py::test_a_process_record_owns_its_enforcement` fails a `kind: process` record with `owns: []` that is not on its pinned exemption list, which names SR-WORK-SCALE and SR-PORT-LIST and the decision each stands on. **This record left that
    state on 2026-09-21** (decision 7's retraction, W-208); **SR-PORT-LIST and
    SR-WORK-SCALE are still in it** (`owns: []`), each by a stated decision of
    its own rather than by omission; SR-WORK-LIFECYCLE has since gained a test
