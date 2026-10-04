@@ -26,6 +26,14 @@ Rules:
 
 ---
 
+## 2026-10-04 — **3.0.0-alpha.10 released — PyPI and npm**
+
+| what | evidence |
+|---|---|
+| **the release** | [v3.0.0-alpha.10](https://github.com/arpitarya/fux/releases/tag/v3.0.0-alpha.10), pre-release, on `30429df1`; Publish run `37181148649`: build, PyPI, npm all green; PyPI serves `3.0.0a10`, npm's `alpha` tag serves `3.0.0-alpha.10` (with provenance) |
+| **what ships** | W-242 (Node `--fast`, Node `fux build`), W-168 step 8 and W-237 removed, **index `fux.index.v7`** — `fux ingest --full` once |
+| **the CI it waited on** | the release commit `91e82dce` went **red** first: node-arm shard 2/3, 1 of 75 on the `api` lane, a 2-ulp graph-boosted score. Bisected to `a62409ed`'s re-ingested index (the data moved, the engine did not). Fixed in `30429df1`: the lane compares at `round(9)` like every other (SR-RANKING d8a), with `tests/test_node_arm_tolerance.py` as the two-strikes gate. Green on push and nightly |
+
 ## 2026-10-03 — **W-242 Tier 2: Node builds the plane, byte-identical; W-242 closed**
 
 | what | evidence |

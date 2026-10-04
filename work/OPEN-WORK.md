@@ -46,7 +46,7 @@ here. Read that record before changing anything below it.
 
 ### testing
 
-- 🟢 **W-243** · `agent` — CI in ~2 min. Built: FULL skips a cell whose code went green, Windows hot spot batched. **Step 1 reopens: W-242 has landed, so re-run its bench.** Then read the first `main` run. **Opus.** [detail](open/W-243-ci-two-minutes.md)
+- 🟢 **W-243** · `agent` — CI in ~2 min. Step 2's key saves on `main` ✅; step 1 re-benched with W-242 landed, still STOP by its bar. Left: confirm a docs-only push skips FULL; batch `test_node_accel` (~40 s on Windows). **Opus.** [detail](open/W-243-ci-two-minutes.md)
 - 🟢 **W-246** · `agent` — the gates the records asked for and nobody wrote: 16 small stdlib tests and 5 `doctor` rows, each named with the sentence it enforces. **Sonnet.** [detail](open/W-246-mechanical-gates.md)
 - 🟢 **W-252** · `agent` — a pre-registration for the Node arm on lab rungs (the live one names the voided playground), then one rerun; parity has read 0 discordant three times. **Sonnet.** [detail](open/W-252-node-arm-preregistration-2.md)
 

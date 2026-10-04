@@ -14,12 +14,24 @@ ball: agent
 
 | step | state | evidence |
 |---|---|---|
-| 1 — one Node process per pass | 🛑 **STOPPED by its own rule**: one process is 1.11–1.44x faster, not ~5x. Nothing built; the arm matrix is unchanged. **Reopens when W-242 T0 and T1 have landed**: re-run the bench | [`2026-09-30-ci-arm-batching`](../regression/2026-09-30-ci-arm-batching/report.md) |
+| 1 — one Node process per pass | 🛑 **STOPPED by its own rule, twice**: one process is 1.11–1.44x faster, not ~5x. **Re-run 2026-10-03 after W-242 landed: 1.21–1.43x, still STOP.** The arm compares the scan, which Tier 1's plane does not touch, and each call still rebuilds the graph plane. **Reopens only when W-242's Fork A (Node reads `graph.json`) is ruled and built** | [`2026-09-30-ci-arm-batching`](../regression/2026-09-30-ci-arm-batching/report.md) |
 | 2 — skip FULL on a known verdict | ✅ built: [`scripts/ci-key.py`](../../scripts/ci-key.py), [`full-verdict`](../../.github/actions/full-verdict/action.yml), a `verdict` job, the `publish.yml` gate, [SR-WORK-RELEASE](../../records/0063_WORK-release.md) d14. **17 of 40** recent commits would skip, not 22 | [analysis §Step 2](../regression/2026-09-30-ci-arm-batching/ANALYSIS.md) |
 | 3 — Windows at the cause | 🟡 partly: profiled (one test was 54 % of the suite's spawns and 72 s on Windows; batched, answers identical on 166 commits); `TMP`/`TEMP` on `$RUNNER_TEMP`; FULL prints `--durations=30`. **In-process CLI tests and a second shard not done** — they wait on the 30-slowest profile from the first `main` run | [analysis §Step 3](../regression/2026-09-30-ci-arm-batching/ANALYSIS.md) |
 | 4 — no queue, no serial stage | 🟡 `ladder` folded into `build`. **`needs:` stays**: 38 jobs against 20, and 8 macOS against 5, so the drop condition does not hold. It can only hold after step 1 | [analysis §Step 4](../regression/2026-09-30-ci-arm-batching/ANALYSIS.md) |
 
-**What is left for done:** push, then read the first `main` run. Check that the
+**First `main` runs read 2026-10-04 (Claude Code, Opus):**
+- ✅ **The `verdict` job saved its key** on the green push run `37140432209`
+  (`ci-full-v1-e9350750…-all`), and the nightly `37161222731` computed the same
+  key for the same tree.
+- **Windows (py3.14) slowest test:** `test_sr_freshness` at **29.5 s**, down
+  from 72 s before step 3's batching.
+- ⚠ **A new cost, from W-242's tests:** `tests/derive/test_node_accel.py` adds
+  ~40 s on Windows: 128 Node processes across four `top` values. Batching it in
+  one Node process is the cheap fix, and it is not done.
+- ⏳ **Still to observe:** a docs-only push after a green FULL skipping every
+  FULL cell. The 2026-10-04 session-close push is that push.
+
+**What was left for done (as written 2026-09-30):** push, then read the first `main` run. Check that the
 `verdict` job saved its key, that a docs-only push after it skips every FULL
 cell, and what the Windows durations say. Then DoD 1–4 as below. DoD 3 (the arm
 still finds a planted defect) is untouched, because the arm did not change.

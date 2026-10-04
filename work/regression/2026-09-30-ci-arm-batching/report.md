@@ -72,3 +72,28 @@ python work/regression/2026-09-30-ci-arm-batching/evidence/bench.py 3
 | artifact | author | could reach |
 |---|---|---|
 | `bench.py`, `one-process.mjs`, this report, `ANALYSIS.md` | Claude (Opus, Claude Code), 2026-09-30 | none: no golden question, judgment or score is involved |
+
+---
+
+## Re-run 2026-10-03, after W-242 Tiers 0–2 (Claude Code, Opus)
+
+The item's reopen condition fired: W-242 T0 and T1 have landed. The same
+`bench.py`, unchanged, 3 trials on this repo at `194d0ca4`, with the 1-minute
+load at **8–10** (another session was active). The ratio compares the two arms
+inside one trial, so load moves both:
+
+| trial | 24 processes | one process | ratio |
+|---|---|---|---|
+| 1 | 7.07 s | 5.31 s | 1.33× |
+| 2 | 7.36 s | 5.14 s | 1.43× |
+| 3 | 7.40 s | 6.10 s | 1.21× |
+
+Rows: `evidence/bench-2026-10-03-after-w242.jsonl`.
+
+**Verdict against the item's bar: still STOP.** The in-process calls fell from
+140–700 ms to 85–300 ms each, because Tier 0 reads each shard once. The arm
+compares the **default** path, which is the scan, so Tier 1's plane does not
+apply to it. What is left per call is the scan plus Node's in-memory
+graph-plane rebuild. Only W-242's open **Fork A** (Node reads `graph.json`),
+Arpit's, would remove the second. **The next reopen trigger is Fork A ruled and
+built.**

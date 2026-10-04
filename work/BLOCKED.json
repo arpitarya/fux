@@ -1,10 +1,8 @@
 {
- "decision": "ASK",
- "reason": "L11 event 2026-10-03 (W-244): `fux ingest --full` at the repo root enumerated the LOCKED key directory with rglob and wrote four key-file NAMES into .fux/.fuxignore; no content or answer reached the session, and the working-tree .fuxignore was restored to HEAD before any commit.",
- "questions": [
-  "W-244: is the cost `informed`-only, and may ingest prune a `!`-excluded directory instead of enumerating it (recommended), so `fux ingest` can run at this repo's root again?"
- ],
- "safe_alternative": "Anything that does not run `fux ingest` at this repo's root: W-242 Tiers 1-2 (fux build, queries, ingests of corpora outside this repo). W-168 step 8's removal is committed (a62409ed) with a v7 index and HEAD's .fuxignore.",
+ "decision": "PROCEED",
+ "reason": "W-244 was ruled 2026-10-03 (Cowork, under Arpit's delegation): no number reclassified; prune at the `!`-exclude. Ball agent. 3.0.0-alpha.10 is released on PyPI and npm.",
+ "questions": [],
+ "safe_alternative": "W-244's fix (prune the ingest walk at a `!`-excluded directory). Until it lands, still no `fux ingest` at this repo's root.",
  "surfaced": true,
- "filed": "2026-10-03"
+ "filed": "2026-10-04"
 }
