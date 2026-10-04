@@ -2,22 +2,34 @@
 type: Compare Doc
 title: "Consumer-side template refresh — how an engine fix reaches a consumer's `.fux/decoders/`, `.fux/fetchers/` and `pii.toml`"
 description: "Backlog B-013 and B-014 (B-073 and B-221 adjacent) as one fork. Today a copy written once into a consumer's `.fux/` is frozen forever; four real decoder defects would each have needed every consumer to refresh by hand. Options: a template sha stamp with engine-owned refresh of unedited copies, doctor-names-the-gap only, or keep the freeze. Recommended: the stamp — but SR-DECODE d10 DECLINED it, so reopening is Arpit's."
-status: proposed (W-251 §3 #2 — Arpit's ruling; reopens SR-DECODE d10)
+status: proposed (W-251 §3 #2 — Arpit's ruling; option A crosses three fences in his name, option B none) — NOT ratifiable by delegation, re-read 2026-10-04
 timestamp: 2026-10-03T00:00:00Z
 filed: 2026-10-03
 ---
 
 # Consumer-side template refresh
 
-> **Verdict: PROPOSED — option A, the template stamp.** Every file the engine
-> writes into a consumer's `.fux/` carries `# fux-template: <sha>` (TOML: a
-> `template_sha` key). A copy whose stamp matches **any** shipped version of
-> that template is **engine-owned** and is refreshed on upgrade exactly as
-> SR-DOTFUX 6a already refreshes `node/`; a copy that was edited is
-> **consumer-owned**, frozen, and `doctor` names the template version it forked
-> from and what changed since. **Confidence: medium** — the mechanism is small
-> and its evidence is in this repository, but it changes who owns
-> `.fux/decoders/`, and SR-DECODE d10 **declined** exactly this stamp (*"copies inert until edited, resolved by a hash stamp; it was declined in favour of the simpler rule"*).
+> **Verdict: PROPOSED — option A, the template stamp; option B if he will not
+> reopen a rewrite.** Every file the engine writes into a consumer's `.fux/`
+> carries `# fux-template: <sha>` (TOML: a `template_sha` key). **A:** a copy
+> whose stamp matches **any** shipped version is engine-owned and refreshed on
+> upgrade exactly as SR-DOTFUX 6a refreshes `node/`; an edited copy is frozen
+> and `doctor` names the version gap. **B:** the stamp, and `doctor` names the
+> gap for every copy — never writes. **Confidence: medium.**
+> ⚠ **Re-read 2026-10-04 (W-251 §4 research), two corrections.** (i) Option A
+> is **not** the variant Arpit declined on 2026-08-26 (W-86 P7, WORKLOG
+> 6641–6647): that one was *copy inert, built-in runs until edited*; A keeps
+> *the copy is what runs* (SR-DECODE d8/d10) and adds *an unedited copy is
+> refreshed on upgrade*. SR-DOTFUX's rejection reason — *"a consumer reading
+> `.fux/decoders/pdf.py` and finding it is not the code that ran"* — does not
+> apply to A. (ii) A still crosses **three fences in his name**: SR-DOTFUX d6
+> (*"If a change must reach existing repos, the mechanism is a loader refusal
+> or a `doctor` check — never a rewrite"*), SR-FETCHER d12 (his, 2026-08-28,
+> restating d6), and L10's *"seeded once, then the consumer owns it"*. **B
+> crosses none** and is the d6-conformant mechanism. **So this fork is his
+> alone (W-251 §3 #2) and nothing here was ratified by delegation** — half the
+> mechanism already exists (`decoderdigest.py` hashes a copy; `doctor._provenance`
+> reports a digest mismatch), so B is S and A is M.
 > **Reopen-trigger:** the fifth engine-side defect in a shipped template that a
 > consumer could not receive, or a consumer reporting an edited copy silently
 > overwritten.

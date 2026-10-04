@@ -58,6 +58,20 @@ moved to the archive on 2026-09-14.
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
 
+## Filed 2026-10-04
+
+* [The build plan, October 2026](build-plan-2026-10.md) — the 2026-10-04 ruling
+  pass over the backlog ([W-251](../open/W-251-backlog-audit-rulings.md) §4)
+  left three decided-but-unbuilt rows whose **approach is now settled** and
+  whose build nobody is about to start: B-031 (a `--json` shape for the write
+  verbs — declared in SR-CLI, waiting for a caller), B-041 (fence-aware
+  grammars for `.rst`/`.adoc`/`.org` in one module both consumers import),
+  B-259 (`unicodedata` column width, no dependency). Key files, DoD, size,
+  model and the law each must respect, so a row graduates by copying a section;
+  the three rows that graduated straight into items the same day (W-253, W-254,
+  W-255) and the measurements (W-256) are named so the map is whole. **Graduates
+  per section** — its own trigger fires, or a session is about to build it.
+
 ## Filed 2026-10-03
 
 * [The measurement plan, October 2026](measurement-plan-2026-10.md) — the
@@ -68,6 +82,12 @@ the defect this ordering exists to make visible.*
   instrument and bar, so a section becomes a `W-nn` by copying it; twelve
   rows stay blocked and the file says on what. **Graduates per section** —
   its data in hand *and* a ranking or design decision waiting on the number.
+  ⚠ **2026-10-04 (W-251 §4):** §2, §4-lab and §8 graduated into
+  [W-256](../open/W-256-no-key-measurements.md), §7 into
+  [W-257](../open/W-257-enriched-rung.md), §4-live into
+  [W-258](../open/W-258-live-network-captures.md); §5's *"tabular seed documents
+  SR-WORK-TESTDATA T-rows describe"* was wrong — no T-row names tabular documents,
+  a T15 is the prerequisite. §1, §3, §5 and the blocked rows stay parked.
 
 ## Filed 2026-09-28
 

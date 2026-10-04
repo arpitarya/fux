@@ -32,10 +32,18 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-03** (Cowork, Fable 5.1 — the backlog audit, W-251).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-04** (Cowork, Fable 5.1 — the second ruling pass over W-251).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-10-03 (latest) — THE BACKLOG AUDIT: 100 ROWS CLOSED BY EVIDENCE, 7 ITEMS FILED, 24 FORKS TO ARPIT
+### 🔴 2026-10-04 (latest) — W-251 RULED BY DELEGATION: 13 OF 24 FORKS SETTLED, 3 IN PART, 10 LEFT THAT ARE HIS; SIX ITEMS FILED
+
+- Arpit repeated the delegation verbatim (*"ratify whatever you can … go for it … I want Opus 5.5 to review it"*). Read as authority to rule where the evidence settles a line and nothing in the way is a Law, an option he declined in person, or a reservation in his name — stated in W-251 §3; every ruling is in §4 with the evidence that settled it and where it lands.
+- **Four of yesterday's recommendations were wrong** (W-251 §Hazards): CAP-3's set is stated; the graph-verb parity direction was backwards; releasing grade 6 collides with inferred edges; `--agents` does not exist. Corrected, not papered over.
+- **Queue:** +W-253, W-254, W-255 (🟢 Sonnet builds), +W-256 (🟢 Sonnet measurements), +W-257, W-258 (🔴 his tokens, his hands). W-245 carries every record sentence the rulings owe (+30 rows); W-246 +1 gate; W-252 +1 line. **The one ruling that touches text he said "stands" — SR-RS d12 (#15) — is flagged first for the Opus review.**
+- **Backlog:** 129 → 108 rows; five rows → `cost`, one → `unruled`; `build-plan-2026-10` filed; `pii-regex-bound` compare ruled; two compare docs *ruled in part*.
+- **Next:** Opus 5.5 reviews W-251 §4 and the six items; Arpit answers §3 (10 lines) and prompt 13; agents pick 🟢.
+
+### 🔴 2026-10-03 — THE BACKLOG AUDIT: 100 ROWS CLOSED BY EVIDENCE, 7 ITEMS FILED, 24 FORKS TO ARPIT
 
 - Arpit asked (Cowork): *"Review open work and backlog. Ratify whatever you can … create proposal documents with ratified or recommended approach. Create a compare if needed."* Four parallel audits read every `B-nnn` against its citation; the ruling session re-read a sample of each.
 - **Queue:** W-225 🟢 (the W-228 hold was stale — its code landed 2026-09-28); **W-244 ruled by delegation** — prune at the `!`-exclude, fix the walking tests, no number reclassified; a second walk-shaped instance (this session's `du`) declared. **Filed:** W-245 (stale record sentences), W-246 (16 tests + 5 doctor rows), W-247 (renderer split), W-248 (enrich reads the queue), W-249 (resident index), W-250 (`fux hooks` here), W-252 (Node arm pre-registration 2); **W-251** is the inbox row — 24 forks, a recommendation each.

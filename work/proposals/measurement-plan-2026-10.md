@@ -57,6 +57,8 @@ link-bearing questions (sets 3/4 carry `ref` edges, 82 per rung).
 
 ## 2 · Confidence and abstention — B-113 (+B-130), B-114, B-261's gates
 
+✅ **Graduated 2026-10-04 → [W-256](../open/W-256-no-key-measurements.md) §2** (W-251 §4); B-114 was ruled, not measured (`cost` B-266).
+
 **Rows:** the `doc_coverage` gate is off because *"the two populations
 overlap"* ([SR-CONFIDENCE](../../records/0141_confidence.md) d12); the fusion
 floor on the RRF scale (W-109 ⚠); the eight unmeasured gates of
@@ -88,6 +90,8 @@ used) stays **blocked**: it needs consumer repos that do not exist.
 
 ## 4 · Fetch and daemon, real network — B-092, B-093, B-101, B-102, B-103, B-124
 
+✅ **Graduated 2026-10-04:** the lab-side half → [W-256](../open/W-256-no-key-measurements.md) §4; his-hands half → [W-258](../open/W-258-live-network-captures.md). B-092 was ruled (`cost` B-265); B-093 stays blocked on B-268.
+
 **Lab-side, now:** B-103 — a daemon start → sweep → stop e2e on
 `windows-latest` with the 2026-08-27 positive control (term absent before,
 present after); B-124 on loopback — journalled answers, server taken down,
@@ -107,8 +111,9 @@ scoring in `_rescore` and count citation changes (B-117). Deterministic byte
 count on synthetic 1k/5k/20k-row sheets (B-121). **Cascade (B-262):** stage-1
 `recall@k` above ~0.98 on golden tables is the gate
 ([SR-CHUNKING](../../records/0151_chunking.md) §What is NOT done); it needs the
-tabular seed documents SR-WORK-TESTDATA T-rows describe, which gen-4 does not
-yet carry — so this half graduates with the next seed generation. B-120 then
+tabular seed documents **no SR-WORK-TESTDATA row yet names** (checked 2026-10-04:
+T1–T14 name none; a T15 is the prerequisite) — so this half graduates with the
+seed generation that carries them. B-120 then
 goes to Arpit as cascade-vs-constant **with numbers**.
 
 ## 6 · Node arm parity — B-125 → [W-252](../open/W-252-node-arm-preregistration-2.md)
@@ -116,6 +121,8 @@ goes to Arpit as cascade-vs-constant **with numbers**.
 Promoted; the plan is the item.
 
 ## 7 · Enrichment — B-108, B-109, B-110, B-245
+
+✅ **Graduated 2026-10-04 → [W-257](../open/W-257-enriched-rung.md)**, with the blind-author protocol this section missed (SR-RS d11).
 
 **All blocked on one deliverable:** an enriched rung — model-generated
 questions over rung-01000 with `enrich=true` declared. The cost is tokens and
@@ -125,6 +132,8 @@ the tilt at 25/50/100 % coverage (B-110). B-245 (the vector plane) reopens only
 when this ceiling **and** a rank-contract corpus both exist.
 
 ## 8 · Ingest cost — B-098
+
+✅ **Graduated 2026-10-04 → [W-256](../open/W-256-no-key-measurements.md) §8**, which rules B-002 on the number.
 
 Re-run `evidence/phase_times.py` with `full=True` against a delta on an
 unchanged rung-10000; endpoint = the ratio, three repeats, identical sha. W-239
@@ -139,5 +148,5 @@ IDE) · B-245 (both conditions).
 
 ## Rulings, not measurements
 
-B-092, B-099, B-100, B-114, B-120, B-128, B-137 are in W-251 §3 — a number is
-either in hand or cannot settle them.
+B-092, B-100, B-114, B-120, B-128, B-137 were ruled 2026-10-04 (W-251 §4) — a
+number was either in hand or could not settle them; B-099 stays Arpit's (§3 #9).

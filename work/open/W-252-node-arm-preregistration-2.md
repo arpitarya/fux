@@ -24,6 +24,10 @@ wrong corpus. The number is in hand; the paper is not.
    committed alone: rung-01000 and rung-10000 in fux-lab (L9 — never the
    playground); every verb the arm covers; `fux build` run in the arm;
    endpoint **0 discordant of N** and identical graph digests. No key is read.
+   The pre-registration lists `verify`, `--why`, `--receipt` and `--journal` as
+   **out of scope on the Node reader** (SR-NODE-SEARCH decision 25, ruled
+   2026-10-04 — W-251 §4 #6, written by W-245), so *every difference is a defect*
+   and *declared out of scope* read the same way.
 2. `tools/differential/node_arm.py` rerun under it; `VERDICT.md` filed.
 3. SR-NODE-SEARCH Consequences rewritten — the arm is green under a
    pre-registration that names its corpus; `sr-hash` restamped.

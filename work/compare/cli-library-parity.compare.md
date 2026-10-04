@@ -2,20 +2,37 @@
 type: Compare Doc
 title: "CLI ↔ library parity — four places the two surfaces disagree and nobody decided"
 description: "Backlog B-146, B-147, B-148, B-151 as one fork: `under` semantics, the graph verbs' `--json` shape, the changed-since line, and the order of `confidence`/`fused`. Options: freeze the divergence, converge on the library, or converge on the CLI. Recommended: converge on the library inside the already-breaking 3.0."
-status: proposed (W-251 §3 #4 — Arpit's ruling)
+status: ruled in part 2026-10-04 by delegation (W-251 §4 #4) — B-146 and B-151 converge (W-253), B-148 refused; B-147 (the graph verbs' shape) is Arpit's (W-251 §3 #4)
 timestamp: 2026-10-03T00:00:00Z
 filed: 2026-10-03
 ---
 
 # CLI ↔ library parity
 
-> **Verdict: PROPOSED — converge on the library surface, in 3.0.** Component-boundary
-> `under` on both surfaces (and in `Weighting.priority_for`); CLI `--json` for
-> `explain`/`graph`/`path` adopts the library/Node payload; `changed_since`
-> becomes a `--json` field; `confidence` precedes `fused` in both verbs.
-> **Confidence: high on three, medium on the `--json` shape** (a documented
-> contract moves). **Reopen-trigger:** a consumer reports scripting the pre-3.0
-> `--json` shape of a graph verb, or `fux.api` is unfrozen (SR-API d1).
+> **Verdict: RULED IN PART, 2026-10-04 (by delegation, W-251 §4 #4) — the
+> four rows had different standing and are split.** **B-146 — ratified:**
+> `--under` applies a component boundary on both CLIs, and
+> `Weighting.priority_for` gains the same boundary — Node's `priorityFor`
+> (`node/src/query/rank.mjs:65`) **already has it** while Python's does not, a
+> cross-runtime divergence the arm cannot see; SR-TUNE d8 + SR-DIR-LIST 2e make
+> a `[priority]` key a directory entry, so a bare prefix on `docs` scaling
+> `docs-old/` is a defect. **B-151 — ratified:** `find --json` writes
+> `confidence` before `fused`, documented and tested (SR-FIND: *"not a decision
+> anybody took"*). **B-148 — REFUSED** (the proposal said yes): a
+> `changed_since` field whose value depends on the previous run's gitignored
+> `last-cited.json` makes `answer --json` differ between two machines on
+> identical bytes — the byte-stability class SR-CLI veto 5 forbids and the
+> reason SR-ANSWER d10 chose stderr. **B-147 — ARPIT'S** (W-251 §3 #4), and
+> ⚠ **the proposal's direction was backwards**: the library's
+> `explain`/`graph`/`path` shapes are the *unruled* ones (*"predates this
+> record"*), while the CLI's carry rulings — SR-CLI d13, SR-GRAPH d13 (lexical
+> seeds; the library seeds from the boosted ranking, the *"walk over its own
+> output"* the record warns against) and his `truncated` on `path` (W-140 row
+> 12). Converging on the library would delete ruled content and move **two**
+> CLIs; the honest direction is library → CLI, which reopens SR-API d1's freeze.
+> Built as [W-253](../open/W-253-three-point-zero-contract-cleanups.md).
+> **Reopen-trigger:** a consumer reports scripting a pre-3.0 `--json` shape of
+> `find`; or SR-API d1 is reopened.
 
 **Model: Sonnet** for the build — every change is parity-testable by the
 existing differential arm.
@@ -73,15 +90,16 @@ would need a deprecation cycle in 3.1 is free in 3.0.
 - `changed_since` as a field is additive; stderr keeps the line for prose mode.
 - The differential arm gains the CLI as a third column for the three graph
   verbs; `tools/differential/node_arm.py` already parses the library shape.
-- [W-247](../open/W-247-api-renderer-split.md) must land **first**: once the CLI
-  renders what `fux.api` builds, B-147 and B-151 become one-line changes, and
-  byte-equality there is what keeps the two changes separable.
+- [W-247](../open/W-247-api-renderer-split.md) does **not** need to land first
+  for B-146/B-151 (it moves none of those lines; W-247 covers `cmd_ask`,
+  `cmd_find`, `cmd_answer`, not the graph verbs). B-147, if Arpit rules it,
+  is where W-247's split would matter.
 
 ## References
 
 - SR-API d1, d6, d7 · SR-FIND Consequences · SR-ANSWER d10 · SR-CLI (the
   `--json` contract) · `tools/differential/node_arm.py`.
-- W-251 §3 #4 — the inbox line that carries this fork.
+- W-251 §4 #4 (B-146, B-148, B-151) and §3 #4 (B-147, Arpit's).
 
 ## Reopen-trigger
 

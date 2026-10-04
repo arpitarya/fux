@@ -23,11 +23,15 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-228** — run [prompt 13](golden/prompts/13-claude-gen4-planted-misfits.md) in a fresh claude.ai chat (6 short docs, 3 planted misfits) and commit its three blocks. No key this time | 2026-10-03 | 0d |
+| 🔴 **W-228** — run [prompt 13](golden/prompts/13-claude-gen4-planted-misfits.md) in a fresh claude.ai chat (6 short docs, 3 planted misfits) and commit its three blocks. No key this time | 2026-10-03 | 1d |
 | ↳ **blocks:** W-240, W-236 | | |
 | 🔴 **W-243** — rule W-242's **Fork A**: may Node read `.fux/runtime/graph.json` when fresh instead of rebuilding the graph per query? Recommended **yes** (N2 still forces a rebuild). Unblocks CI step 1. [compare doc](compare/shared-runtime.compare.md) | 2026-10-04 | 0d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-251** — the backlog audit: 24 forks, each with a recommendation. He answers one line at a time in [the item](open/W-251-backlog-audit-rulings.md) §3; a *yes* lands via W-245 or a new item | 2026-10-03 | 0d |
+| 🔴 **W-251** — the backlog audit: 10 lines only he can answer, in [the item](open/W-251-backlog-audit-rulings.md) §3 — two Laws (L4, L3), two options he declined, two reservations, `find --no-archived`, the graph verbs' shape, a size bar | 2026-10-03 | 1d |
+| ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-257** — launch the enriched-rung authoring session ([the item](open/W-257-enriched-rung.md) says how, and why the author must be blind); it is his tokens. Or say *no* and the three doc2query rows stay unmeasured | 2026-10-04 | 0d |
+| ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-258** — twenty minutes at his own machine for the three captures only a real network gives ([the item](open/W-258-live-network-captures.md) is the checklist); nothing else in the queue waits on it | 2026-10-04 | 0d |
 | ↳ **blocks:** nothing else in the queue | | |
 
 ---
@@ -43,16 +47,22 @@ here. Read that record before changing anything below it.
 - 🟢 **W-248** · `agent` — `fux enrich` reads the decoder queue `fux ingest` writes: declared scope ∪ the rows that need a model; *no decoder* rows become a doctor line. **Sonnet.** [detail](open/W-248-enrich-consumes-queue.md)
 - 🟢 **W-249** · `agent` — `fux mcp` and `fux serve` keep the index open across calls, keyed on `.fux/runtime/stamp.json` — residency, not W-242's refused result cache. **Opus.** [detail](open/W-249-resident-index-mcp-serve.md)
 - 🟢 **W-250** · `agent` — run `fux hooks` in this repository so `.gitattributes` carries the merge driver where it was written. **Sonnet.** [detail](open/W-250-dogfood-fux-hooks.md)
+- 🟢 **W-253** · `agent` — three 3.0 clean-ups (W-251): a fetcher may no longer return a bare string; `--under` and `[priority]` keys stop matching sibling folders; `find --json` puts `confidence` first. **Sonnet.** [detail](open/W-253-three-point-zero-contract-cleanups.md)
+- 🟢 **W-254** · `agent` — the YAML frontmatter at the top of a document becomes its own quotable passage instead of riding into the first section's quote (SR-ANSWER's open question, ruled by W-251). Node twin too. **Sonnet.** [detail](open/W-254-frontmatter-passage-unit.md)
+- 🟢 **W-255** · `agent` — a bad PII regex can hang `fux ingest`: refuse the hang-prone shapes when `pii.toml` loads (same answer on every machine) and let `doctor` time the rest. Ruled by W-251; the design is in the compare. **Sonnet.** [detail](open/W-255-pii-regex-bound.md)
 
 ### testing
 
 - 🔴 **W-243** · `agent` — CI in ~2 min. On `main`: the key saves ✅, a docs-only push skips FULL ✅, `test_node_accel` trimmed. DoD 1 (FAST ≤ 2 min) needs step 1, which is STOP until Arpit rules Fork A. **Opus.** [detail](open/W-243-ci-two-minutes.md)
 - 🟢 **W-246** · `agent` — the gates the records asked for and nobody wrote: 16 small stdlib tests and 5 `doctor` rows, each named with the sentence it enforces. **Sonnet.** [detail](open/W-246-mechanical-gates.md)
 - 🟢 **W-252** · `agent` — a pre-registration for the Node arm on lab rungs (the live one names the voided playground), then one rerun; parity has read 0 discordant three times. **Sonnet.** [detail](open/W-252-node-arm-preregistration-2.md)
+- 🟢 **W-256** · `agent` — three measurements needing no key and no hands: how much of an ingest is the walk vs the extract; whether `doc_coverage` spots an unanswerable question; the daemon on Windows and on a loopback 429. **Sonnet.** [detail](open/W-256-no-key-measurements.md)
+- 🔴 **W-257** · `arpit` — an enriched rung: an agent writes questions over rung-01000 so doc2query can finally be measured; the author must be blind to the question sets or the numbers prove nothing. Arpit launches it (his tokens). **Opus.** [detail](open/W-257-enriched-rung.md)
+- 🔴 **W-258** · `arpit` — one hands-on session on his machine: a journalled answer whose source then vanishes, a real 429 from a real host, and parallel CDP fetches in signed-in Chrome. Checklist and bars are written. [detail](open/W-258-live-network-captures.md)
 
 ### adr update
 
-- 🔴 **W-251** · `arpit` — the backlog audit's rulings: 100 rows closed by evidence, 24 forks recommended one line each; his *yes*/*no* per line is the whole item. [detail](open/W-251-backlog-audit-rulings.md)
+- 🔴 **W-251** · `arpit` — the backlog audit's rulings: 13 of 24 forks ruled by his delegation on 2026-10-04 (§4), 3 in part; 10 lines are his alone (§3): two Laws, two options he declined, two reservations, taste, tokens, hands. [detail](open/W-251-backlog-audit-rulings.md)
 - 🟢 **W-245** · `agent` — the record sentences the audit found false or stale (forks that were ruled still read *open*; *no test* where one exists): one sentence each, restamped. **Sonnet.** [detail](open/W-245-record-sentences-stale.md)
 
 ---
