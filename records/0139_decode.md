@@ -10,7 +10,7 @@ feature: the decoder plane — the protocol, the registry, the consumer seam and
 owns: [src/fux/decode@09d46517feac, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@cbec8e165dca, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@6748ca720ca3]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 0a5885ab962184c461429477ff201f5af8b3df0a7994549f14331c65436dd883
+content_sha: 50e5f64de9e6aaae82ba1fcf646a22021a4d362651c7403d6d95a127ae986093
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -834,6 +834,12 @@ changed decoder's `VERSION` line says so.
 
 ### Consequences
 
+- **`fux doctor`'s `decoder imports` row is a TRIPWIRE, never coverage
+  (W-246, 2026-10-04).** It reads each `.fux/decoders/*.py` with `ast` and warns
+  on a static import of `urllib.request`, `urllib.robotparser`, `socket`,
+  `http.client`, `requests` or `ssl`. It fails open on `importlib`,
+  `__import__`, an alias and `exec`, and a decoder it passes is not thereby
+  offline. (`urllib.parse` is not listed: it opens no socket.)
 - **The converter duplication is structurally impossible now**, and the
   requirement a docstring asked for is retired rather than enforced.
 - **A local `.html` on disk is decodable** for the first time.

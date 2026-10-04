@@ -26,6 +26,15 @@ Rules:
 
 ---
 
+## 2026-10-04 — **W-246: the mechanical gates the records asked for (22)**
+
+| what | evidence |
+|---|---|
+| **§A tests** | 13 repo-discipline gates, each docstring naming its sentence — `tests/test_withdrawn_claims.py`, `test_l2_dependencies.py`, `test_guide_flags_exist.py`, `test_differential_arms_import.py`, `test_dotdir_hygiene.py` + extensions |
+| **§B invariants** | full postings on a real ingest; serial-by-default fetchers; cdp balance; doctor's shard-sha check ([SR-RUNTIME-STAMP](../records/0124_runtime-stamp.md)) |
+| **§C doctor** | `priority keys`, `fuxignore reachable`, `decoder imports`, `ranking priors` + `intent_weight`, `journal size` — `tests/test_doctor_w246_rows.py` (23) ([SR-DOCTOR](../records/0152_doctor.md)) |
+| **findings** | 4 red on the live tree: 3 fixed, SR-LAWS d7 held `xfail(strict)` → B-271 |
+
 ## 2026-10-04 — **W-249: `fux mcp` and `fux serve` keep the loaded index resident**
 
 | what | evidence |

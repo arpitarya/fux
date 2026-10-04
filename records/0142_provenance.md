@@ -12,7 +12,7 @@ owns: [src/fux/query/provenance.py@89166e7718bc]
 laws: [L2, L4, L5, L9]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 1efc74ee38f40dd624679294fc85cb4bed4c88071a7e5fcd7f3153af1bb49830
+content_sha: 79f2f0448446d57859eebb2d3f8ce967a29547d8bc4b6fcca60f9cb62bb4d674
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -387,7 +387,11 @@ world?*, whose answer depends on a network the verifier does not control.
   ENTRIES is not a bound in BYTES** — a thousand `--why` receipts is a very
   different file from a thousand plain ones, and nothing currently says so.
   **Named here rather than discovered later**; if it becomes a problem the fix
-  is a byte bound on the journal, not a thinner receipt.
+  is a byte bound on the journal, not a thinner receipt. **The byte bound exists
+  as a warning (W-246, 2026-10-04):** `fux doctor`'s `journal size` row warns
+  above `[cli.answer] journal_max_bytes` (4 MiB as shipped — a DESIGN default,
+  about ten times what a thousand ordinary receipts weigh, not a law and not a
+  truncation; the journal is never rewritten by it). An absent journal is OK.
 - **A digest-only derivation was considered and refused**: it makes the receipt
   small and uniform, but adds a second artifact to keep in step and forces
   `verify` to decide whether a missing derivation is a mismatch — complexity

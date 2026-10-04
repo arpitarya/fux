@@ -167,7 +167,7 @@ TTY-gated — the record says so); L12 — the zero-width set is a fixed value.
 ## Rows that stay where they are, and why
 
 - **B-055** (`ungated`) — the weak rule is ruled and gated via
-  [W-246](../open/W-246-mechanical-gates.md); the strong rule (*a `component`
+  W-246; the strong rule (*a `component`
   record must own something*) is Arpit's (W-251 §3 #16).
 - **B-262** (`unmeasured`) — cascade's gate needs golden tables and
   row-precise questions, and **no SR-WORK-TESTDATA row names tabular

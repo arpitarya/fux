@@ -11,7 +11,7 @@ feature: scoring, ordering, and the analyzer they share with ingest
 owns: [src/fux/query/rank.py@6811ca222c82, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@63f4c4872bd7, src/fux/query/analyzer.py@8f02dd1c4e44, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@71890f0ff70a, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@3ef9b4ebccf0, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@352450f33e0c, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 773d75f513f65ca8b18463afe766d722fa9d27b560b97f9a547d19f4fe0e74b3
+content_sha: ae470f5780ffcb39f49b682e4d276e072d1712976bb92f9cf126b8e3993360c3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -611,6 +611,9 @@ intent_weight`. `of(record)` is `priority_for(loc) × intent_for(loc)`, and
 - **The default weight is `0.1`**, measured and ratified 2026-09-28
   ([SR-TUNE](0135_tuning.md) decision 20). The prior is live only where a
   consumer declares `[doctype]`, so the shipped state is still `trivial`.
+- **`fux doctor`'s `ranking priors` row reports `intent_weight` with its
+  count of documents per `[doctype]` type** (W-246, [SR-DOCTOR](0152_doctor.md)
+  decision 5a), counted with the same resolver.
 - **The resolver is [`query/intent.py`](../src/fux/query/intent.py)** — which
   intent, which type. Its three parity rules with Node (ASCII-only case and
   whitespace, `.` over every character, globs over code points) are stated

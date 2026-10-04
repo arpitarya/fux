@@ -1212,8 +1212,12 @@ def test_the_row_carries_no_count_for_a_prior_with_no_record_field(tmp_path):
     write_config(tmp_path)
     detail = _check(doctor.run(tmp_path), "ranking priors").detail
     assert "rerank_weight=0" in detail
-    assert "document(s)" not in detail
-    assert "NOTHING in this repository" not in detail
+    # W-246: `intent_weight` IS driven by a per-record declaration (the type
+    # `[doctype]` gives a location), so it carries the count and the clause.
+    # The assertion is on the `rerank_weight` part alone.
+    rerank = detail.split(". Each is implemented")[0].split("values: ")[1]
+    assert "document(s)" not in rerank
+    assert "NOTHING in this repository" not in rerank
 
 
 def test_a_prior_that_is_switched_ON_is_not_listed(tmp_path):

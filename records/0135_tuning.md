@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@f5fe482723d1, .fux/tune.toml@fbc012c8ee4f, node/src/config/tune.mjs@d9a132c42f83]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 535e2402e0e45f1248f35d01007f6fc2d24032bc46fe7c785919c2f157490c72
+content_sha: bd2d41f308dff49f5a646a3df109db290e082107d8e04aa46687dc52cfebd747
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -511,14 +511,15 @@ defaults is the worst outcome available** — the user believes their weights ar
 active, fux answers on different ones, and nothing says so.
 
 **10a. One case is deliberately not fatal:** a `[priority]` key matching no
-source entry is a **stderr warning, once**, plus a durable `doctor` line.
-🔴 **UNBUILT as of 2026-09-12** (W-140 row 12) — `tune.py` validates a
+source entry is named by a durable `doctor` line, `priority keys`.
+🔴 **The stderr-warning-at-load half is DROPPED (W-246, 2026-10-04)** — it
+needs the source lists at tune-load time, a seam that does not exist, and the
+doctor row is the half that reaches a reader. `tune.py` still validates a
 `[priority]` value's *type and sign* and never compares its key against the
-source lists, and `doctor` has no `[priority]` row at all. **An orphaned
-priority is silently inert today**, which is the failure this decision was
-written to make visible. Recorded here rather than quietly fixed: the check
-needs the source lists at tune-load time, which is a seam that does not exist
-yet. With a
+source lists. **The row** calls `Weighting.priority_for`'s own rule (exact or at
+a `/` boundary) rather than re-spelling it, and counts a key live when it
+reaches a listed source in either direction, so an orphaned priority — silently
+inert, the failure this decision was written to make visible — is named. With a
 syntax error nothing is known; with an orphan **every other weight still applies
 exactly as written**, and a source can be legitimately absent for a moment — a
 folder mid-rename, a priority written before its `fux add`. Failing `ask`

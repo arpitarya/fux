@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@84d2a929553a, tests/test_doctor_register_is_complete.py@dff0d535b078]
+owns: [src/fux/doctor.py@1d2aa2bc10ca, tests/test_doctor_register_is_complete.py@dff0d535b078]
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 887b20f290ce443ebdfa81749725d34a046a582c24c2695274e37de6184d94ef
+content_sha: fb29452824638b6869b4875084f608becfd254c94d0819042e0ebbea8e0b43af
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -184,7 +184,10 @@ authoritative about the row.**
 | `provenance` | **warn**, never error | the decoder fault `decoder bindings` and the reuse key both miss: a **record already in the index** that was produced by a decoder the tree no longer carries at that version. The reuse key catches a digest that *moved since the last run*; a record written before a binding existed agrees with nothing, and **no delta run will look at it again** — `fux ingest --full` is the fix and the row names it. ⚠ **No ledger is NOT a finding**: `.fux/runtime/ingest-log.jsonl` is advisory, derived and gitignored, and warning every consumer on upgrade about a file one `fux ingest` creates is how a row becomes one people skip. ⚠ **`prose` and `unknown` rows are never counted** — no binding claims Markdown, and `unknown` means the ledger predates the row, so counting either would report a number no command can bring down | [SR-INGEST](0106_ingest.md) (W-200) |
 | `recency prior` | warn | whether any document carries an `mtime` — a corpus copied out of its git repository loses every one | [SR-INGEST](0106_ingest.md) |
 | `freshness verdicts` | warn | `freshness_counts` and `AS_INGESTED_VETO_SHARE` — the veto instrument, shared verbatim with SR-ACQUIRED's identical one so the quarter has one home | [SR-URL-FRESHNESS](0147_url-freshness.md) |
-| `ranking priors` | warn | every prior that is wired, reads its input and multiplies by one — **and the count of documents it would have acted on**. It refuses to recommend a value | [SR-ARCHIVED-CONTENT](0134_archived-content.md) · [SR-TUNE](0135_tuning.md) |
+| `ranking priors` | warn | every prior that is wired, reads its input and multiplies by one — **and the count of documents it would have acted on**. Since W-246 that includes `intent_weight` with its count of documents per `[doctype]` type (warn only for a declared `[doctype]` that is off or reaches no document; an empty one is the shipped state and is stated, not warned). It refuses to recommend a value | [SR-ARCHIVED-CONTENT](0134_archived-content.md) · [SR-TUNE](0135_tuning.md) |
+| `priority keys` | warn | a `[priority]` key in `tune.toml` that matches no `sources/dirs` entry or listed URL — an orphaned priority is silently inert. The match is `Weighting.priority_for`'s own (exact or at a `/` boundary), called rather than re-spelled, and counted in both directions (a key above an entry, or narrower than one). The tune-load-warning half of SR-TUNE decision 10a is dropped: the loader holds no source lists | [SR-TUNE](0135_tuning.md) decision 10a |
+| `decoder imports` | warn | a `.fux/decoders/*.py` that statically imports `urllib.request`, `urllib.robotparser`, `socket`, `http.client`, `requests` or `ssl`, read with `ast` and never imported. ⚠ **A tripwire, never coverage**: it fails open on `importlib`, `__import__`, an alias or `exec`. `urllib.parse` is not listed — it opens no socket, and the shipped drawio decoder uses it | [SR-DECODE](0139_decode.md) |
+| `journal size` | warn | the `fux answer --journal` log (gitignored, L9) above `[cli.answer] journal_max_bytes` in `.fux/output.toml`. No journal is the normal state — it is opt-in — and is OK. `journal_max` bounds by count, which says nothing about bytes | [SR-PROVENANCE](0142_provenance.md) decision 15 · [SR-OUTPUT](0143_output-defaults.md) |
 | `output.toml present` | warn | absent means every output default is the engine's own and none can be changed | [SR-OUTPUT](0143_output-defaults.md) decision 20 |
 | `tune.toml loads` | warn, **error** when the file will not parse | 🔴 **A broken `.fux/tune.toml` left doctor GREEN until 2026-09-11** (W-140 row 13), which is the worst shape for this file: `fux ingest` reads only `[index]`, so a bad ranking knob does not stop an ingest by design (SR-TUNE decision 13) while `ask`, `find` and `answer` refuse. The repo indexes cleanly, every row is fine, and every query fails. **Absent, or missing a key, is an error too** ([L12](0014_LAW-12-values-live-in-config.md)): there is no engine default to read in its place, and `fux doctor --fix` writes what is missing from the template. It calls `tune.load` rather than re-parsing: a second parser answers a question the real one does not ask | [SR-TUNE](0135_tuning.md) decision 13 |
 | `identifiers.toml loads` | **error** | `.fux/identifiers.toml` is missing, malformed, or holds a template or `[user]` regex the grammar or the static guard refuses — `ingest`, `ask` and `find` refuse alike, so the row names the refusal verbatim | [SR-IDENTIFIERS](0160_identifiers.md) decisions 1, 3, 6 |
@@ -193,6 +196,7 @@ authoritative about the row.**
 | `identifier regex parity` | **error**, only when a `[user]` regex exists | Python `re` and V8 run the same compiled source over the first `inspect.toml [identifiers] parity_sample` documents and find different spans. A warn `skipped` without `node` on PATH | [SR-IDENTIFIERS](0160_identifiers.md) decision 10 |
 | `types list usable` | error | a types list with no live pattern — `read_types` refuses it, so ingest stops | [SR-TYPES](0128_types-list.md) decision 10 |
 | `fuxignore usable` | warn, **error** when the patterns will not parse | the `.fuxignore` patterns parse, and duplicates | [SR-FUXIGNORE](0144_fuxignore.md) |
+| `fuxignore reachable` | warn | a hand-written `.fuxignore` rule a LATER rule always overrides (last match wins), so it never decides anything. ⚠ **Not full coverage — the one observable symptom of a wrong reorder**: only the same pattern with the same anchoring is recognised (a directory-only rule overridden by the bare pattern, or any rule by its twin of either sign); a broad glob below a narrow one is a shadow this does not see | [SR-FUXIGNORE](0144_fuxignore.md) |
 | `dirs exclusions migrated` | warn | the `!` lines still in `.fux/sources/dirs`, each with the anchored pattern to write instead. `fux remove` stopped writing them on 2026-09-14 (SR-FUXIGNORE decision 5a) and they are read forever, so this reports and never fails. ⚠ **Not the duplicate finding above** — that one needs the pattern in *both* files; this fires on every survivor, including the ones nothing duplicates, which are the ones no other row would mention | [SR-FUXIGNORE](0144_fuxignore.md) decisions 5a–5b · [SR-DIR-LIST](0120_dir-list.md) decision 2d |
 | `url redaction current` | warn | the `url:` documents a policy change could not reach — no retained bytes in `.fux/acquired/`, so their records still hold text extracted under the OLD rules. **Never an error**: the record is not wrong about its source, and only a fetch can clear it, so failing here would make `doctor` red until someone goes online. ⚠ **Derived state, so it does not travel with a cloned index** — a fresh clone reads clean until its own ingest re-derives the fact | [SR-PII](0148_pii.md) · [SR-INGEST](0106_ingest.md) · [SR-ACQUIRED](0145_acquired-plane.md) |
 | `retired agent folders` | warn | `.codex/skills/` or `.github/skills/` left behind by an older `setup`. **The DUPLICATE is the defect**: Copilot reads `.agents/skills/` *and* `.github/skills/`, so every skill appears twice and the older copy is free to disagree while both look correct. Delete is the whole remedy, and `fux setup` will not, because the folder may hold files fux did not write | [SR-AGENT-POLICY](0132_agent-policy.md) decision 16 |
@@ -295,6 +299,12 @@ count of documents it would have acted on**. When that count is **0** it adds
   stays in the code**, because it is the distinction, not the subject, that was
   worth building: the next prior that reads a record field gets it for free.
   The paragraphs above stand as the history that produced the removals.
+- 🔴 **`intent_weight` is that next prior (W-246, 2026-10-04).** It reads a
+  per-record declaration — the type `[doctype]` gives a location, counted with
+  the resolver ranking uses — so the row carries its count per type and the
+  *"would change NOTHING"* clause fires at zero. It is a warning only for a
+  declared `[doctype]` that is off or reaches no document; with no `[doctype]`
+  the prior is simply not opted into and the row says so without warning.
 - **This is decision 5's rule in a second costume**: a check that degrades to
   saying nothing must name what does fail. Here nothing degraded — the number was
   printed — and the **conclusion** was left unstated, which reads the same way to

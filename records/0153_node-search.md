@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@38f1f9f691a4, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@9c8fc34d2e59, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 859998db40bbd61ec3ba0ae49a016b6b1224e8637323498f4ab99e76280dc0ed
+content_sha: 5b9b58abe91c280364e964b047064f28df01117a40ce4277d1645a6fadbe59f2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1021,6 +1021,8 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
 **No decision here moved** (W-248, 2026-10-04): `doctor.py` gained a `queue: no decoder` row; the `node reader` rows this record describes did not move.
 
 **No decision here moved** (W-246, 2026-10-04): `node/mcp-tools.json`'s `fux_passage` and `fux_related` descriptions now name the fields their handlers emit, held equal to the Python literal.
+
+**No decision here moved** (W-246, 2026-10-04): the Node output-config reader carries the new `[cli.answer] journal_max_bytes` key beside its Python twin.
 
 ### Consequences
 

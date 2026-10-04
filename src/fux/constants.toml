@@ -656,6 +656,10 @@ kib = 1024
 # doctor's number: it is the reopen condition SR-ACQUIRED and SR-URL-FRESHNESS
 # state, so a consumer cannot move it.
 as_ingested_veto_share = 0.25
+# `decoder imports`: modules a `.fux/decoders/*.py` has no business importing
+# (L5, ingest is offline). A tripwire over static imports, never coverage.
+# `urllib.parse` is deliberately absent: it never touches a socket.
+decoder_network_modules = ["urllib.request", "urllib.robotparser", "socket", "http.client", "requests", "ssl"]
 
 [intent]
 # W-168 step 9 (I1, ruled 2026-09-24): the fixed cue lexicon that reads a

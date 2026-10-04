@@ -23,7 +23,7 @@
 # instead of this one — the "is it me or the config?" switch.
 
 # Keys shared by more than one verb live here. A key only one verb has
-# (`explain`, `sections`, `hops`, `no_refer`, `journal`, `journal_max`,
+# (`explain`, `sections`, `hops`, `no_refer`, `journal`, `journal_max`, `journal_max_bytes`,
 # `port`) is refused at this level BY NAME — it lives under that
 # verb's own table, below — setting it here would read as global, and it is not.
 [cli]
@@ -51,6 +51,8 @@ journal = false    # ⚠ NOT a rendering key. `true` APPENDS every answer's rece
                      #   never committed. Consent, either here or per-call
                      #   with `fux answer --journal` -- both are explicit.
 journal_max = 1000   # the most receipts that journal keeps (L9: gitignored, never committed)
+journal_max_bytes = 4194304   # `fux doctor` warns above this many bytes (4 MiB: ~10x what 1000
+                     #   ordinary receipts weigh; a design default, nothing is truncated by it)
 
 [cli.serve]
 port = 7337        # `fux serve` binds 127.0.0.1 only; this is the port

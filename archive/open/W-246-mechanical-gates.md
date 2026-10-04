@@ -9,6 +9,12 @@ ball: agent
 
 # W-246 — the mechanical gates the backlog named
 
+**✅ CLOSED 2026-10-04 — every row landed** (Claude Code; Sonnet built in two parts, Opus 5.5 reviewed):
+- **§A + §B, 17 gates** (`069ccee7`): withdrawn claims, L2 dependencies, process/component ownership rules, queue rules 37/38/47, guide flags, CLI dests read, arm imports, `adversarial_corpus` root, dotdir hygiene, pii starter ⊆ repo, MCP field descriptions, rows ≠ question sets; full postings, serial-by-default fetchers, cdp paused/resolved balance, doctor's shard-sha deep check.
+- **§C, five `doctor` rows**: `priority keys` (orphans, via `priority_for`'s own `/` boundary), `fuxignore reachable` (⚠ B-074's wording was backwards: `.fuxignore` is last-match-wins, so it is the EARLIER rule an identical later one makes unreachable), `decoder imports` (a tripwire, never coverage; `urllib` narrowed to `urllib.request`/`robotparser` because `drawio.py`'s `urllib.parse` is not network), `ranking priors` (+`intent_weight` with its per-type document count), `journal size` (`output.toml [cli.answer] journal_max_bytes` = 4 MiB, a design default — SR-OUTPUT's key, not `fux.toml`'s).
+- **Red on the live tree, as findings:** the withdrawn L2 phrase in `refer/source.py` and `docs/handbook.html` (fixed); SR-LAWS d7's *zero-dependency guarantee* (a Law record — `xfail(strict)`, B-271); SR-SECTIONS' missing d7 case paragraph (written); the `drawio.py` false positive (the list narrowed).
+- Live successors: the records each gate names (SR-DOCTOR's check table lists every row).
+
 **Status 2026-10-04: §A and §B landed (17 of 17), §C next.** Red on the live tree, as findings: `stdlib-only runtime` in `refer/source.py` and `docs/handbook.html` (fixed — L2 as amended); `zero-dependency guarantee` in SR-LAWS d7 (a Law record — `xfail(strict)`, B-271, Arpit's word); SR-SECTIONS lacked its d7 case sentence (written). Judgement calls: B-047's rule-47 words narrowed to the rule's own state words (`committed`, `staged`, `pushed`, `unpushed`, `git status`) because `commit`/`push` hit two legitimate rows; B-156's row-shape check binds runs from 2026-10-04 on.
 
 **Model:** Claude Code, **Sonnet** — every gate below is written against a
@@ -17,7 +23,7 @@ Land them in small commits grouped as the table groups them; a gate that goes
 red on the live tree is a **finding** to file, never a reason to loosen it.
 
 **Why one item.** SR-WORK-BACKLOG decision 2: *an agent can close an `ungated`*.
-The 2026-10-03 audit ([W-251](W-251-backlog-audit-rulings.md)) found seventeen
+The 2026-10-03 audit ([W-251](../../work/open/W-251-backlog-audit-rulings.md)) found seventeen
 rows whose closer is a test or a doctor row of a few dozen lines each. One item
 keeps the queue honest about how much work it is (an afternoon, not a month)
 and lets each gate cite the same ruling.

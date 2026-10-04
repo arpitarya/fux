@@ -49,7 +49,7 @@ export const CLI_VERBS = {
   //: reason, both readers.
   lexical: ["band", "top", "explain", "sections", "max_headings"],
   find: ["band", "top", "max_headings"],
-  answer: ["band", "no_refer", "journal", "journal_max"],
+  answer: ["band", "no_refer", "journal", "journal_max", "journal_max_bytes"],
   explain: [],
   graph: [],
   path: ["hops"],
@@ -135,7 +135,7 @@ const SHARED_CLI_KEYS = (() => {
 const TYPES = {
   band: "bool", explain: "bool", sections: "bool", no_refer: "bool",
   journal: "bool", enabled: "bool", top: "int", hops: "int",
-  max_headings: "int", progress_threshold: "int", journal_max: "int", port: "int",
+  max_headings: "int", progress_threshold: "int", journal_max: "int", journal_max_bytes: "int", port: "int",
 };
 
 //: The template `fux setup` writes (`src/fux/templates/output.toml.txt`) —
@@ -486,6 +486,6 @@ export function applyOutputDefaults(verb, args, cfg) {
 //: File spelling -> the name this reader's `parseArgs` puts on `args`. Only
 //: the ones that differ are listed; everything else is spelled the same.
 const OUT_KEY_TO_ARG = {
-  no_refer: "noRefer", max_headings: "maxHeadings", journal_max: "journalMax",
+  no_refer: "noRefer", max_headings: "maxHeadings", journal_max: "journalMax", journal_max_bytes: "journalMaxBytes",
   progress_threshold: "progressThreshold",
 };

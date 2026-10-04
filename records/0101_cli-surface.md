@@ -10,7 +10,7 @@ feature: the `fux` command-line interface — every verb, its flags, its exit co
 owns: [src/fux/cli.py@eafa474928d8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@de55b440c56a, node/fux.mjs@b8ee2d6ca979]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 97ad1206933e8de91313cedc2427e405d116736d0c4c5ef4e58c240fd1d79e03
+content_sha: 385df370d9301e9b992638a168872f1a4a2c7422e2402872214bb598cfd2b32f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -549,7 +549,7 @@ other, and nothing else ever writes one.
 
 **`.fux/output.toml` is required ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3a, 2026-09-27).** Every
 verb's rendering defaults — `top`, `max_headings`, `hops`, `band`, `explain`,
-`sections`, `no_refer`, `journal`, `journal_max`, `port`, `progress_threshold`,
+`sections`, `no_refer`, `journal`, `journal_max`, `journal_max_bytes`, `port`, `progress_threshold`,
 `json` — resolve from the file ([SR-OUTPUT](0143_output-defaults.md) decisions 19–20); no argparse `default=`
 carries one. `--no-output-config` (now on `build`, `add`, `remove` and `serve`
 too) reads the packaged template. `doctor` alone starts without the file, from

@@ -58,7 +58,7 @@ a neighbouring plane disagree about the same evidence. That is why this is a
 fork and not a cleanup.
 
 Adjacent, same seam, not decided here: `.fux/pii.toml` is outside the
-template-drift gate (B-073 → a subset-by-id test in [W-246](../open/W-246-mechanical-gates.md));
+template-drift gate (B-073 → a subset-by-id test in W-246);
 a frozen `formats.toml` type list stops tracking new built-in decoders (B-221,
 `cost`).
 

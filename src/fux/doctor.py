@@ -308,10 +308,12 @@ def _layout(root: Path) -> list[Check]:
         )
     )
     checks.append(_output_config_health(root))
+    checks.append(_journal_size(root))
     checks.append(_tune_config_health(root))
     checks.extend(_identifiers(root))
     checks.append(_types_health(root))
     checks.append(_ignore_health(root))
+    checks.append(_ignore_reachable(root))
     checks.append(_dirs_exclusions_migrated(root))
     checks.append(_stale_redaction(root))
     # W-163 — the setup-drift rows. Grouped here, after the files they read
@@ -350,11 +352,13 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_pii_timing(root))
     checks.append(_refusal_health(root))
     checks.append(_decoder_bindings(root))
+    checks.append(_decoder_imports(root))
     checks.append(_queue_no_decoder(root))
     checks.append(_meta_fields(root))
     checks.append(_provenance(root))
     checks.append(_recency_prior(root))
     checks.append(_no_op_priors(root))
+    checks.append(_priority_keys(root))
     checks.append(_freshness_share(root))
     return checks
 
@@ -465,11 +469,16 @@ def _no_op_priors(root: Path) -> Check:
                 part += " - so changing this value would change NOTHING in this repository"
         dead.append(part)
 
+    intent_part, intent_dead = _intent_weight_part(tune, records)
+    if intent_dead:
+        dead.append(intent_part)
+
     if not dead:
         return Check(
             "ranking priors",
             True,
-            "every ranking prior is set to a value that does something",
+            "every ranking prior is set to a value that does something"
+            + (f"; {intent_part}" if intent_part else ""),
         )
     return Check(
         "ranking priors",
@@ -480,7 +489,106 @@ def _no_op_priors(root: Path) -> Check:
         "returns the score unchanged. fux states this and does NOT recommend a "
         "value: the one change ever measured (superseded_weight at 0.5, a knob "
         "since REMOVED) fixed two queries and broke two, and every broken one had "
-        "the superseded document as its correct answer",
+        "the superseded document as its correct answer"
+        + ("" if intent_dead or not intent_part else f". Also: {intent_part}"),
+        level="warn",
+    )
+
+
+def _intent_weight_part(tune, records: dict) -> tuple[str, bool]:
+    """`intent_weight` with its count of documents of each preferred type.
+
+    [SR-DOCTOR](records/0152_doctor.md) decision 5a owed this: the intent prior
+    (SR-RANKING decision 13) is the one prior driven by a per-record
+    declaration, namely the type `[doctype]` assigns a document's location. The
+    count is taken with `intent.type_for`, the resolver ranking itself uses, so
+    the row cannot count a document the ranker would not.
+
+    Returns `(text, dead)`. **Dead is only a declared `[doctype]` that is off
+    or reaches no document** - an empty `[doctype]` is the shipped state, the
+    prior is simply not opted into, and a warning on every default repository
+    would teach readers to ignore the row. It is still stated, with the zero
+    clause 5a asks for. **Recommends no value**, like the rest of the row.
+    """
+    from .query import intent
+
+    weight = tune.intent_weight
+    counts = dict.fromkeys(sorted(intent.TYPES), 0)
+    if tune.doctype:
+        for record in records.values():
+            kind = intent.type_for(record.get("loc", ""), tune.doctype)
+            if kind in counts:
+                counts[kind] += 1
+    total = sum(counts.values())
+    listed = ", ".join(f"{kind}={n}" for kind, n in counts.items())
+    part = f"intent_weight={weight:g} ({total} document(s) of a preferred type: {listed})"
+    if total == 0:
+        part += " - so changing this value would change NOTHING in this repository"
+        if not tune.doctype:
+            part += " ([doctype] in tune.toml is empty, so the prior is not in use)"
+    dead = bool(tune.doctype) and (weight <= 0 or total == 0)
+    return part, dead
+
+
+def _priority_keys(root: Path) -> Check:
+    """Every `[priority]` key in `tune.toml` reaches a listed source.
+
+    [SR-TUNE](records/0135_tuning.md) decision 10a: an orphaned priority is
+    silently inert, and nothing said so. The tune-load warning half of that
+    decision is dropped (the loader has no source lists, and a seam for one is
+    not worth a second reader); this row is the durable half.
+
+    **The match rule is `Weighting.priority_for`'s, called, not re-spelled** -
+    a key matches a location exactly or at a `/` boundary. A key is live when
+    it matches a source entry, or sits under one (`docs/runbooks` under the
+    listed `docs`), since both ways can reach a document. A warning: a source
+    can be legitimately absent for a moment, which is why decision 10a does not
+    fail a read over it.
+    """
+    import math
+
+    from .ingest import sourcelist
+    from .query.rank import Weighting
+    from .tune import load as load_tune
+
+    name = "priority keys"
+    try:
+        tune = load_tune(root, enabled=True)
+    except FuxError:
+        return Check(name, True, "not assessed - .fux/tune.toml does not load (see `tune.toml loads`)")
+    if not tune.priority:
+        return Check(name, True, "no [priority] keys declared")
+    try:
+        config = config_mod.load(root)
+    except FuxError:
+        return Check(name, True, "not assessed - fux.toml does not load; see its row")
+
+    entries: list[str] = []
+    for rel, spec in ((config.dirs_file, sourcelist.DIRS), (config.url.urls_file, sourcelist.URLS)):
+        try:
+            parsed = sourcelist.parse((root / rel).read_text(encoding="utf-8"), spec, origin=rel)
+        except (OSError, FuxError):
+            continue
+        entries.extend(e.value for e in parsed if not e.exclude)
+
+    def reaches(key: str, entry: str) -> bool:
+        probe = math.inf
+        return (
+            Weighting(priority=((key, probe),)).priority_for(entry) == probe
+            or Weighting(priority=((entry, probe),)).priority_for(key) == probe
+        )
+
+    orphans = [key for key, _ in tune.priority if not any(reaches(key, e) for e in entries)]
+    if not orphans:
+        return Check(name, True, f"{len(tune.priority)} [priority] key(s), each reaching a listed source")
+    return Check(
+        name,
+        False,
+        f"{len(orphans)} [priority] key(s) match no listed source and so scale nothing: "
+        + ", ".join(f"`{k}`" for k in orphans[:5])
+        + (f" and {len(orphans) - 5} more" if len(orphans) > 5 else "")
+        + ". A key matches a location exactly or at a `/` boundary (SR-TUNE decision 8a); "
+        "fix the spelling or `fux add` the source",
         level="warn",
     )
 
@@ -1818,6 +1926,39 @@ def _output_config_health(root: Path) -> Check:
     return Check("output.toml present", True, f"{output_config.OUTPUT_NAME}: parsed, every key valid")
 
 
+def _journal_size(root: Path) -> Check:
+    """The `fux answer --journal` log against `[cli.answer] journal_max_bytes`.
+
+    [SR-PROVENANCE](records/0142_provenance.md) decision 15: the journal is a
+    plaintext use record (gitignored, L9) and `journal_max` bounds it by COUNT,
+    which says nothing about bytes when one receipt carries long passages. An
+    absent journal is the normal state (it is opt-in), not a warning.
+    """
+    from .query import provenance
+
+    name = "journal size"
+    path = provenance.journal_path(root)
+    try:
+        size = path.stat().st_size
+    except OSError:
+        return Check(name, True, "no journal (opt-in: `fux answer --journal`)")
+    try:
+        limit = output_config.load(root, enabled=True).resolve(
+            "answer", "journal_max_bytes", None, as_json=False
+        )
+    except FuxError as exc:
+        return Check(name, True, f"{size} bytes; limit not read - {exc}", level="warn")
+    if size <= limit:
+        return Check(name, True, f"{size} bytes, within journal_max_bytes={limit}")
+    return Check(
+        name,
+        False,
+        f"{path.name} is {size} bytes, above [cli.answer] journal_max_bytes={limit}. It holds the plaintext "
+        "of what was asked and answered (gitignored, L9); delete it, or raise the key if you mean to keep more",
+        level="warn",
+    )
+
+
 def _identifiers(root: Path) -> list[Check]:
     """W-233 — `.fux/identifiers.toml`: loads, the index agrees, families current,
     and a `[user]` regex behaves the same in both readers (F1–F3).
@@ -2114,6 +2255,72 @@ def _ignore_health(root: Path) -> Check:
         "fuxignore usable",
         True,
         f"{fuxignore.IGNORE_FILE}: {active} ignore rule(s), {len(rules) - active} re-include(s)",
+    )
+
+
+def _shadowed_rules(rules) -> list[tuple[object, object]]:
+    """`(shadowed, by)` for every hand rule a LATER rule makes unreachable.
+
+    **Last match wins** in `.fuxignore` ([`fuxignore.Ignores._last_match`]), so
+    the rule that never decides anything is the EARLIER one, and what shadows
+    it is a later rule that matches everything it matches. (The backlog wording
+    said "shadowed by an earlier rule"; with this matcher that is the one
+    direction in which it cannot happen.)
+
+    **Conservative on purpose: only provable containment is flagged.** Rule B
+    covers rule A when they carry the same `body` and the same anchoring - the
+    same compiled pattern - and B is not narrower in kind: `B.dir_only` is
+    false (it matches files and directories) or both are directory-only. The
+    negation of either is irrelevant: whichever sign B has, B decides every
+    path A could. Anything cleverer (`*.log` over `a.log`, `**` overlaps)
+    needs regex containment and is left alone.
+    """
+    out: list[tuple[object, object]] = []
+    for i, early in enumerate(rules):
+        for late in rules[i + 1 :]:
+            if (
+                late.body == early.body
+                and late.anchored == early.anchored
+                and (not late.dir_only or early.dir_only)
+            ):
+                out.append((early, late))
+                break
+    return out
+
+
+def _ignore_reachable(root: Path) -> Check:
+    """A `.fuxignore` rule a later rule always overrides (SR-FUXIGNORE, W-246).
+
+    The one observable symptom of a wrong reorder: moving a line below its
+    twin leaves it dead, and nothing complains. **Not full coverage** - only an
+    identical pattern (or a directory-only one overridden by the same pattern
+    without the trailing `/`) is recognised; a broader glob below a narrower
+    one is a shadow this does not see.
+    """
+    from .ingest import fuxignore
+
+    name = "fuxignore reachable"
+    if not (root / fuxignore.IGNORE_FILE).is_file():
+        return Check(name, True, f"{fuxignore.IGNORE_FILE} absent - nothing to shadow")
+    try:
+        rules = fuxignore.read(root).rules
+    except (FuxError, OSError):
+        return Check(name, True, "not assessed - see `fuxignore usable`")
+    shadowed = _shadowed_rules(rules)
+    if not shadowed:
+        return Check(name, True, f"{len(rules)} rule(s), none overridden by an identical later one")
+    return Check(
+        name,
+        False,
+        f"{len(shadowed)} rule(s) never decide anything because a later rule matches the same paths "
+        "(last match wins): "
+        + "; ".join(
+            f"{fuxignore.IGNORE_FILE}:{a.lineno} `{a.raw}` is overridden by :{b.lineno} `{b.raw}`"
+            for a, b in shadowed[:5]
+        )
+        + (f"; and {len(shadowed) - 5} more" if len(shadowed) > 5 else "")
+        + ". Delete the dead line, or move it below the one that overrides it",
+        level="warn",
     )
 
 
@@ -3008,6 +3215,61 @@ def _fetchers_declaring_parallelism(root: Path) -> list[tuple[str, int]]:
                 ):
                     out.append((path.stem, value.value))
     return out
+
+
+#: Modules a decoder has no business importing (L5: ingest is offline).
+DECODER_NETWORK_MODULES = tuple(fixed("doctor", "decoder_network_modules"))
+
+
+def _decoder_imports(root: Path) -> Check:
+    """A `.fux/decoders/*.py` that imports a network module (SR-DECODE, W-246).
+
+    ⚠ **A TRIPWIRE, NEVER COVERAGE.** It reads each file with `ast` (never
+    imports it) and names a static `import`/`from ... import` of a module in
+    `DECODER_NETWORK_MODULES` (`urllib.request`, not `urllib.parse`, which is
+    string handling and which the shipped drawio decoder uses). A decoder reaching the network through
+    `importlib.import_module`, `__import__`, an alias of an allowed module or
+    `exec` passes. It exists to catch the careless import, not to prove a
+    decoder offline; L5's real fence is the import test on the engine.
+    """
+    import ast
+
+    name = "decoder imports"
+    try:
+        paths = sorted((root / fixed("decoders", "consumer_dir")).glob("*.py"))
+    except OSError:
+        paths = []
+    hits: list[str] = []
+    for path in paths:
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+        except (OSError, SyntaxError, ValueError):
+            continue
+        found: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                names = [a.name for a in node.names]
+            elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
+                # `from urllib import request` names the submodule only as an alias.
+                names = [node.module, *(f"{node.module}.{a.name}" for a in node.names)]
+            else:
+                continue
+            for mod in names:
+                for banned in DECODER_NETWORK_MODULES:
+                    if mod == banned or mod.startswith(banned + "."):
+                        found.add(banned)
+        if found:
+            hits.append(f"{path.name} ({', '.join(sorted(found))})")
+    if not hits:
+        return Check(name, True, f"{len(paths)} decoder module(s), none statically importing a network module")
+    return Check(
+        name,
+        False,
+        "decoder(s) importing a network module: " + "; ".join(hits)
+        + ". A decoder runs at ingest, which is offline by law (L5). "
+        "This is a tripwire: a dynamic import is not seen",
+        level="warn",
+    )
 
 
 def _node_reader(root: Path) -> Check:

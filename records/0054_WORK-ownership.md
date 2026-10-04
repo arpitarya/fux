@@ -13,7 +13,7 @@ owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, script
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 3278de007dff54f9708febe1ea0275ca22070a2e9df561fef1f7442ab7f23da3
+content_sha: b4cf6d97780185ed5aab9651497ad9e622c4aa59d67377aaf50dda7253929d65
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -332,7 +332,7 @@ top-level definitions.
     **Since 2026-10-04 (W-251 §4 #16) a `kind: component` record with
     `owns: []` must carry a `describes` row on a `src/` component and name, in
     its own body, which of decision 7's two cases it is — gated by
-    [W-246](../work/open/W-246-mechanical-gates.md).** The stronger rule — a
+    W-246.** The stronger rule — a
     component record must own something — stays proposed; each of the ten is
     Arpit's, one at a time (W-251 §3 #16).
 

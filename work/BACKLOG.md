@@ -49,7 +49,7 @@ W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search impro
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
-| B-055 | Ten `component` records carry `owns: []`; the WEAK rule (a `describes` row + the d7 case stated) was ruled 2026-10-04, gated by [W-246](open/W-246-mechanical-gates.md); the STRONG rule (must own something) is "proposed and NOT in force" | [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision 11 ⚠ | Arpit: the strong rule and each record's verdict, one at a time (W-251 §3 #16) |
+| B-055 | Ten `component` records carry `owns: []`; the WEAK rule (a `describes` row + the d7 case stated) was ruled 2026-10-04, gated by W-246; the STRONG rule (must own something) is "proposed and NOT in force" | [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision 11 ⚠ | Arpit: the strong rule and each record's verdict, one at a time (W-251 §3 #16) |
 | B-259 | Display width is not `len()`: a path holding a CJK character or emoji renders two columns and can still wrap. "No test covers it" (ex-B-134); approach ruled — `unicodedata` column width, no dependency ([plan](proposals/build-plan-2026-10.md) §3) | [SR-CLI](../records/0101_cli-surface.md) decision 12 ⚠ | A session touching `progress.py` builds the plan's §3 with its test |
 
 ---

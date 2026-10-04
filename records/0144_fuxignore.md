@@ -10,7 +10,7 @@ feature: the `.fux/.fuxignore` exclusion file
 owns: [src/fux/ingest/fuxignore.py@286e1f84fe6a]
 laws: [L2, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 04d5dc4e25e79c6b6e26dfa4ec5045d8ded21a9a884b09850c98958c012c91ae
+content_sha: 719346ad91057ea93cccc5a9e6cf7b7da76daec0f9e3936d55978152257e9b35
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -406,6 +406,11 @@ this moved where they are written, not what they are.
 
 ### Consequences
 
+- **`fux doctor` has a `fuxignore reachable` row (W-246, 2026-10-04)**, and it
+  is the one observable symptom of a wrong reorder, not full coverage: last
+  match wins, so a hand rule an identical LATER rule overrides never decides
+  anything, and the row names it. A broad glob below a narrow one is a shadow it
+  does not see.
 - **One file answers the question people actually ask**, in a grammar they
   already know, with a skip reason that names the file, the line and the
   pattern.

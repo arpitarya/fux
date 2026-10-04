@@ -28,6 +28,8 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **Five `fux doctor` rows** (W-246 section C): `priority keys` (a `[priority]` key reaching no listed source), `fuxignore reachable` (a rule a later identical rule always overrides), `decoder imports` (a tripwire for static network imports in `.fux/decoders/`), `journal size` (the `--journal` log against the new `[cli.answer] journal_max_bytes`, 4 MiB as shipped; `fux doctor --fix` writes the key into an older `output.toml`), and `intent_weight` with its per-type document count on `ranking priors`.
+
 - **A PII rule that can backtrack exponentially is refused at load** (W-255). A
   `pii.toml` pattern with a variable-length repeat, overlapping alternation or a
   backreference inside an unbounded repeat (`(a+)+`, `(a|aa)*`, `(\w*\s?)*`)

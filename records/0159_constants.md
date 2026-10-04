@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@57870e10ca16]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@7a65bb22b995]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: e919e81f232fa2001be2124e5b375b78c5fb019007cb7ca0fe4c166c90741ec3
+content_sha: 0f34789ef5dad0eb423e8f7195916610be02f84ef3f1b6140239ad8557e3197b
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -185,6 +185,8 @@ pattern. A consumer who wants other cues is I2, which is not built.
 **No decision here moved** (W-255, 2026-10-04): `constants.toml` gained `[pii] stress_len`, `stress_units`, `ms_per_s` and `lint_alphabet` for the PII linter and `doctor`'s `pii timing` row ([SR-PII](0148_pii.md) decision 23).
 
 **No decision here moved** (W-248, 2026-10-04): two keys, `decoders.reason_no_decoder` and `decoders.reason_nothing_readable`, spell the queue reasons `decode.reason()` writes.
+
+**No decision here moved** (W-246, 2026-10-04): `[doctor] decoder_network_modules` joined constants.toml, the module list the `decoder imports` row scans for.
 
 ### Consequences
 

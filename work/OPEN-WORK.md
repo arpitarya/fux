@@ -48,7 +48,6 @@ here. Read that record before changing anything below it.
 ### testing
 
 - 🔴 **W-243** · `agent` — CI in ~2 min. On `main`: the key saves ✅, a docs-only push skips FULL ✅, `test_node_accel` trimmed. DoD 1 (FAST ≤ 2 min) needs step 1, which is STOP until Arpit rules Fork A. **Opus.** [detail](open/W-243-ci-two-minutes.md)
-- 🟢 **W-246** · `agent` — the gates the records asked for and nobody wrote: §A tests and §B engine invariants landed 2026-10-04 (17/17, one Law-record finding → B-271); §C, the five `doctor` rows, is left. **Sonnet.** [detail](open/W-246-mechanical-gates.md)
 - 🟢 **W-252** · `agent` — a pre-registration for the Node arm on lab rungs (the live one names the voided playground), then one rerun; parity has read 0 discordant three times. **Sonnet.** [detail](open/W-252-node-arm-preregistration-2.md)
 - 🟢 **W-256** · `agent` — three measurements needing no key and no hands: how much of an ingest is the walk vs the extract; whether `doc_coverage` spots an unanswerable question; the daemon on Windows and on a loopback 429. **Sonnet.** [detail](open/W-256-no-key-measurements.md)
 - 🔴 **W-257** · `arpit` — an enriched rung: an agent writes questions over rung-01000 so doc2query can finally be measured; the author must be blind to the question sets or the numbers prove nothing. Arpit launches it (his tokens). **Opus.** [detail](open/W-257-enriched-rung.md)

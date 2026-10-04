@@ -125,7 +125,8 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
     "lexical": ("band", "top", "explain", "sections", "max_headings"),
     "find": ("band", "top", "max_headings"),
     # `journal_max` since L12 (W-225): how many receipts the journal keeps.
-    "answer": ("band", "no_refer", "journal", "journal_max"),
+    # `journal_max_bytes` (W-246): the size `fux doctor` warns above.
+    "answer": ("band", "no_refer", "journal", "journal_max", "journal_max_bytes"),
     "explain": (),
     "graph": (),
     "path": ("hops",),
@@ -259,6 +260,7 @@ _TYPES: dict[str, type] = {
     "max_headings": int,
     "progress_threshold": int,
     "journal_max": int,
+    "journal_max_bytes": int,
     "port": int,
 }
 

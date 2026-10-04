@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@a061729ed875]
+owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@7635cc72189b]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: d45a142cef34556908b076bb8dc26ac542d50b8e71d9127c1eac05df04d3ce52
+content_sha: a97a411e4f931e988a79801d5b66b1d8a9e3ee0f1eca521f39b8ffadbc77ab7a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -682,6 +682,8 @@ copied out, never imported.
 **No decision here moved** (W-248, 2026-10-04): the "nothing readable" URL reason is spelled from `decoders.reason_nothing_readable`, the same constant the queue reader classifies by.
 
 **No decision here moved** (W-246, 2026-10-04): `templates/cdp.py.txt` counts requests paused against resolved per fetch and raises naming the URL when they differ ([SR-CDP-FETCHER](0118_cdp-fetcher.md) Consequences); the fetch contract is untouched.
+
+**No decision here moved** (W-246, 2026-10-04): `templates/output.toml.txt` gained the `[cli.answer] journal_max_bytes` key.
 
 ### Consequences
 

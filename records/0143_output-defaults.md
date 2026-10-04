@@ -10,10 +10,10 @@ amended: 2026-09-30
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@dbd9fda25aa9, src/fux/templates/output.toml.txt@ee3226cd6dcd, .fux/output.toml@38f72dd71a22, node/src/config/output.mjs@ae4f709222ac]
+owns: [src/fux/output_config.py@0c8e85b0e95b, src/fux/templates/output.toml.txt@0952128ae0aa, .fux/output.toml@4a3a8465d2e4, node/src/config/output.mjs@fa59be4a8c93]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: af043705c80fce1957f53e64e0179ca0b0d52ab880fb6d4ac42c89d46d85fec5
+content_sha: 552a3f48334a4bbefac95cbc743ce4a16270dbd537fa9848e5cc8b2268fa2df0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -623,7 +623,9 @@ keys`.
       and the reasoning; this record states only what it means for **this file**.
     - **It ships off** (the template says `journal = false`), so nothing
       records by accident. How many receipts the journal keeps is
-      `[cli.answer] journal_max` (1000 as shipped). **The fork
+      `[cli.answer] journal_max` (1000 as shipped); `journal_max_bytes` (4 MiB as
+      shipped, W-246) is the size `fux doctor` warns above, and truncates
+      nothing. **The fork
       SR-PROVENANCE decision 10 reserved was *always-on by default*, and that is
       still refused** — an opt-in somebody committed is not a default fux picked.
     - 🔴 **This key is therefore a DECLARED EXCEPTION to decision 2's boundary
