@@ -236,12 +236,34 @@ function pieces(text, maxPassageBytes, tableRowsPerPassage) {
   return out;
 }
 
+/** Lines in a leading YAML frontmatter block (both `---` fences included), or 0.
+ *  Twin of `fux.frontmatter.parse`'s boundary rule — the opening fence on line
+ *  1 and the first later fence close it; no closing fence means no block. Node
+ *  needs only WHERE the block ends, never its meta. */
+function frontmatterLines(lines) {
+  if (!lines.length || lines[0].trimEnd() !== "---") return 0;
+  for (let i = 1; i < lines.length; i++) if (lines[i].trimEnd() === "---") return i + 1;
+  return 0;
+}
+
 /** Split into passages, in document order.
  *  `lineNumbers=false` suppresses the range for a document whose text was
  *  GENERATED rather than read — a `.docx`'s Markdown exists nowhere on disk,
  *  so a line number would be a confident lie. */
-export function chunk(content, { minPassageBytes, maxPassageBytes, tableRowsPerPassage, lineNumbers }) {
-  const merged = fold(sections(content), minPassageBytes);
+export function chunk(content, { minPassageBytes, maxPassageBytes, tableRowsPerPassage, lineNumbers, frontmatter = false }) {
+  // A leading frontmatter block is its own passage and never reaches `fold`
+  // (SR-CHUNKING decision 7, W-254). Only for text read as written.
+  let unit = [], shift = 0;
+  if (frontmatter) {
+    const all = content.split("\n");
+    shift = frontmatterLines(all);
+    if (shift > 0) {
+      unit = [["", 0, all.slice(0, shift).join("\n"), 1, shift]];
+      content = all.slice(shift).join("\n");
+    }
+  }
+  const merged = [...unit, ...fold(sections(content), minPassageBytes)
+    .map(([h, l, t, s, e]) => [h, l, t, s + shift, e + shift])];
   const passages = [];
   for (const [heading, , text, start, end] of merged) {
     for (const [piece, offset, span, rung] of pieces(text, maxPassageBytes, tableRowsPerPassage)) {

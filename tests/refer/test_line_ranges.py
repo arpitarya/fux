@@ -25,7 +25,7 @@ MIN_PASSAGE_BYTES = template_tune().min_passage_bytes
 
 def _assert_every_passage_round_trips(doc: str) -> list:
     lines = doc.splitlines()
-    passages = chunk(doc, **chunk_bounds(), line_numbers=True)
+    passages = chunk(doc, **chunk_bounds(), line_numbers=True, frontmatter=False)
     assert passages, "fixture produced no passages"
     for p in passages:
         assert p.line_start >= 1, f"line_start must be 1-based, got {p.line_start}"
@@ -131,7 +131,7 @@ def test_the_locator_falls_back_to_the_ordinal_without_a_range():
 def test_the_ordinal_survives_alongside_the_range():
     """Kept deliberately: it is stable across a reflow that moves every line."""
     doc = "## A\n\n" + ("x " * 90) + "\n\n## B\n\n" + ("y " * 90)
-    for i, p in enumerate(chunk(doc, **chunk_bounds(), line_numbers=True)):
+    for i, p in enumerate(chunk(doc, **chunk_bounds(), line_numbers=True, frontmatter=False)):
         assert p.ordinal == i
 
 

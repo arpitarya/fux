@@ -203,7 +203,7 @@ def compute(root: Path, doc, *, decoder: str, bounds: dict[str, int]) -> dict:
         text, generated = "", False
     out["decoded"] = generated
     out["text_bytes"] = len(text.encode("utf-8"))
-    passages = chunk(text, **bounds, line_numbers=True) if text else []
+    passages = chunk(text, **bounds, line_numbers=True, frontmatter=not generated and not doc.id.startswith("url:")) if text else []
     out["passages"] = len(passages)
     for p in passages:
         out["cuts"][p.cut or "author"] = out["cuts"].get(p.cut or "author", 0) + 1

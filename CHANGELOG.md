@@ -28,6 +28,13 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
+- **A leading YAML frontmatter block is its own passage in `fux answer`** (W-254).
+  It is passage 0 (heading empty, exact `L1-Ln`) instead of riding into the first
+  section, so a `status:` line is quotable and the block no longer tilts that
+  section's rescoring. Detected with the shared frontmatter parser, on text read
+  as written only; decoded documents chunk as before. One more passage per
+  frontmattered document; document membership is unchanged. Node twin updated.
+
 - ⚠ **`.fux/inspect.toml` gains a required `[floors]` table** (W-225 stage 5f):
   the bounds of `fux inspect`'s three headline checks, which were constants in
   code. The values are unchanged (0.01, 0.60, 0.20). An `inspect.toml` without

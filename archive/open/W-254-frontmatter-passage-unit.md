@@ -9,9 +9,15 @@ ball: agent
 
 # W-254 — the frontmatter block is its own passage
 
+**✅ CLOSED 2026-10-04 — built as ruled** (Claude Code; Sonnet built, Opus 5.5 reviewed):
+- `refer/_chunk.chunk()` takes a required `frontmatter: bool`; when true and `fux.frontmatter.parse` finds a block, it is passage 0 (heading `""`, level 0, `L1-Ln`) and never reaches `_fold`; the body is chunked alone and shifted, so its passages equal the no-frontmatter case. Callers: `refer()` passes it for an undecoded `file:` document only; `rerank.boost` (raw file text) always; `inspect` facts/xray when not generated and not `url:`; `enrich._chunk_count` never (committed enrichment unit counts unchanged — a judgement call). Node twin in `node/src/refer/chunk.mjs`, `answer.mjs`, `rerank.mjs`.
+- Tests: six chunker tests (unit, ranges, no fold, body equality, totality, decoded `---` not split, unclosed fence) and rerank veto 2 (membership unchanged).
+- **Parity, checked by hand** because the differential arm never compares `answer` passages: on a 42-document frontmattered corpus, Python and Node `answer --json` agree on 11 of 12 queries, and the twelfth differs only deep in the passage tail. HEAD shows the same 11 of 12, a pre-existing float-ULP tie order (`…473` vs `…472`), not this change.
+- Live successors: [SR-CHUNKING](../../records/0151_chunking.md) d7, [SR-ANSWER](../../records/0105_answer.md) Consequences, [SR-REFER](../../records/0127_refer-plane.md) d23.
+
 **Model:** Claude Code, **Sonnet** — a small change to a pure function with a
 totality invariant already tested, plus its Node twin. **Ratified 2026-10-04 by
-delegation ([W-251](W-251-backlog-audit-rulings.md) §4, row B-150), not built.**
+delegation ([W-251](../../work/open/W-251-backlog-audit-rulings.md) §4, row B-150), not built.**
 
 ## The ruling
 

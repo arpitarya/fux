@@ -23,10 +23,12 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
-## 2026-10-04 — the green items, one after another: W-253 ✓ …  ·  Claude Code (Opus 5.5, Sonnet subagents per item)
+## 2026-10-04 — the green items, one after another: W-253 ✓ W-254 ✓ …  ·  Claude Code (Opus 5.5, Sonnet subagents per item)
 - **Asked:** *"implement everything that is green one after the other till the closure"* — the eleven 🟢 rows (W-245–W-250, W-252–W-256). Order: smallest builds first, W-245 after the builds whose record sentences it maps, measurements last.
 - **First:** committed the Cowork W-251 delegation pass verbatim (`3cbe8f4d`, idle seven hours) so each item lands as a separable change. Baseline: unit 6423 + the 8 known ladder-seed failures (W-240), e2e 158, node 217.
 - **W-253 ✓** — ramp removed (a `str` fetcher return is a named skip), `/`-boundary `--under` and `[priority]` on both CLIs, `find --json` key order; differential arm 0/225 discordant. Built by a Sonnet subagent; reviewed here — its eleven "no decision moved" notes were moved from above each record's H1 to before Consequences (W-225's placement), and the vendored `.fux/node/fux.mjs` rebuilt from the bundler.
+- **W-254 ✓** — the frontmatter block is its own passage, Python and Node; parity checked by hand on a 42-doc frontmattered corpus (the arm compares ranking, not `answer` passages): 11/12 agree, as at HEAD. ⚠ **Finding (pre-existing, not filed as an item):** Python and Node `answer` passage tails can order differently when two passage scores differ only in the last float digit (`0.9062322824919473` vs `…472`), and on this repo Node drops the `.jsonl` passages Python cites. The top passages agree.
+- ⚠ **Two strikes → a gate (SR-WORK-SESSION d13):** `afd59629` (W-253) shipped a stale SR-CLI `owns:` hash because `tests_e2e/test_w253_contracts.py` was untracked when the stamp ran — the third occurrence after LESSONS 2026-09-21 and `f8b21bd5`. Gated in the W-254 change: `sr-owns.py --write` refuses while an owned directory holds an untracked file (SR-WORK-OWNERSHIP d13b, with its test).
 - ⚠ `README.md` was rewritten in the tree at 19:10 by someone else (82 → 35 lines); not this session's, left out of every commit.
 
 ## 2026-10-04 — W-251's 24 forks researched again: 13 ruled by delegation, 3 in part, 10 left that are his; six items filed; four of yesterday's recommendations corrected  ·  Cowork (Fable 5.1)

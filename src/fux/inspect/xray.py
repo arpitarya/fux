@@ -266,7 +266,10 @@ def document(root: Path, view, loc: str) -> dict:
     if raw is not None:
         text, generated = facts_mod.readable_text(root, doc.id, doc.loc, raw)
         bounds = facts_mod.refer_bounds(root)
-        cut = chunk(text, **bounds, line_numbers=not generated) if text else []
+        cut = chunk(
+            text, **bounds, line_numbers=not generated,
+            frontmatter=not generated and not doc.id.startswith("url:"),
+        ) if text else []
         total_passages = len(cut)
         passage_rows = [
             {"ordinal": p.ordinal, "heading": p.heading, "lines": [p.line_start, p.line_end],

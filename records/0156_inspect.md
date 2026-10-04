@@ -8,10 +8,10 @@ amended: 2026-09-28
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@f7a9ffa5df4a, .fux/inspect.toml@a2b927adc116]
+owns: [src/fux/inspect@fa80cf7473e1, .fux/inspect.toml@a2b927adc116]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: b52e4e253f05e40c92750e6930d6b80b8685c4501aeb9353567d6e41aeb1cd86
+content_sha: e79ff81834c49c4d91d14c0cd39d4175ebd6761fb0701119e599df1f704424ae
 ratifies: W-169
 ---
 
@@ -469,6 +469,8 @@ evidence (`work/regression/2026-09-14-inspect-floors/`) are unchanged.
   identical on this repo (2.69 MB) and on rung-01000 (841 KB).
 - ⚠ **A consumer `inspect.toml` without `[floors]` stops** with the missing-key
   error until `fux doctor --fix` (R9), checked on a copy.
+
+**No decision here moved** (W-254, 2026-10-04): `inspect/facts.py` and `xray.py` pass `frontmatter=` to the chunker so the passage counts they report match `answer`'s.
 
 ### Consequences
 

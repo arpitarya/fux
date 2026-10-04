@@ -18,7 +18,7 @@ rescore_mod = sys.modules["fux.refer._rescore"]
 
 
 def _doc(text: str):
-    return [("file:a.md", "a.md", "sha", chunk(text, **chunk_bounds(), line_numbers=True))]
+    return [("file:a.md", "a.md", "sha", chunk(text, **chunk_bounds(), line_numbers=True, frontmatter=False))]
 
 
 def test_the_passage_that_matches_scores_highest():
@@ -119,7 +119,7 @@ def test_the_passage_that_says_the_query_back_wins_when_the_weight_is_on():
     """
     pad = " ".join(f"pad{i}" for i in range(30))
     text = f"# Alpha\n\nrollback {pad} procedure {pad}\n" + f"\n# Beta\n\n{pad} rollback procedure {pad}\n"
-    candidates = [("file:a.md", "a.md", "sha", chunk(text, **chunk_bounds(), line_numbers=True))]
+    candidates = [("file:a.md", "a.md", "sha", chunk(text, **chunk_bounds(), line_numbers=True, frontmatter=False))]
 
     off = rescore("rollback procedure", candidates, scoring=scoring(), weight=0.0, proximity=template_tune().proximity)
     assert off[0].score == off[1].score, "the arms must be a BM25 tie, or this tests length"
@@ -136,7 +136,7 @@ def test_the_multiplier_is_bounded_by_the_weight():
     than the caller allowed."""
     body = "the rollback procedure is documented here"
     text = f"# A\n\n{body}\n"
-    candidates = [("file:a.md", "a.md", "sha", chunk(text, **chunk_bounds(), line_numbers=True))]
+    candidates = [("file:a.md", "a.md", "sha", chunk(text, **chunk_bounds(), line_numbers=True, frontmatter=False))]
     base = rescore("rollback procedure", candidates, scoring=scoring(), weight=0.0, proximity=template_tune().proximity)[0].score
     for weight in (0.5, 1.0, 2.0):
         boosted = rescore("rollback procedure", candidates, weight=weight, scoring=scoring(), proximity=template_tune().proximity)[0].score

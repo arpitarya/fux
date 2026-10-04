@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@32669fe1ce17, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@5c4f7e0da66d, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: c6824fca0a6bc52a787ea8a5f8b8b936d4674f7342d4b6b8cda6b128d7a5ac24
+content_sha: 88c3e0b5376d66fcdadf4e224cccb9adbd395ad2eaf0139f67bbc39a25206de7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -998,6 +998,8 @@ Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1 and 2 BUILT 2026-1
   serves.
 
 **No decision here moved** (2026-10-03): the arm's `api` lane compares scores at `round(9)` like every other lane, under [SR-RANKING](0111_ranking.md) decision 8a. That lane exercises this record's library surface, `index.mjs` against `api.py`. See [SR-T1-ACCELERATOR](0110_accelerator.md)'s note of the same date.
+
+**No decision here moved** (W-254, 2026-10-04): the Node refer chunker gained the frontmatter unit and `answer`/`rerank` pass the flag ([SR-CHUNKING](0151_chunking.md) decision 7).
 
 ### Consequences
 

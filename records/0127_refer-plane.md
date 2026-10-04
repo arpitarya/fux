@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@44c508aa948a, tools/refer-bench@865d1234ec06, tools/refer-budget-sweep@3286249029a0, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@7de781bb989c]
+owns: [src/fux/refer@4f1285893e23, tools/refer-bench@865d1234ec06, tools/refer-budget-sweep@3286249029a0, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@7de781bb989c]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: b423442d4d3a65ea7b4360556b724f21858a8710ce5f95c8585a70d98e115335
+content_sha: 71ac9beafebdcf05f64301a70921de91250c3d8484742d625a3e46d4c5b8ec76
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -425,6 +425,10 @@ impossible to quote.
   [SR-URL-FRESHNESS](0147_url-freshness.md) decision 6a.
 - **A document no decoder claims is unchanged.** `decode()` returns `None`,
   and the path falls back to exactly what it did before.
+- **The seam also carries the "undecoded" flag.** `refer()` passes
+  `frontmatter=True` to `chunk` only for a `file:` document `_readable` did not
+  generate, so a leading YAML block becomes its own passage there and nowhere
+  else ([SR-CHUNKING](0151_chunking.md) decision 7, W-254).
 
 **24. A generated document gets an ordinal citation, never a line range.**
 Decision 17 makes the locator a line range with the ordinal as fallback. That
@@ -626,6 +630,8 @@ is now a committed fact instead of a response header.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 **No decision here moved** (W-253, 2026-10-04): A bare-`str` fetcher return is refused at verify time too (`_unpack` is shared with ingest), per [SR-FETCHER](0117_fetcher.md) decision 2.
+
+**No decision here moved** (W-254, 2026-10-04): `refer/__init__.py` passes the undecoded flag to the chunker (decision 23, one clause added).
 
 ### Consequences
 

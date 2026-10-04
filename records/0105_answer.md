@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@7d111b045e0c]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 18bbd9aa49e80049be110a74b3a6ce8f9b07ad429f6788c0446813895ce3e42b
+content_sha: d7a59769dc24156ae6498b1f16056cd95974c618aa20e3f92dfc2a8df37c216a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -575,7 +575,8 @@ The question `fux answer` ranks is analyzed with the repo's identifier families,
   consistent with the refer plane's "it cannot invent" rule — the passage is a
   genuine verbatim span, frontmatter included — but it is a real readability
   cost on a document that opens with one, recorded rather than smoothed over.
-  Stripping it is `chunk.py`'s call, not this record's.
+  Ruled by [SR-CHUNKING](0151_chunking.md) decision 7 (W-254): the block is its
+  own passage rather than stripped.
 - **A caller can detect which path answered programmatically** via `"source"`,
   without parsing prose.
 - **`answer` is not a summariser and will never become one.** A future request

@@ -51,6 +51,14 @@ repo-wide stamp on a shared tree re-stamps another session's in-progress
 records and silently satisfies the gate that exists to make them re-read those
 records. [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision 13a.
 
+🔴 **`--write` refuses while an owned directory holds an UNTRACKED file**
+(2026-10-04, the third occurrence — work/LESSONS.md 2026-09-21, WORKLOG
+2026-09-27 and 2026-10-04). The hash enumerates `git ls-files`, so a new file
+stamped before `git add` is left out of it, and the gate fires on the next run
+after the commit, naming a component you thought you had just stamped. **Order:
+`git add`, then stamp.** `--untracked-ok` stamps anyway, for a file that is
+another session's and is not meant to land with yours.
+
 ⚠ **Run `scripts/sr-hash.py --write` after this one** — stamping `owns` changes
 the record, which moves its own `content_sha`.
 """
@@ -156,6 +164,20 @@ def restamp(text: str) -> tuple[str, list[str]]:
     return text[: m.start()] + "owns: [" + ", ".join(out) + "]" + text[m.end() :], moved
 
 
+def untracked_under(component: str) -> list[str]:
+    """Untracked, non-ignored files under a directory component — the files
+    `git add` would bring into its hash. Empty for a file component."""
+    target = ROOT / component
+    if not target.is_dir():
+        return []
+    out = subprocess.run(
+        ["git", "ls-files", "-z", "--others", "--exclude-standard", "--",
+         target.relative_to(ROOT).as_posix()],
+        cwd=ROOT, capture_output=True, check=True,
+    ).stdout
+    return [n.decode("utf-8") for n in out.split(b"\0") if n]
+
+
 def records() -> list[Path]:
     return sorted(RECORDS.glob("[0-9][0-9][0-9][0-9]_*.md"))
 
@@ -187,12 +209,30 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--write", action="store_true", help="recompute and stamp the named records' claims")
     ap.add_argument("--all", action="store_true", help="with --write: every record (a tree nobody else is editing)")
+    ap.add_argument("--untracked-ok", action="store_true",
+                    help="with --write: stamp even though an owned directory holds untracked files")
     ap.add_argument("records", nargs="*", help="record numbers, names or paths to act on")
     args = ap.parse_args()
     if args.write and not args.records and not args.all:
         print(_REFUSAL, file=sys.stderr)
         return 2
     chosen = select(records(), args.records) if args.records else records()
+    if args.write and not args.untracked_ok:
+        loose = sorted({
+            f
+            for path in chosen
+            for claim in claims(path.read_text(encoding="utf-8"))
+            for f in untracked_under(split_claim(claim)[0])
+        })
+        if loose:
+            print("refusing --write: these files are untracked under a directory the "
+                  "named records own, so the stamp would leave them out and go stale "
+                  "the moment they are committed. `git add` them first, then stamp "
+                  "(work/LESSONS.md 2026-09-21). If they are another session's, pass "
+                  "--untracked-ok:", file=sys.stderr)
+            for f in loose:
+                print(f"  {f}", file=sys.stderr)
+            return 2
 
     stale: list[str] = []
     for path in chosen:

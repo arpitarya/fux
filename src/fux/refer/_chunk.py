@@ -49,6 +49,7 @@ from dataclasses import dataclass
 # the Markdown being split. See `decode/_markdown.py` for why there is one.
 from fux.decode._markdown import headings as _headings
 from ..constants import fixed
+from ..frontmatter import parse as _parse_frontmatter
 
 _MIN_TABLE_LINES = fixed("markdown", "min_table_lines")
 
@@ -108,6 +109,7 @@ def chunk(
     max_passage_bytes: int,
     table_rows_per_passage: int,
     line_numbers: bool,
+    frontmatter: bool,
 ) -> list[Passage]:
     """Split into passages, in document order.
 
@@ -139,8 +141,29 @@ def chunk(
 
     `line_numbers=False` suppresses `line_start`/`line_end` for a document
     whose text was generated rather than read — see the module docstring.
+
+    `frontmatter=True` — passed ONLY for text read as written, never for a
+    decoder's output — makes a leading YAML block its own passage (heading
+    `""`, level 0, lines `1..n`) that `_fold` never sees, so it cannot ride
+    forward into the first section (SR-CHUNKING decision 7, W-254). It is
+    detected with `fux.frontmatter.parse`, the parser ingest uses. Decoded
+    Markdown may legitimately open with `---` (an `<hr>`), which is why the
+    caller decides rather than the chunker guessing.
     """
-    merged = _fold(_sections(content), min_passage_bytes=min_passage_bytes)
+    unit: list[tuple[str, int, str, int, int]] = []
+    shift = 0
+    if frontmatter:
+        parsed = _parse_frontmatter(content)
+        if parsed.body_start_line > 1:
+            shift = parsed.body_start_line - 1
+            unit = [("", 0, "\n".join(content.split("\n")[:shift]), 1, shift)]
+            content = parsed.body
+    merged = unit + [
+        (heading, level, text, start + shift, end + shift)
+        for heading, level, text, start, end in _fold(
+            _sections(content), min_passage_bytes=min_passage_bytes
+        )
+    ]
 
     passages: list[Passage] = []
     for heading, _level, text, start, end in merged:

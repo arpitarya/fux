@@ -179,7 +179,7 @@ export function passageBoost(queryTerms, passageTerms, proximity) {
 export function boost(queryTerms, text, tune) {
   let best = 0.0;
   const proximity = tune.proximity;
-  for (const passage of chunk(text, { ...tune.chunkBounds(), lineNumbers: true })) {
+  for (const passage of chunk(text, { ...tune.chunkBounds(), lineNumbers: true, frontmatter: true })) {
     const score = passageBoost(queryTerms, analyze(passage.text), proximity);
     if (score > best) best = score;
   }

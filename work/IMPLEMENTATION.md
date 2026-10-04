@@ -26,6 +26,15 @@ Rules:
 
 ---
 
+## 2026-10-04 — **W-254: the frontmatter block is its own passage**
+
+| what | evidence |
+|---|---|
+| **chunker** | `refer/_chunk.chunk(frontmatter=)`: a leading YAML block (via `fux.frontmatter.parse`) is passage 0, never folded forward; undecoded path only ([SR-CHUNKING](../records/0151_chunking.md) d7) |
+| **invariants** | totality, exact line ranges, body passages identical to the no-frontmatter case, rerank veto 2 (membership) — `tests/refer/test_chunk.py`, `tests/query/test_rerank.py` |
+| **Node** | `node/src/refer/chunk.mjs` twin; Python and Node `answer --json` agree on a 42-doc frontmattered corpus as they did at HEAD (11/12, the twelfth a pre-existing float-ULP tail-order difference) |
+| **gate** | the third stale-`owns:`-hash occurrence (`afd59629`) became `sr-owns.py --write`'s untracked-file refusal ([SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) d13b) |
+
 ## 2026-10-04 — **W-253: the 3.0 contract clean-ups (fetcher `str` ramp removed; `/`-boundary `--under` and `[priority]`; `find --json` key order)**
 
 | what | evidence |

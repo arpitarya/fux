@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@a612e4a6b0c8, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@8f3efd21a71f, node/test/pins.test.mjs@daebcdb98aac]
+owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@865879888033, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@8f3efd21a71f, node/test/pins.test.mjs@daebcdb98aac]
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 078bb8456c757cbde1221b483c8e70e5ac1dfeb8251ade6cc19a5b19de1e3544
+content_sha: d11ff0c897e1dd85618f99d6086da178e346a7f83848d5d8b933023ab3693422
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -634,6 +634,8 @@ a missing blob already is — never a crash inside a planning command.
 **`enrich --check` paints a `check` bar over the enrichment files it opens** (W-238, 2026-09-29; [SR-CLI](0101_cli-surface.md) decision 17). Its self-retrieval filter ranks one query per question: 105 s for 300 files at `rung-10000`. `plan(progress=)` counts only documents that HAVE a file, and paints only when `self_retrieval_k > 0`, so `--plan` stays silent. `enrich` gained `--progress` / `--no-progress` and `--no-output-config`. The report is byte-identical.
 
 **No decision here moved** (W-242 (closed 2026-10-03) Tier 0, 2026-09-30; [SR-NODE-SEARCH](0153_node-search.md) decision 24): Node's `applyPin` and `pinnedFor` read the call's `Shards` instead of opening every shard again; which pin applies, and when, is unchanged. Output is byte-identical.
+
+**No decision here moved** (W-254, 2026-10-04): `enrich._chunk_count` passes `frontmatter=False` to the chunker, so an enrichment unit count is what it was before the frontmatter passage existed.
 
 ### Consequences
 

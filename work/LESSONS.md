@@ -211,6 +211,10 @@ a component you thought you had just stamped.
 **Order: `git add`, then `sr-owns.py --write && sr-hash.py --write`, then commit.**
 It cost two re-stamps in one session and looks exactly like a flaky gate.
 
+**Gated 2026-10-04** on the third occurrence (`f8b21bd5`, then `afd59629`): `sr-owns.py --write` now
+refuses while an owned directory holds an untracked file —
+[SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision 13b.
+
 ## 2026-09-15 — "commit with explicit pathspecs" is not a rule you can follow mechanically
 
 **Second occurrence of a failure class, and a gate now exists** —

@@ -198,7 +198,12 @@ def refer(
                 doc_id,
                 loc,
                 result.sha,
-                chunk(text, **tune.chunk_bounds(), line_numbers=not generated),
+                chunk(
+                    text,
+                    **tune.chunk_bounds(),
+                    line_numbers=not generated,
+                    frontmatter=not generated and result.strategy == GIT,
+                ),
             )
         )
 

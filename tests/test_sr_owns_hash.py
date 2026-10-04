@@ -141,3 +141,41 @@ def test_a_bare_write_is_refused(tmp_path, script):
     assert run.returncode == 2, run.stdout + run.stderr
     assert "refusing a repo-wide --write" in run.stderr
     assert {p.name: p.read_bytes() for p in (tmp_path / "records").glob("*.md")} == before
+
+
+def test_write_refuses_while_an_owned_directory_holds_an_untracked_file(tmp_path):
+    """**Two strikes → this gate** (SR-WORK-SESSION decision 13; the third
+    occurrence, 2026-10-04). The hash enumerates `git ls-files`, so a new file
+    stamped before `git add` is left out and the record goes stale the moment
+    the file is committed (work/LESSONS.md 2026-09-21; WORKLOG 2026-09-27 and
+    2026-10-04). Runs in a throwaway git repo holding a copy of the script.
+    """
+    (tmp_path / "scripts").mkdir()
+    shutil.copy(ROOT / "scripts" / "sr-owns.py", tmp_path / "scripts" / "sr-owns.py")
+    (tmp_path / "records").mkdir()
+    (tmp_path / "pkg").mkdir()
+    (tmp_path / "pkg" / "a.py").write_text("a = 1\n")
+    record = tmp_path / "records" / "0999_demo.md"
+    record.write_text("---\nowns: [pkg]\n---\n")
+
+    def run(*extra):
+        return subprocess.run(
+            [sys.executable, str(tmp_path / "scripts" / "sr-owns.py"), "--write", "0999", *extra],
+            cwd=tmp_path, capture_output=True, text=True,
+        )
+
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    subprocess.run(["git", "add", "pkg/a.py"], cwd=tmp_path, check=True)
+    assert run().returncode == 0
+    stamped = record.read_text()
+
+    (tmp_path / "pkg" / "b.py").write_text("b = 2\n")  # new, not yet `git add`-ed
+    refused = run()
+    assert refused.returncode == 2, refused.stdout + refused.stderr
+    assert "pkg/b.py" in refused.stderr and "git add" in refused.stderr
+    assert record.read_text() == stamped
+
+    assert run("--untracked-ok").returncode == 0
+    subprocess.run(["git", "add", "pkg/b.py"], cwd=tmp_path, check=True)
+    assert run().returncode == 0
+    assert record.read_text() != stamped

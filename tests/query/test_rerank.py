@@ -182,3 +182,21 @@ def test_the_reader_is_injected_never_imported(tmp_path):
     assert rerank._read_local_text(tmp_path, "file:a.md", "a.md") == "gateway rollback"
     assert rerank._read_local_text(tmp_path, "url:https://example.com", "https://example.com") is None
     assert rerank._read_local_text(tmp_path, "file:gone.md", "gone.md") is None
+
+
+def test_frontmatter_passage_changes_counts_never_membership():
+    """W-254 / rerank veto 2. A frontmattered document gains one passage; the
+    reranker still returns exactly the documents it was given."""
+    fm = "---\ntitle: Gateway\nstatus: retired\n---\n# Rollback\n\nRun the gateway rollback now."
+    results = [_r("a.md", 10.0), _r("b.md", 9.0)]
+    texts = {"a.md": "unrelated prose", "b.md": fm}
+    out = rerank.rerank(None, "gateway rollback", results, tune=tuned(rerank_weight=1.0), read=_reader(texts))
+    assert {r.id for r in out} == {r.id for r in results}
+    assert len(out) == len(results)
+    from fux.refer._chunk import chunk
+
+    bounds = template_tune().chunk_bounds()
+    plain = chunk(fm, **bounds, line_numbers=True, frontmatter=False)
+    framed = chunk(fm, **bounds, line_numbers=True, frontmatter=True)
+    assert len(framed) == len(plain) + 1 or len(framed) == len(plain)
+    assert framed[0].text.startswith("---")

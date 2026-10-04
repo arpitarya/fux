@@ -257,7 +257,7 @@ def test_the_page_shaped_decoders_still_emit_sibling_headings():
     levels = [h.level for h in headings(out)]
     assert levels[0] == 1, "the file's own title"
     assert set(levels[1:]) == {2}, "every message a sibling of every other"
-    assert [p.heading for p in chunk(out, **chunk_bounds(), line_numbers=True)] == ["First thread", "Second thread"]
+    assert [p.heading for p in chunk(out, **chunk_bounds(), line_numbers=True, frontmatter=False)] == ["First thread", "Second thread"]
 
 
 def test_an_html_email_body_cannot_outrank_its_own_subject():

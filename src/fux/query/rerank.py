@@ -246,7 +246,7 @@ def boost(query_terms: list[str], text: str, tune: "Tune") -> float:
 
     best = 0.0
     proximity = tune.proximity
-    for passage in chunk(text, **tune.chunk_bounds(), line_numbers=True):
+    for passage in chunk(text, **tune.chunk_bounds(), line_numbers=True, frontmatter=True):
         score = passage_boost(query_terms, analyze(passage.text), proximity)
         if score > best:
             best = score

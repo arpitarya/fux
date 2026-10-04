@@ -10,7 +10,7 @@ feature: section records — the committed section plane, the index section rule
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: 37dc9ae52213f6236440d6b89b7fb65b58905752c902a4856e561a1175d07d68
+content_sha: ca65cd514fc4184b86535a75457311dd1a84e5830b97acc2210e90121c678e2c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -270,6 +270,8 @@ file is 168 451 B. Both frozen commit limits pass
 grades the ratio. SR-WORK-SCALE judges by reasoning, and SR-INDEX-LIFECYCLE
 says size is measured, never gated. So the ratio is a cost Arpit has seen, not
 a pass.
+
+**No decision here moved** (W-254, 2026-10-04): the refer chunker gained the frontmatter unit ([SR-CHUNKING](0151_chunking.md) decision 7); section decisions are untouched.
 
 ### Consequences
 

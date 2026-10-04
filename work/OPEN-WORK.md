@@ -47,7 +47,6 @@ here. Read that record before changing anything below it.
 - 🟢 **W-248** · `agent` — `fux enrich` reads the decoder queue `fux ingest` writes: declared scope ∪ the rows that need a model; *no decoder* rows become a doctor line. **Sonnet.** [detail](open/W-248-enrich-consumes-queue.md)
 - 🟢 **W-249** · `agent` — `fux mcp` and `fux serve` keep the index open across calls, keyed on `.fux/runtime/stamp.json` — residency, not W-242's refused result cache. **Opus.** [detail](open/W-249-resident-index-mcp-serve.md)
 - 🟢 **W-250** · `agent` — run `fux hooks` in this repository so `.gitattributes` carries the merge driver where it was written. **Sonnet.** [detail](open/W-250-dogfood-fux-hooks.md)
-- 🟢 **W-254** · `agent` — the YAML frontmatter at the top of a document becomes its own quotable passage instead of riding into the first section's quote (SR-ANSWER's open question, ruled by W-251). Node twin too. **Sonnet.** [detail](open/W-254-frontmatter-passage-unit.md)
 - 🟢 **W-255** · `agent` — a bad PII regex can hang `fux ingest`: refuse the hang-prone shapes when `pii.toml` loads (same answer on every machine) and let `doctor` time the rest. Ruled by W-251; the design is in the compare. **Sonnet.** [detail](open/W-255-pii-regex-bound.md)
 
 ### testing

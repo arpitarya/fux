@@ -61,7 +61,7 @@ function obtain(root, record, textGlobs) {
       const [raw, sha] = readLocal(root, target);
       // Decoded documents carry no line numbers — a `.docx`'s Markdown exists
       // nowhere on disk, so a line number would be a confident lie.
-      return { text: raw.toString("utf8"), verdict: Verdict.verify(indexedSha, sha), lineNumbers: true };
+      return { text: raw.toString("utf8"), verdict: Verdict.verify(indexedSha, sha), lineNumbers: true, frontmatter: true };
     } catch (err) {
       return { text: null, verdict: Verdict.unverified(indexedSha, String(err.message)), lineNumbers: true };
     }
@@ -157,7 +157,7 @@ export function answerPayload(root, args) {
     verdicts.set(r.id, got.verdict);
     if (got.text === null) continue;
     candidates.push([r.id, r.loc, record.sha || "",
-                     chunk(got.text, { ...tune.chunkBounds(), lineNumbers: got.lineNumbers })]);
+                     chunk(got.text, { ...tune.chunkBounds(), lineNumbers: got.lineNumbers, frontmatter: got.frontmatter })]);
   }
 
   if (!candidates.length) {

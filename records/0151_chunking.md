@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-09-06
 feature: chunking — the strategy vocabulary, the boundary ladder, and the retrieval/citation split
-owns: [src/fux/refer/_chunk.py@d8b74dfcef1b, node/src/refer/chunk.mjs@0cd18afc0aaf]
+owns: [src/fux/refer/_chunk.py@a22e14a13f31, node/src/refer/chunk.mjs@18fa6e55bc11]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 4bc500cacbf2399c00f4ab0ace38ad720df394316ed3200a4d6e8ba7e08a53b4
+content_sha: 208d6e87a835343160ca6b67c17b1f33f5d666c2985283782af6dc8238c6a9b8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -121,6 +121,28 @@ ladder therefore uses only boundaries that need no knowledge of any language.
 **6. A single unbreakable token still comes back oversized**, and the assembler
 still refuses it. That is correct, and it is now the **only** case that reaches
 it — before the ladder, every blank-line-free document did.
+
+**7. 🔴 A leading frontmatter block is a UNIT** (W-254, ruled by delegation
+2026-10-04, [W-251](../work/open/W-251-backlog-audit-rulings.md) §4). It is its
+own passage — heading `""`, level 0, exact `L1-Ln` — and **never folds forward**
+into the first section. It is detected with `fux.frontmatter.parse`, shared
+with ingest and never reimplemented, and **only on the undecoded path**: the
+caller passes `frontmatter=True` for text read as written (a `file:` document no
+decoder claimed) and never for a decoder's output, because decoded Markdown may
+legitimately open with `---` (an `<hr>`). The body's first section starts on the
+line the parser reports, so line ranges stay exact and **every byte still lands
+in exactly one passage**.
+
+- **Why a unit and not stripped.** A preamble is content, and a `status:
+  retired` line is exactly the sentence that answers the question. Before this
+  decision `_fold` rode the short block forward into the `# Title` section, so
+  rescoring handed that passage extra `tf` from `title:` and `description:` —
+  the readability cost [SR-ANSWER](0105_answer.md) named was also a scoring tilt.
+- **The block stays quotable** (it is a passage) and stays indexed at document
+  level — what ingest mines from it is untouched.
+- ⚠ **One extra passage per frontmattered document.** Passage counts move;
+  document membership does not ([SR-RERANK](0138_rerank.md) veto 2).
+- A `url:` document is not flagged: `source.py` already decoded it.
 
 ### Alternatives considered
 

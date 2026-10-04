@@ -470,7 +470,10 @@ def _chunk_count(root: Path, record: dict, bounds: dict[str, int]) -> int:
     text = _document_text(root, record)
     if text is None:
         return 0
-    return len(chunk(text, **bounds, line_numbers=True))
+    # `frontmatter=False`: enrichment units are what they were before W-254
+    # (SR-CHUNKING decision 7); the frontmatter passage is refer's, not a unit
+    # anyone writes a question for.
+    return len(chunk(text, **bounds, line_numbers=True, frontmatter=False))
 
 
 #: The synthetic scope every enrichable `url:` document falls under.

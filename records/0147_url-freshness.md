@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 324e7dfc74f6d0ac53b1e3141cb3d944d496c698d164e18629685109ff2f2277
+content_sha: 9be5fde569f0e3ce442f19ecfbddfb8eb23dfdf0ea1d0daa3759d178eb8f5430
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -578,6 +578,8 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 **No decision here moved** (W-253, 2026-10-04): A bare-`str` fetcher return is refused at verify time too (`_unpack` is shared with ingest), per [SR-FETCHER](0117_fetcher.md) decision 2.
+
+**No decision here moved** (W-254, 2026-10-04): the refer seam passes the undecoded flag to the chunker; freshness decisions are untouched.
 
 ### Consequences
 
