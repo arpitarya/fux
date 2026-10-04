@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@865879888033, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@8f3efd21a71f, node/test/pins.test.mjs@daebcdb98aac]
+owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@445f0cf12bd1, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@8f3efd21a71f, node/test/pins.test.mjs@daebcdb98aac]
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 429d2143f0278d572cab465bb6af3c38ec82e4b50ccfa753788303de119299ef
+content_sha: c63d7566331e4468a93a566b5c1c56ce51ab0bfe484249690aad0aa3f34d55c8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -133,11 +133,43 @@ stamp and that nothing here can confirm. ⚠ **That asymmetry is the honest cost
 of decision 1**: provenance downgrades from *measured* to *declared*, mitigated
 by shape validation and by the fact that enrichment lands as a reviewable diff.
 
-**4. Scope is DECLARED — `enrich=true` on a `.fux/sources/dirs` line.** The same
+**4. Scope is DECLARED, plus what ingest QUEUED because a model is needed.**
+The declared half is `enrich=true` on a `.fux/sources/dirs` line, the same
 closed-attribute grammar as `archived`, for the same reason: **a path heuristic
 is exact for the repo that invented it and a silent convention for everyone
 else.** Enrichment costs money and changes ranking, so which directories get it
 is a human decision written in a diffable line.
+
+**The worklist** (W-248, ratified by delegation 2026-10-03)
+is **declared scope ∪ the queue rows whose reason is *nothing readable*** in
+`.fux/enrich/queue.tsv` ([SR-DECODE](0139_decode.md) decision 12) — a decoder
+owns the format and got nothing out of it, so only a model will help.
+- **The queue is read, never written.** `fux enrich` consumes the file
+  `fux ingest` already wrote; enrichment still never runs inside ingest (L4).
+  An absent queue (a fresh clone that never ingested) is no queued rows, never
+  an error.
+- **Rows whose reason is *no decoder for X* are NOT enrichment work.** The
+  remedy is a decoder, so they are a `fux doctor` row (`queue: no decoder`)
+  naming the extensions and the `fux-decoder` skill. A row is in the worklist or
+  in that row, never both; a row with any other reason is in neither.
+- **The two origins stay distinct.** `--plan` heads the queued scope
+  `(queued: a model is needed)` and `--check` counts it on its own line;
+  *discovered* is never folded into the declared count. A queued document is not
+  in the index, so its chunk count is reported as 0 and the self-retrieval
+  filter does not grade it. A row with no sha (a URL whose bytes were not
+  retained) cannot be keyed to an enrichment file and is not plannable.
+- ⚠ **This does not authorise the `enriched` ingest mode** (SR-ENRICHED's
+  folded decision 6, below): the verb gained a second source of documents, and
+  nothing else.
+- ⚠ **A queued document's enrichment reaches no index today.** `ingest/run.py`
+  drops an unreadable document before extraction, and `.fux/enrich/<sha>.md` is
+  read only for a document that parsed, so the worklist names work whose output
+  nothing reads yet. Making it reach the index is an ingest change bound up with
+  the `enriched` mode question (W-251 §3 #1) and is not made here — found by
+  W-248 on contact, filed as B-270.
+- ⚠ **No real ingest writes a *no decoder for X* row today**: an extension no
+  decoder claims falls through to the prose path and is indexed as text. The
+  doctor row is correct and silent until a writer produces one.
 
 **5. Partial coverage is the STEADY STATE, not a degraded mode.** Enrichment is
 keyed by the source content sha, so **editing a document un-enriches it

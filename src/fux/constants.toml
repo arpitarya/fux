@@ -102,6 +102,13 @@ builtin_prefix = "built-in:"
 # digits of the sha256 of its source. It is written into REGISTER.
 digest_hex     = 16
 consumer_dir   = ".fux/decoders"
+# The two reason strings `decode.reason()` writes into `.fux/enrich/queue.tsv`
+# (SR-DECODE decision 12): `<no_decoder><suffix>` and
+# `<decoder><nothing_readable><suffix>`. The queue's consumers (`fux enrich`,
+# `fux doctor`) classify a row by these, so the writer and the readers share one
+# spelling.
+reason_no_decoder       = "no decoder for "
+reason_nothing_readable = ": nothing readable in "
 # Sorted and explicit, never discovered: dispatch must not depend on
 # filesystem order (L4).
 builtin        = ["csv", "docx", "drawio", "html", "image", "ini", "json", "jsonl", "mail", "pdf", "pptx", "rtf", "svg", "toml", "xlsx", "xml", "yaml"]

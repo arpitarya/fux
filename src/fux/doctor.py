@@ -350,6 +350,7 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_pii_timing(root))
     checks.append(_refusal_health(root))
     checks.append(_decoder_bindings(root))
+    checks.append(_queue_no_decoder(root))
     checks.append(_meta_fields(root))
     checks.append(_provenance(root))
     checks.append(_recency_prior(root))
@@ -2631,6 +2632,41 @@ def _thin_urls(root: Path) -> Check:
         + (f" and {len(thin) - 3} more" if len(thin) > 3 else "")
         + ". The `http` fetcher runs no JavaScript, so an app shell decodes to its nav bar. "
         "`fux add <url> --cdp` fetches through a signed-in Chrome instead",
+        level="warn",
+    )
+
+
+def _queue_no_decoder(root: Path) -> Check:
+    """Queue rows saying *no decoder for X* -- work for a decoder, not a model.
+
+    **W-248 / SR-DECODE decision 12.** `fux ingest` queues two different facts,
+    and `fux enrich` takes only one: a format a decoder owns but got nothing out
+    of is enrichment work; a format NOTHING claims is not, because the remedy is
+    a decoder and a model asked to describe a `.heic` is the wrong tool. This row
+    is where that second fact reaches a reader.
+
+    Reads the committed queue only. An absent queue is no rows, so a fresh clone
+    that never ingested is `ok`, never an error.
+    """
+    from collections import Counter
+
+    from .ingest import queue as queue_mod
+
+    name = "queue: no decoder"
+    try:
+        rows = queue_mod.read(root)
+    except OSError:
+        return Check(name, True, "skipped (the queue could not be read)", level="warn")
+    counts = Counter(ext for ext in map(queue_mod.no_decoder, rows) if ext)
+    if not counts:
+        return Check(name, True, "no queued document is waiting on a decoder")
+    shown = ", ".join(f"{ext} ({n})" for ext, n in sorted(counts.items()))
+    return Check(
+        name,
+        False,
+        f"{sum(counts.values())} queued document(s) have no decoder, by extension: {shown}. "
+        "These are not enrichment work: write a decoder (the `fux-decoder` skill, into "
+        f"{fixed('decoders', 'consumer_dir')}/), or exclude them in .fux/.fuxignore",
         level="warn",
     )
 

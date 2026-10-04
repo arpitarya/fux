@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@54b4e504214f]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 81885958addae207af12e1aa64465c44f2fe6229a40a6126939b985aa150d69f
+content_sha: e0ebc7f4fc80d71d86194f76d6e25a68fe868b7f5c0a35c30a09b73d7b77649c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -326,6 +326,8 @@ this moved where they are written, not what they are.
 **No decision here moved** (W-253, 2026-10-04): `ingest/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
 
 **No decision here moved** (W-255, 2026-10-04): `fux.toml` and its template gained `[doctor] pii_rule_budget_ms` ([SR-CONFIG](0113_config.md), [SR-PII](0148_pii.md) decision 23); no other key moved.
+
+**No decision here moved** (W-248, 2026-10-04): in `urlsrc.py` the "nothing readable" skip reason is spelled from `decoders.reason_nothing_readable`; nothing this record decides moved.
 
 ### Consequences
 

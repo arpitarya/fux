@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 1eb022f1e3b6d473eaf6958fc99d301ea10704b770d212b6a962082e16f30ac7
+content_sha: ba70c98b41524785b0be9927fa10c856448d0a38d5f8f7a2175729a871900dd6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -582,6 +582,8 @@ this moved where they are written, not what they are.
 **No decision here moved** (W-254, 2026-10-04): the refer seam passes the undecoded flag to the chunker; freshness decisions are untouched.
 
 **No decision here moved** (W-255, 2026-10-04): `fux.toml` and its template gained `[doctor] pii_rule_budget_ms` ([SR-CONFIG](0113_config.md), [SR-PII](0148_pii.md) decision 23); no other key moved.
+
+**No decision here moved** (W-248, 2026-10-04): in `urlsrc.py` the "nothing readable" skip reason is spelled from `decoders.reason_nothing_readable`; nothing this record decides moved.
 
 ### Consequences
 

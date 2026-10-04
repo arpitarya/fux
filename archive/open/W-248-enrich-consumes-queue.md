@@ -9,6 +9,13 @@ ball: agent
 
 # W-248 — something consumes the decoder queue
 
+**✅ CLOSED 2026-10-04 — built as ruled, with two findings** (Claude Code; Sonnet built, Opus 5.5 reviewed):
+- `fux enrich`'s worklist is declared scope ∪ `.fux/enrich/queue.tsv`'s *nothing readable* rows (`_queued_scope`); `--plan` heads them `(queued: a model is needed)`, `--check` counts them on their own line; an absent queue is no rows. `doctor` gains `queue: no decoder`, naming extensions and the `fux-decoder` skill. Both reason strings are now `constants.toml [decoders]` keys shared by writer and readers. `tests/enrich/test_queue_origin.py` (6); the L12 test passes with no allow-list line.
+- ⚠ **Finding 1, filed as B-270:** enrichment written for a queued document reaches no index — ingest drops an unreadable document before extraction and reads `.fux/enrich/<sha>.md` only for one that parsed. That is the `enriched` mode's question (W-251 §3 #1), stated in SR-ENRICH d4.
+- ⚠ **Finding 2:** no real ingest writes a *no decoder for X* row today (an unclaimed extension falls through to prose); the doctor row is correct and silent until one does. Stated in SR-ENRICH d4.
+- Review fix: the new d4 text cited "decision 8" for the non-authorization; it is SR-ENRICHED's folded decision 6.
+- Live successors: [SR-ENRICH](../../records/0137_enrich.md) d4, [SR-DECODE](../../records/0139_decode.md) d12, [SR-DOCTOR](../../records/0152_doctor.md).
+
 **Model:** Claude Code, **Sonnet**.
 
 **From** backlog B-007. [SR-DECODE](../../records/0139_decode.md) decision 12:

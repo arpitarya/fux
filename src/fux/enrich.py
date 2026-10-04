@@ -65,6 +65,12 @@ from .constants import fixed
 
 ENRICH_DIR = fixed("files", "enrich_dir")
 
+#: The scope label of the QUEUED origin (SR-ENRICH decision 4, as amended by
+#: W-248): the committed file `fux ingest` writes. A scope is named after the
+#: place its declaration lives, as `URL_SCOPE` is, so a report line says where
+#: to look.
+QUEUE_SCOPE = fixed("files", "enrich_queue")
+
 #: Keys fux VERIFIES versus keys it merely RECORDS.
 #:
 #: `source_sha` is computed and checked — a mismatch means stale, full stop.
@@ -282,7 +288,9 @@ def _plan(root, scopes, target, pii_rules, self_retrieval_k, chunk_bounds, bar) 
                 filtered += 1
                 continue
             sha = record.get("sha", "")
-            chunks = _chunk_count(root, record, chunk_bounds)
+            # A queued document is one nothing could read, so there is no text
+            # to count passages in: its chunk count is honestly zero.
+            chunks = 0 if record.get("queued") else _chunk_count(root, record, chunk_bounds)
             enrich_target = f"{ENRICH_DIR}/{sha}.md"
             path = enrich_path(root, sha)
             if not path.is_file():
@@ -318,7 +326,9 @@ def _plan(root, scopes, target, pii_rules, self_retrieval_k, chunk_bounds, bar) 
             # `--plan` has no reason to pay for. A file that fails only this is
             # still well-formed and still committed — `--check` reports it, and
             # nothing here rewrites or deletes.
-            if self_retrieval_k > 0:
+            # A queued document is not in the index, so no question can retrieve
+            # it; grading one would refuse every enrichment it has.
+            if self_retrieval_k > 0 and not record.get("queued"):
                 misses = _unretrievable(root, path, record, self_retrieval_k)
                 if misses:
                     unretrievable.append((_shown(path, root), misses))
@@ -570,6 +580,9 @@ def cmd_enrich(args) -> int:
         raise FuxError("no fux.toml or .git found — run from inside a configured repo")
 
     scopes = _scopes(root)
+    queued = _queued_scope(root)
+    if queued:
+        scopes[QUEUE_SCOPE] = queued
     if not scopes:
         print(
             "no enrichment scopes declared.\n"
@@ -678,6 +691,38 @@ def _scopes(root: Path) -> dict[str, list[dict]]:
     return {scope: records for scope, records in out.items() if scope in declared or records}
 
 
+def _queued_scope(root: Path) -> list[dict]:
+    """The QUEUED origin: queue rows whose reason is *a model is needed*.
+
+    SR-ENRICH decision 4 (W-248). `fux ingest` writes `.fux/enrich/queue.tsv`
+    (SR-DECODE decision 12); this only READS it, so enrichment still never runs
+    inside ingest (L4). Rows saying *no decoder for X* are NOT work here -- the
+    remedy is a decoder, and `fux doctor` names them.
+
+    An absent queue (fresh clone, never ingested) is no rows, never an error.
+    A row with no sha (a URL whose bytes were not retained) cannot be keyed to
+    an enrichment file, so it is not plannable. A row whose document the index
+    now holds is dropped: it is a stale row, and the declared origin owns it.
+    """
+    from . import store as store_mod
+    from .ingest import queue as queue_mod
+
+    rows = [e for e in queue_mod.read(root) if queue_mod.model_needed(e) and e.sha]
+    if not rows:
+        return []
+    try:
+        indexed = {r.get("loc") for r in store_mod.read_index(root).values()}
+    except Exception:  # an unreadable index is not this command's error to name
+        indexed = set()
+    out: list[dict] = []
+    for entry in rows:
+        loc = entry.doc_id.removeprefix("file:").removeprefix("url:")
+        if loc in indexed:
+            continue
+        out.append({"loc": loc, "sha": entry.sha, "id": entry.doc_id, "queued": True})
+    return out
+
+
 def _enrich_urls(root: Path) -> set[str]:
     """URLs whose line says `enrich=true`, resolved through the three layers.
 
@@ -715,7 +760,8 @@ def _render_plan(root: Path, reports: list[ScopeReport], *, target: str | None =
         if target is not None and not work and not report.filtered:
             continue
         suffix = f" — filtered to {target}" if target is not None else ""
-        print(f"scope {report.scope} (enrich=true){suffix}")
+        origin = "queued: a model is needed" if report.scope == QUEUE_SCOPE else "enrich=true"
+        print(f"scope {report.scope} ({origin}){suffix}")
         if not work:
             # ⚠ `report.total` is the WHOLE scope, deliberately, even under a
             # selector: a one-document run must never render as `n/n`, which is
@@ -748,9 +794,15 @@ def _render_plan(root: Path, reports: list[ScopeReport], *, target: str | None =
 
 def _render_check(reports: list[ScopeReport], *, target: str | None = None, k: int) -> int:
     bad = 0
+    declared = [r for r in reports if r.scope != QUEUE_SCOPE]
+    queued = [r for r in reports if r.scope == QUEUE_SCOPE]
     scope_word = "scope(s) declared" if target is None else f"scope(s), filtered to {target}"
-    print(f"enrichment: {len(reports)} {scope_word}")
-    for report in reports:
+    print(f"enrichment: {len(declared)} {scope_word}")
+    if queued:
+        # Two origins, never merged into one count: declared is a human's
+        # choice, queued is what ingest discovered (SR-ENRICH decision 4).
+        print(f"  + {queued[0].total} queued by ingest (a model is needed)")
+    for report in declared + queued:
         bits = []
         if report.stale:
             bits.append(f"{len(report.stale)} stale")

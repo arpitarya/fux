@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@a522f88f9a15, tests/test_doctor_register_is_complete.py@dff0d535b078]
+owns: [src/fux/doctor.py@d03485deede2, tests/test_doctor_register_is_complete.py@dff0d535b078]
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 25e270c4c4c3b260045d5f59f4b6a2d4230be6d0114cce988f04220e2a329045
+content_sha: 4ef6178cd6d9b5431e5ae2242b8f56ad4c7e204e035a7a426a819e2cd126c53b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -179,6 +179,7 @@ authoritative about the row.**
 | `correction pins` | warn | a `fux correct --pin` that is **silently not applying** — its document changed since the pin was made, or left the corpus. Named because a suspended pin is invisible at query time: the query just ranks normally | [SR-ENRICH](0137_enrich.md) decision 19 |
 | `refusal rules` | warn, **error** when the file will not parse | how many rules load, how many responses each has refused, and **the rules that have never fired** — what a typo'd condition looks like | [SR-REFUSAL](0146_refusals.md) decision 11 |
 | `decoder bindings` | warn, **error** when the registry will not build | the one binding fault no ingest can catch: a `[decoders]` binding on an extension **no indexed document has** | [SR-DECODE](0139_decode.md) |
+| `queue: no decoder` | warn | queued documents (`.fux/enrich/queue.tsv`) whose reason is *no decoder for X*, by extension. These are **not enrichment work** — a model asked to describe a format nothing claims is the wrong tool — so `fux enrich` does not take them and this row is where they surface, naming the `fux-decoder` skill. ⚠ **An absent queue is `ok`**, not a finding: a fresh clone that never ingested has no rows | [SR-DECODE](0139_decode.md) decision 12 |
 | `meta fields` | warn, **error** when the config will not load | **which front-matter keys reach the index, and the one disagreement nothing else can see.** Load-time validation already refuses a `[meta]` value naming no index field, so this row is not that. It reports the resolved key set, the keys a `none` binding **silenced** — a silenced key and a key nobody thought about look identical, and only the author can tell them apart — and 🔴 **a key where a `[meta]` binding overrides a decoder's `META_FIELDS` claim.** The binding wins by design ([SR-TYPES](0128_types-list.md) decision 13); it is a **finding, not an error**, because two committed files disagree and **the one that loses is otherwise invisible** | [SR-INGEST](0106_ingest.md) decision 23 |
 | `provenance` | **warn**, never error | the decoder fault `decoder bindings` and the reuse key both miss: a **record already in the index** that was produced by a decoder the tree no longer carries at that version. The reuse key catches a digest that *moved since the last run*; a record written before a binding existed agrees with nothing, and **no delta run will look at it again** — `fux ingest --full` is the fix and the row names it. ⚠ **No ledger is NOT a finding**: `.fux/runtime/ingest-log.jsonl` is advisory, derived and gitignored, and warning every consumer on upgrade about a file one `fux ingest` creates is how a row becomes one people skip. ⚠ **`prose` and `unknown` rows are never counted** — no binding claims Markdown, and `unknown` means the ledger predates the row, so counting either would report a number no command can bring down | [SR-INGEST](0106_ingest.md) (W-200) |
 | `recency prior` | warn | whether any document carries an `mtime` — a corpus copied out of its git repository loses every one | [SR-INGEST](0106_ingest.md) |
@@ -467,6 +468,8 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 **`doctor` paints a progress bar** (W-238, 2026-09-29; [SR-CLI](0101_cli-surface.md) decision 17). `identifier families current` re-runs the identifier lens over every document, which is 45 of 48 s of `doctor` on this repo. The run therefore holds the invocation's `Progress` (in a module global beside `_RECORDS`), and that check paints `read` then `detect`. `doctor` now takes `--progress` / `--no-progress` and reads `[cli] progress_threshold`. No row, level or exit code changed, and stdout is byte-identical with the bar on or off.
+
+**No decision here moved** (W-248, 2026-10-04): a `queue: no decoder` row reports the queued documents no decoder claims, by extension.
 
 ### Consequences
 

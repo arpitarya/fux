@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@4c3f0409c601, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@cbec8e165dca, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@6748ca720ca3]
+owns: [src/fux/decode@09d46517feac, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@cbec8e165dca, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@6748ca720ca3]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 97ab99206f6f6cd9c6cefa0dd39de0ec662ed1badfbee36d12156d3931c12925
+content_sha: 0a5885ab962184c461429477ff201f5af8b3df0a7994549f14331c65436dd883
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -354,10 +354,13 @@ decoder returning `None` is **discovered**, and had nowhere to go.
 - ⚠ **`queue.tsv` is checked against the enrichment pruner's glob**, which
   deletes orphans in that directory. A file at the mercy of that glob would
   vanish; a test pins that it is invisible to it.
-- ⚠ **Nothing consumes the queue yet.** `fux enrich` still derives its worklist
-  from declared scope. **The queue records the need; wiring it to the verb is a
-  separate decision** — and *discovered* and *declared* are different origins,
-  so merging them amends an accepted record.
+- **`fux enrich` consumes the *nothing readable* rows** (W-248, 2026-10-04): its
+  worklist is declared scope ∪ those rows, and *discovered* and *declared* stay
+  separate origins in its report ([SR-ENRICH](0137_enrich.md) decision 4). The
+  *no decoder for X* rows are **not** enrichment work; they are the `fux doctor`
+  row `queue: no decoder`, naming the extensions and the `fux-decoder` skill. The
+  two reason strings are the constants `decoders.reason_no_decoder` and
+  `decoders.reason_nothing_readable`, so writer and readers share one spelling.
 
 **13. A binding in the types list OUTRANKS both, and is
 verified against the module it names.** Ruled by Arpit 2026-09-01; the record

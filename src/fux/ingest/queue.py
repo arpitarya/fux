@@ -107,6 +107,27 @@ def read(root: Path) -> list[QueueEntry]:
     return sorted(out, key=lambda e: e.doc_id)
 
 
+def model_needed(entry: QueueEntry) -> bool:
+    """A decoder owns this format and got nothing out: only a model will help.
+
+    SR-DECODE decision 12's second fact. Classified by the marker
+    `decode.reason()` writes, read from the same constant, so the writer and this
+    reader cannot drift apart.
+    """
+    return fixed("decoders", "reason_nothing_readable") in entry.reason
+
+
+def no_decoder(entry: QueueEntry) -> str:
+    """The extension this row says nothing claims, or `""` when the row is not that.
+
+    SR-DECODE decision 12's first fact: someone could write a decoder. The
+    return value is the suffix as `decode.reason()` spelled it (`.heic`, or
+    `(no extension)`), so a caller prints it without re-deriving anything.
+    """
+    prefix = fixed("decoders", "reason_no_decoder")
+    return entry.reason.removeprefix(prefix) if entry.reason.startswith(prefix) else ""
+
+
 def write(root: Path, entries: list[QueueEntry]) -> bool:
     """Write the queue if its bytes changed. `True` when something was written.
 

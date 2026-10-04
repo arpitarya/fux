@@ -26,6 +26,14 @@ Rules:
 
 ---
 
+## 2026-10-04 — **W-248: `fux enrich` consumes the decoder queue**
+
+| what | evidence |
+|---|---|
+| **worklist** | declared scope ∪ `queue.tsv`'s *nothing readable* rows, origins reported apart ([SR-ENRICH](../records/0137_enrich.md) d4, [SR-DECODE](../records/0139_decode.md) d12); `tests/enrich/test_queue_origin.py` |
+| **doctor** | `queue: no decoder` — extensions + the `fux-decoder` lever ([SR-DOCTOR](../records/0152_doctor.md)) |
+| **findings** | queued enrichment reaches no index yet (B-270, the `enriched` mode's question); no real ingest writes a *no decoder* row today |
+
 ## 2026-10-04 — **W-247: one payload, one place — the CLI renders what `fux.api` builds**
 
 | what | evidence |

@@ -701,8 +701,8 @@ def reason(rel_path: str, root: Path | None = None) -> str:
     suffix = _suffix(rel_path) or "(no extension)"
     decoder = registry(root).get(_suffix(rel_path))
     if decoder is None:
-        return f"no decoder for {suffix}"
-    return f"{decoder.name}: nothing readable in {suffix}"
+        return f"{fixed('decoders', 'reason_no_decoder')}{suffix}"
+    return f"{decoder.name}{fixed('decoders', 'reason_nothing_readable')}{suffix}"
 
 
 def decode(raw: bytes, rel_path: str, root: Path | None = None) -> str | None:

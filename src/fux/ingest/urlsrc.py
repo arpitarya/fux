@@ -1102,7 +1102,7 @@ def _decode_fetched(
     rel = decoder_rel_path(module, url)
     decoded = decode_mod.decode_with(module, raw, rel, root)
     if decoded is None:
-        return None, f"{module.name}: nothing readable in the fetched bytes"
+        return None, f"{module.name}{fixed('decoders', 'reason_nothing_readable')}the fetched bytes"
     return decoded, ""
 
 

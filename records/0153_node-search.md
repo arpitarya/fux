@@ -11,7 +11,7 @@ owns: [node@5c4f7e0da66d, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 39720da30c4a7e7361ff95e737b311910bed589742b0044bc29adc54c438f9f3
+content_sha: 20c67ba91a5edc67edc0fc9b746206d62415776b79206c7ce9ebfd1cdfd4912d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1010,6 +1010,8 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
 **No decision here moved** (W-254, 2026-10-04): the Node refer chunker gained the frontmatter unit and `answer`/`rerank` pass the flag ([SR-CHUNKING](0151_chunking.md) decision 7).
 
 **No decision here moved** (W-255, 2026-10-04): `fux.toml` and its template gained `[doctor] pii_rule_budget_ms` ([SR-CONFIG](0113_config.md), [SR-PII](0148_pii.md) decision 23); no other key moved.
+
+**No decision here moved** (W-248, 2026-10-04): `doctor.py` gained a `queue: no decoder` row; the `node reader` rows this record describes did not move.
 
 ### Consequences
 

@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@e866d2d0a093]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@57870e10ca16]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: c2c2eb8fcc92a9abfeb539949c79b6dc3ac631ddca8c8616c4aee2a6f1d96e50
+content_sha: e919e81f232fa2001be2124e5b375b78c5fb019007cb7ca0fe4c166c90741ec3
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -183,6 +183,8 @@ pattern. A consumer who wants other cues is I2, which is not built.
 **No decision here moved** (W-225 stage 5f, 2026-10-04): `[inspect.minhash]` (`gamma` as a hex string, since it exceeds TOML's signed 64-bit integer, and `bits`) and `[inspect.fits]` (`min_points`, `zipf_ranks`) hold `fux inspect`'s algorithm constants, read through `fixed()` like every other table here.
 
 **No decision here moved** (W-255, 2026-10-04): `constants.toml` gained `[pii] stress_len`, `stress_units`, `ms_per_s` and `lint_alphabet` for the PII linter and `doctor`'s `pii timing` row ([SR-PII](0148_pii.md) decision 23).
+
+**No decision here moved** (W-248, 2026-10-04): two keys, `decoders.reason_no_decoder` and `decoders.reason_nothing_readable`, spell the queue reasons `decode.reason()` writes.
 
 ### Consequences
 

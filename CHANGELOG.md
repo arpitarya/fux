@@ -28,6 +28,11 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
+- **`fux enrich` reads the decoder queue** (W-248). Its worklist is declared scope plus the
+  `.fux/enrich/queue.tsv` rows whose reason is *nothing readable* (a model is needed); `--plan` and
+  `--check` report the queued origin apart from the declared one. Rows saying *no decoder for X* are
+  not enrichment work: `fux doctor` gains a `queue: no decoder` row naming the extensions and the
+  `fux-decoder` skill. An absent queue is no rows. Nothing in `fux ingest` changed (SR-ENRICH decision 4).
 - **`cmd_ask`, `cmd_find` and `cmd_answer` render one payload** (W-247). The
   payload is built once, by `query.build_ask / build_find / build_answer`, and
   `fux.api`'s `find`, `ask` and `answer` read the same builders instead of

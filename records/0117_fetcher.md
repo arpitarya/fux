@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@4de82bf2d212, src/fux/templates@a2725223d4f4]
+owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@a2725223d4f4]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: f9f5c28467b8a362a03d0a85e0917e08de35427ae3a06078b7b948641a3e7bd7
+content_sha: b1479ef40a0138639072c9b4c563e9b833fb7000157ae5bfb9d1c9f58c374947
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -678,6 +678,8 @@ copied out, never imported.
 **No decision here moved** (W-225 stage 5f, 2026-10-04): `templates/inspect.toml.txt` gains `[floors]` ([SR-INSPECT](0156_inspect.md) decision 23a). This record owns `src/fux/templates/` by path, not by subject.
 
 **No decision here moved** (W-255, 2026-10-04): `fux.toml` and its template gained `[doctor] pii_rule_budget_ms` ([SR-CONFIG](0113_config.md), [SR-PII](0148_pii.md) decision 23); no other key moved.
+
+**No decision here moved** (W-248, 2026-10-04): the "nothing readable" URL reason is spelled from `decoders.reason_nothing_readable`, the same constant the queue reader classifies by.
 
 ### Consequences
 
