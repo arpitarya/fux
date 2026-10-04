@@ -1,0 +1,25 @@
+{"id": "rung-01000-v7|trial1|one-proc-rebuild", "arm": "one-proc-rebuild", "trial": 1, "corpus": "rung-01000-v7", "switch": true, "seconds": 0.3349, "load1": 2.97, "load5": 3.53, "position": 0}
+{"id": "rung-01000-v7|trial1|one-proc-once", "arm": "one-proc-once", "trial": 1, "corpus": "rung-01000-v7", "switch": true, "seconds": 0.306, "load1": 2.97, "load5": 3.52, "position": 1, "memo": {"builds": 1, "hits": 7}}
+{"id": "rung-01000-v7|trial1|n-proc", "arm": "n-proc", "trial": 1, "corpus": "rung-01000-v7", "switch": true, "seconds": 1.3483, "load1": 2.97, "load5": 3.52, "position": 2}
+{"id": "rung-01000-v7|trial1|identity", "arm": "one-proc-once-vs-n-proc", "trial": 1, "identical": 24, "of": 24, "differs": []}
+{"id": "rung-01000-v7|trial1|ratio", "arm": "ratio", "trial": 1, "order": ["one-proc-rebuild", "one-proc-once", "n-proc"], "n_proc_over_once": 4.406, "n_proc_over_rebuild": 4.026}
+{"id": "rung-01000-v7|trial2|one-proc-once", "arm": "one-proc-once", "trial": 2, "corpus": "rung-01000-v7", "switch": true, "seconds": 0.3323, "load1": 2.97, "load5": 3.52, "position": 0, "memo": {"builds": 1, "hits": 7}}
+{"id": "rung-01000-v7|trial2|n-proc", "arm": "n-proc", "trial": 2, "corpus": "rung-01000-v7", "switch": true, "seconds": 1.3217, "load1": 2.97, "load5": 3.52, "position": 1}
+{"id": "rung-01000-v7|trial2|one-proc-rebuild", "arm": "one-proc-rebuild", "trial": 2, "corpus": "rung-01000-v7", "switch": true, "seconds": 0.3067, "load1": 2.97, "load5": 3.52, "position": 2}
+{"id": "rung-01000-v7|trial2|identity", "arm": "one-proc-once-vs-n-proc", "trial": 2, "identical": 24, "of": 24, "differs": []}
+{"id": "rung-01000-v7|trial2|ratio", "arm": "ratio", "trial": 2, "order": ["one-proc-once", "n-proc", "one-proc-rebuild"], "n_proc_over_once": 3.978, "n_proc_over_rebuild": 4.31}
+{"id": "rung-01000-v7|trial3|n-proc", "arm": "n-proc", "trial": 3, "corpus": "rung-01000-v7", "switch": true, "seconds": 1.3037, "load1": 2.97, "load5": 3.52, "position": 0}
+{"id": "rung-01000-v7|trial3|one-proc-rebuild", "arm": "one-proc-rebuild", "trial": 3, "corpus": "rung-01000-v7", "switch": true, "seconds": 0.3032, "load1": 3.3, "load5": 3.58, "position": 1}
+{"id": "rung-01000-v7|trial3|one-proc-once", "arm": "one-proc-once", "trial": 3, "corpus": "rung-01000-v7", "switch": true, "seconds": 0.3025, "load1": 3.3, "load5": 3.58, "position": 2, "memo": {"builds": 1, "hits": 7}}
+{"id": "rung-01000-v7|trial3|identity", "arm": "one-proc-once-vs-n-proc", "trial": 3, "identical": 24, "of": 24, "differs": []}
+{"id": "rung-01000-v7|trial3|ratio", "arm": "ratio", "trial": 3, "order": ["n-proc", "one-proc-rebuild", "one-proc-once"], "n_proc_over_once": 4.31, "n_proc_over_rebuild": 4.3}
+{"id": "rung-01000-v7|trial4|one-proc-rebuild", "arm": "one-proc-rebuild", "trial": 4, "corpus": "rung-01000-v7", "switch": true, "seconds": 0.3048, "load1": 3.3, "load5": 3.58, "position": 0}
+{"id": "rung-01000-v7|trial4|one-proc-once", "arm": "one-proc-once", "trial": 4, "corpus": "rung-01000-v7", "switch": true, "seconds": 0.3013, "load1": 3.3, "load5": 3.58, "position": 1, "memo": {"builds": 1, "hits": 7}}
+{"id": "rung-01000-v7|trial4|n-proc", "arm": "n-proc", "trial": 4, "corpus": "rung-01000-v7", "switch": true, "seconds": 1.3485, "load1": 3.3, "load5": 3.58, "position": 2}
+{"id": "rung-01000-v7|trial4|identity", "arm": "one-proc-once-vs-n-proc", "trial": 4, "identical": 24, "of": 24, "differs": []}
+{"id": "rung-01000-v7|trial4|ratio", "arm": "ratio", "trial": 4, "order": ["one-proc-rebuild", "one-proc-once", "n-proc"], "n_proc_over_once": 4.476, "n_proc_over_rebuild": 4.425}
+{"id": "rung-01000-v7|trial5|one-proc-once", "arm": "one-proc-once", "trial": 5, "corpus": "rung-01000-v7", "switch": true, "seconds": 0.3001, "load1": 3.3, "load5": 3.58, "position": 0, "memo": {"builds": 1, "hits": 7}}
+{"id": "rung-01000-v7|trial5|n-proc", "arm": "n-proc", "trial": 5, "corpus": "rung-01000-v7", "switch": true, "seconds": 1.3145, "load1": 3.3, "load5": 3.58, "position": 1}
+{"id": "rung-01000-v7|trial5|one-proc-rebuild", "arm": "one-proc-rebuild", "trial": 5, "corpus": "rung-01000-v7", "switch": true, "seconds": 0.3281, "load1": 3.3, "load5": 3.58, "position": 2}
+{"id": "rung-01000-v7|trial5|identity", "arm": "one-proc-once-vs-n-proc", "trial": 5, "identical": 24, "of": 24, "differs": []}
+{"id": "rung-01000-v7|trial5|ratio", "arm": "ratio", "trial": 5, "order": ["one-proc-once", "n-proc", "one-proc-rebuild"], "n_proc_over_once": 4.38, "n_proc_over_rebuild": 4.006}

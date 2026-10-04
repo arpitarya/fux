@@ -1,0 +1,15 @@
+{"id": "fux-snapshot|trial1|one-proc", "arm": "one-proc", "trial": 1, "corpus": "fux-snapshot", "switch": false, "seconds": 5.0048, "load1": 4.24, "load5": 3.79, "position": 0}
+{"id": "fux-snapshot|trial1|n-proc", "arm": "n-proc", "trial": 1, "corpus": "fux-snapshot", "switch": false, "seconds": 6.5525, "load1": 4.14, "load5": 3.78, "position": 1}
+{"id": "fux-snapshot|trial1|ratio", "arm": "ratio", "trial": 1, "order": ["one-proc", "n-proc"], "n_proc_over_one_proc": 1.309}
+{"id": "fux-snapshot|trial2|n-proc", "arm": "n-proc", "trial": 2, "corpus": "fux-snapshot", "switch": false, "seconds": 6.7415, "load1": 4.05, "load5": 3.76, "position": 0}
+{"id": "fux-snapshot|trial2|one-proc", "arm": "one-proc", "trial": 2, "corpus": "fux-snapshot", "switch": false, "seconds": 5.7184, "load1": 4.36, "load5": 3.83, "position": 1}
+{"id": "fux-snapshot|trial2|ratio", "arm": "ratio", "trial": 2, "order": ["n-proc", "one-proc"], "n_proc_over_one_proc": 1.179}
+{"id": "fux-snapshot|trial3|one-proc", "arm": "one-proc", "trial": 3, "corpus": "fux-snapshot", "switch": false, "seconds": 5.489, "load1": 4.41, "load5": 3.85, "position": 0}
+{"id": "fux-snapshot|trial3|n-proc", "arm": "n-proc", "trial": 3, "corpus": "fux-snapshot", "switch": false, "seconds": 7.6043, "load1": 4.12, "load5": 3.81, "position": 1}
+{"id": "fux-snapshot|trial3|ratio", "arm": "ratio", "trial": 3, "order": ["one-proc", "n-proc"], "n_proc_over_one_proc": 1.385}
+{"id": "fux-snapshot|trial4|n-proc", "arm": "n-proc", "trial": 4, "corpus": "fux-snapshot", "switch": false, "seconds": 8.0622, "load1": 4.11, "load5": 3.81, "position": 0}
+{"id": "fux-snapshot|trial4|one-proc", "arm": "one-proc", "trial": 4, "corpus": "fux-snapshot", "switch": false, "seconds": 5.3995, "load1": 4.17, "load5": 3.83, "position": 1}
+{"id": "fux-snapshot|trial4|ratio", "arm": "ratio", "trial": 4, "order": ["n-proc", "one-proc"], "n_proc_over_one_proc": 1.493}
+{"id": "fux-snapshot|trial5|one-proc", "arm": "one-proc", "trial": 5, "corpus": "fux-snapshot", "switch": false, "seconds": 6.3277, "load1": 4.56, "load5": 3.92, "position": 0}
+{"id": "fux-snapshot|trial5|n-proc", "arm": "n-proc", "trial": 5, "corpus": "fux-snapshot", "switch": false, "seconds": 8.1084, "load1": 4.76, "load5": 3.97, "position": 1}
+{"id": "fux-snapshot|trial5|ratio", "arm": "ratio", "trial": 5, "order": ["one-proc", "n-proc"], "n_proc_over_one_proc": 1.281}

@@ -60,7 +60,9 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   byte-identical: 512 of 512 invocations on this repo and two rungs. The new
   `FUX_GRAPH_REBUILD=1` forces the rebuild. The differential arm sets it on
   every Node process, so N2 still compares two builders and never Python with
-  itself. Whether the read is faster is pre-registered and not yet measured.
+  itself. Measured against a frozen bar, the read is faster in every cell at
+  10 000 documents, by a median 9.5–9.7 %. That falls short of the 10 % the
+  bar required, so the result is a null.
 
 - **`fux mcp` and `fux serve` keep the loaded index resident** (W-249, SR-MCP decision 13). One
   loader, `fux.store.resident`, holds each committed shard's lines and the parsed records for the

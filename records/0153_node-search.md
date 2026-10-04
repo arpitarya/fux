@@ -11,7 +11,7 @@ owns: [node@82eca18314bc, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: bb3c2a14663185d153385abc5599ea37dde3688c9cad01e2c94c91bcc8104e3f
+content_sha: d79e6bebeba5d8dce4174697580789c016fc8017e4d488d6d866df62ba77d9ae
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -311,8 +311,11 @@ and rebuilds in memory exactly as below otherwise. The compose tier of
   their Python twins.
 - Byte-identity, read against rebuild, on this repo and both rungs:
   [`2026-10-04-node-graph-read`](../work/regression/2026-10-04-node-graph-read/report.md).
-  Whether the read is FASTER is pre-registered and not yet measured:
-  [`2026-10-04-node-graph-speed`](../work/regression/2026-10-04-node-graph-speed/PRE-REGISTRATION.md).
+  Speed against the frozen bar is **null**
+  ([`2026-10-04-node-graph-speed`](../work/regression/2026-10-04-node-graph-speed/VERDICT.md)):
+  at rung-10000 the read is faster in 12 of 12 cells but saves a median 9.48 %
+  (`find`) and 9.71 % (`ask`) against 10 %, so it stays as ruled, not as a
+  measured speed-up.
 
 **Node's behaviour is the right one for its audience and is kept.** The reader
 exists for a clone with no Python; `.fux/runtime/` is gitignored and is written
