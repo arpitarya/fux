@@ -32,10 +32,17 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-30** (Claude Code, Opus 5.5 — W-168 step 8 + W-237 captured; W-236 Part A).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-03** (Cowork, Fable 5.1 — the backlog audit, W-251).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-09-30 (latest) — W-168 STEP 8 AND W-237 CAPTURED FOR ARPIT; W-236 PART A DESIGNED
+### 🔴 2026-10-03 (latest) — THE BACKLOG AUDIT: 100 ROWS CLOSED BY EVIDENCE, 7 ITEMS FILED, 24 FORKS TO ARPIT
+
+- Arpit asked (Cowork): *"Review open work and backlog. Ratify whatever you can … create proposal documents with ratified or recommended approach. Create a compare if needed."* Four parallel audits read every `B-nnn` against its citation; the ruling session re-read a sample of each.
+- **Queue:** W-225 🟢 (the W-228 hold was stale — its code landed 2026-09-28); **W-244 ruled by delegation** — prune at the `!`-exclude, fix the walking tests, no number reclassified; a second walk-shaped instance (this session's `du`) declared. **Filed:** W-245 (stale record sentences), W-246 (16 tests + 5 doctor rows), W-247 (renderer split), W-248 (enrich reads the queue), W-249 (resident index), W-250 (`fux hooks` here), W-252 (Node arm pre-registration 2); **W-251** is the inbox row — 24 forks, a recommendation each.
+- **Backlog:** 218 → 129 rows. Three compare docs (`cli-library-parity`, `consumer-template-refresh`, `query-side-lens`) and one proposal (`measurement-plan-2026-10`). `ranking-tuning` marked `graduated`.
+- **Next:** Arpit — W-251 §3 line by line, prompt 13 (W-228); agents — any 🟢 (W-242 closed in a concurrent session the same evening).
+
+### 🔴 2026-09-30 — W-168 STEP 8 AND W-237 CAPTURED FOR ARPIT; W-236 PART A DESIGNED
 
 - **W-168 step 8** (authority prior) and **W-237** (RM3, grounded-gated) are built off at `0.0` in both readers, and five arms of each are captured on `set-4-claude`, not scored ([step 8](regression/2026-09-28-authority-prior/report.md) · [W-237](regression/2026-09-30-rm3-grounded/report.md)).
 - ⚠ **The index format is now `fux.index.v6`** (step 8's two `M/` counts): every v5 index needs `fux ingest --full`, including ladder rungs. It is unreleased.

@@ -21,6 +21,7 @@ this item makes it true.
 - **R13 · the 16 `for-arpit` sites:** OOXML part names + `MAGIC`/`MAGIC_BY_DECODER` → `constants.toml [decoders.*.format]` (both planes, parity test); generated file bodies (`_GITIGNORE`, `_SHIM`, `CACHEDIR_TAG`, `HOOKS`, `_PREAMBLE`) → `src/fux/templates/*.txt`; `sourcelist` `DIRS`/`TYPES`/`URLS` → `grammar` on `tests/l12_allow.toml`.
 - ✅ **R13 built 2026-09-28** (Claude Code, Opus): `for-arpit` → 0, byte-equal. See the compare doc §"Where the build departed".
 - **Left:** stage 5f `inspect` (the `pending-w228` 101) — **waits on W-228**, which holds `src/fux/inspect/` open. Then stage 8 (SR-LAW-12 decision 9's flip, byte-equality run). Both suites whole before it closes.
+- ✅ **2026-10-03 (Cowork, by Arpit's delegation): the hold on W-228 is LIFTED — 🟢.** W-228's DoD 1–10 landed 2026-09-28 and `src/fux/inspect/` is no longer held open; what W-228 still owes (planted misfits in `seed/`, a rung) is golden data, not code, and a later `misfit_floor` lands in `.fux/inspect.toml` — which is where L12 wants it anyway. Stage 5f is agent-closable now.
 
 **Model:** Claude Code, Opus — a cross-plane refactor with byte-equality gates.
 

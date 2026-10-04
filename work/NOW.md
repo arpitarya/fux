@@ -3,4 +3,4 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
-🔴 2026-09-30 Claude Code (Opus): W-237 FAIL (no gain), with removal waiting on Arpit; W-168 step 8 INCONCLUSIVE and his to rule; W-240 prompt 12 written for a fresh chat; W-242 Tier 0 PASS. **Next: Arpit's three inbox rows; agent-closable meanwhile: W-242 Tier 1 (Opus).**
+🔴 2026-10-03 Cowork (Fable 5.1): the backlog audit landed — W-225/W-244 🟢, seven items filed (W-245–W-250, W-252), 218 → 129 backlog rows, three compare docs + the measurement plan; **W-251 holds 24 forks for Arpit, one recommendation each; W-228 still waits on prompt 13.** W-242 closed the same evening (Tier 2, alpha.10). **Next: Arpit's W-251 lines; agent-closable meanwhile: W-245, W-246, W-247–W-250, W-252, W-225 5f, W-243 step 1, W-244 (Opus).**

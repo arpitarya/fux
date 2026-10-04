@@ -2,7 +2,7 @@
 type: Proposal
 title: Ranking tuning, and the utility that would do it
 description: A research note on how a tuning capability could be built for fux — the knobs that exist, the three Fux laws that constrain any tuner, where judgments would live, and why the eval harness is worth more than the optimizer.
-status: proposed
+status: graduated
 timestamp: 2026-08-22T00:00:00Z
 ---
 
@@ -432,6 +432,14 @@ Named here so the cost is visible, not to pre-empt any of them:
 ---
 
 ## §11 — Graduation trigger
+
+> ✅ **Graduated 2026-10-03** ([W-251](../open/W-251-backlog-audit-rulings.md) §2):
+> both halves of the condition below hold since W-204 — the retired sets are
+> committed judgments and W-236/W-228 are ranking decisions waiting — and the
+> **instrument** this note argued for is built: the golden ladder,
+> `tools/golden-score`, the PRE-REGISTRATION/VERDICT discipline. The optimiser
+> was never the product and still is not. The file stays because three records
+> ground on §8; it archives when they repoint.
 
 **This graduates when there are ≥ 50 committed judgments on a fux corpus and a
 ranking decision waiting on them.** Not on a document count, not on a

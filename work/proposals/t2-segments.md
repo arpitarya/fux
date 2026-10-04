@@ -221,8 +221,10 @@ gets an answer built for a speed problem.
 > T2, and write whatever record that then needs — if any of these becomes
 > true:**
 
-1. **A measured worst-case warm p95 exceeds 150 ms** on any corpus fux is
-   judged at. This is the whole decision, and it is a number rather than a
+1. **A measured, INTERLEAVED worst-case warm p95 exceeds 150 ms** on any corpus
+   fux is judged at, **once W-242 Tier 2 has landed** (re-worded 2026-10-03,
+   W-251: uninterleaved runs had read above 150 ms at rung-10000 and cannot
+   fire a trigger; W-242 is the live speed response and is measured first). This is the whole decision, and it is a number rather than a
    size — 50 000 documents crossing it reopens this record; 50 000 documents
    *arriving* does not.
 2. **The T1 accelerator stops being `df`-bound.** R9's verdict rests on the

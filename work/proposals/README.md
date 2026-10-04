@@ -58,6 +58,17 @@ moved to the archive on 2026-09-14.
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
 
+## Filed 2026-10-03
+
+* [The measurement plan, October 2026](measurement-plan-2026-10.md) — the
+  2026-10-03 backlog audit ([W-251](../open/W-251-backlog-audit-rulings.md))
+  sorted every `unmeasured` row by what it waits on; **twenty-one wait on
+  nothing but a frozen pre-registration** on data that exists (lab rungs, the
+  retired sets, a filed capture). Eight sections, each with rung, endpoint,
+  instrument and bar, so a section becomes a `W-nn` by copying it; twelve
+  rows stay blocked and the file says on what. **Graduates per section** —
+  its data in hand *and* a ranking or design decision waiting on the number.
+
 ## Filed 2026-09-28
 
 * [Cross-model agent guides](cross-model-agent-guides.md) — Arpit's ask
@@ -116,7 +127,12 @@ the defect this ordering exists to make visible.*
 ## Filed 2026-08-22
 
 * [Ranking tuning, and the utility that would do it](ranking-tuning.md) —
-  research note. **Twelve ranking constants**, and the literature's verdict that
+  research note. ✅ **`graduated` 2026-10-03 (W-251):** its thesis — *the
+  instrument is the product, the optimiser is not* — shipped as the golden
+  ladder, `tools/golden-score` and the PRE-REGISTRATION/VERDICT discipline, and
+  its trigger's two halves (committed judgments; a ranking decision waiting) are
+  both true since W-204. **Kept, not archived**, because SR-LAWS, SR-TUNE and
+  the bibliography ground on its §8 survey; it archives when they repoint. **Twelve ranking constants**, and the literature's verdict that
   tuning `k1`/`b` buys ~nothing (Anserini's 5-fold CV recovers the default to
   four decimals on 250 topics). Argues the **instrument** (evaluate + gate) is
   the product and the **optimiser** is not, and that judgment supply — not
@@ -146,7 +162,10 @@ the defect this ordering exists to make visible.*
   [SR-TUNE](../../records/0135_tuning.md) both cite its §8 survey in their
   Reference blocks — archiving it would move two accepted records' grounding
   into `archive/`.
-* [T2 segments](t2-segments.md) — **was SR-T2-SEGMENTS (0037) until Arpit
+* [T2 segments](t2-segments.md) — ⚠ **trigger re-worded 2026-10-03 (W-251):**
+  warm p95 at rung-10000 has read above 150 ms on *uninterleaved* runs, which
+  cannot fire a trigger; it now reads *an interleaved warm p95 above 150 ms once
+  W-242 Tier 2 has landed*, because W-242 is the live speed response. **Was SR-T2-SEGMENTS (0037) until Arpit
   moved it here the same day.** The record that **T2 is not built**, decided by
   measurement: [R9](../regression/2026-08-22-r9-t2-at-10k/VERDICT.md) answered
   worst-case queries in **12.46 ms against a 150 ms bar**. **Nothing was ever
