@@ -10,7 +10,7 @@ feature: the graph lane — three relational verbs, a derived plane, and a lazy 
 owns: [src/fux/graph@a32ab4cc2604, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@9b8da04fc9d7, node/src/graph/walk.mjs@61ee1cbb84df, node/src/verbs/graph.mjs@8683c9e4b2e6, src/fux/schemas/graph.schema.json@19bd4c486035]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: a16cf2dd84ee66b291b8ce893b44103c38c35c79d5338bcf4912a1f908bccd43
+content_sha: 5731316f350c436506025571521b20cc6f648244fdb8449fb3fdc7e6bf1b7b08
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -328,14 +328,14 @@ the defect, which is what a per-verb fix leaves behind.
   typo must never turn a real negative into an error; that is the whole value of
   `path`.
 
-⚠ **`--hops` is still unbounded, and that is a fork this record has not
-resolved.** Measured 2026-09-11: `--hops 7` on ~960 documents runs over a
+⚠ **`--hops` was unbounded, and that fork is ruled by decision 17**
+(work bound, option (c)). Measured 2026-09-11: `--hops 7` on ~960 documents runs over a
 minute, because simple-path enumeration grows steeply and a tag shared by a
 thousand documents makes them all mutually two hops apart (the same property
 decision above names). **Capping the argument, warning above a threshold, or
 bounding the walk's work are three different answers** with different costs to
 a small graph, and picking one silently inside a defect fix would be the wrong
-place to decide it. Filed in `work/OPEN-WORK.md`.
+place to decide it. Decision 17 took the third.
 
 **16. 🔴 *`ask` IS UNTOUCHED* IS SUPERSEDED. The graph plane reaches `ask`**
 (W-161; Arpit, 2026-09-13).

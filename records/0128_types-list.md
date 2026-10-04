@@ -10,7 +10,7 @@ feature: the file-type allowlist and `.fux/formats.toml`
 owns: [src/fux/ingest/typesfile.py@cba4e18abe52, .fux/formats.toml@05666c969b79]
 laws: [L2, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 0cc99a8ef833bcddd53ed390cef0207d8d50ff282c9e79172a305bd9f59f9bce
+content_sha: f5e0a5eefe570cb71b6aa388626e496897f53a30bb9295341d6bb99531d334bf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -587,6 +587,9 @@ carries them.
   every line-grammar list promises. And a repo that ran `fux setup` before
   2026-09-11 stops at its next `fux ingest` until it runs `fux setup` and deletes
   the old file — loud, one command, and deliberate.
+  ⚠ **The format split is accepted permanently** (W-251 §2, 2026-10-04): the
+  three lists stay in two formats, because the URL line's per-line diff review
+  is what tables would lose. Veto condition 6 below is the only way back.
 - ⚠ **`types` now has an attribute, so the "no attributes" argument is spent as
   a blanket answer.** The next proposal to hang something on a pattern gets the
   test in decision 11, not a flat no: *is this a property of the extension, or

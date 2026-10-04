@@ -10,7 +10,7 @@ feature: the quality contract — what a fux quality number means
 owns: [tools/quality@97e3d196df53]
 laws: [L2, L3, L4, L5, L9]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 54c9c9e5bd0d70d1ea7c143fef3db905808b3a1fd1202725d93e2da3257a4f89
+content_sha: b0beb28531ff714739a8c595bc1897b2fb5f896654e7ea0914a220a20af16bf2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -410,8 +410,11 @@ future session can be held to.
   it contaminates the set it is meant to test.
 - **Declaring the mix makes some historical numbers incomparable.** That is the
   price of having been undeclared, and it is paid once.
-- ⚠ **The ±2-query (4 pp) resolution floor is a placeholder for a measurement,
-  not a measurement.** Every "no detected change" ruling currently rests on it.
+- **The ±2-query (4 pp) resolution floor WAS a placeholder, and the
+  placeholder is spent** (2026-08-28, veto 5 of this record):
+  [SR-RS](0133_predictions.md) decision 19's measured paired floor — a net of 6
+  flips — replaced it. A "no detected change" ruling made before that date
+  rests on the placeholder; one made after rests on the measurement.
 - ⚠ **Nothing here fixes the lost corpora.** `acme` and `orbit` went in the
   2026-08-20 lab wipe along with their generator, so the measurement half of
   W-87 remains blocked on inputs this record cannot supply.

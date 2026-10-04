@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: e93fdf1968abd88a105f57c201b5e5e5690811ee8a66d51781ead0456c1e3a8e
+content_sha: 1eb022f1e3b6d473eaf6958fc99d301ea10704b770d212b6a962082e16f30ac7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -23,7 +23,7 @@ content_sha: e93fdf1968abd88a105f57c201b5e5e5690811ee8a66d51781ead0456c1e3a8e
 **Describes** — reaches into, does not own:
 
 - [`node/src/refer/source.mjs`](../node/src/refer/source.mjs) · owned by [SR-REFER](0127_refer-plane.md)
-- [`src/fux/config.py`](../src/fux/config.py) · owned by [SR-CONFIG](0113_config.md)
+- [`src/fux/config.py::UrlSource,_load_url_source`](../src/fux/config.py) · owned by [SR-CONFIG](0113_config.md)
 - [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
 - [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
 - [`src/fux/refer/__init__.py`](../src/fux/refer/__init__.py) · owned by [SR-REFER](0127_refer-plane.md)
@@ -609,7 +609,7 @@ caller-side argument nobody can see.
 `tests/refer/test_refer_acquired.py::test_the_output_schema_carries_the_sixth_verdict`
 asserts the prose no longer says *four-state*.
 
-**Owed, and filed in [`work/OPEN-WORK.md`](../work/OPEN-WORK.md):**
+**Owed:** nothing is filed in the queue.
 
 - ~~**`fux doctor` does not report the `as-ingested` share.**~~ **Closed
   2026-09-05 (W-101).** `doctor.freshness_counts()` reports it, as the
@@ -621,9 +621,12 @@ asserts the prose no longer says *four-state*.
   repo that has never journalled reports **unknown** rather than a zero share.
   That is the honest reading and it is the reason nothing new is retained: L9's
   journal already existed, and where it is off there is no number to have.
-- **`ttl=` bounds the TTL fetch cache and nothing else.** It does not yet
-  influence which URLs `fux daemon` sweeps first, which is the other place a
-  per-URL interval obviously belongs.
+- **`ttl=` bounds the TTL fetch cache and nothing else, and nothing is owed**
+  (ruled 2026-10-04, W-251 §4 #5). `ttl` is ask-time (decision 15); `update=`
+  is the only update-time attribute ([SR-URL-LIST](0116_url-list.md) decision
+  14); the daemon's one clock is `[sources.url] sweep_minutes`
+  ([SR-MAINTENANCE](0129_hooks.md) decision 9d, no adaptive scheduling). A
+  `ttl`-ordered sweep would be the third clock decision 15 forbids.
 
 ### Alternatives considered
 

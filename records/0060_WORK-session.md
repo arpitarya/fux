@@ -10,7 +10,7 @@ feature: the session contract — the three files, the running pointer, and how 
 owns: [scripts/commit-paths.py@aba59e8951c7, .claude/hooks/require-progress.sh@840ebec2e7b7]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 599c531a6ef684c45561b8234309b3835e2639da281353a2d61b053b6a6f5085
+content_sha: 9831def0d67ea4e77441f70cbc340c171ecf54b385abc41e3ac086e721385081
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -193,13 +193,25 @@ real regression and would have been filed as one.
     nothing rather than claiming a component that would not measure what it
     cares about.
 
+14. **The worklog is cut at each major release** (W-251 §4 #19, 2026-10-04). In
+    the change that tags `vN.0.0`, every entry dated before the tag moves
+    verbatim to `archive/worklog/WORKLOG-v<N-1>.md` (header line plus the moved
+    entries, newest first); the live file keeps its header and the entries
+    since. One row in `archive/README.md` names `work/WORKLOG.md` as successor.
+    The move is decision 2's mechanical exception; nothing is reworded. An
+    archived entry remains [SR-WORK-OPEN-QUEUE](0051_WORK-open-queue.md) rule
+    58's durable record of a closure and backs no live claim
+    ([SR-WORK-ARCHIVE](0062_WORK-archive.md) decision 5). **First cut: 3.0.0
+    GA.**
+
 ### Consequences
 
 - **A new session can start cold** from four files, which is the only reason
   handing work between models works at all.
-- **The worklog grows monotonically** — over eleven thousand lines today — and
-  that is accepted: it is a trail, not a summary, and the interview is what a
-  reader in a hurry opens instead.
+- **The worklog grows for one major at a time** (decision 14) — over eleven
+  thousand lines today, until the 3.0.0 GA cut — and that is accepted: it is a
+  trail, not a summary, and the interview is what a reader in a hurry opens
+  instead.
 - **Decisions 8 and 9 are in permanent tension with a thorough session's
   instinct to explain itself.** The rule wins; the explanation goes in the
   worklog entry, where someone can choose to read it.
@@ -237,7 +249,7 @@ and not written — that is, the worklog records a hand-off failure whose cause 
 a missing entry or a stale interview for the second time, which is the trigger
 that turns a stated obligation into a gate.
 
-**How to check it:** `grep -nic 'stale INTERVIEW\|no worklog entry\|lost the handoff' work/WORKLOG.md`
+**How to check it:** `grep -nic 'stale INTERVIEW\|no worklog entry\|lost the handoff' work/WORKLOG.md archive/worklog/*.md`
 — read the hits, since the count includes this record's own citation of the rule.
 
 ---

@@ -11,7 +11,7 @@ feature: which sibling environment may do what — the playground, the lab and t
 owns: [tests/test_work_environments.py@3ed28dd3934f]
 laws: []
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 70664b0839b7509e888a1bc4a8a88c235afbc4d1ad5a236916439fde63b51ab1
+content_sha: 5593f06dbd780ca6c68836289f70d73baed9ecef44336b4d7ec124cfa7a8b046
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -198,15 +198,18 @@ ruled on 2026-09-11.
   *(a)* (declare `supersedes:` in the playground), W-97's veto leg, and R-11's
   retarget of W-87 Part B. Each moves to the lab's golden data or closes.
 - **The W-136 ladder moves** from `fux-benchmark/corpora/golden/` to `fux-lab`.
-- **The benchmark corpora do not exist.** The current `t100`/`t1000`/`t10000` are
-  generated with a different shape; the 1 000-line, table-and-diagram documents
-  need a generator, and 100/200/500/2 000/5 000 folders are new.
+- **The benchmark corpora exist.** Built by W-139 (`t100`/`t1000`/`t10000`
+  generated with the 1 000-line, table-and-diagram shape, and the
+  100/200/500/2 000/5 000 folders), kept and reused rather than regenerated; the
+  first run, with its 1.x arm, is filed in
+  [`setup/fux-benchmark.md`](../work/setup/fux-benchmark.md).
 - **Every benchmark run carries two installs**, so the previous major must stay
   installable — a pinned `fux-engine==1.x` in its own virtualenv, per SETUP-BENCHMARK.
 - **Easier:** Arpit can break, edit or wipe the playground without moving any
   number anywhere.
-- ⚠ **Nothing mechanical enforces decision 1 yet** — W-138 is where a check is
-  owed. Until then this record and CLAUDE.md are the guard.
+- **Decision 1 is enforced mechanically:**
+  `tests/test_work_environments.py::test_no_code_under_the_four_roots_reaches_the_sandbox`
+  fails when code under the four roots names the sandbox.
 
 ### Alternatives considered
 

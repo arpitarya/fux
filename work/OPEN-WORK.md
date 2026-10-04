@@ -27,7 +27,7 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** W-240, W-236 | | |
 | 🔴 **W-243** — rule W-242's **Fork A**: may Node read `.fux/runtime/graph.json` when fresh instead of rebuilding the graph per query? Recommended **yes** (N2 still forces a rebuild). Unblocks CI step 1. [compare doc](compare/shared-runtime.compare.md) | 2026-10-04 | 0d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-251** — the backlog audit: 10 lines only he can answer, in [the item](open/W-251-backlog-audit-rulings.md) §3 — two Laws (L4, L3), two options he declined, two reservations, `find --no-archived`, the graph verbs' shape, a size bar | 2026-10-03 | 1d |
+| 🔴 **W-251** — the backlog audit: 11 lines only he can answer, in [the item](open/W-251-backlog-audit-rulings.md) §3 — two Laws (L4, L3), three options he declined (SR-RS d12 is back), two reservations, `find --no-archived`, the graph verbs' shape, a size bar | 2026-10-03 | 1d |
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-257** — launch the enriched-rung authoring session ([the item](open/W-257-enriched-rung.md) says how, and why the author must be blind); it is his tokens. Or say *no* and the three doc2query rows stay unmeasured | 2026-10-04 | 0d |
 | ↳ **blocks:** nothing else in the queue | | |
@@ -59,7 +59,6 @@ here. Read that record before changing anything below it.
 
 ### adr update
 
-- 🔴 **W-251** · `arpit` — the backlog audit's rulings: 13 of 24 forks ruled by his delegation on 2026-10-04 (§4), 3 in part; 10 lines are his alone (§3): two Laws, two options he declined, two reservations, taste, tokens, hands. [detail](open/W-251-backlog-audit-rulings.md)
-- 🟢 **W-245** · `agent` — the record sentences the audit found false or stale (forks that were ruled still read *open*; *no test* where one exists): one sentence each, restamped. **Sonnet.** [detail](open/W-245-record-sentences-stale.md)
+- 🔴 **W-251** · `arpit` — the backlog audit's rulings: 12 of 24 forks ruled by his delegation on 2026-10-04 (§4), 3 in part; 11 lines are his alone (§3): two Laws, three options he declined, two reservations, taste, tokens, hands. [detail](open/W-251-backlog-audit-rulings.md)
 
 ---

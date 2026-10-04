@@ -26,6 +26,15 @@ Rules:
 
 ---
 
+## 2026-10-04 — **W-245: the record sentences that stopped being true**
+
+| what | evidence |
+|---|---|
+| **rows** | ~40 records, one sentence each, restamped — the audit's table and the W-251 §4 rulings' sentences (the W-253/W-254/W-255 rows verified as written) |
+| **ownership** | `records/README.md` §DESCRIBES: the three `config.py` rows narrowed to `UrlSource,_load_url_source`; the four `owns: []` records name their SR-WORK-OWNERSHIP d7 case — W-246's gate passes on landing |
+| **new decision** | [SR-WORK-SESSION](../records/0060_WORK-session.md) d14 — the WORKLOG is cut at each major, first at 3.0.0 GA |
+| **returned** | SR-RS d12 → W-251 §3 #15 (the Opus review: the narrowing Arpit declined in person); SR-NODE-SEARCH's green sentence → W-252 |
+
 ## 2026-10-04 — **W-255: the PII regex bound — a static linter at load, the clock in `doctor`**
 
 | what | evidence |

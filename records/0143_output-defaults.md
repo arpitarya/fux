@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@dbd9fda25aa9, src/fux/templates/output.toml.txt@ee3226cd6dcd, .fux/output.toml@38f72dd71a22, node/src/config/output.mjs@ae4f709222ac]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 92467a8570cae34d02ef506e47af10d8f1fa7b092efacdb585b26b994e592096
+content_sha: 77274b676c3e702ef9d5e043a09c7628c391bec8c29f81a60654bb8e7d7cf5d8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -836,6 +836,8 @@ anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
 **`doctor`, `identifiers` and `enrich` declare `progress_threshold`** in `CLI_VERBS`, on both readers (W-238, 2026-09-29; [SR-CLI](0101_cli-surface.md) decision 17). They now paint the bar, and the one `Progress` a verb builds reads its threshold from this file (L12). `identifiers` and `enrich` gained `--no-output-config` (decision 15), and `identifiers --json` defaults to `None` (decision 10). As a result `[cli.json] identifiers` is now a key a file may set. The template's comment names the three verbs.
 
 **No decision here moved** (W-253, 2026-10-04): `find --under` became a component boundary and `find --json` now writes `confidence` before `fused`, per [SR-FIND](0104_find.md) decisions 7 and Consequences and [SR-CLI](0101_cli-surface.md).
+
+**No decision here moved** (W-245, 2026-10-04): `src/fux/mcp.py`'s module docstring said the index and postings mmaps stay resident across calls; it now says the process is resident and the index is re-read per request, as [SR-MCP](0136_mcp.md) states.
 
 ### Consequences
 

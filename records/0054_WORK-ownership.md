@@ -13,7 +13,7 @@ owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, script
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 0773e0a68b10f478a749fd1c75afe3beeec3e22cd11f1a15a56b2cdf91a6e142
+content_sha: 966366d42a0a0618920dca4c795eb6cb748ae02f2013b19343e4214b0bc9fd7f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -265,6 +265,11 @@ src/fux/query/rank.py        SR-RANKING         SR-TUNE
       describes table a key grid, and it needs a parser that can say which keys
       a diff touched. **Whoever reopens this is reopening a declined option, not
       arguing against a decided one.**
+    - **2026-10-04:** the three `config.py` rows are symbol-narrowed to
+      `UrlSource,_load_url_source`. A module-level edit (`KNOWN_KEYS`,
+      `KNOWN_AGENTS`) still demands all three by the undecidable-diff rule, so
+      the `"codex"` case that motivated this decision is NOT fixed by the
+      narrowing; the key grid stays declined.
 
 **The `describes` relation may narrow itself to SYMBOLS** (W-140 row 20,
 2026-09-11): `` `path::name,name` `` in the register's component column, and
@@ -320,6 +325,16 @@ top-level definitions.
     own nothing and **the rule that would gate it — a `component` record must
     own something — is still proposed and NOT in force.** Inventing an owner to
     satisfy a check would still be worse than the hole.
+    ⚠ **The count today is ten, not nine** (SR-SECTIONS joined them after
+    2026-09-21): SR-FIND, SR-URL-INGEST, SR-DIR-LIST, SR-CACHEDIR-TAG,
+    SR-DOCS-TABLE, SR-RUNTIME-MANIFEST, SR-RUNTIME-STAMP, SR-RUNTIME-STATS,
+    SR-LOCKS and SR-SECTIONS carry `owns: []`.
+    **Since 2026-10-04 (W-251 §4 #16) a `kind: component` record with
+    `owns: []` must carry a `describes` row on a `src/` component and name, in
+    its own body, which of decision 7's two cases it is — gated by
+    [W-246](../work/open/W-246-mechanical-gates.md).** The stronger rule — a
+    component record must own something — stays proposed; each of the ten is
+    Arpit's, one at a time (W-251 §3 #16).
 
 
 12. **Every record carries a `content_sha` of itself** (Arpit, 2026-09-13):
@@ -578,9 +593,10 @@ top-level definitions.
 6. **A `kind: process` record owns no test.** The kind's only enforcement is
    that its rule has one; a process record owning nothing is the drawer this
    record warned about, open. ⚠ **Not gated today.** **This record left that
-   state on 2026-09-21** (decision 7's retraction, W-208); **SR-PORT-LIST,
-   SR-WORK-SCALE and SR-WORK-LIFECYCLE are still in it**, each by a stated
-   decision of its own rather than by omission.
+   state on 2026-09-21** (decision 7's retraction, W-208); **SR-PORT-LIST and
+   SR-WORK-SCALE are still in it** (`owns: []`), each by a stated decision of
+   its own rather than by omission; SR-WORK-LIFECYCLE has since gained a test
+   (`tests/test_handoff_names_its_model.py`).
 7. **`records/RULE-SINCE` gains a fourth entry.** Decision 9 was supposed to
    end the need to move the baseline for this cause; a new entry naming a
    reassignment, a renumber or a new record means it did not.

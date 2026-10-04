@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@54b4e504214f]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: af1d424c0de00e00e8f7c76ef2bf8369ec2f73445fecf222e4831cbad2e0d1b8
+content_sha: 81885958addae207af12e1aa64465c44f2fe6229a40a6126939b985aa150d69f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -21,7 +21,7 @@ content_sha: af1d424c0de00e00e8f7c76ef2bf8369ec2f73445fecf222e4831cbad2e0d1b8
 
 **Describes** — reaches into, does not own:
 
-- [`src/fux/config.py`](../src/fux/config.py) · owned by [SR-CONFIG](0113_config.md)
+- [`src/fux/config.py::UrlSource,_load_url_source`](../src/fux/config.py) · owned by [SR-CONFIG](0113_config.md)
 - [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
 - [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
 - [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)

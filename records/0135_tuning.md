@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@f5fe482723d1, .fux/tune.toml@fbc012c8ee4f, node/src/config/tune.mjs@d9a132c42f83]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 75e1fdeb02997c1b6008a28069c3b664ceb16ede02a21681bdba0546e9e3c736
+content_sha: 535e2402e0e45f1248f35d01007f6fc2d24032bc46fe7c785919c2f157490c72
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -881,10 +881,15 @@ correctly; `Weighting` is left with `[priority]`, and
 [SR-T1-ACCELERATOR](0110_accelerator.md) veto 5 still binds whatever arrives
 next.
 
-⚠ **What is NOT decided here, and no session may take it by implementing it:**
-the query-side mechanism — an `--intent` flag, an `--as-of` date lens, or
-surfacing the supersession chain instead of ranking for it. It is an **unopened
-fork with no compare doc.**
+⚠ **The query-side mechanism is opened and ruled** in
+[`compare/query-side-lens`](../work/compare/query-side-lens.compare.md) (W-251
+§4 #3, 2026-10-04): `--as-of` is refused; `--intent` as a flag is refused —
+doc-type intent is [SR-RANKING](0111_ranking.md) decision 13, and the
+history/current intent stays out (decision 20 S1, Arpit's); `find
+--no-archived` is the one lever and is Arpit's (W-251 §3 #3). `supersedes:`
+remains a declared fact, and the concept question is closed — his own
+SR-WORK-TESTDATA A21/R5 require it. No session takes the lever by implementing
+it before he rules.
 
 **15d. The git authority prior was measured and never shipped** (Arpit,
 2026-10-03, W-168 step 8: *"For 168, go with C."*). `authority_weight`

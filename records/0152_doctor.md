@@ -11,7 +11,7 @@ owns: [src/fux/doctor.py@a522f88f9a15, tests/test_doctor_register_is_complete.py
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 5d77009c7936dce23265dda577f959b517589ae02b15325ea4b6dd0acaa37dad
+content_sha: 25e270c4c4c3b260045d5f59f4b6a2d4230be6d0114cce988f04220e2a329045
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -151,7 +151,9 @@ a component their own owner claims, which is
   fires on the right change instead of on every change.
 - **When it is worth restoring, restore it key-scoped, not file-scoped.** The
   relation that would work here is *record R describes function F*, which the
-  describes table cannot express today.
+  describes table expresses at symbol, not key, granularity
+  ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 10's addendum, W-140
+  row 20).
 
 **2. The check register — every row, its level, and whose subject it reports.**
 This table is what the deleted `describes` rows were for. The *subject* record

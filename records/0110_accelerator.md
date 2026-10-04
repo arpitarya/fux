@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@561b2311a763, node/src/derive@0b3875f3aa7b, tools/differential@0356db55374a, src/fux/schemas/runtime.schema.json@9559934cb843]
+owns: [src/fux/derive@6cb603c6640c, node/src/derive@0b3875f3aa7b, tools/differential@0356db55374a, src/fux/schemas/runtime.schema.json@9559934cb843]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5029949c81639a76481b4c40d5908feb86f6b13f930745cb7b3c7b91e6f0a916
+content_sha: 4c0b3ca2b54ebc4cc6ae727d74523c9470e9d7bbbd1f5d39b0d8d72feacb03f0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -803,8 +803,11 @@ tier two. That means Node will also write."*
     whose scores tie exactly. ⚠ **It MUTATES the index it is pointed at**, so
     it runs in a copy or in CI, never against a repository anyone reads.
 
-  ⚠ **The warning above still applies, and applies harder: no test imports any
-  of them.** They are run by [`ci.yml`](../.github/workflows/ci.yml) — its FAST
+  ⚠ **The warning above still applies to three of them: no test imports
+  `goldens_grade.py`, `graph_arm.py` or `adversarial_corpus.py`.** `node_arm.py`
+  is the exception —
+  [`tests/test_differential_arm.py`](../tests/test_differential_arm.py) imports
+  it (and skips when the harness is not importable). They are run by [`ci.yml`](../.github/workflows/ci.yml) — its FAST
   stage on every push (Linux, Node 22, the repo pass), its FULL stage on `main`
   across 3 OSes × Node 22/24 with the adversarial pass, each spread over runners
   by `node_arm.py --shard K/N` (the N slices together are exactly the unsharded

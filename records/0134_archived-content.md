@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: af05717340f5fd0ea03bc23f1d777ceecd13f26482fe8b7d96215d64550c6235
+content_sha: 9dae3c60f3fd3b107330dcc9f4890530459e7eff254ddc21136938e4b6edad54
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -289,11 +289,12 @@ score by a fact.
 - **This is not `df`.** A score multiplier on a finished score is a different
   mechanism from computing `df` over a different population, and decision 4 is
   untouched by any of this.
-- 🔴 **The unopened fork this leaves:** *"what do we do now?"* and *"what did we
+- 🔴 **The fork this leaves is ruled:** *"what do we do now?"* and *"what did we
   do before?"* want opposite orderings out of one corpus, and a per-document
-  multiplier cannot carry a per-query distinction. A query-side answer —
-  `--intent`, `--as-of`, `--no-archived` — **has no compare doc and is not
-  authorised.**
+  multiplier cannot carry a per-query distinction. The query-side answer is
+  ruled in [`compare/query-side-lens`](../work/compare/query-side-lens.compare.md)
+  (W-251 §4 #3): a REMOVE-only `find --no-archived` on the declared fact is the
+  lever (Arpit's yes pending, W-251 §3 #3); `--as-of` is refused.
 
 **7. When any archived document is returned, the response carries a
 disclaimer.**

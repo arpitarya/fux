@@ -10,7 +10,7 @@ feature: proximity reranking over the refer plane's passages, and the refusal th
 owns: [src/fux/query/rerank.py@c231c0a40857, node/src/query/rerank.mjs@be6714bbed81]
 laws: [L2, L4, L5]
 timestamp: 2026-08-24T00:00:00Z
-content_sha: 11ea5d35242b4a2c6b8f882172926f533c4c152c81eb38a673016f0ccecf8d98
+content_sha: 6f52401be8c92f217befbb4d35bde988fcb6950fc0893f927b9a6f981fad4699
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -167,7 +167,7 @@ contract from the one `ask` has had, **and it is not a change to make silently
 in a released tool.** The differential law is untouched: the accelerator and the
 scan read the same live text and agree byte for byte.
 
-**7a. The default stays `0.0` even though the measured bar was met**, and this
+**7a. The default stays `0.0` even though the bar was met on the first corpus**, and this
 is the sharper half. Re-measured unenriched: **`28 → 32`, `+4`, zero broken**,
 against a frozen bar of `net >= +2, broken <= 1`. **Met, decisively. It does not
 flip.**
@@ -188,7 +188,11 @@ those constants were taken **from the middle of a measured plateau rather than a
 peak**, explicitly so they would survive a corpus they were not tuned on. **That
 is the right mitigation. It is not a substitute for the corpus.** What flips the
 default is the reranker graded on **a second corpus with goldens nobody has
-tuned on**.
+tuned on**. ⚠ **That grading has been done, and it FAILED** (W-154 part B2,
+2026-09-16, [verdict](../work/regression/2026-09-16-rerank-quality-b2/VERDICT.md)):
+`rerank_weight = 1.0` was worse on the de-contaminated `ask` endpoint — 7 better
+against 47 worse, net 40 against a required 16 — so `0.0` is no longer a hold
+awaiting a corpus but a default with a measured reason.
 
 **8. A document it cannot read keeps its score.** Offline, a `url:` document has
 no text to rerank against. **Demoting it would make reachability a ranking

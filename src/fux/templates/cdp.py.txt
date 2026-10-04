@@ -387,12 +387,13 @@ class WebSocket:
 
 
 # ====================================================================
-# HTML -> Markdown lives in `fux.decode.html` (W-86 P1), imported below.
-# It used to be duplicated here and in http.py, with a comment asking the
-# two copies to stay identical and nothing checking that they did. Two
-# fetchers converting differently would make the committed index depend on
-# WHICH ONE RAN, which is L4. Link extraction stays here: crawling is this
-# fetcher's job, not the decoder plane's.
+# HTML -> Markdown is not done here, and this file imports nothing from `fux`
+# (W-199 moved decoding to the line's `decoder=`). It used to be duplicated
+# here and in http.py, with a comment asking the two copies to stay identical
+# and nothing checking that they did. Two fetchers converting differently
+# would make the committed index depend on WHICH ONE RAN, which is L4. Link
+# extraction stays here: crawling is this fetcher's job, not the decoder
+# plane's.
 #
 # And WHICH decoder converts is the URL LINE's to say (2026-09-21): every
 # line states `decoder=<stem>` beside `fetch=<stem>`, `fux add` observes the

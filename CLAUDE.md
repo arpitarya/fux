@@ -99,7 +99,8 @@ systems that own it; verify at answer time.
   boundary and the record shape are ratified; **the build is not**). Both
   ratified by Arpit 2026-08-19. ⚠ **SR-ENRICHED was superseded 2026-08-27** —
   its contract was folded into SR-ENRICH verbatim first, and the
-  non-authorization came with it (SR-ENRICH decision 8). **`fux enrich` is a
+  non-authorization came with it (SR-ENRICHED's folded decision 6, in SR-ENRICH
+  §The `enriched` mode). **`fux enrich` is a
   different feature** and shipping it did not authorize the mode.
   **`inferred` is retired**, because `INFERRED` is the edge grade for
   *model-derived* and the collision is the whole point of those records.
@@ -118,7 +119,8 @@ still unmeasured".
 
 **Out of scope until it has an SR and Arpit's sign-off:** anything from the
 archived build (the SQLite substrate, per-file cache, lean profile, state
-plane, `fux.lock`), further adapters beyond the capped three, MCP (it is
+plane, `fux.lock`), further adapters beyond the capped three, MCP adapters
+beyond `fux mcp` itself (`fux mcp` shipped; the adapters are
 [a proposal](work/proposals/mcp-adapters.md), not a backlog item), and every
 M8 item.
 

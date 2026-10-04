@@ -7,10 +7,10 @@ description: "The browser fetcher, for documents a plain GET cannot read. Drives
 status: accepted
 date: 2026-08-19
 feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind a session a headless client does not have: it borrows your browser's and hands fux the bytes"
-owns: [.fux/fetchers/cdp.py@8af9ecc6bffd, src/fux/templates/cdp.py.txt@8af9ecc6bffd]
+owns: [.fux/fetchers/cdp.py@8af9ecc6bffd, src/fux/templates/cdp.py.txt@079a02043017]
 laws: [L2, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 50d3392860b4a85a49fbf85e776bef70bc4c58f7ea1aa995b2b3530c81bf9c2c
+content_sha: 7b67f462068d59697894c5e5899a8f59e8e00e21258cd448b06f747354649ad5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -604,6 +604,8 @@ unused.
 ⚠ **Stated here because this record owns the file, not because anything it
 decides moved** — decision 12's ETag argument, the WebSocket single-session
 constraint and `MAX_PARALLEL = 1` are all untouched.
+
+**No decision here moved** (W-245, 2026-10-04): the template's comment above its link-extraction code said HTML-to-Markdown conversion was `imported below`; it now says the file imports nothing from `fux` and conversion is the line's `decoder=`, as W-199 left it.
 
 ### Consequences
 

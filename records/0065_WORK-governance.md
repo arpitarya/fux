@@ -10,7 +10,7 @@ feature: the governance map — which file governs what, who reads it, and what 
 owns: [tests/test_record_paths_resolve.py@a3d92ddd910a, tests/test_work_queue_rules_have_one_home.py@be2e38b86b0d]
 laws: [L0]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 76a26e6e1ffcfb9db47af4d5453c16d83b1090c0e58fdf1027bd6d18c22e9c0b
+content_sha: a95163cd686d857ea6eb8ea2c222a86d685c69291e85f036cf39712ff4b84bf4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -135,7 +135,7 @@ still listed `DOGFOOD.md`, which no longer exists, and named neither
    | [`BLOCKED.json`](../work/BLOCKED.json) | the machine-readable gate state | agent | [`.claude/hooks/stop-if-blocked.sh`](../.claude/hooks/stop-if-blocked.sh) · [`inject-inbox.sh`](../.claude/hooks/inject-inbox.sh) | a session blocks or unblocks |
    | [`INTERVIEW.md`](../work/INTERVIEW.md) | cold-start state of play for the next session | agent | none | **during** the session, not at the end |
    | [`IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) | the milestone log — what shipped, when | both | none | a milestone lands |
-   | [`WORKLOG.md`](../work/WORKLOG.md) | the per-session trail, append-only | both (audit) | none; link-exempt because repairing its links would make it false | every session |
+   | [`WORKLOG.md`](../work/WORKLOG.md) | the per-session trail, append-only; cut at each major release ([SR-WORK-SESSION](0060_WORK-session.md) decision 14) | both (audit) | none; link-exempt because repairing its links would make it false | every session; cut at each major |
    | [`LESSONS.md`](../work/LESSONS.md) | dated build lessons — a log, because the date is the lesson | both | none | a failure teaches something durable |
    | [`NOW.md`](../work/NOW.md) | the one-line current-state pointer | both | read by a hook on every prompt | every session transition |
    | [`MACHINE.md`](../work/MACHINE.md) | environment and surface quirks | agent | none | a surface breaks in a new way |
@@ -206,10 +206,11 @@ still listed `DOGFOOD.md`, which no longer exists, and named neither
   *"8 of ~18 test files guard prose"* figure that its own audit had already
   disproved (35 of 836 tests, ≈4%). A record carries no history; git has it.
 
-- **Two ideas that were still parked kept a home** — filed as `B-246`
-  (`WORKLOG.md` archive-and-truncate) and `B-247` (`DOC-REGISTRY.md` scoped to
-  untested prose) in [`work/BACKLOG.md`](../work/BACKLOG.md), under `unruled`,
-  because both need a ruling and neither has one.
+- **One idea that was still parked kept a home** — `B-247` (`DOC-REGISTRY.md`
+  scoped to untested prose) in [`work/BACKLOG.md`](../work/BACKLOG.md), under
+  `unruled`, because it needs a ruling and has none. The other, the `WORKLOG.md`
+  archive-and-truncate, is ruled: the worklog is cut at each major release
+  ([SR-WORK-SESSION](0060_WORK-session.md) decision 14).
 
 ### Alternatives considered
 

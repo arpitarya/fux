@@ -11,7 +11,7 @@ owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@865879888033, src/fux/
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: d11ff0c897e1dd85618f99d6086da178e346a7f83848d5d8b933023ab3693422
+content_sha: 429d2143f0278d572cab465bb6af3c38ec82e4b50ccfa753788303de119299ef
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -462,26 +462,15 @@ them.
 ### The candidate enrichments, and why each needs a model
 
 Recorded so a build designs against a list rather than a mood. **None is
-approved.**
+approved, and two of the four are no longer open: they are served by other
+means.**
 
-| candidate | what deterministic extraction cannot do | risk |
+| candidate | what deterministic extraction cannot do | status and risk |
 |---|---|---|
-| **semantic term expansion** | the analyzer sees only literal page vocabulary — a query for "OOM" never reaches a doc that says "memory exhaustion" | dilutes `df`; needs a graded, separable term set or it contaminates the statistics every document is scored against |
-| **inferred edges** | links two documents mean to have but never wrote — "this design implements that decision", with no hyperlink | must carry `INFERRED`; **a wrong edge is worse than a missing one because it is invisible** |
-| **retirement / supersession flags** | nothing in the bytes distinguishes a live document from a retired one | if it reorders rather than annotates, it violates the ruling [SR-ARCHIVED-CONTENT](0134_archived-content.md) already reached |
-| **richer embeddings** | fux computes no vectors at all ([SR-ASK](0103_ask.md) decision 9) | **L2 collision** — a larger or API-served model may be *called once and pinned*, never imported into the runtime |
-
-### The candidate enrichments, and why each needs a model
-
-Recorded so a build designs against a list rather than a mood. **None is
-approved.**
-
-| candidate | what deterministic extraction cannot do | risk |
-|---|---|---|
-| **semantic term expansion** | the analyzer sees only literal page vocabulary — a query for "OOM" never reaches a doc that says "memory exhaustion" | dilutes `df`; needs a graded, separable term set or it contaminates the statistics every document is scored against |
-| **inferred edges** | links two documents mean to have but never wrote — "this design implements that decision", with no hyperlink | must carry `INFERRED`; **a wrong edge is worse than a missing one because it is invisible** |
-| **retirement / supersession flags** | nothing in the bytes distinguishes a live document from a retired one | if it reorders rather than annotates, it violates the ruling [SR-ARCHIVED-CONTENT](0134_archived-content.md) already reached |
-| **richer embeddings** | fux computes no vectors at all ([SR-ASK](0103_ask.md) decision 9) | **L2 collision** — a larger or API-served model may be *called once and pinned*, never imported into the runtime |
+| **semantic term expansion** | the analyzer sees only literal page vocabulary — a query for "OOM" never reaches a doc that says "memory exhaustion" | *served by other means* — doc2query `ctx` (decision 15), caller `--expand` ([SR-EXPAND](0149_expand.md) decision 1), mined pairs for declared abbreviations (SR-EXPAND decision 18) |
+| **inferred edges** | links two documents mean to have but never wrote — "this design implements that decision", with no hyperlink | *behind B-245's reopen trigger*; must carry `INFERRED` as its grade — **a wrong edge is worse than a missing one because it is invisible** |
+| **retirement / supersession flags** | nothing in the bytes distinguishes a live document from a retired one | *served by other means* — retirement is `superseded_by:` (decision 17), which annotates rather than reorders, as [SR-ARCHIVED-CONTENT](0134_archived-content.md) requires |
+| **richer embeddings** | fux computes no vectors at all ([SR-ASK](0103_ask.md) decision 9) | *behind B-245's reopen trigger*; **L2 collision** — a larger or API-served model may be *called once and pinned*, never imported into the runtime |
 
 ⚠ **Import path moved 2026-08-27, behaviour unchanged.** ``src/fux/enrich.py`` now imports
 `chunk` from **`fux.refer._chunk`**: the module was made private because

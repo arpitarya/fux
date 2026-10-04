@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L3, L5, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: bd637866db9638045f8d67132b748ced04befaffd2ad501cb6254add9cdda6b6
+content_sha: 6f79329a77dd641cb9ca34dca41d02c4ae6eddcb5f1901d0740d4eefe782df11
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -359,6 +359,8 @@ added nothing of its own.
 **A moved identifier-family digest is a fourth trigger**, beside `pii.toml`, `tune.toml [index]` and a decoder, for re-deriving carried `url:` records from `.fux/acquired/` ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 **No decision here moved** (W-253, 2026-10-04): `ingest/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
+
+**Owns nothing, and says which case** ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (b), W-251 §4 #16): this record states a mechanism spread across components each already claimed — the url branch of the walk in `ingest/run.py` (SR-INGEST), `fetch_all` in `ingest/urlsrc.py` (SR-FETCHER) and the background staleness pass in `maintain/dirty.py` (SR-MAINTENANCE) — so no file is its alone. Its `describes` rows on those three are what open it.
 
 ### Consequences
 

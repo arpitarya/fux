@@ -10,7 +10,7 @@ feature: the one archive, and the line between naming a retired document and gro
 owns: [tests/test_archive_law.py@7624c4be91d5]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 67aac3dede57fa09cee8ac63b3effc5b2b1731e97ec225111bcb1a19d1b07ca7
+content_sha: 4692861265e9f586477d0424b4cc7043e786899b911db9d7d625273d08f6e044
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -105,7 +105,7 @@ different costume.
 
 2. **Anything archived is MOVED there, into a directory mirroring where it came
    from** — the handoff directory, for instance, retired wholesale into
-   `archive/handoff/`.
+   `archive/handoff/`, and `work/WORKLOG.md` slices into `archive/worklog/`.
 
 3. **Every archived document gets a row in `archive/README.md` naming its live
    successor**, or saying plainly that it has none.

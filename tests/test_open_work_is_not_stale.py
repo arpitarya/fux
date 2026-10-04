@@ -1,6 +1,6 @@
 """The queue may be wrong about the world, but not about itself.
 
-`work/OPEN-WORK.md` is the file a session reads first, and its rule 4 exists
+`work/OPEN-WORK.md` is the file a session reads first, and its rule 46 exists
 because it keeps being wrong: **four rows in ten days turned out to be already
 closed, already merged, or describing files that had moved.** Every one of
 those was caught by a human re-deriving the row by hand, which means the catch
@@ -16,11 +16,11 @@ claim only that half.**
    exactly what happened here: six rows read `8d`/`9d` on days 9 and 10.
 2. **A link resolves.** A row pointing at a path that no longer exists is
    describing a world that moved.
-3. **A row is not a tombstone.** Rule 2: the length of this file is the signal
-   of how much is pending, so a `CLOSED`/`DONE`/struck row in the inbox is
+3. **A row is not a tombstone.** SR-WORK-OPEN-QUEUE rules 3 and 10: the length
+   of this file is the signal of how much is pending, so a `CLOSED`/`DONE`/struck row in the inbox is
    noise that makes it longer and less trustworthy at once.
-4. **A row is not already recorded as done.** Rule 3: an item whose outcome is
-   in `IMPLEMENTATION.md` is closed, and a closed item does not sit in the
+4. **A row is not already recorded as done.** Rules 8 and 9: an item whose
+   outcome is in `IMPLEMENTATION.md` is closed, and a closed item does not sit in the
    inbox.
 
 ## What is NOT checkable, and is deliberately not attempted
@@ -35,8 +35,8 @@ were false in their sentences**, and nothing here would have caught them.
 claim truth -- grepping the row's nouns, counting files it happens to name --
 would pass on the cases above and fail on prose it does not understand, which
 is the `test_measured_run_files_its_per_query_rows` failure in another costume:
-**a check that proves a file exists, never that it is the right file.** Rule 4
-remains a human obligation; this test narrows what the human has to look at, it
+**a check that proves a file exists, never that it is the right file.** Rule 46
+(re-derive, do not read) remains a human obligation; this test narrows what the human has to look at, it
 does not replace them.
 """
 
@@ -67,7 +67,7 @@ _ROW_SUBJECT = re.compile(r"^[^A-Za-z0-9]*\*\*W-(\d+)\b")
 #: explicit `**Open:** W-118` -- so a bare id match there means nothing.
 _LANDED = re.compile(r"^## W-(\d+)\b", re.MULTILINE)
 
-#: Rule 2. A row saying it is finished does not belong in a queue of what is not.
+#: Rules 3 and 10. A row saying it is finished does not belong in a queue of what is not.
 _TOMBSTONE = re.compile(r"\b(CLOSED|DONE|LANDED|SHIPPED|RESOLVED)\b")
 
 #: `~~struck~~` is the same thing with different punctuation.
@@ -202,7 +202,7 @@ def test_a_row_points_only_at_things_that_exist(row: tuple[int, str, str, str]) 
 
 @pytest.mark.parametrize("row", inbox_rows(), ids=lambda r: f"L{r[0]}")
 def test_the_inbox_holds_no_tombstones(row: tuple[int, str, str, str]) -> None:
-    """Rule 2: the length of this file is the signal of how much is pending.
+    """Rules 3 and 10: the length of this file is the signal of how much is pending.
 
     A row announcing its own completion makes the queue longer and less
     trustworthy in the same edit. The outcome belongs in `IMPLEMENTATION.md`;
@@ -213,14 +213,14 @@ def test_the_inbox_holds_no_tombstones(row: tuple[int, str, str, str]) -> None:
     assert not hit, (
         f"OPEN-WORK.md:{lineno}: reads as finished ({hit.group(0)!r}) but is still in "
         f"the *Blocked on Arpit* inbox.\n\n  {what[:120]}\n\n"
-        "Rule 2 -- delete the row and put the outcome in work/IMPLEMENTATION.md. If it "
+        "Rules 3 and 10 -- delete the row and put the outcome in work/IMPLEMENTATION.md. If it "
         "is genuinely still open, say what remains without the word that says it is not."
     )
 
 
 @pytest.mark.parametrize("row", inbox_rows(), ids=lambda r: f"L{r[0]}")
 def test_a_row_is_not_already_recorded_as_done(row: tuple[int, str, str, str]) -> None:
-    """Rule 3: an item whose outcome is in IMPLEMENTATION.md is closed.
+    """Rules 8 and 9: an item whose outcome is in IMPLEMENTATION.md is closed.
 
     ⚠ **Deliberately narrow, on BOTH sides, and it was narrowed after failing
     honestly.** The first version matched any `W-nn` anywhere in the row against
@@ -244,7 +244,7 @@ def test_a_row_is_not_already_recorded_as_done(row: tuple[int, str, str, str]) -
     assert wid not in landed, (
         f"OPEN-WORK.md:{lineno}: W-{wid} has a `## W-{wid}` landing record in "
         f"work/IMPLEMENTATION.md and still sits in the inbox.\n\n  {what[:120]}\n\n"
-        "Rule 3 -- an item is closed by deleting its row, never by annotating it."
+        "Rules 8 and 9 -- an item is closed by deleting its row, never by annotating it."
     )
 
 

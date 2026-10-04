@@ -10,7 +10,7 @@ feature: the `fux` command-line interface — every verb, its flags, its exit co
 owns: [src/fux/cli.py@eafa474928d8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@de55b440c56a, node/fux.mjs@b8ee2d6ca979]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5ed20317f1e9f9bf1a44aae72a458a110aa6dccbe2d2ef5851ae157341e344d5
+content_sha: 6dd6da24df5e65751a5f141df6d4423829e870b272bb69b23217cb4458cdd0bb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1035,7 +1035,7 @@ usage: fux [-h] [--version] {…} ...      # … verb list omitted; it is build_
 |---|---|---|
 | `0` | ok — **including an honest decline** | yes |
 | `1` | error; message on stderr as `error: <msg>` | yes |
-| `2` | blocking (strict) | **no — reserved** |
+| `2` | usage error — `argparse`'s, before `main`'s boundary; never a `FuxError` | by `argparse`, not by fux (decision 5, as amended) |
 | `130` | interrupted (`KeyboardInterrupt`) | yes |
 
 ---
@@ -1362,13 +1362,15 @@ bar on or off, `--json` untouched, off when stderr is not a TTY, no clock.
   hand-write `fux.toml` without running `fux setup`, which is the shape of a
   real consumer repo. **Merged on Arpit's explicit instruction with the
   breakage named**; the fork (fall back on a missing file, or give existing
-  repos a migration path) is the first item in
-  [`work/OPEN-WORK.md`](../work/OPEN-WORK.md).
+  repos a migration path) is **ruled**: a missing file is a hard error
+  ([L12](0014_LAW-12-values-live-in-config.md) decision 3,
+  [SR-OUTPUT](0143_output-defaults.md) decision 20), and `fux doctor --fix`
+  writes it into an existing repo.
 - **`--no-output-config` now bypasses the file rather than reading it.** It
   sets `root = None` and resolves against `DEFAULT_OUTPUT`, so the flag is a
   true escape hatch: it cannot fail on a file it never opens. **That is the
-  only supported way to run a repo that has no `output.toml`** until the fork
-  above is ruled.
+  only supported way to run a repo that has no `output.toml`** until
+  `fux doctor --fix` has written it.
 - **`json` is resolved in its own pass, before every other key.** It selects
   which chain the rest walk — `[cli.json.<verb>]` is reachable only once JSON
   rendering is on — so resolving it alongside them would make that table
@@ -1389,17 +1391,20 @@ bar on or off, `--json` untouched, off when stderr is not a TTY, no clock.
   `{from, to, paths[]}`). Flattening the last into the first would lose the hop
   list that is the whole point of `path`. Changing a key is a breaking change
   and needs this record updated in the same commit.
-- **The write verbs have no `--json`, deliberately.** `--json` is the read
-  surface. A machine-readable `add` is a reasonable thing to want and is not
-  free — it would need a shape for "recorded, fetched, ingested, and here is
+- **`add` and `remove` have no `--json`, deliberately.** `--json` is the read
+  surface (`fux correct --json` exists; it reports a written file, not a
+  corpus change). A machine-readable `add` is a reasonable thing to want and is
+  not free — it would need a shape for "recorded, fetched, ingested, and here is
   what left the index" — so it waits for a caller who needs it rather than
-  being guessed at now.
+  being guessed at now. **Declared, not shipped:** the shape is written in
+  [`build-plan-2026-10`](../work/proposals/build-plan-2026-10.md) §1, with its
+  trigger — *a `fux_add` MCP tool or an `api.add` is proposed*.
 - **Exit codes are stable across the source verbs.** `add` exits 1 only when a
   fetch it announced failed; a listed file the type allowlist rejects exits 0,
   because that is a fact about the corpus rather than a failure of the command.
-- **`2` stays in the contract unused.** A reader could reasonably call that
-  dead API; the alternative — removing it and re-adding it later — is worse,
-  because exit codes are what scripts branch on.
+- **`2` is argparse's, and fux never produces it.** The strict-mode
+  reservation is retired (decision 5, as amended 2026-09-16); a script that
+  branches on `2` is branching on a malformed command line.
 - **Capturing the surface finds defects that testing it does not.** Four came
   out of the source-verbs capture alone: an L5 announcement that fired against
   an empty URL list; `add --types` silently replacing the built-in allowlist; a

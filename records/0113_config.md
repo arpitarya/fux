@@ -10,7 +10,7 @@ feature: "`fux.toml` — discovery, schema, validation, and the keys that are re
 owns: [src/fux/config.py@d64c7c3d26b9, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@6980bf8407fe]
 laws: [L5, ex-L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 88cce8015a86764f2e4dbbf9c231be20aee05ef4c07ceff0e0982b2f52d679a6
+content_sha: 8121f65aef1fe7e74926ce26acad74450edf8fa1494c9e5fae05b5fc9ffe399c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -336,8 +336,11 @@ share one budget — politer than needed — and five hundred URLs on one host g
 that same budget, which is the case it exists for. The crawler literature's
 politeness constraint is per-host, and the common case at the design point is
 one wiki; shipping both now would mean picking a second default with no more
-evidence than the first. **A per-host key is promoted when a 429 is actually
-observed**, and not before.
+evidence than the first. **A per-host key is promoted when a 429 attributable to
+fux's own parallelism against a real host is observed**, and not before — a host
+that answers 429 to every request (httpbin's `/status/429`) fires the letter of
+the trigger and not its spirit, and the 2026-08-27 run that hit one did not
+promote anything.
 
 ⚠ **This key belongs here and not in `.fux/tune.toml`.** SR-TUNE's mechanical
 test is *does changing it change a byte in `.fux/index/`?* — and this does not,

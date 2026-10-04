@@ -10,7 +10,7 @@ feature: the capture set every benchmark run files
 owns: [tests/test_benchmark_capture.py@f6af3d328537]
 laws: []
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 4703eb2027bb05addb387c6fa166d22b045682222ecce9badcf2154d6952ab52
+content_sha: d7b1be9e8d6c5f034a4b60e3600fa16728c4c5084c1bb4c4776fdeddbac264d1
 ratifies: Arpit, 2026-09-13 — what a benchmark must always capture
 ---
 
@@ -157,6 +157,10 @@ Arpit ruled the set on 2026-09-13, and ruled out the gates in the same breath.
 
 **1. The seven captures above are mandatory**, at the stated granularity, for
 every benchmark run. A run missing one is not filed as a benchmark.
+**CAP-1, CAP-2 and the speed capture run on the TIMING set (`queries.jsonl`);
+CAP-3 and CAP-4 run on the JUDGED set (`judged.jsonl` + `key.jsonl`, planted by
+the generator, decision 3). The timing set keeps no key.** (W-251 §4 #13 — the
+retired golden sets stay in fux-lab.)
 
 **2. hit@k is captured at k = 1, 5, 10, 20, 50** — five columns, every run.
 **hit@5 is the headline**; the rest are context and are never dropped for being
@@ -642,7 +646,7 @@ readers.
 - ⚠ **The TIMING set keeps no key, and that is the shape the answer took.** Its
   words are scattered randomly *inside* each document, so a key for it can only
   be built by re-reading the corpus — a key that agrees with whatever ranked it.
-  The judged set is its own file. **Decision 1 does not say which query set
+  The judged set is its own file. **Decision 1 names which query set
   CAP-3 runs against, and this is why.**
 - **The unanswerables are absent by CONSTRUCTION, not by inspection** — a
   reference token past the pool's last document, a volume number past it, and a
@@ -663,8 +667,10 @@ readers.
   CAP-4's.** Both versions answered **10 of 10** planted unanswerables, with a
   citation — and the current build reported `band: "partial"`, `answerable:
   true` and **named the absent word in `missing`**, one at `coverage: 0.0009`.
-  Fourth recorded occurrence of the abstention shape; **first instrument that
-  names the missing term.** CAP-4 existing is what made it legible, which is the
+  Fourth recorded occurrence of the abstention shape
+  ([`abstention-gates`](../work/compare/abstention-gates.compare.md); the gate
+  programme's queue home closed with W-204, and gates 2-9 are `unbuilt`, filed
+  as B-261); **first instrument that names the missing term.** CAP-4 existing is what made it legible, which is the
   case for the capture set in one line.
 - 🔴 **The baseline is at 2026-09-13** and reaches no frozen report — the same
   discipline `CLASSIFY_SINCE` uses, for the same reason: turning a rule on by

@@ -10,7 +10,7 @@ feature: "`.fux/sources/urls` — the file format itself, and the one grammar bo
 owns: [src/fux/ingest/sourcelist.py@ef3ccfb0002b, node/src/ingest/sourcelist.mjs@01a32a15e889]
 laws: [L3, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: fb5071fa5a821f67b6871e0e0c6ee464c1734874109c1de497a79d16c6ae9035
+content_sha: 02705397e193a2846809e21d5788ebc6715fcd8aaa37b1b831b8be6274e669c4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -412,16 +412,17 @@ its content. Everything in a record is taken from the fetched bytes
 ([SR-EXTRACTED](0115_extracted-mode.md)), and a title supplied by the list
 would be the one field in the index that no document said.
 
-**Three the grammar could hold and this record does not decide** — named so
-nobody re-argues them from scratch, and so nobody adds one quietly:
+**Two the grammar could hold and this record does not decide, and one it
+settles** — named so nobody re-argues them from scratch, and so nobody adds one
+quietly:
 
 | candidate | what it would do | why not here |
 |---|---|---|
-| `snapshot` | commit a machine-made copy of the content, per URL | the refer/snapshot policy is per *source* today and belongs to [SR-REFER](0127_refer-plane.md); a per-URL form is an L3 decision, not a grammar one |
-| `tag` | give a URL document the frontmatter tags a repo file has | URL documents have no frontmatter, so their `tag` edges are always empty — a real gap. But it invents corpus structure in a config file, which needs its own record |
-| `max_age` | per-URL freshness bound at answer time | freshness is the refer plane's, and its threshold is a pre-registered prediction. Deciding it here would fix a number no one has measured |
+| `snapshot` | commit a machine-made copy of the content, per URL | **NOT in the set — ruled 2026-10-04 (W-251 §4).** The per-source retention that exists is `keep=` ([SR-ACQUIRED](0145_acquired-plane.md) decision 4), gitignored by [L3](0005_LAW-3-content-never-durable.md) decision 4. A *committed* copy of content is L3's reserved exception and opens only by amending L3, never by a grammar row |
+| `tag` | give a URL document the frontmatter tags a repo file has | URL documents have no frontmatter, so their `tag` edges are always empty — a real gap. It does not go on the line: that invents corpus structure in a config file. The nearest home is the per-document enrichment file ([SR-ENRICH](0137_enrich.md) decision 11 makes a `url:` document enrichable), but enrichment carries no `tag` key today — `superseded_by:` is the only key there that reaches ranking (decision 17) — so a tag would need its own decision |
+| ~~`max_age`~~ | per-URL freshness bound at answer time | **struck: it exists and is `ttl=`** ([SR-URL-FRESHNESS](0147_url-freshness.md)). It was listed here as undecided before `ttl=` shipped |
 
-Each would be a new row in the table above **and a change to this record**,
+Each of the two would be a new row in the table above **and a change to this record**,
 which is the point of decision 11.
 
 ### The `dirs` attribute set

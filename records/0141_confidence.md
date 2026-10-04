@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: cd7211daf7df8a4b6431b670e5ab1e0d9d2556c47132b85fbce291f705340ca3
+content_sha: 0731aff3f48355958277072c4f006be9f4b985ef63b15b5332c61369c7234eb4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -328,13 +328,13 @@ should have declined, and this is the surface on which it declines.
    for the same three reasons: `find` pipes bare paths, `--json` is a contract,
    and this declares rather than gating. ASCII only.
 
-   ⚠ **Silent-at-`grounded` is REVERSED under the flag, and this is a sub-call
-   made when the ruling was applied rather than one Arpit stated.** The original
+   ⚠ **Silent-at-`grounded` is REVERSED under the flag.** The original
    silence existed so a healthy query would not print a line on every
    invocation. `--band` is an explicit request for the band, so under the flag
    `grounded` prints too — a flag that stays silent exactly when the answer is
-   good reads as broken. **If Arpit wanted the flag to keep the silence, this is
-   the one line to change** (`Confidence.line()`'s first clause).
+   good reads as broken. Confirmed as built (W-251 §2): `Confidence.line()`
+   stays silent at `grounded` and the caller prints `confidence: grounded.` when
+   `--band` was asked for.
 
 5. **`answerable` is a refusal, not the bottom of a scale.** An agent handed
    `0.3` uses it anyway and hedges in prose; an agent handed
@@ -353,8 +353,11 @@ should have declined, and this is the surface on which it declines.
    Therefore:
 
    - The shipped `separation_floor = 0.1` (the template's, [L12](0014_LAW-12-values-live-in-config.md))
-     is a **starting value with no standing**, not a measured optimum. Until R10 is filed, no document may describe the
-     `grounded`/`weak` boundary as calibrated.
+     was a **starting value with no standing** when this was written, not a
+     measured optimum. Decision 17 has since measured the operating point and it
+     stays `0.10` — but it measured it as the `grounded`/`weak` *signal*, not as
+     a calibration against `t`: no document may describe the boundary as
+     calibrated.
    - **R10's job is not to find a good-looking cutoff.** It is to find the
      `separation` value at which `P(correct) = t`, with `t` taken from
      `tools/quality/mix.toml` and **never re-derived here**. If `t` moves, this
@@ -520,9 +523,11 @@ doc_coverage_floor = 0.0   # as shipped; 0.0 = the clause is OFF
 
 - ⚠ **Decision 6's binding is unchanged and now has a gap it did not have.**
   Decision 6 says fux does not get to pick a second abstention threshold. A
-  *consumer* now can. That is a real hole in the argument, accepted rather than
-  argued away: the value fux ships stays bound to `t`, and what a consumer sets
-  locally is theirs and is published as theirs.
+  *consumer* now can. That was a real hole in the argument, accepted rather than
+  argued away, and it **closed with W-214**: `weak` is a signal that gates
+  nothing (decision 3a), so a consumer's floor can no longer set a second
+  abstention threshold. The value fux ships stays bound to `t`, and what a
+  consumer sets locally is theirs and is published as theirs.
 
 - **`doc_coverage_floor`'s cost is MEASURED, which separates it from the
   other.** At `1.0` — the only value that reads structural — **19 of 50 correct
@@ -596,7 +601,7 @@ filed number and not a repeatable check.
 
 ⚠ **Nothing was traded to get that.** No floor moved — `separation_floor` is a
 `tune.toml` key and decision 13 is untouched. No abstention was implemented;
-the band is still reported and gates nothing (that call is Arpit's, and open).
+the band is still reported and gates nothing (that call was Arpit's and he made it on 2026-09-22: decision 3a).
 `ask` is unaffected: it always retrieved `--top` results and always computed a
 real separation. **What changed is that one verb stopped reporting a number
 that could only ever have been `1.0`.**
@@ -875,6 +880,13 @@ The confidence block's pairs and hashes are both analyzed with the repo's identi
 **No decision here moved** (W-253, 2026-10-04): `find --under` became a component boundary and `find --json` now writes `confidence` before `fused`, per [SR-FIND](0104_find.md) decisions 7 and Consequences and [SR-CLI](0101_cli-surface.md).
 
 ### Consequences
+
+- **`separation` stays the `grounded`/`weak` quantity and `separation_floor`
+  is not recalibrated — not for RRF ([SR-EXPAND](0149_expand.md) decision 10),
+  not for any arm** (W-251 §4 #11). Decision 17 measured that it does not carry
+  correctness, so a calibrated floor on it would be a calibrated non-predictor.
+  The next lever is `doc_coverage_floor`
+  ([W-256](../work/open/W-256-no-key-measurements.md) §2).
 
 - ⚠ **W-194 (2026-09-20) moved a component this record describes, and changed
   nothing it decides.** Hashed display meta was deleted outright: `meta` and

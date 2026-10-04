@@ -892,7 +892,7 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/ingest/run.py` | SR-PII | the redaction pass, and its position between `content_sha` and `extract_fields` — decision 3, which is the whole record. Also `_pii_ruleset_moved`, the reuse invalidation. Owned by SR-INGEST for the walk |
 | `src/fux/enrich.py` | SR-PII | `enrich=` for `url:` documents — `_document_text` reading the retained blob, and the single synthetic `.fux/sources/urls` scope. Owned by SR-ENRICH for enrichment itself |
 | `src/fux/ingest/sourcelist.py` | SR-PII | `enrich` on the URL list, resolved through the same three layers as `keep` and `ttl` |
-| `src/fux/config.py` | SR-PII | `[sources.url] enrich` — the source-wide layer |
+| `src/fux/config.py::UrlSource,_load_url_source` | SR-PII | `[sources.url] enrich` — the source-wide layer |
 | `src/fux/cli.py::_require_pii_rules,main` | SR-PII | `_require_pii_rules` and `PII_EXEMPT` — decision 17's refusal, placed before dispatch so a verb added later is gated without knowing it. Owned by SR-CLI for the verb surface; the rule and its exemptions are this record's |
 | `src/fux/setup.py::run` | SR-PII | writes `.fux/pii.toml` from the starter, write-if-missing — the half of decision 17 that makes the refusal fixable. Owned by SR-DOTFUX for scaffolding |
 | `src/fux/store/fuxdir.py` | SR-PII | `pii.toml`'s row in `COMMITTED_FILES` — **the ruleset is committed, and that is the decision** (decision 1): a redaction rule that lived on a gitignored path would redact one clone and not the next, so the file has to sit in the category `fux doctor` audits. Owned by SR-DOTFUX for the layout |
@@ -901,8 +901,8 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/ingest/urlsrc.py` | SR-URL-FRESHNESS | `UrlEntry.ttl`, and `resolve_urls` applying the same three layers to it as to `keep` — a per-URL freshness bound resolved inside the ingest module |
 | `src/fux/ingest/sourcelist.py` | SR-URL-FRESHNESS | `ttl` is the **first typed attribute** in the grammar: `Attribute` grew an optional `validate` callable because a duration cannot be a closed enum. Owned by SR-URL-LIST for the grammar itself, constrained here |
 | `src/fux/ingest/sourcelist.py` | SR-ACQUIRED | `keep`, and its default flipping to `true` (decision 4) — a value in a file this record does not own |
-| `src/fux/config.py` | SR-ACQUIRED | `[sources.url] keep` and `acquired_max_bytes` — the source-wide layer and the store's bound |
-| `src/fux/config.py` | SR-URL-FRESHNESS | `[sources.url] ttl`, validated by the source list's **own** duration grammar rather than a second copy, so `--ttl 1x` and a hand-written `ttl=1x` fail identically |
+| `src/fux/config.py::UrlSource,_load_url_source` | SR-ACQUIRED | `[sources.url] keep` and `acquired_max_bytes` — the source-wide layer and the store's bound |
+| `src/fux/config.py::UrlSource,_load_url_source` | SR-URL-FRESHNESS | `[sources.url] ttl`, validated by the source list's **own** duration grammar rather than a second copy, so `--ttl 1x` and a hand-written `ttl=1x` fail identically |
 | `src/fux/refer/__init__.py` | SR-URL-FRESHNESS | both `as-ingested` fallback points in `_obtain`, and `min(policy, declared)` — decision 11's arithmetic, which is where a per-URL value is prevented from widening a caller's policy |
 | `src/fux/refer/source.py` | SR-URL-FRESHNESS | `from_acquired`, and decision 6's rule that it **imports** `_decode_fetched` and `sanitize` rather than reimplementing them — the property the whole fallback rests on |
 | `src/fux/store/fuxdir.py` | SR-ACQUIRED | the `ACQUIRED` declaration and its `.gitignore` line. Owned by SR-DOTFUX for the layout; this is the record that added the third kind |

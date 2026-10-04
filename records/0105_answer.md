@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@7d111b045e0c]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: d7a59769dc24156ae6498b1f16056cd95974c618aa20e3f92dfc2a8df37c216a
+content_sha: 07db6c56a1a52f88616cd639a4113f078432693df8e4d8167fc555e88777ef80
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -176,7 +176,10 @@ on the 43 graded queries
 promise is kept; the width was never part of it.
 Fetching and re-scoring *every* ranked result is a materially bigger change —
 cost scales with `--top`, and it would change what "ranked" means for every
-result rather than just the first — and is a distinct, undecided scope.
+result rather than just the first — and is **refused** (W-251 §2,
+2026-10-04): `ask` and `find` rank from the index, which is their contract, and
+`answer`'s width is a constant (`ANSWER_TOP`), not a knob that grows with
+`--top`.
 
 **5. It is the same ranking as `ask`**, truncated to three — a projection, never
 a second strategy. Refer never re-ranks *which* document answers, only how that
@@ -241,9 +244,11 @@ decision 6's four labels are **per-citation** facts about one fetch; this is a
 
 ⚠ **The line goes to stderr in BOTH text and JSON mode**, so this record's
 documented stdout — including the `source` key callers switch on — is
-**byte-identical with the feature on or off**. Promoting it to a JSON field
-would be additive but would move a documented surface, so it is a fork rather
-than a default.
+**byte-identical with the feature on or off**. Promoting it to a JSON field is
+**refused** (2026-10-04, W-251 §4 #4): a field whose value depends on the
+previous run's `last-cited.json` would make `answer --json` differ between two
+machines on identical bytes — the byte-stability
+[SR-CLI](0101_cli-surface.md) veto 5 protects. Stderr is the home.
 
 **11. `answer` refers `ANSWER_TOP` = 3 documents, in ONE `refer()` call.**
 Not three calls. `refer/_rescore.py` computes passage `df` across everything

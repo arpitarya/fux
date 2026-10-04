@@ -11,7 +11,7 @@ feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule
 owns: []
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 3d312aaf4d7bf4e06e434d9198d594c29043709394aeb2d214bc87f8b737752f
+content_sha: 378efc75ab26af8b97c041bc9b8e2d7eb68e99a136e437a2a017b65ea6e02404
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -240,13 +240,14 @@ The stats plane is unchanged by identifier families; the scan and the accelerato
   lookup**, and that is the price paid, said plainly. Five multiply-adds against
   an O(corpus) scan the file exists to avoid — the lookup was never the
   expensive part.
-- ⚠ **This record owns no module, so no mechanical check can point at it.**
+- **This record owns no module, but a `describes` row now opens it.**
   Decisions about `stats.json` live here; the code lives in
-  `derive/_build.py` under [SR-T1-ACCELERATOR](0110_accelerator.md). A change to
-  this file satisfies
-  [`tests/test_sr_freshness.py`](../tests/test_sr_freshness.py) by touching
-  the accelerator's record, and **this record's own veto has fired unnoticed
-  before, exactly that way.** Open it deliberately.
+  `derive/_build.py` under [SR-T1-ACCELERATOR](0110_accelerator.md), and
+  [`records/README.md`](README.md) §DESCRIBES (2026-09-21) lists this record
+  against `_build.py`, `format.py`, `accel.py`, `bm25f.py` and `scan.py`, so
+  [`tests/test_sr_freshness.py`](../tests/test_sr_freshness.py) demands it
+  when any of them changes. **This record's own veto fired unnoticed before
+  that row existed, by a change that touched only the accelerator's record.**
 
 ### Alternatives considered
 

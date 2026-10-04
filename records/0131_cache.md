@@ -10,7 +10,7 @@ feature: the refer plane's two caches, and the wall between them
 owns: [src/fux/refer/arc.py@838fb07d8fc5, src/fux/refer/fetchcache.py@0946b328bf10]
 laws: [L2, L3, L4, ex-L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 079b7d23649d8877987bdd25140e5253da05d12167f425d95292ca2be10a935d
+content_sha: 635fc5e38bbe4b1c41ea494d9ec3d820d0f099a190d8a53bd5fd054612679dc3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -216,8 +216,10 @@ about *when a document was ingested*, and that question closed separately as
 [`record-freshness.compare.md`](../archive/compare/record-freshness.compare.md)).
 
 **9. The TTL store is bounded on disk, evicting oldest `fetched_at` first.**
-`max_bytes`, default **500 MB** — a number chosen here, not specified — bounds
-total size under `.fux/runtime/fetch-cache/`. `put()` deletes the oldest
+`max_bytes` — **a design default, not a measured one**: it is
+`fux.toml [refer] fetch_cache_max_bytes` ([L12](0014_LAW-12-values-live-in-config.md)),
+a consumer turns it, and no measurement picks a byte cap; accepted (W-251 §4
+#8). The shipped `524288000` is 500 **MiB**. It bounds total size under `.fux/runtime/fetch-cache/`. `put()` deletes the oldest
 entries by `fetched_at` to make room, and **refuses** a single entry that alone
 exceeds the cap rather than evicting everything else for it. Entries that
 cannot be read at all are evicted first.
@@ -401,7 +403,7 @@ rg -n 'time|clock|datetime|mtime' src/fux/refer/arc.py   # expect: no output
 # 4 — nothing from either store is tracked
 git ls-files | rg 'fetch-cache'                          # expect: no output
 
-# 5 — the directory stays under its cap (default 500 MB)
+# 5 — the directory stays under its cap (default 524288000 B = 500 MiB)
 du -sh .fux/runtime/fetch-cache 2>/dev/null || echo "absent — nothing opted in"
 
 # 6 and 7 — measured/observed, not checkable from the tree; see the compare docs

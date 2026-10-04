@@ -10,7 +10,7 @@ feature: maintenance — the hooks, the deferring runner, the write lock, and th
 owns: [src/fux/maintain@514ae1424ef7, node/src/maintain@74ced4c72392, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 5df2bd1847a0b96077296d01ac86022dba08a630b42d63a661e47afbcbcd3745
+content_sha: dd5b81a49c39f91c240f1b83d0b0e994263dcc331b80086c7aa40c2380eaa7f5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -481,7 +481,8 @@ plus a reader that must remember it.**
 clock lives in the TTL store and nowhere else. A `validated_at` / `changed_at`
 pair was specified and **not shipped**: it would have quietly contradicted an
 accepted record. **`token` is declared absent on purpose** — it belongs to an
-optional fetcher function that is an unruled fork, and **declaring a field
+optional fetcher function whose fork [SR-FETCHER](0117_fetcher.md) decision 12 ruled
+(2026-08-28), and **declaring a field
 nothing writes is how a knob that cannot work ships.**
 
 **12. The sweep's status carries a REASON and COUNTS, and the file is declared.**

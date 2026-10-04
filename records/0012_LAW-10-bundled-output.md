@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L10
 owns: []
 laws: [L10]
 timestamp: 2026-09-12T00:00:00Z
-content_sha: de5f680a271cd90f6eaca406bd86d7aba28194b9dc30117cddaf1c46ae1cb4a1
+content_sha: 37d5abdff09a7955ae79be55779bb9d17c74ab04cc06690e7680d9c3b000ad75
 ---
 
 # SR-LAW-10 — L10 — the consumer is served build output, never source
@@ -276,9 +276,10 @@ case decision 2 names, not a gap.
   pip, where shipping bytecode or a single-file bundle breaks editable installs,
   makes every stack trace useless, fights the packaging ecosystem
   [L2](0004_LAW-2-zero-cost.md) depends on, and protects a repository nobody was
-  putting files in. ⚠ **Reopen this specific bullet, not the law, if the intent
-  was wider** — the ruling this record was written from is quoted in
-  [SR-NODE-SEARCH](0153_node-search.md) decisions 13-15.
+  putting files in. ⚠ **The scope is confirmed narrow** (Arpit, W-251 §2, 2026-10-04): the
+  ruling this record was written from is about the Node bundle in both
+  registries, as quoted in [SR-NODE-SEARCH](0153_node-search.md) decisions
+  13-15, and the intent was not wider.
 - **Exempt any directory the consumer might want to read.** Rejected: that is
   the status quo with a justification attached. The test of an exemption is
   *the consumer EDITS this*, not *the consumer might look at it*, and on that

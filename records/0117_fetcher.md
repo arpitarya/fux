@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@4de82bf2d212, src/fux/templates@2be1e42907bc]
+owns: [src/fux/ingest/urlsrc.py@4de82bf2d212, src/fux/templates@a2725223d4f4]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 6d40752c7f9a5158e576a8a7d48054f0b1881f37fb8b727d100beaa9177f5c4e
+content_sha: f9f5c28467b8a362a03d0a85e0917e08de35427ae3a06078b7b948641a3e7bd7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -723,16 +723,15 @@ copied out, never imported.
   flight, via a counter inside a test fetcher — with a control arm proving a
   fetcher declaring more genuinely does run concurrently, so a pool that never
   parallelised could not pass by doing nothing.
-- ⚠ **The shipped fetchers import `fux.decode`, and that inverts the dependency
-  direction.** Fux imports the fetcher and the fetcher used to import nothing of
-  fux — which is what made *"it is your code"* literally true. A shipped fetcher
-  now carries `from fux.decode.html import …`, so **a consumer's committed
-  file depends on fux's internal module layout**: renaming `html` breaks every
-  copy in every consumer repo, and those copies are files fux has promised never
-  to rewrite. The `.py.txt` extension still keeps the template un-importable, so
-  nothing about L5 changes; what changed is that `fux.decode.html` is
-  **public surface in practice** even though nothing declares it so. **Weigh
-  that before renaming anything under `decode/`.**
+- **The shipped fetchers import nothing from `fux`.** Fux imports the fetcher
+  and the fetcher imports nothing of fux, which is what keeps *"it is your
+  code"* literally true: a consumer's committed copy depends on no internal
+  module layout of fux, so renaming anything under `decode/` cannot break one.
+  For a time (W-86 P1 to W-199) a shipped fetcher carried
+  `from fux.decode.html import …` and inverted that direction; W-199 moved
+  decoding to the line's `decoder=`, and neither template imports `fux` today.
+  The `.py.txt` extension still keeps the template un-importable, so nothing
+  about L5 changes.
 - **Conversion left the fetchers entirely.** Both templates used to hold their
   own copy of the HTML→Markdown pass — **four hand-maintained copies of one
   converter**, and the templates are what `fux setup` writes into every new

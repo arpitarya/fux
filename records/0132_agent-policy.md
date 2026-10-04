@@ -10,7 +10,7 @@ feature: the agent-facing policy and skill artifacts Fux ships, and their instal
 owns: [src/fux/templates/agents@261977d5386f]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: a89fe353e45bdcb55a8c63ccba8ce58c3aa38efb702568c47ae2dedd3f02e52c
+content_sha: 95bbddd2909e0b41dc263e74c27ab92245375dc82072c8633e4097b12f24b41a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -575,6 +575,12 @@ fux cannot tell which one a consumer runs.** On an older CLI that is roughly
 four times larger, paid by developers who may not be using fux. **The byte bound
 is what keeps it from growing; the announcement is what makes it visible;
 `[agents] install` without `kiro` is the way out.**
+*Measured 2026-10-04: the twelve pointers in `.kiro/steering/` total 10 985 B;
+the way out remains `[agents] install` without `kiro`. A per-CLI-version switch
+was considered and refused (W-251 §4 #20): fux cannot observe the CLI version
+(decision 5), no `--agents` flag exists, and a vendor-version enum in
+`KNOWN_AGENTS` is the catalogue-that-rots this record's argument against detection rejects
+(decision 5, §Alternatives).*
 
 **15d. The committed-write topics are path-scoped ONLY** — never
 `inclusion: auto`, never `"**"`. A description match can fire on a request that

@@ -7,11 +7,11 @@ description: "The live queue's discipline has one home, and this is it. Fifty-ei
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@f117a1469989, tests/test_no_work_item_is_lost.py@9b0527556e40, scripts/check-open-work-inbox.py@0eee6f43e26c, .claude/hooks/guard-open-work-inbox.sh@1b479b74cb33]
+owns: [tests/test_open_work_rows_are_short.py@01fe412431ad, tests/test_open_work_is_not_stale.py@51da5a4571e6, tests/test_no_work_item_is_lost.py@9b0527556e40, scripts/check-open-work-inbox.py@0eee6f43e26c, .claude/hooks/guard-open-work-inbox.sh@1b479b74cb33]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 5edd95523d47310d7d94bd1da535b8b1f9afe7002e061e422a6b44fcfe9c3ab5
+content_sha: 0dbc97ad9698a69f80b384751499ff13d7a33e624122c5c67e442ff177e252c1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -436,6 +436,8 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
    row waiting on something nobody had filed, and those are opposite states:
    the first clears itself when its blocker lands, the second never clears.
    `tests/test_open_work_rows_are_short.py` enforces the two forms.
+
+**No decision here moved** (W-245, 2026-10-04): `tests/test_open_work_is_not_stale.py`'s docstrings and failure messages cited rules 2, 3 and 4 by their pre-renumber handles; they now cite rules 3 and 10, 8 and 9, and 46.
 
 ### Consequences
 

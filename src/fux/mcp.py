@@ -4,8 +4,9 @@
 an agent calls a retrieval tool many times per task. A CLI spawn costs
 ~50-150 ms of Python start-up *before any ranking happens*, which is more than
 the ranking itself (warm p95: 27 ms measured at 8 870 documents, 64 ms at
-10 000). A warm process pays that once. The index, the doc table and the
-postings mmaps stay resident across calls.
+10 000). A warm process pays that once. What stays resident is the process;
+the index is re-read from the path on every request, so a rebuilt accelerator
+is picked up mid-session (SR-MCP Consequences; holding it open is W-249).
 
 **Stdlib only.** No `mcp` package, no `pydantic`, no framework. MCP over stdio
 is newline-delimited JSON-RPC 2.0, which is `json` and `sys.stdin` — adopting

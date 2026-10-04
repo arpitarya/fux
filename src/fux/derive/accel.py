@@ -225,7 +225,8 @@ def is_fresh(root: Path) -> bool:
 
     Deliberately not a re-hash of every shard — that is correct but costs
     hundreds of milliseconds on a large index and would land inside R3's
-    budget. The deep check lives in `fux doctor`, which is allowed to be slow.
+    budget. `fux doctor` calls this same cheap check; the deep re-hash is owed
+    as a gate (W-246), not shipped.
     """
     directory = fmt.runtime_dir(root)
     stamp_path = directory / fmt.STAMP_NAME

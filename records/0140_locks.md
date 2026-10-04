@@ -10,7 +10,7 @@ feature: the index write lock and the files around it
 owns: []
 laws: [L2, L3, L4, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 1f9dc6b222c8a92906ae8a46496b419a8a54ddcb638ee3db5d9269474c16d25c
+content_sha: 423b8ae63bdcdc793af3816ae9909f4ffe3f451ff0660c88610605eb0e1f8379
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -242,12 +242,15 @@ this moved where they are written, not what they are.
 - **`wedged` is left unresolved on purpose.** Breaking a lock whose owner is
   demonstrably alive is the two-writer failure the lock exists to prevent, so
   the caller reports it and stops rather than deciding.
-- **This record owns no component, so the freshness gate will not fire on it.**
-  A change to locking updates [SR-MAINTENANCE](0129_hooks.md), which owns
-  `src/fux/maintain/`; the gate demands that record and cannot demand this one.
-  The precedent is the six 2026-08-19 companion records that own nothing by
-  design. **The debt is real and is stated rather than hidden**: if this record
-  goes stale, nothing mechanical will say so.
+- **This record owns no component, but a `describes` row now opens it.** A
+  change to locking updates [SR-MAINTENANCE](0129_hooks.md), which owns
+  `src/fux/maintain/`; a `describes` row on `src/fux/store/fuxdir.py`
+  ([`records/README.md`](README.md) §DESCRIBES, 2026-09-21) is what makes
+  [`tests/test_sr_freshness.py`](../tests/test_sr_freshness.py) demand this
+  record when the lock paths move. The precedent is the six 2026-08-19
+  companion records that own nothing by design. **The row covers where the
+  lock paths live, not the lock protocol**, which still lives in
+  `src/fux/maintain/` and is demanded of SR-MAINTENANCE only.
 
 ### Alternatives considered
 

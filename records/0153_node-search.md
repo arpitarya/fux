@@ -11,7 +11,7 @@ owns: [node@5c4f7e0da66d, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 3322a65433718ea60717a63d517cf6f275802350ae813878a7afd3bd54262661
+content_sha: 39720da30c4a7e7361ff95e737b311910bed589742b0044bc29adc54c438f9f3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -997,6 +997,14 @@ Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1 and 2 BUILT 2026-1
   a Node reader must answer where no Python has run — is what Tier 2 now also
   serves.
 
+**25. `verify`, `--why`, `--receipt` and `--journal` are OUT OF SCOPE ON THIS
+READER, declared rather than missing** (W-251 §4 #6, 2026-10-04), in decision
+18's shape. Nothing structural forbids them — `verify` never fetches
+([SR-PROVENANCE](0142_provenance.md) decision 14) and `--journal` writes a
+gitignored log — they are unbuilt because no consumer has asked for
+verification where no Python runs. **Reopens when one does; that change amends
+this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-NODE-2.md).**
+
 **No decision here moved** (2026-10-03): the arm's `api` lane compares scores at `round(9)` like every other lane, under [SR-RANKING](0111_ranking.md) decision 8a. That lane exercises this record's library surface, `index.mjs` against `api.py`. See [SR-T1-ACCELERATOR](0110_accelerator.md)'s note of the same date.
 
 **No decision here moved** (W-254, 2026-10-04): the Node refer chunker gained the frontmatter unit and `answer`/`rerank` pass the flag ([SR-CHUNKING](0151_chunking.md) decision 7).
@@ -1194,8 +1202,8 @@ Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1 and 2 BUILT 2026-1
   Every one of the three defects in decisions 9-12 lived
   on a surface the arm did not reach, and each was found on the first run after
   it did. ⚠ **`verify`, `--why`, `--receipt` and `--journal` are still
-  uncovered**, because they have no Node twin at all (W-107 R6) — that is a
-  stated absence, not a gap the arm should pretend to close.
+  uncovered**, because they have no Node twin at all (W-107 R6) — that is
+  declared out of scope, decision 25, not a gap the arm should pretend to close.
 - ⚠ **The arm cannot be called green yet.** PRE-REGISTRATION-NODE §4 names
   `fux-playground`, which [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md) voided as an
   instrument. A frozen pre-registration is superseded, never edited; the build

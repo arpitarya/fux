@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L9
 owns: []
 laws: [L9]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: d2bc95355999a80602b0220e840149ed5e9c8ffd4340a04143ae39d2b13a94e3
+content_sha: 2a0e4211f36b16134802888e06641615e1936c92867bd6281bfec127d2689f5d
 ---
 
 # SR-LAW-9 — L9 — a use record is never committed
@@ -182,7 +182,7 @@ is closed and greped rather than merely documented.
 ### Consequences
 
 - **Easier:** a readable local log, and a per-answer provenance receipt on stdout.
-- **Easier:** collecting a judgment supply in the hundreds — now legal, still not collected, and still governed by the blind-authorship rule.
+- **Easier:** collecting a judgment supply in the hundreds — now legal, **still not collected** — the opt-in journal ([SR-PROVENANCE](0142_provenance.md) decision 10) is the only lawful collector and the project does not run one; a supply, if ever graded, is `informed` under [SR-RS](0133_predictions.md) decision 11 — and still governed by the blind-authorship rule. (Wording only, W-251 §4 #14; no law text moves.)
 - ⚠ **The AOL-2006 grounding is OVERRIDDEN, NOT REFUTED.** Nothing about that case became untrue on 2026-08-27; the owner weighed it against a readable local log and chose the log. **A future session may not cite the reversal as evidence the risk was disproved.** The mitigation is confinement alone.
 - ⚠ **`lastcited.py` is stricter than the law** — still hashes, still bounds at 256. That is legal and is the honest state to leave it in until a record asks for more.
 - ⚠ **Nothing mechanical checks a law's wording.** The §1 handle for this law sat on a *withdrawn* form for hours, in four live documents, and no test noticed. **Ratification is a human act and stays one.**
