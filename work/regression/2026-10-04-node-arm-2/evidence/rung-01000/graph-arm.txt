@@ -1,0 +1,7 @@
+corpus       : $SCRATCH/w252p2/rung-01000
+records      : 1000
+nodes/edges  : 226 / 181
+communities  : 95
+python digest: 9d9258429c49743b5f59767fc69a512e0f243f2ad27357d6914b3b54e3d0069d
+node digest  : 9d9258429c49743b5f59767fc69a512e0f243f2ad27357d6914b3b54e3d0069d
+N2           : IDENTICAL

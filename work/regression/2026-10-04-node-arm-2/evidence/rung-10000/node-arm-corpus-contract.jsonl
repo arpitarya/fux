@@ -1,0 +1,802 @@
+{"id": "_condition", "arm": "contract", "_condition": {"corpus": "/private/tmp/claude-501/-Users-arpitarya-my-programs-fux/6d142bd2-57fe-4ea5-9fdb-9a1d4568e0f7/scratchpad/w252p2/rung-10000", "rung": null, "arm": "contract", "tune_vs_defaults": "all defaults \u2014 the contract and transcription arms are the same run", "queries": "corpus", "node_entry": "/Users/arpitarya/my_programs/fux/node/fux.mjs"}}
+{"id": "rung-10000:contract:001", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:002", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:003", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:004", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:005", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:006", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:007", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:008", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:009", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:010", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:011", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:012", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:013", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "1", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:014", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "1", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:015", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "1", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:016", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "1", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:017", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "1", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:018", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "1", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:019", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "minut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:020", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "minut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:021", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "minut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:022", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "minut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:023", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "minut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:024", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "minut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:025", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "befor", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:026", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "befor", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:027", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "befor", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:028", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "befor", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:029", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "befor", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:030", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "befor", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:031", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "replac", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:032", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "replac", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:033", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "replac", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:034", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "replac", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:035", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "replac", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:036", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "replac", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:037", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:038", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:039", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:040", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:041", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:042", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:043", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "time", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:044", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "time", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:045", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "time", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:046", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "time", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:047", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "time", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:048", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "time", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:049", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "qualiti", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:050", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "qualiti", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:051", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "qualiti", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:052", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "qualiti", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:053", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "qualiti", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:054", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "qualiti", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:055", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "patient-critical", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:056", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "patient-critical", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:057", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "patient-critical", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:058", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "patient-critical", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:059", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "patient-critical", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:060", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "patient-critical", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:061", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:062", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:063", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:064", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:065", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:066", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:067", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "trip", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:068", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "trip", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:069", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "trip", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:070", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "trip", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:071", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "trip", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:072", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "trip", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:073", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:074", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:075", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:076", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:077", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:078", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:079", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "rule", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:080", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "rule", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:081", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "rule", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:082", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "rule", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:083", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "rule", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:084", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "rule", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:085", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "21", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:086", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "21", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:087", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "21", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:088", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "21", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:089", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "21", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:090", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "21", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:091", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "on", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:092", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "on", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:093", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "on", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:094", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "on", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:095", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "on", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:096", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "on", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:097", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:098", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:099", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:100", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:101", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:102", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:103", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:104", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:105", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:106", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:107", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:108", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:109", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "financ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:110", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "financ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:111", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "financ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:112", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "financ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:113", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "financ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:114", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "financ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:115", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:116", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:117", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:118", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:119", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:120", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:121", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "hold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:122", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "hold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:123", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "hold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:124", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "hold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:125", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "hold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:126", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "hold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:127", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "record", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:128", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "record", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:129", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "record", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:130", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "record", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:131", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "record", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:132", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "record", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:133", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:134", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:135", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:136", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:137", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:138", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:139", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "pack", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:140", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "pack", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:141", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "pack", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:142", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "pack", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:143", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "pack", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:144", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "pack", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:145", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "both", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:146", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "both", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:147", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "both", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:148", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "both", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:149", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "both", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:150", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "both", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:151", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "accept", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:152", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "accept", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:153", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "accept", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:154", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "accept", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:155", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "accept", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:156", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "accept", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:157", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:158", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:159", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:160", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:161", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:162", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:163", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:164", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:165", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:166", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:167", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:168", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:169", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "chain", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:170", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "chain", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:171", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "chain", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:172", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "chain", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:173", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "chain", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:174", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "chain", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:175", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:176", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:177", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:178", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:179", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:180", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:181", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zac-hse-86", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:182", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zac-hse-86", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:183", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zac-hse-86", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:184", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zac-hse-86", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:185", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zac-hse-86", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:186", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zac-hse-86", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:187", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zac-qa-30", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:188", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zac-qa-30", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:189", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zac-qa-30", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:190", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zac-qa-30", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:191", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zac-qa-30", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:192", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zac-qa-30", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:193", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zac-qa-46", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:194", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zac-qa-46", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:195", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zac-qa-46", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:196", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zac-qa-46", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:197", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zac-qa-46", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:198", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zac-qa-46", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:199", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zac-qa-59", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:200", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zac-qa-59", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:201", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zac-qa-59", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:202", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zac-qa-59", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:203", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zac-qa-59", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:204", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zac-qa-59", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:205", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zac-qa-98", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:206", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zac-qa-98", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:207", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zac-qa-98", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:208", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zac-qa-98", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:209", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zac-qa-98", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:210", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zac-qa-98", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:211", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "0.4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:212", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "0.4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:213", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "0.4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:214", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "0.4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:215", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "0.4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:216", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "0.4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:217", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:218", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:219", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:220", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:221", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:222", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:223", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:224", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:225", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:226", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:227", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:228", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:229", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:230", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:231", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:232", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:233", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:234", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:235", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:236", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:237", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:238", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:239", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:240", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:241", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00175", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:242", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00175", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:243", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00175", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:244", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00175", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:245", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00175", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:246", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00175", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:247", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00215", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:248", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00215", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:249", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00215", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:250", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00215", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:251", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00215", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:252", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00215", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:253", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:254", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:255", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:256", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:257", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:258", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:259", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00295", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:260", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00295", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:261", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00295", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:262", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00295", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:263", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00295", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:264", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00295", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:265", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00335", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:266", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00335", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:267", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00335", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:268", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00335", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:269", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00335", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:270", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00335", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:271", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00375", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:272", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00375", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:273", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00375", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:274", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00375", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:275", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00375", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:276", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00375", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:277", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00415", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:278", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00415", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:279", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00415", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:280", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00415", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:281", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00415", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:282", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00415", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:283", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:284", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:285", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:286", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:287", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:288", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:289", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00495", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:290", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00495", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:291", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00495", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:292", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00495", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:293", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00495", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:294", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00495", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:295", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00535", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:296", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00535", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:297", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00535", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:298", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00535", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:299", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00535", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:300", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00535", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:301", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00575", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:302", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00575", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:303", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00575", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:304", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00575", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:305", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00575", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:306", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00575", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:307", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00615", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:308", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00615", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:309", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00615", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:310", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00615", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:311", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00615", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:312", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00615", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:313", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:314", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:315", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:316", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:317", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:318", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:319", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00695", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:320", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00695", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:321", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00695", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:322", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00695", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:323", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00695", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:324", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00695", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:325", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00735", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:326", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00735", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:327", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00735", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:328", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00735", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:329", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00735", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:330", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00735", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:331", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00775", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:332", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00775", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:333", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00775", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:334", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00775", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:335", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00775", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:336", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00775", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:337", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00815", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:338", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00815", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:339", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00815", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:340", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00815", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:341", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00815", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:342", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00815", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:343", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:344", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:345", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:346", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:347", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:348", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:349", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00895", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:350", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00895", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:351", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00895", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:352", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00895", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:353", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00895", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:354", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00895", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:355", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00935", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:356", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00935", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:357", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00935", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:358", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00935", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:359", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00935", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:360", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00935", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:361", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00975", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:362", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00975", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:363", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00975", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:364", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00975", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:365", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00975", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:366", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00975", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:367", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:368", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:369", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:370", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:371", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:372", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:373", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:374", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:375", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:376", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:377", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:378", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:379", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:380", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:381", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:382", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:383", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:384", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:385", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:386", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:387", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:388", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:389", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:390", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:391", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00155 statu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:392", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00155 statu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:393", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00155 statu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:394", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00155 statu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:395", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00155 statu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:396", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00155 statu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:397", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00435 3", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:398", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00435 3", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:399", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00435 3", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:400", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00435 3", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:401", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00435 3", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:402", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00435 3", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:403", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00715 4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:404", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00715 4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:405", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00715 4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:406", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00715 4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:407", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00715 4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:408", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00715 4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:409", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00995 no", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:410", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00995 no", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:411", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00995 no", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:412", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00995 no", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:413", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00995 no", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:414", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00995 no", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:415", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00075 in_force", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:416", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00075 in_force", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:417", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00075 in_force", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:418", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00075 in_force", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:419", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00075 in_force", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:420", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00075 in_force", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:421", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00355 cold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:422", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00355 cold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:423", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00355 cold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:424", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00355 cold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:425", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00355 cold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:426", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00355 cold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:427", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00635 appli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:428", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00635 appli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:429", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00635 appli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:430", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00635 appli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:431", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00635 appli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:432", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00635 appli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:433", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00915 6", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:434", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00915 6", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:435", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00915 6", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:436", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00915 6", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:437", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00915 6", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:438", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00915 6", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:439", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "0.7 patient", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:440", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "0.7 patient", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:441", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "0.7 patient", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:442", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "0.7 patient", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:443", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "0.7 patient", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:444", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "0.7 patient", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:445", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00275 cut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:446", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00275 cut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:447", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00275 cut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:448", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00275 cut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:449", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00275 cut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:450", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00275 cut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:451", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00555 temperatur", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:452", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00555 temperatur", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:453", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00555 temperatur", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:454", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00555 temperatur", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:455", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00555 temperatur", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:456", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00555 temperatur", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:457", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00835 rs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:458", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00835 rs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:459", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00835 rs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:460", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00835 rs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:461", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00835 rs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:462", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00835 rs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:463", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01115 do", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:464", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01115 do", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:465", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01115 do", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:466", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01115 do", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:467", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01115 do", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:468", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01115 do", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:469", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00195 continu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:470", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00195 continu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:471", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00195 continu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:472", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00195 continu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:473", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00195 continu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:474", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00195 continu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:475", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00475 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:476", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00475 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:477", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00475 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:478", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00475 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:479", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00475 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:480", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00475 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:481", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00755 quarantin", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:482", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00755 quarantin", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:483", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00755 quarantin", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:484", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00755 quarantin", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:485", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00755 quarantin", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:486", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00755 quarantin", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:487", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01035 10", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:488", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01035 10", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:489", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01035 10", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:490", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01035 10", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:491", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01035 10", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:492", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01035 10", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:493", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00115 frozen", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:494", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00115 frozen", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:495", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00115 frozen", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:496", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00115 frozen", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:497", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00115 frozen", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:498", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00115 frozen", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:499", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00395 card", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:500", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00395 card", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:501", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00395 card", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:502", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00395 card", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:503", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00395 card", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:504", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00395 card", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:505", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00675 receiv", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:506", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00675 receiv", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:507", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00675 receiv", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:508", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00675 receiv", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:509", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00675 receiv", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:510", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00675 receiv", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:511", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00955 review", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:512", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00955 review", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:513", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00955 review", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:514", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00955 review", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:515", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00955 review", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:516", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00955 review", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:517", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00035 excurs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:518", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00035 excurs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:519", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00035 excurs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:520", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00035 excurs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:521", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00035 excurs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:522", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00035 excurs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:523", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00315 month", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:524", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00315 month", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:525", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00315 month", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:526", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00315 month", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:527", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00315 month", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:528", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00315 month", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:529", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00595 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:530", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00595 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:531", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00595 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:532", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00595 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:533", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00595 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:534", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00595 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:535", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00875 insid", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:536", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00875 insid", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:537", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00875 insid", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:538", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00875 insid", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:539", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00875 insid", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:540", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00875 insid", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:541", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "0.15 name", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:542", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "0.15 name", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:543", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "0.15 name", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:544", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "0.15 name", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:545", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "0.15 name", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:546", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "0.15 name", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:547", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00235 lane", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:548", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00235 lane", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:549", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00235 lane", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:550", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00235 lane", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:551", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00235 lane", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:552", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00235 lane", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:553", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00515 stop", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:554", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00515 stop", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:555", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00515 stop", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:556", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00515 stop", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:557", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00515 stop", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:558", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00515 stop", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:559", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00795 fit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:560", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00795 fit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:561", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00795 fit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:562", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00795 fit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:563", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00795 fit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:564", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00795 fit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:565", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01075 number", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:566", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01075 number", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:567", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01075 number", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:568", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01075 number", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:569", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01075 number", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:570", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01075 number", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:571", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "statu room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:572", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "statu room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:573", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "statu room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:574", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "statu room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:575", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "statu room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:576", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "statu room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:577", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "3 critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:578", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "3 critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:579", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "3 critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:580", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "3 critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:581", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "3 critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:582", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "3 critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:583", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "4 hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:584", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "4 hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:585", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "4 hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:586", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "4 hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:587", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "4 hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:588", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "4 hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:589", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:590", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:591", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:592", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:593", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:594", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:595", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "in_force need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:596", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "in_force need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:597", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "in_force need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:598", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "in_force need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:599", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "in_force need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:600", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "in_force need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:601", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "cold releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:602", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "cold releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:603", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "cold releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:604", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "cold releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:605", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "cold releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:606", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "cold releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:607", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "appli post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:608", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "appli post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:609", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "appli post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:610", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "appli post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:611", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "appli post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:612", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "appli post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:613", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "6 start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:614", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "6 start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:615", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "6 start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:616", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "6 start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:617", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "6 start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:618", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "6 start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:619", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "patient 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:620", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "patient 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:621", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "patient 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:622", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "patient 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:623", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "patient 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:624", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "patient 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:625", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "cut door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:626", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "cut door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:627", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "cut door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:628", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "cut door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:629", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "cut door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:630", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "cut door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:631", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "temperatur room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:632", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "temperatur room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:633", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "temperatur room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:634", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "temperatur room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:635", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "temperatur room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:636", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "temperatur room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:637", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "rs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:638", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "rs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:639", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "rs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:640", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "rs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:641", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "rs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:642", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "rs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:643", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "do hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:644", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "do hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:645", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "do hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:646", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "do hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:647", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "do hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:648", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "do hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:649", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "continu than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:650", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "continu than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:651", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "continu than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:652", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "continu than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:653", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "continu than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:654", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "continu than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:655", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:656", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:657", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:658", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:659", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:660", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:661", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "quarantin releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:662", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "quarantin releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:663", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "quarantin releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:664", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "quarantin releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:665", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "quarantin releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:666", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "quarantin releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:667", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "10 post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:668", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "10 post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:669", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "10 post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:670", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "10 post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:671", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "10 post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:672", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "10 post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:673", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "frozen start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:674", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "frozen start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:675", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "frozen start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:676", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "frozen start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:677", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "frozen start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:678", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "frozen start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:679", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "card 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:680", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "card 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:681", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "card 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:682", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "card 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:683", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "card 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:684", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "card 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:685", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "receiv door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:686", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "receiv door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:687", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "receiv door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:688", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "receiv door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:689", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "receiv door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:690", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "receiv door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:691", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "review room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:692", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "review room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:693", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "review room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:694", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "review room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:695", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "review room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:696", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "review room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:697", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "excurs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:698", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "excurs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:699", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "excurs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:700", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "excurs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:701", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "excurs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:702", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "excurs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:703", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "month hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:704", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "month hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:705", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "month hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:706", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "month hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:707", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "month hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:708", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "month hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:709", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:710", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:711", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:712", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:713", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:714", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:715", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "insid need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:716", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "insid need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:717", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "insid need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:718", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "insid need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:719", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "insid need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:720", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "insid need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:721", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:722", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:723", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:724", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:725", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:726", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:727", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:728", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:729", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:730", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:731", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:732", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:733", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:734", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:735", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:736", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:737", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:738", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:739", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:740", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:741", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:742", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:743", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:744", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:745", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:746", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:747", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:748", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:749", "arm": "contract", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:750", "arm": "contract", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:751", "arm": "contract", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/adjacent/00001-finance-close.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:752", "arm": "contract", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/adjacent/04167-finance-close.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:753", "arm": "contract", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/adjacent/08334-payroll.yaml"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:754", "arm": "contract", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/archive/07705-decision-retired.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:755", "arm": "contract", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/filler/05138-library.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:756", "arm": "contract", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/sibling/00729-ratecard.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:757", "arm": "contract", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/sibling/03853-dockwiki.html"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:758", "arm": "contract", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/sibling/06979-dockwiki.html"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:759", "arm": "contract", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["owner"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:760", "arm": "contract", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["effect"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:761", "arm": "contract", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["1"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:762", "arm": "contract", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["minut"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:763", "arm": "contract", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["befor"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:764", "arm": "contract", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["replac"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:765", "arm": "contract", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["after"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:766", "arm": "contract", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["time"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:767", "arm": "contract", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/adjacent/00001-finance-close.md", "file:ext/adjacent/04167-finance-close.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:768", "arm": "contract", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/adjacent/04167-finance-close.md", "file:ext/adjacent/08334-payroll.yaml"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:769", "arm": "contract", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/adjacent/08334-payroll.yaml", "file:ext/archive/07705-decision-retired.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:770", "arm": "contract", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/archive/07705-decision-retired.md", "file:ext/filler/05138-library.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:771", "arm": "contract", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/filler/05138-library.md", "file:ext/sibling/00729-ratecard.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:772", "arm": "contract", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/sibling/00729-ratecard.md", "file:ext/sibling/03853-dockwiki.html"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:773", "arm": "contract", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/sibling/03853-dockwiki.html", "file:ext/sibling/06979-dockwiki.html"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:774", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "owner"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:775", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "owner"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:776", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "owner"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:777", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "effect"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:778", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "effect"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:779", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "effect"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:780", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "1"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:781", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "1"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:782", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "1"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:783", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "minut"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:784", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "minut"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:785", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "minut"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:786", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "befor"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:787", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "befor"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:788", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "befor"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:789", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "replac"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:790", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "replac"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:791", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "replac"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:792", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "after"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:793", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "after"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:794", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "after"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:795", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "time"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:796", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "time"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:797", "arm": "contract", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "time"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:798", "arm": "contract", "rung": "rung-10000", "verb": "mcp", "top": null, "query": ["{\"jsonrpc\": \"2.0\", \"id\": 0, \"method\": \"tools/list\"}", "{\"jsonrpc\": \"2.0\", \"id\": 1, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"owner\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 2, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"effect\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 3, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"1\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 4, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"minut\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 5, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"befor\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 6, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"replac\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 7, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"after\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 8, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"time\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 9, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/adjacent/00001-finance-close.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 10, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/adjacent/00001-finance-close.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 11, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/adjacent/04167-finance-close.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 12, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/adjacent/04167-finance-close.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 13, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/adjacent/08334-payroll.yaml\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 14, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/adjacent/08334-payroll.yaml\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 15, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/archive/07705-decision-retired.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 16, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/archive/07705-decision-retired.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 17, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/filler/05138-library.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 18, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/filler/05138-library.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 19, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/sibling/00729-ratecard.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 20, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/sibling/00729-ratecard.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 21, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/sibling/03853-dockwiki.html\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 22, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/sibling/03853-dockwiki.html\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 23, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/sibling/06979-dockwiki.html\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 24, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/sibling/06979-dockwiki.html\", \"line_start\": 1, \"line_end\": 20}}}"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:799", "arm": "contract", "rung": "rung-10000", "verb": "bundle-mcp", "top": null, "query": ["{\"jsonrpc\": \"2.0\", \"id\": 0, \"method\": \"tools/list\"}", "{\"jsonrpc\": \"2.0\", \"id\": 1, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"owner\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 2, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"effect\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 3, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"1\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 4, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"minut\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 5, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"befor\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 6, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"replac\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 7, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"after\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 8, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"time\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 9, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/adjacent/00001-finance-close.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 10, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/adjacent/00001-finance-close.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 11, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/adjacent/04167-finance-close.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 12, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/adjacent/04167-finance-close.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 13, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/adjacent/08334-payroll.yaml\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 14, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/adjacent/08334-payroll.yaml\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 15, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/archive/07705-decision-retired.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 16, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/archive/07705-decision-retired.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 17, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/filler/05138-library.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 18, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/filler/05138-library.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 19, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/sibling/00729-ratecard.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 20, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/sibling/00729-ratecard.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 21, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/sibling/03853-dockwiki.html\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 22, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/sibling/03853-dockwiki.html\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 23, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/sibling/06979-dockwiki.html\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 24, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/sibling/06979-dockwiki.html\", \"line_start\": 1, \"line_end\": 20}}}"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:800", "arm": "contract", "rung": "rung-10000", "verb": "api", "top": null, "query": ["owner", "file:ext/adjacent/00001-finance-close.md", "file:ext/adjacent/04167-finance-close.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:contract:801", "arm": "contract", "rung": "rung-10000", "verb": "bundle-api", "top": null, "query": ["owner", "file:ext/adjacent/00001-finance-close.md", "file:ext/adjacent/04167-finance-close.md"], "status": "pass", "discordances": 0, "detail": []}

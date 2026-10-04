@@ -1,0 +1,88 @@
+engine 9e2aa57f73ba17a02f94f291c047bed52d96c438
+lab ed46bfefbe18bc35139ed2a909a2d4382fc15cbd
+v24.13.0
+Python 3.14.3
+=== rung-01000
+rung head b73348d56edf5c0e16aa6f344ad629ba1dd00c37
+?? fux.toml
+verify lab rung-01000 []
+ingested 1000 docs (1000 changed, 0 carried forward), 0 not indexed, 0 skipped, 253 shards written
+accelerator: 6774 terms, 7085 blocks, 98763 postings (derived, not committed)
+accelerator rebuilt from the committed index: 1000 docs, 6774 terms, 7085 blocks, 98763 postings
+copy documents missing 0 drifted 0
+--- node_arm rung-01000 tune=on
+corpus   : $SCRATCH/w252p2/rung-01000
+arm      : contract (tune applied)
+tune     : all defaults — the contract and transcription arms are the same run
+queries  : 125 (corpus) x tops [1, 5, 20] x 2 verbs = 750 ranking comparisons
+bundle   : 8 queries x 3 verbs through the published artefact as well as the tree
+discordant: 0 of 801
+evidence : /Users/arpitarya/my_programs/fux/work/regression/2026-10-04-node-arm-2/evidence/rung-01000/node-arm-corpus-contract.jsonl (801 rows)
+--- node_arm rung-01000 tune=off
+corpus   : $SCRATCH/w252p2/rung-01000
+arm      : transcription (--no-tune)
+tune     : all defaults — the contract and transcription arms are the same run
+queries  : 125 (corpus) x tops [1, 5, 20] x 2 verbs = 750 ranking comparisons
+bundle   : 8 queries x 3 verbs through the published artefact as well as the tree
+discordant: 0 of 801
+evidence : /Users/arpitarya/my_programs/fux/work/regression/2026-10-04-node-arm-2/evidence/rung-01000/node-arm-corpus-transcription.jsonl (801 rows)
+--- graph_arm rung-01000
+corpus       : $SCRATCH/w252p2/rung-01000
+records      : 1000
+nodes/edges  : 226 / 181
+communities  : 95
+python digest: 9d9258429c49743b5f59767fc69a512e0f243f2ad27357d6914b3b54e3d0069d
+node digest  : 9d9258429c49743b5f59767fc69a512e0f243f2ad27357d6914b3b54e3d0069d
+N2           : IDENTICAL
+accelerator rebuilt from the committed index: 1000 docs, 6774 terms, 7085 blocks, 98763 postings
+--- build diff
+Only in $SCRATCH/w252p2/rung-01000/.fux/runtime: decoder-digests.json
+Only in $SCRATCH/w252p2/rung-01000/.fux/runtime: extract-config-digest
+Only in $SCRATCH/w252p2/rung-01000/.fux/runtime: ingest-log.jsonl
+Only in $SCRATCH/w252p2/rung-01000/.fux/runtime: last-cited.json
+Only in $SCRATCH/w252p2/rung-01000/.fux/runtime: pii-counts.json
+Only in $SCRATCH/w252p2/rung-01000/.fux/runtime: pii-digest
+Files $SCRATCH/w252p2/rung-01000/.fux/runtime/stamp.json and $SCRATCH/w252p2/rung-01000-nodebuilt/.fux/runtime/stamp.json differ
+files in runtime:      602 / nodebuilt      596
+=== rung-10000
+rung head cac5699ce2a48c8ded32a8f5e5df83234d87021e
+?? fux.toml
+verify lab rung-10000 []
+ingested 10000 docs (10000 changed, 0 carried forward), 0 not indexed, 0 skipped, 256 shards written
+accelerator: 30841 terms, 36999 blocks, 902972 postings (derived, not committed)
+accelerator rebuilt from the committed index: 10000 docs, 30841 terms, 36999 blocks, 902972 postings
+copy documents missing 0 drifted 0
+--- node_arm rung-10000 tune=on
+corpus   : $SCRATCH/w252p2/rung-10000
+arm      : contract (tune applied)
+tune     : all defaults — the contract and transcription arms are the same run
+queries  : 125 (corpus) x tops [1, 5, 20] x 2 verbs = 750 ranking comparisons
+bundle   : 8 queries x 3 verbs through the published artefact as well as the tree
+discordant: 0 of 801
+evidence : /Users/arpitarya/my_programs/fux/work/regression/2026-10-04-node-arm-2/evidence/rung-10000/node-arm-corpus-contract.jsonl (801 rows)
+--- node_arm rung-10000 tune=off
+corpus   : $SCRATCH/w252p2/rung-10000
+arm      : transcription (--no-tune)
+tune     : all defaults — the contract and transcription arms are the same run
+queries  : 125 (corpus) x tops [1, 5, 20] x 2 verbs = 750 ranking comparisons
+bundle   : 8 queries x 3 verbs through the published artefact as well as the tree
+discordant: 0 of 801
+evidence : /Users/arpitarya/my_programs/fux/work/regression/2026-10-04-node-arm-2/evidence/rung-10000/node-arm-corpus-transcription.jsonl (801 rows)
+--- graph_arm rung-10000
+corpus       : $SCRATCH/w252p2/rung-10000
+records      : 10000
+nodes/edges  : 2026 / 1081
+communities  : 995
+python digest: 11adfb066d548eb5ba989ab7e39e3980dcdaab2ebb5a3c67fdbd9da36e5a00ae
+node digest  : 11adfb066d548eb5ba989ab7e39e3980dcdaab2ebb5a3c67fdbd9da36e5a00ae
+N2           : IDENTICAL
+accelerator rebuilt from the committed index: 10000 docs, 30841 terms, 36999 blocks, 902972 postings
+--- build diff
+Only in $SCRATCH/w252p2/rung-10000/.fux/runtime: decoder-digests.json
+Only in $SCRATCH/w252p2/rung-10000/.fux/runtime: extract-config-digest
+Only in $SCRATCH/w252p2/rung-10000/.fux/runtime: ingest-log.jsonl
+Only in $SCRATCH/w252p2/rung-10000/.fux/runtime: last-cited.json
+Only in $SCRATCH/w252p2/rung-10000/.fux/runtime: pii-counts.json
+Only in $SCRATCH/w252p2/rung-10000/.fux/runtime: pii-digest
+Files $SCRATCH/w252p2/rung-10000/.fux/runtime/stamp.json and $SCRATCH/w252p2/rung-10000-nodebuilt/.fux/runtime/stamp.json differ
+files in runtime:      602 / nodebuilt      596

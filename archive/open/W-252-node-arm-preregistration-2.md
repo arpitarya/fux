@@ -9,6 +9,12 @@ ball: agent
 
 # W-252 — the Node arm's pre-registration, on data that counts
 
+**✅ CLOSED 2026-10-04 — PASS on both rungs** (Claude Code; a Sonnet subagent wrote the pre-registration and ran the arm, Opus 5.5 reviewed and re-ran the build check):
+- **PRE-REG-NODE-3** frozen alone (`9e2aa57f`) before any number: fux-lab rung-01000 and rung-10000 (lab `ed46bfef`; rung heads `b73348d5`, `cac5699c`), verified against their manifests, re-ingested to v7 in throwaway copies (the lab's v5 rungs are refused by this engine; the lab untouched). Endpoint 0 discordant of 801 per pass, identical graph digests, a Node-built plane equal to Python's.
+- **Result:** 0/801 on all four passes (contract and `--no-tune`, both rungs); graph digests identical; build re-run with the deletion step corrected — 602/602 files byte-equal, `stamp.json` included. The first build check deleted six ingest-side files and failed §7 literally; the procedure defect is disclosed in the VERDICT, no threshold moved.
+- ⚠ **The item's premise was stale:** PRE-REG-NODE-2 (2026-09-12) already named lab rungs; only the first, PRE-REGISTRATION-NODE, named the playground. SR-NODE-SEARCH now says so.
+- Live successor: [SR-NODE-SEARCH](../../records/0153_node-search.md) Consequences; [run](../../work/regression/2026-10-04-node-arm-2/VERDICT.md).
+
 **Model:** Claude Code, **Sonnet** — the endpoint is zero and the harness exists.
 
 **From** backlog B-125. [SR-NODE-SEARCH](../../records/0153_node-search.md)

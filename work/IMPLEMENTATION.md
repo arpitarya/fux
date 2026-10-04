@@ -26,6 +26,14 @@ Rules:
 
 ---
 
+## 2026-10-04 — **W-252: the Node arm is green on lab rungs (PRE-REG-NODE-3, PASS)**
+
+| what | evidence |
+|---|---|
+| **pre-registration** | frozen alone at `9e2aa57f`: rung-01000 + rung-10000, v7 copies, 0 discordant of 801 per pass |
+| **result** | 0/801 × 4 passes; graph digests identical; Node-built plane 602/602 byte-equal (build check re-run with the deletion step corrected, disclosed) — [VERDICT](regression/2026-10-04-node-arm-2/VERDICT.md), `informed` |
+| **record** | [SR-NODE-SEARCH](../records/0153_node-search.md) Consequences: green, and the stale playground premise corrected |
+
 ## 2026-10-04 — **W-246: the mechanical gates the records asked for (22)**
 
 | what | evidence |

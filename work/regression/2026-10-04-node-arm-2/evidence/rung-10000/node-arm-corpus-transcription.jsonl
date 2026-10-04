@@ -1,0 +1,802 @@
+{"id": "_condition", "arm": "transcription", "_condition": {"corpus": "/private/tmp/claude-501/-Users-arpitarya-my-programs-fux/6d142bd2-57fe-4ea5-9fdb-9a1d4568e0f7/scratchpad/w252p2/rung-10000", "rung": null, "arm": "transcription", "tune_vs_defaults": "all defaults \u2014 the contract and transcription arms are the same run", "queries": "corpus", "node_entry": "/Users/arpitarya/my_programs/fux/node/fux.mjs"}}
+{"id": "rung-10000:transcription:001", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:002", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:003", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:004", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:005", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:006", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "owner", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:007", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:008", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:009", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:010", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:011", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:012", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "effect", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:013", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "1", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:014", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "1", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:015", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "1", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:016", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "1", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:017", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "1", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:018", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "1", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:019", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "minut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:020", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "minut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:021", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "minut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:022", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "minut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:023", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "minut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:024", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "minut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:025", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "befor", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:026", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "befor", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:027", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "befor", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:028", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "befor", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:029", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "befor", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:030", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "befor", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:031", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "replac", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:032", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "replac", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:033", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "replac", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:034", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "replac", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:035", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "replac", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:036", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "replac", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:037", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:038", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:039", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:040", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:041", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:042", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "after", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:043", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "time", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:044", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "time", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:045", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "time", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:046", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "time", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:047", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "time", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:048", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "time", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:049", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "qualiti", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:050", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "qualiti", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:051", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "qualiti", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:052", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "qualiti", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:053", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "qualiti", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:054", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "qualiti", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:055", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "patient-critical", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:056", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "patient-critical", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:057", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "patient-critical", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:058", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "patient-critical", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:059", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "patient-critical", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:060", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "patient-critical", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:061", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:062", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:063", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:064", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:065", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:066", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "depart", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:067", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "trip", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:068", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "trip", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:069", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "trip", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:070", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "trip", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:071", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "trip", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:072", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "trip", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:073", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:074", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:075", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:076", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:077", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:078", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "recoveri", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:079", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "rule", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:080", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "rule", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:081", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "rule", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:082", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "rule", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:083", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "rule", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:084", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "rule", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:085", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "21", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:086", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "21", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:087", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "21", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:088", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "21", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:089", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "21", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:090", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "21", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:091", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "on", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:092", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "on", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:093", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "on", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:094", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "on", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:095", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "on", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:096", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "on", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:097", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:098", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:099", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:100", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:101", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:102", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "notif", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:103", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:104", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:105", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:106", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:107", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:108", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "next", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:109", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "financ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:110", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "financ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:111", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "financ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:112", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "financ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:113", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "financ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:114", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "financ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:115", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:116", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:117", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:118", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:119", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:120", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "audit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:121", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "hold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:122", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "hold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:123", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "hold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:124", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "hold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:125", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "hold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:126", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "hold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:127", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "record", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:128", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "record", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:129", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "record", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:130", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "record", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:131", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "record", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:132", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "record", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:133", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:134", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:135", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:136", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:137", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:138", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "us", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:139", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "pack", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:140", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "pack", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:141", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "pack", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:142", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "pack", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:143", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "pack", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:144", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "pack", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:145", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "both", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:146", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "both", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:147", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "both", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:148", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "both", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:149", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "both", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:150", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "both", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:151", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "accept", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:152", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "accept", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:153", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "accept", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:154", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "accept", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:155", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "accept", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:156", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "accept", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:157", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:158", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:159", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:160", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:161", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:162", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "retir", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:163", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:164", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:165", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:166", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:167", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:168", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "limit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:169", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "chain", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:170", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "chain", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:171", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "chain", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:172", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "chain", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:173", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "chain", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:174", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "chain", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:175", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:176", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:177", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:178", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:179", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:180", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "edit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:181", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zac-hse-86", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:182", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zac-hse-86", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:183", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zac-hse-86", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:184", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zac-hse-86", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:185", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zac-hse-86", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:186", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zac-hse-86", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:187", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zac-qa-30", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:188", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zac-qa-30", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:189", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zac-qa-30", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:190", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zac-qa-30", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:191", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zac-qa-30", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:192", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zac-qa-30", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:193", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zac-qa-46", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:194", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zac-qa-46", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:195", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zac-qa-46", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:196", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zac-qa-46", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:197", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zac-qa-46", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:198", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zac-qa-46", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:199", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zac-qa-59", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:200", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zac-qa-59", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:201", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zac-qa-59", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:202", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zac-qa-59", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:203", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zac-qa-59", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:204", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zac-qa-59", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:205", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zac-qa-98", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:206", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zac-qa-98", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:207", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zac-qa-98", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:208", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zac-qa-98", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:209", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zac-qa-98", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:210", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zac-qa-98", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:211", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "0.4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:212", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "0.4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:213", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "0.4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:214", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "0.4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:215", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "0.4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:216", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "0.4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:217", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:218", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:219", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:220", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:221", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:222", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:223", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:224", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:225", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:226", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:227", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:228", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:229", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:230", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:231", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:232", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:233", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:234", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:235", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:236", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:237", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:238", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:239", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:240", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:241", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00175", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:242", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00175", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:243", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00175", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:244", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00175", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:245", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00175", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:246", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00175", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:247", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00215", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:248", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00215", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:249", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00215", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:250", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00215", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:251", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00215", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:252", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00215", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:253", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:254", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:255", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:256", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:257", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:258", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00255", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:259", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00295", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:260", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00295", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:261", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00295", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:262", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00295", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:263", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00295", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:264", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00295", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:265", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00335", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:266", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00335", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:267", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00335", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:268", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00335", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:269", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00335", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:270", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00335", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:271", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00375", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:272", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00375", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:273", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00375", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:274", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00375", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:275", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00375", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:276", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00375", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:277", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00415", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:278", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00415", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:279", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00415", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:280", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00415", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:281", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00415", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:282", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00415", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:283", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:284", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:285", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:286", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:287", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:288", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00455", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:289", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00495", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:290", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00495", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:291", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00495", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:292", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00495", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:293", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00495", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:294", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00495", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:295", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00535", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:296", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00535", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:297", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00535", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:298", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00535", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:299", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00535", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:300", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00535", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:301", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00575", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:302", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00575", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:303", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00575", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:304", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00575", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:305", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00575", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:306", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00575", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:307", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00615", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:308", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00615", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:309", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00615", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:310", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00615", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:311", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00615", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:312", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00615", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:313", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:314", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:315", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:316", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:317", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:318", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00655", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:319", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00695", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:320", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00695", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:321", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00695", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:322", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00695", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:323", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00695", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:324", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00695", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:325", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00735", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:326", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00735", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:327", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00735", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:328", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00735", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:329", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00735", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:330", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00735", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:331", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00775", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:332", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00775", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:333", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00775", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:334", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00775", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:335", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00775", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:336", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00775", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:337", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00815", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:338", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00815", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:339", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00815", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:340", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00815", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:341", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00815", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:342", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00815", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:343", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:344", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:345", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:346", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:347", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:348", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00855", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:349", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00895", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:350", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00895", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:351", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00895", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:352", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00895", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:353", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00895", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:354", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00895", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:355", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00935", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:356", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00935", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:357", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00935", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:358", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00935", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:359", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00935", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:360", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00935", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:361", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00975", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:362", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00975", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:363", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00975", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:364", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00975", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:365", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00975", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:366", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00975", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:367", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:368", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:369", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:370", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:371", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:372", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01015", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:373", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:374", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:375", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:376", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:377", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:378", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01055", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:379", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:380", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:381", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:382", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:383", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:384", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01095", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:385", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:386", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:387", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:388", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:389", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:390", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01135", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:391", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00155 statu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:392", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00155 statu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:393", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00155 statu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:394", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00155 statu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:395", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00155 statu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:396", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00155 statu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:397", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00435 3", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:398", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00435 3", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:399", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00435 3", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:400", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00435 3", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:401", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00435 3", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:402", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00435 3", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:403", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00715 4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:404", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00715 4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:405", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00715 4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:406", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00715 4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:407", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00715 4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:408", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00715 4", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:409", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00995 no", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:410", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00995 no", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:411", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00995 no", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:412", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00995 no", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:413", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00995 no", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:414", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00995 no", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:415", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00075 in_force", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:416", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00075 in_force", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:417", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00075 in_force", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:418", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00075 in_force", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:419", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00075 in_force", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:420", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00075 in_force", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:421", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00355 cold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:422", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00355 cold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:423", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00355 cold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:424", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00355 cold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:425", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00355 cold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:426", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00355 cold", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:427", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00635 appli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:428", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00635 appli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:429", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00635 appli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:430", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00635 appli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:431", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00635 appli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:432", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00635 appli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:433", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00915 6", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:434", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00915 6", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:435", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00915 6", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:436", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00915 6", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:437", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00915 6", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:438", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00915 6", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:439", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "0.7 patient", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:440", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "0.7 patient", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:441", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "0.7 patient", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:442", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "0.7 patient", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:443", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "0.7 patient", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:444", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "0.7 patient", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:445", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00275 cut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:446", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00275 cut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:447", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00275 cut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:448", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00275 cut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:449", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00275 cut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:450", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00275 cut", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:451", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00555 temperatur", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:452", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00555 temperatur", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:453", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00555 temperatur", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:454", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00555 temperatur", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:455", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00555 temperatur", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:456", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00555 temperatur", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:457", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00835 rs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:458", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00835 rs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:459", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00835 rs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:460", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00835 rs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:461", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00835 rs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:462", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00835 rs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:463", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01115 do", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:464", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01115 do", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:465", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01115 do", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:466", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01115 do", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:467", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01115 do", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:468", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01115 do", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:469", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00195 continu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:470", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00195 continu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:471", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00195 continu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:472", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00195 continu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:473", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00195 continu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:474", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00195 continu", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:475", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00475 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:476", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00475 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:477", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00475 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:478", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00475 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:479", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00475 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:480", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00475 monthli", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:481", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00755 quarantin", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:482", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00755 quarantin", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:483", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00755 quarantin", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:484", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00755 quarantin", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:485", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00755 quarantin", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:486", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00755 quarantin", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:487", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01035 10", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:488", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01035 10", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:489", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01035 10", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:490", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01035 10", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:491", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01035 10", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:492", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01035 10", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:493", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00115 frozen", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:494", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00115 frozen", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:495", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00115 frozen", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:496", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00115 frozen", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:497", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00115 frozen", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:498", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00115 frozen", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:499", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00395 card", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:500", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00395 card", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:501", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00395 card", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:502", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00395 card", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:503", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00395 card", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:504", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00395 card", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:505", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00675 receiv", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:506", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00675 receiv", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:507", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00675 receiv", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:508", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00675 receiv", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:509", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00675 receiv", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:510", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00675 receiv", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:511", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00955 review", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:512", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00955 review", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:513", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00955 review", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:514", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00955 review", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:515", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00955 review", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:516", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00955 review", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:517", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00035 excurs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:518", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00035 excurs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:519", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00035 excurs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:520", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00035 excurs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:521", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00035 excurs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:522", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00035 excurs", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:523", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00315 month", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:524", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00315 month", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:525", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00315 month", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:526", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00315 month", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:527", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00315 month", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:528", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00315 month", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:529", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00595 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:530", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00595 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:531", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00595 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:532", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00595 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:533", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00595 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:534", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00595 diesel", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:535", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00875 insid", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:536", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00875 insid", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:537", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00875 insid", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:538", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00875 insid", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:539", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00875 insid", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:540", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00875 insid", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:541", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "0.15 name", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:542", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "0.15 name", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:543", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "0.15 name", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:544", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "0.15 name", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:545", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "0.15 name", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:546", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "0.15 name", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:547", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00235 lane", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:548", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00235 lane", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:549", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00235 lane", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:550", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00235 lane", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:551", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00235 lane", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:552", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00235 lane", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:553", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00515 stop", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:554", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00515 stop", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:555", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00515 stop", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:556", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00515 stop", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:557", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00515 stop", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:558", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00515 stop", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:559", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "00795 fit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:560", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "00795 fit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:561", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "00795 fit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:562", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "00795 fit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:563", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "00795 fit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:564", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "00795 fit", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:565", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "01075 number", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:566", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "01075 number", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:567", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "01075 number", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:568", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "01075 number", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:569", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "01075 number", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:570", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "01075 number", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:571", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "statu room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:572", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "statu room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:573", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "statu room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:574", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "statu room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:575", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "statu room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:576", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "statu room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:577", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "3 critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:578", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "3 critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:579", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "3 critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:580", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "3 critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:581", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "3 critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:582", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "3 critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:583", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "4 hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:584", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "4 hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:585", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "4 hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:586", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "4 hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:587", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "4 hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:588", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "4 hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:589", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:590", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:591", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:592", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:593", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:594", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "no than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:595", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "in_force need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:596", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "in_force need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:597", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "in_force need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:598", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "in_force need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:599", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "in_force need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:600", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "in_force need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:601", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "cold releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:602", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "cold releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:603", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "cold releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:604", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "cold releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:605", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "cold releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:606", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "cold releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:607", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "appli post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:608", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "appli post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:609", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "appli post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:610", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "appli post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:611", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "appli post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:612", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "appli post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:613", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "6 start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:614", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "6 start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:615", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "6 start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:616", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "6 start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:617", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "6 start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:618", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "6 start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:619", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "patient 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:620", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "patient 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:621", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "patient 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:622", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "patient 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:623", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "patient 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:624", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "patient 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:625", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "cut door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:626", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "cut door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:627", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "cut door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:628", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "cut door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:629", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "cut door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:630", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "cut door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:631", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "temperatur room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:632", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "temperatur room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:633", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "temperatur room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:634", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "temperatur room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:635", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "temperatur room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:636", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "temperatur room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:637", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "rs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:638", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "rs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:639", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "rs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:640", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "rs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:641", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "rs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:642", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "rs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:643", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "do hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:644", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "do hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:645", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "do hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:646", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "do hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:647", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "do hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:648", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "do hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:649", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "continu than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:650", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "continu than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:651", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "continu than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:652", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "continu than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:653", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "continu than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:654", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "continu than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:655", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:656", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:657", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:658", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:659", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:660", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "monthli need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:661", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "quarantin releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:662", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "quarantin releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:663", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "quarantin releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:664", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "quarantin releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:665", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "quarantin releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:666", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "quarantin releas", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:667", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "10 post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:668", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "10 post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:669", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "10 post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:670", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "10 post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:671", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "10 post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:672", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "10 post", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:673", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "frozen start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:674", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "frozen start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:675", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "frozen start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:676", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "frozen start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:677", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "frozen start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:678", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "frozen start", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:679", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "card 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:680", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "card 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:681", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "card 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:682", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "card 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:683", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "card 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:684", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "card 5", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:685", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "receiv door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:686", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "receiv door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:687", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "receiv door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:688", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "receiv door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:689", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "receiv door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:690", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "receiv door", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:691", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "review room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:692", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "review room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:693", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "review room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:694", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "review room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:695", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "review room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:696", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "review room", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:697", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "excurs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:698", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "excurs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:699", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "excurs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:700", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "excurs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:701", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "excurs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:702", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "excurs critic", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:703", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "month hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:704", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "month hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:705", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "month hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:706", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "month hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:707", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "month hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:708", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "month hour", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:709", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:710", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:711", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:712", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:713", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:714", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "diesel than", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:715", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "insid need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:716", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "insid need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:717", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "insid need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:718", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "insid need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:719", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "insid need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:720", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "insid need", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:721", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:722", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:723", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:724", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:725", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:726", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zzqq", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:727", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:728", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:729", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:730", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:731", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:732", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "nonascii", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:733", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:734", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:735", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:736", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:737", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:738", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:739", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:740", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:741", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:742", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:743", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:744", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "   ", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:745", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 1, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:746", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 1, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:747", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 5, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:748", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 5, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:749", "arm": "transcription", "rung": "rung-10000", "verb": "find", "top": 20, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:750", "arm": "transcription", "rung": "rung-10000", "verb": "ask", "top": 20, "query": "zzzzzznomatch", "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:751", "arm": "transcription", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/adjacent/00001-finance-close.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:752", "arm": "transcription", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/adjacent/04167-finance-close.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:753", "arm": "transcription", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/adjacent/08334-payroll.yaml"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:754", "arm": "transcription", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/archive/07705-decision-retired.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:755", "arm": "transcription", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/filler/05138-library.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:756", "arm": "transcription", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/sibling/00729-ratecard.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:757", "arm": "transcription", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/sibling/03853-dockwiki.html"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:758", "arm": "transcription", "rung": "rung-10000", "verb": "explain", "top": null, "query": ["file:ext/sibling/06979-dockwiki.html"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:759", "arm": "transcription", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["owner"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:760", "arm": "transcription", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["effect"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:761", "arm": "transcription", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["1"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:762", "arm": "transcription", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["minut"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:763", "arm": "transcription", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["befor"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:764", "arm": "transcription", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["replac"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:765", "arm": "transcription", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["after"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:766", "arm": "transcription", "rung": "rung-10000", "verb": "graph", "top": null, "query": ["time"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:767", "arm": "transcription", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/adjacent/00001-finance-close.md", "file:ext/adjacent/04167-finance-close.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:768", "arm": "transcription", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/adjacent/04167-finance-close.md", "file:ext/adjacent/08334-payroll.yaml"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:769", "arm": "transcription", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/adjacent/08334-payroll.yaml", "file:ext/archive/07705-decision-retired.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:770", "arm": "transcription", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/archive/07705-decision-retired.md", "file:ext/filler/05138-library.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:771", "arm": "transcription", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/filler/05138-library.md", "file:ext/sibling/00729-ratecard.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:772", "arm": "transcription", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/sibling/00729-ratecard.md", "file:ext/sibling/03853-dockwiki.html"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:773", "arm": "transcription", "rung": "rung-10000", "verb": "path", "top": null, "query": ["file:ext/sibling/03853-dockwiki.html", "file:ext/sibling/06979-dockwiki.html"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:774", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "owner"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:775", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "owner"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:776", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "owner"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:777", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "effect"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:778", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "effect"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:779", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "effect"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:780", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "1"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:781", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "1"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:782", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "1"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:783", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "minut"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:784", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "minut"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:785", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "minut"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:786", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "befor"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:787", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "befor"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:788", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "befor"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:789", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "replac"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:790", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "replac"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:791", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "replac"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:792", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "after"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:793", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "after"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:794", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "after"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:795", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["find", "time"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:796", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["ask", "time"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:797", "arm": "transcription", "rung": "rung-10000", "verb": "bundle", "top": 1, "query": ["answer", "time"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:798", "arm": "transcription", "rung": "rung-10000", "verb": "mcp", "top": null, "query": ["{\"jsonrpc\": \"2.0\", \"id\": 0, \"method\": \"tools/list\"}", "{\"jsonrpc\": \"2.0\", \"id\": 1, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"owner\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 2, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"effect\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 3, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"1\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 4, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"minut\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 5, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"befor\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 6, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"replac\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 7, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"after\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 8, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"time\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 9, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/adjacent/00001-finance-close.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 10, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/adjacent/00001-finance-close.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 11, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/adjacent/04167-finance-close.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 12, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/adjacent/04167-finance-close.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 13, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/adjacent/08334-payroll.yaml\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 14, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/adjacent/08334-payroll.yaml\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 15, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/archive/07705-decision-retired.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 16, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/archive/07705-decision-retired.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 17, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/filler/05138-library.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 18, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/filler/05138-library.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 19, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/sibling/00729-ratecard.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 20, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/sibling/00729-ratecard.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 21, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/sibling/03853-dockwiki.html\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 22, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/sibling/03853-dockwiki.html\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 23, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/sibling/06979-dockwiki.html\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 24, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/sibling/06979-dockwiki.html\", \"line_start\": 1, \"line_end\": 20}}}"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:799", "arm": "transcription", "rung": "rung-10000", "verb": "bundle-mcp", "top": null, "query": ["{\"jsonrpc\": \"2.0\", \"id\": 0, \"method\": \"tools/list\"}", "{\"jsonrpc\": \"2.0\", \"id\": 1, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"owner\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 2, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"effect\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 3, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"1\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 4, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"minut\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 5, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"befor\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 6, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"replac\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 7, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"after\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 8, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_search\", \"arguments\": {\"query\": \"time\", \"k\": 5}}}", "{\"jsonrpc\": \"2.0\", \"id\": 9, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/adjacent/00001-finance-close.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 10, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/adjacent/00001-finance-close.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 11, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/adjacent/04167-finance-close.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 12, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/adjacent/04167-finance-close.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 13, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/adjacent/08334-payroll.yaml\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 14, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/adjacent/08334-payroll.yaml\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 15, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/archive/07705-decision-retired.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 16, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/archive/07705-decision-retired.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 17, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/filler/05138-library.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 18, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/filler/05138-library.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 19, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/sibling/00729-ratecard.md\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 20, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/sibling/00729-ratecard.md\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 21, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/sibling/03853-dockwiki.html\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 22, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/sibling/03853-dockwiki.html\", \"line_start\": 1, \"line_end\": 20}}}", "{\"jsonrpc\": \"2.0\", \"id\": 23, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_related\", \"arguments\": {\"path\": \"ext/sibling/06979-dockwiki.html\"}}}", "{\"jsonrpc\": \"2.0\", \"id\": 24, \"method\": \"tools/call\", \"params\": {\"name\": \"fux_passage\", \"arguments\": {\"path\": \"ext/sibling/06979-dockwiki.html\", \"line_start\": 1, \"line_end\": 20}}}"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:800", "arm": "transcription", "rung": "rung-10000", "verb": "api", "top": null, "query": ["owner", "file:ext/adjacent/00001-finance-close.md", "file:ext/adjacent/04167-finance-close.md"], "status": "pass", "discordances": 0, "detail": []}
+{"id": "rung-10000:transcription:801", "arm": "transcription", "rung": "rung-10000", "verb": "bundle-api", "top": null, "query": ["owner", "file:ext/adjacent/00001-finance-close.md", "file:ext/adjacent/04167-finance-close.md"], "status": "pass", "discordances": 0, "detail": []}

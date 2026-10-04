@@ -116,7 +116,7 @@ T1–T14 name none; a T15 is the prerequisite) — so this half graduates with t
 seed generation that carries them. B-120 then
 goes to Arpit as cascade-vs-constant **with numbers**.
 
-## 6 · Node arm parity — B-125 → [W-252](../open/W-252-node-arm-preregistration-2.md)
+## 6 · Node arm parity — B-125 → W-252
 
 Promoted; the plan is the item.
 

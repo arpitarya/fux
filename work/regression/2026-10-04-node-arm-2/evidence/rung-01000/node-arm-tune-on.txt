@@ -1,0 +1,7 @@
+corpus   : $SCRATCH/w252p2/rung-01000
+arm      : contract (tune applied)
+tune     : all defaults — the contract and transcription arms are the same run
+queries  : 125 (corpus) x tops [1, 5, 20] x 2 verbs = 750 ranking comparisons
+bundle   : 8 queries x 3 verbs through the published artefact as well as the tree
+discordant: 0 of 801
+evidence : /Users/arpitarya/my_programs/fux/work/regression/2026-10-04-node-arm-2/evidence/rung-01000/node-arm-corpus-contract.jsonl (801 rows)

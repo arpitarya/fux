@@ -1,0 +1,4 @@
+== rung-01000: node build exit 0; plane files removed 596, ingest-side kept 6 ['decoder-digests.json', 'extract-config-digest', 'ingest-log.jsonl', 'last-cited.json', 'pii-counts.json', 'pii-digest']
+   python 602 files, node-built 602; only-python []; only-node []; differ []
+== rung-10000: node build exit 0; plane files removed 596, ingest-side kept 6 ['decoder-digests.json', 'extract-config-digest', 'ingest-log.jsonl', 'last-cited.json', 'pii-counts.json', 'pii-digest']
+   python 602 files, node-built 602; only-python []; only-node []; differ []

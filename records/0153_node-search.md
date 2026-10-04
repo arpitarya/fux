@@ -11,7 +11,7 @@ owns: [node@9c8fc34d2e59, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 5b9b58abe91c280364e964b047064f28df01117a40ce4277d1645a6fadbe59f2
+content_sha: c858f5778515a54b3250984a158a5cb6712ca32602bb8fe002ee87b3cc0f1b45
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1217,11 +1217,17 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
   it did. ⚠ **`verify`, `--why`, `--receipt` and `--journal` are still
   uncovered**, because they have no Node twin at all (W-107 R6) — that is
   declared out of scope, decision 25, not a gap the arm should pretend to close.
-- ⚠ **The arm cannot be called green yet.** PRE-REGISTRATION-NODE §4 names
-  `fux-playground`, which [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md) voided as an
-  instrument. A frozen pre-registration is superseded, never edited; the build
-  is unaffected and no measured arm may be reported until the superseding
-  document exists on lab golden data.
+- **The arm is green under a pre-registration that names its corpus** (W-252, 2026-10-04):
+  [PRE-REG-NODE-3](../work/regression/2026-10-04-node-arm-2/PRE-REGISTRATION.md) fixes
+  `fux-lab` `rung-01000` and `rung-10000` (lab `ed46bfef`, rung heads `b73348d5` and
+  `cac5699c`), re-ingested to index v7 in throwaway copies, and the
+  [run](../work/regression/2026-10-04-node-arm-2/report.md) found 0 discordant of 801 on
+  every pass and identical graph digests ([verdict](../work/regression/2026-10-04-node-arm-2/VERDICT.md),
+  `informed`: parity, not quality). ⚠ **This sentence used to say the arm could not be
+  called green because "PRE-REGISTRATION-NODE §4 names `fux-playground`".** That was true of
+  PRE-REGISTRATION-NODE only; PRE-REG-NODE-2 (2026-09-12) had already moved the corpora to
+  the lab, so the premise was stale, and what the new document actually fixes is the index
+  version, the six surfaces and the declared out-of-scope list.
 
 ### Alternatives
 

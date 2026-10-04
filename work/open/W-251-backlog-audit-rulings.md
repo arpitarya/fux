@@ -97,7 +97,7 @@ reused; the sentence that closes each is in the cited record.
 | B-007 | W-248 | `fux enrich`'s worklist is declared scope ∪ the decoder queue's *model-needed* rows |
 | B-034 | W-249 | `fux mcp` / `fux serve` hold the index open, keyed on `.fux/runtime/stamp.json` — index residency, **not** W-242's refused T3 memo |
 | B-037 | [W-250](W-250-dogfood-fux-hooks.md) | run `fux hooks` in this repository |
-| B-125 | [W-252](W-252-node-arm-preregistration-2.md) | `PRE-REGISTRATION-NODE-2` on lab rungs, so the Node arm can be called green |
+| B-125 | W-252 | `PRE-REGISTRATION-NODE-2` on lab rungs, so the Node arm can be called green |
 | the stale sentences | W-245 | eleven record sentences the audit found false against the code or stale against a later decision |
 
 **Ratified sentences whose rows left with their item:** B-141, B-149, B-158, B-172, B-167, B-154's `max_age` half (→ W-245); B-156, B-161 (→ W-246). §2 below is the ruling each sentence carries.
