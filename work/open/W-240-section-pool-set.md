@@ -9,7 +9,15 @@ ball: arpit
 
 # W-240 — a set that can measure section records
 
-**Status: prompt written 2026-09-30, not run.** [Prompt 12](../golden/prompts/12-claude-gen4-section-seed.md) covers steps 1–2 in one fresh claude.ai chat. ⚠ **A Claude Code session cannot author it:** SR-WORK-TESTDATA A1 bars any session that has run a rung or seen a score, and step 1's documents are the author's block 1. R10 was amended the same day: the competitor carries the question's words in its title or a heading, and the key row names it as `competitor`. 🔴 **Next: Arpit runs prompt 12** and commits blocks 1–3. Then a session rebuilds the ladder (step 3). Filed by the session that closed
+**Status 2026-10-03: prompt 12 RUN by Arpit; its data is in the tree. Two rulings below. Next: the ladder rebuild, after W-228's prompt 13.**
+
+**✅ RULED 2026-10-03 (Arpit, Cowork) — *"go with the recommendation for decision one and decision two"*:**
+1. **Accept the generation-4 data as it is.** Only `63` meets R10's ≥ 3 000 words. `64` (2 119), `65` (1 750) and `66` (1 318) fall short, but all four have 15–16 sections. Recorded here as a known deviation from R10. **The real gate is the `step10_section` pool on the rebuilt rung: if it is under 6, lengthen `64`–`66` with off-question sections** (an addition that leaves every question valid) rather than re-author.
+2. **Fold W-228's planted misfits into the same generation**, so the ladder is rebuilt **once**. [Prompt 13](../golden/prompts/13-claude-gen4-planted-misfits.md) is written; the rebuild (step 3) waits on W-228 until Arpit runs it.
+
+**What landed from prompt 12 (counted 2026-10-03, key not opened):** seed `63`–`82` (4 long, 16 short competitors under 400 words), 20 `seed-dates.tsv` rows, `questions/set-5-claude.jsonl` (90 questions), and Arpit's key file. Prompt 12 is deleted in the change that commits its data — done 2026-10-04.
+
+**Earlier status: prompt written 2026-09-30.** Prompt 12 (deleted 2026-10-04 with the commit of its data, as its header required) covered steps 1–2 in one fresh claude.ai chat. ⚠ **A Claude Code session cannot author it:** SR-WORK-TESTDATA A1 bars any session that has run a rung or seen a score, and step 1's documents are the author's block 1. R10 was amended the same day: the competitor carries the question's words in its title or a heading, and the key row names it as `competitor`. 🔴 **Next: Arpit runs prompt 12** and commits blocks 1–3. Then a session rebuilds the ladder (step 3). Filed by the session that closed
 [W-236](W-236-section-records.md) Part A, under
 [SR-WORK-OPEN-QUEUE](../../records/0051_WORK-open-queue.md) rules 23a/23b: W-236's
 build waits for a scored set whose `step10_section` pool is ≥ 6, and

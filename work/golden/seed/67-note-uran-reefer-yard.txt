@@ -1,0 +1,35 @@
+title: Uran reefer yard note - trailer detention, waiting charge, pallet exchange and genset diesel
+doc_id: QCL-OPS-NTE-12
+owner: Vikram Thakur
+department: Operations
+status: in_force
+effective_date: 2026-05-04
+applies_to: Uran reefer yard
+
+URAN REEFER YARD: TRAILER DETENTION AND WAITING CHARGE
+
+Detention on a dropped trailer at Uran starts at gate-in. The first 2 hours
+are free; after that the waiting charge is Rs. 750 per hour or part hour,
+billed to whoever dropped the trailer. The free window was 90 minutes until
+the yard was resurfaced in January 2026.
+
+The yard holds export reefer trailers for seafood and fruit exporters waiting
+for a port slot at JNPT. Trailers stand on shore power. A reefer left running
+on diesel is plugged in by the guard, and the time is noted on the yard sheet.
+The guard does not work out detention; the yard office does it from the gate
+sheet each evening.
+
+PALLET EXCHANGE AND DAMAGED PALLETS
+
+Pallets are exchanged one for one. A broken wooden pallet handed in at Uran -
+split board, cracked block, missing nails - is billed back at Rs. 380 each to
+the haulier who delivered it. Broken pallets are stacked by the west fence for
+the repairer.
+
+GENSET DIESEL
+
+The yard genset tank is never allowed below 1,000 litres of diesel. The night
+guard dips it at 21:00 and orders the bowser when it reads 2,000 litres. Nobody
+refuels the genset while it runs.
+
+Questions to the yard office, extension 612.

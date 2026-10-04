@@ -1,0 +1,19 @@
+title: Siliguri cage note - logger battery changes on the shelf, minimum unconditioned blue-cap packs
+doc_id: QCL-OPS-NTE-36
+owner: Ananya Ghosh
+department: Operations
+status: in_force
+effective_date: 2026-08-24
+applies_to: Siliguri depot
+
+SILIGURI CAGE: LOGGER ON THE SHELF - WHEN THE BATTERY GETS CHANGED
+
+A USB logger sitting on the cage shelf has its battery changed every 12 months,
+whatever its sticker says.
+
+MINIMUM UNCONDITIONED BLUE-CAP PACKS
+
+The cage keeps at least 30 unconditioned blue-cap packs at all times, which is
+enough to remake two shippers.
+
+Count both items every Friday.
