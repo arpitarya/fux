@@ -45,6 +45,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from walk_lib import repo_files  # W-244: never enters work/golden
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -80,7 +81,7 @@ _LINK = re.compile(r"(?<=\]\()([^)\s]+?)(?=(?:\s+\"[^\"]*\")?\))")
 
 def _live_markdown() -> list[Path]:
     out = []
-    for path in sorted(ROOT.rglob("*.md")):
+    for path in sorted(repo_files(ROOT, suffixes=(".md",))):
         rel = path.relative_to(ROOT).as_posix()
         if any(part in _SKIP_DIRS for part in Path(rel).parts):
             continue

@@ -28,8 +28,9 @@ ball: agent
 - ⚠ **A new cost, from W-242's tests:** `tests/derive/test_node_accel.py` adds
   ~40 s on Windows: 128 Node processes across four `top` values. Batching it in
   one Node process is the cheap fix, and it is not done.
-- ⏳ **Still to observe:** a docs-only push after a green FULL skipping every
-  FULL cell. The 2026-10-04 session-close push is that push.
+- ✅ **A docs-only push skips FULL** — `2928b775`, run `37181568144`: every FULL
+  cell finished in 7–34 s against 3–5 min on a code push, with the `verdict` step
+  resolving the saved key. The FAST stage (unit 133 s) is now the wall clock.
 
 **What was left for done (as written 2026-09-30):** push, then read the first `main` run. Check that the
 `verdict` job saved its key, that a docs-only push after it skips every FULL

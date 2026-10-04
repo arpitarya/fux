@@ -10,7 +10,7 @@ feature: the `.fux/.fuxignore` exclusion file
 owns: [src/fux/ingest/fuxignore.py@286e1f84fe6a]
 laws: [L2, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: f5c4ce78236b2ad554ecf61aba3fc45b3c86b8e9630a02ec2a861ba654bd72e9
+content_sha: 04d5dc4e25e79c6b6e26dfa4ec5045d8ded21a9a884b09850c98958c012c91ae
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -375,6 +375,15 @@ would ignore the wrong file.
 **11e. `.fux/runtime/skipped` is deleted on every run.** A repo carrying one
 from an older fux loses it rather than keeping a second, stale answer to the
 same question.
+
+**11f. A pruned directory is ONE line, `dir/`, not a line per file** (W-244,
+2026-10-03; [SR-INGEST](0106_ingest.md) decision 24). The walk no longer enters a
+directory a `!` exclusion removes, so it cannot list the files beneath it, and
+the block records the directory with the exclusion as its note
+(`work/golden/  # excluded by !work/golden`). On this repo, 132 per-file
+`work/golden` lines became one. Nothing reads a block line back as a pattern: it
+is a literal record, and `would_index` is false for a directory, so no stale
+warning fires on it.
 
 <!-- L12-VALUES-START -->
 

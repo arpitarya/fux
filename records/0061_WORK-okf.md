@@ -7,10 +7,10 @@ description: "Fux's documentation follows Google's Open Knowledge Format v0.1: t
 status: accepted
 date: 2026-09-14
 feature: conformance to the Open Knowledge Format, and the three declared boundaries of the bundle
-owns: [tests/test_okf_bundle.py@449982f576db]
+owns: [tests/test_okf_bundle.py@e403a2794596]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: ebef8e284b662660b4bf5f422ee7725fade3334ae62f992c425dc00c74063d61
+content_sha: ec041bb9874ae05e1966f3bf3f945dafde533eb1dbe80c1cd41030be9d4dd65f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

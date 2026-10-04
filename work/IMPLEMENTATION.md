@@ -26,6 +26,15 @@ Rules:
 
 ---
 
+## 2026-10-04 — **W-244: the ingest walk prunes excluded directories; test walks never enter `work/golden`**
+
+| what | evidence |
+|---|---|
+| **the ruling** | Cowork, 2026-10-03, under Arpit's *"ratify whatever you can"*: no number reclassified, option A (prune), the walking tests in scope |
+| **the build** | `gitdir._candidate_paths` is an `os.walk` that drops a `!`-excluded directory before listing it, and records it once as `dir/`, unless a hand-written `!` re-include exists; `tests/walk_lib.py` (never enters `work/golden`) used by seven root-walking tests; `tests/test_walks_skip_golden.py` |
+| **verified** | index byte-identical old vs new walk on a `HEAD` worktree, 257/257 shards; root re-ingest writes `work/golden/` as one line, 0 beneath; the `os.scandir` spy test; both suites |
+| **the records** | [SR-INGEST](../records/0106_ingest.md) d24 · [SR-FUXIGNORE](../records/0144_fuxignore.md) d11f · a note in SR-WORK-GOLDEN |
+
 ## 2026-10-04 — **3.0.0-alpha.10 released — PyPI and npm**
 
 | what | evidence |

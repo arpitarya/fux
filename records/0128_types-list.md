@@ -10,7 +10,7 @@ feature: the file-type allowlist and `.fux/formats.toml`
 owns: [src/fux/ingest/typesfile.py@cba4e18abe52, .fux/formats.toml@05666c969b79]
 laws: [L2, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 5039f61312df01311fd3393c7888ea975f032ccd446dfac02b93821eb287aca1
+content_sha: 0cc99a8ef833bcddd53ed390cef0207d8d50ff282c9e79172a305bd9f59f9bce
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -545,6 +545,8 @@ carries them.
 **Decision 14's caps are twenty-four now** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5b, 2026-09-28): `[limits.html] charset_scan_bytes`, `[limits.xml] prolog_bytes`, and `[limits.yaml] indent_step` and `min_value_len` joined them. Each is a whole number `>= 1`, and what each means is [SR-DECODE](0139_decode.md)'s. A `formats.toml` that lacks one stops `fux ingest` until `fux doctor --fix` writes it.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+**No decision here moved** (W-244, 2026-10-04): the walk prunes a `!`-excluded directory before the type allowlist is consulted for anything inside it ([SR-INGEST](0106_ingest.md) decision 24). A file there was skipped before either way, so no type verdict changes.
 
 ### Consequences
 

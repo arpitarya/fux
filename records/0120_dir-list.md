@@ -10,7 +10,7 @@ feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted fr
 owns: []
 laws: [L4, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 4163e4996864aaf8d5b464103a9ab8c611120ef365ec5395417ec78ae1e7d7d4
+content_sha: a2c61913f6dbee85b7d7320d28012e8e6dabd86bb7b35f901bf92a559d003ec6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -278,6 +278,8 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+**No decision here moved** (W-244, 2026-10-04): a `!` line still subtracts a path or any directory above it, and the walk now applies that to a DIRECTORY before entering it rather than to each file after listing it ([SR-INGEST](0106_ingest.md) decision 24). The set of indexed documents is unchanged, byte-identical on this repo.
 
 ### Consequences
 

@@ -38,7 +38,6 @@ here. Read that record before changing anything below it.
 - 🔴 **W-228** · `arpit` — document families. The lens is built, but its misfit threshold is a placeholder: no known misfits exist yet. Arpit runs prompt 13 to plant 3, riding in gen 4 with W-240. [detail](open/W-228-document-families.md)
 - 🔴 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)
 - 🔴 **W-240** · `agent` — a question set that can test section scoring. Prompt 12's docs and 90 questions are in (ruled: accept). Ladder rebuild waits on W-228, then 🔴 Arpit scores. **Opus.** [detail](open/W-240-section-pool-set.md)
-- 🟢 **W-244** · `agent` — L11 event 2026-10-03: ingest's `rglob` walked `work/golden/` and listed its file names. Ruled: prune excluded dirs, fix the walking tests too, no number reclassified. **Opus.** [detail](open/W-244-l11-ingest-walk-2026-10-03.md)
 - 🟢 **W-247** · `agent` — the CLI renders what `fux.api` builds (SR-API's staged renderer split; W-148 closed without it). Byte-identical stdout is the gate. **Sonnet.** [detail](open/W-247-api-renderer-split.md)
 - 🟢 **W-248** · `agent` — `fux enrich` reads the decoder queue `fux ingest` writes: declared scope ∪ the rows that need a model; *no decoder* rows become a doctor line. **Sonnet.** [detail](open/W-248-enrich-consumes-queue.md)
 - 🟢 **W-249** · `agent` — `fux mcp` and `fux serve` keep the index open across calls, keyed on `.fux/runtime/stamp.json` — residency, not W-242's refused result cache. **Opus.** [detail](open/W-249-resident-index-mcp-serve.md)
@@ -46,7 +45,7 @@ here. Read that record before changing anything below it.
 
 ### testing
 
-- 🟢 **W-243** · `agent` — CI in ~2 min. Step 2's key saves on `main` ✅; step 1 re-benched with W-242 landed, still STOP by its bar. Left: confirm a docs-only push skips FULL; batch `test_node_accel` (~40 s on Windows). **Opus.** [detail](open/W-243-ci-two-minutes.md)
+- 🟢 **W-243** · `agent` — CI in ~2 min. On `main`: the key saves ✅, and a docs-only push skips FULL ✅ (cells 7–34 s). Step 1 is still STOP by its bar. Left: batch `test_node_accel` (~40 s on Windows), then DoD 1–4. **Opus.** [detail](open/W-243-ci-two-minutes.md)
 - 🟢 **W-246** · `agent` — the gates the records asked for and nobody wrote: 16 small stdlib tests and 5 `doctor` rows, each named with the sentence it enforces. **Sonnet.** [detail](open/W-246-mechanical-gates.md)
 - 🟢 **W-252** · `agent` — a pre-registration for the Node arm on lab rungs (the live one names the voided playground), then one rerun; parity has read 0 discordant three times. **Sonnet.** [detail](open/W-252-node-arm-preregistration-2.md)
 

@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from walk_lib import repo_files  # W-244: never enters work/golden
 
 ROOT = Path(__file__).resolve().parents[1]
 RECORD = ROOT / "records" / "0051_WORK-open-queue.md"
@@ -164,7 +165,7 @@ def test_the_queue_states_no_other_rule_and_references_the_record() -> None:
 
 def test_no_live_document_restates_a_rule() -> None:
     bad = []
-    for path in sorted(ROOT.rglob("*.md")):
+    for path in sorted(repo_files(ROOT, suffixes=(".md",))):
         rel = path.relative_to(ROOT)
         if _SKIP_PARTS & set(rel.parts) or path in _EXEMPT:
             continue

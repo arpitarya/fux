@@ -41,6 +41,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from walk_lib import repo_files  # W-244: never enters work/golden
 
 ROOT = Path(__file__).resolve().parents[1]
 RECORDS = ROOT / "records"
@@ -109,7 +110,7 @@ def _is_frozen(rel: str) -> bool:
 
 def _candidate_files() -> list[Path]:
     out = []
-    for path in ROOT.rglob("*"):
+    for path in repo_files(ROOT):
         if not path.is_file() or path.suffix not in _TEXT_SUFFIXES:
             continue
         if any(part in _SKIP_DIRS for part in path.relative_to(ROOT).parts):

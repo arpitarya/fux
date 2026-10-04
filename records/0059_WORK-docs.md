@@ -7,10 +7,10 @@ description: "Three rules with one home: how a doc is written (short points, tak
 status: accepted
 date: 2026-09-14
 feature: the documentation contract — form, editing authority, and the sync set every task owes
-owns: [tests/test_doc_links.py@b7f43f8a5547]
+owns: [tests/test_doc_links.py@5cf7ba56ddbd]
 laws: [L0]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: d6cbd24b92b1aadc4eb8bac41676c05fb8c203c65cc4f23f27a5025a1432e741
+content_sha: 67b00300efc8393e0f20fd61f5fd0e54f38ac20a4e78689b7ac107e8dac07f3b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

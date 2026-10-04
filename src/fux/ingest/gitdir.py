@@ -69,6 +69,7 @@ a switch that turned them off would only move the emptiness one layer down.
 
 from __future__ import annotations
 
+import os
 import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
@@ -358,11 +359,27 @@ def walk_sources(
     files: dict[str, bytes] = {}
     #: rel -> (reason, kind). The kind is decided at the point of the skip.
     skipped: dict[str, tuple[str, str]] = {}
+    # W-244 (ruled 2026-10-03): a directory a `!` exclusion removes is PRUNED,
+    # never enumerated, and recorded once as `dir/`. Only while no hand-written
+    # `!` re-include exists: a re-include outranks an exclusion (above), and one
+    # could name a file beneath the pruned directory.
+    can_prune = bool(excludes) and not any(rule.negate for rule in ignores.rules)
+
+    def prune(directory: Path) -> bool:
+        if not can_prune:
+            return False
+        rel_dir = unicodedata.normalize("NFC", directory.relative_to(root).as_posix())
+        pattern = _excluded_by(rel_dir, excludes)
+        if pattern is None:
+            return False
+        skipped.setdefault(rel_dir + "/", (f"excluded by !{pattern}", POLICY))
+        return True
+
     for entry in dirs:
         base = root / entry
         if not base.exists():
             raise FuxError(f"configured source not found: {entry!r} (looked in {base})")
-        for path in _candidate_paths(base):
+        for path in _candidate_paths(base, prune):
             # NFC, the same normalization `parse.py` applies to file content
             # (the R1/macOS-checkout hazard): a filesystem may return a path
             # in NFD even when the file was created and committed as NFC, so
@@ -428,16 +445,31 @@ def _excluded_by(rel: str, excludes: list[str]) -> str | None:
     return None
 
 
-def _candidate_paths(base: Path):
+def _candidate_paths(base: Path, prune=None):
+    """Every file under `base`, dot-paths excluded.
+
+    🔴 **A directory `prune` returns True for is never entered** (W-244). An
+    `rglob` enumerated everything and filtered after, so the walk listed
+    `work/golden/` — the sealed answer key's parent — while the tree was LOCKED,
+    and wrote the key's file NAMES into `.fux/.fuxignore` (L11 decision 9:
+    filtering the output does not stop the walk reading). `os.walk` with
+    `followlinks=False` is `rglob`'s own symlink behaviour, so nothing else moves.
+    """
     if base.is_file():
         yield base
         return
-    for path in base.rglob("*"):
-        if not path.is_file():
-            continue
-        if any(part.startswith(".") for part in path.relative_to(base).parts):
-            continue  # dotfiles/dotdirs (.git, .DS_Store, …) are never doc content
-        yield path
+    for dirpath, dirnames, filenames in os.walk(base):
+        here = Path(dirpath)
+        # dotfiles/dotdirs (.git, .DS_Store, …) are never doc content
+        dirnames[:] = sorted(
+            d for d in dirnames if not d.startswith(".") and not (prune is not None and prune(here / d))
+        )
+        for name in sorted(filenames):
+            if name.startswith("."):
+                continue
+            path = here / name
+            if path.is_file():
+                yield path
 
 
 def _skip_reason(content: bytes, rel: str = "", root: Path | None = None) -> str | None:

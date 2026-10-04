@@ -12,6 +12,7 @@ remembered in two places instead of enforced in one.
 from __future__ import annotations
 
 from pathlib import Path
+from walk_lib import repo_dirs, repo_files  # W-244: never enters work/golden
 
 ROOT = Path(__file__).resolve().parents[1]
 ARCHIVE = ROOT / "archive"
@@ -91,7 +92,7 @@ _CORPUS_ARCHIVE = "work/golden/seed/archive"
 def test_there_is_no_second_archive() -> None:
     """Any directory named `archive` outside the root is the defect."""
     strays = []
-    for path in ROOT.rglob("archive"):
+    for path in repo_dirs("archive", ROOT):
         if not path.is_dir():
             continue
         if path == ARCHIVE:
@@ -122,7 +123,7 @@ def test_nothing_live_points_into_a_retired_second_archive() -> None:
     Both retired into the one archive on the same day. Catch stale links.
     """
     offenders = []
-    for path in sorted(ROOT.rglob("*.md")):
+    for path in sorted(repo_files(ROOT, suffixes=(".md",))):
         rel = path.relative_to(ROOT)
         if any(part in _SKIP for part in rel.parts):
             continue

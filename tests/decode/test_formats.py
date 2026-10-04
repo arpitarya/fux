@@ -25,11 +25,18 @@ from fux.decode import decode
 # -- fixture builders -------------------------------------------------------
 
 
+#: A fixed entry time. `writestr(name, …)` stamps the CURRENT time into the
+#: zip, and these bytes are pytest parameter ids: two xdist workers collecting
+#: a second apart got different ids and xdist aborted the run ("Different tests
+#: were collected"). Found 2026-10-04, intermittent on every local run.
+_ZIP_TIME = (2026, 1, 1, 0, 0, 0)
+
+
 def zf(parts: dict[str, str]) -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w") as archive:
         for name in sorted(parts):
-            archive.writestr(name, parts[name])
+            archive.writestr(zipfile.ZipInfo(name, date_time=_ZIP_TIME), parts[name])
     return buf.getvalue()
 
 

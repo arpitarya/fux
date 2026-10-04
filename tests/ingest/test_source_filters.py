@@ -234,8 +234,10 @@ def test_all_three_conditions_apply_together(tree):
         "docs/data.json",
         "work/regression/r1/report.md",
     ]
+    # W-244: the excluded directory is recorded ONCE, as a directory, and its
+    # files are never enumerated (see `test_an_excluded_directory_is_never_entered`).
     assert {s.rel_path: s.reason for s in skipped} == {
-        "work/regression/r1/evidence/n.md": "excluded by !work/regression/*/evidence",
+        "work/regression/r1/evidence/": "excluded by !work/regression/*/evidence",
     }
 
 
@@ -273,3 +275,55 @@ def test_the_accessors_split_includes_from_exclusions(tmp_path):
     rel = ".fux/sources/dirs"
     assert source_dirs(tmp_path, rel) == ["docs", "work"]
     assert source_excludes(tmp_path, rel) == ["work/regression/*/evidence"]
+
+
+# -- W-244: an excluded directory is PRUNED, never enumerated ---------------
+
+
+def test_an_excluded_directory_is_never_entered(tree, monkeypatch):
+    """🔴 W-244 (L11). An exclusion used to be applied to every file the walk
+    had already listed, so `!work/golden` listed the sealed key's file names.
+    The walk now never enters an excluded directory: `os.walk` lists through
+    `os.scandir`, and the spy proves the directory is never scanned."""
+    import os
+
+    (tree / "work" / "regression" / "r1" / "evidence" / "deep").mkdir()
+    (tree / "work" / "regression" / "r1" / "evidence" / "deep" / "x.md").write_text("# X\n")
+    scanned = []
+    real = os.scandir
+
+    def spy(path="."):
+        scanned.append(os.fspath(path))
+        return real(path)
+
+    monkeypatch.setattr(os, "scandir", spy)
+    walked, skipped = walk_sources(tree, ["work"], excludes=["work/regression/*/evidence"])
+    assert not any("evidence" in path for path in scanned), scanned
+    assert [w.rel_path for w in walked] == ["work/regression/r1/report.md"]
+    assert [(s.rel_path, s.reason) for s in skipped] == [
+        ("work/regression/r1/evidence/", "excluded by !work/regression/*/evidence")
+    ]
+
+
+def test_pruning_indexes_exactly_what_enumeration_did(tree):
+    """The ruled property: what is INDEXED does not move; only what the skip
+    list names does. Same walked bytes with the exclusion as without the tree."""
+    import shutil
+
+    walked, _ = walk_sources(tree, ["docs", "work"], excludes=["work/regression/*/evidence"])
+    shutil.rmtree(tree / "work" / "regression" / "r1" / "evidence")
+    bare, _ = walk_sources(tree, ["docs", "work"])
+    assert [(w.rel_path, w.content) for w in walked] == [(w.rel_path, w.content) for w in bare]
+
+
+def test_a_hand_written_reinclude_turns_pruning_off(tree):
+    """A `.fuxignore` `!` re-include outranks an exclusion, and could name a
+    file under the excluded directory. While one exists, the walk enumerates as
+    it always did, so that file is still indexed."""
+    from fux.ingest import fuxignore
+
+    ignores = fuxignore.parse("!work/regression/r1/evidence/n.md\n")
+    walked, _ = walk_sources(
+        tree, ["work"], excludes=["work/regression/*/evidence"], ignores=ignores
+    )
+    assert "work/regression/r1/evidence/n.md" in [w.rel_path for w in walked]

@@ -7,10 +7,10 @@ description: "The prohibition is law L11 and this record states none of it; what
 status: accepted
 date: 2026-09-28
 feature: the golden benchmark — its two question sets, the key's custody, its guards, what Claude may read, and where the prohibition is stated
-owns: [.claude/hooks/guard-golden-answer.sh@de3c4f5d5725, .claude/hooks/guard-sealed-key.sh@85f6df22a301, tests/test_golden_key_guards.py@280935f6475f, tests/test_settings_never_committed_unlocked.py@df702e8bb51c, tests/test_golden_hook_prose.py@5cf50353a104, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@46fc76cfc8f0, tools/golden-difficulty@d4b84445ced3]
+owns: [.claude/hooks/guard-golden-answer.sh@de3c4f5d5725, .claude/hooks/guard-sealed-key.sh@85f6df22a301, tests/test_golden_key_guards.py@280935f6475f, tests/test_settings_never_committed_unlocked.py@df702e8bb51c, tests/test_golden_hook_prose.py@5cf50353a104, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@4cac53fcdc3c, tools/golden-difficulty@d4b84445ced3]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: 4727a393aa65709af2016a92b5cd72e5cb8c698f98e0cbe0f75707b4e4c29aa2
+content_sha: da1e1209b86312fcd5503403536287b5555a07557bbd1c5830c5c5754970f206
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -558,6 +558,13 @@ is the surrounding process:
     handle, never an authorization: no agent runs any of the three verbs, and a
     filed item is not a session's licence to run the one it names.
     `golden-state` stays the one verb safe for anyone.
+
+**No decision here moved** (W-244, 2026-10-03; ruled under Arpit's delegation). The
+route *"a program that walks on its own"* is narrower, though not closed. `fux ingest`
+no longer enters a `!`-excluded directory ([SR-INGEST](0106_ingest.md) decision
+24), and every repo test that walks the root goes through `tests/walk_lib.py`,
+which never enters `work/golden/`, gated by `tests/test_walks_skip_golden.py`.
+Any other program that walks on its own is still prose, as L11 decision 9 says.
 
 ### Consequences
 

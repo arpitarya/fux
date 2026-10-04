@@ -33,136 +33,7 @@ docs/paper/figures/src/fig-19-observers.mmd                                     
 docs/paper/figures/src/fig-20-verbs.mmd                                                                # not an indexed file type
 records/RULE-SINCE                                                                                     # not an indexed file type
 tools/vector-gate/embed_node.mjs                                                                       # not an indexed file type
-work/golden/README.md                                                                                  # excluded by !work/golden
-work/golden/ladder/rung-00100.coverage                                                                 # excluded by !work/golden
-work/golden/ladder/rung-00100.index                                                                    # excluded by !work/golden
-work/golden/ladder/rung-00100.sha256                                                                   # excluded by !work/golden
-work/golden/ladder/rung-00200.coverage                                                                 # excluded by !work/golden
-work/golden/ladder/rung-00200.index                                                                    # excluded by !work/golden
-work/golden/ladder/rung-00200.sha256                                                                   # excluded by !work/golden
-work/golden/ladder/rung-00500.coverage                                                                 # excluded by !work/golden
-work/golden/ladder/rung-00500.index                                                                    # excluded by !work/golden
-work/golden/ladder/rung-00500.sha256                                                                   # excluded by !work/golden
-work/golden/ladder/rung-01000.coverage                                                                 # excluded by !work/golden
-work/golden/ladder/rung-01000.index                                                                    # excluded by !work/golden
-work/golden/ladder/rung-01000.sha256                                                                   # excluded by !work/golden
-work/golden/ladder/rung-02000.coverage                                                                 # excluded by !work/golden
-work/golden/ladder/rung-02000.index                                                                    # excluded by !work/golden
-work/golden/ladder/rung-02000.sha256                                                                   # excluded by !work/golden
-work/golden/ladder/rung-05000.coverage                                                                 # excluded by !work/golden
-work/golden/ladder/rung-05000.index                                                                    # excluded by !work/golden
-work/golden/ladder/rung-05000.sha256                                                                   # excluded by !work/golden
-work/golden/ladder/rung-10000.coverage                                                                 # excluded by !work/golden
-work/golden/ladder/rung-10000.index                                                                    # excluded by !work/golden
-work/golden/ladder/rung-10000.sha256                                                                   # excluded by !work/golden
-work/golden/ladder/rung-seed.coverage                                                                  # excluded by !work/golden
-work/golden/ladder/rung-seed.index                                                                     # excluded by !work/golden
-work/golden/ladder/rung-seed.sha256                                                                    # excluded by !work/golden
-work/golden/questions/README.md                                                                        # excluded by !work/golden
-work/golden/questions/set-2-claude.jsonl                                                               # excluded by !work/golden
-work/golden/questions/set-3-claude.jsonl                                                               # excluded by !work/golden
-work/golden/questions/set-4-claude.jsonl                                                               # excluded by !work/golden
-work/golden/retired/set-1/README.md                                                                    # excluded by !work/golden
-work/golden/retired/set-1/expected.jsonl                                                               # excluded by !work/golden
-work/golden/retired/set-1/questions.jsonl                                                              # excluded by !work/golden
-work/golden/retired/set-2/README.md                                                                    # excluded by !work/golden
-work/golden/retired/set-2/expected.jsonl                                                               # excluded by !work/golden
-work/golden/retired/set-2/questions.jsonl                                                              # excluded by !work/golden
-work/golden/retired/set-3/README.md                                                                    # excluded by !work/golden
-work/golden/retired/set-3/expected.jsonl                                                               # excluded by !work/golden
-work/golden/retired/set-3/questions.jsonl                                                              # excluded by !work/golden
-work/golden/seed-dates.tsv                                                                             # excluded by !work/golden
-work/golden/seed-history.tsv                                                                           # excluded by !work/golden
-work/golden/seed-history/33-cold-chain-glossary.md@1                                                   # excluded by !work/golden
-work/golden/seed-history/37-procedure-probe-calibration.md@1                                           # excluded by !work/golden
-work/golden/seed-history/38-decision-probe-calibration.md@1                                            # excluded by !work/golden
-work/golden/seed-history/40-procedure-dry-ice-handling.md@1                                            # excluded by !work/golden
-work/golden/seed-history/40-procedure-dry-ice-handling.md@2                                            # excluded by !work/golden
-work/golden/seed-history/40-procedure-dry-ice-handling.md@3                                            # excluded by !work/golden
-work/golden/seed-history/42-reference-dry-ice-handling.md@1                                            # excluded by !work/golden
-work/golden/seed-history/43-procedure-ammonia-leak-response.md@1                                       # excluded by !work/golden
-work/golden/seed-history/43-procedure-ammonia-leak-response.md@2                                       # excluded by !work/golden
-work/golden/seed-history/43-procedure-ammonia-leak-response.md@3                                       # excluded by !work/golden
-work/golden/seed-history/45-reference-ammonia-leak-response.md@1                                       # excluded by !work/golden
-work/golden/seed-history/46-procedure-seal-control.md@1                                                # excluded by !work/golden
-work/golden/seed-history/46-procedure-seal-control.md@2                                                # excluded by !work/golden
-work/golden/seed-history/46-procedure-seal-control.md@3                                                # excluded by !work/golden
-work/golden/seed-history/48-reference-seal-control.md@1                                                # excluded by !work/golden
-work/golden/seed-history/48-reference-seal-control.md@2                                                # excluded by !work/golden
-work/golden/seed-history/48-reference-seal-control.md@3                                                # excluded by !work/golden
-work/golden/seed-history/49-procedure-gel-pack-conditioning.md@1                                       # excluded by !work/golden
-work/golden/seed-history/50-decision-gel-pack-conditioning.md@1                                        # excluded by !work/golden
-work/golden/seed-history/51-reference-gel-pack-conditioning.md@1                                       # excluded by !work/golden
-work/golden/seed-history/51-reference-gel-pack-conditioning.md@2                                       # excluded by !work/golden
-work/golden/seed-history/51-reference-gel-pack-conditioning.md@3                                       # excluded by !work/golden
-work/golden/seed/01-sop-temperature-excursion.md                                                       # excluded by !work/golden
-work/golden/seed/02-sensor-thresholds.yaml                                                             # excluded by !work/golden
-work/golden/seed/03-postmortem-nagpur-vaccine-excursion.md                                             # excluded by !work/golden
-work/golden/seed/04-night-shift-handover-log.txt                                                       # excluded by !work/golden
-work/golden/seed/05-decision-telematics-vendor-2023.md                                                 # excluded by !work/golden
-work/golden/seed/06-re-fw-telematics-cutover.eml                                                       # excluded by !work/golden
-work/golden/seed/07-rate-card-and-surcharges.md                                                        # excluded by !work/golden
-work/golden/seed/08-driver-hours-and-safety-policy.md                                                  # excluded by !work/golden
-work/golden/seed/09-dock-scheduling-wiki-export.html                                                   # excluded by !work/golden
-work/golden/seed/10-new-joiner-faq.md                                                                  # excluded by !work/golden
-work/golden/seed/11-decision-telematics-vendor-2026.md                                                 # excluded by !work/golden
-work/golden/seed/12-rate-card-2026-h2.md                                                               # excluded by !work/golden
-work/golden/seed/13-dock-scheduling-rules-2026.md                                                      # excluded by !work/golden
-work/golden/seed/14-customer-notification-matrix-2025.md                                               # excluded by !work/golden
-work/golden/seed/15-customer-notification-matrix-2026.md                                               # excluded by !work/golden
-work/golden/seed/16-reefer-RF-118-asset-file.md                                                        # excluded by !work/golden
-work/golden/seed/17-reefer-RF-119-asset-file.md                                                        # excluded by !work/golden
-work/golden/seed/18-reefer-RF-120-asset-file.md                                                        # excluded by !work/golden
-work/golden/seed/19-project-PROJ-123-dockwise-rollout.md                                               # excluded by !work/golden
-work/golden/seed/20-project-PROJ-124-red-sleeve-and-passive-shippers.md                                # excluded by !work/golden
-work/golden/seed/21-project-PROJ-125-kalpa-decommission.md                                             # excluded by !work/golden
-work/golden/seed/22-cold-chain-document-map.md                                                         # excluded by !work/golden
-work/golden/seed/23-mapping-study-TMS-41.md                                                            # excluded by !work/golden
-work/golden/seed/24-mapping-study-TMS-42.md                                                            # excluded by !work/golden
-work/golden/seed/25-mapping-study-TMS-43.md                                                            # excluded by !work/golden
-work/golden/seed/26-mapping-study-TMS-44.md                                                            # excluded by !work/golden
-work/golden/seed/27-lane-qualification-LQ-51.md                                                        # excluded by !work/golden
-work/golden/seed/28-lane-qualification-LQ-52.md                                                        # excluded by !work/golden
-work/golden/seed/29-lane-qualification-LQ-53.md                                                        # excluded by !work/golden
-work/golden/seed/30-pharma-night-dispatch-checklist.md                                                 # excluded by !work/golden
-work/golden/seed/31-quarantine-release-and-return-procedure.md                                         # excluded by !work/golden
-work/golden/seed/32-reefer-washdown-and-sanitation-procedure.md                                        # excluded by !work/golden
-work/golden/seed/33-cold-chain-glossary.md                                                             # excluded by !work/golden
-work/golden/seed/34-cold-chain-training-plan-2026.md                                                   # excluded by !work/golden
-work/golden/seed/35-qa-monthly-bulletin-2026-07.md                                                     # excluded by !work/golden
-work/golden/seed/36-nagpur-night-drill-report-2026-q1.md                                               # excluded by !work/golden
-work/golden/seed/37-procedure-probe-calibration.md                                                     # excluded by !work/golden
-work/golden/seed/38-decision-probe-calibration.md                                                      # excluded by !work/golden
-work/golden/seed/39-reference-probe-calibration.md                                                     # excluded by !work/golden
-work/golden/seed/40-procedure-dry-ice-handling.md                                                      # excluded by !work/golden
-work/golden/seed/41-decision-dry-ice-handling.md                                                       # excluded by !work/golden
-work/golden/seed/42-reference-dry-ice-handling.md                                                      # excluded by !work/golden
-work/golden/seed/43-procedure-ammonia-leak-response.md                                                 # excluded by !work/golden
-work/golden/seed/44-decision-ammonia-leak-response.md                                                  # excluded by !work/golden
-work/golden/seed/45-reference-ammonia-leak-response.md                                                 # excluded by !work/golden
-work/golden/seed/46-procedure-seal-control.md                                                          # excluded by !work/golden
-work/golden/seed/47-decision-seal-control.md                                                           # excluded by !work/golden
-work/golden/seed/48-reference-seal-control.md                                                          # excluded by !work/golden
-work/golden/seed/49-procedure-gel-pack-conditioning.md                                                 # excluded by !work/golden
-work/golden/seed/50-decision-gel-pack-conditioning.md                                                  # excluded by !work/golden
-work/golden/seed/51-reference-gel-pack-conditioning.md                                                 # excluded by !work/golden
-work/golden/seed/52-coimbatore-dc-site-handbook.md                                                     # excluded by !work/golden
-work/golden/seed/53-fleet-operations-manual.md                                                         # excluded by !work/golden
-work/golden/seed/54-customer-service-handbook.md                                                       # excluded by !work/golden
-work/golden/seed/55-stores-and-consumables-standard.md                                                 # excluded by !work/golden
-work/golden/seed/56-dry-ice-handling-card-dock-5.md                                                    # excluded by !work/golden
-work/golden/seed/57-dry-ice-handling-card-guwahati.md                                                  # excluded by !work/golden
-work/golden/seed/58-ammonia-alarm-card-canteen.md                                                      # excluded by !work/golden
-work/golden/seed/59-ammonia-alarm-card-dock-5.md                                                       # excluded by !work/golden
-work/golden/seed/60-seal-handling-card-gate-cabin.md                                                   # excluded by !work/golden
-work/golden/seed/61-seal-and-label-card-stores-counter.md                                              # excluded by !work/golden
-work/golden/seed/62-gel-pack-figures-qa-room-sheet.md                                                  # excluded by !work/golden
-work/golden/seed/archive/a01-sop-temperature-excursion-rev2.md                                         # excluded by !work/golden
-work/golden/seed/archive/a02-kalpa-alert-routing-guide-2021.md                                         # excluded by !work/golden
-work/golden/seed/archive/a03-dock-scheduling-wiki-2021.html                                            # excluded by !work/golden
-work/golden/seed/archive/a04-driver-hours-policy-2019.md                                               # excluded by !work/golden
-work/golden/seed/archive/a05-induction-checklist-2020.txt                                              # excluded by !work/golden
-work/golden/seed/archive/a06-reefer-RF-117-retired.md                                                  # excluded by !work/golden
+work/golden/                                                                                           # excluded by !work/golden
 work/regression/2026-08-20-r5-hook-latency/evidence/run.log                                            # not an indexed file type
 work/regression/2026-08-20-r6-merge-driver/evidence/run.log                                            # not an indexed file type
 work/regression/2026-08-20-refer-plane-r4/evidence/run.log                                             # not an indexed file type
@@ -232,9 +103,13 @@ work/regression/2026-09-28-anchor-mined/evidence/doctor-fix.diff                
 work/regression/2026-09-28-authority-prior/evidence/doctor-fix.diff                                    # not an indexed file type
 work/regression/2026-09-28-intent-prior/evidence/doctor-fix.diff                                       # not an indexed file type
 work/regression/2026-09-29-node-reader-per-call/evidence/equal.mjs                                     # not an indexed file type
+work/regression/2026-09-30-ci-arm-batching/evidence/one-process.mjs                                    # not an indexed file type
 work/regression/2026-09-30-rm3-grounded/evidence/doctor-fix.diff                                       # not an indexed file type
 work/regression/2026-09-30-rm3-grounded/evidence/engine.diff                                           # not an indexed file type
 work/regression/2026-09-30-section-size/evidence/run.log                                               # not an indexed file type
+work/regression/2026-09-30-shared-runtime/evidence/t1-arm-adversarial.err                              # not an indexed file type
+work/regression/2026-09-30-shared-runtime/evidence/t1-arm-rung-10000.err                               # not an indexed file type
+work/regression/2026-09-30-shared-runtime/evidence/t2-identity.err                                     # not an indexed file type
 # <<< fux: not indexed <<<
 
 # >>> fux: skipped >>>

@@ -7,10 +7,10 @@ description: "One map of every file that governs how this repo is worked on — 
 status: accepted
 date: 2026-09-14
 feature: the governance map — which file governs what, who reads it, and what enforces it
-owns: [tests/test_record_paths_resolve.py@4582eec0205b, tests/test_work_queue_rules_have_one_home.py@c7edef32bce9]
+owns: [tests/test_record_paths_resolve.py@a3d92ddd910a, tests/test_work_queue_rules_have_one_home.py@be2e38b86b0d]
 laws: [L0]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 119b324aa946e725fff90ff8f5277b9a78bb9ae9ce8e2e396f1448a2a3a56cba
+content_sha: 76a26e6e1ffcfb9db47af4d5453c16d83b1090c0e58fdf1027bd6d18c22e9c0b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

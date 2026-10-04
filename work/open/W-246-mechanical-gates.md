@@ -68,4 +68,4 @@ and lets each gate cite the same ruling.
 ## Out of scope
 
 - Anything the audit classed *judgement* — those are `cost` B-252 and stay there.
-- The walking-tests fix — that is [W-244](W-244-l11-ingest-walk-2026-10-03.md)'s DoD 3.
+- The walking-tests fix — that is W-244 (closed 2026-10-04)'s DoD 3.

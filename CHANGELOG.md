@@ -8,6 +8,14 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Fixed
+
+- **`fux ingest` no longer walks into a `!`-excluded directory** (W-244). It used
+  to list every file there and skip each one, so `.fuxignore` named every file
+  in a tree you had excluded. The directory is now pruned and recorded once, as
+  `dir/`. What gets indexed is unchanged: this repo's index is byte-identical,
+  257/257 shards. A hand-written `!` re-include in `.fuxignore` turns pruning off.
+
 ## [3.0.0-alpha.10] - 2026-10-03
 
 **The Node reader gets the accelerator: `--fast`, and its own `fux build`, both

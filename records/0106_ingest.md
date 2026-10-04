@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@cade968c2c2d, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@a6b1bb5f5517, node/src/ingest/priors.mjs@d8d4691d7e49]
+owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@3a0b98c2d7a6, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@a6b1bb5f5517, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 746a3108eb7d921f25b9c246bd304011206ca5834ebbac87b05293f22624784f
+content_sha: a8994fb45b850686433a783ce0ead8d211cc1c87221f680003531291c1a3a981
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -997,6 +997,25 @@ The Node reader's `dirsFile` no longer falls back to `.fux/sources/dirs`.
 
 
 **`.fux/identifiers.toml` is an input to extraction** ([SR-IDENTIFIERS](0160_identifiers.md)). Ingest loads it once, passes it to every field's analysis and to anchor text, and stamps its effective digest into every shard header; a record is reused only when the whole expected header matches, so an edited file re-analyses the corpus, and a moved digest re-derives carried `url:` records.
+
+**24. The walk never enters a directory a `!` exclusion removes** (W-244,
+ruled 2026-10-03 under Arpit's delegation; L11 decision 9). `gitdir.walk_sources` used to
+`rglob` every file of an included directory and apply the exclusions after. On
+2026-10-03 that listed `work/golden/`, the sealed answer key's parent, while the
+tree was LOCKED, and wrote four key-file names into `.fux/.fuxignore`.
+`_candidate_paths` is now an `os.walk` that drops an excluded directory from
+descent before listing it, and records it once as `dir/`.
+
+- **What is indexed does not move.** On this repo the index built with the
+  old walk and with the new one is byte-identical, 257/257 shards. Only the
+  skip list changes ([SR-FUXIGNORE](0144_fuxignore.md) decision 11f).
+- **A hand-written `!` re-include turns pruning off.** It outranks an
+  exclusion and could name a file under the directory, so while
+  `.fuxignore` holds one, the walk enumerates as before.
+- `followlinks=False` is `rglob`'s own symlink behaviour.
+- Held by `tests/ingest/test_source_filters.py`: a spy on `os.scandir` proves
+  the directory is never scanned. The repo tests that walk the root go through
+  `tests/walk_lib.py`, gated by `tests/test_walks_skip_golden.py`.
 
 ### Consequences
 

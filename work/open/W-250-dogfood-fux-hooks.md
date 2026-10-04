@@ -29,8 +29,8 @@ No ruling is needed — SR-MAINTENANCE 5a: hooks touch no network.
 
 ## Hazards
 
-- 🔴 **Do not run `fux ingest` at this repo's root until [W-244](W-244-l11-ingest-walk-2026-10-03.md)
-  lands** — the merge exercise in DoD 2 uses a scratch copy of the repo, never
-  this tree.
+- ✅ **`fux ingest` at this repo's root is safe again**: W-244 landed on 2026-10-04,
+  and the walk prunes `work/golden/`. The merge exercise in DoD 2 still uses a
+  scratch copy of the repo, never this tree.
 - A concurrent session is active in this tree; `fux hooks` writes to `.git/`.
   Say so in the session before running it (SR-WORK-SESSION d12).

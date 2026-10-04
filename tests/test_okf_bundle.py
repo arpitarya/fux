@@ -44,6 +44,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from fux import frontmatter as fm  # noqa: E402
+from walk_lib import repo_files  # W-244: never enters work/golden
 
 BUNDLE_ROOTS = ("docs", "records", "work")
 #: The bundle root declares `okf_version` and nothing else; it is the one
@@ -81,7 +82,7 @@ def _frozen_run_artifact(rel: str) -> bool:
 def bundle_docs() -> list[Path]:
     out: list[Path] = []
     for root in BUNDLE_ROOTS:
-        for path in sorted((ROOT / root).rglob("*.md")):
+        for path in sorted(repo_files(ROOT, start=root, suffixes=(".md",))):
             rel = path.relative_to(ROOT).as_posix()
             if rel == BUNDLE_INDEX.as_posix():
                 continue
