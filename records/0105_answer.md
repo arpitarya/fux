@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@7d111b045e0c]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 07db6c56a1a52f88616cd639a4113f078432693df8e4d8167fc555e88777ef80
+content_sha: f24f3c80e83621f2d4013cd3011123860fb2133dc0f764828d0a86043a00a602
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -516,6 +516,8 @@ ships empty, so by default nothing here changes.
 The question `fux answer` ranks is analyzed with the repo's identifier families, as `ask`'s is ([SR-IDENTIFIERS](0160_identifiers.md)); refer's passage re-score is not — it analyzes the question and the passage in one function, on analyzer v3's terms, and is self-consistent either way.
 
 **No decision here moved** (W-253, 2026-10-04): `find --under` became a component boundary and `find --json` now writes `confidence` before `fused`, per [SR-FIND](0104_find.md) decisions 7 and Consequences and [SR-CLI](0101_cli-surface.md).
+
+**No decision here moved** (W-247, 2026-10-04): `cmd_answer` renders `build_answer`'s result, and `fux.api.Index.answer` reads the same builder instead of capturing the CLI's stdout. The text and `--json` output are byte-identical.
 
 ### Consequences
 

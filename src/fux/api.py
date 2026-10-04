@@ -28,16 +28,13 @@ contract; the modules are not"*. Three things change once the seam exists:
 3. **It makes the Node port transcribable.** `node/src/api.mjs` mirrors this
    file method for method, argument for argument.
 
-## The one thing this does NOT do yet
+## One payload, one place
 
-⚠ **`cmd_ask` and friends do not call into here yet.** The finished shape is
-`cmd_ask(args) -> print(render(api.ask(...)))`, so there is exactly one
-implementation; today this module assembles from the same primitives
-(`query.scan`, `query.confidence`, `query.headings`, `refer`) rather than
-through `query/__init__.py`. **That is a deliberate staging, not the design:**
-the renderer refactor touches a 1 481-line hot file and is landed with a green
-`pytest`, not blind. Until it lands, a change to how `ask` assembles its
-payload has two places to change, and this sentence is the only thing saying so.
+`cmd_ask`, `cmd_find` and `cmd_answer` render what `query.build_ask`,
+`build_find` and `build_answer` compute, and the methods below read the same
+three builders: a change to what a verb returns has one place to change
+(W-247). The builders print nothing the library did not already print, and the
+CLI's stderr declarations stay in the `cmd_*` functions.
 
 ## What is deliberately NOT here
 
@@ -51,8 +48,6 @@ SR-API and joins what L0 keeps true.
 
 from __future__ import annotations
 
-import contextlib
-import io
 import json as json_mod
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -73,28 +68,25 @@ _PII_RULES = (fixed("fuxdir", "dir"), fixed("files", "pii_name"))
 
 
 class _Args(SimpleNamespace):
-    """The CLI's `Namespace` shape, for the one verb that still needs it.
+    """The CLI's `Namespace` shape, for the builders that read one.
 
-    ⚠ **`answer` is routed through `cmd_answer` on purpose**, not reassembled
-    here. Its payload carries the refer plane's freshness verdict, the audit
-    bundle and the provenance receipt, and a second assembly of those would be
-    a second copy of the claim-strength vocabulary — the exact defect this
-    module's docstring says the seam exists to prevent. `ask` and `find` are
-    assembled from primitives because they have no such vocabulary; the
-    renderer refactor collapses both paths into one.
+    `query.build_ask / build_find / build_answer` take the argparse `Namespace`
+    the CLI resolved, and read it through `getattr`; a flag the library does not
+    pass is therefore *not requested*, which is what `None` answers here.
     """
 
     def __getattr__(self, name: str) -> Any:   # absent flag == not requested
         return None
 
 
-def _answer_from(cmd, args) -> "Answer":
-    """Run `cmd_answer` and read its JSON back, until the renderer split lands."""
-    buffer = io.StringIO()
-    with contextlib.redirect_stdout(buffer):
-        cmd(args)
-    text = buffer.getvalue().strip()
-    payload = json_mod.loads(text) if text else {}
+def _answer_from(payload: dict) -> "Answer":
+    """`build_answer`'s payload as the library's `Answer`.
+
+    ⚠ **Through JSON, on purpose.** The CLI prints this payload and a consumer
+    parses it back; the library hands out what that parse would give (a tuple
+    becomes a list), so `fx.answer().as_dict()` stays equal to `--json` parsed.
+    """
+    payload = json_mod.loads(json_mod.dumps(payload))
     body = payload.get("answer") or {}
     return Answer(
         passages=body.get("passages", []),
@@ -235,20 +227,12 @@ class Index:
         changed — `fux.api` is frozen (SR-API decision 1), so which of the two
         is right is a ruling, not a cleanup. SR-API decision 6.
         """
-        from .query import run_query
+        from .query import build_find
 
         if top is None:
             top = int(self._output().resolve("find", "top", as_json=False))
-        results = [
-            Result(id=r.id, loc=r.loc, title=r.title, score=r.score,
-                   archived=r.archived, tie=r.tie, mtime=r.mtime, pinned=r.pinned,
-                   boosted=r.boosted, route=r.route)
-            for r in run_query(self.root, query, top, force_scan=True, use_tune=True)[0]
-        ]
-        if under is not None:
-            prefix = under if under.endswith("/") else under + "/"
-            results = [r for r in results if r.loc == under or r.loc.startswith(prefix)]
-        return results
+        built = build_find(self.root, _Args(query=query, top=top, under=under), sections=False)
+        return [Result(**row) for row in built.payload()["results"]]
 
     def ask(
         self, query: str, *, top: int | None = None, band: bool | None = None,
@@ -261,9 +245,7 @@ class Index:
         a caller in Python has already decided to read the object, and the block
         is the part that says whether to trust it (W-225 stage 6, L12 R8).
         """
-        from .query import run_query
-        from .query.headings import headings_for
-        from .tune import load as load_tune
+        from .query import build_ask
 
         output = self._output()
         band = bool(output.resolve_api("band", band))
@@ -271,62 +253,25 @@ class Index:
         if top is None:
             top = int(output.resolve("ask", "top", as_json=False))
         max_headings = int(output.resolve("ask", "max_headings", as_json=False))
-        arms = list(dict.fromkeys([query, *(queries or [])]))
-        # 🔴 `run_query`, not `scan_ask` — see `find`. Loaded ONCE and handed to
-        # every arm, the same discipline `_run_fused` applies: two loads could
-        # disagree if the file changed between them, and a band explained by a
-        # different floor than the one that produced it is worse than none.
-        tune = load_tune(self.root, enabled=True)
-        signals: dict = {}
-        first, _path = run_query(
-            self.root, arms[0], top, tune=tune, confidence_out=signals,
-            force_scan=True, use_tune=True,
+        # ⚠ The block always describes ARM 1 (`_run_fused`): `separation_floor`
+        # is calibrated against BM25F and a fused top-2 differs by ~0.0003, so
+        # a band over fused scores would measure a different quantity under the
+        # same name. It comes from `run_query`'s own out-parameter, so the two
+        # `[confidence]` FLOORS reach it.
+        built = build_ask(
+            self.root,
+            _Args(
+                query=query, top=top, also=queries, band=band, sections=sections,
+                max_headings=max_headings,
+            ),
+            compose=True, with_related=False,
         )
-
-        fused = False
-        results = first
-        if len(arms) > 1:
-            from .query.fuse import fuse_results
-
-            others = [run_query(self.root, q, top, tune=tune, force_scan=True, use_tune=True)[0] for q in arms[1:]]
-            results = fuse_results([first, *others], top)
-            fused = True
-
-        rows = [
-            Result(id=r.id, loc=r.loc, title=r.title, score=r.score,
-                   archived=r.archived, tie=r.tie, mtime=r.mtime, pinned=r.pinned,
-                   boosted=r.boosted, route=r.route,
-                   headings=headings_for(self._record(r.id), query, limit=max_headings)
-                   if sections else [])
-            for r in results
-        ]
-        block = None
-        if band:
-            # ⚠ The block always describes ARM 1. `separation_floor` is
-            # calibrated against BM25F and a fused top-2 differs by ~0.0003, so
-            # a band over fused scores measures a different quantity under the
-            # same name.
-            #
-            # 🔴 It comes from `run_query`'s own out-parameter now, so the two
-            # `[confidence]` FLOORS reach it — the block was being built here
-            # at the engine's defaults while the ranking beside it used the
-            # repo's, which is one answer described by two configurations.
-            resolved = signals.get("confidence")
-            block = resolved.as_dict() if resolved is not None else None
-        return AskAnswer(results=rows, confidence=block, fused=fused)
-
-    def _record(self, doc_id: str) -> dict | None:
-        """One record by id, from its own shard. Display-time only."""
-        from . import store as store_mod
-
-        path = store_mod.shard_path(self.root, store_mod.shard_for(doc_id))
-        if not path.is_file():
-            return None
-        _, records = store_mod.read_shard(path)
-        for record in records:
-            if record.get("id") == doc_id:
-                return record
-        return None
+        payload = built.payload()
+        return AskAnswer(
+            results=[Result(**row) for row in payload["results"]],
+            confidence=payload.get("confidence"),
+            fused=bool(payload.get("fused")),
+        )
 
     def answer(
         self, query: str, *, audit: bool, receipt: bool, band: bool | None = None,
@@ -337,7 +282,7 @@ class Index:
         ⚠ **Read the verdict.** A caller that ignores it has thrown away the
         only thing separating fux from a stale cache with good manners.
         """
-        from . import query as query_mod
+        from .query import build_answer
 
         output = self._output()
         band = bool(output.resolve_api("band", band))
@@ -346,7 +291,7 @@ class Index:
             query=query, json=True, band=band, no_refer=no_refer,
             audit=audit, receipt=receipt, top=None,
         )
-        return _answer_from(query_mod.cmd_answer, args)
+        return _answer_from(build_answer(self.root, args).payload)
 
     def explain(self, doc_id: str) -> dict:
         """One document's outbound edges and the community it landed in."""

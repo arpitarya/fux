@@ -28,6 +28,12 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
+- **`cmd_ask`, `cmd_find` and `cmd_answer` render one payload** (W-247). The
+  payload is built once, by `query.build_ask / build_find / build_answer`, and
+  `fux.api`'s `find`, `ask` and `answer` read the same builders instead of
+  assembling `find` and `ask` from primitives and capturing `cmd_answer`'s
+  stdout. Output is byte-identical (stdout, stderr and exit code, 537
+  invocations on two corpora) and so are the library's results.
 - **A leading YAML frontmatter block is its own passage in `fux answer`** (W-254).
   It is passage 0 (heading empty, exact `L1-Ln`) instead of riding into the first
   section, so a `status:` line is quotable and the block no longer tilts that

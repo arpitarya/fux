@@ -93,7 +93,7 @@ reused; the sentence that closes each is in the cited record.
 | rows | item | what it is |
 |---|---|---|
 | B-020, B-047 (gate half), B-052, B-054, B-056, B-065, B-068, B-072, B-073, B-074, B-075, B-076 (smoke half), B-077, B-079, B-080, B-084, B-085, B-086, B-168 | [W-246](W-246-mechanical-gates.md) | the small tests and `doctor` rows the records asked for and nobody wrote — all stdlib, each one named in the item |
-| B-040 | [W-247](W-247-api-renderer-split.md) | `cmd_*` render what `fux.api` builds; one payload, one place |
+| B-040 | W-247 | `cmd_*` render what `fux.api` builds; one payload, one place |
 | B-007 | [W-248](W-248-enrich-consumes-queue.md) | `fux enrich`'s worklist is declared scope ∪ the decoder queue's *model-needed* rows |
 | B-034 | [W-249](W-249-resident-index-mcp-serve.md) | `fux mcp` / `fux serve` hold the index open, keyed on `.fux/runtime/stamp.json` — index residency, **not** W-242's refused T3 memo |
 | B-037 | [W-250](W-250-dogfood-fux-hooks.md) | run `fux hooks` in this repository |

@@ -90,7 +90,7 @@ would need a deprecation cycle in 3.1 is free in 3.0.
 - `changed_since` as a field is additive; stderr keeps the line for prose mode.
 - The differential arm gains the CLI as a third column for the three graph
   verbs; `tools/differential/node_arm.py` already parses the library shape.
-- [W-247](../open/W-247-api-renderer-split.md) does **not** need to land first
+- W-247 does **not** need to land first
   for B-146/B-151 (it moves none of those lines; W-247 covers `cmd_ask`,
   `cmd_find`, `cmd_answer`, not the graph verbs). B-147, if Arpit rules it,
   is where W-247's split would matter.

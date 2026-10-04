@@ -49,6 +49,7 @@ from __future__ import annotations
 
 import json as json_mod
 import sys
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..config import find_root
@@ -66,8 +67,9 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
     from ..tune import Tune
 
 __all__ = [
-    "AskResult", "cmd_answer", "cmd_ask", "cmd_find", "cmd_lexical",
-    "cmd_verify", "run_query",
+    "AnswerBuilt", "AskBuilt", "AskResult", "FindBuilt", "build_answer", "build_ask",
+    "build_find", "cmd_answer", "cmd_ask", "cmd_find", "cmd_lexical", "cmd_verify",
+    "run_query",
 ]
 
 
@@ -566,8 +568,8 @@ def _maybe_rerank(root: Path, query: str, results, tune: "Tune", top: int, uplif
 OUTPUT_SCHEMA = fixed("schema_files", "output")
 
 
-def _emit(payload: dict, shape: str, *, band_requested: bool) -> None:
-    """Validate against the output contract, then print.
+def _validate_answer(payload: dict, band_requested: bool) -> None:
+    """Validate an `answer` payload against the output contract.
 
     **Fux cannot emit JSON that violates its own contract**, and that is worth
     a few microseconds on a payload of a handful of keys. SR-ANSWER already
@@ -594,12 +596,11 @@ def _emit(payload: dict, shape: str, *, band_requested: bool) -> None:
     # fire — and the guard worth having is exactly the one it would lose: with
     # `--band` passed, an `answer` branch that forgot the key now FAILS instead
     # of quietly emitting one shape where its siblings emit another.
-    load_schema(OUTPUT_SCHEMA).shape(shape).validate(
+    load_schema(OUTPUT_SCHEMA).shape("answer_payload").validate(
         payload,
-        label=f"--json {shape}",
+        label="--json answer_payload",
         conditions={"band_requested": lambda _payload: band_requested},
     )
-    print(json_mod.dumps(payload, indent=_JSON_INDENT))
 
 
 def _root() -> Path:
@@ -1043,8 +1044,79 @@ def cmd_ask(args) -> int:
     return _ask_shaped(args, compose=True)
 
 
-def _ask_shaped(args, *, compose: bool) -> int:
-    root = _root()
+@dataclass
+class AskBuilt:
+    """What `ask` / `lexical` computed, before anything is rendered.
+
+    **The one place the payload is built** (W-247, SR-API). `cmd_ask` renders
+    this and `fux.api.Index.ask` reads it, so a change to what `ask` returns has
+    one place to change. `payload()` is the `--json` shape, key order and all;
+    the other fields are what the text rendering and the stderr declarations
+    need and the library payload does not carry.
+    """
+
+    root: Path
+    query: str
+    results: list
+    related: list
+    block: object
+    path: str
+    why: object
+    tune: "Tune"
+    fused: bool
+    show_sections: bool
+    show_band: bool
+    max_headings: int
+    explain: bool
+
+    def payload(self) -> dict:
+        # `--explain` is not text-only: a caller that wants to log which path
+        # answered a slow query needs it in the machine-readable form too. The
+        # key is additive and appears only when asked for, so no existing
+        # consumer's parse changes (W-48).
+        payload: dict = {
+            "results": [
+                _as_dict(
+                    self.root, r, self.query, sections=self.show_sections,
+                    max_headings=self.max_headings,
+                )
+                for r in self.results
+            ]
+        }
+        # W-161. **Its own key, never merged into `results`** — a document with
+        # no lexical match sitting among real matches *looks like* a match, and
+        # the separate key is what keeps a downstream reader from mistaking a
+        # neighbour for a hit. **Absent means the tier did not run**, which
+        # covers `--no-related`, `[graph] ask_related = false`, `fux lexical`,
+        # and a repository with no fresh `fux build`; `[]` is what *no
+        # neighbours* looks like.
+        if self.tune.ask_related:
+            payload["related"] = [_related_dict(r) for r in self.related]
+        # SR-CONFIDENCE decision 11: present only under `--band`. **Absent
+        # means NOT ASKED FOR — it is never a claim about the answer**, which
+        # is why the schema makes it conditional rather than optional-in-prose.
+        if self.block is not None and self.show_band:
+            payload["confidence"] = self.block.as_dict()
+        # W-109 — additive, and it is not optional when it applies: without
+        # it a consumer reads an RRF score as a BM25F score, and the two are
+        # not comparable. Absent means "one question", never "unknown".
+        if self.fused:
+            payload["fused"] = True
+        if self.explain:
+            payload["path"] = self.path
+        if self.why is not None:
+            payload["derivation"] = self.why.as_dict()
+        return payload
+
+
+def build_ask(root: Path, args, *, compose: bool, with_related: bool) -> AskBuilt:
+    """Run `ask` (or the frozen `lexical`) and return what it computed.
+
+    **Prints nothing.** The stderr declarations are the CLI's to make
+    (`_ask_shaped`); the library reads this without them, as it always did.
+    `with_related=False` is the library: it has no Tier B key, and
+    `run_query` skips the work when it is not asked for.
+    """
     tune = _tune_for(root, args)
     # 🔴 **The freeze, enforced on the one line where it could be lost.**
     # `fux lexical` is BM25F, the proximity reranker and `-q` fusion — and no
@@ -1071,54 +1143,33 @@ def _ask_shaped(args, *, compose: bool) -> int:
     related: list = []
     results, path, fused = _run_fused(
         root, args, args.top, tune=tune, confidence_out=signals, trace_out=trace,
-        related_out=related,
+        related_out=related if with_related else None,
     )
     block = signals.get("confidence")
     why = _derivation_for(root, args, results, path, signals, trace, tune) if want_why else None
-    _declare_floor_off(root, tune, quiet=bool(getattr(args, "json", False)))
+    return AskBuilt(
+        root=root, query=args.query, results=results, related=related, block=block,
+        path=path, why=why, tune=tune, fused=fused,
+        # SR-OUTPUT decision 21. `ask`/`lexical` declare `sections`, so the CLI has
+        # always resolved it onto `args` by now — from the flag or the file (L12:
+        # there is no built-in to fall back to).
+        show_sections=bool(args.sections), show_band=_show_band(args),
+        max_headings=args.max_headings, explain=bool(getattr(args, "explain", False)),
+    )
+
+
+def _ask_shaped(args, *, compose: bool) -> int:
+    root = _root()
+    built = build_ask(root, args, compose=compose, with_related=True)
+    results, related, block, path, why = (
+        built.results, built.related, built.block, built.path, built.why
+    )
+    _declare_floor_off(root, built.tune, quiet=bool(getattr(args, "json", False)))
     _declare_pending(root)
     _declare_no_accelerator(root)
 
-    # SR-OUTPUT decision 21. `ask`/`lexical` declare `sections`, so the CLI has
-    # always resolved it onto `args` by now — from the flag or the file (L12:
-    # there is no built-in to fall back to).
-    show_sections = bool(args.sections)
-
     if args.json:
-        # `--explain` is not text-only: a caller that wants to log which path
-        # answered a slow query needs it in the machine-readable form too. The
-        # key is additive and appears only when asked for, so no existing
-        # consumer's parse changes (W-48).
-        payload: dict = {
-            "results": [
-                _as_dict(root, r, args.query, sections=show_sections, max_headings=args.max_headings)
-                for r in results
-            ]
-        }
-        # W-161. **Its own key, never merged into `results`** — a document with
-        # no lexical match sitting among real matches *looks like* a match, and
-        # the separate key is what keeps a downstream reader from mistaking a
-        # neighbour for a hit. **Absent means the tier did not run**, which
-        # covers `--no-related`, `[graph] ask_related = false`, `fux lexical`,
-        # and a repository with no fresh `fux build`; `[]` is what *no
-        # neighbours* looks like.
-        if tune.ask_related:
-            payload["related"] = [_related_dict(r) for r in related]
-        # SR-CONFIDENCE decision 11: present only under `--band`. **Absent
-        # means NOT ASKED FOR — it is never a claim about the answer**, which
-        # is why the schema makes it conditional rather than optional-in-prose.
-        if block is not None and _show_band(args):
-            payload["confidence"] = block.as_dict()
-        # W-109 — additive, and it is not optional when it applies: without
-        # it a consumer reads an RRF score as a BM25F score, and the two are
-        # not comparable. Absent means "one question", never "unknown".
-        if fused:
-            payload["fused"] = True
-        if getattr(args, "explain", False):
-            payload["path"] = path
-        if why is not None:
-            payload["derivation"] = why.as_dict()
-        print(json_mod.dumps(payload, indent=_JSON_INDENT))
+        print(json_mod.dumps(built.payload(), indent=_JSON_INDENT))
         _declare_pinned(results)
         _declare_archived(results)
         _note_run(args, results, related, block)
@@ -1126,7 +1177,7 @@ def _ask_shaped(args, *, compose: bool) -> int:
 
     if not results:
         _decline()
-        _declare_confidence(block, _show_band(args))
+        _declare_confidence(block, built.show_band)
         _note_run(args, results, related, block)
         return 0
 
@@ -1159,7 +1210,7 @@ def _ask_shaped(args, *, compose: bool) -> int:
             moved = r.route and not r.route.startswith(f"#{results.index(r) + 1} ->")
             boost = f"  (graph {r.route.split(' via ')[0]})" if moved else "  (graph)"
         print(f"{r.score:.4f}{tie}{boost}  {mark}{_title_from(root, record, r.title)}  ({r.loc})")
-        if show_sections:
+        if built.show_sections:
             for heading in _headings_for(record, args.query, args.max_headings):
                 print(f"        {SECTION_MARKER} {heading}")
     _declare_related(related)
@@ -1169,7 +1220,7 @@ def _ask_shaped(args, *, compose: bool) -> int:
         _declare_derivation(why)
     _declare_pinned(results)
     _declare_archived(results)
-    _declare_confidence(block, _show_band(args))
+    _declare_confidence(block, built.show_band)
     _note_run(args, results, related, block)
     return 0
 
@@ -1409,9 +1460,50 @@ def _declare_filters(args, dropped: int) -> None:
     )
 
 
-def cmd_find(args) -> int:
-    """Ranked documents, one per line — the terse listing verb."""
-    root = _root()
+@dataclass
+class FindBuilt:
+    """What `find` computed, before anything is rendered (W-247).
+
+    The same arrangement as `AskBuilt`: `cmd_find` renders it and
+    `fux.api.Index.find` reads it, and `payload()` is the `--json` shape.
+    """
+
+    root: Path
+    query: str
+    results: list
+    block: object
+    tune: "Tune"
+    fused: bool
+    dropped: int
+    show_band: bool
+    sections: bool
+    max_headings: int | None
+
+    def payload(self) -> dict:
+        payload: dict = {
+            "results": [
+                _as_dict(
+                    self.root, r, self.query, sections=self.sections,
+                    max_headings=self.max_headings,
+                )
+                for r in self.results
+            ]
+        }
+        # SR-CONFIDENCE decision 11: present only under `--band`. **Absent
+        # means NOT ASKED FOR — it is never a claim about the answer**, which
+        # is why the schema makes it conditional rather than optional-in-prose.
+        # `confidence` before `fused`, as `ask` and `fux.api` write them (W-253).
+        if self.block is not None and self.show_band:
+            payload["confidence"] = self.block.as_dict()
+        if self.fused:
+            payload["fused"] = True
+        return payload
+
+
+def build_find(root: Path, args, *, sections: bool) -> FindBuilt:
+    """Run `find` and return what it computed. **Prints nothing**; the stderr
+    declarations are `cmd_find`'s. `sections=False` is the library, whose
+    `find` is the cheap verb and carries no headings."""
     tune = _tune_for(root, args)
     signals: dict = {}
     results, _path, fused = _run_fused(
@@ -1419,32 +1511,30 @@ def cmd_find(args) -> int:
     )
     block = signals.get("confidence")
     results, dropped = _filtered(root, results, args)
-    _declare_floor_off(root, tune, quiet=bool(getattr(args, "json", False)))
+    return FindBuilt(
+        root=root, query=args.query, results=results, block=block, tune=tune, fused=fused,
+        dropped=dropped, show_band=_show_band(args), sections=sections,
+        max_headings=getattr(args, "max_headings", None),
+    )
+
+
+def cmd_find(args) -> int:
+    """Ranked documents, one per line — the terse listing verb."""
+    root = _root()
+    built = build_find(root, args, sections=True)
+    results, block = built.results, built.block
+    _declare_floor_off(root, built.tune, quiet=bool(getattr(args, "json", False)))
     _declare_no_accelerator(root)
-    _declare_filters(args, dropped)
+    _declare_filters(args, built.dropped)
 
     if args.json:
-        payload: dict = {
-            "results": [
-                _as_dict(root, r, args.query, sections=True, max_headings=args.max_headings)
-                for r in results
-            ]
-        }
-        # SR-CONFIDENCE decision 11: present only under `--band`. **Absent
-        # means NOT ASKED FOR — it is never a claim about the answer**, which
-        # is why the schema makes it conditional rather than optional-in-prose.
-        # `confidence` before `fused`, as `ask` and `fux.api` write them (W-253).
-        if block is not None and _show_band(args):
-            payload["confidence"] = block.as_dict()
-        if fused:
-            payload["fused"] = True
-        print(json_mod.dumps(payload, indent=_JSON_INDENT))
+        print(json_mod.dumps(built.payload(), indent=_JSON_INDENT))
         _declare_archived(results)
         return 0
 
     if not results:
         _decline()
-        _declare_confidence(block, _show_band(args))
+        _declare_confidence(block, built.show_band)
         return 0
 
     # **Bare paths, deliberately unmarked.** `find` exists to be piped, so a
@@ -1454,7 +1544,7 @@ def cmd_find(args) -> int:
     for r in results:
         print(r.loc)
     _declare_archived(results)
-    _declare_confidence(block, _show_band(args))
+    _declare_confidence(block, built.show_band)
     return 0
 
 
@@ -1478,7 +1568,29 @@ def cmd_find(args) -> int:
 ANSWER_TOP = fixed("answer", "candidates")
 
 
-def cmd_answer(args) -> int:
+@dataclass
+class AnswerBuilt:
+    """What `answer` computed, before anything is rendered (W-247).
+
+    `payload` is the `--json` shape, already gated on `--band`. Which branch
+    answered is read off the fields rather than named: `bundle` is set when the
+    refer plane answered, `best` when the index's own structure did, and
+    neither when nothing matched.
+    """
+
+    root: Path
+    payload: dict
+    block: object
+    show_band: bool
+    extra: dict
+    bundle: object = None
+    best: object = None
+    title: str | None = None
+    phrases: list = field(default_factory=list)
+    requested: bool = False
+
+
+def build_answer(root: Path, args) -> AnswerBuilt:
     """The single best answer — a fetched, re-scored passage when the source
     is reachable (PRIORITY.md P6); the index's own structure otherwise.
 
@@ -1489,10 +1601,17 @@ def cmd_answer(args) -> int:
     producing nothing usable — unreachable source, no fetcher, a citation
     deleted from the working tree) falls back to the M2 index-only path —
     `"source": "index"` — never silence.
+
+    ⚠ **Unlike `build_ask`, this one does make the stderr declarations that
+    precede the answer** (the floor note, the missing accelerator, a pin, a
+    change since the last ask). They were `cmd_answer`'s and the library has
+    always reached them through it; moving them would change what the library
+    prints. Under `--json` the payload is validated here, before anything is
+    printed, so the library and the CLI refuse the same payloads.
     """
-    root = _root()
     tune = _tune_for(root, args)
-    _declare_floor_off(root, tune, quiet=bool(getattr(args, "json", False)))
+    as_json = bool(getattr(args, "json", False))
+    _declare_floor_off(root, tune, quiet=as_json)
     signals: dict = {}
     # ⚠ **`answer` takes ONE question and no `-q`** — [SR-ANSWER](../../..)
     # decision 4: the verb means one answer. `--expand` applies here exactly as
@@ -1524,33 +1643,31 @@ def cmd_answer(args) -> int:
 
         block = empty("unverified", tune.separation_floor, tune.doc_coverage_floor)
     _declare_no_accelerator(root)
+    show_band = _show_band(args)
+
+    def built(payload: dict, **more) -> AnswerBuilt:
+        gated = _gated(payload, show_band)
+        if as_json:
+            _validate_answer(gated, show_band)
+        return AnswerBuilt(
+            root=root, payload=gated, block=more.pop("block", block), show_band=show_band,
+            extra=more.pop("extra", {}), **more,
+        )
 
     if not results:
-        if args.json:
-            # `"source"` is the key SR-ANSWER tells callers to switch on when
-            # the refer plane lands, so it must be present on the no-match
-            # branch too — an absent key is a trap, not a signal (W-48).
-            # `confidence` is required on this branch for the same reason, and
-            # it is the branch that most needs it: `band: none` is fux saying
-            # *do not answer this*, which is a stronger claim than an empty
-            # `results` array a caller may read as "try harder".
-            _emit(
-                _gated(
-                    {
-                        "answer": None,
-                        "citation": None,
-                        "source": "index",
-                        "confidence": _block_dict(block),
-                    },
-                    _show_band(args),
-                ),
-                "answer_payload",
-                band_requested=_show_band(args),
-            )
-        else:
-            _decline()
-            _declare_confidence(block, _show_band(args))
-        return 0
+        # `"source"` is the key SR-ANSWER tells callers to switch on when
+        # the refer plane lands, so it must be present on the no-match
+        # branch too — an absent key is a trap, not a signal (W-48).
+        # `confidence` is required on this branch for the same reason, and
+        # it is the branch that most needs it: `band: none` is fux saying
+        # *do not answer this*, which is a stronger claim than an empty
+        # `results` array a caller may read as "try harder".
+        return built({
+            "answer": None,
+            "citation": None,
+            "source": "index",
+            "confidence": _block_dict(block),
+        })
 
     best = results[0]
     # W-162 — before either rendering branch, so the note reaches the reader
@@ -1573,16 +1690,56 @@ def cmd_answer(args) -> int:
             # `current` — two statements about one answer disagreeing, which is
             # the exact failure this plane exists to prevent. Caught by running
             # it, not by a test, which is why the regression test below exists.
-            block = _upgraded(block, referred)
-            extra = _provenance_for(root, args, referred, block)
-            _print_refer_answer(referred, args.json, block, extra=extra, show_band=_show_band(args))
-            return 0
+            upgraded = _upgraded(block, referred)
+            extra = _provenance_for(root, args, referred, upgraded)
+            payload = _refer_payload(referred, upgraded)
+            payload.update(extra or {})
+            return built(payload, block=upgraded, extra=extra, bundle=referred)
 
     extra = _provenance_for(root, args, None, block, best=best)
-    return _print_index_answer(
-        root, best, args.json, requested=no_refer_flag, block=block, extra=extra,
-        show_band=_show_band(args),
+    phrases = _phrases_for(root, best.id)
+    title = _resolve_title(root, best.id, best.title)
+    payload = {
+        "answer": {"title": title, "phrases": phrases},
+        # ⚠ **No `pinned` key here, deliberately** (W-162). `answer`'s
+        # citation is built from an `AskResult` on this path and from a
+        # refer-plane `Citation` on the other, and `pinned` is only on the
+        # first — so a key present on one path and absent on the other
+        # would be **worse than a key on neither**: a consumer reading
+        # `citation.pinned` would see `false` from the refer path for a
+        # question that genuinely is pinned. What carries the pin on
+        # `answer` is the `note:` on stderr, which `build_answer` emits
+        # before either branch and therefore on every path.
+        "citation": {"id": best.id, "loc": best.loc, "score": best.score},
+        "source": "index",
+        # Deliberately NOT upgraded: nothing was fetched on this
+        # path, so `verified` stays `unverified`. Reporting
+        # `current` because the index is internally consistent
+        # would be the exact collapse the refer plane's four-state
+        # verdict exists to prevent.
+        "confidence": _block_dict(block),
+    }
+    payload.update(extra or {})
+    return built(
+        payload, extra=extra, best=best, title=title, phrases=phrases,
+        requested=bool(no_refer_flag),
     )
+
+
+def cmd_answer(args) -> int:
+    """`fux answer` — `build_answer`'s payload, rendered."""
+    root = _root()
+    built = build_answer(root, args)
+    if args.json:
+        print(json_mod.dumps(built.payload, indent=_JSON_INDENT))
+    elif built.bundle is not None:
+        _print_refer_answer(built)
+    elif built.best is not None:
+        _print_index_answer(built)
+    else:
+        _decline()
+        _declare_confidence(built.block, built.show_band)
+    return 0
 
 
 def _provenance_for(root: Path, args, bundle, block, *, best=None) -> dict:
@@ -1890,130 +2047,90 @@ def _gated(payload: dict, show: bool) -> dict:
     return payload
 
 
-def _print_refer_answer(bundle, as_json: bool, block=None, extra=None, *, show_band: bool) -> None:
-    """The fetched, re-scored answer — and the one path where `verified` is real.
+def _refer_payload(bundle, block) -> dict:
+    """The fetched, re-scored answer's `--json` — and the one path where `verified` is real.
 
     **This is where the fourth signal stops being a placeholder.** `ask` and
     `find` never fetch, so they can only ever report `unverified`. Here the
     refer plane has actually compared the fetched bytes against the sha the
-    index ranked on, so the block is upgraded to that verdict before it is
-    emitted — and a `stale` verdict demotes the band to `partial` on its own,
-    with no threshold involved (SR-CONFIDENCE decision 3).
+    index ranked on, so `block` arrives upgraded to that verdict — and a
+    `stale` verdict demotes the band to `partial` on its own, with no
+    threshold involved (SR-CONFIDENCE decision 3).
     """
     citations = bundle.assembled.citations
+    return {
+        "answer": {
+            # ⚠ **`id`/`loc`/`sha` per passage are ADDITIVE and W-108
+            # requires them.** Passages may now come from different
+            # documents, and a list of texts under a single top-level
+            # `citation` would attribute the second document's prose to the
+            # first — in the one product whose promise is that a citation is
+            # checkable. No key was removed or repurposed, which is W-48's
+            # actual rule; `citation` still names the winning passage's
+            # document and means exactly what it meant.
+            "passages": [
+                {
+                    "id": c.doc_id,
+                    "loc": c.locator,
+                    "sha": c.sha,
+                    "heading": c.heading,
+                    "text": c.text,
+                    "score": c.score,
+                    # SR-REFER decision 17 / SR-ANSWER decision 9 promised
+                    # this and the payload did not carry it (W-140 row 2).
+                    # Additive: no key removed or repurposed.
+                    "ordinal": c.ordinal,
+                }
+                for c in citations
+            ]
+        },
+        "citation": {
+            "id": citations[0].doc_id,
+            "loc": citations[0].locator,
+            "sha": citations[0].sha,
+            "freshness": _freshness_of(bundle),
+        },
+        "source": "refer",
+        "confidence": _block_dict(block),
+    }
+
+
+def _print_refer_answer(built: AnswerBuilt) -> None:
+    """The fetched answer as text: every passage, then its locator."""
+    bundle = built.bundle
     freshness = _freshness_of(bundle)
     by_doc = _freshness_by_doc(bundle)
-    block = _upgraded(block, bundle)
-
-    if as_json:
-        # ⚠ **This branch used to print unvalidated.** `output.schema.json`
-        # claims *"`fux answer --json` is validated against this before it is
-        # printed"*, and only the no-match branch went through `_emit` — a
-        # promise in a declaration that nothing enforced, which is the same
-        # defect class W-84 found in the MCP tool descriptions. Routed through
-        # `_emit` here so the claim is true of every branch.
-        payload = {
-            "answer": {
-                # ⚠ **`id`/`loc`/`sha` per passage are ADDITIVE and W-108
-                # requires them.** Passages may now come from different
-                # documents, and a list of texts under a single top-level
-                # `citation` would attribute the second document's prose to the
-                # first — in the one product whose promise is that a citation is
-                # checkable. No key was removed or repurposed, which is W-48's
-                # actual rule; `citation` still names the winning passage's
-                # document and means exactly what it meant.
-                "passages": [
-                    {
-                        "id": c.doc_id,
-                        "loc": c.locator,
-                        "sha": c.sha,
-                        "heading": c.heading,
-                        "text": c.text,
-                        "score": c.score,
-                        # SR-REFER decision 17 / SR-ANSWER decision 9 promised
-                        # this and the payload did not carry it (W-140 row 2).
-                        # Additive: no key removed or repurposed.
-                        "ordinal": c.ordinal,
-                    }
-                    for c in citations
-                ]
-            },
-            "citation": {
-                "id": citations[0].doc_id,
-                "loc": citations[0].locator,
-                "sha": citations[0].sha,
-                "freshness": freshness,
-            },
-            "source": "refer",
-            "confidence": _block_dict(block),
-        }
-        payload.update(extra or {})
-        _emit(_gated(payload, show_band), "answer_payload", band_requested=show_band)
-        return
-
     # ⚠ **One locator PER PASSAGE, not one for the answer** (W-108). This
     # printed every passage above `citations[0]`'s locator, which was already
     # wrong before the top-3 change — a second passage of the same document has
     # its own line range, and the single trailing line named the first one's.
     # With passages from three documents it would name the wrong *file*.
-    for c in citations:
+    for c in bundle.assembled.citations:
         if c.heading:
             print(f"# {c.heading}\n")
         print(c.text)
         print()
         print(f"  -- {c.locator} (sha {c.sha[:12]}, {by_doc.get(c.doc_id, freshness)})")
         print()
-    _declare_provenance(extra)
-    _declare_confidence(block, show_band)
+    _declare_provenance(built.extra)
+    _declare_confidence(built.block, built.show_band)
 
 
-def _print_index_answer(
-    root: Path, best: AskResult, as_json: bool, *, requested: bool, block=None, extra=None,
-    show_band: bool,
-) -> int:
-    """The M2 path: the winning record's own extracted structure — no fetch.
+def _print_index_answer(built: AnswerBuilt) -> None:
+    """The M2 path as text: the winning record's own extracted structure — no fetch.
 
-    `requested` distinguishes why: the caller passed `--no-refer`, versus
+    `built.requested` distinguishes why: the caller passed `--no-refer`, versus
     refer being tried and producing nothing usable (unreachable source, no
     fetcher configured, a citation deleted from the working tree).
     """
-    phrases = _phrases_for(root, best.id)
-    title = _resolve_title(root, best.id, best.title)
-
-    if as_json:
-        payload = {
-            "answer": {"title": title, "phrases": phrases},
-            # ⚠ **No `pinned` key here, deliberately** (W-162). `answer`'s
-            # citation is built from an `AskResult` on this path and from a
-            # refer-plane `Citation` on the other, and `pinned` is only on the
-            # first — so a key present on one path and absent on the other
-            # would be **worse than a key on neither**: a consumer reading
-            # `citation.pinned` would see `false` from the refer path for a
-            # question that genuinely is pinned. What carries the pin on
-            # `answer` is the `note:` on stderr, which `cmd_answer` emits
-            # before either branch and therefore on every path.
-            "citation": {"id": best.id, "loc": best.loc, "score": best.score},
-            "source": "index",
-            # Deliberately NOT upgraded: nothing was fetched on this
-            # path, so `verified` stays `unverified`. Reporting
-            # `current` because the index is internally consistent
-            # would be the exact collapse the refer plane's four-state
-            # verdict exists to prevent.
-            "confidence": _block_dict(block),
-        }
-        payload.update(extra or {})
-        _emit(_gated(payload, show_band), "answer_payload", band_requested=show_band)
-        return 0
-
-    print(title)
-    for phrase in phrases:
+    print(built.title)
+    for phrase in built.phrases:
         print(f"  - {phrase}")
-    print(f"\n  -- {best.loc}")
-    reason = "--no-refer was passed" if requested else "the source could not be reached or verified"
+    print(f"\n  -- {built.best.loc}")
+    reason = "--no-refer was passed" if built.requested else "the source could not be reached or verified"
     print(f"\n(from the index's own structure — {reason})")
-    _declare_provenance(extra)
-    _declare_confidence(block, show_band)
-    return 0
+    _declare_provenance(built.extra)
+    _declare_confidence(built.block, built.show_band)
 
 
 def _declare_provenance(extra) -> None:

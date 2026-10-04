@@ -26,6 +26,14 @@ Rules:
 
 ---
 
+## 2026-10-04 — **W-247: one payload, one place — the CLI renders what `fux.api` builds**
+
+| what | evidence |
+|---|---|
+| **refactor** | `query.build_ask/build_find/build_answer`; `cmd_*` render, `fux.api` reads the same builders; `redirect_stdout` gone; library frozen surface unchanged ([SR-API](../records/0154_api.md)) |
+| **gate** | 537/537 CLI invocations byte-identical (291 repo, 246 rung-01000) + 93 library calls — [run](regression/2026-10-04-api-renderer-split/report.md), `informed`, a surface capture |
+| **parity** | differential arm 0/225 |
+
 ## 2026-10-04 — **W-245: the record sentences that stopped being true**
 
 | what | evidence |
