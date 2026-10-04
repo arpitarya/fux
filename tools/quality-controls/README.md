@@ -51,6 +51,9 @@ have never been separable in any number this project has filed.**
 | **the graded table set** | [`w144_graded.py`](w144_graded.py) | *is the new order **better***, truth from prose density, with an `inverse` positive control and a `placebo` |
 | **the band sweep** | [`band_sweep.py`](band_sweep.py) | where the **abstention threshold** sits, as a REPLAY: `capture` runs the ladder once storing the whole confidence block, and `sweep` re-evaluates the band at each candidate `separation_floor` by constructing **the engine's own `Confidence`**. It adjudicates through `verdict.py` and prices the trade at SR-WORK-QUALITY decision 6's frozen `c = 2`, with `evidence_quoted` **named as the proxy it is** |
 | **the fence/depth arms** | [`w115_instrument.py`](w115_instrument.py) | W-115's heading grammar and key-depth cap, two arms patched at one seam each, with a `selftest` that is 22c(b)'s headroom proof |
+| **the ingest split** | [`ingest_split.py`](ingest_split.py) | W-256 §8: full vs delta ingest on an unchanged rung, every gap between phase events named (W-239's timer folded walk/parse/sha into none) — rules B-002 on the number |
+| **the `doc_coverage` replay** | [`doc_coverage_replay.py`](doc_coverage_replay.py) | W-256 §2: abstention gate 2 — each fixed `doc_coverage_floor` replayed over the stored W-213 confidence blocks with the engine's own `Confidence`, labels from the retired sets, against a rate-matched coin |
+| **the loopback network** | [`loopback_network.py`](loopback_network.py) | W-256 §4: a 127.0.0.1 server for B-102 (429 retries, `rate_limited[host]`, doctor) and B-124 (`keep=true`, journalled `as-ingested` after the server goes down) |
 
 ## 🔴 The endpoint is the thing that fails, not the field
 
