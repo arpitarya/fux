@@ -172,7 +172,7 @@ def _fetch_url(root: Path, doc_id: str, loc: str, fetcher) -> Fetched:
         result = fetcher(loc)
     except Exception as exc:  # consumer code: never let it crash the query
         raise FuxError(f"{loc}: fetcher raised {type(exc).__name__}: {exc}") from exc
-    raw, _content_type = _unpack(result)
+    raw, _content_type = _unpack(result, loc)
     if raw is None:
         raise FuxError(f"{loc}: fetcher returned no bytes")
     # The declared decoder, for `from_acquired`'s reason: this sha is compared

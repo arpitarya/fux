@@ -54,7 +54,7 @@ def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
 
 FETCHER = '''\
 def fetch(url):
-    return "# Page " + url.rsplit("/", 1)[-1] + chr(10) * 2 + "fetched body" + chr(10)
+    return ("# Page " + url.rsplit("/", 1)[-1] + chr(10) * 2 + "fetched body" + chr(10)).encode(), "text/markdown"
 '''
 
 

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@232892e6641d, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@63f4c4872bd7, src/fux/query/analyzer.py@8f02dd1c4e44, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@71890f0ff70a, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@6d04d2c5491b, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@352450f33e0c, node/test/analyzer.test.mjs@2d0342e628a6]
+owns: [src/fux/query/rank.py@6811ca222c82, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@63f4c4872bd7, src/fux/query/analyzer.py@8f02dd1c4e44, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@71890f0ff70a, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@3ef9b4ebccf0, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@352450f33e0c, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 2e56389eef341474b8ed25de7b0ab0115984e13d4a430b1ce9d3441044a92fe1
+content_sha: 773d75f513f65ca8b18463afe766d722fa9d27b560b97f9a547d19f4fe0e74b3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -624,6 +624,8 @@ intent_weight`. `of(record)` is `priority_for(loc) × intent_for(loc)`, and
 **The analyzer takes one more input: the repo's identifier families** ([SR-IDENTIFIERS](0160_identifiers.md)). Each match adds one canonical term beside the pipeline above and changes none of its steps; with no families the output is analyzer v3's, byte for byte, and `ANALYZER_VERSION` stays `v3` because the engine's pipeline did not change.
 
 **No decision here moved** (W-242 Tier 1, 2026-10-03): Node's `Weighting` gains `maximum`, the twin of `Weighting.maximum` — `max(1.0, priority weights)` times the intent factor when the intent prior is active — read only by the Node accelerator's ceiling ([SR-T1-ACCELERATOR](0110_accelerator.md) decision 18).
+
+**No decision here moved** (W-253, 2026-10-04): `Weighting.priority_for` now matches a `[priority]` entry exactly or at a `/` boundary, per [SR-TUNE](0135_tuning.md) decision 8a; the Node twin already did.
 
 ### Consequences
 

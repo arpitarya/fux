@@ -22,7 +22,7 @@ stays a signal (SR-WORK-OPEN-QUEUE rule 3); three 🟢 rows that nobody is about
 to pick would not be.
 
 **Ruled the same day, straight into items** (named so the map is whole):
-B-100 + B-146 + B-151 → [W-253](../open/W-253-three-point-zero-contract-cleanups.md) ·
+B-100 + B-146 + B-151 → W-253 ·
 B-150 → [W-254](../open/W-254-frontmatter-passage-unit.md) ·
 B-260 → [W-255](../open/W-255-pii-regex-bound.md) ([compare](../compare/pii-regex-bound.compare.md)) ·
 B-002/B-098, B-113/B-261 gate 2, B-103 → [W-256](../open/W-256-no-key-measurements.md).

@@ -48,7 +48,7 @@ def fetch(url):
     if "boom" in url:
         raise RuntimeError("no such page")
     name = url.rsplit("/", 1)[-1]
-    return f"# Page {name}\\n\\nrendered body about {name}\\n"
+    return (f"# Page {name}\\n\\nrendered body about {name}\\n".encode(), "text/markdown")
 '''
 
 URLS_FILE = ".fux/sources/urls"
@@ -271,6 +271,25 @@ def test_fetch_all_calls_hooks_once_and_skips_failures(tmp_path):
     assert callable(module.connect) and callable(module.close)
 
 
+def test_a_fetcher_returning_a_str_is_a_named_skip_not_a_crash(tmp_path):
+    """W-253: the bare-`str` ramp is gone. The URL is skipped with a reason that
+    names the fetcher and the contract; its neighbours are unaffected."""
+    _write_fetcher(
+        tmp_path,
+        "def fetch(url):\n"
+        "    if url.endswith('/old'):\n"
+        "        return '# Old\\n\\nmarkdown, the pre-contract shape\\n'\n"
+        "    return ('# New\\n\\nbody\\n'.encode(), 'text/markdown')\n",
+    )
+    fetched, skipped = fetch_all(
+        tmp_path, _entries(["https://x.test/old", "https://x.test/new"]), {}, **url_limits()
+    )
+    assert [f.url for f in fetched] == ["https://x.test/new"]
+    assert [s.rel_path for s in skipped] == ["https://x.test/old"]
+    assert "tuple[bytes, str]" in skipped[0].reason
+    assert ".fux/fetchers/mw.py" in skipped[0].reason
+
+
 # A fake fetcher records what it saw next to itself — `fetch_all` imports
 # the module privately, so its state is only observable through the filesystem.
 _RECORDER = 'import pathlib\n_LOG = pathlib.Path(__file__).with_name("log.txt")\n'
@@ -306,13 +325,13 @@ def test_configure_is_optional_and_absent_table_is_empty(tmp_path):
         + 'def configure(config):\n'
         '    _LOG.write_text(repr(config))\n'
         'def fetch(url):\n'
-        '    return "# T\\n\\nbody\\n"\n',
+        '    return ("# T\\n\\nbody\\n".encode(), "text/markdown")\n',
         encoding="utf-8",
     )
     fetch_all(tmp_path, _entries(["https://x.test/a"]), {}, **url_limits())  # an empty table
     assert (tmp_path / ".fux" / "fetchers" / "log.txt").read_text(encoding="utf-8") == "{}"
 
-    _write_fetcher(tmp_path, 'def fetch(url):\n    return "# T\\n\\nbody\\n"\n', encoding="utf-8")
+    _write_fetcher(tmp_path, 'def fetch(url):\n    return ("# T\\n\\nbody\\n".encode(), "text/markdown")\n', encoding="utf-8")
     fetched, _ = fetch_all(tmp_path, _entries(["https://x.test/a"]), {"k": 1}, **url_limits())  # no configure defined
     assert len(fetched) == 1
 
@@ -327,7 +346,7 @@ def test_configure_runs_before_connect(tmp_path):
         '    ORDER.append("connect")\n'
         'def fetch(url):\n'
         '    _LOG.write_text(",".join(ORDER))\n'
-        '    return "# T\\n\\nbody\\n"\n',
+        '    return ("# T\\n\\nbody\\n".encode(), "text/markdown")\n',
         encoding="utf-8",
     )
     fetch_all(tmp_path, _entries(["https://x.test/a"]), {}, **url_limits())
@@ -337,7 +356,7 @@ def test_configure_runs_before_connect(tmp_path):
 def test_configure_raising_is_a_loud_failure_not_a_skip(tmp_path):
     _write_fetcher(tmp_path, 
         'def configure(config):\n    raise ValueError("unknown key: prot")\n'
-        'def fetch(url):\n    return "# T\\n\\nbody\\n"\n',
+        'def fetch(url):\n    return ("# T\\n\\nbody\\n".encode(), "text/markdown")\n',
         encoding="utf-8",
     )
     with pytest.raises(FuxError, match="configure\\(\\) failed: unknown key"):
@@ -346,7 +365,7 @@ def test_configure_raising_is_a_loud_failure_not_a_skip(tmp_path):
 
 def test_fetch_all_sanitizes_hostile_line_separators(tmp_path):
     _write_fetcher(tmp_path, 
-        'def fetch(url):\n    return "# T\\n\\nbefore\\u2028after \\u2029 \\u0085 end\\n"\n',
+        'def fetch(url):\n    return ("# T\\n\\nbefore\\u2028after \\u2029 \\u0085 end\\n".encode(), "text/markdown")\n',
         encoding="utf-8",
     )
     fetched, skipped = fetch_all(tmp_path, _entries(["https://x.test/a"]), {}, **url_limits())
@@ -488,7 +507,7 @@ def test_ver_bumps_when_fetched_content_changes(tmp_path):
     run(tmp_path, refresh_urls=True, full=False)
     assert store.read_index(tmp_path)["url:https://x.test/a"]["ver"] == 1
 
-    _write_fetcher(tmp_path, 'def fetch(url):\n    return "# Page a\\n\\nnew body\\n"\n', encoding="utf-8")
+    _write_fetcher(tmp_path, 'def fetch(url):\n    return ("# Page a\\n\\nnew body\\n".encode(), "text/markdown")\n', encoding="utf-8")
     run(tmp_path, refresh_urls=True, full=False)
     assert store.read_index(tmp_path)["url:https://x.test/a"]["ver"] == 2
 
@@ -595,7 +614,7 @@ def test_a_line_attribute_beats_the_source_wide_setting(tmp_path):
 
 CDP_FETCHER = """
 def fetch(url):
-    return "# Rendered" + chr(10) * 2 + "browser fetcher body" + chr(10)
+    return ("# Rendered" + chr(10) * 2 + "browser fetcher body" + chr(10)).encode(), "text/markdown"
 """
 
 
@@ -724,8 +743,8 @@ def test_a_url_record_shows_its_real_title(tmp_path):
 LINKING_FETCHER = '''\
 def fetch(url):
     if url.endswith("/a"):
-        return "# Page a\\n\\nsee [b](https://x.test/b) and `docs/keep.md`\\n"
-    return "# Page\\n\\nplain body\\n"
+        return ("# Page a\\n\\nsee [b](https://x.test/b) and `docs/keep.md`\\n".encode(), "text/markdown")
+    return ("# Page\\n\\nplain body\\n".encode(), "text/markdown")
 '''
 
 

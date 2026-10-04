@@ -204,7 +204,6 @@ sites = [
   "src/fux/ingest/urlsrc.py::FetchedUrl.decoder::class::'prose'",
   "src/fux/ingest/urlsrc.py::UrlEntry.update::class::'auto'",
   "src/fux/ingest/urlsrc.py::_PROSE::module::'\\x00prose'",
-  "src/fux/ingest/urlsrc.py::_unpack::path::'text/markdown'",
   "src/fux/mcp.py::_HANDLERS::module::{'fux_search': _search, 'fux_passage': _passage, 'fux_rel...",
   "src/fux/mcp.py::_handle::path::'tools/call'",
   "src/fux/mcp.py::_handle::path::'tools/list'",

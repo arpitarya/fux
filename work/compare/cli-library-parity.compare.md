@@ -30,7 +30,7 @@ filed: 2026-10-03
 > output"* the record warns against) and his `truncated` on `path` (W-140 row
 > 12). Converging on the library would delete ruled content and move **two**
 > CLIs; the honest direction is library → CLI, which reopens SR-API d1's freeze.
-> Built as [W-253](../open/W-253-three-point-zero-contract-cleanups.md).
+> Built as W-253.
 > **Reopen-trigger:** a consumer reports scripting a pre-3.0 `--json` shape of
 > `find`; or SR-API d1 is reopened.
 

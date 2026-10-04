@@ -242,10 +242,10 @@ def test_no_update_is_refused_on_the_dirs_list():
 # -- the real ingest path --------------------------------------------------
 
 
-FAKE = 'def fetch(url):\n    return "# Page\\n\\nbody words here\\n"\n'
+FAKE = 'def fetch(url):\n    return ("# Page\\n\\nbody words here\\n".encode(), "text/markdown")\n'
 EXPLODING = (
     'raise RuntimeError("a pinned URL imported its fetcher")\n'
-    'def fetch(url):\n    return "# Page\\n\\nbody\\n"\n'
+    'def fetch(url):\n    return ("# Page\\n\\nbody\\n".encode(), "text/markdown")\n'
 )
 
 

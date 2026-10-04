@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 549502a66b32408f60d776198d598a5d042670fe21ad2c9f8aed94161b9f4fdd
+content_sha: cd7211daf7df8a4b6431b670e5ab1e0d9d2556c47132b85fbce291f705340ca3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -871,6 +871,8 @@ nothing here changes.
 
 
 The confidence block's pairs and hashes are both analyzed with the repo's identifier families, together, so they stay aligned by hash ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+**No decision here moved** (W-253, 2026-10-04): `find --under` became a component boundary and `find --json` now writes `confidence` before `fused`, per [SR-FIND](0104_find.md) decisions 7 and Consequences and [SR-CLI](0101_cli-surface.md).
 
 ### Consequences
 

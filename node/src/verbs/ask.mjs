@@ -16,6 +16,9 @@
  * `tune.toml` turns the tier on cannot make the frozen baseline verb stop
  * being a baseline, which is the whole value of having the verb.
  *
+ * ⚠ **W-253 changed only `find`'s `--under` and key order** in the Python
+ * half of this one-to-many twin; `ask` already wrote `confidence` first.
+ *
  * ⚠ **No observer hook on this reader.** Python calls `.fux/observers/` once a
  * verb has fully rendered (`cli.main`); Node does not, and that is declared
  * rather than missing — SR-NODE-SEARCH decision 18. The reason is that this

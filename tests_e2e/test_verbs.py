@@ -211,7 +211,7 @@ def test_find_precision_controls(tmp_path):
     plain = _run(tmp_path, "find", "pruning index format").stdout.split()
     assert len(plain) >= 2, "precondition: the query must reach more than one document"
 
-    under = _run(tmp_path, "find", "pruning index format", "--under", "docs/pru")
+    under = _run(tmp_path, "find", "pruning index format", "--under", "docs/pruning.md")
     assert under.stdout.split() == ["docs/pruning.md"]
     assert "[filter] --under removed" in under.stderr
 
@@ -1002,7 +1002,7 @@ def close():
 
 def fetch(url):
     _log("fetch:" + url)
-    return "# Runbook\\n\\nRestart the indexer with `fux build --force`.\\n"
+    return ("# Runbook\\n\\nRestart the indexer with `fux build --force`.\\n".encode(), "text/markdown")
 '''
 
 
@@ -1106,7 +1106,7 @@ def test_a_consumer_drops_a_fetcher_in_and_names_it_on_a_line(tmp_path):
     (fetchers / "http.py").write_text("def fetch(url):\n    return ''\n", encoding="utf-8")
     (fetchers / "glassbox.py").write_text(
         "def fetch(url):\n"
-        "    return '# The pager rota\\n\\nglassbox carried this one\\n'\n",
+        "    return ('# The pager rota\\n\\nglassbox carried this one\\n'.encode(), 'text/markdown')\n",
         encoding="utf-8",
     )
 

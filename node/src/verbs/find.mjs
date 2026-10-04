@@ -57,11 +57,10 @@ function filtered(root, results, query, args, shards) {
   let kept = results;
 
   if (under) {
-    // Plain prefix on `loc`, the same shape `Weighting.priorityFor` matches on.
-    // A trailing slash is NOT appended: `docs/a` matching `docs/ab.md` is what
-    // a prefix means, and inventing a component boundary here would disagree
-    // with `priorityFor`.
-    kept = kept.filter((r) => r.loc === under || r.loc.startsWith(under));
+    // A component boundary (W-253), the one `priorityFor` applies: `docs/a`
+    // keeps `docs/a` and `docs/a/**`, never `docs/ab.md`.
+    const stem = under.endsWith("/") ? under : under + "/";
+    kept = kept.filter((r) => r.loc === under || r.loc.startsWith(stem));
   }
 
   if (requireAll) {
@@ -202,10 +201,11 @@ export function runFind(root, args) {
         ...r, headings: headingsFor(recordFor(root, r.id, shards), query, args.maxHeadings),
       })),
     };
-    if (fused) payload.fused = true;
     // SR-CONFIDENCE decision 11: present ONLY under --band. **Absent means
-    // NOT ASKED FOR — it is never a claim about the answer.**
+    // NOT ASKED FOR — it is never a claim about the answer.** `confidence`
+    // before `fused`, as `ask` writes them (W-253).
     if (confidence && args.band) payload.confidence = confidence.asDict();
+    if (fused) payload.fused = true;
     process.stdout.write(JSON.stringify(payload, null, JSON_INDENT) + "\n");
     declareArchived(results);
     return 0;

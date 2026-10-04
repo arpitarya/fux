@@ -232,7 +232,7 @@ class Weighting:
         if not self.priority:
             return 1.0
         for entry, weight in self.priority:
-            if loc == entry or loc.startswith(entry):
+            if loc == entry or loc.startswith(entry if entry.endswith("/") else entry + "/"):
                 return weight
         return 1.0
 

@@ -15,6 +15,9 @@
  * because `tests/test_node_twins.py` asks the question and the answer is not
  * obvious from the diff.
  *
+ * ⚠ **W-253 removed the bare-`str` fetcher ramp from Python's `_fetch_url`**
+ * (`_unpack` now refuses a `str`). Nothing to port: Node has no fetcher seam.
+ *
  * ⚠ **The suffix candidates below are a pre-existing narrowness, unchanged by
  * that ruling.** A retained blob is named by the format it holds, so a `.pdf`
  * or `.xlsx` blob is not among the four tried here and reads as absent. It was

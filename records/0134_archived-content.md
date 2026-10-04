@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 0cf3d7d3b7fca77821000f92aee23d96fc49a7dcf28f616e4044733e109da9bd
+content_sha: af05717340f5fd0ea03bc23f1d777ceecd13f26482fe8b7d96215d64550c6235
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -487,6 +487,8 @@ this moved where they are written, not what they are.
 
 
 A carried `url:` record re-derived because the identifier-family digest moved keeps its `archived` declaration through `_with_archived`, like every other re-derivation ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+**No decision here moved** (W-253, 2026-10-04): `ingest/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
 
 ### Consequences
 

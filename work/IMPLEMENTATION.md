@@ -26,6 +26,15 @@ Rules:
 
 ---
 
+## 2026-10-04 — **W-253: the 3.0 contract clean-ups (fetcher `str` ramp removed; `/`-boundary `--under` and `[priority]`; `find --json` key order)**
+
+| what | evidence |
+|---|---|
+| **ramp** | `urlsrc._unpack` refuses a `str` return by name; ingest records a named `fetch failed:` skip, never a crash ([SR-FETCHER](../records/0117_fetcher.md) d2, 17d) |
+| **boundary** | `Weighting.priority_for` (Python) gains the `/` boundary Node's `priorityFor` had; `find --under` on both CLIs ([SR-TUNE](../records/0135_tuning.md) d8a, [SR-FIND](../records/0104_find.md) d7) |
+| **key order** | `find --json`: `confidence` before `fused` on both CLIs, documented in [SR-CLI](../records/0101_cli-surface.md) and tested (`tests_e2e/test_w253_contracts.py`) |
+| **parity** | differential arm on this repo: 0 of 225 discordant |
+
 ## 2026-10-04 — **W-225 closed: law L12 is satisfied (stages 5f and 8)**
 
 | what | evidence |

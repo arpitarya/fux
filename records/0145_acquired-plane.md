@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@54b4e504214f]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 9298cc657f1a1743126c1b15b60f96023103985f6fe2d7fbf5b41706cd1f9eb6
+content_sha: e1c01574bc2e6b1c973d551b5f53679923a23d10286378dac36c0bdfb741c9cf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -322,6 +322,8 @@ this moved where they are written, not what they are.
 
 
 `fuxdir.py`'s committed-file table gained `identifiers.toml` and `inspect.toml` ([SR-IDENTIFIERS](0160_identifiers.md)); the `ACQUIRED` declaration is unchanged.
+
+**No decision here moved** (W-253, 2026-10-04): `ingest/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
 
 ### Consequences
 

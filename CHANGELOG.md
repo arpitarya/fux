@@ -8,6 +8,24 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Removed (BREAKING)
+
+- **The bare-`str` fetcher return is refused** (W-253). `fetch(url)` returns
+  `tuple[bytes, str]`; a `str`, or a `str` inside the tuple, now skips that URL
+  by name (the reason cites the fetcher and the contract) instead of being read
+  as prose. 3.0.0-alpha.2 already made every pre-2026-08-26 repository rewrite
+  its URL lines, so the ramp protected nothing the major had not broken. The
+  fix is `return body.encode(), content_type`.
+
+### Changed (BREAKING)
+
+- **`--under` and `[priority]` keys match at a `/` boundary** (W-253), on both
+  CLIs. `--under docs/a` keeps `docs/a` and `docs/a/**`, never `docs/ab.md`; a
+  `[priority]` key `docs` scales `docs/x.md`, no longer `docs-old/x.md`. Node's
+  `priorityFor` and `fux.api.find(under=)` already behaved this way.
+- **`find --json` writes `confidence` before `fused`** (W-253), as `ask` and
+  `fux.api` do. Only a payload carrying both (`-q` with `--band`) differs.
+
 ### Changed
 
 - ⚠ **`.fux/inspect.toml` gains a required `[floors]` table** (W-225 stage 5f):

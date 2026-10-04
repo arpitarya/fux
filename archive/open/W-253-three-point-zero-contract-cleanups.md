@@ -9,9 +9,17 @@ ball: agent
 
 # W-253 — the 3.0 contract cleanups ruled by W-251
 
+**✅ CLOSED 2026-10-04 — built as ruled** (Claude Code; Sonnet built, Opus 5.5 reviewed):
+- **Ramp removed:** `urlsrc._unpack` refuses a `str` (or a `str` inside the tuple) with a `FuxError` naming the fetcher and the contract; ingest reports it as a named `fetch failed:` skip of that URL; `fux add` and verify time raise the same error.
+- **Boundary:** `Weighting.priority_for` and `find --under` match exactly or at a `/` boundary on both CLIs (Node's `priorityFor` already did).
+- **Key order:** `find --json` writes `confidence` before `fused` on both CLIs.
+- Tests: a `str` fetcher is a named skip beside a fetched neighbour; `docs` vs `docs-old`; `tests_e2e/test_w253_contracts.py` (both CLIs). Differential arm on this repo: 0 of 225 discordant. Unit 6425 (8 known ladder-seed failures, W-240), e2e 162, node 217.
+- DoD 4's conversion of `test_source_verbs.py` / `test_doctor_fetcher_bindings.py` was not needed: their `str` fixtures are never invoked.
+- Live successors: [SR-FETCHER](../../records/0117_fetcher.md) d2/17d, [SR-FIND](../../records/0104_find.md) d7, [SR-TUNE](../../records/0135_tuning.md) d8a, [SR-API](../../records/0154_api.md) d6, [SR-CLI](../../records/0101_cli-surface.md) §key order.
+
 **Model:** Claude Code, **Sonnet** — every change is against a written sentence
 and is parity-testable by the existing differential arm; nothing here needs a
-diagnosis. **Ratified 2026-10-04 by delegation ([W-251](W-251-backlog-audit-rulings.md)
+diagnosis. **Ratified 2026-10-04 by delegation ([W-251](../../work/open/W-251-backlog-audit-rulings.md)
 §4 rows #4 and #10), not built.**
 
 **Why one item.** All three are breaking-in-letter changes that are free inside
@@ -52,7 +60,7 @@ block in `CHANGELOG.md`, and the differential arm reads the result once.
 `changed_since` stderr line to a `--json` field (B-148). Its value depends on
 the previous run's gitignored `.fux/runtime/last-cited.json`, so `answer --json`
 would differ between two machines on identical bytes — the byte-stability class
-SR-CLI veto 5 forbids. The sentence lands via [W-245](W-245-record-sentences-stale.md)
+SR-CLI veto 5 forbids. The sentence lands via [W-245](../../work/open/W-245-record-sentences-stale.md)
 (SR-ANSWER d10).
 
 **Left for Arpit, not in this item:** the graph verbs' `--json` shape (B-147,
@@ -91,7 +99,7 @@ W-251 §3 #4).
 
 - The graph verbs' payload shape (B-147) — Arpit's.
 - `changed_since` as a field — refused above.
-- [W-247](W-247-api-renderer-split.md)'s renderer split; it does not need to
+- [W-247](../../work/open/W-247-api-renderer-split.md)'s renderer split; it does not need to
   land first (none of these lines are the ones it moves).
 
 ## Hazards

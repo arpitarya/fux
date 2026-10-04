@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@eafa474928d8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@7a5371c09e45, src/fux/progress.py@10364bd02e0a, tests_e2e@60bd0dcdc3ca, node/fux.mjs@b8ee2d6ca979]
+owns: [src/fux/cli.py@eafa474928d8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@47c0608385ee, node/fux.mjs@b8ee2d6ca979]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 89b012b082e42fd44e05ba7783e59e44f6041d0886b6bc657581812d72b75918
+content_sha: 5ddbea5c1f53ae5dcc49c2ee1d024c662a6e8952b57eae7033bc61d6196ed393
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -933,6 +933,10 @@ $ fux ask "why did pruning fail" --json
 }
 # exit 0
 ```
+
+**Key order is part of the contract** (W-253): `results` first, then
+`confidence` (only under `--band`), then `fused` (only when `-q` fused), in
+`ask`, `find` and `fux.api` alike; Python and Node write the same bytes.
 
 A decline is exit 0, with no results:
 

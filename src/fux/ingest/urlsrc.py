@@ -30,9 +30,9 @@ attribute with all three layers.
 
 Contract (documented in each generated fetcher's docstring too):
   - required `fetch(url: str) -> tuple[bytes, str]` — the bytes the server
-    sent plus the `Content-Type` it declared. ⚠ A bare `str` is still accepted
-    and read as already-prose, so pre-2026-08-26 fetchers keep working; may
-    raise, which records the URL as skipped, never a crash.
+    sent plus the `Content-Type` it declared. ⚠ A `str` is refused (the
+    bare-`str` ramp was removed in 3.0, W-253) and the URL is skipped by name;
+    may raise, which records the URL as skipped, never a crash.
   - optional `connect()` / `close()` — called once around that fetcher's batch.
   - optional `configure(config: dict) -> None` — called once after import,
     before `connect()`, with `[sources.url.config]` verbatim. Fux never reads
@@ -788,7 +788,13 @@ def fetch_all(
                         Skipped(rel_path=url, reason=f"fetch failed: {exc}", kind=UNFETCHED)
                     )
                     continue
-                raw, content_type = _unpack(text)
+                try:
+                    raw, content_type = _unpack(text, fetcher_path)
+                except FuxError as exc:
+                    skipped.append(
+                        Skipped(rel_path=url, reason=f"fetch failed: {exc}", kind=UNFETCHED)
+                    )
+                    continue
                 if raw is None:
                     skipped.append(
                         Skipped(rel_path=url, reason="fetcher returned no bytes", kind=UNFETCHED)
@@ -1015,24 +1021,28 @@ def validate_group(module, urls: list[str], known: dict[str, str]) -> tuple[set[
     return unchanged, shas
 
 
-def _unpack(result) -> tuple[bytes | None, str]:
+def _unpack(result, fetcher: str) -> tuple[bytes | None, str]:
     """A fetcher's return value -> `(bytes, content type)`.
 
-    ⚠ **A bare `str` is still accepted, and that is a deliberate transition
-    ramp rather than an oversight.** Every consumer fetcher written before
-    2026-08-26 returns markdown; refusing them outright would break repos on a
-    contract change they never read. A `str` is treated as already-prose, which
-    is exactly what it was.
+    ⚠ **A `str` is refused, as of 3.0 (W-253).** The bare-`str` ramp protected
+    fetchers written before 2026-08-26 from a contract they had not read;
+    3.0.0-alpha.2 already made every such repository rewrite its URL lines
+    (SR-URL-LIST decisions 16-17), so it protected nothing the major had not
+    broken. The refusal is a `FuxError` naming the fetcher and the contract; the
+    ingest loop turns it into a named skip of that URL, never a crash
+    (SR-FETCHER decision 2).
     """
+    if isinstance(result, str) or (isinstance(result, tuple) and result and isinstance(result[0], str)):
+        raise FuxError(
+            f"{fetcher}: fetch() returned a str; the contract is "
+            "`fetch(url) -> tuple[bytes, str]` (the bytes the server sent, and its "
+            "Content-Type) - return `(body.encode(), content_type)`"
+        )
     if isinstance(result, tuple) and len(result) == len(("raw", "content_type")):
         raw, content_type = result
-        if isinstance(raw, str):
-            raw = raw.encode("utf-8")
         if not isinstance(raw, (bytes, bytearray)) or not raw:
             return None, ""
         return bytes(raw), str(content_type or "")
-    if isinstance(result, str):
-        return (result.encode("utf-8"), "text/markdown") if result.strip() else (None, "")
     if isinstance(result, (bytes, bytearray)) and result:
         return bytes(result), ""
     return None, ""

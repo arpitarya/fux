@@ -40,7 +40,7 @@ def configure(config):
 
 def fetch(url):
     _log(f"fetch:{url}")
-    return f"# Page\\n\\nrendered body for {url}\\n"
+    return (f"# Page\\n\\nrendered body for {url}\\n".encode(), "text/markdown")
 '''
 
 
@@ -290,8 +290,8 @@ def test_two_urls_behind_different_fetchers_each_get_their_own(tmp_path):
          ("url:https://x.test/b", "https://x.test/b", "s2")],
     )
     try:
-        assert "http body for https://x.test/a" in fetch("https://x.test/a")
-        assert "cdp body for https://x.test/b" in fetch("https://x.test/b")
+        assert "http body for https://x.test/a" in fetch("https://x.test/a")[0].decode()
+        assert "cdp body for https://x.test/b" in fetch("https://x.test/b")[0].decode()
     finally:
         close()
 

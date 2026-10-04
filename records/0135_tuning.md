@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@f5fe482723d1, .fux/tune.toml@fbc012c8ee4f, node/src/config/tune.mjs@d9a132c42f83]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 5d70ab573864bf84a832e3801292f549ba41d4d4a9bdbd4a2b643bd2beb7b35d
+content_sha: 75e1fdeb02997c1b6008a28069c3b664ceb16ede02a21681bdba0546e9e3c736
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -426,7 +426,10 @@ cannot copy that, and the reason is a property worth being pleased about: its
 source lists are loader-sorted and file order is presentation only, so there is
 no first.** Longest-match is order-independent, deterministic, and consistent
 with [SR-DIR-LIST](0120_dir-list.md) decision 2b's order-independent
-exclusions. Keys are unique, so ties cannot occur.
+exclusions. Keys are unique, so ties cannot occur. An entry matches a location
+exactly or at a `/` boundary (`docs` scales `docs/x.md`, never
+`docs-old/x.md`) — a source entry names a directory, not a string prefix; Node's
+`priorityFor` had this from the start, Python's gained it in W-253.
 
 **8b. It composes with the other document multipliers by multiplication.** All
 default to `1.0`, so the no-op case survives, and **multiplication is
@@ -1051,7 +1054,7 @@ step 9, 2026-09-28; ruled D2 · I1 · M1 · S1 on 2026-09-24 in
   nothing else is accepted. A glob matches the **whole** location, `*` crosses
   `/`, `?` is one character. Where two match, **the longest wins**, ties by code
   point, so the answer never depends on file order (L4). ⚠ **Not `[priority]`'s
-  matcher**: that one is a path prefix (8a).
+  matcher**: that one is a path prefix at a `/` boundary (8a).
 - **`intent_weight` scales a document whose declared type is the one the
   question's cue prefers by `1 + intent_weight`.** The cue lexicon is a fixed
   engine value (`[intent]` in `constants.toml`), not a key here: the frozen bar

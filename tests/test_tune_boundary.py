@@ -475,6 +475,17 @@ def test_longest_matching_priority_entry_wins(corpus):
     assert w.priority_for("z/x.md") == 1.0
 
 
+def test_a_priority_entry_is_a_directory_not_a_string_prefix(corpus):
+    """W-253: `docs` scales `docs/x.md` and `docs`, never `docs-old/x.md`."""
+    from fux.query.rank import Weighting
+
+    w = Weighting(priority=(("docs", 4.0),))
+    assert w.priority_for("docs") == 4.0
+    assert w.priority_for("docs/x.md") == 4.0
+    assert w.priority_for("docs-old/x.md") == 1.0
+    assert w.priority_for("docsx.md") == 1.0
+
+
 def test_priority_raises_the_bound_ceiling_but_a_demotion_does_not_lower_it(corpus):
     """`1.0` is always attainable, because an unlisted document is never scaled."""
     from fux.query.rank import Weighting

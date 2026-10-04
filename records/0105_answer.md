@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@7d111b045e0c]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: c406920caad7efb9cfef841b3cf3974c32b1933c01479951dd6dae51af375797
+content_sha: 18bbd9aa49e80049be110a74b3a6ce8f9b07ad429f6788c0446813895ce3e42b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -509,6 +509,8 @@ ships empty, so by default nothing here changes.
 
 
 The question `fux answer` ranks is analyzed with the repo's identifier families, as `ask`'s is ([SR-IDENTIFIERS](0160_identifiers.md)); refer's passage re-score is not — it analyzes the question and the passage in one function, on analyzer v3's terms, and is self-consistent either way.
+
+**No decision here moved** (W-253, 2026-10-04): `find --under` became a component boundary and `find --json` now writes `confidence` before `fused`, per [SR-FIND](0104_find.md) decisions 7 and Consequences and [SR-CLI](0101_cli-surface.md).
 
 ### Consequences
 

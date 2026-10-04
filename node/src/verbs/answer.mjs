@@ -8,6 +8,9 @@
  * answer falls back to `source: "index"` — so this verb can emit
  * `as-ingested` and `unverified`, and never `current` or `stale`, for a URL.
  *
+ * ⚠ **W-253 changed only `find` in the Python half of this one-to-many twin**
+ * (`--under` boundary, `confidence` before `fused`); `answer` is unchanged.
+ *
  * ⚠ **No observer hook on this reader.** Python calls `.fux/observers/` once a
  * verb has fully rendered (`cli.main`); Node does not, and that is declared
  * rather than missing — SR-NODE-SEARCH decision 18. The reason is that this

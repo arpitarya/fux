@@ -623,7 +623,7 @@ def _observed_decoder(root: Path, url: str, fetch: str) -> str:
             except Exception:
                 pass  # teardown failure must not lose what we observed
 
-    raw, content_type = urlsrc._unpack(result)
+    raw, content_type = urlsrc._unpack(result, fetcher_path)
     if raw is None:
         raise FuxError(
             f"{url}: the fetcher returned no bytes, so no `decoder=` could be resolved and "

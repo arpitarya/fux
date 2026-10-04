@@ -1344,12 +1344,11 @@ def _filtered(root: Path, results, args) -> tuple[list, int]:
     kept = list(results)
 
     if under:
-        # Prefix on `loc`, the same shape `Weighting.priority_for` matches on,
-        # so `--under docs/adr` and a `[priority]` key spell a scope the same
-        # way. A trailing slash is not required and not stripped: `docs/a`
-        # matching `docs/ab.md` is what a prefix means, and inventing a
-        # component boundary here would disagree with `priority_for`.
-        kept = [r for r in kept if r.loc == under or r.loc.startswith(under)]
+        # A component boundary (W-253), the one `Weighting.priority_for` and
+        # `fux.api.find(under=)` apply: `docs/a` keeps `docs/a` and `docs/a/**`,
+        # never `docs/ab.md`. A trailing slash is neither required nor stripped.
+        stem = under if under.endswith("/") else under + "/"
+        kept = [r for r in kept if r.loc == under or r.loc.startswith(stem)]
 
     if require_all:
         # Over the COMMITTED record's terms — never fetched text. `find` is an
@@ -1431,13 +1430,14 @@ def cmd_find(args) -> int:
                 for r in results
             ]
         }
-        if fused:
-            payload["fused"] = True
         # SR-CONFIDENCE decision 11: present only under `--band`. **Absent
         # means NOT ASKED FOR — it is never a claim about the answer**, which
         # is why the schema makes it conditional rather than optional-in-prose.
+        # `confidence` before `fused`, as `ask` and `fux.api` write them (W-253).
         if block is not None and _show_band(args):
             payload["confidence"] = block.as_dict()
+        if fused:
+            payload["fused"] = True
         print(json_mod.dumps(payload, indent=_JSON_INDENT))
         _declare_archived(results)
         return 0

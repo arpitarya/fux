@@ -269,7 +269,7 @@ def test_a_ttl_hit_returns_what_a_live_fetch_would_have(repo):
 
     def fetcher(url):
         calls.append(url)
-        return PAGE
+        return PAGE.encode(), "text/markdown"
 
     policy = Policy(mode=ALWAYS, cache_ttl_seconds=300, timeout_seconds=_TIMEOUT)
     clock = Clock()
@@ -293,7 +293,7 @@ def test_the_cache_is_bypassed_entirely_when_the_ttl_is_zero(repo):
     for _ in range(3):
         bundle = refer(
             repo, "telemetry", url_candidates(), policy=policy,
-            fetcher=lambda u: (calls.append(u), PAGE)[1], fetch_cache=fc, tune=template_tune()
+            fetcher=lambda u: (calls.append(u), (PAGE.encode(), "text/markdown"))[1], fetch_cache=fc, tune=template_tune()
         )
         assert bundle.documents[0].verdict.label != "cached"
     assert len(calls) == 3
@@ -304,7 +304,7 @@ def test_no_cache_prevents_a_cached_verdict_even_with_a_ttl(repo):
     fc = FetchCache(repo, clock=Clock(), max_bytes=_MAX)
     for _ in range(2):
         bundle = refer(repo, "telemetry", url_candidates(), policy=policy,
-                       fetcher=lambda u: PAGE, fetch_cache=fc, tune=template_tune())
+                       fetcher=lambda u: (PAGE.encode(), "text/markdown"), fetch_cache=fc, tune=template_tune())
         assert bundle.documents[0].verdict.label != "cached"
 
 
@@ -336,7 +336,7 @@ def test_the_ttl_store_is_not_arcs_store(repo):
     arc = ARC(100_000)
     fc = FetchCache(repo, clock=Clock(), max_bytes=_MAX)
     refer(repo, "telemetry", url_candidates(), policy=Policy(mode=ALWAYS, cache_ttl_seconds=300, timeout_seconds=_TIMEOUT),
-          fetcher=lambda u: PAGE, cache=arc, fetch_cache=fc, tune=template_tune())
+          fetcher=lambda u: (PAGE.encode(), "text/markdown"), cache=arc, fetch_cache=fc, tune=template_tune())
 
     assert ("https://x.test/p", sha_of(PAGE)) in arc          # ARC keyed by (loc, sha)
     assert list(fc.directory.glob("*.json"))                   # the TTL store, separate

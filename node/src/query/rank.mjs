@@ -67,6 +67,8 @@ export class Weighting {
     const top = Math.max(1.0, ...this.priority.map(([, w]) => w));
     return this.intentActive ? top * this.intentFactor : top;
   }
+  /** Exact match or a `/` boundary, longest entry wins. Python's `priority_for`
+   *  gained this same boundary in W-253; this side had it from the start. */
   priorityFor(loc) {
     let best = 1.0, bestLen = -1;
     for (const [prefix, w] of this.priority) {

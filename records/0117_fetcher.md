@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@80b919e8f56c, src/fux/templates@f8f2f2542fe2]
+owns: [src/fux/ingest/urlsrc.py@4de82bf2d212, src/fux/templates@f8f2f2542fe2]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 3e2cb26aa290207c6eedfb624180ae4d9260f8979cd5f4f541a57ee6bec52c46
+content_sha: 501d984b66a0d4ed1c972f15ac00eb41bf48128f3c1fbf0ffa6a66c14dbe270a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -145,14 +145,13 @@ ever sees the HTTP charset header — a file on disk has none, which is why
 strictly better than sniffing. And it is what lets a **non-HTML URL reach the
 right decoder at all**.
 
-⚠ **A bare `str` return is still accepted, and that is a transition ramp rather
-than an oversight.** A `str` is treated as already-prose markdown, which is
-exactly what the previous contract returned. **This is the one place the old
-contract survives**, and it is what converts a breaking change into a
-deprecation. ⚠ **The cost of removing it has never been measured** —
-`fux-engine` is on PyPI and nobody has checked whether a consumer fetcher exists
-outside this repo. **Do not remove the ramp without measuring what it
-protects.**
+⚠ **The bare-`str` transition ramp was removed in 3.0 (W-251 §4 #10, W-253).**
+`fetch` returns `tuple[bytes, str]`; a `str`, or a `str` inside the tuple, is
+refused with a `FuxError` that names the fetcher and the contract. At ingest that
+is a **named skip of that URL, never a crash**, and at `fux add` and verify time
+it is the same `FuxError` the other fetcher failures raise. 3.0.0-alpha.2
+(SR-URL-LIST decisions 16-17) already made every pre-2026-08-26 repository
+rewrite its URL lines, so the ramp protected nothing the major had not broken.
 
 **3. It is called a *fetcher*, not middleware, not an adapter.** The file, the
 required function, the config key and the per-URL attribute all say `fetch`.
@@ -638,14 +637,13 @@ with no signature ([SR-REFUSAL](0146_refusals.md)). *A login page can no longer
 sneak in under a wrong `Content-Type`* — the case the header-only form could not
 see, because the server was telling the truth about the shell it sent.
 
-⚠ **17d. Decision 2's bare-`str` transition ramp survives this, unmeasured, and
-is now in tension with the ruling.** *"A fetcher emits a format a decoder
-reads"* and *"a `str` is treated as already-prose"* cannot both be the whole
-truth: a fetcher returning markdown is doing the decoder's job, which is what
-the pipe exists to separate. **Not removed** — the ramp's cost was never
-measured, and removing it breaks every consumer fetcher written before
-2026-08-26 on a contract change they did not read. It is named here so the next
-session does not mistake the silence for agreement.
+⚠ **17d. Decision 2's bare-`str` transition ramp was in tension with this
+ruling, and is removed.** *"A fetcher emits a format a decoder reads"* and *"a
+`str` is treated as already-prose"* could not both be the whole truth: a fetcher
+returning markdown is doing the decoder's job, which is what the pipe exists to
+separate. **Removed in 3.0 (W-251 §4 #10, W-253)**: 3.0.0-alpha.2 had already
+broken every consumer fetcher written before 2026-08-26 by requiring them to
+rewrite their URL lines, so the ramp protected nothing the major had not broken.
 
 <!-- L12-NOTE-START -->
 

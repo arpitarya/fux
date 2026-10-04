@@ -144,7 +144,7 @@ def test_a_url_document_verifies_through_the_injected_fetcher(repo):
         "telemetry rota",
         [("url:https://x.test/p", "https://x.test/p", _sha(page))],
         policy=Policy(mode=ALWAYS, timeout_seconds=_TIMEOUT),
-        fetcher=lambda url: page, tune=template_tune()
+        fetcher=lambda url: (page.encode(), "text/markdown"), tune=template_tune()
     )
     assert bundle.documents[0].verdict.label == "current"
     assert bundle.assembled.citations

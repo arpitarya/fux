@@ -101,18 +101,14 @@ def test_a_url_the_list_no_longer_declares_is_refused_rather_than_guessed(tmp_pa
         )
 
 
-def test_a_pre_contract_fetcher_returning_markdown_still_verifies(tmp_path):
-    """The transition ramp `_unpack` keeps, asserted where it is relied on.
-
-    Every consumer fetcher written before 2026-08-26 returns prose. Refusing
-    one here would break verification in repos that upgraded fux and nothing
-    else.
-    """
+def test_a_fetcher_returning_a_str_is_refused_by_name(tmp_path):
+    """The bare-`str` ramp was removed in 3.0 (W-253): a `str` is a `FuxError`
+    naming the contract, never a crash and never silently read as prose."""
     _listed(tmp_path, "https://x.test/p")
-    fetched = fetch_document(
-        tmp_path, "url:https://x.test/p", "https://x.test/p", fetcher=lambda u: "# Heading\n"
-    )
-    assert fetched.content == b"# Heading\n"
+    with pytest.raises(FuxError, match=r"tuple\[bytes, str\]"):
+        fetch_document(
+            tmp_path, "url:https://x.test/p", "https://x.test/p", fetcher=lambda u: "# Heading\n"
+        )
 
 
 def test_a_tuple_returning_fetcher_is_decoded_exactly_as_ingest_decoded_it(tmp_path):
@@ -170,7 +166,7 @@ def test_verify_time_normalization_is_the_same_function_ingest_uses(tmp_path):
 
     _listed(tmp_path, "https://x.test/p")
     raw = "line\r\nnext after"
-    fetched = fetch_document(tmp_path, "url:https://x.test/p", "https://x.test/p", fetcher=lambda u: raw)
+    fetched = fetch_document(tmp_path, "url:https://x.test/p", "https://x.test/p", fetcher=lambda u: (raw.encode(), "text/markdown"))
     assert fetched.content == urlsrc.sanitize(raw)
 
 
@@ -221,7 +217,7 @@ def test_a_fetch_that_finishes_in_time_is_unaffected(tmp_path):
 
     _listed(tmp_path, "https://x.test/p")
     fetched = _fetch_within(
-        5, tmp_path, "url:https://x.test/p", "https://x.test/p", lambda u: "# quick\n"
+        5, tmp_path, "url:https://x.test/p", "https://x.test/p", lambda u: (b"# quick\n", "text/markdown")
     )
     assert fetched.content == b"# quick\n"
 

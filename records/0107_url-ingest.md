@@ -10,7 +10,7 @@ feature: the `url:` source and how ingestion behaves around the fetcher boundary
 owns: []
 laws: [L3, L5, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 3b6a8a35ac86fd6c8b216891b40b283b27811e8bda4768cc2bbcb1c26753429d
+content_sha: bd637866db9638045f8d67132b748ced04befaffd2ad501cb6254add9cdda6b6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -357,6 +357,8 @@ added nothing of its own.
 
 
 **A moved identifier-family digest is a fourth trigger**, beside `pii.toml`, `tune.toml [index]` and a decoder, for re-deriving carried `url:` records from `.fux/acquired/` ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+**No decision here moved** (W-253, 2026-10-04): `ingest/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
 
 ### Consequences
 
