@@ -10,7 +10,7 @@ feature: the refer plane's two caches, and the wall between them
 owns: [src/fux/refer/arc.py@838fb07d8fc5, src/fux/refer/fetchcache.py@0946b328bf10]
 laws: [L2, L3, L4, ex-L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 635fc5e38bbe4b1c41ea494d9ec3d820d0f099a190d8a53bd5fd054612679dc3
+content_sha: bdb76553878fe8ed498c07dc69190472f5875bd78c65b031b51abdd282748877
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -189,8 +189,8 @@ hatch for access-controlled and regulated sources, where a local copy outliving
 the reader's permission is the risk ex-L5 exists for. The TTL, when a caller does
 opt in, is **300 s**.
 
-**This does not touch L3's single exception** (the per-source `snapshot`
-policy). L3 forbids *durable* content; this store is deliberately the opposite
+**This does not touch L3's exceptions** (declared per source on a committed
+line; [SR-LAW-3](0005_LAW-3-content-never-durable.md) §1 names them). L3 forbids *durable* content; this store is deliberately the opposite
 — unindexed, gitignored, TTL-bounded, default-off, and confined to one machine.
 Nothing here is ever committed, so there is nothing for L3 to except.
 

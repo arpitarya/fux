@@ -203,8 +203,9 @@ each to its record; that is all it does now.
   [SR-LAW-2](records/0004_LAW-2-zero-cost.md) carries what it bought, what replaced
   it, and the three things it left unguarded.
 - **L3** · **Content is never durable outside its source system.** The index holds
-  statistics, never content. The single exception is explicit per-source
-  `snapshot` policy. This is the law the whole architecture rests on.
+  statistics, never content. The only exceptions are declared per source on a
+  committed line the operator wrote — §1 names them; none is built as a
+  committed copy today. This is the law the whole architecture rests on.
 - **L4** · **Deterministic — no model in the maintenance path.** Same sources →
   byte-identical index and root hash. No wall-clock output, no unseeded
   randomness, no set-iteration-order dependence. No maintenance path may ever

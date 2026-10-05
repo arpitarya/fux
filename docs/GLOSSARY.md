@@ -127,8 +127,9 @@ convention. Lives in [`work/compare/`](../work/compare/README.md).
 
 **Content-never-durable (the law)** — v0.30's founding constraint: Fux keeps
 **no durable copy of source content**, only the [index](#index-not-a-db) and
-the [ledger](#ledger-l). The single exception is per-source
-[`snapshot` mode](#snapshot-mode), which is explicit and opt-in. This is what
+the [ledger](#ledger-l). The only exceptions are declared per source on a
+committed line the operator wrote, and none is built as a committed copy today
+([`snapshot`](#snapshot-mode) was the reserved name for one and is retired). This is what
 makes the committed artifact small, ACL-safe, and never stale-by-accumulation.
 See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named by [SR-LAWS](../records/0001_LAWS.md), [paper §3](paper/the-fux-index-paper.md).
 
@@ -730,11 +731,14 @@ as the analyzer reads it, where a term lives — sorted on the server) and Index
 [title probes](#title-probe) streamed in behind) — and the server calls
 `fux inspect`'s library for the last two. See [SR-SERVE](../records/0158_serve.md).
 
-**Snapshot (mode)** — The explicit per-source opt-out from
-[content-never-durable](#content-never-durable-the-law): Fux additionally
-commits a machine-made Markdown copy with provenance frontmatter, for
-air-gap availability, PR-reviewed change tracking, or audit retention. The
-archived frontmatter parser's home in v0.30. Built at [M6](../archive/open/W-26-m6-scale-t2.md).
+**Snapshot (mode)** — ⚠ **Retired 2026-10-04** (Arpit, W-251 #25): the name
+L3 once gave its one exception — a per-source *committed* copy of content, for
+air-gap availability or audit retention. **It was never built**, there is no
+`snapshot` attribute in 3.0, and L3 now says only that its exceptions are
+declared per source on a committed line and that no committed copy is built
+today. The per-source retention that does exist is `keep=`, gitignored
+([SR-ACQUIRED](../records/0145_acquired-plane.md)). See
+[SR-LAW-3](../records/0005_LAW-3-content-never-durable.md).
 
 **Template family** — Two or more documents with an **identical heading
 set** — the same form filled in more than once. The *set*, never the sequence:

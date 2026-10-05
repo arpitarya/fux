@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L3
 owns: []
 laws: [L3]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 0849978bb813c1216eb4ac35c7c8373e2251e28d2f83a36d0d0a4cece45c60aa
+content_sha: 5c7ed8c776f29f3881291df04723a67eb4608587c5c9d7b64812151db03c2752
 ---
 
 # SR-LAW-3 — L3 — content is never durable outside its source system
@@ -41,7 +41,7 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 
 | exception | where | why it is not a breach |
 |---|---|---|
-| per-source `snapshot` policy | the source list | the operator asked for it, per source, in a committed line anyone can read |
+| a per-source **committed copy** — reserved, **none built** | the source list | the operator would ask for it, per source, in a committed line anyone can read. No mechanism exists and none is planned; opening one amends this law (Arpit, 2026-10-04, W-251 #25 — the word `snapshot` went with it) |
 | the **acquired plane** (`keep=true`) | `.fux/acquired/`, gitignored | never committed, not rebuildable, and it is what lets a citation be checked when the source is unreachable |
 | **enrichment prose** | `.fux/enrich/` | not corpus content — a written-*about*-the-corpus artifact the consumer authored and chose to commit
 
@@ -98,10 +98,19 @@ Amend it **here**, then run `python scripts/gen-laws.py --write`.
 Amending a law needs Arpit's ruling, named in this record
 ([SR-LAW-0](0002_LAW-0-authority.md) decision 3).
 
+⚠ **Amended 2026-10-04 (Arpit, W-251 #25).** The block read *"The single
+exception is explicit per-source `snapshot` policy"* — while §1 listed three
+exceptions and no `snapshot` mechanism existed anywhere in `src/`. The law now
+points at §1 for the exceptions and says plainly that no committed copy of
+content is built. The per-source grammar half (no `snapshot` attribute in 3.0;
+the retention that exists is `keep=`, gitignored) was ruled the same day by
+delegation, W-251 §4.
+
 <!-- LAW-TEXT:BEGIN L3 -->
 - **L3** · **Content is never durable outside its source system.** The index holds
-  statistics, never content. The single exception is explicit per-source
-  `snapshot` policy. This is the law the whole architecture rests on.
+  statistics, never content. The only exceptions are declared per source on a
+  committed line the operator wrote — §1 names them; none is built as a
+  committed copy today. This is the law the whole architecture rests on.
 <!-- LAW-TEXT:END L3 -->
 
 ### Context
@@ -122,7 +131,7 @@ on 2026-09-06 at Arpit's ruling.
 
 **2. A passage is derived at query time and never written.** The refer plane cuts fetched bytes into passages for the length of one query. They are never cached to disk, never put in the index, and recomputed every time.
 
-**3. An exception is per-source, declared, and readable in a committed line.** `snapshot` and `keep=` are opt-in on a line the operator wrote. **A blanket exception is not an exception, it is a repeal.**
+**3. An exception is per-source, declared, and readable in a committed line.** `keep=` is opt-in on a line the operator wrote, and so would be a committed copy if L3 is ever amended to build one. **A blanket exception is not an exception, it is a repeal.**
 
 **4. `.fux/acquired/` is a THIRD kind beside committed and derived** — gitignored like derived, but not rebuildable: a blob can only be re-*acquired*, and only while the source is reachable and auth holds.
 
@@ -150,7 +159,7 @@ on 2026-09-06 at Arpit's ruling.
 
 **Reopen if** a committed byte is found to contain document content — a body, a passage, an excerpt, or a summary of one — outside a declared per-source exception.
 
-**Also reopen if** the acquired plane becomes committable by any route, or if a `snapshot` default is ever proposed as anything but per-source opt-in.
+**Also reopen if** the acquired plane becomes committable by any route, or if a committed-copy default is ever proposed as anything but per-source opt-in.
 
 **How to check it:**
 

@@ -2635,8 +2635,8 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
     named by an accepted record. None is named today (amended 2026-09-06: the zero-dependency
     promise was withdrawn, not the $0 one).</span></div>
   <div class="law"><b>L3</b><span><strong>Content is never durable outside its source system.</strong>
-    The index holds statistics, never content. The single exception is an explicit per-source
-    <code>snapshot</code> policy. The whole architecture rests on this.</span></div>
+    The index holds statistics, never content. The only exceptions are declared per source on a
+    committed line the operator wrote; none is built as a committed copy today. The whole architecture rests on this.</span></div>
   <div class="law"><b>L4</b><span><strong>Deterministic — no model in the maintenance path.</strong>
     Same sources produce a byte-identical index. Nothing calls a model to build one.</span></div>
   <div class="law"><b>L5</b><span><strong>Offline by default.</strong> Network access only inside
