@@ -111,6 +111,13 @@ work/regression/2026-09-30-shared-runtime/evidence/t1-arm-adversarial.err       
 work/regression/2026-09-30-shared-runtime/evidence/t1-arm-rung-10000.err                               # not an indexed file type
 work/regression/2026-09-30-shared-runtime/evidence/t2-identity.err                                     # not an indexed file type
 work/regression/2026-10-04-node-arm-2/evidence/run.log                                                 # not an indexed file type
+work/regression/2026-10-04-node-graph-read/evidence/node-arm-fux.log                                   # not an indexed file type
+work/regression/2026-10-04-node-graph-read/evidence/spy.mjs                                            # not an indexed file type
+work/regression/2026-10-04-node-graph-speed/evidence/once-hook.mjs                                     # not an indexed file type
+work/regression/2026-10-04-node-graph-speed/evidence/once-process.mjs                                  # not an indexed file type
+work/regression/2026-10-05-ladder-gen4-rebuild/evidence/build.log                                      # not an indexed file type
+work/regression/2026-10-05-ladder-gen4-rebuild/evidence/new_seed_name_leaks.out                        # not an indexed file type
+work/regression/2026-10-05-ladder-gen4-rebuild/evidence/planted-check.out                              # not an indexed file type
 # <<< fux: not indexed <<<
 
 # >>> fux: skipped >>>

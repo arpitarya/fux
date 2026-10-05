@@ -10,7 +10,7 @@ feature: the doc registry — the freshness table for live documents and the rul
 owns: [tests/test_doc_registry.py@7485529ab347]
 laws: [L0]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: 2cdb3b00b205c1cab77f0b53c05afa2b44580033b8b0d4ff7ae7c1051f0f67e2
+content_sha: 3c8e0ea325891b9ec3e364af3e07fa1b4f008de67781f38c94307b1cc64b996c
 ratifies: "Arpit, 2026-09-22 — 'convert DOC-REGISTRY.md into a law sr'; ruled a WORK record rather than a law in the same exchange, then 'move everything in DOC-REGISTRY into 0067_WORK-registry.md' — the table too, and the work/ file retired"
 ---
 

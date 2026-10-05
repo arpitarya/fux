@@ -41,7 +41,7 @@ valuable judgement, but not the state of play.
 - **Closed:** W-261 (every component record owns a file; strong rule gated), W-262 (all six W-251 rulings, incl. `find --no-archived` and the breaking library payload change).
 - **W-240:** the ladder is rebuilt on 94 seeds ([run](regression/2026-10-05-ladder-gen4-rebuild/report.md)); **gen-3 numbers are not comparable**. Next: phase-5 baseline of `set-5-claude` by a session that did not rebuild, then Arpit scores.
 - **To Arpit:** W-264 (the 6 s was a regression, fixed; a cache would save ≤ 1 s — retire?), W-228 (`misfit_floor` off PROVISIONAL?).
-- ⚠ **Not on main yet:** everything but W-264's fix sits on `land/w261`, waiting for a concurrent session's staged `records/0067` edit to be committed. W-250 waits behind that too (hooks are shared by every worktree).
+- **Released as 3.0.0-alpha.11** (Arpit: *"commit everything and publish a new version"*), with Cowork's eleven redrawn diagrams. Next agent item: W-250 (`fux hooks` here).
 
 ### 🟢 2026-10-05 — ELEVEN GREEN ITEMS BUILT OR MEASURED; THE OPUS REVIEW SENT SR-RS d12 BACK
 
