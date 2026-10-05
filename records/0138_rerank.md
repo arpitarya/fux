@@ -10,7 +10,7 @@ feature: proximity reranking over the refer plane's passages, and the refusal th
 owns: [src/fux/query/rerank.py@c231c0a40857, node/src/query/rerank.mjs@be6714bbed81]
 laws: [L2, L4, L5]
 timestamp: 2026-08-24T00:00:00Z
-content_sha: 6f52401be8c92f217befbb4d35bde988fcb6950fc0893f927b9a6f981fad4699
+content_sha: 407c8d2d22a927a914f5cb02bb57c3b2273f26d19cf9b43ac71d7b110725d0a3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -177,7 +177,8 @@ weight and coverage power (`[ranking] rerank_weight` and `rerank_coverage_power`
 since L12) were chosen from a 4×5 sweep over the 50
 goldens — **retriever settings authored with the evaluation in hand**, which is
 [SR-RS](0133_predictions.md) decision 11's own example of an informed artifact,
-and decision 12 says an informed run **never supplies a delta**.
+and decision 12 says an informed run **never supplies a delta** on an
+evaluation-set metric.
 
 ⚠ **This corrects a claim this record itself once made** — that reranking's
 `+4` was clean because *the author of the arithmetic could not target a query

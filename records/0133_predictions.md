@@ -10,7 +10,7 @@ feature: the prediction system — the R ids, their register, the rules that mak
 owns: [tests/test_regression_runs.py@5d8ba6a4bdcd, tools/t2-eval@cc5410393ce4, tools/quality-controls@d17195b576fa, tools/vector-gate@0023bff0cdef, tools/section-size@25bfc75777a6]
 laws: [L4]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 1779717815d3db55396221aa2277123387e978c6d49439b4d1befb1bed01e0e3
+content_sha: 76fe096fabdd241be7d913555e80ceb6e87b254e6d24fc5ab0138e65076a87a4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -136,8 +136,9 @@ where adding vocabulary to nine of ten documents *must* disturb something.
 | **informed** | anything else |
 
 **An informed run is not thrown away.** It is filed, cited, and may inform the
-corpus — it simply never supplies a delta and is never compared with a blind
-one. That is TREC's manual/automatic split, which has worked since 1994, and it
+corpus — it simply never supplies a delta on an evaluation-set metric and is
+never compared with a blind one (bytes, wall-clock and wheel size it may state;
+decision 12). That is TREC's manual/automatic split, which has worked since 1994, and it
 works because **a rule that bans useful work gets routed around, while a rule
 that sorts it survives.**
 
@@ -292,8 +293,14 @@ per-person and per-stage. And **it does not name the model, because the artifact
 is the contaminated object**, not the model and not the metric.
 
 **12. An informed run is RECLASSIFIED, never banned — and never supplies a
-delta.** It is filed, listed, cited, and may inform the corpus. It is **never
-compared with a blind run and never used to state a difference between arms.**
+delta on an evaluation-set metric.** It is filed, listed, cited, and may inform
+the corpus. It is **never compared with a blind run and never used to state a
+difference between arms on an evaluation-set metric** — nDCG, pass@k, hit@k,
+fixed/broken on a golden set. **Bytes on disk, wall-clock and wheel size may be
+stated** as deltas by any run, blind or informed: there was no evaluation set
+for authorship to have seen. **A latency on a *chosen* query set may be stated
+with the sample's authorship disclosed** under decision 13, because the metric
+cannot be fitted but the sample can.
 
 **This is the load-bearing decision.** TREC has split manual from automatic runs
 since **1994**: manual runs are reported and contribute to the judgment pool,
@@ -301,34 +308,43 @@ and are never scored against automatic ones. **A prohibition on useful work gets
 routed around quietly; a taxonomy survives** — and a rule that is quietly
 violated is worse than no rule, because it also supplies false assurance.
 
-> ⚠ **The scope defect in this wording is KNOWN and DELIBERATELY UNREPAIRED.**
-> *"Never supplies a delta"* is written without qualification, and the first run
-> filed under the rule was `informed` by construction and made **entirely** of
-> deltas — a wheel 30× smaller, an index 22.6 % smaller, an ingest 6.8× faster.
-> **As written, decision 12 forbids reporting a file size.**
+> ⚠ **The scope defect in this wording was REPAIRED 2026-10-04 — the trigger
+> fired 2026-08-27** (Arpit, 2026-10-04, W-251 #15: *"go with the
+> recommendation"*). Until then decision 12 read *"never supplies a delta"*
+> without qualification, and the first run filed under the rule was `informed`
+> by construction and made **entirely** of deltas — a wheel 30× smaller, an
+> index 22.6 % smaller, an ingest 6.8× faster. **As written, decision 12
+> forbade reporting a file size.** The disclosure this block demanded was
+> written three times —
+> [`2026-08-25-model-removal`](../work/regression/2026-08-25-model-removal/),
+> [`2026-08-25-rank-flip-susceptibility`](../work/regression/2026-08-25-rank-flip-susceptibility/)
+> and [`2026-08-27-p3-sha-stability`](../work/regression/2026-08-27-p3-sha-stability/)
+> — which is the reopen trigger below, and the repair is the record's own
+> contamination table, unchanged:
 >
-> The distinction the wording is missing is that **contamination requires an
+> The distinction the wording was missing is that **contamination requires an
 > evaluation set to exist**:
 >
 > | kind of number | can authorship contaminate it? |
 > |---|---|
-> | nDCG, pass@k, fixed/broken on a golden set | **yes** — this is what decision 12 is for |
+> | nDCG, pass@k, hit@k, fixed/broken on a golden set | **yes** — this is what decision 12 is for |
 > | bytes on disk, wall-clock, wheel size | **no** — there was nothing to have seen |
 > | p95 latency on a *chosen* query set | ⚠ **partly** — the metric cannot be fitted, the **sample** can |
 >
-> **Arpit ruled the text stands unchanged.** No narrowing to evaluation-set
-> metrics, no separate declaration axis for performance numbers. **An informed
-> run reporting a cost delta discloses the conflict in its report** rather than
-> the rule being loosened to let it through.
+> **The argument for the old text, kept because it is still the argument
+> against the next narrowing:** *Arpit ruled the text stands unchanged.* No
+> narrowing to evaluation-set metrics, no separate declaration axis for
+> performance numbers. **An informed run reporting a cost delta discloses the
+> conflict in its report** rather than the rule being loosened to let it
+> through. Editing a measurement rule so that a run passes under it is the
+> moving-threshold failure in a different costume, and it is worse than a
+> known-imprecise sentence. **That is why the repair waited for its trigger
+> and for his word, and why any further narrowing needs both again.**
 >
-> ⚠ **This block exists so the defect is not "fixed" by a later session.**
-> Editing a measurement rule so that a run passes under it is the
-> moving-threshold failure in a different costume, and it is worse here than a
-> known-imprecise sentence. **Do not narrow decision 12. Disclose.**
->
-> **Reopen when** the disclosure has been written three times — at that point
-> the repetition is itself the argument that the wording, not the runs, is what
-> costs effort.
+> **The reopen trigger, as it stood:** *reopen when the disclosure has been
+> written three times — at that point the repetition is itself the argument
+> that the wording, not the runs, is what costs effort.* It fired on
+> 2026-08-27; the repair landed on 2026-10-04 (W-262).
 
 **13. The run states who authored each artifact and what evaluation material
 they could reach.** Per artifact: the author, and which of *queries / judgments

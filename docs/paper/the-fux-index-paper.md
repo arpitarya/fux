@@ -912,7 +912,8 @@ data defect fixed in the data, never a null (d23).
 **Blind or informed.** A run is *blind* only if every artifact — enrichment,
 prompt, chunking, tune, analysis — was authored with no access to the queries,
 judgments or prior scores. An informed run is reclassified, never banned, and
-never supplies a delta on its own (d11–d13; the TREC manual/automatic split).
+never supplies a delta on an evaluation-set metric — bytes and wall-clock it
+may state (d11–d13; the TREC manual/automatic split).
 The authorship section has been mandatory since 2026-08-25.
 
 **The paired floor.** Two arms are compared by an exact McNemar test on the

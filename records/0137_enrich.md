@@ -11,7 +11,7 @@ owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@445f0cf12bd1, src/fux/
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: c63d7566331e4468a93a566b5c1c56ce51ab0bfe484249690aad0aa3f34d55c8
+content_sha: 3543c5f0f6210bf3333090a63cef031ce048844174e8fccd59e6eadaecee5688
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -678,7 +678,8 @@ a missing blob already is — never a crash inside a planning command.
   **measurement-protocol** rule, living in [SR-RS](0133_predictions.md)
   decisions 11–15. Nothing changes about *generating* enrichment; what changes
   is that **a run which measures it declares whether the author could reach the
-  evaluation queries**, and an informed run never supplies a delta. **That is a
+  evaluation queries**, and an informed run never supplies a delta on an
+  evaluation-set metric. **That is a
   restriction on what a number may claim, not on the enrichment.**
 
 ### Alternatives considered
