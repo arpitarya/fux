@@ -84,6 +84,7 @@ too (they are the common accident).
 
 from __future__ import annotations
 
+import functools
 import hashlib
 import json
 import re
@@ -253,6 +254,16 @@ class Rule:
         return rx.sub(_sub, text), count
 
 
+#: 🔴 **Memoised per rule, and the memo is the W-264 finding.** `apply` calls
+#: `compiled()` once per rule per string, and `run()`'s redact phase redacts
+#: every document's body, its frontmatter title and its own path: 260 180 calls
+#: at rung-10000. `re.compile` caches internally, but W-255's `_lint` re-parses
+#: the pattern through `re._parser` on every call, uncached -- about 20 us each,
+#: which took the phase from 0.97 s (W-239) to about 6 s (W-256's ingest split).
+#: A `Rule` is a frozen value, so the same rule is the same answer: the lint
+#: still runs at load (`_rule`, below) and still decides, once per rule.
+#: Exceptions are not memoised, so a refused rule refuses on every call.
+@functools.cache
 def _compile(rule: Rule) -> re.Pattern:
     flags = 0
     for name in rule.flags:

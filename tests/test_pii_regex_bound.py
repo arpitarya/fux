@@ -150,3 +150,23 @@ def test_overlap_above_the_compared_alphabet_still_counts():
     assert _lint(r"(?:[^\x00-\x7f]|[^\x80-˿])*", 0) is not None
     assert _lint("(?:一|丁x)*", 0) is not None
     assert _lint(r"(?:a|b)*", 0) is None
+
+
+def test_the_lint_runs_once_per_rule_not_once_per_apply(monkeypatch):
+    """W-264 DoD 1: the 6 s redact phase was `_lint` re-parsing every pattern on
+    every `apply` (260 180 calls at rung-10000). Redacting many strings must
+    lint each rule once, however many strings it is applied to."""
+    calls = []
+    real = pii._lint
+    monkeypatch.setattr(pii, "_lint", lambda pattern, flags: calls.append(pattern) or real(pattern, flags))
+    pii._compile.cache_clear()
+    rules = pii.parse(
+        {"rule": [
+            {"name": "email", "pattern": SAFE[0], "replacement": "[PII:email]"},
+            {"name": "card", "pattern": r"\b[0-9]{16}\b", "replacement": "[PII:card]", "validate": "luhn"},
+        ]},
+        origin="test",
+    )
+    for n in range(200):
+        pii.redact(rules, f"doc {n}: mail a{n}@example.com card 4242424242424242")
+    assert sorted(calls) == sorted({r.pattern for r in rules})

@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-24
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@577ebf850a7e, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@a6b1bb5f5517, node/src/ingest/priors.mjs@d8d4691d7e49]
+owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@cd698c429746, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@a6b1bb5f5517, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 14bf0b8d57b43b03b0997602e239fd5063752cc5a4f416f56ea2ae99114853f3
+content_sha: 8d5208632de24c08b1c6feb4cc1abf51a9da48c812de922f5dee9167b438da55
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
