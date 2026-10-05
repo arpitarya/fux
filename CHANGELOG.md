@@ -8,6 +8,10 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.0-alpha.11] - 2026-10-05
+
+**Breaking: the bare-`str` fetcher return is refused, and `--under` / `[priority]` match at a `/` boundary. The Node reader reads a fresh `graph.json`.** Details below.
+
 ### Removed (BREAKING)
 
 - **The bare-`str` fetcher return is refused** (W-253). `fetch(url)` returns

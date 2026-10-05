@@ -15,8 +15,7 @@ session owes — is stated once in
 here. Read that record before changing anything below it.
 
 **A ball on every row, always one:** 🔴 blocked on Arpit, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item · 🟢 no blockers.
-**Optional, after the ball:** 🧨 broken or getting worse · 🔺 do first (Arpit only).
-**The `research` section runs in Cowork only, never in Claude Code** (rule 37a). Full legend: [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 20–34.
+**Optional, after the ball:** 🧨 broken or getting worse · 🔺 do first (Arpit only). Full legend: [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 20–34.
 
 ---
 
