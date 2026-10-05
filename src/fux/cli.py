@@ -761,6 +761,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--all", dest="require_all", action="store_true",
         help="keep only documents carrying EVERY query term (grep's AND)",
     )
+    p_find.add_argument(
+        "--no-archived", dest="no_archived", action="store_true",
+        help="drop documents declared archived (archived=true, or the record's own flag); "
+        "the confidence band still describes the unfiltered ranking",
+    )
     p_find.set_defaults(func=_cmd_find)
 
     p_answer = _query_parser(

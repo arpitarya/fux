@@ -17,6 +17,7 @@ writes, and neither needs the network. Resolve the `fux` command first — see t
 | paths to pipe into another tool | `fux find "<q>"` |
 | only results under one folder | `fux find "<q>" --under docs/runbooks/ --top 20` |
 | only documents containing an exact phrase | `fux find "<q>" --phrase "blue green deploy"` |
+| only live documents — drop the ones declared archived | `fux find "<q>" --no-archived` |
 | "why did this rank" / "why is X above Y" | `fux ask "<q>" --why --json` |
 | two ways of saying the same thing | `fux ask "<q>" -q "<other phrasing>" --json --band` |
 | the corpus probably uses different words | `fux ask "<q>" --expand "<a passage YOU write — section 5a>" --json --band` |
@@ -61,6 +62,7 @@ every flag `ask` takes and returns `ask`'s exact output shape.
 | `--phrase TEXT` | — | ✓ | keep docs whose local text has these words adjacent, in order |
 | `--under PREFIX` | — | ✓ | keep docs whose `loc` starts with PREFIX (plain string prefix) |
 | `--all` | — | ✓ | keep docs carrying every term of the positional query |
+| `--no-archived` | — | ✓ | drop docs declared archived (`archived=true` in the source list, or the record's own flag); the band still describes the unfiltered list |
 | `--fast` / `--scan` | ✓ | ✓ | accelerator vs reference scan — **identical results**, speed only |
 | `--no-tune` | ✓ | ✓ | ignore `.fux/tune.toml` |
 | `--no-output-config` | ✓ | ✓ | ignore `.fux/output.toml` |
@@ -319,7 +321,7 @@ If a result carries `"archived": true`, follow the `fux-archived-results` policy
 - **Don't report line numbers from `ask`/`find`**, or claim fux cannot give them — that is `fux answer`.
 - **Don't read a missing `confidence` key as `none`.** You forgot `--band`.
 - **Don't compare fused scores with single-query scores**, or any scores across queries or repos.
-- **Don't expect `--under`, `--phrase` or `--all` to surface more** — raise `--top`.
+- **Don't expect `--under`, `--phrase`, `--all` or `--no-archived` to surface more** — raise `--top`.
 - **Don't parse stderr.** The no-match line lives there now, with every other note.
 - **Don't answer from `none`** and cite the returned files as if they said it.
   `answerable: false` is a **refusal, not a low score** — there is nothing to

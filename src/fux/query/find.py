@@ -27,7 +27,7 @@ __all__ = ["FindBuilt", "build_find", "cmd_find"]
 
 
 def _filtered(root: Path, results, args) -> tuple[list, int]:
-    """`find`'s three precision controls. W-111.
+    """`find`'s four precision controls. W-111; `--no-archived` W-262 #3.
 
     **Post-filters on the ranked list, and they retrieve nothing.** A document
     the ranking did not place in `--top` cannot be filtered *into* the answer —
@@ -50,7 +50,8 @@ def _filtered(root: Path, results, args) -> tuple[list, int]:
     phrase = getattr(args, "phrase", None)
     under = getattr(args, "under", None)
     require_all = bool(getattr(args, "require_all", False))
-    if not (phrase or under or require_all):
+    no_archived = bool(getattr(args, "no_archived", False))
+    if not (phrase or under or require_all or no_archived):
         return list(results), 0
 
     from .analyzer import analyze
@@ -58,6 +59,13 @@ def _filtered(root: Path, results, args) -> tuple[list, int]:
 
     before = len(results)
     kept = list(results)
+
+    if no_archived:
+        # The DECLARED fact every result already carries (SR-ARCHIVED-CONTENT
+        # decision 3) — the record's own `archived` property, or an
+        # `archived=true` line in the source list. Never inferred from the
+        # text, and it moves no score: it only removes (SR-FIND decision 7).
+        kept = [r for r in kept if not r.archived]
 
     if under:
         # A component boundary (W-253), the one `Weighting.priority_for` and
@@ -116,6 +124,7 @@ def _declare_filters(args, dropped: int) -> None:
             ("--phrase", getattr(args, "phrase", None)),
             ("--under", getattr(args, "under", None)),
             ("--all", getattr(args, "require_all", False)),
+            ("--no-archived", getattr(args, "no_archived", False)),
         ) if on
     ]
     print(

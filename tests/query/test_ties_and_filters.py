@@ -277,6 +277,21 @@ def test_a_url_document_is_kept_by_phrase_rather_than_dropped(tmp_path):
     assert kept == results and dropped == 0
 
 
+def test_no_archived_removes_only_the_declared_fact(tmp_path):
+    """W-262 #3: `--no-archived` reads the `archived` flag every result already
+    carries, removes those rows and nothing else, and keeps the order."""
+    from fux.query.find import _filtered
+    from fux.query.rank import AskResult
+
+    results = [
+        AskResult(id="file:a.md", title="A", loc="a.md", score=3.0),
+        AskResult(id="file:old/b.md", title="B", loc="old/b.md", score=2.0, archived=True),
+        AskResult(id="file:c.md", title="C", loc="c.md", score=1.0),
+    ]
+    kept, dropped = _filtered(tmp_path, results, _Args(query="x", no_archived=True))
+    assert [r.loc for r in kept] == ["a.md", "c.md"] and dropped == 1
+
+
 @pytest.mark.parametrize(("phrase", "text", "expected"), [
     ("roll back", "you roll back the release", True),
     ("roll back", "back and roll", False),

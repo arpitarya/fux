@@ -91,6 +91,7 @@ function parseArgs(argv) {
     else if (a === "--under") out.under = argv[++i];
     else if (a === "--phrase") out.phrase = argv[++i];
     else if (a === "--all") out.all = true;
+    else if (a === "--no-archived") out.noArchived = true;
     else if (a === "--band") out.band = true;
     else if (a === "--no-sections") out.sections = false;
     // SR-TUNE decision 11: `.fux/tune.toml` is not read AT ALL, so the answer
@@ -135,7 +136,7 @@ function main(argv) {
   if (!verb || verb === "--help" || verb === "-h") {
     process.stdout.write(
       `fux ${VERSION} (node ${process.versions.node}) — the read plane\n\n` +
-      `  fux find <query> [--json] [--top N] [--under DIR] [--phrase P] [--all]\n` +
+      `  fux find <query> [--json] [--top N] [--under DIR] [--phrase P] [--all] [--no-archived]\n` +
       `  fux ask|lexical|answer|explain|graph|path|mcp      (Phases 2-3)\n` +
       `  fux graph --seed <id> [--seed <id>...]     walk from documents you name\n` +
       `  fux build                                   rebuild .fux/runtime/ for --fast\n\n` +

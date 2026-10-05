@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@0c8e85b0e95b, src/fux/templates/output.toml.txt@0952128ae0aa, .fux/output.toml@4a3a8465d2e4, node/src/config/output.mjs@fa59be4a8c93]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 181d43fb4fc3d1f7832443a503be2c50a00e9e6da2c4238be3dcf7896228f9e6
+content_sha: 91d1aec2a5763739305cef42351f4185d426572701234ecb97a6d1a4175fbcd8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -571,7 +571,7 @@ The emission gate is untouched — `_show_band`/`_gated` are unchanged and
 (*this ordering was earned*), and an absent key is indistinguishable from an
 older fux.
 
-⚠ **`find`'s `--phrase`/`--under`/`--all` are NOT gated flags and take no
+⚠ **`find`'s `--phrase`/`--under`/`--all`/`--no-archived` are NOT gated flags and take no
 `.fux/output.toml` key**, which is deliberate rather than an omission: a filter
 that applied itself from a committed file would make `fux find` return a
 different set of paths in two clones of the same repo. The `[filter]` note they

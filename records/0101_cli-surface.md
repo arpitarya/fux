@@ -1079,7 +1079,9 @@ That rule exists to keep a committed `.fux/output.toml` value reachable from
 the command line; `--all` has no such key and is not gated, because a filter
 that silently applied itself from a config file would make `fux find` return a
 different set of paths in two clones of the same repo. It is per-invocation by
-design.
+design. **`--no-archived` (2026-10-05, W-262 #3, [SR-FIND](0104_find.md) decision 7) is a
+`store_true` outside decision 10 for the same reason**, and the Node reader's
+`node/fux.mjs` parses it identically.
 
 **`fux add <URL> --no-update`** records `update=never`
 ([SR-URL-LIST](0116_url-list.md) decision 14): this document is pinned and

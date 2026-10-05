@@ -37,7 +37,7 @@ import { fixed } from "../config/constants.mjs";
 
 const JSON_INDENT = fixed("json", "indent");
 
-/** `find`'s three precision controls. W-111.
+/** `find`'s four precision controls. W-111; `--no-archived` W-262 #3.
  *
  * **Post-filters on the ranked list, and they retrieve nothing.** A document
  * the ranking did not place in `--top` cannot be filtered *into* the answer —
@@ -51,10 +51,17 @@ const JSON_INDENT = fixed("json", "indent");
 function filtered(root, results, query, args, shards) {
   const { under, phrase } = args;
   const requireAll = Boolean(args.all);
-  if (!under && !phrase && !requireAll) return [results, 0];
+  const noArchived = Boolean(args.noArchived);
+  if (!under && !phrase && !requireAll && !noArchived) return [results, 0];
 
   const before = results.length;
   let kept = results;
+
+  if (noArchived) {
+    // The DECLARED fact every result already carries — never inferred, and it
+    // moves no score: it only removes (SR-FIND decision 7).
+    kept = kept.filter((r) => !r.archived);
+  }
 
   if (under) {
     // A component boundary (W-253), the one `priorityFor` applies: `docs/a`
@@ -93,6 +100,7 @@ function declareFilters(args, dropped) {
   if (!dropped) return;
   const names = [
     ["--phrase", args.phrase], ["--under", args.under], ["--all", args.all],
+    ["--no-archived", args.noArchived],
   ].filter(([, on]) => on).map(([name]) => name);
   process.stderr.write(
     `[filter] ${names.join(" ")} removed ${dropped} of the ranked results; ` +

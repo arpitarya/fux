@@ -15,7 +15,7 @@ description: Searching the Fux index with fux ask or fux find - flags, the confi
   document's likely words, not synonyms. `-q` is separate: real phrasings, RRF.
 - **Scores compare only within one result list**; a fused (`-q`) score is a
   different quantity.
-- `find` filters (`--under`, `--phrase`, `--all`) never add results - raise
+- `find` filters (`--under`, `--phrase`, `--all`, `--no-archived`) never add results - raise
   `--top`.
 - A missing `confidence` key means you did not pass `--band`.
 

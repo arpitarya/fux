@@ -806,6 +806,8 @@ The shipped `fux-inspect`, `fux-serve` and `fux-config` skills name identifier f
 
 **The INDEX and ENRICH skills name the new progress bars** (W-238, 2026-09-29): `doctor` and `identifiers` paint `read`/`detect`, and `enrich --check` paints `check`, all on stderr and silenced by `--no-progress` ([SR-CLI](0101_cli-surface.md) decision 17). One line each, in the templates and in this repo's three installed copies. No policy moved.
 
+**No decision here moved** (W-262 #3, 2026-10-05): the `fux-search` skill template (`SEARCH-SKILL.md`) and the Kiro steering guide name `find --no-archived`, the filter [SR-FIND](0104_find.md) decision 7 gained; the repo's installed copies were refreshed byte-equal.
+
 ### Consequences
 
 - ⚠ **W-214 (2026-09-22) rewrote twelve renderings and changed no decision
