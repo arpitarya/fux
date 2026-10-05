@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@7635cc72189b]
+owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@864344a12b14]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: a97a411e4f931e988a79801d5b66b1d8a9e3ee0f1eca521f39b8ffadbc77ab7a
+content_sha: 6ba6dcad80fef631a4492fedd19c3db2adc37ee7f02f564a8c6c8d18a3e62281
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -411,6 +411,14 @@ every request, and it is re-fetched every run while three stable URLs are not.
   people to ignore a red doctor. ⚠ **The gap is now visible, not closed** — a
   consumer must still copy the function in themselves, which is the freeze
   working as designed rather than a defect in it.
+  ✅ **The template stamp, 2026-10-05** (Arpit, 2026-10-04, W-251 #2 — option B;
+  W-262): `fux setup` now writes each fetcher with a first-line
+  `# fux-template: <sha256>` naming the template it came from, and `doctor`'s
+  `seeded copies current` row names an **unedited** copy whose template has
+  changed — *re-seed it yourself* (delete it, run `fux setup`). **Still never a
+  rewrite**: an edited fetcher is the consumer's, and this row says nothing
+  about it; `fetcher optional functions` above still does. Refresh-on-upgrade
+  (option A) was refused.
 - **A validated URL is neither a fetch nor a skip**, and is counted separately —
   its prior record is correct and carried forward, which is the opposite of a
   failure. `fux ingest` prints the count, because **an optimisation that fails

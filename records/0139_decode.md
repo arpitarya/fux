@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@09d46517feac, src/fux/templates/agents/DECODER-SKILL.md@474a416bcc42, .fux/decoders@cbec8e165dca, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@6748ca720ca3]
+owns: [src/fux/decode@09d46517feac, src/fux/templates/agents/DECODER-SKILL.md@b96869349595, .fux/decoders@cbec8e165dca, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@6748ca720ca3]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 50e5f64de9e6aaae82ba1fcf646a22021a4d362651c7403d6d95a127ae986093
+content_sha: 4924c396b3ee498bbfad84a3f8441b76bc219804209d0acff1afec5617c8b270
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -208,9 +208,9 @@ alternative only half delivers.
   network code that must not be importable inside an offline package
   ([SR-CDP-FETCHER](0118_cdp-fetcher.md) decision 9). **A decoder is
   stdlib-only and offline — it is already a legitimate module**, so the module
-  *is* the template and the copy is byte-identical. **Two files that agree by
-  habit is the duplication this record exists to remove**, and nineteen of
-  them would be worse.
+  *is* the template and the copy is byte-identical **below its one stamp
+  line** (the last bullet). **Two files that agree by habit is the duplication
+  this record exists to remove**, and nineteen of them would be worse.
 - ⚠ **Imports inside `decode/` are absolute.** A path-loaded file has no parent
   package, so a relative import raises *attempted relative import with no known
   parent package* and **every copy carrying a helper import would be dead on
@@ -226,6 +226,22 @@ alternative only half delivers.
   each have needed every consumer to refresh their copy. The alternative on the
   table was *copies inert until edited*, resolved by a hash stamp; it was
   declined in favour of the simpler rule.
+- ✅ **The cost is now VISIBLE, never closed by a rewrite** (Arpit, 2026-10-04,
+  W-251 #2 — option B of
+  [`consumer-template-refresh`](../work/compare/consumer-template-refresh.compare.md);
+  built 2026-10-05, W-262). Every copy `fux setup` writes carries **one first
+  line**, `# fux-template: <sha256 of the shipped module>` (the prefix is
+  `constants.toml [templates] stamp_prefix`); below it the bytes are the module
+  exactly, so the copy still is what runs and what fux tests. `fux doctor`'s
+  `seeded copies current` row ([SR-DOCTOR](0152_doctor.md)) names an
+  **unedited** copy — its body still hashes to its stamp — whose module has
+  changed since, with the lever *re-seed it yourself*: delete the file (the
+  built-in runs meanwhile, by the bullet above) and run `fux setup`. An edited
+  copy is the consumer's and is not compared. **fux never writes the file**
+  (SR-DOTFUX decision 6). Option A — refresh unedited copies on upgrade — was
+  refused in the same ruling, and *copies inert until edited* stays declined.
+  ⚠ A copy seeded before the stamp carries none and cannot be judged; the row
+  counts it.
 
 **10a. `jsonl`, `svg` and `image` joined the built-in set on
 2026-08-29** (sixteen → nineteen). `.jsonl` is `.json`'s line-delimited

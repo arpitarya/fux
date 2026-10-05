@@ -8,9 +8,12 @@ the whole plane is quietly broken:
 
 * every copied file must **load standalone**, with no parent package to resolve
   a relative import against;
-* the copy must be **byte-identical** to what fux ships, because a transform at
-  copy time would mean the file fux tests and the file the consumer runs are
-  different files.
+* the copy must be **byte-identical** to what fux ships below its one stamp
+  line, because a transform at copy time would mean the file fux tests and the
+  file the consumer runs are different files. The stamp (W-262, Arpit
+  2026-10-04, W-251 #2) is a comment naming the template's sha256 -- it changes
+  no behaviour, and it is how `fux doctor` tells an unedited copy from an edited
+  one.
 """
 
 from __future__ import annotations
@@ -36,15 +39,22 @@ def test_setup_writes_every_builtin_decoder(repo: Path):
 
 
 def test_the_copy_is_byte_identical_to_the_shipped_module(repo: Path):
-    """No transform at copy time. A rewritten import, a stamped header, anything
-    — and the file fux tests stops being the file the consumer runs, which is
-    the entire failure mode this plane was created to remove.
+    """No transform at copy time. A rewritten import, anything — and the file
+    fux tests stops being the file the consumer runs, which is the entire
+    failure mode this plane was created to remove.
+
+    ⚠ **Amended 2026-10-05 (W-262): exactly ONE line is added, the stamp**, and
+    it is a comment. Everything below it is the shipped module, byte for byte;
+    the stamp names that module's sha256.
     """
     package = Path(setup_mod.__file__).parent / "decode"
     for name in BUILTIN_MODULES:
         shipped = (package / f"{name}.py").read_bytes()
         copied = (repo / ".fux" / "decoders" / f"{name}.py").read_bytes()
-        assert copied == shipped, f"{name} was altered on the way out"
+        stamp, body = setup_mod.read_stamp(copied)
+        assert body == shipped, f"{name} was altered on the way out"
+        assert stamp == setup_mod.template_digest(shipped), f"{name} carries the wrong stamp"
+        assert copied.startswith(setup_mod.template_stamp().encode("ascii")), name
 
 
 def test_every_copied_decoder_loads_standalone(repo: Path):

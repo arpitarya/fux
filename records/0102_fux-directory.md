@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@e9806d6c1a60, node/src/store/fuxdir.mjs@40b2788b27f9, src/fux/setup.py@347155bc8be7, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@e9806d6c1a60, node/src/store/fuxdir.mjs@40b2788b27f9, src/fux/setup.py@43c3c371c374, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 30e7074a4998302e414eef4a00629f61421a558486f8e74b5fd19b5095f081d3
+content_sha: f018402860be252cb202c2a1b54499e993d1063b147ccace5e5caa097fc8b223
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -435,6 +435,18 @@ misreads them.
 before it still holds stale `<name>doc.py` files that claim the same extensions
 and **win**. `tests/test_orphaned_modules.py` catches the shipped half and
 nothing reaches a consumer's directory. Same mechanism, worse outcome.
+
+✅ **What the consumer-owned row now gets instead, 2026-10-05** (Arpit,
+2026-10-04, W-251 #2 — option B of
+[`consumer-template-refresh`](../work/compare/consumer-template-refresh.compare.md);
+W-262). **Not this shape**: `fetchers/` and `decoders/` stay write-if-missing
+and are never overwritten — option A, which would have refreshed an unedited
+copy on upgrade the way this shape refreshes `node/`, was refused. Each seeded
+copy carries a first-line template stamp (`# fux-template: <sha256>`), and
+`fux doctor`'s `seeded copies current` row names an unedited copy whose
+template has changed, with the lever *re-seed it yourself*. That is decision
+6's own mechanism — *a `doctor` check, never a rewrite* — applied to the plane
+whose stale files the paragraph above names.
 
 **The payoff is structural.** The copy in `.fux/` is always written by the
 Python that wrote the index, so **a `_format` mismatch cannot happen** — which

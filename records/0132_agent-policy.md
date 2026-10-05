@@ -7,10 +7,10 @@ description: "Fux's readers are AI agents, and an engine whose output is misread
 status: accepted
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@261977d5386f]
+owns: [src/fux/templates/agents@5f92aa23f8d3]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 9ca63221d3b1ce4ed345beae7e578ab98c78da1d12c602b45da35511a4b67787
+content_sha: f1a74a00ac55912fec4bfca7eb2a43ff315459705acc318aa075c67890284778
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

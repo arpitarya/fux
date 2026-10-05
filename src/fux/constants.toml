@@ -370,6 +370,11 @@ cachedir_tag = "cachedir-tag.txt"
 shim         = "fux-shim.sh.txt"
 hooks_dir    = "hooks"
 hook_preamble = "preamble.sh.txt"
+# W-262 (Arpit, 2026-10-04, W-251 #2 option B): the first line of every decoder
+# and fetcher copy `fux setup` seeds, followed by the sha256 of the template the
+# copy came from. `fux doctor` reads it to name an UNEDITED copy whose template
+# has since changed; nothing ever rewrites the file (SR-DOTFUX decision 6).
+stamp_prefix = "# fux-template: "
 
 [fuse]
 # Reciprocal-rank fusion's k (Cormack et al. 2009) -- a published constant,

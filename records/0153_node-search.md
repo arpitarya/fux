@@ -11,7 +11,7 @@ owns: [node@795a330362ac, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: b4618e7513d506db63badca05cf596eda804cab1f310d0bfbb6fc0bbef43ea88
+content_sha: 5bc11ee032d68ec66f113779543d776135e013caf90aa0745e935fdc45b74787
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1056,6 +1056,8 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
 **No decision here moved** (W-255, 2026-10-04): `fux.toml` and its template gained `[doctor] pii_rule_budget_ms` ([SR-CONFIG](0113_config.md), [SR-PII](0148_pii.md) decision 23); no other key moved.
 
 **No decision here moved** (W-248, 2026-10-04): `doctor.py` gained a `queue: no decoder` row; the `node reader` rows this record describes did not move.
+
+**No decision here moved** (W-262, 2026-10-05): `setup.py` stamps the decoder and fetcher copies it seeds and `doctor.py` gained a `seeded copies current` row (Arpit, W-251 #2). `.fux/node/` is not stamped and stays engine-owned and overwritten (SR-DOTFUX 6a); the `node reader` row and `detect_workspace`/`wire_workspace` did not move.
 
 **No decision here moved** (W-246, 2026-10-04): `node/mcp-tools.json`'s `fux_passage` and `fux_related` descriptions now name the fields their handlers emit, held equal to the Python literal.
 

@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@946e2f282b1f]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@5eebdc5ca33f]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: ca7ac35bd5ffc4c657bf3bb08e53ca25d89b7710744e9c388c62d67c6825ddcf
+content_sha: 1786ecce01206a65e93ea13bba9c19768a2666a32ba633d13fa28eb89e282321
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 

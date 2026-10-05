@@ -1089,8 +1089,8 @@ def decoder_source(name: str) -> bytes:
     be worse than committing it once.
 
     The modules use absolute imports for this reason: the bytes fux ships and
-    the bytes the consumer edits are identical, and a path-loaded copy still
-    resolves `fux.decode._zip`.
+    the bytes the consumer edits are identical below the copy's one stamp line
+    (`stamped`, W-262), and a path-loaded copy still resolves `fux.decode._zip`.
     """
     try:
         return (resources.files("fux") / "decode" / f"{name}.py").read_bytes()
@@ -1099,6 +1099,69 @@ def decoder_source(name: str) -> bytes:
             f"the built-in decoder {name!r} is missing from this install — "
             "reinstall fux-engine"
         ) from exc
+
+
+# -- W-262: the template stamp (Arpit, 2026-10-04, W-251 #2 -- option B) -------
+#
+# Every decoder and fetcher copy `fux setup` seeds carries ONE first line: the
+# stamp prefix and the sha256 of the template it came from. Below that line the
+# bytes are the shipped template exactly -- no import is rewritten, nothing is
+# transformed -- so the file fux tests is still the file the consumer runs.
+#
+# 🔴 **The stamp is read, never acted on.** `fux doctor` uses it to tell an
+# UNEDITED copy (body still hashes to its stamp) whose template has since moved
+# from a copy the consumer has made their own, and names the first with the lever
+# *re-seed it yourself*. **fux never rewrites the file** -- SR-DOTFUX decision 6:
+# a change that must reach an existing repo goes through a loader refusal or a
+# `doctor` check, never a rewrite. Option A, which would have refreshed unedited
+# copies on upgrade, was refused in the same ruling.
+#
+# ⚠ **The digest is over LF-normalised bytes**, so a checkout with
+# `core.autocrlf` does not turn every unedited copy into an "edited" one.
+
+def template_stamp() -> str:
+    """The stamp line's prefix, from `constants.toml [templates]` (L12)."""
+    from .constants import fixed
+
+    return fixed("templates", "stamp_prefix")
+
+
+def template_digest(body: bytes) -> str:
+    """sha256 of a template's bytes, LF-normalised. Deterministic (L4)."""
+    import hashlib
+
+    return hashlib.sha256(body.replace(b"\r\n", b"\n")).hexdigest()
+
+
+def stamped(body: bytes) -> bytes:
+    """`body` with its stamp line in front -- what `fux setup` writes."""
+    return f"{template_stamp()}{template_digest(body)}\n".encode("ascii") + body
+
+
+def read_stamp(raw: bytes) -> "tuple[str | None, bytes]":
+    """`(stamp digest, body)` of a seeded copy, or `(None, raw)` when the first
+    line is not a stamp -- a copy seeded before W-262, or a file the consumer
+    wrote themselves. Neither can be judged edited-or-not, and neither is."""
+    first, sep, rest = raw.partition(b"\n")
+    prefix = template_stamp().encode("ascii")
+    if not sep or not first.startswith(prefix):
+        return None, raw
+    digest = first[len(prefix):].strip().decode("ascii", errors="replace")
+    return digest, rest
+
+
+def seeded_copies() -> "list[tuple[str, bytes]]":
+    """`(path under .fux/, current template bytes)` for every stamped copy.
+
+    The fetchers and the built-in decoders, in that order and each sorted --
+    the same set `run` writes, so the `doctor` row and the writer cannot drift.
+    """
+    pairs = [(f"{FETCHERS_DIR}/{name}", template_bytes(t)) for name, t in sorted(FETCHERS.items())]
+    pairs += [
+        (f"{DECODERS_DIR}/{name}.py", decoder_source(name))
+        for name in sorted(decode_mod.BUILTIN_MODULES)
+    ]
+    return pairs
 
 
 def agent_template_bytes(name: str) -> bytes:
@@ -1688,13 +1751,17 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
 
     directory = fuxdir.fux_dir(root)
     for name, template in FETCHERS.items():
-        _write_if_missing(directory / FETCHERS_DIR / name, template_bytes(template), report, root)
+        _write_if_missing(
+            directory / FETCHERS_DIR / name, stamped(template_bytes(template)), report, root
+        )
 
     # W-86 P7, ruled by Arpit 2026-08-26: every built-in decoder is written into
     # `.fux/decoders/`, and **the copy is what runs** (SR-DECODE decision 11).
+    # Both planes are stamped (W-262) so `fux doctor` can name an unedited copy
+    # whose template has since changed -- and still never rewrites one.
     for name in decode_mod.BUILTIN_MODULES:
         _write_if_missing(
-            directory / DECODERS_DIR / f"{name}.py", decoder_source(name), report, root
+            directory / DECODERS_DIR / f"{name}.py", stamped(decoder_source(name)), report, root
         )
 
     # W-170 — the directory exists so a consumer can find it, with a README

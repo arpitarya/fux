@@ -2,7 +2,7 @@
 type: Compare Doc
 title: "Consumer-side template refresh — how an engine fix reaches a consumer's `.fux/decoders/`, `.fux/fetchers/` and `pii.toml`"
 description: "Backlog B-013 and B-014 (B-073 and B-221 adjacent) as one fork. Today a copy written once into a consumer's `.fux/` is frozen forever; four real decoder defects would each have needed every consumer to refresh by hand. Options: a template sha stamp with engine-owned refresh of unedited copies, doctor-names-the-gap only, or keep the freeze. Recommended: the stamp — but SR-DECODE d10 DECLINED it, so reopening is Arpit's."
-status: ruled 2026-10-04 (Arpit, W-251 §3 #2) — option B; A refused. Build: W-262
+status: ruled 2026-10-04 (Arpit, W-251 §3 #2) — option B; A refused. Built 2026-10-05 (W-262)
 timestamp: 2026-10-03T00:00:00Z
 filed: 2026-10-03
 ---
@@ -16,6 +16,19 @@ filed: 2026-10-03
 > crossed SR-DOTFUX d6, SR-FETCHER d12 and L10. Build:
 > [W-262](../open/W-262-land-arpit-w251-rulings.md) §1. The text below is the
 > argument as it was put.
+>
+> ✅ **BUILT 2026-10-05 (W-262).** `fux setup` writes every decoder and fetcher
+> copy with a first line `# fux-template: <sha256>` (prefix:
+> `constants.toml [templates] stamp_prefix`; digest over LF-normalised bytes);
+> below it the bytes are the template exactly. `fux doctor`'s new
+> `seeded copies current` row (warn) names an **unedited** copy — body still
+> hashes to its stamp — whose template has changed, with the lever *re-seed it
+> yourself* (delete, `fux setup`); an edited copy is not compared, an unstamped
+> one is counted and never judged. Nothing writes the file; a test holds
+> `doctor`, `doctor --fix`'s writer and `fux setup` to that. Records: SR-DECODE
+> d10, SR-FETCHER d12, SR-DOTFUX 6a, SR-DOCTOR's register. `pii.toml` and
+> `refusals.toml` are not stamped — the adjacent seam this doc left undecided.
+> B-013 and B-014 deleted.
 
 > **Verdict: PROPOSED — option A, the template stamp; option B if he will not
 > reopen a rewrite.** Every file the engine writes into a consumer's `.fux/`

@@ -323,6 +323,7 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_retired_agent_folders(root))
     checks.append(_readme_current(root))
     checks.append(_starter_refusals_untouched(root))
+    checks.append(_seeded_copies_current(root))
     checks.extend(_frozen_keys(root))
     checks.append(_unbound_types(root))
     checks.append(_listed_dirs_exist(root))
@@ -2573,6 +2574,87 @@ def _starter_refusals_untouched(root: Path) -> Check:
         "it has never been edited, and the rules it carries are ones fux stopped "
         "shipping. Compare it against `fux setup`'s current starter and take what "
         "applies to your sign-in pages; `fux setup` will not rewrite it",
+        level="warn",
+    )
+
+
+def _seeded_copies_current(root: Path) -> Check:
+    """Every stamped decoder and fetcher copy against the template it came from.
+
+    **W-262 -- Arpit, 2026-10-04, W-251 #2, option B of
+    `work/compare/consumer-template-refresh.compare.md`.** `fux setup` seeds
+    `.fux/decoders/` and `.fux/fetchers/` once and never again, so an engine fix
+    to a shipped template reaches no existing repo on its own (SR-DECODE
+    decision 10's accepted cost, SR-FETCHER decision 12's gap). Each copy now
+    carries a first-line stamp naming the template's sha256, which separates the
+    three cases this row needs:
+
+    | copy | finding |
+    |---|---|
+    | unedited, stamp = current template | none -- it IS the current template |
+    | **unedited, stamp != current template** | **named, with the lever: re-seed it yourself** |
+    | edited (body no longer hashes to its stamp) | none -- the consumer owns it |
+    | no stamp (seeded before W-262, or hand-written) | counted, never judged |
+
+    🔴 **A notice, never a rewrite.** SR-DOTFUX decision 6 names the mechanism
+    for a change that must reach an existing repo -- *a loader refusal or a
+    `doctor` check, never a rewrite* -- and option A, which refreshed unedited
+    copies on upgrade, was refused in the same ruling. **Re-seeding is the
+    consumer's act**: delete the file and run `fux setup`, which writes the
+    current template, stamped.
+
+    A **warning**, never an error: a stale unedited copy is a correct, supported
+    configuration that is merely missing fixes. Read as bytes; nothing is
+    imported (decision 7).
+    """
+    from .setup import read_stamp, seeded_copies, template_digest
+
+    name = "seeded copies current"
+    dot = fixed("fuxdir", "dir")
+    directory = root / dot
+    stale: list[str] = []
+    unstamped = 0
+    edited = 0
+    current = 0
+    for rel, template in seeded_copies():
+        path = directory / rel
+        if not path.is_file():
+            continue
+        try:
+            raw = path.read_bytes()
+        except OSError:
+            continue
+        stamp, body = read_stamp(raw)
+        if stamp is None:
+            unstamped += 1
+        elif template_digest(body) != stamp:
+            edited += 1
+        elif stamp != template_digest(template):
+            stale.append(f"{dot}/{rel}")
+        else:
+            current += 1
+    tail = (
+        f"; {edited} edited (yours, not compared)" if edited else ""
+    ) + (
+        f"; {unstamped} unstamped (seeded before the stamp, or written by hand - "
+        "cannot be judged)" if unstamped else ""
+    )
+    if not stale:
+        return Check(
+            name,
+            True,
+            f"{current} unedited copy(ies) match the current template{tail}",
+            level="warn",
+        )
+    return Check(
+        name,
+        False,
+        f"{len(stale)} unedited copy(ies) whose template has changed since they were "
+        "seeded: "
+        + ", ".join(stale[:4])
+        + (f" and {len(stale) - 4} more" if len(stale) > 4 else "")
+        + f"{tail}. fux will not rewrite them - re-seed it yourself: delete the file "
+        "and run `fux setup`, which writes the current template, stamped",
         level="warn",
     )
 

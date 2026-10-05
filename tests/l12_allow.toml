@@ -431,6 +431,7 @@ sites = [
   "src/fux/doctor.py::_pinned_note::inline::3",
   "src/fux/doctor.py::_pinned_without_bytes::inline::3",
   "src/fux/doctor.py::_readme_current::inline::4",
+  "src/fux/doctor.py::_seeded_copies_current::inline::4",
   "src/fux/doctor.py::_refusal_health::inline::5",
   "src/fux/doctor.py::_stale_redaction::inline::3",
   "src/fux/doctor.py::_suspended_pins::inline::3",

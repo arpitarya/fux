@@ -182,6 +182,12 @@ Fux looks in `.fux/decoders/` first; if no file of that module name is there,
 it falls back to the copy inside the installed package. **Deleting a decoder
 restores the built-in** rather than dropping the format.
 
+A copy `fux setup` wrote starts with one line, `# fux-template: <sha256>` — the
+template it came from. Leave it: `fux doctor`'s `seeded copies current` row uses
+it to tell you when an **unedited** copy has fallen behind a newer fux, and the
+fix is yours — delete the file and run `fux setup`. **Edit one byte below it and
+the copy is yours**; fux never rewrites it and stops comparing it.
+
 Three shared helpers do the parts that are dangerous to rewrite:
 
 | helper | gives you | why not do it yourself |

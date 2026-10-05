@@ -10,7 +10,10 @@ Fux never opens a socket itself. A **fetcher** — a Python file committed in
 responses that are not the document (a sign-in page, an error shell). Fux
 imports a fetcher only for `fux add <URL>`, `fux ingest`, and `fux answer` citing
 a URL. `fux setup` writes the two shipped fetchers once; **after that they are
-the repo's, and fux never rewrites them.**
+the repo's, and fux never rewrites them.** Each starts with a `# fux-template:
+<sha256>` line; `fux doctor`'s `seeded copies current` row names an **unedited**
+one whose template has changed since — re-seed it yourself (delete it, run
+`fux setup`).
 
 > ⚠ **This skill writes committed code and policy that decide which pages are
 > indexed.** Act only when a human asked. Never edit a fetcher or a refusal rule
