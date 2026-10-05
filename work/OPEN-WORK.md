@@ -15,7 +15,8 @@ session owes — is stated once in
 here. Read that record before changing anything below it.
 
 **A ball on every row, always one:** 🔴 blocked on Arpit, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item · 🟢 no blockers.
-**Optional, after the ball:** 🧨 broken or getting worse · 🔺 do first (Arpit only). Full legend: [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 20–34.
+**Optional, after the ball:** 🧨 broken or getting worse · 🔺 do first (Arpit only).
+**The `research` section runs in Cowork only, never in Claude Code** (rule 37a). Full legend: [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 20–34.
 
 ---
 
@@ -23,15 +24,11 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-228** — run [prompt 13](golden/prompts/13-claude-gen4-planted-misfits.md) in a fresh claude.ai chat (6 short docs, 3 planted misfits) and commit its three blocks. No key this time | 2026-10-03 | 1d |
-| ↳ **blocks:** W-240, W-236 | | |
-| 🔴 **W-251** — the backlog audit: 11 lines only he can answer, in [the item](open/W-251-backlog-audit-rulings.md) §3 — two Laws (L4, L3), three options he declined (SR-RS d12 is back), two reservations, `find --no-archived`, the graph verbs' shape, a size bar | 2026-10-03 | 1d |
+| 🔴 **W-243** — CI step 1 is out of levers (W-259: 1.575× vs 5.0×); FAST is 133 s vs ≤ 2 min. Recommended: retire step 1, finish step 3's in-process tests + a 2nd unit shard. [the item](open/W-243-ci-two-minutes.md) | 2026-10-05 | 0d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-257** — launch the enriched-rung authoring session ([the item](open/W-257-enriched-rung.md) says how, and why the author must be blind); it is his tokens. Or say *no* and the three doc2query rows stay unmeasured | 2026-10-04 | 0d |
+| 🔴 **W-257** — **on hold by his word** (2026-10-04): say *run it* to start the blind enriched rung. Ruled: after the gen-4 rebuild (W-240), pilot ~50 docs first. [the item](open/W-257-enriched-rung.md) | 2026-10-04 | 1d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-258** — twenty minutes at his own machine for the three captures only a real network gives ([the item](open/W-258-live-network-captures.md) is the checklist); nothing else in the queue waits on it | 2026-10-04 | 0d |
-| ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-260** — two W-256 results only he rules: the `doc_coverage` floor came back INCONCLUSIVE, and a no-change ingest costs 10 s with `redact` carrying it. [The item](open/W-260-w256-results-to-rule.md) has one line each, with a recommendation | 2026-10-04 | 0d |
+| 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 1d |
 | ↳ **blocks:** nothing else in the queue | | |
 
 ---
@@ -40,21 +37,27 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-228** · `arpit` — document families. The lens is built, but its misfit threshold is a placeholder: no known misfits exist yet. Arpit runs prompt 13 to plant 3, riding in gen 4 with W-240. [detail](open/W-228-document-families.md)
-- 🔴 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)
-- 🔴 **W-240** · `agent` — a question set that can test section scoring. Prompt 12's docs and 90 questions are in (ruled: accept). Ladder rebuild waits on W-228, then 🔴 Arpit scores. **Opus.** [detail](open/W-240-section-pool-set.md)
-- 🟢 **W-259** · `agent` — Node reads Python's saved link graph when fresh instead of rebuilding it per query (Fork A, ruled yes 2026-10-04); the CI comparison still rebuilds. Not built. **Opus.** [detail](open/W-259-node-reads-graph-json.md)
+- 🟡 **W-228** · `agent` — document families. Arpit planted 3 known misfits (prompt 13, checked); the lens is re-run against them on the new rungs, waiting on W-240's ladder rebuild. [detail](open/W-228-document-families.md)
+- 🟡 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)
+- 🟢 **W-240** · `agent` — generation 4 is complete (prompts 12 + 13). Next: rebuild the ladder once, re-run W-228's lens, capture the baseline; then 🔴 Arpit scores. **Opus.** [detail](open/W-240-section-pool-set.md)
+- 🟢 **W-261** · `agent` — every component design record must own a file; ten own none, so their code moves into files of their own (Arpit, 2026-10-04). Not built. **Opus.** [detail](open/W-261-component-records-own-a-file.md)
+- 🟢 **W-262** · `agent` — land six W-251 rulings: doctor names stale copies, library JSON = CLI's, `find --no-archived`, d12 narrowed, no required check, L3 reworded. **Opus.** [detail](open/W-262-land-arpit-w251-rulings.md)
 - 🟢 **W-250** · `agent` — run `fux hooks` in this repository so `.gitattributes` carries the merge driver where it was written. **Sonnet.** [detail](open/W-250-dogfood-fux-hooks.md)
+- 🟢 **W-264** · `agent` — unchanged files skip redaction: a cache keyed on content + `pii.toml` + redactor version; a no-change ingest spends ~6 of 10 s redacting. Not built. **Opus.** [detail](open/W-264-redaction-cache.md)
 
 ### testing
 
-- 🟡 **W-243** · `agent` — CI in ~2 min. On `main`: the key saves ✅, a docs-only push skips FULL ✅. DoD 1 (FAST ≤ 2 min) needs step 1, which waits on W-259. **Opus.** [detail](open/W-243-ci-two-minutes.md)
-- 🔴 **W-257** · `arpit` — an enriched rung: an agent writes questions over rung-01000 so doc2query can finally be measured; the author must be blind to the question sets or the numbers prove nothing. Arpit launches it (his tokens). **Opus.** [detail](open/W-257-enriched-rung.md)
+- 🔴 **W-243** · `arpit` — CI in ~2 min. Steps 2–3 run on `main`; step 1 is out of levers after W-259 (1.575×). FAST is 133 s. Arpit picks the next lever. **Opus.** [detail](open/W-243-ci-two-minutes.md)
+- 🔴 **W-257** · `arpit` — an enriched rung to finally measure doc2query, authored blind. On hold until Arpit says run; then after W-240's gen-4 rebuild, pilot first. **Opus.** [detail](open/W-257-enriched-rung.md)
 - 🔴 **W-258** · `arpit` — one hands-on session on his machine: a journalled answer whose source then vanishes, a real 429 from a real host, and parallel CDP fetches in signed-in Chrome. Checklist and bars are written. [detail](open/W-258-live-network-captures.md)
-- 🔴 **W-260** · `arpit` — W-256's two results his by their frozen rules: `doc_coverage_floor` INCONCLUSIVE (recommended: *off* stands); the delta ingest a split result (recommended: explain `redact`'s 6 s first). [detail](open/W-260-w256-results-to-rule.md)
 
 ### adr update
 
-- 🔴 **W-251** · `arpit` — the backlog audit's rulings: 12 of 24 forks ruled by his delegation on 2026-10-04 (§4), 3 in part; 11 lines are his alone (§3): two Laws, three options he declined, two reservations, taste, tokens, hands. [detail](open/W-251-backlog-audit-rulings.md)
+
+### research
+
+- 🟢 **W-263** · `cowork` — research and propose the never-built `enriched` ingest mode: its overlap with `fux enrich`, and whether it may write index records itself. No code. **Opus.** [detail](open/W-263-enriched-mode-proposal.md)
+- 🟢 **W-265** · `cowork` — deep research: how fux can better spot a question it cannot answer (the coverage floor tested no better than chance). No code. **Opus.** [detail](open/W-265-abstention-research.md)
+- 🟢 **W-266** · `cowork` — the register file (`.fux/index/REGISTER`) needs a better shape: a new column makes the whole file unreadable; one column says the same word on every row. Compare doc, Arpit picks, build filed after. **Cowork.** [detail](open/W-266-register-structure.md)
 
 ---

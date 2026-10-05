@@ -433,7 +433,7 @@ Named here so the cost is visible, not to pre-empt any of them:
 
 ## §11 — Graduation trigger
 
-> ✅ **Graduated 2026-10-03** ([W-251](../open/W-251-backlog-audit-rulings.md) §2):
+> ✅ **Graduated 2026-10-03** ([W-251](../../archive/open/W-251-backlog-audit-rulings.md) §2):
 > both halves of the condition below hold since W-204 — the retired sets are
 > committed judgments and W-236/W-228 are ranking decisions waiting — and the
 > **instrument** this note argued for is built: the golden ladder,

@@ -110,6 +110,7 @@ work/regression/2026-09-30-section-size/evidence/run.log                        
 work/regression/2026-09-30-shared-runtime/evidence/t1-arm-adversarial.err                              # not an indexed file type
 work/regression/2026-09-30-shared-runtime/evidence/t1-arm-rung-10000.err                               # not an indexed file type
 work/regression/2026-09-30-shared-runtime/evidence/t2-identity.err                                     # not an indexed file type
+work/regression/2026-10-04-node-arm-2/evidence/run.log                                                 # not an indexed file type
 # <<< fux: not indexed <<<
 
 # >>> fux: skipped >>>

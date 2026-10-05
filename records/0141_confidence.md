@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 4eed228393fa63800a78d93a4837f25366ba4131c69b5030d803be7d23f706e9
+content_sha: 7624fc80ceb2959901ccafc4af0e9b8293f542f1121f5025196dc6a484f23616
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -671,8 +671,12 @@ at `rung-01000` (three retired sets, 374 rows, 36 unanswerable of which 21 reach
 this clause) one floor of the fixed grid, `0.80`, met the bar's point criteria
 (12 of 21 caught; 61 correct answers demoted against a rate-matched coin's 64.1)
 and was nowhere near distinguishable from chance (p = 0.35 against 0.00625) and
-held in one set of three. The question is with Arpit; see
-[the run](../work/regression/2026-10-04-doc-coverage-replay/VERDICT.md).
+held in one set of three
+([the run](../work/regression/2026-10-04-doc-coverage-replay/VERDICT.md)).
+**Arpit ruled 2026-10-04: the gate stays off, and the next step is research** —
+how fux can better tell an unanswerable question from an answerable one,
+[W-265](../work/open/W-265-abstention-research.md) (Cowork). This run is the
+measured reason it is off.
 
 **What would change this:** a decoy set large enough for the two distributions
 to be estimated rather than sampled, and a pre-registration that fixes the floor

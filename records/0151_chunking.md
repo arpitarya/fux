@@ -11,7 +11,7 @@ feature: chunking — the strategy vocabulary, the boundary ladder, and the retr
 owns: [src/fux/refer/_chunk.py@a22e14a13f31, node/src/refer/chunk.mjs@18fa6e55bc11]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 208d6e87a835343160ca6b67c17b1f33f5d666c2985283782af6dc8238c6a9b8
+content_sha: 7fd0bcf53fe0a531c62a107a680299f59af9e6ea1febe208a5df8b333f6919b0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -123,7 +123,7 @@ still refuses it. That is correct, and it is now the **only** case that reaches
 it — before the ladder, every blank-line-free document did.
 
 **7. 🔴 A leading frontmatter block is a UNIT** (W-254, ruled by delegation
-2026-10-04, [W-251](../work/open/W-251-backlog-audit-rulings.md) §4). It is its
+2026-10-04, [W-251](../archive/open/W-251-backlog-audit-rulings.md) §4). It is its
 own passage — heading `""`, level 0, exact `L1-Ln` — and **never folds forward**
 into the first section. It is detected with `fux.frontmatter.parse`, shared
 with ingest and never reimplemented, and **only on the undecoded path**: the

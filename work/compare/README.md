@@ -26,7 +26,7 @@ at [`archive/v0.26-docs/compare/`](../../archive/v0.26-docs/compare/).
 
 🔴 **Two live forks** — eight after the 2026-09-20 sweep, down from 24; plus `intent-doctype-prior` (2026-09-24), `identifiers-whole` and `authority-prior` (2026-09-28), `rm3-selective` (2026-09-29), `shared-runtime` (2026-09-30); **less `intent-doctype-prior` and `identifiers-whole`, archived 2026-09-29** (built and measured, triggers ported into SR-TUNE d20 and SR-IDENTIFIERS d12); **less seven decided and built forks archived 2026-09-24**, each after its live triggers were ported into its owning record
 ([W-206](../../archive/open/W-206-compare-and-proposals-sweep.md)). **Sixteen left**, and
-the split is worth knowing before you go looking for one. **Plus three filed 2026-10-03** by the backlog audit ([W-251](../open/W-251-backlog-audit-rulings.md)) — **two of them ruled in part on 2026-10-04 by Arpit's delegation** (what is left of each is one §3 line), one still his — **and `pii-regex-bound`, filed and ruled 2026-10-04**:
+the split is worth knowing before you go looking for one. **Plus three filed 2026-10-03** by the backlog audit ([W-251](../../archive/open/W-251-backlog-audit-rulings.md)) — **two of them ruled in part on 2026-10-04 by Arpit's delegation** (what is left of each is one §3 line), one still his — **and `pii-regex-bound`, filed and ruled 2026-10-04**:
 
 - **Nine were MERGED into their owning record** — the verdict and the
   reopen-trigger both live there now, so the row in

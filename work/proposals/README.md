@@ -60,8 +60,28 @@ the defect this ordering exists to make visible.*
 
 ## Filed 2026-10-04
 
+* [Index stores — git today, a database tomorrow](index-stores.md) — Arpit's
+  ask (2026-10-04, clarified 2026-10-05): the index is in git now; in future it
+  may live in a database **outside any repository**, with fux's writer and
+  reader as two modules, and both kinds in parallel. Finds the seam already
+  there (`store/reader.py::read_index`, `store/writer.py::write_index`, 19 call
+  sites) and lifts it into one store boundary with `git` (today's shards,
+  unchanged) and `sql` (SQLite at a path on the stdlib; Postgres by DSN)
+  implementations; one writer publishes **generations**, readers **sync** one
+  into the derived plane so every read verb stays local — the choice that keeps
+  L4, L5 and L9 at once (a shared server would log every question's term
+  hashes). Reader and writer become separate packages over a shared core (an
+  SPA backend installs only the reader, a git hook only the writer; the writer
+  is Python only, the reader Python and Node — ruled 2026-10-05) while
+  `fux-engine` stays everything combined exactly as today, and the generation
+  carries the ranking knobs. Database research: SQLite is the
+  format, Postgres the one hosted server. A committed SQLite file stays
+  refused; a vector DB is not a store.
+  **Graduates when Arpit rules F1 and F2 and names the first index that will
+  live outside a repo.**
+
 * [The build plan, October 2026](build-plan-2026-10.md) — the 2026-10-04 ruling
-  pass over the backlog ([W-251](../open/W-251-backlog-audit-rulings.md) §4)
+  pass over the backlog ([W-251](../../archive/open/W-251-backlog-audit-rulings.md) §4)
   left three decided-but-unbuilt rows whose **approach is now settled** and
   whose build nobody is about to start: B-031 (a `--json` shape for the write
   verbs — declared in SR-CLI, waiting for a caller), B-041 (fence-aware
@@ -75,7 +95,7 @@ the defect this ordering exists to make visible.*
 ## Filed 2026-10-03
 
 * [The measurement plan, October 2026](measurement-plan-2026-10.md) — the
-  2026-10-03 backlog audit ([W-251](../open/W-251-backlog-audit-rulings.md))
+  2026-10-03 backlog audit ([W-251](../../archive/open/W-251-backlog-audit-rulings.md))
   sorted every `unmeasured` row by what it waits on; **twenty-one wait on
   nothing but a frozen pre-registration** on data that exists (lab rungs, the
   retired sets, a filed capture). Eight sections, each with rung, endpoint,

@@ -9,7 +9,7 @@ ball: agent
 
 # W-236 — section records (W-168 step 10, U2)
 
-**Status: Part A done 2026-09-30** — [SR-SECTIONS](../../records/0161_sections.md) (proposed) and the [size run](../regression/2026-09-30-section-size/VERDICT.md) (PASS; index +98.4 % at rung-10000, not graded). Part B waits on W-240 (the pool). Filed 2026-09-29. Arpit asked for an item on
+**Arpit, 2026-10-04 (W-251 #9):** Part B pre-registers a size bar before it builds: section plane ≤ 2.0× the doc plane and ≤ 55 MB at rung-10000, largest file ≤ 1 MiB, labelled post-hoc-informed. No R-series promise. **Status: Part A done 2026-09-30** — [SR-SECTIONS](../../records/0161_sections.md) (proposed) and the [size run](../regression/2026-09-30-section-size/VERDICT.md) (PASS; index +98.4 % at rung-10000, not graded). Part B waits on W-240 (the pool). Filed 2026-09-29. Arpit asked for an item on
 2026-09-29. The ruling is [`compare/section-units`](../compare/section-units.compare.md)
 (U2 · B2 · E1, superseding U0).
 

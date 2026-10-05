@@ -4,12 +4,14 @@ name: W-240
 description: "The data item W-236 Part B waits on: a scored question set whose step10_section pool is ≥ 6 (set-4-claude has 1). Recipe R10 in the seed, one designated Claude session authors set-5-claude under the L11 carve-out, a rung rebuild, then Arpit scores the baseline."
 item: W-240
 filed: 2026-09-30
-ball: arpit
+ball: agent
 ---
 
 # W-240 — a set that can measure section records
 
-**Status 2026-10-03: prompt 12 RUN by Arpit; its data is in the tree. Two rulings below. Next: the ladder rebuild, after W-228's prompt 13.**
+**Status 2026-10-05: prompts 12 AND 13 RUN by Arpit; generation 4 is complete in the tree** (`seed/63`–`88`, `set-5-claude`, `planted-misfits.tsv`). **Next (agent, Opus): commit prompt 13's data and delete prompt 13 in that same change; then rebuild the ladder once, from `seed/` alone (A23); then re-run W-228's families lens on the new rungs against `planted-misfits.tsv`; then capture the baseline for 🔴 Arpit to score.**
+
+**Earlier status (2026-10-03): prompt 12 run; the ladder rebuild waited on W-228's prompt 13.**
 
 **✅ RULED 2026-10-03 (Arpit, Cowork) — *"go with the recommendation for decision one and decision two"*:**
 1. **Accept the generation-4 data as it is.** Only `63` meets R10's ≥ 3 000 words. `64` (2 119), `65` (1 750) and `66` (1 318) fall short, but all four have 15–16 sections. Recorded here as a known deviation from R10. **The real gate is the `step10_section` pool on the rebuilt rung: if it is under 6, lengthen `64`–`66` with off-question sections** (an addition that leaves every question valid) rather than re-author.

@@ -9,10 +9,17 @@ ball: arpit
 
 # W-258 — the live-network captures
 
+**🔴 ON HOLD by Arpit's word, 2026-10-04 (Cowork):** *"block this on me as
+well. And keep it blocked until I say so."* Nothing here starts until he says
+so. Recommended to him the same night, **not yet ruled**: run §1 and §2 (the
+vanishing source, the real 429); park §3 (parallel CDP) in the backlog, since it
+cannot move the shipped default and needs ≥ 12 of his signed-in sources — and
+never employer-intranet pages if it is ever run.
+
 **Model: NONE — Arpit's hands.** The three captures need egress, a signed-in
 Chrome and his credentials; an agent writes the harness and reads the result,
 and does neither of those. Filed 2026-10-04 by delegation
-([W-251](W-251-backlog-audit-rulings.md) §3 #24). The loopback halves of B-102
+([W-251](../../archive/open/W-251-backlog-audit-rulings.md) §3 #24). The loopback halves of B-102
 and B-124 and the Windows daemon e2e (B-103) are **agent** work and live in
 W-256.
 

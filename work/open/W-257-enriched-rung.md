@@ -9,11 +9,22 @@ ball: arpit
 
 # W-257 — an enriched rung, authored blind
 
+**✅ RULED 2026-10-04 (Arpit, Cowork) — *"Go with the recommendation. But keep it
+blocked until I say that we need to run this."*** So:
+
+1. **On hold.** Nothing here starts — not the pilot, not the pre-registration —
+   until Arpit says *run it*. The row stays 🔴 in the inbox for that word.
+2. **After the generation-4 ladder rebuild** (waits on W-240). Enriching
+   today's gen-3 rung-01000 would label a rung that is about to be replaced.
+3. **Pilot first:** one `--plan` scope of about 50 documents; read `--check`'s
+   refusal rate and fix the instructions before the full rung.
+4. Then the full rung and the three pre-registered runs, as below.
+
 **Model: Opus** for the pre-registration and the three runs; **the authoring
 session is a fresh agent of any strong model that has read nothing listed
 below.** 🔴 **The launch is Arpit's** — the authoring is tokens, and they are
 his (W-251 §3 #23). Filed 2026-10-04 by delegation
-([W-251](W-251-backlog-audit-rulings.md) §3 #23); nothing here is built or run.
+([W-251](../../archive/open/W-251-backlog-audit-rulings.md) §3 #23); nothing here is built or run.
 
 ## What it is
 

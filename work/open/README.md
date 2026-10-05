@@ -29,7 +29,10 @@ detail. The detail lives here, one file per `W-nn`, named
    done, blockers, the spec it implements, hazards, and the model that
    should execute it. Anything longer belongs in an SR or a
    compare/proposal doc, and is linked from here.
-4. **This file is the spec as well as the state.** `PLAN.md` was archived on
+4. **A `research` item's file says `**Model:** Cowork`** and its row's lane is
+   `cowork`: it runs in Cowork, never in Claude Code
+   ([SR-WORK-OPEN-QUEUE](../../records/0051_WORK-open-queue.md) rule 37a).
+5. **This file is the spec as well as the state.** `PLAN.md` was archived on
    2026-08-18 and its milestone scope migrated into these files, so there is
    no second document to keep in step.
 

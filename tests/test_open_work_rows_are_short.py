@@ -428,7 +428,7 @@ def test_a_blocks_subrow_names_exactly_the_waiting_items() -> None:
 # honest or whether a session reconciled before it reported.
 
 OPEN_DIR = WORK / "open"
-GROUPS = ("### fux build", "### testing", "### adr update")
+GROUPS = ("### fux build", "### testing", "### adr update", "### research")
 #: Rule 47's own words: what is or is not committed, staged, pushed or unpushed.
 #: The *verb* ("commit its three blocks") and the CI noun ("a docs-only push") are
 #: instructions and events, not a statement of repository state, and are legal.
@@ -438,10 +438,28 @@ _GIT_STATE = re.compile(
 
 
 def test_rule_37_the_open_items_are_grouped_by_what_closing_them_takes() -> None:
-    """SR-WORK-OPEN-QUEUE rule 37: the three group headers are present under `## Open items`."""
+    """SR-WORK-OPEN-QUEUE rule 37: the four group headers are present under `## Open items`."""
     headers = {l.strip() for _, l in _section("## Open items", "# The rules") if l.startswith("### ")}
     missing = [g for g in GROUPS if g not in headers]
     assert not missing, f"rule 37: group header(s) missing from OPEN-WORK: {missing}"
+
+
+def test_rule_37a_research_runs_in_cowork_never_claude_code() -> None:
+    """SR-WORK-OPEN-QUEUE rule 37a (Arpit, 2026-10-05): every row under `### research`
+    is lane `cowork`, and its detail file's Model line names Cowork."""
+    rows = [l for _, l in _section("### research", "---") if l.startswith("- ")]
+    bad = []
+    for row in rows:
+        if "· `cowork` —" not in row:
+            bad.append(f"lane is not `cowork`: {row[:80]!r}")
+        m = re.search(r"\(open/(W-\d+-[^)]+\.md)\)", row)
+        if not m:
+            continue
+        text = (OPEN_DIR / m.group(1)).read_text(encoding="utf-8")
+        model = re.search(r"\*\*Model:\*\*[^\n]*", text)
+        if not model or "Cowork" not in model.group(0):
+            bad.append(f"{m.group(1)}: its **Model:** line does not name Cowork")
+    assert not bad, "rule 37a: research is Cowork-only:\n  " + "\n  ".join(bad)
 
 
 def test_rule_38_every_item_file_names_the_record_it_updates() -> None:

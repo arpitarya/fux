@@ -32,10 +32,19 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-04** (Cowork, Fable 5.1 — the second ruling pass over W-251).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-05** (Claude Code, Opus 5.5 — the green items, one after another).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-10-04 (latest) — W-251 RULED BY DELEGATION: 13 OF 24 FORKS SETTLED, 3 IN PART, 10 LEFT THAT ARE HIS; SIX ITEMS FILED
+### 🟢 2026-10-05 (latest) — ELEVEN GREEN ITEMS BUILT OR MEASURED; THE OPUS REVIEW SENT SR-RS d12 BACK
+
+- Arpit (Claude Code): *"implement everything that is green one after the other till the closure."* Each item went to a subagent on the model its file names; this session reviewed every diff, re-ran the three suites, and closed it by path.
+- **Closed:** W-253 (3.0 clean-ups), W-254 (frontmatter is its own passage), W-255 (PII ReDoS linter + `doctor` timing), W-245 (~40 stale record sentences), W-247 (CLI renders `fux.api`'s payload, 537/537 byte-identical), W-248 (enrich reads the decoder queue — B-270: queued enrichment reaches no index), W-249 (resident index for `mcp`/`serve`, keyed on stamp + shard stats), W-246 (22 gates), W-252 (Node arm PASS 0/801 on lab rungs), W-256 (loopback PASS; two results → W-260). **W-259** built and measured (the read NULL at 9.5 %; one-build-per-process 1.575× → W-243 step 1 STOP); its closure waits on the concurrent session's staged queue.
+- **The Opus review of W-251 §4:** every line applied except **#15, SR-RS d12 — returned to §3**: the narrowing Arpit declined in person; a fired reopen-trigger does not say who closes the question.
+- **Gates added this session:** `sr-owns.py --write` and `gen-components.py --write` refuse over untracked files (the third and fourth occurrence of one class, SR-WORK-OWNERSHIP d13b); an `inspect` hash-seed tie fixed (L4).
+- **Findings for Arpit:** B-270 (enrichment for unreadable docs), B-271 (SR-LAWS d7's withdrawn phrase — a Law record), the lab's committed rungs are index v5 and refused by this engine (every run used migrated copies), and `redact` costs 6 s of a 10 s delta at rung-10000 against W-239's 0.97 s (W-260 §2).
+- **Left:** W-250 (`fux hooks` here) — **deliberately not run while another session has 128 `.fux/index` shards staged**: its post-commit hook spawns a detached re-index that would race that work.
+
+### 🔴 2026-10-04 — W-251 RULED BY DELEGATION: 13 OF 24 FORKS SETTLED, 3 IN PART, 10 LEFT THAT ARE HIS; SIX ITEMS FILED
 
 - Arpit repeated the delegation verbatim (*"ratify whatever you can … go for it … I want Opus 5.5 to review it"*). Read as authority to rule where the evidence settles a line and nothing in the way is a Law, an option he declined in person, or a reservation in his name — stated in W-251 §3; every ruling is in §4 with the evidence that settled it and where it lands.
 - **Four of yesterday's recommendations were wrong** (W-251 §Hazards): CAP-3's set is stated; the graph-verb parity direction was backwards; releasing grade 6 collides with inferred edges; `--agents` does not exist. Corrected, not papered over.

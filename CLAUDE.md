@@ -40,7 +40,8 @@ The rules — what the first output must name, the inbox, the 5-day rule, the
 `↳ blocks:` sub-row, and which balls an agent may pick from — are stated once
 in [SR-WORK-OPEN-QUEUE](records/0051_WORK-open-queue.md) rules 32–34 and
 39–45. **His time and tokens are money**; this applies to Cowork and Claude
-Code alike.
+Code alike. **Claude Code never picks an item from OPEN-WORK's `research`
+section** — those run in Cowork only (rule 37a, Arpit 2026-10-05).
 
 **Two strikes → a gate:** a failure class the WORKLOG records twice becomes a
 test or a mechanical check in the same change that records the second

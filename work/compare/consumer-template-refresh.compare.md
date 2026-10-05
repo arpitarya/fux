@@ -2,12 +2,20 @@
 type: Compare Doc
 title: "Consumer-side template refresh — how an engine fix reaches a consumer's `.fux/decoders/`, `.fux/fetchers/` and `pii.toml`"
 description: "Backlog B-013 and B-014 (B-073 and B-221 adjacent) as one fork. Today a copy written once into a consumer's `.fux/` is frozen forever; four real decoder defects would each have needed every consumer to refresh by hand. Options: a template sha stamp with engine-owned refresh of unedited copies, doctor-names-the-gap only, or keep the freeze. Recommended: the stamp — but SR-DECODE d10 DECLINED it, so reopening is Arpit's."
-status: proposed (W-251 §3 #2 — Arpit's ruling; option A crosses three fences in his name, option B none) — NOT ratifiable by delegation, re-read 2026-10-04
+status: ruled 2026-10-04 (Arpit, W-251 §3 #2) — option B; A refused. Build: W-262
 timestamp: 2026-10-03T00:00:00Z
 filed: 2026-10-03
 ---
 
 # Consumer-side template refresh
+
+> ✅ **RULED 2026-10-04 (Arpit, Cowork): option B** — *"go with the
+> recommendation."* Seeded copies carry a template stamp; `fux doctor` names an
+> unedited copy whose template changed; **fux never rewrites a consumer's
+> file.** Option A (engine-owned refresh of unedited copies) is refused: it
+> crossed SR-DOTFUX d6, SR-FETCHER d12 and L10. Build:
+> [W-262](../open/W-262-land-arpit-w251-rulings.md) §1. The text below is the
+> argument as it was put.
 
 > **Verdict: PROPOSED — option A, the template stamp; option B if he will not
 > reopen a rewrite.** Every file the engine writes into a consumer's `.fux/`

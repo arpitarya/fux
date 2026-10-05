@@ -9,7 +9,9 @@ ball: agent
 
 # W-259 — Node reads `graph.json` when fresh (Fork A)
 
-**Status: ratified 2026-10-04, not built.**
+**CLOSED 2026-10-05: DoD 1–5 done.** Speed run [VERDICT](../regression/2026-10-04-node-graph-speed/VERDICT.md) (`153bd126`): (a) the read is faster in 24/24 rung-10000 cells but saves 9.5–9.7 % against a frozen 10 % bar → **NULL: the read stays**, not a reopen-trigger; (b) one graph build per Node process 1.575× against 5.0× → **W-243 step 1 stays STOP.** Records landed with the run (SR-NODE-SEARCH d9, compare Fork A, CHANGELOG).
+
+**Earlier status (2026-10-05): DoD 1–2 BUILT** (`caa30980`; [identity run](../regression/2026-10-04-node-graph-read/report.md): 512/512 byte-identical read vs rebuild, arm 0/225 with the switch, N2 IDENTICAL). **DoD 3–4: the speed run is pre-registered** ([PRE-REGISTRATION](../regression/2026-10-04-node-graph-speed/PRE-REGISTRATION.md), `d0a60b6e`) **and not yet run.** Ratified 2026-10-04.
 
 **Arpit, 2026-10-04 (Cowork):** *"go with the recommendation"*, on
 [`compare/shared-runtime`](../compare/shared-runtime.compare.md) Fork A. The

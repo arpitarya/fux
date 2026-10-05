@@ -11,7 +11,7 @@ feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@577ebf850a7e, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@a6b1bb5f5517, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: e3790d46227543318bdf9971002e9f8d52e9ce60f6011484d29cf665612fc99a
+content_sha: 14bf0b8d57b43b03b0997602e239fd5063752cc5a4f416f56ea2ae99114853f3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -59,8 +59,10 @@ median 15.11 s and a delta 10.39 s with zero documents re-extracted — a
 full/delta ratio of **1.45×**, not 23× — and the largest delta segment is
 `redact` (~57 %), not walk or parse
 ([run](../work/regression/2026-10-04-ingest-split/VERDICT.md), `informed`).
-What that number licenses for the dirty list (B-002) is Arpit's: the frozen
-rule read it as a split result.
+The frozen rule read it as a split result; **Arpit ruled 2026-10-04: a
+redaction cache**, so an unchanged file skips `redact` on a delta —
+[W-264](../work/open/W-264-redaction-cache.md), which first explains why this
+run's `redact` (~6 s) differs from W-239's 0.97 s on the same rung.
 
 The **write** is incremental too: a shard whose bytes come out identical is left
 untouched on disk, so git sees nothing. Re-running ingest on an unchanged corpus

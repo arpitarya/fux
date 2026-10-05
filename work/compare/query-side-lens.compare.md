@@ -2,13 +2,15 @@
 type: Compare Doc
 title: "The query-side lens — `--intent`, `--as-of`, `--no-archived`, and whether `supersedes:` is a concept anyone will use"
 description: "The fork three records call 'unopened, no compare doc, not authorised' (SR-TUNE d15, SR-ARCHIVED-CONTENT d6, SR-API d7), plus the two questions beside it: whether supersession stays a declared fact (B-144) and which of SR-ENRICH's four candidate enrichments are still live (B-145). Recommended: no `--intent` flag (the cue-derived prior shipped), refuse `--as-of`, build `find --no-archived` only, keep `supersedes:` as a declared fact, and two of four candidates remain."
-status: ruled in part 2026-10-04 by delegation (W-251 §4 #3) — parts 1, 2, 4, 5; part 3 (`find --no-archived`) is Arpit's (W-251 §3 #3)
+status: ruled 2026-10-04 — parts 1, 2, 4, 5 by delegation (W-251 §4 #3); part 3 `find --no-archived` YES by Arpit (W-251 §3 #3). Build: W-262
 timestamp: 2026-10-03T00:00:00Z
 filed: 2026-10-03
 ---
 
 # The query-side lens
 
+> ✅ **Part 3 RULED 2026-10-04 (Arpit): yes, build `find --no-archived`** as designed below — [W-262](../open/W-262-land-arpit-w251-rulings.md) §5. The whole fork is now ruled.
+>
 > **Verdict: RULED IN PART, 2026-10-04 (by delegation, W-251 §4 #3).**
 > (1) **`--intent` as a flag is refused — reworded from the proposal.** W-168
 > step 9 shipped a *doc-type* intent prior derived from the question's cues

@@ -11,7 +11,7 @@ owns: [tests/test_open_work_rows_are_short.py@473adaf7624c, tests/test_open_work
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 6ae11ca2fb6b483b23111e0311683e31fe5ca842d4d8bd9ce19980029be7cfe3
+content_sha: 2f0692739bde0b0a98878a2d950c96c9663f344e53ace09e073306dcaf7b9ca4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -194,21 +194,33 @@ that is the only thing the file says.
     clears it, on any ball.
 30. 🔺 **do first — set and removed only by Arpit.** An agent never adds one.
 31. **Mark order:** the ball, then 🧨, then 🔺, then the id.
-32. **An agent picks from 🟢 only:** 🟢 🧨 🔺 → 🟢 🔺 → 🟢 🧨 → 🟢. 🔴, 🟣 and 🟡 wait.
+32. **An agent picks from 🟢 only:** 🟢 🧨 🔺 → 🟢 🔺 → 🟢 🧨 → 🟢. 🔴, 🟣 and 🟡 wait. **Claude Code never picks from the `research` section** (rule 37a).
 33. **A session names every 🔴 decision in its first output, 🔺 first.**
 34. **A 🔺 item waiting on an item without 🔺 is flagged to Arpit**, never fixed
     by giving the blocker a 🔺.
 
 **E · Ordering**
 
-35. **Two lanes, ordered independently — they run concurrently.** `arpit` needs
-    a human's hands; `agent` an agent can execute alone. Order **within** a
+35. **Three lanes, ordered independently — they run concurrently.** `arpit`
+    needs a human's hands; `agent` an agent can execute alone; `cowork` is a
+    research item, run only in a Cowork session (rule 37a). Order **within** a
     lane; never across them.
 36. **Priority is damage that accrues with elapsed time**, above damage that is
     merely present-but-static. Only the former gets worse by waiting.
 37. **Grouped by what closing it takes** — `fux build` (code), `testing` (a run
     or a harness), `adr update` (a ruling or a record, no code and no
-    measurement).
+    measurement), `research` (a proposal or compare doc reached by reading and
+    analysis — no code, no record change, closes on Arpit picking a shape;
+    added by Arpit, 2026-10-05).
+
+37a. 🔴 **The `research` section is executed in Cowork, never by Claude Code**
+    (Arpit, 2026-10-05: *"research section will never be executed by Claude
+    code and will always be executed on cowork"*). A research row's lane is
+    `cowork`, and its detail file's `**Model:**` line names Cowork. A Claude Code
+    session **does not pick a research item, even a 🟢 one** (rule 32 reads
+    *agent* as Claude Code for the other three sections), and does not start one
+    because it was asked to "work the queue". Research may still *file* items
+    into the other sections; those are built as usual.
 38. **Each item's file names the record its change will have to update.** If it
     cannot name one, it says **"no SR affected"** out loud.
 
@@ -441,7 +453,7 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
 
 ### Consequences
 
-- **Rules 37, 38 and 47 are gated** (W-246, 2026-10-04) by `tests/test_open_work_rows_are_short.py`: the three group headers are present, every `work/open/W-*.md` names an `SR-` record or says *no SR affected*, and the queue states no git state (committed, staged, pushed, unpushed). **The thirteen conduct rules (1, 5, 11, 12, 29, 30, 32, 33, 35, 36, 48, 50, 53) are judgement, permanently** — no parser can tell whether a session reconciled before it reported or whether a priority was honest, and a gate that pretended to would be coverage in name only.
+- **Rules 37, 38 and 47 are gated** (W-246, 2026-10-04) by `tests/test_open_work_rows_are_short.py`: the four group headers are present, every research row is lane `cowork` and its file names Cowork (37a), every `work/open/W-*.md` names an `SR-` record or says *no SR affected*, and the queue states no git state (committed, staged, pushed, unpushed). **The thirteen conduct rules (1, 5, 11, 12, 29, 30, 32, 33, 35, 36, 48, 50, 53) are judgement, permanently** — no parser can tell whether a session reconciled before it reported or whether a priority was honest, and a gate that pretended to would be coverage in name only.
 - **A rule changes in exactly one place and appears in exactly one place.**
   Nothing to regenerate, nothing to hold equal, and no second thing a reader can
   quote. The cost is the extra hop from the queue to this record.

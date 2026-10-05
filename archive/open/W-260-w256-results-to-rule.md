@@ -4,10 +4,23 @@ name: W-260
 description: "Two W-256 measurements came back in the shape their frozen rules send to Arpit: §2's doc_coverage replay INCONCLUSIVE (the one candidate floor is not distinguishable from chance), and §8's ingest split a split result (an unchanged delta costs 10.4 s at rung-10000, but redact, not walk+parse, carries it). One line each; nothing waits on either."
 item: W-260
 filed: 2026-10-04
-ball: arpit
+ball: agent
 ---
 
 # W-260 — two W-256 results that are Arpit's to rule
+
+**✅ RULED 2026-10-04 (Arpit, Cowork):** *"for line 2 go with option B — build a
+cache so unchanged files skip redaction. For the first one create a work item to
+do a deep research on how it can be improved."*
+
+- **Line 1 → [W-265](W-265-abstention-research.md)**, deep research.
+  `doc_coverage_floor` stays `0.0`; SR-CONFIDENCE d12 gets a pointer to the run
+  as the measured reason.
+- **Line 2 → option (b), [W-264](W-264-redaction-cache.md)**, a redaction cache
+  keyed on content sha + `pii.toml` digest + redactor version. (a)'s diagnosis
+  of the 6 s is folded into W-264 as its first step.
+- **Left here:** the two record pointers (SR-CONFIDENCE d12, SR-MAINTENANCE
+  1a-3 → W-264), then archive.
 
 **Model:** none until he rules; the follow-up each answer licenses is named
 below. **Records it would update:** [SR-CONFIDENCE](../../records/0141_confidence.md)

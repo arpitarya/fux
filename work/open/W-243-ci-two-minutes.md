@@ -4,17 +4,22 @@ name: W-243
 description: "CI in ~2 minutes (Arpit, 2026-09-30). Built 2026-09-30, not yet run on main: FULL skips a cell whose verdict is known (step 2), Windows temp moved and the freshness gate batched (step 3). Step 1 STOPPED at 1.1-1.4x against a 5x bar and waits on W-242; step 4 keeps needs: at 38 jobs against a cap of 20."
 item: W-243
 filed: 2026-09-30
-ball: agent
+ball: arpit
 ---
 
 # W-243 — CI in about two minutes
 
-**Status: built 2026-09-30 (Claude Code), uncommitted, and not yet run on
-`main`.** Where each step stands:
+🔴 **FOR ARPIT, 2026-10-05 — step 1 is out of levers.** W-259's speed run ([VERDICT](../regression/2026-10-04-node-graph-speed/VERDICT.md)): one graph build per Node process gives **1.575×** against step 1's **5.0×** bar — the rest of each comparison is the plain scan (~188 ms), which nothing ruled so far touches. So step 1 stays STOP, and step 4 (*no serial stage*) can only follow step 1. **DoD 1 (FAST ≤ 2 min) stands at 133 s, 13 s over.**
+
+- **(a) Recommended:** retire step 1 as measured-and-stopped (three runs: 1.1–1.4×, 1.2–1.4×, 1.575×); finish **step 3's two open pieces** — in-process CLI tests and a second unit shard — which never depended on step 1 and target the 133 s unit job directly; then re-read DoD 1. Step 4 stays as is.
+- (b) Accept 133 s, amend DoD 1 to it, close W-243.
+- (c) Keep step 1 open for a future Node accelerator.
+
+**Status (2026-10-05): steps 2–3 built and running on `main` (the key saves; a docs-only push skips FULL). Step 1 waits on W-259's speed run; step 4 can only follow step 1.** Where each step stands:
 
 | step | state | evidence |
 |---|---|---|
-| 1 — one Node process per pass | 🛑 **STOPPED by its own rule, twice**: one process is 1.11–1.44x faster, not ~5x. **Re-run 2026-10-03 after W-242 landed: 1.21–1.43x, still STOP.** The arm compares the scan, which Tier 1's plane does not touch, and each call still rebuilds the graph plane. **Fork A ruled YES 2026-10-04 (Arpit); built under [W-259](W-259-node-reads-graph-json.md), which also measures a one-graph-build-per-process driver, because the arm itself must still rebuild (N2). Step 1 reopens on whichever clears ~5x** | [`2026-09-30-ci-arm-batching`](../regression/2026-09-30-ci-arm-batching/report.md) |
+| 1 — one Node process per pass | 🛑 **STOPPED by its own rule, twice**: one process is 1.11–1.44x faster, not ~5x. **Re-run 2026-10-03 after W-242 landed: 1.21–1.43x, still STOP.** The arm compares the scan, which Tier 1's plane does not touch, and each call still rebuilds the graph plane. **Fork A ruled YES 2026-10-04 (Arpit); built under [W-259](../../archive/open/W-259-node-reads-graph-json.md), which also measures a one-graph-build-per-process driver, because the arm itself must still rebuild (N2). Step 1 reopens on whichever clears ~5x** | [`2026-09-30-ci-arm-batching`](../regression/2026-09-30-ci-arm-batching/report.md) |
 | 2 — skip FULL on a known verdict | ✅ built: [`scripts/ci-key.py`](../../scripts/ci-key.py), [`full-verdict`](../../.github/actions/full-verdict/action.yml), a `verdict` job, the `publish.yml` gate, [SR-WORK-RELEASE](../../records/0063_WORK-release.md) d14. **17 of 40** recent commits would skip, not 22 | [analysis §Step 2](../regression/2026-09-30-ci-arm-batching/ANALYSIS.md) |
 | 3 — Windows at the cause | 🟡 partly: profiled (one test was 54 % of the suite's spawns and 72 s on Windows; batched, answers identical on 166 commits); `TMP`/`TEMP` on `$RUNNER_TEMP`; FULL prints `--durations=30`. **In-process CLI tests and a second shard not done** — they wait on the 30-slowest profile from the first `main` run | [analysis §Step 3](../regression/2026-09-30-ci-arm-batching/ANALYSIS.md) |
 | 4 — no queue, no serial stage | 🟡 `ladder` folded into `build`. **`needs:` stays**: 38 jobs against 20, and 8 macOS against 5, so the drop condition does not hold. It can only hold after step 1 | [analysis §Step 4](../regression/2026-09-30-ci-arm-batching/ANALYSIS.md) |
@@ -186,3 +191,13 @@ Target: each Windows Python cell ≤ ~2 min.
 - Paid or self-hosted runners.
 - Removing an OS or version from the support matrix (L7/L8).
 - The golden corpus (local-only, L11).
+
+**2026-10-05 — step 1 STAYS STOP (W-259 (b), measured against a frozen bar).**
+One graph build per Node process, reused across the process's comparisons,
+gives a median **1.575×** on this step's own 24-comparison spike: a `git
+archive` of `d0a60b6e`, 5 rotated trials (1.540–1.606). The frozen bar was
+**5.0×**. One process alone gives 1.366×. What remains is the default-path
+scan, ≈188 ms per comparison. The graph.json read (Fork A) is ineligible
+because the arm forbids it, and it would have given 1.309×. The next trigger
+is a cheaper scan, or a ruling on what the arm compares.
+[verdict](../regression/2026-10-04-node-graph-speed/VERDICT.md).
