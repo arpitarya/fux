@@ -9,7 +9,7 @@ ball: agent
 
 # W-262 — land Arpit's W-251 rulings #2, #3, #4, #15, #22, #25
 
-**Status: ratified 2026-10-04, not built.** Rulings quoted in
+**Status: ratified 2026-10-04; DoD 1, 2, 3, 4, 6 and 7 LANDED 2026-10-05 (Claude Code, Opus) — #2 the template stamp and `seeded copies current` row, #4 library → CLI payloads on both readers, #22, #25, #15 record text, B-013/B-014/B-147/B-154 deleted. DoD 5 (#3, `find --no-archived`) is a separate agent's, with the find refactor — B-143 stays until it lands.** Rulings quoted in
 [W-251 §3a](../../archive/open/W-251-backlog-audit-rulings.md).
 
 **Model:** Claude Code, **Opus** for #4 (a public shape, two readers);

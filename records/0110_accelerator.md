@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@158673d75847, node/src/derive@0b3875f3aa7b, tools/differential@867e447d74ee, src/fux/schemas/runtime.schema.json@9559934cb843]
+owns: [src/fux/derive@158673d75847, node/src/derive@0b3875f3aa7b, tools/differential@5b9536850925, src/fux/schemas/runtime.schema.json@9559934cb843]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 6e1f11bc0d9b1b7f1a3fbc532ce004a2bd51479e57de413c3eb07dfd3d642466
+content_sha: 93284ab6623b439513af0a50dfb8de1e52dc447650785c666193d3a9282695b2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -739,6 +739,8 @@ on 2026-10-04 (Arpit) and BUILT the same day (W-259;
   capture above exist to catch.
 
 **No decision here moved** (2026-10-03, the alpha.10 release CI): `tools/differential/node_arm.py`'s `api` lane now compares scores at `round(9)`, through the `_scores_at_round9` the `graph` lane already used. That is [SR-RANKING](0111_ranking.md) decision 8a's resolution, applied in every lane. A 2-ulp difference on a graph-boosted score failed all six OS x Node cells of shard 2/3, and the ruling accepts it. It is the second lane found stricter than the ruling, so `tests/test_node_arm_tolerance.py` is the gate (SR-WORK-SESSION decision 13).
+
+**No decision here moved** (W-262, 2026-10-05): the arm's `api` lane calls `ix.graph(q)` without the retired `hops`/`top` arguments — the library's graph verbs now return the CLI's `--json` payloads ([SR-API](0154_api.md) decision 1, Arpit 2026-10-04, W-251 #4). What the lane compares, and at what tolerance, is unchanged.
 
 ### Consequences
 

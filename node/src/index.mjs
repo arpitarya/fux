@@ -16,13 +16,13 @@
  * CLI on any tuned repo, silently. Three surfaces, one seam, or it is not one
  * API (SR-NODE-SEARCH decision 8; SR-API decision 6).
  *
- * ⚠ **`explain`, `graph` and `path` here are `api.py`'s shapes, which are NOT
- * the CLI's.** The Python API grew its own simpler helpers for the graph lane —
- * `{id, community, members, edges}` rather than the CLI's `{doc, edges,
- * community}`, a breadth-first best route rather than every enumerated route.
- * This file mirrors `api.py` because `api.py` is its twin; that the two Python
- * surfaces disagree is `api.py`'s business and is recorded in SR-API decision
- * 6, not smoothed over here.
+ * 🔴 **`explain`, `graph` and `path` return what the CLI's `--json` prints**
+ * (W-262; Arpit, 2026-10-04, W-251 #4) — computed by `verbs/graph.mjs`'s own
+ * payload builders, exactly as `api.py` now calls `fux.graph`'s. Until then
+ * both libraries returned older shapes of their own (`{id, community, members,
+ * edges}`, a breadth-first best route, a walk seeded off the boosted ranking)
+ * and both differed from both CLIs; SR-API decision 1's freeze was reopened for
+ * these three and the library moved to the ruled shape.
  */
 import { findRoot } from "./config/root.mjs";
 import { FuxError } from "./errors.mjs";
@@ -33,7 +33,7 @@ import { buildPlane } from "./graph/plane.mjs";
 import { loadTune } from "./config/tune.mjs";
 import { loadOutput } from "./config/output.mjs";
 import { answerPayload } from "./verbs/answer.mjs";
-import { cmpCodePoints } from "./compat/pyfloat.mjs";
+import { explainPayload, graphPayload, pathPayload, lazyRecords } from "./verbs/graph.mjs";
 
 /** One ranked document. The `--json` `results[]` element, exactly. */
 function result(r, headings = []) {
@@ -152,71 +152,36 @@ class Index {
     };
   }
 
-  /** One document's outbound edges and the community it landed in. */
-  async explain(docId) {
-    const plane = this._plane();
-    const community = plane.communityOf(docId);
-    return {
-      id: docId,
-      community,
-      members: community ? plane.members(community) : [],
-      edges: plane.graph.outEdges(docId).map((e) => ({ kind: e.kind, dst: e.dst, grade: e.grade })),
-    };
+  /** `fux explain --json`: `{doc, edges, community}`. `doc` is an id or the
+   *  `loc` a human types; an id the index does not hold throws `FuxError`. */
+  async explain(doc) {
+    const shards = new Shards(this.root);
+    return explainPayload(lazyRecords(this.root, shards), this._plane(), doc);
   }
 
-  /** The neighbourhood around a query's best answers. */
-  async graph(query, { hops, top = null }) {
-    const plane = this._plane();
-    const seeds = (await this.find(query, { top })).map((r) => r.id);
-    const seen = new Map(seeds.map((s) => [s, 0]));
-    let frontier = [...seeds];
-    for (let depth = 1; depth <= hops; depth++) {
-      const next = [];
-      for (const node of frontier) {
-        for (const [neighbour] of plane.graph.neighbours(node)) {
-          if (!seen.has(neighbour)) { seen.set(neighbour, depth); next.push(neighbour); }
-        }
-      }
-      frontier = next;
-    }
-    const nodes = [...seen]
-      .sort((a, b) => (a[1] - b[1]) || cmpCodePoints(a[0], b[0]))
-      .map(([id, distance]) => ({ id, distance, community: plane.communityOf(id) }));
-    return { seeds, hops, nodes };
-  }
-
-  /** How two documents are connected, most reliable route first.
+  /** `fux graph --json`: `{nodes}` — the seeds, then the PPR walk.
    *
-   * Breadth-first, preferring the highest-grade route at equal length: a
-   * shorter route through a weak edge is not more reliable than a longer one
-   * through strong ones. */
+   * A query or `seed`, never both. **The query's seeds are `lexical`'s top-k,
+   * never `ask`'s boosted list** (SR-GRAPH decision 13). `kinds`, `linkIdf`
+   * and `maxHops` are `--kinds`, `--link-idf` and `--max-hops`; the sizes come
+   * from `.fux/tune.toml [graph]`, as the CLI's do. */
+  async graph(query = null, { seed = null, kinds = null, linkIdf = null, maxHops = null } = {}) {
+    const shards = new Shards(this.root);
+    const tune = loadTune(this.root, { enabled: true });
+    return graphPayload(this.root, lazyRecords(this.root, shards), this._plane(), tune, shards, {
+      query: query ?? "", seed: seed ?? [], kinds: kinds && kinds.length ? kinds.join(",") : null,
+      linkIdf: linkIdf === true, maxHops,
+    });
+  }
+
+  /** `fux path --json`: `{from, to, paths, truncated}` — every simple directed
+   *  route within `hops`, most reliable first. 🔴 **Read `truncated`.** */
   async path(src, dst, { hops = null } = {}) {
     // R4 (Arpit, 2026-09-27): read `[cli.path] hops` like the CLI.
     if (hops === null) hops = Number(this._output().resolve("path", "hops", null, { asJson: false }));
-    const plane = this._plane();
-    let best = null;
-    const queue = [[src, [src], 0]];
-    const bestSeen = new Map([[src, 0]]);
-    while (queue.length) {
-      const [node, route, weight] = queue.shift();
-      if (node === dst) {
-        if (best === null || route.length < best[0].length
-            || (route.length === best[0].length && weight > best[1])) {
-          best = [route, weight];
-        }
-        continue;
-      }
-      if (route.length > hops) continue;
-      for (const [neighbour, grade] of plane.graph.neighbours(node)) {
-        if (route.includes(neighbour)) continue;
-        const prior = bestSeen.get(neighbour);
-        if (prior !== undefined && prior < route.length) continue;
-        bestSeen.set(neighbour, route.length);
-        queue.push([neighbour, [...route, neighbour], weight + grade]);
-      }
-    }
-    if (best === null) return { from: src, to: dst, hops: null, route: [], weight: 0 };
-    return { from: src, to: dst, hops: best[0].length - 1, route: best[0], weight: best[1] };
+    const shards = new Shards(this.root);
+    const tune = loadTune(this.root, { enabled: true });
+    return pathPayload(lazyRecords(this.root, shards), this._plane(), tune, src, dst, hops);
   }
 
   /** The graph plane, rebuilt from the committed records and cached per Index.

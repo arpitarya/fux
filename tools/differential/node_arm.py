@@ -368,7 +368,7 @@ process.stdout.write(JSON.stringify({
   find: await ix.find(%(q)s, { top: 3 }),
   ask: (await ix.ask(%(q)s, { top: 3 })).asDict(),
   explain: await ix.explain(%(doc)s),
-  graph: await ix.graph(%(q)s, { hops: 1, top: 3 }),
+  graph: await ix.graph(%(q)s),
   path: await ix.path(%(doc)s, %(doc2)s, { hops: 3 }),
   answer: (await ix.answer(%(q)s, { audit: false })).asDict(),
 }));
@@ -381,7 +381,7 @@ print(json.dumps({
   "find": [r.as_dict() for r in ix.find(%(q)s, top=3)],
   "ask": ix.ask(%(q)s, top=3).as_dict(),
   "explain": ix.explain(%(doc)s),
-  "graph": ix.graph(%(q)s, hops=1, top=3),
+  "graph": ix.graph(%(q)s),
   "path": ix.path(%(doc)s, %(doc2)s, hops=3),
   "answer": ix.answer(%(q)s, audit=False, receipt=False).as_dict(),
 }))

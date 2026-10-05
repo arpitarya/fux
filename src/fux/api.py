@@ -293,87 +293,68 @@ class Index:
         )
         return _answer_from(build_answer(self.root, args).payload)
 
-    def explain(self, doc_id: str) -> dict:
-        """One document's outbound edges and the community it landed in."""
-        plane = self._plane()
-        community = plane.community_of(doc_id)
-        return {
-            "id": doc_id,
-            "community": community,
-            "members": plane.members(community) if community else [],
-            "edges": [
-                {"kind": e.kind, "dst": e.dst, "grade": e.grade}
-                for e in plane.graph.out_edges(doc_id)
-            ],
-        }
+    # -- the graph lane: `--json`'s payloads, from the CLI's own builders --------
+    #
+    # 🔴 **Reopened and moved, 2026-10-05 (W-262; Arpit, 2026-10-04, W-251 #4).**
+    # These three returned shapes of their own — `{id, community, members,
+    # edges}`, `{seeds, hops, nodes}` from a hop-ring walk seeded off the BOOSTED
+    # ranking, `{from, to, hops, route, weight}` from a breadth-first best route
+    # — that predated SR-API and carried no ruling, while the CLI's carry three.
+    # **The library now returns exactly what `fux explain|graph|path --json`
+    # prints**, computed by the same functions (`fux.graph.*_payload`), so a
+    # change to a verb's payload has one place to change. BREAKING for a library
+    # caller; the CHANGELOG says so.
 
-    def graph(self, query: str, *, hops: int, top: int | None = None) -> dict:
-        """The neighbourhood around a query's best answers.
+    def explain(self, doc: str) -> dict:
+        """`fux explain --json`: `{doc, edges, community}`.
 
-        `hops` is required: the CLI's `graph` has no hops key to read it from
-        (its walk is `.fux/tune.toml [graph]`'s). `top` defaults to what
-        `find` resolves, because the seeds ARE `find`'s results.
+        `doc` is an id (`file:docs/a.md`, `tag:x`) or the `loc` a human types.
+        An id the index does not hold raises `FuxError`, as the CLI refuses.
         """
-        plane = self._plane()
-        seeds = [r.id for r in self.find(query, top=top)]
-        seen = {s: 0 for s in seeds}
-        frontier = list(seeds)
-        for depth in range(1, hops + 1):
-            nxt = []
-            for node in frontier:
-                for neighbour, _grade in plane.graph.neighbours(node):
-                    if neighbour not in seen:
-                        seen[neighbour] = depth
-                        nxt.append(neighbour)
-            frontier = nxt
-        nodes = sorted(seen.items(), key=lambda kv: (kv[1], kv[0]))
-        return {
-            "seeds": seeds, "hops": hops,
-            "nodes": [
-                {"id": i, "distance": d, "community": plane.community_of(i)}
-                for i, d in nodes
-            ],
-        }
+        from .graph import explain_payload
+
+        return explain_payload(self.root, self._plane(), doc)
+
+    def graph(
+        self, query: str | None = None, *, seed: list[str] | None = None,
+        kinds: list[str] | None = None, link_idf: bool | None = None,
+        max_hops: int | None = None,
+    ) -> dict:
+        """`fux graph --json`: `{nodes}` — the seeds, then the PPR walk.
+
+        A query or `seed`, never both. **The query's seeds are `lexical`'s
+        top-k, never `ask`'s boosted list** (SR-GRAPH decision 13): seeding from
+        a list the walk already re-ordered would be a walk over its own output.
+        `kinds`, `link_idf` and `max_hops` are `--kinds`, `--link-idf` and
+        `--max-hops`; the sizes come from `.fux/tune.toml [graph]`, as the
+        CLI's do.
+        """
+        from .graph import graph_payload
+        from .tune import load as load_tune
+
+        args = _Args(
+            query=query, seed=seed, kinds=",".join(kinds) if kinds else None,
+            link_idf=link_idf, max_hops=max_hops,
+        )
+        return graph_payload(self.root, self._plane(), load_tune(self.root, enabled=True), args)
 
     def path(self, src: str, dst: str, *, hops: int | None = None) -> dict:
-        """How two documents are connected, most reliable route first.
+        """`fux path --json`: `{from, to, paths, truncated}`.
 
-        Breadth-first, preferring the highest-grade route at equal length: a
-        shorter route through a weak edge is not more reliable than a longer
-        one through strong ones.
+        Every simple directed route within `hops`, most reliable first. 🔴
+        **Read `truncated`**: a search cut short that returned `[]` is not *no
+        route*, and one that returned three is not *these three*.
         """
+        from .graph import path_payload
+        from .tune import load as load_tune
+
         if hops is None:
             # R4 (Arpit, 2026-09-27): the API reads `[cli.path] hops` like the
             # CLI; its own `6` is gone.
             hops = int(self._output().resolve("path", "hops", as_json=False))
-        plane = self._plane()
-        best: tuple[list[str], int] | None = None
-        queue: list[tuple[str, list[str], int]] = [(src, [src], 0)]
-        best_seen: dict[str, int] = {src: 0}
-        while queue:
-            node, route, weight = queue.pop(0)
-            if node == dst:
-                if best is None or len(route) < len(best[0]) or (
-                    len(route) == len(best[0]) and weight > best[1]
-                ):
-                    best = (route, weight)
-                continue
-            if len(route) > hops:
-                continue
-            for neighbour, grade in plane.graph.neighbours(node):
-                if neighbour in route:
-                    continue
-                prior = best_seen.get(neighbour)
-                if prior is not None and prior < len(route):
-                    continue
-                best_seen[neighbour] = len(route)
-                queue.append((neighbour, [*route, neighbour], weight + grade))
-        if best is None:
-            return {"from": src, "to": dst, "hops": None, "route": [], "weight": 0}
-        return {
-            "from": src, "to": dst, "hops": len(best[0]) - 1,
-            "route": best[0], "weight": best[1],
-        }
+        return path_payload(
+            self.root, self._plane(), load_tune(self.root, enabled=True), src, dst, hops=hops
+        )
 
     def _plane(self):
         """The graph plane, rebuilt from the committed records.

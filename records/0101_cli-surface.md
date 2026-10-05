@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@eafa474928d8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@de55b440c56a, node/fux.mjs@99e0e9795ee6]
+owns: [src/fux/cli.py@eafa474928d8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@57a74a759682, node/fux.mjs@99e0e9795ee6]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: bfcb650c21b02bb245a85ceb1c99f4d131707727b87ed73ef929b66d721377b1
+content_sha: 4d9ad42f7ae81a6dfd130c81340e84a6d53270554212a50ada8adae5c3396f03
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1348,6 +1348,8 @@ bar on or off, `--json` untouched, off when stderr is not a TTY, no clock.
 `tests_e2e/test_progress_surface.py` holds the list equal to its own.
 
 **No decision here moved** (W-242 Tier 2, 2026-10-03): the Node reader's `fux build` prints `cmd_build`'s report line and takes the same write lock, and `build` left Node's list of refused write verbs. `ingest` stays Python's.
+
+**No decision here moved** (W-262, 2026-10-05): `explain`/`graph`/`path` `--json` are unchanged byte for byte; their payloads are now built by `fux.graph.*_payload` (Node: `verbs/graph.mjs::*Payload`), which the library calls too (Arpit, 2026-10-04, W-251 #4 — library → CLI shape, [SR-API](0154_api.md) decision 1). `tests_e2e/test_relational.py` gained four library-equals-CLI tests.
 
 ### Consequences
 

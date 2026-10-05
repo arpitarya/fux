@@ -500,3 +500,56 @@ def test_kinds_refuses_a_kind_that_does_not_exist(linked):
     result = _run_failing(linked, "graph", "rollback", "--kinds", "reference")
     assert result.returncode == 1
     assert "not an edge kind" in result.stderr
+
+
+# -- W-262: the library returns what `--json` prints (Arpit, 2026-10-04, W-251 #4)
+#
+# `fux.api`'s `explain`/`graph`/`path` used to return shapes of their own —
+# `{id, community, members, edges}`, a hop-ring walk seeded off the BOOSTED
+# ranking, one breadth-first route with no `truncated`. The CLI's shapes carry
+# the rulings, so the library moved to them; these tests hold the two Python
+# surfaces equal. The Node pair is held by `tools/differential/node_arm.py`'s
+# `api` lane and `node/test/api-graph-parity.test.mjs`.
+
+
+def _lib(linked: Path):
+    import fux
+
+    return fux.open(linked)
+
+
+def test_library_explain_is_the_cli_payload(linked):
+    for case in load_pairs("neighbour"):
+        cli = json.loads(_run(linked, "explain", case["doc"], "--json").stdout)
+        assert _lib(linked).explain(case["doc"]) == cli
+
+
+def test_library_graph_is_the_cli_payload_and_seeds_lexically(linked):
+    for case in load_pairs("graph"):
+        cli = json.loads(_run(linked, "graph", case["query"], "--json").stdout)
+        assert _lib(linked).graph(case["query"]) == cli
+    seed = load_pairs("neighbour")[0]["doc"]
+    cli = json.loads(_run(linked, "graph", "--seed", seed, "--kinds", "ref", "--json").stdout)
+    assert _lib(linked).graph(seed=[seed], kinds=["ref"]) == cli
+
+
+def test_library_path_is_the_cli_payload_including_truncated(linked):
+    for case in load_pairs("path") + load_pairs("nopath"):
+        cli = json.loads(
+            _run(linked, "path", case["from"], case["to"], "--json", "--hops", str(case["hops"])).stdout
+        )
+        got = _lib(linked).path(case["from"], case["to"], hops=case["hops"])
+        assert got == cli
+        assert got["truncated"] in (True, False), "`truncated` is always present"
+
+
+def test_library_graph_verbs_refuse_what_the_cli_refuses(linked):
+    from fux.errors import FuxError
+
+    ix = _lib(linked)
+    with pytest.raises(FuxError, match="not in the index"):
+        ix.explain("docs/does-not-exist.md")
+    with pytest.raises(FuxError, match="not in the index"):
+        ix.path("docs/does-not-exist.md", load_pairs("path")[0]["to"])
+    with pytest.raises(FuxError, match="not both"):
+        ix.graph("rollback", seed=[load_pairs("neighbour")[0]["doc"]])

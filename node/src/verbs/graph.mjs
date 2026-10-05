@@ -49,7 +49,7 @@ function resolveDoc(given) {
 
 /** The committed records' `{id, edges}`, read on first use through the call's
  *  `Shards` — never when the plane came from `graph.json` and nothing asks. */
-function lazyRecords(root, shards) {
+export function lazyRecords(root, shards) {
   let records = null;
   return () => (records ??= graphRecords(root, shards));
 }
@@ -85,40 +85,56 @@ function locOf(nodeId) {
   return at >= 0 ? nodeId.slice(at + 1) : nodeId;
 }
 
-/** One document's outbound edges and its community. */
-export function runExplain(root, args) {
-  if (!args._[0]) { process.stderr.write("error: explain needs a document id\n"); return 1; }
-  const shards = new Shards(root);
-  const recordsOf = lazyRecords(root, shards);
-  const plane = planeFor(root, shards);
-  const docId = resolveDoc(args._[0]);
+// -- the payloads: ONE builder per verb, read by the CLI AND the library ------
+//
+// 🔴 **W-262 (Arpit, 2026-10-04, W-251 #4): the library returns what `--json`
+// prints.** `index.mjs` mirrored `api.py`'s older helpers — `{id, community,
+// members, edges}`, a breadth-first best route, a hop-ring walk seeded from the
+// BOOSTED ranking — and both differed from both CLIs. The CLI's shapes carry
+// rulings (SR-CLI decision 13, SR-GRAPH decision 13, `truncated` on `path`), so
+// the library moved to them, and the computation lives here once. Twins of
+// `graph/__init__.py::explain_payload / graph_payload / path_payload`.
+//
+// Each takes the plane and the lazy record reader its caller chose: the CLI's
+// `planeFor` (graph.json when fresh), the library's in-memory rebuild.
 
+/** `fux explain --json`'s payload: `{doc, edges, community}`. Throws
+ *  `FuxError` for an id neither the index nor the plane knows. */
+export function explainPayload(recordsOf, plane, doc) {
+  const docId = resolveDoc(doc);
   const edges = plane.graph.outEdges(docId);
   const label = plane.communityOf(docId);
-
   if (!edges.length && label === null) {
     // **Three states, not two** (W-63): a `fux remove`d document answering as
     // though it were still indexed is the case that made it visible.
     refuseUnknown(recordsOf, plane, docId, "");
-    if (args.json) {
-      process.stdout.write(JSON.stringify({ doc: docId, edges: [], community: null }, null, JSON_INDENT) + "\n");
-    } else {
-      process.stdout.write(`${docId} has no recorded relationships.\n`);
-    }
-    return 0;
   }
+  return {
+    doc: docId,
+    edges: edges.map((e) => ({ kind: e.kind, dst: e.dst, grade: e.grade })),
+    community: label,
+  };
+}
+
+/** One document's outbound edges and its community. */
+export function runExplain(root, args) {
+  if (!args._[0]) { process.stderr.write("error: explain needs a document id\n"); return 1; }
+  const shards = new Shards(root);
+  const plane = planeFor(root, shards);
+  const payload = explainPayload(lazyRecords(root, shards), plane, args._[0]);
+  const { doc: docId, community: label } = payload;
 
   if (args.json) {
-    process.stdout.write(JSON.stringify({
-      doc: docId,
-      edges: edges.map((e) => ({ kind: e.kind, dst: e.dst, grade: e.grade })),
-      community: label,
-    }, null, JSON_INDENT) + "\n");
+    process.stdout.write(JSON.stringify(payload, null, JSON_INDENT) + "\n");
+    return 0;
+  }
+  if (!payload.edges.length && label === null) {
+    process.stdout.write(`${docId} has no recorded relationships.\n`);
     return 0;
   }
 
   process.stdout.write(`${docId}\n`);
-  for (const edge of edges) {
+  for (const edge of payload.edges) {
     process.stdout.write(`  ${edge.kind.padEnd(5)} ${edge.dst}  (grade ${edge.grade})\n`);
   }
   if (label !== null) {
@@ -128,7 +144,7 @@ export function runExplain(root, args) {
   return 0;
 }
 
-/** The three W-160 parameters off `args`, as `expand` wants them.
+/** The three W-160 parameters off `opts`, as `expand` wants them.
  *  All three resolve to their inert values when the flags are absent. */
 function walkParameters(args) {
   let kinds = ALL_KINDS;
@@ -158,7 +174,7 @@ function walkParameters(args) {
  * generator ran. Twin of `graph/__init__.py::_seeds_of`. */
 function seedsOf(root, args, recordsOf, plane, tune, shards) {
   const given = args.seed ?? [];
-  const query = args._.join(" ");
+  const query = args.query ?? "";
   if (given.length && query) {
     throw new FuxError(
       'pass a query or --seed, not both. `fux graph "<q>"` walks from the ' +
@@ -203,18 +219,13 @@ function seedsOf(root, args, recordsOf, plane, tune, shards) {
   ];
 }
 
-/** The neighbourhood around a query's best answers, or around named seeds. */
-export function runGraph(root, args) {
-  // W-242 Tier 0 — one read of each shard, for the plane AND the seed query.
-  const shards = new Shards(root);
-  const recordsOf = lazyRecords(root, shards);
-  const plane = planeFor(root, shards);
-  // Loaded ONCE and used twice — for the seed query and for the walk. Two loads
-  // could disagree if the file changed between them, producing a neighbourhood
-  // around seeds that were ranked under different weights.
-  const tune = loadTune(root, { enabled: args.noTune !== true });
-
-  const [seedRows, seeds] = seedsOf(root, args, recordsOf, plane, tune, shards);
+/** `fux graph --json`'s payload: `{nodes}` — seeds first, then the walk.
+ *
+ * `opts` carries `query`, `seed`, `kinds` (comma-separated), `linkIdf`,
+ * `maxHops` and `fast`; an absent one is not requested. `tune` is loaded ONCE
+ * by the caller and used twice — for the seed query and for the walk. */
+export function graphPayload(root, recordsOf, plane, tune, shards, opts) {
+  const [seedRows, seeds] = seedsOf(root, opts, recordsOf, plane, tune, shards);
 
   // `seedDepth` and `expandLimit` are separately tunable because they answer
   // different questions: how much of the ranking to trust as a starting point,
@@ -224,16 +235,34 @@ export function runGraph(root, args) {
     damping: tune.damping,
     iterations: tune.iterations,
     laziness: tune.laziness,
-    ...walkParameters(args),
+    ...walkParameters(opts),
   });
 
-  const nodes = [
-    ...seedRows,
-    ...expanded.map(([node, score]) => ({ path: locOf(node), id: node, role: "expanded", score })),
-  ];
+  return {
+    nodes: [
+      ...seedRows,
+      ...expanded.map(([node, score]) => ({ path: locOf(node), id: node, role: "expanded", score })),
+    ],
+  };
+}
+
+/** The neighbourhood around a query's best answers, or around named seeds. */
+export function runGraph(root, args) {
+  // W-242 Tier 0 — one read of each shard, for the plane AND the seed query.
+  const shards = new Shards(root);
+  const plane = planeFor(root, shards);
+  // Loaded ONCE and used twice — for the seed query and for the walk. Two loads
+  // could disagree if the file changed between them, producing a neighbourhood
+  // around seeds that were ranked under different weights.
+  const tune = loadTune(root, { enabled: args.noTune !== true });
+  const payload = graphPayload(root, lazyRecords(root, shards), plane, tune, shards, {
+    query: args._.join(" "), seed: args.seed, kinds: args.kinds,
+    linkIdf: args.linkIdf, maxHops: args.maxHops, fast: args.fast,
+  });
+  const { nodes } = payload;
 
   if (args.json) {
-    process.stdout.write(JSON.stringify({ nodes }, null, JSON_INDENT) + "\n");
+    process.stdout.write(JSON.stringify(payload, null, JSON_INDENT) + "\n");
     return 0;
   }
   if (!nodes.length) { process.stdout.write("No confident matches.\n"); return 0; }
@@ -247,6 +276,34 @@ export function runGraph(root, args) {
   return 0;
 }
 
+/** `fux path --json`'s payload: `{from, to, paths, truncated}`. */
+export function pathPayload(recordsOf, plane, tune, srcGiven, dstGiven, hops) {
+  const src = resolveDoc(srcGiven);
+  const dst = resolveDoc(dstGiven);
+  // Both ends, BEFORE the search: *no route* and *no such document* are
+  // different answers and `path` gave the first one for both.
+  refuseUnknown(recordsOf, plane, src, " (FROM)");
+  refuseUnknown(recordsOf, plane, dst, " (TO)");
+  // `--hops` bounds the search and stays a CLI argument; `hop_decay` only
+  // orders what the search found.
+  const { routes: found, truncated } = routes(plane.graph, src, dst, {
+    hops, limit: tune.pathLimit, hopDecay: tune.hopDecay, budget: EXPANSION_BUDGET,
+  });
+  return {
+    from: src,
+    to: dst,
+    paths: found.map((route) => ({
+      hops: route.hops.map((e) => ({ kind: e.kind, src: e.src, dst: e.dst, grade: e.grade })),
+      reliability: route.reliability,
+    })),
+    // 🔴 **The half that matters.** stderr is invisible to exactly the callers
+    // most likely to ask for a deep walk, so the boolean is in the payload —
+    // and, since W-262, in the library's return value. Always present; `false`
+    // is a claim, not an absence (W-48).
+    truncated,
+  };
+}
+
 /** Every simple directed route between two documents, within `--hops`. */
 export function runPath(root, args) {
   if (!args._[0] || !args._[1]) {
@@ -254,38 +311,17 @@ export function runPath(root, args) {
     return 1;
   }
   const shards = new Shards(root);
-  const recordsOf = lazyRecords(root, shards);
   const plane = planeFor(root, shards);
-  const src = resolveDoc(args._[0]);
-  const dst = resolveDoc(args._[1]);
-  // Both ends, BEFORE the search: *no route* and *no such document* are
-  // different answers and `path` gave the first one for both.
-  refuseUnknown(recordsOf, plane, src, " (FROM)");
-  refuseUnknown(recordsOf, plane, dst, " (TO)");
-
   const hops = args.hops; // `.fux/output.toml [cli.path] hops`, resolved before dispatch
-  // `--hops` bounds the search and stays a CLI argument; `hop_decay` only
-  // orders what the search found.
   const tune = loadTune(root, { enabled: args.noTune !== true });
-  const { routes: found, truncated } = routes(plane.graph, src, dst, {
-    hops, limit: tune.pathLimit, hopDecay: tune.hopDecay, budget: EXPANSION_BUDGET,
-  });
+  const payload = pathPayload(lazyRecords(root, shards), plane, tune, args._[0], args._[1], hops);
+  const { from: src, to: dst, truncated } = payload;
 
   if (args.json) {
-    process.stdout.write(JSON.stringify({
-      from: src,
-      to: dst,
-      paths: found.map((route) => ({
-        hops: route.hops.map((e) => ({ kind: e.kind, src: e.src, dst: e.dst, grade: e.grade })),
-        reliability: route.reliability,
-      })),
-      // 🔴 **The half that matters.** stderr is invisible to exactly the
-      // callers most likely to ask for a deep walk, so the boolean is in the
-      // payload. Always present; `false` is a claim, not an absence (W-48).
-      truncated,
-    }, null, JSON_INDENT) + "\n");
+    process.stdout.write(JSON.stringify(payload, null, JSON_INDENT) + "\n");
     return 0;
   }
+  const found = payload.paths;
 
   if (!found.length) {
     if (truncated) {

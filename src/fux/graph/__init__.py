@@ -35,7 +35,10 @@ from ..constants import fixed
 
 _JSON_INDENT = fixed("json", "indent")
 
-__all__ = ["cmd_explain", "cmd_graph", "cmd_path"]
+__all__ = [
+    "cmd_explain", "cmd_graph", "cmd_path",
+    "explain_payload", "graph_payload", "path_payload",
+]
 
 # **The sizes this lane runs at live in `tune.Tune`, not here.** They used to
 # be two module constants: `EXPAND_LIMIT = 10` — how many nodes a PPR expansion
@@ -124,15 +127,33 @@ def _committed_ids(root: Path) -> set[str]:
     return set(store_mod.read_index(root))
 
 
-def cmd_explain(args) -> int:
-    """One document's outbound edges and its community."""
-    root = _root()
-    plane = plane_mod.load(root)
-    doc_id = _resolve_doc(root, args.doc)
+# -- the payloads: ONE builder per verb, read by the CLI AND the library -------
+#
+# 🔴 **W-262 (Arpit, 2026-10-04, W-251 #4): the library returns what `--json`
+# prints.** `fux.api`'s `explain`/`graph`/`path` grew their own simpler helpers
+# before SR-API existed — `{id, community, members, edges}`, a breadth-first
+# best route, a hop-ring walk seeded from the BOOSTED ranking — while the CLI's
+# shapes carry rulings: SR-CLI decision 13, SR-GRAPH decision 13 (lexical
+# seeds), and `truncated` on `path` (W-140 row 12). The direction is library ->
+# CLI, and SR-API decision 1's freeze was reopened for exactly these three.
+# **So the computation lives here, once**, and both `cmd_*` and `api.Index`
+# call it: a payload with two builders is two payloads that agree by habit.
+#
+# Each takes the `plane` its caller chose: the CLI's `plane_mod.load` (which
+# refuses a stale or missing `graph.json` and names `fux build`), the library's
+# rebuild from the committed records (a library caller must not need `fux
+# build`). The edges either plane holds are the same.
 
+
+def explain_payload(root: Path, plane, doc: str) -> dict:
+    """`fux explain --json`'s payload: `{doc, edges, community}`.
+
+    Raises `FuxError` for an id neither the index nor the plane knows — the
+    three-states rule below, which the library now shares.
+    """
+    doc_id = _resolve_doc(root, doc)
     edges = plane.graph.out_edges(doc_id)
     label = plane.community_of(doc_id)
-
     if not edges and label is None:
         # **Three states, not two** (W-63). This used to print "has no
         # recorded relationships" and exit 0 for a document that is not in
@@ -143,30 +164,31 @@ def cmd_explain(args) -> int:
         # read the index, a tag is not in it, so `explain tag:typo` fell
         # straight through to the empty answer.
         _refuse_unknown(root, plane, doc_id, flag="")
-        if args.json:
-            print(json_mod.dumps({"doc": doc_id, "edges": [], "community": None}, indent=_JSON_INDENT))
-        else:
-            print(f"{doc_id} has no recorded relationships.")
-        return 0
+    return {
+        "doc": doc_id,
+        "edges": [{"kind": e.kind, "dst": e.dst, "grade": e.grade} for e in edges],
+        "community": label,
+    }
+
+
+def cmd_explain(args) -> int:
+    """One document's outbound edges and its community."""
+    root = _root()
+    plane = plane_mod.load(root)
+    payload = explain_payload(root, plane, args.doc)
+    doc_id, label = payload["doc"], payload["community"]
 
     if args.json:
-        print(
-            json_mod.dumps(
-                {
-                    "doc": doc_id,
-                    "edges": [
-                        {"kind": e.kind, "dst": e.dst, "grade": e.grade} for e in edges
-                    ],
-                    "community": label,
-                },
-                indent=_JSON_INDENT,
-            )
-        )
+        print(json_mod.dumps(payload, indent=_JSON_INDENT))
+        return 0
+
+    if not payload["edges"] and label is None:
+        print(f"{doc_id} has no recorded relationships.")
         return 0
 
     print(doc_id)
-    for edge in edges:
-        print(f"  {edge.kind:<5} {edge.dst}  (grade {edge.grade})")
+    for edge in payload["edges"]:
+        print(f"  {edge['kind']:<5} {edge['dst']}  (grade {edge['grade']})")
     if label is not None:
         siblings = [n for n in plane.members(label) if n != doc_id]
         print(f"\n  community {label} — {len(siblings)} other node(s)")
@@ -277,15 +299,13 @@ def _seeds_of(root: Path, args, plane, tune):
     return rows, [r.id for r in results]
 
 
-def cmd_graph(args) -> int:
-    """The neighbourhood around a query's best answers, or around named seeds."""
-    root = _root()
-    from ..query import _declare_no_accelerator
+def graph_payload(root: Path, plane, tune, args) -> dict:
+    """`fux graph --json`'s payload: `{nodes}` — seeds first, then the walk.
 
-    _declare_no_accelerator(root)
-    plane = plane_mod.load(root)
-
-    tune = _tune_for(root, args)
+    `args` carries `query`, `seed`, `kinds` (comma-separated), `link_idf`,
+    `max_hops` and `fast`; an absent one is not requested. The seeds are
+    `lexical`'s top-k, never `ask`'s boosted list (SR-GRAPH decision 13).
+    """
     seed_rows, seeds = _seeds_of(root, args, plane, tune)
     # `seed_depth` and `expand_limit` are the two sizes this verb reports, and
     # they are separately tunable because they answer different questions: how
@@ -306,9 +326,21 @@ def cmd_graph(args) -> int:
         {"path": _loc_of(node), "id": node, "role": "expanded", "score": score}
         for node, score in expanded
     ]
+    return {"nodes": nodes}
+
+
+def cmd_graph(args) -> int:
+    """The neighbourhood around a query's best answers, or around named seeds."""
+    root = _root()
+    from ..query import _declare_no_accelerator
+
+    _declare_no_accelerator(root)
+    plane = plane_mod.load(root)
+    payload = graph_payload(root, plane, _tune_for(root, args), args)
+    nodes = payload["nodes"]
 
     if args.json:
-        print(json_mod.dumps({"nodes": nodes}, indent=_JSON_INDENT))
+        print(json_mod.dumps(payload, indent=_JSON_INDENT))
         return 0
 
     if not nodes:
@@ -323,12 +355,10 @@ def cmd_graph(args) -> int:
     return 0
 
 
-def cmd_path(args) -> int:
-    """Every simple directed route between two documents, within `--hops`."""
-    root = _root()
-    plane = plane_mod.load(root)
-    src = _resolve_doc(root, args.src)
-    dst = _resolve_doc(root, args.dst)
+def path_payload(root: Path, plane, tune, src: str, dst: str, *, hops: int) -> dict:
+    """`fux path --json`'s payload: `{from, to, paths, truncated}`."""
+    src = _resolve_doc(root, src)
+    dst = _resolve_doc(root, dst)
     # Both ends, before the search: *no route* and *no such document* are
     # different answers and `path` gave the first one for both.
     _refuse_unknown(root, plane, src, flag=" (FROM)")
@@ -337,47 +367,54 @@ def cmd_path(args) -> int:
     # `--hops` bounds the search and stays a CLI argument; `hop_decay` only
     # orders what the search found. See `walk.routes` for why the boundary is
     # there rather than one step over.
-    tune = _tune_for(root, args)
     found, truncated = routes(
         plane.graph,
         src,
         dst,
-        hops=args.hops,
+        hops=hops,
         limit=tune.path_limit,
         hop_decay=tune.hop_decay,
         budget=walk_mod.EXPANSION_BUDGET,
     )
+    return {
+        "from": src,
+        "to": dst,
+        "paths": [
+            {
+                "hops": [
+                    {"kind": e.kind, "src": e.src, "dst": e.dst, "grade": e.grade}
+                    for e in route.hops
+                ],
+                "reliability": route.reliability,
+            }
+            for route in found
+        ],
+        # 🔴 **The half that matters** (W-140 row 12, Arpit 2026-09-14). A
+        # truncated search that returned `[]` is not *no route*, and a
+        # truncated search that returned three is not *these three*. **stderr
+        # is invisible to exactly the callers most likely to ask for a deep
+        # walk**, so the boolean is in the payload — and, since W-262, in the
+        # library's return value too. Always present; `false` is a claim, not
+        # an absence (W-48).
+        "truncated": truncated,
+    }
+
+
+def cmd_path(args) -> int:
+    """Every simple directed route between two documents, within `--hops`."""
+    root = _root()
+    plane = plane_mod.load(root)
+    payload = path_payload(
+        root, plane, _tune_for(root, args), args.src, args.dst, hops=args.hops
+    )
+    src, dst = payload["from"], payload["to"]
+    truncated = payload["truncated"]
 
     if args.json:
-        print(
-            json_mod.dumps(
-                {
-                    "from": src,
-                    "to": dst,
-                    "paths": [
-                        {
-                            "hops": [
-                                {"kind": e.kind, "src": e.src, "dst": e.dst, "grade": e.grade}
-                                for e in route.hops
-                            ],
-                            "reliability": route.reliability,
-                        }
-                        for route in found
-                    ],
-                    # 🔴 **The half that matters** (W-140 row 12, Arpit
-                    # 2026-09-14). A truncated search that returned `[]` is not
-                    # *no route*, and a truncated search that returned three is
-                    # not *these three*. **stderr is invisible to exactly the
-                    # callers most likely to ask for a deep walk**, so the
-                    # boolean is in the payload. Always present; `false` is a
-                    # claim, not an absence (W-48).
-                    "truncated": truncated,
-                },
-                indent=_JSON_INDENT,
-            )
-        )
+        print(json_mod.dumps(payload, indent=_JSON_INDENT))
         return 0
 
+    found = payload["paths"]
     if not found:
         if truncated:
             # ⚠ **Two different claims, and this is the one that was being made
@@ -393,8 +430,8 @@ def cmd_path(args) -> int:
         return 0
 
     for route in found:
-        trail = " -> ".join(f"[{e.kind}] {e.dst}" for e in route.hops)
-        print(f"{route.reliability:.4f}  {src} -> {trail}")
+        trail = " -> ".join(f"[{e['kind']}] {e['dst']}" for e in route["hops"])
+        print(f"{route['reliability']:.4f}  {src} -> {trail}")
     if truncated:
         # A trailing note, not a prefix: the routes are real and are the
         # answer; what is uncertain is whether a better one was missed.

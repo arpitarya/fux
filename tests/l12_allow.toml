@@ -24,7 +24,6 @@ sites = [
   "node/src/query/identifiers.mjs::groupCount::module::\"\"",
   "src/fux/store/writer.py::write_index(ids_digest)::param::''",
   "node/src/graph/walk.mjs::expand(minScore)::param::0.0",
-  "node/src/index.mjs::seeds(depth)::param::1",
   "node/src/query/bm25f.mjs::deriveWlen(anchorLen)::param::0",
   "node/src/query/bm25f.mjs::scoreRecord(anchorLen)::param::0",
   "node/src/query/bm25f.mjs::scoreRecord::get::1.0",

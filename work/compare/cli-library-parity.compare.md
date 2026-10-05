@@ -2,7 +2,7 @@
 type: Compare Doc
 title: "CLI ↔ library parity — four places the two surfaces disagree and nobody decided"
 description: "Backlog B-146, B-147, B-148, B-151 as one fork: `under` semantics, the graph verbs' `--json` shape, the changed-since line, and the order of `confidence`/`fused`. Options: freeze the divergence, converge on the library, or converge on the CLI. Recommended: converge on the library inside the already-breaking 3.0."
-status: ruled 2026-10-04 — B-146, B-151 converge (W-253), B-148 refused, by delegation; B-147 library → CLI shape by Arpit (W-251 §3 #4). Build: W-262
+status: ruled 2026-10-04 — B-146, B-151 converge (W-253), B-148 refused, by delegation; B-147 library → CLI shape by Arpit (W-251 §3 #4), built 2026-10-05 (W-262)
 timestamp: 2026-10-03T00:00:00Z
 filed: 2026-10-03
 ---
@@ -10,6 +10,17 @@ filed: 2026-10-03
 # CLI ↔ library parity
 
 > ✅ **B-147 RULED 2026-10-04 (Arpit): library → CLI shape** for `explain` / `graph` / `path` `--json`; SR-API d1's freeze reopens for these three only — [W-262](../open/W-262-land-arpit-w251-rulings.md) §2. The whole fork is now ruled.
+>
+> ✅ **B-147 BUILT 2026-10-05 (W-262).** Python's `fux.api.Index` and Node's
+> `index.mjs` now return exactly the CLI's `--json` payloads for `explain`
+> (`{doc, edges, community}`), `graph` (`{nodes}`, lexical seeds per SR-GRAPH
+> d13, `seed`/`kinds`/`link_idf`/`max_hops` as the CLI flags) and `path`
+> (`{from, to, paths, truncated}`), computed by the CLI's own builders
+> (`fux.graph.*_payload`, `verbs/graph.mjs::*Payload`). Both CLIs' bytes are
+> unchanged. Held by `tests_e2e/test_relational.py` (Python library = CLI),
+> `node/test/api-graph-parity.test.mjs` (Node library = CLI) and the arm's `api`
+> lane (Python = Node). SR-API d1 records the reopening; B-147 deleted.
+> **Breaking for library callers**, named in the CHANGELOG.
 >
 > **Verdict: RULED IN PART, 2026-10-04 (by delegation, W-251 §4 #4) — the
 > four rows had different standing and are split.** **B-146 — ratified:**

@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@a32ab4cc2604, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@b814bf2338e5, node/src/graph/walk.mjs@61ee1cbb84df, node/src/verbs/graph.mjs@b8bbc930916b, src/fux/schemas/graph.schema.json@19bd4c486035]
+owns: [src/fux/graph@08de847cb930, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@b814bf2338e5, node/src/graph/walk.mjs@61ee1cbb84df, node/src/verbs/graph.mjs@218d67c1de9b, src/fux/schemas/graph.schema.json@19bd4c486035]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 15831ef33587b0408ddcc38c0d2a28c5ddb0bee9bb49a87e43699943d23095a3
+content_sha: 6e29a0c99c8967927c691ee1e88427ec98410d19cd7ae375c31faef355dbcb59
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -267,6 +267,14 @@ test asserts it does.
 **A hand-named seed carries `rank`, never a score.** See
 [SR-CLI](0101_cli-surface.md) decision 13 for why, including the
 `1.0` / `1` divergence that settled it.
+
+**The library obeys this decision too, since 2026-10-05** (W-262; Arpit,
+2026-10-04, W-251 #4). `fux.api.Index.graph` and `index.mjs`'s `graph` used to
+seed a hop-ring walk from `find` — the boosted ranking — which is the *walk over
+its own output* the paragraph above forbids. Both now call this lane's own
+payload builder (`graph_payload` / `graphPayload`), so the library's seeds are
+the CLI's seeds and the library's payload is `--json`'s; `explain` and `path`
+moved with it ([SR-API](0154_api.md) decision 1).
 
 **14. Three walk parameters are EXPOSED and INERT, ahead of the change that
 uses them.** (W-160 DoD 4.)
