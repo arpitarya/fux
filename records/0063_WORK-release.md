@@ -10,7 +10,7 @@ feature: how a release reaches two registries, how the version stays equal acros
 owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: c4712b25dd4ff11d056fb1d3b7b61cd651df2c7f0466720b0d9fda66e21b4039
+content_sha: c9f8465f3b8826d483a985bcab2bf4c74c6704572d39fa3a48ae37029604222b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -313,9 +313,12 @@ rather than a string somebody might forget to edit.
 - **Publish npm automatically, like PyPI.** Rejected on npm's own guidance —
   a staged publish is the recommended path for a package with a public install
   base, and the human step is the last chance to catch a bad artefact.
-- **Add required status checks to `main`.** Not rejected — **not decided.** It is
-  Arpit's call, and this record states the wall as it is rather than the wall
-  someone assumed.
+- **Add required status checks to `main`.** **Decided: no required check on
+  `main` for now; the release is the gate** (Arpit, 2026-10-04, W-251 #22).
+  Decision 11a's release gate is where a red differential arm stops, and a
+  required check with `enforce_admins: true` would block the direct pushes
+  decision 13 permits. Until 2026-10-04 this line read *"not rejected — not
+  decided"*; the ruling closes it, and the veto below is what reopens it.
 
 ### Reference (required)
 
