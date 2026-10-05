@@ -9,7 +9,7 @@ filed: 2026-10-03
 
 # The query-side lens
 
-> ✅ **Part 3 RULED 2026-10-04 (Arpit): yes, build `find --no-archived`** as designed below — [W-262](../open/W-262-land-arpit-w251-rulings.md) §5. The whole fork is now ruled.
+> ✅ **Part 3 RULED 2026-10-04 (Arpit): yes, build `find --no-archived`** as designed below — W-262 (closed 2026-10-05) §5. The whole fork is now ruled.
 >
 > **Verdict: RULED IN PART, 2026-10-04 (by delegation, W-251 §4 #3).**
 > (1) **`--intent` as a flag is refused — reworded from the proposal.** W-168

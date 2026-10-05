@@ -29,6 +29,10 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 1d |
 | ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-264** — the 6 s `redact` was a W-255 regression, now fixed (1.0 s). A cache would save ≤ 1 s: (a) retire [rec.] · (b) build · (c) re-measure first. [the item](open/W-264-redaction-cache.md) | 2026-10-05 | 0d |
+| ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-228** — lens on gen 4: 3/3 planted misfits, 0/3 controls, 8/8 rungs. Rule: `misfit_floor` off PROVISIONAL now, or after the title-H1 knife-edge is fixed. [the item](open/W-228-document-families.md) | 2026-10-05 | 0d |
+| ↳ **blocks:** nothing else in the queue | | |
 
 ---
 
@@ -36,13 +40,11 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟡 **W-228** · `agent` — document families. Arpit planted 3 known misfits (prompt 13, checked); the lens is re-run against them on the new rungs, waiting on W-240's ladder rebuild. [detail](open/W-228-document-families.md)
+- 🔴 **W-228** · `arpit` — document families. Gen-4 lens: 3/3 planted misfits, 0/3 controls ([run](regression/2026-10-05-ladder-gen4-rebuild/report.md)). Arpit rules on `misfit_floor`. [detail](open/W-228-document-families.md)
 - 🟡 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)
-- 🟢 **W-240** · `agent` — generation 4 is complete (prompts 12 + 13). Next: rebuild the ladder once, re-run W-228's lens, capture the baseline; then 🔴 Arpit scores. **Opus.** [detail](open/W-240-section-pool-set.md)
-- 🟢 **W-261** · `agent` — every component design record must own a file; ten own none, so their code moves into files of their own (Arpit, 2026-10-04). Not built. **Opus.** [detail](open/W-261-component-records-own-a-file.md)
-- 🟢 **W-262** · `agent` — land six W-251 rulings: doctor names stale copies, library JSON = CLI's, `find --no-archived`, d12 narrowed, no required check, L3 reworded. **Opus.** [detail](open/W-262-land-arpit-w251-rulings.md)
+- 🟢 **W-240** · `agent` — ladder rebuilt as gen 4 ([run](regression/2026-10-05-ladder-gen4-rebuild/report.md)). Next: a session other than the rebuild's captures the `set-5-claude` baseline; 🔴 Arpit scores. **Opus.** [detail](open/W-240-section-pool-set.md)
 - 🟢 **W-250** · `agent` — run `fux hooks` in this repository so `.gitattributes` carries the merge driver where it was written. **Sonnet.** [detail](open/W-250-dogfood-fux-hooks.md)
-- 🟢 **W-264** · `agent` — unchanged files skip redaction: a cache keyed on content + `pii.toml` + redactor version; a no-change ingest spends ~6 of 10 s redacting. Not built. **Opus.** [detail](open/W-264-redaction-cache.md)
+- 🔴 **W-264** · `arpit` — redaction cache. DoD 1 found the 6 s was a W-255 regression (per-apply ReDoS lint) and fixed it; the cache would now save ≤ 1 s, so it was not built. Arpit picks (a) retire / (b) build / (c) re-measure. [detail](open/W-264-redaction-cache.md)
 
 ### testing
 

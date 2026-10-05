@@ -14,7 +14,7 @@ filed: 2026-10-03
 > unedited copy whose template changed; **fux never rewrites a consumer's
 > file.** Option A (engine-owned refresh of unedited copies) is refused: it
 > crossed SR-DOTFUX d6, SR-FETCHER d12 and L10. Build:
-> [W-262](../open/W-262-land-arpit-w251-rulings.md) §1. The text below is the
+> W-262 (closed 2026-10-05) §1. The text below is the
 > argument as it was put.
 >
 > ✅ **BUILT 2026-10-05 (W-262).** `fux setup` writes every decoder and fetcher

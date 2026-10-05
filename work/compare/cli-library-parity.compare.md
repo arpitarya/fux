@@ -9,7 +9,7 @@ filed: 2026-10-03
 
 # CLI ↔ library parity
 
-> ✅ **B-147 RULED 2026-10-04 (Arpit): library → CLI shape** for `explain` / `graph` / `path` `--json`; SR-API d1's freeze reopens for these three only — [W-262](../open/W-262-land-arpit-w251-rulings.md) §2. The whole fork is now ruled.
+> ✅ **B-147 RULED 2026-10-04 (Arpit): library → CLI shape** for `explain` / `graph` / `path` `--json`; SR-API d1's freeze reopens for these three only — W-262 (closed 2026-10-05) §2. The whole fork is now ruled.
 >
 > ✅ **B-147 BUILT 2026-10-05 (W-262).** Python's `fux.api.Index` and Node's
 > `index.mjs` now return exactly the CLI's `--json` payloads for `explain`

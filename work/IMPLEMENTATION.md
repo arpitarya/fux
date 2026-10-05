@@ -26,6 +26,35 @@ Rules:
 
 ---
 
+## 2026-10-05 — **W-240 step 3 + W-228 DoD 11: the golden ladder, generation 4**
+
+| what | evidence |
+|---|---|
+| **ladder rebuilt** | 8 rungs from scratch on 94 seeds at `ba1c0e44` (3.0.0-alpha.11); every coverage count equals its declaration; `test_golden_ladder_seed` 10/10, `ladder_check` exit 0, 82 `ref` edges per rung. Gen-3 rungs kept in `fux-lab/corpora/golden-gen3/` ([report](regression/2026-10-05-ladder-gen4-rebuild/report.md)) |
+| **driver changes** | `rung-00100` now holds 6 ext docs: `ext/archive` declared only where it exists; authored retired docs emitted before their successors (every prefix 1–10 000 supersedes-closed) — [ANALYSIS](regression/2026-10-05-ladder-gen4-rebuild/ANALYSIS.md) §1 |
+| **families lens** | 3/3 planted misfits found, 0/3 controls flagged, all 8 rungs, byte-equal across reruns; `misfit_floor` stays PROVISIONAL → Arpit |
+| **not done** | the phase-5 baseline of `set-5-claude` — a session other than the rebuild's |
+
+## 2026-10-05 — **W-261: every component record owns a file** · **W-262: six W-251 rulings**
+
+| what | evidence |
+|---|---|
+| **W-261** | nine records own a moved file (`query/find.py`, `ingest/urlingest.py`, `ingest/dirlist.py`, `store/cachedir.py`, `derive/{docstable,manifest,stamp,stats}.py`, `maintain/lock.py`, Node twins); pure moves, index bytes identical old vs new; strong rule = [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) d11, gated by `tests/test_sr_ownership.py` (SR-SECTIONS exempt by name) |
+| **W-262 #2** | `fux setup` stamps seeded decoder/fetcher copies `# fux-template: <sha256>`; `fux doctor` row `seeded copies current` names an unedited stale copy; fux never rewrites it ([SR-DECODE](../records/0139_decode.md) d10) |
+| **W-262 #3** | `fux find --no-archived`, Python + Node, band on the unfiltered list ([SR-FIND](../records/0104_find.md) d7) |
+| **W-262 #4** | library `explain`/`graph`/`path` return the CLI `--json` payloads, one builder per verb, both readers ([SR-API](../records/0154_api.md) d1) — breaking for library callers |
+| **W-262 #15 #22 #25** | SR-RS d12 narrowed to evaluation-set metrics; SR-WORK-RELEASE: no required check on `main`; SR-LAW-3 re-pointed (`gen-laws.py --write`) |
+| **suites, combined tree** | unit 6863 passed + 8 ladder-seed reds (cleared by W-240's rebuild), e2e 172, node 241 |
+
+## 2026-10-05 — **W-264 DoD 1: the 6 s redact was a regression — fixed; the cache is not built**
+
+| what | evidence |
+|---|---|
+| **cause** | W-255 put `_lint` inside `pii._compile`, which `Rule.apply` calls per string: 260 180 uncached parses per rung-10000 ingest. Not the rule set (byte-identical), not the corpus (gen 2 = gen 3) |
+| **fix** | `functools.cache` on `pii._compile`; `test_the_lint_runs_once_per_rule_not_once_per_apply` |
+| **measured** | ABAB×2, same root sha: redact 6.38–8.26 s → 1.03–1.09 s; unchanged delta 10.40–14.12 s → median 5.16 s ([ANALYSIS addendum](regression/2026-10-04-ingest-split/ANALYSIS.md)); shared machine, load 4.6–14 |
+| **cache** | not built — would save ≤ 1 s; → Arpit (retire / build / re-measure) |
+
 ## 2026-10-04 — **W-256: the three no-key measurements (one PASS, two to Arpit)**
 
 | what | evidence |

@@ -32,10 +32,18 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-05** (Claude Code, Opus 5.5 — the green items, one after another).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-05** (Claude Code, Opus 5.5 — the green items, in parallel).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-10-05 (latest) — ELEVEN GREEN ITEMS BUILT OR MEASURED; THE OPUS REVIEW SENT SR-RS d12 BACK
+### 🟢 2026-10-05 (latest) — W-261 + W-262 BUILT, THE LADDER IS GENERATION 4, TWO ITEMS TO ARPIT
+
+- Arpit (Claude Code): *"implement everything green in openwork."* Four Opus subagents in worktrees; this session combined and verified the branches.
+- **Closed:** W-261 (every component record owns a file; strong rule gated), W-262 (all six W-251 rulings, incl. `find --no-archived` and the breaking library payload change).
+- **W-240:** the ladder is rebuilt on 94 seeds ([run](regression/2026-10-05-ladder-gen4-rebuild/report.md)); **gen-3 numbers are not comparable**. Next: phase-5 baseline of `set-5-claude` by a session that did not rebuild, then Arpit scores.
+- **To Arpit:** W-264 (the 6 s was a regression, fixed; a cache would save ≤ 1 s — retire?), W-228 (`misfit_floor` off PROVISIONAL?).
+- ⚠ **Not on main yet:** everything but W-264's fix sits on `land/w261`, waiting for a concurrent session's staged `records/0067` edit to be committed. W-250 waits behind that too (hooks are shared by every worktree).
+
+### 🟢 2026-10-05 — ELEVEN GREEN ITEMS BUILT OR MEASURED; THE OPUS REVIEW SENT SR-RS d12 BACK
 
 - Arpit (Claude Code): *"implement everything that is green one after the other till the closure."* Each item went to a subagent on the model its file names; this session reviewed every diff, re-ran the three suites, and closed it by path.
 - **Closed:** W-253 (3.0 clean-ups), W-254 (frontmatter is its own passage), W-255 (PII ReDoS linter + `doctor` timing), W-245 (~40 stale record sentences), W-247 (CLI renders `fux.api`'s payload, 537/537 byte-identical), W-248 (enrich reads the decoder queue — B-270: queued enrichment reaches no index), W-249 (resident index for `mcp`/`serve`, keyed on stamp + shard stats), W-246 (22 gates), W-252 (Node arm PASS 0/801 on lab rungs), W-256 (loopback PASS; two results → W-260). **W-259** built and measured (the read NULL at 9.5 %; one-build-per-process 1.575× → W-243 step 1 STOP); its closure waits on the concurrent session's staged queue.

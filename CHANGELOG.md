@@ -8,6 +8,24 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed — BREAKING for library callers
+
+- `fux.open(...).explain`, `.graph` and `.path` (and the Node `open()` equivalents) now return exactly what `fux explain|graph|path --json` prints. `explain(doc)` returns `{doc, edges, community}` (was `{id, community, members, edges}`), accepts a `loc` and raises on an unknown id. `graph(query=None, *, seed, kinds, link_idf, max_hops)` (Node: `graph(query, {seed, kinds, linkIdf, maxHops})`) returns `{nodes}`, seeded from the lexical top-k as on the CLI (was `graph(query, *, hops, top)` → `{seeds, hops, nodes}`). `path(src, dst, *, hops)` returns `{from, to, paths, truncated}` (was `{from, to, hops, route, weight}`). CLI output is unchanged. (W-262, W-251 #4)
+
+### Added
+
+- `fux find --no-archived` (Python and Node) drops results declared archived; the confidence band still describes the unfiltered ranking. (W-262, W-251 #3)
+- `fux setup` stamps every seeded decoder and fetcher copy with `# fux-template: <sha256>`; the new `fux doctor` row `seeded copies current` names an unedited copy whose template has changed — re-seed it yourself. fux never rewrites the file; copies seeded before this release carry no stamp and are not judged. (W-262, W-251 #2)
+
+### Fixed
+
+- `fux ingest` no longer re-runs the PII ReDoS lint on every string it redacts. The lint added in alpha.10 made the redact phase about 6× slower (about 6 s vs 1 s at 10 000 documents); it now runs once per rule, and the index output is byte-identical. (W-264)
+
+### Internal
+
+- Code moved into per-record files, no behaviour change (W-261); `node/src/maintain/runner.mjs` is renamed `lock.mjs`. Library callers importing `fux.query.cmd_find` / `build_find` now import from `fux.query.find`.
+- L3's text is re-pointed and the word `snapshot` retired (W-251 #25); SR-RS d12 narrowed to evaluation-set metrics (W-251 #15).
+
 ## [3.0.0-alpha.11] - 2026-10-05
 
 **Breaking: the bare-`str` fetcher return is refused, and `--under` / `[priority]` match at a `/` boundary. The Node reader reads a fresh `graph.json`.** Details below.

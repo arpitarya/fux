@@ -47,7 +47,6 @@ W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search impro
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
-| B-055 | Ten `component` records carry `owns: []`; the WEAK rule (a `describes` row + the d7 case stated) was ruled 2026-10-04, gated by W-246; the STRONG rule (must own something) is "proposed and NOT in force" | [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision 11 ⚠ | Arpit: the strong rule and each record's verdict, one at a time (W-251 §3 #16) |
 | B-259 | Display width is not `len()`: a path holding a CJK character or emoji renders two columns and can still wrap. "No test covers it" (ex-B-134); approach ruled — `unicodedata` column width, no dependency ([plan](proposals/build-plan-2026-10.md) §3) | [SR-CLI](../records/0101_cli-surface.md) decision 12 ⚠ | A session touching `progress.py` builds the plan's §3 with its test |
 
 ---
@@ -88,7 +87,6 @@ W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search impro
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
-| B-143 | The query-side lens: `--intent` and `--as-of` refused, `supersedes:` a declared fact (ruled 2026-10-04, W-251 §4 #3); `find --no-archived` is the one build left, and his | [SR-TUNE](../records/0135_tuning.md) decision 15 ⚠ · [SR-ARCHIVED-CONTENT](../records/0134_archived-content.md) decision 6 🔴 | Arpit: yes/no to `find --no-archived` ([compare](compare/query-side-lens.compare.md)) |
 | B-145 | Of four candidate enrichments two are served by other means (expansion → doc2query `ctx`, `--expand`, mined pairs d18; retirement → `superseded_by:`); inferred edges and richer embeddings remain, "None is approved" | [SR-ENRICH](../records/0137_enrich.md) §The candidate enrichments | Both behind B-245's reopen trigger; a ruling per candidate when it fires |
 | B-162 | L4 lost its co-guard: a query-time model is held off only by SR-RERANK's determinism refusal — "a decision, and decisions are what an SR is designed to supersede" | [SR-LAW-2](../records/0004_LAW-2-zero-cost.md) §2026-09-06 amendment, trade 2 | Arpit (a Law), **parked by him 2026-10-04**: the draft is in [W-251](../archive/open/W-251-backlog-audit-rulings.md) §3 #18 |
 
