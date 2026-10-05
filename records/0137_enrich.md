@@ -11,7 +11,7 @@ owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@f088f4f6b552, src/fux/
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 3543c5f0f6210bf3333090a63cef031ce048844174e8fccd59e6eadaecee5688
+content_sha: 32aefaa92c278709a7c788c124f0a7c73e0281ae3d4cbf3b1145fc4cb3aa025e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
