@@ -4,12 +4,14 @@ name: W-228
 description: "A `families` lens in `fux inspect` — deterministic grouping of documents by shape (heading skeleton + frontmatter field set + length profile), the misfits that break their family's shape, `--json` for agents, and a panel on the explorer's Index tab. Ratified 2026-09-27, NOT built."
 item: W-228
 filed: 2026-09-27
-ball: agent
+ball: arpit
 ---
 
 # W-228 — document families: pattern recognition over the corpus, inside `inspect`
 
-**Status: DoD 1–10 BUILT 2026-09-28 (Claude Code, Opus). DoD 11 is half done.** The lens, the report section, `--json`, `--diff`, the explorer card, four `[families]` keys in `.fux/inspect.toml` under [L12](../../records/0014_LAW-12-values-live-in-config.md), the tests and SR-INSPECT decision 24 have landed.
+**Status 2026-10-05: DoD 11 MEASURED. Waiting on 🔴 Arpit to rule on `misfit_floor`.** [`2026-10-05-ladder-gen4-rebuild`](../regression/2026-10-05-ladder-gen4-rebuild/report.md): on all eight gen-4 rungs the lens finds **3/3 planted misfits**, each with the right missing heading, and flags **0/3 controls**. The `misfit_share` flag never fires (1.5–10.7 %, floor 0.20). ⚠ From rung-01000 up, 14–143 unplanted misfits are one generator accident: generated SOPs carry the template's title as an H1 that differs from their front-matter title, and that heading's share sits at 0.803–0.816 against `core_share` 0.80. **The proposal, which no session has applied:** take `misfit_floor` 0.20 off PROVISIONAL unchanged, or keep it provisional until the title-H1 knife-edge is fixed. Changing either is Arpit's tuning call.
+
+**Earlier status: DoD 1–10 BUILT 2026-09-28 (Claude Code, Opus). DoD 11 is half done.** The lens, the report section, `--json`, `--diff`, the explorer card, four `[families]` keys in `.fux/inspect.toml` under [L12](../../records/0014_LAW-12-values-live-in-config.md), the tests and SR-INSPECT decision 24 have landed.
 
 **DoD 11, 2026-09-28:** the rung is filed — [`2026-09-28-families-lens-ladder`](../regression/2026-09-28-families-lens-ladder/report.md). The seed has 8 families and **0 misfits**. On rung-01000, 14 of 16 misfits were title headings, so the lens changed in the same session: the title heading is out of the shape, and only a shared heading can found a family (SR-INSPECT d24, amended). rung-01000 now has 1 misfit, and it is real. 🔴 **Open: planted misfits in `seed/`.** That is a generation-4 seed addition under [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md) A1–A3 and A20. It rebuilds the ladder, which re-baselines W-168's set-4 pools (A23). **Arpit ruled when on 2026-09-28: after W-168 steps 7 and 8** (below). Until then `misfit_floor` stays PROVISIONAL.
 

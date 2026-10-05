@@ -1,0 +1,324 @@
+## rung-seed: 8 families, 3 misfits, misfit_share 0.1071, flagged False
+FOUND   seed/83-mapping-study-TMS-45.md  want='Requalification'  missing=['5. Requalification']  family of 7
+FOUND   seed/84-mapping-study-TMS-46.md  want='Probe grid'  missing=['2. Probe grid']  family of 7
+clean   seed/85-mapping-study-TMS-47.md  control  family of 7
+FOUND   seed/86-lane-qualification-LQ-54.md  want='Conditions'  missing=['4. Conditions']  family of 6
+clean   seed/87-lane-qualification-LQ-55.md  control  family of 6
+clean   seed/88-lane-qualification-LQ-56.md  control  family of 6
+summary rung-seed: planted found 3/3, controls flagged 0/3, unplanted misfits 0
+## rung-00100: 10 families, 3 misfits, misfit_share 0.0938, flagged False
+FOUND   seed/83-mapping-study-TMS-45.md  want='Requalification'  missing=['5. Requalification']  family of 7
+FOUND   seed/84-mapping-study-TMS-46.md  want='Probe grid'  missing=['2. Probe grid']  family of 7
+clean   seed/85-mapping-study-TMS-47.md  control  family of 7
+FOUND   seed/86-lane-qualification-LQ-54.md  want='Conditions'  missing=['4. Conditions']  family of 6
+clean   seed/87-lane-qualification-LQ-55.md  control  family of 6
+clean   seed/88-lane-qualification-LQ-56.md  control  family of 6
+summary rung-00100: planted found 3/3, controls flagged 0/3, unplanted misfits 0
+## rung-00200: 22 families, 4 misfits, misfit_share 0.0333, flagged False
+FOUND   seed/83-mapping-study-TMS-45.md  want='Requalification'  missing=['5. Requalification']  family of 7
+FOUND   seed/84-mapping-study-TMS-46.md  want='Probe grid'  missing=['2. Probe grid']  family of 7
+clean   seed/85-mapping-study-TMS-47.md  control  family of 7
+FOUND   seed/86-lane-qualification-LQ-54.md  want='Conditions'  missing=['4. Conditions']  family of 6
+clean   seed/87-lane-qualification-LQ-55.md  control  family of 6
+clean   seed/88-lane-qualification-LQ-56.md  control  family of 6
+unplanted  seed/archive/a01-sop-temperature-excursion-rev2.md  missing=['4. Immediate containment']
+summary rung-00200: planted found 3/3, controls flagged 0/3, unplanted misfits 1
+## rung-00500: 23 families, 4 misfits, misfit_share 0.0097, flagged False
+FOUND   seed/83-mapping-study-TMS-45.md  want='Requalification'  missing=['5. Requalification']  family of 7
+FOUND   seed/84-mapping-study-TMS-46.md  want='Probe grid'  missing=['2. Probe grid']  family of 7
+clean   seed/85-mapping-study-TMS-47.md  control  family of 7
+FOUND   seed/86-lane-qualification-LQ-54.md  want='Conditions'  missing=['4. Conditions']  family of 6
+clean   seed/87-lane-qualification-LQ-55.md  control  family of 6
+clean   seed/88-lane-qualification-LQ-56.md  control  family of 6
+unplanted  seed/archive/a01-sop-temperature-excursion-rev2.md  missing=['4. Immediate containment']
+summary rung-00500: planted found 3/3, controls flagged 0/3, unplanted misfits 1
+## rung-01000: 23 families, 17 misfits, misfit_share 0.0190, flagged False
+FOUND   seed/83-mapping-study-TMS-45.md  want='Requalification'  missing=['5. Requalification']  family of 7
+FOUND   seed/84-mapping-study-TMS-46.md  want='Probe grid'  missing=['2. Probe grid']  family of 7
+clean   seed/85-mapping-study-TMS-47.md  control  family of 7
+FOUND   seed/86-lane-qualification-LQ-54.md  want='Conditions'  missing=['4. Conditions']  family of 6
+clean   seed/87-lane-qualification-LQ-55.md  control  family of 6
+clean   seed/88-lane-qualification-LQ-56.md  control  family of 6
+unplanted  ext/sibling/00046-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00116-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00186-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00256-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00326-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00396-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00466-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00536-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00606-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00676-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00746-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00816-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/a01-marrowbeck-excursion-sop.md  missing=['Temperature Excursion Response SOP']
+unplanted  seed/archive/a01-sop-temperature-excursion-rev2.md  missing=['Temperature Excursion Response SOP', '4. Immediate containment']
+summary rung-01000: planted found 3/3, controls flagged 0/3, unplanted misfits 14
+## rung-02000: 23 families, 32 misfits, misfit_share 0.0172, flagged False
+FOUND   seed/83-mapping-study-TMS-45.md  want='Requalification'  missing=['5. Requalification']  family of 7
+FOUND   seed/84-mapping-study-TMS-46.md  want='Probe grid'  missing=['2. Probe grid']  family of 7
+clean   seed/85-mapping-study-TMS-47.md  control  family of 7
+FOUND   seed/86-lane-qualification-LQ-54.md  want='Conditions'  missing=['4. Conditions']  family of 6
+clean   seed/87-lane-qualification-LQ-55.md  control  family of 6
+clean   seed/88-lane-qualification-LQ-56.md  control  family of 6
+unplanted  ext/sibling/00046-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00116-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00186-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00256-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00326-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00396-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00466-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00536-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00606-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00676-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00746-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00816-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00886-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00956-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01026-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01096-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01166-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01236-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01306-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01376-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01446-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01516-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01586-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01656-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01726-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01796-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01866-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/a01-marrowbeck-excursion-sop.md  missing=['Temperature Excursion Response SOP']
+unplanted  seed/archive/a01-sop-temperature-excursion-rev2.md  missing=['Temperature Excursion Response SOP', '4. Immediate containment']
+summary rung-02000: planted found 3/3, controls flagged 0/3, unplanted misfits 29
+## rung-05000: 23 families, 75 misfits, misfit_share 0.0158, flagged False
+FOUND   seed/83-mapping-study-TMS-45.md  want='Requalification'  missing=['5. Requalification']  family of 7
+FOUND   seed/84-mapping-study-TMS-46.md  want='Probe grid'  missing=['2. Probe grid']  family of 7
+clean   seed/85-mapping-study-TMS-47.md  control  family of 7
+FOUND   seed/86-lane-qualification-LQ-54.md  want='Conditions'  missing=['4. Conditions']  family of 6
+clean   seed/87-lane-qualification-LQ-55.md  control  family of 6
+clean   seed/88-lane-qualification-LQ-56.md  control  family of 6
+unplanted  ext/sibling/00046-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00116-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00186-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00256-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00326-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00396-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00466-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00536-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00606-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00676-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00746-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00816-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00886-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00956-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01026-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01096-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01166-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01236-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01306-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01376-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01446-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01516-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01586-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01656-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01726-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01796-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01866-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01936-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02006-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02076-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02146-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02216-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02286-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02356-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02426-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02496-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02566-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02636-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02706-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02776-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02846-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02916-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02986-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03056-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03126-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03196-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03266-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03336-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03406-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03476-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03546-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03616-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03686-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03756-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03826-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03896-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03966-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04036-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04106-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04176-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04246-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04316-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04386-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04456-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04526-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04596-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04666-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04736-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04806-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04876-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/a01-marrowbeck-excursion-sop.md  missing=['Temperature Excursion Response SOP']
+unplanted  seed/archive/a01-sop-temperature-excursion-rev2.md  missing=['Temperature Excursion Response SOP', '4. Immediate containment']
+summary rung-05000: planted found 3/3, controls flagged 0/3, unplanted misfits 72
+## rung-10000: 23 families, 146 misfits, misfit_share 0.0152, flagged False
+FOUND   seed/83-mapping-study-TMS-45.md  want='Requalification'  missing=['5. Requalification']  family of 7
+FOUND   seed/84-mapping-study-TMS-46.md  want='Probe grid'  missing=['2. Probe grid']  family of 7
+clean   seed/85-mapping-study-TMS-47.md  control  family of 7
+FOUND   seed/86-lane-qualification-LQ-54.md  want='Conditions'  missing=['4. Conditions']  family of 6
+clean   seed/87-lane-qualification-LQ-55.md  control  family of 6
+clean   seed/88-lane-qualification-LQ-56.md  control  family of 6
+unplanted  ext/sibling/00046-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00116-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00186-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00256-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00326-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00396-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00466-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00536-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00606-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00676-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00746-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00816-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00886-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/00956-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01026-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01096-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01166-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01236-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01306-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01376-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01446-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01516-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01586-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01656-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01726-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01796-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01866-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/01936-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02006-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02076-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02146-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02216-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02286-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02356-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02426-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02496-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02566-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02636-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02706-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02776-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02846-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02916-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/02986-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03056-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03126-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03196-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03266-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03336-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03406-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03476-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03546-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03616-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03686-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03756-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03826-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03896-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/03966-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04036-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04106-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04176-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04246-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04316-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04386-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04456-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04526-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04596-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04666-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04736-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04806-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04876-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/04946-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05016-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05086-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05156-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05226-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05296-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05366-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05436-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05506-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05576-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05646-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05716-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05786-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05856-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05926-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/05996-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06066-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06136-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06206-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06276-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06346-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06416-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06486-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06556-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06626-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06696-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06766-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06836-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06906-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/06976-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07046-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07116-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07186-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07256-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07326-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07396-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07466-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07536-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07606-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07676-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07746-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07816-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07886-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/07956-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08026-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08096-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08166-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08236-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08306-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08376-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08446-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08516-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08586-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08656-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08726-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08796-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08866-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/08936-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09006-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09076-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09146-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09216-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09286-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09356-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09426-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09496-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09566-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09636-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09706-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09776-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/09846-quarantine.md  missing=['Temperature Excursion Response SOP']
+unplanted  ext/sibling/a01-marrowbeck-excursion-sop.md  missing=['Temperature Excursion Response SOP']
+unplanted  seed/archive/a01-sop-temperature-excursion-rev2.md  missing=['Temperature Excursion Response SOP', '4. Immediate containment']
+summary rung-10000: planted found 3/3, controls flagged 0/3, unplanted misfits 143

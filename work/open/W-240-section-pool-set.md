@@ -9,7 +9,9 @@ ball: agent
 
 # W-240 — a set that can measure section records
 
-**Status 2026-10-05: prompts 12 AND 13 RUN by Arpit; generation 4 is complete in the tree** (`seed/63`–`88`, `set-5-claude`, `planted-misfits.tsv`). **Next (agent, Opus): commit prompt 13's data and delete prompt 13 in that same change; then rebuild the ladder once, from `seed/` alone (A23); then re-run W-228's families lens on the new rungs against `planted-misfits.tsv`; then capture the baseline for 🔴 Arpit to score.**
+**Status 2026-10-05 (later): step 3 DONE. The ladder was rebuilt once as generation 4** ([the run](../regression/2026-10-05-ladder-gen4-rebuild/report.md)): 94 seeds, all eight rungs frozen at `ba1c0e44`, and every coverage count equal to its declaration. Prompt 13 was deleted in its own change. **Next (agent, Opus): a phase-5 baseline capture of `set-5-claude` on the gen-4 rungs** ([`work/golden/README.md`](../golden/README.md) §Phase 5, with a pre-registration first). It must run in a session other than the rebuild: the rebuild session was held to `seed/` only and never opened `questions/`. **Then 🔴 Arpit scores it** (`tools/golden-score/score.py`, his shell). Done when the `step10_section` pool is ≥ 6. Then W-236 re-balls 🟢.
+
+**Status 2026-10-05 (earlier): prompts 12 AND 13 RUN by Arpit; generation 4 is complete in the tree** (`seed/63`–`88`, `set-5-claude`, `planted-misfits.tsv`). Next was: commit prompt 13's data and delete prompt 13 in that same change; then rebuild the ladder once, from `seed/` alone (A23); then re-run W-228's families lens on the new rungs against `planted-misfits.tsv`; then capture the baseline for 🔴 Arpit to score.**
 
 **Earlier status (2026-10-03): prompt 12 run; the ladder rebuild waited on W-228's prompt 13.**
 

@@ -1,0 +1,313 @@
+{
+ "documents_in_a_family": 28,
+ "families": [
+  {
+   "folders": [
+    "seed/"
+   ],
+   "length_bands": [
+    "200–999"
+   ],
+   "members": [
+    "file:seed/23-mapping-study-TMS-41.md",
+    "file:seed/24-mapping-study-TMS-42.md",
+    "file:seed/25-mapping-study-TMS-43.md",
+    "file:seed/26-mapping-study-TMS-44.md",
+    "file:seed/83-mapping-study-TMS-45.md",
+    "file:seed/84-mapping-study-TMS-46.md",
+    "file:seed/85-mapping-study-TMS-47.md"
+   ],
+   "name": "1. Scope · 2. Probe grid · 3. Results · 4. Conclusion",
+   "shared_meta_keys": [
+    "department",
+    "doc_id",
+    "effective_date",
+    "facility",
+    "owner",
+    "room",
+    "status",
+    "title"
+   ],
+   "size": 7
+  },
+  {
+   "folders": [
+    "seed/"
+   ],
+   "length_bands": [
+    "<200",
+    "200–999"
+   ],
+   "members": [
+    "file:seed/27-lane-qualification-LQ-51.md",
+    "file:seed/28-lane-qualification-LQ-52.md",
+    "file:seed/29-lane-qualification-LQ-53.md",
+    "file:seed/86-lane-qualification-LQ-54.md",
+    "file:seed/87-lane-qualification-LQ-55.md",
+    "file:seed/88-lane-qualification-LQ-56.md"
+   ],
+   "name": "1. Lane · 2. Score · 3. Trial results · 4. Conditions",
+   "shared_meta_keys": [
+    "contributors",
+    "department",
+    "doc_id",
+    "effective_date",
+    "lane",
+    "owner",
+    "status",
+    "title"
+   ],
+   "size": 6
+  },
+  {
+   "folders": [
+    "seed/"
+   ],
+   "length_bands": [
+    "<200"
+   ],
+   "members": [
+    "file:seed/40-procedure-dry-ice-handling.md",
+    "file:seed/56-dry-ice-handling-card-dock-5.md",
+    "file:seed/57-dry-ice-handling-card-guwahati.md"
+   ],
+   "name": "Before you touch it · Taking it out · Frozen body top-up · Afterwards",
+   "shared_meta_keys": [
+    "applies_to",
+    "department",
+    "doc_id",
+    "effective_date",
+    "owner",
+    "status",
+    "title"
+   ],
+   "size": 3
+  },
+  {
+   "folders": [
+    "seed/"
+   ],
+   "length_bands": [
+    "200–999"
+   ],
+   "members": [
+    "file:seed/16-reefer-RF-118-asset-file.md",
+    "file:seed/17-reefer-RF-119-asset-file.md",
+    "file:seed/18-reefer-RF-120-asset-file.md"
+   ],
+   "name": "Identity · What RF-118 may carry · Servicing",
+   "shared_meta_keys": [
+    "base",
+    "department",
+    "doc_id",
+    "effective_date",
+    "fleet_class",
+    "owner",
+    "status",
+    "title"
+   ],
+   "size": 3
+  },
+  {
+   "folders": [
+    "seed/"
+   ],
+   "length_bands": [
+    "<200"
+   ],
+   "members": [
+    "file:seed/43-procedure-ammonia-leak-response.md",
+    "file:seed/58-ammonia-alarm-card-canteen.md",
+    "file:seed/59-ammonia-alarm-card-dock-5.md"
+   ],
+   "name": "When the site siren sounds · The compressor house · Going back",
+   "shared_meta_keys": [
+    "applies_to",
+    "department",
+    "doc_id",
+    "effective_date",
+    "owner",
+    "status",
+    "title"
+   ],
+   "size": 3
+  },
+  {
+   "folders": [
+    "seed/"
+   ],
+   "length_bands": [
+    "<200",
+    "200–999"
+   ],
+   "members": [
+    "file:seed/14-customer-notification-matrix-2025.md",
+    "file:seed/15-customer-notification-matrix-2026.md"
+   ],
+   "name": "1. Timing by product class · 2. Wording · 3. Who may sign · 4. Escalation if the customer cannot be reached",
+   "shared_meta_keys": [
+    "department",
+    "doc_id",
+    "effective_date",
+    "owner",
+    "status",
+    "title"
+   ],
+   "size": 2
+  },
+  {
+   "folders": [
+    "seed/"
+   ],
+   "length_bands": [
+    "<200"
+   ],
+   "members": [
+    "file:seed/46-procedure-seal-control.md",
+    "file:seed/60-seal-handling-card-gate-cabin.md"
+   ],
+   "name": "Fitting · At the destination",
+   "shared_meta_keys": [
+    "department",
+    "doc_id",
+    "effective_date",
+    "owner",
+    "status",
+    "title"
+   ],
+   "size": 2
+  },
+  {
+   "folders": [
+    "seed/"
+   ],
+   "length_bands": [
+    "<200"
+   ],
+   "members": [
+    "file:seed/51-reference-gel-pack-conditioning.md",
+    "file:seed/62-gel-pack-figures-qa-room-sheet.md"
+   ],
+   "name": "Packs · Shippers · Cabinet",
+   "shared_meta_keys": [
+    "department",
+    "doc_id",
+    "effective_date",
+    "owner",
+    "status",
+    "title"
+   ],
+   "size": 2
+  }
+ ],
+ "families_share": 0.2978723404255319,
+ "family_count": 8,
+ "levers": {
+  "misfit": "`fux enrich`, `fux correct`, or fix the source",
+  "shared headings": "`[index]` stopwords, or an analyzer amendment — an index change, with its own record",
+  "split across folders": "`.fuxignore`, `archived=`, or `supersedes` on the one that is current"
+ },
+ "misfit_count": 3,
+ "misfit_flagged": false,
+ "misfit_floor": {
+  "bound": 0.2,
+  "direction": "above",
+  "provisional": true
+ },
+ "misfit_share": 0.10714285714285714,
+ "misfits": [
+  {
+   "family": "1. Scope · 2. Probe grid · 3. Results · 4. Conclusion",
+   "id": "file:seed/83-mapping-study-TMS-45.md",
+   "missing": [
+    "5. Requalification"
+   ]
+  },
+  {
+   "family": "1. Scope · 2. Probe grid · 3. Results · 4. Conclusion",
+   "id": "file:seed/84-mapping-study-TMS-46.md",
+   "missing": [
+    "2. Probe grid"
+   ]
+  },
+  {
+   "family": "1. Lane · 2. Score · 3. Trial results · 4. Conditions",
+   "id": "file:seed/86-lane-qualification-LQ-54.md",
+   "missing": [
+    "4. Conditions"
+   ]
+  }
+ ],
+ "no_headings": [
+  "file:seed/04-night-shift-handover-log.txt",
+  "file:seed/06-re-fw-telematics-cutover.eml",
+  "file:seed/33-cold-chain-glossary.md",
+  "file:seed/67-note-uran-reefer-yard.txt",
+  "file:seed/71-email-rc40-container-hire.eml",
+  "file:seed/74-note-rasoi-bazaar-account.txt",
+  "file:seed/80-email-kirana-frozen-desk.eml",
+  "file:seed/82-note-siliguri-cage-recorders.txt",
+  "file:seed/archive/a05-induction-checklist-2020.txt"
+ ],
+ "no_headings_count": 9,
+ "singleton_count": 57,
+ "singletons": [
+  "file:seed/01-sop-temperature-excursion.md",
+  "file:seed/02-sensor-thresholds.yaml",
+  "file:seed/03-postmortem-nagpur-vaccine-excursion.md",
+  "file:seed/05-decision-telematics-vendor-2023.md",
+  "file:seed/07-rate-card-and-surcharges.md",
+  "file:seed/08-driver-hours-and-safety-policy.md",
+  "file:seed/09-dock-scheduling-wiki-export.html",
+  "file:seed/10-new-joiner-faq.md",
+  "file:seed/11-decision-telematics-vendor-2026.md",
+  "file:seed/12-rate-card-2026-h2.md",
+  "file:seed/13-dock-scheduling-rules-2026.md",
+  "file:seed/19-project-PROJ-123-dockwise-rollout.md",
+  "file:seed/20-project-PROJ-124-red-sleeve-and-passive-shippers.md",
+  "file:seed/21-project-PROJ-125-kalpa-decommission.md",
+  "file:seed/22-cold-chain-document-map.md",
+  "file:seed/30-pharma-night-dispatch-checklist.md",
+  "file:seed/31-quarantine-release-and-return-procedure.md",
+  "file:seed/32-reefer-washdown-and-sanitation-procedure.md",
+  "file:seed/34-cold-chain-training-plan-2026.md",
+  "file:seed/35-qa-monthly-bulletin-2026-07.md",
+  "file:seed/36-nagpur-night-drill-report-2026-q1.md",
+  "file:seed/37-procedure-probe-calibration.md",
+  "file:seed/38-decision-probe-calibration.md",
+  "file:seed/39-reference-probe-calibration.md",
+  "file:seed/41-decision-dry-ice-handling.md",
+  "file:seed/42-reference-dry-ice-handling.md",
+  "file:seed/44-decision-ammonia-leak-response.md",
+  "file:seed/45-reference-ammonia-leak-response.md",
+  "file:seed/47-decision-seal-control.md",
+  "file:seed/48-reference-seal-control.md",
+  "file:seed/49-procedure-gel-pack-conditioning.md",
+  "file:seed/50-decision-gel-pack-conditioning.md",
+  "file:seed/52-coimbatore-dc-site-handbook.md",
+  "file:seed/53-fleet-operations-manual.md",
+  "file:seed/54-customer-service-handbook.md",
+  "file:seed/55-stores-and-consumables-standard.md",
+  "file:seed/61-seal-and-label-card-stores-counter.md",
+  "file:seed/63-handbook-western-frozen-crossdock.md",
+  "file:seed/64-manual-last-mile-programme.md",
+  "file:seed/65-manual-containerised-cold-units.md",
+  "file:seed/66-contract-consolidated-terms-cn31.md",
+  "file:seed/68-card-taloja-freezer-store.md",
+  "file:seed/69-sheet-sahyog-doorstep-delivery.html",
+  "file:seed/70-note-arogya-outreach-cold-bags.md",
+  "file:seed/72-card-pvf200-portable-freezer.md",
+  "file:seed/73-summary-konkan-seafoods-contract.md",
+  "file:seed/75-card-hosur-depot-temp-sticks-and-pellets.md",
+  "file:seed/76-note-siliguri-depot-siren-and-rain-cover.html",
+  "file:seed/77-card-ev-chilled-vans-on-the-road.md",
+  "file:seed/78-note-siliguri-vaccine-relay.md",
+  "file:seed/79-annex-tandoor-junction-service-terms.md",
+  "file:seed/81-card-hosur-depot-cage-and-spend.md",
+  "file:seed/archive/a01-sop-temperature-excursion-rev2.md",
+  "file:seed/archive/a02-kalpa-alert-routing-guide-2021.md",
+  "file:seed/archive/a03-dock-scheduling-wiki-2021.html",
+  "file:seed/archive/a04-driver-hours-policy-2019.md",
+  "file:seed/archive/a06-reefer-RF-117-retired.md"
+ ]
+}

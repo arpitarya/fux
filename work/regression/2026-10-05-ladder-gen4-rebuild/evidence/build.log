@@ -1,0 +1,25 @@
+== rung-seed 94 start 11:26:30
+rung-seed: 94 documents · archived 6 · superseded 6 · mtime 94/94 · frozen
+== rung-seed done 25s
+== rung-00100 100 start 11:26:55
+rung-00100: 100 documents · archived 7 · superseded 7 · mtime 100/100 · frozen
+== rung-00100 done 24s
+== rung-00200 200 start 11:27:19
+rung-00200: 200 documents · archived 17 · superseded 16 · mtime 200/200 · frozen
+== rung-00200 done 44s
+== rung-00500 500 start 11:28:03
+rung-00500: 500 documents · archived 47 · superseded 46 · mtime 500/500 · frozen
+== rung-00500 done 106s
+== rung-01000 1000 start 11:29:49
+rung-01000: 1000 documents · archived 97 · superseded 96 · mtime 1000/1000 · frozen
+== rung-01000 done 184s
+== rung-02000 2000 start 11:32:53
+rung-02000: 2000 documents · archived 197 · superseded 196 · mtime 2000/2000 · frozen
+== rung-02000 done 471s
+== rung-05000 5000 start 11:40:44
+rung-05000: 5000 documents · archived 497 · superseded 496 · mtime 5000/5000 · frozen
+== rung-05000 done 654s
+== rung-10000 10000 start 11:51:38
+rung-10000: 10000 documents · archived 997 · superseded 996 · mtime 10000/10000 · frozen
+== rung-10000 done 695s
+ALLDONE

@@ -1,11 +1,11 @@
 rung: rung-00100
 documents_indexed: 100
-archived_declared: 9
-archived_in_index: 9
-superseded_declared: 9
-superseded_in_index: 9
+archived_declared: 7
+archived_in_index: 7
+superseded_declared: 7
+superseded_in_index: 7
 carrying_mtime: 100
-categories: {"adjacent": 10, "filler": 6, "seed": 68, "sibling": 13, "variant": 3}
+categories: {"seed": 94, "sibling": 5, "variant": 1}
 documents_with_history: 12
 history_commits: 34
 history_authors: 9

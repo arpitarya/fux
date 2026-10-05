@@ -570,7 +570,25 @@ stream.
 [SR-WORK-ENVIRONMENTS](../../records/0052_WORK-environments.md) caps the lab at 10 000 documents.
 There is no rung above this one and none may be built.
 
-🔴 **Rebuilt 2026-09-27 on generation 3's seed, with its history** — [the run](../regression/2026-09-27-ladder-gen3-rebuild/report.md).
+🔴 **Rebuilt 2026-10-05 on generation 4's seed** — [the run](../regression/2026-10-05-ladder-gen4-rebuild/report.md).
+The seed has 94 documents: 63–82 are prompt 12's section documents, and 83–88
+are prompt 13's planted misfits, checked against
+[`planted-misfits.tsv`](planted-misfits.tsv). History is unchanged at 12
+documents and 34 commits. Every rung keeps its headline size, so `rung-00100`
+holds only **6** ext documents. Archived / superseded counts: 6/6 on the seed,
+7/7 on `rung-00100`, then **(headline/10 − 3) / (headline/10 − 4)**, for
+example 997 / 996 at `rung-10000`. Above `rung-00100` each rung holds one
+archived document whose successor falls past the boundary. `ref` edges stay at
+82. Engine `ba1c0e44` (3.0.0-alpha.11). The generation-3 rungs are kept in
+`fux-lab/corpora/golden-gen3/`. ⚠ **Two driver changes, both forced by a
+6-document ext:**
+- `ext/archive` is declared only where it exists;
+- the authored hard negatives are emitted with each retired document just
+  before its successor, the generator's own slot-5/6 rule.
+
+The generator and builder in fux-lab are unmodified. The run's `evidence/` holds both changes.
+
+🔴 **Rebuilt 2026-09-27 on generation 3's seed, with its history** — [the run](../regression/2026-09-27-ladder-gen3-rebuild/report.md). *History since 2026-10-05.*
 The seed has 68 documents, and 12 of them replay a git history of 34 commits by
 9 authors. Every rung above the seed holds its headline size, with fewer ext
 documents. Archived and superseded are **6 + (headline/10 − 7)** (99 at
