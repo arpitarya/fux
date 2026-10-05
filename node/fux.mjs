@@ -14,7 +14,7 @@ import { runAnswer } from "./src/verbs/answer.mjs";
 import { runExplain, runGraph, runPath } from "./src/verbs/graph.mjs";
 import { runMcp } from "./src/verbs/mcp.mjs";
 import { build as buildPlane } from "./src/derive/build.mjs";
-import { withWriteLock } from "./src/maintain/runner.mjs";
+import { withWriteLock } from "./src/maintain/lock.mjs";
 
 /** `fux build` — `ingest/__init__.py::cmd_build`: the same lock, the same line. */
 function runBuild(root) {

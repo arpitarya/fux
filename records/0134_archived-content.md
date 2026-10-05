@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 4ededabd6f2b4e5cfa8bd72166645791477fd6b931780005d9dda8a4e1e447c7
+content_sha: aef4394a0fdaea1f644d247ec7ed2e159355e661d2ec7a75b5d308ad10eccfa9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -492,6 +492,8 @@ A carried `url:` record re-derived because the identifier-family digest moved ke
 **No decision here moved** (W-253, 2026-10-04): `ingest/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
 
 **No decision here moved** (W-248, 2026-10-04): in `urlsrc.py` the "nothing readable" skip reason is spelled from `decoders.reason_nothing_readable`; nothing this record decides moved.
+
+**No decision here moved** (W-261, 2026-10-05): `archived_dirs` moved from `ingest/gitdir.py` to `ingest/dirlist.py` (SR-DIR-LIST's), and the URL branch of `ingest/run.py` to `ingest/urlingest.py` (SR-URL-INGEST's). `is_archived_loc`, `_archived_url_ids` and `_with_archived` stayed where they were; the declaration reaches a record exactly as before.
 
 ### Consequences
 

@@ -586,24 +586,15 @@ def test_archived_content_is_reachable_now() -> None:
     assert "SR-ARCHIVED-CONTENT" not in _records_with_no_src_component()
 
 
-# --- B-055: a component record that owns nothing says which case it is ---------
+# --- W-261: every component record owns a file (the strong rule) -------------
 
-#: The ten `kind: component` records with `owns: []`, by name -- never a range.
-#: Each is one of [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) decision
-#: 7's two honest cases. The list is asserted equal to disk, so an eleventh
-#: record arriving (or one gaining an `owns`) is seen, not inferred.
-COMPONENT_RECORDS_THAT_OWN_NOTHING = {
-    "SR-FIND",
-    "SR-URL-INGEST",
-    "SR-DIR-LIST",
-    "SR-CACHEDIR-TAG",
-    "SR-DOCS-TABLE",
-    "SR-RUNTIME-MANIFEST",
-    "SR-RUNTIME-STAMP",
-    "SR-RUNTIME-STATS",
-    "SR-LOCKS",
-    "SR-SECTIONS",
-}
+#: The ONLY `kind: component` records allowed `owns: []`, **by name** — never a
+#: range, never a pattern. [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md)
+#: decision 11 states the rule (Arpit, 2026-10-04, W-251 #16; built by W-261):
+#: a component record owns at least one file. SR-SECTIONS is `proposed` and
+#: unbuilt — it owns nothing until W-236 Part B builds its plane, and the day it
+#: gains an `owns:` it must leave this set (the pinned test below says so).
+COMPONENT_RECORDS_EXEMPT_FROM_OWNING = {"SR-SECTIONS"}
 
 
 def _component_records_owning_nothing() -> dict[str, str]:
@@ -617,26 +608,34 @@ def _component_records_owning_nothing() -> dict[str, str]:
     return out
 
 
-def test_the_component_records_owning_nothing_are_exactly_these_ten() -> None:
-    """SR-WORK-OWNERSHIP d7: the owns-nothing set is pinned by name. W-246 (B-055)."""
-    actual = set(_component_records_owning_nothing())
-    assert actual == COMPONENT_RECORDS_THAT_OWN_NOTHING, (
-        f"newly owning nothing: {sorted(actual - COMPONENT_RECORDS_THAT_OWN_NOTHING)}; "
-        f"gained an owns: {sorted(COMPONENT_RECORDS_THAT_OWN_NOTHING - actual)}"
+def test_every_component_record_owns_a_file() -> None:
+    """SR-WORK-OWNERSHIP d11, the strong rule: `kind: component` with `owns: []`
+    fails, except the records exempted by name. W-261."""
+    offenders = sorted(set(_component_records_owning_nothing()) - COMPONENT_RECORDS_EXEMPT_FROM_OWNING)
+    assert not offenders, (
+        f"these `kind: component` records own nothing: {offenders}. A component "
+        "record owns at least one file (SR-WORK-OWNERSHIP decision 11). Move its "
+        "code into a file of its own and list it in `owns:` — never invent an "
+        "owner; if it truly has no code, it may be a `process` record, and that "
+        "is Arpit's call."
     )
 
 
-@pytest.mark.parametrize("name", sorted(COMPONENT_RECORDS_THAT_OWN_NOTHING))
-def test_a_component_record_owning_nothing_is_reachable_and_says_its_case(name: str) -> None:
-    """SR-WORK-OWNERSHIP d7 (weak rule, W-251 ruling 16): `kind: component` with `owns: []`
-    has a `describes` row on a `src/` component -- else no change can ever demand it --
-    AND a sentence naming *decision 7* / *d7* and which *case* it is. The strong rule
-    (every record owns something) stays Arpit's. W-246 (B-055).
-    """
+def test_the_exemption_is_still_needed() -> None:
+    """An exemption that outlives its reason turns the rule off for that record."""
+    stale = sorted(COMPONENT_RECORDS_EXEMPT_FROM_OWNING - set(_component_records_owning_nothing()))
+    assert not stale, f"exempt but now owning something (or gone) — delete from the set: {stale}"
+
+
+@pytest.mark.parametrize("name", sorted(COMPONENT_RECORDS_EXEMPT_FROM_OWNING))
+def test_an_exempt_record_is_reachable_and_says_why(name: str) -> None:
+    """While exempt, the record stays reachable by a `describes` row on a `src/`
+    component and names SR-WORK-OWNERSHIP decision 7's case in one sentence —
+    the weak rule W-246 built, kept for the exemptions only."""
     from sr_lib import describes_table
 
     records = _component_records_owning_nothing()
-    assert name in records, f"{name} no longer owns nothing (see the pinned-set test)"
+    assert name in records, f"{name} is exempt but not a component record owning nothing"
     rows = [c for c, rs in describes_table().items() if name in rs and c.startswith("src/")]
     assert rows, f"{name}: owns nothing and describes no src/ component -- unreachable by the gate"
     body = re.sub(r"\s+", " ", records[name])

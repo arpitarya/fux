@@ -5,19 +5,25 @@ name: SR-DOCS-TABLE
 title: SR-DOCS-TABLE (0122) — docs.jsonl, the docidx-ordered doc table
 description: One JSON line per document, sorted by id, so its position (docidx) is a stable, small join key every other derived structure references instead of repeating the string id.
 status: accepted
+amended: 2026-10-05
 date: 2026-08-19
 feature: "`.fux/runtime/docs.jsonl` — the derived doc table and the join key it defines"
-owns: []
+owns: [node/src/derive/docstable.mjs@74dd7c2a91a2, src/fux/derive/docstable.py@8e287539fe3c]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 08519da83eef27b8387d88ee2c4ea422a4a9bbe2257004900b2abc3da6852169
+content_sha: 3bca99b9e31d654aeb55b85f640ae0cb814d87a8ec651fd06f19b9440d376597
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
+**Owns** — the components this record decides:
+
+- [`node/src/derive/docstable.mjs`](../node/src/derive/docstable.mjs) · file
+- [`src/fux/derive/docstable.py`](../src/fux/derive/docstable.py) · file
+
 **Describes** — reaches into, does not own:
 
-- [`src/fux/derive/_build.py`](../src/fux/derive/_build.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
+- [`src/fux/derive/_build.py::_read_committed`](../src/fux/derive/_build.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 - [`src/fux/derive/format.py`](../src/fux/derive/format.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 
 <!-- COMPONENTS-END -->
@@ -96,18 +102,7 @@ repeating it inside every postings entry would bloat both the block line and the
 
 ### Decision
 
-**0. This record owns nothing, and the case is (a)** —
-[SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7: it specifies one file
-another record already generates. The docs table is written by
-[`src/fux/derive/_build.py`](../src/fux/derive/_build.py) and encoded by
-[`derive/format.py`](../src/fux/derive/format.py), both of which
-[SR-T1-ACCELERATOR](0110_accelerator.md) owns as the build; **carving the file
-out would give one plane two owners for one pass.** ⚠ **Until 2026-09-21 that
-left nothing able to open this record** — the freshness gate demands owners and
-describers, and this record was neither. It now carries `describes` rows on both
-files, so a change to what is written or to how it is encoded opens it.
-**Reach is not ownership** — SR-WORK-OWNERSHIP decision 1 — and the case
-above is why owning nothing is the right answer here rather than a gap.
+**0. This record owns [`src/fux/derive/docstable.py`](../src/fux/derive/docstable.py) and its Node twin [`node/src/derive/docstable.mjs`](../node/src/derive/docstable.mjs)** since 2026-10-05 ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). The docs table's writer is a pure move out of `derive/_build.py` (and `build.mjs`): `write` — one sorted-key JSON row per document, in docidx order, byte-identical. `_build.py` still decides **when** it is written, in `build()`'s order, and computes its inputs in `_read_committed`; `format.py` keeps the constants and `write_json`, the serializer every runtime JSON file shares — both [SR-T1-ACCELERATOR](0110_accelerator.md)'s, both reached by this record's `describes` rows. ⚠ **This decision read *owns nothing, case (a)* until W-261, arguing that carving the file out would give one plane two owners for one pass.** The ruling answered it: the build orchestrates, this record owns the bytes of its one file.
 
 **1. One JSON object per line: `archived`, `flen`, `id`, `loc`, `mtime`,
 `superseded`, `title`** — the set `derive/format.py::DOCS_FIELDS` names. It is

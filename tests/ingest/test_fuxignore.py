@@ -20,7 +20,8 @@ import pytest
 
 from fux.errors import FuxError
 from fux.ingest import fuxignore
-from fux.ingest.gitdir import read_types, source_dirs, source_excludes, walk_sources
+from fux.ingest.dirlist import source_dirs, source_excludes
+from fux.ingest.gitdir import read_types, walk_sources
 
 
 # -- the grammar -----------------------------------------------------------

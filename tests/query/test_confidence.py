@@ -27,7 +27,8 @@ import json as json_mod
 
 import pytest
 
-from fux.query import cmd_ask, cmd_find, run_query
+from fux.query import cmd_ask, run_query
+from fux.query.find import cmd_find
 from fux.query.confidence import BANDS, GROUNDED, NONE, PARTIAL, WEAK, Confidence, signals
 DOC_COVERAGE_FLOOR = template_tune().doc_coverage_floor
 SEPARATION_FLOOR = template_tune().separation_floor

@@ -7,10 +7,10 @@ description: "One URL per line in a committed file, deduped and sorted by the lo
 status: accepted
 date: 2026-08-19
 feature: "`.fux/sources/urls` — the file format itself, and the one grammar both committed source lists are parsed by"
-owns: [src/fux/ingest/sourcelist.py@ef3ccfb0002b, node/src/ingest/sourcelist.mjs@01a32a15e889]
+owns: [src/fux/ingest/sourcelist.py@ef3ccfb0002b, node/src/ingest/sourcelist.mjs@b68e15e1467a]
 laws: [L3, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 02705397e193a2846809e21d5788ebc6715fcd8aaa37b1b831b8be6274e669c4
+content_sha: 93f407d098363c6fa96844e097cb3290cb66b4193f730fa7e28dd2ac766a0825
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -622,6 +622,8 @@ pipe** (Arpit, 2026-09-18; built 2026-09-21 as W-199 DoD 10).
 **`parse_duration` and the host-glob matcher hold no numeral**: a duration is "a number and a unit" (`<= 1` character is refused), and `**` is matched and skipped by its own length. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+**No decision here moved** (W-261, 2026-10-05): `readDirs` moved from `node/src/ingest/sourcelist.mjs` to `ingest/dirlist.mjs` (SR-DIR-LIST's, the twin of `read_dirs`); the grammar, `parseDirs`, stays here.
 
 ### Consequences
 

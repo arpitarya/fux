@@ -10,7 +10,7 @@ feature: the file-type allowlist and `.fux/formats.toml`
 owns: [src/fux/ingest/typesfile.py@cba4e18abe52, .fux/formats.toml@05666c969b79]
 laws: [L2, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: f5e0a5eefe570cb71b6aa388626e496897f53a30bb9295341d6bb99531d334bf
+content_sha: c4d9a4ece35389f6884df63c990f677c026c52a9ac2cf3b06f1fed46ddc5c9e3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -547,6 +547,8 @@ carries them.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** (W-244, 2026-10-04): the walk prunes a `!`-excluded directory before the type allowlist is consulted for anything inside it ([SR-INGEST](0106_ingest.md) decision 24). A file there was skipped before either way, so no type verdict changes.
+
+**No decision here moved** (W-261, 2026-10-05): `ingest/gitdir.py`, which this record describes, lost the `dirs`-list readers to `ingest/dirlist.py` (SR-DIR-LIST's). `read_types`, `TypeFilter` and `_default_types` are untouched.
 
 ### Consequences
 

@@ -9,7 +9,28 @@ ball: agent
 
 # W-261 — every component record owns a file
 
-**Status: ratified 2026-10-04, not built.**
+**Status: built 2026-10-05, DoD 1–4 met** — nine records own a moved file
+(Python + Node twin where Node mirrors it), SR-SECTIONS exempt by name; the
+strong rule is SR-WORK-OWNERSHIP d11 and `tests/test_sr_ownership.py`. Index
+bytes verified unchanged: a docs+records corpus ingested and built with HEAD's
+code and with the moved code gives byte-identical `.fux/index/` and runtime
+deterministic files (and identical `find --json --band --under`). Stopped on
+no record — every one of the ten had code of its own.
+
+| record | now owns |
+|---|---|
+| SR-FIND | `src/fux/query/find.py`, `node/src/verbs/find.mjs` |
+| SR-URL-INGEST | `src/fux/ingest/urlingest.py` (Node never fetches) |
+| SR-DIR-LIST | `src/fux/ingest/dirlist.py`, `node/src/ingest/dirlist.mjs` |
+| SR-CACHEDIR-TAG | `src/fux/store/cachedir.py`, `node/src/store/cachedir.mjs` |
+| SR-DOCS-TABLE | `src/fux/derive/docstable.py`, `node/src/derive/docstable.mjs` |
+| SR-RUNTIME-MANIFEST | `src/fux/derive/manifest.py`, `node/src/derive/manifest.mjs` |
+| SR-RUNTIME-STAMP | `src/fux/derive/stamp.py`, `node/src/derive/stamp.mjs` |
+| SR-RUNTIME-STATS | `src/fux/derive/stats.py`, `node/src/derive/stats.mjs` |
+| SR-LOCKS | `src/fux/maintain/lock.py`, `node/src/maintain/lock.mjs` (was `runner.mjs`) |
+| SR-SECTIONS | nothing — exempt by name until W-236 Part B |
+
+_Ratified 2026-10-04._
 
 **Arpit, 2026-10-04 (Cowork):** *"yes, there should be a document, every
 component record on a file. All 10 of them, if the records don't exist, create

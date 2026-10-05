@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@0c8e85b0e95b, src/fux/templates/output.toml.txt@0952128ae0aa, .fux/output.toml@4a3a8465d2e4, node/src/config/output.mjs@fa59be4a8c93]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 552a3f48334a4bbefac95cbc743ce4a16270dbd537fa9848e5cc8b2268fa2df0
+content_sha: 181d43fb4fc3d1f7832443a503be2c50a00e9e6da2c4238be3dcf7896228f9e6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -30,7 +30,8 @@ content_sha: 552a3f48334a4bbefac95cbc743ce4a16270dbd537fa9848e5cc8b2268fa2df0
 - [`node/test/config.test.mjs`](../node/test/config.test.mjs) · owned by [SR-CONFIG](0113_config.md)
 - [`src/fux/cli.py`](../src/fux/cli.py) · owned by [SR-CLI](0101_cli-surface.md)
 - [`src/fux/mcp.py`](../src/fux/mcp.py) · owned by [SR-MCP](0136_mcp.md)
-- [`src/fux/query/__init__.py::_gated,_print_index_answer,_print_refer_answer,_show_band,cmd_answer,cmd_ask,cmd_find`](../src/fux/query/__init__.py) · owned by [SR-ASK](0103_ask.md)
+- [`src/fux/query/__init__.py::_gated,_print_index_answer,_print_refer_answer,_show_band,cmd_answer,cmd_ask`](../src/fux/query/__init__.py) · owned by [SR-ASK](0103_ask.md)
+- [`src/fux/query/find.py`](../src/fux/query/find.py) · owned by [SR-FIND](0104_find.md)
 
 <!-- COMPONENTS-END -->
 
@@ -846,6 +847,8 @@ anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
 **No decision here moved** (W-249, 2026-10-04): `src/fux/mcp.py` holds the loaded index across tool calls ([SR-MCP](0136_mcp.md) decision 13); `[mcp]` is still read once at start-up, and its keys and defaults are unchanged.
 
 **No decision here moved** (W-246, 2026-10-04): `src/fux/mcp.py`'s `fux_passage` and `fux_related` descriptions now name the fields their handlers emit; `[mcp]` keys and `top` are untouched.
+
+**No decision here moved** (W-261, 2026-10-05): `cmd_find` moved to `query/find.py` (SR-FIND's); this record's `describes` row followed it, and the emission gate (`_show_band`) is still the one in `query/__init__.py`.
 
 ### Consequences
 

@@ -7,7 +7,8 @@ import sys
 
 from ..config import find_root, load as load_config
 from ..errors import FuxError
-from .gitdir import partition, read_types, source_dirs, source_excludes, walk_sources
+from .dirlist import source_dirs, source_excludes
+from .gitdir import partition, read_types, walk_sources
 # ⚠ **Aliased, and the alias is the point.** Importing this as the bare name
 # `run` shadows the SUBMODULE `fux.ingest.run`, so `from fux.ingest import run`
 # and `import fux.ingest.run as x` both bind this function -- and any attribute

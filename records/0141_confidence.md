@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 7624fc80ceb2959901ccafc4af0e9b8293f542f1121f5025196dc6a484f23616
+content_sha: 44ace384a8ed803829d14de9f65db60099cd2e7da64b92ff3ee052b184d165d9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -895,6 +895,8 @@ The confidence block's pairs and hashes are both analyzed with the repo's identi
 **No decision here moved** (W-247, 2026-10-04): `query/__init__.py` builds the band through `build_ask`, `build_find` and `build_answer` instead of inside each `cmd_*` body; every block is byte-identical.
 
 **No decision here moved** (W-246, 2026-10-04): `derive/accel.py`'s `is_fresh` docstring now says the deep shard re-hash lives in `doctor`, not that it is owed.
+
+**No decision here moved** (W-261, 2026-10-05): `find` moved to `query/find.py` (SR-FIND's). The band is still computed on the unfiltered ranking in `build_find`, and the block is still assembled in `query/__init__.py`.
 
 ### Consequences
 

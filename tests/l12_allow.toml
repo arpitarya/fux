@@ -467,7 +467,7 @@ sites = [
   "node/src/config/constants.mjs::TEXT::module::\"../../../src/fux/constants.toml\"",
   "node/src/config/output.mjs::TEMPLATE_TEXT::module::\"../../../src/fux/templates/output.toml.txt\"",
   "node/src/config/tune.mjs::TEMPLATE_TEXT::module::\"../../../src/fux/templates/tune.toml.txt\"",
-  "node/src/store/fuxdir.mjs::TEMPLATE::module::\"../../../src/fux/templates/cachedir-tag.txt\"",
+  "node/src/store/cachedir.mjs::TEMPLATE::module::\"../../../src/fux/templates/cachedir-tag.txt\"",
   "src/fux/constants.py::LABEL::module::'src/fux/constants.toml'",
   "src/fux/constants.py::_PATH::module::Path(__file__).with_name('constants.toml')",
   "src/fux/decode/_limits.py::_LIMITS::module::ContextVar('fux_decode_limits', default=None)",

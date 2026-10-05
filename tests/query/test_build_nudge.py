@@ -91,7 +91,7 @@ def test_the_note_is_ascii_only(indexed, capsys):
 
 def test_json_stdout_stays_parseable_with_the_note_present(indexed, capsys, monkeypatch):
     """The whole reason the note is on stderr: `--json` is a contract."""
-    from fux.query import cmd_find
+    from fux.query.find import cmd_find
 
     # cmd_find has no `root` argument — it resolves via find_root() off cwd,
     # so the `indexed` fixture only takes effect once we're actually inside

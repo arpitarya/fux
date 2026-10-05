@@ -5,19 +5,23 @@ name: SR-URL-INGEST
 title: SR-URL-INGEST (0107) — URL ingestion through a consumer-owned fetcher
 description: Fux never fetches. A consumer-owned file does, only under the two named fenced paths; a failed fetch is a skip and never a deletion, and what comes back is normalized.
 status: accepted
+amended: 2026-10-05
 date: 2026-08-18
 feature: the `url:` source and how ingestion behaves around the fetcher boundary
-owns: []
+owns: [src/fux/ingest/urlingest.py@fa544e038bdb]
 laws: [L3, L5, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 6f79329a77dd641cb9ca34dca41d02c4ae6eddcb5f1901d0740d4eefe782df11
+content_sha: fe0f6418d857453ea72a80678e070a7f517cd885df723698f640cabb9266d45d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
+**Owns** — the components this record decides:
+
+- [`src/fux/ingest/urlingest.py`](../src/fux/ingest/urlingest.py) · file
+
 **Describes** — reaches into, does not own:
 
-- [`src/fux/ingest/run.py::_listed_url_ids,_observe_url_health,_reacquire_urls,_report_dead_urls`](../src/fux/ingest/run.py) · owned by [SR-INGEST](0106_ingest.md)
 - [`src/fux/ingest/urlsrc.py::fetch_all`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
 - [`src/fux/maintain/dirty.py`](../src/fux/maintain/dirty.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
 
@@ -360,7 +364,7 @@ added nothing of its own.
 
 **No decision here moved** (W-253, 2026-10-04): `ingest/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
 
-**Owns nothing, and says which case** ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (b), W-251 §4 #16): this record states a mechanism spread across components each already claimed — the url branch of the walk in `ingest/run.py` (SR-INGEST), `fetch_all` in `ingest/urlsrc.py` (SR-FETCHER) and the background staleness pass in `maintain/dirty.py` (SR-MAINTENANCE) — so no file is its alone. Its `describes` rows on those three are what open it.
+**Owns [`src/fux/ingest/urlingest.py`](../src/fux/ingest/urlingest.py) since 2026-10-05** ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). It is a pure move out of `ingest/run.py`: `listed_url_ids` (decision 4's offline reconciliation), `reacquire_urls`, `observe_url_health` and `report_dead_urls`, called by the walk exactly where they were. `fetch_all` in `ingest/urlsrc.py` (SR-FETCHER) and the background staleness pass in `maintain/dirty.py` (SR-MAINTENANCE) stay where they are, reached by this record's `describes` rows. Node never fetches, so there is no Node twin. ⚠ **This paragraph read *owns nothing, case (b)* until W-261.**
 
 ### Consequences
 

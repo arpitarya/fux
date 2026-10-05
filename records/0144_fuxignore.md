@@ -10,7 +10,7 @@ feature: the `.fux/.fuxignore` exclusion file
 owns: [src/fux/ingest/fuxignore.py@286e1f84fe6a]
 laws: [L2, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 719346ad91057ea93cccc5a9e6cf7b7da76daec0f9e3936d55978152257e9b35
+content_sha: 12767463e40dfbb42c151625d8f110b3dc0a5356fb4a4fc309264a1b05b26a60
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -403,6 +403,8 @@ this moved where they are written, not what they are.
 **The glob translator holds no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): it advances by the length of the token it matched (`**/`, `**`, an escaped character). Every pattern compiles to the same regex.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+**No decision here moved** (W-261, 2026-10-05): `ingest/gitdir.py`, which this record describes, lost the `dirs`-list readers to `ingest/dirlist.py` (SR-DIR-LIST's). `would_index`, `_generated_kind` and the walk's verdicts are untouched.
 
 ### Consequences
 

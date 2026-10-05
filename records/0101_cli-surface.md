@@ -1351,6 +1351,8 @@ bar on or off, `--json` untouched, off when stderr is not a TTY, no clock.
 
 **No decision here moved** (W-262, 2026-10-05): `explain`/`graph`/`path` `--json` are unchanged byte for byte; their payloads are now built by `fux.graph.*_payload` (Node: `verbs/graph.mjs::*Payload`), which the library calls too (Arpit, 2026-10-04, W-251 #4 — library → CLI shape, [SR-API](0154_api.md) decision 1). `tests_e2e/test_relational.py` gained four library-equals-CLI tests.
 
+**No decision here moved** (W-261, 2026-10-05): `fux find` dispatches to `cmd_find` in `query/find.py` (SR-FIND's), and `node/fux.mjs` imports `withWriteLock` from `node/src/maintain/lock.mjs` (SR-LOCKS', renamed from `runner.mjs`). Surface, flags and output are unchanged.
+
 ### Consequences
 
 - 🔴 **`_apply_output_defaults` no longer degrades when `.fux/output.toml` is

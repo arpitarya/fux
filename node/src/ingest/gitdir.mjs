@@ -15,7 +15,7 @@
  */
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { readDirs } from "./sourcelist.mjs";
+import { archivedDirs } from "./dirlist.mjs";
 import { parseToml } from "../config/toml.mjs";
 import { fixed } from "../config/constants.mjs";
 import { FuxError } from "../errors.mjs";
@@ -50,13 +50,6 @@ export function dirsFile(root) {
     throw new FuxError(`${path}: [sources] dirs_file must be a path to a line-oriented directory list`);
   }
   return value.trim();
-}
-
-/** Included entries declared `archived=true`. Never derived from a path. */
-export function archivedDirs(root, relPath) {
-  return readDirs(root, relPath)
-    .filter((entry) => !entry.exclude && entry.attrs.archived === "true")
-    .map((entry) => entry.value);
 }
 
 /** `loc` falls under one of `dirs` — a directory entry or an exact single-file

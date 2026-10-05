@@ -5,15 +5,15 @@ name: SR-WORK-OWNERSHIP
 title: "SR-WORK-OWNERSHIP (0054) — owns and describes: the record-to-component model"
 description: "Two relations, not one. Exactly one record OWNS each component; any number DESCRIBE it. The freshness gate demands the owner and every describer, which closes the hole that let sixteen records rot while the check stayed green. Since 2026-09-13 a record also declares its `kind`, which selects an additional gate and never switches one off."
 status: accepted
-amended: 2026-09-13
+amended: 2026-10-05
 date: 2026-08-27
 ratified: 2026-08-27
 feature: the record-to-component model, and the `describes` relation W-82 ruling 4 added to it
-owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@1eba43715793, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@e3d2172d0b11, tests/test_sr_frontmatter.py@c8c81b4b394a, tests/test_sr_ownership.py@2e28ba0be70e, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@8124ebcad40e, tests/test_sr_register_status.py@acae7406d76c]
+owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@1eba43715793, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@e3d2172d0b11, tests/test_sr_frontmatter.py@c8c81b4b394a, tests/test_sr_ownership.py@9f93da933c32, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@8124ebcad40e, tests/test_sr_register_status.py@acae7406d76c]
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: b4cf6d97780185ed5aab9651497ad9e622c4aa59d67377aaf50dda7253929d65
+content_sha: 004737e4844c394312e5b3d3a6ea121c83d3db43b657491407609241028ca8e0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -191,7 +191,7 @@ src/fux/query/rank.py        SR-RANKING         SR-TUNE
    runtime-plane companions. Case (b): it states a mechanism spread across
    components each already claimed by the record carrying its decisions. ⚠ **In
    both, the freshness gate cannot demand that record**, so nothing mechanical
-   catches it going stale. ⚠ **Weakly gated since 2026-10-04** (W-246, W-251 ruling 16): `tests/test_sr_ownership.py` pins the ten `component` records with `owns: []` by name and requires each to carry a `describes` row on a `src/` component and a sentence naming this decision and which case it is. The strong rule, that every record owns something, stays Arpit's.
+   catches it going stale. ⚠ **For a `kind: component` record the two cases are no longer available** (2026-10-05, W-261): decision 11's strong rule requires it to own a file, and the cases survive only for the records exempted there by name — today SR-SECTIONS — and for `law` and `process` records. Between 2026-10-04 and 2026-10-05 this sentence described the weak gate (W-246): ten `component` records with `owns: []`, pinned by name, each carrying a `describes` row and a sentence naming its case.
 
    ⚠ **THIS record's own case-(b) claim is RETRACTED** (2026-09-21, W-208). It
    read *"this record owns nothing … it is the exact hole this record is about,
@@ -325,16 +325,26 @@ top-level definitions.
     own nothing and **the rule that would gate it — a `component` record must
     own something — is still proposed and NOT in force.** Inventing an owner to
     satisfy a check would still be worse than the hole.
-    ⚠ **The count today is ten, not nine** (SR-SECTIONS joined them after
-    2026-09-21): SR-FIND, SR-URL-INGEST, SR-DIR-LIST, SR-CACHEDIR-TAG,
-    SR-DOCS-TABLE, SR-RUNTIME-MANIFEST, SR-RUNTIME-STAMP, SR-RUNTIME-STATS,
-    SR-LOCKS and SR-SECTIONS carry `owns: []`.
-    **Since 2026-10-04 (W-251 §4 #16) a `kind: component` record with
-    `owns: []` must carry a `describes` row on a `src/` component and name, in
-    its own body, which of decision 7's two cases it is — gated by
-    W-246.** The stronger rule — a
-    component record must own something — stays proposed; each of the ten is
-    Arpit's, one at a time (W-251 §3 #16).
+    ⚠ **The count reached ten** (SR-SECTIONS joined them after 2026-09-21):
+    SR-FIND, SR-URL-INGEST, SR-DIR-LIST, SR-CACHEDIR-TAG, SR-DOCS-TABLE,
+    SR-RUNTIME-MANIFEST, SR-RUNTIME-STAMP, SR-RUNTIME-STATS, SR-LOCKS and
+    SR-SECTIONS carried `owns: []`, and from 2026-10-04 (W-246) each had to carry
+    a `describes` row on a `src/` component and name decision 7's case.
+    🔴 **The strong rule is in force since 2026-10-05: a `kind: component`
+    record owns at least one file** (Arpit, 2026-10-04, W-251 #16: *"every
+    component record on a file. All 10 of them, if the records don't exist,
+    create them"*; built by W-261). Where no file held a record's code alone,
+    the code was **moved** into a file of its own — a pure move, behaviour
+    unchanged, the Node twin following its Python owner — never an owner
+    invented over a file whose subject is another record's. Nine records gained
+    a file that way. **Exempt by name, and only by name:** SR-SECTIONS, which is
+    `proposed` and owns nothing until W-236 Part B builds its plane; while
+    exempt it keeps the weak gate's `describes` row and its decision-7 sentence.
+    `tests/test_sr_ownership.py::test_every_component_record_owns_a_file`
+    enforces it, and a second test fails an exemption that is no longer needed.
+    ⚠ **What the rule does not decide:** a component record whose subject truly
+    has no code is not given a file — it is a candidate for `kind: process`,
+    and re-kinding is Arpit's call, one record at a time.
 
 
 12. **Every record carries a `content_sha` of itself** (Arpit, 2026-09-13):

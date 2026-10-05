@@ -1,6 +1,6 @@
 /** `fux find` — ranked document locations, one per line, for pipes.
  *  A projection of `ask`, not a second strategy: same `runQuery`, same `rank()`.
- *  Twin of `src/fux/query/__init__.py`'s `find` half (R4's one-to-many).
+ *  Twin of `src/fux/query/find.py` (SR-FIND owns both, W-261).
  *
  * 🔴 **It goes through `runQuery`, not `scan.ask`.** That is the whole of
  * [SR-NODE-SEARCH](../../../records/0153_node-search.md) decision 8 at the

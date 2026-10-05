@@ -41,7 +41,9 @@ from ..store import fuxdir
 from ..graph import plane as graph_plane
 from ..query import mined as mined_mod
 from ..store import TF_FIELDS
+from . import docstable, manifest, stamp
 from . import format as fmt
+from . import stats as stats_plane
 from .format import _FIELD_COUNT
 from ..constants import fixed
 
@@ -81,11 +83,11 @@ def build(root: Path, *, progress=None) -> BuildReport:
     _clear(anchors_directory)
 
     written = 0
-    written += _write_docs(directory, docs)
-    written += _write_json(directory / fmt.STATS_NAME, stats)
+    written += docstable.write(directory, docs)
+    written += stats_plane.write(directory, stats)
     # W-168 step 4 — the mined table, folded from the same records the scan
     # reads it from (`query/mined.py::table_from_shards`), by the same sort.
-    written += _write_json(
+    written += fmt.write_json(
         directory / fmt.MINED_NAME,
         {"pairs": [[list(s), list(l)] for s, l in mined_mod.table_from_records(records)]},
     )
@@ -108,26 +110,12 @@ def build(root: Path, *, progress=None) -> BuildReport:
     blocks, postings_count = _write_postings(root, postings, [d["flen"] for d in docs], progress)
     written += _write_anchors(root, anchors, progress)
 
-    written += _write_json(
-        directory / fmt.MANIFEST_NAME,
-        {
-            "schema": fmt.RUNTIME_SCHEMA,
-            "index_schema": store_mod.SCHEMA_ID,
-            "analyzer": store_mod.ANALYZER_VERSION,
-            "block_size": fmt.BLOCK_SIZE,
-            "docs_fields": list(fmt.DOCS_FIELDS),
-            "docs": len(docs),
-            "terms": len(postings),
-            "blocks": blocks,
-            "shards": {name: sha for name, sha, _, _ in shard_stamp},
-        },
+    written += manifest.write(
+        directory, docs=len(docs), terms=len(postings), blocks=blocks, shard_stamp=shard_stamp,
     )
     # Volatile on purpose, and excluded from the byte-identity assertion:
     # mtimes are the cheap staleness check and cannot be reproducible.
-    _write_json(
-        directory / fmt.STAMP_NAME,
-        {"shards": {name: [size, mtime] for name, _, size, mtime in shard_stamp}},
-    )
+    stamp.write(directory, shard_stamp)
 
     return BuildReport(
         docs=len(docs),
@@ -267,11 +255,9 @@ def _read_committed(root: Path, progress=None):
     # document the corpus does not hold.
     total_anchor_len = sum(anchor_len.values())
 
-    stats = {
-        "n": total_docs,
-        "total_flen": total_flen,
-        "total_anchor_len": total_anchor_len,
-    }
+    stats = stats_plane.payload(
+        n=total_docs, total_flen=total_flen, total_anchor_len=total_anchor_len,
+    )
     # `records` rides along so the graph plane needs no second pass over the
     # shards; it is already sorted by id, which is what makes it usable.
     return docs, postings, anchors, stats, shard_stamp, records
@@ -484,25 +470,9 @@ def _write_anchors(root: Path, anchors: dict[str, list[tuple[int, int]]], progre
     written = 0
     with progress.phase("anchors", len(anchors), "terms") as p:
         for prefix, payload in sorted(by_prefix.items()):
-            written += _write_json(fmt.anchors_path(root, prefix), payload)
+            written += fmt.write_json(fmt.anchors_path(root, prefix), payload)
             p.update(len(payload))
     return written
-
-
-def _write_docs(directory: Path, docs: list[dict]) -> int:
-    payload = b"".join(
-        json.dumps(doc, ensure_ascii=False, separators=(",", ":"), sort_keys=True).encode("utf-8") + b"\n"
-        for doc in docs
-    )
-    path = directory / fmt.DOCS_NAME
-    path.write_bytes(payload)
-    return len(payload)
-
-
-def _write_json(path: Path, payload: dict) -> int:
-    data = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8") + b"\n"
-    path.write_bytes(data)
-    return len(data)
 
 
 def _clear(directory: Path) -> None:

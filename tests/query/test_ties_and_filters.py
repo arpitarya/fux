@@ -221,7 +221,8 @@ def _filter_corpus(root):
 
 
 def test_under_keeps_only_a_path_prefix(tmp_path):
-    from fux.query import _filtered, run_query
+    from fux.query import run_query
+    from fux.query.find import _filtered
 
     root = _filter_corpus(tmp_path)
     results, _ = run_query(root, "release", 10, force_scan=True, use_tune=True)
@@ -231,7 +232,8 @@ def test_under_keeps_only_a_path_prefix(tmp_path):
 
 
 def test_all_requires_every_query_term(tmp_path):
-    from fux.query import _filtered, run_query
+    from fux.query import run_query
+    from fux.query.find import _filtered
 
     root = _filter_corpus(tmp_path)
     q = "release sidecar"
@@ -244,7 +246,8 @@ def test_all_requires_every_query_term(tmp_path):
 def test_phrase_requires_adjacency_and_order(tmp_path):
     """`notes.md` contains both words and never adjacently in that order —
     which is the whole distinction a phrase filter exists to make."""
-    from fux.query import _filtered, run_query
+    from fux.query import run_query
+    from fux.query.find import _filtered
 
     root = _filter_corpus(tmp_path)
     results, _ = run_query(root, "roll back", 10, force_scan=True, use_tune=True)
@@ -254,7 +257,8 @@ def test_phrase_requires_adjacency_and_order(tmp_path):
 
 
 def test_no_filter_is_the_identity(tmp_path):
-    from fux.query import _filtered, run_query
+    from fux.query import run_query
+    from fux.query.find import _filtered
 
     root = _filter_corpus(tmp_path)
     results, _ = run_query(root, "release", 10, force_scan=True, use_tune=True)
@@ -265,7 +269,7 @@ def test_no_filter_is_the_identity(tmp_path):
 def test_a_url_document_is_kept_by_phrase_rather_than_dropped(tmp_path):
     """⚠ Offline it has no text to test, and dropping it would report *"this
     page does not contain the phrase"* on the strength of not having looked."""
-    from fux.query import _filtered
+    from fux.query.find import _filtered
     from fux.query.rank import AskResult
 
     results = [AskResult(id="url:https://x.test/a", title="A", loc="https://x.test/a", score=1.0)]

@@ -101,39 +101,46 @@ SR-WORK-QUALITY owns `tools/quality` and is a process one** — identical shape,
 opposite kind. A derived field would have to guess, and a guess in this position
 reads as authority.
 
-### 🔴 What the kind made visible: ten ungated component records
+### 🔴 What the kind made visible: ten component records that owned nothing
 
-**22 of 93 records carry `owns: []`, and every one of them is now reachable by
-the freshness gate or stated as unreachable on purpose.** Ten are law records,
-which is correct — a law governs conduct, not components. **Two are `process`
-records that name their own hole out loud**, each in its own decision and never
-by omission: [SR-WORK-SCALE](0057_WORK-scale.md) decision 15 and
+**Every `kind: component` record owns at least one file, since 2026-10-05**
+([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11's strong rule; Arpit,
+W-251 #16; built by W-261), **with exactly one exemption, by name:**
+[SR-SECTIONS](0161_sections.md), `proposed` and unbuilt, which owns nothing until
+W-236 Part B builds its plane and is kept reachable meanwhile by a `describes`
+row on the chunker's two section functions.
+[`tests/test_sr_ownership.py`](../tests/test_sr_ownership.py) fails any other
+component record with `owns: []`.
+
+**13 of 93 records carry `owns: []`, and every one of them is stated as such on
+purpose.** Ten are law records, which is correct — a law governs conduct, not
+components. **Two are `process` records that name their own hole out loud**,
+each in its own decision and never by omission:
+[SR-WORK-SCALE](0057_WORK-scale.md) decision 15 and
 [SR-PORT-LIST](0114_port-list.md), whose subjects are what a sentence may claim
 and where the boundary with the archived engine runs — neither of which a
-checker can grade without grading it wrongly.
+checker can grade without grading it wrongly. The thirteenth is SR-SECTIONS.
 
-**The other ten are `component` records that own no component**, and since
-2026-09-21 (W-208) **each one carries `describes` rows instead**, so a change to
-the code its subject lives in does open it:
+**Nine component records gained a file by W-261**, each by **moving** its code
+out of the file that hosted it into one of its own — never by naming an owner
+over a file whose subject is another record's: `SR-FIND` (`query/find.py`),
+`SR-URL-INGEST` (`ingest/urlingest.py`), `SR-DIR-LIST` (`ingest/dirlist.py`),
+`SR-CACHEDIR-TAG` (`store/cachedir.py`), `SR-DOCS-TABLE`,
+`SR-RUNTIME-MANIFEST`, `SR-RUNTIME-STAMP` and `SR-RUNTIME-STATS`
+(`derive/docstable.py`, `manifest.py`, `stamp.py`, `stats.py`) and `SR-LOCKS`
+(`maintain/lock.py`), each with its Node twin where Node mirrors the code.
+⚠ **Four had left the list earlier by the same route** (W-208, 2026-09-21) —
+`SR-ANSWER`, `SR-RECORD`, `SR-CDP-FETCHER` and `SR-HTTP-FETCHER`, each by a
+carve-out from a directory claim.
 
-`SR-FIND` · `SR-URL-INGEST` · `SR-DIR-LIST` · `SR-CACHEDIR-TAG` ·
-`SR-DOCS-TABLE` · `SR-RUNTIME-MANIFEST` · `SR-RUNTIME-STAMP` ·
-`SR-RUNTIME-STATS` · `SR-LOCKS` · `SR-SECTIONS`
+⚠ **A component record whose subject truly has no code is not given a file**:
+it is a candidate for `kind: process`, and that re-kinding is Arpit's call.
+Inventing an owner to satisfy the check would be the moving-threshold failure
+wearing a helpful face.
 
-⚠ **SR-SECTIONS is the tenth for a different reason**: it is `proposed` and unbuilt, so there is nothing yet to own. Its `describes` row on the chunker's two section functions keeps it reachable until the build gives it its components.
-
-⚠ **Four left that list by gaining the component they were always the record
-for** — `SR-ANSWER`, `SR-RECORD`, `SR-CDP-FETCHER` and `SR-HTTP-FETCHER`, each
-by a carve-out from a directory claim rather than an invention. **`describes`
-never substitutes for `owns`**: the ten above are gate-*reachable*, not owners,
-and the question each still faces is whether it should own its component, be
-re-kinded, or earn a stated exemption. **That is Arpit's call, one record at a
-time**, and inventing an owner to satisfy a check would be the moving-threshold
-failure wearing a helpful face.
-
-**The rule that would close it — *a `kind: component` record must have a
-non-empty `owns`* — is still NOT in force**, and the ten would still turn red
-on the day it lands.
+⚠ **This section read *ten ungated component records* and *22 of 93* until
+2026-10-05**, when each of the ten owned nothing and the question for each was
+*own a file, be re-kinded, or earn an exemption*.
 
 ⚠ **This section read *thirteen ungated component records* and *30 of 80* until
 2026-09-21.** Both numbers were true when written; neither survived the audit
@@ -637,6 +644,7 @@ table does not grant.
 | `src/fux/setup.py` | SR-DOTFUX | the second scaffolding moment — the consumer-owned files, write-if-missing |
 | `src/fux/store/` | SR-INDEX-LIFECYCLE | canonical bytes, shard addressing, writer/reader and collisions — the declared record shape moved to `schemas/` (W-226) |
 | `src/fux/store/fuxdir.py` | SR-DOTFUX | the `.fux/` layout generator — and the **three** kind declarations (`COMMITTED`, `DERIVED`, `ACQUIRED`) the generated README table is built from |
+| `src/fux/store/cachedir.py` | SR-CACHEDIR-TAG | `CACHEDIR.TAG` and `derived_dir` — every derived directory created and tagged byte-exact per the spec. Carved out of `fuxdir.py`, which imports `derived_dir` back so its callers are unchanged (W-261, 2026-10-05: every `kind: component` record owns a file) |
 | `src/fux/store/nodebundle.py` | SR-NODE-SEARCH | the Node plane's bundler — one generated `.mjs` per plane, built at publish (L10). **Carved out of `store/`'s claim for a different DECISION**, on `acquired.py`'s precedent: everything else under `store/` is the committed index, and this is a build-time tool that never reads or writes one. It is the only place a change to how the reader is SHIPPED can land, which is what makes the freshness gate reach this record |
 | `src/fux/store/acquired.py` | SR-ACQUIRED | the retained-bytes plane — content-addressed blobs, the advisory manifest, `sweep` and `evict`. **Carved out of `store/`'s claim for a different DECISION, not a different concern**: everything else under `store/` is the committed index, and this is the one plane that is neither committed nor rebuildable |
 | `src/fux/store/resident.py` | SR-MCP | the loaded index held across calls by `fux mcp` and `fux serve` — one `Holder` per process, keyed on `stamp.json`'s digest plus every shard's size and mtime (decision 13, W-249). **Carved out of `store/`'s claim for a different DECISION**, on `acquired.py`'s precedent: the reader decides how a shard is read, this decides how long a long-running server may keep what it read — and the record that decides the servers is the one a staleness change must open |
@@ -647,6 +655,8 @@ table does not grant.
 | `src/fux/ingest/fuxignore.py` | SR-FUXIGNORE | `.fux/.fuxignore` — the `.gitignore` grammar, the last-match-wins resolution, and the duplicate-pattern warning. **Carved out of SR-INGEST's directory claim for a different DECISION, not a different concern**: everything else under `ingest/` is a step in the walk, and this is a *precedence rule* over it — the one thing that outranks the type allowlist |
 | `src/fux/ingest/typesfile.py` | SR-TYPES | `.fux/formats.toml` — the closed two-key shape, the one-line editors that refuse a layout they did not write, the refusal of the old `.fux/sources/types`, and its conversion. **Carved out of SR-INGEST's directory claim on `fuxignore.py`'s precedent**: a *policy over* the walk — what counts as a document — not a step in it |
 | `src/fux/ingest/urlsrc.py` | SR-FETCHER | fux's half of the fetch contract — load, configure, bound, call, normalize |
+| `src/fux/ingest/urlingest.py` | SR-URL-INGEST | the url branch of the walk — decision 4's offline reconciliation, the offline re-derivation of retained bytes, and the networked run's per-URL health. Carved out of `ingest/run.py`, which calls it (W-261, 2026-10-05: every `kind: component` record owns a file) |
+| `src/fux/ingest/dirlist.py` | SR-DIR-LIST | where `.fux/sources/dirs` becomes values — included entries, `!` subtractions, `archived=true`, `enrich=true`. Carved out of `ingest/gitdir.py`, which keeps the walk (W-261, 2026-10-05: every `kind: component` record owns a file) |
 | `src/fux/ingest/pii.py` | SR-PII | the redaction matcher, the ruleset digest, and the plane table stating that redaction reaches the committed index and nothing else. Carved out of SR-INGEST's directory claim on `fuxignore.py`'s precedent — a *policy over* the walk, not a step in it |
 | `src/fux/ingest/refusals.py` | SR-REFUSAL | the refusal matcher — six byte-pure conditions and the always-on magic-byte floor. **Carved out of SR-INGEST's directory claim on `fuxignore.py`'s precedent**: everything else under `ingest/` is a step in the walk, and this is a *refusal rule* over it |
 | `src/fux/ingest/ingestlog.py` | SR-INGEST | W-200's ingest ledger — one runtime line per consumed document naming its decoder and, for a URL, its fetcher. 🔴 **Not `src/fux/query/provenance.py`**, which is SR-PROVENANCE's answer receipts and the opposite subject: that one records what somebody **asked** and L9 governs it, this one records what **ingest did** and L9 does not reach it. The collision was not noticed when W-200 named the path; both docstrings now open by naming the other |
@@ -655,8 +665,17 @@ table does not grant.
 | `src/fux/decode/xlsx.py` | SR-TABULAR | the same limit, applied per SHEET — a sheet is the workbook's own division, so truncating the fifth because the first four were long would be arbitrary |
 | `src/fux/decode/_limits.py` | SR-TABULAR | the `ContextVar` seam that lets a two-name decoder read committed config without the protocol growing a third parameter (decision 5) |
 | `src/fux/derive/` | SR-T1-ACCELERATOR | T1 build, block maxima and skipping — the declared runtime shapes are `schemas/runtime.schema.json`, carved out to this record |
+| `src/fux/derive/docstable.py` | SR-DOCS-TABLE | `docs.jsonl`'s writer — one docidx-ordered row per document. Carved out of `_build.py`, which decides when it is written (W-261, 2026-10-05: every `kind: component` record owns a file) |
+| `src/fux/derive/manifest.py` | SR-RUNTIME-MANIFEST | `manifest.json`'s nine keys and its writer. Carved out of `_build.py` (W-261, 2026-10-05: every `kind: component` record owns a file) |
+| `src/fux/derive/stamp.py` | SR-RUNTIME-STAMP | `stamp.json`'s writer — `[size_bytes, mtime_ns]` per shard, volatile on purpose. Carved out of `_build.py` (W-261, 2026-10-05: every `kind: component` record owns a file) |
+| `src/fux/derive/stats.py` | SR-RUNTIME-STATS | `stats.json`'s key set and writer — raw totals, never weighted. Carved out of `_build.py` (W-261, 2026-10-05: every `kind: component` record owns a file) |
 | `node/src/derive/` | SR-T1-ACCELERATOR | the Node twins of `format.py` and `accel.py` (W-242 Tier 1): the plane, read by the second runtime under the same contract |
+| `node/src/derive/docstable.mjs` | SR-DOCS-TABLE | the Node twin of `docstable.py` (W-261) |
+| `node/src/derive/manifest.mjs` | SR-RUNTIME-MANIFEST | the Node twin of `manifest.py` (W-261) |
+| `node/src/derive/stamp.mjs` | SR-RUNTIME-STAMP | the Node twin of `stamp.py` (W-261) |
+| `node/src/derive/stats.mjs` | SR-RUNTIME-STATS | the Node twin of `stats.py` (W-261) |
 | `src/fux/query/` | SR-ASK | the scan, unification, and the display-only resolution after it — bound by the differential law |
+| `src/fux/query/find.py` | SR-FIND | the `find` verb — `build_find`, `cmd_find`, its post-filters and the `find` half of the `--json` shape. Carved out of `query/__init__.py`, which keeps the shared ranking and every verb's stderr declarations (W-261, 2026-10-05: every `kind: component` record owns a file) |
 | `src/fux/query/rank.py` | SR-RANKING | the one scorer and the one sort, and `Weighting`, which is where every document multiplier must travel to reach the pruning bound |
 | `src/fux/query/bm25f.py` | SR-RANKING | BM25F, `Scoring`, and `derive_wlen` — the one place the weighting arithmetic exists |
 | `src/fux/query/analyzer.py` | SR-RANKING | split, lowercase, stopword, stem, hash — in that order, shared by ingest and query |
@@ -680,6 +699,7 @@ table does not grant.
 | `src/fux/inspect/` | SR-INSPECT | the index X-ray — one pass over the committed shards, the gitignored hash-to-word dictionary, the six lenses, the vocabulary lens `words.py` the explorer's Words tab reads (2026-09-27), and the three provisional floors. **Reads only**, and the row is what makes the freshness gate demand that record the moment a lens changes what it claims about a corpus |
 | `src/fux/serve/` | SR-SERVE | the explorer — the server, its four GET routes, and the one bundled page. 🔴 **The page is the component most at risk here**: it is the only place in fux where somebody could write a second ranker and have it look right, which is why `tests/serve/test_page_computes_nothing.py` reads its source rather than its behaviour — a behavioural test would need the second ranker to compare against. `_bind_address` is a function, not an inline constant, so the `127.0.0.1` refusal has a name |
 | `src/fux/maintain/` | SR-MAINTENANCE | the git hooks and their installer, the deferring runner, the write lock, the daemon and the local state files. **ex-L5's write-time check is deliberately NOT here** — it lives in `store/writer.py`, because a check beside the thing it guards cannot be skipped |
+| `src/fux/maintain/lock.py` | SR-LOCKS | `.fux/runtime/write.lock` — `acquire`, `holder`, `write_lock`, `release`, `break_lock`. Carved out of `runner.py`, which re-exports every name so `runner.acquire` keeps its callers (W-261, 2026-10-05: every `kind: component` record owns a file) |
 | `src/fux/maintain/mergedriver.py` | SR-MERGE-DRIVER | the merge driver itself — carved out because its failure mode and its gate are its own |
 | `src/fux/refer/` | SR-REFER | source · freshness · chunk · rescore · assemble. **Imports no transport**: the consumer's fetcher is injected |
 | `src/fux/refer/_chunk.py` | SR-CHUNKING | what a passage IS — the fold rule that derives row/unit/section/file from heading depth, the universal table rule and the paragraph→line→word ladder. Carved out of SR-REFER's directory claim on `freshness.py`'s precedent: the subject reaches past `refer/` into what decoders EMIT |
@@ -741,6 +761,7 @@ table does not grant.
 | `node/src/ingest/gitdir.mjs` | SR-INGEST | the Node twin of `src/fux/ingest/gitdir.py` — the live `archived=true` read |
 | `node/src/ingest/priors.mjs` | SR-INGEST | the Node twin of `src/fux/ingest/priors.py` |
 | `node/src/ingest/sourcelist.mjs` | SR-URL-LIST | the Node twin of `src/fux/ingest/sourcelist.py` — `.fux/sources/dirs` read live |
+| `node/src/ingest/dirlist.mjs` | SR-DIR-LIST | the Node twin of `dirlist.py` — `readDirs` and `archivedDirs`, the half the query plane reads (W-261) |
 | `node/src/query/analyzer.mjs` | SR-RANKING | the Node twin of `src/fux/query/analyzer.py`. An identifier analyzed differently is a term one reader indexes and the other never finds |
 | `node/src/query/bm25f.mjs` | SR-RANKING | the Node twin of `src/fux/query/bm25f.py` — the scorer's field weighting |
 | `node/src/query/compose.mjs` | SR-ASK | the graph stage of `ask`. Twin of `src/fux/query/compose.py` |
@@ -763,11 +784,12 @@ table does not grant.
 | `node/src/refer/source.mjs` | SR-REFER | where a document's bytes come from. Twin of `src/fux/refer/source.py`, which SR-REFER owns; SR-URL-FRESHNESS's row covers only the `as-ingested` fallback |
 | `node/src/store/format.mjs` | SR-INDEX-LIFECYCLE | the Node twin of `src/fux/store/format.py` — the wire format, decoded |
 | `node/src/store/reader.mjs` | SR-INDEX-LIFECYCLE | the Node twin of `src/fux/store/reader.py` |
-| `node/src/store/fuxdir.mjs` | SR-DOTFUX | the Node twin of `fuxdir.py`, narrowed to `derived_dir` (W-242 Tier 2) |
-| `node/src/maintain/` | SR-MAINTENANCE | the Node twin of `runner.py`'s write lock, narrowed to `acquire` (W-242 Tier 2) |
+| `node/src/store/fuxdir.mjs` | SR-DOTFUX | the Node twin of `fuxdir.py`, narrowed to `fux_dir` (W-242 Tier 2; `derived_dir` left for `cachedir.mjs` with W-261) |
+| `node/src/store/cachedir.mjs` | SR-CACHEDIR-TAG | the Node twin of `cachedir.py` — `derivedDir` and the tag, from the same template (W-261) |
+| `node/src/maintain/lock.mjs` | SR-LOCKS | the Node twin of `lock.py` — the same `write.lock` by the same protocol (W-242 Tier 2; was `runner.mjs` until W-261) |
 | `node/src/verbs/answer.mjs` | SR-ASK | `fux answer` on the Node reader. Twin of `src/fux/query/__init__.py`'s `answer` half |
 | `node/src/verbs/ask.mjs` | SR-ASK | `fux ask` (and `fux lexical`) on the Node reader. Twin of `src/fux/query/__init__.py`'s `ask` half |
-| `node/src/verbs/find.mjs` | SR-ASK | `fux find` on the Node reader. Twin of `src/fux/query/__init__.py`'s `find` half |
+| `node/src/verbs/find.mjs` | SR-FIND | `fux find` on the Node reader. Twin of `src/fux/query/find.py`; followed its Python owner from SR-ASK with W-261 |
 | `node/src/verbs/graph.mjs` | SR-GRAPH | `explain` · `graph` · `path` on the Node reader. Twin of `src/fux/graph/__init__.py` |
 | `node/src/verbs/mcp.mjs` | SR-MCP | the Node twin of the MCP server — the same three tools, advertised the same way |
 | `node/test/analyzer.test.mjs` | SR-RANKING | the analyzer pinned to Python's output, identifier by identifier (W-202) |
@@ -887,7 +909,8 @@ rows narrowed so far were each verified by reading every mention in the file
 |---|---|---|
 | `src/fux/cli.py` | SR-OUTPUT | decision 10 binds **every gated flag** in this file to `default=None`. Owned by SR-CLI, constrained here — and the constraint failing silently is precisely how six flags shipped at `default=False` |
 | `src/fux/query/__init__.py` | SR-CONFIDENCE | the confidence block is assembled and emitted here (`confidence_out`, `_fill_confidence`), while SR-ASK owns the module for the scan and unification |
-| `src/fux/query/__init__.py::_show_band,_gated,_print_index_answer,_print_refer_answer,cmd_ask,cmd_find,cmd_answer` | SR-OUTPUT | the emission gate (`_show_band`, `_gated`) lives here — where a rendering decision reaches into a file whose subject is the query itself |
+| `src/fux/query/__init__.py::_show_band,_gated,_print_index_answer,_print_refer_answer,cmd_ask,cmd_answer` | SR-OUTPUT | the emission gate (`_show_band`, `_gated`) lives here — where a rendering decision reaches into a file whose subject is the query itself |
+| `src/fux/query/find.py` | SR-OUTPUT | `find`'s use of the emission gate — `confidence` written only under `--band` (`FindBuilt.payload`). Owned by SR-FIND since W-261 |
 | `src/fux/derive/accel.py` | SR-CONFIDENCE | `stats_out` is passed through here so the accelerator and the scan agree about `df`/`n`. **The differential law is what makes this load-bearing**: if only one path carried it, the two would disagree about how confident fux is |
 | `src/fux/query/rank.py` | SR-TUNE | `[priority]` is DATA in SR-TUNE and RESOLUTION on `rank.py::Weighting` — the register's own ownership note already says so, which is what made this row checkable rather than asserted |
 | `src/fux/ingest/run.py` | SR-PII | the redaction pass, and its position between `content_sha` and `extract_fields` — decision 3, which is the whole record. Also `_pii_ruleset_moved`, the reuse invalidation. Owned by SR-INGEST for the walk |
@@ -920,30 +943,23 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/doctor.py::_node_reader,_installed_reader` | SR-NODE-SEARCH | the `node reader` row — the version, the shape, a stale `src/` tree still in the consumer's repo, and a shape-C manifest with nothing installed to resolve it. Owned by SR-DOCTOR, which decides what a row IS |
 | `tools/differential/node_arm.py::bundle_entry,Arm` | SR-NODE-SEARCH | the sixth surface — the published bundle against the module tree it was built from (`bundle_entry` builds it per run; `Arm.compare_bundle`, `compare_bundle_api` and `compare_bundle_mcp` compare it). ⚠ **Narrowed to the top-level symbols the gate can resolve** — a method name here would switch the gate off silently, which `tests/test_sr_freshness.py::test_the_narrowing_is_recorded_where_the_gate_can_read_it` catches. Owned by SR-T1-ACCELERATOR, which owns the harness |
 | `src/fux/store/fuxdir.py::ensure_node_reader,node_version,node_shape,_node_source,_packaged_node_files,_prune_node_reader,_workspace_manifest` | SR-NODE-SEARCH | the vendoring half of R2 — which files are written into `.fux/node/` and the version comparison that decides whether to overwrite. **The `.fux/` SHAPE is still SR-DOTFUX's subject** (it is the fourth shape there); what this record decides is that the vendored thing is a reader and that a stale one is a wrong answer |
-| `src/fux/query/__init__.py::cmd_find` | SR-FIND | `cmd_find`, the folder and phrase filters, and the `find` half of the `--json` shape. Owned by SR-ASK for the scan and unification. ⚠ **Added 2026-09-21 because this record owned NOTHING and could therefore never be opened by the gate** — the SR-ANSWER precedent, which is the same defect one verb along |
 | `src/fux/ingest/urlsrc.py::fetch_all` | SR-URL-INGEST | decision 5's pipeline ends here, and decisions 3 and 6 are what `fetch_all` does with what comes back: a failed fetch is a skip, and the bytes are normalized. Owned by SR-FETCHER for the contract itself |
-| `src/fux/ingest/run.py::_reacquire_urls,_listed_url_ids,_report_dead_urls,_observe_url_health` | SR-URL-INGEST | the url branch of the walk — decision 4's reconciliation, which removes a document only when its URL left the list and does so networked or not. Owned by SR-INGEST for the walk |
 | `src/fux/maintain/dirty.py` | SR-URL-INGEST | which URLs a background pass considers stale enough to re-fetch — the fenced path decision 2 names, on the maintenance side. Owned by SR-MAINTENANCE |
 | `src/fux/store/format.py` | SR-RECORD | the field order and the encoder every record is written through — the declared shape, applied. Owned by SR-INDEX-LIFECYCLE for the store |
 | `src/fux/store/writer.py` | SR-RECORD | where a record is assembled and shard-addressed; a field added to the schema without a writer change is a field nothing emits |
 | `src/fux/store/canonical.py` | SR-RECORD | the canonical byte form the record's `content_sha` and the root hash are taken over — the determinism half of the shape (L4) |
-| `src/fux/ingest/gitdir.py` | SR-DIR-LIST | `read_dirs`, `source_dirs`, `source_excludes`, `archived_dirs` — where the `dirs` list becomes a walk. Owned by SR-INGEST. ⚠ **Added 2026-09-21; this record owned nothing** |
 | `src/fux/ingest/sourcelist.py::_dir_reason` | SR-DIR-LIST | the `dirs` grammar's own validator — the `!` subtraction and the trailing-slash rule are this record's, in a file SR-URL-LIST owns for the grammar machinery |
-| `src/fux/store/fuxdir.py::derived_dir` | SR-CACHEDIR-TAG | every derived directory is created here and tagged here — `CACHEDIR_TAG` written byte-exact per the spec. Owned by SR-DOTFUX for the layout. ⚠ **Added 2026-09-21; this record owned nothing** |
-| `node/src/store/fuxdir.mjs` | SR-CACHEDIR-TAG | Node's `derivedDir` writes the same tag from the same template (W-242 Tier 2). Owned by SR-DOTFUX |
-| `src/fux/derive/_build.py` | SR-DOCS-TABLE | the runtime companion that writes the docs table — this record specifies one file `_build.py` already generates, which is decision 7's honest case (a). Owned by SR-T1-ACCELERATOR |
-| `src/fux/derive/format.py` | SR-DOCS-TABLE | the encoder that decides the table's bytes |
-| `src/fux/derive/_build.py` | SR-RUNTIME-MANIFEST | the manifest is written here; case (a), stated in this record's body |
-| `src/fux/derive/format.py` | SR-RUNTIME-MANIFEST | the encoder that decides the manifest's bytes — the nine keys are this record's and their serialization is here, so a field added in one place and not the other is a manifest `is_fresh()` cannot compare |
-| `src/fux/derive/_build.py` | SR-RUNTIME-STAMP | the stamp is written here; case (a), stated in this record's body |
-| `src/fux/derive/format.py` | SR-RUNTIME-STAMP | the encoder that decides the stamp's bytes — `[size_bytes, mtime_ns]` per shard, and the reason the stamp is excluded from `DETERMINISTIC_FILES` is a property of what is written here |
-| `src/fux/derive/_build.py` | SR-RUNTIME-STATS | the stats plane is written here; case (a), stated in this record's body |
-| `src/fux/derive/format.py` | SR-RUNTIME-STATS | the encoder that decides the stats plane's bytes — `n` and `total_flen` today, and the veto on that set growing is a veto on a change made here |
+| `src/fux/derive/_build.py::_read_committed` | SR-DOCS-TABLE | the rows the table carries are assembled here, in docidx order; the writer is `docstable.py`, this record's own since W-261. Owned by SR-T1-ACCELERATOR |
+| `src/fux/derive/format.py` | SR-DOCS-TABLE | `DOCS_FIELDS` and `DOCS_NAME` — the field set and the file name the table is written under |
+| `src/fux/derive/_build.py::_read_committed` | SR-RUNTIME-MANIFEST | each shard's content sha — the manifest's fingerprint — is computed here; the writer is `manifest.py` since W-261 |
+| `src/fux/derive/format.py` | SR-RUNTIME-MANIFEST | `write_json`, the serialization the manifest's nine keys (in `manifest.py`) are written in, and the constants it carries — a byte changed here is a manifest `is_fresh()` compares differently |
+| `src/fux/derive/_build.py::_read_committed` | SR-RUNTIME-STAMP | each shard's size and mtime are read here; the writer is `stamp.py` since W-261 |
+| `src/fux/derive/format.py` | SR-RUNTIME-STAMP | `STAMP_NAME` and `DETERMINISTIC_FILES` — the stamp is excluded from the byte-identity set here, because mtimes cannot be reproducible |
+| `src/fux/derive/_build.py::_read_committed` | SR-RUNTIME-STATS | the raw totals (`n`, `total_flen`, `total_anchor_len`) are summed here; the key set and writer are `stats.py` since W-261 |
+| `src/fux/derive/format.py` | SR-RUNTIME-STATS | `write_json` and `STATS_NAME` — the bytes and the name of the plane `stats.py` writes |
 | `src/fux/derive/accel.py` | SR-RUNTIME-STATS | the accelerator reads `df`/`n` from this plane, and the differential law is what makes that load-bearing: if only one path carried them, the two would disagree |
 | `src/fux/query/bm25f.py` | SR-RUNTIME-STATS | the scorer is the consumer — a statistic this plane stops carrying is a scorer that silently changes its answer |
-| `src/fux/store/fuxdir.py` | SR-LOCKS | where the lock paths live in the `.fux/` layout. Owned by SR-DOTFUX. ⚠ **Added 2026-09-21**: this record states case (b) — a mechanism spread across components each already claimed — and until now that left it with no way to be opened at all |
-| `src/fux/maintain/runner.py` | SR-LOCKS | the runner takes the lock and is where a stale one is broken. Owned by SR-MAINTENANCE |
-| `node/src/maintain/runner.mjs` | SR-LOCKS | Node's `fux build` takes the same `write.lock` by the same protocol (W-242 Tier 2). Owned by SR-MAINTENANCE |
+| `src/fux/maintain/runner.py` | SR-LOCKS | the runner takes the lock (`run_once`), re-exports `lock.py`'s names, and is where a stale one is broken by a takeover. Owned by SR-MAINTENANCE |
 | `src/fux/maintain/daemon.py` | SR-LOCKS | the daemon's single-instance guarantee IS a lock, and its failure mode is two daemons rather than none |
 | `src/fux/query/scan.py` | SR-RUNTIME-STATS | the scan reads the plane's `df`/`n` on the non-accelerated path — the other half of the differential pair |
 | `src/fux/query/scan.py` | SR-PROVENANCE | what a receipt must be able to say about a hit is decided here, where the hit is produced. Owned by SR-ASK |

@@ -222,12 +222,12 @@ class Index:
         way, by aiming an instrument at the seam the CLI actually uses.
 
         ⚠ **`under` is a prefix PLUS a component boundary here, and a bare
-        prefix on the CLI** (`query/__init__.py::_filtered`): `under="docs/a"`
+        prefix on the CLI** (`query/find.py::_filtered`): `under="docs/a"`
         matches `docs/ab.md` there and not here. Stated rather than quietly
         changed — `fux.api` is frozen (SR-API decision 1), so which of the two
         is right is a ruling, not a cleanup. SR-API decision 6.
         """
-        from .query import build_find
+        from .query.find import build_find
 
         if top is None:
             top = int(self._output().resolve("find", "top", as_json=False))

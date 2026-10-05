@@ -11,12 +11,11 @@ from __future__ import annotations
 import pytest
 
 from fux.errors import FuxError
+from fux.ingest.dirlist import source_dirs, source_excludes
 from fux.ingest.gitdir import (
     DEFAULT_TYPES,
     TypeFilter,
     read_types,
-    source_dirs,
-    source_excludes,
     walk_sources,
 )
 from fux.ingest.sourcelist import DIRS, TYPES, URLS, glob_match, parse

@@ -663,7 +663,7 @@ def _target_problem(root: Path, scopes: dict[str, list[dict]], target: str) -> s
 
 def _scopes(root: Path) -> dict[str, list[dict]]:
     from . import store as store_mod
-    from .ingest.gitdir import enrich_dirs
+    from .ingest.dirlist import enrich_dirs
 
     from .config import load as load_config
 

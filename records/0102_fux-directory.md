@@ -948,6 +948,8 @@ line raises names the fix itself rather than pointing at the header.
 
 **No decision here moved** (W-242 Tier 2, 2026-10-03): `node/src/store/fuxdir.mjs` is a narrow twin of `fuxdir.py`, `derived_dir` alone, owned here with its Python half. The layout is unchanged; a second runtime now creates `runtime/`.
 
+**No decision here moved** (W-261, 2026-10-05): `CACHEDIR_SIGNATURE`, `CACHEDIR_TAG` and `derived_dir` moved from `store/fuxdir.py` to `store/cachedir.py`, owned by SR-CACHEDIR-TAG; `fuxdir` imports them back, so `fuxdir.derived_dir` keeps every caller. The Node twin `store/fuxdir.mjs` is narrowed to `fuxDir`, and `derivedDir` moved to `store/cachedir.mjs`. The layout this record decides is unchanged.
+
 ### Consequences
 
 - **Dotdir Python at least compiles** (W-246, 2026-10-04): `tests/test_dotdir_hygiene.py` `ast.parse`s and `compile`s every `templates/*.py.txt` and this repository's own `.fux/{fetchers,decoders}/*.py`, files no default tool looks at; `[tool.ruff] extend-include` names the same dotdirs for whoever runs ruff (not a dev dependency).

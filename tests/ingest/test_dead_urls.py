@@ -17,10 +17,9 @@ from l12_fixtures import template_fux_toml, write_config
 #: `[sources.url] failing_streak` as the template ships it (W-225 stage 5e).
 _STREAK = template_fux_toml()["sources"]["url"]["failing_streak"]
 
-# ⚠ `from fux.ingest import run` gives the FUNCTION `fux.ingest.run`, not the
-# module `fux.ingest.run` — the package re-exports a callable of the same name
-# and it shadows the submodule. `import_module` is unambiguous.
-run_mod = import_module("fux.ingest.run")
+# The URL branch moved out of `ingest/run.py` into `ingest/urlingest.py`
+# (SR-URL-INGEST, W-261). `import_module` stays: it is unambiguous.
+run_mod = import_module("fux.ingest.urlingest")
 
 URL = "https://wiki.corp/handbook"
 
@@ -43,14 +42,14 @@ def test_a_single_failure_is_not_announced(tmp_path, capsys):
     second warning on every blip is how people learn to ignore warnings."""
     root = _repo(tmp_path)
     _fail_n_runs(root, URL, 1)
-    run_mod._report_dead_urls(root, [URL])
+    run_mod.report_dead_urls(root, [URL])
     assert URL not in capsys.readouterr().err
 
 
 def test_the_streak_is_announced_once_it_reaches_the_bar(tmp_path, capsys):
     root = _repo(tmp_path)
     _fail_n_runs(root, URL, _STREAK)
-    run_mod._report_dead_urls(root, [URL])
+    run_mod.report_dead_urls(root, [URL])
     err = capsys.readouterr().err
     assert URL in err
     assert f"failed {_STREAK} runs in a row" in err
@@ -60,7 +59,7 @@ def test_it_says_what_to_do_about_it(tmp_path, capsys):
     """A warning that names a problem and no action is a warning people skip."""
     root = _repo(tmp_path)
     _fail_n_runs(root, URL, _STREAK)
-    run_mod._report_dead_urls(root, [URL])
+    run_mod.report_dead_urls(root, [URL])
     assert f"fux remove {URL}" in capsys.readouterr().err
 
 
@@ -68,7 +67,7 @@ def test_it_goes_to_stderr_never_stdout(tmp_path, capsys):
     """The query plane's standing contract: declarations never touch stdout."""
     root = _repo(tmp_path)
     _fail_n_runs(root, URL, _STREAK)
-    run_mod._report_dead_urls(root, [URL])
+    run_mod.report_dead_urls(root, [URL])
     captured = capsys.readouterr()
     assert captured.out == ""
     assert URL in captured.err
@@ -82,7 +81,7 @@ def test_a_url_that_did_not_fail_this_run_is_not_reported(tmp_path, capsys):
     """
     root = _repo(tmp_path)
     _fail_n_runs(root, URL, _STREAK)
-    run_mod._report_dead_urls(root, [])
+    run_mod.report_dead_urls(root, [])
     assert capsys.readouterr().err == ""
 
 
@@ -90,7 +89,7 @@ def test_a_recovered_url_stops_being_reported(tmp_path, capsys):
     root = _repo(tmp_path)
     _fail_n_runs(root, URL, _STREAK)
     urlstate.observe(root, fetched={URL: "a" * 40}, failed=[], listed={URL})
-    run_mod._report_dead_urls(root, [URL])
+    run_mod.report_dead_urls(root, [URL])
     assert capsys.readouterr().err == "", "a success resets the streak"
 
 
@@ -100,14 +99,14 @@ def test_it_never_raises_when_the_state_is_unreadable(tmp_path, capsys):
     root = _repo(tmp_path)
     _fail_n_runs(root, URL, _STREAK)
     (root / ".fux" / "runtime" / urlstate.STATE_NAME).write_text("{ not json", encoding="utf-8")
-    run_mod._report_dead_urls(root, [URL])  # must not raise
+    run_mod.report_dead_urls(root, [URL])  # must not raise
     assert capsys.readouterr().err == ""
 
 
 def test_sys_is_actually_imported_by_the_module():
     """⚠ **Found by reading, after the import check passed.**
 
-    `_report_dead_urls` writes to `sys.stderr`, and `run.py` did not import
+    `report_dead_urls` writes to `sys.stderr`, and `run.py` did not import
     `sys`. `import fux.ingest.run` still succeeded, because the reference is
     inside a function body — so the module imported cleanly and would have
     raised `NameError` the first time a URL actually went dead. The same shape
@@ -116,12 +115,12 @@ def test_sys_is_actually_imported_by_the_module():
     import inspect
 
     source = inspect.getsource(run_mod)
-    assert "\nimport sys\n" in source, "run.py uses sys.stderr and must import sys"
+    assert "\nimport sys\n" in source, "urlingest.py uses sys.stderr and must import sys"
 
 
 @pytest.mark.parametrize("streak", [1, 2, 3, 4])
 def test_below_the_bar_stays_quiet(tmp_path, capsys, streak):
     root = _repo(tmp_path)
     _fail_n_runs(root, URL, streak)
-    run_mod._report_dead_urls(root, [URL])
+    run_mod.report_dead_urls(root, [URL])
     assert capsys.readouterr().err == ""

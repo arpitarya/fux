@@ -29,6 +29,9 @@ from __future__ import annotations
 
 from pathlib import Path
 from ..constants import fixed
+# `CACHEDIR.TAG` and `derived_dir` are SR-CACHEDIR-TAG's, in `cachedir.py`
+# since W-261; imported here so `fuxdir.derived_dir` keeps its callers.
+from .cachedir import CACHEDIR_SIGNATURE, CACHEDIR_TAG, derived_dir  # noqa: F401
 
 _JSON_INDENT = fixed("json", "indent")
 
@@ -99,10 +102,6 @@ COMMITTED_FILES: dict[str, str] = {
 #: Everything legally found directly under `.fux/`; anything else is a warning.
 DECLARED = (*COMMITTED, *COMMITTED_FILES, *DERIVED, *ACQUIRED, *GENERATED_FILES)
 
-# CACHEDIR.TAG's first line is a fixed signature — byte-exact, per the spec.
-CACHEDIR_SIGNATURE = fixed("fuxdir", "cachedir_signature")
-
-
 def _template(name: str) -> str:
     """`src/fux/templates/<name>` — the body of a file fux writes.
 
@@ -111,12 +110,6 @@ def _template(name: str) -> str:
     """
     return (Path(__file__).parent.parent / "templates" / name).read_text(encoding="utf-8")
 
-
-def _cachedir_tag() -> str:
-    return _template(fixed("templates", "cachedir_tag")).replace("{signature}", CACHEDIR_SIGNATURE)
-
-
-CACHEDIR_TAG = _cachedir_tag()
 
 # The body is `templates/fuxdir-gitignore.txt` (R13); `{planes}` is every
 # DERIVED and ACQUIRED directory, by name, so the planes have one home.
@@ -736,18 +729,3 @@ def ensure_node_reader(root: Path, *, shape: "str | None" = None) -> "list[Path]
     if shim.exists():
         shim.chmod(_SHIM_MODE)
     return written
-
-
-def derived_dir(root: Path, name: str) -> Path:
-    """Return `.fux/<name>/`, created and tagged as a cache directory.
-
-    For M2 to call when it materializes `runtime/` (M4's fetch cache nests
-    inside it, at `runtime/fetch-cache/`, and does not call this directly).
-    The tag is written once and never overwritten.
-    """
-    path = fux_dir(root) / name
-    path.mkdir(parents=True, exist_ok=True)
-    tag = path / "CACHEDIR.TAG"
-    if not tag.exists():
-        tag.write_bytes(CACHEDIR_TAG.encode("ascii"))
-    return path

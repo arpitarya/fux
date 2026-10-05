@@ -13,7 +13,9 @@
  *
  * Owned, with its Python twin, by [SR-T1-ACCELERATOR](../../../records/0110_accelerator.md).
  */
+import { writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { pyDumps } from "../compat/pyjson.mjs";
 import { fixed } from "../config/constants.mjs";
 
 export const RUNTIME_DIR = fixed("runtime", "dir");
@@ -100,4 +102,14 @@ export function packEntry(termHex, blockNo, offset, length, mx, mnw, first, last
   view.setUint32(at, last, true); at += U32;
   view.setUint16(at, count, true);
   return out;
+}
+
+/** `json.dumps(sort_keys=True, ensure_ascii=False)` — the options every runtime
+ *  JSON file shares (`format.py::write_json`'s). */
+export const DUMPS = { sortKeys: true, ensureAscii: false };
+
+/** One derived JSON file, in the bytes every runtime plane shares. Twin of
+ *  `format.py::write_json`. */
+export function writeJson(path, payload) {
+  writeFileSync(path, Buffer.from(pyDumps(payload, DUMPS) + "\n", "utf8"));
 }

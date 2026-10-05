@@ -7,7 +7,7 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@445f0cf12bd1, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@8f3efd21a71f, node/test/pins.test.mjs@daebcdb98aac]
+owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@f088f4f6b552, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@8f3efd21a71f, node/test/pins.test.mjs@daebcdb98aac]
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
@@ -657,6 +657,8 @@ a missing blob already is — never a crash inside a planning command.
 **No decision here moved** (W-242 (closed 2026-10-03) Tier 0, 2026-09-30; [SR-NODE-SEARCH](0153_node-search.md) decision 24): Node's `applyPin` and `pinnedFor` read the call's `Shards` instead of opening every shard again; which pin applies, and when, is unchanged. Output is byte-identical.
 
 **No decision here moved** (W-254, 2026-10-04): `enrich._chunk_count` passes `frontmatter=False` to the chunker, so an enrichment unit count is what it was before the frontmatter passage existed.
+
+**No decision here moved** (W-261, 2026-10-05): `enrich_dirs` is imported from `ingest/dirlist.py` (SR-DIR-LIST's) instead of `ingest/gitdir.py`; it reads the same committed declaration.
 
 ### Consequences
 

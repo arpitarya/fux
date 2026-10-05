@@ -127,7 +127,7 @@ def test_a_lock_python_holds_stops_a_node_build(corpus, tmp_path):
 def test_a_lock_node_writes_is_one_python_reads(corpus, tmp_path):
     root = _clone(corpus, tmp_path / "c")
     script = (
-        f"import {{ acquire }} from {json.dumps((ENGINE / 'node/src/maintain/runner.mjs').as_uri())};"
+        f"import {{ acquire }} from {json.dumps((ENGINE / 'node/src/maintain/lock.mjs').as_uri())};"
         f"acquire({json.dumps(str(root))}); console.log(process.pid);"
     )
     proc = subprocess.run(["node", "--input-type=module", "-e", script], capture_output=True, text=True)

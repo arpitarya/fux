@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@7d111b045e0c]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: f24f3c80e83621f2d4013cd3011123860fb2133dc0f764828d0a86043a00a602
+content_sha: a2c74f856a00d3a5b3216baf1d9f797d23ddac83fe42289e048a20aa4f6d752b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -518,6 +518,8 @@ The question `fux answer` ranks is analyzed with the repo's identifier families,
 **No decision here moved** (W-253, 2026-10-04): `find --under` became a component boundary and `find --json` now writes `confidence` before `fused`, per [SR-FIND](0104_find.md) decisions 7 and Consequences and [SR-CLI](0101_cli-surface.md).
 
 **No decision here moved** (W-247, 2026-10-04): `cmd_answer` renders `build_answer`'s result, and `fux.api.Index.answer` reads the same builder instead of capturing the CLI's stdout. The text and `--json` output are byte-identical.
+
+**No decision here moved** (W-261, 2026-10-05): `find`'s code moved out of `query/__init__.py`, which this record describes, into `query/find.py` (SR-FIND's). `cmd_answer`, `ANSWER_TOP` and both printers are untouched.
 
 ### Consequences
 

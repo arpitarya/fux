@@ -62,7 +62,7 @@ def _cmd_lexical(args) -> int:
 
 
 def _cmd_find(args) -> int:
-    from .query import cmd_find
+    from .query.find import cmd_find
 
     return cmd_find(args)
 

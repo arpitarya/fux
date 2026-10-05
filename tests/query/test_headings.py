@@ -20,7 +20,8 @@ import json as json_mod
 
 import pytest
 
-from fux.query import cmd_ask, cmd_find
+from fux.query import cmd_ask
+from fux.query.find import cmd_find
 from fux.query import headings as _headings
 from l12_fixtures import cli_args, shipped_output
 

@@ -61,6 +61,7 @@ in `accel.block_bound`.
 
 from __future__ import annotations
 
+import json
 import struct
 from pathlib import Path
 from ..constants import fixed
@@ -230,3 +231,11 @@ def unpack_entry(buf, index: int):
     )
     mx, mnw = tuple(fields[:_FIELD_COUNT]), tuple(fields[_FIELD_COUNT:])
     return term, block_no, offset, length, mx, mnw, first, last, count
+
+
+def write_json(path: Path, payload: dict) -> int:
+    """One derived JSON file, in the bytes every runtime plane shares: sorted
+    keys, no spaces, UTF-8, one trailing newline. Returns the bytes written."""
+    data = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8") + b"\n"
+    path.write_bytes(data)
+    return len(data)

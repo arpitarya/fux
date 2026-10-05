@@ -6,19 +6,24 @@ title: SR-RUNTIME-STATS (0125) — stats.json, the corpus-wide numbers BM25F nee
 description: n and the RAW per-field token-count totals — computed once at build time so length normalisation is an O(1) lookup, and stored unweighted so a field weight cannot bake into the plane. newest_mtime was the third field and left with the recency prior on 2026-09-13.
 status: accepted
 date: 2026-08-19
-amended: 2026-09-24
+amended: 2026-10-05
 feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule that they are stored raw"
-owns: []
+owns: [node/src/derive/stats.mjs@0036d6ff0826, src/fux/derive/stats.py@595e5ee1a4e5]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: dc52f5680a0ff65ec0d343441d8a6e70a5d03744b83161d2cd83e5f5e1c0ec23
+content_sha: c8449369a62454bdb38b47fa77d675519bb5d1ae36b8898515ac6b8aa6c2debc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
+**Owns** — the components this record decides:
+
+- [`node/src/derive/stats.mjs`](../node/src/derive/stats.mjs) · file
+- [`src/fux/derive/stats.py`](../src/fux/derive/stats.py) · file
+
 **Describes** — reaches into, does not own:
 
-- [`src/fux/derive/_build.py`](../src/fux/derive/_build.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
+- [`src/fux/derive/_build.py::_read_committed`](../src/fux/derive/_build.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 - [`src/fux/derive/accel.py`](../src/fux/derive/accel.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 - [`src/fux/derive/format.py`](../src/fux/derive/format.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 - [`src/fux/query/bm25f.py`](../src/fux/query/bm25f.py) · owned by [SR-RANKING](0111_ranking.md)
@@ -111,18 +116,7 @@ that per query would scale with corpus size on the hot path.
 
 ### Decision
 
-**0. This record owns nothing, and the case is (a)** —
-[SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7: it specifies one file
-another record already generates. The stats plane is written by
-[`src/fux/derive/_build.py`](../src/fux/derive/_build.py) and encoded by
-[`derive/format.py`](../src/fux/derive/format.py), both of which
-[SR-T1-ACCELERATOR](0110_accelerator.md) owns as the build; **carving the file
-out would give one plane two owners for one pass.** ⚠ **Until 2026-09-21 that
-left nothing able to open this record** — the freshness gate demands owners and
-describers, and this record was neither. It now carries `describes` rows on both
-files, so a change to what is written or to how it is encoded opens it.
-**Reach is not ownership** — SR-WORK-OWNERSHIP decision 1 — and the case
-above is why owning nothing is the right answer here rather than a gap.
+**0. This record owns [`src/fux/derive/stats.py`](../src/fux/derive/stats.py) and its Node twin [`node/src/derive/stats.mjs`](../node/src/derive/stats.mjs)** since 2026-10-05 ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). The stats plane's writer is a pure move out of `derive/_build.py` (and `build.mjs`): `payload` and `write` — the raw totals and their key set, byte-identical. `_build.py` still decides **when** it is written, in `build()`'s order, and computes its inputs in `_read_committed`; `format.py` keeps the constants and `write_json`, the serializer every runtime JSON file shares — both [SR-T1-ACCELERATOR](0110_accelerator.md)'s, both reached by this record's `describes` rows. ⚠ **This decision read *owns nothing, case (a)* until W-261, arguing that carving the file out would give one plane two owners for one pass.** The ruling answered it: the build orchestrates, this record owns the bytes of its one file.
 
 **1. Fields: `n` and `total_flen`.** The membership bar is **corpus-wide,
 unsupplied by any single posting, needed on the hot path**, and both pass it.

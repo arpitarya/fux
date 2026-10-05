@@ -5,19 +5,25 @@ name: SR-RUNTIME-STAMP
 title: SR-RUNTIME-STAMP (0124) — stamp.json, the cheap pre-check ahead of the manifest
 description: A deliberately non-reproducible per-shard size/mtime snapshot that short-circuits manifest.json's content-hash check on the common unchanged case, and is never itself proof of freshness.
 status: accepted
+amended: 2026-10-05
 date: 2026-08-19
 feature: "`.fux/runtime/stamp.json` — the cheap staleness pre-filter, and its deliberate exclusion from the determinism set"
-owns: []
+owns: [node/src/derive/stamp.mjs@e54866f6479b, src/fux/derive/stamp.py@4ed944c99464]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 05c6d0424d2997b7d383201803978f4bb4230718502fcb75f7322412d7a85b85
+content_sha: 4632bc75167b0ac14aa5dc32efb89113ee466e97e94e77af0cbcdae809a218f7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
+**Owns** — the components this record decides:
+
+- [`node/src/derive/stamp.mjs`](../node/src/derive/stamp.mjs) · file
+- [`src/fux/derive/stamp.py`](../src/fux/derive/stamp.py) · file
+
 **Describes** — reaches into, does not own:
 
-- [`src/fux/derive/_build.py`](../src/fux/derive/_build.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
+- [`src/fux/derive/_build.py::_read_committed`](../src/fux/derive/_build.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 - [`src/fux/derive/format.py`](../src/fux/derive/format.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 
 <!-- COMPONENTS-END -->
@@ -94,18 +100,7 @@ signal can rule out a change first.
 
 ### Decision
 
-**0. This record owns nothing, and the case is (a)** —
-[SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7: it specifies one file
-another record already generates. The stamp is written by
-[`src/fux/derive/_build.py`](../src/fux/derive/_build.py) and encoded by
-[`derive/format.py`](../src/fux/derive/format.py), both of which
-[SR-T1-ACCELERATOR](0110_accelerator.md) owns as the build; **carving the file
-out would give one plane two owners for one pass.** ⚠ **Until 2026-09-21 that
-left nothing able to open this record** — the freshness gate demands owners and
-describers, and this record was neither. It now carries `describes` rows on both
-files, so a change to what is written or to how it is encoded opens it.
-**Reach is not ownership** — SR-WORK-OWNERSHIP decision 1 — and the case
-above is why owning nothing is the right answer here rather than a gap.
+**0. This record owns [`src/fux/derive/stamp.py`](../src/fux/derive/stamp.py) and its Node twin [`node/src/derive/stamp.mjs`](../node/src/derive/stamp.mjs)** since 2026-10-05 ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). The stamp's writer is a pure move out of `derive/_build.py` (and `build.mjs`): `write` — `[size_bytes, mtime_ns]` per shard, byte-identical. `_build.py` still decides **when** it is written, in `build()`'s order, and computes its inputs in `_read_committed`; `format.py` keeps the constants and `write_json`, the serializer every runtime JSON file shares — both [SR-T1-ACCELERATOR](0110_accelerator.md)'s, both reached by this record's `describes` rows. ⚠ **This decision read *owns nothing, case (a)* until W-261, arguing that carving the file out would give one plane two owners for one pass.** The ruling answered it: the build orchestrates, this record owns the bytes of its one file.
 
 **1. Fields: per committed shard, `[size_bytes, mtime_ns]`.** Captured in the
 same pass `build()` already makes over `.fux/index/*.jsonl`, at no extra I/O.

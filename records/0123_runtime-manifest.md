@@ -5,19 +5,25 @@ name: SR-RUNTIME-MANIFEST
 title: SR-RUNTIME-MANIFEST (0123) — manifest.json, the accelerator's staleness fingerprint
 description: A per-shard content-sha map plus schema, counts and the doc-table field set, so a reader can prove the derived plane still matches the committed index and localize exactly which shard drifted when it does not.
 status: accepted
+amended: 2026-10-05
 date: 2026-08-19
 feature: "`.fux/runtime/manifest.json` — the derived plane's freshness contract"
-owns: []
+owns: [node/src/derive/manifest.mjs@1f56aa34661c, src/fux/derive/manifest.py@4b0c54b89a42]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 7c1eee2ebf442443445198e02c55df2a2cf7f78249ccc406c811a9544b7c3b10
+content_sha: 3fcdb4c81b271a3d3274842916e58b4c341a7612b110397569f13518bad1fdc1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
+**Owns** — the components this record decides:
+
+- [`node/src/derive/manifest.mjs`](../node/src/derive/manifest.mjs) · file
+- [`src/fux/derive/manifest.py`](../src/fux/derive/manifest.py) · file
+
 **Describes** — reaches into, does not own:
 
-- [`src/fux/derive/_build.py`](../src/fux/derive/_build.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
+- [`src/fux/derive/_build.py::_read_committed`](../src/fux/derive/_build.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 - [`src/fux/derive/format.py`](../src/fux/derive/format.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 
 <!-- COMPONENTS-END -->
@@ -101,18 +107,7 @@ asserting it — needs a way to answer *"does `.fux/runtime/` still match
 
 ### Decision
 
-**0. This record owns nothing, and the case is (a)** —
-[SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7: it specifies one file
-another record already generates. `manifest.json` is written by
-[`src/fux/derive/_build.py`](../src/fux/derive/_build.py) and encoded by
-[`derive/format.py`](../src/fux/derive/format.py), both of which
-[SR-T1-ACCELERATOR](0110_accelerator.md) owns as the build; **carving the file
-out would give one plane two owners for one pass.** ⚠ **Until 2026-09-21 that
-left nothing able to open this record** — the freshness gate demands owners and
-describers, and this record was neither. It now carries `describes` rows on both
-files, so a change to what is written or to how it is encoded opens it.
-**Reach is not ownership** — SR-WORK-OWNERSHIP decision 1 — and the case
-above is why owning nothing is the right answer here rather than a gap.
+**0. This record owns [`src/fux/derive/manifest.py`](../src/fux/derive/manifest.py) and its Node twin [`node/src/derive/manifest.mjs`](../node/src/derive/manifest.mjs)** since 2026-10-05 ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). `manifest.json`'s writer is a pure move out of `derive/_build.py` (and `build.mjs`): `write` — the nine keys and their values, byte-identical. `_build.py` still decides **when** it is written, in `build()`'s order, and computes its inputs in `_read_committed`; `format.py` keeps the constants and `write_json`, the serializer every runtime JSON file shares — both [SR-T1-ACCELERATOR](0110_accelerator.md)'s, both reached by this record's `describes` rows. ⚠ **This decision read *owns nothing, case (a)* until W-261, arguing that carving the file out would give one plane two owners for one pass.** The ruling answered it: the build orchestrates, this record owns the bytes of its one file.
 
 **1. Nine keys: `schema`, `index_schema`, `analyzer`, `block_size`,
 `docs_fields`, `docs`, `terms`, `blocks`, and `shards`** (shard filename →

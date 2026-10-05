@@ -44,7 +44,7 @@ def test_archived_false_is_not_archived(tmp_path):
 
 def test_an_absent_list_is_empty_and_never_raises(tmp_path):
     """The caller only asks when `url:` records exist, and a missing list with
-    surviving records is already `_listed_url_ids`' loud error — this must not
+    surviving records is already `urlingest.listed_url_ids`' loud error — this must not
     be a second, worse copy of it."""
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
     assert _archived_url_ids(tmp_path, SimpleNamespace(url=None, urls_file=".fux/sources/urls")) == set()

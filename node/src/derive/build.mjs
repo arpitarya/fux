@@ -21,10 +21,14 @@ import { fixed } from "../config/constants.mjs";
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
 import { pyDumps } from "../compat/pyjson.mjs";
 import { iterShardPaths, rawRecordLines } from "../store/reader.mjs";
-import { SCHEMA_ID, ANALYZER_VERSION, TF_FIELDS, contentSha, displayTitle } from "../store/format.mjs";
-import { derivedDir } from "../store/fuxdir.mjs";
+import { TF_FIELDS, contentSha, displayTitle } from "../store/format.mjs";
+import { derivedDir } from "../store/cachedir.mjs";
 import { buildPlane, SCHEMA as GRAPH_SCHEMA } from "../graph/plane.mjs";
 import * as fmt from "./format.mjs";
+import * as docstable from "./docstable.mjs";
+import * as manifest from "./manifest.mjs";
+import * as stamp from "./stamp.mjs";
+import * as statsPlane from "./stats.mjs";
 
 const FIELD_COUNT = TF_FIELDS.length;
 const HEADER_LINES = fixed("index", "shard_header_lines");
@@ -34,8 +38,6 @@ const MAX_LEN = 2 ** (Uint32Array.BYTES_PER_ELEMENT * 8) - 1;
 
 const QUOTED_HASH_RE = /"([0-9a-f]{16})"/g;
 const FLEN_RE = /"flen":\[([0-9,\s]*)\]/;
-
-const DUMPS = { sortKeys: true, ensureAscii: false };
 
 function regexFlen(text) {
   const m = FLEN_RE.exec(text);
@@ -170,7 +172,7 @@ function readCommitted(root) {
   }
   let totalAnchorLen = 0;
   for (const v of anchorLen.values()) totalAnchorLen += v;
-  const stats = { n: totalDocs, total_flen: totalFlen, total_anchor_len: totalAnchorLen };
+  const stats = statsPlane.payload({ n: totalDocs, totalFlen, totalAnchorLen });
   return { docs, postings, anchors, stats, shardStamp, records };
 }
 
@@ -252,10 +254,6 @@ function writePostings(root, postings, flens) {
   return [totalBlocks, totalPostings];
 }
 
-function writeJson(path, payload) {
-  writeFileSync(path, Buffer.from(pyDumps(payload, DUMPS) + "\n", "utf8"));
-}
-
 function writeAnchors(root, anchors) {
   const byPrefix = new Map();
   for (const term of [...anchors.keys()].sort(cmpCodePoints)) {
@@ -263,7 +261,7 @@ function writeAnchors(root, anchors) {
     if (!byPrefix.has(prefix)) byPrefix.set(prefix, new Map());
     byPrefix.get(prefix).set(term, anchors.get(term).map(([idx, count]) => [idx, count]));
   }
-  for (const prefix of [...byPrefix.keys()].sort(cmpCodePoints)) writeJson(fmt.anchorsPath(root, prefix), byPrefix.get(prefix));
+  for (const prefix of [...byPrefix.keys()].sort(cmpCodePoints)) fmt.writeJson(fmt.anchorsPath(root, prefix), byPrefix.get(prefix));
 }
 
 /** `graph/plane.py::build_plane`'s bytes: `sort_keys=False`, `ensure_ascii=True`. */
@@ -298,33 +296,18 @@ export function build(root) {
   mkdirSync(anchorsDirectory, { recursive: true });
   clear(anchorsDirectory);
 
-  writeFileSync(
-    join(directory, fmt.DOCS_NAME),
-    Buffer.from(docs.map((doc) => pyDumps(doc, DUMPS) + "\n").join(""), "utf8"),
-  );
-  writeJson(join(directory, fmt.STATS_NAME), stats);
-  writeJson(join(directory, fmt.MINED_NAME), { pairs: minedTableFromRecords(records) });
+  docstable.write(directory, docs);
+  statsPlane.write(directory, stats);
+  fmt.writeJson(join(directory, fmt.MINED_NAME), { pairs: minedTableFromRecords(records) });
   writeGraph(directory, records);
 
   const [blocks, postingsCount] = writePostings(root, postings, docs.map((d) => d.flen));
   writeAnchors(root, anchors);
 
-  writeJson(join(directory, fmt.MANIFEST_NAME), {
-    schema: fmt.RUNTIME_SCHEMA,
-    index_schema: SCHEMA_ID,
-    analyzer: ANALYZER_VERSION,
-    block_size: fmt.BLOCK_SIZE,
-    docs_fields: [...fmt.DOCS_FIELDS],
-    docs: docs.length,
-    terms: postings.size,
-    blocks,
-    shards: Object.fromEntries(shardStamp.map(([name, sha]) => [name, sha])),
-  });
+  manifest.write(directory, { docs: docs.length, terms: postings.size, blocks, shardStamp });
   // Last, and volatile on purpose: a reader racing this build sees no stamp or
   // the old one, and `isFresh` sends it to the scan rather than a half-plane.
-  writeJson(join(directory, fmt.STAMP_NAME), {
-    shards: new Map(shardStamp.map(([name, , size, mtime]) => [name, [size, mtime]])),
-  });
+  stamp.write(directory, shardStamp);
 
   return { docs: docs.length, terms: postings.size, blocks, postings: postingsCount };
 }

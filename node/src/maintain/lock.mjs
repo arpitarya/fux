@@ -1,4 +1,4 @@
-/** The index write lock — the slice of `src/fux/maintain/runner.py` Node needs.
+/** The index write lock. Twin of `src/fux/maintain/lock.py` (SR-LOCKS, W-261).
  *
  * W-242 Tier 2 made Node a WRITER of the derived plane (`fux build`), so it must
  * exclude a Python `ingest` or `build` running on the same tree, and be excluded
@@ -12,15 +12,17 @@
  * - re-entry by the same pid is allowed, as `write_lock` allows it;
  * - **nothing here breaks a lock automatically.** A stale one is a person's call.
  *
- * Narrowed to `acquire` in `tests/test_node_twins.py`: the runner, its status
- * file and the cooperative stop are the daemon's, and Node runs no daemon.
+ * A whole-file twin since W-261 moved the lock out of `runner.py`: the runner,
+ * its status file and the cooperative stop are the daemon's, and Node runs no
+ * daemon, so `runner.py` has no Node twin.
  */
 import { closeSync, openSync, readFileSync, unlinkSync, writeSync } from "node:fs";
 import { join } from "node:path";
 import { FuxError } from "../errors.mjs";
 import { fixed } from "../config/constants.mjs";
 import { pyDumps } from "../compat/pyjson.mjs";
-import { derivedDir, fuxDir } from "../store/fuxdir.mjs";
+import { derivedDir } from "../store/cachedir.mjs";
+import { fuxDir } from "../store/fuxdir.mjs";
 import { RUNTIME_DIR } from "../derive/format.mjs";
 
 export const LOCK_NAME = fixed("maintain", "write_lock");

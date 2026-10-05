@@ -7,7 +7,7 @@ import pytest
 from fux import setup as setup_mod
 from fux.config import load
 from fux.errors import FuxError
-from fux.ingest.gitdir import read_dirs, source_dirs
+from fux.ingest.dirlist import read_dirs, source_dirs
 from l12_fixtures import write_config
 
 
@@ -209,14 +209,14 @@ def test_config_no_longer_carries_the_ranking_fields(tmp_path):
 
 
 def test_archived_dirs_is_only_the_declared_ones(tmp_path):
-    from fux.ingest.gitdir import archived_dirs
+    from fux.ingest.dirlist import archived_dirs
 
     _write_dirs(tmp_path, ["docs", "old/frozen-docs archived=true"])
     assert archived_dirs(tmp_path, ".fux/sources/dirs") == ["old/frozen-docs"]
 
 
 def test_archived_dirs_excludes_exclusion_lines(tmp_path):
-    from fux.ingest.gitdir import archived_dirs
+    from fux.ingest.dirlist import archived_dirs
 
     _write_dirs(tmp_path, ["old archived=true", "!old/keep"])
     assert archived_dirs(tmp_path, ".fux/sources/dirs") == ["old"]

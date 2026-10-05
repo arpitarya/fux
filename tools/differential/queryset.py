@@ -36,7 +36,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from fux.config import load
-from fux.ingest.gitdir import WalkedFile, source_dirs, walk_sources
+from fux.ingest.dirlist import source_dirs
+from fux.ingest.gitdir import WalkedFile, walk_sources
 from fux.query.tokenize import tokenize
 
 #: The three questions frozen in the M1 handoff §9, before the engine existed.

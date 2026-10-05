@@ -1028,6 +1028,8 @@ descent before listing it, and records it once as `dir/`.
 
 **No decision here moved** (W-248, 2026-10-04): `ingest/queue.py` gained `model_needed` and `no_decoder`, the readers that classify a row by its reason.
 
+**No decision here moved** (W-261, 2026-10-05): the URL branch of `ingest/run.py` moved to `ingest/urlingest.py` (SR-URL-INGEST's) and the `dirs`-list readers of `ingest/gitdir.py` to `ingest/dirlist.py` (SR-DIR-LIST's). The walk calls both at the same points, and its output is byte-identical. Node's `ingest/gitdir.mjs` lost `archivedDirs` to `ingest/dirlist.mjs` and is narrowed to `is_archived_loc`.
+
 ### Consequences
 
 - **Ingest cost is O(corpus) in parsing and edge resolution, O(changed) in

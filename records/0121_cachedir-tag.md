@@ -5,20 +5,21 @@ name: SR-CACHEDIR-TAG
 title: SR-CACHEDIR-TAG (0121) — CACHEDIR.TAG marks a derived directory disposable
 description: A cache-directory tag written once into every derived .fux/ directory, per the bford.info/cachedir spec, so backup and archive tools skip it without Fux-specific configuration.
 status: accepted
+amended: 2026-10-05
 date: 2026-08-19
 feature: the `CACHEDIR.TAG` file written into every derived `.fux/` subdirectory
-owns: []
+owns: [node/src/store/cachedir.mjs@3c5666686c26, src/fux/store/cachedir.py@d7eecddb31d3]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: a9767888236cf82917cee87c99a86e379e3b173d194d7159b4dd64c26b83137f
+content_sha: 8afeb5be112a077e2390b9ed83ef48af9e818aa5eb36d170ab080a3e9e6e2479
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
-**Describes** — reaches into, does not own:
+**Owns** — the components this record decides:
 
-- [`node/src/store/fuxdir.mjs`](../node/src/store/fuxdir.mjs) · owned by [SR-DOTFUX](0102_fux-directory.md)
-- [`src/fux/store/fuxdir.py::derived_dir`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
+- [`node/src/store/cachedir.mjs`](../node/src/store/cachedir.mjs) · file
+- [`src/fux/store/cachedir.py`](../src/fux/store/cachedir.py) · file
 
 <!-- COMPONENTS-END -->
 
@@ -95,7 +96,7 @@ every backup tool, archiver and IDE needs its own configuration line; a
 ### Decision
 
 **1. Byte-exact per the spec.** `CACHEDIR_TAG` in
-[`store/fuxdir.py`](../src/fux/store/fuxdir.py) is fixed bytes — the
+[`store/cachedir.py`](../src/fux/store/cachedir.py) is fixed bytes — the
 signature line plus two comment lines — with **no interpolated value of any
 kind**. Since 2026-09-28 the body is `src/fux/templates/cachedir-tag.txt` and
 its one placeholder is the spec's own signature, `[fuxdir] cachedir_signature`
@@ -151,7 +152,7 @@ this moved where they are written, not what they are.
 
 **No decision here moved** (W-242 Tier 2, 2026-10-03): `node/src/store/fuxdir.mjs::derivedDir` is `derived_dir`'s twin, because Node's `fux build` now creates `.fux/runtime/`. It writes the same bytes from the same template, which is inlined in the bundle, and never overwrites an existing tag.
 
-**Owns nothing, and says which case** ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7, case (a), W-251 §4 #16): this record specifies one file, `CACHEDIR.TAG`, that another record's code already generates — `derived_dir` in `store/fuxdir.py` and its Node twin in `store/fuxdir.mjs`, both SR-DOTFUX's. Its `describes` rows on those two are what open it.
+**Owns [`src/fux/store/cachedir.py`](../src/fux/store/cachedir.py) and its Node twin [`node/src/store/cachedir.mjs`](../node/src/store/cachedir.mjs) since 2026-10-05** ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). A pure move of `CACHEDIR_SIGNATURE`, `CACHEDIR_TAG` and `derived_dir` out of `store/fuxdir.py` (and `cachedirTag`/`derivedDir` out of `fuxdir.mjs`). `fuxdir.py` imports them back, so every caller of `fuxdir.derived_dir` is unchanged; the `.fux/` layout stays SR-DOTFUX's. ⚠ **This paragraph read *owns nothing, case (a)* until W-261.**
 
 ### Consequences
 

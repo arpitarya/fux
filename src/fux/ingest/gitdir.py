@@ -12,7 +12,7 @@ skipped with a reason, never a crash; a configured source that doesn't exist
 on disk is a misconfiguration and fails loudly instead.
 
 **`archived` is parsed, and since 2026-08-22 it is read.** The declaration is
-the half this module owns. `archived_dirs()` exposes it and `is_archived_loc()`
+the half this module owns. `dirlist.archived_dirs()` exposes it and `is_archived_loc()`
 is the one test for whether a `loc` falls under one — used by `ingest/run.py` to
 stamp the record property (SR-ARCHIVED-CONTENT decision 1) and by
 `query/rank.py` for the marker and the demotion. **One definition, because two
@@ -184,59 +184,6 @@ def partition(skips: list[Skipped]) -> tuple[list[Skipped], list[Skipped]]:
     and `fetch_all` both sort, and the printer depends on it).
     """
     return [s for s in skips if s.deliberate], [s for s in skips if not s.deliberate]
-
-
-def read_dirs(root: Path, rel_path: str) -> list[sourcelist.Entry]:
-    """Parse the committed directory list through the one shared grammar.
-
-    Deduped and sorted by entry, so file order is presentation only — a human
-    may group by team or by system and it cannot change a committed byte.
-    """
-    return sourcelist.read(
-        root,
-        rel_path,
-        sourcelist.DIRS,
-        missing_hint=(
-            "create it with one directory or file per line (a line may carry "
-            "`archived=true`), or run `fux setup` to write a starter"
-        ),
-    )
-
-
-def source_dirs(root: Path, rel_path: str) -> list[str]:
-    """Just the **included** entry values. Exclusions are `source_excludes`."""
-    return [entry.value for entry in read_dirs(root, rel_path) if not entry.exclude]
-
-
-def source_excludes(root: Path, rel_path: str) -> list[str]:
-    """The `!` patterns — repo-relative globs, applied to the whole walk."""
-    return [entry.value for entry in read_dirs(root, rel_path) if entry.exclude]
-
-
-def archived_dirs(root: Path, rel_path: str) -> list[str]:
-    """Included entries declared `archived=true` (SR-ARCHIVED-CONTENT decision 6's
-    input). Reads the same committed declaration SR-ARCHIVED-CONTENT decision 1 leaves off the
-    record — the ranking keys off the source list, never a path convention
-    (SR-DIR-LIST decision 4)."""
-    return [
-        entry.value
-        for entry in read_dirs(root, rel_path)
-        if not entry.exclude and entry.attrs.get("archived") == "true"
-    ]
-
-
-def enrich_dirs(root: Path, rel_path: str) -> list[str]:
-    """Included entries declared `enrich=true` (W-76 Phase 8).
-
-    The same shape as `archived_dirs` and read from the same committed file,
-    because the two answer the same kind of question: *which directories did a
-    human decide something about?* Neither is ever inferred from a path.
-    """
-    return [
-        entry.value
-        for entry in read_dirs(root, rel_path)
-        if not entry.exclude and entry.attrs.get("enrich") == "true"
-    ]
 
 
 def is_archived_loc(loc: str, archived_dirs) -> bool:

@@ -742,6 +742,8 @@ on 2026-10-04 (Arpit) and BUILT the same day (W-259;
 
 **No decision here moved** (W-262, 2026-10-05): the arm's `api` lane calls `ix.graph(q)` without the retired `hops`/`top` arguments — the library's graph verbs now return the CLI's `--json` payloads ([SR-API](0154_api.md) decision 1, Arpit 2026-10-04, W-251 #4). What the lane compares, and at what tolerance, is unchanged.
 
+**No decision here moved** (W-261, 2026-10-05): the four runtime companions' writers moved out of `derive/_build.py` into files their records own — `docstable.py`, `manifest.py`, `stamp.py`, `stats.py`, each with a Node twin beside `build.mjs`. `_build.py` still decides when each is written, in the same order, and `format.py` gained `write_json` (Node: `writeJson`), the serializer `_build.py` used to hold. Every `DETERMINISTIC_FILES` byte is identical. `tools/differential` imports `source_dirs` from `ingest/dirlist.py`.
+
 ### Consequences
 
 - **The differential arms import, and the adversarial corpus refuses a live tree** (W-246, 2026-10-04): `tests/test_differential_arms_import.py` imports `graph_arm.py`, `goldens_grade.py` and `adversarial_corpus.py`; and `adversarial_corpus.py` now requires its root argument and refuses the engine checkout or any root holding a `.git` unless `CI` is set. Making the import a required check on `main` is Arpit's (W-251 §3 #22).

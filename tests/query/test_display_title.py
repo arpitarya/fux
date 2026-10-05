@@ -29,7 +29,8 @@ from __future__ import annotations
 import argparse
 import json as json_mod
 
-from fux.query import cmd_answer, cmd_ask, cmd_find
+from fux.query import cmd_answer, cmd_ask
+from fux.query.find import cmd_find
 from fux.query.tokenize import tokenize
 from fux.store import content_sha, term_hash, write_index
 from l12_fixtures import cli_args, write_config

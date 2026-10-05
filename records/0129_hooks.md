@@ -7,17 +7,16 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@514ae1424ef7, node/src/maintain@74ced4c72392, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
+owns: [src/fux/maintain@86f4407e4d59, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: dd5b81a49c39f91c240f1b83d0b0e994263dcc331b80086c7aa40c2380eaa7f5
+content_sha: 0562a0f94c74db93adbb8946cf376ab5c3aeea09692e0e9ff150c85c1dc69395
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
-- [`node/src/maintain/`](../node/src/maintain) · dir
 - [`src/fux/maintain/`](../src/fux/maintain) · dir
 - [`src/fux/schemas/state.schema.json`](../src/fux/schemas/state.schema.json) · file
 - [`tools/maintenance-bench/`](../tools/maintenance-bench) · dir
@@ -627,6 +626,8 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 **No decision here moved** (W-242 Tier 2, 2026-10-03): `node/src/maintain/runner.mjs` is a narrow twin of `runner.py`, the write lock alone, for Node's `fux build`. Node runs no hook, runner or daemon.
+
+**No decision here moved** (W-261, 2026-10-05): the write lock moved from `maintain/runner.py` to `maintain/lock.py` (SR-LOCKS'); `runner` re-exports every name, so `runner.acquire` and `runner.write_lock` keep their callers. `node/src/maintain/runner.mjs`, which was only ever the lock, became `lock.mjs`, so this record no longer claims `node/src/maintain/`.
 
 ### Consequences
 

@@ -1065,6 +1065,8 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
 
 **No decision here moved** (W-246, 2026-10-04): the Node output-config reader carries the new `[cli.answer] journal_max_bytes` key beside its Python twin.
 
+**No decision here moved** (W-261, 2026-10-05): Node modules followed their Python owners into files of their own — `derive/docstable.mjs`, `derive/manifest.mjs`, `derive/stamp.mjs`, `derive/stats.mjs`, `store/cachedir.mjs`, `ingest/dirlist.mjs`, and `maintain/runner.mjs` renamed `maintain/lock.mjs`; `verbs/find.mjs` declares `query/find.py` as its twin. The bundle's behaviour and every answer are byte-identical.
+
 ### Consequences
 
 - ⚠ **W-214 (2026-09-22) moved both planes in one commit.**

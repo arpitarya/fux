@@ -169,7 +169,7 @@ def _default_priority_prefix(root: Path) -> str | None:
     applies to the harness too, or a mismatch is not reproducible.
     """
     from fux.config import load
-    from fux.ingest.gitdir import source_dirs
+    from fux.ingest.dirlist import source_dirs
 
     for entry in source_dirs(root, load(root).dirs_file):
         if (root / entry).is_dir():

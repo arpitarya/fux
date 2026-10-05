@@ -5,22 +5,26 @@ name: SR-LOCKS
 title: "SR-LOCKS (0140) — the one lock fux owns, and the three files beside it that are not locks"
 description: "Fux holds exactly one mutex over the committed index: `.fux/runtime/write.lock`, a pid created with O_CREAT+O_EXCL in the gitignored derived plane. Every command that writes the index holds it and every read verb holds nothing. This record states the mechanism, the two-caller asymmetry, the cooperative stop that releases it, and the three sibling files — `runner.stop`, `daemon.stop`, `daemon.pid` — that are constantly mistaken for locks."
 status: accepted
+amended: 2026-10-05
 date: 2026-08-27
 feature: the index write lock and the files around it
-owns: []
+owns: [node/src/maintain/lock.mjs@e47f524b80f0, src/fux/maintain/lock.py@585fe05f4b74]
 laws: [L2, L3, L4, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 423b8ae63bdcdc793af3816ae9909f4ffe3f451ff0660c88610605eb0e1f8379
+content_sha: 782d5915bfde451ade4928ef7a685174dc43a73747d65d1571561028ac70dc9b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
+**Owns** — the components this record decides:
+
+- [`node/src/maintain/lock.mjs`](../node/src/maintain/lock.mjs) · file
+- [`src/fux/maintain/lock.py`](../src/fux/maintain/lock.py) · file
+
 **Describes** — reaches into, does not own:
 
-- [`node/src/maintain/runner.mjs`](../node/src/maintain/runner.mjs) · owned by [SR-MAINTENANCE](0129_hooks.md)
 - [`src/fux/maintain/daemon.py`](../src/fux/maintain/daemon.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
 - [`src/fux/maintain/runner.py`](../src/fux/maintain/runner.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
-- [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
 
 <!-- COMPONENTS-END -->
 
@@ -103,19 +107,7 @@ paraphrased.
 
 ### Decision
 
-**0. This record owns nothing, and the case is (b)** —
-[SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7: it states a mechanism
-spread across components each already claimed by the record carrying its own
-decisions. The lock lives in the `.fux/` layout
-([`store/fuxdir.py`](../src/fux/store/fuxdir.py), SR-DOTFUX's), is taken and
-broken by [`maintain/runner.py`](../src/fux/maintain/runner.py) and relied on by
-[`maintain/daemon.py`](../src/fux/maintain/daemon.py) (both SR-MAINTENANCE's).
-**Carving any of the three out would move a file away from the record whose
-subject it mostly is, to satisfy a check.** ⚠ **Until 2026-09-21 the
-consequence was that nothing could open this record at all** — decision 7 named
-that hole and left it open. It now carries `describes` rows on all three files,
-so the gate reaches it. **Reach is not ownership**, and this record still owns
-nothing on purpose.
+**0. This record owns [`src/fux/maintain/lock.py`](../src/fux/maintain/lock.py) and its Node twin [`node/src/maintain/lock.mjs`](../node/src/maintain/lock.mjs)** since 2026-10-05 ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). `LOCK_NAME`, `lock_path`, `holder`, `acquire`, `write_lock`, `release` and `break_lock` are a pure move out of `maintain/runner.py`, which **re-exports every name**, so `runner.acquire()` and `runner.write_lock()` below still name what they always did. The runner, its status file and the cooperative stop stay [SR-MAINTENANCE](0129_hooks.md)'s, as does `maintain/daemon.py`; both are reached by this record's `describes` rows. On Node, `maintain/runner.mjs` was only ever the lock, and is renamed `lock.mjs`. ⚠ **This decision read *owns nothing, case (b)* until W-261, arguing that carving a file out would move it away from the record whose subject it mostly is.** The lock primitives were always this record's subject; the runner merely called them.
 
 **1. One mutex per resource, and the committed index has exactly one.**
 `.fux/runtime/write.lock` is it. `ingest`, `build`, `add`, `remove` and

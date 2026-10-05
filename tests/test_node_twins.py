@@ -60,10 +60,11 @@ EXEMPT = {
 NARROWED = {
     "config/root.mjs": "find_root",
     # `gitdir.py` is the git-backed WALK — what ingest visits, what it excludes,
-    # a document's `mtime`. Node does not ingest; what crosses is the pair of
-    # functions the QUERY plane calls, and the walk moves constantly for
-    # reasons `archived_dirs` never sees.
-    "ingest/gitdir.mjs": "archived_dirs",
+    # a document's `mtime`. Node does not ingest; what crosses is the predicate
+    # the QUERY plane calls, and the walk moves constantly for reasons
+    # `is_archived_loc` never sees. (`archived_dirs` moved to `dirlist.py` with
+    # SR-DIR-LIST, W-261, and `ingest/dirlist.mjs` is its whole-file twin.)
+    "ingest/gitdir.mjs": "is_archived_loc",
     # `priors.py` carries the git half (`git_commit_times`) as well, which is
     # an ingest concern with no Node twin. `recency_multiplier` was the narrowed
     # symbol until 2026-09-13, when it was deleted with the knob it served
@@ -78,9 +79,10 @@ NARROWED = {
     # for ingest reasons `isAlreadyText` never sees.
     "decode/registry.mjs": "claims",
     # `query/__init__.py` is a one-to-many twin and `run.mjs` is the narrow end
-    # of it: its own header says "twin of the PURE half", and `verbs/ask.mjs`,
-    # `verbs/find.mjs` and `verbs/answer.mjs` each declare the same Python file
-    # for the half they project. So a change to what a verb PRINTS moves the
+    # of it: its own header says "twin of the PURE half", and `verbs/ask.mjs`
+    # and `verbs/answer.mjs` each declare the same Python file for the half
+    # they project (`verbs/find.mjs` declared it too, until W-261 moved `find`
+    # into `query/find.py`, which it now declares). So a change to what a verb PRINTS moves the
     # Python module without touching anything `runQuery` mirrors, and before
     # 2026-09-14 that reported `run.mjs` as behind while the three files that
     # actually carry the change sat updated beside it (W-165 fix 2).
@@ -112,10 +114,10 @@ NARROWED = {
     # asserts the fact rather than asserting that somebody edited a file.
     "ingest/sourcelist.mjs": "parse",
     # W-242 Tier 2 — Node writes one derived directory and takes one lock.
-    # `fuxdir.py` is the whole `.fux/` layout and `runner.py` the whole
-    # maintenance runner; what crosses is `derived_dir` and the lock's `acquire`.
-    "store/fuxdir.mjs": "derived_dir",
-    "maintain/runner.mjs": "acquire",
+    # `fuxdir.py` is the whole `.fux/` layout; what crosses is `fux_dir`. Since
+    # W-261 `derived_dir` is `cachedir.py`'s and the lock is `lock.py`'s, and
+    # `store/cachedir.mjs` and `maintain/lock.mjs` are their whole-file twins.
+    "store/fuxdir.mjs": "fux_dir",
 }
 
 _DECLARED = re.compile(r"`?(src/fux/[A-Za-z0-9_/]+\.py)`?")
