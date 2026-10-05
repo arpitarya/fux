@@ -1,0 +1,22 @@
+W-264 DoD 1 -- in-process microbenchmarks, 2026-10-05, fux a9090e1f (shipped), Python 3.14.3, macOS 10 cores,
+shared machine (load average 4.3-14 during the session; three other agents running suites and a ladder rebuild).
+
+Copies (session scratchpad, both `fux doctor --fix`-migrated; the lab was not touched):
+  gen3 = W-256's rung-10000 generation-3 copy;  gen2 = W-239's own scratch copy (fux-lab/scratch/w239/rung-10000).
+  `diff` of the two `.fux/pii.toml`: IDENTICAL (12 897 bytes, 10 rules, the shipped template).
+
+redact_bench.py --per-rule (body-only redact over all parsed docs, shipped code):
+{"root": ".../gen2", "docs": 10000, "body_chars": 8808307, "walk": 1.71, "parse": 1.13, "redact_body": 3.087, "docs_with_hits": 6, "rules": 10}
+{"root": ".../gen3", "docs": 10000, "body_chars": 8877300, "walk": 1.75, "parse": 1.21, "redact_body": 3.43,  "docs_with_hits": 6, "rules": 10}
+  -> the two corpora cost the same; the corpus generation is not the difference.
+
+lint_bench.py (run.py's loop shape: body + frontmatter title + loc per doc; same parsed docs, same process):
+{"root": ".../gen3", "docs": 10000, "compile_calls": 260180, "redact_loop_shipped_s": 6.274, "redact_loop_memoised_s": 0.966, "lint_one_call_us": 30.6}
+  -> 260 180 `_compile` calls, each re-running W-255's `_lint` (re._parser.parse, uncached).
+     Memoising the compiled pattern per rule reproduces W-239's 0.97 s to the hundredth.
+
+End-to-end, abab.jsonl (abab.sh): 4 pairs of fresh-process `ingest_split.py one --delta`, order A B B A A B B A,
+shipped = `git archive a9090e1f src tools/quality-controls`, memoised = this worktree (functools.cache on _compile).
+  shipped  redact 8.255 6.376 6.428 6.552   total 14.118 10.396 10.514 10.647
+  memoised redact 1.086 1.033 1.029 1.048   total  6.935  5.152  5.076  5.173
+  every run: changed 0, reused 10000/10000, index sha 6dfae254... (the W-256 run's own root sha).

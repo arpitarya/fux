@@ -4,12 +4,27 @@ name: W-264
 description: "Arpit's ruling 2026-10-04 (W-260 line 2, option B): a redaction cache so an unchanged file skips `redact` on a delta ingest — keyed on the file's content sha AND the pii.toml rules digest AND the redactor's version, so a rule change re-redacts everything. Target: the ~6 s redact share of a 10.4 s no-change ingest at rung-10000."
 item: W-264
 filed: 2026-10-04
-ball: agent
+ball: arpit
 ---
 
 # W-264 — unchanged files skip redaction (a redaction cache)
 
-**Status: ratified 2026-10-04, not built.**
+**Status: STOPPED at DoD 1 on 2026-10-05 — back to Arpit. The cache is not
+built.** The 6 s was a regression, not redaction's cost: W-255 (`f3524f32`)
+made `pii._compile` re-run `_lint` on every `Rule.apply`, 260 180 times at
+rung-10000. Memoised per rule (`functools.cache`), `redact` is **1.03–1.09 s**
+and an unchanged delta **5.08–6.94 s** (median 5.16 s), identical root sha —
+[the ingest split's ANALYSIS addendum](../regression/2026-10-04-ingest-split/ANALYSIS.md), §Addendum 2026-10-05.
+**A cache can now save at most ~1 s**, less the cost of reading and verifying
+10 000 entries. The fix landed as its own commit, with a test.
+
+**For Arpit, one line:** (a) **retire W-264** — the ~1 s left is not worth a
+privacy-critical cache whose short key fails open (recommended); (b) build it
+anyway against a ~1 s target, pre-registered as the DoD below says; (c) first
+re-run W-256 §8's measurement on the fixed engine under a new freeze, since the
+memoised delta now sits on its 5 s bar — B-002 is yours either way.
+
+**Originally ratified 2026-10-04, not built:**
 
 **Arpit, 2026-10-04 (Cowork), on [W-260](../../archive/open/W-260-w256-results-to-rule.md) line 2:**
 *"for line 2 go with option B — build a cache so unchanged files skip
