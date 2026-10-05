@@ -15,7 +15,7 @@ ball: agent
 
 **✅ RULED 2026-10-03 (Arpit, Cowork) — *"go with the recommendation for decision one and decision two"*:**
 1. **Accept the generation-4 data as it is.** Only `63` meets R10's ≥ 3 000 words. `64` (2 119), `65` (1 750) and `66` (1 318) fall short, but all four have 15–16 sections. Recorded here as a known deviation from R10. **The real gate is the `step10_section` pool on the rebuilt rung: if it is under 6, lengthen `64`–`66` with off-question sections** (an addition that leaves every question valid) rather than re-author.
-2. **Fold W-228's planted misfits into the same generation**, so the ladder is rebuilt **once**. [Prompt 13](../golden/prompts/13-claude-gen4-planted-misfits.md) is written; the rebuild (step 3) waits on W-228 until Arpit runs it.
+2. **Fold W-228's planted misfits into the same generation**, so the ladder is rebuilt **once**. Prompt 13 (deleted 2026-10-05 with its data committed, as its header required) is written; the rebuild (step 3) waits on W-228 until Arpit runs it.
 
 **What landed from prompt 12 (counted 2026-10-03, key not opened):** seed `63`–`82` (4 long, 16 short competitors under 400 words), 20 `seed-dates.tsv` rows, `questions/set-5-claude.jsonl` (90 questions), and Arpit's key file. Prompt 12 is deleted in the change that commits its data — done 2026-10-04.
 
