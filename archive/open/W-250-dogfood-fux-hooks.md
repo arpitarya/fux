@@ -9,6 +9,8 @@ ball: agent
 
 # W-250 — run `fux hooks` in the fux repository
 
+✅ **CLOSED 2026-10-09 (Claude Code, Opus 5.5).** `fux hooks` run here; `.gitattributes` committed with both driver lines; MACHINE.md carries the per-clone step. The [dogfood merge](../regression/2026-10-09-merge-driver-dogfood/report.md) resolved with no hand edit and **found a defect**: `REGISTER` merged ancestor-blind with ours winning. It is fixed in the same change (three-way on `loc`), with tests. SR-MERGE-DRIVER is amended and restamped.
+
 **Model:** Claude Code, **Sonnet** — a hands-on action with a written outcome.
 
 **From** backlog B-037. [SR-MERGE-DRIVER](../../records/0130_merge-driver.md)

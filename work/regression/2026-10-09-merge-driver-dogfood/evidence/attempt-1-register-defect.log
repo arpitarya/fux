@@ -1,0 +1,45 @@
+== fux hooks
+  wrote  post-commit
+  wrote  post-merge
+  wrote  post-checkout
+  merge driver registered: fux-merge-index %O %A %B %P
+== base ingest
+
+real	2m19.001s
+user	2m17.836s
+sys	0m1.038s
+fux: re-indexing in the background (1 changed path(s) pending)
+
+real	1m0.891s
+user	0m32.375s
+sys	0m0.622s
+fux: re-indexing in the background (1 changed path(s) pending)
+side A changed: .fux/index/00.jsonl .fux/index/REGISTER 
+
+real	0m33.063s
+user	0m32.326s
+sys	0m0.618s
+fux: re-indexing in the background (1 changed path(s) pending)
+side B changed: .fux/index/00.jsonl .fux/index/REGISTER 
+== shared index files changed on both sides:
+.fux/index/00.jsonl
+.fux/index/REGISTER
+== merge side-a into side-b
+Auto-merging .fux/index/00.jsonl
+Auto-merging .fux/index/REGISTER
+Merge made by the 'ort' strategy.
+ .fux/index/00.jsonl                   | 2 +-
+ work/compare/section-units.compare.md | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+fux: stopped the background re-index
+fux: ingested 2210 docs (0 changed, 2210 carried forward), 628 not indexed, 1 skipped, 1 shards written
+fux:   (629 already recorded in .fux/.fuxignore; 'fux ingest --list-skipped' lists them all)
+fux: accelerator: 113343 terms, 119695 blocks, 1660497 postings (derived, not committed)
+merge exit: 0
+ M .fux/index/00.jsonl
+ M .fux/index/REGISTER
+== conflict markers in index:        0
+== merged index vs a fresh ingest of the merged tree
+index files differing from fresh ingest:        2
+ M .fux/index/00.jsonl
+ M .fux/index/REGISTER

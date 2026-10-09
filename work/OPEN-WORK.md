@@ -36,7 +36,6 @@ here. Read that record before changing anything below it.
 
 - 🟡 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)
 - 🟢 **W-240** · `agent` — ladder rebuilt as gen 4 ([run](regression/2026-10-05-ladder-gen4-rebuild/report.md)). Next: a session other than the rebuild's captures the `set-5-claude` baseline; 🔴 Arpit scores. **Opus.** [detail](open/W-240-section-pool-set.md)
-- 🟢 **W-250** · `agent` — run `fux hooks` in this repository so `.gitattributes` carries the merge driver where it was written. **Sonnet.** [detail](open/W-250-dogfood-fux-hooks.md)
 
 ### testing
 

@@ -8,6 +8,10 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Fixed
+
+- **`fux-merge-index` no longer drops the other side's `REGISTER` rows** (W-250). The register merged as a union with ours winning every `loc`, so a document only the other branch re-ingested kept our stale sha in the merge commit, and a document the other branch deleted came back. It now merges three-way on `loc`: a side whose row equals the ancestor's never wins. Found by running the driver on this repository for the first time.
+
 ## [3.0.0-alpha.11] - 2026-10-05
 
 **Breaking: the bare-`str` fetcher return is refused, `--under` / `[priority]` match at a `/` boundary, and the library's `explain`/`graph`/`path` return the CLI's `--json` payloads. The Node reader reads a fresh `graph.json`; `fux find --no-archived`; ingest's redact phase is ~6× faster again.** Details below.

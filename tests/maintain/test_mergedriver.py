@@ -210,3 +210,53 @@ def test_crlf_input_merges_and_output_is_lf_only(tmp_path):
     raw = ours.read_bytes()
     assert b"\r" not in raw
     assert _ids(raw.decode("utf-8")) == ["file:a.md", "file:b.md", "file:c.md"]
+
+
+# --- the register (W-199 D4) merges three-way on `loc` -----------------------
+
+_REG_HEAD = "# loc\tkind\tsha\tdecoder\tfetcher"
+
+
+def _reg(*rows: tuple[str, str]) -> str:
+    return _REG_HEAD + "\n" + "".join(f"{loc}\tfile\t{sha}\tprose\t-\n" for loc, sha in rows)
+
+
+def _merge_reg(tmp_path, base, ours, theirs) -> str:
+    o = _write(tmp_path, "O", base)
+    a = _write(tmp_path, "A", ours)
+    b = _write(tmp_path, "B", theirs)
+    assert main([str(o), str(a), str(b), ".fux/index/REGISTER"]) == 0
+    return a.read_text(encoding="utf-8")
+
+
+def test_register_takes_a_row_only_their_side_changed(tmp_path):
+    # W-250's dogfood merge: side A re-ingested x.md, side B re-ingested y.md.
+    # The first, union-only form kept OUR stale sha for x.md in the merge commit.
+    base = _reg(("x.md", "old-x"), ("y.md", "old-y"))
+    ours = _reg(("x.md", "old-x"), ("y.md", "new-y"))
+    theirs = _reg(("x.md", "new-x"), ("y.md", "old-y"))
+    assert _merge_reg(tmp_path, base, ours, theirs) == _reg(("x.md", "new-x"), ("y.md", "new-y"))
+
+
+def test_register_keeps_a_deletion_against_an_untouched_side(tmp_path):
+    base = _reg(("gone.md", "g"), ("kept.md", "k"))
+    for ours, theirs in ((_reg(("kept.md", "k")), base), (base, _reg(("kept.md", "k")))):
+        assert _merge_reg(tmp_path, base, ours, theirs) == _reg(("kept.md", "k"))
+
+
+def test_register_unions_disjoint_adds_sorted(tmp_path):
+    base = _reg(("m.md", "m"))
+    out = _merge_reg(tmp_path, base, _reg(("m.md", "m"), ("z.md", "z")), _reg(("a.md", "a"), ("m.md", "m")))
+    assert out == _reg(("a.md", "a"), ("m.md", "m"), ("z.md", "z"))
+
+
+def test_register_both_changed_one_row_ours_wins_and_never_conflicts(tmp_path):
+    base = _reg(("x.md", "old"))
+    assert _merge_reg(tmp_path, base, _reg(("x.md", "ours")), _reg(("x.md", "theirs"))) == _reg(("x.md", "ours"))
+
+
+def test_register_with_no_ancestor_is_the_union_ours_first(tmp_path):
+    a = _write(tmp_path, "A", _reg(("x.md", "ours"), ("a.md", "a")))
+    b = _write(tmp_path, "B", _reg(("x.md", "theirs"), ("b.md", "b")))
+    assert main([str(tmp_path / "missing"), str(a), str(b), ".fux/index/REGISTER"]) == 0
+    assert a.read_text(encoding="utf-8") == _reg(("a.md", "a"), ("b.md", "b"), ("x.md", "ours"))

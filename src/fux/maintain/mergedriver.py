@@ -175,32 +175,44 @@ def _conflict_text(ours: str, theirs: str, ids: list[str]) -> str:
 _REGISTER_NAME = fixed("register", "file")
 
 
-def _merge_register(ours: str, theirs: str) -> str:
-    """Union the two sides on `loc`, sorted, header preserved.
+def _register_rows(text: str) -> tuple[str, dict[str, str]]:
+    """A register's header line and its rows keyed on `loc` (the first column)."""
+    header = ""
+    rows: dict[str, str] = {}
+    for line in text.splitlines():
+        if line.startswith("#"):
+            header = header or line
+        elif line:
+            rows[line.split("\t", 1)[0]] = line
+    return header, rows
+
+
+def _merge_register(ancestor: str, ours: str, theirs: str) -> str:
+    """Three-way on `loc`, sorted, header preserved. Decision 4, applied per row.
 
     **There is no conflict case and that is deliberate.** A register line is
     derived from the index beside it; two sides disagreeing about one `loc`
     means the two indexes disagree, which the shard driver has already resolved
-    by the time this runs. Taking either line and letting the next `fux ingest`
-    rewrite the file is strictly better than stopping a merge over a file nobody
-    edits by hand.
+    by the time this runs.
 
-    ⚠ **Ours wins a same-`loc` disagreement**, matching the shard driver's
-    instinct of never silently preferring the remote — and the choice cannot
-    survive an ingest, so it decides nothing durable.
+    🔴 **A side whose row equals the ancestor's never wins** — the same rule as
+    a shard's (decision 4). The first form was a plain union with ours winning
+    every `loc`, so a row only THEIR side re-ingested kept OUR stale sha, and a
+    row their side deleted came back; the W-250 dogfood merge committed exactly
+    that. Only when **both** sides changed a row does ours win, matching the
+    driver's instinct of never silently preferring the remote.
     """
-    header = ""
-    rows: dict[str, str] = {}
-    for text in (theirs, ours):  # `ours` second so it overwrites
-        for line in text.splitlines():
-            if line.startswith("#"):
-                header = header or line
-                continue
-            if not line:
-                continue
-            rows[line.split("\t", 1)[0]] = line
-    body = "\n".join(rows[loc] for loc in sorted(rows))
-    head = header or "# loc\tkind\tsha\tdecoder\tfetcher"
+    base_header, base = _register_rows(ancestor)
+    our_header, our = _register_rows(ours)
+    their_header, their = _register_rows(theirs)
+    merged: dict[str, str] = {}
+    for loc in sorted(base.keys() | our.keys() | their.keys()):
+        b, o, t = base.get(loc), our.get(loc), their.get(loc)
+        row = t if o == b else o  # ours unchanged -> theirs; else ours (incl. both changed)
+        if row is not None:
+            merged[loc] = row
+    body = "\n".join(merged[loc] for loc in sorted(merged))
+    head = our_header or their_header or base_header or "# loc\tkind\tsha\tdecoder\tfetcher"
     return f"{head}\n{body}\n" if body else f"{head}\n"
 
 
@@ -225,9 +237,9 @@ def main(argv: list[str] | None = None) -> int:
     # conflicted on the register**, caught by `tests_e2e/test_maintenance.py`.
     #
     # A register line is keyed on `loc` and is **fully derived from the index
-    # beside it**, so the union of two sides is the right answer and there is
-    # nothing to lose by taking it: the next `fux ingest` rewrites the file from
-    # the merged index anyway. ⚠ **That is why it cannot conflict** — unlike a
+    # beside it**, so a three-way union on `loc` (decision 4 per row) is the
+    # right answer: the next `fux ingest` rewrites the file from the merged
+    # index anyway, but the merge commit itself must not carry a stale row. ⚠ **That is why it cannot conflict** — unlike a
     # shard, where two sides editing one document at the same revision is a real
     # disagreement about content.
     # `%P` when git supplied it; `%A`'s name is a temp file and cannot answer.
@@ -235,6 +247,7 @@ def main(argv: list[str] | None = None) -> int:
     if pathname.endswith(_REGISTER_NAME):
         ours.write_text(
             _merge_register(
+                ancestor.read_text(encoding="utf-8") if ancestor.exists() else "",
                 ours.read_text(encoding="utf-8"),
                 theirs.read_text(encoding="utf-8"),
             ),

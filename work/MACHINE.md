@@ -403,6 +403,15 @@ them away with the timings unless they were truncated.
   `gh pr checks <n>` yourself and do not merge on red.
 - Releases publish to PyPI as `fux-engine`. `v0.31.x` was tagged but never
   published; its work shipped inside `v0.32.0`.
+- **The fux merge driver is per clone** (W-250, 2026-10-09). `.gitattributes`
+  is committed with the `.fux/index/` `merge=fux-index` lines, but git reads the
+  driver's command from `.git/config`, which is never committed. **Once per
+  clone, run `.venv/bin/fux hooks`** at the repo root. ⚠ The driver runs
+  `fux-merge-index` **from `PATH`**: merge with `.venv/bin` on `PATH` (or the
+  venv activated), or an index merge fails as a conflict. On this Mac the bare
+  `fux` on `PATH` is a pyenv shim that prints *"command not found"* after
+  every commit, checkout and merge. The hooks swallow it, nothing is blocked,
+  and the noise is harmless.
 
 ## Windows is a first-class target
 

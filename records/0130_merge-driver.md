@@ -6,11 +6,12 @@ title: "SR-MERGE-DRIVER (0130) — the committed index merges line by line, last
 description: "The merge driver for .fux/index/*.jsonl. A shard is a header plus one JSON line per document sorted by id, so the union of two line sets is usually the right answer and a textual merge cannot see it. Higher ver wins; four cases are refused with ordinary conflict markers; the output is sorted so two machines produce the same bytes."
 status: accepted
 date: 2026-08-21
+amended: 2026-10-09
 feature: the merge driver for the committed index
-owns: [src/fux/maintain/mergedriver.py@cd579346e718]
+owns: [src/fux/maintain/mergedriver.py@3d3ea30d2dfd]
 laws: [L2, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 34dfa5e0c533edb744549af011055f12a69ba21952ce8113bebf49e37df55274
+content_sha: 73a78b206ab846c1ac7292adf6ff730bb8ff14b651ca333b149af6cba3227239
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -253,12 +254,21 @@ plane conflicting on the mere fact that two people worked at once, which is the
 one thing this driver exists to prevent; `tests_e2e/test_maintenance.py` caught
 it the day the register landed.
 
-- **The union on `loc`, sorted, and there is no conflict case.** A register line
-  is fully derived from the index beside it, so two sides disagreeing about one
-  `loc` means the two indexes disagree — which the shard half has already
-  resolved by the time this runs. ⚠ **Ours wins a same-`loc` disagreement**,
-  matching this driver's instinct of never silently preferring the remote, and
-  the choice cannot survive an ingest, so it decides nothing durable.
+- **Three-way on `loc`, sorted, and there is no conflict case.** A register
+  line is fully derived from the index beside it, so two sides disagreeing about
+  one `loc` means the two indexes disagree — which the shard half has already
+  resolved by the time this runs. **Decision 4 applies per row:** a side whose
+  row equals the ancestor's never wins, so a row only one side changed, added or
+  deleted takes that side's state. ⚠ **Only when both sides changed one row does
+  ours win**, matching this driver's instinct of never silently preferring the
+  remote; the next ingest rewrites it from the merged index.
+  ⚠ **Until 2026-10-09 this was a plain union with ours winning every `loc`**
+  (W-250). A row only *their* side had re-ingested kept *our* stale sha in the
+  merge commit, and a row their side deleted came back. The sentence that
+  allowed it read *"the choice cannot survive an ingest, so it decides nothing
+  durable"* — but **the merge commit is durable**, and it carried a register
+  that disagreed with the index committed beside it. Tripwire:
+  `test_register_takes_a_row_only_their_side_changed`.
 - 🔴 **`%P` is now the fourth argument, and it is load-bearing.** `%A` is a
   temporary file git creates for the result, so its basename is
   `.merge_file_XXXXXX` and says nothing about which file is being merged. With
@@ -301,10 +311,16 @@ it the day the register landed.
   — but only when **both** sides changed, since decision 4 catches every case
   where one of them did not. **That is the difference between a latent
   correctness bug and a rare one.**
-- ⚠ **This repository does not have the driver registered.** `.gitattributes`
-  carries no `merge=fux-index` line, so fux's own committed index merges
-  textually. Dogfooding the driver means running `fux hooks` here, which nobody
-  has. **Stated because decision 8 makes it silent.**
+- **This repository runs the driver on itself** (W-250, 2026-10-09).
+  `.gitattributes` carries both `merge=fux-index` lines; the `.git/config`
+  registration is per clone and never committed, so each clone runs `fux hooks`
+  once ([`work/MACHINE.md`](../work/MACHINE.md) §Merge and release). The first
+  dogfood merge — two branches re-ingesting two documents in one shard — is
+  [filed](../work/regression/2026-10-09-merge-driver-dogfood/report.md). It found
+  the register defect above. ⚠ **Two things it showed that this record's
+  decisions do not control:** git reads the attribute from the branch being
+  merged **into**, so a branch forked before `.gitattributes` gained the lines
+  merges textually; and `fux-merge-index` must be on `PATH` when git runs.
 - **The gate PASSED on a repaired instrument, and the repair is why.**
   [R6-MERGE](../work/regression/2026-08-20-r6-merge-driver/VERDICT.md) read
   **INCONCLUSIVE**: all three tiers matched, but tier 1 — two documents added on

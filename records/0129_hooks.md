@@ -7,10 +7,10 @@ description: "post-commit DEFERS — it writes a dirty list and spawns a detache
 status: accepted
 date: 2026-08-20
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@86f4407e4d59, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
+owns: [src/fux/maintain@081950a9f115, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 0562a0f94c74db93adbb8946cf376ab5c3aeea09692e0e9ff150c85c1dc69395
+content_sha: 0f5efd2e199b5daa835b900116dc13e6eb48102641c472971f17be79d2087192
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -90,7 +90,7 @@ $ fux hooks
   wrote  post-commit
   wrote  post-merge
   wrote  post-checkout
-  merge driver registered: fux-merge-index %O %A %B
+  merge driver registered: fux-merge-index %O %A %B %P
 ```
 
 It refuses rather than clobbers:

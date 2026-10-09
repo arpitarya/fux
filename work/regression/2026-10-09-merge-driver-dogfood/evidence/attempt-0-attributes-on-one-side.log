@@ -1,0 +1,39 @@
+== fux hooks
+  wrote  post-commit
+  wrote  post-merge
+  wrote  post-checkout
+  merge driver registered: fux-merge-index %O %A %B %P
+== base ingest
+
+real	2m19.641s
+user	2m18.099s
+sys	0m1.263s
+fux: re-indexing in the background (0 changed path(s) pending)
+
+real	0m33.165s
+user	0m32.363s
+sys	0m0.624s
+fux: re-indexing in the background (2 changed path(s) pending)
+side A changed: .fux/index/00.jsonl .fux/index/REGISTER 
+
+real	0m33.157s
+user	0m32.383s
+sys	0m0.634s
+fux: re-indexing in the background (1 changed path(s) pending)
+side B changed: .fux/index/00.jsonl .fux/index/REGISTER 
+== shared index files changed on both sides:
+.fux/index/00.jsonl
+.fux/index/REGISTER
+== merge side-a into side-b
+Auto-merging .fux/index/00.jsonl
+CONFLICT (content): Merge conflict in .fux/index/00.jsonl
+Auto-merging .fux/index/REGISTER
+Automatic merge failed; fix conflicts and then commit the result.
+merge exit: 1
+UU .fux/index/00.jsonl
+M  .fux/index/REGISTER
+M  .gitattributes
+M  work/compare/section-units.compare.md
+== conflict markers in index:        1
+== merged index vs a fresh ingest of the merged tree
+.fux/index/00.jsonl: needs merge

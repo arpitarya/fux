@@ -11,3 +11,7 @@
 *.pdf binary
 *.docx binary
 *.bin binary
+
+# fux: the committed index merges line by line, never textually.
+.fux/index/*.jsonl merge=fux-index
+.fux/index/REGISTER merge=fux-index

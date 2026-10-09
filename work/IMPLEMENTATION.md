@@ -26,6 +26,15 @@ Rules:
 
 ---
 
+## 2026-10-09 — **W-250: the merge driver runs on its own repository, and the register merge is three-way**
+
+| what | evidence |
+|---|---|
+| **dogfood** | `fux hooks` run at this root; `.gitattributes` carries `.fux/index/*.jsonl` and `REGISTER` `merge=fux-index`; MACHINE.md names the per-clone step |
+| **the exercise** | two branches, two documents, one shard: merged with no hand edit ([capture](regression/2026-10-09-merge-driver-dogfood/report.md)) |
+| **defect found and fixed** | `_merge_register` was a union with ours winning and no ancestor, so the other side's re-ingested row stayed stale in the merge commit. It is now three-way on `loc` (decision 4 per row); five tests, two of which fail on the old code. [SR-MERGE-DRIVER](../records/0130_merge-driver.md) amended |
+| **verified** | after the fix, the merged index equals a fresh ingest except for git-derived `mtime`; unit and e2e suites whole |
+
 ## 2026-10-09 — **W-228 closed: `misfit_floor` leaves PROVISIONAL**
 
 | what | evidence |
