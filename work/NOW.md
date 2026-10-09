@@ -3,4 +3,4 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
-🟢 2026-10-05 Claude Code (Opus 5.5): **3.0.0-alpha.11 released** with W-261 ✓, W-262 ✓, W-240 step 3 (gen-4 ladder) and W-264's redact fix; W-264 and W-228 wait on Arpit. **Next: W-250 (`fux hooks` here), then W-240's phase-5 baseline by a fresh session.**
+🟢 2026-10-09 Cowork (Opus 5.5): **inbox ruled** — W-243 closed (133 s accepted), W-264 retired (re-measure is W-267), W-228 🟢 (`misfit_floor` final), W-257 pilot ruled, W-258 still held. **Next: Arpit launches W-257's blind pilot; agents take W-228, W-267, W-250.**

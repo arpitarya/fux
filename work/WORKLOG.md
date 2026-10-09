@@ -23,6 +23,16 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-09 — the inbox, ruled one by one: W-243 ✓ (b) · W-264 ✓ retired → W-267 · W-228 → 🟢 · W-257 pilot · W-258 held  ·  Cowork (Opus 5.5)
+- **Asked:** *"Review the open work document. All the blockers on me … one by one … ratify them."* Five inbox rows, each explained with an example and a recommendation.
+- **W-243 — (b):** *"13 seconds over is okay."* FAST at 133 s accepted as DoD 1; step 1 retired (1.575× vs 5.0×); step 3's in-process tests + second shard and step 4 not pursued. Closed and archived.
+- **W-264 — (a)+(c):** the cache is retired, not built; W-256 §8's re-measure on the fixed engine is filed as **W-267** (🟢 Sonnet, same 5 s bar), and B-002 stays Arpit's on its number. Closed and archived; SR-INGEST's pointer and BACKLOG B-002 repointed; SR-INGEST restamped.
+- **W-228 — (a):** `misfit_floor` 0.20 leaves PROVISIONAL unchanged, with the caveat that it is shown not to false-fire but never yet shown firing. Ratified, not built — 🟢 Sonnet.
+- **W-257 — (a):** the ~50-doc pilot only; the blind author's prompt is in the item. Arpit launches it in `fux-lab`.
+- **W-258:** no ruling given; stays on hold by his word.
+- **Not touched:** no code, nothing under `work/golden/`. Nothing committed.
+- **Next:** Arpit launches W-257's pilot session; agents: W-228, W-267, W-250.
+
 ## 2026-10-05 — the green items, in parallel: W-261 ✓ W-262 ✓ · W-240 step 3 ✓ · W-264 → Arpit · W-228 → Arpit · W-250 held  ·  Claude Code (Opus 5.5, four Opus subagents in worktrees)
 - **Asked:** *"implement everything green in openwork."* Green and Claude-Code-closable: W-240, W-261, W-262, W-250, W-264. W-263/W-265/W-266 are `cowork` research (rule 37a) — not touched.
 - **Corrected on arrival:** NOW.md's pointer was stale — W-259 had already closed in `cf7b7e27`; and prompt 13 had not been deleted when its data was committed there (deleted now, W-240's branch).

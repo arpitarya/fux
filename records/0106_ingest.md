@@ -11,7 +11,7 @@ feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@f24eaaa00126, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@aff448e57338, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 8dbfcade58695a8f5a36939534d03e28d3bf718db14ae535ac102740fe1fb5e6
+content_sha: 909ce71415e7c4a168d20c2f2115d6287a08a61f788646fe1d4bb457961dce48
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -60,9 +60,11 @@ full/delta ratio of **1.45×**, not 23× — and the largest delta segment is
 `redact` (~57 %), not walk or parse
 ([run](../work/regression/2026-10-04-ingest-split/VERDICT.md), `informed`).
 The frozen rule read it as a split result; **Arpit ruled 2026-10-04: a
-redaction cache**, so an unchanged file skips `redact` on a delta —
-[W-264](../work/open/W-264-redaction-cache.md), which first explains why this
-run's `redact` (~6 s) differs from W-239's 0.97 s on the same rung.
+redaction cache**, so an unchanged file skips `redact` on a delta. That item
+first found the ~6 s was a regression (W-255's per-apply lint), fixed: `redact`
+1.0 s, an unchanged delta 5.16 s median. **Arpit retired the cache on
+2026-10-09**, and the split is re-measured on the fixed engine under the same
+5 s bar — [W-267](../work/open/W-267-ingest-split-remeasure.md).
 
 The **write** is incremental too: a shard whose bytes come out identical is left
 untouched on disk, so git sees nothing. Re-running ingest on an unchanged corpus

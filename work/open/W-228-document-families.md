@@ -4,10 +4,29 @@ name: W-228
 description: "A `families` lens in `fux inspect` — deterministic grouping of documents by shape (heading skeleton + frontmatter field set + length profile), the misfits that break their family's shape, `--json` for agents, and a panel on the explorer's Index tab. Ratified 2026-09-27, NOT built."
 item: W-228
 filed: 2026-09-27
-ball: arpit
+ball: agent
 ---
 
 # W-228 — document families: pattern recognition over the corpus, inside `inspect`
+
+✅ **RULED 2026-10-09 (Arpit, Cowork) · ratified, NOT built — *"go with the
+recommendation"*:** `misfit_floor` **0.20 leaves PROVISIONAL, unchanged.** What
+the agent lands, in one change:
+
+1. SR-INSPECT decision 24 drops PROVISIONAL and states the evidence — 3/3
+   planted misfits, 0/3 controls, 8/8 gen-4 rungs, `misfit_share` 1.5–10.7 % —
+   **and the caveat in the same sentence:** the floor is shown not to fire
+   falsely; no corpus has yet shown it firing when it should (none exceeded
+   20 %). Restamp (`scripts/sr-hash.py --write 0156`).
+2. The `[families]` comment in `src/fux/templates/inspect.toml.txt` says the
+   same; the value does not move.
+3. The title-H1 generator slip (generated SOPs carry a template H1 that differs
+   from their front-matter title; that heading sits at 0.803–0.816 against
+   `core_share` 0.80) is logged as a `BACKLOG.md` row for the **next** test-data
+   generation. **No ladder rebuild now.**
+4. Both suites whole; WORKLOG.
+
+**Model:** Claude Code, **Sonnet**.
 
 **Status 2026-10-05: DoD 11 MEASURED. Waiting on 🔴 Arpit to rule on `misfit_floor`.** [`2026-10-05-ladder-gen4-rebuild`](../regression/2026-10-05-ladder-gen4-rebuild/report.md): on all eight gen-4 rungs the lens finds **3/3 planted misfits**, each with the right missing heading, and flags **0/3 controls**. The `misfit_share` flag never fires (1.5–10.7 %, floor 0.20). ⚠ From rung-01000 up, 14–143 unplanted misfits are one generator accident: generated SOPs carry the template's title as an H1 that differs from their front-matter title, and that heading's share sits at 0.803–0.816 against `core_share` 0.80. **The proposal, which no session has applied:** take `misfit_floor` 0.20 off PROVISIONAL unchanged, or keep it provisional until the title-H1 knife-edge is fixed. Changing either is Arpit's tuning call.
 

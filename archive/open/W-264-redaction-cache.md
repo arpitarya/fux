@@ -9,6 +9,14 @@ ball: arpit
 
 # W-264 — unchanged files skip redaction (a redaction cache)
 
+✅ **CLOSED 2026-10-09 — RETIRED by Arpit (Cowork), not built:** *"go with the
+recommendation"* — option **(a) and (c)**. No redaction cache: the ≤ 1 s left is
+not worth a privacy-critical cache whose short key fails open. The W-256 §8
+measurement is re-run on the fixed engine, under a new freeze and the same 5 s
+bar, so B-002 can be ruled →
+[W-267](../../work/open/W-267-ingest-split-remeasure.md). DoD 1's fix (the
+memoised `_compile`) stays.
+
 **Status: STOPPED at DoD 1 on 2026-10-05 — back to Arpit. The cache is not
 built.** The 6 s was a regression, not redaction's cost: W-255 (`f3524f32`)
 made `pii._compile` re-run `_lint` on every `Rule.apply`, 260 180 times at

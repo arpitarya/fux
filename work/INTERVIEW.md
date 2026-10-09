@@ -35,7 +35,16 @@ valuable judgement, but not the state of play.
 *Updated **2026-10-05** (Claude Code, Opus 5.5 — the green items, in parallel).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-10-05 (latest) — W-261 + W-262 BUILT, THE LADDER IS GENERATION 4, TWO ITEMS TO ARPIT
+### 🟢 2026-10-09 (latest) — THE INBOX RULED; W-243 AND W-264 CLOSED
+
+- Arpit (Cowork): *"all the blockers on me … one by one … ratify them."*
+- **W-243 closed (b):** 133 s FAST accepted; step 1 retired at 1.575×; step 3's remainder and step 4 not pursued.
+- **W-264 retired:** no redaction cache; W-256 §8 re-measured on the fixed engine as **W-267** (🟢), then Arpit rules B-002.
+- **W-228 🟢:** `misfit_floor` 0.20 off PROVISIONAL, with the caveat that it has not yet been shown firing; title-H1 generator slip logged for the next generation.
+- **W-257:** pilot ruled (~50 docs); Arpit launches the blind session with the item's prompt. **W-258:** no ruling, held by his word.
+- Next for agents: W-228, W-267, W-250, W-240's phase-5 baseline.
+
+### 🟢 2026-10-05 — W-261 + W-262 BUILT, THE LADDER IS GENERATION 4, TWO ITEMS TO ARPIT
 
 - Arpit (Claude Code): *"implement everything green in openwork."* Four Opus subagents in worktrees; this session combined and verified the branches.
 - **Closed:** W-261 (every component record owns a file; strong rule gated), W-262 (all six W-251 rulings, incl. `find --no-archived` and the breaking library payload change).

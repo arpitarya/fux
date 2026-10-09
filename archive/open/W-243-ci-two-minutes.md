@@ -9,6 +9,15 @@ ball: arpit
 
 # W-243 — CI in about two minutes
 
+✅ **CLOSED 2026-10-09 — RULED (b) by Arpit (Cowork):** *"13 seconds over is
+okay."* FAST at **133 s is accepted** and DoD 1's FAST target becomes that
+measured number. **Step 1 is retired** as measured-and-stopped (1.1–1.4×,
+1.2–1.4×, 1.575× against its 5.0× bar). **Step 3's two open pieces** (in-process
+CLI tests, a second unit shard) **and step 4** (drop `needs:`) **are not
+pursued**, and the whole-run ≤ ~2.5 min target goes with step 4. Steps 2–3 as
+built stay on `main`. The reopen-trigger stands as written at the foot: a
+cheaper default-path scan, or a ruling on what the arm compares.
+
 🔴 **FOR ARPIT, 2026-10-05 — step 1 is out of levers.** W-259's speed run ([VERDICT](../regression/2026-10-04-node-graph-speed/VERDICT.md)): one graph build per Node process gives **1.575×** against step 1's **5.0×** bar — the rest of each comparison is the plain scan (~188 ms), which nothing ruled so far touches. So step 1 stays STOP, and step 4 (*no serial stage*) can only follow step 1. **DoD 1 (FAST ≤ 2 min) stands at 133 s, 13 s over.**
 
 - **(a) Recommended:** retire step 1 as measured-and-stopped (three runs: 1.1–1.4×, 1.2–1.4×, 1.575×); finish **step 3's two open pieces** — in-process CLI tests and a second unit shard — which never depended on step 1 and target the 133 s unit job directly; then re-read DoD 1. Step 4 stays as is.

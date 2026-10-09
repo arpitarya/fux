@@ -9,6 +9,46 @@ ball: arpit
 
 # W-257 — an enriched rung, authored blind
 
+✅ **RULED 2026-10-09 (Arpit, Cowork) — *"go with the recommendation"*: the
+PILOT only, now.** The gen-4 rebuild it waited on is done (W-240, 2026-10-05),
+so only his hand remains. **Arpit** opens **one fresh Claude Code session in
+`~/my_programs/fux-lab`** — not in the fux repo and not in a Cowork project,
+both of which carry failure notes — pastes the prompt below, closes that
+session after its report, and brings the report to any session that is not the
+author. That session reads the first-pass `--check` refusal rate; Arpit reads
+the token cost and rules the full rung. **The pre-registration (DoD 2) is owed
+before the full rung, not before the pilot** — the pilot measures cost and
+refusal, not doc2query.
+
+```text
+You are a BLIND enrichment author for a fux measurement. Do exactly one job, report, and stop.
+
+NEVER open, list, grep, search or read:
+- anything under ~/my_programs/fux/ (the fux repo)
+- any work/golden/questions/, work/golden/golden-answers/ or work/regression/ path
+- any evidence/ folder, query log, result file or failure list
+If any such content reaches you, stop and say so.
+
+1. In ~/my_programs/fux-lab, create a new environment with shared/new-env.sh
+   (read its usage first) named enrich-pilot-gen4. Copy corpora/golden/rung-01000
+   into it. Never modify corpora/golden/ itself.
+2. In the copy, pick ONE source folder that holds roughly 40-60 documents.
+   Add enrich=true to that folder's line in .fux/sources/dirs, and to that line only.
+   Run `fux ingest`.
+3. Run `fux enrich --plan` and take its worklist.
+4. Follow the fux-enrich skill (.claude/skills/fux-enrich; if absent, `fux enrich --help`)
+   and write the questions for every planned document. Use only each document's own text.
+5. Run `fux enrich --check`. Do NOT rewrite refused questions: the first-pass refusal
+   rate is the measurement.
+6. Report, then stop:
+   - the folder chosen
+   - documents planned
+   - questions written
+   - questions refused, with the reasons --check gave
+   - wall-clock time
+   Do not run ask, find, answer or any benchmark afterwards.
+```
+
 **✅ RULED 2026-10-04 (Arpit, Cowork) — *"Go with the recommendation. But keep it
 blocked until I say that we need to run this."*** So:
 
