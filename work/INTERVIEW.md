@@ -32,10 +32,16 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-10** (Claude Code, Opus 5.5 — W-236 Part B).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-10** (Claude Code, Opus 5.5 — W-269).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-10-10 (latest) — W-236 CLOSED: SECTION RECORDS FAIL (DRIFT), PARKED
+### 🟢 2026-10-10 (latest) — W-269: GAIN-ONLY SECTION TERM AMENDED, FROZEN, BUILT; NOT CAPTURED
+
+- Arpit's ruling after W-236's FAIL: try the gain-only term. **SR-SECTIONS d5 amended**, the bar **frozen** ([pre-registration](regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md)), **built** on both readers on branch `claude/gracious-galileo-aqrg8b`, unmerged.
+- A sectionless document now gains exactly zero (unit-tested on scan and accelerator); G3 tests the same on the rung.
+- **Next:** capture needs `fux-lab` on Arpit's machine; then 🔴 he scores; a non-capturing session decides. A PASS still waits on the 8.0× size ruling before any merge.
+
+### 🔴 2026-10-10 — W-236 CLOSED: SECTION RECORDS FAIL (DRIFT), PARKED
 
 - Arpit scored the five arms and ran the frozen decider himself: **FAIL — drift** ([verdict](regression/2026-10-10-section-records/VERDICT.md)). Every λ lost rank-1 hits; the pool got worse.
 - **Why:** B2 favoured SHORT documents (best section ≈ whole doc), not the long ones it targets. Offered a gain-only term or B1; **Arpit parked it**.

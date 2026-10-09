@@ -9,7 +9,17 @@ ball: agent
 
 # W-269 — section records, second mechanism: gain-only
 
-**Status: filed 2026-10-10, not started.** 🟢 for Claude Code, **Opus**.
+**Status: DoD 1–3 done 2026-10-10, DoD 4 next.** 🟢 for Claude Code, **Opus**, **on Arpit's machine** (the arms need `fux-lab/corpora/golden/`).
+
+| DoD | state | where |
+|---|---|---|
+| 1 · SR-SECTIONS d5 amended, compare doc noted | ✅ `113ae3b4` | [SR-SECTIONS](../../records/0161_sections.md) decision 5 |
+| 2 · pre-registration frozen, committed alone | ✅ `4f5504d1` | [PRE-REGISTRATION](../regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md): λ ∈ {0.25, 0.5, 1.0, 2.0}; G0 · G1 · G2 · **G3** |
+| 3 · built, both readers, both suites | ✅ `03fbf782` | branch `claude/gracious-galileo-aqrg8b`: `w236-sections` (`f2a139fd`) with `main` merged in (`81b0989a`), then the three commits above. Unmerged |
+| 4 · capture | ⏳ | the pre-registration's §The arms and §Gates, in order: the base, G0 (`g0.py`), G1 (W-236's `g1.py`), the five arms, G3 (`g3.py`). Then 🔴 Arpit scores |
+| 5 · verdict | — | a session that did not capture runs `decide.py`, which refuses without a G3 PASS |
+
+⚠ **Both suites on the branch:** the same three groups of failures W-236's build left, all from **this repository's own index still at `fux.index.v7`** (2 unit, 12 Node): the merge owes its re-ingest and the size ruling. e2e is green. Nothing W-269 changed is among them.
 
 **Arpit, 2026-10-10 (Cowork),** on W-236's FAIL: *"Ideally, it should have
 worked. Research-wise failed."* Then, on the recommended fix: *"Okay. Let's

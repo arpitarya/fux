@@ -28,6 +28,13 @@ play: the worklog is the granular, per-exchange trail.
 - **Done:** `placebo.py --per-line` (0/1,000 files off on line count, −1.1 % words; stamps any `skill:`), with tests and SR-RS d15's row. AMENDMENT.md, `decide.py` (B-108/B-109) and `tilt.py` (B-110) were committed together in `79bc22ea`, before any arm was scored. `build_arms.py` built `filtered` (837 removed), `placebo`, `cov-25` (250) and `cov-50` (500). All seven were ingested and run through `golden_run.py` on `a07f9329`. `none` = the 2026-10-09 capture 90/90. Both suites pass.
 - **Committed by another session** (`c739dac1`, at Arpit's *"commit everything"*): report, ANALYSIS, evidence. **Next:** 🔴 Arpit `just golden-score`, then a non-capturing session runs the deciders. ⚠ This entry is uncommitted: WORKLOG holds a Cowork entry that is also uncommitted.
 
+## 2026-10-10 — W-269 DoD 1–3: the gain-only section term, amended, frozen, built  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement w269"* (after Arpit pushed `main` and `w236-sections`).
+- **Done:** branch `claude/gracious-galileo-aqrg8b` = `f2a139fd` + `main` merged (`81b0989a`, stamp conflicts only). SR-SECTIONS d5 → `G = max(0, max_k S_sec − S_self)` (`113ae3b4`). Pre-registration frozen alone (`4f5504d1`): W-236's bar and decider, λ ∈ {0.25, 0.5, 1.0, 2.0}, G3 by `g3.py`. Build (`03fbf782`): `_section_gain` / `sectionGain`; the accelerator needed no change (ceiling bounds `S_sec ≥ G`; theta never carries the term).
+- **Decided:** G3 compares `rank()`'s term contributions, not the final `score`, because the proximity uplift moves with the rerank window. A gain of zero names no section.
+- **Tests:** three new section tests fail on B2 (16/17) and pass now. Unit: 2 fail, e2e: green, Node: 12 fail — all the branch's own v7-index failures, same set before and after this change.
+- **Not done:** DoD 4 — the corpora are on Arpit's machine, not in this container. **Next:** a session there captures; 🔴 Arpit scores.
+
 ## 2026-10-10 — W-236 explained; W-269 filed (gain-only section term)  ·  Cowork (Opus 5.5)
 - **Asked:** W-236's status, Parts A/B, a review of SR-SECTIONS, W-257's state and how to run it; then why W-236 failed when the literature says passage evidence helps; then *"create a work item for a recommended approach."*
 - **Why it failed (as explained):** `b = 0.15` already removes most of the length penalty the literature's gains recover; and B2 gave a sectionless (short) document ≈ λ × its whole score, so short documents climbed — the pre-registration's own *hurts* row.
