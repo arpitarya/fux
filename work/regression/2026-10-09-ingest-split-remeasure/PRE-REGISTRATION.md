@@ -1,0 +1,139 @@
+---
+type: Pre-registration
+name: PRE-REG-INGEST-SPLIT-2
+description: "W-267 - frozen before the measurement: the unchanged-delta ingest at fux-lab rung-10000 (generation 4, a throwaway copy) re-timed on the fixed engine (redact memoised, W-264 DoD 1), three interleaved repeats, identical root sha required. The decision rule is W-256 section 8's, copied verbatim and unmoved: delta non-extract under 5 s closes B-002; 5 s or more with walk+parse dominant files a parse-cache item; anything else goes to Arpit."
+run: 2026-10-09-ingest-split-remeasure
+item: W-267
+frozen: 2026-10-09
+---
+
+# W-267 - the unchanged delta, re-timed on the fixed engine
+
+**Frozen 2026-10-09, before any timing exists.** The run directory holds this
+file and nothing else until the measurement lands. A latency run: no golden
+question, key or score is read, and no per-query quality row exists. It is
+**`informed`** (section 6), which costs nothing because the endpoint is a clock.
+
+## 1 - Why this run exists
+
+[PRE-REG-INGEST-SPLIT](../2026-10-04-ingest-split/PRE-REGISTRATION.md) (W-256
+section 8) measured an engine that carried W-255's `redact` regression: `_lint`
+re-parsed every pattern on every string, 6 s of a 10.39 s delta. Its verdict was
+the split result and went to Arpit. W-264 DoD 1 memoised the compiled pattern;
+the [addendum](../2026-10-04-ingest-split/ANALYSIS.md) measured `redact` at
+1.03-1.09 s and a whole unchanged delta at a 5.16 s median. That figure is the
+**whole delta**. The rule's quantity is **N, the non-extract time**, and no run
+has measured N under a freeze on the fixed engine. Arpit ruled on 2026-10-09
+(W-264): re-measure, and B-002 is his on the number.
+
+## 2 - The decision rule (verbatim from W-256 section 8; it may not move)
+
+Copied from the 2026-10-04 pre-registration, section 2, unchanged
+([SR-RS](../../../records/0133_predictions.md) decision 10b):
+
+Let **N** = the **median over the three delta repeats** of
+*(delta total wall time) - (the delta's `extract` phase time)*, at rung-10000.
+
+- **N < 5 s -> B-002 closes.** The dirty list stays advisory
+  (`maintain/dirty.py`'s docstring is true), SR-MAINTENANCE 1a-3 cites the run,
+  and option D is *not needed at the design point*.
+- **N >= 5 s AND walk + parse dominate -> a runtime parse cache keyed on content
+  sha becomes its own item** (`.fux/runtime/parsed/`, pure in
+  (sha, header, digests) like `_reusable`; M-L, Opus). **"Walk + parse dominate"
+  is defined in section 4** and is decided on the same median.
+- **Either outcome rewrites SR-INGEST section 1's 23x.**
+
+### What the rule does NOT cover - unchanged
+
+1. **N >= 5 s but walk + parse do NOT dominate**: a **split result. It goes to
+   Arpit, not to the runner.**
+2. **The three repeats straddle 5 s** (at least one below, at least one at or
+   above): ambiguous, **handed to Arpit**. The median is reported but does not
+   decide on its own.
+3. **Exactly 5.000 s** is "at or above". The unit is seconds to the millisecond
+   the script prints.
+
+**What this run adds to who decides:** W-267 DoD 4 sends the outcome to Arpit
+in every case. A clean `N < 5 s` lets the record sentences be rewritten on the
+number; **closing B-002 is still his ruling**, filed as an inbox row.
+
+## 3 - The corpus: one change from the 2026-10-04 run, named now
+
+| | |
+|---|---|
+| corpus | **`fux-lab` `corpora/golden/rung-10000`, generation 4** (rebuilt 2026-10-05, [the run](../2026-10-05-ladder-gen4-rebuild/report.md)). [L9](../../../records/0011_LAW-9-use-record.md): never `fux-playground` |
+| ⚠ **differs from the 2026-10-04 run** | that run timed **generation 3**. Generation 4 is the ladder the committed manifest now describes, so it is the only rung `rungs.verify` can check. Its 10 000 documents include the 26 new seeds' expansions (four of them long, ≥ 1 300 words). **The bar is absolute (5 s), so the rule does not care; a comparison of this N with 10.39 s or 5.16 s does, and the report states it as across generations** |
+| lab commit | `fux-lab` HEAD `ed46bfefbe18bc35139ed2a909a2d4382fc15cbd` (read 2026-10-09). The lab tracks no rung |
+| what pins the bytes | the rung's own git HEAD **`99fe0b4d7b077305f93647b7ac3e6671a01ca0bb`**, one untracked file (`fux.toml`); the committed manifests `work/golden/ladder/rung-10000.sha256` / `.index` |
+| what is timed | a **throwaway copy** of the rung (`cp -R` into the session scratchpad); `fux doctor --fix`, `fux ingest --full`, `fux build` in the copy only |
+| never touched | nothing in `~/my_programs/fux-lab` is modified, re-ingested, rebuilt or deleted. The copy is deleted by the session that made it |
+| copy verified | `rungs.verify("rung-10000", <lab rung>)` returns `[]` **before** the copy; after the copy and its re-ingest, every per-document hash matches the manifest: **0 missing, 0 drifted**, or the run is void. An index-root difference after the re-ingest is reported, not voiding: the copy's index is regenerated by this engine on purpose |
+| key | **No key is read** ([L11](../../../records/0013_LAW-11-sealed-answer-key.md)). The only path under `work/golden/` reached is `ladder/`, through `rungs.verify` |
+| engine commit | recorded at run time. `src/fux/ingest/` (redaction is `ingest/pii.py`), `src/fux/store/` and `tools/quality-controls/ingest_split.py` must equal the freeze commit's, or the run says what moved |
+
+## 4 - The instrument: unchanged
+
+[`tools/quality-controls/ingest_split.py`](../../../tools/quality-controls/ingest_split.py),
+**byte-identical to the 2026-10-04 run's**, with the same cuts and the same
+definitions. The 2026-10-04 pre-registration's section 4 is the definition and is
+not restated: **walk** = `before:walk` + `walk`; **parse** = the gap after the
+`walk` event; **N** = total - `extract`; **walk + parse dominate** = (walk +
+parse) > 50 % of N on the median repeat **and** on at least two of three.
+
+⚠ **The item text says "that run's `evidence/phase_times.py`".** No such file
+is in that run; the 2026-10-04 pre-registration section 4 explains why
+`phase_times.py` cannot produce this split. **The harness that run used is
+`ingest_split.py`, and it is the one used here.**
+
+Each timed run is a fresh process; interpreter start-up and imports are not in N.
+
+## 5 - The protocol (the 2026-10-04 protocol, unchanged)
+
+1. Verify the rung; `cp -R`; `fux doctor --fix`; `fux ingest --full`;
+   `fux build` in the copy; verify the copy's documents.
+2. `ingest_split.py run <copy> --repeats 3 --out evidence/`: one warm-up full
+   ingest, discarded; three repeats of one delta and one full, interleaved
+   (delta first on odd repeats). Six timed runs.
+3. Load average recorded before every run. **A repeat taken under a load
+   average above half the core count (5 of 10) is reported and re-taken once,
+   both attempts filed.** This session runs nothing else while timing; another
+   session's load is named in the report if seen.
+
+## 6 - Validity conditions (any failure is a VOID run)
+
+- **Identical root sha** across the warm-up, all three deltas and all three
+  fulls ([L4](../../../records/0006_LAW-4-deterministic.md)).
+- **Each delta is a true delta**: `changed == 0` and `reused == docs`.
+- `fux build` is outside the clock.
+- 10 000 documents is the design point and a ceiling
+  ([SR-WORK-SCALE](../../../records/0057_WORK-scale.md)); nothing above it is
+  claimed.
+
+## 7 - Reported besides the endpoint
+
+Full/delta ratio on median totals; the per-segment split of all six runs; the
+three N values individually; the `redact` segment beside the 2026-10-04 run's,
+**as a cross-generation comparison, flagged as one**.
+
+## 8 - Classification, authorship, limits
+
+**`informed`**, permanently: instrument, engine and this document are one model
+family's.
+
+| artifact | author | could reach |
+|---|---|---|
+| the rung | the gen-4 rebuild session, 2026-10-05, from `seed/` | the seed corpus; nothing of this run |
+| the instrument | Claude Code, 2026-10-04 (W-256), unchanged | the engine and the copy; no key |
+| this document and the run | Claude Code, 2026-10-09 (W-267) | the code and the rungs; **not** `work/golden/` answers |
+
+It cannot show: cost on larger, more numerous or decoder-heavy corpora; timing
+on another machine (macOS, one 10-core box, Python 3.14.3); a dirty-list
+speedup (this times a delta with **no** change); Windows or Linux.
+
+## 9 - What would make this wrong
+
+- `tail` carrying the majority of N: the split result of section 2 item 1,
+  reported as such and not re-cut.
+- A change to `src/fux/ingest/run.py`'s phase calls between this freeze and the
+  run: reported, not absorbed.
+- The copy's documents drifting from the manifest.
