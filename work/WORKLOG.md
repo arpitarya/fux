@@ -23,6 +23,17 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-10 — W-257: placebo STOP ruled → amendment 1 → seven arms captured  ·  Claude Code (Opus 5.5)
+- **Asked:** *"go with the recommended approach"* (the placebo STOP's ruling).
+- **Done:** `placebo.py --per-line` (0/1,000 files off on line count, −1.1 % words; stamps any `skill:`), with tests and SR-RS d15's row. AMENDMENT.md, `decide.py` (B-108/B-109) and `tilt.py` (B-110) were committed together in `79bc22ea`, before any arm was scored. `build_arms.py` built `filtered` (837 removed), `placebo`, `cov-25` (250) and `cov-50` (500). All seven were ingested and run through `golden_run.py` on `a07f9329`. `none` = the 2026-10-09 capture 90/90. Both suites pass.
+- **Committed by another session** (`c739dac1`, at Arpit's *"commit everything"*): report, ANALYSIS, evidence. **Next:** 🔴 Arpit `just golden-score`, then a non-capturing session runs the deciders. ⚠ This entry is uncommitted: WORKLOG holds a Cowork entry that is also uncommitted.
+
+## 2026-10-10 — W-236 explained; W-269 filed (gain-only section term)  ·  Cowork (Opus 5.5)
+- **Asked:** W-236's status, Parts A/B, a review of SR-SECTIONS, W-257's state and how to run it; then why W-236 failed when the literature says passage evidence helps; then *"create a work item for a recommended approach."*
+- **Why it failed (as explained):** `b = 0.15` already removes most of the length penalty the literature's gains recover; and B2 gave a sectionless (short) document ≈ λ × its whole score, so short documents climbed — the pre-registration's own *hurts* row.
+- **Filed:** **W-269** (🟢, `fux build`, Opus): a gain-only term, `G = max(0, best section − the document scored as one unit)`, so a sectionless document gains 0; W-236's frozen bar unchanged, plus a G3 gate (sectionless scores byte-identical at every λ); built from branch `w236-sections`. `b` untouched.
+- **Not touched:** no code, no record. Nothing committed: the working tree carries other sessions' uncommitted edits.
+
 ## 2026-10-10 — W-236 closed: section records FAIL (drift), parked by Arpit  ·  Claude Code (Opus 5.5)
 - **Asked:** Arpit scored the five arms, then ran the frozen `decide.py` himself: **FAIL — drift** (rank-1 losses 4 · 5 · 9 · 10; pool misses 23 → 26 · 26 · 28 · 28). Filed as his: [VERDICT](regression/2026-10-10-section-records/VERDICT.md).
 - **Diagnosed** from per-query rows and hand-offs (ids, ranks, document lengths; no key): the displaced rank-1 documents were long (median 15 sections), the new #1s short (~70–110 body words). B2 rewards a document whose best section is nearly itself.

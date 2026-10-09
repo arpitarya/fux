@@ -36,6 +36,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
+- 🟢 **W-269** · `agent` — W-236's second mechanism: a gain-only section term (sectionless docs gain 0) on branch `w236-sections`. Amend SR-SECTIONS, pre-register W-236's bar unchanged, build, capture; Arpit scores. **Opus.** [detail](open/W-269-section-gain-only.md)
 
 ### testing
 
