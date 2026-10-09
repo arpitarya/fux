@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "quality-controls"))
 
-from placebo import POOL, placebo_body  # noqa: E402
+from placebo import POOL, SKILL_LINE, placebo_body, placebo_lines  # noqa: E402
 from seal import SEALED_COUNT, split  # noqa: E402
 
 IDS = [f"q{n:03d}" for n in range(1, 51)]
@@ -78,6 +78,27 @@ def test_every_placebo_shares_one_vocabulary():
     for sha in ("aaa", "bbb", "ccc", "ddd"):
         words = {w.lower().strip(".,") for w in placebo_body(sha, 110).split()}
         assert words <= pool_words, words - pool_words
+
+
+def test_the_per_line_placebo_matches_line_count_and_shape():
+    """W-257's amendment: question-shaped enrichment is one question per line,
+    and the control must match LINE count, not only length. A one-word line
+    still gets a sentence — an empty line is a line the real arm lacks."""
+    body = "- What is the cut-off day for payroll?\n\n- Who?\nHow long can the dairy run take in the monsoon season on the hill road?\n"
+    made = placebo_lines("abc", body)
+    lines = made.splitlines()
+    assert len(lines) == 3
+    assert all(l.strip() for l in lines)
+    assert lines[0].startswith("- ") and lines[1].startswith("- ") and not lines[2].startswith("-")
+    assert made == placebo_lines("abc", body)
+    pool_words = {w.lower().strip(".,") for s in POOL for w in s.split()}
+    words = {w.lower().strip(".,") for w in made.replace("- ", " ").split()}
+    assert words <= pool_words, words - pool_words
+
+
+def test_the_placebo_stamp_replaces_any_skill_version():
+    head = "---\nsource: a.md\nskill: fux-enrich\n---"
+    assert SKILL_LINE.sub("skill: placebo", head) == "---\nsource: a.md\nskill: placebo\n---"
 
 
 def test_the_placebo_carries_no_document_specific_term():

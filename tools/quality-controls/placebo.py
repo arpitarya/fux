@@ -24,16 +24,21 @@ fluent text* and nothing else.
 out. No model is called — this is the control *for* model-written text, and
 generating it with a model would be circular.
 
+**`--per-line`** (W-257, 2026-10-10) matches **line count** too: one placebo
+line per question line, each word-matched to its line. Without it the body is
+one paragraph, byte for byte what every earlier run used.
+
 **It is NOT installed anywhere.** It writes to an output directory you name, and
 a measurement swaps it in. Installing a control into `.fux/enrich/` would
 silently replace the corpus everything else is graded against.
 
-    python3 tools/quality-controls/placebo.py <enrich-dir> <out-dir>
+    python3 tools/quality-controls/placebo.py [--per-line] <enrich-dir> <out-dir>
 """
 
 from __future__ import annotations
 
 import hashlib
+import re
 import sys
 from pathlib import Path
 
@@ -89,7 +94,37 @@ def placebo_body(sha: str, words: int) -> str:
     return " ".join(out)
 
 
-def main(src: Path, dst: Path) -> int:
+#: The frontmatter's `skill:` stamp, whatever skill version wrote it.
+SKILL_LINE = re.compile(r"^skill:.*$", re.M)
+
+#: A line's list marker, kept so a placebo line is shaped like the line it
+#: replaces. `is_question` strips the same characters.
+BULLET = re.compile(r"^\s*[-*]\s+")
+
+
+def placebo_lines(sha: str, body: str) -> str:
+    """One placebo line per non-empty `body` line, each matched to that line's
+    word count — W-257's amendment (2026-10-10).
+
+    ⚠ **Why per line.** Question-shaped enrichment is one question per line, and
+    the pre-registration matches the control on **line count** as well as
+    length. `placebo_body` writes one paragraph, so it matches length and not
+    lines. Each line is seeded by `sha` and its index, so the output stays
+    deterministic and seedless, and each line holds **at least one sentence**:
+    the closest-side stop would otherwise return nothing for a line shorter
+    than half a sentence, and an empty line is a line the real arm does not have.
+    """
+    out: list[str] = []
+    for i, line in enumerate(l for l in body.splitlines() if l.strip()):
+        marker = BULLET.match(line)
+        prefix = marker.group(0).strip() + " " if marker else ""
+        words = len(BULLET.sub("", line).split())
+        made = placebo_body(f"{sha}:{i}", words) or POOL[hashlib.sha256(f"{sha}:{i}".encode()).digest()[0] % len(POOL)]
+        out.append(prefix + made)
+    return "\n".join(out)
+
+
+def main(src: Path, dst: Path, per_line: bool = False) -> int:
     files = sorted(src.glob("*.md"))
     if not files:
         print(f"no enrichment files in {src}", file=sys.stderr)
@@ -101,11 +136,12 @@ def main(src: Path, dst: Path) -> int:
         head = (head + "\n---") if head else ""
         sha = f.stem
         target = len(body.split())
-        made = placebo_body(sha, target)
+        made = placebo_lines(sha, body) if per_line else placebo_body(sha, target)
         # The marker is in the frontmatter, never in the body: a body marker
         # would be a term the real arm does not have, and the arms must differ
-        # in content alone.
-        head = head.replace("skill: fux-enrich@1", "skill: placebo (SR-RS decision 15)")
+        # in content alone. ⚠ Any `skill:` stamp, not only `fux-enrich@1` — the
+        # W-257 rung is stamped `skill: fux-enrich` and kept the real label.
+        head = SKILL_LINE.sub("skill: placebo (SR-RS decision 15)", head)
         (dst / f.name).write_text(f"{head}\n{made}\n" if head else f"{made}\n", encoding="utf-8")
         print(f"{f.name}  real {target}w -> placebo {len(made.split())}w")
     print(f"\n{len(files)} placebo file(s) -> {dst}")
@@ -114,7 +150,10 @@ def main(src: Path, dst: Path) -> int:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    argv = sys.argv[1:]
+    per_line = "--per-line" in argv
+    argv = [a for a in argv if a != "--per-line"]
+    if len(argv) != 2:
         print(__doc__.strip().splitlines()[-1], file=sys.stderr)
         raise SystemExit(2)
-    raise SystemExit(main(Path(sys.argv[1]), Path(sys.argv[2])))
+    raise SystemExit(main(Path(argv[0]), Path(argv[1]), per_line=per_line))

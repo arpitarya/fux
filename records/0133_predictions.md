@@ -11,7 +11,7 @@ feature: the prediction system — the R ids, their register, the rules that mak
 owns: [tests/test_regression_runs.py@5d8ba6a4bdcd, tools/t2-eval@cc5410393ce4, tools/quality-controls@821c77744e32, tools/vector-gate@0023bff0cdef, tools/section-size@25bfc75777a6]
 laws: [L4]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: e675b98850e8c7fbe028a3cf88ba70f47da9117789129c4f3f66aff1df61dc10
+content_sha: 8b250725b3e285bdb9a440be0a7c642f7fca23a469d2c6b9a794980fce95a624
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -403,7 +403,7 @@ ruled its power tension.
 
 | control | state |
 |---|---|
-| content-free placebo, matched length | ✅ **built** — one shared sentence pool so every placebo has the same vocabulary and cannot discriminate; length matched to within a few words; deterministic from the source sha (L4), no model |
+| content-free placebo, matched length | ✅ **built** — one shared sentence pool so every placebo has the same vocabulary and cannot discriminate; length matched to within a few words; **`--per-line` also matches line count** for question-shaped enrichment, one word-matched line per question (W-257, 2026-10-10); deterministic from the source sha (L4), no model |
 | decoy query set | ✅ **built** — 15 domain-plausible questions the corpus cannot answer. ⚠ **The one kind of evaluation material an agent may author**: no correct answer exists, so there is nothing to fit |
 | **sealed subset** | ✅ **built 2026-08-28** — 15 of 50, split by `sha256(id)`: deterministic, seedless, order-independent |
 | **intent-split prior probes** | ✅ **built 2026-09-12** — 26 probes, 13 current-seeking / 13 history-seeking, over the golden ladder's declared `supersedes:` pairs and `archived=true` directories. ⚠ **Truth is MECHANICAL, read off a declaration**, which is what lets an agent author them: there is a correct answer, but nobody chose it. Adjudicated W-143 the day it was built |
