@@ -1,0 +1,26 @@
+{
+ "delta_non_extract_median_s": 4.902,
+ "delta_non_extract_s": [
+  4.894,
+  4.908,
+  4.902
+ ],
+ "delta_total_median_s": 4.902,
+ "delta_walk_parse_s": [
+  2.25,
+  2.283,
+  2.262
+ ],
+ "delta_walk_parse_share": [
+  0.46,
+  0.465,
+  0.461
+ ],
+ "docs": 10000,
+ "full_over_delta": 1.92,
+ "full_total_median_s": 9.436,
+ "identical_root_sha": true,
+ "index_sha256": "3b557e622e514adc6b4f9b33bcd9c0d00d28acaf3fe6d5fa15f44cb2105109bb",
+ "problems": [],
+ "repeats": 3
+}

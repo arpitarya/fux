@@ -1,0 +1,18 @@
+engine: 0fec04d1827e12a9e76ab8446e6d123ac18f3bd0  fux fux 3.0.0-alpha.11
+lab: ed46bfefbe18bc35139ed2a909a2d4382fc15cbd  rung: 99fe0b4d7b077305f93647b7ac3e6671a01ca0bb
+== verify lab rung before copy
+[]
+== doctor --fix
+[WARN] ranking priors: BUILT, WIRED AND SWITCHED OFF at these values: rerank_weight=0. Each is implemented and reads its input, and at the value shown it returns the score unchanged. fux states this and does NOT recommend a value: the one change ever measured (superseded_weight at 0.5, a knob since REMOVED) fixed two queries and broke two, and every broken one had the superseded document as its correct answer. Also: intent_weight=0.1 (0 document(s) of a preferred type: decision=0, procedure=0, reference=0) - so changing this value would change NOTHING in this repository ([doctype] in tune.toml is empty, so the prior is not in use)
+[OK] priority keys: no [priority] keys declared
+[OK] freshness verdicts: no receipts journalled - run an answer with `--journal` to record verdicts. Until then the as-ingested share (SR-ACQUIRED and SR-URL-FRESHNESS's veto condition) cannot be computed
+== ingest --full
+ingested 10000 docs (0 changed, 0 carried forward), 0 not indexed, 0 skipped, 0 shards written
+accelerator: 31231 terms, 37379 blocks, 905044 postings (derived, not committed)
+$R/.venv/bin/fux ingest --full 2>&1  9.37s user 1.61s system 91% cpu 11.995 total
+tail -3  0.00s user 0.00s system 0% cpu 11.995 total
+== build
+accelerator rebuilt from the committed index: 10000 docs, 31231 terms, 37379 blocks, 905044 postings
+== verify copy
+[]
+== lab untouched: ?? fux.toml 

@@ -9,6 +9,17 @@ ball: agent
 
 # W-267 — re-time the no-change ingest, so B-002 can be ruled
 
+**Status 2026-10-09: DoD 1–3 and 5 DONE (Claude Code, Opus 5.5). 🔴 Waiting on Arpit for DoD 4: rule B-002.**
+[The run](../regression/2026-10-09-ingest-split-remeasure/report.md) gives
+**N = 4.902 s** (4.894 / 4.908 / 4.902) at gen-4 rung-10000, under the 5 s bar
+with no straddle. Identical root sha on all seven runs; redact 0.96 s; full/delta
+1.92×. **The frozen rule's close branch** ([VERDICT](../regression/2026-10-09-ingest-split-remeasure/VERDICT.md)):
+the dirty list stays advisory and option D is not needed at 10 000 documents.
+SR-MAINTENANCE 1a-3 and SR-INGEST §1 are rewritten on the number and
+restamped. ⚠ The margin is 0.092 s on one machine.
+**The question for Arpit:** close B-002 on this number? Recommended: **yes**.
+The frozen rule says close, and the margin caveat is now in both records.
+
 **Arpit, 2026-10-09 (Cowork), on W-264:** *"go with the recommendation"* —
 retire the redaction cache **and** re-measure on the fixed engine. Ratified, not
 built.

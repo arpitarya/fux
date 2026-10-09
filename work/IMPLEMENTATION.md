@@ -26,6 +26,15 @@ Rules:
 
 ---
 
+## 2026-10-09 — **W-267: the unchanged delta is 4.90 s on the fixed engine — B-002's close branch**
+
+| what | evidence |
+|---|---|
+| **the run** | [2026-10-09-ingest-split-remeasure](regression/2026-10-09-ingest-split-remeasure/report.md): pre-registered at `d8113b7f`, same instrument, gen-4 rung-10000 scratch copy, identical root sha ×7 |
+| **the number** | N = 4.902 s (4.894 / 4.908 / 4.902) < 5 s, so W-256 §8's close branch; `redact` 0.96 s; full 9.44 s, 1.92× |
+| **records** | SR-MAINTENANCE 1a-3 and SR-INGEST §1 rewritten on the number and restamped; BACKLOG B-002 waits on Arpit's word |
+| **not done** | DoD 4, B-002's closure, is Arpit's (inbox) |
+
 ## 2026-10-09 — **W-250: the merge driver runs on its own repository, and the register merge is three-way**
 
 | what | evidence |
@@ -6197,6 +6206,7 @@ it closed by ratification, not by landing; see the W-27 row above.
 | W-252-NODE-ARM | ✅ **PASS** (2026-10-04) — PRE-REG-NODE-3: the Node differential arm on lab rung-01000 and rung-10000 (v7 copies), against *0 discordant of 801 per pass, identical graph digests, a Node-built plane equal to Python's*. **0/801 on all four passes; digests identical; 602/602 build files byte-equal** after the build check was re-run with its deletion step corrected (disclosed). `informed` | [VERDICT](regression/2026-10-04-node-arm-2/VERDICT.md) |
 | PRE-REG-DOC-COVERAGE | 🔴 **INCONCLUSIVE** (2026-10-04) — W-256 §2, abstention gate 2: a fixed grid of `doc_coverage_floor` replayed over the W-213 rows at rung-01000, against *≥ 50 % caught, fewer correct demoted than a coin, p ≤ 0.00625, per-set consistent*. Only 0.80 meets the point criteria; **p = 0.35**, one set of three. Floor stays 0.0; **Arpit's — W-260 §1** | [VERDICT](regression/2026-10-04-doc-coverage-replay/VERDICT.md) |
 | PRE-REG-INGEST-SPLIT | ⚠ **split result → Arpit** (2026-10-04) — W-256 §8 at rung-10000: delta non-extract median **10.39 s** (≥ 5 s, no straddle) but walk+parse 24–30 %, `redact` ~57 %; the frozen rule sends this case to Arpit — **W-260 §2**. Full/delta 1.45× | [VERDICT](regression/2026-10-04-ingest-split/VERDICT.md) |
+| PRE-REG-INGEST-SPLIT-2 | ✅ **close branch → Arpit** (2026-10-09) — W-267, W-256 §8's rule re-run on the fixed engine at gen-4 rung-10000: delta non-extract median **4.902 s** (4.894–4.908, no straddle) < 5 s; `redact` 0.96 s; full/delta 1.92×. B-002 closes on Arpit's word. Margin 0.092 s | [VERDICT](regression/2026-10-09-ingest-split-remeasure/VERDICT.md) |
 | PRE-REG-LOOPBACK | ✅ **PASS** (2026-10-04) — W-256 §4 on 127.0.0.1: B-102 (429 retries, backoff, `rate_limited[host]`, doctor) 14/14 and B-124 (`keep=true`, `as-ingested` with matching sha once down, the quarter veto) 13/13; B-103 (Windows) excluded | [VERDICT](regression/2026-10-04-loopback-network/VERDICT.md) |
 | W-236-SECTION-SIZE | ✅ **PASS** (2026-09-30) — [SR-SECTIONS](../records/0161_sections.md)' section plane against two frozen commit limits at `rung-10000`: largest file ≤ 50 MiB (measured 168,451 B) and whole index ≤ 1 GB (50,351,784 B). 🔴 **The index grows +98.4 % (+79.6 % after zlib)** — reported, not graded: no record sets a growth bar. U3 would save ~2 MB of the 25 MB added. `.jsonl`/`.pdf`/`.pptx` section cost unmeasured (the ladder has none). `blind`, key-free | [verdict](regression/2026-09-30-section-size/VERDICT.md) |
 | W-168-STEP-5-RM3 | ❌ **FAIL — drift** (ruled by Arpit 2026-09-23; the table said INCONCLUSIVE) — RM3 pseudo-relevance feedback, `rm3_weight ∈ {0.1, 0.2, 0.3, 0.5}` vs `0.0`, `hit@1` on the 92 tagged questions of `set-2-claude` at `rung-01000`. **No arm clears the gain bar** (nets −1/−1/+3/+2 against 7–10 needed) and **every arm breaks the drift bound** (6/8/8/11 baseline rank-1 hits lost); `hit@10` falls 102 → 89–94. The frozen table has no row for a positive sub-floor net with drift broken, and he filed it **FAIL**. **`rm3_weight` stays `0.0`** | [W-168-STEP-5-RM3](regression/2026-09-23-rm3/VERDICT.md) |

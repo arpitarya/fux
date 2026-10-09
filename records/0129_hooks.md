@@ -6,11 +6,12 @@ title: "SR-MAINTENANCE (0129) — the git hooks that keep a committed index in s
 description: "post-commit DEFERS — it writes a dirty list and spawns a detached one-shot re-index; post-merge re-ingests, post-checkout only rebuilds; no hook ever touches the network; every index writer holds one lock; and a resident daemon covers the URLs nobody queries."
 status: accepted
 date: 2026-08-20
+amended: 2026-10-09
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
 owns: [src/fux/maintain@081950a9f115, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 0f5efd2e199b5daa835b900116dc13e6eb48102641c472971f17be79d2087192
+content_sha: d5ebe77cb22cc232380e2d65790760612fd3e7cbf311bdad6a00bfd965b21064
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -168,10 +169,14 @@ an edge is a claim about *other* documents, and write every shard.
 2. **A one-shot runner is not the watch daemon that was rejected.** The compare
    doc rejected an always-on filesystem watcher; this starts on a commit and
    exits.
-3. ⚠ **The list alone buys no speedup.** The runner still calls today's
-   `fux ingest`, which walks the corpus. **The win is that nobody waits for
-   it** — not that it got smaller. Saying otherwise would claim a result no
-   measurement supports.
+3. ⚠ **The list alone buys no speedup, and at the design point none is
+   needed.** The runner still calls today's `fux ingest`, which walks the
+   corpus. **The win is that nobody waits for it**, not that it got smaller.
+   Measured 2026-10-09 (W-267): an unchanged delta at rung-10000 spends
+   **4.90 s** outside extraction, under W-256 §8's pre-registered 5 s bar, so
+   option D (incremental corpus-wide passes) is not needed at 10 000 documents
+   ([run](../work/regression/2026-10-09-ingest-split-remeasure/VERDICT.md),
+   `informed`; the margin is 0.09 s on one machine).
 
 **1b. `fux ask` declares the pending count.** A lagging index is the same class
 of claim the refer plane refuses to collapse — *we did not look* is not *we

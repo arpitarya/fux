@@ -5,13 +5,13 @@ name: SR-INGEST
 title: SR-INGEST (0106) — how ingest works
 description: "Re-resolve every edge every run; carry unchanged documents' extraction forward. Write only shards whose bytes changed. Skips are reported once, counted by class, and recorded in the committed `.fux/.fuxignore`; deletions honoured, output byte-identical."
 status: accepted
-amended: 2026-09-24
+amended: 2026-10-09
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@f24eaaa00126, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@aff448e57338, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 909ce71415e7c4a168d20c2f2115d6287a08a61f788646fe1d4bb457961dce48
+content_sha: 36607e93148595cb152f1ba4ce80444beb3936651555b0082ff3ea054b615fc9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -53,18 +53,16 @@ says so rather than reusing the number.** 92 % of that full ingest sat in a
 dense embedding pass which has since been deleted
 ([SR-ASK](0103_ask.md) decision 9). What carry-forward saves today is the
 difference between re-tokenising a corpus and re-tokenising a commit — still
-worth having, still what makes the hook path affordable. **Re-measured
-2026-10-04 (W-256 §8)**: on an unchanged rung-10000 a full ingest takes a
-median 15.11 s and a delta 10.39 s with zero documents re-extracted — a
-full/delta ratio of **1.45×**, not 23× — and the largest delta segment is
-`redact` (~57 %), not walk or parse
-([run](../work/regression/2026-10-04-ingest-split/VERDICT.md), `informed`).
-The frozen rule read it as a split result; **Arpit ruled 2026-10-04: a
-redaction cache**, so an unchanged file skips `redact` on a delta. That item
-first found the ~6 s was a regression (W-255's per-apply lint), fixed: `redact`
-1.0 s, an unchanged delta 5.16 s median. **Arpit retired the cache on
-2026-10-09**, and the split is re-measured on the fixed engine under the same
-5 s bar — [W-267](../work/open/W-267-ingest-split-remeasure.md).
+worth having, still what makes the hook path affordable. **Measured
+2026-10-09 (W-267), on the fixed engine:** on an unchanged rung-10000
+(generation 4) a full ingest takes a median **9.44 s** and a delta **4.90 s**
+with zero documents re-extracted. That is a full/delta ratio of **1.92×**, not
+23×. The delta is five corpus-wide passes, and no one of them is a majority:
+parse 1.42 s, redact 0.96 s, the provenance gap 0.86 s, walk 0.84 s, write
+0.69 s ([run](../work/regression/2026-10-09-ingest-split-remeasure/VERDICT.md),
+`informed`). The 2026-10-04 run read 10.39 s because of a `redact` regression
+(W-255's per-apply lint), since fixed
+([that run](../work/regression/2026-10-04-ingest-split/VERDICT.md)).
 
 The **write** is incremental too: a shard whose bytes come out identical is left
 untouched on disk, so git sees nothing. Re-running ingest on an unchanged corpus

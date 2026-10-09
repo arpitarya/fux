@@ -27,6 +27,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 5d |
 | ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-267** — rule B-002: an unchanged delta at rung-10000 measured **4.90 s < 5 s** (margin 0.09 s), so the frozen rule says close and option D is not needed. Recommended: **close**. [the item](open/W-267-ingest-split-remeasure.md) | 2026-10-09 | 0d |
+| ↳ **blocks:** nothing else in the queue | | |
 
 ---
 
@@ -40,7 +42,7 @@ here. Read that record before changing anything below it.
 ### testing
 
 - 🔴 **W-257** · `arpit` — an enriched rung to measure doc2query, authored blind. Ruled 2026-10-09: pilot ~50 docs first; Arpit launches the blind session with the item's prompt. **Opus.** [detail](open/W-257-enriched-rung.md)
-- 🟢 **W-267** · `agent` — re-time the no-change ingest at rung-10000 on the fixed engine, against the same 5 s bar, so Arpit can rule B-002. **Sonnet.** [detail](open/W-267-ingest-split-remeasure.md)
+- 🔴 **W-267** · `arpit` — measured: unchanged delta N = 4.90 s < 5 s at rung-10000, the frozen rule's close branch. Arpit rules B-002 closed (recommended) or not. [detail](open/W-267-ingest-split-remeasure.md)
 - 🔴 **W-258** · `arpit` — one hands-on session on his machine: a journalled answer whose source then vanishes, a real 429 from a real host, and parallel CDP fetches in signed-in Chrome. Checklist and bars are written. [detail](open/W-258-live-network-captures.md)
 
 ### adr update

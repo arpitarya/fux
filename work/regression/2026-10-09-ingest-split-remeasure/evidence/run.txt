@@ -1,0 +1,36 @@
+19:39  up 12 days,  6:36, 4 users, load averages: 2.00 2.16 2.15
+warm-up full (discarded): 9.464 s  3b557e622e51
+delta #1: total    4.89  extract   0.00  non-extract   4.89  reused 10000/10000  load 2.1
+full  #1: total    9.44  extract   3.83  non-extract   5.61  reused 0/10000  load 2.1
+full  #2: total    9.44  extract   3.81  non-extract   5.62  reused 0/10000  load 2.0
+delta #2: total    4.91  extract   0.00  non-extract   4.91  reused 10000/10000  load 2.0
+delta #3: total    4.90  extract   0.00  non-extract   4.90  reused 10000/10000  load 2.0
+full  #3: total    9.42  extract   3.81  non-extract   5.61  reused 0/10000  load 2.0
+{
+ "repeats": 3,
+ "docs": 10000,
+ "identical_root_sha": true,
+ "index_sha256": "3b557e622e514adc6b4f9b33bcd9c0d00d28acaf3fe6d5fa15f44cb2105109bb",
+ "delta_non_extract_s": [
+  4.894,
+  4.908,
+  4.902
+ ],
+ "delta_non_extract_median_s": 4.902,
+ "delta_walk_parse_s": [
+  2.25,
+  2.283,
+  2.262
+ ],
+ "delta_walk_parse_share": [
+  0.46,
+  0.465,
+  0.461
+ ],
+ "full_total_median_s": 9.436,
+ "delta_total_median_s": 4.902,
+ "full_over_delta": 1.92,
+ "problems": []
+}
+exit 0
+19:40  up 12 days,  6:37, 4 users, load averages: 2.05 2.15 2.15
