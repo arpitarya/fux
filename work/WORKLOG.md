@@ -23,6 +23,16 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-10 — W-236 Part B: section records pre-registered, built, gated and captured → Arpit scores  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement w236 to the closure."* Closure stops at Arpit's score: the bar forbids the capturing session from adjudicating.
+- **Pre-registered** at `4ac1d334` before any build code existed: four arms against `0.0`, with `hit@1` on the key's `step10_section` pool read exactly from score counts under the no-new-misses clause (no tag file, no proxy). G0, G1 and G2 gates. `decide.py` frozen.
+- **Built** on branch `w236-sections` (`f2a139fd`, unmerged; a format bump ships only with a PASS). Python, plus Node through one subagent; both suites green. SR-SECTIONS d9 was amended before any arm: a per-file merge driver cannot follow *the parent's verdict*, so section shards merge by parent group and both-changed is refused. Twenty-nine records amended or restamped.
+- **Gates:** G0 PASS (90/90 rows equal to the freeze engine at 0.0). G1 PASS (rung-10000: 0.979×, 51.4 MB, largest 899 KB). G2 waits on the score.
+- **Captured** five arms; rank 1 moved on 9 / 11 / 16 / 17 of 90 as λ rose. No score, no verdict.
+- ⚠ **Found:** on THIS repository the section plane is **8.0×** the document plane (337.5 vs 42.1 MB; `.jsonl` 75.6 %). It is outside the bar and is Arpit's before any merge. The branch does not carry this repo's re-ingested index.
+- ⚠ **Mistake, disclosed:** `4ac1d334` swept a Cowork session's uncommitted `OPEN-WORK.md` edits (the W-267 removal and the W-268 row) in with mine, because I staged the whole file. That session was told. Every later shared-file edit went in as index-only blobs.
+- **Next:** Arpit runs `just golden-score work/regression/2026-10-10-section-records`; then a non-capturing session runs `evidence/decide.py`.
+
 ## 2026-10-10 — W-257's pilot, read: 745 questions, 31.8 % refused → Arpit  ·  Claude Code (Opus 5.5)
 - **Asked:** *"W257, whats pending?"* then *"it is already done check it."* I had answered from the item file without checking `fux-lab`. The pilot had run on 2026-10-09 at 13:03–13:08 in `fux-lab/enrich-pilot-gen4`.
 - **Read (non-author session):** scope `seed`, 94 docs (the prompt's 40–60 folder does not exist on this rung); 745 questions, all stamped `claude-opus-5-5`; `--check` refused 237 (31.8 %), one reason; 17/94 documents clean. Filed as a surface capture with `plan.txt`/`check.txt` copied in. Both cited paraphrase examples were checked against the seed text, and one was corrected.

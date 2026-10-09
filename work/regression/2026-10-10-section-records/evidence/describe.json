@@ -1,0 +1,67 @@
+{
+ "sw-0.0": {
+  "rank1_changed": 0,
+  "order_changed": 0,
+  "membership_changed": 0,
+  "answer_text_changed": 0,
+  "bands": {
+   "grounded": 44,
+   "partial": 26,
+   "weak": 20
+  },
+  "median_ask_ms": 188.4,
+  "max_ask_ms": 247.8
+ },
+ "sw-0.1": {
+  "rank1_changed": 9,
+  "order_changed": 56,
+  "membership_changed": 19,
+  "answer_text_changed": 3,
+  "bands": {
+   "grounded": 44,
+   "partial": 26,
+   "weak": 20
+  },
+  "median_ask_ms": 527.2,
+  "max_ask_ms": 995.1
+ },
+ "sw-0.25": {
+  "rank1_changed": 11,
+  "order_changed": 81,
+  "membership_changed": 47,
+  "answer_text_changed": 15,
+  "bands": {
+   "grounded": 42,
+   "partial": 26,
+   "weak": 22
+  },
+  "median_ask_ms": 493.0,
+  "max_ask_ms": 925.6
+ },
+ "sw-0.5": {
+  "rank1_changed": 16,
+  "order_changed": 85,
+  "membership_changed": 55,
+  "answer_text_changed": 25,
+  "bands": {
+   "grounded": 45,
+   "partial": 26,
+   "weak": 19
+  },
+  "median_ask_ms": 504.65,
+  "max_ask_ms": 908.9
+ },
+ "sw-1.0": {
+  "rank1_changed": 17,
+  "order_changed": 89,
+  "membership_changed": 68,
+  "answer_text_changed": 31,
+  "bands": {
+   "grounded": 45,
+   "partial": 26,
+   "weak": 19
+  },
+  "median_ask_ms": 484.29999999999995,
+  "max_ask_ms": 1116.8
+ }
+}

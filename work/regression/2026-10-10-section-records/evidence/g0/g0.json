@@ -1,0 +1,10 @@
+{
+ "gate": "G0 - byte identity at section_weight = 0.0",
+ "pre_section_engine": "4ac1d334 (this run's freeze commit), on a plain copy of rung-01000 at e776146f, no re-ingest, no doctor --fix needed",
+ "build_engine": "f2a139fd, sw-0.0, on the --full re-ingested base (v8 index, section plane present)",
+ "compared": "every field of every row except ask_ms, answer_ms, arm, engine_commit, repo_head",
+ "handoff_rows_differing": 0,
+ "prediction_rows_differing": 0,
+ "rows": 90,
+ "verdict": "PASS"
+}

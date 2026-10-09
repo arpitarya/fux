@@ -1,0 +1,20 @@
+{
+ "documents": 10000,
+ "multi_section_documents": 9660,
+ "section_records": 39466,
+ "doc_plane_bytes": 25519343,
+ "section_plane_bytes": 24980580,
+ "ratio": 0.9789,
+ "total_index_bytes": 51398926,
+ "largest_file": "REGISTER",
+ "largest_file_bytes": 899003,
+ "totality_misses": 0,
+ "nsec_disagreements": 0,
+ "bars": {
+  "ratio_le_2.0": true,
+  "total_le_55000000": true,
+  "largest_le_1048576": true,
+  "integrity_zero": true
+ },
+ "verdict": "PASS"
+}

@@ -32,10 +32,18 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-09** (Claude Code, Opus 5.5 — the green items, W-228/W-250/W-267/W-240).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-10** (Claude Code, Opus 5.5 — W-236 Part B).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-10-09 (latest) — THE GREEN ITEMS: W-228 ✓ · W-250 ✓ · W-267 → Arpit · W-240 → Arpit
+### 🔴 2026-10-10 (latest) — W-236 BUILT, GATED, CAPTURED: ARPIT SCORES
+
+- Arpit: *"implement w236 to the closure."* Claude Code, Opus 5.5. Closure stops at his score by the bar's own rule.
+- **Bar** `4ac1d334` → **build** `f2a139fd`, on branch `w236-sections`, **unmerged**. G0 PASS, G1 PASS, five arms captured ([report](regression/2026-10-10-section-records/report.md)).
+- **In flight:** 🔴 Arpit runs `just golden-score work/regression/2026-10-10-section-records`. Then a session that did NOT capture runs `evidence/decide.py`. On PASS the branch merges with the bar's list.
+- ⚠ **Before any merge:** this repository's section plane would be 8.0× its document plane (337.5 MB; `.jsonl` 75.6 %). Three options in [ANALYSIS §2](regression/2026-10-10-section-records/ANALYSIS.md).
+- **Lesson:** staging a shared file whole swept another session's uncommitted edits into my commit (`4ac1d334`). The repair is an index-only blob (`git hash-object -w` + `update-index --cacheinfo`) built from HEAD's version of the file.
+
+### 🟢 2026-10-09 — THE GREEN ITEMS: W-228 ✓ · W-250 ✓ · W-267 → Arpit · W-240 → Arpit
 
 - Arpit: *"everything that is in green and build and testing block implement them to closure."* Claude Code, Opus 5.5, one session, no subagents.
 - **W-228 closed:** `misfit_floor` off PROVISIONAL in SR-INSPECT d24 with its caveat; BACKLOG B-273 (title-H1 slip).
