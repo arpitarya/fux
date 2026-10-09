@@ -9,6 +9,8 @@ ball: agent
 
 # W-236 — section records (W-168 step 10, U2)
 
+**Status 2026-10-10: DoD 4's pre-registration is frozen** — [`2026-10-10-section-records`](../regression/2026-10-10-section-records/PRE-REGISTRATION.md): `section_weight ∈ {0.1, 0.25, 0.5, 1.0}` against `0.0` on a re-ingested copy of gen-4 `rung-01000`; the pool read exactly from the scorer's counts under the no-new-misses clause; G0 byte identity at `0.0`, G1 the W-251 #9 size bar at rung-10000, G2 the pool ≥ 6. The build lives on branch `w236-sections` until the verdict, so a FAIL spends no `_format` number on `main`.
+
 **Status 2026-10-09: Part B is UNBLOCKED (🟢).** W-240 closed: Arpit scored `set-5-claude` on gen-4 `rung-01000`, and the `step10_section` pool is **23** (47 tagged; `reorderable@1` = 23, `@5` = 2) ([run](../regression/2026-10-09-golden-set-5-rung-01000/report.md)). Baseline on that pool: 23 of 47 missed at rank 1, all inside the top ten. **Next (Opus):** DoD 4. Pre-register `hit@1` on the pool, with `section@1` beside it and the W-251 #9 size bar, then build off at `section_weight = 0.0`. Every number is `informed`.
 
 **Arpit, 2026-10-04 (W-251 #9):** Part B pre-registers a size bar before it builds: section plane ≤ 2.0× the doc plane and ≤ 55 MB at rung-10000, largest file ≤ 1 MiB, labelled post-hoc-informed. No R-series promise. **Status: Part A done 2026-09-30** — [SR-SECTIONS](../../records/0161_sections.md) (proposed) and the [size run](../regression/2026-09-30-section-size/VERDICT.md) (PASS; index +98.4 % at rung-10000, not graded). Part B waits on W-240 (the pool). Filed 2026-09-29. Arpit asked for an item on
