@@ -9,6 +9,32 @@ ball: arpit
 
 # W-257 — an enriched rung, authored blind
 
+🔴 **CAPTURED 2026-10-10: Arpit scores.** The full rung hit the pre-registered
+placebo STOP ([GATES](../regression/2026-10-10-enriched-rung/GATES.md)). **Arpit
+ruled *"go with the recommended approach"*** →
+[amendment 1](../regression/2026-10-10-enriched-rung/AMENDMENT.md) (`79bc22ea`):
+`placebo.py --per-line` (line count matched, 0/1,000 off), and the rung is
+accepted as authored without the skill, which every verdict states. `decide.py`
+and `tilt.py` were committed in the same change, before any score. All seven arms
+are captured on `a07f9329` ([report](../regression/2026-10-10-enriched-rung/report.md)).
+`none` reproduces the 2026-10-09 capture 90/90. **Next:** 🔴 Arpit runs `just
+golden-score work/regression/2026-10-10-enriched-rung`. Then **a session that did
+not capture** runs `evidence/decide.py` and `evidence/tilt.py`, writes `VERDICT.md`,
+and does DoD 3's SR rewrite and DoD 4.
+
+✅ **RULED 2026-10-10 (Arpit) — run the FULL enriched rung, instructions
+unchanged** (the recommendation). **DoD 2 is done:** [the pre-registration](../regression/2026-10-10-enriched-rung/PRE-REGISTRATION.md),
+frozen and committed alone. It covers B-108 (`unfiltered` vs `none`, placebo
+control), B-109 (`filtered` vs `unfiltered`) and B-110 (`cov-25`/`cov-50` vs
+`cov-100` on the questions the un-enriched part answered). All three are judged
+at `hit@1` on set-5-claude per SR-RS d19, scope all four `dirs` lines.
+⚠ **The run is `informed` regardless of the blind author**, because set-5-claude
+is Claude-authored (L11 d7). The pre-registration says so; the blind author
+still keeps the enrichment unfitted to the set. **Next:** the full-rung author
+prompt (the pilot's, scope widened to all four lines, nothing else changed) →
+**Arpit launches it**. No session that has read the pre-registration gives the
+author any content.
+
 **Status 2026-10-10: PILOT RUN (2026-10-09, launched by Arpit) and read by a
 non-author session.** [The capture](../regression/2026-10-09-enrich-pilot-gen4/report.md):
 scope `seed` (94 docs; no 40–60 folder exists on this rung). **745 questions;

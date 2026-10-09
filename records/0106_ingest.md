@@ -11,7 +11,7 @@ feature: the `fux ingest` pipeline — sources to committed records
 owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@bf271c88bb28, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@aff448e57338, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 4898701d9c22cf3fff38309ace5d4d7f6d62b184b495d0ed9b47048cc152616a
+content_sha: 34d7a3601a2d79ff60d1447da95a5b97b214ffec6a948a22fa639323c483be61
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -543,7 +543,8 @@ symptom.
 ⚠ **It was not reachable today, and that is not a reason it was safe.**
 `maintain/runner.py`'s `record_head` says in terms that *"`fux ingest`
 re-indexes the whole corpus regardless of what the list says"*, and `B-002`
-records that the dirty list's input is unused. The hazard was **B-002's
+recorded that the dirty list's input is unused (closed 2026-10-10 on W-267's
+measurement; the one-second goal that reopens incremental ingest is W-268). The hazard was **B-002's
 inheritance** — building step 1 first would have planted it where nothing would
 find it.
 

@@ -23,6 +23,50 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-10 — W-257: placebo STOP ruled → amendment 1 → seven arms captured  ·  Claude Code (Opus 5.5)
+- **Asked:** *"go with the recommended approach"* (the placebo STOP's ruling).
+- **Done:** `placebo.py --per-line` (0/1,000 files off on line count, −1.1 % words; stamps any `skill:`), with tests and SR-RS d15's row. AMENDMENT.md, `decide.py` (B-108/B-109) and `tilt.py` (B-110) were committed together in `79bc22ea`, before any arm was scored. `build_arms.py` built `filtered` (837 removed), `placebo`, `cov-25` (250) and `cov-50` (500). All seven were ingested and run through `golden_run.py` on `a07f9329`. `none` = the 2026-10-09 capture 90/90. Both suites pass.
+- **Committed by another session** (`c739dac1`, at Arpit's *"commit everything"*): report, ANALYSIS, evidence. **Next:** 🔴 Arpit `just golden-score`, then a non-capturing session runs the deciders. ⚠ This entry is uncommitted: WORKLOG holds a Cowork entry that is also uncommitted.
+
+## 2026-10-10 — W-236 explained; W-269 filed (gain-only section term)  ·  Cowork (Opus 5.5)
+- **Asked:** W-236's status, Parts A/B, a review of SR-SECTIONS, W-257's state and how to run it; then why W-236 failed when the literature says passage evidence helps; then *"create a work item for a recommended approach."*
+- **Why it failed (as explained):** `b = 0.15` already removes most of the length penalty the literature's gains recover; and B2 gave a sectionless (short) document ≈ λ × its whole score, so short documents climbed — the pre-registration's own *hurts* row.
+- **Filed:** **W-269** (🟢, `fux build`, Opus): a gain-only term, `G = max(0, best section − the document scored as one unit)`, so a sectionless document gains 0; W-236's frozen bar unchanged, plus a G3 gate (sectionless scores byte-identical at every λ); built from branch `w236-sections`. `b` untouched.
+- **Not touched:** no code, no record. Nothing committed: the working tree carries other sessions' uncommitted edits.
+
+## 2026-10-10 — W-236 closed: section records FAIL (drift), parked by Arpit  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit scored the five arms, then ran the frozen `decide.py` himself: **FAIL — drift** (rank-1 losses 4 · 5 · 9 · 10; pool misses 23 → 26 · 26 · 28 · 28). Filed as his: [VERDICT](regression/2026-10-10-section-records/VERDICT.md).
+- **Diagnosed** from per-query rows and hand-offs (ids, ranks, document lengths; no key): the displaced rank-1 documents were long (median 15 sections), the new #1s short (~70–110 body words). B2 rewards a document whose best section is nearly itself.
+- **Ruled (Arpit):** first *"try another arm"*, then, offered a gain-only term or B1, **park it**. W-236 closed and archived; branch `w236-sections` kept, unmerged; SR-SECTIONS stays `proposed` with the FAIL at its top.
+- **Next:** nothing on W-236. The blocker W-257 waits on his placebo ruling.
+
+## 2026-10-10 — W-257 DoD 3: the full rung's gates; STOPPED at the placebo gate  ·  Claude Code (Opus 5.5)
+- **Asked:** capture the three pre-registered runs on `fux-lab/enrich-full-gen4`. The blind author's report was pasted (1,000 files, 5,620 questions, 837 refused).
+- **Done:** pinned the engine at `a07f9329` (the same `src/` the author ran). Built `none`, `declared` and `unfiltered` as `cp -a` copies under `fux-lab/arms/runs/w257/`. **The `archived` gate, G0 (byte-identical index), G1 and G3 (14.9 %) pass.** The first pass reproduces: 837, the same lines. On the *ingested* arm `--check` gives 761, because of index state. That is never a second pass.
+- 🔴 **STOP, as the bar names it:** `placebo.py` writes one word-matched line per file against a median of 5 question lines. Its marker swap also misses `skill: fux-enrich`. **Not run:** `filtered`, `placebo`, `cov-25`, `cov-50`, the harness, `tilt.py`, and any number on set-5-claude.
+- ⚠ **Found:** the author ran without the fux-enrich skill (absent from `fux-lab`). It wrote one question per chunk, template-filled on `ext`. The pilot had `fux-enrich@1`. "Instructions unchanged" held, and the environment did not.
+- **Filed:** [GATES.md](regression/2026-10-10-enriched-rung/GATES.md) + evidence; `BLOCKED.json` (ASK, one question); W-257 → inbox. **Not committed:** WORKLOG, NOW, INTERVIEW and OPEN-WORK carry another session's uncommitted edits.
+
+## 2026-10-10 — W-236 Part B: section records pre-registered, built, gated and captured → Arpit scores  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement w236 to the closure."* Closure stops at Arpit's score: the bar forbids the capturing session from adjudicating.
+- **Pre-registered** at `4ac1d334` before any build code existed: four arms against `0.0`, with `hit@1` on the key's `step10_section` pool read exactly from score counts under the no-new-misses clause (no tag file, no proxy). G0, G1 and G2 gates. `decide.py` frozen.
+- **Built** on branch `w236-sections` (`f2a139fd`, unmerged; a format bump ships only with a PASS). Python, plus Node through one subagent; both suites green. SR-SECTIONS d9 was amended before any arm: a per-file merge driver cannot follow *the parent's verdict*, so section shards merge by parent group and both-changed is refused. Twenty-nine records amended or restamped.
+- **Gates:** G0 PASS (90/90 rows equal to the freeze engine at 0.0). G1 PASS (rung-10000: 0.979×, 51.4 MB, largest 899 KB). G2 waits on the score.
+- **Captured** five arms; rank 1 moved on 9 / 11 / 16 / 17 of 90 as λ rose. No score, no verdict.
+- ⚠ **Found:** on THIS repository the section plane is **8.0×** the document plane (337.5 vs 42.1 MB; `.jsonl` 75.6 %). It is outside the bar and is Arpit's before any merge. The branch does not carry this repo's re-ingested index.
+- ⚠ **Mistake, disclosed:** `4ac1d334` swept a Cowork session's uncommitted `OPEN-WORK.md` edits (the W-267 removal and the W-268 row) in with mine, because I staged the whole file. That session was told. Every later shared-file edit went in as index-only blobs.
+- **Next:** Arpit runs `just golden-score work/regression/2026-10-10-section-records`; then a non-capturing session runs `evidence/decide.py`.
+
+## 2026-10-10 — W-267 closed (B-002) · the one-second ingest researched → W-268 proposal  ·  Cowork (Opus 5.5)
+- **Asked:** what W-267 found and what would have happened over 5 s; then *"I want to build parse cache either way"*; then *"no boundaries … find another programming language … close this work item and let's do some research and put a proposal."*
+- **W-267 closed:** B-002 closes on the frozen close branch (4.902 s < 5 s). The parse cache was weighed and dropped by Arpit's own widening of the goal: it caps near 3.5 s.
+- **Researched** (three subagents: engine throughput, native building blocks, a read-only map of `ingest/`; nothing under `work/golden/` touched): at no change all 4.90 s re-does unchanged documents' work; committed records hold raw tf and BM25F is query-time, so one change does not ripple; the accelerator rebuild and start-up (~2.5 s, inferred) sit outside the timed run; `git log` over the whole history runs every ingest. A throwaway Rust prototype on a 2-vCPU VM did a synthetic 134 MB corpus in ≈ 2.0 s (1 thread), byte-identical across thread counts; fux's corpus is ~15× smaller.
+- ⚠ **Corrected in chat:** I had told Arpit a one-file change might ripple through stored impacts. It does not — there are no stored impacts; the ripple is the runtime accelerator's `docidx`.
+- **Filed:** [proposal](proposals/ingest-under-one-second.md) and **W-268** (🔴, research): (a) incremental Python then a Rust core — recommended · (b) Rust now · (c) incremental only.
+- **Not touched:** no code, no record other than the registry. Nothing committed.
+- **Then (same session):** Arpit — *"We can build it in Rust … I don't want consumer to install Rust."* Explained pre-compiled abi3 wheels (`.so` / `.pyd`, a DLL; no `.exe`, no toolchain on the user's machine). The proposal graduated into [the compare doc](compare/ingest-under-one-second.compare.md): F1 order, F2 language (Rust, his direction), F3 no-wheel fallback.
+- **Next:** Arpit picks F1 and F3 on W-268; then step 0 (Mac measurements, Sonnet).
+
 ## 2026-10-10 — W-257's pilot, read: 745 questions, 31.8 % refused → Arpit  ·  Claude Code (Opus 5.5)
 - **Asked:** *"W257, whats pending?"* then *"it is already done check it."* I had answered from the item file without checking `fux-lab`. The pilot had run on 2026-10-09 at 13:03–13:08 in `fux-lab/enrich-pilot-gen4`.
 - **Read (non-author session):** scope `seed`, 94 docs (the prompt's 40–60 folder does not exist on this rung); 745 questions, all stamped `claude-opus-5-5`; `--check` refused 237 (31.8 %), one reason; 17/94 documents clean. Filed as a surface capture with `plan.txt`/`check.txt` copied in. Both cited paraphrase examples were checked against the seed text, and one was corrected.

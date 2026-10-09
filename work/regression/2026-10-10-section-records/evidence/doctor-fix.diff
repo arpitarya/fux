@@ -1,0 +1,14 @@
+diff -ru /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/6b30d99e-a329-405f-b147-d258373c96f2/scratchpad/sw-base-fux-before/tune.toml /Users/arpitarya/my_programs/fux-lab/arms/runs/sw-base/rung-01000/.fux/tune.toml
+--- /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/6b30d99e-a329-405f-b147-d258373c96f2/scratchpad/sw-base-fux-before/tune.toml	2026-10-05 11:32:49
++++ /Users/arpitarya/my_programs/fux-lab/arms/runs/sw-base/rung-01000/.fux/tune.toml	2026-10-10 00:54:36
+@@ -66,6 +66,10 @@
+ # [doctype] table it does nothing at any value. The default 0.1 is MEASURED: it
+ # passed its pre-registered run on 2026-09-28.
+ intent_weight           = 0.1
++# Rank a long document by its best section too: its score gains this times
++# the score of its best-matching heading section. 0 = OFF, and at 0 the section
++# plane is never read. UNMEASURED: W-236's pre-registered run decides it.
++section_weight          = 0.0
+ 
+ [graph]                         # explain / graph / path
+ damping      = 0.85   # restart probability is 1 - damping; PageRank's published value

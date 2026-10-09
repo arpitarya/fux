@@ -1,0 +1,25 @@
+{
+ "doc_plane_bytes": 42102393,
+ "section_plane_bytes": 337477770,
+ "largest_section_shard": 6192981,
+ "by_ext_bytes": {
+  ".md": 77734948,
+  ".jsonl": 255222711,
+  ".txt": 93445,
+  ".json": 3884500,
+  ".toml": 27408,
+  ".html": 485709,
+  ".yaml": 7617,
+  ".svg": 21432
+ },
+ "by_ext_sections": {
+  ".md": 14004,
+  ".jsonl": 79611,
+  ".txt": 135,
+  ".json": 4522,
+  ".toml": 86,
+  ".html": 363,
+  ".yaml": 12,
+  ".svg": 12
+ }
+}

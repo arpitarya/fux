@@ -32,10 +32,36 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-09** (Claude Code, Opus 5.5 — the green items, W-228/W-250/W-267/W-240).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-10** (Claude Code, Opus 5.5 — W-236 Part B).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-10-09 (latest) — THE GREEN ITEMS: W-228 ✓ · W-250 ✓ · W-267 → Arpit · W-240 → Arpit
+### 🔴 2026-10-10 (latest) — W-236 CLOSED: SECTION RECORDS FAIL (DRIFT), PARKED
+
+- Arpit scored the five arms and ran the frozen decider himself: **FAIL — drift** ([verdict](regression/2026-10-10-section-records/VERDICT.md)). Every λ lost rank-1 hits; the pool got worse.
+- **Why:** B2 favoured SHORT documents (best section ≈ whole doc), not the long ones it targets. Offered a gain-only term or B1; **Arpit parked it**.
+- Branch `w236-sections` (`f2a139fd`) kept unmerged; nothing on `main`; SR-SECTIONS `proposed` with the FAIL at its top.
+
+### 🔴 2026-10-10 — W-257: STOP RULED, AMENDMENT 1, SEVEN ARMS CAPTURED → ARPIT SCORES
+
+- The full rung (5,620 questions, 837 refused first pass) hit the pre-registered placebo STOP. **Arpit: *"go with the recommended approach."*** [Amendment 1](regression/2026-10-10-enriched-rung/AMENDMENT.md) (`79bc22ea`): `placebo.py --per-line`, and the rung accepted as authored without the skill (stated on every verdict). `decide.py` and `tilt.py` were frozen in the same commit.
+- **Captured** on `a07f9329`: G0–G3 pass; `none` = the 2026-10-09 capture 90/90 ([report](regression/2026-10-10-enriched-rung/report.md)). **In flight:** 🔴 Arpit scores. Then a session that did NOT capture decides.
+- **Lesson:** `fux-lab` has no fux-enrich skill, so a blind author cannot follow it ([ANALYSIS §2](regression/2026-10-10-enriched-rung/ANALYSIS.md)).
+
+### 🔴 2026-10-10 — W-236 BUILT, GATED, CAPTURED: ARPIT SCORES
+
+- Arpit: *"implement w236 to the closure."* Claude Code, Opus 5.5. Closure stops at his score by the bar's own rule.
+- **Bar** `4ac1d334` → **build** `f2a139fd`, on branch `w236-sections`, **unmerged**. G0 PASS, G1 PASS, five arms captured ([report](regression/2026-10-10-section-records/report.md)).
+- **In flight:** 🔴 Arpit runs `just golden-score work/regression/2026-10-10-section-records`. Then a session that did NOT capture runs `evidence/decide.py`. On PASS the branch merges with the bar's list.
+- ⚠ **Before any merge:** this repository's section plane would be 8.0× its document plane (337.5 MB; `.jsonl` 75.6 %). Three options in [ANALYSIS §2](regression/2026-10-10-section-records/ANALYSIS.md).
+- **Lesson:** staging a shared file whole swept another session's uncommitted edits into my commit (`4ac1d334`). The repair is an index-only blob (`git hash-object -w` + `update-index --cacheinfo`) built from HEAD's version of the file.
+
+### 🔴 2026-10-10 — INGEST UNDER ONE SECOND: RESEARCHED, ARPIT PICKS
+
+- Arpit (Cowork): W-267 closed (B-002, 4.90 s < 5 s); new goal — 10 000 documents ingested in **under one second**, any language.
+- **Finding:** at no change, all 4.90 s re-does unchanged documents' work; committed records hold raw tf (BM25F at query time), so an incremental ingest in Python reaches the no-change and one-file cases. A full ingest under a second needs a native core (Rust + PyO3, parallel by shard, deterministic).
+- **Waiting on Arpit:** W-268 — (a) A then B (rec.) · (b) Rust now · (c) A only. [proposal](proposals/ingest-under-one-second.md)
+
+### 🟢 2026-10-09 — THE GREEN ITEMS: W-228 ✓ · W-250 ✓ · W-267 → Arpit · W-240 → Arpit
 
 - Arpit: *"everything that is in green and build and testing block implement them to closure."* Claude Code, Opus 5.5, one session, no subagents.
 - **W-228 closed:** `misfit_floor` off PROVISIONAL in SR-INSPECT d24 with its caveat; BACKLOG B-273 (title-H1 slip).
@@ -219,7 +245,7 @@ valuable judgement, but not the state of play.
 - **Next:** Arpit runs prompt 11 → prompt 4 rebuild → prompt 5 run → his score →
   each step counts its pool (< 6 stops). Agent meanwhile: step 4's pre-registration.
 
-### 🟢 2026-09-24 (latest) — W-168 STEP 1 SHIPPED: `[bm25f] anchor` defaults to `1.0`
+### 🟢 2026-09-24 — W-168 STEP 1 SHIPPED: `[bm25f] anchor` defaults to `1.0`
 
 - **Arpit ruled PASS at `1.0`** (Cowork): the hub never takes rank 1 on a miss.
   Shipped per §If it passes, in one change: the default on both engines, SR-TUNE
