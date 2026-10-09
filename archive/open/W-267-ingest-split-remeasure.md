@@ -9,6 +9,15 @@ ball: agent
 
 # W-267 — re-time the no-change ingest, so B-002 can be ruled
 
+✅ **CLOSED 2026-10-10 — Arpit (Cowork):** *"For the time being, close this work
+item and let's do some research and put a proposal."* B-002 closes on the frozen
+rule's close branch (N = 4.902 s < 5 s): the dirty list stays advisory and
+option D is not needed **at the 5 s bar**. Arpit's new goal — ingest of 10 000
+documents in **under one second**, any language — is a separate research item,
+[W-268](../../work/open/W-268-ingest-under-one-second.md). He considered a parse
+cache first and dropped it: it cannot reach one second (parse is 1.42 s of
+4.90 s).
+
 **Status 2026-10-09: DoD 1–3 and 5 DONE (Claude Code, Opus 5.5). 🔴 Waiting on Arpit for DoD 4: rule B-002.**
 [The run](../regression/2026-10-09-ingest-split-remeasure/report.md) gives
 **N = 4.902 s** (4.894 / 4.908 / 4.902) at gen-4 rung-10000, under the 5 s bar

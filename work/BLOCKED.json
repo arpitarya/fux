@@ -1,8 +1,8 @@
 {
  "decision": "PROCEED",
- "reason": "W-244 was ruled 2026-10-03 (Cowork, under Arpit's delegation): no number reclassified; prune at the `!`-exclude. Ball agent. 3.0.0-alpha.10 is released on PyPI and npm.",
+ "reason": "W-257's blocker was ruled 2026-10-10 by Arpit ('go with the recommended approach'): amendment 1 (line-matched placebo; the rung accepted as authored) committed 79bc22ea; the seven arms are captured. What waits now is Arpit's score, an inbox row, not a blocker.",
  "questions": [],
- "safe_alternative": "W-244's fix (prune the ingest walk at a `!`-excluded directory). Until it lands, still no `fux ingest` at this repo's root.",
+ "safe_alternative": "",
  "surfaced": true,
- "filed": "2026-10-04"
+ "filed": "2026-10-10"
 }

@@ -58,6 +58,18 @@ moved to the archive on 2026-09-14.
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
 
+## Filed 2026-10-10
+
+* [Ingest under one second — 10 000 documents, any language](ingest-under-one-second.md)
+  — Arpit's ask (2026-10-10). At no change all 4.90 s re-does work for
+  unchanged documents; committed records do not depend on corpus-wide df. Shape
+  A (incremental ingest in Python: a git-style stat cache, per-document facts
+  never text) reaches the no-change and one-file cases; shape B (a Rust core
+  behind PyO3, parallel by shard, deterministic) is needed for a full ingest
+  under a second. Step 0 measures start-up, the accelerator build and macOS
+  per-file reads first. **Graduated 2026-10-10** into [the compare doc](../compare/ingest-under-one-second.compare.md); Arpit picks on
+  [W-268](../open/W-268-ingest-under-one-second.md).
+
 ## Filed 2026-10-04
 
 * [Index stores — git today, a database tomorrow](index-stores.md) — Arpit's

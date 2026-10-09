@@ -9,6 +9,9 @@ measured: "not yet: no arm captured, no question-set number exists"
 
 # Gates before the arms: one STOP, four passes
 
+✅ **The STOP was ruled the same day** (Arpit: *"go with the recommended
+approach"*). See [AMENDMENT.md](AMENDMENT.md) and the capture in [report.md](report.md).
+
 **No arm has been run against the question set.** No harness call, no
 `score.py`, and no number on `set-5-claude` exists. That is why this is a note
 and not a `report.md` (the per-run contract's half-empty directory still

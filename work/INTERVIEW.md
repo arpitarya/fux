@@ -41,6 +41,11 @@ valuable judgement, but not the state of play.
 - **Why:** B2 favoured SHORT documents (best section ≈ whole doc), not the long ones it targets. Offered a gain-only term or B1; **Arpit parked it**.
 - Branch `w236-sections` (`f2a139fd`) kept unmerged; nothing on `main`; SR-SECTIONS `proposed` with the FAIL at its top.
 
+### 🔴 2026-10-10 — W-257 FULL RUNG AUTHORED; STOPPED AT THE PLACEBO GATE
+
+- Arpit relayed the blind author's report: 1,000 files, 5,620 questions, 837 refused on the first pass (14.9 %), ≈ 15.6 min, ≈ 1.28 M tokens. Claude Code, Opus 5.5, captured.
+- **G0, G1, G3 and the `archived` gate pass**, and the first pass reproduces line for line on `a07f9329`. **No arm is scored.** 🔴 **STOP:** `placebo.py` cannot match line count, which the bar names as a stop. **Also:** the author had no fux-enrich skill, so it wrote one question per chunk, partly template-filled. [GATES](regression/2026-10-10-enriched-rung/GATES.md); `BLOCKED.json` asks the one question.
+
 ### 🔴 2026-10-10 — W-236 BUILT, GATED, CAPTURED: ARPIT SCORES
 
 - Arpit: *"implement w236 to the closure."* Claude Code, Opus 5.5. Closure stops at his score by the bar's own rule.
@@ -48,6 +53,12 @@ valuable judgement, but not the state of play.
 - **In flight:** 🔴 Arpit runs `just golden-score work/regression/2026-10-10-section-records`. Then a session that did NOT capture runs `evidence/decide.py`. On PASS the branch merges with the bar's list.
 - ⚠ **Before any merge:** this repository's section plane would be 8.0× its document plane (337.5 MB; `.jsonl` 75.6 %). Three options in [ANALYSIS §2](regression/2026-10-10-section-records/ANALYSIS.md).
 - **Lesson:** staging a shared file whole swept another session's uncommitted edits into my commit (`4ac1d334`). The repair is an index-only blob (`git hash-object -w` + `update-index --cacheinfo`) built from HEAD's version of the file.
+
+### 🔴 2026-10-10 — INGEST UNDER ONE SECOND: RESEARCHED, ARPIT PICKS
+
+- Arpit (Cowork): W-267 closed (B-002, 4.90 s < 5 s); new goal — 10 000 documents ingested in **under one second**, any language.
+- **Finding:** at no change, all 4.90 s re-does unchanged documents' work; committed records hold raw tf (BM25F at query time), so an incremental ingest in Python reaches the no-change and one-file cases. A full ingest under a second needs a native core (Rust + PyO3, parallel by shard, deterministic).
+- **Waiting on Arpit:** W-268 — (a) A then B (rec.) · (b) Rust now · (c) A only. [proposal](proposals/ingest-under-one-second.md)
 
 ### 🟢 2026-10-09 — THE GREEN ITEMS: W-228 ✓ · W-250 ✓ · W-267 → Arpit · W-240 → Arpit
 
