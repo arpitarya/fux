@@ -23,7 +23,7 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-257** — ruled 2026-10-09: the ~50-doc pilot. Arpit opens one fresh, blind Claude Code session in `fux-lab` with the item's prompt, then brings its report back. [the item](open/W-257-enriched-rung.md) | 2026-10-04 | 5d |
+| 🔴 **W-257** — the pilot ran: 745 questions, `--check` refused **31.8 %** (all paraphrases). Send its token cost, then rule the full rung. Recommended: **go, instructions unchanged**; filtered against unfiltered is B-109's arm. [the item](open/W-257-enriched-rung.md) | 2026-10-04 | 5d |
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 5d |
 | ↳ **blocks:** nothing else in the queue | | |
@@ -40,7 +40,7 @@ here. Read that record before changing anything below it.
 
 ### testing
 
-- 🔴 **W-257** · `arpit` — an enriched rung to measure doc2query, authored blind. Ruled 2026-10-09: pilot ~50 docs first; Arpit launches the blind session with the item's prompt. **Opus.** [detail](open/W-257-enriched-rung.md)
+- 🔴 **W-257** · `arpit` — pilot done ([capture](regression/2026-10-09-enrich-pilot-gen4/report.md)): 31.8 % first-pass refusal. Arpit rules the full rung; then pre-register and three runs. **Opus.** [detail](open/W-257-enriched-rung.md)
 - 🔴 **W-267** · `arpit` — measured: unchanged delta N = 4.90 s < 5 s at rung-10000, the frozen rule's close branch. Arpit rules B-002 closed (recommended) or not. [detail](open/W-267-ingest-split-remeasure.md)
 - 🔴 **W-258** · `arpit` — one hands-on session on his machine: a journalled answer whose source then vanishes, a real 429 from a real host, and parallel CDP fetches in signed-in Chrome. Checklist and bars are written. [detail](open/W-258-live-network-captures.md)
 

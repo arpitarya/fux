@@ -23,6 +23,11 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-10 — W-257's pilot, read: 745 questions, 31.8 % refused → Arpit  ·  Claude Code (Opus 5.5)
+- **Asked:** *"W257, whats pending?"* then *"it is already done check it."* I had answered from the item file without checking `fux-lab`. The pilot had run on 2026-10-09 at 13:03–13:08 in `fux-lab/enrich-pilot-gen4`.
+- **Read (non-author session):** scope `seed`, 94 docs (the prompt's 40–60 folder does not exist on this rung); 745 questions, all stamped `claude-opus-5-5`; `--check` refused 237 (31.8 %), one reason; 17/94 documents clean. Filed as a surface capture with `plan.txt`/`check.txt` copied in. Both cited paraphrase examples were checked against the seed text, and one was corrected.
+- **To Arpit:** wall clock and token cost (only in the author's report); rule the full rung. Recommended: go, instructions unchanged, filtered vs unfiltered as B-109's arm.
+
 ## 2026-10-09 — W-240 scored by Arpit: `step10_section` pool 23 → W-240 ✓, W-236 🟢  ·  Claude Code (Opus 5.5)
 - **Asked:** Arpit pasted `just golden-score` output for the set-5 run (counts only, the L11 scoring channel).
 - **Read:** pool of record = `reorderable@1` (tagged ∩ answerable ∩ miss@1 ∩ top-10) = **23 ≥ 6**. hit@1 45 / hit@5 75 / hit@10 79 of 90; 0 abstentions, so all 9 unanswerable questions were answered (the `_unrecognised` pool row).

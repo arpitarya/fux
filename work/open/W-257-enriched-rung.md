@@ -9,6 +9,19 @@ ball: arpit
 
 # W-257 — an enriched rung, authored blind
 
+**Status 2026-10-10: PILOT RUN (2026-10-09, launched by Arpit) and read by a
+non-author session.** [The capture](../regression/2026-10-09-enrich-pilot-gen4/report.md):
+scope `seed` (94 docs; no 40–60 folder exists on this rung). **745 questions;
+`--check` refused 237 (31.8 %)** on the first pass, all *"does not retrieve its
+document"*, and 17/94 documents came through clean. The refused lines are reader
+paraphrases (*"8 degrees … breach"* against the document's *"+8.0 C …
+excursion"*), which is the vocabulary gap doc2query exists to bridge
+([ANALYSIS](../regression/2026-10-09-enrich-pilot-gen4/ANALYSIS.md)). **🔴 Arpit:
+(1) the author's wall clock and token cost** (they are in its report, not on
+disk); **(2) rule the full rung.** Recommended: **go, with the instructions
+unchanged.** Pre-register filtered (508) against unfiltered (745) as B-109's arm;
+rewriting the refused lines into the documents' words would delete that arm.
+
 ✅ **RULED 2026-10-09 (Arpit, Cowork) — *"go with the recommendation"*: the
 PILOT only, now.** The gen-4 rebuild it waited on is done (W-240, 2026-10-05),
 so only his hand remains. **Arpit** opens **one fresh Claude Code session in
