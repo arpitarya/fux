@@ -1,0 +1,17 @@
+questions                        90
+rows carrying funnel gates  (S4) 90
+empty ranked lists          (S3) 0
+ranked lists shorter than 10     0
+answers declined            (S1) 0
+answers with no citation         0
+answerable: true                 90
+band grounded               (S2) 44
+band partial                (S2) 26
+band weak                   (S2) 20
+band none                   (S2) 0
+rank-1 document under seed/      88
+rank-1 document archived         3
+source                           {'refer': 90}
+freshness                        {'current': 90}
+slowest ask_ms              (S5) s5c-001 220 · s5c-074 200 · s5c-075 195
+slowest answer_ms           (S5) s5c-013 167 · s5c-004 163 · s5c-063 159

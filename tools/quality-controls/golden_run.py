@@ -165,9 +165,13 @@ def one(tree: Path, rung: str, commit: str, row: dict, repo_head: str = "",
     else:
         answer_text, citations = "", []
 
+    # `arm` rides on the prediction too (empty for a single-arm run): SR-RS
+    # d21b's row gate, live for runs filed from 2026-10-04, needs `id` and
+    # `rank` or `arm` on every evidence row, and phase 5's first run after it
+    # (W-240, 2026-10-09) filed predictions that had neither.
     prediction = {
         "id": row["id"], "ranked": ranked,
-        "answerable": answerable, "band": band,
+        "answerable": answerable, "band": band, "arm": arm,
     }
     handoff = {
         **prediction,

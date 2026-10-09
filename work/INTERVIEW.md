@@ -32,10 +32,19 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-05** (Claude Code, Opus 5.5 — the green items, in parallel).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-09** (Claude Code, Opus 5.5 — the green items, W-228/W-250/W-267/W-240).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-10-09 (latest) — THE INBOX RULED; W-243 AND W-264 CLOSED
+### 🟢 2026-10-09 (latest) — THE GREEN ITEMS: W-228 ✓ · W-250 ✓ · W-267 → Arpit · W-240 → Arpit
+
+- Arpit: *"everything that is in green and build and testing block implement them to closure."* Claude Code, Opus 5.5, one session, no subagents.
+- **W-228 closed:** `misfit_floor` off PROVISIONAL in SR-INSPECT d24 with its caveat; BACKLOG B-273 (title-H1 slip).
+- **W-250 closed:** the merge driver is registered on this repository. Its first dogfood merge **found a real defect**: `REGISTER` merged with no ancestor check and ours winning, so the other side's re-ingest stayed stale in the merge commit. It now merges three-way, with tests. SR-MERGE-DRIVER is amended.
+- **W-267 → Arpit:** unchanged delta at rung-10000 **N = 4.90 s < 5 s**, the frozen rule's close branch for B-002 (margin 0.09 s).
+- **W-240 → Arpit:** `set-5-claude` baseline captured (90/90 gated); he runs `just golden-score work/regression/2026-10-09-golden-set-5-rung-01000`. W-236 Part B is now 🔴 through it.
+- Also committed: the Cowork ruling session's uncommitted changes, as their own commit (`f038fd05`).
+
+### 🟢 2026-10-09 — THE INBOX RULED; W-243 AND W-264 CLOSED
 
 - Arpit (Cowork): *"all the blockers on me … one by one … ratify them."*
 - **W-243 closed (b):** 133 s FAST accepted; step 1 retired at 1.575×; step 3's remainder and step 4 not pursued.
@@ -3511,6 +3520,15 @@ which are not laws:
 
 The ones that would change how a successor acts, newest first. Add to this list
 when a session produces a lesson; do not let it become a changelog.
+
+- **A derived file still needs the ancestor in a merge** (2026-10-09, W-250).
+  `_merge_register` skipped decision 4 on the argument that the register
+  *"cannot survive an ingest, so it decides nothing durable"*. But **the merge
+  commit is durable**, and it carried a register that disagreed with the index
+  committed beside it. It was found only by running the driver on a real
+  repository, because no test merged a register three ways. ⚠ For any
+  "regenerated anyway" argument, ask what the commit holds *before* the
+  regeneration.
 
 - **A record can be AHEAD of its code, and it reads as authority just the same**
   (2026-09-12). `6f518c6` held four source files back on the reasoning that their

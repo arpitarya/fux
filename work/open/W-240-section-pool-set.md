@@ -9,6 +9,8 @@ ball: agent
 
 # W-240 — a set that can measure section records
 
+**Status 2026-10-09: phase-5 baseline CAPTURED (Claude Code, Opus 5.5, not the rebuild session).** [The run](../regression/2026-10-09-golden-set-5-rung-01000/report.md): `set-5-claude` (90) on gen-4 `rung-01000` with the rung's own engine `ba1c0e44`, no re-ingest. Gates on 90/90; 0 declined; bands 44/26/20/0. No key was read. **🔴 Next: Arpit scores it** from his shell, `just golden-score work/regression/2026-10-09-golden-set-5-rung-01000`. Done when the `step10_section` pool is ≥ 6. Under 6, ruling 1 applies: lengthen seed `64`–`66`.
+
 **Status 2026-10-05 (later): step 3 DONE. The ladder was rebuilt once as generation 4** ([the run](../regression/2026-10-05-ladder-gen4-rebuild/report.md)): 94 seeds, all eight rungs frozen at `ba1c0e44`, and every coverage count equal to its declaration. Prompt 13 was deleted in its own change. **Next (agent, Opus): a phase-5 baseline capture of `set-5-claude` on the gen-4 rungs** ([`work/golden/README.md`](../golden/README.md) §Phase 5, with a pre-registration first). It must run in a session other than the rebuild: the rebuild session was held to `seed/` only and never opened `questions/`. **Then 🔴 Arpit scores it** (`tools/golden-score/score.py`, his shell). Done when the `step10_section` pool is ≥ 6. Then W-236 re-balls 🟢.
 
 **Status 2026-10-05 (earlier): prompts 12 AND 13 RUN by Arpit; generation 4 is complete in the tree** (`seed/63`–`88`, `set-5-claude`, `planted-misfits.tsv`). Next was: commit prompt 13's data and delete prompt 13 in that same change; then rebuild the ladder once, from `seed/` alone (A23); then re-run W-228's families lens on the new rungs against `planted-misfits.tsv`; then capture the baseline for 🔴 Arpit to score.**

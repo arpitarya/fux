@@ -23,6 +23,16 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-09 — the green items to closure: W-228 ✓ · W-250 ✓ (driver defect found + fixed) · W-267 → Arpit · W-240 → Arpit  ·  Claude Code (Opus 5.5)
+- **Asked:** *"go through all the open work items everything that is in green and build and testing block implement them to closure."* Green in those lanes: W-228, W-240, W-250, W-267. The research lane is Cowork's (rule 37a) and was not touched.
+- **On arrival:** the Cowork ruling session's changes were uncommitted. They are committed as their own change (`f038fd05`).
+- **W-228 ✓:** SR-INSPECT d24 drops PROVISIONAL with the caveat; template comment; BACKLOG B-273; B-002's row shortened under the 400-char cap. Archived.
+- **W-250 ✓:** `fux hooks` run here; `.gitattributes` committed; MACHINE.md gains the per-clone step and the pyenv-shim noise. Dogfood merge in a scratch clone: attempt 0 never called the driver (`.gitattributes` was committed on one side only, and git reads attributes from the branch merged into). Attempt 1 merged clean but **kept a stale `REGISTER` row**. Fixed three-way, with 5 tests (2 fail on the old code); attempt 2 equals a fresh ingest except `mtime`. SR-MERGE-DRIVER amended; SR-MAINTENANCE restamped; CHANGELOG §Fixed. Archived.
+- **W-267 → 🔴 Arpit:** pre-registered alone (`d8113b7f`), timed on a gen-4 rung-10000 scratch copy, load ~2: **N = 4.902 s** (4.894–4.908), identical sha ×7, `redact` 0.96 s. This is the close branch. SR-MAINTENANCE 1a-3 and SR-INGEST §1 rewritten; inbox row filed. ⚠ The item named `phase_times.py`; the harness that run actually used is `ingest_split.py`, and the pre-registration says so.
+- **W-240 → 🔴 Arpit:** pre-registered (`59f8a807`); captured with the rung's own engine `ba1c0e44` (a pinned worktree in the scratchpad). 90/90 gated, 0 declined, bands 44/26/20/0. No key; `golden-state` stayed `locked`. W-236 re-balled 🔴 through it. ⚠ SR-RS d21b's row gate caught `golden_run.py` writing predictions with no `arm`. The tool now writes it; the capture was re-run and is identical except for that key and the timings. Noted in SR-RS d21b.
+- **Machine (d12):** the timed run ran alone. The merge exercise and the suites ran before it, the capture after it.
+- **Next:** Arpit — W-267 (rule B-002), W-240 (`just golden-score …`), W-257, W-258.
+
 ## 2026-10-09 — the inbox, ruled one by one: W-243 ✓ (b) · W-264 ✓ retired → W-267 · W-228 → 🟢 · W-257 pilot · W-258 held  ·  Cowork (Opus 5.5)
 - **Asked:** *"Review the open work document. All the blockers on me … one by one … ratify them."* Five inbox rows, each explained with an example and a recommendation.
 - **W-243 — (b):** *"13 seconds over is okay."* FAST at 133 s accepted as DoD 1; step 1 retired (1.575× vs 5.0×); step 3's in-process tests + second shard and step 4 not pursued. Closed and archived.

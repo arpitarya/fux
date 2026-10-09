@@ -27,6 +27,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 5d |
 | ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-240** — score the `set-5-claude` baseline: type `just golden-score work/regression/2026-10-09-golden-set-5-rung-01000` in your shell. W-240 is done if the `step10_section` pool is ≥ 6. [the item](open/W-240-section-pool-set.md) | 2026-10-09 | 0d |
+| ↳ **blocks:** W-236 Part B | | |
 | 🔴 **W-267** — rule B-002: an unchanged delta at rung-10000 measured **4.90 s < 5 s** (margin 0.09 s), so the frozen rule says close and option D is not needed. Recommended: **close**. [the item](open/W-267-ingest-split-remeasure.md) | 2026-10-09 | 0d |
 | ↳ **blocks:** nothing else in the queue | | |
 
@@ -36,8 +38,8 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟡 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240. **Opus.** [detail](open/W-236-section-records.md)
-- 🟢 **W-240** · `agent` — ladder rebuilt as gen 4 ([run](regression/2026-10-05-ladder-gen4-rebuild/report.md)). Next: a session other than the rebuild's captures the `set-5-claude` baseline; 🔴 Arpit scores. **Opus.** [detail](open/W-240-section-pool-set.md)
+- 🔴 **W-236** · `agent` — W-168 step 10 (U2). Part A done: [SR-SECTIONS](../records/0161_sections.md) proposed, [size PASS](regression/2026-09-30-section-size/VERDICT.md) (+98.4 % index). Part B waits on W-240 (Arpit scores). **Opus.** [detail](open/W-236-section-records.md)
+- 🔴 **W-240** · `arpit` — `set-5-claude` baseline captured on gen-4 rung-01000 ([run](regression/2026-10-09-golden-set-5-rung-01000/report.md)). Arpit scores it; done at a `step10_section` pool ≥ 6. **Opus.** [detail](open/W-240-section-pool-set.md)
 
 ### testing
 
