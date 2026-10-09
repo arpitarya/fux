@@ -23,6 +23,12 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-09 — W-240 scored by Arpit: `step10_section` pool 23 → W-240 ✓, W-236 🟢  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted `just golden-score` output for the set-5 run (counts only, the L11 scoring channel).
+- **Read:** pool of record = `reorderable@1` (tagged ∩ answerable ∩ miss@1 ∩ top-10) = **23 ≥ 6**. hit@1 45 / hit@5 75 / hit@10 79 of 90; 0 abstentions, so all 9 unanswerable questions were answered (the `_unrecognised` pool row).
+- **Landed:** score section in the run report; `scores/` committed; SR-SECTIONS says the gate is met (restamped); W-240 closed and archived; W-236 re-balled 🟢; inbox row removed.
+- **Next:** W-236 Part B (Opus): pre-register, then build off at 0.0. Arpit: W-267, W-257, W-258.
+
 ## 2026-10-09 — the green items to closure: W-228 ✓ · W-250 ✓ (driver defect found + fixed) · W-267 → Arpit · W-240 → Arpit  ·  Claude Code (Opus 5.5)
 - **Asked:** *"go through all the open work items everything that is in green and build and testing block implement them to closure."* Green in those lanes: W-228, W-240, W-250, W-267. The research lane is Cowork's (rule 37a) and was not touched.
 - **On arrival:** the Cowork ruling session's changes were uncommitted. They are committed as their own change (`f038fd05`).

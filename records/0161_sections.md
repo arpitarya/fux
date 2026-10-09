@@ -6,11 +6,12 @@ title: "SR-SECTIONS (0161) — section records: a doc#section plane beside the d
 description: "The design of W-168 step 10 as ruled U2 · B2 · E1: each heading section of a multi-section document becomes a committed `doc#s<k>` record in its own plane, `.fux/index/sections/`, cut by a tunable-free section rule. Its best section adds `section_weight` times its score to the document's. At 0.0 the plane is never opened, so ranking is byte-identical. The design is not built."
 status: proposed
 date: 2026-09-30
+amended: 2026-10-09
 feature: section records — the committed section plane, the index section rule, and the B2 best-section term
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: 7a9e17949dc9c2b920cb18d60bf7ff6ff24adf47fa6615f663332d006177e3ea
+content_sha: 858971af6fa1dedcec8d149f06f3c67cfc4dd56c6ea0892bf511f1eb87cca017
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -45,8 +46,12 @@ byte-identical to an index without it.
 committed index** (+98.4 % at rung-10000, 50.4 MB in total). That passes both
 commit limits, but it is a real cost
 ([the run](../work/regression/2026-09-30-section-size/report.md)). **Nothing is
-built.** The build waits for a scored set whose `step10_section` pool is at
-least 6.
+built.** The build waited for a scored set whose `step10_section` pool is at
+least 6. **That gate is met** (2026-10-09, W-240): `set-5-claude` on the gen-4
+`rung-01000` has a pool of **23** (47 tagged, all answerable, 23 missed at rank 1
+and still in the top ten), scored by Arpit
+([the run](../work/regression/2026-10-09-golden-set-5-rung-01000/report.md),
+`informed`).
 
 ```mermaid
 flowchart LR

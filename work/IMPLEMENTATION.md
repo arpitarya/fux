@@ -26,6 +26,14 @@ Rules:
 
 ---
 
+## 2026-10-09 — **W-240 closed: `set-5-claude` scored, `step10_section` pool 23**
+
+| what | evidence |
+|---|---|
+| **capture** | 90 questions on gen-4 `rung-01000`, rung's own engine `ba1c0e44`, gates 90/90 ([run](regression/2026-10-09-golden-set-5-rung-01000/report.md)) |
+| **score (Arpit's shell)** | hit@1 45 · hit@5 75 · hit@10 79; `step10_section` 47 tagged, **reorderable@1 23** — gate ≥ 6 met; 0 of 9 unanswerable abstained |
+| **effect** | W-236 Part B 🟢; SR-SECTIONS states the gate is met |
+
 ## 2026-10-09 — **W-267: the unchanged delta is 4.90 s on the fixed engine — B-002's close branch**
 
 | what | evidence |

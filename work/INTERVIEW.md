@@ -41,7 +41,7 @@ valuable judgement, but not the state of play.
 - **W-228 closed:** `misfit_floor` off PROVISIONAL in SR-INSPECT d24 with its caveat; BACKLOG B-273 (title-H1 slip).
 - **W-250 closed:** the merge driver is registered on this repository. Its first dogfood merge **found a real defect**: `REGISTER` merged with no ancestor check and ours winning, so the other side's re-ingest stayed stale in the merge commit. It now merges three-way, with tests. SR-MERGE-DRIVER is amended.
 - **W-267 → Arpit:** unchanged delta at rung-10000 **N = 4.90 s < 5 s**, the frozen rule's close branch for B-002 (margin 0.09 s).
-- **W-240 → Arpit:** `set-5-claude` baseline captured (90/90 gated); he runs `just golden-score work/regression/2026-10-09-golden-set-5-rung-01000`. W-236 Part B is now 🔴 through it.
+- **W-240 ✓ (scored the same day):** `step10_section` pool **23** (≥ 6); hit@1 45/90; 0 of 9 unanswerable abstained. **W-236 Part B is 🟢**: pre-register, then build off at 0.0.
 - Also committed: the Cowork ruling session's uncommitted changes, as their own commit (`f038fd05`).
 
 ### 🟢 2026-10-09 — THE INBOX RULED; W-243 AND W-264 CLOSED

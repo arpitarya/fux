@@ -71,7 +71,35 @@ directions. The structural ceiling for a later paired run is 90.
 | the rung (gen 4) | the rebuild session, 2026-10-05, held to `seed/` | the seed corpus; never `questions/` |
 | this capture | Claude Code, 2026-10-09 (W-240) | the question text, as it passes through `golden_run.py`; **no** key, judgment or prior score of this set |
 
-## Next
+## Scored by Arpit, 2026-10-09 — counts only
+
+`just golden-score work/regression/2026-10-09-golden-set-5-rung-01000`, from
+his shell (L11's scoring carve-out). The output is in
+[`scores/`](scores/single/rung-01000/set-5-claude.json): ids, ranks and counts,
+no answer.
+
+| | |
+|---|---:|
+| n | 90 |
+| hit@1 · hit@5 · hit@10 | 45 · 75 · 79 |
+| primary@1 | 37 |
+| evidence quoted | 65 |
+| abstained (correct · wrong) | 0 · 0 |
+| answered a question the key marks unanswerable | **9** (all 9; the `_unrecognised` pool row) |
+
+| pool | tagged | answerable | miss@1 | **reorderable@1** | reorderable@5 | not in top 10 |
+|---|---:|---:|---:|---:|---:|---:|
+| **`step10_section`** | 47 | 47 | 23 | **23** | 2 | 0 |
+| other | 34 | 34 | 13 | 11 | 2 | 2 |
+| `_unrecognised` | 9 | 0 | 0 | 0 | 0 | 0 |
+
+**W-240's gate is met: the `step10_section` pool is 23 ≥ 6.** Every
+pool question that misses rank 1 is still in the top ten. That is the shape
+section records are built to reorder, and it is headroom, not a result.
+⚠ fux abstained on none of the 9 unanswerable questions. That is the coverage
+problem W-265 researches, seen again on a new set. `informed`, permanently.
+
+## Next (as it stood before the score)
 
 🔴 **Arpit scores it**, from his own shell: `just golden-score work/regression/2026-10-09-golden-set-5-rung-01000`. W-240 is done when the
 `step10_section` pool counts **≥ 6**. Under 6, ruling 1 of 2026-10-03 applies:
