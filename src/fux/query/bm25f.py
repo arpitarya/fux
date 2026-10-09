@@ -91,6 +91,13 @@ class Scoring:
     #: either candidate path and scores byte-identically to the build before
     #: anchor text existed.
     anchor: float
+    #: W-236 — `[ranking] section_weight`, B2's λ (SR-SECTIONS decision 5).
+    #: `0.0` is OFF exactly as `anchor` is: neither candidate generator opens
+    #: the section plane and `rank()` performs no section arithmetic, so the
+    #: ranking is byte-identical to an engine without section records. It is
+    #: on this object, not on `Weighting`, because both candidate paths need
+    #: it to decide what to read, and both already receive a `Scoring`.
+    section: float
 
     def __post_init__(self) -> None:
         if len(self.weights) != len(TF_FIELDS):
@@ -106,6 +113,11 @@ class Scoring:
         documents nobody linked to.
         """
         return self.anchor != 0.0
+
+    @property
+    def section_on(self) -> bool:
+        """The one test for *is B2's best-section term live?* — W-236."""
+        return self.section != 0.0
 
 
 def idf(df: int, n: int) -> float:

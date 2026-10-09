@@ -12,13 +12,15 @@
  */
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
-import { copyFileSync, cpSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import {
+  copyFileSync, cpSync, mkdirSync, mkdtempSync, rmSync, existsSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "../src/derive/build.mjs";
 import { buildPlane } from "../src/graph/plane.mjs";
-import { graphRecords, indexDir, iterShardPaths } from "../src/store/reader.mjs";
+import { graphRecords, indexDir, iterShardPaths, sectionsDir } from "../src/store/reader.mjs";
 import { runExplain, runGraph, runPath } from "../src/verbs/graph.mjs";
 import { open } from "../src/index.mjs";
 import { FuxError } from "../src/errors.mjs";
@@ -31,6 +33,13 @@ function fixture() {
   mkdirSync(indexDir(root), { recursive: true });
   for (const path of iterShardPaths(REPO).slice(0, 16)) {
     copyFileSync(path, join(indexDir(root), basename(path)));
+    // W-236: a section shard travels with its document shard (same name), or
+    // the build's nsec check refuses the copy as two disagreeing planes.
+    const section = join(sectionsDir(REPO), basename(path));
+    if (existsSync(section)) {
+      mkdirSync(sectionsDir(root), { recursive: true });
+      copyFileSync(section, join(sectionsDir(root), basename(path)));
+    }
   }
   copyFileSync(join(REPO, "fux.toml"), join(root, "fux.toml"));
   for (const name of ["tune.toml", "output.toml", "identifiers.toml", "formats.toml", "pii.toml"]) {

@@ -7,10 +7,10 @@ description: One canonical encoder, sharded doc-major JSONL, write-if-different;
 status: accepted
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@8737e7eb4ab2, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@6ae66cb599c3]
+owns: [src/fux/store@a8b3ce17c0ec, node/src/store/format.mjs@4fc4a43aafe0, node/src/store/reader.mjs@ea5bf3de3b4d]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 9d6a32b04b7cc59eba2a742ef2a5aec15c813a853d0406d4de8506df3f0eef23
+content_sha: 15975445b72e6444e7cbe77c4530794f1aee904d333a80a7362ef77ee58ced5b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -607,6 +607,9 @@ exactly v5's property set.
 **No decision here moved** (W-249, 2026-10-04): `store/reader.py`'s `raw_record_lines` and `read_index` answer from the index state a long-running server holds when a call is bound to one, and from disk otherwise; Node's `Shards` counts its disk reads and its comment names its one cross-call owner. The decision is [SR-MCP](0136_mcp.md)'s 13, and every byte read is unchanged.
 
 **No decision here moved** (W-261, 2026-10-05): `store/cachedir.py` is carved out of this record's `store/` claim to SR-CACHEDIR-TAG; nothing it decides moved.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `_format` moves to **`fux.index.v8`** by decision 9.1: a plane and a property appear ([SR-SECTIONS](0161_sections.md) decisions 1 and 3). The new plane is `.fux/index/sections/xx.jsonl`, written by the same `write_index` call under decisions 1–4's rules (sorted, write-if-changed, an empty shard removed, and the directory removed when it empties). The migration is decision 10a's `fux ingest --full`. `analyzer` and `tf_fields` are untouched.
 
 ### Consequences
 

@@ -66,6 +66,10 @@ mined_weight            = 0.5
 # [doctype] table it does nothing at any value. The default 0.1 is MEASURED: it
 # passed its pre-registered run on 2026-09-28.
 intent_weight           = 0.1
+# Rank a long document by its best section too: its score gains this times
+# the score of its best-matching heading section. 0 = OFF, and at 0 the section
+# plane is never read. UNMEASURED: W-236's pre-registered run decides it.
+section_weight          = 0.0
 
 [graph]                         # explain / graph / path
 damping      = 0.85   # restart probability is 1 - damping; PageRank's published value

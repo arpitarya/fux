@@ -64,6 +64,9 @@ MUTATIONS: dict[str, dict[str, str]] = {
         # W-168 step 4: off by default, and nothing ingest does reads it.
         "mined_weight": "0.3",
         "intent_weight": "0.3",
+        # W-236: read at query time only; ingest writes the section plane
+        # whatever its value, so it cannot move a committed byte either.
+        "section_weight": "0.5",
     },
     "graph": {
         "damping": "0.25",
@@ -198,13 +201,14 @@ def _scoring(**overrides):
     for name, value in overrides.items():
         if name in TF_FIELDS:
             weights[TF_FIELDS.index(name)] = value
-        elif name not in ("k1", "b"):
+        elif name not in ("k1", "b", "section"):
             raise ValueError(f"unknown scoring override {name!r} — fields: {TF_FIELDS}")
     return DEFAULT_SCORING.__class__(
         k1=overrides.get("k1", DEFAULT_SCORING.k1),
         b=overrides.get("b", DEFAULT_SCORING.b),
         weights=tuple(weights),
         anchor=DEFAULT_SCORING.anchor,
+        section=overrides.get("section", DEFAULT_SCORING.section),
     )
 
 
@@ -331,6 +335,9 @@ SCORING_SWEEP = [
     {"title": 25.0},
     {"path": 0.0},
     {"k1": 2.2, "b": 0.2, "heading": 15.0, "ctx": 30.0},
+    # W-236: the best-section term widens the skip ceiling; it must still bound.
+    {"section": 1.0},
+    {"section": 0.25, "ctx": 60.0},
 ]
 
 

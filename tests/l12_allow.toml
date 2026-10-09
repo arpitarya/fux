@@ -62,6 +62,8 @@ sites = [
   "src/fux/maintain/urlstate.py::UrlState.run_seq::class::0",
   "src/fux/observe.py::Record.fux_version::class::''",
   "src/fux/observe.py::Record.ms::class::0",
+  "src/fux/query/rank.py::Corpus.sec_total_wlen::class::0.0",
+  "src/fux/query/rank.py::Corpus.sec_units::class::0",
   "src/fux/observe.py::Record.q_arms::class::1",
   "src/fux/observe.py::_record_from::get::1",
   "src/fux/output_config.py::OutputDefaults.source::class::''",

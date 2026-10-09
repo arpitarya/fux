@@ -83,6 +83,7 @@ const SCHEMA = {
   ranking: [
     "rerank_weight", "rerank_depth", "rerank_coverage_power", "rerank_base", "rerank_span",
     "rerank_adjacency", "expand_weight", "mined_weight", "intent_weight",
+    "section_weight",
   ],
   // The six `ask_*` keys are W-161's graph tier. They are parsed and carried
   // here so a consumer's committed `tune.toml` is accepted identically by both
@@ -175,7 +176,9 @@ export class Tune {
   }
 
   /** The three-part BM25F parameter set, as one object. */
-  get scoring() { return new Scoring(this.k1, this.b, this.fieldWeights, this.anchorWeight); }
+  get scoring() {
+    return new Scoring(this.k1, this.b, this.fieldWeights, this.anchorWeight, this.sectionWeight);
+  }
 
   /** The reranker's passage arithmetic — coverage power and the mix. */
   get proximity() {
@@ -196,7 +199,7 @@ export class Tune {
 const TUNE_FIELDS = [
   "k1", "b", "fieldWeights", "anchorWeight",
   "rerankWeight", "rerankDepth", "rerankCoveragePower", "rerankBase", "rerankSpan",
-  "rerankAdjacency", "expandWeight", "minedWeight", "intentWeight",
+  "rerankAdjacency", "expandWeight", "minedWeight", "intentWeight", "sectionWeight",
   "damping", "iterations", "laziness", "hopDecay", "expandLimit", "seedDepth", "pathLimit",
   "askBoost", "askRelated", "askKinds", "askLinkIdf", "askMaxHops", "askRelatedLimit",
   "separationFloor", "docCoverageFloor",
@@ -445,6 +448,8 @@ function resolve(data, label) {
     expandWeight: r("ranking", "expand_weight", nonNegative),
     minedWeight: r("ranking", "mined_weight", nonNegative),
     intentWeight: r("ranking", "intent_weight", nonNegative),
+    // W-236 — B2's λ (SR-SECTIONS decision 5). `0.0` never opens the plane.
+    sectionWeight: r("ranking", "section_weight", nonNegative),
     damping: r("graph", "damping", fraction),
     iterations: r("graph", "iterations", whole),
     laziness: r("graph", "laziness", fraction),

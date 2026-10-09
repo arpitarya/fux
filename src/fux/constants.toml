@@ -22,7 +22,7 @@ dir              = ".fux/index"
 # refuses any other number (SR-CONFIG decision 3), never a setting.
 shards           = 256
 # Bump history and why each bump was a _format bump: store/format.py.
-schema           = "fux.index.v7"
+schema           = "fux.index.v8"
 # An ANALYZER bump, not a _format bump -- see store/format.py.
 analyzer         = "v3"
 # ORDER IS LOAD-BEARING: body first, trailing zeros omitted on the wire.
@@ -32,6 +32,14 @@ term_hash_bytes  = 8
 content_sha_bytes = 20
 # A shard file's suffix (store/reader.py's regex spells the same).
 shard_suffix = ".jsonl"
+# W-236 (SR-SECTIONS d1, d3): the section plane is a subdirectory of the index,
+# outside the `??.jsonl` glob every document reader uses, and a section id is
+# `<document id>` + this separator + its ordinal, appended last.
+sections_dir = "sections"
+section_sep  = "#s"
+# The TF_FIELDS slots a section record carries -- a PREFIX of tf_fields, so a
+# section's tf and flen lists are the document's cut to this length (d3).
+section_fields = ["body", "heading"]
 # Every shard file opens with one header line; records follow it.
 shard_header_lines = 1
 # How deep a committed record may nest (store/canonical.py). Deeper is refused,
@@ -198,11 +206,15 @@ header = "# loc\tkind\tsha\tdecoder\tfetcher"
 
 [runtime]
 dir          = "runtime"
-schema       = "fux.runtime.v9"
+schema       = "fux.runtime.v10"
 block_size   = 128
-docs_fields  = ["id", "loc", "title", "flen", "archived", "superseded", "mtime", "alen"]
+docs_fields  = ["id", "loc", "title", "flen", "archived", "superseded", "mtime", "alen", "nsec"]
 docs         = "docs.jsonl"
 anchors_dir  = "anchors"
+# W-236: the section table and the section postings, derived from the
+# committed section plane (SR-SECTIONS d7). Read only at section_weight > 0.
+sections_dir   = "sections"
+section_table  = "sections.json"
 stats        = "stats.json"
 mined        = "mined.json"
 manifest     = "manifest.json"
@@ -384,7 +396,7 @@ rrf_k = 60
 [versions]
 # ingest/extract.py's RULES_VERSION -- bump when what extraction RETURNS moves;
 # the next `fux ingest` then re-extracts the corpus. History: ingest/extract.py.
-extract_rules = 3
+extract_rules = 4
 
 [answer]
 # How many ranked documents `fux answer` hands the refer plane to cite from

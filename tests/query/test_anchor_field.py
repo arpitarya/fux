@@ -232,8 +232,8 @@ def test_a_stale_runtime_is_refused_rather_than_read(corpus):
 
     manifest_path = fmt.runtime_dir(corpus) / fmt.MANIFEST_NAME
     manifest = json.loads(manifest_path.read_bytes())
-    assert manifest["schema"] == "fux.runtime.v9"
-    assert manifest["docs_fields"][-1] == "alen"
+    assert manifest["schema"] == "fux.runtime.v10"
+    assert "alen" in manifest["docs_fields"]  # W-236 appended `nsec` after it
     manifest["schema"] = "fux.runtime.v6"
     manifest_path.write_bytes(json.dumps(manifest).encode("utf-8"))
     assert not accel.is_fresh(corpus)

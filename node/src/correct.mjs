@@ -103,7 +103,7 @@ function recordsById(root, shards = null) {
  * is INSERTED with `score: 0` — the honest number, because the ranking never
  * scored it — and the list is re-truncated. Twin of
  * `query/__init__.py::_apply_pin`. */
-export function applyPin(root, query, results, top, shards = null) {
+export function applyPin(root, query, results, top, shards = null, sectionOn = false) {
   let docId;
   try {
     docId = pinnedFor(root, query, null, shards);
@@ -124,7 +124,14 @@ export function applyPin(root, query, results, top, shards = null) {
       archived: Boolean(record.archived ?? false),
       tie: false,
       mtime: record.mtime ?? null,
+      // `AskResult`'s defaults, in its field order: Python builds this row as
+      // an `AskResult`, so its `--json` carries these keys too.
+      pinned: true,
+      boosted: false,
+      route: null,
     };
+    // W-236 — and its `section` default, while the term is on (decision 6).
+    if (sectionOn) found.section = null;
   }
   return [{ ...found, pinned: true }, ...kept].slice(0, top);
 }

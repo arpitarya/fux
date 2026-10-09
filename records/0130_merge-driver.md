@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-21
 amended: 2026-10-09
 feature: the merge driver for the committed index
-owns: [src/fux/maintain/mergedriver.py@3d3ea30d2dfd]
+owns: [src/fux/maintain/mergedriver.py@175df3674940]
 laws: [L2, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 73a78b206ab846c1ac7292adf6ff730bb8ff14b651ca333b149af6cba3227239
+content_sha: cc0db54ea5be27f5134c3c83bd10b4616fef9ee3a0ff966ea03e06258f71021f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -282,6 +282,9 @@ it the day the register landed.
 **The merge driver reads git's `%O %A %B [%P]` by unpacking** and exits `constants.toml [exit] usage` on a short argv. The merge itself is unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** **Section shards merge by parent, never by line** (`merge_sections`; [SR-SECTIONS](0161_sections.md) decision 9, amended the same day). A document's section lines are one unit, under this record's rules: equal sides agree, and a side equal to the ancestor loses. Both sides changed differently is **refused**, because a per-file driver cannot see which side the sibling document shard took, and mixing lines would break totality silently. The driver tells a section shard by `%P` (`/sections/`), or without `%P` by every id ending in `#s<k>`.
 
 ### Consequences
 

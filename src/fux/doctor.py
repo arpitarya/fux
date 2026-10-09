@@ -3619,14 +3619,16 @@ def _shards_drifted(root: Path, directory: Path) -> list[str]:
     except (OSError, ValueError, KeyError, TypeError):
         return []
     drifted = []
-    for path in store_mod.iter_shard_paths(root):
-        want = recorded.get(path.name)
+    # W-236: section shards are pinned under `sections/<name>` beside the rest.
+    for path in [*store_mod.iter_shard_paths(root), *store_mod.iter_section_paths(root)]:
+        name = derive_fmt.stamp_name(path)
+        want = recorded.get(name)
         try:
             have = store_mod.content_sha(path.read_bytes())
         except OSError:
             continue
         if want is not None and want != have:
-            drifted.append(path.name)
+            drifted.append(name)
     return sorted(drifted)
 
 

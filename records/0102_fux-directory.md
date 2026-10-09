@@ -11,7 +11,7 @@ feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants
 owns: [src/fux/store/fuxdir.py@415610845f68, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@43c3c371c374, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 3324817ebe36114d5d1ee99e1c08db2d49237931810466477be4b90611969737
+content_sha: e5297a814613cfee4b7dfce070e43da4029dda6123b01a62c255e5ddc89ee8c2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -949,6 +949,9 @@ line raises names the fix itself rather than pointing at the header.
 **No decision here moved** (W-242 Tier 2, 2026-10-03): `node/src/store/fuxdir.mjs` is a narrow twin of `fuxdir.py`, `derived_dir` alone, owned here with its Python half. The layout is unchanged; a second runtime now creates `runtime/`.
 
 **No decision here moved** (W-261, 2026-10-05): `CACHEDIR_SIGNATURE`, `CACHEDIR_TAG` and `derived_dir` moved from `store/fuxdir.py` to `store/cachedir.py`, owned by SR-CACHEDIR-TAG; `fuxdir` imports them back, so `fuxdir.derived_dir` keeps every caller. The Node twin `store/fuxdir.mjs` is narrowed to `fuxDir`, and `derivedDir` moved to `store/cachedir.mjs`. The layout this record decides is unchanged.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `.fux/index/sections/` is **committed**, inside `.fux/index/` ([SR-SECTIONS](0161_sections.md) decision 1). The runtime gains `sections.json` and `sections/`, derived and gitignored with the rest of `.fux/runtime/`.
 
 ### Consequences
 

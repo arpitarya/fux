@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-19
 amended: 2026-09-15
 feature: the `extracted` ingest mode — the value in every committed record's `mode` property, and the contract it asserts
-owns: [src/fux/ingest/extract.py@ee003bb36414]
+owns: [src/fux/ingest/extract.py@6c0da17a5bd7]
 laws: [L2, L3, L4, L5]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 4a3893a00bd113ef8f412cdc3aeee6ce29e31bda6ef513217625a3d9a7f0f42a
+content_sha: bc2499d486681dfa67044cf2b3f939e1c3859db062fb3e5a6bd71c250987ddaf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -332,6 +332,9 @@ this moved where they are written, not what they are.
 
 
 `extract_fields` takes the repo's identifier families and analyzes every field through them ([SR-IDENTIFIERS](0160_identifiers.md)). `RULES_VERSION` does not move: with no families the output is unchanged, and a change of families is gated by the shard header's digest instead.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** Extraction returns **`sections`**: one `(flen, terms)` per index section over the body and heading slots, Markdown only, and empty when the document is sectionless ([SR-SECTIONS](0161_sections.md) decisions 2–3). A totality miss makes it sectionless. `extract_rules` is **4**.
 
 ### Consequences
 

@@ -17,13 +17,21 @@ from . import format as fmt
 __all__ = ["payload", "write"]
 
 
-def payload(*, n: int, total_flen: list[int], total_anchor_len: int) -> dict:
+def payload(
+    *, n: int, total_flen: list[int], total_anchor_len: int,
+    sec_units: int, sec_total_flen: list[int],
+) -> dict:
     """The plane's content: raw totals, never a weighted or averaged number, so
-    a field weight cannot bake into a derived file."""
+    a field weight cannot bake into a derived file.
+
+    `sec_units` and `sec_total_flen` are W-236's: the section `avg_wlen`'s
+    count and its raw body and heading totals (SR-SECTIONS decision 5)."""
     return {
         "n": n,
         "total_flen": total_flen,
         "total_anchor_len": total_anchor_len,
+        "sec_units": sec_units,
+        "sec_total_flen": sec_total_flen,
     }
 
 

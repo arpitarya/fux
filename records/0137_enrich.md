@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@f088f4f6b552, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@8f3efd21a71f, node/test/pins.test.mjs@daebcdb98aac]
+owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@f088f4f6b552, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@fafeb8b35584, node/test/pins.test.mjs@daebcdb98aac]
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 32aefaa92c278709a7c788c124f0a7c73e0281ae3d4cbf3b1145fc4cb3aa025e
+content_sha: ac8811fe4b1be7214ce82f8aa1ce75f35bfe8d39a07b7b74f3b8c50499fd685b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -659,6 +659,9 @@ a missing blob already is — never a crash inside a planning command.
 **No decision here moved** (W-254, 2026-10-04): `enrich._chunk_count` passes `frontmatter=False` to the chunker, so an enrichment unit count is what it was before the frontmatter passage existed.
 
 **No decision here moved** (W-261, 2026-10-05): `enrich_dirs` is imported from `ingest/dirlist.py` (SR-DIR-LIST's) instead of `ingest/gitdir.py`; it reads the same committed declaration.
+
+
+**W-236 (2026-10-10; branch `w236-sections`, unmerged) — the Node pin row, made equal to Python's.** `node/src/correct.mjs` builds the row for a pinned document the ranking never returned. It now carries `boosted: false` and `route: null`, as Python's `AskResult` always did. That was a parity gap from before W-236, found by its twin test. The row also carries `section: null` while `[ranking] section_weight > 0` ([SR-SECTIONS](0161_sections.md) decision 6).
 
 ### Consequences
 

@@ -134,6 +134,7 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "expand_weight",
         "mined_weight",
         "intent_weight",
+        "section_weight",
     ),
     "graph": (
         "damping",
@@ -283,6 +284,9 @@ class Tune:
     #: `1 + intent_weight`. ⚠ **Inert without a `[doctype]` table**, whatever
     #: its value.
     intent_weight: float
+    #: W-236 — B2's λ: a document's score gains `section_weight` times its best
+    #: section's score (SR-SECTIONS decision 5). `0.0` never opens the plane.
+    section_weight: float
 
     # [graph]
     damping: float
@@ -329,7 +333,8 @@ class Tune:
     def scoring(self) -> Scoring:
         """The three-part BM25F parameter set, as one object."""
         return Scoring(
-            k1=self.k1, b=self.b, weights=self.field_weights, anchor=self.anchor_weight
+            k1=self.k1, b=self.b, weights=self.field_weights, anchor=self.anchor_weight,
+            section=self.section_weight,
         )
 
     @property
@@ -662,6 +667,7 @@ def _resolve(data: dict, label: "Path | str") -> Tune:
         "expand_weight": read("ranking", "expand_weight", _non_negative),
         "mined_weight": read("ranking", "mined_weight", _non_negative),
         "intent_weight": read("ranking", "intent_weight", _non_negative),
+        "section_weight": read("ranking", "section_weight", _non_negative),
         "damping": read("graph", "damping", _fraction),
         "iterations": read("graph", "iterations", _whole),
         "laziness": read("graph", "laziness", _fraction),

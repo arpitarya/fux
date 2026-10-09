@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@89166e7718bc]
+owns: [src/fux/query/provenance.py@767faae00e0c]
 laws: [L2, L4, L5, L9]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 79f2f0448446d57859eebb2d3f8ce967a29547d8bc4b6fcca60f9cb62bb4d674
+content_sha: 9b84d46d833d3dedd5490d4fb11b7515cf86c2b7cd5c0ec89e119a7dfde7654a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -559,6 +559,9 @@ this moved where they are written, not what they are.
 
 
 Provenance analyzes the question with the repo's identifier families, as the ranking did, so its terms align with the ranked hashes; a failure to load them yields no families, never an exception, because this path never raises ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** A derivation document carries **`section: {id, contribution}`** while `section_weight > 0`, absent otherwise, through `stats_out["sections"]` from `rank()`, the existing seam. `score = (Σ contribution + section.contribution) × rerank_uplift × multiplier`. The stderr line names it as `section s<k> +x` ([SR-SECTIONS](0161_sections.md) decision 6).
 
 ### Consequences
 

@@ -419,6 +419,12 @@ class DocDerivation:
     #: the prior did not run on this query, so a `--why` block at the default is
     #: byte-identical to one written before the prior existed.
     intent_factor: float | None = None
+    #: W-236 — the best-section term on this document (SR-SECTIONS decision
+    #: 6): `{"id": "<id>#s<k>" | None, "contribution": λ · best}`, added to
+    #: the summed term contributions BEFORE the multipliers, so
+    #: `score = (sum(contribution) + section.contribution) x rerank_uplift x
+    #: multiplier`. `None` — and ABSENT — while `section_weight` is off.
+    section: dict | None = None
 
     def as_dict(self) -> dict:
         out = {
@@ -442,6 +448,8 @@ class DocDerivation:
             out["rank_untuned"] = self.rank_untuned
         if self.intent_factor is not None:
             out["intent_factor"] = self.intent_factor
+        if self.section is not None:
+            out["section"] = dict(self.section)
         return out
 
 
@@ -559,6 +567,14 @@ def _contribution(
         return None
 
 
+def _section_of(section_map: dict | None, doc_id: str) -> dict | None:
+    """The best-section term `rank()` recorded for this document, or `None`."""
+    if not section_map or doc_id not in section_map:
+        return None
+    sec_id, contribution = section_map[doc_id]
+    return {"id": sec_id, "contribution": contribution}
+
+
 def derive(
     root: Path,
     query: str,
@@ -608,6 +624,7 @@ def derive(
     except (TypeError, ValueError):
         avg_wlen = 0.0
     scoring = stats.get("scoring")
+    section_map = stats.get("sections")
 
     try:
         pairs = list(analyze_pairs(query, ids))
@@ -714,6 +731,7 @@ def derive(
                 rank_untuned=untuned_rank.get(result.id),
                 rerank_uplift=uplift_map.get(result.id),
                 intent_factor=_intent_factor(intent, result.loc),
+                section=_section_of(section_map, result.id),
             )
         )
 

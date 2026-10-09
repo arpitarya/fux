@@ -21,7 +21,7 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import fs, {
-  copyFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync,
+  copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync,
 } from "node:fs";
 import { syncBuiltinESMExports } from "node:module";
 import { tmpdir } from "node:os";
@@ -30,7 +30,7 @@ import { fileURLToPath } from "node:url";
 import { build } from "../src/derive/build.mjs";
 import { runtimeDir, GRAPH_NAME } from "../src/derive/format.mjs";
 import { buildPlane, planeBytes, planeFor, REBUILD_ENV } from "../src/graph/plane.mjs";
-import { graphRecords, indexDir, iterShardPaths } from "../src/store/reader.mjs";
+import { graphRecords, indexDir, iterShardPaths, sectionsDir } from "../src/store/reader.mjs";
 import { applyOutputDefaults, loadOutput } from "../src/config/output.mjs";
 import { runFind } from "../src/verbs/find.mjs";
 import { runAsk } from "../src/verbs/ask.mjs";
@@ -45,6 +45,13 @@ function fixture() {
   mkdirSync(indexDir(root), { recursive: true });
   for (const path of iterShardPaths(REPO).slice(0, 16)) {
     copyFileSync(path, join(indexDir(root), basename(path)));
+    // W-236: a section shard travels with its document shard (same name), or
+    // the build's nsec check refuses the copy as two disagreeing planes.
+    const section = join(sectionsDir(REPO), basename(path));
+    if (existsSync(section)) {
+      mkdirSync(sectionsDir(root), { recursive: true });
+      copyFileSync(section, join(sectionsDir(root), basename(path)));
+    }
   }
   copyFileSync(join(REPO, "fux.toml"), join(root, "fux.toml"));
   // This repo's tune turns the graph tier on, which is what makes `ask` read.

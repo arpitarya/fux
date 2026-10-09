@@ -11,7 +11,7 @@ feature: "`.fux/runtime/manifest.json` — the derived plane's freshness contrac
 owns: [node/src/derive/manifest.mjs@1f56aa34661c, src/fux/derive/manifest.py@4b0c54b89a42]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 3fcdb4c81b271a3d3274842916e58b4c341a7612b110397569f13518bad1fdc1
+content_sha: 22c3c65b90b140b59fe85ca5d716a311294c9e1168f6b2f0d1763e531f6f9c4c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -174,6 +174,9 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `shards` also pins every **section shard**, keyed `sections/<name>` so that the two planes' `00.jsonl` cannot collide (`derive/format.py::stamp_name`). A commit that rewrites only a section shard makes the runtime stale ([SR-SECTIONS](0161_sections.md) decision 7). `fux doctor`'s deep re-hash reads the same keys.
 
 ### Consequences
 

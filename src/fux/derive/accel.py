@@ -102,6 +102,8 @@ class Runtime:
         self._offsets: dict[str, bytes] = {}
         self._postings: dict[str, bytes] = {}
         self._anchors: dict[str, dict] = {}
+        self._section_rows: list | None = None
+        self._section_postings: dict[str, dict] = {}
 
     @property
     def stats(self) -> dict:
@@ -142,6 +144,22 @@ class Runtime:
             path = fmt.anchors_path(self.root, prefix)
             self._anchors[prefix] = json.loads(path.read_bytes()) if path.exists() else {}
         return [(int(idx), int(count)) for idx, count in self._anchors[prefix].get(term, ())]
+
+    @property
+    def section_rows(self) -> list:
+        """`sections.json`'s rows, `[docidx, k, flen]` by secidx — W-236."""
+        if self._section_rows is None:
+            raw = json.loads((self.dir / fmt.SECTION_TABLE_NAME).read_bytes())
+            self._section_rows = raw["rows"]
+        return self._section_rows
+
+    def section_postings(self, term: str) -> list:
+        """`[secidx, tf]` for one term, off `sections/<prefix>.json` — W-236."""
+        prefix = fmt.term_prefix(term)
+        if prefix not in self._section_postings:
+            path = fmt.section_postings_path(self.root, prefix)
+            self._section_postings[prefix] = json.loads(path.read_bytes()) if path.exists() else {}
+        return self._section_postings[prefix].get(term, [])
 
     def blocks_for(self, term: str) -> list[Block]:
         """Every block of a term, by one bisect over the fixed-width table."""
@@ -250,11 +268,13 @@ def is_fresh(root: Path) -> bool:
 
     from .. import store as store_mod
 
-    paths = store_mod.iter_shard_paths(root)
+    # W-236: the section shards are stamped beside the document shards, under
+    # `sections/<name>`, so a commit that rewrote only a section shard is seen.
+    paths = [*store_mod.iter_shard_paths(root), *store_mod.iter_section_paths(root)]
     if len(paths) != len(stamp):
         return False
     for path in paths:
-        entry = stamp.get(path.name)
+        entry = stamp.get(fmt.stamp_name(path))
         if entry is None:
             return False
         st = path.stat()
@@ -313,6 +333,10 @@ def accel_candidates(
         total_wlen=derive_wlen(
             list(stats["total_flen"]), scoring, int(stats.get("total_anchor_len", 0))
         ),
+        # W-236: read only when the best-section term is on, exactly as the
+        # scan sums them only then. `is_fresh` refuses a pre-v10 plane.
+        sec_units=int(stats["sec_units"]) if scoring.section_on else 0,
+        sec_total_wlen=derive_wlen(list(stats["sec_total_flen"]), scoring) if scoring.section_on else 0.0,
     )
     if corpus.n == 0:
         return [], dict.fromkeys(query_hashes, 0), corpus
@@ -388,6 +412,8 @@ def accel_candidates(
         }
         for docidx, terms in hits.items()
     ]
+    if scoring.section_on:
+        _attach_sections(runtime, query_hashes, candidates, list(hits), docs)
     if anchor_on:
         # **On EVERY candidate, including the ones with no anchor match at
         # all.** `atf` may be empty; `alen` may not be, and a document that is
@@ -461,6 +487,19 @@ def _cannot_reach(
         if expansion is not None and not expansion.trivial:
             bound *= expansion.weight_of(term)
         ceiling += bound
+
+    # W-236 — an unseen document's best section can only match deferred terms
+    # too, and one BM25 term contribution is below `idf · (k1 + 1)` at any tf
+    # and any length. So `λ · idf(h) · (k1 + 1) · w(h)` per deferred term
+    # bounds the section term, before the document weight (SR-SECTIONS d7).
+    if scoring.section_on:
+        for term in deferred:
+            if not blocks[term]:
+                continue
+            bound = scoring.section * idf(df[term], corpus.n) * (scoring.k1 + 1)
+            if expansion is not None and not expansion.trivial:
+                bound *= expansion.weight_of(term)
+            ceiling += bound
 
     if not weighting.trivial:
         ceiling *= weighting.maximum
@@ -543,6 +582,29 @@ def _kth_score(
         scores.append(s)
     scores.sort(reverse=True)
     return scores[top - 1]
+
+
+def _attach_sections(runtime, query_hashes, candidates, docidxs, docs) -> None:
+    """W-236 — each candidate's `nsec`, and its matching sections as `secs`.
+
+    The scan's shape exactly: `(k, flen, terms)` per section that carries a
+    query hash, in `k` order, read from the derived section postings rather
+    than the committed shards (decision 7). Every query term is read in full,
+    so a candidate's sections are complete whatever the skip loop deferred.
+    """
+    rows = runtime.section_rows
+    wanted = set(docidxs)
+    bags: dict[int, dict[int, tuple[list[int], dict[str, list[int]]]]] = {}
+    for term in query_hashes:
+        for secidx, tf in runtime.section_postings(term):
+            docidx, k, flen = rows[secidx]
+            if docidx in wanted:
+                bags.setdefault(docidx, {}).setdefault(k, (list(flen), {}))[1][term] = list(tf)
+    for candidate, docidx in zip(candidates, docidxs, strict=True):
+        candidate["nsec"] = docs[docidx].get("nsec", 0)
+        bag = bags.get(docidx)
+        if bag:
+            candidate["secs"] = [(k, *bag[k]) for k in sorted(bag)]
 
 
 def _fill_deferred(runtime, blocks, opened, query_hashes, hits, read_blocks) -> None:

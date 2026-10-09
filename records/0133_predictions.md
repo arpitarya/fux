@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-10-09
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@5d8ba6a4bdcd, tools/t2-eval@cc5410393ce4, tools/quality-controls@821c77744e32, tools/vector-gate@0023bff0cdef, tools/section-size@25bfc75777a6]
+owns: [tests/test_regression_runs.py@5d8ba6a4bdcd, tools/t2-eval@cc5410393ce4, tools/quality-controls@f2cda53f87d7, tools/vector-gate@0023bff0cdef, tools/section-size@25bfc75777a6]
 laws: [L4]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: e675b98850e8c7fbe028a3cf88ba70f47da9117789129c4f3f66aff1df61dc10
+content_sha: d842790af4fadc7e144ef307fe983312d8e14eb00f9a57ecdd4979a17d9caddc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

@@ -20,8 +20,10 @@ import { FuxError } from "../errors.mjs";
 import { fixed } from "../config/constants.mjs";
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
 import { pyDumps } from "../compat/pyjson.mjs";
-import { iterShardPaths, rawRecordLines } from "../store/reader.mjs";
-import { TF_FIELDS, contentSha, displayTitle } from "../store/format.mjs";
+import { iterSectionPaths, iterShardPaths, rawRecordLines, sectionOrdinal } from "../store/reader.mjs";
+import {
+  TF_FIELDS, SECTION_SLOTS, contentSha, displayTitle, sectionId, sectionParent,
+} from "../store/format.mjs";
 import { derivedDir } from "../store/cachedir.mjs";
 import { buildPlane, SCHEMA as GRAPH_SCHEMA } from "../graph/plane.mjs";
 import * as fmt from "./format.mjs";
@@ -107,8 +109,7 @@ function readCommitted(root) {
   for (const path of iterShardPaths(root)) {
     const raw = readFileSync(path);
     const st = statSync(path, { bigint: true });
-    const name = path.slice(Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1);
-    shardStamp.push([name, contentSha(raw), st.size, st.mtimeNs]);
+    shardStamp.push([fmt.stampName(path), contentSha(raw), st.size, st.mtimeNs]);
     const [, lines] = rawRecordLines(path);
     let lineno = HEADER_LINES + 1;
     for (const line of lines) {
@@ -123,6 +124,7 @@ function readCommitted(root) {
     }
   }
   records.sort((a, b) => cmpCodePoints(a.id, b.id));
+  const sectionLines = readSectionPlane(root, shardStamp);
 
   const docs = records.map((r) => ({
     id: r.id,
@@ -132,7 +134,11 @@ function readCommitted(root) {
     archived: Boolean(r.archived),
     superseded: Boolean(r.superseded),
     mtime: r.mtime ?? null,
+    // W-236: how many section records this document has; 0 is sectionless.
+    // Carried off the record, checked against the plane just below.
+    nsec: Number(r.nsec ?? 0),
   }));
+  const sections = sectionPlanes(docs, sectionLines);
 
   const postings = new Map();
   records.forEach((record, docidx) => {
@@ -172,8 +178,109 @@ function readCommitted(root) {
   }
   let totalAnchorLen = 0;
   for (const v of anchorLen.values()) totalAnchorLen += v;
-  const stats = statsPlane.payload({ n: totalDocs, totalFlen, totalAnchorLen });
-  return { docs, postings, anchors, stats, shardStamp, records };
+  const stats = statsPlane.payload({
+    n: totalDocs, totalFlen, totalAnchorLen,
+    secUnits: sections.units, secTotalFlen: sections.totalFlen,
+  });
+  return { docs, postings, anchors, stats, shardStamp, records, sections };
+}
+
+/** `_read_section_plane` — every committed section line, as
+ *  `[parent, k, flen, terms]`, stamped beside the document shards. Each line's
+ *  byte-level `flen` must equal its parsed `flen`, because the scan reads it
+ *  off the bytes. */
+function readSectionPlane(root, shardStamp) {
+  const out = [];
+  for (const path of iterSectionPaths(root)) {
+    const raw = readFileSync(path);
+    const st = statSync(path, { bigint: true });
+    shardStamp.push([fmt.stampName(path), contentSha(raw), st.size, st.mtimeNs]);
+    const [, lines] = rawRecordLines(path);
+    let lineno = HEADER_LINES + 1;
+    for (const line of lines) {
+      const record = JSON.parse(line.toString("utf8"));
+      const fromRegex = regexFlen(line.toString("latin1")) ?? [];
+      const parsed = [...(record.flen ?? [])];
+      if (FLEN_RE.exec(line.toString("latin1")) === null || JSON.stringify(fromRegex) !== JSON.stringify(parsed)) {
+        throw new FuxError(
+          `${path}:${lineno}: section ${pyRepr(record.id)} has flen ` +
+          `${pyRepr(record.flen ?? null)} but the byte-level regex reads ${pyRepr(fromRegex)}. ` +
+          "Refusing to build.",
+        );
+      }
+      out.push([sectionParent(record.id), sectionOrdinal(record.id), fromRegex, record.terms ?? {}]);
+      lineno++;
+    }
+  }
+  return out;
+}
+
+/** `_section_planes` — the section table, its postings and its statistics,
+ *  and the two planes held together: a section line with no parent, or a
+ *  document whose `nsec` is not its count of section lines, refuses the build
+ *  (SR-SECTIONS decision 9). A SECTIONLESS document counts as its own single
+ *  section over its body and heading slots, as the scan sums it. */
+function sectionPlanes(docs, sectionLines) {
+  const docidxOf = new Map(docs.map((doc, i) => [doc.id, i]));
+  const counts = new Map();
+  const rows = [];
+  for (const [parent, k, flen, terms] of sectionLines) {
+    const idx = docidxOf.get(parent);
+    if (idx === undefined) {
+      throw new FuxError(
+        `the section plane holds ${pyRepr(sectionId(parent, k))}, whose document ` +
+        `${pyRepr(parent)} is not in the index. The two planes disagree; run \`fux ingest\` ` +
+        "to rewrite both. Refusing to build.",
+      );
+    }
+    counts.set(parent, (counts.get(parent) ?? 0) + 1);
+    rows.push([idx, k, flen, terms]);
+  }
+  for (const doc of docs) {
+    const held = counts.get(doc.id) ?? 0;
+    if (doc.nsec !== held) {
+      throw new FuxError(
+        `${pyRepr(doc.id)} declares nsec=${doc.nsec} but the section plane holds ` +
+        `${held} section(s) for it. The two planes disagree; run ` +
+        "`fux ingest` to rewrite both. Refusing to build.",
+      );
+    }
+  }
+  rows.sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]));
+  const totalFlen = new Array(SECTION_SLOTS).fill(0);
+  const postings = new Map();
+  rows.forEach(([, , flen, terms], secidx) => {
+    for (let i = 0; i < Math.min(flen.length, SECTION_SLOTS); i++) totalFlen[i] += flen[i];
+    for (const [term, tf] of Object.entries(terms)) {
+      let list = postings.get(term);
+      if (list === undefined) { list = []; postings.set(term, list); }
+      list.push([secidx, [...tf]]);
+    }
+  });
+  let sectionless = 0;
+  for (const doc of docs) {
+    if (doc.nsec !== 0) continue;
+    sectionless++;
+    for (let i = 0; i < Math.min(doc.flen.length, SECTION_SLOTS); i++) totalFlen[i] += doc.flen[i];
+  }
+  return {
+    rows: rows.map(([idx, k, flen]) => [idx, k, [...flen]]),
+    postings,
+    units: rows.length + sectionless,
+    totalFlen,
+  };
+}
+
+/** `_write_sections` — `sections.json` and `sections/<prefix>.json`. */
+function writeSections(root, directory, sections) {
+  fmt.writeJson(join(directory, fmt.SECTION_TABLE_NAME), { rows: sections.rows });
+  const byPrefix = new Map();
+  for (const term of [...sections.postings.keys()].sort(cmpCodePoints)) {
+    const prefix = fmt.termPrefix(term);
+    if (!byPrefix.has(prefix)) byPrefix.set(prefix, new Map());
+    byPrefix.get(prefix).set(term, sections.postings.get(term).map(([secidx, tf]) => [secidx, tf]));
+  }
+  for (const [prefix, payload] of byPrefix) fmt.writeJson(fmt.sectionPostingsPath(root, prefix), payload);
 }
 
 function cmpSide(a, b) {
@@ -286,7 +393,7 @@ function clear(directory) {
 
 /** Materialize `.fux/runtime/` from the committed index. Returns the report. */
 export function build(root) {
-  const { docs, postings, anchors, stats, shardStamp, records } = readCommitted(root);
+  const { docs, postings, anchors, stats, shardStamp, records, sections } = readCommitted(root);
 
   const directory = derivedDir(root, fmt.RUNTIME_DIR);
   const postingsDirectory = join(directory, fmt.POSTINGS_DIR);
@@ -295,6 +402,9 @@ export function build(root) {
   const anchorsDirectory = join(directory, fmt.ANCHORS_DIR);
   mkdirSync(anchorsDirectory, { recursive: true });
   clear(anchorsDirectory);
+  const sectionDirectory = join(directory, fmt.SECTIONS_RT_DIR);
+  mkdirSync(sectionDirectory, { recursive: true });
+  clear(sectionDirectory);
 
   docstable.write(directory, docs);
   statsPlane.write(directory, stats);
@@ -303,6 +413,7 @@ export function build(root) {
 
   const [blocks, postingsCount] = writePostings(root, postings, docs.map((d) => d.flen));
   writeAnchors(root, anchors);
+  writeSections(root, directory, sections);
 
   manifest.write(directory, { docs: docs.length, terms: postings.size, blocks, shardStamp });
   // Last, and volatile on purpose: a reader racing this build sees no stamp or

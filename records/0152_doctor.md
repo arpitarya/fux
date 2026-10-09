@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@3dd3f0f7cb5e, tests/test_doctor_register_is_complete.py@dff0d535b078]
+owns: [src/fux/doctor.py@618c11ad4407, tests/test_doctor_register_is_complete.py@dff0d535b078]
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 11039d54b00e378a385640676b2a1a40e7f258bdad72ae05be44c27ecbe39bd8
+content_sha: 7b32048b4c0d58924b6142788b436d841b7c518e208300bf0e81137654220799
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -481,6 +481,9 @@ this moved where they are written, not what they are.
 **`doctor` paints a progress bar** (W-238, 2026-09-29; [SR-CLI](0101_cli-surface.md) decision 17). `identifier families current` re-runs the identifier lens over every document, which is 45 of 48 s of `doctor` on this repo. The run therefore holds the invocation's `Progress` (in a module global beside `_RECORDS`), and that check paints `read` then `detect`. `doctor` now takes `--progress` / `--no-progress` and reads `[cli] progress_threshold`. No row, level or exit code changed, and stdout is byte-identical with the bar on or off.
 
 **No decision here moved** (W-248, 2026-10-04): a `queue: no decoder` row reports the queued documents no decoder claims, by extension.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** The accelerator row's deep re-hash covers **section shards** under their `sections/<name>` manifest key ([SR-SECTIONS](0161_sections.md) decision 7).
 
 ### Consequences
 

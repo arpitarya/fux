@@ -14,9 +14,10 @@
  * Owned, with its Python twin, by [SR-T1-ACCELERATOR](../../../records/0110_accelerator.md).
  */
 import { writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { pyDumps } from "../compat/pyjson.mjs";
 import { fixed } from "../config/constants.mjs";
+import { SECTIONS_DIR } from "../store/format.mjs";
 
 export const RUNTIME_DIR = fixed("runtime", "dir");
 export const BLOCK_SIZE = fixed("runtime", "block_size");
@@ -30,8 +31,14 @@ export const MANIFEST_NAME = fixed("runtime", "manifest");
 export const STAMP_NAME = fixed("runtime", "stamp");
 export const POSTINGS_DIR = fixed("runtime", "postings_dir");
 export const GRAPH_NAME = fixed("graph", "file");
+//: W-236 (v10): the section table and its postings, derived from the committed
+//: `.fux/index/sections/`. Read only at `section_weight > 0`.
+export const SECTIONS_RT_DIR = fixed("runtime", "sections_dir");
+export const SECTION_TABLE_NAME = fixed("runtime", "section_table");
 /** Files whose bytes must be identical across two builds — `stamp.json` excluded. */
-export const DETERMINISTIC_FILES = [DOCS_NAME, STATS_NAME, MINED_NAME, MANIFEST_NAME, GRAPH_NAME];
+export const DETERMINISTIC_FILES = [
+  DOCS_NAME, STATS_NAME, MINED_NAME, MANIFEST_NAME, SECTION_TABLE_NAME, GRAPH_NAME,
+];
 
 const FIELD_COUNT = fixed("index", "tf_fields").length;
 export const TERM_BYTES = fixed("index", "term_hash_bytes");
@@ -55,6 +62,16 @@ export function anchorsDir(root) { return join(runtimeDir(root), ANCHORS_DIR); }
 export function anchorsPath(root, prefix) { return join(anchorsDir(root), `${prefix}.json`); }
 export function postingsPath(root, prefix) { return join(postingsDir(root), `${prefix}.jsonl`); }
 export function offsetsPath(root, prefix) { return join(postingsDir(root), `${prefix}.idx`); }
+export function sectionPostingsDir(root) { return join(runtimeDir(root), SECTIONS_RT_DIR); }
+export function sectionPostingsPath(root, prefix) { return join(sectionPostingsDir(root), `${prefix}.json`); }
+
+/** A committed shard's key in `stamp.json` and `manifest.json` — `format.py::stamp_name`.
+ *  A document shard is its bare name, as it always was; a section shard is
+ *  `sections/<name>`, so the two planes' `00.jsonl` cannot collide (W-236). */
+export function stampName(path) {
+  const name = basename(path);
+  return basename(dirname(path)) === SECTIONS_DIR ? `${SECTIONS_DIR}/${name}` : name;
+}
 
 /** Postings shard for a term — its hash's first byte, as hex. */
 export function termPrefix(termHash) { return termHash.slice(0, PREFIX_CHARS); }

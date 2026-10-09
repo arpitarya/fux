@@ -11,7 +11,7 @@ feature: "`.fux/runtime/docs.jsonl` — the derived doc table and the join key i
 owns: [node/src/derive/docstable.mjs@74dd7c2a91a2, src/fux/derive/docstable.py@8e287539fe3c]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 3bca99b9e31d654aeb55b85f640ae0cb814d87a8ec651fd06f19b9440d376597
+content_sha: 203f5d5b2b35353005c1f4dbdf2a116d6673336c4acae2291d347704cd4280a3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -169,6 +169,9 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `docs.jsonl` gains **`nsec`** (0 when sectionless), carried off the record and checked against the section plane at build ([SR-SECTIONS](0161_sections.md) decision 9). `DOCS_FIELDS` and `RUNTIME_SCHEMA` (v10) move together, so a v9 table is refused, not read.
 
 ### Consequences
 

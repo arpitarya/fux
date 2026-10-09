@@ -205,9 +205,12 @@ export function runFind(root, args) {
 
   if (args.json) {
     const payload = {
-      results: results.map((r) => ({
-        ...r, headings: headingsFor(recordFor(root, r.id, shards), query, args.maxHeadings),
-      })),
+      results: results.map((r) => {
+        // W-236: `find` never carries the best-section key (`find.py` passes
+        // `section_on=False`), whatever `[ranking] section_weight` says.
+        const { section: _section, ...row } = r;
+        return { ...row, headings: headingsFor(recordFor(root, r.id, shards), query, args.maxHeadings) };
+      }),
     };
     // SR-CONFIDENCE decision 11: present ONLY under --band. **Absent means
     // NOT ASKED FOR — it is never a claim about the answer.** `confidence`

@@ -40,3 +40,29 @@ export function shardFor(docId) { return blake2bHex(enc.encode(docId), 1); }
 export function displayTitle(record) {
   return record.title ?? "";
 }
+
+// -- W-236: the section plane (SR-SECTIONS) -----------------------------------
+//
+// `.fux/index/sections/xx.jsonl`, one canonical line per section record, in the
+// shard its PARENT document lives in (decision 4). A subdirectory rather than
+// extra lines in the document shards, so every reader that lists `??.jsonl`
+// under `.fux/index/` is untouched by construction (decision 1).
+
+export const SECTIONS_DIR = fixed("index", "sections_dir");
+export const SECTION_SEP = fixed("index", "section_sep");
+/** The slots a section carries: a prefix of `TF_FIELDS` (SR-SECTIONS d3). */
+export const SECTION_FIELDS = fixed("index", "section_fields");
+export const SECTION_SLOTS = SECTION_FIELDS.length;
+if (SECTION_FIELDS.some((f, i) => TF_FIELDS[i] !== f)) {
+  throw new Error("section_fields must prefix tf_fields");
+}
+
+/** `<document id>#s<k>`, 1-based — the separator is appended LAST. */
+export function sectionId(parent, k) { return `${parent}${SECTION_SEP}${k}`; }
+
+/** The parent document id — Python's `rsplit(SECTION_SEP, 1)[0]`, so a `url:`
+ *  id holding `#` still parses. */
+export function sectionParent(secId) {
+  const cut = secId.lastIndexOf(SECTION_SEP);
+  return cut < 0 ? secId : secId.slice(0, cut);
+}

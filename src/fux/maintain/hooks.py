@@ -229,6 +229,10 @@ def _write_gitattributes(root: Path) -> None:
     lines = [
         f"{fixed('index', 'dir')}/*{fixed('index', 'shard_suffix')} merge={MERGE_DRIVER_NAME}",
         f".fux/index/REGISTER merge={MERGE_DRIVER_NAME}",
+        # W-236: the section plane is one directory down, and `*.jsonl` in a
+        # `.gitattributes` pattern does not cross a `/` (SR-SECTIONS d9).
+        f"{fixed('index', 'dir')}/{fixed('index', 'sections_dir')}/*{fixed('index', 'shard_suffix')} "
+        f"merge={MERGE_DRIVER_NAME}",
     ]
     existing = path.read_text(encoding="utf-8") if path.exists() else ""
     missing = [line for line in lines if line not in existing]

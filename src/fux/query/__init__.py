@@ -1079,6 +1079,7 @@ class AskBuilt:
                 _as_dict(
                     self.root, r, self.query, sections=self.show_sections,
                     max_headings=self.max_headings,
+                    section_on=self.tune.section_weight > 0,
                 )
                 for r in self.results
             ]
@@ -1130,8 +1131,10 @@ def build_ask(root: Path, args, *, compose: bool, with_related: bool) -> AskBuil
         # W-168 step 4: the frozen baseline never folds mined pairs — it is the
         # words the user typed (SR-CLI decision 12).
         # W-168 step 9: nor applies the intent prior (SR-CLI decision 12).
+        # W-236: nor adds a best-section term (the same decision).
         tune = dataclasses.replace(
-            tune, ask_boost=False, ask_related=False, mined_weight=0.0, intent_weight=0.0
+            tune, ask_boost=False, ask_related=False, mined_weight=0.0, intent_weight=0.0,
+            section_weight=0.0,
         )
     elif getattr(args, "related", None) is False:
         import dataclasses
@@ -1358,6 +1361,11 @@ def _declare_derivation(why) -> None:
             bits.append(f"rerank {doc.rank_before_rerank + 1}->{doc.rank + 1}")
         if doc.rank_untuned is not None and doc.rank_untuned != doc.rank:
             bits.append(f"untuned #{doc.rank_untuned + 1}")
+        # W-236: the best-section term, when it moved the score at all.
+        section = getattr(doc, "section", None)
+        if section and section.get("contribution"):
+            where = (section.get("id") or "").rsplit("#", 1)[-1] or "whole"
+            bits.append(f"section {where} +{section['contribution']:.4f}")
         print("       " + "  ".join(bits), file=sys.stderr)
 
 
@@ -2030,7 +2038,9 @@ def _title_from(root: Path, record: dict | None, fallback_title: str) -> str:
     return store_mod.display_title(record) or fallback_title
 
 
-def _as_dict(root: Path, result: AskResult, query: str, *, sections: bool, max_headings: int) -> dict:
+def _as_dict(
+    root: Path, result: AskResult, query: str, *, sections: bool, max_headings: int, section_on: bool,
+) -> dict:
     """`AskResult` as JSON, with `title` upgraded through the P5 display cache
     and W-84's matched `headings` alongside it.
 
@@ -2052,6 +2062,12 @@ def _as_dict(root: Path, result: AskResult, query: str, *, sections: bool, max_h
     """
     record = _record_for(root, result.id)
     payload = dict(result.__dict__)
+    # W-236 (SR-SECTIONS decision 6): the best-section key exists only while
+    # `section_weight` is on. Off, the hit is byte-identical to one written
+    # before section records existed; on, `null` is a claim — sectionless, or
+    # no section matched.
+    if not section_on:
+        payload.pop("section", None)
     payload["title"] = _title_from(root, record, result.title)
     if sections:
         payload["headings"] = _headings_for(record, query, max_headings)

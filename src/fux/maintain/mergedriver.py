@@ -47,12 +47,14 @@ there, and the deletion wins over an unmodified other side. A deletion racing a
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
 from ..constants import fixed
+from ..store.format import SECTIONS_DIR
 
-__all__ = ["merge_shards", "main", "MergeConflict"]
+__all__ = ["merge_sections", "merge_shards", "main", "MergeConflict"]
 
 
 class MergeConflict(Exception):
@@ -160,6 +162,64 @@ def merge_shards(ancestor: str, ours: str, theirs: str) -> str:
     return "\n".join([header, *(merged[k] for k in sorted(merged))]) + "\n"
 
 
+def merge_sections(ancestor: str, ours: str, theirs: str) -> str:
+    """Three-way merge of one SECTION shard — a parent's sections as one unit (W-236).
+
+    ⚠ **Not `merge_shards` line by line, and that is the whole point.** A
+    section line carries no `ver` and no `sha` (SR-SECTIONS decision 3), and a
+    document's sections are only true TOGETHER: taking `#s1` from one side and
+    `#s2` from the other would build a set that matches neither side's
+    document, with an `nsec` that may still count right — totality broken in
+    silence. So the unit of agreement is the parent's whole group:
+
+    - both sides hold the same group, or one side's equals the ancestor's →
+      the other side's group, exactly `merge_shards`' rules;
+    - **both sides changed it differently → refused**, and both sides are left
+      with conflict markers. A per-file driver cannot see which side the
+      parent's DOCUMENT shard took on `(ver, sha)`, so it cannot follow that
+      verdict, and picking one would be the silent guess this driver exists
+      to refuse. The shard is derived: take either side, then `fux ingest`.
+
+    `fux build` then checks the merged planes agree (decision 9), so anything a
+    merge leaves inconsistent is refused at build, never read.
+    """
+    base_header, base = _split(ancestor)
+    our_header, mine = _split(ours)
+    their_header, yours = _split(theirs)
+    header = our_header or their_header or base_header
+    if our_header and their_header and our_header != their_header:
+        raise MergeConflict(["<header>"])
+
+    from ..store import section_parent
+
+    def groups(lines: dict[str, str]) -> dict[str, tuple[str, ...]]:
+        out: dict[str, list[str]] = {}
+        for sec_id in sorted(lines):
+            out.setdefault(section_parent(sec_id), []).append(lines[sec_id])
+        return {parent: tuple(group) for parent, group in out.items()}
+
+    g_base, g_ours, g_theirs = groups(base), groups(mine), groups(yours)
+    merged: list[str] = []
+    conflicts: list[str] = []
+    for parent in sorted(set(g_base) | set(g_ours) | set(g_theirs)):
+        in_base, in_ours, in_theirs = g_base.get(parent), g_ours.get(parent), g_theirs.get(parent)
+        if in_ours == in_theirs:
+            chosen = in_ours
+        elif in_ours == in_base:
+            chosen = in_theirs
+        elif in_theirs == in_base:
+            chosen = in_ours
+        else:
+            conflicts.append(parent)
+            continue
+        if chosen:
+            merged.extend(chosen)
+    if conflicts:
+        raise MergeConflict(conflicts)
+    by_id = {json.loads(line)["id"]: line for line in merged}
+    return "\n".join([header, *(by_id[k] for k in sorted(by_id))]) + "\n"
+
+
 def _conflict_text(ours: str, theirs: str, ids: list[str]) -> str:
     """Ordinary conflict markers — the thing a human already knows how to fix."""
     named = ", ".join(ids[:5]) + (f" (+{len(ids) - 5} more)" if len(ids) > 5 else "")
@@ -265,12 +325,18 @@ def main(argv: list[str] | None = None) -> int:
     our_text = ours.read_text(encoding="utf-8")
     their_text = theirs.read_text(encoding="utf-8")
 
+    # W-236: a section shard merges by parent, never by line. `%P` names it;
+    # without `%P` the content does — every id in a section shard carries the
+    # separator, and no document id may (`store.section_parent`).
+    is_section = f"/{SECTIONS_DIR}/" in pathname.replace("\\", "/") or _looks_like_sections(our_text)
+    merge = merge_sections if is_section else merge_shards
     try:
         ours.write_text(
-            merge_shards(base_text, our_text, their_text), encoding="utf-8", newline="\n"
+            merge(base_text, our_text, their_text), encoding="utf-8", newline="\n"
         )
     except MergeConflict as exc:
         # Refuse loudly and leave both sides. Never pick one.
+        shown = pathname or f"{fixed('index', 'dir')}/{ours.name}"
         ours.write_text(
             _conflict_text(our_text, their_text, exc.ids), encoding="utf-8", newline="\n"
         )
@@ -279,12 +345,21 @@ def main(argv: list[str] | None = None) -> int:
             f"at the same revision: {', '.join(exc.ids[:5])}\n"
             f"     This file now holds BOTH sides with conflict markers, so no fux verb can "
             f"read it until one side is taken. A shard is derived, so either is fine:\n"
-            f"     git checkout --ours -- .fux/index/{ours.name}   (or --theirs)\n"
+            f"     git checkout --ours -- {shown}   (or --theirs)\n"
             f"     fux ingest                                      rebuilds it from the merged content",
             file=sys.stderr,
         )
         return 1
     return 0
+
+
+def _looks_like_sections(text: str) -> bool:
+    """A shard whose every record id ends in `#s<k>` is a section shard."""
+    from ..store import SECTION_SEP
+
+    lines = [line for line in text.split("\n")[1:] if line.strip()]
+    pattern = re.compile(re.escape(SECTION_SEP) + r"\d+$")
+    return bool(lines) and all(pattern.search(json.loads(line).get("id", "")) for line in lines)
 
 
 if __name__ == "__main__":

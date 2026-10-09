@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-19
 amended: 2026-10-05
 feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule that they are stored raw"
-owns: [node/src/derive/stats.mjs@0036d6ff0826, src/fux/derive/stats.py@595e5ee1a4e5]
+owns: [node/src/derive/stats.mjs@08ecc3b2004a, src/fux/derive/stats.py@8b9d8204d4e7]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: c8449369a62454bdb38b47fa77d675519bb5d1ae36b8898515ac6b8aa6c2debc
+content_sha: 1f7e1d8cf5e736565009c21fbb613bf255117d3e8787cc13f680ecfb7ef818fd
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -222,6 +222,9 @@ this moved where they are written, not what they are.
 The stats plane is unchanged by identifier families; the scan and the accelerator analyze the question with them identically, so `df` and `n` stay one pair ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 **No decision here moved** (W-246, 2026-10-04): `derive/accel.py`'s `is_fresh` docstring now says the deep shard re-hash lives in `doctor`, not that it is owed.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** Two raw keys join the plane: **`sec_units`** (section records plus sectionless documents) and **`sec_total_flen`** (their raw body and heading totals). They are the section `avg_wlen`, weighted at query time ([SR-SECTIONS](0161_sections.md) decision 5). Raw for the reason `total_flen` is raw.
 
 ### Consequences
 

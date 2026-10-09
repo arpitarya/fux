@@ -9,8 +9,10 @@
  * against; the prior went (W-152) and the regex with it. A candidate's own
  * `mtime` comes off the parsed record, like every other per-document fact.)
  */
-import { recordFor, shardsFor } from "../store/reader.mjs";
-import { termHash, TF_FIELDS } from "../store/format.mjs";
+import {
+  iterSectionPaths, rawRecordLines, recordFor, sectionOrdinal, shardsFor,
+} from "../store/reader.mjs";
+import { termHash, TF_FIELDS, SECTION_SLOTS, sectionParent } from "../store/format.mjs";
 import { deriveWlen } from "./bm25f.mjs";
 import { Corpus, rank } from "./rank.mjs";
 import { tokenize } from "./tokenize.mjs";
@@ -27,6 +29,10 @@ const FLEN_RE = /"flen":\[([0-9,\s]*)\]/;
 //: a line carries many edges. Compiled always, matched only when the anchor
 //: field is switched on.
 const EDGE_ANCHOR_RE = /"al":(?<len>\d+),"at":\{[^}]*\},"dst":"(?<dst>[^"]+)"/g;
+
+//: W-236 — a document's section count, off the raw bytes. Absent means
+//: sectionless, and a sectionless document is its own single section unit.
+const NSEC_RE = /"nsec":(\d+)/;
 
 function flenFromLine(text) {
   const m = FLEN_RE.exec(text);
@@ -76,6 +82,10 @@ export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
   const df = {};
   for (const h of queryHashes) df[h] = 0;
   const candidates = [];
+  // W-236 — the section statistics, gathered only when the term is on.
+  const sectionOn = scoring.sectionOn;
+  let secUnits = 0;
+  const secFlen = new Array(SECTION_SLOTS).fill(0);
 
   for (const path of set.paths()) {
     const lines = set.lines(path);
@@ -86,6 +96,11 @@ export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
       const text = line.toString("latin1");
       const flen = flenFromLine(text);
       if (flen !== null) for (let i = 0; i < flen.length; i++) totalFlen[i] += flen[i];
+      if (sectionOn && !NSEC_RE.test(text)) {
+        secUnits++;
+        const cut = flen ?? [];
+        for (let i = 0; i < Math.min(cut.length, SECTION_SLOTS); i++) secFlen[i] += cut[i];
+      }
       // The substring check is a PREFILTER only: a query hash can appear as a
       // literal 16-hex string outside `terms` (a title, an id, a sha) without
       // the document containing that term. Once a line is worth parsing, `df`
@@ -130,6 +145,8 @@ export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
     }
   }
 
+  if (sectionOn) secUnits += attachSections(root, candidates, patterns, secFlen);
+
   if (anchorOn) {
     // 🔴 The RETRIEVAL half. A document whose only match is a linker's wording
     // carries none of the query's hashes on its own line, so the prefilter
@@ -155,8 +172,50 @@ export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
   return [
     candidates,
     df,
-    new Corpus(totalDocs, deriveWlen(totalFlen, scoring, totalAnchorLen)),
+    new Corpus(
+      totalDocs, deriveWlen(totalFlen, scoring, totalAnchorLen),
+      secUnits, sectionOn ? deriveWlen(secFlen, scoring) : 0.0,
+    ),
   ];
+}
+
+/** W-236 — one pass over the section plane, the document pass's rules.
+ *  `scan.py::_attach_sections`.
+ *
+ *  Every section line adds its body and heading length to the section
+ *  statistics, by byte regex, matched or not. A line carrying a query hash is
+ *  parsed and attached to its parent as `[k, flen, terms]`, in `k` order, on
+ *  the candidate's `secs`. Its parent is always a candidate already: a
+ *  section's terms are a subset of its document's (decision 3's totality).
+ *
+ *  Returns the number of section units read. */
+function attachSections(root, candidates, patterns, secFlen) {
+  const byId = new Map(candidates.map((record) => [record.id, record]));
+  const bags = new Map();
+  let units = 0;
+  for (const path of iterSectionPaths(root)) {
+    const [, lines] = rawRecordLines(path);
+    for (const line of lines) {
+      units++;
+      const flen = flenFromLine(line.toString("latin1")) ?? [];
+      for (let i = 0; i < Math.min(flen.length, SECTION_SLOTS); i++) secFlen[i] += flen[i];
+      let hit = false;
+      for (const p of patterns) { if (line.includes(p)) { hit = true; break; } }
+      if (!hit) continue;
+      const section = JSON.parse(line.toString("utf8"));
+      const parent = sectionParent(section.id);
+      if (byId.has(parent)) {
+        let bag = bags.get(parent);
+        if (bag === undefined) { bag = []; bags.set(parent, bag); }
+        bag.push([sectionOrdinal(section.id), section.flen ?? [], section.terms ?? {}]);
+      }
+    }
+  }
+  for (const [parent, bag] of bags) {
+    bag.sort((a, b) => a[0] - b[0]);
+    byId.get(parent).secs = bag;
+  }
+  return units;
 }
 
 /** The reference path. */

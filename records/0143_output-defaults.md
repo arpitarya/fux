@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@0c8e85b0e95b, src/fux/templates/output.toml.txt@0952128ae0aa, .fux/output.toml@4a3a8465d2e4, node/src/config/output.mjs@fa59be4a8c93]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 91d1aec2a5763739305cef42351f4185d426572701234ecb97a6d1a4175fbcd8
+content_sha: 1024f2ed9a234c3a3bd6bb56993731daa440368b01b56d4e7c7b86cfd474f56c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -849,6 +849,9 @@ anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
 **No decision here moved** (W-246, 2026-10-04): `src/fux/mcp.py`'s `fux_passage` and `fux_related` descriptions now name the fields their handlers emit; `[mcp]` keys and `top` are untouched.
 
 **No decision here moved** (W-261, 2026-10-05): `cmd_find` moved to `query/find.py` (SR-FIND's); this record's `describes` row followed it, and the emission gate (`_show_band`) is still the one in `query/__init__.py`.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `section` on an `ask` hit is gated by the ranking weight that produces it, not by an output flag: absent at `section_weight = 0.0`, present on every row otherwise ([SR-SECTIONS](0161_sections.md) decision 6). No new output key in `.fux/output.toml`.
 
 ### Consequences
 

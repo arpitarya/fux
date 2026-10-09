@@ -97,6 +97,12 @@ class AskResult:
     #: absence here rather than a claim — an unboosted row has no route because
     #: no walk reached it, which the `boosted` key already says.
     route: str | None = None
+    #: W-236 — the document's best index section, `<id>#s<k>`, when
+    #: `[ranking] section_weight` is on (SR-SECTIONS decision 6). `None` when
+    #: the document is sectionless or no section of it matched. **Off, the
+    #: renderers never emit the key**; what decides that is the weight, not
+    #: this value, because `None` is also an honest on-value.
+    section: str | None = None
 
 
 @dataclass(frozen=True)
@@ -120,10 +126,21 @@ class Corpus:
 
     n: int
     total_wlen: float
+    #: W-236 — the section statistics (SR-SECTIONS decision 5): how many
+    #: section units the corpus has (every section record, plus every
+    #: sectionless document as its own single section) and their weighted
+    #: body + heading length. Zero, and never read, while `section_weight` is
+    #: off; both candidate generators fill them only when it is on.
+    sec_units: int = 0
+    sec_total_wlen: float = 0.0
 
     @property
     def avg_wlen(self) -> float:
         return self.total_wlen / self.n
+
+    @property
+    def sec_avg_wlen(self) -> float:
+        return self.sec_total_wlen / self.sec_units if self.sec_units else 0.0
 
 
 def _record_is_archived(record: dict, archived_dirs: frozenset[str]) -> bool:
@@ -391,6 +408,12 @@ def rank(
     # `None` when the anchor field is off, and `None` performs no arithmetic:
     # see `score_record`.
     anchor_on = scoring.anchor_on
+    # 🔴 **W-236 — B2's best-section term lands HERE, once, for both paths**,
+    # for the anchor fold's reason. Each generator attaches `secs` — this
+    # document's matching section records as `(k, flen, terms)` — and `nsec`.
+    # Off, nothing below reads either and no arithmetic runs (decision 7).
+    section_on = scoring.section_on
+    sections_out: dict[str, tuple[str | None, float]] = {}
 
     scored = []
     for record in candidates:
@@ -411,6 +434,13 @@ def rank(
             anchor_tf,
             record.get("alen", 0) if anchor_on else 0,
         )
+        if section_on:
+            best_id, best = _best_section(
+                record, query_hashes, df, corpus, scoring, term_weights,
+            )
+            contribution = scoring.section * best
+            s = s + contribution
+            sections_out[record["id"]] = (best_id, contribution)
         archived = _record_is_archived(record, weighting.archived_dirs)
         if demote:
             s *= weighting.of(record)
@@ -477,6 +507,10 @@ def rank(
     if stats_out is not None and scored:
         top_terms = scored[0][0].get("terms", {})
         stats_out["top_doc_hashes"] = [h for h in query_hashes if h in top_terms]
+    # W-236 — `--why`'s seam: each scored document's best section and the
+    # amount it added, before the document's weight. Written after the sort.
+    if stats_out is not None and section_on:
+        stats_out["sections"] = sections_out
 
     return [
         AskResult(
@@ -491,6 +525,43 @@ def rank(
             # table — so reading it here is under the differential law like
             # every other field, rather than being a second read on one path.
             mtime=record.get("mtime"),
+            section=sections_out[record["id"]][0] if section_on else None,
         )
         for i, (record, s, archived) in enumerate(scored[:top])
     ]
+
+
+def _best_section(
+    record: dict,
+    query_hashes: list[str],
+    df: dict[str, int],
+    corpus: Corpus,
+    scoring: Scoring,
+    term_weights: dict[str, float] | None,
+) -> tuple[str | None, float]:
+    """`max_k S_sec(d#s_k)` and the section that reached it — SR-SECTIONS decision 5.
+
+    The SAME `score_record`, over the body and heading slots only, with the
+    DOCUMENT's `df` and `n` and the SECTION `avg_wlen`. A sectionless document
+    is its own single section: its own record, cut to those two slots, so a
+    short document is not penalised for having no section records. Ties go to
+    the lowest `k`; a best of zero names no section, because no section of
+    the document matched anything.
+    """
+    avg = corpus.sec_avg_wlen
+    if not record.get("nsec"):
+        slots = store_mod.SECTION_SLOTS
+        terms = {h: tf[:slots] for h, tf in record.get("terms", {}).items()}
+        best = score_record(
+            terms, list(record.get("flen", []))[:slots], query_hashes, df, corpus.n, avg,
+            scoring, term_weights,
+        )
+        return None, best
+    best_k, best = None, 0.0
+    for k, flen, terms in record.get("secs", ()):
+        s = score_record(terms, flen, query_hashes, df, corpus.n, avg, scoring, term_weights)
+        if s > best:
+            best_k, best = k, s
+    if best_k is None:
+        return None, 0.0
+    return store_mod.section_id(record["id"], best_k), best

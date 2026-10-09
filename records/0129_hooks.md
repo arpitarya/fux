@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-20
 amended: 2026-10-09
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@081950a9f115, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
+owns: [src/fux/maintain@487b49fcff14, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: d5ebe77cb22cc232380e2d65790760612fd3e7cbf311bdad6a00bfd965b21064
+content_sha: e81782482e7a3defa51d9da09e9df154e201896bf7ada6bf1869574d75c956c5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -633,6 +633,9 @@ this moved where they are written, not what they are.
 **No decision here moved** (W-242 Tier 2, 2026-10-03): `node/src/maintain/runner.mjs` is a narrow twin of `runner.py`, the write lock alone, for Node's `fux build`. Node runs no hook, runner or daemon.
 
 **No decision here moved** (W-261, 2026-10-05): the write lock moved from `maintain/runner.py` to `maintain/lock.py` (SR-LOCKS'); `runner` re-exports every name, so `runner.acquire` and `runner.write_lock` keep their callers. `node/src/maintain/runner.mjs`, which was only ever the lock, became `lock.mjs`, so this record no longer claims `node/src/maintain/`.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `fux hooks install` binds the driver to `.fux/index/sections/*.jsonl` too. A `.gitattributes` `*.jsonl` does not cross a `/`, so the existing line never covered the section plane ([SR-SECTIONS](0161_sections.md) decision 9).
 
 ### Consequences
 

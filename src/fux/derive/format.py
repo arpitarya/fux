@@ -107,6 +107,12 @@ BLOCK_SIZE = fixed("runtime", "block_size")
 #: v9 (2026-10-03): they left with the authority prior, so `docs_fields` is v7's
 #: again. The number moves forward so that a v8 plane is refused by name and
 #: rebuilt, never read by a reader that does not expect its fields.
+#: v10 (2026-10-10, W-236): the SECTION plane. `docs.jsonl` carries `nsec`;
+#: `stats.json` carries `sec_units` and `sec_total_flen`; `sections.json` is
+#: the section table and `sections/<prefix>.json` its postings — all derived
+#: from the committed `.fux/index/sections/`, and the stamp and manifest pin
+#: those shards beside the document shards. A v9 plane has none of it and is
+#: refused and rebuilt rather than read as "no sections".
 RUNTIME_SCHEMA = fixed("runtime", "schema")
 
 #: v3 (W-76 Phase 1 record half): `mx` and `mnw` become PER-FIELD arrays.
@@ -167,6 +173,8 @@ MINED_NAME = fixed("runtime", "mined")
 MANIFEST_NAME = fixed("runtime", "manifest")
 STAMP_NAME = fixed("runtime", "stamp")
 POSTINGS_DIR = fixed("runtime", "postings_dir")
+SECTIONS_RT_DIR = fixed("runtime", "sections_dir")
+SECTION_TABLE_NAME = fixed("runtime", "section_table")
 
 #: Files whose bytes must be identical across two builds of the same index.
 #: `stamp.json` is deliberately excluded — it carries filesystem mtimes, which
@@ -175,7 +183,7 @@ POSTINGS_DIR = fixed("runtime", "postings_dir")
 #: `codes.jsonl` left this tuple on 2026-08-25 with the dense lane. A `v4`
 #: plane still has the file on disk; `RUNTIME_SCHEMA` moved to `v5` in the same
 #: change so such a plane is refused and rebuilt rather than read past.
-DETERMINISTIC_FILES = (DOCS_NAME, STATS_NAME, MINED_NAME, MANIFEST_NAME, fixed("graph", "file"))
+DETERMINISTIC_FILES = (DOCS_NAME, STATS_NAME, MINED_NAME, MANIFEST_NAME, SECTION_TABLE_NAME, fixed("graph", "file"))
 
 
 def runtime_dir(root: Path) -> Path:
@@ -192,6 +200,25 @@ def anchors_dir(root: Path) -> Path:
 
 def anchors_path(root: Path, prefix: str) -> Path:
     return anchors_dir(root) / f"{prefix}.json"
+
+
+def section_postings_dir(root: Path) -> Path:
+    return runtime_dir(root) / SECTIONS_RT_DIR
+
+
+def section_postings_path(root: Path, prefix: str) -> Path:
+    return section_postings_dir(root) / f"{prefix}.json"
+
+
+def stamp_name(path: Path) -> str:
+    """A committed shard's key in `stamp.json` and `manifest.json`.
+
+    A document shard is its bare name, as it always was; a section shard is
+    `sections/<name>`, so the two planes' `00.jsonl` cannot collide (W-236).
+    """
+    from ..store import SECTIONS_DIR
+
+    return f"{SECTIONS_DIR}/{path.name}" if path.parent.name == SECTIONS_DIR else path.name
 
 
 def postings_path(root: Path, prefix: str) -> Path:

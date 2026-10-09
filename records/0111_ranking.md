@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@6811ca222c82, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@13c967f6f4d7, src/fux/query/tokenize.py@63f4c4872bd7, src/fux/query/analyzer.py@8f02dd1c4e44, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@71890f0ff70a, node/src/query/bm25f.mjs@683622b24ed0, node/src/query/rank.mjs@3ef9b4ebccf0, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@352450f33e0c, node/test/analyzer.test.mjs@2d0342e628a6]
+owns: [src/fux/query/rank.py@314ca6f0748b, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@4ab5f5c87abe, src/fux/query/tokenize.py@63f4c4872bd7, src/fux/query/analyzer.py@8f02dd1c4e44, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@71890f0ff70a, node/src/query/bm25f.mjs@167ce9d10c88, node/src/query/rank.mjs@17d648c3b2a9, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@352450f33e0c, node/test/analyzer.test.mjs@2d0342e628a6]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ae470f5780ffcb39f49b682e4d276e072d1712976bb92f9cf126b8e3993360c3
+content_sha: 9adeef458a444731ac4722665b6447a831d311eb8309e1b4ef8b1fd5953f40d1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -629,6 +629,9 @@ intent_weight`. `of(record)` is `priority_for(loc) × intent_for(loc)`, and
 **No decision here moved** (W-242 Tier 1, 2026-10-03): Node's `Weighting` gains `maximum`, the twin of `Weighting.maximum` — `max(1.0, priority weights)` times the intent factor when the intent prior is active — read only by the Node accelerator's ceiling ([SR-T1-ACCELERATOR](0110_accelerator.md) decision 18).
 
 **No decision here moved** (W-253, 2026-10-04): `Weighting.priority_for` now matches a `[priority]` entry exactly or at a `/` boundary, per [SR-TUNE](0135_tuning.md) decision 8a; the Node twin already did.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `rank()` gains B2's term, in the one place both paths reach: `S(d) = (S_doc(d) + λ · max_k S_sec(d#s_k)) · w(d)` ([SR-SECTIONS](0161_sections.md) decision 5). `S_sec` is the same `score_record` over the body and heading slots, with the document's `df` and `n` and a section `avg_wlen` carried on `Corpus` (`sec_units`, `sec_total_wlen`). A sectionless document is its own single section, ties go to the lowest `k`, and a best of zero names no section. At `λ = 0` no section arithmetic runs (decision 7). Decision 2's *weight then saturate once* still governs fields within a unit; this adds two units' scores, which is Arpit's ruling.
 
 ### Consequences
 

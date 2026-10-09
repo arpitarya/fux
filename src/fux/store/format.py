@@ -160,3 +160,36 @@ def shard_path(root: Path, shard: str) -> Path:
 
 def index_dir(root: Path) -> Path:
     return root / INDEX_DIR
+
+
+# -- W-236: the section plane (SR-SECTIONS) -----------------------------------
+#
+# `.fux/index/sections/xx.jsonl`, one canonical line per section record, in the
+# shard its PARENT document lives in (decision 4). A subdirectory rather than
+# extra lines in the document shards, so every reader that globs `??.jsonl`
+# under `.fux/index/` is untouched by construction (decision 1).
+
+SECTIONS_DIR = fixed("index", "sections_dir")
+SECTION_SEP = fixed("index", "section_sep")
+#: The slots a section carries: a prefix of `TF_FIELDS` (SR-SECTIONS d3).
+SECTION_FIELDS = tuple(fixed("index", "section_fields"))
+SECTION_SLOTS = len(SECTION_FIELDS)
+assert TF_FIELDS[:SECTION_SLOTS] == SECTION_FIELDS, "section_fields must prefix tf_fields"
+
+
+def sections_dir(root: Path) -> Path:
+    return root / INDEX_DIR / SECTIONS_DIR
+
+
+def section_shard_path(root: Path, shard: str) -> Path:
+    return sections_dir(root) / f"{shard}.jsonl"
+
+
+def section_id(parent: str, k: int) -> str:
+    """`<document id>#s<k>`, 1-based — the separator is appended LAST."""
+    return f"{parent}{SECTION_SEP}{k}"
+
+
+def section_parent(sec_id: str) -> str:
+    """The parent document id. `rsplit`, so a `url:` id holding `#` still parses."""
+    return sec_id.rsplit(SECTION_SEP, 1)[0]

@@ -208,6 +208,11 @@ def run(
     if stopping():
         return None
     existing = _existing_index(root, full=full)
+    # W-236 — the prior section plane, carried with its document when the
+    # document's extraction is carried (SR-SECTIONS d8). Read only when there
+    # is a current-format index to carry from; a discarded foreign index has
+    # no sections this engine could reuse.
+    existing_sections = store_mod.read_sections(root) if existing else {}
     existing_urls = {doc_id: rec for doc_id, rec in existing.items() if doc_id.startswith("url:")}
 
     fresh: dict[str, bytes] = {}  # url doc_id -> fetched content, this run only
@@ -673,6 +678,7 @@ def run(
         if prior is not None:
             # Carried forward: pure functions of bytes that have not changed.
             record.update({k: prior[k] for k in EXTRACTED_FIELDS if k in prior})
+            record["sections"] = existing_sections.get(doc_id, [])
         else:
             fields = extracted[doc_id]
             record.update(
@@ -686,6 +692,7 @@ def run(
             abbr = _hash_abbr(fields.abbr, tracker)
             if abbr:
                 record["abbr"] = abbr
+            record["sections"] = _section_records(doc_id, fields.sections, tracker)
         # Edges last, and never reused: they are the one field the rest of the
         # corpus can change without this document changing.
         #
@@ -727,13 +734,20 @@ def run(
         # exactly like a git one and there is nothing left to branch on.
         record["title"] = fields.title
         record["phrases"] = fields.phrases
+        record["sections"] = _section_records(doc_id, fields.sections, tracker)
         records.append(record)
 
     # `known_ids` is exactly this run's final id set — every parsed document
     # becomes a record, and so does every carried one — which is what makes it
     # the right thing to re-check a carried record's edges against (W-63).
     records.extend(
-        _with_archived(_without_dangling_edges(carried[doc_id], known_ids), doc_id in archived_url_srcs)
+        {
+            **_with_archived(_without_dangling_edges(carried[doc_id], known_ids), doc_id in archived_url_srcs),
+            # W-236: a carried `url:` record keeps its section records too. One
+            # whose fetch failed under a foreign index has none and is
+            # sectionless — SR-SECTIONS d8's correct, degraded state.
+            "sections": existing_sections.get(doc_id, []),
+        }
         for doc_id in sorted(carried)
     )
 
@@ -958,6 +972,23 @@ def _enrichment_for(root, sha: str, rules=()) -> tuple[str, dict[str, int]]:
 #: changing, so carrying it forward would freeze a link that a newly added
 #: document should have resolved.
 EXTRACTED_FIELDS = store_mod.recordschema.carried_fields()
+
+
+def _section_records(doc_id: str, sections, tracker) -> list[dict]:
+    """W-236 — one extraction's sections as committed section records.
+
+    `{"id", "flen", "terms"}` and nothing else (SR-SECTIONS d3), hashed through
+    the run's tracker like `terms`. `store.write_index` takes the list off the
+    record, writes it to the section plane and stamps `nsec` from it.
+    """
+    return [
+        {
+            "id": store_mod.section_id(doc_id, k),
+            "flen": store_mod.trim(flen),
+            "terms": store_mod.hash_terms(terms, tracker),
+        }
+        for k, (flen, terms) in enumerate(sections, start=1)
+    ]
 
 
 def _hash_abbr(pairs, tracker) -> list[list[list[str]]]:

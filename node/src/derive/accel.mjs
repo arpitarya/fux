@@ -25,7 +25,7 @@ import { idf, deriveWlen, scoreRecord } from "../query/bm25f.mjs";
 import { Corpus, rank, Weighting } from "../query/rank.mjs";
 import { queryTermHashes } from "../query/scan.mjs";
 import { identifiersFor } from "../query/identifiers.mjs";
-import { iterShardPaths } from "../store/reader.mjs";
+import { iterSectionPaths, iterShardPaths } from "../store/reader.mjs";
 import { pyRound9 } from "../compat/pyfloat.mjs";
 import * as fmt from "./format.mjs";
 
@@ -39,6 +39,8 @@ export class Runtime {
     this._offsets = new Map();
     this._postings = new Map();
     this._anchors = new Map();
+    this._sectionRows = null;
+    this._sectionPostings = new Map();
   }
 
   get stats() {
@@ -84,6 +86,26 @@ export class Runtime {
       this._anchors.set(prefix, table);
     }
     return (Object.hasOwn(table, term) ? table[term] : []).map(([idx, count]) => [Number(idx), Number(count)]);
+  }
+
+  /** `sections.json`'s rows, `[docidx, k, flen]` by secidx — W-236. */
+  get sectionRows() {
+    if (this._sectionRows === null) {
+      this._sectionRows = JSON.parse(readFileSync(join(this.dir, fmt.SECTION_TABLE_NAME), "utf8")).rows;
+    }
+    return this._sectionRows;
+  }
+
+  /** `[secidx, tf]` for one term, off `sections/<prefix>.json` — W-236. */
+  sectionPostings(term) {
+    const prefix = fmt.termPrefix(term);
+    let table = this._sectionPostings.get(prefix);
+    if (table === undefined) {
+      const path = fmt.sectionPostingsPath(this.root, prefix);
+      table = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {};
+      this._sectionPostings.set(prefix, table);
+    }
+    return Object.hasOwn(table, term) ? table[term] : [];
   }
 
   /** Every block of a term, by one bisect over the fixed-width table. */
@@ -179,20 +201,17 @@ export function isFresh(root) {
   const fields = Array.isArray(manifest.docs_fields) ? manifest.docs_fields : [];
   if (fields.length !== fmt.DOCS_FIELDS.length || fields.some((f, i) => f !== fmt.DOCS_FIELDS[i])) return false;
 
-  const paths = iterShardPaths(root);
+  // W-236: the section shards are stamped beside the document shards, under
+  // `sections/<name>`, so a commit that rewrote only a section shard is seen.
+  const paths = [...iterShardPaths(root), ...iterSectionPaths(root)];
   if (paths.length !== stamp.size) return false;
   for (const path of paths) {
-    const entry = stamp.get(baseName(path));
+    const entry = stamp.get(fmt.stampName(path));
     if (entry === undefined) return false;
     const st = statSync(path, { bigint: true });
     if (st.size !== entry[0] || st.mtimeNs !== entry[1]) return false;
   }
   return true;
-}
-
-function baseName(path) {
-  const cut = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
-  return path.slice(cut + 1);
 }
 
 /** Is a plane present AND fresh? The one test `runQuery` makes before `--fast`. */
@@ -214,6 +233,10 @@ export function accelCandidates(runtime, queryHashes, top, { skipping, weighting
   const corpus = new Corpus(
     stats.n,
     deriveWlen([...stats.total_flen], scoring, Number(stats.total_anchor_len ?? 0)),
+    // W-236: read only when the best-section term is on, exactly as the scan
+    // sums them only then. `isFresh` refuses a pre-v10 plane.
+    scoring.sectionOn ? Number(stats.sec_units) : 0,
+    scoring.sectionOn ? deriveWlen([...stats.sec_total_flen], scoring) : 0.0,
   );
   if (corpus.n === 0) {
     const df = {};
@@ -285,13 +308,18 @@ export function accelCandidates(runtime, queryHashes, top, { skipping, weighting
       mtime: doc.mtime ?? null,
       terms: termsCopy,
     };
-    if (anchorOn) {
-      // On EVERY candidate, matching or not: a linked-to document is a longer
-      // document whatever words its linkers used (`accel.py`'s note).
-      candidate.atf = anchorTf.get(docidx) ?? {};
-      candidate.alen = doc.alen ?? 0;
-    }
     candidates.push(candidate);
+  }
+  if (scoring.sectionOn) attachSections(runtime, queryHashes, candidates, [...hits.keys()], docs);
+  if (anchorOn) {
+    // On EVERY candidate, matching or not: a linked-to document is a longer
+    // document whatever words its linkers used (`accel.py`'s note).
+    let i = 0;
+    for (const docidx of hits.keys()) {
+      candidates[i].atf = anchorTf.get(docidx) ?? {};
+      candidates[i].alen = docs[docidx].alen ?? 0;
+      i++;
+    }
   }
   return [candidates, df, corpus];
 }
@@ -315,6 +343,19 @@ function cannotReach(
     }
     if (expansion !== null && !expansion.trivial) bound *= expansion.weightOf(term);
     ceiling += bound;
+  }
+
+  // W-236 — an unseen document's best section can only match deferred terms
+  // too, and one BM25 term contribution is below `idf · (k1 + 1)` at any tf
+  // and any length. So `λ · idf(h) · (k1 + 1) · w(h)` per deferred term
+  // bounds the section term, before the document weight (SR-SECTIONS d7).
+  if (scoring.sectionOn) {
+    for (const term of deferred) {
+      if (!blocks.get(term).length) continue;
+      let bound = scoring.section * idf(df[term], corpus.n) * (scoring.k1 + 1);
+      if (expansion !== null && !expansion.trivial) bound *= expansion.weightOf(term);
+      ceiling += bound;
+    }
   }
 
   if (!weighting.trivial) ceiling *= weighting.maximum;
@@ -353,6 +394,34 @@ function kthScore(hits, docs, openedOrder, df, corpus, top, avgWlen, weighting, 
   }
   scores.sort((a, b) => b - a);
   return scores[top - 1];
+}
+
+/** W-236 — each candidate's `nsec`, and its matching sections as `secs`.
+ *  `accel.py::_attach_sections`: the scan's shape exactly, `[k, flen, terms]`
+ *  per section carrying a query hash, in `k` order, read from the derived
+ *  section postings rather than the committed shards (decision 7). */
+function attachSections(runtime, queryHashes, candidates, docidxs, docs) {
+  const rows = runtime.sectionRows;
+  const wanted = new Set(docidxs);
+  const bags = new Map();  // docidx -> Map(k -> [flen, terms])
+  for (const term of queryHashes) {
+    for (const [secidx, tf] of runtime.sectionPostings(term)) {
+      const [docidx, k, flen] = rows[secidx];
+      if (!wanted.has(docidx)) continue;
+      let bag = bags.get(docidx);
+      if (bag === undefined) { bag = new Map(); bags.set(docidx, bag); }
+      let entry = bag.get(k);
+      if (entry === undefined) { entry = [[...flen], {}]; bag.set(k, entry); }
+      entry[1][term] = [...tf];
+    }
+  }
+  docidxs.forEach((docidx, i) => {
+    candidates[i].nsec = docs[docidx].nsec ?? 0;
+    const bag = bags.get(docidx);
+    if (bag !== undefined && bag.size) {
+      candidates[i].secs = [...bag.keys()].sort((a, b) => a - b).map((k) => [k, ...bag.get(k)]);
+    }
+  });
 }
 
 /** Complete known candidates from the few blocks that actually cover them. */

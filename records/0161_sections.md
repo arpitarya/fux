@@ -6,19 +6,21 @@ title: "SR-SECTIONS (0161) — section records: a doc#section plane beside the d
 description: "The design of W-168 step 10 as ruled U2 · B2 · E1: each heading section of a multi-section document becomes a committed `doc#s<k>` record in its own plane, `.fux/index/sections/`, cut by a tunable-free section rule. Its best section adds `section_weight` times its score to the document's. At 0.0 the plane is never opened, so ranking is byte-identical. The design is not built."
 status: proposed
 date: 2026-09-30
-amended: 2026-10-09
+amended: 2026-10-10
 feature: section records — the committed section plane, the index section rule, and the B2 best-section term
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: 858971af6fa1dedcec8d149f06f3c67cfc4dd56c6ea0892bf511f1eb87cca017
+content_sha: 15e922c40d754eac02758fe6b25b5d9c8824b798613acdde37efd0058db3d2c7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Describes** — reaches into, does not own:
 
-- [`src/fux/refer/_chunk.py::_sections,_title_index`](../src/fux/refer/_chunk.py) · owned by [SR-CHUNKING](0151_chunking.md)
+- [`src/fux/maintain/mergedriver.py::merge_sections`](../src/fux/maintain/mergedriver.py) · owned by [SR-MERGE-DRIVER](0130_merge-driver.md)
+- [`src/fux/query/rank.py::_best_section`](../src/fux/query/rank.py) · owned by [SR-RANKING](0111_ranking.md)
+- [`src/fux/refer/_chunk.py::_sections,_title_index,index_sections`](../src/fux/refer/_chunk.py) · owned by [SR-CHUNKING](0151_chunking.md)
 
 <!-- COMPONENTS-END -->
 
@@ -39,6 +41,14 @@ section is cut by **heading depth alone, with no tunable**. A document keeps
 **one result**: its score gains `section_weight` × its best section's score
 (B2). At the default `0.0` nothing reads the plane, so the ranking is
 byte-identical to an index without it.
+
+**Built 2026-10-10 on branch `w236-sections`, not merged** (W-236 Part B).
+Both readers, the build invariant, the merge driver and the `section` hit key
+exist there. `main` carries none of it until the
+[pre-registered run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md)
+passes: the format bump ships only with a PASS (decision 8). Building it
+settled three details the design had left open. They are written into
+decisions 3, 5 and 9 below, before any arm ran.
 
 **Owns nothing yet.** Neither case (a) nor case (b) of [SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 7 fits this record: it is `proposed` and unbuilt, so there is no component of its own to own, and its `describes` row on the chunker's two section functions keeps it reachable until the build gives it components.
 
@@ -176,6 +186,11 @@ Over the same text `extract.py` tokenises (the decoded, PII-redacted body):
   whole document's body and heading (front-matter values excluded). **Measured:
   0 misses on every rung**
   ([run](../work/regression/2026-09-30-section-size/report.md)).
+  **Built as a check** (2026-10-10): `extract.py` compares the sums with the
+  document's own counts, and a miss makes the document **sectionless**. It
+  gets no section records rather than ones that disagree with its postings.
+  That is deterministic, and it keeps the invariant by construction rather
+  than by the ladder's measurement.
 - **The document record gains `nsec`**, the number of its section records.
   It is omitted when the document is sectionless (`omit_when`, as
   `archived` is). A reader can then tell *sectionless* from *sections
@@ -203,8 +218,11 @@ S(d) = ( S_doc(d) + λ · max_k S_sec(d#s_k) ) · w(d)
 - **A sectionless document is its own single section.** Its section view is
   its own record restricted to the body and heading slots. It is scored the
   same way, so short documents are not penalised for having no section records.
-- **Ties go to the lowest `k`.** Anchor terms stay document-level: a section
-  gets no anchor field. The `--expand` guard is unchanged, because it runs on
+- **Ties go to the lowest `k`.** **A best of zero names no section**
+  (2026-10-10): when no section of a document matched a query term, the hit's
+  `section` is `null` and the term adds nothing. Naming `#s1` there would be a
+  tie-break among zeros, presented as an answer. Anchor terms stay
+  document-level: a section gets no anchor field. The `--expand` guard is unchanged, because it runs on
   the document before anything is scored.
 - **This is one scorer, not a second stage.**
   [SR-RANKING](0111_ranking.md) decision 6 reserves BM25F arithmetic to
@@ -218,13 +236,15 @@ S(d) = ( S_doc(d) + λ · max_k S_sec(d#s_k) ) · w(d)
 
 **6. One result per document, always.** A section is never a hit, a candidate
 or a line in the output. When `λ ≠ 0`, each hit carries
-`section: "<document id>#s<k>"`, or `null` for a sectionless document, and
-`--why` names the section term's contribution. **When `λ = 0` the key is
+`section: "<document id>#s<k>"`, or `null` for a sectionless document or one
+with no matching section. `--why` names the section term's contribution: each
+derivation document carries `section: {"id", "contribution"}`, and
+`score = (Σ contribution + section.contribution) × rerank_uplift × multiplier`. **When `λ = 0` the key is
 absent**, because the output has to be byte-identical (decision 7).
 
 **7. `0.0` is OFF, not "weight zero"** (the anchor field's rule,
 SR-RANKING decision 12c). At `0.0` neither reader opens `.fux/index/sections/`,
-no section statistic is computed, and no arithmetic runs. **A v6 index at
+no section statistic is computed, and no arithmetic runs. **A v8 index at
 `0.0` must rank byte-identically to the pre-section engine on the same
 corpus**, and that is Part B's first gate. When `λ > 0`:
 
@@ -263,10 +283,21 @@ decision 9.1, and `fux ingest --full` is the migration.**
 - `fux build` refuses an index where a document's `nsec` differs from the
   number of section lines under its id, or where a section line has no parent.
   That is the same *refuse rather than diverge* rule as decision 6 there.
-- The merge driver ([SR-MERGE-DRIVER](0130_merge-driver.md)) resolves a
-  section shard **by its parent's verdict**: a document's sections come from
-  the side whose document record won on `(ver, sha)`. A section line has no
-  `ver` or `sha` of its own to compare.
+- The merge driver ([SR-MERGE-DRIVER](0130_merge-driver.md)) merges a
+  section shard **by parent, never by line**: a document's section lines are
+  one unit. If both sides hold the same group, or one side's group equals the
+  ancestor's, the other side's group wins. **If both sides changed a group
+  differently, the merge is refused** and both sides are left with conflict
+  markers.
+  ⚠ **Amended 2026-10-10, before any arm ran.** This decision said *by its
+  parent's verdict: the side whose document record won on `(ver, sha)`*. That
+  cannot be built. Git runs the driver on one file at a time, so a section
+  shard never sees which side its sibling document shard took. Merging line by
+  line would be worse: `#s1` from one side and `#s2` from the other match
+  neither side's document, and `nsec` can still count right, so totality would
+  break with nothing to see. Refusing costs one `git checkout --ours` and one
+  `fux ingest` on a derived file. The `nsec` check above refuses anything a
+  merge leaves inconsistent at the next `fux build`.
 
 **10. The size, measured on the ladder** (fixed before the build, as the
 ruling required): at rung-10000, 9 663 of 10 000 documents split into
@@ -346,7 +377,7 @@ a pass.
 - the size tool, re-run on the ladder, shows any committed file above 50 MiB or
   a total above 1 GB at rung-10000;
 - it reports any totality miss;
-- or, once built, a v6 index at `section_weight = 0.0` ranks any query
+- or, once built, a v8 index at `section_weight = 0.0` ranks any query
   differently from the pre-section engine on the same corpus.
 
 **How to check it:**

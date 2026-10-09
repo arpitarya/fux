@@ -11,7 +11,7 @@ feature: "`.fux/runtime/stamp.json` — the cheap staleness pre-filter, and its 
 owns: [node/src/derive/stamp.mjs@e54866f6479b, src/fux/derive/stamp.py@4ed944c99464]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 4632bc75167b0ac14aa5dc32efb89113ee466e97e94e77af0cbcdae809a218f7
+content_sha: 3fa9425f233986f6b0adcf52ccf0ca7a74096fd7f8395bec95c56b62bba23fd2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -136,6 +136,9 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `stamp.json` stamps every **section shard** too, under `sections/<name>`, and `accel.is_fresh` compares the document and section shard lists together ([SR-SECTIONS](0161_sections.md) decision 7).
 
 ### Consequences
 

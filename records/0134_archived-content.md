@@ -10,7 +10,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: aef4394a0fdaea1f644d247ec7ed2e159355e661d2ec7a75b5d308ad10eccfa9
+content_sha: fc7a89e43f02961bb38dfe88dfc6a9cf7da53700b8ee5c62c33c7ee365073064
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -494,6 +494,9 @@ A carried `url:` record re-derived because the identifier-family digest moved ke
 **No decision here moved** (W-248, 2026-10-04): in `urlsrc.py` the "nothing readable" skip reason is spelled from `decoders.reason_nothing_readable`; nothing this record decides moved.
 
 **No decision here moved** (W-261, 2026-10-05): `archived_dirs` moved from `ingest/gitdir.py` to `ingest/dirlist.py` (SR-DIR-LIST's), and the URL branch of `ingest/run.py` to `ingest/urlingest.py` (SR-URL-INGEST's). `is_archived_loc`, `_archived_url_ids` and `_with_archived` stayed where they were; the declaration reaches a record exactly as before.
+
+
+**W-236 — section records (2026-10-10; branch `w236-sections`, unmerged).** `rank()` gains the best-section term ([SR-SECTIONS](0161_sections.md) decision 5). It is added **before** the document weight and never reads `archived`, so decision 2's veto still holds: the marker moves nothing, with the term on or off.
 
 ### Consequences
 

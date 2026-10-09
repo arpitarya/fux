@@ -77,6 +77,33 @@ function titleIndex(secs) {
   return headed.slice(1).every((i) => secs[i][1] > level) ? first : -1;
 }
 
+/** The INDEX's section rule (W-236, SR-SECTIONS decision 2): section texts, in
+ *  order. Twin of `_chunk.py::index_sections`, kept beside `fold` so the two
+ *  fold rules cannot drift. Same grammar, same `sections`; one different test:
+ *  a section folds forward only when it is **bodiless** — its heading line and
+ *  nothing else — and the next is strictly deeper. No byte count is read, so
+ *  no tunable reaches a committed byte (SR-TUNE decision 6).
+ *
+ *  ⚠ Node does not ingest, so nothing here calls it today. It is transcribed
+ *  so that recovering a section id's heading from fetched bytes (decision 3's
+ *  consequence) has one rule per reader to reach for, not a re-derivation. */
+export function indexSections(content) {
+  const secs = sections(content);
+  const out = [];
+  let carry = [];
+  for (let i = 0; i < secs.length; i++) {
+    const [heading, level, text] = secs[i];
+    const nxt = i + 1 < secs.length ? secs[i + 1] : null;
+    const bodiless = Boolean(heading) && !text.trim().includes("\n");
+    const nested = nxt !== null && nxt[1] > level;
+    if (bodiless && nested) { carry.push(text); continue; }
+    out.push([...carry, text].join("\n\n"));
+    carry = [];
+  }
+  if (carry.length) out.push(carry.join("\n\n"));
+  return out;
+}
+
 /** Fold a short section forward **only into a section NESTED INSIDE it**.
  *
  * 🔴 Depth, not size. The old rule folded on size alone, so a short slide

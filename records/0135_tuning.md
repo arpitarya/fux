@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-09-24
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@f5fe482723d1, .fux/tune.toml@fbc012c8ee4f, node/src/config/tune.mjs@d9a132c42f83]
+owns: [src/fux/tune.py@7055a30470b9, .fux/tune.toml@5ccca6f37014, node/src/config/tune.mjs@16baad79b561]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: bd2d41f308dff49f5a646a3df109db290e082107d8e04aa46687dc52cfebd747
+content_sha: 161fc889dda24b9dfac63c6dd85b1bfe0200252e8495bc1c0701ab1e734dce64
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -763,6 +763,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + ranking.expand_weight
 + ranking.mined_weight
 + ranking.intent_weight
++ ranking.section_weight
 + graph.damping
 + graph.iterations
 + graph.laziness
@@ -1111,6 +1112,9 @@ this moved where they are written, not what they are.
 **No tune key changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/tune.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** **`[ranking] section_weight`** joins the closed key set: B2's λ ([SR-SECTIONS](0161_sections.md) decision 5), `_non_negative`, template value **`0.0`** (OFF: the plane is never read). It rides `Scoring.section`, not `Weighting`, because both candidate generators decide from it what to read. It is read at query time only, so it moves no committed byte (decision 6). `fux lexical` forces it to `0.0` with the other W-168 terms.
 
 ### Consequences
 

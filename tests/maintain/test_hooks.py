@@ -154,9 +154,11 @@ def test_gitattributes_is_not_appended_to_twice(repo):
     hooks.install(repo)
     hooks.install(repo)
     text = (repo / ".gitattributes").read_text(encoding="utf-8")
-    assert text.count(f"merge={hooks.MERGE_DRIVER_NAME}") == 2
+    # W-236: the section plane is the third bound path.
+    assert text.count(f"merge={hooks.MERGE_DRIVER_NAME}") == 3
     assert text.count(".fux/index/*.jsonl") == 1
     assert text.count(".fux/index/REGISTER") == 1
+    assert text.count(".fux/index/sections/*.jsonl") == 1
 
 
 # -- status and uninstall ---------------------------------------------------

@@ -10,6 +10,10 @@
  *
  * ⚠ **W-253 changed only `find` in the Python half of this one-to-many twin**
  * (`--under` boundary, `confidence` before `fused`); `answer` is unchanged.
+ * **W-236 changed only `ask`'s half** (the `section` hit key, `--why`'s section
+ * bit, `fux lexical` forcing `section_weight` off). `answer` ranks through
+ * `runQuery`, so the best-section term reaches its ranking there, and it emits
+ * no hit rows, so it has no `section` key to carry.
  *
  * ⚠ **No observer hook on this reader.** Python calls `.fux/observers/` once a
  * verb has fully rendered (`cli.main`); Node does not, and that is declared

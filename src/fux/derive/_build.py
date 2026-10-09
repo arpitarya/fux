@@ -72,7 +72,7 @@ class BuildReport:
 def build(root: Path, *, progress=None) -> BuildReport:
     """Materialize `.fux/runtime/` from the committed index."""
     progress = progress or _NULL_PROGRESS
-    docs, postings, anchors, stats, shard_stamp, records = _read_committed(root, progress)
+    docs, postings, anchors, stats, shard_stamp, records, sections = _read_committed(root, progress)
 
     directory = fuxdir.derived_dir(root, fmt.RUNTIME_DIR)
     postings_directory = directory / fmt.POSTINGS_DIR
@@ -81,6 +81,9 @@ def build(root: Path, *, progress=None) -> BuildReport:
     anchors_directory = directory / fmt.ANCHORS_DIR
     anchors_directory.mkdir(parents=True, exist_ok=True)
     _clear(anchors_directory)
+    section_directory = directory / fmt.SECTIONS_RT_DIR
+    section_directory.mkdir(parents=True, exist_ok=True)
+    _clear(section_directory)
 
     written = 0
     written += docstable.write(directory, docs)
@@ -109,6 +112,7 @@ def build(root: Path, *, progress=None) -> BuildReport:
 
     blocks, postings_count = _write_postings(root, postings, [d["flen"] for d in docs], progress)
     written += _write_anchors(root, anchors, progress)
+    written += _write_sections(root, directory, sections)
 
     written += manifest.write(
         directory, docs=len(docs), terms=len(postings), blocks=blocks, shard_stamp=shard_stamp,
@@ -147,7 +151,7 @@ def _read_committed(root: Path, progress=None):
             raw = path.read_bytes()
             stat = path.stat()
             shard_stamp.append(
-                (path.name, store_mod.content_sha(raw), stat.st_size, stat.st_mtime_ns)
+                (fmt.stamp_name(path), store_mod.content_sha(raw), stat.st_size, stat.st_mtime_ns)
             )
             _, lines = store_mod.raw_record_lines(path)
             for lineno, line in enumerate(lines, start=fixed("index", "shard_header_lines") + 1):
@@ -168,6 +172,7 @@ def _read_committed(root: Path, progress=None):
             p.update(1)
 
     records.sort(key=lambda r: r["id"])
+    section_lines = _read_section_plane(root, shard_stamp)
 
     # `archived` is carried, not re-derived. The scan reads the record's own
     # stamp first and only falls back to matching `loc` against the configured
@@ -188,9 +193,14 @@ def _read_committed(root: Path, progress=None):
             # or the two paths weight the same document differently.
             "superseded": bool(r.get("superseded")),
             "mtime": r.get("mtime"),
+            # W-236: how many section records this document has; 0 is
+            # sectionless. Carried off the record, checked against the plane
+            # just below, so both paths read the same count.
+            "nsec": int(r.get("nsec", 0)),
         }
         for r in records
     ]
+    sections = _section_planes(docs, section_lines)
 
     postings: dict[str, list[tuple[int, list[int]]]] = {}
     for docidx, record in enumerate(records):
@@ -257,10 +267,108 @@ def _read_committed(root: Path, progress=None):
 
     stats = stats_plane.payload(
         n=total_docs, total_flen=total_flen, total_anchor_len=total_anchor_len,
+        sec_units=sections["units"], sec_total_flen=sections["total_flen"],
     )
     # `records` rides along so the graph plane needs no second pass over the
     # shards; it is already sorted by id, which is what makes it usable.
-    return docs, postings, anchors, stats, shard_stamp, records
+    return docs, postings, anchors, stats, shard_stamp, records, sections
+
+
+def _read_section_plane(root: Path, shard_stamp: list) -> list[tuple[str, int, list[int], dict]]:
+    """Every committed section line, as `(parent, k, flen, terms)`, stamped.
+
+    The section shards are pinned in the stamp and the manifest beside the
+    document shards (SR-SECTIONS decision 7), so a commit that touches only a
+    section shard still makes the runtime stale. Each line's byte-level `flen`
+    must equal its parsed `flen`, the document plane's rule, because the scan
+    reads it off the bytes.
+    """
+    out: list[tuple[str, int, list[int], dict]] = []
+    for path in store_mod.iter_section_paths(root):
+        raw = path.read_bytes()
+        stat = path.stat()
+        shard_stamp.append((fmt.stamp_name(path), store_mod.content_sha(raw), stat.st_size, stat.st_mtime_ns))
+        _, lines = store_mod.raw_record_lines(path)
+        for lineno, line in enumerate(lines, start=fixed("index", "shard_header_lines") + 1):
+            record = json.loads(line)
+            m = _FLEN_RE.search(line)
+            inner = m.group(1).strip() if m else b""
+            regex_flen = [int(part) for part in inner.split(b",")] if inner else []
+            if m is None or regex_flen != list(record.get("flen", [])):
+                raise FuxError(
+                    f"{path}:{lineno}: section {record.get('id')!r} has flen "
+                    f"{record.get('flen')!r} but the byte-level regex reads {regex_flen!r}. "
+                    f"Refusing to build."
+                )
+            parent = store_mod.section_parent(record["id"])
+            k = store_mod.reader.section_ordinal(record["id"])
+            out.append((parent, k, regex_flen, record.get("terms", {})))
+    return out
+
+
+def _section_planes(docs: list[dict], section_lines) -> dict:
+    """The section table, its postings and its statistics — and the two planes held together.
+
+    🔴 **`fux build` refuses an index whose planes disagree** (SR-SECTIONS
+    decision 9): a section line with no parent document, or a document whose
+    `nsec` is not the number of section lines under its id. Refuse rather than
+    diverge — the same rule as the document plane's.
+
+    The statistics count a SECTIONLESS document as its own single section
+    (decision 5), over its body and heading slots, which is exactly what the
+    scan sums off the raw bytes.
+    """
+    docidx_of = {doc["id"]: i for i, doc in enumerate(docs)}
+    counts: dict[str, int] = {}
+    rows: list[tuple[int, int, list[int], dict]] = []
+    for parent, k, flen, terms in section_lines:
+        idx = docidx_of.get(parent)
+        if idx is None:
+            raise FuxError(
+                f"the section plane holds {store_mod.section_id(parent, k)!r}, whose document "
+                f"{parent!r} is not in the index. The two planes disagree; run `fux ingest` "
+                f"to rewrite both. Refusing to build."
+            )
+        counts[parent] = counts.get(parent, 0) + 1
+        rows.append((idx, k, flen, terms))
+    for doc in docs:
+        if doc["nsec"] != counts.get(doc["id"], 0):
+            raise FuxError(
+                f"{doc['id']!r} declares nsec={doc['nsec']} but the section plane holds "
+                f"{counts.get(doc['id'], 0)} section(s) for it. The two planes disagree; run "
+                f"`fux ingest` to rewrite both. Refusing to build."
+            )
+    rows.sort(key=lambda row: (row[0], row[1]))
+    total_flen = [0] * store_mod.SECTION_SLOTS
+    postings: dict[str, list[tuple[int, list[int]]]] = {}
+    for secidx, (_idx, _k, flen, terms) in enumerate(rows):
+        for i, count in enumerate(flen[: store_mod.SECTION_SLOTS]):
+            total_flen[i] += count
+        for term, tf in terms.items():
+            postings.setdefault(term, []).append((secidx, list(tf)))
+    sectionless = [doc for doc in docs if doc["nsec"] == 0]
+    for doc in sectionless:
+        for i, count in enumerate(doc["flen"][: store_mod.SECTION_SLOTS]):
+            total_flen[i] += count
+    return {
+        "rows": [[idx, k, list(flen)] for idx, k, flen, _ in rows],
+        "postings": postings,
+        "units": len(rows) + len(sectionless),
+        "total_flen": total_flen,
+    }
+
+
+def _write_sections(root: Path, directory: Path, sections: dict) -> int:
+    """`sections.json` and `sections/<prefix>.json` — W-236's derived plane."""
+    written = fmt.write_json(directory / fmt.SECTION_TABLE_NAME, {"rows": sections["rows"]})
+    by_prefix: dict[str, dict[str, list]] = {}
+    for term in sorted(sections["postings"]):
+        by_prefix.setdefault(fmt.term_prefix(term), {})[term] = [
+            [secidx, tf] for secidx, tf in sections["postings"][term]
+        ]
+    for prefix, payload in by_prefix.items():
+        written += fmt.write_json(fmt.section_postings_path(root, prefix), payload)
+    return written
 
 
 def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> None:

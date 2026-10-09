@@ -43,7 +43,11 @@ from ..constants import fixed
 #: document's `Long Form (ABBR)` pairs. Redundant with the `_format` bump to
 #: v5, which already forces re-extraction; bumped anyway because the rule this
 #: constant enforces is about what this module returns, and it now returns more.
-RULES_VERSION = fixed("versions", "extract_rules")  # not bumped by W-233: no families = identical output; families are gated by the header digest
+#:
+#: **4 (2026-10-10, W-236):** extraction also returns `sections`, the per-section
+#: body and heading counts SR-SECTIONS decision 2 cuts. Redundant with the
+#: `_format` bump to v8, bumped for the same reason 3 was.
+RULES_VERSION = fixed("versions", "extract_rules")  # 4 since W-236 (sections); W-233 did not bump: no families = identical output
 
 import re
 from collections import Counter
@@ -161,6 +165,12 @@ class Extracted:
     #: collision tracker, like `terms`. Empty for most documents, and then the
     #: record carries no `abbr` at all.
     abbr: tuple = ()
+    #: W-236 — SR-SECTIONS decision 3: one `(flen, terms)` per index section,
+    #: in document order, over the `body` and `heading` slots only. Empty when
+    #: the document has one section or none — a SECTIONLESS document, which
+    #: gets no section records. Raw terms; ingest hashes them through the run's
+    #: collision tracker exactly as it hashes `terms`.
+    sections: tuple = ()
 
 
 def extract_fields(
@@ -215,6 +225,10 @@ def extract_fields(
     # text is. **Which is why this does not make an identifier WHOLE** — only
     # reachable. `QCL-IT-ADR-08` enters and then loses its `IT` to the stopword
     # list and its hyphens to `_WORD_RE`, precisely as it would in the body.
+    # W-236: the document's OWN body and heading counts, taken before the
+    # front-matter values below are appended to these very lists — section
+    # totality is measured against these (SR-SECTIONS decision 3).
+    own_counts = (len(body_tokens), len(heading_tokens))
     by_field = {
         "body": body_tokens, "heading": heading_tokens, "title": title_tokens,
         "path": path_tokens, "ctx": ctx_tokens,
@@ -241,7 +255,46 @@ def extract_fields(
     from ..query.mined import mine
 
     abbr = tuple(mine(doc.body))
-    return Extracted(title=title, phrases=phrases, terms=terms, flen=flen, abbr=abbr)
+    sections = _index_sections(rel_path, doc.body, own_counts, ids)
+    return Extracted(
+        title=title, phrases=phrases, terms=terms, flen=flen, abbr=abbr, sections=sections,
+    )
+
+
+def _index_sections(rel_path: str, body: str, own_counts: tuple[int, int], ids) -> tuple:
+    """SR-SECTIONS decisions 2 and 3: the document's index sections, or `()`.
+
+    **Markdown only.** `.rst`, `.adoc` and `.org` headings are not the grammar
+    `_chunk._sections` reads, and the chunker gives them no sections either.
+
+    🔴 **Totality is checked, and a miss makes the document sectionless.**
+    Summed over the sections, the body and heading token counts must equal the
+    document's own — `own_counts`, taken BEFORE front-matter values were
+    appended to the field lists. The ladder measured no miss on
+    any rung; a document that misses anyway gets no section records rather
+    than ones that disagree with its own postings. That is decision 3's
+    invariant kept by construction, and it is deterministic.
+    """
+    if _grammar(rel_path) is not None:
+        return ()
+    from ..refer._chunk import index_sections
+
+    texts = index_sections(body)
+    if len(texts) <= 1:
+        return ()
+    out = []
+    total_body = total_heading = 0
+    for text in texts:
+        sec_heading = tokenize(" ".join(h.text for h in _md_headings(text)), ids)
+        sec_body = tokenize(_md_strip_headings(text), ids)
+        total_body += len(sec_body)
+        total_heading += len(sec_heading)
+        b, h = Counter(sec_body), Counter(sec_heading)
+        terms = {t: (b[t], h[t]) for t in set(b) | set(h)}
+        out.append(((len(sec_body), len(sec_heading)), terms))
+    if (total_body, total_heading) != own_counts:
+        return ()
+    return tuple(out)
 
 
 def _title(meta: dict, headings: list[str], rel_path: str) -> str:

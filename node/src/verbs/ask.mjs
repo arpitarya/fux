@@ -99,6 +99,11 @@ export function runAsk(root, args, { compose }) {
   // Headings are display-only and are resolved AFTER ranking, exactly like the
   // title fallback — so they can never reach a score.
   const showSections = args.sections !== false;
+  // W-236: a row carries `section` exactly when `rank()` put it there — while
+  // `[ranking] section_weight` is on, and never under `fux lexical`, which
+  // `runQuery` runs at 0.0. That is `_as_dict(section_on=...)`'s rule, decided
+  // once upstream rather than popped here. (`--why`'s section bit has no twin:
+  // this reader has no `--why`.)
   const rows = results.map((r) => {
     const out = { ...r };
     if (showSections) out.headings = headingsFor(recordFor(root, r.id, shards), query, args.maxHeadings);

@@ -116,6 +116,7 @@ def rank(rung: Path, question: str, weight: float, k: int) -> list[tuple[str, fl
         b=DEFAULT_SCORING.b,
         weights=DEFAULT_SCORING.weights,
         anchor=weight,
+        section=DEFAULT_SCORING.section,
     )
     hashes = query_term_hashes(question)
     candidates, df, corpus = scan_candidates(rung, hashes, scoring=scoring)

@@ -60,6 +60,11 @@ _EDGE_ANCHOR_RE = re.compile(rb'"al":(?P<len>\d+),"at":\{[^}]*\},"dst":"(?P<dst>
 _FLEN_RE = re.compile(rb'"flen":\[([0-9,\s]*)\]')
 
 
+#: W-236 — a document's section count, off the raw bytes. Absent means
+#: sectionless, and a sectionless document is its own single section unit.
+_NSEC_RE = re.compile(rb'"nsec":(\d+)')
+
+
 def _flen_from_line(line: bytes) -> list[int] | None:
     m = _FLEN_RE.search(line)
     if m is None:
@@ -137,6 +142,10 @@ def scan_candidates(
     total_flen = [0] * len(TF_FIELDS)
     df: dict[str, int] = dict.fromkeys(query_hashes, 0)
     candidates: list[dict] = []
+    # W-236 — the section statistics, gathered only when the term is on.
+    section_on = scoring.section_on
+    sec_units = 0
+    sec_flen = [0] * store_mod.SECTION_SLOTS
 
     for path in store_mod.iter_shard_paths(root):
         _, lines = store_mod.raw_record_lines(path)
@@ -146,6 +155,10 @@ def scan_candidates(
             if flen is not None:
                 for i, count in enumerate(flen):
                     total_flen[i] += count
+            if section_on and _NSEC_RE.search(line) is None:
+                sec_units += 1
+                for i, count in enumerate((flen or [])[: store_mod.SECTION_SLOTS]):
+                    sec_flen[i] += count
             # The substring check is a prefilter only: a query hash can appear
             # as a literal 16-hex string somewhere outside `terms` (a title,
             # an id, a sha — anything quoted) without the document actually
@@ -177,6 +190,9 @@ def scan_candidates(
                 _fold_out_edges(record, wanted, anchor_tf)
             candidates.append(record)
 
+    if section_on:
+        sec_units += _attach_sections(root, candidates, patterns, sec_flen)
+
     if anchor_on:
         _add_anchor_only_candidates(root, candidates, anchor_tf)
         for record in candidates:
@@ -190,8 +206,47 @@ def scan_candidates(
         Corpus(
             n=total_docs,
             total_wlen=derive_wlen(total_flen, scoring, total_anchor_len),
+            sec_units=sec_units,
+            sec_total_wlen=derive_wlen(sec_flen, scoring) if section_on else 0.0,
         ),
     )
+
+
+def _attach_sections(
+    root: Path, candidates: list[dict], patterns: dict[str, bytes], sec_flen: list[int]
+) -> int:
+    """W-236 — one pass over the section plane, the document pass's rules.
+
+    Every section line adds its body and heading length to the section
+    statistics, by byte regex, matched or not. A line carrying a query hash is
+    parsed and attached to its parent as `(k, flen, terms)`, in `k` order, on
+    the candidate's `secs`. Its parent is always a candidate already: a
+    section's terms are a subset of its document's (SR-SECTIONS decision 3's
+    totality), so the document line matched the prefilter first.
+
+    Returns the number of section units read.
+    """
+    by_id = {record["id"]: record for record in candidates}
+    bags: dict[str, list[tuple[int, list[int], dict]]] = {}
+    units = 0
+    for path in store_mod.iter_section_paths(root):
+        _, lines = store_mod.raw_record_lines(path)
+        for line in lines:
+            units += 1
+            flen = _flen_from_line(line) or []
+            for i, count in enumerate(flen[: store_mod.SECTION_SLOTS]):
+                sec_flen[i] += count
+            if not any(pattern in line for pattern in patterns.values()):
+                continue
+            section = json.loads(line)
+            parent = store_mod.section_parent(section["id"])
+            if parent in by_id:
+                k = store_mod.reader.section_ordinal(section["id"])
+                bags.setdefault(parent, []).append((k, section.get("flen", []), section.get("terms", {})))
+    for parent, bag in bags.items():
+        bag.sort(key=lambda entry: entry[0])
+        by_id[parent]["secs"] = bag
+    return units
 
 
 def _fold_out_edges(record: dict, wanted: set[bytes], anchor_tf: dict[str, dict[str, int]]) -> None:

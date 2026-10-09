@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-09
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@f24eaaa00126, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@aff448e57338, node/src/ingest/priors.mjs@d8d4691d7e49]
+owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@bf271c88bb28, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@aff448e57338, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 36607e93148595cb152f1ba4ce80444beb3936651555b0082ff3ea054b615fc9
+content_sha: 4898701d9c22cf3fff38309ace5d4d7f6d62b184b495d0ed9b47048cc152616a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1029,6 +1029,9 @@ descent before listing it, and records it once as `dir/`.
 **No decision here moved** (W-248, 2026-10-04): `ingest/queue.py` gained `model_needed` and `no_decoder`, the readers that classify a row by its reason.
 
 **No decision here moved** (W-261, 2026-10-05): the URL branch of `ingest/run.py` moved to `ingest/urlingest.py` (SR-URL-INGEST's) and the `dirs`-list readers of `ingest/gitdir.py` to `ingest/dirlist.py` (SR-DIR-LIST's). The walk calls both at the same points, and its output is byte-identical. Node's `ingest/gitdir.mjs` lost `archivedDirs` to `ingest/dirlist.mjs` and is narrowed to `is_archived_loc`.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** Ingest hands each record its section records (`_section_records`, hashed through the run's tracker) and `write_index` writes the plane. A **carried** document, `file:` or `url:`, keeps its prior section lines byte for byte, read once per run by `store.read_sections` ([SR-SECTIONS](0161_sections.md) decision 8). A foreign index has none to carry.
 
 ### Consequences
 

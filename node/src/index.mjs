@@ -35,9 +35,12 @@ import { loadOutput } from "./config/output.mjs";
 import { answerPayload } from "./verbs/answer.mjs";
 import { explainPayload, graphPayload, pathPayload, lazyRecords } from "./verbs/graph.mjs";
 
-/** One ranked document. The `--json` `results[]` element, exactly. */
-function result(r, headings = []) {
-  return {
+/** One ranked document. The `--json` `results[]` element, exactly.
+ *  `withSection` is `api.py::Result.section_on`: W-236's `section` key rides
+ *  only on an `ask` row whose ranking carried it (`[ranking] section_weight`
+ *  on), and after `headings`, as `Result.as_dict` writes it. Never on `find`. */
+function result(r, headings = [], withSection = false) {
+  const out = {
     id: r.id, loc: r.loc, title: r.title, score: r.score,
     archived: r.archived, tie: r.tie, mtime: r.mtime ?? null,
     // W-162 — a human pinned this document to this exact question, so its
@@ -51,6 +54,8 @@ function result(r, headings = []) {
     boosted: Boolean(r.boosted), route: r.route ?? null,
     headings,
   };
+  if (withSection && Object.hasOwn(r, "section")) out.section = r.section;
+  return out;
 }
 
 class Index {
@@ -96,7 +101,7 @@ class Index {
       this.root, [query, ...(queries ?? [])], top, { tune, useTune: true, wantConfidence: band, compose: true, shards },
     );
     const rows = results.map((r) => result(
-      r, sections ? headingsFor(recordFor(this.root, r.id, shards), query, maxHeadings) : [],
+      r, sections ? headingsFor(recordFor(this.root, r.id, shards), query, maxHeadings) : [], true,
     ));
     return {
       results: rows,

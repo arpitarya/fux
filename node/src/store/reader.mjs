@@ -10,7 +10,9 @@
  */
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { INDEX_DIR, SCHEMA_ID, ANALYZER_VERSION, TF_FIELDS, shardFor } from "./format.mjs";
+import {
+  INDEX_DIR, SCHEMA_ID, ANALYZER_VERSION, TF_FIELDS, SECTIONS_DIR, sectionParent, shardFor,
+} from "./format.mjs";
 
 const NL = "\n".charCodeAt(0);
 
@@ -30,6 +32,27 @@ export function iterShardPaths(root) {
     .filter((f) => SHARD_NAME_RE.test(f) && statSync(join(dir, f)).isFile())
     .sort()
     .map((f) => join(dir, f));
+}
+
+/** `.fux/index/sections/` — W-236's plane (SR-SECTIONS decision 1). */
+export function sectionsDir(root) { return join(root, INDEX_DIR, SECTIONS_DIR); }
+
+/** The section plane's shard files, sorted — `reader.py::iter_section_paths`.
+ *  Its own function, deliberately NOT folded into `iterShardPaths`: the plane
+ *  lives in a subdirectory so that every document reader stays blind to it. */
+export function iterSectionPaths(root) {
+  const dir = sectionsDir(root);
+  if (!existsSync(dir) || !statSync(dir).isDirectory()) return [];
+  return readdirSync(dir)
+    .filter((f) => SHARD_NAME_RE.test(f) && statSync(join(dir, f)).isFile())
+    .sort()
+    .map((f) => join(dir, f));
+}
+
+/** `k` in `<parent>#s<k>` — `reader.py::section_ordinal`, whose
+ *  `lstrip("#s")` strips any run of `#` and `s` before the digits. */
+export function sectionOrdinal(secId) {
+  return Number(secId.slice(sectionParent(secId).length).replace(/^[#s]+/, ""));
 }
 
 /** The committed shards, each read AT MOST ONCE, for the life of ONE call.

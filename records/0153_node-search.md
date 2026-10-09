@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@444bddb999a8, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@614c3fcaadb2, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: c1e842d7933610c311ed08cdf23bfc35002448c187025a6b6c50cf1fdecb53d1
+content_sha: 71354238b21538afe917f4f55aa74f001055e488c538ae566a342c2fe373d3f1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1066,6 +1066,9 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
 **No decision here moved** (W-246, 2026-10-04): the Node output-config reader carries the new `[cli.answer] journal_max_bytes` key beside its Python twin.
 
 **No decision here moved** (W-261, 2026-10-05): Node modules followed their Python owners into files of their own — `derive/docstable.mjs`, `derive/manifest.mjs`, `derive/stamp.mjs`, `derive/stats.mjs`, `store/cachedir.mjs`, `ingest/dirlist.mjs`, and `maintain/runner.mjs` renamed `maintain/lock.mjs`; `verbs/find.mjs` declares `query/find.py` as its twin. The bundle's behaviour and every answer are byte-identical.
+
+
+**W-236 — section records (2026-10-10; branch `w236-sections`, unmerged).** The Node reader transcribes the whole plane: `section_weight` in `config/tune.mjs`, `Scoring.section`, the B2 term and `bestSection` in `rank.mjs`, the section pass in `scan.mjs`, and in the accelerator the section table, the postings, the widened ceiling and `isFresh` over section shards. The Node build writes `sections.json`, `sections/*.json` and `nsec` byte-identically to Python's. `fux lexical` forces the weight to `0.0`. The `section` hit key appears on `ask` only while the weight is on. `tests/query/test_sections_node_twin.py` holds Python and Node equal at `0.0`, `0.25` and `1.0`, on scan and `--fast` ([SR-SECTIONS](0161_sections.md)).
 
 ### Consequences
 

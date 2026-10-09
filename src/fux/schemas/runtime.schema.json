@@ -23,7 +23,7 @@
     "above, in a new costume."
   ],
 
-  "schema": "fux.runtime.v9",
+  "schema": "fux.runtime.v10",
 
   "postings_block_line": {
     "_doc": [
@@ -117,10 +117,11 @@
       "archived":   { "type": "bool" },
       "superseded": { "type": "bool" },
       "mtime":      { "type": "int",  "doc": "git commit time -- NOT wall clock at build time" },
-      "alen":       { "type": "int",  "doc": "anchor token total -- the words OTHER documents use to link here (W-168 step 1)" }
+      "alen":       { "type": "int",  "doc": "anchor token total -- the words OTHER documents use to link here (W-168 step 1)" },
+      "nsec":       { "type": "int",  "doc": "section records under this document; 0 when it is sectionless (W-236, SR-SECTIONS d3)" }
     },
     "example": {
-      "alen": 3, "archived": false, "flen": [990, 6, 1, 2], "id": "file:README.md",
+      "alen": 3, "archived": false, "nsec": 4, "flen": [990, 6, 1, 2], "id": "file:README.md",
       "loc": "README.md", "mtime": 1787688862, "superseded": false, "title": "Fux"
     }
   },
@@ -192,8 +193,31 @@
     "fields": {
       "n":            { "type": "int",  "doc": "documents in the index" },
       "total_flen":   { "type": "list", "of": "int", "len": 5, "doc": "raw per-field token totals" },
-      "total_anchor_len": { "type": "int", "doc": "corpus-wide anchor token total -- avg_wlen's sixth term, at the query's own anchor weight (W-168 step 1)" }
+      "total_anchor_len": { "type": "int", "doc": "corpus-wide anchor token total -- avg_wlen's sixth term, at the query's own anchor weight (W-168 step 1)" },
+      "sec_units":    { "type": "int",  "doc": "section units: every section record, plus every sectionless document, which is its own single section (W-236, SR-SECTIONS d5)" },
+      "sec_total_flen": { "type": "list", "of": "int", "len": 2, "doc": "raw body and heading token totals over those units -- the section avg_wlen, weighted at query time" }
     },
-    "example": { "n": 508, "total_anchor_len": 4180, "total_flen": [637866, 21752, 3380, 4524, 0] }
+    "example": { "n": 508, "sec_total_flen": [637866, 21752], "sec_units": 1630, "total_anchor_len": 4180, "total_flen": [637866, 21752, 3380, 4524, 0] }
+  },
+
+  "section_table": {
+    "_doc": [
+      "W-236. The whole of .fux/runtime/sections.json: one row per committed",
+      "section record, ordered by (docidx, k). A row's position is its SECIDX,",
+      "which a section_shard posting names. Derived from .fux/index/sections/",
+      "alone and read only when [ranking] section_weight > 0 (SR-SECTIONS d7)."
+    ],
+    "shape": { "type": "dict", "key": "rows", "value": "list of [docidx, k, flen]" },
+    "example": { "rows": [[0, 1, [120, 2]], [0, 2, [340, 1]], [3, 1, [88, 3]]] }
+  },
+
+  "section_shard": {
+    "_doc": [
+      "W-236. One file of .fux/runtime/sections/<xx>.json: term hash -> its section",
+      "postings, [secidx, tf], tf over the body and heading slots with trailing",
+      "zeros trimmed. `xx` is the term hash's first byte, as for anchor_shard."
+    ],
+    "shape": { "type": "dict", "key": "term hash (16 hex)", "value": "list of [secidx, tf]" },
+    "example": { "000219ac0fa26dbb": [[0, [2]], [2, [0, 1]]] }
   }
 }

@@ -167,4 +167,4 @@ def test_the_index_header_pins_the_current_format(tmp_path):
     write_config(tmp_path)
     shard = next((tmp_path / ".fux" / "index").glob("*.jsonl"))
     header = json_mod.loads(shard.read_text(encoding="utf-8").splitlines()[0])
-    assert header["_format"] == "fux.index.v7"
+    assert header["_format"] == "fux.index.v8"

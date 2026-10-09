@@ -143,7 +143,7 @@ def test_the_pairs_ride_the_declaring_documents_own_record(corpus):
 def test_the_index_is_v5_or_later(corpus):
     shard = list(store_mod.iter_shard_paths(corpus))[0]
     header = json.loads(shard.read_text(encoding="utf-8").splitlines()[0])
-    assert header["_format"] == "fux.index.v7"  # v5 added `abbr`; v7 is current
+    assert header["_format"] == "fux.index.v8"  # v5 added `abbr`; v8 is current
 
 
 def test_the_table_is_the_same_from_the_shards_and_from_the_plane(corpus):
