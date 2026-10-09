@@ -36,7 +36,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-236** · `agent` — W-168 step 10 (U2). Pre-registered 2026-10-10 ([bar](regression/2026-10-10-section-records/PRE-REGISTRATION.md)): `hit@1` on the key's pool, four arms, G0/G1/G2. Next: build on branch `w236-sections`, gates, capture the arms. **Opus.** [detail](open/W-236-section-records.md)
+- 🟢 **W-236** · `agent` — W-168 step 10 (U2). Bar frozen 2026-10-10 ([pre-reg](regression/2026-10-10-section-records/PRE-REGISTRATION.md)). Next: build on branch `w236-sections`, gates G0–G2, capture four arms. **Opus.** [detail](open/W-236-section-records.md)
 
 ### testing
 
