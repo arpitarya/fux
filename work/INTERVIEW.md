@@ -41,10 +41,11 @@ valuable judgement, but not the state of play.
 - **Why:** B2 favoured SHORT documents (best section ≈ whole doc), not the long ones it targets. Offered a gain-only term or B1; **Arpit parked it**.
 - Branch `w236-sections` (`f2a139fd`) kept unmerged; nothing on `main`; SR-SECTIONS `proposed` with the FAIL at its top.
 
-### 🔴 2026-10-10 — W-257 FULL RUNG AUTHORED; STOPPED AT THE PLACEBO GATE
+### 🔴 2026-10-10 — W-257: STOP RULED, AMENDMENT 1, SEVEN ARMS CAPTURED → ARPIT SCORES
 
-- Arpit relayed the blind author's report: 1,000 files, 5,620 questions, 837 refused on the first pass (14.9 %), ≈ 15.6 min, ≈ 1.28 M tokens. Claude Code, Opus 5.5, captured.
-- **G0, G1, G3 and the `archived` gate pass**, and the first pass reproduces line for line on `a07f9329`. **No arm is scored.** 🔴 **STOP:** `placebo.py` cannot match line count, which the bar names as a stop. **Also:** the author had no fux-enrich skill, so it wrote one question per chunk, partly template-filled. [GATES](regression/2026-10-10-enriched-rung/GATES.md); `BLOCKED.json` asks the one question.
+- The full rung (5,620 questions, 837 refused first pass) hit the pre-registered placebo STOP. **Arpit: *"go with the recommended approach."*** [Amendment 1](regression/2026-10-10-enriched-rung/AMENDMENT.md) (`79bc22ea`): `placebo.py --per-line`, and the rung accepted as authored without the skill (stated on every verdict). `decide.py` and `tilt.py` were frozen in the same commit.
+- **Captured** on `a07f9329`: G0–G3 pass; `none` = the 2026-10-09 capture 90/90 ([report](regression/2026-10-10-enriched-rung/report.md)). **In flight:** 🔴 Arpit scores. Then a session that did NOT capture decides.
+- **Lesson:** `fux-lab` has no fux-enrich skill, so a blind author cannot follow it ([ANALYSIS §2](regression/2026-10-10-enriched-rung/ANALYSIS.md)).
 
 ### 🔴 2026-10-10 — W-236 BUILT, GATED, CAPTURED: ARPIT SCORES
 
