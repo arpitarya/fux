@@ -412,6 +412,9 @@ def rank(
     # for the anchor fold's reason. Each generator attaches `secs` — this
     # document's matching section records as `(k, flen, terms)` — and `nsec`.
     # Off, nothing below reads either and no arithmetic runs (decision 7).
+    # **Gain-only since W-269**: the term is what the best section scores
+    # beyond the document as one unit, and a document that gains nothing —
+    # every sectionless one — has nothing added, not `+ 0.0`.
     section_on = scoring.section_on
     sections_out: dict[str, tuple[str | None, float]] = {}
 
@@ -435,11 +438,12 @@ def rank(
             record.get("alen", 0) if anchor_on else 0,
         )
         if section_on:
-            best_id, best = _best_section(
+            best_id, gain = _section_gain(
                 record, query_hashes, df, corpus, scoring, term_weights,
             )
-            contribution = scoring.section * best
-            s = s + contribution
+            contribution = scoring.section * gain if gain else 0.0
+            if gain:
+                s = s + contribution
             sections_out[record["id"]] = (best_id, contribution)
         archived = _record_is_archived(record, weighting.archived_dirs)
         if demote:
@@ -531,7 +535,7 @@ def rank(
     ]
 
 
-def _best_section(
+def _section_gain(
     record: dict,
     query_hashes: list[str],
     df: dict[str, int],
@@ -539,24 +543,23 @@ def _best_section(
     scoring: Scoring,
     term_weights: dict[str, float] | None,
 ) -> tuple[str | None, float]:
-    """`max_k S_sec(d#s_k)` and the section that reached it — SR-SECTIONS decision 5.
+    """`G(d) = max(0, max_k S_sec(d#s_k) − S_self(d))` and the section that earned it.
 
-    The SAME `score_record`, over the body and heading slots only, with the
-    DOCUMENT's `df` and `n` and the SECTION `avg_wlen`. A sectionless document
-    is its own single section: its own record, cut to those two slots, so a
-    short document is not penalised for having no section records. Ties go to
-    the lowest `k`; a best of zero names no section, because no section of
-    the document matched anything.
+    SR-SECTIONS decision 5, gain-only (W-269). `S_sec` and `S_self` are the
+    SAME `score_record` over the body and heading slots only, with the
+    DOCUMENT's `df` and `n` and the SECTION `avg_wlen`: `S_self` scores the
+    document's own record cut to those slots, which the sections partition
+    exactly (totality, decision 3).
+
+    🔴 **A sectionless document is its own single section, so its gain is
+    zero by construction** — `max_k S_sec = S_self` — and nothing is scored
+    for it at all. That is the short-document credit W-236 measured, removed
+    rather than tuned. Ties go to the lowest `k`; a gain of zero names no
+    section, because no section earned anything beyond the document.
     """
-    avg = corpus.sec_avg_wlen
     if not record.get("nsec"):
-        slots = store_mod.SECTION_SLOTS
-        terms = {h: tf[:slots] for h, tf in record.get("terms", {}).items()}
-        best = score_record(
-            terms, list(record.get("flen", []))[:slots], query_hashes, df, corpus.n, avg,
-            scoring, term_weights,
-        )
-        return None, best
+        return None, 0.0
+    avg = corpus.sec_avg_wlen
     best_k, best = None, 0.0
     for k, flen, terms in record.get("secs", ()):
         s = score_record(terms, flen, query_hashes, df, corpus.n, avg, scoring, term_weights)
@@ -564,4 +567,12 @@ def _best_section(
             best_k, best = k, s
     if best_k is None:
         return None, 0.0
-    return store_mod.section_id(record["id"], best_k), best
+    slots = store_mod.SECTION_SLOTS
+    whole = score_record(
+        {h: tf[:slots] for h, tf in record.get("terms", {}).items()},
+        list(record.get("flen", []))[:slots], query_hashes, df, corpus.n, avg,
+        scoring, term_weights,
+    )
+    if best <= whole:
+        return None, 0.0
+    return store_mod.section_id(record["id"], best_k), best - whole

@@ -973,6 +973,6 @@ rows narrowed so far were each verified by reading every mention in the file
 | `node/test/config.test.mjs` | SR-OUTPUT | `.fux/output.toml` as the Node reader loads it |
 | `src/fux/refer/_chunk.py::_sections,_title_index,index_sections` | SR-SECTIONS | the index section rule (decision 2) cuts with `_sections`, folds the title `_title_index` names, and is `index_sections` itself (built 2026-10-10 on `w236-sections`); a change to any of them changes what a section record is. Narrowed because the rest of the file (`_fold`, the table bands, the ladder) is passage policy the rule deliberately does not reuse |
 | `src/fux/maintain/mergedriver.py::merge_sections` | SR-SECTIONS | decision 9's merge rule: a parent's sections merge as one unit, and both-sides-changed is refused. Owned by SR-MERGE-DRIVER for the driver; this is the one function whose rule this record states |
-| `src/fux/query/rank.py::_best_section` | SR-SECTIONS | decision 5's `max_k S_sec`, with the sectionless view, the section `avg_wlen` and the zero-best rule. Owned by SR-RANKING for `rank()` |
+| `src/fux/query/rank.py::_section_gain` | SR-SECTIONS | decision 5's gain-only term, `max(0, max_k S_sec − S_self)`: zero for a sectionless document, the section `avg_wlen`, and the zero-gain rule. Owned by SR-RANKING for `rank()` |
 <!-- DESCRIBES-TABLE-END -->
 

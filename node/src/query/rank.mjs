@@ -138,9 +138,11 @@ export function rank(
       anchorTf, anchorOn ? (record.alen ?? 0) : 0,
     );
     if (sectionOn) {
-      const [bestId, best] = bestSection(record, queryHashes, df, corpus, scoring, termWeights);
-      const contribution = scoring.section * best;
-      s = s + contribution;
+      // Gain-only since W-269: a document that gains nothing — every
+      // sectionless one — has nothing added, not `+ 0.0` (`rank.py`).
+      const [bestId, gain] = sectionGain(record, queryHashes, df, corpus, scoring, termWeights);
+      const contribution = gain ? scoring.section * gain : 0.0;
+      if (gain) s = s + contribution;
       sectionsOut.set(record.id, [bestId, contribution]);
     }
     const archived = recordIsArchived(record, w.archivedDirs);
@@ -214,28 +216,29 @@ export function rank(
   });
 }
 
-/** `max_k S_sec(d#s_k)` and the section that reached it — `rank.py::_best_section`.
+/** `G(d) = max(0, max_k S_sec(d#s_k) − S_self(d))` and the section that earned
+ *  it — `rank.py::_section_gain`, SR-SECTIONS decision 5, gain-only (W-269).
  *
- *  The SAME `scoreRecord`, over the body and heading slots only, with the
- *  DOCUMENT's `df` and `n` and the SECTION `avgWlen`. A sectionless document
- *  is its own single section: its own record cut to those slots. Ties go to
- *  the lowest `k`; a best of zero names no section. */
-function bestSection(record, queryHashes, df, corpus, scoring, termWeights) {
+ *  `S_sec` and `S_self` are the SAME `scoreRecord` over the body and heading
+ *  slots only, with the DOCUMENT's `df` and `n` and the SECTION `avgWlen`.
+ *  A sectionless document is its own single section, so its gain is zero by
+ *  construction and nothing is scored for it. Ties go to the lowest `k`; a
+ *  gain of zero names no section. */
+function sectionGain(record, queryHashes, df, corpus, scoring, termWeights) {
+  if (!record.nsec) return [null, 0.0];
   const avg = corpus.secAvgWlen;
-  if (!record.nsec) {
-    const terms = {};
-    for (const [h, tf] of Object.entries(record.terms || {})) terms[h] = tf.slice(0, SECTION_SLOTS);
-    const best = scoreRecord(
-      terms, [...(record.flen || [])].slice(0, SECTION_SLOTS), queryHashes, df, corpus.n, avg,
-      scoring, termWeights,
-    );
-    return [null, best];
-  }
   let bestK = null, best = 0.0;
   for (const [k, flen, terms] of record.secs || []) {
     const s = scoreRecord(terms, flen, queryHashes, df, corpus.n, avg, scoring, termWeights);
     if (s > best) { bestK = k; best = s; }
   }
   if (bestK === null) return [null, 0.0];
-  return [sectionId(record.id, bestK), best];
+  const terms = {};
+  for (const [h, tf] of Object.entries(record.terms || {})) terms[h] = tf.slice(0, SECTION_SLOTS);
+  const whole = scoreRecord(
+    terms, [...(record.flen || [])].slice(0, SECTION_SLOTS), queryHashes, df, corpus.n, avg,
+    scoring, termWeights,
+  );
+  if (best <= whole) return [null, 0.0];
+  return [sectionId(record.id, bestK), best - whole];
 }

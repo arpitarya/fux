@@ -11,7 +11,7 @@ feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error 
 owns: [src/fux/tune.py@7055a30470b9, .fux/tune.toml@5ccca6f37014, node/src/config/tune.mjs@16baad79b561]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 161fc889dda24b9dfac63c6dd85b1bfe0200252e8495bc1c0701ab1e734dce64
+content_sha: 581fa81fd655757e70998f4691d8f8f6f0f1481624bf53213ea14d3d8d444206
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1115,6 +1115,8 @@ this moved where they are written, not what they are.
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** **`[ranking] section_weight`** joins the closed key set: B2's λ ([SR-SECTIONS](0161_sections.md) decision 5), `_non_negative`, template value **`0.0`** (OFF: the plane is never read). It rides `Scoring.section`, not `Weighting`, because both candidate generators decide from it what to read. It is read at query time only, so it moves no committed byte (decision 6). `fux lexical` forces it to `0.0` with the other W-168 terms.
+
+**W-269 — what `section_weight` weighs (2026-10-10; on a branch from `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md) passes).** The key, its validation and its template value `0.0` are unchanged. Its meaning moved: λ now multiplies the **gain-only** term, what the best section scores beyond the document as one unit ([SR-SECTIONS](0161_sections.md) decision 5), not the best section's whole score. A value tuned against W-236's B2 means something else here. The default is written only on a PASS, with the merge.
 
 ### Consequences
 

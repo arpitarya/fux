@@ -9,7 +9,10 @@ What is pinned here, in the record's order:
 3. **Off is off** (decision 7): at `section_weight = 0.0` the ranking and the
    `--json` hit are what they were without section records.
 4. **The differential law at λ > 0**: the scan and the accelerator — skipping
-   on — return identical lists, and the widened ceiling still bounds.
+   on — return identical lists, and the widened ceiling still bounds. **The
+   term is gain-only** (W-269): a sectionless document scores at every λ
+   exactly what it scores at 0.0, and a document whose words are spread over
+   its sections gains nothing.
 5. **The two planes are held together** (decision 9): `fux build` refuses a
    disagreement rather than diverging.
 6. **Carried with the document** (decision 8): an unchanged document keeps its
@@ -68,6 +71,9 @@ def corpus(tmp_path):
         "docs/short.md": "# Canary\n\nthe canary deploy is a staged rollout\n",
         "docs/rollback-note.md": "# Rollback\n\nrollback means returning to the previous release\n",
         "docs/one-section.md": "# Lonely\n\nonly one section, rollback mentioned once\n",
+        # W-269: the query words spread evenly over two sections, so the
+        # document as one unit outscores either section and gains nothing.
+        "docs/spread.md": "# Spread\n\n## East\n\nzebra quokka\n\n## West\n\nzebra quokka\n",
     }
     for i in range(25):
         files[f"docs/filler-{i:02d}.md"] = (
@@ -203,6 +209,54 @@ def test_a_sectionless_hit_names_no_section(corpus):
     results = scan.ask(corpus, "staged rollout", 5, scoring=on(1.0))
     short = next(r for r in results if r.id == "file:docs/short.md")
     assert short.section is None
+
+
+SECTIONLESS = ("file:docs/short.md", "file:docs/rollback-note.md", "file:docs/one-section.md")
+
+
+@pytest.mark.parametrize("weight", [0.25, 0.5, 1.0, 2.0, 4.0])
+@pytest.mark.parametrize("query", ["rollback canary deploy script", "staged rollout rollback", "rollback"])
+def test_a_sectionless_document_scores_exactly_what_it_scores_at_zero(corpus, weight, query):
+    """W-269's G3 on the fixture: the gain-only term gives a sectionless
+    document NOTHING, so its score is byte-identical to `0.0` on both paths.
+    B2 as W-236 built it gave each of these `λ ×` its whole body score."""
+    off = {r.id: r.score for r in scan.ask(corpus, query, 50, scoring=OFF)}
+    for results in (
+        scan.ask(corpus, query, 50, scoring=on(weight)),
+        accel.ask(corpus, query, 50, skipping=False, scoring=on(weight)),
+    ):
+        got = {r.id: r for r in results}
+        compared = [d for d in SECTIONLESS if d in off]
+        assert compared, query
+        for doc in compared:
+            assert got[doc].score == off[doc], (doc, weight)
+            assert got[doc].section is None
+
+
+def test_a_document_whose_words_are_spread_gains_nothing(corpus):
+    """Each section holds half of the tf; the document as one unit holds all
+    of it, so `max_k S_sec <= S_self` and `G = 0`."""
+    stats: dict = {}
+    off = {r.id: r.score for r in scan.ask(corpus, "zebra quokka", 5, scoring=OFF)}
+    results = scan.ask(corpus, "zebra quokka", 5, scoring=on(2.0), stats_out=stats)
+    spread = next(r for r in results if r.id == "file:docs/spread.md")
+    assert store.read_index(corpus)["file:docs/spread.md"]["nsec"] == 2
+    assert spread.score == off["file:docs/spread.md"]
+    assert spread.section is None
+    assert stats["sections"]["file:docs/spread.md"] == (None, 0.0)
+
+
+def test_the_gain_is_the_best_section_minus_the_document_as_one_unit(corpus):
+    """The `--why` contribution is `λ · G`, and G is strictly below the best
+    section's own score: the document's whole-unit score is subtracted."""
+    query = "rollback canary deploy script"
+    one = {}
+    two = {}
+    scan.ask(corpus, query, 5, scoring=on(1.0), stats_out=one)
+    scan.ask(corpus, query, 5, scoring=on(2.0), stats_out=two)
+    sec_id, gain = one["sections"]["file:docs/runbook.md"]
+    assert sec_id == "file:docs/runbook.md#s2" and gain > 0
+    assert two["sections"]["file:docs/runbook.md"] == (sec_id, 2.0 * gain)
 
 
 @pytest.mark.parametrize("weight", [0.1, 0.25, 0.5, 1.0, 4.0])

@@ -11,7 +11,7 @@ feature: section records — the committed section plane, the index section rule
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: becd3084970983efad93d401fae69011f0728b0f3a45212aeaeb369c64de918a
+content_sha: 1375dd2ba4641839f4e67b26f79e1ca90cc289be6b7c38e01821d5d2c6ac17f9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -19,7 +19,7 @@ content_sha: becd3084970983efad93d401fae69011f0728b0f3a45212aeaeb369c64de918a
 **Describes** — reaches into, does not own:
 
 - [`src/fux/maintain/mergedriver.py::merge_sections`](../src/fux/maintain/mergedriver.py) · owned by [SR-MERGE-DRIVER](0130_merge-driver.md)
-- [`src/fux/query/rank.py::_best_section`](../src/fux/query/rank.py) · owned by [SR-RANKING](0111_ranking.md)
+- [`src/fux/query/rank.py::_section_gain`](../src/fux/query/rank.py) · owned by [SR-RANKING](0111_ranking.md)
 - [`src/fux/refer/_chunk.py::_sections,_title_index,index_sections`](../src/fux/refer/_chunk.py) · owned by [SR-CHUNKING](0151_chunking.md)
 
 <!-- COMPONENTS-END -->
