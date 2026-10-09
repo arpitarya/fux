@@ -11,7 +11,7 @@ feature: section records — the committed section plane, the index section rule
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: 858971af6fa1dedcec8d149f06f3c67cfc4dd56c6ea0892bf511f1eb87cca017
+content_sha: 7343bc27d9bcc62b46a0e5399d07303b995827f9eaeaa0a940092009ab0fb0d3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -25,6 +25,8 @@ content_sha: 858971af6fa1dedcec8d149f06f3c67cfc4dd56c6ea0892bf511f1eb87cca017
 # SR-SECTIONS — section records
 
 ## §1 — For humans
+
+🔴 **FAILED 2026-10-10 — drift, and PARKED by Arpit.** Built on branch `w236-sections` (unmerged), it passed both gates and lost at every weight: rank-1 losses 4 · 5 · 9 · 10 across `section_weight` 0.1 · 0.25 · 0.5 · 1.0, and the `step10_section` pool's misses rose 23 → 26 · 26 · 28 · 28 ([verdict](../work/regression/2026-10-10-section-records/VERDICT.md)). The term rewarded **short** documents, whose best section is nearly the whole of them, not the long ones it was built for. `section_weight` does not exist on `main`; this design stays `proposed` and unbuilt there.
 
 A long document whose answer sits under one heading loses at ranking. Its
 query words are a small share of a big document. U0 (a query-time re-rank)
@@ -256,7 +258,7 @@ decision 9.1, and `fux ingest --full` is the migration.**
   which refetches. A URL whose fetch fails keeps its document record with no
   `nsec`, so it is sectionless, which is a correct, degraded state.
 - ⚠ **Every consumer re-ingests, so the bump ships only with a PASS**
-  ([the handoff](../work/open/W-236-section-records.md)).
+  ([the handoff](../archive/open/W-236-section-records.md)).
 
 **9. The two planes are held together.**
 
@@ -388,4 +390,4 @@ evidence.*
 **Project docs**
 
 - [`work/compare/section-units.compare.md`](../work/compare/section-units.compare.md)
-- [`work/open/W-236-section-records.md`](../work/open/W-236-section-records.md)
+- [`work/open/W-236-section-records.md`](../archive/open/W-236-section-records.md)

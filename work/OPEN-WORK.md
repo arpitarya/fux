@@ -34,7 +34,6 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-236** · `agent` — scored by Arpit 2026-10-10. Next: a session that did NOT capture the arms runs `evidence/decide.py` and files the VERDICT ([report](regression/2026-10-10-section-records/report.md)). **Opus.** [detail](open/W-236-section-records.md)
 
 ### testing
 

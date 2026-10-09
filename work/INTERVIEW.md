@@ -35,7 +35,13 @@ valuable judgement, but not the state of play.
 *Updated **2026-10-10** (Claude Code, Opus 5.5 — W-236 Part B).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-10-10 (latest) — W-236 BUILT, GATED, CAPTURED: ARPIT SCORES
+### 🔴 2026-10-10 (latest) — W-236 CLOSED: SECTION RECORDS FAIL (DRIFT), PARKED
+
+- Arpit scored the five arms and ran the frozen decider himself: **FAIL — drift** ([verdict](regression/2026-10-10-section-records/VERDICT.md)). Every λ lost rank-1 hits; the pool got worse.
+- **Why:** B2 favoured SHORT documents (best section ≈ whole doc), not the long ones it targets. Offered a gain-only term or B1; **Arpit parked it**.
+- Branch `w236-sections` (`f2a139fd`) kept unmerged; nothing on `main`; SR-SECTIONS `proposed` with the FAIL at its top.
+
+### 🔴 2026-10-10 — W-236 BUILT, GATED, CAPTURED: ARPIT SCORES
 
 - Arpit: *"implement w236 to the closure."* Claude Code, Opus 5.5. Closure stops at his score by the bar's own rule.
 - **Bar** `4ac1d334` → **build** `f2a139fd`, on branch `w236-sections`, **unmerged**. G0 PASS, G1 PASS, five arms captured ([report](regression/2026-10-10-section-records/report.md)).
@@ -227,7 +233,7 @@ valuable judgement, but not the state of play.
 - **Next:** Arpit runs prompt 11 → prompt 4 rebuild → prompt 5 run → his score →
   each step counts its pool (< 6 stops). Agent meanwhile: step 4's pre-registration.
 
-### 🟢 2026-09-24 (latest) — W-168 STEP 1 SHIPPED: `[bm25f] anchor` defaults to `1.0`
+### 🟢 2026-09-24 — W-168 STEP 1 SHIPPED: `[bm25f] anchor` defaults to `1.0`
 
 - **Arpit ruled PASS at `1.0`** (Cowork): the hub never takes rank 1 on a miss.
   Shipped per §If it passes, in one change: the default on both engines, SR-TUNE

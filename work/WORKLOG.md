@@ -23,6 +23,12 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-10 — W-236 closed: section records FAIL (drift), parked by Arpit  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit scored the five arms, then ran the frozen `decide.py` himself: **FAIL — drift** (rank-1 losses 4 · 5 · 9 · 10; pool misses 23 → 26 · 26 · 28 · 28). Filed as his: [VERDICT](regression/2026-10-10-section-records/VERDICT.md).
+- **Diagnosed** from per-query rows and hand-offs (ids, ranks, document lengths; no key): the displaced rank-1 documents were long (median 15 sections), the new #1s short (~70–110 body words). B2 rewards a document whose best section is nearly itself.
+- **Ruled (Arpit):** first *"try another arm"*, then, offered a gain-only term or B1, **park it**. W-236 closed and archived; branch `w236-sections` kept, unmerged; SR-SECTIONS stays `proposed` with the FAIL at its top.
+- **Next:** nothing on W-236. The blocker W-257 waits on his placebo ruling.
+
 ## 2026-10-10 — W-236 Part B: section records pre-registered, built, gated and captured → Arpit scores  ·  Claude Code (Opus 5.5)
 - **Asked:** *"implement w236 to the closure."* Closure stops at Arpit's score: the bar forbids the capturing session from adjudicating.
 - **Pre-registered** at `4ac1d334` before any build code existed: four arms against `0.0`, with `hit@1` on the key's `step10_section` pool read exactly from score counts under the no-new-misses clause (no tag file, no proxy). G0, G1 and G2 gates. `decide.py` frozen.
