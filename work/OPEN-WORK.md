@@ -27,8 +27,6 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 0d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-236** — score it: `just golden-score work/regression/2026-10-10-section-records`. Before any merge: the 8.0× section plane on this repo ([ANALYSIS](regression/2026-10-10-section-records/ANALYSIS.md)). [item](open/W-236-section-records.md) | 2026-10-10 | 0d |
-| ↳ **blocks:** nothing else in the queue | | |
 
 ---
 
@@ -36,7 +34,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-236** · `arpit` — built on branch `w236-sections`; G0 + G1 PASS; five arms captured ([report](regression/2026-10-10-section-records/report.md)). Arpit scores; a non-capturing session decides. **Opus.** [detail](open/W-236-section-records.md)
+- 🟢 **W-236** · `agent` — scored by Arpit 2026-10-10. Next: a session that did NOT capture the arms runs `evidence/decide.py` and files the VERDICT ([report](regression/2026-10-10-section-records/report.md)). **Opus.** [detail](open/W-236-section-records.md)
 
 ### testing
 

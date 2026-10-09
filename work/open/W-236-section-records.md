@@ -9,6 +9,8 @@ ball: agent
 
 # W-236 — section records (W-168 step 10, U2)
 
+**Status 2026-10-10 (scored): Arpit scored all five arms** ([report](../regression/2026-10-10-section-records/report.md) §top; baseline pool 23). **Next (🟢, any session that did NOT capture):** run `evidence/decide.py` and file `VERDICT.md`. The capturing session may not.
+
 **Status 2026-10-10 (later): built, gated, captured → 🔴 Arpit scores.** Build `f2a139fd` on branch `w236-sections` (unmerged): both readers, the build invariant, the merge driver (SR-SECTIONS d9 amended before any arm: per-parent groups, both-changed refused). **G0 PASS** (90/90 rows identical to the freeze engine at `0.0`), **G1 PASS** (rung-10000: 0.979×, 51.4 MB, largest 899 KB). Five arms captured ([report](../regression/2026-10-10-section-records/report.md)). Next: `just golden-score work/regression/2026-10-10-section-records` (Arpit), then `evidence/decide.py` by a session that did not capture. ⚠ **Before any merge:** on THIS repository the section plane is 337.5 MB vs a 42.1 MB doc plane (8.0×; `.jsonl` 75.6 %), three options in [ANALYSIS §2](../regression/2026-10-10-section-records/ANALYSIS.md). The branch does not carry this repo's re-ingested index.
 
 **Status 2026-10-10: DoD 4's pre-registration is frozen** — [`2026-10-10-section-records`](../regression/2026-10-10-section-records/PRE-REGISTRATION.md): `section_weight ∈ {0.1, 0.25, 0.5, 1.0}` against `0.0` on a re-ingested copy of gen-4 `rung-01000`; the pool read exactly from the scorer's counts under the no-new-misses clause; G0 byte identity at `0.0`, G1 the W-251 #9 size bar at rung-10000, G2 the pool ≥ 6. The build lives on branch `w236-sections` until the verdict, so a FAIL spends no `_format` number on `main`.
