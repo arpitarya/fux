@@ -11,7 +11,7 @@ feature: section records — the committed section plane, the index section rule
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: d5e86d4555584c69788ff1da88b6ec31e0fc2d1cfac327c9775d489eb20f4848
+content_sha: becd3084970983efad93d401fae69011f0728b0f3a45212aeaeb369c64de918a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -30,6 +30,8 @@ content_sha: d5e86d4555584c69788ff1da88b6ec31e0fc2d1cfac327c9775d489eb20f4848
 
 🔴 **FAILED 2026-10-10 — drift, and PARKED by Arpit.** Built on branch `w236-sections` (unmerged), it passed both gates and lost at every weight: rank-1 losses 4 · 5 · 9 · 10 across `section_weight` 0.1 · 0.25 · 0.5 · 1.0, and the `step10_section` pool's misses rose 23 → 26 · 26 · 28 · 28 ([verdict](../work/regression/2026-10-10-section-records/VERDICT.md)). The term rewarded **short** documents, whose best section is nearly the whole of them, not the long ones it was built for. `section_weight` does not exist on `main`; this design stays `proposed` and unbuilt there.
 
+🟡 **Reopened 2026-10-10 for a second mechanism (W-269, Arpit's ruling): a GAIN-ONLY term.** A document gains only where its best section beats the document scored as one unit, so a sectionless document gains exactly nothing (decision 5). It is built on a branch from `w236-sections` and judged by W-236's frozen bar unchanged, plus one gate that tests the diagnosis ([pre-registration](../work/regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md)). `b` is not touched.
+
 A long document whose answer sits under one heading loses at ranking. Its
 query words are a small share of a big document. U0 (a query-time re-rank)
 could only reorder documents that were already in the top k, so it could not
@@ -40,8 +42,9 @@ with its own length.
 **What this record fixes.** Section records live in **their own plane**,
 `.fux/index/sections/`, beside the document shards and sharded like them. A
 section is cut by **heading depth alone, with no tunable**. A document keeps
-**one result**: its score gains `section_weight` × its best section's score
-(B2). At the default `0.0` nothing reads the plane, so the ranking is
+**one result**: its score gains `section_weight` × what its best section
+scores **beyond the document scored as one unit** (B2's gain-only variant,
+W-269), so a document without sections gains nothing. At the default `0.0` nothing reads the plane, so the ranking is
 byte-identical to an index without it.
 
 **Built 2026-10-10 on branch `w236-sections`, not merged** (W-236 Part B).
@@ -74,7 +77,7 @@ flowchart LR
     P --> Q{"section_weight"}
     S --> Q
     Q -->|"0.0"| O["plane never opened<br/>ranking byte-identical"]
-    Q -->|"> 0"| B["rank(): S_doc + λ · max section score<br/>one result per document"]
+    Q -->|"> 0"| B["rank(): S_doc + λ · gain of the best section<br/>over the document as one unit<br/>one result per document"]
 ```
 
 <details>
@@ -94,7 +97,8 @@ flowchart LR
                                                          |
                                section_weight ----------+
                                  0.0  -> plane never opened, byte-identical
-                                 > 0  -> rank(): S_doc + λ * best section
+                                 > 0  -> rank(): S_doc + λ * gain, where gain =
+                                         max(0, best section - document as one unit)
                                          one result per document
 ```
 
@@ -113,6 +117,11 @@ flowchart LR
   reported beside it. The ruling left the format, the section id and the fold
   back to one result per document to a record written before the build. This is
   that record.
+- **The second mechanism** (W-269, Arpit, 2026-10-10, Cowork): after W-236's
+  FAIL, *"Okay. Let's create a work item for a recommended approach"*, and the
+  recommended approach was a gain-only term on the same section plane.
+  Decision 5 carries it. The plane, the rule and the format (decisions 1–4, 8
+  and 9) are unchanged.
 - **U1 stays refused**: no section index built from content fetched at query
   time ([SR-POSTINGS](0112_postings.md), and the compare doc's own reason).
   Everything here is written by `fux ingest` from the bytes ingest already
@@ -209,8 +218,36 @@ one section shard, both with the same number.
 document `d`, with `λ = [ranking] section_weight`:
 
 ```
-S(d) = ( S_doc(d) + λ · max_k S_sec(d#s_k) ) · w(d)
+G(d) = max(0, max_k S_sec(d#s_k) − S_self(d))
+S(d) = ( S_doc(d) + λ · G(d) ) · w(d)
 ```
+
+- 🟡 **Gain-only, amended 2026-10-10 (W-269, Arpit's ruling) before any build
+  code.** W-236 built B2 as `S_doc + λ · max_k S_sec` and it **failed (drift)
+  at every weight**: a sectionless document was its own single section, so it
+  gained about `λ ×` its whole body and heading score, while a long document's
+  best section held only part of its tf. The term favoured short documents
+  ([verdict](../work/regression/2026-10-10-section-records/VERDICT.md)). The
+  gain-only form is **B2's variant, not a new blend**: the same two units, the
+  same `λ`, and only what the best section adds **beyond the document itself**.
+- **`S_self(d)`** is the document's own record, cut to the body and heading
+  slots, scored by the same `score_record` under the **same section
+  statistics** that score its sections (the section `avg_wlen`, the document
+  `df` and `n`). Totality (decision 3) makes the two comparable: the sections
+  partition exactly those tokens.
+- 🔴 **A sectionless document gains nothing, by construction.** It is its own
+  single section, so `max_k S_sec = S_self` and `G = 0`. No arithmetic runs for
+  it, so its score is **byte-identical** to `λ = 0` at every `λ`. That is the
+  bias W-236 measured, removed rather than tuned. A multi-section document gains
+  only where its query words are **concentrated** in one section, which is the
+  case the step exists for. Where they are spread, the whole outscores any one
+  section and `G = 0`.
+- **The accelerator needs no change.** `G ≤ max_k S_sec` because `S_self ≥ 0`,
+  so decision 7's skip ceiling still bounds the term. Its `theta` scores opened
+  terms only and never includes the section term, so it stays an
+  under-estimate. Re-checked against the code, not assumed.
+- **The B2 form is history** and is kept here only as what W-236 measured:
+  `S(d) = ( S_doc(d) + λ · max_k S_sec(d#s_k) ) · w(d)`.
 
 - `S_sec` is the **same `score_record`** in `rank()`, over the section's body
   and heading slots, with the **document** `df` and `n` and a **section**
@@ -218,11 +255,13 @@ S(d) = ( S_doc(d) + λ · max_k S_sec(d#s_k) ) · w(d)
   totals plus the body and heading `flen` of every sectionless document,
   divided by the number of units counted.
 - **A sectionless document is its own single section.** Its section view is
-  its own record restricted to the body and heading slots. It is scored the
-  same way, so short documents are not penalised for having no section records.
-- **Ties go to the lowest `k`.** **A best of zero names no section**
-  (2026-10-10): when no section of a document matched a query term, the hit's
-  `section` is `null` and the term adds nothing. Naming `#s1` there would be a
+  its own record restricted to the body and heading slots, which is exactly
+  `S_self`, so its gain is zero (above).
+- **Ties go to the lowest `k`.** **A gain of zero names no section**
+  (2026-10-10, gain-only since W-269): when no section of a document beats the
+  document as one unit, including when none matched a query term, the hit's
+  `section` is `null` and the term adds nothing. Naming the best section there
+  would present a section that earned nothing as an answer. Naming `#s1` there would be a
   tie-break among zeros, presented as an answer. Anchor terms stay
   document-level: a section gets no anchor field. The `--expand` guard is unchanged, because it runs on
   the document before anything is scored.
@@ -238,9 +277,9 @@ S(d) = ( S_doc(d) + λ · max_k S_sec(d#s_k) ) · w(d)
 
 **6. One result per document, always.** A section is never a hit, a candidate
 or a line in the output. When `λ ≠ 0`, each hit carries
-`section: "<document id>#s<k>"`, or `null` for a sectionless document or one
-with no matching section. `--why` names the section term's contribution: each
-derivation document carries `section: {"id", "contribution"}`, and
+`section: "<document id>#s<k>"`, the section that earned the gain, or `null`
+when the gain is zero (always, for a sectionless document). `--why` names the section term's contribution: each
+derivation document carries `section: {"id", "contribution"}`, where `contribution` is `λ · G(d)`, and
 `score = (Σ contribution + section.contribution) × rerank_uplift × multiplier`. **When `λ = 0` the key is
 absent**, because the output has to be byte-identical (decision 7).
 
@@ -380,7 +419,9 @@ a pass.
   a total above 1 GB at rung-10000;
 - it reports any totality miss;
 - or, once built, a v8 index at `section_weight = 0.0` ranks any query
-  differently from the pre-section engine on the same corpus.
+  differently from the pre-section engine on the same corpus;
+- or, with the gain-only term built, a sectionless document scores differently
+  at any `λ` from what it scores at `λ = 0` (W-269's G3).
 
 **How to check it:**
 `.venv/bin/python tools/section-size/measure.py --ladder ~/my_programs/fux-lab/corpora/golden --rungs rung-10000 --out /tmp/s.json`.
