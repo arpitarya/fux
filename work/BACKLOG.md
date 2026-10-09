@@ -35,11 +35,12 @@ W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search impro
 
 | id | what is outstanding | named in | what closes it |
 |---|---|---|---|
-| B-002 | The dirty list "alone buys no speedup" — the runner still calls today's `fux ingest`, which walks the corpus; the list's input is unused | [SR-MAINTENANCE](../records/0129_hooks.md) decision 1a, point 3 | Arpit ([W-260](../archive/open/W-260-w256-results-to-rule.md)); W-264 retired 2026-10-09 (`redact` was a regression, fixed — delta 5.16 s); the re-measure is [W-267](open/W-267-ingest-split-remeasure.md) |
+| B-002 | The dirty list "alone buys no speedup" — the runner still calls today's `fux ingest`, which walks the corpus; the list's input is unused | [SR-MAINTENANCE](../records/0129_hooks.md) decision 1a, point 3 | Arpit, on [W-267](open/W-267-ingest-split-remeasure.md)'s re-measure (W-264 retired 2026-10-09) |
 | B-006 | The `enriched` ingest mode has no sign-off — "the sign-off half has not been given"; grade `6` `INFERRED` stays reserved (ex-B-005) | [SR-ENRICH](../records/0137_enrich.md) folded decision 6 · [SR-EXTRACTED](../records/0115_extracted-mode.md) decision 3 | Arpit: [W-251](../archive/open/W-251-backlog-audit-rulings.md) §3 #1 recommends retire the mode, KEEP grade 6 for inferred edges |
 | B-031 | The write verbs have no `--json`; the shape for *recorded, fetched, ingested* is now DECLARED, not shipped ([plan](proposals/build-plan-2026-10.md) §1, W-251 §4) | [SR-CLI](../records/0101_cli-surface.md) Consequences | A caller: a `fux_add` MCP tool or an `api.add` proposed in a record — then the declared shape is built |
 | B-041 | `.rst`, `.adoc` and `.org` keep their own regexes in `extract.py` and get no fence handling; approach ruled — one fence-aware module both consumers import ([plan](proposals/build-plan-2026-10.md) §2) | [SR-DECODE](../records/0139_decode.md) decision 14 ⚠ | The first corpus or golden seed in one of the three formats, then the plan's §2 as a `W-nn` |
 | B-261 | Abstention gates 2–9 are ruled (option (a), 2026-09-14) and unbuilt; gate 2 INCONCLUSIVE → [W-265](open/W-265-abstention-research.md); gates 4 and 3 are replayable next, 5/8 need captures, 6 waits on the graph value | [`abstention-gates`](compare/abstention-gates.compare.md) · [SR-CONFIDENCE](../records/0141_confidence.md) decision 3a | One `W-nn` per gate, in the ruled order |
+| B-273 | Title-H1 generator slip: SOPs carry a template H1 unequal to their title (0.803–0.816 vs `core_share` 0.80) — 14–143 unplanted misfits per rung | [SR-INSPECT](../records/0156_inspect.md) decision 24 ⚠ · [gen-4 run](regression/2026-10-05-ladder-gen4-rebuild/report.md) | The **next** test-data generation's generator emits an H1 equal to the front-matter title |
 
 ---
 

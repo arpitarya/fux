@@ -40,7 +40,9 @@ retrieval_sample  = 100
 # their heading-and-front-matter-key sets is at least `skeleton_jaccard` against
 # EVERY member (complete linkage). A member missing a heading that at least
 # `core_share` of its family carries is a misfit; `misfit_floor` is the share
-# of family members that flags the lens, PROVISIONAL until measured on golden.
+# of family members that flags the lens. Measured on golden (W-228, 2026-10-09):
+# it does not fire falsely on any gen-4 rung (1.5-10.7 %); no corpus has yet
+# shown it firing when it should.
 # `length_edges` cut body tokens into the bands a family reports.
 [families]
 skeleton_jaccard = 0.60

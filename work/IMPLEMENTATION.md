@@ -26,6 +26,14 @@ Rules:
 
 ---
 
+## 2026-10-09 — **W-228 closed: `misfit_floor` leaves PROVISIONAL**
+
+| what | evidence |
+|---|---|
+| **the ruling** | Arpit, Cowork, 2026-10-09: 0.20 unchanged, off PROVISIONAL, with its caveat |
+| **landed** | [SR-INSPECT](../records/0156_inspect.md) d24 states the gen-4 evidence (3/3 planted, 0/3 controls, `misfit_share` 1.5–10.7 %) and that the flag has never been seen firing; `templates/inspect.toml.txt` comment says the same; BACKLOG B-273 |
+| **verified** | unit and e2e suites whole on the working tree |
+
 ## 2026-10-05 — **W-240 step 3 + W-228 DoD 11: the golden ladder, generation 4**
 
 | what | evidence |

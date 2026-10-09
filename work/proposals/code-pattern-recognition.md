@@ -15,7 +15,7 @@ timestamp: 2026-09-27T18:30:00Z
 > fux works, that … there's a CLI that is available, which can be ingested by
 > Claude Code, and can give meaningful answers."*
 
-The **document** half is [W-228](../open/W-228-document-families.md), a lens in
+The **document** half is W-228 ([SR-INSPECT](../../records/0156_inspect.md) decision 24), a lens in
 `fux inspect`. This file is the **code** half, and it is parked because the
 honest answer to *"shall we build a separate tool?"* is *"the field has, and
 the part that is fux-shaped is small."*
@@ -116,5 +116,5 @@ distribution.
 - [Codebase-Memory: tree-sitter-based knowledge graphs for LLM code agents](https://arxiv.org/html/2603.27277v1), 2026
 - [tree-sitter-analyzer](https://github.com/aimasteracc/tree-sitter-analyzer) · [coderlm](https://github.com/JaredStewart/coderlm)
 - [13 duplicate-code checkers, 2026](https://dev.to/rahulxsingh/13-best-duplicate-code-checker-tools-in-2026-1cnk)
-- [W-228](../open/W-228-document-families.md) — the document half, and the
+- W-228 ([SR-INSPECT](../../records/0156_inspect.md) decision 24) — the document half, and the
   shape/minhash/misfit pattern this sketch reuses

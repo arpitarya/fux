@@ -9,6 +9,8 @@ ball: agent
 
 # W-228 — document families: pattern recognition over the corpus, inside `inspect`
 
+✅ **CLOSED 2026-10-09 (Claude Code, Opus 5.5) — the ruling below is landed:** SR-INSPECT d24 drops PROVISIONAL with its caveat; the template's `[families]` comment says the same, value unmoved; the title-H1 slip is BACKLOG B-273; both suites whole.
+
 ✅ **RULED 2026-10-09 (Arpit, Cowork) · ratified, NOT built — *"go with the
 recommendation"*:** `misfit_floor` **0.20 leaves PROVISIONAL, unchanged.** What
 the agent lands, in one change:

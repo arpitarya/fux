@@ -4,14 +4,14 @@ kind: component
 name: SR-INSPECT
 title: "SR-INSPECT (0156) — `fux inspect`, the index X-ray: six lenses, three flagged checks, a local dictionary that names the hashes, and per-document facts, probes and a diff"
 description: "Arpit asked whether a consumed index is a good index or a bad one. `fux inspect` answers it descriptively: six lenses over the committed shards — boilerplate, findability, length and fields, duplication and templates, analyzer coverage, graph — each printing distributions and named lists, each naming the lever that would change what it found and applying none. Exactly three numbers carry a pass/attention flag and their floors are provisional, measured on the golden ladder and dropped to descriptive if one ever flags a healthy rung. The committed index holds term hashes, so the words come from a gitignored dictionary built by re-tokenising the sources locally; nothing new is committed and nothing is fetched. Since W-220 (2026-09-23) it also computes cached per-document facts, probes each document by its own title and headings (the new findability headline), folds identity, segments, chunks and a worst-first triage, and diffs two reports with edge loss always an alert; fux serve calls the same library."
-amended: 2026-09-28
+amended: 2026-10-09
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
 owns: [src/fux/inspect@776eab8447d3, .fux/inspect.toml@a2b927adc116]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 66aa42e0255cbd80ad2bea4dbaaed5290f2e12cc599c3aa15a5dfdf0fb6a356a
+content_sha: 3e724f4294584d19cfdc7a2838bf465cee89a48b3a2fd82aabf51fb56b102feb
 ratifies: W-169
 ---
 
@@ -430,13 +430,17 @@ placed inside `inspect` by the W-220 ruling — a lens, never a verb).
   its family carries, named with what it lacks, worst first. A document in no
   family of two is a **singleton**; one with no headings has **no shape**, and is
   listed as such rather than as unique.
-- **`misfit_share` carries the one flag, at `[families] misfit_floor`, PROVISIONAL**
-  — the `SEPARATION_FLOOR` discipline: it stays provisional until the golden seed
-  corpus carries families and planted misfits and a filed rung reports the lens on
-  it (W-228 DoD 11, open). ⚠ **The rung is filed and the planted misfits are not:**
-  on 2026-09-28 the seed carried 8 families and 0 misfits
-  ([the run](../work/regression/2026-09-28-families-lens-ladder/report.md)), so
-  the floor stays PROVISIONAL.
+- **`misfit_share` carries the one flag, at `[families] misfit_floor` = 0.20 —
+  no longer PROVISIONAL, its value unchanged** (Arpit, 2026-10-09, W-228). On the
+  eight generation-4 rungs the lens finds the **3/3 planted misfits**, each with
+  the right missing heading, flags **0/3 controls**, and `misfit_share` reads
+  **1.5–10.7 %** ([the run](../work/regression/2026-10-05-ladder-gen4-rebuild/report.md)).
+  ⚠ **What that evidence shows is that the floor does not fire falsely; no corpus
+  has yet shown it firing when it should** — none exceeded 20 %, so the flag's
+  true-positive side is unmeasured. ⚠ From rung-01000 up, 14–143 unplanted
+  misfits are one generator slip (a template H1 that differs from the
+  front-matter title, at 0.803–0.816 against `core_share` 0.80); it is a test-data
+  defect logged for the next generation, not a lens defect.
 - **Levers from `LEVERS` only**: a misfit — *unfindable document*'s (fix the
   source); a family's shared headings — *boilerplate term*'s; a family split across
   folders — *template family*'s.
