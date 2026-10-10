@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@7262c71ca945]
+owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@d8ca2d4ddf18]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 7d7e9047ef4c8f93751caa52ff4bd4e6195640cc169752e49ea8d6eb043e74a6
+content_sha: 78e72e12194d2bfb8be55947b77dfc3df90d02302679b5692f1cb887aa6bb67b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -692,6 +692,8 @@ copied out, never imported.
 **No decision here moved** (W-246, 2026-10-04): `templates/cdp.py.txt` counts requests paused against resolved per fetch and raises naming the URL when they differ ([SR-CDP-FETCHER](0118_cdp-fetcher.md) Consequences); the fetch contract is untouched.
 
 **No decision here moved** (W-246, 2026-10-04): `templates/output.toml.txt` gained the `[cli.answer] journal_max_bytes` key.
+
+**No decision here moved** (W-273, 2026-10-11): `templates/tune.toml.txt`'s `section_weight` comment now describes the gain-only term ([SR-TUNE](0135_tuning.md), [SR-SECTIONS](0161_sections.md) decision 5); comment bytes only.
 
 ### Consequences
 

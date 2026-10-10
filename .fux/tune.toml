@@ -67,8 +67,9 @@ mined_weight            = 0.5
 # passed its pre-registered run on 2026-09-28.
 intent_weight           = 0.1
 # Rank a long document by its best section too: its score gains this times
-# the score of its best-matching heading section. 0 = OFF, and at 0 the section
-# plane is never read. UNMEASURED: W-236's pre-registered run decides it.
+# what its best heading section scores BEYOND the document scored as one unit,
+# so a document with one section or none gains nothing. 0 = OFF, and at 0 the
+# section plane is never read. UNMEASURED: W-270's pre-registered run decides it.
 section_weight          = 0.0
 
 [graph]                         # explain / graph / path

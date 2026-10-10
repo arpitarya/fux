@@ -6,12 +6,12 @@ title: "SR-SECTIONS (0161) — section records: a doc#section plane beside the d
 description: "The design of W-168 step 10 as ruled U2 · B2 · E1: each heading section of a multi-section document becomes a committed `doc#s<k>` record in its own plane, `.fux/index/sections/`, cut by a tunable-free section rule. Its best section adds `section_weight` times its score to the document's. At 0.0 the plane is never opened, so ranking is byte-identical. The design is not built."
 status: proposed
 date: 2026-09-30
-amended: 2026-10-10
+amended: 2026-10-11
 feature: section records — the committed section plane, the index section rule, and the B2 best-section term
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: 38769229803aa0fc43cd855fdfd685a646ea2b07b76e0c0889508900f5c68d25
+content_sha: 61170703aeb50edd2d4f3f1fc2fe21340c112ccb292db8f10a259e7e3a918368
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -160,6 +160,31 @@ Over the same text `extract.py` tokenises (the decoded, PII-redacted body):
 3. **one section or none** → the document is *sectionless* and gets no
    section records;
 4. otherwise the sections are numbered `1…N` in document order.
+
+- 🔴 **Decoded record formats are sectionless, by a closed list** (amended
+  2026-10-11, W-273, carrying W-271's ruling, option (b): Arpit, 2026-10-10,
+  *"Go with the recommendation"*). A document whose extension is `.jsonl`,
+  `.csv` or `.json` gets **no section records**, whatever headings its decoder
+  emits. The list is `[index] sectionless_formats` in `constants.toml`, a fixed
+  engine value and not a tunable, because it decides committed bytes
+  ([SR-TUNE](0135_tuning.md) decision 6).
+  - **Why.** Those decoders emit one sibling heading per **record**, so the rule
+    above cut one section per row or object. A record is not a passage of a long
+    document. It is a whole unit already, and the document plane scores it as
+    one. On this repository's own index the plane was **8.0×** the document
+    plane, and `.jsonl` alone was 75.6 % of it
+    ([W-236 ANALYSIS](../work/regression/2026-10-10-section-records/ANALYSIS.md)
+    §2). The step exists for long prose, which those formats are not.
+  - **What it does to ranking.** Each such document is sectionless, so the
+    gain-only term (decision 5) leaves it byte-identical at every `λ`. W-269's
+    gate G3 already covers that case. It changes which documents carry
+    sections, not how a section scores, so it is not a new mechanism.
+  - **Closed, not open-ended.** `.pdf`, `.pptx` and the other formats that emit
+    a heading per page or slide keep their sections; a page is a passage. A
+    format joins the list only by an amendment here.
+  - `extract.RULES_VERSION` bumps with the list (4 → 5), so the next ingest
+    re-extracts, and every such document loses its section lines and its
+    `nsec`.
 
 - **How this maps onto SR-CHUNKING.** It uses the same grammar and the same
   `_sections`, with a different fold test: *bodiless* where the chunker uses
@@ -364,9 +389,10 @@ a pass.
   `.gitattributes`; the merge driver's parent rule; both readers; the build
   invariant; and this record's `owns`.
 - **The index about doubles on prose.** Formats that emit one sibling heading
-  per record (`.jsonl`, `.pdf`, `.pptx`) get one section per record, page or
-  slide. That is not measured, because the ladder has none of those formats.
-  Rows of a table never become sections.
+  per page or slide (`.pdf`, `.pptx`) get one section per page or slide. That
+  is not measured, because the ladder has none of those formats. The decoded
+  record formats (`.jsonl`, `.csv`, `.json`) get none (decision 2, W-273), and
+  rows of a table never become sections.
 - **A section cannot be cited offline by its heading.** The id is an ordinal.
   `refer` recovers the heading by running the same rule on the fetched bytes,
   and the fetched sha is what makes that honest.

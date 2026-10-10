@@ -133,6 +133,27 @@ def test_a_sectionless_document_has_no_nsec_and_no_lines(corpus):
         assert doc_id not in sections
 
 
+def test_decoded_record_formats_are_sectionless(tmp_path):
+    """W-273 (SR-SECTIONS decision 2, W-271's option b): a `.jsonl`, `.csv` or
+    `.json` document gets no section records, however many records its decoder
+    turns into headings; the same headings in Markdown still split."""
+    rows = [{"name": f"row {i}", "note": f"record body {i} about queues"} for i in range(4)]
+    _init(tmp_path, {
+        "docs/table.jsonl": "".join(json.dumps(r) + "\n" for r in rows),
+        "docs/table.csv": "name,note\n" + "".join(f"{r['name']},{r['note']}\n" for r in rows),
+        "docs/table.json": json.dumps({f"k{i}": r for i, r in enumerate(rows)}),
+        "docs/control.md": "# Control\n\n## A\n\nalpha body\n\n## B\n\nbeta body\n",
+    })
+    run(tmp_path, refresh_urls=False, full=False)
+    records = store.read_index(tmp_path)
+    sections = store.read_sections(tmp_path)
+    for ext in ("jsonl", "csv", "json"):
+        doc_id = f"file:docs/table.{ext}"
+        assert doc_id in records, doc_id
+        assert "nsec" not in records[doc_id] and doc_id not in sections, doc_id
+    assert records["file:docs/control.md"]["nsec"] == 2
+
+
 def test_totality_sections_sum_to_the_document(corpus):
     """SR-SECTIONS decision 3's invariant, on every multi-section document."""
     records = store.read_index(corpus)

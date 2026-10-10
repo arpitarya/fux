@@ -47,7 +47,17 @@ from ..constants import fixed
 #: **4 (2026-10-10, W-236):** extraction also returns `sections`, the per-section
 #: body and heading counts SR-SECTIONS decision 2 cuts. Redundant with the
 #: `_format` bump to v8, bumped for the same reason 3 was.
-RULES_VERSION = fixed("versions", "extract_rules")  # 4 since W-236 (sections); W-233 did not bump: no families = identical output
+#:
+#: **5 (2026-10-11, W-273):** decoded record formats (`[index]
+#: sectionless_formats`: `.csv`, `.json`, `.jsonl`) return no `sections`
+#: (SR-SECTIONS decision 2, W-271's option b). Their documents lose their
+#: section lines and `nsec` at the next ingest.
+RULES_VERSION = fixed("versions", "extract_rules")  # 5 since W-273 (no sections for record formats); W-233 did not bump: no families = identical output
+
+#: SR-SECTIONS decision 2 (W-273): extensions whose documents are sectionless
+#: whatever headings their decoder emits — one heading per record is not a
+#: passage. A closed list in `constants.toml`, never a tunable.
+_SECTIONLESS_FORMATS = frozenset(fixed("index", "sectionless_formats"))
 
 import re
 from collections import Counter
@@ -123,11 +133,14 @@ _GRAMMARS: dict[str, re.Pattern] = {
 }
 
 
-def _grammar(rel_path: str) -> re.Pattern | None:
+def _extension(rel_path: str) -> str:
     dot = rel_path.rfind(".")
     slash = max(rel_path.rfind("/"), rel_path.rfind("\\"))
-    ext = rel_path[dot:].lower() if dot > slash + 1 else ""
-    return _GRAMMARS.get(ext)
+    return rel_path[dot:].lower() if dot > slash + 1 else ""
+
+
+def _grammar(rel_path: str) -> re.Pattern | None:
+    return _GRAMMARS.get(_extension(rel_path))
 
 
 def _headings_and_body(rel_path: str, body: str) -> tuple[list[str], str]:
@@ -267,6 +280,9 @@ def _index_sections(rel_path: str, body: str, own_counts: tuple[int, int], ids) 
     **Markdown only.** `.rst`, `.adoc` and `.org` headings are not the grammar
     `_chunk._sections` reads, and the chunker gives them no sections either.
 
+    **Not for decoded record formats** (W-273): a `.csv`, `.json` or `.jsonl`
+    decoder emits one heading per record, and a record is not a passage.
+
     🔴 **Totality is checked, and a miss makes the document sectionless.**
     Summed over the sections, the body and heading token counts must equal the
     document's own — `own_counts`, taken BEFORE front-matter values were
@@ -275,7 +291,7 @@ def _index_sections(rel_path: str, body: str, own_counts: tuple[int, int], ids) 
     than ones that disagree with its own postings. That is decision 3's
     invariant kept by construction, and it is deterministic.
     """
-    if _grammar(rel_path) is not None:
+    if _grammar(rel_path) is not None or _extension(rel_path) in _SECTIONLESS_FORMATS:
         return ()
     from ..refer._chunk import index_sections
 

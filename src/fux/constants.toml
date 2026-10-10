@@ -40,6 +40,12 @@ section_sep  = "#s"
 # The TF_FIELDS slots a section record carries -- a PREFIX of tf_fields, so a
 # section's tf and flen lists are the document's cut to this length (d3).
 section_fields = ["body", "heading"]
+# W-273 (SR-SECTIONS d2, W-271's ruling option b): decoded RECORD formats get
+# no section records -- their decoders emit one heading per row or object, and
+# a record is a whole unit, not a passage. A closed list; it decides committed
+# bytes, so it is fixed here and never a tunable. Bump [versions] extract_rules
+# with any edit.
+sectionless_formats = [".csv", ".json", ".jsonl"]
 # Every shard file opens with one header line; records follow it.
 shard_header_lines = 1
 # How deep a committed record may nest (store/canonical.py). Deeper is refused,
@@ -396,7 +402,7 @@ rrf_k = 60
 [versions]
 # ingest/extract.py's RULES_VERSION -- bump when what extraction RETURNS moves;
 # the next `fux ingest` then re-extracts the corpus. History: ingest/extract.py.
-extract_rules = 4
+extract_rules = 5
 
 [answer]
 # How many ranked documents `fux answer` hands the refer plane to cite from
