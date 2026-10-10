@@ -9,7 +9,7 @@ ball: agent
 
 # W-269 — section records, second mechanism: gain-only
 
-**Status: DoD 1–4 done 2026-10-10.** 🔴 **Arpit scores:** `just golden-score work/regression/2026-10-10-section-gain-only`. Then a session that did not capture runs `decide.py` (DoD 5).
+**Status: DoD 1–4 done and scored 2026-10-10** (Arpit's hand; totals in the [report](../regression/2026-10-10-section-gain-only/report.md)). **DoD 5 next:** Arpit, or a session that did **not** capture, runs `python3 work/regression/2026-10-10-section-gain-only/evidence/decide.py` and files the VERDICT.
 
 | DoD | state | where |
 |---|---|---|

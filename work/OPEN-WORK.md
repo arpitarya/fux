@@ -27,10 +27,6 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 0d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-257** — score it: `just golden-score work/regression/2026-10-10-enriched-rung` (7 arms; G0–G3 pass; placebo line-matched per your ruling). [report](regression/2026-10-10-enriched-rung/report.md) | 2026-10-10 | 0d |
-| ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-269** — score it: `just golden-score work/regression/2026-10-10-section-gain-only` (5 arms; G0 · G1 · G3 pass). Run it from the branch `claude/gracious-galileo-aqrg8b`. [report](regression/2026-10-10-section-gain-only/report.md) | 2026-10-10 | 0d |
-| ↳ **blocks:** nothing else in the queue | | |
 
 ---
 
@@ -38,11 +34,10 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-269** · `arpit` — gain-only section term: built and captured, 5 arms, G0 · G1 · G3 pass ([report](regression/2026-10-10-section-gain-only/report.md); branch `claude/gracious-galileo-aqrg8b`). Arpit scores; a non-capturing session runs `decide.py`. **Opus.** [detail](open/W-269-section-gain-only.md)
+- 🟢 **W-269** · `agent` — gain-only section term: captured and **scored by Arpit** ([report](regression/2026-10-10-section-gain-only/report.md); branch `claude/gracious-galileo-aqrg8b`). Next: a session that did **not** capture runs `decide.py` and files the VERDICT. **Opus.** [detail](open/W-269-section-gain-only.md)
 
 ### testing
 
-- 🔴 **W-257** · `arpit` — amendment 1 ruled; seven arms captured ([report](regression/2026-10-10-enriched-rung/report.md)). Arpit scores; a non-capturing session runs `decide.py` + `tilt.py`. **Opus.** [detail](open/W-257-enriched-rung.md)
 - 🔴 **W-258** · `arpit` — one hands-on session on his machine: a journalled answer whose source then vanishes, a real 429 from a real host, and parallel CDP fetches in signed-in Chrome. Checklist and bars are written. [detail](open/W-258-live-network-captures.md)
 
 ### adr update

@@ -10,7 +10,27 @@ pre_registration: work/regression/2026-10-10-section-gain-only/PRE-REGISTRATION.
 
 # Report: section records, gain-only (`set-5-claude`, `rung-01000` copy)
 
-⏳ **Captured, not scored, not decided.** No answer key reached this session
+✅ **Scored 2026-10-10 (Arpit's hand); not decided.** `just golden-score` wrote
+five complete score files (n = 90) under `scores/`. 🔴 **This session captured
+the arms, so it files the totals and runs no decider** (the bar's item 4).
+
+| arm | hit@1 | hit@5 | primary@1 | evidence quoted | `step10_section` reorderable@1 | `other` reorderable@1 |
+|---|---:|---:|---:|---:|---:|---:|
+| `sw-0.0` | 45 | 75 | 37 | 65 | 23 | 11 |
+| `sw-0.25` | 45 | 76 | 37 | 66 | 23 | 12 |
+| `sw-0.5` | 46 | 76 | 38 | 66 | 21 | 13 |
+| `sw-1.0` | 48 | 76 | 39 | 67 | 19 | 13 |
+| `sw-2.0` | 52 | 77 | 42 | 64 | 13 | 15 |
+
+G2's input is the first row: the baseline pool is **23** (≥ 6), equal to
+W-236's baseline, as G0 implied. ⚠ **The totals are not the rule.** Clause 2
+(no new rank-1 miss anywhere) is decided on per-row flips, and the `other`
+pool's `reorderable@1` rising 11 → 15 says flips run both ways. Only
+`decide.py` reads that.
+
+---
+
+⏳ *As captured, before the score:* **not scored, not decided.** No answer key reached this session
 (`just golden-state` read `locked` before, during and after the capture).
 Below, *changed* means **the ranking moved**, never that it *improved*.
 

@@ -23,11 +23,21 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-10 — W-269 scored by Arpit; totals filed, no decider run  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted his `just golden-score work/regression/2026-10-10-section-gain-only` output (5 arms, n = 90 each).
+- **Done:** totals filed in the [report](regression/2026-10-10-section-gain-only/report.md); scores committed. hit@1 45 · 45 · 46 · 48 · 52; pool reorderable@1 23 · 23 · 21 · 19 · 13; `other` 11 · 12 · 13 · 13 · 15. G2 = 23.
+- **Not done:** the verdict. This session captured the arms, so the bar's item 4 bars it from `decide.py`. **Next:** a session that did not capture (or Arpit) runs it. W-269 → 🟢 `agent`, out of the inbox.
+
 ## 2026-10-10 — W-269 DoD 4: the gain-only arms captured; G0, G1, G3 pass  ·  Claude Code (Opus 5.5)
 - **Asked:** *"implement w-269"* (DoD 1–3 were done; DoD 4 needed this machine's `fux-lab`).
 - **Done:** frozen hashes re-verified; engine pinned in a detached worktree at `03fbf782`. Base `arms/runs/gain-base` (`doctor --fix` wrote only `section_weight = 0.0`; `ingest --full`; index byte-identical to W-236's `sw-base`). Five `gain-sw-<λ>` copies, `diff -r` = the one line. **G0 PASS** (0/90 + 0/90 against W-236's `sw-0.0`). **G1 PASS** (`g1.json` byte-identical to W-236's). **G3 PASS** (0 failures, 1 481 comparisons per arm, 40 sectionless docs). Rank 1 moved on 4 · 10 · 13 · 24 questions. [report](regression/2026-10-10-section-gain-only/report.md).
 - **Noted:** the `section_weight` comment that `doctor --fix` writes still describes B2. It is template text, owed to any merge.
 - **Not done:** no score, no verdict, by rule. `golden-state` read `locked` throughout. **Next:** 🔴 Arpit runs `just golden-score work/regression/2026-10-10-section-gain-only`; a non-capturing session runs `decide.py`. ⚠ OPEN-WORK, WORKLOG and NOW share hunks with another session's uncommitted W-257 close, so this session commits only its own paths.
+
+## 2026-10-10 — W-257 closed: doc2query, the filter and the tilt all measure no detected change  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted his `just golden-score work/regression/2026-10-10-enriched-rung` output (7 arms).
+- **Done (a non-capturing session, as rule 6 requires):** ran the frozen `decide.py` and `tilt.py` (sha256 unchanged since `79bc22ea`). G2 36/45, G3 14.9 %. **B-108 NO DETECTED CHANGE** (`unfiltered` vs `none` 6/4, net 8 needed; placebo 1/5). **B-109 NO DETECTED CHANGE** (1/1). **B-110 NO DETECTED TILT** at 25 and 50 (4/1 each). Filed [VERDICT](regression/2026-10-10-enriched-rung/VERDICT.md) + scores. SR-ENRICH d6/d15/d16 rewritten; B-245's second condition met; SR-WORK-TESTDATA T15 + R11 (author had no skill; 0 of 90 tagged for doc2query). W-257 archived.
+- **Not done:** nothing owed on W-257. ⚠ Every claim carries amendment 1's sentence (no skill, one question per chunk) and is `informed`.
 
 ## 2026-10-10 — W-257: placebo STOP ruled → amendment 1 → seven arms captured  ·  Claude Code (Opus 5.5)
 - **Asked:** *"go with the recommended approach"* (the placebo STOP's ruling).
