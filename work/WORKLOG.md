@@ -23,6 +23,11 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-10 — W-270 filed: re-test the gain-only section term at λ = 2.0 on a new set  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit asked how W-269 was built and scored, whether wins beat losses (yes: 12 / 5 at λ = 2.0, net +7), and whether to ship 2.0. Recommended a re-test first; he agreed: *"Let's have new set of questions"*, Claude-authored in a fresh session, with new long documents.
+- **Done:** [W-270](open/W-270-section-retest-set-6.md) filed with a proposed bar (decided arm `sw-2.0`, `sw-4.0` reported only; net `hit@1` ≥ 6; non-section losses − wins ≤ 2; G2 ≥ 15), to be frozen before the ladder rebuild. [Prompt 14](golden/prompts/14-claude-gen5-section-seed.md) written from SR-WORK-TESTDATA: 6 new long docs, ≥ 12 competitors, ~110 questions `s6c-`, ≥ 60 `step10_section` on new docs only. Inbox row added.
+- **Not done:** the bar is not frozen; W-269's VERDICT is untouched. ⚠ This session read W-269's scores, so under A1 it may not author the set. **Next:** 🔴 Arpit runs prompt 14 in a fresh claude.ai chat.
+
 ## 2026-10-10 — W-269 closed: the gain-only section term FAIL (drift), by Arpit's run of the decider  ·  Claude Code (Opus 5.5)
 - **Asked:** Arpit pasted his `decide.py` output: clause 2 failed at every λ (drift losses 2 · 4 · 4 · 5), **FAIL — drift**.
 - **Done:** filed as his: [VERDICT](regression/2026-10-10-section-gain-only/VERDICT.md) (decider hash unchanged). SR-SECTIONS (§1 banner, d5) and compare/section-units record both mechanisms; register row; IMPLEMENTATION section + prediction row; W-269 archived; OPEN-WORK row removed; INTERVIEW latest.
