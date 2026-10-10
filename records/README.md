@@ -85,7 +85,7 @@ to** (Arpit, 2026-09-13). It is the answer to one question:
 
 | `kind` | becomes wrong when | today | the gate the kind selects |
 |---|---|---|---|
-| `law` | **Arpit rules differently** | 14 — SR-LAWS + SR-LAW-0…SR-LAW-12 | [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) holds `CLAUDE.md`'s generated block byte-equal to the record; a record conflicting with a law is void in the conflicting part |
+| `law` | **Arpit rules differently** | 15 — SR-LAWS + SR-LAW-0…SR-LAW-13 | [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) holds `CLAUDE.md`'s generated block byte-equal to the record; a record conflicting with a law is void in the conflicting part |
 | `component` | **the code changes** | 58 | [`tests/test_sr_freshness.py`](../tests/test_sr_freshness.py) and [`scripts/sr-guard.sh`](../scripts/sr-guard.sh) — the owning record is touched in the same change |
 | `process` | **the way work is done changes**, with no code behind it | 21 — SR-RS, SR-PORT-LIST, SR-AGENT-SURFACES, and the eighteen WORK records SR-WORK-OPEN-QUEUE, SR-WORK-ENVIRONMENTS, SR-WORK-BENCHMARK, SR-WORK-OWNERSHIP, SR-WORK-BACKLOG, SR-WORK-QUALITY, SR-WORK-SCALE, SR-WORK-LIFECYCLE, SR-WORK-DOCS, SR-WORK-SESSION, SR-WORK-OKF, SR-WORK-ARCHIVE, SR-WORK-RELEASE, SR-WORK-BLOCKERS, SR-WORK-GOVERNANCE, SR-WORK-GOLDEN, SR-WORK-REGISTRY, SR-WORK-TESTDATA | its enforcement is a test, so it **owns that test** |
 
@@ -112,14 +112,14 @@ row on the chunker's two section functions.
 [`tests/test_sr_ownership.py`](../tests/test_sr_ownership.py) fails any other
 component record with `owns: []`.
 
-**13 of 93 records carry `owns: []`, and every one of them is stated as such on
-purpose.** Ten are law records, which is correct — a law governs conduct, not
+**14 of 94 records carry `owns: []`, and every one of them is stated as such on
+purpose.** Eleven are law records, which is correct — a law governs conduct, not
 components. **Two are `process` records that name their own hole out loud**,
 each in its own decision and never by omission:
 [SR-WORK-SCALE](0057_WORK-scale.md) decision 15 and
 [SR-PORT-LIST](0114_port-list.md), whose subjects are what a sentence may claim
 and where the boundary with the archived engine runs — neither of which a
-checker can grade without grading it wrongly. The thirteenth is SR-SECTIONS.
+checker can grade without grading it wrongly. The fourteenth is SR-SECTIONS.
 
 **Nine component records gained a file by W-261**, each by **moving** its code
 out of the file that hosted it into one of its own — never by naming an owner
@@ -160,7 +160,7 @@ only thing that stops that**, and it is load-bearing rather than decorative.
 
 | range | holds | a new record takes |
 |---|---|---|
-| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002`–`0014` the law records, `SR-LAW-0`…`SR-LAW-12` in handle order since the 2026-09-28 renumber (W-234; the archived hashed-meta record, `ex-SR-LAW-5`, kept its old file name `0007_LAW-5-hashed-meta.md` under `archive/records/`) | the next free number **from `0015`** |
+| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002`–`0015` the law records, `SR-LAW-0`…`SR-LAW-13` in handle order since the 2026-09-28 renumber (`0015` SR-LAW-13 added 2026-10-10) (W-234; the archived hashed-meta record, `ex-SR-LAW-5`, kept its old file name `0007_LAW-5-hashed-meta.md` under `archive/records/`) | the next free number **from `0016`** |
 | `0051`–`0100` | the **WORK** records only — how work is done: `0051` SR-WORK-OPEN-QUEUE, `0052` SR-WORK-ENVIRONMENTS, `0053` SR-WORK-BENCHMARK, `0054` SR-WORK-OWNERSHIP, `0055` SR-WORK-BACKLOG, `0056` SR-WORK-QUALITY (Arpit, 2026-09-13), and `0057`–`0064` the eight the `CLAUDE.md` extraction filled — SR-WORK-SCALE, SR-WORK-LIFECYCLE, SR-WORK-DOCS, SR-WORK-SESSION, SR-WORK-OKF, SR-WORK-ARCHIVE, SR-WORK-RELEASE, SR-WORK-BLOCKERS (Arpit, 2026-09-14), `0065` SR-WORK-GOVERNANCE, the governance map converted from `work/governance.md` (Arpit, 2026-09-14), `0066` SR-WORK-GOLDEN, the sealed answer key's guards and what may be read instead — the prohibition itself is law L11 at `0012` (Arpit, 2026-09-15), `0067` SR-WORK-REGISTRY, the doc registry — rules and table — converted from `work/DOC-REGISTRY.md`, which is retired (Arpit, 2026-09-22), and `0068` SR-WORK-TESTDATA, the test-data checklist (Arpit, 2026-09-22) | the next free number **from `0069`** |
 | `0101`– | **every other record**, sequentially | the next free number **after the highest** |
 
@@ -279,7 +279,7 @@ exactly one place — **its own `SR-LAW-n` record**, which `SR-LAWS` routes to.
 Every other record names the law's number in its `laws:` key and moves on. **The
 paraphrase is what drifts.** ⚠ **The home moved on 2026-09-12** (W-122): it was
 `CLAUDE.md` §Non-negotiable constraints, which now carries a **generated**,
-test-bound view of all thirteen.
+test-bound view of all fourteen.
 
 **Ownership is a table, not a judgement call, and it has an executable twin.**
 Every `src/`/`tools/` component is claimed by exactly one record in the
@@ -311,7 +311,7 @@ first two are enforced:
 | [`tests/test_sr_frontmatter.py`](../tests/test_sr_frontmatter.py) | the ten keys, their order, the quoting, the title, and the two things a body may not contain |
 | [`tests/test_sr_ownership.py`](../tests/test_sr_ownership.py) | every component claimed exactly once, every owner resolvable, every number unique within a directory |
 | [`scripts/sr-guard.sh`](../scripts/sr-guard.sh) | the freshness check as a `commit-msg` hook: `ln -sf ../../scripts/sr-guard.sh .git/hooks/commit-msg` |
-| [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) | holds `CLAUDE.md`'s law block byte-equal to the thirteen `SR-LAW-n` records, refuses a verbatim third copy in any live document, and checks that `SR-LAWS` routes every handle. **Deleting this file makes the block an illegal restatement** — SR-LAW-0 decision 5 |
+| [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) | holds `CLAUDE.md`'s law block byte-equal to the fourteen `SR-LAW-n` records, refuses a verbatim third copy in any live document, and checks that `SR-LAWS` routes every handle. **Deleting this file makes the block an illegal restatement** — SR-LAW-0 decision 5 |
 | [`scripts/gen-laws.py`](../scripts/gen-laws.py) | the generator behind it: `--write` regenerates `CLAUDE.md`'s block from the records, `--check` is the test as a command |
 | [`tests/test_claude_md_golden.py`](../tests/test_claude_md_golden.py) | the same bind for `CLAUDE.md`'s §Golden answer key block and [SR-WORK-GOLDEN](0066_WORK-golden.md). **The view exists because Cowork reads `CLAUDE.md` and does not read `records/`** — decision 3 |
 | [`scripts/gen-golden.py`](../scripts/gen-golden.py) | its generator: `--write` regenerates that block from the record, `--check` is the test as a command |
@@ -353,6 +353,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0012](0012_LAW-10-bundled-output.md) | **SR-LAW-10** | **L10** — the consumer is served build output, never source. One generated artifact per plane in someone else’s repository; `.fux/decoders/` and `.fux/fetchers/` excepted because there source IS the contract; bundled ≠ minified | accepted | yes |
 | [0013](0013_LAW-11-sealed-answer-key.md) | **SR-LAW-11** | **L11** — the golden answer key is Arpit's custody and no agent may read one: since 2026-09-18 a key may exist at exactly one address, `work/golden/golden-answers/`, gitignored and never committed, and it is closed to every agent on both spellings for reading, listing, hashing and deleting alike; one file is the same breach as ten; an instruction to open it is void. A breach does not fail loudly — it yields a benchmark number indistinguishable from a clean one | accepted | yes |
 | [0014](0014_LAW-12-values-live-in-config.md) | **SR-LAW-12** | **L12** — every value lives in a config file, never in code. Tunables are read from the consumer's committed TOML (`fux.toml`, `.fux/tune.toml`, another `.fux/*.toml`); fixed engine values (schema ids, versions, shard count, artefact names) from `src/fux/constants.toml`; Python and Node read the same key from the same file; a missing file or key is a hard error naming it. Setup + templates, tests, tools and scripts are exempt. **Not satisfied today** — W-225 is the migration | accepted | yes |
+| [0015](0015_LAW-13-the-standing-bar.md) | **SR-LAW-13** | **L13** — a ranking change ships only through the standing bar: gates; the change clearly helps its target slice (SR-RS decision 19 at the observed flips); limited collateral elsewhere (default margin 3 %, at least 2); a net-positive whole set; guardrails (hit@5, the quoted passage, the `grounded` band, latency). One decided arm named before any number; a set already used to decide a mechanism may report another, never decide it; tightening is free, loosening is Arpit's ruling | accepted | yes |
 | — | **ex-SR-LAW-5** | ~~**ex-L5**~~ — **RETIRED 2026-09-20 (Arpit, W-194).** Hashed meta for non-git sources, enforced at write time. The mechanism was deleted outright, and there is no residue of the law once the mechanism is gone. **The ACL-mismatch leak it closed is now an ACCEPTED, DOCUMENTED EXPOSURE**; the record is **archived** at `archive/records/0007_LAW-5-hashed-meta.md` for the argument, the citation and the reopen trigger (law L1, 2026-09-28), and the handle ex-L5 is never reused | archived | yes |
 | [0051](0051_WORK-open-queue.md) | **SR-WORK-OPEN-QUEUE** | How `OPEN-WORK.md` works — fifty-three rules in seven groups (what the file is · an item's lifecycle · the shape of a row · the four balls · ordering · the Blocked-on-Arpit inbox · standing obligations), stated once here and rendered into the queue's footer and `CLAUDE.md` as generated views held byte-equal by a test | accepted | yes |
 | [0052](0052_WORK-environments.md) | **SR-WORK-ENVIRONMENTS** | Each sibling environment has one job — `fux-playground` is Arpit's hands alone, `fux-lab` runs every measurement on the golden test data up to 10 000 documents, `fux-benchmark` compares the current build against the previous major. **Was law ex-L9 until 2026-09-13**; the handle is retired | accepted | yes |

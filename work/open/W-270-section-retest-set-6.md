@@ -9,7 +9,7 @@ ball: arpit
 
 # W-270 — the gain-only section term at λ = 2.0, re-tested on `set-6-claude`
 
-**Status: OPEN. 🔴 Arpit runs the authoring prompt** (DoD 2).
+**Status: OPEN. 🟡 waits on W-273** phase 1. The test data landed 2026-10-11 ([W-272](../../archive/open/W-272-section-test-data-gen5.md), closed): seeds 89–112 and `questions/set-6-claude.jsonl`. Waits on (the build to pin; W-271's size ruling, option (b), landed 2026-10-10). Split 2026-10-10 (Arpit, Cowork): this item is the measurement only.
 
 **Model:** DoD 2 — **Claude Opus, highest reasoning, in a fresh claude.ai chat**
 (the designated author, A1). DoD 3 — **Opus** (the bar is the deliverable and
@@ -18,11 +18,10 @@ procedure. DoD 6 — **Arpit** scores; the decider is a frozen script.
 
 | DoD | state | where |
 |---|---|---|
-| 1 · the authoring prompt, written from SR-WORK-TESTDATA | ✅ 2026-10-10 | [prompt 14](../golden/prompts/14-claude-gen5-section-seed.md) |
-| 2 · 🔴 **Arpit** runs it in a fresh claude.ai chat, commits blocks 1–3, keeps block 4 | ⏳ | prompt 14 §How Arpit runs it |
-| 3 · the bar frozen and committed alone, **before** the ladder rebuild and before any arm | ⏳ | `work/regression/<date>-section-retest-set-6/PRE-REGISTRATION.md` |
+| 1–2 · the test data (prompt 14, `set-6-claude`) | ✅ 2026-10-11 — **W-272** closed | [W-272](../../archive/open/W-272-section-test-data-gen5.md) |
+| 3 · the bar frozen and committed alone, **before** the ladder rebuild and before any arm — L13 shape; pins W-273 phase 1's engine | ⏳ | `work/regression/<date>-section-retest-set-6/PRE-REGISTRATION.md` |
 | 4 · the ladder rebuilt from `seed/` alone (generation 5, a new baseline) | ⏳ | [`work/golden/README.md`](../golden/README.md) phase 4 · A23 |
-| 5 · capture: engine pinned at `03fbf782`, three arms on a copy of the new `rung-01000` | ⏳ | the run's `report.md` |
+| 5 · capture: the engine W-273 phase 1 hands over (else `03fbf782`), three arms on a copy of the new `rung-01000` | ⏳ | the run's `report.md` |
 | 6 · 🔴 **Arpit** scores; a session that did not capture runs the frozen decider | ⏳ | the run's `VERDICT.md` |
 
 ## Why
@@ -46,26 +45,45 @@ A fresh set with fresh long documents answers whether the +7 survives
 selection. A looser bar is legal **only** as a new pre-registration on a new
 set ([SR-RS](../../records/0133_predictions.md) d10b), which is this item.
 
-## The bar — proposed here, frozen at DoD 3
+## The bar — law L13, frozen at DoD 3
 
-⚠ **Not frozen.** These are the numbers DoD 3 starts from; DoD 3 may tighten
-them, never loosen them, and must be committed before the ladder rebuild.
+**Re-based on [L13](../../records/0015_LAW-13-the-standing-bar.md) by Arpit's
+ruling, 2026-10-10 (Cowork):** *"go with the proposed bar … create it as a law
+SR."* The draft's clause 1 (*whole-set net ≥ 6*) was looser than SR-RS
+decision 19 once more than six questions flip; it is replaced by L13's C1 + C3.
+⚠ **Not frozen.** DoD 3 writes `L13, defaults` plus the parameters below, may
+tighten any of them, and is committed before the ladder rebuild.
 
-| | |
+| L13 row | this run's parameter |
 |---|---|
-| engine | branch `claude/gracious-galileo-aqrg8b` at **`03fbf782`** (W-269's build), unchanged |
-| data | `set-6-claude` on a copy of generation 5's `rung-01000`, `ingest --full` |
-| arms | baseline `sw-0.0`; **decided arm `sw-2.0`**; `sw-4.0` captured and **reported only**, because 2.0 was the top of W-269's grid and the trend still rose |
-| G0 · G1 · G3 | W-269's, unchanged (byte identity at 0.0, the size bar, sectionless documents unmoved) |
-| G2 | baseline `step10_section` `reorderable@1` **≥ 15** (W-269's 23 was on 45 tagged; this set asks for ≥ 60) |
-| clause 1 | whole-set `hit@1` net (wins − losses) at `sw-2.0` **≥ 6**, the SR-RS paired-comparison floor |
-| clause 2 | on questions **not** tagged `step10_section`, `hit@1` losses − wins **≤ 2** — the collateral cap W-269 had no clause for |
-| outcome | PASS needs G0–G3 and both clauses; a clause-1 net of 4–5 is INCONCLUSIVE and goes to Arpit |
+| engine | the commit [W-273](W-273-section-records-implementation.md) phase 1 hands over (W-269's `03fbf782` plus option (b): no section records for record formats) |
+| data | `set-6-claude` on a copy of generation 5's `rung-01000`, `ingest --full` — a fresh set, as L13 decision 5 requires |
+| arms | baseline `sw-0.0`; **decided arm `sw-2.0`**; `sw-4.0` captured and **reported only** |
+| G · gates | W-269's G0 (byte identity at 0.0), G1 (the size bar), G3 (sectionless documents unmoved) |
+| slice | `step10_section`: tagged questions that miss `hit@1` at baseline; **≥ 15** (L13 default), read from the scorer's counts |
+| endpoint | `hit@1` — the step's claim is that the right document reaches rank 1 |
+| C1 · helps | slice net at `sw-2.0` clears SR-RS decision 19 **at the observed flips**, by `verdict.py` |
+| C2 · collateral | on questions outside the slice, `hit@1` losses − wins **≤ 2** (L13's default for this set's size, stated explicitly) |
+| C3 · net positive | whole-set `hit@1` net at `sw-2.0` **> 0** |
+| guardrails | L13 defaults: `hit@5` −1 at most · `evidence_quoted` −2 · `grounded` −2 · median `ask` +100 ms standalone at `rung-10000` |
+| outcome | L13 decision 4's table |
+
+Post-hoc, for orientation only: W-269 at `sw-2.0` on set-5 would have read
+C1 ✅ (10 / 0), C2 ❌ (2 wins, 5 losses: −3, one past the margin), C3 ✅
+(+7) — **INCONCLUSIVE**. It decides nothing (L13 decision 1).
 
 **What a PASS buys:** a ship case for `section_weight = 2.0`, which still owes
 the merge (index `_format` `fux.index.v8`, this repository's re-ingest) and
 the **8.0×** size ruling ([W-236 ANALYSIS](../regression/2026-10-10-section-records/ANALYSIS.md) §2).
 **What a FAIL buys:** the section term is closed on two sets.
+
+## After the verdict (ruled with W-271, Arpit 2026-10-10)
+
+- **PASS** → W-273 phase 2 ships `section_weight = 2.0`.
+- **FAIL** → step 10 closes as measured on two sets; SR-SECTIONS stays
+  `proposed` with both FAILs on it (not archived), so a `b > 0.5` re-try can
+  reopen it.
+- **INCONCLUSIVE** → Arpit rules, per L13 decision 4.
 
 ## Custody
 

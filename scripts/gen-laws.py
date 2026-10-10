@@ -21,7 +21,7 @@ permission is the test, not the generation.
       - **L4** · **Deterministic — no model in the maintenance path.** ...
       <!-- LAW-TEXT:END L4 -->
 
-- The blocks are concatenated in `LAW_ORDER` (`L0 … L12`) between `CLAUDE.md`'s
+- The blocks are concatenated in `LAW_ORDER` (`L0 … L13`) between `CLAUDE.md`'s
   `<!-- LAWS:BEGIN … -->` / `<!-- LAWS:END -->` markers.
 - **Link targets are rewritten, and that is the only transform.** A record lives
   at `records/`, `CLAUDE.md` at the repo root, so the same law text needs two
@@ -54,8 +54,9 @@ CLAUDE_MD = ROOT / "CLAUDE.md"
 #: The two retired laws are `ex-L5` (hashed display meta) and `ex-L9` (the
 #: environment rule) in live text.
 #:
-#: **Thirteen live laws, thirteen numbers.**
-LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "L10", "L11", "L12")
+#: **Fourteen live laws, fourteen numbers** — L13, the standing ship bar, added
+#: 2026-10-10 (Arpit).
+LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "L10", "L11", "L12", "L13")
 
 BEGIN = "<!-- LAWS:BEGIN"
 END = "<!-- LAWS:END -->"

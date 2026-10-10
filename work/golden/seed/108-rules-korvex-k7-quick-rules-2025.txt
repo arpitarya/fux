@@ -1,0 +1,34 @@
+title: Korvex K7 pilot quick rules - screen lock, PIN change, battery, lost device, agency staff, unreturned device
+doc_id: QCL-IT-RUL-02
+owner: Tushar Naik
+department: IT
+status: superseded
+effective_date: 2025-05-12
+superseded_by: seed/90-policy-handheld-and-mobile-devices.md
+applies_to: Waluj training workshop
+
+KORVEX K7 PILOT QUICK RULES (WALUJ, 2025)
+
+These quick rules were written for the twenty-device K7 pilot at the Waluj
+workshop.
+
+SCREEN LOCK
+An idle K7 locks after 5 minutes.
+
+PIN CHANGE
+PINs are six digits and are changed every 180 days.
+
+WRONG ATTEMPTS
+Ten wrong attempts lock the user out.
+
+BATTERY
+Batteries are retired at 400 charge cycles.
+
+LOST DEVICE
+Report a lost K7 the same shift. The desk wipes it after 72 hours.
+
+AGENCY STAFF
+Agency staff scan under the shift lead's login.
+
+UNRETURNED DEVICE
+A K7 not returned by a leaver is recovered at Rs. 15,000.

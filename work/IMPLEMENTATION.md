@@ -26,6 +26,23 @@ Rules:
 
 ---
 
+## 2026-10-11 — **W-272 closed: generation 5 committed (`set-6-claude`)**
+
+| what | evidence |
+|---|---|
+| **data** | seeds `89`–`94` (6 long, 2 596–3 847 words, 18–20 sections) and `95`–`112` (18 short: 12 different-subject competitors, 6 superseded predecessors) in [`work/golden/seed/`](golden/seed/); 24 rows in [`seed-dates.tsv`](golden/seed-dates.tsv); [`questions/set-6-claude.jsonl`](golden/questions/set-6-claude.jsonl), 110 ids `s6c-…`, `id` + `question` only |
+| **check** | DoD 3, Sonnet, all PASS against prompt 14's counts; the tag counts are the key's and are checked by W-270's scorer pools |
+| **deleted** | prompt 14 (SR-WORK-TESTDATA: a prompt goes in the change that commits its data) |
+| **not done** | the measurement, [W-270](open/W-270-section-retest-set-6.md), waits on W-273 phase 1 |
+
+## 2026-10-10 — **W-271 closed: section records' size ruling, option (b) · law L13 ratified**
+
+| what | evidence |
+|---|---|
+| **law** | [SR-LAW-13](../records/0015_LAW-13-the-standing-bar.md), the standing ship bar for ranking changes (Arpit, 2026-10-10); `CLAUDE.md` regenerated; SR-LAWS decision 11 |
+| **ruling** | W-271, Arpit: *"Go with the recommendation"* — no section records for `.jsonl` / `.csv` / `.json` (≈ 1.9× on this repo against 8.0×); SR-SECTIONS stays `proposed` on a W-270 FAIL |
+| **not done** | the build is [W-273](open/W-273-section-records-implementation.md) phase 1; the test data [W-272](../archive/open/W-272-section-test-data-gen5.md); the measurement [W-270](open/W-270-section-retest-set-6.md) |
+
 ## 2026-10-10 — **W-269: section records' gain-only term FAIL (drift); the item is closed**
 
 | what | evidence |

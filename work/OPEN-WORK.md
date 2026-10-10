@@ -23,11 +23,9 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 5d |
+| 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 7d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 0d |
-| ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-270** — run prompt 14 in a fresh claude.ai chat (new long docs + `set-6-claude`); commit blocks 1–3, keep the key. Re-tests the gain-only section term at λ = 2.0 on fresh questions. [the item](open/W-270-section-retest-set-6.md) | 2026-10-10 | 0d |
+| 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 1d |
 | ↳ **blocks:** nothing else in the queue | | |
 
 ---
@@ -36,10 +34,11 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
+- 🟢 **W-273** · `agent` — section records build: phase 1 option (b) as W-271 ruled (no sections for `.jsonl`/`.csv`/`.json`) + the gates, before W-270 captures; phase 2 the ship path on a PASS. **Opus.** [detail](open/W-273-section-records-implementation.md)
 
 ### testing
 
-- 🔴 **W-270** · `arpit` — re-test the gain-only section term at λ = 2.0 on a new Claude-authored set with new long documents; new bar: net `hit@1` ≥ 6, collateral cap. Arpit runs prompt 14 first. [detail](open/W-270-section-retest-set-6.md)
+- 🟡 **W-270** · `agent` — re-test the gain-only section term at λ = 2.0 on `set-6-claude` under L13: freeze the bar, rebuild the ladder, capture; Arpit scores. The test data landed (W-272, 2026-10-11); waits on W-273 phase 1. [detail](open/W-270-section-retest-set-6.md)
 - 🔴 **W-258** · `arpit` — one hands-on session on his machine: a journalled answer whose source then vanishes, a real 429 from a real host, and parallel CDP fetches in signed-in Chrome. Checklist and bars are written. [detail](open/W-258-live-network-captures.md)
 
 ### adr update

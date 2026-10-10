@@ -1,0 +1,34 @@
+title: Hubballi trainee floor rules - gas handling certificate, pass marks, attendance, supervisor ratio on live units, night shifts
+doc_id: QCL-ENG-NTE-23
+owner: Manjunath Hegde
+department: Engineering
+status: in_force
+effective_date: 2026-02-16
+applies_to: Hubballi service centre
+
+HUBBALLI TRAINEE FLOOR RULES
+
+These rules cover the gas handling certificate, pass marks, attendance, the
+supervisor ratio on live units and night shifts for refrigeration trainees at
+the Hubballi service centre.
+
+GAS HANDLING CERTIFICATE
+A trainee must pass the gas handling certificate by the end of month six before
+touching a refrigerant charge.
+
+PASS MARKS
+The practical pass mark is 60 per cent and the theory pass mark is 50 per cent.
+
+ATTENDANCE
+A trainee present for less than 75 per cent of a module's sessions repeats the
+module.
+
+SUPERVISOR RATIO ON LIVE UNITS
+One supervisor may take five trainees on live units, and two on a pharma
+chamber.
+
+NIGHT SHIFTS
+Trainees may be rostered on night shifts from month four, with a supervisor on
+the same job.
+
+Questions to the centre lead.

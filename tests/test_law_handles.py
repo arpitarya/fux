@@ -7,13 +7,15 @@ reverses the old *"a handle is never reused"* rule, and decision 2a is the
 mapping table a reader of an older document uses.
 
 The renumber repointed every live citation in one change. **This test catches
-the ones written afterwards from habit or from an old copy**: a live `L13`, or a
-live `L14`, cites a law that does not exist. A citation of a retired law is
+the ones written afterwards from habit or from an old copy**: a live `L14`
+cites a law that does not exist. ⚠ **`L13` is valid again since 2026-10-10** —
+the standing ship bar — so a stale `L13` meaning *a retired SR is archived*
+(now L1) passes this test; SR-LAWS decision 11 names that exposure. A citation of a retired law is
 written `ex-L5` / `ex-L9` and is not a handle.
 
 ⚠ **What it cannot catch, stated rather than discovered:** a live `L3` written
 by someone who meant the OLD L3 (*deterministic*, now L4). Every number from L0
-to L12 is valid, so a wrong-but-existing handle passes. Nothing mechanical can
+to L13 is valid, so a wrong-but-existing handle passes. Nothing mechanical can
 tell which law a sentence meant; SR-LAWS decision 2 names that exposure.
 
 **What is not a live file**, and why each is skipped: the same frozen-by-law set
@@ -86,9 +88,9 @@ def _live_files() -> list[str]:
 
 
 def test_the_current_table_is_dense():
-    """Decision 2: L0–L12, no gaps, since 2026-09-28."""
+    """Decision 2: L0–L13, no gaps, since 2026-09-28 (L13 added 2026-10-10)."""
     handles = _current_handles()
-    assert handles == {f"L{n}" for n in range(13)}, sorted(handles, key=lambda h: int(h[1:]))
+    assert handles == {f"L{n}" for n in range(14)}, sorted(handles, key=lambda h: int(h[1:]))
 
 
 def test_every_live_law_handle_exists():

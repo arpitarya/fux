@@ -23,6 +23,38 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-11 — W-272 closed: generation 5 moved into `work/golden/`  ·  Claude Code (Opus 5.5)
+- **Asked:** *"checkout set-6-claude-gen5 dir for W-272"*, then *"yes"* to committing it.
+- **Done:** checked the untracked `set-6-claude-gen5/` at the repo root by file name and JSON keys first (no key file; questions `id` + `question` only). Moved seeds 89–112 into `seed/`, appended 24 date rows, moved `set-6-claude.jsonl` into `questions/`, deleted prompt 14 (the `prompts/` directory is now empty, so gone). Sonnet ran DoD 3: all PASS. W-272 archived; W-270 re-balled 🟡 on W-273; the questions README lists sets 5 and 6; the golden README layout no longer names the retired set-1/2/3 files.
+- **Noticed:** seeds 107–112 are superseded predecessors of the six long documents (`superseded_by:`) and sit in `seed/`, not `seed/archive/`. That is the `retired_competitor` shape and was left as authored.
+- ⚠ **Guard hits, twice, nothing opened:** a `find … -prune` and a `grep --exclude-dir` that *named* the key directory were refused by the L11 hooks. Use `git grep` or exact paths instead.
+- **Not committed:** the index already carried the 2026-10-10 Cowork session's uncommitted W-271/W-273/LAW-13 work in the same files (OPEN-WORK, NOW, WORKLOG, IMPLEMENTATION, W-270, and W-272 itself), so this change is left staged for Arpit, not split.
+- 🔴 **Red on purpose, owed to W-270:** `test_golden_ladder_seed` fails on all 8 rungs (24 seed documents absent from every manifest) until W-270 DoD 4 rebuilds the ladder, which L13 says must come after DoD 3 freezes the bar. Also red, and older than this change: `test_own_index_is_current_format` and `test_differential_arm` (the committed index is `fux.index.v7`; the engine writes v8 since `f2a139fd`). Both suites otherwise pass (unit 7 038, e2e 171).
+- **Next:** W-273 phase 1 (🟢, Opus).
+
+## 2026-10-10 — inbox walk: W-271 ruled (option b) and closed  ·  Cowork (Opus 5.5)
+- **Asked:** review the queue's blockers one by one; on W-271, *"Go with the recommendation, next blocker."*
+- **Ruled:** option (b), no section records for `.jsonl`/`.csv`/`.json`; `w236-sections` may go once W-270 starts; on a W-270 FAIL SR-SECTIONS stays `proposed`. **W-273 → 🟢** (phase 1); W-270 now waits on W-272 and W-273 only.
+- **Closed:** W-271 archived with its map row and an IMPLEMENTATION entry (ruling-only, no code).
+- **Found and fixed:** the live archive map still called the retired-records law "L13 / SR-LAW-13" (pre-renumber, broken link) — now L1 / SR-LAW-1. SR-LAWS decision 11 and `test_law_handles.py`'s docstring name the reused-handle exposure.
+- **Not committed;** the tree is still on the W-269 branch.
+
+## 2026-10-10 — section records split: W-272 (test data) and W-273 (implementation) filed  ·  Cowork (Opus 5.5)
+- **Asked:** *"create work items for whatever is needed for sections. Create one work item for implementation and one work item if test data needs to be generated."*
+- **Test data IS needed:** set-5-claude has decided two section mechanisms, so L13 decision 5 forbids a third decision on it. **W-272** (🔴): Arpit runs prompt 14 (moved from W-270 DoD 1–2), commits blocks 1–3, keeps the key; prompt deleted with its data.
+- **W-273** (🔴 via W-271, Opus): phase 1 the build W-271's size ruling asks for, the template comment, gates re-run, the engine handed to W-270; phase 2 the ship path on a PASS (moved from W-271).
+- **W-270** is now the measurement only; **W-271** the rulings only. W-271 no longer carries git state (rule 47).
+- **Not committed;** the tree is still on the W-269 branch.
+
+## 2026-10-10 — law L13 (the standing bar) ratified; W-270 re-based; W-271 filed  ·  Cowork (Opus 5.5)
+- **Asked:** compare W-236 and W-269 with ranking before sections; why W-269 is a FAIL; a pragmatic bar; *"go with the proposed bar … create it as a law SR"*; then whether SR-RS and the law do the same thing (if so, fold SR-RS in); review runs that failed only on a bar; a work item for the sections' next steps.
+- **Landed (uncommitted):** [SR-LAW-13](../records/0015_LAW-13-the-standing-bar.md) — gates · C1 helps the slice by SR-RS d19 at the observed flips · C2 collateral ≤ max(2, 3 %) · C3 net > 0 · guardrails · one decided arm · fresh set. SR-LAWS row + decision 11, L0's law text (`…SR-LAW-13`), `gen-laws.py` LAW_ORDER, `test_law_handles.py` (L0–L13), the gate-unreachable pin, `CLAUDE.md` regenerated, README / docs index / register. SR-RS 10b points at L13.
+- **SR-RS is NOT folded in:** it is the measurement discipline (filing, blind/informed, controls, headroom, the d19 table, tools it owns — 1 644 lines); L13 is only the ship bar and cites it. No duplicate rule.
+- **Review (post-hoc, in W-271):** only W-269 at λ 2.0 failed on the bar alone — INCONCLUSIVE under L13. Every other ranking FAIL fails C1 anyway.
+- **Filed:** W-271 (🔴, size ruling before W-270's bar; ship path; branches). W-270's bar re-based on L13 (its *net ≥ 6* was looser than d19).
+- ⚠ **The tree is on branch `claude/gracious-galileo-aqrg8b`**, which carries unmerged engine code; today's record commits there must reach `main` without it.
+- **Checked:** the record, law, OKF, link, registry, ownership and queue suites pass on a 3.12 venv.
+
 ## 2026-10-10 — W-270 filed: re-test the gain-only section term at λ = 2.0 on a new set  ·  Claude Code (Opus 5.5)
 - **Asked:** Arpit asked how W-269 was built and scored, whether wins beat losses (yes: 12 / 5 at λ = 2.0, net +7), and whether to ship 2.0. Recommended a re-test first; he agreed: *"Let's have new set of questions"*, Claude-authored in a fresh session, with new long documents.
 - **Done:** [W-270](open/W-270-section-retest-set-6.md) filed with a proposed bar (decided arm `sw-2.0`, `sw-4.0` reported only; net `hit@1` ≥ 6; non-section losses − wins ≤ 2; G2 ≥ 15), to be frozen before the ladder rebuild. [Prompt 14](golden/prompts/14-claude-gen5-section-seed.md) written from SR-WORK-TESTDATA: 6 new long docs, ≥ 12 competitors, ~110 questions `s6c-`, ≥ 60 `step10_section` on new docs only. Inbox row added.

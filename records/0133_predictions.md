@@ -9,9 +9,9 @@ date: 2026-08-22
 amended: 2026-10-09
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
 owns: [tests/test_regression_runs.py@5d8ba6a4bdcd, tools/t2-eval@cc5410393ce4, tools/quality-controls@6f935cfeb8de, tools/vector-gate@0023bff0cdef, tools/section-size@25bfc75777a6]
-laws: [L4]
+laws: [L4, L13]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: cc014cb6fc0708c985691c7211a264d439e7016b86273fe795611e2e162e9a0c
+content_sha: e81fbef8e4eb4e33f9ad9e682678f457738f37b6084e2ca0514263fc05ce421b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -276,6 +276,11 @@ measure against it.
   [SR-WORK-ENVIRONMENTS](0052_WORK-environments.md) decision 2 names the only
   place a measurement runs, and [SR-LAW-0](0002_LAW-0-authority.md) decision 2a
   is why no second corpus is demanded here.
+- **The shape of the bar a ranking change is decided by is law
+  [L13](0015_LAW-13-the-standing-bar.md)'s** (Arpit, 2026-10-10): this record
+  keeps the rules that make a frozen claim mean something and decision 19's
+  floor arithmetic; L13 states which clauses a ship decision is made of and
+  their defaults, and outranks any pre-registration written after it.
 
 [`tools/pruning-eval/PRE-REGISTRATION.md`](../tools/pruning-eval/PRE-REGISTRATION.md)
 is the worked example.

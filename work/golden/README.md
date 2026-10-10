@@ -209,9 +209,7 @@ work/golden/
   seed-dates.tsv            one date per seed document; each rung commits the file at that date
   golden-answers/               🚫 Arpit's. Gitignored, never committed, CLOSED to every agent (L11 d3+d5)
   golden-answer/                🚫 the older singular spelling — deleted 2026-09-15, still guarded
-  questions/set-1.jsonl         set 1: ids + text only — Codex-authored questions
-  questions/set-2.jsonl         set 2: ids + text only — Claude-authored questions
-  questions/set-3.jsonl         set 3: ids + text only — Claude-authored, the failing shapes + links
+  questions/set-<gen>-<author>.jsonl   one live set each: ids + text only — the list is questions/README.md
   questions/README.md           what they omit, and the cost of them existing before the corpus
   ladder/rung-NNNNN.sha256      frozen manifests: which files make each rung, by hash
   ladder/rung-NNNNN.index       the engine version AND COMMIT, and the index root hash, each rung was built with

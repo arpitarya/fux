@@ -531,6 +531,11 @@ _UNREACHABLE_BY_THE_GATE = {
     # not exist until W-225 lands, and the law binds every module rather than
     # one, so no single `src/` change can demand it.
     "SR-LAW-12",
+    # SR-LAW-13 (2026-10-10) is the standing ship bar for ranking changes. Its
+    # subject is how a measurement decides what ships, so no change under
+    # `src/` can make it true or false -- SR-RS's reason, not SR-ANSWER's. Its
+    # check is a grep over pre-registrations, stated in its veto condition.
+    "SR-LAW-13",
     # SR-LAW-1 (2026-09-28) owns only its enforcement test: a retired record is
     # archived, and no change under `src/` can make that true or false.
     # (ex-SR-LAW-5 left this set the same day — it moved to `archive/records/`.)

@@ -61,7 +61,7 @@ archive/
   benchmark-reports/     benchmark HTML superseded by a dated report under work/benchmark/reports/
   handoff/               executed handoff + prompt pairs of the current build
   open/                  closed work items — the detail file, once its row left the queue
-  records/               RETIRED standing records, moved here under law L13 (2026-09-28)
+  records/               RETIRED standing records, moved here under law L1 (2026-09-28; L13 before the renumber)
   templates/             retired shipped-fetcher code, lifted out of src/fux/templates/
   v0.1/                  build: the first one, pre-reset #1
   v0.26/                 build: the v0.19-0.26 substrate engine, runnable
@@ -102,11 +102,12 @@ one change, on Arpit's instruction. `work/adr/` no longer exists; the live
 records are in [`docs/adr/`](../docs/adr/README.md) and the archive's map names
 a successor for every one.
 
-## `records/` — retired standing records (law L13)
+## `records/` — retired standing records (law L1)
 
 A record whose law, rule or subject was **retired** is moved here in the change
-that retires it — [SR-LAW-13](../records/0014_LAW-13-retired-records-archived.md),
-Arpit 2026-09-28. Each carries `status: archived` and an `ARCHIVED <date> —
+that retires it — [SR-LAW-1](../records/0003_LAW-1-retired-records-archived.md),
+Arpit 2026-09-28 (written L13 / SR-LAW-13 until the same day's renumber; L13 is now
+a different law, [SR-LAW-13](../records/0015_LAW-13-the-standing-bar.md)). Each carries `status: archived` and an `ARCHIVED <date> —
 retired by <ruling>` banner; it may be **named, never cited**. A *superseded*
 record is not archived — it is rewritten or deleted in place. The records deleted
 on 2026-09-06 are not restored; git holds them.
@@ -162,6 +163,8 @@ they are worth keeping.
 
 | item | closed | outcome and live successor |
 |---|---|---|
+| [`W-271-sections-next-steps.md`](open/W-271-sections-next-steps.md) | 2026-10-10 | **Ruled by Arpit, 2026-10-10 — no code.** Section records' rulings after W-236/W-269: the 8× size question → option (b), no section records for decoded record formats (`.jsonl`, `.csv`, `.json`); on a W-270 FAIL SR-SECTIONS stays `proposed`; plus a post-hoc review of past verdicts under L13 (only W-269 at λ 2.0 failed on the bar alone). Successors: [W-273](../work/open/W-273-section-records-implementation.md) (the build), [W-270](../work/open/W-270-section-retest-set-6.md) (the measurement), [SR-LAW-13](../records/0015_LAW-13-the-standing-bar.md) |
+| [`W-272-section-test-data-gen5.md`](open/W-272-section-test-data-gen5.md) | 2026-10-11 | **Done.** Generation 5's test data for the section re-test: 6 long documents and 18 short competitors (seeds 89–112), their `seed-dates.tsv` rows and `set-6-claude` (110 questions), authored by prompt 14 in an isolated chat; the key is Arpit's. Prompt 14 deleted in the same change. |
 | [`W-240-section-pool-set.md`](open/W-240-section-pool-set.md) | 2026-10-09 | **Built.** Generation 4 (seed `63`–`88`, `set-5-claude`) authored and the ladder rebuilt once; the phase-5 baseline was captured and scored by Arpit, with a `step10_section` pool of **23** (gate ≥ 6). Successors: [SR-SECTIONS](../records/0161_sections.md), [W-236](open/W-236-section-records.md), the [scored run](../work/regression/2026-10-09-golden-set-5-rung-01000/report.md). |
 | [`W-236-section-records.md`](open/W-236-section-records.md) | 2026-10-10 | **FAIL (drift), parked.** Section records built on branch `w236-sections` (unmerged); G0 + G1 PASS; every `section_weight` lost rank-1 hits and the pool got worse. Arpit parked it rather than try a second mechanism. Successors: [SR-SECTIONS](../records/0161_sections.md) (proposed, FAIL recorded), the [verdict](../work/regression/2026-10-10-section-records/VERDICT.md). |
 | [`W-269-section-gain-only.md`](open/W-269-section-gain-only.md) | 2026-10-10 | **FAIL (drift).** Section records' second mechanism, the gain-only term, built on branch `claude/gracious-galileo-aqrg8b` (unmerged); G0 · G1 · G3 PASS; the pool improved (misses 23 → 13 at λ 2.0) but every λ lost baseline rank-1 hits (2 · 4 · 4 · 5). Successors: [SR-SECTIONS](../records/0161_sections.md) (proposed, both FAILs recorded), the [verdict](../work/regression/2026-10-10-section-gain-only/VERDICT.md). |
