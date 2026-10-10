@@ -1,0 +1,181 @@
+{
+ "arms": {
+  "sw-0.25": {
+   "clears_gain": false,
+   "drift_losses": [
+    "s5c-009",
+    "s5c-060"
+   ],
+   "gain": null,
+   "gain_line": "undetermined (clause 2 failed)",
+   "hit@10_total": {
+    "baseline": 79,
+    "treatment": 80
+   },
+   "hit@1_all": [
+    2,
+    2
+   ],
+   "hit@5_total": {
+    "baseline": 75,
+    "treatment": 76
+   },
+   "holds_drift": false,
+   "other_pool_miss@1": {
+    "baseline": 13,
+    "treatment": 13
+   },
+   "pool": {
+    "baseline_miss@1": 23,
+    "net": 0,
+    "split": "undetermined",
+    "treatment_miss@1": 23
+   },
+   "primary@1_all": [
+    2,
+    2
+   ],
+   "section@1_evidence_quoted": [
+    1,
+    0
+   ]
+  },
+  "sw-0.5": {
+   "clears_gain": false,
+   "drift_losses": [
+    "s5c-009",
+    "s5c-060",
+    "s5c-073",
+    "s5c-075"
+   ],
+   "gain": null,
+   "gain_line": "undetermined (clause 2 failed)",
+   "hit@10_total": {
+    "baseline": 79,
+    "treatment": 80
+   },
+   "hit@1_all": [
+    5,
+    4
+   ],
+   "hit@5_total": {
+    "baseline": 75,
+    "treatment": 76
+   },
+   "holds_drift": false,
+   "other_pool_miss@1": {
+    "baseline": 13,
+    "treatment": 14
+   },
+   "pool": {
+    "baseline_miss@1": 23,
+    "net": 2,
+    "split": "undetermined",
+    "treatment_miss@1": 21
+   },
+   "primary@1_all": [
+    5,
+    4
+   ],
+   "section@1_evidence_quoted": [
+    2,
+    1
+   ]
+  },
+  "sw-1.0": {
+   "clears_gain": false,
+   "drift_losses": [
+    "s5c-009",
+    "s5c-060",
+    "s5c-073",
+    "s5c-075"
+   ],
+   "gain": null,
+   "gain_line": "undetermined (clause 2 failed)",
+   "hit@10_total": {
+    "baseline": 79,
+    "treatment": 80
+   },
+   "hit@1_all": [
+    7,
+    4
+   ],
+   "hit@5_total": {
+    "baseline": 75,
+    "treatment": 76
+   },
+   "holds_drift": false,
+   "other_pool_miss@1": {
+    "baseline": 13,
+    "treatment": 14
+   },
+   "pool": {
+    "baseline_miss@1": 23,
+    "net": 4,
+    "split": "undetermined",
+    "treatment_miss@1": 19
+   },
+   "primary@1_all": [
+    6,
+    4
+   ],
+   "section@1_evidence_quoted": [
+    3,
+    1
+   ]
+  },
+  "sw-2.0": {
+   "clears_gain": false,
+   "drift_losses": [
+    "s5c-009",
+    "s5c-024",
+    "s5c-060",
+    "s5c-073",
+    "s5c-075"
+   ],
+   "gain": null,
+   "gain_line": "undetermined (clause 2 failed)",
+   "hit@10_total": {
+    "baseline": 79,
+    "treatment": 80
+   },
+   "hit@1_all": [
+    12,
+    5
+   ],
+   "hit@5_total": {
+    "baseline": 75,
+    "treatment": 77
+   },
+   "holds_drift": false,
+   "other_pool_miss@1": {
+    "baseline": 13,
+    "treatment": 16
+   },
+   "pool": {
+    "baseline_miss@1": 23,
+    "net": 10,
+    "split": "undetermined",
+    "treatment_miss@1": 13
+   },
+   "primary@1_all": [
+    11,
+    6
+   ],
+   "section@1_evidence_quoted": [
+    3,
+    4
+   ]
+  }
+ },
+ "g2_pool": {
+  "floor": 6,
+  "reorderable@1": 23,
+  "stop": false
+ },
+ "headroom": {
+  "improvement_pool": 23,
+  "regression_exposed": 45
+ },
+ "outcome_by_the_table": "FAIL \u2014 drift"
+}

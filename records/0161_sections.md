@@ -11,7 +11,7 @@ feature: section records — the committed section plane, the index section rule
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: 1375dd2ba4641839f4e67b26f79e1ca90cc289be6b7c38e01821d5d2c6ac17f9
+content_sha: 38769229803aa0fc43cd855fdfd685a646ea2b07b76e0c0889508900f5c68d25
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -30,7 +30,7 @@ content_sha: 1375dd2ba4641839f4e67b26f79e1ca90cc289be6b7c38e01821d5d2c6ac17f9
 
 🔴 **FAILED 2026-10-10 — drift, and PARKED by Arpit.** Built on branch `w236-sections` (unmerged), it passed both gates and lost at every weight: rank-1 losses 4 · 5 · 9 · 10 across `section_weight` 0.1 · 0.25 · 0.5 · 1.0, and the `step10_section` pool's misses rose 23 → 26 · 26 · 28 · 28 ([verdict](../work/regression/2026-10-10-section-records/VERDICT.md)). The term rewarded **short** documents, whose best section is nearly the whole of them, not the long ones it was built for. `section_weight` does not exist on `main`; this design stays `proposed` and unbuilt there.
 
-🟡 **Reopened 2026-10-10 for a second mechanism (W-269, Arpit's ruling): a GAIN-ONLY term.** A document gains only where its best section beats the document scored as one unit, so a sectionless document gains exactly nothing (decision 5). It is built on a branch from `w236-sections` and judged by W-236's frozen bar unchanged, plus one gate that tests the diagnosis ([pre-registration](../work/regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md)). `b` is not touched.
+🔴 **The second mechanism FAILED too, 2026-10-10 — drift (W-269).** The gain-only term (decision 5) removed the short-document credit (G3 PASS), and the `step10_section` pool's misses fell 23 → 23 · 21 · 19 · 13 across `section_weight` 0.25 · 0.5 · 1.0 · 2.0. But every weight lost baseline rank-1 hits (2 · 4 · 4 · 5), and the frozen bar allows none ([verdict](../work/regression/2026-10-10-section-gain-only/VERDICT.md)). Built on branch `claude/gracious-galileo-aqrg8b`, unmerged. `section_weight` does not exist on `main`; what happens next is Arpit's.
 
 A long document whose answer sits under one heading loses at ranking. Its
 query words are a small share of a big document. U0 (a query-time re-rank)
@@ -222,8 +222,10 @@ G(d) = max(0, max_k S_sec(d#s_k) − S_self(d))
 S(d) = ( S_doc(d) + λ · G(d) ) · w(d)
 ```
 
-- 🟡 **Gain-only, amended 2026-10-10 (W-269, Arpit's ruling) before any build
-  code.** W-236 built B2 as `S_doc + λ · max_k S_sec` and it **failed (drift)
+- 🔴 **Gain-only, amended 2026-10-10 (W-269, Arpit's ruling) before any build
+  code — and measured: FAIL (drift)**, rank-1 losses 2 · 4 · 4 · 5 at λ 0.25 ·
+  0.5 · 1.0 · 2.0 while the pool improved 23 → 23 · 21 · 19 · 13
+  ([verdict](../work/regression/2026-10-10-section-gain-only/VERDICT.md)). W-236 built B2 as `S_doc + λ · max_k S_sec` and it **failed (drift)
   at every weight**: a sectionless document was its own single section, so it
   gained about `λ ×` its whole body and heading score, while a long document's
   best section held only part of its tf. The term favoured short documents

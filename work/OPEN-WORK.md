@@ -34,7 +34,6 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-269** · `agent` — gain-only section term: captured and **scored by Arpit** ([report](regression/2026-10-10-section-gain-only/report.md); branch `claude/gracious-galileo-aqrg8b`). Next: a session that did **not** capture runs `decide.py` and files the VERDICT. **Opus.** [detail](open/W-269-section-gain-only.md)
 
 ### testing
 

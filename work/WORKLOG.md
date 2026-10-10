@@ -23,6 +23,12 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-10 — W-269 closed: the gain-only section term FAIL (drift), by Arpit's run of the decider  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted his `decide.py` output: clause 2 failed at every λ (drift losses 2 · 4 · 4 · 5), **FAIL — drift**.
+- **Done:** filed as his: [VERDICT](regression/2026-10-10-section-gain-only/VERDICT.md) (decider hash unchanged). SR-SECTIONS (§1 banner, d5) and compare/section-units record both mechanisms; register row; IMPLEMENTATION section + prediction row; W-269 archived; OPEN-WORK row removed; INTERVIEW latest.
+- ⚠ **A red test went in twice:** `f9f1bb02` and `3b6972b8` filed a measured run with no `ANALYSIS.md`, so `test_regression_runs` failed on both commits. This session never ran the suite after filing them. ANALYSIS.md added here. The unit suite now shows only the branch's 2 known v7-index failures.
+- **Noted:** unlike W-236, the pool improved (23 → 13 at 2.0) — descriptive, gates nothing. **Not done:** nothing owed. The branch and any next step are Arpit's.
+
 ## 2026-10-10 — W-269 scored by Arpit; totals filed, no decider run  ·  Claude Code (Opus 5.5)
 - **Asked:** Arpit pasted his `just golden-score work/regression/2026-10-10-section-gain-only` output (5 arms, n = 90 each).
 - **Done:** totals filed in the [report](regression/2026-10-10-section-gain-only/report.md); scores committed. hit@1 45 · 45 · 46 · 48 · 52; pool reorderable@1 23 · 23 · 21 · 19 · 13; `other` 11 · 12 · 13 · 13 · 15. G2 = 23.

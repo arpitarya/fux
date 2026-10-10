@@ -35,7 +35,13 @@ valuable judgement, but not the state of play.
 *Updated **2026-10-10** (Claude Code, Opus 5.5 — W-269).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-10-10 (latest) — W-269: GAIN-ONLY SECTION TERM AMENDED, FROZEN, BUILT; NOT CAPTURED
+### 🔴 2026-10-10 (latest) — W-269 CLOSED: THE GAIN-ONLY SECTION TERM FAILS TOO (DRIFT)
+
+- Captured on Arpit's machine (G0 · G1 · G3 PASS), scored and decided by Arpit: **FAIL — drift** ([verdict](regression/2026-10-10-section-gain-only/VERDICT.md)).
+- **Different from W-236:** the short-document credit is gone and the pool improved (misses 23 → 13 at λ 2.0; `hit@1` 12 wins / 5 losses). But every λ lost 2–5 baseline rank-1 hits, and the bar allows zero.
+- Both mechanisms FAIL on the frozen bar. Branch `claude/gracious-galileo-aqrg8b` unmerged; what next (park, a third mechanism, or a new bar on a new set) is Arpit's.
+
+### 🟢 2026-10-10 — W-269: GAIN-ONLY SECTION TERM AMENDED, FROZEN, BUILT; NOT CAPTURED
 
 - Arpit's ruling after W-236's FAIL: try the gain-only term. **SR-SECTIONS d5 amended**, the bar **frozen** ([pre-registration](regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md)), **built** on both readers on branch `claude/gracious-galileo-aqrg8b`, unmerged.
 - A sectionless document now gains exactly zero (unit-tested on scan and accelerator); G3 tests the same on the rung.
