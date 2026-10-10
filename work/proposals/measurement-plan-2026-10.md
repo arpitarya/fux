@@ -122,7 +122,7 @@ Promoted; the plan is the item.
 
 ## 7 · Enrichment — B-108, B-109, B-110, B-245
 
-✅ **Graduated 2026-10-04 → [W-257](../open/W-257-enriched-rung.md)**, with the blind-author protocol this section missed (SR-RS d11).
+✅ **Graduated 2026-10-04 → W-257 ([verdict](../regression/2026-10-10-enriched-rung/VERDICT.md), closed 2026-10-10)**, with the blind-author protocol this section missed (SR-RS d11).
 
 **All blocked on one deliverable:** an enriched rung — model-generated
 questions over rung-01000 with `enrich=true` declared. The cost is tokens and

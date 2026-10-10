@@ -26,6 +26,18 @@ Rules:
 
 ---
 
+## 2026-10-10 — **W-257 closed: doc2query, its filter and the tilt, all no detected change**
+
+| what | evidence |
+|---|---|
+| **the bar** | frozen before the author ran ([pre-registration](regression/2026-10-10-enriched-rung/PRE-REGISTRATION.md)); amendment 1 (`79bc22ea`, Arpit) line-matched the placebo and froze both deciders before any score |
+| **the rung** | gen-4 `rung-01000`, 1,000 documents, 5,620 questions by a blind author **without the fux-enrich skill** (one per chunk); 837 (14.9 %) refused on the first pass. Seven arms on engine `a07f9329` ([report](regression/2026-10-10-enriched-rung/report.md)) |
+| **B-108 doc2query** | `unfiltered` vs `none` at `hit@1`: 6 / 4, net +2, 8 needed → **NO DETECTED CHANGE**; placebo 1 / 5, did not clear |
+| **B-109 the filter** | `filtered` vs `unfiltered`: 1 / 1 → **NO DETECTED CHANGE** (G3 passed, so the filter was visible) |
+| **B-110 the tilt** | 4 losses / 1 win on `Q_out` at both 25 % and 50 % → **NO DETECTED TILT**; SR-ENRICH d6's condition met |
+| **verdict** | Arpit scored; a non-capturing session ran the frozen deciders ([verdict](regression/2026-10-10-enriched-rung/VERDICT.md)). `informed` |
+| **effect** | SR-ENRICH d6, d15, d16 rewritten to the numbers; B-245's second condition met; SR-WORK-TESTDATA T15 + R11. No behaviour change |
+
 ## 2026-10-10 — **W-236 / W-168 step 10: section records FAIL (drift), parked; the item is closed**
 
 | what | evidence |
@@ -6225,6 +6237,7 @@ it closed by ratification, not by landing; see the W-27 row above.
 | W-233-IDENTIFIER-FAMILIES | ✅ **PASS** (2026-09-28; the table said PASS, every clause by a wide margin, so it was not ambiguous) — identifier families from `.fux/identifiers.toml`, one canonical term per match on both readers, against the frozen rule *E1 net ≥ 6 on at least one rung; no E1 or E2 net ≤ −6; E3 < 6 of 60; G1–G3 hold*. **Measured +25 / +88 / +105 with 0 broken; E2 0; E3 0 of 60; G1–G3 hold; index +0.3 %.** A mechanism result on the ladder's own IDs, not a measure of real query spellings | [verdict](regression/2026-09-28-identifier-families/VERDICT.md) · [SR-IDENTIFIERS](../records/0160_identifiers.md) |
 | W-252-NODE-ARM | ✅ **PASS** (2026-10-04) — PRE-REG-NODE-3: the Node differential arm on lab rung-01000 and rung-10000 (v7 copies), against *0 discordant of 801 per pass, identical graph digests, a Node-built plane equal to Python's*. **0/801 on all four passes; digests identical; 602/602 build files byte-equal** after the build check was re-run with its deletion step corrected (disclosed). `informed` | [VERDICT](regression/2026-10-04-node-arm-2/VERDICT.md) |
 | PRE-REG-DOC-COVERAGE | 🔴 **INCONCLUSIVE** (2026-10-04) — W-256 §2, abstention gate 2: a fixed grid of `doc_coverage_floor` replayed over the W-213 rows at rung-01000, against *≥ 50 % caught, fewer correct demoted than a coin, p ≤ 0.00625, per-set consistent*. Only 0.80 meets the point criteria; **p = 0.35**, one set of three. Floor stays 0.0; **Arpit's — W-260 §1** | [VERDICT](regression/2026-10-04-doc-coverage-replay/VERDICT.md) |
+| W-257-ENRICHED-RUNG | ❌ **NO DETECTED CHANGE** (2026-10-10; frozen deciders, run by a non-capturing session on Arpit's scores) — doc2query on all 1,000 docs of gen-4 `rung-01000`, `hit@1` on `set-5-claude`: B-108 6 / 4 (net 8 needed), placebo 1 / 5; B-109 filter 1 / 1; B-110 no tilt at 25 % or 50 % (4 / 1 each). Blind author without the skill; `informed` | [VERDICT](regression/2026-10-10-enriched-rung/VERDICT.md) |
 | PRE-REG-INGEST-SPLIT | ⚠ **split result → Arpit** (2026-10-04) — W-256 §8 at rung-10000: delta non-extract median **10.39 s** (≥ 5 s, no straddle) but walk+parse 24–30 %, `redact` ~57 %; the frozen rule sends this case to Arpit — **W-260 §2**. Full/delta 1.45× | [VERDICT](regression/2026-10-04-ingest-split/VERDICT.md) |
 | PRE-REG-INGEST-SPLIT-2 | ✅ **close branch → Arpit** (2026-10-09) — W-267, W-256 §8's rule re-run on the fixed engine at gen-4 rung-10000: delta non-extract median **4.902 s** (4.894–4.908, no straddle) < 5 s; `redact` 0.96 s; full/delta 1.92×. B-002 closes on Arpit's word. Margin 0.092 s | [VERDICT](regression/2026-10-09-ingest-split-remeasure/VERDICT.md) |
 | PRE-REG-LOOPBACK | ✅ **PASS** (2026-10-04) — W-256 §4 on 127.0.0.1: B-102 (429 retries, backoff, `rate_limited[host]`, doctor) 14/14 and B-124 (`keep=true`, `as-ingested` with matching sha once down, the quarter veto) 13/13; B-103 (Windows) excluded | [VERDICT](regression/2026-10-04-loopback-network/VERDICT.md) |

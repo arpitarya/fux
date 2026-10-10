@@ -11,7 +11,7 @@ owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@f088f4f6b552, src/fux/
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: ac8811fe4b1be7214ce82f8aa1ce75f35bfe8d39a07b7b74f3b8c50499fd685b
+content_sha: 2787dc3b22b50b4729bb808d54b8227b075a1dd44833a8b9198208c1072b595b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -184,6 +184,17 @@ can match queries an un-enriched one cannot, **so a half-enriched scope tilts
 ranking toward whichever half was finished.** `ctx` is a weighted field with its
 own tune key *conditional on the tilt being small* — which is a measurement, not
 an opinion.
+
+**Measured 2026-10-10: NO DETECTED TILT at 25 % and at 50 % coverage, so the
+condition is met and `ctx` keeps its own tune key**
+([`2026-10-10-enriched-rung`](../work/regression/2026-10-10-enriched-rung/VERDICT.md),
+W-257). On the questions the un-enriched part answered under no enrichment
+(81 at 25 %, 66 at 50 %), partial coverage against full lost **4** rank-1 hits
+and won **1** at each coverage, below the paired floor. The shift is visible: 9 of
+90 rank-1 documents fell in the enriched quarter before, and 16 after. It did
+not reach the floor. ⚠ `informed`, one Claude-authored set of 90, on
+enrichment written by a blind author **without the fux-enrich skill** (one
+question per chunk). *Small* means *not detected at this size*, not *zero*.
 
 **7. Orphaned enrichment is never auto-deleted.** A reverted document recovers
 its enrichment for free, because the old sha comes back and the file is still
@@ -412,10 +423,22 @@ not a fixable style of prose; it is what prose is. A question is a narrower
 object: a retrieval claim about **one** document, which `fux enrich --check`
 can put to the index and test.
 
-🔴 **This decision is BUILT AND UNPROVEN, and that is the whole of its
-evidential standing.** It ships on the argument above — prose measured no net
-gain, and a question is checkable where prose is not — **not** on a gate it
-cleared. The four-arm run
+🔴 **Measured 2026-10-10: NO DETECTED CHANGE at `hit@1`, and that is the whole
+of its evidential standing**
+([`2026-10-10-enriched-rung`](../work/regression/2026-10-10-enriched-rung/VERDICT.md),
+W-257, the bar frozen before the author ran). Questions on all 1,000 documents
+of gen-4 `rung-01000` against no enrichment: **6 wins / 4 losses, net +2**, where
+10 discordant questions needed net 8. The line-matched placebo went **1 / 5**
+and did not clear. So it still ships on the argument above — prose measured no
+net gain, and a question is checkable where prose is not. It ships now beside a
+measured null, not a gate it cleared. ⚠ **What was measured is narrower than
+this decision:** a blind author **without the fux-enrich skill** wrote one
+question per chunk (median 5 per document), template-filled on the
+near-identical `ext` documents. `informed`, one Claude-authored set of 90. A
+rung written with the shipped skill is a different treatment and is not
+measured.
+
+**The earlier run.** The four-arm run
 ([`2026-09-05-doc2query`](../work/regression/2026-09-05-doc2query/report.md))
 was voided on Arpit's ruling of 2026-09-06
 ([`W110-DOC2QUERY`](../work/regression/2026-09-05-doc2query/VERDICT.md)):
@@ -454,10 +477,15 @@ a human decides.
 lines that end in `?`; a body with none has nothing to check. No existing
 enrichment is invalidated by this record.
 
-⚠ **The filter's own value is UNPROVEN, on the same run.** It refused **2 of
-98** questions and moved **no** recall number at any `k` — a **2 %** treatment,
-too small to see. *Did not hurt* is the honest statement; *works* is not
-available yet.
+⚠ **The filter is visible and moves nothing measurable: NO DETECTED CHANGE**
+([`2026-10-10-enriched-rung`](../work/regression/2026-10-10-enriched-rung/VERDICT.md),
+W-257). On the first pass it refused **837 of 5,620** questions (14.9 %, in
+357 of 1,000 files). Removing them changed `hit@1` on **2 of 90** questions,
+1 win and 1 loss. The 2026-09-05 run's *too small to see* (2 of 98) no longer
+applies. What stands now is *a visible treatment with no detected effect*, and
+*works* is still not available. Same caveats as decision 15: `informed`, and
+authored without the skill. What `--check` does next stays Arpit's, and
+nothing about it changed.
 
 **17. `superseded_by:` in an enrichment's frontmatter retires its document, and
 it is the ONE key here that reaches the ranking.** Everything else in that

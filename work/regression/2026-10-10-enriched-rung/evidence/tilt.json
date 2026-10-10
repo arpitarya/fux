@@ -1,0 +1,60 @@
+{
+ "coverages": {
+  "25": {
+   "Q_out": 81,
+   "S_c": 250,
+   "headroom": {
+    "improvement": 29,
+    "regression": 43
+   },
+   "line": "b=4 c=1 discordant=5 net=3 p=0.3750 (no net difference can clear alpha at this count, alpha=0.05) -> NO DETECTED CHANGE",
+   "losses": 4,
+   "outcome": "NO DETECTED TILT",
+   "rank1_in_S_c": {
+    "cov-25": 16,
+    "none": 9
+   },
+   "share_of_corpus": 0.25,
+   "verdict": {
+    "alpha": 0.05,
+    "b": 4,
+    "c": 1,
+    "discordant": 5,
+    "net": 3,
+    "net_needed": null,
+    "outcome": "no detected change",
+    "p": 0.375
+   },
+   "wins": 1
+  },
+  "50": {
+   "Q_out": 66,
+   "S_c": 500,
+   "headroom": {
+    "improvement": 24,
+    "regression": 33
+   },
+   "line": "b=4 c=1 discordant=5 net=3 p=0.3750 (no net difference can clear alpha at this count, alpha=0.05) -> NO DETECTED CHANGE",
+   "losses": 4,
+   "outcome": "NO DETECTED TILT",
+   "rank1_in_S_c": {
+    "cov-50": 30,
+    "none": 24
+   },
+   "share_of_corpus": 0.5,
+   "verdict": {
+    "alpha": 0.05,
+    "b": 4,
+    "c": 1,
+    "discordant": 5,
+    "net": 3,
+    "net_needed": null,
+    "outcome": "no detected change",
+    "p": 0.375
+   },
+   "wins": 1
+  }
+ },
+ "d6_condition_met": true,
+ "n_documents": 1000
+}

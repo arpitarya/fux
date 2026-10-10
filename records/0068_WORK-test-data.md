@@ -11,7 +11,7 @@ feature: the test-data source — what a seed document, a question set or a rung
 owns: [tests/test_test_data_prompts.py@a84a10681d8b, tools/golden-history@b6156bbc0ceb, tests/test_golden_history.py@ffae3050d744]
 laws: [L0, L11]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: 0afe3bd869ee15f8e0b5f29463c336ce6eaeacd0c77df7d080ee868efe8db475
+content_sha: ab946c258d3c2fd9d8333df36a2fb8fab25144c79da1c8aca4cc9a9e3cf95942
 ratifies: "Arpit, 2026-09-22 — 'note it down that this is also one of the cases that need to be tested. So in future, the prompt or test data creation should account for this use case … create a work document which will just have pointers what all things test data creation should have … keep everything precise … I was talking about SR work document' · Arpit, 2026-09-27 — 'prompts can have copy of those but sr should be the source and should be maintained … delete them and when a new test data needs to be created create new prompts'\"
 ---
 
@@ -89,6 +89,7 @@ the checklist on 2026-09-22; on 2026-09-27 it absorbed the prompts too.
    | **T12** | **Additions only** — an existing seed document is never edited; new documents rebuild the ladder | A20 · [`work/golden/README.md`](../work/golden/README.md) phase 4 |
    | **T13** | **Custody and naming** — one designated session per set, `set-<gen>-<claude\|codex>`, and `informed` for every agent-authored set | [L11](0013_LAW-11-sealed-answer-key.md) · [SR-WORK-GOLDEN](0066_WORK-golden.md) d14 · A1–A5 |
    | **T14** | **At most 10 000 documents** on any rung | [SR-WORK-SCALE](0057_WORK-scale.md) |
+   | **T15** | **Enrichment written with the shipped skill** — an enriched rung's `.fux/enrich/` is authored by a blind session running the `fux-enrich` skill, 5–10 questions per document. *Why:* W-257's author had no skill and wrote one question per chunk (median 5, min 1, 1,000 of 1,000 files), so its verdict covers that treatment only | [SR-ENRICH](0137_enrich.md) d15 · R11 |
 
 3. **The three checklist items stated here.**
 
@@ -208,6 +209,7 @@ the checklist on 2026-09-22; on 2026-09-27 it absorbed the prompts too.
    | **R8** | diversity · `step7_diversity` | ≥ 3 facet clusters, each ≥ 3 facets; one facet **crowded** with 3–4 near-duplicate docs (none superseded or archived), the rest one doc each | ≥ 15 about the topic **as a whole**; the row carries `"facets": [[…], […]]`, every relevant doc in exactly one group |
    | **R9** | git authority · `step8_authority` (T11) | ≥ 12 docs with history, ≥ 5 authors on the company domain; ≥ 5 **authority pairs** — a maintained doc (≥ 3 authors, ≥ 4 commits, correct) and a one-person doc (1 author, 1 commit, plausible but wrong), same `status`, neither superseded nor archived, no *draft / unofficial / old* wording; in ≥ half, the one-person doc is **newer**. Revisions are full text, consecutive ones differ, the final is the committed text; `seed-history.tsv` rows `path · date · Name <email> · revision` with exactly one `final` per doc, dated as in `seed-dates.tsv` | ≥ 15 answered by the maintained doc, quoted from its final text |
    | **R10** | section scoring · `step10_section` | ≥ 4 long docs (≥ 3 000 words, ≥ 8 headed sections, most sections off-question); ≥ 2 short (< 400 words) wrong competitors per long doc; the answering section's heading does not repeat the question's words. ⚠ **The competitor must be able to win at document level:** it carries the question's distinctive words in its **title or a heading**, while the long doc carries them in the answering section's **body** and elsewhere only scattered. A long doc that also matches in its title or headings ranks first on its own and the question never enters the pool (set-4-claude: 1 of 15, 2026-09-28) | ≥ 15 answered by one section of a long doc; the row carries `"competitor": "seed/…"`, the short doc built to beat it, never in `relevant` |
+   | **R11** | doc2query · `enrich_doc2query` (T15) | documents whose own words differ from a reader's (*"excursion"* where the reader says *"breach"*); the rung's enrichment per T15 | ≥ 20 in the **reader's** word, answered by the document that uses the other. *Why:* set-5-claude carries **0 of 90** tagged for it, so W-257's whole set was the pool |
 
 ### Consequences
 
