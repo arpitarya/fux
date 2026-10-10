@@ -29,6 +29,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-257** — score it: `just golden-score work/regression/2026-10-10-enriched-rung` (7 arms; G0–G3 pass; placebo line-matched per your ruling). [report](regression/2026-10-10-enriched-rung/report.md) | 2026-10-10 | 0d |
 | ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-269** — score it: `just golden-score work/regression/2026-10-10-section-gain-only` (5 arms; G0 · G1 · G3 pass). Run it from the branch `claude/gracious-galileo-aqrg8b`. [report](regression/2026-10-10-section-gain-only/report.md) | 2026-10-10 | 0d |
+| ↳ **blocks:** nothing else in the queue | | |
 
 ---
 
@@ -36,7 +38,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-269** · `agent` — gain-only section term: amended, frozen, built (branch `claude/gracious-galileo-aqrg8b`). Next: capture on Arpit's machine (fux-lab), then he scores. **Opus.** [detail](open/W-269-section-gain-only.md)
+- 🔴 **W-269** · `arpit` — gain-only section term: built and captured, 5 arms, G0 · G1 · G3 pass ([report](regression/2026-10-10-section-gain-only/report.md); branch `claude/gracious-galileo-aqrg8b`). Arpit scores; a non-capturing session runs `decide.py`. **Opus.** [detail](open/W-269-section-gain-only.md)
 
 ### testing
 

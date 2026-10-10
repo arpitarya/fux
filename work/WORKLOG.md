@@ -23,6 +23,12 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-10 — W-269 DoD 4: the gain-only arms captured; G0, G1, G3 pass  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement w-269"* (DoD 1–3 were done; DoD 4 needed this machine's `fux-lab`).
+- **Done:** frozen hashes re-verified; engine pinned in a detached worktree at `03fbf782`. Base `arms/runs/gain-base` (`doctor --fix` wrote only `section_weight = 0.0`; `ingest --full`; index byte-identical to W-236's `sw-base`). Five `gain-sw-<λ>` copies, `diff -r` = the one line. **G0 PASS** (0/90 + 0/90 against W-236's `sw-0.0`). **G1 PASS** (`g1.json` byte-identical to W-236's). **G3 PASS** (0 failures, 1 481 comparisons per arm, 40 sectionless docs). Rank 1 moved on 4 · 10 · 13 · 24 questions. [report](regression/2026-10-10-section-gain-only/report.md).
+- **Noted:** the `section_weight` comment that `doctor --fix` writes still describes B2. It is template text, owed to any merge.
+- **Not done:** no score, no verdict, by rule. `golden-state` read `locked` throughout. **Next:** 🔴 Arpit runs `just golden-score work/regression/2026-10-10-section-gain-only`; a non-capturing session runs `decide.py`. ⚠ OPEN-WORK, WORKLOG and NOW share hunks with another session's uncommitted W-257 close, so this session commits only its own paths.
+
 ## 2026-10-10 — W-257: placebo STOP ruled → amendment 1 → seven arms captured  ·  Claude Code (Opus 5.5)
 - **Asked:** *"go with the recommended approach"* (the placebo STOP's ruling).
 - **Done:** `placebo.py --per-line` (0/1,000 files off on line count, −1.1 % words; stamps any `skill:`), with tests and SR-RS d15's row. AMENDMENT.md, `decide.py` (B-108/B-109) and `tilt.py` (B-110) were committed together in `79bc22ea`, before any arm was scored. `build_arms.py` built `filtered` (837 removed), `placebo`, `cov-25` (250) and `cov-50` (500). All seven were ingested and run through `golden_run.py` on `a07f9329`. `none` = the 2026-10-09 capture 90/90. Both suites pass.

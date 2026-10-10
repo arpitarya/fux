@@ -9,14 +9,14 @@ ball: agent
 
 # W-269 — section records, second mechanism: gain-only
 
-**Status: DoD 1–3 done 2026-10-10, DoD 4 next.** 🟢 for Claude Code, **Opus**, **on Arpit's machine** (the arms need `fux-lab/corpora/golden/`).
+**Status: DoD 1–4 done 2026-10-10.** 🔴 **Arpit scores:** `just golden-score work/regression/2026-10-10-section-gain-only`. Then a session that did not capture runs `decide.py` (DoD 5).
 
 | DoD | state | where |
 |---|---|---|
 | 1 · SR-SECTIONS d5 amended, compare doc noted | ✅ `113ae3b4` | [SR-SECTIONS](../../records/0161_sections.md) decision 5 |
 | 2 · pre-registration frozen, committed alone | ✅ `4f5504d1` | [PRE-REGISTRATION](../regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md): λ ∈ {0.25, 0.5, 1.0, 2.0}; G0 · G1 · G2 · **G3** |
 | 3 · built, both readers, both suites | ✅ `03fbf782` | branch `claude/gracious-galileo-aqrg8b`: `w236-sections` (`f2a139fd`) with `main` merged in (`81b09892`), then the three commits above. Unmerged |
-| 4 · capture | ⏳ | the pre-registration's §The arms and §Gates, in order: the base, G0 (`g0.py`), G1 (W-236's `g1.py`), the five arms, G3 (`g3.py`). Then 🔴 Arpit scores |
+| 4 · capture | ✅ | [report](../regression/2026-10-10-section-gain-only/report.md): engine pinned at `03fbf782`; G0 PASS (0/90), G1 PASS (byte-identical to W-236's), G3 PASS (0 of 4 × 1 481); five arms × 90. Key `locked` throughout. 🔴 Arpit scores |
 | 5 · verdict | — | a session that did not capture runs `decide.py`, which refuses without a G3 PASS |
 
 ⚠ **Erratum:** the frozen pre-registration's §Freeze and this session's WORKLOG entry name the merge commit as `81b0989a`. It is **`81b09892`**. Neither file is edited: one is frozen, the other is append-only.
