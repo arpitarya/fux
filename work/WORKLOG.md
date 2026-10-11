@@ -23,6 +23,12 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-11 — W-270 scored by Arpit; totals filed, no decider run  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted `just golden-score` output (4 arms, n = 110).
+- **Done:** totals filed in the report; scores committed. `sw-0.0` = pre-section (hit@1 79). `sw-2.0` hit@1 79, section pool misses 11 → 8, `other` 9 → 12. `sw-4.0` hit@1 68.
+- 🔴 **The baseline slice is 11, below the frozen floor of 15**: `decide.py` will STOP before reading any arm. The baseline already hits 49 of 60 tagged section questions at rank 1.
+- **Not done:** the decider (this session captured). **Next:** Arpit or a fresh session runs it; then Arpit rules.
+
 ## 2026-10-11 — W-273 phase 1 landed; W-270 DoD 3–5 (bar, ladder gen 5, capture)  ·  Claude Code (Opus 5.5)
 - **Asked:** *"implement W-273, then W-270"*. Ruled mid-session: `rung-00100` → *keep it at 118 docs* (the seed outgrew it).
 - **Committed first:** the staged Cowork + W-272 pile as its own commit (`17f79e1b`), so W-270's bar could be committed alone.

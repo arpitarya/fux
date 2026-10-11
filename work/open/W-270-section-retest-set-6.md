@@ -9,7 +9,7 @@ ball: arpit
 
 # W-270 — the gain-only section term at λ = 2.0, re-tested on `set-6-claude`
 
-**Status: OPEN. 🔴 DoD 6 — Arpit scores.** DoD 3–5 ✅ 2026-10-11: bar frozen (`9ab19fc6`), ladder gen 5 (`04e717ba`), three arms captured on engine `b4d961cd`. Gates PASS; **the latency guardrail FAILED (+328 ms against 100)**, so by L13's table this run cannot PASS — the score decides between FAIL and INCONCLUSIVE (or a slice STOP). Then a session that did not capture runs `evidence/decide.py`.
+**Status: OPEN. 🔴 Scored by Arpit 2026-10-11; the decider is owed.** The baseline's `step10_section` `miss@1` is **11, below the frozen slice floor of 15**, so `evidence/decide.py` will STOP (L13: a data defect, never a verdict) — run by Arpit or a session that did not capture. Then what next is Arpit's: L13 says *a run that needs a smaller slice says so and asks Arpit*. The latency guardrail had already failed (+328 ms).
 
 **Model:** DoD 2 — **Claude Opus, highest reasoning, in a fresh claude.ai chat**
 (the designated author, A1). DoD 3 — **Opus** (the bar is the deliverable and
@@ -22,7 +22,7 @@ procedure. DoD 6 — **Arpit** scores; the decider is a frozen script.
 | 3 · the bar frozen and committed alone, **before** the ladder rebuild and before any arm — L13 shape; pins W-273 phase 1's engine | ✅ 2026-10-11 — `b4d961cd`; L13 defaults, C2 margin 2, slice read from counts as a range | [`PRE-REGISTRATION.md`](../regression/2026-10-11-section-retest-set-6/PRE-REGISTRATION.md) |
 | 4 · the ladder rebuilt from `seed/` alone (generation 5, a new baseline) | ✅ 2026-10-11 — all eight frozen; `rung-00100` = 118 docs (Arpit's ruling) | [rebuild](../regression/2026-10-11-ladder-gen5-rebuild/report.md) |
 | 5 · capture: the engine W-273 phase 1 hands over (else `03fbf782`), three arms on a copy of the new `rung-01000` | ✅ 2026-10-11 — `b4d961cd`; G0, G1, G3 PASS; 🔴 **latency guardrail FAIL (+328 ms)**, so no PASS is possible | [report](../regression/2026-10-11-section-retest-set-6/report.md) |
-| 6 · 🔴 **Arpit** scores; a session that did not capture runs the frozen decider | ⏳ | the run's `VERDICT.md` |
+| 6 · 🔴 **Arpit** scores; a session that did not capture runs the frozen decider | ✅ scored 2026-10-11 (slice 11 < 15); ⏳ decider | the run's `report.md` |
 
 ## Why
 

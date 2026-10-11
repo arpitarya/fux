@@ -1,6 +1,6 @@
 ---
 type: Report
-description: "W-270 capture: the gain-only section term on set-6-claude (110) at a re-ingested copy of generation 5's rung-01000, engine b4d961cd. G0 PASS (0 of 110 rows differ from the pre-section engine dca6aaa4), G1 PASS (ratio 0.982), G3 PASS (0 failures, 2 395 comparisons per arm, 48 sectionless documents). The latency guardrail FAILED: median ask at rung-10000 466 -> 794 ms (+328, limit 100). Three arms captured; not scored, not decided."
+description: "W-270 capture, scored by Arpit (baseline step10_section miss@1 = 11, below the frozen slice floor of 15): the gain-only section term on set-6-claude (110) at a re-ingested copy of generation 5's rung-01000, engine b4d961cd. G0 PASS (0 of 110 rows differ from the pre-section engine dca6aaa4), G1 PASS (ratio 0.982), G3 PASS (0 failures, 2 395 comparisons per arm, 48 sectionless documents). The latency guardrail FAILED: median ask at rung-10000 466 -> 794 ms (+328, limit 100). Three arms captured; not scored, not decided."
 run: 2026-10-11-section-retest-set-6
 item: W-270
 classification: informed
@@ -10,7 +10,31 @@ pre_registration: work/regression/2026-10-11-section-retest-set-6/PRE-REGISTRATI
 
 # Report: the gain-only section term at λ = 2.0, `set-6-claude`
 
-⏳ **Captured, not scored, not decided.** No answer key reached this session
+✅ **Scored 2026-10-11 (Arpit's hand); not decided.** `just golden-score` wrote
+four complete score files (n = 110) under `scores/`. 🔴 **This session captured
+the arms, so it files the totals and runs no decider** (the bar's item 4).
+
+| arm | hit@1 | hit@5 | primary@1 | evidence quoted | grounded | `step10_section` miss@1 · reorderable@1 | `other` miss@1 · reorderable@1 |
+|---|---:|---:|---:|---:|---:|---|---|
+| `pre-section` (`dca6aaa4`) | 79 | 96 | 74 | 76 | 52 | 11 · 11 | 9 · 8 |
+| `sw-0.0` | 79 | 96 | 74 | 76 | 52 | 11 · 11 | 9 · 8 |
+| `sw-2.0` (decided) | 79 | 96 | 73 | 77 | 54 | 8 · 8 | 12 · 11 |
+| `sw-4.0` (reported) | 68 | 94 | 62 | 74 | 56 | 13 · 13 | 18 · 16 |
+
+🔴 **The slice floor's input is the `sw-0.0` row: `step10_section` `miss@1` =
+11, and the frozen floor is 15** (L13 decision 3; §The bar). By L13's table a
+slice below its floor **STOPs the run before any arm is read — a data defect,
+never a verdict**. `decide.py` checks that first. Stated here as a count, the
+way W-269's report stated its pool; the outcome is still the decider's to print.
+Of 60 tagged section questions, the baseline already puts 49 at rank 1.
+
+⚠ **The totals are not the rule.** `sw-2.0` reads level on `hit@1` (79 → 79)
+while its `other` pool loses 3 and the section pool gains 3. Only per-row
+flips say that, and only the decider reads them.
+
+---
+
+⏳ *As captured, before the score:* **not scored, not decided.** No answer key reached this session
 (`just golden-state` read `locked` before the capture). Below, *changed*
 means **the ranking moved**, never that it *improved*.
 
