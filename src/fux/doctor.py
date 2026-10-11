@@ -144,6 +144,49 @@ def _background_runner(root: Path) -> Check:
     return Check("background runner", True, "idle, nothing pending", level="warn")
 
 
+def _git_hooks(root: Path) -> Check:
+    """Can the installed hooks reach a `fux`? (W-276, SR-MAINTENANCE decision 3a.)
+
+    A hook resolves `fux` through the interpreter `fux hooks --install` pinned,
+    and PATH only after it. **The pinned interpreter gone, or a hook written
+    before the pin, is the case this row exists for**: the commit succeeds, the
+    hook does nothing or prints one line nobody reads, and the committed index
+    falls behind. On this repository that was 39 commits from 2026-10-04.
+
+    Read-only like every row here: it names `fux hooks --install` and runs
+    nothing. A **warning** — absent hooks are a choice (decision 5), not a fault.
+    """
+    from .maintain import hooks as hooks_mod
+
+    try:
+        state = hooks_mod.status(root)
+    except Exception as exc:  # no git repository: the hooks have nowhere to live
+        return Check("git hooks", True, f"not applicable - {exc}", level="warn")
+    ours = sorted(name for name, who in state["hooks"].items() if who == "fux")
+    if not ours:
+        return Check("git hooks", True, "not installed - `fux hooks --install` re-indexes on commit", level="warn")
+    pinned = state["python"]
+    broken = [name for name in ours if pinned.get(name) == "missing"]
+    if broken:
+        return Check(
+            "git hooks",
+            False,
+            f"{', '.join(broken)}: the interpreter they were installed with is gone, so they fall "
+            "back to PATH or skip - run `fux hooks --install`",
+            level="warn",
+        )
+    old = [name for name in ours if pinned.get(name) == "unpinned"]
+    if old:
+        return Check(
+            "git hooks",
+            False,
+            f"{', '.join(old)}: written before W-276 and resolve `fux` on PATH alone, which an IDE "
+            "or a shell without the venv may not have - run `fux hooks --install`",
+            level="warn",
+        )
+    return Check("git hooks", True, f"{', '.join(ours)} installed, interpreter pinned", level="warn")
+
+
 def _daemon(root: Path) -> Check | None:
     """The resident clock's last sweep — `None` when it has never run.
 
@@ -333,6 +376,7 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_accelerator(root))
     checks.append(_node_reader(root))
     checks.append(_fux_on_path())
+    checks.append(_git_hooks(root))
     checks.append(_background_runner(root))
     daemon_check = _daemon(root)
     if daemon_check is not None:

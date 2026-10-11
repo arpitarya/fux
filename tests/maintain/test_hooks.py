@@ -258,3 +258,82 @@ def test_the_offline_invariant_covers_every_installed_hook():
     a guard whose subject silently became empty is the failure mode.
     """
     assert set(hooks.HOOKS) == {"post-commit", "post-merge", "post-checkout"}
+
+
+# -- W-276: the hook pins its interpreter, and says when it cannot run ------
+
+
+def test_every_hook_pins_the_interpreter_that_installed_it(repo):
+    """A bare `fux` resolves against whatever PATH git hands the hook. On the
+    machine that filed W-276 that was a pyenv shim which passed `command -v`
+    and exited 127, and 39 commits re-indexed nothing without a word."""
+    hooks.install(repo)
+    state = hooks.status(repo)
+    for name in hooks.HOOKS:
+        body = (repo / ".git" / "hooks" / name).read_text(encoding="utf-8")
+        assert hooks.PYTHON_LINE in body and sys.executable in body, name
+        assert state["python"][name] == "ok", name
+
+
+def test_status_names_a_pinned_interpreter_that_is_gone_and_an_unpinned_hook(repo):
+    hooks.install(repo)
+    path = repo / ".git" / "hooks" / "post-commit"
+    text = path.read_text(encoding="utf-8")
+    pinned = next(line for line in text.splitlines() if line.startswith(hooks.PYTHON_LINE))
+    path.write_text(text.replace(pinned, f"{hooks.PYTHON_LINE}/nonexistent/bin/python"), encoding="utf-8")
+    assert hooks.status(repo)["python"]["post-commit"] == "missing"
+
+    path.write_text(hooks.MARKER + "\ncommand -v fux || exit 0\nfux ingest --spawn-runner\n", encoding="utf-8")
+    assert hooks.status(repo)["python"]["post-commit"] == "unpinned"
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="runs the hook under /bin/sh")
+def test_a_hook_that_cannot_reach_fux_says_so_and_still_exits_zero(repo):
+    """DoD 3: never silent again — one line naming what to type, and exit 0."""
+    hooks.install(repo)
+    path = repo / ".git" / "hooks" / "post-commit"
+    text = path.read_text(encoding="utf-8")
+    pinned = next(line for line in text.splitlines() if line.startswith(hooks.PYTHON_LINE))
+    path.write_text(text.replace(pinned, f"{hooks.PYTHON_LINE}/nonexistent/bin/python"), encoding="utf-8")
+
+    result = subprocess.run(
+        ["sh", str(path)], cwd=repo, capture_output=True, text=True, encoding="utf-8",
+        env={"PATH": "/usr/bin:/bin"},
+    )
+    assert result.returncode == 0
+    assert "fux hooks --install" in result.stderr, result.stderr
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="runs the hook under /bin/sh")
+def test_a_fux_on_path_that_fails_is_reported_not_swallowed(repo, tmp_path):
+    """The pyenv-shim shape: `command -v fux` passes, `fux` exits 127."""
+    hooks.install(repo)
+    path = repo / ".git" / "hooks" / "post-commit"
+    text = path.read_text(encoding="utf-8")
+    pinned = next(line for line in text.splitlines() if line.startswith(hooks.PYTHON_LINE))
+    path.write_text(text.replace(pinned, f"{hooks.PYTHON_LINE}/nonexistent/bin/python"), encoding="utf-8")
+    shim = tmp_path / "shim"
+    shim.mkdir()
+    (shim / "fux").write_text("#!/bin/sh\necho 'pyenv: fux: command not found' >&2\nexit 127\n", encoding="utf-8")
+    (shim / "fux").chmod(0o755)
+
+    result = subprocess.run(
+        ["sh", str(path)], cwd=repo, capture_output=True, text=True, encoding="utf-8",
+        env={"PATH": f"{shim}:/usr/bin:/bin"},
+    )
+    assert result.returncode == 0
+    assert "did not start (exit 127)" in result.stderr, result.stderr
+
+
+def test_doctor_flags_a_hook_whose_interpreter_is_gone(repo):
+    from fux import doctor
+
+    assert doctor._git_hooks(repo).ok                   # absent is a choice, not a fault
+    hooks.install(repo)
+    assert doctor._git_hooks(repo).ok
+    path = repo / ".git" / "hooks" / "post-commit"
+    text = path.read_text(encoding="utf-8")
+    pinned = next(line for line in text.splitlines() if line.startswith(hooks.PYTHON_LINE))
+    path.write_text(text.replace(pinned, f"{hooks.PYTHON_LINE}/nonexistent/bin/python"), encoding="utf-8")
+    check = doctor._git_hooks(repo)
+    assert not check.ok and "fux hooks --install" in check.detail and "post-commit" in check.detail

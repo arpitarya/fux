@@ -26,6 +26,16 @@ Rules:
 
 ---
 
+## 2026-10-11 — **W-276 closed: the post-commit hook pins its interpreter and is never silent**
+
+| what | evidence |
+|---|---|
+| **cause** | `command -v fux` found a pyenv shim (`system` global, fux only under 3.14.2); the shim exited 127 and `|| exit 0` swallowed it — 39 commits from 2026-10-04 re-indexed nothing. From `PATH=/usr/bin:/bin` the hook skipped with no output. Both reproduced by running `.git/hooks/post-commit` directly |
+| **code** | `maintain/hooks.py` + `templates/hooks/` (`fux_python=` pinned, one-line skip and failure messages); `ingest/__init__.py` names a stale lock instead of "already running"; `doctor.py` `git hooks` row |
+| **records** | [SR-MAINTENANCE](../records/0129_hooks.md) d3 amended, **d3a** new, veto 11 restated; [SR-DOCTOR](../records/0152_doctor.md) register row; owns/content hashes restamped (SR-INGEST, SR-FETCHER, SR-AGENT-POLICY, SR-CLI, SR-NODE-SEARCH no-decision note) |
+| **tests** | 5 unit (`tests/maintain/test_hooks.py`), 2 e2e (`test_a_commit_with_fux_off_path_still_re_indexes`, the absent case asserts its message). Unit suite whole: 7094 passed, 4 failed — 2 from another session's uncommitted W-270 work, 2 fixed in this change; e2e whole: 172 passed, 1 skipped |
+| **live** | this repository's hooks reinstalled; the closing commit made from `env -i PATH=/usr/bin:/bin` |
+
 ## 2026-10-11 — **W-270: STOP — the section re-test's slice is 11, below 15 (Arpit's run of the decider)**
 
 | what | evidence |

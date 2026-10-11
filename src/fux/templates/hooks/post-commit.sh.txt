@@ -1,2 +1,2 @@
 
-fux ingest --spawn-runner || exit 0
+fux ingest --spawn-runner || { echo "fux: the background re-index did not start (exit $?) - run 'fux doctor'" >&2; exit 0; }

@@ -40,8 +40,11 @@ that installed itself on clone would be executing code a reviewer never saw.
 
 from __future__ import annotations
 
+import os
+import shlex
 import stat
 import subprocess
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -92,13 +95,38 @@ def _template(name: str) -> str:
     return (hooks_dir / name).read_text(encoding="utf-8")
 
 
-#: Every hook starts with this: the MARKER, and best-effort (`set -u`, exit 0 when
-#: `fux` is not on PATH). `templates/hooks/preamble.sh.txt`, `{marker}` filled here.
-def _preamble() -> str:
-    return _template(fixed("templates", "hook_preamble")).replace("{marker}", MARKER)
+#: The preamble's assignment of the pinned interpreter, read off the template
+#: (the text before `{python}` on its line), so the two cannot drift. `status`
+#: reads it back to tell whether that interpreter still exists.
+def _python_line() -> str:
+    for line in _template(fixed("templates", "hook_preamble")).splitlines():
+        if "{python}" in line:
+            return line.split("{python}")[0]
+    raise FuxError("the hook preamble template has no `{python}` line")
 
 
-_PREAMBLE = _preamble()
+PYTHON_LINE = _python_line()
+
+
+def _python() -> str:
+    """The interpreter this `fux` runs in, absolute and NOT resolved.
+
+    W-276 (SR-MAINTENANCE decision 3a). Absolute, because git hands a hook
+    whatever PATH its caller had; unresolved, because a venv's `bin/python` is
+    a symlink whose target would drop the venv's site-packages.
+    """
+    return os.path.abspath(sys.executable)
+
+
+#: Every hook starts with this: the MARKER, the pinned interpreter, and
+#: best-effort (`set -u`, one line and exit 0 when no fux can run).
+#: `templates/hooks/preamble.sh.txt`, `{marker}` and `{python}` filled here.
+def _preamble(python: str) -> str:
+    return (
+        _template(fixed("templates", "hook_preamble"))
+        .replace("{marker}", MARKER)
+        .replace("{python}", shlex.quote(python))
+    )
 
 # Each hook's body is `templates/hooks/<name>.sh.txt`, after the preamble, for
 # every name in `constants.toml [hooks] names`, in that order. Why each one does
@@ -137,11 +165,12 @@ _PREAMBLE = _preamble()
 # `post-checkout` --
 # A checkout changes which committed index is present. Nothing needs
 # re-deriving from content — only the gitignored runtime plane.
-def _hooks() -> dict[str, str]:
-    return {name: _PREAMBLE + _template(f"{name}.sh.txt") for name in fixed("hooks", "names")}
+def _hooks(python: str) -> dict[str, str]:
+    preamble = _preamble(python)
+    return {name: preamble + _template(f"{name}.sh.txt") for name in fixed("hooks", "names")}
 
 
-HOOKS: dict[str, str] = _hooks()
+HOOKS: dict[str, str] = _hooks(_python())
 
 
 @dataclass
@@ -263,12 +292,31 @@ def status(root: Path) -> dict:
             )
             for name in HOOKS
         },
+        "python": {
+            name: _pinned(directory / name) for name in HOOKS if (directory / name).exists()
+        },
         "merge_driver": driver or "unregistered",
         "gitattributes": (
             f"merge={MERGE_DRIVER_NAME}" in attributes.read_text(encoding="utf-8")
             if attributes.exists() else False
         ),
     }
+
+
+def _pinned(path: Path) -> str:
+    """`ok`, `missing` (the pinned interpreter is gone) or `unpinned`.
+
+    `unpinned` is a fux hook written before W-276, which resolves `fux` on PATH
+    alone; a hook fux did not write is `other` and is not ours to judge.
+    """
+    text = path.read_text(encoding="utf-8", errors="replace")
+    if MARKER not in text:
+        return "other"
+    for line in text.splitlines():
+        if line.startswith(PYTHON_LINE):
+            words = shlex.split(line[len(PYTHON_LINE):])
+            return "ok" if words and os.access(words[0], os.X_OK) else "missing"
+    return "unpinned"
 
 
 def uninstall(root: Path) -> HookReport:

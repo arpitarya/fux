@@ -7,10 +7,10 @@ description: Flat verbs in seven groups, one error boundary, three output modes.
 status: accepted
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@4272dd277334, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@66e3fb96c9e3, node/fux.mjs@803cf090827b]
+owns: [src/fux/cli.py@4272dd277334, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@ae7410298d0c, node/fux.mjs@803cf090827b]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 054fa9ab2f80b60bb80d7decb6ad8e565f26e78c4e674888dbe8b18eeb1630b0
+content_sha: 87c467c8de961f592182194766a5a7847d364df2c053f97c3145c317ba5a8da2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

@@ -69,7 +69,18 @@ def cmd_ingest(args) -> int:
         # The hook's whole job. Constant time in the corpus — one dirty-list
         # write plus one spawn — which is SR-MAINTENANCE veto condition 5.
         pending = runner_mod.record_head(root)
-        if runner_mod.spawn(root, handoff=False):
+        state = runner_mod.status(root)
+        if state["lock"] == "stale":
+            # W-276: `spawn` stands down for ANY holder, so a dead one stopped
+            # every later commit's re-index while this said "already running".
+            # Named, never cleared — a hook is not a human command (decision 1c).
+            print(
+                f"fux: NOT re-indexing - a dead process (pid {state['pid']}) holds "
+                f"{state['lock_path']}; run 'fux ingest --stop' to clear it "
+                f"({pending} changed path(s) pending)",
+                file=sys.stderr,
+            )
+        elif runner_mod.spawn(root, handoff=False):
             print(f"fux: re-indexing in the background ({pending} changed path(s) pending)", file=sys.stderr)
         else:
             print(f"fux: a re-index is already running ({pending} changed path(s) pending)", file=sys.stderr)
