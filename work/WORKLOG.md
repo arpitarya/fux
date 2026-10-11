@@ -23,6 +23,15 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-11 — W-273 phase 1 landed; W-270 DoD 3–5 (bar, ladder gen 5, capture)  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement W-273, then W-270"*. Ruled mid-session: `rung-00100` → *keep it at 118 docs* (the seed outgrew it).
+- **Committed first:** the staged Cowork + W-272 pile as its own commit (`17f79e1b`), so W-270's bar could be committed alone.
+- **W-273 phase 1** (`b4d961cd`): SR-SECTIONS d2 amended; `[index] sectionless_formats`; `extract_rules` 5; template comment; a unit test that fails with the list emptied. Gates (`42f9e2d0`): base index byte-identical, G0 0/90, G1 and G3 identical to W-269's; own repo 8.0× → **1.756×** (W-273 expected ~1.9×; the document plane grew).
+- **W-270:** bar frozen alone (`9ab19fc6`) — L13 defaults, slice split read from counts as a range (dry-run on W-269's scores: INCONCLUSIVE, as expected). Ladder gen 5 (`04e717ba`): all frozen, ext a byte-identical subset of gen 4, gen 4 moved to `golden-gen4/`. Capture: G0 0/110 vs `main`, G1 0.982, G3 0 failures. 🔴 **Latency guardrail FAIL: 466 → 794 ms (+328)**, reproducible, 0.38 s/call in `scan._attach_sections` — so no PASS is possible.
+- ⚠ The build predates the bar (L13 d4 says freeze before build code): a re-test of an existing build, by Arpit's ordering; stated in the pre-registration.
+- **Red, known:** the repo's own v7 index (2 unit + 12 Node; W-273 phase 2). Ladder test now green.
+- **Next:** 🔴 Arpit scores W-270; a non-capturing session runs `decide.py`. This session may not.
+
 ## 2026-10-11 — W-272 closed: generation 5 moved into `work/golden/`  ·  Claude Code (Opus 5.5)
 - **Asked:** *"checkout set-6-claude-gen5 dir for W-272"*, then *"yes"* to committing it.
 - **Done:** checked the untracked `set-6-claude-gen5/` at the repo root by file name and JSON keys first (no key file; questions `id` + `question` only). Moved seeds 89–112 into `seed/`, appended 24 date rows, moved `set-6-claude.jsonl` into `questions/`, deleted prompt 14 (the `prompts/` directory is now empty, so gone). Sonnet ran DoD 3: all PASS. W-272 archived; W-270 re-balled 🟡 on W-273; the questions README lists sets 5 and 6; the golden README layout no longer names the retired set-1/2/3 files.

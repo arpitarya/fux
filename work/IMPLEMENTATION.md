@@ -26,6 +26,15 @@ Rules:
 
 ---
 
+## 2026-10-11 — **W-270 DoD 3–5: the bar frozen, the golden ladder generation 5, three arms captured**
+
+| what | evidence |
+|---|---|
+| **bar** | [pre-registration](regression/2026-10-11-section-retest-set-6/PRE-REGISTRATION.md), L13 defaults, committed alone at `9ab19fc6` before the ladder |
+| **ladder** | [gen-5 rebuild](regression/2026-10-11-ladder-gen5-rebuild/report.md) `04e717ba`: eight rungs frozen on the 118-document seed; `rung-00100` = 118 (Arpit); gen 4 kept at `fux-lab/corpora/golden-gen4/` |
+| **capture** | [report](regression/2026-10-11-section-retest-set-6/report.md): G0 0/110, G1 0.982, G3 0 failures; 🔴 latency guardrail FAIL (+328 ms) |
+| **not done** | 🔴 Arpit's score; the verdict by a non-capturing session |
+
 ## 2026-10-11 — **W-273 phase 1: no section records for decoded record formats (unmerged)**
 
 | what | evidence |

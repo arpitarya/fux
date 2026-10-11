@@ -27,6 +27,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 1d |
 | ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-270** — score the section re-test: `just golden-score work/regression/2026-10-11-section-retest-set-6` (no unlock). The latency guardrail already failed (+328 ms), so it cannot PASS; the score decides FAIL vs INCONCLUSIVE. [the item](open/W-270-section-retest-set-6.md) | 2026-10-11 | 0d |
+| ↳ **blocks:** W-273 phase 2 | | |
 
 ---
 
@@ -34,11 +36,11 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟡 **W-273** · `agent` — section records build. **Phase 1 ✅ 2026-10-11** (engine `b4d961cd`: no sections for `.jsonl`/`.csv`/`.json`; gates PASS). Phase 2, the ship path, waits on W-270 (a PASS). **Opus.** [detail](open/W-273-section-records-implementation.md)
+- 🔴 **W-273** · `agent` — section records build. **Phase 1 ✅ 2026-10-11** (engine `b4d961cd`: no sections for `.jsonl`/`.csv`/`.json`; gates PASS). Phase 2, the ship path, waits on W-270 (a PASS). **Opus.** [detail](open/W-273-section-records-implementation.md)
 
 ### testing
 
-- 🟢 **W-270** · `agent` — re-test the gain-only section term at λ = 2.0 on `set-6-claude` under L13. **The bar is frozen** (2026-10-11, engine `b4d961cd`). Next: rebuild the ladder (generation 5), capture three arms; Arpit scores. [detail](open/W-270-section-retest-set-6.md)
+- 🔴 **W-270** · `arpit` — section term at λ = 2.0 on `set-6-claude`: captured 2026-10-11; gates PASS, **latency guardrail FAIL (+328 ms)**. Arpit scores; a non-capturing session runs `decide.py`. [detail](open/W-270-section-retest-set-6.md)
 - 🔴 **W-258** · `arpit` — one hands-on session on his machine: a journalled answer whose source then vanishes, a real 429 from a real host, and parallel CDP fetches in signed-in Chrome. Checklist and bars are written. [detail](open/W-258-live-network-captures.md)
 
 ### adr update

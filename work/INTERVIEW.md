@@ -32,10 +32,16 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-10** (Claude Code, Opus 5.5 — W-269).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-11** (Claude Code, Opus 5.5 — W-273 phase 1, W-270 DoD 3–5).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-10-10 (latest) — W-269 CLOSED: THE GAIN-ONLY SECTION TERM FAILS TOO (DRIFT)
+### 🔴 2026-10-11 (latest) — W-273 PHASE 1 LANDED; W-270 CAPTURED, LATENCY GUARDRAIL FAILED → ARPIT SCORES
+
+- **W-273 phase 1** (`b4d961cd`): no section records for `.csv`/`.json`/`.jsonl` (SR-SECTIONS d2, W-271 option b). Gates PASS, each identical to W-269's; this repo's section plane **8.0× → 1.756×** ([gates](regression/2026-10-11-section-formats-gates/report.md)).
+- **W-270:** bar frozen alone under L13 (`9ab19fc6`); the ladder rebuilt for gen 5 (`04e717ba`, **`rung-00100` = 118 docs by Arpit's ruling**); three arms captured. G0 · G1 · G3 PASS. 🔴 **Latency guardrail FAIL: +328 ms at `rung-10000`**, located in `scan._attach_sections` — the run cannot PASS; the score decides FAIL vs INCONCLUSIVE ([report](regression/2026-10-11-section-retest-set-6/report.md)).
+- **The decider reads the slice split as a range** (L11 keeps tags out of rows) and hands a split-dependent outcome to Arpit. **This session captured, so it may not run `decide.py`.**
+
+### 🔴 2026-10-10 — W-269 CLOSED: THE GAIN-ONLY SECTION TERM FAILS TOO (DRIFT)
 
 - Captured on Arpit's machine (G0 · G1 · G3 PASS), scored and decided by Arpit: **FAIL — drift** ([verdict](regression/2026-10-10-section-gain-only/VERDICT.md)).
 - **Different from W-236:** the short-document credit is gone and the pool improved (misses 23 → 13 at λ 2.0; `hit@1` 12 wins / 5 losses). But every λ lost 2–5 baseline rank-1 hits, and the bar allows zero.
