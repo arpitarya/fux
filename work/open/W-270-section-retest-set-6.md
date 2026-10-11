@@ -20,7 +20,7 @@ procedure. DoD 6 — **Arpit** scores; the decider is a frozen script.
 |---|---|---|
 | 1–2 · the test data (prompt 14, `set-6-claude`) | ✅ 2026-10-11 — **W-272** closed | [W-272](../../archive/open/W-272-section-test-data-gen5.md) |
 | 3 · the bar frozen and committed alone, **before** the ladder rebuild and before any arm — L13 shape; pins W-273 phase 1's engine | ✅ 2026-10-11 — `b4d961cd`; L13 defaults, C2 margin 2, slice read from counts as a range | [`PRE-REGISTRATION.md`](../regression/2026-10-11-section-retest-set-6/PRE-REGISTRATION.md) |
-| 4 · the ladder rebuilt from `seed/` alone (generation 5, a new baseline) | ⏳ | [`work/golden/README.md`](../golden/README.md) phase 4 · A23 |
+| 4 · the ladder rebuilt from `seed/` alone (generation 5, a new baseline) | ✅ 2026-10-11 — all eight frozen; `rung-00100` = 118 docs (Arpit's ruling) | [rebuild](../regression/2026-10-11-ladder-gen5-rebuild/report.md) |
 | 5 · capture: the engine W-273 phase 1 hands over (else `03fbf782`), three arms on a copy of the new `rung-01000` | ⏳ | the run's `report.md` |
 | 6 · 🔴 **Arpit** scores; a session that did not capture runs the frozen decider | ⏳ | the run's `VERDICT.md` |
 

@@ -476,6 +476,11 @@ decision 23: **missing input is a data defect, not a null.**
 **Rungs: seed → 100 → 200 → 500 → 1 000 → 2 000 → 5 000 → 10 000.** Nested: each
 rung is the previous one plus new files, so the seed documents are in every rung.
 
+⚠ **Since generation 5 (2026-10-11) the seed is 118 documents, so `rung-00100`
+holds 118** — the seed alone, the same content as `rung-seed`. Arpit ruled it
+(*keep it at 118 docs*) when the builder refused a 100-document rung
+([rebuild](../regression/2026-10-11-ladder-gen5-rebuild/report.md)).
+
 ⚠ **10 000 is the ceiling.** Arpit's 2026-08-22 ruling forbids measuring above it
 until he reopens it; *"and so on"* past 10 000 is a separate, later decision.
 
