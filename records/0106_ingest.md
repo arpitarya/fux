@@ -5,13 +5,13 @@ name: SR-INGEST
 title: SR-INGEST (0106) — how ingest works
 description: "Re-resolve every edge every run; carry unchanged documents' extraction forward. Write only shards whose bytes changed. Skips are reported once, counted by class, and recorded in the committed `.fux/.fuxignore`; deletions honoured, output byte-identical."
 status: accepted
-amended: 2026-10-09
+amended: 2026-10-11
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@70711b8170e6, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@aff448e57338, node/src/ingest/priors.mjs@d8d4691d7e49]
+owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@648c64a5043e, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@aff448e57338, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 135a23fb829e4f3c98ad8ea2f04c6742e187537547bbff5522aef6ef1c0cce71
+content_sha: fdfb10fd30bcd8296252f47a77fdaa4387c5c07f9fc02a32e1be4c4f19f798af
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1030,6 +1030,8 @@ descent before listing it, and records it once as `dir/`.
 **No decision here moved** (W-248, 2026-10-04): `ingest/queue.py` gained `model_needed` and `no_decoder`, the readers that classify a row by its reason.
 
 **No decision here moved** (W-261, 2026-10-05): the URL branch of `ingest/run.py` moved to `ingest/urlingest.py` (SR-URL-INGEST's) and the `dirs`-list readers of `ingest/gitdir.py` to `ingest/dirlist.py` (SR-DIR-LIST's). The walk calls both at the same points, and its output is byte-identical. Node's `ingest/gitdir.mjs` lost `archivedDirs` to `ingest/dirlist.mjs` and is narrowed to `is_archived_loc`.
+
+**W-274, 2026-10-11 — the section plane is opt-in.** Ingest builds section records only under `fux.toml [index] section_records = true`. A delta run whose committed index was built in the other mode refuses and names `fux ingest --full`. The last run's mode is one more line in `runtime/extract-config-digest`, so the first run after this change re-extracts once. The rule is SR-SECTIONS decision 11's.
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** Ingest hands each record its section records (`_section_records`, hashed through the run's tracker) and `write_index` writes the plane. A **carried** document, `file:` or `url:`, keeps its prior section lines byte for byte, read once per run by `store.read_sections` ([SR-SECTIONS](0161_sections.md) decision 8). A foreign index has none to carry.

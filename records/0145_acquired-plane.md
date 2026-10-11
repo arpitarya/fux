@@ -10,7 +10,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@54b4e504214f]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 7a89738e51f3bf8ad4d3e318db5db8cac8b6c00919edfbc083bb2309411e4dcd
+content_sha: 1c1c4e9c1fee0f3db466e48705e43e1bbc323785bb1693a618ad86310e1379ef
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -330,6 +330,8 @@ this moved where they are written, not what they are.
 **No decision here moved** (W-248, 2026-10-04): in `urlsrc.py` the "nothing readable" skip reason is spelled from `decoders.reason_nothing_readable`; nothing this record decides moved.
 
 **No decision here moved** (W-261, 2026-10-05): `CACHEDIR.TAG` and `derived_dir` moved from `store/fuxdir.py` — a file this record describes — to `store/cachedir.py` (SR-CACHEDIR-TAG's); `fuxdir` imports them back. The `ACQUIRED` declaration and its `.gitignore` line are untouched.
+
+**No decision here moved** (W-274, 2026-10-11): `config.py` gained `[index] section_records` and its one-key reader (SR-SECTIONS decision 11). Nothing about the acquired plane changed.
 
 ### Consequences
 

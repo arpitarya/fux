@@ -11,7 +11,7 @@ feature: section records — the committed section plane, the index section rule
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: d31650f01369795d8836968948d576cc7e3911caceff977a9ff55739aeea5c4d
+content_sha: 4af98926350ed2504cc73f83287f633c4827e6bc9a7c56e3d03c84bafaf93c83
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -380,6 +380,39 @@ says size is measured, never gated. So the ratio is a cost Arpit has seen, not
 a pass.
 
 **No decision here moved** (W-254, 2026-10-04): the refer chunker gained the frontmatter unit ([SR-CHUNKING](0151_chunking.md) decision 7); section decisions are untouched.
+
+**11. The section plane is OPT-IN: `fux.toml [index] section_records`,
+off by default** (Arpit, 2026-10-11, Cowork, W-274: *"by default it should just
+be documents. Only if explicitly turned on should it be documents as well as
+sections"*; the key lives in `fux.toml [index]`, not in `.fux/tune.toml`).
+
+- **`false`, which the template writes:** ingest builds no section record, so
+  no document carries `nsec` and `.fux/index/sections/` does not exist. **The
+  index is byte-identical to one written without section code**, which is
+  decision 7's base index.
+- **`true`:** decisions 1–10 as written. The index is byte-identical to the one
+  `b4d961cd` writes (W-273 phase 1).
+- **It is a key and not a function of `section_weight`.** A tunable may not
+  decide a committed byte ([SR-TUNE](0135_tuning.md) decision 6). It sits beside
+  `shards`, the other `[index]` key that decides committed bytes. It is not
+  named `sections`, because `output.toml`'s `sections` is a display flag.
+- **A flip refuses a delta ingest and names `fux ingest --full`.** A delta run
+  would carry the old mode forward for every unchanged document, and that is
+  how a half-migrated index reaches git. **No committed byte carries the mode**,
+  because both states are pinned byte for byte. So the mode is read off the
+  section plane: a plane means on, and no plane means off. The one case the
+  plane cannot tell is *on, with nothing to section*. It is settled by the mode
+  the last completed run recorded in `runtime/extract-config-digest`. A fresh
+  clone has no such record, so it refuses once.
+- **`section_weight > 0` with the key `false` is a hard error naming both
+  keys**, in `tune.load` and in Node's `loadTune`. A weight with nothing to read
+  would otherwise rank exactly as `0.0` while claiming not to: a silent zero.
+- **`fux doctor`'s `section records` row** reports the mode. It is an error on
+  the mismatch above, and a warning when the key is off and a plane is still
+  committed.
+- *What this does not decide:* whether sections ship (W-278), how a section is
+  cut (decision 2), or how one scores (decision 5). With the key off, ranking is
+  unchanged, so this is not a ranking change and L13's bar does not apply.
 
 ### Consequences
 

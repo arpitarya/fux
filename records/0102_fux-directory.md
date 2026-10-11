@@ -5,13 +5,13 @@ name: SR-DOTFUX
 title: SR-DOTFUX (0102) — the .fux/ directory
 description: "Every child of .fux/ is declared committed, derived or acquired; the ignore rule is narrow by construction and asserted by doctor against git itself."
 status: accepted
-amended: 2026-09-11
+amended: 2026-10-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
 owns: [src/fux/store/fuxdir.py@415610845f68, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@43c3c371c374, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: e5297a814613cfee4b7dfce070e43da4029dda6123b01a62c255e5ddc89ee8c2
+content_sha: e039c46b738fae4d25314590085864a7dac2e4ab341a56946e8008e96ec7023d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -951,7 +951,7 @@ line raises names the fix itself rather than pointing at the header.
 **No decision here moved** (W-261, 2026-10-05): `CACHEDIR_SIGNATURE`, `CACHEDIR_TAG` and `derived_dir` moved from `store/fuxdir.py` to `store/cachedir.py`, owned by SR-CACHEDIR-TAG; `fuxdir` imports them back, so `fuxdir.derived_dir` keeps every caller. The Node twin `store/fuxdir.mjs` is narrowed to `fuxDir`, and `derivedDir` moved to `store/cachedir.mjs`. The layout this record decides is unchanged.
 
 
-**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `.fux/index/sections/` is **committed**, inside `.fux/index/` ([SR-SECTIONS](0161_sections.md) decision 1). The runtime gains `sections.json` and `sections/`, derived and gitignored with the rest of `.fux/runtime/`.
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `.fux/index/sections/` is **committed**, inside `.fux/index/` ([SR-SECTIONS](0161_sections.md) decision 1). **It exists only when `fux.toml [index] section_records = true`** (W-274, SR-SECTIONS decision 11); the template writes `false`, and then neither the directory nor any `nsec` is written. The runtime gains `sections.json` and `sections/`, derived and gitignored with the rest of `.fux/runtime/`.
 
 ### Consequences
 

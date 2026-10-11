@@ -32,10 +32,16 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-11** (Claude Code, Opus 5.5 — W-273 phase 1, W-270 DoD 3–5).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-11** (Claude Code, Opus 5.5 — the green items: W-276, W-274).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟠 2026-10-11 (latest) — W-270 STOP: THE SECTION RE-TEST COULD NOT MEASURE THE TERM
+### 🟢 2026-10-11 (latest) — THE GREEN ITEMS: W-276 ✓ · W-274 ✓
+
+- **W-276:** the post-commit hook had re-indexed nothing since 2026-10-04: a pyenv shim passed `command -v fux` and exited 127. Hooks now pin the interpreter that installed them and print one line whenever they cannot run. `fux doctor` → `git hooks`. **After moving or rebuilding the venv, run `fux hooks --install`.** The merge driver is still resolved on PATH, and SR-MAINTENANCE d3a names that gap.
+- **W-274:** `fux.toml [index] section_records`, **off by default** (SR-SECTIONS d11). Any section experiment must set it `true` **and** run `fux ingest --full`, because `section_weight > 0` with it off is a hard error. A lab arm built before today has no key and must gain it, or `fux doctor --fix` writes `false`.
+- **Owed by someone:** Cowork's W-270 closure is uncommitted, including its `git rm work/open/W-270-section-retest-set-6.md`.
+
+### 🟠 2026-10-11 — W-270 STOP: THE SECTION RE-TEST COULD NOT MEASURE THE TERM
 
 - Arpit scored and ran the decider: **STOP — slice 11 < 15** ([verdict](regression/2026-10-11-section-retest-set-6/VERDICT.md)). The baseline already ranks 49 of 60 tagged long-document questions first, so set 6 left little to win. Latency guardrail failed too (+328 ms).
 - **Open:** Arpit rules — (a) close step 10 as measured (rec.), (b) accept a slice of 11, (c) a third set.

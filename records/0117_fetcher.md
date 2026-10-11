@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@1be0cec48522]
+owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@d3d8a58c793b]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 16e2efdd97f7efcae4e9fcea185c98c4d96c092991e22f08b6d5ec6552f7c296
+content_sha: 2c551d764fbe913f4e86b9b639371dd7ec94a6d38a8e00dd8d0dd90368ef5e6e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

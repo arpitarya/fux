@@ -64,6 +64,7 @@ refuses.** A query succeeding proves nothing about `fux.toml`; the
 | `acquired_max_bytes` | store default | byte cap on `.fux/acquired/` |
 | `[sources.url.config]` | `{}` | handed **verbatim** to the fetcher's `configure()`; fux reads no key in it |
 | `[index] shards` | `256` | documents the value; any other number is an error |
+| `[index] section_records` | `false` | `false` = whole documents only. `true` = ingest also writes `.fux/index/sections/`, which `.fux/tune.toml [ranking] section_weight` reads. **It changes committed bytes**: after flipping it, a plain `fux ingest` refuses, so run `fux ingest --full`. `section_weight > 0` with this `false` is a hard error |
 | `[agents] install` | all of `claude`, `codex`, `copilot`, `kiro` | vendors `fux setup` writes files for; `[]` = none |
 
 **`keep`, `ttl`, `update` and `enrich` are source-wide defaults** — a

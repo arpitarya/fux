@@ -95,6 +95,11 @@ user_agent           = "fux/0.x (+https://github.com/arpitarya/fux)"
 shards = 256
 git_timeout_s = 120
 
+# false: whole documents only. true: ingest also writes the section plane,
+# .fux/index/sections/, which [ranking] section_weight in .fux/tune.toml reads.
+# Flipping it changes committed bytes: run `fux ingest --full` after.
+section_records = false
+
 # Which agent vendors `fux setup` writes archived-results policy for. These
 # files land OUTSIDE .fux/ -- in .claude/, .github/, .kiro/ and AGENTS.md at the
 # repo root -- which is why the default is spelled out rather than left

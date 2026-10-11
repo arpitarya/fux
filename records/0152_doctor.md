@@ -7,11 +7,11 @@ description: "One record owns the health-check surface. Every check names a caus
 status: accepted
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@e1443077e8b9, tests/test_doctor_register_is_complete.py@dff0d535b078]
+owns: [src/fux/doctor.py@68ec7c15e6f3, tests/test_doctor_register_is_complete.py@dff0d535b078]
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 0cf15d9d0549face8ec6ed743657316e946d9ef02be2cd58ec7433a158af41fb
+content_sha: 9017073e43de84aedf8b345eeed0723ea16f6bbd695cfb59c4cceba05b760161
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -215,6 +215,7 @@ authoritative about the row.**
 | `register` | warn | `.fux/index/REGISTER` against the ledger plane — a document in the index with no register line, or a register line for a document the index does not hold. **Drift means the register was committed from a different ingest than the index beside it**, which is the one thing a committed derived file can get wrong and the one thing nobody reads it closely enough to notice | [SR-INGEST](0106_ingest.md) decision 22 |
 | `fetcher optional functions` | warn | which of `validate()` / `is_rate_limited()` the consumer's fetcher implements — **read as text, never imported** | [SR-FETCHER](0117_fetcher.md) decisions 12–13 |
 | `url sources` | warn | per-URL health from the committed index, **the listed URLs that have never been fetched and so have no record at all** (SR-MAINTENANCE decision 5a's stated cost, built 2026-09-12), the concurrency policy (with every `.fux/fetchers/*.py` declaring `MAX_PARALLEL` above 1 named, read with `ast` and never imported — W-246), and **the `update=never` count with the `keep=false` ones named** — a pinned URL is one `fux ingest` will never go out for again, which is otherwise learnable only by reading every line of the list | [SR-URL-LIST](0116_url-list.md) decisions 14/14b |
+| `section records` | error / warn | **error** when `[ranking] section_weight > 0` and `fux.toml [index] section_records = false` (`ask` refuses then too); **warn** when the key is off and the committed index still holds a section plane (the next delta ingest refuses). Otherwise it reports the mode. **Read-only: names `fux ingest --full`** | [SR-SECTIONS](0161_sections.md) decision 11 |
 | `git hooks` | warn | an installed fux hook whose pinned interpreter is gone (`missing`), or one written before the pin (`unpinned`): it falls back to PATH or skips, and the committed index falls behind. Absent hooks pass, because they are a choice. **Read-only: names `fux hooks --install`** | [SR-MAINTENANCE](0129_hooks.md) decision 3a |
 | `background runner` | warn | is a runner live, how many documents pend, is the lock held or stale, did the last run fail. **Read-only: a stale lock is named, never cleared** | [SR-MAINTENANCE](0129_hooks.md) decision 1c |
 | `url daemon` | warn | the refresh daemon's state | [SR-URL-FRESHNESS](0147_url-freshness.md) |

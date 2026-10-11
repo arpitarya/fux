@@ -591,7 +591,29 @@ def load(root: Path, *, enabled: bool) -> Tune:
     if not enabled:
         return _resolve(_parse(template_text(), _TEMPLATE_LABEL), _TEMPLATE_LABEL)
     path = root / TUNE_NAME
-    return _resolve(_parse(_read_text(path), path), path)
+    tune = _resolve(_parse(_read_text(path), path), path)
+    _require_section_records(root, tune.section_weight)
+    return tune
+
+
+def _require_section_records(root: Path, section_weight: float) -> None:
+    """`section_weight > 0` needs the plane it reads (W-274, SR-SECTIONS d11).
+
+    With `fux.toml [index] section_records = false` there is no plane, and a
+    weight that read nothing would rank exactly as `0.0` while claiming not to:
+    a silent zero. A hard error naming both keys instead, in Python and Node.
+    """
+    if section_weight <= 0:
+        return
+    from .config import CONFIG_NAME, section_records
+
+    if not section_records(root):
+        raise FuxError(
+            f"{root / TUNE_NAME}: [ranking] section_weight > 0 reads the "
+            f"section plane, but {root / CONFIG_NAME} [index] section_records = false, so "
+            "ingest builds none. Set section_records = true and run `fux ingest --full`, "
+            "or set section_weight = 0.0"
+        )
 
 
 def _resolve(data: dict, label: "Path | str") -> Tune:

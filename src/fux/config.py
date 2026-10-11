@@ -35,7 +35,7 @@ _FIX_HINT = "`fux doctor --fix` writes every missing key from the template `fux 
 #: map is an empty one.
 REQUIRED_KEYS: dict[str, tuple[str, ...]] = {
     "sources": ("dirs_file", "urls_file"),
-    "index": ("shards", "git_timeout_s"),
+    "index": ("shards", "git_timeout_s", "section_records"),
     "observe": ("max_ms",),
     "agents": ("install",),
     "maintain": (
@@ -94,6 +94,10 @@ KNOWN_KEYS: tuple[str, ...] = (
     "sources.url.parallel_warn_at",
     "index.shards",
     "index.git_timeout_s",
+    # W-274. Beside `shards` because, like it, it decides COMMITTED bytes:
+    # whether ingest writes `.fux/index/sections/` at all (SR-SECTIONS d11).
+    # Never derived from `section_weight`, a tunable (SR-TUNE decision 6).
+    "index.section_records",
     "agents.install",
     # W-170. **`[observe] max_ms` is in `fux.toml` and not in `tune.toml`**,
     # because it is not a ranking knob: it bounds how long fux WAITS for a
@@ -394,6 +398,9 @@ class Config:
     #: `[index] git_timeout_s` -- the bound on ingest's one `git log` call for
     #: recency priors (W-225 stage 5e).
     git_timeout_s: float
+    #: `[index] section_records` -- whether ingest builds the section plane
+    #: (W-274, SR-SECTIONS decision 11). Off: whole documents only.
+    section_records: bool
     #: `[maintain]` -- the runner's and daemon's pacing (W-225 stage 5e).
     maintain: "Maintain"
     #: `[refer] fetch_cache_max_bytes` -- the fetch cache's disk bound.
@@ -570,6 +577,7 @@ def load(root: Path) -> Config:
         agents=_load_agents(path, data["agents"]),
         url=_load_url_source(path, sources.get("url"), urls_file.strip()),
         git_timeout_s=_number(path, "[index] git_timeout_s", data["index"]["git_timeout_s"], whole=False, positive=True),
+        section_records=_section_records(path, data["index"]["section_records"]),
         maintain=maintain,
         fetch_cache_max_bytes=_number(
             path, "[refer] fetch_cache_max_bytes", data["refer"]["fetch_cache_max_bytes"], whole=True, positive=True
@@ -659,6 +667,34 @@ def _refuse_unknown_keys(path: Path, data: dict) -> None:
     walk(data, "")
 
 
+
+
+def _section_records(path: Path, value: object) -> bool:
+    if not isinstance(value, bool):
+        raise FuxError(
+            f"{path}: [index] section_records must be true or false (got {value!r}). "
+            "false indexes whole documents only; true adds the section plane "
+            "(.fux/index/sections/)"
+        )
+    return value
+
+
+def section_records(root: Path) -> bool:
+    """`fux.toml [index] section_records` alone, for a reader that loads no other key.
+
+    The tune loader needs it when `section_weight > 0` (SR-SECTIONS decision 11)
+    and must not fail on an unrelated key's fault, so this reads one key and
+    raises only about that one. Missing is a hard error naming it (L12).
+    """
+    path = root / CONFIG_NAME
+    try:
+        data = tomllib.loads(path.read_text(encoding="utf-8"))
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        raise FuxError(f"{path}: cannot read [index] section_records ({exc})") from None
+    index = data.get("index")
+    if not isinstance(index, dict) or "section_records" not in index:
+        raise FuxError(f"{path}: [index] section_records is missing - {_FIX_HINT}")
+    return _section_records(path, index["section_records"])
 
 
 def _load_agents(path: Path, raw: dict) -> tuple[str, ...]:

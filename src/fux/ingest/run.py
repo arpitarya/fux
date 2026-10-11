@@ -213,6 +213,13 @@ def run(
     # is a current-format index to carry from; a discarded foreign index has
     # no sections this engine could reuse.
     existing_sections = store_mod.read_sections(root) if existing else {}
+    # W-274 — the section plane is opt-in (SR-SECTIONS decision 11). An
+    # incremental run after `[index] section_records` flips would carry the old
+    # mode forward for every unchanged document, so it refuses instead.
+    if existing and not full:
+        _refuse_a_flipped_mode(root, config.section_records, bool(existing_sections))
+    if not config.section_records:
+        existing_sections = {}
     existing_urls = {doc_id: rec for doc_id, rec in existing.items() if doc_id.startswith("url:")}
 
     fresh: dict[str, bytes] = {}  # url doc_id -> fetched content, this run only
@@ -419,7 +426,7 @@ def run(
     # The new digest is RECORDED only after `write_index` (below): a run
     # stopped before then left the old records in the shards, and a digest
     # already claiming the new value would let the next delta run reuse them.
-    extract_digest = _extract_config_digest(limits, root)
+    extract_digest = _extract_config_digest(limits, root, section_records=config.section_records)
     extract_moved = extract_digest != _read_extract_config_digest(root)
     # W-233. `.fux/identifiers.toml` is the third input to extraction that no
     # document's sha carries. Its digest is COMMITTED — stamped into every
@@ -692,7 +699,7 @@ def run(
             abbr = _hash_abbr(fields.abbr, tracker)
             if abbr:
                 record["abbr"] = abbr
-            record["sections"] = _section_records(doc_id, fields.sections, tracker)
+            record["sections"] = _section_records(doc_id, fields.sections, tracker) if config.section_records else []
         # Edges last, and never reused: they are the one field the rest of the
         # corpus can change without this document changing.
         #
@@ -734,7 +741,7 @@ def run(
         # exactly like a git one and there is nothing left to branch on.
         record["title"] = fields.title
         record["phrases"] = fields.phrases
-        record["sections"] = _section_records(doc_id, fields.sections, tracker)
+        record["sections"] = _section_records(doc_id, fields.sections, tracker) if config.section_records else []
         records.append(record)
 
     # `known_ids` is exactly this run's final id set — every parsed document
@@ -1076,7 +1083,7 @@ ENRICH_DIGEST_FILE = fixed("index", "enrich_digests")
 DECODER_DIGEST_FILE = fixed("index", "decoder_digests")
 
 
-def _extract_config_digest(limits, root: Path) -> str:
+def _extract_config_digest(limits, root: Path, *, section_records: bool) -> str:
     """`[index]`'s values, `extract.py`'s rule version **and every decoder cap**,
     as one string.
 
@@ -1103,8 +1110,42 @@ def _extract_config_digest(limits, root: Path) -> str:
         f"max_phrases={limits.max_phrases}\n"
         f"max_table_rows={limits.max_table_rows}\n"
         f"rules={extract_mod.RULES_VERSION}\n"
+        # W-274: the mode the last completed run built in, which
+        # `_refuse_a_flipped_mode` reads back when the plane itself cannot say.
+        + _mode_line(section_records)
         + _decode_limits_digest(root)
     )
+
+
+def _mode_line(section_records: bool) -> str:
+    """The digest line that remembers `[index] section_records` (W-274)."""
+    return f"section_records={str(section_records).lower()}\n"
+
+
+def _refuse_a_flipped_mode(root: Path, wanted: bool, has_plane: bool) -> None:
+    """Refuse an incremental run whose index was built in the other mode (W-274).
+
+    **No committed byte carries the mode**, because both states are pinned
+    byte for byte: off is an index built without section code, and on is
+    `b4d961cd`'s. So the index's mode is read off its section plane. A plane
+    means on. No plane means off, **or** on with nothing to section. That one
+    ambiguous case is settled by the mode the last completed run recorded in
+    `runtime/`; a fresh clone has none, so it refuses once, and `--full`
+    records it.
+    """
+    if not wanted and has_plane:
+        raise FuxError(
+            "[index] section_records = false, but the committed index holds section "
+            "records (.fux/index/sections/). A delta run would keep them for every "
+            "unchanged document - run `fux ingest --full` to rebuild without them"
+        )
+    if wanted and not has_plane:
+        if _mode_line(True).strip() not in _read_extract_config_digest(root).splitlines():
+            raise FuxError(
+                "[index] section_records = true, but the committed index was built "
+                "without section records. A delta run would section only the documents "
+                "that changed - run `fux ingest --full` to build the section plane"
+            )
 
 
 def _decode_limits_digest(root: Path) -> str:

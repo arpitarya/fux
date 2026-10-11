@@ -187,6 +187,60 @@ def _git_hooks(root: Path) -> Check:
     return Check("git hooks", True, f"{', '.join(ours)} installed, interpreter pinned", level="warn")
 
 
+def _section_mode(root: Path) -> Check:
+    """Which mode built the index, and does ranking agree? (W-274, SR-SECTIONS d11.)
+
+    Three facts, one row: `fux.toml [index] section_records`, whether the
+    committed index holds a section plane, and `tune.toml [ranking]
+    section_weight`. **An error** when the weight is on and the key is off,
+    because `ask` refuses then too. **A warning** when the key and the plane
+    disagree, because the next delta ingest refuses and names `--full`.
+    Read-only: it names the command and runs nothing.
+    """
+    import tomllib
+
+    from .config import section_records
+    from .store import iter_section_paths
+    from .tune import TUNE_NAME
+
+    try:
+        wanted = section_records(root)
+    except Exception as exc:  # `fux.toml loads` names the fault; one report per cause
+        return Check("section records", False, str(exc), level="warn")
+    try:
+        ranking = tomllib.loads((root / TUNE_NAME).read_text(encoding="utf-8")).get("ranking", {})
+        weight = float(ranking.get("section_weight", 0.0))
+    except Exception:
+        weight = 0.0  # `tune.toml loads` is the row for a broken tune file
+    has_plane = bool(iter_section_paths(root))
+    if weight > 0 and not wanted:
+        return Check(
+            "section records",
+            False,
+            "[ranking] section_weight > 0 but fux.toml [index] section_records = false - "
+            "`fux ask` refuses. Set section_records = true and run `fux ingest --full`, "
+            "or set section_weight = 0.0",
+        )
+    if has_plane and not wanted:
+        return Check(
+            "section records",
+            False,
+            "off in fux.toml, but the committed index holds section records - "
+            "run `fux ingest --full`",
+            level="warn",
+        )
+    if wanted and not has_plane:
+        return Check(
+            "section records",
+            True,
+            "on - no document has two or more sections yet (if the key was just "
+            "switched on, run `fux ingest --full`)",
+            level="warn",
+        )
+    mode = "on - documents and their sections" if wanted else "off - whole documents only"
+    return Check("section records", True, mode, level="warn")
+
+
 def _daemon(root: Path) -> Check | None:
     """The resident clock's last sweep — `None` when it has never run.
 
@@ -377,6 +431,7 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_node_reader(root))
     checks.append(_fux_on_path())
     checks.append(_git_hooks(root))
+    checks.append(_section_mode(root))
     checks.append(_background_runner(root))
     daemon_check = _daemon(root)
     if daemon_check is not None:

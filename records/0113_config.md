@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@d64c7c3d26b9, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@6980bf8407fe]
+owns: [src/fux/config.py@779a7e0d7e8e, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@6980bf8407fe]
 laws: [L5, ex-L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8121f65aef1fe7e74926ce26acad74450edf8fa1494c9e5fae05b5fc9ffe399c
+content_sha: a09dc83eb9c16b210ee3eae12bb4c5dc0e3155a5eaaa4b809f3eb878280e9a4f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -72,6 +72,7 @@ flowchart TD
     F --> I["[index]"]
     I --> SH["shards = 256 — REQUIRED<br/>a check; cannot set it"]
     I --> GT["git_timeout_s — REQUIRED"]
+    I --> SR["section_records — REQUIRED<br/>false = whole documents only"]
     F --> OB["[observe]"]
     OB --> OM["max_ms — REQUIRED"]
     F --> MA["[maintain] · [refer] · [doctor]"]
@@ -115,6 +116,7 @@ flowchart TD
      +-- [index]
      |     +-- shards = 256   REQUIRED; a check, cannot change it
      |     +-- git_timeout_s  REQUIRED; the recency-prior `git log` bound
+     |     +-- section_records REQUIRED; true adds .fux/index/sections/
      |
      +-- [observe]
      |     +-- max_ms         REQUIRED
@@ -168,6 +170,7 @@ timeout_s = 30.0                        # the fetcher's vocabulary, never fux's
 [index]
 shards = 256                            # a check, cannot set it
 git_timeout_s = 120                     # the recency-prior `git log` bound, seconds
+section_records = false                 # true: ingest also writes the section plane
 
 [observe]
 max_ms = 50                             # the wait for one .fux/observers/ file
@@ -556,6 +559,7 @@ at any value, with an error naming the new home.
 * sources.url.config
 + index.shards
 + index.git_timeout_s
++ index.section_records
 + agents.install
 + observe.max_ms
 + maintain.daemon_poll_s
@@ -763,6 +767,12 @@ each keeps the number it had in code; the template writes it and `fux doctor
 - **The fetch cache's TTL is not a key.** It arrives per call as `--cache-ttl`,
   and `0` (off) is its only default; 300 s is the recommendation in the
   template's own history, never a fallback (SR-LAW-12 decision 9a).
+
+**`[index] section_records` — W-274, 2026-10-11 (Arpit).** A required boolean,
+`false` in the template. It decides whether ingest writes the section plane, so
+it decides committed bytes, and that is why it is here beside `shards` and not in
+`.fux/tune.toml`. What it means, the flip refusal and the mismatch error are
+[SR-SECTIONS](0161_sections.md) decision 11's.
 
 ### Consequences
 

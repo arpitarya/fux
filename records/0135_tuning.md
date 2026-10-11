@@ -6,12 +6,12 @@ title: "SR-TUNE (0135) — the tunables file, and per-source priority"
 description: "`.fux/tune.toml` — a committed, setup-written, never-rewritten file holding every knob that changes ordering, plus one declared exception (`[index]`: `max_phrases`, `max_table_rows`) that changes the index; plus a per-source preference weight in either direction, where fux states the cost and refuses only what is broken."
 status: accepted
 date: 2026-08-22
-amended: 2026-09-24
+amended: 2026-10-11
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@7055a30470b9, .fux/tune.toml@65682ee5a88f, node/src/config/tune.mjs@16baad79b561]
+owns: [src/fux/tune.py@211ecf089fa6, .fux/tune.toml@65682ee5a88f, node/src/config/tune.mjs@6c5a03c0fd3f]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: f64270b50f8af0765164cac6765d72ac8faf7d96eea0f518e0c9eb8a37dcb22f
+content_sha: 7e377ed18f887f86a3d9b1d74ecbfe6276abfdbabeaede2e6bf21116a20a845a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1112,6 +1112,8 @@ this moved where they are written, not what they are.
 **No tune key changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/tune.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+**W-274, 2026-10-11 — `section_weight > 0` needs `fux.toml [index] section_records = true`.** `tune.load` (and Node's `loadTune`) raises, naming both keys, when the weight is on and the plane is switched off. A weight with nothing to read would otherwise rank exactly as `0.0` while claiming not to. This is the converse of decision 6: the tunable still decides no committed byte, and it may not claim a plane the committed key did not build. The rule is SR-SECTIONS decision 11's.
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** **`[ranking] section_weight`** joins the closed key set: B2's λ ([SR-SECTIONS](0161_sections.md) decision 5), `_non_negative`, template value **`0.0`** (OFF: the plane is never read). It rides `Scoring.section`, not `Weighting`, because both candidate generators decide from it what to read. It is read at query time only, so it moves no committed byte (decision 6). `fux lexical` forces it to `0.0` with the other W-168 terms.

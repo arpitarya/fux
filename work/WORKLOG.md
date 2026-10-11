@@ -23,6 +23,13 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-11 — the green items: W-276 ✓ (the hook pins its interpreter) · W-274 ✓ (section records opt-in)  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement the work items in green. Bring them to closure."* Only W-274 and W-276 were Claude Code's; W-263, W-265, W-266 and W-275 are `cowork` research (rule 37a).
+- **W-276:** the cause was suspect 1 in a worse form. `command -v fux` found a **pyenv shim** for a Python with no fux; it exited 127 and `|| exit 0` swallowed it. From a bare PATH the hook skipped with no output. The fix: hooks pin `fux_python=<sys.executable>`, print one line whenever they cannot run, name a stale lock, and doctor has a `git hooks` row. SR-MAINTENANCE d3a. Proven live: commit `c35a805a` was made from `env -i PATH=/usr/bin:/bin` and printed `re-indexing in the background`; the runner finished `ok`.
+- **W-274:** `fux.toml [index] section_records`, `false` in the template. Off is byte-identical to an index without section records; on is byte-identical to `b4d961cd` (checked by hand on `records/` + `docs/`). A flip refuses a delta ingest; `section_weight > 0` with the key off is a hard error in Python and Node; doctor has a `section records` row. SR-SECTIONS d11. This repo: key off, `ingest --full` run.
+- **Concurrency:** the Cowork session's W-270 closure (records, OPEN-WORK, archive, prompts, NOW and INTERVIEW edits) is still **uncommitted** in the tree, its shell wedged. Both commits here hold HEAD plus this session's edits only; the W-274 and W-275 filings went in verbatim with W-276 so the id sequence holds. Two unit failures are that work's and not this session's: `work/open/W-270…` is both open and archived (its owed `git rm`), and W-270's verdict has no register row.
+- **Next:** 🔴 Arpit runs prompt 15 (W-277). Someone commits the Cowork W-270 work and runs its `git rm`.
+
 ## 2026-10-11 — W-270 STOP filed (Arpit ran the decider)  ·  Claude Code (Opus 5.5)
 - **Asked:** Arpit pasted `decide.py`'s output: *STOP — the slice is 11, below 15*.
 - **Done:** VERDICT filed as his (hash unchanged); SR-SECTIONS STOP banner; run index, registry, IMPLEMENTATION; W-270 kept open with three options, rec. (a) close step 10 as measured. `decision.json` was already in `0727135b`: his run preceded that commit.

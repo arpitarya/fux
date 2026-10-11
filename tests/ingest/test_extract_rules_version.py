@@ -79,17 +79,17 @@ def test_the_digest_moves_when_the_constant_does(monkeypatch):
     guarding a value nothing reads.
     """
     root = configured_root()  # the digest reads `[limits]` from its formats.toml
-    before = _extract_config_digest(_Limits(), root)
+    before = _extract_config_digest(_Limits(), root, section_records=False)
     monkeypatch.setattr(extract_mod, "RULES_VERSION", extract_mod.RULES_VERSION + 1)
-    assert _extract_config_digest(_Limits(), root) != before
+    assert _extract_config_digest(_Limits(), root, section_records=False) != before
 
 
 def test_the_caps_are_still_in_the_digest_too():
     """`rules=` was ADDED to this digest, not substituted for what was there."""
     root = configured_root()
-    base = _extract_config_digest(_Limits(), root)
-    assert _extract_config_digest(_Limits(phrases=12), root) != base
-    assert _extract_config_digest(_Limits(rows=5), root) != base
+    base = _extract_config_digest(_Limits(), root, section_records=False)
+    assert _extract_config_digest(_Limits(phrases=12), root, section_records=False) != base
+    assert _extract_config_digest(_Limits(rows=5), root, section_records=False) != base
 
 
 def test_a_changed_decoder_cap_forces_re_extraction(tmp_path):
@@ -99,7 +99,7 @@ def test_a_changed_decoder_cap_forces_re_extraction(tmp_path):
     leave an index `fux ingest --check` calls current while every CSV it holds
     was cut at the old width. The new value is template + 1, never typed."""
     write_config(tmp_path)
-    before = _extract_config_digest(_Limits(), tmp_path)
+    before = _extract_config_digest(_Limits(), tmp_path, section_records=False)
     path = tmp_path / ".fux" / "formats.toml"
     shipped = typesfile.read(tmp_path).limits["csv"]["max_cell_chars"]
     text, n = re.subn(
@@ -108,4 +108,4 @@ def test_a_changed_decoder_cap_forces_re_extraction(tmp_path):
     assert n == 1, "exactly one max_cell_chars line, under [limits.csv]"
     path.write_text(text, encoding="utf-8")
     assert typesfile.read(tmp_path).limits["csv"]["max_cell_chars"] == shipped + 1
-    assert _extract_config_digest(_Limits(), tmp_path) != before
+    assert _extract_config_digest(_Limits(), tmp_path, section_records=False) != before

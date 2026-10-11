@@ -26,6 +26,17 @@ Rules:
 
 ---
 
+## 2026-10-11 — **W-274 closed: section records are opt-in (`fux.toml [index] section_records`, off by default)**
+
+| what | evidence |
+|---|---|
+| **code** | `config.py` (the required key, plus a one-key reader); `ingest/run.py` (no section records when off; a delta run refuses after a flip, and the last mode is recorded in `runtime/extract-config-digest`); `tune.py` and `node/src/config/tune.mjs` (`section_weight > 0` with the key off is a hard error naming both keys); `doctor.py` (`section records` row); the template and this repo's `fux.toml` write `false` |
+| **identity** | off: byte-identical to the same corpus indexed with the plane on and then rewritten without `sections` (`test_off_is_byte_identical_to_an_index_written_without_section_records`). On: `records/` + `docs/` ingested `--full` by `b4d961cd` and by this engine, and `diff -r` over `.fux/index/` was empty, with 81 section shards |
+| **records** | [SR-SECTIONS](../records/0161_sections.md) **d11**; [SR-CONFIG](../records/0113_config.md) key block, tree and diagram; [SR-DOTFUX](../records/0102_fux-directory.md); notes in SR-INGEST and SR-TUNE; SR-DOCTOR register row; no-decision notes in SR-ACQUIRED, SR-ARCHIVED-CONTENT, SR-PII, SR-URL-FRESHNESS and SR-NODE-SEARCH |
+| **tests** | `tests/query/test_section_records_switch.py` (10); the section fixtures set the key `true`; `test_extract_rules_version.py` passes the mode |
+| **this repo** | `fux ingest --full` with the key off removed the untracked `sections/` plane; doctor reads `off - whole documents only` |
+| **not decided here** | whether sections ship (W-278), how a section is cut or scored |
+
 ## 2026-10-11 — **W-276 closed: the post-commit hook pins its interpreter and is never silent**
 
 | what | evidence |

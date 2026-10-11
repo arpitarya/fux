@@ -46,7 +46,7 @@ def _init(tmp_path, files: dict[str, str]) -> None:
     listing = tmp_path / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
-    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / "fux.toml").write_text("[sources]\n\n[index]\nsection_records = true\n", encoding="utf-8")
     (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     write_config(tmp_path)
     for rel, text in files.items():

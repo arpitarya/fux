@@ -1,7 +1,7 @@
 ---
 type: Handoff
 name: W-274
-description: "Arpit's ask (2026-10-11, Cowork): section records become opt-in. By default fux indexes whole documents only; `fux.toml [index] section_records = true` adds the section plane. Ratified, not built."
+description: "Arpit's ask (2026-10-11, Cowork): section records become opt-in. By default fux indexes whole documents only; `fux.toml [index] section_records = true` adds the section plane. CLOSED 2026-10-11: built, both states byte-identical to their references."
 item: W-274
 filed: 2026-10-11
 ball: agent
@@ -9,7 +9,7 @@ ball: agent
 
 # W-274 — section records, off unless switched on
 
-**Status: OPEN — ratified, not built.**
+**Status: CLOSED 2026-10-11 — built (Claude Code, Opus 5.5), on `claude/gracious-galileo-aqrg8b`.** §Outcome below.
 
 **Arpit, 2026-10-11 (Cowork):** *"Right now fux indexes sections and documents
 both by default. I want it configurable, and by default it should just be
@@ -80,3 +80,21 @@ whether sections ship.
 ## Records this will touch
 
 SR-SECTIONS · SR-CONFIG · SR-DOTFUX (`sections/` now conditional) · CONFIG-SKILL.
+
+## Outcome (2026-10-11, Claude Code, Opus 5.5)
+
+| DoD | what landed |
+|---|---|
+| 1 · records | [SR-SECTIONS](../../records/0161_sections.md) **decision 11** (the plane is opt-in); [SR-CONFIG](../../records/0113_config.md) declares `index.section_records`; [SR-DOTFUX](../../records/0102_fux-directory.md) says `sections/` exists only when the key is on; notes in SR-INGEST and SR-TUNE; no-decision notes in SR-ACQUIRED, SR-ARCHIVED-CONTENT, SR-PII, SR-URL-FRESHNESS, SR-NODE-SEARCH |
+| 2 · the key | `config.py`: required boolean in `[index]`, no default in code; `config.section_records(root)` reads that one key for the tune loader. The template and this repo's `fux.toml` write `false` |
+| 3 · ingest | `ingest/run.py`: the two `_section_records` call sites build nothing when off, and the carried sections (both reuse sites) are dropped, so `store/writer.py` stamps no `nsec` and removes `sections/` |
+| 4 · the mode | **No committed byte carries it**, because both states are pinned byte for byte, so the index's mode is read off its section plane. A delta run refuses after a flip in either direction and names `fux ingest --full`. The one ambiguous case (on, nothing to section) is settled by a `section_records=` line the last completed run records in `runtime/extract-config-digest`; a fresh clone refuses once |
+| 5 · the mismatch | `tune.load` and Node's `loadTune` raise, naming both keys, when `section_weight > 0` and the key is `false` |
+| 6 · doctor | `section records` row: the mode; **error** on the mismatch; **warn** when off but a plane is committed. Registered in SR-DOCTOR |
+| 7 · tests | `tests/query/test_section_records_switch.py`, 10 tests: off is byte-identical to an index written without section records; on writes the plane; the flip refuses both ways and `--full` settles it; on-with-nothing-to-section does not refuse forever; the mismatch in Python and Node; a missing key; the template ships `false`; the doctor row. The section fixtures now set the key `true` |
+| 7 · on = `b4d961cd` | **byte-identical**, checked once by hand: `records/` + `docs/` of this repo ingested `--full` by `b4d961cd` (a worktree, its own `fill_missing`) and by this engine with the key on. `diff -r` over `.fux/index/` was empty, with 81 section shards |
+| 8 · docs | CONFIG-SKILL and its three seeded copies; the `fux.toml` template comment |
+
+**This repository:** the key is `false`, so `fux ingest --full` removed the
+untracked `.fux/index/sections/` the morning's runner had written, and doctor
+reads `off - whole documents only`.

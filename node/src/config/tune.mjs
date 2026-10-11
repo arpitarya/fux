@@ -372,7 +372,45 @@ export function loadTune(root, { enabled }) {
   }
   if (raw.startsWith(BOM)) raw = raw.slice(BOM.length);
   rejectConflictMarkers(label, raw);
-  return resolve(parseToml(raw, label), label);
+  const tune = resolve(parseToml(raw, label), label);
+  requireSectionRecords(root, tune.sectionWeight);
+  return tune;
+}
+
+/** `section_weight > 0` needs the plane it reads (W-274, SR-SECTIONS d11) —
+ *  `tune.py`'s `_require_section_records`. With `fux.toml [index]
+ *  section_records = false` ingest builds no plane, and a weight that read
+ *  nothing would be a silent zero. Reads that one key only. */
+function requireSectionRecords(root, sectionWeight) {
+  if (!(sectionWeight > 0)) return;
+  const path = join(root, fixed("files", "config"));
+  let data;
+  try {
+    data = parseToml(readFileSync(path, "utf8"), path);
+  } catch (err) {
+    if (err instanceof FuxError) throw err;
+    throw new FuxError(`${path}: cannot read [index] section_records (${err.message})`);
+  }
+  const value = data?.index?.section_records;
+  if (value === undefined) {
+    throw new FuxError(
+      `${path}: [index] section_records is missing - \`fux doctor --fix\` writes every ` +
+      "missing key from the template `fux setup` uses",
+    );
+  }
+  if (typeof value !== "boolean") {
+    throw new FuxError(
+      `${path}: [index] section_records must be true or false (got ${JSON.stringify(value)}). ` +
+      "false indexes whole documents only; true adds the section plane (.fux/index/sections/)",
+    );
+  }
+  if (!value) {
+    throw new FuxError(
+      `${root}/${TUNE_NAME}: [ranking] section_weight > 0 reads the section plane, but ` +
+      `${path} [index] section_records = false, so ingest builds none. Set ` +
+      "section_records = true and run `fux ingest --full`, or set section_weight = 0.0",
+    );
+  }
 }
 
 /** Validate a parsed tune file and build the `Tune` — or throw, naming every fault. */

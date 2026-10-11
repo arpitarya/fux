@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/refer/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@f44c2c09f8f9]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 58fee21fea9cab95b6184430ab3c759e46afbcebdb1bc826fe13327a2d58ed6c
+content_sha: e880c7300b67b87f4bff47c65eaac3a23fe16473224fd77f225fcefd3deed62b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -586,6 +586,8 @@ this moved where they are written, not what they are.
 **No decision here moved** (W-248, 2026-10-04): in `urlsrc.py` the "nothing readable" skip reason is spelled from `decoders.reason_nothing_readable`; nothing this record decides moved.
 
 **No decision here moved** (W-246, 2026-10-04): `refer/source.py`'s module docstring states L2 as amended on 2026-09-06; no code moved.
+
+**No decision here moved** (W-274, 2026-10-11): `config.py` gained `[index] section_records` (SR-SECTIONS decision 11). No URL freshness key moved.
 
 ### Consequences
 

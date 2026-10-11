@@ -7,11 +7,11 @@ description: "Why a Node reader exists, what it may and may not do, and the deci
 status: accepted
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@d24bb10f2dd5, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@746e45e8fd5b, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 3f694e75a1f79ac7fe137e39c4fed5d0c1c576127363d7b7e3ceb2b2b477f17f
+content_sha: 74c3843cc444a95d2e3466a12b1d94ec1371ce5c6d243cc9d00a8a71e6585438
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1068,6 +1068,8 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
 **No decision here moved** (W-261, 2026-10-05): Node modules followed their Python owners into files of their own — `derive/docstable.mjs`, `derive/manifest.mjs`, `derive/stamp.mjs`, `derive/stats.mjs`, `store/cachedir.mjs`, `ingest/dirlist.mjs`, and `maintain/runner.mjs` renamed `maintain/lock.mjs`; `verbs/find.mjs` declares `query/find.py` as its twin. The bundle's behaviour and every answer are byte-identical.
 
 **No decision here moved** (W-276, 2026-10-11): `doctor.py` gained a `git hooks` row (SR-MAINTENANCE decision 3a). The `node reader` rows this record describes did not move, and the Node reader installs no hooks.
+
+**No decision here moved** (W-274, 2026-10-11): `doctor.py` gained a `section records` row, and `config/tune.mjs` refuses `section_weight > 0` while `fux.toml [index] section_records = false`. That is the Python check transcribed under the differential law (SR-SECTIONS decision 11). The `node reader` rows did not move.
 
 
 **W-236 — section records (2026-10-10; branch `w236-sections`, unmerged).** The Node reader transcribes the whole plane: `section_weight` in `config/tune.mjs`, `Scoring.section`, the B2 term and `bestSection` in `rank.mjs`, the section pass in `scan.mjs`, and in the accelerator the section table, the postings, the widened ceiling and `isFresh` over section shards. The Node build writes `sections.json`, `sections/*.json` and `nsec` byte-identically to Python's. `fux lexical` forces the weight to `0.0`. The `section` hit key appears on `ask` only while the weight is on. `tests/query/test_sections_node_twin.py` holds Python and Node equal at `0.0`, `0.25` and `1.0`, on scan and `--fast` ([SR-SECTIONS](0161_sections.md)).

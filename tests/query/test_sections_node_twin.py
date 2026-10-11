@@ -60,7 +60,7 @@ def corpus(tmp_path_factory) -> Path:
     listing = root / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
-    (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (root / "fux.toml").write_text("[sources]\n\n[index]\nsection_records = true\n", encoding="utf-8")
     (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     write_config(root)
     files = {
