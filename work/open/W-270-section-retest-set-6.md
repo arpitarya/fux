@@ -9,7 +9,7 @@ ball: arpit
 
 # W-270 — the gain-only section term at λ = 2.0, re-tested on `set-6-claude`
 
-**Status: OPEN. 🟡 waits on W-273** phase 1. The test data landed 2026-10-11 ([W-272](../../archive/open/W-272-section-test-data-gen5.md), closed): seeds 89–112 and `questions/set-6-claude.jsonl`. Waits on (the build to pin; W-271's size ruling, option (b), landed 2026-10-10). Split 2026-10-10 (Arpit, Cowork): this item is the measurement only.
+**Status: OPEN. DoD 3 ✅ 2026-10-11** — the bar is frozen ([pre-registration](../regression/2026-10-11-section-retest-set-6/PRE-REGISTRATION.md)) on W-273 phase 1's engine `b4d961cd`. **Next: DoD 4, the generation-5 ladder.** The test data landed 2026-10-11 ([W-272](../../archive/open/W-272-section-test-data-gen5.md), closed).
 
 **Model:** DoD 2 — **Claude Opus, highest reasoning, in a fresh claude.ai chat**
 (the designated author, A1). DoD 3 — **Opus** (the bar is the deliverable and
@@ -19,7 +19,7 @@ procedure. DoD 6 — **Arpit** scores; the decider is a frozen script.
 | DoD | state | where |
 |---|---|---|
 | 1–2 · the test data (prompt 14, `set-6-claude`) | ✅ 2026-10-11 — **W-272** closed | [W-272](../../archive/open/W-272-section-test-data-gen5.md) |
-| 3 · the bar frozen and committed alone, **before** the ladder rebuild and before any arm — L13 shape; pins W-273 phase 1's engine | ⏳ | `work/regression/<date>-section-retest-set-6/PRE-REGISTRATION.md` |
+| 3 · the bar frozen and committed alone, **before** the ladder rebuild and before any arm — L13 shape; pins W-273 phase 1's engine | ✅ 2026-10-11 — `b4d961cd`; L13 defaults, C2 margin 2, slice read from counts as a range | [`PRE-REGISTRATION.md`](../regression/2026-10-11-section-retest-set-6/PRE-REGISTRATION.md) |
 | 4 · the ladder rebuilt from `seed/` alone (generation 5, a new baseline) | ⏳ | [`work/golden/README.md`](../golden/README.md) phase 4 · A23 |
 | 5 · capture: the engine W-273 phase 1 hands over (else `03fbf782`), three arms on a copy of the new `rung-01000` | ⏳ | the run's `report.md` |
 | 6 · 🔴 **Arpit** scores; a session that did not capture runs the frozen decider | ⏳ | the run's `VERDICT.md` |

@@ -38,7 +38,7 @@ here. Read that record before changing anything below it.
 
 ### testing
 
-- 🟡 **W-270** · `agent` — re-test the gain-only section term at λ = 2.0 on `set-6-claude` under L13: freeze the bar, rebuild the ladder, capture; Arpit scores. The test data landed (W-272, 2026-10-11); waits on W-273 phase 1. [detail](open/W-270-section-retest-set-6.md)
+- 🟢 **W-270** · `agent` — re-test the gain-only section term at λ = 2.0 on `set-6-claude` under L13. **The bar is frozen** (2026-10-11, engine `b4d961cd`). Next: rebuild the ladder (generation 5), capture three arms; Arpit scores. [detail](open/W-270-section-retest-set-6.md)
 - 🔴 **W-258** · `arpit` — one hands-on session on his machine: a journalled answer whose source then vanishes, a real 429 from a real host, and parallel CDP fetches in signed-in Chrome. Checklist and bars are written. [detail](open/W-258-live-network-captures.md)
 
 ### adr update
