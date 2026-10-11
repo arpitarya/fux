@@ -23,6 +23,11 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-11 — W-270 STOP filed (Arpit ran the decider)  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted `decide.py`'s output: *STOP — the slice is 11, below 15*.
+- **Done:** VERDICT filed as his (hash unchanged); SR-SECTIONS STOP banner; run index, registry, IMPLEMENTATION; W-270 kept open with three options, rec. (a) close step 10 as measured. `decision.json` was already in `0727135b`: his run preceded that commit.
+- **Next:** 🔴 Arpit rules (a) / (b) / (c).
+
 ## 2026-10-11 — W-270 scored by Arpit; totals filed, no decider run  ·  Claude Code (Opus 5.5)
 - **Asked:** Arpit pasted `just golden-score` output (4 arms, n = 110).
 - **Done:** totals filed in the report; scores committed. `sw-0.0` = pre-section (hit@1 79). `sw-2.0` hit@1 79, section pool misses 11 → 8, `other` 9 → 12. `sw-4.0` hit@1 68.

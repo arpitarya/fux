@@ -35,7 +35,12 @@ valuable judgement, but not the state of play.
 *Updated **2026-10-11** (Claude Code, Opus 5.5 — W-273 phase 1, W-270 DoD 3–5).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-10-11 (latest) — W-273 PHASE 1 LANDED; W-270 CAPTURED, LATENCY GUARDRAIL FAILED → ARPIT SCORES
+### 🟠 2026-10-11 (latest) — W-270 STOP: THE SECTION RE-TEST COULD NOT MEASURE THE TERM
+
+- Arpit scored and ran the decider: **STOP — slice 11 < 15** ([verdict](regression/2026-10-11-section-retest-set-6/VERDICT.md)). The baseline already ranks 49 of 60 tagged long-document questions first, so set 6 left little to win. Latency guardrail failed too (+328 ms).
+- **Open:** Arpit rules — (a) close step 10 as measured (rec.), (b) accept a slice of 11, (c) a third set.
+
+### 🔴 2026-10-11 — W-273 PHASE 1 LANDED; W-270 CAPTURED, LATENCY GUARDRAIL FAILED → ARPIT SCORES
 
 - **W-273 phase 1** (`b4d961cd`): no section records for `.csv`/`.json`/`.jsonl` (SR-SECTIONS d2, W-271 option b). Gates PASS, each identical to W-269's; this repo's section plane **8.0× → 1.756×** ([gates](regression/2026-10-11-section-formats-gates/report.md)).
 - **W-270:** bar frozen alone under L13 (`9ab19fc6`); the ladder rebuilt for gen 5 (`04e717ba`, **`rung-00100` = 118 docs by Arpit's ruling**); three arms captured. G0 · G1 · G3 PASS. 🔴 **Latency guardrail FAIL: +328 ms at `rung-10000`**, located in `scan._attach_sections` — the run cannot PASS; the score decides FAIL vs INCONCLUSIVE ([report](regression/2026-10-11-section-retest-set-6/report.md)).

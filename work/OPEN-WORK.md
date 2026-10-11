@@ -27,7 +27,7 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 1d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-270** — scored; slice **11 < floor 15**, so `decide.py` will STOP. Run it (or a fresh session), then rule what next. [the item](open/W-270-section-retest-set-6.md) | 2026-10-11 | 0d |
+| 🔴 **W-270** — STOP (slice 11 < 15; latency guardrail failed too). Rule what next: (a) close step 10 as measured — rec.; (b) accept a slice of 11; (c) a third set. [the item](open/W-270-section-retest-set-6.md) | 2026-10-11 | 0d |
 | ↳ **blocks:** W-273 phase 2 | | |
 
 ---
@@ -40,7 +40,7 @@ here. Read that record before changing anything below it.
 
 ### testing
 
-- 🔴 **W-270** · `arpit` — section term at λ = 2.0 on `set-6-claude`: scored 2026-10-11; slice 11 < floor 15 (decider will STOP); latency guardrail FAIL. Decider owed, then Arpit's call. [detail](open/W-270-section-retest-set-6.md)
+- 🔴 **W-270** · `arpit` — section term at λ = 2.0 on `set-6-claude`: **STOP** 2026-10-11 (slice 11 < 15); latency guardrail FAIL. Arpit rules what next; rec. close step 10. [detail](open/W-270-section-retest-set-6.md)
 - 🔴 **W-258** · `arpit` — one hands-on session on his machine: a journalled answer whose source then vanishes, a real 429 from a real host, and parallel CDP fetches in signed-in Chrome. Checklist and bars are written. [detail](open/W-258-live-network-captures.md)
 
 ### adr update

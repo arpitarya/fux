@@ -26,6 +26,14 @@ Rules:
 
 ---
 
+## 2026-10-11 — **W-270: STOP — the section re-test's slice is 11, below 15 (Arpit's run of the decider)**
+
+| what | evidence |
+|---|---|
+| **outcome** | [VERDICT](regression/2026-10-11-section-retest-set-6/VERDICT.md): STOP, a data defect — the baseline already hits 49 of 60 tagged section questions at rank 1; latency guardrail FAIL (+328 ms) recorded |
+| **state** | `section_weight` absent from `main`; SR-SECTIONS `proposed` with the STOP banner |
+| **not done** | Arpit's ruling on what next (W-270's options) |
+
 ## 2026-10-11 — **W-270 DoD 3–5: the bar frozen, the golden ladder generation 5, three arms captured**
 
 | what | evidence |

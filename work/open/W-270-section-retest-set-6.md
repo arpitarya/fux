@@ -9,7 +9,13 @@ ball: arpit
 
 # W-270 — the gain-only section term at λ = 2.0, re-tested on `set-6-claude`
 
-**Status: OPEN. 🔴 Scored by Arpit 2026-10-11; the decider is owed.** The baseline's `step10_section` `miss@1` is **11, below the frozen slice floor of 15**, so `evidence/decide.py` will STOP (L13: a data defect, never a verdict) — run by Arpit or a session that did not capture. Then what next is Arpit's: L13 says *a run that needs a smaller slice says so and asks Arpit*. The latency guardrail had already failed (+328 ms).
+**Status: OPEN. 🔴 STOP by the frozen decider (Arpit's run, 2026-10-11): the slice is 11, below 15** ([verdict](../regression/2026-10-11-section-retest-set-6/VERDICT.md)). A data defect, not a verdict on the term. The latency guardrail had failed too (+328 ms). **Arpit rules what next** (L13 d3: a smaller slice needs his word):
+
+| | option | what it costs |
+|---|---|---|
+| **(a) — recommended** | **close step 10 as measured**: two FAILs (W-236, W-269) and this STOP; SR-SECTIONS stays `proposed` with all three on it, not archived; W-273 phase 2 never runs; the branch's engine code stays unmerged | nothing more; a `b > 0.5` re-try or a faster attachment can reopen it with a new run |
+| (b) | accept a slice of 11 by ruling and let the decider read the arms | a loosened L13 default, and the latency row already rules out a PASS — it can only yield FAIL or INCONCLUSIVE |
+| (c) | a third question set, built so the baseline misses more long-document answers | another authoring round, and the latency guardrail still fails unless the attachment is rebuilt first |
 
 **Model:** DoD 2 — **Claude Opus, highest reasoning, in a fresh claude.ai chat**
 (the designated author, A1). DoD 3 — **Opus** (the bar is the deliverable and
@@ -22,7 +28,7 @@ procedure. DoD 6 — **Arpit** scores; the decider is a frozen script.
 | 3 · the bar frozen and committed alone, **before** the ladder rebuild and before any arm — L13 shape; pins W-273 phase 1's engine | ✅ 2026-10-11 — `b4d961cd`; L13 defaults, C2 margin 2, slice read from counts as a range | [`PRE-REGISTRATION.md`](../regression/2026-10-11-section-retest-set-6/PRE-REGISTRATION.md) |
 | 4 · the ladder rebuilt from `seed/` alone (generation 5, a new baseline) | ✅ 2026-10-11 — all eight frozen; `rung-00100` = 118 docs (Arpit's ruling) | [rebuild](../regression/2026-10-11-ladder-gen5-rebuild/report.md) |
 | 5 · capture: the engine W-273 phase 1 hands over (else `03fbf782`), three arms on a copy of the new `rung-01000` | ✅ 2026-10-11 — `b4d961cd`; G0, G1, G3 PASS; 🔴 **latency guardrail FAIL (+328 ms)**, so no PASS is possible | [report](../regression/2026-10-11-section-retest-set-6/report.md) |
-| 6 · 🔴 **Arpit** scores; a session that did not capture runs the frozen decider | ✅ scored 2026-10-11 (slice 11 < 15); ⏳ decider | the run's `report.md` |
+| 6 · 🔴 **Arpit** scores; a session that did not capture runs the frozen decider | ✅ 2026-10-11 — scored and decided by Arpit: **STOP, slice 11 < 15** | [VERDICT](../regression/2026-10-11-section-retest-set-6/VERDICT.md) |
 
 ## Why
 
