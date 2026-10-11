@@ -26,6 +26,15 @@ Rules:
 
 ---
 
+## 2026-10-11 — **W-273 phase 1: no section records for decoded record formats (unmerged)**
+
+| what | evidence |
+|---|---|
+| **code** | `b4d961cd` on `claude/gracious-galileo-aqrg8b`: `[index] sectionless_formats` (`.csv`, `.json`, `.jsonl`) in `constants.toml`; `extract._index_sections` skips them; `extract_rules` 4 → 5; the `section_weight` comment describes the gain-only term |
+| **records** | [SR-SECTIONS](../records/0161_sections.md) decision 2 amended (W-271's option b); dated notes in SR-EXTRACTED, SR-CONSTANTS, SR-TUNE, SR-FETCHER |
+| **gates** | [`2026-10-11-section-formats-gates`](regression/2026-10-11-section-formats-gates/report.md): G0, G1, G3 PASS, each byte-identical to W-269's; this repo's section plane **8.0× → 1.756×** |
+| **not done** | phase 2 (merge, `_format` v8, re-ingest, default) waits on [W-270](open/W-270-section-retest-set-6.md) |
+
 ## 2026-10-11 — **W-272 closed: generation 5 committed (`set-6-claude`)**
 
 | what | evidence |

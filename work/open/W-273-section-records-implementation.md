@@ -9,7 +9,7 @@ ball: agent
 
 # W-273 — section records: the implementation
 
-**Status: OPEN. 🟢 phase 1 is unblocked** — W-271 ruled 2026-10-10 (Arpit, Cowork, *"Go with the recommendation"*): **option (b)**. Phase 2 waits on a W-270 PASS.
+**Status: OPEN. ✅ Phase 1 landed 2026-10-11** (engine **`b4d961cd`**, [gates](../regression/2026-10-11-section-formats-gates/report.md) all PASS). **🟡 Phase 2 waits on a W-270 PASS.** W-271 ruled 2026-10-10 (Arpit, Cowork, *"Go with the recommendation"*): **option (b)**.
 
 **Arpit, 2026-10-10 (Cowork):** *"Create one work item for implementation and
 one work item if test data needs to be generated."* The data is
@@ -41,6 +41,15 @@ exist on `main`.
    repository's own section plane by format against the document plane — with
    (b) it should land near 1.9×.
 4. **Hand W-270 the engine commit to pin.** Both suites green, whole.
+
+**Phase 1, as landed (2026-10-11, Claude Code, Opus 5.5):**
+
+| step | state | evidence |
+|---|---|---|
+| 1 · option (b) | ✅ SR-SECTIONS d2 amended first; `[index] sectionless_formats` (`.csv`, `.json`, `.jsonl`) in `constants.toml`; `extract_rules` 4 → 5; Node unchanged (it does not ingest) | `b4d961cd` · `test_decoded_record_formats_are_sectionless`, which fails with the list emptied |
+| 2 · template comment | ✅ the gain-only form, in the template and this repo's `tune.toml` | `b4d961cd` |
+| 3 · gates | ✅ G0 0/90, G1 byte-identical to W-269's, G3 0 failures; the gen-4 ladder has none of the three formats, so each is an identity. Own repo **1.756×** (expected ~1.9×; the document plane grew 6.5 % since W-236) | [report](../regression/2026-10-11-section-formats-gates/report.md) |
+| 4 · the engine | ✅ **`b4d961cd`**, pinned by W-270's bar. ⚠ Suites: unit and e2e green apart from the known reds — the repo's own v7 index (2 unit, 12 Node; phase 2's re-ingest) and the ladder's missing gen-5 seeds (8 unit; W-270 DoD 4) | WORKLOG 2026-10-11 |
 
 ## Phase 2 — only on a W-270 PASS
 

@@ -34,7 +34,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-273** · `agent` — section records build: phase 1 option (b) as W-271 ruled (no sections for `.jsonl`/`.csv`/`.json`) + the gates, before W-270 captures; phase 2 the ship path on a PASS. **Opus.** [detail](open/W-273-section-records-implementation.md)
+- 🟡 **W-273** · `agent` — section records build. **Phase 1 ✅ 2026-10-11** (engine `b4d961cd`: no sections for `.jsonl`/`.csv`/`.json`; gates PASS). Phase 2, the ship path, waits on W-270 (a PASS). **Opus.** [detail](open/W-273-section-records-implementation.md)
 
 ### testing
 
