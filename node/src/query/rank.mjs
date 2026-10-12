@@ -15,16 +15,10 @@ import { pyRound9, cmpCodePoints } from "../compat/pyfloat.mjs";
 import { typeFor } from "./intent.mjs";
 
 export class Corpus {
-  constructor(n = 0, totalWlen = 0.0, secUnits = 0, secTotalWlen = 0.0) {
+  constructor(n = 0, totalWlen = 0.0) {
     this.n = n; this.totalWlen = totalWlen;
-    // W-236 — the section statistics (SR-SECTIONS decision 5): every section
-    // record plus every sectionless document as its own single section, and
-    // their weighted body + heading length. Zero, and never read, while
-    // `section_weight` is off; both generators fill them only when it is on.
-    this.secUnits = secUnits; this.secTotalWlen = secTotalWlen;
   }
   get avgWlen() { return this.n ? this.totalWlen / this.n : 0.0; }
-  get secAvgWlen() { return this.secUnits ? this.secTotalWlen / this.secUnits : 0.0; }
 }
 
 // `isArchivedLoc` is `ingest/gitdir.mjs`'s, imported rather than copied — the
@@ -138,9 +132,12 @@ export function rank(
       anchorTf, anchorOn ? (record.alen ?? 0) : 0,
     );
     if (sectionOn) {
-      // Gain-only since W-269: a document that gains nothing — every
-      // sectionless one — has nothing added, not `+ 0.0` (`rank.py`).
-      const [bestId, gain] = sectionGain(record, queryHashes, df, corpus, scoring, termWeights);
+      // The third form since W-278: a document that gains nothing — every
+      // sectionless one — has nothing added, not `+ 0.0` (`rank.py`). With no
+      // anchor fold, `S_doc'` is `s` itself and is not scored twice.
+      const [bestId, gain] = sectionGain(
+        record, queryHashes, df, corpus, scoring, termWeights, anchorTf === null ? s : null,
+      );
       const contribution = gain ? scoring.section * gain : 0.0;
       if (gain) s = s + contribution;
       sectionsOut.set(record.id, [bestId, contribution]);
@@ -216,29 +213,50 @@ export function rank(
   });
 }
 
-/** `G(d) = max(0, max_k S_sec(d#s_k) − S_self(d))` and the section that earned
- *  it — `rank.py::_section_gain`, SR-SECTIONS decision 5, gain-only (W-269).
+/** `G(d) = max(0, max_k S_sec*(d#s_k) − S_doc'(d))` and the section that
+ *  earned it — `rank.py::_section_gain`, SR-SECTIONS decision 5, the third
+ *  form (W-278).
  *
- *  `S_sec` and `S_self` are the SAME `scoreRecord` over the body and heading
- *  slots only, with the DOCUMENT's `df` and `n` and the SECTION `avgWlen`.
- *  A sectionless document is its own single section, so its gain is zero by
- *  construction and nothing is scored for it. Ties go to the lowest `k`; a
- *  gain of zero names no section. */
-function sectionGain(record, queryHashes, df, corpus, scoring, termWeights) {
+ *  `S_sec*` scores a section as the short document it would be: its own body
+ *  and heading slots plus the parent's title, path and ctx slots and their
+ *  lengths, on the DOCUMENT's `df`, `n` and `avgWlen`. `S_doc'` is the
+ *  document without the anchor fold; `sDoc` hands it in, `null` scores it
+ *  here. Only sections matching on their own words are in `secs` (Arpit,
+ *  2026-10-13). Ties go to the lowest `k`; a gain of zero names no section. */
+function sectionGain(record, queryHashes, df, corpus, scoring, termWeights, sDoc) {
   if (!record.nsec) return [null, 0.0];
-  const avg = corpus.secAvgWlen;
+  const secs = record.secs;
+  if (!secs || secs.length === 0) return [null, 0.0];
+  const avg = corpus.avgWlen;
+  const terms = record.terms || {};
+  const docFlen = [...(record.flen || [])];
+  const flenTail = docFlen.slice(SECTION_SLOTS);
+  const tfTail = new Map();
+  for (const h of queryHashes) {
+    const tf = terms[h];
+    if (tf === undefined) continue;
+    const tail = tf.slice(SECTION_SLOTS);
+    if (tail.some((c) => c)) tfTail.set(h, tail);
+  }
+  const pad = new Array(SECTION_SLOTS).fill(0);
   let bestK = null, best = 0.0;
-  for (const [k, flen, terms] of record.secs || []) {
-    const s = scoreRecord(terms, flen, queryHashes, df, corpus.n, avg, scoring, termWeights);
+  for (const [k, flen, secTerms] of secs) {
+    const unitTerms = {};
+    for (const h of queryHashes) {
+      const own = secTerms[h];
+      const tail = tfTail.get(h);
+      if (own === undefined && tail === undefined) continue;
+      const head = own !== undefined ? [...own, ...pad].slice(0, SECTION_SLOTS) : [...pad];
+      unitTerms[h] = [...head, ...(tail || [])];
+    }
+    const unitFlen = [...[...flen, ...pad].slice(0, SECTION_SLOTS), ...flenTail];
+    const s = scoreRecord(unitTerms, unitFlen, queryHashes, df, corpus.n, avg, scoring, termWeights);
     if (s > best) { bestK = k; best = s; }
   }
   if (bestK === null) return [null, 0.0];
-  const terms = {};
-  for (const [h, tf] of Object.entries(record.terms || {})) terms[h] = tf.slice(0, SECTION_SLOTS);
-  const whole = scoreRecord(
-    terms, [...(record.flen || [])].slice(0, SECTION_SLOTS), queryHashes, df, corpus.n, avg,
-    scoring, termWeights,
-  );
-  if (best <= whole) return [null, 0.0];
-  return [sectionId(record.id, bestK), best - whole];
+  if (sDoc === null) {
+    sDoc = scoreRecord(terms, docFlen, queryHashes, df, corpus.n, avg, scoring, termWeights);
+  }
+  if (best <= sDoc) return [null, 0.0];
+  return [sectionId(record.id, bestK), best - sDoc];
 }

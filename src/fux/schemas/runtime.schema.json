@@ -23,7 +23,7 @@
     "above, in a new costume."
   ],
 
-  "schema": "fux.runtime.v10",
+  "schema": "fux.runtime.v11",
 
   "postings_block_line": {
     "_doc": [
@@ -193,11 +193,9 @@
     "fields": {
       "n":            { "type": "int",  "doc": "documents in the index" },
       "total_flen":   { "type": "list", "of": "int", "len": 5, "doc": "raw per-field token totals" },
-      "total_anchor_len": { "type": "int", "doc": "corpus-wide anchor token total -- avg_wlen's sixth term, at the query's own anchor weight (W-168 step 1)" },
-      "sec_units":    { "type": "int",  "doc": "section units: every section record, plus every sectionless document, which is its own single section (W-236, SR-SECTIONS d5)" },
-      "sec_total_flen": { "type": "list", "of": "int", "len": 2, "doc": "raw body and heading token totals over those units -- the section avg_wlen, weighted at query time" }
+      "total_anchor_len": { "type": "int", "doc": "corpus-wide anchor token total -- avg_wlen's sixth term, at the query's own anchor weight (W-168 step 1)" }
     },
-    "example": { "n": 508, "sec_total_flen": [637866, 21752], "sec_units": 1630, "total_anchor_len": 4180, "total_flen": [637866, 21752, 3380, 4524, 0] }
+    "example": { "n": 508, "total_anchor_len": 4180, "total_flen": [637866, 21752, 3380, 4524, 0] }
   },
 
   "section_table": {

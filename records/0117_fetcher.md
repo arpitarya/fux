@@ -7,10 +7,10 @@ description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher
 status: accepted
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@d3d8a58c793b]
+owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@88b0a5bf4178]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 2c551d764fbe913f4e86b9b639371dd7ec94a6d38a8e00dd8d0dd90368ef5e6e
+content_sha: 98cf6dbbf3021937204c7f3865a0d323c81424c2f4b28c5d5eac188889261c43
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -694,6 +694,8 @@ copied out, never imported.
 **No decision here moved** (W-246, 2026-10-04): `templates/output.toml.txt` gained the `[cli.answer] journal_max_bytes` key.
 
 **No decision here moved** (W-273, 2026-10-11): `templates/tune.toml.txt`'s `section_weight` comment now describes the gain-only term ([SR-TUNE](0135_tuning.md), [SR-SECTIONS](0161_sections.md) decision 5); comment bytes only.
+
+**No decision here moved** (W-278, 2026-10-13): `src/fux/templates/tune.toml.txt` changed the `section_weight` comment only ([SR-TUNE](0135_tuning.md)).
 
 ### Consequences
 

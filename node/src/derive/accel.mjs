@@ -18,16 +18,21 @@
  *
  * Owned, with its Python twin, by [SR-T1-ACCELERATOR](../../../records/0110_accelerator.md).
  */
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { FuxError } from "../errors.mjs";
 import { idf, deriveWlen, scoreRecord } from "../query/bm25f.mjs";
 import { Corpus, rank, Weighting } from "../query/rank.mjs";
 import { queryTermHashes } from "../query/scan.mjs";
 import { identifiersFor } from "../query/identifiers.mjs";
-import { iterSectionPaths, iterShardPaths } from "../store/reader.mjs";
 import { pyRound9 } from "../compat/pyfloat.mjs";
 import * as fmt from "./format.mjs";
+import { isFresh, readStamp } from "./fresh.mjs";
+
+// `isFresh` and `readStamp` live in `fresh.mjs` since W-278, so the scan can
+// ask whether the runtime is fresh without importing this module, which
+// imports the scan (the bundle refuses an import cycle).
+export { isFresh, readStamp };
 
 /** Lazily-loaded handle on `.fux/runtime/`, for ONE call. */
 export class Runtime {
@@ -162,58 +167,6 @@ export function minedTable(root) {
   return raw.pairs.map(([s, l]) => [[...s], [...l]]);
 }
 
-//: One `"name":[size,mtime_ns]` pair of `stamp.json`'s `shards`, kept as text.
-//: 🔴 **Never `JSON.parse` the stamp.** `mtime_ns` is ~1.79e18, past 2^53, so a
-//: `Number` rounds it, the check never matches, and Node would scan forever
-//: while every test still passed (W-242 step 6).
-const STAMP_PAIR_RE = /"([^"\\]+)":\[(\d+),(\d+)\]/g;
-
-/** `{name: [size, mtimeNs]}` as BigInts, or `null` on a stamp this cannot read. */
-export function readStamp(text) {
-  const start = text.indexOf("\"shards\":{");
-  if (start < 0) return null;
-  const out = new Map();
-  STAMP_PAIR_RE.lastIndex = start;
-  let m;
-  while ((m = STAMP_PAIR_RE.exec(text)) !== null) {
-    const [, name, size, mtime] = m;
-    out.set(name, [BigInt(size), BigInt(mtime)]);
-  }
-  return out;
-}
-
-/** Cheap staleness check: shard sizes and mtimes against the build stamp.
- *  `accel.py::is_fresh`, exactly — and anything it cannot read is NOT fresh. */
-export function isFresh(root) {
-  const directory = fmt.runtimeDir(root);
-  const stampPath = join(directory, fmt.STAMP_NAME);
-  const manifestPath = join(directory, fmt.MANIFEST_NAME);
-  if (!existsSync(stampPath) || !existsSync(manifestPath)) return false;
-  let manifest, stamp;
-  try {
-    manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-    stamp = readStamp(readFileSync(stampPath, "utf8"));
-  } catch {
-    return false;
-  }
-  if (stamp === null || manifest === null || typeof manifest !== "object") return false;
-  if (manifest.schema !== fmt.RUNTIME_SCHEMA) return false;
-  const fields = Array.isArray(manifest.docs_fields) ? manifest.docs_fields : [];
-  if (fields.length !== fmt.DOCS_FIELDS.length || fields.some((f, i) => f !== fmt.DOCS_FIELDS[i])) return false;
-
-  // W-236: the section shards are stamped beside the document shards, under
-  // `sections/<name>`, so a commit that rewrote only a section shard is seen.
-  const paths = [...iterShardPaths(root), ...iterSectionPaths(root)];
-  if (paths.length !== stamp.size) return false;
-  for (const path of paths) {
-    const entry = stamp.get(fmt.stampName(path));
-    if (entry === undefined) return false;
-    const st = statSync(path, { bigint: true });
-    if (st.size !== entry[0] || st.mtimeNs !== entry[1]) return false;
-  }
-  return true;
-}
-
 /** Is a plane present AND fresh? The one test `runQuery` makes before `--fast`. */
 export function usable(root) {
   return existsSync(join(fmt.runtimeDir(root), fmt.STATS_NAME)) && isFresh(root);
@@ -233,10 +186,6 @@ export function accelCandidates(runtime, queryHashes, top, { skipping, weighting
   const corpus = new Corpus(
     stats.n,
     deriveWlen([...stats.total_flen], scoring, Number(stats.total_anchor_len ?? 0)),
-    // W-236: read only when the best-section term is on, exactly as the scan
-    // sums them only then. `isFresh` refuses a pre-v10 plane.
-    scoring.sectionOn ? Number(stats.sec_units) : 0,
-    scoring.sectionOn ? deriveWlen([...stats.sec_total_flen], scoring) : 0.0,
   );
   if (corpus.n === 0) {
     const df = {};

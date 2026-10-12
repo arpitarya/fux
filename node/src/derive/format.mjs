@@ -21,6 +21,7 @@ import { SECTIONS_DIR } from "../store/format.mjs";
 
 export const RUNTIME_DIR = fixed("runtime", "dir");
 export const BLOCK_SIZE = fixed("runtime", "block_size");
+// v11 (W-278): `stats.json` dropped the section statistics (`format.py`).
 export const RUNTIME_SCHEMA = fixed("runtime", "schema");
 export const DOCS_FIELDS = fixed("runtime", "docs_fields");
 export const DOCS_NAME = fixed("runtime", "docs");

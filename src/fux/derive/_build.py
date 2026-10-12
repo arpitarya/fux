@@ -267,7 +267,6 @@ def _read_committed(root: Path, progress=None):
 
     stats = stats_plane.payload(
         n=total_docs, total_flen=total_flen, total_anchor_len=total_anchor_len,
-        sec_units=sections["units"], sec_total_flen=sections["total_flen"],
     )
     # `records` rides along so the graph plane needs no second pass over the
     # shards; it is already sorted by id, which is what makes it usable.
@@ -307,16 +306,15 @@ def _read_section_plane(root: Path, shard_stamp: list) -> list[tuple[str, int, l
 
 
 def _section_planes(docs: list[dict], section_lines) -> dict:
-    """The section table, its postings and its statistics — and the two planes held together.
+    """The section table and its postings — and the two planes held together.
 
     🔴 **`fux build` refuses an index whose planes disagree** (SR-SECTIONS
     decision 9): a section line with no parent document, or a document whose
     `nsec` is not the number of section lines under its id. Refuse rather than
     diverge — the same rule as the document plane's.
 
-    The statistics count a SECTIONLESS document as its own single section
-    (decision 5), over its body and heading slots, which is exactly what the
-    scan sums off the raw bytes.
+    No section statistic is derived: since W-278 every unit is scored on the
+    document `avg_wlen` (decision 5).
     """
     docidx_of = {doc["id"]: i for i, doc in enumerate(docs)}
     counts: dict[str, int] = {}
@@ -339,22 +337,13 @@ def _section_planes(docs: list[dict], section_lines) -> dict:
                 f"`fux ingest` to rewrite both. Refusing to build."
             )
     rows.sort(key=lambda row: (row[0], row[1]))
-    total_flen = [0] * store_mod.SECTION_SLOTS
     postings: dict[str, list[tuple[int, list[int]]]] = {}
-    for secidx, (_idx, _k, flen, terms) in enumerate(rows):
-        for i, count in enumerate(flen[: store_mod.SECTION_SLOTS]):
-            total_flen[i] += count
+    for secidx, (_idx, _k, _flen, terms) in enumerate(rows):
         for term, tf in terms.items():
             postings.setdefault(term, []).append((secidx, list(tf)))
-    sectionless = [doc for doc in docs if doc["nsec"] == 0]
-    for doc in sectionless:
-        for i, count in enumerate(doc["flen"][: store_mod.SECTION_SLOTS]):
-            total_flen[i] += count
     return {
         "rows": [[idx, k, list(flen)] for idx, k, flen, _ in rows],
         "postings": postings,
-        "units": len(rows) + len(sectionless),
-        "total_flen": total_flen,
     }
 
 

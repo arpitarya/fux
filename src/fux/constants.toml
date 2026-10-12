@@ -212,7 +212,7 @@ header = "# loc\tkind\tsha\tdecoder\tfetcher"
 
 [runtime]
 dir          = "runtime"
-schema       = "fux.runtime.v10"
+schema       = "fux.runtime.v11"
 block_size   = 128
 docs_fields  = ["id", "loc", "title", "flen", "archived", "superseded", "mtime", "alen", "nsec"]
 docs         = "docs.jsonl"

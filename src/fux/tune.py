@@ -284,8 +284,10 @@ class Tune:
     #: `1 + intent_weight`. ⚠ **Inert without a `[doctype]` table**, whatever
     #: its value.
     intent_weight: float
-    #: W-236 — B2's λ: a document's score gains `section_weight` times its best
-    #: section's score (SR-SECTIONS decision 5). `0.0` never opens the plane.
+    #: W-278 — the section term's λ, in [0, 1]: a document's score moves
+    #: `section_weight` of the way toward its best section scored as a short
+    #: document (SR-SECTIONS decision 5). `1.0` is pure max; above it is
+    #: refused. `0.0` never opens the plane.
     section_weight: float
 
     # [graph]
@@ -689,7 +691,7 @@ def _resolve(data: dict, label: "Path | str") -> Tune:
         "expand_weight": read("ranking", "expand_weight", _non_negative),
         "mined_weight": read("ranking", "mined_weight", _non_negative),
         "intent_weight": read("ranking", "intent_weight", _non_negative),
-        "section_weight": read("ranking", "section_weight", _non_negative),
+        "section_weight": read("ranking", "section_weight", _fraction),
         "damping": read("graph", "damping", _fraction),
         "iterations": read("graph", "iterations", _whole),
         "laziness": read("graph", "laziness", _fraction),

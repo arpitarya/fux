@@ -11,7 +11,7 @@ feature: "`.fux/runtime/stamp.json` — the cheap staleness pre-filter, and its 
 owns: [node/src/derive/stamp.mjs@e54866f6479b, src/fux/derive/stamp.py@4ed944c99464]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 3fa9425f233986f6b0adcf52ccf0ca7a74096fd7f8395bec95c56b62bba23fd2
+content_sha: 83ab32b7a6c8aae97a74e296077cd2474330f1747d951488c054b7f36e1f06b6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -139,6 +139,8 @@ this moved where they are written, not what they are.
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `stamp.json` stamps every **section shard** too, under `sections/<name>`, and `accel.is_fresh` compares the document and section shard lists together ([SR-SECTIONS](0161_sections.md) decision 7).
+
+**No decision here moved** (W-278, 2026-10-13): the stamp is unchanged. `is_fresh`, which reads it, now also gates the scan's section route ([SR-SECTIONS](0161_sections.md) decision 7), and its Node twin moved to `node/src/derive/fresh.mjs`.
 
 ### Consequences
 

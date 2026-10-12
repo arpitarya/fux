@@ -113,6 +113,9 @@ BLOCK_SIZE = fixed("runtime", "block_size")
 #: from the committed `.fux/index/sections/`, and the stamp and manifest pin
 #: those shards beside the document shards. A v9 plane has none of it and is
 #: refused and rebuilt rather than read as "no sections".
+#: v11 (2026-10-13, W-278): `stats.json` drops `sec_units` and
+#: `sec_total_flen` — the section term scores every unit on the document
+#: `avg_wlen`. A v10 plane is refused and rebuilt by name.
 RUNTIME_SCHEMA = fixed("runtime", "schema")
 
 #: v3 (W-76 Phase 1 record half): `mx` and `mnw` become PER-FIELD arrays.

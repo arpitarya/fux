@@ -10,9 +10,11 @@ What is pinned here, in the record's order:
    `--json` hit are what they were without section records.
 4. **The differential law at λ > 0**: the scan and the accelerator — skipping
    on — return identical lists, and the widened ceiling still bounds. **The
-   term is gain-only** (W-269): a sectionless document scores at every λ
-   exactly what it scores at 0.0, and a document whose words are spread over
-   its sections gains nothing.
+   term is the third form** (W-278): the best section scored as a short
+   document — its own body and heading plus the parent's title, path and ctx,
+   on the document yardstick — and `λ = 1` is pure max. A sectionless
+   document scores at every λ exactly what it scores at 0.0; a document whose
+   words are spread, or that matches only in its title, gains nothing.
 5. **The two planes are held together** (decision 9): `fux build` refuses a
    disagreement rather than diverging.
 6. **Carried with the document** (decision 8): an unchanged document keeps its
@@ -235,7 +237,7 @@ def test_a_sectionless_hit_names_no_section(corpus):
 SECTIONLESS = ("file:docs/short.md", "file:docs/rollback-note.md", "file:docs/one-section.md")
 
 
-@pytest.mark.parametrize("weight", [0.25, 0.5, 1.0, 2.0, 4.0])
+@pytest.mark.parametrize("weight", [0.25, 0.5, 1.0])
 @pytest.mark.parametrize("query", ["rollback canary deploy script", "staged rollout rollback", "rollback"])
 def test_a_sectionless_document_scores_exactly_what_it_scores_at_zero(corpus, weight, query):
     """W-269's G3 on the fixture: the gain-only term gives a sectionless
@@ -255,11 +257,11 @@ def test_a_sectionless_document_scores_exactly_what_it_scores_at_zero(corpus, we
 
 
 def test_a_document_whose_words_are_spread_gains_nothing(corpus):
-    """Each section holds half of the tf; the document as one unit holds all
-    of it, so `max_k S_sec <= S_self` and `G = 0`."""
+    """Each section holds half of the tf; the document holds all of it at a
+    length barely longer, so `max_k S_sec* <= S_doc'` and `G = 0`."""
     stats: dict = {}
     off = {r.id: r.score for r in scan.ask(corpus, "zebra quokka", 5, scoring=OFF)}
-    results = scan.ask(corpus, "zebra quokka", 5, scoring=on(2.0), stats_out=stats)
+    results = scan.ask(corpus, "zebra quokka", 5, scoring=on(1.0), stats_out=stats)
     spread = next(r for r in results if r.id == "file:docs/spread.md")
     assert store.read_index(corpus)["file:docs/spread.md"]["nsec"] == 2
     assert spread.score == off["file:docs/spread.md"]
@@ -267,20 +269,102 @@ def test_a_document_whose_words_are_spread_gains_nothing(corpus):
     assert stats["sections"]["file:docs/spread.md"] == (None, 0.0)
 
 
-def test_the_gain_is_the_best_section_minus_the_document_as_one_unit(corpus):
-    """The `--why` contribution is `λ · G`, and G is strictly below the best
-    section's own score: the document's whole-unit score is subtracted."""
+def _section_as_document(root, doc_id: str, k: int, query: str) -> float:
+    """`S_sec*`, by hand: the section's own body and heading slots, the
+    parent's title, path and ctx slots, on the DOCUMENT statistics."""
+    from fux.query.bm25f import score_record
+
+    hashes = scan.query_term_hashes(query)
+    candidates, df, corpus_stats = scan.scan_candidates(root, hashes, scoring=on(1.0))
+    parent = next(r for r in candidates if r["id"] == doc_id)
+    section = next(s for s in store.read_sections(root)[doc_id] if s["id"].endswith(f"#s{k}"))
+    slots = store.SECTION_SLOTS
+    terms = {}
+    for h in hashes:
+        own = section["terms"].get(h)
+        tail = parent["terms"].get(h, [])[slots:]
+        if own is None and not any(tail):
+            continue
+        terms[h] = (list(own or []) + [0] * slots)[:slots] + list(tail)
+    flen = (list(section["flen"]) + [0] * slots)[:slots] + list(parent["flen"])[slots:]
+    return score_record(terms, flen, hashes, df, corpus_stats.n, corpus_stats.avg_wlen, on(1.0))
+
+
+def test_at_one_the_document_scores_its_best_section_as_a_document(corpus):
+    """W-278's max form: at `λ = 1` the long document's score IS its best
+    section's score as a stand-alone document — no bonus on top."""
     query = "rollback canary deploy script"
-    one = {}
-    two = {}
-    scan.ask(corpus, query, 5, scoring=on(1.0), stats_out=one)
-    scan.ask(corpus, query, 5, scoring=on(2.0), stats_out=two)
-    sec_id, gain = one["sections"]["file:docs/runbook.md"]
-    assert sec_id == "file:docs/runbook.md#s2" and gain > 0
-    assert two["sections"]["file:docs/runbook.md"] == (sec_id, 2.0 * gain)
+    got = {r.id: r for r in scan.ask(corpus, query, 10, scoring=on(1.0))}
+    off = {r.id: r.score for r in scan.ask(corpus, query, 10, scoring=OFF)}
+    want = _section_as_document(corpus, "file:docs/runbook.md", 2, query)
+    assert want > off["file:docs/runbook.md"]
+    assert got["file:docs/runbook.md"].score == pytest.approx(want, rel=1e-12)
 
 
-@pytest.mark.parametrize("weight", [0.1, 0.25, 0.5, 1.0, 4.0])
+def test_the_parent_title_is_folded_into_the_section(corpus):
+    """`runbook` is in the parent's title and path, never in section 2: the
+    section-as-document carries it, so it scores above the section alone."""
+    with_title = _section_as_document(corpus, "file:docs/runbook.md", 2, "rollback runbook")
+    alone = _section_as_document(corpus, "file:docs/runbook.md", 2, "rollback")
+    assert with_title > alone
+
+
+def test_a_match_only_in_the_parents_slots_gains_nothing(corpus):
+    """Own-match only (Arpit, 2026-10-13): `docs` is in every path and in no
+    section's own body or heading, so no section is scored and the document
+    is unmoved. (`runbook` would not do: the `# Operations runbook` heading
+    folds into section 1's heading slot.)"""
+    stats: dict = {}
+    off = {r.id: r.score for r in scan.ask(corpus, "docs", 50, scoring=OFF)}
+    got = {r.id: r for r in scan.ask(corpus, "docs", 50, scoring=on(1.0), stats_out=stats)}
+    assert got["file:docs/runbook.md"].score == off["file:docs/runbook.md"]
+    assert stats["sections"]["file:docs/runbook.md"] == (None, 0.0)
+
+
+@pytest.mark.parametrize("weight", [0.25, 0.5, 1.0])
+@pytest.mark.parametrize("query", ["rollback canary deploy script", "filler queues", "appendix tooling servers"])
+def test_the_contribution_never_exceeds_the_documents_lift_to_its_section(corpus, weight, query):
+    """G4's construction: `λ · G` is linear in λ, and at `λ = 1` the score is
+    the best section's own — so no λ adds more than the gap to it."""
+    one: dict = {}
+    this: dict = {}
+    scan.ask(corpus, query, 50, scoring=on(1.0), stats_out=one)
+    scan.ask(corpus, query, 50, scoring=on(weight), stats_out=this)
+    for doc, (sec_id, contribution) in this["sections"].items():
+        assert one["sections"][doc][0] == sec_id
+        assert contribution == pytest.approx(weight * one["sections"][doc][1], rel=1e-12)
+        assert contribution <= one["sections"][doc][1]
+
+
+@pytest.mark.parametrize("weight", [0.5, 1.0])
+@pytest.mark.parametrize("query", ["rollback canary deploy script", "filler queues", "appendix tooling servers"])
+def test_the_scan_reads_the_same_sections_from_the_runtime_and_the_committed_plane(
+    corpus, tmp_path, weight, query
+):
+    """W-278 DoD 2: with a fresh runtime the scan reads the derived section
+    table; without one it reads the committed plane by byte pattern. Same
+    `secs`, so the same ranking and the same `--why` seam."""
+    import shutil
+
+    fresh: dict = {}
+    want = scan.ask(corpus, query, 50, scoring=on(weight), stats_out=fresh)
+    stale = tmp_path / "stale"
+    shutil.copytree(corpus, stale)
+    shutil.rmtree(stale / ".fux" / "runtime")
+    assert not accel.is_fresh(stale)
+    committed: dict = {}
+    got = scan.ask(stale, query, 50, scoring=on(weight), stats_out=committed)
+    assert [(r.id, r.score, r.section) for r in got] == [(r.id, r.score, r.section) for r in want]
+    assert committed["sections"] == fresh["sections"]
+
+
+def test_the_runtime_stats_carry_no_section_average(corpus):
+    """SR-RUNTIME-STATS, W-278: one yardstick, so nothing reads a section mean."""
+    stats = json.loads((corpus / ".fux" / "runtime" / "stats.json").read_text(encoding="utf-8"))
+    assert not {"sec_units", "sec_total_flen"} & set(stats)
+
+
+@pytest.mark.parametrize("weight", [0.1, 0.25, 0.5, 1.0])
 @pytest.mark.parametrize("top", TOPS)
 @pytest.mark.parametrize("query", ["rollback canary deploy script", "filler queues", "appendix tooling servers"])
 def test_the_accelerator_equals_the_scan_at_every_weight(corpus, weight, top, query):

@@ -7,10 +7,10 @@ description: "src/fux/constants.toml holds every fixed engine value — schema i
 status: accepted
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@d1fbbad60de4]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@d095444e26b8]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 150031cdf76c7234084bddd9b458ce4e8adea4fc638d417296764513bdbe3a01
+content_sha: 9ee8df6eadb3bfa446550920d2ce9f55ae3f354c33a7959c92807788b24e1cdd
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -194,6 +194,8 @@ pattern. A consumer who wants other cues is I2, which is not built.
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** New fixed keys: `[index] sections_dir`, `section_sep` (`#s`), `section_fields` (`["body", "heading"]`, a prefix of `tf_fields` checked at import); `[runtime] sections_dir`, `section_table`; `docs_fields` gains `nsec`; `[index] schema` → `fux.index.v8`, `[runtime] schema` → `fux.runtime.v10`, `[versions] extract_rules` → 4 ([SR-SECTIONS](0161_sections.md)).
 
 **W-273 (2026-10-11; same branch, unmerged).** New fixed key `[index] sectionless_formats` (`[".csv", ".json", ".jsonl"]`): the closed list of extensions that get no section records ([SR-SECTIONS](0161_sections.md) decision 2). It decides committed bytes, so it is fixed and never a tunable. `[versions] extract_rules` → 5.
+
+**W-278 — `[runtime] schema` is `fux.runtime.v11` (2026-10-13; branch, unmerged).** The section statistics left `stats.json`, so a v10 plane is refused by name and rebuilt.
 
 ### Consequences
 

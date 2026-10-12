@@ -12,7 +12,7 @@ owns: [src/fux/query/provenance.py@767faae00e0c]
 laws: [L2, L4, L5, L9]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 9b84d46d833d3dedd5490d4fb11b7515cf86c2b7cd5c0ec89e119a7dfde7654a
+content_sha: 6240f97eaaa97a57aa01b4c5f0ca67c705cca97e97733b0b6206c33f7d87380f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -562,6 +562,8 @@ Provenance analyzes the question with the repo's identifier families, as the ran
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** A derivation document carries **`section: {id, contribution}`** while `section_weight > 0`, absent otherwise, through `stats_out["sections"]` from `rank()`, the existing seam. `score = (Σ contribution + section.contribution) × rerank_uplift × multiplier`. The stderr line names it as `section s<k> +x` ([SR-SECTIONS](0161_sections.md) decision 6).
+
+**No decision here moved** (W-278, 2026-10-13): the section term's form changed under `--why`'s `section` key ([SR-SECTIONS](0161_sections.md) decision 5); the key, its shape and its meaning — `λ · G` — are unchanged.
 
 ### Consequences
 

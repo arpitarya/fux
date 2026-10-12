@@ -170,6 +170,28 @@ def test_node_refuses_the_same_mismatch(tmp_path):
     assert out.strip() == "LOADED", out
 
 
+def test_a_section_weight_above_one_is_refused(tmp_path):
+    """W-278, SR-TUNE: `λ > 1` extrapolates past the section's own score."""
+    root = _repo(tmp_path, on=True)
+    _set_weight(root, 1.5)
+    with pytest.raises(FuxError, match=r"section_weight must be between 0 and 1"):
+        tune.load(root, enabled=True)
+    _set_weight(root, 1.0)
+    tune.load(root, enabled=True)
+
+
+@pytest.mark.skipif(NODE is None, reason="node is not installed")
+def test_node_refuses_a_section_weight_above_one(tmp_path):
+    root = _repo(tmp_path, on=True)
+    _set_weight(root, 1.5)
+    script = (
+        f"import({str(FUX_MJS)!r}).then(m => {{ try {{ m.loadTune({str(root)!r}, {{enabled: true}}); "
+        "console.log('LOADED'); } catch (e) { console.log(e.message); } })"
+    )
+    out = subprocess.run([NODE, "-e", script], capture_output=True, text=True, encoding="utf-8").stdout
+    assert "section_weight must be between 0 and 1" in out, out
+
+
 # -- 5. the key is required ---------------------------------------------------------
 
 

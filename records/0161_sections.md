@@ -3,15 +3,15 @@ type: Standing Record
 kind: component
 name: SR-SECTIONS
 title: "SR-SECTIONS (0161) — section records: a doc#section plane beside the document plane, folded back to one result per document"
-description: "The design of W-168 step 10 as ruled U2 · B2 · E1: each heading section of a multi-section document becomes a committed `doc#s<k>` record in its own plane, `.fux/index/sections/`, cut by a tunable-free section rule. Its best section adds `section_weight` times its score to the document's. At 0.0 the plane is never opened, so ranking is byte-identical. The design is not built."
+description: "The design of W-168 step 10 as ruled U2 · B2 · E1: each heading section of a multi-section document becomes a committed `doc#s<k>` record in its own plane, `.fux/index/sections/`, cut by a tunable-free section rule. Its best section, scored as a short document on the document yardstick, lifts the document toward that score by `section_weight` ≤ 1 (the third form, W-278). At 0.0 the plane is never opened, so ranking is byte-identical. The design is not built."
 status: proposed
 date: 2026-09-30
-amended: 2026-10-11
+amended: 2026-10-13
 feature: section records — the committed section plane, the index section rule, and the B2 best-section term
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: c2039fa8473a4ddb617a1ff95d8a2025fa6831c8137c4a5c0504bcad9d0d7405
+content_sha: 8af9b2a62e801414c518d1ea6926e1eeca479532da7ab98d499945b8787e3c4b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -33,6 +33,8 @@ content_sha: c2039fa8473a4ddb617a1ff95d8a2025fa6831c8137c4a5c0504bcad9d0d7405
 🔴 **The second mechanism FAILED too, 2026-10-10 — drift (W-269).** The gain-only term (decision 5) removed the short-document credit (G3 PASS), and the `step10_section` pool's misses fell 23 → 23 · 21 · 19 · 13 across `section_weight` 0.25 · 0.5 · 1.0 · 2.0. But every weight lost baseline rank-1 hits (2 · 4 · 4 · 5), and the frozen bar allows none ([verdict](../work/regression/2026-10-10-section-gain-only/VERDICT.md)). Built on branch `claude/gracious-galileo-aqrg8b`, unmerged. `section_weight` does not exist on `main`; what happens next is Arpit's.
 
 🟠 **The re-test STOPPED, 2026-10-11 — not a verdict (W-270).** On a fresh set (`set-6-claude`, generation 5) under law L13, the baseline already put 49 of the 60 tagged section questions at rank 1, so the slice was **11, below the floor of 15**, and the frozen decider stopped before reading any arm ([verdict](../work/regression/2026-10-11-section-retest-set-6/VERDICT.md)). Separately, `sw-2.0` as built **failed the latency guardrail** (+328 ms at `rung-10000`, in the scan path's section attachment). Decision 2 now excludes `.csv`/`.json`/`.jsonl` (W-273 phase 1). `section_weight` does not exist on `main`. **Ruled 2026-10-11 (Arpit, Cowork), W-270 closed:** both failed terms scored the document as one unit against the *section* average length, so a long document's gain was a length artefact (arm diffs: 17 of 21 and 19 of 24 rank-1 changes brought in a long document). The third form — the best section scored **as a standalone document** on the document yardstick, combined by **max**, `λ ≤ 1` — is [W-278](../work/open/W-278-section-term-v3.md), to be written into decision 5 before its build; the data is generation 6, `set-7-claude` (W-277, placed 2026-10-12).
+
+🟡 **The third form is written, not yet measured (2026-10-13, W-278).** Decision 5 now scores the best section **as a short document**: its own body and heading, its parent's title, path and ctx, on the **document** yardstick. The document keeps the better of the two (`λ = 1`), and `λ > 1` is refused. Only a section that matches on its own words counts (Arpit, 2026-10-13). The section average is gone from the runtime stats, and the scan no longer decodes every section line. The bar is W-278's, on `set-7-claude`.
 
 A long document whose answer sits under one heading loses at ranking. Its
 query words are a small share of a big document. U0 (a query-time re-rank)
@@ -242,64 +244,79 @@ decisions 1 and 4). Editing one document touches one document shard and at most
 one section shard, both with the same number.
 
 **5. `best_section` comes from the index, never from `refer`.** For a candidate
-document `d`, with `λ = [ranking] section_weight`:
+document `d`, with `λ = [ranking] section_weight`, **the third form** (W-278,
+amended 2026-10-13 before any build code):
 
 ```
-G(d) = max(0, max_k S_sec(d#s_k) − S_self(d))
-S(d) = ( S_doc(d) + λ · G(d) ) · w(d)
+S_sec*(d#s_k) = score_record( the section's body + heading slots
+                              ∪ d's title, path and ctx slots,
+                              flen = the section's flen ++ d's title/path/ctx flen,
+                              the DOCUMENT df, n and avg_wlen )
+G(d) = max(0, max_k S_sec*(d#s_k) − S_doc'(d))
+S(d) = ( S_doc(d) + λ · G(d) ) · w(d)          0 < λ ≤ 1
 ```
 
-- 🔴 **Gain-only, amended 2026-10-10 (W-269, Arpit's ruling) before any build
-  code — and measured: FAIL (drift)**, rank-1 losses 2 · 4 · 4 · 5 at λ 0.25 ·
-  0.5 · 1.0 · 2.0 while the pool improved 23 → 23 · 21 · 19 · 13
-  ([verdict](../work/regression/2026-10-10-section-gain-only/VERDICT.md)). W-236 built B2 as `S_doc + λ · max_k S_sec` and it **failed (drift)
-  at every weight**: a sectionless document was its own single section, so it
-  gained about `λ ×` its whole body and heading score, while a long document's
-  best section held only part of its tf. The term favoured short documents
-  ([verdict](../work/regression/2026-10-10-section-records/VERDICT.md)). The
-  gain-only form is **B2's variant, not a new blend**: the same two units, the
-  same `λ`, and only what the best section adds **beyond the document itself**.
-- **`S_self(d)`** is the document's own record, cut to the body and heading
-  slots, scored by the same `score_record` under the **same section
-  statistics** that score its sections (the section `avg_wlen`, the document
-  `df` and `n`). Totality (decision 3) makes the two comparable: the sections
-  partition exactly those tokens.
-- 🔴 **A sectionless document gains nothing, by construction.** It is its own
-  single section, so `max_k S_sec = S_self` and `G = 0`. No arithmetic runs for
-  it, so its score is **byte-identical** to `λ = 0` at every `λ`. That is the
-  bias W-236 measured, removed rather than tuned. A multi-section document gains
-  only where its query words are **concentrated** in one section, which is the
-  case the step exists for. Where they are spread, the whole outscores any one
-  section and `G = 0`.
-- **The accelerator needs no change.** `G ≤ max_k S_sec` because `S_self ≥ 0`,
-  so decision 7's skip ceiling still bounds the term. Its `theta` scores opened
-  terms only and never includes the section term, so it stays an
-  under-estimate. Re-checked against the code, not assumed.
-- **The B2 form is history** and is kept here only as what W-236 measured:
-  `S(d) = ( S_doc(d) + λ · max_k S_sec(d#s_k) ) · w(d)`.
-
-- `S_sec` is the **same `score_record`** in `rank()`, over the section's body
-  and heading slots, with the **document** `df` and `n` and a **section**
-  `avg_wlen`. That average is `derive_wlen` over the section plane's `flen`
-  totals plus the body and heading `flen` of every sectionless document,
-  divided by the number of units counted.
-- **A sectionless document is its own single section.** Its section view is
-  its own record restricted to the body and heading slots, which is exactly
-  `S_self`, so its gain is zero (above).
-- **Ties go to the lowest `k`.** **A gain of zero names no section**
-  (2026-10-10, gain-only since W-269): when no section of a document beats the
-  document as one unit, including when none matched a query term, the hit's
-  `section` is `null` and the term adds nothing. Naming the best section there
-  would present a section that earned nothing as an answer. Naming `#s1` there would be a
-  tie-break among zeros, presented as an answer. Anchor terms stay
-  document-level: a section gets no anchor field. The `--expand` guard is unchanged, because it runs on
-  the document before anything is scored.
+- 🔴 **A section is scored as the short document it would be** (Arpit,
+  2026-10-11, Cowork: *"update the work items to go with the suggestive
+  approach"* — [W-278](../work/open/W-278-section-term-v3.md)). Its own body and
+  heading, plus its parent's title, path and ctx slots and their lengths. A
+  question that names the manual is credited to the section as it would be to
+  a stand-alone note with that title.
+- 🔴 **One yardstick.** Every unit, the document and each section-as-document,
+  is scored on the **document** plane's `avg_wlen`, `df` and `n`. There is no
+  section average, so the runtime stats carry none
+  ([SR-RUNTIME-STATS](0125_runtime-stats.md)).
+  - **Why.** Both earlier forms scored on a **section** `avg_wlen` (31.5 tokens
+    on gen-5 `rung-01000`, against a document average of 134). On that scale a
+    2 000-token manual is 64× "too long". Its whole-document score collapsed to
+    near zero, and the gain was nearly the full section score: a length
+    artefact, not a passage. Measured from the arms' own `ranked` lists: 19 of
+    24 rank-1 changes on set 5 and 17 of 21 on set 6 brought in a long document.
+- 🔴 **Only a section that matches on its own words is a candidate** (Arpit,
+  2026-10-13, Claude Code: *own-match only*). `max_k` runs over the sections
+  that carry at least one of the query's terms in their **own** body or
+  heading. A section that would match only through its parent's title, path or
+  ctx is not scored. A document matching the query only in its title gains
+  nothing. Otherwise its shortest section plus that title would rank it like a
+  short note with that title, which is a length leap of its own.
+- **`S_doc'(d)`** is the document's score over the same five slots, without
+  the anchor fold. **Anchor stays document-level and outside both units:** its
+  fold is added once to `S_doc`, as before, and never to a section. With the
+  anchor field off, `S_doc' = S_doc` and it is not scored twice.
+- 🔴 **`λ = 1` is pure max:** the document scores `max(S_doc, best S_sec*)`
+  before `w(d)`. `λ ∈ (0, 1)` interpolates toward it (Callan, 1994).
+  **`λ > 1` is refused** by `tune.load` and Node's `loadTune`
+  ([SR-TUNE](0135_tuning.md)). It would extrapolate past the section's own
+  score, which is what produced W-269's leaps. A long document can never leap
+  over a short one that matches better. The other terms, the title and the
+  tie-breaks decide.
+- 🔴 **A sectionless document gains nothing.** No `nsec` means no arithmetic,
+  so it is byte-identical at every `λ` (W-269's G3). **`0.0` stays OFF**
+  (decision 7).
+- **The accelerator's skip ceiling still bounds the term.** An unseen
+  document's sections can match only deferred terms in their own slots, and
+  its title carries no opened term either. So `S_sec* ≤ Σ_deferred idf · (k1 +
+  1) · weight`, and with `λ ≤ 1` the term adds at most that. Decision 7's
+  ceiling is unchanged. W-278's gate G4 checks the construction on every
+  candidate: `λ · G ≤ S_sec*`.
+- **Ties go to the lowest `k`. A gain of zero names no section**, as before.
+- 🔴 **The second form, gain-only, is history** (W-269, measured FAIL, drift:
+  rank-1 losses 2 · 4 · 4 · 5 at λ 0.25 · 0.5 · 1.0 · 2.0;
+  [verdict](../work/regression/2026-10-10-section-gain-only/VERDICT.md)):
+  `G(d) = max(0, max_k S_sec(d#s_k) − S_self(d))`, where `S_sec` scored the
+  section's body and heading slots and `S_self` the document cut to those
+  slots, both on the section `avg_wlen`. Re-tested at λ 2.0 on set 6 (W-270):
+  STOP, slice 11, below the floor; latency +328 ms
+  ([verdict](../work/regression/2026-10-11-section-retest-set-6/VERDICT.md)).
+- **The first form, B2, is history** (W-236, measured FAIL, drift, every λ):
+  `S(d) = ( S_doc(d) + λ · max_k S_sec(d#s_k) ) · w(d)`, with a sectionless
+  document as its own single section. It favoured short documents
+  ([verdict](../work/regression/2026-10-10-section-records/VERDICT.md)).
 - **This is one scorer, not a second stage.**
   [SR-RANKING](0111_ranking.md) decision 6 reserves BM25F arithmetic to
   `rank()`, and this term lives there, as the anchor fold does (decision 12b).
-  Decision 2's *weight then saturate once* governs fields **within** a unit.
-  B2 adds the scores of two units (the document and one of its sections), which
-  is Arpit's ruling, not a second per-field BM25.
+  *Weight then saturate once* governs fields **within** a unit. The max form
+  compares two units' scores; it is not a second per-field BM25.
 - **`refer` is not consulted.** `section@1` (E1's side metric) stays `refer`'s
   first passage. The index's best section is reported beside it, and neither
   feeds the other: one mechanism per arm.
@@ -318,9 +335,26 @@ no section statistic is computed, and no arithmetic runs. **A v8 index at
 `0.0` must rank byte-identically to the pre-section engine on the same
 corpus**, and that is Part B's first gate. When `λ > 0`:
 
-- **The scan** reads the section plane in the same pass as the document
-  shards: every line's `flen` for the average, and the lines whose raw bytes
-  match a query hash, grouped by parent.
+- **The scan** (amended 2026-10-13, W-278 DoD 2) reads a sectioned
+  candidate's sections **from the derived plane when the runtime is fresh**:
+  `sections.json` and the per-term section postings, exactly what the
+  accelerator reads. `is_fresh` stamps every section shard beside the document
+  shards, so a fresh plane holds the committed plane's numbers. **When the
+  runtime is stale or absent it reads the committed plane**: only the shards
+  that hold a candidate's sections, only the `"<hash>":[` entries of the
+  query's terms, by byte position, never a whole-line decode. The two routes
+  give the same sections, and a test holds them equal on both readers.
+  - **Why.** W-270 measured the committed read at +328 ms a query at
+    `rung-10000` (0.38 s of whole-line decodes), against L13's 100 ms. With the
+    section average gone the byte-pattern read still cost about 110 ms there:
+    25 MB of section shards is as large as the document plane. The derived
+    plane is about a twentieth of those bytes. W-278 DoD 2 prescribed this
+    route.
+  - ⚠ **What it costs the oracle.** With a fresh runtime the scan and the
+    accelerator read their sections from the same derived files, so the
+    differential law no longer checks the section plane's derivation on the
+    default path. The committed-plane route is still the scan's whenever the
+    runtime is stale, and the route test compares the two.
 - **The accelerator** derives a per-document section table at `fux build`, from
   the committed section plane, and pins those shard shas in the runtime
   manifest. It never reads committed shards at query time. Its skip ceiling

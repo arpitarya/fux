@@ -10,9 +10,19 @@ ball: arpit
 # W-278 — section term v3: the best section scored as a document, combined by max
 
 **Status: RULED 2026-10-11 (Arpit, Cowork): *"update the work items to go with
-the suggestive approach"* — this item is the approach. Not started. W-277's data
-is placed** (2026-10-12: generation 6, seeds 113–182, `set-7-claude`, 165
-questions; W-277 closed). W-270 closed on this ruling; its STOP stands.
+the suggestive approach"* — this item is the approach. ✅ DoD 1–3 landed
+2026-10-13 (Claude Code, Opus 5.5)** — the record, the latency fix (+68.6 ms
+standalone at gen-5 `rung-10000`, against 100), the build on both readers.
+W-277's data is placed (2026-10-12: generation 6, seeds 113–182,
+`set-7-claude`, 165 questions; W-277 closed). W-270 closed on this ruling; its
+STOP stands.
+
+**Ruled 2026-10-13 (Arpit, Claude Code), before the build: *own-match only*.**
+`max_k` runs over the sections that carry a query term in their **own** body or
+heading; a section that would match only through its parent's title, path or
+ctx is not scored, so a document matching only in its title gains nothing
+(SR-SECTIONS decision 5). The alternative, every section, would have scored a
+title-only match as the document's shortest section: a length leap of its own.
 
 **Supersedes this item's first form (filed earlier on 2026-10-11)**: *"bonus only
 when the answer is concentrated, whole document on its normal yardstick"*. Both of
@@ -105,9 +115,9 @@ S(d)  = ( S_doc(d) + λ · G(d) ) · w(d)          with 0 < λ ≤ 1
 
 | DoD | what | state |
 |---|---|---|
-| 1 · record first (L0) | [SR-SECTIONS](../../records/0161_sections.md) decision 5 amended to the form above as the third mechanism, W-236's and W-269's kept beside it as history; the `λ ≤ 1` refusal stated there and in [SR-TUNE](../../records/0135_tuning.md); the runtime stats change in [SR-RUNTIME-STATS](../../records/0125_runtime-stats.md); [`compare/section-units`](../compare/section-units.compare.md) notes the reopen | ⏳ |
-| 2 · 🔴 latency first | `scan.py:_attach_sections` reads pre-parsed section postings from the runtime segment instead of ≈ 18 900 `json.loads` per query ([W-270 ANALYSIS](../regression/2026-10-11-section-retest-set-6/ANALYSIS.md) §1). **Measured alone, before any scored arm**: median `ask` at `rung-10000` within L13's +100 ms. If it misses, stop — no arm can PASS | ⏳ |
-| 3 · build | the form above on [W-273](W-273-section-records-implementation.md)'s branch, Python and Node (differential law), the accelerator bound re-checked; off = byte-identical (G0). Gates as W-270: G0, G1, G3, plus **G4 (a construction check, no key): no document's section contribution exceeds its best section's `S_sec*`**, and **G5 (descriptive, no key): the length distribution of incoming rank-1 documents against the baseline's**, the diagnostic above, so a length-driven arm is visible before any score | ⏳ |
+| 1 · record first (L0) | [SR-SECTIONS](../../records/0161_sections.md) decision 5 amended to the form above as the third mechanism, W-236's and W-269's kept beside it as history; the `λ ≤ 1` refusal stated there and in [SR-TUNE](../../records/0135_tuning.md); the runtime stats change in [SR-RUNTIME-STATS](../../records/0125_runtime-stats.md); [`compare/section-units`](../compare/section-units.compare.md) notes the reopen | ✅ 2026-10-13: d5 (third form, own-match), d7 (the scan's two routes), SR-TUNE (`_fraction`), SR-RUNTIME-STATS (`sec_*` gone, `fux.runtime.v11`), compare doc |
+| 2 · 🔴 latency first | `scan.py:_attach_sections` reads pre-parsed section postings from the runtime segment instead of ≈ 18 900 `json.loads` per query ([W-270 ANALYSIS](../regression/2026-10-11-section-retest-set-6/ANALYSIS.md) §1). **Measured alone, before any scored arm**: median `ask` at `rung-10000` within L13's +100 ms. If it misses, stop — no arm can PASS | ✅ 2026-10-13, gen-5 `rung-10000`, `latency.py` (3 × 110 calls per arm): a byte-pattern read of the committed plane **failed, +190.4 ms**; the runtime read **passed, +68.6 ms** (403.8 → 472.4). [evidence](../regression/2026-10-13-section-term-v3/evidence/latency-precheck/). The bar's own latency row is re-measured on gen 6 |
+| 3 · build | the form above on [W-273](W-273-section-records-implementation.md)'s branch, Python and Node (differential law), the accelerator bound re-checked; off = byte-identical (G0). Gates as W-270: G0, G1, G3, plus **G4 (a construction check, no key): no document's section contribution exceeds its best section's `S_sec*`**, and **G5 (descriptive, no key): the length distribution of incoming rank-1 documents against the baseline's**, the diagnostic above, so a length-driven arm is visible before any score | ✅ 2026-10-13: `rank._section_gain` and `rank.mjs` (third form); the scan's runtime route + committed fallback on both readers (`fresh.mjs` split out of `accel.mjs`, the bundle refuses a cycle); `section_weight` bounded by `_fraction`; G4 and G5 written ([`g4.py`](../regression/2026-10-13-section-term-v3/evidence/g4.py), [`g5.py`](../regression/2026-10-13-section-term-v3/evidence/g5.py)); the gates run in DoD 5 |
 | 4 · the bar, frozen and committed alone | L13 shape, on `set-7-claude` at the generation-6 ladder (W-277). **One decided arm, named before any number: `sw-1.0` (pure max)**; `sw-0.5` (Callan's interpolation) reported only; no arm above 1.0 | ⏳ |
 | 5 · capture | baseline (sections off), the decided arm, the reported arm | ⏳ |
 | 6 · 🔴 Arpit scores; a session that did not capture runs the frozen decider | PASS → W-273 phase 2 ships `section_weight = 1.0`; FAIL → step 10 closes on three mechanisms; INCONCLUSIVE → Arpit | ⏳ |

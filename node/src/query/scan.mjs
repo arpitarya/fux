@@ -9,14 +9,16 @@
  * against; the prior went (W-152) and the regex with it. A candidate's own
  * `mtime` comes off the parsed record, like every other per-document fact.)
  */
+import { basename } from "node:path";
 import {
   iterSectionPaths, rawRecordLines, recordFor, sectionOrdinal, shardsFor,
 } from "../store/reader.mjs";
-import { termHash, TF_FIELDS, SECTION_SLOTS, sectionParent } from "../store/format.mjs";
+import { termHash, TF_FIELDS, sectionParent, shardFor } from "../store/format.mjs";
 import { deriveWlen } from "./bm25f.mjs";
 import { Corpus, rank } from "./rank.mjs";
 import { tokenize } from "./tokenize.mjs";
 import { EMPTY, identifiersFor } from "./identifiers.mjs";
+import { attachSectionsById } from "../derive/fresh.mjs";
 
 //: The byte-level oracle, over per-field counts. `wlen` is DERIVED from `flen`
 //: at the weights in force, so this parses the array and applies `deriveWlen`
@@ -30,9 +32,11 @@ const FLEN_RE = /"flen":\[([0-9,\s]*)\]/;
 //: field is switched on.
 const EDGE_ANCHOR_RE = /"al":(?<len>\d+),"at":\{[^}]*\},"dst":"(?<dst>[^"]+)"/g;
 
-//: W-236 — a document's section count, off the raw bytes. Absent means
-//: sectionless, and a sectionless document is its own single section unit.
-const NSEC_RE = /"nsec":(\d+)/;
+//: W-278 — a section line's id, off the raw bytes (`scan.py::_SEC_ID_RE`).
+//: Keys are sorted (`flen`, `id`, `terms`), so the first `"id":` is the id.
+const SEC_ID_RE = /"id":"((?:[^"\\]|\\.)*)"/g;
+//: `FLEN_RE`, global, so a search can start at a line's offset.
+const FLEN_AT_RE = /"flen":\[([0-9,\s]*)\]/g;
 
 function flenFromLine(text) {
   const m = FLEN_RE.exec(text);
@@ -82,10 +86,7 @@ export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
   const df = {};
   for (const h of queryHashes) df[h] = 0;
   const candidates = [];
-  // W-236 — the section statistics, gathered only when the term is on.
   const sectionOn = scoring.sectionOn;
-  let secUnits = 0;
-  const secFlen = new Array(SECTION_SLOTS).fill(0);
 
   for (const path of set.paths()) {
     const lines = set.lines(path);
@@ -96,11 +97,6 @@ export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
       const text = line.toString("latin1");
       const flen = flenFromLine(text);
       if (flen !== null) for (let i = 0; i < flen.length; i++) totalFlen[i] += flen[i];
-      if (sectionOn && !NSEC_RE.test(text)) {
-        secUnits++;
-        const cut = flen ?? [];
-        for (let i = 0; i < Math.min(cut.length, SECTION_SLOTS); i++) secFlen[i] += cut[i];
-      }
       // The substring check is a PREFILTER only: a query hash can appear as a
       // literal 16-hex string outside `terms` (a title, an id, a sha) without
       // the document containing that term. Once a line is worth parsing, `df`
@@ -145,7 +141,7 @@ export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
     }
   }
 
-  if (sectionOn) secUnits += attachSections(root, candidates, patterns, secFlen);
+  if (sectionOn) attachSections(root, candidates, queryHashes);
 
   if (anchorOn) {
     // 🔴 The RETRIEVAL half. A document whose only match is a linker's wording
@@ -172,50 +168,69 @@ export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
   return [
     candidates,
     df,
-    new Corpus(
-      totalDocs, deriveWlen(totalFlen, scoring, totalAnchorLen),
-      secUnits, sectionOn ? deriveWlen(secFlen, scoring) : 0.0,
-    ),
+    new Corpus(totalDocs, deriveWlen(totalFlen, scoring, totalAnchorLen)),
   ];
 }
 
-/** W-236 — one pass over the section plane, the document pass's rules.
- *  `scan.py::_attach_sections`.
- *
- *  Every section line adds its body and heading length to the section
- *  statistics, by byte regex, matched or not. A line carrying a query hash is
- *  parsed and attached to its parent as `[k, flen, terms]`, in `k` order, on
- *  the candidate's `secs`. Its parent is always a candidate already: a
- *  section's terms are a subset of its document's (decision 3's totality).
- *
- *  Returns the number of section units read. */
-function attachSections(root, candidates, patterns, secFlen) {
-  const byId = new Map(candidates.map((record) => [record.id, record]));
+/** Each sectioned candidate's matching sections, as `secs` in `k` order —
+ *  `scan.py::_attach_sections`, SR-SECTIONS decision 7 as amended by W-278:
+ *  from the derived plane when the runtime is fresh (`fresh.mjs`), from the
+ *  committed plane otherwise. */
+function attachSections(root, candidates, queryHashes) {
+  if (!attachSectionsById(root, candidates, queryHashes)) {
+    attachCommittedSections(root, candidates, queryHashes);
+  }
+}
+
+/** `scan.py::_attach_committed_sections`. Only the section shards that hold a
+ *  sectioned candidate's sections are read; each query term's `"<hash>":[`
+ *  entry is found in the shard's text directly, so a line with no query term
+ *  is never visited, and one that does yields its id, `flen` and the query's
+ *  own `terms` entries by position — never a whole-line parse. */
+function attachCommittedSections(root, candidates, queryHashes) {
+  const byId = new Map();
+  for (const record of candidates) if (record.nsec) byId.set(record.id, record);
+  if (byId.size === 0) return;
+  const shards = new Set([...byId.keys()].map((id) => shardFor(id)));
+  const keys = queryHashes.map((h) => [h, `"${h}":[`]);
   const bags = new Map();
-  let units = 0;
   for (const path of iterSectionPaths(root)) {
+    if (!shards.has(basename(path, ".jsonl"))) continue;
     const [, lines] = rawRecordLines(path);
-    for (const line of lines) {
-      units++;
-      const flen = flenFromLine(line.toString("latin1")) ?? [];
-      for (let i = 0; i < Math.min(flen.length, SECTION_SLOTS); i++) secFlen[i] += flen[i];
-      let hit = false;
-      for (const p of patterns) { if (line.includes(p)) { hit = true; break; } }
-      if (!hit) continue;
-      const section = JSON.parse(line.toString("utf8"));
-      const parent = sectionParent(section.id);
-      if (byId.has(parent)) {
-        let bag = bags.get(parent);
-        if (bag === undefined) { bag = []; bags.set(parent, bag); }
-        bag.push([sectionOrdinal(section.id), section.flen ?? [], section.terms ?? {}]);
+    const data = lines.map((line) => line.toString("utf8")).join("\n");
+    const found = new Map();
+    for (const [h, key] of keys) {
+      let at = data.indexOf(key);
+      while (at !== -1) {
+        const start = data.lastIndexOf("\n", at) + 1;
+        const open = at + key.length;
+        const close = data.indexOf("]", open);
+        let hits = found.get(start);
+        if (hits === undefined) { hits = {}; found.set(start, hits); }
+        hits[h] = data.slice(open, close).split(",").map(Number);
+        at = data.indexOf(key, close);
       }
+    }
+    for (const [start, hits] of found) {
+      SEC_ID_RE.lastIndex = start;
+      const raw = SEC_ID_RE.exec(data)[1];
+      const secId = raw.includes("\\") ? JSON.parse(`"${raw}"`) : raw;
+      const parent = sectionParent(secId);
+      if (!byId.has(parent)) continue;
+      FLEN_AT_RE.lastIndex = start;
+      const inner = FLEN_AT_RE.exec(data)[1].trim();
+      const flen = inner ? inner.split(",").map(Number) : [];
+      const terms = {};
+      for (const h of queryHashes) if (h in hits) terms[h] = hits[h];
+      let bag = bags.get(parent);
+      if (bag === undefined) { bag = []; bags.set(parent, bag); }
+      bag.push([sectionOrdinal(secId), flen, terms]);
     }
   }
   for (const [parent, bag] of bags) {
     bag.sort((a, b) => a[0] - b[0]);
     byId.get(parent).secs = bag;
   }
-  return units;
 }
 
 /** The reference path. */

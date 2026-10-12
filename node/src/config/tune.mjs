@@ -487,7 +487,7 @@ function resolve(data, label) {
     minedWeight: r("ranking", "mined_weight", nonNegative),
     intentWeight: r("ranking", "intent_weight", nonNegative),
     // W-236 — B2's λ (SR-SECTIONS decision 5). `0.0` never opens the plane.
-    sectionWeight: r("ranking", "section_weight", nonNegative),
+    sectionWeight: r("ranking", "section_weight", fraction),
     damping: r("graph", "damping", fraction),
     iterations: r("graph", "iterations", whole),
     laziness: r("graph", "laziness", fraction),

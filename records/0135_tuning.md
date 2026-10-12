@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-10-11
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@211ecf089fa6, .fux/tune.toml@65682ee5a88f, node/src/config/tune.mjs@6c5a03c0fd3f]
+owns: [src/fux/tune.py@6fa94645ad85, .fux/tune.toml@bc8cab747dd3, node/src/config/tune.mjs@f6e2c32f57f5]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 7e377ed18f887f86a3d9b1d74ecbfe6276abfdbabeaede2e6bf21116a20a845a
+content_sha: 1da36de92a187bddc10e1450198e1d3705dea8a642bb203757c46a959f7965a8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1121,6 +1121,8 @@ this moved where they are written, not what they are.
 **W-269 — what `section_weight` weighs (2026-10-10; on a branch from `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md) passes).** The key, its validation and its template value `0.0` are unchanged. Its meaning moved: λ now multiplies the **gain-only** term, what the best section scores beyond the document as one unit ([SR-SECTIONS](0161_sections.md) decision 5), not the best section's whole score. A value tuned against W-236's B2 means something else here. The default is written only on a PASS, with the merge.
 
 **W-273 — the comment caught up (2026-10-11; same branch, unmerged).** The `section_weight` comment in the template and in this repository's `.fux/tune.toml` described W-236's B2 form; it now describes the gain-only term and names W-270 as the run that decides it. Comment bytes only: the key, its validation and its value `0.0` are unchanged.
+
+**W-278 — `section_weight` is bounded above by 1.0 (2026-10-13; same branch, unmerged until [its run](../work/regression/2026-10-13-section-term-v3/PRE-REGISTRATION.md) passes).** λ now interpolates toward the **third form**, the better of the document and its best section scored as a short document ([SR-SECTIONS](0161_sections.md) decision 5). **`1.0` is pure max, and a value above `1.0` is refused** by `tune.load` and by Node's `loadTune`, naming the key and the bound. Above 1.0 the term would extrapolate past the section's own score, which is what produced W-269's leaps. The bound is the `_fraction` validator (Node: `fraction`), not a clamp: a silently clamped `2.0` would rank as `1.0` while claiming not to. Template value still **`0.0`** (OFF); a default is written only on a PASS.
 
 ### Consequences
 

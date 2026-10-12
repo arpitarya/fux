@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 2e8c2328cfcfd1f326bb1044c23c9bbb006519c001ab88cf49c6e0405f4bd947
+content_sha: 69fe8a71e1dc4bf30f0bffa37063cf0403a23041c99c42af04c9f8ffa6591fa3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -900,6 +900,8 @@ The confidence block's pairs and hashes are both analyzed with the repo's identi
 
 
 **W-236 — section records (2026-10-10; branch `w236-sections`, unmerged).** While `[ranking] section_weight > 0`, the band is computed over scores that include the best-section term. `df`, `n` and `top_doc_hashes` reach this block through the same seam and are unchanged, because the term uses the document `df` and `n` ([SR-SECTIONS](0161_sections.md) decision 5). At `0.0` every input is byte-identical.
+
+**No decision here moved** (W-278, 2026-10-13): `derive/accel.py`, which this record describes, gained the scan's runtime section route and lost the section statistics; `stats_out`'s `df` and `n` are untouched.
 
 ### Consequences
 

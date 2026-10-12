@@ -11,7 +11,7 @@ feature: "`.fux/runtime/docs.jsonl` — the derived doc table and the join key i
 owns: [node/src/derive/docstable.mjs@74dd7c2a91a2, src/fux/derive/docstable.py@8e287539fe3c]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 203f5d5b2b35353005c1f4dbdf2a116d6673336c4acae2291d347704cd4280a3
+content_sha: 251892518e07de32e6b1c0fd12b89b3869bc9f43fd2cf96886573c80f52121c2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -172,6 +172,8 @@ this moved where they are written, not what they are.
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `docs.jsonl` gains **`nsec`** (0 when sectionless), carried off the record and checked against the section plane at build ([SR-SECTIONS](0161_sections.md) decision 9). `DOCS_FIELDS` and `RUNTIME_SCHEMA` (v10) move together, so a v9 table is refused, not read.
+
+**No decision here moved** (W-278, 2026-10-13): `derive/_build.py::_section_planes` no longer sums section statistics; the doc table's fields and `_read_committed` are untouched. The scan now reads `docs.jsonl` by byte pattern for a section's parent id when the runtime is fresh ([SR-SECTIONS](0161_sections.md) decision 7).
 
 ### Consequences
 

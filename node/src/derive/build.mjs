@@ -22,7 +22,7 @@ import { cmpCodePoints } from "../compat/pyfloat.mjs";
 import { pyDumps } from "../compat/pyjson.mjs";
 import { iterSectionPaths, iterShardPaths, rawRecordLines, sectionOrdinal } from "../store/reader.mjs";
 import {
-  TF_FIELDS, SECTION_SLOTS, contentSha, displayTitle, sectionId, sectionParent,
+  TF_FIELDS, contentSha, displayTitle, sectionId, sectionParent,
 } from "../store/format.mjs";
 import { derivedDir } from "../store/cachedir.mjs";
 import { buildPlane, SCHEMA as GRAPH_SCHEMA } from "../graph/plane.mjs";
@@ -178,10 +178,7 @@ function readCommitted(root) {
   }
   let totalAnchorLen = 0;
   for (const v of anchorLen.values()) totalAnchorLen += v;
-  const stats = statsPlane.payload({
-    n: totalDocs, totalFlen, totalAnchorLen,
-    secUnits: sections.units, secTotalFlen: sections.totalFlen,
-  });
+  const stats = statsPlane.payload({ n: totalDocs, totalFlen, totalAnchorLen });
   return { docs, postings, anchors, stats, shardStamp, records, sections };
 }
 
@@ -215,11 +212,10 @@ function readSectionPlane(root, shardStamp) {
   return out;
 }
 
-/** `_section_planes` — the section table, its postings and its statistics,
- *  and the two planes held together: a section line with no parent, or a
- *  document whose `nsec` is not its count of section lines, refuses the build
- *  (SR-SECTIONS decision 9). A SECTIONLESS document counts as its own single
- *  section over its body and heading slots, as the scan sums it. */
+/** `_section_planes` — the section table and its postings, and the two
+ *  planes held together: a section line with no parent, or a document whose
+ *  `nsec` is not its count of section lines, refuses the build (SR-SECTIONS
+ *  decision 9). No section statistic since W-278. */
 function sectionPlanes(docs, sectionLines) {
   const docidxOf = new Map(docs.map((doc, i) => [doc.id, i]));
   const counts = new Map();
@@ -247,27 +243,17 @@ function sectionPlanes(docs, sectionLines) {
     }
   }
   rows.sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]));
-  const totalFlen = new Array(SECTION_SLOTS).fill(0);
   const postings = new Map();
-  rows.forEach(([, , flen, terms], secidx) => {
-    for (let i = 0; i < Math.min(flen.length, SECTION_SLOTS); i++) totalFlen[i] += flen[i];
+  rows.forEach(([, , , terms], secidx) => {
     for (const [term, tf] of Object.entries(terms)) {
       let list = postings.get(term);
       if (list === undefined) { list = []; postings.set(term, list); }
       list.push([secidx, [...tf]]);
     }
   });
-  let sectionless = 0;
-  for (const doc of docs) {
-    if (doc.nsec !== 0) continue;
-    sectionless++;
-    for (let i = 0; i < Math.min(doc.flen.length, SECTION_SLOTS); i++) totalFlen[i] += doc.flen[i];
-  }
   return {
     rows: rows.map(([idx, k, flen]) => [idx, k, [...flen]]),
     postings,
-    units: rows.length + sectionless,
-    totalFlen,
   };
 }
 

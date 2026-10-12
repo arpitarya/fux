@@ -8,14 +8,11 @@
 import { join } from "node:path";
 import * as fmt from "./format.mjs";
 
-/** The plane's content: raw totals, never weighted. `secUnits` and
- *  `secTotalFlen` are W-236's: the section `avg_wlen`'s count and its raw body
- *  and heading totals (SR-SECTIONS decision 5). */
-export function payload({ n, totalFlen, totalAnchorLen, secUnits, secTotalFlen }) {
-  return {
-    n, total_flen: totalFlen, total_anchor_len: totalAnchorLen,
-    sec_units: secUnits, sec_total_flen: secTotalFlen,
-  };
+/** The plane's content: raw totals, never weighted. W-236's section totals
+ *  left with W-278: every section is scored on the document `avg_wlen`
+ *  (SR-SECTIONS decision 5). */
+export function payload({ n, totalFlen, totalAnchorLen }) {
+  return { n, total_flen: totalFlen, total_anchor_len: totalAnchorLen };
 }
 
 /** `stats.json` for one build. */

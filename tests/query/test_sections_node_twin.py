@@ -185,3 +185,17 @@ def test_node_build_writes_pythons_section_plane(corpus, tmp_path):
         ).read_bytes(), name
     manifest = json.loads((nd_rt / fmt.MANIFEST_NAME).read_text(encoding="utf-8"))
     assert any(name.startswith("sections/") for name in manifest["shards"])
+
+
+@pytest.mark.parametrize("weight", (0.25, 1.0))
+def test_node_reads_the_committed_section_plane_as_python_does(corpus, tmp_path, weight):
+    """W-278: with no fresh runtime both scans read the committed section plane
+    by pattern, and they still agree, byte for byte."""
+    stale = tmp_path / "stale"
+    shutil.copytree(corpus, stale)
+    shutil.rmtree(stale / ".fux" / "runtime")
+    _set_weight(stale, weight)
+    for query in QUERIES:
+        argv = ("ask", query, "--json", "--top", "10")
+        py, nd = _rows(_python(stale, *argv)), _rows(_node(stale, *argv))
+        assert nd == py, f"{argv} at section_weight={weight}, runtime removed"
