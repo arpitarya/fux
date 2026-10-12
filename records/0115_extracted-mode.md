@@ -12,7 +12,7 @@ owns: [src/fux/ingest/extract.py@582f0d83c2d9]
 laws: [L2, L3, L4, L5]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 8f19533bf15c682600890c16ee40335fd34ebcbacd72f05ec86569ed1c72318f
+content_sha: 64d0bc623525080c2c878a5947687a9dd50ec761c9a275c2cc98b56f6a5736f6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -336,7 +336,7 @@ this moved where they are written, not what they are.
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** Extraction returns **`sections`**: one `(flen, terms)` per index section over the body and heading slots, Markdown only, and empty when the document is sectionless ([SR-SECTIONS](0161_sections.md) decisions 2–3). A totality miss makes it sectionless. `extract_rules` is **4**.
 
-**W-273 — record formats are sectionless (2026-10-11; same branch, unmerged until [W-270](../work/open/W-270-section-retest-set-6.md) passes).** A `.csv`, `.json` or `.jsonl` document returns **no `sections`**, whatever headings its decoder emits, by the closed list `[index] sectionless_formats` ([SR-SECTIONS](0161_sections.md) decision 2, W-271's option (b)). `extract_rules` is **5**, so the next ingest re-extracts and those documents lose their section lines and `nsec`.
+**W-273 — record formats are sectionless (2026-10-11; same branch, unmerged until W-270 passed — it stopped, and its successor is [W-278](../work/open/W-278-section-term-v3.md)).** A `.csv`, `.json` or `.jsonl` document returns **no `sections`**, whatever headings its decoder emits, by the closed list `[index] sectionless_formats` ([SR-SECTIONS](0161_sections.md) decision 2, W-271's option (b)). `extract_rules` is **5**, so the next ingest re-extracts and those documents lose their section lines and `nsec`.
 
 ### Consequences
 

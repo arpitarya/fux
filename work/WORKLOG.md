@@ -23,6 +23,11 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-13 — Arpit chose A: the Cowork filing committed, then the placement  ·  Claude Code (Opus 5.5)
+- **Done:** `1e8c1771` holds the Cowork W-270/W-277/W-278 filing as it was staged, plus the owed `git rm work/open/W-270…`, so prompt 15's re-amended text is in history; `788b44b4` holds the W-277 placement. Follow-up: 4 links still pointed at the removed W-270 file (IMPLEMENTATION ×3, SR-EXTRACTED) and now point at W-278; W-270's verdict got its feature-gate row; the inbox ages were recomputed (9d, 3d).
+- **Unit suite:** 7096 pass. The only red is `test_golden_ladder_seed` ×8, which waits on W-278's generation-6 ladder rebuild.
+- **Next:** Claude Code (Opus) W-278.
+
 ## 2026-10-12 — W-277 closed: generation 6 placed (`set-7-claude`)  ·  Claude Code (Opus 5.5)
 - **Asked:** Arpit pasted `PLACE.md` (W-277) after running prompt 15 in a fresh chat and unzipping the release.
 - **Checks (§1), all PASS:** 75 manifest rows, each matched to a file and no stray file; no name holds `key` or `answer`; released fields `[('id', 'question')]`; no `move` destination pre-existed; none of the 70 date rows already present. The key's address was never named, listed or opened. The guard hook fired twice when a command *named* that path, once as an exclusion and once inside a quoted DoD line; the work was redone without naming it.
