@@ -9,7 +9,7 @@ ball: arpit
 
 # W-277 — section records: generation-6 test data (`set-7-claude`)
 
-**Status: OPEN. 🔴 Arpit runs [prompt 15](../golden/prompts/15-claude-gen6-section-seed.md)** in a fresh claude.ai chat that can create files, saves the key by his own hand, unzips the release and runs its `PLACE.md` in Claude Code. **Run it as re-amended 2026-10-11 (later)** — §Re-amended below; the earlier competitor rule would have made the set unwinnable.
+**Status: CLOSED 2026-10-12.** Arpit ran prompt 15 (as re-amended) in a fresh chat, saved the key by his own hand and unzipped the release; Claude Code ran its `PLACE.md`, every check passed, and 75 files were placed by the manifest. Generation 6 is seeds 113–182 and `questions/set-7-claude.jsonl` (165). Prompt 15 and `incoming/` were deleted in the same change. The ladder rebuild and the re-run are W-278's.
 
 **Arpit, 2026-10-11 (Cowork),** after W-270's STOP: *"Give me a work item to
 create the new test data based on the findings. And I'll run it in an
@@ -97,11 +97,11 @@ anything, and stops and declares on anything that looks like a key.
 
 | DoD | state | where |
 |---|---|---|
-| 1 · the authoring prompt, written from SR-WORK-TESTDATA, with the placement prompt inside it | ✅ 2026-10-11 | [prompt 15](../golden/prompts/15-claude-gen6-section-seed.md) |
-| 2 · 🔴 **Arpit** runs it in a fresh chat; saves the key into `golden-answers/` by hand; unzips the release at the repo root | ⏳ | — |
-| 3 · `PLACE.md` run in Claude Code (Sonnet): checks pass, files placed by the manifest | ⏳ | — |
-| 4 · the released half checked against prompt 15's counts: 8 long (≥ 3 000 words, ≥ 8 sections), ≥ 48 short (200–400 words, the words once each and never in a title or heading), one per tagged section and none shared across sections, ≈ 165 ids `s7c-…` with `id` + `question` only, a date row per new file | ⏳ | — |
-| 5 · prompt 15 and `incoming/` deleted in the change that commits the data (SR-WORK-TESTDATA decision 5) | ⏳ | — |
+| 1 · the authoring prompt, written from SR-WORK-TESTDATA, with the placement prompt inside it | ✅ 2026-10-11 | prompt 15 — deleted 2026-10-12 (DoD 5); `git log --diff-filter=D -- work/golden/prompts/` |
+| 2 · 🔴 **Arpit** runs it in a fresh chat; saves the key into `golden-answers/` by hand; unzips the release at the repo root | ✅ 2026-10-12 | Arpit; the key's address was never looked at (L11) |
+| 3 · `PLACE.md` run in Claude Code (Sonnet): checks pass, files placed by the manifest | ✅ 2026-10-12 | 75 manifest rows, each with its file and no file without a row; no name holds `key` or `answer`; fields `[('id', 'question')]`; no `move` destination pre-existed; 70 date rows, none already present. Run by Opus 5.5, not Sonnet |
+| 4 · the released half checked against prompt 15's counts: 8 long (≥ 3 000 words, ≥ 8 sections), ≥ 48 short (200–400 words, the words once each and never in a title or heading), one per tagged section and none shared across sections, ≈ 165 ids `s7c-…` with `id` + `question` only, a date row per new file | ✅ 2026-10-12 | 8 long (113–120): 3 060–3 166 words, 13–21 `## ` headings · 48 short (121–168): 254–324 words · 165 ids `s7c-001…165`, contiguous, unique, `{id, question}` only · 70 date rows, 2025-03-24…2026-08-24, no duplicate path. **Not counted here:** word placement and one-competitor-per-section — those need the key. The author's `REPORT.md` says 104 of 104 placements pass; the scorer's pool counts check the rest |
+| 5 · prompt 15 and `incoming/` deleted in the change that commits the data (SR-WORK-TESTDATA decision 5) | ✅ 2026-10-12 | the closing change |
 
 ## Out of scope — and why this data alone cannot give a PASS
 

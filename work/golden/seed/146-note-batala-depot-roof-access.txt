@@ -1,0 +1,31 @@
+title: Batala depot roof and rack-top work - kit, checks, when to stop
+doc_id: QCL-HSE-NTE-95
+owner: Harjit Randhawa
+department: Health, Safety and Environment
+status: in_force
+effective_date: 2025-10-20
+applies_to: Batala depot
+
+BATALA DEPOT: ROOF AND RACK-TOP WORK
+
+The Batala depot has an old asbestos-cement roof over the dry store and high racking in the chilled store. Both have hurt people before. This note says how work up there is done.
+
+WHEN THE KIT IS NEEDED
+Any work more than 2 metres above the floor needs either a platform with guard rails or a full-body harness clipped to a marked anchor point by a lanyard with a shock absorber. Nobody steps onto the roof sheets themselves; crawling boards are always used.
+
+CHECKS
+The person wearing the kit checks it before each use against the tag on its bag. The depot's maintenance supervisor checks every set once a year and writes the date on the tag.
+
+HOW LONG IT LASTS
+The Batala kit is withdrawn ten years after its date of manufacture, or at once after it has stopped a fall.
+
+WHO MAY GO UP
+Only staff who have done the working-at-height course, and contractors with their own certificate, go up. Two people always: one working, one watching from below.
+
+WEATHER
+Work on the roof stops in rain, in strong wind and after dark, and does not restart until the shift lead has looked at the roof.
+
+RECORDS
+Every job at height is written in the depot's height register with the date, the job, the names of both people and the anchor point used. The register is read at the monthly safety walk.
+
+Questions to the depot maintenance supervisor.

@@ -10,9 +10,9 @@ ball: arpit
 # W-278 — section term v3: the best section scored as a document, combined by max
 
 **Status: RULED 2026-10-11 (Arpit, Cowork): *"update the work items to go with
-the suggestive approach"* — this item is the approach. Not started. 🔴 Waits on
-[W-277](W-277-section-test-data-gen6.md)'s data (Arpit runs prompt 15, as
-re-amended the same day).** W-270 closed on this ruling; its STOP stands.
+the suggestive approach"* — this item is the approach. Not started. W-277's data
+is placed** (2026-10-12: generation 6, seeds 113–182, `set-7-claude`, 165
+questions; W-277 closed). W-270 closed on this ruling; its STOP stands.
 
 **Supersedes this item's first form (filed earlier on 2026-10-11)**: *"bonus only
 when the answer is concentrated, whole document on its normal yardstick"*. Both of
@@ -151,5 +151,5 @@ L11, L12, L13.
 
 - [W-270](../../archive/open/W-270-section-retest-set-6.md) (closed) · [VERDICT](../regression/2026-10-11-section-retest-set-6/VERDICT.md) · [report](../regression/2026-10-11-section-retest-set-6/report.md)
 - [W-269 VERDICT](../regression/2026-10-10-section-gain-only/VERDICT.md) · [W-236 VERDICT](../regression/2026-10-10-section-records/VERDICT.md)
-- [W-273](W-273-section-records-implementation.md) · [W-277](W-277-section-test-data-gen6.md) · [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md) R10
+- [W-273](W-273-section-records-implementation.md) · W-277 (closed 2026-10-12) · [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md) R10
 - Callan (1994), Kaszkiel & Zobel (1997) — [BIBLIOGRAPHY](../../records/BIBLIOGRAPHY.md)

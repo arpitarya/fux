@@ -3,4 +3,4 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
-🟢 2026-10-11 Claude Code (Opus 5.5): **the green items closed: W-276 (hooks pin their interpreter; never silent) and W-274 (section records opt-in, off by default).** **Next: Arpit runs prompt 15 (W-277); Cowork's W-270 closure is still uncommitted in the tree (its `git rm` is owed).**
+🟢 2026-10-12 Claude Code (Opus 5.5): **W-277 closed — generation 6 placed (seeds 113–182, `set-7-claude`, 165 questions); prompt 15 and `incoming/` deleted.** **Next: Claude Code (Opus) W-278 — the latency fix, the max form, the gen-6 ladder; Cowork's W-270/W-277/W-278 filing is still uncommitted in the index.**

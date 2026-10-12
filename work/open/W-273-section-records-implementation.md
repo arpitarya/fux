@@ -14,7 +14,7 @@ ball: agent
 **Arpit, 2026-10-10 (Cowork):** *"Create one work item for implementation and
 one work item if test data needs to be generated."* The data is
 [W-272](../../archive/open/W-272-section-test-data-gen5.md) and now
-[W-277](W-277-section-test-data-gen6.md); the measurement is
+W-277 (closed 2026-10-12); the measurement is
 [W-278](W-278-section-term-v3.md) (W-270 closed 2026-10-11); the rulings were
 W-271 (closed 2026-10-10).
 

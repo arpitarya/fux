@@ -1,0 +1,27 @@
+title: Medrona Pharma - terms for their supplier audit of our pharma handling
+doc_id: QCL-QA-LTR-17
+owner: Neelam Joshi
+department: QA and Compliance
+status: in_force
+effective_date: 2025-10-06
+
+MEDRONA PHARMA: TERMS FOR THEIR SUPPLIER AUDIT
+
+Summary of the letter Medrona Pharma sent before its yearly audit of how we store and move its injectables. Medrona's quality department sets these terms; they are not ours to change.
+
+WHO COMES
+Medrona sends two auditors from its supplier quality team for two days. They are escorted by the site QA lead throughout and see only Medrona's stock and records.
+
+WHO MAY NOT COME
+Medrona will not send an auditor who has worked for Quillfern, or for any of our subcontractors, during the previous 36 months. They ask us to tell them at once if we recognise a name on their list, because their independence rules depend on it.
+
+CHANGING THE AUDITORS
+Medrona changes the lead auditor for each supplier every two years. Their letter calls this rotation and says it is not a sign of any problem with the supplier.
+
+WHAT THEY WANT READY
+Temperature records for Medrona's stock for the past year; training records for staff who handle it; the deviation register; and the results of our last mock recall.
+
+AFTER THE AUDIT
+Medrona sends its report within 30 days. Answers are written by the site QA lead and signed by the head of QA. Medrona expects an answer to each of its findings within 20 working days of receiving the report, and tracks every one until it is closed.
+
+Questions to the QA office.

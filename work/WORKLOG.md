@@ -23,6 +23,15 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-12 — W-277 closed: generation 6 placed (`set-7-claude`)  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted `PLACE.md` (W-277) after running prompt 15 in a fresh chat and unzipping the release.
+- **Checks (§1), all PASS:** 75 manifest rows, each matched to a file and no stray file; no name holds `key` or `answer`; released fields `[('id', 'question')]`; no `move` destination pre-existed; none of the 70 date rows already present. The key's address was never named, listed or opened. The guard hook fired twice when a command *named* that path, once as an exclusion and once inside a quoted DoD line; the work was redone without naming it.
+- **Placed:** 70 seeds (113–182), `questions/set-7-claude.jsonl` (165), 70 `seed-dates.tsv` rows, the author's `REPORT`/`PLACE`/`MANIFEST` → `work/golden/reports/`.
+- **Released half (§3), all PASS:** 8 long, 3 060–3 166 words and 13–21 `## ` headings; 48 short, 254–324 words; ids `s7c-001…165` contiguous and unique; date rows 2025-03-24…2026-08-24, no duplicate path. Word placement and one-competitor-per-section need the key, so they were not counted here.
+- **Closed:** prompt 15 and `incoming/` deleted; W-277 → `archive/open/`; W-278 🟢, W-273 🟡; IMPLEMENTATION, archive map, both golden READMEs, NOW and the registry bumped (SR-WORK-REGISTRY restamped).
+- ⚠ **The index carries the Cowork W-270/W-277/W-278 filing, still uncommitted**, including prompt 15 itself (never committed). This change was made in the working tree only, so that filing can be committed first and prompt 15's re-amended text reaches history before its deletion.
+- **Next:** Claude Code (Opus) W-278 — the latency fix, the max form, the generation-6 ladder.
+
 ## 2026-10-11 — the green items: W-276 ✓ (the hook pins its interpreter) · W-274 ✓ (section records opt-in)  ·  Claude Code (Opus 5.5)
 - **Asked:** *"implement the work items in green. Bring them to closure."* Only W-274 and W-276 were Claude Code's; W-263, W-265, W-266 and W-275 are `cowork` research (rule 37a).
 - **W-276:** the cause was suspect 1 in a worse form. `command -v fux` found a **pyenv shim** for a Python with no fux; it exited 127 and `|| exit 0` swallowed it. From a bare PATH the hook skipped with no output. The fix: hooks pin `fux_python=<sys.executable>`, print one line whenever they cannot run, name a stale lock, and doctor has a `git hooks` row. SR-MAINTENANCE d3a. Proven live: commit `c35a805a` was made from `env -i PATH=/usr/bin:/bin` and printed `re-indexing in the background`; the runner finished `ok`.

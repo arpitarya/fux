@@ -477,6 +477,10 @@ decision 23: **missing input is a data defect, not a null.**
 **Rungs: seed → 100 → 200 → 500 → 1 000 → 2 000 → 5 000 → 10 000.** Nested: each
 rung is the previous one plus new files, so the seed documents are in every rung.
 
+⚠ **Generation 6 (2026-10-12, W-277) brings the seed to 182 documents** (seeds
+113–182, with `set-7-claude`). The ladder below has **not** been rebuilt on it
+yet — that is W-278 DoD 3 — so every rung named here is still generation 5's.
+
 ⚠ **Since generation 5 (2026-10-11) the seed is 118 documents, so `rung-00100`
 holds 118** — the seed alone, the same content as `rung-seed`. Arpit ruled it
 (*keep it at 118 docs*) when the builder refused a 100-document rung

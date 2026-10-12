@@ -18,6 +18,7 @@ timestamp: 2026-09-15T00:00:00Z
 | `set-4-claude.jsonl` | set 4 (generation 3), 125 questions, against seeds 37+ and the seed history | Claude | `s4u-001…` |
 | `set-5-claude.jsonl` | set 5 (generation 4), 90 questions | Claude | `s5c-001…` |
 | `set-6-claude.jsonl` | set 6 (generation 5), 110 questions, the section re-test ([W-272](../../open/W-272-section-test-data-gen5.md)), against seeds 89–112 | Claude | `s6c-001…` |
+| `set-7-claude.jsonl` | set 7 (generation 6), 165 questions, the section re-test on the third form (W-278), against seeds 113–182 | Claude | `s7c-001…` |
 
 **Named by author** — `set-<gen>-<claude|codex>` (Arpit, 2026-09-27; these three
 were `set-N-u` before). **Ids were not renamed**: the `u` in `s4u-` is the old

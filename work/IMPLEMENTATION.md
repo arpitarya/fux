@@ -26,6 +26,16 @@ Rules:
 
 ---
 
+## 2026-10-12 — **W-277 closed: generation 6 placed — seeds 113–182 and `set-7-claude` (165 questions)**
+
+| what | evidence |
+|---|---|
+| **data** | 70 seed files: 8 long (113–120, 3 060–3 166 words, 13–21 sections), 48 competitors (121–168, 254–324 words), 14 predecessors and title-match guardrails (169–182); 70 `seed-dates.tsv` rows (2025-03-24…2026-08-24); `questions/set-7-claude.jsonl`, `s7c-001…165`, `{id, question}` only |
+| **delivery** | the first set delivered as files (SR-WORK-TESTDATA A3, A24): the release zip unzipped to `incoming/`, placed by its `PLACE.md`; the author's report, manifest and placement prompt kept in `work/golden/reports/`; the key in Arpit's hand only, never looked for |
+| **checks** | `PLACE.md` §1 and §3, all PASS (counts in the archived item's DoD 3–4). Word placement and one-competitor-per-section need the key, so they are not counted here; the author reports 104 of 104 |
+| **deleted** | prompt 15 and `incoming/` (SR-WORK-TESTDATA decision 5) |
+| **not done here** | the generation-6 ladder rebuild and the re-run (W-278) |
+
 ## 2026-10-11 — **W-274 closed: section records are opt-in (`fux.toml [index] section_records`, off by default)**
 
 | what | evidence |

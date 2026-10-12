@@ -1,0 +1,28 @@
+title: Baddi depot switch room card - utility bill, panel steps, surcharge months
+doc_id: QCL-ENG-CRD-44
+owner: Rakesh Thakur
+department: Engineering
+status: in_force
+effective_date: 2025-11-17
+applies_to: Baddi pharma depot
+
+BADDI DEPOT SWITCH ROOM CARD
+
+Taped inside the switch room door at the Baddi pharma depot in Himachal Pradesh.
+
+WHAT THE BILL CHARGES FOR
+The state utility bills Baddi on kVAh, so a lagging load costs money every month even when the plant is healthy. The depot's chillers and the two air handlers in the pharma rooms pull the factor down.
+
+THE BANK IN THE CORNER
+The capacitor bank beside the main panel is sized at 150 kvar in three steps, switched automatically. The depot aims for a monthly average of 0.95. The utility adds a surcharge when a month averages below 0.85; there is no rebate at Baddi.
+
+CHECKS
+The maintenance technician reads the controller display every Monday and writes the steps in service in the switch room book. A step that does not come in is reported to the regional engineer the same day. Fuses are replaced only by the electrical contractor, with the bank isolated and the discharge time on the door allowed to pass.
+
+KEEP CLEAR
+Nothing is stored in the switch room: no cartons, no ladders, no spare pallets. The floor in front of the panels is marked with yellow tape and kept clear for one metre.
+
+AFTER A POWER CUT
+After any outage, check that every step has come back in before leaving the room. If the display shows a fault, do not reset it; phone the regional engineer.
+
+Questions to the regional engineering desk, extension 562.
