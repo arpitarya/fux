@@ -4,18 +4,29 @@ name: W-270
 description: "Arpit's ask (2026-10-10), after W-269 failed with a net hit@1 gain at λ = 2.0 (12 wins, 5 losses): re-test the gain-only section term at 2.0 on a NEW question set, set-6-claude, with new long documents, under a new bar that allows rank-1 losses when the net gain clears the SR-RS floor. W-269's verdict stands; nothing is re-read."
 item: W-270
 filed: 2026-10-10
-ball: arpit
+ball: closed
 ---
 
 # W-270 — the gain-only section term at λ = 2.0, re-tested on `set-6-claude`
 
-**Status: OPEN. 🔴 STOP by the frozen decider (Arpit's run, 2026-10-11): the slice is 11, below 15** ([verdict](../regression/2026-10-11-section-retest-set-6/VERDICT.md)). A data defect, not a verdict on the term. The latency guardrail had failed too (+328 ms). **Arpit rules what next** (L13 d3: a smaller slice needs his word):
+**Status: CLOSED 2026-10-11 — RULED (Arpit, Cowork): *"update the work items to
+go with the suggestive approach"*.** Neither (a) nor (b): the STOP stands, and
+the re-test moves to a **third form of the term** — the best section scored as a
+standalone document and combined by max, λ ≤ 1 ([W-278](../../work/open/W-278-section-term-v3.md))
+— on **set-7-claude**, whose competitor rule was re-amended the same day so a
+long document loses at baseline by length alone ([W-277](../../work/open/W-277-section-test-data-gen6.md),
+R10). The research behind the ruling (arm diffs, no key): W-278 §Why. Nothing
+else in this file changes; the options table below is history.
+
+**Status before the ruling: OPEN. 🔴 STOP by the frozen decider (Arpit's run, 2026-10-11): the slice is 11, below 15** ([verdict](../../work/regression/2026-10-11-section-retest-set-6/VERDICT.md)). A data defect, not a verdict on the term. The latency guardrail had failed too (+328 ms). **Arpit rules what next** (L13 d3: a smaller slice needs his word):
 
 | | option | what it costs |
 |---|---|---|
 | **(a) — recommended** | **close step 10 as measured**: two FAILs (W-236, W-269) and this STOP; SR-SECTIONS stays `proposed` with all three on it, not archived; W-273 phase 2 never runs; the branch's engine code stays unmerged | nothing more; a `b > 0.5` re-try or a faster attachment can reopen it with a new run |
 | (b) | accept a slice of 11 by ruling and let the decider read the arms | a loosened L13 default, and the latency row already rules out a PASS — it can only yield FAIL or INCONCLUSIVE |
 | (c) | a third question set, built so the baseline misses more long-document answers | another authoring round, and the latency guardrail still fails unless the attachment is rebuilt first |
+
+**Arpit, 2026-10-11 (Cowork):** asked for new test data built from this STOP — filed as [W-277](../../work/open/W-277-section-test-data-gen6.md) (`set-7-claude`, generation 6). That makes the data for option (c); the ruling itself, and the latency fix (c) needs first, are still his. **Same day:** a competitor for every tagged section (W-277, amended) and two fixes to the mechanism plus the latency fix, filed as [W-278](../../work/open/W-278-section-term-v3.md).
 
 **Model:** DoD 2 — **Claude Opus, highest reasoning, in a fresh claude.ai chat**
 (the designated author, A1). DoD 3 — **Opus** (the bar is the deliverable and
@@ -25,10 +36,10 @@ procedure. DoD 6 — **Arpit** scores; the decider is a frozen script.
 | DoD | state | where |
 |---|---|---|
 | 1–2 · the test data (prompt 14, `set-6-claude`) | ✅ 2026-10-11 — **W-272** closed | [W-272](../../archive/open/W-272-section-test-data-gen5.md) |
-| 3 · the bar frozen and committed alone, **before** the ladder rebuild and before any arm — L13 shape; pins W-273 phase 1's engine | ✅ 2026-10-11 — `b4d961cd`; L13 defaults, C2 margin 2, slice read from counts as a range | [`PRE-REGISTRATION.md`](../regression/2026-10-11-section-retest-set-6/PRE-REGISTRATION.md) |
-| 4 · the ladder rebuilt from `seed/` alone (generation 5, a new baseline) | ✅ 2026-10-11 — all eight frozen; `rung-00100` = 118 docs (Arpit's ruling) | [rebuild](../regression/2026-10-11-ladder-gen5-rebuild/report.md) |
-| 5 · capture: the engine W-273 phase 1 hands over (else `03fbf782`), three arms on a copy of the new `rung-01000` | ✅ 2026-10-11 — `b4d961cd`; G0, G1, G3 PASS; 🔴 **latency guardrail FAIL (+328 ms)**, so no PASS is possible | [report](../regression/2026-10-11-section-retest-set-6/report.md) |
-| 6 · 🔴 **Arpit** scores; a session that did not capture runs the frozen decider | ✅ 2026-10-11 — scored and decided by Arpit: **STOP, slice 11 < 15** | [VERDICT](../regression/2026-10-11-section-retest-set-6/VERDICT.md) |
+| 3 · the bar frozen and committed alone, **before** the ladder rebuild and before any arm — L13 shape; pins W-273 phase 1's engine | ✅ 2026-10-11 — `b4d961cd`; L13 defaults, C2 margin 2, slice read from counts as a range | [`PRE-REGISTRATION.md`](../../work/regression/2026-10-11-section-retest-set-6/PRE-REGISTRATION.md) |
+| 4 · the ladder rebuilt from `seed/` alone (generation 5, a new baseline) | ✅ 2026-10-11 — all eight frozen; `rung-00100` = 118 docs (Arpit's ruling) | [rebuild](../../work/regression/2026-10-11-ladder-gen5-rebuild/report.md) |
+| 5 · capture: the engine W-273 phase 1 hands over (else `03fbf782`), three arms on a copy of the new `rung-01000` | ✅ 2026-10-11 — `b4d961cd`; G0, G1, G3 PASS; 🔴 **latency guardrail FAIL (+328 ms)**, so no PASS is possible | [report](../../work/regression/2026-10-11-section-retest-set-6/report.md) |
+| 6 · 🔴 **Arpit** scores; a session that did not capture runs the frozen decider | ✅ 2026-10-11 — scored and decided by Arpit: **STOP, slice 11 < 15** | [VERDICT](../../work/regression/2026-10-11-section-retest-set-6/VERDICT.md) |
 
 ## Why
 
@@ -40,7 +51,7 @@ in a fresh session**, and **it adds new long documents**, not questions alone.
 
 At λ = 2.0, W-269 measured `hit@1` 12 wins / 5 losses (net +7, 45 → 52) and the
 `step10_section` pool's misses 23 → 13. It failed the frozen bar's clause 2
-(zero rank-1 losses) ([VERDICT](../regression/2026-10-10-section-gain-only/VERDICT.md)).
+(zero rank-1 losses) ([VERDICT](../../work/regression/2026-10-10-section-gain-only/VERDICT.md)).
 **That verdict stands.** Three things kept it from being a ship decision:
 
 - **λ = 2.0 was picked after the score**, the best of four tries on one set;
@@ -62,7 +73,7 @@ tighten any of them, and is committed before the ladder rebuild.
 
 | L13 row | this run's parameter |
 |---|---|
-| engine | the commit [W-273](W-273-section-records-implementation.md) phase 1 hands over (W-269's `03fbf782` plus option (b): no section records for record formats) |
+| engine | the commit [W-273](../../work/open/W-273-section-records-implementation.md) phase 1 hands over (W-269's `03fbf782` plus option (b): no section records for record formats) |
 | data | `set-6-claude` on a copy of generation 5's `rung-01000`, `ingest --full` — a fresh set, as L13 decision 5 requires |
 | arms | baseline `sw-0.0`; **decided arm `sw-2.0`**; `sw-4.0` captured and **reported only** |
 | G · gates | W-269's G0 (byte identity at 0.0), G1 (the size bar), G3 (sectionless documents unmoved) |
@@ -80,7 +91,7 @@ C1 ✅ (10 / 0), C2 ❌ (2 wins, 5 losses: −3, one past the margin), C3 ✅
 
 **What a PASS buys:** a ship case for `section_weight = 2.0`, which still owes
 the merge (index `_format` `fux.index.v8`, this repository's re-ingest) and
-the **8.0×** size ruling ([W-236 ANALYSIS](../regression/2026-10-10-section-records/ANALYSIS.md) §2).
+the **8.0×** size ruling ([W-236 ANALYSIS](../../work/regression/2026-10-10-section-records/ANALYSIS.md) §2).
 **What a FAIL buys:** the section term is closed on two sets.
 
 ## After the verdict (ruled with W-271, Arpit 2026-10-10)
@@ -102,8 +113,8 @@ the **8.0×** size ruling ([W-236 ANALYSIS](../regression/2026-10-10-section-rec
 
 ## Reference
 
-- [W-269 VERDICT](../regression/2026-10-10-section-gain-only/VERDICT.md) ·
-  [W-269 report](../regression/2026-10-10-section-gain-only/report.md)
+- [W-269 VERDICT](../../work/regression/2026-10-10-section-gain-only/VERDICT.md) ·
+  [W-269 report](../../work/regression/2026-10-10-section-gain-only/report.md)
 - [SR-SECTIONS](../../records/0161_sections.md) d5 ·
   [SR-WORK-TESTDATA](../../records/0068_WORK-test-data.md) R10, A1–A24 ·
   [SR-RS](../../records/0133_predictions.md) d10b, d14, d19

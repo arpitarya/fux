@@ -41,6 +41,13 @@ valuable judgement, but not the state of play.
 - **W-274:** `fux.toml [index] section_records`, **off by default** (SR-SECTIONS d11). Any section experiment must set it `true` **and** run `fux ingest --full`, because `section_weight > 0` with it off is a hard error. A lab arm built before today has no key and must gain it, or `fux doctor --fix` writes `false`.
 - **Owed by someone:** Cowork's W-270 closure is uncommitted, including its `git rm work/open/W-270-section-retest-set-6.md`.
 
+### 🔴 2026-10-11 — SECTIONS RULED: THE MAX FORM (W-278) ON RE-AMENDED DATA (W-277); W-270 CLOSED
+
+- **Why both terms failed, measured without the key** (arm `ranked` lists against the runtime document table): at λ 2.0 the incoming rank-1 document was a 1 000–2 400-token manual in 19 of 24 (set-5) and 17 of 21 (set-6) rank-1 changes. `rank._section_gain` scores the document as one unit against the **section** average (31.5 tokens; documents average 134), so a long document's "gain" is ≈ its full section score — a length artefact, W-236 again for long documents. Per term at λ 2: manual 1.77 vs a short tf-1 competitor 0.99.
+- **Arpit's ruling:** the best section scored **as a standalone document** on the document yardstick (parent title/path/ctx folded in), combined by **max** — `S = S_doc + λ·max(0, S_sec* − S_doc')`, `λ ≤ 1`, decided arm `sw-1.0` ([W-278](open/W-278-section-term-v3.md), rewritten; its concentration gate and document-average `whole` withdrawn). W-270 archived; W-273 phase 2 waits on W-278.
+- **The data was unwinnable as written:** prompt 15's competitor carried the words in title + heading + first lines + ≥ 2 more, out-matching the section in every unit. **R10 re-amended** ([SR-WORK-TESTDATA](../records/0068_WORK-test-data.md)): long doc words twice in the answering section (≤ 200 words) only; competitor 200–400 words, words once each, body only, never title/heading; ≥ 6 title-match short docs as `other` guardrails. **Prompt 15 not yet run.**
+- **Owed:** `git rm work/open/W-270-section-retest-set-6.md` (archived copy written through file staging; the device shell was wedged) and the record/queue/link tests.
+
 ### 🟠 2026-10-11 — W-270 STOP: THE SECTION RE-TEST COULD NOT MEASURE THE TERM
 
 - Arpit scored and ran the decider: **STOP — slice 11 < 15** ([verdict](regression/2026-10-11-section-retest-set-6/VERDICT.md)). The baseline already ranks 49 of 60 tagged long-document questions first, so set 6 left little to win. Latency guardrail failed too (+328 ms).

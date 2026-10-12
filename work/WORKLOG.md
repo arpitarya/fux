@@ -30,6 +30,48 @@ play: the worklog is the granular, per-exchange trail.
 - **Concurrency:** the Cowork session's W-270 closure (records, OPEN-WORK, archive, prompts, NOW and INTERVIEW edits) is still **uncommitted** in the tree, its shell wedged. Both commits here hold HEAD plus this session's edits only; the W-274 and W-275 filings went in verbatim with W-276 so the id sequence holds. Two unit failures are that work's and not this session's: `work/open/W-270…` is both open and archived (its owed `git rm`), and W-270's verdict has no register row.
 - **Next:** 🔴 Arpit runs prompt 15 (W-277). Someone commits the Cowork W-270 work and runs its `git rm`.
 
+## 2026-10-11 — sections researched; W-270 closed on Arpit's ruling; W-278 and W-277 rewritten  ·  Cowork (Fable 5.1)
+- **Asked:** research every section work item and the test data — why section records failed, and what can be done. Then: *"update the work items to go with the suggestive approach. Remove older work items if needed."*
+- **Found (no key read; arm `ranked` lists against the runtime document table):** at λ 2.0 the incoming rank-1 document was a long manual in 19/24 (set-5) and 17/21 (set-6) rank-1 changes — wins and losses are the same move. Cause: `rank._section_gain` scores `whole` against the **section** average (31.5 tokens; document average 134), so a 2 000-token manual's `whole` ≈ 0.16·idf and the gain ≈ the section score: W-269 is B2 again for long documents (1.77 per term at λ 2 vs 0.99 for a short tf-1 competitor). W-278's first form left 1.16 (λ 2) / 0.82 (λ 1) — no fair λ — and its concentration gate has a one-term hole. Prompt 15's competitor rule (words in title + heading + first lines + ≥ 2) out-matched the section in every unit: a FAIL by construction.
+- **Ruled (Arpit):** the max form — the best section scored as a standalone document on the document yardstick, parent title/path/ctx folded in, `S = S_doc + λ·max(0, S_sec* − S_doc')`, `λ ≤ 1` (1 = pure max); R10 re-amended: long doc words twice in the answering section (≤ 200 words) only, competitor 200–400 words with the words once each, body only, never title/heading; ≥ 6 title-match short docs as `other` guardrails.
+- **Done (file staging; the device shell was wedged, no test run):** W-278 rewritten; W-277 re-amended (+DoD 4); W-273 phase 2 → W-278, `section_weight` 1.0; W-270 archived with its map row (`archive/open/`); OPEN-WORK (W-270 rows gone, W-277 `↳ blocks` W-278 · W-273); SR-WORK-TESTDATA R10 + restamp; SR-SECTIONS §1 + restamp; prompt 15; IMPLEMENTATION; NOW; INTERVIEW.
+- ⚠ **Owed by hand:** `git rm work/open/W-270-section-retest-set-6.md` (the archived copy is written; the shell could not delete the original) and the record/queue/link tests.
+- **Next:** 🔴 Arpit runs prompt 15 (re-amended); Claude Code (Opus) W-278 DoD 1–3.
+
+## 2026-10-11 — W-278 filed; a competitor for every tagged section  ·  Cowork (Opus 5.5)
+- **Asked:** Arpit, on the three untested ideas: bonus only when the answer is concentrated; whole doc on its normal yardstick; every future set needs a short competitor per tagged section — put them in a work item or update the existing one.
+- **Done:** `work/open/W-278-section-term-v3.md` + 🔴 `fux build` row (waits on W-270's ruling; latency fix first; G4 tests the length-artifact hypothesis without the key). The competitor rule: SR-WORK-TESTDATA R10 amended (`content_sha` restamped by the `sr-hash.py` formula), prompt 15 §2–§3, W-277 (≥ 48 competitors), W-270 cross-reference, W-270's `↳ blocks`. Edited through file staging — the device shell was unreachable, so **no test was run**; `tests/test_test_data_prompts.py` and the record tests are owed.
+- **Next:** Arpit rules W-270 (W-278 is the alternative to (a)); prompt 15 is ready to run as amended.
+
+## 2026-10-11 — W-277 filed: set-7 test data; authors now deliver files  ·  Cowork (Opus 5.5)
+- **Asked:** Arpit: a work item for new test data from W-270's findings, run in an independent chat that gives downloadable files plus a Claude Code prompt that places them — and that delivery for every future test-data creation.
+- **Ruled (Arpit):** files, not chat blocks, for every future set. Recorded in L11 decision 6 and its law block (a law amendment on his ruling, named there), SR-WORK-TESTDATA A1/A3/A24, SR-WORK-GOLDEN, `work/golden/README.md`; `CLAUDE.md` regenerated. The key comes as its own download, never in the release zip; the placement prompt checks file and field names before reading.
+- **Done:** R10 amended from W-270 (≥ 8 long docs, ≥ 3 competitors each, ≥ 100 tagged sized from the 18 % miss rate, question words only in the answering section, counted in code); prompt 15 (`work/golden/prompts/15-claude-gen6-section-seed.md`); `work/open/W-277-section-test-data-gen6.md`; inbox + testing rows; W-270 cross-referenced. No `src/`, `node/` or `tests/` touched. This session read W-270's scores, so it may not author (A1).
+- **Next:** Arpit runs prompt 15. The re-run still needs his ruling on W-270 (c) and the latency fix.
+
+## 2026-10-11 — W-276 filed: the post-commit hook re-indexes nothing  ·  Cowork (Opus 5.5)
+- **Asked:** Arpit: a work item for a hook that runs `fux ingest` on every commit.
+- **Found:** the hook exists and is installed (`fux ingest --spawn-runner`), yet `.fux/runtime/` dates from 2026-10-04 across 39 commits. Lead suspect: `fux` is only in `.venv/bin`, and the hook exits silently when it is not on `PATH`.
+- **Ruled:** fix the existing hook; `pre-commit` stays rejected.
+- **Done:** `work/open/W-276-post-commit-ingest-silent.md` + 🟢🧨 `fux build` row. No `src/`, `node/` or `tests/` touched.
+- **Next:** Claude Code (Sonnet) diagnoses and fixes W-276.
+
+## 2026-10-11 — why set-6 shows no section gain (chat only)  ·  Cowork (Opus 5.5)
+- **Asked:** Arpit: set-6-claude does not look good — sections should have improved ranking; why?
+- **Answered:** the baseline is strong (79/99 hit@1); only ~2 short competitors per long doc, so few section questions face a rival; the gain-only term scores the whole doc at the SECTION average length (`rank._section_gain`, `b4d961cd`), so any long doc gets a length-relief bonus, lifting wrong long docs too (section pool +3, other −3). Hypotheses from code + pool counts; no per-question join (L11's named door). Nothing changed.
+- **Next:** unchanged — Arpit rules W-270.
+
+## 2026-10-11 — W-275 filed: research a ranking tuner  ·  Cowork (Opus 5.5)
+- **Asked:** Arpit: explain W-270; how fux differs from section-based RAG; are long docs penalised (yes, lightly: `b = 0.15`); is there a tool to tune these knobs — file a research item; compare `hit@1/5/10` with and without sections.
+- **Done:** `work/open/W-275-ranking-tuner-research.md` + 🟢 `research` row. Comparison read from the filed score files of W-236, W-269, W-270 (counts only) and given in chat; nothing filed, no `src/`, `node/` or `tests/` touched.
+- **Next:** unchanged — Arpit rules W-270. W-275 runs in Cowork (rule 37a).
+
+## 2026-10-11 — W-274 filed: section records become opt-in  ·  Cowork (Opus 5.5)
+- **Asked:** Arpit: index whole documents only by default; sections only when switched on. Then: file it as its own item.
+- **Ruled:** the key lives in `fux.toml [index]` (not tune.toml); named `section_records` because `output.toml`'s `sections` is a display flag.
+- **Done:** `work/open/W-274-section-records-opt-in.md` + 🟢 row. Ratified, not built — no `src/`, `node/` or `tests/` touched.
+- **Next:** Claude Code (Opus) builds W-274 on the section branch.
+
 ## 2026-10-11 — W-270 STOP filed (Arpit ran the decider)  ·  Claude Code (Opus 5.5)
 - **Asked:** Arpit pasted `decide.py`'s output: *STOP — the slice is 11, below 15*.
 - **Done:** VERDICT filed as his (hash unchanged); SR-SECTIONS STOP banner; run index, registry, IMPLEMENTATION; W-270 kept open with three options, rec. (a) close step 10 as measured. `decision.json` was already in `0727135b`: his run preceded that commit.

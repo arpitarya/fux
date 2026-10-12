@@ -182,7 +182,8 @@ of author, where *"the Claude set"* would quietly become a lie.
   a missing input, checkable *before* any arm runs.
 - 🔴 **Each agent-authored set is authored in ONE session that then leaves, and
   the carve-out is PER SET.** That session reads `seed/` and nothing else, hands
-  the questions *and* answers to Arpit **in the chat**, writes no file, and
+  the questions *and* answers to Arpit **as files he downloads from that chat**
+  — the key in a file of its own — writes nothing into a repository, and
   **never runs a rung, scores anything, or returns**. From that handoff on the
   set's answers are as closed to Claude as set 1's — authorship buys no access,
   and authoring set 3 gives nobody reach into set 1 or set 2
@@ -278,7 +279,7 @@ a rule a prompt needs that the record lacks is added to the record first.
 
 | step | who | reads | produces |
 |---|---|---|---|
-| seed additions + a question set | **one designated session per set** (A1) | `seed/` only (A2) | fenced blocks in the chat, no file (A3): documents, dates, history, released questions, **the key** |
+| seed additions + a question set | **one designated session per set** (A1) | `seed/` only (A2) | downloadable files (A3): a release archive — documents, dates, history, released questions, a manifest and a Claude Code placement prompt — and **the key in a file of its own** |
 | commit | **Arpit** | the blocks | documents → `seed/`, rows → `seed-dates.tsv` / `seed-history.tsv`, questions → `questions/set-<gen>-<claude\|codex>.jsonl`; **the key he keeps** |
 | rebuild the ladder | Claude Code | `seed/` only (A23) | phase 4 below |
 | run | Claude Code | the ladder + released questions | phase 5 below |
@@ -655,17 +656,22 @@ seed documents are in `rung-10000`. Re-verified after the 2026-09-15 rebuild.
 
 ## Between authoring and running — what Arpit commits, and what he keeps
 
-**This replaced the freeze-and-release step on 2026-09-15.** Each author ends
-with fenced blocks (SR-WORK-TESTDATA A3) and he splits them:
+**This replaced the freeze-and-release step on 2026-09-15; since 2026-10-11 the
+author delivers downloadable files instead of fenced blocks** (SR-WORK-TESTDATA
+A3, Arpit's ruling), and he routes them:
 
-1. **Block 1 → the repository.** `{"id", "question"}` only, committed as
+1. **The release archive → the repository.** He unzips it at the repository root
+   (`incoming/<set>/`) and runs its `PLACE.md` in Claude Code, which checks file
+   and field names first and moves every file to its place. The released
+   questions are `{"id", "question"}` only, committed as
    `questions/set-<gen>-<claude|codex>.jsonl`. No `type`, no `answerable`, no
    `difficulty`, no `sealed`. 🔴 **Ids carry no type signal** — each author
    permutes its rows before numbering, or the `unanswerable` slice can be
    abstained on by arithmetic.
-2. **Block 2 → Arpit.** The full key, all fields, **including the 20 % sealed
-   holdout the author marked**. It never touches disk; he brings it to
-   scoring (phase 6) when a run needs it.
+2. **The key file → Arpit's hand only.** The full key, all fields, **including
+   the 20 % sealed holdout the author marked**. He saves it as
+   `golden-answers/set-<gen>-<author>.jsonl` (the name `just golden-score` reads)
+   and deletes the download. No agent touches it, and it is never committed.
 
 ⚠ **`ladder/KEY.sha256` is not written any more.** It pinned a key file, and
 there is no key file — the pin now lives with whoever holds the key, which is the

@@ -238,7 +238,8 @@ each to its record; that is all it does now.
   **in every set** — Codex-authored and Claude-authored alike are one subject
   under this law. 🔴 **A key may exist in exactly one place**:
   **`work/golden/golden-answers/`** — Arpit's, on his machine, **gitignored and
-  never committed on any ref**. **A key found anywhere else, or on any committed
+  never committed on any ref**. **A key found anywhere else — save the authoring
+  chat's own download, on its way there by Arpit's hand — or on any committed
   ref, is a breach to declare.** 🔴 **Never committed is the one clause no state
   relaxes** — not while locked, not while unlocked, not ever, and no agent
   commits a key byte in any state.
@@ -284,8 +285,10 @@ each to its record; that is all it does now.
   🔴 **The authoring carve-out survives, and it applies PER SET:** for each
   agent-authored set — set 2, set 3, and any later one — **one designated
   session** writes that set's
-  questions *and* answers from `work/golden/seed/`, hands them to Arpit **in the
-  chat**, writes no file, and never runs a rung or returns to the benchmark;
+  questions *and* answers from `work/golden/seed/`, hands them to Arpit **as
+  files he downloads from that chat** — the key alone in a file of its own —
+  writes nothing into any repository, and never runs a rung or returns to the
+  benchmark;
   from that handoff on **that set is as closed to Claude as set 1**, and every
   number measured on it is `informed` permanently. **The carve-out is one
   session per set and never a standing permission** — authoring set 3 gives no

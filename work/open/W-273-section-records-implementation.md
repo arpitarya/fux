@@ -1,7 +1,7 @@
 ---
 type: Handoff
 name: W-273
-description: "Arpit's ask (2026-10-10, Cowork): the implementation section records still need, in two phases. Phase 1, before W-270 captures: W-271's ruled option (b) — no section records for decoded record formats — plus the template comment and the gates re-run, pinning the engine W-270 measures. Phase 2, only on a W-270 PASS: the ship path to main."
+description: "Arpit's ask (2026-10-10, Cowork): the implementation section records still need, in two phases. Phase 1, before W-270 captures: W-271's ruled option (b) — no section records for decoded record formats — plus the template comment and the gates re-run, pinning the engine W-270 measures. Phase 2, only on a W-278 PASS (the measurement moved there 2026-10-11): the ship path to main."
 item: W-273
 filed: 2026-10-10
 ball: agent
@@ -9,12 +9,13 @@ ball: agent
 
 # W-273 — section records: the implementation
 
-**Status: OPEN. ✅ Phase 1 landed 2026-10-11** (engine **`b4d961cd`**, [gates](../regression/2026-10-11-section-formats-gates/report.md) all PASS). **🟡 Phase 2 waits on a W-270 PASS.** W-271 ruled 2026-10-10 (Arpit, Cowork, *"Go with the recommendation"*): **option (b)**.
+**Status: OPEN. ✅ Phase 1 landed 2026-10-11** (engine **`b4d961cd`**, [gates](../regression/2026-10-11-section-formats-gates/report.md) all PASS). **🔴 Phase 2 waits on a [W-278](W-278-section-term-v3.md) PASS** (W-270 closed 2026-10-11 on Arpit's ruling: the third form of the term, measured on set 7). W-271 ruled 2026-10-10 (Arpit, Cowork, *"Go with the recommendation"*): **option (b)**.
 
 **Arpit, 2026-10-10 (Cowork):** *"Create one work item for implementation and
 one work item if test data needs to be generated."* The data is
-[W-272](../../archive/open/W-272-section-test-data-gen5.md); the measurement is
-[W-270](W-270-section-retest-set-6.md); the rulings were
+[W-272](../../archive/open/W-272-section-test-data-gen5.md) and now
+[W-277](W-277-section-test-data-gen6.md); the measurement is
+[W-278](W-278-section-term-v3.md) (W-270 closed 2026-10-11); the rulings were
 W-271 (closed 2026-10-10).
 
 **Model:** Claude Code, **Opus** — a committed-plane change across both readers.
@@ -51,19 +52,20 @@ exist on `main`.
 | 3 · gates | ✅ G0 0/90, G1 byte-identical to W-269's, G3 0 failures; the gen-4 ladder has none of the three formats, so each is an identity. Own repo **1.756×** (expected ~1.9×; the document plane grew 6.5 % since W-236) | [report](../regression/2026-10-11-section-formats-gates/report.md) |
 | 4 · the engine | ✅ **`b4d961cd`**, pinned by W-270's bar. ⚠ Suites: unit and e2e green apart from the known reds — the repo's own v7 index (2 unit, 12 Node; phase 2's re-ingest) and the ladder's missing gen-5 seeds (8 unit; W-270 DoD 4) | WORKLOG 2026-10-11 |
 
-## Phase 2 — only on a W-270 PASS
+## Phase 2 — only on a W-278 PASS
 
 5. Merge `main` into the branch; `_format` → `fux.index.v8`; this repository
    re-ingested with `--full`.
-6. `section_weight = 2.0` in the template (the decided arm, L13 decision 4).
+6. `section_weight = 1.0` in the template (W-278's decided arm, pure max; L13 decision 4). The record refuses a value above 1.0.
 7. Records, in the same change: SR-SECTIONS → `accepted`, with its `owns`;
    SR-TUNE (`section_weight`); SR-RANKING; SR-NODE-SEARCH; the index record
    schema (`nsec`); SR-DOTFUX (`sections/` committed).
-8. The latency guardrail measured standalone if W-270 did not; CHANGELOG
+8. The latency guardrail measured standalone if W-278 did not; CHANGELOG
    *Breaking* (every consumer re-ingests).
 
-**On a W-270 FAIL or INCONCLUSIVE**, phase 2 does not run; W-270 says what
-happens instead.
+**On a W-278 FAIL or INCONCLUSIVE**, phase 2 does not run; W-278 says what
+happens instead. ⚠ W-278 DoD 1–3 (the record, the latency fix, the third form
+of the term) land on this branch before its bar is frozen.
 
 ## Hazards
 

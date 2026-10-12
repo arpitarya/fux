@@ -118,12 +118,22 @@ work/regression/2026-10-04-node-graph-speed/evidence/once-process.mjs           
 work/regression/2026-10-05-ladder-gen4-rebuild/evidence/build.log                                      # not an indexed file type
 work/regression/2026-10-05-ladder-gen4-rebuild/evidence/new_seed_name_leaks.out                        # not an indexed file type
 work/regression/2026-10-05-ladder-gen4-rebuild/evidence/planted-check.out                              # not an indexed file type
+work/regression/2026-10-09-merge-driver-dogfood/evidence/attempt-0-attributes-on-one-side.log          # not an indexed file type
+work/regression/2026-10-09-merge-driver-dogfood/evidence/attempt-1-register-defect.log                 # not an indexed file type
+work/regression/2026-10-09-merge-driver-dogfood/evidence/attempt-2-fixed-driver.log                    # not an indexed file type
+work/regression/2026-10-10-section-gain-only/evidence/doctor-fix.diff                                  # not an indexed file type
+work/regression/2026-10-10-section-records/evidence/doctor-fix.diff                                    # not an indexed file type
+work/regression/2026-10-11-ladder-gen5-rebuild/evidence/build.log                                      # not an indexed file type
+work/regression/2026-10-11-ladder-gen5-rebuild/evidence/new_seed_name_leaks.out                        # not an indexed file type
+work/regression/2026-10-11-section-retest-set-6/evidence/doctor-fix.diff                               # not an indexed file type
+work/regression/2026-10-11-section-retest-set-6/evidence/pre-section-tune.diff                         # not an indexed file type
 # <<< fux: not indexed <<<
 
 # >>> fux: skipped >>>
 # fux opened these and could not read them. Rewritten by every `fux ingest`.
 # These are the ones worth a look. Fix the file and delete its line.
-archive/v0.26/tests_e2e/corpus/docs/binary.md   # binary
+archive/v0.26/tests_e2e/corpus/docs/binary.md                                  # binary
+work/regression/2026-10-11-section-retest-set-6/evidence/arm-diff-sw-0.0.txt   # empty
 # <<< fux: skipped <<<
 
 # What fux does NOT index. Same grammar as .gitignore, and it is the ONE place

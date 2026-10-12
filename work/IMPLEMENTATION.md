@@ -47,6 +47,16 @@ Rules:
 | **tests** | 5 unit (`tests/maintain/test_hooks.py`), 2 e2e (`test_a_commit_with_fux_off_path_still_re_indexes`, the absent case asserts its message). Unit suite whole: 7094 passed, 4 failed — 2 from another session's uncommitted W-270 work, 2 fixed in this change; e2e whole: 172 passed, 1 skipped |
 | **live** | this repository's hooks reinstalled; the closing commit made from `env -i PATH=/usr/bin:/bin` |
 
+## 2026-10-11 — **W-270 closed: ruled — the section term's third form (W-278), on re-amended data (W-277)**
+
+| what | evidence |
+|---|---|
+| **research** | arm diffs against the runtime document table, no key: at λ 2.0 the incoming rank-1 document was a 1 000–2 400-token manual in 19 of 24 changes (set-5) and 17 of 21 (set-6); `rank._section_gain` scores the whole document against the **section** average (31.5 tokens vs a document average of 134), so a long document's gain is a length artefact — [W-278](open/W-278-section-term-v3.md) §Why |
+| **ruling** | Arpit, Cowork: *"update the work items to go with the suggestive approach"* — the best section scored as a standalone document (document yardstick, parent title/path/ctx folded in), combined by max, `λ ≤ 1`; W-278's first form (concentration gate, document-average `whole`) withdrawn; R10 re-amended so the competitor wins at baseline by length alone (the morning form made the set unwinnable) |
+| **records** | [SR-WORK-TESTDATA](../records/0068_WORK-test-data.md) R10 re-amended, restamped; [SR-SECTIONS](../records/0161_sections.md) §1 notes the ruling (decision 5 changes at W-278 DoD 1); prompt 15 §why, §2, §3, Part B |
+| **queue** | W-270 archived (ruling only, no code); W-278 and W-277 rewritten; W-273 phase 2 re-pointed at W-278 |
+| **not done** | 🔴 Arpit runs prompt 15; W-278 DoD 1–6 (Claude Code, Opus); no test run — the device shell was unreachable |
+
 ## 2026-10-11 — **W-270: STOP — the section re-test's slice is 11, below 15 (Arpit's run of the decider)**
 
 | what | evidence |

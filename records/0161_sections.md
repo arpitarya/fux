@@ -11,7 +11,7 @@ feature: section records — the committed section plane, the index section rule
 owns: []
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: 4af98926350ed2504cc73f83287f633c4827e6bc9a7c56e3d03c84bafaf93c83
+content_sha: 9c2341a9e18ec081b80934b82b18b80341223f40f26f2bbd67f60017231c4be8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -32,7 +32,7 @@ content_sha: 4af98926350ed2504cc73f83287f633c4827e6bc9a7c56e3d03c84bafaf93c83
 
 🔴 **The second mechanism FAILED too, 2026-10-10 — drift (W-269).** The gain-only term (decision 5) removed the short-document credit (G3 PASS), and the `step10_section` pool's misses fell 23 → 23 · 21 · 19 · 13 across `section_weight` 0.25 · 0.5 · 1.0 · 2.0. But every weight lost baseline rank-1 hits (2 · 4 · 4 · 5), and the frozen bar allows none ([verdict](../work/regression/2026-10-10-section-gain-only/VERDICT.md)). Built on branch `claude/gracious-galileo-aqrg8b`, unmerged. `section_weight` does not exist on `main`; what happens next is Arpit's.
 
-🟠 **The re-test STOPPED, 2026-10-11 — not a verdict (W-270).** On a fresh set (`set-6-claude`, generation 5) under law L13, the baseline already put 49 of the 60 tagged section questions at rank 1, so the slice was **11, below the floor of 15**, and the frozen decider stopped before reading any arm ([verdict](../work/regression/2026-10-11-section-retest-set-6/VERDICT.md)). Separately, `sw-2.0` as built **failed the latency guardrail** (+328 ms at `rung-10000`, in the scan path's section attachment). Decision 2 now excludes `.csv`/`.json`/`.jsonl` (W-273 phase 1). `section_weight` does not exist on `main`; what happens next is Arpit's.
+🟠 **The re-test STOPPED, 2026-10-11 — not a verdict (W-270).** On a fresh set (`set-6-claude`, generation 5) under law L13, the baseline already put 49 of the 60 tagged section questions at rank 1, so the slice was **11, below the floor of 15**, and the frozen decider stopped before reading any arm ([verdict](../work/regression/2026-10-11-section-retest-set-6/VERDICT.md)). Separately, `sw-2.0` as built **failed the latency guardrail** (+328 ms at `rung-10000`, in the scan path's section attachment). Decision 2 now excludes `.csv`/`.json`/`.jsonl` (W-273 phase 1). `section_weight` does not exist on `main`. **Ruled 2026-10-11 (Arpit, Cowork), W-270 closed:** both failed terms scored the document as one unit against the *section* average length, so a long document's gain was a length artefact (arm diffs: 17 of 21 and 19 of 24 rank-1 changes brought in a long document). The third form — the best section scored **as a standalone document** on the document yardstick, combined by **max**, `λ ≤ 1` — is [W-278](../work/open/W-278-section-term-v3.md), to be written into decision 5 before its build; the data is [W-277](../work/open/W-277-section-test-data-gen6.md).
 
 A long document whose answer sits under one heading loses at ranking. Its
 query words are a small share of a big document. U0 (a query-time re-rank)
