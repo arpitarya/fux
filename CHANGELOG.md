@@ -8,6 +8,12 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.1] - 2026-10-14
+
+### Fixed
+
+- **Two Node section-weight tests imported a bare Windows path** (`import('C:\\…')`), which Node rejects as an ESM specifier, so the Windows unit suite was red and 3.0.0 could not pass the release gate. They now import a `file://` URL. No engine change; 3.0.0 was never published.
+
 ## [3.0.0] - 2026-10-13
 
 **Breaking: the index format is `fux.index.v8` — run `fux ingest --full` once. `.fux/index/REGISTER` is `fux.register.v2`. First stable 3.0 release.** Details below.

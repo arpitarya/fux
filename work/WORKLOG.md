@@ -23,6 +23,11 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-14 — 3.0.0 merged (PR #52), Windows red → 3.0.1  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *commit everything and merge the PR; then push directly to main if anything changed.*
+- **Done:** index refresh committed onto the branch, PR #52 merged. The run on `main` before it (61707ae4) was red on Windows py3.12/3.14: `test_section_records_switch.py`'s two Node tests did `import('C:\\…')`, which Node rejects, so stdout was empty. Fixed with `Path.as_uri()` (as `test_tune.py` already does). The 3.0.0 tree could never pass the release gate, so per Arpit's instruction it ships as **3.0.1**, pushed straight to `main`. First recorded occurrence of the bare-path `import()` class; a second one is a gate (SR-WORK-SESSION d13).
+
 ## 2026-10-13 — release 3.0.0 (major)  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *do a major release 3.0.0; if the pipeline fails, fix and do a patch upgrade.*

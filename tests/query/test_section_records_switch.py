@@ -159,7 +159,7 @@ def test_node_refuses_the_same_mismatch(tmp_path):
     root = _repo(tmp_path, on=False)
     _set_weight(root, 1.0)
     script = (
-        f"import({str(FUX_MJS)!r}).then(m => {{ try {{ m.loadTune({str(root)!r}, {{enabled: true}}); "
+        f"import({FUX_MJS.as_uri()!r}).then(m => {{ try {{ m.loadTune({str(root)!r}, {{enabled: true}}); "
         "console.log('LOADED'); } catch (e) { console.log(e.message); } })"
     )
     out = subprocess.run([NODE, "-e", script], capture_output=True, text=True, encoding="utf-8").stdout
@@ -185,7 +185,7 @@ def test_node_refuses_a_section_weight_above_one(tmp_path):
     root = _repo(tmp_path, on=True)
     _set_weight(root, 1.5)
     script = (
-        f"import({str(FUX_MJS)!r}).then(m => {{ try {{ m.loadTune({str(root)!r}, {{enabled: true}}); "
+        f"import({FUX_MJS.as_uri()!r}).then(m => {{ try {{ m.loadTune({str(root)!r}, {{enabled: true}}); "
         "console.log('LOADED'); } catch (e) { console.log(e.message); } })"
     )
     out = subprocess.run([NODE, "-e", script], capture_output=True, text=True, encoding="utf-8").stdout
