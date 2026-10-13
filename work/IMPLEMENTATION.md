@@ -25,6 +25,15 @@ Rules:
    this is per milestone, for the next session.
 
 
+
+---
+
+## 2026-10-13 — **W-273 closed: section records merged to `main`, opt-in (PR #49)**
+
+| | |
+|---|---|
+| **shipped** | `fux.index.v8` (BREAKING: `fux ingest --full`); `fux.toml [index] section_records` + `[ranking] section_weight` (both off; measured pair `true` + `1.0`); the third form of the section term; SR-SECTIONS accepted |
+| **evidence** | [W-278 VERDICT](regression/2026-10-13-section-term-v3/VERDICT.md) (INCONCLUSIVE, ruled ship); PR #49 CI green |
 ---
 
 ## 2026-10-13 — **W-278 DoD 1–5: the section term's third form, built and captured (not yet scored)**
@@ -139,7 +148,7 @@ Rules:
 |---|---|
 | **law** | [SR-LAW-13](../records/0015_LAW-13-the-standing-bar.md), the standing ship bar for ranking changes (Arpit, 2026-10-10); `CLAUDE.md` regenerated; SR-LAWS decision 11 |
 | **ruling** | W-271, Arpit: *"Go with the recommendation"* — no section records for `.jsonl` / `.csv` / `.json` (≈ 1.9× on this repo against 8.0×); SR-SECTIONS stays `proposed` on a W-270 FAIL |
-| **not done** | the build is [W-273](open/W-273-section-records-implementation.md) phase 1; the test data [W-272](../archive/open/W-272-section-test-data-gen5.md); the measurement W-270 (closed 2026-10-11; successor [W-278](../archive/open/W-278-section-term-v3.md)) |
+| **not done** | the build is [W-273](../archive/open/W-273-section-records-implementation.md) phase 1; the test data [W-272](../archive/open/W-272-section-test-data-gen5.md); the measurement W-270 (closed 2026-10-11; successor [W-278](../archive/open/W-278-section-term-v3.md)) |
 
 ## 2026-10-10 — **W-269: section records' gain-only term FAIL (drift); the item is closed**
 

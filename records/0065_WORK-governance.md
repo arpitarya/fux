@@ -7,10 +7,10 @@ description: "One map of every file that governs how this repo is worked on — 
 status: accepted
 date: 2026-09-14
 feature: the governance map — which file governs what, who reads it, and what enforces it
-owns: [tests/test_record_paths_resolve.py@a3d92ddd910a, tests/test_work_queue_rules_have_one_home.py@be2e38b86b0d]
+owns: [tests/test_record_paths_resolve.py@e13409b8783a, tests/test_work_queue_rules_have_one_home.py@c6ca0165b514]
 laws: [L0]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: a95163cd686d857ea6eb8ea2c222a86d685c69291e85f036cf39712ff4b84bf4
+content_sha: 4544b49c9593c51d86094fd251d0ed8e19e27f5c2f20366f39b00dc2b5e6c2fb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -189,6 +189,8 @@ still listed `DOGFOOD.md`, which no longer exists, and named neither
     `pre-commit`: the `no SR affected` escape hatch needs the commit message,
     which does not exist yet at `pre-commit` time. `test_sr_freshness.py` runs
     the identical check in CI. Nobody reconciles a record by discipline.
+
+**`WORK-SYSTEM.md` is exempt from the record-path and one-home checks by name (2026-10-13, Arpit: *"commit everything"*).** It is an export for another repository: its record numbers are that repository's, and it restates the queue rules on purpose because SR-WORK-OPEN-QUEUE does not exist there. ⚠ **The cost, named:** nothing holds it equal to the records it copies, so it can drift silently — exactly what L0's restatement test forbids for a file that binds this repository, which this one does not.
 
 ### Consequences
 

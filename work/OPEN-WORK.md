@@ -34,7 +34,6 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-273** · `agent` — section records. Phases 1–2 ✅ on the branch (W-278 ruled ship, opt-in pair). Owed: the merge to `main` by SR-WORK-RELEASE. **Opus.** [detail](open/W-273-section-records-implementation.md)
 
 ### testing
 
