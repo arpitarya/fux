@@ -136,6 +136,7 @@ edit it, replace it ([SR-DECODE](records/0139_decode.md), [SR-FETCHER](records/0
 | Follow links between docs | `fux explain <doc>` · `fux graph "…"` · `fux path <a> <b>` |
 | Find duplicate, unreachable or boilerplate docs | `fux inspect` |
 | Keep IDs whole (`RF 118` = `RF-118`) | `fux identifiers` |
+| List what is in the index, one line per document | `fux register` (`--json` for scripts) |
 | See it all in a browser | `fux serve` — Ask, Answer, Documents, Words, Index, Identifiers |
 | Check the setup | `fux doctor` (read-only, offline) |
 
@@ -191,7 +192,7 @@ it's how other people find it. 👀 **Watch → Custom → Releases** to hear wh
 </details>
 
 <details>
-<summary><b>The thirteen laws fux is built under</b></summary>
+<summary><b>The fourteen laws fux is built under</b></summary>
 
 Every decision of record lives in the [SR register](records/README.md)
 ([SR-LAWS](records/0001_LAWS.md)):
@@ -207,7 +208,8 @@ Every decision of record lives in the [SR register](records/README.md)
 [L9 use record never committed](records/0011_LAW-9-use-record.md) ·
 [L10 build output, never source](records/0012_LAW-10-bundled-output.md) ·
 [L11 the sealed answer key is closed to Claude](records/0013_LAW-11-sealed-answer-key.md) ·
-[L12 every value lives in a config file](records/0014_LAW-12-values-live-in-config.md).
+[L12 every value lives in a config file](records/0014_LAW-12-values-live-in-config.md) ·
+[L13 a ranking change ships only through the standing bar](records/0015_LAW-13-the-standing-bar.md).
 The laws were renumbered on 2026-09-28; an older document is read through
 [SR-LAWS](records/0001_LAWS.md) decision 2a.
 

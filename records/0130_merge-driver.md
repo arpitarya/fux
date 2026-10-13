@@ -6,12 +6,12 @@ title: "SR-MERGE-DRIVER (0130) — the committed index merges line by line, last
 description: "The merge driver for .fux/index/*.jsonl. A shard is a header plus one JSON line per document sorted by id, so the union of two line sets is usually the right answer and a textual merge cannot see it. Higher ver wins; four cases are refused with ordinary conflict markers; the output is sorted so two machines produce the same bytes."
 status: accepted
 date: 2026-08-21
-amended: 2026-10-09
+amended: 2026-10-13
 feature: the merge driver for the committed index
-owns: [src/fux/maintain/mergedriver.py@3d3ea30d2dfd]
+owns: [src/fux/maintain/mergedriver.py@b1175af9b955]
 laws: [L2, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 73a78b206ab846c1ac7292adf6ff730bb8ff14b651ca333b149af6cba3227239
+content_sha: ba79ad7a40563cd11afb13f92adc3d297271c6b929f5eae0424746ec69231f40
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -278,10 +278,24 @@ it the day the register landed.
   unparseable rather than merging it wrongly. `fux hooks` re-registers.
 - **`.gitattributes` gains a second line**, appended write-if-missing per line
   like the first.
+- **The header is every leading `#` line, kept whole** (W-279, 2026-10-13).
+  The v2 register opens with **two** comment lines — the format line carrying
+  `rules=`, then the column header ([SR-INGEST](0106_ingest.md) decision 22) —
+  and the first form of `_register_rows` kept only the first, so a merged
+  register would have lacked its column header and `fux ingest` would have
+  rewritten it after every merge for no change in the corpus. Ours wins the
+  header block when the two sides were written at different `rules=`: ours is
+  the engine that will re-ingest, and the next ingest settles it either way.
+  With no header on any side the driver writes the column header from
+  `constants.toml [register]` alone, which doctor then reports as *old format*.
+  Tripwire: `test_register_keeps_both_header_lines`.
 
 **The merge driver reads git's `%O %A %B [%P]` by unpacking** and exits `constants.toml [exit] usage` on a short argv. The merge itself is unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** **Section shards merge by parent, never by line** (`merge_sections`; [SR-SECTIONS](0161_sections.md) decision 9, amended the same day). A document's section lines are one unit, under this record's rules: equal sides agree, and a side equal to the ancestor loses. Both sides changed differently is **refused**, because a per-file driver cannot see which side the sibling document shard took, and mixing lines would break totality silently. The driver tells a section shard by `%P` (`/sections/`), or without `%P` by every id ending in `#s<k>`.
 
 ### Consequences
 

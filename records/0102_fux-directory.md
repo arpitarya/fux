@@ -5,13 +5,13 @@ name: SR-DOTFUX
 title: SR-DOTFUX (0102) — the .fux/ directory
 description: "Every child of .fux/ is declared committed, derived or acquired; the ignore rule is narrow by construction and asserted by doctor against git itself."
 status: accepted
-amended: 2026-09-11
+amended: 2026-10-13
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@415610845f68, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@43c3c371c374, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@6421326ac75c, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@43c3c371c374, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 3324817ebe36114d5d1ee99e1c08db2d49237931810466477be4b90611969737
+content_sha: 43b7cf0fdb668057d407b9d7d9d238212ce359fee45b097769012caa04c6fa6d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -220,7 +220,7 @@ table is the reasoning.
 
 | entry | kind | what it is, and why that kind |
 |---|---|---|
-| `index/` | committed | the product; nothing can recompute it |
+| `index/` | committed | the product; nothing can recompute it. Beside the shards, **`index/REGISTER`**: one line per indexed document — `loc` ⇥ `sha` ⇥ `decoder` ⇥ optional `k=v` — derived from the index and committed with it, so a PR shows what the corpus is without a reader ([SR-INGEST](0106_ingest.md) decision 22; the `fux register` verb prints the same rows from the index) |
 | `sources/` | committed | `dirs` · `urls`, one entry per line, on the one grammar in [SR-URL-LIST](0116_url-list.md). ⚠ **`types` lived here until 2026-09-11** and is `formats.toml` now (the row below) |
 | `formats.toml` | committed | which files are documents and which decoder reads each extension — `include` plus `[decoders]` ([SR-TYPES](0128_types-list.md) decisions 11–12). **Optional**: absent means the built-in default. Write-if-missing — a repo that already has the file keeps it, bindings and all; a repo with only the old `sources/types` has it **converted** by `fux setup`, never rewritten in place |
 | `fetchers/` | committed | consumer code — decision 4 |
@@ -949,6 +949,9 @@ line raises names the fix itself rather than pointing at the header.
 **No decision here moved** (W-242 Tier 2, 2026-10-03): `node/src/store/fuxdir.mjs` is a narrow twin of `fuxdir.py`, `derived_dir` alone, owned here with its Python half. The layout is unchanged; a second runtime now creates `runtime/`.
 
 **No decision here moved** (W-261, 2026-10-05): `CACHEDIR_SIGNATURE`, `CACHEDIR_TAG` and `derived_dir` moved from `store/fuxdir.py` to `store/cachedir.py`, owned by SR-CACHEDIR-TAG; `fuxdir` imports them back, so `fuxdir.derived_dir` keeps every caller. The Node twin `store/fuxdir.mjs` is narrowed to `fuxDir`, and `derivedDir` moved to `store/cachedir.mjs`. The layout this record decides is unchanged.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `.fux/index/sections/` is **committed**, inside `.fux/index/` ([SR-SECTIONS](0161_sections.md) decision 1). **It exists only when `fux.toml [index] section_records = true`** (W-274, SR-SECTIONS decision 11); the template writes `false`, and then neither the directory nor any `nsec` is written. The runtime gains `sections.json` and `sections/`, derived and gitignored with the rest of `.fux/runtime/`.
 
 ### Consequences
 

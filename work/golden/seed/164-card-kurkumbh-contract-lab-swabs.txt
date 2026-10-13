@@ -1,0 +1,33 @@
+title: Kurkumbh contract laboratory - rapid hygiene swab results we accept
+doc_id: QCL-LAB-CRD-15
+owner: Yogesh Dhumal
+department: QA and Compliance
+status: in_force
+effective_date: 2025-12-01
+applies_to: Kurkumbh frozen depot
+
+KURKUMBH FROZEN DEPOT: RAPID HYGIENE SWABS FROM THE CONTRACT LABORATORY
+
+The Kurkumbh frozen depot does not have its own laboratory. Its hygiene swabs of reefer floors, cleaned crates and the blast freezer are read by a contract laboratory in the MIDC estate, whose technician visits on Tuesdays and Fridays.
+
+WHAT THE SWAB MEASURES
+The swab picks up atp from food residue and living cells; the technician's hand-held reader gives a number within seconds.
+
+THE LINE WE USE
+At Kurkumbh, a reading of 300 rlu or below is a pass. Above that, the surface is cleaned again and swabbed again before it is used.
+
+The depot's line is set by the frozen food customer's contract, which is looser than the lines used for chilled food.
+
+WHAT A PASS DOES NOT MEAN
+A pass means the surface was cleaned, not that it is free of germs. Any microbiological test the customer asks for still goes to the contract laboratory in the usual way.
+
+RECORDS
+The technician leaves a copy of each day's readings with the depot shift lead, who files it in the hygiene folder.
+
+IF THE TECHNICIAN DOES NOT COME
+The shift lead phones the laboratory. Surfaces waiting for a swab are not used until they have been swabbed and passed.
+
+THE READER
+The technician checks the reader with the maker's control swabs at the start of each visit and writes the result at the top of the day's sheet. A reader that fails its check is not used that day.
+
+Questions to the depot QA officer.

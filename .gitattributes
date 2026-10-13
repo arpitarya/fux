@@ -15,3 +15,4 @@
 # fux: the committed index merges line by line, never textually.
 .fux/index/*.jsonl merge=fux-index
 .fux/index/REGISTER merge=fux-index
+.fux/index/sections/*.jsonl merge=fux-index

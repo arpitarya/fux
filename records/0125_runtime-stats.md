@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-19
 amended: 2026-10-05
 feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule that they are stored raw"
-owns: [node/src/derive/stats.mjs@0036d6ff0826, src/fux/derive/stats.py@595e5ee1a4e5]
+owns: [node/src/derive/stats.mjs@04eace0fe7a4, src/fux/derive/stats.py@b9882b444f9a]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: c8449369a62454bdb38b47fa77d675519bb5d1ae36b8898515ac6b8aa6c2debc
+content_sha: 9d2191842b2976aef0ae3a2cbbdf41d3aaba82633cc4f645c6eb24d3cedb939a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -222,6 +222,13 @@ this moved where they are written, not what they are.
 The stats plane is unchanged by identifier families; the scan and the accelerator analyze the question with them identically, so `df` and `n` stay one pair ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 **No decision here moved** (W-246, 2026-10-04): `derive/accel.py`'s `is_fresh` docstring now says the deep shard re-hash lives in `doctor`, not that it is owed.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** Two raw keys join the plane: **`sec_units`** (section records plus sectionless documents) and **`sec_total_flen`** (their raw body and heading totals). They are the section `avg_wlen`, weighted at query time ([SR-SECTIONS](0161_sections.md) decision 5). Raw for the reason `total_flen` is raw.
+
+**W-278 — the section keys leave (2026-10-13; same branch, unmerged).** `sec_units` and `sec_total_flen` are **removed** from `stats.json` on both readers. The third form of the section term scores every unit on the **document** `avg_wlen` ([SR-SECTIONS](0161_sections.md) decision 5), so nothing reads a section average. `RUNTIME_SCHEMA` bumps, so `is_fresh` refuses a plane built with them and the next `fux build` drops them. The differential law has one number fewer to transcribe.
+
+**No decision here moved** (W-273 phase 2, 2026-10-13): `derive/accel.py`, which reads this plane, lost the scan's section route to `query/sections.py`.
 
 ### Consequences
 

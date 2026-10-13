@@ -265,6 +265,37 @@ def _title_index(sections: list[tuple[str, int, str, int, int]]) -> int:
     return first if all(sections[i][1] > level for i in headed[1:]) else -1
 
 
+def index_sections(content: str) -> list[str]:
+    """The INDEX's section rule (W-236, SR-SECTIONS decision 2): section texts, in order.
+
+    **`_fold`'s sibling, kept beside it so the two fold rules cannot drift.**
+    Same grammar, same `_sections`; one different test. Here a section folds
+    forward only when it is **bodiless** — its heading line and nothing else —
+    and the next section is strictly deeper. `_fold` asks *shorter than
+    `[refer] min_passage_bytes`* instead, and that is a tunable: a committed
+    byte may not be a function of one (SR-TUNE decision 6), so the index cannot
+    use it. The document title is always such a section and needs no rule.
+
+    No byte count is read anywhere in this function. One section or none means
+    the document is sectionless; the caller decides that, not this.
+    """
+    secs = _sections(content)
+    out: list[str] = []
+    carry: list[str] = []
+    for i, (heading, level, text, _start, _end) in enumerate(secs):
+        nxt = secs[i + 1] if i + 1 < len(secs) else None
+        bodiless = bool(heading) and "\n" not in text.strip()
+        nested = nxt is not None and nxt[1] > level
+        if bodiless and nested:
+            carry.append(text)
+            continue
+        out.append("\n\n".join(carry + [text]))
+        carry = []
+    if carry:
+        out.append("\n\n".join(carry))
+    return out
+
+
 def _fold(
     sections: list[tuple[str, int, str, int, int]],
     *,

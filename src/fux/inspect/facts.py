@@ -246,7 +246,7 @@ def _decoders(root: Path) -> tuple[dict[str, str], dict[str, str]]:
     from ..ingest import decoderdigest, register
 
     digests = decoderdigest.binding_digests(root)
-    names = {loc: row.decoder.split("@", 1)[0] for loc, row in register.read(root).items()}
+    names = {loc: row.decoder.split("@", 1)[0] for loc, row in register.read(root).rows.items()}
     return digests, names
 
 

@@ -686,7 +686,7 @@ async function openDocument(loc) {
   const ing = x.ingested || {}, idx = x.indexed || {}, links = x.links || { out: [], in: [] };
   const wordCut = (ing.cuts || {}).word;
   let html = `<div class="card dochead"><h2>${esc(x.title || baseName(loc))}</h2><div class="loc mono">${esc(x.loc || loc)} · <span style="color:var(--faint)">${esc(x.id)}</span></div>
-    <div class="badges">${ing.kind ? `<span class="badge">${esc(ing.kind)}</span>` : ""}${ing.decoder && ing.decoder !== ing.kind ? `<span class="badge">decoder ${esc(ing.decoder)}</span>` : ""}${x.register && x.register.kind === "url" ? '<span class="badge boost">url</span>' : ""}${x.archived ? '<span class="badge arch">archived</span>' : ""}${x.superseded ? '<span class="badge arch">superseded</span>' : ""}
+    <div class="badges">${ing.kind ? `<span class="badge">${esc(ing.kind)}</span>` : ""}${ing.decoder && ing.decoder !== ing.kind ? `<span class="badge">decoder ${esc(ing.decoder)}</span>` : ""}${x.register && x.register.attrs && x.register.attrs.fetch ? '<span class="badge boost">url</span>' : ""}${x.archived ? '<span class="badge arch">archived</span>' : ""}${x.superseded ? '<span class="badge arch">superseded</span>' : ""}
       ${x.identity && x.identity.shares_title_count ? `<span class="flag">title shared with ${esc(x.identity.shares_title_count)} other${x.identity.shares_title_count === 1 ? "" : "s"}</span>` : ""}</div>
     <div class="actions"><button class="btn" id="askTitle">Ask its title</button><button class="btn" id="answerTitle">Answer its title</button></div>
     <div class="stats">

@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@7d111b045e0c]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: a2c74f856a00d3a5b3216baf1d9f797d23ddac83fe42289e048a20aa4f6d752b
+content_sha: bcb1b7b7e826b6c9d34160879eb9bfe75221a4ca97049067bb5a2abbf22a5382
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -520,6 +520,9 @@ The question `fux answer` ranks is analyzed with the repo's identifier families,
 **No decision here moved** (W-247, 2026-10-04): `cmd_answer` renders `build_answer`'s result, and `fux.api.Index.answer` reads the same builder instead of capturing the CLI's stdout. The text and `--json` output are byte-identical.
 
 **No decision here moved** (W-261, 2026-10-05): `find`'s code moved out of `query/__init__.py`, which this record describes, into `query/find.py` (SR-FIND's). `cmd_answer`, `ANSWER_TOP` and both printers are untouched.
+
+
+**W-236 — section records (2026-10-10; branch `w236-sections`, unmerged).** `answer`'s passages are unchanged. `refer/_chunk.py` gains `index_sections`, the *index's* section rule beside `_fold`, and `answer` does not call it. A hit's `section` (only while `[ranking] section_weight > 0`) names an index section by ordinal; refer recovers its heading by cutting the fetched bytes the same way ([SR-SECTIONS](0161_sections.md) Consequences).
 
 ### Consequences
 

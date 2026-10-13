@@ -1,0 +1,22 @@
+{
+ "doc_plane_bytes": 44851336,
+ "section_plane_bytes": 78772996,
+ "ratio": 1.756,
+ "largest_section_shard": 4297059,
+ "by_ext_bytes": {
+  ".md": 78100953,
+  ".txt": 93445,
+  ".toml": 27408,
+  ".yaml": 7617,
+  ".html": 485709,
+  ".svg": 21432
+ },
+ "by_ext_sections": {
+  ".md": 14159,
+  ".txt": 135,
+  ".toml": 86,
+  ".yaml": 12,
+  ".html": 363,
+  ".svg": 12
+ }
+}

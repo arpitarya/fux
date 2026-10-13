@@ -46,7 +46,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | `post-merge` | `fux ingest` inline | re-derives the index from the merged content |
 | `post-checkout` | `fux build` | refreshes only the derived accelerator |
 
-**Plus the merge driver:** `merge.fux-index.driver = fux-merge-index %O %A %B`
+**Plus the merge driver:** `merge.fux-index.driver = fux-merge-index %O %A %B %P`
 in the repo's **local** git config, and this line appended to `.gitattributes`:
 
 ```
@@ -54,12 +54,14 @@ in the repo's **local** git config, and this line appended to `.gitattributes`:
 ```
 
 ```json
-{"gitattributes": true, "hooks": {"post-checkout": "fux", "post-commit": "fux", "post-merge": "fux"}, "merge_driver": "fux-merge-index %O %A %B"}
+{"gitattributes": true, "hooks": {"post-checkout": "fux", "post-commit": "fux", "post-merge": "fux"}, "merge_driver": "fux-merge-index %O %A %B %P", "python": {"post-checkout": "ok", "post-commit": "ok", "post-merge": "ok"}}
 ```
 
 **Wired means all three hooks are `"fux"`, `merge_driver` is not
 `"unregistered"`, and `gitattributes` is `true`.** A hook reads `"other"` when
-a file exists that fux did not write.
+a file exists that fux did not write. `python` is `ok`, `missing` (the pinned
+interpreter is gone) or `unpinned` (written before W-276): anything but `ok`
+means run `fux hooks --install` again.
 
 - **Never clobbers.** A hook without fux's marker line is left alone and
   printed as `REFUSED <hook>`; **exit is still 0**, so check `--json`. Ask
@@ -69,10 +71,20 @@ a file exists that fux did not write.
 - **Nothing here is cloned.** Every teammate runs `fux hooks` once; commit the
   `.gitattributes` line so their merges use the driver.
 
-⚠ **Hooks do nothing when `fux` is not on the PATH git runs them with.** Each
-starts `command -v fux >/dev/null 2>&1 || exit 0`, so a fux inside an
-unactivated `.venv/` gives hooks that silently skip. Same for the driver: the
-merge prints `fux-merge-index: not found` and falls back to a plain conflict.
+**A hook runs the Python that installed it, not whatever `fux` is on PATH**
+(W-276). `fux hooks --install` writes that interpreter's absolute path into
+each hook, so a commit from an IDE, an agent or a shell without the venv still
+re-indexes. PATH is only the fallback, for when that interpreter is gone.
+
+⚠ **Re-run `fux hooks --install` after you move or rebuild the venv.** If the
+pinned interpreter is gone and no `fux` is on PATH, the hook prints
+`fux: hook skipped - … run 'fux hooks --install' …` and exits 0. If the `fux` it
+finds fails (for example a pyenv shim for another Python), it prints
+`fux: the background re-index did not start (exit N)`. **`fux doctor`'s
+`git hooks` row** flags both cases, and flags hooks written before W-276 that
+have no pinned path. The merge driver is still resolved on PATH: without
+`fux-merge-index` on PATH the merge prints `not found` and falls back to a
+plain conflict.
 
 ⚠ **If `.fux/output.toml` turns JSON on by default** (`[cli.json] enabled = true`),
 a bare `fux hooks` only reports. Use `fux hooks --install --no-output-config`.
@@ -82,7 +94,9 @@ a bare `fux hooks` only reports. Use `fux hooks --install --no-output-config`.
 ## 3 · What happens after each commit
 
 1. `git commit` → stderr: `fux: re-indexing in the background (N changed path(s) pending)`.
-   **No such line means the hook did not run** — see the PATH pitfall above.
+   A `fux: NOT re-indexing - a dead process … holds …` line means a killed run
+   left its lock: run `fux ingest --stop`. **No line at all means the hook did
+   not run** — check `fux doctor`'s `git hooks` row.
 2. The detached runner takes `.fux/runtime/write.lock`, re-ingests, and exits.
    **It rewrites `.fux/index/` in the working tree and commits nothing.**
 3. **Commit `.fux/index/`, `.fux/.fuxignore` and `.fux/enrich/` as a follow-up commit.** The

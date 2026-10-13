@@ -1,0 +1,25 @@
+{
+ "calls_per_arm": {
+  "sw-0.0": 330,
+  "sw-1.0": 330
+ },
+ "guardrail": "median ask latency at rung-10000, decided arm minus baseline, <= 100 ms (L13 decision 3)",
+ "limit_ms": 100.0,
+ "load_average_after": [
+  2.33,
+  2.56,
+  2.57
+ ],
+ "load_average_before": [
+  2.12,
+  2.44,
+  2.52
+ ],
+ "median_ms": {
+  "sw-0.0": 403.8,
+  "sw-1.0": 472.4
+ },
+ "rise_ms": 68.6,
+ "runs_per_arm": 3,
+ "verdict": "PASS"
+}

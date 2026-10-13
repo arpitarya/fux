@@ -9,11 +9,11 @@ amended: 2026-10-05
 date: 2026-08-27
 ratified: 2026-08-27
 feature: the record-to-component model, and the `describes` relation W-82 ruling 4 added to it
-owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@1eba43715793, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@e3d2172d0b11, tests/test_sr_frontmatter.py@c8c81b4b394a, tests/test_sr_ownership.py@9f93da933c32, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@8124ebcad40e, tests/test_sr_register_status.py@acae7406d76c]
+owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@1eba43715793, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@e3d2172d0b11, tests/test_sr_frontmatter.py@c8c81b4b394a, tests/test_sr_ownership.py@78ff4b92cf56, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@8124ebcad40e, tests/test_sr_register_status.py@acae7406d76c]
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 004737e4844c394312e5b3d3a6ea121c83d3db43b657491407609241028ca8e0
+content_sha: 7a72d5426d35bdfd3bc435958bde723dbd24da3f2ee804041c5d2ac10508faa8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -535,6 +535,10 @@ top-level definitions.
 **`tests/test_sr_config_keys.py` moved with `fux.toml`'s strictness** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): its fixtures write only the key under test and fill the rest from the template; the key-tree gate it enforces is unchanged.
 
 **The gate-unreachable pin swaps ex-SR-LAW-5 for SR-LAW-1** (2026-09-28, law L1): ex-SR-LAW-5 moved to `archive/records/` and left the record set, and SR-LAW-1 owns only its enforcement test, so no change under `src/` can demand it.
+
+**The gate-unreachable pin gains SR-LAW-13** (2026-10-10, law L13): the standing ship bar governs how a measurement decides what ships, so no change under `src/` can make it true or false — SR-RS's reason, not SR-ANSWER's.
+
+**No decision here moved** (W-273 phase 2, 2026-10-13): decision 11's one named exemption, SR-SECTIONS, is gone — the record was accepted and owns `query/sections.py` — so `tests/test_sr_ownership.py`'s exemption set is empty.
 
 ### Consequences
 

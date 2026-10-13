@@ -15,12 +15,15 @@ const IDF_OFFSET = fixed("bm25f", "idf_offset");
 //: (W-168 step 1) — is said once, beside its key in `templates/tune.toml.txt`.
 
 export class Scoring {
-  constructor(k1, b, weights, anchor) {
+  constructor(k1, b, weights, anchor, section) {
     if (!Array.isArray(weights) || weights.length !== TF_FIELDS.length) {
       throw new Error("field weights must align with TF_FIELDS");
     }
     if (typeof k1 !== "number" || typeof b !== "number" || typeof anchor !== "number") {
       throw new Error("Scoring needs k1, b and anchor — read from .fux/tune.toml [bm25f]");
+    }
+    if (typeof section !== "number") {
+      throw new Error("Scoring needs section — read from .fux/tune.toml [ranking] section_weight");
     }
     this.k1 = k1; this.b = b; this.weights = weights;
     /** W-168 step 1 — the anchor field's weight (0 = OFF). Kept out of
@@ -28,10 +31,16 @@ export class Scoring {
      *  the five fields a record commits an `flen` for; anchor has no committed
      *  slot and is folded at read time from other documents' edges. */
     this.anchor = anchor;
+    /** W-236 — `[ranking] section_weight`, B2's λ (SR-SECTIONS decision 5).
+     *  `0.0` is OFF exactly as `anchor` is: neither candidate generator opens
+     *  the section plane and `rank()` performs no section arithmetic. */
+    this.section = section;
     Object.freeze(this);
   }
   /** The one test for *is the anchor fold live?* — twin of `Scoring.anchor_on`. */
   get anchorOn() { return this.anchor !== 0.0; }
+  /** The one test for *is B2's best-section term live?* — twin of `Scoring.section_on`. */
+  get sectionOn() { return this.section !== 0.0; }
 }
 
 /** ⚠ `Math.log` and Python's `math.log` disagree in the last ulp on ~0.7 % of

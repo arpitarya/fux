@@ -1,0 +1,18 @@
+{
+ "arms": {
+  "sw-0.5": {
+   "compared": 4328,
+   "failures": 0,
+   "first_failures": []
+  },
+  "sw-1.0": {
+   "compared": 4328,
+   "failures": 0,
+   "first_failures": []
+  }
+ },
+ "gate": "G3 - every sectionless document's term at every lambda equals lambda = 0",
+ "questions": 165,
+ "sectionless_documents": 62,
+ "verdict": "PASS"
+}

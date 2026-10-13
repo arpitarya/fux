@@ -9,7 +9,7 @@
  * Owned, with its Python twin, by [SR-RANKING](../../../records/0111_ranking.md).
  */
 import { deriveWlen, scoreRecord } from "./bm25f.mjs";
-import { displayTitle } from "../store/format.mjs";
+import { displayTitle, SECTION_SLOTS, sectionId } from "../store/format.mjs";
 import { isArchivedLoc } from "../ingest/gitdir.mjs";
 import { pyRound9, cmpCodePoints } from "../compat/pyfloat.mjs";
 import { typeFor } from "./intent.mjs";
@@ -106,6 +106,12 @@ export function rank(
   // over. The fold being in the shared scorer rather than in a generator is
   // what keeps the two readers, and the two Python paths, on one arithmetic.
   const anchorOn = scoring.anchorOn;
+  // 🔴 **W-236 — B2's best-section term lands HERE, once, for both paths**,
+  // for the anchor fold's reason. Each generator attaches `secs` — this
+  // document's matching section records as `[k, flen, terms]` — and `nsec`.
+  // Off, nothing below reads either and no arithmetic runs (decision 7).
+  const sectionOn = scoring.sectionOn;
+  const sectionsOut = new Map();
 
   const scored = [];
   for (const record of candidates) {
@@ -125,6 +131,17 @@ export function rank(
       terms, record.flen || [], queryHashes, df, corpus.n, avgWlen, scoring, termWeights,
       anchorTf, anchorOn ? (record.alen ?? 0) : 0,
     );
+    if (sectionOn) {
+      // The third form since W-278: a document that gains nothing — every
+      // sectionless one — has nothing added, not `+ 0.0` (`rank.py`). With no
+      // anchor fold, `S_doc'` is `s` itself and is not scored twice.
+      const [bestId, gain] = sectionGain(
+        record, queryHashes, df, corpus, scoring, termWeights, anchorTf === null ? s : null,
+      );
+      const contribution = gain ? scoring.section * gain : 0.0;
+      if (gain) s = s + contribution;
+      sectionsOut.set(record.id, [bestId, contribution]);
+    }
     const archived = recordIsArchived(record, w.archivedDirs);
     if (demote) s *= w.of(record);
     if (s > 0) scored.push([record, s, archived]);
@@ -161,28 +178,85 @@ export function rank(
     const topTerms = scored[0][0].terms || {};
     statsOut.top_doc_hashes = queryHashes.filter((h) => h in topTerms);
   }
+  // W-236 — `--why`'s seam: each scored document's best section and the
+  // amount it added, before the document's weight. Written after the sort.
+  if (statsOut !== null && sectionOn) statsOut.sections = sectionsOut;
 
-  return scored.slice(0, top).map(([record, s, archived], i) => ({
-    id: record.id,
-    title: displayTitle(record),
-    loc: record.loc,
-    score: s,
-    archived,
-    tie: tied.has(i),
-    // W-153 — the committed git timestamp in whole unix seconds, or `null` for
-    // a document outside git history. `null` is a claim, never an absence.
-    mtime: record.mtime ?? null,
-    // W-162 — a human pinned this document to this exact question. `rank()`
-    // never sets it true: the pin is applied after ranking, in `runQuery`.
-    // `false` is a claim, not an absence (W-48).
-    pinned: false,
-    // W-161 — the graph walk out of the lexical top-k reached this document.
-    // `rank()` never sets it either: the tier is composed after the lexical
-    // core, in `runQuery`. **Key order here is the payload's key order**, and
-    // Python builds the same payload from `AskResult.__dict__`, so these two
-    // lines have to sit exactly where `boosted` and `route` sit in the
-    // dataclass or `--json` differs between the runtimes on every hit.
-    boosted: false,
-    route: null,
-  }));
+  return scored.slice(0, top).map(([record, s, archived], i) => {
+    const hit = {
+      id: record.id,
+      title: displayTitle(record),
+      loc: record.loc,
+      score: s,
+      archived,
+      tie: tied.has(i),
+      // W-153 — the committed git timestamp in whole unix seconds, or `null` for
+      // a document outside git history. `null` is a claim, never an absence.
+      mtime: record.mtime ?? null,
+      // W-162 — a human pinned this document to this exact question. `rank()`
+      // never sets it true: the pin is applied after ranking, in `runQuery`.
+      // `false` is a claim, not an absence (W-48).
+      pinned: false,
+      // W-161 — the graph walk out of the lexical top-k reached this document.
+      // `rank()` never sets it either: the tier is composed after the lexical
+      // core, in `runQuery`. **Key order here is the payload's key order**, and
+      // Python builds the same payload from `AskResult.__dict__`, so these two
+      // lines have to sit exactly where `boosted` and `route` sit in the
+      // dataclass or `--json` differs between the runtimes on every hit.
+      boosted: false,
+      route: null,
+    };
+    // W-236 — the best index section, AFTER `route` as in `AskResult`, and
+    // only while the term is on: off, the key does not exist (decision 6).
+    if (sectionOn) hit.section = sectionsOut.get(record.id)[0];
+    return hit;
+  });
+}
+
+/** `G(d) = max(0, max_k S_sec*(d#s_k) − S_doc'(d))` and the section that
+ *  earned it — `rank.py::_section_gain`, SR-SECTIONS decision 5, the third
+ *  form (W-278).
+ *
+ *  `S_sec*` scores a section as the short document it would be: its own body
+ *  and heading slots plus the parent's title, path and ctx slots and their
+ *  lengths, on the DOCUMENT's `df`, `n` and `avgWlen`. `S_doc'` is the
+ *  document without the anchor fold; `sDoc` hands it in, `null` scores it
+ *  here. Only sections matching on their own words are in `secs` (Arpit,
+ *  2026-10-13). Ties go to the lowest `k`; a gain of zero names no section. */
+function sectionGain(record, queryHashes, df, corpus, scoring, termWeights, sDoc) {
+  if (!record.nsec) return [null, 0.0];
+  const secs = record.secs;
+  if (!secs || secs.length === 0) return [null, 0.0];
+  const avg = corpus.avgWlen;
+  const terms = record.terms || {};
+  const docFlen = [...(record.flen || [])];
+  const flenTail = docFlen.slice(SECTION_SLOTS);
+  const tfTail = new Map();
+  for (const h of queryHashes) {
+    const tf = terms[h];
+    if (tf === undefined) continue;
+    const tail = tf.slice(SECTION_SLOTS);
+    if (tail.some((c) => c)) tfTail.set(h, tail);
+  }
+  const pad = new Array(SECTION_SLOTS).fill(0);
+  let bestK = null, best = 0.0;
+  for (const [k, flen, secTerms] of secs) {
+    const unitTerms = {};
+    for (const h of queryHashes) {
+      const own = secTerms[h];
+      const tail = tfTail.get(h);
+      if (own === undefined && tail === undefined) continue;
+      const head = own !== undefined ? [...own, ...pad].slice(0, SECTION_SLOTS) : [...pad];
+      unitTerms[h] = [...head, ...(tail || [])];
+    }
+    const unitFlen = [...[...flen, ...pad].slice(0, SECTION_SLOTS), ...flenTail];
+    const s = scoreRecord(unitTerms, unitFlen, queryHashes, df, corpus.n, avg, scoring, termWeights);
+    if (s > best) { bestK = k; best = s; }
+  }
+  if (bestK === null) return [null, 0.0];
+  if (sDoc === null) {
+    sDoc = scoreRecord(terms, docFlen, queryHashes, df, corpus.n, avg, scoring, termWeights);
+  }
+  if (best <= sDoc) return [null, 0.0];
+  return [sectionId(record.id, bestK), best - sDoc];
 }

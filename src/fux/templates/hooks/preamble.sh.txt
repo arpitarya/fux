@@ -4,7 +4,17 @@
 # Re-indexing is best-effort: a hook that fails must never block a commit, a
 # merge or a checkout. It reports and gets out of the way.
 set -u
-command -v fux >/dev/null 2>&1 || exit 0
+# W-276: the interpreter `fux hooks --install` ran in, by absolute path. A bare
+# `fux` resolves against whatever PATH git hands the hook -- an IDE, an agent,
+# a shell with no venv -- and a pyenv shim on that PATH passes `command -v` and
+# then exits 127. Both were silent for 39 commits. PATH is the fallback only.
+fux_python={python}
+if [ -x "$fux_python" ]; then
+  fux() { "$fux_python" -m fux.cli "$@"; }
+elif ! command -v fux >/dev/null 2>&1; then
+  echo "fux: hook skipped - $fux_python is gone and no fux is on PATH; run 'fux hooks --install' from the environment fux is installed in" >&2
+  exit 0
+fi
 # W-64 turned the progress bar ON here, to break R5's 44.4 s of silence on the
 # commit path, and said in as many words: revisit if the fork resolves to
 # option B. It did (2026-08-22), so this is that revisit. post-commit no

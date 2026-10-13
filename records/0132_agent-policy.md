@@ -5,12 +5,13 @@ name: SR-AGENT-POLICY
 title: "SR-AGENT-POLICY (0132) — Fux ships the policy its consumers need to read it correctly"
 description: "Fux's readers are AI agents, and an engine whose output is misread is an engine that does not work. Fux emits intent-neutral facts and ships one canonical policy rendered into each agent's native format, installed by fux setup from a declaration, never from detection, and never clobbering a file the consumer owns."
 status: accepted
+amended: 2026-10-13
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@c8b1b9c5321a]
+owns: [src/fux/templates/agents@35780e5af97d]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 26a500933880a46fd5a34f2a4f92292c7bde921a25c4b9f5f68ef269056646db
+content_sha: fdc8f8bd2690ac4a6c14fec7581849db2a201c21fc494745b0ecdd34690eea39
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -808,6 +809,8 @@ The shipped `fux-inspect`, `fux-serve` and `fux-config` skills name identifier f
 
 **No decision here moved** (W-262 #3, 2026-10-05): the `fux-search` skill template (`SEARCH-SKILL.md`) and the Kiro steering guide name `find --no-archived`, the filter [SR-FIND](0104_find.md) decision 7 gained; the repo's installed copies were refreshed byte-equal.
 
+**No decision here moved** (W-273 phase 2, 2026-10-13): the `fux-config` skill's `section_records` row names `section_weight = 1.0` as the measured value to set with it (W-278, ruled ship as an opt-in pair).
+
 ### Consequences
 
 - ⚠ **W-214 (2026-09-22) rewrote twelve renderings and changed no decision
@@ -880,6 +883,16 @@ The shipped `fux-inspect`, `fux-serve` and `fux-config` skills name identifier f
 | **Write `.github/skills/fux-decoder/` now that Copilot has a skill surface** | ✅ **ACCEPTED BY RULING, 2026-09-11** — see decision 14a. It was deferred here, not rejected: Copilot already reads `.claude/skills` (decision 13), so this writes a *second* copy under one `name:`, and whether that collides is still **not known**. What changed is not that evidence — it is Arpit's ruling that the `install = ["copilot"]` hole outweighs an unmeasured duplicate-name risk whose worst case is a hard error, not divergent instructions. `fux-usage` came with it. [`copilot-skill-surface`](../archive/compare/copilot-skill-surface.compare.md)'s reopen-trigger — an **observed** error — is unchanged and still live |
 | **Keep Codex in `.codex/skills/`, or write both that and `.agents/skills/`** | rejected in decision 16 (W-141): Codex's docs list only `.agents/skills`, a skill that never loads fails silently, and a second directory would show Copilot three copies |
 | **Give Codex its own `AGENTS.md` template** | it already has the right one. `AGENTS.md` is vendor-neutral by W-82 ruling 16 and carries the verbatim block; a Codex-specific copy would be a second rendering of a policy that has exactly one |
+
+**2026-10-13 — `fux-index` and `fux-usage` gain the register (W-279).** The
+`fux-index` guide's doctor table takes the `register` row's three states, its
+commit list names `.fux/index/REGISTER` beside the shards, and a new section
+teaches `fux register [--json]` — a read-only verb that prints the register's
+rows from the index ([SR-CLI](0101_cli-surface.md) decision 18). `fux-usage`'s
+*which skill next* table routes the verb to `fux-index`. **No path-scoped
+pointer and no Kiro auto guide**, for `fux-inspect`'s and `fux-serve`'s reason
+in 15a: the verb writes nothing, and a read-only verb is not ambient-safe. The
+three vendor copies in this repository are re-copied byte for byte (decision 10).
 
 ### Reference (required)
 

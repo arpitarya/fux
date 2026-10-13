@@ -10,7 +10,7 @@ feature: the golden benchmark — its two question sets, the key's custody, its 
 owns: [.claude/hooks/guard-golden-answer.sh@de3c4f5d5725, .claude/hooks/guard-sealed-key.sh@85f6df22a301, tests/test_golden_key_guards.py@280935f6475f, tests/test_settings_never_committed_unlocked.py@df702e8bb51c, tests/test_golden_hook_prose.py@5cf50353a104, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@4cac53fcdc3c, tools/golden-difficulty@d4b84445ced3]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: da1e1209b86312fcd5503403536287b5555a07557bbd1c5830c5c5754970f206
+content_sha: 1f2a806d2b0dab2f1b2be8c9a2f2454545051143b12aaf771d535758841e3abd
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -330,8 +330,9 @@ is the surrounding process:
    **Set 2** — ids `s2-001…` — and **set 3** — ids `s3-001…` — are authored by
    **Claude** from `work/golden/seed/` and nothing else. Every later set is
    authored under [SR-WORK-TESTDATA](0068_WORK-test-data.md) A1–A5, each in its
-   own designated session that hands questions *and* answers to Arpit in the
-   chat, writes no file, and never runs a rung. ⚠ **The id namespaces must not
+   own designated session that hands questions *and* answers to Arpit as
+   files he downloads from that chat (A3), writes nothing into a repository, and
+   never runs a rung. ⚠ **The id namespaces must not
    collide**: a prediction file names ids and nothing else, and one ambiguous id
    silently scores the wrong set. ⚠ **The sets are numbered, not named after
    their author** (Arpit, 2026-09-15) — the author is a fact about a set, not its

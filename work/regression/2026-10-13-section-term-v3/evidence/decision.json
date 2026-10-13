@@ -1,0 +1,141 @@
+{
+ "arms": {
+  "sw-0.5": {
+   "by_slice_wins": {
+    "3": {
+     "c1": "b=3 c=0 discordant=3 net=3 p=0.2500 (no net difference can clear alpha at this count, alpha=0.05) -> NO DETECTED CHANGE",
+     "c1_holds": false,
+     "c2_collateral": 0,
+     "c2_holds": true,
+     "outcome": "INCONCLUSIVE"
+    }
+   },
+   "c2_margin": 4,
+   "c3_holds": true,
+   "guardrails": {
+    "evidence_quoted_total": {
+     "baseline": 142,
+     "holds": true,
+     "max_drop": 2,
+     "treatment": 144
+    },
+    "grounded_total": {
+     "baseline": 86,
+     "holds": true,
+     "max_drop": 2,
+     "treatment": 89
+    },
+    "hit@5_total": {
+     "baseline": 148,
+     "holds": true,
+     "max_drop": 1,
+     "treatment": 148
+    },
+    "latency": {
+     "holds": null,
+     "note": "reported arm: not measured"
+    }
+   },
+   "hit@1_all": {
+    "losses": 0,
+    "net": 3,
+    "wins": 3
+   },
+   "other_pool_miss@1": {
+    "baseline": 8,
+    "treatment": 8
+   },
+   "outcome": "INCONCLUSIVE",
+   "pool": {
+    "baseline_miss@1": 24,
+    "baseline_reorderable@1": 24,
+    "drop": 3,
+    "treatment_miss@1": 21
+   },
+   "primary@1_all": [
+    4,
+    0
+   ],
+   "role": "reported only",
+   "slice_wins_consistent": [
+    3
+   ]
+  },
+  "sw-1.0": {
+   "by_slice_wins": {
+    "5": {
+     "c1": "b=5 c=0 discordant=5 net=5 p=0.0625 (no net difference can clear alpha at this count, alpha=0.05) -> NO DETECTED CHANGE",
+     "c1_holds": false,
+     "c2_collateral": -1,
+     "c2_holds": true,
+     "outcome": "INCONCLUSIVE"
+    }
+   },
+   "c2_margin": 4,
+   "c3_holds": true,
+   "guardrails": {
+    "evidence_quoted_total": {
+     "baseline": 142,
+     "holds": true,
+     "max_drop": 2,
+     "treatment": 144
+    },
+    "grounded_total": {
+     "baseline": 86,
+     "holds": true,
+     "max_drop": 2,
+     "treatment": 89
+    },
+    "hit@5_total": {
+     "baseline": 148,
+     "holds": true,
+     "max_drop": 1,
+     "treatment": 148
+    },
+    "latency": {
+     "holds": true
+    }
+   },
+   "hit@1_all": {
+    "losses": 0,
+    "net": 6,
+    "wins": 6
+   },
+   "other_pool_miss@1": {
+    "baseline": 8,
+    "treatment": 7
+   },
+   "outcome": "INCONCLUSIVE",
+   "pool": {
+    "baseline_miss@1": 24,
+    "baseline_reorderable@1": 24,
+    "drop": 5,
+    "treatment_miss@1": 19
+   },
+   "primary@1_all": [
+    7,
+    0
+   ],
+   "role": "decided",
+   "slice_wins_consistent": [
+    5
+   ]
+  }
+ },
+ "gates": {
+  "G0": "PASS",
+  "G1": "PASS",
+  "G3": "PASS",
+  "G4": "PASS"
+ },
+ "headroom": {
+  "improvement_slice": 24,
+  "regression_exposed": 117
+ },
+ "outcome_by_the_table": "INCONCLUSIVE",
+ "slice": {
+  "floor": 15,
+  "reorderable@1": 24,
+  "size": 24
+ }
+}

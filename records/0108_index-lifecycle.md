@@ -5,12 +5,13 @@ name: SR-INDEX-LIFECYCLE
 title: SR-INDEX-LIFECYCLE (0108) — how the index is generated and updated
 description: One canonical encoder, sharded doc-major JSONL, write-if-different; a derived accelerator bound by the differential law and detected stale by per-shard shas.
 status: accepted
+amended: 2026-10-13
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@8737e7eb4ab2, node/src/store/format.mjs@ec3056937006, node/src/store/reader.mjs@6ae66cb599c3]
+owns: [src/fux/store@edf8e6426075, node/src/store/format.mjs@4fc4a43aafe0, node/src/store/reader.mjs@ea5bf3de3b4d]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 9d6a32b04b7cc59eba2a742ef2a5aec15c813a853d0406d4de8506df3f0eef23
+content_sha: 4e7f808a7e9e883ea70065210097601c2d084bdad11c4bb1c0dd71be8d19eaa2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -608,6 +609,9 @@ exactly v5's property set.
 
 **No decision here moved** (W-261, 2026-10-05): `store/cachedir.py` is carved out of this record's `store/` claim to SR-CACHEDIR-TAG; nothing it decides moved.
 
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `_format` moves to **`fux.index.v8`** by decision 9.1: a plane and a property appear ([SR-SECTIONS](0161_sections.md) decisions 1 and 3). The new plane is `.fux/index/sections/xx.jsonl`, written by the same `write_index` call under decisions 1–4's rules (sorted, write-if-changed, an empty shard removed, and the directory removed when it empties). The migration is decision 10a's `fux ingest --full`. `analyzer` and `tf_fields` are untouched.
+
 ### Consequences
 
 - **The committed index is reviewable.** A document change is one line in one
@@ -662,6 +666,8 @@ exactly v5's property set.
   that duplicates another gate is the one that gets loosened first. ⚠ **The meta
   policy was the second guarantee named here** and W-194 deleted it on
   2026-09-20; the rejection rests on the encoder alone now, and still holds.
+
+**No decision here moved** (W-279, 2026-10-13): `store/fuxdir.py` changed two README strings — the `index/` row names `REGISTER`, and the template's **lifecycle** verb row gains `register` ([SR-DOTFUX](0102_fux-directory.md), [SR-CLI](0101_cli-surface.md) decision 18). The register's shape is [SR-INGEST](0106_ingest.md) decision 22's.
 
 ### Reference (required)
 

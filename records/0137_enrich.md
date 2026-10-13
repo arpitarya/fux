@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@f088f4f6b552, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@8f3efd21a71f, node/test/pins.test.mjs@daebcdb98aac]
+owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@f088f4f6b552, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@fafeb8b35584, node/test/pins.test.mjs@daebcdb98aac]
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 32aefaa92c278709a7c788c124f0a7c73e0281ae3d4cbf3b1145fc4cb3aa025e
+content_sha: 2787dc3b22b50b4729bb808d54b8227b075a1dd44833a8b9198208c1072b595b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -184,6 +184,17 @@ can match queries an un-enriched one cannot, **so a half-enriched scope tilts
 ranking toward whichever half was finished.** `ctx` is a weighted field with its
 own tune key *conditional on the tilt being small* — which is a measurement, not
 an opinion.
+
+**Measured 2026-10-10: NO DETECTED TILT at 25 % and at 50 % coverage, so the
+condition is met and `ctx` keeps its own tune key**
+([`2026-10-10-enriched-rung`](../work/regression/2026-10-10-enriched-rung/VERDICT.md),
+W-257). On the questions the un-enriched part answered under no enrichment
+(81 at 25 %, 66 at 50 %), partial coverage against full lost **4** rank-1 hits
+and won **1** at each coverage, below the paired floor. The shift is visible: 9 of
+90 rank-1 documents fell in the enriched quarter before, and 16 after. It did
+not reach the floor. ⚠ `informed`, one Claude-authored set of 90, on
+enrichment written by a blind author **without the fux-enrich skill** (one
+question per chunk). *Small* means *not detected at this size*, not *zero*.
 
 **7. Orphaned enrichment is never auto-deleted.** A reverted document recovers
 its enrichment for free, because the old sha comes back and the file is still
@@ -412,10 +423,22 @@ not a fixable style of prose; it is what prose is. A question is a narrower
 object: a retrieval claim about **one** document, which `fux enrich --check`
 can put to the index and test.
 
-🔴 **This decision is BUILT AND UNPROVEN, and that is the whole of its
-evidential standing.** It ships on the argument above — prose measured no net
-gain, and a question is checkable where prose is not — **not** on a gate it
-cleared. The four-arm run
+🔴 **Measured 2026-10-10: NO DETECTED CHANGE at `hit@1`, and that is the whole
+of its evidential standing**
+([`2026-10-10-enriched-rung`](../work/regression/2026-10-10-enriched-rung/VERDICT.md),
+W-257, the bar frozen before the author ran). Questions on all 1,000 documents
+of gen-4 `rung-01000` against no enrichment: **6 wins / 4 losses, net +2**, where
+10 discordant questions needed net 8. The line-matched placebo went **1 / 5**
+and did not clear. So it still ships on the argument above — prose measured no
+net gain, and a question is checkable where prose is not. It ships now beside a
+measured null, not a gate it cleared. ⚠ **What was measured is narrower than
+this decision:** a blind author **without the fux-enrich skill** wrote one
+question per chunk (median 5 per document), template-filled on the
+near-identical `ext` documents. `informed`, one Claude-authored set of 90. A
+rung written with the shipped skill is a different treatment and is not
+measured.
+
+**The earlier run.** The four-arm run
 ([`2026-09-05-doc2query`](../work/regression/2026-09-05-doc2query/report.md))
 was voided on Arpit's ruling of 2026-09-06
 ([`W110-DOC2QUERY`](../work/regression/2026-09-05-doc2query/VERDICT.md)):
@@ -454,10 +477,15 @@ a human decides.
 lines that end in `?`; a body with none has nothing to check. No existing
 enrichment is invalidated by this record.
 
-⚠ **The filter's own value is UNPROVEN, on the same run.** It refused **2 of
-98** questions and moved **no** recall number at any `k` — a **2 %** treatment,
-too small to see. *Did not hurt* is the honest statement; *works* is not
-available yet.
+⚠ **The filter is visible and moves nothing measurable: NO DETECTED CHANGE**
+([`2026-10-10-enriched-rung`](../work/regression/2026-10-10-enriched-rung/VERDICT.md),
+W-257). On the first pass it refused **837 of 5,620** questions (14.9 %, in
+357 of 1,000 files). Removing them changed `hit@1` on **2 of 90** questions,
+1 win and 1 loss. The 2026-09-05 run's *too small to see* (2 of 98) no longer
+applies. What stands now is *a visible treatment with no detected effect*, and
+*works* is still not available. Same caveats as decision 15: `informed`, and
+authored without the skill. What `--check` does next stays Arpit's, and
+nothing about it changed.
 
 **17. `superseded_by:` in an enrichment's frontmatter retires its document, and
 it is the ONE key here that reaches the ranking.** Everything else in that
@@ -659,6 +687,9 @@ a missing blob already is — never a crash inside a planning command.
 **No decision here moved** (W-254, 2026-10-04): `enrich._chunk_count` passes `frontmatter=False` to the chunker, so an enrichment unit count is what it was before the frontmatter passage existed.
 
 **No decision here moved** (W-261, 2026-10-05): `enrich_dirs` is imported from `ingest/dirlist.py` (SR-DIR-LIST's) instead of `ingest/gitdir.py`; it reads the same committed declaration.
+
+
+**W-236 (2026-10-10; branch `w236-sections`, unmerged) — the Node pin row, made equal to Python's.** `node/src/correct.mjs` builds the row for a pinned document the ranking never returned. It now carries `boosted: false` and `route: null`, as Python's `AskResult` always did. That was a parity gap from before W-236, found by its twin test. The row also carries `section: null` while `[ranking] section_weight > 0` ([SR-SECTIONS](0161_sections.md) decision 6).
 
 ### Consequences
 

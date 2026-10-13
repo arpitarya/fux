@@ -1,0 +1,9 @@
+{
+ "compared": "every field of every row except answer_ms, arm, ask_ms, engine_commit, repo_head",
+ "gate": "G0 - byte identity at section_weight = 0.0, W-273 phase 1 build against the pre-section engine",
+ "handoff_rows": 110,
+ "handoff_rows_differing": [],
+ "predictions_rows": 110,
+ "predictions_rows_differing": [],
+ "verdict": "PASS"
+}

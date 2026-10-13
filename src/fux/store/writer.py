@@ -46,7 +46,7 @@ from ..errors import FuxError
 from .canonical import canonical_dumps
 from .collisions import CollisionTracker
 from . import recordschema
-from .format import HEADER, header_for, index_dir, shard_for, shard_path
+from .format import HEADER, header_for, index_dir, section_shard_path, sections_dir, shard_for, shard_path
 from ..constants import fixed
 
 _SHARDS = fixed("index", "shards")
@@ -70,6 +70,8 @@ def write_index(root: Path, records: list[dict], *, ids_digest: str = "") -> lis
     documents) before records ever reach here; see `hash_terms`.
     """
     by_shard: dict[str, list[dict]] = {}
+    #: W-236 — the section plane, grouped by the PARENT's shard (SR-SECTIONS d4).
+    sections_by_shard: dict[str, list[dict]] = {}
     seen_ids: set[str] = set()
     for record in records:
         try:
@@ -79,6 +81,7 @@ def write_index(root: Path, records: list[dict], *, ids_digest: str = "") -> lis
         if doc_id in seen_ids:
             raise FuxError(f"duplicate id in index write: {doc_id!r}")
         seen_ids.add(doc_id)
+        record = _split_sections(record, sections_by_shard)
         by_shard.setdefault(shard_for(doc_id), []).append(record)
 
     directory = index_dir(root)
@@ -101,6 +104,54 @@ def write_index(root: Path, records: list[dict], *, ids_digest: str = "") -> lis
         path = shard_path(root, shard)
         path.unlink(missing_ok=True)
 
+    written.extend(_write_sections(root, sections_by_shard, header_line))
+    return written
+
+
+def _split_sections(record: dict, sections_by_shard: dict[str, list[dict]]) -> dict:
+    """Take a record's in-memory `sections` off it, and stamp `nsec` from them.
+
+    **`nsec` is written HERE and nowhere else** (SR-SECTIONS d3, d9). Ingest
+    hands each record the list of its section records under `sections`; the
+    key never reaches a committed byte. Two or more become lines in the
+    section plane and `nsec` on the document; one or none — or no key at all —
+    is a sectionless document, and any `nsec` it arrived with is dropped, so
+    the count cannot disagree with the plane it counts.
+    """
+    sections = record.get("sections")
+    if "sections" not in record and "nsec" not in record:
+        return record
+    out = {k: v for k, v in record.items() if k not in ("sections", "nsec")}
+    if sections and len(sections) > 1:
+        out["nsec"] = len(sections)
+        sections_by_shard.setdefault(shard_for(record["id"]), []).extend(sections)
+    return out
+
+
+def _write_sections(root: Path, sections_by_shard: dict[str, list[dict]], header_line: bytes) -> list[Path]:
+    """The section plane: the document plane's rules, one directory down.
+
+    Same header, lines sorted by id, written only when the bytes changed, and a
+    shard with no section left in it removed (SR-SECTIONS d4). The directory
+    itself goes when it empties, so an index with no multi-section document
+    looks exactly like one written before the plane existed.
+    """
+    directory = sections_dir(root)
+    written: list[Path] = []
+    if sections_by_shard:
+        directory.mkdir(parents=True, exist_ok=True)
+    for shard, group in sections_by_shard.items():
+        path = section_shard_path(root, shard)
+        group.sort(key=lambda r: r["id"])
+        data = header_line + b"".join(canonical_dumps(section) for section in group)
+        if not path.exists() or path.read_bytes() != data:
+            _atomic_write(path, data)
+            written.append(path)
+    if directory.is_dir():
+        for shard in {format(i, "02x") for i in range(_SHARDS)} - sections_by_shard.keys():
+            section_shard_path(root, shard).unlink(missing_ok=True)
+        if not any(directory.iterdir()):
+            directory.rmdir()
     return written
 
 

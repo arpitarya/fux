@@ -6,12 +6,12 @@ title: "SR-TUNE (0135) — the tunables file, and per-source priority"
 description: "`.fux/tune.toml` — a committed, setup-written, never-rewritten file holding every knob that changes ordering, plus one declared exception (`[index]`: `max_phrases`, `max_table_rows`) that changes the index; plus a per-source preference weight in either direction, where fux states the cost and refuses only what is broken."
 status: accepted
 date: 2026-08-22
-amended: 2026-09-24
+amended: 2026-10-11
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@f5fe482723d1, .fux/tune.toml@fbc012c8ee4f, node/src/config/tune.mjs@d9a132c42f83]
+owns: [src/fux/tune.py@6fa94645ad85, .fux/tune.toml@e2ed652a089c, node/src/config/tune.mjs@f6e2c32f57f5]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: bd2d41f308dff49f5a646a3df109db290e082107d8e04aa46687dc52cfebd747
+content_sha: 452b92f65b8e5e595699bc1838d5dd1a12f2d43f82611405f643b32dba2873e1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -763,6 +763,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + ranking.expand_weight
 + ranking.mined_weight
 + ranking.intent_weight
++ ranking.section_weight
 + graph.damping
 + graph.iterations
 + graph.laziness
@@ -1111,6 +1112,19 @@ this moved where they are written, not what they are.
 **No tune key changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/tune.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
+
+**W-274, 2026-10-11 — `section_weight > 0` needs `fux.toml [index] section_records = true`.** `tune.load` (and Node's `loadTune`) raises, naming both keys, when the weight is on and the plane is switched off. A weight with nothing to read would otherwise rank exactly as `0.0` while claiming not to. This is the converse of decision 6: the tunable still decides no committed byte, and it may not claim a plane the committed key did not build. The rule is SR-SECTIONS decision 11's.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** **`[ranking] section_weight`** joins the closed key set: B2's λ ([SR-SECTIONS](0161_sections.md) decision 5), `_non_negative`, template value **`0.0`** (OFF: the plane is never read). It rides `Scoring.section`, not `Weighting`, because both candidate generators decide from it what to read. It is read at query time only, so it moves no committed byte (decision 6). `fux lexical` forces it to `0.0` with the other W-168 terms.
+
+**W-269 — what `section_weight` weighs (2026-10-10; on a branch from `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md) passes).** The key, its validation and its template value `0.0` are unchanged. Its meaning moved: λ now multiplies the **gain-only** term, what the best section scores beyond the document as one unit ([SR-SECTIONS](0161_sections.md) decision 5), not the best section's whole score. A value tuned against W-236's B2 means something else here. The default is written only on a PASS, with the merge.
+
+**W-273 — the comment caught up (2026-10-11; same branch, unmerged).** The `section_weight` comment in the template and in this repository's `.fux/tune.toml` described W-236's B2 form; it now describes the gain-only term and names W-270 as the run that decides it. Comment bytes only: the key, its validation and its value `0.0` are unchanged.
+
+**W-278 — `section_weight` is bounded above by 1.0 (2026-10-13; same branch, unmerged until [its run](../work/regression/2026-10-13-section-term-v3/PRE-REGISTRATION.md) passes).** λ now interpolates toward the **third form**, the better of the document and its best section scored as a short document ([SR-SECTIONS](0161_sections.md) decision 5). **`1.0` is pure max, and a value above `1.0` is refused** by `tune.load` and by Node's `loadTune`, naming the key and the bound. Above 1.0 the term would extrapolate past the section's own score, which is what produced W-269's leaps. The bound is the `_fraction` validator (Node: `fraction`), not a clamp: a silently clamped `2.0` would rank as `1.0` while claiming not to. Template value still **`0.0`** (OFF); a default is written only on a PASS.
+
+**W-278 → W-273 phase 2 — `section_weight`'s measured value is `1.0`, opt-in (2026-10-13).** W-278 came back INCONCLUSIVE (0 losses, +6 `hit@1`, slice 5 of 24) and Arpit ruled ship **as an opt-in pair**: the template value stays **`0.0`**, and `1.0` is what a repo sets together with `fux.toml [index] section_records = true` ([verdict](../work/regression/2026-10-13-section-term-v3/VERDICT.md)). The template comment says so.
 
 ### Consequences
 

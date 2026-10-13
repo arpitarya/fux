@@ -1,0 +1,28 @@
+title: Talegaon frozen store returns cage - what happens to frozen stock sent back
+doc_id: QCL-OPS-NTE-77
+owner: Nitin Bhegade
+department: Operations
+status: in_force
+effective_date: 2025-12-15
+applies_to: Talegaon frozen store
+
+TALEGAON FROZEN STORE: THE RETURNS CAGE
+
+Frozen stock sent back by restaurants and retailers to the Talegaon frozen store is held in the returns cage at the back of the freezer, behind the yellow mesh.
+
+ON ARRIVAL
+The receiving clerk checks the cartons against the return note, probes one carton per pallet and writes the reading on the note. Anything that arrives soft is photographed before it goes into the cage.
+
+THE DECISION
+Every line in the cage gets its grading within 72 hours of arrival. The Talegaon team uses three labels rather than letters: KEEP for stock that can go back to the owner's saleable stock, REWORK for stock the owner must decide about, and SCRAP for stock that must be destroyed. Each label is a coloured bucket tag tied to the pallet: green, orange and red.
+
+WHO DECIDES
+The shift lead decides on frozen food. Ice cream that has softened at any point is always SCRAP, whatever the owner says, because it cannot be refrozen safely.
+
+TELLING THE OWNER
+The owner is told of every REWORK line on the day it is labelled, by e-mail from the store office, and the line waits in the cage until the owner replies.
+
+SPACE
+The cage holds twelve pallets. If it is full, the store manager is told at once; nothing is put in the main freezer to make room.
+
+Questions to the store office.

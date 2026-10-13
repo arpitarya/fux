@@ -1,0 +1,27 @@
+From: "Simran Arora" <simran.arora@quillfern.example>
+To: Jalandhar cross-dock shift leads <jalandhar-leads@quillfern.example>
+Date: Tue, 9 Jun 2026 16:21:07 +0530
+Subject: Jalandhar cross-dock comms room - what keeps the alarm panel alive in a power cut
+Message-ID: <20260609162107.QCL.7712@quillfern.example>
+X-Doc-Title: Jalandhar cross-dock comms room - what keeps the alarm panel alive in a power cut
+X-Doc-Id: QCL-ENG-EML-46
+X-Owner: Simran Arora
+X-Department: Engineering
+X-Status: in_force
+X-Effective-Date: 2026-06-09
+
+Team,
+
+After last week's question at handover, here is how the comms room at the cross-dock is kept running when the grid drops.
+
+The alarm panel, the gate barrier and the dock door controls are fed from the ups in the comms room. It carries them through the changeover to the genset and through a genset that refuses to start. On battery alone it gives 30 minutes at full connected load, and that is what we test against every six months.
+
+The battery string is replaced every three years whatever its readings, because the comms room gets hot in May and heat shortens battery life faster than anything else. The last replacement was in March.
+
+If the room's air conditioner fails, open the door, put the pedestal fan in the doorway and phone the regional engineer. Do not prop the door open overnight.
+
+Nothing else is plugged into the unit: no kettle, no heater, no phone charger, no extension board for the guard's radio. If you find something plugged in that should not be, unplug it and tell me.
+
+The autonomy figure from each test goes in the comms room log with the date and the name of the person who ran it. If a test falls short, I will arrange the replacement early.
+
+Simran

@@ -1,0 +1,10 @@
+{
+ "failures": 0,
+ "first_failures": [],
+ "gate": "G4 - no section contribution exceeds its section scored as a document (construction, no key)",
+ "questions": 165,
+ "section_weight": 1.0,
+ "sectioned_candidates_checked": 69969,
+ "sections_named": 40225,
+ "verdict": "PASS"
+}

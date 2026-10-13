@@ -103,6 +103,8 @@ def test_every_field_ingest_writes_is_declared():
         "id", "src", "loc", "sha", "ver", "mode",
         "title", "phrases", "terms", "flen", "abbr", "edges",
         "archived", "superseded", "mtime",
+        # W-236: written by `store.write_index` from a record's sections.
+        "nsec",
     }
     assert written == set(recordschema.shape().fields)
 

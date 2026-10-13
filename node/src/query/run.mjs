@@ -180,8 +180,12 @@ export function runQuery(root, query, top, {
   // default weights, on the frozen baseline verb, with nothing failing.
   // W-168 step 4: the frozen baseline never folds mined pairs either.
   // W-168 step 9: nor applies the intent prior.
-  if (!compose) resolved = withTier(resolved, { askBoost: false, askRelated: false, minedWeight: 0.0, intentWeight: 0.0 });
-  else if (wantRelated === false) resolved = withTier(resolved, { askRelated: false });
+  // W-236: nor adds a best-section term (the same decision).
+  if (!compose) {
+    resolved = withTier(resolved, {
+      askBoost: false, askRelated: false, minedWeight: 0.0, intentWeight: 0.0, sectionWeight: 0.0,
+    });
+  } else if (wantRelated === false) resolved = withTier(resolved, { askRelated: false });
   // After the two lines above, `wantRelated` and `resolved.askRelated` agree, so
   // the tier reads one of them and the verb reads the other without either
   // having to know about the flag that set it.
@@ -238,7 +242,9 @@ export function runQuery(root, query, top, {
   // signal. Letting the walk re-order a pinned document off the top would mean
   // a person's explicit intervention could be overruled, silently, by a link
   // somebody else drew.
-  const ordered = applyPin(root, query, maybeRerank(root, query, window, resolved, depth), depth, set);
+  const ordered = applyPin(
+    root, query, maybeRerank(root, query, window, resolved, depth), depth, set, scoring.sectionOn,
+  );
   // 🔴 **`find` shares Tier A and never computes Tier B.** `find` is `ask`'s
   // terse sibling — both are *ranked documents* — so a boost that moved one and
   // not the other would make the two verbs rank the same corpus differently,

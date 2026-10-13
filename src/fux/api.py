@@ -132,15 +132,30 @@ class Result:
     #: `boosted` already says so.
     route: str | None = None
     headings: list[str] = field(default_factory=list)
+    #: W-236. The best index section, `<id>#s<k>`, while `[ranking]
+    #: section_weight` is on; `None` there means sectionless or unmatched. ⚠
+    #: **Off, the `--json` row carries no `section` key at all**, so the row a
+    #: Result is built from says which: `section_on` records it.
+    section: str | None = None
+    section_on: bool = field(default=False, repr=False)
+
+    @classmethod
+    def from_row(cls, row: dict) -> "Result":
+        """A `--json` `results[]` row as a `Result`, remembering whether it
+        carried `section` — the one key whose absence is a statement."""
+        return cls(**row, section_on="section" in row)
 
     def as_dict(self) -> dict:
-        return {
+        out = {
             "id": self.id, "loc": self.loc, "title": self.title,
             "score": self.score, "archived": self.archived, "tie": self.tie,
             "mtime": self.mtime, "pinned": self.pinned,
             "boosted": self.boosted, "route": self.route,
             "headings": list(self.headings),
         }
+        if self.section_on:
+            out["section"] = self.section
+        return out
 
 
 @dataclass(frozen=True)
@@ -232,7 +247,7 @@ class Index:
         if top is None:
             top = int(self._output().resolve("find", "top", as_json=False))
         built = build_find(self.root, _Args(query=query, top=top, under=under), sections=False)
-        return [Result(**row) for row in built.payload()["results"]]
+        return [Result.from_row(row) for row in built.payload()["results"]]
 
     def ask(
         self, query: str, *, top: int | None = None, band: bool | None = None,
@@ -268,7 +283,7 @@ class Index:
         )
         payload = built.payload()
         return AskAnswer(
-            results=[Result(**row) for row in payload["results"]],
+            results=[Result.from_row(row) for row in payload["results"]],
             confidence=payload.get("confidence"),
             fused=bool(payload.get("fused")),
         )

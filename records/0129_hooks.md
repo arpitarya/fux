@@ -6,12 +6,12 @@ title: "SR-MAINTENANCE (0129) — the git hooks that keep a committed index in s
 description: "post-commit DEFERS — it writes a dirty list and spawns a detached one-shot re-index; post-merge re-ingests, post-checkout only rebuilds; no hook ever touches the network; every index writer holds one lock; and a resident daemon covers the URLs nobody queries."
 status: accepted
 date: 2026-08-20
-amended: 2026-10-09
+amended: 2026-10-13
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@081950a9f115, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
+owns: [src/fux/maintain@6832a7b366ee, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: d5ebe77cb22cc232380e2d65790760612fd3e7cbf311bdad6a00bfd965b21064
+content_sha: b5d131fc3b2db43d325cb7daa46c063278bd42575fc62f52b721c09c073e90b2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -250,10 +250,28 @@ missing hook costs latency, never correctness. **That is exactly why decision 3
 can make the hooks best-effort**: the thing they optimise is speed, and the
 thing that protects the answer is somewhere else.
 
-**3. Every hook is best-effort and cannot block anything.** Each begins
-`command -v fux >/dev/null 2>&1 || exit 0` and swallows failures. **A tool that
-blocks a commit because *its own* index step failed has made itself the most
-important thing in the repository, which it is not.**
+**3. Every hook is best-effort and cannot block anything.** Every hook exits 0
+whatever happens to fux inside it. **A tool that blocks a commit because *its
+own* index step failed has made itself the most important thing in the
+repository, which it is not.**
+
+**3a. Best-effort is never silent, and a hook does not trust PATH** (W-276,
+2026-10-11). `fux hooks --install` writes into each hook the absolute,
+unresolved path of the interpreter it is running in (`fux_python=`), and the
+hook runs `"$fux_python" -m fux.cli`. **PATH is only the fallback**, used when
+that interpreter is gone. When neither can run, the hook prints **one line**
+naming `fux hooks --install` and exits 0. When `post-commit`'s fux fails, it
+prints **one line** with the exit code and names `fux doctor`. When a dead
+process holds `write.lock`, `--spawn-runner` says so and names
+`fux ingest --stop`, instead of "already running". The hook never clears the
+lock (1c). **`fux doctor`'s `git hooks` row** flags a pinned interpreter that is
+gone and a hook written before this decision (`unpinned`), and it repairs
+nothing. *Why:* the earlier form began `command -v fux >/dev/null 2>&1 ||
+exit 0` and ended `|| exit 0`. On the machine that filed W-276, `command -v`
+found a pyenv shim for a Python that had no fux. The shim exited 127, the hook
+swallowed it, and **39 commits from 2026-10-04 re-indexed nothing.** From a
+bare PATH the same hook skipped with no output at all. *What it does not cover:*
+the merge driver (decision 6) is still `fux-merge-index` resolved on PATH.
 
 **4. Installation refuses rather than clobbers.** A hook fux did not write (no
 marker line) is left exactly as it is, the others still install, and the refusal
@@ -634,6 +652,9 @@ this moved where they are written, not what they are.
 
 **No decision here moved** (W-261, 2026-10-05): the write lock moved from `maintain/runner.py` to `maintain/lock.py` (SR-LOCKS'); `runner` re-exports every name, so `runner.acquire` and `runner.write_lock` keep their callers. `node/src/maintain/runner.mjs`, which was only ever the lock, became `lock.mjs`, so this record no longer claims `node/src/maintain/`.
 
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `fux hooks install` binds the driver to `.fux/index/sections/*.jsonl` too. A `.gitattributes` `*.jsonl` does not cross a `/`, so the existing line never covered the section plane ([SR-SECTIONS](0161_sections.md) decision 9).
+
 ### Consequences
 
 - **There is no path into a committed shard that skips ex-L5.** That is the
@@ -721,6 +742,8 @@ new file — *counters, never clocks*, advisory only, and
 [`skipnotice`](../src/fux/ingest/skipnotice.py) already refused a second
 runtime file for URL facts on the grounds that it would put the answer in two
 places. **An offline run never touches it**, exactly like `observe`.
+
+**No decision here moved** (W-279, 2026-10-13): `maintain/mergedriver.py` keeps every leading `#` line of the register as its header ([SR-MERGE-DRIVER](0130_merge-driver.md)). No hook moved. The register's shape is [SR-INGEST](0106_ingest.md) decision 22's.
 
 ### Reference (required)
 
@@ -878,9 +901,12 @@ re-index; and that the successor is spawned carrying the marker at all).
     is about a **failure** at any point, stop or not. Both are checkable in
     `tests_e2e/test_maintenance.py`.
 
-11. **A hook-driven test passes with `fux` unreachable on `PATH`.** The hook's
-    first line is `command -v fux >/dev/null 2>&1 || exit 0`, so an absent
-    install turns every hook into a no-op that reports success.
+11. **A hook-driven test passes with `fux` unreachable on `PATH`.** Before
+    decision 3a the hook's first line was `command -v fux >/dev/null 2>&1 ||
+    exit 0`, so an absent install turned every hook into a no-op that reported
+    success. Since 3a a hook reaches fux through the pinned interpreter, and
+    `tests_e2e/test_maintenance.py::test_a_commit_with_fux_off_path_still_re_indexes`
+    asserts a commit made with `PATH=/usr/bin:/bin` still re-indexes.
     `tests_e2e/test_maintenance.py::test_the_hook_environment_can_actually_find_fux`
     is the guard; **measured 2026-08-27**, removing `fux` from `PATH` fails four
     hook tests and used to leave `test_nothing_fux_spawned_outlives_its_own_run`

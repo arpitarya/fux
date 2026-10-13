@@ -29,6 +29,7 @@ from .rank import AskResult, Corpus, rank
 from ..store import TF_FIELDS
 from .bm25f import Scoring, derive_wlen
 from . import identifiers as ids_mod
+from . import sections as sections_mod
 from .identifiers import EMPTY, IdentifierRules
 from .tokenize import tokenize
 
@@ -58,6 +59,8 @@ _EDGE_ANCHOR_RE = re.compile(rb'"al":(?P<len>\d+),"at":\{[^}]*\},"dst":"(?P<dst>
 #: the corpus, candidate or not, and parsing every record to sum a length is
 #: what the prefilter exists to avoid.
 _FLEN_RE = re.compile(rb'"flen":\[([0-9,\s]*)\]')
+
+
 
 
 def _flen_from_line(line: bytes) -> list[int] | None:
@@ -137,6 +140,7 @@ def scan_candidates(
     total_flen = [0] * len(TF_FIELDS)
     df: dict[str, int] = dict.fromkeys(query_hashes, 0)
     candidates: list[dict] = []
+    section_on = scoring.section_on
 
     for path in store_mod.iter_shard_paths(root):
         _, lines = store_mod.raw_record_lines(path)
@@ -176,6 +180,9 @@ def scan_candidates(
                 # hashes: the prefilter finds them at no extra cost.
                 _fold_out_edges(record, wanted, anchor_tf)
             candidates.append(record)
+
+    if section_on:
+        sections_mod.attach(root, candidates, query_hashes)
 
     if anchor_on:
         _add_anchor_only_candidates(root, candidates, anchor_tf)

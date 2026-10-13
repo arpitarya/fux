@@ -5,12 +5,13 @@ name: SR-CLI
 title: SR-CLI (0101) — the command-line surface
 description: Flat verbs in seven groups, one error boundary, three output modes. Freezes the CLI contract with a captured transcript of every command and its real output.
 status: accepted
+amended: 2026-10-13
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@4272dd277334, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@66e3fb96c9e3, node/fux.mjs@803cf090827b]
+owns: [src/fux/cli.py@5a5e81b5cae2, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@00842bc95502, node/fux.mjs@803cf090827b]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 054fa9ab2f80b60bb80d7decb6ad8e565f26e78c4e674888dbe8b18eeb1630b0
+content_sha: 307f80a39d33873ee2065ff3d3941b895d4d5c06f8439777928533f2f36ac38a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -34,7 +35,7 @@ content_sha: 054fa9ab2f80b60bb80d7decb6ad8e565f26e78c4e674888dbe8b18eeb1630b0
 
 | group | verbs | |
 |---|---|---|
-| **lifecycle** | `setup` · `doctor` · `inspect` · `identifiers` | set the repo up, check the environment, then X-ray the index — `doctor`'s fix is a command or a config edit, `inspect`'s is a change to the corpus, and `identifiers` records the ID families `inspect` found (SR-IDENTIFIERS) ([SR-INSPECT](0156_inspect.md)) |
+| **lifecycle** | `setup` · `doctor` · `inspect` · `identifiers` · `register` | set the repo up, check the environment, then X-ray the index — `doctor`'s fix is a command or a config edit, `inspect`'s is a change to the corpus, `identifiers` records the ID families `inspect` found (SR-IDENTIFIERS) ([SR-INSPECT](0156_inspect.md)), and `register` prints what the index holds, one line per document, for a machine ([SR-INGEST](0106_ingest.md) decision 22d; decision 18) |
 | **write** | `ingest` · `build` | one writes the committed plane, one derives from it. **`ingest` is the first ingest AND every re-ingest**, directories and URLs alike — decision 16 |
 | **sources** | `add` · `remove` · `enrich` · `correct` | maintain what is indexed — `add` and `remove` write lines and end in an ingest, `enrich` plans and validates a MODEL's text, and `correct` writes one question a PERSON typed ([SR-ENRICH](0137_enrich.md) decision 19). ⚠ **`update` was a fourth verb here and decision 16 deleted it** |
 | **read** | `ask` · `find` · `answer` · `lexical` | differ only in how much they commit to. `lexical` is the words alone, **frozen** — decision 12 |
@@ -658,6 +659,32 @@ cost (latency, a git call, a false FAIL) rather than a bonus. Until one of
 those is observed **and named in the change that promotes it**, the check stays
 where it is. That evidence belongs in `work/regression/` or a WORKLOG entry,
 not in a commit message.
+
+#### `fux register` — what the index holds, one line per document
+
+Read-only, offline, no lock. The same rows `.fux/index/REGISTER` carries,
+derived from the index rather than read from the file — so on a current index
+the text output **is** the file's bytes (captured on this repository, 2026-10-13):
+
+```console
+$ fux register | head -4
+# fux.register.v2	rules=5
+# loc	sha	decoder	[k=v ...]
+CHANGELOG.md	e204170f5723f264be83b66ebdd6a7ee5c1fc9e0	prose
+CLAUDE.md	a8393815e6ab2c878098e22522beec62ae375d1f	prose
+# exit 0
+
+$ fux register | diff - .fux/index/REGISTER && echo current
+current
+
+$ fux register --json | head -1
+{"loc": "CHANGELOG.md", "sha": "e204170f5723f264be83b66ebdd6a7ee5c1fc9e0", "decoder": {"name": "prose", "digest": null}, "rules": 5}
+# exit 0
+```
+
+**The shape of a row, the tail keys and why a verb rather than a second
+committed file are [SR-INGEST](0106_ingest.md) decisions 22 and 22d.** This
+record owns the verb: decision 18.
 
 #### `fux ingest` — sources → committed index
 
@@ -1354,6 +1381,34 @@ bar on or off, `--json` untouched, off when stderr is not a TTY, no clock.
 **No decision here moved** (W-262, 2026-10-05): `explain`/`graph`/`path` `--json` are unchanged byte for byte; their payloads are now built by `fux.graph.*_payload` (Node: `verbs/graph.mjs::*Payload`), which the library calls too (Arpit, 2026-10-04, W-251 #4 — library → CLI shape, [SR-API](0154_api.md) decision 1). `tests_e2e/test_relational.py` gained four library-equals-CLI tests.
 
 **No decision here moved** (W-261, 2026-10-05): `fux find` dispatches to `cmd_find` in `query/find.py` (SR-FIND's), and `node/fux.mjs` imports `withWriteLock` from `node/src/maintain/lock.mjs` (SR-LOCKS', renamed from `runner.mjs`). Surface, flags and output are unchanged.
+
+**18. `fux register [--json]` is a flat read verb, and the file stays the one
+committed copy** (Arpit, 2026-10-13, Cowork, W-279: *"s1 + fux register
+--json"*). It prints the committed register's rows **from the index** —
+[SR-INGEST](0106_ingest.md) decision 22d says what and why — and this record
+places it:
+
+- **A verb, not a flag on `inspect` or `doctor`.** `inspect` judges the index
+  and `doctor` the environment; this one *lists* — it makes no finding and
+  names no fix — and a `--register` on either would hand a program a list under
+  a report's exit semantics. It is the `lifecycle` group's fifth verb and
+  stays flat (veto 1).
+- **Flags:** `--json` (one JSON object per document; `default=None`, resolved
+  through `[cli.json]` like every read verb — `register` is in
+  `output_config.CLI_VERBS` with an empty key tuple, [SR-OUTPUT](0143_output-defaults.md))
+  and `--no-output-config`. **No `--since`, no `--for <question>`, no reader of
+  any kind** (L9). No progress bar: it was measured at 0.6 s on 2 363 documents
+  (decision 17).
+- **Exit codes by decisions 4–5:** `0`, or `1` with `error: not inside a fux
+  repository` outside a root. An index that will not read raises as every read
+  verb's does. **A closed pipe is not an error** — `fux register | head` is a
+  documented use, and the verb returns `0` on `BrokenPipeError`.
+- **PII-gated like every verb** ([SR-PII](0148_pii.md) decision 17): it is not
+  in `PII_EXEMPT`, because it reads the index.
+- **Text output is the file's bytes exactly** on a current index, so
+  `fux register | diff - .fux/index/REGISTER` is the drift check by hand, and
+  `fux doctor`'s `register` row is the same check with three named states
+  (SR-INGEST decision 22c).
 
 ### Consequences
 

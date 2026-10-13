@@ -5,12 +5,13 @@ name: SR-FETCHER
 title: "SR-FETCHER (0117) — the consumer-owned fetcher"
 description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher per URL, declared not detected, returning bytes and a Content-Type — and the word is fetcher because nothing here composes."
 status: accepted
+amended: 2026-10-13
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@6cd601897290]
+owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@269a301bf855]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 3acc2b8ebb922d52309cee773ca0702b7a5b81fbcc88d1265f38ccd7d10c3f1c
+content_sha: 9efb476756b59b06e8acdecb62a68353190d3e47df93b874e8872349ce932e36
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -693,6 +694,12 @@ copied out, never imported.
 
 **No decision here moved** (W-246, 2026-10-04): `templates/output.toml.txt` gained the `[cli.answer] journal_max_bytes` key.
 
+**No decision here moved** (W-273, 2026-10-11): `templates/tune.toml.txt`'s `section_weight` comment now describes the gain-only term ([SR-TUNE](0135_tuning.md), [SR-SECTIONS](0161_sections.md) decision 5); comment bytes only.
+
+**No decision here moved** (W-278, 2026-10-13): `src/fux/templates/tune.toml.txt` changed the `section_weight` comment only ([SR-TUNE](0135_tuning.md)).
+
+**No decision here moved** (W-273 phase 2, 2026-10-13): the `section_weight` and `section_records` comments in the templates name `1.0` as the measured value.
+
 ### Consequences
 
 - ⚠ **W-200 (2026-09-20) added two advisory fields to `FetchedUrl`** —
@@ -795,6 +802,8 @@ retention and the refusal check itself: every fetcher gains the counter with no
 line changed in any of them. The decision is
 [SR-REFUSAL](0146_refusals.md) decision 11; the storage is
 [SR-MAINTENANCE](0129_hooks.md)'s `url-state.json`.
+
+**No decision here moved** (W-279, 2026-10-13): `src/fux/templates/agents/` changed: the `fux-index` and `fux-usage` guides teach `fux register` ([SR-AGENT-POLICY](0132_agent-policy.md)). No fetcher template moved. The register's shape is [SR-INGEST](0106_ingest.md) decision 22's.
 
 ### Reference (required)
 

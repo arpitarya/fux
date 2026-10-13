@@ -134,6 +134,7 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "expand_weight",
         "mined_weight",
         "intent_weight",
+        "section_weight",
     ),
     "graph": (
         "damping",
@@ -283,6 +284,11 @@ class Tune:
     #: `1 + intent_weight`. ⚠ **Inert without a `[doctype]` table**, whatever
     #: its value.
     intent_weight: float
+    #: W-278 — the section term's λ, in [0, 1]: a document's score moves
+    #: `section_weight` of the way toward its best section scored as a short
+    #: document (SR-SECTIONS decision 5). `1.0` is pure max; above it is
+    #: refused. `0.0` never opens the plane.
+    section_weight: float
 
     # [graph]
     damping: float
@@ -329,7 +335,8 @@ class Tune:
     def scoring(self) -> Scoring:
         """The three-part BM25F parameter set, as one object."""
         return Scoring(
-            k1=self.k1, b=self.b, weights=self.field_weights, anchor=self.anchor_weight
+            k1=self.k1, b=self.b, weights=self.field_weights, anchor=self.anchor_weight,
+            section=self.section_weight,
         )
 
     @property
@@ -586,7 +593,29 @@ def load(root: Path, *, enabled: bool) -> Tune:
     if not enabled:
         return _resolve(_parse(template_text(), _TEMPLATE_LABEL), _TEMPLATE_LABEL)
     path = root / TUNE_NAME
-    return _resolve(_parse(_read_text(path), path), path)
+    tune = _resolve(_parse(_read_text(path), path), path)
+    _require_section_records(root, tune.section_weight)
+    return tune
+
+
+def _require_section_records(root: Path, section_weight: float) -> None:
+    """`section_weight > 0` needs the plane it reads (W-274, SR-SECTIONS d11).
+
+    With `fux.toml [index] section_records = false` there is no plane, and a
+    weight that read nothing would rank exactly as `0.0` while claiming not to:
+    a silent zero. A hard error naming both keys instead, in Python and Node.
+    """
+    if section_weight <= 0:
+        return
+    from .config import CONFIG_NAME, section_records
+
+    if not section_records(root):
+        raise FuxError(
+            f"{root / TUNE_NAME}: [ranking] section_weight > 0 reads the "
+            f"section plane, but {root / CONFIG_NAME} [index] section_records = false, so "
+            "ingest builds none. Set section_records = true and run `fux ingest --full`, "
+            "or set section_weight = 0.0"
+        )
 
 
 def _resolve(data: dict, label: "Path | str") -> Tune:
@@ -662,6 +691,7 @@ def _resolve(data: dict, label: "Path | str") -> Tune:
         "expand_weight": read("ranking", "expand_weight", _non_negative),
         "mined_weight": read("ranking", "mined_weight", _non_negative),
         "intent_weight": read("ranking", "intent_weight", _non_negative),
+        "section_weight": read("ranking", "section_weight", _fraction),
         "damping": read("graph", "damping", _fraction),
         "iterations": read("graph", "iterations", _whole),
         "laziness": read("graph", "laziness", _fraction),

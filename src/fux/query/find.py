@@ -159,6 +159,9 @@ class FindBuilt:
                 _q._as_dict(
                     self.root, r, self.query, sections=self.sections,
                     max_headings=self.max_headings,
+                    # `find` ranks with the same tune as `ask`, so the term moves
+                    # its order too; it never emits the `section` key.
+                    section_on=False,
                 )
                 for r in self.results
             ]

@@ -9,7 +9,19 @@ ball: agent
 
 # W-269 — section records, second mechanism: gain-only
 
-**Status: filed 2026-10-10, not started.** 🟢 for Claude Code, **Opus**.
+**Status: CLOSED 2026-10-10 — FAIL (drift).** Arpit ran the frozen `decide.py`: rank-1 losses 2 · 4 · 4 · 5 at λ 0.25 · 0.5 · 1.0 · 2.0, pool misses 23 → 23 · 21 · 19 · 13 ([verdict](../../work/regression/2026-10-10-section-gain-only/VERDICT.md)). The branch is Arpit's.
+
+| DoD | state | where |
+|---|---|---|
+| 1 · SR-SECTIONS d5 amended, compare doc noted | ✅ `113ae3b4` | [SR-SECTIONS](../../records/0161_sections.md) decision 5 |
+| 2 · pre-registration frozen, committed alone | ✅ `4f5504d1` | [PRE-REGISTRATION](../../work/regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md): λ ∈ {0.25, 0.5, 1.0, 2.0}; G0 · G1 · G2 · **G3** |
+| 3 · built, both readers, both suites | ✅ `03fbf782` | branch `claude/gracious-galileo-aqrg8b`: `w236-sections` (`f2a139fd`) with `main` merged in (`81b09892`), then the three commits above. Unmerged |
+| 4 · capture | ✅ | [report](../../work/regression/2026-10-10-section-gain-only/report.md): engine pinned at `03fbf782`; G0 PASS (0/90), G1 PASS (byte-identical to W-236's), G3 PASS (0 of 4 × 1 481); five arms × 90. Key `locked` throughout. 🔴 Arpit scores |
+| 5 · verdict | ✅ | **FAIL — drift**, Arpit's run of the frozen decider; [VERDICT](../../work/regression/2026-10-10-section-gain-only/VERDICT.md). SR-SECTIONS and the compare doc record both mechanisms |
+
+⚠ **Erratum:** the frozen pre-registration's §Freeze and this session's WORKLOG entry name the merge commit as `81b0989a`. It is **`81b09892`**. Neither file is edited: one is frozen, the other is append-only.
+
+⚠ **Both suites on the branch:** the same three groups of failures W-236's build left, all from **this repository's own index still at `fux.index.v7`** (2 unit, 12 Node): the merge owes its re-ingest and the size ruling. e2e is green. Nothing W-269 changed is among them.
 
 **Arpit, 2026-10-10 (Cowork),** on W-236's FAIL: *"Ideally, it should have
 worked. Research-wise failed."* Then, on the recommended fix: *"Okay. Let's
@@ -20,7 +32,7 @@ carries: **gain-only, on the existing section plane.**
 
 W-236 built U2 · B2 and failed (drift) at every weight: rank-1 losses
 4 · 5 · 9 · 10, pool misses 23 → 26 · 26 · 28 · 28
-([VERDICT](../regression/2026-10-10-section-records/VERDICT.md)). Its
+([VERDICT](../../work/regression/2026-10-10-section-records/VERDICT.md)). Its
 pre-registration named the cause in advance as *the likelier failure*: a
 sectionless (short) document is its own single section, so B2 gave it about
 λ × its **whole** score, while a long document's best section holds only part
@@ -57,7 +69,7 @@ S(d)  = ( S_doc(d) + λ · G(d) ) · w(d)
 
 1. **Amend [SR-SECTIONS](../../records/0161_sections.md) decision 5** to the
    gain-only term (B2 stays the ruled blend; this is its gain-only variant),
-   and note the reopen in [`compare/section-units`](../compare/section-units.compare.md).
+   and note the reopen in [`compare/section-units`](../../work/compare/section-units.compare.md).
    Restamp. Still `proposed`.
 2. **Pre-register, frozen, committed alone before any build code:**
    - **W-236's bar unchanged** — the same clauses (no new rank-1 misses
@@ -76,7 +88,7 @@ S(d)  = ( S_doc(d) + λ · G(d) ) · w(d)
    session that did not capture runs the decider and files the VERDICT.
 5. **On FAIL:** the step closes as measured. Record both mechanisms' results in
    SR-SECTIONS and the compare doc; the branch is Arpit's.
-   **On PASS:** nothing merges until [ANALYSIS §2](../regression/2026-10-10-section-records/ANALYSIS.md)'s
+   **On PASS:** nothing merges until [ANALYSIS §2](../../work/regression/2026-10-10-section-records/ANALYSIS.md)'s
    size question is ruled by Arpit — on this repository the section plane is
    8.0× the document plane (`.jsonl` 75.6 %). Then SR-SECTIONS is accepted in
    the merging change, with the `_format` bump and CHANGELOG (Breaking).

@@ -15,6 +15,7 @@ import { deriveWlen } from "./bm25f.mjs";
 import { Corpus, rank } from "./rank.mjs";
 import { tokenize } from "./tokenize.mjs";
 import { EMPTY, identifiersFor } from "./identifiers.mjs";
+import { attach as attachSections } from "./sections.mjs";
 
 //: The byte-level oracle, over per-field counts. `wlen` is DERIVED from `flen`
 //: at the weights in force, so this parses the array and applies `deriveWlen`
@@ -27,6 +28,7 @@ const FLEN_RE = /"flen":\[([0-9,\s]*)\]/;
 //: a line carries many edges. Compiled always, matched only when the anchor
 //: field is switched on.
 const EDGE_ANCHOR_RE = /"al":(?<len>\d+),"at":\{[^}]*\},"dst":"(?<dst>[^"]+)"/g;
+
 
 function flenFromLine(text) {
   const m = FLEN_RE.exec(text);
@@ -76,6 +78,7 @@ export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
   const df = {};
   for (const h of queryHashes) df[h] = 0;
   const candidates = [];
+  const sectionOn = scoring.sectionOn;
 
   for (const path of set.paths()) {
     const lines = set.lines(path);
@@ -129,6 +132,8 @@ export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
       candidates.push(record);
     }
   }
+
+  if (sectionOn) attachSections(root, candidates, queryHashes);
 
   if (anchorOn) {
     // 🔴 The RETRIEVAL half. A document whose only match is a linker's wording

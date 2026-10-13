@@ -150,6 +150,10 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
     # `--top` and `--retrieval-sample` stay flags: both are how much WORK to
     # do, not how a result is shown, and SR-OUTPUT's subject is the latter.
     "inspect": ("progress_threshold",),
+    # `register` (W-279) carries no `[cli.register]` key of its own -- only
+    # `--json` to resolve, like `doctor` and `inspect`; the EMPTY tuple is the
+    # declaration that this verb IS shaped by this file (W-140 row 14).
+    "register": (),
     # `correct` carries no `[cli.correct]` key of its own — only `--json` to
     # resolve, like `doctor`, `ingest` and `inspect`. An EMPTY tuple is the
     # declaration that this verb IS shaped by this file (W-140 row 14).

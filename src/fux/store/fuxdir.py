@@ -39,7 +39,7 @@ FUX_DIR = fixed("fuxdir", "dir")
 
 #: Declared children of `.fux/` — name -> one-line description for the README.
 COMMITTED: dict[str, str] = {
-    "index": "the wire-format index (SR-RECORD)",
+    "index": "the wire-format index (SR-RECORD), plus REGISTER: one line per indexed document -- loc, sha, decoder, k=v extras -- derived from the index and committed with it; `fux register` prints the same rows (SR-INGEST decision 22)",
     "sources": "the committed source lists (`dirs`, `urls`), one entry per line",
     "fetchers": "consumer-owned code (`cdp.py`, `http.py`), edit freely",
     # ASCII only: `_readme()` encodes this table as ASCII on purpose, for
@@ -239,7 +239,7 @@ def _readme() -> str:
         "",
         "| group | verbs | what the group does |",
         "|---|---|---|",
-        "| lifecycle | `setup` `doctor` `inspect` `identifiers` | set the repo up, check the environment, X-ray the index it produced, and record the ID families it holds |",
+        "| lifecycle | `setup` `doctor` `inspect` `identifiers` `register` | set the repo up, check the environment, X-ray the index it produced, record the ID families it holds, and list what the index holds (one line per document, for a machine) |",
         "| write | `ingest` `build` | `ingest` writes the committed index - the first time and every time after, for directories and URLs alike, re-fetching the URLs known to be stale; `build` derives the local accelerator from it |",
         "| sources | `add` `remove` `enrich` `correct` | maintain what is indexed. `add`/`remove` write lines and end in an ingest; `enrich` plans and validates a model's text; `correct` writes one question a PERSON typed onto the document that answers it |",
         "| read | `ask` `find` `answer` `lexical` | the same question, differing only in how much each commits to. `lexical` is BM25F alone, frozen - the baseline `ask` is measured against |",

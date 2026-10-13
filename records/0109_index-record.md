@@ -7,10 +7,10 @@ description: What every property of a committed JSONL record is for, why it is i
 status: accepted
 date: 2026-08-18
 feature: the committed record schema — `fux.index.v2`
-owns: [src/fux/schemas/index-record.schema.json@310d6f6997ee]
+owns: [src/fux/schemas/index-record.schema.json@0c56eb4a5ad7]
 laws: [L3, L4, ex-L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: e7eb5b6f9b1f65eb36a9345a62ffea5d9e5e8381acafbd25aac69aa6b3a622ab
+content_sha: c9fde0578754a0245e615a8818c2cce4764e43a61e9c3cecdce1adf4b887a8bf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -325,6 +325,9 @@ this moved where they are written, not what they are.
 
 
 The record's shape is unchanged by identifier families; only the shard header gains an optional `identifiers` field ([SR-IDENTIFIERS](0160_identifiers.md)).
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** A document record may carry **`nsec`**, its number of section records, absent when it is sectionless ([SR-SECTIONS](0161_sections.md) decision 3). It is declared in `schemas/index-record.schema.json`, not `carried`: `store.write_index` stamps it from the sections ingest hands it, and drops any `nsec` that arrives without them, so the count cannot disagree with the plane. A section record is `{id, flen, terms}` over the first two `TF_FIELDS` slots and lives in its own plane, outside this shape.
 
 ### Consequences
 

@@ -85,7 +85,7 @@ to** (Arpit, 2026-09-13). It is the answer to one question:
 
 | `kind` | becomes wrong when | today | the gate the kind selects |
 |---|---|---|---|
-| `law` | **Arpit rules differently** | 14 — SR-LAWS + SR-LAW-0…SR-LAW-12 | [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) holds `CLAUDE.md`'s generated block byte-equal to the record; a record conflicting with a law is void in the conflicting part |
+| `law` | **Arpit rules differently** | 15 — SR-LAWS + SR-LAW-0…SR-LAW-13 | [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) holds `CLAUDE.md`'s generated block byte-equal to the record; a record conflicting with a law is void in the conflicting part |
 | `component` | **the code changes** | 58 | [`tests/test_sr_freshness.py`](../tests/test_sr_freshness.py) and [`scripts/sr-guard.sh`](../scripts/sr-guard.sh) — the owning record is touched in the same change |
 | `process` | **the way work is done changes**, with no code behind it | 21 — SR-RS, SR-PORT-LIST, SR-AGENT-SURFACES, and the eighteen WORK records SR-WORK-OPEN-QUEUE, SR-WORK-ENVIRONMENTS, SR-WORK-BENCHMARK, SR-WORK-OWNERSHIP, SR-WORK-BACKLOG, SR-WORK-QUALITY, SR-WORK-SCALE, SR-WORK-LIFECYCLE, SR-WORK-DOCS, SR-WORK-SESSION, SR-WORK-OKF, SR-WORK-ARCHIVE, SR-WORK-RELEASE, SR-WORK-BLOCKERS, SR-WORK-GOVERNANCE, SR-WORK-GOLDEN, SR-WORK-REGISTRY, SR-WORK-TESTDATA | its enforcement is a test, so it **owns that test** |
 
@@ -105,21 +105,21 @@ reads as authority.
 
 **Every `kind: component` record owns at least one file, since 2026-10-05**
 ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11's strong rule; Arpit,
-W-251 #16; built by W-261), **with exactly one exemption, by name:**
-[SR-SECTIONS](0161_sections.md), `proposed` and unbuilt, which owns nothing until
-W-236 Part B builds its plane and is kept reachable meanwhile by a `describes`
-row on the chunker's two section functions.
+W-251 #16; built by W-261), **with no exemption since 2026-10-13.**
+[SR-SECTIONS](0161_sections.md) was the one, by name, while it was `proposed`
+and unbuilt; W-278 accepted it and moved its code into `query/sections.py` and
+its Node twin, which it owns.
 [`tests/test_sr_ownership.py`](../tests/test_sr_ownership.py) fails any other
 component record with `owns: []`.
 
-**13 of 93 records carry `owns: []`, and every one of them is stated as such on
-purpose.** Ten are law records, which is correct — a law governs conduct, not
+**13 of 94 records carry `owns: []`, and every one of them is stated as such on
+purpose.** Eleven are law records, which is correct — a law governs conduct, not
 components. **Two are `process` records that name their own hole out loud**,
 each in its own decision and never by omission:
 [SR-WORK-SCALE](0057_WORK-scale.md) decision 15 and
 [SR-PORT-LIST](0114_port-list.md), whose subjects are what a sentence may claim
 and where the boundary with the archived engine runs — neither of which a
-checker can grade without grading it wrongly. The thirteenth is SR-SECTIONS.
+checker can grade without grading it wrongly.
 
 **Nine component records gained a file by W-261**, each by **moving** its code
 out of the file that hosted it into one of its own — never by naming an owner
@@ -160,7 +160,7 @@ only thing that stops that**, and it is load-bearing rather than decorative.
 
 | range | holds | a new record takes |
 |---|---|---|
-| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002`–`0014` the law records, `SR-LAW-0`…`SR-LAW-12` in handle order since the 2026-09-28 renumber (W-234; the archived hashed-meta record, `ex-SR-LAW-5`, kept its old file name `0007_LAW-5-hashed-meta.md` under `archive/records/`) | the next free number **from `0015`** |
+| `0001`–`0050` | the **Law** records only — `0001` SR-LAWS, `0002`–`0015` the law records, `SR-LAW-0`…`SR-LAW-13` in handle order since the 2026-09-28 renumber (`0015` SR-LAW-13 added 2026-10-10) (W-234; the archived hashed-meta record, `ex-SR-LAW-5`, kept its old file name `0007_LAW-5-hashed-meta.md` under `archive/records/`) | the next free number **from `0016`** |
 | `0051`–`0100` | the **WORK** records only — how work is done: `0051` SR-WORK-OPEN-QUEUE, `0052` SR-WORK-ENVIRONMENTS, `0053` SR-WORK-BENCHMARK, `0054` SR-WORK-OWNERSHIP, `0055` SR-WORK-BACKLOG, `0056` SR-WORK-QUALITY (Arpit, 2026-09-13), and `0057`–`0064` the eight the `CLAUDE.md` extraction filled — SR-WORK-SCALE, SR-WORK-LIFECYCLE, SR-WORK-DOCS, SR-WORK-SESSION, SR-WORK-OKF, SR-WORK-ARCHIVE, SR-WORK-RELEASE, SR-WORK-BLOCKERS (Arpit, 2026-09-14), `0065` SR-WORK-GOVERNANCE, the governance map converted from `work/governance.md` (Arpit, 2026-09-14), `0066` SR-WORK-GOLDEN, the sealed answer key's guards and what may be read instead — the prohibition itself is law L11 at `0012` (Arpit, 2026-09-15), `0067` SR-WORK-REGISTRY, the doc registry — rules and table — converted from `work/DOC-REGISTRY.md`, which is retired (Arpit, 2026-09-22), and `0068` SR-WORK-TESTDATA, the test-data checklist (Arpit, 2026-09-22) | the next free number **from `0069`** |
 | `0101`– | **every other record**, sequentially | the next free number **after the highest** |
 
@@ -279,7 +279,7 @@ exactly one place — **its own `SR-LAW-n` record**, which `SR-LAWS` routes to.
 Every other record names the law's number in its `laws:` key and moves on. **The
 paraphrase is what drifts.** ⚠ **The home moved on 2026-09-12** (W-122): it was
 `CLAUDE.md` §Non-negotiable constraints, which now carries a **generated**,
-test-bound view of all thirteen.
+test-bound view of all fourteen.
 
 **Ownership is a table, not a judgement call, and it has an executable twin.**
 Every `src/`/`tools/` component is claimed by exactly one record in the
@@ -311,7 +311,7 @@ first two are enforced:
 | [`tests/test_sr_frontmatter.py`](../tests/test_sr_frontmatter.py) | the ten keys, their order, the quoting, the title, and the two things a body may not contain |
 | [`tests/test_sr_ownership.py`](../tests/test_sr_ownership.py) | every component claimed exactly once, every owner resolvable, every number unique within a directory |
 | [`scripts/sr-guard.sh`](../scripts/sr-guard.sh) | the freshness check as a `commit-msg` hook: `ln -sf ../../scripts/sr-guard.sh .git/hooks/commit-msg` |
-| [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) | holds `CLAUDE.md`'s law block byte-equal to the thirteen `SR-LAW-n` records, refuses a verbatim third copy in any live document, and checks that `SR-LAWS` routes every handle. **Deleting this file makes the block an illegal restatement** — SR-LAW-0 decision 5 |
+| [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) | holds `CLAUDE.md`'s law block byte-equal to the fourteen `SR-LAW-n` records, refuses a verbatim third copy in any live document, and checks that `SR-LAWS` routes every handle. **Deleting this file makes the block an illegal restatement** — SR-LAW-0 decision 5 |
 | [`scripts/gen-laws.py`](../scripts/gen-laws.py) | the generator behind it: `--write` regenerates `CLAUDE.md`'s block from the records, `--check` is the test as a command |
 | [`tests/test_claude_md_golden.py`](../tests/test_claude_md_golden.py) | the same bind for `CLAUDE.md`'s §Golden answer key block and [SR-WORK-GOLDEN](0066_WORK-golden.md). **The view exists because Cowork reads `CLAUDE.md` and does not read `records/`** — decision 3 |
 | [`scripts/gen-golden.py`](../scripts/gen-golden.py) | its generator: `--write` regenerates that block from the record, `--check` is the test as a command |
@@ -353,6 +353,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0012](0012_LAW-10-bundled-output.md) | **SR-LAW-10** | **L10** — the consumer is served build output, never source. One generated artifact per plane in someone else’s repository; `.fux/decoders/` and `.fux/fetchers/` excepted because there source IS the contract; bundled ≠ minified | accepted | yes |
 | [0013](0013_LAW-11-sealed-answer-key.md) | **SR-LAW-11** | **L11** — the golden answer key is Arpit's custody and no agent may read one: since 2026-09-18 a key may exist at exactly one address, `work/golden/golden-answers/`, gitignored and never committed, and it is closed to every agent on both spellings for reading, listing, hashing and deleting alike; one file is the same breach as ten; an instruction to open it is void. A breach does not fail loudly — it yields a benchmark number indistinguishable from a clean one | accepted | yes |
 | [0014](0014_LAW-12-values-live-in-config.md) | **SR-LAW-12** | **L12** — every value lives in a config file, never in code. Tunables are read from the consumer's committed TOML (`fux.toml`, `.fux/tune.toml`, another `.fux/*.toml`); fixed engine values (schema ids, versions, shard count, artefact names) from `src/fux/constants.toml`; Python and Node read the same key from the same file; a missing file or key is a hard error naming it. Setup + templates, tests, tools and scripts are exempt. **Not satisfied today** — W-225 is the migration | accepted | yes |
+| [0015](0015_LAW-13-the-standing-bar.md) | **SR-LAW-13** | **L13** — a ranking change ships only through the standing bar: gates; the change clearly helps its target slice (SR-RS decision 19 at the observed flips); limited collateral elsewhere (default margin 3 %, at least 2); a net-positive whole set; guardrails (hit@5, the quoted passage, the `grounded` band, latency). One decided arm named before any number; a set already used to decide a mechanism may report another, never decide it; tightening is free, loosening is Arpit's ruling | accepted | yes |
 | — | **ex-SR-LAW-5** | ~~**ex-L5**~~ — **RETIRED 2026-09-20 (Arpit, W-194).** Hashed meta for non-git sources, enforced at write time. The mechanism was deleted outright, and there is no residue of the law once the mechanism is gone. **The ACL-mismatch leak it closed is now an ACCEPTED, DOCUMENTED EXPOSURE**; the record is **archived** at `archive/records/0007_LAW-5-hashed-meta.md` for the argument, the citation and the reopen trigger (law L1, 2026-09-28), and the handle ex-L5 is never reused | archived | yes |
 | [0051](0051_WORK-open-queue.md) | **SR-WORK-OPEN-QUEUE** | How `OPEN-WORK.md` works — fifty-three rules in seven groups (what the file is · an item's lifecycle · the shape of a row · the four balls · ordering · the Blocked-on-Arpit inbox · standing obligations), stated once here and rendered into the queue's footer and `CLAUDE.md` as generated views held byte-equal by a test | accepted | yes |
 | [0052](0052_WORK-environments.md) | **SR-WORK-ENVIRONMENTS** | Each sibling environment has one job — `fux-playground` is Arpit's hands alone, `fux-lab` runs every measurement on the golden test data up to 10 000 documents, `fux-benchmark` compares the current build against the previous major. **Was law ex-L9 until 2026-09-13**; the handle is retired | accepted | yes |
@@ -432,7 +433,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0158](0158_serve.md) | **SR-SERVE** | `fux serve` — the explorer. A stdlib server bound to **`127.0.0.1` with no `--host`** (a contract, not a default) serving ONE self-contained page, and `GET /ask` answering with the **byte-identical stdout of `fux ask --json --why --band`** — because the route runs that command rather than rebuilding its payload. 🔴 **The page computes no score, no band and no rank**: a second ranker in a browser is a restatement in the L0 sense, and the three sample pages this was designed from had one. Lever cards are a rule per condition over the JSON, the two untuned thresholds print the word *provisional* **to the reader**, no route writes anything and `POST` is a 405 with a sentence. Rungs 2–4 (`ask --html`, the per-document findability card, `/docs`) are filed, not built | accepted | yes |
 | [0159](0159_constants.md) | **SR-CONSTANTS** | `src/fux/constants.toml` — the engine's FIXED values (schema ids, format and rules versions, artefact names, decoder versions, and the numbers a format or protocol defines), read by one Python and one Node loader through `fixed(table, key)`. **The Node bundle carries the file inlined** (`@fux-inline`, L10). A missing table or key raises the same sentence in both runtimes; nothing in code supplies a fallback (L12) | accepted | yes |
 | [0160](0160_identifiers.md) | **SR-IDENTIFIERS** | identifier families — `.fux/identifiers.toml` (`[user]` hand-written and winning, `[detected]` written only by `fux identifiers --write`), matched against the text on BOTH readers at ingest and query; each match adds ONE canonical term beside analyzer v3 (`RF 118`, `rf118`, `RF–118` → `rf-118`). Templates by default, a statically guarded `[user]` regex for experts; the effective digest stamped in every shard header. **An empty file is byte-identical to no feature**. Measured PASS (W-233, 2026-09-28) | accepted | yes |
-| [0161](0161_sections.md) | **SR-SECTIONS** | section records (W-168 step 10, ruled U2 · B2 · E1): each heading section of a multi-section document is a committed `doc#s<k>` record in its own plane, `.fux/index/sections/`, cut by a TUNABLE-FREE rule (bodiless headings fold forward; table rows never make a section), with `nsec` on the parent; the best section adds `[ranking] section_weight` × its score inside `rank()`, one result per document, and at `0.0` the plane is never opened. `_format` bump + `ingest --full`. **Measured: about doubles the index** (+98.4 % at rung-10000, 50.4 MB, both commit limits pass). 🔴 **FAILED 2026-10-10 (drift), parked by Arpit** — built on branch `w236-sections`, never merged ([verdict](../work/regression/2026-10-10-section-records/VERDICT.md)) | proposed | **no** |
+| [0161](0161_sections.md) | **SR-SECTIONS** | section records (W-168 step 10, U2 · E1): each heading section of a multi-section document is a committed `doc#s<k>` record in its own plane, `.fux/index/sections/`, cut by a TUNABLE-FREE rule, with `nsec` on the parent — **opt-in**, `fux.toml [index] section_records` (W-274). **The term is the third form** (W-278): the best own-matching section scored as a short document on the document yardstick, `S_doc + λ · max(0, S_sec* − S_doc')`, `λ ≤ 1`; one result per document; at `0.0` the plane is never opened. **About doubles the index** (G1: section ÷ document plane 0.987 at rung-10000). Two forms FAILED (W-236, W-269); the third measured **INCONCLUSIVE** (0 losses, +6 `hit@1`, slice 5 of 24) and **Arpit ruled ship, 2026-10-13**: `section_weight = 1.0` with `section_records = true`, both off by default ([verdict](../work/regression/2026-10-13-section-term-v3/VERDICT.md)) | accepted | **yes** |
 | [0002](0002_LAW-0-authority.md) | **SR-LAW-0** | L0 — a rule is stated in exactly one SR and every other artifact links to it; the Law records outrank every other record and a conflicting record is void in the conflicting part; a Law changes only on Arpit's ruling | accepted | yes |
 
 > ## Renumbered again on 2026-09-13 — the quality contract became a WORK record
@@ -677,6 +678,7 @@ table does not grant.
 | `src/fux/query/` | SR-ASK | the scan, unification, and the display-only resolution after it — bound by the differential law |
 | `src/fux/query/find.py` | SR-FIND | the `find` verb — `build_find`, `cmd_find`, its post-filters and the `find` half of the `--json` shape. Carved out of `query/__init__.py`, which keeps the shared ranking and every verb's stderr declarations (W-261, 2026-10-05: every `kind: component` record owns a file) |
 | `src/fux/query/rank.py` | SR-RANKING | the one scorer and the one sort, and `Weighting`, which is where every document multiplier must travel to reach the pruning bound |
+| `src/fux/query/sections.py` | SR-SECTIONS | the scan's section attachment, decision 7: the derived plane when the runtime is fresh, the committed plane by byte pattern otherwise; one result, and no arithmetic (that is `rank()`'s). Moved out of `scan.py` and `accel.py` by W-278 so the record owns its code |
 | `src/fux/query/bm25f.py` | SR-RANKING | BM25F, `Scoring`, and `derive_wlen` — the one place the weighting arithmetic exists |
 | `src/fux/query/analyzer.py` | SR-RANKING | split, lowercase, stopword, stem, hash — in that order, shared by ingest and query |
 | `src/fux/query/stem.py` | SR-RANKING | the Porter implementation, checked against the published test vectors |
@@ -771,6 +773,7 @@ table does not grant.
 | `node/src/query/headings.mjs` | SR-ASK | the Node twin of `src/fux/query/headings.py` — display only, never a score |
 | `node/src/query/intent.mjs` | SR-RANKING | the Node twin of `src/fux/query/intent.py` — ASCII-only case and whitespace, `.` over every character, globs over code points |
 | `node/src/query/rank.mjs` | SR-RANKING | the Node twin of the scorer. **The differential law is the whole point**: one scorer changing without the other is two engines answering differently from one index |
+| `node/src/query/sections.mjs` | SR-SECTIONS | the Node twin of `query/sections.py` (W-278) |
 | `node/src/query/rerank.mjs` | SR-RERANK | the Node twin of `src/fux/query/rerank.py` — the proximity reranker |
 | `node/src/query/run.mjs` | SR-ASK | the shared spine of `ask`, `find` and `answer`. Twin of the pure half of `src/fux/query/__init__.py` |
 | `node/src/query/scan.mjs` | SR-ASK | the Node twin of `src/fux/query/scan.py` — the only candidate path Node has |
@@ -971,6 +974,8 @@ rows narrowed so far were each verified by reading every mention in the file
 | `node/dist/fux.mjs` | SR-WORK-RELEASE | the ONE bundled file a consumer is served ([L10](0012_LAW-10-bundled-output.md)), built at publish. ⚠ **Named, never owned, and GITIGNORED** — it is build output, so the gate can never fire on it and the generated Components block renders it without a link. The row exists so the record that decides how a release reaches npm names the artefact that goes there |
 | `node/test/config.test.mjs` | SR-TUNE | `.fux/tune.toml` as the Node reader loads it — the header names it first |
 | `node/test/config.test.mjs` | SR-OUTPUT | `.fux/output.toml` as the Node reader loads it |
-| `src/fux/refer/_chunk.py::_sections,_title_index` | SR-SECTIONS | the index section rule (decision 2) cuts with `_sections` and folds the title `_title_index` names; a change to either changes what a section record would be. Narrowed because the rest of the file (`_fold`, the table bands, the ladder) is passage policy the rule deliberately does not reuse |
+| `src/fux/refer/_chunk.py::_sections,_title_index,index_sections` | SR-SECTIONS | the index section rule (decision 2) cuts with `_sections`, folds the title `_title_index` names, and is `index_sections` itself (built 2026-10-10 on `w236-sections`); a change to any of them changes what a section record is. Narrowed because the rest of the file (`_fold`, the table bands, the ladder) is passage policy the rule deliberately does not reuse |
+| `src/fux/maintain/mergedriver.py::merge_sections` | SR-SECTIONS | decision 9's merge rule: a parent's sections merge as one unit, and both-sides-changed is refused. Owned by SR-MERGE-DRIVER for the driver; this is the one function whose rule this record states |
+| `src/fux/query/rank.py::_section_gain` | SR-SECTIONS | decision 5's third form, `max(0, max_k S_sec* − S_doc')`: each own-matching section scored as a short document (its body and heading, the parent's title/path/ctx) on the document `avg_wlen`; zero for a sectionless document; the zero-gain rule. Owned by SR-RANKING for `rank()` |
 <!-- DESCRIBES-TABLE-END -->
 

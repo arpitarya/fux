@@ -43,6 +43,12 @@ def _cmd_inspect(args) -> int:
     return cmd_inspect(args)
 
 
+def _cmd_register(args) -> int:
+    from .ingest.register import cmd_register
+
+    return cmd_register(args)
+
+
 def _cmd_ingest(args) -> int:
     from .ingest import cmd_ingest
 
@@ -386,6 +392,18 @@ def build_parser() -> argparse.ArgumentParser:
     _add_progress_flags(p_doctor)
     _add_output_flags(p_doctor, band=False)
     p_doctor.set_defaults(func=_cmd_doctor)
+
+    # `register` prints the committed register's rows FROM THE INDEX -- the
+    # records, the decoder digest table and the URL list -- so a program reads
+    # what the file would say without parsing the file, and the file stays the
+    # one committed copy (SR-INGEST decision 22d, W-279). Read-only, offline,
+    # no lock: `fux register | diff - .fux/index/REGISTER` is the drift check.
+    p_register = sub.add_parser(
+        "register", help="print the register (one line per indexed document) from the index; --json for machines"
+    )
+    p_register.add_argument("--json", action="store_true", default=None, help="one JSON object per document")
+    _add_output_flags(p_register, band=False)
+    p_register.set_defaults(func=_cmd_register)
 
     # `inspect` reads the INDEX; `doctor` checks the ENVIRONMENT (SR-INSPECT
     # decision 1). A flag on `doctor` would have made one command answer two

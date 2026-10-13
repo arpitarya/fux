@@ -71,6 +71,9 @@ _FROZEN_FILES = {
     "work/WORKLOG.md",       # append-only session log
     "CHANGELOG.md",          # released history
     "records/TEMPLATE.md",  # links are placeholders, not paths
+    # An export for ANOTHER repository (2026-10-13): its links name that
+    # repository's paths and record numbers, never this one's.
+    "WORK-SYSTEM.md",
 }
 
 # A link may legitimately point at a sibling repo that is not vendored here.

@@ -46,10 +46,17 @@
     "declares in its own text, analyzed and hashed like `terms`. Absent when",
     "there is none (omit_when). It is a function of THIS document's bytes, so",
     "it is carried; the corpus-wide table is a read-time fold of every record's",
-    "pairs (query/mined.py) and is committed nowhere. Hashes, not text (L3)."
+    "pairs (query/mined.py) and is committed nowhere. Hashes, not text (L3).",
+    "",
+    "NSEC, W-236 (2026-10-10, _format v8). The number of this document's",
+    "section records in `.fux/index/sections/` (SR-SECTIONS d3). Absent when",
+    "the document has one section or none, so absent means SECTIONLESS, and a",
+    "v8 reader can tell that from an index that predates section records. It",
+    "is written by `store.write_index` from the sections it is handed, never",
+    "carried, so it cannot disagree with the plane it counts."
   ],
 
-  "schema": "fux.index.v7",
+  "schema": "fux.index.v8",
 
   "fields": {
     "id":         { "type": "str",  "required": "always" },
@@ -70,7 +77,8 @@
 
     "archived":   { "type": "bool", "required": "never", "omit_when": false },
     "superseded": { "type": "bool", "required": "never", "omit_when": false },
-    "mtime":      { "type": "int",  "required": "never" }
+    "mtime":      { "type": "int",  "required": "never" },
+    "nsec":       { "type": "int",  "required": "never" }
   },
 
   "_examples_doc": [

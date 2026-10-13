@@ -4,12 +4,23 @@ name: W-266
 description: "Arpit's ask (2026-10-04): a better structure for `.fux/index/REGISTER`, the committed register of what the index holds. Research found five defects in today's five-column TSV (positional columns that make any new field a silent total read failure, a `-` sentinel, a near-constant `kind` column, two grammars in the `decoder` column, no format marker, no grouping by source). This item: a compare doc of the candidate shapes, one 🔴 row for Arpit to pick, then the build. Ratified, not built."
 item: W-266
 filed: 2026-10-04
-ball: agent
+ball: closed
 ---
 
 # W-266 — a better structure for the register
 
-**Status: filed 2026-10-04, not started. Ratified, not built.** The research
+**Status: CLOSED 2026-10-13 — RULED (Arpit, Cowork): *"s1 + fux register
+--json"*.** The research was given in chat at his word (*"research and suggest
+W-266 within the chat"*), with the candidate shapes rendered on this repo's own
+rows, the alternatives to TSV (the sources grammar, JSONL, TOML, YAML, Markdown,
+CSV, an indented tree, two files, no file) and their costs; **no compare doc was
+written.** The build is [W-279](../../work/open/W-279-register-v2.md), whose §Why
+keeps the measured defects and the refused shapes. Two findings added on
+2026-10-13: SR-INGEST d22 still names `outcome`, a column the file never
+carried (record ≠ code, L0); and `archived=true` is declared in `sources/dirs`
+and absent from the register. The text below is as filed on 2026-10-04.
+
+**Status as filed: filed 2026-10-04, not started. Ratified, not built.** The research
 below is this session's; the compare doc, the ruling and the build are the
 item.
 

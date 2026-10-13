@@ -144,6 +144,103 @@ def _background_runner(root: Path) -> Check:
     return Check("background runner", True, "idle, nothing pending", level="warn")
 
 
+def _git_hooks(root: Path) -> Check:
+    """Can the installed hooks reach a `fux`? (W-276, SR-MAINTENANCE decision 3a.)
+
+    A hook resolves `fux` through the interpreter `fux hooks --install` pinned,
+    and PATH only after it. **The pinned interpreter gone, or a hook written
+    before the pin, is the case this row exists for**: the commit succeeds, the
+    hook does nothing or prints one line nobody reads, and the committed index
+    falls behind. On this repository that was 39 commits from 2026-10-04.
+
+    Read-only like every row here: it names `fux hooks --install` and runs
+    nothing. A **warning** — absent hooks are a choice (decision 5), not a fault.
+    """
+    from .maintain import hooks as hooks_mod
+
+    try:
+        state = hooks_mod.status(root)
+    except Exception as exc:  # no git repository: the hooks have nowhere to live
+        return Check("git hooks", True, f"not applicable - {exc}", level="warn")
+    ours = sorted(name for name, who in state["hooks"].items() if who == "fux")
+    if not ours:
+        return Check("git hooks", True, "not installed - `fux hooks --install` re-indexes on commit", level="warn")
+    pinned = state["python"]
+    broken = [name for name in ours if pinned.get(name) == "missing"]
+    if broken:
+        return Check(
+            "git hooks",
+            False,
+            f"{', '.join(broken)}: the interpreter they were installed with is gone, so they fall "
+            "back to PATH or skip - run `fux hooks --install`",
+            level="warn",
+        )
+    old = [name for name in ours if pinned.get(name) == "unpinned"]
+    if old:
+        return Check(
+            "git hooks",
+            False,
+            f"{', '.join(old)}: written before W-276 and resolve `fux` on PATH alone, which an IDE "
+            "or a shell without the venv may not have - run `fux hooks --install`",
+            level="warn",
+        )
+    return Check("git hooks", True, f"{', '.join(ours)} installed, interpreter pinned", level="warn")
+
+
+def _section_mode(root: Path) -> Check:
+    """Which mode built the index, and does ranking agree? (W-274, SR-SECTIONS d11.)
+
+    Three facts, one row: `fux.toml [index] section_records`, whether the
+    committed index holds a section plane, and `tune.toml [ranking]
+    section_weight`. **An error** when the weight is on and the key is off,
+    because `ask` refuses then too. **A warning** when the key and the plane
+    disagree, because the next delta ingest refuses and names `--full`.
+    Read-only: it names the command and runs nothing.
+    """
+    import tomllib
+
+    from .config import section_records
+    from .store import iter_section_paths
+    from .tune import TUNE_NAME
+
+    try:
+        wanted = section_records(root)
+    except Exception as exc:  # `fux.toml loads` names the fault; one report per cause
+        return Check("section records", False, str(exc), level="warn")
+    try:
+        ranking = tomllib.loads((root / TUNE_NAME).read_text(encoding="utf-8")).get("ranking", {})
+        weight = float(ranking.get("section_weight", 0.0))
+    except Exception:
+        weight = 0.0  # `tune.toml loads` is the row for a broken tune file
+    has_plane = bool(iter_section_paths(root))
+    if weight > 0 and not wanted:
+        return Check(
+            "section records",
+            False,
+            "[ranking] section_weight > 0 but fux.toml [index] section_records = false - "
+            "`fux ask` refuses. Set section_records = true and run `fux ingest --full`, "
+            "or set section_weight = 0.0",
+        )
+    if has_plane and not wanted:
+        return Check(
+            "section records",
+            False,
+            "off in fux.toml, but the committed index holds section records - "
+            "run `fux ingest --full`",
+            level="warn",
+        )
+    if wanted and not has_plane:
+        return Check(
+            "section records",
+            True,
+            "on - no document has two or more sections yet (if the key was just "
+            "switched on, run `fux ingest --full`)",
+            level="warn",
+        )
+    mode = "on - documents and their sections" if wanted else "off - whole documents only"
+    return Check("section records", True, mode, level="warn")
+
+
 def _daemon(root: Path) -> Check | None:
     """The resident clock's last sweep — `None` when it has never run.
 
@@ -333,6 +430,8 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_accelerator(root))
     checks.append(_node_reader(root))
     checks.append(_fux_on_path())
+    checks.append(_git_hooks(root))
+    checks.append(_section_mode(root))
     checks.append(_background_runner(root))
     daemon_check = _daemon(root)
     if daemon_check is not None:
@@ -1114,30 +1213,45 @@ def _register(root: Path) -> Check:
     from .store import reader as reader_mod
 
     name = "register"
-    rows = register_mod.read(root)
+    reg = register_mod.read(root)
     try:
         index = reader_mod.read_index(root)
     except Exception:  # pragma: no cover - no readable index is other rows' business
         return Check(name, True, "skipped (no readable index)", level="warn")
     if not index:
         return Check(name, True, "no index to describe", level="warn")
-    if not rows:
+    # Three states, named (SR-INGEST decision 22c): missing, old format, drift.
+    if reg.state == "missing":
         return Check(
             name, False,
-            f"no {register_mod.NAME} beside an index of {len(index)} document(s) - "
-            f"run `fux ingest` to write one",
+            f"no {register_mod.NAME} beside the index - `fux ingest` writes one",
             level="warn",
         )
-    locs = {r.get("loc", "") for r in index.values()}
-    missing = sorted(locs - set(rows))
-    extra = sorted(set(rows) - locs)
-    if not missing and not extra:
-        return Check(name, True, f"{len(rows)} line(s), agreeing with the index")
+    if reg.state == "old":
+        return Check(
+            name, False,
+            f"{register_mod.NAME} is in the old format (`{register_mod.HEADER_V1.lstrip('# ')}`) - "
+            f"`fux ingest` rewrites it as {register_mod.FORMAT}",
+            level="warn",
+        )
+    from .ingest.extract import RULES_VERSION
+
+    rows = reg.rows
+    by_loc = {r.get("loc", ""): r for r in index.values()}
+    missing = sorted(by_loc.keys() - rows.keys())
+    extra = sorted(rows.keys() - by_loc.keys())
+    moved = sorted(loc for loc in rows.keys() & by_loc.keys() if rows[loc].sha != by_loc[loc].get("sha", ""))
     parts = []
+    if reg.rules != RULES_VERSION:
+        parts.append(f"written at {register_mod.RULES_KEY}={reg.rules}, this fux extracts at {RULES_VERSION}")
     if missing:
         parts.append(f"{len(missing)} indexed document(s) with no register line ({missing[0]})")
     if extra:
         parts.append(f"{len(extra)} register line(s) for nothing in the index ({extra[0]})")
+    if moved:
+        parts.append(f"{len(moved)} register line(s) whose sha disagrees with the index ({moved[0]})")
+    if not parts:
+        return Check(name, True, f"{len(rows)} line(s) ({register_mod.FORMAT}), agreeing with the index")
     return Check(
         name, False,
         "; ".join(parts) + " - the register was committed from a different ingest "
@@ -3619,14 +3733,16 @@ def _shards_drifted(root: Path, directory: Path) -> list[str]:
     except (OSError, ValueError, KeyError, TypeError):
         return []
     drifted = []
-    for path in store_mod.iter_shard_paths(root):
-        want = recorded.get(path.name)
+    # W-236: section shards are pinned under `sections/<name>` beside the rest.
+    for path in [*store_mod.iter_shard_paths(root), *store_mod.iter_section_paths(root)]:
+        name = derive_fmt.stamp_name(path)
+        want = recorded.get(name)
         try:
             have = store_mod.content_sha(path.read_bytes())
         except OSError:
             continue
         if want is not None and want != have:
-            drifted.append(path.name)
+            drifted.append(name)
     return sorted(drifted)
 
 

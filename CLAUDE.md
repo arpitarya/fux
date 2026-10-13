@@ -133,7 +133,7 @@ its milestone needs it. Nothing else comes back.
 
 ⚠ **This section is NOT normative, and has not been since 2026-09-12.** Each law
 is *stated* in exactly one record — [SR-LAW-0](records/0002_LAW-0-authority.md)
-through [SR-LAW-12](records/0014_LAW-12-values-live-in-config.md) — and the block below is
+through [SR-LAW-13](records/0015_LAW-13-the-standing-bar.md) — and the block below is
 **generated from them** by [`scripts/gen-laws.py`](scripts/gen-laws.py) and held
 byte-equal by [`tests/test_claude_md_laws.py`](tests/test_claude_md_laws.py).
 
@@ -144,7 +144,7 @@ It is reproduced at all because this is the file every session reads first, and
 **for exactly as long as a test binds it** — remove the test and this block
 violates decision 1.
 
-[SR-LAWS](records/0001_LAWS.md) assigns the handles `L0`–`L12` and routes
+[SR-LAWS](records/0001_LAWS.md) assigns the handles `L0`–`L13` and routes
 each to its record; that is all it does now.
 
 <!-- LAWS:BEGIN — GENERATED from records/*_LAW-*.md by scripts/gen-laws.py. Do not edit by hand: amend the record, then run `python scripts/gen-laws.py --write`. -->
@@ -153,7 +153,7 @@ each to its record; that is all it does now.
   every other record.** Every rule is *stated* in exactly one SR; every other
   artifact — `CLAUDE.md`, a schema, a config comment, a skill, a diagram —
   **links to it and never restates it**, and a change is made in the record
-  first. The Law records `SR-LAW-0`…`SR-LAW-12` outrank every other SR: **a
+  first. The Law records `SR-LAW-0`…`SR-LAW-13` outrank every other SR: **a
   record that conflicts with a Law is void in the conflicting part**, never a
   trade-off to weigh. **A Law changes only on Arpit's ruling, named in the
   record**; an ordinary SR a session may accept.
@@ -238,7 +238,8 @@ each to its record; that is all it does now.
   **in every set** — Codex-authored and Claude-authored alike are one subject
   under this law. 🔴 **A key may exist in exactly one place**:
   **`work/golden/golden-answers/`** — Arpit's, on his machine, **gitignored and
-  never committed on any ref**. **A key found anywhere else, or on any committed
+  never committed on any ref**. **A key found anywhere else — save the authoring
+  chat's own download, on its way there by Arpit's hand — or on any committed
   ref, is a breach to declare.** 🔴 **Never committed is the one clause no state
   relaxes** — not while locked, not while unlocked, not ever, and no agent
   commits a key byte in any state.
@@ -284,8 +285,10 @@ each to its record; that is all it does now.
   🔴 **The authoring carve-out survives, and it applies PER SET:** for each
   agent-authored set — set 2, set 3, and any later one — **one designated
   session** writes that set's
-  questions *and* answers from `work/golden/seed/`, hands them to Arpit **in the
-  chat**, writes no file, and never runs a rung or returns to the benchmark;
+  questions *and* answers from `work/golden/seed/`, hands them to Arpit **as
+  files he downloads from that chat** — the key alone in a file of its own —
+  writes nothing into any repository, and never runs a rung or returns to the
+  benchmark;
   from that handoff on **that set is as closed to Claude as set 1**, and every
   number measured on it is `informed` permanently. **The carve-out is one
   session per set and never a standing permission** — authoring set 3 gives no
@@ -319,6 +322,7 @@ each to its record; that is all it does now.
   the sets, the guards, the switch's mechanics and the benchmark process are
   [SR-WORK-GOLDEN](records/0066_WORK-golden.md)'s.
 - **L12** · **Every value lives in a config file, never in code.** A *tunable* value — a weight, threshold, limit, timeout, TTL or sample size — is read from a committed TOML file: `fux.toml`, `.fux/tune.toml`, or another `.fux/*.toml`. A *fixed* engine value — a schema id, a format or rules version, the shard count, an artefact file name — is read from the engine's internal constants file, `src/fux/constants.toml`, shipped inside both distributions. Python and Node read the same key from the same file. **A missing file or key is a hard error that names it; no module constant, function body or parameter default supplies a fallback.** The only places a literal value may sit are `setup.py` and `src/fux/templates/`, which write the config files, and `tests/`, `tests_e2e/`, `tools/` and `scripts/`.
+- **L13** · **A ranking change ships only through the standing bar.** Every pre-registration that decides whether a change meant to improve what fux ranks may ship uses ONE shape and fills in only its parameters: **gates** (identical output when the change is off; the run's own size bar) · **helps** (on the target slice the change exists for, the paired net on the declared endpoint clears [SR-RS](records/0133_predictions.md) decision 19's floor at the observed flips) · **limited collateral** (on every other question, losses minus wins stay within the margin — by default 3 % of those questions, rounded down, and never below 2) · **net positive** (the whole-set net is above zero) · **guardrails** (the side measures this record names do not fall past their limits). **One arm is decided, and it is named before any number exists**; every other arm is reported only. **A question set on which one mechanism has already been decided may report another, never decide it.** A pre-registration may tighten any parameter; loosening one, or departing from the shape, needs Arpit's ruling named in it. The outcome is PASS, INCONCLUSIVE (handed to Arpit) or FAIL, by this record's table, and a run frozen before 2026-10-10 keeps the bar it froze.
 
 <!-- LAWS:END -->
 
@@ -543,7 +547,7 @@ directories a session needs to find its way:
 
 ```
 work/        THE SHARED MEMORY between sessions — start at work/README.md
-records/     THE STANDING RECORDS — the register, the template, SR-LAW-0…SR-LAW-11
+records/     THE STANDING RECORDS — the register, the template, SR-LAW-0…SR-LAW-13
 docs/        WHAT THE PROJECT IS — the OKF bundle root, the glossary
 src/fux/     the engine — every component claimed in records/README.md
 node/        the Node read plane — authored .mjs; ONE bundled file ships (L10)

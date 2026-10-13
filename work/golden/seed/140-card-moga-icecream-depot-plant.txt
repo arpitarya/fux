@@ -1,0 +1,31 @@
+title: Moga ice-cream depot plant card - before the gas goes in
+doc_id: QCL-ENG-CRD-83
+owner: Gagandeep Mann
+department: Engineering
+status: in_force
+effective_date: 2025-11-03
+applies_to: Moga ice-cream depot
+
+MOGA ICE-CREAM DEPOT: BEFORE THE GAS GOES IN
+
+Pinned in the plant room at the Moga ice-cream depot, where the hardening room runs at -30 C.
+
+WHY WE ARE STRICT
+A very cold system shows the effects of moisture sooner than any other. A trace of water freezes at the expansion valve and the room warms with nobody knowing why.
+
+PUMPING DOWN
+Before any charge, the system is pumped down from both sides with the two-stage pump. The target is 250 micron on the electronic gauge, read at the system end of the hose and never at the pump.
+
+THE HOLD
+When the target is reached, the pump is isolated and the system is left for 60 minutes. The reading must stay below 500 for the whole hour. If it rises past that, there is moisture or a leak, and the job goes back to the start.
+
+RECORDS
+Write the reading at isolation, at 30 minutes and at 60 minutes on the plant sheet, with the gauge serial and your name.
+
+DO NOT
+Do not stop pumping early because a crew is waiting elsewhere, and do not read the vacuum on the pump's own dial.
+
+AFTER THE CHARGE
+The charge is weighed in from the scale and written on the sheet with the cylinder number. The hardening room is not loaded until it has held -30 C for a full day.
+
+Questions to the regional engineer.

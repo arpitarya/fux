@@ -8,6 +8,53 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed (BREAKING)
+
+- **The index format is `fux.index.v8`** (W-236, W-273, W-274). An index
+  written by an earlier fux is refused by name: run **`fux ingest --full`** once.
+  With section records off (the default) the new index is byte-identical to one
+  written without them; the bump exists so an older index cannot be read as
+  *"no sections"*.
+
+### Added
+
+- **Section records, opt-in** (W-168 step 10; W-278 measured it, Arpit ruled
+  ship on 2026-10-13). Set `fux.toml [index] section_records = true`, run
+  `fux ingest --full`, and set `.fux/tune.toml [ranking] section_weight = 1.0`.
+  A long document is then also scored by its best heading section, as if that
+  section were a short document with the document's title, and keeps the better
+  of the two scores. Measured on 165 golden questions: no question got worse,
+  6 more at rank 1. The index roughly doubles (`.fux/index/sections/`).
+  `section_weight` above `1.0` is refused; above `0` with `section_records`
+  off is an error.
+
+- **`fux register [--json]`** (W-279). A read-only verb that prints the
+  committed register's rows from the index — the records, the decoder digest
+  table and the URL list — so on a current index its text output is
+  `.fux/index/REGISTER`'s bytes (`fux register | diff - .fux/index/REGISTER` is
+  the drift check by hand) and `--json` is one object per document: `loc`,
+  `sha`, `decoder {name, digest}`, `rules`, then every tail key by name.
+
+### Changed
+
+- **`.fux/index/REGISTER` has a shape: `fux.register.v2`** (W-279, ruled by
+  Arpit 2026-10-13). A `# fux.register.v2	rules=<n>` format line, a column
+  header, three tab-separated columns (`loc`, `sha`, `decoder`) and an optional
+  `k=v` tail present only where it holds a value — `archived=true` on the
+  documents under an `archived=true` source entry, `fetch=<name>` on a URL row.
+  The constant `kind` and `-` columns are gone; `rules=` dates every bare
+  decoder once instead of per row. The reader parses by the header and keeps a
+  key it does not know. **The next `fux ingest` rewrites the file** — one
+  commit per repository; nothing a consumer runs reads it. Until then
+  `fux doctor`'s `register` row says *old format*, and the row now names three
+  states (missing, old format, drift) instead of counting the index's
+  documents in a sentence about the register. A URL row's decoder and fetcher
+  now come from the committed URL list rather than from the run, so an offline
+  ingest writes the same bytes as a networked one.
+- **`fux-merge-index` keeps both header lines of the register.** The driver
+  kept only the first `#` line; a merged v2 register would have lost its column
+  header and been rewritten by the next ingest for no change in the corpus.
+
 ### Fixed
 
 - **`fux-merge-index` no longer drops the other side's `REGISTER` rows** (W-250). The register merged as a union with ours winning every `loc`, so a document only the other branch re-ingested kept our stale sha in the merge commit, and a document the other branch deleted came back. It now merges three-way on `loc`: a side whose row equals the ancestor's never wins. Found by running the driver on this repository for the first time.

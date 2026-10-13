@@ -19,7 +19,10 @@ __all__ = ["payload", "write"]
 
 def payload(*, n: int, total_flen: list[int], total_anchor_len: int) -> dict:
     """The plane's content: raw totals, never a weighted or averaged number, so
-    a field weight cannot bake into a derived file."""
+    a field weight cannot bake into a derived file.
+
+    W-236's `sec_units` and `sec_total_flen` left with W-278: every section is
+    scored on the document `avg_wlen` (SR-SECTIONS decision 5)."""
     return {
         "n": n,
         "total_flen": total_flen,

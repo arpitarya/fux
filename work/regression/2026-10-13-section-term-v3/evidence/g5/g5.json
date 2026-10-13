@@ -1,0 +1,60 @@
+{
+ "arms": {
+  "sw-0.5": {
+   "incoming": {
+    "max": 1982,
+    "median": 1980.0,
+    "min": 1978,
+    "n": 4,
+    "q1": 1978.0,
+    "q3": 1982.0
+   },
+   "incoming_long": 4,
+   "incoming_longer_than_outgoing": 4,
+   "incoming_sectioned": 4,
+   "outgoing": {
+    "max": 207,
+    "median": 174.0,
+    "min": 102,
+    "n": 4,
+    "q1": 114.25,
+    "q3": 204.5
+   },
+   "outgoing_long": 0,
+   "rank1_changes": 4
+  },
+  "sw-1.0": {
+   "incoming": {
+    "max": 2099,
+    "median": 1982.0,
+    "min": 1978,
+    "n": 7,
+    "q1": 1978.0,
+    "q3": 1997.0
+   },
+   "incoming_long": 7,
+   "incoming_longer_than_outgoing": 7,
+   "incoming_sectioned": 7,
+   "outgoing": {
+    "max": 207,
+    "median": 156.0,
+    "min": 101,
+    "n": 7,
+    "q1": 102.0,
+    "q3": 197.0
+   },
+   "outgoing_long": 0,
+   "rank1_changes": 7
+  }
+ },
+ "baseline_rank1": {
+  "max": 2296,
+  "median": 1978.0,
+  "min": 74,
+  "n": 165,
+  "q1": 250.5,
+  "q3": 2025.0
+ },
+ "diagnostic": "G5 - length of incoming vs outgoing rank-1 documents (descriptive, no verdict)",
+ "long_tokens": 1000
+}

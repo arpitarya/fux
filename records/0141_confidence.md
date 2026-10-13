@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 44ace384a8ed803829d14de9f65db60099cd2e7da64b92ff3ee052b184d165d9
+content_sha: 1dfdc67b7d8fcbd0184852ae1ad606019c8f161f773403a6f777f075d44f64e2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -897,6 +897,13 @@ The confidence block's pairs and hashes are both analyzed with the repo's identi
 **No decision here moved** (W-246, 2026-10-04): `derive/accel.py`'s `is_fresh` docstring now says the deep shard re-hash lives in `doctor`, not that it is owed.
 
 **No decision here moved** (W-261, 2026-10-05): `find` moved to `query/find.py` (SR-FIND's). The band is still computed on the unfiltered ranking in `build_find`, and the block is still assembled in `query/__init__.py`.
+
+
+**W-236 — section records (2026-10-10; branch `w236-sections`, unmerged).** While `[ranking] section_weight > 0`, the band is computed over scores that include the best-section term. `df`, `n` and `top_doc_hashes` reach this block through the same seam and are unchanged, because the term uses the document `df` and `n` ([SR-SECTIONS](0161_sections.md) decision 5). At `0.0` every input is byte-identical.
+
+**No decision here moved** (W-278, 2026-10-13): `derive/accel.py`, which this record describes, gained the scan's runtime section route and lost the section statistics; `stats_out`'s `df` and `n` are untouched.
+
+**No decision here moved** (W-273 phase 2, 2026-10-13): `derive/accel.py::attach_sections_by_id` moved to `query/sections.py` ([SR-SECTIONS](0161_sections.md)).
 
 ### Consequences
 

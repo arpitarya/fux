@@ -18,16 +18,21 @@
  *
  * Owned, with its Python twin, by [SR-T1-ACCELERATOR](../../../records/0110_accelerator.md).
  */
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { FuxError } from "../errors.mjs";
 import { idf, deriveWlen, scoreRecord } from "../query/bm25f.mjs";
 import { Corpus, rank, Weighting } from "../query/rank.mjs";
 import { queryTermHashes } from "../query/scan.mjs";
 import { identifiersFor } from "../query/identifiers.mjs";
-import { iterShardPaths } from "../store/reader.mjs";
 import { pyRound9 } from "../compat/pyfloat.mjs";
 import * as fmt from "./format.mjs";
+import { isFresh, readStamp } from "./fresh.mjs";
+
+// `isFresh` and `readStamp` live in `fresh.mjs` since W-278, so the scan can
+// ask whether the runtime is fresh without importing this module, which
+// imports the scan (the bundle refuses an import cycle).
+export { isFresh, readStamp };
 
 /** Lazily-loaded handle on `.fux/runtime/`, for ONE call. */
 export class Runtime {
@@ -39,6 +44,8 @@ export class Runtime {
     this._offsets = new Map();
     this._postings = new Map();
     this._anchors = new Map();
+    this._sectionRows = null;
+    this._sectionPostings = new Map();
   }
 
   get stats() {
@@ -84,6 +91,26 @@ export class Runtime {
       this._anchors.set(prefix, table);
     }
     return (Object.hasOwn(table, term) ? table[term] : []).map(([idx, count]) => [Number(idx), Number(count)]);
+  }
+
+  /** `sections.json`'s rows, `[docidx, k, flen]` by secidx — W-236. */
+  get sectionRows() {
+    if (this._sectionRows === null) {
+      this._sectionRows = JSON.parse(readFileSync(join(this.dir, fmt.SECTION_TABLE_NAME), "utf8")).rows;
+    }
+    return this._sectionRows;
+  }
+
+  /** `[secidx, tf]` for one term, off `sections/<prefix>.json` — W-236. */
+  sectionPostings(term) {
+    const prefix = fmt.termPrefix(term);
+    let table = this._sectionPostings.get(prefix);
+    if (table === undefined) {
+      const path = fmt.sectionPostingsPath(this.root, prefix);
+      table = existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {};
+      this._sectionPostings.set(prefix, table);
+    }
+    return Object.hasOwn(table, term) ? table[term] : [];
   }
 
   /** Every block of a term, by one bisect over the fixed-width table. */
@@ -138,61 +165,6 @@ export function blockBound(block, df, n, avgWlen, scoring) {
 export function minedTable(root) {
   const raw = JSON.parse(readFileSync(join(fmt.runtimeDir(root), fmt.MINED_NAME), "utf8"));
   return raw.pairs.map(([s, l]) => [[...s], [...l]]);
-}
-
-//: One `"name":[size,mtime_ns]` pair of `stamp.json`'s `shards`, kept as text.
-//: 🔴 **Never `JSON.parse` the stamp.** `mtime_ns` is ~1.79e18, past 2^53, so a
-//: `Number` rounds it, the check never matches, and Node would scan forever
-//: while every test still passed (W-242 step 6).
-const STAMP_PAIR_RE = /"([^"\\]+)":\[(\d+),(\d+)\]/g;
-
-/** `{name: [size, mtimeNs]}` as BigInts, or `null` on a stamp this cannot read. */
-export function readStamp(text) {
-  const start = text.indexOf("\"shards\":{");
-  if (start < 0) return null;
-  const out = new Map();
-  STAMP_PAIR_RE.lastIndex = start;
-  let m;
-  while ((m = STAMP_PAIR_RE.exec(text)) !== null) {
-    const [, name, size, mtime] = m;
-    out.set(name, [BigInt(size), BigInt(mtime)]);
-  }
-  return out;
-}
-
-/** Cheap staleness check: shard sizes and mtimes against the build stamp.
- *  `accel.py::is_fresh`, exactly — and anything it cannot read is NOT fresh. */
-export function isFresh(root) {
-  const directory = fmt.runtimeDir(root);
-  const stampPath = join(directory, fmt.STAMP_NAME);
-  const manifestPath = join(directory, fmt.MANIFEST_NAME);
-  if (!existsSync(stampPath) || !existsSync(manifestPath)) return false;
-  let manifest, stamp;
-  try {
-    manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-    stamp = readStamp(readFileSync(stampPath, "utf8"));
-  } catch {
-    return false;
-  }
-  if (stamp === null || manifest === null || typeof manifest !== "object") return false;
-  if (manifest.schema !== fmt.RUNTIME_SCHEMA) return false;
-  const fields = Array.isArray(manifest.docs_fields) ? manifest.docs_fields : [];
-  if (fields.length !== fmt.DOCS_FIELDS.length || fields.some((f, i) => f !== fmt.DOCS_FIELDS[i])) return false;
-
-  const paths = iterShardPaths(root);
-  if (paths.length !== stamp.size) return false;
-  for (const path of paths) {
-    const entry = stamp.get(baseName(path));
-    if (entry === undefined) return false;
-    const st = statSync(path, { bigint: true });
-    if (st.size !== entry[0] || st.mtimeNs !== entry[1]) return false;
-  }
-  return true;
-}
-
-function baseName(path) {
-  const cut = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
-  return path.slice(cut + 1);
 }
 
 /** Is a plane present AND fresh? The one test `runQuery` makes before `--fast`. */
@@ -285,13 +257,18 @@ export function accelCandidates(runtime, queryHashes, top, { skipping, weighting
       mtime: doc.mtime ?? null,
       terms: termsCopy,
     };
-    if (anchorOn) {
-      // On EVERY candidate, matching or not: a linked-to document is a longer
-      // document whatever words its linkers used (`accel.py`'s note).
-      candidate.atf = anchorTf.get(docidx) ?? {};
-      candidate.alen = doc.alen ?? 0;
-    }
     candidates.push(candidate);
+  }
+  if (scoring.sectionOn) attachSections(runtime, queryHashes, candidates, [...hits.keys()], docs);
+  if (anchorOn) {
+    // On EVERY candidate, matching or not: a linked-to document is a longer
+    // document whatever words its linkers used (`accel.py`'s note).
+    let i = 0;
+    for (const docidx of hits.keys()) {
+      candidates[i].atf = anchorTf.get(docidx) ?? {};
+      candidates[i].alen = docs[docidx].alen ?? 0;
+      i++;
+    }
   }
   return [candidates, df, corpus];
 }
@@ -315,6 +292,19 @@ function cannotReach(
     }
     if (expansion !== null && !expansion.trivial) bound *= expansion.weightOf(term);
     ceiling += bound;
+  }
+
+  // W-236 — an unseen document's best section can only match deferred terms
+  // too, and one BM25 term contribution is below `idf · (k1 + 1)` at any tf
+  // and any length. So `λ · idf(h) · (k1 + 1) · w(h)` per deferred term
+  // bounds the section term, before the document weight (SR-SECTIONS d7).
+  if (scoring.sectionOn) {
+    for (const term of deferred) {
+      if (!blocks.get(term).length) continue;
+      let bound = scoring.section * idf(df[term], corpus.n) * (scoring.k1 + 1);
+      if (expansion !== null && !expansion.trivial) bound *= expansion.weightOf(term);
+      ceiling += bound;
+    }
   }
 
   if (!weighting.trivial) ceiling *= weighting.maximum;
@@ -353,6 +343,34 @@ function kthScore(hits, docs, openedOrder, df, corpus, top, avgWlen, weighting, 
   }
   scores.sort((a, b) => b - a);
   return scores[top - 1];
+}
+
+/** W-236 — each candidate's `nsec`, and its matching sections as `secs`.
+ *  `accel.py::_attach_sections`: the scan's shape exactly, `[k, flen, terms]`
+ *  per section carrying a query hash, in `k` order, read from the derived
+ *  section postings rather than the committed shards (decision 7). */
+function attachSections(runtime, queryHashes, candidates, docidxs, docs) {
+  const rows = runtime.sectionRows;
+  const wanted = new Set(docidxs);
+  const bags = new Map();  // docidx -> Map(k -> [flen, terms])
+  for (const term of queryHashes) {
+    for (const [secidx, tf] of runtime.sectionPostings(term)) {
+      const [docidx, k, flen] = rows[secidx];
+      if (!wanted.has(docidx)) continue;
+      let bag = bags.get(docidx);
+      if (bag === undefined) { bag = new Map(); bags.set(docidx, bag); }
+      let entry = bag.get(k);
+      if (entry === undefined) { entry = [[...flen], {}]; bag.set(k, entry); }
+      entry[1][term] = [...tf];
+    }
+  }
+  docidxs.forEach((docidx, i) => {
+    candidates[i].nsec = docs[docidx].nsec ?? 0;
+    const bag = bags.get(docidx);
+    if (bag !== undefined && bag.size) {
+      candidates[i].secs = [...bag.keys()].sort((a, b) => a - b).map((k) => [k, ...bag.get(k)]);
+    }
+  });
 }
 
 /** Complete known candidates from the few blocks that actually cover them. */

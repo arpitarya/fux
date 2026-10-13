@@ -52,7 +52,7 @@ on this proposal.
    Laws, cost, and what a golden run would have to prove.
 5. **What it would take to measure** any surviving shape (SR-RS d23: the test
    data must contain the input the feature acts on) — and how this relates to
-   [W-257](W-257-enriched-rung.md)'s enriched rung, which measures doc2query.
+   W-257's enriched rung, which measured doc2query ([verdict](../regression/2026-10-10-enriched-rung/VERDICT.md): no detected change, 2026-10-10).
 
 ## Definition of done
 

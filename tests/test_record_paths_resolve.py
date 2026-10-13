@@ -113,6 +113,10 @@ def _candidate_files() -> list[Path]:
     for path in repo_files(ROOT):
         if not path.is_file() or path.suffix not in _TEXT_SUFFIXES:
             continue
+        # `WORK-SYSTEM.md` is an export for ANOTHER repository: its record
+        # numbers are that repository's, never this one's (2026-10-13).
+        if path.relative_to(ROOT).as_posix() == "WORK-SYSTEM.md":
+            continue
         if any(part in _SKIP_DIRS for part in path.relative_to(ROOT).parts):
             continue
         rel = path.relative_to(ROOT).as_posix()

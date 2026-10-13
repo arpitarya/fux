@@ -140,6 +140,11 @@ def test_parser_has_the_verb_surface():
         # checks the ENVIRONMENT, whose fix is a command or a config edit, and
         # `inspect` checks the INDEX, whose fix is a change to the corpus.
         "inspect",
+        # SR-INGEST decision 22d (W-279). A verb rather than a flag on
+        # `inspect` or `doctor`: it prints the committed register's rows FROM
+        # the index, for a program -- the file is what a PR shows, the verb is
+        # what a machine calls, and a second committed copy is what it refuses.
+        "register",
         # SR-IDENTIFIERS (W-233, F1). A verb rather than a flag on `inspect`,
         # because it WRITES: `inspect` is read-only by contract, and the one
         # table it proposes is recorded only when a person asks for it.

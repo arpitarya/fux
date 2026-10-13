@@ -1,0 +1,42 @@
+title: Surat pharma depot quality note - humidity limit, walk-in chamber requalification, logger gaps at goods-in, critical deviations, CAPA follow-up, self-inspection, printed copies, audit findings
+doc_id: QCL-QA-NTE-44
+owner: Pooja Desai
+department: QA and Compliance
+status: in_force
+effective_date: 2026-05-04
+applies_to: Surat pharma depot
+
+SURAT PHARMA DEPOT QUALITY NOTE
+
+This note covers the humidity limit, walk-in chamber requalification, logger
+gaps at goods-in, critical deviations, CAPA follow-up, self-inspection,
+printed copies and customer audit findings at the Surat depot.
+
+HUMIDITY LIMIT IN THE CRT STORE
+The humidity limit in the CRT store is 70 per cent RH. A reading above the
+limit for 60 minutes is a deviation.
+
+WALK-IN CHAMBER REQUALIFICATION
+Each walk-in chamber is requalified every 24 months, and within 60 days after a
+compressor is replaced.
+
+LOGGER GAPS AT GOODS-IN
+A gap of up to 20 minutes in an inbound vehicle's temperature printout may be
+accepted by the goods-in clerk. A longer gap goes to the QA lead.
+
+CRITICAL DEVIATIONS
+A critical deviation is reported to the RP within 4 hours of discovery.
+
+CAPA FOLLOW-UP
+Every closed CAPA gets an effectiveness check 90 days after closure.
+
+SELF-INSPECTION
+The depot runs a self-inspection twice a year, in April and October.
+
+PRINTED COPIES
+A printed copy of a procedure is valid for 7 days from the print date.
+
+CUSTOMER AUDIT FINDINGS
+Each customer audit finding is answered within 30 working days.
+
+Questions to the QA lead, extension 708.

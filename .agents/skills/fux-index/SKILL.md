@@ -1,6 +1,6 @@
 ---
 name: fux-index
-description: Bootstrap, diagnose and rebuild a Fux index — `fux setup`, `fux doctor` (every check row, --json, exit codes), `fux ingest`, `fux build`, what to commit from .fux/, and how CI proves the index is current. Use for "set up fux in this repo", "fux doctor says", "rebuild the index", "ingest failed", "what should I commit from .fux", or when a fux verb refuses to run. doctor is read-only; setup writes committed files, only when asked.
+description: Bootstrap, diagnose and rebuild a Fux index — `fux setup`, `fux doctor` (every check row, --json, exit codes), `fux ingest`, `fux build`, `fux register` (what the index holds, one line per document), what to commit from .fux/, and how CI proves the index is current. Use for "set up fux in this repo", "fux doctor says", "rebuild the index", "ingest failed", "what should I commit from .fux", or when a fux verb refuses to run. doctor is read-only; setup writes committed files, only when asked.
 ---
 
 # Building and diagnosing the Fux index
@@ -21,6 +21,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | "fux doctor says …" / a verb refuses | §3 — run `fux doctor --json` and branch on the failing row |
 | "rebuild the index" / "the index is stale" | §4 `fux ingest`; `--full` only for the cases in §4 |
 | queries are slow, or `graph`/`explain`/`path` refuse | §5 `fux build` |
+| "what is in the index" / "list every indexed document" for a script | §4b `fux register --json` |
 | "what should I commit from .fux" | §6 |
 | "make CI check the index" | §7 |
 
@@ -100,6 +101,7 @@ mode prints `[OK]`, `[WARN]` or `[FAIL]` per row.
 | `fuxignore usable` | error on parse · warn on duplicates | a pattern in both `.fuxignore` and `sources/dirs` |
 | `pii rules` | error when missing/invalid · warn when empty | ingest refuses without the file |
 | `refusal rules` · `decoder bindings` | error when the file/binding will not load · else warn | a hand-written binding matching no indexed document is a warn |
+| `register` | warn, never error | `.fux/index/REGISTER` against the index beside it, in three named states: **missing** (no file), **old format** (a file without the `# fux.register.v2` line — written before the v2 shape of 2026-10-13) and **drift** (a document with no line, a line for no document, a moved `sha`, a foreign `rules=`). **`fux ingest` rewrites it in every case**; §4b |
 | `provenance` | warn, never error | a record in the index was produced by a decoder the tree no longer carries at that version. **`fux ingest --full` is the fix — a plain `fux ingest` will not do it**, because the reuse key only catches a decoder that MOVED since the last run. No ledger yet is not a finding |
 | `acquired plane` | **error if not gitignored** · warn near cap | fetched source bytes visible to git |
 | `.fux/ layout declared` · `output.toml present` | warn | undeclared entry under `.fux/` · no output defaults file |
@@ -142,6 +144,33 @@ The summary line is
 
 ---
 
+## 4b · `fux register` — what the index holds, one line per document
+
+**Read-only, offline, no lock, writes nothing.** Prints the rows of
+`.fux/index/REGISTER` **from the index** (the records, the decoder digest table
+and the URL list), so on a current index the text output *is* the file's bytes.
+
+```bash
+fux register                                   # the file's text: 2 header lines, then loc ⇥ sha ⇥ decoder [⇥ k=v …]
+fux register | diff - .fux/index/REGISTER      # empty = the committed register matches the index
+fux register --json                            # one JSON object per document
+```
+
+| `--json` field | meaning |
+|---|---|
+| `loc` | the path (file) or URL, as the index names it |
+| `sha` | the document's content sha, as ingested |
+| `decoder` | `{name, digest}` — `digest` is `null` for a decoder shipped with fux, a 16-hex sha for a consumer decoder in `.fux/decoders/` |
+| `rules` | the engine's extraction rules version the file was written at (`rules=` on the format line) |
+| `archived` | `true` only on documents under an `archived=true` source entry; absent otherwise |
+| `fetch` | the fetcher name on a URL row; absent on a file row |
+
+**Use `--json` from a script; parse the text only to diff it.** The verb takes
+no question and no reader — it lists documents, never answers. Exit `1` with
+`error: not inside a fux repository` outside a root.
+
+---
+
 ## 5 · `fux build` — the derived accelerator
 
 **Rebuilds `.fux/runtime/` from the committed shards only** — no source walk,
@@ -160,7 +189,7 @@ no network. `ingest` already does this unless given `--no-accelerator`.
 
 | commit | never commit |
 |---|---|
-| `fux.toml`, `.fux/index/*.jsonl` | `.fux/runtime/` — derived, rebuildable |
+| `fux.toml`, `.fux/index/*.jsonl`, `.fux/index/REGISTER` | `.fux/runtime/` — derived, rebuildable |
 | `.fux/sources/`, `.fux/formats.toml`, `.fux/.fuxignore` | `.fux/acquired/` — **fetched source bytes**, not rebuildable |
 | `.fux/pii.toml`, `.fux/refusals.toml`, `.fux/tune.toml`, `.fux/output.toml` | `__pycache__/` under `.fux/decoders/` or `.fux/fetchers/` — **`.fux/.gitignore` does not list these** |
 | `.fux/fetchers/*.py`, `.fux/decoders/*.py`, `.fux/enrich/` | |

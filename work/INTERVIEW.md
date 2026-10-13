@@ -32,10 +32,68 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-10** (Claude Code, Opus 5.5 — W-236 Part B).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-13** (Claude Code, Fable 5.1 — W-279 closed; W-278 in flight in another session).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-10-10 (latest) — W-236 CLOSED: SECTION RECORDS FAIL (DRIFT), PARKED
+### 🔴 2026-10-13 (latest) — W-278 CAPTURED: EVERY GATE PASS, LATENCY +49.5 ms; ARPIT SCORES
+
+- **Arpit, in this session:** *own-match only* — a section is scored as a short document only if one of the query's terms is in its **own** body or heading; a match through the parent's title/path/ctx alone gains nothing (SR-SECTIONS d5).
+- **Built `08ef6293`** (Claude Code, Opus 5.5): `rank._section_gain` + `rank.mjs` = the third form; `section_weight` ∈ [0, 1] (`_fraction`); `sec_*` stats gone (`fux.runtime.v11`).
+- 🔴 **Latency was the hard part.** A byte-pattern read of the committed section plane still **failed, +190 ms** (25 MB of section shards is as big as the document plane). **The scan now reads sections from the derived plane when the runtime is fresh**, the committed plane otherwise (SR-SECTIONS d7): **+68.6 ms, PASS** at gen-5 `rung-10000`. Cost, named in d7: on the default path the scan and the accelerator share their section source.
+- **Bar frozen `2ac82d3b`**: L13 defaults on `set-7-claude`, decided `sw-1.0`, `sw-0.5` reported; G0/G1/G3/G4, G5 descriptive. Node: `isFresh` moved to `derive/fresh.mjs`, because the bundle refuses the cycle.
+- **Captured:** gen-6 ladder rebuilt (8/8 frozen; gen 5 at `fux-lab/corpora/golden-gen5/`; rung-10000 stalled 12 h on gpg commit signing → [W-281](open/W-281-capture-harness-speed.md)). G0/G1/G3/G4 PASS; latency +49.5 ms; rank 1 moved on **7 of 165** at `sw-1.0`, all incoming ~2 000-token manuals (G5). Seven moves cap the slice's wins at 7, so a FAIL: no gain is live.
+- **Next:** 🔴 Arpit `just golden-score work/regression/2026-10-13-section-term-v3` → a session that did **not** capture runs `decide.py` (this one built engine, bar, ladder and capture).
+
+
+### 🟢 2026-10-13 — W-279 CLOSED: THE REGISTER IS `fux.register.v2`, AND `fux register [--json]` PRINTS IT FROM THE INDEX
+
+- Built as filed: SR-INGEST d22 rewritten in place (22c the three doctor states, 22d the verb), SR-CLI decision 18, `constants.toml [register]`; `register.py` renders v2 and reads by header (`v2` · `old` · `missing`), keeps a key it does not know and refuses one it does not state; a URL row's decoder and `fetch=` come from the committed list, so an offline and a networked ingest write the same bytes; the merge driver keeps both header lines; the X-ray, explorer and facts read the v2 row. This repository re-ingested (2 371 rows, 606 `archived=true`).
+- **Judgement worth keeping:** three readers of the register were missed by a grep for `import register` and found by the suite — grep for the call (`register.read(`), not the import. The whole index plane was committed with the register, so the two agree at HEAD; the other session's in-flight regression folder was left out.
+- **Open:** the section-split tail key (`sections=<n>` or per-section line starts) is Arpit's pick and lands with W-273 phase 2 — W-273's item file carries it; nothing on the inbox because nothing waits on it yet.
+
+### 🟢 2026-10-13 — W-266 RULED: THE REGISTER BECOMES S1 + `fux register --json` → W-279
+
+- Research in chat on this repo's 2 363-row register: two constant columns, two decoder grammars, a positional reader, no format marker, `archived=true` missing, and SR-INGEST d22 naming a column (`outcome`) the file never carried. Alternatives to TSV weighed (sources grammar — breaks on paths with spaces; JSONL; TOML/YAML; Markdown/CSV; an indented tree; two files; no file).
+- **Arpit:** *"s1 + fux register --json"* — one committed human file (`# fux.register.v2`, `loc` ⇥ `sha` ⇥ `decoder` ⇥ `k=v` tail), the machine's view a derived verb. [W-279](../archive/open/W-279-register-v2.md) filed 🟢 (Opus); W-266 archived. A section-split tail key is his pending pick, after W-273 phase 2.
+- **Owed:** `git rm work/open/W-266-register-structure.md`.
+
+### 🟢 2026-10-11 — THE GREEN ITEMS: W-276 ✓ · W-274 ✓
+
+- **W-276:** the post-commit hook had re-indexed nothing since 2026-10-04: a pyenv shim passed `command -v fux` and exited 127. Hooks now pin the interpreter that installed them and print one line whenever they cannot run. `fux doctor` → `git hooks`. **After moving or rebuilding the venv, run `fux hooks --install`.** The merge driver is still resolved on PATH, and SR-MAINTENANCE d3a names that gap.
+- **W-274:** `fux.toml [index] section_records`, **off by default** (SR-SECTIONS d11). Any section experiment must set it `true` **and** run `fux ingest --full`, because `section_weight > 0` with it off is a hard error. A lab arm built before today has no key and must gain it, or `fux doctor --fix` writes `false`.
+- **Owed by someone:** Cowork's W-270 closure is uncommitted, including its `git rm work/open/W-270-section-retest-set-6.md`.
+
+### 🔴 2026-10-11 — SECTIONS RULED: THE MAX FORM (W-278) ON RE-AMENDED DATA (W-277); W-270 CLOSED
+
+- **Why both terms failed, measured without the key** (arm `ranked` lists against the runtime document table): at λ 2.0 the incoming rank-1 document was a 1 000–2 400-token manual in 19 of 24 (set-5) and 17 of 21 (set-6) rank-1 changes. `rank._section_gain` scores the document as one unit against the **section** average (31.5 tokens; documents average 134), so a long document's "gain" is ≈ its full section score — a length artefact, W-236 again for long documents. Per term at λ 2: manual 1.77 vs a short tf-1 competitor 0.99.
+- **Arpit's ruling:** the best section scored **as a standalone document** on the document yardstick (parent title/path/ctx folded in), combined by **max** — `S = S_doc + λ·max(0, S_sec* − S_doc')`, `λ ≤ 1`, decided arm `sw-1.0` ([W-278](../archive/open/W-278-section-term-v3.md), rewritten; its concentration gate and document-average `whole` withdrawn). W-270 archived; W-273 phase 2 waits on W-278.
+- **The data was unwinnable as written:** prompt 15's competitor carried the words in title + heading + first lines + ≥ 2 more, out-matching the section in every unit. **R10 re-amended** ([SR-WORK-TESTDATA](../records/0068_WORK-test-data.md)): long doc words twice in the answering section (≤ 200 words) only; competitor 200–400 words, words once each, body only, never title/heading; ≥ 6 title-match short docs as `other` guardrails. **Prompt 15 not yet run.**
+- **Owed:** `git rm work/open/W-270-section-retest-set-6.md` (archived copy written through file staging; the device shell was wedged) and the record/queue/link tests.
+
+### 🟠 2026-10-11 — W-270 STOP: THE SECTION RE-TEST COULD NOT MEASURE THE TERM
+
+- Arpit scored and ran the decider: **STOP — slice 11 < 15** ([verdict](regression/2026-10-11-section-retest-set-6/VERDICT.md)). The baseline already ranks 49 of 60 tagged long-document questions first, so set 6 left little to win. Latency guardrail failed too (+328 ms).
+- **Open:** Arpit rules — (a) close step 10 as measured (rec.), (b) accept a slice of 11, (c) a third set.
+
+### 🔴 2026-10-11 — W-273 PHASE 1 LANDED; W-270 CAPTURED, LATENCY GUARDRAIL FAILED → ARPIT SCORES
+
+- **W-273 phase 1** (`b4d961cd`): no section records for `.csv`/`.json`/`.jsonl` (SR-SECTIONS d2, W-271 option b). Gates PASS, each identical to W-269's; this repo's section plane **8.0× → 1.756×** ([gates](regression/2026-10-11-section-formats-gates/report.md)).
+- **W-270:** bar frozen alone under L13 (`9ab19fc6`); the ladder rebuilt for gen 5 (`04e717ba`, **`rung-00100` = 118 docs by Arpit's ruling**); three arms captured. G0 · G1 · G3 PASS. 🔴 **Latency guardrail FAIL: +328 ms at `rung-10000`**, located in `scan._attach_sections` — the run cannot PASS; the score decides FAIL vs INCONCLUSIVE ([report](regression/2026-10-11-section-retest-set-6/report.md)).
+- **The decider reads the slice split as a range** (L11 keeps tags out of rows) and hands a split-dependent outcome to Arpit. **This session captured, so it may not run `decide.py`.**
+
+### 🔴 2026-10-10 — W-269 CLOSED: THE GAIN-ONLY SECTION TERM FAILS TOO (DRIFT)
+
+- Captured on Arpit's machine (G0 · G1 · G3 PASS), scored and decided by Arpit: **FAIL — drift** ([verdict](regression/2026-10-10-section-gain-only/VERDICT.md)).
+- **Different from W-236:** the short-document credit is gone and the pool improved (misses 23 → 13 at λ 2.0; `hit@1` 12 wins / 5 losses). But every λ lost 2–5 baseline rank-1 hits, and the bar allows zero.
+- Both mechanisms FAIL on the frozen bar. Branch `claude/gracious-galileo-aqrg8b` unmerged; what next (park, a third mechanism, or a new bar on a new set) is Arpit's.
+
+### 🟢 2026-10-10 — W-269: GAIN-ONLY SECTION TERM AMENDED, FROZEN, BUILT; NOT CAPTURED
+
+- Arpit's ruling after W-236's FAIL: try the gain-only term. **SR-SECTIONS d5 amended**, the bar **frozen** ([pre-registration](regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md)), **built** on both readers on branch `claude/gracious-galileo-aqrg8b`, unmerged.
+- A sectionless document now gains exactly zero (unit-tested on scan and accelerator); G3 tests the same on the rung.
+- **Next:** capture needs `fux-lab` on Arpit's machine; then 🔴 he scores; a non-capturing session decides. A PASS still waits on the 8.0× size ruling before any merge.
+
+### 🔴 2026-10-10 — W-236 CLOSED: SECTION RECORDS FAIL (DRIFT), PARKED
 
 - Arpit scored the five arms and ran the frozen decider himself: **FAIL — drift** ([verdict](regression/2026-10-10-section-records/VERDICT.md)). Every λ lost rank-1 hits; the pool got worse.
 - **Why:** B2 favoured SHORT documents (best section ≈ whole doc), not the long ones it targets. Offered a gain-only term or B1; **Arpit parked it**.

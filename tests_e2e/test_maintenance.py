@@ -521,9 +521,33 @@ def test_ask_declares_a_pending_reindex_on_stderr_never_stdout(tmp_path):
     assert "2 changed path(s) pending re-index" in loud.stderr
 
 
-def test_a_hook_never_blocks_a_commit_even_when_fux_is_absent(tmp_path):
-    """`command -v fux || exit 0` — asserted by running with an empty PATH."""
+def test_a_commit_with_fux_off_path_still_re_indexes(tmp_path):
+    """W-276. The hook used to start `command -v fux || exit 0`, so a commit
+    from an IDE, an agent or a shell without the venv re-indexed nothing and
+    said nothing — 39 commits on this repository. It now runs the interpreter
+    `fux hooks --install` pinned, so PATH does not matter."""
     make_repo(tmp_path, hooks=True)
+    (tmp_path / "docs" / "x.md").write_text(doc("offpathterm"), encoding="utf-8")
+    git(tmp_path, "add", "-A")
+    result = subprocess.run(
+        ["git", "commit", "-m", "no fux on path"],
+        cwd=tmp_path, capture_output=True, text=True, encoding="utf-8",
+        env={"PATH": "/usr/bin:/bin", "HOME": os.environ.get("HOME", "")},
+    )
+    assert result.returncode == 0, result.stderr
+    assert "re-indexing in the background" in result.stderr, result.stderr
+    assert _drain(tmp_path), "the detached runner never finished"
+    assert "x.md" in fux(tmp_path, "find", "offpathterm", "--json").stdout
+
+
+def test_a_hook_never_blocks_a_commit_even_when_fux_is_absent(tmp_path):
+    """No pinned interpreter and no `fux` on PATH: the commit succeeds, and the
+    hook says so in one line naming what to type (W-276 DoD 3)."""
+    make_repo(tmp_path, hooks=True)
+    hook = tmp_path / ".git" / "hooks" / "post-commit"
+    text = hook.read_text(encoding="utf-8")
+    pinned = next(line for line in text.splitlines() if line.startswith("fux_python="))
+    hook.write_text(text.replace(pinned, "fux_python=/nonexistent/bin/python"), encoding="utf-8")
     (tmp_path / "docs" / "x.md").write_text(doc("x"), encoding="utf-8")
     git(tmp_path, "add", "-A")
     result = subprocess.run(
@@ -532,3 +556,4 @@ def test_a_hook_never_blocks_a_commit_even_when_fux_is_absent(tmp_path):
         env={"PATH": "/usr/bin:/bin", "HOME": os.environ.get("HOME", "")},
     )
     assert result.returncode == 0, result.stderr
+    assert "fux hooks --install" in result.stderr, result.stderr

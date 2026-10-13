@@ -214,11 +214,12 @@ def test_crlf_input_merges_and_output_is_lf_only(tmp_path):
 
 # --- the register (W-199 D4) merges three-way on `loc` -----------------------
 
-_REG_HEAD = "# loc\tkind\tsha\tdecoder\tfetcher"
+#: The v2 header is TWO lines (W-279): the format line, then the columns.
+_REG_HEAD = "# fux.register.v2\trules=5\n# loc\tsha\tdecoder\t[k=v ...]"
 
 
 def _reg(*rows: tuple[str, str]) -> str:
-    return _REG_HEAD + "\n" + "".join(f"{loc}\tfile\t{sha}\tprose\t-\n" for loc, sha in rows)
+    return _REG_HEAD + "\n" + "".join(f"{loc}\t{sha}\tprose\n" for loc, sha in rows)
 
 
 def _merge_reg(tmp_path, base, ours, theirs) -> str:
@@ -253,6 +254,24 @@ def test_register_unions_disjoint_adds_sorted(tmp_path):
 def test_register_both_changed_one_row_ours_wins_and_never_conflicts(tmp_path):
     base = _reg(("x.md", "old"))
     assert _merge_reg(tmp_path, base, _reg(("x.md", "ours")), _reg(("x.md", "theirs"))) == _reg(("x.md", "ours"))
+
+
+def test_register_keeps_both_header_lines(tmp_path):
+    """A driver that kept only the first `#` line handed `fux ingest` a file to
+    rewrite after every merge, for no change in the corpus (L4)."""
+    base = _reg(("x.md", "x"))
+    out = _merge_reg(tmp_path, base, base, _reg(("x.md", "x"), ("y.md", "y")))
+    assert out.startswith(_REG_HEAD + "\n")
+    assert out == _reg(("x.md", "x"), ("y.md", "y"))
+
+
+def test_register_a_v1_side_is_merged_as_rows_too(tmp_path):
+    """An old-format side (no second header line) still merges on `loc`; ours
+    decides the header, and the next ingest rewrites it either way."""
+    v1 = "# loc\tkind\tsha\tdecoder\tfetcher\na.md\tfile\ta\tprose\t-\n"
+    out = _merge_reg(tmp_path, "", _reg(("x.md", "x")), v1)
+    assert out.splitlines()[:2] == _REG_HEAD.splitlines()
+    assert "a.md\tfile\ta\tprose\t-" in out and "x.md\tx\tprose" in out
 
 
 def test_register_with_no_ancestor_is_the_union_ours_first(tmp_path):

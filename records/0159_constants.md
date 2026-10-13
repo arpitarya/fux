@@ -5,12 +5,13 @@ name: SR-CONSTANTS
 title: SR-CONSTANTS (0159) — the engine's fixed values live in one TOML file both planes read
 description: "src/fux/constants.toml holds every fixed engine value — schema ids, format and rules versions, artefact names, decoder versions, and the numbers a file format or protocol defines. One Python loader and one Node loader read it; the Node bundle carries it inlined; a missing table or key stops the process naming it."
 status: accepted
+amended: 2026-10-13
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@5eebdc5ca33f]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@b400e5c87edc]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 1786ecce01206a65e93ea13bba9c19768a2666a32ba633d13fa28eb89e282321
+content_sha: d0467a9bf6e3faf71d28062b4fb193781b7cccf8247e02f005067692b8217204
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -190,6 +191,13 @@ pattern. A consumer who wants other cues is I2, which is not built.
 
 **No decision here moved** (W-259, 2026-10-04): `[env] graph_rebuild` names `FUX_GRAPH_REBUILD`, the switch that makes the Node reader rebuild the graph plane even when `graph.json` is fresh ([SR-NODE-SEARCH](0153_node-search.md) decision 9).
 
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** New fixed keys: `[index] sections_dir`, `section_sep` (`#s`), `section_fields` (`["body", "heading"]`, a prefix of `tf_fields` checked at import); `[runtime] sections_dir`, `section_table`; `docs_fields` gains `nsec`; `[index] schema` → `fux.index.v8`, `[runtime] schema` → `fux.runtime.v10`, `[versions] extract_rules` → 4 ([SR-SECTIONS](0161_sections.md)).
+
+**W-273 (2026-10-11; same branch, unmerged).** New fixed key `[index] sectionless_formats` (`[".csv", ".json", ".jsonl"]`): the closed list of extensions that get no section records ([SR-SECTIONS](0161_sections.md) decision 2). It decides committed bytes, so it is fixed and never a tunable. `[versions] extract_rules` → 5.
+
+**W-278 — `[runtime] schema` is `fux.runtime.v11` (2026-10-13; branch, unmerged).** The section statistics left `stats.json`, so a v10 plane is refused by name and rebuilt.
+
 ### Consequences
 
 - **Parity between the runtimes holds by construction** for every shared fixed
@@ -212,6 +220,13 @@ pattern. A consumer who wants other cues is I2, which is not built.
   generated artefact in the checkout, and a Node test run against `node/src/`
   would need the generator to have run first. Inlining at bundle time needs
   neither.
+
+**W-279 (2026-10-13)** — `[register]` carries the v2 shape of
+`.fux/index/REGISTER` ([SR-INGEST](0106_ingest.md) decision 22): `format`
+(`fux.register.v2`), `rules_key`, the two-line `header`, the closed tail-key
+list `keys` (`archived`, `fetch`) and `header_v1`, the retired column header the
+reader recognises as *old format*. `file` is unchanged. Python reads all of
+them through `fixed`; the Node reader does not read the register.
 
 ### Reference (required)
 

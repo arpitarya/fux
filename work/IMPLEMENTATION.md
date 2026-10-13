@@ -24,7 +24,153 @@ Rules:
 5. This file is **not** a changelog. `CHANGELOG.md` is per release, for users;
    this is per milestone, for the next session.
 
+
+
 ---
+
+## 2026-10-13 — **W-273 closed: section records merged to `main`, opt-in (PR #49)**
+
+| | |
+|---|---|
+| **shipped** | `fux.index.v8` (BREAKING: `fux ingest --full`); `fux.toml [index] section_records` + `[ranking] section_weight` (both off; measured pair `true` + `1.0`); the third form of the section term; SR-SECTIONS accepted |
+| **evidence** | [W-278 VERDICT](regression/2026-10-13-section-term-v3/VERDICT.md) (INCONCLUSIVE, ruled ship); PR #49 CI green |
+---
+
+## 2026-10-13 — **W-278 DoD 1–5: the section term's third form, built and captured (not yet scored)**
+
+| | |
+|---|---|
+| **shipped (branch, unmerged)** | `08ef6293`: SR-SECTIONS d5 third form (own-match only), d7 two-route scan; `section_weight` ≤ 1; `fux.runtime.v11`. `2ac82d3b`: the frozen bar |
+| **evidence** | [the run](regression/2026-10-13-section-term-v3/report.md): G0/G1/G3/G4 PASS, latency +49.5 ms PASS; [the gen-6 ladder](regression/2026-10-13-ladder-gen6-rebuild/report.md) |
+| **open** | Arpit's score, then the decider; W-273 phase 2 on a PASS |
+---
+
+## 2026-10-13 — **W-279 closed: the register is `fux.register.v2`, and `fux register [--json]` prints it from the index**
+
+| | |
+|---|---|
+| **ruling** | Arpit, 2026-10-13 (Cowork, closing W-266): *"s1 + fux register --json"* |
+| **records** | [SR-INGEST](../records/0106_ingest.md) **d22 rewritten in place** (the format line, three columns, the closed tail-key list, what stays off a row, the reader's contract, the v1 defect), **22b** widened (a moved `sha`, a foreign `rules=`), **22c** (doctor's three states) and **22d** (the verb) new; [SR-CLI](../records/0101_cli-surface.md) **decision 18** + §1 table + a `fux register` block; [SR-DOCTOR](../records/0152_doctor.md) register row; [SR-MERGE-DRIVER](../records/0130_merge-driver.md) (both header lines); [SR-DOTFUX](../records/0102_fux-directory.md) `index/` row; [SR-CONSTANTS](../records/0159_constants.md) `[register]`; no-decision notes in SR-OUTPUT, SR-INSPECT, SR-SERVE, SR-AGENT-POLICY |
+| **engine** | `ingest/register.py`: `Row(loc, sha, decoder, attrs)`, `render`/`write(rules=)` written only when bytes change, `read` → `Register(state, rules, rows)` by header (`v2` · `old` · `missing`), unknown keys kept, `render` refuses a key outside `[register] keys`; `url_provenance` + `rows_for` resolve a URL row from the committed list (the v1 offline/online byte split closed); `from_index`, `as_json`, `cmd_register`. `run._record_register` calls `rows_for`; `doctor._register` three states; `mergedriver._register_rows` keeps every leading `#` line; `inspect/facts.py`, `inspect/xray.py`, `serve` read `.rows`; `cli.py` registers the verb; `output_config.CLI_VERBS["register"] = ()` |
+| **this repo** | re-ingested: `.fux/index/REGISTER` is v2 (2 371 rows, 606 `archived=true`, no `fetch=` — no URL sources). `fux register` 0.6 s |
+| **guides** | `fux-index` §3 register row, §4b `fux register`, §6 commit list; `fux-usage` routing row; the three vendor copies re-copied |
+| **tests** | `tests/ingest/test_register.py` rewritten (26: byte-identity, written-once, the shape, the closed key set, `archived=true` on exactly the archived entry's documents, a URL row from the list, v1 → *old*, unknown key kept, truncated row, the verb's bytes, `--json` round-trip, the CLI); doctor's three states + moved sha + foreign rules (`test_doctor_fetcher_routes.py`); merge driver's two header lines and a v1 side (`test_mergedriver.py`); `tests/test_cli.py` verb list; `tests_e2e/test_register_verb.py` (4). L12 allowlist: the `-` sentinel entry removed |
+| **open after it** | the section-split tail key — Arpit's pick (`sections=<n>` / per-section line starts), landing with W-273 phase 2; W-273's item file carries it |
+
+## 2026-10-13 — **W-266 closed: the register's shape ruled (S1 + `fux register --json`) → W-279**
+
+| what | evidence |
+|---|---|
+| **research (chat)** | this repo's register, 2 363 rows: `kind` = `file` on every row, `fetcher` = `-` on every row, two decoder grammars, a positional reader that reads a six-column file as *no register*, no format marker, `archived=true` declared and absent; SR-INGEST d22 still names `outcome` (record ≠ code). Shapes rendered on real rows: S1 flat TSV v2, S2 grouped, JSONL, TOML/YAML, Markdown/CSV, an indented tree, two files, no file |
+| **ruling** | Arpit, Cowork: *"s1 + fux register --json"* — one committed human-readable file; the machine's view is a derived verb, never a second committed file |
+| **filed** | [W-279](../archive/open/W-279-register-v2.md) (🟢, Claude Code, Opus): record first (d22 rewritten in place, SR-CLI verb, `constants.toml`), `register.py` by header, doctor's three states, the verb, migration, tests. A section-split tail key is his pending pick, after W-273 phase 2 |
+| **not done** | the build; no `src/`, `node/` or `tests/` touched; the original `work/open/W-266-register-structure.md` owes a `git rm` (archived copy written through file staging) |
+
+## 2026-10-12 — **W-277 closed: generation 6 placed — seeds 113–182 and `set-7-claude` (165 questions)**
+
+| what | evidence |
+|---|---|
+| **data** | 70 seed files: 8 long (113–120, 3 060–3 166 words, 13–21 sections), 48 competitors (121–168, 254–324 words), 14 predecessors and title-match guardrails (169–182); 70 `seed-dates.tsv` rows (2025-03-24…2026-08-24); `questions/set-7-claude.jsonl`, `s7c-001…165`, `{id, question}` only |
+| **delivery** | the first set delivered as files (SR-WORK-TESTDATA A3, A24): the release zip unzipped to `incoming/`, placed by its `PLACE.md`; the author's report, manifest and placement prompt kept in `work/golden/reports/`; the key in Arpit's hand only, never looked for |
+| **checks** | `PLACE.md` §1 and §3, all PASS (counts in the archived item's DoD 3–4). Word placement and one-competitor-per-section need the key, so they are not counted here; the author reports 104 of 104 |
+| **deleted** | prompt 15 and `incoming/` (SR-WORK-TESTDATA decision 5) |
+| **not done here** | the generation-6 ladder rebuild and the re-run (W-278) |
+
+## 2026-10-11 — **W-274 closed: section records are opt-in (`fux.toml [index] section_records`, off by default)**
+
+| what | evidence |
+|---|---|
+| **code** | `config.py` (the required key, plus a one-key reader); `ingest/run.py` (no section records when off; a delta run refuses after a flip, and the last mode is recorded in `runtime/extract-config-digest`); `tune.py` and `node/src/config/tune.mjs` (`section_weight > 0` with the key off is a hard error naming both keys); `doctor.py` (`section records` row); the template and this repo's `fux.toml` write `false` |
+| **identity** | off: byte-identical to the same corpus indexed with the plane on and then rewritten without `sections` (`test_off_is_byte_identical_to_an_index_written_without_section_records`). On: `records/` + `docs/` ingested `--full` by `b4d961cd` and by this engine, and `diff -r` over `.fux/index/` was empty, with 81 section shards |
+| **records** | [SR-SECTIONS](../records/0161_sections.md) **d11**; [SR-CONFIG](../records/0113_config.md) key block, tree and diagram; [SR-DOTFUX](../records/0102_fux-directory.md); notes in SR-INGEST and SR-TUNE; SR-DOCTOR register row; no-decision notes in SR-ACQUIRED, SR-ARCHIVED-CONTENT, SR-PII, SR-URL-FRESHNESS and SR-NODE-SEARCH |
+| **tests** | `tests/query/test_section_records_switch.py` (10); the section fixtures set the key `true`; `test_extract_rules_version.py` passes the mode |
+| **this repo** | `fux ingest --full` with the key off removed the untracked `sections/` plane; doctor reads `off - whole documents only` |
+| **not decided here** | whether sections ship (W-278), how a section is cut or scored |
+
+## 2026-10-11 — **W-276 closed: the post-commit hook pins its interpreter and is never silent**
+
+| what | evidence |
+|---|---|
+| **cause** | `command -v fux` found a pyenv shim (`system` global, fux only under 3.14.2); the shim exited 127 and `|| exit 0` swallowed it — 39 commits from 2026-10-04 re-indexed nothing. From `PATH=/usr/bin:/bin` the hook skipped with no output. Both reproduced by running `.git/hooks/post-commit` directly |
+| **code** | `maintain/hooks.py` + `templates/hooks/` (`fux_python=` pinned, one-line skip and failure messages); `ingest/__init__.py` names a stale lock instead of "already running"; `doctor.py` `git hooks` row |
+| **records** | [SR-MAINTENANCE](../records/0129_hooks.md) d3 amended, **d3a** new, veto 11 restated; [SR-DOCTOR](../records/0152_doctor.md) register row; owns/content hashes restamped (SR-INGEST, SR-FETCHER, SR-AGENT-POLICY, SR-CLI, SR-NODE-SEARCH no-decision note) |
+| **tests** | 5 unit (`tests/maintain/test_hooks.py`), 2 e2e (`test_a_commit_with_fux_off_path_still_re_indexes`, the absent case asserts its message). Unit suite whole: 7094 passed, 4 failed — 2 from another session's uncommitted W-270 work, 2 fixed in this change; e2e whole: 172 passed, 1 skipped |
+| **live** | this repository's hooks reinstalled; the closing commit made from `env -i PATH=/usr/bin:/bin` |
+
+## 2026-10-11 — **W-270 closed: ruled — the section term's third form (W-278), on re-amended data (W-277)**
+
+| what | evidence |
+|---|---|
+| **research** | arm diffs against the runtime document table, no key: at λ 2.0 the incoming rank-1 document was a 1 000–2 400-token manual in 19 of 24 changes (set-5) and 17 of 21 (set-6); `rank._section_gain` scores the whole document against the **section** average (31.5 tokens vs a document average of 134), so a long document's gain is a length artefact — [W-278](../archive/open/W-278-section-term-v3.md) §Why |
+| **ruling** | Arpit, Cowork: *"update the work items to go with the suggestive approach"* — the best section scored as a standalone document (document yardstick, parent title/path/ctx folded in), combined by max, `λ ≤ 1`; W-278's first form (concentration gate, document-average `whole`) withdrawn; R10 re-amended so the competitor wins at baseline by length alone (the morning form made the set unwinnable) |
+| **records** | [SR-WORK-TESTDATA](../records/0068_WORK-test-data.md) R10 re-amended, restamped; [SR-SECTIONS](../records/0161_sections.md) §1 notes the ruling (decision 5 changes at W-278 DoD 1); prompt 15 §why, §2, §3, Part B |
+| **queue** | W-270 archived (ruling only, no code); W-278 and W-277 rewritten; W-273 phase 2 re-pointed at W-278 |
+| **not done** | 🔴 Arpit runs prompt 15; W-278 DoD 1–6 (Claude Code, Opus); no test run — the device shell was unreachable |
+
+## 2026-10-11 — **W-270: STOP — the section re-test's slice is 11, below 15 (Arpit's run of the decider)**
+
+| what | evidence |
+|---|---|
+| **outcome** | [VERDICT](regression/2026-10-11-section-retest-set-6/VERDICT.md): STOP, a data defect — the baseline already hits 49 of 60 tagged section questions at rank 1; latency guardrail FAIL (+328 ms) recorded |
+| **state** | `section_weight` absent from `main`; SR-SECTIONS `proposed` with the STOP banner |
+| **not done** | Arpit's ruling on what next (W-270's options) |
+
+## 2026-10-11 — **W-270 DoD 3–5: the bar frozen, the golden ladder generation 5, three arms captured**
+
+| what | evidence |
+|---|---|
+| **bar** | [pre-registration](regression/2026-10-11-section-retest-set-6/PRE-REGISTRATION.md), L13 defaults, committed alone at `9ab19fc6` before the ladder |
+| **ladder** | [gen-5 rebuild](regression/2026-10-11-ladder-gen5-rebuild/report.md) `04e717ba`: eight rungs frozen on the 118-document seed; `rung-00100` = 118 (Arpit); gen 4 kept at `fux-lab/corpora/golden-gen4/` |
+| **capture** | [report](regression/2026-10-11-section-retest-set-6/report.md): G0 0/110, G1 0.982, G3 0 failures; 🔴 latency guardrail FAIL (+328 ms) |
+| **not done** | 🔴 Arpit's score; the verdict by a non-capturing session |
+
+## 2026-10-11 — **W-273 phase 1: no section records for decoded record formats (unmerged)**
+
+| what | evidence |
+|---|---|
+| **code** | `b4d961cd` on `claude/gracious-galileo-aqrg8b`: `[index] sectionless_formats` (`.csv`, `.json`, `.jsonl`) in `constants.toml`; `extract._index_sections` skips them; `extract_rules` 4 → 5; the `section_weight` comment describes the gain-only term |
+| **records** | [SR-SECTIONS](../records/0161_sections.md) decision 2 amended (W-271's option b); dated notes in SR-EXTRACTED, SR-CONSTANTS, SR-TUNE, SR-FETCHER |
+| **gates** | [`2026-10-11-section-formats-gates`](regression/2026-10-11-section-formats-gates/report.md): G0, G1, G3 PASS, each byte-identical to W-269's; this repo's section plane **8.0× → 1.756×** |
+| **not done** | phase 2 (merge, `_format` v8, re-ingest, default) waits on W-270 (closed 2026-10-11; successor [W-278](../archive/open/W-278-section-term-v3.md)) |
+
+## 2026-10-11 — **W-272 closed: generation 5 committed (`set-6-claude`)**
+
+| what | evidence |
+|---|---|
+| **data** | seeds `89`–`94` (6 long, 2 596–3 847 words, 18–20 sections) and `95`–`112` (18 short: 12 different-subject competitors, 6 superseded predecessors) in [`work/golden/seed/`](golden/seed/); 24 rows in [`seed-dates.tsv`](golden/seed-dates.tsv); [`questions/set-6-claude.jsonl`](golden/questions/set-6-claude.jsonl), 110 ids `s6c-…`, `id` + `question` only |
+| **check** | DoD 3, Sonnet, all PASS against prompt 14's counts; the tag counts are the key's and are checked by W-270's scorer pools |
+| **deleted** | prompt 14 (SR-WORK-TESTDATA: a prompt goes in the change that commits its data) |
+| **not done** | the measurement, W-270 (closed 2026-10-11; successor [W-278](../archive/open/W-278-section-term-v3.md)), waits on W-273 phase 1 |
+
+## 2026-10-10 — **W-271 closed: section records' size ruling, option (b) · law L13 ratified**
+
+| what | evidence |
+|---|---|
+| **law** | [SR-LAW-13](../records/0015_LAW-13-the-standing-bar.md), the standing ship bar for ranking changes (Arpit, 2026-10-10); `CLAUDE.md` regenerated; SR-LAWS decision 11 |
+| **ruling** | W-271, Arpit: *"Go with the recommendation"* — no section records for `.jsonl` / `.csv` / `.json` (≈ 1.9× on this repo against 8.0×); SR-SECTIONS stays `proposed` on a W-270 FAIL |
+| **not done** | the build is [W-273](../archive/open/W-273-section-records-implementation.md) phase 1; the test data [W-272](../archive/open/W-272-section-test-data-gen5.md); the measurement W-270 (closed 2026-10-11; successor [W-278](../archive/open/W-278-section-term-v3.md)) |
+
+## 2026-10-10 — **W-269: section records' gain-only term FAIL (drift); the item is closed**
+
+| what | evidence |
+|---|---|
+| **the bar** | frozen at `4f5504d7` before any code: W-236's bar unchanged, `section_weight ∈ {0.25, 0.5, 1.0, 2.0}` vs `0.0`, plus G3 (a sectionless document never moves) |
+| **the build** | branch `claude/gracious-galileo-aqrg8b` (`03fbf782`), **never merged**: `G = max(0, max_k S_sec − S_self)` in `rank()`, both readers. Nothing of it is on `main` |
+| **gates** | G0 PASS (0/90 rows differ from W-236's `sw-0.0`); G1 PASS (byte-identical to W-236's); G2 pool 23; G3 PASS (0 failures, 4 × 1 481 comparisons) |
+| **verdict** | Arpit ran the frozen `decide.py`: **FAIL — drift**. Rank-1 losses 2 · 4 · 4 · 5; pool misses 23 → 23 · 21 · 19 · 13; `hit@1` wins/losses up to 12 / 5 ([verdict](regression/2026-10-10-section-gain-only/VERDICT.md)) |
+| **reading** | unlike W-236 the pool improved; clause 2 (zero new rank-1 misses) is what failed. Descriptive only |
+
+## 2026-10-10 — **W-257 closed: doc2query, its filter and the tilt, all no detected change**
+
+| what | evidence |
+|---|---|
+| **the bar** | frozen before the author ran ([pre-registration](regression/2026-10-10-enriched-rung/PRE-REGISTRATION.md)); amendment 1 (`79bc22ea`, Arpit) line-matched the placebo and froze both deciders before any score |
+| **the rung** | gen-4 `rung-01000`, 1,000 documents, 5,620 questions by a blind author **without the fux-enrich skill** (one per chunk); 837 (14.9 %) refused on the first pass. Seven arms on engine `a07f9329` ([report](regression/2026-10-10-enriched-rung/report.md)) |
+| **B-108 doc2query** | `unfiltered` vs `none` at `hit@1`: 6 / 4, net +2, 8 needed → **NO DETECTED CHANGE**; placebo 1 / 5, did not clear |
+| **B-109 the filter** | `filtered` vs `unfiltered`: 1 / 1 → **NO DETECTED CHANGE** (G3 passed, so the filter was visible) |
+| **B-110 the tilt** | 4 losses / 1 win on `Q_out` at both 25 % and 50 % → **NO DETECTED TILT**; SR-ENRICH d6's condition met |
+| **verdict** | Arpit scored; a non-capturing session ran the frozen deciders ([verdict](regression/2026-10-10-enriched-rung/VERDICT.md)). `informed` |
+| **effect** | SR-ENRICH d6, d15, d16 rewritten to the numbers; B-245's second condition met; SR-WORK-TESTDATA T15 + R11. No behaviour change |
 
 ## 2026-10-10 — **W-236 / W-168 step 10: section records FAIL (drift), parked; the item is closed**
 
@@ -6218,6 +6364,9 @@ it closed by ratification, not by landing; see the W-27 row above.
 | W-168-STEP-7-MMR | ⏸ **STOP before build** (2026-09-28; Arpit ruled the candidate depth *ranks 6–10 → STOP*) — the ruled swap (top 5 in one graph community → #5 swapped for another community's best) fires on **7 of 125** `set-4-claude` questions at the shipped configuration, and only **5** have a candidate in ranks 6–10, below the floor of 6. Key-free; nothing built, nothing scored. Reopens on a denser graph or a similarity measure (option C) | [report](regression/2026-09-28-mmr-trigger/report.md) |
 | L11-13B-FACET-COUNTS | ✅ **landed 2026-09-28** (Arpit ruled on W-168) — `tools/golden-score/score.py` emits `facets_top5` and `facets_key` per question, as counts only, and L11 decision 13b names both, including the per-row tag membership it publishes. `tests/test_golden_score_output.py` pins the fields and their silence (11 pass). ⚠ Step 7 stopped before it needed the column; it stays for option C | [L11](../records/0013_LAW-11-sealed-answer-key.md) 13b |
 | W-168-STEP-10-SECTION-RECORDS | 🔴 **FAIL — drift** (2026-10-10; decider run by Arpit, then parked by his ruling) — committed `doc#s<k>` section records, B2 `S + λ·max_k S_sec`, `section_weight ∈ {0.1, 0.25, 0.5, 1.0}` vs `0.0`, `hit@1` on the key's `step10_section` pool (23) of `set-5-claude` at a re-ingested copy of gen-4 `rung-01000`. G0 and G1 PASS. **Every arm loses baseline rank-1 hits (4 · 5 · 9 · 10)**, and pool misses rise 23 → 26 · 26 · 28 · 28. The term favoured short documents. Built on branch `w236-sections`, never merged. `informed`. | [VERDICT](regression/2026-10-10-section-records/VERDICT.md) |
+| W-269-SECTION-GAIN-ONLY | 🔴 **FAIL — drift** (2026-10-10; decider run by Arpit) — B2's gain-only variant `S_doc + λ · max(0, max_k S_sec − S_self)`, `section_weight ∈ {0.25, 0.5, 1.0, 2.0}` vs `0.0`, W-236's bar unchanged plus G3. G0, G1, G3 PASS. **Every arm loses baseline rank-1 hits (2 · 4 · 4 · 5)** while pool misses fall 23 → 23 · 21 · 19 · 13. Built on branch `claude/gracious-galileo-aqrg8b`, never merged. `informed`; second mechanism on the same 90 questions. | [VERDICT](regression/2026-10-10-section-gain-only/VERDICT.md) |
+| W-270-SECTION-RETEST-SET-6 | ⏸ **STOP by the frozen table, filed INCONCLUSIVE** (2026-10-11; decider run by Arpit) — the gain-only term at `section_weight = 2.0` on `set-6-claude` under L13: the baseline's `step10_section` slice was **11, below the floor of 15**, a data defect and never a verdict on the term; gates G0, G1, G3 PASS; the latency guardrail had failed (+328 ms). Successor: W-278 on `set-7-claude` | [verdict](regression/2026-10-11-section-retest-set-6/VERDICT.md) |
+| W-278-SECTION-TERM-V3 | 🟡 **INCONCLUSIVE, ruled ship by Arpit** (2026-10-13; decider run by Arpit) — the third form at `section_weight = 1.0` on `set-7-claude` under L13: gates G0 · G1 · G3 · G4 PASS; latency +49.5 ms; whole set `hit@1` 117 → 123, **0 losses**; slice 5 of 24, below SR-RS d19's floor. Ruled: ship as an opt-in pair (`section_records = true` + `section_weight = 1.0`, both off by default). [verdict](regression/2026-10-13-section-term-v3/VERDICT.md) |
 | W-168-STEP-9-INTENT-PRIOR | ✅ **PASS at `intent_weight = 0.1`** (the table said PASS; Arpit ratified 2026-09-28) — a query-time `[doctype]` glob table and a fixed three-intent cue lexicon, `intent_weight ∈ {0.1, 0.2, 0.3, 0.5}` vs `0.0`, `hit@1` on the 25 tagged questions of `set-4-claude` at a copy of `rung-01000`. Wins/losses **6/0 · 8/0 · 11/0 · 14/0**; every value clears and `0.1` is the first, at exactly the floor of 6 (p = 0.031). **No baseline rank-1 hit lost at any weight**, untagged 0/0, `hit@10` 110 → 110; every win is also a `primary@1` win; `0.5` wins the whole pool of 14. Measured at the shipped `anchor = 1.0` + `mined_weight = 0.5`. The default `[doctype]` is empty, so it is inert on upgrade. **Shipped 2026-09-28** as the template default. `informed`. | [VERDICT](regression/2026-09-28-intent-prior/VERDICT.md) |
 | W-168-STEP-8-AUTHORITY-PRIOR | ⚠ **INCONCLUSIVE by the table, pending Arpit** (2026-09-30; recommended FAIL — drift) — a multiplicative git authority prior, `1 + w · (1 − 1/(authors × commits))`, `authority_weight ∈ {0.1, 0.2, 0.3, 0.5}` vs `0.0`, `hit@1` on the 101 tagged questions of `set-4-claude` at a re-ingested copy of `rung-01000`. Wins/losses **3/2 · 5/4 · 7/4 · 12/10**, every net below the floor, and **every arm loses baseline rank-1 hits (2 · 4 · 4 · 10)**, a shape the table does not name. `authority_weight` stays `0.0`. ⚠ `decide.py` was written after scoring, before any row was read. `informed`. | [VERDICT](regression/2026-09-28-authority-prior/VERDICT.md) |
 | W-237-RM3-GROUNDED | ❌ **FAIL — no gain** (the table, 2026-09-30) — RM3 only when the un-expanded first pass is `grounded`, `rm3_weight ∈ {0.1, 0.2, 0.3, 0.5}` vs `0.0`, `hit@1` on the 69 grounded questions of `set-4-claude`. Wins/losses **0/0 · 1/1 · 2/3 · 4/6**, drift losses 0 · 1 · 3 · 6; the gate held (untagged 0/0). RM3's third failure. ⚠ **The code removal the table requires waits on Arpit** (refused in-session); off at `0.0` meanwhile. `informed`. | [VERDICT](regression/2026-09-30-rm3-grounded/VERDICT.md) |
@@ -6225,6 +6374,7 @@ it closed by ratification, not by landing; see the W-27 row above.
 | W-233-IDENTIFIER-FAMILIES | ✅ **PASS** (2026-09-28; the table said PASS, every clause by a wide margin, so it was not ambiguous) — identifier families from `.fux/identifiers.toml`, one canonical term per match on both readers, against the frozen rule *E1 net ≥ 6 on at least one rung; no E1 or E2 net ≤ −6; E3 < 6 of 60; G1–G3 hold*. **Measured +25 / +88 / +105 with 0 broken; E2 0; E3 0 of 60; G1–G3 hold; index +0.3 %.** A mechanism result on the ladder's own IDs, not a measure of real query spellings | [verdict](regression/2026-09-28-identifier-families/VERDICT.md) · [SR-IDENTIFIERS](../records/0160_identifiers.md) |
 | W-252-NODE-ARM | ✅ **PASS** (2026-10-04) — PRE-REG-NODE-3: the Node differential arm on lab rung-01000 and rung-10000 (v7 copies), against *0 discordant of 801 per pass, identical graph digests, a Node-built plane equal to Python's*. **0/801 on all four passes; digests identical; 602/602 build files byte-equal** after the build check was re-run with its deletion step corrected (disclosed). `informed` | [VERDICT](regression/2026-10-04-node-arm-2/VERDICT.md) |
 | PRE-REG-DOC-COVERAGE | 🔴 **INCONCLUSIVE** (2026-10-04) — W-256 §2, abstention gate 2: a fixed grid of `doc_coverage_floor` replayed over the W-213 rows at rung-01000, against *≥ 50 % caught, fewer correct demoted than a coin, p ≤ 0.00625, per-set consistent*. Only 0.80 meets the point criteria; **p = 0.35**, one set of three. Floor stays 0.0; **Arpit's — W-260 §1** | [VERDICT](regression/2026-10-04-doc-coverage-replay/VERDICT.md) |
+| W-257-ENRICHED-RUNG | ❌ **NO DETECTED CHANGE** (2026-10-10; frozen deciders, run by a non-capturing session on Arpit's scores) — doc2query on all 1,000 docs of gen-4 `rung-01000`, `hit@1` on `set-5-claude`: B-108 6 / 4 (net 8 needed), placebo 1 / 5; B-109 filter 1 / 1; B-110 no tilt at 25 % or 50 % (4 / 1 each). Blind author without the skill; `informed` | [VERDICT](regression/2026-10-10-enriched-rung/VERDICT.md) |
 | PRE-REG-INGEST-SPLIT | ⚠ **split result → Arpit** (2026-10-04) — W-256 §8 at rung-10000: delta non-extract median **10.39 s** (≥ 5 s, no straddle) but walk+parse 24–30 %, `redact` ~57 %; the frozen rule sends this case to Arpit — **W-260 §2**. Full/delta 1.45× | [VERDICT](regression/2026-10-04-ingest-split/VERDICT.md) |
 | PRE-REG-INGEST-SPLIT-2 | ✅ **close branch → Arpit** (2026-10-09) — W-267, W-256 §8's rule re-run on the fixed engine at gen-4 rung-10000: delta non-extract median **4.902 s** (4.894–4.908, no straddle) < 5 s; `redact` 0.96 s; full/delta 1.92×. B-002 closes on Arpit's word. Margin 0.092 s | [VERDICT](regression/2026-10-09-ingest-split-remeasure/VERDICT.md) |
 | PRE-REG-LOOPBACK | ✅ **PASS** (2026-10-04) — W-256 §4 on 127.0.0.1: B-102 (429 retries, backoff, `rate_limited[host]`, doctor) 14/14 and B-124 (`keep=true`, `as-ingested` with matching sha once down, the quarter veto) 13/13; B-103 (Windows) excluded | [VERDICT](regression/2026-10-04-loopback-network/VERDICT.md) |

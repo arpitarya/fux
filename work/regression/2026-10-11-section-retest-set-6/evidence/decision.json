@@ -1,0 +1,13 @@
+{
+ "gates": {
+  "G0": "PASS",
+  "G1": "PASS",
+  "G3": "PASS"
+ },
+ "outcome_by_the_table": "STOP \u2014 the slice is 11, below 15",
+ "slice": {
+  "floor": 15,
+  "reorderable@1": 11,
+  "size": 11
+ }
+}

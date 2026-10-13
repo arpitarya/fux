@@ -18,7 +18,7 @@ import re
 from pathlib import Path
 
 from ..errors import FuxError
-from .format import HEADER, index_dir, shard_for
+from .format import HEADER, index_dir, section_parent, sections_dir, shard_for
 from .resident import held_lines, held_records
 from ..constants import fixed
 
@@ -33,6 +33,49 @@ def iter_shard_paths(root: Path) -> list[Path]:
         return []
     # The regex is the whole shard-name grammar, suffix included.
     return sorted(p for p in directory.iterdir() if p.is_file() and _SHARD_NAME_RE.fullmatch(p.name))
+
+
+def iter_section_paths(root: Path) -> list[Path]:
+    """The section plane's shard files (W-236, SR-SECTIONS decision 1).
+
+    Its own function, and deliberately NOT folded into `iter_shard_paths`: the
+    plane lives in a subdirectory so that every document reader stays blind to
+    it. A reader that wants sections asks for them by name.
+    """
+    directory = sections_dir(root)
+    if not directory.is_dir():
+        return []
+    return sorted(p for p in directory.iterdir() if p.is_file() and _SHARD_NAME_RE.fullmatch(p.name))
+
+
+def section_ordinal(sec_id: str) -> int:
+    """`k` in `<parent>#s<k>`."""
+    return int(sec_id[len(section_parent(sec_id)) :].lstrip("#s"))
+
+
+def read_sections(root: Path) -> dict[str, list[dict]]:
+    """Every section record, grouped by parent document id, in `k` order.
+
+    Placement is checked exactly as `read_index` checks it: a section line
+    lives in its PARENT's shard (decision 4), so one in any other file is a
+    merge gone wrong and is refused rather than read.
+    """
+    out: dict[str, list[dict]] = {}
+    seen: set[str] = set()
+    for path in iter_section_paths(root):
+        _, records = read_shard(path)
+        for record in records:
+            sec_id = record["id"]
+            parent = section_parent(sec_id)
+            if shard_for(parent) != path.stem:
+                raise FuxError(f"{path}: section {sec_id!r} belongs in sections/{shard_for(parent)}.jsonl, not here")
+            if sec_id in seen:
+                raise FuxError(f"duplicate section id: {sec_id!r}")
+            seen.add(sec_id)
+            out.setdefault(parent, []).append(record)
+    for sections in out.values():
+        sections.sort(key=lambda r: section_ordinal(r["id"]))
+    return out
 
 
 def raw_record_lines(path: Path) -> tuple[dict, list[bytes]]:

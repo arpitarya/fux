@@ -7,10 +7,10 @@ description: "The constitutional law. A rule is stated in exactly one SR and eve
 status: accepted
 date: 2026-09-06
 feature: the authority of records — where a rule lives, which record wins, and who may amend one
-owns: [scripts/gen-laws.py@e827930d1ffc, scripts/gen-components.py@d146ee4a28b1, tests/test_claude_md_laws.py@d5a71ea8bd15, tests/test_record_components.py@5559f217ae22]
+owns: [scripts/gen-laws.py@96ca5a116bcc, scripts/gen-components.py@d146ee4a28b1, tests/test_claude_md_laws.py@d5a71ea8bd15, tests/test_record_components.py@5559f217ae22]
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 6db6a52adcc95be64ef5bd11e5dfb80225f5d9d0cc6b9129fd6464d643706451
+content_sha: 48ef72d875cd9387c9923dc72ea8da3075bfe0cc9ce47535e7a3938be95da75a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -100,7 +100,7 @@ Amending a law needs Arpit's ruling, named in this record
   every other record.** Every rule is *stated* in exactly one SR; every other
   artifact — `CLAUDE.md`, a schema, a config comment, a skill, a diagram —
   **links to it and never restates it**, and a change is made in the record
-  first. The Law records `SR-LAW-0`…`SR-LAW-12` outrank every other SR: **a
+  first. The Law records `SR-LAW-0`…`SR-LAW-13` outrank every other SR: **a
   record that conflicts with a Law is void in the conflicting part**, never a
   trade-off to weigh. **A Law changes only on Arpit's ruling, named in the
   record**; an ordinary SR a session may accept.

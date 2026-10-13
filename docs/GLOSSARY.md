@@ -498,8 +498,12 @@ and they are one mechanism plus its bookkeeping.
 - 🔴 **There is no default layer.** `[sources.url] fetcher` was deleted; a URL
   that resolves to nothing is an error naming the hosts tried and the stems on
   disk.
-- **Register** — `.fux/index/REGISTER`, **committed** beside the index: one
-  sorted line per indexed document, `loc · kind · sha · decoder · fetcher`.
+- **Register** — `.fux/index/REGISTER`, **committed** beside the index: a
+  `# fux.register.v2` format line carrying `rules=`, a column header, then one
+  sorted line per indexed document — `loc` ⇥ `sha` ⇥ `decoder`, plus a `k=v`
+  tail (`archived=true`, `fetch=<name>`) only where it holds a value
+  ([SR-INGEST](../records/0106_ingest.md) decision 22, shape ruled 2026-10-13).
+  `fux register [--json]` prints the same rows from the index, for a machine.
   Distinct from W-200's gitignored per-run ledger: the ledger answers *"what did
   this ingest do?"*, the register answers *"what is in here, and what read
   it?"*. Bound by [L4](../records/0006_LAW-4-deterministic.md) — no clock, no

@@ -1,0 +1,233 @@
+{
+ "B-108": {
+  "filtered_vs_none (beside)": {
+   "beside_wins_losses": {
+    "evidence_quoted": [
+     2,
+     2
+    ],
+    "hit@10": [
+     0,
+     0
+    ],
+    "hit@5": [
+     2,
+     0
+    ],
+    "primary@1": [
+     6,
+     3
+    ]
+   },
+   "line": "b=6 c=4 discordant=10 net=2 p=0.7539 (net needed 8, alpha=0.05) -> NO DETECTED CHANGE",
+   "verdict": {
+    "alpha": 0.05,
+    "b": 6,
+    "c": 4,
+    "discordant": 10,
+    "net": 2,
+    "net_needed": 8,
+    "outcome": "no detected change",
+    "p": 0.753906
+   }
+  },
+  "outcome": "NO DETECTED CHANGE",
+  "placebo_vs_none": {
+   "beside_wins_losses": {
+    "evidence_quoted": [
+     4,
+     3
+    ],
+    "hit@10": [
+     0,
+     0
+    ],
+    "hit@5": [
+     1,
+     0
+    ],
+    "primary@1": [
+     1,
+     5
+    ]
+   },
+   "line": "b=1 c=5 discordant=6 net=4 p=0.2188 (net needed 6, alpha=0.05) -> NO DETECTED CHANGE",
+   "verdict": {
+    "alpha": 0.05,
+    "b": 1,
+    "c": 5,
+    "discordant": 6,
+    "net": 4,
+    "net_needed": 6,
+    "outcome": "no detected change",
+    "p": 0.21875
+   }
+  },
+  "unfiltered_vs_none": {
+   "beside_wins_losses": {
+    "evidence_quoted": [
+     2,
+     2
+    ],
+    "hit@10": [
+     0,
+     0
+    ],
+    "hit@5": [
+     2,
+     0
+    ],
+    "primary@1": [
+     6,
+     3
+    ]
+   },
+   "line": "b=6 c=4 discordant=10 net=2 p=0.7539 (net needed 8, alpha=0.05) -> NO DETECTED CHANGE",
+   "verdict": {
+    "alpha": 0.05,
+    "b": 6,
+    "c": 4,
+    "discordant": 10,
+    "net": 2,
+    "net_needed": 8,
+    "outcome": "no detected change",
+    "p": 0.753906
+   }
+  }
+ },
+ "B-109": {
+  "filtered_vs_unfiltered": {
+   "beside_wins_losses": {
+    "evidence_quoted": [
+     0,
+     0
+    ],
+    "hit@10": [
+     0,
+     0
+    ],
+    "hit@5": [
+     0,
+     0
+    ],
+    "primary@1": [
+     1,
+     1
+    ]
+   },
+   "line": "b=1 c=1 discordant=2 net=0 p=1.0000 (no net difference can clear alpha at this count, alpha=0.05) -> NO DETECTED CHANGE",
+   "verdict": {
+    "alpha": 0.05,
+    "b": 1,
+    "c": 1,
+    "discordant": 2,
+    "net": 0,
+    "net_needed": null,
+    "outcome": "no detected change",
+    "p": 1.0
+   }
+  },
+  "headroom": {
+   "improvement": 34,
+   "regression": 47
+  },
+  "outcome": "NO DETECTED CHANGE"
+ },
+ "B-245_second_condition_met": true,
+ "G2": {
+  "improvement": 36,
+  "regression": 45
+ },
+ "G3": {
+  "passes": true,
+  "refused": 837,
+  "share": 0.1489,
+  "written": 5620
+ },
+ "totals": {
+  "cov-25": {
+   "abstain_correct": 0,
+   "abstain_wrong": 0,
+   "answered_unanswerable": 9,
+   "evidence_quoted": 67,
+   "hit@1": 46,
+   "hit@10": 79,
+   "hit@20": 79,
+   "hit@5": 76,
+   "hit@50": 79,
+   "primary_at_1": 38
+  },
+  "cov-50": {
+   "abstain_correct": 0,
+   "abstain_wrong": 0,
+   "answered_unanswerable": 9,
+   "evidence_quoted": 66,
+   "hit@1": 45,
+   "hit@10": 78,
+   "hit@20": 78,
+   "hit@5": 77,
+   "hit@50": 78,
+   "primary_at_1": 38
+  },
+  "declared": {
+   "abstain_correct": 0,
+   "abstain_wrong": 0,
+   "answered_unanswerable": 9,
+   "evidence_quoted": 65,
+   "hit@1": 45,
+   "hit@10": 79,
+   "hit@20": 79,
+   "hit@5": 75,
+   "hit@50": 79,
+   "primary_at_1": 37
+  },
+  "filtered": {
+   "abstain_correct": 0,
+   "abstain_wrong": 0,
+   "answered_unanswerable": 9,
+   "evidence_quoted": 65,
+   "hit@1": 47,
+   "hit@10": 79,
+   "hit@20": 79,
+   "hit@5": 77,
+   "hit@50": 79,
+   "primary_at_1": 40
+  },
+  "none": {
+   "abstain_correct": 0,
+   "abstain_wrong": 0,
+   "answered_unanswerable": 9,
+   "evidence_quoted": 65,
+   "hit@1": 45,
+   "hit@10": 79,
+   "hit@20": 79,
+   "hit@5": 75,
+   "hit@50": 79,
+   "primary_at_1": 37
+  },
+  "placebo": {
+   "abstain_correct": 0,
+   "abstain_wrong": 0,
+   "answered_unanswerable": 9,
+   "evidence_quoted": 66,
+   "hit@1": 41,
+   "hit@10": 79,
+   "hit@20": 79,
+   "hit@5": 76,
+   "hit@50": 79,
+   "primary_at_1": 33
+  },
+  "unfiltered": {
+   "abstain_correct": 0,
+   "abstain_wrong": 0,
+   "answered_unanswerable": 9,
+   "evidence_quoted": 65,
+   "hit@1": 47,
+   "hit@10": 79,
+   "hit@20": 79,
+   "hit@5": 77,
+   "hit@50": 79,
+   "primary_at_1": 40
+  }
+ }
+}

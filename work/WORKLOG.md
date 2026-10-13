@@ -23,10 +23,196 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-13 — W-278 DoD 1–5: the section term's third form built, frozen, captured  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *implement W-278 & W-273.* W-273 phase 2 runs only on a W-278 PASS, so it was not touched.
+- **Ruled by Arpit in-session:** *own-match only* (SR-SECTIONS d5).
+- **Done:** `08ef6293` (record + build, both readers), `2ac82d3b` (bar, alone), the gen-6 ladder, the capture. Latency: the committed byte-pattern read failed (+190 ms); the scan now reads sections from the derived plane when fresh (+68.6 gen 5, +49.5 gen 6). Every gate PASS; rank 1 moved on 7 of 165 at `sw-1.0`. W-281 filed on Arpit's ask (capture speed; the 12 h gpg stall).
+- **Mistakes:** first ladder attempt ran the 3.9 `python3` (no `tomllib`); discarded before any rung froze. Estimated the capture at an hour; it took 15 min.
+- **Shared machine:** a Fable session built and committed W-279 in this tree during the capture; I committed only my own paths.
+- **Next:** 🔴 Arpit scores; a session that did not capture runs `decide.py`.
+
+## 2026-10-13 — W-279 closed: the register is v2, `fux register [--json]` ships  ·  Claude Code (Fable 5.1)
+- **Asked:** *"implement W-279"*. Triage first: W-258 (9d) and W-268 (3d) wait on Arpit and block nothing; W-279 was the 🟢 item with the ball on the agent.
+- **Shared machine:** a second Claude Code session was mid-W-278 (its `latency.py` ran at 00:41; it committed `08ef6293` and `2ac82d3b` during this session and has shards + the Cowork W-279/W-280 filings **staged**). No whole-suite run started while its measurement was live; the suites here ran after it ended. The whole index plane is committed here, from this session's `fux ingest --no-accelerator`, because a register that disagrees with the shards beside it is the drift doctor reports; its uncommitted `2026-10-13-ladder-gen6-rebuild` folder is left behind.
+- **Record first (L0):** SR-INGEST d22 rewritten in place — the v1 text named `outcome`, a column the file never carried. 22c/22d new; SR-CLI decision 18; eight other records touched because the ownership table says so (each with its note); owns/content hashes restamped on the ten.
+- **Built:** `register.py` v2 (by header, unknown keys kept, closed key set on write, written only when bytes change, URL rows from the committed list); doctor's three states (+ a moved `sha` and a foreign `rules=` are drift); the verb; the merge driver keeps both header lines; three readers I had missed on the first grep (`inspect/facts.py`, `inspect/xray.py`, `serve`) — the second was found by the suite, not by me: a reason to grep for `register.read(` and not for `import register`.
+- **Measured:** `fux register` 0.6 s on 2 371 rows; `archived=true` on 606; no `fetch=` here (no URL sources). doctor on the v1 file: *old format*, as 22c says.
+- **Suites:** unit whole 7 113 pass; the 15 reds are the other session's in-flight W-278 work (8 ladder seeds, its 🟡 W-278 queue row ×3, its uncommitted `2026-10-13-ladder-gen6-rebuild` folder ×4). e2e whole 176 pass, 1 skip. Node 241 pass. A second whole e2e run was **stopped by me** when it shared the machine with the other session's ladder rebuild (load 12); the register, smoke and verb e2e files were rerun alone, 59 pass.
+- **Late fixes the whole suite found:** the `.fux/README.md` template's verb row, the Node `output.mjs` verb table, two broken links, a renumbered record link, and no-decision notes in SR-INDEX-LIFECYCLE, SR-FETCHER, SR-HOOKS, SR-ACQUIRED, SR-ARCHIVED-CONTENT, SR-NODE-SEARCH and SR-PII, which describe files this change touched.
+- **Owed by hand, done:** `git rm work/open/W-266-register-structure.md`.
+- **Open after it:** the section-split tail key — Arpit's pick, with W-273 phase 2 (noted in W-273's item file). Nothing on the inbox: nothing waits on it yet.
+- **Next:** Claude Code (Opus) W-278; Arpit picks the section-split register key.
+
+## 2026-10-13 — W-280 filed: research the intent cue lexicon  ·  Claude Code (Fable 5.1)
+- **Asked:** what could be improved in `constants.toml` `[intent]`/`[analyzer]`; then *"improve intent"*; then whether to improve the table; then *"create a research work item for this"*.
+- **Found (question texts only, no answer read):** the lexicon tags 36 of 693 released questions, 0 on sets 5 and 6; only 19–77 rows per set open with any cue word, so the ceiling is the register, not the regex. A drafted v2 reaches 79, most of it yes/no questions whose doc type is a judgement. Rationale cue is past-tense only (*"what is the reason"* tags reference); `’` and `whats` miss; no lead-in tolerance. Stopwords: checked before stemming (`having` → `have` survives), contractions leave a stray `s` term, do/does/did and should/would absent — each a posting change, not touched.
+- **Advised:** not now — a v2 is a new frozen tag plus an L13 run on sets 5–7 at 6–9 tagged rows each, foreseeably INCONCLUSIVE. Arpit filed it as research instead.
+- **Done:** `work/open/W-280-intent-lexicon-research.md` (🟢, Cowork), its row under `### research`, NOW. No `src/`, `node/`, `tests/` or record touched; nothing committed.
+- **Next:** unchanged — Claude Code (Opus) W-278, then W-279.
+
+## 2026-10-13 — W-266 researched in chat and ruled; W-279 filed  ·  Cowork (Fable 5.1)
+- **Asked:** *"research and suggest W-266 within the chat"*; then whether the register could be something other than TSV, a new format, two files (human + machine); then *"s1 + fux register --json"*; then a section-split key, in chat with examples.
+- **Found:** 2 363 rows — `kind` and `fetcher` constant on every row; `prose` bare vs `name@sha:` for the rest; reader positional (an added column → *no register*); no format marker; `archived=true` declared on `archive` (605 rows) and absent; **SR-INGEST d22 names `outcome`, which the file never carried** (L0 restatement, record ≠ code); only reader is `doctor._register`. 51 % of the bytes are repeated path prefixes, 31 % shas.
+- **Shown:** S1 and S2 on real rows; the sources grammar fails on paths with spaces (no quoting, SR-URL-LIST d8); JSONL/TOML/YAML/Markdown/CSV/tree/two-files/no-file each with its cost.
+- **Ruled (Arpit):** S1 + `fux register [--json]` derived from the index, never committed. W-266 closed (archived copy with the ruling; no compare doc, at his word); **W-279** filed 🟢 (Opus). Section-split key: examples given in chat, his pick pending, lands after W-273 phase 2.
+- **Done (file staging; the device shell was wedged, no test run):** W-279, W-266 archived + map row, OPEN-WORK, IMPLEMENTATION, NOW, INTERVIEW. No `src/`, `node/` or `tests/` touched.
+- ⚠ **Owed by hand:** `git rm work/open/W-266-register-structure.md`; the queue/link tests.
+- **Next:** Claude Code (Opus) W-278, then W-279.
+
+## 2026-10-13 — Arpit chose A: the Cowork filing committed, then the placement  ·  Claude Code (Opus 5.5)
+- **Done:** `1e8c1771` holds the Cowork W-270/W-277/W-278 filing as it was staged, plus the owed `git rm work/open/W-270…`, so prompt 15's re-amended text is in history; `788b44b4` holds the W-277 placement. Follow-up: 4 links still pointed at the removed W-270 file (IMPLEMENTATION ×3, SR-EXTRACTED) and now point at W-278; W-270's verdict got its feature-gate row; the inbox ages were recomputed (9d, 3d).
+- **Unit suite:** 7096 pass. The only red is `test_golden_ladder_seed` ×8, which waits on W-278's generation-6 ladder rebuild.
+- **Next:** Claude Code (Opus) W-278.
+
+## 2026-10-12 — W-277 closed: generation 6 placed (`set-7-claude`)  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted `PLACE.md` (W-277) after running prompt 15 in a fresh chat and unzipping the release.
+- **Checks (§1), all PASS:** 75 manifest rows, each matched to a file and no stray file; no name holds `key` or `answer`; released fields `[('id', 'question')]`; no `move` destination pre-existed; none of the 70 date rows already present. The key's address was never named, listed or opened. The guard hook fired twice when a command *named* that path, once as an exclusion and once inside a quoted DoD line; the work was redone without naming it.
+- **Placed:** 70 seeds (113–182), `questions/set-7-claude.jsonl` (165), 70 `seed-dates.tsv` rows, the author's `REPORT`/`PLACE`/`MANIFEST` → `work/golden/reports/`.
+- **Released half (§3), all PASS:** 8 long, 3 060–3 166 words and 13–21 `## ` headings; 48 short, 254–324 words; ids `s7c-001…165` contiguous and unique; date rows 2025-03-24…2026-08-24, no duplicate path. Word placement and one-competitor-per-section need the key, so they were not counted here.
+- **Closed:** prompt 15 and `incoming/` deleted; W-277 → `archive/open/`; W-278 🟢, W-273 🟡; IMPLEMENTATION, archive map, both golden READMEs, NOW and the registry bumped (SR-WORK-REGISTRY restamped).
+- ⚠ **The index carries the Cowork W-270/W-277/W-278 filing, still uncommitted**, including prompt 15 itself (never committed). This change was made in the working tree only, so that filing can be committed first and prompt 15's re-amended text reaches history before its deletion.
+- **Next:** Claude Code (Opus) W-278 — the latency fix, the max form, the generation-6 ladder.
+
+## 2026-10-11 — the green items: W-276 ✓ (the hook pins its interpreter) · W-274 ✓ (section records opt-in)  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement the work items in green. Bring them to closure."* Only W-274 and W-276 were Claude Code's; W-263, W-265, W-266 and W-275 are `cowork` research (rule 37a).
+- **W-276:** the cause was suspect 1 in a worse form. `command -v fux` found a **pyenv shim** for a Python with no fux; it exited 127 and `|| exit 0` swallowed it. From a bare PATH the hook skipped with no output. The fix: hooks pin `fux_python=<sys.executable>`, print one line whenever they cannot run, name a stale lock, and doctor has a `git hooks` row. SR-MAINTENANCE d3a. Proven live: commit `c35a805a` was made from `env -i PATH=/usr/bin:/bin` and printed `re-indexing in the background`; the runner finished `ok`.
+- **W-274:** `fux.toml [index] section_records`, `false` in the template. Off is byte-identical to an index without section records; on is byte-identical to `b4d961cd` (checked by hand on `records/` + `docs/`). A flip refuses a delta ingest; `section_weight > 0` with the key off is a hard error in Python and Node; doctor has a `section records` row. SR-SECTIONS d11. This repo: key off, `ingest --full` run.
+- **Concurrency:** the Cowork session's W-270 closure (records, OPEN-WORK, archive, prompts, NOW and INTERVIEW edits) is still **uncommitted** in the tree, its shell wedged. Both commits here hold HEAD plus this session's edits only; the W-274 and W-275 filings went in verbatim with W-276 so the id sequence holds. Two unit failures are that work's and not this session's: `work/open/W-270…` is both open and archived (its owed `git rm`), and W-270's verdict has no register row.
+- **Next:** 🔴 Arpit runs prompt 15 (W-277). Someone commits the Cowork W-270 work and runs its `git rm`.
+
+## 2026-10-11 — sections researched; W-270 closed on Arpit's ruling; W-278 and W-277 rewritten  ·  Cowork (Fable 5.1)
+- **Asked:** research every section work item and the test data — why section records failed, and what can be done. Then: *"update the work items to go with the suggestive approach. Remove older work items if needed."*
+- **Found (no key read; arm `ranked` lists against the runtime document table):** at λ 2.0 the incoming rank-1 document was a long manual in 19/24 (set-5) and 17/21 (set-6) rank-1 changes — wins and losses are the same move. Cause: `rank._section_gain` scores `whole` against the **section** average (31.5 tokens; document average 134), so a 2 000-token manual's `whole` ≈ 0.16·idf and the gain ≈ the section score: W-269 is B2 again for long documents (1.77 per term at λ 2 vs 0.99 for a short tf-1 competitor). W-278's first form left 1.16 (λ 2) / 0.82 (λ 1) — no fair λ — and its concentration gate has a one-term hole. Prompt 15's competitor rule (words in title + heading + first lines + ≥ 2) out-matched the section in every unit: a FAIL by construction.
+- **Ruled (Arpit):** the max form — the best section scored as a standalone document on the document yardstick, parent title/path/ctx folded in, `S = S_doc + λ·max(0, S_sec* − S_doc')`, `λ ≤ 1` (1 = pure max); R10 re-amended: long doc words twice in the answering section (≤ 200 words) only, competitor 200–400 words with the words once each, body only, never title/heading; ≥ 6 title-match short docs as `other` guardrails.
+- **Done (file staging; the device shell was wedged, no test run):** W-278 rewritten; W-277 re-amended (+DoD 4); W-273 phase 2 → W-278, `section_weight` 1.0; W-270 archived with its map row (`archive/open/`); OPEN-WORK (W-270 rows gone, W-277 `↳ blocks` W-278 · W-273); SR-WORK-TESTDATA R10 + restamp; SR-SECTIONS §1 + restamp; prompt 15; IMPLEMENTATION; NOW; INTERVIEW.
+- ⚠ **Owed by hand:** `git rm work/open/W-270-section-retest-set-6.md` (the archived copy is written; the shell could not delete the original) and the record/queue/link tests.
+- **Next:** 🔴 Arpit runs prompt 15 (re-amended); Claude Code (Opus) W-278 DoD 1–3.
+
+## 2026-10-11 — W-278 filed; a competitor for every tagged section  ·  Cowork (Opus 5.5)
+- **Asked:** Arpit, on the three untested ideas: bonus only when the answer is concentrated; whole doc on its normal yardstick; every future set needs a short competitor per tagged section — put them in a work item or update the existing one.
+- **Done:** `work/open/W-278-section-term-v3.md` + 🔴 `fux build` row (waits on W-270's ruling; latency fix first; G4 tests the length-artifact hypothesis without the key). The competitor rule: SR-WORK-TESTDATA R10 amended (`content_sha` restamped by the `sr-hash.py` formula), prompt 15 §2–§3, W-277 (≥ 48 competitors), W-270 cross-reference, W-270's `↳ blocks`. Edited through file staging — the device shell was unreachable, so **no test was run**; `tests/test_test_data_prompts.py` and the record tests are owed.
+- **Next:** Arpit rules W-270 (W-278 is the alternative to (a)); prompt 15 is ready to run as amended.
+
+## 2026-10-11 — W-277 filed: set-7 test data; authors now deliver files  ·  Cowork (Opus 5.5)
+- **Asked:** Arpit: a work item for new test data from W-270's findings, run in an independent chat that gives downloadable files plus a Claude Code prompt that places them — and that delivery for every future test-data creation.
+- **Ruled (Arpit):** files, not chat blocks, for every future set. Recorded in L11 decision 6 and its law block (a law amendment on his ruling, named there), SR-WORK-TESTDATA A1/A3/A24, SR-WORK-GOLDEN, `work/golden/README.md`; `CLAUDE.md` regenerated. The key comes as its own download, never in the release zip; the placement prompt checks file and field names before reading.
+- **Done:** R10 amended from W-270 (≥ 8 long docs, ≥ 3 competitors each, ≥ 100 tagged sized from the 18 % miss rate, question words only in the answering section, counted in code); prompt 15 (`work/golden/prompts/15-claude-gen6-section-seed.md`); `work/open/W-277-section-test-data-gen6.md`; inbox + testing rows; W-270 cross-referenced. No `src/`, `node/` or `tests/` touched. This session read W-270's scores, so it may not author (A1).
+- **Next:** Arpit runs prompt 15. The re-run still needs his ruling on W-270 (c) and the latency fix.
+
+## 2026-10-11 — W-276 filed: the post-commit hook re-indexes nothing  ·  Cowork (Opus 5.5)
+- **Asked:** Arpit: a work item for a hook that runs `fux ingest` on every commit.
+- **Found:** the hook exists and is installed (`fux ingest --spawn-runner`), yet `.fux/runtime/` dates from 2026-10-04 across 39 commits. Lead suspect: `fux` is only in `.venv/bin`, and the hook exits silently when it is not on `PATH`.
+- **Ruled:** fix the existing hook; `pre-commit` stays rejected.
+- **Done:** `work/open/W-276-post-commit-ingest-silent.md` + 🟢🧨 `fux build` row. No `src/`, `node/` or `tests/` touched.
+- **Next:** Claude Code (Sonnet) diagnoses and fixes W-276.
+
+## 2026-10-11 — why set-6 shows no section gain (chat only)  ·  Cowork (Opus 5.5)
+- **Asked:** Arpit: set-6-claude does not look good — sections should have improved ranking; why?
+- **Answered:** the baseline is strong (79/99 hit@1); only ~2 short competitors per long doc, so few section questions face a rival; the gain-only term scores the whole doc at the SECTION average length (`rank._section_gain`, `b4d961cd`), so any long doc gets a length-relief bonus, lifting wrong long docs too (section pool +3, other −3). Hypotheses from code + pool counts; no per-question join (L11's named door). Nothing changed.
+- **Next:** unchanged — Arpit rules W-270.
+
+## 2026-10-11 — W-275 filed: research a ranking tuner  ·  Cowork (Opus 5.5)
+- **Asked:** Arpit: explain W-270; how fux differs from section-based RAG; are long docs penalised (yes, lightly: `b = 0.15`); is there a tool to tune these knobs — file a research item; compare `hit@1/5/10` with and without sections.
+- **Done:** `work/open/W-275-ranking-tuner-research.md` + 🟢 `research` row. Comparison read from the filed score files of W-236, W-269, W-270 (counts only) and given in chat; nothing filed, no `src/`, `node/` or `tests/` touched.
+- **Next:** unchanged — Arpit rules W-270. W-275 runs in Cowork (rule 37a).
+
+## 2026-10-11 — W-274 filed: section records become opt-in  ·  Cowork (Opus 5.5)
+- **Asked:** Arpit: index whole documents only by default; sections only when switched on. Then: file it as its own item.
+- **Ruled:** the key lives in `fux.toml [index]` (not tune.toml); named `section_records` because `output.toml`'s `sections` is a display flag.
+- **Done:** `work/open/W-274-section-records-opt-in.md` + 🟢 row. Ratified, not built — no `src/`, `node/` or `tests/` touched.
+- **Next:** Claude Code (Opus) builds W-274 on the section branch.
+
+## 2026-10-11 — W-270 STOP filed (Arpit ran the decider)  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted `decide.py`'s output: *STOP — the slice is 11, below 15*.
+- **Done:** VERDICT filed as his (hash unchanged); SR-SECTIONS STOP banner; run index, registry, IMPLEMENTATION; W-270 kept open with three options, rec. (a) close step 10 as measured. `decision.json` was already in `0727135b`: his run preceded that commit.
+- **Next:** 🔴 Arpit rules (a) / (b) / (c).
+
+## 2026-10-11 — W-270 scored by Arpit; totals filed, no decider run  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted `just golden-score` output (4 arms, n = 110).
+- **Done:** totals filed in the report; scores committed. `sw-0.0` = pre-section (hit@1 79). `sw-2.0` hit@1 79, section pool misses 11 → 8, `other` 9 → 12. `sw-4.0` hit@1 68.
+- 🔴 **The baseline slice is 11, below the frozen floor of 15**: `decide.py` will STOP before reading any arm. The baseline already hits 49 of 60 tagged section questions at rank 1.
+- **Not done:** the decider (this session captured). **Next:** Arpit or a fresh session runs it; then Arpit rules.
+
+## 2026-10-11 — W-273 phase 1 landed; W-270 DoD 3–5 (bar, ladder gen 5, capture)  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement W-273, then W-270"*. Ruled mid-session: `rung-00100` → *keep it at 118 docs* (the seed outgrew it).
+- **Committed first:** the staged Cowork + W-272 pile as its own commit (`17f79e1b`), so W-270's bar could be committed alone.
+- **W-273 phase 1** (`b4d961cd`): SR-SECTIONS d2 amended; `[index] sectionless_formats`; `extract_rules` 5; template comment; a unit test that fails with the list emptied. Gates (`42f9e2d0`): base index byte-identical, G0 0/90, G1 and G3 identical to W-269's; own repo 8.0× → **1.756×** (W-273 expected ~1.9×; the document plane grew).
+- **W-270:** bar frozen alone (`9ab19fc6`) — L13 defaults, slice split read from counts as a range (dry-run on W-269's scores: INCONCLUSIVE, as expected). Ladder gen 5 (`04e717ba`): all frozen, ext a byte-identical subset of gen 4, gen 4 moved to `golden-gen4/`. Capture: G0 0/110 vs `main`, G1 0.982, G3 0 failures. 🔴 **Latency guardrail FAIL: 466 → 794 ms (+328)**, reproducible, 0.38 s/call in `scan._attach_sections` — so no PASS is possible.
+- ⚠ The build predates the bar (L13 d4 says freeze before build code): a re-test of an existing build, by Arpit's ordering; stated in the pre-registration.
+- **Red, known:** the repo's own v7 index (2 unit + 12 Node; W-273 phase 2). Ladder test now green.
+- **Next:** 🔴 Arpit scores W-270; a non-capturing session runs `decide.py`. This session may not.
+
+## 2026-10-11 — W-272 closed: generation 5 moved into `work/golden/`  ·  Claude Code (Opus 5.5)
+- **Asked:** *"checkout set-6-claude-gen5 dir for W-272"*, then *"yes"* to committing it.
+- **Done:** checked the untracked `set-6-claude-gen5/` at the repo root by file name and JSON keys first (no key file; questions `id` + `question` only). Moved seeds 89–112 into `seed/`, appended 24 date rows, moved `set-6-claude.jsonl` into `questions/`, deleted prompt 14 (the `prompts/` directory is now empty, so gone). Sonnet ran DoD 3: all PASS. W-272 archived; W-270 re-balled 🟡 on W-273; the questions README lists sets 5 and 6; the golden README layout no longer names the retired set-1/2/3 files.
+- **Noticed:** seeds 107–112 are superseded predecessors of the six long documents (`superseded_by:`) and sit in `seed/`, not `seed/archive/`. That is the `retired_competitor` shape and was left as authored.
+- ⚠ **Guard hits, twice, nothing opened:** a `find … -prune` and a `grep --exclude-dir` that *named* the key directory were refused by the L11 hooks. Use `git grep` or exact paths instead.
+- **Not committed:** the index already carried the 2026-10-10 Cowork session's uncommitted W-271/W-273/LAW-13 work in the same files (OPEN-WORK, NOW, WORKLOG, IMPLEMENTATION, W-270, and W-272 itself), so this change is left staged for Arpit, not split.
+- 🔴 **Red on purpose, owed to W-270:** `test_golden_ladder_seed` fails on all 8 rungs (24 seed documents absent from every manifest) until W-270 DoD 4 rebuilds the ladder, which L13 says must come after DoD 3 freezes the bar. Also red, and older than this change: `test_own_index_is_current_format` and `test_differential_arm` (the committed index is `fux.index.v7`; the engine writes v8 since `f2a139fd`). Both suites otherwise pass (unit 7 038, e2e 171).
+- **Next:** W-273 phase 1 (🟢, Opus).
+
+## 2026-10-10 — inbox walk: W-271 ruled (option b) and closed  ·  Cowork (Opus 5.5)
+- **Asked:** review the queue's blockers one by one; on W-271, *"Go with the recommendation, next blocker."*
+- **Ruled:** option (b), no section records for `.jsonl`/`.csv`/`.json`; `w236-sections` may go once W-270 starts; on a W-270 FAIL SR-SECTIONS stays `proposed`. **W-273 → 🟢** (phase 1); W-270 now waits on W-272 and W-273 only.
+- **Closed:** W-271 archived with its map row and an IMPLEMENTATION entry (ruling-only, no code).
+- **Found and fixed:** the live archive map still called the retired-records law "L13 / SR-LAW-13" (pre-renumber, broken link) — now L1 / SR-LAW-1. SR-LAWS decision 11 and `test_law_handles.py`'s docstring name the reused-handle exposure.
+- **Not committed;** the tree is still on the W-269 branch.
+
+## 2026-10-10 — section records split: W-272 (test data) and W-273 (implementation) filed  ·  Cowork (Opus 5.5)
+- **Asked:** *"create work items for whatever is needed for sections. Create one work item for implementation and one work item if test data needs to be generated."*
+- **Test data IS needed:** set-5-claude has decided two section mechanisms, so L13 decision 5 forbids a third decision on it. **W-272** (🔴): Arpit runs prompt 14 (moved from W-270 DoD 1–2), commits blocks 1–3, keeps the key; prompt deleted with its data.
+- **W-273** (🔴 via W-271, Opus): phase 1 the build W-271's size ruling asks for, the template comment, gates re-run, the engine handed to W-270; phase 2 the ship path on a PASS (moved from W-271).
+- **W-270** is now the measurement only; **W-271** the rulings only. W-271 no longer carries git state (rule 47).
+- **Not committed;** the tree is still on the W-269 branch.
+
+## 2026-10-10 — law L13 (the standing bar) ratified; W-270 re-based; W-271 filed  ·  Cowork (Opus 5.5)
+- **Asked:** compare W-236 and W-269 with ranking before sections; why W-269 is a FAIL; a pragmatic bar; *"go with the proposed bar … create it as a law SR"*; then whether SR-RS and the law do the same thing (if so, fold SR-RS in); review runs that failed only on a bar; a work item for the sections' next steps.
+- **Landed (uncommitted):** [SR-LAW-13](../records/0015_LAW-13-the-standing-bar.md) — gates · C1 helps the slice by SR-RS d19 at the observed flips · C2 collateral ≤ max(2, 3 %) · C3 net > 0 · guardrails · one decided arm · fresh set. SR-LAWS row + decision 11, L0's law text (`…SR-LAW-13`), `gen-laws.py` LAW_ORDER, `test_law_handles.py` (L0–L13), the gate-unreachable pin, `CLAUDE.md` regenerated, README / docs index / register. SR-RS 10b points at L13.
+- **SR-RS is NOT folded in:** it is the measurement discipline (filing, blind/informed, controls, headroom, the d19 table, tools it owns — 1 644 lines); L13 is only the ship bar and cites it. No duplicate rule.
+- **Review (post-hoc, in W-271):** only W-269 at λ 2.0 failed on the bar alone — INCONCLUSIVE under L13. Every other ranking FAIL fails C1 anyway.
+- **Filed:** W-271 (🔴, size ruling before W-270's bar; ship path; branches). W-270's bar re-based on L13 (its *net ≥ 6* was looser than d19).
+- ⚠ **The tree is on branch `claude/gracious-galileo-aqrg8b`**, which carries unmerged engine code; today's record commits there must reach `main` without it.
+- **Checked:** the record, law, OKF, link, registry, ownership and queue suites pass on a 3.12 venv.
+
+## 2026-10-10 — W-270 filed: re-test the gain-only section term at λ = 2.0 on a new set  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit asked how W-269 was built and scored, whether wins beat losses (yes: 12 / 5 at λ = 2.0, net +7), and whether to ship 2.0. Recommended a re-test first; he agreed: *"Let's have new set of questions"*, Claude-authored in a fresh session, with new long documents.
+- **Done:** [W-270](open/W-270-section-retest-set-6.md) filed with a proposed bar (decided arm `sw-2.0`, `sw-4.0` reported only; net `hit@1` ≥ 6; non-section losses − wins ≤ 2; G2 ≥ 15), to be frozen before the ladder rebuild. [Prompt 14](golden/prompts/14-claude-gen5-section-seed.md) written from SR-WORK-TESTDATA: 6 new long docs, ≥ 12 competitors, ~110 questions `s6c-`, ≥ 60 `step10_section` on new docs only. Inbox row added.
+- **Not done:** the bar is not frozen; W-269's VERDICT is untouched. ⚠ This session read W-269's scores, so under A1 it may not author the set. **Next:** 🔴 Arpit runs prompt 14 in a fresh claude.ai chat.
+
+## 2026-10-10 — W-269 closed: the gain-only section term FAIL (drift), by Arpit's run of the decider  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted his `decide.py` output: clause 2 failed at every λ (drift losses 2 · 4 · 4 · 5), **FAIL — drift**.
+- **Done:** filed as his: [VERDICT](regression/2026-10-10-section-gain-only/VERDICT.md) (decider hash unchanged). SR-SECTIONS (§1 banner, d5) and compare/section-units record both mechanisms; register row; IMPLEMENTATION section + prediction row; W-269 archived; OPEN-WORK row removed; INTERVIEW latest.
+- ⚠ **A red test went in twice:** `f9f1bb02` and `3b6972b8` filed a measured run with no `ANALYSIS.md`, so `test_regression_runs` failed on both commits. This session never ran the suite after filing them. ANALYSIS.md added here. The unit suite now shows only the branch's 2 known v7-index failures.
+- **Noted:** unlike W-236, the pool improved (23 → 13 at 2.0) — descriptive, gates nothing. **Not done:** nothing owed. The branch and any next step are Arpit's.
+
+## 2026-10-10 — W-269 scored by Arpit; totals filed, no decider run  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted his `just golden-score work/regression/2026-10-10-section-gain-only` output (5 arms, n = 90 each).
+- **Done:** totals filed in the [report](regression/2026-10-10-section-gain-only/report.md); scores committed. hit@1 45 · 45 · 46 · 48 · 52; pool reorderable@1 23 · 23 · 21 · 19 · 13; `other` 11 · 12 · 13 · 13 · 15. G2 = 23.
+- **Not done:** the verdict. This session captured the arms, so the bar's item 4 bars it from `decide.py`. **Next:** a session that did not capture (or Arpit) runs it. W-269 → 🟢 `agent`, out of the inbox.
+
+## 2026-10-10 — W-269 DoD 4: the gain-only arms captured; G0, G1, G3 pass  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement w-269"* (DoD 1–3 were done; DoD 4 needed this machine's `fux-lab`).
+- **Done:** frozen hashes re-verified; engine pinned in a detached worktree at `03fbf782`. Base `arms/runs/gain-base` (`doctor --fix` wrote only `section_weight = 0.0`; `ingest --full`; index byte-identical to W-236's `sw-base`). Five `gain-sw-<λ>` copies, `diff -r` = the one line. **G0 PASS** (0/90 + 0/90 against W-236's `sw-0.0`). **G1 PASS** (`g1.json` byte-identical to W-236's). **G3 PASS** (0 failures, 1 481 comparisons per arm, 40 sectionless docs). Rank 1 moved on 4 · 10 · 13 · 24 questions. [report](regression/2026-10-10-section-gain-only/report.md).
+- **Noted:** the `section_weight` comment that `doctor --fix` writes still describes B2. It is template text, owed to any merge.
+- **Not done:** no score, no verdict, by rule. `golden-state` read `locked` throughout. **Next:** 🔴 Arpit runs `just golden-score work/regression/2026-10-10-section-gain-only`; a non-capturing session runs `decide.py`. ⚠ OPEN-WORK, WORKLOG and NOW share hunks with another session's uncommitted W-257 close, so this session commits only its own paths.
+
+## 2026-10-10 — W-257 closed: doc2query, the filter and the tilt all measure no detected change  ·  Claude Code (Opus 5.5)
+- **Asked:** Arpit pasted his `just golden-score work/regression/2026-10-10-enriched-rung` output (7 arms).
+- **Done (a non-capturing session, as rule 6 requires):** ran the frozen `decide.py` and `tilt.py` (sha256 unchanged since `79bc22ea`). G2 36/45, G3 14.9 %. **B-108 NO DETECTED CHANGE** (`unfiltered` vs `none` 6/4, net 8 needed; placebo 1/5). **B-109 NO DETECTED CHANGE** (1/1). **B-110 NO DETECTED TILT** at 25 and 50 (4/1 each). Filed [VERDICT](regression/2026-10-10-enriched-rung/VERDICT.md) + scores. SR-ENRICH d6/d15/d16 rewritten; B-245's second condition met; SR-WORK-TESTDATA T15 + R11 (author had no skill; 0 of 90 tagged for doc2query). W-257 archived.
+- **Not done:** nothing owed on W-257. ⚠ Every claim carries amendment 1's sentence (no skill, one question per chunk) and is `informed`.
+
 ## 2026-10-10 — W-257: placebo STOP ruled → amendment 1 → seven arms captured  ·  Claude Code (Opus 5.5)
 - **Asked:** *"go with the recommended approach"* (the placebo STOP's ruling).
 - **Done:** `placebo.py --per-line` (0/1,000 files off on line count, −1.1 % words; stamps any `skill:`), with tests and SR-RS d15's row. AMENDMENT.md, `decide.py` (B-108/B-109) and `tilt.py` (B-110) were committed together in `79bc22ea`, before any arm was scored. `build_arms.py` built `filtered` (837 removed), `placebo`, `cov-25` (250) and `cov-50` (500). All seven were ingested and run through `golden_run.py` on `a07f9329`. `none` = the 2026-10-09 capture 90/90. Both suites pass.
 - **Committed by another session** (`c739dac1`, at Arpit's *"commit everything"*): report, ANALYSIS, evidence. **Next:** 🔴 Arpit `just golden-score`, then a non-capturing session runs the deciders. ⚠ This entry is uncommitted: WORKLOG holds a Cowork entry that is also uncommitted.
+
+## 2026-10-10 — W-269 DoD 1–3: the gain-only section term, amended, frozen, built  ·  Claude Code (Opus 5.5)
+- **Asked:** *"implement w269"* (after Arpit pushed `main` and `w236-sections`).
+- **Done:** branch `claude/gracious-galileo-aqrg8b` = `f2a139fd` + `main` merged (`81b0989a`, stamp conflicts only). SR-SECTIONS d5 → `G = max(0, max_k S_sec − S_self)` (`113ae3b4`). Pre-registration frozen alone (`4f5504d1`): W-236's bar and decider, λ ∈ {0.25, 0.5, 1.0, 2.0}, G3 by `g3.py`. Build (`03fbf782`): `_section_gain` / `sectionGain`; the accelerator needed no change (ceiling bounds `S_sec ≥ G`; theta never carries the term).
+- **Decided:** G3 compares `rank()`'s term contributions, not the final `score`, because the proximity uplift moves with the rerank window. A gain of zero names no section.
+- **Tests:** three new section tests fail on B2 (16/17) and pass now. Unit: 2 fail, e2e: green, Node: 12 fail — all the branch's own v7-index failures, same set before and after this change.
+- **Not done:** DoD 4 — the corpora are on Arpit's machine, not in this container. **Next:** a session there captures; 🔴 Arpit scores.
 
 ## 2026-10-10 — W-236 explained; W-269 filed (gain-only section term)  ·  Cowork (Opus 5.5)
 - **Asked:** W-236's status, Parts A/B, a review of SR-SECTIONS, W-257's state and how to run it; then why W-236 failed when the literature says passage evidence helps; then *"create a work item for a recommended approach."*

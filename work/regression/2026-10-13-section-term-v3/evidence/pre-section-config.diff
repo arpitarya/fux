@@ -1,0 +1,13 @@
+69,75d68
+< # Rank a long document by its best section too: the section is scored as if it
+< # were a short document of its own (with the document's title), and the
+< # document moves this far toward that score when it is higher. 1 = take the
+< # better of the two; above 1 is refused. A document with one section or none
+< # gains nothing. 0 = OFF, and at 0 the section plane is never read.
+< # UNMEASURED: W-278's pre-registered run decides it.
+< section_weight          = 0.0
+95,98d94
+< # false: whole documents only. true: ingest also writes the section plane,
+< # .fux/index/sections/, which [ranking] section_weight in .fux/tune.toml reads.
+< # Flipping it changes committed bytes: run `fux ingest --full` after.
+< section_records = false

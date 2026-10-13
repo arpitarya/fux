@@ -5,13 +5,13 @@ name: SR-INGEST
 title: SR-INGEST (0106) — how ingest works
 description: "Re-resolve every edge every run; carry unchanged documents' extraction forward. Write only shards whose bytes changed. Skips are reported once, counted by class, and recorded in the committed `.fux/.fuxignore`; deletions honoured, output byte-identical."
 status: accepted
-amended: 2026-10-09
+amended: 2026-10-13
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@f24eaaa00126, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@aff448e57338, node/src/ingest/priors.mjs@d8d4691d7e49]
+owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@03f031d06fcd, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@aff448e57338, node/src/ingest/priors.mjs@d8d4691d7e49]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 0e95aa15d81bfa55d1b74fb6c06040930b22fbf11577ef536c2ac2a154f7d65a
+content_sha: 2d0fbfa880929484e4e27e71c7f6891f0c8e16c4710de6aead3e4809dd772498
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -909,31 +909,109 @@ cost of the closed list is that a consumer must say what is searchable; the cost
 of the open one is that they find out afterwards.
 
 **22. THE COMMITTED REGISTER — one sorted line per document, beside the index**
-(Arpit, 2026-09-20, W-199 D4). *"A log file should be generated of every document
-that is indexed, and because we are maintaining the index we should maintain that
-log file as well — today there is nowhere we document what files and URLs were
-ingested."*
+(Arpit, 2026-09-20, W-199 D4; **the shape ruled 2026-10-13**, Cowork, W-266 →
+W-279: *"s1 + fux register --json"*). *"A log file should be generated of every
+document that is indexed, and because we are maintaining the index we should
+maintain that log file as well — today there is nowhere we document what files
+and URLs were ingested."*
 
-**`.fux/index/REGISTER`**, committed, one line per document in the index:
-`loc` · `sha` · `decoder@version` · `fetcher` (URLs only) · `outcome`.
+**`.fux/index/REGISTER`**, committed, in this shape and no other:
+
+```
+# fux.register.v2	rules=5
+# loc	sha	decoder	[k=v ...]
+CHANGELOG.md	e204170f5723f264be83b66ebdd6a7ee5c1fc9e0	prose
+archive/PLAN-v0.30.md	2e0ef4e71c9f6d31558cf644bbf0da82c0af9b1d	prose	archived=true
+work/regression/2026-08-28-annotator-agreement/evidence/per-query.csv	d8369d3ec03afc0fce1e6aff16cdeb26f8063157	csv@sha:2c37b28e4a9f6292
+https://wiki.example/ops/cold-store	9c1f0b2e7a4d5e6f8091a2b3c4d5e6f708192a3b	html@sha:773b7cb1d9a7be6e	fetch=cdp
+```
+
+- **Line 1, the format line:** `# fux.register.v2`, then `rules=<extract.RULES_VERSION>`,
+  tab-separated, read by key. `rules=` answers *"did the built-in decoder
+  change?"* once, for every bare decoder row, instead of digesting a thousand
+  `prose` rows and churning them all on every fux upgrade. **The rule:** no
+  `@sha:` tail = read by code shipped with fux at that rules version; a `@sha:`
+  tail = read by consumer code in `.fux/decoders/`, at that file's digest
+  (`decoderdigest`, [SR-DECODE](0139_decode.md)).
+- **Line 2, the column header**, kept so a reader knows the spine without the
+  module. **Both `#` lines are part of the bytes** (L4).
+- **Three columns, tab-separated:** `loc` · `sha` · `decoder`. The tab after
+  `loc` is what the whitespace-split sources grammar cannot give: a walked
+  path may carry a space; a sources entry may not
+  ([SR-URL-LIST](0116_url-list.md) decision 8).
+- **The tail:** zero or more `key=value` in the sources-list grammar — no
+  whitespace in a value, no bare flag, **no sentinel: a key is present only
+  when it holds a value.** The key set is **closed, and it is this list:**
+  `archived=true` (the record carries it, from the source entry's declaration —
+  [SR-ARCHIVED-CONTENT](0134_archived-content.md)) · `fetch=<name>` (a URL
+  row; the fetcher stem on its committed line). **Adding a key is a change to
+  this decision**, never a config addition: `constants.toml [register] keys`
+  is its implementation and `register.render` refuses a key outside it.
+  ⚠ `superseded=true` and a section-split key (`sections=<n>`, with or
+  without per-section line starts — **Arpit's pick is pending**, 2026-10-13,
+  and lands only after section records reach `main`) are candidates and are
+  **not keys** until this list says so.
+- **Not on a row, by decision:** `kind` (visible from the `loc`); `mode`
+  (always `extracted`); the fetcher as a *digest* (the name is enough — the
+  file is the consumer's and its digest is the ledger's business); titles or
+  any display text (L3); anything run-shaped — `outcome`, timestamps, run ids
+  (L4, below); anything naming a question, query or reader (L9).
+- **Sorted by `loc`**, trailing newline, **written only when the bytes
+  change**, best-effort: a register that can fail an ingest is worse than one
+  a run behind — `fux doctor` reports the second, nothing can report the first.
+- **A URL row's `decoder` and `fetch=` come from the committed URL list, never
+  from the run.** A networked run knows what fetched each URL and an offline
+  run knows nothing; a row that read the run changed bytes with the *kind* of
+  run that wrote it — the v1 defect: an offline `fux ingest` wrote `prose` and
+  `-` for every carried URL.
 
 🔴 **Bound by [L4](0006_LAW-4-deterministic.md), and that is what makes it
 committable at all.** No wall clock, no run id, no ordering that depends on how
 the walk happened to schedule — **sorted by `loc`**, and byte-identical across
 runs from the same sources. It is derived from the same inputs as the index
-beside it, so it changes exactly when the index changes.
-[`tests/…`](../tests/) asserts two consecutive `fux ingest` runs write it once.
+beside it, so it changes exactly when the index changes — and when the engine's
+extraction rules do, which `rules=` says out loud rather than hides.
 
 🔴 **Bound by [L3](0005_LAW-3-content-never-durable.md): paths and hashes, never
-content.** A `sha` is not content and a `loc` is not a quote.
+content.** A `sha` is not content and a `loc` is not a quote. A tail key that
+carried display text would be a change to this decision, and this decision
+refuses it.
 
 🔴 **NOT bound by [L9](0011_LAW-9-use-record.md), and the distinction is the
 whole reason this file may be committed when W-200's may not.** L9 governs *the
 record of who went looking*; this records **what the corpus is**. A register line
 names a document that exists whether or not anybody ever queried it. ⚠ **It must
-never grow a field that names a question, a query or a reader** — the moment it
-does, it becomes an L9 artifact sitting on a committed path, which is the
-prohibition L9 exists for.
+never grow a field or a key that names a question, a query or a reader** — the
+moment it does, it becomes an L9 artifact sitting on a committed path, which is
+the prohibition L9 exists for.
+
+**The reader parses by the header, never by count.** `loc, sha, decoder, *attrs
+= line.split("\t")`; each attr by `partition("=")`; **an unknown key is kept**,
+so an older engine survives a newer file. A file whose first line is not the v2
+format line — the v1 header `# loc  kind  sha  decoder  fetcher` (2026-09-20 to
+2026-10-13), or anything else — is **old format**: never read as rows, named by
+`fux doctor` (22c), rewritten by the next `fux ingest`. **The migration is one
+ingest per consumer repository**, *Changed* and not *Breaking*: nothing a
+consumer runs reads the file.
+
+⚠ **v1 (2026-09-20 → 2026-10-13), and what was wrong with it.** This decision
+named the columns `loc · sha · decoder@version · fetcher · outcome`; the file
+carried `loc · kind · sha · decoder · fetcher`, with `outcome` refused for L4
+by the module's docstring alone and `kind` put in its place — **the record and
+the code disagreed while both looked correct**, which is L0's restatement test
+failing inside the record's own text. Measured on this repository (2 363 rows,
+2026-10-13): `kind` said `file` on every row, `fetcher` said `-` on every row,
+the reader was positional (one added column read as *no register*), there was
+no format marker, and `archived=true` — declared on the `archive` entry, 605
+rows — was absent. The shapes weighed and refused (S2 grouped by source entry,
+JSONL, TOML/YAML, Markdown/CSV, an indented tree, two committed files) are in
+[W-266](../archive/open/W-266-register-structure.md).
+
+[`tests/ingest/test_register.py`](../tests/ingest/test_register.py) asserts two
+consecutive `fux ingest` runs write it once, the shape, the closed key set, the
+reader's three states and the verb's rows;
+[`tests_e2e/test_register_verb.py`](../tests_e2e/test_register_verb.py) the verb
+and doctor's three states through the real CLI.
 
 **22a. It is not W-200's ledger, and they are not redundant.**
 
@@ -950,10 +1028,37 @@ register alone, because the register describes the index and the document is not
 in it.
 
 **22b. `fux doctor` compares the two planes and reports drift.** A document in
-the index with no register line, or a register line naming a document the index
-does not hold, means **the register was committed from a different ingest than
-the index beside it** — the one thing a committed derived file can get wrong, and
-the one thing nobody reads closely enough to catch by eye.
+the index with no register line, a register line naming a document the index
+does not hold, **a line whose `sha` is not the record's, or a `rules=` that is
+not this engine's** (since W-279), means **the register was committed from a
+different ingest than the index beside it** — the one thing a committed derived
+file can get wrong, and the one thing nobody reads closely enough to catch by
+eye.
+
+**22c. `fux doctor`'s `register` row names three states** (W-279, 2026-10-13),
+all `warn`, because the register describes the index and does not gate it:
+*missing* — no file: `no REGISTER beside the index - fux ingest writes one`
+(⚠ it no longer counts the index's documents, which was a number about the
+wrong thing); *old format* — a file without the v2 format line, named as such
+with the rewrite named; *drift* — 22b. The row's level and subject are
+[SR-DOCTOR](0152_doctor.md)'s register.
+
+**22d. `fux register [--json]` — the machine's view, derived, never committed**
+(Arpit, 2026-10-13). Read-only, offline, no lock, no index write. It prints the
+rows **from the index** — the records, the decoder digest table and the
+committed URL list — through the one function `fux ingest` writes the file
+with (`register.rows_for`), so the file and the verb cannot disagree. The
+default output is the file's bytes exactly, so `fux register | diff -
+.fux/index/REGISTER` is the drift check by hand. `--json` is JSONL, one object
+per document: `loc`, `sha`, `decoder {name, digest}` (`digest` is `null` for a
+decoder shipped with fux — what `rules` dates), `rules`, then every tail key by
+name (`archived: true`, `fetch: "cdp"`). **Why a verb and not a second
+committed file:** the machine's register already exists — it is the index
+record (`loc`, `sha`, `src`, `archived`, `nsec`) — so a committed JSON copy
+would be a subset of the shards beside it, with its own drift. Not an L9
+artifact: it names documents, never a question; it takes no `--since` and no
+reader. The verb's flags, placement and exit codes are
+[SR-CLI](0101_cli-surface.md) decision 18's.
 
 **2026-09-21 — `src/fux/ingest/` moved under this record and nothing it decides
 did.**
@@ -1030,6 +1135,11 @@ descent before listing it, and records it once as `dir/`.
 **No decision here moved** (W-248, 2026-10-04): `ingest/queue.py` gained `model_needed` and `no_decoder`, the readers that classify a row by its reason.
 
 **No decision here moved** (W-261, 2026-10-05): the URL branch of `ingest/run.py` moved to `ingest/urlingest.py` (SR-URL-INGEST's) and the `dirs`-list readers of `ingest/gitdir.py` to `ingest/dirlist.py` (SR-DIR-LIST's). The walk calls both at the same points, and its output is byte-identical. Node's `ingest/gitdir.mjs` lost `archivedDirs` to `ingest/dirlist.mjs` and is narrowed to `is_archived_loc`.
+
+**W-274, 2026-10-11 — the section plane is opt-in.** Ingest builds section records only under `fux.toml [index] section_records = true`. A delta run whose committed index was built in the other mode refuses and names `fux ingest --full`. The last run's mode is one more line in `runtime/extract-config-digest`, so the first run after this change re-extracts once. The rule is SR-SECTIONS decision 11's.
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** Ingest hands each record its section records (`_section_records`, hashed through the run's tracker) and `write_index` writes the plane. A **carried** document, `file:` or `url:`, keeps its prior section lines byte for byte, read once per run by `store.read_sections` ([SR-SECTIONS](0161_sections.md) decision 8). A foreign index has none to carry.
 
 ### Consequences
 

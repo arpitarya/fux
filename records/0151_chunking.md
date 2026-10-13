@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-09-06
 feature: chunking — the strategy vocabulary, the boundary ladder, and the retrieval/citation split
-owns: [src/fux/refer/_chunk.py@a22e14a13f31, node/src/refer/chunk.mjs@18fa6e55bc11]
+owns: [src/fux/refer/_chunk.py@544a2fd79bfc, node/src/refer/chunk.mjs@696feef53cdb]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 7fd0bcf53fe0a531c62a107a680299f59af9e6ea1febe208a5df8b333f6919b0
+content_sha: 0c18ddc087321bfda7bb5b08221837a14fecf35a038069a1fe6116f2ac1f70fe
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -226,6 +226,9 @@ until it is measured this stays a proposal. The harness in
 `fux-lab/2026-09-06-csv-chunk-granularity/` discriminates it as one new arm.
 
 **The chunker holds no numeral**: section tuples are unpacked, "fewer than two" is `<= 1`, a paragraph break costs `len("\n\n")`, and a pipe table's minimum — header, delimiter, one row — is `constants.toml [markdown] min_table_lines` in both planes. Every passage is unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
+
+
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `index_sections` sits beside `_fold`: the **index's** section rule ([SR-SECTIONS](0161_sections.md) decision 2). It uses the same grammar and the same `_sections`, and one different fold test, *bodiless* instead of *shorter than `min_passage_bytes`*, because a committed byte may not follow a tunable. Passages are unchanged.
 
 ### Consequences
 
