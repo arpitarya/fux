@@ -4,7 +4,7 @@ name: W-278
 description: "Arpit's ruling (2026-10-11, Cowork): the section term's third form — the best section scored AS A STANDALONE DOCUMENT (document average length, its parent's title/path/ctx folded in) and combined by max, λ ≤ 1 — replacing both the section-average yardstick and the concentration gate; with the latency fix the L13 guardrail needs; measured on set-7-claude (W-277, R10 re-amended) under one pre-registered decided arm."
 item: W-278
 filed: 2026-10-11
-ball: agent
+ball: arpit
 ---
 
 # W-278 — section term v3: the best section scored as a document, combined by max
@@ -120,7 +120,7 @@ S(d)  = ( S_doc(d) + λ · G(d) ) · w(d)          with 0 < λ ≤ 1
 | 3 · build | the form above on [W-273](W-273-section-records-implementation.md)'s branch, Python and Node (differential law), the accelerator bound re-checked; off = byte-identical (G0). Gates as W-270: G0, G1, G3, plus **G4 (a construction check, no key): no document's section contribution exceeds its best section's `S_sec*`**, and **G5 (descriptive, no key): the length distribution of incoming rank-1 documents against the baseline's**, the diagnostic above, so a length-driven arm is visible before any score | ✅ 2026-10-13: `rank._section_gain` and `rank.mjs` (third form); the scan's runtime route + committed fallback on both readers (`fresh.mjs` split out of `accel.mjs`, the bundle refuses a cycle); `section_weight` bounded by `_fraction`; G4 and G5 written ([`g4.py`](../regression/2026-10-13-section-term-v3/evidence/g4.py), [`g5.py`](../regression/2026-10-13-section-term-v3/evidence/g5.py)); the gates run in DoD 5 |
 | 4 · the bar, frozen and committed alone | L13 shape, on `set-7-claude` at the generation-6 ladder (W-277). **One decided arm, named before any number: `sw-1.0` (pure max)**; `sw-0.5` (Callan's interpolation) reported only; no arm above 1.0 | ✅ 2026-10-13: [PRE-REGISTRATION](../regression/2026-10-13-section-term-v3/PRE-REGISTRATION.md), engine **`08ef6293`**, committed before the gen-6 ladder exists; C2's margin is L13's default from the slice size |
 | 5 · capture | baseline (sections off), the decided arm, the reported arm | ✅ 2026-10-13: gen-6 ladder ([rebuild](../regression/2026-10-13-ladder-gen6-rebuild/report.md)); three arms + the pre-section engine captured ([report](../regression/2026-10-13-section-term-v3/report.md)); G0, G1, G3, G4 PASS; latency +49.5 ms PASS; rank 1 moved on 7 of 165 at `sw-1.0` |
-| 6 · 🔴 Arpit scores; a session that did not capture runs the frozen decider | PASS → W-273 phase 2 ships `section_weight = 1.0`; FAIL → step 10 closes on three mechanisms; INCONCLUSIVE → Arpit | 🟡 scored by Arpit 2026-10-13 ([scores](../regression/2026-10-13-section-term-v3/scores/)); **decider owed, by a session that did not capture** |
+| 6 · 🔴 Arpit scores; a session that did not capture runs the frozen decider | PASS → W-273 phase 2 ships `section_weight = 1.0`; FAIL → step 10 closes on three mechanisms; INCONCLUSIVE → Arpit | 🔴 **INCONCLUSIVE** 2026-10-13, decider run by Arpit ([VERDICT](../regression/2026-10-13-section-term-v3/VERDICT.md)): 0 losses, +6 `hit@1`, slice 5 of 24 below SR-RS d19's floor. **Arpit's ruling owed** |
 
 **Optional, decides nothing:** a report-only rehearsal on `set-6-claude` (L13:
 a set on which a mechanism was decided may report another, never decide it) to

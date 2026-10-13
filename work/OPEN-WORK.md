@@ -27,6 +27,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 3d |
 | ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-278** — the section term is **INCONCLUSIVE**: 0 losses anywhere, whole set +6, but the slice won 5 of 24, one short of the floor. Rule: ship `section_weight = 1.0` · re-test on a fresh set · close step 10. Rec. ship. [verdict](regression/2026-10-13-section-term-v3/VERDICT.md) | 2026-10-13 | 0d |
+| ↳ **blocks:** W-273 phase 2 | | |
 
 ---
 
@@ -35,7 +37,7 @@ here. Read that record before changing anything below it.
 ### fux build
 
 - 🟡 **W-273** · `agent` — section records build. **Phase 1 ✅ 2026-10-11** (engine `b4d961cd`: no sections for `.jsonl`/`.csv`/`.json`; gates PASS). Phase 2, the ship path, waits on W-278 (a PASS). **Opus.** [detail](open/W-273-section-records-implementation.md)
-- 🟢 **W-278** · `agent` — section term v3. **DoD 1–5 ✅; scored by Arpit 2026-10-13.** 🔴 **The decider is owed by a session that did NOT capture** (the 2026-10-13 Opus 5.5 session built engine, bar, ladder and capture): run `python3 work/regression/2026-10-13-section-term-v3/evidence/decide.py`, file `VERDICT.md`, and route PASS → W-273 phase 2, FAIL → close step 10, INCONCLUSIVE → Arpit. **Opus.** [detail](open/W-278-section-term-v3.md)
+- 🔴 **W-278** · `arpit` — section term v3. **INCONCLUSIVE 2026-10-13** (decider run by Arpit): 0 losses, +6 hit@1, slice 5/24 below d19's floor. Waits on his ruling. [verdict](regression/2026-10-13-section-term-v3/VERDICT.md)
 
 ### testing
 
