@@ -5,13 +5,14 @@ name: SR-NODE-SEARCH
 title: "SR-NODE-SEARCH (0153) — the Node read plane: one index, two readers, three arms"
 description: "Why a Node reader exists, what it may and may not do, and the decisions that keep it from becoming a second product: the _format version policy, the never-fetch rule, the url: verdict asymmetry, the shared tool-description file, and the three places where Node is deliberately a SUBSET of Python rather than a copy — the derived graph plane, the accelerator label, and the decoder boundary. Decisions 13-16 carry the SHIPPING shape, ruled AND BUILT on 2026-09-12: the consumer gets a published artefact rather than source, the bundle is built at publish time into both registries, a monorepo is auto-detected and wired up, and the .fux/fux shim resolves the binary across five package managers."
 status: accepted
+amended: 2026-10-13
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@45aed3cb3ad4, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@b2b431e2ee1a, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 0594348802ee39397d92c7d51c4d7bfcd947ac38de1a8381cf34553cb357a197
+content_sha: 28efb789d73b51ac622f76fb2900f4b666e3c008834c4c98dfd258de15ffce69
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1075,6 +1076,8 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
 **W-236 — section records (2026-10-10; branch `w236-sections`, unmerged).** The Node reader transcribes the whole plane: `section_weight` in `config/tune.mjs`, `Scoring.section`, the B2 term and `bestSection` in `rank.mjs`, the section pass in `scan.mjs`, and in the accelerator the section table, the postings, the widened ceiling and `isFresh` over section shards. The Node build writes `sections.json`, `sections/*.json` and `nsec` byte-identically to Python's. `fux lexical` forces the weight to `0.0`. The `section` hit key appears on `ask` only while the weight is on. `tests/query/test_sections_node_twin.py` holds Python and Node equal at `0.0`, `0.25` and `1.0`, on scan and `--fast` ([SR-SECTIONS](0161_sections.md)).
 
 **W-269 — gain-only (2026-10-10; on a branch from `w236-sections`, unmerged).** `bestSection` became `sectionGain` in `rank.mjs`, transcribing `rank.py::_section_gain`: the best section's score minus the document scored as one unit, floored at zero, and zero without arithmetic for a sectionless document ([SR-SECTIONS](0161_sections.md) decision 5). Nothing else in the Node reader moved. The twin test holds the two readers equal as before.
+
+**No decision here moved** (W-279, 2026-10-13): `doctor.py`'s `register` row and the `.fux/README.md` template changed; `node/src/config/output.mjs` declares the Python-only `register` verb so `[cli.json] register` validates on both readers. The Node reader does not read the register and gains no verb. The register's shape is [SR-INGEST](0106_ingest.md) decision 22's.
 
 ### Consequences
 

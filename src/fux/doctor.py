@@ -1213,30 +1213,45 @@ def _register(root: Path) -> Check:
     from .store import reader as reader_mod
 
     name = "register"
-    rows = register_mod.read(root)
+    reg = register_mod.read(root)
     try:
         index = reader_mod.read_index(root)
     except Exception:  # pragma: no cover - no readable index is other rows' business
         return Check(name, True, "skipped (no readable index)", level="warn")
     if not index:
         return Check(name, True, "no index to describe", level="warn")
-    if not rows:
+    # Three states, named (SR-INGEST decision 22c): missing, old format, drift.
+    if reg.state == "missing":
         return Check(
             name, False,
-            f"no {register_mod.NAME} beside an index of {len(index)} document(s) - "
-            f"run `fux ingest` to write one",
+            f"no {register_mod.NAME} beside the index - `fux ingest` writes one",
             level="warn",
         )
-    locs = {r.get("loc", "") for r in index.values()}
-    missing = sorted(locs - set(rows))
-    extra = sorted(set(rows) - locs)
-    if not missing and not extra:
-        return Check(name, True, f"{len(rows)} line(s), agreeing with the index")
+    if reg.state == "old":
+        return Check(
+            name, False,
+            f"{register_mod.NAME} is in the old format (`{register_mod.HEADER_V1.lstrip('# ')}`) - "
+            f"`fux ingest` rewrites it as {register_mod.FORMAT}",
+            level="warn",
+        )
+    from .ingest.extract import RULES_VERSION
+
+    rows = reg.rows
+    by_loc = {r.get("loc", ""): r for r in index.values()}
+    missing = sorted(by_loc.keys() - rows.keys())
+    extra = sorted(rows.keys() - by_loc.keys())
+    moved = sorted(loc for loc in rows.keys() & by_loc.keys() if rows[loc].sha != by_loc[loc].get("sha", ""))
     parts = []
+    if reg.rules != RULES_VERSION:
+        parts.append(f"written at {register_mod.RULES_KEY}={reg.rules}, this fux extracts at {RULES_VERSION}")
     if missing:
         parts.append(f"{len(missing)} indexed document(s) with no register line ({missing[0]})")
     if extra:
         parts.append(f"{len(extra)} register line(s) for nothing in the index ({extra[0]})")
+    if moved:
+        parts.append(f"{len(moved)} register line(s) whose sha disagrees with the index ({moved[0]})")
+    if not parts:
+        return Check(name, True, f"{len(rows)} line(s) ({register_mod.FORMAT}), agreeing with the index")
     return Check(
         name, False,
         "; ".join(parts) + " - the register was committed from a different ingest "

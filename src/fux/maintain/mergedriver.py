@@ -236,15 +236,22 @@ _REGISTER_NAME = fixed("register", "file")
 
 
 def _register_rows(text: str) -> tuple[str, dict[str, str]]:
-    """A register's header line and its rows keyed on `loc` (the first column)."""
-    header = ""
+    """A register's header block and its rows keyed on `loc` (the first column).
+
+    The header is **every leading `#` line**, joined — two of them since the
+    v2 shape (W-279): the format line carrying `rules=`, then the column
+    header. A driver that kept only the first would hand `fux ingest` a file
+    to rewrite on every merge, for no change in the corpus.
+    """
+    head: list[str] = []
     rows: dict[str, str] = {}
     for line in text.splitlines():
         if line.startswith("#"):
-            header = header or line
+            if not rows:
+                head.append(line)
         elif line:
             rows[line.split("\t", 1)[0]] = line
-    return header, rows
+    return "\n".join(head), rows
 
 
 def _merge_register(ancestor: str, ours: str, theirs: str) -> str:
@@ -272,7 +279,9 @@ def _merge_register(ancestor: str, ours: str, theirs: str) -> str:
         if row is not None:
             merged[loc] = row
     body = "\n".join(merged[loc] for loc in sorted(merged))
-    head = our_header or their_header or base_header or "# loc\tkind\tsha\tdecoder\tfetcher"
+    # Ours first: when the two sides were written at different `rules=`, ours
+    # is the engine that will re-ingest; the next ingest settles it either way.
+    head = our_header or their_header or base_header or fixed("register", "header")
     return f"{head}\n{body}\n" if body else f"{head}\n"
 
 

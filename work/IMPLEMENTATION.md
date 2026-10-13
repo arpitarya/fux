@@ -26,6 +26,27 @@ Rules:
 
 ---
 
+## 2026-10-13 — **W-279 closed: the register is `fux.register.v2`, and `fux register [--json]` prints it from the index**
+
+| | |
+|---|---|
+| **ruling** | Arpit, 2026-10-13 (Cowork, closing W-266): *"s1 + fux register --json"* |
+| **records** | [SR-INGEST](../records/0106_ingest.md) **d22 rewritten in place** (the format line, three columns, the closed tail-key list, what stays off a row, the reader's contract, the v1 defect), **22b** widened (a moved `sha`, a foreign `rules=`), **22c** (doctor's three states) and **22d** (the verb) new; [SR-CLI](../records/0101_cli-surface.md) **decision 18** + §1 table + a `fux register` block; [SR-DOCTOR](../records/0152_doctor.md) register row; [SR-MERGE-DRIVER](../records/0130_merge-driver.md) (both header lines); [SR-DOTFUX](../records/0102_fux-directory.md) `index/` row; [SR-CONSTANTS](../records/0159_constants.md) `[register]`; no-decision notes in SR-OUTPUT, SR-INSPECT, SR-SERVE, SR-AGENT-POLICY |
+| **engine** | `ingest/register.py`: `Row(loc, sha, decoder, attrs)`, `render`/`write(rules=)` written only when bytes change, `read` → `Register(state, rules, rows)` by header (`v2` · `old` · `missing`), unknown keys kept, `render` refuses a key outside `[register] keys`; `url_provenance` + `rows_for` resolve a URL row from the committed list (the v1 offline/online byte split closed); `from_index`, `as_json`, `cmd_register`. `run._record_register` calls `rows_for`; `doctor._register` three states; `mergedriver._register_rows` keeps every leading `#` line; `inspect/facts.py`, `inspect/xray.py`, `serve` read `.rows`; `cli.py` registers the verb; `output_config.CLI_VERBS["register"] = ()` |
+| **this repo** | re-ingested: `.fux/index/REGISTER` is v2 (2 371 rows, 606 `archived=true`, no `fetch=` — no URL sources). `fux register` 0.6 s |
+| **guides** | `fux-index` §3 register row, §4b `fux register`, §6 commit list; `fux-usage` routing row; the three vendor copies re-copied |
+| **tests** | `tests/ingest/test_register.py` rewritten (26: byte-identity, written-once, the shape, the closed key set, `archived=true` on exactly the archived entry's documents, a URL row from the list, v1 → *old*, unknown key kept, truncated row, the verb's bytes, `--json` round-trip, the CLI); doctor's three states + moved sha + foreign rules (`test_doctor_fetcher_routes.py`); merge driver's two header lines and a v1 side (`test_mergedriver.py`); `tests/test_cli.py` verb list; `tests_e2e/test_register_verb.py` (4). L12 allowlist: the `-` sentinel entry removed |
+| **open after it** | the section-split tail key — Arpit's pick (`sections=<n>` / per-section line starts), landing with W-273 phase 2; W-273's item file carries it |
+
+## 2026-10-13 — **W-266 closed: the register's shape ruled (S1 + `fux register --json`) → W-279**
+
+| what | evidence |
+|---|---|
+| **research (chat)** | this repo's register, 2 363 rows: `kind` = `file` on every row, `fetcher` = `-` on every row, two decoder grammars, a positional reader that reads a six-column file as *no register*, no format marker, `archived=true` declared and absent; SR-INGEST d22 still names `outcome` (record ≠ code). Shapes rendered on real rows: S1 flat TSV v2, S2 grouped, JSONL, TOML/YAML, Markdown/CSV, an indented tree, two files, no file |
+| **ruling** | Arpit, Cowork: *"s1 + fux register --json"* — one committed human-readable file; the machine's view is a derived verb, never a second committed file |
+| **filed** | [W-279](../archive/open/W-279-register-v2.md) (🟢, Claude Code, Opus): record first (d22 rewritten in place, SR-CLI verb, `constants.toml`), `register.py` by header, doctor's three states, the verb, migration, tests. A section-split tail key is his pending pick, after W-273 phase 2 |
+| **not done** | the build; no `src/`, `node/` or `tests/` touched; the original `work/open/W-266-register-structure.md` owes a `git rm` (archived copy written through file staging) |
+
 ## 2026-10-12 — **W-277 closed: generation 6 placed — seeds 113–182 and `set-7-claude` (165 questions)**
 
 | what | evidence |

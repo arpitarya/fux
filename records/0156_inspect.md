@@ -4,14 +4,14 @@ kind: component
 name: SR-INSPECT
 title: "SR-INSPECT (0156) — `fux inspect`, the index X-ray: six lenses, three flagged checks, a local dictionary that names the hashes, and per-document facts, probes and a diff"
 description: "Arpit asked whether a consumed index is a good index or a bad one. `fux inspect` answers it descriptively: six lenses over the committed shards — boilerplate, findability, length and fields, duplication and templates, analyzer coverage, graph — each printing distributions and named lists, each naming the lever that would change what it found and applying none. Exactly three numbers carry a pass/attention flag and their floors are provisional, measured on the golden ladder and dropped to descriptive if one ever flags a healthy rung. The committed index holds term hashes, so the words come from a gitignored dictionary built by re-tokenising the sources locally; nothing new is committed and nothing is fetched. Since W-220 (2026-09-23) it also computes cached per-document facts, probes each document by its own title and headings (the new findability headline), folds identity, segments, chunks and a worst-first triage, and diffs two reports with edge loss always an alert; fux serve calls the same library."
-amended: 2026-10-09
+amended: 2026-10-13
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@776eab8447d3, .fux/inspect.toml@a2b927adc116]
+owns: [src/fux/inspect@215dbbf4a61a, .fux/inspect.toml@a2b927adc116]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 3e724f4294584d19cfdc7a2838bf465cee89a48b3a2fd82aabf51fb56b102feb
+content_sha: 2356ef58f21e2751c9bbefc572abb6e148de7456cb31e29622a102d51150b7f6
 ratifies: W-169
 ---
 
@@ -530,6 +530,13 @@ evidence (`work/regression/2026-09-14-inspect-floors/`) are unchanged.
   query each, measured at ~0.2 s on this repo's 1 179 documents with the
   accelerator warm, which is four minutes for a diagnostic. `0` asks for it
   explicitly.
+
+**No decision here moved** (W-279, 2026-10-13): the register's shape changed
+under `inspect/facts.py` and `inspect/xray.py` ([SR-INGEST](0106_ingest.md)
+decision 22). `facts._decoders` names a document's decoder from
+`register.read(root).rows`, and the X-ray's `register` block is the v2 row —
+`{sha, decoder, attrs}`, where `attrs` holds the `k=v` tail (`archived`,
+`fetch`) — in place of the retired `kind` and `fetcher` columns.
 
 ### Reference (required)
 

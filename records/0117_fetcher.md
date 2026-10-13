@@ -5,12 +5,13 @@ name: SR-FETCHER
 title: "SR-FETCHER (0117) — the consumer-owned fetcher"
 description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher per URL, declared not detected, returning bytes and a Content-Type — and the word is fetcher because nothing here composes."
 status: accepted
+amended: 2026-10-13
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@88b0a5bf4178]
+owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@b7434dc501dd]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 98cf6dbbf3021937204c7f3865a0d323c81424c2f4b28c5d5eac188889261c43
+content_sha: f25a1ef367874741711dec60aadf96a20439a2693de31cc1f776031b4527e15e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -799,6 +800,8 @@ retention and the refusal check itself: every fetcher gains the counter with no
 line changed in any of them. The decision is
 [SR-REFUSAL](0146_refusals.md) decision 11; the storage is
 [SR-MAINTENANCE](0129_hooks.md)'s `url-state.json`.
+
+**No decision here moved** (W-279, 2026-10-13): `src/fux/templates/agents/` changed: the `fux-index` and `fux-usage` guides teach `fux register` ([SR-AGENT-POLICY](0132_agent-policy.md)). No fetcher template moved. The register's shape is [SR-INGEST](0106_ingest.md) decision 22's.
 
 ### Reference (required)
 

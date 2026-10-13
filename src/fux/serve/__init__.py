@@ -313,8 +313,13 @@ class _Handler(BaseHTTPRequestHandler):
 
         root = self.server.state.root()
         rows = [
-            {"loc": r.loc, "kind": r.kind, "sha": r.sha, "decoder": r.decoder.split("@", 1)[0]}
-            for r in sorted(register.read(root).values(), key=lambda r: r.loc)
+            {
+                "loc": r.loc,
+                "kind": "url" if r.attr("fetch") or r.loc.startswith(("http://", "https://")) else "file",
+                "sha": r.sha,
+                "decoder": r.decoder.split("@", 1)[0],
+            }
+            for r in sorted(register.read(root).rows.values(), key=lambda r: r.loc)
         ]
         self._send_json({"documents": rows, "count": len(rows)})
 

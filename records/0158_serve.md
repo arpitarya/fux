@@ -6,12 +6,12 @@ title: "SR-SERVE (0158) — `fux serve`, the explorer: a local page that renders
 description: "Arpit's framing, 2026-09-22 — fux is like Google: if the ten documents an agent is handed are the right ten, the answer is mostly right. So the inspection surface is question-first. `fux serve` starts a stdlib server bound to 127.0.0.1 with no --host, serves one self-contained page, and answers GET /ask with the byte-identical stdout of `fux ask --json --why --band`. The page is a RENDERER: it computes no score, no band and no rank, because a second ranker in a browser is a restatement in the L0 sense. Every lever it prints is a proposal; no route writes a committed byte. Since W-220 (2026-09-23) the page has tabs — Ask, Answer (2026-09-27: the one passage `fux answer --json --band` would cite, byte-identical too), Documents, Words (2026-09-27: the vocabulary, a question as the analyzer reads it, where a term lives), Index — and the server calls fux.inspect in-process for the last two, on demand and cached under .fux/runtime/inspect/; the browser still computes nothing."
 status: accepted
 date: 2026-09-22
-amended: 2026-10-04
+amended: 2026-10-13
 feature: the explorer — a local page over the real ask
-owns: [src/fux/serve@f307aa0daa79]
+owns: [src/fux/serve@fc16117d376d]
 laws: [L2, L3, L5, L6, L9, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: 7644d6335725e6f312390e823a45aca2c5ea77d526308445997b3a80720719bf
+content_sha: c97dfa521cbcaf8237d2f8b2228b0ae49af76efa0da785b849c22555a943fb9b
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
@@ -128,7 +128,7 @@ special-case.
 | `/answer?q=…[&no_refer=1]` | `fux answer --json --band [--no-refer]` — the Answer tab (2026-09-27) |
 | `/graph?seed=…` | `fux graph --seed … --json` |
 | `/health` | version, index schema id, analyzer version, bind address |
-| `/inspect/documents` | the rows of `.fux/index/REGISTER` (decision 15) |
+| `/inspect/documents` | the rows of `.fux/index/REGISTER` (decision 15); `kind` is derived from the v2 row — `url` when it carries `fetch=` or an `http(s)://` loc, else `file` (W-279) |
 | `/inspect/document?loc=…` | one document's X-ray — [SR-INSPECT](0156_inspect.md) decision 20 |
 | `/inspect/document/probes?loc=…` | that document's own probes — SR-INSPECT decision 19 |
 | `/inspect/index` | the corpus report **without** probes, as a job with progress |
@@ -359,6 +359,11 @@ this moved where they are written, not what they are.
 | **Bind `0.0.0.0` behind a `--host` flag** | it makes the fence a preference. A person who needs this off-machine needs a different tool with a different record |
 | **An *apply this lever* button** | every lever is a committed change. A page that edits is no longer an inspection tool, and the one-click version of `fux correct --pin` is the version nobody reviews |
 | **A one-number *page quality score*** | SR-INSPECT refused the same thing for the same reason: it becomes the figure everybody quotes and nobody can act on |
+
+**No decision here moved** (W-279, 2026-10-13): the register lost its `kind`
+and `fetcher` columns ([SR-INGEST](0106_ingest.md) decision 22). The Documents
+tab's `/inspect/documents` keeps its `kind` field by deriving it from the row,
+and the X-ray's `url` badge reads the row's `fetch=` key instead of `kind`.
 
 ### Reference (required)
 

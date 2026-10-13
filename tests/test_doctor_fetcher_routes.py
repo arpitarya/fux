@@ -143,8 +143,7 @@ def test_the_register_row_is_quiet_with_no_index(tmp_path):
     assert _row(root, "register").ok
 
 
-def test_the_register_row_reports_drift_against_the_index(tmp_path):
-    from fux.ingest import register
+def _register_repo(tmp_path):
     from fux.ingest.run import run
 
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
@@ -157,12 +156,70 @@ def test_the_register_row_reports_drift_against_the_index(tmp_path):
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     (tmp_path / ".git").mkdir()
     run(tmp_path, refresh_urls=False, full=False)
-    assert _row(tmp_path, "register").ok
+    return tmp_path
+
+
+def test_the_register_row_reports_drift_against_the_index(tmp_path):
+    from fux.ingest import register
+    from fux.ingest.extract import RULES_VERSION
+
+    root = _register_repo(tmp_path)
+    assert _row(root, "register").ok
 
     # A register committed from a different ingest than the index beside it —
     # the one thing a committed derived file can get wrong, and the one nobody
     # catches by eye.
-    register.write(tmp_path, [register.Row(loc="gone.md", kind="file", sha="s", decoder="d")])
-    row = _row(tmp_path, "register")
+    register.write(root, [register.Row(loc="gone.md", sha="s", decoder="d")], rules=RULES_VERSION)
+    row = _row(root, "register")
     assert not row.ok and row.level == "warn"
     assert "gone.md" in row.detail and "docs/a.md" in row.detail
+
+
+def test_the_register_row_names_a_sha_that_moved(tmp_path):
+    from fux.ingest import register
+    from fux.ingest.extract import RULES_VERSION
+
+    root = _register_repo(tmp_path)
+    rows = list(register.read(root).rows.values())
+    stale = [register.Row(loc=r.loc, sha="0" * 40, decoder=r.decoder, attrs=r.attrs) for r in rows]
+    register.write(root, stale, rules=RULES_VERSION)
+    row = _row(root, "register")
+    assert not row.ok and "sha disagrees" in row.detail
+
+
+def test_the_register_row_names_a_rules_version_that_moved(tmp_path):
+    from fux.ingest import register
+    from fux.ingest.extract import RULES_VERSION
+
+    root = _register_repo(tmp_path)
+    rows = list(register.read(root).rows.values())
+    register.write(root, rows, rules=RULES_VERSION + 1)
+    row = _row(root, "register")
+    assert not row.ok and f"rules={RULES_VERSION + 1}" in row.detail
+
+
+def test_the_register_row_says_OLD_FORMAT_for_a_v1_file_not_missing(tmp_path):
+    """SR-INGEST decision 22c: the three states are named. A v1 file used to
+    read as *no register beside an index of N documents* — the wrong message
+    for a file that is right there."""
+    from fux.ingest import register
+
+    root = _register_repo(tmp_path)
+    register.path_for(root).write_text(
+        f"{register.HEADER_V1}\ndocs/a.md\tfile\tabc\tprose\t-\n", encoding="utf-8"
+    )
+    row = _row(root, "register")
+    assert not row.ok and row.level == "warn"
+    assert "old format" in row.detail and "fux.register.v2" in row.detail
+    assert "no REGISTER" not in row.detail
+
+
+def test_the_register_row_says_MISSING_without_counting_documents(tmp_path):
+    from fux.ingest import register
+
+    root = _register_repo(tmp_path)
+    register.path_for(root).unlink()
+    row = _row(root, "register")
+    assert not row.ok and row.level == "warn"
+    assert "no REGISTER beside the index" in row.detail
+    assert "document(s)" not in row.detail

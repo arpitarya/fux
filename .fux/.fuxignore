@@ -127,6 +127,7 @@ work/regression/2026-10-11-ladder-gen5-rebuild/evidence/build.log               
 work/regression/2026-10-11-ladder-gen5-rebuild/evidence/new_seed_name_leaks.out                        # not an indexed file type
 work/regression/2026-10-11-section-retest-set-6/evidence/doctor-fix.diff                               # not an indexed file type
 work/regression/2026-10-11-section-retest-set-6/evidence/pre-section-tune.diff                         # not an indexed file type
+work/regression/2026-10-13-ladder-gen6-rebuild/evidence/build.log                                      # not an indexed file type
 # <<< fux: not indexed <<<
 
 # >>> fux: skipped >>>

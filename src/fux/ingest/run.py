@@ -852,12 +852,7 @@ def run(
     # which decoder produced a record. 🔴 It carries no run id and no clock: two
     # ingests from the same sources write it once (L4), which is what makes a
     # derived file safe to commit.
-    _record_register(
-        root,
-        records=records,
-        url_provenance=url_provenance,
-        decoder_digests=decoder_digests,
-    )
+    _record_register(root, records=records, decoder_digests=decoder_digests)
 
     return IngestReport(
         written_shards=written,
@@ -1367,29 +1362,25 @@ def _record_provenance(
     ingestlog.write(root, rows)
 
 
-def _record_register(
-    root: Path,
-    *,
-    records: list[dict],
-    url_provenance: dict[str, tuple[str, str | None]],
-    decoder_digests: dict[str, str],
-) -> None:
-    """Write `.fux/index/REGISTER` for this index (W-199 D4). **Never raises.**
+def _record_register(root: Path, *, records: list[dict], decoder_digests: dict[str, str]) -> None:
+    """Write `.fux/index/REGISTER` for this index (W-199 D4; shape v2 since
+    W-279). **Never raises on I/O.**
 
     ⚠ **Built from the records, never from the ledger's rows.** The ledger
     carries skips and a `run_seq`, and both are facts about a run; a register
-    derived from it would change bytes when a transient fetch failed. The one
-    thing the two share is `provenance`, so they agree about decoders by
-    construction and about nothing else.
+    derived from it would change bytes when a transient fetch failed.
+
+    ⚠ **A URL row's decoder and fetcher come from the committed list, not from
+    this run** (`register.rows_for`). Until W-279 they came from
+    `url_provenance`, which only a networked run fills — so an offline ingest
+    wrote `prose` and no fetcher for every carried URL, and the file changed
+    bytes with the kind of run that wrote it. The list is what both kinds read.
     """
-    provenance: dict[str, tuple[str, str | None]] = {}
-    for record in records:
-        doc_id = record.get("id", "")
-        if record.get("src") == "url":
-            provenance[doc_id] = url_provenance.get(doc_id, (ingestlog.PROSE, None))
-        else:
-            provenance[doc_id] = (_decoder_for_loc(record.get("loc", ""), decoder_digests), None)
-    register.write(root, register.rows_from(records, provenance))
+    register.write(
+        root,
+        register.rows_for(root, records, decoder_digests),
+        rules=extract_mod.RULES_VERSION,
+    )
 
 
 def _decoder_for_loc(loc: str, digests: dict[str, str]) -> str:

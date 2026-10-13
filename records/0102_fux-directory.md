@@ -5,13 +5,13 @@ name: SR-DOTFUX
 title: SR-DOTFUX (0102) — the .fux/ directory
 description: "Every child of .fux/ is declared committed, derived or acquired; the ignore rule is narrow by construction and asserted by doctor against git itself."
 status: accepted
-amended: 2026-10-11
+amended: 2026-10-13
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@415610845f68, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@43c3c371c374, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@6421326ac75c, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@43c3c371c374, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: e039c46b738fae4d25314590085864a7dac2e4ab341a56946e8008e96ec7023d
+content_sha: 43b7cf0fdb668057d407b9d7d9d238212ce359fee45b097769012caa04c6fa6d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -220,7 +220,7 @@ table is the reasoning.
 
 | entry | kind | what it is, and why that kind |
 |---|---|---|
-| `index/` | committed | the product; nothing can recompute it |
+| `index/` | committed | the product; nothing can recompute it. Beside the shards, **`index/REGISTER`**: one line per indexed document — `loc` ⇥ `sha` ⇥ `decoder` ⇥ optional `k=v` — derived from the index and committed with it, so a PR shows what the corpus is without a reader ([SR-INGEST](0106_ingest.md) decision 22; the `fux register` verb prints the same rows from the index) |
 | `sources/` | committed | `dirs` · `urls`, one entry per line, on the one grammar in [SR-URL-LIST](0116_url-list.md). ⚠ **`types` lived here until 2026-09-11** and is `formats.toml` now (the row below) |
 | `formats.toml` | committed | which files are documents and which decoder reads each extension — `include` plus `[decoders]` ([SR-TYPES](0128_types-list.md) decisions 11–12). **Optional**: absent means the built-in default. Write-if-missing — a repo that already has the file keeps it, bindings and all; a repo with only the old `sources/types` has it **converted** by `fux setup`, never rewritten in place |
 | `fetchers/` | committed | consumer code — decision 4 |

@@ -6,12 +6,12 @@ title: "SR-MERGE-DRIVER (0130) — the committed index merges line by line, last
 description: "The merge driver for .fux/index/*.jsonl. A shard is a header plus one JSON line per document sorted by id, so the union of two line sets is usually the right answer and a textual merge cannot see it. Higher ver wins; four cases are refused with ordinary conflict markers; the output is sorted so two machines produce the same bytes."
 status: accepted
 date: 2026-08-21
-amended: 2026-10-09
+amended: 2026-10-13
 feature: the merge driver for the committed index
-owns: [src/fux/maintain/mergedriver.py@175df3674940]
+owns: [src/fux/maintain/mergedriver.py@b1175af9b955]
 laws: [L2, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: cc0db54ea5be27f5134c3c83bd10b4616fef9ee3a0ff966ea03e06258f71021f
+content_sha: ba79ad7a40563cd11afb13f92adc3d297271c6b929f5eae0424746ec69231f40
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -278,6 +278,17 @@ it the day the register landed.
   unparseable rather than merging it wrongly. `fux hooks` re-registers.
 - **`.gitattributes` gains a second line**, appended write-if-missing per line
   like the first.
+- **The header is every leading `#` line, kept whole** (W-279, 2026-10-13).
+  The v2 register opens with **two** comment lines — the format line carrying
+  `rules=`, then the column header ([SR-INGEST](0106_ingest.md) decision 22) —
+  and the first form of `_register_rows` kept only the first, so a merged
+  register would have lacked its column header and `fux ingest` would have
+  rewritten it after every merge for no change in the corpus. Ours wins the
+  header block when the two sides were written at different `rules=`: ours is
+  the engine that will re-ingest, and the next ingest settles it either way.
+  With no header on any side the driver writes the column header from
+  `constants.toml [register]` alone, which doctor then reports as *old format*.
+  Tripwire: `test_register_keeps_both_header_lines`.
 
 **The merge driver reads git's `%O %A %B [%P]` by unpacking** and exits `constants.toml [exit] usage` on a short argv. The merge itself is unchanged. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 

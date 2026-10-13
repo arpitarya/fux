@@ -136,6 +136,7 @@ edit it, replace it ([SR-DECODE](records/0139_decode.md), [SR-FETCHER](records/0
 | Follow links between docs | `fux explain <doc>` · `fux graph "…"` · `fux path <a> <b>` |
 | Find duplicate, unreachable or boilerplate docs | `fux inspect` |
 | Keep IDs whole (`RF 118` = `RF-118`) | `fux identifiers` |
+| List what is in the index, one line per document | `fux register` (`--json` for scripts) |
 | See it all in a browser | `fux serve` — Ask, Answer, Documents, Words, Index, Identifiers |
 | Check the setup | `fux doctor` (read-only, offline) |
 

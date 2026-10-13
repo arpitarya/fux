@@ -2460,6 +2460,9 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
         <td>Proposes identifier families (<code>RF-{n}</code>) from the index; <code>--write</code> records them in
           <code>.fux/identifiers.toml [detected]</code> so <code>RF 118</code>, <code>rf118</code> and <code>RF-118</code> are one term. An index change: <code>fux ingest</code> after.</td>
         <td><code>--write --json</code></td></tr>
+      <tr><td><code>fux register</code></td>
+          <td>Prints what the index holds, one line per document, <em>from the index</em>: the rows of <code>.fux/index/REGISTER</code> (<code>loc</code>, <code>sha</code>, <code>decoder</code>, a <code>k=v</code> tail such as <code>archived=true</code>). Read-only; <code>--json</code> for scripts; <code>fux register | diff - .fux/index/REGISTER</code> is the drift check by hand.</td>
+          <td><code>--json</code></td></tr>
       <tr><td><code>fux add [entry]</code></td>
         <td>List a directory, a file or a URL — and ingest it. Omit the entry to list everything.</td>
         <td><code>--types --cdp --http --archived --keep --no-keep --no-update --ttl --no-ingest --no-fetch --dry-run</code></td></tr>

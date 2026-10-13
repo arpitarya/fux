@@ -257,7 +257,7 @@ def document(root: Path, view, loc: str) -> dict:
         raise FuxError(f"no indexed document at {loc!r}")
     doc = view.docs[index]
     facts = facts_mod.load_or_compute_one(root, view, doc)
-    reg = register.read(root).get(doc.loc)
+    reg = register.read(root).rows.get(doc.loc)
 
     raw = facts_mod.source_bytes(root, doc.id, doc.loc)
     passage_rows: list[dict] = []
@@ -292,7 +292,7 @@ def document(root: Path, view, loc: str) -> dict:
         "archived": doc.archived,
         "superseded": doc.superseded,
         "register": None if reg is None else {
-            "kind": reg.kind, "sha": reg.sha, "decoder": reg.decoder, "fetcher": reg.fetcher,
+            "sha": reg.sha, "decoder": reg.decoder, "attrs": dict(reg.attrs),
         },
         "ingested": {k: v for k, v in sorted(facts.items()) if k != "key"},
         "indexed": {

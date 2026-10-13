@@ -23,6 +23,34 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-13 — W-279 closed: the register is v2, `fux register [--json]` ships  ·  Claude Code (Fable 5.1)
+- **Asked:** *"implement W-279"*. Triage first: W-258 (9d) and W-268 (3d) wait on Arpit and block nothing; W-279 was the 🟢 item with the ball on the agent.
+- **Shared machine:** a second Claude Code session was mid-W-278 (its `latency.py` ran at 00:41; it committed `08ef6293` and `2ac82d3b` during this session and has shards + the Cowork W-279/W-280 filings **staged**). No whole-suite run started while its measurement was live; the suites here ran after it ended. The whole index plane is committed here, from this session's `fux ingest --no-accelerator`, because a register that disagrees with the shards beside it is the drift doctor reports; its uncommitted `2026-10-13-ladder-gen6-rebuild` folder is left behind.
+- **Record first (L0):** SR-INGEST d22 rewritten in place — the v1 text named `outcome`, a column the file never carried. 22c/22d new; SR-CLI decision 18; eight other records touched because the ownership table says so (each with its note); owns/content hashes restamped on the ten.
+- **Built:** `register.py` v2 (by header, unknown keys kept, closed key set on write, written only when bytes change, URL rows from the committed list); doctor's three states (+ a moved `sha` and a foreign `rules=` are drift); the verb; the merge driver keeps both header lines; three readers I had missed on the first grep (`inspect/facts.py`, `inspect/xray.py`, `serve`) — the second was found by the suite, not by me: a reason to grep for `register.read(` and not for `import register`.
+- **Measured:** `fux register` 0.6 s on 2 371 rows; `archived=true` on 606; no `fetch=` here (no URL sources). doctor on the v1 file: *old format*, as 22c says.
+- **Suites:** unit whole 7 113 pass; the 15 reds are the other session's in-flight W-278 work (8 ladder seeds, its 🟡 W-278 queue row ×3, its uncommitted `2026-10-13-ladder-gen6-rebuild` folder ×4). e2e whole 176 pass, 1 skip. Node 241 pass. A second whole e2e run was **stopped by me** when it shared the machine with the other session's ladder rebuild (load 12); the register, smoke and verb e2e files were rerun alone, 59 pass.
+- **Late fixes the whole suite found:** the `.fux/README.md` template's verb row, the Node `output.mjs` verb table, two broken links, a renumbered record link, and no-decision notes in SR-INDEX-LIFECYCLE, SR-FETCHER, SR-HOOKS, SR-ACQUIRED, SR-ARCHIVED-CONTENT, SR-NODE-SEARCH and SR-PII, which describe files this change touched.
+- **Owed by hand, done:** `git rm work/open/W-266-register-structure.md`.
+- **Open after it:** the section-split tail key — Arpit's pick, with W-273 phase 2 (noted in W-273's item file). Nothing on the inbox: nothing waits on it yet.
+- **Next:** Claude Code (Opus) W-278; Arpit picks the section-split register key.
+
+## 2026-10-13 — W-280 filed: research the intent cue lexicon  ·  Claude Code (Fable 5.1)
+- **Asked:** what could be improved in `constants.toml` `[intent]`/`[analyzer]`; then *"improve intent"*; then whether to improve the table; then *"create a research work item for this"*.
+- **Found (question texts only, no answer read):** the lexicon tags 36 of 693 released questions, 0 on sets 5 and 6; only 19–77 rows per set open with any cue word, so the ceiling is the register, not the regex. A drafted v2 reaches 79, most of it yes/no questions whose doc type is a judgement. Rationale cue is past-tense only (*"what is the reason"* tags reference); `’` and `whats` miss; no lead-in tolerance. Stopwords: checked before stemming (`having` → `have` survives), contractions leave a stray `s` term, do/does/did and should/would absent — each a posting change, not touched.
+- **Advised:** not now — a v2 is a new frozen tag plus an L13 run on sets 5–7 at 6–9 tagged rows each, foreseeably INCONCLUSIVE. Arpit filed it as research instead.
+- **Done:** `work/open/W-280-intent-lexicon-research.md` (🟢, Cowork), its row under `### research`, NOW. No `src/`, `node/`, `tests/` or record touched; nothing committed.
+- **Next:** unchanged — Claude Code (Opus) W-278, then W-279.
+
+## 2026-10-13 — W-266 researched in chat and ruled; W-279 filed  ·  Cowork (Fable 5.1)
+- **Asked:** *"research and suggest W-266 within the chat"*; then whether the register could be something other than TSV, a new format, two files (human + machine); then *"s1 + fux register --json"*; then a section-split key, in chat with examples.
+- **Found:** 2 363 rows — `kind` and `fetcher` constant on every row; `prose` bare vs `name@sha:` for the rest; reader positional (an added column → *no register*); no format marker; `archived=true` declared on `archive` (605 rows) and absent; **SR-INGEST d22 names `outcome`, which the file never carried** (L0 restatement, record ≠ code); only reader is `doctor._register`. 51 % of the bytes are repeated path prefixes, 31 % shas.
+- **Shown:** S1 and S2 on real rows; the sources grammar fails on paths with spaces (no quoting, SR-URL-LIST d8); JSONL/TOML/YAML/Markdown/CSV/tree/two-files/no-file each with its cost.
+- **Ruled (Arpit):** S1 + `fux register [--json]` derived from the index, never committed. W-266 closed (archived copy with the ruling; no compare doc, at his word); **W-279** filed 🟢 (Opus). Section-split key: examples given in chat, his pick pending, lands after W-273 phase 2.
+- **Done (file staging; the device shell was wedged, no test run):** W-279, W-266 archived + map row, OPEN-WORK, IMPLEMENTATION, NOW, INTERVIEW. No `src/`, `node/` or `tests/` touched.
+- ⚠ **Owed by hand:** `git rm work/open/W-266-register-structure.md`; the queue/link tests.
+- **Next:** Claude Code (Opus) W-278, then W-279.
+
 ## 2026-10-13 — Arpit chose A: the Cowork filing committed, then the placement  ·  Claude Code (Opus 5.5)
 - **Done:** `1e8c1771` holds the Cowork W-270/W-277/W-278 filing as it was staged, plus the owed `git rm work/open/W-270…`, so prompt 15's re-amended text is in history; `788b44b4` holds the W-277 placement. Follow-up: 4 links still pointed at the removed W-270 file (IMPLEMENTATION ×3, SR-EXTRACTED) and now point at W-278; W-270's verdict got its feature-gate row; the inbox ages were recomputed (9d, 3d).
 - **Unit suite:** 7096 pass. The only red is `test_golden_ladder_seed` ×8, which waits on W-278's generation-6 ladder rebuild.

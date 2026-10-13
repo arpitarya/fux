@@ -5,12 +5,13 @@ name: SR-INDEX-LIFECYCLE
 title: SR-INDEX-LIFECYCLE (0108) — how the index is generated and updated
 description: One canonical encoder, sharded doc-major JSONL, write-if-different; a derived accelerator bound by the differential law and detected stale by per-shard shas.
 status: accepted
+amended: 2026-10-13
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@a8b3ce17c0ec, node/src/store/format.mjs@4fc4a43aafe0, node/src/store/reader.mjs@ea5bf3de3b4d]
+owns: [src/fux/store@edf8e6426075, node/src/store/format.mjs@4fc4a43aafe0, node/src/store/reader.mjs@ea5bf3de3b4d]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 15975445b72e6444e7cbe77c4530794f1aee904d333a80a7362ef77ee58ced5b
+content_sha: 4e7f808a7e9e883ea70065210097601c2d084bdad11c4bb1c0dd71be8d19eaa2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -665,6 +666,8 @@ exactly v5's property set.
   that duplicates another gate is the one that gets loosened first. ⚠ **The meta
   policy was the second guarantee named here** and W-194 deleted it on
   2026-09-20; the rejection rests on the encoder alone now, and still holds.
+
+**No decision here moved** (W-279, 2026-10-13): `store/fuxdir.py` changed two README strings — the `index/` row names `REGISTER`, and the template's **lifecycle** verb row gains `register` ([SR-DOTFUX](0102_fux-directory.md), [SR-CLI](0101_cli-surface.md) decision 18). The register's shape is [SR-INGEST](0106_ingest.md) decision 22's.
 
 ### Reference (required)
 

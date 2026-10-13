@@ -205,8 +205,21 @@ version    = 1
 extensions = [".yaml", ".yml"]
 
 [register]
-file   = "REGISTER"
-header = "# loc\tkind\tsha\tdecoder\tfetcher"
+# The committed register, `.fux/index/REGISTER` -- SR-INGEST decision 22.
+# Shape S1 (Arpit, 2026-10-13, W-279): a format line, a column header, three
+# tab-separated columns and an optional `k=v` tail. Both header lines are
+# part of the bytes (L4). `rules=` on the format line is extract.RULES_VERSION.
+file      = "REGISTER"
+format    = "fux.register.v2"
+rules_key = "rules"
+header    = "# loc\tsha\tdecoder\t[k=v ...]"
+# The closed tail-key set, in the order a row states them. Adding one is a
+# change to SR-INGEST decision 22, never a config addition; the reader keeps
+# a key it does not know so an older engine survives a newer file.
+keys      = ["archived", "fetch"]
+# The v1 column header (2026-09-20 .. 2026-10-13), recognised as *old format*
+# by the reader and `fux doctor`, and never read as rows.
+header_v1 = "# loc\tkind\tsha\tdecoder\tfetcher"
 
 # -- Runtime segments: gitignored, derived, mmap'd (derive/format.py) --------
 

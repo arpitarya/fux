@@ -6,12 +6,12 @@ title: "SR-MAINTENANCE (0129) — the git hooks that keep a committed index in s
 description: "post-commit DEFERS — it writes a dirty list and spawns a detached one-shot re-index; post-merge re-ingests, post-checkout only rebuilds; no hook ever touches the network; every index writer holds one lock; and a resident daemon covers the URLs nobody queries."
 status: accepted
 date: 2026-08-20
-amended: 2026-10-11
+amended: 2026-10-13
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@a124a8ebbf8a, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
+owns: [src/fux/maintain@6832a7b366ee, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 33978a06c2a2abca899fa91c98cbeda954c97030f4ae82025fbad44cf77914ec
+content_sha: b5d131fc3b2db43d325cb7daa46c063278bd42575fc62f52b721c09c073e90b2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -742,6 +742,8 @@ new file — *counters, never clocks*, advisory only, and
 [`skipnotice`](../src/fux/ingest/skipnotice.py) already refused a second
 runtime file for URL facts on the grounds that it would put the answer in two
 places. **An offline run never touches it**, exactly like `observe`.
+
+**No decision here moved** (W-279, 2026-10-13): `maintain/mergedriver.py` keeps every leading `#` line of the register as its header ([SR-MERGE-DRIVER](0130_merge-driver.md)). No hook moved. The register's shape is [SR-INGEST](0106_ingest.md) decision 22's.
 
 ### Reference (required)
 

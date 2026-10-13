@@ -5,13 +5,14 @@ name: SR-DOCTOR
 title: "SR-DOCTOR (0152) — what `fux doctor` checks, and why each row is a warning or an error"
 description: "One record owns the health-check surface. Every check names a cause and never repairs it; warn is the default and error is reserved for a repo a verb will refuse; a check that degrades to `skipped` must name the row that does fail."
 status: accepted
+amended: 2026-10-13
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@68ec7c15e6f3, tests/test_doctor_register_is_complete.py@dff0d535b078]
+owns: [src/fux/doctor.py@ec8bc29b1e3f, tests/test_doctor_register_is_complete.py@dff0d535b078]
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 9017073e43de84aedf8b345eeed0723ea16f6bbd695cfb59c4cceba05b760161
+content_sha: fabeb286577d57b0b421a03c780a01056639cc614fe3710e21c55076dd7ffd98
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -212,7 +213,7 @@ authoritative about the row.**
 | `pinned fetchers` | warn | **`N line(s) pin a fetcher the routes table would now resolve differently`** — the whole cost of [SR-URL-LIST](0116_url-list.md) decision 16, made visible. Every line is a pin, so a route changed later moves nothing; this row is the only thing that tells a consumer their table and their list disagree, and it names the one-line fix per line. 🔴 **It reports and never rewrites** — fux editing the meaning of a committed file is the thing this repo has refused before | [SR-URL-LIST](0116_url-list.md) decision 16 |
 | `url decoders` | **error** | every `decoder=` on every URL line resolves to a module — a built-in, a file in `.fux/decoders/`, or the reserved `prose` ([SR-URL-LIST](0116_url-list.md) decision 17). **The mirror of `fetcher bindings`, for the same reason**: the grammar validates a stem's SHAPE and cannot reach the registry, so `decoder=xlxs` is a legal line naming a module nobody wrote, and without this row it is found by the next person's ingest skipping that document. ⚠ **A consumer module is checked by NAME on disk and never imported** — a decoder whose dependency is missing is [SR-DECODE](0139_decode.md) decision 7's loud ingest failure and not this row's business; it reports that a stem is absent, never that a library is | [SR-URL-LIST](0116_url-list.md) decision 17 |
 | `observed types` | warn | **`M URL(s) whose declared `decoder=` disagrees with the last observed content type`** — the line against the `Content-Type` in `.fux/acquired/`'s manifest. 🔴 **W-200's second provenance finding, which had no field to read until the `decoder=` half of the pipe ruling shipped.** The line wins and the header loses *silently* by design ([SR-FETCHER](0117_fetcher.md) decision 17), so a disagreement is never an error and this row is the only place anybody learns it exists. ⚠ **Both directions are one finding, deliberately**: a page that moved from HTML to a PDF export and a line typed wrong on the day it was added look identical from here, and only its author can tell them apart | [SR-URL-LIST](0116_url-list.md) decision 17 |
-| `register` | warn | `.fux/index/REGISTER` against the ledger plane — a document in the index with no register line, or a register line for a document the index does not hold. **Drift means the register was committed from a different ingest than the index beside it**, which is the one thing a committed derived file can get wrong and the one thing nobody reads it closely enough to notice | [SR-INGEST](0106_ingest.md) decision 22 |
+| `register` | warn | `.fux/index/REGISTER` against the index beside it, in **three named states** (W-279, 2026-10-13): *missing* (no file — `fux ingest` writes one; the message no longer counts the index's documents), *old format* (a file without the `# fux.register.v2` format line — the v1 header — rewritten by the next `fux ingest`), and *drift*: a document in the index with no register line, a line for a document the index does not hold, a line whose `sha` is not the record's, or a `rules=` that is not this engine's. **Drift means the register was committed from a different ingest than the index beside it**, which is the one thing a committed derived file can get wrong and the one thing nobody reads it closely enough to notice | [SR-INGEST](0106_ingest.md) decisions 22b–22c |
 | `fetcher optional functions` | warn | which of `validate()` / `is_rate_limited()` the consumer's fetcher implements — **read as text, never imported** | [SR-FETCHER](0117_fetcher.md) decisions 12–13 |
 | `url sources` | warn | per-URL health from the committed index, **the listed URLs that have never been fetched and so have no record at all** (SR-MAINTENANCE decision 5a's stated cost, built 2026-09-12), the concurrency policy (with every `.fux/fetchers/*.py` declaring `MAX_PARALLEL` above 1 named, read with `ast` and never imported — W-246), and **the `update=never` count with the `keep=false` ones named** — a pinned URL is one `fux ingest` will never go out for again, which is otherwise learnable only by reading every line of the list | [SR-URL-LIST](0116_url-list.md) decisions 14/14b |
 | `section records` | error / warn | **error** when `[ranking] section_weight > 0` and `fux.toml [index] section_records = false` (`ask` refuses then too); **warn** when the key is off and the committed index still holds a section plane (the next delta ingest refuses). Otherwise it reports the mode. **Read-only: names `fux ingest --full`** | [SR-SECTIONS](0161_sections.md) decision 11 |
@@ -530,6 +531,15 @@ this moved where they are written, not what they are.
 | **`no SR affected`** | false. The change updated five records. The hatch is a claim written into git history under a name, and using it for a gate's over-firing is exactly what would make it worthless |
 | **leave `doctor.py` with SR-DOTFUX and accept the over-firing** | what was in force, and it convicted a commit that changed nothing any describer describes. The gate stops being read when it is right for the wrong reason |
 | **one record per check** | fifteen records for one command, each too small to carry an argument, and the shared contract (decisions 3 and 5) would have no home |
+
+**W-279 (2026-10-13) — the `register` row names three states.** The first form
+reported a v1 file (five positional columns, no format line) as *"no REGISTER
+beside an index of 2 363 documents"* — a count about the index in a sentence
+about the register, for a file that was right there. The row now says
+*missing*, *old format* or *drift*, each naming `fux ingest` as the rewrite,
+and drift now also sees a moved `sha` and a foreign `rules=`. Level and subject
+unchanged; the register of rows is unchanged. Tripwire:
+`test_the_register_row_says_OLD_FORMAT_for_a_v1_file_not_missing`.
 
 ### Reference (required)
 

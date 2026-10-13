@@ -6,14 +6,14 @@ title: SR-OUTPUT (0143) — output defaults are configurable, in a third file
 description: "`.fux/output.toml` sets the default SHAPE of every verb's output — and of the MCP surface, which has no flags at all. A third file because it has a third boundary: it changes how a result is shown, never which documents come back."
 status: accepted
 built: 2026-08-28
-amended: 2026-09-30
+amended: 2026-10-13
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@0c8e85b0e95b, src/fux/templates/output.toml.txt@0952128ae0aa, .fux/output.toml@4a3a8465d2e4, node/src/config/output.mjs@fa59be4a8c93]
+owns: [src/fux/output_config.py@5d3b9020433f, src/fux/templates/output.toml.txt@0952128ae0aa, .fux/output.toml@4a3a8465d2e4, node/src/config/output.mjs@a00d8fa88ee8]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 1024f2ed9a234c3a3bd6bb56993731daa440368b01b56d4e7c7b86cfd474f56c
+content_sha: 0f5f01f13d2697f0abd71cb38cb0f6f66e87deec621524a3305e9cb65d5fc5dd
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -783,6 +783,15 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 `runtime` kind's description string, which gained `runtime/inspect/`
 ([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
 **It does not reach this record's claim on that file.**
+
+**No decision moved (W-279, 2026-10-13).** `CLI_VERBS` gained `register: ()`
+— the new read-only verb ([SR-CLI](0101_cli-surface.md) decision 18) resolves
+`--json` through `[cli.json]` and `[cli.json.register]` and has no
+`[cli.register]` key of its own, exactly as `doctor`, `inspect` and `ingest`
+declare theirs. The empty tuple is the declaration that the verb IS shaped by
+this file (W-140 row 14). The Node twin, `node/src/config/output.mjs`, declares
+`register: []` too: the verb is Python-only, and the table is what the file may
+say, so `[cli.json] register = true` validates on both readers.
 
 <!-- L12-NOTE-START -->
 

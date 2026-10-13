@@ -185,7 +185,7 @@ This skill is the router. Load the one that matches the job:
 | exact lines, freshness verdicts, receipts, `fux verify` | `fux-answer` |
 | links, neighbourhoods and routes between documents | `fux-graph` |
 | read a result marked `archived` | the `fux-archived-results` policy |
-| `fux setup`, `fux doctor`, `fux ingest`, `fux build`, what to commit | `fux-index` |
+| `fux setup`, `fux doctor`, `fux ingest`, `fux build`, `fux register`, what to commit | `fux-index` |
 | hooks, the merge driver, the URL daemon, a conflicted index shard | `fux-maintain` |
 | add, remove, archive or refresh what is indexed | `fux-sources` |
 | `fux.toml`, `.fux/tune.toml`, `.fux/output.toml` | `fux-config` |

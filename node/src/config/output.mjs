@@ -76,6 +76,10 @@ export const CLI_VERBS = {
   //: this table is what `.fux/output.toml` may SAY, so a repo whose file
   //: carries `[cli.json] correct = true` must validate on both readers.
   correct: [],
+  //: `register` is PYTHON-ONLY as a verb (W-279: it reads the ingest side's
+  //: decoder digests and URL list) and is declared for `inspect`'s reason: a
+  //: repo whose file carries `[cli.json] register = true` must validate on both.
+  register: [],
   //: PYTHON-ONLY verbs, declared for the reason `ingest` and `inspect` are:
   //: this table is what `.fux/output.toml` may SAY, so a key they own must
   //: validate on both readers (L12 added them, W-225).

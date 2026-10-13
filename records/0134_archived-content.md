@@ -5,12 +5,13 @@ name: SR-ARCHIVED-CONTENT
 title: "SR-ARCHIVED-CONTENT (0134) — what a document declared archived does, once it is indexed"
 description: "A document from a source declared archived=true carries archived: true; ranking is byte-identical at the default weight; a configurable weight may demote it; every verb surfaces the fact; and a response-level disclaimer states what archived means without telling the reader what to conclude."
 status: accepted
+amended: 2026-10-13
 date: 2026-08-22
 feature: what happens once a document is declared archived — the record property, ranking, the marker, and the disclaimer
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 2b324062b38407ffd8bf30c4575e87204c3bcdff66556f74defd5716e7ace9d2
+content_sha: 73d7ab725343be869287322f1706063efdd83d3057a82fe23b67f4a3727c8984
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -603,6 +604,8 @@ $ fux ask "what commands does the fux command line have" --top 8   # shipped beh
 > ([W44-SIGNAL](../work/regression/2026-08-22-archived-signal/VERDICT.md)).
 > The `note:` line would have fixed the *invisible* half. **It does not fix the
 > missing half, and that is what settled it.**
+
+**No decision here moved** (W-279, 2026-10-13): `ingest/run.py` changed only how the register is written. The register now carries `archived=true` on exactly the records that carry it, which this record's declaration puts there; nothing about how `archived` is declared or applied moved. The register's shape is [SR-INGEST](0106_ingest.md) decision 22's.
 
 ### Reference (required)
 

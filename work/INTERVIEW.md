@@ -32,10 +32,31 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-11** (Claude Code, Opus 5.5 — the green items: W-276, W-274).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-13** (Claude Code, Fable 5.1 — W-279 closed; W-278 in flight in another session).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-10-11 (latest) — THE GREEN ITEMS: W-276 ✓ · W-274 ✓
+### 🟡 2026-10-13 (latest) — W-278 BUILT AND ITS BAR FROZEN; DoD 5 (LADDER + CAPTURE) IN FLIGHT
+
+- **Arpit, in this session:** *own-match only* — a section is scored as a short document only if one of the query's terms is in its **own** body or heading; a match through the parent's title/path/ctx alone gains nothing (SR-SECTIONS d5).
+- **Built `08ef6293`** (Claude Code, Opus 5.5): `rank._section_gain` + `rank.mjs` = the third form; `section_weight` ∈ [0, 1] (`_fraction`); `sec_*` stats gone (`fux.runtime.v11`).
+- 🔴 **Latency was the hard part.** A byte-pattern read of the committed section plane still **failed, +190 ms** (25 MB of section shards is as big as the document plane). **The scan now reads sections from the derived plane when the runtime is fresh**, the committed plane otherwise (SR-SECTIONS d7): **+68.6 ms, PASS** at gen-5 `rung-10000`. Cost, named in d7: on the default path the scan and the accelerator share their section source.
+- **Bar frozen `2ac82d3b`**: L13 defaults on `set-7-claude`, decided `sw-1.0`, `sw-0.5` reported; G0/G1/G3/G4, G5 descriptive. Node: `isFresh` moved to `derive/fresh.mjs`, because the bundle refuses the cycle.
+- **Next:** the gen-6 ladder (gen 5 kept at `fux-lab/corpora/golden-gen5/`) → `evidence/capture.sh` → 🔴 Arpit scores → a session that did not capture runs `decide.py`.
+
+
+### 🟢 2026-10-13 — W-279 CLOSED: THE REGISTER IS `fux.register.v2`, AND `fux register [--json]` PRINTS IT FROM THE INDEX
+
+- Built as filed: SR-INGEST d22 rewritten in place (22c the three doctor states, 22d the verb), SR-CLI decision 18, `constants.toml [register]`; `register.py` renders v2 and reads by header (`v2` · `old` · `missing`), keeps a key it does not know and refuses one it does not state; a URL row's decoder and `fetch=` come from the committed list, so an offline and a networked ingest write the same bytes; the merge driver keeps both header lines; the X-ray, explorer and facts read the v2 row. This repository re-ingested (2 371 rows, 606 `archived=true`).
+- **Judgement worth keeping:** three readers of the register were missed by a grep for `import register` and found by the suite — grep for the call (`register.read(`), not the import. The whole index plane was committed with the register, so the two agree at HEAD; the other session's in-flight regression folder was left out.
+- **Open:** the section-split tail key (`sections=<n>` or per-section line starts) is Arpit's pick and lands with W-273 phase 2 — W-273's item file carries it; nothing on the inbox because nothing waits on it yet.
+
+### 🟢 2026-10-13 — W-266 RULED: THE REGISTER BECOMES S1 + `fux register --json` → W-279
+
+- Research in chat on this repo's 2 363-row register: two constant columns, two decoder grammars, a positional reader, no format marker, `archived=true` missing, and SR-INGEST d22 naming a column (`outcome`) the file never carried. Alternatives to TSV weighed (sources grammar — breaks on paths with spaces; JSONL; TOML/YAML; Markdown/CSV; an indented tree; two files; no file).
+- **Arpit:** *"s1 + fux register --json"* — one committed human file (`# fux.register.v2`, `loc` ⇥ `sha` ⇥ `decoder` ⇥ `k=v` tail), the machine's view a derived verb. [W-279](../archive/open/W-279-register-v2.md) filed 🟢 (Opus); W-266 archived. A section-split tail key is his pending pick, after W-273 phase 2.
+- **Owed:** `git rm work/open/W-266-register-structure.md`.
+
+### 🟢 2026-10-11 — THE GREEN ITEMS: W-276 ✓ · W-274 ✓
 
 - **W-276:** the post-commit hook had re-indexed nothing since 2026-10-04: a pyenv shim passed `command -v fux` and exited 127. Hooks now pin the interpreter that installed them and print one line whenever they cannot run. `fux doctor` → `git hooks`. **After moving or rebuilding the venv, run `fux hooks --install`.** The merge driver is still resolved on PATH, and SR-MAINTENANCE d3a names that gap.
 - **W-274:** `fux.toml [index] section_records`, **off by default** (SR-SECTIONS d11). Any section experiment must set it `true` **and** run `fux ingest --full`, because `section_weight > 0` with it off is a hard error. A lab arm built before today has no key and must gain it, or `fux doctor --fix` writes `false`.

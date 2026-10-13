@@ -54,6 +54,8 @@ exist on `main`.
 
 ## Phase 2 — only on a W-278 PASS
 
+**Also lands here (W-279, 2026-10-13):** the register's section-split tail key — `sections=<n>`, with or without per-section line starts — once Arpit picks its form. It is not a key until [SR-INGEST](../../records/0106_ingest.md) decision 22's list says so, and on a repo with `[index] section_records` off it stays absent.
+
 5. Merge `main` into the branch; `_format` → `fux.index.v8`; this repository
    re-ingested with `--full`.
 6. `section_weight = 1.0` in the template (W-278's decided arm, pure max; L13 decision 4). The record refuses a value above 1.0.
