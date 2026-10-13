@@ -71,7 +71,9 @@ intent_weight           = 0.1
 # document moves this far toward that score when it is higher. 1 = take the
 # better of the two; above 1 is refused. A document with one section or none
 # gains nothing. 0 = OFF, and at 0 the section plane is never read.
-# UNMEASURED: W-278's pre-registered run decides it.
+# MEASURED: 1.0, set together with fux.toml [index] section_records = true and
+# `fux ingest --full` (W-278, 2026-10-13). Off by default: the plane about
+# doubles the index. Above 0 with section_records = false is an error.
 section_weight          = 0.0
 
 [graph]                         # explain / graph / path

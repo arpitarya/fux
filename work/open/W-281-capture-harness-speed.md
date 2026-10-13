@@ -53,7 +53,7 @@ And the ladder: **rung-10000 took 43 690 s on 2026-10-13** (rung-05000 took
 
 ## Reference
 
-[W-278](W-278-section-term-v3.md) ·
+[W-278](../../archive/open/W-278-section-term-v3.md) ·
 [`capture.sh`](../regression/2026-10-13-section-term-v3/evidence/capture.sh) ·
 [W-270's capture](../regression/2026-10-11-section-retest-set-6/evidence/capture.sh) ·
 [L13](../../records/0015_LAW-13-the-standing-bar.md)

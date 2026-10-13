@@ -105,21 +105,21 @@ reads as authority.
 
 **Every `kind: component` record owns at least one file, since 2026-10-05**
 ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11's strong rule; Arpit,
-W-251 #16; built by W-261), **with exactly one exemption, by name:**
-[SR-SECTIONS](0161_sections.md), `proposed` and unbuilt, which owns nothing until
-W-236 Part B builds its plane and is kept reachable meanwhile by a `describes`
-row on the chunker's two section functions.
+W-251 #16; built by W-261), **with no exemption since 2026-10-13.**
+[SR-SECTIONS](0161_sections.md) was the one, by name, while it was `proposed`
+and unbuilt; W-278 accepted it and moved its code into `query/sections.py` and
+its Node twin, which it owns.
 [`tests/test_sr_ownership.py`](../tests/test_sr_ownership.py) fails any other
 component record with `owns: []`.
 
-**14 of 94 records carry `owns: []`, and every one of them is stated as such on
+**13 of 94 records carry `owns: []`, and every one of them is stated as such on
 purpose.** Eleven are law records, which is correct — a law governs conduct, not
 components. **Two are `process` records that name their own hole out loud**,
 each in its own decision and never by omission:
 [SR-WORK-SCALE](0057_WORK-scale.md) decision 15 and
 [SR-PORT-LIST](0114_port-list.md), whose subjects are what a sentence may claim
 and where the boundary with the archived engine runs — neither of which a
-checker can grade without grading it wrongly. The fourteenth is SR-SECTIONS.
+checker can grade without grading it wrongly.
 
 **Nine component records gained a file by W-261**, each by **moving** its code
 out of the file that hosted it into one of its own — never by naming an owner
@@ -433,7 +433,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0158](0158_serve.md) | **SR-SERVE** | `fux serve` — the explorer. A stdlib server bound to **`127.0.0.1` with no `--host`** (a contract, not a default) serving ONE self-contained page, and `GET /ask` answering with the **byte-identical stdout of `fux ask --json --why --band`** — because the route runs that command rather than rebuilding its payload. 🔴 **The page computes no score, no band and no rank**: a second ranker in a browser is a restatement in the L0 sense, and the three sample pages this was designed from had one. Lever cards are a rule per condition over the JSON, the two untuned thresholds print the word *provisional* **to the reader**, no route writes anything and `POST` is a 405 with a sentence. Rungs 2–4 (`ask --html`, the per-document findability card, `/docs`) are filed, not built | accepted | yes |
 | [0159](0159_constants.md) | **SR-CONSTANTS** | `src/fux/constants.toml` — the engine's FIXED values (schema ids, format and rules versions, artefact names, decoder versions, and the numbers a format or protocol defines), read by one Python and one Node loader through `fixed(table, key)`. **The Node bundle carries the file inlined** (`@fux-inline`, L10). A missing table or key raises the same sentence in both runtimes; nothing in code supplies a fallback (L12) | accepted | yes |
 | [0160](0160_identifiers.md) | **SR-IDENTIFIERS** | identifier families — `.fux/identifiers.toml` (`[user]` hand-written and winning, `[detected]` written only by `fux identifiers --write`), matched against the text on BOTH readers at ingest and query; each match adds ONE canonical term beside analyzer v3 (`RF 118`, `rf118`, `RF–118` → `rf-118`). Templates by default, a statically guarded `[user]` regex for experts; the effective digest stamped in every shard header. **An empty file is byte-identical to no feature**. Measured PASS (W-233, 2026-09-28) | accepted | yes |
-| [0161](0161_sections.md) | **SR-SECTIONS** | section records (W-168 step 10, ruled U2 · B2 · E1): each heading section of a multi-section document is a committed `doc#s<k>` record in its own plane, `.fux/index/sections/`, cut by a TUNABLE-FREE rule (bodiless headings fold forward; table rows never make a section), with `nsec` on the parent; the best section adds `[ranking] section_weight` × its score inside `rank()`, one result per document, and at `0.0` the plane is never opened. `_format` bump + `ingest --full`. **Measured: about doubles the index** (+98.4 % at rung-10000, 50.4 MB, both commit limits pass). 🔴 **FAILED 2026-10-10 (drift), parked by Arpit** — built on branch `w236-sections`, never merged ([verdict](../work/regression/2026-10-10-section-records/VERDICT.md)). 🔴 **The gain-only term (W-269) FAILED too, 2026-10-10 (drift)**: `λ · max(0, best section − the document as one unit)`; the pool improved but every λ lost rank-1 hits (2 · 4 · 4 · 5) ([verdict](../work/regression/2026-10-10-section-gain-only/VERDICT.md)). Branch `claude/gracious-galileo-aqrg8b`, unmerged | proposed | **no** |
+| [0161](0161_sections.md) | **SR-SECTIONS** | section records (W-168 step 10, U2 · E1): each heading section of a multi-section document is a committed `doc#s<k>` record in its own plane, `.fux/index/sections/`, cut by a TUNABLE-FREE rule, with `nsec` on the parent — **opt-in**, `fux.toml [index] section_records` (W-274). **The term is the third form** (W-278): the best own-matching section scored as a short document on the document yardstick, `S_doc + λ · max(0, S_sec* − S_doc')`, `λ ≤ 1`; one result per document; at `0.0` the plane is never opened. **About doubles the index** (G1: section ÷ document plane 0.987 at rung-10000). Two forms FAILED (W-236, W-269); the third measured **INCONCLUSIVE** (0 losses, +6 `hit@1`, slice 5 of 24) and **Arpit ruled ship, 2026-10-13**: `section_weight = 1.0` with `section_records = true`, both off by default ([verdict](../work/regression/2026-10-13-section-term-v3/VERDICT.md)) | accepted | **yes** |
 | [0002](0002_LAW-0-authority.md) | **SR-LAW-0** | L0 — a rule is stated in exactly one SR and every other artifact links to it; the Law records outrank every other record and a conflicting record is void in the conflicting part; a Law changes only on Arpit's ruling | accepted | yes |
 
 > ## Renumbered again on 2026-09-13 — the quality contract became a WORK record
@@ -678,6 +678,7 @@ table does not grant.
 | `src/fux/query/` | SR-ASK | the scan, unification, and the display-only resolution after it — bound by the differential law |
 | `src/fux/query/find.py` | SR-FIND | the `find` verb — `build_find`, `cmd_find`, its post-filters and the `find` half of the `--json` shape. Carved out of `query/__init__.py`, which keeps the shared ranking and every verb's stderr declarations (W-261, 2026-10-05: every `kind: component` record owns a file) |
 | `src/fux/query/rank.py` | SR-RANKING | the one scorer and the one sort, and `Weighting`, which is where every document multiplier must travel to reach the pruning bound |
+| `src/fux/query/sections.py` | SR-SECTIONS | the scan's section attachment, decision 7: the derived plane when the runtime is fresh, the committed plane by byte pattern otherwise; one result, and no arithmetic (that is `rank()`'s). Moved out of `scan.py` and `accel.py` by W-278 so the record owns its code |
 | `src/fux/query/bm25f.py` | SR-RANKING | BM25F, `Scoring`, and `derive_wlen` — the one place the weighting arithmetic exists |
 | `src/fux/query/analyzer.py` | SR-RANKING | split, lowercase, stopword, stem, hash — in that order, shared by ingest and query |
 | `src/fux/query/stem.py` | SR-RANKING | the Porter implementation, checked against the published test vectors |
@@ -772,6 +773,7 @@ table does not grant.
 | `node/src/query/headings.mjs` | SR-ASK | the Node twin of `src/fux/query/headings.py` — display only, never a score |
 | `node/src/query/intent.mjs` | SR-RANKING | the Node twin of `src/fux/query/intent.py` — ASCII-only case and whitespace, `.` over every character, globs over code points |
 | `node/src/query/rank.mjs` | SR-RANKING | the Node twin of the scorer. **The differential law is the whole point**: one scorer changing without the other is two engines answering differently from one index |
+| `node/src/query/sections.mjs` | SR-SECTIONS | the Node twin of `query/sections.py` (W-278) |
 | `node/src/query/rerank.mjs` | SR-RERANK | the Node twin of `src/fux/query/rerank.py` — the proximity reranker |
 | `node/src/query/run.mjs` | SR-ASK | the shared spine of `ask`, `find` and `answer`. Twin of the pure half of `src/fux/query/__init__.py` |
 | `node/src/query/scan.mjs` | SR-ASK | the Node twin of `src/fux/query/scan.py` — the only candidate path Node has |
@@ -974,6 +976,6 @@ rows narrowed so far were each verified by reading every mention in the file
 | `node/test/config.test.mjs` | SR-OUTPUT | `.fux/output.toml` as the Node reader loads it |
 | `src/fux/refer/_chunk.py::_sections,_title_index,index_sections` | SR-SECTIONS | the index section rule (decision 2) cuts with `_sections`, folds the title `_title_index` names, and is `index_sections` itself (built 2026-10-10 on `w236-sections`); a change to any of them changes what a section record is. Narrowed because the rest of the file (`_fold`, the table bands, the ladder) is passage policy the rule deliberately does not reuse |
 | `src/fux/maintain/mergedriver.py::merge_sections` | SR-SECTIONS | decision 9's merge rule: a parent's sections merge as one unit, and both-sides-changed is refused. Owned by SR-MERGE-DRIVER for the driver; this is the one function whose rule this record states |
-| `src/fux/query/rank.py::_section_gain` | SR-SECTIONS | decision 5's gain-only term, `max(0, max_k S_sec − S_self)`: zero for a sectionless document, the section `avg_wlen`, and the zero-gain rule. Owned by SR-RANKING for `rank()` |
+| `src/fux/query/rank.py::_section_gain` | SR-SECTIONS | decision 5's third form, `max(0, max_k S_sec* − S_doc')`: each own-matching section scored as a short document (its body and heading, the parent's title/path/ctx) on the document `avg_wlen`; zero for a sectionless document; the zero-gain rule. Owned by SR-RANKING for `rank()` |
 <!-- DESCRIBES-TABLE-END -->
 

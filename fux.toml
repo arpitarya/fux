@@ -96,7 +96,8 @@ shards = 256
 git_timeout_s = 120
 
 # false: whole documents only. true: ingest also writes the section plane,
-# .fux/index/sections/, which [ranking] section_weight in .fux/tune.toml reads.
+# .fux/index/sections/, which [ranking] section_weight in .fux/tune.toml reads;
+# set that to 1.0, the measured value (W-278). About doubles the index.
 # Flipping it changes committed bytes: run `fux ingest --full` after.
 section_records = false
 

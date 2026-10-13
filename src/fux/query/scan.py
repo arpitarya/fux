@@ -29,6 +29,7 @@ from .rank import AskResult, Corpus, rank
 from ..store import TF_FIELDS
 from .bm25f import Scoring, derive_wlen
 from . import identifiers as ids_mod
+from . import sections as sections_mod
 from .identifiers import EMPTY, IdentifierRules
 from .tokenize import tokenize
 
@@ -60,10 +61,6 @@ _EDGE_ANCHOR_RE = re.compile(rb'"al":(?P<len>\d+),"at":\{[^}]*\},"dst":"(?P<dst>
 _FLEN_RE = re.compile(rb'"flen":\[([0-9,\s]*)\]')
 
 
-#: W-278 — a section line's id, off the raw bytes. A section line is
-#: canonical JSON with sorted keys (`flen`, `id`, `terms`), so the id is the
-#: first string after `"id":`; an escape in it is decoded by `json`.
-_SEC_ID_RE = re.compile(rb'"id":"((?:[^"\\]|\\.)*)"')
 
 
 def _flen_from_line(line: bytes) -> list[int] | None:
@@ -185,7 +182,7 @@ def scan_candidates(
             candidates.append(record)
 
     if section_on:
-        _attach_sections(root, candidates, query_hashes)
+        sections_mod.attach(root, candidates, query_hashes)
 
     if anchor_on:
         _add_anchor_only_candidates(root, candidates, anchor_tf)
@@ -202,67 +199,6 @@ def scan_candidates(
             total_wlen=derive_wlen(total_flen, scoring, total_anchor_len),
         ),
     )
-
-
-def _attach_sections(root: Path, candidates: list[dict], query_hashes: list[str]) -> None:
-    """Each sectioned candidate's matching sections, as `secs` in `k` order.
-
-    SR-SECTIONS decision 7, as amended by W-278. **From the derived plane when
-    the runtime is fresh** (`derive.accel.attach_sections_by_id`): W-278 DoD 2,
-    because W-270 measured the committed read at +328 ms a query at
-    `rung-10000`, against L13's 100. **From the committed plane otherwise**,
-    below. The two give the same `secs`; `tests/query/test_sections.py` holds
-    them equal.
-    """
-    from ..derive import accel
-
-    if not accel.attach_sections_by_id(root, candidates, query_hashes):
-        _attach_committed_sections(root, candidates, query_hashes)
-
-
-def _attach_committed_sections(root: Path, candidates: list[dict], query_hashes: list[str]) -> None:
-    """The committed-plane read, when no fresh runtime exists.
-
-    Only the section shards that hold a sectioned candidate's sections are
-    read (a section shares its parent's shard number, decision 4). Each query
-    term's `"<hash>":[` entry is found in the shard's bytes directly, so a line
-    that carries no query term is never visited, and one that does yields its
-    id, its `flen` and the query's own `terms` entries by byte position, never
-    a whole-line decode. A section's terms are a subset of its document's
-    (decision 3's totality), so its parent was already a candidate.
-    """
-    by_id = {record["id"]: record for record in candidates if record.get("nsec")}
-    if not by_id:
-        return
-    shards = {store_mod.shard_for(doc_id) for doc_id in by_id}
-    keys = [(h, f'"{h}":['.encode("ascii")) for h in query_hashes]
-    bags: dict[str, list[tuple[int, list[int], dict]]] = {}
-    for path in store_mod.iter_section_paths(root):
-        if path.stem not in shards:
-            continue
-        data = b"\n".join(store_mod.raw_record_lines(path)[1])
-        found: dict[int, dict[str, list[int]]] = {}
-        for h, key in keys:
-            at = data.find(key)
-            while at != -1:
-                start = data.rfind(b"\n", 0, at) + 1
-                open_ = at + len(key)
-                close = data.index(b"]", open_)
-                found.setdefault(start, {})[h] = [int(part) for part in data[open_:close].split(b",")]
-                at = data.find(key, close)
-        for start, hits in found.items():
-            raw = _SEC_ID_RE.search(data, start).group(1)
-            sec_id = json.loads(b'"' + raw + b'"') if b"\\" in raw else raw.decode("utf-8")
-            parent = store_mod.section_parent(sec_id)
-            if parent not in by_id:
-                continue
-            inner = _FLEN_RE.search(data, start).group(1).strip()
-            flen = [int(part) for part in inner.split(b",")] if inner else []
-            terms = {h: hits[h] for h in query_hashes if h in hits}
-            bags.setdefault(parent, []).append((store_mod.reader.section_ordinal(sec_id), flen, terms))
-    for parent, bag in bags.items():
-        bag.sort(key=lambda entry: entry[0])
-        by_id[parent]["secs"] = bag
 
 
 def _fold_out_edges(record: dict, wanted: set[bytes], anchor_tf: dict[str, dict[str, int]]) -> None:

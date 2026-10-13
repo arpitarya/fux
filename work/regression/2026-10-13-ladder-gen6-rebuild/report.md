@@ -11,7 +11,7 @@ filed: 2026-10-13
 
 **Not a paired run.** No arms, no judged queries, no threshold; no question
 was asked of a rung. It is [phase 4](../../golden/README.md) of the golden
-process and [W-278](../../open/W-278-section-term-v3.md)'s DoD 5 step 1. **A
+process and [W-278](../../../archive/open/W-278-section-term-v3.md)'s DoD 5 step 1. **A
 surface capture: no verdict, no per-query rows.** It ran **after** W-278's bar
 was frozen and committed alone (`2ac82d3b`).
 

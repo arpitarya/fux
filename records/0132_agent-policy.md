@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@6ed77bf24bfe]
+owns: [src/fux/templates/agents@35780e5af97d]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 3647563c0a44c46c40d0ec4ed0fdfb377d5cfe4f7b119f88646507814862e820
+content_sha: fdc8f8bd2690ac4a6c14fec7581849db2a201c21fc494745b0ecdd34690eea39
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -808,6 +808,8 @@ The shipped `fux-inspect`, `fux-serve` and `fux-config` skills name identifier f
 **The INDEX and ENRICH skills name the new progress bars** (W-238, 2026-09-29): `doctor` and `identifiers` paint `read`/`detect`, and `enrich --check` paints `check`, all on stderr and silenced by `--no-progress` ([SR-CLI](0101_cli-surface.md) decision 17). One line each, in the templates and in this repo's three installed copies. No policy moved.
 
 **No decision here moved** (W-262 #3, 2026-10-05): the `fux-search` skill template (`SEARCH-SKILL.md`) and the Kiro steering guide name `find --no-archived`, the filter [SR-FIND](0104_find.md) decision 7 gained; the repo's installed copies were refreshed byte-equal.
+
+**No decision here moved** (W-273 phase 2, 2026-10-13): the `fux-config` skill's `section_records` row names `section_weight = 1.0` as the measured value to set with it (W-278, ruled ship as an opt-in pair).
 
 ### Consequences
 

@@ -27,8 +27,6 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 3d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-278** — the section term is **INCONCLUSIVE**: 0 losses anywhere, whole set +6, but the slice won 5 of 24, one short of the floor. Rule: ship `section_weight = 1.0` · re-test on a fresh set · close step 10. Rec. ship. [verdict](regression/2026-10-13-section-term-v3/VERDICT.md) | 2026-10-13 | 0d |
-| ↳ **blocks:** W-273 phase 2 | | |
 
 ---
 
@@ -36,12 +34,11 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟡 **W-273** · `agent` — section records build. **Phase 1 ✅ 2026-10-11** (engine `b4d961cd`: no sections for `.jsonl`/`.csv`/`.json`; gates PASS). Phase 2, the ship path, waits on W-278 (a PASS). **Opus.** [detail](open/W-273-section-records-implementation.md)
-- 🔴 **W-278** · `arpit` — section term v3. **INCONCLUSIVE 2026-10-13** (decider run by Arpit): 0 losses, +6 hit@1, slice 5/24 below d19's floor. Waits on his ruling. [verdict](regression/2026-10-13-section-term-v3/VERDICT.md)
+- 🟢 **W-273** · `agent` — section records. Phases 1–2 ✅ on the branch (W-278 ruled ship, opt-in pair). Owed: the merge to `main` by SR-WORK-RELEASE. **Opus.** [detail](open/W-273-section-records-implementation.md)
 
 ### testing
 
-- 🟢 **W-281** · `agent` — capture and ladder speed: W-278's capture ~45 min, its rung-10000 build stalled 12 h on gpg commit signing. Unsigned ladder commits; G1's 10k ingest and G3's arms in parallel; latency stays standalone; no frozen script edited. **Sonnet.** [detail](open/W-281-capture-harness-speed.md)
+- 🟢 **W-281** · `agent` — capture and ladder speed: unsigned ladder commits (rung-10000 stalled 12 h on gpg); G1 and G3 in parallel; latency stays standalone. **Sonnet.** [detail](open/W-281-capture-harness-speed.md)
 - 🔴 **W-258** · `arpit` — one hands-on session on his machine: a journalled answer whose source then vanishes, a real 429 from a real host, and parallel CDP fetches in signed-in Chrome. Checklist and bars are written. [detail](open/W-258-live-network-captures.md)
 
 ### adr update

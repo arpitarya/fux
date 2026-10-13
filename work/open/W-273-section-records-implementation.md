@@ -9,13 +9,13 @@ ball: agent
 
 # W-273 — section records: the implementation
 
-**Status: OPEN. ✅ Phase 1 landed 2026-10-11** (engine **`b4d961cd`**, [gates](../regression/2026-10-11-section-formats-gates/report.md) all PASS). **🔴 Phase 2 waits on a [W-278](W-278-section-term-v3.md) PASS** (W-270 closed 2026-10-11 on Arpit's ruling: the third form of the term, measured on set 7). W-271 ruled 2026-10-10 (Arpit, Cowork, *"Go with the recommendation"*): **option (b)**.
+**Status: OPEN. ✅ Phase 1 landed 2026-10-11** (engine **`b4d961cd`**, [gates](../regression/2026-10-11-section-formats-gates/report.md) all PASS). **Phase 2 landed on the branch 2026-10-13 after [W-278](../../archive/open/W-278-section-term-v3.md) PASS** (W-270 closed 2026-10-11 on Arpit's ruling: the third form of the term, measured on set 7). W-271 ruled 2026-10-10 (Arpit, Cowork, *"Go with the recommendation"*): **option (b)**.
 
 **Arpit, 2026-10-10 (Cowork):** *"Create one work item for implementation and
 one work item if test data needs to be generated."* The data is
 [W-272](../../archive/open/W-272-section-test-data-gen5.md) and now
 W-277 (closed 2026-10-12); the measurement is
-[W-278](W-278-section-term-v3.md) (W-270 closed 2026-10-11); the rulings were
+[W-278](../../archive/open/W-278-section-term-v3.md) (W-270 closed 2026-10-11); the rulings were
 W-271 (closed 2026-10-10).
 
 **Model:** Claude Code, **Opus** — a committed-plane change across both readers.
@@ -64,6 +64,18 @@ exist on `main`.
    schema (`nsec`); SR-DOTFUX (`sections/` committed).
 8. The latency guardrail measured standalone if W-278 did not; CHANGELOG
    *Breaking* (every consumer re-ingests).
+
+**Phase 2, as landed (2026-10-13, Claude Code, Opus 5.5)** — W-278 came back
+INCONCLUSIVE and **Arpit ruled ship, as an opt-in pair** (VERDICT §Arpit's
+ruling), so phase 2 ran on that ruling, not on a PASS:
+
+| step | state | evidence |
+|---|---|---|
+| 5 · `main` in the branch; `fux.index.v8`; this repo re-ingested | ✅ `main` (`dca6aaa4`) is an ancestor; the repo's index is v8 (re-ingested by W-279) | `git merge-base` |
+| 6 · the template | ✅ **changed by the ruling:** `section_weight = 0.0` and `section_records = false` stay the defaults; both templates, this repo's copies and the four `fux-config` skill copies name `1.0` as the measured value to set with `section_records = true` | templates |
+| 7 · records | ✅ SR-SECTIONS **accepted**, owns `query/sections.py` + `node/src/query/sections.mjs` (the scan's two section routes, moved out of `scan.py`/`accel.py` and `scan.mjs`/`fresh.mjs`); the W-261 exemption set is empty; register row; SR-TUNE note | `records/0161_sections.md` |
+| 8 · latency + CHANGELOG | ✅ latency measured by W-278 (+49.5 ms); CHANGELOG *Changed (BREAKING)*: `fux.index.v8` → `fux ingest --full`; *Added*: section records, opt-in | `CHANGELOG.md` |
+| 9 · the merge to `main` | ⏳ by [SR-WORK-RELEASE](../../records/0063_WORK-release.md) | — |
 
 **On a W-278 FAIL or INCONCLUSIVE**, phase 2 does not run; W-278 says what
 happens instead. ⚠ W-278 DoD 1–3 (the record, the latency fix, the third form

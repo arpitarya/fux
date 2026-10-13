@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@1ec98d3edb99, node/src/derive@85693ade7ae8, tools/differential@4a635565c6c8, src/fux/schemas/runtime.schema.json@aae95a5ebb11]
+owns: [src/fux/derive@b6bd56fb2ebe, node/src/derive@b8e5388ded11, tools/differential@4a635565c6c8, src/fux/schemas/runtime.schema.json@aae95a5ebb11]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: fd8a8d8921eedd93c5564d9e8334d15e0a8d131f5b1460164a8dbf54d0fce966
+content_sha: 90f440b70b283273461dc9ce9a602de4bdc16eb7351e844714e9df42fe93f4e4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -748,6 +748,8 @@ on 2026-10-04 (Arpit) and BUILT the same day (W-259;
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** The accelerator carries the section plane ([SR-SECTIONS](0161_sections.md) decision 7). `fux build` derives `sections.json` (one row `[docidx, k, flen]` per section record, in `(docidx, k)` order) and `sections/<prefix>.json` (term → `[secidx, tf]`), from `.fux/index/sections/` alone. It **refuses an index whose planes disagree**: an orphan section, or an `nsec` that is not the count under its id. With `section_weight > 0`, `_cannot_reach` adds `λ · idf(h) · (k1 + 1) · w(h)` per deferred term before `× weighting.maximum`. That is sound because one BM25 term contribution is below `idf · (k1 + 1)` at any tf and length. Each candidate's sections are then read in full for every query term. `RUNTIME_SCHEMA` is `fux.runtime.v10`.
 
 **W-278 — `fux.runtime.v11` (2026-10-13; branch, unmerged).** `stats.json` drops `sec_units` and `sec_total_flen` ([SR-RUNTIME-STATS](0125_runtime-stats.md)); `accel.py::attach_sections_by_id` serves the scan's section attachment from `sections.json` and the section postings when `is_fresh` holds ([SR-SECTIONS](0161_sections.md) decision 7). On the Node side `isFresh` and `readStamp` moved to `node/src/derive/fresh.mjs`, re-exported by `accel.mjs`, because the scan now needs them and `accel.mjs` imports the scan: the bundle refuses an import cycle. No decision here moved.
+
+**W-273 phase 2 (2026-10-13):** `accel.py::attach_sections_by_id` moved to `query/sections.py` and its Node half from `fresh.mjs` to `node/src/query/sections.mjs`, both owned by [SR-SECTIONS](0161_sections.md); `fresh.mjs` keeps `isFresh` and `readStamp`. No decision here moved.
 
 ### Consequences
 

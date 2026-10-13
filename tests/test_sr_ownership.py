@@ -596,10 +596,10 @@ def test_archived_content_is_reachable_now() -> None:
 #: The ONLY `kind: component` records allowed `owns: []`, **by name** — never a
 #: range, never a pattern. [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md)
 #: decision 11 states the rule (Arpit, 2026-10-04, W-251 #16; built by W-261):
-#: a component record owns at least one file. SR-SECTIONS is `proposed` and
-#: unbuilt — it owns nothing until W-236 Part B builds its plane, and the day it
-#: gains an `owns:` it must leave this set (the pinned test below says so).
-COMPONENT_RECORDS_EXEMPT_FROM_OWNING = {"SR-SECTIONS"}
+#: a component record owns at least one file. SR-SECTIONS was the one exemption
+#: while `proposed` and unbuilt; W-278 accepted it and gave it `query/sections.py`
+#: (2026-10-13), so the set is empty. A new entry is a ruling.
+COMPONENT_RECORDS_EXEMPT_FROM_OWNING: set[str] = set()
 
 
 def _component_records_owning_nothing() -> dict[str, str]:

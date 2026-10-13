@@ -50,7 +50,6 @@ wrong only on ties — which is exactly the class of bug a spot-check misses.
 from __future__ import annotations
 
 import json
-import re
 from bisect import bisect_left
 from dataclasses import dataclass
 from pathlib import Path
@@ -602,53 +601,6 @@ def _attach_sections(runtime, query_hashes, candidates, docidxs, docs) -> None:
         bag = bags.get(docidx)
         if bag:
             candidate["secs"] = [(k, *bag[k]) for k in sorted(bag)]
-
-
-#: A doc-table line's id, by byte pattern: `docs.jsonl` is canonical JSON with
-#: sorted keys, and `id` is the first key named `id`.
-_DOC_ID_RE = re.compile(rb'"id":"((?:[^"\\]|\\.)*)"')
-
-
-def attach_sections_by_id(root: Path, candidates: list[dict], query_hashes: list[str]) -> bool:
-    """The SCAN's section attachment, read from the derived plane (W-278 DoD 2).
-
-    `query/scan.py` calls this first. When the runtime is fresh — `is_fresh`
-    stamps every section shard beside the document shards — each sectioned
-    candidate gets the same `secs` the committed plane would give it (`(k,
-    flen, terms)` over the query's terms, in `k` order), read from
-    `sections.json` and the per-term section postings: about a twentieth of
-    the bytes, and no line of the committed plane decoded. **Returns False,
-    attaching nothing, when the runtime is stale or absent**; the scan then
-    reads the committed plane itself. `tests/query/test_sections.py` holds the
-    two routes equal.
-    """
-    by_id = {record["id"]: record for record in candidates if record.get("nsec")}
-    if not by_id:
-        return True
-    if not is_fresh(root):
-        return False
-    directory = fmt.runtime_dir(root)
-    rows = json.loads((directory / fmt.SECTION_TABLE_NAME).read_bytes())["rows"]
-    lines = (directory / fmt.DOCS_NAME).read_bytes().split(b"\n")
-    ids: dict[int, str] = {}
-    by_prefix: dict[str, dict] = {}
-    bags: dict[str, dict[int, tuple[list[int], dict[str, list[int]]]]] = {}
-    for term in query_hashes:
-        prefix = fmt.term_prefix(term)
-        if prefix not in by_prefix:
-            path = fmt.section_postings_path(root, prefix)
-            by_prefix[prefix] = json.loads(path.read_bytes()) if path.exists() else {}
-        for secidx, tf in by_prefix[prefix].get(term, ()):
-            docidx, k, flen = rows[secidx]
-            doc_id = ids.get(docidx)
-            if doc_id is None:
-                raw = _DOC_ID_RE.search(lines[docidx]).group(1)
-                doc_id = ids[docidx] = json.loads(b'"' + raw + b'"') if b"\\" in raw else raw.decode("utf-8")
-            if doc_id in by_id:
-                bags.setdefault(doc_id, {}).setdefault(k, (list(flen), {}))[1][term] = list(tf)
-    for doc_id, bag in bags.items():
-        by_id[doc_id]["secs"] = [(k, *bag[k]) for k in sorted(bag)]
-    return True
 
 
 def _fill_deferred(runtime, blocks, opened, query_hashes, hits, read_blocks) -> None:

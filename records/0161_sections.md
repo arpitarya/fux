@@ -3,18 +3,23 @@ type: Standing Record
 kind: component
 name: SR-SECTIONS
 title: "SR-SECTIONS (0161) — section records: a doc#section plane beside the document plane, folded back to one result per document"
-description: "The design of W-168 step 10 as ruled U2 · B2 · E1: each heading section of a multi-section document becomes a committed `doc#s<k>` record in its own plane, `.fux/index/sections/`, cut by a tunable-free section rule. Its best section, scored as a short document on the document yardstick, lifts the document toward that score by `section_weight` ≤ 1 (the third form, W-278). At 0.0 the plane is never opened, so ranking is byte-identical. The design is not built."
-status: proposed
+description: "The design of W-168 step 10 as ruled U2 · B2 · E1: each heading section of a multi-section document becomes a committed `doc#s<k>` record in its own plane, `.fux/index/sections/`, cut by a tunable-free section rule. Its best section, scored as a short document on the document yardstick, lifts the document toward that score by `section_weight` ≤ 1 (the third form, W-278). At 0.0 the plane is never opened, so ranking is byte-identical. Built; measured INCONCLUSIVE and ruled ship by Arpit (2026-10-13): section_weight = 1.0 together with section_records = true, both off by default."
+status: accepted
 date: 2026-09-30
 amended: 2026-10-13
 feature: section records — the committed section plane, the index section rule, and the B2 best-section term
-owns: []
+owns: [node/src/query/sections.mjs@4c883e2a8a83, src/fux/query/sections.py@d88c194f0e6c]
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: 8af9b2a62e801414c518d1ea6926e1eeca479532da7ab98d499945b8787e3c4b
+content_sha: 4b7ca64f9c80e15a0fb1616e1eaf2233542ee2848fca36944d6fc91c752d2f38
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- [`node/src/query/sections.mjs`](../node/src/query/sections.mjs) · file
+- [`src/fux/query/sections.py`](../src/fux/query/sections.py) · file
 
 **Describes** — reaches into, does not own:
 
@@ -32,9 +37,9 @@ content_sha: 8af9b2a62e801414c518d1ea6926e1eeca479532da7ab98d499945b8787e3c4b
 
 🔴 **The second mechanism FAILED too, 2026-10-10 — drift (W-269).** The gain-only term (decision 5) removed the short-document credit (G3 PASS), and the `step10_section` pool's misses fell 23 → 23 · 21 · 19 · 13 across `section_weight` 0.25 · 0.5 · 1.0 · 2.0. But every weight lost baseline rank-1 hits (2 · 4 · 4 · 5), and the frozen bar allows none ([verdict](../work/regression/2026-10-10-section-gain-only/VERDICT.md)). Built on branch `claude/gracious-galileo-aqrg8b`, unmerged. `section_weight` does not exist on `main`; what happens next is Arpit's.
 
-🟠 **The re-test STOPPED, 2026-10-11 — not a verdict (W-270).** On a fresh set (`set-6-claude`, generation 5) under law L13, the baseline already put 49 of the 60 tagged section questions at rank 1, so the slice was **11, below the floor of 15**, and the frozen decider stopped before reading any arm ([verdict](../work/regression/2026-10-11-section-retest-set-6/VERDICT.md)). Separately, `sw-2.0` as built **failed the latency guardrail** (+328 ms at `rung-10000`, in the scan path's section attachment). Decision 2 now excludes `.csv`/`.json`/`.jsonl` (W-273 phase 1). `section_weight` does not exist on `main`. **Ruled 2026-10-11 (Arpit, Cowork), W-270 closed:** both failed terms scored the document as one unit against the *section* average length, so a long document's gain was a length artefact (arm diffs: 17 of 21 and 19 of 24 rank-1 changes brought in a long document). The third form — the best section scored **as a standalone document** on the document yardstick, combined by **max**, `λ ≤ 1` — is [W-278](../work/open/W-278-section-term-v3.md), to be written into decision 5 before its build; the data is generation 6, `set-7-claude` (W-277, placed 2026-10-12).
+🟠 **The re-test STOPPED, 2026-10-11 — not a verdict (W-270).** On a fresh set (`set-6-claude`, generation 5) under law L13, the baseline already put 49 of the 60 tagged section questions at rank 1, so the slice was **11, below the floor of 15**, and the frozen decider stopped before reading any arm ([verdict](../work/regression/2026-10-11-section-retest-set-6/VERDICT.md)). Separately, `sw-2.0` as built **failed the latency guardrail** (+328 ms at `rung-10000`, in the scan path's section attachment). Decision 2 now excludes `.csv`/`.json`/`.jsonl` (W-273 phase 1). `section_weight` does not exist on `main`. **Ruled 2026-10-11 (Arpit, Cowork), W-270 closed:** both failed terms scored the document as one unit against the *section* average length, so a long document's gain was a length artefact (arm diffs: 17 of 21 and 19 of 24 rank-1 changes brought in a long document). The third form — the best section scored **as a standalone document** on the document yardstick, combined by **max**, `λ ≤ 1` — is [W-278](../archive/open/W-278-section-term-v3.md), to be written into decision 5 before its build; the data is generation 6, `set-7-claude` (W-277, placed 2026-10-12).
 
-🟡 **The third form is written, not yet measured (2026-10-13, W-278).** Decision 5 now scores the best section **as a short document**: its own body and heading, its parent's title, path and ctx, on the **document** yardstick. The document keeps the better of the two (`λ = 1`), and `λ > 1` is refused. Only a section that matches on its own words counts (Arpit, 2026-10-13). The section average is gone from the runtime stats, and the scan no longer decodes every section line. The bar is W-278's, on `set-7-claude`.
+✅ **ACCEPTED 2026-10-13 — the third form, ruled ship by Arpit (W-278).** On `set-7-claude` the frozen L13 table said **INCONCLUSIVE**: every gate, C2, C3 and every guardrail held; the whole set gained 6 `hit@1` with **0 losses**; the slice (24 long-document misses) gained 5, one short of SR-RS decision 19's floor ([verdict](../work/regression/2026-10-13-section-term-v3/VERDICT.md)). **Arpit, 2026-10-13: ship `sw-1.0` — as an opt-in pair** (*"Opt-in pair"*): defaults stay `section_records = false` and `section_weight = 0.0`; the measured value is `section_weight = 1.0` set together with `section_records = true`. Decision 11's hard error stands.
 
 A long document whose answer sits under one heading loses at ranking. Its
 query words are a small share of a big document. U0 (a query-time re-rank)
@@ -258,7 +263,7 @@ S(d) = ( S_doc(d) + λ · G(d) ) · w(d)          0 < λ ≤ 1
 
 - 🔴 **A section is scored as the short document it would be** (Arpit,
   2026-10-11, Cowork: *"update the work items to go with the suggestive
-  approach"* — [W-278](../work/open/W-278-section-term-v3.md)). Its own body and
+  approach"* — [W-278](../archive/open/W-278-section-term-v3.md)). Its own body and
   heading, plus its parent's title, path and ctx slots and their lengths. A
   question that names the manual is credited to the section as it would be to
   a stand-alone note with that title.
@@ -444,19 +449,20 @@ sections"*; the key lives in `fux.toml [index]`, not in `.fux/tune.toml`).
 - **`fux doctor`'s `section records` row** reports the mode. It is an error on
   the mismatch above, and a warning when the key is off and a plane is still
   committed.
-- *What this does not decide:* whether sections ship (W-278), how a section is
-  cut (decision 2), or how one scores (decision 5). With the key off, ranking is
+- *What this does not decide:* how a section is cut (decision 2) or how one
+  scores (decision 5). **Whether sections ship was W-278's**: they ship as an
+  opt-in pair, both keys off by default, and `section_weight = 1.0` is the
+  measured value to set beside `section_records = true` (Arpit, 2026-10-13). With the key off, ranking is
   unchanged, so this is not a ranking change and L13's bar does not apply.
 
 ### Consequences
 
-- **Part B owes, in one change with its PASS:** `[ranking] section_weight` in
-  [SR-TUNE](0135_tuning.md) and the template; the `nsec` field and its example
-  in `schemas/index-record.schema.json` ([SR-RECORD](0109_index-record.md)); the
-  `section` hit key in `output.schema.json` ([SR-API](0154_api.md)); the plane
-  in [SR-DOTFUX](0102_fux-directory.md)'s committed list and in
-  `.gitattributes`; the merge driver's parent rule; both readers; the build
-  invariant; and this record's `owns`.
+- **Landed with the ruling (W-273 phase 2, 2026-10-13):** `[ranking]
+  section_weight` in [SR-TUNE](0135_tuning.md) and the template; `nsec` in
+  `schemas/index-record.schema.json`; the `section` hit key; the plane in
+  [SR-DOTFUX](0102_fux-directory.md); the merge driver's parent rule; both
+  readers; the build invariant; and this record's `owns`
+  (`query/sections.py`, `node/src/query/sections.mjs`).
 - **The index about doubles on prose.** Formats that emit one sibling heading
   per page or slide (`.pdf`, `.pptx`) get one section per page or slide. That
   is not measured, because the ladder has none of those formats. The decoded

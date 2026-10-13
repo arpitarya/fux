@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@b7434dc501dd]
+owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@269a301bf855]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: f25a1ef367874741711dec60aadf96a20439a2693de31cc1f776031b4527e15e
+content_sha: 9efb476756b59b06e8acdecb62a68353190d3e47df93b874e8872349ce932e36
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -697,6 +697,8 @@ copied out, never imported.
 **No decision here moved** (W-273, 2026-10-11): `templates/tune.toml.txt`'s `section_weight` comment now describes the gain-only term ([SR-TUNE](0135_tuning.md), [SR-SECTIONS](0161_sections.md) decision 5); comment bytes only.
 
 **No decision here moved** (W-278, 2026-10-13): `src/fux/templates/tune.toml.txt` changed the `section_weight` comment only ([SR-TUNE](0135_tuning.md)).
+
+**No decision here moved** (W-273 phase 2, 2026-10-13): the `section_weight` and `section_records` comments in the templates name `1.0` as the measured value.
 
 ### Consequences
 

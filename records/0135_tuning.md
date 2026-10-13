@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-10-11
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@6fa94645ad85, .fux/tune.toml@bc8cab747dd3, node/src/config/tune.mjs@f6e2c32f57f5]
+owns: [src/fux/tune.py@6fa94645ad85, .fux/tune.toml@e2ed652a089c, node/src/config/tune.mjs@f6e2c32f57f5]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 1da36de92a187bddc10e1450198e1d3705dea8a642bb203757c46a959f7965a8
+content_sha: 452b92f65b8e5e595699bc1838d5dd1a12f2d43f82611405f643b32dba2873e1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1123,6 +1123,8 @@ this moved where they are written, not what they are.
 **W-273 — the comment caught up (2026-10-11; same branch, unmerged).** The `section_weight` comment in the template and in this repository's `.fux/tune.toml` described W-236's B2 form; it now describes the gain-only term and names W-270 as the run that decides it. Comment bytes only: the key, its validation and its value `0.0` are unchanged.
 
 **W-278 — `section_weight` is bounded above by 1.0 (2026-10-13; same branch, unmerged until [its run](../work/regression/2026-10-13-section-term-v3/PRE-REGISTRATION.md) passes).** λ now interpolates toward the **third form**, the better of the document and its best section scored as a short document ([SR-SECTIONS](0161_sections.md) decision 5). **`1.0` is pure max, and a value above `1.0` is refused** by `tune.load` and by Node's `loadTune`, naming the key and the bound. Above 1.0 the term would extrapolate past the section's own score, which is what produced W-269's leaps. The bound is the `_fraction` validator (Node: `fraction`), not a clamp: a silently clamped `2.0` would rank as `1.0` while claiming not to. Template value still **`0.0`** (OFF); a default is written only on a PASS.
+
+**W-278 → W-273 phase 2 — `section_weight`'s measured value is `1.0`, opt-in (2026-10-13).** W-278 came back INCONCLUSIVE (0 losses, +6 `hit@1`, slice 5 of 24) and Arpit ruled ship **as an opt-in pair**: the template value stays **`0.0`**, and `1.0` is what a repo sets together with `fux.toml [index] section_records = true` ([verdict](../work/regression/2026-10-13-section-term-v3/VERDICT.md)). The template comment says so.
 
 ### Consequences
 

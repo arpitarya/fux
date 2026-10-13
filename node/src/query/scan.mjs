@@ -9,16 +9,13 @@
  * against; the prior went (W-152) and the regex with it. A candidate's own
  * `mtime` comes off the parsed record, like every other per-document fact.)
  */
-import { basename } from "node:path";
-import {
-  iterSectionPaths, rawRecordLines, recordFor, sectionOrdinal, shardsFor,
-} from "../store/reader.mjs";
-import { termHash, TF_FIELDS, sectionParent, shardFor } from "../store/format.mjs";
+import { recordFor, shardsFor } from "../store/reader.mjs";
+import { termHash, TF_FIELDS } from "../store/format.mjs";
 import { deriveWlen } from "./bm25f.mjs";
 import { Corpus, rank } from "./rank.mjs";
 import { tokenize } from "./tokenize.mjs";
 import { EMPTY, identifiersFor } from "./identifiers.mjs";
-import { attachSectionsById } from "../derive/fresh.mjs";
+import { attach as attachSections } from "./sections.mjs";
 
 //: The byte-level oracle, over per-field counts. `wlen` is DERIVED from `flen`
 //: at the weights in force, so this parses the array and applies `deriveWlen`
@@ -32,11 +29,6 @@ const FLEN_RE = /"flen":\[([0-9,\s]*)\]/;
 //: field is switched on.
 const EDGE_ANCHOR_RE = /"al":(?<len>\d+),"at":\{[^}]*\},"dst":"(?<dst>[^"]+)"/g;
 
-//: W-278 — a section line's id, off the raw bytes (`scan.py::_SEC_ID_RE`).
-//: Keys are sorted (`flen`, `id`, `terms`), so the first `"id":` is the id.
-const SEC_ID_RE = /"id":"((?:[^"\\]|\\.)*)"/g;
-//: `FLEN_RE`, global, so a search can start at a line's offset.
-const FLEN_AT_RE = /"flen":\[([0-9,\s]*)\]/g;
 
 function flenFromLine(text) {
   const m = FLEN_RE.exec(text);
@@ -170,67 +162,6 @@ export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
     df,
     new Corpus(totalDocs, deriveWlen(totalFlen, scoring, totalAnchorLen)),
   ];
-}
-
-/** Each sectioned candidate's matching sections, as `secs` in `k` order —
- *  `scan.py::_attach_sections`, SR-SECTIONS decision 7 as amended by W-278:
- *  from the derived plane when the runtime is fresh (`fresh.mjs`), from the
- *  committed plane otherwise. */
-function attachSections(root, candidates, queryHashes) {
-  if (!attachSectionsById(root, candidates, queryHashes)) {
-    attachCommittedSections(root, candidates, queryHashes);
-  }
-}
-
-/** `scan.py::_attach_committed_sections`. Only the section shards that hold a
- *  sectioned candidate's sections are read; each query term's `"<hash>":[`
- *  entry is found in the shard's text directly, so a line with no query term
- *  is never visited, and one that does yields its id, `flen` and the query's
- *  own `terms` entries by position — never a whole-line parse. */
-function attachCommittedSections(root, candidates, queryHashes) {
-  const byId = new Map();
-  for (const record of candidates) if (record.nsec) byId.set(record.id, record);
-  if (byId.size === 0) return;
-  const shards = new Set([...byId.keys()].map((id) => shardFor(id)));
-  const keys = queryHashes.map((h) => [h, `"${h}":[`]);
-  const bags = new Map();
-  for (const path of iterSectionPaths(root)) {
-    if (!shards.has(basename(path, ".jsonl"))) continue;
-    const [, lines] = rawRecordLines(path);
-    const data = lines.map((line) => line.toString("utf8")).join("\n");
-    const found = new Map();
-    for (const [h, key] of keys) {
-      let at = data.indexOf(key);
-      while (at !== -1) {
-        const start = data.lastIndexOf("\n", at) + 1;
-        const open = at + key.length;
-        const close = data.indexOf("]", open);
-        let hits = found.get(start);
-        if (hits === undefined) { hits = {}; found.set(start, hits); }
-        hits[h] = data.slice(open, close).split(",").map(Number);
-        at = data.indexOf(key, close);
-      }
-    }
-    for (const [start, hits] of found) {
-      SEC_ID_RE.lastIndex = start;
-      const raw = SEC_ID_RE.exec(data)[1];
-      const secId = raw.includes("\\") ? JSON.parse(`"${raw}"`) : raw;
-      const parent = sectionParent(secId);
-      if (!byId.has(parent)) continue;
-      FLEN_AT_RE.lastIndex = start;
-      const inner = FLEN_AT_RE.exec(data)[1].trim();
-      const flen = inner ? inner.split(",").map(Number) : [];
-      const terms = {};
-      for (const h of queryHashes) if (h in hits) terms[h] = hits[h];
-      let bag = bags.get(parent);
-      if (bag === undefined) { bag = []; bags.set(parent, bag); }
-      bag.push([sectionOrdinal(secId), flen, terms]);
-    }
-  }
-  for (const [parent, bag] of bags) {
-    bag.sort((a, b) => a[0] - b[0]);
-    byId.get(parent).secs = bag;
-  }
 }
 
 /** The reference path. */

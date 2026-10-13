@@ -1,10 +1,10 @@
 ---
 type: Verdict
 name: W-278-SECTION-TERM-V3
-description: "W-278, the section term's third form at section_weight = 1.0 on set-7-claude under law L13: INCONCLUSIVE by the frozen table, handed to Arpit. Every gate, C2, C3 and every guardrail hold; the slice (24) gained 5 with 0 losses, below SR-RS decision 19's floor at 5 flips (p = 0.0625). Whole set hit@1 117 -> 123, 6 wins, 0 losses. Decider run by Arpit 2026-10-13. section_weight stays 0.0 until he rules."
+description: "W-278, the section term's third form at section_weight = 1.0 on set-7-claude under law L13: INCONCLUSIVE by the frozen table, handed to Arpit. Every gate, C2, C3 and every guardrail hold; the slice (24) gained 5 with 0 losses, below SR-RS decision 19's floor at 5 flips (p = 0.0625). Whole set hit@1 117 -> 123, 6 wins, 0 losses. Decider run by Arpit 2026-10-13. Arpit ruled ship: section_weight = 1.0 with section_records = true, both off by default."
 verdict: INCONCLUSIVE
 verdict_by_table: "INCONCLUSIVE — C2, C3 and the guardrails hold; the slice net is positive (5) but below decision 19's floor"
-ruled_by: "Arpit, 2026-10-13 — ran the frozen decide.py from his own shell; the ruling the table hands him is owed"
+ruled_by: "Arpit, 2026-10-13 — ran the frozen decide.py from his own shell, then ruled: ship sw-1.0 as an opt-in pair"
 prediction: W-278-SECTION-TERM-V3
 pre_registration: work/regression/2026-10-13-section-term-v3/PRE-REGISTRATION.md
 run: 2026-10-13-section-term-v3
@@ -41,5 +41,14 @@ the 24 long-document misses it was built for, and one more elsewhere. Five
 flips cannot clear the floor of all floors (a net of 6), so the size of the
 effect, not its direction, is what is unproven. `informed`, permanently.
 
-**Owed: Arpit's ruling** (L13 decision 4). Until then `section_weight` stays
-`0.0` and W-273 phase 2 does not run.
+## Arpit's ruling (L13 decision 4), 2026-10-13, Claude Code
+
+1. **"Ship sw-1.0"** — offered beside *re-test on a fresh set*, *close step
+   10*, and *ship with the default off*.
+2. Asked what *ship* means against W-274 (section records off by default, a
+   weight above 0 with them off a hard error): **"Opt-in pair"** — the
+   defaults stay `section_records = false` and `section_weight = 0.0`; `1.0` is
+   the measured value set together with `section_records = true`. W-274 stands.
+
+A ruling on an INCONCLUSIVE, not a PASS: the slice's 5 of 5 is below the
+floor, and every number here is `informed`. W-273 phase 2 carries it.
