@@ -5,7 +5,7 @@ CLAUDE.md	a8393815e6ab2c878098e22522beec62ae375d1f	prose
 README.md	c7f2fa28befe8e16d58594dbf69f6d5cff6dfd2a	prose
 archive/PLAN-v0.30.md	2e0ef4e71c9f6d31558cf644bbf0da82c0af9b1d	prose	archived=true
 archive/PRIORITY.md	7249a801980d585f6fcd43abc9bb6ebb05d82408	prose	archived=true
-archive/README.md	acefee8b797c6c1da07e1bbb134bc057f6be0f4a	prose	archived=true
+archive/README.md	89c2f32b2e5956e4e0190320d193d7658f2d743f	prose	archived=true
 archive/benchmark-reports/2026-08-28-benchmark-contested-handbuilt-deck.html	488f8e5347af75ee9482d0370a2a34a2b6520ab6	html@sha:773b7cb1d9a7be6e	archived=true
 archive/benchmark-reports/2026-08-28-benchmark-v1-vs-head-handbuilt-deck.html	7d0fbec1818866c000594c0c6278a876e27139bd	html@sha:773b7cb1d9a7be6e	archived=true
 archive/benchmark-reports/2026-09-13-benchmark-captures-handbuilt-deck.html	f513074617593e5de84be32131644915d67050b1	html@sha:773b7cb1d9a7be6e	archived=true
@@ -218,6 +218,7 @@ archive/open/W-27-m7-dogfood-release-gate.md	86900982c003052c93b0bb40873b646d32b
 archive/open/W-270-section-retest-set-6.md	8dbe5024854ed1af0b7e5c1b32e3b6d88b6fa458	prose	archived=true
 archive/open/W-271-sections-next-steps.md	98cf2ee7fdd6a20ee9eff88e43da0861eaf229ed	prose	archived=true
 archive/open/W-272-section-test-data-gen5.md	ba99334e11c2368d9235a07c6b109d3ec363a870	prose	archived=true
+archive/open/W-273-section-records-implementation.md	3530683f3c4f48fb1ea56836170bf584a360f12d	prose	archived=true
 archive/open/W-274-section-records-opt-in.md	d1608a8544429fc1b729748fca06eea9121b0e14	prose	archived=true
 archive/open/W-276-post-commit-ingest-silent.md	a2c2081c7b6580d160ac622e11715f72cb4a4395	prose	archived=true
 archive/open/W-277-section-test-data-gen6.md	80477caf5fa957c8707707ae4a878a9959b46330	prose	archived=true
@@ -642,13 +643,13 @@ records/0055_WORK-backlog.md	c84c190dec99454543c195f933731b3d99056890	prose
 records/0056_WORK-quality.md	0be9b3d0000ce540a95cfee2f3c3a483702b8f35	prose
 records/0057_WORK-scale.md	16b452f85c38bef12c21efb8ace9da813caa4d2b	prose
 records/0058_WORK-lifecycle.md	8d159737ee598d207fbbb582f0f4dd53d55b3c26	prose
-records/0059_WORK-docs.md	aba422be945940595e156f37beeb27d2aa97fa96	prose
+records/0059_WORK-docs.md	b9eedd42af1df15986fefd622e69795a1b7f4d0a	prose
 records/0060_WORK-session.md	e126d7a25ce12e8fbe11fdfeae30cc1e95d42461	prose
 records/0061_WORK-okf.md	499eaa7a4966a9f5b547368a6d1f6b3ac9b6054b	prose
 records/0062_WORK-archive.md	b34ce9d58d813b69ba7a44dec6620d58dbbffc70	prose
 records/0063_WORK-release.md	b2249895a785c82d12d8baa934b5e60c40c9949f	prose
 records/0064_WORK-blockers.md	8cc7fa229f31e57f18cb6b3c5564b9d31eb86599	prose
-records/0065_WORK-governance.md	c807882350385e7920e1103ff2759ced5572500c	prose
+records/0065_WORK-governance.md	ae4906ebfdf383e7b97efa70bee096d3e8aae4c4	prose
 records/0066_WORK-golden.md	77ae5051faafb8703c42a188f52d60c0f67131d7	prose
 records/0067_WORK-registry.md	e6b478e17bb509dd079c017988db35c6b846c430	prose
 records/0068_WORK-test-data.md	a437be3ce2d31a1d9d7c181339827df7bbd3ee86	prose
@@ -742,12 +743,12 @@ tools/t2-eval/PRE-REGISTRATION.md	0678bc82904423b9aa82c801f4286abbdc84961c	prose
 tools/vector-gate/README.md	544da73b4409bef1e5dac598d9b8214d8abf4180	prose
 work/BACKLOG.md	8b975b303ec0f6e37cbd1643c57e6b2e5fd13737	prose
 work/BLOCKED.json	5598b94e0d231527edb50b11f34722b0a6a86ed4	json@sha:39c0b82580489591
-work/IMPLEMENTATION.md	616d1df4fd0d60602dbb7ad8ba0c1a3e1ff2fd9c	prose
+work/IMPLEMENTATION.md	b5640fcdadd2430aedf20e23a7fe3ea3f74344bf	prose
 work/INTERVIEW.md	e3e4d502a145301ba2149cf03b9e9ff975f32fb7	prose
 work/LESSONS.md	f91b46f8742c542fe12e2d871452148c56751eae	prose
 work/MACHINE.md	34863c282c90b7363a5eb7da18a622354a995c35	prose
-work/NOW.md	1d6e05edd8e27386773e8a1087e77ed25d8cb77c	prose
-work/OPEN-WORK.md	dd41e60171d3ec5b81e4bbcb6807bd5a8496195b	prose
+work/NOW.md	dac1e02e7e74611aff1dc90738f660a4df161c1d	prose
+work/OPEN-WORK.md	6ea6757b52b170989136fe393dd0a9aed433dbb8	prose
 work/README.md	f1d5e3f1efe1e8a20ce9f0fcc88bf46e272ac6ff	prose
 work/WORKLOG.md	4275d6067111477ff8a4e9ce5281c006de3cbc63	prose
 work/architecture-algorithms.svg	fdf6ef399bf2649dd92510973076e607cb955576	svg@sha:0d25b190415a4706
@@ -797,7 +798,6 @@ work/open/W-258-live-network-captures.md	ccf4a2ee6405ed2e6f0cf3aec822e83a359fc59
 work/open/W-263-enriched-mode-proposal.md	0542e8d7be89bd5287d74e12b122cf4badd3b6aa	prose
 work/open/W-265-abstention-research.md	66b8c8f24d05f35dffc21d6161bba40156457ead	prose
 work/open/W-268-ingest-under-one-second.md	5d1f1781f5eec354ddaf62400ca79429a9307d2e	prose
-work/open/W-273-section-records-implementation.md	0d30e030b3ae8042c63352edbe9650da5869117c	prose
 work/open/W-275-ranking-tuner-research.md	7c0165b6700c2e2cea0691808e94d52e3d71072d	prose
 work/open/W-280-intent-lexicon-research.md	53c011d0dab8b1e30d0e7edc657524bc0dd4d12e	prose
 work/open/W-281-capture-harness-speed.md	e04af8562462614f23536d92534b1435127bd1c3	prose
