@@ -1,6 +1,6 @@
 # fux.register.v2	rules=5
 # loc	sha	decoder	[k=v ...]
-CHANGELOG.md	a1db49a294d906b503327213ea295f54fda4c494	prose
+CHANGELOG.md	bd3e8b04ee075142d245b6d1948a9430b0d7f65b	prose
 CLAUDE.md	a8393815e6ab2c878098e22522beec62ae375d1f	prose
 README.md	c7f2fa28befe8e16d58594dbf69f6d5cff6dfd2a	prose
 archive/PLAN-v0.30.md	2e0ef4e71c9f6d31558cf644bbf0da82c0af9b1d	prose	archived=true
@@ -620,7 +620,7 @@ docs/paper/figures/fig-06-expand.svg	284802f63550cfd46bd33dcb3f5fe0ed6a07a560	sv
 docs/paper/figures/fig-15-latency.svg	cf124bce629880208a1ef3872e4b57e20830a5bf	svg@sha:0d25b190415a4706
 docs/paper/figures/mermaid.config.json	1085b4d4514eba7464626520653acb962f6c3376	json@sha:39c0b82580489591
 docs/paper/the-fux-index-paper.md	925b53de1e44ff5e1e2c9155afab4b7698d95f04	prose
-records/0001_LAWS.md	4f415c07028085eaa0f83045fc01afe4d76bc112	prose
+records/0001_LAWS.md	ad0c9c52bad1868a2e88cc15b1482a0605c21a5a	prose
 records/0002_LAW-0-authority.md	aa3d8dc48aa155992a42f389a032445bbe256cca	prose
 records/0003_LAW-1-retired-records-archived.md	95bb26a9f034a718ff04d528a03c8c66b331d6ac	prose
 records/0004_LAW-2-zero-cost.md	2bb2096bc9b58e6881f9e86b1b9ae852afccefef	prose
@@ -651,9 +651,9 @@ records/0063_WORK-release.md	b2249895a785c82d12d8baa934b5e60c40c9949f	prose
 records/0064_WORK-blockers.md	8cc7fa229f31e57f18cb6b3c5564b9d31eb86599	prose
 records/0065_WORK-governance.md	ae4906ebfdf383e7b97efa70bee096d3e8aae4c4	prose
 records/0066_WORK-golden.md	77ae5051faafb8703c42a188f52d60c0f67131d7	prose
-records/0067_WORK-registry.md	e6b478e17bb509dd079c017988db35c6b846c430	prose
+records/0067_WORK-registry.md	ffa152cbe4415bb9cc70bb481ecf9a1a410c444b	prose
 records/0068_WORK-test-data.md	a437be3ce2d31a1d9d7c181339827df7bbd3ee86	prose
-records/0101_cli-surface.md	97d5b9cd70ee6e7c8c4a90ab14c8ed6f8c7e9217	prose
+records/0101_cli-surface.md	3db1f2d1605af261219262c0e7b1eb560c18ab37	prose
 records/0102_fux-directory.md	45e0e06a88f2e29b4f17ca0208c24ec682e39b88	prose
 records/0103_ask.md	3689c1acce9daf4650b60593011f4292c24c43eb	prose
 records/0104_find.md	c9dba1733c881eccc5a556086bdfd287b18e2017	prose
@@ -688,7 +688,7 @@ records/0132_agent-policy.md	c800746b7a17bba2c01efb58b8602d1af3d5f027	prose
 records/0133_predictions.md	fc50f4476f8c0c5ef82ee16d48d22da1c5fa2384	prose
 records/0134_archived-content.md	e3ec3cb3881517979718d033128475e13f9a0a8a	prose
 records/0135_tuning.md	80c4394a8e11a746cba8a9a4f68c1a5474e15146	prose
-records/0136_mcp.md	bfc9e2b938216a2527eb59b8ad59488af1455625	prose
+records/0136_mcp.md	1f45652a8142efa1dd7c6edb7b3c8d42e38e3786	prose
 records/0137_enrich.md	3baf2728fdcbe7675f830b0ed85cdc0ddac34c94	prose
 records/0138_rerank.md	f22a82e0de3215b526aa9151a2aae20a1c86defb	prose
 records/0139_decode.md	bd004d2ed89104114e50231469c3575c09228bd8	prose
@@ -705,7 +705,7 @@ records/0149_expand.md	76c31e02ee4a52742702abffdad7f6957926ec62	prose
 records/0150_tabular.md	c429f25fc36e17b96458f15fc96b0fdac104b32c	prose
 records/0151_chunking.md	d74d15f4d339fcc64426fa6a6bd6e81378c217f6	prose
 records/0152_doctor.md	fb73d2cb3ee7c15cd8701aad383008bd9caf66a6	prose
-records/0153_node-search.md	e0fb218b3bc1960bee8f78abb0f6ddd9b185c9d2	prose
+records/0153_node-search.md	ad8f46884b67c6bed4c3c40ff70a8497ee11f39d	prose
 records/0154_api.md	b73f8b12f0664091e6e6f788d1171018ed2735db	prose
 records/0155_agent-surfaces.md	c0c2ecdbd9a406b030bd680c201e6dd44fb5947d	prose
 records/0156_inspect.md	9568d94cbbe70054ccf8625b02a40c4e1150117f	prose
@@ -747,10 +747,10 @@ work/IMPLEMENTATION.md	b5640fcdadd2430aedf20e23a7fe3ea3f74344bf	prose
 work/INTERVIEW.md	e3e4d502a145301ba2149cf03b9e9ff975f32fb7	prose
 work/LESSONS.md	f91b46f8742c542fe12e2d871452148c56751eae	prose
 work/MACHINE.md	34863c282c90b7363a5eb7da18a622354a995c35	prose
-work/NOW.md	dac1e02e7e74611aff1dc90738f660a4df161c1d	prose
+work/NOW.md	cfad0aaa9738c22dee73c5fca7cc04578d759e6d	prose
 work/OPEN-WORK.md	6ea6757b52b170989136fe393dd0a9aed433dbb8	prose
 work/README.md	f1d5e3f1efe1e8a20ce9f0fcc88bf46e272ac6ff	prose
-work/WORKLOG.md	4275d6067111477ff8a4e9ce5281c006de3cbc63	prose
+work/WORKLOG.md	a7192ac658c9fe264102cd573c0a127522a3f2d1	prose
 work/architecture-algorithms.svg	fdf6ef399bf2649dd92510973076e607cb955576	svg@sha:0d25b190415a4706
 work/architecture-answer.svg	3e133168cf7695f77b23accae2835e28418ee770	svg@sha:0d25b190415a4706
 work/architecture-ask.svg	40d6f07068f275412528bb14d5a3455bc0626778	svg@sha:0d25b190415a4706
