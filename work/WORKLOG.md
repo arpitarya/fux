@@ -23,6 +23,15 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-13 — W-278 DoD 1–5: the section term's third form built, frozen, captured  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *implement W-278 & W-273.* W-273 phase 2 runs only on a W-278 PASS, so it was not touched.
+- **Ruled by Arpit in-session:** *own-match only* (SR-SECTIONS d5).
+- **Done:** `08ef6293` (record + build, both readers), `2ac82d3b` (bar, alone), the gen-6 ladder, the capture. Latency: the committed byte-pattern read failed (+190 ms); the scan now reads sections from the derived plane when fresh (+68.6 gen 5, +49.5 gen 6). Every gate PASS; rank 1 moved on 7 of 165 at `sw-1.0`. W-281 filed on Arpit's ask (capture speed; the 12 h gpg stall).
+- **Mistakes:** first ladder attempt ran the 3.9 `python3` (no `tomllib`); discarded before any rung froze. Estimated the capture at an hour; it took 15 min.
+- **Shared machine:** a Fable session built and committed W-279 in this tree during the capture; I committed only my own paths.
+- **Next:** 🔴 Arpit scores; a session that did not capture runs `decide.py`.
+
 ## 2026-10-13 — W-279 closed: the register is v2, `fux register [--json]` ships  ·  Claude Code (Fable 5.1)
 - **Asked:** *"implement W-279"*. Triage first: W-258 (9d) and W-268 (3d) wait on Arpit and block nothing; W-279 was the 🟢 item with the ball on the agent.
 - **Shared machine:** a second Claude Code session was mid-W-278 (its `latency.py` ran at 00:41; it committed `08ef6293` and `2ac82d3b` during this session and has shards + the Cowork W-279/W-280 filings **staged**). No whole-suite run started while its measurement was live; the suites here ran after it ended. The whole index plane is committed here, from this session's `fux ingest --no-accelerator`, because a register that disagrees with the shards beside it is the drift doctor reports; its uncommitted `2026-10-13-ladder-gen6-rebuild` folder is left behind.

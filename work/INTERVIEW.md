@@ -35,13 +35,14 @@ valuable judgement, but not the state of play.
 *Updated **2026-10-13** (Claude Code, Fable 5.1 — W-279 closed; W-278 in flight in another session).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟡 2026-10-13 (latest) — W-278 BUILT AND ITS BAR FROZEN; DoD 5 (LADDER + CAPTURE) IN FLIGHT
+### 🔴 2026-10-13 (latest) — W-278 CAPTURED: EVERY GATE PASS, LATENCY +49.5 ms; ARPIT SCORES
 
 - **Arpit, in this session:** *own-match only* — a section is scored as a short document only if one of the query's terms is in its **own** body or heading; a match through the parent's title/path/ctx alone gains nothing (SR-SECTIONS d5).
 - **Built `08ef6293`** (Claude Code, Opus 5.5): `rank._section_gain` + `rank.mjs` = the third form; `section_weight` ∈ [0, 1] (`_fraction`); `sec_*` stats gone (`fux.runtime.v11`).
 - 🔴 **Latency was the hard part.** A byte-pattern read of the committed section plane still **failed, +190 ms** (25 MB of section shards is as big as the document plane). **The scan now reads sections from the derived plane when the runtime is fresh**, the committed plane otherwise (SR-SECTIONS d7): **+68.6 ms, PASS** at gen-5 `rung-10000`. Cost, named in d7: on the default path the scan and the accelerator share their section source.
 - **Bar frozen `2ac82d3b`**: L13 defaults on `set-7-claude`, decided `sw-1.0`, `sw-0.5` reported; G0/G1/G3/G4, G5 descriptive. Node: `isFresh` moved to `derive/fresh.mjs`, because the bundle refuses the cycle.
-- **Next:** the gen-6 ladder (gen 5 kept at `fux-lab/corpora/golden-gen5/`) → `evidence/capture.sh` → 🔴 Arpit scores → a session that did not capture runs `decide.py`.
+- **Captured:** gen-6 ladder rebuilt (8/8 frozen; gen 5 at `fux-lab/corpora/golden-gen5/`; rung-10000 stalled 12 h on gpg commit signing → [W-281](open/W-281-capture-harness-speed.md)). G0/G1/G3/G4 PASS; latency +49.5 ms; rank 1 moved on **7 of 165** at `sw-1.0`, all incoming ~2 000-token manuals (G5). Seven moves cap the slice's wins at 7, so a FAIL: no gain is live.
+- **Next:** 🔴 Arpit `just golden-score work/regression/2026-10-13-section-term-v3` → a session that did **not** capture runs `decide.py` (this one built engine, bar, ladder and capture).
 
 
 ### 🟢 2026-10-13 — W-279 CLOSED: THE REGISTER IS `fux.register.v2`, AND `fux register [--json]` PRINTS IT FROM THE INDEX

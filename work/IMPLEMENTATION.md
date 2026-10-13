@@ -24,6 +24,16 @@ Rules:
 5. This file is **not** a changelog. `CHANGELOG.md` is per release, for users;
    this is per milestone, for the next session.
 
+
+---
+
+## 2026-10-13 — **W-278 DoD 1–5: the section term's third form, built and captured (not yet scored)**
+
+| | |
+|---|---|
+| **shipped (branch, unmerged)** | `08ef6293`: SR-SECTIONS d5 third form (own-match only), d7 two-route scan; `section_weight` ≤ 1; `fux.runtime.v11`. `2ac82d3b`: the frozen bar |
+| **evidence** | [the run](regression/2026-10-13-section-term-v3/report.md): G0/G1/G3/G4 PASS, latency +49.5 ms PASS; [the gen-6 ladder](regression/2026-10-13-ladder-gen6-rebuild/report.md) |
+| **open** | Arpit's score, then the decider; W-273 phase 2 on a PASS |
 ---
 
 ## 2026-10-13 — **W-279 closed: the register is `fux.register.v2`, and `fux register [--json]` prints it from the index**

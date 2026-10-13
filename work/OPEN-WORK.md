@@ -27,6 +27,8 @@ here. Read that record before changing anything below it.
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 3d |
 | ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-278** — score the section-term run: `just golden-score work/regression/2026-10-13-section-term-v3` in your shell. Captured 2026-10-13; every gate and the latency guardrail PASS. [the run](regression/2026-10-13-section-term-v3/report.md) | 2026-10-13 | 0d |
+| ↳ **blocks:** W-273 phase 2 (ships only on a W-278 PASS) | | |
 
 ---
 
@@ -35,10 +37,11 @@ here. Read that record before changing anything below it.
 ### fux build
 
 - 🟡 **W-273** · `agent` — section records build. **Phase 1 ✅ 2026-10-11** (engine `b4d961cd`: no sections for `.jsonl`/`.csv`/`.json`; gates PASS). Phase 2, the ship path, waits on W-278 (a PASS). **Opus.** [detail](open/W-273-section-records-implementation.md)
-- 🟡 **W-278** · `agent` — section term v3: the best section scored as its own short doc, the doc keeps the better of the two. **DoD 1–4 ✅ 2026-10-13**: record + build `08ef6293` (own-match only, Arpit's ruling; latency pre-check +68.6 ms PASS), bar frozen `2ac82d3b` (decided `sw-1.0`). **DoD 5 in flight**: gen-6 ladder, then capture. Then 🔴 Arpit scores. **Opus.** [detail](open/W-278-section-term-v3.md)
+- 🔴 **W-278** · `arpit` — section term v3: the best section scored as its own short doc, the doc keeps the better of the two. **DoD 1–5 ✅ 2026-10-13**: build `08ef6293`, bar `2ac82d3b`, gen-6 ladder, capture — G0/G1/G3/G4 PASS, latency +49.5 ms PASS. **Waits on Arpit's score**, then a non-capturing session runs `decide.py`. [detail](open/W-278-section-term-v3.md)
 
 ### testing
 
+- 🟢 **W-281** · `agent` — capture and ladder speed: W-278's capture ~45 min, its rung-10000 build stalled 12 h on gpg commit signing. Unsigned ladder commits; G1's 10k ingest and G3's arms in parallel; latency stays standalone; no frozen script edited. **Sonnet.** [detail](open/W-281-capture-harness-speed.md)
 - 🔴 **W-258** · `arpit` — one hands-on session on his machine: a journalled answer whose source then vanishes, a real 429 from a real host, and parallel CDP fetches in signed-in Chrome. Checklist and bars are written. [detail](open/W-258-live-network-captures.md)
 
 ### adr update
