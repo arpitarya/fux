@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@5a5e81b5cae2, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@00842bc95502, node/fux.mjs@803cf090827b]
+owns: [src/fux/cli.py@5a5e81b5cae2, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@00842bc95502, node/fux.mjs@4add14233db7]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 307f80a39d33873ee2065ff3d3941b895d4d5c06f8439777928533f2f36ac38a
+content_sha: bc18222b3fbd20c980653ec029e472de7bd3e8bd85b81837f29e0bddad21ded7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

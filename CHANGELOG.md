@@ -8,6 +8,10 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-10-13
+
+**Breaking: the index format is `fux.index.v8` — run `fux ingest --full` once. `.fux/index/REGISTER` is `fux.register.v2`. First stable 3.0 release.** Details below.
+
 ### Changed (BREAKING)
 
 - **The index format is `fux.index.v8`** (W-236, W-273, W-274). An index

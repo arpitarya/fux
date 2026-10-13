@@ -23,6 +23,11 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-13 — release 3.0.0 (major)  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *do a major release 3.0.0; if the pipeline fails, fix and do a patch upgrade.*
+- **Done:** four version sites `3.0.0-alpha.11` → `3.0.0`, CHANGELOG `[3.0.0] - 2026-10-13` heading over the Unreleased block (index v8, register v2, section records, `fux register`), owns/content_sha restamped on 0001/0101/0136/0153, bundle rebuilt and vendored into `.fux/node/`. Parity 4/4 + bundle; unit 7141 pass, e2e 176 pass, Node 241 pass. Shipped by PR, then a GitHub release after `ci.yml` is green (SR-WORK-RELEASE d11a).
+
 ## 2026-10-13 — W-278 DoD 1–5: the section term's third form built, frozen, captured  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *implement W-278 & W-273.* W-273 phase 2 runs only on a W-278 PASS, so it was not touched.
