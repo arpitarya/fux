@@ -128,6 +128,9 @@ work/regression/2026-10-11-ladder-gen5-rebuild/evidence/new_seed_name_leaks.out 
 work/regression/2026-10-11-section-retest-set-6/evidence/doctor-fix.diff                               # not an indexed file type
 work/regression/2026-10-11-section-retest-set-6/evidence/pre-section-tune.diff                         # not an indexed file type
 work/regression/2026-10-13-ladder-gen6-rebuild/evidence/build.log                                      # not an indexed file type
+work/regression/2026-10-13-ladder-gen6-rebuild/evidence/new_seed_name_leaks.out                        # not an indexed file type
+work/regression/2026-10-13-section-term-v3/evidence/doctor-fix.diff                                    # not an indexed file type
+work/regression/2026-10-13-section-term-v3/evidence/pre-section-config.diff                            # not an indexed file type
 # <<< fux: not indexed <<<
 
 # >>> fux: skipped >>>
@@ -135,6 +138,7 @@ work/regression/2026-10-13-ladder-gen6-rebuild/evidence/build.log               
 # These are the ones worth a look. Fix the file and delete its line.
 archive/v0.26/tests_e2e/corpus/docs/binary.md                                  # binary
 work/regression/2026-10-11-section-retest-set-6/evidence/arm-diff-sw-0.0.txt   # empty
+work/regression/2026-10-13-section-term-v3/evidence/arm-diff-sw-0.0.txt        # empty
 # <<< fux: skipped <<<
 
 # What fux does NOT index. Same grammar as .gitignore, and it is the ONE place
