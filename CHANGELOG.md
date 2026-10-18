@@ -8,6 +8,19 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [4.0.1] - 2026-10-18
+
+**No engine change.** The first release published entirely by the workflow to
+all six names — `fux-core`, `fux-reader`, `fux-writer` and `fux-engine` on
+PyPI, `fux-engine` and `@fux-engine/reader` on npm — on one version.
+
+### Fixed
+
+- **`fux-engine` 4.0.0 never reached PyPI**: the three new role packages had no
+  trusted publishers yet, and the publish workflow held `fux-engine` back rather
+  than publish an engine pinned to packages PyPI lacked. 4.0.0 is on npm, and
+  `fux-core` and `fux-reader` 4.0.0 are on PyPI; use 4.0.1 everywhere.
+
 ## [4.0.0] - 2026-10-18
 
 **Breaking for anyone who imports fux internals or develops fux; nothing

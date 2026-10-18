@@ -575,7 +575,7 @@ record; this section states nothing of its own.**
 
 ## Build & test
 
-**`fux-engine` 4.0.0 is released on PyPI and on npm.** `src/fux/` is the live
+**`fux-engine` 4.0.1 is released on PyPI and on npm.** `src/fux/` is the live
 tree — one tree, four distributions (W-282) — `node/` is the Node reader, and how a release reaches each registry is
 [SR-WORK-RELEASE](records/0063_WORK-release.md)'s.
 
