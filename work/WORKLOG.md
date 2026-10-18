@@ -23,6 +23,13 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-18 — 4.0.3 cut: a root export removed; 4.0.2 never published  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"upgrade to version 4.0.2, update the fux index, push and publish"*; then a root-level export was deleted by Arpit — *"don't mention it anywhere … upgrade the version again and publish all the packages"*; then *"commit everything and push."*
+- **Done:** `fc9df93b` (4.0.2: seven sites, `.fux/node`, CHANGELOG, records re-stamped, index re-ingested) pushed; its CI was superseded before a release. `c56440b8` (4.0.3): the export's exemptions in SR-WORK-DOCS and SR-WORK-GOVERNANCE, their three tests and every reference removed — two past entries in this log included, by Arpit's instruction over the append-only rule; CHANGELOG `[4.0.2]` replaced by `[4.0.3]`.
+- **Verified:** units 7172, e2e 183, Node 241 green before each commit; `ingest --check` clean; version parity 7/7 on 4.0.3; `sr-owns.py` current.
+- **Not done:** history keeps the file (in v3.0.1, v4.0.0, v4.0.1); Arpit chose not to rewrite it. **Next:** CI green on this commit, then `gh release create v4.0.3` and confirm all six names.
+
 ## 2026-10-18 — W-283 and W-282 closed: 4.0.0 and 4.0.1 on all six names  ·  Claude Code (Opus 5.5)
 
 - **Asked:** finish the 4.0.0 publish (W-283), gitignore `node/dist-scoped/`, *"commit everything and publish 4.0.1 … just to be sure everything is working"*.
