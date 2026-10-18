@@ -28,6 +28,14 @@ Rules:
 
 ---
 
+## 2026-10-18 — **v4.0.0 released — npm only so far**
+
+| | |
+|---|---|
+| **shipped** | npm `fux-engine@4.0.0` (`latest`). Tag `v4.0.0` at `c54a5d81`, CI 38/38 |
+| **not yet** | PyPI `fux-core`/`fux-reader`/`fux-writer` (400: no pending publishers), PyPI `fux-engine` 4.0.0 (skipped by design until they land), npm `@fux-engine/reader` (no org) — W-283 |
+---
+
 ## 2026-10-18 — **W-282 Step 2: four distributions from one tree (unreleased)**
 
 | | |

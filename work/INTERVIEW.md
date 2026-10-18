@@ -35,7 +35,12 @@ valuable judgement, but not the state of play.
 *Updated **2026-10-18** (Claude Code, Opus 5.5 — W-282 Steps 1–2, the untangle and the packaging; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-10-18 (latest) — W-282 STEP 2: FOUR DISTRIBUTIONS FROM ONE TREE; THE RELEASE WAITS ON ARPIT (W-283)
+### 🔴 2026-10-18 (latest) — v4.0.0 RELEASED: NPM LIVE, PYPI WAITS ON ARPIT'S REGISTRY STEPS (W-283)
+
+- npm `fux-engine` 4.0.0 is `latest`. PyPI refused the three new names (*"Non-user identities cannot create new projects"* — no pending publishers), so fux-engine 4.0.0 was **skipped by the guard** and PyPI's latest is an intact 3.0.1. `@fux-engine/reader`: no org yet.
+- **Next:** Arpit does W-283 steps 1–3; then `gh run rerun 39115990157 --failed` publishes the rest. Do **not** cut another release for it.
+
+### 🔴 2026-10-18 — W-282 STEP 2: FOUR DISTRIBUTIONS FROM ONE TREE; THE RELEASE WAITS ON ARPIT (W-283)
 
 - **Built:** `fux-core` / `fux-reader` / `fux-writer` under `packages/`, the root as `fux-engine`; each wheel's files come from [the layer map](../records/README.md) via `packages/layer_hook.py`. `cli.py` is core and runs verbs by layer (`VERBS`); doctor is split by layer with one row order (`health.ROWS`). Step 1 is commit `1cce3ac4`; Step 2 is the commit after it.
 - **Departures, both deliberate:** `fux` ships in fux-core and `fux-merge-index` in fux-writer (not fux-engine); the Node bundle rides fux-writer only. One owning wheel per file, or an uninstall deletes another package's file.

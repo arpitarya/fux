@@ -19,7 +19,8 @@ ball: arpit
 | 1 | On pypi.org, add a **pending trusted publisher** for each of `fux-core`, `fux-reader`, `fux-writer` | the release workflow can create and upload the three new packages | 🔴 Arpit |
 | 2 | On npmjs.com, **create the free `@fux-engine` organization** | the scope `@fux-engine/reader` publishes under | 🔴 Arpit |
 | 3 | **Publish `@fux-engine/reader` once by hand**, then add its trusted publisher | every later release publishes it automatically | 🔴 Arpit |
-| 4 | Say **"release 4.0.0"** | an agent cuts it: version bump, changelog, PR, `gh release` — irreversible, so it waits on his word | 🔴 Arpit decides |
+| 4 | Say **"release 4.0.0"** | an agent cuts it | ✅ ruled and cut 2026-10-18 — `v4.0.0` released; see *State after the release* |
+| 5 | Re-run the failed publish jobs once 1–3 are done | the three role packages, then fux-engine 4.0.0, reach PyPI; the scoped package reaches npm | ⏳ one command, after 1–3 |
 
 **Why each is his hand and no agent's:** each is an action in his PyPI or npm
 account, and step 4 publishes to two public registries, which cannot be undone.
@@ -30,6 +31,23 @@ built and committed; this is all that stands between them and PyPI.
 **Model:** NONE for steps 1–3 (his accounts); **Sonnet** for step 4 once he
 says go — it follows [SR-WORK-RELEASE](../../records/0063_WORK-release.md)
 mechanically.
+
+## State after the release (2026-10-18, Claude Code)
+
+Arpit ruled *"push publish everything and release a new major version 4.0.0"*.
+`c54a5d81` passed CI (38/38, verdict saved) and **`v4.0.0` was released**;
+[publish run 39115990157](https://github.com/arpitarya/fux/actions/runs/39115990157):
+
+| registry | outcome | why |
+|---|---|---|
+| npm `fux-engine` | ✅ **4.0.0 published**, `latest` | unchanged path |
+| PyPI `fux-core`, `fux-reader`, `fux-writer` | ❌ 400 *"Non-user identities cannot create new projects"* | the token came from fux-engine's publisher; a NEW project needs a pending publisher of its own — step 1 |
+| PyPI `fux-engine` | ⏸ **skipped, by design** | it waits for the three above, so PyPI's latest stays 3.0.1, intact — never an engine pinned to packages PyPI lacks |
+| npm `@fux-engine/reader` | ❌ 404 | no `@fux-engine` org — steps 2–3 |
+
+**To finish, after steps 1–3:** `gh run rerun 39115990157 --failed`.
+`skip-existing` makes it safe: the roles upload, then fux-engine 4.0.0, then the
+scoped package. Then check `https://pypi.org/pypi/fux-engine/json` reads 4.0.0.
 
 ## Goal
 

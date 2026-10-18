@@ -23,6 +23,13 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-18 — v4.0.0 released: npm live, PyPI waits on the registry steps (W-283)  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"push publish everything and release a new major version 4.0.0."*
+- **Done:** seven version sites → 4.0.0, CHANGELOG `[4.0.0]`; `publish.yml` now uploads fux-core/reader/writer first and fux-engine only after them. `c54a5d81` pushed, CI 38/38 green, `v4.0.0` released.
+- **Outcome (run 39115990157):** npm `fux-engine` 4.0.0 ✅ (`latest`). PyPI role packages ❌ 400 *"Non-user identities cannot create new projects"* — no pending publishers yet; fux-engine **skipped by the new guard**, so PyPI stays on an intact 3.0.1. `@fux-engine/reader` ❌ 404 — no org.
+- **Open:** W-283 steps 1–3 (Arpit's accounts), then `gh run rerun 39115990157 --failed`.
+
 ## 2026-10-18 — W-282 Step 2: four distributions from one tree; Step 3 waits on W-283  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"commit everything and continue … keep implementing till the closure."* Step 1 committed with Cowork's staged W-282 filing (`1cce3ac4`); Step 2 built.
