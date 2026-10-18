@@ -97,10 +97,7 @@ _SKIP_PARTS = frozenset(
      # `.claude/worktrees/`: subagent checkouts of older commits.
      "worktrees"}
 )
-#: `WORK-SYSTEM.md` restates the queue rules ON PURPOSE: it is an export that
-#: recreates the work system in another repository, where SR-WORK-OPEN-QUEUE
-#: does not exist (2026-10-13). It binds nothing here.
-_EXEMPT = {RECORD, ROOT / "work" / "WORKLOG.md", ROOT / "WORK-SYSTEM.md", Path(__file__)}
+_EXEMPT = {RECORD, ROOT / "work" / "WORKLOG.md", Path(__file__)}
 
 
 def _rule_block() -> str:

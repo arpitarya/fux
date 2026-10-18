@@ -1,8 +1,8 @@
 # fux.register.v2	rules=5
 # loc	sha	decoder	[k=v ...]
-CHANGELOG.md	576ee65469719e484385746760075bb43ebc71bd	prose
-CLAUDE.md	0373025a39efc561955b977c58077901ad318c35	prose
-README.md	ba0a8eb7d9116eaf5261f8dba8b5034abef8b53f	prose
+CHANGELOG.md	a5b7662db0a0d7c4c6c864a0de2eeee66dff1699	prose
+CLAUDE.md	178258c79fbe88c05d23a787bb0910bf7c87db13	prose
+README.md	6fb4ac68df4573e5763938d95bdd1156d0c41164	prose
 archive/PLAN-v0.30.md	2e0ef4e71c9f6d31558cf644bbf0da82c0af9b1d	prose	archived=true
 archive/PRIORITY.md	7249a801980d585f6fcd43abc9bb6ebb05d82408	prose	archived=true
 archive/README.md	80a766e0408ac1c16480186fe5d1756aba976989	prose	archived=true
@@ -622,7 +622,7 @@ docs/paper/figures/fig-06-expand.svg	284802f63550cfd46bd33dcb3f5fe0ed6a07a560	sv
 docs/paper/figures/fig-15-latency.svg	cf124bce629880208a1ef3872e4b57e20830a5bf	svg@sha:0d25b190415a4706
 docs/paper/figures/mermaid.config.json	1085b4d4514eba7464626520653acb962f6c3376	json@sha:df03417b3bc177d9
 docs/paper/the-fux-index-paper.md	925b53de1e44ff5e1e2c9155afab4b7698d95f04	prose
-records/0001_LAWS.md	e9fada3d1421c368a87c67c04cfb0f7fdbd14d2e	prose
+records/0001_LAWS.md	a2248c2b2b916f731176f9404b8ec3ee9c5bbd8a	prose
 records/0002_LAW-0-authority.md	aa3d8dc48aa155992a42f389a032445bbe256cca	prose
 records/0003_LAW-1-retired-records-archived.md	95bb26a9f034a718ff04d528a03c8c66b331d6ac	prose
 records/0004_LAW-2-zero-cost.md	6ba7006925c1f9451dbba471da3bb35c6efb80bd	prose
@@ -637,7 +637,7 @@ records/0012_LAW-10-bundled-output.md	9c8a41a1902f3aa79f5ad618c69f97de7153425c	p
 records/0013_LAW-11-sealed-answer-key.md	0d0692917ffc95dbb1c254fa7f2ecbd439b7d80e	prose
 records/0014_LAW-12-values-live-in-config.md	6123d06f0dfed154d75e8adb97d2a0abcfddaee6	prose
 records/0015_LAW-13-the-standing-bar.md	5dccbde2748d9f462f334396dbc3d541c7adeb62	prose
-records/0051_WORK-open-queue.md	96e9847bcf12f5bdc7b1881cdd139bff815b2860	prose
+records/0051_WORK-open-queue.md	d613a2a02df2bf8e1ff50686b53130e741618aeb	prose
 records/0052_WORK-environments.md	4ba7fbbffd0a04393dc416b170c9e1054df175ea	prose
 records/0053_WORK-benchmark.md	359d2e02fa2c5dc41a61d0adea476134e64ad8f7	prose
 records/0054_WORK-ownership.md	697b140ecc99e97bcb920178d3130e1250cbea9e	prose
@@ -645,17 +645,17 @@ records/0055_WORK-backlog.md	c84c190dec99454543c195f933731b3d99056890	prose
 records/0056_WORK-quality.md	0be9b3d0000ce540a95cfee2f3c3a483702b8f35	prose
 records/0057_WORK-scale.md	16b452f85c38bef12c21efb8ace9da813caa4d2b	prose
 records/0058_WORK-lifecycle.md	8d159737ee598d207fbbb582f0f4dd53d55b3c26	prose
-records/0059_WORK-docs.md	b9eedd42af1df15986fefd622e69795a1b7f4d0a	prose
+records/0059_WORK-docs.md	aba422be945940595e156f37beeb27d2aa97fa96	prose
 records/0060_WORK-session.md	e126d7a25ce12e8fbe11fdfeae30cc1e95d42461	prose
 records/0061_WORK-okf.md	499eaa7a4966a9f5b547368a6d1f6b3ac9b6054b	prose
 records/0062_WORK-archive.md	b34ce9d58d813b69ba7a44dec6620d58dbbffc70	prose
-records/0063_WORK-release.md	e9368a22d2672f2a0a2b375760c496b9fa094919	prose
+records/0063_WORK-release.md	f67af82ee40282b78c63863635600773d192a169	prose
 records/0064_WORK-blockers.md	8cc7fa229f31e57f18cb6b3c5564b9d31eb86599	prose
-records/0065_WORK-governance.md	ae4906ebfdf383e7b97efa70bee096d3e8aae4c4	prose
+records/0065_WORK-governance.md	c807882350385e7920e1103ff2759ced5572500c	prose
 records/0066_WORK-golden.md	77ae5051faafb8703c42a188f52d60c0f67131d7	prose
-records/0067_WORK-registry.md	f76a2a781cb3a38134e2dd06bd89264f0be0823b	prose
+records/0067_WORK-registry.md	dc695924be509e16b3d1c818c2dc5c5ea5cbff44	prose
 records/0068_WORK-test-data.md	a437be3ce2d31a1d9d7c181339827df7bbd3ee86	prose
-records/0101_cli-surface.md	2dd0ec356b7dc9aa6926c424f12dbad6398c6f86	prose
+records/0101_cli-surface.md	33268142543745642d43819007c8186c389b6d59	prose
 records/0102_fux-directory.md	64fcdc7746f9aaf558328c896295bc4fc8851fc8	prose
 records/0103_ask.md	6ce4abd93e594b6484f000f121526cfcaa94e886	prose
 records/0104_find.md	28a9fcd7b24753671b5eb3c2ea729e4b7aa30c14	prose
@@ -690,7 +690,7 @@ records/0132_agent-policy.md	478e4ef148512cf4ada9c4db79fe051cd04c3a71	prose
 records/0133_predictions.md	bc04cc245b1cb3541245420c3dcc02caab787447	prose
 records/0134_archived-content.md	e3f3dbbc9ec4b7566504f92af084dc1d7daca061	prose
 records/0135_tuning.md	a9d9afa3cce43b52339d03688fcce3dd2127fe2c	prose
-records/0136_mcp.md	af8ad568dc1532326b3b4eb56aec0b12ea1b14c0	prose
+records/0136_mcp.md	a2409db0a307d4928c91991e5b800bc39721a2bc	prose
 records/0137_enrich.md	c576096312e6896868d37ccfd09e3456001f6a80	prose
 records/0138_rerank.md	706018c8bac4a32131a81aef95c92b079dea19f0	prose
 records/0139_decode.md	daa56cec586280c3f806619e5b86a8255d0b10da	prose
@@ -707,7 +707,7 @@ records/0149_expand.md	b855a01b3d080e6ad35f4e63a9866d0c309a3e6d	prose
 records/0150_tabular.md	dc0f4b2492b64e26818df15569214fa7867a4493	prose
 records/0151_chunking.md	ca077bdc8997952fbc860a54a2907981b793d20f	prose
 records/0152_doctor.md	9faea81033526a50b02733792774d838f3f8c1d9	prose
-records/0153_node-search.md	787fe95c06a6b7a8ae53b300c51113a45ed0af01	prose
+records/0153_node-search.md	24d7e2fe3b978483e5da6c818f6549c1c3fb2528	prose
 records/0154_api.md	8be46aebe34f4f2455350f2253e9d0e5c6f44898	prose
 records/0155_agent-surfaces.md	c0c2ecdbd9a406b030bd680c201e6dd44fb5947d	prose
 records/0156_inspect.md	61ee81897f1e1dfed20bc8cced6830ecdaa968f0	prose
@@ -752,7 +752,7 @@ work/MACHINE.md	34863c282c90b7363a5eb7da18a622354a995c35	prose
 work/NOW.md	08bd8b035164e489f1b6f8eec3f16be1185947bb	prose
 work/OPEN-WORK.md	413357870ee01720f81187a3f902977e916ead73	prose
 work/README.md	d5073a07920179dc0c35071dc2337a8ed6856ddb	prose
-work/WORKLOG.md	7700cb706be4e9eeb2e5381828020f72dc09716d	prose
+work/WORKLOG.md	9feea7a583af873f0aaf81edd5bd0b56f4bf9904	prose
 work/architecture-algorithms.svg	fdf6ef399bf2649dd92510973076e607cb955576	svg@sha:0d25b190415a4706
 work/architecture-answer.svg	3e133168cf7695f77b23accae2835e28418ee770	svg@sha:0d25b190415a4706
 work/architecture-ask.svg	40d6f07068f275412528bb14d5a3455bc0626778	svg@sha:0d25b190415a4706

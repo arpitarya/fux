@@ -7,10 +7,10 @@ description: "Three rules with one home: how a doc is written (short points, tak
 status: accepted
 date: 2026-09-14
 feature: the documentation contract — form, editing authority, and the sync set every task owes
-owns: [tests/test_doc_links.py@861696d81314]
+owns: [tests/test_doc_links.py@5cf7ba56ddbd]
 laws: [L0]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 073ce72cb0f191a3aa1e37bb30e6bb5a5f7e467ec7e0f07b90a6a03fceeeee33
+content_sha: 67b00300efc8393e0f20fd61f5fd0e54f38ac20a4e78689b7ac107e8dac07f3b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -170,8 +170,6 @@ package on `main` yet"* while `fux-engine` was on PyPI, because nobody would
 14. **A `kind: process` record owns its enforcement**, and this one owns the two
     tests above — both of which had **no owner at all** until this record
     existed, so the freshness gate could not fire for either.
-
-**`WORK-SYSTEM.md` is exempt from the link check by name (2026-10-13, Arpit: *"commit everything"*).** It is an export that recreates the work system in another repository; its links name that repository's paths, as `records/TEMPLATE.md`'s are placeholders. It binds nothing here.
 
 ### Consequences
 

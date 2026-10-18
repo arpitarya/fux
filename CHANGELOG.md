@@ -8,12 +8,12 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
-## [4.0.2] - 2026-10-18
+## [4.0.3] - 2026-10-18
 
 **No engine change.** A version bump on all six names — `fux-core`,
 `fux-reader`, `fux-writer` and `fux-engine` on PyPI, `fux-engine` and
 `@fux-engine/reader` on npm — with the committed index re-ingested to match the
-tree it ships from.
+tree it ships from. 4.0.2 was cut but never published; use 4.0.3.
 
 ## [4.0.1] - 2026-10-18
 

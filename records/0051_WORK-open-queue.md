@@ -11,7 +11,7 @@ owns: [tests/test_open_work_rows_are_short.py@edc408037b7f, tests/test_open_work
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: c452630999ec512cc15c489a44e35b5c067589f1dce46caaa9050aa8a8615b4d
+content_sha: d7dc897c9c7b5e9f58fc336f4ba945d5edbd5a7c9c5fd00d918ac253188815b8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -500,8 +500,7 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
    (`test_rule_59_every_item_file_opens_with_a_meeting_view`): position, heading
    and shape. **Rules 60 and 61 are judgement** — no parser can tell plain
    English from jargon, or a current view from a stale one. The template every
-   new file is written from is in [`work/open/README.md`](../work/open/README.md)
-   and, for a repository set up from it, `WORK-SYSTEM.md` §6.13.
+   new file is written from is in [`work/open/README.md`](../work/open/README.md).
 
 10. **Every item says who filed it and who last touched it** (Arpit,
     2026-10-18 — rules 62–64): *"In work items, in front matter, always have
