@@ -8,6 +8,13 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-10-18
+
+**Breaking for anyone who imports fux internals or develops fux; nothing
+changes for a `fux` user.** Same verbs, same flags, same `--json`, same index
+format (`fux.index.v8` — no re-ingest). `pip install fux-engine` installs the
+same files as before, now as four packages. Details below.
+
 ### Added
 
 - **fux ships as four PyPI packages on one version** (W-282). `fux-engine`
@@ -23,7 +30,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 - **The Node reader also publishes as `@fux-engine/reader`** — the same single
   file as `fux-engine` on npm, which is unchanged.
 
-### Changed
+### Changed (BREAKING)
 
 - **Developing fux installs four packages from one tree**: `uv sync --extra dev`,
   or `pip install -e packages/fux-core -e packages/fux-reader -e packages/fux-writer -e ".[dev]"`.

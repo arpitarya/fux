@@ -40,7 +40,7 @@ valuable judgement, but not the state of play.
 - **Built:** `fux-core` / `fux-reader` / `fux-writer` under `packages/`, the root as `fux-engine`; each wheel's files come from [the layer map](../records/README.md) via `packages/layer_hook.py`. `cli.py` is core and runs verbs by layer (`VERBS`); doctor is split by layer with one row order (`health.ROWS`). Step 1 is commit `1cce3ac4`; Step 2 is the commit after it.
 - **Departures, both deliberate:** `fux` ships in fux-core and `fux-merge-index` in fux-writer (not fux-engine); the Node bundle rides fux-writer only. One owning wheel per file, or an uninstall deletes another package's file.
 - **Evidence:** the engine's output is unchanged (worktree comparison, every query and `--help`); each wheel installs and works alone offline (`tests_e2e/test_role_packages.py`); all suites green.
-- 🔴 **Waits on Arpit — [W-283](open/W-283-registry-hand-steps.md):** PyPI pending publishers for the three new names, the `@fux-engine` npm org, the first `@fux-engine/reader` publish, then *"release 3.1.0"*. **Until a release, the three PyPI names are unreserved** — a pending publisher reserves them.
+- 🔴 **Waits on Arpit — [W-283](open/W-283-registry-hand-steps.md):** PyPI pending publishers for the three new names, the `@fux-engine` npm org, the first `@fux-engine/reader` publish, then *"release 4.0.0"*. **Until a release, the three PyPI names are unreserved** — a pending publisher reserves them.
 - ⚠ **Development install changed:** `pip install -e ".[dev]"` alone no longer resolves (fux-engine pins the role packages); use `uv sync --extra dev` or the four-package pip line in SR-WORK-RELEASE d15.
 
 ### 🟢 2026-10-18 — W-282 STEP 1: READER AND WRITER NO LONGER IMPORT EACH OTHER

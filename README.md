@@ -91,7 +91,7 @@ plain `git clone`.
 > zero-dependency Node reader into `.fux/node/`, so `.fux/fux find rollback`
 > works with nothing installed. Or: `npx fux-engine find rollback`.
 
-> **A machine that only reads, or only writes?** From 3.1.0 fux ships as four
+> **A machine that only reads, or only writes?** Since 4.0.0 fux ships as four
 > packages on one version: `fux-engine` is all of them, `fux-reader` ranks and
 > answers (refer included), `fux-writer` ingests and keeps the index current,
 > and `fux-core` is what both share. No package has an extra, and a verb from a
@@ -176,7 +176,7 @@ Honesty up front, so you don't find out the hard way:
 
 ## Status
 
-**`3.0.1` is the latest release** (`pip install fux-engine`). The index format is versioned and fux tells you when to run
+**`4.0.0` is the latest release** (`pip install fux-engine`). The index format is versioned and fux tells you when to run
 `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ⭐ **Star the repo** if fux saved your agent from one confident wrong answer —

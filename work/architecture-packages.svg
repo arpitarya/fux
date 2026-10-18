@@ -2,7 +2,7 @@
 <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10" fill="none" stroke="#3d6df2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
 <rect width="1020" height="1150" fill="#fcfcfb"/>
 <text x="46" y="52" font-size="23" font-weight="600" fill="#14181f">Fux packages, after the split</text>
-<text x="46" y="76" font-size="13" fill="#626b78">What a consumer installs, and everything that comes with it. Built in W-282 (Steps 1-2); released from 3.1.0.</text>
+<text x="46" y="76" font-size="13" fill="#626b78">What a consumer installs, and everything that comes with it. Built in W-282 (Steps 1-2); released from 4.0.0.</text>
 <path d="M560,104 L598,104" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/><text x="606" y="108" font-size="11.5" fill="#626b78">depends on -- installs it</text>
 <rect x="752" y="96" width="22" height="16" rx="4" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.4"/><text x="782" y="108" font-size="11.5" fill="#626b78">what most people install</text>
 <text x="46" y="108" font-size="11.5" fill="#c2410c">orange = a rule the split must keep</text>

@@ -131,12 +131,46 @@ jobs:
           name: dist
           path: dist/
 
-  publish-pypi:
-    name: Publish to PyPI
+  publish-pypi-roles:
+    name: Publish fux-core, fux-reader, fux-writer to PyPI
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write  # OIDC trusted publishing — only this job needs it
+      id-token: write  # OIDC trusted publishing — only the publish jobs need it
+    environment:
+      name: pypi
+      url: https://pypi.org/project/fux-core/
+
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+      - name: Only the role wheels
+        # 🔴 W-282: the role packages go FIRST and fux-engine only after every
+        # one of them is on PyPI. fux-engine pins all three at this version, so
+        # an engine published beside a role package whose upload failed (a
+        # missing trusted publisher, say) would break `pip install fux-engine`
+        # for everyone. In this order, a failure here leaves the previous
+        # fux-engine as the latest, intact.
+        run: |
+          mkdir roles
+          mv dist/fux_core-* dist/fux_reader-* dist/fux_writer-* roles/
+          ls roles/
+
+      - name: Publish the role packages
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: roles/
+          skip-existing: true
+
+  publish-pypi:
+    name: Publish fux-engine to PyPI
+    runs-on: ubuntu-latest
+    needs: publish-pypi-roles   # never before the three it depends on are live
+    permissions:
+      id-token: write
     environment:
       name: pypi
       url: https://pypi.org/project/fux-engine/
@@ -146,6 +180,11 @@ jobs:
         with:
           name: dist
           path: dist/
+
+      - name: Only fux-engine
+        run: |
+          rm -f dist/fux_core-* dist/fux_reader-* dist/fux_writer-*
+          ls dist/
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

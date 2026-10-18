@@ -19,7 +19,7 @@ ball: arpit
 | 1 | On pypi.org, add a **pending trusted publisher** for each of `fux-core`, `fux-reader`, `fux-writer` | the release workflow can create and upload the three new packages | 🔴 Arpit |
 | 2 | On npmjs.com, **create the free `@fux-engine` organization** | the scope `@fux-engine/reader` publishes under | 🔴 Arpit |
 | 3 | **Publish `@fux-engine/reader` once by hand**, then add its trusted publisher | every later release publishes it automatically | 🔴 Arpit |
-| 4 | Say **"release 3.1.0"** | an agent cuts it: version bump, changelog, PR, `gh release` — irreversible, so it waits on his word | 🔴 Arpit decides |
+| 4 | Say **"release 4.0.0"** | an agent cuts it: version bump, changelog, PR, `gh release` — irreversible, so it waits on his word | 🔴 Arpit decides |
 
 **Why each is his hand and no agent's:** each is an action in his PyPI or npm
 account, and step 4 publishes to two public registries, which cannot be undone.
@@ -64,11 +64,11 @@ version, from `publish.yml` — with no upload failing for want of a publisher.
 4. **His go**, in his words, for the release. The agent then follows
    SR-WORK-RELEASE: bump `src/fux/__init__.py` and every parity site
    (`python scripts/check-version-parity.py` lists them — seven since W-282),
-   a `## [3.1.0]` changelog section from `[Unreleased]`, the gated PR, and
-   `gh release create v3.1.0` once CI's FULL verdict is green.
-5. **Verified after publish:** `pip install fux-reader==3.1.0` in a clean venv
+   a `## [4.0.0]` changelog section from `[Unreleased]`, the gated PR, and
+   `gh release create v4.0.0` once CI's FULL verdict is green.
+5. **Verified after publish:** `pip install fux-reader==4.0.0` in a clean venv
    runs `fux ask` and refuses `fux ingest` by name; `npm view @fux-engine/reader
-   version` says 3.1.0.
+   version` says 4.0.0.
 
 ## Blockers
 

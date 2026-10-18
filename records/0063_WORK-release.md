@@ -7,10 +7,10 @@ description: "fux-engine ships to PyPI and npm from one release trigger — PyPI
 status: accepted
 date: 2026-09-14
 feature: how a release reaches two registries, how the version stays equal across its sites, and what the branch wall does not do
-owns: [scripts/check-version-parity.py@8640e01487a4, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@5bdd2a4c3ab0, scripts/npm-scoped.py@4214c9c3380a]
+owns: [scripts/check-version-parity.py@8640e01487a4, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@594679f9249e, scripts/npm-scoped.py@4214c9c3380a]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 9bd80fdcf8ed79794819e75e9234a0c53eff9ebe46cce19c1cb3f9671bc08230
+content_sha: f0d2a918c247917f09df574333f908932651d3d2c83314a20c2cd25fc77fe0eb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
