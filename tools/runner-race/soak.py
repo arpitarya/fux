@@ -160,7 +160,7 @@ def live(path: Path) -> bool:
 
 
 def pending_ids(path: Path) -> set[str]:
-    from fux.maintain import dirty
+    from fux.store import dirty
 
     try:
         return set(dirty.read(path))

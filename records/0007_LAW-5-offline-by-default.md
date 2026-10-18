@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L5
 owns: []
 laws: [L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 72583f3e754ad758db0aecb6a622f9e8cb965eac0c14644a3aebc28e4c7a7e48
+content_sha: 4ac7050824b965354822d92f2c79330ccfd8aed35a5b56eb1ce618c933f41f68
 ---
 
 # SR-LAW-5 — L5 — offline by default
@@ -165,6 +165,6 @@ on 2026-09-06 at Arpit's ruling.
 **How to check it:**
 
 ```bash
-grep -rn "urlopen\|socket\|http.client" src/fux --include='*.py' | grep -v "ingest/urlsrc.py\|refer/"
+grep -rn "urlopen\|socket\|http.client" src/fux --include='*.py' | grep -v "acquire/urlsrc.py\|acquire/source.py\|refer/"
 # expect: no output — the fence
 ```

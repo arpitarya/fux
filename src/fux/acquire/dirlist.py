@@ -2,7 +2,7 @@
 
 **Owned by [SR-DIR-LIST](../../../records/0120_dir-list.md)** since 2026-10-05
 (W-261, Arpit's ruling that every `kind: component` record owns a file). A pure
-move out of `ingest/gitdir.py`, which keeps the walk the list drives
+move out of `acquire/gitdir.py`, which keeps the walk the list drives
 (SR-INGEST's). The grammar machinery is `sourcelist.py`'s (SR-URL-LIST); what is
 here is where the `dirs` list becomes values: the included entries, the `!`
 subtractions, and the two declarations a line may carry — `archived=true` and

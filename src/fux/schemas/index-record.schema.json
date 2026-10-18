@@ -46,7 +46,7 @@
     "declares in its own text, analyzed and hashed like `terms`. Absent when",
     "there is none (omit_when). It is a function of THIS document's bytes, so",
     "it is carried; the corpus-wide table is a read-time fold of every record's",
-    "pairs (query/mined.py) and is committed nowhere. Hashes, not text (L3).",
+    "pairs (text/mined.py) and is committed nowhere. Hashes, not text (L3).",
     "",
     "NSEC, W-236 (2026-10-10, _format v8). The number of this document's",
     "section records in `.fux/index/sections/` (SR-SECTIONS d3). Absent when",

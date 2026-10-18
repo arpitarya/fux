@@ -34,7 +34,7 @@ filed: 2026-10-04
 [SR-PII](../../records/0148_pii.md) Consequences, *Owed*: *"A pathological regex
 can hang an ingest. Python's `re` has no timeout. Patterns that match the empty
 string are refused and `doctor` compiles the rest; beyond that a consumer's
-regex is a consumer's regex."* The module docstring (`ingest/pii.py:74–78`)
+regex is a consumer's regex."* The module docstring (`acquire/pii.py:74–78`)
 repeats it. The record said the bound was *"Owed, and filed in OPEN-WORK"*; it
 never was — backlog row B-232 was its only home (W-251 §1), now B-260 → W-255.
 
@@ -92,7 +92,7 @@ differential harness exists to catch and cannot see on one machine.
 
 ## Consequences of (a) + (e)
 
-- `ingest/pii.py` gains `_lint`; `doctor` gains a `pii timing` row; the
+- `acquire/pii.py` gains `_lint`; `doctor` gains a `pii timing` row; the
   starter `pii.toml` and this repository's must pass the linter.
 - L12: stress-string lengths are fixed values in `constants.toml [pii]`; the
   budget is a tunable in `fux.toml [doctor]`.
@@ -107,7 +107,7 @@ differential harness exists to catch and cannot see on one machine.
   Windows-first litmus) · [L2](../../records/0004_LAW-2-zero-cost.md) ·
   [L4](../../records/0006_LAW-4-deterministic.md) ·
   [L12](../../records/0014_LAW-12-values-live-in-config.md).
-- `src/fux/ingest/pii.py`, `src/fux/doctor.py::_pii_health`,
+- `src/fux/acquire/pii.py`, `src/fux/doctor.py::_pii_health`,
   `src/fux/templates/pii.toml.txt`.
 - W-251 §4 (B-260); W-255.
 

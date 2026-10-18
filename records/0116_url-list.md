@@ -7,10 +7,10 @@ description: "One URL per line in a committed file, deduped and sorted by the lo
 status: accepted
 date: 2026-08-19
 feature: "`.fux/sources/urls` — the file format itself, and the one grammar both committed source lists are parsed by"
-owns: [src/fux/ingest/sourcelist.py@ef3ccfb0002b, node/src/ingest/sourcelist.mjs@b68e15e1467a]
+owns: [src/fux/acquire/sourcelist.py@ef3ccfb0002b, node/src/ingest/sourcelist.mjs@99e1bee84bcf]
 laws: [L3, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 93f407d098363c6fa96844e097cb3290cb66b4193f730fa7e28dd2ac766a0825
+content_sha: d7aa7c997546bf892a8c82c13b1d852625e807ff6516a888e063c15e2d3a0a37
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,7 +18,7 @@ content_sha: 93f407d098363c6fa96844e097cb3290cb66b4193f730fa7e28dd2ac766a0825
 **Owns** — the components this record decides:
 
 - [`node/src/ingest/sourcelist.mjs`](../node/src/ingest/sourcelist.mjs) · file
-- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · file
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py) · file
 
 <!-- COMPONENTS-END -->
 
@@ -699,12 +699,12 @@ pipe** (Arpit, 2026-09-18; built 2026-09-21 as W-199 DoD 10).
 ### Reference (required)
 
 - The grammar, in its single implementation —
-  [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py): the
+  [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py): the
   comment rule, the attribute parse, the dedupe-and-sort and the two error
   classes; `urls` and `dirs` differ only in a closed attribute set and one entry
   validator.
 - The loader that consumes it — `read_urls` in
-  [`urlsrc.py`](../src/fux/ingest/urlsrc.py), whose docstring states the
+  [`urlsrc.py`](../src/fux/acquire/urlsrc.py), whose docstring states the
   sort-and-dedupe guarantee.
 - A real list, every attribute exercised, and the fetch behaviour it drives —
   [`work/regression/2026-08-19-w54/`](../work/regression/2026-08-19-w54/report.md),
@@ -740,7 +740,7 @@ awk '!/^ *#/ && NF {print $1}' .fux/sources/urls 2>/dev/null | sort | uniq -d
 # expect: no output; a hit must be an error, per decision 10
 
 # 3. is there still exactly ONE parser for the two lists?
-grep -rln "def parse(" src/fux/ingest/sourcelist.py src/fux/ingest/urlsrc.py
+grep -rln "def parse(" src/fux/acquire/sourcelist.py src/fux/acquire/urlsrc.py
 # expect: only sourcelist.py — a second parser is the drift this record forbids
 ```
 
@@ -763,8 +763,8 @@ evidence.*
 
 **Code**
 
-- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py)
-- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py)
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py)
+- [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py)
 
 **Measured evidence**
 

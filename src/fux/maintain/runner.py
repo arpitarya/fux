@@ -77,15 +77,7 @@ from ..store import fuxdir
 from ..constants import fixed
 # The write lock is SR-LOCKS', in `lock.py` since W-261; imported here so
 # `runner.acquire`, `runner.write_lock` and the rest keep their callers.
-from .lock import (  # noqa: F401
-    LOCK_NAME,
-    acquire,
-    break_lock,
-    holder,
-    lock_path,
-    release,
-    write_lock,
-)
+from ..store.lock import LOCK_NAME, acquire, break_lock, holder, lock_path, release, write_lock
 
 __all__ = [
     "LOCK_NAME",
@@ -302,7 +294,7 @@ def status(root: Path) -> dict:
     repairs nothing. `fux doctor` renders it; nothing else in the engine acts
     on it.
     """
-    from . import dirty
+    from ..store import dirty
 
     pid = holder(root)
     alive = is_alive(pid) if pid is not None else False
@@ -339,7 +331,7 @@ def record_head(root: Path) -> int:
     costs a *report*, never correctness — `fux ingest` re-indexes the whole
     corpus regardless of what the list says.
     """
-    from . import dirty
+    from ..store import dirty
 
     try:
         result = subprocess.run(
@@ -469,7 +461,7 @@ def run_once(root: Path) -> str:
             if not stop_requested(root, pid):
                 _clear_stop(root)
 
-        from . import dirty
+        from ..store import dirty
 
         # Every id this runner has LOOKED at, across all its passes. What it
         # is for is in `_hand_off_if_leftovers_are_new`: a count cannot tell
@@ -533,9 +525,10 @@ def run_once(root: Path) -> str:
         # wrong answer.
         accelerator = "built"
         try:
-            from ..derive import build as build_accelerator
+            from ..ingest import build_runtime
 
-            build_accelerator(root)
+            if build_runtime(root) is None:
+                accelerator = "none: no reader installed"
         except Exception as exc:  # noqa: BLE001 - recorded, never fatal
             accelerator = f"failed: {type(exc).__name__}: {exc}"
         _write_status(
@@ -583,7 +576,7 @@ def _hand_off_if_leftovers_are_new(root: Path, seen: set[str] | None) -> bool:
     if seen is None:  # run_once failed before it could look at the list
         return False
     try:
-        from . import dirty
+        from ..store import dirty
 
         fresh = set(dirty.read(root)) - seen
         if not fresh:

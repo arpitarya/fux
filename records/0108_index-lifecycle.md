@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@edf8e6426075, node/src/store/format.mjs@4fc4a43aafe0, node/src/store/reader.mjs@ea5bf3de3b4d]
+owns: [src/fux/store@21e5ce665c5f, node/src/store/format.mjs@4fc4a43aafe0, node/src/store/reader.mjs@ea5bf3de3b4d]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 4e7f808a7e9e883ea70065210097601c2d084bdad11c4bb1c0dd71be8d19eaa2
+content_sha: e923c33239c805863009bf6b696216a449c70a2ebdaaf12b78a9df5bdaa33c94
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -203,7 +203,7 @@ bump unnecessary rather than merely expensive.
 
 **10. An analyzer change bumps `analyzer` and not `_format`.** Analyzer v2
 splits identifiers *before* lowercasing and Porter-stems *before* hashing
-(`query/analyzer.py`, `query/stem.py`). Both change which hash a given piece of
+(`text/analyzer.py`, `text/stem.py`). Both change which hash a given piece of
 text produces, so **every `terms` key in the index changes** — and yet the
 property set is unchanged: a record still has `terms`, still maps a 16-hex hash
 to a per-field tf. **The function that produces the key changed**, and that is
@@ -382,7 +382,7 @@ corpus links without words* from *this index predates anchor text*. That is the
 W-48 trap, on the edge.
 
 - **`analyzer` is untouched, by 9.2's own reasoning.** Anchor terms go through
-  the same `query/tokenize.py` every other term does, so no hash changes
+  the same `text/tokenize.py` every other term does, so no hash changes
   meaning and no `df` moves.
 - **`tf_fields` is untouched.** Anchor is a **read-time** field with no
   committed `flen` slot; it is folded from other documents' edges and enters no

@@ -206,11 +206,11 @@ holds open. `for-arpit` (16) are calls no ruling covers:
 | `decode/xlsx.py` | `_SHARED` |
 | `decode/xlsx.py` | `_SHEETS` |
 | `decode/xlsx.py` | `_WORKBOOK` |
-| `ingest/refusals.py` | `MAGIC` |
-| `ingest/refusals.py` | `MAGIC_BY_DECODER` |
-| `ingest/sourcelist.py` | `DIRS` |
-| `ingest/sourcelist.py` | `TYPES` |
-| `ingest/sourcelist.py` | `URLS` |
+| `acquire/refusals.py` | `MAGIC` |
+| `acquire/refusals.py` | `MAGIC_BY_DECODER` |
+| `acquire/sourcelist.py` | `DIRS` |
+| `acquire/sourcelist.py` | `TYPES` |
+| `acquire/sourcelist.py` | `URLS` |
 | `maintain/hooks.py` | `HOOKS` |
 | `maintain/hooks.py` | `_PREAMBLE` |
 | `store/fuxdir.py` | `CACHEDIR_TAG` |
@@ -282,19 +282,19 @@ Sorted by class, then by site. Literals are cut at 40 characters.
 | 26 | `src/fux/graph/walk.py:60` | `ITERATIONS` | `3` | tunable | tune.toml [graph] iterations | already overridable |
 | 27 | `src/fux/graph/walk.py:65` | `LAZINESS` | `0.5` | tunable | tune.toml [graph] laziness | already overridable |
 | 28 | `src/fux/graph/walk.py:69` | `HOP_DECAY` | `0.5` | tunable | tune.toml [graph] hop_decay | already overridable |
-| 29 | `src/fux/ingest/urlsrc.py:309` | `DEFAULT_MAX_PARALLEL` | `4` | tunable | fux.toml [sources.url] max_parallel | already overridable |
+| 29 | `src/fux/acquire/urlsrc.py:309` | `DEFAULT_MAX_PARALLEL` | `4` | tunable | fux.toml [sources.url] max_parallel | already overridable |
 | 30 | `src/fux/maintain/daemon.py:113` | `DEFAULT_SWEEP_MINUTES` | `60` | tunable | fux.toml [sources.url] sweep_minutes | already overridable; two copies (config.py, daemon.py) |
 | 31 | `src/fux/query/bm25f.py:65` | `FIELD_WEIGHTS` | `(1.0, 3.0, 2.0, 1.5, 1.0)` | tunable | tune.toml [bm25f] body…ctx | already overridable |
 | 32 | `src/fux/query/bm25f.py:74` | `K1` | `1.2` | tunable | tune.toml [bm25f] k1 | already overridable |
 | 33 | `src/fux/query/bm25f.py:111` | `ANCHOR` | `1.0` | tunable | tune.toml [bm25f] anchor | already overridable |
 | 34 | `src/fux/query/confidence.py:145` | `SEPARATION_FLOOR` | `0.10` | tunable | tune.toml [confidence] separation_floor | already overridable |
 | 35 | `src/fux/query/confidence.py:185` | `DOC_COVERAGE_FLOOR` | `0.0` | tunable | tune.toml [confidence] doc_coverage_floor | already overridable |
-| 36 | `src/fux/query/mined.py:49` | `MINED_WEIGHT` | `0.5` | tunable | tune.toml [ranking] mined_weight | the worked example |
+| 36 | `src/fux/text/mined.py:49` | `MINED_WEIGHT` | `0.5` | tunable | tune.toml [ranking] mined_weight | the worked example |
 | 37 | `src/fux/query/rerank.py:92` | `WEIGHT` | `1.0` | tunable | tune.toml [ranking] rerank_weight | the reranker's uplift cap; ⚠ Tune.rerank_weight ships 0.0 and gates it — two values, one name |
 | 38 | `src/fux/refer/_assemble.py:67` | `DEFAULT_BUDGET` | `8000` | tunable | tune.toml [refer] budget | already overridable |
 | 39 | `src/fux/refer/_assemble.py:70` | `PER_DOC_FRACTION` | `0.5` | tunable | tune.toml [refer] per_doc_fraction | already overridable |
-| 40 | `src/fux/refer/_chunk.py:65` | `MIN_PASSAGE_BYTES` | `120` | tunable | tune.toml [refer] min_passage_bytes | already overridable |
-| 41 | `src/fux/refer/_chunk.py:69` | `MAX_PASSAGE_BYTES` | `4000` | tunable | tune.toml [refer] max_passage_bytes | already overridable |
+| 40 | `src/fux/text/chunk.py:65` | `MIN_PASSAGE_BYTES` | `120` | tunable | tune.toml [refer] min_passage_bytes | already overridable |
+| 41 | `src/fux/text/chunk.py:69` | `MAX_PASSAGE_BYTES` | `4000` | tunable | tune.toml [refer] max_passage_bytes | already overridable |
 | 42 | `src/fux/store/acquired.py:266` | `DEFAULT_MAX_BYTES` | `2 * 1024 * 1024 * 1024` | tunable | fux.toml [sources.url] acquired_max_bytes | already overridable |
 | 43 | `src/fux/tune.py:122` | `DEFAULT_MAX_PHRASES` | `32` | tunable | tune.toml [index] max_phrases | already overridable |
 | 44 | `src/fux/tune.py:128` | `DEFAULT_MAX_TABLE_ROWS` | `20_000` | tunable | tune.toml [index] max_table_rows | already overridable |
@@ -332,13 +332,13 @@ Sorted by class, then by site. Literals are cut at 40 characters.
 | 76 | `src/fux/enrich.py:64` | `SELF_RETRIEVAL_K` | `3` | tunable-new | tune.toml [enrich] self_retrieval_k | an enrich check threshold |
 | 77 | `src/fux/graph/community.py:51` | `MAX_SWEEPS` | `20` | tunable-new | tune.toml [graph] community_max_sweeps | a loop bound that changes output |
 | 78 | `src/fux/graph/walk.py:321` | `EXPANSION_BUDGET` | `200_000` | tunable-new | tune.toml [graph] expansion_budget | a walk bound |
-| 79 | `src/fux/ingest/refusals.py:126` | `BODY_SCAN_BYTES` | `1024 * 1024` | tunable-new | refusals.toml [scan] | refusal scan window |
-| 80 | `src/fux/ingest/refusals.py:131` | `ALWAYS_SCAN_UNDER` | `8 * 1024` | tunable-new | refusals.toml [scan] | refusal scan window |
-| 81 | `src/fux/ingest/urlsrc.py:315` | `UNDECLARED_MAX_PARALLEL` | `1` | tunable-new | fux.toml [sources.url] undeclared_max_parallel | ⚠ SR-FETCHER dec 5 calls this behaviour, not a knob — may be fixed |
-| 82 | `src/fux/ingest/urlsrc.py:393` | `RATE_LIMIT_RETRIES` | `3` | tunable-new | fux.toml [sources.url] rate_limit_* | fetch politeness |
-| 83 | `src/fux/ingest/urlsrc.py:394` | `RATE_LIMIT_BACKOFF_BASE` | `1.0` | tunable-new | fux.toml [sources.url] rate_limit_* | fetch politeness |
-| 84 | `src/fux/ingest/urlsrc.py:624` | `THIN_DOCUMENT_WORDS` | `50` | tunable-new | fux.toml [sources.url] thin_* | thin-page detection |
-| 85 | `src/fux/ingest/urlsrc.py:636` | `THIN_WORDS_PER_KB` | `2.0` | tunable-new | fux.toml [sources.url] thin_* | thin-page detection |
+| 79 | `src/fux/acquire/refusals.py:126` | `BODY_SCAN_BYTES` | `1024 * 1024` | tunable-new | refusals.toml [scan] | refusal scan window |
+| 80 | `src/fux/acquire/refusals.py:131` | `ALWAYS_SCAN_UNDER` | `8 * 1024` | tunable-new | refusals.toml [scan] | refusal scan window |
+| 81 | `src/fux/acquire/urlsrc.py:315` | `UNDECLARED_MAX_PARALLEL` | `1` | tunable-new | fux.toml [sources.url] undeclared_max_parallel | ⚠ SR-FETCHER dec 5 calls this behaviour, not a knob — may be fixed |
+| 82 | `src/fux/acquire/urlsrc.py:393` | `RATE_LIMIT_RETRIES` | `3` | tunable-new | fux.toml [sources.url] rate_limit_* | fetch politeness |
+| 83 | `src/fux/acquire/urlsrc.py:394` | `RATE_LIMIT_BACKOFF_BASE` | `1.0` | tunable-new | fux.toml [sources.url] rate_limit_* | fetch politeness |
+| 84 | `src/fux/acquire/urlsrc.py:624` | `THIN_DOCUMENT_WORDS` | `50` | tunable-new | fux.toml [sources.url] thin_* | thin-page detection |
+| 85 | `src/fux/acquire/urlsrc.py:636` | `THIN_WORDS_PER_KB` | `2.0` | tunable-new | fux.toml [sources.url] thin_* | thin-page detection |
 | 86 | `src/fux/inspect/_scan.py:46` | `BOILERPLATE_DF_SHARE` | `0.50` | tunable-new | .fux/inspect.toml (NEW file) | inspect finding thresholds |
 | 87 | `src/fux/inspect/_scan.py:52` | `DISTINCTIVE_DF_SHARE` | `0.10` | tunable-new | .fux/inspect.toml (NEW file) | inspect finding thresholds |
 | 88 | `src/fux/inspect/diff.py:107` | `render_markdown()` | `top:int=50` | tunable-new | .fux/inspect.toml (NEW file) | inspect list lengths |
@@ -358,10 +358,10 @@ Sorted by class, then by site. Literals are cut at 40 characters.
 | 102 | `src/fux/inspect/xray.py:77` | `fold()` | `top:int=20` | tunable-new | .fux/inspect.toml (NEW file) | inspect list lengths |
 | 103 | `src/fux/inspect/xray.py:242` | `document()` | `passages_cap:int=200, words:int=25` | tunable-new | .fux/inspect.toml (NEW file) | inspect list lengths |
 | 104 | `src/fux/maintain/daemon.py:108` | `POLL_S` | `1.0` | tunable-new | fux.toml [maintain] daemon_poll_s | daemon loop |
-| 105 | `src/fux/maintain/lastcited.py:57` | `MAX_QUESTIONS` | `256` | tunable-new | fux.toml [maintain] last_cited_max | log bound |
+| 105 | `src/fux/store/lastcited.py:57` | `MAX_QUESTIONS` | `256` | tunable-new | fux.toml [maintain] last_cited_max | log bound |
 | 106 | `src/fux/maintain/runner.py:114` | `STOP_TIMEOUT_S` | `30.0` | tunable-new | fux.toml [maintain] (NEW table) | runner bounds |
 | 107 | `src/fux/maintain/runner.py:126` | `MAX_PASSES` | `5` | tunable-new | fux.toml [maintain] (NEW table) | runner bounds |
-| 108 | `src/fux/maintain/urlstate.py:92` | `FAILING_STREAK` | `5` | tunable-new | fux.toml [sources.url] failing_streak | when a URL is reported failing |
+| 108 | `src/fux/acquire/urlstate.py:92` | `FAILING_STREAK` | `5` | tunable-new | fux.toml [sources.url] failing_streak | when a URL is reported failing |
 | 109 | `src/fux/progress.py:38` | `THRESHOLD` | `200` | tunable-new | output.toml [cli] progress_threshold | when a progress bar appears |
 | 110 | `src/fux/query/__init__.py:1403` | `ANSWER_TOP` | `3` | tunable-new | output.toml [cli.answer] top | `answer` reads no `top` today |
 | 111 | `src/fux/query/headings.py:64` | `MAX_HEADINGS` | `3` | tunable-new | output.toml [cli] max_headings | display count |
@@ -369,7 +369,7 @@ Sorted by class, then by site. Literals are cut at 40 characters.
 | 113 | `src/fux/query/rerank.py:78` | `DEPTH` | `20` | tunable-new | tune.toml [ranking] rerank_depth / rerank_coverage_power | ranking knobs |
 | 114 | `src/fux/query/rerank.py:105` | `COVERAGE_POWER` | `2` | tunable-new | tune.toml [ranking] rerank_depth / rerank_coverage_power | ranking knobs |
 | 115 | `src/fux/refer/_assemble.py:75` | `CITATION_OVERHEAD` | `80` | tunable-new | tune.toml [refer] citation_overhead | budget accounting |
-| 116 | `src/fux/refer/_chunk.py:87` | `TABLE_ROWS_PER_PASSAGE` | `1` | tunable-new | tune.toml [refer] table_rows_per_passage | passage shape |
+| 116 | `src/fux/text/chunk.py:87` | `TABLE_ROWS_PER_PASSAGE` | `1` | tunable-new | tune.toml [refer] table_rows_per_passage | passage shape |
 | 117 | `src/fux/refer/fetchcache.py:61` | `DEFAULT_TTL_SECONDS` | `300` | tunable-new | fux.toml [refer] fetch_cache_ttl | fetch-cache TTL; ⚠ Policy default 0 disables it — two values |
 | 118 | `src/fux/refer/fetchcache.py:66` | `DEFAULT_MAX_BYTES` | `500 * 1024 * 1024` | tunable-new | fux.toml [refer] fetch_cache_max_bytes | cache bound |
 | 119 | `src/fux/serve/__init__.py:78` | `DEFAULT_PORT` | `7337` | tunable-new | output.toml [cli.serve] port | serve port |
@@ -449,22 +449,22 @@ Sorted by class, then by site. Literals are cut at 40 characters.
 | 193 | `src/fux/graph/plane.py:35` | `GRAPH_NAME` | `"graph.json"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 194 | `src/fux/graph/plane.py:36` | `SCHEMA` | `"fux.graph.v1"` | fixed | constants.toml [schema] | a schema id |
 | 195 | `src/fux/graph/walk.py:91` | `EDGE_KINDS` | `("ref", "tag", "code", "supersedes")` | fixed | constants.toml | committed field/kind vocabulary |
-| 196 | `src/fux/ingest/decoderdigest.py:56` | `BUILTIN_PREFIX` | `"built-in:"` | fixed | constants.toml | a committed namespace/prefix |
+| 196 | `src/fux/acquire/decoderdigest.py:56` | `BUILTIN_PREFIX` | `"built-in:"` | fixed | constants.toml | a committed namespace/prefix |
 | 197 | `src/fux/ingest/edges.py:64` | `TAG_PREFIX` | `"tag:"` | fixed | constants.toml | a committed namespace/prefix |
 | 198 | `src/fux/ingest/edges.py:66` | `EXTRACTED_GRADE` | `10` | fixed | constants.toml [graph] grades | committed in E/ |
 | 199 | `src/fux/ingest/edges.py:67` | `AMBIG_GRADE` | `8` | fixed | constants.toml [graph] grades | committed in E/ |
 | 200 | `src/fux/ingest/edges.py:68` | `INFERRED_GRADE` | `6` | fixed | constants.toml [graph] grades | committed in E/ |
 | 201 | `src/fux/ingest/extract.py:45` | `RULES_VERSION` | `3` | fixed | constants.toml [versions] | a format/rules version |
-| 202 | `src/fux/ingest/fuxignore.py:128` | `IGNORE_FILE` | `".fux/.fuxignore"` | fixed | constants.toml [files] | an artefact file/dir name |
-| 203 | `src/fux/ingest/ingestlog.py:105` | `INGEST_LOG_FILE` | `"ingest-log.jsonl"` | fixed | constants.toml [files] | an artefact file/dir name |
-| 204 | `src/fux/ingest/pii.py:93` | `RULES_NAME` | `"pii.toml"` | fixed | constants.toml [files] | an artefact file/dir name |
-| 205 | `src/fux/ingest/pii.py:517` | `COUNTS_NAME` | `"pii-counts.json"` | fixed | constants.toml [files] | an artefact file/dir name |
+| 202 | `src/fux/acquire/fuxignore.py:128` | `IGNORE_FILE` | `".fux/.fuxignore"` | fixed | constants.toml [files] | an artefact file/dir name |
+| 203 | `src/fux/acquire/ingestlog.py:105` | `INGEST_LOG_FILE` | `"ingest-log.jsonl"` | fixed | constants.toml [files] | an artefact file/dir name |
+| 204 | `src/fux/acquire/pii.py:93` | `RULES_NAME` | `"pii.toml"` | fixed | constants.toml [files] | an artefact file/dir name |
+| 205 | `src/fux/acquire/pii.py:517` | `COUNTS_NAME` | `"pii-counts.json"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 206 | `src/fux/ingest/queue.py:38` | `QUEUE_REL` | `".fux/enrich/queue.tsv"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 207 | `src/fux/ingest/queue.py:39` | `PROGRESS_REL` | `".fux/runtime/enrich-progress.tsv"` | fixed | constants.toml [files] | an artefact file/dir name |
-| 208 | `src/fux/ingest/refusals.py:71` | `RULES_NAME` | `"refusals.toml"` | fixed | constants.toml [files] | an artefact file/dir name |
+| 208 | `src/fux/acquire/refusals.py:71` | `RULES_NAME` | `"refusals.toml"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 209 | `src/fux/ingest/register.py:57` | `NAME` | `"REGISTER"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 210 | `src/fux/ingest/register.py:61` | `HEADER` | `"` | fixed | constants.toml [register] header | committed REGISTER header |
-| 211 | `src/fux/ingest/routes.py:37` | `REGEX_PREFIX` | `"re:"` | fixed | constants.toml | a committed namespace/prefix |
+| 211 | `src/fux/acquire/routes.py:37` | `REGEX_PREFIX` | `"re:"` | fixed | constants.toml | a committed namespace/prefix |
 | 212 | `src/fux/ingest/run.py:1003` | `PII_DIGEST_FILE` | `"pii-digest"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 213 | `src/fux/ingest/run.py:1010` | `EXTRACT_CONFIG_DIGEST_FILE` | `"extract-config-digest"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 214 | `src/fux/ingest/run.py:1015` | `ENRICH_DIGEST_FILE` | `"enrich-digests.json"` | fixed | constants.toml [files] | an artefact file/dir name |
@@ -483,17 +483,17 @@ Sorted by class, then by site. Literals are cut at 40 characters.
 | 227 | `src/fux/maintain/daemon.py:96` | `PID_NAME` | `"daemon.pid"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 228 | `src/fux/maintain/daemon.py:97` | `STOP_NAME` | `"daemon.stop"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 229 | `src/fux/maintain/daemon.py:98` | `STATUS_NAME` | `"daemon.status"` | fixed | constants.toml [files] | an artefact file/dir name |
-| 230 | `src/fux/maintain/dirty.py:33` | `DIRTY_NAME` | `"dirty"` | fixed | constants.toml [files] | an artefact file/dir name |
+| 230 | `src/fux/store/dirty.py:33` | `DIRTY_NAME` | `"dirty"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 231 | `src/fux/maintain/hooks.py:77` | `MERGE_DRIVER_NAME` | `"fux-index"` | fixed | constants.toml [hooks] | written into .git — identifies fux's hooks |
 | 232 | `src/fux/maintain/hooks.py:81` | `MARKER` | `"` | fixed | constants.toml [hooks] | written into .git — identifies fux's hooks |
-| 233 | `src/fux/maintain/lastcited.py:52` | `LOG_NAME` | `"last-cited.json"` | fixed | constants.toml [files] | an artefact file/dir name |
+| 233 | `src/fux/store/lastcited.py:52` | `LOG_NAME` | `"last-cited.json"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 234 | `src/fux/maintain/runner.py:106` | `LOCK_NAME` | `"write.lock"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 235 | `src/fux/maintain/runner.py:107` | `STOP_NAME` | `"runner.stop"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 236 | `src/fux/maintain/runner.py:108` | `STATUS_NAME` | `"runner.status"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 237 | `src/fux/maintain/runner.py:477` | `HANDOFF_ENV` | `"FUX_RUNNER_HANDOFF"` | fixed | constants.toml [env] | env var names |
 | 238 | `src/fux/maintain/runner.py:493` | `NO_SPAWN_ENV` | `"FUX_NO_SPAWN"` | fixed | constants.toml [env] | env var names |
-| 239 | `src/fux/maintain/urlstate.py:67` | `STATE_NAME` | `"url-state.json"` | fixed | constants.toml [files] | an artefact file/dir name |
-| 240 | `src/fux/maintain/urlstate.py:70` | `SCHEMA_NAME` | `"state.schema.json"` | fixed | constants.toml [files] | an artefact file/dir name |
+| 239 | `src/fux/acquire/urlstate.py:67` | `STATE_NAME` | `"url-state.json"` | fixed | constants.toml [files] | an artefact file/dir name |
+| 240 | `src/fux/acquire/urlstate.py:70` | `SCHEMA_NAME` | `"state.schema.json"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 241 | `src/fux/mcp.py:32` | `PROTOCOL_VERSION` | `"2024-11-05"` | fixed | constants.toml [versions] | a format/rules version |
 | 242 | `src/fux/observe.py:73` | `CONSUMER_DIR` | `".fux/observers"` | fixed | constants.toml [files] | an artefact file/dir name |
 | 243 | `src/fux/observe.py:79` | `LIVENESS_NAME` | `"observers.json"` | fixed | constants.toml [files] | an artefact file/dir name |
@@ -539,18 +539,18 @@ Sorted by class, then by site. Literals are cut at 40 characters.
 | 283 | `node/src/refer/source.mjs:31` | `URL` | `"url";` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
 | 284 | `src/fux/config.py:119` | `KNOWN_AGENTS` | `("claude", "codex", "copilot", "kiro")` | not-a-value? | — | the closed agent set; fux.toml [agents] install selects from it |
 | 285 | `src/fux/decode/__init__.py:93` | `PROSE_DECODER` | `"prose"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 286 | `src/fux/ingest/fuxignore.py:133` | `BLOCK_NOT_INDEXED` | `"not indexed"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 287 | `src/fux/ingest/fuxignore.py:134` | `BLOCK_SKIPPED` | `"skipped"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 288 | `src/fux/ingest/fuxignore.py:135` | `BLOCKS` | `(BLOCK_NOT_INDEXED, BLOCK_SKIPPED)` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 289 | `src/fux/ingest/gitdir.py:99` | `POLICY` | `"policy"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 290 | `src/fux/ingest/gitdir.py:100` | `UNREADABLE` | `"unreadable"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 291 | `src/fux/ingest/gitdir.py:114` | `UNFETCHED` | `"unfetched"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 292 | `src/fux/ingest/ingestlog.py:111` | `PROSE` | `"prose"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 293 | `src/fux/ingest/ingestlog.py:116` | `UNKNOWN` | `"unknown"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 294 | `src/fux/ingest/refusals.py:408` | `MAGIC_FLOOR` | `"magic-floor"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 286 | `src/fux/acquire/fuxignore.py:133` | `BLOCK_NOT_INDEXED` | `"not indexed"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 287 | `src/fux/acquire/fuxignore.py:134` | `BLOCK_SKIPPED` | `"skipped"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 288 | `src/fux/acquire/fuxignore.py:135` | `BLOCKS` | `(BLOCK_NOT_INDEXED, BLOCK_SKIPPED)` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 289 | `src/fux/acquire/gitdir.py:99` | `POLICY` | `"policy"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 290 | `src/fux/acquire/gitdir.py:100` | `UNREADABLE` | `"unreadable"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 291 | `src/fux/acquire/gitdir.py:114` | `UNFETCHED` | `"unfetched"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 292 | `src/fux/acquire/ingestlog.py:111` | `PROSE` | `"prose"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 293 | `src/fux/acquire/ingestlog.py:116` | `UNKNOWN` | `"unknown"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 294 | `src/fux/acquire/refusals.py:408` | `MAGIC_FLOOR` | `"magic-floor"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
 | 295 | `src/fux/ingest/register.py:66` | `UNKNOWN` | `"-"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
 | 296 | `src/fux/ingest/skipnotice.py:84` | `LEGACY_NOTICE` | `"skipped"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 297 | `src/fux/ingest/sourcelist.py:344` | `PROSE_DECODER` | `"prose"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 297 | `src/fux/acquire/sourcelist.py:344` | `PROSE_DECODER` | `"prose"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
 | 298 | `src/fux/inspect/__init__.py:402` | `_number()` | `digits:int=3` | not-a-value? | — | display rounding digits — text formatting? |
 | 299 | `src/fux/inspect/xray.py:40` | `FINDINGS` | `` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
 | 300 | `src/fux/query/confidence.py:108` | `GROUNDED` | `"grounded"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
@@ -563,11 +563,11 @@ Sorted by class, then by site. Literals are cut at 40 characters.
 | 307 | `src/fux/query/provenance.py:179` | `DRIFTED_CONFIG` | `"drifted:config"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
 | 308 | `src/fux/query/provenance.py:180` | `UNVERIFIABLE` | `"unverifiable"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
 | 309 | `src/fux/query/provenance.py:182` | `VERDICTS` | `(REPRODUCED, DRIFTED_CORPUS, DRIFTED_…` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 310 | `src/fux/refer/freshness.py:76` | `NEVER` | `"never"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 311 | `src/fux/refer/freshness.py:79` | `ALWAYS` | `"always"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 312 | `src/fux/refer/freshness.py:81` | `MODES` | `(NEVER, ALWAYS)` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 313 | `src/fux/refer/source.py:58` | `GIT` | `"git"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
-| 314 | `src/fux/refer/source.py:59` | `URL` | `"url"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 310 | `src/fux/acquire/freshness.py:76` | `NEVER` | `"never"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 311 | `src/fux/acquire/freshness.py:79` | `ALWAYS` | `"always"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 312 | `src/fux/acquire/freshness.py:81` | `MODES` | `(NEVER, ALWAYS)` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 313 | `src/fux/acquire/source.py:58` | `GIT` | `"git"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
+| 314 | `src/fux/acquire/source.py:59` | `URL` | `"url"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
 | 315 | `src/fux/store/fuxdir.py:449` | `SHAPE_VENDORED` | `"A"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
 | 316 | `src/fux/store/fuxdir.py:450` | `SHAPE_WORKSPACE` | `"C"` | not-a-value? | — | an enum tag / wire vocabulary — an identifier, like a key name |
 | 317 | `node/src/config/output.mjs:35` | `ROOTS` | `["cli", "mcp"];` | not-a-value | — | names of config keys |
@@ -596,8 +596,8 @@ Sorted by class, then by site. Literals are cut at 40 characters.
 | 340 | `src/fux/doctor.py:2566` | `FLOOR_OFF_NOTE` | `` | not-a-value | — | user-facing text |
 | 341 | `src/fux/enrich.py:75` | `REQUIRED_KEYS` | `("source", "source_sha", "chunks", "m…` | not-a-value | — | names of config keys |
 | 342 | `src/fux/errors.py:18` | `__init__()` | `exit_code:int=1` | not-a-value | — | exit code 1 is an identity, not a setting |
-| 343 | `src/fux/ingest/typesfile.py:79` | `KEYS` | `("include", "decoders", "meta")` | not-a-value | — | names of config keys |
-| 344 | `src/fux/ingest/typesfile.py:86` | `META_TARGETS` | `("body", "heading", "title", "path", …` | not-a-value | — | names of config keys |
+| 343 | `src/fux/acquire/typesfile.py:79` | `KEYS` | `("include", "decoders", "meta")` | not-a-value | — | names of config keys |
+| 344 | `src/fux/acquire/typesfile.py:86` | `META_TARGETS` | `("body", "heading", "title", "path", …` | not-a-value | — | names of config keys |
 | 345 | `src/fux/maintain/hooks.py:75` | `REFS_NOTE` | `"refs/fux/<tree> — see the module not…` | not-a-value | — | user-facing text |
 | 346 | `src/fux/output_config.py:219` | `MCP_KEYS` | `("top",)` | not-a-value | — | names of config keys |
 | 347 | `src/fux/progress.py:184` | `update()` | `n:int=1` | not-a-value | — | increment of 1 is arithmetic identity |

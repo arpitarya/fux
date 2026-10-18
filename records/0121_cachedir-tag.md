@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-05
 date: 2026-08-19
 feature: the `CACHEDIR.TAG` file written into every derived `.fux/` subdirectory
-owns: [node/src/store/cachedir.mjs@3c5666686c26, src/fux/store/cachedir.py@d7eecddb31d3]
+owns: [node/src/store/cachedir.mjs@3c5666686c26, src/fux/store/cachedir.py@2ad17a07d1e5]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 8afeb5be112a077e2390b9ed83ef48af9e818aa5eb36d170ab080a3e9e6e2479
+content_sha: 46f0d232cc2a2d2e20d06e3a0a3bebffe56d34f5d1dab0211019e7a3a8aef868
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

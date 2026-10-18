@@ -28,10 +28,10 @@ from .. import store as store_mod
 from .rank import AskResult, Corpus, rank
 from ..store import TF_FIELDS
 from .bm25f import Scoring, derive_wlen
-from . import identifiers as ids_mod
+from ..text import identifiers as ids_mod
 from . import sections as sections_mod
-from .identifiers import EMPTY, IdentifierRules
-from .tokenize import tokenize
+from ..text.identifiers import EMPTY, IdentifierRules
+from ..text.tokenize import tokenize
 
 #: W-168 step 1 — one `ref` edge's anchor length and its target, off the raw
 #: bytes.

@@ -66,7 +66,7 @@ disappearance of a key.
 
 Since 2026-09-11 the types list is `.fux/formats.toml` (SR-TYPES decision 12),
 so every verb here branches on `sourcelist.TYPES` and hands the edit to
-[`ingest/typesfile.py`](ingest/typesfile.py). **The rule above still holds** —
+[`acquire/typesfile.py`](acquire/typesfile.py). **The rule above still holds** —
 one line of the file changes, every other byte is kept — and the editor
 **refuses** a layout it did not write rather than reformatting it. A bare
 `*.ext` a decoder reads becomes a `[decoders]` line; anything else is an
@@ -88,7 +88,7 @@ from .config import (
     load,
 )
 from .errors import FuxError
-from .ingest import fuxignore, sourcelist, typesfile
+from .acquire import fuxignore, sourcelist, typesfile
 from .constants import fixed
 
 _JSON_INDENT = fixed("json", "indent")
@@ -515,7 +515,7 @@ def _resolved_fetch(root: Path, url: str) -> str:
     consumer either has no fetcher for that host, or has one and has not routed
     it.
     """
-    from .ingest import urlsrc
+    from .acquire import urlsrc
 
     fetchers_dir = root / FETCHERS_DIR
     try:
@@ -586,7 +586,7 @@ def _observed_decoder(root: Path, url: str, fetch: str) -> str:
       make it loadable is the one the fetch was for. The message says
       `--decoder <stem>` writes it without a network at all.
     """
-    from .ingest import refusals, urlsrc
+    from .acquire import refusals, urlsrc
 
     try:
         source = load(root).url
@@ -1047,7 +1047,7 @@ def _seed_types(path: Path) -> None:
     `[decoders]` lines, so the map does not decay from its first entry.
     """
     from .decode import builtin_bindings
-    from .ingest.gitdir import DEFAULT_TYPES
+    from .acquire.gitdir import DEFAULT_TYPES
 
     bindings = {ext.lstrip("."): name for ext, name in builtin_bindings().items()}
     prose = [glob for glob in DEFAULT_TYPES if typesfile.pattern_extension(glob) not in bindings]
@@ -1318,7 +1318,7 @@ def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool):
     daemon and never commits a URL change will not re-fetch. That is why the
     announcement always names `--refetch-all`.
     """
-    from .maintain import dirty as dirty_mod
+    from .store import dirty as dirty_mod
 
     # ⚠ **`--failed` was PARSED AND NEVER READ** from the day it landed until
     # 2026-09-11 (W-140 row 4). `fux update --failed` ran the ordinary narrow
@@ -1330,7 +1330,7 @@ def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool):
     # different costume, and argparse cannot express "more specific" — only
     # "mutually exclusive", which would break every script already passing both.
     if failed_only:
-        from .maintain import urlstate as urlstate_mod
+        from .acquire import urlstate as urlstate_mod
 
         known = {e.value for e in listed if not e.exclude}
         failing = {
@@ -1382,7 +1382,7 @@ def _check(root: Path, entry: str | None, *, as_json: bool) -> int:
     import sys
 
     from . import store as store_mod
-    from .refer import freshness
+    from .acquire import freshness
 
     index = store_mod.read_index(root)
     if entry:
@@ -1434,7 +1434,7 @@ def _check(root: Path, entry: str | None, *, as_json: bool) -> int:
     # The digest is COMMITTED in the shard header, which is why a fresh clone
     # in CI can see it at all.
     if not entry:
-        from .query import identifiers as ids_mod
+        from .text import identifiers as ids_mod
 
         built = (store_mod.index_header(root) or {}).get(store_mod.IDENTIFIERS_KEY, "")
         wanted = ids_mod.load(root).digest

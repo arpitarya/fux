@@ -27,7 +27,7 @@ no session should treat this file as exhaustive.
 that the queue holds instead carry no row here: W-87, W-136, W-140,
 W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-157, and — promoted
 from rows here on 2026-09-14 — W-163 (eight doctor rows), W-164 (four gates),
-W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search improvements), W-169 (`fux inspect`), W-170 (cage search leg), W-176 (the nine abstention gates, from B-175); from rows here on 2026-10-04 — W-253 (B-100, B-146, B-151), W-254 (B-150), W-255 (B-260), W-256 (B-098, B-113, B-103 and the loopback halves of B-102/B-124), W-257 (B-108–B-110), W-258 (B-101 and the live halves of B-102/B-124).
+W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search improvements), W-169 (`fux inspect`), W-170 (cage search leg), W-176 (the nine abstention gates, from B-175); from rows here on 2026-10-04 — W-253 (B-100, B-146, B-151), W-254 (B-150), W-255 (B-260), W-256 (B-098, B-113, B-103 and the loopback halves of B-102/B-124), W-257 (B-108–B-110), W-258 (B-101 and the live halves of B-102/B-124); from B-272 on 2026-10-18 — W-282 (its §8, the package split; the row stays for the store).
 
 ---
 
@@ -118,7 +118,7 @@ with its proposal.
 | B-269 | The build plan — the `unbuilt`/`ungated` rows whose approach was ruled 2026-10-04 and whose build nobody is about to start (B-031, B-041, B-259): key files, DoD, size, model, the law each must respect | [`build-plan-2026-10.md`](proposals/build-plan-2026-10.md) | Per section: its own trigger fires, or a session is about to build it — then a `W-nn` |
 | B-270 | `fux enrich` plans the queue's *nothing readable* documents (W-248), but nothing indexes what it writes for them: ingest drops an unreadable document before extraction | [SR-ENRICH](../records/0137_enrich.md) d4 | the `enriched` mode ruling (W-251 §3 #1) |
 | B-271 | SR-LAWS decision 7 still says `concurrent.futures` keeps *"the zero-dependency guarantee untouched"* — a guarantee L2's 2026-09-06 amendment withdrew; a Law record changes only on Arpit's word, so `tests/test_withdrawn_claims.py` holds it `xfail(strict)` | [SR-LAWS](../records/0001_LAWS.md) d7 | Arpit's word on one sentence (e.g. *"…so no runtime dependency is added"*) |
-| B-272 | Index stores — the index may live in a database outside any repository, not only in git: one store boundary over today's reader/writer seam, `git` and `sql` stores, one writer, readers sync locally so `fux ask` stays offline | [`index-stores.md`](proposals/index-stores.md) | Arpit rules F1 (sync vs direct query), F2 (first backend), and names the first index outside a repo |
+| B-272 | Index stores — the index may live in a database outside any repository: one store boundary, `git` and `sql` stores, one writer, readers sync locally; §8 → [W-282](open/W-282-reader-writer-packages.md) | [`index-stores.md`](proposals/index-stores.md) | W-282 lands and this proposal is rewritten against it (ruled 2026-10-18); Arpit rules F1, F2 and names the first index outside a repo |
 
 ---
 

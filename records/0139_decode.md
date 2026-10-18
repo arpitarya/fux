@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@09d46517feac, src/fux/templates/agents/DECODER-SKILL.md@b96869349595, .fux/decoders@cbec8e165dca, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@6748ca720ca3]
+owns: [src/fux/decode@871929ff8a92, src/fux/templates/agents/DECODER-SKILL.md@c328738ae3e6, .fux/decoders@f95b2a0e7dd6, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@5f97a79df7ad]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 4924c396b3ee498bbfad84a3f8441b76bc219804209d0acff1afec5617c8b270
+content_sha: 9fb061d594424f91c6014cfdc80a94f9991c479faf112dd913296daac22eefd0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -291,7 +291,7 @@ records as SIBLINGS beneath it.** Measured 2026-09-11 and fixed the same day.
 
 - **What went wrong.** `jsonl` and `json`'s record-array branch gained a
   per-record `## Record N` / `## Item N` heading on 2026-09-06 so that
-  `refer/_chunk.py` had a boundary to split on — correct, and it emitted **no
+  `text/chunk.py` had a boundary to split on — correct, and it emitted **no
   document title at all**. `extract.py` takes the **shallowest** heading, so
   every such document was titled **`Record 1`** in a heavily-weighted field.
 - **The measurement** ([W-116's run](../work/regression/2026-09-11-w116-chunking/report.md)):
@@ -320,7 +320,7 @@ records as SIBLINGS beneath it.** Measured 2026-09-11 and fixed the same day.
   the fix** — while the run reported success and `fux doctor` stayed green.
 
   **Every decoder now declares `VERSION`**, and
-  [`ingest/decoderdigest.py`](../src/fux/ingest/decoderdigest.py) puts it in the
+  [`acquire/decoderdigest.py`](../src/fux/acquire/decoderdigest.py) puts it in the
   reuse key. **Bump it in the same change as any edit that can move what
   `decode()` returns**; leaving it alone is the claim the edit cannot.
   `tests/decode/test_decoder_versions.py` fails a changed module whose constant
@@ -340,7 +340,7 @@ records as SIBLINGS beneath it.** Measured 2026-09-11 and fixed the same day.
   would silently pin a whole format to stale extraction. The price is that a
   whitespace edit re-extracts that format — the cheap direction of being wrong.
 
-  ⚠ **It lives in `ingest/`, not here, and the reason is worth keeping.** The
+  ⚠ **It lives in `acquire/`, not here, and the reason is worth keeping.** The
   first shape put it beside `registry()`, and `tests/test_node_twins.py` refused
   it: `node/src/decode/registry.mjs` is this module's twin, Node **reads** an
   index and never builds one, so the change would have left that twin
@@ -386,7 +386,7 @@ is what it means for dispatch.
 ⚠ **Where the binding lives moved on 2026-09-11** ([SR-TYPES](0128_types-list.md)
 decision 12): it was `decoder=<module>` on a `*.ext` line of `.fux/sources/types`,
 and is `<ext> = "<module>"` under `[decoders]` in `.fux/formats.toml`.
-`_declared_bindings` reads it through `ingest/typesfile.py` and passes `_bind` a
+`_declared_bindings` reads it through `acquire/typesfile.py` and passes `_bind` a
 **location string** (`.fux/formats.toml:14 (decoders.geojson)`) instead of a line
 number, because a parsed TOML value carries no position. **`_bound_extension`
 is deleted, not moved**: its one job was refusing a path-scoped binding, which a
@@ -446,7 +446,7 @@ what the file's own default should say.
 **14. What counts as a heading lives in `decode/_markdown.py`, and both readers
 import it.** A decoder's output has exactly two consumers, and each used to
 carry its own `^#{1,6}` regex: `ingest/extract.py` to mine the `heading` field
-and `phrases`, `refer/_chunk.py` to decide where a citable passage begins.
+and `phrases`, `text/chunk.py` to decide where a citable passage begins.
 
 - **They had already drifted.** The chunker stripped a closing `###` sequence
   and extraction kept it, so one document's heading was `Rollbacks` to one plane
@@ -478,7 +478,7 @@ and `phrases`, `refer/_chunk.py` to decide where a citable passage begins.
 headings ARE its chunking.** Four shipped decoders emitted no heading at all —
 `pdf`, `rtf`, `csv`, and `jsonl` between records — which meant those
 formats contributed **no `phrases` to any record in any corpus** and were cut by
-`refer/_chunk.py` into blind fixed-size slabs. What each emits now, and the
+`text/chunk.py` into blind fixed-size slabs. What each emits now, and the
 judgement in it:
 
 | format | structure | the judgement |
@@ -980,7 +980,7 @@ grep -rnE '^(import|from) ' src/fux/decode/ | grep -vE 'fux\.|^\S+:(import|from)
 # expect: no output
 
 # 3 — the default unions BUILT-IN extensions only
-grep -n 'builtin_extensions' src/fux/ingest/gitdir.py
+grep -n 'builtin_extensions' src/fux/acquire/gitdir.py
 # expect: one call, inside the default-types helper
 ```
 
@@ -1004,7 +1004,7 @@ evidence.*
 
 - [`.fux/fetchers/http.py`](../.fux/fetchers/http.py)
 - [`src/fux/decode/__init__.py`](../src/fux/decode/__init__.py)
-- [`src/fux/ingest/gitdir.py`](../src/fux/ingest/gitdir.py)
+- [`src/fux/acquire/gitdir.py`](../src/fux/acquire/gitdir.py)
 - [`src/fux/templates/agents/DECODER-SKILL.md`](../src/fux/templates/agents/DECODER-SKILL.md)
 - [`tests/decode/test_decode.py`](../tests/decode/test_decode.py)
 

@@ -33,7 +33,7 @@ import stat
 
 import pytest
 
-from fux.ingest import ingestlog as provenance
+from fux.acquire import ingestlog as provenance
 from fux.ingest.run import run
 from l12_fixtures import write_config
 

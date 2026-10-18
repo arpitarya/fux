@@ -8,8 +8,8 @@ from __future__ import annotations
 import pytest
 
 from fux.errors import FuxError
-from fux.ingest import sourcelist
-from fux.refer import freshness
+from fux.acquire import sourcelist
+from fux.acquire import freshness
 
 
 # -- the duration grammar ---------------------------------------------------

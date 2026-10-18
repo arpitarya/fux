@@ -1,6 +1,6 @@
 """The one Markdown heading grammar — `decode/_markdown.py`.
 
-Both `ingest/extract.py` and `refer/_chunk.py` read this module, so a defect
+Both `ingest/extract.py` and `text/chunk.py` read this module, so a defect
 here is a ranking defect and a citation defect at the same time. The case that
 created it is the first test: a `#` comment inside a fenced code block, which
 both planes used to count as a heading.

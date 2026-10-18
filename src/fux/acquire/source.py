@@ -10,7 +10,7 @@ the adapter cap.
 The engine already solved this. **SR-FETCHER established that the consumer
 owns the fetcher file**: fux loads it by path and calls
 `fetch(url) -> tuple[bytes, str]`, and all transport, auth, retries and browser
-machinery live on the consumer's side of that line. `ingest/urlsrc.py` is fux's half of that contract at ingest
+machinery live on the consumer's side of that line. `acquire/urlsrc.py` is fux's half of that contract at ingest
 time; this module is the same half at verify time.
 
 **There is exactly one fetch mechanism in this engine, and the refer plane
@@ -52,7 +52,7 @@ from pathlib import Path
 
 from .. import store as store_mod
 from ..errors import FuxError
-from ..ingest.urlsrc import _decode_fetched, _unpack, declared_decoder, sanitize
+from .urlsrc import _decode_fetched, _unpack, declared_decoder, sanitize
 
 __all__ = ["Fetched", "resolve", "fetch_document", "from_acquired", "GIT", "URL"]
 

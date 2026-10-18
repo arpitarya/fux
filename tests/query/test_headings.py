@@ -31,7 +31,7 @@ MAX_HEADINGS = shipped_output()["max_headings"]
 
 def headings_for(record, query, *, limit=MAX_HEADINGS):
     return _headings.headings_for(record, query, limit=limit)
-from fux.query.tokenize import tokenize
+from fux.text.tokenize import tokenize
 from fux.store import content_sha, term_hash, write_index
 from l12_fixtures import write_config
 

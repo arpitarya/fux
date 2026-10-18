@@ -8,17 +8,17 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/ingest/urlsrc.py@495b26bb16a0, src/fux/templates@269a301bf855]
+owns: [src/fux/acquire/urlsrc.py@0ff7a50c2648, src/fux/templates@8f310c47eabc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 9efb476756b59b06e8acdecb62a68353190d3e47df93b874e8872349ce932e36
+content_sha: d095744f49782d24feac0a64f29315ee2a6515ce6eb6b3f6eadb53072d91396d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
-- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · file
+- [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py) · file
 - [`src/fux/templates/`](../src/fux/templates) · dir
 
 <!-- COMPONENTS-END -->
@@ -218,7 +218,7 @@ is still the back door through which the adapter cap would otherwise leak: a
 it out of the schema exactly as verbatim passing did.
 
 ⚠ **The resolution lives in ONE place and this record does not own it.**
-`UrlSource.config_for()` resolves the slice for `ingest/urlsrc.py` and
+`UrlSource.config_for()` resolves the slice for `acquire/urlsrc.py` and
 `query/refer_answer.py` alike, so `configure_fetcher` receives a table that is
 **already this fetcher's** — it never sees the whole of `[sources.url.config]`.
 The key shape is [SR-CONFIG](0113_config.md) decision 8a's; what is stated here
@@ -808,7 +808,7 @@ line changed in any of them. The decision is
 ### Reference (required)
 
 - Fux's half of the contract —
-  [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py):
+  [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py):
   `load_fetcher`, `configure_fetcher`, `resolve_parallel`, `fetch_all`.
 - The shipped templates —
   [`src/fux/templates/`](../src/fux/templates/), `http.py.txt` and
@@ -870,11 +870,11 @@ ls src/fux/templates/*.py 2>/dev/null
 # expect: no output — a `.py` here could be imported, which is decision 6's point
 
 # 5. decision 11: the registry is asked with `root`, so consumer decoders apply
-grep -n "decode_mod\.\(decode\|claims\)" src/fux/ingest/urlsrc.py
+grep -n "decode_mod\.\(decode\|claims\)" src/fux/acquire/urlsrc.py
 # expect: every call passes `root` as its last argument
 
 # 6. decision 11: no skip reason is assembled from the content type
-grep -n "no decoder for {content_type" src/fux/ingest/urlsrc.py
+grep -n "no decoder for {content_type" src/fux/acquire/urlsrc.py
 # expect: exactly one — the branch where NOTHING claims the type
 ```
 
@@ -898,7 +898,7 @@ evidence.*
 
 - [`.fux/fetchers/cdp.py`](../.fux/fetchers/cdp.py)
 - [`src/fux/config.py`](../src/fux/config.py)
-- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py)
+- [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py)
 - [`src/fux/templates/`](../src/fux/templates/)
 - [`tests/ingest/test_url_parallel.py`](../tests/ingest/test_url_parallel.py)
 

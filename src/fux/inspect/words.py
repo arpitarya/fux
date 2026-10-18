@@ -138,8 +138,8 @@ def analyze(view, dictionary, text: str, ids=None) -> dict:
     """A question as the analyzer reads it — kept terms with their index
     statistics, and the tokens it dropped, in order. `ids` are the repo's
     identifier families (W-233), so a canonical term shows as a kept term."""
-    from ..query.analyzer import _WORD_RE, split_identifier
-    from ..query.tokenize import _STOPWORDS, tokenize_pairs
+    from ..text.analyzer import _WORD_RE, split_identifier
+    from ..text.tokenize import _STOPWORDS, tokenize_pairs
     from ..store.format import term_hash
 
     by_hash = _id_index(view)

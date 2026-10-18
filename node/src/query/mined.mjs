@@ -1,4 +1,4 @@
-/** Corpus-mined expansion — the read-time fold. Twin of `src/fux/query/mined.py`.
+/** Corpus-mined expansion — the read-time fold. Twin of `src/fux/text/mined.py`.
  *
  * W-168 step 4. A document that writes "Mean Kinetic Temperature (MKT)" has
  * declared the two spellings the same; ingest (Python only) commits that as

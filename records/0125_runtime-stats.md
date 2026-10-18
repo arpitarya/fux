@@ -11,7 +11,7 @@ feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule
 owns: [node/src/derive/stats.mjs@04eace0fe7a4, src/fux/derive/stats.py@b9882b444f9a]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 9d2191842b2976aef0ae3a2cbbdf41d3aaba82633cc4f645c6eb24d3cedb939a
+content_sha: 51f35e2bed89a2474173e954ac7c0bf2604293ef62ae2a07fce412a245d64aaf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -229,6 +229,8 @@ The stats plane is unchanged by identifier families; the scan and the accelerato
 **W-278 — the section keys leave (2026-10-13; same branch, unmerged).** `sec_units` and `sec_total_flen` are **removed** from `stats.json` on both readers. The third form of the section term scores every unit on the **document** `avg_wlen` ([SR-SECTIONS](0161_sections.md) decision 5), so nothing reads a section average. `RUNTIME_SCHEMA` bumps, so `is_fresh` refuses a plane built with them and the next `fux build` drops them. The differential law has one number fewer to transcribe.
 
 **No decision here moved** (W-273 phase 2, 2026-10-13): `derive/accel.py`, which reads this plane, lost the scan's section route to `query/sections.py`.
+
+**No decision here moved** (W-282, 2026-10-18): `derive/format.py` re-imports `runtime_dir` from `store/cachedir.py` (one formula, now core so the resident holder can read the stamp without importing the reader), and `derive/_build.py` gained `cmd_build`, the `fux build` handler, moved out of `ingest/`. Every field, name, byte and order this record states is unchanged; `fux ask/find/answer --json` were checked byte-identical before and after on this repository's own index.
 
 ### Consequences
 

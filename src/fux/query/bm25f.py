@@ -50,75 +50,12 @@ must not pick up a last-bit difference from the feature merely being present.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
 
-from ..store import TF_FIELDS
+# Defined in `tune.py`, which builds it (W-282: tune is core, this is the reader).
+from ..tune import Scoring  # noqa: F401
 from ..constants import fixed
 
 _IDF_OFFSET = fixed("bm25f", "idf_offset")
-
-@dataclass(frozen=True)
-class Scoring:
-    """`k1`, `b` and the five field weights, carried as ONE object.
-
-    **Why one object and not three parameters.** Every number here appears on
-    both sides of the same fraction:
-
-        denom = wtf + k1 * (1 - b + b * wlen / avg_wlen)
-
-    `wtf` is the field weights applied to the numerator; `wlen` is the same
-    weights applied to the denominator; `k1` and `b` join them. A caller that
-    passes the weights and forgets `k1` reweights half a formula — which is
-    the exact defect [SR-TUNE](../../records/0135_tuning.md) decision 6
-    recorded as fux's own LUCENE-6819, one level up. Three parameters make
-    that mistake possible at every call site; one object makes it
-    unrepresentable.
-
-    Immutable, and built by `tune.Tune.scoring` from `.fux/tune.toml` — the
-    values and why each is what it is live beside their keys in the template
-    `fux setup` writes, never here (L12).
-    """
-
-    k1: float
-    b: float
-    #: Aligned index-for-index with `store.TF_FIELDS` — asserted in
-    #: `__post_init__`, because a silent misalignment would weight `title` as
-    #: `path` and produce a plausible, wrong ranking.
-    weights: tuple[float, ...]
-    #: W-168 step 1 — the anchor field's weight. `0.0` is OFF and is not
-    #: "weight zero": every anchor branch in the engine tests `anchor_on` and
-    #: is skipped entirely, so a corpus that sets `anchor = 0` pays no cost on
-    #: either candidate path and scores byte-identically to the build before
-    #: anchor text existed.
-    anchor: float
-    #: W-236 — `[ranking] section_weight`, B2's λ (SR-SECTIONS decision 5).
-    #: `0.0` is OFF exactly as `anchor` is: neither candidate generator opens
-    #: the section plane and `rank()` performs no section arithmetic, so the
-    #: ranking is byte-identical to an engine without section records. It is
-    #: on this object, not on `Weighting`, because both candidate paths need
-    #: it to decide what to read, and both already receive a `Scoring`.
-    section: float
-
-    def __post_init__(self) -> None:
-        if len(self.weights) != len(TF_FIELDS):
-            raise ValueError("field weights must align with TF_FIELDS")
-
-    @property
-    def anchor_on(self) -> bool:
-        """The one test for *is the anchor fold live?*
-
-        Read by both candidate generators and by the build. One spelling,
-        because a generator that folds anchors and one that does not is the
-        differential law failing — and it would fail data-dependently, on the
-        documents nobody linked to.
-        """
-        return self.anchor != 0.0
-
-    @property
-    def section_on(self) -> bool:
-        """The one test for *is B2's best-section term live?* — W-236."""
-        return self.section != 0.0
-
 
 def idf(df: int, n: int) -> float:
     return math.log((n - df + _IDF_OFFSET) / (df + _IDF_OFFSET) + 1)

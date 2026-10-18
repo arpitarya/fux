@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@6421326ac75c, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@43c3c371c374, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@6421326ac75c, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@5d2f590c0567, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 43b7cf0fdb668057d407b9d7d9d238212ce359fee45b097769012caa04c6fa6d
+content_sha: b8e392a0fa2af2d45c0409b29a51889c3f958f32051c01e8f189f947eb1eff55
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

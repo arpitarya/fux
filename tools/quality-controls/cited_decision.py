@@ -78,9 +78,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fux.query.analyzer import analyze  # noqa: E402
+from fux.text.analyzer import analyze  # noqa: E402
 from fux.query.rerank import passage_boost  # noqa: E402
-from fux.refer._chunk import chunk  # noqa: E402
+from fux.text.chunk import chunk  # noqa: E402
 
 #: `](<something>.md) decision 19` / `decisions 3-5`. The link target is kept
 #: raw and resolved against the CITING file's directory, because the same

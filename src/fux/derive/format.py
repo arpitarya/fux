@@ -65,6 +65,7 @@ import json
 import struct
 from pathlib import Path
 from ..constants import fixed
+from ..store.cachedir import runtime_dir  # noqa: F401  (one formula, W-282)
 
 RUNTIME_DIR = fixed("runtime", "dir")
 
@@ -187,10 +188,6 @@ SECTION_TABLE_NAME = fixed("runtime", "section_table")
 #: plane still has the file on disk; `RUNTIME_SCHEMA` moved to `v5` in the same
 #: change so such a plane is refused and rebuilt rather than read past.
 DETERMINISTIC_FILES = (DOCS_NAME, STATS_NAME, MINED_NAME, MANIFEST_NAME, SECTION_TABLE_NAME, fixed("graph", "file"))
-
-
-def runtime_dir(root: Path) -> Path:
-    return root / fixed("fuxdir", "dir") / RUNTIME_DIR
 
 
 def postings_dir(root: Path) -> Path:

@@ -9,11 +9,11 @@ amended: 2026-10-05
 date: 2026-08-27
 ratified: 2026-08-27
 feature: the record-to-component model, and the `describes` relation W-82 ruling 4 added to it
-owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@1eba43715793, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@e3d2172d0b11, tests/test_sr_frontmatter.py@c8c81b4b394a, tests/test_sr_ownership.py@78ff4b92cf56, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@8124ebcad40e, tests/test_sr_register_status.py@acae7406d76c]
+owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@1eba43715793, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@e3d2172d0b11, tests/test_sr_frontmatter.py@c8c81b4b394a, tests/test_sr_ownership.py@2db4b35a0e53, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@8124ebcad40e, tests/test_sr_register_status.py@acae7406d76c]
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 7a72d5426d35bdfd3bc435958bde723dbd24da3f2ee804041c5d2ac10508faa8
+content_sha: 42a4a08a4c83d3ddceb9b73d55e59154f0bade6241c6fe02a45e3cbc7520818c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

@@ -420,7 +420,7 @@ def open(root: str | Path) -> Index:  # noqa: A001 - the name is the API
     # the warm path where nothing is wrong. The import happens only on the cold
     # path, where the next statement raises anyway and the wording lives.
     if not resolved.joinpath(*_PII_RULES).is_file():
-        from .ingest import pii
+        from .acquire import pii
 
         pii.require(resolved)
     return Index(resolved)

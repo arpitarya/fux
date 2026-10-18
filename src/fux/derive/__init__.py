@@ -11,7 +11,7 @@ The law this package lives under: **its results are identical to
 from __future__ import annotations
 
 from .accel import Runtime, accel_candidates, ask, block_bound, is_fresh
-from ._build import BuildReport, build
+from ._build import BuildReport, build, cmd_build
 from .format import BLOCK_SIZE, ENTRY_SIZE, RUNTIME_SCHEMA, runtime_dir
 
 __all__ = [
@@ -24,6 +24,7 @@ __all__ = [
     "ask",
     "block_bound",
     "build",
+    "cmd_build",
     "is_fresh",
     "runtime_dir",
 ]

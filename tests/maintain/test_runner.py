@@ -17,7 +17,8 @@ from pathlib import Path
 import pytest
 
 from fux.errors import FuxError
-from fux.maintain import dirty, runner
+from fux.store import dirty
+from fux.maintain import runner
 from l12_fixtures import write_config
 
 

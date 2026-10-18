@@ -9,12 +9,12 @@ import sys
 import pytest
 
 from fux.errors import FuxError
-from fux.refer.source import GIT, URL, fetch_document, resolve
+from fux.acquire.source import GIT, URL, fetch_document, resolve
 from l12_fixtures import write_config
 
-import fux.refer.source  # for the registry lookup below
+import fux.acquire.source  # for the registry lookup below
 
-source_mod = sys.modules["fux.refer.source"]
+source_mod = sys.modules["fux.acquire.source"]
 
 
 def _listed(root, url, decoder="prose"):
@@ -124,7 +124,7 @@ def test_a_tuple_returning_fetcher_is_decoded_exactly_as_ingest_decoded_it(tmp_p
     response. Anything less and a verified document reports `drifted` against
     itself.
     """
-    from fux.ingest import urlsrc
+    from fux.acquire import urlsrc
 
     _listed(tmp_path, "https://x.test/p", decoder="html")
     html = b"<html><body><h1>Title</h1><p>Body text here.</p></body></html>"
@@ -147,7 +147,7 @@ def test_the_decode_step_travels_with_the_normalization(tmp_path):
     `sanitize` was already shared and asserted; `_decode_fetched` was not, and
     that is exactly the half that fell behind the contract.
     """
-    from fux.ingest import urlsrc
+    from fux.acquire import urlsrc
 
     assert source_mod._decode_fetched is urlsrc._decode_fetched
     assert source_mod._unpack is urlsrc._unpack
@@ -160,7 +160,7 @@ def test_verify_time_normalization_is_the_same_function_ingest_uses(tmp_path):
     normalizations diverged by one character, every URL document would report
     as permanently stale — a defect that presents as a working feature.
     """
-    from fux.ingest import urlsrc
+    from fux.acquire import urlsrc
 
     assert source_mod.sanitize is urlsrc.sanitize
 

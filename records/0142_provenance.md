@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@767faae00e0c]
+owns: [src/fux/query/provenance.py@88c67c28dc3e]
 laws: [L2, L4, L5, L9]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: ab064652ccaacdb14113dadadca4e18bff772c95f0a128c57fe5320f1f877f39
+content_sha: 45416f88e886aa2426395e697b56ec1e4255dcb5f7bfb135147b2289747601dd
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -572,7 +572,7 @@ Provenance analyzes the question with the repo's identifier families, as the ran
 - ⚠ **W-200 (2026-09-20) added the ingest provenance ledger**,
   `.fux/runtime/ingest-log.jsonl` — one runtime line per consumed document
   naming its decoder and, for a URL, its fetcher
-  ([SR-INGEST](0106_ingest.md) decision 19). 🔴 **The new module is `fux.ingest.ingestlog` and it is NOT this record's subject.** This record owns `fux.query.provenance` — answer **receipts**, what somebody asked, which L9 governs. The other records what ingest did and must never grow a query field. The names collided because W-200's spec chose that path and nobody noticed this one; both docstrings now open by naming the other, and `tests/test_doctor_provenance.py` fences the query plane off the ledger by fully qualified name. **This record's decisions
+  ([SR-INGEST](0106_ingest.md) decision 19). 🔴 **The new module is `fux.acquire.ingestlog` and it is NOT this record's subject.** This record owns `fux.query.provenance` — answer **receipts**, what somebody asked, which L9 governs. The other records what ingest did and must never grow a query field. The names collided because W-200's spec chose that path and nobody noticed this one; both docstrings now open by naming the other, and `tests/test_doctor_provenance.py` fences the query plane off the ledger by fully qualified name. **This record's decisions
   are unaffected**, and the line is here because the freshness gate asks a
   describer to say so rather than to be silent.
 

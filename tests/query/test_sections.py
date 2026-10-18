@@ -34,7 +34,7 @@ from fux.derive import accel, build
 from fux.errors import FuxError
 from fux.ingest.run import run
 from fux.query import scan
-from fux.refer._chunk import index_sections
+from fux.text.chunk import index_sections
 
 OFF = dataclasses.replace(scoring(), section=0.0)
 TOPS = (1, 3, 10)

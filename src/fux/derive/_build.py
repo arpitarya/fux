@@ -39,7 +39,7 @@ from ..errors import FuxError
 from ..progress import NULL as _NULL_PROGRESS
 from ..store import fuxdir
 from ..graph import plane as graph_plane
-from ..query import mined as mined_mod
+from ..text import mined as mined_mod
 from ..store import TF_FIELDS
 from . import docstable, manifest, stamp
 from . import format as fmt
@@ -89,7 +89,7 @@ def build(root: Path, *, progress=None) -> BuildReport:
     written += docstable.write(directory, docs)
     written += stats_plane.write(directory, stats)
     # W-168 step 4 — the mined table, folded from the same records the scan
-    # reads it from (`query/mined.py::table_from_shards`), by the same sort.
+    # reads it from (`text/mined.py::table_from_shards`), by the same sort.
     written += fmt.write_json(
         directory / fmt.MINED_NAME,
         {"pairs": [[list(s), list(l)] for s, l in mined_mod.table_from_records(records)]},
@@ -576,3 +576,31 @@ def _clear(directory: Path) -> None:
     for path in directory.glob("*"):
         if path.is_file():
             path.unlink()
+
+
+def cmd_build(args) -> int:
+    """`fux build` — rebuild the derived accelerator from the committed index.
+
+    Exists because the derived plane is disposable by design: deleting
+    `.fux/runtime/` must always be safe, and this is how it comes back without
+    re-walking the source tree.
+    """
+    from ..config import find_root
+    from ..errors import FuxError
+    from ..store.lock import write_lock
+
+    root = find_root()
+    if root is None:
+        raise FuxError("no fux.toml or .git found — run from inside a configured repo")
+
+    # The accelerator is derived, but it is written into `.fux/runtime/` while
+    # a concurrent ingest may be replacing the committed shards it is derived
+    # FROM. Taking the same lock is what stops a rebuild reading half of one
+    # index and half of another.
+    with write_lock(root):
+        report = build(root, progress=getattr(args, "progress", None))
+    print(
+        f"accelerator rebuilt from the committed index: {report.docs} docs, "
+        f"{report.terms} terms, {report.blocks} blocks, {report.postings} postings"
+    )
+    return 0

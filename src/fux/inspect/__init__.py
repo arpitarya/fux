@@ -655,7 +655,7 @@ def cmd_inspect(args) -> int:
     # distinguishable from an explicit `0` (which means *every document*) --
     # the same reason every output-gated flag on this surface defaults to
     # `None`. `0 or default` would silently turn "all of them" into 100.
-    from .config import load as load_inspect_config
+    from ..inspect_config import load as load_inspect_config
 
     config = load_inspect_config(root)
     sample = getattr(args, "retrieval_sample", None)
@@ -694,7 +694,7 @@ def _diff_top(args) -> int:
     """`--top`, else `[report] top` — the repo's when inside one, the template's
     when not (`--diff` compares two files and needs no repository)."""
     from ..config import find_root
-    from .config import load as load_inspect_config
+    from ..inspect_config import load as load_inspect_config
 
     return getattr(args, "top", None) or load_inspect_config(find_root()).top
 

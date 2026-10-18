@@ -83,20 +83,15 @@ from ..errors import FuxError
 from ..progress import NULL as _NULL_PROGRESS
 from . import edges as edges_mod
 from . import extract as extract_mod
-from . import decoderdigest, fuxignore, gitdir, ingestlog, register, sourcelist, urlingest, urlsrc
+from ..acquire import decoderdigest, fuxignore, gitdir, ingestlog, sourcelist, urlsrc
+from . import register, urlingest
 from .edges import TAG_PREFIX
-from .dirlist import archived_dirs, source_dirs, source_excludes
-from .gitdir import (
-    UNFETCHED,
-    Skipped,
-    is_archived_loc,
-    read_types,
-    walk_sources,
-)
+from ..acquire.dirlist import archived_dirs, source_dirs, source_excludes
+from ..acquire.gitdir import UNFETCHED, Skipped, is_archived_loc, read_types, walk_sources
 from .. import decode as decode_mod
-from . import pii as pii_mod
+from ..acquire import pii as pii_mod
 from . import queue as queue_mod
-from ..query import identifiers as ids_mod
+from ..text import identifiers as ids_mod
 from .parse import parse, parse_document
 from ..constants import fixed
 
@@ -178,7 +173,7 @@ def run(
     stopping = should_stop or (lambda: False)
     # Snapshot first, before any work: a commit landing mid-run appends to the
     # list, and only what was pending when we *started* is ours to subtract.
-    from ..maintain import dirty as dirty_mod
+    from ..store import dirty as dirty_mod
 
     covered = dirty_mod.read(root)
     config = load_config(root)
@@ -296,7 +291,7 @@ def run(
         # whose token has not moved costs no body fetch. `known_tokens` is read
         # from gitignored runtime state, so a wiped `.fux/runtime/` means every
         # URL is simply fetched — the safe direction.
-        from ..maintain import urlstate as _urlstate
+        from ..acquire import urlstate as _urlstate
 
         _prior = _urlstate.read(root)
         known_tokens = {
@@ -1271,7 +1266,7 @@ def _current_run_seq(root: Path) -> int:
     field nothing branches on.
     """
     try:
-        from ..maintain import urlstate
+        from ..acquire import urlstate
 
         return int(urlstate.read(root).run_seq)
     except Exception:  # noqa: BLE001 - an advisory stamp must never fail a run

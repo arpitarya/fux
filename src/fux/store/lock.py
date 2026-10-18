@@ -20,7 +20,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from ..errors import FuxError
-from ..store import fuxdir
+from . import fuxdir
 from ..constants import fixed
 
 __all__ = ["LOCK_NAME", "acquire", "break_lock", "holder", "lock_path", "release", "write_lock"]

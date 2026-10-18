@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/ingest/ingestlog.py@f7d675254e1d, src/fux/ingest@03f031d06fcd, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@aff448e57338, node/src/ingest/priors.mjs@d8d4691d7e49]
+owns: [src/fux/acquire/ingestlog.py@f7d675254e1d, src/fux/ingest@998708c30fe9, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@4ca02fdd1c47, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@26004073c416]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 2d0fbfa880929484e4e27e71c7f6891f0c8e16c4710de6aead3e4809dd772498
+content_sha: d34611fecfee0f266f3d00bbc3e3f214bae77130447953ce45f0209e44bdb474
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -20,8 +20,9 @@ content_sha: 2d0fbfa880929484e4e27e71c7f6891f0c8e16c4710de6aead3e4809dd772498
 
 - [`node/src/ingest/gitdir.mjs`](../node/src/ingest/gitdir.mjs) · file
 - [`node/src/ingest/priors.mjs`](../node/src/ingest/priors.mjs) · file
+- [`src/fux/acquire/`](../src/fux/acquire) · dir
+- [`src/fux/acquire/ingestlog.py`](../src/fux/acquire/ingestlog.py) · file
 - [`src/fux/ingest/`](../src/fux/ingest) · dir
-- [`src/fux/ingest/ingestlog.py`](../src/fux/ingest/ingestlog.py) · file
 - [`src/fux/ingest/priors.py`](../src/fux/ingest/priors.py) · file
 
 <!-- COMPONENTS-END -->
@@ -596,13 +597,13 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/ingest/decoderdigest.py` — `BUILTIN_PREFIX` ← `[decoders] builtin_prefix`
+- `src/fux/acquire/decoderdigest.py` — `BUILTIN_PREFIX` ← `[decoders] builtin_prefix`
 - `src/fux/ingest/edges.py` — `TAG_PREFIX` ← `[graph] tag_prefix`, `EXTRACTED_GRADE` ← `[graph] grade_extracted`, `AMBIG_GRADE` ← `[graph] grade_ambiguous`, `INFERRED_GRADE` ← `[graph] grade_inferred`
-- `src/fux/ingest/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
-- `src/fux/ingest/ingestlog.py` — `INGEST_LOG_FILE` ← `[runtime] ingest_log`
+- `src/fux/acquire/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
+- `src/fux/acquire/ingestlog.py` — `INGEST_LOG_FILE` ← `[runtime] ingest_log`
 - `src/fux/ingest/queue.py` — `QUEUE_REL` ← `[files] enrich_queue`, `PROGRESS_REL` ← `[files] enrich_progress`
 - `src/fux/ingest/register.py` — `NAME` ← `[register] file`, `HEADER` ← `[register] header`
-- `src/fux/ingest/routes.py` — `REGEX_PREFIX` ← `[routes] regex_prefix`
+- `src/fux/acquire/routes.py` — `REGEX_PREFIX` ← `[routes] regex_prefix`
 - `src/fux/ingest/run.py` — `PII_DIGEST_FILE` ← `[index] pii_digest`, `EXTRACT_CONFIG_DIGEST_FILE` ← `[index] extract_config_digest`, `ENRICH_DIGEST_FILE` ← `[index] enrich_digests`, `DECODER_DIGEST_FILE` ← `[index] decoder_digests`, `STALE_REDACTION_FILE` ← `[runtime] stale_redaction`
 
 <!-- L12-VALUES-END -->
@@ -1130,11 +1131,11 @@ descent before listing it, and records it once as `dir/`.
   the directory is never scanned. The repo tests that walk the root go through
   `tests/walk_lib.py`, gated by `tests/test_walks_skip_golden.py`.
 
-**No decision here moved** (W-255, 2026-10-04): `ingest/pii.py` gained a load-time ReDoS linter ([SR-PII](0148_pii.md) decision 23); the ingest path is otherwise unchanged and still reads no clock.
+**No decision here moved** (W-255, 2026-10-04): `acquire/pii.py` gained a load-time ReDoS linter ([SR-PII](0148_pii.md) decision 23); the ingest path is otherwise unchanged and still reads no clock.
 
 **No decision here moved** (W-248, 2026-10-04): `ingest/queue.py` gained `model_needed` and `no_decoder`, the readers that classify a row by its reason.
 
-**No decision here moved** (W-261, 2026-10-05): the URL branch of `ingest/run.py` moved to `ingest/urlingest.py` (SR-URL-INGEST's) and the `dirs`-list readers of `ingest/gitdir.py` to `ingest/dirlist.py` (SR-DIR-LIST's). The walk calls both at the same points, and its output is byte-identical. Node's `ingest/gitdir.mjs` lost `archivedDirs` to `ingest/dirlist.mjs` and is narrowed to `is_archived_loc`.
+**No decision here moved** (W-261, 2026-10-05): the URL branch of `ingest/run.py` moved to `ingest/urlingest.py` (SR-URL-INGEST's) and the `dirs`-list readers of `acquire/gitdir.py` to `acquire/dirlist.py` (SR-DIR-LIST's). The walk calls both at the same points, and its output is byte-identical. Node's `ingest/gitdir.mjs` lost `archivedDirs` to `ingest/dirlist.mjs` and is narrowed to `is_archived_loc`.
 
 **W-274, 2026-10-11 — the section plane is opt-in.** Ingest builds section records only under `fux.toml [index] section_records = true`. A delta run whose committed index was built in the other mode refuses and names `fux ingest --full`. The last run's mode is one more line in `runtime/extract-config-digest`, so the first run after this change re-extracts once. The rule is SR-SECTIONS decision 11's.
 
@@ -1315,7 +1316,7 @@ policy input to what gets indexed.
 
 - The orchestration — [`src/fux/ingest/run.py`](../src/fux/ingest/run.py)
   (its module docstring states the incremental rule); the walk —
-  [`gitdir.py`](../src/fux/ingest/gitdir.py); edges —
+  [`gitdir.py`](../src/fux/acquire/gitdir.py); edges —
   [`edges.py`](../src/fux/ingest/edges.py); the declared record shape —
   [`schemas/index-record.schema.json`](../src/fux/schemas/index-record.schema.json).
 - Determinism, change and deletion, captured —
@@ -1326,9 +1327,9 @@ policy input to what gets indexed.
   [`work/regression/2026-08-20-ingest-cost-profile/`](../work/regression/2026-08-20-ingest-cost-profile/report.md).
 - **The classification and the two counts (decision 15)** — the skip classes,
   `partition` and `would_index` in
-  [`gitdir.py`](../src/fux/ingest/gitdir.py); the record and the printed
+  [`gitdir.py`](../src/fux/acquire/gitdir.py); the record and the printed
   wording in [`skipnotice.py`](../src/fux/ingest/skipnotice.py); the blocks
-  themselves in [`fuxignore.py`](../src/fux/ingest/fuxignore.py); the summary
+  themselves in [`fuxignore.py`](../src/fux/acquire/fuxignore.py); the summary
   in [`ingest/__init__.py`](../src/fux/ingest/__init__.py). Behaviour pinned
   by [`tests/ingest/test_gitdir.py`](../tests/ingest/test_gitdir.py),
   [`tests/ingest/test_skipnotice.py`](../tests/ingest/test_skipnotice.py) and
@@ -1425,7 +1426,7 @@ evidence.*
 **Code**
 
 - [`src/fux/ingest/edges.py`](../src/fux/ingest/edges.py)
-- [`src/fux/ingest/gitdir.py`](../src/fux/ingest/gitdir.py)
+- [`src/fux/acquire/gitdir.py`](../src/fux/acquire/gitdir.py)
 - [`src/fux/ingest/run.py`](../src/fux/ingest/run.py)
 - [`src/fux/ingest/skipnotice.py`](../src/fux/ingest/skipnotice.py)
 - [`src/fux/store/recordschema.py`](../src/fux/store/recordschema.py)

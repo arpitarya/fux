@@ -10,7 +10,7 @@ from __future__ import annotations
 import pytest
 
 from fux.errors import FuxError
-from fux.ingest import sourcelist
+from fux.acquire import sourcelist
 
 
 def _fill_fetch(text, spec):

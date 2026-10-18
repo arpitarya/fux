@@ -21,7 +21,7 @@ import pytest
 
 from fux.config import UrlSource
 from fux.errors import FuxError
-from fux.ingest import sourcelist, urlsrc
+from fux.acquire import sourcelist, urlsrc
 from l12_fixtures import url_limits, write_config
 
 
@@ -148,7 +148,7 @@ def test_a_pinned_url_is_a_policy_skip_not_an_unfetched_one():
     """`POLICY` means *the declaration did its job*. `UNFETCHED` would say the
     bytes failed to arrive, which puts the URL in front of somebody as a problem
     and, through `enrich/queue.tsv`, in front of the whole team."""
-    from fux.ingest.gitdir import POLICY, UNFETCHED
+    from fux.acquire.gitdir import POLICY, UNFETCHED
 
     assert POLICY != UNFETCHED
 

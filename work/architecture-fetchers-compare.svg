@@ -129,6 +129,6 @@
 <text x="46" y="852" font-size="11.5" fill="#14181f" font-weight="600">5  answer</text>
 <text x="130" y="852" font-size="11.5" fill="#4a5260">not in mind: the SAME pinned fetcher and declared decoder run again at fux answer -- fresh sha; verdict current / stale / cached / as-ingested / unverified.</text>
 <line x1="46" y1="878" x2="1096" y2="878" stroke="#e4e4e0" stroke-width="1"/>
-<text x="46" y="894" font-size="10.5" fill="#8a93a0">Left: Arpit, Cowork, 2026-09-21. Right: drawn from the code, 2026-10-05 -- src/fux/ingest/urlsrc.py, routes.py, edges.py, src/fux/decode/image.py, html.py, src/fux/templates/cdp.py.txt.</text>
+<text x="46" y="894" font-size="10.5" fill="#8a93a0">Left: Arpit, Cowork, 2026-09-21. Right: drawn from the code, 2026-10-05 -- src/fux/acquire/urlsrc.py, routes.py, edges.py, src/fux/decode/image.py, html.py, src/fux/templates/cdp.py.txt.</text>
 <text x="46" y="908" font-size="10.5" fill="#8a93a0">SR-FETCHER (0117) - SR-URL-LIST (0116) - SR-DECODE (0139). The mechanics: architecture-fetchers.svg and architecture-decoders.svg.</text>
 </svg>

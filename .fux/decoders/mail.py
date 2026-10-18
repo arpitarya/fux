@@ -11,7 +11,7 @@ mail and web pages convert by one implementation rather than two.
 
 `BytesParser` parses **one** message. Pointed at a `.mbox` it returned the
 first and silently discarded the rest, so an archive of four hundred threads
-was indexed as one email — and cited as one, since `refer/_chunk.py` had a
+was indexed as one email — and cited as one, since `text/chunk.py` had a
 single `# Subject` to split on. Each message now becomes its own `## Subject`
 section under the file's own H1, which is both the right index unit and the
 right citation unit.
@@ -54,7 +54,7 @@ _RECORD_LEVEL = fixed("markdown", "record_level")
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.mail", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
+VERSION = fixed("decoders.mail", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output); nor W-282 (moved module paths in comments)
 
 EXTENSIONS = tuple(fixed("decoders.mail", "extensions"))
 

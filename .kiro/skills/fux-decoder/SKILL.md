@@ -70,7 +70,7 @@ handed, and works for content that never had a path.
 
 **Your headings ARE your chunking. There is nothing to declare.**
 
-`refer/_chunk.py` derives what a citable passage is from the heading depth you
+`text/chunk.py` derives what a citable passage is from the heading depth you
 emit, with one rule: *a short section folds forward only into a section nested
 inside it.* So:
 

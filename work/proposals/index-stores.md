@@ -19,6 +19,8 @@ in git, but in future the index can be present in a DB, not in a repository.
 Fux can have a writer and a reader, two separate modules, and everybody can use
 it. Both can exist in parallel."*
 
+⚠ **§8 graduated 2026-10-18 into [W-282](../open/W-282-reader-writer-packages.md)** — Arpit: *"we are going to build it out."* §8's finding that the split already exists in the module tree is **wrong**: about 125 imports cross its own lines; W-282 §Research has the count, and three placements below are corrected there. The rest of this file stays parked. **Order ruled 2026-10-18 (W-282 F3):** the split ships first; this proposal is then rewritten against the split packages.
+
 **Status: proposed, not ruled, not built.** Research and a recommendation
 only — no code, no record change. Cowork ratifies; Claude Code builds.
 *(The first draft of this file, 2026-10-04, proposed a derived "sink" plane
@@ -324,6 +326,8 @@ a separate chat agent in a single-page application, you don't need a writer —
 you just need a reader. If you're updating the DB through hooks, you just need
 a writer — you don't need a reader. How can the package be structured?"*
 
+⚠ **Corrected 2026-10-18 ([W-282](../open/W-282-reader-writer-packages.md) §Research):** the sentence below is wrong — 86 reader→writer and 36 writer→reader imports; `derive/` belongs to the reader; `answer` needs decoders, fetchers and PII; `@fux` on npm is taken; PEP 420 conflicts with `fux/__init__.py`.
+
 **Finding: the split already exists in the module tree; only the distribution
 hides it.** `src/fux/` is one wheel (`fux-engine`, `dependencies = []`) and
 `node/` is one bundle (`fux-engine`, `fux.mjs`). Inside, the modules sort
@@ -331,7 +335,7 @@ cleanly:
 
 | package | holds today's | verbs | installs for |
 |---|---|---|---|
-| **`fux-core`** · Python + Node | `store/format.py`, `canonical.py`, `recordschema.py`, `schema.py`, `constants.py` + `constants.toml`, `schemas/`, `query/tokenize.py` (the analyzer), `config.py`, `errors.py` — pure functions, **no I/O, no socket** | none | everyone, transitively |
+| **`fux-core`** · Python + Node | `store/format.py`, `canonical.py`, `recordschema.py`, `schema.py`, `constants.py` + `constants.toml`, `schemas/`, `text/tokenize.py` (the analyzer), `config.py`, `errors.py` — pure functions, **no I/O, no socket** | none | everyone, transitively |
 | **`fux-reader`** · **Python + Node** | the store boundary's **read** half (`git`, `sqlite`; `[postgres]` extra), `query/`, `graph/`, `refer/`, `serve/`, `mcp.py`, `api.py`, `observe.py`, `doctor`'s read checks | `ask` `find` `answer` `lexical` `explain` `graph` `path` `serve` `mcp` `verify` | the SPA's backend, an MCP server, any agent host — **no decoders, no fetchers, no CDP, no PII engine, no git** |
 | **`fux-writer`** · **Python only** (ruled) | the store boundary's **write** half, `ingest/`, `decode/`, `derive/` (build), `maintain/` (hooks, daemon, merge driver), `enrich.py`, `correct.py`, `identifiers_cmd.py`, `setup.py` + `templates/`, `sources.py`, `tune.py`, `output_config.py` | `setup` `ingest` `build` `add` `remove` `enrich` `correct` `identifiers` `hooks` `daemon` `tune` `output` | CI, a git hook, the one machine that writes — **no ranking, no serve, no MCP** |
 | **`fux-engine`** — **everything combined, exactly as today** (Arpit, 2026-10-05) | the CLI; depends on core + reader + writer, or keeps shipping as the single wheel / single bundle it is now | all | what a developer installs today — same name on PyPI and npm, same verbs, same `--json`; nothing changes for them |

@@ -7,8 +7,8 @@ import sys
 
 from ..config import find_root, load as load_config
 from ..errors import FuxError
-from .dirlist import source_dirs, source_excludes
-from .gitdir import partition, read_types, walk_sources
+from ..acquire.dirlist import source_dirs, source_excludes
+from ..acquire.gitdir import partition, read_types, walk_sources
 # ⚠ **Aliased, and the alias is the point.** Importing this as the bare name
 # `run` shadows the SUBMODULE `fux.ingest.run`, so `from fux.ingest import run`
 # and `import fux.ingest.run as x` both bind this function -- and any attribute
@@ -105,7 +105,7 @@ def cmd_ingest(args) -> int:
         )
 
     if getattr(args, "list_skipped", False):
-        from . import fuxignore
+        from ..acquire import fuxignore
 
         config = load_config(root)
         _, skipped = walk_sources(
@@ -216,38 +216,29 @@ def ingest_and_report(args_root, args, *, refresh_urls: bool, only_urls=None, fi
     # written: `ask` should never pay for a build, and a stale accelerator that
     # silently falls back to scan would hide a real slowdown.
     if not getattr(args, "no_accelerator", False):
-        from ..derive import build as build_accelerator
-
-        accel_report = build_accelerator(args_root, progress=progress)
-        print(
-            f"accelerator: {accel_report.terms} terms, {accel_report.blocks} blocks, "
-            f"{accel_report.postings} postings (derived, not committed)"
-        )
+        accel_report = build_runtime(args_root, progress=progress)
+        if accel_report is not None:
+            print(
+                f"accelerator: {accel_report.terms} terms, {accel_report.blocks} blocks, "
+                f"{accel_report.postings} postings (derived, not committed)"
+            )
     return report
 
 
-def cmd_build(args) -> int:
-    """`fux build` — rebuild the derived accelerator from the committed index.
+def build_runtime(root, *, progress=None):
+    """Rebuild the reader's derived accelerator, or `None` when there is no reader.
 
-    Exists because the derived plane is disposable by design: deleting
-    `.fux/runtime/` must always be safe, and this is how it comes back without
-    re-walking the source tree.
+    ⚠ **A guarded import of the reader** (W-282). The derived
+    plane is the reader's, and a machine with only `fux-writer` installed never
+    ranks, so it has no runtime to keep current: the import fails and the
+    writer stops once the committed index is written. Wherever the reader is
+    installed — `fux-engine` always — the accelerator is rebuilt right where
+    the shards were written, exactly as before the split.
+    `tests/test_package_layers.py` permits a cross-layer import only in this
+    form: inside `try`, with an `except ImportError` handler.
     """
-    root = find_root()
-    if root is None:
-        raise FuxError("no fux.toml or .git found — run from inside a configured repo")
-
-    from ..derive import build as build_accelerator
-    from ..maintain import runner as runner_mod
-
-    # The accelerator is derived, but it is written into `.fux/runtime/` while
-    # a concurrent ingest may be replacing the committed shards it is derived
-    # FROM. Taking the same lock is what stops a rebuild reading half of one
-    # index and half of another.
-    with runner_mod.write_lock(root):
-        report = build_accelerator(root, progress=getattr(args, "progress", None))
-    print(
-        f"accelerator rebuilt from the committed index: {report.docs} docs, "
-        f"{report.terms} terms, {report.blocks} blocks, {report.postings} postings"
-    )
-    return 0
+    try:
+        from ..derive import build as build_accelerator
+    except ImportError:  # a writer-only install: no reader, no runtime to build
+        return None
+    return build_accelerator(root, progress=progress)

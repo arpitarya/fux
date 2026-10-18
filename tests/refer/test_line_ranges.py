@@ -18,7 +18,7 @@ from __future__ import annotations
 from l12_fixtures import chunk_bounds, template_tune
 import pytest
 
-from fux.refer._chunk import chunk
+from fux.text.chunk import chunk
 MAX_PASSAGE_BYTES = template_tune().max_passage_bytes
 MIN_PASSAGE_BYTES = template_tune().min_passage_bytes
 
@@ -106,7 +106,7 @@ def test_identical_paragraphs_get_different_ranges():
 
 
 def test_the_locator_renders_a_line_range():
-    from fux.refer._chunk import Passage
+    from fux.text.chunk import Passage
     from fux.refer._rescore import ScoredPassage
 
     p = Passage(heading="H", text="t", ordinal=3, line_start=12, line_end=40)
@@ -120,7 +120,7 @@ def test_the_locator_falls_back_to_the_ordinal_without_a_range():
     A passage built by something other than the chunker carries no range, and
     inventing one would produce a citation that looks actionable and is not.
     """
-    from fux.refer._chunk import Passage
+    from fux.text.chunk import Passage
     from fux.refer._rescore import ScoredPassage
 
     p = Passage(heading="H", text="t", ordinal=3)

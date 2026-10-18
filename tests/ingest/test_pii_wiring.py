@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from fux.ingest import pii
+from fux.acquire import pii
 from l12_fixtures import write_config
 
 SRC = Path(__file__).resolve().parents[2] / "src" / "fux" / "ingest" / "run.py"
@@ -159,7 +159,7 @@ def test_the_acquired_plane_is_never_redacted():
     verify-time one built from these bytes. Redacting them makes `as-ingested`
     a claim about text nobody ever served.
     """
-    urlsrc = (SRC.parent / "urlsrc.py").read_text(encoding="utf-8")
+    urlsrc = (SRC.parents[1] / "acquire" / "urlsrc.py").read_text(encoding="utf-8")
     assert "pii" not in urlsrc.lower().replace("copii", ""), (
         "urlsrc.py mentions pii — the fetch path must not redact"
     )

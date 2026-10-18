@@ -2,7 +2,7 @@
  *
  *     split identifiers  ->  lower  ->  stopwords  ->  stem  ->  (caller hashes)
  *
- * Twin of `src/fux/query/analyzer.py`. The order is the whole design; two
+ * Twin of `src/fux/text/analyzer.py`. The order is the whole design; two
  * steps are load-bearing in a way that is easy to get backwards:
  *
  * 1. **Splitting happens BEFORE lowercasing** — case is the only signal that a

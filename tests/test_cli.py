@@ -252,7 +252,7 @@ def test_the_gate_checks_the_same_file_pii_loads(tmp_path):
     """
     from fux.api import _PII_RULES as api_rules
     from fux.cli import _PII_RULES
-    from fux.ingest import pii
+    from fux.acquire import pii
 
     assert tmp_path.joinpath(*_PII_RULES) == pii.rules_path(tmp_path)
     assert api_rules == _PII_RULES
@@ -266,7 +266,7 @@ def test_the_node_reader_gates_on_the_same_file(tmp_path):
     is the only index anything reads. `fux.mjs` is read as text rather than
     run, so this costs nothing and still fails if the path is edited there.
     """
-    from fux.ingest import pii
+    from fux.acquire import pii
 
     source = (ROOT / "node" / "fux.mjs").read_text(encoding="utf-8")
     assert '".fux", "pii.toml"' in source, (

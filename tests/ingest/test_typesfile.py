@@ -11,7 +11,7 @@ from __future__ import annotations
 import pytest
 
 from fux.errors import FuxError
-from fux.ingest import typesfile
+from fux.acquire import typesfile
 
 ORIGIN = ".fux/formats.toml"
 

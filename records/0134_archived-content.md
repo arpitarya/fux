@@ -11,7 +11,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 73d7ab725343be869287322f1706063efdd83d3057a82fe23b67f4a3727c8984
+content_sha: 85d21a77b3bb95fa44c6a538ce6c128eb2f588beae0c4366de08b617e69ff170
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -22,9 +22,9 @@ content_sha: 73d7ab725343be869287322f1706063efdd83d3057a82fe23b67f4a3727c8984
 
 **Describes** — reaches into, does not own:
 
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
+- [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
 - [`src/fux/ingest/run.py`](../src/fux/ingest/run.py) · owned by [SR-INGEST](0106_ingest.md)
-- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
-- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
 
 <!-- COMPONENTS-END -->
 
@@ -402,7 +402,7 @@ it was. ⚠ **An `archived=true` line and an `update=never` line are independent
 pinning a retired page is legal and means what both words mean.
 
 
-**2026-09-14 — `src/fux/ingest/urlsrc.py and src/fux/ingest/run.py` changed under this record and NOTHING this record
+**2026-09-14 — `src/fux/acquire/urlsrc.py and src/fux/ingest/run.py` changed under this record and NOTHING this record
 decides moved.** Two unrelated edits: per-fetcher `[sources.url.config]` resolution in
 `urlsrc` ([SR-CONFIG](0113_config.md) decision 8a), and in `run.py` a
 `config.url is not None else DEFAULT_URLS_FILE` fallback collapsing to
@@ -490,11 +490,11 @@ this moved where they are written, not what they are.
 
 A carried `url:` record re-derived because the identifier-family digest moved keeps its `archived` declaration through `_with_archived`, like every other re-derivation ([SR-IDENTIFIERS](0160_identifiers.md)).
 
-**No decision here moved** (W-253, 2026-10-04): `ingest/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
+**No decision here moved** (W-253, 2026-10-04): `acquire/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
 
 **No decision here moved** (W-248, 2026-10-04): in `urlsrc.py` the "nothing readable" skip reason is spelled from `decoders.reason_nothing_readable`; nothing this record decides moved.
 
-**No decision here moved** (W-261, 2026-10-05): `archived_dirs` moved from `ingest/gitdir.py` to `ingest/dirlist.py` (SR-DIR-LIST's), and the URL branch of `ingest/run.py` to `ingest/urlingest.py` (SR-URL-INGEST's). `is_archived_loc`, `_archived_url_ids` and `_with_archived` stayed where they were; the declaration reaches a record exactly as before.
+**No decision here moved** (W-261, 2026-10-05): `archived_dirs` moved from `acquire/gitdir.py` to `acquire/dirlist.py` (SR-DIR-LIST's), and the URL branch of `ingest/run.py` to `ingest/urlingest.py` (SR-URL-INGEST's). `is_archived_loc`, `_archived_url_ids` and `_with_archived` stayed where they were; the declaration reaches a record exactly as before.
 
 **No decision here moved** (W-274, 2026-10-11): `ingest/run.py` builds section records only when `fux.toml [index] section_records = true`, and refuses a delta run after that key flips (SR-SECTIONS decision 11). Archived marking is untouched.
 
@@ -703,7 +703,7 @@ evidence.*
 
 **Code**
 
-- [`src/fux/ingest/gitdir.py`](../src/fux/ingest/gitdir.py)
+- [`src/fux/acquire/gitdir.py`](../src/fux/acquire/gitdir.py)
 - [`src/fux/query/rank.py`](../src/fux/query/rank.py)
 - [`src/fux/tune.py`](../src/fux/tune.py)
 - [`tools/archived-signal-eval/`](../tools/archived-signal-eval/)

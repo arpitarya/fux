@@ -46,7 +46,7 @@ from .config import (
 )
 from . import decode as decode_mod
 from .errors import FuxError
-from .ingest import fuxignore, pii, refusals
+from .acquire import fuxignore, pii, refusals
 from .store import fuxdir
 
 #: Generated name -> the package-data file it is copied from.
@@ -733,7 +733,7 @@ def _urls_header() -> str:
     `_seed_types` already had the rule: **derived, never transcribed**, so the
     file cannot disagree with the engine that wrote it.
     """
-    from .ingest.sourcelist import URLS
+    from .acquire.sourcelist import URLS
 
     # 🔴 **The placeholder comes from the ATTRIBUTE now** (W-178, 2026-09-15).
     # This line hardcoded `<duration>` for every attribute with no `values` —
@@ -871,8 +871,8 @@ def _mandatory_config() -> "tuple[Mandatory, ...]":
     """
     from . import output_config as output_mod
     from . import tune as tune_mod
-    from .inspect import config as inspect_config
-    from .query import identifiers as ids_mod
+    from . import inspect_config
+    from .text import identifiers as ids_mod
 
     return (
         Mandatory(CONFIG_NAME, config_text(), ("sources.url",), ("sources.url.config", "sources.url.routes")),
@@ -1233,8 +1233,8 @@ def _seed_types() -> bytes:
     within a group the extensions are still sorted, so the output stays a pure
     function of the registry (L4).
     """
-    from .ingest import typesfile
-    from .ingest.gitdir import DEFAULT_TYPES
+    from .acquire import typesfile
+    from .acquire.gitdir import DEFAULT_TYPES
 
     bindings = {ext.lstrip("."): name for ext, name in decode_mod.builtin_bindings().items()}
     prose = [glob for glob in DEFAULT_TYPES if typesfile.pattern_extension(glob) not in bindings]
@@ -1267,7 +1267,7 @@ def _convert_legacy_types(root: Path, report: "SetupReport") -> None:
     winning — placing the moved lines first is what keeps it winning.
     """
     from .config import LEGACY_TYPES_FILE
-    from .ingest import typesfile
+    from .acquire import typesfile
 
     legacy = root / LEGACY_TYPES_FILE
     include, decoders, exclusions = typesfile.convert_legacy(

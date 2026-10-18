@@ -1,6 +1,6 @@
 """How the returned output got generated — SR-PROVENANCE.
 
-🔴 **NOT `fux.ingest.ingestlog`, which is the opposite of this file.** That one
+🔴 **NOT `fux.acquire.ingestlog`, which is the opposite of this file.** That one
 is W-200's **ingest ledger** — what decoder and fetcher produced each *record* —
 and it records nothing about a query, which is why L9 does not reach it. **This
 file is about what somebody ASKED**, so L9 does. `tests/test_doctor_provenance.py`
@@ -259,9 +259,9 @@ def _ctx_authorship(root, record: dict) -> tuple[frozenset[str], frozenset[str]]
     sha = record.get("sha", "")
     if not sha:
         return frozenset(), frozenset()
-    from ..correct import human_lines, model_lines
-    from ..enrich import enrich_path
-    from .tokenize import tokenize
+    from ..store.corrections import human_lines, model_lines
+    from ..store.enrichfile import enrich_path
+    from ..text.tokenize import tokenize
 
     path = enrich_path(root, sha)
     try:
@@ -601,8 +601,8 @@ def derive(
     is what makes the `in window` gate and the cut line real rather than a
     restatement of `placed`.
     """
-    from . import identifiers as ids_mod
-    from .analyzer import analyze_pairs
+    from ..text import identifiers as ids_mod
+    from ..text.analyzer import analyze_pairs
     from .scan import query_term_hashes
 
     # W-233: aligned by hash with the ranking, so analyzed with the same

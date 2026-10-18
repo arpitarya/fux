@@ -122,12 +122,12 @@ def build(root: Path, view, *, progress=None) -> Dictionary:
     and a surface tie is broken by the spelling itself, so the same sources
     produce the same file twice.
     """
-    from ..ingest import pii as pii_mod
+    from ..acquire import pii as pii_mod
     from ..ingest.extract import _headings_and_body, _title
     from ..ingest.parse import parse_document
     from ..progress import NULL as _NULL_PROGRESS
-    from ..query import identifiers as ids_mod
-    from ..query.tokenize import tokenize_pairs
+    from ..text import identifiers as ids_mod
+    from ..text.tokenize import tokenize_pairs
     from ..store import term_hash
 
     progress = progress or _NULL_PROGRESS
@@ -209,7 +209,7 @@ def _word_runs(text: str) -> int:
     of the document's text became searchable vocabulary. Counted with the
     analyzer's own `_WORD_RE` so the two numbers are about the same thing.
     """
-    from ..query.analyzer import _WORD_RE
+    from ..text.analyzer import _WORD_RE
 
     return sum(1 for _ in _WORD_RE.finditer(text))
 
@@ -217,7 +217,7 @@ def _word_runs(text: str) -> int:
 def _source_bytes(root: Path, doc) -> bytes | None:
     """This document's source bytes, from disk only. Never a fetch (L5)."""
     if doc.id.startswith("url:"):
-        from ..refer import source as refer_source
+        from ..acquire import source as refer_source
 
         fetched = refer_source.from_acquired(root, doc.id, doc.loc)
         return fetched.content if fetched is not None else None
@@ -272,7 +272,7 @@ def pii_mod_redact(rules, text: str):
     in this file is deferred: `fux --version` must stay instant, and
     `fux.ingest` pulls the decoders in behind it.
     """
-    from ..ingest import pii as pii_mod
+    from ..acquire import pii as pii_mod
 
     return pii_mod.redact(rules, text)
 

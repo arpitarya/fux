@@ -34,7 +34,7 @@ from fux import store
 from fux.derive import build
 from fux.ingest.run import run
 from fux.query import run_query
-from fux.query.tokenize import tokenize, tokenize_pairs
+from fux.text.tokenize import tokenize, tokenize_pairs
 from fux.store import term_hash
 from l12_fixtures import write_config
 

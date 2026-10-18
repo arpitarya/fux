@@ -7,10 +7,10 @@ description: "How fresh a url: citation is, said in six positions that never col
 status: accepted
 date: 2026-09-01
 feature: the freshness verdict vocabulary and the per-URL check interval
-owns: [src/fux/refer/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@f44c2c09f8f9]
+owns: [src/fux/acquire/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@108aa7da8d74]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: e880c7300b67b87f4bff47c65eaac3a23fe16473224fd77f225fcefd3deed62b
+content_sha: 8d6902fc6480f45d52b7000d176aa575e54b670e96c5fa852dca04fba780bb0e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,16 +18,16 @@ content_sha: e880c7300b67b87f4bff47c65eaac3a23fe16473224fd77f225fcefd3deed62b
 **Owns** — the components this record decides:
 
 - [`node/src/refer/freshness.mjs`](../node/src/refer/freshness.mjs) · file
-- [`src/fux/refer/freshness.py`](../src/fux/refer/freshness.py) · file
+- [`src/fux/acquire/freshness.py`](../src/fux/acquire/freshness.py) · file
 
 **Describes** — reaches into, does not own:
 
 - [`node/src/refer/source.mjs`](../node/src/refer/source.mjs) · owned by [SR-REFER](0127_refer-plane.md)
+- [`src/fux/acquire/source.py`](../src/fux/acquire/source.py) · owned by [SR-REFER](0127_refer-plane.md)
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
+- [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
 - [`src/fux/config.py::UrlSource,_load_url_source`](../src/fux/config.py) · owned by [SR-CONFIG](0113_config.md)
-- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
-- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
 - [`src/fux/refer/__init__.py`](../src/fux/refer/__init__.py) · owned by [SR-REFER](0127_refer-plane.md)
-- [`src/fux/refer/source.py`](../src/fux/refer/source.py) · owned by [SR-REFER](0127_refer-plane.md)
 
 <!-- COMPONENTS-END -->
 
@@ -54,7 +54,7 @@ six distinct labels and nothing ever folds one into another:
 | `as-ingested` *(mismatched)* | the retained bytes disagree with the index — an **index defect**, not a stale source |
 
 ⚠ **There are FIVE labels, and two other records said six** (W-140 row 1,
-corrected 2026-09-12). `Verdict.label` in `src/fux/refer/freshness.py` — which
+corrected 2026-09-12). `Verdict.label` in `src/fux/acquire/freshness.py` — which
 this record owns — returns `current` · `stale` · `cached` · `as-ingested` ·
 `unverified`, and `output.schema.json`'s enum has had exactly those five since it
 was written. **The off-by-one entered on the day `as-ingested` joined a
@@ -147,7 +147,7 @@ has ever been able to say. It needed a name that was neither `current` nor
 Separately, `ttl=` was added to the URL line grammar in the same work item, and
 **nothing consumed it.** It parsed, it validated, it round-tripped through `fux
 update`, and no code path turned it into a bound. That is precisely the failure
-[`freshness.py`](../src/fux/refer/freshness.py) refused `max_age_seconds` over
+[`freshness.py`](../src/fux/acquire/freshness.py) refused `max_age_seconds` over
 — *a knob that silently does nothing is the worst available outcome, because a
 caller passing it reasonably believes they bounded their staleness* — and
 shipping it that way would have contradicted the argument in the module's own
@@ -184,7 +184,7 @@ docstring.
 
 6. **The retained-bytes path decodes through the SAME functions ingest used.**
    `from_acquired` imports `_decode_fetched` and `sanitize` from
-   `ingest/urlsrc.py` rather than reimplementing them.
+   `acquire/urlsrc.py` rather than reimplementing them.
    ⚠ **This is the property the whole fallback rests on.** A verify-time sha is
    compared against an ingest-time sha; if the two pipelines diverge by one
    line, every retained document is `as-ingested` with `current=False` forever —
@@ -446,7 +446,7 @@ two commits later — see SR-CONFIG after decision 15.
 table, and until 2026-09-14 the mode behind it was built and unreachable**
 (W-174, ratified by Arpit the same day).
 
-`refer/freshness.py` has shipped `Policy(mode=NEVER)` — *"do not fetch.
+`acquire/freshness.py` has shipped `Policy(mode=NEVER)` — *"do not fetch.
 Deterministic-replay mode"* — since the module existed, and
 `refer/__init__.py::_obtain`'s never-branch has always fallen back to
 `.fux/acquired/` and returned `as-ingested`. **`query/refer_answer.py`
@@ -515,7 +515,7 @@ match. Under `false` the verdicts for a `url:` citation converge exactly:
 `fux.toml` read in `node/` would be work for no behaviour, and is not owed.
 
 
-**2026-09-14 — `src/fux/ingest/urlsrc.py` changed under this record and NOTHING this record
+**2026-09-14 — `src/fux/acquire/urlsrc.py` changed under this record and NOTHING this record
 decides moved.** Per-fetcher `[sources.url.config]` resolution ([SR-CONFIG](0113_config.md)
 decision 8a). `UrlEntry.ttl` and its three-layer resolution are untouched, and
 so is decision 16's `fetch_at_answer`, which lives in `config.py` and
@@ -585,7 +585,7 @@ this moved where they are written, not what they are.
 
 **No decision here moved** (W-248, 2026-10-04): in `urlsrc.py` the "nothing readable" skip reason is spelled from `decoders.reason_nothing_readable`; nothing this record decides moved.
 
-**No decision here moved** (W-246, 2026-10-04): `refer/source.py`'s module docstring states L2 as amended on 2026-09-06; no code moved.
+**No decision here moved** (W-246, 2026-10-04): `acquire/source.py`'s module docstring states L2 as amended on 2026-09-06; no code moved.
 
 **No decision here moved** (W-274, 2026-10-11): `config.py` gained `[index] section_records` (SR-SECTIONS decision 11). No URL freshness key moved.
 
@@ -676,8 +676,8 @@ asserts the prose no longer says *four-state*.
 
 ### Reference (required)
 
-- [`src/fux/refer/freshness.py`](../src/fux/refer/freshness.py) — the six labels, and the `max_age_seconds` refusal this record does not undo
-- [`src/fux/refer/source.py`](../src/fux/refer/source.py) — `from_acquired`, and decision 6's imported-never-reimplemented rule
+- [`src/fux/acquire/freshness.py`](../src/fux/acquire/freshness.py) — the six labels, and the `max_age_seconds` refusal this record does not undo
+- [`src/fux/acquire/source.py`](../src/fux/acquire/source.py) — `from_acquired`, and decision 6's imported-never-reimplemented rule
 - [`tests/refer/test_freshness_ttl.py`](../tests/refer/test_freshness_ttl.py) · [`tests/refer/test_refer_acquired.py`](../tests/refer/test_refer_acquired.py) · [`tests/refer/test_ttl_resolution.py`](../tests/refer/test_ttl_resolution.py) — 45 tests, including the four that pin decision 11's arithmetic
 - [`src/fux/doctor.py`](../src/fux/doctor.py) — `freshness_counts()` and `AS_INGESTED_VETO_SHARE`, this veto's instrument (W-101, 2026-09-05)
 - [SR-ACQUIRED](0145_acquired-plane.md) — the plane the fourth verdict reads from
@@ -724,11 +724,11 @@ evidence.*
 
 **Code**
 
-- [`src/fux/refer/freshness.py`](../src/fux/refer/freshness.py)
-- [`src/fux/refer/source.py`](../src/fux/refer/source.py)
+- [`src/fux/acquire/freshness.py`](../src/fux/acquire/freshness.py)
+- [`src/fux/acquire/source.py`](../src/fux/acquire/source.py)
 - [`src/fux/refer/__init__.py`](../src/fux/refer/__init__.py)
-- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py)
-- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py)
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py)
+- [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py)
 - [`src/fux/config.py`](../src/fux/config.py)
 - [`src/fux/schemas/output.schema.json`](../src/fux/schemas/output.schema.json)
 

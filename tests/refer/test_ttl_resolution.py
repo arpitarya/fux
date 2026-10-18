@@ -14,7 +14,7 @@ from __future__ import annotations
 import pytest
 
 from fux import refer as refer_mod
-from fux.refer.freshness import Policy
+from fux.acquire.freshness import Policy
 from l12_fixtures import write_config
 from l12_fixtures import template_fux_toml
 

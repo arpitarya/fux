@@ -22,7 +22,7 @@ import pytest
 
 from fux import sources
 from fux.errors import FuxError
-from fux.ingest import sourcelist, typesfile
+from fux.acquire import sourcelist, typesfile
 from l12_fixtures import write_config
 
 
@@ -585,7 +585,7 @@ def test_adding_the_first_type_seeds_the_built_in_allowlist(repo, monkeypatch):
     (SR-TYPES), so a one-entry file is a corpus-wide invisible filter — the
     exact defect W-55 was opened about. Found by running the verb.
     """
-    from fux.ingest.gitdir import DEFAULT_TYPES, read_types
+    from fux.acquire.gitdir import DEFAULT_TYPES, read_types
 
     # The fixture writes `.fux/formats.toml` (required since W-225 stage 4a);
     # the seed is `add`'s answer to a repo that has none, so remove it.
@@ -771,7 +771,7 @@ def test_a_cli_written_line_states_the_repo_policy_not_the_engine_default(tmp_pa
     middle layer of a three-layer resolution was dead for every line the CLI
     produced. That layer exists so a whole intranet is configured in one place.
     """
-    from fux.ingest import sourcelist
+    from fux.acquire import sourcelist
     from fux.sources import _source_defaults, add
 
     (tmp_path / "fux.toml").write_text(
@@ -807,7 +807,7 @@ def test_a_cli_written_line_states_the_repo_policy_not_the_engine_default(tmp_pa
 
 def test_an_explicit_flag_still_beats_the_repo_policy(tmp_path):
     """Precedence is unchanged: built-in, then [sources.url], then the line."""
-    from fux.ingest import sourcelist
+    from fux.acquire import sourcelist
     from fux.sources import _source_defaults, add
 
     (tmp_path / "fux.toml").write_text(
@@ -824,7 +824,7 @@ def test_an_explicit_flag_still_beats_the_repo_policy(tmp_path):
 
 def test_a_repo_with_no_sources_url_is_untouched(tmp_path):
     """No `[sources.url]`, no `fux.toml`, an unreadable one — engine defaults."""
-    from fux.ingest import sourcelist
+    from fux.acquire import sourcelist
     from fux.sources import _source_defaults
 
     assert _source_defaults(tmp_path, sourcelist.URLS) == {}

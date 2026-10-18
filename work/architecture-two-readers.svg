@@ -98,7 +98,7 @@
 <rect x="370" y="1174" width="440" height="40" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
 <text x="388" y="1199" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">one ranked, banded list  --  identical in both runtimes</text>
 <rect x="46" y="442" width="300" height="114" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
-<text x="64" y="466" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">ingest/pii.py  (761 lines)</text>
+<text x="64" y="466" font-size="12" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">acquire/pii.py  (761 lines)</text>
 <text x="64" y="485" font-size="11" fill="#4a5260">The redaction engine runs at INGEST, so</text>
 <text x="64" y="500" font-size="11" fill="#4a5260">both readers inherit redacted bytes.</text>
 <text x="64" y="515" font-size="11" fill="#4a5260">Python owns the rules, the luhn and</text>

@@ -16,12 +16,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..query.analyzer import analyze
+from ..text.analyzer import analyze
 from ..query.bm25f import Scoring, derive_wlen, score_record
 from ..query.rerank import Proximity, passage_boost
 from ..query.scan import query_term_hashes
-from ..query.tokenize import tokenize
-from ._chunk import Passage
+from ..text.tokenize import tokenize
+from ..text.chunk import Passage
 
 __all__ = ["ScoredPassage", "rescore"]
 

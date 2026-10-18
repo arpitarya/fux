@@ -153,7 +153,7 @@ def read_index_view(root: Path, *, progress=None) -> IndexView:
     """
     from ..progress import NULL as _NULL_PROGRESS
 
-    from .config import load as load_inspect_config
+    from ..inspect_config import load as load_inspect_config
 
     progress = progress or _NULL_PROGRESS
     view = IndexView(config=load_inspect_config(root))

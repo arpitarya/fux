@@ -249,7 +249,7 @@ def document(root: Path, view, loc: str) -> dict:
     passages_cap, words = view.config.passages_cap, view.config.words
     from ..errors import FuxError
     from ..ingest import register
-    from ..refer._chunk import chunk
+    from ..text.chunk import chunk
     from . import facts as facts_mod
 
     index = next((i for i, d in enumerate(view.docs) if d.loc == loc or d.id == loc), None)
@@ -318,11 +318,11 @@ def _named_terms(root: Path, view, doc, raw: bytes, *, words: int) -> dict[str, 
     applied first, in `dictionary.build`'s order, so a value the index never held
     is never printed here either.
     """
-    from ..ingest import pii as pii_mod
+    from ..acquire import pii as pii_mod
     from ..ingest.extract import _headings_and_body, _title
     from ..ingest.parse import parse_document
-    from ..query import identifiers as ids_mod
-    from ..query.tokenize import tokenize_pairs
+    from ..text import identifiers as ids_mod
+    from ..text.tokenize import tokenize_pairs
     from ..store import TF_FIELDS, term_hash
     from .dictionary import _enrichment
 

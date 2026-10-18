@@ -1,6 +1,6 @@
 """Structural headings, per format — W-115.
 
-**A decoder's headings ARE its chunking.** `refer/_chunk.py` splits a document
+**A decoder's headings ARE its chunking.** `text/chunk.py` splits a document
 into citable passages at `^#{1,6}` and nowhere else, and `ingest/extract.py`
 mines the same lines into the `heading` field and the record's `phrases`. So a
 decoder that emits no heading is not merely untidy: its format gets no `§`
@@ -251,7 +251,7 @@ def test_the_page_shaped_decoders_still_emit_sibling_headings():
     title — a structural fact `_chunk._fold` can see, not a claim it must be
     told. This pins the emission the guarantee now rests on."""
     from fux.decode._markdown import headings
-    from fux.refer._chunk import chunk
+    from fux.text.chunk import chunk
 
     out = decode(MBOX, "archive.mbox", root=configured_root())
     levels = [h.level for h in headings(out)]

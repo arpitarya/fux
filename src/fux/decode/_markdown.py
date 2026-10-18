@@ -8,7 +8,7 @@ Two planes read a decoder's output and both ask the same question of it:
 * `ingest/extract.py` asks *which lines are headings*, to mine the `heading`
   field that ranking weights above `body` — and to strip those lines out of
   `body`, so a heading's words are not counted twice.
-* `refer/_chunk.py` asks *which lines are headings*, to decide where one
+* `text/chunk.py` asks *which lines are headings*, to decide where one
   citable passage ends and the next begins.
 
 Each carried its own `^#{1,6}` regex. Two spellings of one rule is the

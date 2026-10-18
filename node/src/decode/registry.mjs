@@ -41,7 +41,7 @@ import { parseToml } from "../config/toml.mjs";
 import { fixed } from "../config/constants.mjs";
 
 //: The built-in `include` default, for a repo with no `.fux/formats.toml` —
-//: `ingest/gitdir.py::_PROSE_TYPES`. **Held equal to Python's by
+//: `acquire/gitdir.py::_PROSE_TYPES`. **Held equal to Python's by
 //: `tests/test_node_decode_boundary.py`**: a format that becomes prose on one
 //: side and not the other is a silent citation defect, which is the whole
 //: reason this module exists.
@@ -52,7 +52,7 @@ export const PROSE_TYPES = fixed("decoders", "prose_types");
  * `fnmatch` semantics are deliberately not used on either side: its `*`
  * matches `/`. A pattern with no `/` matches the **basename**, which is what
  * makes `*.md` mean "any markdown file anywhere". Twin of
- * `ingest/sourcelist.py::glob_match`. */
+ * `acquire/sourcelist.py::glob_match`. */
 export function globMatch(pattern, path) {
   const subject = pattern.includes("/") ? path : path.split("/").pop();
   let out = "";

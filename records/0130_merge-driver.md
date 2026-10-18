@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-21
 amended: 2026-10-13
 feature: the merge driver for the committed index
-owns: [src/fux/maintain/mergedriver.py@b1175af9b955]
+owns: [src/fux/maintain/mergedriver.py@7e0c69741515]
 laws: [L2, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: ba79ad7a40563cd11afb13f92adc3d297271c6b929f5eae0424746ec69231f40
+content_sha: 714d6d00b650e6d062b7353d7a64d310c4c26244fe8932bc52ed7fe9db7404da
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

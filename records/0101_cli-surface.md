@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@5a5e81b5cae2, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@582800c0d8f5, src/fux/progress.py@10364bd02e0a, tests_e2e@00842bc95502, node/fux.mjs@aca43f47f32f]
+owns: [src/fux/cli.py@ee2a8bb5f2f8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@898d2cf2c7ee, src/fux/progress.py@10364bd02e0a, tests_e2e@00842bc95502, node/fux.mjs@aca43f47f32f, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8b814a88fe2342760fc88a30f641030ccff167d9c595e88ecfb5d1ba25c0cb7c
+content_sha: 517e4d11172416f54ac8d22033bd112235653554cf51cad5c0efa67452d0e744
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -23,6 +23,7 @@ content_sha: 8b814a88fe2342760fc88a30f641030ccff167d9c595e88ecfb5d1ba25c0cb7c
 - [`src/fux/cli.py`](../src/fux/cli.py) · file
 - [`src/fux/progress.py`](../src/fux/progress.py) · file
 - [`src/fux/sources.py`](../src/fux/sources.py) · file
+- [`src/fux/stdio.py`](../src/fux/stdio.py) · file
 - [`tests_e2e/`](../tests_e2e) · dir
 
 <!-- COMPONENTS-END -->
@@ -178,7 +179,7 @@ every attribute explicitly ([SR-URL-LIST](0116_url-list.md) decision 12) and
 edit one line, so a human's grouping comments survive.
 
 ⚠ **Since 2026-09-11 the type list is `.fux/formats.toml`** ([SR-TYPES](0128_types-list.md)
-decision 12), and every verb hands a `--types` edit to `ingest/typesfile.py`
+decision 12), and every verb hands a `--types` edit to `acquire/typesfile.py`
 instead of the line grammar. **The one-line rule holds there too**: `add` inserts
 one glob into `include`, or one `ext = "module"` into `[decoders]` when a decoder
 reads the extension (moving a bare `"*.ext"` out of `include` if it was there);
@@ -395,7 +396,7 @@ parses every module under `src/fux/` and refuses a non-`cp1252` character in
 any string reaching `print()`, `FuxError()` or `.write()`. Docstrings are
 exempt (never encoded), as is `progress.py`'s bar (stderr, TTY-gated). **Its
 scope is calls rather than literals** because `store/canonical.py` and
-`ingest/urlsrc.py` hold U+2028/U+2029/U+0085 as the sentinels they *strip*, and
+`acquire/urlsrc.py` hold U+2028/U+2029/U+0085 as the sentinels they *strip*, and
 a guard that flags the code defending against a character is one people learn
 to switch off.
 

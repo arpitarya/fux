@@ -196,7 +196,7 @@ def test_an_ok_sweep_reports_what_it_skipped(repo, monkeypatch):
     clean run.
     """
     import fux.ingest.run as ingest_run
-    from fux.ingest.gitdir import Skipped
+    from fux.acquire.gitdir import Skipped
     from fux.maintain import daemon
 
 

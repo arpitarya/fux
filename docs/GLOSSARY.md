@@ -206,7 +206,7 @@ live answer. Three facts:
 - **Fux has no code-analysis layer** — no AST, no symbol table, no call graph.
   `src/` imports no parser and declares no parsing dependency (`dependencies = []`).
 - **Source files are not indexed by default.** No source-code extension is on
-  `DEFAULT_TYPES` (`ingest/gitdir.py`); adding `src/` to
+  `DEFAULT_TYPES` (`acquire/gitdir.py`); adding `src/` to
   [`.fux/sources/dirs`](#fux-directory) still reports *not an indexed file type*
   per file. Indexing code is opt-in, and even then it is indexed **as text**.
 - **What looks like code analysis is not.** The [`code` edge kind](#code-edge-kind)
@@ -443,6 +443,14 @@ Document-centric, so every document keeps *some* postings (unlike term-centric
 pruning, which can empty a document entirely). Büttcher & Clarke, CIKM 2006
 (ref [1]). Measured by [M1](../work/IMPLEMENTATION.md).
 
+**Layer (core / reader / writer / engine)** — Which distribution a file under
+`src/fux/` ships in once fux is split (W-282). **core** is shared and has no
+verbs; **reader** ranks and answers, refer included; **writer** ingests and
+keeps the index current; **engine** is the CLI and the verbs that need both.
+Reader and writer never import each other except through a listed, guarded
+import. The map and its rules: [`records/README.md` §The layer
+map](../records/README.md).
+
 **Ledger (`L/`)** — The committed source-of-record plane: one entry per
 document — [locator](#locator), `sha@index` (the content hash *as indexed*),
 `mode`, version info. It answers *what is in the corpus, from where,
@@ -655,7 +663,7 @@ numbers it produced stand as filed, and the reconciliation is W-138. Replaced
    records what somebody **asked**, so
    [L9](../records/0011_LAW-9-use-record.md) governs it.
 2. **The ingest ledger** (`.fux/runtime/ingest-log.jsonl`,
-   `fux.ingest.ingestlog`, W-200) — one line per document the last ingest
+   `fux.acquire.ingestlog`, W-200) — one line per document the last ingest
    consumed: which decoder read it and at what version, which fetcher retrieved
    it, from which bytes, and with what outcome. It records what **ingest** did
    and nothing about a query, so **L9 does not reach it — and it must never
@@ -815,7 +823,7 @@ it**, as opposed to about the corpus: query keys, citation history, counters. L9
 requires every one of them to be **hashed at write time, bounded in size,
 confined to gitignored runtime state, and absent from any committed byte, from
 stdout, and from the network.** Today there is exactly one — `last-cited.json`,
-written by [`maintain/lastcited.py`](../src/fux/maintain/lastcited.py): 256
+written by [`store/lastcited.py`](../src/fux/store/lastcited.py): 256
 `sha256[:16]` question keys, so the query text never lands on disk. ⚠ **A hashed
 key is not anonymity** — the value is the locators that answered, so the file
 still says which documents are asked about and how often; those locators are

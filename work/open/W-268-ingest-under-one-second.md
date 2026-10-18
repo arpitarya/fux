@@ -4,10 +4,23 @@ name: W-268
 description: "Arpit's ask (2026-10-10): `fux ingest` of 10 000 documents in under one second, any language. Research done in Cowork the same night; the proposal is work/proposals/ingest-under-one-second.md. Arpit picks a shape — (a) incremental Python first, then a Rust core (recommended), (b) Rust now, (c) incremental only — and the chosen steps are filed as build items."
 item: W-268
 filed: 2026-10-10
+filed_by: "Arpit (Cowork, Opus 5.5)"
+updated: 2026-10-18
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
 
 # W-268 — ingest under one second
+
+## At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 1 | Find where the 4.9 seconds go and what could remove them | a proposal and a side-by-side comparison | ✅ 2026-10-10 |
+| 2 | Arpit picks the order — Python incremental first, then Rust (recommended), Rust now, or incremental only | the build order | 🔴 Arpit decides |
+| 3 | Arpit picks what happens on a machine with no pre-built Rust package — fall back to Python (recommended) or fail | no consumer ever installs Rust | 🔴 Arpit decides |
+| 4 | Measure start-up, the runtime build and file reading on the Mac | the three unknowns, measured before any code | ⏳ |
+| 5 | File the chosen build steps as their own items | work that can start | ⏳ |
 
 **Arpit, 2026-10-10 (Cowork), closing W-267:** *"No boundaries, no limitations.
 If programming language is a boundary, find another programming language in

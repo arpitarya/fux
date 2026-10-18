@@ -7,10 +7,10 @@ description: "BM25F is a bag of words and cannot see where terms are. The rerank
 status: accepted
 date: 2026-08-24
 feature: proximity reranking over the refer plane's passages, and the refusal that bounds it
-owns: [src/fux/query/rerank.py@c231c0a40857, node/src/query/rerank.mjs@be6714bbed81]
+owns: [src/fux/query/rerank.py@84b1bdc19364, node/src/query/rerank.mjs@be6714bbed81]
 laws: [L2, L4, L5]
 timestamp: 2026-08-24T00:00:00Z
-content_sha: 407c8d2d22a927a914f5cb02bb57c3b2273f26d19cf9b43ac71d7b110725d0a3
+content_sha: 3e6bb231a54eca652fe19ec605ebae2968492d4302d9a75a59745c7930addedb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -23,6 +23,7 @@ content_sha: 407c8d2d22a927a914f5cb02bb57c3b2273f26d19cf9b43ac71d7b110725d0a3
 **Describes** — reaches into, does not own:
 
 - [`src/fux/refer/_rescore.py`](../src/fux/refer/_rescore.py) · owned by [SR-REFER](0127_refer-plane.md)
+- [`src/fux/tune.py::Proximity`](../src/fux/tune.py) · owned by [SR-TUNE](0135_tuning.md)
 
 <!-- COMPONENTS-END -->
 
@@ -201,7 +202,7 @@ signal**, which is the failure the refer plane's offline behaviour exists to
 avoid.
 
 ⚠ **Import path moved 2026-08-27, behaviour unchanged.** `src/fux/query/rerank.py`
-now imports `chunk` from **`fux.refer._chunk`**: the module was made private
+now imports `chunk` from **`fux.text.chunk`**: the module was made private
 because `fux.refer` re-exported the `chunk` *function* over its own submodule of
 that name, a shape that had already cost four defects and silently narrowed L5's
 network import fence. The function, its signature and its output are untouched —

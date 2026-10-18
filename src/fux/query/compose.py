@@ -278,7 +278,7 @@ def _related(root: Path, plane, query: str, walked, in_window: dict[str, int], t
 
     kinds = frozenset(tune.ask_kinds.split(","))
 
-    from . import identifiers as ids_mod
+    from ..text import identifiers as ids_mod
 
     hashes = set(query_term_hashes(query, ids_mod.for_root(root)))
     out: list[Related] = []

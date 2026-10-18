@@ -77,8 +77,8 @@ import re
 from pathlib import Path
 
 from ..store import fuxdir
-from . import fuxignore
-from .gitdir import POLICY, Skipped, would_index
+from ..acquire import fuxignore
+from ..acquire.gitdir import POLICY, Skipped, would_index
 
 #: The pre-W-93 home. Kept only so every run can delete it.
 LEGACY_NOTICE = "skipped"

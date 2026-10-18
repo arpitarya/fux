@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
 from fux.errors import FuxError  # noqa: E402
-from fux.ingest import pii  # noqa: E402
+from fux.acquire import pii  # noqa: E402
 
 
 def _documents(root: Path):

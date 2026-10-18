@@ -36,7 +36,7 @@ never detected* — `fetch=` on a line names a fetcher, and
 
 > *"a name resolves to `<fetchers dir>/<name>.py` — the directory being the
 > parent of `[sources.url] fetcher`"*
-> — [`src/fux/ingest/urlsrc.py`](../../src/fux/ingest/urlsrc.py) module docstring
+> — [`src/fux/acquire/urlsrc.py`](../../src/fux/acquire/urlsrc.py) module docstring
 
 So the shape of the answer to *"how do folks connect to Glassbox"* is already
 settled by records that exist: **you write `.fux/fetchers/glassbox.py`, and you
@@ -63,7 +63,7 @@ had not been one for five days.**
 The `fetch=` attribute's value set **was** closed:
 
 ```python
-# src/fux/ingest/sourcelist.py:263, until 2026-09-15
+# src/fux/acquire/sourcelist.py:263, until 2026-09-15
 Attribute("fetch", ("http", "cdp"), "http"),
 ```
 

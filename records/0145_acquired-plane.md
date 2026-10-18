@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-09-01
 feature: the acquired plane
-owns: [src/fux/store/acquired.py@54b4e504214f]
+owns: [src/fux/store/acquired.py@89dd8c94308a]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 17cfc883d9e0ec62b6f60aebbc3d8823b1a517d4508201152bdfcfe3ecfc04e0
+content_sha: 37b1f048618d45423ec8e32b4e27a820ae39c551307ee6d106796f64adf6e62f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -22,9 +22,9 @@ content_sha: 17cfc883d9e0ec62b6f60aebbc3d8823b1a517d4508201152bdfcfe3ecfc04e0
 
 **Describes** — reaches into, does not own:
 
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
+- [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
 - [`src/fux/config.py::UrlSource,_load_url_source`](../src/fux/config.py) · owned by [SR-CONFIG](0113_config.md)
-- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
-- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
 - [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
 
 <!-- COMPONENTS-END -->
@@ -109,7 +109,7 @@ None is solved by the two caches that already exist, and `refer/fetchcache.py` s
    ⚠ **It defaulted to `false` for one day.** The argument for off-by-default was a stranger's 9 000-URL corpus quietly filling a disk. Decision 8 answers that directly — the store is bounded and evicts — and once the blast radius is bounded, defaulting off means almost nobody gets the thing the plane exists for.
 5. **Retention happens in `fetch_all()`, never inside a fetcher.** W-86 P8 removed conversion from `http.py` and `cdp.py` because it lived there as two hand-maintained copies that a comment asked to keep identical and nothing checked. Retention in the fetchers repeats that defect exactly, and would make *which fetcher retrieved a document* observable again. Above the boundary, every fetcher gains retention with no line changed in any of them.
 6. **The order is `_unpack` → refusal check → persist → decode.** A refusal is never stored. Retaining a login page would keep the wrong bytes *and* make them look authoritative.
-7. **The plane holds no wall clock.** Ordering is by `run_seq`, read from `maintain/urlstate.py` rather than started here — two run counters would drift, and the one that drifts would be the one deciding what gets deleted. Wall clock lives in `runtime/fetch-cache/` and nowhere else.
+7. **The plane holds no wall clock.** Ordering is by `run_seq`, read from `acquire/urlstate.py` rather than started here — two run counters would drift, and the one that drifts would be the one deciding what gets deleted. Wall clock lives in `runtime/fetch-cache/` and nowhere else.
 8. **The store is bounded by `[sources.url] acquired_max_bytes` (required with the table since W-225 stage 3b; the template writes 2 GiB), and eviction is by `run_seq`, oldest first** — never by `mtime`, which would be a clock. **A blob whose URL has `fail_streak > 0` is never evicted**: that is precisely the copy that cannot be re-acquired. `fail_streak > 0`, not `>= FAILING_STREAK` — that constant is the threshold for *reporting* a URL as dead; here one failure already means "may not be re-acquirable", and the cost of protecting it is one blob of disk.
 8a. ⚠ **`acquired_max_bytes` stays in `fux.toml` while `max_table_rows` left it**
     (2026-09-11). On that day `[decode] max_table_rows` moved to
@@ -241,7 +241,7 @@ silently restoring the default. ⚠ The record said so from `6f518c6` and the co
 landed one commit later — see SR-CONFIG after decision 15.
 
 
-**2026-09-14 — `src/fux/ingest/urlsrc.py` changed under this record and NOTHING this record
+**2026-09-14 — `src/fux/acquire/urlsrc.py` changed under this record and NOTHING this record
 decides moved.** `fetch_all` now hands each fetcher its own slice of `[sources.url.config]`
 instead of the whole table ([SR-CONFIG](0113_config.md) decision 8a). Retention
 is untouched: still in `fetch_all` and never inside a fetcher (decision 5),
@@ -324,7 +324,7 @@ this moved where they are written, not what they are.
 
 `fuxdir.py`'s committed-file table gained `identifiers.toml` and `inspect.toml` ([SR-IDENTIFIERS](0160_identifiers.md)); the `ACQUIRED` declaration is unchanged.
 
-**No decision here moved** (W-253, 2026-10-04): `ingest/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
+**No decision here moved** (W-253, 2026-10-04): `acquire/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
 
 **No decision here moved** (W-255, 2026-10-04): `fux.toml` and its template gained `[doctor] pii_rule_budget_ms` ([SR-CONFIG](0113_config.md), [SR-PII](0148_pii.md) decision 23); no other key moved.
 
@@ -373,7 +373,7 @@ this moved where they are written, not what they are.
   category** had appeared beside committed, derived and acquired. It has not —
   a transient is not a plane.
 
-**Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `refer/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.
+**Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `acquire/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.
 
 **Harder.** `.fux/` now has a directory that grows, and a bounded store means an eviction policy, which means a way to lose the only local copy of something. Decision 8's two rules are what confine that loss to blobs a re-fetch can restore; they are not optimisations and removing either breaks the guarantee.
 
@@ -399,7 +399,7 @@ this moved where they are written, not what they are.
 
 - `src/fux/store/fuxdir.py` — the `COMMITTED` / `DERIVED` declaration this record extends
 - `src/fux/refer/fetchcache.py` — the two-stores-provably-separate argument, and the wall-clock invariant
-- `src/fux/maintain/urlstate.py` — the counters-not-clocks precedent, and `fail_streak`
+- `src/fux/acquire/urlstate.py` — the counters-not-clocks precedent, and `fail_streak`
 - `src/fux/doctor.py` — `freshness_counts()` and `AS_INGESTED_VETO_SHARE`, the veto's instrument (W-101, 2026-09-05)
 - `tests/store/test_acquired.py` — 24 tests, including the failing-URL eviction guard and the no-wall-clock assertion
 - SR-DOTFUX (`0102_fux-directory.md`) · SR-FETCHER (`0117_fetcher.md`) · SR-REFER (`0127_refer-plane.md`)
@@ -438,11 +438,11 @@ $ fux doctor --json | python -c "import json,sys; print(json.load(sys.stdin)['fr
 - `src/fux/store/acquired.py`
 - `src/fux/store/fuxdir.py`
 - `src/fux/refer/fetchcache.py`
-- `src/fux/refer/source.py`
-- `src/fux/refer/freshness.py`
-- `src/fux/maintain/urlstate.py`
-- `src/fux/ingest/urlsrc.py`
-- `src/fux/ingest/sourcelist.py`
+- `src/fux/acquire/source.py`
+- `src/fux/acquire/freshness.py`
+- `src/fux/acquire/urlstate.py`
+- `src/fux/acquire/urlsrc.py`
+- `src/fux/acquire/sourcelist.py`
 
 **Tests:**
 

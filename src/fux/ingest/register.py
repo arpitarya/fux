@@ -251,7 +251,7 @@ def url_provenance(root: Path) -> dict[str, tuple[str, str | None]]:
     answer rather than a guess.
     """
     from ..config import load as load_config
-    from . import urlsrc
+    from ..acquire import urlsrc
 
     try:
         config = load_config(root)
@@ -284,7 +284,7 @@ def rows_from(records: list[dict], provenance: dict[str, tuple[str, str | None]]
     source entry, SR-ARCHIVED-CONTENT), `fetch=<name>` when a fetcher is
     recorded. Keys in `KEYS` order; absent when they hold nothing.
     """
-    from . import ingestlog
+    from ..acquire import ingestlog
 
     out: list[Row] = []
     for record in records:
@@ -305,7 +305,7 @@ def rows_for(root: Path, records: list[dict], decoder_digests: dict[str, str]) -
     committed list. **One function, two callers**, so the file and the verb
     cannot disagree.
     """
-    from . import ingestlog
+    from ..acquire import ingestlog
 
     urls = url_provenance(root)
     provenance: dict[str, tuple[str, str | None]] = {}
@@ -322,7 +322,7 @@ def rows_for(root: Path, records: list[dict], decoder_digests: dict[str, str]) -
 def from_index(root: Path) -> tuple[list[Row], int]:
     """The rows and `rules=` the register would hold for the index on disk."""
     from ..store import reader as reader_mod
-    from . import decoderdigest
+    from ..acquire import decoderdigest
     from . import extract as extract_mod
 
     records = list(reader_mod.read_index(root).values())

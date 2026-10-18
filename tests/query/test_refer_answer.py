@@ -3,7 +3,7 @@
 `refer_answer.answer_via_refer` is the seam between `cmd_answer` and
 `fux.refer.refer()` — this suite proves the fetcher resolution (the part
 `refer()` itself does not own: which consumer fetcher a `url:` citation
-gets, mirroring `ingest/urlsrc.py`'s own resolution exactly) and the honest
+gets, mirroring `acquire/urlsrc.py`'s own resolution exactly) and the honest
 `None` degradation when nothing usable can be produced. The e2e proof of the
 default-on behaviour and the sha-changes-on-edit case live in
 `tests_e2e/test_verbs.py`, against the real CLI.
@@ -263,7 +263,7 @@ def test_two_urls_behind_different_fetchers_each_get_their_own(tmp_path):
 
     `refer()` takes one `fetcher` for the whole call. Handing both URLs the
     first one's module compares a rendered page against a shell and reports a
-    **false staleness on every query** (`refer/source.py`). Each URL must reach
+    **false staleness on every query** (`acquire/source.py`). Each URL must reach
     the fetcher its own line names.
 
     `fetch=` is a closed set — `http` or `cdp` — so those are the two names,

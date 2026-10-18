@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import pytest
 
-from fux.query.analyzer import analyze, analyze_pairs
+from fux.text.analyzer import analyze, analyze_pairs
 
 #: The awkward cases, not the easy ones. Each is here because it exercises a
 #: branch where a hand-copied loop could plausibly diverge.

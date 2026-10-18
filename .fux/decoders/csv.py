@@ -12,7 +12,7 @@ table, a glossary export — becomes a real table with its header row intact, an
 the header row is what makes a cell findable.
 
 **The filename leads as an H1**, added 2026-09-06. Without it a CSV decoded to
-a bare table: no heading for `refer/_chunk.py` to open a passage on, no
+a bare table: no heading for `text/chunk.py` to open a passage on, no
 `phrases` for `extract.py` to mine, and — because a table contains no blank
 line — a file over the passage ceiling that the chunker could not split at all.
 The chunker now bands oversized tables by rows; this gives the band something
@@ -36,7 +36,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.csv", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values
+VERSION = fixed("decoders.csv", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values; nor W-282 (moved module paths in comments)
 
 EXTENSIONS = tuple(fixed("decoders.csv", "extensions"))
 

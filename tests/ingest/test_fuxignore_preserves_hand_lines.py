@@ -11,7 +11,7 @@ the bug it was suspected of.
 from __future__ import annotations
 
 from fux import setup as setup_mod
-from fux.ingest import fuxignore
+from fux.acquire import fuxignore
 
 HAND = "# mine\n__pycache__/\n*.py[cod]\n"
 

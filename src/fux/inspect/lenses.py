@@ -416,7 +416,7 @@ def _fingerprint(view, dictionary, index: int) -> str:
     different word than the one this document is being tested on, and the miss
     would be the fingerprint's fault rather than the corpus's.
     """
-    from ..query.tokenize import tokenize
+    from ..text.tokenize import tokenize
     from ..store import term_hash
 
     terms = sorted(

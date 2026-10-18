@@ -1,4 +1,4 @@
-/** The committed directory declaration, read. Twin of `src/fux/ingest/gitdir.py`.
+/** The committed directory declaration, read. Twin of `src/fux/acquire/gitdir.py`.
  *
  * ⚠ **NARROWED, and `tests/test_node_twins.py` says so.** `gitdir.py` is the
  * git-backed *walk* — what ingest visits, what it excludes, what a document's

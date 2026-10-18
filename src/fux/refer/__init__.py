@@ -62,10 +62,10 @@ from ..decode import DecodeFailed
 from ..decode import decode as _decode_bytes
 from . import arc as arc_mod
 from . import fetchcache as fetchcache_mod
-from . import freshness as freshness_mod
+from ..acquire import freshness as freshness_mod
 from ._assemble import Assembled, assemble
-from ._chunk import chunk
-from .freshness import (
+from ..text.chunk import chunk
+from ..acquire.freshness import (
     Policy,
     Verdict,
     as_ingested as as_ingested_verdict,
@@ -74,7 +74,7 @@ from .freshness import (
 )
 from ._rescore import ScoredPassage, rescore
 from ..errors import FuxError
-from .source import GIT, Fetched, fetch_document, from_acquired
+from ..acquire.source import GIT, Fetched, fetch_document, from_acquired
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from ..tune import Tune
@@ -323,7 +323,7 @@ def _mark_changed_urls_dirty(root: Path, documents: list[Cited]) -> None:
     if not changed:
         return
     try:
-        from ..maintain import dirty
+        from ..store import dirty
 
         dirty.record(root, changed)
     except Exception:  # pragma: no cover - a detector must not break an answer
@@ -346,7 +346,7 @@ def _declared_ttls(root) -> dict[str, int]:
     """
     from ..config import CONFIG_NAME
     from ..config import load as load_config
-    from ..ingest import sourcelist, urlsrc
+    from ..acquire import sourcelist, urlsrc
 
     # ⚠ **An UNCONFIGURED repo declares nothing; it is not a malformed one.**
     # The refusal above is for a file that exists and is wrong. `refer()` is
@@ -437,7 +437,7 @@ def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fe
     refusing it would make `--audit` unable to quote the very repository it is
     auditing. What `never` forbids is going *out*.
     """
-    from .source import GIT, resolve
+    from ..acquire.source import GIT, resolve
 
     strategy = resolve(doc_id)
     if strategy != GIT and not decision.fetch:

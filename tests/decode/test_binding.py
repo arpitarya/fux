@@ -21,7 +21,7 @@ import pytest
 
 from fux.decode import builtin_bindings, decode, reason, registry
 from fux.errors import FuxError
-from fux.ingest import typesfile
+from fux.acquire import typesfile
 from l12_fixtures import write_config
 
 

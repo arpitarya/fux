@@ -32,10 +32,37 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-13** (Claude Code, Fable 5.1 — W-279 closed; W-278 in flight in another session).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-18** (Claude Code, Opus 5.5 — W-282 Step 1, the untangle; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-10-13 (latest) — W-278 CAPTURED: EVERY GATE PASS, LATENCY +49.5 ms; ARPIT SCORES
+### 🟢 2026-10-18 (latest) — W-282 STEP 1: READER AND WRITER NO LONGER IMPORT EACH OTHER
+
+- **Asked:** *"implement W282."* Step 1 (the untangle) is done in the working tree, **uncommitted** — Cowork's own W-282 filing was still staged in the same files, so Arpit commits.
+- **The map:** every file under `src/fux/` is core, reader, writer or engine — [`records/README.md` §The layer map](../records/README.md), held by `tests/test_package_layers.py` (it reads the map from the record and fails on any crossing; a planted reader→writer import fails it).
+- **The moves:** two new core packages — `text/` (analyzer, identifiers, stem, tokenize, mined, chunk) and `acquire/` (source lists, dir walk, decoder digest, URL fetch and state, refusals, freshness, source, PII, ingest ledger); `store/` gained the dirty set, last-cited file, write lock and the read halves of `correct`/`enrich`; `inspect_config.py` and `stdio.py` at the root; `Scoring`/`Proximity` into `tune.py`; `fux build` into `derive/`.
+- **Three guarded imports, listed in the record:** `fux.open` (lazy, PEP 562), the post-ingest runtime build, and `enrich --check`'s ranker. Each works where the other layer is installed and degrades by name where it is not.
+- **Evidence:** 50/50 `ask`/`find`/`answer`/`lexical`/`graph --json` byte-identical on this repo's index (the final code run against the baseline's documents in a worktree). Units 7 164 pass; e2e 176; Node 241. The one red unit is the Node-twin working-tree check, which clears at commit.
+- **Next:** 🟢 W-282 Step 2, packaging (Sonnet) — and the item's "Carried into Step 2" list: the `-m fux.cli` relaunches, the doctor split, and verb placements that differ from the diagram.
+
+### 🟢 2026-10-18 — EVERY WORK ITEM SAYS WHO FILED IT AND WHO LAST UPDATED IT
+
+- **Arpit:** filer and updater in every item's frontmatter; the filer called out on every open-items row. → SR-WORK-OPEN-QUEUE rules 62–64, gated; eight items back-filled; template is `work/open/README.md` contract 7.
+
+### 🟢 2026-10-18 — EVERY WORK ITEM FILE OPENS WITH A MEETING VIEW
+
+- **Arpit:** the first thing in a work item file is a graph or table *"easier to present in a meeting"*, and it is enforced. → SR-WORK-OPEN-QUEUE rules 59–61; rule 59 gated by `test_open_work_rows_are_short.py`; all eight open items retrofitted; the template is `work/open/README.md` contract 6.
+
+### 🔴 2026-10-18 — W-282 FILED: THE READER / WRITER / CORE PACKAGE SPLIT
+
+- **Arpit:** *"Research and put this in work item. We are going to build it out"* — index-stores §8: `fux-core`, `fux-reader` (Python + Node), `fux-writer` (Python only), `fux-engine` unchanged. Filed as [W-282](open/W-282-reader-writer-packages.md), 🔴; the database store stays B-272.
+- **Research changed the shape:** §8's *"the split already exists in the module tree"* is wrong — 86 reader→writer and 36 writer→reader imports. `derive/` is the reader's; `answer` needs decoders, fetchers and PII; PEP 420 clashes with `fux/__init__.py`; `@fux` on npm is another account's; the three PyPI names are free.
+- **Ruled later the same day:** F1 — SR-LAW-2 amended: *`fux-engine` is the one install; `fux-reader` and `fux-writer` are role packages*; CLAUDE.md regenerated. F4 — npm scope `@fux`, first package `@fux/fux-reader` (the registry shows `@fux` owned by npm user `fux`, not `aarya11`: Arpit to confirm before release). F3 parked by him as a blocker, the store kept in B-272.
+- **F2 ruled (a):** the reader's `answer` is exactly today's — refer included, same output, a test compares it with `fux-engine`.
+- **F4 re-ruled:** `@fux` is another person's npm user account (checked in his browser); the scope is **`@fux-engine`**, first package **`@fux-engine/reader`**.
+- **F3 ruled:** split first; index-stores.md is rewritten after it lands. Package names final: PyPI `fux-engine`, `fux-core`, `fux-reader`, `fux-writer`; npm `fux-engine`, `@fux-engine/reader`.
+- **Next:** 🟢 W-282 Step 1, the untangle behind a layer test (Claude Code, Opus). Arpit creates the `@fux-engine` npm org before Step 3.
+
+### 🔴 2026-10-13 — W-278 CAPTURED: EVERY GATE PASS, LATENCY +49.5 ms; ARPIT SCORES
 
 - **Arpit, in this session:** *own-match only* — a section is scored as a short document only if one of the query's terms is in its **own** body or heading; a match through the parent's title/path/ctx alone gains nothing (SR-SECTIONS d5).
 - **Built `08ef6293`** (Claude Code, Opus 5.5): `rank._section_gain` + `rank.mjs` = the third form; `section_weight` ∈ [0, 1] (`_fraction`); `sec_*` stats gone (`fux.runtime.v11`).
@@ -2435,7 +2462,7 @@ Ruled by Arpit on 2026-08-27, closing W-89.
   which SR-LAWS decision 4 requires — **if you find them committed separately,
   that is the defect, not a style question.**
 - **L9 forbids nothing fux does today.** Verified against the code *before* the
-  text was written: `maintain/lastcited.py` hashes the query key
+  text was written: `store/lastcited.py` hashes the query key
   (`sha256[:16]` of the normalised text), bounds the store at `MAX_QUESTIONS = 256`,
   writes into gitignored `.fux/runtime/`, never raises, and reports on **stderr**
   so stdout stays byte-identical.
@@ -2980,7 +3007,7 @@ the reason is that the measuring environments are gone.**
   [`regression/2026-08-19-w54/`](regression/2026-08-19-w54/report.md).
 - **Both source lists are files now.** `.fux/sources/dirs` and
   `.fux/sources/urls`, one entry per line, **one parser**
-  ([`ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py)). `[sources] dirs`
+  ([`acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py)). `[sources] dirs`
   and `[sources.url] middleware` are retired keys that stop the run with
   instructions — **two breaking changes**, both cheapest now.
 - **Two new verbs, eight in total.** `fux setup` writes the files a consumer
@@ -3604,6 +3631,18 @@ which are not laws:
 
 The ones that would change how a successor acts, newest first. Add to this list
 when a session produces a lesson; do not let it become a changelog.
+
+- **Placing a module in a layer places its package too** (2026-10-18, W-282).
+  `import fux.query.tokenize` runs `fux/query/__init__.py` — the whole ranker —
+  so a shared module cannot stay under a heavy package `__init__` and be
+  "core" by relabelling. Count the ancestors as imports; move the module.
+  ⚠ **And an import walk sees only imports**: `python -m fux.cli` relaunched
+  from the writer crosses into the engine and no AST gate notices.
+- **A comment edit in `.fux/decoders/` re-extracts its whole format**
+  (2026-10-18, W-282). The consumer-decoder digest is the file's sha, so
+  syncing a docstring into this repo's decoder copies moved the digest of 958
+  documents. It is deterministic and the post-commit re-ingest absorbs it, but
+  it is a large `REGISTER` diff for a comment — weigh it before touching them.
 
 - **A derived file still needs the ancestor in a merge** (2026-10-09, W-250).
   `_merge_register` skipped decision 4 on the argument that the register

@@ -20,7 +20,7 @@ from fux.errors import FuxError
 from fux.refer import Policy, refer
 from fux.refer.arc import ARC
 from fux.refer.fetchcache import FetchCache
-from fux.refer.freshness import ALWAYS, NEVER, cached, verify
+from fux.acquire.freshness import ALWAYS, NEVER, cached, verify
 from l12_fixtures import template_fux_toml, template_tune, write_config
 
 _TIMEOUT = template_fux_toml()["refer"]["timeout_seconds"]

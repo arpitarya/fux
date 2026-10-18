@@ -12,7 +12,7 @@ import json
 
 import pytest
 
-from fux.maintain import lastcited
+from fux.store import lastcited
 from l12_fixtures import template_fux_toml, write_config
 
 

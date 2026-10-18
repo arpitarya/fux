@@ -191,7 +191,7 @@ def test_reusable_refuses_a_header_that_is_not_the_current_one(corpus, monkeypat
 def test_reusable_refuses_an_index_built_under_other_identifier_families(corpus):
     """W-233: editing `.fux/identifiers.toml` re-analyses every document, and
     reverting it does the same — the digest in the header is the gate."""
-    from fux.query import identifiers as ids_mod
+    from fux.text import identifiers as ids_mod
 
     assert run(corpus, refresh_urls=False, full=False).reused_count > 0
     path = ids_mod.path(corpus)

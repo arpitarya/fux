@@ -43,8 +43,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .model import Edge, Graph
-from ..ingest.edges import EXTRACTED_GRADE
 from ..constants import fixed
+
+#: The grade `ingest/edges.py` stamps on an extracted edge — read from the
+#: same key rather than imported from the writer (W-282).
+EXTRACTED_GRADE = fixed("graph", "grade_extracted")
 
 __all__ = [
     "ppr", "expand", "routes", "Route", "link_idf",

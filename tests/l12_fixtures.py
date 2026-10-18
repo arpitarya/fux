@@ -202,7 +202,7 @@ def refusals_scan_text() -> str:
 
 def inspect_template():
     """`.fux/inspect.toml` as the template ships it — an `InspectConfig` (W-225 4c)."""
-    from fux.inspect import config as inspect_config
+    from fux import inspect_config
 
     return inspect_config.load(None)
 

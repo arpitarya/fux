@@ -1,6 +1,6 @@
 /** Identifier families — `.fux/identifiers.toml`, matched on both sides (W-233).
  *
- * Twin of `src/fux/query/identifiers.py`. A family (a template such as
+ * Twin of `src/fux/text/identifiers.py`. A family (a template such as
  * `RF-{n}`, or a guarded `[user]` regex) is matched against the TEXT, and each
  * match adds ONE term — its canonical form — beside analyzer v3's own terms.
  * With no families nothing changes, byte for byte.

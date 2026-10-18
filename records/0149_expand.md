@@ -11,7 +11,7 @@ owns: [src/fux/query/expand.py@fe8364556021, src/fux/query/fuse.py@ca1f9d50d93c,
 laws: [3, 4, 8]
 ratifies: W-109
 timestamp: 2026-09-05T00:00:00Z
-content_sha: 07317e1d06d624aff466056fc538ab13a9c82b3e2881725e1078c10793aec932
+content_sha: f347a63fd41e98feb3a5c1f4c3e36c713dac54604afa947cba0d384842680eae
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -144,7 +144,7 @@ are the measured form of that idea; RRF is Cormack, Clarke & Buettcher 2009.
 
 **1. Fux never writes an expansion, and this record never lets it.** `--expand`
 is a *term slot*. The text arrives from the caller, is analyzed by
-`query/analyzer.py` — the analyzer the index was built with — and is hashed.
+`text/analyzer.py` — the analyzer the index was built with — and is hashed.
 Nothing in `src/fux/` generates, rewrites or suggests one. L4 is why, and the
 slot is what makes the law survivable rather than merely obeyed. **The one
 addition fux makes is not a written expansion in this sense**: decision 18's
@@ -335,7 +335,7 @@ form, gated or not.** What remains is the caller's own `--expand`, at
 step 4, built 2026-09-27; [the frozen bar](../work/regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md)).
 A document that writes *"Mean Kinetic Temperature (MKT)"* has said the two
 spellings are one thing. When a query carries one side of such a pair and not
-the other, [`query/mined.py`](../src/fux/query/mined.py) adds the other side,
+the other, [`text/mined.py`](../src/fux/text/mined.py) adds the other side,
 scored through `Expansion` at `[ranking] mined_weight`
 ([SR-TUNE](0135_tuning.md) decision 19), **default `0.5` since its PASS on
 2026-09-27** (SR-TUNE decision 19a). `0.0` reads no pair.

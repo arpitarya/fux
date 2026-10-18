@@ -157,7 +157,7 @@ def test_setup_writes_a_types_file_ingest_can_actually_read(tmp_path):
     every fresh repo with "lists no file types". Nothing asserted the two verbs
     composed, which is exactly why it got out.
     """
-    from fux.ingest.gitdir import DEFAULT_TYPES, read_types
+    from fux.acquire.gitdir import DEFAULT_TYPES, read_types
 
     setup_mod.run(tmp_path)
     types = read_types(tmp_path)  # must not raise
@@ -172,8 +172,8 @@ def test_the_written_types_file_spells_the_default_out_as_live_lines(tmp_path):
     `include`, and a bound extension is not written twice.
     """
     from fux.decode import builtin_bindings
-    from fux.ingest import typesfile
-    from fux.ingest.gitdir import DEFAULT_TYPES
+    from fux.acquire import typesfile
+    from fux.acquire.gitdir import DEFAULT_TYPES
 
     setup_mod.run(tmp_path)
     text = (tmp_path / ".fux" / "formats.toml").read_text(encoding="utf-8")
@@ -187,7 +187,7 @@ def test_the_written_types_file_spells_the_default_out_as_live_lines(tmp_path):
 
 def test_a_freshly_set_up_repo_indexes_its_own_readme(tmp_path):
     """End to end: the two verbs compose, and the default actually matches."""
-    from fux.ingest.gitdir import read_types, walk_sources
+    from fux.acquire.gitdir import read_types, walk_sources
 
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "note.md").write_text("# note\n", encoding="utf-8")
@@ -203,7 +203,7 @@ def test_setup_never_overwrites_an_edited_types_file(tmp_path):
     never REWRITES what the consumer wrote (the list and `[decoders]` are
     theirs), but it APPENDS the `[limits.*]` keys the file lacks."""
     from fux.decode._limits import template_limits
-    from fux.ingest import typesfile
+    from fux.acquire import typesfile
 
     setup_mod.run(tmp_path)
     listing = tmp_path / ".fux" / "formats.toml"
@@ -225,7 +225,7 @@ def _legacy(root, text):
 
 
 def test_setup_converts_a_leftover_line_grammar_types_file(tmp_path, capsys):
-    from fux.ingest import typesfile
+    from fux.acquire import typesfile
 
     _legacy(tmp_path, "# mine\n*.md\ndocs/*.txt\n*.csv decoder=csv\n*.geojson decoder=json\n")
     report = setup_mod.run(tmp_path)
@@ -239,8 +239,8 @@ def test_setup_converts_a_leftover_line_grammar_types_file(tmp_path, capsys):
 def test_the_converted_file_states_what_the_old_one_admitted(tmp_path):
     """The whole point: a conversion that changed the allowlist would be the silent
     index change the refusal exists to prevent."""
-    from fux.ingest.gitdir import TypeFilter, read_types
-    from fux.ingest import sourcelist
+    from fux.acquire.gitdir import TypeFilter, read_types
+    from fux.acquire import sourcelist
 
     legacy = "*.md\n*.rst\n*.CSV\n*.csv decoder=csv\n*.pdf decoder=pdf\ndocs/**/*.txt\n"
     _legacy(tmp_path, legacy)
@@ -276,7 +276,7 @@ def test_bang_lines_move_to_fuxignore_above_the_first_hand_pattern(tmp_path):
     assert report.moved_exclusions == ["*.min.md"]
     lines = (tmp_path / ".fux" / ".fuxignore").read_text(encoding="utf-8").splitlines()
     assert lines.index("*.min.md") < lines.index("!keep.min.md")
-    from fux.ingest import fuxignore
+    from fux.acquire import fuxignore
 
     ignores = fuxignore.read(tmp_path)
     assert ignores.decide("docs/a.min.md", is_dir=False, hand_only=False).ignored
@@ -334,7 +334,7 @@ def test_the_generated_config_loads(tmp_path):
     assert config.url is not None
     # ...and the list it points at is header comments only. Not one address, so
     # nothing can be fetched: the opt-in is a URL existing, not a table existing.
-    from fux.ingest import sourcelist
+    from fux.acquire import sourcelist
 
     listed = sourcelist.parse(
         (tmp_path / config.url.urls_file).read_text(encoding="utf-8"),
@@ -472,7 +472,7 @@ def test_a_plain_ingest_puts_no_code_in_the_repo(tmp_path):
 
 def test_setup_writes_the_pii_starter_and_never_rewrites_it(tmp_path):
     """SR-PII decision 17: the starter's header said setup wrote it; now it does."""
-    from fux.ingest import pii
+    from fux.acquire import pii
 
     setup_mod.run(tmp_path, agents=False)
     path = pii.rules_path(tmp_path)
@@ -520,7 +520,7 @@ def test_the_urls_header_is_derived_from_the_spec(tmp_path):
     `keep`, `ttl`, `enrich`, `archived` and `update` all landed after the header
     was written, and every repo set up in between committed the sentence.
     """
-    from fux.ingest.sourcelist import URLS
+    from fux.acquire.sourcelist import URLS
     from fux.setup import _urls_header
 
     header = _urls_header()
@@ -551,7 +551,7 @@ def test_the_header_prints_no_duration_for_a_non_duration_attribute():
     So the assertion is on the *general* rule, not on `fetch`: no attribute may
     print a placeholder that belongs to another attribute's type.
     """
-    from fux.ingest.sourcelist import URLS
+    from fux.acquire.sourcelist import URLS
     from fux.setup import _urls_header
 
     header = _urls_header()

@@ -90,7 +90,8 @@ the defect this ordering exists to make visible.*
   format, Postgres the one hosted server. A committed SQLite file stays
   refused; a vector DB is not a store.
   **Graduates when Arpit rules F1 and F2 and names the first index that will
-  live outside a repo.**
+  live outside a repo.** **§8 (the package split) graduated 2026-10-18** into
+  [W-282](../open/W-282-reader-writer-packages.md); the store stays parked.
 
 * [The build plan, October 2026](build-plan-2026-10.md) — the 2026-10-04 ruling
   pass over the backlog ([W-251](../../archive/open/W-251-backlog-audit-rulings.md) §4)
@@ -155,7 +156,7 @@ the defect this ordering exists to make visible.*
   numbers"* — what was on screen when an API call failed, and whether it later
   succeeded in another session. **The connection point already exists**
   (`.fux/fetchers/<name>.py` + `fetch=<name>`), but 🔴 **`fetch=`'s value set is
-  closed at [`sourcelist.py:263`](../../src/fux/ingest/sourcelist.py) while
+  closed at [`sourcelist.py:263`](../../src/fux/acquire/sourcelist.py) while
   `urlsrc.py`'s docstring says it resolves by filename** — the two have drifted
   and *no* third fetcher is possible today. Argues the answer is not a fetcher
   at all but **fetch → materialise → index**: aggregate deterministically at

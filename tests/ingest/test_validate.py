@@ -15,7 +15,7 @@ from __future__ import annotations
 import hashlib
 import types
 
-from fux.ingest.urlsrc import validate_group
+from fux.acquire.urlsrc import validate_group
 
 
 def sha(token: str) -> str:

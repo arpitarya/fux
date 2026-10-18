@@ -23,6 +23,70 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-18 — W-282 Step 1: reader and writer no longer import each other  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement W282."* Step 1 is the agent-closable part (Steps 2–3: Sonnet; Step 3 waits on the `@fux-engine` npm org).
+- **Done:** a layer map in `records/README.md` §Ownership places every file under `src/fux/` in core, reader, writer or engine; `tests/test_package_layers.py` reads it and fails on any crossing (proved with a planted `query → ingest` import). ~125 cross imports → 0, plus 3 listed guarded ones. 24 modules moved into `text/`, `acquire/`, `store/` and the root by an AST rewrite that recomputes relative imports from each file's new home; `correct`/`enrich` read halves split into `store/`; `Scoring`/`Proximity` into `tune.py`; `fux build` into `derive/`; `fux.open` lazy. Ownership table, `owns:`, describes rows, component blocks and every live doc's paths updated; 4 describer records got a no-decision-moved line; owns and content hashes re-stamped.
+- **Verified:** 50/50 `ask`/`find`/`answer`/`lexical`/`graph --json` byte-identical on this repo's index — the final code run on the baseline's documents in a worktree, because `answer` re-reads the records this change edits. Units 7 164 pass, e2e 176, Node 241, bundle builds. One red, by design: `test_node_twins`' working-tree check (Python halves changed in imports only) clears at commit.
+- **Not committed:** Cowork's W-282 filing (L2 amendment, queue rules, the item itself) is still staged in some of the same files, and no commit was asked for. ⚠ A commit carrying `.fux/decoders/` re-extracts 958 documents in the post-commit re-ingest — docstring-only, deterministic.
+- **Next:** Arpit commits; then W-282 Step 2 (Sonnet), starting from the item's *Carried into Step 2* list.
+
+## 2026-10-18 — every work item says who filed it and who last updated it  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"In work items, in front matter, always have the name who filed the work item, who updated the work item. And in open items as well, do call out who filed the work item."*
+- **Done:** SR-WORK-OPEN-QUEUE rules 62–64 (group J), rule 14 and decision 10: `filed_by` / `updated` / `updated_by` in every item's frontmatter as `"<person> (<surface>, <model>)"`; every open-items row ends `Filed by <person> (<surface>).`. Gated in `tests/test_open_work_rows_are_short.py` (+ a fixed-input self-test); record restamped. Eight items back-filled from WORKLOG headers and commit messages — W-263 and W-265 have no surviving model, so it is omitted, not guessed. Rows for W-258, W-280, W-282 trimmed to stay ≤ 280. Template: `work/open/README.md` contract 7 + frontmatter; `WORK-SYSTEM.md` rules 61–63, §6.11 sample rows, §6.13, §8, §9.
+- **Verified:** the queue test's 23 functions and the inbox check pass on the device VM (stdlib runner); full suites not run from this surface.
+- **Open:** nothing new. W-282's four forks are still next.
+
+## 2026-10-18 — every work item file opens with a meeting view  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"In work items and individual work item files … I want the first item to be a graph or a tabular kind of structure, which is easier to present in a meeting … And we are going to enforce it."* Retrofit the existing items and update the template.
+- **Done:** SR-WORK-OPEN-QUEUE rules 59–61 (group I) + decision 9: `## At a glance` is the first thing under the title, a table or diagram the first thing under that, plain English, kept current. Rule 59 gated in `tests/test_open_work_rows_are_short.py` (the check + a fixed-input self-test); record restamped. All eight open items (W-258, 263, 265, 268, 275, 280, 281, 282) given a `step · what we do · what it gives us · state` table. Template: `work/open/README.md` contract 6 + a copyable file shape; `WORK-SYSTEM.md` §3.3 rules 58–60, §6.13 shape, §8 checklist, §9 gate row. `archive/open/` not touched (rule 58).
+- **Verified:** the queue test's 20 functions pass on the device VM (stdlib runner — no pytest there); the full suites were not run from this surface.
+- **Open:** nothing new. W-282's four forks are still the next step.
+
+## 2026-10-18 — W-282: F3 ruled, the item is 🟢  ·  Cowork (Opus 5.5)
+
+- **Asked:** any other blockers on W-282; *"we will split the packages before the DB work is done and later on update the DB proposal."*
+- **Done:** F3 recorded as option (a); W-282 🟢, its inbox row and `↳ blocks` sub-row removed. B-272's trigger now waits on W-282 landing and the proposal's rewrite; `index-stores.md` notes the order. The `@fux-engine` npm org stays a hand-step before Step 3 only.
+- **Next:** W-282 Step 1 in Claude Code (Opus).
+
+## 2026-10-18 — W-282: package names final  ·  Cowork (Opus 5.5)
+
+- **Asked:** whether PyPI has npm-style scopes (`fux-engine/core`…); then *"let's go with whatever we had — four PyPI packages, two npm packages."*
+- **Done:** PyPI has no scopes; PEP 752 prefix reservation is accepted (2026-06-29), not confirmed live. W-282 gained a *Package names — final* table: PyPI `fux-engine`, `fux-core`, `fux-reader`, `fux-writer`; npm `fux-engine`, `@fux-engine/reader`. Reserving the `fux` prefix when PyPI offers it is noted as Arpit's.
+
+## 2026-10-18 — W-282: F4 re-ruled — `@fux-engine/reader`  ·  Cowork (Opus 5.5)
+
+- **Asked:** check in his browser whether `@fux` is his; then suggest other names; picked *"@fux-engine/reader, rather than fux-reader"*.
+- **Done:** in his signed-in Chrome (`aarya11`, no organizations): `npmjs.com/~fux` is another user (0 packages, 0 orgs), so `@fux` cannot be had; he has no second login. Registry showed `@fux-engine`, `@fuxhq`, `@fux-index`, `@fuxengine` and others free. W-282 F4 rewritten, inbox row, At-a-glance view and `architecture-packages.svg` updated.
+- **Next:** F3 (parked); Arpit creates the `@fux-engine` org before release.
+
+## 2026-10-18 — W-282: the package dependency graph  ·  Cowork (Opus 5.5)
+
+- **Asked:** a dependency graph of the packages, and what a consumer's install pulls in transitively.
+- **Done:** `work/architecture-packages.svg` (house style): fux-engine → fux-reader + fux-writer → fux-core on PyPI; `@fux/fux-reader` and `fux-engine` on npm, one file each; an install table; no third-party package anywhere (`dependencies = []`, none in `node/package.json`). Linked from W-282, work/README, the registry. C2PA stamp stripped.
+
+## 2026-10-18 — W-282: F2 ruled — the reader's `answer` is exactly today's  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"in reader can answer read the whole document again can it be a full copy exactly how it works today"*.
+- **Done:** F2 recorded as option (a): the reader carries the refer plane unchanged; DoD 10 adds a byte-identity check of reader-only `fux answer --json` against `fux-engine`. Inbox row and At-a-glance view updated.
+- **Next:** F3 (parked) and the `@fux` scope's owner.
+
+## 2026-10-18 — W-282: F1 and F4 ruled, L2 amended; F2 elaborated, F3 parked  ·  Cowork (Opus 5.5)
+
+- **Asked:** go with the F1 recommendation; F3 stays a blocker, kept in the backlog for later; F4 as `@fux/fux-reader`, with `@fux` the scope for all future packages; elaborate F2.
+- **Done:** SR-LAW-2's law text gained *"`fux-engine` is the one install; `fux-reader` and `fux-writer` are role packages — each complete for its role, none with optional extras"* plus a dated amendment note; CLAUDE.md regenerated (`gen-laws.py --write`), content_sha restamped. W-282 rulings recorded, F2 expanded (index-only `answer` has no text to quote — L3; refer adds no dependency). B-272's trigger names F3. Registry check: `@fux` is owned by npm user `fux`, while `fux-engine` is published by `aarya11` — to confirm before release.
+- **Open:** F2; F3 (parked); `@fux` scope ownership.
+- **Next:** Arpit rules F2.
+
+## 2026-10-18 — W-282 filed: split fux into a reader, a writer and a shared core  ·  Cowork (Opus 5.5)
+
+- **Asked:** which item planned splitting fux into a reader, a writer, one with both, and the Node search — then *"research and put this in work item. We are going to build it out."*
+- **Done:** found it in B-272 / `index-stores.md` §8. Researched it against the tree: an AST walk of `src/fux/` (140 modules) finds 86 reader→writer and 36 writer→reader imports, so the split needs untangling before packaging. `derive/` belongs to the reader, `answer`'s refer plane needs decoders/fetchers/PII, PEP 420 conflicts with `fux/__init__.py`, `@fux` on npm is taken, and the three PyPI names are free. Filed [W-282](open/W-282-reader-writer-packages.md) 🔴 with four forks. B-272 stays for the store and names W-282. The proposal carries a correction note. Ratified, not built.
+- **Open:** F1 (L2's one-install sentence: his ruling), F2, F3, F4.
+- **Next:** Arpit rules the four forks; then W-282 Step 1 (Opus).
+
 ## 2026-10-14 — 3.0.0 merged (PR #52), Windows red → 3.0.1  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *commit everything and merge the PR; then push directly to main if anything changed.*

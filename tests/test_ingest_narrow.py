@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fux.maintain import dirty
+from fux.store import dirty
 from fux.sources import _narrow
 
 
@@ -113,7 +113,7 @@ def test_an_excluded_entry_is_never_a_target(tmp_path):
 
 
 def _with_fail_streaks(root: Path, streaks: dict[str, int]) -> None:
-    from fux.maintain import urlstate
+    from fux.acquire import urlstate
 
     state = urlstate.read(root)
     for url, streak in streaks.items():

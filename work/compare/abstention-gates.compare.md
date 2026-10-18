@@ -135,7 +135,7 @@ Binding on every measured gate:
 | 4 | SR-CONFIDENCE, SR-REFER-PLANE, a new section on answer types | `refer/`, `query/confidence.py` |
 | 5 | SR-CONFIDENCE, SR-RUNTIME-STATS | `query/confidence.py`, `derive/` |
 | 6 | SR-CONFIDENCE, SR-GRAPH | `graph/`, `query/confidence.py` |
-| 7 | SR-CONFIDENCE, SR-RANKING | `query/analyzer.py`, `query/confidence.py` |
+| 7 | SR-CONFIDENCE, SR-RANKING | `text/analyzer.py`, `query/confidence.py` |
 | 8 | SR-ANSWER, SR-REFER-PLANE | `refer/`, `query/refer_answer.py` |
 | 9 | SR-AGENT-POLICY, SR-MCP | `templates/agents/`, `mcp.py` |
 | all | SR-OUTPUT-DEFAULTS, SR-NODE-SEARCH | `output_config.py`, `node/` |

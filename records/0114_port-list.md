@@ -10,7 +10,7 @@ feature: the boundary between the archived engine and this one
 owns: []
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 45f064296c314d71cb9e704cd14b2ff02cf81b060c60b2f194cb37867babcc8b
+content_sha: 07db6da5b2450a6eb0159861907c38197c5e9eafb8d6c11116dba4e84d791e76
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -160,7 +160,7 @@ the SQLite substrate, the per-file cache, the lean profile, the state plane,
   map — [`archive/README.md`](../archive/README.md).
 - Ports already landed, with their modules named in docstrings —
   [`src/fux/frontmatter.py`](../src/fux/frontmatter.py),
-  [`src/fux/query/tokenize.py`](../src/fux/query/tokenize.py),
+  [`src/fux/text/tokenize.py`](../src/fux/text/tokenize.py),
   [`src/fux/query/bm25f.py`](../src/fux/query/bm25f.py).
 - The archived baselines this rests on —
   [`work/regression/README.md`](../work/regression/README.md) §Archived runs.
@@ -203,7 +203,7 @@ evidence.*
 
 - [`src/fux/frontmatter.py`](../src/fux/frontmatter.py)
 - [`src/fux/query/bm25f.py`](../src/fux/query/bm25f.py)
-- [`src/fux/query/tokenize.py`](../src/fux/query/tokenize.py)
+- [`src/fux/text/tokenize.py`](../src/fux/text/tokenize.py)
 
 **Measured evidence**
 

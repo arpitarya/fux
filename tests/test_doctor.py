@@ -413,7 +413,7 @@ def test_doctor_never_imports_the_consumers_fetcher_to_read_its_declaration(tmp_
 
 
 def test_url_check_reports_what_the_last_run_confirmed(tmp_path):
-    from fux.maintain import urlstate
+    from fux.acquire import urlstate
 
     _git_repo(tmp_path)
     _url_index(tmp_path, ["https://a", "https://b"])
@@ -431,7 +431,7 @@ def test_url_check_names_a_persistently_failing_url_and_refuses_to_delete_it(tmp
     So the check reports and points at the file a human must edit — and the
     record is still in the index afterwards, which is the property under test.
     """
-    from fux.maintain import urlstate
+    from fux.acquire import urlstate
     from fux.store import reader
 
     _git_repo(tmp_path)
@@ -459,7 +459,7 @@ def test_url_check_reports_a_rate_limited_host_when_urls_are_indexed(tmp_path):
     persists was unreachable through its only reader in every repo that has
     URLs -- that is, in every repo where a rate limit can happen at all.
     """
-    from fux.maintain import urlstate
+    from fux.acquire import urlstate
 
     _git_repo(tmp_path)
     _url_index(tmp_path, ["https://a", "https://b"])
@@ -473,7 +473,7 @@ def test_url_check_reports_a_rate_limited_host_when_urls_are_indexed(tmp_path):
 def test_url_check_reports_a_rate_limited_host_with_nothing_indexed(tmp_path):
     """The no-URLs branch is where a rate limit is most likely to be the REASON
     nothing is indexed, so it is reported there too -- and stays reported."""
-    from fux.maintain import urlstate
+    from fux.acquire import urlstate
 
     _git_repo(tmp_path)
     _url_index(tmp_path, [])
@@ -488,7 +488,7 @@ def test_the_rate_limit_note_names_the_worst_hosts_first_and_stops_at_three(tmp_
     """Worst first, capped at three: the point is to name the host worth acting
     on, not to print the whole tally. The cap is silent because the count it
     drops is by construction smaller than the three it kept."""
-    from fux.maintain import urlstate
+    from fux.acquire import urlstate
 
     _git_repo(tmp_path)
     _url_index(tmp_path, ["https://a"])
@@ -515,7 +515,7 @@ def test_url_state_carries_no_wall_clock(tmp_path):
     """
     import json
 
-    from fux.maintain import urlstate
+    from fux.acquire import urlstate
 
     (tmp_path / "fux.toml").write_text("", encoding="utf-8")
     urlstate.observe(tmp_path, fetched={"https://a": "sha"}, failed=[], listed=["https://a"])
@@ -761,7 +761,7 @@ def _record(doc_id="file:a.md", loc="a.md", **extra):
 
 
 def _refusals_toml(tmp_path, *names):
-    from fux.ingest import refusals
+    from fux.acquire import refusals
 
     body = "".join(
         f'[[rule]]\nname = "{n}"\nreason = "no"\nbody_contains = ["{n}"]\n\n' for n in names
@@ -790,7 +790,7 @@ def test_refusal_rules_that_have_never_fired_are_named(tmp_path):
 
 
 def test_refusal_counts_are_reported_per_rule(tmp_path):
-    from fux.maintain import urlstate
+    from fux.acquire import urlstate
 
     _git_repo(tmp_path)
     _refusals_toml(tmp_path, "sso", "paywall")
@@ -802,7 +802,7 @@ def test_refusal_counts_are_reported_per_rule(tmp_path):
 
 def test_refusals_with_no_surviving_url_document_is_the_loud_case(tmp_path):
     """The failure this check exists for: a rule that empties the URL half."""
-    from fux.maintain import urlstate
+    from fux.acquire import urlstate
 
     _git_repo(tmp_path)
     _refusals_toml(tmp_path, "sso")
@@ -814,7 +814,7 @@ def test_refusals_with_no_surviving_url_document_is_the_loud_case(tmp_path):
 
 
 def test_a_surviving_url_document_keeps_the_refusal_line_quiet(tmp_path):
-    from fux.maintain import urlstate
+    from fux.acquire import urlstate
     from fux.store import write_index
 
     _git_repo(tmp_path)
@@ -827,7 +827,7 @@ def test_a_surviving_url_document_keeps_the_refusal_line_quiet(tmp_path):
 
 
 def test_refusal_counts_accumulate_across_runs(tmp_path):
-    from fux.maintain import urlstate
+    from fux.acquire import urlstate
 
     _git_repo(tmp_path)
     urlstate.record_refusals(tmp_path, {"sso": 2})
@@ -837,7 +837,7 @@ def test_refusal_counts_accumulate_across_runs(tmp_path):
 
 
 def test_a_malformed_refusals_file_is_an_error_not_a_traceback(tmp_path):
-    from fux.ingest import refusals
+    from fux.acquire import refusals
 
     _git_repo(tmp_path)
     path = refusals.rules_path(tmp_path)
@@ -851,7 +851,7 @@ def test_a_malformed_refusals_file_is_an_error_not_a_traceback(tmp_path):
 def test_magic_floor_is_a_reserved_rule_name(tmp_path):
     """A counter keyed by rule name needs one key that cannot collide."""
     from fux.errors import FuxError
-    from fux.ingest import refusals
+    from fux.acquire import refusals
 
     with pytest.raises(FuxError, match="reserved"):
         refusals.parse(
@@ -865,7 +865,7 @@ def test_magic_floor_is_a_reserved_rule_name(tmp_path):
 
 def test_refusal_returns_the_rule_name_structurally(tmp_path):
     """`refused()` renders; `refusal()` is what the counter reads."""
-    from fux.ingest import refusals
+    from fux.acquire import refusals
 
     rules = refusals.parse(
         {
@@ -880,7 +880,7 @@ def test_refusal_returns_the_rule_name_structurally(tmp_path):
 
 
 def test_the_magic_floor_is_counted_under_its_reserved_name():
-    from fux.ingest import refusals
+    from fux.acquire import refusals
 
     hit = refusals.refusal((), "https://x/a.pdf", "application/pdf", b"<html>nope")
     assert hit is not None
@@ -913,7 +913,7 @@ def test_a_generated_binding_that_matches_nothing_is_not_reported(tmp_path):
     from fux.store import write_index
 
     _git_repo(tmp_path)
-    from fux.ingest import typesfile
+    from fux.acquire import typesfile
 
     bindings = {ext.lstrip("."): name for ext, name in decode.builtin_bindings().items()}
     types = tmp_path / ".fux" / "formats.toml"
@@ -1089,7 +1089,7 @@ def test_a_corrupt_journal_line_cannot_break_doctor(tmp_path):
 
 
 def test_pii_line_says_no_ingest_has_recorded_counts_yet(tmp_path):
-    from fux.ingest import pii
+    from fux.acquire import pii
 
     _git_repo(tmp_path)
     path = pii.rules_path(tmp_path)
@@ -1100,7 +1100,7 @@ def test_pii_line_says_no_ingest_has_recorded_counts_yet(tmp_path):
 
 
 def test_recorded_counts_are_reported_with_their_denominator(tmp_path):
-    from fux.ingest import pii
+    from fux.acquire import pii
 
     _git_repo(tmp_path)
     path = pii.rules_path(tmp_path)
@@ -1113,7 +1113,7 @@ def test_recorded_counts_are_reported_with_their_denominator(tmp_path):
 
 
 def test_zero_recorded_redactions_is_not_the_same_as_none_recorded(tmp_path):
-    from fux.ingest import pii
+    from fux.acquire import pii
 
     _git_repo(tmp_path)
     path = pii.rules_path(tmp_path)
@@ -1125,7 +1125,7 @@ def test_zero_recorded_redactions_is_not_the_same_as_none_recorded(tmp_path):
 
 
 def test_partial_enrichment_counts_say_they_are_partial(tmp_path):
-    from fux.ingest import pii
+    from fux.acquire import pii
 
     _git_repo(tmp_path)
     path = pii.rules_path(tmp_path)
@@ -1140,7 +1140,7 @@ def test_partial_enrichment_counts_say_they_are_partial(tmp_path):
 
 
 def test_a_corrupt_counts_file_reads_as_nothing_recorded(tmp_path):
-    from fux.ingest import pii
+    from fux.acquire import pii
     from fux.store import fuxdir
 
     _git_repo(tmp_path)
@@ -1151,7 +1151,7 @@ def test_a_corrupt_counts_file_reads_as_nothing_recorded(tmp_path):
 
 def test_the_counts_file_is_gitignored_like_every_derived_plane(tmp_path):
     """L9 and SR-DOTFUX: a use-shaped record never reaches a committed byte."""
-    from fux.ingest import pii
+    from fux.acquire import pii
     from fux.store import fuxdir
 
     _git_repo(tmp_path)

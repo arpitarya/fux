@@ -7,7 +7,7 @@
  * 🔴 **The fixture is the SAME FILE the Python test reads** —
  * `tests/query/identifier-fixture.json`. That is the whole point of this file
  * existing: `node/src/query/analyzer.mjs` is a transcription of
- * `src/fux/query/analyzer.py`, and a one-step divergence between them is a
+ * `src/fux/text/analyzer.py`, and a one-step divergence between them is a
  * **silent no-match** — the Node reader hashes a string the Python-built index
  * never wrote, and there is no error to see. Two copies of the fixture would
  * let one be updated and the other forgotten, which is the exact drift this

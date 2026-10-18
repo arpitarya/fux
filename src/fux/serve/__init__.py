@@ -418,7 +418,7 @@ class _Handler(BaseHTTPRequestHandler):
         if not text:
             self._json_error(HTTPStatus.BAD_REQUEST, "give me some text: /inspect/analyze?q=…")
             return
-        from ..query import identifiers as ids_mod
+        from ..text import identifiers as ids_mod
 
         state = self.server.state
         self._send_json(words_mod.analyze(state.view(), state.dictionary(), text, ids_mod.for_root(state.root())))
@@ -426,7 +426,7 @@ class _Handler(BaseHTTPRequestHandler):
     def _identifiers(self, params: dict) -> None:
         """W-233 F3 — the Identifiers test bench. Read-only like every route."""
         from ..inspect import idfamilies
-        from ..query import identifiers as ids_mod
+        from ..text import identifiers as ids_mod
 
         state = self.server.state
         view = state.view()

@@ -4,7 +4,7 @@ from l12_fixtures import scoring, write_config
 import pytest
 
 from fux.query.scan import ask, scan_candidates
-from fux.query.tokenize import tokenize
+from fux.text.tokenize import tokenize
 from fux.store import term_hash, write_index
 
 

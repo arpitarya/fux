@@ -15,8 +15,8 @@ from types import SimpleNamespace
 import pytest
 
 from fux.ingest.run import _archived_url_ids, _with_archived
-from fux.ingest.sourcelist import URLS, parse
-from fux.ingest.urlsrc import resolve_urls
+from fux.acquire.sourcelist import URLS, parse
+from fux.acquire.urlsrc import resolve_urls
 
 
 def _repo(tmp_path, body):

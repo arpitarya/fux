@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L9
 owns: []
 laws: [L9]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 2a0e4211f36b16134802888e06641615e1936c92867bd6281bfec127d2689f5d
+content_sha: 7dfec54c6d22798b10349459db91cb08bf08be3df79515cc6f0a6e627bfe95d5
 ---
 
 # SR-LAW-9 — L9 — a use record is never committed
@@ -56,7 +56,7 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 
 **No law now says a use record may not be transmitted.** That is a deliberate outcome — Arpit, asked directly: ***"drop it — L9 is only about commits."*** [L5](0007_LAW-5-offline-by-default.md) does not close it: L5 is offline *by default* and already carries a fenced network path.
 
-**What holds today is the code, not a law** — nothing under `maintain/lastcited.py` or `query/provenance.py` imports a transport, and `fux verify` never fetches.
+**What holds today is the code, not a law** — nothing under `store/lastcited.py` or `query/provenance.py` imports a transport, and `fux verify` never fetches.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
@@ -196,7 +196,7 @@ is closed and greped rather than merely documented.
 ### Reference (required)
 
 - `CLAUDE.md` §Non-negotiable constraints — the normative text. Repo path: [`../../CLAUDE.md`](../CLAUDE.md)
-- [`src/fux/maintain/lastcited.py`](../src/fux/maintain/lastcited.py) — the first durable use record
+- [`src/fux/store/lastcited.py`](../src/fux/store/lastcited.py) — the first durable use record
 - [SR-PROVENANCE](0142_provenance.md) — the second, and the record the reversal produced
 - [SR-DOTFUX](0102_fux-directory.md) — the committed/derived/acquired split this law's test depends on
 - **The grounding — the AOL search-log release (2006).** 20 million queries, usernames replaced by numbers, one user identified *from the queries alone*: Barbaro & Zeller, *A Face Is Exposed for AOL Searcher No. 4417749*, NYT, 9 August 2006 — https://www.nytimes.com/2006/08/09/technology/09aol.html

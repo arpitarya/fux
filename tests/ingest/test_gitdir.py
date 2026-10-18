@@ -5,8 +5,8 @@ import unicodedata
 import pytest
 
 from fux.errors import FuxError
-from fux.ingest import fuxignore
-from fux.ingest.gitdir import (
+from fux.acquire import fuxignore
+from fux.acquire.gitdir import (
     POLICY,
     UNREADABLE,
     Skipped,

@@ -15,7 +15,7 @@ import pytest
 
 from fux import doctor
 from fux.errors import FuxError
-from fux.ingest import pii
+from fux.acquire import pii
 from l12_fixtures import write_config
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -125,10 +125,10 @@ def test_a_generous_budget_does_not_warn(tmp_path):
 _CLOCKS = {"time", "datetime", "perf_counter", "monotonic", "time_ns", "process_time"}
 
 
-@pytest.mark.parametrize("module", ["pii.py", "run.py"])
+@pytest.mark.parametrize("module", ["acquire/pii.py", "ingest/run.py"])
 def test_no_clock_on_the_ingest_path(module):
     """Redaction writes committed bytes; a clock there would make them CPU-dependent."""
-    tree = ast.parse((SRC / "ingest" / module).read_text(encoding="utf-8"))
+    tree = ast.parse((SRC / module).read_text(encoding="utf-8"))
     found: list[str] = []
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -145,7 +145,7 @@ def test_overlap_above_the_compared_alphabet_still_counts():
     """Two negated classes share every code point above `[pii] lint_alphabet`,
     so alternating them under a repeat is refused even though no character
     below the limit is common to both (review of W-255)."""
-    from fux.ingest.pii import _lint
+    from fux.acquire.pii import _lint
 
     assert _lint(r"(?:[^\x00-\x7f]|[^\x80-˿])*", 0) is not None
     assert _lint("(?:一|丁x)*", 0) is not None

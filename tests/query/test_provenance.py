@@ -21,7 +21,7 @@ import json
 from fux.query import provenance
 from fux.query.rank import AskResult
 from fux.query.scan import ask
-from fux.query.tokenize import tokenize
+from fux.text.tokenize import tokenize
 from fux.store import term_hash, write_index
 from l12_fixtures import scoring, shipped_output, write_config
 

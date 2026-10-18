@@ -35,6 +35,66 @@ detail. The detail lives here, one file per `W-nn`, named
 5. **This file is the spec as well as the state.** `PLAN.md` was archived on
    2026-08-18 and its milestone scope migrated into these files, so there is
    no second document to keep in step.
+6. **A file opens with its meeting view** — `## At a glance` directly under
+   the title, and a table or a diagram directly under that, saying in plain
+   English what we are going to do
+   ([SR-WORK-OPEN-QUEUE](../../records/0051_WORK-open-queue.md) rules 59–61,
+   gated by `tests/test_open_work_rows_are_short.py`). Write every new file
+   from the template below.
+7. **A file names who filed it and who last updated it** — `filed_by`,
+   `updated` and `updated_by` in its frontmatter, each `_by` as
+   `"<person> (<surface>, <model>)"`, e.g. `"Arpit (Cowork, Opus 5.5)"`; every
+   change re-sets `updated` and `updated_by`. Its *Open items* row ends
+   `Filed by <person> (<surface>).` before the detail link
+   ([SR-WORK-OPEN-QUEUE](../../records/0051_WORK-open-queue.md) rules 62–64,
+   gated by the same test).
+
+**The template — copy it for every new item.**
+
+```markdown
+---
+type: Handoff
+name: W-nn
+description: "<one sentence: who asked, when, for what>"
+item: W-nn
+filed: YYYY-MM-DD
+filed_by: "<person> (<surface>, <model>)"
+updated: YYYY-MM-DD
+updated_by: "<person> (<surface>, <model>)"
+ball: agent | arpit | cowork
+---
+
+# W-nn — <title, in plain words>
+
+## At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 1 | <a plain-English action, readable aloud> | <what it buys, in one phrase> | ⏳ |
+| 2 | Arpit picks <the choice> | <the decision it unblocks> | 🔴 Arpit decides |
+
+**Arpit, YYYY-MM-DD (<surface>):** *"<the ask, in his words>"*
+
+**Model:** <Opus | Sonnet | Haiku | Cowork | NONE — who, and why>: <one sentence why>.
+
+## Goal
+
+## Definition of done
+
+## Blockers
+
+## Record affected
+
+<SR-NAME decision n> — or **no SR affected**.
+
+## Hazards
+
+## Reference
+```
+
+State is ✅ done · ⏳ not yet · 🔴 Arpit decides. When the item's shape is a
+flow or a dependency rather than a list of steps, the table may be a fenced
+`mermaid` or `text` diagram, or an image, instead.
 
 **Naming.** `W-nn` ids are never reused. Ids `W-00`…`W-14`, `W-20`,
 `W-21`, `W-40`, `W-41` are retired (done); see WORKLOG for their record.

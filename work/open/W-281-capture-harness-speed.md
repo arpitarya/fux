@@ -4,10 +4,23 @@ name: W-281
 description: "Arpit's ask (2026-10-13, Claude Code): make a measured run's capture faster. W-278's capture takes ~45 min and its ladder build stalled 12 h on commit signing. Parallelise what does not care about load (G1's 10 000-doc ingest, G3's arms), keep the latency guardrail standalone, and stop the ladder builder from waiting on gpg. Driver and builder changes only; no bar, gate or engine change."
 item: W-281
 filed: 2026-10-13
+filed_by: "Arpit (Claude Code, Opus 5.5)"
+updated: 2026-10-18
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
 
 # W-281 — capture and ladder speed
+
+## At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 1 | Stop the test-data builder signing its commits | no more 12-hour stall waiting on gpg | ⏳ |
+| 2 | Run the 10 000-document ingest in the background | about 10 minutes saved | ⏳ |
+| 3 | Run the three comparison arms side by side | about 10 minutes saved | ⏳ |
+| 4 | Keep the timing check last and alone | speed numbers stay honest | ⏳ |
+| 5 | Time every step of the next capture | proof: about 45 min down to 30 or less | ⏳ |
 
 **Arpit, 2026-10-13 (Claude Code):** *"why does it take an hour? can it be
 done faster … okay add a work item for improving the performance."*

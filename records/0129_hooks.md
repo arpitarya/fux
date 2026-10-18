@@ -8,18 +8,21 @@ status: accepted
 date: 2026-08-20
 amended: 2026-10-13
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@6832a7b366ee, tools/maintenance-bench@1327184f960f, tools/runner-race@98bd70ff092a, src/fux/schemas/state.schema.json@fc7d0f478383]
+owns: [src/fux/maintain@1d55c635801e, tools/maintenance-bench@1327184f960f, tools/runner-race@ef39682b6efc, src/fux/schemas/state.schema.json@fc7d0f478383, src/fux/acquire/urlstate.py@02bff7516346, src/fux/store/dirty.py@94e65bb0120f, src/fux/store/lastcited.py@f9d94f9e600b]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: b5d131fc3b2db43d325cb7daa46c063278bd42575fc62f52b721c09c073e90b2
+content_sha: e64a7ad7d9e568a43713307c88c9808fd20501aab4711c96aa2f703946be38c0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`src/fux/acquire/urlstate.py`](../src/fux/acquire/urlstate.py) · file
 - [`src/fux/maintain/`](../src/fux/maintain) · dir
 - [`src/fux/schemas/state.schema.json`](../src/fux/schemas/state.schema.json) · file
+- [`src/fux/store/dirty.py`](../src/fux/store/dirty.py) · file
+- [`src/fux/store/lastcited.py`](../src/fux/store/lastcited.py) · file
 - [`tools/maintenance-bench/`](../tools/maintenance-bench) · dir
 - [`tools/runner-race/`](../tools/runner-race) · dir
 
@@ -632,11 +635,11 @@ process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchange
 this moved where they are written, not what they are.
 
 - `src/fux/maintain/daemon.py` — `PID_NAME` ← `[maintain] daemon_pid`, `STOP_NAME` ← `[maintain] daemon_stop`, `STATUS_NAME` ← `[maintain] daemon_status`
-- `src/fux/maintain/dirty.py` — `DIRTY_NAME` ← `[maintain] dirty`
+- `src/fux/store/dirty.py` — `DIRTY_NAME` ← `[maintain] dirty`
 - `src/fux/maintain/hooks.py` — `MERGE_DRIVER_NAME` ← `[hooks] merge_driver`, `MARKER` ← `[hooks] marker`; and, from `src/fux/templates/hooks/` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28), `_PREAMBLE` ← `[templates] hook_preamble` (`{marker}` filled from `[hooks] marker`) and `HOOKS` ← `[hooks] names`, each body `<name>.sh.txt` after the preamble — the bytes installed are unchanged
-- `src/fux/maintain/lastcited.py` — `short` ← `[maintain] last_cited`
+- `src/fux/store/lastcited.py` — `short` ← `[maintain] last_cited`
 - `src/fux/maintain/runner.py` — `LOCK_NAME` ← `[maintain] write_lock`, `STOP_NAME` ← `[maintain] runner_stop`, `STATUS_NAME` ← `[maintain] runner_status`, `HANDOFF_ENV` ← `[env] runner_handoff`, `NO_SPAWN_ENV` ← `[env] no_spawn`
-- `src/fux/maintain/urlstate.py` — `STATE_NAME` ← `[maintain] url_state`, `SCHEMA_NAME` ← `[maintain] url_state_schema`
+- `src/fux/acquire/urlstate.py` — `STATE_NAME` ← `[maintain] url_state`, `SCHEMA_NAME` ← `[maintain] url_state_schema`
 
 <!-- L12-VALUES-END -->
 
@@ -650,7 +653,7 @@ this moved where they are written, not what they are.
 
 **No decision here moved** (W-242 Tier 2, 2026-10-03): `node/src/maintain/runner.mjs` is a narrow twin of `runner.py`, the write lock alone, for Node's `fux build`. Node runs no hook, runner or daemon.
 
-**No decision here moved** (W-261, 2026-10-05): the write lock moved from `maintain/runner.py` to `maintain/lock.py` (SR-LOCKS'); `runner` re-exports every name, so `runner.acquire` and `runner.write_lock` keep their callers. `node/src/maintain/runner.mjs`, which was only ever the lock, became `lock.mjs`, so this record no longer claims `node/src/maintain/`.
+**No decision here moved** (W-261, 2026-10-05): the write lock moved from `maintain/runner.py` to `store/lock.py` (SR-LOCKS'); `runner` re-exports every name, so `runner.acquire` and `runner.write_lock` keep their callers. `node/src/maintain/runner.mjs`, which was only ever the lock, became `lock.mjs`, so this record no longer claims `node/src/maintain/`.
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `fux hooks install` binds the driver to `.fux/index/sections/*.jsonl` too. A `.gitattributes` `*.jsonl` does not cross a `/`, so the existing line never covered the section plane ([SR-SECTIONS](0161_sections.md) decision 9).

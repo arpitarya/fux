@@ -149,8 +149,8 @@ def compute(root: Path, doc, *, decoder: str, bounds: dict[str, int]) -> dict:
     """One document's summary. **Never raises** — a report must not fail on one file."""
     from ..ingest.extract import _headings_and_body
     from ..ingest.parse import parse_document
-    from ..query.tokenize import tokenize
-    from ..refer._chunk import chunk
+    from ..text.tokenize import tokenize
+    from ..text.chunk import chunk
 
     out: dict = {
         "decoder": decoder,
@@ -222,7 +222,7 @@ def _chrome_tokens(root: Path, loc: str, raw: bytes) -> int:
     skips an element counts it as zero, which is the truth.
     """
     from ..decode import DecodeFailed, decode
-    from ..query.tokenize import tokenize
+    from ..text.tokenize import tokenize
 
     stripped = _CHROME.sub(b"", raw)
     if stripped == raw:
@@ -243,7 +243,8 @@ def _path(root: Path) -> Path:
 
 def _decoders(root: Path) -> tuple[dict[str, str], dict[str, str]]:
     """`(extension -> digest, loc -> decoder name)` — the register names the decoder."""
-    from ..ingest import decoderdigest, register
+    from ..acquire import decoderdigest
+    from ..ingest import register
 
     digests = decoderdigest.binding_digests(root)
     names = {loc: row.decoder.split("@", 1)[0] for loc, row in register.read(root).rows.items()}

@@ -4,10 +4,23 @@ name: W-263
 description: "Research item (Arpit, 2026-10-04, W-251 #1): write a proposal for the never-built `enriched` ingest mode — what it would be, how it overlaps with `fux enrich`, and whether a model-assisted step could write index records (.fux/index/*.jsonl) itself — with a compare doc if there are several shapes. Nothing is retired or built until he rules on the proposal."
 item: W-263
 filed: 2026-10-04
+filed_by: "Arpit (Cowork)"
+updated: 2026-10-18
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
 
 # W-263 — a proposal for the `enriched` ingest mode
+
+## At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 1 | Explain the never-built `enriched` mode on one page | everyone knows what it was meant to do | ⏳ |
+| 2 | Compare it with `fux enrich`, which already ships | what is already covered and what is not | ⏳ |
+| 3 | Test whether a model may write index lines itself without breaking "same input, same index" | a yes or no, with the proof | ⏳ |
+| 4 | Lay the possible shapes side by side | clear options to choose from | ⏳ |
+| 5 | Arpit picks a shape | a decision; build items follow | 🔴 Arpit decides |
 
 **Status: filed 2026-10-04, not started.** Research and a proposal only. **No
 code, no record change.**

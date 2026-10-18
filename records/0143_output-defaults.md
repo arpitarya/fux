@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@5d3b9020433f, src/fux/templates/output.toml.txt@0952128ae0aa, .fux/output.toml@4a3a8465d2e4, node/src/config/output.mjs@a00d8fa88ee8]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 0f5f01f13d2697f0abd71cb38cb0f6f66e87deec621524a3305e9cb65d5fc5dd
+content_sha: 0bde8ff59a1d591bcb0818aeb9d3b3080d5abf3434f8046cfce2024534a7788b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1020,7 +1020,7 @@ choice rather than the console's. Nothing about the guard itself changed;
    their order.** Decision 2 is then false and this file has become a second
    `tune.toml`. `top` is the known boundary case and is exempt **only**
    because it truncates without reordering.
-2. **Anything under `ingest/`, `derive/`, `maintain/` or `store/` imports
+2. **Anything under `ingest/`, `acquire/`, `text/`, `derive/`, `maintain/` or `store/` imports
    `output_config`.** L4 is then reachable from a rendering preference.
 3. **`MCP_KEYS` is empty, or `[mcp]` gains inheritance from `[cli]`.** The
    first makes MCP unconfigurable again; the second reopens the leak decision

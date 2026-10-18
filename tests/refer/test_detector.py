@@ -11,9 +11,9 @@ from __future__ import annotations
 import pytest
 
 from fux import refer as refer_mod
-from fux.maintain import dirty
+from fux.store import dirty
 from fux.refer import Cited
-from fux.refer.freshness import Policy, verify
+from fux.acquire.freshness import Policy, verify
 from l12_fixtures import template_fux_toml
 
 _TIMEOUT = template_fux_toml()["refer"]["timeout_seconds"]
@@ -109,7 +109,7 @@ def test_a_cached_verdict_that_is_definitively_stale_still_counts(root):
     dirty list is advisory and the refresh re-fetches anyway, so acting on it
     costs a fetch at worst and recovers recall at best.
     """
-    from fux.refer.freshness import cached
+    from fux.acquire.freshness import cached
 
     documents = [Cited("url:https://a", "https://a", cached("old", "new", 10, 300), "http")]
     refer_mod._mark_changed_urls_dirty(root, documents)

@@ -477,3 +477,17 @@ def signals(
         separation_floor=separation_floor,
         doc_coverage_floor=doc_coverage_floor,
     )
+
+
+#: The one sentence both surfaces print. **One string, two callers** — `doctor`'s
+#: row and `ask`'s first-of-process note would otherwise drift into two accounts
+#: of one fact. **ASCII only**: it is printed, and printed text reaches a Windows
+#: console.
+FLOOR_OFF_NOTE = (
+    "`[confidence] separation_floor = 0.0` in .fux/tune.toml: NO answer in this repo "
+    "can ever be `weak` again. That tunes away the SIGNAL, not the ranking - a "
+    "`grounded` here does not mean what a `grounded` elsewhere means. The band "
+    "publishes the floor it was judged under (`--band`, or the `confidence` block in "
+    "`--json`), which is the only way a reader can tell. Raise it, or keep it and "
+    "know what the band is worth"
+)

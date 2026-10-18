@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@60d1c52abf5c, tools/refer-bench@865d1234ec06, tools/refer-budget-sweep@3286249029a0, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@7de781bb989c]
+owns: [src/fux/refer@ae9646ff93e5, tools/refer-bench@971d72542a1f, tools/refer-budget-sweep@da100abfb8a5, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@b525f684aede, src/fux/acquire/source.py@da0d26931219]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 4a5f6e48725275704108fc2dab3e26260d57236dffb8f886f45aaf771500c292
+content_sha: 0068c64c68f58d34f4e596790f930c148cbb6f4ce46af9b1cbef8eab71af4f09
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -20,6 +20,7 @@ content_sha: 4a5f6e48725275704108fc2dab3e26260d57236dffb8f886f45aaf771500c292
 - [`node/src/refer/assemble.mjs`](../node/src/refer/assemble.mjs) · file
 - [`node/src/refer/rescore.mjs`](../node/src/refer/rescore.mjs) · file
 - [`node/src/refer/source.mjs`](../node/src/refer/source.mjs) · file
+- [`src/fux/acquire/source.py`](../src/fux/acquire/source.py) · file
 - [`src/fux/refer/`](../src/fux/refer) · dir
 - [`tools/refer-bench/`](../tools/refer-bench) · dir
 - [`tools/refer-budget-sweep/`](../tools/refer-budget-sweep) · dir
@@ -396,7 +397,7 @@ it, not this function.** `refer()` still takes one callable, so
 URL** — each document reaching the fetcher its own `.fux/sources/urls` line
 names. Handing all three the first document's fetcher compares a rendered page
 against a shell and reports **a false staleness on every query**, which is the
-failure `refer/source.py`'s own docstring names and the one thing this plane
+failure `acquire/source.py`'s own docstring names and the one thing this plane
 must never do quietly.
 
 **23. The citation path DECODES, and the seam is in `refer()`, not
@@ -560,7 +561,7 @@ is now load-bearing rather than cosmetic.
   line range means. That is the drift this file already paid for once with two
   private heading regexes.
 
-⚠ **Decisions 25–27 are history now.** `src/fux/refer/_chunk.py` moved to
+⚠ **Decisions 25–27 are history now.** `src/fux/text/chunk.py` moved to
 [SR-CHUNKING](0151_chunking.md) on 2026-09-06, which owns what a passage IS —
 the fold rule, the universal table rule and the boundary ladder. They are kept
 here because they record why each behaviour exists; the current statement of it
@@ -694,7 +695,7 @@ is now a committed fact instead of a response header.
   [`tools/refer-budget-sweep/`](../tools/refer-budget-sweep/).
 - The fetch contract this plane reuses rather than replaces:
   [SR-FETCHER](0117_fetcher.md), and fux's ingest-side half at
-  [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py).
+  [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py).
 - The record's field set, which is why decision 4 exists:
   [SR-RECORD](0109_index-record.md); the freshness fork it settles:
   [`work/compare/record-freshness.compare.md`](../archive/compare/record-freshness.compare.md).
@@ -765,7 +766,7 @@ cost on Windows, is stated once in
    halves are checkable in one command: neither string may be mapped onto
    `current` anywhere in `src/`.
 
-4a. **`refer/source.py` grows its own copy of the decode pipeline.** Decision 19
+4a. **`acquire/source.py` grows its own copy of the decode pipeline.** Decision 19
    rests on `from_acquired` importing `_decode_fetched` and `sanitize`; a local
    reimplementation — however faithful on the day — reopens the divergence that
    would mark every retained document permanently stale.
@@ -815,7 +816,7 @@ evidence.*
 
 **Code**
 
-- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py)
+- [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py)
 - [`src/fux/refer/`](../src/fux/refer/)
 - `src/fux/store/displaycache.py` — **DELETED 2026-09-20 (W-194)**, named rather than linked
 - [`tests/refer/`](../tests/refer/)

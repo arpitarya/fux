@@ -4,10 +4,23 @@ name: W-275
 description: "Research item (Arpit, 2026-10-11): is there a tool that can tune fux's ranking knobs (b, k1, the field weights, section_weight), or can one be built? Survey what exists, what fux already has, and propose a tuner that trains on the retired open sets and ships nothing except through law L13 on a fresh sealed set. No code."
 item: W-275
 filed: 2026-10-11
+filed_by: "Arpit (Cowork, Opus 5.5)"
+updated: 2026-10-18
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
 
 # W-275 — research: a tuning tool for the ranking knobs
+
+## At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 1 | Survey the tuning tools that already exist, and their licences | what we can reuse for free | ⏳ |
+| 2 | List what fux already has that a tuner would reuse | how small the build really is | ⏳ |
+| 3 | Set the data rules: practise on retired questions, decide only on fresh sealed ones | no tuning against the answer key | ⏳ |
+| 4 | Work out speed, and which knobs to try first | a tuner that runs in seconds, aimed at the biggest wins | ⏳ |
+| 5 | Write the proposal and an outline of the first sweep; Arpit picks | a decision; build items follow | 🔴 Arpit decides |
 
 **Status: filed 2026-10-11, not started.** Research and a proposal only; **no
 code, no knob moves, no record change.**

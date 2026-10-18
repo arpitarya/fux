@@ -2,7 +2,7 @@
 """W-106 — dump what gets embedded: the corpus's chunks, and the queries.
 
 **This is the only file here that imports fux, and it imports the CHUNKER.**
-`fux.refer._chunk.chunk` is what `answer` cites and what `rerank.boost` scores,
+`fux.text.chunk.chunk` is what `answer` cites and what `rerank.boost` scores,
 so a dense lane that chunked differently would be measuring a corpus fux does
 not have. One chunker, the same argument `refer/_rescore.py` makes for one
 scorer.
@@ -20,7 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
-from fux.refer._chunk import chunk  # noqa: E402
+from fux.text.chunk import chunk  # noqa: E402
 
 
 def main() -> int:

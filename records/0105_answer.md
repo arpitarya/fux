@@ -7,10 +7,10 @@ description: The single best answer the index can give — a fetched, re-scored 
 status: accepted
 date: 2026-08-18
 feature: "`fux answer` — one answer, its footing stated, and the report of what changed since the question was last asked"
-owns: [src/fux/query/refer_answer.py@7d111b045e0c]
+owns: [src/fux/query/refer_answer.py@d04cd01910cd]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: bcb1b7b7e826b6c9d34160879eb9bfe75221a4ca97049067bb5a2abbf22a5382
+content_sha: ec9dc0c845b555d1f43868b6bd69289be42d1f6dcd1c25b531916e639e00f50c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -453,7 +453,7 @@ here**; what belongs to this record is the seam:
 decides moved.** `_load_fetchers` passes `config.url.config_for(entry.fetcher_path)` to
 `configure()` rather than the whole table ([SR-CONFIG](0113_config.md) decision
 8a) — a one-line change that keeps this module's resolution identical to
-`ingest/urlsrc.py`'s, which is the property this record's §Reference already
+`acquire/urlsrc.py`'s, which is the property this record's §Reference already
 insists on. The candidate list, the dispatch and the policy seam are
 unchanged.
 
@@ -522,7 +522,7 @@ The question `fux answer` ranks is analyzed with the repo's identifier families,
 **No decision here moved** (W-261, 2026-10-05): `find`'s code moved out of `query/__init__.py`, which this record describes, into `query/find.py` (SR-FIND's). `cmd_answer`, `ANSWER_TOP` and both printers are untouched.
 
 
-**W-236 — section records (2026-10-10; branch `w236-sections`, unmerged).** `answer`'s passages are unchanged. `refer/_chunk.py` gains `index_sections`, the *index's* section rule beside `_fold`, and `answer` does not call it. A hit's `section` (only while `[ranking] section_weight > 0`) names an index section by ordinal; refer recovers its heading by cutting the fetched bytes the same way ([SR-SECTIONS](0161_sections.md) Consequences).
+**W-236 — section records (2026-10-10; branch `w236-sections`, unmerged).** `answer`'s passages are unchanged. `text/chunk.py` gains `index_sections`, the *index's* section rule beside `_fold`, and `answer` does not call it. A hit's `section` (only while `[ranking] section_weight > 0`) names an index section by ordinal; refer recovers its heading by cutting the fetched bytes the same way ([SR-SECTIONS](0161_sections.md) Consequences).
 
 ### Consequences
 
@@ -581,7 +581,7 @@ The question `fux answer` ranks is analyzed with the repo's identifier families,
   `confidence` block carries the floor in parseable form.
   [SR-CONFIDENCE](0141_confidence.md) decision 13.
 
-- **The passage carries the document's frontmatter block.** `refer/_chunk.py`
+- **The passage carries the document's frontmatter block.** `text/chunk.py`
   chunks the fetched bytes as fetched — it does not strip the YAML frontmatter
   the way `ingest/extract.py`'s title/phrase extraction does. This is
   consistent with the refer plane's "it cannot invent" rule — the passage is a
@@ -637,7 +637,7 @@ The question `fux answer` ranks is analyzed with the repo's identifier families,
 - The refer wiring —
   [`src/fux/query/refer_answer.py`](../src/fux/query/refer_answer.py)
   (`answer_via_refer`, the per-URL fetcher resolution that mirrors
-  `ingest/urlsrc.py`'s own); the plane it calls —
+  `acquire/urlsrc.py`'s own); the plane it calls —
   [SR-REFER](0127_refer-plane.md).
 - The ranking it projects — [SR-ASK](0103_ask.md).
 - Captured behaviour, both modes and the empty case —

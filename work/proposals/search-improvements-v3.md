@@ -73,7 +73,7 @@ pre-registration exist.**
 |---|---|---|
 | 1 | SR-RANKING (a field), SR-POSTINGS, SR-EXTRACTED (anchor extraction) | `ingest/edges.py`, `ingest/extract.py`, `query/bm25f.py` |
 | 2 | SR-EXPAND, a new dictionary section in SR-POSTINGS | `ingest/`, `query/expand.py` |
-| 3 | SR-RANKING, the analyzer note in SR-POSTINGS | `query/analyzer.py`, `query/bm25f.py` |
+| 3 | SR-RANKING, the analyzer note in SR-POSTINGS | `text/analyzer.py`, `query/bm25f.py` |
 | 4 | SR-EXPAND, SR-RS (prediction) | `query/expand.py`, `query/__init__.py` |
 | 5 | SR-RANKING, SR-GRAPH, SR-ARCHIVED-CONTENT | `query/rank.py`, `graph/walk.py` |
 | 6 | SR-REFER-PLANE, SR-CHUNKING | `refer/` |
@@ -133,5 +133,5 @@ comparison that changed two things cannot attribute the delta.
 - Jardine & van Rijsbergen — the cluster hypothesis, 1971 (#7).
 - Kamps et al. — element/section retrieval at INEX (#10).
 - Live code: [`src/fux/query/expand.py`](../../src/fux/query/expand.py),
-  [`src/fux/query/analyzer.py`](../../src/fux/query/analyzer.py),
+  [`src/fux/text/analyzer.py`](../../src/fux/text/analyzer.py),
   [`src/fux/graph/`](../../src/fux/graph/).

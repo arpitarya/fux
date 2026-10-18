@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING
 
 from .. import store as store_mod
 from ..constants import fixed
-from ..ingest.gitdir import is_archived_loc
+from ..acquire.gitdir import is_archived_loc
 from .bm25f import Scoring, score_record
 
 #: The sort key's resolution (SR-RANKING decision 8a): `round(x, score_digits)`.

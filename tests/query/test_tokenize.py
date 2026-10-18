@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fux.query.tokenize import tokenize
+from fux.text.tokenize import tokenize
 
 
 def test_tokenize():

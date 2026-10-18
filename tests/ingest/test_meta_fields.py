@@ -19,7 +19,7 @@ import pytest
 from fux.decode import Decoder
 from fux.ingest.extract import _meta_values, extract_fields
 from fux.ingest.parse import DEFAULT_META_FIELDS, ParsedDoc, meta_fields
-from fux.ingest.typesfile import META_TARGETS
+from fux.acquire.typesfile import META_TARGETS
 
 
 def doc(**meta) -> ParsedDoc:

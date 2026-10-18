@@ -32,7 +32,7 @@ what make the check usable rather than a nuisance:
 
 - **Docstrings.** A module docstring is never encoded to the console, and this
   codebase uses arrows and box-drawing to explain itself in prose.
-- **Data.** `store/canonical.py` and `ingest/urlsrc.py` hold U+2028, U+2029 and
+- **Data.** `store/canonical.py` and `acquire/urlsrc.py` hold U+2028, U+2029 and
   U+0085 as the *sentinels they strip*. Both tripped the first version of this
   check, which is how the scope got narrowed — a guard that flags the code
   defending against a character is a guard people learn to switch off.

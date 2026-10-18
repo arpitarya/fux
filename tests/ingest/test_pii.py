@@ -8,7 +8,7 @@ from __future__ import annotations
 import pytest
 
 from fux.errors import FuxError
-from fux.ingest import pii
+from fux.acquire import pii
 from l12_fixtures import write_config
 
 

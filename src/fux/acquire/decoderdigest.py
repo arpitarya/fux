@@ -8,7 +8,7 @@ reached an unchanged PDF only on `fux ingest --full`, and a corpus that never ra
 one went on serving text the current code would not produce — while ingest
 reported success and `fux doctor` stayed green.
 
-## Why this lives in `ingest/` and not in `decode/`
+## Why this lives in `acquire/` and not in `decode/`
 
 **It is a reuse-key concern, and `decode/` is a read plane.** Putting it beside
 `registry()` was the first shape, and `tests/test_node_twins.py` rejected it:

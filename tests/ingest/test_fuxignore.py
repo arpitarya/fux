@@ -19,9 +19,9 @@ from __future__ import annotations
 import pytest
 
 from fux.errors import FuxError
-from fux.ingest import fuxignore
-from fux.ingest.dirlist import source_dirs, source_excludes
-from fux.ingest.gitdir import read_types, walk_sources
+from fux.acquire import fuxignore
+from fux.acquire.dirlist import source_dirs, source_excludes
+from fux.acquire.gitdir import read_types, walk_sources
 
 
 # -- the grammar -----------------------------------------------------------

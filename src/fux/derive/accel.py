@@ -57,7 +57,7 @@ from pathlib import Path
 from ..errors import FuxError
 from ..query.bm25f import Scoring, derive_wlen, idf
 from ..query.rank import AskResult, Corpus, rank
-from ..query import identifiers as ids_mod
+from ..text import identifiers as ids_mod
 from ..query.scan import query_term_hashes
 from ..query.rank import Weighting
 from . import format as fmt
@@ -229,7 +229,7 @@ def block_bound(
 def mined_table(root: Path) -> tuple:
     """W-168 step 4 — the corpus `(short, long)` pair table, off `mined.json`.
 
-    The same tuple `query/mined.py::table_from_shards` builds from the raw
+    The same tuple `text/mined.py::table_from_shards` builds from the raw
     shards, sorted the same way, so the fold is identical on both paths. Read
     only when `mined_weight > 0`; `is_fresh` has already refused a plane built
     before the file existed (`RUNTIME_SCHEMA` v7).

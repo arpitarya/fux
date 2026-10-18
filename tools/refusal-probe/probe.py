@@ -39,7 +39,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
 from fux.errors import FuxError  # noqa: E402
-from fux.ingest import refusals  # noqa: E402
+from fux.acquire import refusals  # noqa: E402
 
 
 def main(argv: list[str]) -> int:

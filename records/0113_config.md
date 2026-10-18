@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@779a7e0d7e8e, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@6980bf8407fe]
+owns: [src/fux/config.py@ebf4c9d628a7, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@6980bf8407fe]
 laws: [L5, ex-L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a09dc83eb9c16b210ee3eae12bb4c5dc0e3155a5eaaa4b809f3eb878280e9a4f
+content_sha: a8917db6f97c313bc1ec1199ef170de5ade848850004f4b15a4c5a02cc5eca56
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -856,7 +856,7 @@ it decides committed bytes, and that is why it is here beside `shards` and not i
   [`src/fux/config.py`](../src/fux/config.py); the `[sources.url]` dataclass
   docstring is the normative statement of the opaque-table rule; the resolver —
   `resolve_parallel` in
-  [`ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py); the written template —
+  [`acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py); the written template —
   `_CONFIG` in [`setup.py`](../src/fux/setup.py).
 - A real config and the errors it produces —
   [`work/regression/2026-08-18-ingest-and-index/`](../work/regression/2026-08-18-ingest-and-index/report.md) §6
@@ -917,7 +917,7 @@ evidence.*
 **Code**
 
 - [`src/fux/config.py`](../src/fux/config.py)
-- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py)
+- [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py)
 - [`src/fux/setup.py`](../src/fux/setup.py)
 - [`src/fux/tune.py`](../src/fux/tune.py)
 - [`tests/ingest/test_url_parallel.py`](../tests/ingest/test_url_parallel.py)

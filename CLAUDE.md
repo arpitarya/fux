@@ -193,6 +193,8 @@ each to its record; that is all it does now.
   **Dependencies ship packaged.** Fux is one install with everything it needs —
   no optional extras, no "install this for PDFs", no capability that works on
   one machine and not another because of what somebody chose at install time.
+  **`fux-engine` is the one install; `fux-reader` and `fux-writer` are role
+  packages — each complete for its role, none with optional extras.**
   **Permission is not authorization:** the law permits a dependency, a record
   still decides one, and every runtime dependency is named by an accepted SR.
   **Dev, test and measurement tooling is bound by the same licence rule and

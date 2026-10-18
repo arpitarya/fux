@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@08de847cb930, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@b814bf2338e5, node/src/graph/walk.mjs@61ee1cbb84df, node/src/verbs/graph.mjs@218d67c1de9b, src/fux/schemas/graph.schema.json@19bd4c486035]
+owns: [src/fux/graph@0ebcd9751ced, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@b814bf2338e5, node/src/graph/walk.mjs@61ee1cbb84df, node/src/verbs/graph.mjs@218d67c1de9b, src/fux/schemas/graph.schema.json@19bd4c486035]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 6e29a0c99c8967927c691ee1e88427ec98410d19cd7ae375c31faef355dbcb59
+content_sha: f6fdb5fa9fd3a1d0fd1a7cfd619efbd49660206a92f1c5046b9548d3ae9353d3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

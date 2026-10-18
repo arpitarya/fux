@@ -169,7 +169,7 @@ def find_root(start: Path | None = None) -> Path | None:
 FETCHERS_DIR = fixed("files", "fetchers_dir")
 #: Optional. Absent means the built-in allowlist in `gitdir.DEFAULT_TYPES`.
 #: TOML, beside the other `.fux/*.toml` policy files -- read and written by
-#: `ingest/typesfile.py` (SR-TYPES decision 12).
+#: `acquire/typesfile.py` (SR-TYPES decision 12).
 DEFAULT_TYPES_FILE = fixed("files", "formats")
 #: Where the types list lived until 2026-09-11, in the line grammar `dirs` and
 #: `urls` still use. **Refused, never read**: a file fux silently ignored would
@@ -190,7 +190,7 @@ def _url_routes(path: Path, raw) -> dict[str, str]:
     ⚠ **Validated here rather than at first use**, so a bad pattern is a named
     error when the config loads — `fux doctor` sees it offline, and nobody
     discovers it mid-fetch. The grammar and the collision rule live in
-    `ingest/routes.py`; this function only checks the table's shape and hands
+    `acquire/routes.py`; this function only checks the table's shape and hands
     it over.
     """
     if not isinstance(raw, dict):
@@ -200,7 +200,7 @@ def _url_routes(path: Path, raw) -> dict[str, str]:
         )
     # Imported inside the function for the same reason `sourcelist` is:
     # `ingest/__init__` imports this module, so a top-level import is a cycle.
-    from .ingest import routes as _routes
+    from .acquire import routes as _routes
 
     _routes.validate({str(k): v for k, v in raw.items()}, where=f"{path}: [sources.url.routes]")
     return {str(k): str(v) for k, v in raw.items()}
@@ -773,7 +773,7 @@ def _load_url_source(path: Path, raw, urls_file: str) -> UrlSource | None:
     # `--ttl 1x`, a hand-written `ttl=1x` and this key end up failing
     # differently. Imported inside the function because `ingest/__init__`
     # imports this module -- a top-level import here is a cycle.
-    from .ingest import sourcelist
+    from .acquire import sourcelist
 
     ttl = raw["ttl"]
     if not isinstance(ttl, str) or sourcelist.parse_duration(ttl) is None:

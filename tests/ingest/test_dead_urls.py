@@ -11,7 +11,7 @@ import pytest
 
 from importlib import import_module
 
-from fux.maintain import urlstate
+from fux.acquire import urlstate
 from l12_fixtures import template_fux_toml, write_config
 
 #: `[sources.url] failing_streak` as the template ships it (W-225 stage 5e).

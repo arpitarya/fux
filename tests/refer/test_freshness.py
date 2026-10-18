@@ -8,8 +8,8 @@ import inspect
 import pytest
 
 from fux.errors import FuxError
-from fux.refer import freshness
-from fux.refer.freshness import ALWAYS, NEVER, Policy, decide, verify
+from fux.acquire import freshness
+from fux.acquire.freshness import ALWAYS, NEVER, Policy, decide, verify
 from l12_fixtures import template_fux_toml
 
 _TIMEOUT = template_fux_toml()["refer"]["timeout_seconds"]

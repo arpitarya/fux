@@ -18,7 +18,7 @@ from pathlib import Path
 import pytest
 
 from fux import decode
-from fux.ingest import decoderdigest
+from fux.acquire import decoderdigest
 
 ROOT = Path(__file__).resolve().parents[2]
 DECODE_DIR = "src/fux/decode"

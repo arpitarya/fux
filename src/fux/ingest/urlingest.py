@@ -18,7 +18,7 @@ from pathlib import Path
 from .. import store as store_mod
 from ..config import load as load_config
 from ..errors import FuxError
-from . import sourcelist, urlsrc
+from ..acquire import sourcelist, urlsrc
 
 __all__ = ["listed_url_ids", "observe_url_health", "reacquire_urls", "report_dead_urls"]
 
@@ -56,7 +56,7 @@ def reacquire_urls(
     **Never raises.** A blob that will not decode is stranded like an absent one;
     a re-derivation that fails must not fail an ingest that otherwise succeeded.
     """
-    from ..refer import source as source_mod
+    from ..acquire import source as source_mod
     from .run import _loc_of
 
     if config.url is None:
@@ -95,7 +95,7 @@ def observe_url_health(root: Path, *, fetched, skipped, listed, token_shas=None)
     diagnostic that can break the thing it diagnoses is worse than no
     diagnostic.
     """
-    from ..maintain import urlstate
+    from ..acquire import urlstate
 
     try:
         urlstate.observe(
@@ -134,7 +134,7 @@ def report_dead_urls(root: Path, failed_now: list[str]) -> None:
     """
     if not failed_now:
         return
-    from ..maintain import urlstate
+    from ..acquire import urlstate
 
     try:
         state = urlstate.read(root)

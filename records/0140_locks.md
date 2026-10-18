@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-05
 date: 2026-08-27
 feature: the index write lock and the files around it
-owns: [node/src/maintain/lock.mjs@e47f524b80f0, src/fux/maintain/lock.py@585fe05f4b74]
+owns: [node/src/maintain/lock.mjs@b2da63ce03e8, src/fux/store/lock.py@4eac9f18cec5]
 laws: [L2, L3, L4, L7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 782d5915bfde451ade4928ef7a685174dc43a73747d65d1571561028ac70dc9b
+content_sha: 5e765636f465032d2a25558e7cc3ebabc5582d3bea569b6a305dd7658dd531d1
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -19,7 +19,7 @@ content_sha: 782d5915bfde451ade4928ef7a685174dc43a73747d65d1571561028ac70dc9b
 **Owns** — the components this record decides:
 
 - [`node/src/maintain/lock.mjs`](../node/src/maintain/lock.mjs) · file
-- [`src/fux/maintain/lock.py`](../src/fux/maintain/lock.py) · file
+- [`src/fux/store/lock.py`](../src/fux/store/lock.py) · file
 
 **Describes** — reaches into, does not own:
 
@@ -107,7 +107,7 @@ paraphrased.
 
 ### Decision
 
-**0. This record owns [`src/fux/maintain/lock.py`](../src/fux/maintain/lock.py) and its Node twin [`node/src/maintain/lock.mjs`](../node/src/maintain/lock.mjs)** since 2026-10-05 ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). `LOCK_NAME`, `lock_path`, `holder`, `acquire`, `write_lock`, `release` and `break_lock` are a pure move out of `maintain/runner.py`, which **re-exports every name**, so `runner.acquire()` and `runner.write_lock()` below still name what they always did. The runner, its status file and the cooperative stop stay [SR-MAINTENANCE](0129_hooks.md)'s, as does `maintain/daemon.py`; both are reached by this record's `describes` rows. On Node, `maintain/runner.mjs` was only ever the lock, and is renamed `lock.mjs`. ⚠ **This decision read *owns nothing, case (b)* until W-261, arguing that carving a file out would move it away from the record whose subject it mostly is.** The lock primitives were always this record's subject; the runner merely called them.
+**0. This record owns [`src/fux/store/lock.py`](../src/fux/store/lock.py) and its Node twin [`node/src/maintain/lock.mjs`](../node/src/maintain/lock.mjs)** since 2026-10-05 ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). `LOCK_NAME`, `lock_path`, `holder`, `acquire`, `write_lock`, `release` and `break_lock` are a pure move out of `maintain/runner.py`, which **re-exports every name**, so `runner.acquire()` and `runner.write_lock()` below still name what they always did. The runner, its status file and the cooperative stop stay [SR-MAINTENANCE](0129_hooks.md)'s, as does `maintain/daemon.py`; both are reached by this record's `describes` rows. On Node, `maintain/runner.mjs` was only ever the lock, and is renamed `lock.mjs`. ⚠ **This decision read *owns nothing, case (b)* until W-261, arguing that carving a file out would move it away from the record whose subject it mostly is.** The lock primitives were always this record's subject; the runner merely called them.
 
 **1. One mutex per resource, and the committed index has exactly one.**
 `.fux/runtime/write.lock` is it. `ingest`, `build`, `add`, `remove` and

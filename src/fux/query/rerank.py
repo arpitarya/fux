@@ -63,12 +63,13 @@ So the reranker computes three things BM25F structurally cannot, over the
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from ..constants import fixed
-from .analyzer import analyze
+from ..text.analyzer import analyze
+# Defined in `tune.py`, which builds it (W-282: tune is core, this is the reader).
+from ..tune import Proximity  # noqa: F401
 
 #: The sort key's resolution (SR-RANKING decision 8a): `round(x, score_digits)`.
 _SCORE_DIGITS = fixed("ranking", "score_digits")
@@ -77,29 +78,6 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
     from ..tune import Tune
 
 __all__ = ["Proximity", "boost", "passage_boost", "phrase_present", "rerank", "signals"]
-
-@dataclass(frozen=True)
-class Proximity:
-    """The passage arithmetic's four `[ranking]` numbers, carried as one.
-
-    `coverage_power` — how hard a **missing** query term is punished: coverage
-    is raised to it before it multiplies. The measured argument is golden
-    `q015` (*"what is the current decision for east west traffic"*): the
-    superseded ADR scores BM25F 8.01 against the current one's 6.64, and the
-    current one contains every query term while the superseded one misses
-    `current` — which is *the entire question*. Linear coverage prices that
-    omission at 20 % and loses; squared prices it at 36 % and wins.
-
-    `base`, `span`, `adjacency` — the mix. The shipped values, and the depth
-    the reranker reorders to, live in `templates/tune.toml.txt` (L12).
-    """
-
-    coverage_power: float
-    base: float
-    span: float
-    adjacency: float
-
-
 
 def signals(query_terms: list[str], doc_terms: list[str]) -> tuple[float, float, float]:
     """`(coverage, span, adjacency)`, each in `[0, 1]`.
@@ -242,7 +220,7 @@ def boost(query_terms: list[str], text: str, tune: "Tune") -> float:
     Chunking is the refer plane's, deliberately -- one chunker, so a passage
     the reranker scored is a passage `answer` can cite.
     """
-    from ..refer._chunk import chunk
+    from ..text.chunk import chunk
 
     best = 0.0
     proximity = tune.proximity
@@ -268,7 +246,7 @@ def rerank(
     the proximity mix and the chunk bounds — so a caller cannot rerank under
     one value and cite under another (L12: none of them has a module default).
 
-    `read` is **injected, never imported** -- the same rule `refer/source.py`
+    `read` is **injected, never imported** -- the same rule `acquire/source.py`
     follows for fetchers. It takes `(root, doc_id, loc)` and returns text, or
     `None` when the document cannot be read; the default reads local files and
     declines `url:` documents, because reranking one offline would mean

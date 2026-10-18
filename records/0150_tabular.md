@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-06
 amended: 2026-09-11
 feature: tabular documents — row granularity, the admitted-row limit, and what a table citation is
-owns: [src/fux/decode/csv.py@2c37b28e4a9f, src/fux/decode/xlsx.py@1ec265cb92e2, src/fux/decode/_limits.py@42ac9cfa5394]
+owns: [src/fux/decode/csv.py@8458975be6fd, src/fux/decode/xlsx.py@1ec265cb92e2, src/fux/decode/_limits.py@943c646c639b]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: bccf4043337cffa364820470bd6f0585321fde475c56346cf5dea8da05cdeee7
+content_sha: 8d40510996cab4d9b450ee842140c46346141fc0b7460cccea772a53593a6027
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -56,7 +56,7 @@ stopped there.
 
 `.csv`/`.tsv` decode through `csv.py` into one Markdown table; `.xlsx`/`.xlsm`
 through `xlsx.py` into one table per sheet under a `## <sheet name>` heading.
-Both then reach `refer/_chunk.py`, which is what decides a citation.
+Both then reach `text/chunk.py`, which is what decides a citation.
 
 ⚠ **`.xls` is out of scope for this record.** It is the OLE2 compound binary
 format, not a zip of XML, and nothing here reads it.
@@ -278,7 +278,7 @@ print(decode(rows, 'a.csv', __import__('pathlib').Path('.')).count(chr(10) + '| 
 # one passage per row
 python -c "
 from fux.decode import decode
-from fux.refer._chunk import chunk
+from fux.text.chunk import chunk
 md = decode(b'a,b\n1,2\n3,4\n5,6\n', 'x.csv')
 print(len(chunk(md)))"
 # expect: 3

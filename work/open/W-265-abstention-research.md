@@ -4,10 +4,23 @@ name: W-265
 description: "Research item (Arpit, 2026-10-04, W-260 line 1): doc_coverage_floor came back INCONCLUSIVE (0.80 catches 12 of 21 unanswerables, p = 0.35). Deep research on how fux can better tell an unanswerable question from an answerable one — mechanisms, what the literature does, what data it needs — ending in a proposal. doc_coverage_floor stays 0.0 meanwhile."
 item: W-265
 filed: 2026-10-04
+filed_by: "Arpit (Cowork)"
+updated: 2026-10-18
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
 
 # W-265 — deep research: refusing unanswerable questions better
+
+## At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 1 | Find out why the coverage check missed (it caught 12 of 21) | what the missed questions have in common | ⏳ |
+| 2 | List signals fux can compute without a model | candidate ways to spot "I can't answer this" | ⏳ |
+| 3 | Check what published research already does | proven methods we can borrow | ⏳ |
+| 4 | Work out how much test data a fair test needs | a test that can actually tell | ⏳ |
+| 5 | Write the proposal; Arpit picks | a decision and a first measurement plan | 🔴 Arpit decides |
 
 **Status: filed 2026-10-04, not started.** Research and a proposal only; **no
 code, no threshold moves.**

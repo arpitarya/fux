@@ -8,7 +8,7 @@ import pytest
 from fux.refer._assemble import assemble
 CITATION_OVERHEAD = template_tune().citation_overhead
 PER_DOC_FRACTION = template_tune().per_doc_fraction
-from fux.refer._chunk import Passage
+from fux.text.chunk import Passage
 from fux.refer._rescore import ScoredPassage
 
 

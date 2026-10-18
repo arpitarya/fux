@@ -51,3 +51,13 @@ def derived_dir(root: Path, name: str) -> Path:
     if not tag.exists():
         tag.write_bytes(CACHEDIR_TAG.encode("ascii"))
     return path
+
+
+def runtime_dir(root: Path) -> Path:
+    """`.fux/runtime/` — where the derived plane lives. Not created here.
+
+    Here rather than in `derive/format.py`, which re-imports it, because the
+    resident holder (`store/resident.py`, core) reads the build stamp to know
+    when its held index changed, and core never imports the reader (W-282).
+    """
+    return root / _FUX_DIR / fixed("runtime", "dir")

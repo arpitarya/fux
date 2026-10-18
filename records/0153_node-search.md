@@ -8,11 +8,11 @@ status: accepted
 amended: 2026-10-13
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@304519ada02a, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@e889e284c27c, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 2edf67f6073764836716759f50204289f218261438405ca0147c2b35d5ce0028
+content_sha: 48bb10385f20d77a0995e59d7ae5db44f27f354e82bfd41384891311a84e3a51
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -190,7 +190,7 @@ forgotten — which is why there is one file and both suites read it.
 after it existed.** W-205 part 2 family (a) stepped the analyzer to `v3` — `-`,
 `.` and `/` became identifier separators alongside `_` — and the change is **two
 regexes in `analyze()` transcribed twice**, once in
-[`query/analyzer.py`](../src/fux/query/analyzer.py) and once in
+[`text/analyzer.py`](../src/fux/text/analyzer.py) and once in
 `node/src/query/analyzer.mjs`. The shared fixture moved with it in one file, both
 suites read the new rows, and `ANALYZER_VERSION` in `node/src/store/format.mjs`
 was bumped in the same change, so a Node reader cannot be handed a v3 index while
@@ -841,7 +841,7 @@ reader the reason.
 
 ⚠ **`node/src/ingest/sourcelist.mjs` is narrowed for freshness, and the gap is
 covered by parity instead** (2026-09-15, W-178). That module is the **`dirs`
-half** of `src/fux/ingest/sourcelist.py` — Node never fetches (decision 3), so
+half** of `src/fux/acquire/sourcelist.py` — Node never fetches (decision 3), so
 `fetch`, `keep`, `ttl` and `update` decide nothing there. A change
 entirely inside the `URLS` spec therefore reported the twin as behind, and
 porting it would have meant teaching this reader a grammar for a list it does

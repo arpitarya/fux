@@ -23,7 +23,7 @@ from pathlib import Path
 import pytest
 
 from fux import doctor
-from fux.ingest import ingestlog as provenance
+from fux.acquire import ingestlog as provenance
 from l12_fixtures import write_config
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -64,7 +64,7 @@ def test_a_stale_decoder_is_reported_and_names_the_full_flag(tmp_path, monkeypat
     root = _repo(tmp_path)
     provenance.write(root, [_row("csv@sha:0000000000000000")])
     monkeypatch.setattr(
-        "fux.ingest.decoderdigest.binding_digests",
+        "fux.acquire.decoderdigest.binding_digests",
         lambda r=None: {".csv": "csv@sha:1111111111111111"},
     )
     check = doctor._provenance(root)
@@ -77,7 +77,7 @@ def test_a_current_ledger_is_clean(tmp_path, monkeypatch):
     root = _repo(tmp_path)
     provenance.write(root, [_row("csv@sha:1111111111111111")])
     monkeypatch.setattr(
-        "fux.ingest.decoderdigest.binding_digests",
+        "fux.acquire.decoderdigest.binding_digests",
         lambda r=None: {".csv": "csv@sha:1111111111111111"},
     )
     check = doctor._provenance(root)
@@ -96,7 +96,7 @@ def test_the_json_block_distinguishes_unknown_from_clean(tmp_path, monkeypatch):
 
     provenance.write(root, [_row("csv@sha:1111111111111111")])
     monkeypatch.setattr(
-        "fux.ingest.decoderdigest.binding_digests",
+        "fux.acquire.decoderdigest.binding_digests",
         lambda r=None: {".csv": "csv@sha:1111111111111111"},
     )
     assert doctor.provenance_counts(root) == {"rows": 1, "stale_decoders": 0}
@@ -120,7 +120,7 @@ QUERY_PLANES = ("query", "refer", "derive")
 #:   was produced, and a thing [L9](../records/0011_LAW-9-use-record.md)
 #:   governs, because it records what somebody **asked**. Its journal is
 #:   `.fux/runtime/provenance.jsonl`, written **only under explicit consent**.
-#: - `fux.ingest.ingestlog` — W-200's ledger: what read each document, and a
+#: - `fux.acquire.ingestlog` — W-200's ledger: what read each document, and a
 #:   thing L9 does **not** reach, because it records nothing about a query.
 #:   `.fux/runtime/ingest-log.jsonl`, written by every ingest.
 #:
@@ -135,7 +135,7 @@ QUERY_PLANES = ("query", "refer", "derive")
 #: `test_golden_key_never_committed.py` hit on its first run.
 _INGEST_LEDGER = frozenset(
     {
-        "fux.ingest.ingestlog",
+        "fux.acquire.ingestlog",
         "..ingest.ingestlog",
         "...ingest.ingestlog",
     }

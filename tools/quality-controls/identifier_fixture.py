@@ -39,8 +39,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fux.query.analyzer import analyze, split_identifier  # noqa: E402
-from fux.query.stem import stem  # noqa: E402
+from fux.text.analyzer import analyze, split_identifier  # noqa: E402
+from fux.text.stem import stem  # noqa: E402
 
 LAB_RUNGS = Path.home() / "my_programs" / "fux-lab" / "corpora" / "golden"
 
@@ -154,7 +154,7 @@ def run_cases() -> list[dict]:
 
 
 def _raw(text: str) -> list[str]:
-    from fux.query.analyzer import _WORD_RE
+    from fux.text.analyzer import _WORD_RE
 
     return _WORD_RE.findall(text)
 

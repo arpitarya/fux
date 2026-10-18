@@ -49,7 +49,6 @@ Two halves, in two places, and they are deliberately different:
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -63,25 +62,22 @@ from .constants import fixed
 #: claim, and one that cannot reach the top three on the corpus it was written
 #: for is not one.
 
-ENRICH_DIR = fixed("files", "enrich_dir")
+from .store.enrichfile import (  # noqa: F401  (the file format, W-282)
+    ENRICH_DIR,
+    REQUIRED_KEYS,
+    enrich_path,
+    is_question,
+    match_end,
+    parse_frontmatter,
+    superseded_by,
+    validate,
+)
 
 #: The scope label of the QUEUED origin (SR-ENRICH decision 4, as amended by
 #: W-248): the committed file `fux ingest` writes. A scope is named after the
 #: place its declaration lives, as `URL_SCOPE` is, so a report line says where
 #: to look.
 QUEUE_SCOPE = fixed("files", "enrich_queue")
-
-#: Keys fux VERIFIES versus keys it merely RECORDS.
-#:
-#: `source_sha` is computed and checked — a mismatch means stale, full stop.
-#: `model` is a **claim**: an agent is asked to stamp what produced the text,
-#: and nothing here can confirm it. That asymmetry is the honest cost of
-#: Arpit's ruling and the record says so rather than implying provenance is
-#: proven.
-REQUIRED_KEYS = ("source", "source_sha", "chunks", "model", "generated", "skill")
-
-_FRONTMATTER_RE = re.compile(r"\A---\n(.*?)\n---\n", re.S)
-
 
 @dataclass(frozen=True)
 class PlanItem:
@@ -121,48 +117,6 @@ class ScopeReport:
         return self.ok
 
 
-def enrich_path(root: Path, sha: str) -> Path:
-    return root / ENRICH_DIR / f"{sha}.md"
-
-
-def parse_frontmatter(text: str) -> dict | None:
-    """A permissive `key: value` read of the leading block, or `None`.
-
-    Deliberately not a YAML parser: the block is written by an agent following
-    a skill, the key set is closed and flat, and adopting a parser to read six
-    strings would be the same L2 trade this whole design refuses.
-    """
-    match = _FRONTMATTER_RE.match(text)
-    if match is None:
-        return None
-    out: dict[str, str] = {}
-    for line in match.group(1).splitlines():
-        if ":" not in line:
-            continue
-        key, _, value = line.partition(":")
-        out[key.strip()] = value.strip()
-    return out
-
-
-def validate(path: Path, expected_sha: str | None = None) -> str | None:
-    """`None` when the file is a usable enrichment, else why it is not."""
-    try:
-        text = path.read_text(encoding="utf-8")
-    except OSError as exc:
-        return f"unreadable: {exc}"
-    meta = parse_frontmatter(text)
-    if meta is None:
-        return "no frontmatter block"
-    missing = [k for k in REQUIRED_KEYS if not meta.get(k)]
-    if missing:
-        return f"frontmatter missing {', '.join(missing)}"
-    if expected_sha is not None and meta.get("source_sha") != expected_sha:
-        return f"source_sha {meta.get('source_sha')!r} does not match the document"
-    if not text[match_end(text):].strip():
-        return "no body after the frontmatter"
-    return None
-
-
 #: Fields the self-retrieval filter scores over. **`title` and `ctx` are
 #: ZEROED**, and each for its own reason:
 #:
@@ -184,41 +138,6 @@ _FILTER_ZEROED = frozenset({"title", "ctx"})
 
 def _filter_weights(weights: tuple[float, ...]) -> tuple[float, ...]:
     return tuple(0.0 if name in _FILTER_ZEROED else w for name, w in zip(TF_FIELDS, weights))
-
-
-def is_question(line: str) -> bool:
-    """Is this body line a question a searcher would type?
-
-    Deliberately shallow: a line ending in `?`. **The skill asks for one
-    question per line**, and a cleverer test — leading interrogative, a parser —
-    would refuse lines a human wrote on purpose and pass lines it should not.
-    Prose bodies written under the older skill contain no `?`-terminated lines
-    as a rule, and they stay valid either way (`plan()` only checks what looks
-    like a question).
-    """
-    stripped = line.strip().lstrip("-*").strip()
-    return stripped.endswith("?") and len(stripped) > 1
-
-
-def superseded_by(text: str) -> str:
-    """The `superseded_by:` value in an enrichment's frontmatter, or `""`.
-
-    **The declared path a retired document cannot state about itself.** A
-    document's own `supersedes:` is written by the *successor*; a document that
-    was retired years ago cannot name a successor that did not exist. An
-    enrichment file is written later, so it can — and this is the only key in
-    that frontmatter that reaches the ranking rather than a report.
-
-    ⚠ **Declared, never inferred**, exactly as `ingest/priors.py::superseded_ids`
-    is: nothing here guesses from titles, numbering or dates.
-    """
-    meta = parse_frontmatter(text)
-    return (meta or {}).get("superseded_by", "").strip()
-
-
-def match_end(text: str) -> int:
-    match = _FRONTMATTER_RE.match(text)
-    return match.end() if match else 0
 
 
 def plan(
@@ -421,7 +340,18 @@ def _unretrievable(root: Path, path: Path, record: dict, k: int) -> list[tuple[s
 
     import dataclasses
 
-    from .query import run_query
+    # ⚠ **A guarded import of the reader** (W-282): self-retrieval RANKS, and
+    # ranking is the reader's. Wherever the reader is installed — `fux-engine`
+    # always — this is the check it always was; on a writer-only install it
+    # refuses rather than reporting every question as fine.
+    try:
+        from .query import run_query
+    except ImportError:  # a writer-only install: nothing here can rank
+        raise FuxError(
+            "`fux enrich --check` ranks every question against the index, and ranking "
+            "is fux-reader's — install fux-engine (or fux-reader beside fux-writer), "
+            "or set [enrich] self_retrieval_k = 0 in .fux/tune.toml"
+        ) from None
     from .tune import load as load_tune
 
     tune = load_tune(root, enabled=True)
@@ -458,7 +388,7 @@ def _pii_in_body(path: Path, rules: tuple) -> list[str]:
     """
     if not rules:
         return []
-    from .ingest import pii as pii_mod
+    from .acquire import pii as pii_mod
 
     try:
         text = path.read_text(encoding="utf-8")
@@ -475,7 +405,7 @@ def _chunk_count(root: Path, record: dict, bounds: dict[str, int]) -> int:
     bytes fux already has, and storing it would be a committed field that
     changes whenever the chunker is tuned.
     """
-    from .refer._chunk import chunk
+    from .text.chunk import chunk
 
     text = _document_text(root, record)
     if text is None:
@@ -508,7 +438,7 @@ def _document_text(root: Path, record: dict) -> str | None:
     """
     loc = record.get("loc", "")
     if record.get("src") == "url":
-        from .ingest.urlsrc import _decode_fetched, declared_decoder
+        from .acquire.urlsrc import _decode_fetched, declared_decoder
         from .store import acquired
 
         blob = acquired.read_manifest(root).get(loc)
@@ -573,7 +503,7 @@ def prune(root: Path, live_shas: set[str]) -> list[Path]:
 
 def cmd_enrich(args) -> int:
     from .config import find_root
-    from .ingest import pii as pii_mod
+    from .acquire import pii as pii_mod
 
     root = find_root()
     if root is None:
@@ -663,7 +593,7 @@ def _target_problem(root: Path, scopes: dict[str, list[dict]], target: str) -> s
 
 def _scopes(root: Path) -> dict[str, list[dict]]:
     from . import store as store_mod
-    from .ingest.dirlist import enrich_dirs
+    from .acquire.dirlist import enrich_dirs
 
     from .config import load as load_config
 
@@ -731,7 +661,7 @@ def _enrich_urls(root: Path) -> set[str]:
     has simply declared nothing.
     """
     from .config import load as load_config
-    from .ingest import urlsrc
+    from .acquire import urlsrc
 
     try:
         source = load_config(root).url

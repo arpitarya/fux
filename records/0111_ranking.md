@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@ca86eb1f3726, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@4ab5f5c87abe, src/fux/query/tokenize.py@63f4c4872bd7, src/fux/query/analyzer.py@8f02dd1c4e44, src/fux/query/stem.py@86954ab3789b, node/src/query/analyzer.mjs@71890f0ff70a, node/src/query/bm25f.mjs@167ce9d10c88, node/src/query/rank.mjs@afbddd6eeed0, node/src/query/stem.mjs@7b327f67ee29, node/src/query/tokenize.mjs@352450f33e0c, node/test/analyzer.test.mjs@2d0342e628a6]
+owns: [src/fux/query/rank.py@53d44972d1fc, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@38da8c6bfe7e, src/fux/text/tokenize.py@63f4c4872bd7, src/fux/text/analyzer.py@8f02dd1c4e44, src/fux/text/stem.py@86954ab3789b, node/src/query/analyzer.mjs@9833b643cc8d, node/src/query/bm25f.mjs@167ce9d10c88, node/src/query/rank.mjs@afbddd6eeed0, node/src/query/stem.mjs@90946a49a2d8, node/src/query/tokenize.mjs@8fd5727daa05, node/test/analyzer.test.mjs@823f6321024c, src/fux/text@14fff59d2315]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: e79e98567ce2752a6159dfdc2c731b6ad82207e2399602ea9045a01c92ba3b37
+content_sha: 04327cb20602bf55fb12e5218bb86310ce3298fadb3d51a4e7352af04881f328
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -25,12 +25,17 @@ content_sha: e79e98567ce2752a6159dfdc2c731b6ad82207e2399602ea9045a01c92ba3b37
 - [`node/src/query/stem.mjs`](../node/src/query/stem.mjs) · file
 - [`node/src/query/tokenize.mjs`](../node/src/query/tokenize.mjs) · file
 - [`node/test/analyzer.test.mjs`](../node/test/analyzer.test.mjs) · file
-- [`src/fux/query/analyzer.py`](../src/fux/query/analyzer.py) · file
 - [`src/fux/query/bm25f.py`](../src/fux/query/bm25f.py) · file
 - [`src/fux/query/intent.py`](../src/fux/query/intent.py) · file
 - [`src/fux/query/rank.py`](../src/fux/query/rank.py) · file
-- [`src/fux/query/stem.py`](../src/fux/query/stem.py) · file
-- [`src/fux/query/tokenize.py`](../src/fux/query/tokenize.py) · file
+- [`src/fux/text/`](../src/fux/text) · dir
+- [`src/fux/text/analyzer.py`](../src/fux/text/analyzer.py) · file
+- [`src/fux/text/stem.py`](../src/fux/text/stem.py) · file
+- [`src/fux/text/tokenize.py`](../src/fux/text/tokenize.py) · file
+
+**Describes** — reaches into, does not own:
+
+- [`src/fux/tune.py::Scoring`](../src/fux/tune.py) · owned by [SR-TUNE](0135_tuning.md)
 
 <!-- COMPONENTS-END -->
 
@@ -717,9 +722,9 @@ intent_weight`. `of(record)` is `priority_for(loc) × intent_for(loc)`, and
 - The scorer — [`src/fux/query/bm25f.py`](../src/fux/query/bm25f.py); the
   single sort — [`rank.py`](../src/fux/query/rank.py) (its docstring is the
   normative statement of why scoring is shared); the analyzer pipeline —
-  [`analyzer.py`](../src/fux/query/analyzer.py) and the Porter stemmer in
-  [`stem.py`](../src/fux/query/stem.py).
-- ⚠ [`tokenize.py`](../src/fux/query/tokenize.py) is a **thin shim that
+  [`analyzer.py`](../src/fux/text/analyzer.py) and the Porter stemmer in
+  [`stem.py`](../src/fux/text/stem.py).
+- ⚠ [`tokenize.py`](../src/fux/text/tokenize.py) is a **thin shim that
   re-exports `analyze`**, kept deliberately: it is the entry point `ingest/` and
   `query/` have always imported, and keeping it is what makes both sides get the
   same analysis *by construction* rather than by review. Follow the shim, not
@@ -759,8 +764,8 @@ grep -n 'round(' src/fux/query/rank.py
 # expect: the sort key, rounding to 9 places
 
 # 3. ingest and query still share one analyzer entry point
-grep -rn 'from .tokenize import\|from ..query.tokenize import' src/fux/
-# expect: both ingest/ and query/ importing the same module
+grep -rn 'from ..text.tokenize import\|from .tokenize import' src/fux/
+# expect: both ingest/ and query/ importing the same module, text/tokenize.py
 
 # 4. the shipped values still match the archived baseline the checks rest on
 grep -nE '^(k1|b|body|heading|title|path|ctx) ' src/fux/templates/tune.toml.txt
@@ -793,11 +798,11 @@ evidence.*
 
 **Code**
 
-- [`src/fux/query/analyzer.py`](../src/fux/query/analyzer.py)
+- [`src/fux/text/analyzer.py`](../src/fux/text/analyzer.py)
 - [`src/fux/query/bm25f.py`](../src/fux/query/bm25f.py)
 - [`src/fux/query/rank.py`](../src/fux/query/rank.py)
-- [`src/fux/query/stem.py`](../src/fux/query/stem.py)
-- [`src/fux/query/tokenize.py`](../src/fux/query/tokenize.py)
+- [`src/fux/text/stem.py`](../src/fux/text/stem.py)
+- [`src/fux/text/tokenize.py`](../src/fux/text/tokenize.py)
 
 **Measured evidence**
 

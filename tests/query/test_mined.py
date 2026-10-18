@@ -31,7 +31,8 @@ import pytest
 from fux import store as store_mod
 from fux.derive import accel, build
 from fux.ingest.run import run
-from fux.query import mined, run_query
+from fux.text import mined
+from fux.query import run_query
 from fux.query.expand import build as build_expansion
 from fux.query.expand import stack
 from fux.query.scan import query_term_hashes
@@ -110,7 +111,7 @@ def test_the_pattern_is_the_frozen_tag_pattern():
 
 
 def test_mine_finds_pairs_drops_the_leading_the_and_skips_a_stopword_short_form():
-    from fux.query.tokenize import tokenize
+    from fux.text.tokenize import tokenize
 
     pairs = mined.mine(FILES["docs/glossary.md"])
     # `(IT)` analyzes to nothing — `it` is a stopword — so it has no side to

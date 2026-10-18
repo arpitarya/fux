@@ -44,7 +44,7 @@ _RECORD_LEVEL = fixed("markdown", "record_level")
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.json", "version")  # not bumped by W-234: law handles in comments only; W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
+VERSION = fixed("decoders.json", "version")  # not bumped by W-234: law handles in comments only; W-225 4a (caps moved, same values) nor 5b (numerals moved, same output); nor W-282 (moved module paths in comments)
 
 EXTENSIONS = tuple(fixed("decoders.json", "extensions"))
 
@@ -106,7 +106,7 @@ MAX_DEPTH = _Cap("json", "max_depth")
 #: claiming a section.
 #:
 #: ⚠ **Why a second, shallower cap.** A heading is a section boundary to
-#: `refer/_chunk.py` and a `phrases` entry to `ingest/extract.py`. Emitting one
+#: `text/chunk.py` and a `phrases` entry to `ingest/extract.py`. Emitting one
 #: per key at every level turned a 200-key payload into 200 sections, almost
 #: all of them under the passage floor and all merged straight back together —
 #: and it filled the record's twelve `phrases` slots with fifth-level keys
@@ -162,7 +162,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
         lines.append(f"# {rel_path.rsplit('/', 1)[-1]}")
         # ⚠ **A top-level array emitted NO heading at all until 2026-09-06.**
         # `_walk` on a list with `label=None` emits nothing and recurses, so an
-        # export of six records decoded to one undivided block: `refer/_chunk.py`
+        # export of six records decoded to one undivided block: `text/chunk.py`
         # had nothing to split on and cited all six as though they were one
         # statement, and `extract.py` mined no `phrases` from any of them. This
         # is the same defect `jsonl.py` fixed for the line-delimited spelling of

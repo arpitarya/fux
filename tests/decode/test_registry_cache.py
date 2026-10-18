@@ -16,7 +16,7 @@ import pytest
 
 from fux import decode
 from fux.errors import FuxError
-from fux.ingest import typesfile
+from fux.acquire import typesfile
 
 
 @pytest.fixture

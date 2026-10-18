@@ -291,7 +291,7 @@ def _meta_fields_of(module, name: str, origin: str) -> dict[str, str]:
             f"decoder {origin} declares META_FIELDS that is not a dict of "
             f"`metadata key -> index field` (SR-DECODE decision 20a)"
         )
-    from ..ingest.typesfile import META_TARGETS
+    from ..acquire.typesfile import META_TARGETS
 
     out: dict[str, str] = {}
     for key, target in claimed.items():
@@ -511,7 +511,7 @@ def _declared_bindings(root: Path | None) -> dict[str, tuple[str, str]]:
     # decoded both packages are fully initialised. `gitdir._default_types()`
     # defers the mirror-image import for the mirror-image reason.
     from ..config import LEGACY_TYPES_FILE
-    from ..ingest import typesfile
+    from ..acquire import typesfile
 
     legacy = (root / LEGACY_TYPES_FILE).is_file()
     path = root / TYPES_FILE
@@ -546,7 +546,7 @@ def meta_bindings(root: Path | None) -> dict[str, str]:
     """
     if root is None:
         return {}
-    from ..ingest import typesfile
+    from ..acquire import typesfile
 
     # Dispatch, not policy: an absent file binds nothing here. That the file
     # must exist is `read_types`'s (ingest) and `_limits`'s (every capped

@@ -130,7 +130,7 @@ builtin        = ["csv", "docx", "drawio", "html", "image", "ini", "json", "json
 # `include` that `fux setup` writes into .fux/formats.toml.
 prose_types    = ["*.md", "*.markdown", "*.txt", "*.rst", "*.adoc", "*.org"]
 # The always-on magic-byte floor, checked against the type the SERVER claimed
-# (ingest/refusals.py `MAGIC`). Keyed by MIME, not by decoder, because ODT has a
+# (acquire/refusals.py `MAGIC`). Keyed by MIME, not by decoder, because ODT has a
 # signature and no decoder. Only formats with a fixed, unambiguous signature: a
 # guessed one turns the floor into a source of false refusals. Latin-1 bytes.
 # The by-decoder half is each `[decoders.<name>.format] magic` (R13).
@@ -335,7 +335,7 @@ url_state        = "url-state.json"
 url_state_schema = "state.schema.json"
 # A remembered question is stored as this many hex digits of its sha256.
 question_key_hex = 16
-# The runtime file of per-URL content shas (maintain/urlstate.py).
+# The runtime file of per-URL content shas (acquire/urlstate.py).
 url_shas = "url-shas.json"
 # chmod bits of the runner's write lock.
 lock_mode = 0o644
@@ -451,7 +451,7 @@ lint_alphabet = 768
 ms_per_s = 1000
 
 [pii.luhn]
-# ISO/IEC 7812-1 Annex B (ingest/pii.py). `doubled[d]` is 2d with its digits
+# ISO/IEC 7812-1 Annex B (acquire/pii.py). `doubled[d]` is 2d with its digits
 # summed; the check passes when the total is a multiple of `modulus`.
 doubled = [0, 2, 4, 6, 8, 1, 3, 5, 7, 9]
 modulus = 10
@@ -595,7 +595,7 @@ gif_image_separator      = 0x2C
 
 [decoders.pdf.format]
 # The numbers PDF fixes (decode/pdf.py; SR-LAW-12 decision 6a).
-# What a real PDF begins with -- the by-decoder magic floor (ingest/refusals.py).
+# What a real PDF begins with -- the by-decoder magic floor (acquire/refusals.py).
 magic = "%PDF-"
 # A literal string octal escape carries at most three digits.
 octal_escape_digits = 3
@@ -625,7 +625,7 @@ min_table_lines = 3
 unicode_wrap = 65536
 
 # The OOXML part names each decoder reads, and the ZIP local-file-header every
-# OOXML package begins with -- the by-decoder magic floor (ingest/refusals.py).
+# OOXML package begins with -- the by-decoder magic floor (acquire/refusals.py).
 # Fixed by ECMA-376, not knobs (SR-LAW-12 decision 6b, R13). Latin-1 bytes.
 [decoders.docx.format]
 magic    = "PK\u0003\u0004"

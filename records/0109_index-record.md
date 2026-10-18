@@ -7,10 +7,10 @@ description: What every property of a committed JSONL record is for, why it is i
 status: accepted
 date: 2026-08-18
 feature: the committed record schema — `fux.index.v2`
-owns: [src/fux/schemas/index-record.schema.json@0c56eb4a5ad7]
+owns: [src/fux/schemas/index-record.schema.json@58adc06eb3c2]
 laws: [L3, L4, ex-L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: c9fde0578754a0245e615a8818c2cce4764e43a61e9c3cecdce1adf4b887a8bf
+content_sha: bda9fe54b042d4fc2333a5908e6bea9d97dad2dab363c36cbfdc00b3dd8ac517
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

@@ -2,7 +2,7 @@
 from __future__ import annotations
 import types
 from fux import doctor, sources
-from fux.ingest import sourcelist
+from fux.acquire import sourcelist
 from fux.store import acquired
 
 XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

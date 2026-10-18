@@ -10,7 +10,7 @@ feature: "`.fux/fetchers/http.py` — the fetcher a URL gets when its line says 
 owns: [.fux/fetchers/http.py@4f0f4a3431ce, src/fux/templates/http.py.txt@4f0f4a3431ce]
 laws: [L2, L5, ex-L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: e8b70a218187c0a2752bd296086ec30d2e6b0d4fca90a0417de2b9fdbc4b5b09
+content_sha: 27652eecd20bc3304ebe0d005ce2d1028841ec65b8d59b6ec7f1f16f3db4496e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -366,7 +366,7 @@ grep -rn "urllib\|http.client\|socket\|requests" src/fux/ --include=*.py
 # expect: no output — writing a template is a file write, not a connection
 
 # 2. no escalation: nothing picks a fetcher that a line did not name
-grep -rniE "fallback|escalat|retry_with|if .*failed.*cdp" src/fux/ingest/urlsrc.py
+grep -rniE "fallback|escalat|retry_with|if .*failed.*cdp" src/fux/acquire/urlsrc.py
 # expect: no output
 
 # 3. the template is still un-importable package data

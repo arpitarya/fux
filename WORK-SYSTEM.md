@@ -277,7 +277,8 @@ different concern. A component with no decision yet is owned by an open
 
 13. One or two lines per item, always.
 14. A row is: ball · optional 🧨 · optional 🔺 · `**W-nn**` · `` `lane` `` ·
-    what is open · `[detail](open/W-nn-slug.md)`.
+    what is open · `Filed by <person> (<surface>).` (rule 63) ·
+    `[detail](open/W-nn-slug.md)`.
 15. At most 280 characters.
 16. No body — no nested bullet, no table, no indented paragraph.
 17. Every row links its own detail file, and the id in the row matches it.
@@ -377,6 +378,31 @@ different concern. A component with no decision yet is owned by an open
 56. Archiving is not done until `archive/README.md` §`open/` names a
     successor — the file, the close date, and where the live answer lives now.
 57. `archive/open/` is history, not evidence.
+
+**I · An item's file opens with its meeting view**
+
+58. **The first thing under an item file's `# W-nn` title is `## At a glance`,
+    and the first thing under that is a table or a diagram** — a Markdown
+    table, a fenced `mermaid` or `text` diagram, or an image. Nothing comes
+    before it, not the ruling and not the `**Model:**` line.
+59. The view says **what we are going to do, in plain English, fit to put on a
+    screen in a meeting.** Default shape: `| step | what we do | what it gives
+    us | state |`, state ✅ done · ⏳ not yet · 🔴 Arpit decides. Ids, metric
+    names and paths go in the body below.
+60. The view changes in the same change as the item; a view that disagrees
+    with its body is wrong, and the body wins.
+
+**J · Who filed it, and who last updated it**
+
+61. An item file's frontmatter carries `filed_by`, `updated` and `updated_by`
+    beside `filed`. Each `_by` is `"<person> (<surface>, <model>)"` — the person
+    whose ask it is, then the session that wrote it. The model is left out only
+    when no record of it survives; never guessed.
+62. Every change to an item file re-sets `updated` and `updated_by`; `updated`
+    is never earlier than `filed`.
+63. An *Open items* row ends `Filed by <person> (<surface>).` — the file's
+    `filed_by` without the model — just before its detail link. Inbox rows do
+    not carry it.
 
 **The legend** — the one rule text the queue carries, exactly these two lines
 under its header:
@@ -1395,12 +1421,12 @@ not part of the file):
 
 ### build
 
-- 🟡 **W-04** · `agent` — the config loader; waiting on W-03. **Sonnet.** [detail](open/W-04-config-loader.md)
-- 🟢 **W-05** · `agent` — the `--json` flag on `list`. **Sonnet.** [detail](open/W-05-list-json.md)
+- 🟡 **W-04** · `agent` — the config loader; waiting on W-03. **Sonnet.** Filed by Arpit (Claude Code). [detail](open/W-04-config-loader.md)
+- 🟢 **W-05** · `agent` — the `--json` flag on `list`. **Sonnet.** Filed by Arpit (Claude Code). [detail](open/W-05-list-json.md)
 
 ### research
 
-- 🟢 **W-06** · `cowork` — survey of schema validators; no code. **Cowork.** [detail](open/W-06-validator-survey.md)
+- 🟢 **W-06** · `cowork` — survey of schema validators; no code. **Cowork.** Filed by Arpit (Cowork). [detail](open/W-06-validator-survey.md)
 ```
 
 ### 6.12 · `work/BACKLOG.md`
@@ -1498,6 +1524,12 @@ detail lives here, one file per `W-nn`, named `W-nn-slug.md`.
 4. A `research` item's file says `**Model:** Cowork` and its row's lane is
    `cowork` (rule 37a).
 5. This file is the spec as well as the state. There is no second document.
+6. **A file opens with its meeting view** — `## At a glance` directly under the
+   title, a table or diagram directly under that (rules 58–60). Write every new
+   file from the shape below.
+7. **A file names who filed it and who last updated it** — `filed_by`,
+   `updated`, `updated_by` in its frontmatter; its *Open items* row ends
+   `Filed by <person> (<surface>).` (rules 61–63).
 
 **Naming.** `W-nn` ids are never reused; the first is `W-01`.
 
@@ -1510,10 +1542,20 @@ name: W-nn
 description: "<one sentence: who asked, when, for what>"
 item: W-nn
 filed: YYYY-MM-DD
+filed_by: "<person> (<surface>, <model>)"
+updated: YYYY-MM-DD
+updated_by: "<person> (<surface>, <model>)"
 ball: agent | arpit | cowork
 ---
 
-# W-nn — <title>
+# W-nn — <title, in plain words>
+
+## At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 1 | <a plain-English action, readable aloud> | <what it buys, in one phrase> | ⏳ |
+| 2 | Arpit picks <the choice> | <the decision it unblocks> | 🔴 Arpit decides |
 
 **Arpit, YYYY-MM-DD:** *"<the ask, in his words>"*
 
@@ -2291,6 +2333,8 @@ Print each line with ✅ or ❌ and a one-line reason for any ❌.
 [ ] every owns: entry in a record appears in the Ownership table with that owner, and vice versa
 [ ] work/OPEN-WORK.md: legend is the two exact lines; inbox table + "*Empty since <DATE>" line; four section headings
 [ ] python3 scripts/check-open-work-inbox.py exits 0
+[ ] every work/open/W-*.md opens with "## At a glance" and a table or diagram right under it (rule 58)
+[ ] every work/open/W-*.md has filed_by / updated / updated_by; every open-items row says "Filed by …" (rules 61–63)
 [ ] work/BLOCKED.json is valid JSON with decision PROCEED
 [ ] work/NOW.md's first content line begins "idle"
 [ ] every file under .claude/hooks/ and scripts/sr-guard.sh is executable
@@ -2312,7 +2356,7 @@ the gates to add. When tests exist, the first five to write:
 
 | gate | checks |
 |---|---|
-| `test_open_work_rows_are_short.py` | rules 13–19, 23a, 27, 37, 37a, 38, 42, 44, 45a, 47 over the queue |
+| `test_open_work_rows_are_short.py` | rules 13–19, 23a, 27, 37, 37a, 38, 42, 44, 45a, 47 over the queue; rule 58's meeting view and rules 61–63's authorship over `work/open/` |
 | `test_no_work_item_is_lost.py` | every `W-nn` ever named resolves to `work/open/` or `archive/open/` |
 | `test_sr_owns_consistency.py` + `test_sr_ownership.py` | `owns:` ↔ Ownership table both ways; every code path claimed once |
 | `test_sr_freshness.py` | the guard, replayed over history from `RULE-SINCE` |

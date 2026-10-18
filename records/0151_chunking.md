@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-09-06
 feature: chunking — the strategy vocabulary, the boundary ladder, and the retrieval/citation split
-owns: [src/fux/refer/_chunk.py@544a2fd79bfc, node/src/refer/chunk.mjs@696feef53cdb]
+owns: [src/fux/text/chunk.py@544a2fd79bfc, node/src/refer/chunk.mjs@4d14d3bc8a39]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 0c18ddc087321bfda7bb5b08221837a14fecf35a038069a1fe6116f2ac1f70fe
+content_sha: 9e63c3b3fc12d4d9b99b9a3c4a01433cf78ae49ed2d7e9579215a0512c71f98d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -19,7 +19,7 @@ content_sha: 0c18ddc087321bfda7bb5b08221837a14fecf35a038069a1fe6116f2ac1f70fe
 **Owns** — the components this record decides:
 
 - [`node/src/refer/chunk.mjs`](../node/src/refer/chunk.mjs) · file
-- [`src/fux/refer/_chunk.py`](../src/fux/refer/_chunk.py) · file
+- [`src/fux/text/chunk.py`](../src/fux/text/chunk.py) · file
 
 <!-- COMPONENTS-END -->
 
@@ -47,7 +47,7 @@ to serve all three with one span, or an admission of where that fails.
 
 ### Context
 
-`refer/_chunk.py` splits a decoder's Markdown into citable passages. Until
+`text/chunk.py` splits a decoder's Markdown into citable passages. Until
 2026-09-06 it did so one way — at `^#{1,6}` headings — with one hard-coded
 special case for tables. Format-specific knowledge was accumulating in a plane
 that knows a regex, not a format.
@@ -236,7 +236,7 @@ until it is measured this stays a proposal. The harness in
   lands in a passage"; a passage nothing can seat is not a citation.
 - **`Passage` gained a field**, so anything constructing one directly gets
   `cut=""` — an author boundary, which is the honest default.
-- ⚠ **Ownership moved.** `src/fux/refer/_chunk.py` is carved out of
+- ⚠ **Ownership moved.** `src/fux/text/chunk.py` is carved out of
   [SR-REFER](0127_refer-plane.md)'s directory claim, on `freshness.py`'s
   precedent: the subject reaches past `refer/` into what decoders declare and
   what `extract.py` mines, and a record that owns nothing cannot be opened by
@@ -251,7 +251,7 @@ until it is measured this stays a proposal. The harness in
 # every document is quotable
 python -c "
 from pathlib import Path
-from fux.refer._chunk import chunk
+from fux.text.chunk import chunk
 from fux.tune import load
 bounds = load(Path('.'), enabled=False).chunk_bounds()   # the template's [refer]
 wall = '# N\n\n' + ' '.join(f'sentence {i} here.' for i in range(200))
@@ -261,7 +261,7 @@ print(len(ps), max(p.nbytes for p in ps) <= bounds['max_passage_bytes'])"
 
 # the line rung is preferred to the word rung
 python -c "
-from fux.refer._chunk import chunk
+from fux.text.chunk import chunk
 doc = '# L\n\n' + '\n'.join(f'line {i} of the log' for i in range(400))
 print(sorted({p.cut for p in chunk(doc)}))"
 # expect: ['', 'line']  -- never 'word'

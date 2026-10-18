@@ -12,8 +12,8 @@ import types
 
 import pytest
 
-from fux.ingest import urlsrc
-from fux.maintain import urlstate
+from fux.acquire import urlsrc
+from fux.acquire import urlstate
 
 
 

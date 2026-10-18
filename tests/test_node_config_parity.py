@@ -250,7 +250,7 @@ def test_the_node_prose_types_are_the_python_ones():
     line numbers into text the index never held; too narrow and it declines a
     document it could have answered from.
     """
-    from fux.ingest.gitdir import _PROSE_TYPES
+    from fux.acquire.gitdir import _PROSE_TYPES
 
     assert sorted(_node_export("decode/registry.mjs", "PROSE_TYPES")) == sorted(_PROSE_TYPES)
 
@@ -262,7 +262,7 @@ def test_the_node_pii_gate_path_is_the_python_one():
     Node literal; this asserts the Node side still spells it, so a refactor
     that drops the gate fails here too rather than only in a file about the CLI.
     """
-    from fux.ingest.pii import rules_path
+    from fux.acquire.pii import rules_path
 
     entry = (ROOT / "node" / "fux.mjs").read_text(encoding="utf-8")
     spelled = re.search(r'const PII_RULES = \[(.*?)\];', entry)
@@ -275,7 +275,7 @@ def test_the_dirs_attribute_set_is_the_python_one():
     """🔴 **The gap `test_node_twins`'s narrowing leaves open, closed by parity.**
 
     `node/src/ingest/sourcelist.mjs` mirrors the **`dirs` half** of
-    `src/fux/ingest/sourcelist.py` — Node never fetches, so the `urls` spec
+    `src/fux/acquire/sourcelist.py` — Node never fetches, so the `urls` spec
     decides nothing there. The freshness check therefore narrows that twin to
     `parse`, the shared grammar engine; a change to the `dirs` **attribute
     tuple** lives at module level, outside any `def`, and git's hunk-context
@@ -288,7 +288,7 @@ def test_the_dirs_attribute_set_is_the_python_one():
     set from the same committed file** — the loud half and the lenient half
     disagreeing, which is worse than either alone.
     """
-    from fux.ingest.sourcelist import DIRS
+    from fux.acquire.sourcelist import DIRS
 
     source = _source("ingest/sourcelist.mjs")
     body = re.search(r"const DIRS_ATTRIBUTES = \[(.*?)\n\];", source, re.S)

@@ -16,7 +16,7 @@ reconstruct everything there, and it can never reconstruct this.
 disconnected or signed-out session degrades every citation to `unverified` —
 the weakest verdict, and indistinguishable from never having looked. With the
 bytes on disk the comparison is against *the exact input the record was built
-from*, which is a stronger claim than comparing two fetches: `refer/source.py`
+from*, which is a stronger claim than comparing two fetches: `acquire/source.py`
 verifies with the same fetcher a document was ingested with precisely because
 *a document fetched two ways is two documents*.
 
@@ -40,7 +40,7 @@ directory deletes the whole feature rather than orphaning a field.
 
 ## No wall clock
 
-`run_seq` and byte counts only, the same rule `maintain/urlstate.py` follows
+`run_seq` and byte counts only, the same rule `acquire/urlstate.py` follows
 and for the same reason: wall clock lives in `refer/fetchcache.py`'s TTL store
 and nowhere else.
 """
@@ -83,7 +83,7 @@ class Blob:
     content_type: str
     bytes: int
     #: The `run_seq` this blob was retained in. **A counter, never a clock** --
-    #: it is the eviction order, and `maintain/urlstate.py` states why the
+    #: it is the eviction order, and `acquire/urlstate.py` states why the
     #: distinction is a law rather than a preference. `None` means the entry
     #: predates the field, which sorts oldest.
     run_seq: int | None = None
@@ -313,7 +313,7 @@ def evict(
     a re-fetch could restore.
 
     ⚠ **Order is by `run_seq`, never by mtime.** This plane holds no wall
-    clock (`maintain/urlstate.py`'s rule), and reading the filesystem's clock
+    clock (`acquire/urlstate.py`'s rule), and reading the filesystem's clock
     to decide would smuggle one in through the back door. A blob with no
     recorded `run_seq` sorts oldest -- it predates the counter, so it is the
     least evidence of recent use there is -- with the URL as a tie-break so

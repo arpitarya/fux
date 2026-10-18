@@ -38,7 +38,7 @@ _RECORD_LEVEL = fixed("markdown", "record_level")
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.jsonl", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
+VERSION = fixed("decoders.jsonl", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output); nor W-282 (moved module paths in comments)
 
 EXTENSIONS = tuple(fixed("decoders.jsonl", "extensions"))
 
@@ -84,7 +84,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
             continue
         # ⚠ **The record boundary is the chunk boundary, and it used to be
         # invisible.** Walking the whole list under one `label=None` emitted no
-        # heading between records, so `refer/_chunk.py` saw one undivided
+        # heading between records, so `text/chunk.py` saw one undivided
         # passage and a citation spanning six unrelated log lines read as one
         # statement. A JSONL record is the natural unit of this format — one
         # line in, one section out.

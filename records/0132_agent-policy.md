@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@35780e5af97d]
+owns: [src/fux/templates/agents@dcd13c002392]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: fdc8f8bd2690ac4a6c14fec7581849db2a201c21fc494745b0ecdd34690eea39
+content_sha: ebf7ffb925f535c77290d48046963c22bfc1771361c8a11bd3452de19d0415c8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -899,7 +899,7 @@ three vendor copies in this repository are re-copied byte for byte (decision 10)
 - The fact this policy interprets —
   [SR-ARCHIVED-CONTENT](0134_archived-content.md) decisions 6 and 7.
 - The precedent for caller-owned policy — [SR-REFER](0127_refer-plane.md) and
-  [`src/fux/refer/freshness.py`](../src/fux/refer/freshness.py): *three
+  [`src/fux/acquire/freshness.py`](../src/fux/acquire/freshness.py): *three
   callers want three different answers from the same index, and no single
   engine-wide policy is right for more than one of them.*
 - The installer this extends — [`src/fux/setup.py`](../src/fux/setup.py)
@@ -1049,7 +1049,7 @@ evidence.*
 
 **Code**
 
-- [`src/fux/refer/freshness.py`](../src/fux/refer/freshness.py)
+- [`src/fux/acquire/freshness.py`](../src/fux/acquire/freshness.py)
 - [`src/fux/setup.py`](../src/fux/setup.py)
 - [`src/fux/templates/agents/`](../src/fux/templates/agents/)
 - [`tests/test_setup_agents.py`](../tests/test_setup_agents.py)

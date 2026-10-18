@@ -7,21 +7,21 @@ description: "Exclusion moves out of the source lists into one .gitignore-shaped
 status: accepted
 date: 2026-08-27
 feature: the `.fux/.fuxignore` exclusion file
-owns: [src/fux/ingest/fuxignore.py@286e1f84fe6a]
+owns: [src/fux/acquire/fuxignore.py@286e1f84fe6a]
 laws: [L2, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 12767463e40dfbb42c151625d8f110b3dc0a5356fb4a4fc309264a1b05b26a60
+content_sha: ab0de82b21578b37b5f4408513270f4710af69758d7e5c7a389468b099ca781f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
-- [`src/fux/ingest/fuxignore.py`](../src/fux/ingest/fuxignore.py) · file
+- [`src/fux/acquire/fuxignore.py`](../src/fux/acquire/fuxignore.py) · file
 
 **Describes** — reaches into, does not own:
 
-- [`src/fux/ingest/gitdir.py`](../src/fux/ingest/gitdir.py) · owned by [SR-INGEST](0106_ingest.md)
+- [`src/fux/acquire/gitdir.py`](../src/fux/acquire/gitdir.py) · owned by [SR-INGEST](0106_ingest.md)
 
 <!-- COMPONENTS-END -->
 
@@ -393,8 +393,8 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/ingest/fuxignore.py` — `buried` ← `[files] fuxignore`
-- `src/fux/ingest/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
+- `src/fux/acquire/fuxignore.py` — `buried` ← `[files] fuxignore`
+- `src/fux/acquire/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
 
 <!-- L12-VALUES-END -->
 
@@ -404,7 +404,7 @@ this moved where they are written, not what they are.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
-**No decision here moved** (W-261, 2026-10-05): `ingest/gitdir.py`, which this record describes, lost the `dirs`-list readers to `ingest/dirlist.py` (SR-DIR-LIST's). `would_index`, `_generated_kind` and the walk's verdicts are untouched.
+**No decision here moved** (W-261, 2026-10-05): `acquire/gitdir.py`, which this record describes, lost the `dirs`-list readers to `acquire/dirlist.py` (SR-DIR-LIST's). `would_index`, `_generated_kind` and the walk's verdicts are untouched.
 
 ### Consequences
 
@@ -512,10 +512,10 @@ this moved where they are written, not what they are.
 
 ### Reference (required)
 
-- The code: [`src/fux/ingest/fuxignore.py`](../src/fux/ingest/fuxignore.py)
+- The code: [`src/fux/acquire/fuxignore.py`](../src/fux/acquire/fuxignore.py)
   (`parse`, `Ignores.decide`, `duplicate_warnings`, `_translate`, and for
   decision 11 `write_blocks`, `writable`, `Generated`) and its callers,
-  [`src/fux/ingest/gitdir.py`](../src/fux/ingest/gitdir.py) (`walk_sources`,
+  [`src/fux/acquire/gitdir.py`](../src/fux/acquire/gitdir.py) (`walk_sources`,
   `would_index`) and
   [`src/fux/ingest/skipnotice.py`](../src/fux/ingest/skipnotice.py)
   (`write`, `unseen`, `stale_warnings`).
@@ -598,9 +598,9 @@ evidence.*
 
 **Code**
 
-- [`src/fux/ingest/fuxignore.py`](../src/fux/ingest/fuxignore.py)
-- [`src/fux/ingest/gitdir.py`](../src/fux/ingest/gitdir.py)
-- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py)
+- [`src/fux/acquire/fuxignore.py`](../src/fux/acquire/fuxignore.py)
+- [`src/fux/acquire/gitdir.py`](../src/fux/acquire/gitdir.py)
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py)
 - [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py)
 - [`tests/ingest/test_fuxignore.py`](../tests/ingest/test_fuxignore.py)
 

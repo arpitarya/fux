@@ -55,7 +55,7 @@ with no headings — which is why there was never a special case to delete.
 
 from __future__ import annotations
 
-from .tokenize import tokenize
+from ..text.tokenize import tokenize
 
 #: How many matched headings a single result may show is `.fux/output.toml`'s
 #: `max_headings` (`[cli]` for ask/find, `[mcp]` for the MCP surface) — three

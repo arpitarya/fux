@@ -20,9 +20,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from fux.ingest import cmd_ingest, fuxignore, ingest_and_report, skipnotice
-from fux.ingest.dirlist import source_excludes
-from fux.ingest.gitdir import Skipped, read_types
+from fux.ingest import cmd_ingest, ingest_and_report, skipnotice
+from fux.acquire import fuxignore
+from fux.acquire.dirlist import source_excludes
+from fux.acquire.gitdir import Skipped, read_types
 from fux.store import iter_shard_paths
 from l12_fixtures import write_config
 

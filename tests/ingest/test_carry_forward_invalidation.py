@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import pytest
 
-from fux.ingest import decoderdigest
+from fux.acquire import decoderdigest
 from fux.ingest.run import run
 from l12_fixtures import write_config
 

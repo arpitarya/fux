@@ -23,7 +23,7 @@ INDEX_DIR = fixed("index", "dir")
 # anywhere, and a reader cannot tell "this corpus links without words" from
 # "this index predates anchor text" — the W-48 trap, on the edge.
 # `analyzer` is UNTOUCHED (decision 9.2): anchor terms go through the same
-# `query/tokenize.py` every other term does, so no hash changes meaning.
+# `text/tokenize.py` every other term does, so no hash changes meaning.
 # v4 (W-194, 2026-09-20): `meta` and `title_h` are GONE from the record. Arpit
 # ruled hashed display meta deleted outright rather than deprecated, so a URL
 # record carries a plain `title` and `phrases` like every other record and law

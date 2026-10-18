@@ -120,7 +120,7 @@ def test_manifest_is_sorted_and_stable(tmp_path):
 
 
 def test_the_manifest_holds_no_wall_clock(tmp_path):
-    # `maintain/urlstate.py`'s rule: counters, never clocks. Wall clock lives
+    # `acquire/urlstate.py`'s rule: counters, never clocks. Wall clock lives
     # in refer/fetchcache.py's TTL store and nowhere else.
     acquired.write_manifest(
         tmp_path, {"https://x/a": acquired.Blob("https://x/a", "b" * 64, XLSX, 10)}

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-27
 amended: 2026-09-22
 feature: the confidence plane
-owns: [src/fux/query/confidence.py@fdccb0b489f4, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
+owns: [src/fux/query/confidence.py@4ca01e637d08, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 1dfdc67b7d8fcbd0184852ae1ad606019c8f161f773403a6f777f075d44f64e2
+content_sha: 6fa6a03005330c0774b5c6b80524dbb96798f13f7f033bfa197fd74f86ba359d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -468,7 +468,8 @@ doc_coverage_floor = 0.0   # as shipped; 0.0 = the clause is OFF
   ✅ **It is no longer SILENT, and no longer uncaught (2026-09-14, W-164 gate 4).**
   This bullet ended *"it is silent, and **nothing mechanical catches it**"* from
   the day the reversal was accepted. Two surfaces now say so, from **one string**
-  (`doctor.FLOOR_OFF_NOTE` — two accounts of one fact is how they drift):
+  (`query/confidence.py::FLOOR_OFF_NOTE`, beside the band it describes — two
+  accounts of one fact is how they drift):
 
   1. **`fux doctor`'s `confidence floors` row**, for whoever goes looking.
   2. **A once-per-PROCESS note on `ask`'s stderr**, for whoever does not. The
@@ -1102,7 +1103,7 @@ evidence.*
 **Code**
 
 - [`src/fux/query/confidence.py`](../src/fux/query/confidence.py)
-- [`src/fux/query/analyzer.py`](../src/fux/query/analyzer.py)
+- [`src/fux/text/analyzer.py`](../src/fux/text/analyzer.py)
 - [`src/fux/query/bm25f.py`](../src/fux/query/bm25f.py)
 - [`src/fux/schemas/output.schema.json`](../src/fux/schemas/output.schema.json)
 - [`tools/quality/mix.toml`](../tools/quality/mix.toml)

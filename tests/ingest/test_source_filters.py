@@ -11,14 +11,14 @@ from __future__ import annotations
 import pytest
 
 from fux.errors import FuxError
-from fux.ingest.dirlist import source_dirs, source_excludes
-from fux.ingest.gitdir import (
+from fux.acquire.dirlist import source_dirs, source_excludes
+from fux.acquire.gitdir import (
     DEFAULT_TYPES,
     TypeFilter,
     read_types,
     walk_sources,
 )
-from fux.ingest.sourcelist import DIRS, TYPES, URLS, glob_match, parse
+from fux.acquire.sourcelist import DIRS, TYPES, URLS, glob_match, parse
 from l12_fixtures import write_config
 
 
@@ -319,7 +319,7 @@ def test_a_hand_written_reinclude_turns_pruning_off(tree):
     """A `.fuxignore` `!` re-include outranks an exclusion, and could name a
     file under the excluded directory. While one exists, the walk enumerates as
     it always did, so that file is still indexed."""
-    from fux.ingest import fuxignore
+    from fux.acquire import fuxignore
 
     ignores = fuxignore.parse("!work/regression/r1/evidence/n.md\n")
     walked, _ = walk_sources(

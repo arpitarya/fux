@@ -24,7 +24,7 @@ stylesheet is a destination group this decoder skips wholesale (it is where
 
 Before 2026-09-06 no heading was emitted at all: every RTF was one undivided
 blob, mined for no `phrases` and cut into blind 4 KB slabs by
-`refer/_chunk.py`. `\\pard` resets paragraph properties and therefore clears a
+`text/chunk.py`. `\\pard` resets paragraph properties and therefore clears a
 pending level, which is what stops one heading marking every paragraph after it.
 """
 
@@ -40,7 +40,7 @@ from fux.decode._limits import limit
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.rtf", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
+VERSION = fixed("decoders.rtf", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output); nor W-282 (moved module paths in comments)
 
 EXTENSIONS = tuple(fixed("decoders.rtf", "extensions"))
 

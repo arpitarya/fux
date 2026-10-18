@@ -68,7 +68,7 @@ def _load(root: Path) -> dict | None:
     """`.fux/formats.toml [limits]`, or `None` when the file is absent — which
     `limit()` then reports, so a decoder that reads no cap never needs the file."""
     from ..constants import fixed
-    from ..ingest import typesfile
+    from ..acquire import typesfile
 
     path = root / fixed("files", "formats")
     try:
@@ -134,7 +134,7 @@ def check(root: Path) -> None:
     `[index]` precedent, SR-TABULAR decision 6)."""
     from ..constants import fixed
     from ..errors import FuxError
-    from ..ingest import typesfile
+    from ..acquire import typesfile
 
     have = typesfile.read(root).limits
     missing = [
@@ -153,7 +153,7 @@ def digest_lines(root: Path) -> str:
 
     Only the keys the built-ins read: a consumer's extra table changes nothing
     fux extracts, so it must not force a re-extraction."""
-    from ..ingest import typesfile
+    from ..acquire import typesfile
 
     have = typesfile.read(root).limits
     return "\n".join(

@@ -54,8 +54,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import PurePosixPath
 
-from ..query.identifiers import EMPTY, IdentifierRules
-from ..query.tokenize import tokenize
+from ..text.identifiers import EMPTY, IdentifierRules
+from ..text.tokenize import tokenize
 from .parse import ParsedDoc
 from ..constants import fixed
 

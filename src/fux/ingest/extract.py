@@ -52,7 +52,7 @@ from ..constants import fixed
 #: sectionless_formats`: `.csv`, `.json`, `.jsonl`) return no `sections`
 #: (SR-SECTIONS decision 2, W-271's option b). Their documents lose their
 #: section lines and `nsec` at the next ingest.
-RULES_VERSION = fixed("versions", "extract_rules")  # 5 since W-273 (no sections for record formats); W-233 did not bump: no families = identical output
+RULES_VERSION = fixed("versions", "extract_rules")  # 5 since W-273 (no sections for record formats); W-233 did not bump: no families = identical output; W-282 did not bump: imports moved, same output
 
 #: SR-SECTIONS decision 2 (W-273): extensions whose documents are sectionless
 #: whatever headings their decoder emits — one heading per record is not a
@@ -66,8 +66,8 @@ from pathlib import Path
 
 from ..decode._markdown import headings as _md_headings
 from ..decode._markdown import strip_headings as _md_strip_headings
-from ..query.identifiers import EMPTY, IdentifierRules
-from ..query.tokenize import tokenize
+from ..text.identifiers import EMPTY, IdentifierRules
+from ..text.tokenize import tokenize
 from .parse import ParsedDoc, meta_fields
 
 #: The cap on `phrases` is `.fux/tune.toml [index] max_phrases` (default
@@ -82,7 +82,7 @@ from .parse import ParsedDoc, meta_fields
 #: a `# Install dependencies` line inside a ```bash block was counted as a
 #: heading, given heading-field weight, published in `phrases` where `fux ask`
 #: renders it as a `§` line, and **removed from the body**. Every SR in this
-#: repository contains such a block. `refer/_chunk.py` reads the same module,
+#: repository contains such a block. `text/chunk.py` reads the same module,
 #: so the two planes can no longer disagree about what a heading is.
 #:
 #: The `text` group name is still shared by all three patterns below, so the
@@ -265,7 +265,7 @@ def extract_fields(
     # redacted text, headings included, front-matter not. A declaration is the
     # document's own words, so this is extraction and is carried forward on an
     # unchanged sha exactly like `terms`.
-    from ..query.mined import mine
+    from ..text.mined import mine
 
     abbr = tuple(mine(doc.body))
     sections = _index_sections(rel_path, doc.body, own_counts, ids)
@@ -293,7 +293,7 @@ def _index_sections(rel_path: str, body: str, own_counts: tuple[int, int], ids) 
     """
     if _grammar(rel_path) is not None or _extension(rel_path) in _SECTIONLESS_FORMATS:
         return ()
-    from ..refer._chunk import index_sections
+    from ..text.chunk import index_sections
 
     texts = index_sections(body)
     if len(texts) <= 1:

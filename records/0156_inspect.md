@@ -8,10 +8,10 @@ amended: 2026-10-13
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@215dbbf4a61a, .fux/inspect.toml@a2b927adc116]
+owns: [src/fux/inspect@87c48db021cb, .fux/inspect.toml@a2b927adc116, src/fux/inspect_config.py@9362e4e69b02]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 2356ef58f21e2751c9bbefc572abb6e148de7456cb31e29622a102d51150b7f6
+content_sha: d645329d7ff8ed7f7e5a9a113468cac93a15dd3b7863321dca16696993530053
 ratifies: W-169
 ---
 
@@ -21,6 +21,7 @@ ratifies: W-169
 
 - [`.fux/inspect.toml`](../.fux/inspect.toml) · file
 - [`src/fux/inspect/`](../src/fux/inspect) · dir
+- [`src/fux/inspect_config.py`](../src/fux/inspect_config.py) · file
 
 <!-- COMPONENTS-END -->
 
@@ -392,7 +393,7 @@ rank, the report's row counts, the X-ray's caps, and the explorer's triage and
 Words-tab page sizes — for seven tables: `[thresholds]`, `[minhash]`,
 `[findability]`, `[probes]`, `[report]`, `[xray]`, `[serve]`.
 
-- **One loader, `inspect/config.py`**, strict inside a repository (a missing
+- **One loader, `inspect_config.py`**, strict inside a repository (a missing
   file or key is a named error with the `fux doctor --fix` remedy), and the
   packaged template outside one — `fux inspect --diff A B` needs no repository.
 - **`read_index_view` attaches it to the view**, so every lens already had it;

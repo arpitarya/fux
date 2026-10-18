@@ -93,8 +93,8 @@ def _fake_fetch_all(root, entries, *a, **kw):
     `refer.source.from_acquired` imports them: a second copy of this pipeline
     drifts by one line and makes a passing test prove the wrong thing.
     """
-    from fux.ingest import urlsrc
-    from fux.ingest.urlsrc import _decode_fetched, sanitize
+    from fux.acquire import urlsrc
+    from fux.acquire.urlsrc import _decode_fetched, sanitize
 
     out = []
     for entry in entries:
@@ -116,7 +116,7 @@ def seeded(tmp_path, monkeypatch):
     file simulates the network, and it simulates it by returning exactly what
     `.fux/acquired/` already holds.
     """
-    from fux.ingest import urlsrc
+    from fux.acquire import urlsrc
 
     root = _repo(tmp_path)
     _retain(root)
@@ -153,7 +153,7 @@ def test_a_new_pii_rule_re_extracts_the_url_from_retained_bytes(seeded):
 
 def test_the_redacted_term_actually_leaves_the_index(seeded):
     """The point of all of it. A re-extraction that kept the term fixes nothing."""
-    from fux.query.tokenize import tokenize
+    from fux.text.tokenize import tokenize
     from fux.store import term_hash
 
     (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
@@ -274,7 +274,7 @@ def test_re_derivation_is_byte_identical_to_what_a_fetch_would_produce(seeded, m
     record — including its `sha`, which fingerprints the SOURCE and not fux's
     redacted view of it.
     """
-    from fux.ingest import urlsrc
+    from fux.acquire import urlsrc
 
     (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
     write_config(seeded)

@@ -35,7 +35,7 @@ bundle *transcribes* this analyzer and a drift between the two readers is a
 Python's copy be updated and Node's forgotten, which is the precise failure the
 fixture exists to catch.
 
-**Stdlib only, offline, no index.** `analyze()` imports `query/stem.py` and
+**Stdlib only, offline, no index.** `analyze()` imports `text/stem.py` and
 nothing else, so this runs anywhere — including a Cowork bridge shell.
 """
 
@@ -47,7 +47,7 @@ from pathlib import Path
 
 import pytest
 
-from fux.query.analyzer import _STOPWORDS, analyze
+from fux.text.analyzer import _STOPWORDS, analyze
 
 #: The separators an identifier is split on for the *derived flags* below. This
 #: is the check's own notion of "the parts a human would read", deliberately

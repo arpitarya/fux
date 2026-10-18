@@ -47,7 +47,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..store import fuxdir
+from . import fuxdir
 from ..constants import fixed
 
 _JSON_INDENT = fixed("json", "indent")

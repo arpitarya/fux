@@ -32,7 +32,7 @@ from fux.query.find import cmd_find
 from fux.query.confidence import BANDS, GROUNDED, NONE, PARTIAL, WEAK, Confidence, signals
 DOC_COVERAGE_FLOOR = template_tune().doc_coverage_floor
 SEPARATION_FLOOR = template_tune().separation_floor
-from fux.query.tokenize import tokenize, tokenize_pairs
+from fux.text.tokenize import tokenize, tokenize_pairs
 from fux.store import content_sha, term_hash, write_index
 
 N = 1000
@@ -116,7 +116,7 @@ def test_support_counts_scored_results_and_is_zero_on_the_empty_branch():
 def test_ask_and_find_never_claim_a_freshness_they_did_not_check():
     """`unverified` means *we did not look*, and it must never read `current`.
 
-    Collapsing the two is the exact failure `refer/freshness.py`'s four-state
+    Collapsing the two is the exact failure `acquire/freshness.py`'s four-state
     verdict exists to prevent, and re-introducing it one layer up would undo
     that for every agent reading `--json` instead of the refer plane.
     """

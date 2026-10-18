@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from fux.ingest import refusals
+from fux.acquire import refusals
 
 PROBE = Path(__file__).resolve().parents[2] / "tools" / "refusal-probe"
 CASES = tomllib.loads((PROBE / "cases.toml").read_text(encoding="utf-8"))["case"]

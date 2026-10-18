@@ -163,7 +163,7 @@
       "",
       "Derived, never committed, for step 1's reason: the table is corpus-wide.",
       "The scan builds the identical table from the shards' raw bytes",
-      "(query/mined.py::table_from_shards); the fold reads pairs in this order,",
+      "(text/mined.py::table_from_shards); the fold reads pairs in this order,",
       "so the sort is part of the differential law, not presentation."
     ],
     "shape": { "type": "dict", "key": "pairs", "value": "list of [list of hash, list of hash]" },

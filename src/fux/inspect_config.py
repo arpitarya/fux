@@ -18,8 +18,8 @@ from dataclasses import dataclass, fields
 from importlib import resources
 from pathlib import Path
 
-from ..constants import fixed
-from ..errors import FuxError
+from .constants import fixed
+from .errors import FuxError
 
 __all__ = ["InspectConfig", "load", "template_text", "INSPECT_NAME"]
 

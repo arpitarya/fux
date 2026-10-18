@@ -12,7 +12,7 @@ nothing but the JSON named by `--out`.
         --out work/regression/2026-09-30-section-size/evidence/sizes.json
 
 ⚠ The index-section rule below is SR-SECTIONS decision 2, written here because
-it is not built. It reuses `refer/_chunk.py`'s `_sections` and `_title_index`
+it is not built. It reuses `text/chunk.py`'s `_sections` and `_title_index`
 unchanged; the one difference from the chunker's `_fold` is the fold test:
 **bodiless**, not **shorter than `[refer] min_passage_bytes`**, so no tunable
 reaches a committed byte.
@@ -34,12 +34,12 @@ sys.path.insert(0, str(ROOT / "src"))
 from fux import store  # noqa: E402
 from fux.decode._markdown import headings as md_headings  # noqa: E402
 from fux.decode._markdown import strip_headings  # noqa: E402
-from fux.ingest import pii as pii_mod  # noqa: E402
+from fux.acquire import pii as pii_mod  # noqa: E402
 from fux.ingest.extract import _headings_and_body  # noqa: E402
 from fux.ingest.parse import parse_document  # noqa: E402
-from fux.query import identifiers as ids_mod  # noqa: E402
-from fux.query.tokenize import tokenize  # noqa: E402
-from fux.refer._chunk import _sections  # noqa: E402
+from fux.text import identifiers as ids_mod  # noqa: E402
+from fux.text.tokenize import tokenize  # noqa: E402
+from fux.text.chunk import _sections  # noqa: E402
 
 def _fill_missing_limits() -> None:
     """The rungs' `.fux/formats.toml` predates W-225's `[limits]` keys, and the

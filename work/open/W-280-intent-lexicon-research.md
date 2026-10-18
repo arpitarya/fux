@@ -4,10 +4,23 @@ name: W-280
 description: "Research item (Arpit, 2026-10-13): the intent cue lexicon in constants.toml [intent] tags 36 of 693 released questions and zero on two sets. Research whether a stronger lexicon, a lead-in-tolerant prepare, or a fourth doc type for yes/no policy questions can make the prior reach the questions people actually ask — and whether the gain is measurable under L13 at all. No code."
 item: W-280
 filed: 2026-10-13
+filed_by: "Arpit (Claude Code, Fable 5.1)"
+updated: 2026-10-18
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: agent
 ---
 
 # W-280 — research: can the intent cue lexicon reach the questions people ask?
+
+## At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 1 | Decide whether the feature is worth more cue words at all — no consumer uses it yet | possibly "close it for now" | ⏳ |
+| 2 | Work out where yes/no questions ("can I…", "is it still…") are answered | whether a fourth document type is needed | ⏳ |
+| 3 | Compare tolerating lead-ins ("hi, how do I…") with looser patterns | more questions reached, without false hits | ⏳ |
+| 4 | Check whether any question set can measure a gain under the ship bar | no run that can only end inconclusive | ⏳ |
+| 5 | Write the proposal, "do nothing" included; Arpit picks | a decision | 🔴 Arpit decides |
 
 **Status: filed 2026-10-13, not started.** Research and a proposal only; **no
 code, no lexicon change, no record change.**

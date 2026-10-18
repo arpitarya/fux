@@ -323,7 +323,7 @@ def resolve_parallel(module, configured: int, warn_at: int) -> int:
       how much load the wiki should take. A large value is merely rude, so it is
       **honoured with a warning that states the cost**, never clamped down.
     - **`max_parallel < 1` is BROKEN** and refuses, the same treatment
-      `cache_ttl_seconds < 0` already gets in `refer/freshness.py`.
+      `cache_ttl_seconds < 0` already gets in `acquire/freshness.py`.
 
     ⚠ **There is no silence any more** (W-225 stage 3b). This took `None` for
     an unconfigured source and answered `min(declared, DEFAULT_MAX_PARALLEL)`
@@ -551,7 +551,7 @@ def _record_refusals(root: Path, denied: dict[str, int]) -> None:
     if not denied:
         return
     try:
-        from ..maintain import urlstate
+        from . import urlstate
 
         urlstate.record_refusals(root, denied)
     except Exception:  # pragma: no cover - a report must not break a run
@@ -577,7 +577,7 @@ def _report_rate_limits(root: Path, limited: dict[str, int]) -> None:
     """
     if not limited:
         return
-    from ..maintain import urlstate
+    from . import urlstate
 
     urlstate.record_rate_limits(root, limited)
     for host, count in sorted(limited.items()):
@@ -728,7 +728,7 @@ def fetch_all(
     run_seq = None
     if keep_urls:
         try:
-            from ..maintain import urlstate
+            from . import urlstate
 
             run_seq = urlstate.read(root).run_seq
         except Exception:  # advisory: a missing counter must not stop a fetch
@@ -881,7 +881,7 @@ def fetch_all(
         # eviction is safe at all.
         failing: set[str] = set()
         try:
-            from ..maintain import urlstate
+            from . import urlstate
 
             # `fail_streak > 0`, not `>= failing_streak`. That key is the
             # threshold for *reporting* a URL as dead; here a SINGLE failure is
@@ -1187,7 +1187,7 @@ def declared_decoder(root: Path, loc: str) -> str | None:
     decoded, and their sha is compared against ingest's.** Reading the same
     committed line both did is what makes the two decodes identical *by
     construction* rather than by two callers agreeing to pass the same string —
-    the false-staleness hazard `refer/source.py`'s docstring names, closed the
+    the false-staleness hazard `acquire/source.py`'s docstring names, closed the
     way `sanitize` was closed: one function, shared.
 
     `None` when the URL is not listed (or nothing is configured), which is an

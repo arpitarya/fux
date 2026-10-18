@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L2
 owns: []
 laws: [L2]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 31ecf553ef11b69265302469668b3c676fd9491372737483d2a0265954758387
+content_sha: cbe1dde64952af36461956d6627366ef1da0a5efae610e6954ed577f529350e8
 ---
 
 # SR-LAW-2 — L2 — $0, FOSS-only
@@ -57,6 +57,15 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 3. **Byte-identity became conditional.** It was free while every path was stdlib pinned by `requires-python`. It is now a function of dependency resolution on the maintenance path.
 
 ⚠ **What the amendment does NOT do.** It does not authorize a model — L4 is untouched. It does not make convenience a reason to add a dependency. It does not retire hand-rolled code that works. And it does not close the consumer decoder seam, which stands on a better ground than L2 ever gave it.
+
+### ⚠ The 2026-10-18 amendment — role packages
+
+**Arpit, 2026-10-18, in Cowork, on [W-282](../work/open/W-282-reader-writer-packages.md) F1** — asked whether L2's *one install* permits a reader-only and a writer-only package, and shown the sentence this amendment adds: *"For first one, go with the recommendation."*
+
+- **What it permits:** `fux-reader` (search and answers) and `fux-writer` (ingest and maintenance) as separate installs beside `fux-engine`, which still installs everything.
+- **What it keeps:** inside any one package, nothing is optional. A role package is complete for its role, so no capability inside it depends on what somebody chose at install time.
+- **What it costs, named now:** a reader-only machine cannot `ingest`, and that is now lawful. The "one install" promise holds for `fux-engine` alone.
+- ⚠ **Still refused:** an optional extra on any package, such as the `fux-reader[postgres]` that index-stores §8 sketched.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
@@ -126,6 +135,8 @@ Amending a law needs Arpit's ruling, named in this record
   **Dependencies ship packaged.** Fux is one install with everything it needs —
   no optional extras, no "install this for PDFs", no capability that works on
   one machine and not another because of what somebody chose at install time.
+  **`fux-engine` is the one install; `fux-reader` and `fux-writer` are role
+  packages — each complete for its role, none with optional extras.**
   **Permission is not authorization:** the law permits a dependency, a record
   still decides one, and every runtime dependency is named by an accepted SR.
   **Dev, test and measurement tooling is bound by the same licence rule and

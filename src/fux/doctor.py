@@ -26,6 +26,8 @@ from .errors import FuxError
 from . import output_config
 from .store import fuxdir
 from .constants import fixed
+# Defined beside the band it describes (W-282); the floor row prints it.
+from .query.confidence import FLOOR_OFF_NOTE
 
 _JSON_INDENT = fixed("json", "indent")
 
@@ -647,7 +649,7 @@ def _priority_keys(root: Path) -> Check:
     """
     import math
 
-    from .ingest import sourcelist
+    from .acquire import sourcelist
     from .query.rank import Weighting
     from .tune import load as load_tune
 
@@ -708,7 +710,7 @@ def _pii_health(root: Path) -> Check:
     the words that would have found them. `tools/pii-probe/` is where that is
     visible, and no offline check substitutes for reading what a rule caught.
     """
-    from .ingest import pii
+    from .acquire import pii
 
     # SR-PII decision 17: a missing file is an ERROR row -- `load` raises and
     # says what to run. `doctor` is exempt from the CLI gate so that it gets
@@ -744,7 +746,7 @@ def _pii_timing(root: Path) -> Check:
     from time import perf_counter
 
     from .constants import fixed
-    from .ingest import pii
+    from .acquire import pii
 
     name = "pii timing"
     try:
@@ -807,7 +809,7 @@ def _redaction_note(root: Path, rules) -> str:
     same number. `tools/pii-probe/` is the instrument; this is the pointer to
     it.
     """
-    from .ingest import pii
+    from .acquire import pii
 
     counts = pii.read_counts(root)
     if counts is None:
@@ -909,8 +911,8 @@ def _fetcher_routes(root: Path) -> Check:
       a table written before the URLs are added, so it is never an error alone.
     """
     from .config import load as load_config
-    from .ingest import routes as routes_mod
-    from .ingest import sourcelist
+    from .acquire import routes as routes_mod
+    from .acquire import sourcelist
 
     name = "fetcher routes"
     try:
@@ -1001,8 +1003,8 @@ def _pinned_fetchers(root: Path) -> Check:
     `ingest --unpin-default`.
     """
     from .config import load as load_config
-    from .ingest import routes as routes_mod
-    from .ingest import sourcelist
+    from .acquire import routes as routes_mod
+    from .acquire import sourcelist
 
     name = "pinned fetchers"
     try:
@@ -1073,7 +1075,7 @@ def _url_decoders(root: Path) -> Check:
     """
     from .config import load as load_config
     from .decode import BUILTIN_MODULES, CONSUMER_DIR, PROSE_DECODER
-    from .ingest import sourcelist
+    from .acquire import sourcelist
 
     name = "url decoders"
     try:
@@ -1144,7 +1146,7 @@ def _observed_types(root: Path) -> Check:
     decoder.
     """
     from .config import load as load_config
-    from .ingest import sourcelist, urlsrc
+    from .acquire import sourcelist, urlsrc
     from .store import acquired
 
     name = "observed types"
@@ -1286,7 +1288,7 @@ def _fetcher_bindings(root: Path) -> Check:
     when something is already wrong.
     """
     from .config import load as load_config
-    from .ingest import sourcelist, urlsrc
+    from .acquire import sourcelist, urlsrc
 
     name = "fetcher bindings"
     try:
@@ -1357,7 +1359,7 @@ def _pinned_without_bytes(root: Path) -> Check:
     warn about while fux may still go and look.
     """
     from .config import load as load_config
-    from .ingest import urlsrc
+    from .acquire import urlsrc
     from .store import acquired
 
     name = "pinned url bytes"
@@ -1597,7 +1599,7 @@ def _refusal_health(root: Path) -> Check:
     intranet pages is a legitimate state of the world and failing `doctor` on
     it would train people to ignore a red one.
     """
-    from .ingest import refusals
+    from .acquire import refusals
 
     if not refusals.rules_path(root).is_file():
         return Check(
@@ -1612,7 +1614,7 @@ def _refusal_health(root: Path) -> Check:
         return Check("refusal rules", False, str(exc))
 
     try:
-        from .maintain import urlstate
+        from .acquire import urlstate
 
         counted = dict(urlstate.read(root).refused)
     except Exception:
@@ -1672,7 +1674,7 @@ def provenance_counts(root: Path) -> dict:
     **Never raises.** A caller reading `doctor --json` in CI must not have its
     pipeline broken by an advisory, derived file.
     """
-    from .ingest import decoderdigest, ingestlog
+    from .acquire import decoderdigest, ingestlog
 
     try:
         if not ingestlog.path_for(root).is_file():
@@ -1710,7 +1712,7 @@ def _provenance(root: Path) -> Check:
 
     Read-only and offline. It opens two runtime files and imports no decoder.
     """
-    from .ingest import decoderdigest, ingestlog
+    from .acquire import decoderdigest, ingestlog
 
     if not ingestlog.path_for(root).is_file():
         return Check(
@@ -2088,7 +2090,7 @@ def _identifiers(root: Path) -> list[Check]:
     a template's two readers are held equal by the engine's own shared fixture.
     """
     from . import store as store_mod
-    from .query import identifiers as ids_mod
+    from .text import identifiers as ids_mod
 
     try:
         rules = ids_mod.load(root)
@@ -2130,7 +2132,7 @@ def _identifier_families_current(root: Path) -> Check:
 
     from .inspect._scan import read_index_view
     from .inspect.idfamilies import identifier_families
-    from .query import identifiers as ids_mod
+    from .text import identifiers as ids_mod
 
     try:
         view = read_index_view(root, progress=_PROGRESS)
@@ -2166,7 +2168,7 @@ def _identifier_regex_parity(root: Path, regexes) -> Check:
 
     from .inspect._scan import read_index_view
     from .inspect.idfamilies import corpus_texts, regex_parity
-    from .query.identifiers import IdentifierRules
+    from .text.identifiers import IdentifierRules
 
     view = read_index_view(root)
     texts = list(islice(corpus_texts(root, view), view.config.parity_sample))
@@ -2231,7 +2233,7 @@ def _types_health(root: Path) -> Check:
        empty the index — `fux setup` once wrote exactly that, and **`setup`
        then `ingest` failed on every fresh repo** until 2026-08-27.
     """
-    from .ingest import typesfile
+    from .acquire import typesfile
 
     try:
         listed = typesfile.read(root, DEFAULT_TYPES_FILE)
@@ -2344,7 +2346,7 @@ def _ignore_health(root: Path) -> Check:
     someone puts a `!` in front of the `.fuxignore` copy they get the opposite
     of what the other file says, silently. This check is early for that.
     """
-    from .ingest import fuxignore
+    from .acquire import fuxignore
 
     path = root / fuxignore.IGNORE_FILE
     if not path.is_file():
@@ -2412,7 +2414,7 @@ def _ignore_reachable(root: Path) -> Check:
     without the trailing `/`) is recognised; a broader glob below a narrower
     one is a shadow this does not see.
     """
-    from .ingest import fuxignore
+    from .acquire import fuxignore
 
     name = "fuxignore reachable"
     if not (root / fuxignore.IGNORE_FILE).is_file():
@@ -2504,7 +2506,7 @@ def _dirs_exclusions_migrated(root: Path) -> Check:
 
     **ASCII only** - it is printed, and printed text reaches a Windows console.
     """
-    from .ingest import fuxignore
+    from .acquire import fuxignore
 
     dirs_file = _dirs_file(root)
     if dirs_file is None:
@@ -2853,7 +2855,7 @@ def _unbound_types(root: Path) -> Check:
     rather than a fault.
     """
     from . import decode as decode_mod
-    from .ingest import typesfile
+    from .acquire import typesfile
 
     try:
         listed = typesfile.read(root, DEFAULT_TYPES_FILE)
@@ -2934,7 +2936,7 @@ def _listed_dirs_exist(root: Path) -> Check:
     ⚠ **Exclusions are not checked.** A `!` line names a pattern, not a path,
     and a pattern matching nothing today is exactly what a pattern is for.
     """
-    from .ingest import sourcelist
+    from .acquire import sourcelist
 
     dirs_file = _dirs_file(root)
     if dirs_file is None:
@@ -3111,20 +3113,6 @@ def _confidence_floors(root: Path) -> Check:
     return Check("confidence floors", False, FLOOR_OFF_NOTE, level="warn")
 
 
-#: The one sentence both surfaces print. **One string, two callers** — `doctor`'s
-#: row and `ask`'s first-of-process note would otherwise drift into two accounts
-#: of one fact. **ASCII only**: it is printed, and printed text reaches a Windows
-#: console.
-FLOOR_OFF_NOTE = (
-    "`[confidence] separation_floor = 0.0` in .fux/tune.toml: NO answer in this repo "
-    "can ever be `weak` again. That tunes away the SIGNAL, not the ranking - a "
-    "`grounded` here does not mean what a `grounded` elsewhere means. The band "
-    "publishes the floor it was judged under (`--band`, or the `confidence` block in "
-    "`--json`), which is the only way a reader can tell. Raise it, or keep it and "
-    "know what the band is worth"
-)
-
-
 def _url_health(root: Path) -> Check:
     """The `url:` half of the corpus, reported (W-82 §3.1).
 
@@ -3145,7 +3133,7 @@ def _url_health(root: Path) -> Check:
     reporting it as a failure would train people to ignore a red doctor —
     the same reasoning `_accelerator` records.
     """
-    from .maintain import urlstate
+    from .acquire import urlstate
 
     try:
         from .store import reader
@@ -3258,7 +3246,7 @@ def _unfetched_note(root: Path, indexed: list[str]) -> list[str]:
     everything else here.
     """
     from .config import load as load_config
-    from .ingest import urlsrc
+    from .acquire import urlsrc
 
     try:
         config = load_config(root)
@@ -3302,7 +3290,7 @@ def _pinned_note(root: Path) -> list[str]:
     counted too.
     """
     from .config import load as load_config
-    from .ingest import urlsrc
+    from .acquire import urlsrc
 
     try:
         config = load_config(root)

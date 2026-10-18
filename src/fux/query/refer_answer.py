@@ -13,13 +13,13 @@ cross-document and was being run on a field of one.
 
 ## Why this is safe under L5 (offline by default)
 
-A `file:` citation never needs a fetcher — `refer/source.py`'s git strategy
+A `file:` citation never needs a fetcher — `acquire/source.py`'s git strategy
 reads the local checkout, no network, always. A `url:` citation only exists
 in the corpus because the user already configured `[sources.url]` with a
 real URL — the network dependency was created by that configuration choice,
 not invented by `answer` deciding to fetch on its own. This module never
 runs `fux setup` or writes anything; a missing consumer fetcher degrades to
-the refer plane's own honest `unverified` verdict (`refer/source.py`'s
+the refer plane's own honest `unverified` verdict (`acquire/source.py`'s
 `_fetch_url`), never a crash.
 """
 
@@ -31,7 +31,7 @@ from typing import TYPE_CHECKING
 
 from ..errors import FuxError
 from ..refer import Bundle, Policy, refer
-from ..refer.freshness import ALWAYS, NEVER
+from ..acquire.freshness import ALWAYS, NEVER
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from ..tune import Tune
@@ -142,10 +142,10 @@ def answer_via_refer(
 def _load_fetchers(root: Path, citations: list[tuple[str, str, str]]):
     """Resolve every fetcher the candidates need, and route by URL.
 
-    Mirrors `ingest/urlsrc.py`'s own resolution exactly — verifying with a
+    Mirrors `acquire/urlsrc.py`'s own resolution exactly — verifying with a
     *different* fetcher than a document was ingested with compares a rendered
     page against a shell and reports a false staleness on every query
-    (`refer/source.py`'s module docstring).
+    (`acquire/source.py`'s module docstring).
 
     ## Why this dispatches instead of loading one module
 
@@ -195,7 +195,7 @@ def _load_fetchers(root: Path, citations: list[tuple[str, str, str]]):
         return None, noop, True
 
     from ..config import load as load_config
-    from ..ingest import urlsrc
+    from ..acquire import urlsrc
 
     try:
         config = load_config(root)

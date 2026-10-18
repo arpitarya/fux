@@ -61,7 +61,7 @@ committed index.
   one heading.
 - **What already exists:**
   - [SR-CHUNKING](../../records/0151_chunking.md) derives sections from heading
-    depth, with nothing declared. `refer/_chunk.py` cuts them.
+    depth, with nothing declared. `text/chunk.py` cuts them.
   - [SR-REFER](../../records/0127_refer-plane.md) fetches the cited documents and
     **re-scores their passages against the question**, to choose what to quote.
   - [SR-RERANK](../../records/0138_rerank.md) already turns those passages into

@@ -1,5 +1,5 @@
 /** The five verdicts, and what each actually claims.
- *  Twin of `src/fux/refer/freshness.py`, minus everything that fetches.
+ *  Twin of `src/fux/acquire/freshness.py`, minus everything that fetches.
  *
  * 🔴 **Node never fetches** (W-107 R6), so only three of the five are
  * reachable here: `current`/`stale` from reading the local checkout, and

@@ -55,7 +55,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fux.ingest import pii as pii_mod  # noqa: E402
+from fux.acquire import pii as pii_mod  # noqa: E402
 from fux.ingest.extract import _headings_and_body  # noqa: E402
 from fux.ingest.parse import parse_document  # noqa: E402
 from fux.query.bm25f import derive_wlen  # noqa: E402
@@ -64,7 +64,7 @@ from fux.tune import load as _load_tune  # noqa: E402
 #: The template's scoring — L12 left no copy in code (W-225).
 DEFAULT_SCORING = _load_tune(Path('.'), enabled=False).scoring
 FIELD_WEIGHTS = DEFAULT_SCORING.weights
-from fux.query.tokenize import tokenize  # noqa: E402
+from fux.text.tokenize import tokenize  # noqa: E402
 from fux.store import TF_FIELDS, reader  # noqa: E402
 
 LAB = Path.home() / "my_programs" / "fux-lab" / "corpora" / "golden"

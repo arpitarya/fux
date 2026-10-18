@@ -16,7 +16,7 @@ from __future__ import annotations
 import pytest
 
 from fux.errors import FuxError
-from fux.ingest import routes
+from fux.acquire import routes
 from l12_fixtures import write_config
 
 
@@ -215,7 +215,7 @@ def test_the_answer_path_resolves_through_resolve_urls_and_nothing_else(monkeypa
     answer plane is how the two come apart, so this asserts the answer plane
     goes through the one function rather than re-deriving a path.
     """
-    from fux.ingest import urlsrc
+    from fux.acquire import urlsrc
     from fux.query import refer_answer
 
     seen = []
@@ -255,6 +255,6 @@ def test_fetcher_for_joins_the_declared_directory_and_nothing_else():
     rather than left to be discovered.
     """
     from fux.config import FETCHERS_DIR
-    from fux.ingest.urlsrc import fetcher_for
+    from fux.acquire.urlsrc import fetcher_for
 
     assert fetcher_for("cdp") == f"{FETCHERS_DIR}/cdp.py"

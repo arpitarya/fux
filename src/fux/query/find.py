@@ -54,7 +54,7 @@ def _filtered(root: Path, results, args) -> tuple[list, int]:
     if not (phrase or under or require_all or no_archived):
         return list(results), 0
 
-    from .analyzer import analyze
+    from ..text.analyzer import analyze
     from .scan import query_term_hashes
 
     before = len(results)
@@ -77,7 +77,7 @@ def _filtered(root: Path, results, args) -> tuple[list, int]:
     if require_all:
         # Over the COMMITTED record's terms — never fetched text. `find` is an
         # offline verb and the whole point of `--all` is that it is cheap.
-        from . import identifiers as ids_mod
+        from ..text import identifiers as ids_mod
 
         wanted = set(query_term_hashes(args.query, ids_mod.for_root(root)))
         survivors = []

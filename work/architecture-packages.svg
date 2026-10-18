@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 1150" width="1020" height="1150" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10" fill="none" stroke="#3d6df2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect width="1020" height="1150" fill="#fcfcfb"/>
+<text x="46" y="52" font-size="23" font-weight="600" fill="#14181f">Fux packages, after the split</text>
+<text x="46" y="76" font-size="13" fill="#626b78">What a consumer installs, and everything that comes with it. Planned in W-282 -- ruled, not built.</text>
+<path d="M560,104 L598,104" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/><text x="606" y="108" font-size="11.5" fill="#626b78">depends on -- installs it</text>
+<rect x="752" y="96" width="22" height="16" rx="4" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.4"/><text x="782" y="108" font-size="11.5" fill="#626b78">what most people install</text>
+<text x="46" y="108" font-size="11.5" fill="#c2410c">orange = a rule the split must keep</text>
+<circle cx="58" cy="146" r="11" fill="#3d6df2"/><text x="58" y="150" font-size="12" fill="#ffffff" font-weight="600" text-anchor="middle">1</text>
+<text x="78" y="150" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">WHAT DEPENDS ON WHAT</text>
+<rect x="60" y="166" width="610" height="498" rx="12" fill="#ffffff" stroke="#e4e4e0" stroke-width="1.2"/>
+<text x="80" y="192" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">PYPI -- PYTHON 3.12+</text>
+<rect x="245" y="206" width="240" height="96" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+<text x="263" y="234" font-size="14" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fux-engine</text>
+<text x="263" y="256" font-size="12" fill="#4a5260">everything, exactly as today</text>
+<text x="263" y="274" font-size="12" fill="#4a5260">the fux CLI -- every verb</text>
+<rect x="80" y="352" width="250" height="124" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="98" y="380" font-size="14" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fux-reader</text>
+<text x="98" y="402" font-size="12" fill="#4a5260">search and answers</text>
+<text x="98" y="420" font-size="12" fill="#4a5260">ask . find . answer . build</text>
+<text x="98" y="438" font-size="12" fill="#4a5260">graph . path . serve . mcp . verify</text>
+<text x="98" y="456" font-size="12" fill="#8a93a0">+ refer: decoders, fetchers, PII</text>
+<rect x="400" y="352" width="250" height="124" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="418" y="380" font-size="14" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fux-writer</text>
+<text x="418" y="402" font-size="12" fill="#4a5260">ingest and upkeep -- Python only</text>
+<text x="418" y="420" font-size="12" fill="#4a5260">setup . ingest . add . remove</text>
+<text x="418" y="438" font-size="12" fill="#4a5260">enrich . correct . hooks . daemon</text>
+<text x="418" y="456" font-size="12" fill="#8a93a0">+ the Node bundle, for fux setup</text>
+<rect x="245" y="526" width="240" height="96" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="263" y="554" font-size="14" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fux-core</text>
+<text x="263" y="576" font-size="12" fill="#4a5260">shared, pure -- no verbs</text>
+<text x="263" y="594" font-size="12" fill="#4a5260">record format . analyzer . config</text>
+<text x="263" y="612" font-size="12" fill="#4a5260">constants.toml . errors</text>
+<path d="M330,302 L224,348" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M400,302 L506,348" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M215,476 L320,522" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M535,476 L410,522" fill="none" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="365" y="650" font-size="11.5" fill="#c2410c" text-anchor="middle">fux-reader and fux-writer never import each other -- a layer test holds the line</text>
+<rect x="690" y="166" width="270" height="498" rx="12" fill="#ffffff" stroke="#e4e4e0" stroke-width="1.2"/>
+<text x="710" y="192" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">NPM -- NODE 22+</text>
+<rect x="708" y="206" width="234" height="124" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="726" y="234" font-size="14" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">@fux-engine/reader</text>
+<text x="726" y="256" font-size="12" fill="#4a5260">new -- the @fux-engine scope</text>
+<text x="726" y="274" font-size="12" fill="#4a5260">one file: reader + core inlined</text>
+<text x="726" y="292" font-size="12" fill="#4a5260">ask . find . answer . graph . mcp</text>
+<text x="726" y="310" font-size="12" fill="#4a5260">re-checks sources, as today</text>
+<text x="726" y="328" font-size="12" fill="#4a5260"></text>
+<rect x="708" y="372" width="234" height="96" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="726" y="400" font-size="14" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">fux-engine</text>
+<text x="726" y="422" font-size="12" fill="#4a5260">unchanged -- the same</text>
+<text x="726" y="440" font-size="12" fill="#4a5260">reader bundle as today</text>
+<text x="710" y="500" font-size="12" fill="#4a5260" font-weight="600">Both: one file, no dependencies.</text>
+<text x="710" y="520" font-size="12" fill="#8a93a0">No Node writer, ever (ruled 2026-10-05).</text>
+<text x="710" y="560" font-size="12" fill="#c2410c">Create the @fux-engine org on npm</text>
+<text x="710" y="578" font-size="12" fill="#c2410c">(free) before the first release;</text>
+<text x="710" y="596" font-size="12" fill="#c2410c">@fux belongs to another npm user.</text>
+<circle cx="58" cy="702" r="11" fill="#3d6df2"/><text x="58" y="706" font-size="12" fill="#ffffff" font-weight="600" text-anchor="middle">2</text>
+<text x="78" y="706" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">WHAT LANDS ON THE CONSUMER'S MACHINE</text>
+<rect x="60" y="722" width="900" height="210" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+<text x="80" y="742" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">YOU RUN</text><text x="330" y="742" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">IT INSTALLS</text><text x="850" y="742" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">THIRD-PARTY</text>
+<line x1="60" y1="752" x2="960" y2="752" stroke="#eef0f2" stroke-width="1"/>
+<text x="80" y="772" font-size="12" fill="#14181f" font-family="ui-monospace, Menlo, monospace">pip install fux-engine</text>
+<text x="330" y="772" font-size="12" fill="#4a5260">fux-engine, fux-reader, fux-writer, fux-core -- 4 packages</text>
+<text x="850" y="772" font-size="12" fill="#1d8a5e" font-weight="600">none</text>
+<line x1="60" y1="782" x2="960" y2="782" stroke="#eef0f2" stroke-width="1"/>
+<text x="80" y="802" font-size="12" fill="#14181f" font-family="ui-monospace, Menlo, monospace">pip install fux-reader</text>
+<text x="330" y="802" font-size="12" fill="#4a5260">fux-reader, fux-core -- 2 packages</text>
+<text x="850" y="802" font-size="12" fill="#1d8a5e" font-weight="600">none</text>
+<line x1="60" y1="812" x2="960" y2="812" stroke="#eef0f2" stroke-width="1"/>
+<text x="80" y="832" font-size="12" fill="#14181f" font-family="ui-monospace, Menlo, monospace">pip install fux-writer</text>
+<text x="330" y="832" font-size="12" fill="#4a5260">fux-writer, fux-core -- 2 packages</text>
+<text x="850" y="832" font-size="12" fill="#1d8a5e" font-weight="600">none</text>
+<line x1="60" y1="842" x2="960" y2="842" stroke="#eef0f2" stroke-width="1"/>
+<text x="80" y="862" font-size="12" fill="#14181f" font-family="ui-monospace, Menlo, monospace">pip install fux-core</text>
+<text x="330" y="862" font-size="12" fill="#4a5260">fux-core -- 1 package (a library; nothing to run)</text>
+<text x="850" y="862" font-size="12" fill="#1d8a5e" font-weight="600">none</text>
+<line x1="60" y1="872" x2="960" y2="872" stroke="#eef0f2" stroke-width="1"/>
+<text x="80" y="892" font-size="12" fill="#14181f" font-family="ui-monospace, Menlo, monospace">npm install @fux-engine/reader</text>
+<text x="330" y="892" font-size="12" fill="#4a5260">@fux-engine/reader -- 1 package, 1 file</text>
+<text x="850" y="892" font-size="12" fill="#1d8a5e" font-weight="600">none</text>
+<line x1="60" y1="902" x2="960" y2="902" stroke="#eef0f2" stroke-width="1"/>
+<text x="80" y="922" font-size="12" fill="#14181f" font-family="ui-monospace, Menlo, monospace">npm install fux-engine</text>
+<text x="330" y="922" font-size="12" fill="#4a5260">fux-engine -- 1 package, 1 file (unchanged)</text>
+<text x="850" y="922" font-size="12" fill="#1d8a5e" font-weight="600">none</text>
+<circle cx="58" cy="966" r="11" fill="#3d6df2"/><text x="58" y="970" font-size="12" fill="#ffffff" font-weight="600" text-anchor="middle">3</text>
+<text x="78" y="970" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">WHY THE TREE STOPS THERE</text>
+<rect x="60" y="988" width="900" height="84" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+<text x="80" y="1012" font-size="13" fill="#14181f" font-weight="600">Every transitive install is one of fux's own packages. Nothing else.</text>
+<text x="80" y="1032" font-size="11.5" fill="#4a5260">Today <tspan font-family="ui-monospace, Menlo, monospace">pyproject.toml</tspan> says <tspan font-family="ui-monospace, Menlo, monospace">dependencies = []</tspan> and <tspan font-family="ui-monospace, Menlo, monospace">node/package.json</tspan> names no dependencies. L2 allows FOSS dependencies,</text>
+<text x="80" y="1049" font-size="11.5" fill="#4a5260">but each must be named by an accepted SR -- none is. No package has optional extras (L2, amended 2026-10-18). A Rust ingest core (W-268),</text>
+<text x="80" y="1066" font-size="11.5" fill="#4a5260">if built, compiles into the fux-writer wheel: still no new package, and fux-reader stays pure Python.</text>
+<line x1="60" y1="1102" x2="960" y2="1102" stroke="#e4e4e0" stroke-width="1"/>
+<text x="60" y="1118" font-size="10.5" fill="#8a93a0">Planned, not built -- drawn 2026-10-18 from W-282 (rulings F1, F2, F4) and the tree at 3.0.1: pyproject.toml, node/package.json. npm registry checked 2026-10-18.</text>
+<text x="60" y="1134" font-size="10.5" fill="#8a93a0">SR-LAW-2 - SR-CLI - SR-WORK-RELEASE - index-stores.md section 8. Readers today: architecture-two-readers.svg. Whole system: architecture-high-level.svg.</text>
+</svg>

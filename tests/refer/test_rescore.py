@@ -7,7 +7,7 @@ import ast
 import inspect
 import sys
 
-from fux.refer._chunk import Passage, chunk
+from fux.text.chunk import Passage, chunk
 from fux.refer._rescore import rescore
 
 # `fux.refer` re-exports the `rescore` *function*, which shadows the submodule

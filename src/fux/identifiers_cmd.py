@@ -23,7 +23,7 @@ import tomllib
 from pathlib import Path
 
 from .errors import FuxError
-from .query import identifiers as ids_mod
+from .text import identifiers as ids_mod
 
 #: A TOML table header line — where the `[detected]` block ends.
 _TABLE = re.compile(r"^\s*\[[^\[\]]+\]\s*(#.*)?$")

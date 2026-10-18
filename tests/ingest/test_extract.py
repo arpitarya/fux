@@ -6,7 +6,7 @@ import pytest
 from fux.ingest.extract import extract_fields
 from fux.ingest.parse import ParsedDoc, parse
 from fux.query.bm25f import derive_wlen
-from fux.query.tokenize import tokenize
+from fux.text.tokenize import tokenize
 
 
 def test_title_from_frontmatter():

@@ -2,7 +2,7 @@
  *
  * 🔴 **The fixture is the SAME FILE the Python test reads** —
  * `tests/query/identifiers-fixture.json`. `node/src/query/identifiers.mjs` is
- * a transcription of `src/fux/query/identifiers.py`, and a divergence is a
+ * a transcription of `src/fux/text/identifiers.py`, and a divergence is a
  * silent no-match: the query writes a canonical term the index never did.
  *
  * ⚠ If Python's `tests/query/test_identifiers.py` passes and this fails, the

@@ -22,12 +22,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from ..ingest.edges import TAG_PREFIX
+from ..constants import fixed
 
-#: Re-exported, not redefined: `ingest/edges.py` mints every tag node, so it
-#: owns the namespace. This package consumes the vocabulary and does not
-#: re-decide it — the same rule this module's docstring already states for
-#: the edge kinds and grades.
+#: Read from the key `ingest/edges.py` mints every tag node with, not
+#: redefined: the namespace is `constants.toml [graph] tag_prefix`, and this
+#: package consumes it rather than importing the writer that mints it (W-282)
+#: — the same rule this module's docstring already states for the edge kinds
+#: and grades.
+TAG_PREFIX = fixed("graph", "tag_prefix")
 __all__ = ["Edge", "Graph", "TAG_PREFIX"]
 
 

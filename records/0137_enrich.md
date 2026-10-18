@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@40e487645fc2, src/fux/enrich.py@f088f4f6b552, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@fafeb8b35584, node/test/pins.test.mjs@daebcdb98aac]
+owns: [src/fux/correct.py@e1a235d29134, src/fux/enrich.py@3d0f8ae966d2, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@fafeb8b35584, node/test/pins.test.mjs@daebcdb98aac, src/fux/store/corrections.py@be66e8efb505, src/fux/store/enrichfile.py@2f1d9142b1b1]
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 2787dc3b22b50b4729bb808d54b8227b075a1dd44833a8b9198208c1072b595b
+content_sha: 40f342466a9be805b729c8bd9a7e7bdea94cbc6286961d24e65b9b76c4d0c28a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -22,6 +22,8 @@ content_sha: 2787dc3b22b50b4729bb808d54b8227b075a1dd44833a8b9198208c1072b595b
 - [`node/test/pins.test.mjs`](../node/test/pins.test.mjs) · file
 - [`src/fux/correct.py`](../src/fux/correct.py) · file
 - [`src/fux/enrich.py`](../src/fux/enrich.py) · file
+- [`src/fux/store/corrections.py`](../src/fux/store/corrections.py) · file
+- [`src/fux/store/enrichfile.py`](../src/fux/store/enrichfile.py) · file
 - [`src/fux/templates/agents/ENRICH-SKILL.md`](../src/fux/templates/agents/ENRICH-SKILL.md) · file
 
 <!-- COMPONENTS-END -->
@@ -533,7 +535,7 @@ means.**
 | **richer embeddings** | fux computes no vectors at all ([SR-ASK](0103_ask.md) decision 9) | *behind B-245's reopen trigger*; **L2 collision** — a larger or API-served model may be *called once and pinned*, never imported into the runtime |
 
 ⚠ **Import path moved 2026-08-27, behaviour unchanged.** ``src/fux/enrich.py`` now imports
-`chunk` from **`fux.refer._chunk`**: the module was made private because
+`chunk` from **`fux.text.chunk`**: the module was made private because
 `fux.refer` re-exported the `chunk` *function* over its own submodule of that
 name, a shape that had already cost four defects and silently narrowed L5's
 network import fence. The function, its signature and its output are untouched —
@@ -686,7 +688,7 @@ a missing blob already is — never a crash inside a planning command.
 
 **No decision here moved** (W-254, 2026-10-04): `enrich._chunk_count` passes `frontmatter=False` to the chunker, so an enrichment unit count is what it was before the frontmatter passage existed.
 
-**No decision here moved** (W-261, 2026-10-05): `enrich_dirs` is imported from `ingest/dirlist.py` (SR-DIR-LIST's) instead of `ingest/gitdir.py`; it reads the same committed declaration.
+**No decision here moved** (W-261, 2026-10-05): `enrich_dirs` is imported from `acquire/dirlist.py` (SR-DIR-LIST's) instead of `acquire/gitdir.py`; it reads the same committed declaration.
 
 
 **W-236 (2026-10-10; branch `w236-sections`, unmerged) — the Node pin row, made equal to Python's.** `node/src/correct.mjs` builds the row for a pinned document the ranking never returned. It now carries `boosted: false` and `route: null`, as Python's `AskResult` always did. That was a parity gap from before W-236, found by its twin test. The row also carries `section: null` while `[ranking] section_weight > 0` ([SR-SECTIONS](0161_sections.md) decision 6).

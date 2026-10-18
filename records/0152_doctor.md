@@ -8,11 +8,11 @@ status: accepted
 amended: 2026-10-13
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@ec8bc29b1e3f, tests/test_doctor_register_is_complete.py@dff0d535b078]
+owns: [src/fux/doctor.py@d865bc99b5ac, tests/test_doctor_register_is_complete.py@dff0d535b078]
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: fabeb286577d57b0b421a03c780a01056639cc614fe3710e21c55076dd7ffd98
+content_sha: 83d8f2f0aa62ac5986252c92841d9156313f6b12366d47fd8665d3f0015cb7bd
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

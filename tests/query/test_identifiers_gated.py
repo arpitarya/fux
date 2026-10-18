@@ -17,8 +17,8 @@ from pathlib import Path
 
 import pytest
 
-from fux.query import identifiers as ids_mod
-from fux.query.identifiers import build
+from fux.text import identifiers as ids_mod
+from fux.text.identifiers import build
 
 REPO = Path(__file__).resolve().parents[2]
 FIXTURE = json.loads((Path(__file__).parent / "identifiers-fixture.json").read_text("utf-8"))

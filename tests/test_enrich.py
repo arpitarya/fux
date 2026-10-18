@@ -22,7 +22,7 @@ from fux.enrich import (
     prune,
     validate,
 )
-from fux.ingest import pii
+from fux.acquire import pii
 
 GOOD_BODY = (
     "Sets the payment gateway resilience policy for checkout. Covers "
@@ -197,7 +197,7 @@ def test_the_ctx_field_carries_enrichment_vocabulary():
     from fux.ingest.extract import extract_fields
     from fux.ingest.parse import parse
     from fux.store import TF_FIELDS
-    from fux.query.tokenize import tokenize
+    from fux.text.tokenize import tokenize
 
     ctx_i = TF_FIELDS.index("ctx")
     doc = parse(b"# Retry policy\n\nThe parser retries three times.\n")

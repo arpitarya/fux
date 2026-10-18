@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from l12_fixtures import chunk_bounds, scoring, template_tune
-from fux.refer._chunk import chunk
+from fux.text.chunk import chunk
 MAX_PASSAGE_BYTES = template_tune().max_passage_bytes
 MIN_PASSAGE_BYTES = template_tune().min_passage_bytes
 
@@ -74,7 +74,7 @@ def test_the_thresholds_are_ordered_sensibly():
 
 
 def test_a_fenced_hash_comment_does_not_open_a_passage():
-    """`refer/_chunk.py` used to split here, cutting a code example in two and
+    """`text/chunk.py` used to split here, cutting a code example in two and
     titling the second half with a shell comment."""
     doc = f"# A\n\n{_body('alpha')}\n\n```bash\n# Install dependencies\nuv sync\n```\n"
     passages = chunk(doc, **chunk_bounds(), line_numbers=True, frontmatter=False)

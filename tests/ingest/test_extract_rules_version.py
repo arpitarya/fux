@@ -23,7 +23,7 @@ from pathlib import Path
 import pytest
 
 from fux.ingest import extract as extract_mod
-from fux.ingest import typesfile
+from fux.acquire import typesfile
 from fux.ingest.run import _extract_config_digest
 from l12_fixtures import configured_root, write_config
 

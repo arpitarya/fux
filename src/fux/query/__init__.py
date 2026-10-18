@@ -104,7 +104,7 @@ def _archived_ranking(
     file is not covered by the tolerance either**; see `_tune`.
     """
     from ..config import CONFIG_NAME, load as load_config
-    from ..ingest.dirlist import archived_dirs
+    from ..acquire.dirlist import archived_dirs
 
     if not (root / CONFIG_NAME).is_file():
         dirs: frozenset[str] = frozenset()
@@ -238,7 +238,7 @@ def run_query(
     from .expand import build as build_expansion
     from .scan import query_term_hashes
 
-    from . import identifiers as ids_mod
+    from ..text import identifiers as ids_mod
 
     # W-233: the families the index was written with, so the question gains
     # the same canonical terms (`RF 118` -> `rf-118`).
@@ -259,9 +259,9 @@ def run_query(
     # fold is over the USER's words only, never a caller's `--expand`; it
     # stacks on that expansion, and a hash in both keeps the caller's weight.
     # The table comes from the path that will answer, so `--fast` and `--scan`
-    # fold identically (`query/mined.py`).
+    # fold identically (`text/mined.py`).
     if tune.mined_weight > 0 and query_hashes:
-        from . import mined as mined_mod
+        from ..text import mined as mined_mod
         from .expand import stack
 
         table = accel.mined_table(root) if use_accel else mined_mod.table_from_shards(root)
@@ -393,7 +393,7 @@ def _band_guard(root: Path, query: str, stats: dict | None, results: list) -> No
         from .scan import query_term_hashes
 
         terms = record.get("terms", {})
-        from . import identifiers as ids_mod
+        from ..text import identifiers as ids_mod
 
         shown = [h for h in query_term_hashes(query, ids_mod.for_root(root)) if h in terms]
         df, n = stats.get("df", {}), int(stats.get("n", 0))
@@ -427,7 +427,7 @@ def _apply_pin(root: Path, query: str, results: list, top: int) -> list:
     returns `None` the moment `.fux/eval/corrections.tsv` has no pins, which is
     a `stat` on the common path.
     """
-    from ..correct import pinned_for
+    from ..store.corrections import pinned_for
 
     try:
         doc_id = pinned_for(root, query)
@@ -498,7 +498,7 @@ def _fill_confidence(
     try:
         from .confidence import signals as build_signals
         from .scan import query_term_hashes
-        from .tokenize import tokenize_pairs
+        from ..text.tokenize import tokenize_pairs
 
         stats = stats or {}
         # SR-PROVENANCE reads the same `df`/`n` rather than recomputing them:
@@ -681,7 +681,7 @@ def _declare_floor_off(root: Path, tune, *, quiet: bool) -> None:
         return
     if getattr(tune, "separation_floor", None) != 0.0:
         return
-    from ..doctor import FLOOR_OFF_NOTE
+    from .confidence import FLOOR_OFF_NOTE
 
     _FLOOR_NOTE_SAID = True
     print(f"fux: {FLOOR_OFF_NOTE}", file=sys.stderr)
@@ -696,7 +696,7 @@ def _declare_pending(root: Path) -> None:
     ASCII only: a Windows console's default codepage cannot encode a fancy
     dash or arrow and the process crashes on print() rather than degrading.
     """
-    from ..maintain import dirty
+    from ..store import dirty
 
     pending = dirty.read(root)
     if pending:
@@ -1727,7 +1727,7 @@ def _cache_ttl_of(args) -> int:
     raw = getattr(args, "cache_ttl", None)
     if raw is None:
         return 0
-    from ..ingest.sourcelist import parse_duration
+    from ..acquire.sourcelist import parse_duration
 
     seconds = parse_duration(str(raw))
     if seconds is None:
@@ -1788,7 +1788,7 @@ def _declare_change_since_last_ask(root: Path, query: str, bundle) -> None:
     no diagnostic.
     """
     try:
-        from ..maintain import lastcited
+        from ..store import lastcited
 
         # ⚠ **The documents that were CITED, not every document fetched**
         # (W-108). With one candidate the two sets were identical. With three,

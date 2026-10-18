@@ -3,15 +3,15 @@ type: Standing Record
 kind: process
 name: SR-WORK-OPEN-QUEUE
 title: "SR-WORK-OPEN-QUEUE (0051) — how OPEN-WORK works"
-description: "The live queue's discipline has one home, and this is it. Fifty-eight rules across eight groups — what the file is, an item's lifecycle, the shape of a row, the four balls, ordering, the Blocked-on-Arpit inbox, the standing obligations, and how an item is closed: archived, never deleted. OPEN-WORK.md is the list and nothing else; it and CLAUDE.md reference this record and state no rule themselves."
+description: "The live queue's discipline has one home, and this is it. Sixty-four rules across ten groups — what the file is, an item's lifecycle, the shape of a row, the four balls, ordering, the Blocked-on-Arpit inbox, the standing obligations, how an item is closed: archived, never deleted — how an item's file opens: with a table or diagram fit to show in a meeting — and who filed and last updated each item. OPEN-WORK.md is the list and nothing else; it and CLAUDE.md reference this record and state no rule themselves."
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@be21ec782bd7, tests/test_open_work_is_not_stale.py@51da5a4571e6, tests/test_no_work_item_is_lost.py@9b0527556e40, scripts/check-open-work-inbox.py@0eee6f43e26c, .claude/hooks/guard-open-work-inbox.sh@1b479b74cb33]
+owns: [tests/test_open_work_rows_are_short.py@edc408037b7f, tests/test_open_work_is_not_stale.py@51da5a4571e6, tests/test_no_work_item_is_lost.py@9b0527556e40, scripts/check-open-work-inbox.py@0eee6f43e26c, .claude/hooks/guard-open-work-inbox.sh@1b479b74cb33]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: 48489ade93da0422d609dd93eaa7e975cd3fd044882be7e23ecfffda24805332
+content_sha: c452630999ec512cc15c489a44e35b5c067589f1dce46caaa9050aa8a8615b4d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -135,7 +135,7 @@ that is the only thing the file says.
 
 13. **One or two lines per item, always.**
 14. **A row is:** ball, optional 🧨, optional 🔺, id, lane, what is open, and a
-    link to the item's file.
+    link to the item's file — and, under *Open items*, who filed it (rule 64).
 15. **At most 280 characters.** Two 2 000-character lines are not a one-liner.
 16. **A row has no body** — no nested bullet, no table, no indented paragraph.
 17. **Every row links its own detail file**, and the `W-nn` in the row matches
@@ -316,6 +316,42 @@ that is the only thing the file says.
     its record plus its `WORKLOG` entry; the archived file is *why the call was
     made*, kept for the reader who asks two months later.
 
+**I · An item's file opens with its meeting view** *(appended 2026-10-18)*
+
+59. **The first thing under an item file's `# W-nn` title is `## At a glance`,
+    and the first thing under that heading is a table or a diagram** — a
+    Markdown table, a fenced `mermaid` or `text` diagram, or an image. Nothing
+    comes before it: not the ruling, not the `**Model:**` line, not a status
+    paragraph. Everything else in the file follows it, unchanged.
+60. **The view says what we are going to do, in plain English, so it can be put
+    on a screen in a meeting as it stands.** A table's default shape is one row
+    per step — `| step | what we do | what it gives us | state |` — with the
+    state as ✅ done · ⏳ not yet · 🔴 Arpit decides. Ids, metric names, law
+    numbers and file paths belong in the body below it, not in the view: the
+    same plain-English standard an OPEN-WORK row meets. A diagram is for an
+    item whose shape is a flow or a dependency rather than a list of steps.
+61. **The view changes in the same change as the item** (rule 49). A step that
+    finishes, fails or is descoped changes its row in the view and the body
+    together. **A view that disagrees with its body is wrong, and the body
+    wins** until the view is fixed.
+
+**J · Who filed it, and who last updated it** *(appended 2026-10-18)*
+
+62. **An item file's frontmatter names who filed it and who last updated it** —
+    `filed_by`, `updated` and `updated_by`, beside `filed`. Each `_by` value is
+    `"<person> (<surface>, <model>)"`: the person whose ask the item is, then
+    the session that wrote the bytes — e.g. `"Arpit (Cowork, Opus 5.5)"`. The
+    model is left out **only** when no record of it survives; it is never
+    guessed.
+63. **Every change to an item file sets `updated` and `updated_by`** to that
+    change's date and session, in the same change. `updated` is never earlier
+    than `filed`. A file just filed carries the same value in both pairs.
+64. **An *Open items* row names who filed it** — `Filed by <person>
+    (<surface>).`, copied from the file's `filed_by` without the model, just
+    before the detail link. A *Blocked on Arpit* row does not carry it: the
+    inbox row is what he decides, and the open-items row under it already says
+    who filed the item.
+
 ### Context
 
 **The rules above were stated twice and owned nowhere.** `CLAUDE.md`
@@ -449,11 +485,45 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
    the first clears itself when its blocker lands, the second never clears.
    `tests/test_open_work_rows_are_short.py` enforces the two forms.
 
+9. **Every item file opens with a meeting view** (Arpit, 2026-10-18 — rules
+   59–61): *"In work items and individual work item files, specifically, I want
+   the first item to be a graph or a tabular kind of structure, which is easier
+   to present in a meeting on what we are going to do in there. And we are going
+   to enforce it."* An item file is written for the builder who picks it up —
+   its ruling, evidence, forks and hazards — and that made every one of them
+   unpresentable: the reader of a meeting screen met a quoted ruling and a
+   paragraph of status before learning what the work *was*. The view puts the
+   plan first; the builder's text stays below it, untouched. **It is not a
+   second OPEN-WORK row**: the row says *that* an item is open and what it waits
+   on; the view says *what we will do*, step by step.
+   **Rule 59 is gated** by `tests/test_open_work_rows_are_short.py`
+   (`test_rule_59_every_item_file_opens_with_a_meeting_view`): position, heading
+   and shape. **Rules 60 and 61 are judgement** — no parser can tell plain
+   English from jargon, or a current view from a stale one. The template every
+   new file is written from is in [`work/open/README.md`](../work/open/README.md)
+   and, for a repository set up from it, `WORK-SYSTEM.md` §6.13.
+
+10. **Every item says who filed it and who last touched it** (Arpit,
+    2026-10-18 — rules 62–64): *"In work items, in front matter, always have
+    the name who filed the work item, who updated the work item. And in open
+    items as well, do call out who filed the work item."* Until now an item's
+    author lived only in its prose (*"Arpit, 2026-10-13 (Claude Code)"*) or in a
+    commit trailer, and with every commit authored as the same git user,
+    `git log` could not say which surface or model wrote a file. **The value
+    names both halves** — the person whose ask it is and the session that wrote
+    it — because either alone answers a different question. Rules 62–64 are
+    gated by `tests/test_open_work_rows_are_short.py`: the three keys and their
+    shape, `updated` ≥ `filed`, and every open-items row's `Filed by` equal to
+    its file's. **Whether `updated_by` was actually set by the last change is
+    judgement**, since nothing but the commit can say who made it.
+
 **No decision here moved** (W-245, 2026-10-04): `tests/test_open_work_is_not_stale.py`'s docstrings and failure messages cited rules 2, 3 and 4 by their pre-renumber handles; they now cite rules 3 and 10, 8 and 9, and 46.
 
 ### Consequences
 
 - **Rules 37, 38 and 47 are gated** (W-246, 2026-10-04) by `tests/test_open_work_rows_are_short.py`: the four group headers are present, every research row is lane `cowork` and its file names Cowork (37a), every `work/open/W-*.md` names an `SR-` record or says *no SR affected*, and the queue states no git state (committed, staged, pushed, unpushed). **The thirteen conduct rules (1, 5, 11, 12, 29, 30, 32, 33, 35, 36, 48, 50, 53) are judgement, permanently** — no parser can tell whether a session reconciled before it reported or whether a priority was honest, and a gate that pretended to would be coverage in name only.
+- **Rules 62–64 are gated** (2026-10-18) by `tests/test_open_work_rows_are_short.py` — the frontmatter keys, their `"<person> (<surface>, <model>)"` shape, `updated` ≥ `filed`, and each open-items row's `Filed by` matching its file. The eight items open that day were back-filled from their WORKLOG entries and commit messages; for W-263 and W-265 no record of the filing session's model survives, so the model is omitted rather than guessed.
+- **Rule 59 is gated** (2026-10-18) by `tests/test_open_work_rows_are_short.py`: every `work/open/W-*.md` has `## At a glance` as the first thing under its title, and a table (header, separator, at least one row), a closed `mermaid`/`text` fence or an image as the first thing under that. **Rules 60 and 61 are judgement.** All eight item files open at the time were given their view in the change that made the rule; `archive/open/` is history and is not retrofitted (rule 58).
 - **A rule changes in exactly one place and appears in exactly one place.**
   Nothing to regenerate, nothing to hold equal, and no second thing a reader can
   quote. The cost is the extra hop from the queue to this record.

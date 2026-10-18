@@ -1,4 +1,4 @@
-/** The index write lock. Twin of `src/fux/maintain/lock.py` (SR-LOCKS, W-261).
+/** The index write lock. Twin of `src/fux/store/lock.py` (SR-LOCKS, W-261).
  *
  * W-242 Tier 2 made Node a WRITER of the derived plane (`fux build`), so it must
  * exclude a Python `ingest` or `build` running on the same tree, and be excluded

@@ -7,10 +7,10 @@ description: "Prose plus every format a built-in decoder reads is compiled in as
 status: accepted
 date: 2026-08-20
 feature: the file-type allowlist and `.fux/formats.toml`
-owns: [src/fux/ingest/typesfile.py@cba4e18abe52, .fux/formats.toml@05666c969b79]
+owns: [src/fux/acquire/typesfile.py@cba4e18abe52, .fux/formats.toml@05666c969b79]
 laws: [L2, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: c4d9a4ece35389f6884df63c990f677c026c52a9ac2cf3b06f1fed46ddc5c9e3
+content_sha: 15ff916a85d8c94595b54507856272a6c29d8ee696435a6ffed9fbca19cfd5bc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,11 +18,11 @@ content_sha: c4d9a4ece35389f6884df63c990f677c026c52a9ac2cf3b06f1fed46ddc5c9e3
 **Owns** — the components this record decides:
 
 - [`.fux/formats.toml`](../.fux/formats.toml) · file
-- [`src/fux/ingest/typesfile.py`](../src/fux/ingest/typesfile.py) · file
+- [`src/fux/acquire/typesfile.py`](../src/fux/acquire/typesfile.py) · file
 
 **Describes** — reaches into, does not own:
 
-- [`src/fux/ingest/gitdir.py`](../src/fux/ingest/gitdir.py) · owned by [SR-INGEST](0106_ingest.md)
+- [`src/fux/acquire/gitdir.py`](../src/fux/acquire/gitdir.py) · owned by [SR-INGEST](0106_ingest.md)
 
 <!-- COMPONENTS-END -->
 
@@ -473,7 +473,7 @@ three source lists no longer share one grammar and one writer.
 - **Two bindings for one extension.** *"Defining a key multiple times is
   invalid"* — TOML refuses it before fux reads a value.
 
-**What is still checked, by [`typesfile.py`](../src/fux/ingest/typesfile.py):**
+**What is still checked, by [`typesfile.py`](../src/fux/acquire/typesfile.py):**
 the closed key set (`tomllib` accepts anything); every glob by the rule the line
 grammar used (`_type_reason`); every module name by its shape
 (`_decoder_reason`); and an extension key's shape — lowercase, no dot, no glob
@@ -517,7 +517,7 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/ingest/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
+- `src/fux/acquire/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
 
 <!-- L12-VALUES-END -->
 
@@ -548,7 +548,7 @@ carries them.
 
 **No decision here moved** (W-244, 2026-10-04): the walk prunes a `!`-excluded directory before the type allowlist is consulted for anything inside it ([SR-INGEST](0106_ingest.md) decision 24). A file there was skipped before either way, so no type verdict changes.
 
-**No decision here moved** (W-261, 2026-10-05): `ingest/gitdir.py`, which this record describes, lost the `dirs`-list readers to `ingest/dirlist.py` (SR-DIR-LIST's). `read_types`, `TypeFilter` and `_default_types` are untouched.
+**No decision here moved** (W-261, 2026-10-05): `acquire/gitdir.py`, which this record describes, lost the `dirs`-list readers to `acquire/dirlist.py` (SR-DIR-LIST's). `read_types`, `TypeFilter` and `_default_types` are untouched.
 
 ### Consequences
 
@@ -659,13 +659,13 @@ the short version:
 
 ### Reference (required)
 
-- The code: [`src/fux/ingest/gitdir.py`](../src/fux/ingest/gitdir.py)
+- The code: [`src/fux/acquire/gitdir.py`](../src/fux/acquire/gitdir.py)
   (`_PROSE_TYPES`, `_default_types`, `DEFAULT_TYPES`, `read_types`,
   `walk_sources`), the file itself in
-  [`src/fux/ingest/typesfile.py`](../src/fux/ingest/typesfile.py) (`parse`,
+  [`src/fux/acquire/typesfile.py`](../src/fux/acquire/typesfile.py) (`parse`,
   `read`, `check_legacy`, `render`, `add_include`, `set_decoder`, `remove`,
   `convert_legacy`), and `glob_match`, `_type_reason` and `_decoder_reason` in
-  [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py); the
+  [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py); the
   decoder registry the default unions with — [SR-DECODE](0139_decode.md).
 - Decision 11's binding, resolved and checked:
   [`src/fux/decode/__init__.py`](../src/fux/decode/__init__.py)
@@ -749,7 +749,7 @@ fux ingest --list-skipped | grep -c 'not an indexed file type'
 # 3 — unmeasured; it rides with the df pre-registration
 
 # 4 — the default must union BUILT-IN extensions only
-grep -n 'builtin_extensions' src/fux/ingest/gitdir.py
+grep -n 'builtin_extensions' src/fux/acquire/gitdir.py
 # expect: one call, inside _default_types()
 
 # 6 — decision 12's triggers
@@ -773,8 +773,8 @@ evidence.*
 
 **Code**
 
-- [`src/fux/ingest/gitdir.py`](../src/fux/ingest/gitdir.py)
-- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py)
+- [`src/fux/acquire/gitdir.py`](../src/fux/acquire/gitdir.py)
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py)
 
 **Project docs**
 

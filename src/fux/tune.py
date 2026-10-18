@@ -72,15 +72,11 @@ from __future__ import annotations
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from .constants import fixed
 from .errors import FuxError
-from .query.bm25f import Scoring
 from .store import TF_FIELDS
 
-if TYPE_CHECKING:  # pragma: no cover - typing only
-    from .query.rerank import Proximity
 
 __all__ = [
     "TUNE_NAME",
@@ -92,6 +88,97 @@ __all__ = [
     "specimen",
     "template_text",
 ]
+
+
+# The parameter objects this module builds. They live here, beside the keys
+# they are read from, because tune is core and both readers of them —
+# `query.bm25f` and `query.rerank` — are the reader's (W-282); each module
+# re-imports its own, so `query.bm25f.Scoring` still names this class.
+
+
+@dataclass(frozen=True)
+class Scoring:
+    """`k1`, `b` and the five field weights, carried as ONE object.
+
+    **Why one object and not three parameters.** Every number here appears on
+    both sides of the same fraction:
+
+        denom = wtf + k1 * (1 - b + b * wlen / avg_wlen)
+
+    `wtf` is the field weights applied to the numerator; `wlen` is the same
+    weights applied to the denominator; `k1` and `b` join them. A caller that
+    passes the weights and forgets `k1` reweights half a formula — which is
+    the exact defect [SR-TUNE](../../records/0135_tuning.md) decision 6
+    recorded as fux's own LUCENE-6819, one level up. Three parameters make
+    that mistake possible at every call site; one object makes it
+    unrepresentable.
+
+    Immutable, and built by `tune.Tune.scoring` from `.fux/tune.toml` — the
+    values and why each is what it is live beside their keys in the template
+    `fux setup` writes, never here (L12).
+    """
+
+    k1: float
+    b: float
+    #: Aligned index-for-index with `store.TF_FIELDS` — asserted in
+    #: `__post_init__`, because a silent misalignment would weight `title` as
+    #: `path` and produce a plausible, wrong ranking.
+    weights: tuple[float, ...]
+    #: W-168 step 1 — the anchor field's weight. `0.0` is OFF and is not
+    #: "weight zero": every anchor branch in the engine tests `anchor_on` and
+    #: is skipped entirely, so a corpus that sets `anchor = 0` pays no cost on
+    #: either candidate path and scores byte-identically to the build before
+    #: anchor text existed.
+    anchor: float
+    #: W-236 — `[ranking] section_weight`, B2's λ (SR-SECTIONS decision 5).
+    #: `0.0` is OFF exactly as `anchor` is: neither candidate generator opens
+    #: the section plane and `rank()` performs no section arithmetic, so the
+    #: ranking is byte-identical to an engine without section records. It is
+    #: on this object, not on `Weighting`, because both candidate paths need
+    #: it to decide what to read, and both already receive a `Scoring`.
+    section: float
+
+    def __post_init__(self) -> None:
+        if len(self.weights) != len(TF_FIELDS):
+            raise ValueError("field weights must align with TF_FIELDS")
+
+    @property
+    def anchor_on(self) -> bool:
+        """The one test for *is the anchor fold live?*
+
+        Read by both candidate generators and by the build. One spelling,
+        because a generator that folds anchors and one that does not is the
+        differential law failing — and it would fail data-dependently, on the
+        documents nobody linked to.
+        """
+        return self.anchor != 0.0
+
+    @property
+    def section_on(self) -> bool:
+        """The one test for *is B2's best-section term live?* — W-236."""
+        return self.section != 0.0
+
+
+@dataclass(frozen=True)
+class Proximity:
+    """The passage arithmetic's four `[ranking]` numbers, carried as one.
+
+    `coverage_power` — how hard a **missing** query term is punished: coverage
+    is raised to it before it multiplies. The measured argument is golden
+    `q015` (*"what is the current decision for east west traffic"*): the
+    superseded ADR scores BM25F 8.01 against the current one's 6.64, and the
+    current one contains every query term while the superseded one misses
+    `current` — which is *the entire question*. Linear coverage prices that
+    omission at 20 % and loses; squared prices it at 36 % and wins.
+
+    `base`, `span`, `adjacency` — the mix. The shipped values, and the depth
+    the reranker reorders to, live in `templates/tune.toml.txt` (L12).
+    """
+
+    coverage_power: float
+    base: float
+    span: float
+    adjacency: float
 
 #: Committed, and written once by `fux setup` (decision 2 and 3).
 TUNE_NAME = fixed("files", "tune")
@@ -342,8 +429,6 @@ class Tune:
     @property
     def proximity(self) -> "Proximity":
         """The reranker's passage arithmetic — coverage power and the mix."""
-        from .query.rerank import Proximity
-
         return Proximity(
             coverage_power=self.rerank_coverage_power,
             base=self.rerank_base,
@@ -428,17 +513,18 @@ def _edge_kinds(c: _Collector, table: str, key: str, value: object) -> object:
     if not isinstance(value, str):
         c.add(f"[{table}] {key} must be a string (got {value!r})")
         return value
-    from .graph import walk as walk_mod
-
+    # The graph plane's `walk.EDGE_KINDS`, read from the same key rather than
+    # imported: tune is core and the graph is the reader's (W-282).
+    edge_kinds = tuple(fixed("graph", "edge_kinds"))
     named = [k.strip() for k in value.split(",") if k.strip()]
     if not named:
         c.add(f"[{table}] {key} names no edge kind; the kinds this index mints are "
-              f"{', '.join(walk_mod.EDGE_KINDS)}")
+              f"{', '.join(edge_kinds)}")
         return value
-    unknown = sorted(set(named) - set(walk_mod.EDGE_KINDS))
+    unknown = sorted(set(named) - set(edge_kinds))
     if unknown:
         c.add(f"[{table}] {key} names {', '.join(unknown)}, which is not an edge kind; "
-              f"the kinds this index mints are {', '.join(walk_mod.EDGE_KINDS)}")
+              f"the kinds this index mints are {', '.join(edge_kinds)}")
         return value
     return ",".join(named)
 
@@ -751,7 +837,11 @@ def _resolve(data: dict, label: "Path | str") -> Tune:
     # case cannot occur: TOML keys are unique.
     priority.sort(key=lambda pair: (-len(pair[0]), pair[0]))
 
-    from .query.intent import TYPES
+    # `query.intent.TYPES`, read from the same table rather than imported:
+    # tune is core and the intent cues are the reader's (W-282).
+    from .constants import table
+
+    TYPES = frozenset(table("intent.type").values())
 
     doctype: list[tuple[str, str]] = []
     for pattern, kind in data.get("doctype", {}).items():

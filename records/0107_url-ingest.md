@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-05
 date: 2026-08-18
 feature: the `url:` source and how ingestion behaves around the fetcher boundary
-owns: [src/fux/ingest/urlingest.py@fa544e038bdb]
+owns: [src/fux/ingest/urlingest.py@b94ca9b209dc]
 laws: [L3, L5, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: fe0f6418d857453ea72a80678e070a7f517cd885df723698f640cabb9266d45d
+content_sha: fcb4ea67b0c89cc0255942fc5ea84f80585b106f4ae76ce69479d61160492f1c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -22,8 +22,8 @@ content_sha: fe0f6418d857453ea72a80678e070a7f517cd885df723698f640cabb9266d45d
 
 **Describes** — reaches into, does not own:
 
-- [`src/fux/ingest/urlsrc.py::fetch_all`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
-- [`src/fux/maintain/dirty.py`](../src/fux/maintain/dirty.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
+- [`src/fux/acquire/urlsrc.py::fetch_all`](../src/fux/acquire/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
+- [`src/fux/store/dirty.py`](../src/fux/store/dirty.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
 
 <!-- COMPONENTS-END -->
 
@@ -162,7 +162,7 @@ design. It is [SR-INGEST](0106_ingest.md) decision 9, and it is what
 `fux remove <URL>` rests on.
 
 **5. The pipeline is `read_urls` → `resolve_urls` → `fetch_all`**, in
-[`urlsrc.py`](../src/fux/ingest/urlsrc.py): parse the list, layer the
+[`urlsrc.py`](../src/fux/acquire/urlsrc.py): parse the list, layer the
 source-wide policy *under* the line's own attributes, then fetch each URL
 through the fetcher its line declared — importing only the fetchers some line
 actually names. The committed list's grammar, comment rule, dedupe-and-sort,
@@ -218,7 +218,7 @@ process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchange
 this moved where they are written, not what they are.
 
 - `src/fux/ingest/run.py` — `PII_DIGEST_FILE` ← `[index] pii_digest`, `EXTRACT_CONFIG_DIGEST_FILE` ← `[index] extract_config_digest`, `ENRICH_DIGEST_FILE` ← `[index] enrich_digests`, `DECODER_DIGEST_FILE` ← `[index] decoder_digests`, `STALE_REDACTION_FILE` ← `[runtime] stale_redaction`
-- `src/fux/maintain/dirty.py` — `DIRTY_NAME` ← `[maintain] dirty`
+- `src/fux/store/dirty.py` — `DIRTY_NAME` ← `[maintain] dirty`
 
 <!-- L12-VALUES-END -->
 
@@ -291,7 +291,7 @@ tail is never refreshed unless something else sweeps it."*
   word with the name substituted, which is why the record was renamed rather
   than re-decided.
 - 🔴 **An ABSENT dirty list sweeps EVERYTHING; a present-and-empty one fetches
-  nothing.** [`dirty.read`](../src/fux/maintain/dirty.py) collapses
+  nothing.** [`dirty.read`](../src/fux/store/dirty.py) collapses
   missing-and-unreadable to `[]` on purpose, because it feeds reporting paths
   where *"cannot tell"* should degrade quietly. **A consumer that acts on the
   list cannot afford that**: under narrow-by-default, empty means *fetch
@@ -362,9 +362,9 @@ added nothing of its own.
 
 **A moved identifier-family digest is a fourth trigger**, beside `pii.toml`, `tune.toml [index]` and a decoder, for re-deriving carried `url:` records from `.fux/acquired/` ([SR-IDENTIFIERS](0160_identifiers.md)).
 
-**No decision here moved** (W-253, 2026-10-04): `ingest/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
+**No decision here moved** (W-253, 2026-10-04): `acquire/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
 
-**Owns [`src/fux/ingest/urlingest.py`](../src/fux/ingest/urlingest.py) since 2026-10-05** ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). It is a pure move out of `ingest/run.py`: `listed_url_ids` (decision 4's offline reconciliation), `reacquire_urls`, `observe_url_health` and `report_dead_urls`, called by the walk exactly where they were. `fetch_all` in `ingest/urlsrc.py` (SR-FETCHER) and the background staleness pass in `maintain/dirty.py` (SR-MAINTENANCE) stay where they are, reached by this record's `describes` rows. Node never fetches, so there is no Node twin. ⚠ **This paragraph read *owns nothing, case (b)* until W-261.**
+**Owns [`src/fux/ingest/urlingest.py`](../src/fux/ingest/urlingest.py) since 2026-10-05** ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). It is a pure move out of `ingest/run.py`: `listed_url_ids` (decision 4's offline reconciliation), `reacquire_urls`, `observe_url_health` and `report_dead_urls`, called by the walk exactly where they were. `fetch_all` in `acquire/urlsrc.py` (SR-FETCHER) and the background staleness pass in `store/dirty.py` (SR-MAINTENANCE) stay where they are, reached by this record's `describes` rows. Node never fetches, so there is no Node twin. ⚠ **This paragraph read *owns nothing, case (b)* until W-261.**
 
 ### Consequences
 
@@ -413,7 +413,7 @@ added nothing of its own.
 ### Reference (required)
 
 - The fux half of the contract —
-  [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) (its docstring
+  [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py) (its docstring
   is the normative statement of the four functions).
 - The carry-forward rule —
   [`src/fux/ingest/run.py`](../src/fux/ingest/run.py) module docstring.
@@ -469,8 +469,8 @@ evidence.*
 **Code**
 
 - [`src/fux/ingest/run.py`](../src/fux/ingest/run.py)
-- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py)
-- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py)
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py)
+- [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py)
 
 **Measured evidence**
 

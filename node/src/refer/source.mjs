@@ -1,5 +1,5 @@
 /** Where a document's bytes come from — **the local checkout, and nothing
- *  else.** Twin of the `GIT` half of `src/fux/refer/source.py`.
+ *  else.** Twin of the `GIT` half of `src/fux/acquire/source.py`.
  *
  * 🔴 **Node never fetches, and this module is where that is enforced.** It
  * imports no transport and has no fetcher seam to inject one through. A `url:`

@@ -16,7 +16,8 @@ from pathlib import Path
 
 import pytest
 
-from fux.maintain import dirty, runner
+from fux.store import dirty
+from fux.maintain import runner
 
 
 def _corpus(root: Path, docs: int = 3) -> None:

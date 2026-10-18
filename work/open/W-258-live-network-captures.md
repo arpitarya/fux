@@ -4,10 +4,23 @@ name: W-258
 description: "One hands-on session on Arpit's machine for the three captures only a real network and his credentials can produce: B-124 live (a journalled answer whose source then disappears), B-102 (a real 429 against a real host), B-101 (CDP `MAX_PARALLEL` in signed-in Chrome against session-gated sources). Checklist, instruments and bars written so the session is twenty minutes of typing, not design. Filed 2026-10-04 (W-251 §3 #24)."
 item: W-258
 filed: 2026-10-04
+filed_by: "Arpit (Cowork, Fable 5.1)"
+updated: 2026-10-18
+updated_by: "Arpit (Cowork, Opus 5.5)"
 ball: arpit
 ---
 
 # W-258 — the live-network captures
+
+## At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 0 | Arpit says when to run — on hold by his word | the go-ahead | 🔴 Arpit decides |
+| 1 | Ask fux questions, take one source offline, ask again (about 20 min, no logins) | proof fux still answers honestly when a source disappears | ⏳ |
+| 2 | Point fux at a real website that rate-limits us | proof a "slow down" page is never indexed as a document | ⏳ |
+| 3 | Fetch 12+ signed-in pages in parallel Chrome tabs (recommended: park this one) | a safe parallel setting for consumers | ⏳ |
+| 4 | An agent writes the pass bars down first, then reports the results | the records restated on real numbers | ⏳ |
 
 **🔴 ON HOLD by Arpit's word, 2026-10-04 (Cowork):** *"block this on me as
 well. And keep it blocked until I say so."* Nothing here starts until he says

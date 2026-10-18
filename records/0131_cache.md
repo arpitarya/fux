@@ -10,7 +10,7 @@ feature: the refer plane's two caches, and the wall between them
 owns: [src/fux/refer/arc.py@838fb07d8fc5, src/fux/refer/fetchcache.py@0946b328bf10]
 laws: [L2, L3, L4, ex-L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: bdb76553878fe8ed498c07dc69190472f5875bd78c65b031b51abdd282748877
+content_sha: 87e0e5531363d3bc70d99245866f8670682ac4e36a4dc96625d634b52458fb16
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -105,7 +105,7 @@ The default that makes the TTL store unreachable until a caller asks for it —
 `cache_ttl_seconds = 0`, and `no_cache` beating any TTL:
 
 ```console
-$ grep -n 'def caches' -A 3 src/fux/refer/freshness.py
+$ grep -n 'def caches' -A 3 src/fux/acquire/freshness.py
     def caches(self) -> bool:
         """True when a cached copy may be served. `no_cache` always wins."""
         return self.cache_ttl_seconds > 0 and not self.no_cache
@@ -344,7 +344,7 @@ changes**: ARC and the TTL store stay Python's, and Node still never fetches.
 - The call site, where the consultation order of decision 12 is written —
   [`src/fux/refer/__init__.py`](../src/fux/refer/__init__.py) (`_obtain`)
 - The verdict and the policy knobs —
-  [`src/fux/refer/freshness.py`](../src/fux/refer/freshness.py) (`Policy`,
+  [`src/fux/acquire/freshness.py`](../src/fux/acquire/freshness.py) (`Policy`,
   `Verdict.label`, `cached`)
 - The tests — [`tests/refer/test_arc.py`](../tests/refer/test_arc.py) and
   [`tests/refer/test_fetchcache.py`](../tests/refer/test_fetchcache.py)
@@ -427,7 +427,7 @@ evidence.*
 - [`src/fux/refer/__init__.py`](../src/fux/refer/__init__.py)
 - [`src/fux/refer/arc.py`](../src/fux/refer/arc.py)
 - [`src/fux/refer/fetchcache.py`](../src/fux/refer/fetchcache.py)
-- [`src/fux/refer/freshness.py`](../src/fux/refer/freshness.py)
+- [`src/fux/acquire/freshness.py`](../src/fux/acquire/freshness.py)
 - [`tests/refer/test_arc.py`](../tests/refer/test_arc.py)
 - [`tests/refer/test_fetchcache.py`](../tests/refer/test_fetchcache.py)
 

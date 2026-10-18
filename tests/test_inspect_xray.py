@@ -181,7 +181,7 @@ def test_an_unchanged_index_recomputes_no_facts(corpus, report) -> None:
 
 
 def test_a_decoder_bump_recomputes_only_that_decoders_documents(corpus, report, monkeypatch) -> None:
-    from fux.ingest import decoderdigest
+    from fux.acquire import decoderdigest
 
     real = decoderdigest.binding_digests
 

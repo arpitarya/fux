@@ -45,6 +45,17 @@ CLAUDE.md's two-strikes rule makes the second time the trigger for a gate.
    and nothing that is not an open item. `nothing else` is legal only when
    nothing waits.
 
+8. **Every item file opens with its meeting view** (SR-WORK-OPEN-QUEUE rule 59,
+   Arpit 2026-10-18). The first thing under the `# W-nn` title is
+   `## At a glance`, and the first thing under that is a Markdown table (header,
+   separator, at least one row), a closed `mermaid` or `text` fence, or an image.
+   Whether the view is plain English and current (rules 60-61) is judgement.
+9. **Every item file says who filed it and who last updated it** (SR-WORK-OPEN-QUEUE
+   rules 62-64, Arpit 2026-10-18). Its frontmatter carries `filed_by`, `updated` and
+   `updated_by`, each `_by` shaped `"<person> (<surface>, <model>)"` (the model may be
+   absent), `updated` is not before `filed`, and every *Open items* row says
+   `Filed by <person> (<surface>).` exactly as its file's `filed_by` has it.
+
 ## What is NOT checked
 
 Whether the line is a *good* summary. A row can be short and still wrong about
@@ -482,3 +493,166 @@ def test_rule_47_the_queue_says_nothing_about_git_state() -> None:
         if _GIT_STATE.search(l)
     ]
     assert not bad, "rule 47: git housekeeping in the queue:\n  " + "\n  ".join(bad)
+
+
+#: SR-WORK-OPEN-QUEUE rule 59: the heading the meeting view sits under.
+GLANCE = "## At a glance"
+_TABLE_ROW = re.compile(r"^\|.*\|\s*$")
+_TABLE_SEP = re.compile(r"^\|(\s*:?-{3,}:?\s*\|)+\s*$")
+_FENCE_OPEN = re.compile(r"^```(mermaid|text)\s*$")
+_IMAGE = re.compile(r"^!\[[^\]]*\]\([^)\s]+\)\s*$")
+
+
+def meeting_view_defect(text: str) -> str | None:
+    """Return why a `work/open/W-*.md` breaks rule 59, or None when it does not."""
+    lines = text.splitlines()
+    i = 0
+    if lines and lines[0].strip() == "---":
+        try:
+            i = next(n for n in range(1, len(lines)) if lines[n].strip() == "---") + 1
+        except StopIteration:
+            return "the frontmatter never closes"
+    while i < len(lines) and not lines[i].startswith("# "):
+        i += 1
+    if i == len(lines):
+        return "no `# W-nn` title"
+
+    def next_nonblank(k: int) -> int:
+        while k < len(lines) and not lines[k].strip():
+            k += 1
+        return k
+
+    h = next_nonblank(i + 1)
+    if h == len(lines) or lines[h].strip() != GLANCE:
+        got = lines[h].strip()[:60] if h < len(lines) else "end of file"
+        return f"the first thing under the title is {got!r}, not {GLANCE!r}"
+    b = next_nonblank(h + 1)
+    if b == len(lines):
+        return f"{GLANCE!r} is empty"
+    first = lines[b].rstrip()
+    if _TABLE_ROW.match(first):
+        if b + 2 >= len(lines) or not _TABLE_SEP.match(lines[b + 1].rstrip()):
+            return "the table under it has no `|---|` separator under its header"
+        if not _TABLE_ROW.match(lines[b + 2].rstrip()):
+            return "the table under it has a header and no rows"
+        return None
+    if _FENCE_OPEN.match(first):
+        if not any(l.strip() == "```" for l in lines[b + 1 :]):
+            return "the diagram's fence never closes"
+        return None
+    if _IMAGE.match(first):
+        return None
+    return f"the first thing under {GLANCE!r} is {first[:60]!r}: not a table, a mermaid/text diagram or an image"
+
+
+def test_rule_59_every_item_file_opens_with_a_meeting_view() -> None:
+    """SR-WORK-OPEN-QUEUE rule 59 (Arpit, 2026-10-18): *"I want the first item to be a graph or
+    a tabular kind of structure, which is easier to present in a meeting ... And we are going to
+    enforce it."* Every `work/open/W-*.md` opens, right under its title, with `## At a glance`
+    and a table or diagram under that."""
+    bad = [
+        f"{p.name}: {why}"
+        for p in sorted(OPEN_DIR.glob("W-*.md"))
+        if (why := meeting_view_defect(p.read_text(encoding="utf-8")))
+    ]
+    assert not bad, "rule 59: item files without a meeting view first:\n  " + "\n  ".join(bad)
+
+
+def test_rule_59_the_checker_rejects_what_it_should() -> None:
+    """The checker itself, on fixed inputs — so a regex that matches nothing cannot pass vacuously."""
+    head = "---\nname: W-1\n---\n\n# W-1 — x\n\n"
+    good_table = head + GLANCE + "\n\n| step | what we do | what it gives us | state |\n|---|---|---|---|\n| 1 | a | b | ⏳ |\n"
+    good_fence = head + GLANCE + "\n\n```mermaid\nflowchart LR\n  a --> b\n```\n"
+    good_image = head + GLANCE + "\n\n![plan](../plan.svg)\n"
+    assert meeting_view_defect(good_table) is None
+    assert meeting_view_defect(good_fence) is None
+    assert meeting_view_defect(good_image) is None
+    assert meeting_view_defect(head + "**Arpit:** *\"x\"*\n\n" + GLANCE + "\n\n| a |\n|---|\n| 1 |\n")
+    assert meeting_view_defect(head + GLANCE + "\n\nSome prose first.\n\n| a |\n|---|\n| 1 |\n")
+    assert meeting_view_defect(head + GLANCE + "\n\n| a | b |\n| 1 | 2 |\n")
+    assert meeting_view_defect(head + GLANCE + "\n\n| a | b |\n|---|---|\n")
+    assert meeting_view_defect(head + GLANCE + "\n\n```python\nx = 1\n```\n")
+    assert meeting_view_defect(head + GLANCE + "\n\n```text\nnever closed\n")
+    assert meeting_view_defect(head + GLANCE + "\n")
+
+
+#: SR-WORK-OPEN-QUEUE rule 62: `"<person> (<surface>, <model>)"`, the model optional.
+_BY = re.compile(r'^"(?P<who>[^"()]+?) \((?P<surface>[^",()]+?)(?:, (?P<model>[^"()]+))?\)"$')
+_ISO = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def frontmatter(text: str) -> dict[str, str]:
+    """The item file's frontmatter as raw `key: value` strings (no YAML needed for these keys)."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return {}
+    out: dict[str, str] = {}
+    for line in lines[1:]:
+        if line.strip() == "---":
+            break
+        if ":" in line and not line.startswith(" "):
+            k, v = line.split(":", 1)
+            out[k.strip()] = v.strip()
+    return out
+
+
+def authorship_defects(fm: dict[str, str]) -> list[str]:
+    """Why a frontmatter breaks rules 62-63, or an empty list."""
+    bad = []
+    for key in ("filed_by", "updated_by"):
+        if key not in fm:
+            bad.append(f"no `{key}`")
+        elif not _BY.match(fm[key]):
+            bad.append(f'`{key}: {fm[key]}` is not "<person> (<surface>, <model>)"')
+    for key in ("filed", "updated"):
+        if key not in fm:
+            bad.append(f"no `{key}`")
+        elif not _ISO.match(fm[key]):
+            bad.append(f"`{key}: {fm[key]}` is not YYYY-MM-DD")
+    if not bad and fm["updated"] < fm["filed"]:
+        bad.append(f"`updated: {fm['updated']}` is before `filed: {fm['filed']}`")
+    return bad
+
+
+def test_rule_62_every_item_file_names_who_filed_and_who_updated_it() -> None:
+    """SR-WORK-OPEN-QUEUE rules 62-63 (Arpit, 2026-10-18): *"In work items, in front matter, always
+    have the name who filed the work item, who updated the work item."*"""
+    bad = [
+        f"{p.name}: {why}"
+        for p in sorted(OPEN_DIR.glob("W-*.md"))
+        for why in authorship_defects(frontmatter(p.read_text(encoding="utf-8")))
+    ]
+    assert not bad, "rules 62-63: item files missing who filed / updated them:\n  " + "\n  ".join(bad)
+
+
+def test_rule_64_every_open_item_row_says_who_filed_it() -> None:
+    """SR-WORK-OPEN-QUEUE rule 64 (Arpit, 2026-10-18): *"And in open items as well, do call out who
+    filed the work item."* The row's `Filed by <person> (<surface>).` equals its file's `filed_by`."""
+    bad = []
+    for n, lines in open_items():
+        row = " ".join(l.strip() for l in lines)
+        m = _DETAIL.search(row)
+        if not m:
+            continue
+        path = WORK / m.group(1)
+        if not path.exists():
+            continue
+        by = _BY.match(frontmatter(path.read_text(encoding="utf-8")).get("filed_by", ""))
+        if not by:
+            continue  # rule 62's test names it
+        want = f"Filed by {by['who']} ({by['surface']})."
+        if want not in row:
+            bad.append(f"L{n} {m.group(2)}: the row does not say {want!r}")
+    assert not bad, "rule 64: open-items rows that do not say who filed them:\n  " + "\n  ".join(bad)
+
+
+def test_rules_62_64_the_checker_rejects_what_it_should() -> None:
+    """The authorship checker on fixed inputs, so a pattern that matches nothing cannot pass vacuously."""
+    ok = {"filed": "2026-10-04", "updated": "2026-10-18",
+          "filed_by": '"Arpit (Cowork, Fable 5.1)"', "updated_by": '"Arpit (Claude Code)"'}
+    assert authorship_defects(ok) == []
+    assert authorship_defects({**ok, "updated": "2026-10-01"})
+    assert authorship_defects({k: v for k, v in ok.items() if k != "updated_by"})
+    assert authorship_defects({**ok, "filed_by": '"Arpit"'})
+    assert authorship_defects({**ok, "filed_by": "Arpit (Cowork, Opus 5.5)"})
+    assert authorship_defects({**ok, "updated": "18 Oct"})

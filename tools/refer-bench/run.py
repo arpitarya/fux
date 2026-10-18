@@ -66,10 +66,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
-from fux.ingest import urlsrc  # noqa: E402
+from fux.acquire import urlsrc  # noqa: E402
 from fux.refer import Policy, refer  # noqa: E402
 from fux.refer.arc import ARC  # noqa: E402
-from fux.refer.freshness import ALWAYS  # noqa: E402
+from fux.acquire.freshness import ALWAYS  # noqa: E402
 from fux.store import read_index  # noqa: E402
 
 #: The pre-registered bars. Do not edit these to make a run pass.

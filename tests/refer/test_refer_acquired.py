@@ -11,7 +11,7 @@ import json
 import pytest
 
 from fux.errors import FuxError
-from fux.refer import source as source_mod
+from fux.acquire import source as source_mod
 from fux.store import acquired
 from l12_fixtures import write_config
 
@@ -80,7 +80,7 @@ def test_the_sha_matches_what_ingest_would_have_recorded(tmp_path):
     forever -- a defect that presents as a working feature. This asserts the
     blob path produces the identical sha to the fetch path for identical bytes.
     """
-    from fux.ingest.urlsrc import _decode_fetched, sanitize
+    from fux.acquire.urlsrc import _decode_fetched, sanitize
     from fux import store as store_mod
 
     _retain(tmp_path)
@@ -118,7 +118,7 @@ def test_a_file_document_is_never_served_from_the_plane(tmp_path):
 
 
 def test_matching_retained_bytes_are_as_ingested_not_current(tmp_path):
-    from fux.refer import freshness
+    from fux.acquire import freshness
 
     _retain(tmp_path)
     got = source_mod.from_acquired(tmp_path, DOC, LOC)

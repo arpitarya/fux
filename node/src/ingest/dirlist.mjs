@@ -1,4 +1,4 @@
-/** The committed directory list, read. Twin of `src/fux/ingest/dirlist.py`.
+/** The committed directory list, read. Twin of `src/fux/acquire/dirlist.py`.
  *
  * **Owned by [SR-DIR-LIST](../../../records/0120_dir-list.md)** since
  * 2026-10-05 (W-261): a pure move of `readDirs` out of `sourcelist.mjs` and

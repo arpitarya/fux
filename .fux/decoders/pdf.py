@@ -29,7 +29,7 @@ conflating them would hide a real defect inside a normal-looking outcome.
 
 A PDF has no headings, so before 2026-09-06 this decoder returned one
 undivided blob: `extract.py` mined **no** `phrases` from any PDF in any corpus
-(`fux ask` renders those as `§` lines), and `refer/_chunk.py`, having nothing
+(`fux ask` renders those as `§` lines), and `text/chunk.py`, having nothing
 to split on, cut every PDF into blind 4 KB slabs mid-argument.
 
 `## Page N` is emitted per **text-bearing content stream**, and the document
@@ -65,7 +65,7 @@ from fux.decode._limits import limit
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.pdf", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output)
+VERSION = fixed("decoders.pdf", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output); nor W-282 (moved module paths in comments)
 
 EXTENSIONS = tuple(fixed("decoders.pdf", "extensions"))
 

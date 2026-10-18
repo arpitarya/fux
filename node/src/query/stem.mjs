@@ -1,6 +1,6 @@
 /** The Porter stemmer — analyzer v2's morphology step.
  *
- * Twin of `src/fux/query/stem.py`. **Transcribed, not reimplemented**: Porter
+ * Twin of `src/fux/text/stem.py`. **Transcribed, not reimplemented**: Porter
  * is a fully specified algorithm with a published test vocabulary, and every
  * departure fux makes from the textbook (see `shouldStem`) is a departure the
  * Python side already made. A difference here is a silent no-match, not an

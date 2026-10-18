@@ -44,7 +44,7 @@ ID_RE = re.compile(
 
 def survives(token: str) -> tuple[bool, list[str]]:
     """Does `token` come out of the analyzer whole? Returns `(whole, tokens)`."""
-    from fux.query.tokenize import tokenize
+    from fux.text.tokenize import tokenize
 
     out = tokenize(token)
     return (out == [token.lower()], out)

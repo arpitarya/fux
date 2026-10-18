@@ -18,7 +18,7 @@ from dataclasses import dataclass
 import pytest
 
 from fux.query import rerank
-from fux.query.analyzer import analyze
+from fux.text.analyzer import analyze
 from l12_fixtures import template_tune, tuned
 
 
@@ -176,7 +176,7 @@ def test_it_is_deterministic_across_repeated_calls():
 
 
 def test_the_reader_is_injected_never_imported(tmp_path):
-    """The `refer/source.py` rule, applied again: the default reads local
+    """The `acquire/source.py` rule, applied again: the default reads local
     files and declines anything that would need the network."""
     (tmp_path / "a.md").write_text("gateway rollback", encoding="utf-8")
     assert rerank._read_local_text(tmp_path, "file:a.md", "a.md") == "gateway rollback"
@@ -193,7 +193,7 @@ def test_frontmatter_passage_changes_counts_never_membership():
     out = rerank.rerank(None, "gateway rollback", results, tune=tuned(rerank_weight=1.0), read=_reader(texts))
     assert {r.id for r in out} == {r.id for r in results}
     assert len(out) == len(results)
-    from fux.refer._chunk import chunk
+    from fux.text.chunk import chunk
 
     bounds = template_tune().chunk_bounds()
     plain = chunk(fm, **bounds, line_numbers=True, frontmatter=False)

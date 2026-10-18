@@ -7,10 +7,10 @@ description: "A declarative refusal table, every condition pure over the respons
 status: accepted
 date: 2026-09-01
 feature: refusal detection before decode
-owns: [src/fux/ingest/refusals.py@f40de632d66c, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@76b6f6b7f4aa, .fux/refusals.toml@5fdc90fab388]
+owns: [src/fux/acquire/refusals.py@f40de632d66c, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@5979308bfe8a, .fux/refusals.toml@5fdc90fab388]
 laws: [L2, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 0e89b1d56b789b4cfacf1533c92c61fa7c4b766e571050948bf9a737830bb46b
+content_sha: 1c2b47075c1f7aee02aed33fb105b705e5dfb9d7225fc7688e55c981deee0d9a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,14 +18,14 @@ content_sha: 0e89b1d56b789b4cfacf1533c92c61fa7c4b766e571050948bf9a737830bb46b
 **Owns** — the components this record decides:
 
 - [`.fux/refusals.toml`](../.fux/refusals.toml) · file
-- [`src/fux/ingest/refusals.py`](../src/fux/ingest/refusals.py) · file
+- [`src/fux/acquire/refusals.py`](../src/fux/acquire/refusals.py) · file
 - [`src/fux/templates/refusals.toml.txt`](../src/fux/templates/refusals.toml.txt) · file
 - [`tools/refusal-probe/`](../tools/refusal-probe) · dir
 
 **Describes** — reaches into, does not own:
 
-- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
-- [`src/fux/maintain/urlstate.py`](../src/fux/maintain/urlstate.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
+- [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
+- [`src/fux/acquire/urlstate.py`](../src/fux/acquire/urlstate.py) · owned by [SR-MAINTENANCE](0129_hooks.md)
 
 <!-- COMPONENTS-END -->
 
@@ -387,7 +387,7 @@ those is the document, not an auth wall. `.action`, `.aspx`, `.asp`, `.php` and
   consumer would notice.
 
 
-**2026-09-14 — `src/fux/ingest/urlsrc.py` changed under this record and NOTHING this record
+**2026-09-14 — `src/fux/acquire/urlsrc.py` changed under this record and NOTHING this record
 decides moved.** The line that changed is the `configure()` call — each fetcher is handed its
 own slice of `[sources.url.config]` ([SR-CONFIG](0113_config.md) decision 8a).
 The refusal check's **position** is what this record owns and it has not moved:
@@ -446,8 +446,8 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/ingest/refusals.py` — `RULES_NAME` ← `[files] refusals_name`, `MAGIC` ← `[decoders] magic_by_mime`, `MAGIC_BY_DECODER` ← every built-in decoder's `[decoders.<name>.format] magic` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28) — the floor is still fux's and not a consumer's knob: `constants.toml` ships inside the engine
-- `src/fux/maintain/urlstate.py` — `STATE_NAME` ← `[maintain] url_state`, `SCHEMA_NAME` ← `[maintain] url_state_schema`
+- `src/fux/acquire/refusals.py` — `RULES_NAME` ← `[files] refusals_name`, `MAGIC` ← `[decoders] magic_by_mime`, `MAGIC_BY_DECODER` ← every built-in decoder's `[decoders.<name>.format] magic` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28) — the floor is still fux's and not a consumer's knob: `constants.toml` ships inside the engine
+- `src/fux/acquire/urlstate.py` — `STATE_NAME` ← `[maintain] url_state`, `SCHEMA_NAME` ← `[maintain] url_state_schema`
 
 <!-- L12-VALUES-END -->
 
@@ -474,7 +474,7 @@ the rules carrying the two bounds — so every caller that iterates is unchanged
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
-**No decision here moved** (W-253, 2026-10-04): `ingest/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
+**No decision here moved** (W-253, 2026-10-04): `acquire/urlsrc.py` now refuses a bare-`str` fetcher return (a named skip of that URL), per [SR-FETCHER](0117_fetcher.md) decision 2.
 
 **No decision here moved** (W-248, 2026-10-04): in `urlsrc.py` the "nothing readable" skip reason is spelled from `decoders.reason_nothing_readable`; nothing this record decides moved.
 
@@ -491,7 +491,7 @@ the rules carrying the two bounds — so every caller that iterates is unchanged
   nothing it decides.** Hashed display meta was deleted outright: `meta` and
   `title_h` left the record shape, `store/displaycache.py` and
   `assert_meta_policy` were deleted, `fux.index` stepped to **v4**, and law ex-L5
-  retired ([ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). Nothing in `ingest/refusals.py`, `refusals.toml.txt` or `tools/refusal-probe/` changed. A refusal is a judgement about the BYTES a server returned, taken before a record exists; `meta` only ever decided what a record could hold afterwards, so the two never met.
+  retired ([ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md), superseded). Nothing in `acquire/refusals.py`, `refusals.toml.txt` or `tools/refusal-probe/` changed. A refusal is a judgement about the BYTES a server returned, taken before a record exists; `meta` only ever decided what a record could hold afterwards, so the two never met.
   **This record's decisions are unaffected**, and the line is here because the
   freshness gate asks a describer to say so rather than to be silent.
 
@@ -559,7 +559,7 @@ away from firing on real short documents. It warns and never refuses, because
 
 ### Reference (required)
 
-- [`src/fux/ingest/refusals.py`](../src/fux/ingest/refusals.py) — the matcher, and the module docstring that argues decision 4 in place
+- [`src/fux/acquire/refusals.py`](../src/fux/acquire/refusals.py) — the matcher, and the module docstring that argues decision 4 in place
 - [`src/fux/templates/refusals.toml.txt`](../src/fux/templates/refusals.toml.txt) — the six shipped rules
 - [`tests/ingest/test_refusals.py`](../tests/ingest/test_refusals.py) — 37 tests over the matcher, including the `""`-suffix case and the two fixtures that were wrong before the code was
 - [`tools/refusal-probe/`](../tools/refusal-probe/README.md) — the shipped rules against real captured responses; [`tests/ingest/test_refusal_probe.py`](../tests/ingest/test_refusal_probe.py) runs its cases in CI
@@ -606,8 +606,8 @@ evidence.*
 
 **Code**
 
-- [`src/fux/ingest/refusals.py`](../src/fux/ingest/refusals.py)
-- [`src/fux/ingest/urlsrc.py`](../src/fux/ingest/urlsrc.py)
+- [`src/fux/acquire/refusals.py`](../src/fux/acquire/refusals.py)
+- [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py)
 - [`src/fux/templates/refusals.toml.txt`](../src/fux/templates/refusals.toml.txt)
 - [`tests/ingest/test_refusals.py`](../tests/ingest/test_refusals.py)
 - [`tests/ingest/test_refusal_probe.py`](../tests/ingest/test_refusal_probe.py)

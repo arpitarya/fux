@@ -35,8 +35,8 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from ..query.analyzer import _WORD_RE
-from ..query.identifiers import parse_template
+from ..text.analyzer import _WORD_RE
+from ..text.identifiers import parse_template
 from ..errors import FuxError
 
 _SEGMENT = re.compile(r"[A-Za-z]+|[0-9]+|[-_.]")
@@ -238,7 +238,7 @@ def regex_parity(rules, texts: list[tuple[str, str]]) -> Parity:
     import shutil
     import subprocess
 
-    from ..query.identifiers import _compiled
+    from ..text.identifiers import _compiled
 
     node = shutil.which("node")
     if node is None or not rules.rules:
@@ -277,8 +277,8 @@ def bench(texts: list[tuple[str, str]], pattern: str, kind: str, *, examples: in
     """
     import json
 
-    from ..query.analyzer import analyze
-    from ..query.identifiers import IdentifierRules, parse_regex, parse_template
+    from ..text.analyzer import analyze
+    from ..text.identifiers import IdentifierRules, parse_regex, parse_template
 
     try:
         rule = parse_template(pattern) if kind == "template" else parse_regex(pattern)

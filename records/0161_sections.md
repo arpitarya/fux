@@ -11,7 +11,7 @@ feature: section records — the committed section plane, the index section rule
 owns: [node/src/query/sections.mjs@4c883e2a8a83, src/fux/query/sections.py@d88c194f0e6c]
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: 4b7ca64f9c80e15a0fb1616e1eaf2233542ee2848fca36944d6fc91c752d2f38
+content_sha: d604d0a9b19b0b63256919164855a41c6b4743e154de09af05f74c1835626c3e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -25,7 +25,7 @@ content_sha: 4b7ca64f9c80e15a0fb1616e1eaf2233542ee2848fca36944d6fc91c752d2f38
 
 - [`src/fux/maintain/mergedriver.py::merge_sections`](../src/fux/maintain/mergedriver.py) · owned by [SR-MERGE-DRIVER](0130_merge-driver.md)
 - [`src/fux/query/rank.py::_section_gain`](../src/fux/query/rank.py) · owned by [SR-RANKING](0111_ranking.md)
-- [`src/fux/refer/_chunk.py::_sections,_title_index,index_sections`](../src/fux/refer/_chunk.py) · owned by [SR-CHUNKING](0151_chunking.md)
+- [`src/fux/text/chunk.py::_sections,_title_index,index_sections`](../src/fux/text/chunk.py) · owned by [SR-CHUNKING](0151_chunking.md)
 
 <!-- COMPONENTS-END -->
 
@@ -136,7 +136,7 @@ flowchart LR
   Everything here is written by `fux ingest` from the bytes ingest already
   reads, so the committed plane stays enough to answer a query.
 - **What already cuts sections.** [SR-CHUNKING](0151_chunking.md) derives
-  passages from heading depth in `refer/_chunk.py`, at answer time, over
+  passages from heading depth in `text/chunk.py`, at answer time, over
   fetched bytes. Its fold test reads `[refer] min_passage_bytes`, a tunable.
 
 ### Decision
@@ -207,7 +207,7 @@ Over the same text `extract.py` tokenises (the decoded, PII-redacted body):
 - **Why the fold test is different.** A committed byte may not be a function
   of a tunable ([SR-TUNE](0135_tuning.md) decision 6). Folding on
   `min_passage_bytes` would make editing `tune.toml` rewrite the index.
-- It lives beside `_fold` in `refer/_chunk.py`, so the two fold rules sit
+- It lives beside `_fold` in `text/chunk.py`, so the two fold rules sit
   together and cannot drift. `.rst`, `.adoc` and `.org` headings are not
   Markdown and get no section records, which is what the chunker already does
   with them.
@@ -507,7 +507,7 @@ sections"*; the key lives in `fux.toml [index]`, not in `.fux/tune.toml`).
 - The ruling: [`work/compare/section-units.compare.md`](../work/compare/section-units.compare.md).
 - The size: [`work/regression/2026-09-30-section-size/`](../work/regression/2026-09-30-section-size/report.md),
   from [`tools/section-size/measure.py`](../tools/section-size/measure.py).
-- The code this design reuses: [`src/fux/refer/_chunk.py`](../src/fux/refer/_chunk.py)
+- The code this design reuses: [`src/fux/text/chunk.py`](../src/fux/text/chunk.py)
   (`_sections`, `_title_index`), [`src/fux/ingest/extract.py`](../src/fux/ingest/extract.py),
   [`src/fux/query/rank.py`](../src/fux/query/rank.py),
   [`src/fux/query/scan.py`](../src/fux/query/scan.py),
@@ -548,7 +548,7 @@ evidence.*
 
 **Code**
 
-- [`src/fux/refer/_chunk.py`](../src/fux/refer/_chunk.py)
+- [`src/fux/text/chunk.py`](../src/fux/text/chunk.py)
 - [`src/fux/ingest/extract.py`](../src/fux/ingest/extract.py)
 - [`src/fux/query/rank.py`](../src/fux/query/rank.py)
 - [`src/fux/query/scan.py`](../src/fux/query/scan.py)

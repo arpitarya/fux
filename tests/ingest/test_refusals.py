@@ -9,7 +9,7 @@ from __future__ import annotations
 import pytest
 
 from fux.errors import FuxError
-from fux.ingest import refusals
+from fux.acquire import refusals
 
 XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 HTML = "text/html; charset=utf-8"
@@ -464,7 +464,7 @@ def _starter_rules():
     from pathlib import Path
     import tomllib
 
-    from fux.ingest import refusals
+    from fux.acquire import refusals
 
     text = (
         Path(__file__).resolve().parents[2]
@@ -517,7 +517,7 @@ def test_no_rule_in_this_engine_can_warn_instead_of_refusing():
     so the comment cannot drift back — if a warn level is ever added, this test
     is the thing that says the starter's prose has to change with it.
     """
-    from fux.ingest import refusals
+    from fux.acquire import refusals
 
     assert not hasattr(refusals.Rule, "level")
     assert "warn" not in {f for f in refusals.Rule.__dataclass_fields__}

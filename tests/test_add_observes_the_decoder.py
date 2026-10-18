@@ -199,6 +199,6 @@ def test_dry_run_opens_nothing_and_says_what_fills_the_placeholder(repo, capsys)
 def test_the_placeholder_is_not_a_legal_stem():
     """So a copy-pasted preview fails loudly rather than loading as a decoder
     nobody has."""
-    from fux.ingest import sourcelist
+    from fux.acquire import sourcelist
 
     assert sourcelist.URLS.attribute("decoder").reject(sources._OBSERVED_AT_ADD) is not None

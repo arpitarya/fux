@@ -99,11 +99,16 @@ def test_the_package_exports_nothing_that_writes():
     import fux
 
     assert set(fux.__all__) == {"__version__", "open"}
+    # W-282: `open` is resolved lazily (PEP 562) because `fux/__init__.py` is
+    # the core layer's and must import without the reader — so it is in
+    # `vars(fux)` only once something has asked for it. It must still be the
+    # ONE public name, listed by `dir()` and resolvable.
     exported = {
         name for name, value in vars(fux).items()
         if not name.startswith("_") and not isinstance(value, ModuleType)
     }
-    assert exported == {"open"}, f"fux exports more than the read surface: {exported}"
+    assert exported <= {"open"}, f"fux exports more than the read surface: {exported}"
+    assert "open" in dir(fux) and callable(fux.open)
 
 
 # -- 2. the two refusals ----------------------------------------------------

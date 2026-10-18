@@ -22,7 +22,7 @@ import pytest
 
 from fux import decode as decode_mod
 from fux.errors import FuxError
-from fux.ingest import sourcelist, urlsrc
+from fux.acquire import sourcelist, urlsrc
 from l12_fixtures import configured_root, write_config
 
 

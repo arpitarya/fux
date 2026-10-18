@@ -93,11 +93,12 @@ def state_key(root: Path) -> tuple:
     — an index mid-rewrite, which `Holder.call` answers by holding nothing for
     that call.
     """
-    from ..derive import format as derive_fmt
+    from ..constants import fixed
+    from .cachedir import runtime_dir
     from .reader import iter_shard_paths
 
     try:
-        stamp = (derive_fmt.runtime_dir(root) / derive_fmt.STAMP_NAME).read_bytes()
+        stamp = (runtime_dir(root) / fixed("runtime", "stamp")).read_bytes()
     except FileNotFoundError:
         digest = None
     else:

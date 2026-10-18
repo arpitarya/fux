@@ -10,7 +10,7 @@ import pytest
 from fux import store as store_mod
 from fux.refer import Policy, refer
 from fux.refer.arc import ARC
-from fux.refer.freshness import ALWAYS, NEVER
+from fux.acquire.freshness import ALWAYS, NEVER
 from l12_fixtures import template_tune, write_config
 from l12_fixtures import template_fux_toml
 
@@ -216,7 +216,9 @@ def test_no_module_in_the_plane_imports_a_network_library():
     `_chunk` and `_rescore`, and are imported by their real names here.
     """
     import fux.refer as plane
-    from fux.refer import _assemble, _chunk, _rescore, arc, freshness, source
+    from fux.refer import _assemble, _rescore, arc
+    from fux.text import chunk as _chunk
+    from fux.acquire import freshness, source
 
     for module in (plane, arc, _assemble, _chunk, freshness, _rescore, source):
         tree = ast.parse(inspect.getsource(module))

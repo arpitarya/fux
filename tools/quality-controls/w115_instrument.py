@@ -65,14 +65,14 @@ measuring nothing and says so.
 | `decode.json._label` | a heading at every depth | capped at `MAX_HEADING_DEPTH` |
 
 ⚠ **This deliberately does NOT run the 94231b2 tree.** 25 files and 1 290 lines
-changed between the two commits — `decode/__init__.py`, `refer/_chunk.py`,
+changed between the two commits — `decode/__init__.py`, `text/chunk.py`,
 `mail.py`, the `doc`-suffix rename, `max_phrases` 12 → 32. Checking that tree
 out would measure the whole range and call it W-115, which is the confound
 W-116's report had to unpick by hand. `max_phrases` is left at HEAD's default in
 **both** arms, so it is not a variable here at all.
 
 **What this therefore measures:** W-115's heading-grammar and key-depth changes,
-which are its ranking half. Its `refer/_chunk.py` half is a passage-boundary
+which are its ranking half. Its `text/chunk.py` half is a passage-boundary
 change and is not on this endpoint.
 
 Usage:

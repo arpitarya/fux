@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fux.maintain import dirty
+from fux.store import dirty
 
 
 def test_empty_repo_reads_as_nothing_pending(tmp_path):

@@ -18,8 +18,8 @@ import pytest
 
 from fux import decode
 from fux.errors import FuxError
-from fux.ingest import sourcelist
-from fux.ingest import ingestlog
+from fux.acquire import sourcelist
+from fux.acquire import ingestlog
 from l12_fixtures import configured_root
 
 

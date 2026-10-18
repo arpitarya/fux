@@ -11,7 +11,7 @@ from __future__ import annotations
 import pytest
 
 from fux import enrich as enrich_mod
-from fux.ingest import sourcelist
+from fux.acquire import sourcelist
 from fux.store import acquired
 from l12_fixtures import chunk_bounds, write_config
 

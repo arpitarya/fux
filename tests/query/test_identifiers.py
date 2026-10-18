@@ -19,10 +19,10 @@ from pathlib import Path
 import pytest
 
 from fux.errors import FuxError
-from fux.query import identifiers as ids_mod
-from fux.query.analyzer import analyze, analyze_pairs
-from fux.query.identifiers import EMPTY, build, check_regex, parse, parse_template
-from fux.query.stem import stem
+from fux.text import identifiers as ids_mod
+from fux.text.analyzer import analyze, analyze_pairs
+from fux.text.identifiers import EMPTY, build, check_regex, parse, parse_template
+from fux.text.stem import stem
 
 FIXTURE = json.loads((Path(__file__).parent / "identifiers-fixture.json").read_text("utf-8"))
 FAM = FIXTURE["families"]

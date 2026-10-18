@@ -88,7 +88,7 @@ phrase, removed from the body, and opened a passage.
 `_ADOC_RE` (`={1,6} `), `_ORG_RE` (`\*{1,6}[ \t]`), applied with
 `finditer`/`sub` and **no fence state**. Markdown goes through
 `decode/_markdown.py::headings/strip_headings` (CommonMark fences). **The refer
-chunker uses the Markdown grammar for everything** (`refer/_chunk.py:50,181`),
+chunker uses the Markdown grammar for everything** (`text/chunk.py:50,181`),
 so the three formats have no passage boundaries at all today. They are
 `prose_types` (`constants.toml:108`): they reach no decoder and keep
 frontmatter parsing. Node mirrors the prose set and **declines to `answer`
@@ -98,7 +98,7 @@ anything that is not prose** (`node/src/decode/registry.mjs:48`).
 walker per format beside `_markdown.py` (or a `decode/_prose.py`): rst literal
 blocks and `code-block::` indented bodies; adoc `----` / `....` / `====`
 delimited blocks; org `#+BEGIN_SRC` / `#+BEGIN_EXAMPLE … #+END_*`.
-`extract.py::_headings_and_body` and `refer/_chunk.py` dispatch on extension;
+`extract.py::_headings_and_body` and `text/chunk.py` dispatch on extension;
 a Node twin in `node/src/decode/markdown.mjs` keeps refer parity. **Rejected:
 (b) decode the three to Markdown via built-in decoders** — they would leave
 `prose_types`, so **Node would stop citing them**, frontmatter would stop being

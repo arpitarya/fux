@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-from fux.maintain import urlstate
+from fux.acquire import urlstate
 from l12_fixtures import template_fux_toml
 
 #: `[sources.url] failing_streak` as the template ships it (W-225 stage 5e).
@@ -183,7 +183,7 @@ def test_every_declared_field_survives_a_round_trip(tmp_path):
     This walks the DECLARED shape rather than a hard-coded list, so a field added
     tomorrow is covered without editing this test.
     """
-    from fux.maintain import urlstate
+    from fux.acquire import urlstate
 
     declared = set(urlstate._health_schema().fields)
 

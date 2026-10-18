@@ -33,7 +33,7 @@ if _FUX_SRC.is_dir():
 else:
     import fux  # noqa: F401  # fall back to whatever's on PYTHONPATH/installed
 
-from fux.refer._chunk import chunk
+from fux.text.chunk import chunk
 from fux.refer._rescore import rescore
 from fux.refer._assemble import assemble, Assembled
 from fux.tune import load as _load_tune

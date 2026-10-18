@@ -157,7 +157,7 @@
 <text x="46" y="1302" font-size="10.5" fill="#8a93a0">Following links at ingest would make the index depend on a crawl frontier (L4), reach beyond the fenced list (L5) and index pages nobody declared (L3).</text>
 <text x="46" y="1318" font-size="10.5" fill="#8a93a0">cdp.py ships extract_links() and nothing in fux calls it: a crawl, if you want one, is the fetcher's to write, because the decoder plane may not open a socket.</text>
 <line x1="46" y1="1330" x2="1096" y2="1330" stroke="#e4e4e0" stroke-width="1"/>
-<text x="46" y="1344" font-size="10.5" fill="#8a93a0">Drawn from the code, 2026-10-05. src/fux/ingest/urlsrc.py, routes.py, register.py, refusals.py, edges.py, src/fux/templates/http.py.txt, cdp.py.txt, refusals.toml.txt,</text>
-<text x="46" y="1358" font-size="10.5" fill="#8a93a0">src/fux/refer/source.py, src/fux/query/refer_answer.py. SR-FETCHER (0117) - SR-HTTP-FETCHER (0119) - SR-CDP-FETCHER (0118) - SR-URL-LIST (0116) - SR-CONFIG (0113) - SR-REFUSAL (0146) -</text>
+<text x="46" y="1344" font-size="10.5" fill="#8a93a0">Drawn from the code, 2026-10-05. src/fux/acquire/urlsrc.py, routes.py, register.py, refusals.py, edges.py, src/fux/templates/http.py.txt, cdp.py.txt, refusals.toml.txt,</text>
+<text x="46" y="1358" font-size="10.5" fill="#8a93a0">src/fux/acquire/source.py, src/fux/query/refer_answer.py. SR-FETCHER (0117) - SR-HTTP-FETCHER (0119) - SR-CDP-FETCHER (0118) - SR-URL-LIST (0116) - SR-CONFIG (0113) - SR-REFUSAL (0146) -</text>
 <text x="46" y="1372" font-size="10.5" fill="#8a93a0">SR-ACQUIRED (0145) - SR-URL-FRESHNESS (0147) - SR-REFER-PLANE (0127). Decoders: architecture-decoders.svg. The model-vs-built comparison: architecture-fetchers-compare.svg.</text>
 </svg>

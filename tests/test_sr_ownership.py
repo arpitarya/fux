@@ -430,7 +430,7 @@ def test_the_freshness_gate_actually_consults_describers(monkeypatch) -> None:
 #:    `SR-RUNTIME-*`. **These are the SR-ANSWER shape**, which the register's
 #:    own describes-table note already records as a defect that shipped.
 #:    ⚠ `SR-TYPES` left this list on 2026-09-11: decision 12 gave it
-#:    `ingest/typesfile.py`, so a change to the types file's shape can now open it.
+#:    `acquire/typesfile.py`, so a change to the types file's shape can now open it.
 #:
 #: The pin is deliberate: a record that GAINS coverage, or a new record that
 #: arrives with none, lands as one failing assertion naming itself.

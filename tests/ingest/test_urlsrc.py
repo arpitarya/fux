@@ -13,8 +13,8 @@ from fux import store
 from fux.config import load as load_config
 from fux.errors import FuxError
 from fux.ingest.run import run
-from fux.ingest.urlsrc import UrlEntry, fetch_all, load_fetcher, read_urls
-from fux.query.tokenize import tokenize
+from fux.acquire.urlsrc import UrlEntry, fetch_all, load_fetcher, read_urls
+from fux.text.tokenize import tokenize
 from fux.store.format import term_hash
 
 _TTL = template_fux_toml()["sources"]["url"]["ttl"]
@@ -832,7 +832,7 @@ def test_a_decoder_that_ran_and_found_nothing_is_not_reported_as_missing():
     the change unaltered — it is simply keyed on what the line said instead of
     on what the server said.
     """
-    from fux.ingest.urlsrc import _decode_fetched
+    from fux.acquire.urlsrc import _decode_fetched
 
     uuid_only = b'{\n  "uuid": "23f0c01c-4067-49f9-99cd-b19564aa930e"\n}\n'
     # `configured_root()`: the json decoder reads its caps from `.fux/formats.toml
@@ -855,7 +855,7 @@ def test_a_stem_nothing_provides_still_says_no_decoder():
     module*, which only a committed line can say. The unreadable format is
     caught one step earlier now — `fux add` refuses to write a line for it.
     """
-    from fux.ingest.urlsrc import _decode_fetched
+    from fux.acquire.urlsrc import _decode_fetched
 
     markdown, why = _decode_fetched(b"RIFF....WEBP", "webp", "https://x.test/y.webp")
     assert markdown is None
@@ -865,7 +865,7 @@ def test_a_stem_nothing_provides_still_says_no_decoder():
 
 def test_json_with_prose_in_it_decodes_rather_than_skipping():
     """The control: the skip above is about the CONTENT, not the stem."""
-    from fux.ingest.urlsrc import _decode_fetched
+    from fux.acquire.urlsrc import _decode_fetched
 
     markdown, why = _decode_fetched(
         b'{"note": "the paging rotation"}', "json", "https://x.test/y", configured_root()
@@ -886,7 +886,7 @@ def test_a_consumer_decoder_reaches_url_content_too(tmp_path):
     through an extension the registry happened to resolve, which is
     `decoder_named`'s job; `root` is still what makes it reachable at all.
     """
-    from fux.ingest.urlsrc import _decode_fetched
+    from fux.acquire.urlsrc import _decode_fetched
 
     decoders = tmp_path / ".fux" / "decoders"
     decoders.mkdir(parents=True)
@@ -906,7 +906,7 @@ def test_a_consumer_decoder_reaches_url_content_too(tmp_path):
 
 def test_a_consumer_decoder_is_unreachable_without_the_root():
     """The control for the case above, and it is why `root` is threaded."""
-    from fux.ingest.urlsrc import _decode_fetched
+    from fux.acquire.urlsrc import _decode_fetched
 
     markdown, why = _decode_fetched(b"payload", "vndthing", "https://x.test/doc", None)
     assert markdown is None and "no decoder module named 'vndthing'" in why
@@ -925,7 +925,7 @@ def test_a_fetch_failure_is_not_queued_for_a_model():
     would put a permanent work item in front of the whole team that no amount of
     model time closes.
     """
-    from fux.ingest.gitdir import UNFETCHED, UNREADABLE, Skipped
+    from fux.acquire.gitdir import UNFETCHED, UNREADABLE, Skipped
 
     dead = Skipped(rel_path="https://x.test/gone", reason="fetch failed: 404", kind=UNFETCHED)
     unreadable = Skipped(rel_path="https://x.test/scan", reason="pdf: no text layer")
@@ -941,7 +941,7 @@ def test_the_kind_is_set_at_the_skip_site_not_read_back_from_the_reason():
     would be one string edit away from silently wrong."""
     import inspect
 
-    from fux.ingest import urlsrc
+    from fux.acquire import urlsrc
 
     source = inspect.getsource(urlsrc.fetch_all)
     assert "kind=UNFETCHED" in source

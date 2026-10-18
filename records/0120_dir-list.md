@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-05
 date: 2026-08-19
 feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted from it, which of it is retired, and the grammar for declaring so"
-owns: [node/src/ingest/dirlist.mjs@175e0f8dc29a, src/fux/ingest/dirlist.py@ae1be9ab5f27]
+owns: [node/src/ingest/dirlist.mjs@3fbfc2e90b52, src/fux/acquire/dirlist.py@d43e93694da4]
 laws: [L4, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 06958ee9d9870bc67767d5521b79ebf796d3c1f5d9fe4fa051655d41a7070e28
+content_sha: e214af75c41d14c2b2f038a7ffe1abce0558504e971b73bd7bd035939fec895a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -19,11 +19,11 @@ content_sha: 06958ee9d9870bc67767d5521b79ebf796d3c1f5d9fe4fa051655d41a7070e28
 **Owns** — the components this record decides:
 
 - [`node/src/ingest/dirlist.mjs`](../node/src/ingest/dirlist.mjs) · file
-- [`src/fux/ingest/dirlist.py`](../src/fux/ingest/dirlist.py) · file
+- [`src/fux/acquire/dirlist.py`](../src/fux/acquire/dirlist.py) · file
 
 **Describes** — reaches into, does not own:
 
-- [`src/fux/ingest/sourcelist.py::_dir_reason`](../src/fux/ingest/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
+- [`src/fux/acquire/sourcelist.py::_dir_reason`](../src/fux/acquire/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
 
 <!-- COMPONENTS-END -->
 
@@ -274,7 +274,7 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/ingest/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
+- `src/fux/acquire/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
 
 <!-- L12-VALUES-END -->
 
@@ -286,7 +286,7 @@ this moved where they are written, not what they are.
 
 **No decision here moved** (W-244, 2026-10-04): a `!` line still subtracts a path or any directory above it, and the walk now applies that to a DIRECTORY before entering it rather than to each file after listing it ([SR-INGEST](0106_ingest.md) decision 24). The set of indexed documents is unchanged, byte-identical on this repo.
 
-**Owns [`src/fux/ingest/dirlist.py`](../src/fux/ingest/dirlist.py) and its Node twin [`node/src/ingest/dirlist.mjs`](../node/src/ingest/dirlist.mjs) since 2026-10-05** ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). A pure move: `read_dirs`, `source_dirs`, `source_excludes`, `archived_dirs` and `enrich_dirs` out of `ingest/gitdir.py`, which keeps the walk the list drives (SR-INGEST); on Node, `readDirs` out of `sourcelist.mjs` and `archivedDirs` out of `gitdir.mjs` — the half the query plane reads. The `dirs` grammar's validator `_dir_reason` stays in `ingest/sourcelist.py` (SR-URL-LIST), reached by a `describes` row. ⚠ **This paragraph read *owns nothing, case (b)* until W-261.**
+**Owns [`src/fux/acquire/dirlist.py`](../src/fux/acquire/dirlist.py) and its Node twin [`node/src/ingest/dirlist.mjs`](../node/src/ingest/dirlist.mjs) since 2026-10-05** ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 11, W-261 — Arpit's ruling that every `kind: component` record owns a file). A pure move: `read_dirs`, `source_dirs`, `source_excludes`, `archived_dirs` and `enrich_dirs` out of `acquire/gitdir.py`, which keeps the walk the list drives (SR-INGEST); on Node, `readDirs` out of `sourcelist.mjs` and `archivedDirs` out of `gitdir.mjs` — the half the query plane reads. The `dirs` grammar's validator `_dir_reason` stays in `acquire/sourcelist.py` (SR-URL-LIST), reached by a `describes` row. ⚠ **This paragraph read *owns nothing, case (b)* until W-261.**
 
 ### Consequences
 
@@ -354,9 +354,9 @@ this moved where they are written, not what they are.
 
 - The grammar this record reuses — [SR-URL-LIST](0116_url-list.md), and its one
   implementation,
-  [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py); the walk
+  [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py); the walk
   that consumes it — `read_dirs` / `source_dirs` in
-  [`ingest/gitdir.py`](../src/fux/ingest/gitdir.py).
+  [`acquire/gitdir.py`](../src/fux/acquire/gitdir.py).
 - The key it retires — [SR-CONFIG](0113_config.md) decision 10.
 - The layout it extends — [SR-DOTFUX](0102_fux-directory.md) decision 2.
 - The finding that opened it —
@@ -390,7 +390,7 @@ grep -rln "def parse(" src/fux/ingest/
 #         and fuxignore.py (.fux/.fuxignore, SR-FUXIGNORE)
 
 # 3. the attribute set is still closed at two
-grep -n "archived\|enrich" src/fux/ingest/sourcelist.py | head
+grep -n "archived\|enrich" src/fux/acquire/sourcelist.py | head
 # expect: one ListSpec naming exactly those two keys for `dirs`
 ```
 
@@ -413,8 +413,8 @@ evidence.*
 
 **Code**
 
-- [`src/fux/ingest/gitdir.py`](../src/fux/ingest/gitdir.py)
-- [`src/fux/ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py)
+- [`src/fux/acquire/gitdir.py`](../src/fux/acquire/gitdir.py)
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py)
 - [`tests/test_archive_law.py`](../tests/test_archive_law.py)
 
 **Measured evidence**

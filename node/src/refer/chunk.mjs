@@ -1,5 +1,5 @@
 /** Passages, derived from the document's own heading DEPTH.
- *  Twin of `src/fux/refer/_chunk.py`.
+ *  Twin of `src/fux/text/chunk.py`.
  *
  * **There is no strategy parameter and no CHUNK to declare.** What a passage
  * is — a table row, a slide, a prose section, the whole file — falls out of

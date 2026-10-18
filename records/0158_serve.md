@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-22
 amended: 2026-10-13
 feature: the explorer — a local page over the real ask
-owns: [src/fux/serve@fc16117d376d]
+owns: [src/fux/serve@c9ad3ab95dec]
 laws: [L2, L3, L5, L6, L9, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: c97dfa521cbcaf8237d2f8b2228b0ae49af76efa0da785b849c22555a943fb9b
+content_sha: 79746de434c7806f0381c086d12c35de0adf9e59daf6b8d02979647babf8ee85
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 

@@ -303,7 +303,7 @@ def test_no_archived_removes_only_the_declared_fact(tmp_path):
     ("rollback", "nothing here", False),
 ])
 def test_phrase_present_is_ordered_and_immediate(phrase, text, expected):
-    from fux.query.analyzer import analyze
+    from fux.text.analyzer import analyze
     from fux.query.rerank import phrase_present
 
     assert phrase_present(analyze(phrase), text) is expected

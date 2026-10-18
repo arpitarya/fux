@@ -23,7 +23,7 @@ import types
 import pytest
 
 from fux.errors import FuxError
-from fux.ingest import urlsrc
+from fux.acquire import urlsrc
 from l12_fixtures import url_limits
 
 #: `[sources.url] parallel_warn_at` as the template ships it.

@@ -287,10 +287,10 @@ def _merge_register(ancestor: str, ours: str, theirs: str) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     # The second console script gets the same UTF-8 stdio as `fux` — one
-    # encoding per artefact, not per entry point. See `cli._stdio_utf8`.
-    from ..cli import _stdio_utf8
+    # encoding per artefact, not per entry point. See `stdio.stdio_utf8`.
+    from ..stdio import stdio_utf8
 
-    _stdio_utf8()
+    stdio_utf8()
     argv = list(sys.argv[1:] if argv is None else argv)
     try:
         ancestor, ours, theirs, *rest = argv  # git's %O %A %B, then %P when given

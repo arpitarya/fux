@@ -10,7 +10,7 @@ feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind 
 owns: [.fux/fetchers/cdp.py@8af9ecc6bffd, src/fux/templates/cdp.py.txt@2534b0cf35c5]
 laws: [L2, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 62a20bb0799d834289788c0cb967507cde4afc64ead7826511b42cf658b82731
+content_sha: 3ff5efe077140ef73dd2b23c2a3fe09f62c1d08ad4f488e298a272b124f2d5af
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -730,7 +730,7 @@ grep -niE "download|install|playwright|selenium" .fux/fetchers/cdp.py
 # expect: no output outside prose about swapping it yourself
 
 # 3. it is still chosen by declaration, not escalation
-grep -rn "fetch=cdp\|escalat\|fallback" src/fux/ingest/urlsrc.py
+grep -rn "fetch=cdp\|escalat\|fallback" src/fux/acquire/urlsrc.py
 # expect: no automatic-escalation logic in fux's half
 
 # 4. it still converts nothing

@@ -124,11 +124,11 @@ checker can grade without grading it wrongly.
 **Nine component records gained a file by W-261**, each by **moving** its code
 out of the file that hosted it into one of its own — never by naming an owner
 over a file whose subject is another record's: `SR-FIND` (`query/find.py`),
-`SR-URL-INGEST` (`ingest/urlingest.py`), `SR-DIR-LIST` (`ingest/dirlist.py`),
+`SR-URL-INGEST` (`ingest/urlingest.py`), `SR-DIR-LIST` (`acquire/dirlist.py`),
 `SR-CACHEDIR-TAG` (`store/cachedir.py`), `SR-DOCS-TABLE`,
 `SR-RUNTIME-MANIFEST`, `SR-RUNTIME-STAMP` and `SR-RUNTIME-STATS`
 (`derive/docstable.py`, `manifest.py`, `stamp.py`, `stats.py`) and `SR-LOCKS`
-(`maintain/lock.py`), each with its Node twin where Node mirrors the code.
+(`store/lock.py`), each with its Node twin where Node mirrors the code.
 ⚠ **Four had left the list earlier by the same route** (W-208, 2026-09-21) —
 `SR-ANSWER`, `SR-RECORD`, `SR-CDP-FETCHER` and `SR-HTTP-FETCHER`, each by a
 carve-out from a directory claim.
@@ -637,8 +637,9 @@ table does not grant.
 | `src/fux/cli.py` | SR-CLI | the flat verb surface, the boundary error contract, and the `--json` shape |
 | `src/fux/api.py` | SR-API | `from fux import open` — the read-only library surface. **Carved out of nothing**: it is a new component, and it is the Python half of the one shape both readers expose — `node/src/index.mjs` is its Node twin, method for method. ⚠ The re-export that makes `from fux import open` resolve lives in `src/fux/__init__.py`, which SR-LAWS owns, and **no `describes` row covers it**: the qualifier narrows to top-level `def`s and `class`es, `open` there is an imported NAME, and an un-narrowed row would demand this record on every version bump. The gate reaches SR-API through `api.py` instead — editing the re-export alone does not open it, and that gap is stated rather than hidden |
 | `src/fux/__main__.py` | SR-CLI | `python -m fux` — the invocation ladder's last rung, and the spelling a human guesses |
-| `src/fux/sources.py` | SR-CLI | `add`/`remove`/`update` — the writer for **all three** source lists, and the verbs over them. The types list's edits go through `ingest/typesfile.py` (SR-TYPES decision 12) |
+| `src/fux/sources.py` | SR-CLI | `add`/`remove`/`update` — the writer for **all three** source lists, and the verbs over them. The types list's edits go through `acquire/typesfile.py` (SR-TYPES decision 12) |
 | `src/fux/progress.py` | SR-CLI | the progress plane — stderr-only, TTY-gated, counts not clocks |
+| `src/fux/stdio.py` | SR-CLI | UTF-8 on stdout and stderr, named rather than inherited — called first by both console scripts, `fux` and `fux-merge-index`. **Its own core-layer module** (W-282) so the writer's merge driver need not import the engine's CLI for it |
 | `src/fux/config.py` | SR-CONFIG | `fux.toml`'s schema, the opaque `[sources.url.config]` table, and the tables refused by name rather than ignored |
 | `src/fux/tune.py` | SR-TUNE | `.fux/tune.toml` — the loader, the closed key set, the two refusals, and the `[priority]` data. **The priority RESOLUTION is not here**: it lives on `query/rank.py::Weighting`, next to the bound that has to agree with it |
 | `src/fux/doctor.py` | SR-DOCTOR | every check, its level, and the register naming whose subject each one reports on. **Carved out of SR-DOTFUX for a different DECISION, not a different concern** (Arpit, 2026-09-11): the layout assertions are still SR-DOTFUX's subject, but this file's subject is the health command itself — and seven records describing one file made the freshness gate demand all eight for any change to any check |
@@ -649,18 +650,25 @@ table does not grant.
 | `src/fux/store/nodebundle.py` | SR-NODE-SEARCH | the Node plane's bundler — one generated `.mjs` per plane, built at publish (L10). **Carved out of `store/`'s claim for a different DECISION**, on `acquired.py`'s precedent: everything else under `store/` is the committed index, and this is a build-time tool that never reads or writes one. It is the only place a change to how the reader is SHIPPED can land, which is what makes the freshness gate reach this record |
 | `src/fux/store/acquired.py` | SR-ACQUIRED | the retained-bytes plane — content-addressed blobs, the advisory manifest, `sweep` and `evict`. **Carved out of `store/`'s claim for a different DECISION, not a different concern**: everything else under `store/` is the committed index, and this is the one plane that is neither committed nor rebuildable |
 | `src/fux/store/resident.py` | SR-MCP | the loaded index held across calls by `fux mcp` and `fux serve` — one `Holder` per process, keyed on `stamp.json`'s digest plus every shard's size and mtime (decision 13, W-249). **Carved out of `store/`'s claim for a different DECISION**, on `acquired.py`'s precedent: the reader decides how a shard is read, this decides how long a long-running server may keep what it read — and the record that decides the servers is the one a staleness change must open |
+| `src/fux/store/dirty.py` | SR-MAINTENANCE | the dirty set — which documents changed since the index was written. **Here, not in `maintain/`** (W-282), because the reader declares a lagging index from it and the refer plane marks changed URLs into it, and core imports neither side |
+| `src/fux/store/lastcited.py` | SR-MAINTENANCE | when each document was last cited — written on the query path, read by upkeep. In `store/` for the same reason as `dirty.py` |
+| `src/fux/store/corrections.py` | SR-ENRICH | the read side of `fux correct`: `.fux/eval/corrections.tsv`, pins and their suspension, and the `corrections:` marker that says which enrichment lines a person wrote. **Split out of `correct.py`** (W-282) because the ranker applies pins and reads provenance from it |
+| `src/fux/store/enrichfile.py` | SR-ENRICH | the enrichment file's format — its path, frontmatter, required keys and validity test. **Split out of `enrich.py`** (W-282) because ingest, the ranker and `correct` all read it, and none of them may import another layer for it |
 | `src/fux/ingest/` | SR-INGEST | git-dir walk, parse, edges — writes the committed plane |
 | `src/fux/ingest/priors.py` | SR-INGEST | ⚠ **covered by the directory claim, and described by no record's decisions.** It computes the supersession and recency priors and writes `mtime` and `superseded` into the committed record; SR-RECORD documents the properties and SR-TUNE the weights, but the module's own behaviour is unrecorded |
 | `src/fux/ingest/extract.py` | SR-EXTRACTED | what extraction *promises* — title, phrases, terms and per-field lengths, taken from the bytes and nothing else |
-| `src/fux/ingest/sourcelist.py` | SR-URL-LIST | the one line grammar `.fux/sources/dirs` and `.fux/sources/urls` are parsed by — and the `TYPES` entry vocabulary, which `fux source --types` checks against and `fux setup` reads the old `.fux/sources/types` with |
-| `src/fux/ingest/fuxignore.py` | SR-FUXIGNORE | `.fux/.fuxignore` — the `.gitignore` grammar, the last-match-wins resolution, and the duplicate-pattern warning. **Carved out of SR-INGEST's directory claim for a different DECISION, not a different concern**: everything else under `ingest/` is a step in the walk, and this is a *precedence rule* over it — the one thing that outranks the type allowlist |
-| `src/fux/ingest/typesfile.py` | SR-TYPES | `.fux/formats.toml` — the closed two-key shape, the one-line editors that refuse a layout they did not write, the refusal of the old `.fux/sources/types`, and its conversion. **Carved out of SR-INGEST's directory claim on `fuxignore.py`'s precedent**: a *policy over* the walk — what counts as a document — not a step in it |
-| `src/fux/ingest/urlsrc.py` | SR-FETCHER | fux's half of the fetch contract — load, configure, bound, call, normalize |
+| `src/fux/acquire/` | SR-INGEST | acquiring a document from its source — the source lists, the directory walk, the decoder digest, URL fetching and its state, refusals, freshness, PII redaction and the ingest ledger. **A core-layer package** (W-282): the writer ingests through it and the reader re-reads through it at answer time, so it imports neither |
+| `src/fux/acquire/source.py` | SR-REFER | where a cited document's bytes come from at answer time — a git file or a fetched URL, and `from_acquired`. In `acquire/` because `fux ingest`'s URL path decodes through `from_acquired` too |
+| `src/fux/acquire/urlstate.py` | SR-MAINTENANCE | the per-URL fetch counters and rate state the fetch path writes — in `acquire/` beside the fetcher that writes it |
+| `src/fux/acquire/sourcelist.py` | SR-URL-LIST | the one line grammar `.fux/sources/dirs` and `.fux/sources/urls` are parsed by — and the `TYPES` entry vocabulary, which `fux source --types` checks against and `fux setup` reads the old `.fux/sources/types` with |
+| `src/fux/acquire/fuxignore.py` | SR-FUXIGNORE | `.fux/.fuxignore` — the `.gitignore` grammar, the last-match-wins resolution, and the duplicate-pattern warning. **Carved out of SR-INGEST's directory claim for a different DECISION, not a different concern**: everything else under `ingest/` is a step in the walk, and this is a *precedence rule* over it — the one thing that outranks the type allowlist |
+| `src/fux/acquire/typesfile.py` | SR-TYPES | `.fux/formats.toml` — the closed two-key shape, the one-line editors that refuse a layout they did not write, the refusal of the old `.fux/sources/types`, and its conversion. **Carved out of SR-INGEST's directory claim on `fuxignore.py`'s precedent**: a *policy over* the walk — what counts as a document — not a step in it |
+| `src/fux/acquire/urlsrc.py` | SR-FETCHER | fux's half of the fetch contract — load, configure, bound, call, normalize |
 | `src/fux/ingest/urlingest.py` | SR-URL-INGEST | the url branch of the walk — decision 4's offline reconciliation, the offline re-derivation of retained bytes, and the networked run's per-URL health. Carved out of `ingest/run.py`, which calls it (W-261, 2026-10-05: every `kind: component` record owns a file) |
-| `src/fux/ingest/dirlist.py` | SR-DIR-LIST | where `.fux/sources/dirs` becomes values — included entries, `!` subtractions, `archived=true`, `enrich=true`. Carved out of `ingest/gitdir.py`, which keeps the walk (W-261, 2026-10-05: every `kind: component` record owns a file) |
-| `src/fux/ingest/pii.py` | SR-PII | the redaction matcher, the ruleset digest, and the plane table stating that redaction reaches the committed index and nothing else. Carved out of SR-INGEST's directory claim on `fuxignore.py`'s precedent — a *policy over* the walk, not a step in it |
-| `src/fux/ingest/refusals.py` | SR-REFUSAL | the refusal matcher — six byte-pure conditions and the always-on magic-byte floor. **Carved out of SR-INGEST's directory claim on `fuxignore.py`'s precedent**: everything else under `ingest/` is a step in the walk, and this is a *refusal rule* over it |
-| `src/fux/ingest/ingestlog.py` | SR-INGEST | W-200's ingest ledger — one runtime line per consumed document naming its decoder and, for a URL, its fetcher. 🔴 **Not `src/fux/query/provenance.py`**, which is SR-PROVENANCE's answer receipts and the opposite subject: that one records what somebody **asked** and L9 governs it, this one records what **ingest did** and L9 does not reach it. The collision was not noticed when W-200 named the path; both docstrings now open by naming the other |
+| `src/fux/acquire/dirlist.py` | SR-DIR-LIST | where `.fux/sources/dirs` becomes values — included entries, `!` subtractions, `archived=true`, `enrich=true`. Carved out of `acquire/gitdir.py`, which keeps the walk (W-261, 2026-10-05: every `kind: component` record owns a file) |
+| `src/fux/acquire/pii.py` | SR-PII | the redaction matcher, the ruleset digest, and the plane table stating that redaction reaches the committed index and nothing else. Carved out of SR-INGEST's directory claim on `fuxignore.py`'s precedent — a *policy over* the walk, not a step in it |
+| `src/fux/acquire/refusals.py` | SR-REFUSAL | the refusal matcher — six byte-pure conditions and the always-on magic-byte floor. **Carved out of SR-INGEST's directory claim on `fuxignore.py`'s precedent**: everything else under `ingest/` is a step in the walk, and this is a *refusal rule* over it |
+| `src/fux/acquire/ingestlog.py` | SR-INGEST | W-200's ingest ledger — one runtime line per consumed document naming its decoder and, for a URL, its fetcher. 🔴 **Not `src/fux/query/provenance.py`**, which is SR-PROVENANCE's answer receipts and the opposite subject: that one records what somebody **asked** and L9 governs it, this one records what **ingest did** and L9 does not reach it. The collision was not noticed when W-200 named the path; both docstrings now open by naming the other |
 | `src/fux/decode/` | SR-DECODE | bytes → Markdown, in one place: the built-in decoders, the registry, the override precedence and the `.fux/decoders/` consumer seam. Separate from SR-INGEST's claim because the record it carries is a **boundary** — where consumer-supplied dependencies become legal — not a step in the walk |
 | `src/fux/decode/csv.py` | SR-TABULAR | how much of a `.csv`/`.tsv` is read — `.fux/tune.toml [index] max_table_rows`. Carved out of SR-DECODE's directory claim on `freshness.py`'s precedent: the record is about **tabular documents**, which reaches past `decode/` into how `refer` cites them |
 | `src/fux/decode/xlsx.py` | SR-TABULAR | the same limit, applied per SHEET — a sheet is the workbook's own division, so truncating the fifth because the first four were long would be arbitrary |
@@ -679,12 +687,14 @@ table does not grant.
 | `src/fux/query/find.py` | SR-FIND | the `find` verb — `build_find`, `cmd_find`, its post-filters and the `find` half of the `--json` shape. Carved out of `query/__init__.py`, which keeps the shared ranking and every verb's stderr declarations (W-261, 2026-10-05: every `kind: component` record owns a file) |
 | `src/fux/query/rank.py` | SR-RANKING | the one scorer and the one sort, and `Weighting`, which is where every document multiplier must travel to reach the pruning bound |
 | `src/fux/query/sections.py` | SR-SECTIONS | the scan's section attachment, decision 7: the derived plane when the runtime is fresh, the committed plane by byte pattern otherwise; one result, and no arithmetic (that is `rank()`'s). Moved out of `scan.py` and `accel.py` by W-278 so the record owns its code |
-| `src/fux/query/bm25f.py` | SR-RANKING | BM25F, `Scoring`, and `derive_wlen` — the one place the weighting arithmetic exists |
-| `src/fux/query/analyzer.py` | SR-RANKING | split, lowercase, stopword, stem, hash — in that order, shared by ingest and query |
-| `src/fux/query/stem.py` | SR-RANKING | the Porter implementation, checked against the published test vectors |
-| `src/fux/query/identifiers.py` | SR-IDENTIFIERS | identifier families — the template grammar, the static regex guard, the text matcher, the canonical form and the file loader. The analyzer takes its rules as a parameter; every index-matching caller threads them from `for_root(root)` |
+| `src/fux/query/bm25f.py` | SR-RANKING | BM25F and `derive_wlen` — the one place the weighting arithmetic exists. `Scoring` is defined in `tune.py`, which builds it, and re-imported here (W-282); the describes row for `tune.py::Scoring` keeps this record bound to it |
+| `src/fux/text/` | SR-RANKING | the shared text plane — analyzer, stemmer, tokenizer, identifiers, mined terms and the chunker. **A core-layer package** (W-282): ingest and query both analyze through it, which is what makes them agree by construction, and it imports neither |
+| `src/fux/text/mined.py` | SR-ASK | the W-168 mined terms — taken from a document's body at ingest, scored at query time; in `text/` because both sides read it |
+| `src/fux/text/analyzer.py` | SR-RANKING | split, lowercase, stopword, stem, hash — in that order, shared by ingest and query |
+| `src/fux/text/stem.py` | SR-RANKING | the Porter implementation, checked against the published test vectors |
+| `src/fux/text/identifiers.py` | SR-IDENTIFIERS | identifier families — the template grammar, the static regex guard, the text matcher, the canonical form and the file loader. The analyzer takes its rules as a parameter; every index-matching caller threads them from `for_root(root)` |
 | `src/fux/identifiers_cmd.py` | SR-IDENTIFIERS | `fux identifiers [--write]` — prints the lens's families and their diff against the file; `--write` replaces only `[detected]` |
-| `src/fux/query/tokenize.py` | SR-RANKING | the shim both `ingest/` and `query/` import, which is what makes the two sides agree **by construction** rather than by review |
+| `src/fux/text/tokenize.py` | SR-RANKING | the shim both `ingest/` and `query/` import, which is what makes the two sides agree **by construction** rather than by review |
 | `src/fux/query/rerank.py` | SR-RERANK | proximity reranking — carved out because it is the one thing under `query/` that reads the **working tree** rather than the committed index, and because the decision it carries is a *refusal* |
 | `src/fux/query/confidence.py` | SR-CONFIDENCE | the four signals and the band, computed from what ranking already produced |
 | `src/fux/query/expand.py` | SR-EXPAND | the `Expansion` object — what to score, what the user actually asked, and at what weight. Carved out of `query/` because the decision it carries is a **refusal**: a document matching no original term is not ranked low, it is not returned |
@@ -699,13 +709,14 @@ table does not grant.
 | `src/fux/mcp.py` | SR-MCP | the stdio JSON-RPC server — three tools, stdlib-only, warm across calls. **`answer` is deliberately absent**: the agent is the answerer |
 | `src/fux/graph/` | SR-GRAPH | edges lifted into adjacency, unseeded label-propagation communities, PPR-lite, and the three relational verbs. Owns `.fux/runtime/graph.json` |
 | `src/fux/inspect/` | SR-INSPECT | the index X-ray — one pass over the committed shards, the gitignored hash-to-word dictionary, the six lenses, the vocabulary lens `words.py` the explorer's Words tab reads (2026-09-27), and the three provisional floors. **Reads only**, and the row is what makes the freshness gate demand that record the moment a lens changes what it claims about a corpus |
+| `src/fux/inspect_config.py` | SR-INSPECT | `.fux/inspect.toml` — the loader and its template, beside `tune.py` and `output_config.py`. **Out of `inspect/`** (W-282) because `fux setup` writes the file and the setup verb is the writer's, while `inspect/` is the engine's |
 | `src/fux/serve/` | SR-SERVE | the explorer — the server, its four GET routes, and the one bundled page. 🔴 **The page is the component most at risk here**: it is the only place in fux where somebody could write a second ranker and have it look right, which is why `tests/serve/test_page_computes_nothing.py` reads its source rather than its behaviour — a behavioural test would need the second ranker to compare against. `_bind_address` is a function, not an inline constant, so the `127.0.0.1` refusal has a name |
-| `src/fux/maintain/` | SR-MAINTENANCE | the git hooks and their installer, the deferring runner, the write lock, the daemon and the local state files. **ex-L5's write-time check is deliberately NOT here** — it lives in `store/writer.py`, because a check beside the thing it guards cannot be skipped |
-| `src/fux/maintain/lock.py` | SR-LOCKS | `.fux/runtime/write.lock` — `acquire`, `holder`, `write_lock`, `release`, `break_lock`. Carved out of `runner.py`, which re-exports every name so `runner.acquire` keeps its callers (W-261, 2026-10-05: every `kind: component` record owns a file) |
+| `src/fux/maintain/` | SR-MAINTENANCE | the git hooks and their installer, the deferring runner, the daemon and the merge driver. The write lock (`store/lock.py`), the dirty set and last-cited file (`store/dirty.py`, `store/lastcited.py`) and the URL fetch state (`acquire/urlstate.py`) are core since W-282, because the reader reads them too. **ex-L5's write-time check is deliberately NOT here** — it lives in `store/writer.py`, because a check beside the thing it guards cannot be skipped |
+| `src/fux/store/lock.py` | SR-LOCKS | `.fux/runtime/write.lock` — `acquire`, `holder`, `write_lock`, `release`, `break_lock`. Carved out of `runner.py`, which re-exports every name so `runner.acquire` keeps its callers (W-261, 2026-10-05: every `kind: component` record owns a file) |
 | `src/fux/maintain/mergedriver.py` | SR-MERGE-DRIVER | the merge driver itself — carved out because its failure mode and its gate are its own |
-| `src/fux/refer/` | SR-REFER | source · freshness · chunk · rescore · assemble. **Imports no transport**: the consumer's fetcher is injected |
-| `src/fux/refer/_chunk.py` | SR-CHUNKING | what a passage IS — the fold rule that derives row/unit/section/file from heading depth, the universal table rule and the paragraph→line→word ladder. Carved out of SR-REFER's directory claim on `freshness.py`'s precedent: the subject reaches past `refer/` into what decoders EMIT |
-| `src/fux/refer/freshness.py` | SR-URL-FRESHNESS | the six verdicts and the policy object — the **claim-strength vocabulary**, which now reaches past `refer/` into the output schema and `fux verify`. Carved out of SR-REFER's directory claim on `arc.py`'s precedent |
+| `src/fux/refer/` | SR-REFER | obtain · rescore · assemble, and the two caches. The modules it re-reads a document through are core since W-282 — `acquire/source.py`, `acquire/freshness.py`, `text/chunk.py` — because `fux ingest` uses them too. **Imports no transport**: the consumer's fetcher is injected |
+| `src/fux/text/chunk.py` | SR-CHUNKING | what a passage IS — the fold rule that derives row/unit/section/file from heading depth, the universal table rule and the paragraph→line→word ladder. Carved out of SR-REFER's directory claim on `freshness.py`'s precedent: the subject reaches past `refer/` into what decoders EMIT |
+| `src/fux/acquire/freshness.py` | SR-URL-FRESHNESS | the six verdicts and the policy object — the **claim-strength vocabulary**, which now reaches past `refer/` into the output schema and `fux verify`. Carved out of SR-REFER's directory claim on `arc.py`'s precedent |
 | `src/fux/refer/arc.py` | SR-CACHE | the content cache, keyed `(loc, sha)` so a hit cannot change an answer |
 | `src/fux/refer/fetchcache.py` | SR-CACHE | the TTL fetch store — the only place in the engine that reads a wall clock |
 | `src/fux/templates/` | SR-FETCHER | shipped package data — **bytes, never imported**. ⚠ **The two fetcher templates are CARVED OUT** (2026-09-21, W-208): `http.py.txt` is SR-HTTP-FETCHER's and `cdp.py.txt` is SR-CDP-FETCHER's, each beside the `.fux/fetchers/` file it is the template for. What stays here is the directory and everything not carved out of it |
@@ -760,11 +771,11 @@ table does not grant.
 | `node/src/graph/plane.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/plane.py` — read from `graph.json` when fresh, rebuilt in memory otherwise and whenever `FUX_GRAPH_REBUILD=1` (SR-NODE-SEARCH decision 9, W-259) |
 | `node/src/graph/walk.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/walk.py` |
 | `node/src/index.mjs` | SR-API | the Node twin of `from fux import open`, method for method. The register's own note on `src/fux/api.py` already says the two are one shape |
-| `node/src/ingest/gitdir.mjs` | SR-INGEST | the Node twin of `src/fux/ingest/gitdir.py` — the live `archived=true` read |
+| `node/src/ingest/gitdir.mjs` | SR-INGEST | the Node twin of `src/fux/acquire/gitdir.py` — the live `archived=true` read |
 | `node/src/ingest/priors.mjs` | SR-INGEST | the Node twin of `src/fux/ingest/priors.py` |
-| `node/src/ingest/sourcelist.mjs` | SR-URL-LIST | the Node twin of `src/fux/ingest/sourcelist.py` — `.fux/sources/dirs` read live |
+| `node/src/ingest/sourcelist.mjs` | SR-URL-LIST | the Node twin of `src/fux/acquire/sourcelist.py` — `.fux/sources/dirs` read live |
 | `node/src/ingest/dirlist.mjs` | SR-DIR-LIST | the Node twin of `dirlist.py` — `readDirs` and `archivedDirs`, the half the query plane reads (W-261) |
-| `node/src/query/analyzer.mjs` | SR-RANKING | the Node twin of `src/fux/query/analyzer.py`. An identifier analyzed differently is a term one reader indexes and the other never finds |
+| `node/src/query/analyzer.mjs` | SR-RANKING | the Node twin of `src/fux/text/analyzer.py`. An identifier analyzed differently is a term one reader indexes and the other never finds |
 | `node/src/query/bm25f.mjs` | SR-RANKING | the Node twin of `src/fux/query/bm25f.py` — the scorer's field weighting |
 | `node/src/query/compose.mjs` | SR-ASK | the graph stage of `ask`. Twin of `src/fux/query/compose.py` |
 | `node/src/query/confidence.mjs` | SR-CONFIDENCE | the Node twin of `src/fux/query/confidence.py` — the band and `answerable` |
@@ -777,14 +788,14 @@ table does not grant.
 | `node/src/query/rerank.mjs` | SR-RERANK | the Node twin of `src/fux/query/rerank.py` — the proximity reranker |
 | `node/src/query/run.mjs` | SR-ASK | the shared spine of `ask`, `find` and `answer`. Twin of the pure half of `src/fux/query/__init__.py` |
 | `node/src/query/scan.mjs` | SR-ASK | the Node twin of `src/fux/query/scan.py` — the only candidate path Node has |
-| `node/src/query/stem.mjs` | SR-RANKING | the Node twin of `src/fux/query/stem.py` |
-| `node/src/query/identifiers.mjs` | SR-IDENTIFIERS | the Node twin of `src/fux/query/identifiers.py` — the grammar, the guard, the matcher and `identifiersFor(root)`. A divergence is a canonical term one reader writes and the other never asks for |
-| `node/src/query/tokenize.mjs` | SR-RANKING | the Node twin of `src/fux/query/tokenize.py` |
+| `node/src/query/stem.mjs` | SR-RANKING | the Node twin of `src/fux/text/stem.py` |
+| `node/src/query/identifiers.mjs` | SR-IDENTIFIERS | the Node twin of `src/fux/text/identifiers.py` — the grammar, the guard, the matcher and `identifiersFor(root)`. A divergence is a canonical term one reader writes and the other never asks for |
+| `node/src/query/tokenize.mjs` | SR-RANKING | the Node twin of `src/fux/text/tokenize.py` |
 | `node/src/refer/assemble.mjs` | SR-REFER | the Node twin of `src/fux/refer/_assemble.py` — the byte budget filled by score per byte |
-| `node/src/refer/chunk.mjs` | SR-CHUNKING | the Node twin of `src/fux/refer/_chunk.py` — passages from the document's own heading depth |
+| `node/src/refer/chunk.mjs` | SR-CHUNKING | the Node twin of `src/fux/text/chunk.py` — passages from the document's own heading depth |
 | `node/src/refer/freshness.mjs` | SR-URL-FRESHNESS | the Node twin of the freshness verdicts — the same five words, computed the same way, or the two readers disagree about whether an answer is current. Owned by SR-NODE-SEARCH |
 | `node/src/refer/rescore.mjs` | SR-REFER | the Node twin of `src/fux/refer/_rescore.py` — fetched passages re-scored with the same BM25F |
-| `node/src/refer/source.mjs` | SR-REFER | where a document's bytes come from. Twin of `src/fux/refer/source.py`, which SR-REFER owns; SR-URL-FRESHNESS's row covers only the `as-ingested` fallback |
+| `node/src/refer/source.mjs` | SR-REFER | where a document's bytes come from. Twin of `src/fux/acquire/source.py`, which SR-REFER owns; SR-URL-FRESHNESS's row covers only the `as-ingested` fallback |
 | `node/src/store/format.mjs` | SR-INDEX-LIFECYCLE | the Node twin of `src/fux/store/format.py` — the wire format, decoded |
 | `node/src/store/reader.mjs` | SR-INDEX-LIFECYCLE | the Node twin of `src/fux/store/reader.py` |
 | `node/src/store/fuxdir.mjs` | SR-DOTFUX | the Node twin of `fuxdir.py`, narrowed to `fux_dir` (W-242 Tier 2; `derived_dir` left for `cachedir.mjs` with W-261) |
@@ -850,9 +861,9 @@ table does not grant.
 | `.fux/output.toml` | SR-OUTPUT | this repo's own rendering defaults — the file whose shape is this record's whole subject |
 | `.fux/pii.toml` | SR-PII | this repo's own redaction ruleset. Decision 1 is that the ruleset is COMMITTED, so the committed file is the record's subject and not merely its output |
 | `.fux/refusals.toml` | SR-REFUSAL | this repo's own sign-in and refusal rules — the pair of `src/fux/templates/refusals.toml.txt`, already owned here |
-| `.fux/inspect.toml` | SR-INSPECT | this repo's own `fux inspect` / explorer thresholds, samples and row counts — the pair of `src/fux/templates/inspect.toml.txt` and `inspect/config.py`, already owned here. Changes what the report SAYS, never the index or a ranking |
+| `.fux/inspect.toml` | SR-INSPECT | this repo's own `fux inspect` / explorer thresholds, samples and row counts — the pair of `src/fux/templates/inspect.toml.txt` and `inspect_config.py`, already owned here. Changes what the report SAYS, never the index or a ranking |
 | `.fux/identifiers.toml` | SR-IDENTIFIERS | this repo's own identifier families — both tables empty, so this repo's index is v3's, byte for byte |
-| `.fux/formats.toml` | SR-TYPES | this repo's own types list. `ingest/typesfile.py` is the writer, already owned here; this is what it writes |
+| `.fux/formats.toml` | SR-TYPES | this repo's own types list. `acquire/typesfile.py` is the writer, already owned here; this is what it writes |
 | `scripts/check-open-work-inbox.py` | SR-WORK-OPEN-QUEUE | the Blocked-on-Arpit inbox check — rules 39–45, executable |
 | `.claude/hooks/guard-open-work-inbox.sh` | SR-WORK-OPEN-QUEUE | the same check at session start, which is where the first-output rule bites |
 | `scripts/commit-paths.py` | SR-WORK-SESSION | explicit pathspecs when the index carries another session's work — decision 10, executable. **This record named no code path at all until 2026-09-21** |
@@ -861,6 +872,86 @@ table does not grant.
 | `tests/test_record_paths_resolve.py` | SR-WORK-GOVERNANCE | the renumber gate — a numbered record path in a live file must resolve |
 | `tests/test_work_queue_rules_have_one_home.py` | SR-WORK-GOVERNANCE | the one-home rule, over the records that carry the queue's discipline |
 <!-- OWNERSHIP-TABLE-END -->
+
+### The layer map — which package each component ships in
+
+**Every file under `src/fux/` belongs to exactly one of four layers**, and the
+layer decides which distribution will carry it (W-282, from
+[`index-stores.md` §8](../work/proposals/index-stores.md)): **core** is
+shared and has no verbs; **reader** ranks and answers, refer included;
+**writer** ingests and keeps the index current; **engine** is the CLI and the
+verbs that need both. `fux-engine` installs all four, exactly as today.
+
+- **Who may import whom.** core imports only core; reader imports core and
+  reader; writer imports core and writer; engine imports anything. An import
+  of `fux.a.b` also runs `fux/a/__init__.py`, so a package counts as imported.
+- **A sub-package is placed whole** — one layer per directory — so a
+  reader-only install has no `fux.ingest` and a writer-only one no
+  `fux.query`. Root-level modules are placed one by one. The most specific row
+  wins.
+- **A cross-layer import is permitted in one form only**: listed in the second
+  table, and written inside `try:` with an `except ImportError` handler, so
+  the importing package still works where the other layer is not installed.
+  Each row says what happens then.
+- 🔴 **Held by [`tests/test_package_layers.py`](../tests/test_package_layers.py)**,
+  which reads both tables from this file, walks every import in `src/fux/`
+  and fails on any edge that crosses them, on a file no row places, and on a
+  guarded row that no longer matches the code.
+- ⚠ **What the walk cannot see.** A subprocess relaunch is not an import:
+  `maintain/runner.py` and `maintain/daemon.py` start `python -m fux.cli`, the
+  engine's CLI, from the writer. That holds while `fux-engine` is the only
+  distribution, and is W-282 Step 2's to cut when the writer gets its own
+  entry point.
+
+<!-- LAYER-MAP-START -->
+
+| path | layer |
+|---|---|
+| `src/fux/__init__.py` | core |
+| `src/fux/errors.py` | core |
+| `src/fux/constants.py` | core |
+| `src/fux/constants.toml` | core |
+| `src/fux/schema.py` | core |
+| `src/fux/schemas/` | core |
+| `src/fux/frontmatter.py` | core |
+| `src/fux/progress.py` | core |
+| `src/fux/stdio.py` | core |
+| `src/fux/config.py` | core |
+| `src/fux/tune.py` | core |
+| `src/fux/output_config.py` | core |
+| `src/fux/inspect_config.py` | core |
+| `src/fux/store/` | core |
+| `src/fux/decode/` | core |
+| `src/fux/text/` | core |
+| `src/fux/acquire/` | core |
+| `src/fux/templates/` | core |
+| `src/fux/api.py` | reader |
+| `src/fux/observe.py` | reader |
+| `src/fux/mcp.py` | reader |
+| `src/fux/query/` | reader |
+| `src/fux/refer/` | reader |
+| `src/fux/graph/` | reader |
+| `src/fux/derive/` | reader |
+| `src/fux/setup.py` | writer |
+| `src/fux/sources.py` | writer |
+| `src/fux/correct.py` | writer |
+| `src/fux/enrich.py` | writer |
+| `src/fux/ingest/` | writer |
+| `src/fux/maintain/` | writer |
+| `src/fux/cli.py` | engine |
+| `src/fux/__main__.py` | engine |
+| `src/fux/doctor.py` | engine |
+| `src/fux/identifiers_cmd.py` | engine |
+| `src/fux/inspect/` | engine |
+| `src/fux/serve/` | engine |
+
+| importer | guarded import | where that layer is not installed |
+|---|---|---|
+| `src/fux/__init__.py` | `fux.api` | `fux.open` raises `ImportError` naming fux-reader; everything else in `fux` imports as usual |
+| `src/fux/ingest/__init__.py` | `fux.derive` | `build_runtime` returns `None`: the writer stops once the committed index is written, because a machine that never ranks has no runtime to keep current |
+| `src/fux/enrich.py` | `fux.query` | `fux enrich --check` refuses with a `FuxError` naming fux-reader rather than passing questions it could not rank |
+
+<!-- LAYER-MAP-END -->
 
 ---
 
@@ -884,7 +975,7 @@ unauditable, and an unauditable table stops being trusted.
 ⚠ **Seeded small and first-hand, and deliberately filled once.** It opened at
 **four** rows, each verified against a change actually made rather than a sweep
 guessing at intent, because a bulk fill would make the relation *look* enforced
-while asserting things nobody checked. It stands at **67** rows: the growth to
+while asserting things nobody checked. It stands at **68** rows: the growth to
 about thirty was row-by-row with the change that needed it, and the rest landed
 together on **2026-09-21** (W-208), when the nine `component` records that could
 not be opened at all were given the reach their subjects already had. **That
@@ -918,40 +1009,40 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/query/rank.py` | SR-TUNE | `[priority]` is DATA in SR-TUNE and RESOLUTION on `rank.py::Weighting` — the register's own ownership note already says so, which is what made this row checkable rather than asserted |
 | `src/fux/ingest/run.py` | SR-PII | the redaction pass, and its position between `content_sha` and `extract_fields` — decision 3, which is the whole record. Also `_pii_ruleset_moved`, the reuse invalidation. Owned by SR-INGEST for the walk |
 | `src/fux/enrich.py` | SR-PII | `enrich=` for `url:` documents — `_document_text` reading the retained blob, and the single synthetic `.fux/sources/urls` scope. Owned by SR-ENRICH for enrichment itself |
-| `src/fux/ingest/sourcelist.py` | SR-PII | `enrich` on the URL list, resolved through the same three layers as `keep` and `ttl` |
+| `src/fux/acquire/sourcelist.py` | SR-PII | `enrich` on the URL list, resolved through the same three layers as `keep` and `ttl` |
 | `src/fux/config.py::UrlSource,_load_url_source` | SR-PII | `[sources.url] enrich` — the source-wide layer |
 | `src/fux/cli.py::_require_pii_rules,main` | SR-PII | `_require_pii_rules` and `PII_EXEMPT` — decision 17's refusal, placed before dispatch so a verb added later is gated without knowing it. Owned by SR-CLI for the verb surface; the rule and its exemptions are this record's |
 | `src/fux/setup.py::run` | SR-PII | writes `.fux/pii.toml` from the starter, write-if-missing — the half of decision 17 that makes the refusal fixable. Owned by SR-DOTFUX for scaffolding |
 | `src/fux/store/fuxdir.py` | SR-PII | `pii.toml`'s row in `COMMITTED_FILES` — **the ruleset is committed, and that is the decision** (decision 1): a redaction rule that lived on a gitignored path would redact one clone and not the next, so the file has to sit in the category `fux doctor` audits. Owned by SR-DOTFUX for the layout |
-| `src/fux/ingest/urlsrc.py` | SR-ACQUIRED | retention lives in `fetch_all()` and **never inside a fetcher** (decision 5) — W-86 P8's precedent, so every fetcher gains it with no line changed in any of them. Owned by SR-FETCHER for the contract itself |
-| `src/fux/ingest/urlsrc.py` | SR-REFUSAL | the refusal check sits in `fetch_all()`, **after `_unpack` and before persist and decode** (decision 1) — the ordering is the decision, and it lives in a file this record does not own |
-| `src/fux/ingest/urlsrc.py` | SR-URL-FRESHNESS | `UrlEntry.ttl`, and `resolve_urls` applying the same three layers to it as to `keep` — a per-URL freshness bound resolved inside the ingest module |
-| `src/fux/ingest/sourcelist.py` | SR-URL-FRESHNESS | `ttl` is the **first typed attribute** in the grammar: `Attribute` grew an optional `validate` callable because a duration cannot be a closed enum. Owned by SR-URL-LIST for the grammar itself, constrained here |
-| `src/fux/ingest/sourcelist.py` | SR-ACQUIRED | `keep`, and its default flipping to `true` (decision 4) — a value in a file this record does not own |
+| `src/fux/acquire/urlsrc.py` | SR-ACQUIRED | retention lives in `fetch_all()` and **never inside a fetcher** (decision 5) — W-86 P8's precedent, so every fetcher gains it with no line changed in any of them. Owned by SR-FETCHER for the contract itself |
+| `src/fux/acquire/urlsrc.py` | SR-REFUSAL | the refusal check sits in `fetch_all()`, **after `_unpack` and before persist and decode** (decision 1) — the ordering is the decision, and it lives in a file this record does not own |
+| `src/fux/acquire/urlsrc.py` | SR-URL-FRESHNESS | `UrlEntry.ttl`, and `resolve_urls` applying the same three layers to it as to `keep` — a per-URL freshness bound resolved inside the ingest module |
+| `src/fux/acquire/sourcelist.py` | SR-URL-FRESHNESS | `ttl` is the **first typed attribute** in the grammar: `Attribute` grew an optional `validate` callable because a duration cannot be a closed enum. Owned by SR-URL-LIST for the grammar itself, constrained here |
+| `src/fux/acquire/sourcelist.py` | SR-ACQUIRED | `keep`, and its default flipping to `true` (decision 4) — a value in a file this record does not own |
 | `src/fux/config.py::UrlSource,_load_url_source` | SR-ACQUIRED | `[sources.url] keep` and `acquired_max_bytes` — the source-wide layer and the store's bound |
 | `src/fux/config.py::UrlSource,_load_url_source` | SR-URL-FRESHNESS | `[sources.url] ttl`, validated by the source list's **own** duration grammar rather than a second copy, so `--ttl 1x` and a hand-written `ttl=1x` fail identically |
 | `src/fux/refer/__init__.py` | SR-URL-FRESHNESS | both `as-ingested` fallback points in `_obtain`, and `min(policy, declared)` — decision 11's arithmetic, which is where a per-URL value is prevented from widening a caller's policy |
-| `src/fux/refer/source.py` | SR-URL-FRESHNESS | `from_acquired`, and decision 6's rule that it **imports** `_decode_fetched` and `sanitize` rather than reimplementing them — the property the whole fallback rests on |
+| `src/fux/acquire/source.py` | SR-URL-FRESHNESS | `from_acquired`, and decision 6's rule that it **imports** `_decode_fetched` and `sanitize` rather than reimplementing them — the property the whole fallback rests on |
 | `src/fux/store/fuxdir.py` | SR-ACQUIRED | the `ACQUIRED` declaration and its `.gitignore` line. Owned by SR-DOTFUX for the layout; this is the record that added the third kind |
 | `src/fux/mcp.py` | SR-OUTPUT | decisions 11, 16 and 17 reach in directly: `[mcp]`'s closed key set (`top` only, `band` refused by name), `tools/list` advertising the RESOLVED `top` rather than a literal (the W-83-class defect this decision exists to prevent), and `[mcp]` being loaded once at `serve()` start rather than per search. Owned by SR-MCP for the protocol itself; this is a rendering decision reaching into the module that serves it |
 
 | `src/fux/query/__init__.py` | SR-ANSWER | `cmd_answer` and both printers live here — `ANSWER_TOP`, the refer/index fork, `_freshness_of`. ⚠ **Added 2026-09-05 because this record owned NOTHING and therefore could never be opened by the gate**: W-108 rewrote the `answer` verb and the freshness check demanded SR-ASK, SR-CONFIDENCE, SR-OUTPUT, SR-REFER and SR-URL-FRESHNESS — every record except the one whose entire subject is the verb. Owned by SR-ASK for the scan and unification |
 | `src/fux/refer/_rescore.py` | SR-RERANK | `passage_boost` and the bounded multiplicative uplift reach in here (decision 9) — the same constant that reorders documents scores their passages. Owned by SR-REFER under its `src/fux/refer/` claim |
-| `src/fux/maintain/urlstate.py` | SR-REFUSAL | `refused` and `record_refusals` — the counter's storage, in the file SR-MAINTENANCE owns, on `rate_limited`'s shape with the key turned from host to rule |
-| `src/fux/ingest/urlsrc.py` | SR-URL-FRESHNESS | `_record_refusals` in `fetch_all()` — see SR-REFUSAL decision 11; the counting sits beside the refusal check the row above places |
-| `src/fux/ingest/sourcelist.py` | SR-ARCHIVED-CONTENT | `archived` on both lists — `dirs` since 2026-08-22 and `urls` since 2026-09-11 (decision 1a), the same name, values and default on each. ⚠ **Added because this record OWNED NOTHING in `src/` and could therefore never be opened by the freshness gate** — the [SR-ANSWER](0105_answer.md) precedent above, exactly: W-126 amended this record and the gate demanded seven others instead |
-| `src/fux/ingest/urlsrc.py` | SR-ARCHIVED-CONTENT | `UrlEntry.archived`, and `resolve_urls` applying **two** layers to it where `keep` and `ttl` take three — the absence of a source-wide layer is decision 1a's call, not an omission |
+| `src/fux/acquire/urlstate.py` | SR-REFUSAL | `refused` and `record_refusals` — the counter's storage, in the file SR-MAINTENANCE owns, on `rate_limited`'s shape with the key turned from host to rule |
+| `src/fux/acquire/urlsrc.py` | SR-URL-FRESHNESS | `_record_refusals` in `fetch_all()` — see SR-REFUSAL decision 11; the counting sits beside the refusal check the row above places |
+| `src/fux/acquire/sourcelist.py` | SR-ARCHIVED-CONTENT | `archived` on both lists — `dirs` since 2026-08-22 and `urls` since 2026-09-11 (decision 1a), the same name, values and default on each. ⚠ **Added because this record OWNED NOTHING in `src/` and could therefore never be opened by the freshness gate** — the [SR-ANSWER](0105_answer.md) precedent above, exactly: W-126 amended this record and the gate demanded seven others instead |
+| `src/fux/acquire/urlsrc.py` | SR-ARCHIVED-CONTENT | `UrlEntry.archived`, and `resolve_urls` applying **two** layers to it where `keep` and `ttl` take three — the absence of a source-wide layer is decision 1a's call, not an omission |
 | `src/fux/ingest/run.py` | SR-ARCHIVED-CONTENT | `_archived_url_ids` and `_with_archived` — the declaration reaching a record, including a CARRIED one, which is the half that makes a retired page declarable at all. Owned by SR-INGEST for the walk |
 | `src/fux/setup.py::detect_workspace,wire_workspace,_yarn_berry_linker` | SR-NODE-SEARCH | the monorepo half of decision 15 — which signals mean a workspace, and the format-preserving splice into a manifest fux does not own. **It lives in `setup.py` rather than in `fuxdir.py` by structure, not by convention**: `ensure_layout` runs at the head of every ingest and must never edit a consumer's `package.json`. Owned by SR-DOTFUX as scaffolding |
 | `src/fux/doctor.py::_node_reader,_installed_reader` | SR-NODE-SEARCH | the `node reader` row — the version, the shape, a stale `src/` tree still in the consumer's repo, and a shape-C manifest with nothing installed to resolve it. Owned by SR-DOCTOR, which decides what a row IS |
 | `tools/differential/node_arm.py::bundle_entry,Arm` | SR-NODE-SEARCH | the sixth surface — the published bundle against the module tree it was built from (`bundle_entry` builds it per run; `Arm.compare_bundle`, `compare_bundle_api` and `compare_bundle_mcp` compare it). ⚠ **Narrowed to the top-level symbols the gate can resolve** — a method name here would switch the gate off silently, which `tests/test_sr_freshness.py::test_the_narrowing_is_recorded_where_the_gate_can_read_it` catches. Owned by SR-T1-ACCELERATOR, which owns the harness |
 | `src/fux/store/fuxdir.py::ensure_node_reader,node_version,node_shape,_node_source,_packaged_node_files,_prune_node_reader,_workspace_manifest` | SR-NODE-SEARCH | the vendoring half of R2 — which files are written into `.fux/node/` and the version comparison that decides whether to overwrite. **The `.fux/` SHAPE is still SR-DOTFUX's subject** (it is the fourth shape there); what this record decides is that the vendored thing is a reader and that a stale one is a wrong answer |
-| `src/fux/ingest/urlsrc.py::fetch_all` | SR-URL-INGEST | decision 5's pipeline ends here, and decisions 3 and 6 are what `fetch_all` does with what comes back: a failed fetch is a skip, and the bytes are normalized. Owned by SR-FETCHER for the contract itself |
-| `src/fux/maintain/dirty.py` | SR-URL-INGEST | which URLs a background pass considers stale enough to re-fetch — the fenced path decision 2 names, on the maintenance side. Owned by SR-MAINTENANCE |
+| `src/fux/acquire/urlsrc.py::fetch_all` | SR-URL-INGEST | decision 5's pipeline ends here, and decisions 3 and 6 are what `fetch_all` does with what comes back: a failed fetch is a skip, and the bytes are normalized. Owned by SR-FETCHER for the contract itself |
+| `src/fux/store/dirty.py` | SR-URL-INGEST | which URLs a background pass considers stale enough to re-fetch — the fenced path decision 2 names, on the maintenance side. Owned by SR-MAINTENANCE |
 | `src/fux/store/format.py` | SR-RECORD | the field order and the encoder every record is written through — the declared shape, applied. Owned by SR-INDEX-LIFECYCLE for the store |
 | `src/fux/store/writer.py` | SR-RECORD | where a record is assembled and shard-addressed; a field added to the schema without a writer change is a field nothing emits |
 | `src/fux/store/canonical.py` | SR-RECORD | the canonical byte form the record's `content_sha` and the root hash are taken over — the determinism half of the shape (L4) |
-| `src/fux/ingest/sourcelist.py::_dir_reason` | SR-DIR-LIST | the `dirs` grammar's own validator — the `!` subtraction and the trailing-slash rule are this record's, in a file SR-URL-LIST owns for the grammar machinery |
+| `src/fux/acquire/sourcelist.py::_dir_reason` | SR-DIR-LIST | the `dirs` grammar's own validator — the `!` subtraction and the trailing-slash rule are this record's, in a file SR-URL-LIST owns for the grammar machinery |
 | `src/fux/derive/_build.py::_read_committed` | SR-DOCS-TABLE | the rows the table carries are assembled here, in docidx order; the writer is `docstable.py`, this record's own since W-261. Owned by SR-T1-ACCELERATOR |
 | `src/fux/derive/format.py` | SR-DOCS-TABLE | `DOCS_FIELDS` and `DOCS_NAME` — the field set and the file name the table is written under |
 | `src/fux/derive/_build.py::_read_committed` | SR-RUNTIME-MANIFEST | each shard's content sha — the manifest's fingerprint — is computed here; the writer is `manifest.py` since W-261 |
@@ -967,15 +1058,17 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/query/scan.py` | SR-RUNTIME-STATS | the scan reads the plane's `df`/`n` on the non-accelerated path — the other half of the differential pair |
 | `src/fux/query/scan.py` | SR-PROVENANCE | what a receipt must be able to say about a hit is decided here, where the hit is produced. Owned by SR-ASK |
 | `src/fux/store/collisions.py` | SR-POSTINGS | the term-to-shard collision handling the postings layout rests on. Owned by SR-INDEX-LIFECYCLE |
-| `src/fux/ingest/gitdir.py` | SR-FUXIGNORE | `would_index`, `_generated_kind` and the verdicts a `.fuxignore` rule produces — the file where an ignore rule becomes a skip |
-| `src/fux/ingest/gitdir.py` | SR-TYPES | `read_types`, `TypeFilter`, `_default_types` — the types list applied to the walk. `ingest/typesfile.py` is the writer and is owned here; this is the reader |
+| `src/fux/acquire/gitdir.py` | SR-FUXIGNORE | `would_index`, `_generated_kind` and the verdicts a `.fuxignore` rule produces — the file where an ignore rule becomes a skip |
+| `src/fux/acquire/gitdir.py` | SR-TYPES | `read_types`, `TypeFilter`, `_default_types` — the types list applied to the walk. `acquire/typesfile.py` is the writer and is owned here; this is the reader |
 | `node/src/refer/source.mjs` | SR-URL-FRESHNESS | the Node twin of `from_acquired` and the `as-ingested` fallback |
 | `node/mcp-tools.json` | SR-MCP | the tool declarations both readers serve from |
 | `node/dist/fux.mjs` | SR-WORK-RELEASE | the ONE bundled file a consumer is served ([L10](0012_LAW-10-bundled-output.md)), built at publish. ⚠ **Named, never owned, and GITIGNORED** — it is build output, so the gate can never fire on it and the generated Components block renders it without a link. The row exists so the record that decides how a release reaches npm names the artefact that goes there |
 | `node/test/config.test.mjs` | SR-TUNE | `.fux/tune.toml` as the Node reader loads it — the header names it first |
 | `node/test/config.test.mjs` | SR-OUTPUT | `.fux/output.toml` as the Node reader loads it |
-| `src/fux/refer/_chunk.py::_sections,_title_index,index_sections` | SR-SECTIONS | the index section rule (decision 2) cuts with `_sections`, folds the title `_title_index` names, and is `index_sections` itself (built 2026-10-10 on `w236-sections`); a change to any of them changes what a section record is. Narrowed because the rest of the file (`_fold`, the table bands, the ladder) is passage policy the rule deliberately does not reuse |
+| `src/fux/text/chunk.py::_sections,_title_index,index_sections` | SR-SECTIONS | the index section rule (decision 2) cuts with `_sections`, folds the title `_title_index` names, and is `index_sections` itself (built 2026-10-10 on `w236-sections`); a change to any of them changes what a section record is. Narrowed because the rest of the file (`_fold`, the table bands, the ladder) is passage policy the rule deliberately does not reuse |
 | `src/fux/maintain/mergedriver.py::merge_sections` | SR-SECTIONS | decision 9's merge rule: a parent's sections merge as one unit, and both-sides-changed is refused. Owned by SR-MERGE-DRIVER for the driver; this is the one function whose rule this record states |
 | `src/fux/query/rank.py::_section_gain` | SR-SECTIONS | decision 5's third form, `max(0, max_k S_sec* − S_doc')`: each own-matching section scored as a short document (its body and heading, the parent's title/path/ctx) on the document `avg_wlen`; zero for a sectionless document; the zero-gain rule. Owned by SR-RANKING for `rank()` |
+| `src/fux/tune.py::Scoring` | SR-RANKING | the BM25F parameter object — `k1`, `b`, the field weights, `anchor`, `section`. **Defined in `tune.py`**, which builds it from `.fux/tune.toml`, since W-282 made tune core and kept the ranker out of it; its arithmetic and its alignment assert are this record's |
+| `src/fux/tune.py::Proximity` | SR-RERANK | the passage arithmetic's four `[ranking]` numbers as one object — defined in `tune.py` for the same reason as `Scoring` (W-282); what they do is this record's |
 <!-- DESCRIBES-TABLE-END -->
 
