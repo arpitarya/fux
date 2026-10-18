@@ -49,6 +49,27 @@ Arpit ruled *"push publish everything and release a new major version 4.0.0"*.
 `skip-existing` makes it safe: the roles upload, then fux-engine 4.0.0, then the
 scoped package. Then check `https://pypi.org/pypi/fux-engine/json` reads 4.0.0.
 
+## Progress 2026-10-18, 16:10 (Cowork, in Arpit's signed-in Chrome)
+
+- ✅ **PyPI pending publisher for `fux-core`** added (arpitarya/fux, `publish.yml`, env `pypi`).
+- ❌ **`fux-reader` refused by PyPI:** *"A pending trusted publisher matching this
+  configuration has already been registered for a different project name."*
+  PyPI allows **one pending publisher per identical configuration**, so the
+  three new projects cannot all be pending at once with one workflow and one
+  environment. **Way through, no code change:** re-run the
+  `publish-pypi-roles` job → it creates `fux-core` (the pending publisher turns
+  ordinary, `fux_reader` then fails and stops the upload) → add the
+  `fux-reader` pending publisher → re-run → add `fux-writer` → re-run; the
+  `fux-engine` job follows on the last green run. The alternative — one
+  GitHub environment per package — is a `publish.yml` change and a new tag.
+- ⏳ **npm `@fux-engine` org:** Arpit clicks *Create* on `npmjs.com/org/create`
+  himself (name `fux-engine`, free plan); an agent may not create it.
+- **16:48:** ✅ `fux-core` 4.0.0 is live on PyPI (first re-run). ✅ npm org
+  `fux-engine` exists (Arpit). ✅ PyPI pending publisher for **`fux-reader`**
+  added. ⏳ next: re-run the roles job (creates fux-reader) → add the
+  `fux-writer` pending publisher → re-run (fux-writer, then fux-engine 4.0.0) →
+  first hand publish of `@fux-engine/reader` + its npm trusted publisher.
+
 ## Goal
 
 The first release that publishes `fux-core`, `fux-reader`, `fux-writer` and

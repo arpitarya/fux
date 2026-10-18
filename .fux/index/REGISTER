@@ -651,7 +651,7 @@ records/0063_WORK-release.md	61a856b2ece54f733f9a900fc65e80c692658c73	prose
 records/0064_WORK-blockers.md	8cc7fa229f31e57f18cb6b3c5564b9d31eb86599	prose
 records/0065_WORK-governance.md	ae4906ebfdf383e7b97efa70bee096d3e8aae4c4	prose
 records/0066_WORK-golden.md	77ae5051faafb8703c42a188f52d60c0f67131d7	prose
-records/0067_WORK-registry.md	f02864d10e4daab9cf9108220cfe6e850a29d621	prose
+records/0067_WORK-registry.md	379e9576535a74a7b39968486f4508305b2df8a5	prose
 records/0068_WORK-test-data.md	a437be3ce2d31a1d9d7c181339827df7bbd3ee86	prose
 records/0101_cli-surface.md	9ea846aac1c5d327b12b691d8bbc28ee81b9e9ef	prose
 records/0102_fux-directory.md	64fcdc7746f9aaf558328c896295bc4fc8851fc8	prose
@@ -743,14 +743,14 @@ tools/t2-eval/PRE-REGISTRATION.md	0678bc82904423b9aa82c801f4286abbdc84961c	prose
 tools/vector-gate/README.md	544da73b4409bef1e5dac598d9b8214d8abf4180	prose
 work/BACKLOG.md	e7cf51c620947b9581c6cb7de94e142a50612f60	prose
 work/BLOCKED.json	5598b94e0d231527edb50b11f34722b0a6a86ed4	json@sha:df03417b3bc177d9
-work/IMPLEMENTATION.md	5737f37186d9e3b5670a7684fe28b25fccd388b6	prose
-work/INTERVIEW.md	75cdcde3a2851f8cc6bdd440adc56a741b6b7186	prose
+work/IMPLEMENTATION.md	3de7382d7664da06a715e9fa975270899d55dc79	prose
+work/INTERVIEW.md	d09644a9c4bc2554a5f2a5e98728ca014c6cfdac	prose
 work/LESSONS.md	f91b46f8742c542fe12e2d871452148c56751eae	prose
 work/MACHINE.md	34863c282c90b7363a5eb7da18a622354a995c35	prose
-work/NOW.md	f5f4b326bf1731f739562e6ad76873e9b4b1c14a	prose
-work/OPEN-WORK.md	44dcf4526ade4804aaeab8878a44cf7ff1a10b70	prose
+work/NOW.md	150a1385eb8edc2402880f89501686bf23822e9a	prose
+work/OPEN-WORK.md	64905bbf6d038fbba4b22df81848fdaaa43eb04e	prose
 work/README.md	d5073a07920179dc0c35071dc2337a8ed6856ddb	prose
-work/WORKLOG.md	92a69aa2d066d3b2d765190a383b3330d7fac8d3	prose
+work/WORKLOG.md	00491673e35ea0544322b3d5545389962a211202	prose
 work/architecture-algorithms.svg	fdf6ef399bf2649dd92510973076e607cb955576	svg@sha:0d25b190415a4706
 work/architecture-answer.svg	3e133168cf7695f77b23accae2835e28418ee770	svg@sha:0d25b190415a4706
 work/architecture-ask.svg	40d6f07068f275412528bb14d5a3455bc0626778	svg@sha:0d25b190415a4706
@@ -803,7 +803,7 @@ work/open/W-275-ranking-tuner-research.md	cfd785d941f8e566cea5eceff3db7f44f2878d
 work/open/W-280-intent-lexicon-research.md	4b582eae12e7d665d03c47716c5cbeab7e38070e	prose
 work/open/W-281-capture-harness-speed.md	68d7952e77793fb5515ab490017f2bec59a912d8	prose
 work/open/W-282-reader-writer-packages.md	a99bdbae41d572174035ae3f512ec39ca68ce2fc	prose
-work/open/W-283-registry-hand-steps.md	21ac15ca1c6993da3a7f18cb37930c096daa392e	prose
+work/open/W-283-registry-hand-steps.md	830b2787606bb03a42f03383ac675a7da0a4b997	prose
 work/proposals/README.md	2b7f9a132f2aeb0bfa0599612307990540adbcc6	prose
 work/proposals/build-plan-2026-10.md	7872d33ab8c7a411b8fc2b613b413b188ce2694b	prose
 work/proposals/code-pattern-recognition.md	94d72e5b92f5d2f2f69d2c868a5ca18792eea466	prose
