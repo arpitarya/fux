@@ -35,7 +35,7 @@ import { applyOutputDefaults, loadOutput } from "./src/config/output.mjs";
 // shapes are authored in `src/index.mjs`, which stays `api.py`'s twin.
 import { open, Index } from "./src/index.mjs";
 
-const VERSION = "4.0.1";
+const VERSION = "4.0.2";
 
 /** The PII gate's path, spelled here the way `cli.py` and `api.py` spell it.
  *
