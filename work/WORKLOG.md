@@ -23,6 +23,11 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-18 — 4.0.3 published on all six names  ·  Claude Code (Opus 5.5)
+
+- **Done:** CI green on `a95b6088` (38/38), `v4.0.3` released; publish run 39131563782 green on every job.
+- **Verified:** PyPI JSON 200 for the four names; clean-venv install resolves all four at 4.0.3; npm `latest` 4.0.3 on `fux-engine` and `@fux-engine/reader` (the scoped one took ~1 min to appear, the PyPI simple index ~2 min). **Next:** the inbox — W-258, W-268.
+
 ## 2026-10-18 — 4.0.3 cut: a root export removed; 4.0.2 never published  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"upgrade to version 4.0.2, update the fux index, push and publish"*; then a root-level export was deleted by Arpit — *"don't mention it anywhere … upgrade the version again and publish all the packages"*; then *"commit everything and push."*

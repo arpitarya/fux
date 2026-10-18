@@ -28,6 +28,14 @@ Rules:
 
 ---
 
+## 2026-10-18 — **4.0.3 on all six names; 4.0.2 never published**
+
+| | |
+|---|---|
+| **shipped** | **4.0.3** (tag `v4.0.3` at `a95b6088`, CI 38/38 run 39130424649) published by the workflow to PyPI `fux-core`, `fux-reader`, `fux-writer`, `fux-engine` and npm `fux-engine`, `@fux-engine/reader` (run 39131563782). A root-level export removed with its exemptions. `4.0.2` (`fc9df93b`) was cut and superseded before a release |
+| **evidence** | PyPI `/pypi/<name>/4.0.3/json` 200 for all four; clean-venv `uv pip install fux-engine==4.0.3` → the four packages, `fux --version` = 4.0.3; npm `latest` = 4.0.3 on both names |
+---
+
 ## 2026-10-18 — **4.0.1 on all six names; W-282 and W-283 closed**
 
 | | |
