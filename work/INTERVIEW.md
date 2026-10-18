@@ -32,10 +32,18 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-18** (Claude Code, Opus 5.5 — W-282 Step 1, the untangle; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-18** (Claude Code, Opus 5.5 — W-282 Steps 1–2, the untangle and the packaging; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-10-18 (latest) — W-282 STEP 1: READER AND WRITER NO LONGER IMPORT EACH OTHER
+### 🔴 2026-10-18 (latest) — W-282 STEP 2: FOUR DISTRIBUTIONS FROM ONE TREE; THE RELEASE WAITS ON ARPIT (W-283)
+
+- **Built:** `fux-core` / `fux-reader` / `fux-writer` under `packages/`, the root as `fux-engine`; each wheel's files come from [the layer map](../records/README.md) via `packages/layer_hook.py`. `cli.py` is core and runs verbs by layer (`VERBS`); doctor is split by layer with one row order (`health.ROWS`). Step 1 is commit `1cce3ac4`; Step 2 is the commit after it.
+- **Departures, both deliberate:** `fux` ships in fux-core and `fux-merge-index` in fux-writer (not fux-engine); the Node bundle rides fux-writer only. One owning wheel per file, or an uninstall deletes another package's file.
+- **Evidence:** the engine's output is unchanged (worktree comparison, every query and `--help`); each wheel installs and works alone offline (`tests_e2e/test_role_packages.py`); all suites green.
+- 🔴 **Waits on Arpit — [W-283](open/W-283-registry-hand-steps.md):** PyPI pending publishers for the three new names, the `@fux-engine` npm org, the first `@fux-engine/reader` publish, then *"release 3.1.0"*. **Until a release, the three PyPI names are unreserved** — a pending publisher reserves them.
+- ⚠ **Development install changed:** `pip install -e ".[dev]"` alone no longer resolves (fux-engine pins the role packages); use `uv sync --extra dev` or the four-package pip line in SR-WORK-RELEASE d15.
+
+### 🟢 2026-10-18 — W-282 STEP 1: READER AND WRITER NO LONGER IMPORT EACH OTHER
 
 - **Asked:** *"implement W282."* Step 1 (the untangle) is done in the working tree, **uncommitted** — Cowork's own W-282 filing was still staged in the same files, so Arpit commits.
 - **The map:** every file under `src/fux/` is core, reader, writer or engine — [`records/README.md` §The layer map](../records/README.md), held by `tests/test_package_layers.py` (it reads the map from the record and fails on any crossing; a planted reader→writer import fails it).
@@ -1123,7 +1131,7 @@ satisfied.** What a consumer's `.fux/node/` holds is **one generated `fux.mjs`**
 plus `package.json`, `mcp-tools.json` and a README (shape A), or a **workspace
 manifest alone** (shape C); the bundler is
 [`src/fux/store/nodebundle.py`](../src/fux/store/nodebundle.py), the wheel gets
-it from [`hatch_build.py`](../hatch_build.py), npm gets the same artefact from
+it from [`packages/layer_hook.py`](../packages/layer_hook.py) (fux-writer's wheel since W-282), npm gets the same artefact from
 one build in `publish.yml`, and `fux setup` **prunes** whatever an older engine
 left behind. Outcome and evidence: [`IMPLEMENTATION.md`](IMPLEMENTATION.md).
 

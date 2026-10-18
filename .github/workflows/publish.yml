@@ -97,11 +97,31 @@ jobs:
           name: node-bundle
           path: node/dist/
 
+      - name: The same bundle as @fux-engine/reader — one artefact, two names
+        # W-282 F4: the Node reader also publishes under the @fux-engine scope.
+        # Same bytes; only package.json's `name` (and public access) differ.
+        run: python scripts/npm-scoped.py node/dist node/dist-scoped
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: node-bundle-scoped
+          path: node/dist-scoped/
+
       - name: Install build tooling
         run: pip install build twine
 
-      - name: Build sdist + wheel
-        run: python -m build
+      - name: Build fux-engine (sdist + wheel) and the three role wheels
+        # W-282: four distributions, one version, one tree. Which file ships in
+        # which is records/README.md §The layer map, read by
+        # packages/layer_hook.py. The role packages ship as wheels only — they
+        # are built from the repository, and fux-engine's sdist is the source.
+        # ⚠ Each PyPI project needs its own trusted publisher bound to this
+        # file and the `pypi` environment; a role package without one fails
+        # its upload here while the others succeed.
+        run: |
+          python -m build
+          for role in core reader writer; do python -m build --wheel --outdir dist "packages/fux-$role"; done
+          ls dist/
 
       - name: Validate distribution metadata
         run: twine check --strict dist/*
@@ -219,3 +239,50 @@ jobs:
           esac
           echo "publishing fux-engine@$version with tag $tag"
           npm publish --tag "$tag" --provenance
+
+  publish-npm-scoped:
+    name: Publish @fux-engine/reader to npm
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+    # 🔴 **Needs Arpit's hand once, before the first release** (W-282 Step 3):
+    # the `@fux-engine` organization on npmjs.com, and — because npm binds a
+    # trusted publisher to a package that already exists — the first publish
+    # of `@fux-engine/reader` by hand, then a trusted publisher naming this
+    # file and the `npm` environment. Until then this job fails; PyPI and the
+    # unscoped `fux-engine` are unaffected.
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/@fux-engine/reader
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+
+      - name: Take the scoped bundle the build job made — never rebuild it here
+        uses: actions/download-artifact@v7
+        with:
+          name: node-bundle-scoped
+          path: node/dist-scoped/
+
+      - name: npm >= 11.5.1 (the floor trusted publishing needs)
+        run: |
+          npm i -g npm@latest
+          npm --version
+
+      - name: Publish the tarball
+        working-directory: node/dist-scoped
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          case "$version" in
+            *-*) tag=alpha ;;
+            *)   tag=latest ;;
+          esac
+          echo "publishing @fux-engine/reader@$version with tag $tag"
+          npm publish --tag "$tag" --provenance --access public

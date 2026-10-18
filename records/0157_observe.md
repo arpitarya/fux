@@ -7,10 +7,10 @@ description: "After a verb has fully rendered, fux hands every file in `.fux/obs
 status: accepted
 date: 2026-09-14
 feature: the observer hook — the extension point a consumer's analytics subscribe to
-owns: [src/fux/observe.py@16cce34173d9, tools/observer-bench@e12d60cca125]
+owns: [src/fux/observe.py@b12c1b0c5bc3, tools/observer-bench@e12d60cca125]
 laws: [L2, L3, L4, L5, L9, L10]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 5e33e7faecae8ade0108f30b1c2747083e9b306c5c555a1a65b6bf210bce65d6
+content_sha: 4e07224ca93f35ac06fe0191ee0c6fc7a46c47b53b23c27cb33c6f2e2f30d87f
 ratifies: W-170
 ---
 

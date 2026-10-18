@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@ee2a8bb5f2f8, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@898d2cf2c7ee, src/fux/progress.py@10364bd02e0a, tests_e2e@00842bc95502, node/fux.mjs@aca43f47f32f, src/fux/stdio.py@9e270b49bdaa]
+owns: [src/fux/cli.py@ca147df6eeb4, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@898d2cf2c7ee, src/fux/progress.py@10364bd02e0a, tests_e2e@438c745622ca, node/fux.mjs@aca43f47f32f, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 517e4d11172416f54ac8d22033bd112235653554cf51cad5c0efa67452d0e744
+content_sha: 0acb7afdec44def3f37c86f2be04295d1245b4ad3d9ca125d5dc34ef68bcdd1f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1410,6 +1410,35 @@ places it:
   `fux register | diff - .fux/index/REGISTER` is the drift check by hand, and
   `fux doctor`'s `register` row is the same check with three named states
   (SR-INGEST decision 22c).
+
+
+**16. Which package runs which verb** (W-282, 2026-10-18). `cli.py` is core —
+it ships in `fux-core`, with the `fux` script — and runs each verb through its
+`VERBS` table: the verb, the module that runs it, and that module's layer
+([the layer map](README.md)). A verb whose layer is not installed is **absent
+from `--help` and refused by name** (`` `fux ingest` is fux-writer's, which is
+not installed here``, exit 1), never reported as an unknown choice.
+
+| package | its verbs |
+|---|---|
+| fux-core | `tune` · `output` |
+| fux-reader | `ask` · `lexical` · `find` · `answer` · `verify` · `explain` · `graph` · `path` · `build` · `mcp` · `doctor` (its rows) |
+| fux-writer | `setup` · `ingest` · `add` · `remove` · `register` · `enrich` · `correct` · `hooks` · `daemon` · `doctor` (its rows, and `--fix`) — and the `fux-merge-index` script |
+| fux-engine | everything above, plus `inspect` · `serve` · `identifiers` and the whole `doctor` |
+
+- **`answer` is the reader's whole `answer`**, refer included (ruling F2): the
+  decoders, fetchers and PII engine it re-reads a document through are core.
+- **`build` is the reader's** — the derived plane is the reader's runtime. The
+  writer's `ingest` rebuilds it only where the reader is installed (a guarded
+  import the layer map lists); on a writer-only machine it stops once the
+  committed index is written.
+- **`enrich --check` ranks**, so on a writer-only install it refuses and names
+  fux-reader rather than passing questions it could not rank.
+- **`serve`, `inspect` and `identifiers` are the engine's**: each reads both
+  halves — the X-ray re-extracts documents and ranks them.
+- `tests/test_package_layers.py` holds every `VERBS` row to the layer map, and
+  `tests_e2e/test_role_packages.py` installs each wheel alone and asks for the
+  other packages' verbs.
 
 ### Consequences
 

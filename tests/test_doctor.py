@@ -5,7 +5,7 @@ import subprocess
 
 import pytest
 
-from fux import doctor
+from fux import doctor, health
 from l12_fixtures import template_fux_toml, refusals_scan, write_config
 
 
@@ -1069,7 +1069,10 @@ def test_the_veto_share_is_machine_readable_in_json(tmp_path, monkeypatch, capsy
     _git_repo(tmp_path)
     _journal(tmp_path, ["current", "as-ingested"])
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(doctor_mod, "find_root", lambda *a, **k: tmp_path)
+    # W-282: the `--json` payload is rendered by `health`, which resolves the root.
+    from fux import health
+
+    monkeypatch.setattr(health, "find_root", lambda *a, **k: tmp_path)
     doctor_mod.cmd_doctor(type("A", (), {"json": True})())
     payload = json.loads(capsys.readouterr().out)
     assert payload["freshness"] == {"current": 1, "as-ingested": 1}
@@ -1731,7 +1734,7 @@ def test_a_retired_starter_is_reported(tmp_path, monkeypatch):
     # report no match. The defect was the test's, never doctor's.
     (root / ".fux" / "refusals.toml").write_bytes(body.encode("utf-8"))
     monkeypatch.setattr(
-        doctor, "RETIRED_REFUSAL_STARTERS", (hashlib.sha256(body.encode()).hexdigest(),)
+        health, "RETIRED_REFUSAL_STARTERS", (hashlib.sha256(body.encode()).hexdigest(),)
     )
     row = _row(root, "refusal rules current")
     assert not row.ok
@@ -1744,7 +1747,7 @@ def test_an_edited_refusals_file_is_never_reported(tmp_path, monkeypatch):
     root = _drift_repo(tmp_path)
     (root / ".fux" / "refusals.toml").write_text("# ours\n", encoding="utf-8")
     monkeypatch.setattr(
-        doctor, "RETIRED_REFUSAL_STARTERS", (hashlib.sha256(b"# an old starter\n").hexdigest(),)
+        health, "RETIRED_REFUSAL_STARTERS", (hashlib.sha256(b"# an old starter\n").hexdigest(),)
     )
     assert _row(root, "refusal rules current").ok
 

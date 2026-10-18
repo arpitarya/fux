@@ -96,3 +96,19 @@ def test_the_check_actually_fails_on_a_mismatch(tmp_path):
     problems = _mod.check(tmp_path)
     assert problems, "a mismatched node/package.json was not detected"
     assert any("node/package.json" in p for p in problems)
+
+
+def test_a_drifted_distribution_pin_is_caught(tmp_path):
+    """W-282: fux-engine pins the three role packages, and the role packages
+    pin fux-core. A release that bumps the source and forgets one pin would
+    install a role package from the previous release — so one drifted pin
+    among several in one file must fail, not average out."""
+    for name in _mod.SITES:
+        dst = tmp_path / name
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_text((ROOT / name).read_text(encoding="utf-8"), encoding="utf-8")
+    pyproject = tmp_path / "pyproject.toml"
+    text = pyproject.read_text(encoding="utf-8")
+    pyproject.write_text(text.replace('"fux-reader==', '"fux-reader==9.9.9-not-', 1), encoding="utf-8")
+    problems = _mod.check(tmp_path)
+    assert any("pyproject.toml" in p and "fux-reader" in p for p in problems), problems

@@ -23,6 +23,14 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-18 — W-282 Step 2: four distributions from one tree; Step 3 waits on W-283  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"commit everything and continue … keep implementing till the closure."* Step 1 committed with Cowork's staged W-282 filing (`1cce3ac4`); Step 2 built.
+- **Done:** `packages/fux-{core,reader,writer}` + the root as `fux-engine`, one uv workspace; `packages/layer_hook.py` picks each wheel's files from the layer map. `cli.py` became core and dispatches through `VERBS` (verb → module → layer): an uninstalled layer's verbs vanish from `--help` and are refused by name. Doctor split into `health.py` / `query/health.py` / `ingest/health.py` / `doctor.py` with the row order stated once (`health.ROWS`). Seven version-parity sites (pins included, drift test added); CI and `publish.yml` build all four and publish the bundle as `@fux-engine/reader` too. SR-CLI d16, SR-DOCTOR d12, SR-WORK-RELEASE d15 written; README install, CHANGELOG `[Unreleased]`, the package diagram, and two stale facts in **CLAUDE.md** (the released version; the distribution identity) updated — named here per SR-WORK-DOCS d7.
+- **Verified:** a worktree at `1cce3ac4` ran HEAD's code and the new code on the same documents — 50 query `--json`, every verb's `--help`, `tune`, `--version` and `doctor` identical, `doctor` up to its timed `pii timing` row. `tests_e2e/test_role_packages.py` installs each wheel alone offline: reader-only `ask`/`find`/`answer --json` equal the engine's (F2). Units 7 174, e2e 183, Node 241, all green.
+- **Departs from the DoD's wording (recorded in the item):** `fux` is fux-core's script and `fux-merge-index` fux-writer's, not fux-engine's; the Node bundle is in fux-writer's wheel only — a file owned by two wheels is deleted when either is uninstalled.
+- **Open → W-283 (🔴 Arpit):** PyPI pending publishers ×3, the `@fux-engine` npm org, the first `@fux-engine/reader` publish, then his go for 3.1.0. **Next:** W-283; then the release (Sonnet).
+
 ## 2026-10-18 — W-282 Step 1: reader and writer no longer import each other  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement W282."* Step 1 is the agent-closable part (Steps 2–3: Sonnet; Step 3 waits on the `@fux-engine` npm org).

@@ -20,142 +20,76 @@ from .errors import FuxError
 from .stdio import stdio_utf8 as _stdio_utf8
 
 
-def _cmd_setup(args) -> int:
-    from .setup import cmd_setup
-
-    return cmd_setup(args)
-
-
-def _cmd_doctor(args) -> int:
-    from .doctor import cmd_doctor
-
-    return cmd_doctor(args)
-
-
-def _cmd_identifiers(args) -> int:
-    from .identifiers_cmd import cmd_identifiers
-
-    return cmd_identifiers(args)
-
-
-def _cmd_inspect(args) -> int:
-    from .inspect import cmd_inspect
-
-    return cmd_inspect(args)
-
-
-def _cmd_register(args) -> int:
-    from .ingest.register import cmd_register
-
-    return cmd_register(args)
-
-
-def _cmd_ingest(args) -> int:
-    from .ingest import cmd_ingest
-
-    return cmd_ingest(args)
-
-
-def _cmd_ask(args) -> int:
-    from .query import cmd_ask
-
-    return cmd_ask(args)
-
-
-def _cmd_lexical(args) -> int:
-    from .query import cmd_lexical
-
-    return cmd_lexical(args)
-
-
-def _cmd_find(args) -> int:
-    from .query.find import cmd_find
-
-    return cmd_find(args)
-
-
-def _cmd_answer(args) -> int:
-    from .query import cmd_answer
-
-    return cmd_answer(args)
-
-
-def _cmd_add(args) -> int:
-    from .sources import cmd_add
-
-    return cmd_add(args)
-
-
-def _cmd_remove(args) -> int:
-    from .sources import cmd_remove
-
-    return cmd_remove(args)
-
-
-def _cmd_build(args) -> int:
-    from .derive import cmd_build
-
-    return cmd_build(args)
-
-
-def _cmd_correct(args) -> int:
-    from .correct import cmd_correct
-
-    return cmd_correct(args)
-
-
-def _cmd_enrich(args) -> int:
-    from .enrich import cmd_enrich
-
-    return cmd_enrich(args)
-
-
-def _cmd_serve(args) -> int:
-    from .serve import cmd_serve
-
-    return cmd_serve(args)
-
-
-def _cmd_mcp(args) -> int:
-    from .mcp import cmd_mcp
-
-    return cmd_mcp(args)
-
-
-def _cmd_hooks(args) -> int:
-    from .maintain import cmd_hooks
-
-    return cmd_hooks(args)
-
-
-def _cmd_daemon(args) -> int:
-    from .maintain import cmd_daemon
-
-    return cmd_daemon(args)
-
-
-def _cmd_verify(args) -> int:
-    from .query import cmd_verify
-
-    return cmd_verify(args)
-
-
-def _cmd_explain(args) -> int:
-    from .graph import cmd_explain
-
-    return cmd_explain(args)
-
-
-def _cmd_graph(args) -> int:
-    from .graph import cmd_graph
-
-    return cmd_graph(args)
-
-
-def _cmd_path(args) -> int:
-    from .graph import cmd_path
-
-    return cmd_path(args)
+#: **Which module runs each verb, and which layer that module ships in** (W-282).
+#: `cli.py` is core — it ships with every install — so it imports no verb
+#: module by name: a verb runs through this table, and a verb whose layer is not
+#: installed is left out of the parser and refused by name (`fux ingest` on a
+#: reader-only install names fux-writer). `doctor` has a candidate per layer:
+#: the engine's runs every row, a role package's runs its own and core's.
+#: `tests/test_package_layers.py` holds every row to the layer map. `tune` and
+#: `output` are core and run inline below.
+VERBS: dict[str, tuple[tuple[str, str, str], ...]] = {
+    "setup": (('writer', 'fux.setup', 'cmd_setup'),),
+    "doctor": (('engine', 'fux.doctor', 'cmd_doctor'), ('reader', 'fux.query.health', 'cmd_doctor'), ('writer', 'fux.ingest.health', 'cmd_doctor'),),
+    "identifiers": (('engine', 'fux.identifiers_cmd', 'cmd_identifiers'),),
+    "inspect": (('engine', 'fux.inspect', 'cmd_inspect'),),
+    "register": (('writer', 'fux.ingest.register', 'cmd_register'),),
+    "ingest": (('writer', 'fux.ingest', 'cmd_ingest'),),
+    "ask": (('reader', 'fux.query', 'cmd_ask'),),
+    "lexical": (('reader', 'fux.query', 'cmd_lexical'),),
+    "find": (('reader', 'fux.query.find', 'cmd_find'),),
+    "answer": (('reader', 'fux.query', 'cmd_answer'),),
+    "add": (('writer', 'fux.sources', 'cmd_add'),),
+    "remove": (('writer', 'fux.sources', 'cmd_remove'),),
+    "build": (('reader', 'fux.derive', 'cmd_build'),),
+    "correct": (('writer', 'fux.correct', 'cmd_correct'),),
+    "enrich": (('writer', 'fux.enrich', 'cmd_enrich'),),
+    "serve": (('engine', 'fux.serve', 'cmd_serve'),),
+    "mcp": (('reader', 'fux.mcp', 'cmd_mcp'),),
+    "hooks": (('writer', 'fux.maintain', 'cmd_hooks'),),
+    "daemon": (('writer', 'fux.maintain', 'cmd_daemon'),),
+    "verify": (('reader', 'fux.query', 'cmd_verify'),),
+    "explain": (('reader', 'fux.graph', 'cmd_explain'),),
+    "graph": (('reader', 'fux.graph', 'cmd_graph'),),
+    "path": (('reader', 'fux.graph', 'cmd_path'),),
+}
+
+def _installed(module: str) -> bool:
+    """Is this module on this install? A spec lookup — nothing is imported."""
+    from importlib.util import find_spec
+
+    try:
+        return find_spec(module) is not None
+    except ModuleNotFoundError:  # its package is not installed at all
+        return False
+
+
+def available(verb: str) -> bool:
+    """Can this install run `verb`? Core verbs always can."""
+    return verb not in VERBS or any(_installed(module) for _layer, module, _fn in VERBS[verb])
+
+
+def _refusal(verb: str) -> FuxError:
+    # The distribution each layer ships in — what the refusal tells you to install.
+    owners = sorted({fixed("distributions", layer) for layer, _m, _f in VERBS[verb]})
+    return FuxError(
+        f"`fux {verb}` is {' or '.join(owners)}'s, which is not installed here — "
+        f"install {fixed('distributions', 'engine')} (everything) or {' or '.join(owners)}"
+    )
+
+
+def _run_verb(verb: str, args) -> int:
+    from importlib import import_module
+
+    for _layer, module, function in VERBS[verb]:
+        if _installed(module):
+            return getattr(import_module(module), function)(args)
+    raise _refusal(verb)
+
+
+def _dispatch(args) -> int:
+    """Every table verb's handler: run `args.command` from the module `VERBS` names."""
+    return _run_verb(args.command, args)
 
 
 def _cmd_tune(args) -> int:
@@ -357,12 +291,26 @@ def _add_output_flags(parser: argparse.ArgumentParser, *, band: bool) -> None:
         )
 
 
+def _verb_adder(sub):
+    """`sub.add_parser`, except a verb this install cannot run is built on a
+    parser nothing reaches — so it is absent from `--help` and from the choice
+    list, and `main` refuses it by name instead of argparse calling it unknown."""
+
+    def add(name: str, **kwargs) -> argparse.ArgumentParser:
+        if available(name):
+            return sub.add_parser(name, **kwargs)
+        return argparse.ArgumentParser(prog=f"fux {name}", add_help=False)
+
+    return add
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fux", description="rank, fetch, verify — an index over the systems that own your docs")
     parser.add_argument("--version", action="version", version=f"fux {__version__}")
     sub = parser.add_subparsers(dest="command")
+    _verb = _verb_adder(sub)
 
-    p_setup = sub.add_parser(
+    p_setup = _verb(
         "setup", help="write the consumer-owned files into .fux/ (write-if-missing)"
     )
     # W-68 / SR-AGENT-POLICY decisions 5 and 6. The agent policy installs by
@@ -373,9 +321,9 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="do not write the agent policy files outside .fux/ (.claude/, .github/, .kiro/)",
     )
-    p_setup.set_defaults(func=_cmd_setup)
+    p_setup.set_defaults(func=_dispatch)
 
-    p_doctor = sub.add_parser("doctor", help="check environment and repo health")
+    p_doctor = _verb("doctor", help="check environment and repo health")
     # W-66 Phase 4. `doctor` is where the detached runner becomes visible, and
     # an agent reading that needs a parse rather than a sentence (SR-CLI,
     # 2026-08-22). Promotion to a `fux status` verb has a written condition in
@@ -392,25 +340,25 @@ def build_parser() -> argparse.ArgumentParser:
     )
     _add_progress_flags(p_doctor)
     _add_output_flags(p_doctor, band=False)
-    p_doctor.set_defaults(func=_cmd_doctor)
+    p_doctor.set_defaults(func=_dispatch)
 
     # `register` prints the committed register's rows FROM THE INDEX -- the
     # records, the decoder digest table and the URL list -- so a program reads
     # what the file would say without parsing the file, and the file stays the
     # one committed copy (SR-INGEST decision 22d, W-279). Read-only, offline,
     # no lock: `fux register | diff - .fux/index/REGISTER` is the drift check.
-    p_register = sub.add_parser(
+    p_register = _verb(
         "register", help="print the register (one line per indexed document) from the index; --json for machines"
     )
     p_register.add_argument("--json", action="store_true", default=None, help="one JSON object per document")
     _add_output_flags(p_register, band=False)
-    p_register.set_defaults(func=_cmd_register)
+    p_register.set_defaults(func=_dispatch)
 
     # `inspect` reads the INDEX; `doctor` checks the ENVIRONMENT (SR-INSPECT
     # decision 1). A flag on `doctor` would have made one command answer two
     # questions with two different remedies — a config edit versus a change to
     # the corpus — and the two lists would have been read as one.
-    p_inspect = sub.add_parser(
+    p_inspect = _verb(
         "inspect", help="what the index looks like: boilerplate, unfindable documents, duplicates"
     )
     p_inspect.add_argument("--json", action="store_true", default=None, help="machine-readable report")
@@ -455,7 +403,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     _add_progress_flags(p_inspect)
     _add_output_flags(p_inspect, band=False)
-    p_inspect.set_defaults(func=_cmd_inspect)
+    p_inspect.set_defaults(func=_dispatch)
 
     # **The one verb over the corpus** (W-177, Arpit 2026-09-15). `fux update`
     # is deleted and its whole surface is here: the first ingest and every
@@ -466,7 +414,7 @@ def build_parser() -> argparse.ArgumentParser:
     # the move untouched — W-82 ruling 3 is about *which* URLs, never which
     # verb — so the bare form fetches the ones known to be stale and says so.
     # `--no-fetch` is the offline form, and it is what `fux hooks` writes.
-    p_ingest = sub.add_parser(
+    p_ingest = _verb(
         "ingest",
         help="walk configured sources into the committed index, re-fetching stale URLs",
     )
@@ -556,16 +504,16 @@ def build_parser() -> argparse.ArgumentParser:
     # hatch is how *is it me or the config?* stays one flag rather than an
     # experiment.
     _add_output_flags(p_ingest, band=False)
-    p_ingest.set_defaults(func=_cmd_ingest)
+    p_ingest.set_defaults(func=_dispatch)
 
-    p_build = sub.add_parser(
+    p_build = _verb(
         "build", help="rebuild the derived accelerator from the committed index"
     )
     _add_progress_flags(p_build)
     # L12: `[cli] progress_threshold` is read from .fux/output.toml, so this
     # verb can bisect the file like every other verb that reads it (decision 15).
     _add_output_flags(p_build, band=False)
-    p_build.set_defaults(func=_cmd_build)
+    p_build.set_defaults(func=_dispatch)
 
     # The source group. Flat verbs over all three lists, dispatching on the
     # entry — `fux source add` is the subcommand tree SR-CLI decision 1
@@ -604,7 +552,7 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--ttl", metavar="D", help="URLs: record ttl=D - how long a citation may go unchecked at ask time (0, 30s, 15m, 1h, 7d)")
         p.add_argument("--dry-run", action="store_true", help="print the line and the plan; write nothing")
 
-    p_add = sub.add_parser(
+    p_add = _verb(
         "add", help="list a directory, a document or a URL, and ingest it (omit the entry to list everything)"
     )
     p_add.add_argument("entry", nargs="?", help="a path, a single file, or an http(s) URL")
@@ -617,9 +565,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     _add_progress_flags(p_add)
     _add_output_flags(p_add, band=False)
-    p_add.set_defaults(func=_cmd_add)
+    p_add.set_defaults(func=_dispatch)
 
-    p_remove = sub.add_parser(
+    p_remove = _verb(
         "remove", help="take an entry out of the corpus — deletes its line, or excludes it if an ancestor is listed"
     )
     p_remove.add_argument("entry", help="a path, a single file, or an http(s) URL")
@@ -628,11 +576,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_remove.add_argument("--no-ingest", action="store_true", help="edit the line only; do not re-ingest")
     _add_progress_flags(p_remove)
     _add_output_flags(p_remove, band=False)
-    p_remove.set_defaults(func=_cmd_remove)
+    p_remove.set_defaults(func=_dispatch)
 
 
     def _query_parser(name: str, help_text: str):
-        p = sub.add_parser(name, help=help_text)
+        p = _verb(name, help=help_text)
         p.add_argument("query", help="natural-language question")
         p.add_argument("--json", action="store_true", default=None, help="machine-readable output")
         # The accelerator is asserted byte-identical to the scan, so either
@@ -744,7 +692,7 @@ def build_parser() -> argparse.ArgumentParser:
         return p
 
     p_ask = _ask_shaped_parser("ask", "answer a question from the committed index, with citations")
-    p_ask.set_defaults(func=_cmd_ask)
+    p_ask.set_defaults(func=_dispatch)
 
     # **W-160's first atom: BM25F alone, named and FROZEN.** `ask --scan`
     # already *is* the lexical core; this makes it a contract — the baseline
@@ -756,7 +704,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_lexical = _ask_shaped_parser(
         "lexical", "rank on the words alone — BM25F, frozen; the baseline `ask` is measured against"
     )
-    p_lexical.set_defaults(func=_cmd_lexical)
+    p_lexical.set_defaults(func=_dispatch)
 
     p_find = _query_parser("find", "ranked document locations, one per line")
     p_find.add_argument("--top", type=int, default=None, metavar="N", help=_top_help())
@@ -785,7 +733,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="drop documents declared archived (archived=true, or the record's own flag); "
         "the confidence band still describes the unfiltered ranking",
     )
-    p_find.set_defaults(func=_cmd_find)
+    p_find.set_defaults(func=_dispatch)
 
     p_answer = _query_parser(
         "answer", "the single best answer — a fetched, re-scored passage when the source is reachable"
@@ -833,12 +781,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--journal", action="store_true", default=None,
         help="also append the receipt to .fux/runtime/ (local, gitignored, never committed)",
     )
-    p_answer.set_defaults(func=_cmd_answer)
+    p_answer.set_defaults(func=_dispatch)
 
     # SR-PROVENANCE. A verb, not a flag: it takes a FILE rather than a query,
     # so it does not belong on the query parser at all — every flag there
     # assumes a `query` positional this command has no use for.
-    p_verify = sub.add_parser(
+    p_verify = _verb(
         "verify", help="re-run a receipt against this tree: reproduced | drifted | unverifiable"
     )
     p_verify.add_argument("receipt", help="path to a receipt written by `fux answer --receipt`")
@@ -847,12 +795,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--rerun", action="store_true",
         help="re-answer the question too; without it only the INPUTS are checked",
     )
-    p_verify.set_defaults(func=_cmd_verify)
+    p_verify.set_defaults(func=_dispatch)
 
     # W-76 Phase 8. **No `--model` flag, and that is the design**: fux never
     # calls a model, so there is no networked path to fence. Generation is the
     # `fux-enrich` agent skill; these two flags are the deterministic halves.
-    p_enrich = sub.add_parser(
+    p_enrich = _verb(
         "enrich", help="plan and validate the enrichment an agent skill generates"
     )
     enrich_mode = p_enrich.add_mutually_exclusive_group()
@@ -878,7 +826,7 @@ def build_parser() -> argparse.ArgumentParser:
     # W-238: `--check` paints a bar — one ranked query per question.
     _add_progress_flags(p_enrich)
     _add_output_flags(p_enrich, band=False)
-    p_enrich.set_defaults(func=_cmd_enrich)
+    p_enrich.set_defaults(func=_dispatch)
 
     # W-76 Phase 5. A verb rather than a flag on `ask`: it is a long-running
     # server, not a query, and SR-CLI's four groups gain a fifth consumer-facing
@@ -888,7 +836,7 @@ def build_parser() -> argparse.ArgumentParser:
     # line a PERSON typed, and the two have different provenance, different
     # survival rules under regeneration, and different `--check` treatment.
     # Folding them would make one command answer to two authors.
-    p_correct = sub.add_parser(
+    p_correct = _verb(
         "correct",
         help="add the words people ASK with to the document that answers — one human question line",
     )
@@ -912,9 +860,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_correct.add_argument("--list", action="store_true", help="every filed correction, and any suspended pin")
     p_correct.add_argument("--json", action="store_true", default=None, help="machine-readable output")
     _add_output_flags(p_correct, band=False)
-    p_correct.set_defaults(func=_cmd_correct)
+    p_correct.set_defaults(func=_dispatch)
 
-    p_mcp = sub.add_parser(
+    p_mcp = _verb(
         "mcp", help="serve the index over MCP on stdio, for coding agents"
     )
     # SR-OUTPUT decision 15: on EVERY verb that reads .fux/output.toml,
@@ -926,12 +874,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="ignore .fux/output.toml and use the template `fux setup` writes",
     )
-    p_mcp.set_defaults(func=_cmd_mcp)
+    p_mcp.set_defaults(func=_dispatch)
 
     # W-210 — the explorer. A LOCAL page over the real `ask`, and the verb
     # carries no `--host`: `serve.HOST` is the contract, not a default, and a
     # flag would turn a refusal into a preference. See `serve/__init__.py`.
-    p_serve = sub.add_parser(
+    p_serve = _verb(
         "serve", help="a local page that shows why each document ranked, over the real `ask`"
     )
     p_serve.add_argument(
@@ -942,15 +890,15 @@ def build_parser() -> argparse.ArgumentParser:
         "--open", action="store_true", help="open the page in a browser once the server is up"
     )
     _add_output_flags(p_serve, band=False)
-    p_serve.set_defaults(func=_cmd_serve)
+    p_serve.set_defaults(func=_dispatch)
 
-    p_hooks = sub.add_parser("hooks", help="install the git hooks and the index merge driver")
+    p_hooks = _verb("hooks", help="install the git hooks and the index merge driver")
     p_hooks.add_argument("--install", action="store_true", help="write them (the default)")
     p_hooks.add_argument("--status", action="store_true", help="report what is wired")
     p_hooks.add_argument("--uninstall", action="store_true", help="remove only what fux wrote")
     p_hooks.add_argument("--json", action="store_true", default=None, help="machine-readable status")
     _add_output_flags(p_hooks, band=False)
-    p_hooks.set_defaults(func=_cmd_hooks)
+    p_hooks.set_defaults(func=_dispatch)
 
     # W-82 ruling 10 (Arpit, 2026-08-27). A verb, like `mcp`, for the same
     # reason: it is a long-running process rather than a query, and flat rather
@@ -958,7 +906,7 @@ def build_parser() -> argparse.ArgumentParser:
     # constraint. `start`/`stop`/`status` are POSITIONAL, not flags, because
     # they are mutually exclusive states and `fux daemon --start --stop` should
     # not parse.
-    p_daemon = sub.add_parser(
+    p_daemon = _verb(
         "daemon", help="run the URL freshness clock in the background (start | stop | status)"
     )
     p_daemon.add_argument(
@@ -974,18 +922,18 @@ def build_parser() -> argparse.ArgumentParser:
     # into a supervisor, which is the global install this verb exists to avoid.
     p_daemon.add_argument("--serve", action="store_true", help=argparse.SUPPRESS)
     _add_output_flags(p_daemon, band=False)
-    p_daemon.set_defaults(func=_cmd_daemon)
+    p_daemon.set_defaults(func=_dispatch)
 
     # The graph group. Flat, like every other verb — `fux graph path` would be
     # the first subcommand tree on this surface, and "no subcommand tree" is
     # the constraint SR-CLI keeps.
-    p_explain = sub.add_parser("explain", help="one document's outbound edges and its community")
+    p_explain = _verb("explain", help="one document's outbound edges and its community")
     p_explain.add_argument("doc", help="a doc id or the loc `find` printed")
     p_explain.add_argument("--json", action="store_true", default=None, help="machine-readable output")
     _add_output_flags(p_explain, band=False)
-    p_explain.set_defaults(func=_cmd_explain)
+    p_explain.set_defaults(func=_dispatch)
 
-    p_graph = sub.add_parser(
+    p_graph = _verb(
         "graph", help="the neighbourhood around a query's best answers, or around documents you name"
     )
     # **W-160's second atom.** The walk gets a life without a query. `query`
@@ -1044,20 +992,20 @@ def build_parser() -> argparse.ArgumentParser:
     )
     _add_tune_flag(p_graph)
     _add_output_flags(p_graph, band=False)
-    p_graph.set_defaults(func=_cmd_graph)
+    p_graph.set_defaults(func=_dispatch)
 
-    p_path = sub.add_parser("path", help="how two documents are connected, most reliable route first")
+    p_path = _verb("path", help="how two documents are connected, most reliable route first")
     p_path.add_argument("src", metavar="FROM", help="the document the route starts at")
     p_path.add_argument("dst", metavar="TO", help="the document the route ends at")
     p_path.add_argument("--hops", type=int, default=None, metavar="N", help=_hops_help())
     p_path.add_argument("--json", action="store_true", default=None, help="machine-readable output")
     _add_tune_flag(p_path)
     _add_output_flags(p_path, band=False)
-    p_path.set_defaults(func=_cmd_path)
+    p_path.set_defaults(func=_dispatch)
 
     # W-233 (F1): proposes identifier families; `--write` replaces only the
     # [detected] table of .fux/identifiers.toml. [user] is never touched.
-    p_ids = sub.add_parser(
+    p_ids = _verb(
         "identifiers",
         help="propose identifier families (RF-{n}) from the index; --write records them",
     )
@@ -1066,12 +1014,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_ids.add_argument("--json", action="store_true", default=None, help="machine-readable output")
     _add_progress_flags(p_ids)
     _add_output_flags(p_ids, band=False)
-    p_ids.set_defaults(func=_cmd_identifiers)
+    p_ids.set_defaults(func=_dispatch)
 
     # A flat verb with no arguments at all: it neither reads the repo nor
     # writes it, so it works before `fux setup` has run and outside a root.
     # Printing is the whole feature — see `_cmd_tune`.
-    p_tune = sub.add_parser(
+    p_tune = _verb(
         "tune", help="print the tunables file for you to paste into .fux/tune.toml"
     )
     p_tune.set_defaults(func=_cmd_tune)
@@ -1079,7 +1027,7 @@ def build_parser() -> argparse.ArgumentParser:
     # SR-OUTPUT: prints, never writes. `tomllib` reads and the stdlib does not
     # write TOML, and a writer would mean fux editing a file it promised was
     # yours — the same refusal `fux tune` makes.
-    p_output = sub.add_parser(
+    p_output = _verb(
         "output", help="print the output-defaults file for you to paste into .fux/output.toml"
     )
     p_output.set_defaults(func=_cmd_output)
@@ -1121,6 +1069,12 @@ def _require_pii_rules(command: str) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     _stdio_utf8()
+    words = list(sys.argv[1:] if argv is None else argv)
+    verb = next((w for w in words if not w.startswith("-")), None)
+    if verb in VERBS and not available(verb):
+        exc = _refusal(verb)
+        print(f"error: {exc}", file=sys.stderr)
+        return exc.exit_code
     parser = build_parser()
     args = parser.parse_args(argv)
     if not getattr(args, "command", None):

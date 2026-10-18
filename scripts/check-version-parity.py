@@ -40,6 +40,23 @@ def _re(path: str, pattern: str):
     return read
 
 
+def _pins(path: str, names: tuple[str, ...]):
+    """The one version every `name==X` pin in `path` names — or, when they
+    disagree, a string naming each, which then fails the comparison loudly."""
+
+    def read(root: Path) -> str | None:
+        text = (root / path).read_text(encoding="utf-8")
+        found = {n: re.search(rf'"{re.escape(n)}==([^"]+)"', text) for n in names}
+        if any(m is None for m in found.values()):
+            return None
+        versions = {n: m.group(1) for n, m in found.items()}
+        if len(set(versions.values())) == 1:
+            return next(iter(versions.values()))
+        return " / ".join(f"{n} {v}" for n, v in versions.items())
+
+    return read
+
+
 def _pkg_json(root: Path) -> str | None:
     return json.loads((root / "node/package.json").read_text(encoding="utf-8")).get("version")
 
@@ -51,6 +68,13 @@ SITES = {
     "node/src/verbs/mcp.mjs": _re(
         "node/src/verbs/mcp.mjs", r'serverInfo:\s*\{[^}]*version:\s*"([^"]+)"'
     ),
+    # W-282: four PyPI distributions on one version. Each takes its version
+    # from src/fux/__init__.py; what can drift is the PINS between them, which
+    # a release must bump with the source or `pip install fux-engine` resolves
+    # a role package from the previous release.
+    "pyproject.toml": _pins("pyproject.toml", ("fux-core", "fux-reader", "fux-writer")),
+    "packages/fux-reader/pyproject.toml": _pins("packages/fux-reader/pyproject.toml", ("fux-core",)),
+    "packages/fux-writer/pyproject.toml": _pins("packages/fux-writer/pyproject.toml", ("fux-core",)),
 }
 
 

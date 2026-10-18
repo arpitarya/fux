@@ -575,8 +575,8 @@ record; this section states nothing of its own.**
 
 ## Build & test
 
-**`fux-engine` 2.0.0 is released on PyPI and on npm.** `src/fux/` is the live
-tree, `node/` is the Node reader, and how a release reaches each registry is
+**`fux-engine` 3.0.1 is released on PyPI and on npm.** `src/fux/` is the live
+tree — one tree, four distributions (W-282) — `node/` is the Node reader, and how a release reaches each registry is
 [SR-WORK-RELEASE](records/0063_WORK-release.md)'s.
 
 ```bash
@@ -609,7 +609,8 @@ archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit syn
 ## Package identity and release (do not change casually)
 
 **Distribution name `fux-engine`; import package `fux`; released on PyPI and on
-npm.** How a release reaches both registries, where the version number lives and
+npm** — and since W-282 `fux-engine` depends on `fux-core`, `fux-reader` and
+`fux-writer`, built from the same tree by `records/README.md` §The layer map. How a release reaches both registries, where the version number lives and
 what keeps its copies equal, and what the merge wall does and does not block are
 stated once in [SR-WORK-RELEASE](records/0063_WORK-release.md) — **read
 decisions 10–11 before merging anything.** The version's history is

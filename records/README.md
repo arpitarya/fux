@@ -642,7 +642,10 @@ table does not grant.
 | `src/fux/stdio.py` | SR-CLI | UTF-8 on stdout and stderr, named rather than inherited — called first by both console scripts, `fux` and `fux-merge-index`. **Its own core-layer module** (W-282) so the writer's merge driver need not import the engine's CLI for it |
 | `src/fux/config.py` | SR-CONFIG | `fux.toml`'s schema, the opaque `[sources.url.config]` table, and the tables refused by name rather than ignored |
 | `src/fux/tune.py` | SR-TUNE | `.fux/tune.toml` — the loader, the closed key set, the two refusals, and the `[priority]` data. **The priority RESOLUTION is not here**: it lives on `query/rank.py::Weighting`, next to the bound that has to agree with it |
-| `src/fux/doctor.py` | SR-DOCTOR | every check, its level, and the register naming whose subject each one reports on. **Carved out of SR-DOTFUX for a different DECISION, not a different concern** (Arpit, 2026-09-11): the layout assertions are still SR-DOTFUX's subject, but this file's subject is the health command itself — and seven records describing one file made the freshness gate demand all eight for any change to any check |
+| `src/fux/doctor.py` | SR-DOCTOR | the engine's `fux doctor` — every row, in `health.ROWS` order, with the identifier-family rows that read `inspect/`; it re-exports every row so `doctor.<check>` keeps its callers (the rows themselves live in `health.py`, `query/health.py` and `ingest/health.py` since W-282). **Carved out of SR-DOTFUX for a different DECISION, not a different concern** (Arpit, 2026-09-11): the layout assertions are still SR-DOTFUX's subject, but this file's subject is the health command itself — and seven records describing one file made the freshness gate demand all eight for any change to any check |
+| `src/fux/health.py` | SR-DOCTOR | doctor's core rows, the row order (`ROWS`, stated once for every install) and the run and render every doctor shares. **Split out of `doctor.py`** (W-282 DoD 8) so `fux-reader` and `fux-writer` each carry a doctor of their own |
+| `src/fux/query/health.py` | SR-DOCTOR | doctor's reader rows — priors, the band's floor, the accelerator, the journal, the freshness share — and the reader-only `fux doctor`. Carved out of `query/` because its decision is doctor's |
+| `src/fux/ingest/health.py` | SR-DOCTOR | doctor's writer rows — hooks, runner, daemon, register, seeded copies, frozen keys, redaction drift — and the writer-only `fux doctor`, the one that can `--fix`. Carved out of `ingest/` because its decision is doctor's |
 | `src/fux/setup.py` | SR-DOTFUX | the second scaffolding moment — the consumer-owned files, write-if-missing |
 | `src/fux/store/` | SR-INDEX-LIFECYCLE | canonical bytes, shard addressing, writer/reader and collisions — the declared record shape moved to `schemas/` (W-226) |
 | `src/fux/store/fuxdir.py` | SR-DOTFUX | the `.fux/` layout generator — and the **three** kind declarations (`COMMITTED`, `DERIVED`, `ACQUIRED`) the generated README table is built from |
@@ -820,6 +823,8 @@ table does not grant.
 | `tests/test_okf_bundle.py` | SR-WORK-OKF | parseable frontmatter and a non-empty `type` across `docs/` + `records/` + `work/`, the asserted document count, and the three declared boundaries whose reasons live in the docstring. **Previously unowned** — the conformance claim was gated and the gate belonged to nobody |
 | `tests/test_archive_law.py` | SR-WORK-ARCHIVE | one archive, and no live document pointing into it where the rule forbids it. **Previously unowned.** What it cannot check is the naming-versus-citing line, which is stated in [SR-WORK-ARCHIVE](0062_WORK-archive.md) decision 8 as an unguarded hole rather than approximated by a looser check |
 | `tests/test_retired_records_archived.py` | SR-LAW-1 | law L1's enforcement — no file in `records/` at a retired status, and every file in `archive/records/` marked archived three ways (status, banner, archive row) |
+| `packages/` | SR-WORK-RELEASE | the three role distributions (`fux-core`, `fux-reader`, `fux-writer`) and `layer_hook.py`, the build hook every wheel — `fux-engine`'s too — selects its files with, from §The layer map (W-282) |
+| `scripts/npm-scoped.py` | SR-WORK-RELEASE | the same Node bundle under `@fux-engine/reader` — only `package.json`'s name changes (W-282 F4) |
 | `scripts/check-version-parity.py` | SR-WORK-RELEASE | the `SITES` list and the `--with-bundle` derivation check — the only thing standing between a missed version bump and a PyPI wheel and npm tarball naming different releases. **The first claimed component under `scripts/`**, and previously unowned despite being run by CI and by the release workflow |
 | `tests/test_version_parity.py` | SR-WORK-RELEASE | runs the parity script on every push and builds a bundle to check the derivation. **Previously unowned** |
 | `scripts/ci-key.py` | SR-WORK-RELEASE | the FULL-stage verdict key (decision 14) — the tree digest over every non-inert path, the per-cell runtime half, and the aggregate key `publish.yml` reads. **The exclude list lives here and nowhere else**; the record states the rule it follows |
@@ -897,11 +902,15 @@ verbs that need both. `fux-engine` installs all four, exactly as today.
   which reads both tables from this file, walks every import in `src/fux/`
   and fails on any edge that crosses them, on a file no row places, and on a
   guarded row that no longer matches the code.
-- ⚠ **What the walk cannot see.** A subprocess relaunch is not an import:
-  `maintain/runner.py` and `maintain/daemon.py` start `python -m fux.cli`, the
-  engine's CLI, from the writer. That holds while `fux-engine` is the only
-  distribution, and is W-282 Step 2's to cut when the writer gets its own
-  entry point.
+- **`cli.py` is core, and runs a verb through its `VERBS` table** — the verb,
+  the module that runs it and that module's layer. It imports no verb module
+  by name, so a verb whose layer is not installed is absent from `--help` and
+  refused by name; the same test holds every row to this map. This is also why
+  the writer's `python -m fux.cli` relaunches (`maintain/runner.py`,
+  `maintain/daemon.py`) stay inside what a writer-only install has.
+- ⚠ **What the walk cannot see.** A subprocess relaunch is not an import, and
+  a data file read by path is not one either; the `VERBS` rows are checked
+  separately because they are imports by name.
 
 <!-- LAYER-MAP-START -->
 
@@ -916,6 +925,10 @@ verbs that need both. `fux-engine` installs all four, exactly as today.
 | `src/fux/frontmatter.py` | core |
 | `src/fux/progress.py` | core |
 | `src/fux/stdio.py` | core |
+| `src/fux/observe.py` | core |
+| `src/fux/health.py` | core |
+| `src/fux/cli.py` | core |
+| `src/fux/__main__.py` | core |
 | `src/fux/config.py` | core |
 | `src/fux/tune.py` | core |
 | `src/fux/output_config.py` | core |
@@ -926,7 +939,6 @@ verbs that need both. `fux-engine` installs all four, exactly as today.
 | `src/fux/acquire/` | core |
 | `src/fux/templates/` | core |
 | `src/fux/api.py` | reader |
-| `src/fux/observe.py` | reader |
 | `src/fux/mcp.py` | reader |
 | `src/fux/query/` | reader |
 | `src/fux/refer/` | reader |
@@ -938,8 +950,6 @@ verbs that need both. `fux-engine` installs all four, exactly as today.
 | `src/fux/enrich.py` | writer |
 | `src/fux/ingest/` | writer |
 | `src/fux/maintain/` | writer |
-| `src/fux/cli.py` | engine |
-| `src/fux/__main__.py` | engine |
 | `src/fux/doctor.py` | engine |
 | `src/fux/identifiers_cmd.py` | engine |
 | `src/fux/inspect/` | engine |
@@ -1034,7 +1044,7 @@ rows narrowed so far were each verified by reading every mention in the file
 | `src/fux/acquire/urlsrc.py` | SR-ARCHIVED-CONTENT | `UrlEntry.archived`, and `resolve_urls` applying **two** layers to it where `keep` and `ttl` take three — the absence of a source-wide layer is decision 1a's call, not an omission |
 | `src/fux/ingest/run.py` | SR-ARCHIVED-CONTENT | `_archived_url_ids` and `_with_archived` — the declaration reaching a record, including a CARRIED one, which is the half that makes a retired page declarable at all. Owned by SR-INGEST for the walk |
 | `src/fux/setup.py::detect_workspace,wire_workspace,_yarn_berry_linker` | SR-NODE-SEARCH | the monorepo half of decision 15 — which signals mean a workspace, and the format-preserving splice into a manifest fux does not own. **It lives in `setup.py` rather than in `fuxdir.py` by structure, not by convention**: `ensure_layout` runs at the head of every ingest and must never edit a consumer's `package.json`. Owned by SR-DOTFUX as scaffolding |
-| `src/fux/doctor.py::_node_reader,_installed_reader` | SR-NODE-SEARCH | the `node reader` row — the version, the shape, a stale `src/` tree still in the consumer's repo, and a shape-C manifest with nothing installed to resolve it. Owned by SR-DOCTOR, which decides what a row IS |
+| `src/fux/health.py::_node_reader,_installed_reader` | SR-NODE-SEARCH | the `node reader` row — the version, the shape, a stale `src/` tree still in the consumer's repo, and a shape-C manifest with nothing installed to resolve it. Owned by SR-DOCTOR, which decides what a row IS |
 | `tools/differential/node_arm.py::bundle_entry,Arm` | SR-NODE-SEARCH | the sixth surface — the published bundle against the module tree it was built from (`bundle_entry` builds it per run; `Arm.compare_bundle`, `compare_bundle_api` and `compare_bundle_mcp` compare it). ⚠ **Narrowed to the top-level symbols the gate can resolve** — a method name here would switch the gate off silently, which `tests/test_sr_freshness.py::test_the_narrowing_is_recorded_where_the_gate_can_read_it` catches. Owned by SR-T1-ACCELERATOR, which owns the harness |
 | `src/fux/store/fuxdir.py::ensure_node_reader,node_version,node_shape,_node_source,_packaged_node_files,_prune_node_reader,_workspace_manifest` | SR-NODE-SEARCH | the vendoring half of R2 — which files are written into `.fux/node/` and the version comparison that decides whether to overwrite. **The `.fux/` SHAPE is still SR-DOTFUX's subject** (it is the fourth shape there); what this record decides is that the vendored thing is a reader and that a stale one is a wrong answer |
 | `src/fux/acquire/urlsrc.py::fetch_all` | SR-URL-INGEST | decision 5's pipeline ends here, and decisions 3 and 6 are what `fetch_all` does with what comes back: a failed fetch is a skip, and the bytes are normalized. Owned by SR-FETCHER for the contract itself |

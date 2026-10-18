@@ -3,6 +3,7 @@ type: Guide
 description: "One document that recreates the fux work system — records, laws, the work queue, backlog, blockers, session files, archive, hooks and the commit guard — in any repository. Paste it in, hand it to Claude, and the mechanism is live."
 status: bootstrap
 date: 2026-10-13
+updated: 2026-10-18
 ---
 
 # WORK-SYSTEM — the fux work mechanism, portable
@@ -19,9 +20,13 @@ ranking, no golden benchmark, no release pipeline. Tests are **deliberately
 left out** of this bootstrap (§9 names the ones to add later); the hooks and
 the commit guard are the only mechanical enforcement installed on day one.
 
-**The human decider is named `Arpit` throughout.** If the repository's
-decider is someone else, replace the name everywhere on setup (hooks included —
-they grep for the heading `## Blocked on Arpit`).
+**The human decider is the git user — never a hard-coded name.** This
+document assumes the target is a **git repository**. "The decider" means the
+person `git config user.name` returns in that clone. The queue heading is the
+fixed string `## Blocked on the decider` (hooks grep it), and every hook that
+names a person reads `git config user.name` at run time. Nothing in the
+installed tree spells a person's name except authorship lines (`filed_by`,
+`Filed by …`, rulings quoted with their date), which record who actually did it.
 
 ---
 
@@ -80,7 +85,8 @@ The system answers four questions, each with exactly one home:
    │                                     ▼                             │
    │  CLAUDE.md ──reads first──▶  work/OPEN-WORK.md  ◀── the ONE queue │
    │  (agent contract, pointers)  ┌─────────────────┐                  │
-   │                              │ Blocked on Arpit│ ◀─ 🔴 inbox      │
+   │                              │ Blocked on      │ ◀─ 🔴 inbox      │
+   │                              │   the decider   │                  │
    │                              │ Open items      │ ◀─ 🟢 🟡 🟣 rows  │
    │                              └────────┬────────┘                  │
    │          work/open/W-nn-slug.md ◀──────┘ one detail file per item │
@@ -106,7 +112,7 @@ named in a record / proposal ──▶ B-nnn row in BACKLOG (no file)
                                       ▼
             W-nn detail file + OPEN-WORK row, with a ball (same change)
                                       │
-        🔴 blocked on Arpit ──▶ inbox row + "↳ blocks:" sub-row
+        🔴 blocked on the decider ──▶ inbox row + "↳ blocks:" sub-row
         🟣 gated on a date  ──▶ row names YYYY-MM-DD
         🟡 waiting on W-mm  ──▶ row names the id (file one if none exists)
         🟢 no blockers      ──▶ an agent may pick it up
@@ -129,16 +135,17 @@ a file; nothing closed is ever deleted.*
 | term | meaning |
 |---|---|
 | **SR / Standing Record** | a maintained specification in `records/`. Amended in the same change as the code it governs; cited by name (`SR-WORK-SESSION`), never by number. Not an ADR: it must be **true now** and carries no history. |
-| **Law (`L0`, `L1`, …)** | a rule that outranks every other record. Lives in its own `SR-LAW-n` record. Changes only on Arpit's ruling, named in the record. |
+| **decider** | the human who rules: whoever `git config user.name` returns in the clone. Never written into a heading, hook or rule as a literal name. |
+| **Law (`L0`, `L1`, …)** | a rule that outranks every other record. Lives in its own `SR-LAW-n` record. Changes only on the decider's ruling, named in the record. |
 | **WORK record** | a `kind: process` record stating how work is done — `SR-WORK-<SUBJECT>`, numbered `0051`–`0100`. |
-| **kind** | `law` · `component` · `process`. Answers *what would have to change for this record to become wrong?* — Arpit rules differently / the code changes / the way work is done changes. |
+| **kind** | `law` · `component` · `process`. Answers *what would have to change for this record to become wrong?* — the decider rules differently / the code changes / the way work is done changes. |
 | **owns / describes** | `owns`: exactly one record per component path. `describes`: any number of records whose subject reaches into a component they do not own. The guard demands the owner **and** every describer be touched in the same change. |
 | **`no SR affected`** | the escape line in a commit message, on its own line — a claim under your name that the change touches no recorded decision. |
 | **W-nn** | an open work item: a row in `OPEN-WORK.md` + a file in `work/open/`. Ids never reused. |
 | **B-nnn** | a backlog row: named somewhere, nobody doing it. No file. Ids never reused. |
-| **ball** | the one marker every queue row opens with: 🔴 blocked on Arpit · 🟣 gated on a date · 🟡 waiting on another item · 🟢 no blockers. Optional after it: 🧨 getting worse · 🔺 do first (Arpit only). |
+| **ball** | the one marker every queue row opens with: 🔴 blocked on the decider · 🟣 gated on a date · 🟡 waiting on another item · 🟢 no blockers. Optional after it: 🧨 getting worse · 🔺 do first (the decider only). |
 | **lane** | `arpit` (needs a human's hands) · `agent` (an agent alone) · `cowork` (research, chat-only). Ordered within a lane, never across. |
-| **inbox** | the `## Blocked on Arpit` table at the top of the queue — every decision he owes, with its age. |
+| **inbox** | the `## Blocked on the decider` table at the top of the queue — every decision the decider owes, with its age. |
 | **blocker** | `work/BLOCKED.json` with a decision other than `PROCEED`. The session stops. |
 | **veto condition** | the checkable condition under which a record's decision reopens — a condition, never an event to await. |
 | **archive** | `archive/` at the repo root, the only one. Things are moved there, mapped in `archive/README.md`, and may be named but never cited. |
@@ -170,7 +177,7 @@ never inserted.
    trade-off.
 2a. **On contact, the conflicting sentence is deleted from the lower document**
    — never softened, footnoted, or left beside a pointer.
-3. **Amendment is entrenched.** A Law changes only on Arpit's ruling, named in
+3. **Amendment is entrenched.** A Law changes only on the decider's ruling, named in
    the record. An ordinary record a session may accept.
 4. **The restatement test:** *could this artifact and the record disagree
    while both still look correct?* If yes it is a restatement and forbidden.
@@ -219,7 +226,7 @@ Optional: `supersedes`, `ratifies`. **Quote any value containing `: `.**
 
 | `kind` | becomes wrong when | the extra gate it answers to |
 |---|---|---|
-| `law` | Arpit rules differently | precedence (3.0 rule 2) |
+| `law` | The decider rules differently | precedence (3.0 rule 2) |
 | `component` | the code changes | the owning record is touched in the same change (guard) |
 | `process` | the way work is done changes | it owns its own enforcement — a hook or a test |
 
@@ -282,25 +289,25 @@ different concern. A component with no decision yet is owned by an open
 15. At most 280 characters.
 16. No body — no nested bullet, no table, no indented paragraph.
 17. Every row links its own detail file, and the id in the row matches it.
-18. A *Blocked on Arpit* row is short too.
+18. A *Blocked on the decider* row is short too.
 19. Everything else — status, evidence, records, rulings, hazards, history —
     goes in the item's file.
 
 **D · The balls**
 
 20. A ball on every row, always, and exactly one.
-21. 🔴 blocked on Arpit's decision — directly, or through any chain of items
+21. 🔴 blocked on the decider's decision — directly, or through any chain of items
     ending at one.
 22. 🟣 gated on a named date — the row that owns the gate names `YYYY-MM-DD`;
     a row behind it names the item it waits on.
-23. 🟡 waiting on another item whose chain ends at neither Arpit nor a date —
+23. 🟡 waiting on another item whose chain ends at neither the decider nor a date —
     the row says `waiting on W-mm`, the bare id right after the verb.
 23a. **A 🟡 row names a queue item; if none exists, the same edit files one.**
     *"Waiting on a run"*, *"waiting on an endpoint"* — each is an unfiled item
     wearing a blocker's clothes. The filed item states what the missing thing
     is, what producing it takes, and who or what can produce it. **A blocker
     that cannot be turned into an item is a reason to close**, or to put the
-    fork to Arpit — never a reason to stay 🟡.
+    fork to the decider — never a reason to stay 🟡.
 24. 🟢 no blockers, good to go.
 25. Red wins, then purple.
 26. A date-gated item is not in the inbox.
@@ -309,12 +316,12 @@ different concern. A component with no decision yet is owned by an open
 28. When a state changes, re-ball that row and every row waiting on it.
 29. 🧨 broken, or getting worse every day it waits. Any session sets or clears
     it, on any ball.
-30. 🔺 do first — set and removed only by Arpit. An agent never adds one.
+30. 🔺 do first — set and removed only by the decider. An agent never adds one.
 31. Mark order: the ball, then 🧨, then 🔺, then the id.
 32. **An agent picks from 🟢 only:** 🟢🧨🔺 → 🟢🔺 → 🟢🧨 → 🟢. 🔴, 🟣 and 🟡
     wait. A Claude Code session never picks from the `research` section.
 33. A session names every 🔴 decision in its first output, 🔺 first.
-34. A 🔺 item waiting on an item without 🔺 is flagged to Arpit, never fixed by
+34. A 🔺 item waiting on an item without 🔺 is flagged to the decider, never fixed by
     giving the blocker a 🔺.
 
 **E · Ordering**
@@ -324,14 +331,14 @@ different concern. A component with no decision yet is owned by an open
     merely present.
 37. Grouped by what closing it takes — `build` (code) · `testing` (a run or a
     harness) · `record update` (a ruling or a record; no code) · `research`
-    (a proposal or compare doc reached by reading; no code; closes on Arpit
+    (a proposal or compare doc reached by reading; no code; closes on the decider
     picking a shape).
 37a. **The `research` section runs in a chat/Cowork session, never in Claude
     Code.** Its rows' lane is `cowork`; its files say `**Model:** Cowork`.
 38. Each item's file names the record its change will update, or says
     **"no SR affected"** out loud.
 
-**F · The Blocked-on-Arpit inbox**
+**F · The Blocked-on-the-decider inbox**
 
 39. The header carries the inbox; each item's file carries its `filed` date.
 40. `age` is arithmetic — today minus `filed`, recomputed on every read, never
@@ -387,7 +394,7 @@ different concern. A component with no decision yet is owned by an open
     before it, not the ruling and not the `**Model:**` line.
 59. The view says **what we are going to do, in plain English, fit to put on a
     screen in a meeting.** Default shape: `| step | what we do | what it gives
-    us | state |`, state ✅ done · ⏳ not yet · 🔴 Arpit decides. Ids, metric
+    us | state |`, state ✅ done · ⏳ not yet · 🔴 the decider decides. Ids, metric
     names and paths go in the body below.
 60. The view changes in the same change as the item; a view that disagrees
     with its body is wrong, and the body wins.
@@ -408,8 +415,8 @@ different concern. A component with no decision yet is owned by an open
 under its header:
 
 ```text
-**A ball on every row, always one:** 🔴 blocked on Arpit, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item · 🟢 no blockers.
-**Optional, after the ball:** 🧨 broken or getting worse · 🔺 do first (Arpit only). Full legend: [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 20–34.
+**A ball on every row, always one:** 🔴 blocked on the decider, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item · 🟢 no blockers.
+**Optional, after the ball:** 🧨 broken or getting worse · 🔺 do first (the decider only). Full legend: [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 20–34.
 ```
 
 ### 3.4 · The backlog (→ `SR-WORK-BACKLOG`)
@@ -438,7 +445,7 @@ under its header:
 16. Every row names what would close it.
 17–21. **Five classes, exhaustive:** `unbuilt` (ratified, not implemented) ·
     `ungated` (a rule nothing checks) · `unmeasured` (a default or claim with
-    no measurement) · `unruled` (a fork not decided — **only Arpit closes
+    no measurement) · `unruled` (a fork not decided — **only the decider closes
     one**) · `cost` (a consequence accepted deliberately — **never
     graduates**; leaves when paid or when its decision reopens).
 22. One class per row: what would have to happen first.
@@ -460,7 +467,7 @@ under its header:
 
 1. **On a fork, a compare doc first** — `work/compare/<name>.compare.md`:
    verdict block on top, context, options, matrix, consequences, references,
-   **reopen-trigger** (a condition, not a date). Arpit accepts or overrides the
+   **reopen-trigger** (a condition, not a date). The decider accepts or overrides the
    verdict.
 2. **On a parked idea, a proposal** — `work/proposals/<name>.md`, `status:
    proposed`, with a **graduation trigger**. Every proposal has one `B-nnn` row.
@@ -526,7 +533,7 @@ under its header:
    included — no proposal step.
 7. Under two obligations, both judgment: **(a) say it out loud** — a change to
    `CLAUDE.md` is named in the session output and the worklog entry; **(b) a
-   ruling of Arpit's, or a fact** — never latitude you were not given.
+   ruling of the decider's, or a fact** — never latitude you were not given.
 8. Statements of fact are exempt from every ceremony: fixed on contact.
 9. The split is `docs/` (what the project *is*) and `work/` (what is
    *happening* to it). `work/README.md` is the map.
@@ -544,17 +551,17 @@ under its header:
 ### 3.8 · Blockers (→ `SR-WORK-BLOCKERS`)
 
 1. **A blocker is a file, not a remark.** The moment you cannot proceed
-   without Arpit, write `work/BLOCKED.json` and stop.
+   without the decider, write `work/BLOCKED.json` and stop.
 2. Shape:
    ```json
    {"decision":"ASK","reason":"one line","questions":["the minimum question"],
     "safe_alternative":"what you can do meanwhile, or \"\"","surfaced":false,"filed":"YYYY-MM-DD"}
    ```
-3. `decision` takes exactly four values — `ASK` (he can unblock you) ·
+3. `decision` takes exactly four values — `ASK` (the decider can unblock you) ·
    `REFUSE` (disallowed or unsafe) · `UNKNOWN` (out of scope to answer
    reliably) · `PROCEED` (nothing is blocked).
 4. `questions` carries the **minimum** question.
-5. `safe_alternative` is what can be done meanwhile — never a guess at what he
+5. `safe_alternative` is what can be done meanwhile — never a guess at what the decider
    would have said.
 6. **Do not work around a blocker.** Say it, set `surfaced: true`, stop.
 7. Three hooks enforce it: `UserPromptSubmit` injects the blocker and the
@@ -566,7 +573,7 @@ under its header:
    never relents is a hang. Taking the third exit while still blocked breaks
    rule 6.
 9. The lock is per asset, not per session; two sessions are expected.
-10. When Arpit rules, the file is set back to `PROCEED` with the ruling as
+10. When the decider rules, the file is set back to `PROCEED` with the ruling as
     `reason` and the resulting item re-balled in the same change.
 
 ### 3.9 · The archive (→ `SR-WORK-ARCHIVE`)
@@ -643,7 +650,7 @@ change that retires it.
 2. **Triage first.** If `work/BLOCKED.json` is not `PROCEED`, the first
    sentence says so. Name every inbox row and its age (any > 5 days called out).
    If no item is agent-closable (no 🟢 outside `research`, for Claude Code),
-   the session's first output is the blocked-on-Arpit list and it **stops**.
+   the session's first output is the blocked-on-the-decider list and it **stops**.
 3. **Pick** from 🟢 by rule 32. Announce `→ W-nn: …`. Write `work/NOW.md`.
 4. **Work**, record first (L0): amend the owning record in the same change as
    the code. Keep the item file, the queue and INTERVIEW current as you go.
@@ -743,7 +750,7 @@ ln -sf ../../scripts/sr-guard.sh .git/hooks/commit-msg
 
 **Before any work, read [`work/OPEN-WORK.md`](work/OPEN-WORK.md)** and ask: *is
 any item agent-closable right now?* If none is, the session's **first** output
-is the blocked-on-Arpit list and it then **stops**. What the first output must
+is the blocked-on-the-decider list and it then **stops**. What the first output must
 name, the inbox, the 5-day rule, the `↳ blocks:` sub-row and which balls an
 agent may pick from are [SR-WORK-OPEN-QUEUE](records/0051_WORK-open-queue.md)
 rules 32–34 and 39–45. **Claude Code never picks from the `research` section**
@@ -765,7 +772,7 @@ decision 13.
 | the stages a feature moves through | [SR-WORK-LIFECYCLE](records/0053_WORK-lifecycle.md) |
 | what a session owes before it ends, and how long an answer may be | [SR-WORK-SESSION](records/0054_WORK-session.md) |
 | what a task owes the documentation | [SR-WORK-DOCS](records/0055_WORK-docs.md) |
-| what to do when you cannot proceed without Arpit | [SR-WORK-BLOCKERS](records/0056_WORK-blockers.md) |
+| what to do when you cannot proceed without the decider | [SR-WORK-BLOCKERS](records/0056_WORK-blockers.md) |
 | whether a claim may be grounded in an archived doc | [SR-WORK-ARCHIVE](records/0057_WORK-archive.md) |
 | which record owns a module | [`records/README.md`](records/README.md) §Ownership |
 | which file governs what | [SR-WORK-GOVERNANCE](records/0059_WORK-governance.md) |
@@ -784,7 +791,7 @@ Each law is stated in exactly one record and is **not restated here**:
 
 [SR-LAWS](records/0001_LAWS.md) assigns the handles and routes each to its
 record; that is all it does. Add a law by adding a record in the law range and
-a line here, on Arpit's ruling named in the record.
+a line here, on the decider's ruling named in the record.
 
 ## Documentation (required)
 
@@ -878,7 +885,7 @@ record to become wrong?*
 
 | `kind` | becomes wrong when | the gate the kind selects |
 |---|---|---|
-| `law` | Arpit rules differently | precedence: a record conflicting with a law is void in the conflicting part |
+| `law` | The decider rules differently | precedence: a record conflicting with a law is void in the conflicting part |
 | `component` | the code changes | `scripts/sr-guard.sh` — the owning record is touched in the same change |
 | `process` | the way work is done changes | it owns its enforcement — a hook or script today, a test once tests exist |
 
@@ -1179,7 +1186,7 @@ A law restated in two places is two laws the moment one is edited.
    | **L1** | [SR-LAW-1](0003_LAW-1-retired-records-archived.md) | a retired record is archived, never deleted |
 
 2. **A new law** takes the next handle and the next free number in the law
-   range, on Arpit's ruling named in its record; this table gains its row and
+   range, on the decider's ruling named in its record; this table gains its row and
    `CLAUDE.md` §The laws its line, in the same change.
 3. **A retired law** is written `ex-Ln`; the handle is never reused; the record
    is archived under L1.
@@ -1217,7 +1224,7 @@ carries a law's normative text.
 Frontmatter as in 6.5 with `name: SR-LAW-0`, `title: "SR-LAW-0 (0002) — L0,
 the records are the only source of truth"`, `description: "Every rule is
 stated in exactly one record; every other artifact links to it; Law records
-outrank every other record; a Law changes only on Arpit's ruling."`,
+outrank every other record; a Law changes only on the decider's ruling."`,
 `laws: [L0]`. Body:
 
 - **§1** — three short paragraphs: one home per rule; the restatement test in
@@ -1323,7 +1330,7 @@ better off. Every file has a trigger that says when it must change.
 | [`INTERVIEW.md`](INTERVIEW.md) | the state-of-play doc a cold successor reads | **during** the session, not at the end |
 | [`IMPLEMENTATION.md`](IMPLEMENTATION.md) | what shipped, when, and how it turned out | something lands |
 | [`NOW.md`](NOW.md) | one line: current state and immediate next step | every transition; `idle` when stopping |
-| [`BLOCKED.json`](BLOCKED.json) | the blocker file — [SR-WORK-BLOCKERS](../records/0056_WORK-blockers.md) | a session blocks or Arpit rules |
+| [`BLOCKED.json`](BLOCKED.json) | the blocker file — [SR-WORK-BLOCKERS](../records/0056_WORK-blockers.md) | a session blocks or the decider rules |
 | [`LESSONS.md`](LESSONS.md) | dated lessons, newest first — a log, because the date is the lesson | a failure teaches something durable |
 | [`MACHINE.md`](MACHINE.md) | environment and tooling quirks of wherever this runs | a surface breaks in a way the code did not cause |
 | [`open/`](open/README.md) | one detail file per open `W-nn` | opened with the item, **archived** with it |
@@ -1364,7 +1371,7 @@ it is a `B-nnn` row in `BACKLOG.md` and nothing else. **Never both.**
 ````markdown
 ---
 type: Queue
-description: "The single live work queue, three lanes, plus the Blocked-on-Arpit inbox. The list only — its rules live in the record below."
+description: "The single live work queue, three lanes, plus the Blocked-on-the-decider inbox. The list only — its rules live in the record below."
 governed_by: SR-WORK-OPEN-QUEUE
 governed_by_path: records/0051_WORK-open-queue.md
 ---
@@ -1377,14 +1384,14 @@ how the inbox works, and what every session owes — is stated once in
 **[SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md)** and is not repeated
 here. Read that record before changing anything below it.
 
-**A ball on every row, always one:** 🔴 blocked on Arpit, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item · 🟢 no blockers.
-**Optional, after the ball:** 🧨 broken or getting worse · 🔺 do first (Arpit only). Full legend: [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 20–34.
+**A ball on every row, always one:** 🔴 blocked on the decider, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item · 🟢 no blockers.
+**Optional, after the ball:** 🧨 broken or getting worse · 🔺 do first (the decider only). Full legend: [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 20–34.
 
 ---
 
-## Blocked on Arpit
+## Blocked on the decider
 
-| what he decides | filed | age |
+| what the decider decides | filed | age |
 |---|---|---|
 
 *Empty since <DATE> — nothing waits on a ruling; the next gate is the first item filed.*
@@ -1408,9 +1415,9 @@ here. Read that record before changing anything below it.
 not part of the file):
 
 ```markdown
-## Blocked on Arpit
+## Blocked on the decider
 
-| what he decides | filed | age |
+| what the decider decides | filed | age |
 |---|---|---|
 | 🔴 **W-03** — pick the config format: TOML (rec.) or YAML. [the item](open/W-03-config-format.md) | 2026-10-13 | 2d |
 | ↳ **blocks:** W-04 | | |
@@ -1421,12 +1428,12 @@ not part of the file):
 
 ### build
 
-- 🟡 **W-04** · `agent` — the config loader; waiting on W-03. **Sonnet.** Filed by Arpit (Claude Code). [detail](open/W-04-config-loader.md)
-- 🟢 **W-05** · `agent` — the `--json` flag on `list`. **Sonnet.** Filed by Arpit (Claude Code). [detail](open/W-05-list-json.md)
+- 🟡 **W-04** · `agent` — the config loader; waiting on W-03. **Sonnet.** Filed by <git user.name> (Claude Code). [detail](open/W-04-config-loader.md)
+- 🟢 **W-05** · `agent` — the `--json` flag on `list`. **Sonnet.** Filed by <git user.name> (Claude Code). [detail](open/W-05-list-json.md)
 
 ### research
 
-- 🟢 **W-06** · `cowork` — survey of schema validators; no code. **Cowork.** Filed by Arpit (Cowork). [detail](open/W-06-validator-survey.md)
+- 🟢 **W-06** · `cowork` — survey of schema validators; no code. **Cowork.** Filed by <git user.name> (Cowork). [detail](open/W-06-validator-survey.md)
 ```
 
 ### 6.12 · `work/BACKLOG.md`
@@ -1555,9 +1562,9 @@ ball: agent | arpit | cowork
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | <a plain-English action, readable aloud> | <what it buys, in one phrase> | ⏳ |
-| 2 | Arpit picks <the choice> | <the decision it unblocks> | 🔴 Arpit decides |
+| 2 | The decider picks <the choice> | <the decision it unblocks> | 🔴 decider decides |
 
-**Arpit, YYYY-MM-DD:** *"<the ask, in his words>"*
+**<decider>, YYYY-MM-DD:** *"<the ask, in their words>"*
 
 **Model:** <Opus | Sonnet | Haiku | Cowork | NONE — who, and why>: <one sentence why>.
 
@@ -1627,7 +1634,7 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 
 - **Asked:** *<the ask>*
 - **Done:** <what landed, with commit shas where they exist>
-- **Decided / left open:** <rulings taken in-session; forks put to Arpit>
+- **Decided / left open:** <rulings taken in-session; forks put to the decider>
 - **Mistakes:** <what went wrong and what was done about it, or "none">
 - **Next:** <the single next step>
 ```
@@ -1640,7 +1647,7 @@ entry is corrected by a new one. Distinct from `INTERVIEW.md`, which is the
 - **Done:** records 0001–0003 and 0051–0060, `work/`, `archive/`, `scripts/`, `.claude/` hooks, `CLAUDE.md`; WORK-SYSTEM.md moved to `archive/bootstrap/`.
 - **Decided / left open:** tests deferred — filed as backlog rows B-001–B-005.
 - **Mistakes:** none.
-- **Next:** Arpit installs the commit-msg guard; the first `W-nn` is filed.
+- **Next:** the decider installs the commit-msg guard; the first `W-nn` is filed.
 ````
 
 ### 6.17 · `work/INTERVIEW.md`
@@ -1677,7 +1684,7 @@ entry.**
 
 ## 2 · In flight, and the immediate next step
 
-Nothing in flight. Next: Arpit installs `scripts/sr-guard.sh` as the
+Nothing in flight. Next: the decider (`git config user.name`) installs `scripts/sr-guard.sh` as the
 `commit-msg` hook; the first item is filed from the first real ask.
 
 ## 3 · Standing constraints
@@ -2000,7 +2007,7 @@ exit 0
 
 ```python
 #!/usr/bin/env python3
-"""Validates the "Blocked on Arpit" section of work/OPEN-WORK.md against
+"""Validates the "Blocked on the decider" section of work/OPEN-WORK.md against
 SR-WORK-OPEN-QUEUE rule 45a: when the inbox table carries no rows, the line
 directly beneath it is exactly one `*Empty since YYYY-MM-DD ...*` declaration
 and nothing else; when it carries rows, nothing follows them.
@@ -2012,7 +2019,7 @@ import re
 import sys
 from pathlib import Path
 
-HEADING = "## Blocked on Arpit"
+HEADING = "## Blocked on the decider"
 EMPTY_RE = re.compile(r"^\*Empty since \d{4}-\d{2}-\d{2}\b.*\*$")
 
 
@@ -2133,11 +2140,12 @@ if [ -s work/BLOCKED.json ] && ! jq -e '.decision == "PROCEED"' work/BLOCKED.jso
 fi
 
 if [ -f work/OPEN-WORK.md ]; then
-  INBOX=$(sed -n '/## Blocked on Arpit/,/^---$/p' work/OPEN-WORK.md | sed '1d;$d')
+  DECIDER=$(git config user.name 2>/dev/null); DECIDER=${DECIDER:-the decider}
+  INBOX=$(sed -n '/## Blocked on the decider/,/^---$/p' work/OPEN-WORK.md | sed '1d;$d')
   case "$INBOX" in
     *"*Empty since"*|"") ;;
     *) echo "<inbox>"; echo "$INBOX"; echo "</inbox>"
-       echo "These are waiting on Arpit. Name them in your first three lines, with their age." ;;
+       echo "These are waiting on $DECIDER. Name them in your first three lines, with their age." ;;
   esac
 fi
 
@@ -2170,8 +2178,9 @@ if [ "$N" -ge 3 ]; then rm -f .claude/.stop-attempts; exit 0; fi
 echo $((N + 1)) > .claude/.stop-attempts
 
 REASON=$(jq -r '"\(.decision): \(.reason)"' "$B" 2>/dev/null || echo "work/BLOCKED.json is unresolved")
-jq -n --arg r "$REASON" '{hookSpecificOutput:{hookEventName:"Stop",decision:"block",
-  reason:("A blocker is recorded and has not been surfaced to Arpit — " + $r +
+DECIDER=$(git config user.name 2>/dev/null); DECIDER=${DECIDER:-the decider}
+jq -n --arg r "$REASON" --arg d "$DECIDER" '{hookSpecificOutput:{hookEventName:"Stop",decision:"block",
+  reason:("A blocker is recorded and has not been surfaced to " + $d + " — " + $r +
   "  State it in one short paragraph, set .surfaced=true in work/BLOCKED.json, and stop. Do not work around it.")}}'
 exit 0
 ```
@@ -2254,7 +2263,7 @@ exit 0
 ```bash
 #!/usr/bin/env bash
 # PostToolUse(Write|Edit|MultiEdit|NotebookEdit|Bash) — catches a malformed
-# "Blocked on Arpit" section the moment a session writes one. Bash is in the
+# "Blocked on the decider" section the moment a session writes one. Bash is in the
 # matcher because a session told to prefer the shell edits files that way.
 # The rule is SR-WORK-OPEN-QUEUE rule 45a — stated once there, NOT here.
 set -uo pipefail
@@ -2277,8 +2286,12 @@ exit 0
 Work on a branch `work-system-setup`. One commit at the end (two if the
 register needs the sha). Say `→ setup: the work system` first.
 
-1. **Read this file whole.** Then confirm the decider's name (`Arpit`); if the
-   human has said otherwise, substitute it everywhere, hooks included.
+1. **Read this file whole. Confirm it is a git repository** —
+   `git rev-parse --show-toplevel` must succeed; if not, stop and say so
+   (the guard, the hooks and rule 63's authorship all need git). Then read
+   `git config user.name`: that is the decider. If it is empty, stop and ask
+   the human to set it. **Never** write the name into a heading, hook or rule —
+   the heading stays `## Blocked on the decider`.
 2. **Create the tree** of §5: every directory, every `.gitkeep`.
 3. **Write the register, the template and `RULE-SINCE`** (6.2–6.4), filling
    `<CODE ROOTS>` with the repository's real code directories. If the repo
@@ -2310,11 +2323,12 @@ register needs the sha). Say `→ setup: the work system` first.
     `work system: set up from WORK-SYSTEM.md` + a blank line + `no SR affected`
     (the records are being created, not changed). Then write the commit sha
     into `records/RULE-SINCE`, and commit that with the same escape line.
-13. Final line: `✓ setup · → Arpit installs the commit-msg guard; the first
+13. Final line: `✓ setup · → <git user.name> installs the commit-msg guard; the first
     item is filed from the first real ask.`
 
-**Decisions that are Arpit's** (stop and ask): the decider's name if the repo
-has more than one human; whether an existing `CLAUDE.md` rule becomes a record
+**Decisions that are the decider's** (stop and ask): who the decider is if the
+repo has more than one human and they want one fixed person instead of the
+committing git user; whether an existing `CLAUDE.md` rule becomes a record
 or a pointer when the two disagree; the code roots if they are not obvious.
 
 ---
@@ -2333,6 +2347,7 @@ Print each line with ✅ or ❌ and a one-line reason for any ❌.
 [ ] every owns: entry in a record appears in the Ownership table with that owner, and vice versa
 [ ] work/OPEN-WORK.md: legend is the two exact lines; inbox table + "*Empty since <DATE>" line; four section headings
 [ ] python3 scripts/check-open-work-inbox.py exits 0
+[ ] git rev-parse succeeds; git config user.name is set; the inbox heading is "## Blocked on the decider" and no hook, heading or rule spells a person's name
 [ ] every work/open/W-*.md opens with "## At a glance" and a table or diagram right under it (rule 58)
 [ ] every work/open/W-*.md has filed_by / updated / updated_by; every open-items row says "Filed by …" (rules 61–63)
 [ ] work/BLOCKED.json is valid JSON with decision PROCEED

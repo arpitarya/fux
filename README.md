@@ -76,7 +76,7 @@ wrong answer is worse than none.
 ## 60-second quickstart
 
 ```bash
-pip install --pre fux-engine     # Python ≥ 3.12 · Linux, macOS, Windows · zero deps
+pip install fux-engine           # Python ≥ 3.12 · Linux, macOS, Windows · zero deps
 cd your-repo
 fux setup                        # writes .fux/ and agent instructions (only missing files)
 fux ingest                       # indexes README.md and docs/ by default
@@ -90,6 +90,12 @@ plain `git clone`.
 > **No Python on the machine?** `fux setup` vendors a single-file,
 > zero-dependency Node reader into `.fux/node/`, so `.fux/fux find rollback`
 > works with nothing installed. Or: `npx fux-engine find rollback`.
+
+> **A machine that only reads, or only writes?** From 3.1.0 fux ships as four
+> packages on one version: `fux-engine` is all of them, `fux-reader` ranks and
+> answers (refer included), `fux-writer` ingests and keeps the index current,
+> and `fux-core` is what both share. No package has an extra, and a verb from a
+> package you did not install is refused by name.
 
 > **Prefer a library?**
 > ```python
@@ -170,8 +176,7 @@ Honesty up front, so you don't find out the hard way:
 
 ## Status
 
-**`3.0.0` is in alpha** (`pip install --pre fux-engine`); `2.0.x` is the latest
-stable line. The index format is versioned and fux tells you when to run
+**`3.0.1` is the latest release** (`pip install fux-engine`). The index format is versioned and fux tells you when to run
 `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ⭐ **Star the repo** if fux saved your agent from one confident wrong answer —
@@ -241,7 +246,8 @@ The laws were renumbered on 2026-09-28; an older document is read through
 ## Contributing
 
 ```bash
-pip install -e ".[dev]" && pytest
+uv sync --extra dev && uv run pytest -q tests   # or, with pip, all four packages at once:
+pip install -e packages/fux-core -e packages/fux-reader -e packages/fux-writer -e ".[dev]"
 ```
 
 Issues and PRs welcome — bug reports with a failing query are gold. Every change

@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L10
 owns: []
 laws: [L10]
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 37d5abdff09a7955ae79be55779bb9d17c74ab04cc06690e7680d9c3b000ad75
+content_sha: df39925018e998354acd5dd91c89799d26c4181596ff4a48b9c36850b35ac3f8
 ---
 
 # SR-LAW-10 — L10 — the consumer is served build output, never source
@@ -299,7 +299,7 @@ case decision 2 names, not a gap.
 - [SR-FUX-DIRECTORY](0102_fux-directory.md) — what `.fux/` holds, and who owns each child
 - [SR-DECODE](0139_decode.md) · [SR-FETCHER](0117_fetcher.md) · [SR-OBSERVE](0157_observe.md) — the three exemptions
 - [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) — `_node_source`, `_packaged_node_files`, `ensure_node_reader`: the code that vendors today
-- [`hatch_build.py`](../hatch_build.py) — the wheel's build hook, which replaced
+- [`packages/layer_hook.py`](../packages/layer_hook.py) — the wheels' build hook (since W-282 it builds the bundle into fux-writer's wheel), which replaced
   `pyproject.toml`'s `force-include` list · `node/package.json` `exports` / `files`
   — the published surface, now naming the bundle ·
   [`src/fux/store/nodebundle.py`](../src/fux/store/nodebundle.py) — the bundler

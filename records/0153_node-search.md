@@ -12,7 +12,7 @@ owns: [node@e889e284c27c, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 48bb10385f20d77a0995e59d7ae5db44f27f354e82bfd41384891311a84e3a51
+content_sha: 119c37bd3177e431d92af5d85e23313f0ed1f53317fad609f3c0522e9cc9277c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -24,7 +24,7 @@ content_sha: 48bb10385f20d77a0995e59d7ae5db44f27f354e82bfd41384891311a84e3a51
 
 **Describes** — reaches into, does not own:
 
-- [`src/fux/doctor.py::_installed_reader,_node_reader`](../src/fux/doctor.py) · owned by [SR-DOCTOR](0152_doctor.md)
+- [`src/fux/health.py::_installed_reader,_node_reader`](../src/fux/health.py) · owned by [SR-DOCTOR](0152_doctor.md)
 - [`src/fux/setup.py::_yarn_berry_linker,detect_workspace,wire_workspace`](../src/fux/setup.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
 - [`src/fux/store/fuxdir.py::_node_source,_packaged_node_files,_prune_node_reader,_workspace_manifest,ensure_node_reader,node_shape,node_version`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
 - [`tools/differential/node_arm.py::Arm,bundle_entry`](../tools/differential/node_arm.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
@@ -509,7 +509,7 @@ distributions.** RULED by Arpit 2026-09-12 and **BUILT the same day**.
   contains a `src/` file it **refuses**, naming L10, rather than writing fux's
   source into a repository.
   ✅ **The wheel gets it from a hatchling build HOOK**
-  ([`hatch_build.py`](../hatch_build.py)), not a static `force-include`: a
+  ([`packages/layer_hook.py`](../packages/layer_hook.py) — fux-writer's wheel since W-282, the one that carries `fux setup`), not a static `force-include`: a
   generated file cannot be named in an include list without somebody having
   remembered to generate it first. `pyproject.toml` no longer mentions
   `node/src` at all, which is this record's own veto check.
@@ -1317,7 +1317,7 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
   capture**, so no classification and no per-query rows; Yarn Berry is named as
   unmeasured in its §4
 - [`src/fux/store/nodebundle.py`](../src/fux/store/nodebundle.py) — the
-  bundler · [`hatch_build.py`](../hatch_build.py) — the wheel's build hook ·
+  bundler · [`packages/layer_hook.py`](../packages/layer_hook.py) — the wheels' build hook ·
   [`tests/test_node_bundle.py`](../tests/test_node_bundle.py) — equal
   ANSWERS, not equal bytes · [`tests/test_setup_workspace.py`](../tests/test_setup_workspace.py)
   — the detection table and the manifest diff

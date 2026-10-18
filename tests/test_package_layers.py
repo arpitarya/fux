@@ -228,3 +228,42 @@ def test_every_guarded_row_still_matches_an_import():
         "rows of the guarded-import table that no guarded import matches any more — "
         "delete them:\n  " + "\n  ".join(stale)
     )
+
+
+def test_every_doctor_row_lives_in_the_layer_it_claims():
+    """`health.ROWS` tags each row with a layer; the row must be defined there.
+
+    A row tagged core but defined in the reader would be skipped by every
+    install — including the engine, whose `installed` map would not offer it.
+    """
+    from fux import doctor, health
+    from fux.ingest import health as writer_health
+    from fux.query import health as reader_health
+
+    homes = {"core": vars(health), "reader": reader_health.ROWS,
+             "writer": writer_health.ROWS, "engine": {"_identifiers": doctor._identifiers}}
+    wrong = [f"{layer} {name}" for layer, name in health.ROWS if name not in homes[layer]]
+    assert not wrong, "doctor rows tagged with a layer that does not define them:\n  " + "\n  ".join(wrong)
+    assert set(doctor.ROWS) == {n for layer, n in health.ROWS if layer != "core"}
+
+
+def test_every_verb_runs_from_the_layer_it_claims():
+    """`cli.VERBS` imports by NAME, which the import walk cannot see — so each
+    row is held to the map here: the module exists, is placed in the layer the
+    row claims, and defines the function the row calls."""
+    from fux import cli
+
+    rows = layer_rows()
+    mods = _modules()
+    wrong = []
+    for verb, candidates in cli.VERBS.items():
+        for layer, module, function in candidates:
+            path = mods.get(module)
+            if path is None:
+                wrong.append(f"{verb}: {module} does not exist")
+                continue
+            if layer_of(_rel(path), rows) != layer:
+                wrong.append(f"{verb}: {module} is {layer_of(_rel(path), rows)}, the row says {layer}")
+            if not callable(getattr(__import__(module, fromlist=[function]), function, None)):
+                wrong.append(f"{verb}: {module} defines no {function}")
+    assert not wrong, "cli.VERBS rows that disagree with the layer map:\n  " + "\n  ".join(wrong)

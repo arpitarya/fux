@@ -4,7 +4,7 @@
 # repository it lives in. `shell: bash` on every step, because the matrix runs
 # on Windows too and pwsh would read the install line differently.
 name: setup-fux
-description: Python (pip-cached), optional Node, and `pip install -e .[extras]`
+description: Python (pip-cached), optional Node, and the four distributions installed editable (`.[extras]` on fux-engine)
 inputs:
   python:
     description: Python version (L7 floor is 3.12)
@@ -42,8 +42,12 @@ runs:
     - name: Install fux
       shell: bash
       run: |
+        # W-282: fux-engine depends on the three role packages at this
+        # release's version, which PyPI does not have until it is released —
+        # so all four go on ONE pip command line and resolve from this tree.
+        roles="-e packages/fux-core -e packages/fux-reader -e packages/fux-writer"
         if [ -n "${{ inputs.extras }}" ]; then
-          pip install -e ".[${{ inputs.extras }}]"
+          pip install $roles -e ".[${{ inputs.extras }}]"
         else
-          pip install -e .
+          pip install $roles -e .
         fi

@@ -8,11 +8,11 @@ status: accepted
 amended: 2026-10-13
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@d865bc99b5ac, tests/test_doctor_register_is_complete.py@dff0d535b078]
+owns: [src/fux/doctor.py@6bd775571bb1, tests/test_doctor_register_is_complete.py@dff0d535b078, src/fux/health.py@c8c1c05085a7, src/fux/query/health.py@f2e53c6fb7b0, src/fux/ingest/health.py@c25753c0e6a5]
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 83d8f2f0aa62ac5986252c92841d9156313f6b12366d47fd8665d3f0015cb7bd
+content_sha: 0021f128b219458cafe65d62ef2ce07fba263c6aad6d0027e1dff6ad19ea69d9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -20,6 +20,9 @@ content_sha: 83d8f2f0aa62ac5986252c92841d9156313f6b12366d47fd8665d3f0015cb7bd
 **Owns** — the components this record decides:
 
 - [`src/fux/doctor.py`](../src/fux/doctor.py) · file
+- [`src/fux/health.py`](../src/fux/health.py) · file
+- [`src/fux/ingest/health.py`](../src/fux/ingest/health.py) · file
+- [`src/fux/query/health.py`](../src/fux/query/health.py) · file
 - [`tests/test_doctor_register_is_complete.py`](../tests/test_doctor_register_is_complete.py) · file
 
 <!-- COMPONENTS-END -->
@@ -457,13 +460,36 @@ file, or without any key of it that `doctor` resolves, from the template
 
 <!-- L12-VALUES-START -->
 
+**12. Doctor is split by layer, and the row order is stated once** (W-282
+DoD 8, 2026-10-18). Each row lives where its imports put it
+([the layer map](README.md)): the core rows, the run and the rendering in
+`health.py`; the reader's (priors, the band's floor, the accelerator, the
+journal, the freshness share) in `query/health.py`; the writer's (hooks,
+runner, daemon, register, seeded copies, frozen keys, redaction drift, and
+`--fix`) in `ingest/health.py`; the identifier-family rows in `doctor.py`,
+because they read `inspect/`. **`health.ROWS` is the one order**, as
+`(layer, check)` pairs, and every doctor runs it:
+
+| install | runs | `--json` blocks beside `checks` |
+|---|---|---|
+| fux-engine | every row, exactly as before the split | `runner` · `freshness` · `provenance` |
+| fux-reader alone | core rows + reader rows | `freshness` · `provenance` |
+| fux-writer alone | core rows + writer rows; the only one that can `--fix` | `runner` · `provenance` |
+
+A row whose layer is not installed is **skipped, never failed** — a reader-only
+machine has no hooks to check. `doctor --fix` on a reader-only install refuses
+and names fux-writer, because fixing writes files. `doctor.py` re-exports every
+row, so `doctor._pii_timing` and its siblings keep their callers.
+`tests/test_package_layers.py` holds each `ROWS` tag to the module that defines
+the row.
+
 **Where this record's fixed values live — [L12](0014_LAW-12-values-live-in-config.md), W-225, 2026-09-27.**
 Each name below keeps its spelling in code and holds no literal: it is read from
 [`src/fux/constants.toml`](../src/fux/constants.toml), and a missing key stops the
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/doctor.py` — `PY_MIN` ← `[python] min`
+- `src/fux/health.py` — `PY_MIN` ← `[python] min`
 
 <!-- L12-VALUES-END -->
 
@@ -577,7 +603,7 @@ unchanged; the register of rows is unchanged. Tripwire:
 $ grep -c 'src/fux/doctor.py' records/README.md
 1                                  # 2026-09-11 — the ownership row only; veto 1 not fired
 
-$ grep -oE 'Check\("[a-z. /]+"' src/fux/doctor.py | sort -u | wc -l
+$ grep -ohE 'Check\("[a-z. /]+"' src/fux/doctor.py src/fux/health.py src/fux/query/health.py src/fux/ingest/health.py | sort -u | wc -l
 15                                 # every one has a register row; veto 2 not fired
 ```
 

@@ -27,45 +27,43 @@ classifiers = [
 # L2: OSI-approved licences only, ever — source-available (BSL, SSPL, Elastic
 # v2, Commons Clause) does NOT qualify. Fux ships packaged: no feature-extras tier. Anything on the ingest path is pinned: byte-identity is a
 # function of what resolves here. See CLAUDE.md and records/0004_LAW-2-zero-cost.md.
-dependencies = []
+# W-282: fux-engine is the one install of everything — the three role
+# packages, pinned to this release's one version (held equal by
+# scripts/check-version-parity.py), plus the engine's own verbs.
+dependencies = ["fux-core==3.0.1", "fux-reader==3.0.1", "fux-writer==3.0.1"]
 
 [project.urls]
 Homepage = "https://github.com/arpitarya/fux"
 Repository = "https://github.com/arpitarya/fux"
 "Bug Tracker" = "https://github.com/arpitarya/fux/issues"
 
-[project.scripts]
-fux = "fux.cli:main"
-# A separate entry point, not a `fux` subcommand: git invokes a merge driver as
-# a bare command with positional arguments and no way to pass a verb.
-fux-merge-index = "fux.maintain.mergedriver:main"
+# No console scripts here since W-282: `fux` ships in fux-core (cli.py is core
+# and dispatches by layer) and `fux-merge-index` in fux-writer — one owning
+# distribution per script, and every install that needs one carries it. See
+# packages/fux-core/pyproject.toml and packages/fux-writer/pyproject.toml.
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-xdist>=3"]
+# hatchling: the e2e suite builds the four wheels offline (W-282 DoD 10).
+dev = ["pytest>=8", "pytest-xdist>=3", "hatchling>=1.25"]
 
 [tool.hatch.version]
 path = "src/fux/__init__.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/fux"]
+# W-282: the engine's wheel carries the ENGINE layer only (records/README.md
+# §The layer map, read by the hook); core, reader and writer arrive as the
+# three dependencies above. Installed together they are the same files one
+# wheel carried before. An editable install puts the whole src/ on the path.
+#
+# The Node read plane's bundle travels in fux-writer's wheel, beside `fux setup`
+# which vendors it (SR-NODE-SEARCH decision 13): one generated `.mjs` plus its
+# sidecars, built at publish (L10).
+bypass-selection = true
+dev-mode-dirs = ["src"]
 
-# The Node read plane travels in the wheel so `fux setup` can vendor it into a
-# consumer's `.fux/node/` (SR-NODE-SEARCH decision 13). What travels is the
-# BUNDLE — one generated `.mjs` plus its manifest and tool descriptions, never
-# fux's own module tree, which is L10 (records/0012_LAW-10-bundled-output.md).
-#
-# 🔴 **Generated, so it is a build HOOK and not a `force-include` list.** A
-# static list cannot name a file that does not exist until something has built
-# it; the hook builds it on every wheel, from this tree, with the same
-# deterministic bundler the release workflow runs for npm. One artefact, two
-# registries — and none of the authored module tree is ever copied into a
-# consumer's repository again.
-#
-# ⚠ The path of that tree is deliberately NOT spelled here: SR-LAW-10's veto
-# command greps this file for it and expects no hit, so a mention in a comment
-# would be a false positive on the law's own check.
 [tool.hatch.build.targets.wheel.hooks.custom]
-path = "hatch_build.py"
+path = "packages/layer_hook.py"
+layer = "engine"
 
 [tool.hatch.build.targets.sdist]
 # The sdist is the buildable source + its tests/docs — never the archived old
@@ -78,3 +76,14 @@ line-length = 100
 # from a glob; ruff is not a dev dependency (stdlib-only gate in
 # tests/test_dotdir_hygiene.py), this is for whoever runs it.
 extend-include = [".fux/fetchers/*.py", ".fux/decoders/*.py"]
+
+# W-282: the four distributions are one uv workspace. `uv sync --extra dev`
+# installs all four from this tree; pip needs them on one command line:
+#   pip install -e packages/fux-core -e packages/fux-reader -e packages/fux-writer -e ".[dev]"
+[tool.uv.workspace]
+members = ["packages/fux-core", "packages/fux-reader", "packages/fux-writer"]
+
+[tool.uv.sources]
+fux-core = { workspace = true }
+fux-reader = { workspace = true }
+fux-writer = { workspace = true }

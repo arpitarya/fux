@@ -8,6 +8,30 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **fux ships as four PyPI packages on one version** (W-282). `fux-engine`
+  is still the one install of everything — same name, same verbs, same
+  `--json` — and now depends on **`fux-core`** (the shared core and the `fux`
+  command), **`fux-reader`** (`ask`, `find`, `answer` with refer, `lexical`,
+  `verify`, `explain`, `graph`, `path`, `build`, `mcp`) and **`fux-writer`**
+  (`setup`, `ingest`, `add`, `remove`, `register`, `enrich`, `correct`,
+  `hooks`, `daemon`, `fux-merge-index`). Install a role package alone for a
+  machine that only reads or only writes; a verb from a package that is not
+  installed is refused by name, and `fux doctor` runs the rows that install
+  has. No third-party dependency anywhere in the tree.
+- **The Node reader also publishes as `@fux-engine/reader`** — the same single
+  file as `fux-engine` on npm, which is unchanged.
+
+### Changed
+
+- **Developing fux installs four packages from one tree**: `uv sync --extra dev`,
+  or `pip install -e packages/fux-core -e packages/fux-reader -e packages/fux-writer -e ".[dev]"`.
+  `pip install -e ".[dev]"` alone no longer resolves.
+- Internal module moves (no output changes): the shared text plane is
+  `fux.text`, the source plane `fux.acquire`; `fux.open` is imported on first
+  use. Code importing fux internals by path may need the new names.
+
 ## [3.0.1] - 2026-10-14
 
 ### Fixed

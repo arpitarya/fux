@@ -358,9 +358,9 @@ def _record_liveness(root: Path, present: list[str], fired: list[str]) -> None:
     import json
 
     try:
-        from .derive import format as derive_fmt
+        from .store.cachedir import runtime_dir
 
-        directory = derive_fmt.runtime_dir(root)
+        directory = runtime_dir(root)
         directory.mkdir(parents=True, exist_ok=True)
         (directory / LIVENESS_NAME).write_text(
             json.dumps({"present": sorted(present), "fired": sorted(fired)}, indent=_JSON_INDENT) + "\n",
@@ -375,9 +375,9 @@ def liveness(root: Path) -> dict:
     import json
 
     try:
-        from .derive import format as derive_fmt
+        from .store.cachedir import runtime_dir
 
-        path = derive_fmt.runtime_dir(root) / LIVENESS_NAME
+        path = runtime_dir(root) / LIVENESS_NAME
         if not path.exists():
             return {}
         return json.loads(path.read_text(encoding="utf-8"))

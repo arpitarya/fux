@@ -42,7 +42,9 @@ def test_an_unignored_plane_is_an_ERROR_not_a_warning(tmp_path, monkeypatch):
     acquired.write_manifest(root, {"https://x/a": b})
     # This plane holds SOURCE BYTES. Git being able to see them is the one
     # failing case, not a housekeeping note.
-    monkeypatch.setattr(doctor, "_is_git_ignored", lambda r, p: False)
+    from fux import health  # W-282: the row runs from `health`
+
+    monkeypatch.setattr(health, "_is_git_ignored", lambda r, p: False)
     c = doctor._acquired_health(root)
     assert not c.ok
     assert "NOT GITIGNORED" in c.detail

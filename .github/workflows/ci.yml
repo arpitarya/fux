@@ -119,7 +119,13 @@ jobs:
       # runs local-only, in fux-lab. This checks the manifests and nothing
       # else. Its own job until 2026-09-30; folded here to save a runner (W-243).
       - run: python tools/differential/ladder_check.py
-      - run: pip install build twine && python -m build && twine check --strict dist/*
+      # W-282: fux-engine's sdist + wheel, and the three role wheels.
+      - run: |
+          pip install build twine
+          python -m build
+          for role in core reader writer; do python -m build --wheel --outdir dist "packages/fux-$role"; done
+          twine check --strict dist/*
+          ls dist/
       - name: sdist must not ship the archived old build
         run: |
           python - <<'PY'

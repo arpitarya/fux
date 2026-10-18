@@ -249,6 +249,18 @@ fetch_cache_dir = "fetch-cache"
 # L7 -- records/0009_LAW-7-python-312.md.
 min = [3, 12]
 
+[distributions]
+# W-282: the PyPI distribution each layer ships in (records/README.md §The
+# layer map). Fixed identity, never tunable: a refusal names the package to
+# install, and the release builds one wheel per name. `engine` installs all four.
+core = "fux-core"
+reader = "fux-reader"
+writer = "fux-writer"
+engine = "fux-engine"
+# The Node reader's second npm name, under the @fux-engine scope (W-282 F4);
+# the unscoped `fux-engine` on npm is the same bundle.
+npm_reader = "@fux-engine/reader"
+
 # -- fux inspect's committed-nowhere report files ----------------------------
 
 [inspect]

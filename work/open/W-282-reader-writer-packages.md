@@ -21,8 +21,8 @@ ball: agent
 | 0c | The reader gives full answers, re-checked against the source — exactly as `fux answer` works today | one meaning of `answer` on every install | ✅ decided |
 | 0d | The split goes first; the database work comes after it, and its proposal is updated then | a clear order of work | ✅ decided |
 | 1 | Untangle the code so reading and writing stop importing each other (about 125 cross imports today) | a clean line between reader and writer, held by a test | ✅ done 2026-10-18 — uncommitted |
-| 2 | Package it as fux-core, fux-reader and fux-writer — fux-engine still installs everything | smaller installs for machines that only read or only write | ⏳ |
-| 3 | Release all four together, on one version | the split live on PyPI, and on npm per the name call | ⏳ |
+| 2 | Package it as fux-core, fux-reader and fux-writer — fux-engine still installs everything | smaller installs for machines that only read or only write | ✅ done 2026-10-18 |
+| 3 | Release all four together, on one version | the split live on PyPI, and on npm per the name call | 🔴 waits on [W-283](W-283-registry-hand-steps.md) — Arpit's registry steps and his go |
 
 **The packages and what each install pulls in:** [`architecture-packages.svg`](../architecture-packages.svg) — four on PyPI, two on npm, no third-party package anywhere in the tree.
 
@@ -237,23 +237,23 @@ Opus 5.5), in the working tree, uncommitted** — see *Step 1 — what landed*.
    this repository's own index (`ask`, `find`, `answer`, `graph`, a fixed query
    set).
 
-**Step 2 — package.**
-6. A `uv` workspace with `fux-core`, `fux-reader`, `fux-writer`, `fux-engine`.
+**Step 2 — package.** ✅ **Done 2026-10-18 (Claude Code, Opus 5.5)** — see *Step 2 — what landed*, which names the two places it departs from the wording below.
+6. ✅ A `uv` workspace with `fux-core`, `fux-reader`, `fux-writer`, `fux-engine`.
    `fux-engine` depends on the three, owns `cli.py` and both console scripts,
    and `pip install fux-engine` installs what it installs today.
-7. `fux-reader` and `fux-writer` each expose only their verbs (SR-CLI says
+7. ✅ `fux-reader` and `fux-writer` each expose only their verbs (SR-CLI says
    which); a reader-only install asked for `ingest` names the package that has
    it.
-8. `fux doctor` splits: read checks in the reader, write checks in the writer,
+8. ✅ `fux doctor` splits: read checks in the reader, write checks in the writer,
    both in `fux-engine` (index-stores §8).
-9. The wheel's Node-bundle payload (`hatch_build.py`) travels with the package
+9. ✅ The wheel's Node-bundle payload (`hatch_build.py`) travels with the package
    that owns `fux setup` (the writer) and with `fux-engine`.
-10. **e2e:** each wheel installed alone in a clean venv runs its own verbs on a
+10. ✅ **e2e:** each wheel installed alone in a clean venv runs its own verbs on a
     fixture repo; a reader-only venv has no `fux.ingest`, a writer-only one no
     `fux.query`. A reader-only `fux answer --json` is byte-identical to
     `fux-engine`'s on the same query set (F2).
 
-**Step 3 — release.**
+**Step 3 — release.** 🔴 Waits on [W-283](W-283-registry-hand-steps.md): three registry steps in Arpit's accounts, then his go. The workflow, the version sites and the scoped npm package are built and committed.
 11. SR-WORK-RELEASE: four PyPI distributions and `@fux-engine/reader` on npm,
     one version on all of them, held equal by the version test.
 
@@ -293,6 +293,37 @@ Opus 5.5), in the working tree, uncommitted** — see *Step 1 — what landed*.
 - **This repo's index will re-extract 958 documents** on the next ingest: the
   `.fux/decoders/` copies changed (docstrings only), and a consumer decoder's
   digest is its file sha. Deterministic; the post-commit hook absorbs it.
+
+## Step 2 — what landed (2026-10-18, Claude Code)
+
+| | |
+|---|---|
+| distributions | `packages/fux-core`, `packages/fux-reader`, `packages/fux-writer` + the root as `fux-engine`, one uv workspace; every wheel's files chosen by `packages/layer_hook.py` from the layer map — no `pyproject.toml` lists a file |
+| the CLI | `cli.py` is **core**: it runs each verb through `VERBS` (verb → module → layer); a verb whose layer is absent is left out of `--help` and refused by name. The gate holds every row to the map |
+| doctor | split by layer: `health.py` (core rows, the one row order `ROWS`, the run and render), `query/health.py` (reader rows + a reader doctor), `ingest/health.py` (writer rows + a writer doctor, the one that can `--fix`), `doctor.py` (the engine: every row, re-exporting all) |
+| release plumbing | seven version-parity sites (the pins between distributions included, with a drift test); CI builds all four; `publish.yml` builds four, uploads to PyPI, and publishes the bundle as `fux-engine` and `@fux-engine/reader` (`scripts/npm-scoped.py`) |
+| byte-identity | in a worktree at the Step-1 commit, HEAD's code and the new code on the same documents: 50 query `--json` outputs, `--help` for all 25 verbs, `tune`, `--version` and `doctor` identical — `doctor` up to its `pii timing` row, which reports measured milliseconds |
+| e2e | `tests_e2e/test_role_packages.py`: each wheel installed alone, offline, in a clean venv; writer-only ingests and has no `fux.query`; reader-only answers, has no `fux.ingest`, and its `ask`/`find`/`answer --json` equal the engine's (F2); each refuses the other's verbs by name; no file in two wheels |
+| suites | units 7 174 · e2e 183 · Node 241 — all green |
+
+**Where it departs from the DoD's wording, and why:**
+
+- **DoD 6 said `fux-engine` owns `cli.py` and both console scripts.** It owns
+  neither: `fux` ships in **fux-core** and `fux-merge-index` in
+  **fux-writer**. A script file owned by several distributions is deleted when
+  any one of them is uninstalled, and core is the one package every install
+  has — which is also what lets a reader-only or writer-only machine have a
+  `fux` at all. `pip install fux-engine` still yields both scripts.
+- **DoD 9 said the Node bundle travels with the writer *and* fux-engine.** It
+  is in the writer's wheel only; fux-engine has it through its dependency.
+  Two wheels carrying one file is the same uninstall hazard.
+
+**What the Step-1 "Carried into Step 2" list became:** the `-m fux.cli`
+relaunches stay inside a writer-only install now that `cli.py` is core;
+SR-CLI decision 16 names each package's verbs, writer-only behaviour of the
+guarded imports included; the diagram is redrawn; `store/writer.py` stays core
+(moving it is not needed for any install to work, and would break
+`from fux.store import write_index` for nothing).
 
 ## Out of scope
 

@@ -26,10 +26,11 @@ until it is the answer.
 
 | root | where it is declared | why it is not statically imported |
 |---|---|---|
-| `fux.cli`, `fux.maintain.mergedriver` | `[project.scripts]` in `pyproject.toml` | console scripts; git invokes the merge driver as a bare command |
+| `fux.cli`, `fux.maintain.mergedriver` | `[project.scripts]` in `packages/*/pyproject.toml` (and the root's) | console scripts; git invokes the merge driver as a bare command |
 | `fux.__main__` | `python -m fux` | rung 4 of the invocation ladder in `AGENTS.md` |
 | every `fux.decode.*doc` | `decode.BUILTIN_MODULES` | loaded by `importlib.import_module` from that tuple |
 | `fux.schemas` | `constants.toml` `[schema_files] package` | a data package: `schema.load` resolves it by name through `importlib.resources` (W-226) |
+| every verb module | `cli.VERBS` | `cli.py` is core and runs a verb by module NAME, so a missing layer is refused rather than imported (W-282) |
 
 **All four are read from the repository**, so adding a decoder or an entry
 point keeps the check honest with no edit here. The decoders are the case that
@@ -127,11 +128,13 @@ def _edges(modules: dict[str, Path]) -> dict[str, set[str]]:
 
 
 def _console_scripts() -> set[str]:
-    data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    return {
-        spec.split(":")[0]
-        for spec in data.get("project", {}).get("scripts", {}).values()
-    }
+    """Every distribution's scripts — since W-282 `fux` is fux-core's and
+    `fux-merge-index` fux-writer's, and the root (fux-engine) declares none."""
+    out: set[str] = set()
+    for pyproject in [ROOT / "pyproject.toml", *sorted((ROOT / "packages").glob("*/pyproject.toml"))]:
+        data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+        out |= {spec.split(":")[0] for spec in data.get("project", {}).get("scripts", {}).values()}
+    return out
 
 
 def _builtin_decoders() -> set[str]:
@@ -156,8 +159,24 @@ def _schema_package() -> set[str]:
     return {name}
 
 
+def _verb_modules() -> set[str]:
+    """Every module `cli.VERBS` runs a verb from (W-282). `cli.py` imports them
+    by NAME so a missing layer can be refused, which hides them from the walk;
+    read the table from the file, for the reason the decoders are read."""
+    tree = ast.parse((SRC / "cli.py").read_text(encoding="utf-8"))
+    for node in tree.body:
+        target = getattr(node, "target", None) or (node.targets[0] if isinstance(node, ast.Assign) else None)
+        if getattr(target, "id", None) == "VERBS":
+            names = {c.value for c in ast.walk(node.value)
+                     if isinstance(c, ast.Constant) and isinstance(c.value, str) and c.value.startswith("fux.")}
+            assert names, "cli.VERBS names no module"
+            return names
+    raise AssertionError("cli.py carries no VERBS table")
+
+
 def _roots() -> set[str]:
-    return _console_scripts() | {"fux.__main__"} | _builtin_decoders() | _schema_package()
+    return (_console_scripts() | {"fux.__main__"} | _builtin_decoders() | _schema_package()
+            | _verb_modules())
 
 
 def _reachable(modules: dict[str, Path]) -> set[str]:

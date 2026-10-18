@@ -7,18 +7,20 @@ description: "fux-engine ships to PyPI and npm from one release trigger — PyPI
 status: accepted
 date: 2026-09-14
 feature: how a release reaches two registries, how the version stays equal across its sites, and what the branch wall does not do
-owns: [scripts/check-version-parity.py@2db5c69a9bcd, tests/test_version_parity.py@f45f30bf53ea, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d]
+owns: [scripts/check-version-parity.py@8640e01487a4, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@5bdd2a4c3ab0, scripts/npm-scoped.py@4214c9c3380a]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: c9f8465f3b8826d483a985bcab2bf4c74c6704572d39fa3a48ae37029604222b
+content_sha: 9bd80fdcf8ed79794819e75e9234a0c53eff9ebe46cce19c1cb3f9671bc08230
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`packages/`](../packages) · dir
 - [`scripts/check-version-parity.py`](../scripts/check-version-parity.py) · file
 - [`scripts/ci-key.py`](../scripts/ci-key.py) · file
+- [`scripts/npm-scoped.py`](../scripts/npm-scoped.py) · file
 - [`tests/test_ci_key.py`](../tests/test_ci_key.py) · file
 - [`tests/test_version_parity.py`](../tests/test_version_parity.py) · file
 
@@ -108,14 +110,17 @@ rather than a string somebody might forget to edit.
 ### Decision
 
 1. **The distribution name is `fux-engine`; the import package is `fux`.** One
-   name in both registries.
+   name in both registries. ⚠ **Since W-282 it is one of four PyPI
+   distributions** — decision 15.
 
 2. **The version's source is the Python package's own `__init__`**, which
    `pyproject.toml` reads dynamically. **That component belongs to SR-LAWS and is
    not claimed here** — one component, one owner.
 
-3. **It is the SOURCE, not the only copy.** Four hand-written sites exist today:
-   the source, `node/package.json`, `node/fux.mjs` and `node/src/verbs/mcp.mjs`.
+3. **It is the SOURCE, not the only copy.** Seven hand-written sites exist today:
+   the source, `node/package.json`, `node/fux.mjs`, `node/src/verbs/mcp.mjs`, and
+   the distribution pins in `pyproject.toml`, `packages/fux-reader/pyproject.toml`
+   and `packages/fux-writer/pyproject.toml` (decision 15).
 
 4. **[`scripts/check-version-parity.py`](../scripts/check-version-parity.py) is
    the enforcement**, run by
@@ -291,6 +296,43 @@ rather than a string somebody might forget to edit.
       evicted: a release cut later than that is refused until a dispatched
       run re-earns the key.
 
+15. **Four PyPI distributions and two npm packages, released together on one
+    version** (W-282, 2026-10-18; rulings F1 and F4, Arpit):
+
+    | registry | package | carries | built by |
+    |---|---|---|---|
+    | PyPI | `fux-core` | the core layer and the `fux` console script | `packages/fux-core/` — wheel |
+    | PyPI | `fux-reader` | the reader layer; depends on `fux-core` | `packages/fux-reader/` — wheel |
+    | PyPI | `fux-writer` | the writer layer, `fux-merge-index`, the Node bundle; depends on `fux-core` | `packages/fux-writer/` — wheel |
+    | PyPI | `fux-engine` | the engine layer; depends on the three — **installs what it installed before** | the root — sdist + wheel |
+    | npm | `fux-engine` | the Node reader bundle, unchanged | `node/dist/` |
+    | npm | `@fux-engine/reader` | the same bundle under the scope | `scripts/npm-scoped.py` |
+
+    - **Which file ships in which is the layer map's**
+      ([records/README.md §The layer map](README.md)), read at build time by
+      [`packages/layer_hook.py`](../packages/layer_hook.py); no `pyproject.toml`
+      lists a file. No two wheels carry the same file (asserted by
+      `tests_e2e/test_role_packages.py`, which also installs each wheel alone).
+    - **The role packages ship wheels only**: they are built from the
+      repository, and `fux-engine`'s sdist is the buildable source.
+    - **One version, held by decision 4**: every distribution reads it from
+      `src/fux/__init__.py`, and the pins between them (`fux-engine` →
+      `fux-core`, `fux-reader`, `fux-writer`; each role → `fux-core`) are
+      parity sites — a forgotten pin would install a role package from the
+      previous release.
+    - **Development installs all four from this tree** — `uv sync --extra dev`
+      (a uv workspace), or one pip command line:
+      `pip install -e packages/fux-core -e packages/fux-reader -e packages/fux-writer -e ".[dev]"`.
+      CI's `setup-fux` action does the latter, because PyPI has no copy of an
+      unreleased version for pip to resolve the pins against.
+    - 🔴 **Three hand steps before the first four-package release**, each
+      Arpit's: a PyPI trusted publisher for `fux-core`, `fux-reader` and
+      `fux-writer` bound to `publish.yml` and the `pypi` environment (a
+      pending publisher, before the names exist); the `@fux-engine`
+      organization on npm; and the first `@fux-engine/reader` publish by hand,
+      since npm binds a trusted publisher to a package that exists. Until each
+      is done, its upload fails and the others still publish.
+
 ### Consequences
 
 - **A version bump is a five-place edit** (four sites plus the changelog), and
@@ -364,7 +406,8 @@ evidence.*
 
 - [`scripts/check-version-parity.py`](../scripts/check-version-parity.py)
 - [`tests/test_version_parity.py`](../tests/test_version_parity.py)
-- [`hatch_build.py`](../hatch_build.py)
+- [`packages/layer_hook.py`](../packages/layer_hook.py)
+- [`scripts/npm-scoped.py`](../scripts/npm-scoped.py)
 
 **Project docs**
 

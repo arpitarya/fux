@@ -28,11 +28,20 @@ Rules:
 
 ---
 
+## 2026-10-18 — **W-282 Step 2: four distributions from one tree (unreleased)**
+
+| | |
+|---|---|
+| **shipped (main, not released)** | `fux-core`, `fux-reader`, `fux-writer` (`packages/`) + `fux-engine` (the root), one uv workspace, files chosen from the layer map by `packages/layer_hook.py`; `cli.py` core with a layer-checked `VERBS` table; doctor split by layer (`health.ROWS`); seven version-parity sites; CI + `publish.yml` build all four; the bundle also as `@fux-engine/reader` |
+| **evidence** | engine output unchanged (worktree at `1cce3ac4`: 50 query `--json`, all 25 `--help`, `doctor` up to its timed row); `tests_e2e/test_role_packages.py` — each wheel alone, offline, reader `answer` = engine's; units 7 174 · e2e 183 · Node 241 |
+| **open** | the release — W-283 (Arpit's registry steps and go) |
+---
+
 ## 2026-10-18 — **W-282 Step 1: reader and writer no longer import each other**
 
 | | |
 |---|---|
-| **shipped (working tree, uncommitted)** | the layer map — every file under `src/fux/` placed in core, reader, writer or engine ([`records/README.md` §The layer map](../records/README.md)); `tests/test_package_layers.py` holds it. New core packages `text/` and `acquire/`; `store/` gains dirty, lastcited, lock and the read halves of correct/enrich; three guarded cross-layer imports, each listed. No verb, flag or output changed |
+| **shipped** (`1cce3ac4`) | the layer map — every file under `src/fux/` placed in core, reader, writer or engine ([`records/README.md` §The layer map](../records/README.md)); `tests/test_package_layers.py` holds it. New core packages `text/` and `acquire/`; `store/` gains dirty, lastcited, lock and the read halves of correct/enrich; three guarded cross-layer imports, each listed. No verb, flag or output changed |
 | **evidence** | 50/50 `ask`/`find`/`answer`/`lexical`/`graph --json` byte-identical on this repo's index (final code, baseline documents, a worktree); units 7 164 · e2e 176 · Node 241 pass; one working-tree-only red (Node twins), clears at commit |
 | **open** | Step 2, packaging (Sonnet) — and the item's *Carried into Step 2* list |
 ---
