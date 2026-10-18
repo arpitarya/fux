@@ -7,7 +7,7 @@ filed: 2026-10-18
 filed_by: "Claude Code (Opus 5.5)"
 updated: 2026-10-18
 updated_by: "Claude Code (Opus 5.5)"
-ball: arpit
+ball: agent
 ---
 
 # W-283 — the registry steps before the four-package release
@@ -16,11 +16,11 @@ ball: arpit
 
 | step | what Arpit does | what it unblocks | state |
 |---|---|---|---|
-| 1 | On pypi.org, add a **pending trusted publisher** for each of `fux-core`, `fux-reader`, `fux-writer` | the release workflow can create and upload the three new packages | 🔴 Arpit |
-| 2 | On npmjs.com, **create the free `@fux-engine` organization** | the scope `@fux-engine/reader` publishes under | 🔴 Arpit |
-| 3 | **Publish `@fux-engine/reader` once by hand**, then add its trusted publisher | every later release publishes it automatically | 🔴 Arpit |
+| 1 | On pypi.org, add a **pending trusted publisher** for each of `fux-core`, `fux-reader`, `fux-writer` | the release workflow can create and upload the three new packages | ✅ done |
+| 2 | On npmjs.com, **create the free `@fux-engine` organization** | the scope `@fux-engine/reader` publishes under | ✅ done |
+| 3 | **Publish `@fux-engine/reader` once by hand**, then add its trusted publisher | every later release publishes it automatically | ✅ done |
 | 4 | Say **"release 4.0.0"** | an agent cuts it | ✅ ruled and cut 2026-10-18 — `v4.0.0` released; see *State after the release* |
-| 5 | Re-run the failed publish jobs once 1–3 are done | the three role packages, then fux-engine 4.0.0, reach PyPI; the scoped package reaches npm | ⏳ one command, after 1–3 |
+| 5 | Re-run the failed publish jobs once 1–3 are done | the three role packages, then fux-engine 4.0.0, reach PyPI; the scoped package reaches npm | ✅ done — and 4.0.1 published all six names from the workflow |
 
 **Why each is his hand and no agent's:** each is an action in his PyPI or npm
 account, and step 4 publishes to two public registries, which cannot be undone.
@@ -69,6 +69,39 @@ scoped package. Then check `https://pypi.org/pypi/fux-engine/json` reads 4.0.0.
   added. ⏳ next: re-run the roles job (creates fux-reader) → add the
   `fux-writer` pending publisher → re-run (fux-writer, then fux-engine 4.0.0) →
   first hand publish of `@fux-engine/reader` + its npm trusted publisher.
+
+## Closed 2026-10-18 (Claude Code) — every step done
+
+| | 4.0.0 | 4.0.1 |
+|---|---|---|
+| PyPI `fux-core` · `fux-reader` · `fux-writer` | ✅ re-runs of run 39115990157, one new project per pending publisher | ✅ run 39127620476 |
+| PyPI `fux-engine` | ✅ attempt 6, after its publisher was re-added with environment `pypi` | ✅ run 39127620476 |
+| npm `fux-engine` | ✅ | ✅ |
+| npm `@fux-engine/reader` | ✅ Arpit's hand publish | ✅ run 39127620476, attempt 2, after the trusted publisher was saved |
+
+**What it took, for the next new distribution:**
+
+- **PyPI keeps one pending publisher per identical configuration**, so new
+  projects sharing one workflow and one environment are created one re-run at a
+  time.
+- **While a pending publisher exists, the token PyPI mints is scoped to that
+  pending project only** — so re-run with no other new project in the upload,
+  and expect the others to be skipped as existing.
+- **`fux-engine`'s original publisher did not carry environment `pypi`**: once
+  the role packages' identical publishers existed, PyPI chose theirs and the
+  token was *"not valid for project 'fux-engine'"* (403). Re-adding the
+  publisher to `fux-engine` with exactly `arpitarya / fux / publish.yml / pypi`
+  fixed it.
+- **npm 404s an unauthenticated or untrusted `PUT`** — an expired `~/.npmrc`
+  token on the hand publish, a missing trusted publisher on the workflow's —
+  and caches a new package's *not found* for minutes after it exists.
+- **The publish ordering held**: no `fux-engine` ever reached PyPI pinned to a
+  role package PyPI lacked.
+
+**Verified:** `pip install fux-reader==4.0.1` in a clean venv → `fux-core`
+4.0.1 + `fux-reader` 4.0.1, `fux ask --help` runs, `fux ingest` refused naming
+fux-writer. `pip install fux-engine==4.0.1` → all four at 4.0.1, both scripts,
+all 25 verbs.
 
 ## Goal
 

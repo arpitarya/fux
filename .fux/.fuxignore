@@ -1,136 +1,73 @@
 # >>> fux: not indexed >>>
 # a committed list said not to index these. Rewritten by every `fux ingest`.
 # Delete a line and it comes back next run unless the list that rejected it changed.
-archive/handoff/v0.30.0-claude-md.diff                                                                 # not an indexed file type
-archive/handoff/v0.30.0-m1-claude-md-build-test.diff                                                   # not an indexed file type
-archive/handoff/v0.31.0-claude-md-layout.diff                                                          # not an indexed file type
-archive/handoff/v0.32.0-adr-numbering.diff                                                             # not an indexed file type
-archive/v0.1/fux/assets/graph_boot.js                                                                  # not an indexed file type
-archive/v0.1/justfile                                                                                  # not an indexed file type
-archive/v0.1/uv.lock                                                                                   # not an indexed file type
-archive/v0.26-docs/architecture-flow.mermaid                                                           # not an indexed file type
-archive/v0.26/src/fux/embed/data/model.bin                                                             # not an indexed file type
-archive/v0.26/uv.lock                                                                                  # not an indexed file type
-docs/paper/figures/src/fig-01-index-and-refer.mmd                                                      # not an indexed file type
-docs/paper/figures/src/fig-02-dotfux.mmd                                                               # not an indexed file type
-docs/paper/figures/src/fig-03-ingest.mmd                                                               # not an indexed file type
-docs/paper/figures/src/fig-04-record.mmd                                                               # not an indexed file type
-docs/paper/figures/src/fig-05-ask.mmd                                                                  # not an indexed file type
-docs/paper/figures/src/fig-06-expand.mmd                                                               # not an indexed file type
-docs/paper/figures/src/fig-07-graph.mmd                                                                # not an indexed file type
-docs/paper/figures/src/fig-08-answer.mmd                                                               # not an indexed file type
-docs/paper/figures/src/fig-09-confidence.mmd                                                           # not an indexed file type
-docs/paper/figures/src/fig-10-two-readers.mmd                                                          # not an indexed file type
-docs/paper/figures/src/fig-11-surfaces.mmd                                                             # not an indexed file type
-docs/paper/figures/src/fig-12-maintenance.mmd                                                          # not an indexed file type
-docs/paper/figures/src/fig-13-evaluation.mmd                                                           # not an indexed file type
-docs/paper/figures/src/fig-14-governance.mmd                                                           # not an indexed file type
-docs/paper/figures/src/fig-15-latency.mmd                                                              # not an indexed file type
-docs/paper/figures/src/fig-16-roadmap.mmd                                                              # not an indexed file type
-docs/paper/figures/src/fig-17-designed-vs-built.mmd                                                    # not an indexed file type
-docs/paper/figures/src/fig-18-enrich.mmd                                                               # not an indexed file type
-docs/paper/figures/src/fig-19-observers.mmd                                                            # not an indexed file type
-docs/paper/figures/src/fig-20-verbs.mmd                                                                # not an indexed file type
-records/RULE-SINCE                                                                                     # not an indexed file type
-tools/vector-gate/embed_node.mjs                                                                       # not an indexed file type
-work/golden/                                                                                           # excluded by !work/golden
-work/regression/2026-08-20-r5-hook-latency/evidence/run.log                                            # not an indexed file type
-work/regression/2026-08-20-r6-merge-driver/evidence/run.log                                            # not an indexed file type
-work/regression/2026-08-20-refer-plane-r4/evidence/run.log                                             # not an indexed file type
-work/regression/2026-08-21-r7-preliminary-analysis/evidence/byte_breakdown.out                         # not an indexed file type
-work/regression/2026-08-21-r7-preliminary-analysis/evidence/pack_compression.out                       # not an indexed file type
-work/regression/2026-08-22-graph-acceptance/evidence/graph-json.sha256                                 # not an indexed file type
-work/regression/2026-08-22-r6-rerun/evidence/run.out                                                   # not an indexed file type
-work/regression/2026-08-23-fork3-per-field-bound/evidence/bench-run.log                                # not an indexed file type
-work/regression/2026-08-23-fork3-per-field-bound/evidence/diff10k.log                                  # not an indexed file type
-work/regression/2026-08-23-fork3-per-field-bound/evidence/real-corpus-10k.log                          # not an indexed file type
-work/regression/2026-08-23-r5-rerun-after-code-removal/evidence/scaling-after-phase7.log               # not an indexed file type
-work/regression/2026-08-23-r5-rerun-after-code-removal/evidence/scaling-run.log                        # not an indexed file type
-work/regression/2026-09-05-node-log-divergence/evidence/idfdomain.mjs                                  # not an indexed file type
-work/regression/2026-09-05-node-log-divergence/evidence/logprobe.mjs                                   # not an indexed file type
-work/regression/2026-09-05-node-log-divergence/evidence/score.mjs                                      # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00100.coverage   # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00100.index      # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00100.sha256     # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00200.coverage   # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00200.index      # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00200.sha256     # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00500.coverage   # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00500.index      # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-00500.sha256     # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-01000.coverage   # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-01000.index      # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-01000.sha256     # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-02000.coverage   # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-02000.index      # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-02000.sha256     # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-05000.coverage   # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-05000.index      # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-05000.sha256     # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-10000.coverage   # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-10000.index      # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-10000.sha256     # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-seed.coverage    # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-seed.index       # not an indexed file type
-work/regression/2026-09-15-ladder-seed-refresh/evidence/ladder-before-2026-09-12/rung-seed.sha256      # not an indexed file type
-work/regression/2026-09-21-identifier-analyzer/evidence/family-a.patch                                 # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00100.coverage       # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00100.index          # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00100.sha256         # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00200.coverage       # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00200.index          # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00200.sha256         # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00500.coverage       # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00500.index          # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-00500.sha256         # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-01000.coverage       # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-01000.index          # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-01000.sha256         # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-02000.coverage       # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-02000.index          # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-02000.sha256         # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-05000.coverage       # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-05000.index          # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-05000.sha256         # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-10000.coverage       # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-10000.index          # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-10000.sha256         # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-seed.coverage        # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-seed.index           # not an indexed file type
-work/regression/2026-09-21-ladder-set-3-rebuild/evidence/ladder-before-set-3/rung-seed.sha256          # not an indexed file type
-work/regression/2026-09-28-anchor-mined-set3/evidence/doctor-fix.diff                                  # not an indexed file type
-work/regression/2026-09-28-anchor-mined/evidence/doctor-fix.diff                                       # not an indexed file type
-work/regression/2026-09-28-authority-prior/evidence/doctor-fix.diff                                    # not an indexed file type
-work/regression/2026-09-28-intent-prior/evidence/doctor-fix.diff                                       # not an indexed file type
-work/regression/2026-09-29-node-reader-per-call/evidence/equal.mjs                                     # not an indexed file type
-work/regression/2026-09-30-ci-arm-batching/evidence/one-process.mjs                                    # not an indexed file type
-work/regression/2026-09-30-rm3-grounded/evidence/doctor-fix.diff                                       # not an indexed file type
-work/regression/2026-09-30-rm3-grounded/evidence/engine.diff                                           # not an indexed file type
-work/regression/2026-09-30-section-size/evidence/run.log                                               # not an indexed file type
-work/regression/2026-09-30-shared-runtime/evidence/t1-arm-adversarial.err                              # not an indexed file type
-work/regression/2026-09-30-shared-runtime/evidence/t1-arm-rung-10000.err                               # not an indexed file type
-work/regression/2026-09-30-shared-runtime/evidence/t2-identity.err                                     # not an indexed file type
-work/regression/2026-10-04-node-arm-2/evidence/run.log                                                 # not an indexed file type
-work/regression/2026-10-04-node-graph-read/evidence/node-arm-fux.log                                   # not an indexed file type
-work/regression/2026-10-04-node-graph-read/evidence/spy.mjs                                            # not an indexed file type
-work/regression/2026-10-04-node-graph-speed/evidence/once-hook.mjs                                     # not an indexed file type
-work/regression/2026-10-04-node-graph-speed/evidence/once-process.mjs                                  # not an indexed file type
-work/regression/2026-10-05-ladder-gen4-rebuild/evidence/build.log                                      # not an indexed file type
-work/regression/2026-10-05-ladder-gen4-rebuild/evidence/new_seed_name_leaks.out                        # not an indexed file type
-work/regression/2026-10-05-ladder-gen4-rebuild/evidence/planted-check.out                              # not an indexed file type
-work/regression/2026-10-09-merge-driver-dogfood/evidence/attempt-0-attributes-on-one-side.log          # not an indexed file type
-work/regression/2026-10-09-merge-driver-dogfood/evidence/attempt-1-register-defect.log                 # not an indexed file type
-work/regression/2026-10-09-merge-driver-dogfood/evidence/attempt-2-fixed-driver.log                    # not an indexed file type
-work/regression/2026-10-10-section-gain-only/evidence/doctor-fix.diff                                  # not an indexed file type
-work/regression/2026-10-10-section-records/evidence/doctor-fix.diff                                    # not an indexed file type
-work/regression/2026-10-11-ladder-gen5-rebuild/evidence/build.log                                      # not an indexed file type
-work/regression/2026-10-11-ladder-gen5-rebuild/evidence/new_seed_name_leaks.out                        # not an indexed file type
-work/regression/2026-10-11-section-retest-set-6/evidence/doctor-fix.diff                               # not an indexed file type
-work/regression/2026-10-11-section-retest-set-6/evidence/pre-section-tune.diff                         # not an indexed file type
-work/regression/2026-10-13-ladder-gen6-rebuild/evidence/build.log                                      # not an indexed file type
-work/regression/2026-10-13-ladder-gen6-rebuild/evidence/new_seed_name_leaks.out                        # not an indexed file type
-work/regression/2026-10-13-section-term-v3/evidence/doctor-fix.diff                                    # not an indexed file type
-work/regression/2026-10-13-section-term-v3/evidence/pre-section-config.diff                            # not an indexed file type
+archive/handoff/v0.30.0-claude-md.diff                                                          # not an indexed file type
+archive/handoff/v0.30.0-m1-claude-md-build-test.diff                                            # not an indexed file type
+archive/handoff/v0.31.0-claude-md-layout.diff                                                   # not an indexed file type
+archive/handoff/v0.32.0-adr-numbering.diff                                                      # not an indexed file type
+archive/v0.26-docs/architecture-flow.mermaid                                                    # not an indexed file type
+archive/v0.26/src/fux/embed/data/model.bin                                                      # not an indexed file type
+docs/paper/figures/src/fig-01-index-and-refer.mmd                                               # not an indexed file type
+docs/paper/figures/src/fig-02-dotfux.mmd                                                        # not an indexed file type
+docs/paper/figures/src/fig-03-ingest.mmd                                                        # not an indexed file type
+docs/paper/figures/src/fig-04-record.mmd                                                        # not an indexed file type
+docs/paper/figures/src/fig-05-ask.mmd                                                           # not an indexed file type
+docs/paper/figures/src/fig-06-expand.mmd                                                        # not an indexed file type
+docs/paper/figures/src/fig-07-graph.mmd                                                         # not an indexed file type
+docs/paper/figures/src/fig-08-answer.mmd                                                        # not an indexed file type
+docs/paper/figures/src/fig-09-confidence.mmd                                                    # not an indexed file type
+docs/paper/figures/src/fig-10-two-readers.mmd                                                   # not an indexed file type
+docs/paper/figures/src/fig-11-surfaces.mmd                                                      # not an indexed file type
+docs/paper/figures/src/fig-12-maintenance.mmd                                                   # not an indexed file type
+docs/paper/figures/src/fig-13-evaluation.mmd                                                    # not an indexed file type
+docs/paper/figures/src/fig-14-governance.mmd                                                    # not an indexed file type
+docs/paper/figures/src/fig-15-latency.mmd                                                       # not an indexed file type
+docs/paper/figures/src/fig-16-roadmap.mmd                                                       # not an indexed file type
+docs/paper/figures/src/fig-17-designed-vs-built.mmd                                             # not an indexed file type
+docs/paper/figures/src/fig-18-enrich.mmd                                                        # not an indexed file type
+docs/paper/figures/src/fig-19-observers.mmd                                                     # not an indexed file type
+docs/paper/figures/src/fig-20-verbs.mmd                                                         # not an indexed file type
+records/RULE-SINCE                                                                              # not an indexed file type
+work/golden/                                                                                    # excluded by !work/golden
+work/regression/2026-08-20-r5-hook-latency/evidence/run.log                                     # not an indexed file type
+work/regression/2026-08-20-r6-merge-driver/evidence/run.log                                     # not an indexed file type
+work/regression/2026-08-20-refer-plane-r4/evidence/run.log                                      # not an indexed file type
+work/regression/2026-08-21-r7-preliminary-analysis/evidence/byte_breakdown.out                  # not an indexed file type
+work/regression/2026-08-21-r7-preliminary-analysis/evidence/pack_compression.out                # not an indexed file type
+work/regression/2026-08-22-r6-rerun/evidence/run.out                                            # not an indexed file type
+work/regression/2026-08-23-fork3-per-field-bound/evidence/bench-run.log                         # not an indexed file type
+work/regression/2026-08-23-fork3-per-field-bound/evidence/diff10k.log                           # not an indexed file type
+work/regression/2026-08-23-fork3-per-field-bound/evidence/real-corpus-10k.log                   # not an indexed file type
+work/regression/2026-08-23-r5-rerun-after-code-removal/evidence/scaling-after-phase7.log        # not an indexed file type
+work/regression/2026-08-23-r5-rerun-after-code-removal/evidence/scaling-run.log                 # not an indexed file type
+work/regression/2026-09-28-anchor-mined-set3/evidence/doctor-fix.diff                           # not an indexed file type
+work/regression/2026-09-28-anchor-mined/evidence/doctor-fix.diff                                # not an indexed file type
+work/regression/2026-09-28-authority-prior/evidence/doctor-fix.diff                             # not an indexed file type
+work/regression/2026-09-28-intent-prior/evidence/doctor-fix.diff                                # not an indexed file type
+work/regression/2026-09-30-rm3-grounded/evidence/doctor-fix.diff                                # not an indexed file type
+work/regression/2026-09-30-rm3-grounded/evidence/engine.diff                                    # not an indexed file type
+work/regression/2026-09-30-section-size/evidence/run.log                                        # not an indexed file type
+work/regression/2026-09-30-shared-runtime/evidence/t1-arm-adversarial.err                       # not an indexed file type
+work/regression/2026-09-30-shared-runtime/evidence/t1-arm-rung-10000.err                        # not an indexed file type
+work/regression/2026-09-30-shared-runtime/evidence/t2-identity.err                              # not an indexed file type
+work/regression/2026-10-04-node-arm-2/evidence/run.log                                          # not an indexed file type
+work/regression/2026-10-04-node-graph-read/evidence/node-arm-fux.log                            # not an indexed file type
+work/regression/2026-10-05-ladder-gen4-rebuild/evidence/build.log                               # not an indexed file type
+work/regression/2026-10-05-ladder-gen4-rebuild/evidence/new_seed_name_leaks.out                 # not an indexed file type
+work/regression/2026-10-05-ladder-gen4-rebuild/evidence/planted-check.out                       # not an indexed file type
+work/regression/2026-10-09-merge-driver-dogfood/evidence/attempt-0-attributes-on-one-side.log   # not an indexed file type
+work/regression/2026-10-09-merge-driver-dogfood/evidence/attempt-1-register-defect.log          # not an indexed file type
+work/regression/2026-10-09-merge-driver-dogfood/evidence/attempt-2-fixed-driver.log             # not an indexed file type
+work/regression/2026-10-10-section-gain-only/evidence/doctor-fix.diff                           # not an indexed file type
+work/regression/2026-10-10-section-records/evidence/doctor-fix.diff                             # not an indexed file type
+work/regression/2026-10-11-ladder-gen5-rebuild/evidence/build.log                               # not an indexed file type
+work/regression/2026-10-11-ladder-gen5-rebuild/evidence/new_seed_name_leaks.out                 # not an indexed file type
+work/regression/2026-10-11-section-retest-set-6/evidence/doctor-fix.diff                        # not an indexed file type
+work/regression/2026-10-11-section-retest-set-6/evidence/pre-section-tune.diff                  # not an indexed file type
+work/regression/2026-10-13-ladder-gen6-rebuild/evidence/build.log                               # not an indexed file type
+work/regression/2026-10-13-ladder-gen6-rebuild/evidence/new_seed_name_leaks.out                 # not an indexed file type
+work/regression/2026-10-13-section-term-v3/evidence/doctor-fix.diff                             # not an indexed file type
+work/regression/2026-10-13-section-term-v3/evidence/pre-section-config.diff                     # not an indexed file type
 # <<< fux: not indexed <<<
 
 # >>> fux: skipped >>>
@@ -188,3 +125,14 @@ __pycache__/
 *.py[cod]
 *.py
 *.sh
+*.js
+*.mjs
+*.index
+*.sha256
+*.coverage
+*.patch
+
+justfile
+package.json
+package-lock.json
+uv.lock

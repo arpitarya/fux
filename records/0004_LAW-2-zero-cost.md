@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L2
 owns: []
 laws: [L2]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: cbe1dde64952af36461956d6627366ef1da0a5efae610e6954ed577f529350e8
+content_sha: a604b02578aa5259d5b9922dfc7f5346d90cbfc068fdf87d5818d61b6b20e761
 ---
 
 # SR-LAW-2 — L2 — $0, FOSS-only
@@ -60,7 +60,7 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 
 ### ⚠ The 2026-10-18 amendment — role packages
 
-**Arpit, 2026-10-18, in Cowork, on [W-282](../work/open/W-282-reader-writer-packages.md) F1** — asked whether L2's *one install* permits a reader-only and a writer-only package, and shown the sentence this amendment adds: *"For first one, go with the recommendation."*
+**Arpit, 2026-10-18, in Cowork, on W-282 (closed — [the layer map](README.md), [SR-WORK-RELEASE](0063_WORK-release.md) d15) F1** — asked whether L2's *one install* permits a reader-only and a writer-only package, and shown the sentence this amendment adds: *"For first one, go with the recommendation."*
 
 - **What it permits:** `fux-reader` (search and answers) and `fux-writer` (ingest and maintenance) as separate installs beside `fux-engine`, which still installs everything.
 - **What it keeps:** inside any one package, nothing is optional. A role package is complete for its role, so no capability inside it depends on what somebody chose at install time.

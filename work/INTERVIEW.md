@@ -35,7 +35,12 @@ valuable judgement, but not the state of play.
 *Updated **2026-10-18** (Claude Code, Opus 5.5 — W-282 Steps 1–2, the untangle and the packaging; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-10-18 (latest) — v4.0.0 RELEASED: NPM LIVE, PYPI WAITS ON ARPIT'S REGISTRY STEPS (W-283)
+### 🟢 2026-10-18 (latest) — 4.0.1 ON ALL SIX NAMES; W-282 AND W-283 CLOSED
+
+- fux is four PyPI packages (`fux-core`, `fux-reader`, `fux-writer`, `fux-engine`) and two npm names (`fux-engine`, `@fux-engine/reader`), all at 4.0.1, published by `publish.yml`. 4.0.0 was finished by hand-triggered single-job re-runs.
+- **For the next new distribution:** PyPI keeps one pending publisher per identical config, and while one exists the minted token covers only that pending project; every project sharing a workflow must carry an identical publisher (environment included) or PyPI may mint a token for another's. Archived W-283 has the whole account.
+
+### 🔴 2026-10-18 — v4.0.0 RELEASED: NPM LIVE, PYPI WAITS ON ARPIT'S REGISTRY STEPS (W-283)
 
 - npm `fux-engine` 4.0.0 is `latest`. PyPI refused the three new names (*"Non-user identities cannot create new projects"* — no pending publishers), so fux-engine 4.0.0 was **skipped by the guard** and PyPI's latest is an intact 3.0.1. `@fux-engine/reader`: no org yet.
 - **Next:** Arpit does W-283 steps 1–3; then `gh run rerun 39115990157 --failed` publishes the rest. Do **not** cut another release for it.
@@ -45,7 +50,7 @@ valuable judgement, but not the state of play.
 - **Built:** `fux-core` / `fux-reader` / `fux-writer` under `packages/`, the root as `fux-engine`; each wheel's files come from [the layer map](../records/README.md) via `packages/layer_hook.py`. `cli.py` is core and runs verbs by layer (`VERBS`); doctor is split by layer with one row order (`health.ROWS`). Step 1 is commit `1cce3ac4`; Step 2 is the commit after it.
 - **Departures, both deliberate:** `fux` ships in fux-core and `fux-merge-index` in fux-writer (not fux-engine); the Node bundle rides fux-writer only. One owning wheel per file, or an uninstall deletes another package's file.
 - **Evidence:** the engine's output is unchanged (worktree comparison, every query and `--help`); each wheel installs and works alone offline (`tests_e2e/test_role_packages.py`); all suites green.
-- 🔴 **Waits on Arpit — [W-283](open/W-283-registry-hand-steps.md):** PyPI pending publishers for the three new names, the `@fux-engine` npm org, the first `@fux-engine/reader` publish, then *"release 4.0.0"*. **Until a release, the three PyPI names are unreserved** — a pending publisher reserves them.
+- 🔴 **Waits on Arpit — W-283 (closed — [SR-WORK-RELEASE](../records/0063_WORK-release.md) d15):** PyPI pending publishers for the three new names, the `@fux-engine` npm org, the first `@fux-engine/reader` publish, then *"release 4.0.0"*. **Until a release, the three PyPI names are unreserved** — a pending publisher reserves them.
 - ⚠ **Development install changed:** `pip install -e ".[dev]"` alone no longer resolves (fux-engine pins the role packages); use `uv sync --extra dev` or the four-package pip line in SR-WORK-RELEASE d15.
 
 ### 🟢 2026-10-18 — W-282 STEP 1: READER AND WRITER NO LONGER IMPORT EACH OTHER
@@ -67,7 +72,7 @@ valuable judgement, but not the state of play.
 
 ### 🔴 2026-10-18 — W-282 FILED: THE READER / WRITER / CORE PACKAGE SPLIT
 
-- **Arpit:** *"Research and put this in work item. We are going to build it out"* — index-stores §8: `fux-core`, `fux-reader` (Python + Node), `fux-writer` (Python only), `fux-engine` unchanged. Filed as [W-282](open/W-282-reader-writer-packages.md), 🔴; the database store stays B-272.
+- **Arpit:** *"Research and put this in work item. We are going to build it out"* — index-stores §8: `fux-core`, `fux-reader` (Python + Node), `fux-writer` (Python only), `fux-engine` unchanged. Filed as W-282 (closed — [the layer map](../records/README.md), [SR-WORK-RELEASE](../records/0063_WORK-release.md) d15), 🔴; the database store stays B-272.
 - **Research changed the shape:** §8's *"the split already exists in the module tree"* is wrong — 86 reader→writer and 36 writer→reader imports. `derive/` is the reader's; `answer` needs decoders, fetchers and PII; PEP 420 clashes with `fux/__init__.py`; `@fux` on npm is another account's; the three PyPI names are free.
 - **Ruled later the same day:** F1 — SR-LAW-2 amended: *`fux-engine` is the one install; `fux-reader` and `fux-writer` are role packages*; CLAUDE.md regenerated. F4 — npm scope `@fux`, first package `@fux/fux-reader` (the registry shows `@fux` owned by npm user `fux`, not `aarya11`: Arpit to confirm before release). F3 parked by him as a blocker, the store kept in B-272.
 - **F2 ruled (a):** the reader's `answer` is exactly today's — refer included, same output, a test compares it with `fux-engine`.

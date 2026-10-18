@@ -28,6 +28,14 @@ Rules:
 
 ---
 
+## 2026-10-18 — **4.0.1 on all six names; W-282 and W-283 closed**
+
+| | |
+|---|---|
+| **shipped** | 4.0.0 completed on PyPI by single-job re-runs (run 39115990157); **4.0.1** (tag at `fa5104ba`, CI green) published by the workflow to PyPI `fux-core`, `fux-reader`, `fux-writer`, `fux-engine` and npm `fux-engine`, `@fux-engine/reader` (run 39127620476) |
+| **evidence** | `/simple/` lists the four 4.0.1 wheels; clean-venv `pip install fux-reader==4.0.1` and `fux-engine==4.0.1` behave as SR-CLI d16 states |
+---
+
 ## 2026-10-18 — **v4.0.0 released — npm only so far**
 
 | | |

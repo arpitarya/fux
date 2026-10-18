@@ -23,6 +23,13 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-18 — W-283 and W-282 closed: 4.0.0 and 4.0.1 on all six names  ·  Claude Code (Opus 5.5)
+
+- **Asked:** finish the 4.0.0 publish (W-283), gitignore `node/dist-scoped/`, *"commit everything and publish 4.0.1 … just to be sure everything is working"*.
+- **Done:** 4.0.0 completed by re-running single jobs of run 39115990157 — one new PyPI project per pending publisher (`fux-core`, `fux-reader`, `fux-writer`), then `fux-engine` after Arpit re-added its publisher with environment `pypi` (it had been refused *"OIDC scoped token is not valid for project 'fux-engine'"*); `@fux-engine/reader` 4.0.0 by Arpit's hand after a fresh `npm login` (the September token was dead → 404). `node/dist-scoped/` gitignored. **4.0.1** (no engine change) cut at CI-green `fa5104ba`: run 39127620476 published all four PyPI names and `fux-engine` on npm; the scoped job published after its trusted publisher was saved (attempt 2).
+- **Verified:** PyPI `/simple/` lists all four 4.0.1 wheels; npm `fux-engine` 4.0.1; `pip install fux-reader==4.0.1` (clean venv) → core + reader, `ask` runs, `ingest` refused by name; `pip install fux-engine==4.0.1` → all four, both scripts, 25 verbs.
+- **Closed:** W-283 and W-282 archived to `archive/open/` with archive-map rows; live links repointed to the layer map and SR-WORK-RELEASE d15. **Next:** nothing on this thread; the inbox is W-258 and W-268.
+
 ## 2026-10-18 — v4.0.0 released: npm live, PyPI waits on the registry steps (W-283)  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"push publish everything and release a new major version 4.0.0."*

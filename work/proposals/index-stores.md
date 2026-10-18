@@ -19,7 +19,7 @@ in git, but in future the index can be present in a DB, not in a repository.
 Fux can have a writer and a reader, two separate modules, and everybody can use
 it. Both can exist in parallel."*
 
-⚠ **§8 graduated 2026-10-18 into [W-282](../open/W-282-reader-writer-packages.md)** — Arpit: *"we are going to build it out."* §8's finding that the split already exists in the module tree is **wrong**: about 125 imports cross its own lines; W-282 §Research has the count, and three placements below are corrected there. The rest of this file stays parked. **Order ruled 2026-10-18 (W-282 F3):** the split ships first; this proposal is then rewritten against the split packages. ⚠ **The split is built (2026-10-18, W-282 Steps 1–2):** what §8 proposed is now [`records/README.md` §The layer map](../../records/README.md) and [SR-WORK-RELEASE](../../records/0063_WORK-release.md) decision 15 — `cli.py` and the decoders, fetchers and PII engine are core, not reader; there is no per-distribution `hatch_build.py` but one `packages/layer_hook.py`. §8 below is the proposal as written; read those for what exists, and rewrite §8 against them before B-272 graduates.
+⚠ **§8 graduated 2026-10-18 into W-282 (closed — [the layer map](../../records/README.md), [SR-WORK-RELEASE](../../records/0063_WORK-release.md) d15)** — Arpit: *"we are going to build it out."* §8's finding that the split already exists in the module tree is **wrong**: about 125 imports cross its own lines; W-282 §Research has the count, and three placements below are corrected there. The rest of this file stays parked. **Order ruled 2026-10-18 (W-282 F3):** the split ships first; this proposal is then rewritten against the split packages. ⚠ **The split is built (2026-10-18, W-282 Steps 1–2):** what §8 proposed is now [`records/README.md` §The layer map](../../records/README.md) and [SR-WORK-RELEASE](../../records/0063_WORK-release.md) decision 15 — `cli.py` and the decoders, fetchers and PII engine are core, not reader; there is no per-distribution `hatch_build.py` but one `packages/layer_hook.py`. §8 below is the proposal as written; read those for what exists, and rewrite §8 against them before B-272 graduates.
 
 **Status: proposed, not ruled, not built.** Research and a recommendation
 only — no code, no record change. Cowork ratifies; Claude Code builds.
@@ -326,7 +326,7 @@ a separate chat agent in a single-page application, you don't need a writer —
 you just need a reader. If you're updating the DB through hooks, you just need
 a writer — you don't need a reader. How can the package be structured?"*
 
-⚠ **Corrected 2026-10-18 ([W-282](../open/W-282-reader-writer-packages.md) §Research):** the sentence below is wrong — 86 reader→writer and 36 writer→reader imports; `derive/` belongs to the reader; `answer` needs decoders, fetchers and PII; `@fux` on npm is taken; PEP 420 conflicts with `fux/__init__.py`.
+⚠ **Corrected 2026-10-18 (W-282 (closed — [the layer map](../../records/README.md), [SR-WORK-RELEASE](../../records/0063_WORK-release.md) d15) §Research):** the sentence below is wrong — 86 reader→writer and 36 writer→reader imports; `derive/` belongs to the reader; `answer` needs decoders, fetchers and PII; `@fux` on npm is taken; PEP 420 conflicts with `fux/__init__.py`.
 
 **Finding: the split already exists in the module tree; only the distribution
 hides it.** `src/fux/` is one wheel (`fux-engine`, `dependencies = []`) and

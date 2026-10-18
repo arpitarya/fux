@@ -22,7 +22,7 @@ ball: agent
 | 0d | The split goes first; the database work comes after it, and its proposal is updated then | a clear order of work | ✅ decided |
 | 1 | Untangle the code so reading and writing stop importing each other (about 125 cross imports today) | a clean line between reader and writer, held by a test | ✅ done 2026-10-18 — uncommitted |
 | 2 | Package it as fux-core, fux-reader and fux-writer — fux-engine still installs everything | smaller installs for machines that only read or only write | ✅ done 2026-10-18 |
-| 3 | Release all four together, on one version | the split live on PyPI, and on npm per the name call | 🔴 waits on [W-283](W-283-registry-hand-steps.md) — Arpit's registry steps and his go |
+| 3 | Release all four together, on one version | the split live on PyPI, and on npm per the name call | ✅ 4.0.0 and 4.0.1 on all six names (2026-10-18) |
 
 **The packages and what each install pulls in:** [`architecture-packages.svg`](../architecture-packages.svg) — four on PyPI, two on npm, no third-party package anywhere in the tree.
 
@@ -253,8 +253,8 @@ Opus 5.5), in the working tree, uncommitted** — see *Step 1 — what landed*.
     `fux.query`. A reader-only `fux answer --json` is byte-identical to
     `fux-engine`'s on the same query set (F2).
 
-**Step 3 — release.** 🔴 Waits on [W-283](W-283-registry-hand-steps.md): three registry steps in Arpit's accounts, then his go. The workflow, the version sites and the scoped npm package are built and committed.
-11. SR-WORK-RELEASE: four PyPI distributions and `@fux-engine/reader` on npm,
+**Step 3 — release.** ✅ **Done 2026-10-18** — Arpit ruled a major, 4.0.0; 4.0.1 was the first release the workflow published to all six names (W-283 carried the registry steps).
+11. ✅ SR-WORK-RELEASE: four PyPI distributions and `@fux-engine/reader` on npm,
     one version on all of them, held equal by the version test.
 
 ## Step 1 — what landed (2026-10-18, Claude Code)

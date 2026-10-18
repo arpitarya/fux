@@ -91,7 +91,7 @@ the defect this ordering exists to make visible.*
   refused; a vector DB is not a store.
   **Graduates when Arpit rules F1 and F2 and names the first index that will
   live outside a repo.** **§8 (the package split) graduated 2026-10-18** into
-  [W-282](../open/W-282-reader-writer-packages.md); the store stays parked.
+  W-282 (closed — [the layer map](../../records/README.md), [SR-WORK-RELEASE](../../records/0063_WORK-release.md) d15); the store stays parked.
 
 * [The build plan, October 2026](build-plan-2026-10.md) — the 2026-10-04 ruling
   pass over the backlog ([W-251](../../archive/open/W-251-backlog-audit-rulings.md) §4)
