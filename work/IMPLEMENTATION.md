@@ -28,7 +28,15 @@ Rules:
 
 ---
 
-## 2026-10-19 — **W-284 · W-285 · W-286: `fux llms`, `fux lsp`, the VS Code extension (main; release 4.1.0 pending)**
+## 2026-10-19 — **4.1.0 on all six names, plus the `.vsix` on the release**
+
+| | |
+|---|---|
+| **shipped** | **4.1.0** (tag `v4.1.0` at `0e5a950f`, CI 38/38 run 39215702521) published by the workflow (run 39217050658) to PyPI `fux-core`, `fux-reader`, `fux-writer`, `fux-engine`, npm `fux-engine`, `@fux-engine/reader`; `fux-4.1.0.vsix` attached to the GitHub release by the new `publish-vsix` job |
+| **evidence** | PyPI `/pypi/<name>/4.1.0/json` 200 for all four; clean-venv `uv pip install --no-cache fux-engine==4.1.0` → the four packages, `fux --version` = 4.1.0, `fux llms` and a whole `fux lsp` session run; npm `latest` = 4.1.0 on both names; the released `.vsix` installs with `code --install-extension` into a scratch extensions dir |
+---
+
+## 2026-10-19 — **W-284 · W-285 · W-286: `fux llms`, `fux lsp`, the VS Code extension (main)**
 
 | | |
 |---|---|

@@ -23,6 +23,11 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-19 — 4.1.0 published on all six names, `.vsix` on the release  ·  Claude Code (Opus 5.5)
+
+- **Done:** CI green on `0e5a950f` (38/38), `v4.1.0` released; publish run 39217050658 green on all six jobs, `publish-vsix` included.
+- **Verified:** PyPI JSON 200 ×4; npm `latest` 4.1.0 on both names (~3 min to appear); clean-venv install resolves all four at 4.1.0 (`uv` needed `--no-cache` — its cache held the pre-release index); `fux llms` and a `fux lsp` session from that install; the released `.vsix` installs. **Next:** the inbox — W-258, W-268 (Arpit). Open, not filed: a Marketplace / Open VSX listing needs his publisher.
+
 ## 2026-10-19 — W-284 · W-285 · W-286: `fux llms`, `fux lsp`, the VS Code extension; 4.1.0 cut  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"create llms-full.txt and llms.txt files as well as mcp and lsp for vscode research and build it out create work items then implement it and close them then commit push and publish a new version."*
