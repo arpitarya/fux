@@ -36,6 +36,7 @@ here. Read that record before changing anything below it.
 
 - 🟢 **W-287** · `agent` — tables answer by row AND by column: built; L13 verdict FAIL on latency (59 wins, 0 losses), key stays off; stages A–C land as built. **Opus.** Filed by Arpit (Cowork). [detail](open/W-287-tables-by-row-and-column.md)
 - 🟡 **W-288** · `agent` — decoder extensions: versioned shared modules under the decoders, in the reuse key; W-287's table module becomes `ext/table.py` first. After W-287. **Opus.** Filed by Arpit (Cowork). [detail](open/W-288-decoder-extensions.md)
+- 🟡 **W-289** · `agent` — plugin packages: only the engine is mandatory; 12 decoders, 2 fetchers, the table extension become opt-in packages declared in `.fux/plugins.toml`; L2 amended. After W-288. **Opus.** Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
 
 ### testing
 
