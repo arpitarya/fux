@@ -5,13 +5,13 @@ name: SR-DOTFUX
 title: SR-DOTFUX (0102) — the .fux/ directory
 description: "Every child of .fux/ is declared committed, derived or acquired; the ignore rule is narrow by construction and asserted by doctor against git itself."
 status: accepted
-amended: 2026-10-13
+amended: 2026-10-19
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@6421326ac75c, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@5d2f590c0567, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@906d623d96f3, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@5d2f590c0567, tests/test_verb_table_agreement.py@1e7999ffd28f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: b8e392a0fa2af2d45c0409b29a51889c3f958f32051c01e8f189f947eb1eff55
+content_sha: 079af171429ad87109b0f5f7730dadda6fa4393b2ce0e60d448b77bad4f6d368
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -966,6 +966,10 @@ line raises names the fix itself rather than pointing at the header.
   there is nothing for it to put there. The directory and its README exist so
   the extension point is **discoverable**; an empty directory git cannot commit
   would be indistinguishable from a fux too old to have observers.
+
+- **No decision here moved** (W-284, W-285, 2026-10-19): the template's verb
+  table gained `llms` (lifecycle) and `lsp` (serve), the same change made to
+  SR-CLI §1 and this repository's `.fux/README.md`; no kind, row or file moved.
 
 - ✅ **The verb table in `.fux/README.md` is HELD EQUAL to SR-CLI §1**
   (2026-09-14, W-164 gate 2) by `tests/test_verb_table_agreement.py`. Two

@@ -5,13 +5,13 @@ name: SR-ACQUIRED
 title: "SR-ACQUIRED (0145) — retained source bytes"
 description: "Fetched source bytes are retained in .fux/acquired/, a third category beside committed and derived: gitignored, and not rebuildable."
 status: accepted
-amended: 2026-10-13
+amended: 2026-10-19
 date: 2026-09-01
 feature: the acquired plane
 owns: [src/fux/store/acquired.py@89dd8c94308a]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 37b1f048618d45423ec8e32b4e27a820ae39c551307ee6d106796f64adf6e62f
+content_sha: ec6ec8a97826efd2b5cde4a0a2cc92862061c05b280cf3039fa0b0497ec70f52
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -392,6 +392,8 @@ this moved where they are written, not what they are.
 - **Reusing `runtime/fetch-cache/`.** Rejected: a TTL entry expires, and an artifact store that expires is not one. `fetchcache.py`'s own argument for keeping two stores provably separate applies unchanged to a third.
 - **Storing under `runtime/`.** Rejected by decision 1. `runtime/` means rebuildable, and this is not.
 - **Eviction by `mtime`.** Rejected by decision 7. It is the obvious implementation and it smuggles a wall clock into a plane that forbids one, through the filesystem rather than through a field.
+
+**No decision here moved** (W-284, W-285, 2026-10-19): `store/fuxdir.py` changed only the lifecycle and serve verb rows of the `.fux/README.md` template, adding `llms` and `lsp`; the `acquired/` row and its kind did not move.
 
 **No decision here moved** (W-279, 2026-10-13): `store/fuxdir.py` changed only the `index/` row and the lifecycle verb row of the `.fux/README.md` template; the `acquired/` row and its kind did not move. The register's shape is [SR-INGEST](0106_ingest.md) decision 22's.
 

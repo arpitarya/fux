@@ -6,11 +6,12 @@ title: "SR-WORK-RELEASE (0063) — one name in two registries, and what actually
 description: "fux-engine ships to PyPI and npm from one release trigger — PyPI automatically by OIDC, npm staged for a human to approve — and the version has four hand-written sites plus one derived bundle, held equal by check-version-parity.py. main has no required status checks: history is protected, the quality gate is not, so CI green is the author's to read."
 status: accepted
 date: 2026-09-14
+amended: 2026-10-19
 feature: how a release reaches two registries, how the version stays equal across its sites, and what the branch wall does not do
-owns: [scripts/check-version-parity.py@8640e01487a4, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@30ec0febcab3, scripts/npm-scoped.py@4214c9c3380a]
+owns: [scripts/check-version-parity.py@72454ae055c2, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@026df0094b57, scripts/npm-scoped.py@4214c9c3380a]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 92cf735d127d88fa7b798efbc012e23edf4e7630723e9a8174ce08ac0b8b05f1
+content_sha: f63ca9397c4ef8b209fdec4564902df6f143275075fcd4d6dd7b84b0818058e9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -117,10 +118,11 @@ rather than a string somebody might forget to edit.
    `pyproject.toml` reads dynamically. **That component belongs to SR-LAWS and is
    not claimed here** — one component, one owner.
 
-3. **It is the SOURCE, not the only copy.** Seven hand-written sites exist today:
-   the source, `node/package.json`, `node/fux.mjs`, `node/src/verbs/mcp.mjs`, and
+3. **It is the SOURCE, not the only copy.** Eight hand-written sites exist today:
+   the source, `node/package.json`, `node/fux.mjs`, `node/src/verbs/mcp.mjs`,
    the distribution pins in `pyproject.toml`, `packages/fux-reader/pyproject.toml`
-   and `packages/fux-writer/pyproject.toml` (decision 15).
+   and `packages/fux-writer/pyproject.toml` (decision 15), and the VS Code
+   extension's `vscode/package.json` (decision 16).
 
 4. **[`scripts/check-version-parity.py`](../scripts/check-version-parity.py) is
    the enforcement**, run by
@@ -332,6 +334,14 @@ rather than a string somebody might forget to edit.
       organization on npm; and the first `@fux-engine/reader` publish by hand,
       since npm binds a trusted publisher to a package that exists. Until each
       is done, its upload fails and the others still publish.
+16. **The VS Code extension rides the same release as a GitHub release
+    asset** (W-286, 2026-10-19). `publish.yml`'s `publish-vsix` job builds
+    `fux-<version>.vsix` with `scripts/build-vsix.py` after the CI-verdict gate
+    and uploads it to the release being published — `contents: write`, the
+    workflow's own token, no registry. Its version is a parity site (decision
+    3). **No Marketplace or Open VSX listing**: each needs a publisher and a
+    token on Arpit's accounts, and the extension's record says what one more
+    job would take ([SR-VSCODE](0164_vscode.md) decision 8).
 
 ### Consequences
 

@@ -32,10 +32,16 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-18** (Claude Code, Opus 5.5 — W-282 Steps 1–2, the untangle and the packaging; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-19** (Claude Code, Opus 5.5 — W-284/285/286, the editor and llms surfaces; before it Claude Code, Opus 5.5 — W-282 Steps 1–2, the untangle and the packaging; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-10-18 (latest) — 4.0.1 ON ALL SIX NAMES; W-282 AND W-283 CLOSED
+### 🟢 2026-10-19 (latest) — THREE NEW SURFACES: `fux llms`, `fux lsp`, THE VS CODE EXTENSION (W-284 · W-285 · W-286)
+
+- **Asked (Arpit):** llms.txt + llms-full.txt, and MCP + LSP for VS Code — research, file items, build, close, release.
+- **Built:** both verbs are Python, stdlib, reader layer, siblings of `fux mcp`; the extension is dependency-free (hand-rolled LSP client), one bundled file, a `.vsix` attached to the GitHub release — no Marketplace listing (needs Arpit's publisher). The forks and their reopen-triggers: [`editor-and-llms-surfaces.compare.md`](compare/editor-and-llms-surfaces.compare.md).
+- **Standing:** this repo's `llms.txt` / `llms-full.txt` are a generated view held by `tests/test_llms.py` — retitling a listed document or editing its `description:` means `fux ingest` then `just llms`.
+
+### 🟢 2026-10-18 — 4.0.1 ON ALL SIX NAMES; W-282 AND W-283 CLOSED
 
 - fux is four PyPI packages (`fux-core`, `fux-reader`, `fux-writer`, `fux-engine`) and two npm names (`fux-engine`, `@fux-engine/reader`), all at 4.0.1, published by `publish.yml`. 4.0.0 was finished by hand-triggered single-job re-runs.
 - **For the next new distribution:** PyPI keeps one pending publisher per identical config, and while one exists the minted token covers only that pending project; every project sharing a workflow must carry an identical publisher (environment included) or PyPI may mint a token for another's. Archived W-283 has the whole account.

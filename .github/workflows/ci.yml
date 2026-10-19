@@ -114,6 +114,13 @@ jobs:
         # MODULE_NOT_FOUND (work/MACHINE.md §Two test invocations).
         working-directory: node
         run: node --test
+      # W-286: the VS Code extension's client units, and its .vsix built the
+      # way the release builds it. File paths, never the bare directory
+      # (work/MACHINE.md §Two test invocations).
+      - name: vscode extension
+        run: |
+          node --test vscode/test/*.test.js
+          python scripts/build-vsix.py
       - run: python scripts/check-version-parity.py
       # 🔴 THE GOLDEN CORPUS IS NOT FOR CI (Arpit, 2026-09-14, W-148 row 1): it
       # runs local-only, in fux-lab. This checks the manifests and nothing

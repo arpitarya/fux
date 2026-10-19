@@ -28,6 +28,14 @@ Rules:
 
 ---
 
+## 2026-10-19 — **W-284 · W-285 · W-286: `fux llms`, `fux lsp`, the VS Code extension (main; release 4.1.0 pending)**
+
+| | |
+|---|---|
+| **shipped (main)** | `fux llms` ([SR-LLMS](../records/0162_llms.md)) and this repo's root `llms.txt` / `llms-full.txt` (`scripts/gen-llms.py`); `fux lsp` ([SR-LSP](../records/0163_lsp.md)); `vscode/` + `scripts/build-vsix.py` + `publish.yml` `publish-vsix` ([SR-VSCODE](../records/0164_vscode.md)); version 4.1.0 on eight sites |
+| **evidence** | `tests/test_lsp.py` (24), `tests/test_llms.py` (9), `tests_e2e/test_lsp_verb.py` (3 — the extension's client against the real server), `vscode/test/client.test.js` (9); the `.vsix` installed into a scratch `--extensions-dir` by `code --install-extension` (VS Code 1.142.0). Not run: activation inside a live VS Code window |
+---
+
 ## 2026-10-18 — **4.0.3 on all six names; 4.0.2 never published**
 
 | | |

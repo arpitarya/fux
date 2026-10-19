@@ -1,11 +1,11 @@
 # fux.register.v2	rules=5
 # loc	sha	decoder	[k=v ...]
-CHANGELOG.md	a5b7662db0a0d7c4c6c864a0de2eeee66dff1699	prose
-CLAUDE.md	178258c79fbe88c05d23a787bb0910bf7c87db13	prose
-README.md	6fb4ac68df4573e5763938d95bdd1156d0c41164	prose
+CHANGELOG.md	6c2d2b3810538e48c99ea89f0853dbb063b4edfa	prose
+CLAUDE.md	b9c443b10ee07a365630cda24486094d58eca306	prose
+README.md	063e2b5c6f3e1c634d0af4c578229d70a7dcbe19	prose
 archive/PLAN-v0.30.md	2e0ef4e71c9f6d31558cf644bbf0da82c0af9b1d	prose	archived=true
 archive/PRIORITY.md	7249a801980d585f6fcd43abc9bb6ebb05d82408	prose	archived=true
-archive/README.md	80a766e0408ac1c16480186fe5d1756aba976989	prose	archived=true
+archive/README.md	4aa032795b20095e3194ccda40da7a83edc34a00	prose	archived=true
 archive/benchmark-reports/2026-08-28-benchmark-contested-handbuilt-deck.html	488f8e5347af75ee9482d0370a2a34a2b6520ab6	html@sha:773b7cb1d9a7be6e	archived=true
 archive/benchmark-reports/2026-08-28-benchmark-v1-vs-head-handbuilt-deck.html	7d0fbec1818866c000594c0c6278a876e27139bd	html@sha:773b7cb1d9a7be6e	archived=true
 archive/benchmark-reports/2026-09-13-benchmark-captures-handbuilt-deck.html	f513074617593e5de84be32131644915d67050b1	html@sha:773b7cb1d9a7be6e	archived=true
@@ -226,6 +226,9 @@ archive/open/W-278-section-term-v3.md	36051dced5c4a3fb64aba0baa9cb5d6cc59d3c7c	p
 archive/open/W-279-register-v2.md	5a51420b8e503af414d3d68ced62283d73ad9dad	prose	archived=true
 archive/open/W-282-reader-writer-packages.md	2e4b2d21ead64248841a9dccbe2da2528da563f2	prose	archived=true
 archive/open/W-283-registry-hand-steps.md	c6b173a55b635f9e36a193981ca40dafea421448	prose	archived=true
+archive/open/W-284-llms-txt.md	d533c017038bd868f2477dc7cda3f10f639c362c	prose	archived=true
+archive/open/W-285-language-server.md	e443ecf3199367d0ea7688d393ff5382115974ac	prose	archived=true
+archive/open/W-286-vscode-extension.md	dfb6d43e5863d6c273844745915b8f9d9bebdd4c	prose	archived=true
 archive/open/W-30-ratify-adr-0001.md	181d91e7e0dc2d19e4be278f34482a733fc8844d	prose	archived=true
 archive/open/W-31-ratify-adr-0010-0011.md	f001d18e8a10412f1ba7454a9ab62efdc27addc0	prose	archived=true
 archive/open/W-32-claude-md-adoption.md	c108aeb7afd828c1ac3e873a20343fe3276bf0d6	prose	archived=true
@@ -614,15 +617,15 @@ archive/v0.30-rev1-planning/v0.30.0-m0-m1-gate-handoff.md	37efba2f32fd6746301abe
 archive/v0.30-rev1-planning/v0.30.0-m0-m1-gate-prompt.md	ca7c72e29cb8df21ec0aca4046910cafc1416c4c	prose	archived=true
 archive/v0.30-rev1-planning/v0.30.0-m1-rerun-handoff.md	8e93360337e12c9258aa5b351312123ed4fe8511	prose	archived=true
 archive/v0.30-rev1-planning/v0.30.0-m1-rerun-prompt.md	1777ded8b60379e1a8b93eddbf3d5c5c5d6f6c53	prose	archived=true
-docs/GLOSSARY.md	97a6dce5bcd46f6a34692a6ebd93ef1937f633c7	prose
-docs/handbook.html	e3ff40b72fb0404622ec86ee5ea9bc4fa8b007ad	html@sha:773b7cb1d9a7be6e
+docs/GLOSSARY.md	4398edfa48325f9b4c2142e2cc1edc1d55e0e8b6	prose
+docs/handbook.html	e1d5b707de6e5fe21fb4da170c8f9f025b982617	html@sha:773b7cb1d9a7be6e
 docs/index.md	a0ca82e21d1593a521595b15ed776bc7fddb5aea	prose
 docs/paper/figures/README.md	27ded7ca65541e58e8876c68768d5a6ec883771c	prose
 docs/paper/figures/fig-06-expand.svg	284802f63550cfd46bd33dcb3f5fe0ed6a07a560	svg@sha:0d25b190415a4706
 docs/paper/figures/fig-15-latency.svg	cf124bce629880208a1ef3872e4b57e20830a5bf	svg@sha:0d25b190415a4706
 docs/paper/figures/mermaid.config.json	1085b4d4514eba7464626520653acb962f6c3376	json@sha:df03417b3bc177d9
 docs/paper/the-fux-index-paper.md	925b53de1e44ff5e1e2c9155afab4b7698d95f04	prose
-records/0001_LAWS.md	a2248c2b2b916f731176f9404b8ec3ee9c5bbd8a	prose
+records/0001_LAWS.md	d27a5a7961bd75339131bc9a8d2693ec0386877c	prose
 records/0002_LAW-0-authority.md	aa3d8dc48aa155992a42f389a032445bbe256cca	prose
 records/0003_LAW-1-retired-records-archived.md	95bb26a9f034a718ff04d528a03c8c66b331d6ac	prose
 records/0004_LAW-2-zero-cost.md	6ba7006925c1f9451dbba471da3bb35c6efb80bd	prose
@@ -649,20 +652,20 @@ records/0059_WORK-docs.md	aba422be945940595e156f37beeb27d2aa97fa96	prose
 records/0060_WORK-session.md	e126d7a25ce12e8fbe11fdfeae30cc1e95d42461	prose
 records/0061_WORK-okf.md	499eaa7a4966a9f5b547368a6d1f6b3ac9b6054b	prose
 records/0062_WORK-archive.md	b34ce9d58d813b69ba7a44dec6620d58dbbffc70	prose
-records/0063_WORK-release.md	f67af82ee40282b78c63863635600773d192a169	prose
+records/0063_WORK-release.md	e4c0bde0190d575cd1f142fa952ec45c1487b248	prose
 records/0064_WORK-blockers.md	8cc7fa229f31e57f18cb6b3c5564b9d31eb86599	prose
 records/0065_WORK-governance.md	c807882350385e7920e1103ff2759ced5572500c	prose
 records/0066_WORK-golden.md	77ae5051faafb8703c42a188f52d60c0f67131d7	prose
-records/0067_WORK-registry.md	dc695924be509e16b3d1c818c2dc5c5ea5cbff44	prose
+records/0067_WORK-registry.md	8810922d6c6fe7812a288a44a85a51de8feb9645	prose
 records/0068_WORK-test-data.md	a437be3ce2d31a1d9d7c181339827df7bbd3ee86	prose
-records/0101_cli-surface.md	33268142543745642d43819007c8186c389b6d59	prose
-records/0102_fux-directory.md	64fcdc7746f9aaf558328c896295bc4fc8851fc8	prose
+records/0101_cli-surface.md	95920d8015c17eaf73204d1e95652636d9a8aebf	prose
+records/0102_fux-directory.md	b08ca8bc0514bb6a347b60b0f8e411ee670695af	prose
 records/0103_ask.md	6ce4abd93e594b6484f000f121526cfcaa94e886	prose
 records/0104_find.md	28a9fcd7b24753671b5eb3c2ea729e4b7aa30c14	prose
 records/0105_answer.md	8bc1e9bdbb48ad015f4740b74f441a0eaf51ad26	prose
 records/0106_ingest.md	6ebfa02b3bef1ca9289f6595b8856a4a67874cd9	prose
 records/0107_url-ingest.md	17f7f28204e6aca092fb70f4e72cdfa92ace25bd	prose
-records/0108_index-lifecycle.md	afbec57297e8a095bca14b68f15b49c709ab04b0	prose
+records/0108_index-lifecycle.md	cebe989b717ec39002e1ad6834f7c42e091e88b8	prose
 records/0109_index-record.md	0b2c5b14b97026a169dddde691a3395425a05335	prose
 records/0110_accelerator.md	5fd4cc71f42accc73c6771b88a7b6c730a2f9ff7	prose
 records/0111_ranking.md	b465d3f1862ff1d4949f554d462e1c5316717a8c	prose
@@ -690,34 +693,37 @@ records/0132_agent-policy.md	478e4ef148512cf4ada9c4db79fe051cd04c3a71	prose
 records/0133_predictions.md	bc04cc245b1cb3541245420c3dcc02caab787447	prose
 records/0134_archived-content.md	e3f3dbbc9ec4b7566504f92af084dc1d7daca061	prose
 records/0135_tuning.md	a9d9afa3cce43b52339d03688fcce3dd2127fe2c	prose
-records/0136_mcp.md	a2409db0a307d4928c91991e5b800bc39721a2bc	prose
+records/0136_mcp.md	256f48c5666f83128168c9c500e4573291ccac39	prose
 records/0137_enrich.md	c576096312e6896868d37ccfd09e3456001f6a80	prose
 records/0138_rerank.md	706018c8bac4a32131a81aef95c92b079dea19f0	prose
 records/0139_decode.md	daa56cec586280c3f806619e5b86a8255d0b10da	prose
 records/0140_locks.md	eda20971d73ad360a60cecd222ec6b0381a8cf08	prose
 records/0141_confidence.md	5a1e6a816abfe93cf7f8e6600ef7e7ae376f6312	prose
 records/0142_provenance.md	9f9ed7f051994a93dc748a175d41bca25632f58d	prose
-records/0143_output-defaults.md	2f5acdf7166df75c8d4b4ff3fd2f012675dc20be	prose
+records/0143_output-defaults.md	d045a69fb028ebedd99cbbedb88a2a9a88b55117	prose
 records/0144_fuxignore.md	c065f03fca3aeda8d8b7db654cfdb22c3b48f9ad	prose
-records/0145_acquired-plane.md	2033218783838aa500e24866db0066dee7cb34b5	prose
+records/0145_acquired-plane.md	ac26ebce034405c3470560f7bc2c30c9dab82123	prose
 records/0146_refusals.md	258aedc29a87d673c4681657908ef68dab6dff5f	prose
 records/0147_url-freshness.md	ff54ad144ae13643cb6571742aa85fba75b1b30f	prose
-records/0148_pii.md	237774c88ccbadfa1b94ebb556d67f552fdab661	prose
+records/0148_pii.md	db82b5ad494f04c73871ce6ba76bdff8d6b40aa6	prose
 records/0149_expand.md	b855a01b3d080e6ad35f4e63a9866d0c309a3e6d	prose
 records/0150_tabular.md	dc0f4b2492b64e26818df15569214fa7867a4493	prose
 records/0151_chunking.md	ca077bdc8997952fbc860a54a2907981b793d20f	prose
 records/0152_doctor.md	9faea81033526a50b02733792774d838f3f8c1d9	prose
-records/0153_node-search.md	24d7e2fe3b978483e5da6c818f6549c1c3fb2528	prose
+records/0153_node-search.md	acd2829eee81db6f3d642e0c9960f4013a91071c	prose
 records/0154_api.md	8be46aebe34f4f2455350f2253e9d0e5c6f44898	prose
 records/0155_agent-surfaces.md	c0c2ecdbd9a406b030bd680c201e6dd44fb5947d	prose
 records/0156_inspect.md	61ee81897f1e1dfed20bc8cced6830ecdaa968f0	prose
 records/0157_observe.md	910fa84e1f858d4360a900b2b0dd92bdfb796a8b	prose
 records/0158_serve.md	fedae9ddb2c465050d5d1041fe840ddf66988651	prose
-records/0159_constants.md	5042ffd6cea90023833efb66c6a7203f6c9e31d8	prose
+records/0159_constants.md	6686786636eb0e51727e9eeaef7f325568aeebf7	prose
 records/0160_identifiers.md	f263e60073faaa049cb22db84e3edfdc38b2bef7	prose
 records/0161_sections.md	a0c2e1a53d8044004a132c51f5cd01987b82eaea	prose
+records/0162_llms.md	ba1ce0dfe6aa2be5fda66f0f6f6421226006cbcb	prose
+records/0163_lsp.md	b79c34870e9b95089f9201aea6637b37719eeabc	prose
+records/0164_vscode.md	ee1a8743e6a6173433898528004fcea4cffb7c4a	prose
 records/BIBLIOGRAPHY.md	0330c4879f38dd9b9e03a0cee7fe6b8265ab8c2a	prose
-records/README.md	1003e716350ebb3f0d71748ba60e39f33ffa202f	prose
+records/README.md	7a47cfbb0f12eced190c8065dbbeac97087d9169	prose
 records/TEMPLATE.md	5c8f49120633c5766122218aa4e9f9d09a5f35c5	prose
 tools/archived-signal-eval/PRE-REGISTRATION.md	e61f32202c7d8ff4146d1772c5ba8c017f522809	prose
 tools/archived-signal-eval/queries.jsonl	53451b6ed99085039dc8e1e95367604ed9bbb1dc	jsonl@sha:e336198fe1681628
@@ -745,14 +751,14 @@ tools/t2-eval/PRE-REGISTRATION.md	0678bc82904423b9aa82c801f4286abbdc84961c	prose
 tools/vector-gate/README.md	544da73b4409bef1e5dac598d9b8214d8abf4180	prose
 work/BACKLOG.md	9f08862c55f2b5aa7ea81fa48b14d1f405d46c70	prose
 work/BLOCKED.json	5598b94e0d231527edb50b11f34722b0a6a86ed4	json@sha:df03417b3bc177d9
-work/IMPLEMENTATION.md	fd72b26d806c1a986624f2163bff021d8689607e	prose
-work/INTERVIEW.md	b9dd50bf5d1e31731671c8aac59ede4b9b853c41	prose
+work/IMPLEMENTATION.md	e732d25c8ab483bbf6d2c3435f9df9669fba5b91	prose
+work/INTERVIEW.md	cca558a48226925ca5ed50db8567785343136be8	prose
 work/LESSONS.md	f91b46f8742c542fe12e2d871452148c56751eae	prose
 work/MACHINE.md	34863c282c90b7363a5eb7da18a622354a995c35	prose
-work/NOW.md	22fee5585f380e3846a2363beccfd9c83414c7ed	prose
-work/OPEN-WORK.md	413357870ee01720f81187a3f902977e916ead73	prose
+work/NOW.md	199ecaa7b092cf04935d71be0b68591950ff4237	prose
+work/OPEN-WORK.md	5804c771f70c8edce122ddb82f843fb628aec625	prose
 work/README.md	d5073a07920179dc0c35071dc2337a8ed6856ddb	prose
-work/WORKLOG.md	eeab94feffc1f25d719b3448407b3bcbaa5e67a5	prose
+work/WORKLOG.md	bb18a760123e39a821b9fdfcd2b6d76a59270fd3	prose
 work/architecture-algorithms.svg	fdf6ef399bf2649dd92510973076e607cb955576	svg@sha:0d25b190415a4706
 work/architecture-answer.svg	3e133168cf7695f77b23accae2835e28418ee770	svg@sha:0d25b190415a4706
 work/architecture-ask.svg	40d6f07068f275412528bb14d5a3455bc0626778	svg@sha:0d25b190415a4706
@@ -783,11 +789,12 @@ work/benchmark/reports/2026-09-16-node-column.html	e163025485cc26770013fe23e768b
 work/benchmark/reports/2026-09-21-golden-three-engines.html	f1ffb1e2717ae3445366c99204c87641a88b16d2	html@sha:773b7cb1d9a7be6e
 work/benchmark/reports/README.md	ac1e0a689941adcd093a1a32f5ceb313d4a7c6a4	prose
 work/benchmark/reports/TEMPLATE.html	00355e33593c3641079295802699f8d74aaf1ded	html@sha:773b7cb1d9a7be6e
-work/compare/README.md	47ab6039031b4433681630884015af6e06955fd4	prose
+work/compare/README.md	a5764eb4e2cab5dedc882e75c5ada7229cd99568	prose
 work/compare/abstention-gates.compare.md	2faaf7b160a61b05428d8ec5beca42c398effaf5	prose
 work/compare/authority-prior.compare.md	9a7f8ea532d543b0e98d69be2d29dcb4afd8b256	prose
 work/compare/cli-library-parity.compare.md	645bad578196be28117b831bc3a54427852e62b3	prose
 work/compare/consumer-template-refresh.compare.md	3a7d92a0350684f427f02894c80773e7c25156b3	prose
+work/compare/editor-and-llms-surfaces.compare.md	561840b1144e4f214267f19e2eba28724eb63049	prose
 work/compare/ingest-under-one-second.compare.md	47aee3685e178fe783381dedcb1cc08e6ff0ed76	prose
 work/compare/l12-classify.compare.md	8fce69163fde10efb6afd66d632b4c4c00492cb1	prose
 work/compare/node-plane-rebuild.compare.md	10dc763eb4fbc4fd9d549a9bee326040cea68801	prose

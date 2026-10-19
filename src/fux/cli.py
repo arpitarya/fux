@@ -46,6 +46,8 @@ VERBS: dict[str, tuple[tuple[str, str, str], ...]] = {
     "enrich": (('writer', 'fux.enrich', 'cmd_enrich'),),
     "serve": (('engine', 'fux.serve', 'cmd_serve'),),
     "mcp": (('reader', 'fux.mcp', 'cmd_mcp'),),
+    "lsp": (('reader', 'fux.lsp', 'cmd_lsp'),),
+    "llms": (('reader', 'fux.llms', 'cmd_llms'),),
     "hooks": (('writer', 'fux.maintain', 'cmd_hooks'),),
     "daemon": (('writer', 'fux.maintain', 'cmd_daemon'),),
     "verify": (('reader', 'fux.query', 'cmd_verify'),),
@@ -876,6 +878,39 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_mcp.set_defaults(func=_dispatch)
 
+    # W-285. A verb, like `mcp`, for `mcp`'s reason: a long-running stdio
+    # server an editor spawns, not a query. SR-LSP.
+    p_lsp = _verb(
+        "lsp", help="serve the index over the Language Server Protocol on stdio, for editors"
+    )
+    p_lsp.add_argument(
+        "--no-output-config",
+        action="store_true",
+        help="ignore .fux/output.toml and use the template `fux setup` writes",
+    )
+    p_lsp.set_defaults(func=_dispatch)
+
+    # W-284. A verb rather than a flag on `find`: its output is a document in
+    # someone else's format (llms.txt), not a result list. SR-LLMS.
+    p_llms = _verb(
+        "llms", help="print an llms.txt (or, with --full, an llms-full.txt) from the index"
+    )
+    p_llms.add_argument(
+        "--in", dest="prefixes", action="append", metavar="PREFIX",
+        help="only documents whose loc starts with PREFIX (repeatable; default: every document)",
+    )
+    p_llms.add_argument(
+        "--full", action="store_true",
+        help="append each prose document's text, read off disk -- the llms-full.txt convention",
+    )
+    p_llms.add_argument("--title", help="the H1 (default: the repository's directory name)")
+    p_llms.add_argument("--summary", help="the blockquote under the H1 (default: none)")
+    p_llms.add_argument(
+        "--base-url", metavar="URL",
+        help="prefix every file link with URL (default: links are repo-relative)",
+    )
+    p_llms.set_defaults(func=_dispatch)
+
     # W-210 — the explorer. A LOCAL page over the real `ask`, and the verb
     # carries no `--host`: `serve.HOST` is the contract, not a default, and a
     # flag would turn a refusal into a preference. See `serve/__init__.py`.
@@ -1114,7 +1149,7 @@ def main(argv: list[str] | None = None) -> int:
     # computed first, stdout is flushed, and only then does anything in
     # `.fux/observers/` run — and its return value is discarded.
     #
-    # ⚠ **`fux mcp` is excluded by name.** A long-lived server calling consumer
+    # ⚠ **`fux mcp` and `fux lsp` are excluded by name.** A long-lived server calling consumer
     # code once per request is a different decision with a different blast
     # radius, and SR-OBSERVE does not make it.
     started = time.monotonic()
@@ -1136,7 +1171,7 @@ def _observe(args, argv: list[str] | None, ms: int) -> None:
     the same shape `_apply_pin` takes for an unpinned query. The import is
     local so `--version` stays instant (SR-CLI decision 7).
     """
-    if args.command == "mcp":
+    if args.command in ("mcp", "lsp"):
         return
     try:
         sys.stdout.flush()

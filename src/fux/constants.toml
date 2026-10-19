@@ -384,6 +384,46 @@ method_not_found = -32601
 # fux_search's score and fux_related's mass are rounded to this many digits.
 score_digits     = 6
 
+[lsp]
+# LSP 3.17 base protocol (lsp.py, W-285). JSON-RPC's own version and reserved
+# codes are [mcp]'s; these are the ones LSP adds.
+header                 = "Content-Length"
+server_not_initialized = -32002
+request_failed         = -32803
+# TextDocumentSyncKind.Full, SymbolKind.File, DiagnosticSeverity.
+sync_full              = 1
+symbol_kind            = 1
+severity_warning       = 2
+severity_information   = 3
+# The diagnostic source and the server's name.
+source                 = "fux"
+# The position encoding every client accepts.
+position_unit          = "utf-16"
+# Bytes per UTF-16 code unit: an LSP column is a byte length divided by this.
+unit_bytes             = 2
+# The methods the server answers or sends.
+initialize             = "initialize"
+shutdown               = "shutdown"
+exit                   = "exit"
+did_open               = "textDocument/didOpen"
+did_change             = "textDocument/didChange"
+did_save               = "textDocument/didSave"
+did_close              = "textDocument/didClose"
+workspace_symbol       = "workspace/symbol"
+hover                  = "textDocument/hover"
+references             = "textDocument/references"
+publish_diagnostics    = "textDocument/publishDiagnostics"
+
+[llms]
+# `fux llms` (llms.py, W-284) -- the llms.txt format's own words. `Optional`
+# is the spec's name for the section a reader may skip (llmstxt.org).
+optional_section = "Optional"
+# The section the repository's root-level files are listed under.
+root_section     = "Overview"
+# Between documents in --full output, and the line naming each one's source.
+separator        = "---"
+source_label     = "Source:"
+
 [receipt]
 statement_type = "https://in-toto.io/Statement/v1"
 predicate_type = "https://fux.dev/receipt/v1"

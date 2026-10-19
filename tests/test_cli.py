@@ -160,6 +160,12 @@ def test_parser_has_the_verb_surface():
         # have different provenance, different survival under regeneration and
         # different `--check` treatment.
         "correct",
+        # SR-LSP (W-285). A verb, like `mcp`: a long-running stdio server an
+        # editor spawns, not a query.
+        "lsp",
+        # SR-LLMS (W-284). A verb rather than a flag on `find`: its output is a
+        # document in llms.txt's format, not a result list.
+        "llms",
     }
 
 

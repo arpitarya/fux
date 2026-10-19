@@ -4,7 +4,7 @@ Part of [fux](https://github.com/arpitarya/fux) — rank your written knowledge
 from a small index committed to git; fetch content from the systems that own
 it; verify freshness at answer time.
 
-**`fux-reader` is the reader: `fux ask`, `find`, `answer` (refer included — the cited document is re-read from its source and re-checked), `lexical`, `verify`, `explain`, `graph`, `path`, `build` and `mcp`, plus a reader's `fux doctor`. It reads a committed index; it never writes one.**
+**`fux-reader` is the reader: `fux ask`, `find`, `answer` (refer included — the cited document is re-read from its source and re-checked), `lexical`, `verify`, `explain`, `graph`, `path`, `build`, `mcp`, `lsp` and `llms`, plus a reader's `fux doctor`. It reads a committed index; it never writes one.**
 
 Most people want everything: `pip install fux-engine` installs `fux-core`,
 `fux-reader` and `fux-writer` together, exactly as one package did before.

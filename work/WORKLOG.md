@@ -23,6 +23,14 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-19 — W-284 · W-285 · W-286: `fux llms`, `fux lsp`, the VS Code extension; 4.1.0 cut  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"create llms-full.txt and llms.txt files as well as mcp and lsp for vscode research and build it out create work items then implement it and close them then commit push and publish a new version."*
+- **Decided (compare doc `editor-and-llms-surfaces`, his to override):** L1 both verbs Python/stdlib/reader layer · C1 hand-rolled LSP client, no dependency · S1 `.vsix` on the GitHub release, no Marketplace (needs his publisher) · F1 llms output to stdout only (L3), this repo's own pair generated and test-bound.
+- **Done:** `src/fux/llms.py`, `src/fux/lsp.py`, `vscode/` (client + extension, one bundled file), `scripts/build-vsix.py`, `scripts/gen-llms.py` + `just llms`, root `llms.txt` / `llms-full.txt`; SR-LLMS/SR-LSP/SR-VSCODE; SR-CLI d19, SR-WORK-RELEASE d16; CI builds the `.vsix`, `publish.yml` attaches it; 4.1.0 on eight sites. W-284/285/286 filed and closed.
+- **Verified:** `.vsix` installs into a scratch `--extensions-dir` (VS Code 1.142.0); the extension's client drives the real `fux lsp` (e2e). Not verified: activation inside a live VS Code window.
+- **Incident:** an unquoted heredoc ran its backticks — `pip install fux-engine` (failed: no `pip` on PATH) and a `fux mcp` that sat on stdin until stopped. Nothing installed; file rewritten with the Write tool. **Next:** CI green, then `gh release create v4.1.0`, then confirm six names + the `.vsix` asset.
+
 ## 2026-10-18 — 4.0.3 published on all six names  ·  Claude Code (Opus 5.5)
 
 - **Done:** CI green on `a95b6088` (38/38), `v4.0.3` released; publish run 39131563782 green on every job.

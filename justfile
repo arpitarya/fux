@@ -189,3 +189,12 @@ test-all: test test-e2e test-node
 # The published Node bundle (L10).
 bundle:
     {{py}} -m fux.store.nodebundle node node/dist
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Generated views
+# ─────────────────────────────────────────────────────────────────────────────
+
+# This repository's own llms.txt and llms-full.txt, rendered by `fux llms`
+# (W-284, SR-LLMS). tests/test_llms.py fails while either is stale.
+llms:
+    {{py}} scripts/gen-llms.py --write

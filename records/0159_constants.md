@@ -5,13 +5,13 @@ name: SR-CONSTANTS
 title: SR-CONSTANTS (0159) — the engine's fixed values live in one TOML file both planes read
 description: "src/fux/constants.toml holds every fixed engine value — schema ids, format and rules versions, artefact names, decoder versions, and the numbers a file format or protocol defines. One Python loader and one Node loader read it; the Node bundle carries it inlined; a missing table or key stops the process naming it."
 status: accepted
-amended: 2026-10-13
+amended: 2026-10-19
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@90b3e80a39c4]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@516ec11efc31]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: a2ef0d149fe38a8f93644b0dfd4e3bef5c3e351381cd6e1a808eb453a2ae4516
+content_sha: 18707b1546c7f076e2a98f85a39d84ed3f63e915ea88559805f05f21c3627332
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -188,6 +188,8 @@ pattern. A consumer who wants other cues is I2, which is not built.
 **No decision here moved** (W-248, 2026-10-04): two keys, `decoders.reason_no_decoder` and `decoders.reason_nothing_readable`, spell the queue reasons `decode.reason()` writes.
 
 **No decision here moved** (W-246, 2026-10-04): `[doctor] decoder_network_modules` joined constants.toml, the module list the `decoder imports` row scans for.
+
+**No decision here moved** (W-284, W-285, 2026-10-19): `[lsp]` holds the Language Server's protocol numbers and method names ([SR-LSP](0163_lsp.md) decision 9; JSON-RPC's own are `[mcp]`'s), and `[llms]` the llms.txt format's words ([SR-LLMS](0162_llms.md) decision 7).
 
 **No decision here moved** (W-259, 2026-10-04): `[env] graph_rebuild` names `FUX_GRAPH_REBUILD`, the switch that makes the Node reader rebuild the graph plane even when `graph.json` is fresh ([SR-NODE-SEARCH](0153_node-search.md) decision 9).
 

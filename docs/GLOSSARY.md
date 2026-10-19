@@ -443,6 +443,13 @@ Document-centric, so every document keeps *some* postings (unlike term-centric
 pruning, which can empty a document entirely). Büttcher & Clarke, CIKM 2006
 (ref [1]). Measured by [M1](../work/IMPLEMENTATION.md).
 
+**Language server (`fux lsp`)** — The index served to an editor over the
+Language Server Protocol: workspace symbols are a ranked search, hover on a
+link describes its target, references are backlinks, and a link to an archived
+or superseded document is a warning. Any LSP client can run it; the
+[VS Code extension](../vscode/README.md) runs it for you.
+[SR-LSP](../records/0163_lsp.md).
+
 **Layer (core / reader / writer / engine)** — Which distribution a file under
 `src/fux/` ships in once fux is split (W-282). **core** is shared and has no
 verbs; **reader** ranks and answers, refer included; **writer** ingests and
@@ -456,6 +463,12 @@ document — [locator](#locator), `sha@index` (the content hash *as indexed*),
 `mode`, version info. It answers *what is in the corpus, from where,
 at which version* without holding any content, and its sort order defines
 [doc-ids](#doc-id). Replaces the archived `fux.lock`.
+
+**llms.txt / llms-full.txt** — A Markdown map of a project for a language
+model ([llmstxt.org](https://llmstxt.org/)); the *full* form appends the
+documents' text. `fux llms` prints both from the index, to stdout only, and
+this repository commits its own pair at the root.
+[SR-LLMS](../records/0162_llms.md).
 
 **Locator** — The stable, source-system-native address of a document: a repo
 path + blob sha for git, a URL for HTTP, a page id + version for Confluence.

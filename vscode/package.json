@@ -1,0 +1,50 @@
+{
+  "name": "fux",
+  "displayName": "Fux",
+  "description": "Your repository's fux index in the editor: MCP tools for agent mode, plus search, link hovers, backlinks and archived-link warnings over LSP.",
+  "version": "4.1.0",
+  "publisher": "arpitarya",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/arpitarya/fux.git" },
+  "homepage": "https://github.com/arpitarya/fux",
+  "engines": { "vscode": "^1.101.0", "node": ">=22" },
+  "categories": ["AI", "Other"],
+  "keywords": ["fux", "mcp", "lsp", "documentation", "search"],
+  "activationEvents": ["workspaceContains:.fux/index"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "mcpServerDefinitionProviders": [
+      { "id": "fux", "label": "Fux" }
+    ],
+    "commands": [
+      { "command": "fux.search", "title": "Search the index", "category": "Fux" },
+      { "command": "fux.restart", "title": "Restart the language server", "category": "Fux" },
+      { "command": "fux.showOutput", "title": "Show output", "category": "Fux" }
+    ],
+    "configuration": {
+      "title": "Fux",
+      "properties": {
+        "fux.command": {
+          "type": "string",
+          "default": "fux",
+          "description": "The fux executable. Install it with `pip install fux-engine` (or `fux-reader`), or give its full path."
+        },
+        "fux.mcp.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Register `fux mcp` for every workspace folder that has a .fux/index."
+        },
+        "fux.lsp.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run `fux lsp` for every workspace folder that has a .fux/index."
+        },
+        "fux.search.debounceMs": {
+          "type": "number",
+          "default": 200,
+          "description": "How long `Fux: Search the index` waits after a keystroke before it searches."
+        }
+      }
+    }
+  }
+}

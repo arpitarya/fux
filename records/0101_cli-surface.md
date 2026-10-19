@@ -5,13 +5,13 @@ name: SR-CLI
 title: SR-CLI (0101) — the command-line surface
 description: Flat verbs in seven groups, one error boundary, three output modes. Freezes the CLI contract with a captured transcript of every command and its real output.
 status: accepted
-amended: 2026-10-13
+amended: 2026-10-19
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@ca147df6eeb4, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@898d2cf2c7ee, src/fux/progress.py@10364bd02e0a, tests_e2e@438c745622ca, node/fux.mjs@6af00138fe82, src/fux/stdio.py@9e270b49bdaa]
+owns: [src/fux/cli.py@aa502f353fb6, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@898d2cf2c7ee, src/fux/progress.py@10364bd02e0a, tests_e2e@59be546571d4, node/fux.mjs@69e53d32263f, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d7a1ccc0f9a21abf3ea8fd20b969dab79cc7b96fe5b85affb7b4cb2d336deaeb
+content_sha: 2acb7a3e42d71c256da98beee56949d6c8aaef7e4dbc0ddbaae96a90b12ec30a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -36,12 +36,12 @@ content_sha: d7a1ccc0f9a21abf3ea8fd20b969dab79cc7b96fe5b85affb7b4cb2d336deaeb
 
 | group | verbs | |
 |---|---|---|
-| **lifecycle** | `setup` · `doctor` · `inspect` · `identifiers` · `register` | set the repo up, check the environment, then X-ray the index — `doctor`'s fix is a command or a config edit, `inspect`'s is a change to the corpus, `identifiers` records the ID families `inspect` found (SR-IDENTIFIERS) ([SR-INSPECT](0156_inspect.md)), and `register` prints what the index holds, one line per document, for a machine ([SR-INGEST](0106_ingest.md) decision 22d; decision 18) |
+| **lifecycle** | `setup` · `doctor` · `inspect` · `identifiers` · `register` · `llms` | set the repo up, check the environment, then X-ray the index — `doctor`'s fix is a command or a config edit, `inspect`'s is a change to the corpus, `identifiers` records the ID families `inspect` found (SR-IDENTIFIERS) ([SR-INSPECT](0156_inspect.md)), `register` prints what the index holds, one line per document, for a machine ([SR-INGEST](0106_ingest.md) decision 22d; decision 18), and `llms` prints it as an llms.txt for a language model ([SR-LLMS](0162_llms.md)) |
 | **write** | `ingest` · `build` | one writes the committed plane, one derives from it. **`ingest` is the first ingest AND every re-ingest**, directories and URLs alike — decision 16 |
 | **sources** | `add` · `remove` · `enrich` · `correct` | maintain what is indexed — `add` and `remove` write lines and end in an ingest, `enrich` plans and validates a MODEL's text, and `correct` writes one question a PERSON typed ([SR-ENRICH](0137_enrich.md) decision 19). ⚠ **`update` was a fourth verb here and decision 16 deleted it** |
 | **read** | `ask` · `find` · `answer` · `lexical` | differ only in how much they commit to. `lexical` is the words alone, **frozen** — decision 12 |
 | **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
-| **serve** | `serve` · `mcp` · `daemon` | long-running processes; the only verbs that do not return. `serve` (W-210, 2026-09-22) is a **local page over the real `ask`**, bound to `127.0.0.1` with no `--host`; `mcp` is the same index over the Model Context Protocol; `daemon` watches for staleness |
+| **serve** | `serve` · `mcp` · `lsp` · `daemon` | long-running processes; the only verbs that do not return. `serve` (W-210, 2026-09-22) is a **local page over the real `ask`**, bound to `127.0.0.1` with no `--host`; `mcp` is the same index over the Model Context Protocol; `lsp` is the same index over the Language Server Protocol, for an editor ([SR-LSP](0163_lsp.md)); `daemon` watches for staleness |
 | **maintenance** | `hooks` · `tune` · `output` · `verify` | wire the repository to keep its own index in step, print the tunables and the output defaults, and re-run a provenance receipt against this tree |
 
 ⚠ **`output` was missing from this table until 2026-09-14 (W-164 gate 2).**
@@ -1412,6 +1412,15 @@ places it:
   (SR-INGEST decision 22c).
 
 
+**19. `fux lsp` and `fux llms` are flat reader verbs** (W-285, W-284,
+Arpit 2026-10-19). `lsp` joins **serve**: a long-running stdio server an editor
+spawns, excluded from `.fux/observers/` by name like `mcp`; its contract is
+[SR-LSP](0163_lsp.md)'s. `llms` joins **lifecycle** beside `register`: both
+print what the index holds, `register` for a machine and `llms` as an llms.txt
+for a language model — stdout only, never a file ([SR-LLMS](0162_llms.md)).
+Neither has a `CLI_VERBS` row: `lsp` resolves `[cli.ask] top` itself, as `mcp`
+resolves `[mcp]`, and `llms` has no `--json` and no output key.
+
 **16. Which package runs which verb** (W-282, 2026-10-18). `cli.py` is core —
 it ships in `fux-core`, with the `fux` script — and runs each verb through its
 `VERBS` table: the verb, the module that runs it, and that module's layer
@@ -1422,7 +1431,7 @@ not installed here``, exit 1), never reported as an unknown choice.
 | package | its verbs |
 |---|---|
 | fux-core | `tune` · `output` |
-| fux-reader | `ask` · `lexical` · `find` · `answer` · `verify` · `explain` · `graph` · `path` · `build` · `mcp` · `doctor` (its rows) |
+| fux-reader | `ask` · `lexical` · `find` · `answer` · `verify` · `explain` · `graph` · `path` · `build` · `mcp` · `lsp` · `llms` · `doctor` (its rows) |
 | fux-writer | `setup` · `ingest` · `add` · `remove` · `register` · `enrich` · `correct` · `hooks` · `daemon` · `doctor` (its rows, and `--fix`) — and the `fux-merge-index` script |
 | fux-engine | everything above, plus `inspect` · `serve` · `identifiers` and the whole `doctor` |
 

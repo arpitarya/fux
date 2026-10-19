@@ -75,6 +75,9 @@ SITES = {
     "pyproject.toml": _pins("pyproject.toml", ("fux-core", "fux-reader", "fux-writer")),
     "packages/fux-reader/pyproject.toml": _pins("packages/fux-reader/pyproject.toml", ("fux-core",)),
     "packages/fux-writer/pyproject.toml": _pins("packages/fux-writer/pyproject.toml", ("fux-core",)),
+    # W-286: the VS Code extension ships on the same version, as a .vsix on
+    # the release — the eighth site (SR-VSCODE).
+    "vscode/package.json": _re("vscode/package.json", r'^\s*"version":\s*"([^"]+)"'),
 }
 
 

@@ -8,6 +8,33 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [4.1.0] - 2026-10-19
+
+**Three new surfaces, no ranking change.** Same index format
+(`fux.index.v8` — no re-ingest), same `ask`/`find`/`answer` output.
+
+### Added
+
+- **`fux lsp`** — the index over the Language Server Protocol, for any editor
+  (W-285, [SR-LSP](records/0163_lsp.md)). Workspace symbols are a ranked
+  search placed at the matching heading; hover on a Markdown link shows the
+  target's title, archived/superseded state, commit date and link counts; Find
+  All References lists backlinks; a link to an archived or superseded document
+  is a warning as you type. Stdlib only, and the index stays loaded between
+  requests, as in `fux mcp`.
+- **`fux llms`** — prints an [llms.txt](https://llmstxt.org/) from the index
+  (`--in PREFIX`, `--title`, `--summary`, `--base-url`), and with `--full` an
+  llms-full.txt: every prose document's text, read off disk. Output goes to
+  stdout only, so fux writes no copy of your corpus (W-284,
+  [SR-LLMS](records/0162_llms.md)). This repository now ships its own
+  `llms.txt` and `llms-full.txt` at the root.
+- **The VS Code extension** — `fux-4.1.0.vsix` on the GitHub release (W-286,
+  [SR-VSCODE](records/0164_vscode.md)). For every folder with a `.fux/index/`
+  it registers `fux mcp` through VS Code's MCP API, so agent mode gets the
+  three tools without an `mcp.json`. It also runs `fux lsp` and adds
+  `Fux: Search the index`. It has no dependencies and needs VS Code 1.101+ and
+  `fux` on `PATH`.
+
 ## [4.0.3] - 2026-10-18
 
 **No engine change.** A version bump on all six names — `fux-core`,

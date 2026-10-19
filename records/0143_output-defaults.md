@@ -6,14 +6,14 @@ title: SR-OUTPUT (0143) — output defaults are configurable, in a third file
 description: "`.fux/output.toml` sets the default SHAPE of every verb's output — and of the MCP surface, which has no flags at all. A third file because it has a third boundary: it changes how a result is shown, never which documents come back."
 status: accepted
 built: 2026-08-28
-amended: 2026-10-13
+amended: 2026-10-19
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
 owns: [src/fux/output_config.py@5d3b9020433f, src/fux/templates/output.toml.txt@0952128ae0aa, .fux/output.toml@4a3a8465d2e4, node/src/config/output.mjs@a00d8fa88ee8]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 014bbba49bae8cea273b93edb4a189a2295b8ea99ca7c88fb177a0eb614995db
+content_sha: b3f99c52ff30986774783d7ba0789069250a540aab41d33a1c2d365ef502e528
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -783,6 +783,8 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 `runtime` kind's description string, which gained `runtime/inspect/`
 ([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
 **It does not reach this record's claim on that file.**
+
+**No decision moved (W-285, W-284, 2026-10-19).** `fux lsp` reads `.fux/output.toml` once at start-up and resolves `ask`'s `top` through `resolve("ask", "top")` — the person's number, for a person's editor — and honours `--no-output-config` (decision 15). Like `mcp`, it has no `CLI_VERBS` row: it carries no gated flag. `fux llms` has no output key and no `--json`, so it neither reads the file nor needs a row. The `cli.py` edit adds their parsers; no gated flag was added.
 
 **No decision moved (W-279, 2026-10-13).** `CLI_VERBS` gained `register: ()`
 — the new read-only verb ([SR-CLI](0101_cli-surface.md) decision 18) resolves

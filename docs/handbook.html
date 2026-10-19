@@ -2513,6 +2513,13 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
         to fence.</td><td><code>--plan --check</code></td></tr>
       <tr><td><code>fux mcp</code></td><td>Serve the index over MCP on stdio, for coding agents.</td>
         <td>—</td></tr>
+      <tr><td><code>fux lsp</code></td><td>Serve the index over the Language Server Protocol on stdio,
+        for editors: symbol search, link hovers, backlinks, archived-link warnings. The VS Code
+        extension (a <code>.vsix</code> on each release) runs it and registers <code>fux mcp</code>.</td>
+        <td><code>--no-output-config</code></td></tr>
+      <tr><td><code>fux llms</code></td><td>Print an llms.txt of the indexed documents — or, with
+        <code>--full</code>, an llms-full.txt with each prose document's text. Stdout only.</td>
+        <td><code>--in --full --title --summary --base-url</code></td></tr>
     </tbody>
   </table>
   </div>

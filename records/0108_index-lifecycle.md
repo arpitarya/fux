@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@21e5ce665c5f, node/src/store/format.mjs@4fc4a43aafe0, node/src/store/reader.mjs@ea5bf3de3b4d]
+owns: [src/fux/store@5564d72af89f, node/src/store/format.mjs@4fc4a43aafe0, node/src/store/reader.mjs@ea5bf3de3b4d]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: e923c33239c805863009bf6b696216a449c70a2ebdaaf12b78a9df5bdaa33c94
+content_sha: 8c66227a1f4281734933da22cff9bd133380b33f59d4b767e1340f8c5390261d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

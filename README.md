@@ -67,7 +67,8 @@ wrong answer is worse than none.
   lets anyone reproduce it later.
 - 🤖 **Built for agents first.** `fux setup` drops ready-made skills and
   instructions for **Claude Code, Codex, GitHub Copilot and Kiro**, and
-  `fux mcp` serves the index over MCP.
+  `fux mcp` serves the index over MCP, `fux lsp` serves it to your editor, and
+  `fux llms` prints it as an [llms.txt](llms.txt).
 - 🔒 **Offline unless you ask.** No telemetry, no network on any default path,
   PII redaction before anything is committed.
 - 🧾 **Your docs never move.** fux stores statistics, not content. Sources stay
@@ -108,7 +109,15 @@ plain `git clone`.
 ```bash
 fux setup        # skills + instructions for Claude Code, Codex, Copilot, Kiro, plus AGENTS.md
 fux mcp          # MCP over stdio: fux_search, fux_passage, fux_related
+fux lsp          # LSP over stdio: search, link hovers, backlinks, archived-link warnings
+fux llms --full  # an llms-full.txt of the corpus, to stdout
 ```
+
+**VS Code:** install the `.vsix` from the
+[latest release](https://github.com/arpitarya/fux/releases/latest)
+(`code --install-extension fux-<version>.vsix`). It registers `fux mcp` for
+agent mode automatically and runs `fux lsp` — no `mcp.json` to write
+([`vscode/`](vscode/README.md) · [SR-VSCODE](records/0164_vscode.md)).
 
 The instructions teach the agent to **search the index before grepping**, read
 the JSON (not the prose), and treat an archived document as history rather than
@@ -176,7 +185,7 @@ Honesty up front, so you don't find out the hard way:
 
 ## Status
 
-**`4.0.3` is the latest release** (`pip install fux-engine`). The index format is versioned and fux tells you when to run
+**`4.1.0` is the latest release** (`pip install fux-engine`). The index format is versioned and fux tells you when to run
 `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ⭐ **Star the repo** if fux saved your agent from one confident wrong answer —
