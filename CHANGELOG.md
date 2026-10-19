@@ -8,6 +8,14 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [4.1.1] - 2026-10-19
+
+**No engine change.** A version bump on all six names — `fux-core`,
+`fux-reader`, `fux-writer` and `fux-engine` on PyPI, `fux-engine` and
+`@fux-engine/reader` on npm — and on the VS Code extension's `.vsix`, with the
+committed index re-ingested to match the tree it ships from. The extension's
+README names the `.vsix` by `<version>` rather than a fixed release.
+
 ## [4.1.0] - 2026-10-19
 
 **Three new surfaces, no ranking change.** Same index format

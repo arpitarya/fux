@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-14
 amended: 2026-10-19
 feature: how a release reaches two registries, how the version stays equal across its sites, and what the branch wall does not do
-owns: [scripts/check-version-parity.py@72454ae055c2, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@026df0094b57, scripts/npm-scoped.py@4214c9c3380a]
+owns: [scripts/check-version-parity.py@72454ae055c2, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@813638a7e6a2, scripts/npm-scoped.py@4214c9c3380a]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: f63ca9397c4ef8b209fdec4564902df6f143275075fcd4d6dd7b84b0818058e9
+content_sha: cceabadd2c558175c26cbeaff8fc225418e97c6d4a8a8b3f9b79ba722bf3e05c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

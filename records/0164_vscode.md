@@ -7,10 +7,10 @@ description: "One dependency-free extension that registers `fux mcp` through VS 
 status: accepted
 date: 2026-10-19
 feature: the VS Code extension — the editor install for both protocols
-owns: [vscode@3471387dd5a2, scripts/build-vsix.py@220c1d54ada6]
+owns: [vscode@1b99aef63b10, scripts/build-vsix.py@220c1d54ada6]
 laws: [L2, L5, L10]
 timestamp: 2026-10-19T00:00:00Z
-content_sha: f6971d9ce42da85d0605fc3005652e622fc1143ab4db0c2c7cebb01ec7fc99f0
+content_sha: 3648231703ad5bc5e50c3825a650be8d775ec47da1b97c7286a1abb1231b1440
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

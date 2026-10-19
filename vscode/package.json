@@ -2,7 +2,7 @@
   "name": "fux",
   "displayName": "Fux",
   "description": "Your repository's fux index in the editor: MCP tools for agent mode, plus search, link hovers, backlinks and archived-link warnings over LSP.",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "publisher": "arpitarya",
   "license": "MIT",
   "repository": { "type": "git", "url": "https://github.com/arpitarya/fux.git" },

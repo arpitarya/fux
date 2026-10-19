@@ -20,7 +20,7 @@ Download `fux-<version>.vsix` from the
 [GitHub release](https://github.com/arpitarya/fux/releases), then:
 
 ```console
-code --install-extension fux-4.1.0.vsix
+code --install-extension fux-<version>.vsix
 ```
 
 ## Requirements

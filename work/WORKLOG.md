@@ -23,6 +23,12 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-19 — 4.1.1 cut: a patch bump, committed, not released  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"commit everything and upgrade a patch version."*
+- **Done:** the post-commit hook's re-index committed; eight version sites, `.fux/node`, README and CLAUDE.md facts → 4.1.1; CHANGELOG `[4.1.1]`; `vscode/README.md` names the `.vsix` by `<version>`; owns and content_sha re-stamped; index re-ingested, `ingest --check` clean; `llms*.txt` regenerated.
+- **Verified:** units 7239, e2e 187, Node 242, extension client 9 — green; `.vsix` builds at 4.1.1. **Not done:** push and release — not asked. **Next:** Arpit's go to push and `gh release create v4.1.1`.
+
 ## 2026-10-19 — 4.1.0 published on all six names, `.vsix` on the release  ·  Claude Code (Opus 5.5)
 
 - **Done:** CI green on `0e5a950f` (38/38), `v4.1.0` released; publish run 39217050658 green on all six jobs, `publish-vsix` included.

@@ -185,7 +185,7 @@ Honesty up front, so you don't find out the hard way:
 
 ## Status
 
-**`4.1.0` is the latest release** (`pip install fux-engine`). The index format is versioned and fux tells you when to run
+**`4.1.1` is the latest release** (`pip install fux-engine`). The index format is versioned and fux tells you when to run
 `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ⭐ **Star the repo** if fux saved your agent from one confident wrong answer —
