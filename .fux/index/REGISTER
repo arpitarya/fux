@@ -656,7 +656,7 @@ records/0063_WORK-release.md	bbcff3cbe863d942dfc1284e26ab75877d095f79	prose
 records/0064_WORK-blockers.md	8cc7fa229f31e57f18cb6b3c5564b9d31eb86599	prose
 records/0065_WORK-governance.md	c807882350385e7920e1103ff2759ced5572500c	prose
 records/0066_WORK-golden.md	77ae5051faafb8703c42a188f52d60c0f67131d7	prose
-records/0067_WORK-registry.md	9ba1f08fb1b165936e70aa958e324422ffaac34f	prose
+records/0067_WORK-registry.md	1641d31f540881bbb04f5cd135ca82d5eac4e9ba	prose
 records/0068_WORK-test-data.md	a437be3ce2d31a1d9d7c181339827df7bbd3ee86	prose
 records/0101_cli-surface.md	4c2343bc36ab7ee79b7cdb94f7aadef9b0f4002e	prose
 records/0102_fux-directory.md	b08ca8bc0514bb6a347b60b0f8e411ee670695af	prose
@@ -755,10 +755,10 @@ work/IMPLEMENTATION.md	b71387cd766b64786703e3fdf4ffd5079b70fe5d	prose
 work/INTERVIEW.md	cca558a48226925ca5ed50db8567785343136be8	prose
 work/LESSONS.md	f91b46f8742c542fe12e2d871452148c56751eae	prose
 work/MACHINE.md	34863c282c90b7363a5eb7da18a622354a995c35	prose
-work/NOW.md	ada2aef33654a715a0d8dd798c8015a904442ae2	prose
+work/NOW.md	8448ecfc49df58544e93f2622b483530992c7c6e	prose
 work/OPEN-WORK.md	5804c771f70c8edce122ddb82f843fb628aec625	prose
 work/README.md	d5073a07920179dc0c35071dc2337a8ed6856ddb	prose
-work/WORKLOG.md	a3e70bc738ac6056117e45e8110b59e0fcb86ea5	prose
+work/WORKLOG.md	e58623d9e0141754a7b7356f6121e79cdf7cc354	prose
 work/architecture-algorithms.svg	fdf6ef399bf2649dd92510973076e607cb955576	svg@sha:0d25b190415a4706
 work/architecture-answer.svg	3e133168cf7695f77b23accae2835e28418ee770	svg@sha:0d25b190415a4706
 work/architecture-ask.svg	40d6f07068f275412528bb14d5a3455bc0626778	svg@sha:0d25b190415a4706
