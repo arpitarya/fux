@@ -52,8 +52,11 @@ from ..constants import fixed
 from ..frontmatter import parse as _parse_frontmatter
 
 _MIN_TABLE_LINES = fixed("markdown", "min_table_lines")
+#: W-287 B5 — the header pairs that make a two-column table a RECORD (a
+#: property sheet), compared lower-cased (`constants.toml [tables]`).
+_RECORD_HEADERS = frozenset(tuple(pair) for pair in fixed("tables", "record_headers"))
 
-__all__ = ["Passage", "chunk"]
+__all__ = ["Passage", "TableRow", "chunk"]
 
 #: A Markdown table row, and the `|---|---|` separator under a header row.
 #: A table is one "paragraph" — it contains no blank line — so without these
@@ -61,6 +64,14 @@ __all__ = ["Passage", "chunk"]
 #: for the assembler to refuse.
 _TABLE_ROW_RE = re.compile(r"^\s*\|")
 _TABLE_SEP_RE = re.compile(r"^\s*\|[\s:|-]+\|?\s*$")
+#: W-287 A5 — GFM's delimiter row with its edge pipes optional: `--- | :---:`.
+#: At least one `|` between two dash runs, so a lone `---` (an `<hr>`, a YAML
+#: fence) is never one. A table whose rows carry no leading `|` used to be an
+#: ordinary paragraph — one passage for the whole table, SR-TABULAR's 0.229 case.
+_GFM_SEP_RE = re.compile(r"^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$")
+#: A row's cells: its edge pipes off, split on every `|` no backslash escapes.
+_ROW_EDGES_RE = re.compile(r"^\s*\|?(.*?)(?<!\\)\|?\s*$")
+_CELL_SPLIT_RE = re.compile(r"(?<!\\)\|")
 
 #: The three `[refer]` bounds — `min_passage_bytes` (below it a section MAY
 #: fold forward, but only into a section NESTED INSIDE it: `_fold`),
@@ -68,6 +79,36 @@ _TABLE_SEP_RE = re.compile(r"^\s*\|[\s:|-]+\|?\s*$")
 #: `table_rows_per_passage` — arrive from the caller's `Tune`, never from this
 #: module (L12). What each is and why its shipped value is what it is lives
 #: beside its key in `templates/tune.toml.txt`.
+
+@dataclass(frozen=True)
+class TableRow:
+    """What a ROW passage knows about its table (W-287 B1) — derived on fetched
+    bytes in the refer plane and never written anywhere (L3).
+
+    `columns` are the header's cells and `values` this row's, padded to the
+    header's width. `label` is the section the table sits in (a sheet name, a
+    caption), filled by `chunk`; `ordinal` is the data row, from 1, header not
+    counted. `key` is the index of the table's KEY column — the leftmost whose
+    values are distinct in every row (B4) — or `-1`. `record` marks a property
+    sheet (B5): two columns under a generic header such as `Field | Value`,
+    where each row's first cell is its name — and, when the names are distinct,
+    its key.
+    """
+
+    label: str
+    ordinal: int
+    columns: tuple[str, ...]
+    values: tuple[str, ...]
+    key: int
+    record: bool
+
+    @property
+    def cells(self) -> tuple[tuple[str, str], ...]:
+        """`(column, value)` per cell — for a record, the row's own `(name, value)`."""
+        if self.record:
+            return ((self.values[0], self.values[1]),)
+        return tuple(zip(self.columns, self.values))
+
 
 @dataclass(frozen=True)
 class Passage:
@@ -96,10 +137,22 @@ class Passage:
     #: paragraph. ⚠ Several `"word"` passages can share one line range, because
     #: they all came from the same line; `ordinal` is what separates them.
     cut: str = ""
+    #: W-287 B1 — set on a passage that is ONE table row, `None` otherwise.
+    row: TableRow | None = None
 
     @property
     def nbytes(self) -> int:
         return len(self.text.encode("utf-8"))
+
+    @property
+    def cells(self) -> tuple[tuple[str, str], ...] | None:
+        """`(column, value)` per cell of a row passage, or `None`."""
+        return self.row.cells if self.row is not None else None
+
+    @property
+    def table(self) -> tuple[str, int] | None:
+        """`(label, data-row ordinal)` of a row passage, or `None`."""
+        return (self.row.label, self.row.ordinal) if self.row is not None else None
 
 
 def chunk(
@@ -167,7 +220,7 @@ def chunk(
 
     passages: list[Passage] = []
     for heading, _level, text, start, end in merged:
-        for piece, offset, span, rung in _pieces(text, max_passage_bytes, table_rows_per_passage):
+        for piece, offset, span, rung, row in _pieces(text, max_passage_bytes, table_rows_per_passage):
             piece_start = start + offset
             passages.append(
                 Passage(
@@ -177,6 +230,7 @@ def chunk(
                     line_start=piece_start if line_numbers else 0,
                     line_end=min(end, piece_start + span - 1) if line_numbers else 0,
                     cut=rung,
+                    row=TableRow(heading, *row) if row is not None else None,
                 )
             )
     return passages
@@ -399,7 +453,7 @@ def _fold(
 
 def _pieces(
     text: str, max_passage_bytes: int, table_rows_per_passage: int
-) -> list[tuple[str, int, int, str]]:
+) -> list[tuple[str, int, int, str, tuple | None]]:
     """`(piece, line_offset, source_lines)` — the oversized split, with each
     piece's position and reach in the source.
 
@@ -418,7 +472,7 @@ def _pieces(
     to use. That is a bound the assembler then enforces by not seating it,
     rather than a passage cut mid-sentence and cited as if it were the author's.
     """
-    out: list[tuple[str, int, int, str]] = []
+    out: list[tuple[str, int, int, str, tuple | None]] = []
     # ⚠ **No early return for a small section**, and that is deliberate. It used
     # to short-circuit whenever the section fitted the ceiling, which meant a
     # ten-row table — the common case — never reached the row split at all and
@@ -435,7 +489,7 @@ def _pieces(
             return
         piece = "\n\n".join(current)
         span = piece.count("\n") + 1
-        out.append((piece, cursor, span, ""))
+        out.append((piece, cursor, span, "", None))
         cursor += span + 1  # the blank line that separated this piece from the next
         current, size = [], 0
 
@@ -453,12 +507,12 @@ def _pieces(
             # runt the merge pass never sees, because merging happens before
             # splitting.
             if current:
-                head, span = bands[0]
+                head, span, row = bands[0]
                 pending = "\n\n".join(current)
-                bands[0] = (pending + "\n\n" + head, pending.count("\n") + 1 + 1 + span)
+                bands[0] = (pending + "\n\n" + head, pending.count("\n") + 1 + 1 + span, row)
                 current, size = [], 0
-            for band, span in bands:
-                out.append((band, cursor, span, ""))
+            for band, span, row in bands:
+                out.append((band, cursor, span, "", row))
                 cursor += span  # bands are contiguous rows: no blank line between
             cursor += 1  # ...but a blank line does follow the table itself
             continue
@@ -467,7 +521,7 @@ def _pieces(
             # rather than hand the assembler something it will refuse.
             flush()
             for piece, span, rung in _descend(paragraph, max_passage_bytes):
-                out.append((piece, cursor, span, rung))
+                out.append((piece, cursor, span, rung, None))
                 cursor += span
             cursor += 1
             continue
@@ -548,11 +602,12 @@ def _descend(paragraph: str, max_passage_bytes: int) -> list[tuple[str, int, str
     return out
 
 
-def _table_bands(paragraph: str, rows_per_passage: int) -> list[tuple[str, int]] | None:
+def _table_bands(paragraph: str, rows_per_passage: int) -> list[tuple[str, int, tuple | None]] | None:
     """A Markdown table split into row passages, or `None` if not a table.
 
     `rows_per_passage` rows per passage (`[refer] table_rows_per_passage`). Returns
-    `(band, source_lines)` per band.
+    `(band, source_lines, row)` per band, where `row` is `TableRow`'s fields
+    after `label` when the band is ONE row (W-287 B1), `None` when it is several.
 
     **The header row and its separator are repeated into every band.** A row
     whose columns have no names is a citation nobody can read, and it is the one
@@ -573,24 +628,69 @@ def _table_bands(paragraph: str, rows_per_passage: int) -> list[tuple[str, int]]
     lines = paragraph.split("\n")
     if len(lines) < _MIN_TABLE_LINES:
         return None
-    if not all(_TABLE_ROW_RE.match(line) for line in lines if line.strip()):
+    if all(_TABLE_ROW_RE.match(line) for line in lines if line.strip()):
+        separator = lines[1] if _TABLE_SEP_RE.match(lines[1]) else None
+    elif _GFM_SEP_RE.match(lines[1]) and all("|" in line for line in lines if line.strip()):
+        # W-287 A5: no edge pipes, so the delimiter row is what says "table".
+        separator = lines[1]
+    else:
         return None
 
     header = lines[0]
-    separator = lines[1] if _TABLE_SEP_RE.match(lines[1]) else None
     prefix = [header, separator] if separator else [header]
     body = lines[len(prefix) :]
     if not body:
         return None
 
-    bands: list[tuple[str, int]] = []
+    rows_meta = _row_meta(header, body) if rows_per_passage == 1 else None
+    bands: list[tuple[str, int, tuple | None]] = []
     for index in range(0, len(body), rows_per_passage):
         rows = body[index : index + rows_per_passage]
-        bands.append(("\n".join(prefix + rows), len(rows)))
+        meta = rows_meta[index] if rows_meta is not None else None
+        bands.append(("\n".join(prefix + rows), len(rows), meta))
 
     if len(bands) <= 1:
         return None  # nothing was gained; leave it as the ordinary case
     # The first band covers its own rows AND the header lines above them.
-    first, first_span = bands[0]
-    bands[0] = (first, first_span + len(prefix))
+    first, first_span, first_row = bands[0]
+    bands[0] = (first, first_span + len(prefix), first_row)
     return bands
+
+
+def split_row(line: str) -> list[str]:
+    """One Markdown table row -> its cells, edge pipes off and `\\|` unescaped."""
+    inner = _ROW_EDGES_RE.match(line).group(1)
+    return [cell.strip().replace("\\|", "|") for cell in _CELL_SPLIT_RE.split(inner)]
+
+
+def _row_meta(header: str, body: list[str]) -> list[tuple] | None:
+    """`(ordinal, columns, values, key, record)` per body row — `TableRow`'s
+    fields after `label` (W-287 B1, B4, B5). Pure: the same table always
+    yields the same rows, and nothing here reads a tunable."""
+    columns = tuple(split_row(header))
+    width = len(columns)
+    values = []
+    for line in body:
+        cells = split_row(line)
+        values.append(tuple(cells + [""] * (width - len(cells))))
+    record = tuple(c.lower() for c in columns) in _RECORD_HEADERS
+    # A record's key is its field-name column, when the names are distinct: in a
+    # property sheet the field name IS what identifies the row (B4 over B5).
+    key = _key_column(values, 1) if record else _key_column(values, width)
+    return [(i, columns, row, key, record) for i, row in enumerate(values, start=1)]
+
+
+def _key_column(values: list[tuple[str, ...]], width: int) -> int:
+    """The leftmost column whose values are filled and distinct in every row, or
+    `-1` (B4). Compared lower-cased — `lower()`, never `casefold()`, which has
+    no JavaScript twin — so `INC1` and `inc1` are one ticket in both runtimes."""
+    for col in range(width):
+        seen: set[str] = set()
+        for row in values:
+            cell = row[col].strip().lower() if col < len(row) else ""
+            if not cell or cell in seen:
+                break
+            seen.add(cell)
+        else:
+            return col
+    return -1

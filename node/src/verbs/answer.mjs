@@ -28,7 +28,7 @@ import { runQuery } from "../query/run.mjs";
 import { recordFor, Shards } from "../store/reader.mjs";
 import { chunk } from "../refer/chunk.mjs";
 import { rescore } from "../refer/rescore.mjs";
-import { assemble } from "../refer/assemble.mjs";
+import { assemble, recordOf } from "../refer/assemble.mjs";
 import { Verdict } from "../refer/freshness.mjs";
 import { resolve, readLocal, fromAcquired, GIT } from "../refer/source.mjs";
 import { passageBoost } from "../query/rerank.mjs";
@@ -180,7 +180,7 @@ export function answerPayload(root, args) {
   // turned on without the other (`refer/_rescore.py::rescore`).
   const scored = rescore(query, candidates, {
     scoring: tune.scoring, weight: tune.rerankWeight, proximity: tune.proximity,
-    boostFn: passageBoost,
+    columnWeight: tune.tableColumnWeight, boostFn: passageBoost,
   });
   const bundle = assemble(scored, {
     overhead: tune.citationOverhead, budget: tune.budget, source: "fetched",
@@ -204,6 +204,7 @@ export function answerPayload(root, args) {
         // SR-REFER decision 17 / SR-ANSWER decision 9. Additive: no key
         // removed or repurposed.
         ordinal: c.ordinal,
+        ...rowFields(c),
       })),
     },
     citation: { id: winner.doc_id, loc: winner.locator, sha: winner.sha, freshness },
@@ -225,6 +226,13 @@ export function answerPayload(root, args) {
   return { payload, freshness, results };
 }
 
+/** W-287 C1 — a ROW passage's record for `--json`; `{}` for any other
+ *  passage. Twin of `query/__init__.py::_row_fields`. */
+function rowFields(c) {
+  if (!c.cells) return {};
+  return { cells: c.cells, table: c.table[0], row: c.table[1], columns_matched: c.columns_matched };
+}
+
 export function runAnswer(root, args) {
   const { payload, freshness } = answerPayload(root, args);
 
@@ -240,7 +248,16 @@ export function runAnswer(root, args) {
   for (const p of payload.answer.passages) {
     process.stdout.write(`${p.loc}  [${freshness}]\n`);
     if (p.heading) process.stdout.write(`§ ${p.heading}\n`);
-    process.stdout.write(p.text + "\n\n");
+    const record = p.cells ? recordOf(p) : [];
+    if (record.length) {
+      // W-287 C1, C2 — one `column: value` line per filled cell, asked first.
+      for (const [column, value, asked] of record) {
+        process.stdout.write(`${column}: ${value}${asked ? "  <- asked" : ""}\n`);
+      }
+      process.stdout.write("\n");
+    } else {
+      process.stdout.write(p.text + "\n\n");
+    }
   }
   return 0;
 }

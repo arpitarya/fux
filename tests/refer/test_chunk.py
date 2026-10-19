@@ -319,7 +319,7 @@ def test_a_wall_of_text_can_be_quoted_at_all():
     assert len(passages) > 1
     assert max(p.nbytes for p in passages) <= MAX_PASSAGE_BYTES
     seated = assemble(
-        rescore("broker retention policy", [("d", "n.md", "s", passages)], scoring=scoring(), weight=0.0, proximity=template_tune().proximity),
+        rescore("broker retention policy", [("d", "n.md", "s", passages)], scoring=scoring(), weight=0.0, proximity=template_tune().proximity, column_weight=0.0),
         budget=DEFAULT_BUDGET, k=5, source="fetched", per_doc_fraction=template_tune().per_doc_fraction, citation_overhead=template_tune().citation_overhead
     )
     assert seated.citations, "a document that ranks must be quotable"

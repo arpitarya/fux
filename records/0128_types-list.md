@@ -7,10 +7,10 @@ description: "Prose plus every format a built-in decoder reads is compiled in as
 status: accepted
 date: 2026-08-20
 feature: the file-type allowlist and `.fux/formats.toml`
-owns: [src/fux/acquire/typesfile.py@cba4e18abe52, .fux/formats.toml@05666c969b79]
+owns: [src/fux/acquire/typesfile.py@cba4e18abe52, .fux/formats.toml@2dfc07ff74b8]
 laws: [L2, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 15ff916a85d8c94595b54507856272a6c29d8ee696435a6ffed9fbca19cfd5bc
+content_sha: 0086c632ddebb26c43869af6d603ec050064bff98326d273799c3784fe2430f0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -543,6 +543,8 @@ carries them.
 **`typesfile.py` holds no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `[decoders]` lines are matched by named groups (`key`, `value`), `*.` is removed with `removeprefix`, and a control character is recognised by comparison rather than by code point. The file it writes is unchanged.
 
 **Decision 14's caps are twenty-four now** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5b, 2026-09-28): `[limits.html] charset_scan_bytes`, `[limits.xml] prolog_bytes`, and `[limits.yaml] indent_step` and `min_value_len` joined them. Each is a whole number `>= 1`, and what each means is [SR-DECODE](0139_decode.md)'s. A `formats.toml` that lacks one stops `fux ingest` until `fux doctor --fix` writes it.
+
+**Twenty-six since 2026-10-19** (W-287 A4): `[limits.html] header_fill_percent` and `[limits.xlsx] header_fill_percent` (both 60) — the share of a table's width its header row must fill, [SR-TABULAR](0150_tabular.md) decision 8.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 

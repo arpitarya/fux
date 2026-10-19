@@ -4,6 +4,7 @@
  * Greedy by **score per byte** — the question is not "what scores highest" but
  * "what is the most answer per byte of the caller's window".
  */
+import { cellsOf } from "./chunk.mjs";
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
 
 //: `budget`, `perDocFraction` and `citationOverhead` are `.fux/tune.toml
@@ -23,7 +24,7 @@ export function assemble(scored, {
   const cmp = (a, b) => {
     if (a.score !== b.score) return a.score > b.score ? -1 : 1;
     const s = cmpCodePoints(a.sha, b.sha);
-    return s !== 0 ? s : cmpCodePoints(a.locator, b.locator);
+    return s !== 0 ? s : cmpCodePoints(a.order_key, b.order_key);
   };
 
   // The floor: the best answer by ABSOLUTE score is seated first, so greedy
@@ -37,7 +38,7 @@ export function assemble(scored, {
     const rb = -(b.score / Math.max(b.nbytes, 1));
     if (ra !== rb) return ra < rb ? -1 : 1;
     const s = cmpCodePoints(a.sha, b.sha);
-    return s !== 0 ? s : cmpCodePoints(a.locator, b.locator);
+    return s !== 0 ? s : cmpCodePoints(a.order_key, b.order_key);
   });
 
   // **The cap protects against competition, so with no competition there is
@@ -62,6 +63,13 @@ export function assemble(scored, {
       // Python half; this is the Node half, found 2026-09-12 by comparing the
       // two library surfaces).
       ordinal: s.passage.ordinal,
+      // W-287 C1 — a ROW passage's cells, its table and the columns the
+      // query named; `null`/`[]` otherwise. Twin of `_assemble.Citation`.
+      cells: cellsOf(s.passage.row ?? null),
+      table: s.passage.row ? [s.passage.row.label, s.passage.row.ordinal] : null,
+      columns_matched: s.columns_matched ?? [],
+      // The positional key ties are broken on, never the displayed locator.
+      order_key: s.order_key ?? s.locator,
       // ⚠ The overhead is part of a citation's OWN size, not a separate line
       // item: the locator line and separator will be rendered around every
       // passage, so the budget bounds the rendered answer rather than the
@@ -82,4 +90,15 @@ export function assemble(scored, {
   // though selection ran on score-per-byte.
   chosen.sort(cmp);
   return { citations: chosen, budget, used, dropped };
+}
+
+/** `[column, value, asked]` in the order an answer prints them (W-287 C1, C2):
+ *  the cells the query named first, then the rest; an empty cell is not a
+ *  line. Twin of `_assemble.Citation.record`. */
+export function recordOf(citation) {
+  if (!citation.cells || !citation.cells.length) return [];
+  const asked = new Set(citation.columns_matched);
+  const first = citation.cells.filter(([c, v]) => asked.has(c) && v).map(([c, v]) => [c, v, true]);
+  const rest = citation.cells.filter(([c, v]) => !asked.has(c) && v).map(([c, v]) => [c, v, false]);
+  return [...first, ...rest];
 }

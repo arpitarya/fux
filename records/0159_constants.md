@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-19
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@516ec11efc31]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@55cb4f3000df]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 18707b1546c7f076e2a98f85a39d84ed3f63e915ea88559805f05f21c3627332
+content_sha: 8db26bf50eb2befe9ce283664fb0f7cf677adb227b8b610eb1b4ff4406e2476a
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -199,6 +199,8 @@ pattern. A consumer who wants other cues is I2, which is not built.
 **W-273 (2026-10-11; same branch, unmerged).** New fixed key `[index] sectionless_formats` (`[".csv", ".json", ".jsonl"]`): the closed list of extensions that get no section records ([SR-SECTIONS](0161_sections.md) decision 2). It decides committed bytes, so it is fixed and never a tunable. `[versions] extract_rules` → 5.
 
 **W-278 — `[runtime] schema` is `fux.runtime.v11` (2026-10-13; branch, unmerged).** The section statistics left `stats.json`, so a v10 plane is refused by name and rebuilt.
+
+**New fixed values, no decision moved** (W-287, 2026-10-19): `[decoders.xlsx.format]` gains the styles part, ECMA-376's built-in date/time `numFmtId`s, the three serial-date epochs, the phantom leap day and seconds per day; `[decoders.html.format]` WHATWG's span clamps; `[tables] record_headers`, the closed list of `Field | Value`-style header pairs; `[radix] percent`, a `*_percent` cap's denominator. Decoder versions: `html` 2, `docx` 2, `xlsx` 3. Both planes read `[tables]` ([SR-CHUNKING](0151_chunking.md) decision 2b).
 
 ### Consequences
 

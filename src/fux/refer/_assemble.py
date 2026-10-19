@@ -87,6 +87,27 @@ class Citation:
     #: pointing somewhere else. ⚠ **It was promised by two accepted records and
     #: not carried by the code for six days** (W-140 row 2, fixed 2026-09-12).
     ordinal: int = -1
+    #: W-287 C1 — a ROW passage's `(column, value)` cells, its table's
+    #: `(label, data row)`, and the columns the query named (B3). `None`/`()`
+    #: for every passage that is not one table row.
+    cells: tuple[tuple[str, str], ...] | None = None
+    table: tuple[str, int] | None = None
+    columns_matched: tuple[str, ...] = ()
+    #: The positional locator ties are broken on — `ScoredPassage.order_key`,
+    #: never the displayed `locator` (W-287: C3 must not move an order).
+    order_key: str = ""
+
+    def record(self) -> list[tuple[str, str, bool]]:
+        """`(column, value, asked)` in the order an answer prints them (W-287
+        C1, C2): the cells the query's columns named first, in column order,
+        then the rest; an empty cell is not a line. `[]` for a non-row passage.
+        """
+        if not self.cells:
+            return []
+        asked = set(self.columns_matched)
+        first = [(c, v, True) for c, v in self.cells if c in asked and v]
+        rest = [(c, v, False) for c, v in self.cells if c not in asked and v]
+        return first + rest
 
 
 @dataclass(frozen=True)
@@ -139,12 +160,12 @@ def assemble(
     # The floor: the best answer by ABSOLUTE score is seated first, so greedy
     # score-per-byte cannot crowd it out with cheaper fragments. Ties on
     # (sha, locator), as everywhere.
-    best = min(candidates, key=lambda s: (-s.score, s.sha, s.locator))
+    best = min(candidates, key=lambda s: (-s.score, s.sha, s.order_key))
 
     # Everything else, greedy by score per byte — the right objective once the
     # best answer is safe: most answer per byte of the caller's window.
     rest = [s for s in candidates if s is not best]
-    rest.sort(key=lambda s: (-(s.score / max(s.nbytes, 1)), s.sha, s.locator))
+    rest.sort(key=lambda s: (-(s.score / max(s.nbytes, 1)), s.sha, s.order_key))
 
     # **The cap protects against competition, so with no competition there is
     # nothing to protect** (W-72). `query/refer_answer.py` passes `refer()`
@@ -178,6 +199,10 @@ def assemble(
             score=s.score,
             source=source,
             ordinal=s.passage.ordinal,
+            cells=s.passage.cells,
+            table=s.passage.table,
+            columns_matched=s.columns_matched,
+            order_key=s.order_key,
         )
         cost = len(citation.text.encode("utf-8")) + citation_overhead
         spent = per_doc.get(s.doc_id, 0)
@@ -193,5 +218,5 @@ def assemble(
 
     # Present in score order — the caller reads the best answer first, even
     # though selection ran on score-per-byte.
-    chosen.sort(key=lambda c: (-c.score, c.sha, c.locator))
+    chosen.sort(key=lambda c: (-c.score, c.sha, c.order_key))
     return Assembled(citations=chosen, budget=budget, used=used, dropped=dropped)

@@ -83,7 +83,7 @@ const SCHEMA = {
   ranking: [
     "rerank_weight", "rerank_depth", "rerank_coverage_power", "rerank_base", "rerank_span",
     "rerank_adjacency", "expand_weight", "mined_weight", "intent_weight",
-    "section_weight",
+    "section_weight", "table_column_weight",
   ],
   // The six `ask_*` keys are W-161's graph tier. They are parsed and carried
   // here so a consumer's committed `tune.toml` is accepted identically by both
@@ -199,7 +199,7 @@ export class Tune {
 const TUNE_FIELDS = [
   "k1", "b", "fieldWeights", "anchorWeight",
   "rerankWeight", "rerankDepth", "rerankCoveragePower", "rerankBase", "rerankSpan",
-  "rerankAdjacency", "expandWeight", "minedWeight", "intentWeight", "sectionWeight",
+  "rerankAdjacency", "expandWeight", "minedWeight", "intentWeight", "sectionWeight", "tableColumnWeight",
   "damping", "iterations", "laziness", "hopDecay", "expandLimit", "seedDepth", "pathLimit",
   "askBoost", "askRelated", "askKinds", "askLinkIdf", "askMaxHops", "askRelatedLimit",
   "separationFloor", "docCoverageFloor",
@@ -488,6 +488,8 @@ function resolve(data, label) {
     intentWeight: r("ranking", "intent_weight", nonNegative),
     // W-236 — B2's λ (SR-SECTIONS decision 5). `0.0` never opens the plane.
     sectionWeight: r("ranking", "section_weight", fraction),
+    // W-287 stage B — `0.0` is OFF: `refer/rescore.mjs` takes the old path.
+    tableColumnWeight: r("ranking", "table_column_weight", nonNegative),
     damping: r("graph", "damping", fraction),
     iterations: r("graph", "iterations", whole),
     laziness: r("graph", "laziness", fraction),

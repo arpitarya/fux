@@ -15,7 +15,7 @@ from __future__ import annotations
 # `from . import _xml` raises `attempted relative import with no known parent
 # package` — the copy would be dead on arrival. Absolute imports mean the file
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
-from fux.decode import _ooxml, _xml
+from fux.decode import _ooxml, _table, _xml
 from fux.decode._zip import SafeZip, ZipTooBig
 from fux.constants import fixed
 
@@ -25,7 +25,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.docx", "version")  # not bumped by W-225 R13: its OOXML part names moved to constants.toml at the same values
+VERSION = fixed("decoders.docx", "version")  # 2 (W-287 A3): gridSpan/vMerge expanded, nested tables flattened once
 
 EXTENSIONS = tuple(fixed("decoders.docx", "extensions"))
 
@@ -42,11 +42,22 @@ def decode(raw: bytes, rel_path: str) -> str | None:
     except (ZipTooBig, _xml.UnsafeXml):
         return None
 
+    # A table nested in a cell is read as part of that cell's text (W-287 A3);
+    # walking it again here emitted every nested table a second time.
+    nested = {
+        id(inner)
+        for outer in root.iter()
+        if _xml.local(outer.tag) == "tbl"
+        for inner in outer.iter()
+        if inner is not outer and _xml.local(inner.tag) == "tbl"
+    }
     blocks: list[str] = []
     for element in root.iter():
         tag = _xml.local(element.tag)
+        if tag == "tbl" and id(element) in nested:
+            continue
         if tag == "tbl":
-            table = _table(element)
+            table = _table_of(element)
             if table:
                 blocks.append(table)
         elif tag == "p" and not _inside_table(root, element):
@@ -86,24 +97,98 @@ def _is_list_item(element) -> bool:
     return any(_xml.local(node.tag) == "numPr" for node in element.iter())
 
 
-def _table(element) -> str:
-    rows: list[list[str]] = []
-    for row in element.iter():
-        if _xml.local(row.tag) != "tr":
-            continue
-        cells: list[str] = []
-        for cell in row.iter():
-            if _xml.local(cell.tag) != "tc":
-                continue
-            cells.append(
-                " ".join(
-                    _ooxml.paragraph_text(p)
-                    for p in cell.iter()
-                    if _xml.local(p.tag) == "p"
+def _table_of(element) -> str:
+    """A `w:tbl` -> a Markdown table, every cell under its TRUE grid column.
+
+    W-287 A3: the table becomes a `_table.Grid` and `_table.emit` writes it. A
+    cell spanning columns (`w:gridSpan`) is a span across them, and a vertical
+    merge (`w:vMerge`: `restart`, then cells that continue it) is ONE span down
+    the column — Word stores the continuing cells empty, so reading them as
+    written put a blank under a column whose value sits one row up.
+    `w:gridBefore` shifts a row right. Rows and cells are this table's OWN: a
+    nested table's rows are not this table's rows, and its text joins the cell
+    it sits in. The first row is the header, as Word's tables are written.
+    """
+    grid = _table.Grid(header=(0,))
+    open_merges: dict[int, tuple[int, int, int, int]] = {}  # start column -> (row0, col0, row1, col1)
+    for r, row in enumerate(_own(element, "tr")):
+        col = _val(row, "gridBefore", 0)
+        continued: set[int] = set()
+        for cell in _own(row, "tc"):
+            span = max(1, _val(cell, "gridSpan", 1))
+            merge = _vmerge(cell)
+            if merge == "continue" and col in open_merges:
+                row0, col0, _row1, col1 = open_merges[col]
+                open_merges[col] = (row0, col0, r, col1)
+                continued.add(col)
+            else:
+                if col in open_merges:  # a new cell where a merge was open ends it
+                    grid.spans.append(open_merges.pop(col))
+                text = " ".join(
+                    _ooxml.paragraph_text(p) for p in cell.iter() if _xml.local(p.tag) == "p"
                 ).strip()
-            )
-        rows.append(cells)
-    return _ooxml.table_markdown(rows)
+                grid.cells[(r, col)] = _table.Cell(text, "text")
+                if merge == "restart":
+                    open_merges[col] = (r, col, r, col + span - 1)
+                    continued.add(col)
+                elif span > 1:
+                    grid.spans.append((r, col, r, col + span - 1))
+            col += span
+        for start in [c for c in open_merges if c not in continued]:
+            grid.spans.append(open_merges.pop(start))
+    grid.spans.extend(open_merges.values())
+    return _table.emit(grid, header_fill_percent=None, row_limit=None, max_cell_chars=None).markdown
+
+
+def _own(element, tag: str):
+    """`element`'s `tag` descendants that belong to it — through wrappers such as
+    `w:sdt`, never into a nested `w:tbl`, and never into a match's own subtree."""
+    for child in element:
+        name = _xml.local(child.tag)
+        if name == tag:
+            yield child
+        elif name != "tbl":
+            yield from _own(child, tag)
+
+
+def _props(element):
+    """The `w:trPr` / `w:tcPr` child of a row or cell, or `None`."""
+    for child in element:
+        if _xml.local(child.tag) in ("trPr", "tcPr"):
+            return child
+    return None
+
+
+def _val(element, name: str, default: int) -> int:
+    """An integer `w:val` of the named property (`gridSpan`, `gridBefore`)."""
+    props = _props(element)
+    if props is None:
+        return default
+    for node in props:
+        if _xml.local(node.tag) != name:
+            continue
+        for key, value in node.attrib.items():
+            if _xml.local(key) == "val":
+                try:
+                    return int(value)
+                except ValueError:
+                    return default
+    return default
+
+
+def _vmerge(cell) -> str | None:
+    """`"restart"`, `"continue"` or `None` — a cell's place in a vertical merge:
+    `w:vMerge` with `w:val="restart"` starts one, and with its `w:val` absent or
+    `continue` carries it on (ECMA-376 §17.4.85)."""
+    props = _props(cell)
+    if props is None:
+        return None
+    for node in props:
+        if _xml.local(node.tag) != "vMerge":
+            continue
+        values = [v for k, v in node.attrib.items() if _xml.local(k) == "val"]
+        return "restart" if values and values[0] == "restart" else "continue"
+    return None
 
 
 def _inside_table(root, target) -> bool:

@@ -137,11 +137,11 @@ prose_types    = ["*.md", "*.markdown", "*.txt", "*.rst", "*.adoc", "*.org"]
 magic_by_mime = { "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = "PK\u0003\u0004", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" = "PK\u0003\u0004", "application/vnd.openxmlformats-officedocument.presentationml.presentation" = "PK\u0003\u0004", "application/vnd.oasis.opendocument.text" = "PK\u0003\u0004", "application/pdf" = "%PDF-" }
 
 [decoders.csv]
-version    = 1
+version    = 2  # 2026-10-19 W-287 A: rows feed the shared table emitter (decode/_table.py); a column empty in every row is dropped
 extensions = [".csv", ".tsv"]
 
 [decoders.docx]
-version    = 1
+version    = 2  # 2026-10-19 W-287 A3: gridSpan/vMerge expand; a nested table is flattened into its cell, not emitted twice
 extensions = [".docx", ".docm"]
 
 [decoders.drawio]
@@ -149,7 +149,7 @@ version    = 1
 extensions = [".drawio", ".dio"]
 
 [decoders.html]
-version    = 1
+version    = 2  # 2026-10-19 W-287 A2/A4: thead/th header, colspan/rowspan, caption, nested tables, pipes escaped in cells
 extensions = [".html", ".htm", ".xhtml"]
 
 [decoders.image]
@@ -193,7 +193,7 @@ version    = 1
 extensions = [".toml"]
 
 [decoders.xlsx]
-version    = 2  # 2026-09-14: phantom rows no longer spend the row budget; truncation and column notices added
+version    = 3  # 2026-10-19 W-287 A1/A4: cells placed by address, number formats read, merges expanded, header detected
 extensions = [".xlsx", ".xlsm"]
 
 [decoders.xml]
@@ -661,6 +661,17 @@ max_code_bytes      = 2
 hex                 = 16
 octal               = 8
 hex_digits_per_byte = 2
+# A `*_percent` cap's denominator (decode/_table.py: `header_fill_percent`).
+percent             = 100
+
+[tables]
+# W-287 B5 (SR-TABULAR): a two-column table whose header is one of these pairs,
+# compared lower-cased, is a RECORD -- a property sheet whose rows each name a
+# field. A closed list: it decides what a row passage's column names are.
+record_headers = [
+  ["field", "value"], ["key", "value"], ["property", "value"], ["attribute", "value"],
+  ["parameter", "value"], ["setting", "value"], ["name", "value"], ["item", "value"],
+]
 
 [markdown]
 # Markdown has six heading levels; a deeper one is clamped, never invented.
@@ -695,6 +706,28 @@ shared   = "xl/sharedStrings.xml"
 # A prefix: sheet N is `<sheets>N.xml`.
 sheets   = "xl/worksheets/sheet"
 workbook = "xl/workbook.xml"
+# W-287 A1: where a cell's number format lives, and the built-in numFmtIds
+# ECMA-376 Part 1 §18.8.30 defines as dates and times (27-36 and 50-58 are the
+# East Asian built-ins). 46 (`[h]:mm:ss`) is an elapsed duration, not a clock
+# time, and is deliberately absent. A custom format is classified by its code.
+styles            = "xl/styles.xml"
+date_formats      = [14, 15, 16, 17, 27, 28, 29, 30, 31, 34, 35, 36, 50, 51, 52, 53, 54, 55, 56, 57, 58]
+time_formats      = [18, 19, 20, 21, 32, 33, 45, 47]
+datetime_formats  = [22]
+# The serial-date epochs (§18.17.4.1): the 1900 system counts from 1899-12-30
+# for serials past Lotus's phantom 1900-02-29 (serial 60), from 1899-12-31
+# below it; `workbookPr date1904="1"` counts from 1904-01-01.
+epoch_1900        = "1899-12-30"
+epoch_1900_early  = "1899-12-31"
+epoch_1904        = "1904-01-01"
+phantom_leap_day  = 60
+seconds_per_day   = 86400
+
+[decoders.html.format]
+# WHATWG HTML §4.9.11: user agents clamp colspan to 1000 and rowspan to 65534,
+# and `rowspan="0"` spans to the end of the row group. Spec values, not knobs.
+max_colspan = 1000
+max_rowspan = 65534
 
 [ooxml]
 # Word's built-in paragraph styles as Markdown levels (decode/_ooxml.py):

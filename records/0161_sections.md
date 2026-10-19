@@ -11,7 +11,7 @@ feature: section records — the committed section plane, the index section rule
 owns: [node/src/query/sections.mjs@4c883e2a8a83, src/fux/query/sections.py@d88c194f0e6c]
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: d604d0a9b19b0b63256919164855a41c6b4743e154de09af05f74c1835626c3e
+content_sha: addb9d494cdf45636f4f034e9f7875eea20dae63f5f287d1d45c4750e20c0e94
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -454,6 +454,8 @@ sections"*; the key lives in `fux.toml [index]`, not in `.fux/tune.toml`).
   opt-in pair, both keys off by default, and `section_weight = 1.0` is the
   measured value to set beside `section_records = true` (Arpit, 2026-10-13). With the key off, ranking is
   unchanged, so this is not a ranking change and L13's bar does not apply.
+
+**No decision here moved** (W-287, 2026-10-19): `src/fux/text/chunk.py` changed outside the section rule — `_table_bands`, `_pieces`, `Passage` — and `_sections`, `_title_index` and `index_sections` are byte-identical, so no section record moves.
 
 ### Consequences
 

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-10-11
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@1d2b7e666a71, .fux/tune.toml@e2ed652a089c, node/src/config/tune.mjs@f6e2c32f57f5]
+owns: [src/fux/tune.py@ff21531aa301, .fux/tune.toml@3e16953e4cb3, node/src/config/tune.mjs@3be0ddaaa953]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: f2358e184a5797f221a7649c21d5604ec1730c5698472151c8c82410a4e6bc2b
+content_sha: c9322263187dcdff74230627cbb207f4fd8bedd8a8cb257dc93bc6adaadc741c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -764,6 +764,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 + ranking.mined_weight
 + ranking.intent_weight
 + ranking.section_weight
++ ranking.table_column_weight
 + graph.damping
 + graph.iterations
 + graph.laziness

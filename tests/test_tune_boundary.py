@@ -61,6 +61,8 @@ MUTATIONS: dict[str, dict[str, str]] = {
         # reason on top of every other key's: nothing reads it unless a caller
         # passes `--expand`, and `fux ingest` never does.
         "expand_weight": "0.75",
+        # W-287 — read by the refer plane on fetched bytes, never by ingest.
+        "table_column_weight": "1.0",
         # W-168 step 4: off by default, and nothing ingest does reads it.
         "mined_weight": "0.3",
         "intent_weight": "0.3",

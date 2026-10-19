@@ -553,11 +553,22 @@ const later = (fn) => new Promise((r) => setTimeout(() => r(fn()), 700));   /* a
 
 /* ---- Answer: the one passage `fux answer` would cite. ------------------- */
 function freshPill(f) { return f ? `<span class="fresh ${esc(f)}">${esc(f)}</span>` : ""; }
+/* W-287 C1, C2: a table-row passage as a record — one `column: value` row per
+   filled cell, the cell the question's column named first and marked. The same
+   order `fux answer` prints (`Citation.record`); `text` keeps the Markdown band. */
+function recordTable(p) {
+  const asked = new Set(p.columns_matched || []);
+  const cells = (p.cells || []).filter(([, v]) => v);
+  const rows = [...cells.filter(([c]) => asked.has(c)), ...cells.filter(([c]) => !asked.has(c))];
+  return `<div class="sub">${esc(p.table)} · row <span class="num">${esc(p.row)}</span></div>` +
+    table(["column", "value"], rows.map(([c, v]) =>
+      `<tr><td>${asked.has(c) ? "<b>" + esc(c) + "</b> (asked)" : esc(c)}</td><td>${esc(v)}</td></tr>`));
+}
 function passageCard(p, i) {
   return `<div class="passage">
     <div class="h"><span class="rank mono">#${i + 1}</span><b>${esc(p.heading || "(no heading)")}</b>
       <span class="mono">${esc(p.loc)}</span>${p.score != null ? `<span class="num">score ${esc(p.score)}</span>` : ""}${p.ordinal != null ? `<span>passage <span class="num">${esc(p.ordinal)}</span></span>` : ""}</div>
-    <pre>${esc(p.text)}</pre>
+    ${p.cells ? recordTable(p) : `<pre>${esc(p.text)}</pre>`}
     <div class="cite"><span>document <a href="#" class="opendoc mono" data-loc="${esc(p.id)}">${esc(p.id)}</a></span><span>sha <span class="mono">${esc((p.sha || "").slice(0, 12))}</span></span></div>
   </div>`;
 }

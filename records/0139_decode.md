@@ -7,10 +7,10 @@ description: "Decoding gets one home, one protocol, and a consumer seam where th
 status: accepted
 date: 2026-08-26
 feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@871929ff8a92, src/fux/templates/agents/DECODER-SKILL.md@c328738ae3e6, .fux/decoders@f95b2a0e7dd6, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@5f97a79df7ad]
+owns: [src/fux/decode@8db6cb28b665, src/fux/templates/agents/DECODER-SKILL.md@c328738ae3e6, .fux/decoders@bc4ca7321ccc, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@5f97a79df7ad]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 9fb061d594424f91c6014cfdc80a94f9991c479faf112dd913296daac22eefd0
+content_sha: 2944e527fd10d2336c4da66f64647eb2f550157f83e9088c5d4c6727a900719c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -847,6 +847,47 @@ changed decoder's `VERSION` line says so.
 **The decoders hold no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5b, 2026-09-28). What a format fixes went to `constants.toml`: PNG/JPEG/EXIF/GIF signatures, markers and record layouts in `[decoders.image.format]` (each layout is a `struct` format, and its size is the offset the walk advances by); PDF's octal-escape width, bfrange span and code length in `[decoders.pdf.format]`; RTF's `\uN` wrap in `[decoders.rtf.format]`; the bases in `[radix]`; Markdown's six levels and a record's level in `[markdown]`; Word's style levels in `[ooxml]`. drawio's raw-deflate window is `-zlib.MAX_WBITS`, and HTML's BOM is `codecs.BOM_UTF8`. **Four scan windows are caps, not format facts, and joined `[limits]`** — the same call as the stage-4a caps: `[limits.html] charset_scan_bytes` (4096), `[limits.xml] prolog_bytes` (8192, the shared XML reader's DOCTYPE window), and `[limits.yaml] indent_step` (2) and `min_value_len` (3). They enter the extract-config digest with the rest. A decoder called with no repository bound now needs one for `html` too; every production caller already passes it. `VERSION` was not bumped, and each changed decoder's `VERSION` line says so. HEAD's and the new decoders return the same result on 17 147 inputs: every tracked file of each type, crafted files for each format, and every prefix of each crafted file.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
+
+**23. Every table becomes Markdown in ONE place, `decode/_table.py`** (W-287
+stage A, 2026-10-19; Arpit: *"how about we build 1 decoder just for table and
+internally html, docs and xlsx use the same?"*). `xlsx.py`, `html.py`,
+`docx.py` and `csv.py` are **parsers**: each turns its format into a
+`_table.Grid` — cells placed at `(row, col)` with a `kind` (`text`, `number`,
+`bool`, `date`, `time`, `datetime`), span rectangles, declared header rows — and
+`_table.emit` does the rest once: values written as a person writes them, spans
+expanded, the header found, the row budget, empty columns dropped, `|` escaped,
+the Markdown `text/chunk.py::_table_bands` reads back. `_ooxml.table_markdown`
+and `html.py`'s own emitter are gone; three copies of one rule were how
+SR-TABULAR decision 7's defect happened.
+
+- **Not a decoder**: no suffix, never chosen by the registry. Naming it a
+  *decoder extension*, moving it to `decode/ext/` and putting a `VERSION` of its
+  own into every importing decoder's reuse key is **W-288's**. Until then a
+  change to `_table.py` bumps the `VERSION` of all four importers, as this one
+  did: `csv` → 2, `docx` → 2, `html` → 2, `xlsx` → 3.
+- **What each parser still owns** — what its format fixes: `xlsx` places a cell
+  by its `r=` address (Excel omits empty cells) and reads its kind from `t=` and
+  the style's `numFmt` ([SR-TABULAR](0150_tabular.md) decision 8); `html` places
+  cells around earlier `rowspan`s (clamped to WHATWG's 1000 / 65534,
+  `rowspan="0"` to the end), declares `<thead>` or a leading run of all-`<th>`
+  rows as the header, turns `<caption>` into the table's heading one level below
+  the last, and flattens a nested table into its cell; `docx` reads
+  `w:gridSpan`, a `w:vMerge` restart and its continuations as ONE span, and
+  `w:gridBefore`, and reads only the table's OWN rows and cells, so a nested
+  table is read once, inside its cell; `csv` keeps its separator sniff.
+- **`[limits.html]` and `[limits.xlsx]` gain `header_fill_percent`** (60), so
+  `formats.toml` holds **26** caps; `fux doctor --fix` writes them into an older
+  file. `html` reads it only for a table that declares no header, because
+  `html_to_markdown` is also called with no repository bound.
+- ⚠ **The fetchers share `html`** ([SR-FETCHER](0117_fetcher.md)), so an
+  `http`/`cdp` URL's Markdown changes with it at its next refresh.
+- **The gates.** HEAD's decoders and chunker and these were run over every
+  tracked Markdown, HTML, `.docx` and `.xlsx` file in the repo and the test
+  fixtures: **the only differences are five HTML files, in escaped `|` and
+  nothing else** — a pipe inside a cell used to add a column. Every defect has a
+  fixture named for its number in `tests/decode/test_tables.py`, and its
+  round-trip test decodes one table in all four formats and requires the
+  chunker to read back exactly the cells written.
 
 ### Consequences
 

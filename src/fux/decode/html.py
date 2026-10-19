@@ -24,6 +24,7 @@ import codecs
 import re
 from html.parser import HTMLParser
 from fux.constants import fixed
+from fux.decode import _table
 from fux.decode._limits import limit
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
@@ -32,7 +33,7 @@ from fux.decode._limits import limit
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.html", "version")  # not bumped by W-234: law handles in comments only; W-225 5b: the charset window moved to formats.toml at the same value; nor 7: the h1-h6 map is derived, same output
+VERSION = fixed("decoders.html", "version")  # 2 (W-287 A2/A4): thead/th header, colspan/rowspan, caption, nested tables, escaped pipes
 
 EXTENSIONS = tuple(fixed("decoders.html", "extensions"))
 
@@ -48,6 +49,29 @@ _HEADINGS = {f"h{level}": level for level in range(1, fixed("markdown", "max_hea
 _CHARSET_RE = re.compile(rb"""charset\s*=\s*["']?\s*([A-Za-z0-9_\-.:]+)""", re.IGNORECASE)
 
 PREPEND_TITLE_HEADING = True
+
+#: WHATWG's span clamps (`constants.toml [decoders.html.format]`).
+_MAX_COLSPAN = fixed("decoders.html.format", "max_colspan")
+_MAX_ROWSPAN = fixed("decoders.html.format", "max_rowspan")
+_MAX_HEADING = fixed("markdown", "max_heading")
+
+
+class _Table:
+    """One `<table>` being read: its rows, the cell in progress, its caption.
+
+    W-287 A2. A row is `(cells, section)` and a cell `(text, is_th, colspan,
+    rowspan)` — the spans are expanded only when the table closes, because a
+    `rowspan` reaches rows that have not been read yet.
+    """
+
+    def __init__(self) -> None:
+        self.rows: list[tuple[list[tuple[str, bool, int, int]], str]] = []
+        self.cell: list[str] | None = None
+        self.cell_th = False
+        self.cell_span = (1, 1)
+        self.caption: list[str] | None = None
+        self.caption_text = ""
+        self.section = "tbody"
 
 
 def decode(raw: bytes, rel_path: str) -> str | None:
@@ -114,8 +138,13 @@ class _MdParser(HTMLParser):
         self.quote_depth = 0
         self.list_stack: list[tuple[str, int]] = []  # (kind, counter)
         self.href: list[str] = []
-        self.table_rows: list[list[str]] | None = None
-        self.cell: list[str] | None = None
+        #: Open tables, innermost last. A table opened inside a cell is NESTED:
+        #: it is flattened into that cell when it closes (W-287 A2), where it
+        #: used to reset the outer table and lose every row read so far.
+        self.tables: list[_Table] = []
+        #: The level of the last heading emitted — a `<caption>` becomes a
+        #: heading one level below it. The title the decoder prepends is H1.
+        self.last_level = 1
 
     # -- emit helpers ------------------------------------------------------
 
@@ -127,10 +156,13 @@ class _MdParser(HTMLParser):
             self.blocks.append(f"{quote}{prefix}{text}")
 
     def _text(self, data: str) -> None:
+        table = self.tables[-1] if self.tables else None
         if self.pre_depth:
             self.pre_text.append(data)
-        elif self.cell is not None:
-            self.cell.append(data)
+        elif table is not None and table.caption is not None:
+            table.caption.append(data)
+        elif table is not None and table.cell is not None:
+            table.cell.append(data)
         else:
             self.inline.append(data)
 
@@ -158,12 +190,23 @@ class _MdParser(HTMLParser):
             self._flush_inline()
             self.quote_depth += 1
         elif tag == "table":
-            self._flush_inline()
-            self.table_rows = []
-        elif tag == "tr" and self.table_rows is not None:
-            self.table_rows.append([])
-        elif tag in ("td", "th") and self.table_rows is not None:
-            self.cell = []
+            if not self.tables:
+                self._flush_inline()
+            self.tables.append(_Table())
+        elif tag == "caption" and self.tables:
+            self.tables[-1].caption = []
+        elif tag in ("thead", "tbody", "tfoot") and self.tables:
+            self.tables[-1].section = tag
+        elif tag == "tr" and self.tables:
+            table = self.tables[-1]
+            self._close_cell(table)
+            table.rows.append(([], table.section))
+        elif tag in ("td", "th") and self.tables:
+            table = self.tables[-1]
+            self._close_cell(table)
+            table.cell = []
+            table.cell_th = tag == "th"
+            table.cell_span = (_span(attrs.get("colspan"), _MAX_COLSPAN), _span(attrs.get("rowspan"), _MAX_ROWSPAN))
         elif tag == "a":
             self.href.append(attrs.get("href", ""))
             self._text("[")
@@ -203,6 +246,7 @@ class _MdParser(HTMLParser):
             level = self.heading or _HEADINGS[tag]
             self._flush_inline(prefix="#" * level + " ")
             self.heading = None
+            self.last_level = level
         elif tag in ("ul", "ol"):
             self._flush_inline()
             if self.list_stack:
@@ -218,12 +262,22 @@ class _MdParser(HTMLParser):
         elif tag == "blockquote":
             self._flush_inline()
             self.quote_depth = max(0, self.quote_depth - 1)
-        elif tag in ("td", "th") and self.table_rows is not None:
-            if self.cell is not None and self.table_rows:
-                self.table_rows[-1].append(" ".join("".join(self.cell).split()))
-            self.cell = None
-        elif tag == "table":
-            self._emit_table()
+        elif tag in ("td", "th") and self.tables:
+            self._close_cell(self.tables[-1])
+        elif tag == "caption" and self.tables:
+            table = self.tables[-1]
+            if table.caption is not None:
+                table.caption_text = " ".join("".join(table.caption).split())
+            table.caption = None
+        elif tag in ("thead", "tbody", "tfoot") and self.tables:
+            self.tables[-1].section = "tbody"
+        elif tag == "table" and self.tables:
+            table = self.tables.pop()
+            self._close_cell(table)
+            if self.tables:
+                self._nest(table, self.tables[-1])
+            else:
+                self._emit_table(table)
         elif tag == "a":
             href = self.href.pop() if self.href else ""
             self._text(f"]({href})" if href else "]")
@@ -240,24 +294,109 @@ class _MdParser(HTMLParser):
         if not self.skip_depth:
             self._text(data)
 
-    def _emit_table(self) -> None:
-        rows = [r for r in (self.table_rows or []) if r]
-        self.table_rows = None
-        if not rows:
+    def _close_cell(self, table: _Table) -> None:
+        """End the cell in progress, if any — `</td>` is optional in HTML."""
+        if table.cell is None:
             return
-        width = max(len(r) for r in rows)
-        lines = []
-        for i, row in enumerate(rows):
-            padded = row + [""] * (width - len(row))
-            lines.append("| " + " | ".join(padded) + " |")
-            if i == 0:
-                lines.append("|" + "---|" * width)
-        self.blocks.append("\n".join(lines))
+        if table.rows:
+            text = " ".join("".join(table.cell).split())
+            colspan, rowspan = table.cell_span
+            table.rows[-1][0].append((text, table.cell_th, colspan, rowspan))
+        table.cell = None
+
+    def _nest(self, inner: _Table, outer: _Table) -> None:
+        """A nested table, flattened into the outer cell it sits in: its caption,
+        then each row's cells, rows separated by `;`."""
+        rows = [" ".join(t for t, *_ in cells if t) for cells, _section in inner.rows]
+        text = "; ".join(r for r in [inner.caption_text, *rows] if r)
+        if outer.cell is not None and text:
+            outer.cell.append(" " + text + " ")
+
+    def _emit_table(self, table: _Table) -> None:
+        """W-287 A2/A4 — the table as a `Grid` for `_table.emit`; a caption is
+        its heading, one level below the last heading emitted."""
+        grid = _grid(table.rows)
+        # Read only when the table declares no header: a `<th>` table needs no
+        # threshold, and `html_to_markdown` is called with no repository bound.
+        percent = None if grid.header else limit("html", "header_fill_percent")
+        out = _table.emit(
+            grid,
+            header_fill_percent=percent,
+            row_limit=None,
+            max_cell_chars=None,
+        )
+        if not out.markdown:
+            if table.caption_text:
+                self.blocks.append(table.caption_text)
+            return
+        if table.caption_text:
+            level = min(self.last_level + 1, _MAX_HEADING)
+            self.blocks.append("#" * level + " " + table.caption_text)
+        if out.prose:
+            self.blocks.append("\n".join(out.prose))
+        self.blocks.append(out.markdown)
 
     def result(self) -> str:
         self._flush_inline()
         out = "\n\n".join(b for b in self.blocks if b.strip())
         return out + "\n" if out else ""
+
+
+def _span(value, cap: int) -> int:
+    """A `colspan`/`rowspan` attribute as a count: 1 when absent or nonsense,
+    clamped to WHATWG's ceiling. `rowspan="0"` spans the rest of the table."""
+    try:
+        n = int(str(value).strip())
+    except (TypeError, ValueError):
+        return 1
+    if n == 0:
+        return cap
+    return max(1, min(n, cap))
+
+
+def _grid(rows) -> _table.Grid:
+    """The rows an HTML table held -> a `_table.Grid` (W-287 A2).
+
+    A cell is placed at the first column no earlier `rowspan` still holds;
+    `colspan`/`rowspan` become a span; a row with no cells is no row. The
+    declared header is the `<thead>` rows, else a leading run of rows whose
+    every cell is a `<th>`; with neither, `_table.emit` finds it by fill.
+    """
+    grid = _table.Grid()
+    pending: dict[int, int] = {}  # column -> rows still covered below
+    sections: list[str] = []
+    all_th: list[bool] = []
+    r = -1
+    for cells, section in rows:
+        if not cells:
+            continue
+        r += 1
+        sections.append(section)
+        all_th.append(all(th for _t, th, *_ in cells))
+        occupied = set(pending)
+        for col, left in list(pending.items()):
+            if left <= 1:
+                del pending[col]
+            else:
+                pending[col] = left - 1
+        col = 0
+        for text, _th, colspan, rowspan in cells:
+            while col in occupied:
+                col += 1
+            grid.cells[(r, col)] = _table.Cell(text, "text")
+            if colspan > 1 or rowspan > 1:
+                grid.spans.append((r, col, r + rowspan - 1, col + colspan - 1))
+            for k in range(colspan):
+                occupied.add(col + k)
+                if rowspan > 1:
+                    pending[col + k] = rowspan - 1
+            col += colspan
+    head = [i for i, section in enumerate(sections) if section == "thead"]
+    if not head:
+        while len(head) < len(all_th) and all_th[len(head)]:
+            head.append(len(head))
+    grid.header = tuple(head)
+    return grid
 
 
 class _TitleParser(HTMLParser):

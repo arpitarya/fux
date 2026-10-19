@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-09-06
 feature: chunking — the strategy vocabulary, the boundary ladder, and the retrieval/citation split
-owns: [src/fux/text/chunk.py@544a2fd79bfc, node/src/refer/chunk.mjs@4d14d3bc8a39]
+owns: [src/fux/text/chunk.py@0e3ea2b588b1, node/src/refer/chunk.mjs@fa8a64801ed9]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 9e63c3b3fc12d4d9b99b9a3c4a01433cf78ae49ed2d7e9579215a0512c71f98d
+content_sha: 4e9809ece7fbdd5715e8d7495d187fae96223880feff7236d59b427d0513710e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -89,6 +89,26 @@ measured getting row-split, correctly, and a per-format rule would have taken
 that away. How many rows a `csv`/`xlsx` table has to split is not this record's:
 it is `.fux/tune.toml [index] max_table_rows` ([SR-TABULAR](0150_tabular.md),
 moved there from `fux.toml [decode]` on 2026-09-11).
+
+**2a. A table is recognised with or without edge pipes** (W-287 A5, 2026-10-19).
+A paragraph is a table when every line starts with `|` (as before), **or** when
+its second line is a GFM delimiter row — at least one `|` between two dash runs,
+`--- | :---:` — and every line contains a `|`. A table written `host | owner`
+with no edge pipes used to be one ordinary paragraph: the whole table one
+passage, SR-TABULAR's 0.229 case. A lone `---` is never a delimiter row. All
+1 387 tracked Markdown files chunk byte-identically under the new rule.
+
+**2b. A one-row passage carries its table — `Passage.row`** (W-287 B1,
+2026-10-19). `TableRow(label, ordinal, columns, values, key, record)`, with
+`Passage.cells` and `Passage.table` read from it; `None` on every passage that
+is not one table row, including every band when `table_rows_per_passage > 1`.
+Cells are split on every `|` no backslash escapes, `\|` unescaped, edge pipes
+off, and padded to the header's width. What the fields mean, the key column and
+the record rule are [SR-TABULAR](0150_tabular.md) decision 9's. **Derived,
+transient, never written** — the module's L3 contract holds for it as for the
+text. Node's `refer/chunk.mjs` is the twin, held equal by
+`tests/refer/test_table_twins.py`. Key comparison is lower-cased with `lower()`,
+never `casefold()`, which has no JavaScript twin.
 
 **3. The boundary ladder has a floor, so every document is quotable.** An
 oversized paragraph descends until something cuts:

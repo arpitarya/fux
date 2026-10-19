@@ -21,7 +21,12 @@ max_cell_chars = 500
 max_inflated = 16777216
 
 [limits.html]
-charset_scan_bytes = 4096
+charset_scan_bytes  = 4096
+# W-287 A4: in a table with no <th>, the header is the first row whose filled
+# cells reach this percent of the table's width; rows above it are prose. It
+# decides which words are COLUMN NAMES -- what a row passage cites -- not which
+# words are indexed. At 1 the first row is always the header, as before.
+header_fill_percent = 60
 
 [limits.image]
 max_inflated = 1048576
@@ -48,7 +53,11 @@ max_text_chars = 2000000
 max_chars = 2000000
 
 [limits.xlsx]
-max_cols = 40
+max_cols            = 40
+# W-287 A4: as [limits.html] -- a sheet's title banner is prose, not a header.
+# 60: a one-cell banner over a 2-column table is not a header; a header naming
+# 3 of 5 columns is.
+header_fill_percent = 60
 
 [limits.xml]
 min_attr_len = 12

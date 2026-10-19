@@ -222,6 +222,7 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "mined_weight",
         "intent_weight",
         "section_weight",
+        "table_column_weight",
     ),
     "graph": (
         "damping",
@@ -376,6 +377,12 @@ class Tune:
     #: document (SR-SECTIONS decision 5). `1.0` is pure max; above it is
     #: refused. `0.0` never opens the plane.
     section_weight: float
+    #: W-287 stage B — a table row passage scored on three fields (its section
+    #: and key value, its column names, its cell values) with column names at
+    #: this weight, a query term naming a column selecting that column's cell,
+    #: and `Field | Value` tables read as records. `0.0` is OFF and is not
+    #: "weight zero": `refer/_rescore.py` takes the pre-W-287 path untouched.
+    table_column_weight: float
 
     # [graph]
     damping: float
@@ -778,6 +785,7 @@ def _resolve(data: dict, label: "Path | str") -> Tune:
         "mined_weight": read("ranking", "mined_weight", _non_negative),
         "intent_weight": read("ranking", "intent_weight", _non_negative),
         "section_weight": read("ranking", "section_weight", _fraction),
+        "table_column_weight": read("ranking", "table_column_weight", _non_negative),
         "damping": read("graph", "damping", _fraction),
         "iterations": read("graph", "iterations", _whole),
         "laziness": read("graph", "laziness", _fraction),

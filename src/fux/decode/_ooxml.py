@@ -78,21 +78,5 @@ def heading_level(style: str | None) -> int | None:
     return _UNNUMBERED_LEVEL
 
 
-def table_markdown(rows: list[list[str]]) -> str:
-    """Rows -> a Markdown table, header separator after the first row.
-
-    Empty rows are dropped and short rows padded so the grammar stays valid;
-    a malformed table that breaks Markdown parsing downstream would take the
-    rest of the document with it.
-    """
-    rows = [r for r in rows if any(cell.strip() for cell in r)]
-    if not rows:
-        return ""
-    width = max(len(r) for r in rows)
-    lines: list[str] = []
-    for index, row in enumerate(rows):
-        cells = [c.replace("|", r"\|") for c in row] + [""] * (width - len(row))
-        lines.append("| " + " | ".join(cells) + " |")
-        if index == 0:
-            lines.append("|" + "---|" * width)
-    return "\n".join(lines)
+# `table_markdown` lived here until 2026-10-19: every table format now becomes
+# Markdown in ONE place, `decode/_table.py::emit` (W-287 stage A).

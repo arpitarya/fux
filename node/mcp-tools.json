@@ -28,7 +28,7 @@
     },
     {
       "name": "fux_passage",
-      "description": "Read the verbatim text of a cited span, addressed as returned by fux_search. Use this instead of reading a whole file when you already have a citation: it returns only the cited lines and the hash they were read at, as `path`, `line_start`, `line_end`, `sha` and `text`.",
+      "description": "Read the verbatim text of a cited span, addressed as returned by fux_search. Use this instead of reading a whole file when you already have a citation: it returns only the cited lines and the hash they were read at, as `path`, `line_start`, `line_end`, `sha` and `text`. `cells` ([column, value] pairs), `table` and `row` are set when the span is one table row and null otherwise.",
       "inputSchema": {
         "type": "object",
         "properties": {

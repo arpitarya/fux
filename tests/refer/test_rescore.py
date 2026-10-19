@@ -24,14 +24,14 @@ def _doc(text: str):
 def test_the_passage_that_matches_scores_highest():
     body = lambda w: (w + " ") * 40
     text = f"# Storage\n\n{body('storage')}\n\n## Capacity\n\n{body('capacity throughput')}"
-    scored = rescore("capacity throughput", _doc(text), scoring=scoring(), weight=0.0, proximity=template_tune().proximity)
+    scored = rescore("capacity throughput", _doc(text), scoring=scoring(), weight=0.0, proximity=template_tune().proximity, column_weight=0.0)
     assert scored[0].passage.heading == "Capacity"
 
 
 def test_a_nonmatching_passage_scores_zero():
     body = lambda w: (w + " ") * 40
     text = f"# Storage\n\n{body('storage')}\n\n## Catering\n\n{body('espresso')}"
-    scored = rescore("espresso", _doc(text), scoring=scoring(), weight=0.0, proximity=template_tune().proximity)
+    scored = rescore("espresso", _doc(text), scoring=scoring(), weight=0.0, proximity=template_tune().proximity, column_weight=0.0)
     assert scored[0].passage.heading == "Catering"
     assert scored[-1].score == 0.0
 
@@ -39,14 +39,14 @@ def test_a_nonmatching_passage_scores_zero():
 def test_results_are_sorted_and_tie_break_on_the_locator():
     body = lambda w: (w + " ") * 40
     text = f"# A\n\n{body('same')}\n\n## B\n\n{body('same')}"
-    scored = rescore("same", _doc(text), scoring=scoring(), weight=0.0, proximity=template_tune().proximity)
+    scored = rescore("same", _doc(text), scoring=scoring(), weight=0.0, proximity=template_tune().proximity, column_weight=0.0)
     assert [s.score for s in scored] == sorted((s.score for s in scored), reverse=True)
     ties = [s.locator for s in scored if s.score == scored[0].score]
     assert ties == sorted(ties)
 
 
 def test_the_locator_addresses_the_passage_not_just_the_document():
-    scored = rescore("storage", _doc("# Storage\n\n" + ("storage " * 40)), scoring=scoring(), weight=0.0, proximity=template_tune().proximity)
+    scored = rescore("storage", _doc("# Storage\n\n" + ("storage " * 40)), scoring=scoring(), weight=0.0, proximity=template_tune().proximity, column_weight=0.0)
     # W-76 Phase 5: the locator is a LINE RANGE now, not a passage ordinal.
     # The assertion's intent is unchanged — the locator must address the
     # passage rather than just the document — and a line range addresses it
@@ -55,7 +55,7 @@ def test_the_locator_addresses_the_passage_not_just_the_document():
 
 
 def test_an_empty_query_scores_nothing():
-    assert rescore("", _doc("# A\n\n" + ("alpha " * 40)), scoring=scoring(), weight=0.0, proximity=template_tune().proximity) == []
+    assert rescore("", _doc("# A\n\n" + ("alpha " * 40)), scoring=scoring(), weight=0.0, proximity=template_tune().proximity, column_weight=0.0) == []
 
 
 def test_it_reuses_the_index_scorer_rather_than_defining_a_second():
@@ -87,8 +87,8 @@ def test_weight_zero_is_byte_identical_to_the_unweighted_score():
     """
     body = lambda w: (w + " ") * 40
     text = f"# Storage\n\n{body('storage capacity')}\n\n## Catering\n\n{body('capacity espresso')}"
-    default = rescore("storage capacity", _doc(text), scoring=scoring(), weight=0.0, proximity=template_tune().proximity)
-    explicit = rescore("storage capacity", _doc(text), weight=0.0, scoring=scoring(), proximity=template_tune().proximity)
+    default = rescore("storage capacity", _doc(text), scoring=scoring(), weight=0.0, proximity=template_tune().proximity, column_weight=0.0)
+    explicit = rescore("storage capacity", _doc(text), weight=0.0, scoring=scoring(), proximity=template_tune().proximity, column_weight=0.0)
     assert [s.score for s in default] == [s.score for s in explicit]
     assert [s.locator for s in default] == [s.locator for s in explicit]
     # And the identity is exact, not rounded: these are the same float objects
@@ -102,8 +102,8 @@ def test_a_negative_weight_is_off_rather_than_a_penalty():
     own weight the same way."""
     body = lambda w: (w + " ") * 40
     text = f"# A\n\n{body('storage capacity')}\n\n## B\n\n{body('capacity')}"
-    assert [s.score for s in rescore("storage capacity", _doc(text), weight=-1.0, scoring=scoring(), proximity=template_tune().proximity)] == [
-        s.score for s in rescore("storage capacity", _doc(text), scoring=scoring(), weight=0.0, proximity=template_tune().proximity)
+    assert [s.score for s in rescore("storage capacity", _doc(text), weight=-1.0, scoring=scoring(), proximity=template_tune().proximity, column_weight=0.0)] == [
+        s.score for s in rescore("storage capacity", _doc(text), scoring=scoring(), weight=0.0, proximity=template_tune().proximity, column_weight=0.0)
     ]
 
 
@@ -121,11 +121,11 @@ def test_the_passage_that_says_the_query_back_wins_when_the_weight_is_on():
     text = f"# Alpha\n\nrollback {pad} procedure {pad}\n" + f"\n# Beta\n\n{pad} rollback procedure {pad}\n"
     candidates = [("file:a.md", "a.md", "sha", chunk(text, **chunk_bounds(), line_numbers=True, frontmatter=False))]
 
-    off = rescore("rollback procedure", candidates, scoring=scoring(), weight=0.0, proximity=template_tune().proximity)
+    off = rescore("rollback procedure", candidates, scoring=scoring(), weight=0.0, proximity=template_tune().proximity, column_weight=0.0)
     assert off[0].score == off[1].score, "the arms must be a BM25 tie, or this tests length"
     assert off[0].passage.heading == "Alpha"
 
-    on = rescore("rollback procedure", candidates, weight=1.0, scoring=scoring(), proximity=template_tune().proximity)
+    on = rescore("rollback procedure", candidates, weight=1.0, scoring=scoring(), proximity=template_tune().proximity, column_weight=0.0)
     assert on[0].passage.heading == "Beta"
 
 
@@ -137,7 +137,7 @@ def test_the_multiplier_is_bounded_by_the_weight():
     body = "the rollback procedure is documented here"
     text = f"# A\n\n{body}\n"
     candidates = [("file:a.md", "a.md", "sha", chunk(text, **chunk_bounds(), line_numbers=True, frontmatter=False))]
-    base = rescore("rollback procedure", candidates, scoring=scoring(), weight=0.0, proximity=template_tune().proximity)[0].score
+    base = rescore("rollback procedure", candidates, scoring=scoring(), weight=0.0, proximity=template_tune().proximity, column_weight=0.0)[0].score
     for weight in (0.5, 1.0, 2.0):
-        boosted = rescore("rollback procedure", candidates, weight=weight, scoring=scoring(), proximity=template_tune().proximity)[0].score
+        boosted = rescore("rollback procedure", candidates, weight=weight, scoring=scoring(), proximity=template_tune().proximity, column_weight=0.0)[0].score
         assert base <= boosted <= base * (1.0 + weight) + 1e-12

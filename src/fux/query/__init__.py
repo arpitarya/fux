@@ -1901,6 +1901,7 @@ def _refer_payload(bundle, block) -> dict:
                     # this and the payload did not carry it (W-140 row 2).
                     # Additive: no key removed or repurposed.
                     "ordinal": c.ordinal,
+                    **_row_fields(c),
                 }
                 for c in citations
             ]
@@ -1916,6 +1917,30 @@ def _refer_payload(bundle, block) -> dict:
     }
 
 
+def _row_fields(c) -> dict:
+    """W-287 C1 — a ROW passage's record, as `--json` and MCP carry it.
+
+    **Additive, and only on a row**: a passage that is not one table row gains
+    no key, and `text` — the Markdown band with its header — stays exactly what
+    it was, so an agent that parsed the band does not break.
+    """
+    if c.cells is None:
+        return {}
+    return {
+        "cells": [[column, value] for column, value in c.cells],
+        "table": c.table[0],
+        "row": c.table[1],
+        "columns_matched": list(c.columns_matched),
+    }
+
+
+def _print_record(c) -> None:
+    """A row passage as a record (W-287 C1, C2): one `column: value` line per
+    filled cell, the cell the query's column named first and marked."""
+    for column, value, asked in c.record():
+        print(f"{column}: {value}" + ("  <- asked" if asked else ""))
+
+
 def _print_refer_answer(built: AnswerBuilt) -> None:
     """The fetched answer as text: every passage, then its locator."""
     bundle = built.bundle
@@ -1929,7 +1954,10 @@ def _print_refer_answer(built: AnswerBuilt) -> None:
     for c in bundle.assembled.citations:
         if c.heading:
             print(f"# {c.heading}\n")
-        print(c.text)
+        if c.record():
+            _print_record(c)
+        else:
+            print(c.text)
         print()
         print(f"  -- {c.locator} (sha {c.sha[:12]}, {by_doc.get(c.doc_id, freshness)})")
         print()

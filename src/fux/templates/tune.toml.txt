@@ -75,6 +75,14 @@ intent_weight           = 0.1
 # `fux ingest --full` (W-278, 2026-10-13). Off by default: the plane about
 # doubles the index. Above 0 with section_records = false is an error.
 section_weight          = 0.0
+# Answer from a table by row AND by column (W-287): a row passage is scored on
+# its section and key value, its column names (at this weight) and its cells,
+# and a query word that names a column points at that column's cell. 0 = OFF:
+# a row scores exactly as it did before. MEASURED 2026-10-19: at 1.0 it won 59
+# of 59 changed table questions and lost none, but FAILED the latency
+# guardrail -- answer p95 on a 20 000-row sheet 1.74x -- so it ships OFF
+# (work/regression/2026-10-19-w287-table-columns/VERDICT.md).
+table_column_weight     = 0.0
 
 [graph]                         # explain / graph / path
 damping      = 0.85   # restart probability is 1 - damping; PageRank's published value

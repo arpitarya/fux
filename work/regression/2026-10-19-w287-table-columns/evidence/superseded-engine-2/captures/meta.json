@@ -1,0 +1,52 @@
+{
+  "arms": {
+    "tc-0.0": {
+      "ablated": [],
+      "index_digest": "145ceb896368f4a94b8a7cd125f63c799d607c00e158db1fc7e77821aa335377",
+      "questions": 102,
+      "table_column_weight": 0.0
+    },
+    "tc-1.0": {
+      "ablated": [],
+      "index_digest": "145ceb896368f4a94b8a7cd125f63c799d607c00e158db1fc7e77821aa335377",
+      "questions": 102,
+      "table_column_weight": 1.0
+    },
+    "tc-1.0-B2": {
+      "ablated": [
+        "B3",
+        "B4",
+        "B5"
+      ],
+      "index_digest": "145ceb896368f4a94b8a7cd125f63c799d607c00e158db1fc7e77821aa335377",
+      "questions": 102,
+      "table_column_weight": 1.0
+    },
+    "tc-1.0-noB3": {
+      "ablated": [
+        "B3"
+      ],
+      "index_digest": "145ceb896368f4a94b8a7cd125f63c799d607c00e158db1fc7e77821aa335377",
+      "questions": 102,
+      "table_column_weight": 1.0
+    },
+    "tc-1.0-noB4": {
+      "ablated": [
+        "B4"
+      ],
+      "index_digest": "145ceb896368f4a94b8a7cd125f63c799d607c00e158db1fc7e77821aa335377",
+      "questions": 102,
+      "table_column_weight": 1.0
+    },
+    "tc-1.0-noB5": {
+      "ablated": [
+        "B5"
+      ],
+      "index_digest": "145ceb896368f4a94b8a7cd125f63c799d607c00e158db1fc7e77821aa335377",
+      "questions": 102,
+      "table_column_weight": 1.0
+    }
+  },
+  "engine": "/Users/arpitarya/my_programs/fux/src/fux/__init__.py",
+  "version": "4.1.1"
+}

@@ -426,6 +426,26 @@ historical carry-over and is a known misnomer; a rename to `path` would change
 a committed record field and is owned by
 [SR-GRAPH](../records/0126_graph.md). See [documents, not code](#documents-not-code).
 
+**Column selector** — W-287's B3: a query word that is a word of a table
+column's NAME selects that column, and the query's other words are scored
+against the selected cell alone, so *"status open"* prefers the row whose Status
+cell says `open`. The selected column is printed first in `fux answer` (`<-
+asked`). Lexical and deterministic; behind `[ranking] table_column_weight`,
+shipped off. [SR-REFER](../records/0127_refer-plane.md) decision 28.
+
+**Key column** — W-287's B4: the leftmost column of a table whose values are
+filled and distinct in every row (`Ticket`, `host`). Its value is folded into
+the row passage's heading field, so `INC6014999` names its row the way a heading
+names a section. A [record table](#record-table)'s key is its field-name column.
+[SR-TABULAR](../records/0150_tabular.md) decision 9.
+
+**Record table** — W-287's B5: a two-column table under a generic header
+(`Field | Value`, `Key | Value`, … a closed list in `constants.toml [tables]`) —
+a property sheet. Each row's first cell is its field name, so the row answers as
+`Pager: sre-oncall`, not as `Field: Pager, Value: sre-oncall`. A two-column table
+with a real header (`Ticket | Owner`) is NOT one.
+[SR-TABULAR](../records/0150_tabular.md) decision 9.
+
 **Compare doc** — A decision record written *before* building whenever a fork
 has multiple viable options: debate, matrix, grounded references, a proposed
 verdict Arpit accepts or overrides, and a **reopen-trigger**. Verdict-first by

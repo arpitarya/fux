@@ -3,15 +3,15 @@ type: Standing Record
 kind: component
 name: SR-TABULAR
 title: "SR-TABULAR (0150) — a table is a list of rows, and a row is the unit of an answer"
-description: "How .csv, .tsv, .xlsx and .xlsm are read and cited: one passage per row, how much of a table is admitted, and the two silent data losses this record was written to close."
+description: "How .csv, .tsv, .xlsx and .xlsm are read and cited: one passage per row, how much of a table is admitted, every value under its true column name (cells by address, number formats, merges, the header found by fill), a row passage that knows its table, and the sheet-and-row citation."
 status: accepted
 date: 2026-09-06
-amended: 2026-09-11
+amended: 2026-10-19
 feature: tabular documents — row granularity, the admitted-row limit, and what a table citation is
-owns: [src/fux/decode/csv.py@8458975be6fd, src/fux/decode/xlsx.py@1ec265cb92e2, src/fux/decode/_limits.py@943c646c639b]
+owns: [src/fux/decode/csv.py@37535df2ad5e, src/fux/decode/xlsx.py@658e011c03ab, src/fux/decode/_limits.py@943c646c639b]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 8d40510996cab4d9b450ee842140c46346141fc0b7460cccea772a53593a6027
+content_sha: 037d69d5b71d8b7c29133d14094f1952a216b6d25241582dde35ca573a87e1b6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -163,9 +163,70 @@ process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchange
 this moved where they are written, not what they are.
 
 - `src/fux/decode/csv.py` — `VERSION` ← `[decoders.csv] version`, `EXTENSIONS` ← `[decoders.csv] extensions`
-- `src/fux/decode/xlsx.py` — `VERSION` ← `[decoders.xlsx] version`, `EXTENSIONS` ← `[decoders.xlsx] extensions`, `_SHARED` / `_SHEETS` / `_WORKBOOK` ← `[decoders.xlsx.format] shared` / `sheets` / `workbook` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28)
+- `src/fux/decode/xlsx.py` — `VERSION` ← `[decoders.xlsx] version`, `EXTENSIONS` ← `[decoders.xlsx] extensions`, `_SHARED` / `_SHEETS` / `_WORKBOOK` ← `[decoders.xlsx.format] shared` / `sheets` / `workbook` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28); `_STYLES`, `_DATE_IDS` / `_TIME_IDS` / `_DATETIME_IDS`, the three epochs, `_PHANTOM_LEAP_DAY` and `_SECONDS_PER_DAY` ← `[decoders.xlsx.format] styles` / `date_formats` / `time_formats` / `datetime_formats` / `epoch_1900` / `epoch_1900_early` / `epoch_1904` / `phantom_leap_day` / `seconds_per_day` (W-287, 2026-10-19)
 
 <!-- L12-VALUES-END -->
+
+**8. Every value sits under its TRUE column name** (W-287 stage A, 2026-10-19).
+Every rule below lives ONCE, in `decode/_table.py`, which all four table
+formats feed ([SR-DECODE](0139_decode.md) decision 23); the bullets say what
+each rule is.
+
+- **An `.xlsx` cell is placed by its address.** Excel omits an empty cell, so a
+  row whose second cell is blank stores two `<c>` elements; appending them in
+  XML order put the third column's value under the second column's name. Each
+  cell is placed by its `r="C7"` column; a gap is an empty cell; a column empty
+  in every row is dropped (it names nothing and holds nothing).
+- **A number is read through its format.** `styles.xml`'s `cellXfs` →
+  `numFmtId`: a date reads `2026-07-11`, a time `14:30`, both `2026-07-11
+  14:30`; a boolean `true`/`false`; any other number its shortest decimal. The
+  built-in date ids and the epochs are ECMA-376's, in `constants.toml
+  [decoders.xlsx.format]`; the 1900 system's phantom leap day (serial 60) stays a
+  number, because it is a date that never existed.
+- **A merged cell repeats its anchor's value** into every cell of the span that
+  the sheet holds a row for.
+- **The header is the first row whose source-filled cells reach
+  `[limits.<decoder>] header_fill_percent` of the table's width**
+  (`.fux/formats.toml`, shipped `60`, for `xlsx` and for an HTML table with no
+  `<th>`; `decode/_table.py`). Rows above it — a title banner — are prose under
+  the sheet heading, so their words are no one's column name. *Filled in the
+  source*: a merged banner fills one cell, not five. At `1` the first row is the
+  header, as before.
+  ⚠ **It is a decoder cap, not an `[index]` key, and the work item said
+  `[index]`.** The index is a bag of terms: a banner's words are the same body
+  terms whether they head the columns or sit above them, so the threshold moves
+  **no committed byte** — measured: `test_an_index_key_does_change_the_index`
+  stayed red with a banner table in its corpus. [SR-TUNE](0135_tuning.md)
+  decision 1's rule therefore refuses it from `[index]`, whose exception exists
+  for keys that DO change the index. What it changes is which words a ROW
+  PASSAGE repeats as its column names, and it sits in the extract-config digest
+  with every other cap.
+- **The row budget counts data rows below the header** (decision 3); a banner
+  spends none of it. Every row is read before the budget is applied, because
+  the header cannot be known until the table's width is; the sheet's XML is
+  already wholly parsed, so this costs no more than the parse.
+
+**9. A row passage knows its table — on fetched bytes, never committed** (W-287
+stage B, 2026-10-19). Each one-row passage carries a `TableRow`
+([SR-CHUNKING](0151_chunking.md)): its columns, its cells, its data-row
+ordinal, its KEY column — the leftmost whose values are filled and distinct in
+every row — and whether the table is a **record**: two columns under a generic
+header (`Field | Value`, a closed list in `constants.toml [tables]`), where each
+row's first cell is its field name and, when the names are distinct, its key.
+**How a row is scored on it is [SR-REFER](0127_refer-plane.md) decision 28's**,
+behind `[ranking] table_column_weight`, shipped `0.0` — its L13 run FAILED on
+the 20 000-row latency guardrail (1.74×) with 59 wins and 0 losses, so it stays
+off. Nothing of it is written anywhere (L3):
+`tests_e2e/test_table_answers.py::test_the_mechanism_writes_nothing_to_the_index`.
+
+**10. A spreadsheet row is cited `book.xlsx#Sheet!R12`** — the sheet and the
+data row, from 1, header not counted ([SR-ANSWER](0105_answer.md) decision 9).
+The decoded Markdown's line numbers exist nowhere, and `#p12` names nothing a
+person can open. `.csv`/`.tsv` keep `owners.csv:L438-L438`, which a person can.
+⚠ **The address is presentation, and it may not move an order**: ties are broken
+on the positional locator (`path#p12`), never this one. The first form broke
+them on this string and reordered tied rows with the ranking key off — found by
+the run's G0 gate, `work/regression/2026-10-19-w287-table-columns/`.
 
 ### The measurement
 

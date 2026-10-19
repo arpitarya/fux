@@ -29,6 +29,7 @@ from __future__ import annotations
 import csv
 import io
 from fux.constants import fixed
+from fux.decode import _table
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -36,7 +37,7 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.csv", "version")  # not bumped by W-225 4a: its caps moved to formats.toml at the same values; nor W-282 (moved module paths in comments)
+VERSION = fixed("decoders.csv", "version")  # 2 (W-287 A): rows feed the one table emitter, `_table.emit`; an all-empty column is dropped
 
 EXTENSIONS = tuple(fixed("decoders.csv", "extensions"))
 
@@ -68,24 +69,24 @@ def decode(raw: bytes, rel_path: str) -> str | None:
     except csv.Error:
         return None
 
-    rows = [r for r in rows if any(cell.strip() for cell in r)]
-    if not rows:
+    # W-287 stage A: the rows become a `_table.Grid` and `_table.emit` writes
+    # them — the same emitter every table format uses. A csv's header is its
+    # first non-blank row, always; a blank row never reaches the table, so it
+    # spends no budget. The limit counts DATA rows: a consumer who writes
+    # 20 000 means twenty thousand records, not 19 999 plus a header.
+    grid = _table.Grid(
+        cells={(r, c): _table.Cell(value, "text") for r, row in enumerate(rows) for c, value in enumerate(row)}
+    )
+    table = _table.emit(
+        grid,
+        header_fill_percent=None,
+        row_limit=max_table_rows(),
+        max_cell_chars=limit("csv", "max_cell_chars"),
+    )
+    if not table.markdown:
         return None
-    # The limit counts DATA rows: a consumer who writes 20 000 means twenty
-    # thousand records, not 19 999 plus a header. The header is row 0 here and
-    # is always kept — without it every cell downstream is unlabelled.
-    limit = max_table_rows()
-    truncated = len(rows) > limit + 1
-    rows = rows[: limit + 1]
-
-    width = max(len(r) for r in rows)
-    lines: list[str] = []
-    for index, row in enumerate(rows):
-        cells = [_cell(c) for c in row] + [""] * (width - len(row))
-        lines.append("| " + " | ".join(cells) + " |")
-        if index == 0:
-            lines.append("|" + "---|" * width)
-    if truncated:
+    lines = [table.markdown]
+    if table.truncated:
         # Said in the document rather than hidden, so a reader of a search hit
         # knows the tail exists. Not a row count — a count would change with
         # the file and make the text a moving target for no benefit.
@@ -93,12 +94,6 @@ def decode(raw: bytes, rel_path: str) -> str | None:
         lines.append("*(table truncated)*")
     name = rel_path.rsplit("/", 1)[-1]
     return f"# {name}\n\n" + "\n".join(lines) + "\n"
-
-
-def _cell(value: str) -> str:
-    # Pipes would break the table grammar; escaping rather than dropping keeps
-    # the term searchable, which is the only thing that matters downstream.
-    return " ".join(value.split())[:limit("csv", "max_cell_chars")].replace("|", r"\|")
 
 
 def _sniff(text: str) -> str:

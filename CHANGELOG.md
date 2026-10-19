@@ -8,6 +8,49 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+**Tables answer by row and by column (W-287).** No index-format change
+(`fux.index.v8`); the ranking change ships **off** — its pre-registered run
+failed on latency, not on quality.
+
+### Changed
+
+- **Every table becomes Markdown in one place** (`decode/_table.py`), fed by the
+  `.xlsx`, HTML, `.docx` and `.csv` decoders — and every value now sits under its
+  true column name: an `.xlsx` cell by its address (Excel omits empty cells, so
+  sparse rows shifted left), dates as `2026-07-11` and booleans as `true`/`false`
+  instead of serials and `0`/`1`, merged cells repeated across their span, HTML
+  `<thead>`/`<th>`, `colspan`/`rowspan`, `<caption>` and nested tables, Word
+  `gridSpan`/`vMerge`, and a `|` inside an HTML cell escaped (it added a column).
+  A sheet's title banner is prose, not the header row.
+- **A Markdown table without edge pipes** (`host | owner` over `--- | ---`) is
+  split one row per passage, like any other table.
+- **`fux answer` prints a table row as a record**: one `column: value` line per
+  filled cell. `--json` passages that are one table row gain `cells`, `table`,
+  `row` and `columns_matched`; `text` keeps the Markdown band. MCP `fux_passage`
+  returns `cells`/`table`/`row` (null unless the span is one row). An `.xlsx` row
+  is cited `book.xlsx#Sheet!R12`.
+
+### Added
+
+- **`[ranking] table_column_weight`** (`.fux/tune.toml`, ships `0.0` = OFF):
+  above zero a row passage is scored on its section and key value, its column
+  names and its cells, and a query word that names a column points at that
+  column's cell (`<- asked`). **Measured and left off:** on its L13 run it won
+  59 table questions and lost none, but `answer` on a 20 000-row sheet slowed
+  1.74× against a 1.2× limit. Set it to `1.0` yourself if your tables are small.
+- **`[limits.html]` and `[limits.xlsx] header_fill_percent = 60`**
+  (`.fux/formats.toml`).
+
+### ⚠ Upgrading
+
+- **Run `fux doctor --fix` once**: it writes `table_column_weight` and the two
+  `header_fill_percent` caps into an existing `tune.toml` / `formats.toml`.
+  Without them `fux ingest` and the ranked verbs stop, naming the key.
+- **The next `fux ingest` re-extracts every `.csv`, `.tsv`, `.xlsx`, `.xlsm`,
+  `.html`, `.htm`, `.xhtml`, `.docx` and `.docm`** (four decoder versions moved),
+  and **every document once** (the new caps are in the extract-config digest).
+  A fetched HTML page's Markdown changes at its next refresh.
+
 ## [4.1.1] - 2026-10-19
 
 **No engine change.** A version bump on all six names — `fux-core`,

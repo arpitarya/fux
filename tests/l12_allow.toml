@@ -17,6 +17,7 @@ category = "identity"
 basis = "decision 6"
 why = "an arithmetic identity, an empty value or a zero-count start: `0`, `1`, `-1`, `0.0`, `1.0`, `''`"
 sites = [
+  "src/fux/refer/_assemble.py::Citation.order_key::class::''",
   "src/fux/inspect/idfamilies.py::Detection.candidates::class::0",
   "src/fux/inspect/idfamilies.py::Detection.documents::class::0",
   "src/fux/inspect/idfamilies.py::Parity.diff::class::''",
@@ -177,6 +178,7 @@ sites = [
   "node/src/refer/freshness.mjs::UNVERIFIED::module::\"unverified\"",
   "node/src/refer/rescore.mjs::BODY_I::module::\"body\"",
   "node/src/refer/rescore.mjs::HEADING_I::module::\"heading\"",
+  "node/src/refer/rescore.mjs::CTX_I::module::\"ctx\"",
   "node/src/refer/source.mjs::GIT::module::\"git\"",
   "node/src/refer/source.mjs::URL::module::\"url\"",
   "node/src/verbs/mcp.mjs::handle::path::\"tools/call\"",
@@ -337,6 +339,7 @@ why = "parsing logic: a regex, an algorithm's rule table, a character class, a s
 sites = [
   "src/fux/inspect/idfamilies.py::_NODE_SPANS::module::\"let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{...",
   "src/fux/inspect/idfamilies.py::_utf16::inline::2",
+  "src/fux/decode/xlsx.py::_column::inline::26",
   "src/fux/inspect/idfamilies.py::regex_parity::inline::2",
   "node/src/query/analyzer.mjs::withFamilies::inline::2",
   "node/src/query/identifiers.mjs::CLASS_ESC::module::\"0-9\"",

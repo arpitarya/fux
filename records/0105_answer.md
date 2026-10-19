@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@d04cd01910cd]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: ec9dc0c845b555d1f43868b6bd69289be42d1f6dcd1c25b531916e639e00f50c
+content_sha: 56b23bcb06ad16c2e544e86e3c9c5dc4a51a8b0ed01fc9de5f58597e6b2773b7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -222,6 +222,13 @@ the same change: `answer.passages[]` now emits `ordinal`, pinned through the
 CLI by `tests_e2e/test_verbs.py::test_every_passage_carries_its_ordinal`.
 [SR-REFER](0127_refer-plane.md) decision 17 carries both halves.
 
+**9a. A spreadsheet row is `book.xlsx#Sheet!R12`** (W-287 C3, 2026-10-19) — the
+sheet and the data row, from 1, header not counted. A decoded `.xlsx` has no
+line a person can open, and `#p12` names a chunk of generated Markdown;
+`Sheet!R12` names what Excel shows. Every other document keeps its line range or
+its ordinal, `.csv` included. The address is presentation: ties are broken on
+the positional locator ([SR-REFER](0127_refer-plane.md) decision 28a).
+
 **10. `answer` reports whether anything changed since the same question was
 last asked.** The comparison that needs — *did the cited bytes move?* — is
 already performed on every call by the refer plane; what is remembered is only
@@ -277,6 +284,19 @@ the *first* passage's line range whatever the second passage was. With passages
 from three documents it would have named the wrong file — in the one product
 whose promise is that a citation is checkable. Additive keys only: nothing was
 removed or repurposed ([SR-ASK](0103_ask.md) decision 11's rule).
+
+**12a. A table row is answered as a RECORD** (W-287 C1/C2, 2026-10-19). A passage
+that is one table row carries four more keys in `answer.passages[]` — `cells`
+(`[column, value]` pairs, in column order), `table` (its section: a sheet, a
+caption), `row` (the data row, from 1) and `columns_matched` (the columns the
+query named, [SR-REFER](0127_refer-plane.md) decision 28) — and the text surface
+prints it as one `column: value` line per filled cell, **the cell the query's
+column named first, marked `<- asked`**, then the rest in column order
+(`Citation.record`). `text` keeps the Markdown band, header included, so a
+caller that parsed it does not break; a passage that is not a row gains no key.
+`columns_matched` is empty while `[ranking] table_column_weight` is `0.0`, so the
+record then prints in column order. Pinned through the CLI by
+`tests_e2e/test_table_answers.py`, in Node by `node/test/tables.test.mjs`.
 
 **13. The byte budget is unchanged; the bytes SPENT went up, and that is the
 price.** `[refer] budget` still bounds the whole rendered answer and is never

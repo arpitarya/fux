@@ -215,6 +215,7 @@ def refer(
         scoring=tune.scoring,
         weight=tune.rerank_weight,
         proximity=tune.proximity,
+        column_weight=tune.table_column_weight,
     )
     assembled = assemble(
         scored,

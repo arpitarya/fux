@@ -3,14 +3,14 @@ type: Standing Record
 kind: component
 name: SR-REFER
 title: "SR-REFER (0127) — the refer plane: fetch from the source, verify by content, assemble under a byte budget"
-description: "Fux still does not fetch — the refer plane reuses the consumer-fetcher contract. Freshness is verified by content sha rather than by age. The answer limit is a byte budget, not k."
+description: "Fux still does not fetch — the refer plane reuses the consumer-fetcher contract. Freshness is verified by content sha rather than by age. The answer limit is a byte budget, not k. A table row is scored by row and by column behind one key, shipped off (decision 28)."
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@ae9646ff93e5, tools/refer-bench@971d72542a1f, tools/refer-budget-sweep@da100abfb8a5, node/src/refer/assemble.mjs@5ec2194a5a0a, node/src/refer/rescore.mjs@ba64261b7406, node/src/refer/source.mjs@b525f684aede, src/fux/acquire/source.py@da0d26931219]
+owns: [src/fux/refer@deb80a9325b9, tools/refer-bench@971d72542a1f, tools/refer-budget-sweep@da100abfb8a5, node/src/refer/assemble.mjs@cd053158edc1, node/src/refer/rescore.mjs@eb08cb7e6d28, node/src/refer/source.mjs@b525f684aede, src/fux/acquire/source.py@da0d26931219]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 0068c64c68f58d34f4e596790f930c148cbb6f4ce46af9b1cbef8eab71af4f09
+content_sha: f014b9eaa903aa467f0025ce87137718e503af9b5d642f70420099c51d77ff9d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -621,6 +621,52 @@ degradation this plane already has) and `from_acquired` returns `None`.
 ⚠ **`_decode_fetched` and `sanitize` are still IMPORTED, never reimplemented.**
 The rule did not change; what changed is that the thing threaded alongside them
 is now a committed fact instead of a response header.
+
+**28. A table row is scored by row AND by column — behind one key, shipped OFF**
+(W-287 stage B, 2026-10-19).
+
+> 🔴 **FAILED 2026-10-19 — on a guardrail, not on gain.** Its L13 run
+> ([VERDICT](../work/regression/2026-10-19-w287-table-columns/VERDICT.md),
+> decider run by Arpit): slice `hit@1` and `cell@1` each **59 wins, 0 losses**
+> (net needed 17), no prose collateral, every other guardrail held — and
+> `answer` p95 on a 20 000-row sheet rose **1.74×** (1 110 → 1 933 ms) against a
+> limit of 1.2×. **`table_column_weight` stays `0.0`.** A faster form is a new
+> run on a fresh set (L13 decision 5). The code below stays, off, because the
+> record surface (C1–C3) reads `columns_matched` and the gates prove off is
+> byte-identical. `rescore` takes `[ranking] table_column_weight`
+([SR-TUNE](0135_tuning.md)). **`0.0` is OFF, and off is the path before W-287,
+untouched**: every passage goes through `_terms_of`. Above zero, a passage that
+is ONE table row (`passage.row`, [SR-TABULAR](0150_tabular.md) decision 9) is
+scored differently in three ways, and every other passage exactly as before:
+
+- **B2 — three fields, not two.** *heading*: the section and, when the table has
+  one, the row's key value (B4); *columns*: the header's cells — for a record,
+  the row's own field name — at `table_column_weight`, riding in the `ctx` slot
+  a passage never otherwise fills; *body*: the rest of the text, the header line
+  taken out once. BM25F is weight-then-saturate, so column names at the body's
+  weight score as they did inside the body.
+- **B3 — the column selector.** A query term that is a word of a column's name
+  (a record's field name) selects that column; the query's other terms are
+  scored with the passage set's own BM25F against the selected cell(s) alone,
+  and that score is added. The passage records `columns_matched`, which is the
+  cell `fux answer` prints first ([SR-ANSWER](0105_answer.md) decision 12).
+- **B4/B5** as SR-TABULAR decision 9 defines them.
+
+**Why a lexical selector and not a parse.** *"owner of INC6014999"* names a
+column and a key; matching column-name words is deterministic, needs no model
+(L4) and adds work only to rows of a table whose header the query matched. A
+query that names no column runs none of B3.
+
+**Measured, and FAILED** — the banner above. Its L13 run is
+`work/regression/2026-10-19-w287-table-columns/`, decided arm `1.0`, decider run
+by Arpit, who did not capture.
+
+**28a. Ties break on the POSITIONAL locator, never the displayed one.** `rescore`
+and `assemble` sort equal scores by `order_key` (`path:L12-L40` / `path#p3`).
+They sorted by `locator`, and W-287's C3 changed a spreadsheet row's locator to
+`book.xlsx#Sheet!R12` — which reordered identically scored rows and, where the
+budget cut a tie, changed which one was cited, **with the ranking key off**.
+Found by that run's G0 gate on 2 of 102 questions, before any endpoint existed.
 
 **The refer plane holds no structural numeral**: `source.mjs` strips `file:`/`url:` by their length and fans acquired objects out by `[radix] hex_digits_per_byte`; the fetch cache's key width and the ARC ghost bound are `[refer] cache_key_hex` and `arc_ghost_bytes` ([SR-CACHE](0131_cache.md)). ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 

@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/acquire/urlsrc.py@0ff7a50c2648, src/fux/templates@8f310c47eabc]
+owns: [src/fux/acquire/urlsrc.py@0ff7a50c2648, src/fux/templates@e596891dfbec]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: d095744f49782d24feac0a64f29315ee2a6515ce6eb6b3f6eadb53072d91396d
+content_sha: c38c07ffaeb64e2d752bb0f7dceb871ba9e9ae54c99e1ed5f82be249265168e3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -699,6 +699,8 @@ copied out, never imported.
 **No decision here moved** (W-278, 2026-10-13): `src/fux/templates/tune.toml.txt` changed the `section_weight` comment only ([SR-TUNE](0135_tuning.md)).
 
 **No decision here moved** (W-273 phase 2, 2026-10-13): the `section_weight` and `section_records` comments in the templates name `1.0` as the measured value.
+
+**No decision here moved** (W-287, 2026-10-19): `src/fux/templates` gains two template keys — `.fux/tune.toml [ranking] table_column_weight` and `.fux/formats.toml [limits.html|xlsx] header_fill_percent` ([SR-TUNE](0135_tuning.md), [SR-DECODE](0139_decode.md) decision 23). ⚠ **A fetched HTML page's Markdown changes** through the shared `html` decoder at its next refresh — header rows, spans, captions, nested tables, escaped pipes — which is SR-DECODE decision 23's, not a fetcher's.
 
 ### Consequences
 

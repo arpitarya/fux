@@ -19,6 +19,8 @@ import { headings } from "../decode/markdown.mjs";
 import { fixed } from "../config/constants.mjs";
 
 const MIN_TABLE_LINES = fixed("markdown", "min_table_lines");
+// W-287 B5 — the header pairs that make a two-column table a RECORD.
+const RECORD_HEADERS = new Set(fixed("tables", "record_headers").map((pair) => JSON.stringify(pair)));
 
 //: The three passage bounds are `.fux/tune.toml [refer]`'s and arrive from the
 //: caller's `Tune` (L12). Why each is what the template ships — one row per
@@ -26,6 +28,11 @@ const MIN_TABLE_LINES = fixed("markdown", "min_table_lines");
 
 const TABLE_ROW_RE = /^\s*\|/;
 const TABLE_SEP_RE = /^\s*\|[\s:|-]+\|?\s*$/;
+// W-287 A5 — GFM's delimiter row, edge pipes optional. Twin of `_GFM_SEP_RE`.
+const GFM_SEP_RE = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$/;
+// A row's cells: edge pipes off, split on every `|` no backslash escapes.
+const ROW_EDGES_RE = /^\s*\|?(.*?)(?<!\\)\|?\s*$/;
+const CELL_SPLIT_RE = /(?<!\\)\|/;
 
 const enc = new TextEncoder();
 const nbytes = (s) => enc.encode(s).length;
@@ -148,26 +155,83 @@ function fold(secs, minPassageBytes) {
   return out;
 }
 
+/** One Markdown table row -> its cells, edge pipes off and `\\|` unescaped.
+ *  Twin of `chunk.py::split_row`. */
+export function splitRow(line) {
+  const inner = ROW_EDGES_RE.exec(line)[1];
+  return inner.split(CELL_SPLIT_RE).map((cell) => cell.trim().replaceAll("\\|", "|"));
+}
+
+/** The leftmost column filled and distinct in every row, or -1 (W-287 B4).
+ *  Lower-cased, as `chunk.py::_key_column` is. */
+function keyColumn(values, width) {
+  for (let col = 0; col < width; col++) {
+    const seen = new Set();
+    let ok = true;
+    for (const row of values) {
+      const cell = col < row.length ? row[col].trim().toLowerCase() : "";
+      if (!cell || seen.has(cell)) { ok = false; break; }
+      seen.add(cell);
+    }
+    if (ok) return col;
+  }
+  return -1;
+}
+
+/** `{ordinal, columns, values, key, record}` per body row (W-287 B1, B4, B5).
+ *  Twin of `chunk.py::_row_meta`. */
+function rowMeta(header, body) {
+  const columns = splitRow(header);
+  const width = columns.length;
+  const values = body.map((line) => {
+    const cells = splitRow(line);
+    while (cells.length < width) cells.push("");
+    return cells;
+  });
+  const record = RECORD_HEADERS.has(JSON.stringify(columns.map((c) => c.toLowerCase())));
+  // A record's key is its field-name column when the names are distinct (B4 over B5).
+  const key = record ? keyColumn(values, 1) : keyColumn(values, width);
+  return values.map((row, i) => ({ ordinal: i + 1, columns, values: row, key, record }));
+}
+
+/** A row passage's `[column, value]` pairs — for a record, its own name and
+ *  value. Twin of `TableRow.cells`. */
+export function cellsOf(row) {
+  if (!row) return null;
+  if (row.record) return [[row.values[0], row.values[1]]];
+  return row.columns.map((c, i) => [c, row.values[i]]);
+}
+
 /** A Markdown table split into row passages, or `null` if not a table.
- *  The header and its separator are repeated into every band. */
+ *  The header and its separator are repeated into every band; a ONE-row band
+ *  carries its row's metadata (W-287 B1). */
 function tableBands(paragraph, rowsPerPassage) {
   const lines = paragraph.split("\n");
   if (lines.length < MIN_TABLE_LINES) return null;
-  for (const line of lines) if (line.trim() && !TABLE_ROW_RE.test(line)) return null;
+  const filled = lines.filter((line) => line.trim());
+  let separator;
+  if (filled.every((line) => TABLE_ROW_RE.test(line))) {
+    separator = TABLE_SEP_RE.test(lines[1]) ? lines[1] : null;
+  } else if (GFM_SEP_RE.test(lines[1]) && filled.every((line) => line.includes("|"))) {
+    separator = lines[1];   // W-287 A5: no edge pipes — the delimiter row says "table"
+  } else {
+    return null;
+  }
 
   const header = lines[0];
-  const separator = TABLE_SEP_RE.test(lines[1]) ? lines[1] : null;
   const prefix = separator ? [header, separator] : [header];
   const body = lines.slice(prefix.length);
   if (!body.length) return null;
 
+  const meta = rowsPerPassage === 1 ? rowMeta(header, body) : null;
   const bands = [];
   for (let i = 0; i < body.length; i += rowsPerPassage) {
     const rows = body.slice(i, i + rowsPerPassage);
-    bands.push([[...prefix, ...rows].join("\n"), rows.length]);
+    bands.push([[...prefix, ...rows].join("\n"), rows.length, meta ? meta[i] : null]);
   }
   if (bands.length <= 1) return null;   // nothing gained; leave it ordinary
-  bands[0] = [bands[0][0], bands[0][1] + prefix.length];
+  const [firstBand, firstSpan, firstRow] = bands[0];
+  bands[0] = [firstBand, firstSpan + prefix.length, firstRow];
   return bands;
 }
 
@@ -225,7 +289,7 @@ function pieces(text, maxPassageBytes, tableRowsPerPassage) {
     if (!current.length) return;
     const piece = current.join("\n\n");
     const span = countNl(piece) + 1;
-    out.push([piece, cursor, span, ""]);
+    out.push([piece, cursor, span, "", null]);
     cursor += span + 1;   // the blank line that separated this piece from the next
     current = []; size = 0;
   };
@@ -238,19 +302,19 @@ function pieces(text, maxPassageBytes, tableRowsPerPassage) {
     const bands = tableBands(paragraph, tableRowsPerPassage);
     if (bands !== null) {
       if (current.length) {
-        const [head, span] = bands[0];
+        const [head, span, row] = bands[0];
         const pending = current.join("\n\n");
-        bands[0] = [pending + "\n\n" + head, countNl(pending) + 1 + 1 + span];
+        bands[0] = [pending + "\n\n" + head, countNl(pending) + 1 + 1 + span, row];
         current = []; size = 0;
       }
-      for (const [band, span] of bands) { out.push([band, cursor, span, ""]); cursor += span; }
+      for (const [band, span, row] of bands) { out.push([band, cursor, span, "", row]); cursor += span; }
       cursor += 1;   // ...but a blank line does follow the table itself
       continue;
     }
     if (paragraphSize > maxPassageBytes) {
       flush();
       for (const [piece, span, rung] of descend(paragraph, maxPassageBytes)) {
-        out.push([piece, cursor, span, rung]);
+        out.push([piece, cursor, span, rung, null]);
         cursor += span;
       }
       cursor += 1;
@@ -293,7 +357,7 @@ export function chunk(content, { minPassageBytes, maxPassageBytes, tableRowsPerP
     .map(([h, l, t, s, e]) => [h, l, t, s + shift, e + shift])];
   const passages = [];
   for (const [heading, , text, start, end] of merged) {
-    for (const [piece, offset, span, rung] of pieces(text, maxPassageBytes, tableRowsPerPassage)) {
+    for (const [piece, offset, span, rung, row] of pieces(text, maxPassageBytes, tableRowsPerPassage)) {
       const pieceStart = start + offset;
       passages.push({
         heading,
@@ -303,6 +367,8 @@ export function chunk(content, { minPassageBytes, maxPassageBytes, tableRowsPerP
         line_end: lineNumbers ? Math.min(end, pieceStart + span - 1) : 0,
         cut: rung,
         nbytes: nbytes(piece),
+        // W-287 B1 — a ONE-row table passage's table, `null` otherwise.
+        row: row ? { label: heading, ...row } : null,
       });
     }
   }

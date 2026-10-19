@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@53d44972d1fc, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@38da8c6bfe7e, src/fux/text/tokenize.py@63f4c4872bd7, src/fux/text/analyzer.py@8f02dd1c4e44, src/fux/text/stem.py@86954ab3789b, node/src/query/analyzer.mjs@9833b643cc8d, node/src/query/bm25f.mjs@167ce9d10c88, node/src/query/rank.mjs@afbddd6eeed0, node/src/query/stem.mjs@90946a49a2d8, node/src/query/tokenize.mjs@8fd5727daa05, node/test/analyzer.test.mjs@823f6321024c, src/fux/text@14fff59d2315]
+owns: [src/fux/query/rank.py@53d44972d1fc, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@38da8c6bfe7e, src/fux/text/tokenize.py@63f4c4872bd7, src/fux/text/analyzer.py@8f02dd1c4e44, src/fux/text/stem.py@86954ab3789b, node/src/query/analyzer.mjs@9833b643cc8d, node/src/query/bm25f.mjs@167ce9d10c88, node/src/query/rank.mjs@afbddd6eeed0, node/src/query/stem.mjs@90946a49a2d8, node/src/query/tokenize.mjs@8fd5727daa05, node/test/analyzer.test.mjs@823f6321024c, src/fux/text@ae715db8d208]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 04327cb20602bf55fb12e5218bb86310ce3298fadb3d51a4e7352af04881f328
+content_sha: 06b02895ec6dbea8410f3f240e14ac6761063999aa135501e55b391854ba0e42
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -641,6 +641,8 @@ intent_weight`. `of(record)` is `priority_for(loc) × intent_for(loc)`, and
 **W-269 — the term is gain-only (2026-10-10; on a branch from `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md) passes).** W-236's B2 failed (drift), and the paragraph above is what it measured. `rank()` now adds `λ · G(d)`, `G(d) = max(0, max_k S_sec(d#s_k) − S_self(d))`, where `S_self` is the document's own record cut to the body and heading slots and scored under the same section statistics ([SR-SECTIONS](0161_sections.md) decision 5). `_best_section` became `_section_gain`. **A sectionless document gains zero and nothing is added to its score**, so it is byte-identical to `λ = 0`; a gain of zero names no section. The accelerator's ceiling and `theta` are unchanged and still sound: `G ≤ max_k S_sec`, and `theta` never carries the section term.
 
 **W-278 — the section term's third form (2026-10-13; branch, unmerged).** `rank._section_gain` and `rank.mjs::sectionGain` score the best section **as a short document** (its own body and heading, the parent's title, path and ctx, the document `avg_wlen`) against the document without its anchor fold, and `Corpus` loses its section statistics. The mechanism is [SR-SECTIONS](0161_sections.md) decision 5's; decision 6's one-scorer rule holds.
+
+**No decision here moved** (W-287, 2026-10-19): `src/fux/text/chunk.py` gains `TableRow` and the pipe-less table rule ([SR-CHUNKING](0151_chunking.md) decisions 2a–2b); document ranking — `rank()`, BM25F, the analyzer — is untouched, and a row's three-field passage score is [SR-REFER](0127_refer-plane.md) decision 28's.
 
 ### Consequences
 

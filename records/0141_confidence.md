@@ -11,7 +11,7 @@ feature: the confidence plane
 owns: [src/fux/query/confidence.py@4ca01e637d08, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 6fa6a03005330c0774b5c6b80524dbb96798f13f7f033bfa197fd74f86ba359d
+content_sha: b0b09ffcc8a5cc0406919f8983d81691d22b771a09f8b9f2d154ac4b853250ea
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -905,6 +905,8 @@ The confidence block's pairs and hashes are both analyzed with the repo's identi
 **No decision here moved** (W-278, 2026-10-13): `derive/accel.py`, which this record describes, gained the scan's runtime section route and lost the section statistics; `stats_out`'s `df` and `n` are untouched.
 
 **No decision here moved** (W-273 phase 2, 2026-10-13): `derive/accel.py::attach_sections_by_id` moved to `query/sections.py` ([SR-SECTIONS](0161_sections.md)).
+
+**No decision here moved** (W-287, 2026-10-19): `src/fux/query/__init__.py` changed in `answer`'s printers and payload only; the confidence block is assembled and emitted exactly as before.
 
 ### Consequences
 

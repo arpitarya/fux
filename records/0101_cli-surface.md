@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-19
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@aa502f353fb6, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@898d2cf2c7ee, src/fux/progress.py@10364bd02e0a, tests_e2e@59be546571d4, node/fux.mjs@ef9e157970bc, src/fux/stdio.py@9e270b49bdaa]
+owns: [src/fux/cli.py@aa502f353fb6, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@898d2cf2c7ee, src/fux/progress.py@10364bd02e0a, tests_e2e@3ed8925220fc, node/fux.mjs@ef9e157970bc, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 7b37194c883fe265f01b5b0179bed40733c0f3dfc13f7ff9cc9b35ff7ff5a95e
+content_sha: 9fbb470403c5dffaaf23d15f967c19062e5826857eff70a8a4735b91d62b0bc9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1448,6 +1448,8 @@ not installed here``, exit 1), never reported as an unknown choice.
 - `tests/test_package_layers.py` holds every `VERBS` row to the layer map, and
   `tests_e2e/test_role_packages.py` installs each wheel alone and asks for the
   other packages' verbs.
+
+**No decision here moved** (W-287, 2026-10-19): `tests_e2e/` gains `test_table_answers.py` — `fux answer` on a Markdown table, through the real CLI.
 
 ### Consequences
 

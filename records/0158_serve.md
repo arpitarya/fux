@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-22
 amended: 2026-10-13
 feature: the explorer — a local page over the real ask
-owns: [src/fux/serve@c9ad3ab95dec]
+owns: [src/fux/serve@e4943525a226]
 laws: [L2, L3, L5, L6, L9, L10]
 timestamp: 2026-09-22T00:00:00Z
-content_sha: 79746de434c7806f0381c086d12c35de0adf9e59daf6b8d02979647babf8ee85
+content_sha: 340eb08e6b2b21f717e31507d333dad680af9317fb0505639d53ac3810f13912
 ratifies: "Arpit, 2026-09-22 (Cowork, W-210) — three sample pages built on his machine, the per-token ingest X-ray REJECTED as a front page ('do you believe people will go through this big document?') and the question-first explorer ratified in its modern-dark form: 'the way I'm thinking about fux is something like Google. If a question gets asked, if you have the best 10 documents, the answer the agent gives is going to be mostly correct.'"
 ---
 
@@ -320,6 +320,8 @@ this moved where they are written, not what they are.
 **A sixth tab, Identifiers** ([SR-IDENTIFIERS](0160_identifiers.md) decision 11, W-233 F3) — a test bench over `GET /inspect/identifiers?p=…&kind=template|regex`. For a typed pattern it shows the matches across the corpus, each one's canonical term and its terms with and without the family, whether Python `re` and V8 find the same spans, a refusal with the guard's reason, the `[user]` line to paste, and the detected families. **It writes no byte**, like every route: the corpus text it matches is read once per index state and held in memory. The report's section 12 has its Index-tab card, as W-229 requires of every lens.
 
 **No decision here moved** (W-225 stage 5f, 2026-10-04): the Index tab passes `rebuild_dictionary=False` and the Words tab's dictionary `rebuild=False` explicitly, because the library functions no longer default them (L12 R8). The tab's output is unchanged.
+
+**The Answer tab shows a table row as a record** (W-287 C1, 2026-10-19): a passage carrying `cells` renders as a `column | value` table under its `table · row`, the asked cell first and marked, in `Citation.record`'s order ([SR-ANSWER](0105_answer.md) decision 12a); any other passage is unchanged. Display only.
 
 ### Consequences
 

@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@5d3b9020433f, src/fux/templates/output.toml.txt@0952128ae0aa, .fux/output.toml@4a3a8465d2e4, node/src/config/output.mjs@a00d8fa88ee8]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: b3f99c52ff30986774783d7ba0789069250a540aab41d33a1c2d365ef502e528
+content_sha: 28d38da30893e5d810bed3615557c0ef17d0413680486e18a6ca3f461f65e1b6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -865,6 +865,8 @@ anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `section` on an `ask` hit is gated by the ranking weight that produces it, not by an output flag: absent at `section_weight = 0.0`, present on every row otherwise ([SR-SECTIONS](0161_sections.md) decision 6). No new output key in `.fux/output.toml`.
 
 **No decision here moved** (W-282, 2026-10-18): `cli.py` became core and runs a verb through its `VERBS` table, leaving a verb whose layer is not installed out of the parser and refusing it by name before argparse. `_apply_output_defaults` still runs in `main` before any verb is dispatched, unchanged.
+
+**No decision here moved** (W-287, 2026-10-19): `_print_refer_answer` prints a table row as a record and `mcp.py`'s `fux_passage` emits `cells`/`table`/`row` (null when not a row); the emission gate, `[mcp]`'s keys and `--band` are untouched.
 
 ### Consequences
 

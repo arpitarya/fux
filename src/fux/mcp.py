@@ -136,7 +136,9 @@ def _tools(top: int) -> list[dict]:
             "Read the verbatim text of a cited span, addressed as returned by "
             "fux_search. Use this instead of reading a whole file when you already "
             "have a citation: it returns only the cited lines and the hash they were "
-            "read at, as `path`, `line_start`, `line_end`, `sha` and `text`."
+            "read at, as `path`, `line_start`, `line_end`, `sha` and `text`. `cells` "
+            "([column, value] pairs), `table` and `row` are set when the span is one "
+            "table row and null otherwise."
         ),
         "inputSchema": {
             "type": "object",
@@ -330,7 +332,8 @@ def _passage(root: Path, args: dict) -> dict:
         raise FuxError(f"{rel!r} is not a file in this repository")
 
     raw = target.read_bytes()
-    lines = raw.decode("utf-8", errors="replace").splitlines()
+    text = raw.decode("utf-8", errors="replace")
+    lines = text.splitlines()
     start = max(1, int(args.get("line_start") or 1))
     end = min(len(lines), int(args.get("line_end") or len(lines)))
     return {
@@ -339,7 +342,36 @@ def _passage(root: Path, args: dict) -> dict:
         "line_end": end,
         "sha": content_sha(raw),
         "text": "\n".join(lines[start - 1 : end]),
+        **_row_at(root, text, start, end),
     }
+
+
+def _row_at(root: Path, text: str, start: int, end: int) -> dict:
+    """W-287 C1 — when the span is ONE row of a Markdown table, that row's record:
+    `cells`, `table` and `row`, exactly as `fux answer --json` carries them.
+
+    Found by chunking the file with the chunker `answer` cites from, under the
+    repository's own `[refer]` bounds, so the two surfaces cannot disagree about
+    which row a line is. A row passage's last line is its row (the first row's
+    passage also holds the header above it). Every key is present on every
+    call, `null` when the span is not one row, so the fields this tool emits are
+    one set whatever it is asked.
+    """
+    none = {"cells": None, "table": None, "row": None}
+    if start != end:
+        return none
+    from . import tune as tune_mod
+    from .text.chunk import chunk
+
+    bounds = tune_mod.load(root, enabled=True).chunk_bounds()
+    for p in chunk(text, **bounds, line_numbers=True, frontmatter=True):
+        if p.row is not None and p.line_end == end and p.line_start <= start:
+            return {
+                "cells": [[column, value] for column, value in p.row.cells],
+                "table": p.row.label,
+                "row": p.row.ordinal,
+            }
+    return none
 
 
 def _related(root: Path, args: dict) -> dict:

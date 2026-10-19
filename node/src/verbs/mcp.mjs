@@ -30,6 +30,8 @@ import { cmpCodePoints, pyRound } from "../compat/pyfloat.mjs";
 import { loadOutput } from "../config/output.mjs";
 import { Graph, edgesFromRecords } from "../graph/model.mjs";
 import { FuxError } from "../errors.mjs";
+import { loadTune } from "../config/tune.mjs";
+import { chunk, cellsOf } from "../refer/chunk.mjs";
 import { fixed } from "../config/constants.mjs";
 
 const JSON_INDENT = fixed("json", "indent");
@@ -264,6 +266,21 @@ function fuxSearch(root, args, top, maxHeadings, held = null) {
   };
 }
 
+/** W-287 C1 — when the span is ONE Markdown table row, its `cells`, `table`
+ *  and `row`, found by the chunker `answer` cites from. Twin of
+ *  `mcp.py::_row_at`. */
+function rowAt(root, text, start, end) {
+  const none = { cells: null, table: null, row: null };
+  if (start !== end) return none;
+  const tune = loadTune(root, { enabled: true });
+  for (const p of chunk(text, { ...tune.chunkBounds(), lineNumbers: true, frontmatter: true })) {
+    if (p.row && p.line_end === end && p.line_start <= start) {
+      return { cells: cellsOf(p.row), table: p.row.label, row: p.row.ordinal };
+    }
+  }
+  return none;
+}
+
 function fuxPassage(root, args) {
   const rel = args.path ?? "";
   // Refuse to escape the repo. `resolve` collapses `..` BEFORE the check, so a
@@ -286,7 +303,8 @@ function fuxPassage(root, args) {
   } catch {
     throw new FuxError(`'${rel}' is not a file in this repository`);
   }
-  const lines = splitLines(raw.toString("utf8"));
+  const text = raw.toString("utf8");
+  const lines = splitLines(text);
   const start = Math.max(1, Number(args.line_start || 1));
   const end = Math.min(lines.length, Number(args.line_end || lines.length));
   return {
@@ -295,6 +313,7 @@ function fuxPassage(root, args) {
     line_end: end,
     sha: contentSha(raw),
     text: lines.slice(start - 1, end).join("\n"),
+    ...rowAt(root, text, start, end),
   };
 }
 
