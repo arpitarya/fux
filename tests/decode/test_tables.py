@@ -1,8 +1,7 @@
 """W-287 stage A — every value under its TRUE column name.
 
-One test per defect the work item names, by number
-([`work/open/W-287-tables-by-row-and-column.md`](../../work/open/W-287-tables-by-row-and-column.md)
-§The defects). Fixtures are built here, as `test_formats.py` builds its own, so
+One test per defect W-287 named, by number — the defects are stated in
+[SR-TABULAR](../../records/0150_tabular.md) decision 8. Fixtures are built here, as `test_formats.py` builds its own, so
 the input sits beside the assertion.
 
 The assertions read the decoded Markdown back as `{column: value}` rather than

@@ -5,8 +5,8 @@ description: "Arpit's ruling (2026-10-19, Cowork): one shared TABLE module that 
 item: W-288
 filed: 2026-10-19
 filed_by: "Arpit (Cowork, Fable 5.1)"
-updated: 2026-10-19
-updated_by: "Arpit (Cowork, Fable 5.1)"
+updated: 2026-10-20
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -18,7 +18,7 @@ ball: agent
 |---|---|---|---|
 | 1 | Name the layer: a **decoder extension** is a shared module a decoder calls, with its own `VERSION`; `decode/ext/` is its home | the five shared helpers that already exist stop being nameless | ⏳ |
 | 2 | Put every extension's `VERSION` into the reuse key of every decoder that uses it | a fix in shared code re-extracts the documents it changes — today only `--full` does | ⏳ |
-| 3 | Move W-287's `decode/_table.py` to `ext/table.py` — the first extension built to the rule | the table module gets a version that reaches existing corpora | 🟡 after W-287 |
+| 3 | Move W-287's `decode/_table.py` to `ext/table.py` — the first extension built to the rule | the table module gets a version that reaches existing corpora | ⏳ W-287 landed (`1fd1c9a9`) |
 | 4 | Finish what W-287 leaves: csv on the same emitter, `_ooxml.table_markdown` and `html.py::_emit_table` gone if any copy remains | one emitter, zero copies | ⏳ |
 | 5 | Keep W-287's round-trip gate (emit → `_table_bands` → cells) running against `ext/table.py` | the emitter and the chunker stay one contract | ⏳ |
 | 6 | Move the existing helpers (`_ooxml`, `_xml`, `_zip`, `_markdown`, `_limits`) under the same rule | one kind of shared module, not two | ⏳ |
@@ -116,10 +116,14 @@ The pipeline, in order, one place for each rule:
 2. **spans** — merged / `colspan` / `rowspan` / `gridSpan` / `vMerge` expand
    by repeating the anchor value into the span.
 3. **header** — a declared header wins (`<th>`/`<thead>`, a parser flag);
-   otherwise the first row whose filled-cell count ≥ width ×
-   `[index] table_header_min_fill` (a committed `[index]` key beside
-   `max_table_rows` — it changes what is indexed, and the `[index]` digest
-   re-extracts on change); rows above it are emitted as prose.
+   otherwise the first row whose source-filled cells reach
+   `.fux/formats.toml [limits.html|xlsx] header_fill_percent` of the width;
+   rows above it are emitted as prose. ⚠ **Corrected 2026-10-20** (W-287's
+   finding): this said `[index] table_header_min_fill`. Measured in W-287, the
+   index is a bag of terms, so a banner's words are the same body terms whether
+   they head the columns or sit above them — the key moves no committed byte,
+   and SR-TUNE decision 1 refuses it from `[index]`. It is a decoder cap, in the
+   extract-config digest ([SR-TABULAR](../../records/0150_tabular.md) decision 8).
 4. **values** — dates ISO-8601, times `HH:MM`, booleans `true`/`false`,
    numbers shortest repr, `|` escaped, `[limits.csv] max_cell_chars`.
 5. **limits** — `max_table_rows` counts data rows, blank rows spend nothing,
@@ -164,7 +168,7 @@ it separately.
 4. `docs/GLOSSARY.md` carries *decoder extension* and *suffix*; CHANGELOG names
    the one-time re-extraction.
 5. `IMPLEMENTATION.md`, WORKLOG, the registry rows; both suites green.
-6. W-287 closed first; this item's move leaves every W-287 fixture byte-identical.
+6. W-287 closed first (done 2026-10-20); this item's move leaves every W-287 fixture byte-identical.
 
 ## Out of scope
 
@@ -176,9 +180,8 @@ it separately.
 
 ## Blockers
 
-🟡 Waits on **W-287** — its stage A writes `decode/_table.py`, html/docx/xlsx and the
-decoder `VERSION`s; this item moves and versions them afterwards so two sessions never edit
-the same files at once.
+None. W-287 landed (`1fd1c9a9`, closed 2026-10-20); `decode/_table.py` and the
+decoder `VERSION`s it wrote are on `main`.
 
 ## Record affected
 
