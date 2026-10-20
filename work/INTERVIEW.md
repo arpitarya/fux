@@ -3118,6 +3118,8 @@ the reason is that the measuring environments are gone.**
 
 ## 2 · In flight, and the immediate next step
 
+*Updated **2026-10-20** (Claude Code, Opus 5.5) — maintainer line: this session. **W-288 and W-289 are built on `main`, unreleased**; W-289 waits on Arpit for 15 PyPI trusted publishers and two rulings (its §Decisions for Arpit). ⚠ A worktree's commits fire the post-commit hook with the MAIN checkout's venv, which writes a stale-format `.fux/index/` into the worktree — never stage it there.*
+
 *Updated **2026-09-12** (Claude Code, Opus) — maintainer line: this session.*
 *Updated **2026-09-13** (Cowork, Opus) — maintainer line: this session.*
 *Updated **2026-09-17** (Claude Code, Opus 5) — maintainer line: this session.*

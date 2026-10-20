@@ -23,6 +23,14 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-20 — W-287 closed; W-288 and W-289 built in parallel worktrees, merged to main  ·  Claude Code (Opus 5.5)
+
+- **Asked:** implement W-287, W-288, W-289; a monorepo if needed; run in parallel.
+- **Done:** W-287 was already landed (`1fd1c9a9`) — archived (`02a32c91`). W-288 (`4699251a`) and W-289 phase 1 (`d14330ee`) built concurrently in two worktrees, merged on `integrate-w288-w289` (record-hash conflicts re-stamped), then W-289 phase 2 (`1dd052bd`): decoders moved into 12 packages + `fux-extension-table`, the declared-only registry, P4/P5/P12/P13. The monorepo is a uv workspace under `packages/`. Fast-forwarded to `main`, index re-ingested. W-288 archived; W-289 stays open on Arpit.
+- **Found:** `USES` must be the closure (`drawio → html → table`); a RECORD-file hash differs by installer, so the pin hashes RECORD-format lines over the package's own files; `fux-decoder-xml` depends on json too; undeclared files must not go to `.fuxignore` (would freeze them out after declaring); the shared post-commit hook runs the main checkout's venv against every worktree and writes a stale-format index there.
+- **Verified:** units 7455, e2e 193, Node 245 on the merged tree; 19 wheels, no overlap.
+- **Open (Arpit):** 15 trusted publishers; package version in the reuse key or REGISTER only; aliases for pre-4.2 seeded copies. **Next:** his rulings, then a release.
+
 ## 2026-10-19 — W-287 decided: FAIL on the latency guardrail  ·  Claude Code (Opus 5.5)
 
 - **Asked:** Arpit ran the frozen decider from his own shell (`decide.py … > decision.json`).

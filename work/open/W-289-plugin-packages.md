@@ -7,7 +7,7 @@ filed: 2026-10-19
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-20
 updated_by: "Claude Code (Opus 5.5)"
-ball: agent
+ball: arpit
 ---
 
 # W-289 — plugin packages: only the engine is mandatory, everything else is declared per repo
@@ -268,6 +268,13 @@ W-288.** Everything that does not touch the decoder tree:
   preclude it; it is its own item.
 - New verbs supplied by a plugin — refused: the CLI surface is SR-CLI's.
 - Installing anything from fux (`fux setup` prints the pip line; it does not run it).
+
+## Decisions for Arpit (2026-10-20, Claude Code)
+
+1. **The 15 trusted publishers** (step 6): one PyPI pending publisher per new name, bound to `publish.yml` and the `pypi` environment. Until they exist, `publish-pypi-plugins` fails; it does not gate `fux-engine`.
+2. **Package version in the reuse key.** P12 puts `pkg:<dist>@<version>/…` in the digest, and lockstep moves the version every release, so **every release re-extracts every decoded document once**. Alternative: keep the package in the REGISTER column only and out of the reuse key. Recommended: REGISTER only — a decoder's own `VERSION` already moves when its output moves.
+3. **Import aliases for the moved modules** (`fux.decode.<format>`, `fux.decode.ext.table`). Without them, a consumer still holding a pre-4.2 seeded copy hits a hard error (naming the fix) on the first ingest after upgrading. Recommended: no aliases — the error is loud and names the fix; aliases would keep stale copies overriding the packages silently.
+4. Already decided by the session, reversible on his word: this repo declares `office` and `pdf` too (indexed `.docx`/`.pdf` under `archive/`); fetcher packages keep their tunables as their own defaults (they import nothing from fux); `fux-extension-table` is pinned as a dependency row.
 
 ## Blockers
 

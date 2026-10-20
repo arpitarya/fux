@@ -28,6 +28,16 @@ Rules:
 
 ---
 
+## 2026-10-20 — **W-288 + W-289: decoder extensions, and plugin packages — only the engine is mandatory (main, unreleased)**
+
+| | |
+|---|---|
+| **shipped** | **W-288:** `src/fux/decode/ext/` (`ooxml`, `xml`, `zip`, `markdown`, `limits`; `table` until W-289 moved it), each `VERSION` from `constants.toml [extensions.*]`; decoders declare `USES` (the closure of what they reach); the digest composes `+<ext>@<v>`; the old `_helper` names stay as aliases. **W-289:** SR-LAW-2 amended (Arpit 2026-10-19: optional only by the committed repo's choice); SR-PLUGINS; `src/fux/plugins.py`; a uv workspace of 15 packages under `packages/` — 12 decoder packages, `fux-extension-table`, `fux-fetcher-http`, `fux-fetcher-cdp`; the 17 decoders and `table` moved into them, fux-core ships none; the registry and type allowlist load only what `.fux/plugins.toml` declares (file override > declared package > nothing); missing file = prose only, declared-but-missing/drifted = hard error on every verb but setup/doctor/tune/output/hooks/daemon; `fux ingest` counts undeclared suffixes on stderr; `fux setup` writes and `--pin`s `plugins.toml`, seeds nothing; four doctor rows; REGISTER/digest `pkg:<dist>@<v>/<module>@<n>+ext tail`; parity 23 sites, ci/publish build the 15. This repo: twins and fetcher copies deleted, `plugins.toml` declares 12 packages. |
+| **evidence** | [SR-DECODE](../records/0139_decode.md) d24–25, [SR-PLUGINS](../records/0165_plugins.md), [SR-LAW-2](../records/0004_LAW-2-zero-cost.md), SR-TABULAR, SR-TYPES d1, SR-INGEST d4b/22, SR-FETCHER, SR-CDP-FETCHER d9, SR-WORK-RELEASE d15; `tests/decode/test_decoder_versions.py` (E4 gates), `tests/test_plugins.py`, `test_plugin_fence.py`, `test_plugin_packages.py`, `test_plugin_registry.py`, `tests_e2e/test_plugin_l4_gate.py` (P13 in real venvs). Units 7455, e2e 193, Node 245; 19 wheels, no file in two; 1 411 decodable files byte-identical HEAD vs packages. |
+| **outcome** | Built on `main`, unreleased. The first ingest after upgrade re-extracts every decoded document (digest shape). 🔴 Before the release: 15 PyPI trusted publishers and two rulings (W-289 §Decisions for Arpit). |
+
+---
+
 ## 2026-10-19 — **W-287: tables answer by row and by column — built; its ranking key decided FAIL (latency), shipped off (main, unreleased)**
 
 | | |

@@ -23,9 +23,11 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 14d |
+| 🔴 **W-289** — before the release that carries plugin packages: set up 15 PyPI trusted publishers; rule (a) package version in the reuse key (re-extract every release) or REGISTER only; (b) import aliases for pre-4.2 seeded decoder copies. [the item](open/W-289-plugin-packages.md) | 2026-10-20 | 0d |
+| ↳ **blocks:** the next release | | |
+| 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 16d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 8d |
+| 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 10d |
 | ↳ **blocks:** nothing else in the queue | | |
 
 ---
@@ -34,8 +36,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-288** · `agent` — decoder extensions: versioned shared modules under the decoders, in the reuse key; W-287's table module becomes `ext/table.py` first. **Opus.** Filed by Arpit (Cowork). [detail](open/W-288-decoder-extensions.md)
-- 🟡 **W-289** · `agent` — plugin packages: only the engine is mandatory; 12 decoders, 2 fetchers, the table extension become opt-in packages declared in `.fux/plugins.toml`; L2 amended. After W-288. **Opus.** Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
+- 🔴 **W-289** · `arpit` — plugin packages: built on `main` (unreleased) — law, SR-PLUGINS, 15 packages, declared-only registry. Arpit: 15 PyPI trusted publishers + two rulings before the release. [detail](open/W-289-plugin-packages.md)
 
 ### testing
 
