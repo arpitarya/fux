@@ -612,6 +612,25 @@ def _url_decoders(root: Path) -> Check:
     known = set(BUILTIN_MODULES) | on_disk | {PROSE_DECODER}
 
     missing = sorted({e.attrs["decoder"] for e in lines} - known)
+    # W-289, SR-PLUGINS P3: a first-party module is known, but reads nothing
+    # until its package is declared (or a consumer file of its name exists).
+    from . import plugins
+
+    try:
+        undeclared = sorted(
+            n for n in {e.attrs["decoder"] for e in lines} & set(BUILTIN_MODULES)
+            if n not in on_disk and plugins.for_decoder_module(root, n) is None
+        )
+    except FuxError:
+        undeclared = []
+    if undeclared and not missing:
+        packages = sorted({plugins.package_for_module(n).name for n in undeclared})
+        return Check(
+            name, False,
+            f"`decoder=` {', '.join(undeclared)} name(s) a module no declared package "
+            f"carries - declare {', '.join(packages)} in {fixed('plugins', 'file')} "
+            "(`fux setup` adds it); until then every URL on those lines is skipped at ingest",
+        )
     if not missing:
         return Check(
             name, True,
@@ -2688,8 +2707,9 @@ def _plugins_declared(root: Path) -> Check:
     if found is None:
         return Check(
             name, False,
-            f"no {rel} - this repo declares no decoder or fetcher package. Run `fux setup`: "
-            "it proposes the packages your sources need and prints the one install line",
+            f"no {rel} - only Markdown and plain text are read: this repo declares no "
+            "decoder or fetcher package. Run `fux setup`: it proposes the packages your "
+            "sources need and prints the one install line",
             level="warn",
         )
     first = sum(1 for d in found.values() if d.package.first_party)
@@ -2743,7 +2763,7 @@ def _plugins_undeclared(root: Path) -> Check:
     if found is None:
         return Check(name, True, f"skipped (no {fixed('plugins', 'file')} - see that row)", level="warn")
     try:
-        missing = plugins.undeclared(plugins.scan(root), found)
+        missing = plugins.unread(root)
     except FuxError:
         return Check(name, True, "skipped (the source list does not read)", level="warn")
     if not missing:

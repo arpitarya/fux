@@ -148,14 +148,21 @@ def test_two_declared_packages_may_not_claim_one_suffix(tmp_path):
         plugins.read(tmp_path)
 
 
-def test_the_file_is_read_once_per_process(tmp_path):
-    """P2: an edit mid-process is not seen until `reset` — which is the point."""
+def test_the_file_is_read_once_per_process(tmp_path, monkeypatch):
+    """P2: parsed once per process while it is unchanged — a 10 000-document
+    walk asks for it per file — and re-read when it changes (W-289 phase 2:
+    the cache is keyed on the file's stat, as `decode.registry()`'s is, so a
+    long-lived `fux mcp` sees an edited declaration)."""
     _declare(tmp_path, _row("fux-decoder-pdf"))
-    assert list(plugins.declared(tmp_path)) == ["fux-decoder-pdf"]
+    calls = []
+    real = plugins.parse
+    monkeypatch.setattr(plugins, "parse", lambda *a: calls.append(a) or real(*a))
+    for _ in range(3):
+        assert list(plugins.declared(tmp_path)) == ["fux-decoder-pdf"]
+    assert len(calls) == 1
     plugins.path(tmp_path).write_text("", encoding="utf-8")
-    assert list(plugins.declared(tmp_path)) == ["fux-decoder-pdf"]
-    plugins.reset()
     assert plugins.declared(tmp_path) == {}
+    assert len(calls) == 2
 
 
 def test_render_round_trips_through_parse(tmp_path):

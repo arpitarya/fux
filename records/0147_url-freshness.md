@@ -6,11 +6,12 @@ title: "SR-URL-FRESHNESS (0147) — six verdicts, and a per-URL ttl that can onl
 description: "How fresh a url: citation is, said in six positions that never collapse into each other; and ttl= as a per-URL bound that narrows the caller's policy and can never widen it."
 status: accepted
 date: 2026-09-01
+amended: 2026-10-20
 feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/acquire/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@108aa7da8d74]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 4971a20984cd48955b6c6867a338697e02e9393292b50b0f179f44c240bc3e11
+content_sha: 45e255af4b94d74f191393b3d51a25994fece8409d951d2823115b8d8f6764ed
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -592,6 +593,8 @@ this moved where they are written, not what they are.
 **No decision here moved** (W-287, 2026-10-19): `refer/__init__.py` passes `[ranking] table_column_weight` to `rescore`; both `as-ingested` fallbacks and the `min(policy, declared)` arithmetic are untouched.
 
 **No decision here moved** (W-289, 2026-10-20): `acquire/urlsrc.py`'s `load_fetcher` resolves a declared fetcher package when the consumer has no file of that name ([SR-PLUGINS](0165_plugins.md) P8); `UrlEntry.ttl` and `resolve_urls`' three layers are untouched.
+
+**W-289 phase 2 (2026-10-20) — no decision here moved.** `acquire/urlsrc.py`, which this record describes, gained [SR-PLUGINS](0165_plugins.md) P3's named skip for an undeclared decoder package; a URL so skipped is reported as any skip is. Freshness is untouched.
 
 ### Consequences
 

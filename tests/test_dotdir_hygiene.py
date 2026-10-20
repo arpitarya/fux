@@ -26,7 +26,10 @@ FILES = sorted(
 
 
 def test_the_dotdir_python_is_found() -> None:
-    assert any(p.parent.name == "decoders" for p in FILES)
+    # W-289 phase 2 deleted this repo's unedited twins — the declared packages
+    # run (SR-PLUGINS P9) — so an EMPTY dotdir is the expected state; what this
+    # still guards is that a file put back there is found and compiled.
+    assert all(p.parent.name in ("decoders", "fetchers") for p in FILES)
     assert not [*(ROOT / "src" / "fux" / "templates").glob("*.py.txt")], (
         "a `.py.txt` template is Python no tool sees; W-289 moved the fetchers into packages"
     )

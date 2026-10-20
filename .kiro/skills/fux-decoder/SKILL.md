@@ -6,8 +6,10 @@ description: Write a new Fux decoder, or edit an existing one, in .fux/decoders/
 # Writing a Fux decoder
 
 A **decoder** turns one file format into Markdown so Fux can index it. Seventeen
-ship with Fux and live in `.fux/decoders/` in this repository — **those copies
-are what run**, not the ones inside the installed package.
+are first-party, shipped in `fux-decoder-*` packages (`fux-decoder-pdf`,
+`fux-decoder-office`, …). **One runs only when `.fux/plugins.toml` declares its
+package**, installed at the pinned version and digest. A file you put in
+`.fux/decoders/<module>.py` overrides the package's module of that name.
 
 > ⚠ **This skill writes committed code that changes what is indexed and how it
 > ranks.** Only act when a human asked for it by name. Never add or edit a
@@ -19,15 +21,18 @@ are what run**, not the ones inside the installed package.
 
 | the ask | what to do |
 |---|---|
+| Fux ignores a format a first-party package reads (`fux ingest` prints `N .pdf file(s) not read`) | **Not a decoder job.** Declare the package: `fux setup` adds it to `.fux/plugins.toml` and prints the install line |
 | Fux ignores a format entirely | **New decoder.** A new file in `.fux/decoders/` |
-| Fux reads a format badly | **Edit the existing one.** It is already in `.fux/decoders/` — open it |
-| A format needs a library Fux does not ship (`pypdf`, `olefile`, OCR) | **Edit or replace**, and add the dependency to the repo's own environment |
+| Fux reads a format badly | **Override the shipped one.** Copy the package's module into `.fux/decoders/<module>.py` and edit the copy — it now runs instead of the package's |
+| A format needs a library Fux does not ship (`pypdf`, `olefile`, OCR) | **Override or replace**, and add the dependency to the repo's own environment |
 
 **Check what exists before writing anything:**
 
 ```bash
-ls .fux/decoders/
-grep -l "EXTENSIONS" .fux/decoders/*.py | xargs grep -H "^EXTENSIONS"
+cat .fux/plugins.toml          # the declared packages
+ls .fux/decoders/              # your overrides, if any
+fux doctor | grep -i plugins   # what is declared, installed, and not covered
+python -c "import fux_decoder_pdf.pdf as m; print(m.__file__)"   # a shipped module, to copy
 ```
 
 If a decoder already claims the extension, **edit it**. Two files claiming one
@@ -133,8 +138,9 @@ srt = "srtdoc"
 vtt = "srtdoc"
 ```
 
-Absent that file, the built-in default (prose plus every format a built-in
-decoder reads) applies, and your new format is never walked.
+A binding to a first-party module (`pdf = "pdf"`) reads nothing until its
+package is declared in `.fux/plugins.toml` — or until a file of that module
+name sits in `.fux/decoders/`.
 
 ---
 
@@ -179,24 +185,29 @@ fux ingest && fux ask "a phrase from the new file"
 
 Every decoder is `bytes -> Markdown | None`, dispatched by lowercase extension.
 Fux looks in `.fux/decoders/` first; if no file of that module name is there,
-it falls back to the copy inside the installed package. **Deleting a decoder
-restores the built-in** rather than dropping the format.
+it runs the module from the **declared** package; if no package carrying it is
+declared, the format is not read (and `fux ingest` counts its files on stderr).
+**Deleting an override restores the package's module** rather than dropping
+the format — as long as the package is declared.
 
-A copy `fux setup` wrote starts with one line, `# fux-template: <sha256>` — the
-template it came from. Leave it: `fux doctor`'s `seeded copies current` row uses
-it to tell you when an **unedited** copy has fallen behind a newer fux, and the
-fix is yours — delete the file and run `fux setup`. **Edit one byte below it and
-the copy is yours**; fux never rewrites it and stops comparing it.
+An older `fux setup` (before 4.2) seeded a copy of every decoder into
+`.fux/decoders/`, each starting with `# fux-template: <sha256>`. `fux doctor`'s
+`seeded copies removable` row names every copy that is still **unedited** — delete
+those, so the package runs and engine fixes reach you. A copy that imports
+`fux.decode.json` or `fux.decode.ext.table` stops ingest with an error naming
+where the import moved: delete it if unedited, or fix the import if it is yours.
 
-Shared **decoder extensions** under `fux.decode.ext` do the parts that are
-dangerous to rewrite:
+Shared **decoder extensions** do the parts that are dangerous to rewrite. Five
+are in fux itself, under `fux.decode.ext`; `table` ships in the
+`fux-extension-table` package, which every table-reading decoder package
+depends on:
 
 | decoder extension | gives you | why not do it yourself |
 |---|---|---|
 | `fux.decode.ext.zip` | `SafeZip`, `numeric_key` | Decompression-bomb caps, and **sorted** member lists. `namelist()` is archive order — writer-dependent — and `slide10` sorts before `slide2` |
 | `fux.decode.ext.xml` | `parse`, `local`, `text_of` | Refuses any DOCTYPE, which closes billion-laughs and XXE in one rule |
 | `fux.decode.ext.ooxml` | `paragraph_text`, `heading_level` | Run assembly. A run boundary is a formatting event, **not** a word boundary |
-| `fux.decode.ext.table` | `Grid`, `Cell`, `Table`, `emit` | The one table emitter: values, spans, the header, the row budget, `\|` escaping — and exactly the Markdown the chunker reads back as rows |
+| `fux_extension_table.table` | `Grid`, `Cell`, `Table`, `emit` | The one table emitter: values, spans, the header, the row budget, `\|` escaping — and exactly the Markdown the chunker reads back as rows |
 | `fux.decode.ext.limits` | `limit`, `max_table_rows` | The repository's committed caps (`.fux/formats.toml [limits]`), read without a third `decode()` parameter |
 | `fux.decode.ext.markdown` | `headings`, `strip_headings` | The one heading grammar, fence-aware |
 
@@ -210,7 +221,7 @@ re-extracts your documents on the next `fux ingest` instead of waiting for
 (`docs/GLOSSARY.md`).
 
 ⚠ **Imports must be absolute** — `from fux.decode.ext.zip import SafeZip`,
-never `from . import zip`. A file loaded by path has no parent package, so a
+`from fux_extension_table import table`, never `from . import zip`. A file loaded by path has no parent package, so a
 relative import raises and the decoder is dead on arrival. The pre-4.2 names
 (`fux.decode._zip`, `_xml`, `_ooxml`, `_markdown`, `_limits`) still import, as
 aliases of the same modules — but declare nothing to the reuse key, so prefer
@@ -220,12 +231,15 @@ the `ext` names.
 
 | your format looks like | read |
 |---|---|
-| a zip of XML (Office, OpenDocument) | `docx.py`, then `fux/decode/ext/ooxml.py` |
-| markup or tags | `html.py` |
-| nested key/value (JSON, TOML, config) | `json.py` — especially `_prose`, which drops UUIDs, hashes, timestamps and bare numbers |
-| line-oriented text | `yaml.py`, `csv.py` |
-| a binary container | `pdf.py` — and read its stated limits before copying its approach |
-| headers plus a body | `mail.py` |
+| a zip of XML (Office, OpenDocument) | `fux_decoder_office/docx.py`, then `fux/decode/ext/ooxml.py` |
+| markup or tags | `fux_decoder_html/html.py` |
+| nested key/value (JSON, TOML, config) | `fux_decoder_json/json.py` — especially `_prose`, which drops UUIDs, hashes, timestamps and bare numbers |
+| line-oriented text | `fux_decoder_config/yaml.py`, `fux_decoder_sheet/csv.py` |
+| a binary container | `fux_decoder_pdf/pdf.py` — and read its stated limits before copying its approach |
+| headers plus a body | `fux_decoder_mail/mail.py` |
+
+(In this repository they are under `packages/fux-decoder-*/src/`; installed,
+`python -c "import fux_decoder_html.html as m; print(m.__file__)"` finds one.)
 
 ---
 
@@ -252,7 +266,8 @@ each already cost a defect in the shipped set:
 | you want | go to |
 |---|---|
 | the decision of record | `records/0139_decode.md` — §1 for the shape, §2 for the protocol and every per-format judgement |
-| the seventeen shipped decoders | `.fux/decoders/` in this repo |
+| the seventeen shipped decoders | the `fux-decoder-*` packages; which one reads what is `fux.plugins.first_party()` |
+| which packages this repo declares | `.fux/plugins.toml`, and `records/0165_plugins.md` |
 | the loader, the override rule, the registry | `fux.decode.__init__` — read its module docstring |
 | where decoding joins ingest | `fux.ingest.parse.parse_document` |
 | which files are walked at all | `.fux/formats.toml`, and `records/0128_types-list.md` |

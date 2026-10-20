@@ -242,12 +242,16 @@ def stale_decoder_count(root: Path, current: dict[str, str]) -> int:
     that the decoder moved. Counting either would report a number that no
     command can bring down.
     """
-    by_name = {digest.split("@", 1)[0]: digest for digest in current.values()}
+    from .decoderdigest import name_of
+
+    # By MODULE, so a row written as `pdf@3` before W-289 and a live
+    # `pkg:fux-decoder-pdf@4.2.0/pdf@3` are the same decoder at a moved digest.
+    by_name = {name_of(digest): digest for digest in current.values()}
     stale = 0
     for row in read(root).values():
         if row.decoder in (PROSE, UNKNOWN):
             continue
-        name = row.decoder.split("@", 1)[0]
+        name = name_of(row.decoder)
         live = by_name.get(name)
         if live is not None and live != row.decoder:
             stale += 1

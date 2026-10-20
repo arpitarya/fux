@@ -12,52 +12,52 @@
 [[package]]
 name = "fux-decoder-config"
 version = "4.1.1"
-digest = "sha256:5a32b9d7239212c27b9d66db6b1299f530d7d84f2fe2c6e57b382d1f9f1d8a89"
+digest = "sha256:49fc7e21fa6ac9383cb0c7fb391f037689e4f4367edfadd6b7a600c25c33f0af"
 
 [[package]]
 name = "fux-decoder-html"
 version = "4.1.1"
-digest = "sha256:0cc0ee7edb8a58b0ded521d3e1987bc892840fd1abda3711bac6aba302d281d9"
+digest = "sha256:699dc9085b095c09701f5fd19020fe8b9c8ab301c4d907fdcb40b40a9804976f"
 
 [[package]]
 name = "fux-decoder-image"
 version = "4.1.1"
-digest = "sha256:cbbd3acd86efb4c61c9e83ec9c32aad42c998c2c2d9650d893ccc2d11b51dbb9"
+digest = "sha256:ea53318875d7d7bd4d7b693435a85adac06349d1b4f0befc39c38bc8560074c5"
 
 [[package]]
 name = "fux-decoder-json"
 version = "4.1.1"
-digest = "sha256:ea610be3426758585f48bd396a3d925ef31d75327c6de8aec080d04a53c95b0a"
+digest = "sha256:0d0ac3263c449b709055c1b571881084fe40b334f5d14a25722cb9515021fc93"
 
 [[package]]
 name = "fux-decoder-mail"
 version = "4.1.1"
-digest = "sha256:2fb0ffca88e6900b332f900b91565ccaca09b091bcc091acd3535f9a70114f9c"
+digest = "sha256:e0ca940a050e642b929ae7c52bcde7ffc38573c1f911a26b802a6088de4e9cfb"
 
 [[package]]
 name = "fux-decoder-office"
 version = "4.1.1"
-digest = "sha256:0cd4c6b89d8d52129af413ece015618aa9af078ca713eac662b60b26ffb45dcf"
+digest = "sha256:c176e28c784f26c0ac7c1f07d5e7ae5cc03a712a86f26ec2225c98c581e6fc05"
 
 [[package]]
 name = "fux-decoder-pdf"
 version = "4.1.1"
-digest = "sha256:c26a9464c9512a3b55458eba5708bec5b5dca0d5349f21b961cbbbd37034d20c"
+digest = "sha256:bf1a91ef37270ff1d78db58dfe3b8e290109d0d9f6704a0c146026fc3557ab9d"
 
 [[package]]
 name = "fux-decoder-sheet"
 version = "4.1.1"
-digest = "sha256:8611c3335e53828a02940f07c10edcce41147cba896f197cceeeca0e83655bb5"
+digest = "sha256:a630a020ab007f56fa4c1f1f0cf0a2dece0f230009dc44e90c59982cc27546e0"
 
 [[package]]
 name = "fux-decoder-svg"
 version = "4.1.1"
-digest = "sha256:f62bbf3b597fafac45d8a3cad1c98669b5e73377ab5f069e85e55ec3e2518292"
+digest = "sha256:fc2942885e1f0232f6757f3891c6bcc4a854e0318a23fd7ca19b38239ad51ac0"
 
 [[package]]
 name = "fux-extension-table"
 version = "4.1.1"
-digest = "sha256:07eab32ae2585bd70a2d9698081fb68a54b891684aa39a8b667298aaa635ab7d"
+digest = "sha256:70480709be4899e732c97ce74eb5698e06ff09d737a44963e8558afe908ad46a"
 
 [[package]]
 name = "fux-fetcher-cdp"

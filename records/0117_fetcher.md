@@ -5,13 +5,13 @@ name: SR-FETCHER
 title: "SR-FETCHER (0117) — the consumer-owned fetcher"
 description: "Fux never fetches; a fetcher does — the consumer's file in `.fux/fetchers/`, or a declared fetcher package. One fetcher per URL, declared not detected, returning bytes and a Content-Type — and the word is fetcher because nothing here composes."
 status: accepted
-amended: 2026-10-13
+amended: 2026-10-20
 date: 2026-08-19
 feature: the fetch contract, what it is called, and how a fetcher reaches a repository
-owns: [src/fux/acquire/urlsrc.py@3bde03cfad43]
+owns: [src/fux/acquire/urlsrc.py@bc63887bcee4]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: aba8dcbf6ade7cf757764df0a13210e2c749e956c3da1604204d4c784c210b5f
+content_sha: 7cdf7a3508fdc8e768a1fb112e4831b4fc561c3884f66c7fde8c940e0dd907c2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -713,6 +713,8 @@ decision 5), the files `fux setup` writes.
 **No decision here moved** (W-273 phase 2, 2026-10-13): the `section_weight` and `section_records` comments in the templates name `1.0` as the measured value.
 
 **No decision here moved** (W-287, 2026-10-19): `src/fux/templates` gains two template keys — `.fux/tune.toml [ranking] table_column_weight` and `.fux/formats.toml [limits.html|xlsx] header_fill_percent` ([SR-TUNE](0135_tuning.md), [SR-DECODE](0139_decode.md) decision 23). ⚠ **A fetched HTML page's Markdown changes** through the shared `html` decoder at its next refresh — header rows, spans, captions, nested tables, escaped pipes — which is SR-DECODE decision 23's, not a fetcher's.
+
+**W-289 phase 2 (2026-10-20) — no decision here moved.** Under this record's claim, `acquire/urlsrc.py` gained the decoder half of [SR-PLUGINS](0165_plugins.md) P3: a `decoder=` naming a first-party module whose package is not declared is a named skip at ingest (*"read by fux-decoder-pdf, which .fux/plugins.toml does not declare"*), never prose; `fux add` still proposes the first-party stem for an observed response whether or not its package is declared, and a retained blob still takes that module's own first suffix. The fetch contract is untouched.
 
 ### Consequences
 

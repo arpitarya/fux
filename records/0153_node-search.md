@@ -5,14 +5,14 @@ name: SR-NODE-SEARCH
 title: "SR-NODE-SEARCH (0153) — the Node read plane: one index, two readers, three arms"
 description: "Why a Node reader exists, what it may and may not do, and the decisions that keep it from becoming a second product: the _format version policy, the never-fetch rule, the url: verdict asymmetry, the shared tool-description file, and the three places where Node is deliberately a SUBSET of Python rather than a copy — the derived graph plane, the accelerator label, and the decoder boundary. Decisions 13-16 carry the SHIPPING shape, ruled AND BUILT on 2026-09-12: the consumer gets a published artefact rather than source, the bundle is built at publish time into both registries, a monorepo is auto-detected and wired up, and the .fux/fux shim resolves the binary across five package managers."
 status: accepted
-amended: 2026-10-13
+amended: 2026-10-20
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
 owns: [node@5dfe7951d6c5, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: c8e3f125f0f968becfb5ba544600db3ccae03420eb71fb1a7bbb3c9fb70c09bf
+content_sha: 083842b7e348d238de0f3ad0e5a8a6a5d844c3540070b038fd2c85bdf7c833d9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1082,6 +1082,8 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
 **The Node reader twins W-287's refer-plane half** (2026-10-19): `refer/chunk.mjs` (pipe-less tables, `row` metadata), `refer/rescore.mjs` (`columnWeight`, three-field rows, the selector, the sheet locator, ties on `order_key`), `refer/assemble.mjs` (`cells`/`table`/`columns_matched`, `recordOf`), `verbs/answer.mjs` (the record keys and the text record) and `verbs/mcp.mjs` (`fux_passage`'s row). Held equal by `tests/refer/test_table_twins.py`; Node still declines a decoded document, so an `.xlsx` row is never cited from Node (decision 11).
 
 **No decision here moved** (W-289, 2026-10-20): module-level edits in three files this record describes by symbol — `setup.py` (no decoder or fetcher is seeded; `.fux/plugins.toml` is written), `health.py` (three plugin rows in `ROWS`) and `store/fuxdir.py` (the `plugins.toml` row) — left `detect_workspace`, `wire_workspace`, the `node reader` row and every `.fux/node/` writer untouched ([SR-PLUGINS](0165_plugins.md)). npm is unchanged: plugin packages are writer-side and Python only.
+
+**W-289 phase 2 (2026-10-20) — no decision here moved.** `health.py`, `setup.py` and `store/fuxdir.py`, which this record describes, changed for [SR-PLUGINS](0165_plugins.md) — the doctor rows on the declaration, the types-file header, the `.fux/README.md` wording. The vendored Node reader and its shapes are untouched; Node still declines a decoded document rather than decoding it.
 
 ### Consequences
 

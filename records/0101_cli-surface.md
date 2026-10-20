@@ -5,13 +5,13 @@ name: SR-CLI
 title: SR-CLI (0101) — the command-line surface
 description: Flat verbs in seven groups, one error boundary, three output modes. Freezes the CLI contract with a captured transcript of every command and its real output.
 status: accepted
-amended: 2026-10-19
+amended: 2026-10-20
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@7b67dcb8cfc4, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@f5e59a40b46a, src/fux/progress.py@10364bd02e0a, tests_e2e@40e52ff66c93, node/fux.mjs@ef9e157970bc, src/fux/stdio.py@9e270b49bdaa]
+owns: [src/fux/cli.py@3bd5b00dfd42, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@f5e59a40b46a, src/fux/progress.py@10364bd02e0a, tests_e2e@62817a4c65c5, node/fux.mjs@ef9e157970bc, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 99a08780675eca395be60542994688f14fc79ca36654589af8687e09288c1e4e
+content_sha: d3c053667d424210fc1d3332cd044f5e9f288b83e56c100069c065b665a51b75
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -323,6 +323,13 @@ handler runs** (2026-09-11): a missing `.fux/pii.toml` stops the verb. The rule,
 its exemptions and why are [SR-PII](0148_pii.md) decision 17's, not this
 record's; what this record owns is the placement — **before dispatch**, so a
 verb added later is gated without its author knowing the gate exists.
+⚠ **A second precondition shares that placement since W-289 phase 2
+(2026-10-20)**: a package `.fux/plugins.toml` declares that is missing or
+drifted stops every verb except `cli.PLUGINS_EXEMPT` — `setup`, `doctor`,
+`tune`, `output`, `hooks`, `daemon` — with the install line, exit `1`. The rule
+is [SR-PLUGINS](0165_plugins.md) P4's; **a missing file is not this refusal**
+(prose only, P3), so a repository that never declared anything runs every verb
+it ran before.
 
 **5. Exit codes: fux produces `0` ok · `1` error · `130` interrupted.
 `argparse` produces `2` for a usage error, before this contract applies at all**

@@ -80,7 +80,7 @@ def test_a_second_no_op_delta_also_re_extracts_nothing(mixed):
 
 def test_a_decoder_bump_re_extracts_exactly_its_bindings(mixed, monkeypatch):
     """The design claim: `.csv` re-extracts, the markdown beside it does not."""
-    import fux.decode.csv as csv_mod
+    import fux_decoder_sheet.csv as csv_mod
 
     monkeypatch.setattr(csv_mod, "VERSION", csv_mod.VERSION + 1)
     report = run(mixed, refresh_urls=False, full=False)
@@ -94,7 +94,7 @@ def test_a_decoder_bump_re_extracts_exactly_its_bindings(mixed, monkeypatch):
 
 def test_a_decoder_bump_for_a_format_the_corpus_lacks_changes_nothing(mixed, monkeypatch):
     """A `.pptx` fix must not re-extract a corpus with no slides in it."""
-    import fux.decode.pptx as pptx_mod
+    import fux_decoder_office.pptx as pptx_mod
 
     monkeypatch.setattr(pptx_mod, "VERSION", pptx_mod.VERSION + 1)
     assert run(mixed, refresh_urls=False, full=False).reused_count == 2
@@ -202,7 +202,7 @@ def test_a_delta_run_is_still_byte_identical_to_a_full_run(mixed, monkeypatch):
     Same sources -> same index, whichever path got there. A reuse key that let a
     stale record through would show up here and nowhere else.
     """
-    import fux.decode.csv as csv_mod
+    import fux_decoder_sheet.csv as csv_mod
     from fux.store import iter_shard_paths
 
     def digest():
@@ -225,4 +225,8 @@ def test_the_digests_are_not_functions_of_time(mixed):
     first = decoderdigest.binding_digests(mixed)
     second = decoderdigest.binding_digests(mixed)
     assert first == second
-    assert all(":" not in v or v.split(":")[0].endswith("@sha") for v in first.values())
+    # No clock-shaped value: a `:` is only ever the `pkg:` head or `@sha:`.
+    assert all(
+        ":" not in v.removeprefix("pkg:") or v.removeprefix("pkg:").split(":")[0].endswith("@sha")
+        for v in first.values()
+    )

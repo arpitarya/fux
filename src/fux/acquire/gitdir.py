@@ -249,9 +249,17 @@ class TypeFilter:
     allow: tuple[str, ...]
     #: True when the built-in default is in force — i.e. no types file exists.
     default: bool = True
+    #: W-289: the globs `.fux/formats.toml` admits that no declared package can
+    #: read (`readable()`). A file one of them matches is not walked and is NOT
+    #: a skip — it is counted on `fux ingest`'s stderr instead (SR-PLUGINS P5).
+    undeclared: tuple[str, ...] = ()
 
     def accepts(self, rel_path: str) -> bool:
         return any(sourcelist.glob_match(p, rel_path) for p in self.allow)
+
+    def awaits_package(self, rel_path: str) -> bool:
+        """Is this file out only because its format's package is undeclared?"""
+        return any(sourcelist.glob_match(p, rel_path) for p in self.undeclared)
 
 
 def read_types(root: Path, rel_path: str = TYPES_FILE) -> TypeFilter:
@@ -277,7 +285,45 @@ def read_types(root: Path, rel_path: str = TYPES_FILE) -> TypeFilter:
             f"nothing would be indexed. Add at least one entry, or delete the file and run "
             f"`fux doctor --fix` to write the built-in list ({', '.join(DEFAULT_TYPES)})"
         )
-    return TypeFilter(allow=allow, default=False)
+    kept = readable(root, allow)
+    return TypeFilter(
+        allow=kept, default=False, undeclared=tuple(g for g in allow if g not in kept)
+    )
+
+
+def readable(root: Path, allow: tuple[str, ...]) -> tuple[str, ...]:
+    """`allow` without the globs for a format no declared package reads.
+
+    🔴 **SR-TYPES decision 1, since W-289 phase 2: the allowlist in force is
+    prose plus every suffix a DECLARED package claims** (SR-PLUGINS P3) — and
+    every suffix a consumer decoder in `.fux/decoders/` claims, which a
+    `.fux/formats.toml` line already had to admit. A `*.pdf` glob in a
+    repository that declares no `fux-decoder-pdf` admits nothing: the file is
+    never read as prose (its bytes are a PDF) and never decoded (nothing
+    declared can), so it is not walked at all. ⚠ **Not silent**: `fux ingest`
+    prints the count per suffix on stderr, naming the package, and `fux doctor`
+    has a row for it (P5).
+
+    🔴 **Such a file is NOT a skip**, and so never reaches the `.fuxignore`
+    blocks `skipnotice` writes: a generated line there would freeze the
+    verdict, and declaring the package later would read nothing. It is simply
+    not walked — and counted (`plugins.notes`).
+
+    The seeded file spells out every first-party binding, so declaring a
+    package later is the whole change — nobody edits this list to start
+    reading a format fux already wrote down.
+    """
+    from . import typesfile
+
+    first_party = set(decode_mod.builtin_extensions())
+    claimed = decode_mod.registry(root)
+    out = []
+    for glob in allow:
+        ext = typesfile.pattern_extension(glob)
+        if ext is not None and f".{ext}" in first_party and f".{ext}" not in claimed:
+            continue
+        out.append(glob)
+    return tuple(out)
 
 
 def walk_sources(
@@ -356,6 +402,8 @@ def walk_sources(
                     skipped[rel] = (f"excluded by !{pattern}", POLICY)
                     continue
                 if types is not None and not types.accepts(rel):
+                    if types.awaits_package(rel):
+                        continue  # W-289 P5: counted on stderr, never a frozen skip
                     skipped[rel] = ("not an indexed file type", POLICY)
                     continue
 
@@ -363,6 +411,8 @@ def walk_sources(
             # bytes themselves decide, so every skip below is UNREADABLE.
             content = path.read_bytes()
             reason = _skip_reason(content, rel, root)
+            if reason == fixed("plugins", "skip_undeclared"):
+                continue  # W-289 P5, as above: counted, never written down
             if reason:
                 skipped[rel] = (reason, UNREADABLE)
             else:
@@ -434,6 +484,14 @@ def _skip_reason(content: bytes, rel: str = "", root: Path | None = None) -> str
         return "empty"
     if rel and decode_mod.claims(rel, root):
         return None  # a decoder owns this type; its bytes are its own business
+    if rel and root is not None:
+        # W-289: a format a first-party package reads, admitted by a glob
+        # `readable()` cannot see through (`docs/*.json`), with no declared
+        # package. Never read as prose — the bytes are that format's.
+        dot = rel.rfind(".")
+        suffix = rel[dot:].lower() if dot > rel.rfind("/") + 1 else ""
+        if suffix and suffix in decode_mod.builtin_extensions():
+            return fixed("plugins", "skip_undeclared")
     if b"\x00" in content:
         return "binary"
     try:

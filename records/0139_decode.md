@@ -8,19 +8,29 @@ status: accepted
 date: 2026-08-26
 amended: 2026-10-20
 feature: the decoder plane — the protocol, the registry, the consumer seam, the enrichment queue and the decoder extensions
-owns: [src/fux/decode@da72579ffe71, src/fux/decode/ext/__init__.py@0102048c0ed3, src/fux/decode/ext/markdown.py@e6152422eabb, src/fux/decode/ext/ooxml.py@f6b06732db01, src/fux/decode/ext/xml.py@904fbe40e264, src/fux/decode/ext/zip.py@809ff180996d, src/fux/templates/agents/DECODER-SKILL.md@c202f8a44e12, .fux/decoders@53e86e4578cd, node/src/decode/markdown.mjs@9b8c05b393cb, node/src/decode/registry.mjs@5f97a79df7ad]
+owns: [src/fux/decode@b850b8639175, src/fux/decode/ext/__init__.py@c9bb2ae89770, src/fux/decode/ext/markdown.py@e6152422eabb, src/fux/decode/ext/ooxml.py@f6b06732db01, src/fux/decode/ext/xml.py@904fbe40e264, src/fux/decode/ext/zip.py@809ff180996d, src/fux/templates/agents/DECODER-SKILL.md@046a17bbf04f, node/src/decode/markdown.mjs@9b8c05b393cb, node/src/decode/registry.mjs@5f97a79df7ad, packages/fux-decoder-config@c70265358db8, packages/fux-decoder-drawio@746bc5e609cd, packages/fux-decoder-html@6e591271a9a4, packages/fux-decoder-image@bf396431f6a4, packages/fux-decoder-json@1fcccaa78a04, packages/fux-decoder-mail@e41b6deba238, packages/fux-decoder-office@102fe1c11551, packages/fux-decoder-pdf@06e2a83a46da, packages/fux-decoder-rtf@69e71c4eba5c, packages/fux-decoder-svg@cffecd76162b, packages/fux-decoder-xml@39d1b27141b9]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: b1b032da63580606b5ee6c2f6a109a8d6ed28c9df36a817870d3278a003d2b59
+content_sha: c633b07dff23c1581c773f20ea6d60ffd43be9ece9277d0dc426e462706269be
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
-- [`.fux/decoders/`](../.fux/decoders) · dir
 - [`node/src/decode/markdown.mjs`](../node/src/decode/markdown.mjs) · file
 - [`node/src/decode/registry.mjs`](../node/src/decode/registry.mjs) · file
+- [`packages/fux-decoder-config/`](../packages/fux-decoder-config) · dir
+- [`packages/fux-decoder-drawio/`](../packages/fux-decoder-drawio) · dir
+- [`packages/fux-decoder-html/`](../packages/fux-decoder-html) · dir
+- [`packages/fux-decoder-image/`](../packages/fux-decoder-image) · dir
+- [`packages/fux-decoder-json/`](../packages/fux-decoder-json) · dir
+- [`packages/fux-decoder-mail/`](../packages/fux-decoder-mail) · dir
+- [`packages/fux-decoder-office/`](../packages/fux-decoder-office) · dir
+- [`packages/fux-decoder-pdf/`](../packages/fux-decoder-pdf) · dir
+- [`packages/fux-decoder-rtf/`](../packages/fux-decoder-rtf) · dir
+- [`packages/fux-decoder-svg/`](../packages/fux-decoder-svg) · dir
+- [`packages/fux-decoder-xml/`](../packages/fux-decoder-xml) · dir
 - [`src/fux/decode/`](../src/fux/decode) · dir
 - [`src/fux/decode/ext/__init__.py`](../src/fux/decode/ext/__init__.py) · file
 - [`src/fux/decode/ext/markdown.py`](../src/fux/decode/ext/markdown.py) · file
@@ -60,9 +70,11 @@ flowchart TD
     W["the walker reads bytes"] --> C{"does a decoder claim<br/>this extension?"}
     C -->|no| P["parse: utf-8 + NFC + frontmatter"]
     P --> X["extract.py"]
-    C -->|yes| O{"is there a copy in<br/>.fux/decoders/ ?"}
-    O -->|"yes: the normal case,<br/>setup writes all of them"| CD["the CONSUMER COPY runs<br/>consumer dependencies allowed"]
-    O -->|"no: the copy was deleted"| BD["the packaged built-in runs<br/>stdlib only, L2"]
+    C -->|yes| O{"is there a file in<br/>.fux/decoders/ ?"}
+    O -->|"yes: the consumer's override"| CD["the CONSUMER FILE runs<br/>consumer dependencies allowed"]
+    O -->|"no: the normal case"| D{"is its package declared<br/>in .fux/plugins.toml ?"}
+    D -->|"yes, and verified"| BD["the PACKAGED decoder runs<br/>stdlib only, L2"]
+    D -->|"no"| U["not read, never prose:<br/>counted on ingest's stderr"]
     CD --> R{"Markdown, or None?"}
     BD --> R
     R -->|Markdown| N["NFC applied<br/>frontmatter NOT re-read"]
@@ -80,17 +92,20 @@ flowchart TD
         |                     |
         no                   yes
         |                     |
-  parse:                is there a copy in .fux/decoders/ ?
+  parse:                is there a file in .fux/decoders/ ?
   utf-8 + NFC +               |                    |
-  frontmatter          yes: the normal      no: the copy
-        |              case, setup          was deleted
-        |              writes them all           |
-        |                     |                  |
-        |            the CONSUMER COPY    the packaged built-in
-        |            runs (consumer       runs (stdlib only, L2)
-        |            dependencies OK)           |
-        |                     |                  |
-        |                     +--------+---------+
+  frontmatter          yes: the consumer's   no: the normal case
+        |              override                   |
+        |                     |         is its package declared in
+        |                     |         .fux/plugins.toml ?
+        |                     |            |               |
+        |                     |      yes, verified         no
+        |                     |            |               |
+        |            the CONSUMER FILE  the PACKAGED    not read, never
+        |            runs (consumer     decoder runs    prose: counted on
+        |            dependencies OK)   (stdlib, L2)    ingest's stderr
+        |                     |            |
+        |                     +-----+------+
         |                              |
         |                     Markdown, or None?
         |                      |               |
@@ -113,7 +128,7 @@ answer is not to amend L2** — it is
 
 | fux refuses to own | the consumer owns it as |
 |---|---|
-| network I/O | `.fux/fetchers/http.py` |
+| network I/O | a fetcher — the declared `fux-fetcher-http` package, or `.fux/fetchers/<name>.py` |
 | model calls | their own agent, invoked by them |
 | **third-party parsing libraries** | **`.fux/decoders/<name>.py`** |
 
@@ -173,9 +188,14 @@ not handed, and works unchanged for URL-sourced content, which has no path** —
 the opt-in exists because some libraries will not accept a buffer, and without
 it every such decoder would spill its own temp file, differently.
 
-**5. A consumer decoder overrides a built-in BY MODULE NAME, not by extension.**
-`.fux/decoders/html.py` replaces the built-in `html` wholesale — not
-merged, not fallen back to. **Matching on extension would let two files both
+**5. A consumer decoder overrides a packaged decoder BY MODULE NAME, not by
+extension.** `.fux/decoders/html.py` replaces the `html` module of
+`fux-decoder-html` wholesale — not merged, not fallen back to — and the package
+is then not imported for that module at all. **The precedence is
+[SR-PLUGINS](0165_plugins.md) P8: the consumer's file, then the DECLARED
+package, then nothing** (W-289 phase 2, 2026-10-20). Until then the middle rung
+was a built-in shipped inside fux-core, which ran whether or not anyone
+declared it. **Matching on extension would let two files both
 claim `.html` and resolve by load order**, which is the same class of defect as
 a filesystem-ordered registry.
 
@@ -189,7 +209,11 @@ depends on filesystem order has a committed index that depends on it too**
 shrinks. ⚠ **Detection would break L4 outright:** a decoder that ran whenever
 its library happened to import makes two developers with identical sources
 commit different root hashes. **Declared-and-committed plus a loud failure is
-what preserves *same sources → same index*.**
+what preserves *same sources → same index*.** ⚠ **Since W-289 phase 2 the same
+rule governs the packaged decoders**: a package `.fux/plugins.toml` declares
+that is missing, or installed at another version or digest, stops every verb
+that reads the index or ingests ([SR-PLUGINS](0165_plugins.md) P4), and an
+installed package nobody declared is never imported (P3).
 
 **8. A decoder that raises is a skipped document, never a failed run.**
 `DecodeFailed` is deliberately **not** a `FuxError`, because `FuxError` renders
@@ -197,7 +221,11 @@ at the CLI boundary as *the command failed* — **and one corrupt file among ten
 thousand is not that.**
 
 **9. The default type allowlist is prose plus every extension a BUILT-IN decoder
-claims.** ⚠ **This decision once read the opposite** — that widening it needed a
+claims** — and since W-289 phase 2 a *built-in* is a first-party module in a
+`fux-decoder-*` package, and **the allowlist in force is prose plus every
+suffix a DECLARED package claims**: `.fux/formats.toml` as seeded spells every
+first-party binding out, and a glob whose package is not declared admits
+nothing until it is ([SR-TYPES](0128_types-list.md) decision 1). ⚠ **This decision once read the opposite** — that widening it needed a
 pre-registered measurement — and **that was wrong on its own terms.** The
 pre-registration rule governs **frozen thresholds**; the allowlist's *contents*
 were never one (its own verdict block calls them *a defaults judgment rather
@@ -205,8 +233,21 @@ than a measurement*), so a ruling could move it, and one did. See
 [SR-TYPES](0128_types-list.md) decision 1 for what stays out and why, **and for
 the reason the default may never be derived from the live registry.**
 
-**10. `fux setup` writes every built-in decoder into `.fux/decoders/`, and the
-copy is what runs.** The argument: **a consumer invited to override decoders
+**10. ⚠ REVERSED by W-289 (SR-PLUGINS P9): `fux setup` writes no decoder into
+`.fux/decoders/`, and the DECLARED PACKAGE is what runs.** Phase 1 stopped the
+seeding (2026-10-20); phase 2 moved every decoder module out of
+`src/fux/decode/` into its `fux-decoder-*` package the same day, so an engine
+fix reaches a consumer with the next install rather than never. A file a
+consumer keeps in `.fux/decoders/` still overrides the package of its module
+name (decision 5), and `fux doctor`'s `seeded copies removable` row
+([SR-DOCTOR](0152_doctor.md)) names every copy it can prove unedited — its body
+still hashes to its stamp — as safe to delete. **fux never deletes one**
+(SR-DOTFUX decision 6). This repository deleted its own seventeen unedited
+twins in phase 2. A copy seeded before phase 2 imports `fux.decode.<format>` or
+`fux.decode.ext.table`, which no longer exist; loading it is a hard error that
+names where the import moved and says to delete an unedited copy. What follows
+is the decision as it stood from 2026-08-26, kept because its reasoning is what
+the reversal answers. The argument was: **a consumer invited to override decoders
 should be able to read them in their own repo**, which an eject-on-demand
 alternative only half delivers.
 
@@ -239,8 +280,8 @@ alternative only half delivers.
   line**, `# fux-template: <sha256 of the shipped module>` (the prefix is
   `constants.toml [templates] stamp_prefix`); below it the bytes are the module
   exactly, so the copy still is what runs and what fux tests. `fux doctor`'s
-  `seeded copies current` row ([SR-DOCTOR](0152_doctor.md)) names an
-  **unedited** copy — its body still hashes to its stamp — whose module has
+  `seeded copies current` row — `seeded copies removable` since W-289 —
+  ([SR-DOCTOR](0152_doctor.md)) named an **unedited** copy — its body still hashes to its stamp — whose module has
   changed since, with the lever *re-seed it yourself*: delete the file (the
   built-in runs meanwhile, by the bullet above) and run `fux setup`. An edited
   copy is the consumer's and is not compared. **fux never writes the file**
@@ -913,7 +954,12 @@ output until `fux ingest --full` while `fux doctor` stayed green. That is
 decision 11a's trap again, one layer down.
 
 - **E1 — home and shape.** A **decoder extension** is a module
-  `src/fux/decode/ext/<name>.py` that a decoder calls to do part of its work. It
+  `src/fux/decode/ext/<name>.py` that a decoder calls to do part of its work —
+  or, since W-289 phase 2, a module in a `fux-extension-*` plugin package:
+  `table` lives at `fux_extension_table.table`, in `fux-extension-table`, and
+  `constants.toml [extensions.<name>] package` says which distribution ships
+  each one (`fux-core` for the other five, the decoder SDK).
+  `fux.decode.ext.module_name()` turns the row into the import name. It
   declares `VERSION`, read from `constants.toml [extensions.<name>] version`,
   and nothing else protocol-wise: no suffix, no `decode()`, never chosen by the
   registry. There are six, each at `1`: `limits`, `markdown`, `ooxml`, `table`,
@@ -938,7 +984,12 @@ decision 11a's trap again, one layer down.
   `table` bump re-extracts the formats that declare `table`, and nothing else.
 - **E4 — the gates**, in `tests/decode/test_decoder_versions.py`:
   `test_every_extension_declares_a_version` (also: the files under `ext/` and
-  the `[extensions.*]` tables are one list);
+  in the `fux-extension-*` packages, together, and the `[extensions.*]` tables
+  are one list); `test_an_extension_lives_where_its_row_says_and_reads_its_version_there`
+  (W-289: a packaged extension still declares `VERSION` from its own
+  `[extensions.<name>]` row, every decoder package that uses it depends on its
+  package, and `test_the_digest_composes_in_declared_order` holds it in the
+  digest);
   `test_a_decoders_uses_is_the_closure_of_what_it_imports`, which walks each
   built-in decoder's imports with `ast`. **That walk is the one place
   introspection is used**, to catch a missing declaration, never to build the
@@ -964,14 +1015,17 @@ decision 11a's trap again, one layer down.
   `json.MAX_DEPTH` shim exists. `decode/__init__.py` binds each name in
   `constants.toml [decoders] legacy_helpers` to the extension **module object
   itself**, so there is one `ContextVar` and one cache, and no `_<name>.py` file
-  exists to drift. `_table` has no alias because it never shipped. ⚠ A decoder
-  that imports an old name declares no `USES` for it, so that extension's
-  `VERSION` does not reach its key. That is the stale copy `fux doctor`'s
-  `seeded copies current` row already names (decision 10), and re-seeding closes
-  it.
-- **Owned per file.** [SR-TABULAR](0150_tabular.md) owns `ext/table.py` and
-  `ext/limits.py`. This record owns `ext/__init__.py`, `ooxml`, `xml`, `zip` and
-  `markdown`. The package is **core**, like the rest of `decode/`.
+  exists to drift. `_table` has no alias because it never shipped, and
+  `fux.decode.ext.table` has none since W-289 phase 2 moved the module into its
+  package — a copy importing it gets the hard error decision 10 describes. ⚠ A
+  decoder that imports an old name declares no `USES` for it, so that
+  extension's `VERSION` does not reach its key. That is a stale copy, and
+  `fux doctor`'s `seeded copies removable` row names it when it is unedited
+  (decision 10): deleting it closes the gap, because the package runs.
+- **Owned per file.** [SR-TABULAR](0150_tabular.md) owns `ext/limits.py` and
+  — since W-289 phase 2 — the `fux-extension-table` package that carries
+  `table`. This record owns `ext/__init__.py`, `ooxml`, `xml`, `zip` and
+  `markdown`. `decode/ext/` is **core**, like the rest of `decode/`.
 - ⚠ **What it does not close: a decoder importing another DECODER.** `mail`
   and `drawio` call `html`, and `ini`, `jsonl`, `toml` and `yaml` call `json`.
   An extension reached that way is in the importer's `USES` (E2), but the
@@ -994,6 +1048,46 @@ sentence must name a `.xlsx`-style extension beside one, the former is a
 Both words are in [`docs/GLOSSARY.md`](../docs/GLOSSARY.md). This is Arpit's
 word ([L6](0008_LAW-6-say-index.md)'s kind of ruling); a rename is one word from
 him, and this table is where it lands.
+
+**25. The decoders are plugin packages, and the registry is gated on the
+declaration** (W-289 phase 2, 2026-10-20; [SR-PLUGINS](0165_plugins.md) carries
+the rule, this decision what it did to the plane).
+
+- **Where they live.** Each of the seventeen first-party modules moved,
+  unchanged in output, from `src/fux/decode/` into the package
+  `constants.toml [plugins.packages.*] modules` names — `fux_decoder_<subject>`,
+  one submodule per format (`fux_decoder_config/toml.py`). Cross-decoder imports
+  became package dependencies: `config` and `xml` depend on `fux-decoder-json`,
+  `mail` and `drawio` on `fux-decoder-html`, and `html`, `sheet` and `office` on
+  `fux-extension-table`. **fux-core ships `decode/__init__.py` and the decoder
+  SDK (`decode/ext/`) and no decoder.** No `VERSION` moved: every decoded file
+  in this repository decodes to the same bytes before and after.
+- **What the registry loads.** A module from a package `.fux/plugins.toml`
+  declares, verified first (P4) and imported by its fixed name (P7); a file in
+  `.fux/decoders/` of the same module name instead (decision 5, P8); nothing
+  else. **No declaration means prose only** — not an error: `fux ingest` and
+  `fux doctor` say so in one line, with `fux setup` as the lever. A
+  `[decoders]` binding in `.fux/formats.toml` to a first-party module whose
+  package is undeclared reads nothing and is not an error either, so the file
+  `fux setup` seeds with every binding stays valid; a binding to a module no
+  package carries and no file provides is still decision 13's hard error.
+- **Never read as prose, never silent.** A file whose suffix a first-party
+  package reads and no declared package does is not walked — **and is not a
+  skip**, because a skip is written into `.fux/.fuxignore`, where it would keep
+  the file out after the package is declared. `fux ingest` prints the count per
+  suffix on stderr, naming the package ([SR-INGEST](0106_ingest.md) decision
+  4b), and `fux doctor`'s `plugins cover sources` row lists the same.
+- **The digest names the distribution** (P12): `pkg:<dist>@<version>/<module>@<VERSION>`
+  plus decision 24's extension tail — `pkg:fux-decoder-office@4.1.1/docx@2+table@1+ooxml@1+xml@1+zip@1+limits@1`.
+  It is the reuse key and REGISTER's `decoder` column alike. ⚠ **The package
+  version is in the key**, so every release — lockstep moves every first-party
+  version (P11) — re-extracts the decoded documents once. That is decision
+  11a's cheap direction of being wrong, accepted so a committed row names the
+  distribution that read it.
+- **`fux add` still proposes the first-party stem** for an observed response
+  (`decoder=pdf`) whether or not the package is declared; the line is what
+  `fux setup` then reads to propose the package, and until it is declared that
+  URL is a named skip at ingest.
 
 ### Consequences
 
@@ -1122,8 +1216,8 @@ him, and this table is where it lands.
 # 1, 4 — the protocol's own properties
 uv run pytest -q tests/decode/
 
-# 2 — the built-ins are stdlib only
-grep -rnE '^(import|from) ' src/fux/decode/ | grep -vE 'fux\.|^\S+:(import|from) (json|re|zipfile|xml|html|email|csv|struct|base64|io|pathlib|typing|dataclasses|unicodedata|__future__)'
+# 2 — the packaged decoders are stdlib only (W-289: they live in packages/)
+grep -rnE '^(import|from) ' src/fux/decode/ packages/fux-decoder-*/src packages/fux-extension-*/src | grep -vE 'fux(_[a-z]+)*\.|fux_[a-z_]+ import|^\S+:(import|from) (json|re|zipfile|xml|html|email|csv|struct|base64|io|pathlib|typing|dataclasses|unicodedata|__future__)'
 # expect: no output
 
 # 3 — the default unions BUILT-IN extensions only
@@ -1140,7 +1234,7 @@ grep -n 'builtin_extensions' src/fux/acquire/gitdir.py
 document is never listed here — the body may name one, but archive is not
 evidence.*
 
-**Records** — [SR-LAWS](0001_LAWS.md) · [SR-INGEST](0106_ingest.md) ·
+**Records** — [SR-LAWS](0001_LAWS.md) · [SR-PLUGINS](0165_plugins.md) · [SR-INGEST](0106_ingest.md) ·
 [SR-EXTRACTED](0115_extracted-mode.md) ·
 [SR-CDP-FETCHER](0118_cdp-fetcher.md) ·
 [SR-HTTP-FETCHER](0119_http-fetcher.md) · [SR-TYPES](0128_types-list.md) ·
@@ -1149,8 +1243,10 @@ evidence.*
 
 **Code**
 
-- [`.fux/fetchers/http.py`](../.fux/fetchers/http.py)
+- [`packages/fux-fetcher-http/src/fux_fetcher_http/__init__.py`](../packages/fux-fetcher-http/src/fux_fetcher_http/__init__.py) — the plain-GET fetcher, a plugin package since W-289 (this repository's own copy, `.fux/fetchers/http.py`, was deleted in phase 2)
 - [`src/fux/decode/__init__.py`](../src/fux/decode/__init__.py)
+- [`src/fux/plugins.py`](../src/fux/plugins.py) — the declaration the registry is gated on (W-289)
+- [`packages/`](../packages) — the `fux-decoder-*` packages every decoder module moved into (W-289 phase 2)
 - [`src/fux/acquire/gitdir.py`](../src/fux/acquire/gitdir.py)
 - [`src/fux/templates/agents/DECODER-SKILL.md`](../src/fux/templates/agents/DECODER-SKILL.md)
 - [`tests/decode/test_decode.py`](../tests/decode/test_decode.py)

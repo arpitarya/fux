@@ -24,7 +24,7 @@ answer from outside, and leaves the read plane alone.
 
 | decoder | digest | why |
 |---|---|---|
-| built-in | `pdf@3` — the module's `VERSION` | fux owns this tree, so it can require a hand bump and hold it with a test. A constant does not move on a comment or a docstring |
+| packaged | `pkg:fux-decoder-pdf@4.2.0/pdf@3` — the declared distribution, its version, and the module's `VERSION` | fux owns these packages, so it can require a hand bump and hold it with a test; the distribution and its version name exactly which code read the document (SR-PLUGINS P12, W-289). Until W-289 phase 2 this row was a *built-in*, `pdf@3`, shipped inside fux-core |
 | `.fux/decoders/` | `logdoc@sha:1a2b…` — sha of the file | fux can require nothing of a consumer's file and hold nothing about it. A forgotten bump there would silently pin a whole format to stale extraction. The file is committed, so its sha is as stable as the rule it stands for |
 
 ⚠ **A consumer decoder therefore re-extracts on a whitespace edit.** That is the
@@ -38,7 +38,7 @@ its `USES` names, in declared order: `docx@2+table@1+ooxml@1+xml@1+zip@1+limits@
 decision 24. Before it, a fix to a shared helper moved no decoder's `VERSION`
 and no consumer copy's bytes, so an existing corpus kept the old output until
 `--full` — decision 11a's trap, one layer down. **A consumer copy needs this as
-much as a built-in does:** the seeded copies in `.fux/decoders/` import
+much as a packaged decoder does:** the seeded copies in `.fux/decoders/` import
 `fux.decode.ext` from the installed engine, so an engine upgrade changes their
 output while their sha stands still.
 
@@ -61,28 +61,11 @@ time, and the map is built in sorted order.
 from __future__ import annotations
 
 import hashlib
-import importlib
 from pathlib import Path
 from ..constants import fixed
 
-#: `Decoder.origin` for a built-in, as `decode._load_builtin` spells it.
-BUILTIN_PREFIX = fixed("decoders", "builtin_prefix")
-
-
-def _module_version(name: str) -> int:
-    """`VERSION` from a built-in decoder module, or `0` when it declares none.
-
-    **`0` rather than a raise**, because this runs inside every ingest: a
-    decoder that has lost its constant should re-extract once and be caught by
-    `tests/decode/test_decoder_versions.py`, not stop the run. The test is where
-    the discipline is enforced; this is where it is read.
-    """
-    try:
-        module = importlib.import_module(f".{name}", "fux.decode")
-    except Exception:  # pragma: no cover - the registry already loaded it
-        return 0
-    version = getattr(module, "VERSION", 0)
-    return version if isinstance(version, int) else 0
+#: `Decoder.origin` for a decoder from a declared plugin package (P12).
+PACKAGE_PREFIX = fixed("decoders", "package_prefix")
 
 
 def _extension_version(name: str) -> int:
@@ -96,13 +79,56 @@ def _extension_version(name: str) -> int:
     return version if isinstance(version, int) else 0
 
 
+def _packaged_version(origin: str, name: str) -> int:
+    """`VERSION` of a packaged decoder module, from `pkg:<dist>@<v>/<module>`.
+
+    Read from `sys.modules`, where the registry's verified load put it — this
+    never imports a package the registry did not (SR-PLUGINS P3).
+    """
+    import sys
+
+    from .. import plugins
+
+    dist = origin[len(PACKAGE_PREFIX):].partition("@")[0]
+    try:
+        module = sys.modules.get(f"{plugins.package_named(dist).module}.{name}")
+    except Exception:  # pragma: no cover - the registry already validated the name
+        return 0
+    version = getattr(module, "VERSION", 0)
+    return version if isinstance(version, int) else 0
+
+
+def name_of(digest: str) -> str:
+    """The decoder module a digest names: `pdf` from `pdf@3`, from `pdf@sha:…`
+    and from `pkg:fux-decoder-pdf@4.2.0/pdf@3+limits@1`."""
+    if digest.startswith(PACKAGE_PREFIX):
+        _package, _slash, digest = digest.partition("/")
+    return digest.partition("@")[0]
+
+
+def package_of(digest: str) -> "str | None":
+    """`<dist>@<version>` from a packaged decoder's digest, else `None`."""
+    if not digest.startswith(PACKAGE_PREFIX):
+        return None
+    return digest[len(PACKAGE_PREFIX):].partition("/")[0]
+
+
 def of(decoder) -> str:
-    """One decoder's digest, from its `origin` and its `uses`."""
+    """One decoder's digest, from its `origin` and its `uses`.
+
+    A packaged decoder reads `pkg:<dist>@<version>/<module>@<VERSION>+<ext>@<v>…`
+    (SR-PLUGINS P12): the distribution that read the document, the module, and
+    the W-288 extension tail. ⚠ **The package version is part of the key**, so a
+    release that moves it — every release, in lockstep (P11) — re-extracts the
+    documents its decoders read once; SR-DECODE decision 11a's "cheap direction
+    of being wrong", chosen so a committed REGISTER row names the exact
+    distribution that produced it.
+    """
     origin = getattr(decoder, "origin", "") or ""
     name = getattr(decoder, "name", "") or "?"
     tail = "".join(f"+{ext}@{_extension_version(ext)}" for ext in getattr(decoder, "uses", ()))
-    if origin.startswith(BUILTIN_PREFIX):
-        return f"{name}@{_module_version(origin[len(BUILTIN_PREFIX):])}{tail}"
+    if origin.startswith(PACKAGE_PREFIX):
+        return f"{origin}@{_packaged_version(origin, name)}{tail}"
     try:
         raw = Path(origin).read_bytes()
     except OSError:

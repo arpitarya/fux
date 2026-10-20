@@ -154,6 +154,8 @@ makes the committed artifact small, ACL-safe, and never stale-by-accumulation.
 See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named by [SR-LAWS](../records/0001_LAWS.md), [paper §3](paper/the-fux-index-paper.md).
 
 **Decoder extension** <a id="decoder-extension"></a> — A versioned shared module under `src/fux/decode/ext/`
+— or, for `table` since W-289 phase 2, in the `fux-extension-table`
+[plugin package](#plugin-package) (`fux_extension_table.table`) —
 that a decoder calls to do part of its work: `table` (the one table emitter),
 `ooxml`, `xml`, `zip`, `markdown` (the heading grammar), `limits` (the caps
 seam). It has no [suffix](#suffix) and is never chosen by the registry. A
@@ -689,7 +691,9 @@ capability to fux — a decoder (`fux-decoder-pdf`), a fetcher
 `fux_<kind>_<subject>`. Only `fux-engine` is mandatory; a repository runs a
 plugin package only when it is [declared](#declared-a-plugin-package)
 ([SR-PLUGINS](../records/0165_plugins.md), W-289). The fifteen first-party
-ones ship on fux's own version.
+ones ship on fux's own version. **Every decoder fux ships is in one** since
+W-289 phase 2 — `fux.decode.pdf` is `fux_decoder_pdf.pdf` — and with no
+declaration a repository reads Markdown and plain text only.
 
 **PPR-lite** — Personalized PageRank restricted to the seed neighbourhood
 (damping 0.85, exactly 3 iterations, sorted traversal). A *fixed* iteration

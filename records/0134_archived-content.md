@@ -5,13 +5,13 @@ name: SR-ARCHIVED-CONTENT
 title: "SR-ARCHIVED-CONTENT (0134) — what a document declared archived does, once it is indexed"
 description: "A document from a source declared archived=true carries archived: true; ranking is byte-identical at the default weight; a configurable weight may demote it; every verb surfaces the fact; and a response-level disclaimer states what archived means without telling the reader what to conclude."
 status: accepted
-amended: 2026-10-13
+amended: 2026-10-20
 date: 2026-08-22
 feature: what happens once a document is declared archived — the record property, ranking, the marker, and the disclaimer
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 1eae4a9c956c2dd8de3d0e237ba8f1747ba3a2740fbf59f626c177883a1dbac6
+content_sha: 2800638943e911ed12d67c9f4dc05bc446c9b745662868ef3dcbf74f0be5d969
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -504,6 +504,8 @@ A carried `url:` record re-derived because the identifier-family digest moved ke
 **No decision here moved** (W-288, 2026-10-20): `ingest/run.py` imports the limits seam as `fux.decode.ext.limits` ([SR-DECODE](0139_decode.md) decision 24). `_archived_url_ids` and `_with_archived` are untouched.
 
 **No decision here moved** (W-289, 2026-10-20): `acquire/urlsrc.py`'s `load_fetcher` resolves a declared fetcher package when the consumer has no file of that name ([SR-PLUGINS](0165_plugins.md) P8); `UrlEntry.archived` and its two layers are untouched.
+
+**W-289 phase 2 (2026-10-20) — no decision here moved.** `acquire/urlsrc.py`, which this record describes, gained [SR-PLUGINS](0165_plugins.md) P3's named skip for a `decoder=` whose package is undeclared. `archived=` is untouched.
 
 ### Consequences
 

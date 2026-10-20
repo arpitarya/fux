@@ -29,6 +29,11 @@ In prose this layer is always the two-word *decoder extension*
 Imports here and in every extension are absolute and cheap: a consumer decoder
 loaded by path from `.fux/decoders/` imports `fux.decode.ext.<name>` with no
 parent package of its own (SR-DECODE decision 10).
+
+**`table` is not here since W-289 phase 2.** It ships in the
+`fux-extension-table` plugin package as `fux_extension_table.table`, and
+`module_name()` says where each extension lives. The other five stay in
+fux-core as the decoder SDK.
 """
 
 from __future__ import annotations
@@ -37,13 +42,35 @@ import importlib
 
 from fux import constants as _constants
 
-__all__ = ["NAMES", "version"]
+__all__ = ["NAMES", "module_name", "version"]
 
 #: Every decoder extension, sorted — the `[extensions.<name>]` tables of
 #: `constants.toml`. A `USES` entry outside this tuple is a hard error at load.
 NAMES: tuple[str, ...] = tuple(sorted(_constants.table("extensions")))
 
 
+def module_name(name: str) -> str:
+    """The import name of decoder extension `name`.
+
+    `constants.toml [extensions.<name>] package` says which distribution ships
+    it: `fux-core` puts it here, at `fux.decode.ext.<name>`; a plugin package
+    puts it at `<its import name>.<name>` — `fux_extension_table.table` since
+    W-289 phase 2 (SR-PLUGINS P7). Fixed identity, never discovered.
+    """
+    package = _constants.fixed(f"extensions.{name}", "package")
+    if package == _constants.fixed("distributions", "core"):
+        return f"fux.decode.ext.{name}"
+    from fux import plugins
+
+    return f"{plugins.package_named(package).module}.{name}"
+
+
 def version(name: str) -> int:
-    """The `VERSION` of decoder extension `name`, from its own module."""
-    return importlib.import_module(f"fux.decode.ext.{name}").VERSION
+    """The `VERSION` of decoder extension `name`, from its own module.
+
+    ⚠ **A packaged extension is imported here only because a decoder that
+    USES it already ran** — the registry loaded that decoder from a declared
+    package, and the closure rule (SR-PLUGINS P4) made the extension's package
+    a declared row too.
+    """
+    return importlib.import_module(module_name(name)).VERSION

@@ -79,7 +79,8 @@ wrong answer is worse than none.
 ```bash
 pip install fux-engine           # Python ≥ 3.12 · Linux, macOS, Windows · zero deps
 cd your-repo
-fux setup                        # writes .fux/ and agent instructions (only missing files)
+fux setup                        # writes .fux/, agent instructions, and .fux/plugins.toml
+pip install fux-decoder-pdf ...  # the ONE line setup printed: readers for the formats you have
 fux ingest                       # indexes README.md and docs/ by default
 fux ask "how do we roll back a release"
 git add .fux fux.toml && git commit -m "Add fux index"
@@ -91,6 +92,19 @@ plain `git clone`.
 > **No Python on the machine?** `fux setup` vendors a single-file,
 > zero-dependency Node reader into `.fux/node/`, so `.fux/fux find rollback`
 > works with nothing installed. Or: `npx fux-engine find rollback`.
+
+> **Upgrading from 4.1 or earlier? One breaking change.** fux-engine now reads
+> Markdown and plain text on its own; every other format — PDF, Office, HTML,
+> CSV, JSON, mail, images — is read by a `fux-decoder-*` package that your
+> repository declares in the committed `.fux/plugins.toml`, pinned to one version
+> and digest. Until then those files are not indexed, and `fux ingest` says how
+> many, per format, on stderr. Once per repository: run `fux setup`, run the
+> `pip install …` line it prints, and commit `.fux/plugins.toml`; teammates then
+> run that same one-time `pip install`. A machine missing a declared package, or
+> holding a different build of it, gets a hard error with the install line —
+> never a quietly smaller index. If `.fux/decoders/` holds copies an older
+> `fux setup` wrote, `fux doctor` lists the unedited ones: delete them, so the
+> packages run.
 
 > **A machine that only reads, or only writes?** Since 4.0.0 fux ships as four
 > packages on one version: `fux-engine` is all of them, `fux-reader` ranks and

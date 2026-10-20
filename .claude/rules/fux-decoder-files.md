@@ -5,8 +5,9 @@ paths:
 
 # Editing a Fux decoder
 
-The files in `.fux/decoders/` are the decoders that run. They are committed and
-change which documents are indexed and how they rank.
+The files in `.fux/decoders/` are this repository's own decoders: each runs
+instead of the declared package's module of the same name (`.fux/plugins.toml`).
+They are committed and change which documents are indexed and how they rank.
 
 - **Only when a human asked for this decoder change.** Never as a side effect.
 - **Contract:** `EXTENSIONS` (lowercase, with the dot) and

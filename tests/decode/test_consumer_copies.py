@@ -20,21 +20,35 @@ from pathlib import Path
 
 import pytest
 
+from fux import plugins
 from fux import setup as setup_mod
 from fux.decode import BUILTIN_MODULES, decode, registry
+from fux.errors import FuxError
+from l12_fixtures import write_plugins
+
+
+def _shipped(name: str) -> Path:
+    """The module fux ships for decoder `name` — in its plugin package since
+    W-289 phase 2, located and never imported."""
+    import importlib.util
+
+    package = plugins.package_for_module(name)
+    spec = importlib.util.find_spec(package.module)
+    return Path(next(iter(spec.submodule_search_locations))) / f"{name}.py"
 
 
 @pytest.fixture
 def repo(tmp_path: Path) -> Path:
     """A repository holding every decoder copy, stamped, as a pre-W-289 setup
-    seeded them."""
+    seeded them — and declaring every decoder package, so a deleted copy has a
+    package to fall back to."""
     (tmp_path / ".git").mkdir()
     setup_mod.run(tmp_path, agents=False)
-    package = Path(setup_mod.__file__).parent / "decode"
+    write_plugins(tmp_path, force=True)
     for name in BUILTIN_MODULES:
         copy = tmp_path / ".fux" / "decoders" / f"{name}.py"
         copy.parent.mkdir(parents=True, exist_ok=True)
-        copy.write_bytes(setup_mod.stamped((package / f"{name}.py").read_bytes()))
+        copy.write_bytes(setup_mod.stamped(_shipped(name).read_bytes()))
     return tmp_path
 
 
@@ -58,9 +72,8 @@ def test_the_copy_is_byte_identical_to_the_shipped_module(repo: Path):
     it is a comment. Everything below it is the shipped module, byte for byte;
     the stamp names that module's sha256.
     """
-    package = Path(setup_mod.__file__).parent / "decode"
     for name in BUILTIN_MODULES:
-        shipped = (package / f"{name}.py").read_bytes()
+        shipped = _shipped(name).read_bytes()
         copied = (repo / ".fux" / "decoders" / f"{name}.py").read_bytes()
         stamp, body = setup_mod.read_stamp(copied)
         assert body == shipped, f"{name} was altered on the way out"
@@ -94,7 +107,8 @@ def test_the_copy_runs_not_the_packaged_module(repo: Path):
 
 
 def test_a_deleted_copy_falls_back_to_the_packaged_module(repo: Path):
-    """Deleting a decoder must not remove the format — it restores the built-in.
+    """Deleting a decoder must not remove the format — the declared package
+    runs (SR-PLUGINS P8: override > declared package > nothing).
 
     Without this, `rm .fux/decoders/pdf.py` would silently stop indexing every
     PDF in the corpus, which looks identical to a corpus that has no PDFs.
@@ -102,7 +116,31 @@ def test_a_deleted_copy_falls_back_to_the_packaged_module(repo: Path):
     (repo / ".fux" / "decoders" / "html.py").unlink()
     out = decode(b"<h1>Still here</h1>", "a.html", repo)
     assert out is not None and "Still here" in out
-    assert registry(repo)[".html"].origin.startswith("built-in:")
+    assert registry(repo)[".html"].origin.startswith("pkg:fux-decoder-html@")
+
+
+def test_a_deleted_copy_with_no_declared_package_reads_nothing(repo: Path):
+    """P3: with the package undeclared, the format is not read at all — never
+    read as prose, never by an installed package nobody declared."""
+    write_plugins(repo, ["fux-decoder-json"], force=True)
+    (repo / ".fux" / "decoders" / "html.py").unlink()
+    assert ".html" not in registry(repo)
+    assert decode(b"<h1>gone</h1>", "a.html", repo) is None
+
+
+def test_a_pre_phase_2_copy_names_where_its_import_moved(tmp_path: Path):
+    """A copy seeded before W-289 phase 2 imports `fux.decode.json`; the error
+    names the package it moved to and the fix (delete an unedited copy)."""
+    (tmp_path / ".git").mkdir()
+    folder = tmp_path / ".fux" / "decoders"
+    folder.mkdir(parents=True)
+    (folder / "toml.py").write_text(
+        "from fux.decode.json import _prose\nEXTENSIONS = ('.toml',)\n"
+        "def decode(raw, rel_path):\n    return _prose(raw)\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(FuxError, match=r"fux_decoder_json\.json, in fux-decoder-json.*delete it"):
+        registry(tmp_path)
 
 
 def test_setup_never_overwrites_an_edited_decoder(repo: Path):

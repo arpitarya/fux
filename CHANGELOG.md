@@ -8,9 +8,11 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
-**Plugin packages — only the engine is mandatory (W-289, phase 1).** ⚠
-**Breaking for every consumer, once**: run `fux setup` after upgrading, run the
-one `pip install …` line it prints, and commit `.fux/plugins.toml`.
+**Plugin packages — only the engine is mandatory (W-289, phases 1 and 2).** ⚠
+**Breaking for every consumer, once**: after upgrading, fux reads only Markdown
+and plain text until `.fux/plugins.toml` declares the decoder packages your
+sources need. Run `fux setup`, run the one `pip install …` line it prints, and
+commit `.fux/plugins.toml`.
 [SR-LAW-2](records/0004_LAW-2-zero-cost.md) is amended (Arpit, 2026-10-19): a
 capability may be opt-in only when the committed repository chooses it; no
 capability may depend on what a machine happens to have installed.
@@ -33,22 +35,41 @@ capability may depend on what a machine happens to have installed.
 - **`fux doctor` rows**: `plugins declared`, `plugins installed`, `plugins cover
   sources` (a format in your sources with no declared package, and how many
   files), and `seeded copies removable` (replacing `seeded copies current`).
+- **`fux ingest` counts what it did not read**: one stderr line per suffix your
+  sources hold that no declared package reads — `fux: 2 .pdf file(s) not read -
+  … declare fux-decoder-pdf` — and, with no `.fux/plugins.toml` at all, one line
+  saying only Markdown and plain text are read. Every run; stdout unchanged.
 
 ### Changed
 
 - **The two fetchers are packages**: `fux-fetcher-http` and `fux-fetcher-cdp`
   import nothing from fux. `fetch=<name>` loads `.fux/fetchers/<name>.py` when
   you have one — your file still wins — and otherwise the declared package.
-- **`fux setup` seeds no fetcher and no decoder** into `.fux/`; the package (for
-  decoders, still the built-in module until phase 2) is what runs, so engine
-  fixes reach you again. A copy an older setup wrote keeps overriding; `fux
-  doctor` names every unedited one as safe to delete.
+- **`fux setup` seeds no fetcher and no decoder** into `.fux/`; the declared
+  package is what runs, so engine fixes reach you again. A copy an older setup
+  wrote keeps overriding; `fux doctor` names every unedited one as safe to
+  delete.
+- ⚠ **The seventeen decoders moved out of fux into their packages** (phase 2):
+  `fux.decode.json` is `fux_decoder_json.json`, `fux.decode.html` is
+  `fux_decoder_html.html`, and so on, and `fux.decode.ext.table` is
+  `fux_extension_table.table`. fux-engine and fux-core ship no decoder. **A
+  decoder runs only when its package is declared**; a format no declared package
+  reads is not indexed — never read as raw text — and is counted on stderr. No
+  decoder's output changed. A copy in `.fux/decoders/` that an older setup
+  seeded and that imports one of the moved names stops ingest with an error
+  naming the new import: delete it if you never edited it.
+- ⚠ **A declared package that is missing or drifted stops every verb that reads
+  the index or ingests**, with the install line; `fux doctor` and `fux setup`
+  still run. A missing `.fux/plugins.toml` is not an error: it means prose only.
+- ⚠ **One more re-extraction, and one per release.** REGISTER's `decoder` column
+  and the reuse key now name the package that read each document —
+  `pkg:fux-decoder-pdf@4.2.0/pdf@1+limits@1` — so the first `fux ingest` after
+  upgrading re-extracts every decoded document once, and so does the first one
+  after each later release (the plugin packages move in lockstep with fux's
+  version). Markdown and plain text are never re-extracted for it.
 - **The scaffolded `fux.toml` carries no `[sources.url.config.http]` /
   `[sources.url.config.cdp]` table**; a fetcher with no table runs on its own
   documented defaults.
-- ⚠ **Phase 1 does not yet gate decoders**: every format is still read by the
-  built-in modules whether or not its package is declared. Phase 2 moves the
-  decoder modules into their packages and stops reading an undeclared format.
 
 
 **Tables answer by row and by column (W-287).** No index-format change

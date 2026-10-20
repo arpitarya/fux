@@ -8,7 +8,7 @@ rendered onto the drawing (a box's caption, a diagram's callouts).
 
 ⚠ **`.svg` REJOINED `DEFAULT_TYPES` on 2026-08-29** (Arpit, in the same
 change this decoder shipped), reversing the SVG half of
-[SR-TYPES](../../../records/0128_types-list.md) decision 5. That decision
+[SR-TYPES](../../../../records/0128_types-list.md) decision 5. That decision
 excluded SVG on the same reasoning `json.py` states for why `.json` was
 once excluded: undecoded, raw markup and path data drown a handful of real
 words. The reversal is the same one `.json` already made on 2026-08-26 —
@@ -37,7 +37,7 @@ from fux.constants import fixed
 #: `fux ingest` re-extracts the documents bound to THIS decoder and no others.
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
-#: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
+#: not bump it. [SR-DECODE](../../../../records/0139_decode.md) decision 11a.
 VERSION = fixed("decoders.svg", "version")  # not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.svg", "extensions"))

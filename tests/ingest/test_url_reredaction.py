@@ -176,7 +176,7 @@ def test_the_file_half_of_the_corpus_is_re_extracted_too(seeded):
 
 def test_a_decoder_bump_also_reaches_a_retained_url(seeded, monkeypatch):
     """Not only PII. A decoder change is the other input to a url's extraction."""
-    import fux.decode.html as html_mod
+    import fux_decoder_html.html as html_mod
 
     before = _url_record(seeded)
     monkeypatch.setattr(html_mod, "VERSION", html_mod.VERSION + 1)

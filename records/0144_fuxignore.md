@@ -6,11 +6,12 @@ title: "SR-FUXIGNORE (0144) — .fux/.fuxignore: one file for what is not indexe
 description: "Exclusion moves out of the source lists into one .gitignore-shaped file that is read first and decides in both directions, including over the type allowlist. `fux ingest` writes the skip list into two delimited blocks at its top."
 status: accepted
 date: 2026-08-27
+amended: 2026-10-20
 feature: the `.fux/.fuxignore` exclusion file
 owns: [src/fux/acquire/fuxignore.py@286e1f84fe6a]
 laws: [L2, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: ab0de82b21578b37b5f4408513270f4710af69758d7e5c7a389468b099ca781f
+content_sha: 976ca2f3be53d654ee7b569520310aafced131f54f83a0a23f44ced67e3de785
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -405,6 +406,8 @@ this moved where they are written, not what they are.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
 **No decision here moved** (W-261, 2026-10-05): `acquire/gitdir.py`, which this record describes, lost the `dirs`-list readers to `acquire/dirlist.py` (SR-DIR-LIST's). `would_index`, `_generated_kind` and the walk's verdicts are untouched.
+
+**W-289 phase 2 (2026-10-20) — no decision here moved.** `acquire/gitdir.py`, which this record describes, drops from the type filter the globs no declared package reads ([SR-PLUGINS](0165_plugins.md) P3), and such a file is **not a skip** — it never reaches the generated `.fuxignore` blocks, where a frozen line would keep it out after the package is declared ([SR-INGEST](0106_ingest.md) decision 4b). Decision 11's freeze is untouched for every other skip.
 
 ### Consequences
 

@@ -28,7 +28,7 @@ until it is the answer.
 |---|---|---|
 | `fux.cli`, `fux.maintain.mergedriver` | `[project.scripts]` in `packages/*/pyproject.toml` (and the root's) | console scripts; git invokes the merge driver as a bare command |
 | `fux.__main__` | `python -m fux` | rung 4 of the invocation ladder in `AGENTS.md` |
-| every `fux.decode.*doc` | `decode.BUILTIN_MODULES` | loaded by `importlib.import_module` from that tuple |
+| every first-party decoder module | `constants.toml [plugins.packages.*] modules` | since W-289 phase 2 each lives in a `fux-decoder-*` package and is imported by NAME, only when declared (SR-PLUGINS P7) |
 | `fux.schemas` | `constants.toml` `[schema_files] package` | a data package: `schema.load` resolves it by name through `importlib.resources` (W-226) |
 | every verb module | `cli.VERBS` | `cli.py` is core and runs a verb by module NAME, so a missing layer is refused rather than imported (W-282) |
 
@@ -51,6 +51,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src" / "fux"
+#: W-289 phase 2: the decoder and extension packages are engine code built from
+#: this tree. Walked too, so the decoder SDK in `decode/ext/` — reached only from
+#: a decoder module now — is still seen as live, and a dead module in a package
+#: is still caught.
+PLUGIN_SRCS = sorted(
+    p for p in (ROOT / "packages").glob("fux-*/src") if not p.parent.name.startswith("fux-fetcher-")
+    and p.parent.name not in ("fux-core", "fux-reader", "fux-writer")
+)
 
 #: module -> the reason it is reachable in a way this walk cannot see.
 #: **Empty on purpose.** See the module docstring.
@@ -61,14 +69,18 @@ DECLARED_EXCEPTIONS: dict[str, str] = {}
 
 
 def _module_name(path: Path) -> str:
-    parts = list(path.relative_to(ROOT / "src").with_suffix("").parts)
+    base = next((s for s in PLUGIN_SRCS if s in path.parents), ROOT / "src")
+    parts = list(path.relative_to(base).with_suffix("").parts)
     if parts[-1] == "__init__":
         parts.pop()
     return ".".join(parts)
 
 
 def _modules() -> dict[str, Path]:
-    return {_module_name(p): p for p in sorted(SRC.rglob("*.py"))}
+    files = sorted(SRC.rglob("*.py"))
+    for src in PLUGIN_SRCS:
+        files += sorted(p for p in src.rglob("*.py") if "__pycache__" not in p.parts)
+    return {_module_name(p): p for p in files}
 
 
 def _imports(path: Path, own: str) -> set[str]:
@@ -147,7 +159,15 @@ def _builtin_decoders() -> set[str]:
     data = tomllib.loads((SRC / "constants.toml").read_text(encoding="utf-8"))
     names = data.get("decoders", {}).get("builtin")
     assert isinstance(names, list) and names, "constants.toml carries no [decoders] builtin list"
-    return {f"fux.decode.{name}" for name in names}
+    # W-289 phase 2: `fux_decoder_<subject>.<module>`, from the package table.
+    out = set()
+    for dist, row in data["plugins"]["packages"].items():
+        if row["kind"] == "decoder":
+            top = "fux_decoder_" + dist.removeprefix("fux-decoder-").replace("-", "_")
+            out |= {f"{top}.{m}" for m in row["modules"]}
+    assert {n.rsplit(".", 1)[1] for n in out} == set(names), "a builtin module no package carries"
+    # Importing `fux_decoder_x.y` runs `fux_decoder_x` first.
+    return out | {n.rsplit(".", 1)[0] for n in out}
 
 
 def _schema_package() -> set[str]:
@@ -259,7 +279,7 @@ def test_a_module_kept_alive_only_by_its_own_tests_is_still_dead():
     for name, path in _modules().items():
         assert "tests" not in path.parts, f"{name} is not under src/"
 
-    assert all(root.startswith("fux.") for root in _roots())
+    assert all(root.startswith(("fux.", "fux_decoder_")) for root in _roots())
     source = Path(__file__).read_text(encoding="utf-8")
     assert 'rglob("*.py")' in source and "SRC.rglob" in source, (
         "the module walk must be rooted at SRC; a walk that reached tests/ "
@@ -282,10 +302,9 @@ def test_the_decoder_roots_come_from_the_declared_tuple():
     decoders = _builtin_decoders()
 
     assert len(decoders) >= 14, "the decoder registry shrank unexpectedly"
+    modules = _modules()
     for name in decoders:
-        assert (SRC / "decode" / f"{name.rsplit('.', 1)[1]}.py").is_file(), (
-            f"{name} is registered in BUILTIN_MODULES but has no module"
-        )
+        assert name in modules, f"{name} is registered in BUILTIN_MODULES but has no module"
 
 
 def test_the_exception_list_is_auditable():

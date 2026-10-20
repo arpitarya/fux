@@ -18,8 +18,8 @@ of THREE kinds:
 | `.gitignore` | committed | lists the ignored directories BY NAME, never `*` |
 | `index/` | committed | the wire-format index (SR-RECORD), plus REGISTER: one line per indexed document -- loc, sha, decoder, k=v extras -- derived from the index and committed with it; `fux register` prints the same rows (SR-INGEST decision 22) |
 | `sources/` | committed | the committed source lists (`dirs`, `urls`), one entry per line |
-| `fetchers/` | committed | consumer-owned code (`cdp.py`, `http.py`), edit freely |
-| `decoders/` | committed | consumer-owned code, one module per format. THESE COPIES ARE WHAT RUN, not the ones inside the installed package (SR-DECODE) |
+| `fetchers/` | committed | consumer-owned code, one module per `fetch=` name. A file here runs INSTEAD of the declared fetcher package of that name (SR-PLUGINS P8); fux writes none |
+| `decoders/` | committed | consumer-owned code, one module per format. A file here runs INSTEAD of the declared package's module of that name (SR-PLUGINS P8); fux writes none (SR-DECODE) |
 | `observers/` | committed | consumer-owned code, one module per subscriber. Called AFTER a verb has fully rendered, with one record of COUNTS -- never the question, a path, or the answer. It cannot change an answer: no return path, and the dispatch runs after every write (SR-OBSERVE) |
 | `enrich/` | committed | pinned enrichment text, one file per source content sha, plus `queue.tsv` (W-86 P6: what fux could NOT read and a model must). Committed, because a backlog is a team fact |
 | `node/` | committed | the Node read plane (`fux-engine`) as ONE BUNDLED FILE plus its manifest -- build output, never fux's source (L10). Engine-owned and REWRITTEN on a version change, not write-if-missing, because nobody edits it and a stale copy is a wrong answer. In a monorepo it is a workspace member holding only a manifest (SR-NODE-SEARCH) |
@@ -36,13 +36,14 @@ of THREE kinds:
 | `runtime/` | derived | M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull), and `runtime/trace/` (SR-SERVE: an inspection page for one question or one document - it quotes passages, so it is never committed, and it is regenerable by re-running the verb), and `runtime/inspect/` (SR-INSPECT: `fux inspect`'s and `fux serve`'s reports and caches - the hash-to-word dictionary, per-document facts and probe results - regenerable from the committed index and the sources on this disk); carries `CACHEDIR.TAG` |
 | `acquired/` | acquired | the bytes a fetch actually returned, for URLs whose line says keep=true. Gitignored and NOT rebuildable - re-acquirable only, and only while the source is still reachable; carries CACHEDIR.TAG |
 
-## The fetchers are yours
+## The decoders and fetchers are packages; your files override them
 
-`fetchers/http.py` and `fetchers/cdp.py` are **your** code, committed
-to **your** repo. `fux setup` writes them once if they are missing;
-`fux ingest` never writes a fetcher at all. Fux loads one by path
-under `fux add <URL>` or `fux ingest`, and never rewrites it. Change the
-port, the transport, the extraction, anything.
+Every decoder and fetcher fux ships is a package this repo declares in
+`plugins.toml`, pinned (SR-PLUGINS). A file you put in `decoders/` or
+`fetchers/` is **your** code, committed to **your** repo, and runs
+instead of the package module of the same name. fux never writes or
+rewrites one. Copies an older `fux setup` wrote are listed by
+`fux doctor` when unedited: delete them and the package runs.
 
 One consequence of living in a dotdir: linters that skip hidden
 directories by default (ruff does) will not lint it. That is fine, it

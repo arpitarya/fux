@@ -1109,6 +1109,34 @@ def _require_pii_rules(command: str) -> None:
     pii.require(root)
 
 
+#: SR-PLUGINS P4: the verbs that still run while a declared package is missing
+#: or drifted — the two that diagnose and repair the declaration, and the ones
+#: that neither read the index nor decode a byte. Every other verb refuses.
+PLUGINS_EXEMPT = frozenset({"setup", "doctor", "tune", "output", "hooks", "daemon"})
+
+
+def _require_plugins(command: str) -> None:
+    """SR-PLUGINS P4: a declared package missing or drifted, no command.
+
+    🔴 **A missing `.fux/plugins.toml` is NOT this refusal** — it means prose
+    only, and `fux ingest` and `fux doctor` say so (W-289's decision). What
+    refuses is a declaration this machine cannot honour: two machines on one
+    repository must never build or read different indexes. Outside any root
+    there is no declaration and the gate does not fire.
+    """
+    if command in PLUGINS_EXEMPT:
+        return
+    from .config import find_root
+
+    root = find_root()
+    if root is None:
+        return
+    from . import plugins
+
+    if plugins.exists(root):
+        plugins.require(root)
+
+
 def main(argv: list[str] | None = None) -> int:
     _stdio_utf8()
     words = list(sys.argv[1:] if argv is None else argv)
@@ -1126,6 +1154,9 @@ def main(argv: list[str] | None = None) -> int:
     # before anything else reads the repository, so no handler has to remember.
     try:
         _require_pii_rules(args.command)
+        # SR-PLUGINS P4, at the same boundary for the same reason: before
+        # anything reads the repository, so no handler has to remember.
+        _require_plugins(args.command)
     except FuxError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return exc.exit_code

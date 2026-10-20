@@ -1,4 +1,4 @@
-"""W-166 DoD 1 — every built-in decoder carries a `VERSION`, and it is the key.
+"""W-166 DoD 1 — every first-party decoder carries a `VERSION`, and it is the key.
 
 **Why a constant and not a file sha.** `binding_digests` explains the split: fux
 owns this tree and can require a hand bump, and a constant does not move on a
@@ -14,6 +14,15 @@ E4 names, one layer down: every `decode/ext/*.py` declares a `VERSION`; a
 built-in decoder's `USES` is exactly the closure of the extensions it imports
 (the ONE place the import graph is walked — to catch a missing declaration,
 never to build the key); and a changed extension touched its `VERSION` line.
+
+**W-289 phase 2 — the decoders are packages (SR-PLUGINS).** Every decoder
+module moved into its `fux-decoder-*` package, and `table` into
+`fux-extension-table`. The gates follow them: a module is found through the
+first-party table (`constants.toml [plugins.packages.*] modules`), a packaged
+extension still declares `VERSION` from its own `[extensions.<name>]` row and
+still rides in the digest, and a registry is built from a root that DECLARES
+the packages (`l12_fixtures.configured_root`) — with no declaration there is
+no registry to test (P3).
 """
 
 from __future__ import annotations
@@ -24,15 +33,38 @@ from pathlib import Path
 
 import pytest
 
-from fux import decode
+from fux import decode, plugins
 from fux.acquire import decoderdigest
 from fux.decode import ext as ext_pkg
 from fux.constants import fixed
 from fux.errors import FuxError
+from l12_fixtures import configured_root
 
 ROOT = Path(__file__).resolve().parents[2]
 DECODE_DIR = "src/fux/decode"
 EXT_DIR = f"{DECODE_DIR}/ext"
+#: A repository that declares every first-party decoder package (P3).
+REPO = configured_root()
+
+
+def _import_name(decoder: str) -> str:
+    """`fux_decoder_sheet.csv` — where a first-party decoder module lives now."""
+    package = plugins.package_for_module(decoder)
+    assert package is not None, f"{decoder} is in no [plugins.packages.*] modules"
+    return f"{package.module}.{decoder}"
+
+
+def _file_of(module: str) -> Path:
+    """The source file of an import name, in `src/fux/` or a plugin package."""
+    if module.startswith("fux."):
+        return ROOT / "src" / (module.replace(".", "/") + ".py")
+    top, _, sub = module.partition(".")
+    dist = top.replace("_", "-", 2)
+    return ROOT / "packages" / dist / "src" / top / f"{sub}.py"
+
+
+def _rel_of(decoder: str) -> str:
+    return _file_of(_import_name(decoder)).relative_to(ROOT).as_posix()
 #: The pre-4.2 helper names, kept as `sys.modules` aliases for consumer copies.
 ALIASES = tuple(f"_{n}" for n in fixed("decoders", "legacy_helpers"))
 
@@ -51,7 +83,7 @@ def _git(*args: str) -> str:
 def test_every_builtin_module_declares_a_version():
     missing = []
     for name in decode.BUILTIN_MODULES:
-        module = __import__(f"fux.decode.{name}", fromlist=["VERSION"])
+        module = __import__(_import_name(name), fromlist=["VERSION"])
         version = getattr(module, "VERSION", None)
         if not isinstance(version, int) or version < 1:
             missing.append(name)
@@ -64,11 +96,35 @@ def test_every_builtin_module_declares_a_version():
 
 
 def test_every_binding_has_a_digest_naming_its_decoder():
-    for ext, digest in decoderdigest.binding_digests().items():
-        assert "@" in digest, ext
-        name, _, version = digest.partition("@")
-        assert name and version, ext
-        assert decode.registry()[ext].name == name, ext
+    digests = decoderdigest.binding_digests(REPO)
+    assert digests, "a repository declaring every decoder package binds something"
+    for ext, digest in digests.items():
+        decoder = decode.registry(REPO)[ext]
+        assert decoderdigest.name_of(digest) == decoder.name, ext
+        # P12: `pkg:<dist>@<version>/<module>@<VERSION>`, the package that read it.
+        package = plugins.package_for_module(decoder.name)
+        assert decoderdigest.package_of(digest) == f"{package.name}@{plugins.installed_version(package.name)}"
+        assert f"/{decoder.name}@" in digest, ext
+
+
+def test_no_decoder_module_is_left_in_core():
+    """W-289 phase 2: fux-core ships the SDK (`decode/ext/`) and no decoder."""
+    left = sorted(p.name for p in (ROOT / DECODE_DIR).glob("*.py") if p.name != "__init__.py")
+    assert not left, f"decoder modules still under {DECODE_DIR}: {left}"
+    for name in decode.BUILTIN_MODULES:
+        assert _file_of(_import_name(name)).is_file(), name
+
+
+@pytest.mark.parametrize("name", decode.BUILTIN_MODULES)
+def test_a_modules_extensions_are_its_constants_row(name):
+    """`builtin_extensions()` reads `[decoders.<name>] extensions` without
+    importing anything (P3), so the module and its row must agree — and the
+    package's `suffixes` must be exactly the union of its modules' rows."""
+    module = __import__(_import_name(name), fromlist=["EXTENSIONS"])
+    assert sorted(e.lower() for e in module.EXTENSIONS) == sorted(fixed(f"decoders.{name}", "extensions"))
+    package = plugins.package_for_module(name)
+    union = sorted({e for m in package.modules for e in fixed(f"decoders.{m}", "extensions")})
+    assert sorted(package.suffixes) == union, package.name
 
 
 def test_a_version_bump_changes_only_its_own_bindings(monkeypatch):
@@ -78,12 +134,11 @@ def test_a_version_bump_changes_only_its_own_bindings(monkeypatch):
     Keyed by extension, the blast radius is the extensions that decoder claims —
     **all of them**, which is why this checks a multi-extension decoder.
     """
-    import fux.decode.csv as csv_mod
+    import fux_decoder_sheet.csv as csv_mod
 
-    before = decoderdigest.binding_digests()
+    before = decoderdigest.binding_digests(REPO)
     monkeypatch.setattr(csv_mod, "VERSION", csv_mod.VERSION + 1)
-    decode.registry.cache_clear() if hasattr(decode.registry, "cache_clear") else None
-    after = decoderdigest.binding_digests()
+    after = decoderdigest.binding_digests(REPO)
 
     moved = {ext for ext in set(before) | set(after) if before.get(ext) != after.get(ext)}
     assert moved == {".csv", ".tsv"}, moved
@@ -98,7 +153,7 @@ def test_a_changed_builtin_decoder_bumped_its_version():
 
     behind = []
     for name in decode.BUILTIN_MODULES:
-        rel = f"{DECODE_DIR}/{name}.py"
+        rel = _rel_of(name)
         if rel not in changed:
             continue
         diff = _git("diff", "-U0", "HEAD", "--", rel)
@@ -122,13 +177,21 @@ def test_a_changed_builtin_decoder_bumped_its_version():
 
 
 def _ext_files() -> list[str]:
-    return sorted(p.stem for p in (ROOT / EXT_DIR).glob("*.py") if p.stem != "__init__")
+    """Every decoder extension's file: `decode/ext/` in core, plus the packaged ones."""
+    core = {p.stem for p in (ROOT / EXT_DIR).glob("*.py") if p.stem != "__init__"}
+    packaged = {
+        p.stem
+        for p in (ROOT / "packages").glob("fux-extension-*/src/fux_extension_*/*.py")
+        if p.stem != "__init__"
+    }
+    assert not core & packaged, f"an extension in core AND a package: {sorted(core & packaged)}"
+    return sorted(core | packaged)
 
 
 def test_every_extension_declares_a_version():
     """E4, gate 1 — and the module list and `[extensions.*]` are one list."""
     assert _ext_files() == list(ext_pkg.NAMES), (
-        "the files under decode/ext/ and constants.toml [extensions.*] disagree: "
+        "the decoder-extension files and constants.toml [extensions.*] disagree: "
         f"files {_ext_files()}, tables {list(ext_pkg.NAMES)}"
     )
     missing = []
@@ -139,6 +202,29 @@ def test_every_extension_declares_a_version():
     assert not missing, (
         "these decoder extensions declare no integer `VERSION >= 1`:\n  " + "\n  ".join(missing)
     )
+
+
+@pytest.mark.parametrize("name", ext_pkg.NAMES)
+def test_an_extension_lives_where_its_row_says_and_reads_its_version_there(name):
+    """W-289: `[extensions.<name>] package` places the file — `fux-core` under
+    `decode/ext/`, otherwise in that plugin package — and the module's
+    `VERSION` is its row's, packaged or not (SR-DECODE decision 24)."""
+    import importlib
+
+    target = ext_pkg.module_name(name)
+    assert _file_of(target).is_file(), target
+    package = fixed(f"extensions.{name}", "package")
+    if package == fixed("distributions", "core"):
+        assert target == f"fux.decode.ext.{name}"
+    else:
+        first = plugins.first_party()[package]
+        assert first.kind == "extension" and target == f"{first.module}.{name}"
+        # Every decoder package that USES it depends on its package.
+        for decoder in decode.BUILTIN_MODULES:
+            if name in fixed(f"decoders.{decoder}", "uses"):
+                owner = plugins.package_for_module(decoder)
+                assert package in plugins.closure([owner.name]), (owner.name, package)
+    assert importlib.import_module(target).VERSION == fixed(f"extensions.{name}", "version")
 
 
 def _imports(path: Path) -> list[tuple[str, tuple[str, ...]]]:
@@ -152,27 +238,34 @@ def _imports(path: Path) -> list[tuple[str, tuple[str, ...]]]:
     return out
 
 
+_PLUGIN_TOPS = ("fux_decoder_", "fux_extension_")
+#: import name -> decoder-extension name, for every extension, core or packaged.
+_EXTENSIONS = {ext_pkg.module_name(n): n for n in ext_pkg.NAMES}
+
+
 def _reached(module: str, names: tuple[str, ...]) -> list[str]:
-    """The `fux.decode` modules one import statement reaches, as dotted names."""
-    if module == "fux.decode" or module == "fux.decode.ext":
+    """The decoder and extension modules one import statement reaches."""
+    if module in ("fux.decode", "fux.decode.ext") or (
+        module.startswith(_PLUGIN_TOPS) and "." not in module
+    ):
         return [f"{module}.{n}" for n in names]
-    return [module] if module.startswith("fux.decode.") else []
+    if module.startswith("fux.decode.") or module.startswith(_PLUGIN_TOPS):
+        return [module]
+    return []
 
 
 def _path_of(module: str) -> Path | None:
-    rel = module.removeprefix("fux.").replace(".", "/")
-    for candidate in (ROOT / "src/fux" / f"{rel}.py",):
-        if candidate.is_file():
-            return candidate
-    return None
+    candidate = _file_of(module)
+    return candidate if candidate.is_file() else None
 
 
 def _closure(decoder: str) -> set[str]:
-    """Every decoder extension a built-in decoder reaches through its imports —
-    directly, through another extension, or through another decoder."""
+    """Every decoder extension a first-party decoder reaches through its imports
+    — directly, through another extension, or through another decoder (in its
+    own package or another one)."""
     seen: set[str] = set()
     found: set[str] = set()
-    todo = [f"fux.decode.{decoder}"]
+    todo = [_import_name(decoder)]
     while todo:
         module = todo.pop()
         if module in seen:
@@ -183,8 +276,8 @@ def _closure(decoder: str) -> set[str]:
             continue
         for imported, names in _imports(path):
             for target in _reached(imported, names):
-                if target.startswith("fux.decode.ext."):
-                    found.add(target.rsplit(".", 1)[1])
+                if target in _EXTENSIONS:
+                    found.add(_EXTENSIONS[target])
                 todo.append(target)
     return found
 
@@ -196,7 +289,7 @@ def test_a_decoders_uses_is_the_closure_of_what_it_imports(name):
     **Exactly the closure, not a superset**: a name declared and never called
     re-extracts a format for an edit that cannot touch it.
     """
-    module = __import__(f"fux.decode.{name}", fromlist=["USES"])
+    module = __import__(_import_name(name), fromlist=["USES"])
     declared = getattr(module, "USES", None)
     assert isinstance(declared, tuple), f"{name} declares no USES tuple"
     assert len(set(declared)) == len(declared), f"{name}: USES repeats a name"
@@ -211,8 +304,8 @@ def test_a_decoders_uses_is_the_closure_of_what_it_imports(name):
 
 @pytest.mark.parametrize("name", decode.BUILTIN_MODULES)
 def test_a_builtin_decoder_imports_extensions_by_their_ext_name(name):
-    """The pre-4.2 names are aliases for consumer copies, never for the built-ins."""
-    path = ROOT / DECODE_DIR / f"{name}.py"
+    """The pre-4.2 names are aliases for consumer copies, never for a packaged decoder."""
+    path = _file_of(_import_name(name))
     old = [
         target
         for imported, names in _imports(path)
@@ -234,15 +327,15 @@ def test_an_old_helper_name_is_the_extension_itself(alias):
 
 def test_an_extension_bump_moves_exactly_the_decoders_that_use_it(monkeypatch):
     """E3 — the blast radius stays per suffix, one layer down."""
-    import fux.decode.ext.table as table_mod
+    import fux_extension_table.table as table_mod
 
-    before = decoderdigest.binding_digests()
+    before = decoderdigest.binding_digests(REPO)
     monkeypatch.setattr(table_mod, "VERSION", table_mod.VERSION + 1)
-    after = decoderdigest.binding_digests()
+    after = decoderdigest.binding_digests(REPO)
     moved = {ext for ext in before if before[ext] != after[ext]}
     expected = {
         ext
-        for ext, decoder in decode.registry().items()
+        for ext, decoder in decode.registry(REPO).items()
         if "table" in decoder.uses
     }
     assert moved == expected
@@ -251,14 +344,17 @@ def test_an_extension_bump_moves_exactly_the_decoders_that_use_it(monkeypatch):
 
 
 def test_the_digest_composes_in_declared_order():
-    """E3's shape: `<decoder>@<v>+<ext>@<v>+…`, extensions in `USES` order."""
-    import fux.decode.docx as docx_mod
+    """E3's shape, under P12: `pkg:<dist>@<v>/<decoder>@<v>+<ext>@<v>+…`,
+    extensions in `USES` order — `table` from its package, the rest from core."""
+    import fux_decoder_office.docx as docx_mod
 
-    digest = decoderdigest.binding_digests()[".docx"]
-    expected = f"docx@{docx_mod.VERSION}" + "".join(
+    digest = decoderdigest.binding_digests(REPO)[".docx"]
+    version = plugins.installed_version("fux-decoder-office")
+    expected = f"pkg:fux-decoder-office@{version}/docx@{docx_mod.VERSION}" + "".join(
         f"+{n}@{ext_pkg.version(n)}" for n in docx_mod.USES
     )
     assert digest == expected
+    assert "+table@" in digest, "the packaged extension stays in the digest"
 
 
 def _consumer(tmp_path: Path, body: str) -> Path:
@@ -307,7 +403,7 @@ def test_a_changed_extension_bumped_its_version():
 
     behind = []
     for name in ext_pkg.NAMES:
-        rel = f"{EXT_DIR}/{name}.py"
+        rel = _file_of(ext_pkg.module_name(name)).relative_to(ROOT).as_posix()
         if rel not in changed:
             continue
         diff = _git("diff", "-U0", "HEAD", "--", rel)

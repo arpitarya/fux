@@ -6,18 +6,18 @@ title: "SR-HTTP-FETCHER (0119) — the default HTTP fetcher"
 description: "A plain stdlib GET is the shipped plain fetcher, published as its own package, fux-fetcher-http, that imports nothing from fux — so core still holds zero network lines — and it never escalates."
 status: accepted
 date: 2026-08-19
+amended: 2026-10-20
 feature: "`fux-fetcher-http` — the fetcher a URL line gets when it says `fetch=http`"
-owns: [.fux/fetchers/http.py@4f0f4a3431ce, packages/fux-fetcher-http@e24639f5d275]
+owns: [packages/fux-fetcher-http@e24639f5d275]
 laws: [L2, L5, ex-L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 36cd14c3d9d9fca5fb78915951d11bf2cf9b2d13e5091e7520fff1218f664fd2
+content_sha: e0659ffe39588943512ec3a9a1561af28ab252eddbcfe62842cdb9acc9231166
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
-- [`.fux/fetchers/http.py`](../.fux/fetchers/http.py) · file
 - [`packages/fux-fetcher-http/`](../packages/fux-fetcher-http) · dir
 
 <!-- COMPONENTS-END -->
@@ -145,9 +145,9 @@ pinned version and digest. A repo that only wanted an index installs no network
 code at all. **Core keeps zero network lines and zero network imports**, and the
 adapter cap is structural rather than remembered. A consumer who needs a header,
 a proxy or a token copies it to `.fux/fetchers/http.py`, which overrides the
-package (P8). ⚠ **This repository still carries such a copy, unedited** — kept
-through W-289 phase 1 only because [SR-DECODE](0139_decode.md) links it; phase 2
-deletes it so the declared package runs here too.
+package (P8). This repository's own unedited copy was deleted in W-289 phase 2
+(2026-10-20), and [SR-DECODE](0139_decode.md)'s link to it repointed at the
+package, so the declared `fux-fetcher-http` is what runs here too.
 
 **3. There is no automatic escalation to another fetcher, ever.** Not on
 non-2xx, not on an empty body, not on a rendered-shell heuristic. A plain GET

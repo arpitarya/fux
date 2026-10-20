@@ -239,10 +239,16 @@ def test_setup_writes_a_types_file_ingest_can_actually_read(tmp_path):
     composed, which is exactly why it got out.
     """
     from fux.acquire.gitdir import DEFAULT_TYPES, read_types
+    from fux.constants import fixed
+    from l12_fixtures import write_plugins
 
     setup_mod.run(tmp_path)
     types = read_types(tmp_path)  # must not raise
-    assert set(types.allow) == set(DEFAULT_TYPES)
+    # W-289: nothing in the sources, so nothing declared, so prose only (P3) —
+    # the file still spells every first-party binding out.
+    assert set(types.allow) == set(fixed("decoders", "prose_types"))
+    write_plugins(tmp_path, force=True)
+    assert set(read_types(tmp_path).allow) == set(DEFAULT_TYPES)
 
 
 def test_the_written_types_file_spells_the_default_out_as_live_lines(tmp_path):
@@ -330,6 +336,10 @@ def test_the_converted_file_states_what_the_old_one_admitted(tmp_path):
     )
     setup_mod.run(tmp_path)
     (tmp_path / ".fux" / "sources" / "types").unlink()
+    # Declared, so the bound formats are readable at all (SR-PLUGINS P3).
+    from l12_fixtures import write_plugins
+
+    write_plugins(tmp_path, force=True)
     after = read_types(tmp_path)
     for name in ("a.md", "a.rst", "a.csv", "a.CSV", "a.pdf", "docs/x/y.txt", "a.txt", "a.json"):
         assert before.accepts(name) == after.accepts(name), name

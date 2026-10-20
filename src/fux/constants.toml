@@ -105,13 +105,17 @@ identifiers     = ".fux/identifiers.toml"
 # A `.fux/sources/routes` host pattern that is a regex, not a literal.
 regex_prefix = "re:"
 
-# -- Decoders (decode/*.py, decode/registry.mjs) ------------------------------
-# A built-in decoder's VERSION enters the decoder digest; its EXTENSIONS are its
-# default claim. The built-ins are COPIED into a consumer's .fux/decoders/ and
-# the copy reads these keys through `fux.constants`, absolutely.
+# -- Decoders (the fux-decoder-* packages, decode/registry.mjs) ---------------
+# A first-party decoder's VERSION enters the decoder digest; its EXTENSIONS are
+# its default claim. Since W-289 phase 2 every decoder module ships in a plugin
+# package (`[plugins.packages.*] modules`) and runs only when the repository
+# declares that package in `.fux/plugins.toml` (SR-PLUGINS P3); the module reads
+# these keys through `fux.constants`, absolutely.
 
 [decoders]
-builtin_prefix = "built-in:"
+# A decoder loaded from a declared plugin package: its `Decoder.origin` and the
+# head of its digest, `pkg:<dist>@<version>/<module>@<VERSION>` (SR-PLUGINS P12).
+package_prefix = "pkg:"
 # A consumer decoder's digest and a fetcher's: `<name>@sha:` and this many hex
 # digits of the sha256 of its source. It is written into REGISTER.
 digest_hex     = 16
@@ -127,8 +131,9 @@ reason_nothing_readable = ": nothing readable in "
 # `fux.decode._<name>` ALIASES of `fux.decode.ext.<name>` for decoders written
 # before then (SR-DECODE decision 24). Not `table`: `_table` never shipped.
 legacy_helpers = ["limits", "markdown", "ooxml", "xml", "zip"]
-# Sorted and explicit, never discovered: dispatch must not depend on
-# filesystem order (L4).
+# Every first-party decoder module, sorted and explicit, never discovered:
+# dispatch must not depend on filesystem order (L4). Each lives in the plugin
+# package whose `[plugins.packages.*] modules` names it.
 builtin        = ["csv", "docx", "drawio", "html", "image", "ini", "json", "jsonl", "mail", "pdf", "pptx", "rtf", "svg", "toml", "xlsx", "xml", "yaml"]
 # Already-text formats that reach no decoder -- the prose half of the default
 # `include` that `fux setup` writes into .fux/formats.toml.
@@ -239,21 +244,27 @@ uses       = ["limits"]
 
 [extensions.limits]
 version = 1
+package = "fux-core"
 
 [extensions.markdown]
 version = 1
+package = "fux-core"
 
 [extensions.ooxml]
 version = 1
+package = "fux-core"
 
 [extensions.table]
 version = 1
+package = "fux-extension-table"
 
 [extensions.xml]
 version = 1
+package = "fux-core"
 
 [extensions.zip]
 version = 1
+package = "fux-core"
 
 [register]
 # The committed register, `.fux/index/REGISTER` -- SR-INGEST decision 22.
@@ -337,6 +348,10 @@ digest_prefix = "sha256:"
 fetcher_needs = "fux-decoder-html"
 # How a refusal and `fux setup` spell the install line. fux runs no installer.
 install = "pip install"
+# The walk's reason for dropping a file a first-party package reads when none
+# is declared (P5). Never recorded as a skip -- a `.fuxignore` line would freeze
+# it out after the package is declared; `fux ingest` counts it on stderr.
+skip_undeclared = "no declared package reads this format"
 
 [plugins.packages.fux-decoder-json]
 kind = "decoder"
@@ -348,7 +363,7 @@ depends = []
 kind = "decoder"
 suffixes = [".toml", ".yaml", ".yml", ".ini", ".cfg", ".properties"]
 modules = ["toml", "yaml", "ini"]
-depends = []
+depends = ["fux-decoder-json"]
 
 [plugins.packages.fux-decoder-html]
 kind = "decoder"
@@ -378,7 +393,7 @@ depends = []
 kind = "decoder"
 suffixes = [".xml"]
 modules = ["xml"]
-depends = []
+depends = ["fux-decoder-json"]
 
 [plugins.packages.fux-decoder-svg]
 kind = "decoder"
@@ -390,7 +405,7 @@ depends = []
 kind = "decoder"
 suffixes = [".drawio", ".dio"]
 modules = ["drawio"]
-depends = []
+depends = ["fux-decoder-html"]
 
 [plugins.packages.fux-decoder-image]
 kind = "decoder"
@@ -402,7 +417,7 @@ depends = []
 kind = "decoder"
 suffixes = [".eml", ".mbox"]
 modules = ["mail"]
-depends = []
+depends = ["fux-decoder-html"]
 
 [plugins.packages.fux-decoder-rtf]
 kind = "decoder"

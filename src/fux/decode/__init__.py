@@ -8,12 +8,21 @@ and silently disable *"heading match outranks body match"* on every
 non-Markdown document. The heading syntax is the interface, so the intermediate
 has to carry it.
 
-**Two kinds of decoder, one protocol.** Built-ins live in this package and are
-stdlib-only (**L2**). Consumer decoders live in `.fux/decoders/<name>.py`, may
-import whatever the consumer installed, and **override a built-in of the same
-name**. This is [SR-FETCHER]'s pattern at a third boundary: fux refuses to
-own network I/O, model calls, and now third-party parsing libraries — the
-consumer owns each as a file loaded by path that fux never rewrites.
+**Two kinds of decoder, one protocol.** Packaged decoders ship in the
+`fux-decoder-*` plugin packages and are stdlib-only (**L2**); **one runs only
+when its package is declared in the committed `.fux/plugins.toml`**, verified
+against its pinned version and digest ([SR-PLUGINS](../../../records/0165_plugins.md)
+P3, P4, W-289). Consumer decoders live in `.fux/decoders/<name>.py`, may
+import whatever the consumer installed, and **override a packaged decoder of
+the same module name** (P8). This is [SR-FETCHER]'s pattern at a third
+boundary: fux refuses to own network I/O, model calls, and now third-party
+parsing libraries — the consumer owns each as a file loaded by path that fux
+never rewrites.
+
+🔴 **No declaration, prose only.** A repository without `.fux/plugins.toml`
+decodes nothing — Markdown and plain text are read without a decoder — and
+`fux ingest` and `fux doctor` say so in one line, with `fux setup` as the lever.
+An installed package nobody declared is never imported here.
 
 **The protocol** (see `references` in SR-DECODE):
 
@@ -49,6 +58,7 @@ asymmetry SR-ENRICH already owns about `model:`.
 
 from __future__ import annotations
 
+import functools
 import importlib
 import importlib.util
 import os
@@ -115,7 +125,11 @@ CONSUMER_DIR = fixed("decoders", "consumer_dir")
 #: the three equal anyway.
 PROSE_DECODER = "prose"
 
-#: Built-in decoder modules, by module name.
+#: Every first-party decoder module, by module name — `constants.toml [decoders]
+#: builtin`. **Since W-289 phase 2 none ships in fux-core**: each lives in the
+#: plugin package whose `[plugins.packages.*] modules` names it, and runs only
+#: when that package is declared. The name stays `BUILTIN_MODULES` because every
+#: error message that lists "the built-ins" lists exactly these.
 #:
 #: ⚠ **The `doc` suffix was dropped on 2026-09-06** (Arpit): `csvdoc` -> `csv`,
 #: `jsondoc` -> `json`, and so on for all nineteen. The comment that stood here
@@ -245,19 +259,70 @@ def _suffix(rel_path: str) -> str:
     return rel_path[dot:].lower()
 
 
-def _load_builtin(name: str) -> Decoder | None:
-    module = importlib.import_module(f".{name}", __package__)
-    return _from_module(module, name, origin=f"built-in:{name}")
+#: `Decoder.origin` for a decoder loaded from a declared plugin package:
+#: `pkg:<dist>@<version>/<module>` — and the head of its digest (SR-PLUGINS P12).
+PACKAGE_PREFIX = fixed("decoders", "package_prefix")
+
+
+def _load_packaged(decl, name: str) -> Decoder | None:
+    """A decoder module from a DECLARED package, verified first (P4, P7)."""
+    from .. import plugins
+
+    module = plugins.load_decoder(decl, name)
+    decoder = _from_module(module, name, origin=f"{PACKAGE_PREFIX}{decl.name}@{decl.version}/{name}")
+    if decoder is None:
+        return None
+    if not decl.package.first_party:
+        # A third-party package reads what its declaration says it reads, and
+        # nothing more: the committed row is the claim (SR-PLUGINS P2).
+        claimed = tuple(e for e in decoder.extensions if e in decl.package.suffixes)
+        decoder.extensions = claimed
+    return decoder
+
+
+def _moved(missing: str | None) -> str | None:
+    """Where a module a pre-W-289 decoder imports went, or `None`.
+
+    `fux.decode.<format>` moved into its `fux-decoder-*` package and
+    `fux.decode.ext.table` into `fux-extension-table` (W-289 phase 2). A copy
+    `fux setup` seeded before then imports the old names, and the right fix is
+    almost always to delete the copy so the declared package runs.
+    """
+    if not missing:
+        return None
+    from .. import plugins
+
+    if missing in (f"{__name__}.ext.table", f"{__name__}._table"):
+        return f"{plugins.import_name('extension', 'table')}.table, in fux-extension-table"
+    head, _, tail = missing.rpartition(".")
+    if head == __name__ and tail in BUILTIN_MODULES:
+        package = plugins.package_for_module(tail)
+        if package is not None:
+            return f"{package.module}.{tail}, in {package.name}"
+    return None
 
 
 def _load_consumer(path: Path, name: str) -> Decoder:
-    spec = importlib.util.spec_from_file_location(f"fux_decoder_{name}", path)
+    # Not `fux_decoder_<name>`: since W-289 that is a plugin package's import
+    # name (SR-PLUGINS P7), and a consumer file must never be mistaken for one.
+    spec = importlib.util.spec_from_file_location(f"fux_consumer_decoder_{name}", path)
     if spec is None or spec.loader is None:
         raise FuxError(f"decoder could not be loaded: {path}")
     module = importlib.util.module_from_spec(spec)
     try:
         spec.loader.exec_module(module)
-    except ModuleNotFoundError as exc:
+    except ImportError as exc:
+        moved = _moved(getattr(exc, "name", None))
+        if moved is None and not isinstance(exc, ModuleNotFoundError):
+            raise FuxError(f"decoder failed to import: {path} ({exc})") from exc
+        if moved is not None:
+            raise FuxError(
+                f"{CONSUMER_DIR}/{path.name} imports {exc.name}, which moved to {moved} "
+                "(W-289). If this file is a copy an older `fux setup` seeded and you never "
+                "edited it, delete it - the declared package runs instead, and `fux doctor` "
+                "lists the copies it can prove unedited. If you edited it, change the import "
+                "and declare the package in .fux/plugins.toml (SR-PLUGINS P8)"
+            ) from exc
         # The loud failure Arpit ruled on 2026-08-26. A decoder whose library is
         # absent must NOT quietly hand the file to the enrichment queue: two
         # machines with the same sources would then commit different indexes,
@@ -407,7 +472,11 @@ def _registry_key(root: Path | None) -> tuple:
     except OSError:
         types = None
     legacy = (root / LEGACY_TYPES_FILE).is_file()
-    return (os.path.abspath(root), tuple(sorted(files)), types, legacy)
+    from .. import plugins
+
+    # W-289: the declaration decides which packaged modules load, so an edited
+    # `.fux/plugins.toml` is a different registry.
+    return (os.path.abspath(root), tuple(sorted(files)), types, legacy, plugins.stamp(root))
 
 
 def registry(root: Path | None = None) -> dict[str, Decoder]:
@@ -452,15 +521,22 @@ def _build_registry(root: Path | None) -> dict[str, Decoder]:
     #: decoder out of the extension map entirely, and a binding must still be
     #: able to name it.
     available: dict[str, Decoder] = {}
+    if root is not None:
+        from .. import plugins
+
+        # P4 for the whole declaration, once per registry: a declared package
+        # whose dependency is undeclared would otherwise import an installed
+        # but undeclared sibling (`fux_decoder_mail.mail` -> `fux_decoder_html`).
+        plugins.require(root)
     consumer = _consumer_decoders(root)
-    for name in BUILTIN_MODULES:
-        if name in consumer:
-            continue  # replaced wholesale; the built-in is not consulted
-        built = _load_builtin(name)
-        if built is not None:
-            available[name] = built
-            for ext in built.extensions:
-                decoders[ext] = built
+    # A consumer file replaces a packaged module of its name wholesale (P8),
+    # so a declared package whose every module is overridden is never imported.
+    packaged = _packaged_decoders(root, set(consumer))
+    for name in sorted(packaged):
+        built = packaged[name]
+        available[name] = built
+        for ext in built.extensions:
+            decoders[ext] = built
     for name in sorted(consumer):
         decoder = consumer[name]
         available[name] = decoder
@@ -472,8 +548,46 @@ def _build_registry(root: Path | None) -> dict[str, Decoder]:
     # bindings then cannot change any answer (L4).
     claimed = dict(decoders)
     for ext, (name, where) in _declared_bindings(root).items():
+        if name not in available and _undeclared_module(name):
+            # 🔴 **A binding to a first-party module whose package is not
+            # declared reads nothing, and is not an error** (SR-PLUGINS P3): a
+            # `.fux/formats.toml` seeded with every first-party binding stays
+            # valid in a repository that declares only some packages. The files
+            # are counted on `fux ingest`'s stderr and in `fux doctor`, never
+            # read as prose (P5).
+            continue
         decoders[ext] = _bind(ext, name, where, available, claimed)
     return decoders
+
+
+def _undeclared_module(name: str) -> bool:
+    """Is `name` a first-party decoder module — one a package carries?"""
+    return name in BUILTIN_MODULES
+
+
+def _packaged_decoders(root: Path | None, overridden: set[str]) -> dict[str, Decoder]:
+    """Module name -> decoder, for every module a DECLARED package carries.
+
+    🔴 **The declaration is the whole gate (P3).** No root, no file, or a
+    package nobody declared: nothing is imported. A module in `overridden` — a
+    consumer file of that name exists — is skipped (P8). Sorted by package and
+    module, so two machines load the same modules in the same order (L4).
+    """
+    if root is None:
+        return {}
+    from .. import plugins
+
+    out: dict[str, Decoder] = {}
+    for _name, decl in sorted(plugins.declared(root).items()):
+        if decl.package.kind != "decoder":
+            continue
+        for module in sorted(decl.package.modules):
+            if module in overridden:
+                continue
+            built = _load_packaged(decl, module)
+            if built is not None:
+                out[module] = built
+    return out
 
 
 def _bind(
@@ -519,8 +633,8 @@ def _bind(
     if decoder is None:
         raise FuxError(
             f"{where}: no decoder module named {name!r}. The name is a module "
-            f"stem, not a path — a built-in ({', '.join(BUILTIN_MODULES)}) or a file in "
-            f"{CONSUMER_DIR}/. Add {CONSUMER_DIR}/{name}.py, or correct the name"
+            f"stem, not a path — one a declared package carries ({', '.join(BUILTIN_MODULES)}) "
+            f"or a file in {CONSUMER_DIR}/. Add {CONSUMER_DIR}/{name}.py, or correct the name"
         )
     holder = claimed.get(ext)
     if ext not in decoder.extensions and holder is not None:
@@ -694,13 +808,34 @@ def decoder_named(name: str, root: Path | None = None) -> Decoder | None:
     consumer = _consumer_decoders(root)
     if name in consumer:
         return consumer[name]
-    if name in BUILTIN_MODULES:
-        return _load_builtin(name)
+    if root is None:
+        return None
+    from .. import plugins
+
+    resolved = plugins.resolve(root, "decoder", name)
+    if resolved.how == "package":
+        return _load_packaged(resolved.declared, name)
     return None
 
 
+def _first_party_extensions(name: str) -> tuple[str, ...]:
+    """`constants.toml [decoders.<name>] extensions` — read, never imported.
+
+    🔴 **Nothing is imported to answer this** (SR-PLUGINS P3): the default
+    allowlist and the generated bindings are about what fux CAN read, and a
+    package nobody declared must not be executed to say so.
+    `tests/decode/test_decoder_versions.py` holds each module's `EXTENSIONS` equal
+    to its row.
+    """
+    return tuple(sorted(str(e).lower() for e in fixed(f"decoders.{name}", "extensions")))
+
+
+@functools.cache
 def builtin_extensions() -> tuple[str, ...]:
     """Every extension a **built-in** decoder claims, sorted.
+
+    *Built-in* means first-party since W-289 phase 2: a module a
+    `fux-decoder-*` package carries, declared here or not.
 
     ⚠ **Built-ins only, deliberately — never `registry(root)`.** This feeds
     `DEFAULT_TYPES`, and a default allowlist derived from consumer code would
@@ -711,9 +846,7 @@ def builtin_extensions() -> tuple[str, ...]:
     """
     out: set[str] = set()
     for name in BUILTIN_MODULES:
-        decoder = _load_builtin(name)
-        if decoder is not None:
-            out.update(decoder.extensions)
+        out.update(_first_party_extensions(name))
     return tuple(sorted(out))
 
 
@@ -733,10 +866,8 @@ def builtin_bindings() -> dict[str, str]:
     """
     out: dict[str, str] = {}
     for name in BUILTIN_MODULES:
-        decoder = _load_builtin(name)
-        if decoder is not None:
-            for ext in decoder.extensions:
-                out[ext] = name
+        for ext in _first_party_extensions(name):
+            out[ext] = name
     return dict(sorted(out.items()))
 
 

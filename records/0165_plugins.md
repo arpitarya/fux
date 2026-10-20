@@ -6,11 +6,12 @@ title: "SR-PLUGINS (0165) — plugin packages: declared, pinned, refused loudly"
 description: "Only the engine is mandatory. Every decoder, fetcher and extension package is declared per repository in a committed `.fux/plugins.toml`, pinned to a version and digest, loaded by one fixed import name, and refused loudly when missing or drifted — so two machines on one repository can never build different indexes."
 status: accepted
 date: 2026-10-19
+amended: 2026-10-20
 feature: plugin packages — the declaration, its verification, the loader and the scan that proposes it
-owns: [src/fux/plugins.py@e3439650d464, .fux/plugins.toml@8c366b6b58b9, tests/test_plugins.py@6dc275c209cb, tests/test_plugin_fence.py@8ce1c2309be8, tests/test_plugin_packages.py@68333db84fa1]
+owns: [src/fux/plugins.py@f841cf499dc1, .fux/plugins.toml@05a8986e0790, tests/test_plugins.py@52c673190765, tests/test_plugin_fence.py@8ce1c2309be8, tests/test_plugin_packages.py@68333db84fa1, tests/test_plugin_registry.py@774c0279b2c8]
 laws: [L2, L4, L5, L12]
 timestamp: 2026-10-19T00:00:00Z
-content_sha: dc2614cf5d4d8e245734ed9e6c5ae63fde2568ea68b6867c418148bbfa9a6194
+content_sha: d2eadae3be484b65698227db713a465911c81229c05c98941ae71669bcb4b46c
 ratifies: "Arpit, 2026-10-19 (Cowork), on W-289: 'maybe we can build out a mechanism of extensions, decoders, plugins, and fetchers as separate packages that can be plugged into Fox' -> 'I want to go with the third option' (C: declared, pinned, committed) -> 'i like the recommendation now create a list what are mandatory and what are optional. because we dont need all' -> 'fux-decoder-json and config should also be optional only use if needed' -> 'okay file a work item for this', given in reply to confirming the SR-LAW-2 wording"
 ---
 
@@ -22,6 +23,7 @@ ratifies: "Arpit, 2026-10-19 (Cowork), on W-289: 'maybe we can build out a mecha
 - [`src/fux/plugins.py`](../src/fux/plugins.py) · file
 - [`tests/test_plugin_fence.py`](../tests/test_plugin_fence.py) · file
 - [`tests/test_plugin_packages.py`](../tests/test_plugin_packages.py) · file
+- [`tests/test_plugin_registry.py`](../tests/test_plugin_registry.py) · file
 - [`tests/test_plugins.py`](../tests/test_plugins.py) · file
 
 <!-- COMPONENTS-END -->
@@ -114,14 +116,22 @@ package: `name`, `version`, `digest`, and — for a third-party decoder only —
 `suffixes`. A first-party row may not restate its suffixes: the first-party table is
 `src/fux/constants.toml [plugins.packages]`, fixed identity a repository cannot
 redefine. A row with an unknown key, a duplicate name, or two packages claiming one
-suffix is refused by name. The file is read once per process, before any package
-runs ([SR-DOTFUX](0102_fux-directory.md) declares the child).
+suffix is refused by name. The file is parsed once per process while it is
+unchanged, before any package runs — the cache is keyed on its stat, as
+`decode.registry()`'s is on `.fux/formats.toml`, so a long-lived `fux mcp` or
+daemon sees an edited declaration (phase 2) ([SR-DOTFUX](0102_fux-directory.md)
+declares the child).
 
 **P3. Declared, never detected.** A package runs only when declared. An installed
 package nobody declared is never consulted — there is no fallback to *"whatever is
-installed"*. ([SR-TYPES](0128_types-list.md) decision 1 already forbids deriving the
-type list from the live registry; the default list becoming *prose plus every suffix
-a declared package claims* is phase 2's.)
+installed"*. The decoder registry imports a module only from a declared package
+(`decode._packaged_decoders`), and the type allowlist in force is *prose plus every
+suffix a declared package claims* ([SR-TYPES](0128_types-list.md) decision 1). **No
+`.fux/plugins.toml` at all means prose only — not an error**: `fux ingest` and `fux
+doctor` say so in one line with `fux setup` as the lever (W-289's first hazard; Arpit's
+call in the phase-2 brief). A `.fux/formats.toml` binding to a first-party module whose
+package is undeclared reads nothing and is not an error either
+([SR-DECODE](0139_decode.md) decision 25).
 
 **P4. Missing or drifted is a hard error.** A declared package that is not installed,
 installed at a version other than the pin, pinned without a digest, or whose files
@@ -129,7 +139,14 @@ hash to another digest, is a `FuxError` naming the package, the expected version
 digest, and the install line. A first-party package must be pinned at fux's own
 version. A declared package whose dependency is undeclared is the same error. `fux
 doctor` and `fux setup` still run, and report it; every other verb that needs the
-package refuses.
+package refuses. **Built verb-wide in phase 2**: `cli._require_plugins` runs
+`plugins.require(root)` beside the PII gate, before any handler reads the repository,
+for every verb except `PLUGINS_EXEMPT` — `setup`, `doctor`, `tune`, `output`, `hooks`
+and `daemon`, which neither read the index nor decode (a daemon's re-index is an
+`ingest`, and refuses). The registry calls `require` too, once per build, so a library
+caller that skips the CLI meets the same refusal before a decoder runs. The `plugins
+declared` row stays a **warning** when the file is missing — prose only is a legal
+state — rather than the error phase 1 anticipated.
 
 **The digest** is `sha256:` over the import package's files in the line format the
 wheel's `RECORD` uses — `<path>,sha256=<urlsafe base64>` — sorted, with CRLF read as
@@ -140,9 +157,13 @@ editable checkout of the same release.
 
 **P5. Never silent.** A suffix present in the configured sources that a first-party
 package reads and no declared package does is reported with its count and the package
-that reads it: by `fux doctor` (the `plugins cover sources` row) and, in phase 2, by
-`fux ingest` on stderr. A corpus that loses its PDFs looks exactly like one that never
-had any.
+that reads it: by `fux doctor` (the `plugins cover sources` row) and by `fux ingest`
+on stderr, one line per suffix with the count and the package, every run
+(`plugins.notes`; [SR-INGEST](0106_ingest.md) decision 4b). A consumer file in
+`.fux/decoders/` that reads the suffix silences it. **Such a file is not a skip** —
+a skip is written into `.fux/.fuxignore`, and a generated line there would keep the
+file out after the package is declared. A corpus that loses its PDFs looks exactly
+like one that never had any.
 
 **P6. `fux setup` scans and proposes; it installs nothing.** It walks the configured
 directories — the same roots, `!` exclusions and hand-written `.fuxignore` lines
@@ -158,12 +179,17 @@ fux (L5).
 imported as `fux_<kind>_<subject>` and by nothing else. **No entry-point scan**, so an
 installed package fux was not told about has no way in. A fetcher is loaded as a fresh
 module per call, never registered in `sys.modules`, because its `configure()` writes
-module globals.
+module globals. **A decoder module is imported normally** (`plugins.load_decoder`,
+`<import name>.<module>`, phase 2), after `verify`: decoders are functions of
+`(raw, rel_path)`, and their siblings import each other by name —
+`fux_decoder_config.toml` imports `fux_decoder_json.json`. P4's closure check is what
+keeps that graph inside the declaration.
 
 **P8. Precedence: the consumer's file, then the declared package, then nothing.**
 `.fux/fetchers/<name>.py` beats the package declaring `fetch=<name>`;
-`.fux/decoders/<module>.py` beats the declared package carrying that module. The
-fetcher half is built; the decoder half is phase 2's, beside the decoder registry.
+`.fux/decoders/<module>.py` beats the declared package carrying that module, and the
+package is then not imported for that module at all. Both halves are built; the
+decoder half is `decode.registry()` and `decode.decoder_named()` (phase 2).
 
 **P10. A fetcher package stays import-isolated.** It imports nothing from `fux` and
 depends on nothing ([SR-FETCHER](0117_fetcher.md) decision 1); fux executes one only
@@ -179,26 +205,42 @@ from this one tree, and published by the same workflow
 Independent versions would need a compatibility matrix; refused.
 
 **P12. The register names the distribution.** REGISTER's `decoder` column gains the
-package — `pkg:fux-decoder-pdf@4.2.0/pdf@3` — so a committed row says which
-distribution read it ([SR-INGEST](0106_ingest.md)). Phase 2's.
+package — `pkg:fux-decoder-pdf@4.2.0/pdf@3`, then W-288's extension tail
+(`+limits@1`) — so a committed row says which distribution read it
+([SR-INGEST](0106_ingest.md) decision 22). **Built in phase 2, as ONE string**: the
+`decoderdigest` digest is the reuse key and the column alike, so they cannot disagree.
+⚠ The package version is in the key, so every lockstep release re-extracts the decoded
+documents once ([SR-DECODE](0139_decode.md) decision 25 names the cost).
 
 **P13. The L4 gate.** Two environments on one repository, one with an extra undeclared
 package installed, build byte-identical indexes; one with a declared package at a
-different version refuses and writes no index. The fetcher half is held today; the
-decoder half lands with phase 2's gate.
+different version refuses and writes no index. **Held in REAL virtual environments**
+by `tests_e2e/test_plugin_l4_gate.py` (phase 2): wheels built from this tree, two
+venvs — one with `fux-decoder-json`, one with it and an undeclared `fux-decoder-pdf` —
+ingest one repository to byte-identical `.fux/index/` trees; the installed
+`fux_decoder_json` edited in place, and a row pinned at another version, each stop
+`fux ingest` with no index written.
 
 **The fifteen first-party packages**, by `constants.toml [plugins.packages]`:
 
 | package | reads | depends on |
 |---|---|---|
 | `fux-decoder-json` | `.json` `.jsonl` | — |
-| `fux-decoder-config` | `.toml` `.yaml` `.yml` `.ini` `.cfg` `.properties` | — |
+| `fux-decoder-config` | `.toml` `.yaml` `.yml` `.ini` `.cfg` `.properties` | `fux-decoder-json` |
 | `fux-decoder-html` | `.html` `.htm` `.xhtml` | `fux-extension-table` |
 | `fux-decoder-sheet` | `.xlsx` `.xlsm` `.csv` `.tsv` | `fux-extension-table` |
 | `fux-decoder-office` | `.docx` `.docm` `.pptx` `.pptm` | `fux-extension-table` |
-| `fux-decoder-pdf` · `-xml` · `-svg` · `-drawio` · `-image` · `-mail` · `-rtf` | one format each | — |
+| `fux-decoder-xml` | `.xml` | `fux-decoder-json` |
+| `fux-decoder-drawio` · `fux-decoder-mail` | `.drawio` `.dio` · `.eml` `.mbox` | `fux-decoder-html` |
+| `fux-decoder-pdf` · `-svg` · `-image` · `-rtf` | one format each | — |
 | `fux-fetcher-http` · `fux-fetcher-cdp` | `fetch=http` · `fetch=cdp` | **nothing from fux** |
 | `fux-extension-table` | — (declared beside a dependent, never chosen alone) | `fux-core` |
+
+Every decoder package also depends on `fux-core`. ⚠ **Phase 2 found two
+dependencies the item's table did not list**: `fux-decoder-config` and
+`fux-decoder-xml` both import `fux-decoder-json`'s helpers (`_prose`, `_label`), the
+same way `mail` and `drawio` import `html`. Declared in each `pyproject.toml` and in
+`[plugins.packages.*] depends`, so `fux setup` closes over them.
 
 ### Consequences
 
@@ -211,11 +253,14 @@ decoder half lands with phase 2's gate.
 - **Typosquats are possible** — PyPI has no namespaces, so a `fux-decoder-*` name fux
   does not own can be published by anyone. The pin is the defence: a declared package
   runs only at its digest. `fux doctor` marks the first-party set.
-- ⚠ **Phase 1 built the mechanism and the fetchers; the decoders are still built-in.**
-  Until phase 2 moves the decoder modules into their packages and gates the registry
-  on the declaration, a declared decoder package changes nothing ingest does, and an
-  undeclared format is still read. The `plugins cover sources` row says what phase 2
-  would stop reading.
+- **The decoders are packages** (phase 2, 2026-10-20). Every module moved out of
+  `src/fux/decode/` into its package with its output unchanged; fux-core and
+  fux-engine ship no decoder. An undeclared format is no longer read, and is counted.
+- **Every release re-extracts the decoded documents once**, because the package
+  version is in the digest (P12). Markdown and plain text are untouched.
+- **A copy seeded before phase 2 stops ingest** if it imports a module that moved
+  (`fux.decode.json`, `fux.decode.ext.table`): the error names the new import and says
+  to delete an unedited copy, which `fux doctor` lists.
 - **The per-fetcher `[sources.url.config.<name>]` tables are no longer scaffolded.**
   They were derived from the two templates, which may not be installed when setup runs.
 
@@ -245,7 +290,7 @@ decoder half lands with phase 2's gate.
    had installed (P13).
 3. **An engine module imports a plugin package by name.**
 
-**How to check it:** `uv run pytest -q tests/test_plugins.py tests/test_plugin_fence.py tests/test_plugin_packages.py`.
+**How to check it:** `uv run pytest -q tests/test_plugins.py tests/test_plugin_fence.py tests/test_plugin_packages.py tests/test_plugin_registry.py tests_e2e/test_plugin_l4_gate.py`.
 
 ---
 
@@ -256,7 +301,7 @@ decoder half lands with phase 2's gate.
 document is never listed here — the body may name one, but archive is not
 evidence.*
 
-**Records** — [SR-LAW-2](0004_LAW-2-zero-cost.md) · [SR-DOTFUX](0102_fux-directory.md) · [SR-INGEST](0106_ingest.md) · [SR-FETCHER](0117_fetcher.md) · [SR-CDP-FETCHER](0118_cdp-fetcher.md) · [SR-TYPES](0128_types-list.md) · [SR-WORK-RELEASE](0063_WORK-release.md)
+**Records** — [SR-LAW-2](0004_LAW-2-zero-cost.md) · [SR-DECODE](0139_decode.md) · [SR-DOTFUX](0102_fux-directory.md) · [SR-INGEST](0106_ingest.md) · [SR-FETCHER](0117_fetcher.md) · [SR-CDP-FETCHER](0118_cdp-fetcher.md) · [SR-TYPES](0128_types-list.md) · [SR-WORK-RELEASE](0063_WORK-release.md)
 
 **Code**
 
@@ -265,6 +310,9 @@ evidence.*
 - [`tests/test_plugins.py`](../tests/test_plugins.py)
 - [`tests/test_plugin_fence.py`](../tests/test_plugin_fence.py)
 - [`tests/test_plugin_packages.py`](../tests/test_plugin_packages.py)
+- [`tests/test_plugin_registry.py`](../tests/test_plugin_registry.py)
+- [`tests_e2e/test_plugin_l4_gate.py`](../tests_e2e/test_plugin_l4_gate.py)
+- [`src/fux/decode/__init__.py`](../src/fux/decode/__init__.py) — the registry the declaration gates
 
 **Project docs**
 

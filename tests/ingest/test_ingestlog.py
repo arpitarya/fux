@@ -101,8 +101,10 @@ def test_one_row_per_document_naming_its_decoder(tmp_path):
     # Markdown carries no binding — W-166 says so, and `prose` is minted here
     # once rather than left as null for every reader to interpret.
     assert rows["file:docs/a.md"]["decoder"] == provenance.PROSE
-    # A built-in decoder's digest is the string `decoderdigest` already mints.
-    assert rows["file:docs/t.csv"]["decoder"].startswith("csv@")
+    # A packaged decoder's digest is the string `decoderdigest` already mints:
+    # the declared distribution, then the module (SR-PLUGINS P12).
+    assert rows["file:docs/t.csv"]["decoder"].startswith("pkg:fux-decoder-sheet@")
+    assert "/csv@" in rows["file:docs/t.csv"]["decoder"]
 
 
 def test_rows_are_sorted_by_id_with_sorted_keys(tmp_path):

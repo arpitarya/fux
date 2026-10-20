@@ -5,13 +5,13 @@ name: SR-INGEST
 title: SR-INGEST (0106) — how ingest works
 description: "Re-resolve every edge every run; carry unchanged documents' extraction forward. Write only shards whose bytes changed. Skips are reported once, counted by class, and recorded in the committed `.fux/.fuxignore`; deletions honoured, output byte-identical."
 status: accepted
-amended: 2026-10-13
+amended: 2026-10-20
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/acquire/ingestlog.py@f7d675254e1d, src/fux/ingest@ae7adfeafefc, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@4ca02fdd1c47, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@b520a1d47f4d]
+owns: [src/fux/acquire/ingestlog.py@afe95bbf7a6b, src/fux/ingest@c36f8b245917, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@4ca02fdd1c47, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@088221e5a8d2]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 09f314f31f1da9ac1b38ea99a518d06efc1052e709b0df4761217c5838e38a3d
+content_sha: eb9bb5e59bab7cd8b2b84a44be8d781fcad5103e1911d78890ff6b2faec8779b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -260,6 +260,23 @@ one file.
 prints everything, writing nothing; and the notice file itself is `cat`-able.
 **The suppressed count names them both in its own line**, so the way out is on
 screen rather than in a record.
+
+**4b. A format no declared package reads is COUNTED, never skipped** (W-289
+phase 2, 2026-10-20; [SR-PLUGINS](0165_plugins.md) P5). A file whose suffix a
+first-party decoder package reads, in a repository that declares no package
+reading it, is not walked — and is **not a skip**, because decision 4's record
+lives in `.fux/.fuxignore` and *decides*: a generated line there would keep the
+file out after the package is declared. Instead every `fux ingest` prints, **on
+stderr**, one line per such suffix with the count and the package to declare
+(`fux: 2 .pdf file(s) not read - no declared package reads .pdf; declare
+fux-decoder-pdf in .fux/plugins.toml`), and — when `.fux/plugins.toml` does not
+exist at all — one line saying only Markdown and plain text are read, with
+`fux setup` as the lever. Every run, not once: the line is per suffix, not per
+file, so it is never a wall, and the hazard it guards — *a corpus that loses its
+PDFs looks exactly like one that never had any* — is one a once-only notice
+would let back in. stderr, so a piped ingest's stdout is unchanged. Names only;
+no file is opened (`plugins.scan`). Held by `tests/test_plugin_registry.py` and
+the real-venv `tests_e2e/test_plugin_l4_gate.py`.
 
 ⚠ **What this does not touch:** the skip *rules*, the reasons,
 `--list-skipped`, or any committed byte. The summary counts every skip and not
@@ -597,7 +614,7 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/acquire/decoderdigest.py` — `BUILTIN_PREFIX` ← `[decoders] builtin_prefix`
+- `src/fux/acquire/decoderdigest.py` — `PACKAGE_PREFIX` ← `[decoders] package_prefix` (W-289 phase 2; `BUILTIN_PREFIX` ← `[decoders] builtin_prefix` until then, retired with the last built-in decoder)
 - `src/fux/ingest/edges.py` — `TAG_PREFIX` ← `[graph] tag_prefix`, `EXTRACTED_GRADE` ← `[graph] grade_extracted`, `AMBIG_GRADE` ← `[graph] grade_ambiguous`, `INFERRED_GRADE` ← `[graph] grade_inferred`
 - `src/fux/acquire/gitdir.py` — `_PROSE_TYPES` ← `[decoders] prose_types`
 - `src/fux/acquire/ingestlog.py` — `INGEST_LOG_FILE` ← `[runtime] ingest_log`
@@ -936,7 +953,11 @@ https://wiki.example/ops/cold-store	9c1f0b2e7a4d5e6f8091a2b3c4d5e6f708192a3b	htm
   (`decoderdigest`, [SR-DECODE](0139_decode.md)).
 - **Line 2, the column header**, kept so a reader knows the spine without the
   module. **Both `#` lines are part of the bytes** (L4).
-- **Three columns, tab-separated:** `loc` · `sha` · `decoder`. The tab after
+- **Three columns, tab-separated:** `loc` · `sha` · `decoder`. Since W-289
+  phase 2 a packaged decoder's `decoder` names the distribution that read the
+  document — `pkg:fux-decoder-pdf@4.1.1/pdf@1+limits@1`, the
+  `decoderdigest` string ([SR-PLUGINS](0165_plugins.md) P12) — and a
+  consumer file's is still `<module>@sha:<hex>+…`. The tab after
   `loc` is what the whitespace-split sources grammar cannot give: a walked
   path may carry a space; a sources entry may not
   ([SR-URL-LIST](0116_url-list.md) decision 8).
@@ -1144,7 +1165,9 @@ descent before listing it, and records it once as `dir/`.
 
 **The decoder digest carries the decoder extensions** (W-288, 2026-10-20; [SR-DECODE](0139_decode.md) decision 24). `acquire/decoderdigest.py` now mints `<decoder>@<v>+<ext>@<v>+…`, one `+name@VERSION` for every decoder extension the decoder's `USES` names, in declared order — `docx@2+table@1+ooxml@1+xml@1+zip@1+limits@1`, and `csv@sha:2c37…+table@1+limits@1` for a consumer file. The reuse key, the REGISTER `decoder` column and `fux register --json`'s `decoder` object carry that string as they carried the old one. The rule above still holds, because the tail follows either kind: no `@sha:` means code shipped with fux, and `@sha:` means a `.fux/decoders/` file. ⚠ A consumer row's `--json` `digest` now ends in that tail. The change re-extracts every decoded document once, on the first ingest after the upgrade. `ingest/run.py` imports the limits seam as `fux.decode.ext.limits`, and no other line in it changed.
 
-**No decision here moved** (W-289, 2026-10-20): under this record's directory claims, `acquire/urlsrc.py` (SR-FETCHER's) resolves a declared fetcher package when the consumer has no file of that name, and `ingest/health.py` (SR-DOCTOR's) gained the `seeded copies removable` row ([SR-PLUGINS](0165_plugins.md) P8, P9). Ingest does not read `.fux/plugins.toml` yet: the P5 per-suffix report on stderr and P12's `pkg:` register column are phase 2's, and the register's shape is still decision 22's.
+**No decision here moved** (W-289, 2026-10-20): under this record's directory claims, `acquire/urlsrc.py` (SR-FETCHER's) resolves a declared fetcher package when the consumer has no file of that name, and `ingest/health.py` (SR-DOCTOR's) gained the `seeded copies removable` row ([SR-PLUGINS](0165_plugins.md) P8, P9).
+
+**W-289 phase 2 (2026-10-20) — ingest reads `.fux/plugins.toml`.** Two decisions moved: **4b** (a format no declared package reads is counted on stderr, never written into the skip record) and **22**'s `decoder` column, which carries the `pkg:<dist>@<version>/<module>@<VERSION>` digest for a packaged decoder. The digest is also the reuse key, so the first ingest after this change re-extracts every decoded document once, and every later release does the same (the package version moves in lockstep, SR-PLUGINS P11). `acquire/gitdir.py`'s type filter drops the globs no declared package can read (SR-TYPES decision 1), and `fux ingest` refuses before it reads anything when a declared package is missing or drifted (P4). `acquire/ingestlog.py` reads a digest's module through `decoderdigest.name_of`, so a pre-phase-2 `pdf@1` row and a live `pkg:…/pdf@1` row are one decoder.
 
 ### Consequences
 

@@ -1116,6 +1116,16 @@ def _decode_fetched(
     if decoder == decode_mod.PROSE_DECODER:
         return raw.decode("utf-8", errors="replace"), ""
     module = decode_mod.decoder_named(decoder, root)
+    if module is None and decoder in decode_mod.BUILTIN_MODULES:
+        # W-289, SR-PLUGINS P3: a first-party module whose package this
+        # repository has not declared. A skip with the lever, never prose.
+        from .. import plugins
+
+        package = plugins.package_for_module(decoder)
+        return None, (
+            f"`decoder={decoder}` is read by {package.name if package else 'a plugin package'}, "
+            f"which {fixed('plugins', 'file')} does not declare - declare it (`fux setup` adds it)"
+        )
     if module is None:
         # The `_bind` message shape (§3 edge case 2). A hard fact about the
         # repo rather than about this response, so it names both halves of the
@@ -1177,7 +1187,12 @@ def acquired_ext(decoder: str, root: Path | None) -> str:
     if decoder == decode_mod.PROSE_DECODER:
         return ""
     module = decode_mod.decoder_named(decoder, root)
-    return module.primary if module is not None else ""
+    if module is not None:
+        return module.primary
+    if decoder in decode_mod.BUILTIN_MODULES:
+        # Undeclared here (P3): the module's own first extension, from its row.
+        return str(fixed(f"decoders.{decoder}", "extensions")[0]).lower()
+    return ""
 
 
 def propose_decoder(content_type: str, url: str, root: Path | None) -> str | None:
@@ -1203,8 +1218,14 @@ def propose_decoder(content_type: str, url: str, root: Path | None) -> str | Non
         return decode_mod.PROSE_DECODER
     if rel is None:
         return None
-    module = decode_mod.registry(root).get(PurePosixPath(rel).suffix.lower())
-    return None if module is None else module.name
+    suffix = PurePosixPath(rel).suffix.lower()
+    module = decode_mod.registry(root).get(suffix)
+    if module is not None:
+        return module.name
+    # W-289, SR-PLUGINS P3: the stem of the first-party module that reads it,
+    # declared or not. The line is what `fux setup` then reads to propose the
+    # package, and an undeclared one is a named skip at ingest, never prose.
+    return decode_mod.builtin_bindings().get(suffix)
 
 
 def declared_decoder(root: Path, loc: str) -> str | None:
@@ -1298,7 +1319,9 @@ def _fetched_rel_path(mime: str, url: str, root: Path | None) -> str | None:
     # then to treating it as prose — which is what every pre-P8 fetcher meant.
     path = PurePosixPath(url.split("?", 1)[0].split("#", 1)[0])
     suffix = path.suffix.lower()
-    if suffix and decode_mod.claims("x" + suffix, root):
+    # W-289: a first-party format counts whether or not its package is declared
+    # here — `fux add` proposes the stem, and `fux doctor` names the package.
+    if suffix and (decode_mod.claims("x" + suffix, root) or suffix in decode_mod.builtin_extensions()):
         return "fetched" + suffix
     if not mime or mime.startswith("text/"):
         return _PROSE

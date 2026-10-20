@@ -17,10 +17,10 @@ ball: agent
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Amend L2: *optional is chosen by the committed repo, never by the machine* | the law permits opt-in packages without permitting machine drift | ✅ phase 1 |
-| 2 | Write SR-PLUGINS: `.fux/plugins.toml`, declared-not-detected, pinned, missing = hard error | two machines on one repo can never build different indexes | ✅ record + `plugins.py`; the verb-wide refusal is phase 2 |
-| 3 | Split the 17 built-in decoders, 2 fetchers and the table extension into 15 packages | a repo installs only the readers it needs | 🟡 15 packages build; fetchers moved; decoders are placeholders — phase 2 |
-| 4 | `fux setup` scans the sources and writes the first `plugins.toml`; `fux ingest` and `fux doctor` name every undeclared suffix | nothing is skipped silently | 🟡 setup + doctor done; ingest's stderr count is phase 2 |
-| 5 | Stop seeding copies into `.fux/decoders/` and `.fux/fetchers/` — the package runs; a same-named file there still overrides | engine fixes reach consumers again | ✅ seeding stopped; fetcher override built; decoder override is phase 2 |
+| 2 | Write SR-PLUGINS: `.fux/plugins.toml`, declared-not-detected, pinned, missing = hard error | two machines on one repo can never build different indexes | ✅ record + `plugins.py` (phase 1); the verb-wide refusal and the registry gate (phase 2) |
+| 3 | Split the 17 built-in decoders, 2 fetchers and the table extension into 15 packages | a repo installs only the readers it needs | ✅ fetchers (phase 1); the 17 decoder modules and `table` moved into their packages, fux-core ships none (phase 2) |
+| 4 | `fux setup` scans the sources and writes the first `plugins.toml`; `fux ingest` and `fux doctor` name every undeclared suffix | nothing is skipped silently | ✅ setup + doctor (phase 1); ingest's per-suffix stderr count (phase 2) |
+| 5 | Stop seeding copies into `.fux/decoders/` and `.fux/fetchers/` — the package runs; a same-named file there still overrides | engine fixes reach consumers again | ✅ seeding stopped, both overrides built; this repo's twins deleted (phase 2) |
 | 6 | Publish 15 new PyPI names in lockstep with fux's version | 6 names become 21, one release | 🔴 workflow ready; Arpit sets up 15 trusted publishers |
 
 **Arpit, 2026-10-19 (Cowork):** *"maybe we can build out a mechanism of extensions,
@@ -170,7 +170,50 @@ W-288.** Everything that does not touch the decoder tree:
   pdf are beyond the DoD 7 list**: the scan found indexed `.docx`/`.pdf` files
   under `archive/`, and dropping them is exactly P5's silent shrink.
 
-**Phase 2 owes** (after W-288 and this branch merge):
+**Phase 2 — built 2026-10-20 (Claude Code, Opus 5.5), on `integrate-w288-w289`.**
+
+- **P3 / P7, the move** — the 17 decoder modules `git mv`'d from
+  `src/fux/decode/` into `fux_decoder_<subject>/<module>.py`, and
+  `ext/table.py` into `fux_extension_table/table.py`. Imports rewritten
+  (`fux_extension_table.table`, `fux_decoder_html.html`,
+  `fux_decoder_json.json`); no `VERSION` moved, and every one of the 1 411
+  decoded files in this repository decodes to the same bytes (sha256 of each
+  output, HEAD's built-ins vs the packages). Cross-decoder imports are package
+  dependencies: `config` and **`xml`** → `fux-decoder-json` (xml was missing
+  from this item's list), `mail` and `drawio` → `fux-decoder-html`.
+  `constants.toml [extensions.<name>] package` places each extension.
+  fux-core and fux-engine ship no decoder (19 wheels built, no file in two).
+- **P3 / P8, the gate** — `decode.registry()` loads a module only from a
+  declared package (`plugins.load_decoder`, after `verify`, a normal import)
+  or a `.fux/decoders/` file of its name; no declaration is prose only. A
+  `[decoders]` binding to an undeclared first-party module reads nothing and
+  is not an error. `gitdir.read_types` drops the globs no declared package
+  reads (SR-TYPES d1 amended), and such files are **not skips** — never
+  written into `.fuxignore` — but counted.
+- **P5** — `fux ingest` prints the per-suffix count and the package on stderr
+  (`plugins.notes`), plus one *prose only* line when the file is missing.
+- **P4, verb-wide** — `cli._require_plugins` beside the PII gate, exempt
+  `setup doctor tune output hooks daemon`; the registry calls `require` too.
+  `plugins declared` stays a **warning** when the file is missing (prose only
+  is legal), not the error this list once planned.
+- **P12** — the digest, reuse key and REGISTER column read
+  `pkg:<dist>@<version>/<module>@<VERSION>+<ext tail>`. ⚠ The package version
+  is in the reuse key, so every lockstep release re-extracts decoded documents
+  once — flagged for Arpit.
+- **P13** — `tests_e2e/test_plugin_l4_gate.py`, in **real** venvs built from
+  this tree's wheels: an extra undeclared `fux-decoder-pdf` changes no index
+  byte; an installed package edited in place, and a row pinned at another
+  version, each stop ingest with no index written.
+- **This repo** — the 17 unedited `.fux/decoders/` twins and
+  `.fux/fetchers/http.py` deleted; `.fux/plugins.toml` re-pinned;
+  `fux ingest --check` lists the same 50 stale documents under HEAD's code
+  and this code (content shas; the index predates W-288 and phase 1).
+- **Records** — SR-DECODE (d5, d7, d9, d10, d24, new d25, the fetcher link),
+  SR-TYPES d1, SR-INGEST (4b, 22), SR-TABULAR, SR-PLUGINS (built), SR-DOCTOR,
+  SR-CLI d4, SR-HTTP-FETCHER, SR-CONSTANTS, SR-DOTFUX; the `fux-decoder` skill
+  and its three copies, README, CHANGELOG, GLOSSARY, `llms-full.txt`.
+
+**What phase 2 was handed** (kept for the record of what was asked):
 
 - **P3 / P5 / P13, decoder half** — move the decoder modules from
   `src/fux/decode/` (and W-288's `ext/table.py`) into their packages; gate the

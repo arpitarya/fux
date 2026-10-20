@@ -6,11 +6,12 @@ title: "SR-TYPES (0128) — which files are documents, and which metadata keys a
 description: "Prose plus every format a built-in decoder reads is compiled in as an allowlist; a committed types file replaces it, and .fux/.fuxignore outranks it in both directions. The file is required since W-225 stage 4a, written with that default spelled out; it never means everything and never nothing."
 status: accepted
 date: 2026-08-20
+amended: 2026-10-20
 feature: the file-type allowlist and `.fux/formats.toml`
 owns: [src/fux/acquire/typesfile.py@72b6b6a844f8, .fux/formats.toml@2dfc07ff74b8]
 laws: [L2, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: d80a689d621e9801c12a8fdfa27583ad5bcfdac8ce5b508f954d0d26c9bcd5a0
+content_sha: 1443f2e69390f13ca15b2cf16adc1671a965935095b61f75860ef46fb7904405
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -178,6 +179,22 @@ measured.**
 measurement** — the compare doc's own verdict block calls them *"a defaults
 judgment rather than a measurement"*. **The pre-registration rule governs frozen
 thresholds, and this was not one.**
+
+⚠ **Amended 2026-10-20 (W-289 phase 2, [SR-PLUGINS](0165_plugins.md) P3): the
+allowlist IN FORCE is prose plus every suffix a DECLARED package claims.** The
+decoders left fux-core for `fux-decoder-*` packages that run only when
+`.fux/plugins.toml` declares them, so *a built-in decoder* now means a
+first-party module, declared or not. What `fux setup` writes is unchanged — the
+six prose globs and every first-party binding, read from `constants.toml`
+without importing a package — and that file is the ceiling. Below it,
+`gitdir.read_types` drops every glob whose format no declared package (and no
+consumer file in `.fux/decoders/`) reads: such a file is not walked, never read
+as prose, and counted on `fux ingest`'s stderr naming the package
+([SR-INGEST](0106_ingest.md) decision 4b). **Declaring the package is the whole
+change** — nobody edits this list to start reading a format fux already wrote
+down — and with no `.fux/plugins.toml` at all the allowlist in force is the
+prose globs alone. Both inputs are committed files, so the walk is still a
+function of committed bytes (L4), never of what a machine installed.
 
 **1a. The default is derived from BUILT-IN decoders only, never the live
 registry.** A default that grew when a consumer dropped a `logdoc.py` into

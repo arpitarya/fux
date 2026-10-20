@@ -339,7 +339,7 @@ def cmd_gen(a) -> int:
 #: they can never disagree about what "old" means.
 #:
 #: ⚠ **`_label` has to be patched on FOUR modules, not one.** `yaml`, `jsonl`
-#: and `xml` each do `from fux.decode.json import _label`, so each holds its own
+#: and `xml` each do `from fux_decoder_json.json import _label`, so each holds its own
 #: reference and rebinding `json._label` alone leaves three decoders on the
 #: shipped behaviour. The first selftest did exactly that and reported 30 of 60
 #: decoys separable — which is what a selftest is for.
@@ -350,10 +350,10 @@ _OLD_MD = _re.compile(r"^(#{1,6})\s+(?P<text>.+?)\s*$", _re.MULTILINE)
 
 
 def patch_old():
-    import fux.decode.json as _J
-    import fux.decode.jsonl as _JL
-    import fux.decode.xml as _XM
-    import fux.decode.yaml as _YA
+    import fux_decoder_json.json as _J
+    import fux_decoder_json.jsonl as _JL
+    import fux_decoder_xml.xml as _XM
+    import fux_decoder_config.yaml as _YA
     import fux.ingest.extract as _E
 
     def _old_headings_and_body(rel_path, body):

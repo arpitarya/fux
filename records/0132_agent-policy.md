@@ -5,13 +5,13 @@ name: SR-AGENT-POLICY
 title: "SR-AGENT-POLICY (0132) — Fux ships the policy its consumers need to read it correctly"
 description: "Fux's readers are AI agents, and an engine whose output is misread is an engine that does not work. Fux emits intent-neutral facts and ships one canonical policy rendered into each agent's native format, installed by fux setup from a declaration, never from detection, and never clobbering a file the consumer owns."
 status: accepted
-amended: 2026-10-13
+amended: 2026-10-20
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@86ac23abe4eb]
+owns: [src/fux/templates/agents@a071966d5ff4]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 19a8a470ddff080ad0cbfa838cb7bdbc1464dabe90dabb39ad1f0dd1b51d27dc
+content_sha: d12fbefe9704ce3fecb20aab07398449e95e1e9f7f3398ce4ca2a239517586d5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -812,6 +812,8 @@ The shipped `fux-inspect`, `fux-serve` and `fux-config` skills name identifier f
 **No decision here moved** (W-273 phase 2, 2026-10-13): the `fux-config` skill's `section_records` row names `section_weight = 1.0` as the measured value to set with it (W-278, ruled ship as an opt-in pair).
 
 **No decision here moved** (W-289, 2026-10-20): the `fux-fetcher`, `fux-index` and `fux-sources` skill templates say a fetcher is a file in `.fux/fetchers/` or a declared fetcher package, that `fux setup` writes `.fux/plugins.toml` and no decoder or fetcher, and name `fux setup --pin` and the `seeded copies removable` row ([SR-PLUGINS](0165_plugins.md)); the repo's installed copies were refreshed byte-equal. The `fux-decoder` skill's stamp paragraph is SR-DECODE's and moves with W-289 phase 2.
+
+**W-289 phase 2 (2026-10-20) — no decision here moved.** The `fux-decoder-files` steering, rule and instructions renderings (and the `fux-decoder` skill, SR-DECODE's) now say a file in `.fux/decoders/` runs instead of the declared package's module of the same name, rather than that the copies there are what run.
 
 ### Consequences
 

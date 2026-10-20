@@ -20,7 +20,7 @@ from fux import decode
 from fux.errors import FuxError
 from fux.acquire import sourcelist
 from fux.acquire import ingestlog
-from l12_fixtures import configured_root
+from l12_fixtures import configured_root, write_plugins
 
 
 def _consumer(root, stem, body):
@@ -30,8 +30,16 @@ def _consumer(root, stem, body):
 
 
 def test_a_built_in_resolves_by_its_module_name():
-    assert decode.decoder_named("xlsx").name == "xlsx"
-    assert decode.decoder_named("html").name == "html"
+    root = configured_root()  # the packages are declared there (SR-PLUGINS P3)
+    assert decode.decoder_named("xlsx", root).name == "xlsx"
+    assert decode.decoder_named("html", root).name == "html"
+
+
+def test_an_undeclared_package_resolves_no_name(tmp_path):
+    """P3: a first-party module whose package is not declared is `None` — the
+    installed package is never imported to answer."""
+    (tmp_path / ".git").mkdir()
+    assert decode.decoder_named("xlsx", tmp_path) is None
 
 
 def test_an_unknown_name_is_None_and_never_a_guess():
@@ -87,6 +95,7 @@ def test_a_decoders_binding_table_never_re_routes_a_NAME(tmp_path):
     specific thing there is.
     """
     (tmp_path / ".fux").mkdir(parents=True, exist_ok=True)
+    write_plugins(tmp_path, ["fux-decoder-json"])
     (tmp_path / ".fux" / "formats.toml").write_text(
         'include = ["*.md"]\n\n[decoders]\ngeojson = "json"\n', encoding="utf-8"
     )
@@ -148,12 +157,12 @@ def test_decode_is_decode_with_plus_an_extension_lookup():
     """
     raw = b"a,b\n1,2\n"
     by_extension = decode.decode(raw, "docs/t.csv", root=configured_root())
-    by_name = decode.decode_with(decode.decoder_named("csv"), raw, "docs/t.csv", configured_root())
+    by_name = decode.decode_with(decode.decoder_named("csv", configured_root()), raw, "docs/t.csv", configured_root())
     assert by_extension == by_name is not None
 
 
 def test_primary_is_the_authors_first_extension_and_extensions_stays_sorted():
-    module = decode.decoder_named("xlsx")
+    module = decode.decoder_named("xlsx", configured_root())
     assert module.extensions == tuple(sorted(module.extensions))
     assert module.primary == ".xlsx"
     assert module.primary in module.extensions

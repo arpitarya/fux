@@ -30,7 +30,7 @@ from fux.constants import fixed
 #: `fux ingest` re-extracts the documents bound to THIS decoder and no others.
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
-#: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
+#: not bump it. [SR-DECODE](../../../../records/0139_decode.md) decision 11a.
 VERSION = fixed("decoders.pptx", "version")  # not bumped by W-225 R13: its OOXML part names moved to constants.toml at the same values; not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.pptx", "extensions"))

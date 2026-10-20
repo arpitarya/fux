@@ -116,7 +116,37 @@ def write_config(root: Path) -> "list[str]":
     """
     from fux import setup as setup_mod
 
-    return setup_mod.fill_missing(root)
+    changed = setup_mod.fill_missing(root)
+    if write_plugins(root):
+        changed.append(".fux/plugins.toml: written")
+    return changed
+
+
+def write_plugins(root: Path, names: "list[str] | None" = None, *, force: bool = False) -> bool:
+    """Declare plugin packages in `root/.fux/plugins.toml` — THE shared fixture
+    for W-289 phase 2 (SR-PLUGINS).
+
+    Since phase 2 a repository decodes nothing until it declares the package
+    that reads a format (P3). A hand-built test repository that decodes `.json`,
+    `.pdf` or `.html` therefore needs this file, pinned to what is installed —
+    exactly what `fux setup --pin` writes. `names=None` declares every
+    first-party DECODER package and the closure of what they depend on, which
+    is the reading power every such repository had before phase 2; a test of
+    P3 or P5 passes the few it means. Written only when absent unless `force`:
+    a test that wrote its own declaration keeps it. Returns whether it wrote.
+    """
+    from fux import plugins
+
+    target = plugins.path(root)
+    if target.exists() and not force:
+        return False
+    if names is None:
+        names = [n for n, p in plugins.first_party().items() if p.kind == "decoder"]
+    target.parent.mkdir(parents=True, exist_ok=True)
+    rows = [plugins.pin(n) for n in plugins.closure(names)]
+    target.write_text(plugins.render(rows), encoding="utf-8")
+    plugins.reset()
+    return True
 
 
 @lru_cache(maxsize=1)

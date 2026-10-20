@@ -19,7 +19,7 @@ import pytest
 
 from fux import decode as decode_mod
 from fux.decode import claims, decode, registry
-from fux.decode.html import html_to_markdown
+from fux_decoder_html.html import html_to_markdown
 from fux.errors import FuxError
 from fux.ingest.parse import parse_document
 from l12_fixtures import configured_root
@@ -44,7 +44,7 @@ HTML = b"""<!doctype html>
 
 
 def test_html_is_claimed_and_markdown_comes_out():
-    assert claims("docs/runbook.html")
+    assert claims("docs/runbook.html", ROOT)
     out = decode(HTML, "docs/runbook.html", ROOT)
     assert out is not None
     assert "# Restarting the broker" in out
@@ -64,8 +64,8 @@ def test_extension_match_is_case_insensitive():
     # A case-insensitive checkout can hand back `PAGE.HTML` for a file committed
     # as `page.html`. A registry keyed on raw case would make the index depend
     # on which machine cloned the repo.
-    assert claims("PAGE.HTML")
-    assert claims("page.HtMl")
+    assert claims("PAGE.HTML", ROOT)
+    assert claims("page.HtMl", ROOT)
 
 
 def test_a_dotfile_with_no_extension_is_not_a_format():

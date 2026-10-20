@@ -4,7 +4,7 @@
 # repository it lives in. `shell: bash` on every step, because the matrix runs
 # on Windows too and pwsh would read the install line differently.
 name: setup-fux
-description: Python (pip-cached), optional Node, and the four distributions installed editable (`.[extras]` on fux-engine; with extras, the fifteen plugin packages too)
+description: Python (pip-cached), optional Node, and the four distributions plus the fifteen plugin packages installed editable (`.[extras]` on fux-engine)
 inputs:
   python:
     description: Python version (L7 floor is 3.12)
@@ -46,14 +46,19 @@ runs:
         # release's version, which PyPI does not have until it is released —
         # so all four go on ONE pip command line and resolve from this tree.
         roles="-e packages/fux-core -e packages/fux-reader -e packages/fux-writer"
+        # W-289: the fifteen plugin packages (SR-PLUGINS), from this tree, on
+        # EVERY job — with extras or without. Since phase 2 this repository's
+        # committed .fux/plugins.toml declares the decoders it reads, and a
+        # declared package that is not installed stops every verb that reads
+        # the index (P4): the bare-engine jobs run `fux build` and the arm on
+        # this repo, so they need them as much as the dev jobs do. Editable,
+        # so the installed files are this tree's and match the pinned digests.
+        plugins=""
+        for d in packages/fux-decoder-* packages/fux-fetcher-* packages/fux-extension-*; do
+          plugins="$plugins -e $d"
+        done
         if [ -n "${{ inputs.extras }}" ]; then
-          # W-289: the `dev` extra names the fifteen plugin packages (SR-PLUGINS),
-          # which resolve from this tree the same way.
-          plugins=""
-          for d in packages/fux-decoder-* packages/fux-fetcher-* packages/fux-extension-*; do
-            plugins="$plugins -e $d"
-          done
           pip install $roles $plugins -e ".[${{ inputs.extras }}]"
         else
-          pip install $roles -e .
+          pip install $roles $plugins -e .
         fi

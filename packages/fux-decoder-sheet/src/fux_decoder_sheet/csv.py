@@ -3,7 +3,7 @@
 ⚠ **This decoder inherits `json`'s problem and does not solve it.** A
 spreadsheet of numbers has almost no prose in it, and admitting one to a corpus
 adds tokens without adding answers — which is the shape
-[SR-TYPES](../../../records/0128_types-list.md) verdict G measured. `.csv` is
+[SR-TYPES](../../../../records/0128_types-list.md) verdict G measured. `.csv` is
 therefore **not** in `DEFAULT_TYPES` either, and a consumer opts in knowing
 their data is mostly words.
 
@@ -21,7 +21,7 @@ to be a section *of*.
 ⚠ The columns-as-headings question is deliberately **not** answered here. That
 is ranking policy, it belongs in `extract.py`, and putting it in a decoder
 would hand ranking to every consumer decoder — see
-[`work/proposals/structure-aware-extraction.md`](../../../work/proposals/structure-aware-extraction.md).
+[`work/proposals/structure-aware-extraction.md`](../../../../work/proposals/structure-aware-extraction.md).
 """
 
 from __future__ import annotations
@@ -29,14 +29,14 @@ from __future__ import annotations
 import csv
 import io
 from fux.constants import fixed
-from fux.decode.ext import table as _table
+from fux_extension_table import table as _table
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
 #: `fux ingest` re-extracts the documents bound to THIS decoder and no others.
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
-#: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
+#: not bump it. [SR-DECODE](../../../../records/0139_decode.md) decision 11a.
 VERSION = fixed("decoders.csv", "version")  # 2 (W-287 A): rows feed the one table emitter, `_table.emit`; an all-empty column is dropped; not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.csv", "extensions"))

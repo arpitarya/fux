@@ -1,7 +1,12 @@
 """`fux_decoder_sheet` — the fux-decoder-sheet package (W-289, SR-PLUGINS).
 
-**A placeholder, deliberately empty.** Phase 1 of W-289 built the package, its
-build and its release; phase 2 moves the decoder modules into it from
-`src/fux/decode/` once W-288's decoder extensions have landed. Until then fux
-still reads these formats with its built-in modules, and nothing here runs.
+One fux decoder module per format it reads: `fux_decoder_sheet.xlsx`, `fux_decoder_sheet.csv`. Each is the
+decoder protocol of SR-DECODE — `EXTENSIONS`, `VERSION`, `USES` and
+`decode(raw, rel_path)` — moved here unchanged from `src/fux/decode/` in
+W-289 phase 2.
+
+**fux loads a module from here only when `.fux/plugins.toml` declares this
+package**, after verifying its version and digest (SR-PLUGINS P3, P4), by its
+fixed import name (P7). A same-named file in `.fux/decoders/` overrides it
+(P8). This file runs nothing: importing the package imports no decoder.
 """

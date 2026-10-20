@@ -54,6 +54,7 @@ __all__ = [
     "check",
     "closure",
     "declared",
+    "exists",
     "fetcher_names",
     "first_party",
     "for_decoder_module",
@@ -64,6 +65,10 @@ __all__ = [
     "installed_version",
     "is_suffix_declared",
     "load",
+    "load_decoder",
+    "notes",
+    "package_for_module",
+    "package_for_suffix",
     "package_named",
     "parse",
     "path",
@@ -76,7 +81,9 @@ __all__ = [
     "reset",
     "resolve",
     "scan",
+    "stamp",
     "undeclared",
+    "unread",
     "verify",
 ]
 
@@ -288,8 +295,11 @@ def parse(text: str, origin: str) -> dict[str, Declared]:
     return dict(sorted(out.items()))
 
 
-#: P2: read once per process, per repository root.
-_CACHE: dict[Path, "dict[str, Declared] | None"] = {}
+#: P2: read once per process, per repository root — and per version of the
+#: file. The key carries the file's stat, so a long-lived process (`fux mcp`,
+#: the daemon) sees an edited declaration the way `decode.registry()` sees an
+#: edited `.fux/formats.toml`, while a 10 000-document walk still parses it once.
+_CACHE: dict[tuple, "dict[str, Declared] | None"] = {}
 
 
 def reset() -> None:
@@ -297,16 +307,31 @@ def reset() -> None:
     _CACHE.clear()
 
 
+def stamp(root: Path) -> tuple:
+    """The declaration's identity for a cache key: its path and stat, or absent."""
+    target = path(Path(root).resolve())
+    try:
+        st = target.stat()
+    except OSError:
+        return (str(target), None)
+    return (str(target), st.st_mtime_ns, st.st_size, st.st_ino)
+
+
 def read(root: Path) -> "dict[str, Declared] | None":
     """The declaration, or `None` when `.fux/plugins.toml` does not exist."""
-    key = Path(root).resolve()
+    key = stamp(root)
     if key not in _CACHE:
-        target = path(key)
-        if not target.is_file():
+        if key[1] is None:
             _CACHE[key] = None
         else:
+            target = path(Path(root).resolve())
             _CACHE[key] = parse(target.read_text(encoding="utf-8"), fixed("plugins", "file"))
     return _CACHE[key]
+
+
+def exists(root: Path) -> bool:
+    """Is there a `.fux/plugins.toml` at all? Absent means prose only (P3)."""
+    return path(Path(root)).is_file()
 
 
 def declared(root: Path) -> dict[str, Declared]:
@@ -524,6 +549,49 @@ def load(decl: Declared):
     return module
 
 
+def load_decoder(decl: Declared, module: str):
+    """P7 for a decoder: verify, then import `<import name>.<module>`.
+
+    **A normal import, registered in `sys.modules`** — unlike `load`, which
+    hands a fetcher a fresh module per call for its `configure()` state. A
+    decoder module is a function of `(raw, rel_path)` (SR-DECODE decision 1)
+    and its siblings import each other by name: `fux_decoder_config.toml`
+    imports `fux_decoder_json.json`, and `fux_decoder_mail.mail` imports
+    `fux_decoder_html.html`. 🔴 **Only a declared package is ever imported
+    here**, and `problems()` refuses a declared package whose dependency is
+    not declared too, so the import graph never leaves the declaration.
+    """
+    import importlib
+
+    if module not in decl.package.modules:
+        raise FuxError(f"{decl.name} carries no decoder module {module!r} ({', '.join(decl.package.modules)})")
+    verify(decl)
+    target = f"{decl.package.module}.{module}"
+    try:
+        return importlib.import_module(target)
+    except ModuleNotFoundError as exc:
+        raise FuxError(
+            f"{decl.name}: {target} could not be imported - {exc.name} is missing. "
+            f"Reinstall it: `{install_line([(decl.name, decl.version)])}` (SR-PLUGINS P4)"
+        ) from exc
+    except Exception as exc:
+        raise FuxError(f"{decl.name}: {target} failed to import: {exc}") from exc
+
+
+def package_for_module(module: str) -> "Package | None":
+    """The first-party decoder package that carries decoder module `module`."""
+    for package in first_party().values():
+        if package.kind == "decoder" and module in package.modules:
+            return package
+    return None
+
+
+def package_for_suffix(suffix: str) -> "Package | None":
+    """The first-party decoder package that reads `suffix`, declared or not."""
+    name = _claims().get(suffix.lower())
+    return first_party()[name] if name else None
+
+
 def resolve(root: Path, kind: str, name: str) -> Resolution:
     """P8: `.fux/<kind>s/<name>.py` (the consumer's) > a declared package > none."""
     if kind == "fetcher":
@@ -618,6 +686,47 @@ def undeclared(counts: Counter, found: dict[str, Declared]) -> dict[str, tuple[i
         for suffix, count in sorted(counts.items())
         if suffix in claims and suffix not in covered
     }
+
+
+def unread(root: Path) -> dict[str, tuple[int, str]]:
+    """P5: suffix -> (files, package) for every format in the sources that a
+    first-party package reads and nothing in this repository does.
+
+    `undeclared()` minus what a consumer decoder in `.fux/decoders/` claims —
+    an override reads its format whether or not the package is declared (P8).
+    """
+    from . import decode
+
+    claimed = decode.registry(root)
+    return {
+        suffix: row
+        for suffix, row in undeclared(scan(root), declared(root)).items()
+        if suffix not in claimed
+    }
+
+
+def notes(root: Path) -> list[str]:
+    """What `fux ingest` prints on stderr about the declaration (P5).
+
+    🔴 **Never silent** (W-289's hazard: *a corpus that loses its PDFs looks
+    exactly like one that never had any*). One line when the file is missing —
+    only Markdown and plain text are read, and `fux setup` is the lever — then
+    one line per suffix the sources hold that nothing declared reads, with the
+    count and the package. Names only; no file is opened.
+    """
+    rel = fixed("plugins", "file")
+    out: list[str] = []
+    if not exists(root):
+        out.append(
+            f"fux: no {rel} - only Markdown and plain text are read. Run `fux setup` to "
+            "declare the decoder packages your sources need (SR-PLUGINS)"
+        )
+    for suffix, (count, package) in unread(root).items():
+        out.append(
+            f"fux: {count} {suffix} file(s) not read - no declared package reads {suffix}; "
+            f"declare {package} in {rel} (`fux setup` adds it) (SR-PLUGINS P5)"
+        )
+    return out
 
 
 def _url_needs(root: Path) -> tuple[set[str], set[str]]:

@@ -105,6 +105,9 @@ def corpus(tmp_path_factory) -> Path:
     dirs.write_text("docs\n", encoding="utf-8")
     (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     write_config(root)
+    # Markdown only, so no plugin package is needed — and none is installed in
+    # these venvs. No declaration means prose only (SR-PLUGINS, W-289 phase 2).
+    (root / ".fux" / "plugins.toml").unlink()
     docs = root / "docs"
     (docs / "sub").mkdir(parents=True)
     (docs / "a.md").write_text("---\ntitle: A\ntags: [x, y]\n---\n# A\n\nsee [b](b.md) and `docs/a.md`\n",

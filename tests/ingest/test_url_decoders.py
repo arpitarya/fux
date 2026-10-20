@@ -178,7 +178,7 @@ def test_the_pseudo_path_keeps_the_urls_own_suffix_when_the_decoder_claims_it():
     """🔴 Two built-ins branch on the extension, and choosing by NAME loses it
     unless the URL is consulted: `csv` reads a `.tsv` tab-separated and `mail`
     reads a `.mbox` as a mailbox."""
-    csv = decode_mod.decoder_named("csv")
+    csv = decode_mod.decoder_named("csv", configured_root())
     assert urlsrc.decoder_rel_path(csv, "https://x.test/export.tsv") == "fetched.tsv"
     assert urlsrc.decoder_rel_path(csv, "https://x.test/api/export?f=1") == "fetched.csv"
 
@@ -194,7 +194,7 @@ def test_the_fallback_suffix_is_the_modules_own_first_extension_not_the_sorted_o
     for stem, sorted_first, primary in (
         ("xlsx", ".xlsm", ".xlsx"), ("docx", ".docm", ".docx"), ("html", ".htm", ".html"),
     ):
-        module = decode_mod.decoder_named(stem)
+        module = decode_mod.decoder_named(stem, configured_root())
         assert module.extensions[0] == sorted_first
         assert module.primary == primary
         assert urlsrc.decoder_rel_path(module, "https://x.test/d") == "fetched" + primary

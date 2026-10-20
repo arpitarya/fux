@@ -22,13 +22,14 @@ import pytest
 from fux.decode import builtin_bindings, decode, reason, registry
 from fux.errors import FuxError
 from fux.acquire import typesfile
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_plugins
 
 
 @pytest.fixture
 def repo(tmp_path: Path) -> Path:
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir(parents=True)
+    write_plugins(tmp_path)  # every decoder package declared (SR-PLUGINS P3)
     return tmp_path
 
 

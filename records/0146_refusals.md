@@ -6,11 +6,12 @@ title: "SR-REFUSAL (0146) — the response the server sent instead of the docume
 description: "A declarative refusal table, every condition pure over the response bytes, plus an always-on magic-byte floor fux owns and no consumer can switch off."
 status: accepted
 date: 2026-09-01
+amended: 2026-10-20
 feature: refusal detection before decode
 owns: [src/fux/acquire/refusals.py@f40de632d66c, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@5979308bfe8a, .fux/refusals.toml@5fdc90fab388]
 laws: [L2, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 69b8b5898d8e14ff1b29325e8135865f72aa90aa241fd8ba59501d6b9ed4e3a7
+content_sha: 38de140b2de5a5f1a39d753b390f7c5f222f52dd74bbb6e3ea5eb8586355e62c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -479,6 +480,8 @@ the rules carrying the two bounds — so every caller that iterates is unchanged
 **No decision here moved** (W-248, 2026-10-04): in `urlsrc.py` the "nothing readable" skip reason is spelled from `decoders.reason_nothing_readable`; nothing this record decides moved.
 
 **No decision here moved** (W-289, 2026-10-20): `acquire/urlsrc.py`'s `load_fetcher` now resolves a fetcher from a declared package when the consumer has no file of that name ([SR-PLUGINS](0165_plugins.md) P8). The refusal check still sits in `fetch_all()` after `_unpack` and before persist and decode (decision 1), whatever loaded the fetcher. `templates/refusals.toml.txt`'s row now notes `templates/` is SR-DOTFUX's.
+
+**W-289 phase 2 (2026-10-20) — no decision here moved.** `acquire/urlsrc.py`, which this record describes, gained [SR-PLUGINS](0165_plugins.md) P3's named skip for an undeclared decoder package. No refusal rule moved.
 
 ### Consequences
 

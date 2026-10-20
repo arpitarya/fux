@@ -16,7 +16,7 @@ goes. A date is a number with a date FORMAT (`styles.xml`), so reading the
 number alone indexed `46214` where a human reads `2026-07-11`.
 
 ⚠ **A spreadsheet is the format most likely to be pure numbers**, which is the
-shape [SR-TYPES](../../../records/0128_types-list.md) verdict G punished. A
+shape [SR-TYPES](../../../../records/0128_types-list.md) verdict G punished. A
 consumer opting `.xlsx` in should know their sheets are mostly words.
 """
 
@@ -30,7 +30,8 @@ from __future__ import annotations
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
 import re
 
-from fux.decode.ext import table as _table, xml as _xml
+from fux.decode.ext import xml as _xml
+from fux_extension_table import table as _table
 from fux.decode.ext.zip import SafeZip, ZipTooBig, numeric_key
 from fux.constants import fixed
 
@@ -39,7 +40,7 @@ from fux.constants import fixed
 #: `fux ingest` re-extracts the documents bound to THIS decoder and no others.
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
-#: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
+#: not bump it. [SR-DECODE](../../../../records/0139_decode.md) decision 11a.
 VERSION = fixed("decoders.xlsx", "version")  # 3 (W-287 A1/A4): cells by address, number formats, merges, header detection; not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.xlsx", "extensions"))

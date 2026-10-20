@@ -460,7 +460,7 @@ _TYPES_HEADER = """\
 # that admits nothing is an error rather than a silently empty index.
 #
 # WHAT IS BELOW IS THAT DEFAULT, written out at `fux setup`: prose, plus every
-# format a built-in decoder reads. It is spelled out rather than left implicit
+# format a first-party decoder package reads. It is spelled out rather than left implicit
 # so you can see what fux considers a document without reading its source
 # (SR-TYPES decision 10). From here it is YOURS -- setup never rewrites this
 # file, so the list stays exactly as you leave it.
@@ -473,9 +473,12 @@ _TYPES_HEADER = """\
 # NOTHING HERE SUBTRACTS. To keep files out, write the pattern in
 # .fux/.fuxignore, which is read first and outranks this file.
 #
-# NOTHING BELOW NEEDS INSTALLING. Every built-in decoder is stdlib-only and
-# works out of the box. A format that needed something installed would appear
-# under OPT-IN at the bottom, commented, with what enables it.
+# A FORMAT IS READ ONLY WHEN ITS PACKAGE IS DECLARED. Each `[decoders]` module
+# below ships in a fux-decoder-* package, and runs only when .fux/plugins.toml
+# declares that package (SR-PLUGINS). Until then its files are not indexed, and
+# `fux ingest` counts them on stderr naming the package -- declaring it is the
+# whole change; nothing here needs editing. Every first-party decoder is
+# stdlib-only.
 #
 # What is OUT of the default, and why: source code, shell scripts and
 # extensionless files. They have no decoder, machine data is not a document,

@@ -24,7 +24,7 @@ import codecs
 import re
 from html.parser import HTMLParser
 from fux.constants import fixed
-from fux.decode.ext import table as _table
+from fux_extension_table import table as _table
 from fux.decode.ext.limits import limit
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
@@ -32,7 +32,7 @@ from fux.decode.ext.limits import limit
 #: `fux ingest` re-extracts the documents bound to THIS decoder and no others.
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
-#: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
+#: not bump it. [SR-DECODE](../../../../records/0139_decode.md) decision 11a.
 VERSION = fixed("decoders.html", "version")  # 2 (W-287 A2/A4): thead/th header, colspan/rowspan, caption, nested tables, escaped pipes; not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.html", "extensions"))

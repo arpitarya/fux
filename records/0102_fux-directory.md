@@ -5,13 +5,13 @@ name: SR-DOTFUX
 title: SR-DOTFUX (0102) — the .fux/ directory
 description: "Every child of .fux/ is declared committed, derived or acquired; the ignore rule is narrow by construction and asserted by doctor against git itself."
 status: accepted
-amended: 2026-10-19
+amended: 2026-10-20
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@9f9bd8118442, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@cacc930ca1a3, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@4ca555144c60]
+owns: [src/fux/store/fuxdir.py@6b33ceae222f, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@e059b21d3059, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@c785b43be2bc]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 2b8afb86800c2e7529f25e3c9d774179aa0081dabc675e53b718afd13fe5856a
+content_sha: 283f9c1af912d0149f23bf0e99885c307240b9b478ae2063619cdaaf6582d4e2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -958,6 +958,8 @@ line raises names the fix itself rather than pointing at the header.
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `.fux/index/sections/` is **committed**, inside `.fux/index/` ([SR-SECTIONS](0161_sections.md) decision 1). **It exists only when `fux.toml [index] section_records = true`** (W-274, SR-SECTIONS decision 11); the template writes `false`, and then neither the directory nor any `nsec` is written. The runtime gains `sections.json` and `sections/`, derived and gitignored with the rest of `.fux/runtime/`.
+
+**W-289 phase 2 (2026-10-20) — no decision here moved; the README's wording followed it.** `.fux/decoders/` and `.fux/fetchers/` stay declared children, committed and consumer-owned, but nothing fux ships is seeded into either any more: a file there runs **instead of** the declared package module of the same name ([SR-PLUGINS](0165_plugins.md) P8). The generated `.fux/README.md` table and its fetchers paragraph now say so (`store/fuxdir.py`), and the `.fux/formats.toml` header `fux setup` writes says a bound format is read only when its package is declared. This repository deleted its own unedited decoder and fetcher copies, so both directories are absent here — an absent child is a legal state, as it always was.
 
 ### Consequences
 

@@ -5,13 +5,13 @@ name: SR-ACQUIRED
 title: "SR-ACQUIRED (0145) — retained source bytes"
 description: "Fetched source bytes are retained in .fux/acquired/, a third category beside committed and derived: gitignored, and not rebuildable."
 status: accepted
-amended: 2026-10-19
+amended: 2026-10-20
 date: 2026-09-01
 feature: the acquired plane
 owns: [src/fux/store/acquired.py@89dd8c94308a]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: b4a6e20186b16e9d142773f5c6b93fef47c9b17e249bf649dd8a0aa6f19c6afe
+content_sha: f039810a1f26657979c8a35b512f2cfd9ca1f8d0e9cf9a6b80e059467e04b9f9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -335,6 +335,8 @@ this moved where they are written, not what they are.
 **No decision here moved** (W-274, 2026-10-11): `config.py` gained `[index] section_records` and its one-key reader (SR-SECTIONS decision 11). Nothing about the acquired plane changed.
 
 **No decision here moved** (W-289, 2026-10-20): `acquire/urlsrc.py`'s `load_fetcher` now resolves `fetch=<name>` to the consumer's `.fux/fetchers/<name>.py`, else the fetcher package `.fux/plugins.toml` declares ([SR-PLUGINS](0165_plugins.md) P8). Retention still lives in `fetch_all()` and never inside a fetcher (decision 5), so a package fetcher gains it with no line changed; `store/fuxdir.py` added the `plugins.toml` row, and the `acquired/` row and its kind did not move.
+
+**W-289 phase 2 (2026-10-20) — no decision here moved.** `acquire/urlsrc.py` and `store/fuxdir.py`, which this record describes, changed for [SR-PLUGINS](0165_plugins.md): a retained blob's suffix still comes from the declared decoder, read from `constants.toml` when that decoder's package is not declared here, and the `.fux/README.md` wording changed. Nothing about the acquired plane moved.
 
 ### Consequences
 

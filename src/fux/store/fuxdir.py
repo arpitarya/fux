@@ -41,11 +41,11 @@ FUX_DIR = fixed("fuxdir", "dir")
 COMMITTED: dict[str, str] = {
     "index": "the wire-format index (SR-RECORD), plus REGISTER: one line per indexed document -- loc, sha, decoder, k=v extras -- derived from the index and committed with it; `fux register` prints the same rows (SR-INGEST decision 22)",
     "sources": "the committed source lists (`dirs`, `urls`), one entry per line",
-    "fetchers": "consumer-owned code (`cdp.py`, `http.py`), edit freely",
+    "fetchers": "consumer-owned code, one module per `fetch=` name. A file here runs INSTEAD of the declared fetcher package of that name (SR-PLUGINS P8); fux writes none",
     # ASCII only: `_readme()` encodes this table as ASCII on purpose, for
     # Windows consoles. An em-dash here fails the write, which is how this was
     # caught rather than shipped.
-    "decoders": "consumer-owned code, one module per format. THESE COPIES ARE WHAT RUN, not the ones inside the installed package (SR-DECODE)",
+    "decoders": "consumer-owned code, one module per format. A file here runs INSTEAD of the declared package's module of that name (SR-PLUGINS P8); fux writes none (SR-DECODE)",
     # ASCII only, like every value in this table.
     "observers": "consumer-owned code, one module per subscriber. Called AFTER a verb has fully rendered, with one record of COUNTS -- never the question, a path, or the answer. It cannot change an answer: no return path, and the dispatch runs after every write (SR-OBSERVE)",
     "enrich": "pinned enrichment text, one file per source content sha, plus `queue.tsv` (W-86 P6: what fux could NOT read and a model must). Committed, because a backlog is a team fact",
@@ -190,13 +190,14 @@ def _readme() -> str:
     rows += [f"| `{name}/` | acquired | {desc} |" for name, desc in ACQUIRED.items()]
     rows += [
         "",
-        "## The fetchers are yours",
+        "## The decoders and fetchers are packages; your files override them",
         "",
-        "`fetchers/http.py` and `fetchers/cdp.py` are **your** code, committed",
-        "to **your** repo. `fux setup` writes them once if they are missing;",
-        "`fux ingest` never writes a fetcher at all. Fux loads one by path",
-        "under `fux add <URL>` or `fux ingest`, and never rewrites it. Change the",
-        "port, the transport, the extraction, anything.",
+        "Every decoder and fetcher fux ships is a package this repo declares in",
+        "`plugins.toml`, pinned (SR-PLUGINS). A file you put in `decoders/` or",
+        "`fetchers/` is **your** code, committed to **your** repo, and runs",
+        "instead of the package module of the same name. fux never writes or",
+        "rewrites one. Copies an older `fux setup` wrote are listed by",
+        "`fux doctor` when unedited: delete them and the package runs.",
         "",
         "One consequence of living in a dotdir: linters that skip hidden",
         "directories by default (ruff does) will not lint it. That is fine, it",

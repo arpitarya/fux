@@ -53,10 +53,14 @@ version = "4.1.1"
 source = { editable = "packages/fux-decoder-config" }
 dependencies = [
     { name = "fux-core" },
+    { name = "fux-decoder-json" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+requires-dist = [
+    { name = "fux-core", editable = "packages/fux-core" },
+    { name = "fux-decoder-json", editable = "packages/fux-decoder-json" },
+]
 
 [[package]]
 name = "fux-decoder-drawio"
@@ -64,10 +68,14 @@ version = "4.1.1"
 source = { editable = "packages/fux-decoder-drawio" }
 dependencies = [
     { name = "fux-core" },
+    { name = "fux-decoder-html" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+requires-dist = [
+    { name = "fux-core", editable = "packages/fux-core" },
+    { name = "fux-decoder-html", editable = "packages/fux-decoder-html" },
+]
 
 [[package]]
 name = "fux-decoder-html"
@@ -112,10 +120,14 @@ version = "4.1.1"
 source = { editable = "packages/fux-decoder-mail" }
 dependencies = [
     { name = "fux-core" },
+    { name = "fux-decoder-html" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+requires-dist = [
+    { name = "fux-core", editable = "packages/fux-core" },
+    { name = "fux-decoder-html", editable = "packages/fux-decoder-html" },
+]
 
 [[package]]
 name = "fux-decoder-office"
@@ -186,10 +198,14 @@ version = "4.1.1"
 source = { editable = "packages/fux-decoder-xml" }
 dependencies = [
     { name = "fux-core" },
+    { name = "fux-decoder-json" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+requires-dist = [
+    { name = "fux-core", editable = "packages/fux-core" },
+    { name = "fux-decoder-json", editable = "packages/fux-decoder-json" },
+]
 
 [[package]]
 name = "fux-engine"

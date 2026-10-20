@@ -19,7 +19,7 @@ from fux.acquire.gitdir import (
     walk_sources,
 )
 from fux.acquire.sourcelist import DIRS, TYPES, URLS, glob_match, parse
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_plugins
 
 
 # -- the glob matcher ------------------------------------------------------
@@ -217,7 +217,25 @@ def tree(tmp_path):
     (tmp_path / "work" / "regression" / "r1" / "evidence").mkdir(parents=True)
     (tmp_path / "work" / "regression" / "r1" / "report.md").write_text("# R\n", encoding="utf-8")
     (tmp_path / "work" / "regression" / "r1" / "evidence" / "n.md").write_text("# N\n", encoding="utf-8")
+    write_plugins(tmp_path, ["fux-decoder-json"])  # `.json` is read (SR-PLUGINS P3)
     return tmp_path
+
+
+def test_an_undeclared_format_is_skipped_by_name_never_read_as_prose(tree):
+    """W-289 P3/P5: with no package declared for `.json`, the file is a named
+    skip — not a raw-text document, and not silently gone."""
+    from fux import plugins
+    from fux.constants import fixed
+
+    plugins.path(tree).unlink()
+    plugins.reset()
+    walked, skipped = walk_sources(tree, ["docs"])
+    assert [w.rel_path for w in walked] == ["docs/a.md"]
+    # Not a skip either: a skip is written into `.fuxignore`, and a frozen line
+    # there would keep the file out after the package is declared. It is
+    # counted on `fux ingest`'s stderr instead (`plugins.notes`).
+    assert skipped == []
+    assert fixed("plugins", "skip_undeclared")  # the reason the walk drops it under
 
 
 def test_all_three_conditions_apply_together(tree):

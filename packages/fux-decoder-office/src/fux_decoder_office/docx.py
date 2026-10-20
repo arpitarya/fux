@@ -15,7 +15,8 @@ from __future__ import annotations
 # `from . import _xml` raises `attempted relative import with no known parent
 # package` — the copy would be dead on arrival. Absolute imports mean the file
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
-from fux.decode.ext import ooxml as _ooxml, table as _table, xml as _xml
+from fux.decode.ext import ooxml as _ooxml, xml as _xml
+from fux_extension_table import table as _table
 from fux.decode.ext.zip import SafeZip, ZipTooBig
 from fux.constants import fixed
 
@@ -24,7 +25,7 @@ from fux.constants import fixed
 #: `fux ingest` re-extracts the documents bound to THIS decoder and no others.
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
-#: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
+#: not bump it. [SR-DECODE](../../../../records/0139_decode.md) decision 11a.
 VERSION = fixed("decoders.docx", "version")  # 2 (W-287 A3): gridSpan/vMerge expanded, nested tables flattened once; not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.docx", "extensions"))

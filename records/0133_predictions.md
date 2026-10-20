@@ -6,12 +6,12 @@ title: "SR-RS (0133) — the R predictions: what a frozen claim is, and the four
 description: "An R is a claim frozen before measurement; its threshold may never move; its verdict is never edited; an ambiguous result goes to Arpit rather than to whoever ran it; and it ends in exactly four ways — PASS, FAIL, INCONCLUSIVE, RETIRED — of which FAIL is a success and RETIRED is not a failure. Every measured run is blind or informed, and an informed run is reclassified rather than banned."
 status: accepted
 date: 2026-08-22
-amended: 2026-10-09
+amended: 2026-10-20
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@5d8ba6a4bdcd, tools/t2-eval@cc5410393ce4, tools/quality-controls@cc88d77ca900, tools/vector-gate@54116ebffca4, tools/section-size@610cd81f5c4c]
+owns: [tests/test_regression_runs.py@5d8ba6a4bdcd, tools/t2-eval@cc5410393ce4, tools/quality-controls@cf1e28fd6b21, tools/vector-gate@54116ebffca4, tools/section-size@610cd81f5c4c]
 laws: [L4, L13]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: f5a65217aa39dce5f56e91f90ad5c774bd1204a0f8bbda4af184da3b728aceef
+content_sha: 880917a7afafe10acc327ec845c97a136a483fcb5b74a32606a2dacca1e626ff
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1416,6 +1416,8 @@ G0** (a build defect: tie-breaks on a display string) and was re-captured on the
 fixed engine with the bar unchanged — the STOP is filed beside it, unscored.
 
 **Filed under this record, no decision moved** (W-288, 2026-10-20): `tools/section-size/measure.py` imports the heading grammar and the limits seam from `fux.decode.ext` ([SR-DECODE](0139_decode.md) decision 24). What it measures is unchanged.
+
+**W-289 phase 2 (2026-10-20) — no decision here moved.** `tools/quality-controls/w115_instrument.py` imports the four decoders it instruments from their plugin packages (`fux_decoder_json.json`, `.jsonl`, `fux_decoder_xml.xml`, `fux_decoder_config.yaml`); what it measures is unchanged.
 
 ### Consequences
 

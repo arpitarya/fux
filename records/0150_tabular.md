@@ -8,20 +8,19 @@ status: accepted
 date: 2026-09-06
 amended: 2026-10-20
 feature: tabular documents — row granularity, the admitted-row limit, the one table emitter, and what a table citation is
-owns: [src/fux/decode/csv.py@95a1cb175d4b, src/fux/decode/xlsx.py@11ab675ca307, src/fux/decode/ext/limits.py@4fe441b1aa86, src/fux/decode/ext/table.py@efd7df6faca6]
+owns: [packages/fux-decoder-sheet@446fd8804270, src/fux/decode/ext/limits.py@4fe441b1aa86, packages/fux-extension-table@f43a4ccab57e]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: ccc8565f8f6653eac0a48c1760a0b0060d372453dd8acf21d5c907faaf3044d5
+content_sha: 1cb18a818deef3e83db95bad8358d964b3cee33819f2e85370f656d9b9ba906f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
-- [`src/fux/decode/csv.py`](../src/fux/decode/csv.py) · file
+- [`packages/fux-decoder-sheet/`](../packages/fux-decoder-sheet) · dir
+- [`packages/fux-extension-table/`](../packages/fux-extension-table) · dir
 - [`src/fux/decode/ext/limits.py`](../src/fux/decode/ext/limits.py) · file
-- [`src/fux/decode/ext/table.py`](../src/fux/decode/ext/table.py) · file
-- [`src/fux/decode/xlsx.py`](../src/fux/decode/xlsx.py) · file
 
 <!-- COMPONENTS-END -->
 
@@ -145,8 +144,9 @@ one of them right: the divergence was the defect.
 
 ✅ **The two-file story is closed** (W-287 stage A, 2026-10-19; W-288,
 2026-10-20). Both rules — blank rows spend nothing, and the two notices — now
-live ONCE, in the table decoder extension `decode/ext/table.py`, which `csv`,
-`xlsx`, `html` and `docx` all feed (decision 8). `_ooxml.table_markdown` and
+live ONCE, in the table decoder extension — `decode/ext/table.py` until
+W-289 phase 2, `fux_extension_table.table` in the `fux-extension-table` package
+since — which `csv`, `xlsx`, `html` and `docx` all feed (decision 8). `_ooxml.table_markdown` and
 every other emitter are gone, so the two copies can no longer disagree. A fix
 to that module bumps `constants.toml [extensions.table] version`, and that
 version is in the reuse key of every decoder that uses it, so the fix reaches
@@ -175,13 +175,13 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/decode/csv.py` — `VERSION` ← `[decoders.csv] version`, `EXTENSIONS` ← `[decoders.csv] extensions`
-- `src/fux/decode/xlsx.py` — `VERSION` ← `[decoders.xlsx] version`, `EXTENSIONS` ← `[decoders.xlsx] extensions`, `_SHARED` / `_SHEETS` / `_WORKBOOK` ← `[decoders.xlsx.format] shared` / `sheets` / `workbook` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28); `_STYLES`, `_DATE_IDS` / `_TIME_IDS` / `_DATETIME_IDS`, the three epochs, `_PHANTOM_LEAP_DAY` and `_SECONDS_PER_DAY` ← `[decoders.xlsx.format] styles` / `date_formats` / `time_formats` / `datetime_formats` / `epoch_1900` / `epoch_1900_early` / `epoch_1904` / `phantom_leap_day` / `seconds_per_day` (W-287, 2026-10-19)
+- `packages/fux-decoder-sheet/src/fux_decoder_sheet/csv.py` (`src/fux/decode/csv.py` until W-289 phase 2) — `VERSION` ← `[decoders.csv] version`, `EXTENSIONS` ← `[decoders.csv] extensions`
+- `packages/fux-decoder-sheet/src/fux_decoder_sheet/xlsx.py` (`src/fux/decode/xlsx.py` until W-289 phase 2) — `VERSION` ← `[decoders.xlsx] version`, `EXTENSIONS` ← `[decoders.xlsx] extensions`, `_SHARED` / `_SHEETS` / `_WORKBOOK` ← `[decoders.xlsx.format] shared` / `sheets` / `workbook` ([L12](0014_LAW-12-values-live-in-config.md) decision 6b, R13, 2026-09-28); `_STYLES`, `_DATE_IDS` / `_TIME_IDS` / `_DATETIME_IDS`, the three epochs, `_PHANTOM_LEAP_DAY` and `_SECONDS_PER_DAY` ← `[decoders.xlsx.format] styles` / `date_formats` / `time_formats` / `datetime_formats` / `epoch_1900` / `epoch_1900_early` / `epoch_1904` / `phantom_leap_day` / `seconds_per_day` (W-287, 2026-10-19)
 
 <!-- L12-VALUES-END -->
 
 **8. Every value sits under its TRUE column name** (W-287 stage A, 2026-10-19).
-Every rule below lives ONCE, in the table decoder extension `decode/ext/table.py`, which all four table
+Every rule below lives ONCE, in the table decoder extension (`fux_extension_table.table` since W-289 phase 2; `decode/ext/table.py` before), which all four table
 formats feed ([SR-DECODE](0139_decode.md) decision 23); the bullets say what
 each rule is.
 

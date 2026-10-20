@@ -211,6 +211,13 @@ def ingest_and_report(args_root, args, *, refresh_urls: bool, only_urls=None, fi
     # Advisory, and on stderr so a piped `fux ingest` is unchanged by it.
     for line in report.warnings:
         print(line, file=sys.stderr)
+    # W-289, SR-PLUGINS P5: never silent. A format the sources hold that no
+    # declared package reads is counted here, per suffix, naming the package —
+    # and a repository with no declaration is told it reads prose only.
+    from .. import plugins
+
+    for line in plugins.notes(args_root):
+        print(line, file=sys.stderr)
 
     # Build the derived accelerator here, where the committed shards were just
     # written: `ask` should never pay for a build, and a stale accelerator that

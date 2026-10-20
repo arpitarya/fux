@@ -484,6 +484,12 @@ def python_files() -> list[Path]:
         if rel == "setup.py" or rel.startswith("templates/"):
             continue
         out.append(p)
+    # W-289 phase 2: the decoder and extension packages are engine code that
+    # moved out of `src/fux/decode/`, and L12 binds them exactly as it did
+    # there. The fetcher packages are not scanned — they were `templates/`,
+    # the consumer-readable source L12 exempts, before they were packages.
+    for pattern in ("fux-decoder-*/src/**/*.py", "fux-extension-*/src/**/*.py"):
+        out.extend(p for p in sorted((ROOT / "packages").glob(pattern)) if "__pycache__" not in p.parts)
     return out
 
 
