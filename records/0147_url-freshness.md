@@ -10,7 +10,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/acquire/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@108aa7da8d74]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: d5db7a139709b2f13221e56bfeee02cdd2772f030d309886649cadfd159538e9
+content_sha: 4971a20984cd48955b6c6867a338697e02e9393292b50b0f179f44c240bc3e11
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -590,6 +590,8 @@ this moved where they are written, not what they are.
 **No decision here moved** (W-274, 2026-10-11): `config.py` gained `[index] section_records` (SR-SECTIONS decision 11). No URL freshness key moved.
 
 **No decision here moved** (W-287, 2026-10-19): `refer/__init__.py` passes `[ranking] table_column_weight` to `rescore`; both `as-ingested` fallbacks and the `min(policy, declared)` arithmetic are untouched.
+
+**No decision here moved** (W-289, 2026-10-20): `acquire/urlsrc.py`'s `load_fetcher` resolves a declared fetcher package when the consumer has no file of that name ([SR-PLUGINS](0165_plugins.md) P8); `UrlEntry.ttl` and `resolve_urls`' three layers are untouched.
 
 ### Consequences
 

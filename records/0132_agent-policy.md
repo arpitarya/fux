@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@dcd13c002392]
+owns: [src/fux/templates/agents@b277724f1f65]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: ebf7ffb925f535c77290d48046963c22bfc1771361c8a11bd3452de19d0415c8
+content_sha: a764dbe0d2cf8c591f9ed6056f3304b912dfaa9c120b61059c52204025c047ad
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -810,6 +810,8 @@ The shipped `fux-inspect`, `fux-serve` and `fux-config` skills name identifier f
 **No decision here moved** (W-262 #3, 2026-10-05): the `fux-search` skill template (`SEARCH-SKILL.md`) and the Kiro steering guide name `find --no-archived`, the filter [SR-FIND](0104_find.md) decision 7 gained; the repo's installed copies were refreshed byte-equal.
 
 **No decision here moved** (W-273 phase 2, 2026-10-13): the `fux-config` skill's `section_records` row names `section_weight = 1.0` as the measured value to set with it (W-278, ruled ship as an opt-in pair).
+
+**No decision here moved** (W-289, 2026-10-20): the `fux-fetcher`, `fux-index` and `fux-sources` skill templates say a fetcher is a file in `.fux/fetchers/` or a declared fetcher package, that `fux setup` writes `.fux/plugins.toml` and no decoder or fetcher, and name `fux setup --pin` and the `seeded copies removable` row ([SR-PLUGINS](0165_plugins.md)); the repo's installed copies were refreshed byte-equal. The `fux-decoder` skill's stamp paragraph is SR-DECODE's and moves with W-289 phase 2.
 
 ### Consequences
 

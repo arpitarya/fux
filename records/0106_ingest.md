@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/acquire/ingestlog.py@f7d675254e1d, src/fux/ingest@56dfbbcb6343, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@4ca02fdd1c47, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@26004073c416]
+owns: [src/fux/acquire/ingestlog.py@f7d675254e1d, src/fux/ingest@80e3df489f1c, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@4ca02fdd1c47, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@077eee5643f0]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: eedf8631ae3b92d93ff2a01ab6f8e7246f9371ec98e425bd50915aa2e5cdf6db
+content_sha: 2898908ff5e843fc445e29a085fb0e452fb5aaccea963fdde04e204adb62bb09
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1141,6 +1141,8 @@ descent before listing it, and records it once as `dir/`.
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** Ingest hands each record its section records (`_section_records`, hashed through the run's tracker) and `write_index` writes the plane. A **carried** document, `file:` or `url:`, keeps its prior section lines byte for byte, read once per run by `store.read_sections` ([SR-SECTIONS](0161_sections.md) decision 8). A foreign index has none to carry.
+
+**No decision here moved** (W-289, 2026-10-20): under this record's directory claims, `acquire/urlsrc.py` (SR-FETCHER's) resolves a declared fetcher package when the consumer has no file of that name, and `ingest/health.py` (SR-DOCTOR's) gained the `seeded copies removable` row ([SR-PLUGINS](0165_plugins.md) P8, P9). Ingest does not read `.fux/plugins.toml` yet: the P5 per-suffix report on stderr and P12's `pkg:` register column are phase 2's, and the register's shape is still decision 22's.
 
 ### Consequences
 

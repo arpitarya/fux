@@ -11,7 +11,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 85d21a77b3bb95fa44c6a538ce6c128eb2f588beae0c4366de08b617e69ff170
+content_sha: 8571228ab3f720d673c1c1dd3640aa4ae48275f75dc341757cfeb3fe7e15c3fe
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -500,6 +500,8 @@ A carried `url:` record re-derived because the identifier-family digest moved ke
 
 
 **W-236 — section records (2026-10-10; branch `w236-sections`, unmerged).** `rank()` gains the best-section term ([SR-SECTIONS](0161_sections.md) decision 5). It is added **before** the document weight and never reads `archived`, so decision 2's veto still holds: the marker moves nothing, with the term on or off.
+
+**No decision here moved** (W-289, 2026-10-20): `acquire/urlsrc.py`'s `load_fetcher` resolves a declared fetcher package when the consumer has no file of that name ([SR-PLUGINS](0165_plugins.md) P8); `UrlEntry.archived` and its two layers are untouched.
 
 ### Consequences
 

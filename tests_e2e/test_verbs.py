@@ -558,10 +558,13 @@ def test_setup_writes_the_consumer_owned_files_and_never_rewrites_them(tmp_path)
     """`fux setup` as a user runs it — and the second run must change nothing."""
     (tmp_path / "docs").mkdir()
     first = _run(tmp_path, "setup")
-    assert "wrote .fux/fetchers/http.py" in first.stdout
-    assert (tmp_path / ".fux" / "fetchers" / "cdp.py").is_file()
+    # W-289 (SR-PLUGINS P6, P9): the declaration is written; no fetcher is seeded.
+    assert "wrote .fux/plugins.toml" in first.stdout
+    assert not (tmp_path / ".fux" / "fetchers").exists()
 
+    # A fetcher the consumer writes is theirs, and overrides the package.
     edited = tmp_path / ".fux" / "fetchers" / "http.py"
+    edited.parent.mkdir(parents=True)
     edited.write_text("# my proxy lives here\n", encoding="utf-8")
     second = _run(tmp_path, "setup")
     assert "nothing to do" in second.stdout

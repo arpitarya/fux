@@ -3,15 +3,15 @@ type: Standing Record
 kind: component
 name: SR-FETCHER
 title: "SR-FETCHER (0117) — the consumer-owned fetcher"
-description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher per URL, declared not detected, returning bytes and a Content-Type — and the word is fetcher because nothing here composes."
+description: "Fux never fetches; a fetcher does — the consumer's file in `.fux/fetchers/`, or a declared fetcher package. One fetcher per URL, declared not detected, returning bytes and a Content-Type — and the word is fetcher because nothing here composes."
 status: accepted
 amended: 2026-10-13
 date: 2026-08-19
-feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/acquire/urlsrc.py@0ff7a50c2648, src/fux/templates@e596891dfbec]
+feature: the fetch contract, what it is called, and how a fetcher reaches a repository
+owns: [src/fux/acquire/urlsrc.py@3bde03cfad43]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: c38c07ffaeb64e2d752bb0f7dceb871ba9e9ae54c99e1ed5f82be249265168e3
+content_sha: aba8dcbf6ade7cf757764df0a13210e2c749e956c3da1604204d4c784c210b5f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -19,7 +19,6 @@ content_sha: c38c07ffaeb64e2d752bb0f7dceb871ba9e9ae54c99e1ed5f82be249265168e3
 **Owns** — the components this record decides:
 
 - [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py) · file
-- [`src/fux/templates/`](../src/fux/templates) · dir
 
 <!-- COMPONENTS-END -->
 
@@ -27,8 +26,9 @@ content_sha: c38c07ffaeb64e2d752bb0f7dceb871ba9e9ae54c99e1ed5f82be249265168e3
 
 ## §1 — For humans
 
-**Fux never fetches. Your fetcher does.** A Python file in your repo, named in
-`fux.toml`, loaded by path, called once per URL under either fenced path —
+**Fux never fetches. Your fetcher does.** A Python file in your repo's
+`.fux/fetchers/`, or a fetcher package your repo declares in `.fux/plugins.toml`
+([SR-PLUGINS](0165_plugins.md)), called once per URL under either fenced path —
 `fux add <URL>` (that URL only) or `fux ingest` (all of them). Core holds **zero
 network lines**, and that is the property this record exists to keep true.
 
@@ -51,8 +51,8 @@ per-URL attribute all say one word.
 ```mermaid
 flowchart LR
     L[".fux/sources/urls<br/>fetch= declares which"] --> R["fux add &lt;URL&gt; · fux ingest"]
-    R --> P["load by path<br/>fux.toml [sources.url] fetcher"]
-    P --> F[".fux/fetchers/*.py<br/>YOUR code"]
+    R --> P["resolve fetch=&lt;name&gt;<br/>your file, else the declared package"]
+    P --> F[".fux/fetchers/&lt;name&gt;.py · fux-fetcher-&lt;name&gt;<br/>never fux's own code"]
     F --> B["bytes + Content-Type"]
     B --> DC["fux.decode<br/>bytes to markdown"]
     DC --> I["indexed as src: url"]
@@ -64,9 +64,9 @@ flowchart LR
 
 ```text
   .fux/sources/urls          fux add <URL> · fux ingest
-  (fetch= declares which) -->  |  load by path from fux.toml
+  (fetch= declares which) -->  |  resolve fetch=<name>
                                v
-                     .fux/fetchers/*.py   <-- YOUR code, fux never rewrites it
+       .fux/fetchers/<name>.py  (yours, wins)  else  fux-fetcher-<name> (declared, pinned)
                                |              core holds ZERO network lines
                                v
                      bytes + Content-Type
@@ -82,7 +82,7 @@ flowchart LR
 ### Examples
 
 The contract, from the file that implements it in this repo
-([`.fux/fetchers/cdp.py`](../.fux/fetchers/cdp.py)):
+([`fux_fetcher_cdp`](../packages/fux-fetcher-cdp/src/fux_fetcher_cdp/__init__.py), the `fux-fetcher-cdp` package):
 
 ```python
 configure(config: dict) -> None  # optional; once after import, before connect()
@@ -155,7 +155,10 @@ it is the same `FuxError` the other fetcher failures raise. 3.0.0-alpha.2
 rewrite its URL lines, so the ramp protected nothing the major had not broken.
 
 **3. It is called a *fetcher*, not middleware, not an adapter.** The file, the
-required function, the config key and the per-URL attribute all say `fetch`.
+required function, the config key and the per-URL attribute all say `fetch`. A
+fetcher published as its own distribution is a **fetcher package** — one kind of
+*plugin package* ([SR-PLUGINS](0165_plugins.md)), named `fux-fetcher-<name>` —
+and it is still a fetcher: same contract, one per URL, nothing composes.
 
 **4. Exactly one fetcher runs per URL.** No chain, no wrapping, no
 passthrough-to-the-next. A URL resolves to one fetcher and that fetcher either
@@ -164,8 +167,9 @@ true** — the day a chain lands, the name is wrong again.
 
 **5. Which fetcher a URL uses is declared, never detected.** Via
 [SR-URL-LIST](0116_url-list.md)'s `fetch=` attribute, which resolves to
-`<fetchers dir>/<name>.py` — the directory being the parent of
-`[sources.url] fetcher` ([SR-CONFIG](0113_config.md) decision 5). **A fetcher
+`.fux/fetchers/<name>.py` when the consumer has that file, and otherwise to the
+fetcher package `.fux/plugins.toml` declares for `<name>` ([SR-PLUGINS](0165_plugins.md)
+P8) — an installed package nobody declared is never consulted. **A fetcher
 no line names is never imported**, which is what keeps a repo that only wants
 plain HTTP from loading WebSocket code. Automatic escalation from one fetcher to
 another would make the committed bytes a function of network conditions at that
@@ -178,28 +182,37 @@ second, never sniffed.** The HTTP header wins; a URL's extension is a fallback
 hint; the bytes are never inspected. A heuristic here would make the committed
 index a function of how confident a guesser felt.
 
-**6. Fetchers live in `.fux/fetchers/`**, a child declared **committed** by
-[SR-DOTFUX](0102_fux-directory.md). Plural, because decision 5 presumes more
-than one can exist in a repo at once.
+**6. A fetcher is the consumer's file in `.fux/fetchers/`, or a declared
+fetcher package — and fux writes neither.** `.fux/fetchers/` is a child declared
+**committed** by [SR-DOTFUX](0102_fux-directory.md). Plural, because decision 5
+presumes more than one can exist in a repo at once.
 
-**Fux ships two of them and imports neither.** `http.py` and `cdp.py` live in
-the wheel as package data under `src/fux/templates/`, **with an extension
-Python's import machinery cannot resolve**, and `fux setup` copies them out
-write-if-missing.
+**Fux ships two fetchers, as packages, and the engine imports neither.**
+`fux-fetcher-http` and `fux-fetcher-cdp` are separate distributions
+([SR-PLUGINS](0165_plugins.md) P10) that **import nothing from fux and depend on
+nothing**; a repository runs one only when `.fux/plugins.toml` declares it,
+pinned, and a URL line names it. **`fux setup` seeds no copy** (P9): the package
+is what runs, so an engine fix reaches every repository with its next install —
+the freeze a seeded copy imposed is gone. **A file of the same name in
+`.fux/fetchers/` overrides the package** (P8), which is how a consumer edits one:
+copy it in.
 
-⚠ **The two shipped files are on the same axis, and it is *whose session*, not
-*how hard it tries*.** `http.py` uses none; `cdp.py` borrows the one your
-browser already holds. **Neither renders a page** — `cdp.py` stopped on
-2026-09-01 (W-98) and now intercepts the response, so both return the bytes the
-server sent and the type it declared, and `fux.decode` converts. That matters
-here rather than only in [SR-CDP-FETCHER](0118_cdp-fetcher.md): decision 5
-forbids escalation between fetchers, which is only coherent while the two
-produce the *same kind of thing* for the same URL. A renderer and a downloader
-on one axis would have made "which fetcher ran" a fact about the committed
-index, and that is L4 demoted to a code comment. That is decision 1 made **structural**: a `.py` in the package
-could be imported by a later edit, a `.py.txt` cannot be. It also answers the
-question a shipped default otherwise raises — how an air-gapped consumer gets a
-working fetcher without being told to copy a file from GitHub.
+⚠ **The two shipped fetchers are on the same axis, and it is *whose session*, not
+*how hard it tries*.** `http` uses none; `cdp` borrows the one your browser
+already holds. **Neither renders a page** — `cdp` stopped on 2026-09-01 (W-98)
+and intercepts the response, so both return the bytes the server sent and the
+type it declared, and `fux.decode` converts. That matters here rather than only
+in [SR-CDP-FETCHER](0118_cdp-fetcher.md): decision 5 forbids escalation between
+fetchers, which is only coherent while the two produce the *same kind of thing*
+for the same URL. A renderer and a downloader on one axis would have made "which
+fetcher ran" a fact about the committed index, and that is L4 demoted to a code
+comment.
+
+**Decision 1 stays structural.** The network code lives in a distribution the
+engine depends on not at all, which no offline path can reach: `fux ingest
+--no-fetch` and `fux doctor` locate and hash a declared fetcher and never run it
+(`tests/test_plugin_fence.py`). An air-gapped consumer installs the declared
+package from wherever it mirrors PyPI, or writes the file.
 
 **7. `[sources.url] middleware` is a retired key that errors with
 instructions**, naming both the new key and the directory move. A retired key
@@ -412,14 +425,13 @@ every request, and it is re-fetched every run while three stable URLs are not.
   people to ignore a red doctor. ⚠ **The gap is now visible, not closed** — a
   consumer must still copy the function in themselves, which is the freeze
   working as designed rather than a defect in it.
-  ✅ **The template stamp, 2026-10-05** (Arpit, 2026-10-04, W-251 #2 — option B;
-  W-262): `fux setup` now writes each fetcher with a first-line
-  `# fux-template: <sha256>` naming the template it came from, and `doctor`'s
-  `seeded copies current` row names an **unedited** copy whose template has
-  changed — *re-seed it yourself* (delete it, run `fux setup`). **Still never a
-  rewrite**: an edited fetcher is the consumer's, and this row says nothing
-  about it; `fetcher optional functions` above still does. Refresh-on-upgrade
-  (option A) was refused.
+  ✅ **Closed by the packages** (W-289, [SR-PLUGINS](0165_plugins.md) P9): a
+  repository that declares `fux-fetcher-http` and keeps no `.fux/fetchers/http.py`
+  runs the current fetcher, with every optional function it has, from its next
+  install. A copy an older `fux setup` left still overrides; `doctor`'s
+  `seeded copies removable` row names every **unedited** one by its first-line
+  `# fux-template: <sha256>` stamp, and fux never deletes it. An edited copy is
+  the consumer's, and `fetcher optional functions` above still reads it.
 - **A validated URL is neither a fetch nor a skip**, and is counted separately —
   its prior record is correct and carried forward, which is the opposite of a
   failure. `fux ingest` prints the count, because **an optimisation that fails
@@ -595,8 +607,10 @@ doctor` gains, all offline: a **failure** when a route names no file on disk; a
 collision; and 16b's finding — *"N line(s) pin a fetcher the routes table would
 now resolve differently"*.
 
-**16f. The shipped templates claim nothing, and say why.** `http.py` and
-`cdp.py` carry a **commented** `ROUTES` example only. A shipped claim would make
+**16f. The shipped fetchers claim nothing, and say why.** `fux-fetcher-http`
+and `fux-fetcher-cdp` carry a **commented** `ROUTES` example only, and a
+package's `ROUTES` is not read at all — claims are read from the consumer's
+files in `.fux/fetchers/`, where a host map is something the consumer wrote. A shipped claim would make
 fux's opinion about somebody's hosts arrive with an install, and the adapter cap
 ([SR-ENRICH](0137_enrich.md)) is the same argument: fux ships the mechanism and
 declares no host it does not own.
@@ -656,12 +670,10 @@ rewrite their URL lines, so the ramp protected nothing the major had not broken.
 
 <!-- L12-NOTE-START -->
 
-**`src/fux/templates/` holds more than the fetchers since L12 (W-225,
-2026-09-27).** It is the one home of every shipped tunable value
-([SR-LAW-12](0014_LAW-12-values-live-in-config.md) decision 5): `tune.toml.txt`
-is the file `fux setup` writes, `fux doctor --fix` restores a missing key from,
-and `--no-tune` reads. The fetcher templates' rules here are unchanged — bytes,
-copied out, never imported.
+**`src/fux/templates/` holds no fetcher** since W-289 — the two left for their
+packages — and is [SR-DOTFUX](0102_fux-directory.md)'s: the one home of every
+shipped tunable value ([SR-LAW-12](0014_LAW-12-values-live-in-config.md)
+decision 5), the files `fux setup` writes.
 
 <!-- L12-NOTE-END -->
 
@@ -752,9 +764,8 @@ copied out, never imported.
   module layout of fux, so renaming anything under `decode/` cannot break one.
   For a time (W-86 P1 to W-199) a shipped fetcher carried
   `from fux.decode.html import …` and inverted that direction; W-199 moved
-  decoding to the line's `decoder=`, and neither template imports `fux` today.
-  The `.py.txt` extension still keeps the template un-importable, so nothing
-  about L5 changes.
+  decoding to the line's `decoder=`, and neither fetcher imports `fux` today —
+  a test holds it, now that each is its own package (`tests/test_plugin_packages.py`).
 - **Conversion left the fetchers entirely.** Both templates used to hold their
   own copy of the HTML→Markdown pass — **four hand-maintained copies of one
   converter**, and the templates are what `fux setup` writes into every new
@@ -812,11 +823,12 @@ line changed in any of them. The decision is
 - Fux's half of the contract —
   [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py):
   `load_fetcher`, `configure_fetcher`, `resolve_parallel`, `fetch_all`.
-- The shipped templates —
-  [`src/fux/templates/`](../src/fux/templates/), `http.py.txt` and
-  `cdp.py.txt`; a real fetcher implementing the contract —
-  [`.fux/fetchers/cdp.py`](../.fux/fetchers/cdp.py) and
-  [SR-CDP-FETCHER](0118_cdp-fetcher.md).
+- The shipped fetchers — the packages
+  [`packages/fux-fetcher-http/`](../packages/fux-fetcher-http/) and
+  [`packages/fux-fetcher-cdp/`](../packages/fux-fetcher-cdp/), each a real fetcher
+  implementing the contract ([SR-HTTP-FETCHER](0119_http-fetcher.md),
+  [SR-CDP-FETCHER](0118_cdp-fetcher.md)), loaded through
+  [SR-PLUGINS](0165_plugins.md).
 - The retired-key error — [`src/fux/config.py`](../src/fux/config.py).
 - The behaviour around the contract — [SR-URL-INGEST](0107_url-ingest.md),
   captured in
@@ -867,9 +879,10 @@ grep -rn "urllib\|http.client\|socket\|requests" src/fux/ --include=*.py
 grep -c 'middleware' src/fux/config.py
 # expect: the guard and its message, nothing else
 
-# 4. the shipped templates are still un-importable package data
-ls src/fux/templates/*.py 2>/dev/null
-# expect: no output — a `.py` here could be imported, which is decision 6's point
+# 4. no fetcher is engine code: none under src/fux/, and no engine module
+#    imports a fetcher package by name (decision 6, SR-PLUGINS P10)
+ls src/fux/templates/*.py* 2>/dev/null; grep -rn "import fux_fetcher_" src/fux/
+# expect: no output
 
 # 5. decision 11: the registry is asked with `root`, so consumer decoders apply
 grep -n "decode_mod\.\(decode\|claims\)" src/fux/acquire/urlsrc.py
@@ -893,15 +906,16 @@ evidence.*
 [SR-URL-INGEST](0107_url-ingest.md) · [SR-RECORD](0109_index-record.md) ·
 [SR-CONFIG](0113_config.md) · [SR-EXTRACTED](0115_extracted-mode.md) ·
 [SR-URL-LIST](0116_url-list.md) · [SR-CDP-FETCHER](0118_cdp-fetcher.md) ·
-[SR-HTTP-FETCHER](0119_http-fetcher.md) · [SR-REFER](0127_refer-plane.md) ·
+[SR-HTTP-FETCHER](0119_http-fetcher.md) · [SR-PLUGINS](0165_plugins.md) · [SR-REFER](0127_refer-plane.md) ·
 [SR-DECODE](0139_decode.md)
 
 **Code**
 
-- [`.fux/fetchers/cdp.py`](../.fux/fetchers/cdp.py)
+- [`packages/fux-fetcher-cdp/`](../packages/fux-fetcher-cdp/)
+- [`packages/fux-fetcher-http/`](../packages/fux-fetcher-http/)
 - [`src/fux/config.py`](../src/fux/config.py)
 - [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py)
-- [`src/fux/templates/`](../src/fux/templates/)
+- [`src/fux/plugins.py`](../src/fux/plugins.py)
 - [`tests/ingest/test_url_parallel.py`](../tests/ingest/test_url_parallel.py)
 
 **Measured evidence**

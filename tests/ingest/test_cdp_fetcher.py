@@ -1,10 +1,10 @@
 """The shipped `cdp.py` fetcher — offline unit tests only.
 
-The file ships in the wheel as **package data** (`src/fux/templates/cdp.py.txt`)
-and `fux setup` copies it into the consumer's `.fux/fetchers/cdp.py`, where it
-becomes their code (SR-CDP-FETCHER decision 7). It is never imported by fux —
-which is why the extension is one Python's import machinery cannot resolve, and
-why these tests have to load it explicitly.
+The fetcher ships as its own distribution, `fux-fetcher-cdp`
+(`packages/fux-fetcher-cdp/src/fux_fetcher_cdp/__init__.py`, W-289), which a
+repository declares in `.fux/plugins.toml` and fux loads only when a URL line
+says `fetch=cdp` (SR-CDP-FETCHER decision 9, SR-PLUGINS P10). These tests load
+the file by path, as a fresh module, so nothing here goes through that gate.
 
 They exercise the pure parts (RFC 6455 framing, handshake key, link
 extraction, the contract surface, the `configure` hook) plus the CDP
@@ -28,7 +28,10 @@ from pathlib import Path
 
 import pytest
 
-_TEMPLATE = Path(__file__).resolve().parents[2] / "src" / "fux" / "templates" / "cdp.py.txt"
+_TEMPLATE = (
+    Path(__file__).resolve().parents[2]
+    / "packages" / "fux-fetcher-cdp" / "src" / "fux_fetcher_cdp" / "__init__.py"
+)
 
 
 def _load():
@@ -44,10 +47,11 @@ def mw():
     return _load()
 
 
-def test_the_fetcher_ships_as_package_data_and_is_never_imported():
-    """SR-FETCHER's adapter cap, made structural rather than remembered."""
+def test_the_fetcher_ships_outside_the_engine_package():
+    """SR-FETCHER's adapter cap, made structural rather than remembered: the
+    WebSocket code lives in its own distribution, never under `src/fux/`."""
     assert _TEMPLATE.is_file()
-    assert _TEMPLATE.suffix == ".txt"  # `import fux.templates.cdp` must not resolve
+    assert "src/fux/" not in _TEMPLATE.as_posix().split("packages/")[-1]
 
 
 def test_contract_surface(mw):

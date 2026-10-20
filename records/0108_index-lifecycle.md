@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@5564d72af89f, node/src/store/format.mjs@4fc4a43aafe0, node/src/store/reader.mjs@ea5bf3de3b4d]
+owns: [src/fux/store@90e59ea1c5cb, node/src/store/format.mjs@4fc4a43aafe0, node/src/store/reader.mjs@ea5bf3de3b4d]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 8c66227a1f4281734933da22cff9bd133380b33f59d4b767e1340f8c5390261d
+content_sha: 6d80c91d075d36ce793fc6623ba6e6e5c473a3745b491dac24b1cd7751b6d18e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -611,6 +611,8 @@ exactly v5's property set.
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `_format` moves to **`fux.index.v8`** by decision 9.1: a plane and a property appear ([SR-SECTIONS](0161_sections.md) decisions 1 and 3). The new plane is `.fux/index/sections/xx.jsonl`, written by the same `write_index` call under decisions 1–4's rules (sorted, write-if-changed, an empty shard removed, and the directory removed when it empties). The migration is decision 10a's `fux ingest --full`. `analyzer` and `tf_fields` are untouched.
+
+**No decision here moved** (W-289, 2026-10-20): `store/fuxdir.py` (SR-DOTFUX's) declares `plugins.toml` as a committed child ([SR-PLUGINS](0165_plugins.md) P2); the index planes and their lifecycle are untouched.
 
 ### Consequences
 

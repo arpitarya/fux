@@ -3,14 +3,14 @@ type: Standing Record
 kind: law
 name: SR-LAW-2
 title: "SR-LAW-2 (0004) — L2 — $0, FOSS-only"
-description: "Why fux costs nothing and depends on nothing anyone must buy; and the 2026-09-06 amendment that withdrew the zero-dependency guarantee while hardening the money clause."
+description: "Why fux costs nothing and depends on nothing anyone must buy; the 2026-09-06 amendment that withdrew the zero-dependency guarantee while hardening the money clause; and the 2026-10-19 amendment that lets the committed repository, never the machine, choose an opt-in package."
 status: accepted
-date: 2026-09-06
+date: 2026-10-19
 feature: the rationale, history and reopen-trigger of L2
 owns: []
 laws: [L2]
-timestamp: 2026-09-06T00:00:00Z
-content_sha: a604b02578aa5259d5b9922dfc7f5346d90cbfc068fdf87d5818d61b6b20e761
+timestamp: 2026-10-19T00:00:00Z
+content_sha: 2f866cf7c4ddf83c3d22a3cfe0ce0da3cdfef099ffeb5a3d7bcaf86cbd9bb5d7
 ---
 
 # SR-LAW-2 — L2 — $0, FOSS-only
@@ -66,6 +66,33 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 - **What it keeps:** inside any one package, nothing is optional. A role package is complete for its role, so no capability inside it depends on what somebody chose at install time.
 - **What it costs, named now:** a reader-only machine cannot `ingest`, and that is now lawful. The "one install" promise holds for `fux-engine` alone.
 - ⚠ **Still refused:** an optional extra on any package, such as the `fux-reader[postgres]` that index-stores §8 sketched.
+
+### ⚠ The 2026-10-19 amendment — the repository chooses, never the machine
+
+**Arpit, 2026-10-19, in Cowork, on W-289 ([SR-PLUGINS](0165_plugins.md))** — after
+*"I want to go with the third option"* (declared, pinned, committed) and *"i like the
+recommendation now create a list what are mandatory and what are optional. because we
+dont need all"*, asked to confirm this sentence for the law: *"okay file a work item for
+this"*. Recorded here as that ruling.
+
+| clause | before | after |
+|---|---|---|
+| what ships in every install | everything: all 17 decoders, both fetchers | **the engine only** — `fux-core`, `fux-reader`, `fux-writer`, `fux-engine`; Markdown and prose need nothing more |
+| an opt-in capability | refused outright — *"no 'install this for PDFs'"* | **permitted when the COMMITTED repository chooses it** in `.fux/plugins.toml` |
+| a capability that depends on what a machine has installed | refused | **still refused** — an undeclared package never runs, and a declared one that is missing or differs stops fux |
+| an optional *extra* (`pkg[x]`) | refused | **still refused** |
+
+- **What the old form bought:** one install, nothing to choose, and therefore nothing to
+  differ between two machines. Two clones of one repository could not build different
+  indexes because they had installed different things — there was nothing to install
+  differently.
+- **What this trades, named now:** a fresh clone needs `pip install` of the declared set
+  before `fux` reads its formats, and every consumer meets that once, on the upgrade. The
+  guarantee the old form gave for free is now carried by a mechanism —
+  **declared, pinned, refused loudly** (SR-PLUGINS P3, P4, P13) — and none of the three
+  may be relaxed to a warning, because a warning is how two machines drift apart.
+- **What it keeps:** the licence clause is untouched. Every package, first-party and
+  third-party alike, declares an OSI licence by SPDX identifier.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
@@ -132,20 +159,23 @@ Amending a law needs Arpit's ruling, named in this record
   precisely because each one looks like it passes. **The test is the OSI
   approved-licence list**, never the price, never a public repo, never the word
   "open" in a README.
-  **Dependencies ship packaged.** Fux is one install with everything it needs —
-  no optional extras, no "install this for PDFs", no capability that works on
-  one machine and not another because of what somebody chose at install time.
-  **`fux-engine` is the one install; `fux-reader` and `fux-writer` are role
-  packages — each complete for its role, none with optional extras.**
+  **Dependencies ship packaged, and the repository chooses, never the
+  machine.** No optional extras. **A capability may be opt-in only when the
+  committed repository chooses it; no capability may depend on what a machine
+  happens to have installed.** **`fux-engine` is the one mandatory install;
+  `fux-reader` and `fux-writer` are role packages, each complete for its role;
+  a decoder, fetcher or extension package runs only when the repository's
+  committed `.fux/plugins.toml` declares it, pinned, and one that is missing or
+  differs is refused loudly.**
   **Permission is not authorization:** the law permits a dependency, a record
   still decides one, and every runtime dependency is named by an accepted SR.
   **Dev, test and measurement tooling is bound by the same licence rule and
   nothing more** — OSI-licensed, and numpy/pandas/scipy explicitly fine.
-  ⚠ **Amended 2026-09-06** (Arpit). The previous form forbade third-party runtime
-  dependencies outright — the zero-dependency guarantee, sold as the product's
-  central promise. **That guarantee is withdrawn**, deliberately, and
-  [SR-LAW-2](0004_LAW-2-zero-cost.md) carries what it bought, what replaced
-  it, and the three things it left unguarded.
+  ⚠ **Amended 2026-09-06 and 2026-10-19** (Arpit). The first withdrew the
+  zero-dependency guarantee, sold as the product's central promise; the second
+  replaced *"nothing optional"* with *"optional only by the committed
+  repository's choice"*. [SR-LAW-2](0004_LAW-2-zero-cost.md) carries what each
+  bought, what replaced it, and what it left unguarded.
 <!-- LAW-TEXT:END L2 -->
 
 ### Context
@@ -170,7 +200,7 @@ Two of them are worse than that: **BSL and SSPL convert on a timer or on a use c
 
 **The test is the OSI approved-licence list** — never the price, never a public repository, never the word "open" in a README. **Read the SPDX identifier, not the marketing.**
 
-**2. Dependencies ship packaged.** One install with everything it needs. No feature extras, no *"install this for PDFs"*, no capability that works on one machine and not another because of what somebody typed at install time. An install-time choice is a support surface, not a feature — which is why the opt-in-extras form was put to Arpit and declined.
+**2. Dependencies ship packaged, and the repository chooses, never the machine.** No feature extras: an install-time choice is a support surface, not a feature — which is why the opt-in-extras form was put to Arpit and declined. **A capability may be opt-in only when the committed repository chooses it** — a decoder, fetcher or extension package declared in `.fux/plugins.toml`, pinned to a version and digest ([SR-PLUGINS](0165_plugins.md)). **No capability may depend on what a machine happens to have installed**: an undeclared package never runs, and a declared one that is missing or differs is a hard error naming the install line. `fux-engine` is the one mandatory install; Markdown and prose need nothing else.
 
 **3. Permission is not authorization.** The law permits a dependency; a record still decides one. **Every runtime dependency is named by an accepted SR that says what it does and what was measured without it.** A dependency with no record is a defect, exactly like an undeclared `.fux/` child.
 
@@ -196,6 +226,7 @@ Two of them are worse than that: **BSL and SSPL convert on a timer or on a use c
 - [SR-LAWS](0001_LAWS.md) — the numbering this record hangs from
 - [SR-DECODE](0139_decode.md) — the consumer seam, whose §1 premise this amendment falsified and which was corrected in the same change
 - [SR-RERANK](0138_rerank.md) — the determinism refusal that is now the only guard against a query-time model
+- [SR-PLUGINS](0165_plugins.md) — the mechanism decision 2's opt-in clause rests on: declared, pinned, refused loudly
 - The supply-chain case for a small dependency tree: Ohm et al., *Backstabber's Knife Collection: A Review of Open Source Software Supply Chain Attacks* (DIMVA 2020) — https://arxiv.org/abs/2005.09535
 
 ### Veto condition
@@ -203,7 +234,7 @@ Two of them are worse than that: **BSL and SSPL convert on a timer or on a use c
 **Reopen if any of these becomes true:**
 
 1. **A dependency appears in `pyproject.toml` that no accepted record names.** Decision 3 failing.
-2. **A feature extra appears** under `[project.optional-dependencies]` other than `dev`. Decision 2 failing.
+2. **A feature extra appears** under `[project.optional-dependencies]` other than `dev`, or **a package runs that `.fux/plugins.toml` does not declare, or runs although it differs from its pin**. Decision 2 failing — the second is SR-PLUGINS veto condition 1.
 3. **Two machines produce different root hashes from the same sources and the same commit** — the exposure named in Consequences arriving.
 4. **Anything proposes a paid service, model or library**, however small the price. That is not a reopen so much as a refusal, and it is the clause that never moved.
 

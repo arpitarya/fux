@@ -323,6 +323,13 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="do not write the agent policy files outside .fux/ (.claude/, .github/, .kiro/)",
     )
+    # W-289, SR-PLUGINS P4/P6: re-pin every `.fux/plugins.toml` row from what
+    # is installed — the one deliberate act after an upgrade, never implicit.
+    p_setup.add_argument(
+        "--pin",
+        action="store_true",
+        help="re-pin every package in .fux/plugins.toml to the installed version and digest",
+    )
     p_setup.set_defaults(func=_dispatch)
 
     p_doctor = _verb("doctor", help="check environment and repo health")

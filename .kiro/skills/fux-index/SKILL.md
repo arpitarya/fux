@@ -32,9 +32,12 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 
 ## 2 · `fux setup` — scaffold once
 
-**Write-if-missing, always.** Each path prints `wrote <path>` or
-`kept <path> (yours; never rewritten)`. A consumer's edit is never overwritten,
-so a newer template never reaches a file that already exists.
+**Write-if-missing, always** — except `.fux/plugins.toml`, whose rows setup adds
+and pins (`updated <path>`), never removes. Each other path prints `wrote <path>`
+or `kept <path> (yours; never rewritten)`. A consumer's edit is never
+overwritten, so a newer template never reaches a file that already exists. Setup
+writes **no** decoder or fetcher: a file you put in `.fux/decoders/` or
+`.fux/fetchers/` overrides the declared package of the same name.
 
 | writes | what it is |
 |---|---|
@@ -43,7 +46,7 @@ so a newer template never reaches a file that already exists.
 | `.fux/formats.toml` · `.fux/.fuxignore` | which files are documents · what is excluded |
 | `.fux/pii.toml` · `.fux/refusals.toml` | redaction rules (required) · what a sign-in wall looks like |
 | `.fux/tune.toml` · `.fux/output.toml` | ranking knobs · output defaults — the engine defaults spelled out |
-| `.fux/fetchers/*.py` · `.fux/decoders/*.py` | consumer-owned code; **the copies in `.fux/` are what run** |
+| `.fux/plugins.toml` | the decoder and fetcher **packages** this repo runs, pinned — proposed from your sources; setup prints the one `pip install` line and installs nothing. After a fux upgrade, `fux setup --pin` re-pins every row |
 | `.fux/README.md` · `.fux/.gitignore` | the layout table · ignores `runtime/` and `acquired/` by name |
 
 **It also writes agent files OUTSIDE `.fux/`** — under `.claude/{skills,rules}/`,

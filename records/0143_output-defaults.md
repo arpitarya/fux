@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@5d3b9020433f, src/fux/templates/output.toml.txt@0952128ae0aa, .fux/output.toml@4a3a8465d2e4, node/src/config/output.mjs@a00d8fa88ee8]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 28d38da30893e5d810bed3615557c0ef17d0413680486e18a6ca3f461f65e1b6
+content_sha: 10b22d63cdc4abf10a9d0776d570a18709df67ab3ac736bf5c00ce571c02cd36
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -867,6 +867,8 @@ anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
 **No decision here moved** (W-282, 2026-10-18): `cli.py` became core and runs a verb through its `VERBS` table, leaving a verb whose layer is not installed out of the parser and refusing it by name before argparse. `_apply_output_defaults` still runs in `main` before any verb is dispatched, unchanged.
 
 **No decision here moved** (W-287, 2026-10-19): `_print_refer_answer` prints a table row as a record and `mcp.py`'s `fux_passage` emits `cells`/`table`/`row` (null when not a row); the emission gate, `[mcp]`'s keys and `--band` are untouched.
+
+**No decision here moved** (W-289, 2026-10-20): `cli.py` gained `fux setup --pin` ([SR-PLUGINS](0165_plugins.md) P6). `_apply_output_defaults` and the emission gate are untouched.
 
 ### Consequences
 

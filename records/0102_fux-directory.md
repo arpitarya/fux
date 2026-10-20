@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-19
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@906d623d96f3, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@5d2f590c0567, tests/test_verb_table_agreement.py@1e7999ffd28f]
+owns: [src/fux/store/fuxdir.py@9f9bd8118442, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@dec49a4f23a7, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@ff9bde6099c7]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 079af171429ad87109b0f5f7730dadda6fa4393b2ce0e60d448b77bad4f6d368
+content_sha: dcf01f41c3d324765b438b71b257cb2b7669efdf27a4811bb0c88c7750ebbdc9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -21,6 +21,7 @@ content_sha: 079af171429ad87109b0f5f7730dadda6fa4393b2ce0e60d448b77bad4f6d368
 - [`node/src/store/fuxdir.mjs`](../node/src/store/fuxdir.mjs) · file
 - [`src/fux/setup.py`](../src/fux/setup.py) · file
 - [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) · file
+- [`src/fux/templates/`](../src/fux/templates) · dir
 - [`tests/test_verb_table_agreement.py`](../tests/test_verb_table_agreement.py) · file
 
 <!-- COMPONENTS-END -->
@@ -56,8 +57,9 @@ flowchart TD
     F[".fux/"]
     F --> C1["index/ — committed<br/>the product"]
     F --> C2["sources/ — committed<br/>dirs · urls · types"]
-    F --> C3["fetchers/ — committed<br/>YOUR code"]
-    F --> C4["decoders/ — committed<br/>YOUR code; these copies RUN"]
+    F --> C3["fetchers/ — committed<br/>YOUR code; overrides a package"]
+    F --> C4["decoders/ — committed<br/>YOUR code; overrides a package"]
+    F --> C8["plugins.toml — committed<br/>the declared packages, pinned"]
     F --> C5["enrich/ — committed<br/>pinned text + queue.tsv"]
     F --> C6["README.md · .gitignore<br/>generated, write-if-missing"]
     F --> C7["tune.toml · output.toml · .fuxignore · refusals.toml · pii.toml<br/>committed files, write-if-missing"]
@@ -76,8 +78,9 @@ flowchart TD
     |
     +-- index/        COMMITTED   the product; not rebuildable from anything
     +-- sources/      COMMITTED   dirs . urls . types, one entry per line
-    +-- fetchers/     COMMITTED   your code, fux never rewrites it
-    +-- decoders/     COMMITTED   your code; THESE COPIES RUN, not the package's
+    +-- fetchers/     COMMITTED   your code; overrides the declared package; fux writes none
+    +-- decoders/     COMMITTED   your code; overrides the built-in/package; fux writes none
+    +-- plugins.toml  COMMITTED   the decoder and fetcher PACKAGES this repo runs, pinned (SR-PLUGINS)
     +-- enrich/       COMMITTED   pinned enrichment text + queue.tsv
     +-- tune.toml     COMMITTED   how results are ORDERED, + [index] (write-if-missing)
     +-- output.toml   COMMITTED   how a result is SHOWN (write-if-missing)
@@ -223,8 +226,9 @@ table is the reasoning.
 | `index/` | committed | the product; nothing can recompute it. Beside the shards, **`index/REGISTER`**: one line per indexed document — `loc` ⇥ `sha` ⇥ `decoder` ⇥ optional `k=v` — derived from the index and committed with it, so a PR shows what the corpus is without a reader ([SR-INGEST](0106_ingest.md) decision 22; the `fux register` verb prints the same rows from the index) |
 | `sources/` | committed | `dirs` · `urls`, one entry per line, on the one grammar in [SR-URL-LIST](0116_url-list.md). ⚠ **`types` lived here until 2026-09-11** and is `formats.toml` now (the row below) |
 | `formats.toml` | committed | which files are documents and which decoder reads each extension — `include` plus `[decoders]` ([SR-TYPES](0128_types-list.md) decisions 11–12). **Optional**: absent means the built-in default. Write-if-missing — a repo that already has the file keeps it, bindings and all; a repo with only the old `sources/types` has it **converted** by `fux setup`, never rewritten in place |
-| `fetchers/` | committed | consumer code — decision 4 |
-| `decoders/` | committed | consumer code — decision 5 |
+| `fetchers/` | committed | consumer code — decision 7. A file here overrides the declared fetcher package of the same name ([SR-PLUGINS](0165_plugins.md) P8); fux writes none |
+| `decoders/` | committed | consumer code — decision 8. A file here overrides the decoder of the same module name; fux writes none |
+| `plugins.toml` | committed | which decoder and fetcher **packages** this repository runs, each pinned to a version and digest ([SR-PLUGINS](0165_plugins.md) P2). Only a declared package runs; one that is missing or differs stops fux with the install line. **Written by `fux setup`, and the one fux-written file setup UPDATES**: it adds a row the sources now need and pins a row that has none — and never removes one |
 | `enrich/` | committed | pinned enrichment text, one file per **source content sha**, plus `queue.tsv`. It cannot be re-derived: a model wrote it, in an agent, once, and [SR-ENRICH](0137_enrich.md) decision 1 refuses to call one. Committed also means **every clone has identical coverage**, so L4 holds with a wider input rather than a weaker property. Keying by source sha means editing a document orphans its enrichment automatically — staleness is structural rather than a check someone has to remember |
 | `tune.toml` | committed | how results are **ordered** — plus `[index]` (`max_phrases`, `max_table_rows`), the one table that changes what is indexed ([SR-TUNE](0135_tuning.md) decision 13, 2026-09-11). A preference that does not travel with the clone is not one: two clones would rank the same corpus differently, which is the surprise this split exists to remove |
 | `inspect.toml` | committed | what `fux inspect` and the explorer call a **finding**, how much they sample and how many rows they show ([SR-INSPECT](0156_inspect.md) decision 23; W-225 stage 4c). Changes what the report says, never the index or a ranking. Required: `fux setup` writes it, `fux doctor --fix` restores it |
@@ -276,10 +280,12 @@ holding code.
 | moment | writes | why |
 |---|---|---|
 | **`ensure_layout`**, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore`, **`.fux/node/` + `.fux/fux`** — 🔴 **and NOTHING outside `.fux/`**: [SR-NODE-SEARCH](0153_node-search.md) decision 15 wires `.fux/node` into the consumer's root manifest, and **that edit belongs to `fux setup` alone**, precisely because this row's own rule is that a no-op ingest produces a no-op diff. ✅ **Structural since 2026-09-12, not a convention**: `detect_workspace`/`wire_workspace` live in `setup.py`, and `ensure_layout(root, node_shape=...)` takes the decided shape as a keyword it never computes — an ingest keeps whatever shape is already on disk and can flip nothing | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory. The reader is here rather than in `setup` for the same reason: a clone with no Python has to be able to read the index the first time anyone ingests, not only after someone remembers to run `setup` |
-| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `formats.toml`, `tune.toml`, `output.toml`, `inspect.toml`, `.fuxignore`, `refusals.toml`, `pii.toml`, `fetchers/*.py`, `decoders/*.py`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions | **optional, explicit, once per repo** — a consumer asked for it |
+| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `formats.toml`, `tune.toml`, `output.toml`, `inspect.toml`, `.fuxignore`, `refusals.toml`, `pii.toml`, `plugins.toml`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions. **No `fetchers/*.py` and no `decoders/*.py`** since W-289 ([SR-PLUGINS](0165_plugins.md) P9): the declared package runs | **optional, explicit, once per repo** — a consumer asked for it |
 
 **`ensure_layout` must never write a fetcher**, and nothing in either column is
-ever overwritten: a consumer's annotations and edits survive every run.
+ever overwritten: a consumer's annotations and edits survive every run. **The
+one exception is `plugins.toml`**, which `fux setup` re-renders to add a row or
+pin one — never to change a pin unless `--pin` asks, and never to remove a row.
 `fux setup` is also the one verb permitted to run before a repo root exists,
 because it is what writes the `fux.toml` that makes a directory a root.
 
@@ -439,14 +445,15 @@ nothing reaches a consumer's directory. Same mechanism, worse outcome.
 ✅ **What the consumer-owned row now gets instead, 2026-10-05** (Arpit,
 2026-10-04, W-251 #2 — option B of
 [`consumer-template-refresh`](../work/compare/consumer-template-refresh.compare.md);
-W-262). **Not this shape**: `fetchers/` and `decoders/` stay write-if-missing
-and are never overwritten — option A, which would have refreshed an unedited
-copy on upgrade the way this shape refreshes `node/`, was refused. Each seeded
-copy carries a first-line template stamp (`# fux-template: <sha256>`), and
-`fux doctor`'s `seeded copies current` row names an unedited copy whose
-template has changed, with the lever *re-seed it yourself*. That is decision
-6's own mechanism — *a `doctor` check, never a rewrite* — applied to the plane
-whose stale files the paragraph above names.
+W-262). **Not this shape**: `fetchers/` and `decoders/` are never overwritten —
+option A, which would have refreshed an unedited copy on upgrade the way this
+shape refreshes `node/`, was refused. **Since W-289 setup seeds no copy at all**
+([SR-PLUGINS](0165_plugins.md) P9): the declared package runs and reaches every
+repository with its next install. A copy an older setup left carries a
+first-line template stamp (`# fux-template: <sha256>`), and `fux doctor`'s
+`seeded copies removable` row names every **unedited** one — fux's code, pinned
+in place, overriding the package — as safe to delete. That is decision 6's own
+mechanism — *a `doctor` check, never a rewrite and never a deletion*.
 
 **The payoff is structural.** The copy in `.fux/` is always written by the
 Python that wrote the index, so **a `_format` mismatch cannot happen** — which
@@ -537,32 +544,35 @@ repository** — decision 6b's hazard, firing a second time within a day, on the
 other annotatable file. So `fux doctor` gains a **`warn` row**, `index temp files
 ignored`, which is the only thing that reaches a repo set up before 2026-09-15.
 
-**7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded by
-path, and only under the two fenced paths — `fux add <URL>` and `fux ingest`.
-The two files fux can put there ship as package data with an extension Python's
-import machinery cannot resolve, so **fux copies them and never imports them**
-([SR-FETCHER](0117_fetcher.md) decision 1). One known consequence, accepted:
-linters that skip hidden directories by default (ruff does) will not lint them.
+**7. `fetchers/` is consumer code and fux never writes it.** A file there is
+loaded by path, only under the two fenced paths — `fux add <URL>` and `fux
+ingest` — and **overrides the declared fetcher package of the same name**
+([SR-PLUGINS](0165_plugins.md) P8). The two shipped fetchers are packages,
+`fux-fetcher-http` and `fux-fetcher-cdp`, which import nothing from fux
+([SR-FETCHER](0117_fetcher.md) decisions 1 and 6); fux copies neither into the
+repository. One known consequence, accepted: linters that skip hidden
+directories by default (ruff does) will not lint a consumer's file here.
 
-**8. `decoders/` is consumer code too, and the copies are what run.** `fux
-setup` writes all seventeen built-in decoders there, write-if-missing, and **the
-modules inside the installed package are not consulted while a copy exists** —
-so a consumer invited to override a decoder can read the ones they are
-overriding, in their own repo.
+**8. `decoders/` is consumer code too, and a copy there is what runs.** **The
+module fux ships is not consulted while a copy of the same name exists.** `fux
+setup` writes none since W-289 ([SR-PLUGINS](0165_plugins.md) P9); a copy an older
+setup wrote, or one a consumer drops in to override a decoder, keeps running.
+⚠ **Phase 2 of W-289 moves the decoder modules into their packages** and
+amends [SR-DECODE](0139_decode.md) decision 10, which still describes the seeding;
+until then the built-in module runs wherever no copy exists.
 
-**It follows `fetchers/`'s ownership model and not its packaging model.** A
-fetcher ships as `templates/*.py.txt` because it carries network code that must
-not be importable inside an offline package
-([SR-CDP-FETCHER](0118_cdp-fetcher.md) decision 8). A decoder is stdlib-only
-and offline, so it is already a legitimate module: **the module is the
-template**, copied out verbatim, and there is exactly one copy of every decoder
-in the repo rather than two that agree by habit. Three consequences that bite if
+**It follows `fetchers/`'s ownership model.** A fetcher ships as its own
+package because it carries network code that must not be importable inside an
+offline package ([SR-CDP-FETCHER](0118_cdp-fetcher.md) decision 9). A decoder is
+stdlib-only and offline, so it is already a legitimate module, and a copy of one
+is that module verbatim: there is exactly one source for every decoder rather
+than two that agree by habit. Three consequences that bite if
 forgotten:
 
-1. ⚠ **After setup, `src/fux/decode/` does not execute in that repo.** Engine
-   upgrades do not reach a consumer's decoders; they re-run `fux setup` after
-   deleting the file they want refreshed. This was ruled with the cost on the
-   table — the alternative (copies inert until edited) was declined.
+1. ⚠ **While a copy exists, the shipped module does not execute in that repo.**
+   Engine upgrades do not reach a copied decoder; deleting an unedited copy is
+   how a repository gets them back, and `fux doctor`'s `seeded copies removable`
+   row names each one.
 2. **A deleted copy restores the built-in.** `rm .fux/decoders/pdf.py` must
    not silently stop indexing PDFs, which looks exactly like a corpus with no
    PDFs in it.
@@ -811,8 +821,7 @@ rulings in one sitting.** What it writes now, and the rule behind each:
 | `[sources] urls_file` beside `dirs_file` | the two committed lists are one kind of thing ([SR-CONFIG](0113_config.md) decision 11a) |
 | `keep`, `enrich`, `update`, `fetch_at_answer` written **live** | closed, small value domains — the written line is the complete menu. ⚠ `meta` was in this list until W-194 deleted the key, 2026-09-20 |
 | `ttl`, `sweep_minutes`, `acquired_max_bytes` **absent** | defaults that may move; leaving them out is how a new value reaches this repo without an edit |
-| `[sources.url.config]` + one sub-table **per shipped fetcher**, live | one flat table refused every mixed-fetcher repo (decision 8a) |
-| those sub-tables **derived** from the fetchers, by `ast`, never executed | a transcribed table goes stale — `_urls_header()` is the scar (W-140 row 18); `cdp.py` must never run inside the package (SR-CDP-FETCHER decision 8) |
+| `[sources.url.config]`, shared and empty, with how a per-fetcher sub-table works | one flat table refused every mixed-fetcher repo (decision 8a). **No per-fetcher sub-table is scaffolded since W-289**: they were derived from the two fetcher templates, which are packages now and may not be installed when setup runs — a scaffold derived from them would differ by machine |
 
 ⚠ **The header now says what is NOT in the file and why**, because a reader who
 sees `keep` written and `ttl` missing will otherwise read the absence as an
@@ -821,14 +830,11 @@ oversight rather than a rule.
 **`fux.toml`'s starter is a TEMPLATE FILE now, not a string in `setup.py`**
 (Arpit, 2026-09-14: *"create a template for fux.toml file like others"*).
 `templates/fux.toml.txt`, read through `template_bytes` beside
-`pii.toml.txt`, `refusals.toml.txt` and the two fetchers.
+`pii.toml.txt` and `refusals.toml.txt`.
 
-- **Read, never imported** — and for a `.toml` that phrase means something
-  different than it does for `cdp.py.txt`. The fetchers are un-importable
-  because they carry network code that has no business inside an offline
-  package (SR-CDP-FETCHER decision 8). This one is a file because **a starter a
-  consumer is meant to open and edit belongs in a file they can open**, where a
-  stray quote is a typo in a config and not a syntax error in the engine.
+- **Read, never imported** — a file because **a starter a consumer is meant to
+  open and edit belongs in a file they can open**, where a stray quote is a typo
+  in a config and not a syntax error in the engine.
 - ⚠ **`{default}` is now SUBSTITUTED, not `.format`ted**, and the change of
   mechanism is the point. W-83's property is unchanged — the number written and
   the number applied are one object, asserted by `tests/test_setup.py` — but
@@ -955,7 +961,7 @@ line raises names the fix itself rather than pointing at the header.
 
 ### Consequences
 
-- **Dotdir Python at least compiles** (W-246, 2026-10-04): `tests/test_dotdir_hygiene.py` `ast.parse`s and `compile`s every `templates/*.py.txt` and this repository's own `.fux/{fetchers,decoders}/*.py`, files no default tool looks at; `[tool.ruff] extend-include` names the same dotdirs for whoever runs ruff (not a dev dependency).
+- **Dotdir Python at least compiles** (W-246, 2026-10-04): `tests/test_dotdir_hygiene.py` `ast.parse`s and `compile`s this repository's own `.fux/{fetchers,decoders}/*.py` (the `templates/*.py.txt` fetchers it also covered are packages since W-289), files no default tool looks at; `[tool.ruff] extend-include` names the same dotdirs for whoever runs ruff (not a dev dependency).
 - **`.fux/observers/` is the third committed consumer-owned directory**
   (W-170, 2026-09-15), beside `fetchers/` and `decoders/`, and it is listed in
   the generated `.fux/README` with the others.

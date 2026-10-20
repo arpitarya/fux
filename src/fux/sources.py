@@ -526,16 +526,15 @@ def _resolved_fetch(root: Path, url: str) -> str:
     if stem is not None:
         return stem
 
-    try:
-        on_disk = sorted(p.stem for p in fetchers_dir.glob("*.py"))
-    except OSError:
-        on_disk = []
+    from . import plugins
+
+    on_disk = plugins.fetcher_names(root)
     host = urlsrc.routes.normalise_host(url)
-    have = ", ".join(on_disk) if on_disk else "none — run `fux setup`"
+    have = ", ".join(on_disk) if on_disk else "none — `fux setup` declares the shipped packages"
     raise FuxError(
         f"no fetcher resolves for {host!r}: nothing in [sources.url.routes] matches it and "
         f"no ROUTES claim in {FETCHERS_DIR}/ does either. "
-        f"Fetchers on disk: {have}. "
+        f"Fetchers available (files in {FETCHERS_DIR}/ and declared packages): {have}. "
         f"Write `--fetch <stem>` on this command, or add a route "
         f'(`[sources.url.routes]` `"{host}" = "<stem>"`). '
         f"There is no default fetcher (W-199, 2026-09-20)"
@@ -595,7 +594,7 @@ def _observed_decoder(root: Path, url: str, fetch: str) -> str:
     if source is None:
         raise FuxError(
             f"{url} needs a `decoder=`, and there is no [sources.url] in {CONFIG_NAME} to "
-            "observe one with. `fux setup` writes a fetcher, or pass `--decoder <stem>`"
+            "observe one with. `fux setup` writes one, or pass `--decoder <stem>`"
         )
 
     fetcher_path = urlsrc.fetcher_for(fetch)

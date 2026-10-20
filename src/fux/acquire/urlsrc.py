@@ -119,28 +119,55 @@ class UrlEntry:
 
 
 def load_fetcher(root: Path, rel_path: str):
-    """Import a consumer fetcher file; fail loudly if it's unusable."""
+    """The fetcher for `.fux/fetchers/<name>.py`; fail loudly if it's unusable.
+
+    🔴 **SR-PLUGINS P8 — the consumer's file, then a declared package, then
+    nothing.** A file at `rel_path` is loaded by path and wins outright. Without
+    one, the package `.fux/plugins.toml` declares for `fetch=<name>` is verified
+    (P4) and loaded by its fixed import name (P7). An installed package nobody
+    declared is never consulted (P3), so this is the one place a fetcher
+    package is ever executed, and only once a URL line names it (P10).
+    """
     path = root / rel_path
     if not path.is_file():
-        # ⚠ **The message has to cover a name fux never shipped** (W-178). It
-        # said *"run `fux setup` to write the shipped fetchers"* and nothing
-        # else — correct while `fetch=` was an enum of `http` and `cdp`, and
-        # actively misleading for `fetch=glasbox`, where `fux setup` writes two
-        # files and none of them is the one the line names. So it names the
-        # sibling files that DO exist, which is the fix for a typo, and keeps
-        # the setup hint for the case where the directory is simply empty.
+        rel = PurePosixPath(rel_path)
+        if rel.parent.as_posix() == config.FETCHERS_DIR:
+            from .. import plugins
+
+            resolved = plugins.resolve(root, "fetcher", rel.stem)
+            if resolved.how == "package":
+                module = plugins.load(resolved.declared)
+                if not callable(getattr(module, "fetch", None)):
+                    raise FuxError(f"fetcher defines no fetch(url) callable: {resolved.declared.name}")
+                return module
+        # ⚠ **The message has to cover a name fux never shipped** (W-178), and
+        # since W-289 it names the PACKAGE too (SR-PLUGINS P4): the sibling files
+        # that do exist are the fix for a typo; the package and the one command
+        # that declares it are the fix for a fresh repository.
         try:
             siblings = sorted(p.stem for p in path.parent.glob("*.py"))
         except OSError:  # pragma: no cover - an unreadable directory
             siblings = []
+        from .. import plugins
+
+        package = f"{fixed('plugins', 'dist_prefix')}fetcher-{rel.stem}"
         beside = (
             f" {path.parent.name}/ has {siblings}, so check the `fetch=` name on the line"
             if siblings
-            else " run `fux setup` to write the shipped fetchers into .fux/fetchers/"
+            else f" {path.parent.name}/ holds no fetcher file"
+        )
+        # `fux setup` is named only where it would help: it proposes a FIRST-
+        # PARTY package, and writes no module a line asks for by another name.
+        declare = (
+            f"declare {package} (`fux setup` proposes it from the URL list and prints "
+            "the install line)"
+            if package in plugins.first_party()
+            else f"declare the package that provides it in {fixed('plugins', 'file')}"
         )
         raise FuxError(
-            f"fetcher not found: {rel_path} (looked in {path}) —{beside}, or point "
-            "[sources.url] fetcher at your own file. `fux doctor` reports this before a run"
+            f"fetcher not found: {rel_path} (looked in {path}), and "
+            f"{fixed('plugins', 'file')} declares no package for fetch={rel.stem} —{beside}; "
+            f"or {declare}, or write the file yourself. `fux doctor` reports this before a run"
         )
     spec = importlib.util.spec_from_file_location("fux_url_fetcher", path)
     if spec is None or spec.loader is None:

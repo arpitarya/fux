@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-19
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@55cb4f3000df]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@618219cef3d9]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 8db26bf50eb2befe9ce283664fb0f7cf677adb227b8b610eb1b4ff4406e2476a
+content_sha: ead8da0e1d85dca041d63bbcfdde182ea338136aeb03e815afd06f8081838745
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -201,6 +201,8 @@ pattern. A consumer who wants other cues is I2, which is not built.
 **W-278 — `[runtime] schema` is `fux.runtime.v11` (2026-10-13; branch, unmerged).** The section statistics left `stats.json`, so a v10 plane is refused by name and rebuilt.
 
 **New fixed values, no decision moved** (W-287, 2026-10-19): `[decoders.xlsx.format]` gains the styles part, ECMA-376's built-in date/time `numFmtId`s, the three serial-date epochs, the phantom leap day and seconds per day; `[decoders.html.format]` WHATWG's span clamps; `[tables] record_headers`, the closed list of `Field | Value`-style header pairs; `[radix] percent`, a `*_percent` cap's denominator. Decoder versions: `html` 2, `docx` 2, `xlsx` 3. Both planes read `[tables]` ([SR-CHUNKING](0151_chunking.md) decision 2b).
+
+**No decision here moved** (W-289, 2026-10-20): `[plugins]` and `[plugins.packages.<name>]` hold the plugin declaration's fixed identity — the file's name and row keys, the naming rule, the digest prefix, the install line's verb, and the fifteen first-party packages with their kind, suffixes, decoder modules and dependencies ([SR-PLUGINS](0165_plugins.md) P2). A repository's declaration cannot redefine a name in this table.
 
 ### Consequences
 

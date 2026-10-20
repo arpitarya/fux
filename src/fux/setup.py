@@ -6,21 +6,19 @@ module existing (SR-DOTFUX decision 6, SR-FETCHER decision 6):
 | moment | writes | why |
 |---|---|---|
 | `ensure_layout`, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore` | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory |
-| `fux setup` | `fux.toml`, the two source lists with their headers, and the fetchers | **optional, explicit, once per repo** — a consumer asked for it |
+| `fux setup` | `fux.toml`, the two source lists with their headers, and `.fux/plugins.toml` | **optional, explicit, once per repo** — a consumer asked for it |
 
-**`ensure_layout` must never write a fetcher.** That is what keeps `fux ingest`
-from putting 28 KB of WebSocket code into a repo that only wanted an index. It
-is also why `.fux/fetchers/http.py` can be relied on to exist: setup put it there,
-because someone ran setup.
+**`fux setup` writes no decoder or fetcher any more** (W-289, SR-PLUGINS P9).
+Each is a separately published package the repository DECLARES in
+`.fux/plugins.toml`: setup scans the configured sources, proposes the packages
+their formats and URL lines need, writes the declaration, and prints the one
+install line. **It installs nothing** — no network from fux (L5) — and a file a
+consumer drops into `.fux/fetchers/` or `.fux/decoders/` still overrides the
+package of the same name (P8).
 
-The two fetchers ship in the wheel as **package data under `templates/`, with
-an extension Python's import machinery cannot resolve**. Bytes, copied out,
-never imported — which makes SR-FETCHER's adapter cap structural rather than a
-rule someone has to remember. A fetcher fux imports is a fetcher fux owns.
-
-Everything here is **write-if-missing**. An edited `http.py` survives every
-later `fux setup`, exactly as an annotated `.fux/README.md` survives every
-ingest.
+Everything here is **write-if-missing**, except `.fux/plugins.toml`, whose rows
+setup ADDS (a package the sources now need) and PINS (a row with no digest,
+once its package is installed; every row under `--pin`) and never removes.
 
 This is also the one verb that may run before a repo root exists — it is what
 writes the `fux.toml` that *makes* a directory a root, so demanding one first
@@ -49,10 +47,12 @@ from .errors import FuxError
 from .acquire import fuxignore, pii, refusals
 from .store import fuxdir
 
-#: Generated name -> the package-data file it is copied from.
-FETCHERS = {"http.py": "http.py.txt", "cdp.py": "cdp.py.txt"}
+#: The fetchers and decoders a pre-W-289 `fux setup` seeded into `.fux/`, by
+#: name. Nothing writes them now (SR-PLUGINS P9); `fux doctor` reads the list to
+#: name the unedited copies a repository may delete.
+SEEDED_FETCHERS = ("cdp.py", "http.py")
 
-#: The starter refusal rules, shipped as package data like the fetchers.
+#: The starter refusal rules, shipped as package data.
 REFUSALS_TEMPLATE = "refusals.toml.txt"
 PII_TEMPLATE = "pii.toml.txt"
 #: The scaffolded `fux.toml`, shipped the same way. See `config_text`.
@@ -60,8 +60,7 @@ CONFIG_TEMPLATE = "fux.toml.txt"
 
 FETCHERS_DIR = "fetchers"
 
-#: W-86 P7. Every built-in decoder is copied here at setup and the copy is what
-#: runs — see `decoder_source` for why there is no `.py.txt` template.
+#: Where a pre-W-289 `fux setup` copied every built-in decoder.
 DECODERS_DIR = "decoders"
 
 #: What `fux setup` writes into `.fux/observers/`.
@@ -594,96 +593,31 @@ def _toml_scalar(value) -> str:
     raise TypeError(type(value).__name__)
 
 
-def fetcher_defaults(name: str) -> "dict[str, object]":
-    """A shipped fetcher's tunables and their current defaults — **read by
-    `ast`, never executed.**
-
-    ⚠ **The fetchers are package data precisely so they are not imported**
-    (SR-CDP-FETCHER decision 8): `cdp.py` carries network code that has no
-    business running inside an offline package, and `fux setup` is the last
-    place that should launch a browser. So this parses the file and reads two
-    things statically: the `_SETTINGS` map (config key -> module global) and
-    the module-level assignment to each of those globals.
-
-    **Derived, never transcribed.** The alternative was typing the values into
-    `templates/fux.toml.txt`, and this repo has already paid for that once —
-    `_urls_header()` below carries the same lesson (W-140 row 18: the table was
-    transcribed and went stale).
-
-    A value whose default is not a plain literal is skipped rather than
-    guessed: a key absent from the scaffolded file falls back to the fetcher's
-    own constant, which is correct, where a wrong literal would not be.
-    """
-    import ast
-
-    tree = ast.parse(template_bytes(name).decode("utf-8"))
-    globals_: dict[str, object] = {}
-    settings: dict[str, str] = {}
-    for node in tree.body:
-        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
-            continue
-        target = node.targets[0]
-        if not isinstance(target, ast.Name):
-            continue
-        if target.id == "_SETTINGS" and isinstance(node.value, ast.Dict):
-            for k, v in zip(node.value.keys, node.value.values):
-                if isinstance(k, ast.Constant) and isinstance(v, ast.Tuple) and v.elts:
-                    first = v.elts[0]
-                    if isinstance(first, ast.Constant):
-                        settings[k.value] = first.value
-            continue
-        try:
-            globals_[target.id] = ast.literal_eval(node.value)
-        except (ValueError, SyntaxError):
-            continue  # a computed default -- the fetcher's own value stands
-    out: dict[str, object] = {}
-    for key, global_name in settings.items():
-        if global_name in globals_:
-            out[key] = globals_[global_name]
-    return out
-
-
 def url_config_tables() -> str:
-    """`[sources.url.config]` and one sub-table per shipped fetcher.
+    """`[sources.url.config]`, shared and empty, with how a per-fetcher table works.
 
-    ⚠ **Two tables, because one was BROKEN for any repo using both** (Arpit,
-    2026-09-14). The single flat table went verbatim to every fetcher and each
-    `configure()` raises on a key it does not know, so `cdp_port` made
-    `http.py` refuse and `timeout_s` made `cdp.py` refuse. The scaffolded file
-    could only ever comment the block out, which is how it shipped.
+    ⚠ **Two levels, because one was BROKEN for any repo using both** (Arpit,
+    2026-09-14): one flat table went verbatim to every fetcher, and each
+    `configure()` raises on a key it does not know. A key at the top level goes
+    to every fetcher; a `[sources.url.config.<name>]` table to one.
 
-    The shared table stays, and stays **empty in the scaffold**: a key belongs
-    there only when every fetcher a repo loads knows it, and fux cannot know
-    that for a fetcher somebody writes tomorrow.
+    **No per-fetcher table is scaffolded** (W-289). They were derived from the
+    two shipped templates, which are packages now — `fux-fetcher-http` and
+    `fux-fetcher-cdp` — and may not be installed when setup runs, so a scaffold
+    derived from them would differ by machine. A fetcher with no table runs on
+    its own defaults, which its package documents.
     """
-    # ⚠ **"your fetchers", plural and open** (W-178, 2026-09-15). `fetch=` is a
-    # typed attribute now, so the set is whatever `.fux/fetchers/*.py` holds --
-    # the two below are the ones fux SHIPS, not the ones a repo may use. The
-    # per-table comments are correct as written; this block's wording is what
-    # used to imply the set was two.
     lines = [
         "# Handed to your fetcher's configure() verbatim; fux reads no key inside.",
         "# A key at THIS level goes to every fetcher -- only put one here that all",
         "# of yours know, because each configure() refuses a key it does not.",
         "#",
-        "# One sub-table per fetcher, named after its file without `.py`. The two",
-        "# below ship with fux; add a table for any fetcher you drop into",
-        "# .fux/fetchers/ and name on a URL line with `fetch=<name>`.",
+        "# One sub-table per fetcher, named after its `fetch=` name: a package's",
+        "# (`fux-fetcher-http` -> [sources.url.config.http]) or a file you dropped",
+        "# into .fux/fetchers/. Each fetcher's keys and defaults are in its docs.",
         "[sources.url.config]",
-        "",
     ]
-    for generated, template in sorted(FETCHERS.items()):
-        stem = generated.removesuffix(".py")
-        defaults = fetcher_defaults(template)
-        if not defaults:  # pragma: no cover - a fetcher with no tunables
-            continue
-        lines.append(f"# Only .fux/fetchers/{generated} receives these.")
-        lines.append(f"[sources.url.config.{stem}]")
-        width = max(len(k) for k in defaults)
-        for key in sorted(defaults):
-            lines.append(f"{key.ljust(width)} = {_toml_scalar(defaults[key])}")
-        lines.append("")
-    return "\n".join(lines).rstrip("\n") + "\n"
+    return "\n".join(lines) + "\n"
 
 
 def config_text() -> str:
@@ -692,7 +626,7 @@ def config_text() -> str:
     ⚠ **It was a triple-quoted constant in this module until 2026-09-14**
     (Arpit: *"create a template for fux.toml file like others"*). It is now
     `templates/fux.toml.txt`, beside `pii.toml.txt`, `refusals.toml.txt` and
-    the two fetchers — **read, never imported**, which for a `.toml` is a
+    the starters — **read, never imported**, which for a `.toml` is a
     statement about where it lives rather than about safety: a starter a
     consumer is meant to read and edit belongs in a file they can open, not
     inside a Python string where a stray quote is a syntax error in the engine.
@@ -702,8 +636,7 @@ def config_text() -> str:
     `urlsrc.DEFAULT_MAX_PARALLEL` so the file and the engine could not drift;
     the engine now holds no copy at all, so there is nothing to drift from.
     `{url_config}` is still SUBSTITUTED, by `str.replace` rather than
-    `str.format` — the fetcher tables are the fetchers' own, derived from their
-    templates, and `format` would raise on any `{` added to a comment.
+    `str.format` — `format` would raise on any `{` added to a comment.
     """
     text = template_bytes(CONFIG_TEMPLATE).decode("utf-8")
     return text.replace("{url_config}", url_config_tables())
@@ -820,16 +753,24 @@ class SetupReport:
     workspace_note: "str | None" = None
     #: The package manager whose install command the consumer now has to run.
     workspace_manager: "str | None" = None
+    #: Fux-written files this run UPDATED in place — `.fux/plugins.toml`'s
+    #: added or pinned rows, and nothing else (SR-PLUGINS P6).
+    updated: list[str] = field(default_factory=list)
+    #: The one install line for declared packages this machine lacks, or `None`.
+    install_line: "str | None" = None
+    #: Declared packages with no digest yet — pinned by the next `fux setup`.
+    unpinned: list[str] = field(default_factory=list)
+    #: Why `.fux/plugins.toml` could not be written, when it could not.
+    plugins_note: "str | None" = None
 
 
 def template_bytes(name: str) -> bytes:
-    """Read one shipped fetcher out of the wheel. **Read, never imported.**"""
+    """Read one shipped starter out of the wheel. **Read, never imported.**"""
     try:
         return (resources.files("fux") / "templates" / name).read_bytes()
     except (FileNotFoundError, ModuleNotFoundError) as exc:  # pragma: no cover - broken install
         raise FuxError(
-            f"the shipped fetcher {name!r} is missing from this install — "
-            "reinstall fux-engine, or write .fux/fetchers/ yourself"
+            f"the shipped template {name!r} is missing from this install — reinstall fux-engine"
         ) from exc
 
 
@@ -1076,45 +1017,17 @@ def fill_missing(root: Path) -> "list[str]":
     return changed
 
 
-def decoder_source(name: str) -> bytes:
-    """One built-in decoder's source, read out of the installed package.
-
-    **There is no `.py.txt` template for a decoder, and the asymmetry with the
-    fetchers is deliberate.** A fetcher template must be un-importable because
-    it carries network code that has no business inside an offline package
-    (SR-CDP-FETCHER decision 8). A decoder is stdlib-only and offline — it is
-    already a legitimate module — so the module *is* the template, and there is
-    exactly one copy of every decoder in the repo rather than two that agree by
-    habit. That was the `_MdParser` defect, and repeating it sixteen times would
-    be worse than committing it once.
-
-    The modules use absolute imports for this reason: the bytes fux ships and
-    the bytes the consumer edits are identical below the copy's one stamp line
-    (`stamped`, W-262), and a path-loaded copy still resolves `fux.decode._zip`.
-    """
-    try:
-        return (resources.files("fux") / "decode" / f"{name}.py").read_bytes()
-    except (FileNotFoundError, ModuleNotFoundError) as exc:  # pragma: no cover
-        raise FuxError(
-            f"the built-in decoder {name!r} is missing from this install — "
-            "reinstall fux-engine"
-        ) from exc
-
-
-# -- W-262: the template stamp (Arpit, 2026-10-04, W-251 #2 -- option B) -------
+# -- W-262: the template stamp, READ only since W-289 ---------------------------
 #
-# Every decoder and fetcher copy `fux setup` seeds carries ONE first line: the
-# stamp prefix and the sha256 of the template it came from. Below that line the
-# bytes are the shipped template exactly -- no import is rewritten, nothing is
-# transformed -- so the file fux tests is still the file the consumer runs.
+# A pre-W-289 `fux setup` seeded every decoder and fetcher copy with ONE first
+# line: the stamp prefix and the sha256 of the template it came from, the bytes
+# below it the template exactly. Nothing seeds a copy now (SR-PLUGINS P9): the
+# package runs, and a same-named file in `.fux/` overrides it (P8). The stamp
+# survives as a READ: a copy whose body still hashes to its stamp is unedited —
+# fux's code, not the consumer's — so `fux doctor` names it as removable.
 #
-# 🔴 **The stamp is read, never acted on.** `fux doctor` uses it to tell an
-# UNEDITED copy (body still hashes to its stamp) whose template has since moved
-# from a copy the consumer has made their own, and names the first with the lever
-# *re-seed it yourself*. **fux never rewrites the file** -- SR-DOTFUX decision 6:
-# a change that must reach an existing repo goes through a loader refusal or a
-# `doctor` check, never a rewrite. Option A, which would have refreshed unedited
-# copies on upgrade, was refused in the same ruling.
+# 🔴 **fux never deletes one** (SR-DOTFUX decision 6): removing it is the
+# consumer's act.
 #
 # ⚠ **The digest is over LF-normalised bytes**, so a checkout with
 # `core.autocrlf` does not turn every unedited copy into an "edited" one.
@@ -1134,7 +1047,8 @@ def template_digest(body: bytes) -> str:
 
 
 def stamped(body: bytes) -> bytes:
-    """`body` with its stamp line in front -- what `fux setup` writes."""
+    """`body` with its stamp line in front -- the shape a pre-W-289 setup wrote,
+    stated once so the reader below and its tests cannot disagree."""
     return f"{template_stamp()}{template_digest(body)}\n".encode("ascii") + body
 
 
@@ -1150,16 +1064,14 @@ def read_stamp(raw: bytes) -> "tuple[str | None, bytes]":
     return digest, rest
 
 
-def seeded_copies() -> "list[tuple[str, bytes]]":
-    """`(path under .fux/, current template bytes)` for every stamped copy.
+def seeded_paths() -> "list[tuple[str, str, str]]":
+    """`(kind, name, path under .fux/)` for every copy a pre-W-289 setup seeded.
 
-    The fetchers and the built-in decoders, in that order and each sorted --
-    the same set `run` writes, so the `doctor` row and the writer cannot drift.
+    The fetchers and the built-in decoders, in that order and each sorted.
     """
-    pairs = [(f"{FETCHERS_DIR}/{name}", template_bytes(t)) for name, t in sorted(FETCHERS.items())]
+    pairs = [("fetcher", name.removesuffix(".py"), f"{FETCHERS_DIR}/{name}") for name in SEEDED_FETCHERS]
     pairs += [
-        (f"{DECODERS_DIR}/{name}.py", decoder_source(name))
-        for name in sorted(decode_mod.BUILTIN_MODULES)
+        ("decoder", name, f"{DECODERS_DIR}/{name}.py") for name in sorted(decode_mod.BUILTIN_MODULES)
     ]
     return pairs
 
@@ -1711,7 +1623,63 @@ def wire_workspace(root: Path, workspace: Workspace) -> "tuple[bool, str | None]
     return True, None
 
 
-def run(root: Path, *, agents: bool = True) -> SetupReport:
+def write_plugins(root: Path, report: "SetupReport", *, pin_all: bool = False) -> None:
+    """`.fux/plugins.toml` — SR-PLUGINS P6, and the only fux-written file
+    setup ever updates.
+
+    - **No file**: write one row per package `plugins.propose` names, each
+      pinned from what is installed, or left without a digest when it is not.
+    - **A file**: every row is kept as written; a package the sources now need
+      and the file lacks is ADDED; a row with no digest is PINNED once its
+      package is installed. Nothing is removed — an unneeded row is the
+      consumer's to delete.
+    - **`--pin`**: every row is re-pinned from what is installed — the one
+      deliberate act after an upgrade, and never implicit.
+
+    🔴 **Installs nothing.** The packages a row names but this machine lacks
+    become ONE install line, printed by `cmd_setup` (L5: fux opens no socket).
+    """
+    from . import plugins
+
+    target = plugins.path(root)
+    rel = target.relative_to(root).as_posix()
+    try:
+        existing = plugins.read(root)
+        proposed = plugins.propose(root)
+    except FuxError as exc:
+        report.plugins_note = str(exc)
+        return
+    rows = dict(existing or {})
+    changed = existing is None
+    for name in proposed:
+        if name not in rows:
+            rows[name] = plugins.pin(name)
+            changed = True
+    for name, decl in sorted(rows.items()):
+        if pin_all or not decl.digest:
+            suffixes = () if decl.package.first_party else decl.package.suffixes
+            try:
+                fresh = plugins.pin(name, suffixes)
+            except FuxError:
+                continue  # a third-party package that is not installed keeps its row
+            if fresh != decl:
+                rows[name] = fresh
+                changed = True
+    if changed:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(plugins.render(list(rows.values())), encoding="utf-8")
+        (report.written if existing is None else report.updated).append(rel)
+        plugins.reset()
+    missing = [
+        (decl.name, decl.version)
+        for decl in rows.values()
+        if plugins.installed_version(decl.name) != decl.version
+    ]
+    report.install_line = plugins.install_line(missing) if missing else None
+    report.unpinned = sorted(name for name, decl in rows.items() if not decl.digest)
+
+
+def run(root: Path, *, agents: bool = True, pin: bool = False) -> SetupReport:
     """Write the consumer-owned files, write-if-missing. Returns what happened.
 
     `agents=False` is `--no-agents`, and it must write **nothing** under
@@ -1750,19 +1718,11 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
         (report.written if path.exists() else report.removed).append(rel)
 
     directory = fuxdir.fux_dir(root)
-    for name, template in FETCHERS.items():
-        _write_if_missing(
-            directory / FETCHERS_DIR / name, stamped(template_bytes(template)), report, root
-        )
-
-    # W-86 P7, ruled by Arpit 2026-08-26: every built-in decoder is written into
-    # `.fux/decoders/`, and **the copy is what runs** (SR-DECODE decision 11).
-    # Both planes are stamped (W-262) so `fux doctor` can name an unedited copy
-    # whose template has since changed -- and still never rewrites one.
-    for name in decode_mod.BUILTIN_MODULES:
-        _write_if_missing(
-            directory / DECODERS_DIR / f"{name}.py", stamped(decoder_source(name)), report, root
-        )
+    # W-289, SR-PLUGINS P9: no decoder and no fetcher is seeded. The package a
+    # repository declares is what runs, so an engine fix reaches it with the
+    # next install; a file the consumer writes into `.fux/decoders/` or
+    # `.fux/fetchers/` still overrides it (P8). `.fux/plugins.toml` is written
+    # below, after `fux.toml` and the source lists it scans.
 
     # W-170 — the directory exists so a consumer can find it, with a README
     # saying what goes in it. An empty directory git cannot commit would be
@@ -1822,6 +1782,9 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     # now requires; without this, `_agents_to_install` read a `fux.toml` that
     # would not load and fell back to the template's vendors (W-225 stage 3b).
     report.written += fill_missing(root)
+    # W-289, SR-PLUGINS P6: after `fux.toml` and the two source lists, which
+    # are what the scan reads.
+    write_plugins(root, report, pin_all=pin)
 
     # After `fux.toml`, so a first run reads the default this very call just
     # wrote out in full, and a later run reads whatever the consumer edited it
@@ -1847,9 +1810,13 @@ def cmd_setup(args) -> int:
     # marker (`fux.toml`), so requiring one first would be circular. Everywhere
     # else, no root is an error.
     root = find_root() or Path.cwd()
-    report = run(root, agents=not getattr(args, "no_agents", False))
+    report = run(
+        root, agents=not getattr(args, "no_agents", False), pin=getattr(args, "pin", False)
+    )
     for rel in report.written:
         print(f"  wrote {rel}")
+    for rel in report.updated:
+        print(f"  updated {rel} (rows added or pinned; none removed)")
     for rel in report.kept:
         print(f"  kept  {rel} (yours; never rewritten)")
     for rel in report.removed:
@@ -1923,6 +1890,21 @@ def cmd_setup(args) -> int:
         print(
             "        Turn them off with [agents] install = [] in fux.toml, "
             "or `fux setup --no-agents`."
+        )
+
+    # SR-PLUGINS P6: the one install line, printed and never run (L5). ASCII
+    # only: these bytes reach a Windows console (SR-CLI veto 7).
+    if report.plugins_note:
+        print()
+        print(f"  note: .fux/plugins.toml was not written: {report.plugins_note}")
+    if report.install_line:
+        print()
+        print("  install the packages .fux/plugins.toml declares (fux installs nothing):")
+        print(f"        {report.install_line}")
+    if report.unpinned:
+        print(
+            f"        then run `fux setup` again to pin {len(report.unpinned)} package(s): "
+            + ", ".join(report.unpinned)
         )
 
     load(root)  # a hand-edited fux.toml fails loudly here, not on the first ingest

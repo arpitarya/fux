@@ -1,10 +1,8 @@
-"""`fux setup` writes every built-in decoder into `.fux/decoders/`, and the copy
-is what runs — W-86 P7, ruled by Arpit 2026-08-26.
-
-The consequence that makes these tests worth having: **after setup, the modules
-inside the installed package never execute.** A repo's decoders are its own
-files. That is the intended behaviour, and it means two things have to hold or
-the whole plane is quietly broken:
+"""A decoder copy in `.fux/decoders/` is what runs — W-86 P7, ruled by Arpit
+2026-08-26 — and since W-289 nothing seeds one: `fux setup` writes no decoder
+(SR-PLUGINS P9), and a copy a consumer keeps, or a pre-W-289 setup left,
+overrides the module fux ships (P8). The fixture below seeds the copies the way
+that older setup did, so the plane's contract is still held:
 
 * every copied file must **load standalone**, with no parent package to resolve
   a relative import against;
@@ -28,12 +26,25 @@ from fux.decode import BUILTIN_MODULES, decode, registry
 
 @pytest.fixture
 def repo(tmp_path: Path) -> Path:
+    """A repository holding every decoder copy, stamped, as a pre-W-289 setup
+    seeded them."""
     (tmp_path / ".git").mkdir()
     setup_mod.run(tmp_path, agents=False)
+    package = Path(setup_mod.__file__).parent / "decode"
+    for name in BUILTIN_MODULES:
+        copy = tmp_path / ".fux" / "decoders" / f"{name}.py"
+        copy.parent.mkdir(parents=True, exist_ok=True)
+        copy.write_bytes(setup_mod.stamped((package / f"{name}.py").read_bytes()))
     return tmp_path
 
 
-def test_setup_writes_every_builtin_decoder(repo: Path):
+def test_setup_seeds_no_decoder_any_more(tmp_path: Path):
+    """SR-PLUGINS P9: the shipped module (later, the declared package) runs."""
+    setup_mod.run(tmp_path, agents=False)
+    assert not (tmp_path / ".fux" / "decoders").exists()
+
+
+def test_every_seeded_decoder_is_one_built_in_module(repo: Path):
     written = sorted(p.stem for p in (repo / ".fux" / "decoders").glob("*.py"))
     assert written == sorted(BUILTIN_MODULES)
 
@@ -97,9 +108,8 @@ def test_a_deleted_copy_falls_back_to_the_packaged_module(repo: Path):
 def test_setup_never_overwrites_an_edited_decoder(repo: Path):
     edited = repo / ".fux" / "decoders" / "json.py"
     edited.write_text("EXTENSIONS = ('.json',)\ndef decode(raw, rel_path):\n    return '# mine'\n")
-    report = setup_mod.run(repo, agents=False)
+    setup_mod.run(repo, agents=False)
     assert edited.read_text().endswith("return '# mine'\n")
-    assert ".fux/decoders/json.py" in report.kept
 
 
 def test_the_decoders_directory_is_declared(repo: Path):

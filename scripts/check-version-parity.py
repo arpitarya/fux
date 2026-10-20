@@ -81,6 +81,36 @@ SITES = {
 }
 
 
+def _plugin(name: str):
+    """W-289: a plugin package's static `version` and every `==` pin it carries
+    (`fux-core`, `fux-extension-table`) — one version, or a string naming each
+    so the comparison fails loudly. A fetcher package pins nothing."""
+    path = f"packages/{name}/pyproject.toml"
+
+    def read(root: Path) -> str | None:
+        text = (root / path).read_text(encoding="utf-8")
+        m = re.search(r'^version\s*=\s*"([^"]+)"', text, re.M)
+        if m is None:
+            return None
+        found = {"version": m.group(1)}
+        found |= {f"{n} pin": v for n, v in re.findall(r'"(fux-[a-z-]+)==([^"]+)"', text)}
+        if len(set(found.values())) == 1:
+            return m.group(1)
+        return " / ".join(f"{k} {v}" for k, v in found.items())
+
+    return read
+
+
+#: W-289: the fifteen plugin packages (SR-PLUGINS), released in lockstep with
+#: fux — each pyproject.toml is a site. The list is the directories on disk, so
+#: a sixteenth package is checked the day it is added.
+PLUGINS = sorted(
+    p.name for p in (ROOT / "packages").glob("fux-*-*")
+    if p.name.split("-")[1] in ("decoder", "fetcher", "extension")
+)
+SITES |= {f"packages/{n}/pyproject.toml": _plugin(n) for n in PLUGINS}
+
+
 #: The BUNDLE is not a site — it is a DERIVATION, and that distinction is the
 #: whole reason it is checked separately. `node/dist/fux.mjs` is generated from
 #: `node/`, so nobody can forget to bump it; what can go wrong is the

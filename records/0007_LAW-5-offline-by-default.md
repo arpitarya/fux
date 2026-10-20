@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L5
 owns: []
 laws: [L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 4ac7050824b965354822d92f2c79330ccfd8aed35a5b56eb1ce618c933f41f68
+content_sha: 39e06e88b472024736dbc5148efc8ff86495d39ac2a2401749a0b00ca65d9c3f
 ---
 
 # SR-LAW-5 — L5 — offline by default
@@ -49,7 +49,7 @@ open a socket now — and the fence moved with it: the import test asserts that
 text is untouched**, and §"The narrowing that already happened once" below is
 the record of why reading a count off this table is the mistake.
 
-**Network code lives in the consumer's repo, not in the package.** `fux setup` writes `http.py` and `cdp.py` into `.fux/fetchers/`, where they become the consumer's own code. That is why the package can keep zero network lines while URLs still work — and it is a decision of [SR-CDP-FETCHER](0118_cdp-fetcher.md), not of this law.
+**Network code lives outside the engine's packages.** The two shipped fetchers are their own distributions, `fux-fetcher-http` and `fux-fetcher-cdp`, which a repository runs only when its `.fux/plugins.toml` declares them and a URL line names one; a consumer's own fetcher lives in `.fux/fetchers/`. That is why the engine can keep zero network lines while URLs still work, and the import fence extends to the fetcher packages: no offline path executes one (`tests/test_plugin_fence.py`). It is a decision of [SR-CDP-FETCHER](0118_cdp-fetcher.md) and [SR-PLUGINS](0165_plugins.md) (W-289, ruled by Arpit 2026-10-19), not of this law — the law's text is untouched.
 
 ### ⚠ The narrowing that already happened once
 

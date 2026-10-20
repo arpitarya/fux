@@ -64,8 +64,10 @@ attribute is another `fux add` on the same entry — it is an upsert.
   **mandatory** — see below), `keep`, `enrich`, `archived` (`true`/`false`),
   `ttl` (`0` or `<int>s|m|h|d`), `update` (`auto`|`never`).
 - 🔴 **`fetch=` is a NAME, not an enum** (3.0). It resolves to
-  `.fux/fetchers/<name>.py`, so `fetch=confluence` works the moment you write
-  that file — the same pattern `.fux/decoders/` already uses. The grammar
+  `.fux/fetchers/<name>.py` when that file exists, else to the fetcher package
+  `.fux/plugins.toml` declares (`fux-fetcher-http`, `fux-fetcher-cdp`), so
+  `fetch=confluence` works the moment you write that file — the same pattern
+  `.fux/decoders/` already uses. The grammar
   checks shape only; `fux doctor`'s `fetcher bindings` row reports a name with
   no file, and a **typo now parses**. The `fux-fetcher` skill covers writing one.
 - 🔴 **`decoder=` is a NAME too, and a URL line MUST state it** (the pipe,
@@ -105,7 +107,7 @@ entry.
 | flag | records | valid for |
 |---|---|---|
 | `--archived` | `archived=true` | dirs, urls |
-| `--fetch STEM` | `fetch=STEM` — a file in `.fux/fetchers/`. Without it the routes table and the modules' `ROUTES` claims decide, and nothing matching **refuses** | urls |
+| `--fetch STEM` | `fetch=STEM` — a file in `.fux/fetchers/`, or a declared fetcher package. Without it the routes table and the modules' `ROUTES` claims decide, and nothing matching **refuses** | urls |
 | `--cdp` / `--http` | aliases of `--fetch cdp` / `--fetch http`, the two shipped fetchers | urls |
 | `--decoder STEM` | `decoder=STEM` — a built-in, `prose`, or a file in `.fux/decoders/`. Without it the add **observes** the `Content-Type` on its one fetch and writes what it saw, and **refuses** if nothing claims that format | urls, types |
 | `--keep` / `--no-keep` | `keep=` | urls |

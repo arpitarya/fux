@@ -6,19 +6,18 @@ title: "SR-CDP-FETCHER (0118) — the CDP fetcher"
 description: "The browser fetcher, for documents a plain GET cannot read. Drives your existing signed-in Chrome over CDP and returns the RESOURCE the server sent — intercepted, never rendered; declared per URL, never escalated to."
 status: accepted
 date: 2026-08-19
-feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind a session a headless client does not have: it borrows your browser's and hands fux the bytes"
-owns: [.fux/fetchers/cdp.py@8af9ecc6bffd, src/fux/templates/cdp.py.txt@2534b0cf35c5]
+feature: "`fux-fetcher-cdp` — the reference fetcher for documents behind a session a headless client does not have: it borrows your browser's and hands fux the bytes"
+owns: [packages/fux-fetcher-cdp@ad8162024587]
 laws: [L2, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 3ff5efe077140ef73dd2b23c2a3fe09f62c1d08ad4f488e298a272b124f2d5af
+content_sha: 9d09d769f010a726ad5a801c1f59ab1a4f4c30205c88b38b923aed1c50bd675e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
-- [`.fux/fetchers/cdp.py`](../.fux/fetchers/cdp.py) · file
-- [`src/fux/templates/cdp.py.txt`](../src/fux/templates/cdp.py.txt) · file
+- [`packages/fux-fetcher-cdp/`](../packages/fux-fetcher-cdp) · dir
 
 <!-- COMPONENTS-END -->
 
@@ -151,9 +150,8 @@ cannot collide:
 
 ```toml
 [sources.url]
-fetcher = ".fux/fetchers/cdp.py"
 
-[sources.url.config]        # fux passes this VERBATIM and reads no key in it
+[sources.url.config.cdp]        # fux passes this VERBATIM and reads no key in it
 cdp_port       = 9222
 load_timeout_s = 30
 launch_chrome  = false      # the default, and the point — see decision 13
@@ -326,13 +324,19 @@ part of it — port, wait strategy, extraction, even the transport — is editab
 Swapping in Playwright is a supported outcome; fux imports none of it, only the
 entry points.
 
-**9. It reaches your repo through `fux setup`, and only then.** The file ships
-in the wheel as package data
-([`src/fux/templates/cdp.py.txt`](../src/fux/templates/cdp.py.txt)) with an
-extension Python cannot import, and `fux setup` copies it into
-`.fux/fetchers/cdp.py` write-if-missing. **Ingest never writes it** — a repo
-that indexes only local files never sees a byte of WebSocket code, which is what
-decision 1's *never bundle a browser* is worth nothing without.
+**9. It reaches your repo as its own package, and only when declared.** It
+ships as the distribution `fux-fetcher-cdp`
+([`packages/fux-fetcher-cdp/`](../packages/fux-fetcher-cdp/)), which **imports
+nothing from fux and depends on nothing**, and a repository runs it only when
+`.fux/plugins.toml` declares it, pinned, and a URL line says `fetch=cdp`
+([SR-PLUGINS](0165_plugins.md) P10). **Network code is never importable inside an
+offline package**: the engine distributions carry none of it, no engine module
+imports it by name, and no offline path — `fux ingest --no-fetch`, `fux doctor` —
+executes it (`tests/test_plugin_fence.py`). A repo that indexes only local files
+never installs a byte of WebSocket code, which is what decision 1's *never bundle
+a browser* is worth nothing without. **To change it, copy it** to
+`.fux/fetchers/cdp.py`, which overrides the package (P8); fux never writes that
+file.
 
 **10. The bytes come from the paused response, never from the page** —
 `Fetch.getResponseBody` for an ordinary body, `Fetch.takeResponseBodyAsStream`
@@ -677,9 +681,9 @@ constraint and `MAX_PARALLEL = 1` are all untouched.
 
 ### Reference (required)
 
-- The file itself — [`.fux/fetchers/cdp.py`](../.fux/fetchers/cdp.py), whose
-  module docstring states the contract it implements; the shipped template —
-  [`src/fux/templates/cdp.py.txt`](../src/fux/templates/cdp.py.txt).
+- The package itself —
+  [`packages/fux-fetcher-cdp/src/fux_fetcher_cdp/__init__.py`](../packages/fux-fetcher-cdp/src/fux_fetcher_cdp/__init__.py),
+  whose module docstring states the contract it implements.
 - Its test, including that it lives in the declared plane —
   [`tests/ingest/test_cdp_fetcher.py`](../tests/ingest/test_cdp_fetcher.py).
 - The contract, including `validate` as the optional fifth entry point —
@@ -721,12 +725,12 @@ for it is no longer true of the bytes.
 # 1. stdlib only — anchored on a real import statement, because the module
 #    docstring contains English sentences starting "from …" that a looser
 #    pattern matches and a reader then has to dismiss by hand every time
-grep -nE "^(import [a-z_.]+|from [a-z_.]+ import )" .fux/fetchers/cdp.py \
+grep -nE "^(import [a-z_.]+|from [a-z_.]+ import )" packages/fux-fetcher-cdp/src/fux_fetcher_cdp/__init__.py \
   | grep -vE "socket|ssl|json|base64|hashlib|struct|os|sys|time|re|html|urllib|subprocess|shutil|pathlib|typing|dataclasses|__future__"
 # expect: no output
 
 # 2. no browser is downloaded or bundled
-grep -niE "download|install|playwright|selenium" .fux/fetchers/cdp.py
+grep -niE "download|install|playwright|selenium" packages/fux-fetcher-cdp/src/fux_fetcher_cdp/__init__.py
 # expect: no output outside prose about swapping it yourself
 
 # 3. it is still chosen by declaration, not escalation
@@ -734,24 +738,24 @@ grep -rn "fetch=cdp\|escalat\|fallback" src/fux/acquire/urlsrc.py
 # expect: no automatic-escalation logic in fux's half
 
 # 4. it still converts nothing
-grep -n "markdown\|html_to_\|fux.decode" .fux/fetchers/cdp.py
+grep -n "markdown\|html_to_\|fux.decode" packages/fux-fetcher-cdp/src/fux_fetcher_cdp/__init__.py
 # expect: no conversion — decision 5
 
 # 5. it returns the resource, not a rendering — decisions 5 and 10
-grep -n "outerHTML\|Runtime.evaluate\|loadEventFired" .fux/fetchers/cdp.py
+grep -n "outerHTML\|Runtime.evaluate\|loadEventFired" packages/fux-fetcher-cdp/src/fux_fetcher_cdp/__init__.py
 # expect: no output outside the docstring explaining why they are gone
 
 # 6. every paused request is resolved — decision 11
-grep -c "Fetch.continueRequest\|Fetch.failRequest" .fux/fetchers/cdp.py
+grep -c "Fetch.continueRequest\|Fetch.failRequest" packages/fux-fetcher-cdp/src/fux_fetcher_cdp/__init__.py
 # expect: >= 2, and `_resolve` is the only caller of either
 
 # 7. no protocol state on the shared session — decision 7a
-grep -nE "self\._(msg_id|results|events)" .fux/fetchers/cdp.py
+grep -nE "self\._(msg_id|results|events)" packages/fux-fetcher-cdp/src/fux_fetcher_cdp/__init__.py
 # expect: no output. Any hit is state two workers share, which is the
 # corruption decision 7 describes, back again
 
 # 8. the session does not hand out a tab it did not open — decision 7a
-grep -n "_page_target\|_opened" .fux/fetchers/cdp.py
+grep -n "_page_target\|_opened" packages/fux-fetcher-cdp/src/fux_fetcher_cdp/__init__.py
 # expect: `_opened` only. `_page_target` returning the first existing target
 # is what put two threads on one tab
 ```
@@ -773,12 +777,11 @@ evidence.*
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-RECORD](0109_index-record.md) ·
 [SR-PORT-LIST](0114_port-list.md) · [SR-EXTRACTED](0115_extracted-mode.md) ·
 [SR-URL-LIST](0116_url-list.md) · [SR-FETCHER](0117_fetcher.md) ·
-[SR-HTTP-FETCHER](0119_http-fetcher.md) · [SR-DECODE](0139_decode.md)
+[SR-HTTP-FETCHER](0119_http-fetcher.md) · [SR-DECODE](0139_decode.md) · [SR-PLUGINS](0165_plugins.md)
 
 **Code**
 
-- [`.fux/fetchers/cdp.py`](../.fux/fetchers/cdp.py)
-- [`src/fux/templates/cdp.py.txt`](../src/fux/templates/cdp.py.txt)
+- [`packages/fux-fetcher-cdp/`](../packages/fux-fetcher-cdp/)
 - [`tests/ingest/test_cdp_fetcher.py`](../tests/ingest/test_cdp_fetcher.py)
 
 **Measured evidence**

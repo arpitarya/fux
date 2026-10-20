@@ -17,6 +17,7 @@ it is where the next person checks whether the hazard is still live.
 from __future__ import annotations
 
 import threading
+from pathlib import Path
 import time
 import types
 
@@ -214,9 +215,12 @@ def test_the_two_paths_produce_identical_results(workers):
 
 
 def _template(name: str) -> str:
-    from importlib import resources
-
-    return (resources.files("fux") / "templates" / f"{name}.py.txt").read_text(encoding="utf-8")
+    """The shipped fetcher's source — its package since W-289 (SR-PLUGINS P10)."""
+    root = Path(__file__).resolve().parents[2]
+    module = f"fux_fetcher_{name}"
+    return (root / "packages" / f"fux-fetcher-{name}" / "src" / module / "__init__.py").read_text(
+        encoding="utf-8"
+    )
 
 
 def test_the_shipped_cdp_fetcher_declares_one_explicitly():

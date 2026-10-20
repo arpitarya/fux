@@ -1,0 +1,70 @@
+# .fux/plugins.toml -- the packages this repository's index needs (SR-PLUGINS).
+#
+# Committed. Only fux itself is mandatory; every decoder and fetcher package
+# runs only when declared here, at exactly this version and digest. An
+# installed package nobody declared is never loaded. A declared package that
+# is missing or differs stops fux with the install line -- two machines on
+# one repository never build different indexes.
+#
+# `fux setup` proposes rows from your sources; `fux setup --pin` re-pins every
+# row from what is installed, after an upgrade.
+
+[[package]]
+name = "fux-decoder-config"
+version = "4.1.1"
+digest = "sha256:5a32b9d7239212c27b9d66db6b1299f530d7d84f2fe2c6e57b382d1f9f1d8a89"
+
+[[package]]
+name = "fux-decoder-html"
+version = "4.1.1"
+digest = "sha256:0cc0ee7edb8a58b0ded521d3e1987bc892840fd1abda3711bac6aba302d281d9"
+
+[[package]]
+name = "fux-decoder-image"
+version = "4.1.1"
+digest = "sha256:cbbd3acd86efb4c61c9e83ec9c32aad42c998c2c2d9650d893ccc2d11b51dbb9"
+
+[[package]]
+name = "fux-decoder-json"
+version = "4.1.1"
+digest = "sha256:ea610be3426758585f48bd396a3d925ef31d75327c6de8aec080d04a53c95b0a"
+
+[[package]]
+name = "fux-decoder-mail"
+version = "4.1.1"
+digest = "sha256:2fb0ffca88e6900b332f900b91565ccaca09b091bcc091acd3535f9a70114f9c"
+
+[[package]]
+name = "fux-decoder-office"
+version = "4.1.1"
+digest = "sha256:0cd4c6b89d8d52129af413ece015618aa9af078ca713eac662b60b26ffb45dcf"
+
+[[package]]
+name = "fux-decoder-pdf"
+version = "4.1.1"
+digest = "sha256:c26a9464c9512a3b55458eba5708bec5b5dca0d5349f21b961cbbbd37034d20c"
+
+[[package]]
+name = "fux-decoder-sheet"
+version = "4.1.1"
+digest = "sha256:8611c3335e53828a02940f07c10edcce41147cba896f197cceeeca0e83655bb5"
+
+[[package]]
+name = "fux-decoder-svg"
+version = "4.1.1"
+digest = "sha256:f62bbf3b597fafac45d8a3cad1c98669b5e73377ab5f069e85e55ec3e2518292"
+
+[[package]]
+name = "fux-extension-table"
+version = "4.1.1"
+digest = "sha256:07eab32ae2585bd70a2d9698081fb68a54b891684aa39a8b667298aaa635ab7d"
+
+[[package]]
+name = "fux-fetcher-cdp"
+version = "4.1.1"
+digest = "sha256:90a9089745ed1385324a4aaafd3b5e5d896b70cc8935ca60a1a597250c608c1b"
+
+[[package]]
+name = "fux-fetcher-http"
+version = "4.1.1"
+digest = "sha256:ebc2586ed07048df59d2f855e16de3f6222c1a5fc86e621e039c4e385e2872da"

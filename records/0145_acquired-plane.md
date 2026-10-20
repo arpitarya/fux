@@ -11,7 +11,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@89dd8c94308a]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: ec6ec8a97826efd2b5cde4a0a2cc92862061c05b280cf3039fa0b0497ec70f52
+content_sha: b4a6e20186b16e9d142773f5c6b93fef47c9b17e249bf649dd8a0aa6f19c6afe
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -333,6 +333,8 @@ this moved where they are written, not what they are.
 **No decision here moved** (W-261, 2026-10-05): `CACHEDIR.TAG` and `derived_dir` moved from `store/fuxdir.py` — a file this record describes — to `store/cachedir.py` (SR-CACHEDIR-TAG's); `fuxdir` imports them back. The `ACQUIRED` declaration and its `.gitignore` line are untouched.
 
 **No decision here moved** (W-274, 2026-10-11): `config.py` gained `[index] section_records` and its one-key reader (SR-SECTIONS decision 11). Nothing about the acquired plane changed.
+
+**No decision here moved** (W-289, 2026-10-20): `acquire/urlsrc.py`'s `load_fetcher` now resolves `fetch=<name>` to the consumer's `.fux/fetchers/<name>.py`, else the fetcher package `.fux/plugins.toml` declares ([SR-PLUGINS](0165_plugins.md) P8). Retention still lives in `fetch_all()` and never inside a fetcher (decision 5), so a package fetcher gains it with no line changed; `store/fuxdir.py` added the `plugins.toml` row, and the `acquired/` row and its kind did not move.
 
 ### Consequences
 

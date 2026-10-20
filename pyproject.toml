@@ -44,7 +44,27 @@ Repository = "https://github.com/arpitarya/fux"
 
 [project.optional-dependencies]
 # hatchling: the e2e suite builds the four wheels offline (W-282 DoD 10).
-dev = ["pytest>=8", "pytest-xdist>=3", "hatchling>=1.25"]
+# W-289: the fifteen plugin packages are DEV tooling here, so the tests can
+# import them from this tree. fux-engine itself depends on none of them — a
+# repository declares the ones it needs in `.fux/plugins.toml` (SR-PLUGINS).
+dev = [
+    "pytest>=8", "pytest-xdist>=3", "hatchling>=1.27",
+    "fux-decoder-config",
+    "fux-decoder-drawio",
+    "fux-decoder-html",
+    "fux-decoder-image",
+    "fux-decoder-json",
+    "fux-decoder-mail",
+    "fux-decoder-office",
+    "fux-decoder-pdf",
+    "fux-decoder-rtf",
+    "fux-decoder-sheet",
+    "fux-decoder-svg",
+    "fux-decoder-xml",
+    "fux-extension-table",
+    "fux-fetcher-cdp",
+    "fux-fetcher-http",
+]
 
 [tool.hatch.version]
 path = "src/fux/__init__.py"
@@ -77,13 +97,33 @@ line-length = 100
 # tests/test_dotdir_hygiene.py), this is for whoever runs it.
 extend-include = [".fux/fetchers/*.py", ".fux/decoders/*.py"]
 
-# W-282: the four distributions are one uv workspace. `uv sync --extra dev`
+# W-282: the four distributions are one uv workspace; W-289 adds fifteen. `uv sync --extra dev`
 # installs all four from this tree; pip needs them on one command line:
-#   pip install -e packages/fux-core -e packages/fux-reader -e packages/fux-writer -e ".[dev]"
+#   pip install -e packages/fux-core -e packages/fux-reader -e packages/fux-writer \
+#       -e packages/fux-<each plugin> ... -e ".[dev]"
 [tool.uv.workspace]
-members = ["packages/fux-core", "packages/fux-reader", "packages/fux-writer"]
+members = [
+    "packages/fux-core", "packages/fux-reader", "packages/fux-writer",
+    # W-289: the fifteen plugin packages (SR-PLUGINS), one directory each.
+    "packages/fux-decoder-*", "packages/fux-fetcher-*", "packages/fux-extension-table",
+]
 
 [tool.uv.sources]
 fux-core = { workspace = true }
 fux-reader = { workspace = true }
 fux-writer = { workspace = true }
+fux-decoder-config = { workspace = true }
+fux-decoder-drawio = { workspace = true }
+fux-decoder-html = { workspace = true }
+fux-decoder-image = { workspace = true }
+fux-decoder-json = { workspace = true }
+fux-decoder-mail = { workspace = true }
+fux-decoder-office = { workspace = true }
+fux-decoder-pdf = { workspace = true }
+fux-decoder-rtf = { workspace = true }
+fux-decoder-sheet = { workspace = true }
+fux-decoder-svg = { workspace = true }
+fux-decoder-xml = { workspace = true }
+fux-extension-table = { workspace = true }
+fux-fetcher-cdp = { workspace = true }
+fux-fetcher-http = { workspace = true }

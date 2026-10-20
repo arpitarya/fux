@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-19
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@aa502f353fb6, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@898d2cf2c7ee, src/fux/progress.py@10364bd02e0a, tests_e2e@3ed8925220fc, node/fux.mjs@ef9e157970bc, src/fux/stdio.py@9e270b49bdaa]
+owns: [src/fux/cli.py@7b67dcb8cfc4, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@f5e59a40b46a, src/fux/progress.py@10364bd02e0a, tests_e2e@40e52ff66c93, node/fux.mjs@ef9e157970bc, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 9fbb470403c5dffaaf23d15f967c19062e5826857eff70a8a4735b91d62b0bc9
+content_sha: 99a08780675eca395be60542994688f14fc79ca36654589af8687e09288c1e4e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -240,10 +240,16 @@ exists to prevent, so this decision names the paths and cites the law rather
 than paraphrasing it.
 
 **1e. `setup` writes the files a consumer owns, write-if-missing** — `fux.toml`,
-the source lists, both fetchers, `.fux/tune.toml`, and the agent policy files.
-It is the only verb that may run before a repo root exists, because it is what
-creates one ([SR-DOTFUX](0102_fux-directory.md) decision 6). Everything it
-writes is the consumer's from that moment, and no later run rewrites any of it.
+the source lists, `.fux/tune.toml`, the agent policy files, and
+`.fux/plugins.toml` — **and no decoder or fetcher** ([SR-PLUGINS](0165_plugins.md)
+P9). It is the only verb that may run before a repo root exists, because it is
+what creates one ([SR-DOTFUX](0102_fux-directory.md) decision 6). Everything it
+writes is the consumer's from that moment, and no later run rewrites any of it —
+**except `.fux/plugins.toml`**, where setup scans the configured sources, adds a
+row for every package they now need, pins a row whose package is installed but
+has no digest yet, and **prints one install line for what this machine lacks —
+it installs nothing** (P6, L5). **`fux setup --pin`** re-pins every row from what
+is installed: the one deliberate act after an upgrade, never implicit.
 
 **1f. `hooks` writes outside `.fux/`, and is the only verb that does so
 uninvited.** It takes flags — `--install` (the default), `--status`,
@@ -578,31 +584,35 @@ string is the one the capture ran under.
 #### `fux setup` — write what is mine, once
 
 Optional and explicit. Everything is write-if-missing, so a second run is a
-no-op and an edited file is never clobbered.
+no-op and an edited file is never clobbered. Captured 2026-10-20 on a directory
+holding `docs/a.md` and `docs/b.pdf`, with `--no-agents` (lines trimmed):
 
 ```console
-$ fux setup
+$ fux setup --no-agents
   wrote .fux/README.md
   wrote .fux/.gitignore
-  wrote .fux/fetchers/http.py
-  wrote .fux/fetchers/cdp.py
-  wrote .fux/sources/dirs
-  wrote .fux/sources/urls
+  … 13 lines omitted …
   wrote fux.toml
-setup: 7 file(s) written. They are yours: commit them, edit them, fux will not rewrite them.
+  wrote .fux/tune.toml
+  wrote .fux/output.toml
+  wrote .fux/inspect.toml: written
+  wrote .fux/identifiers.toml: written
+  wrote .fux/plugins.toml
+setup: 20 file(s) written. They are yours: commit them, edit them, fux will not rewrite them.
 next: add entries to .fux/sources/dirs, then `fux ingest`
+      anything you do NOT want indexed goes in .fux/.fuxignore
 # exit 0
 
-$ fux setup
-  kept  .fux/fetchers/http.py (yours; never rewritten)
-  kept  .fux/fetchers/cdp.py (yours; never rewritten)
-  kept  .fux/sources/dirs (yours; never rewritten)
-  kept  .fux/sources/urls (yours; never rewritten)
-  kept  fux.toml (yours; never rewritten)
+$ fux setup --no-agents
+  … kept lines omitted …
 setup: nothing to do - every consumer-owned file is already here
-next: add entries to .fux/sources/dirs, then `fux ingest`
-# exit 0
 ```
+
+`.fux/plugins.toml` declares `fux-decoder-pdf`, because `docs/` holds a PDF. On a
+machine where a declared package is not installed, setup also prints
+`install the packages .fux/plugins.toml declares (fux installs nothing):` and the
+one `pip install …==<version>` line, then names the rows the next `fux setup`
+will pin.
 
 **`fux ingest` writes none of that.** `ensure_layout` writes only
 `.fux/README.md` and `.fux/.gitignore`, so a repo that wanted an index never
