@@ -28,6 +28,16 @@ Rules:
 
 ---
 
+## 2026-10-20 — **W-290: the front-door docs (main, unreleased)**
+
+| | |
+|---|---|
+| **shipped** | `README.md` rewritten for consumers (plain-words section, real `answer` / stale / `--why` output, is-it-for-you, roadmap, FAQ; the version fact corrected to 4.1.0; plugin packages described as the next release); new `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`; `CLAUDE.md`'s release line corrected |
+| **evidence** | quickstart run on `fux-engine==4.1.0` from PyPI and `npx fux-engine@4.1.0` in a clean Linux container; PyPI and npm both serve 4.1.0, no `v4.1.1` tag; every relative link resolves; codelaw `md/recommended` clean on the new docs |
+| **outcome** | Landed, uncommitted. 🔴 The five `.github/` templates wait on Arpit (W-290 step 4). |
+
+---
+
 ## 2026-10-20 — **W-288 + W-289: decoder extensions, and plugin packages — only the engine is mandatory (main, unreleased)**
 
 | | |

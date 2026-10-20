@@ -23,6 +23,19 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-20 — W-290: the front-door docs  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"i like the files that got created for codelaw add/create/update similar kind of file for sheetpane and fux"*.
+- **Done:** README rewritten (kept the hero, comparison table, measured section and laws; added plain words, a real stale-answer demo, `--why` output, is-it-for-you, roadmap from OPEN-WORK, FAQ); `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`; CHANGELOG `[Unreleased]` note; registry rows; W-290 filed 🔴.
+- **Found:** the README and `CLAUDE.md` said 4.1.1 is released — PyPI and npm serve 4.1.0 and there is no `v4.1.1` tag (the 2026-10-19 entry: cut, not released). Both corrected as statements of fact; **`CLAUDE.md` line 581 changed, said out loud here.** The README's quickstart told 4.1.0 users to `pip install fux-decoder-pdf …` — unpublished (W-289); moved to a "next release" note. The npm badge read the `alpha` tag (3.0.0-alpha.11); now the default tag. `fux answer` printed the section heading twice in this run; on "how many times do we retry a card" `answer` cited `README.md` while `ask` ranked the ADR first; `fux verify` on a local-file answer says `unverifiable` (refer plane) — the README no longer says a receipt "reproduces" an answer.
+- **Not done:** the `.github/` templates (protected from remote writes; sent as a zip); commit (not asked). **Next:** Arpit unzips the templates; W-289's rulings, then a release.
+
+## 2026-10-20 — W-290 closed: the `.github/` templates written  ·  Claude Code (Opus 5.5)
+
+- **Asked:** what is wrong with W-290; then "close W290" (Arpit).
+- **Done:** only step 4 was open — Cowork's `fux-github-templates.zip` was never unpacked. Wrote `.github/ISSUE_TEMPLATE/{wrong_answer,bug_report,feature_request,config}.yml` and `.github/PULL_REQUEST_TEMPLATE.md` to match CONTRIBUTING/SECURITY's `?template=` links; committed with Cowork's uncommitted W-290 docs; item archived, rows removed.
+- **Next:** the inbox — W-289, W-258, W-268.
+
 ## 2026-10-20 — W-287 closed; W-288 and W-289 built in parallel worktrees, merged to main  ·  Claude Code (Opus 5.5)
 
 - **Asked:** implement W-287, W-288, W-289; a monorepo if needed; run in parallel.

@@ -38,6 +38,7 @@ here. Read that record before changing anything below it.
 
 - 🔴 **W-289** · `arpit` — plugin packages: built on `main` (unreleased) — law, SR-PLUGINS, 15 packages, declared-only registry. Arpit: 15 PyPI trusted publishers + two rulings before the release. [detail](open/W-289-plugin-packages.md)
 
+
 ### testing
 
 - 🟢 **W-281** · `agent` — capture and ladder speed: unsigned ladder commits (rung-10000 stalled 12 h on gpg); G1 and G3 in parallel; latency stays standalone. **Sonnet.** Filed by Arpit (Claude Code). [detail](open/W-281-capture-harness-speed.md)

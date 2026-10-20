@@ -1,0 +1,43 @@
+name: Bug report
+description: A crash, an error, or a command that doesn't do what it says.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: command
+    attributes:
+      label: The command you ran
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: What happened
+      description: The full output, including the error.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: "`fux --version`"
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `fux doctor`
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: OS, Python and Node versions
+      placeholder: macOS 15, Python 3.12.7, Node 22.11

@@ -133,6 +133,12 @@ version of their own, and it reaches existing corpora.
   and **every document once** (the new caps are in the extract-config digest).
   A fetched HTML page's Markdown changes at its next refresh.
 
+**Front-door docs (W-290).** No engine change. The README is rewritten for
+consumers: a plain-words section, a real stale-answer demo, who fux is and isn't
+for, a roadmap from the queue, and an FAQ. It now says what PyPI and npm serve
+(4.1.0) and describes plugin packages as the next release. New:
+`CONTRIBUTING.md`, `SECURITY.md` and `CODE_OF_CONDUCT.md`.
+
 ## [4.1.1] - 2026-10-19
 
 **No engine change.** A version bump on all six names — `fux-core`,

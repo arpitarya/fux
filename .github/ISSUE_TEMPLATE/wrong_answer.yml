@@ -1,0 +1,48 @@
+name: Wrong answer
+description: fux ranked the wrong document, missed the right one, or served a stale answer.
+labels: ["wrong-answer"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A failing query is the most useful report there is. To fix it for yourself today, `fux correct "<question>" <doc>` records the question on the document that answers it.
+  - type: input
+    id: question
+    attributes:
+      label: The question
+      description: Exactly what you asked.
+      placeholder: who owns the billing runbook?
+    validations:
+      required: true
+  - type: input
+    id: expected
+    attributes:
+      label: The document that should have answered
+      description: Its path or URL in your corpus.
+    validations:
+      required: true
+  - type: textarea
+    id: got
+    attributes:
+      label: What fux returned instead
+      description: The top results, or the answer and its freshness verdict (current, stale, …).
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Output of `fux ask --why "<question>"`
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: "`fux --version`"
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Corpus size, file formats involved, whether the source changed recently.

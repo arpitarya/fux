@@ -1,0 +1,34 @@
+name: Feature request
+description: A format, a source, an agent integration, or another idea.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you're trying to do
+      description: The problem first, not the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would help
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - A file format (a decoder)
+        - A source system (a fetcher)
+        - An agent or editor integration
+        - Ranking or answers
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Fux stays $0, open source and offline by default; a proposal that needs a paid API or a hosted model can't land.
