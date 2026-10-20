@@ -190,20 +190,23 @@ each to its record; that is all it does now.
   precisely because each one looks like it passes. **The test is the OSI
   approved-licence list**, never the price, never a public repo, never the word
   "open" in a README.
-  **Dependencies ship packaged.** Fux is one install with everything it needs —
-  no optional extras, no "install this for PDFs", no capability that works on
-  one machine and not another because of what somebody chose at install time.
-  **`fux-engine` is the one install; `fux-reader` and `fux-writer` are role
-  packages — each complete for its role, none with optional extras.**
+  **Dependencies ship packaged, and the repository chooses, never the
+  machine.** No optional extras. **A capability may be opt-in only when the
+  committed repository chooses it; no capability may depend on what a machine
+  happens to have installed.** **`fux-engine` is the one mandatory install;
+  `fux-reader` and `fux-writer` are role packages, each complete for its role;
+  a decoder, fetcher or extension package runs only when the repository's
+  committed `.fux/plugins.toml` declares it, pinned, and one that is missing or
+  differs is refused loudly.**
   **Permission is not authorization:** the law permits a dependency, a record
   still decides one, and every runtime dependency is named by an accepted SR.
   **Dev, test and measurement tooling is bound by the same licence rule and
   nothing more** — OSI-licensed, and numpy/pandas/scipy explicitly fine.
-  ⚠ **Amended 2026-09-06** (Arpit). The previous form forbade third-party runtime
-  dependencies outright — the zero-dependency guarantee, sold as the product's
-  central promise. **That guarantee is withdrawn**, deliberately, and
-  [SR-LAW-2](records/0004_LAW-2-zero-cost.md) carries what it bought, what replaced
-  it, and the three things it left unguarded.
+  ⚠ **Amended 2026-09-06 and 2026-10-19** (Arpit). The first withdrew the
+  zero-dependency guarantee, sold as the product's central promise; the second
+  replaced *"nothing optional"* with *"optional only by the committed
+  repository's choice"*. [SR-LAW-2](records/0004_LAW-2-zero-cost.md) carries what each
+  bought, what replaced it, and what it left unguarded.
 - **L3** · **Content is never durable outside its source system.** The index holds
   statistics, never content. The only exceptions are declared per source on a
   committed line the operator wrote — §1 names them; none is built as a

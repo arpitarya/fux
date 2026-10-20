@@ -312,6 +312,122 @@ engine = "fux-engine"
 # the unscoped `fux-engine` on npm is the same bundle.
 npm_reader = "@fux-engine/reader"
 
+# -- Plugin packages (W-289, SR-PLUGINS) --------------------------------------
+# Every package beyond the engine is DECLARED per repository in the committed
+# `.fux/plugins.toml`, pinned, and refused loudly when missing or drifted. The
+# first-party set is fixed identity, never a knob: `fux doctor` marks it, the
+# release builds one wheel per name on fux's own version, and a name in this
+# table cannot be redefined by a repository's declaration.
+
+[plugins]
+file = ".fux/plugins.toml"
+# The declaration's one array of tables, and the keys a row may carry.
+table = "package"
+keys = ["name", "version", "digest", "suffixes"]
+# `fux-<kind>-<subject>` is the distribution; `fux_<kind>_<subject>` the one
+# import name fux loads (P7). Third-party packages follow the same rule.
+dist_prefix = "fux-"
+import_prefix = "fux_"
+kinds = ["decoder", "fetcher", "extension"]
+# A kind a repository declares directly; an extension arrives as a dependency.
+declarable = ["decoder", "fetcher"]
+# The digest: sha256 over the import package's files in RECORD's line format.
+digest_prefix = "sha256:"
+# Every fetcher emits HTML, so a declared fetcher needs this package (P10).
+fetcher_needs = "fux-decoder-html"
+# How a refusal and `fux setup` spell the install line. fux runs no installer.
+install = "pip install"
+
+[plugins.packages.fux-decoder-json]
+kind = "decoder"
+suffixes = [".json", ".jsonl"]
+modules = ["json", "jsonl"]
+depends = []
+
+[plugins.packages.fux-decoder-config]
+kind = "decoder"
+suffixes = [".toml", ".yaml", ".yml", ".ini", ".cfg", ".properties"]
+modules = ["toml", "yaml", "ini"]
+depends = []
+
+[plugins.packages.fux-decoder-html]
+kind = "decoder"
+suffixes = [".html", ".htm", ".xhtml"]
+modules = ["html"]
+depends = ["fux-extension-table"]
+
+[plugins.packages.fux-decoder-sheet]
+kind = "decoder"
+suffixes = [".xlsx", ".xlsm", ".csv", ".tsv"]
+modules = ["xlsx", "csv"]
+depends = ["fux-extension-table"]
+
+[plugins.packages.fux-decoder-office]
+kind = "decoder"
+suffixes = [".docx", ".docm", ".pptx", ".pptm"]
+modules = ["docx", "pptx"]
+depends = ["fux-extension-table"]
+
+[plugins.packages.fux-decoder-pdf]
+kind = "decoder"
+suffixes = [".pdf"]
+modules = ["pdf"]
+depends = []
+
+[plugins.packages.fux-decoder-xml]
+kind = "decoder"
+suffixes = [".xml"]
+modules = ["xml"]
+depends = []
+
+[plugins.packages.fux-decoder-svg]
+kind = "decoder"
+suffixes = [".svg"]
+modules = ["svg"]
+depends = []
+
+[plugins.packages.fux-decoder-drawio]
+kind = "decoder"
+suffixes = [".drawio", ".dio"]
+modules = ["drawio"]
+depends = []
+
+[plugins.packages.fux-decoder-image]
+kind = "decoder"
+suffixes = [".png", ".jpg", ".jpeg", ".gif"]
+modules = ["image"]
+depends = []
+
+[plugins.packages.fux-decoder-mail]
+kind = "decoder"
+suffixes = [".eml", ".mbox"]
+modules = ["mail"]
+depends = []
+
+[plugins.packages.fux-decoder-rtf]
+kind = "decoder"
+suffixes = [".rtf"]
+modules = ["rtf"]
+depends = []
+
+[plugins.packages.fux-fetcher-http]
+kind = "fetcher"
+suffixes = []
+modules = []
+depends = []
+
+[plugins.packages.fux-fetcher-cdp]
+kind = "fetcher"
+suffixes = []
+modules = []
+depends = []
+
+[plugins.packages.fux-extension-table]
+kind = "extension"
+suffixes = []
+modules = []
+depends = []
+
 # -- fux inspect's committed-nowhere report files ----------------------------
 
 [inspect]

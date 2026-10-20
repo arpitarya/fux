@@ -3,14 +3,14 @@ type: Standing Record
 kind: component
 name: SR-HTTP-FETCHER
 title: "SR-HTTP-FETCHER (0119) — the default HTTP fetcher"
-description: "A plain stdlib GET is the default fetcher, written write-if-missing into the consumer's repo by fux setup so core still holds zero network lines — and it never escalates."
+description: "A plain stdlib GET is the shipped plain fetcher, published as its own package, fux-fetcher-http, that imports nothing from fux — so core still holds zero network lines — and it never escalates."
 status: accepted
 date: 2026-08-19
-feature: "`.fux/fetchers/http.py` — the fetcher a URL gets when its line says nothing"
-owns: [.fux/fetchers/http.py@4f0f4a3431ce, src/fux/templates/http.py.txt@4f0f4a3431ce]
+feature: "`fux-fetcher-http` — the fetcher a URL line gets when it says `fetch=http`"
+owns: [.fux/fetchers/http.py@4f0f4a3431ce, packages/fux-fetcher-http@e24639f5d275]
 laws: [L2, L5, ex-L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 27652eecd20bc3304ebe0d005ce2d1028841ec65b8d59b6ec7f1f16f3db4496e
+content_sha: 36cd14c3d9d9fca5fb78915951d11bf2cf9b2d13e5091e7520fff1218f664fd2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -18,7 +18,7 @@ content_sha: 27652eecd20bc3304ebe0d005ce2d1028841ec65b8d59b6ec7f1f16f3db4496e
 **Owns** — the components this record decides:
 
 - [`.fux/fetchers/http.py`](../.fux/fetchers/http.py) · file
-- [`src/fux/templates/http.py.txt`](../src/fux/templates/http.py.txt) · file
+- [`packages/fux-fetcher-http/`](../packages/fux-fetcher-http) · dir
 
 <!-- COMPONENTS-END -->
 
@@ -36,13 +36,15 @@ Chrome.
 `Content-Type` the server declared. A URL that needs a browser says so —
 `fetch=cdp` — and that is the only way it happens.
 
-The interesting part is **where the default lives**. Putting `urllib` in
-`src/fux/` would be the obvious move and would cost the adapter cap: core would
-hold network code, and *"fux never fetches"* would become *"fux fetches, except
-when it doesn't"*. Instead fux **writes** `.fux/fetchers/http.py` into your
-repo, write-if-missing. You get a working default with no configuration; core
-ships a *template*, never a fetch path; and the file is yours from birth —
-committed, editable, reviewable.
+The interesting part is **where it lives**. Putting `urllib` in `src/fux/`
+would be the obvious move and would cost the adapter cap: core would hold
+network code, and *"fux never fetches"* would become *"fux fetches, except when
+it doesn't"*. Instead it is **its own package**, `fux-fetcher-http`, which
+imports nothing from fux and which a repository runs only when its
+`.fux/plugins.toml` declares it ([SR-PLUGINS](0165_plugins.md)). An engine fix
+reaches you with the next install; and when you want to edit it, you copy it to
+`.fux/fetchers/http.py`, which overrides the package and is yours — committed,
+editable, reviewable.
 
 **There is no automatic escalation.** If the plain GET returns a shell that
 needed JavaScript, fux does not quietly retry through Chrome. It returns what it
@@ -54,30 +56,30 @@ server felt that afternoon.
 
 ```mermaid
 flowchart LR
-    E["fux setup"] -->|write-if-missing| G[".fux/fetchers/http.py<br/>written once, then yours"]
-    U["url line, no fetch="] --> G
+    E[".fux/plugins.toml<br/>declares fux-fetcher-http"] --> G["fux_fetcher_http<br/>(or your .fux/fetchers/http.py)"]
+    U["url line, fetch=http"] --> G
     G --> Q["urllib GET<br/>redirects, no decode"]
     Q --> B["(bytes, Content-Type)"]
     B --> DC["fux.decode"]
-    U2["url line, fetch=cdp"] --> C[".fux/fetchers/cdp.py"]
+    U2["url line, fetch=cdp"] --> C["fux_fetcher_cdp"]
 ```
 
 <details>
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-  fux setup
-        |  write-if-missing (never overwrite)
-        v
-  .fux/fetchers/http.py    <-- written once, then YOUR file
-        ^
-        |  url line with no fetch=  (the default)
+  .fux/plugins.toml declares fux-fetcher-http
         |
-  url line with fetch=cdp  -->  .fux/fetchers/cdp.py
+        v
+  fux_fetcher_http   <-- or YOUR .fux/fetchers/http.py, which overrides it
+        ^
+        |  url line with fetch=http
+        |
+  url line with fetch=cdp  -->  fux_fetcher_cdp
 
   both return (bytes, Content-Type); fux.decode converts.
-  core src/fux/ still holds ZERO network lines — it writes a template,
-  it does not open a connection.  No escalation between the two, ever.
+  core src/fux/ still holds ZERO network lines — the fetcher is another
+  distribution.  No escalation between the two, ever.
 ```
 
 </details>
@@ -134,17 +136,18 @@ already the missing behaviour, not a new one.
 attribute is fetched by `http.py`: `urllib.request`, redirects followed, the
 response bytes and the `Content-Type` header returned to fux.
 
-**2. It is written into the consumer's repo by `fux setup`, write-if-missing** —
-never imported from `src/fux/`, and **never written by `ensure_layout`**. That
-distinction is load-bearing: `ensure_layout` runs at the head of *every* ingest,
-so putting a fetcher there means a repo that only wanted an index gets network
-code it never asked for, on its first run. **Setup is optional, explicit, and
-once per repo — a consumer asked for it.**
-
-The file ships in the wheel as **package data** with an extension Python's
-import machinery cannot resolve (`templates/http.py.txt`), so it is copied out
-and never imported. **Core keeps zero network lines and zero network imports**,
-and the adapter cap is structural rather than remembered.
+**2. It ships as its own package, `fux-fetcher-http`, and runs only when
+declared** ([SR-PLUGINS](0165_plugins.md) P10) — never imported from `src/fux/`,
+never written into the consumer's repo by `fux setup` or `ensure_layout`. The
+package **imports nothing from fux and depends on nothing**, and fux executes it
+only when a URL line says `fetch=http` and `.fux/plugins.toml` declares it at its
+pinned version and digest. A repo that only wanted an index installs no network
+code at all. **Core keeps zero network lines and zero network imports**, and the
+adapter cap is structural rather than remembered. A consumer who needs a header,
+a proxy or a token copies it to `.fux/fetchers/http.py`, which overrides the
+package (P8). ⚠ **This repository still carries such a copy, unedited** — kept
+through W-289 phase 1 only because [SR-DECODE](0139_decode.md) links it; phase 2
+deletes it so the declared package runs here too.
 
 **3. There is no automatic escalation to another fetcher, ever.** Not on
 non-2xx, not on an empty body, not on a rendered-shell heuristic. A plain GET
@@ -219,18 +222,18 @@ forked file is a file that stops taking upstream fixes.
 ### What it looks like
 
 **Specimen, not a capture.** The shape is what decisions 1–3 fix; the exact
-bytes are the template's.
+bytes are the package's.
 
 **The whole fetcher.** It is short on purpose: the point of the contract is that
-a useful fetcher is a page of stdlib, and the point of *writing it out* is that
-this page lives in your repo rather than in fux.
+a useful fetcher is a page of stdlib, and the point of keeping it outside fux is
+that this page is something you can copy into `.fux/fetchers/` and own.
 
 ```python
-"""Default URL fetcher — a plain GET. Written by fux setup, owned by you.
+"""A plain GET — the fux-fetcher-http package, or your copy of it.
 
-Fux writes this file once if it is missing and never rewrites it. Edit it:
-add headers, a proxy, a retry, an auth token from your environment. Fux
-imports none of that — only the entry points below.
+Copy it to .fux/fetchers/http.py to edit it: add headers, a proxy, a retry,
+an auth token from your environment. Fux imports none of that — only the
+entry points below.
 """
 import urllib.request
 
@@ -336,11 +339,9 @@ argument for it: a plain GET that returns a rendered shell on a line declaring
 
 ### Reference (required)
 
-- The contract it implements — [SR-FETCHER](0117_fetcher.md); the shipped
-  template — [`src/fux/templates/http.py.txt`](../src/fux/templates/http.py.txt).
-- The scaffolding mechanism it reuses —
-  [`src/fux/setup.py`](../src/fux/setup.py) and
-  [SR-DOTFUX](0102_fux-directory.md) decision 6.
+- The contract it implements — [SR-FETCHER](0117_fetcher.md); the package —
+  [`packages/fux-fetcher-http/`](../packages/fux-fetcher-http/).
+- How a repository declares and loads it — [SR-PLUGINS](0165_plugins.md).
 - The defect that made "write it out" the answer, and the capture that closed
   it — [`2026-08-19-w54`](../work/regression/2026-08-19-w54/report.md) §1.
 - The per-URL attribute that selects a non-default fetcher —
@@ -369,9 +370,9 @@ grep -rn "urllib\|http.client\|socket\|requests" src/fux/ --include=*.py
 grep -rniE "fallback|escalat|retry_with|if .*failed.*cdp" src/fux/acquire/urlsrc.py
 # expect: no output
 
-# 3. the template is still un-importable package data
-ls src/fux/templates/http.py 2>/dev/null
-# expect: no output — only http.py.txt exists
+# 3. the fetcher is not engine code, and imports none
+ls src/fux/templates/http.py* 2>/dev/null; grep -n "^from fux\|^import fux" packages/fux-fetcher-http/src/fux_fetcher_http/__init__.py
+# expect: no output
 ```
 
 ---
@@ -386,12 +387,12 @@ evidence.*
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-DOTFUX](0102_fux-directory.md) ·
 [SR-CONFIG](0113_config.md) · [SR-URL-LIST](0116_url-list.md) ·
 [SR-FETCHER](0117_fetcher.md) · [SR-CDP-FETCHER](0118_cdp-fetcher.md) ·
-[SR-DECODE](0139_decode.md)
+[SR-DECODE](0139_decode.md) · [SR-PLUGINS](0165_plugins.md)
 
 **Code**
 
-- [`src/fux/setup.py`](../src/fux/setup.py)
-- [`src/fux/templates/http.py.txt`](../src/fux/templates/http.py.txt)
+- [`packages/fux-fetcher-http/`](../packages/fux-fetcher-http/)
+- [`src/fux/plugins.py`](../src/fux/plugins.py)
 - [`tests/decode/test_decode.py`](../tests/decode/test_decode.py)
 
 **Measured evidence**

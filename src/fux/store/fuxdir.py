@@ -94,6 +94,8 @@ COMMITTED_FILES: dict[str, str] = {
     # W-233 found the warning, `fux setup` wrote this file and `doctor` then
     # called it undeclared.
     "inspect.toml": "the knobs of `fux inspect`'s lenses and floors - what the index REPORT flags, never what is indexed or ranked (SR-INSPECT)",
+    # ASCII only, like every other value in these tables. W-289.
+    "plugins.toml": "which decoder and fetcher PACKAGES this repo runs, each pinned to a version and digest. Only what is declared here runs; a declared package that is missing or differs stops fux with the install line. `fux setup` proposes it from your sources (SR-PLUGINS)",
     "refusals.toml": "what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (SR-REFUSAL)",
     # ASCII only, like every other value in these tables.
     "fux": "the shim: `.fux/fux find rollback` in a clone with nothing installed. Resolves the reader in three rungs -- the vendored bundle, this member's `node_modules/.bin`, then every ancestor's -- because npm and yarn hoist that bin and pnpm and bun do not (SR-NODE-SEARCH)",

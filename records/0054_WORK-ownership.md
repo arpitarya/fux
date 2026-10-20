@@ -9,11 +9,11 @@ amended: 2026-10-05
 date: 2026-08-27
 ratified: 2026-08-27
 feature: the record-to-component model, and the `describes` relation W-82 ruling 4 added to it
-owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@1eba43715793, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@e3d2172d0b11, tests/test_sr_frontmatter.py@c8c81b4b394a, tests/test_sr_ownership.py@2db4b35a0e53, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@8124ebcad40e, tests/test_sr_register_status.py@acae7406d76c]
+owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@1eba43715793, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@e3d2172d0b11, tests/test_sr_frontmatter.py@c8c81b4b394a, tests/test_sr_ownership.py@029b43c8f611, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@8124ebcad40e, tests/test_sr_register_status.py@acae7406d76c]
 laws: [0]
 ratifies: W-82 ruling 4
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 42a4a08a4c83d3ddceb9b73d55e59154f0bade6241c6fe02a45e3cbc7520818c
+content_sha: c81fe1541b8f2d17e2277b98e6a5a9ac31779e72e00554f49a3f596a5780c025
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -539,6 +539,8 @@ top-level definitions.
 **The gate-unreachable pin gains SR-LAW-13** (2026-10-10, law L13): the standing ship bar governs how a measurement decides what ships, so no change under `src/` can make it true or false — SR-RS's reason, not SR-ANSWER's.
 
 **No decision here moved** (W-273 phase 2, 2026-10-13): decision 11's one named exemption, SR-SECTIONS, is gone — the record was accepted and owns `query/sections.py` — so `tests/test_sr_ownership.py`'s exemption set is empty.
+
+**No decision here moved** (W-289, 2026-10-20): SR-CDP-FETCHER and SR-HTTP-FETCHER joined `tests/test_sr_ownership.py`'s set of records no change under `src/` can demand — each now owns a fetcher distribution under `packages/` ([SR-PLUGINS](0165_plugins.md) P10), which the freshness gate still reaches by path.
 
 ### Consequences
 

@@ -322,6 +322,32 @@ def _redaction_note(root: Path, rules) -> str:
     return note
 
 
+def _fetcher_names(root: Path) -> list[str]:
+    """Every `fetch=` name this repo can run, or `[]` when the declaration does
+    not read -- the `plugins` row reports that, once (SR-PLUGINS)."""
+    from . import plugins
+
+    try:
+        return plugins.fetcher_names(root)
+    except FuxError:
+        try:
+            return sorted(p.stem for p in (root / FETCHERS_DIR).glob("*.py"))
+        except OSError:  # pragma: no cover - an unreadable directory
+            return []
+
+
+def _package_source(module: str) -> "Path | None":
+    """The file a package's import name resolves to -- `find_spec`, which does
+    not execute it (L5: doctor never imports a fetcher)."""
+    import importlib.util
+
+    try:
+        spec = importlib.util.find_spec(module)
+    except (ImportError, ValueError):
+        return None
+    return Path(spec.origin) if spec is not None and spec.origin else None
+
+
 def _fetcher_config_tables(root: Path) -> Check:
     """`[sources.url.config.<name>]` sub-tables that name no fetcher file.
 
@@ -352,19 +378,18 @@ def _fetcher_config_tables(root: Path) -> Check:
         return Check(name, True, "only shared keys - every fetcher gets them")
 
     fetchers_dir = root / FETCHERS_DIR
-    try:
-        stems = {p.stem for p in fetchers_dir.glob("*.py")}
-    except OSError:
-        stems = set()
+    # SR-PLUGINS P8: a fetcher is a file in `.fux/fetchers/` OR a declared package.
+    stems = set(_fetcher_names(root))
     orphans = [n for n in named if n not in stems]
     if not orphans:
-        return Check(name, True, f"{len(named)} per-fetcher table(s), each naming a fetcher on disk")
+        return Check(name, True, f"{len(named)} per-fetcher table(s), each naming a fetcher this repo has")
     return Check(
         name,
         False,
         f"[sources.url.config.{orphans[0]}]"
         + (f" and {len(orphans) - 1} more" if len(orphans) > 1 else "")
-        + f" name(s) no fetcher: {fetchers_dir}/ has {sorted(stems) or 'nothing'}. "
+        + f" name(s) no fetcher: {fetchers_dir}/ and the declared packages have "
+        f"{sorted(stems) or 'nothing'}. "
         "These keys reach NO fetcher and nothing else says so - rename the table "
         "to the fetcher's filename without .py, or delete it",
     )
@@ -417,10 +442,7 @@ def _fetcher_routes(root: Path) -> Check:
     if not table and not claimed:
         return Check(name, True, "no routes and no ROUTES claim - every line is a pin", level="warn")
 
-    try:
-        stems = {p.stem for p in fetchers_dir.glob("*.py")}
-    except OSError:
-        stems = set()
+    stems = set(_fetcher_names(root))
 
     dangling = sorted(
         f"{pattern} -> {stem}"
@@ -430,7 +452,8 @@ def _fetcher_routes(root: Path) -> Check:
     if dangling:
         return Check(
             name, False,
-            f"{len(dangling)} route(s) name a fetcher that is not in {FETCHERS_DIR}/: "
+            f"{len(dangling)} route(s) name a fetcher that is neither in {FETCHERS_DIR}/ "
+            f"nor a declared package: "
             f"{', '.join(dangling)}. Every URL they match is unfetchable",
         )
 
@@ -734,10 +757,8 @@ def _fetcher_bindings(root: Path) -> Check:
         return Check(name, True, "no URL lines listed")
 
     fetchers_dir = root / FETCHERS_DIR
-    try:
-        stems = {p.stem for p in fetchers_dir.glob("*.py")}
-    except OSError:
-        stems = set()
+    # SR-PLUGINS P8: the consumer's file, else a declared package.
+    stems = set(_fetcher_names(root))
 
     wanted = sorted({e.fetch for e in resolved})
     missing = [n for n in wanted if n not in stems]
@@ -746,7 +767,7 @@ def _fetcher_bindings(root: Path) -> Check:
             name,
             True,
             f"{len(wanted)} fetcher name(s) in use, each resolving to a file in "
-            f"{fetchers_dir.name}/",
+            f"{fetchers_dir.name}/ or a declared package",
         )
     shown = ", ".join(missing[:3])
     more = f" (+{len(missing) - 3} more)" if len(missing) > 3 else ""
@@ -754,8 +775,9 @@ def _fetcher_bindings(root: Path) -> Check:
         name,
         False,
         f"{len(missing)} URL line(s) name a fetcher with no file: {shown}{more}. "
-        f"{fetchers_dir}/ has {sorted(stems) or 'nothing'}. Every fetch through one of "
-        "these fails at ingest time - write the module, or fix the `fetch=` name",
+        f"{fetchers_dir}/ and the declared packages have {sorted(stems) or 'nothing'}. Every "
+        "fetch through one of these fails at ingest time - declare its package (`fux setup`), "
+        "write the module, or fix the `fetch=` name",
     )
 
 
@@ -1440,10 +1462,26 @@ def _fetcher_capabilities(root: Path) -> Check:
     # fetcher to read any more. This row reports the optional functions of the
     # fetchers actually on disk, and names the shipped plain-GET one when it is
     # there, because that is the file a consumer is most likely asking about.
-    rel = f"{FETCHERS_DIR}/http.py"
-    path = root / rel
-    if not path.is_file():
-        return Check(name, True, f"{rel}: absent - run `fux setup` to write the shipped fetchers", level="warn")
+    # SR-PLUGINS P8: the consumer's `http.py` if there is one, else the declared
+    # package's source -- LOCATED, never imported.
+    from . import plugins
+
+    try:
+        resolved = plugins.resolve(root, "fetcher", "http")
+    except FuxError:  # an unreadable declaration is the `plugins` row's finding
+        resolved = plugins.Resolution(None, "http")
+    if resolved.how == "override":
+        rel, path = f"{FETCHERS_DIR}/http.py", resolved.path
+    elif resolved.how == "package":
+        rel, path = resolved.declared.name, _package_source(resolved.declared.package.module)
+    else:
+        rel, path = f"{FETCHERS_DIR}/http.py", None
+    if path is None or not path.is_file():
+        return Check(
+            name, True,
+            f"{rel}: absent - declare fux-fetcher-http (`fux setup`) or write the file",
+            level="warn",
+        )
 
     # Read the source; never import it. Importing a consumer's fetcher runs
     # their module-level code, and `doctor` is offline by this module's
@@ -2270,7 +2308,23 @@ def _fetchers_declaring_parallelism(root: Path) -> list[tuple[str, int]]:
         paths = sorted((root / FETCHERS_DIR).glob("*.py"))
     except OSError:
         return out
-    for path in paths:
+    # SR-PLUGINS P8: a declared fetcher package with no consumer file of its
+    # name runs too, so its source is read the same way -- located, not imported.
+    named = [(p.stem, p) for p in paths]
+    on_disk = {stem for stem, _ in named}
+    from . import plugins
+
+    try:
+        declared = plugins.declared(root)
+    except FuxError:
+        declared = {}
+    for decl in declared.values():
+        stem = decl.package.fetch
+        if stem and stem not in on_disk:
+            source = _package_source(decl.package.module)
+            if source is not None:
+                named.append((stem, source))
+    for stem, path in sorted(named):
         try:
             tree = ast.parse(path.read_text(encoding="utf-8"))
         except (OSError, SyntaxError, ValueError):
@@ -2286,7 +2340,7 @@ def _fetchers_declaring_parallelism(root: Path) -> list[tuple[str, int]]:
                     and not isinstance(value.value, bool)
                     and value.value > fixed("fetch", "undeclared_max_parallel")
                 ):
-                    out.append((path.stem, value.value))
+                    out.append((stem, value.value))
     return out
 
 
@@ -2612,6 +2666,104 @@ def _is_git_ignored(root: Path, path: Path) -> bool | None:
 
 
 # --------------------------------------------------------------------------
+# SR-PLUGINS: the declared packages
+# --------------------------------------------------------------------------
+
+
+def _plugins_declared(root: Path) -> Check:
+    """`.fux/plugins.toml` — present, and readable (SR-PLUGINS P2).
+
+    🔴 **One line when it is missing, with the lever** (W-289's first hazard):
+    a repository without the file runs no plugin package at all, and every row
+    that would list what that costs says nothing more until this one is fixed.
+    """
+    from . import plugins
+
+    name = "plugins declared"
+    rel = fixed("plugins", "file")
+    try:
+        found = plugins.read(root)
+    except FuxError as exc:
+        return Check(name, False, _ascii(str(exc)))
+    if found is None:
+        return Check(
+            name, False,
+            f"no {rel} - this repo declares no decoder or fetcher package. Run `fux setup`: "
+            "it proposes the packages your sources need and prints the one install line",
+            level="warn",
+        )
+    first = sum(1 for d in found.values() if d.package.first_party)
+    third = len(found) - first
+    listed = ", ".join(found) or "none"
+    return Check(
+        name, True,
+        f"{len(found)} package(s) declared ({first} first-party, {third} third-party): {listed}",
+    )
+
+
+def _plugins_installed(root: Path) -> Check:
+    """Every declared package installed at its pinned version and digest (P4),
+    its dependencies declared, and HTML readable wherever a fetcher is (P10).
+
+    **An error**, because the verb that needs the package refuses: a declared
+    package that is missing or drifted is the machine drift L2 exists to stop.
+    Located and hashed, never imported (L5).
+    """
+    from . import plugins
+
+    name = "plugins installed"
+    try:
+        found = plugins.read(root)
+    except FuxError:
+        return Check(name, True, "skipped (the declaration does not read - see that row)", level="warn")
+    if not found:
+        return Check(name, True, "nothing declared", level="warn")
+    problems = plugins.problems(root)
+    if not problems:
+        return Check(name, True, f"{len(found)} declared package(s), each installed at its pin")
+    more = f" (+{len(problems) - 1} more)" if len(problems) > 1 else ""
+    return Check(name, False, _ascii(problems[0]) + more)
+
+
+def _plugins_undeclared(root: Path) -> Check:
+    """A suffix in the configured sources that no declared package reads (P5).
+
+    **Never silent** (SR-DECODE decision 10's *"must not silently stop indexing
+    PDFs"*): a corpus that loses its PDFs looks exactly like one that never had
+    any. Names the package and the count. Offline: it lists names and opens no
+    file.
+    """
+    from . import plugins
+
+    name = "plugins cover sources"
+    try:
+        found = plugins.read(root)
+    except FuxError:
+        return Check(name, True, "skipped (the declaration does not read - see that row)", level="warn")
+    if found is None:
+        return Check(name, True, f"skipped (no {fixed('plugins', 'file')} - see that row)", level="warn")
+    try:
+        missing = plugins.undeclared(plugins.scan(root), found)
+    except FuxError:
+        return Check(name, True, "skipped (the source list does not read)", level="warn")
+    if not missing:
+        return Check(name, True, "every format in the sources has a declared package")
+    shown = "; ".join(f"{count} {suffix} ({package})" for suffix, (count, package) in missing.items())
+    packages = sorted({package for _, package in missing.values()})
+    return Check(
+        name, False,
+        f"{len(missing)} format(s) in the sources have no declared package: {shown}. "
+        f"Declare {', '.join(packages)} - `fux setup` adds them - or ignore those files",
+        level="warn",
+    )
+
+
+def _ascii(text: str) -> str:
+    """A doctor detail reaches a Windows console (SR-CLI veto 7)."""
+    return text.replace("—", "-").encode("ascii", "replace").decode("ascii")
+
+
+# --------------------------------------------------------------------------
 # the run: every row, in the order `fux doctor` prints them
 # --------------------------------------------------------------------------
 
@@ -2626,6 +2778,10 @@ ROWS: tuple[tuple[str, str], ...] = (
     ("core", "_index_not_ignored"),
     ("core", "_index_temp_ignored"),
     ("core", "_layout_declared"),
+    # W-289 — the declared packages, before any row that would need one.
+    ("core", "_plugins_declared"),
+    ("core", "_plugins_installed"),
+    ("core", "_plugins_undeclared"),
     ("core", "_output_config_health"),
     ("reader", "_journal_size"),
     ("core", "_tune_config_health"),
@@ -2642,7 +2798,7 @@ ROWS: tuple[tuple[str, str], ...] = (
     ("core", "_retired_agent_folders"),
     ("core", "_readme_current"),
     ("core", "_starter_refusals_untouched"),
-    ("writer", "_seeded_copies_current"),
+    ("writer", "_seeded_copies_removable"),
     ("writer", "_frozen_keys"),
     ("core", "_unbound_types"),
     ("core", "_listed_dirs_exist"),

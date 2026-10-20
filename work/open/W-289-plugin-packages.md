@@ -5,8 +5,8 @@ description: "Arpit's ruling (2026-10-19, Cowork): decoders, fetchers and decode
 item: W-289
 filed: 2026-10-19
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-19
-updated_by: "Arpit (Cowork, Opus 5.5)"
+updated: 2026-10-20
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -16,12 +16,12 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Amend L2: *optional is chosen by the committed repo, never by the machine* | the law permits opt-in packages without permitting machine drift | ⏳ |
-| 2 | Write SR-PLUGINS: `.fux/plugins.toml`, declared-not-detected, pinned, missing = hard error | two machines on one repo can never build different indexes | ⏳ |
-| 3 | Split the 17 built-in decoders, 2 fetchers and the table extension into 15 packages | a repo installs only the readers it needs | ⏳ |
-| 4 | `fux setup` scans the sources and writes the first `plugins.toml`; `fux ingest` and `fux doctor` name every undeclared suffix | nothing is skipped silently | ⏳ |
-| 5 | Stop seeding copies into `.fux/decoders/` and `.fux/fetchers/` — the package runs; a same-named file there still overrides | engine fixes reach consumers again | ⏳ |
-| 6 | Publish 15 new PyPI names in lockstep with fux's version | 6 names become 21, one release | 🔴 Arpit sets up 15 trusted publishers |
+| 1 | Amend L2: *optional is chosen by the committed repo, never by the machine* | the law permits opt-in packages without permitting machine drift | ✅ phase 1 |
+| 2 | Write SR-PLUGINS: `.fux/plugins.toml`, declared-not-detected, pinned, missing = hard error | two machines on one repo can never build different indexes | ✅ record + `plugins.py`; the verb-wide refusal is phase 2 |
+| 3 | Split the 17 built-in decoders, 2 fetchers and the table extension into 15 packages | a repo installs only the readers it needs | 🟡 15 packages build; fetchers moved; decoders are placeholders — phase 2 |
+| 4 | `fux setup` scans the sources and writes the first `plugins.toml`; `fux ingest` and `fux doctor` name every undeclared suffix | nothing is skipped silently | 🟡 setup + doctor done; ingest's stderr count is phase 2 |
+| 5 | Stop seeding copies into `.fux/decoders/` and `.fux/fetchers/` — the package runs; a same-named file there still overrides | engine fixes reach consumers again | ✅ seeding stopped; fetcher override built; decoder override is phase 2 |
+| 6 | Publish 15 new PyPI names in lockstep with fux's version | 6 names become 21, one release | 🔴 workflow ready; Arpit sets up 15 trusted publishers |
 
 **Arpit, 2026-10-19 (Cowork):** *"maybe we can build out a mechanism of extensions,
 decoders, plugins, and fetchers as separate packages that can be plugged into Fox"* →
@@ -127,6 +127,74 @@ Markdown/prose stays in core and needs no package.
 - **P13 L4 gate:** two virtualenvs, same repo, one with an extra undeclared package
   installed → byte-identical index. One with a declared package at a different version
   → hard error, no index written.
+
+## State
+
+**Phase 1 — built 2026-10-20 (Claude Code, Opus 5.5), on its own branch, alongside
+W-288.** Everything that does not touch the decoder tree:
+
+- **P1** — [SR-LAW-2](../../records/0004_LAW-2-zero-cost.md) amended with Arpit's
+  ruling quoted; `CLAUDE.md`'s law block regenerated.
+- **SR-PLUGINS** — [`records/0165_plugins.md`](../../records/0165_plugins.md),
+  accepted, built *partial*; registered; owns `src/fux/plugins.py`,
+  `.fux/plugins.toml` and three tests. `plugins.py` is core in the layer map.
+- **`src/fux/plugins.py`** — P2 parse (read once per process), the first-party
+  table from `constants.toml [plugins.packages]`, P3 lookups, P4 verification
+  (version and a RECORD-format digest computed from the located files, never
+  by import), P7 load by fixed name (fresh module, no entry points), P8
+  `resolve`, the P5/P6 scan, `propose`, `pin`, `render`.
+- **The uv workspace and the fifteen packages** under `packages/` — each a
+  hatchling project on fux's version, `license = "MIT"`, pinning `fux-core`
+  (and `fux-extension-table` for html/sheet/office); the fetchers pin nothing.
+  `fux-engine` depends on none; the `dev` extra names all fifteen.
+- **P10, complete** — the two fetcher templates moved into
+  `fux-fetcher-http` / `fux-fetcher-cdp`; `fetch=<name>` loads
+  `.fux/fetchers/<name>.py`, else the declared package, else a hard error naming
+  it. Tests: fetchers import nothing from fux; no offline path executes one; a
+  fetcher without `fux-decoder-html` is a `fux doctor` error. This repo's own
+  `.fux/fetchers/cdp.py` (an older unedited copy) was deleted; both packages are
+  declared here. ⚠ **`.fux/fetchers/http.py` (byte-identical to the old template)
+  is KEPT** — [SR-DECODE](../../records/0139_decode.md) links it, and that record
+  is off-limits to phase 1; it overrides the package here until phase 2 deletes it.
+- **P6, P9** — `fux setup` writes `.fux/plugins.toml` and prints one install
+  line, adds and pins rows on later runs, re-pins all under `--pin`, and seeds
+  no decoder or fetcher.
+- **`fux doctor`** — `plugins declared`, `plugins installed`, `plugins cover
+  sources`, and `seeded copies removable` (replacing `seeded copies current`).
+- **P11** — the parity script checks 23 sites; `ci.yml`, `publish.yml` and the
+  `setup-fux` action build, install and publish the fifteen;
+  `publish-pypi-plugins` runs after the role packages and does not gate
+  `fux-engine`.
+- **This repo's `.fux/plugins.toml`** — config, html, image, json, mail,
+  office, pdf, sheet, svg, the table extension and both fetchers. ⚠ **office and
+  pdf are beyond the DoD 7 list**: the scan found indexed `.docx`/`.pdf` files
+  under `archive/`, and dropping them is exactly P5's silent shrink.
+
+**Phase 2 owes** (after W-288 and this branch merge):
+
+- **P3 / P5 / P13, decoder half** — move the decoder modules from
+  `src/fux/decode/` (and W-288's `ext/table.py`) into their packages; gate the
+  decoder registry and the default type allowlist on the declaration; `fux
+  ingest` prints the per-suffix count of undeclared formats on stderr; the
+  two-environment L4 gate.
+- **P4, verb-wide** — `plugins.require(root)` at the start of every verb that
+  reads the index or ingests, `doctor` and `setup` excepted; then promote
+  `plugins declared` (missing file) from warn to error.
+- **P8, decoder half** — `.fux/decoders/<module>.py` > the declared package >
+  nothing, through `plugins.resolve(root, "decoder", module)`.
+- **P12** — REGISTER's `decoder` column as `pkg:<dist>@<version>/<module>@<n>`.
+- **Records phase 1 could not touch** — SR-DECODE (d5, d9, d10; and the
+  `seeded copies current` sentence at its decision 10), SR-TYPES d1 (default
+  allowlist), SR-INGEST (register column), SR-TABULAR as W-288 left it; the
+  `fux-decoder` skill's stamp paragraph (`DECODER-SKILL.md` is SR-DECODE's);
+  this repo's `.fux/decoders/` twins (keep, or delete as unedited?);
+  delete this repo's `.fux/fetchers/http.py` and repoint SR-DECODE's link to it; re-pin
+  this repo's `.fux/plugins.toml` once the decoder packages carry code.
+- **README** — the breaking change and the one-time `pip install` for existing
+  consumers, once the decoders actually move (CHANGELOG already says it).
+- 🔴 **Step 6, Arpit's** — fifteen PyPI pending trusted publishers bound to
+  `publish.yml` and the `pypi` environment, before the first release carrying
+  the packages.
 
 ## Definition of done
 

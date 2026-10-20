@@ -127,10 +127,14 @@ jobs:
       # else. Its own job until 2026-09-30; folded here to save a runner (W-243).
       - run: python tools/differential/ladder_check.py
       # W-282: fux-engine's sdist + wheel, and the three role wheels.
+      # W-289: and the fifteen plugin wheels (SR-PLUGINS P11).
       - run: |
           pip install build twine
           python -m build
           for role in core reader writer; do python -m build --wheel --outdir dist "packages/fux-$role"; done
+          for plugin in packages/fux-decoder-* packages/fux-fetcher-* packages/fux-extension-*; do
+            python -m build --wheel --outdir dist "$plugin"
+          done
           twine check --strict dist/*
           ls dist/
       - name: sdist must not ship the archived old build

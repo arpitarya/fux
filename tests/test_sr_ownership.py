@@ -540,6 +540,15 @@ _UNREACHABLE_BY_THE_GATE = {
     # archived, and no change under `src/` can make that true or false.
     # (ex-SR-LAW-5 left this set the same day — it moved to `archive/records/`.)
     "SR-LAW-1",
+    # SR-CDP-FETCHER and SR-HTTP-FETCHER (2026-10-20, W-289) each own a plugin
+    # DISTRIBUTION under `packages/` — the fetcher itself — and, for HTTP, this
+    # repository's `.fux/fetchers/http.py`. Neither is under `src/`, on purpose:
+    # a fetcher imports nothing from fux and ships outside the engine
+    # (SR-PLUGINS P10). The freshness gate still reaches both through those
+    # paths; only THIS set's question — can a change under `src/` demand them —
+    # answers no, which is the decision working, not the SR-ANSWER defect.
+    "SR-CDP-FETCHER",
+    "SR-HTTP-FETCHER",
 }
 
 

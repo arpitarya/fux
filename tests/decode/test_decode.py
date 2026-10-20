@@ -129,8 +129,8 @@ def test_both_fetchers_now_share_one_conversion():
     Assert the copies are gone, not merely that they currently agree.
     """
     root = Path(__file__).resolve().parents[2]
-    for name in ("http.py", "cdp.py"):
-        source = (root / ".fux" / "fetchers" / name).read_text()
+    for name in ("http", "cdp"):  # their packages since W-289 (SR-PLUGINS P10)
+        source = (root / "packages" / f"fux-fetcher-{name}" / "src" / f"fux_fetcher_{name}" / "__init__.py").read_text()
         assert "class _MdParser" not in source, f"{name} still carries a copy of the parser"
         # W-86 P8 went further than P1: a fetcher no longer converts at all, so
         # it does not even import the converter. `fetch()` returns bytes and the

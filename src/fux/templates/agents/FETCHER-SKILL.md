@@ -5,15 +5,17 @@ description: Write or edit a Fux URL fetcher in .fux/fetchers/ (http.py, the sig
 
 # Writing a Fux fetcher
 
-Fux never opens a socket itself. A **fetcher** — a Python file committed in
-`.fux/fetchers/` — retrieves each URL's bytes; **`.fux/refusals.toml`** names the
-responses that are not the document (a sign-in page, an error shell). Fux
-imports a fetcher only for `fux add <URL>`, `fux ingest`, and `fux answer` citing
-a URL. `fux setup` writes the two shipped fetchers once; **after that they are
-the repo's, and fux never rewrites them.** Each starts with a `# fux-template:
-<sha256>` line; `fux doctor`'s `seeded copies current` row names an **unedited**
-one whose template has changed since — re-seed it yourself (delete it, run
-`fux setup`).
+Fux never opens a socket itself. A **fetcher** retrieves each URL's bytes:
+a Python file committed in `.fux/fetchers/`, or a **fetcher package** the repo
+declares in `.fux/plugins.toml` — the two shipped ones are `fux-fetcher-http`
+and `fux-fetcher-cdp`. **`.fux/refusals.toml`** names the responses that are not
+the document (a sign-in page, an error shell). Fux runs a fetcher only for
+`fux add <URL>`, `fux ingest`, and `fux answer` citing a URL. `fux setup`
+declares the packages a URL list needs and prints the install line; it writes no
+fetcher file. **A file in `.fux/fetchers/` overrides the package of the same
+name** — to change a shipped fetcher, copy its package source there; that copy
+is the repo's, and fux never rewrites it. `fux doctor`'s `seeded copies
+removable` row names an **unedited** copy an older `fux setup` left behind.
 
 > ⚠ **This skill writes committed code and policy that decide which pages are
 > indexed.** Act only when a human asked. Never edit a fetcher or a refusal rule
@@ -36,7 +38,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 **Look before writing:**
 
 ```bash
-ls .fux/fetchers/ && grep -n "fetcher\|max_parallel" fux.toml
+ls .fux/fetchers/; cat .fux/plugins.toml; grep -n "fetcher\|max_parallel" fux.toml
 fux doctor --json      # checks: "fetcher optional functions", "refusal rules", "url sources"
 ```
 

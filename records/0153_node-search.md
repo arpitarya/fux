@@ -12,7 +12,7 @@ owns: [node@5dfe7951d6c5, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 295cecb96dbc7ca6e67021788c996eeb0f0b09bad3b783320139a26e664a0f96
+content_sha: c8e3f125f0f968becfb5ba544600db3ccae03420eb71fb1a7bbb3c9fb70c09bf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1080,6 +1080,8 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
 **No decision here moved** (W-279, 2026-10-13): `doctor.py`'s `register` row and the `.fux/README.md` template changed; `node/src/config/output.mjs` declares the Python-only `register` verb so `[cli.json] register` validates on both readers. The Node reader does not read the register and gains no verb. The register's shape is [SR-INGEST](0106_ingest.md) decision 22's.
 
 **The Node reader twins W-287's refer-plane half** (2026-10-19): `refer/chunk.mjs` (pipe-less tables, `row` metadata), `refer/rescore.mjs` (`columnWeight`, three-field rows, the selector, the sheet locator, ties on `order_key`), `refer/assemble.mjs` (`cells`/`table`/`columns_matched`, `recordOf`), `verbs/answer.mjs` (the record keys and the text record) and `verbs/mcp.mjs` (`fux_passage`'s row). Held equal by `tests/refer/test_table_twins.py`; Node still declines a decoded document, so an `.xlsx` row is never cited from Node (decision 11).
+
+**No decision here moved** (W-289, 2026-10-20): module-level edits in three files this record describes by symbol — `setup.py` (no decoder or fetcher is seeded; `.fux/plugins.toml` is written), `health.py` (three plugin rows in `ROWS`) and `store/fuxdir.py` (the `plugins.toml` row) — left `detect_workspace`, `wire_workspace`, the `node reader` row and every `.fux/node/` writer untouched ([SR-PLUGINS](0165_plugins.md)). npm is unchanged: plugin packages are writer-side and Python only.
 
 ### Consequences
 

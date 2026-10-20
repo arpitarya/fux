@@ -1,17 +1,17 @@
-"""Consumer-owned URL fetcher — Chrome DevTools Protocol, pure stdlib.
+"""`fux-fetcher-cdp` — Chrome DevTools Protocol, pure stdlib (W-289, SR-CDP-FETCHER).
 
-**This file belongs to you, not to fux. It is committed to your repo, at
-`.fux/fetchers/cdp.py`, and fux will never rewrite it.** Fux writes it once
-if it is missing and reads it by path from `fux.toml`
-(`[sources.url] fetcher`) under `fux add <URL>` or `fux ingest`, calls it to
-turn each URL into markdown, and indexes the result exactly like a repo file.
-Edit anything — port, launch flags, wait strategy, extraction, even the whole
-transport (swap in `websockets` or Playwright if you'd rather carry a
-dependency; fux never imports those, only this file's entry points).
+**This is a fux plugin package, and it imports nothing from fux.** A repository
+runs it only when `.fux/plugins.toml` declares `fux-fetcher-cdp`, pinned, and a
+URL line says `fetch=cdp` (SR-PLUGINS P2-P4, P10). Fux loads it under
+`fux add <URL>` or `fux ingest`, calls it once per URL, and decodes the bytes it
+returns exactly like a repo file. No offline path can reach it: its WebSocket
+code ships in this separate distribution, never inside fux (SR-CDP-FETCHER
+decision 9).
 
-Living in a dotdir has one consequence worth knowing: linters that skip
-hidden directories by default (ruff does) will not lint this file. That is
-deliberate — it is your code, not a fux CI target.
+**To change it, copy it.** A file at `.fux/fetchers/cdp.py` in your repository
+overrides this package (SR-PLUGINS P8) — port, launch flags, wait strategy, even
+the whole transport (swap in `websockets` or Playwright if you would rather carry
+a dependency; fux never imports those, only the file's entry points).
 
 **This file claims no routes, and that is deliberate.** A fetcher may declare a
 module-level `ROUTES` map — host pattern to fetcher stem — which fux reads with

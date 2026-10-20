@@ -110,7 +110,7 @@ jobs:
       - name: Install build tooling
         run: pip install build twine
 
-      - name: Build fux-engine (sdist + wheel) and the three role wheels
+      - name: Build fux-engine (sdist + wheel), the three role wheels and the fifteen plugin wheels
         # W-282: four distributions, one version, one tree. Which file ships in
         # which is records/README.md §The layer map, read by
         # packages/layer_hook.py. The role packages ship as wheels only — they
@@ -118,9 +118,19 @@ jobs:
         # ⚠ Each PyPI project needs its own trusted publisher bound to this
         # file and the `pypi` environment; a role package without one fails
         # its upload here while the others succeed.
+        #
+        # W-289 (SR-PLUGINS P11): the plugin packages — every
+        # packages/fux-{decoder,fetcher,extension}-* directory — on the same
+        # version, wheels only. 🔴 Their fifteen PyPI trusted publishers are
+        # Arpit's to create, once, before the first release that carries them
+        # (SR-WORK-RELEASE decision 15); until then `publish-pypi-plugins`
+        # fails and nothing else does.
         run: |
           python -m build
           for role in core reader writer; do python -m build --wheel --outdir dist "packages/fux-$role"; done
+          for plugin in packages/fux-decoder-* packages/fux-fetcher-* packages/fux-extension-*; do
+            python -m build --wheel --outdir dist "$plugin"
+          done
           ls dist/
 
       - name: Validate distribution metadata
@@ -165,6 +175,38 @@ jobs:
           packages-dir: roles/
           skip-existing: true
 
+  publish-pypi-plugins:
+    name: Publish the fifteen plugin packages to PyPI
+    runs-on: ubuntu-latest
+    # After the role packages, because every decoder package pins fux-core at
+    # this version. fux-engine does NOT wait for this job: it depends on no
+    # plugin package (SR-PLUGINS), so a plugin upload that fails — a missing
+    # trusted publisher, say — leaves the engine release intact.
+    needs: publish-pypi-roles
+    permissions:
+      id-token: write
+    environment:
+      name: pypi
+      url: https://pypi.org/project/fux-decoder-html/
+
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+      - name: Only the plugin wheels
+        run: |
+          mkdir plugins
+          mv dist/fux_decoder_* dist/fux_fetcher_* dist/fux_extension_* plugins/
+          ls plugins/
+
+      - name: Publish the plugin packages
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: plugins/
+          skip-existing: true
+
   publish-pypi:
     name: Publish fux-engine to PyPI
     runs-on: ubuntu-latest
@@ -184,6 +226,7 @@ jobs:
       - name: Only fux-engine
         run: |
           rm -f dist/fux_core-* dist/fux_reader-* dist/fux_writer-*
+          rm -f dist/fux_decoder_* dist/fux_fetcher_* dist/fux_extension_*
           ls dist/
 
       - name: Publish to PyPI

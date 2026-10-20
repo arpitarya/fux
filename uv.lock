@@ -5,7 +5,22 @@ requires-python = ">=3.12"
 [manifest]
 members = [
     "fux-core",
+    "fux-decoder-config",
+    "fux-decoder-drawio",
+    "fux-decoder-html",
+    "fux-decoder-image",
+    "fux-decoder-json",
+    "fux-decoder-mail",
+    "fux-decoder-office",
+    "fux-decoder-pdf",
+    "fux-decoder-rtf",
+    "fux-decoder-sheet",
+    "fux-decoder-svg",
+    "fux-decoder-xml",
     "fux-engine",
+    "fux-extension-table",
+    "fux-fetcher-cdp",
+    "fux-fetcher-http",
     "fux-reader",
     "fux-writer",
 ]
@@ -33,6 +48,150 @@ name = "fux-core"
 source = { editable = "packages/fux-core" }
 
 [[package]]
+name = "fux-decoder-config"
+version = "4.1.1"
+source = { editable = "packages/fux-decoder-config" }
+dependencies = [
+    { name = "fux-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+
+[[package]]
+name = "fux-decoder-drawio"
+version = "4.1.1"
+source = { editable = "packages/fux-decoder-drawio" }
+dependencies = [
+    { name = "fux-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+
+[[package]]
+name = "fux-decoder-html"
+version = "4.1.1"
+source = { editable = "packages/fux-decoder-html" }
+dependencies = [
+    { name = "fux-core" },
+    { name = "fux-extension-table" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fux-core", editable = "packages/fux-core" },
+    { name = "fux-extension-table", editable = "packages/fux-extension-table" },
+]
+
+[[package]]
+name = "fux-decoder-image"
+version = "4.1.1"
+source = { editable = "packages/fux-decoder-image" }
+dependencies = [
+    { name = "fux-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+
+[[package]]
+name = "fux-decoder-json"
+version = "4.1.1"
+source = { editable = "packages/fux-decoder-json" }
+dependencies = [
+    { name = "fux-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+
+[[package]]
+name = "fux-decoder-mail"
+version = "4.1.1"
+source = { editable = "packages/fux-decoder-mail" }
+dependencies = [
+    { name = "fux-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+
+[[package]]
+name = "fux-decoder-office"
+version = "4.1.1"
+source = { editable = "packages/fux-decoder-office" }
+dependencies = [
+    { name = "fux-core" },
+    { name = "fux-extension-table" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fux-core", editable = "packages/fux-core" },
+    { name = "fux-extension-table", editable = "packages/fux-extension-table" },
+]
+
+[[package]]
+name = "fux-decoder-pdf"
+version = "4.1.1"
+source = { editable = "packages/fux-decoder-pdf" }
+dependencies = [
+    { name = "fux-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+
+[[package]]
+name = "fux-decoder-rtf"
+version = "4.1.1"
+source = { editable = "packages/fux-decoder-rtf" }
+dependencies = [
+    { name = "fux-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+
+[[package]]
+name = "fux-decoder-sheet"
+version = "4.1.1"
+source = { editable = "packages/fux-decoder-sheet" }
+dependencies = [
+    { name = "fux-core" },
+    { name = "fux-extension-table" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "fux-core", editable = "packages/fux-core" },
+    { name = "fux-extension-table", editable = "packages/fux-extension-table" },
+]
+
+[[package]]
+name = "fux-decoder-svg"
+version = "4.1.1"
+source = { editable = "packages/fux-decoder-svg" }
+dependencies = [
+    { name = "fux-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+
+[[package]]
+name = "fux-decoder-xml"
+version = "4.1.1"
+source = { editable = "packages/fux-decoder-xml" }
+dependencies = [
+    { name = "fux-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+
+[[package]]
 name = "fux-engine"
 source = { editable = "." }
 dependencies = [
@@ -43,6 +202,21 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
+    { name = "fux-decoder-config" },
+    { name = "fux-decoder-drawio" },
+    { name = "fux-decoder-html" },
+    { name = "fux-decoder-image" },
+    { name = "fux-decoder-json" },
+    { name = "fux-decoder-mail" },
+    { name = "fux-decoder-office" },
+    { name = "fux-decoder-pdf" },
+    { name = "fux-decoder-rtf" },
+    { name = "fux-decoder-sheet" },
+    { name = "fux-decoder-svg" },
+    { name = "fux-decoder-xml" },
+    { name = "fux-extension-table" },
+    { name = "fux-fetcher-cdp" },
+    { name = "fux-fetcher-http" },
     { name = "hatchling" },
     { name = "pytest" },
     { name = "pytest-xdist" },
@@ -51,13 +225,49 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fux-core", editable = "packages/fux-core" },
+    { name = "fux-decoder-config", marker = "extra == 'dev'", editable = "packages/fux-decoder-config" },
+    { name = "fux-decoder-drawio", marker = "extra == 'dev'", editable = "packages/fux-decoder-drawio" },
+    { name = "fux-decoder-html", marker = "extra == 'dev'", editable = "packages/fux-decoder-html" },
+    { name = "fux-decoder-image", marker = "extra == 'dev'", editable = "packages/fux-decoder-image" },
+    { name = "fux-decoder-json", marker = "extra == 'dev'", editable = "packages/fux-decoder-json" },
+    { name = "fux-decoder-mail", marker = "extra == 'dev'", editable = "packages/fux-decoder-mail" },
+    { name = "fux-decoder-office", marker = "extra == 'dev'", editable = "packages/fux-decoder-office" },
+    { name = "fux-decoder-pdf", marker = "extra == 'dev'", editable = "packages/fux-decoder-pdf" },
+    { name = "fux-decoder-rtf", marker = "extra == 'dev'", editable = "packages/fux-decoder-rtf" },
+    { name = "fux-decoder-sheet", marker = "extra == 'dev'", editable = "packages/fux-decoder-sheet" },
+    { name = "fux-decoder-svg", marker = "extra == 'dev'", editable = "packages/fux-decoder-svg" },
+    { name = "fux-decoder-xml", marker = "extra == 'dev'", editable = "packages/fux-decoder-xml" },
+    { name = "fux-extension-table", marker = "extra == 'dev'", editable = "packages/fux-extension-table" },
+    { name = "fux-fetcher-cdp", marker = "extra == 'dev'", editable = "packages/fux-fetcher-cdp" },
+    { name = "fux-fetcher-http", marker = "extra == 'dev'", editable = "packages/fux-fetcher-http" },
     { name = "fux-reader", editable = "packages/fux-reader" },
     { name = "fux-writer", editable = "packages/fux-writer" },
-    { name = "hatchling", marker = "extra == 'dev'", specifier = ">=1.25" },
+    { name = "hatchling", marker = "extra == 'dev'", specifier = ">=1.27" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "pytest-xdist", marker = "extra == 'dev'", specifier = ">=3" },
 ]
 provides-extras = ["dev"]
+
+[[package]]
+name = "fux-extension-table"
+version = "4.1.1"
+source = { editable = "packages/fux-extension-table" }
+dependencies = [
+    { name = "fux-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "fux-core", editable = "packages/fux-core" }]
+
+[[package]]
+name = "fux-fetcher-cdp"
+version = "4.1.1"
+source = { editable = "packages/fux-fetcher-cdp" }
+
+[[package]]
+name = "fux-fetcher-http"
+version = "4.1.1"
+source = { editable = "packages/fux-fetcher-http" }
 
 [[package]]
 name = "fux-reader"

@@ -114,7 +114,10 @@ def test_the_shipped_fetcher_implements_it():
     """
     from pathlib import Path
 
-    template = Path(__file__).resolve().parents[2] / "src" / "fux" / "templates" / "http.py.txt"
+    template = (
+        Path(__file__).resolve().parents[2]
+        / "packages" / "fux-fetcher-http" / "src" / "fux_fetcher_http" / "__init__.py"
+    )
     source = template.read_text(encoding="utf-8")
     assert "def validate(url: str) -> str | None:" in source
     assert "ETag" in source and "Last-Modified" in source

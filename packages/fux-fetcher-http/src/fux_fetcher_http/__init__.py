@@ -1,12 +1,15 @@
-"""Consumer-owned URL fetcher — a plain HTTP GET, pure stdlib.
+"""`fux-fetcher-http` — a plain HTTP GET, pure stdlib (W-289, SR-HTTP-FETCHER).
 
-**This file belongs to you, not to fux. It is committed to your repo, at
-`.fux/fetchers/http.py`, and fux will never rewrite it.** `fux setup` writes it
-once if it is missing; after that it is yours. Fux reads it by path under
-`fux add <URL>` or `fux ingest`, calls it once per URL to RETRIEVE
-the bytes, decodes those itself, and indexes the result exactly like a repo
-file. Edit anything — add headers, a
-proxy, an auth token from your environment, a retry. Fux imports none of that, only this file's entry points.
+**This is a fux plugin package, and it imports nothing from fux.** A repository
+runs it only when `.fux/plugins.toml` declares `fux-fetcher-http`, pinned, and a
+URL line says `fetch=http` (SR-PLUGINS P2-P4, P10). Fux loads it under
+`fux add <URL>` or `fux ingest`, calls it once per URL to RETRIEVE the bytes,
+decodes those itself, and indexes the result exactly like a repo file.
+
+**To change it, copy it.** A file at `.fux/fetchers/http.py` in your repository
+overrides this package (SR-PLUGINS P8): add headers, a proxy, an auth token from
+your environment, a retry. Fux imports none of that, only the file's entry
+points, and never rewrites it.
 
 **There is NO default fetcher** (2026-09-20). Every line in `.fux/sources/urls`
 states its own `fetch=`, and a line without one fails to load. A line that says

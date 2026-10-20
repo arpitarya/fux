@@ -330,45 +330,42 @@ def _stale_redaction(root: Path) -> Check:
     )
 
 
-def _seeded_copies_current(root: Path) -> Check:
-    """Every stamped decoder and fetcher copy against the template it came from.
+def _seeded_copies_removable(root: Path) -> Check:
+    """Every decoder and fetcher copy a pre-W-289 `fux setup` seeded, judged
+    by its first-line stamp: an UNEDITED one is fux's code, not the consumer's,
+    and can be deleted (SR-PLUGINS P9).
 
-    **W-262 -- Arpit, 2026-10-04, W-251 #2, option B of
-    `work/compare/consumer-template-refresh.compare.md`.** `fux setup` seeds
-    `.fux/decoders/` and `.fux/fetchers/` once and never again, so an engine fix
-    to a shipped template reaches no existing repo on its own (SR-DECODE
-    decision 10's accepted cost, SR-FETCHER decision 12's gap). Each copy now
-    carries a first-line stamp naming the template's sha256, which separates the
-    three cases this row needs:
+    `fux setup` seeds nothing now: the declared package runs, and a same-named
+    file in `.fux/` still OVERRIDES it (P8). So an unedited copy is pure cost —
+    it pins this repo to the template it was seeded from and keeps every later
+    engine fix out.
 
     | copy | finding |
     |---|---|
-    | unedited, stamp = current template | none -- it IS the current template |
-    | **unedited, stamp != current template** | **named, with the lever: re-seed it yourself** |
-    | edited (body no longer hashes to its stamp) | none -- the consumer owns it |
+    | **unedited** (body still hashes to its stamp) | **named as removable** — for a fetcher, once its package is declared |
+    | edited (body no longer hashes to its stamp) | counted; the consumer owns it |
     | no stamp (seeded before W-262, or hand-written) | counted, never judged |
 
-    🔴 **A notice, never a rewrite.** SR-DOTFUX decision 6 names the mechanism
-    for a change that must reach an existing repo -- *a loader refusal or a
-    `doctor` check, never a rewrite* -- and option A, which refreshed unedited
-    copies on upgrade, was refused in the same ruling. **Re-seeding is the
-    consumer's act**: delete the file and run `fux setup`, which writes the
-    current template, stamped.
-
-    A **warning**, never an error: a stale unedited copy is a correct, supported
-    configuration that is merely missing fixes. Read as bytes; nothing is
-    imported (decision 7).
+    🔴 **A notice, never a deletion** (SR-DOTFUX decision 6). A **warning**: an
+    unedited copy is a correct, supported configuration. Read as bytes; nothing
+    is imported.
     """
-    from ..setup import read_stamp, seeded_copies, template_digest
+    from .. import plugins
+    from ..setup import read_stamp, seeded_paths, template_digest
 
-    name = "seeded copies current"
+    name = "seeded copies removable"
     dot = fixed("fuxdir", "dir")
     directory = root / dot
-    stale: list[str] = []
+    removable: list[str] = []
+    waiting: list[str] = []
     unstamped = 0
     edited = 0
-    current = 0
-    for rel, template in seeded_copies():
+    try:
+        declared = plugins.declared(root)
+    except FuxError:
+        declared = {}
+    fetches = {d.package.fetch for d in declared.values() if d.package.fetch}
+    for kind, stem, rel in seeded_paths():
         path = directory / rel
         if not path.is_file():
             continue
@@ -381,32 +378,28 @@ def _seeded_copies_current(root: Path) -> Check:
             unstamped += 1
         elif template_digest(body) != stamp:
             edited += 1
-        elif stamp != template_digest(template):
-            stale.append(f"{dot}/{rel}")
+        elif kind == "fetcher" and stem not in fetches:
+            waiting.append(f"{dot}/{rel} (declare fux-fetcher-{stem} first)")
         else:
-            current += 1
+            removable.append(f"{dot}/{rel}")
     tail = (
-        f"; {edited} edited (yours, not compared)" if edited else ""
+        f"; {edited} edited (yours, and they override the package)" if edited else ""
     ) + (
         f"; {unstamped} unstamped (seeded before the stamp, or written by hand - "
         "cannot be judged)" if unstamped else ""
     )
-    if not stale:
-        return Check(
-            name,
-            True,
-            f"{current} unedited copy(ies) match the current template{tail}",
-            level="warn",
-        )
+    found = removable + waiting
+    if not found:
+        return Check(name, True, f"no unedited seeded copy{tail}", level="warn")
     return Check(
         name,
         False,
-        f"{len(stale)} unedited copy(ies) whose template has changed since they were "
-        "seeded: "
-        + ", ".join(stale[:4])
-        + (f" and {len(stale) - 4} more" if len(stale) > 4 else "")
-        + f"{tail}. fux will not rewrite them - re-seed it yourself: delete the file "
-        "and run `fux setup`, which writes the current template, stamped",
+        f"{len(found)} unedited seeded copy(ies) override the package that would run "
+        "without them: "
+        + ", ".join(found[:4])
+        + (f" and {len(found) - 4} more" if len(found) > 4 else "")
+        + f"{tail}. fux will not delete them - delete them yourself and the declared "
+        "package runs, with every engine fix since",
         level="warn",
     )
 
@@ -523,7 +516,7 @@ def _fix() -> None:
 #: This layer's rows, by the name `health.ROWS` gives them.
 ROWS = {
     "_stale_redaction": _stale_redaction,
-    "_seeded_copies_current": _seeded_copies_current,
+    "_seeded_copies_removable": _seeded_copies_removable,
     "_frozen_keys": _frozen_keys,
     "_git_hooks": _git_hooks,
     "_background_runner": _background_runner,

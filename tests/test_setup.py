@@ -30,35 +30,44 @@ def _load(path: Path, name: str):
 
 
 # -- what ships ------------------------------------------------------------
+#
+# W-289 (SR-PLUGINS P9/P10): the two fetchers are packages now --
+# `fux-fetcher-http` and `fux-fetcher-cdp` -- and setup writes neither. Their
+# own contract tests are in `tests/ingest/` and `tests/test_plugin_packages.py`.
+
+PACKAGES = Path(__file__).resolve().parents[1] / "packages"
 
 
-def test_both_fetchers_ship_as_package_data_never_as_modules():
-    for template in setup_mod.FETCHERS.values():
-        path = TEMPLATES / template
-        assert path.is_file(), f"{template} is missing from the wheel's package data"
-        assert path.suffix == ".txt"
+def _fetcher_source(name: str) -> Path:
+    return PACKAGES / f"fux-fetcher-{name}" / "src" / f"fux_fetcher_{name}" / "__init__.py"
+
+
+def test_no_fetcher_ships_as_a_template_any_more():
+    assert not [*TEMPLATES.glob("*.py.txt")]
     assert not (TEMPLATES / "__init__.py").exists()  # not a package; nothing here imports
 
 
 def test_the_engine_never_imports_a_fetcher():
-    """SR-FETCHER decision 1 — a fetcher fux imports is a fetcher fux owns."""
+    """SR-FETCHER decision 1 -- a fetcher fux imports is a fetcher fux owns."""
     offenders = []
     for path in (Path(__file__).resolve().parents[1] / "src" / "fux").rglob("*.py"):
         text = path.read_text(encoding="utf-8")
         for line in text.splitlines():
             stripped = line.strip()
-            if stripped.startswith(("import ", "from ")) and "templates" in stripped:
+            if stripped.startswith(("import ", "from ")) and (
+                "templates" in stripped or "fux_fetcher_" in stripped
+            ):
                 offenders.append(f"{path.name}: {stripped}")
     assert not offenders, offenders
 
 
 def test_template_bytes_reads_out_of_the_installed_package():
-    assert setup_mod.template_bytes("http.py.txt").startswith(b'"""Consumer-owned URL fetcher')
+    assert setup_mod.template_bytes(setup_mod.PII_TEMPLATE).strip()
 
 
 def test_both_fetchers_satisfy_the_contract():
-    for name, template in setup_mod.FETCHERS.items():
-        module = _load(TEMPLATES / template, f"fetcher_{name.replace('.', '_')}")
+    for name in ("http", "cdp"):
+        module = _load(_fetcher_source(name), f"fetcher_{name}")
         assert callable(module.fetch), f"{name} defines no fetch(url)"
         assert callable(module.configure)
 
@@ -67,7 +76,7 @@ def test_neither_shipped_fetcher_converts_anything():
     """W-86 P8 replaced this test's subject rather than its assertion.
 
     It used to assert the two fetchers produced **identical markdown**, because
-    `fetch=` is routing and not a property of the document — if the two passes
+    `fetch=` is routing and not a property of the document -- if the two passes
     diverged, which fetcher retrieved a page would change the committed index.
     That property now holds **by construction**: neither file converts at all,
     both return bytes, and one decoder runs afterwards.
@@ -75,14 +84,14 @@ def test_neither_shipped_fetcher_converts_anything():
     Asserting absence rather than agreement matters. A test that two copies
     agree passes right up until someone edits one.
     """
-    for name in ("http.py.txt", "cdp.py.txt"):
-        source = (TEMPLATES / name).read_text(encoding="utf-8")
+    for name in ("http", "cdp"):
+        source = _fetcher_source(name).read_text(encoding="utf-8")
         assert "_MdParser" not in source, name
         assert "html_to_markdown" not in source, name
         assert "-> tuple[bytes, str]" in source, name
 
 def test_the_http_fetcher_rejects_an_unknown_config_key():
-    module = _load(TEMPLATES / "http.py.txt", "http_fetcher_cfg")
+    module = _load(_fetcher_source("http"), "http_fetcher_cfg")
     module.configure({"timeout_s": 5, "user_agent": "x"})
     assert module.TIMEOUT_S == 5.0
     with pytest.raises(module.FetcherError, match="unknown key"):
@@ -92,39 +101,111 @@ def test_the_http_fetcher_rejects_an_unknown_config_key():
 # -- what setup does -------------------------------------------------------
 
 
-def test_setup_writes_both_fetchers_and_both_source_lists(tmp_path):
+def test_setup_writes_no_fetcher_and_no_decoder_and_both_source_lists(tmp_path):
+    """SR-PLUGINS P9: the declared package runs; nothing is seeded."""
     report = setup_mod.run(tmp_path)
-    assert (tmp_path / ".fux" / "fetchers" / "http.py").is_file()
-    assert (tmp_path / ".fux" / "fetchers" / "cdp.py").is_file()
+    assert not (tmp_path / ".fux" / "fetchers").exists()
+    assert not (tmp_path / ".fux" / "decoders").exists()
     assert (tmp_path / ".fux" / "sources" / "dirs").is_file()
     assert (tmp_path / ".fux" / "sources" / "urls").is_file()
-    assert ".fux/fetchers/http.py" in report.written
+    assert ".fux/plugins.toml" in report.written
     assert report.kept == []
 
 
-def test_the_default_fetcher_path_resolves_to_a_file_after_setup(tmp_path):
-    """W-51: the shipped plain-GET fetcher must exist where a stem resolves to it.
+def test_setup_declares_what_the_sources_need_and_prints_one_install_line(tmp_path, monkeypatch, capsys):
+    """SR-PLUGINS P6: scan, write the declaration, print the line, install nothing."""
+    import argparse
 
-    ⚠ **`DEFAULT_FETCHER` is gone** (W-199 D2, 2026-09-20) — there is no default
-    fetcher any more. What survives of W-51's lesson is narrower and still
-    worth a test: `fetch=http` resolves to `<FETCHERS_DIR>/http.py`, and `fux
-    setup` has to have put a file there.
-    """
-    from fux.config import FETCHERS_DIR
-    DEFAULT_FETCHER = f"{FETCHERS_DIR}/http.py"
+    from fux import plugins
 
-    setup_mod.run(tmp_path)
-    assert (tmp_path / DEFAULT_FETCHER).is_file()
+    (tmp_path / ".git").mkdir()
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "a.md").write_text("# A\n", encoding="utf-8")
+    (tmp_path / "docs" / "b.pdf").write_bytes(b"%PDF-1.4")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(plugins, "installed_version", lambda name: None)
+    assert setup_mod.cmd_setup(argparse.Namespace(no_agents=True, pin=False)) == 0
+    monkeypatch.undo()
+    plugins.reset()
+    assert list(plugins.declared(tmp_path)) == ["fux-decoder-pdf"]
+    out = capsys.readouterr().out
+    assert "wrote .fux/plugins.toml" in out
+    install = [line.strip() for line in out.splitlines() if line.strip().startswith("pip install")]
+    assert install == [plugins.install_line([("fux-decoder-pdf", plugins._fux_version())])]
+    assert "fux setup` again to pin" in out
+    plugins.reset()
 
 
-def test_setup_never_overwrites_an_edited_fetcher(tmp_path):
-    setup_mod.run(tmp_path)
-    edited = tmp_path / ".fux" / "fetchers" / "http.py"
-    edited.write_text("# mine now\n", encoding="utf-8")
+def test_setup_installs_nothing(tmp_path, monkeypatch):
+    """L5: fux runs no installer. A package this machine lacks becomes a line."""
+    import subprocess
+
+    from fux import plugins
+
+    def explode(*a, **k):  # pragma: no cover - the point is that it is not called
+        raise AssertionError("fux setup ran a process")
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "b.pdf").write_bytes(b"%PDF-1.4")
+    monkeypatch.setattr(subprocess, "Popen", explode)
+    monkeypatch.setattr(plugins, "installed_version", lambda name: None)
     report = setup_mod.run(tmp_path)
-    assert edited.read_text(encoding="utf-8") == "# mine now\n"
-    assert ".fux/fetchers/http.py" in report.kept
-    assert report.written == []
+    assert report.install_line == plugins.install_line([("fux-decoder-pdf", plugins._fux_version())])
+    assert report.unpinned == ["fux-decoder-pdf"]
+    plugins.reset()
+
+
+def test_setup_adds_and_pins_rows_and_never_removes_one(tmp_path, monkeypatch):
+    from fux import plugins
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "b.pdf").write_bytes(b"%PDF-1.4")
+    monkeypatch.setattr(plugins, "installed_version", lambda name: None)
+    setup_mod.run(tmp_path)
+    plugins.reset()
+    assert plugins.declared(tmp_path)["fux-decoder-pdf"].digest == ""
+    monkeypatch.undo()
+    # A hand-declared extra row survives; the unpinned one is pinned now.
+    rows = list(plugins.declared(tmp_path).values()) + [plugins.pin("fux-decoder-rtf")]
+    plugins.path(tmp_path).write_text(plugins.render(rows), encoding="utf-8")
+    (tmp_path / "docs" / "c.json").write_text("{}", encoding="utf-8")
+    plugins.reset()
+    report = setup_mod.run(tmp_path)
+    plugins.reset()
+    found = plugins.declared(tmp_path)
+    assert set(found) == {"fux-decoder-pdf", "fux-decoder-rtf", "fux-decoder-json"}
+    assert found["fux-decoder-pdf"].digest == plugins.installed_digest("fux_decoder_pdf")
+    assert ".fux/plugins.toml" in report.updated
+    plugins.reset()
+
+
+def test_only_pin_re_pins_a_drifted_row(tmp_path):
+    from fux import plugins
+    from fux.constants import fixed
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "b.pdf").write_bytes(b"%PDF-1.4")
+    setup_mod.run(tmp_path)
+    wrong = fixed("plugins", "digest_prefix") + "0" * 64
+    target = plugins.path(tmp_path)
+    good = plugins.installed_digest("fux_decoder_pdf")
+    target.write_text(target.read_text(encoding="utf-8").replace(good, wrong), encoding="utf-8")
+    plugins.reset()
+    setup_mod.run(tmp_path)  # without --pin: a drifted pin is never touched
+    plugins.reset()
+    assert plugins.declared(tmp_path)["fux-decoder-pdf"].digest == wrong
+    setup_mod.run(tmp_path, pin=True)
+    plugins.reset()
+    assert plugins.declared(tmp_path)["fux-decoder-pdf"].digest == good
+    plugins.reset()
+
+
+def test_a_fetcher_file_written_by_hand_survives_setup(tmp_path):
+    fetchers = tmp_path / ".fux" / "fetchers"
+    fetchers.mkdir(parents=True)
+    (fetchers / "http.py").write_text("# mine now\n", encoding="utf-8")
+    setup_mod.run(tmp_path)
+    assert (fetchers / "http.py").read_text(encoding="utf-8") == "# mine now\n"
 
 
 def test_setup_never_overwrites_an_edited_source_list(tmp_path):
@@ -637,36 +718,14 @@ def test_the_two_valued_url_keys_are_written_live_with_their_defaults(tmp_path):
     assert {"acquired_max_bytes", "sweep_minutes", "ttl"} <= assigned
 
 
-def test_the_fetcher_config_tables_are_derived_from_the_fetchers(tmp_path):
-    """Derived, never transcribed — the `_urls_header()` lesson (W-140 row 18).
-
-    The values in `[sources.url.config.<stem>]` must be the fetcher's own
-    defaults, read out of the shipped file, so editing a fetcher's default
-    cannot leave the scaffolded config saying something else.
-    """
+def test_no_per_fetcher_table_is_scaffolded(tmp_path):
+    """W-289: the per-fetcher tables were derived from the two templates, which
+    are packages now and may not be installed when setup runs -- a scaffold
+    derived from them would differ by machine. The shared table stays."""
     tables = setup_mod.url_config_tables()
-    assert "[sources.url.config.http]" in tables
-    assert "[sources.url.config.cdp]" in tables
-    for template, key, needle in (
-        ("cdp.py.txt", "cdp_port", "CDP_PORT"),
-        ("http.py.txt", "timeout_s", "TIMEOUT_S"),
-    ):
-        derived = setup_mod.fetcher_defaults(template)
-        source = setup_mod.template_bytes(template).decode("utf-8")
-        assert f"{needle} = {derived[key]!r}" in source or f"{needle} = {derived[key]}" in source
-
-
-def test_the_fetchers_are_parsed_not_executed(tmp_path, monkeypatch):
-    """`cdp.py` carries network code and must never run inside the package
-    (SR-CDP-FETCHER decision 8) — least of all from `fux setup`."""
-    import subprocess
-
-    def explode(*a, **k):  # pragma: no cover - the point is that it is not called
-        raise AssertionError("fux setup executed a fetcher")
-
-    monkeypatch.setattr(subprocess, "Popen", explode)
-    monkeypatch.setattr(subprocess, "run", explode)
-    assert setup_mod.fetcher_defaults("cdp.py.txt")["cdp_port"] == 9222
+    assert "[sources.url.config]" in tables
+    assert "\n[sources.url.config.http]" not in tables
+    assert "\n[sources.url.config.cdp]" not in tables
 
 
 def test_no_fetcher_receives_another_fetchers_keys(tmp_path):
@@ -676,6 +735,17 @@ def test_no_fetcher_receives_another_fetchers_keys(tmp_path):
     from fux.config import load
 
     setup_mod.run(tmp_path)
+    # W-289: the scaffold carries no per-fetcher table; a consumer writes them.
+    config = tmp_path / "fux.toml"
+    config.write_text(
+        config.read_text(encoding="utf-8").replace(
+            "[sources.url.config]\n",
+            "[sources.url.config]\n\n[sources.url.config.cdp]\ncdp_port = 9222\n\n"
+            "[sources.url.config.http]\ntimeout_s = 30.0\n",
+            1,
+        ),
+        encoding="utf-8",
+    )
     url = load(tmp_path).url
     http_keys = set(url.config_for(".fux/fetchers/http.py"))
     cdp_keys = set(url.config_for(".fux/fetchers/cdp.py"))

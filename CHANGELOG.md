@@ -8,6 +8,49 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+**Plugin packages — only the engine is mandatory (W-289, phase 1).** ⚠
+**Breaking for every consumer, once**: run `fux setup` after upgrading, run the
+one `pip install …` line it prints, and commit `.fux/plugins.toml`.
+[SR-LAW-2](records/0004_LAW-2-zero-cost.md) is amended (Arpit, 2026-10-19): a
+capability may be opt-in only when the committed repository chooses it; no
+capability may depend on what a machine happens to have installed.
+
+### Added
+
+- **Fifteen plugin packages**, built from this tree on fux's own version:
+  `fux-decoder-{json,config,html,sheet,office,pdf,xml,svg,drawio,image,mail,rtf}`,
+  `fux-fetcher-{http,cdp}` and `fux-extension-table`. `fux-engine` depends on
+  none of them.
+- **`.fux/plugins.toml`** — the committed declaration: one `[[package]]` row per
+  package with its `version` and `digest`
+  ([SR-PLUGINS](records/0165_plugins.md)). A declared package that is missing,
+  at another version, or whose files differ from the pin is refused with the
+  install line; an installed package nobody declared never runs.
+- **`fux setup` scans your sources and writes the declaration** — every package
+  your files and URL lines need, closed over its dependencies — and prints one
+  `pip install` line. It installs nothing. **`fux setup --pin`** re-pins every
+  row after an upgrade.
+- **`fux doctor` rows**: `plugins declared`, `plugins installed`, `plugins cover
+  sources` (a format in your sources with no declared package, and how many
+  files), and `seeded copies removable` (replacing `seeded copies current`).
+
+### Changed
+
+- **The two fetchers are packages**: `fux-fetcher-http` and `fux-fetcher-cdp`
+  import nothing from fux. `fetch=<name>` loads `.fux/fetchers/<name>.py` when
+  you have one — your file still wins — and otherwise the declared package.
+- **`fux setup` seeds no fetcher and no decoder** into `.fux/`; the package (for
+  decoders, still the built-in module until phase 2) is what runs, so engine
+  fixes reach you again. A copy an older setup wrote keeps overriding; `fux
+  doctor` names every unedited one as safe to delete.
+- **The scaffolded `fux.toml` carries no `[sources.url.config.http]` /
+  `[sources.url.config.cdp]` table**; a fetcher with no table runs on its own
+  documented defaults.
+- ⚠ **Phase 1 does not yet gate decoders**: every format is still read by the
+  built-in modules whether or not its package is declared. Phase 2 moves the
+  decoder modules into their packages and stops reading an undeclared format.
+
+
 **Tables answer by row and by column (W-287).** No index-format change
 (`fux.index.v8`); the ranking change ships **off** — its pre-registered run
 failed on latency, not on quality.

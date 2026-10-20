@@ -670,10 +670,18 @@ def test_the_shipped_template_implements_every_optional_function(tmp_path):
     from fux import doctor as doctor_mod
     from fux import setup as setup_mod
 
+    from fux import plugins
+
     setup_mod.run(tmp_path)
     (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
     write_config(tmp_path)
+    # W-289: the shipped fetcher is a package the repository declares (P8).
+    plugins.path(tmp_path).write_text(
+        plugins.render([plugins.pin("fux-fetcher-http")]), encoding="utf-8"
+    )
+    plugins.reset()
     check = doctor_mod._fetcher_capabilities(tmp_path)
+    plugins.reset()
     assert check.ok and "implements" in check.detail, check.detail
 
 

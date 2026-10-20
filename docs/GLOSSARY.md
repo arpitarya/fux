@@ -218,6 +218,14 @@ best score, every unopened block is skipped. **Never by dropping postings** —
 pruning is forbidden ([P1-RERUN](../work/regression/2026-08-09-pruning-rerun/VERDICT.md)); the
 worst case is doing the scan's work, never a wrong answer.
 
+**Declared (a plugin package)** — Named, with its version and digest, in the
+committed `.fux/plugins.toml` ([SR-PLUGINS](../records/0165_plugins.md) P2).
+Only a declared [plugin package](#plugin-package) runs; one that is installed
+and not declared is never consulted, and one that is declared and missing or
+different from its pin stops fux with the install line. The opposite of
+*detected*: fux never decides what runs from what a machine has installed
+([SR-LAW-2](../records/0004_LAW-2-zero-cost.md) decision 2).
+
 **Derived plane** — A child of the [`.fux` directory](#fux-directory) that is
 **rebuildable and gitignored**: `runtime/` (M2's accelerator segments, and
 M4's fetch cache nested inside it at `runtime/fetch-cache/`). Created through
@@ -673,6 +681,15 @@ number. **Suspended** when its document's content sha moves, until a human
 `fux correct --reaffirm`s it — `fux doctor`'s `correction pins` row names every
 suspended one, because suspension is silent at query time. See
 [SR-ENRICH](../records/0137_enrich.md) decision 19a.
+
+**Plugin package** — A separately published distribution that adds one
+capability to fux — a decoder (`fux-decoder-pdf`), a fetcher
+(`fux-fetcher-cdp`) or an extension (`fux-extension-table`) — named
+`fux-<kind>-<subject>` and imported by exactly one name,
+`fux_<kind>_<subject>`. Only `fux-engine` is mandatory; a repository runs a
+plugin package only when it is [declared](#declared-a-plugin-package)
+([SR-PLUGINS](../records/0165_plugins.md), W-289). The fifteen first-party
+ones ship on fux's own version.
 
 **PPR-lite** — Personalized PageRank restricted to the seed neighbourhood
 (damping 0.85, exactly 3 iterations, sorted traversal). A *fixed* iteration

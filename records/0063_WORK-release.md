@@ -6,12 +6,12 @@ title: "SR-WORK-RELEASE (0063) — one name in two registries, and what actually
 description: "fux-engine ships to PyPI and npm from one release trigger — PyPI automatically by OIDC, npm staged for a human to approve — and the version has four hand-written sites plus one derived bundle, held equal by check-version-parity.py. main has no required status checks: history is protected, the quality gate is not, so CI green is the author's to read."
 status: accepted
 date: 2026-09-14
-amended: 2026-10-19
+amended: 2026-10-20
 feature: how a release reaches two registries, how the version stays equal across its sites, and what the branch wall does not do
-owns: [scripts/check-version-parity.py@72454ae055c2, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@813638a7e6a2, scripts/npm-scoped.py@4214c9c3380a]
+owns: [scripts/check-version-parity.py@b861fee901b6, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@4c2f38935d60, scripts/npm-scoped.py@4214c9c3380a]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: cceabadd2c558175c26cbeaff8fc225418e97c6d4a8a8b3f9b79ba722bf3e05c
+content_sha: b192233be8994615bed8300c7e059741c8fbf01fa70da43390f63c2daf277605
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -118,11 +118,15 @@ rather than a string somebody might forget to edit.
    `pyproject.toml` reads dynamically. **That component belongs to SR-LAWS and is
    not claimed here** — one component, one owner.
 
-3. **It is the SOURCE, not the only copy.** Eight hand-written sites exist today:
-   the source, `node/package.json`, `node/fux.mjs`, `node/src/verbs/mcp.mjs`,
-   the distribution pins in `pyproject.toml`, `packages/fux-reader/pyproject.toml`
-   and `packages/fux-writer/pyproject.toml` (decision 15), and the VS Code
-   extension's `vscode/package.json` (decision 16).
+3. **It is the SOURCE, not the only copy.** Twenty-three hand-written sites
+   exist today: the source, `node/package.json`, `node/fux.mjs`,
+   `node/src/verbs/mcp.mjs`, the distribution pins in `pyproject.toml`,
+   `packages/fux-reader/pyproject.toml` and `packages/fux-writer/pyproject.toml`
+   (decision 15), the VS Code extension's `vscode/package.json` (decision 16),
+   and **the fifteen plugin packages' `pyproject.toml`** — each a static
+   `version` plus its `fux-core` / `fux-extension-table` pins (decision 15,
+   [SR-PLUGINS](0165_plugins.md) P11). The plugin sites are the directories on
+   disk, so a sixteenth package is checked the day it is added.
 
 4. **[`scripts/check-version-parity.py`](../scripts/check-version-parity.py) is
    the enforcement**, run by
@@ -298,8 +302,9 @@ rather than a string somebody might forget to edit.
       evicted: a release cut later than that is refused until a dispatched
       run re-earns the key.
 
-15. **Four PyPI distributions and two npm packages, released together on one
-    version** (W-282, 2026-10-18; rulings F1 and F4, Arpit):
+15. **Nineteen PyPI distributions and two npm packages — twenty-one names —
+    released together on one version** (W-282, 2026-10-18, rulings F1 and F4;
+    W-289, 2026-10-19 — Arpit):
 
     | registry | package | carries | built by |
     |---|---|---|---|
@@ -309,7 +314,19 @@ rather than a string somebody might forget to edit.
     | PyPI | `fux-engine` | the engine layer; depends on the three — **installs what it installed before** | the root — sdist + wheel |
     | npm | `fux-engine` | the Node reader bundle, unchanged | `node/dist/` |
     | npm | `@fux-engine/reader` | the same bundle under the scope | `scripts/npm-scoped.py` |
+    | PyPI | `fux-decoder-json` · `-config` · `-html` · `-sheet` · `-office` · `-pdf` · `-xml` · `-svg` · `-drawio` · `-image` · `-mail` · `-rtf` | twelve decoder packages; each depends on `fux-core`, and `-html`/`-sheet`/`-office` on `fux-extension-table` | `packages/fux-decoder-*/` — wheel |
+    | PyPI | `fux-fetcher-http` · `fux-fetcher-cdp` | the two fetchers; **depend on nothing**, import nothing from fux | `packages/fux-fetcher-*/` — wheel |
+    | PyPI | `fux-extension-table` | the table extension; depends on `fux-core` | `packages/fux-extension-table/` — wheel |
 
+    - **The fifteen plugin packages are optional by the repository's choice**
+      ([SR-LAW-2](0004_LAW-2-zero-cost.md) decision 2): `fux-engine` depends on
+      none of them, and a repository runs one only when its `.fux/plugins.toml`
+      declares it ([SR-PLUGINS](0165_plugins.md)). Each carries its files in
+      its own `src/<import name>/` and is built by hatchling directly — the
+      layer map is the engine's, not theirs. `publish.yml`'s
+      `publish-pypi-plugins` job uploads them **after** the role packages
+      (every decoder pins `fux-core`) and **does not gate `fux-engine`**, which
+      depends on none of them.
     - **Which file ships in which is the layer map's**
       ([records/README.md §The layer map](README.md)), read at build time by
       [`packages/layer_hook.py`](../packages/layer_hook.py); no `pyproject.toml`
@@ -322,10 +339,13 @@ rather than a string somebody might forget to edit.
       `fux-core`, `fux-reader`, `fux-writer`; each role → `fux-core`) are
       parity sites — a forgotten pin would install a role package from the
       previous release.
-    - **Development installs all four from this tree** — `uv sync --extra dev`
-      (a uv workspace), or one pip command line:
-      `pip install -e packages/fux-core -e packages/fux-reader -e packages/fux-writer -e ".[dev]"`.
-      CI's `setup-fux` action does the latter, because PyPI has no copy of an
+    - **Development installs every one from this tree** — `uv sync --extra
+      dev` (a uv workspace whose members include `packages/fux-decoder-*`,
+      `packages/fux-fetcher-*` and `packages/fux-extension-table`), or one pip
+      command line naming each `packages/` directory with `-e` beside
+      `-e ".[dev]"`. The `dev` extra names the fifteen plugin packages so the
+      tests can import them; it is dev tooling, not an install option. CI's
+      `setup-fux` action does the pip form, because PyPI has no copy of an
       unreleased version for pip to resolve the pins against.
     - 🔴 **Three hand steps before the first four-package release**, each
       Arpit's: a PyPI trusted publisher for `fux-core`, `fux-reader` and
@@ -334,6 +354,15 @@ rather than a string somebody might forget to edit.
       organization on npm; and the first `@fux-engine/reader` publish by hand,
       since npm binds a trusted publisher to a package that exists. Until each
       is done, its upload fails and the others still publish.
+    - 🔴 **Fifteen more hand steps before the first release that carries the
+      plugin packages** (W-289 step 6), each Arpit's: a PyPI **pending trusted
+      publisher** for every `fux-decoder-*`, `fux-fetcher-*` and
+      `fux-extension-table` name, bound to `publish.yml` and the `pypi`
+      environment. **None exists yet.** Until each does, `publish-pypi-plugins`
+      fails at its upload while `fux-engine`, the role packages and npm still
+      publish — and a consumer who declares a package that never reached PyPI
+      gets P4's install line naming a version pip cannot find. No agent sets
+      these up and no workflow works around them.
 16. **The VS Code extension rides the same release as a GitHub release
     asset** (W-286, 2026-10-19). `publish.yml`'s `publish-vsix` job builds
     `fux-<version>.vsix` with `scripts/build-vsix.py` after the CI-verdict gate
@@ -410,7 +439,7 @@ against the `SITES` list in the script, and
 document is never listed here — the body may name one, but archive is not
 evidence.*
 
-**Records** — [SR-LAWS](0001_LAWS.md) · [SR-LAW-10](0012_LAW-10-bundled-output.md) · [SR-NODE-SEARCH](0153_node-search.md) · [SR-WORK-SESSION](0060_WORK-session.md)
+**Records** — [SR-LAWS](0001_LAWS.md) · [SR-LAW-10](0012_LAW-10-bundled-output.md) · [SR-NODE-SEARCH](0153_node-search.md) · [SR-WORK-SESSION](0060_WORK-session.md) · [SR-LAW-2](0004_LAW-2-zero-cost.md) · [SR-PLUGINS](0165_plugins.md)
 
 **Code**
 

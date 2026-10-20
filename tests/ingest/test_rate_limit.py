@@ -7,6 +7,8 @@ read HTTP. Everything else here is in service of those two.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import time
 import types
 
@@ -340,17 +342,15 @@ def test_the_counts_survive_a_round_trip_through_the_schema(tmp_path):
 def test_the_shipped_http_fetcher_declares_the_predicate():
     """An optional hook nobody implements is dead weight. The shipped fetcher
     implementing it is the clean test that this one is not."""
-    from fux.setup import FETCHERS, template_bytes
 
-    source = template_bytes(FETCHERS["http.py"]).decode("utf-8")
+    source = _HTTP_SOURCE.read_bytes().decode("utf-8")
     assert "def is_rate_limited(" in source
     assert "rate_limited" in source
 
 
 def test_the_shipped_fetcher_reads_a_flag_not_the_message():
-    from fux.setup import FETCHERS, template_bytes
 
-    source = template_bytes(FETCHERS["http.py"]).decode("utf-8")
+    source = _HTTP_SOURCE.read_bytes().decode("utf-8")
     body = _code_only(source[source.index("def is_rate_limited("):])
     assert 'getattr' in body and 'rate_limited' in body
     assert "429" not in body, (
@@ -361,9 +361,8 @@ def test_the_shipped_fetcher_reads_a_flag_not_the_message():
 def test_the_shipped_fetcher_still_parses():
     import ast
 
-    from fux.setup import FETCHERS, template_bytes
 
-    ast.parse(template_bytes(FETCHERS["http.py"]).decode("utf-8"))
+    ast.parse(_HTTP_SOURCE.read_bytes().decode("utf-8"))
 
 
 @pytest.mark.parametrize("code,expected", [(429, True), (500, False), (404, False)])
@@ -371,10 +370,9 @@ def test_the_shipped_predicate_fires_only_on_429(code, expected, tmp_path):
     """Execute the SHIPPED template, not a copy of its logic."""
     import urllib.error
 
-    from fux.setup import FETCHERS, template_bytes
 
     namespace: dict = {}
-    exec(compile(template_bytes(FETCHERS["http.py"]).decode("utf-8"), "http.py", "exec"), namespace)
+    exec(compile(_HTTP_SOURCE.read_bytes().decode("utf-8"), "http.py", "exec"), namespace)
 
     err = namespace["FetcherError"]("HTTPError: x")
     err.rate_limited = code == 429
@@ -410,3 +408,10 @@ def test_doctor_never_suggests_a_number_for_the_cap(tmp_path):
     detail = doctor._url_health(tmp_path).detail
     assert "lower max_parallel to" not in detail
     assert "set max_parallel" not in detail
+
+
+#: The shipped plain-GET fetcher — its package since W-289 (SR-PLUGINS P10).
+_HTTP_SOURCE = (
+    Path(__file__).resolve().parents[2]
+    / "packages" / "fux-fetcher-http" / "src" / "fux_fetcher_http" / "__init__.py"
+)
