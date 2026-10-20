@@ -306,6 +306,12 @@ W-288.** Everything that does not touch the decoder tree:
   uvx twine upload /tmp/fuxplug/*     # username __token__, an account-scoped token
   ```
 
+- **Progress 2026-10-21:** Arpit's upload created **config, drawio, html, image**
+  (4.1.1), then PyPI answered `429 Too Many Requests` (it limits new-project creation
+  per account). Cowork added the `publish.yml` · `pypi` publisher to those four.
+  **11 to go**: re-run the upload with `--skip-existing` after a wait, then Cowork
+  adds their publishers.
+
   ⚠ The uploaded files ARE that version on PyPI for good (files cannot be replaced);
   CI's `skip-existing: true` then skips them at the release. Their `fux-core==` pin
   resolves once the release publishes fux-core.
