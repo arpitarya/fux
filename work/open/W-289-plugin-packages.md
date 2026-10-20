@@ -6,7 +6,7 @@ item: W-289
 filed: 2026-10-19
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-20
-updated_by: "Claude Code (Opus 5.5)"
+updated_by: "Cowork (Opus 5.5)"
 ball: arpit
 ---
 
@@ -21,7 +21,7 @@ ball: arpit
 | 3 | Split the 17 built-in decoders, 2 fetchers and the table extension into 15 packages | a repo installs only the readers it needs | ✅ fetchers (phase 1); the 17 decoder modules and `table` moved into their packages, fux-core ships none (phase 2) |
 | 4 | `fux setup` scans the sources and writes the first `plugins.toml`; `fux ingest` and `fux doctor` name every undeclared suffix | nothing is skipped silently | ✅ setup + doctor (phase 1); ingest's per-suffix stderr count (phase 2) |
 | 5 | Stop seeding copies into `.fux/decoders/` and `.fux/fetchers/` — the package runs; a same-named file there still overrides | engine fixes reach consumers again | ✅ seeding stopped, both overrides built; this repo's twins deleted (phase 2) |
-| 6 | Publish 15 new PyPI names in lockstep with fux's version | 6 names become 21, one release | 🔴 workflow ready; Arpit sets up 15 trusted publishers |
+| 6 | Publish 15 new PyPI names in lockstep with fux's version | 6 names become 21, one release | 🔴 PyPI refuses 15 identical pending publishers; Arpit uploads 14 wheels once by token, then Cowork adds the publishers (see §Step 6 below) |
 
 **Arpit, 2026-10-19 (Cowork):** *"maybe we can build out a mechanism of extensions,
 decoders, plugins, and fetchers as separate packages that can be plugged into Fox"* →
@@ -269,18 +269,52 @@ W-288.** Everything that does not touch the decoder tree:
 - New verbs supplied by a plugin — refused: the CLI surface is SR-CLI's.
 - Installing anything from fux (`fux setup` prints the pip line; it does not run it).
 
-## Decisions for Arpit (2026-10-20, Claude Code)
+## Decisions — ruled by Arpit 2026-10-20 (Cowork)
 
-1. **The 15 trusted publishers** (step 6): one PyPI pending publisher per new name, bound to `publish.yml` and the `pypi` environment. Until they exist, `publish-pypi-plugins` fails; it does not gate `fux-engine`.
-2. **Package version in the reuse key.** P12 puts `pkg:<dist>@<version>/…` in the digest, and lockstep moves the version every release, so **every release re-extracts every decoded document once**. Alternative: keep the package in the REGISTER column only and out of the reuse key. Recommended: REGISTER only — a decoder's own `VERSION` already moves when its output moves.
-3. **Import aliases for the moved modules** (`fux.decode.<format>`, `fux.decode.ext.table`). Without them, a consumer still holding a pre-4.2 seeded copy hits a hard error (naming the fix) on the first ingest after upgrading. Recommended: no aliases — the error is loud and names the fix; aliases would keep stale copies overriding the packages silently.
-4. Already decided by the session, reversible on his word: this repo declares `office` and `pdf` too (indexed `.docx`/`.pdf` under `archive/`); fetcher packages keep their tunables as their own defaults (they import nothing from fux); `fux-extension-table` is pinned as a dependency row.
+1. **Package version in the reuse key → REGISTER only** (the recommendation). The
+   `pkg:<dist>@<version>/…` form stays in REGISTER's `decoder` column and **leaves
+   the reuse key/digest**, which keeps `<module>@<VERSION>+<ext tail>`; a decoder's own
+   `VERSION` moves when its output moves. 🟢 **Ratified, not built** — Claude Code:
+   amend P12 here, SR-INGEST (4b, 22) and SR-DECODE's digest sentence in the same
+   change; a test that a lockstep version bump alone re-extracts nothing; both suites.
+2. **Import aliases → none** (the recommendation). A pre-4.2 seeded copy fails loudly
+   on first ingest with the error that names the fix. As built; nothing to change.
+3. Decision 4 of the earlier list (office + pdf declared here; fetcher tunables;
+   table pinned as a row) stands — not reversed.
+
+## Step 6 — what PyPI actually allows (found 2026-10-20, Cowork)
+
+- **PyPI permits ONE pending publisher per (owner, repo, workflow, environment).**
+  `fux-decoder-json` registered (arpitarya/fux · `publish.yml` · `pypi`); the second
+  was refused: *"a pending trusted publisher matching this configuration has already
+  been registered for a different project name"*. The earlier plan — 15 pending
+  publishers — is impossible as written.
+- **Existing projects may share one config** — fux-core, fux-reader, fux-writer and
+  fux-engine all do. So the block is only the *first* upload.
+- **Ruled (Arpit):** he uploads the other **14** wheels once with an account-wide API
+  token (a project-scoped token cannot create a project); then Cowork adds the normal
+  trusted publisher (same config) to each. `fux-decoder-json` arrives through its
+  pending publisher on the first CI release.
+- **His commands**, from the commit being released (versions are `4.1.1` today):
+
+  ```bash
+  rm -rf /tmp/fuxplug && for d in packages/fux-decoder-* packages/fux-fetcher-* packages/fux-extension-*; do
+    [ "$d" = packages/fux-decoder-json ] && continue
+    uvx --from build pyproject-build --wheel --outdir /tmp/fuxplug "$d"   # what publish.yml runs
+  done
+  uvx twine check --strict /tmp/fuxplug/*
+  uvx twine upload /tmp/fuxplug/*     # username __token__, an account-scoped token
+  ```
+
+  ⚠ The uploaded files ARE that version on PyPI for good (files cannot be replaced);
+  CI's `skip-existing: true` then skips them at the release. Their `fux-core==` pin
+  resolves once the release publishes fux-core.
 
 ## Blockers
 
-🟡 Waits on **W-288** — the `name@version` digest composition and `ext/table.py`
-are what this item packages. Step 6 is 🔴 Arpit's: 15 PyPI trusted-publisher setups,
-done once, before the first release that carries them.
+🔴 Arpit: upload the 14 plugin wheels once by token (§Step 6) and tell Cowork, which
+then adds the 14 trusted publishers. 🟢 Claude Code: build ruling 1 (REGISTER only).
+Both before the release that carries the packages. (W-288, waited on before, is merged.)
 
 ## Record affected
 

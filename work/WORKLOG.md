@@ -23,6 +23,14 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-20 — W-289: rulings, and PyPI's one-pending-publisher limit  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"What are we blocked on W289? … You have the access to the browser. Implement what is pending in there"*.
+- **Ruled (Arpit):** decision 2 → package version in REGISTER only, out of the reuse key; decision 3 → no import aliases. Ruling 1 is ratified, not built (Claude Code; this bridge cannot run the engine suites).
+- **Done (browser, with his yes):** PyPI pending publisher for `fux-decoder-json` (arpitarya/fux · publish.yml · pypi). All 15 names were free.
+- **Found:** PyPI refuses a second pending publisher with the same (owner, repo, workflow, environment) — the 15-pending plan cannot work. Existing projects can share the config. Arpit chose: he uploads the other 14 wheels once by token, then Cowork adds their publishers. Commands in the item.
+- **Next:** Arpit's token upload → Cowork adds 14 publishers; Claude Code builds ruling 1; then the release.
+
 ## 2026-10-20 — W-290: the front-door docs  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"i like the files that got created for codelaw add/create/update similar kind of file for sheetpane and fux"*.

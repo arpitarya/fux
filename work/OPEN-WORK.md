@@ -23,8 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-289** — before the release that carries plugin packages: set up 15 PyPI trusted publishers; rule (a) package version in the reuse key (re-extract every release) or REGISTER only; (b) import aliases for pre-4.2 seeded decoder copies. [the item](open/W-289-plugin-packages.md) | 2026-10-20 | 0d |
-| ↳ **blocks:** the next release | | |
+| 🔴 **W-289** — upload the 14 plugin wheels once by API token (PyPI allows one pending publisher per config; commands in the item); then Cowork adds their publishers. Rulings made 2026-10-20. [the item](open/W-289-plugin-packages.md) | 2026-10-20 | 0d |
+| ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 16d |
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 10d |
@@ -36,7 +36,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-289** · `arpit` — plugin packages: built on `main` (unreleased) — law, SR-PLUGINS, 15 packages, declared-only registry. Arpit: 15 PyPI trusted publishers + two rulings before the release. [detail](open/W-289-plugin-packages.md)
+- 🔴 **W-289** · `arpit` — plugin packages built on `main` (unreleased). Arpit: one token upload of 14 wheels; Claude Code: ruling 1, REGISTER-only package version. Both before the release. Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
 
 
 ### testing

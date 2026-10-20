@@ -1,11 +1,11 @@
 # fux.register.v2	rules=5
 # loc	sha	decoder	[k=v ...]
-CHANGELOG.md	8455e617089b09783de887b0633ba02807ec6c43	prose
-CLAUDE.md	2b3c62505da9645b3bf008d46e37f30a0e26d17b	prose
-README.md	19ce6f6bbb0415748ff91bd937080190161939ce	prose
+CHANGELOG.md	c6c6bc6069e9909780778338ceb125394e779b0a	prose
+CLAUDE.md	97be78e328e7a5dc10aa21dd30ce9e9dc68f26c2	prose
+README.md	003bc45347c6f6b8008576ef4ae7ebfe3a65e970	prose
 archive/PLAN-v0.30.md	2e0ef4e71c9f6d31558cf644bbf0da82c0af9b1d	prose	archived=true
 archive/PRIORITY.md	7249a801980d585f6fcd43abc9bb6ebb05d82408	prose	archived=true
-archive/README.md	d658bcaabc078a043d8ae242c94f80ceb61eb210	prose	archived=true
+archive/README.md	2bbc9d31fa78d410a7b6b9827447337e929381e6	prose	archived=true
 archive/benchmark-reports/2026-08-28-benchmark-contested-handbuilt-deck.html	488f8e5347af75ee9482d0370a2a34a2b6520ab6	pkg:fux-decoder-html@4.1.1/html@2+table@1+limits@1	archived=true
 archive/benchmark-reports/2026-08-28-benchmark-v1-vs-head-handbuilt-deck.html	7d0fbec1818866c000594c0c6278a876e27139bd	pkg:fux-decoder-html@4.1.1/html@2+table@1+limits@1	archived=true
 archive/benchmark-reports/2026-09-13-benchmark-captures-handbuilt-deck.html	f513074617593e5de84be32131644915d67050b1	pkg:fux-decoder-html@4.1.1/html@2+table@1+limits@1	archived=true
@@ -231,6 +231,7 @@ archive/open/W-285-language-server.md	e443ecf3199367d0ea7688d393ff5382115974ac	p
 archive/open/W-286-vscode-extension.md	dfb6d43e5863d6c273844745915b8f9d9bebdd4c	prose	archived=true
 archive/open/W-287-tables-by-row-and-column.md	9c94b2c7e166cc1e562f18a837402fa7bb6275d7	prose	archived=true
 archive/open/W-288-decoder-extensions.md	241ab0b069d1507a823d588ebc6dd5f99f741ffe	prose	archived=true
+archive/open/W-290-front-door-docs.md	6e650cc17ecfa4ac6e11a7637740e4db80f32065	prose	archived=true
 archive/open/W-30-ratify-adr-0001.md	181d91e7e0dc2d19e4be278f34482a733fc8844d	prose	archived=true
 archive/open/W-31-ratify-adr-0010-0011.md	f001d18e8a10412f1ba7454a9ab62efdc27addc0	prose	archived=true
 archive/open/W-32-claude-md-adoption.md	c108aeb7afd828c1ac3e873a20343fe3276bf0d6	prose	archived=true
@@ -658,7 +659,7 @@ records/0063_WORK-release.md	4ea6aa05e418c0ed814429d257283d24fee73523	prose
 records/0064_WORK-blockers.md	8cc7fa229f31e57f18cb6b3c5564b9d31eb86599	prose
 records/0065_WORK-governance.md	c807882350385e7920e1103ff2759ced5572500c	prose
 records/0066_WORK-golden.md	77ae5051faafb8703c42a188f52d60c0f67131d7	prose
-records/0067_WORK-registry.md	d19d90fa19a4c99bfa23ea116b6ff42722ce2f97	prose
+records/0067_WORK-registry.md	5af02719c20dcb66cc5c06b3b2bcc6e6b2d55347	prose
 records/0068_WORK-test-data.md	a437be3ce2d31a1d9d7c181339827df7bbd3ee86	prose
 records/0101_cli-surface.md	f9b957b6612b9a0568a7d84e416798a901335263	prose
 records/0102_fux-directory.md	0e4024ae091cef09f50cb5151ab68de51890e0fb	prose
@@ -754,14 +755,14 @@ tools/t2-eval/PRE-REGISTRATION.md	0678bc82904423b9aa82c801f4286abbdc84961c	prose
 tools/vector-gate/README.md	544da73b4409bef1e5dac598d9b8214d8abf4180	prose
 work/BACKLOG.md	9f08862c55f2b5aa7ea81fa48b14d1f405d46c70	prose
 work/BLOCKED.json	5598b94e0d231527edb50b11f34722b0a6a86ed4	pkg:fux-decoder-json@4.1.1/json@1+limits@1
-work/IMPLEMENTATION.md	27c2bca7ae388bc8d853ad38ec213015c0975db6	prose
-work/INTERVIEW.md	6aa6545ed932fc19b865e66880806d68c0accf3d	prose
+work/IMPLEMENTATION.md	81ff8f6df06001bccf614d9996949d6e75d92b7c	prose
+work/INTERVIEW.md	d9cf4f71d6d124ad09af8af46620bdcd79b8f0d9	prose
 work/LESSONS.md	f91b46f8742c542fe12e2d871452148c56751eae	prose
 work/MACHINE.md	34863c282c90b7363a5eb7da18a622354a995c35	prose
-work/NOW.md	c90e30e6ec68eb99d6a9ff18ade87cc24d50f6a1	prose
-work/OPEN-WORK.md	b03d13bcdda4abead9e799973581495dad3cc024	prose
+work/NOW.md	3733390f559e3444886fcdbc59999078ceb35a72	prose
+work/OPEN-WORK.md	f3803856bbb451803abf2cf5d3b84e66d7b88ca8	prose
 work/README.md	d5073a07920179dc0c35071dc2337a8ed6856ddb	prose
-work/WORKLOG.md	5660a4f2738d687e831ab1efc1d5cd12de90f41f	prose
+work/WORKLOG.md	b5f5af7de281dd6d45f469957a4dc12221be35a8	prose
 work/architecture-algorithms.svg	fdf6ef399bf2649dd92510973076e607cb955576	pkg:fux-decoder-svg@4.1.1/svg@1+xml@1+limits@1
 work/architecture-answer.svg	3e133168cf7695f77b23accae2835e28418ee770	pkg:fux-decoder-svg@4.1.1/svg@1+xml@1+limits@1
 work/architecture-ask.svg	40d6f07068f275412528bb14d5a3455bc0626778	pkg:fux-decoder-svg@4.1.1/svg@1+xml@1+limits@1
