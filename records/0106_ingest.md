@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/acquire/ingestlog.py@f7d675254e1d, src/fux/ingest@56dfbbcb6343, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@4ca02fdd1c47, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@26004073c416]
+owns: [src/fux/acquire/ingestlog.py@f7d675254e1d, src/fux/ingest@22ef2d04b6a5, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@4ca02fdd1c47, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@8c93a05ac038]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: eedf8631ae3b92d93ff2a01ab6f8e7246f9371ec98e425bd50915aa2e5cdf6db
+content_sha: 0f871fea94aee56e4b4903e702de1bfa234918fb1a80ff72b0a47d48af728621
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1141,6 +1141,8 @@ descent before listing it, and records it once as `dir/`.
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** Ingest hands each record its section records (`_section_records`, hashed through the run's tracker) and `write_index` writes the plane. A **carried** document, `file:` or `url:`, keeps its prior section lines byte for byte, read once per run by `store.read_sections` ([SR-SECTIONS](0161_sections.md) decision 8). A foreign index has none to carry.
+
+**The decoder digest carries the decoder extensions** (W-288, 2026-10-20; [SR-DECODE](0139_decode.md) decision 24). `acquire/decoderdigest.py` now mints `<decoder>@<v>+<ext>@<v>+…`, one `+name@VERSION` for every decoder extension the decoder's `USES` names, in declared order — `docx@2+table@1+ooxml@1+xml@1+zip@1+limits@1`, and `csv@sha:2c37…+table@1+limits@1` for a consumer file. The reuse key, the REGISTER `decoder` column and `fux register --json`'s `decoder` object carry that string as they carried the old one. The rule above still holds, because the tail follows either kind: no `@sha:` means code shipped with fux, and `@sha:` means a `.fux/decoders/` file. ⚠ A consumer row's `--json` `digest` now ends in that tail. The change re-extracts every decoded document once, on the first ingest after the upgrade. `ingest/run.py` imports the limits seam as `fux.decode.ext.limits`, and no other line in it changed.
 
 ### Consequences
 

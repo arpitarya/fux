@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-09-06
 feature: chunking — the strategy vocabulary, the boundary ladder, and the retrieval/citation split
-owns: [src/fux/text/chunk.py@0e3ea2b588b1, node/src/refer/chunk.mjs@fa8a64801ed9]
+owns: [src/fux/text/chunk.py@d6ace3a1d499, node/src/refer/chunk.mjs@fa8a64801ed9]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 4e9809ece7fbdd5715e8d7495d187fae96223880feff7236d59b427d0513710e
+content_sha: 976e6bc696d232cc22fc365dd332425f0f0716f7a39bc43b725137946ba7e81a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -249,6 +249,8 @@ until it is measured this stays a proposal. The harness in
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `index_sections` sits beside `_fold`: the **index's** section rule ([SR-SECTIONS](0161_sections.md) decision 2). It uses the same grammar and the same `_sections`, and one different fold test, *bodiless* instead of *shorter than `min_passage_bytes`*, because a committed byte may not follow a tunable. Passages are unchanged.
+
+**No decision here moved** (W-288, 2026-10-20): `text/chunk.py` imports the heading grammar from `decode/ext/markdown.py`, where it now lives as a decoder extension ([SR-DECODE](0139_decode.md) decision 24). The grammar and every passage are unchanged.
 
 ### Consequences
 

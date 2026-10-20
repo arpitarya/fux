@@ -32,7 +32,7 @@ from __future__ import annotations
 
 import re
 from fux.constants import fixed
-from fux.decode._limits import limit
+from fux.decode.ext.limits import limit
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -40,9 +40,11 @@ from fux.decode._limits import limit
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.rtf", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output); nor W-282 (moved module paths in comments)
+VERSION = fixed("decoders.rtf", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output); nor W-282 (moved module paths in comments); not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.rtf", "extensions"))
+#: The decoder extensions this decoder calls, read by the reuse key (SR-DECODE decision 24).
+USES = tuple(fixed("decoders.rtf", "uses"))
 
 #: Control words that end a paragraph. Everything else that is not text is
 #: formatting, and formatting is not a term.

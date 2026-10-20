@@ -22,7 +22,7 @@ has to guess here; this one does not.
 
 ## What counts as a heading is NOT decided here
 
-`decode/_markdown.py` owns that, and `ingest/extract.py` reads the same module.
+`decode/ext/markdown.py` owns that, and `ingest/extract.py` reads the same module.
 This file used to carry its own `^#{1,6}` regex and extraction carried another;
 they had already drifted (one stripped a closing `###`, the other kept it) and
 both counted a `# comment` inside a ``` fence as a heading — which cut a code
@@ -46,8 +46,8 @@ from dataclasses import dataclass
 
 # Absolute, not relative: this module is imported by planes that are loaded
 # normally, but the grammar it shares lives beside the decoders that produce
-# the Markdown being split. See `decode/_markdown.py` for why there is one.
-from fux.decode._markdown import headings as _headings
+# the Markdown being split. See `decode/ext/markdown.py` for why there is one.
+from fux.decode.ext.markdown import headings as _headings
 from ..constants import fixed
 from ..frontmatter import parse as _parse_frontmatter
 
@@ -250,7 +250,7 @@ def _sections(content: str) -> list[tuple[str, int, str, int, int]]:
     text is `strip`ped: once leading blank lines are gone, the offset that
     would map a passage back to its source is gone with them.
     """
-    # `split("\n")`, never `splitlines()`: the grammar in `decode/_markdown.py`
+    # `split("\n")`, never `splitlines()`: the grammar in `decode/ext/markdown.py`
     # splits the same way, so the heading line numbers it reports index this
     # list exactly. `splitlines()` also breaks on \r, \v, \f and U+2028, any
     # one of which would desynchronise the two and cite the wrong lines.

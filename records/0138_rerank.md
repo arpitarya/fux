@@ -10,7 +10,7 @@ feature: proximity reranking over the refer plane's passages, and the refusal th
 owns: [src/fux/query/rerank.py@84b1bdc19364, node/src/query/rerank.mjs@be6714bbed81]
 laws: [L2, L4, L5]
 timestamp: 2026-08-24T00:00:00Z
-content_sha: 1d94a6d2937a6a0d3c6727a02fc59a442b956930cf9c89c0668aec3f69dbed33
+content_sha: fb7c10fdc509515f0031db46769689d9e53b7da75beb241135f5f131c17fd71a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -272,6 +272,8 @@ read back out of it can reach a score or an ordering.
 **No decision here moved** (W-254, 2026-10-04): `rerank.boost` and its Node twin pass `frontmatter=True` to the chunker; a frontmattered document gains one passage and the result set's membership is unchanged (veto 2, now tested).
 
 **No decision here moved** (W-287, 2026-10-19): `refer/_rescore.py` adds the column selector's bonus BEFORE the bounded uplift, so `passage_boost` and `rerank_weight` multiply exactly what they did; with `[ranking] table_column_weight = 0.0` there is no bonus.
+
+**No decision here moved** (W-288, 2026-10-20): only `tune.py`'s module docstring changed, to name `decode/ext/limits.py` ([SR-DECODE](0139_decode.md) decision 24). `Proximity` is untouched.
 
 ### Consequences — the measurement
 

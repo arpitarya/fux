@@ -1,4 +1,4 @@
-"""The one Markdown heading grammar — `decode/_markdown.py`.
+"""The one Markdown heading grammar — `decode/ext/markdown.py`.
 
 Both `ingest/extract.py` and `text/chunk.py` read this module, so a defect
 here is a ranking defect and a citation defect at the same time. The case that
@@ -8,7 +8,7 @@ both planes used to count as a heading.
 
 from __future__ import annotations
 
-from fux.decode._markdown import headings, strip_headings
+from fux.decode.ext.markdown import headings, strip_headings
 
 FENCED = """# Real Heading
 

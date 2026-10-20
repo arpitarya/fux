@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@dcd13c002392]
+owns: [src/fux/templates/agents@f78ad9b3bbe7]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: ebf7ffb925f535c77290d48046963c22bfc1771361c8a11bd3452de19d0415c8
+content_sha: c0311bd7f97e7e6bd71a713bf1c947d4dce03799d97e404c4fa1a70ecd849640
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

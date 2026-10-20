@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-19
 amended: 2026-09-15
 feature: the `extracted` ingest mode — the value in every committed record's `mode` property, and the contract it asserts
-owns: [src/fux/ingest/extract.py@bb2165f07b8d]
+owns: [src/fux/ingest/extract.py@6a9153343598]
 laws: [L2, L3, L4, L5]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: c3ef0953b64911b1260ffb2a04f3deecdb5c6b0cedffa5895fa3e856a16a9f7d
+content_sha: 153a861eb5519ffb0201a6625991e272b91e426a088a6bfb6bb0f8670af9cf59
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -233,7 +233,7 @@ Markdown by contract ([SR-DECODE](0139_decode.md) decision 2). Only an
 already-prose file takes a different pattern.
 
 ⚠ **Amended 2026-09-06: the Markdown grammar is no longer here.** It moved to
-`decode/_markdown.py`, which `text/chunk.py` reads too — see
+`decode/ext/markdown.py` (a decoder extension since W-288), which `text/chunk.py` reads too — see
 [SR-DECODE](0139_decode.md) decision 14 for why one grammar and what the two
 private copies had already drifted into. Extraction keeps the three
 already-prose patterns above and nothing else.

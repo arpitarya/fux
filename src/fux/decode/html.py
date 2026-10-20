@@ -24,8 +24,8 @@ import codecs
 import re
 from html.parser import HTMLParser
 from fux.constants import fixed
-from fux.decode import _table
-from fux.decode._limits import limit
+from fux.decode.ext import table as _table
+from fux.decode.ext.limits import limit
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -33,9 +33,11 @@ from fux.decode._limits import limit
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.html", "version")  # 2 (W-287 A2/A4): thead/th header, colspan/rowspan, caption, nested tables, escaped pipes
+VERSION = fixed("decoders.html", "version")  # 2 (W-287 A2/A4): thead/th header, colspan/rowspan, caption, nested tables, escaped pipes; not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.html", "extensions"))
+#: The decoder extensions this decoder calls, read by the reuse key (SR-DECODE decision 24).
+USES = tuple(fixed("decoders.html", "uses"))
 
 _SKIP = {"script", "style", "head", "noscript", "template", "svg", "iframe"}
 _BLOCK_BREAK = {"p", "div", "section", "article", "main", "header", "footer", "figure"}
@@ -277,7 +279,7 @@ class _MdParser(HTMLParser):
             if self.tables:
                 self._nest(table, self.tables[-1])
             else:
-                self._emit_table(table)
+                self._add_table(table)
         elif tag == "a":
             href = self.href.pop() if self.href else ""
             self._text(f"]({href})" if href else "]")
@@ -312,9 +314,10 @@ class _MdParser(HTMLParser):
         if outer.cell is not None and text:
             outer.cell.append(" " + text + " ")
 
-    def _emit_table(self, table: _Table) -> None:
-        """W-287 A2/A4 — the table as a `Grid` for `_table.emit`; a caption is
-        its heading, one level below the last heading emitted."""
+    def _add_table(self, table: _Table) -> None:
+        """W-287 A2/A4 — the table as a `Grid` for `ext.table.emit`, which writes
+        it; this only places the result, and writes no table of its own (W-288).
+        A caption is its heading, one level below the last heading emitted."""
         grid = _grid(table.rows)
         # Read only when the table declares no header: a `<th>` table needs no
         # threshold, and `html_to_markdown` is called with no repository bound.

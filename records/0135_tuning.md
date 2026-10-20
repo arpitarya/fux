@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-10-11
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@ff21531aa301, .fux/tune.toml@3e16953e4cb3, node/src/config/tune.mjs@3be0ddaaa953]
+owns: [src/fux/tune.py@fd4dbc74d337, .fux/tune.toml@3e16953e4cb3, node/src/config/tune.mjs@3be0ddaaa953]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: c9322263187dcdff74230627cbb207f4fd8bedd8a8cb257dc93bc6adaadc741c
+content_sha: b675c400e5b42953f3c1e1fefe204c583af3bc6ad39654c4aa0a5778e6065575
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1126,6 +1126,8 @@ this moved where they are written, not what they are.
 **W-278 — `section_weight` is bounded above by 1.0 (2026-10-13; same branch, unmerged until [its run](../work/regression/2026-10-13-section-term-v3/PRE-REGISTRATION.md) passes).** λ now interpolates toward the **third form**, the better of the document and its best section scored as a short document ([SR-SECTIONS](0161_sections.md) decision 5). **`1.0` is pure max, and a value above `1.0` is refused** by `tune.load` and by Node's `loadTune`, naming the key and the bound. Above 1.0 the term would extrapolate past the section's own score, which is what produced W-269's leaps. The bound is the `_fraction` validator (Node: `fraction`), not a clamp: a silently clamped `2.0` would rank as `1.0` while claiming not to. Template value still **`0.0`** (OFF); a default is written only on a PASS.
 
 **W-278 → W-273 phase 2 — `section_weight`'s measured value is `1.0`, opt-in (2026-10-13).** W-278 came back INCONCLUSIVE (0 losses, +6 `hit@1`, slice 5 of 24) and Arpit ruled ship **as an opt-in pair**: the template value stays **`0.0`**, and `1.0` is what a repo sets together with `fux.toml [index] section_records = true` ([verdict](../work/regression/2026-10-13-section-term-v3/VERDICT.md)). The template comment says so.
+
+**No decision here moved** (W-288, 2026-10-20): `tune.py`'s module docstring names `decode/ext/limits.py`, the new home of the seam that reads `[index] max_table_rows` ([SR-DECODE](0139_decode.md) decision 24). No code changed.
 
 ### Consequences
 

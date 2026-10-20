@@ -32,7 +32,7 @@ from __future__ import annotations
 import re
 from email import policy
 from email.parser import BytesParser
-from fux.decode._limits import limit
+from fux.decode.ext.limits import limit
 
 # Imports are ABSOLUTE, not relative, and that is what makes this file work in
 # both places it runs: as a package module, and as a consumer copy in
@@ -54,9 +54,11 @@ _RECORD_LEVEL = fixed("markdown", "record_level")
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.mail", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output); nor W-282 (moved module paths in comments)
+VERSION = fixed("decoders.mail", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output); nor W-282 (moved module paths in comments); not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.mail", "extensions"))
+#: The decoder extensions this decoder calls, read by the reuse key (SR-DECODE decision 24).
+USES = tuple(fixed("decoders.mail", "uses"))
 
 #: A message is a complete unit. Its BODY may carry headings of its own
 #: (see `_demote`), which used to shatter one email into four passages.
@@ -204,11 +206,11 @@ def _demote(body: str) -> str:
     siblings never fold, so the message would split into standalone passages
     attributed as though they were separate emails.
 
-    Fence-aware, through the one grammar in `decode/_markdown.py` — a `#`
+    Fence-aware, through the one grammar in `decode/ext/markdown.py` — a `#`
     comment inside a fenced code block in an email is not a heading and must
     not be demoted into looking like one.
     """
-    from fux.decode._markdown import headings
+    from fux.decode.ext.markdown import headings
 
     levels = {h.lineno: h.level for h in headings(body)}
     if not levels:

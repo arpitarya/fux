@@ -6,20 +6,21 @@ title: "SR-TABULAR (0150) — a table is a list of rows, and a row is the unit o
 description: "How .csv, .tsv, .xlsx and .xlsm are read and cited: one passage per row, how much of a table is admitted, every value under its true column name (cells by address, number formats, merges, the header found by fill), a row passage that knows its table, and the sheet-and-row citation."
 status: accepted
 date: 2026-09-06
-amended: 2026-10-19
-feature: tabular documents — row granularity, the admitted-row limit, and what a table citation is
-owns: [src/fux/decode/csv.py@37535df2ad5e, src/fux/decode/xlsx.py@658e011c03ab, src/fux/decode/_limits.py@943c646c639b]
+amended: 2026-10-20
+feature: tabular documents — row granularity, the admitted-row limit, the one table emitter, and what a table citation is
+owns: [src/fux/decode/csv.py@95a1cb175d4b, src/fux/decode/xlsx.py@11ab675ca307, src/fux/decode/ext/limits.py@4fe441b1aa86, src/fux/decode/ext/table.py@efd7df6faca6]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 037d69d5b71d8b7c29133d14094f1952a216b6d25241582dde35ca573a87e1b6
+content_sha: ccc8565f8f6653eac0a48c1760a0b0060d372453dd8acf21d5c907faaf3044d5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
-- [`src/fux/decode/_limits.py`](../src/fux/decode/_limits.py) · file
 - [`src/fux/decode/csv.py`](../src/fux/decode/csv.py) · file
+- [`src/fux/decode/ext/limits.py`](../src/fux/decode/ext/limits.py) · file
+- [`src/fux/decode/ext/table.py`](../src/fux/decode/ext/table.py) · file
 - [`src/fux/decode/xlsx.py`](../src/fux/decode/xlsx.py) · file
 
 <!-- COMPONENTS-END -->
@@ -109,8 +110,10 @@ re-extracts when it changes ([SR-INGEST](0106_ingest.md)).
 `tests/ingest/test_delta.py::test_changing_max_table_rows_is_not_carried_forward`
 fails with the digest removed.
 
-**5. A decoder reads it through `decode/_limits.py`, and the protocol does not
-grow a parameter.** A decoder is `EXTENSIONS` plus `decode(raw, rel_path)` and
+**5. A decoder reads it through `decode/ext/limits.py`, and the protocol does not
+grow a parameter.** That module is a **decoder extension**
+([SR-DECODE](0139_decode.md) decision 24, W-288): its own `VERSION` is in the
+reuse key of every decoder whose `USES` names `limits`. A decoder is `EXTENSIONS` plus `decode(raw, rel_path)` and
 [SR-DECODE](0139_decode.md) decision 1 is emphatic that this is the whole
 interface. But `decode()` at the registry level *does* take a root, so the root
 is bound in a `ContextVar` for the duration of one decoder call and read back by
@@ -140,6 +143,16 @@ clean short table and **the loss left no trace anywhere**. `csv.py` never had
 it — it filters empty rows *before* applying the limit. Two files, one record,
 one of them right: the divergence was the defect.
 
+✅ **The two-file story is closed** (W-287 stage A, 2026-10-19; W-288,
+2026-10-20). Both rules — blank rows spend nothing, and the two notices — now
+live ONCE, in the table decoder extension `decode/ext/table.py`, which `csv`,
+`xlsx`, `html` and `docx` all feed (decision 8). `_ooxml.table_markdown` and
+every other emitter are gone, so the two copies can no longer disagree. A fix
+to that module bumps `constants.toml [extensions.table] version`, and that
+version is in the reuse key of every decoder that uses it, so the fix reaches
+an existing corpus on the next plain `fux ingest`
+([SR-DECODE](0139_decode.md) decision 24).
+
 ⚠ **And `xlsx.py` emitted no truncation notice at all.** The `*(table
 truncated)*` line this record is rude about — *"the only trace was a `*(table
 truncated)*` line that nobody diffs"* — was rude about it because it was the
@@ -168,7 +181,7 @@ this moved where they are written, not what they are.
 <!-- L12-VALUES-END -->
 
 **8. Every value sits under its TRUE column name** (W-287 stage A, 2026-10-19).
-Every rule below lives ONCE, in `decode/_table.py`, which all four table
+Every rule below lives ONCE, in the table decoder extension `decode/ext/table.py`, which all four table
 formats feed ([SR-DECODE](0139_decode.md) decision 23); the bullets say what
 each rule is.
 
@@ -188,7 +201,7 @@ each rule is.
 - **The header is the first row whose source-filled cells reach
   `[limits.<decoder>] header_fill_percent` of the table's width**
   (`.fux/formats.toml`, shipped `60`, for `xlsx` and for an HTML table with no
-  `<th>`; `decode/_table.py`). Rows above it — a title banner — are prose under
+  `<th>`; `decode/ext/table.py::_header_index`). Rows above it — a title banner — are prose under
   the sheet heading, so their words are no one's column name. *Filled in the
   source*: a merged banner fills one cell, not five. At `1` the first row is the
   header, as before.

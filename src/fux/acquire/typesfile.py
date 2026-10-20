@@ -114,7 +114,7 @@ class TypesList:
     text: str = field(default="", repr=False, compare=False)
     #: `[limits.<decoder>]` — the built-in decoders' caps, `{decoder: {key: int}}`
     #: (W-225 stage 4a, SR-LAW-12 decision 9b). Whether every key a decoder
-    #: reads is PRESENT is `decode._limits.check`'s question, not the parser's.
+    #: reads is PRESENT is `decode.ext.limits.check`'s question, not the parser's.
     limits: dict = field(default_factory=dict, compare=False)
 
     @property

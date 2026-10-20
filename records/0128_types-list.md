@@ -7,10 +7,10 @@ description: "Prose plus every format a built-in decoder reads is compiled in as
 status: accepted
 date: 2026-08-20
 feature: the file-type allowlist and `.fux/formats.toml`
-owns: [src/fux/acquire/typesfile.py@cba4e18abe52, .fux/formats.toml@2dfc07ff74b8]
+owns: [src/fux/acquire/typesfile.py@72b6b6a844f8, .fux/formats.toml@2dfc07ff74b8]
 laws: [L2, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 0086c632ddebb26c43869af6d603ec050064bff98326d273799c3784fe2430f0
+content_sha: d80a689d621e9801c12a8fdfa27583ad5bcfdac8ce5b508f954d0d26c9bcd5a0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -551,6 +551,8 @@ carries them.
 **No decision here moved** (W-244, 2026-10-04): the walk prunes a `!`-excluded directory before the type allowlist is consulted for anything inside it ([SR-INGEST](0106_ingest.md) decision 24). A file there was skipped before either way, so no type verdict changes.
 
 **No decision here moved** (W-261, 2026-10-05): `acquire/gitdir.py`, which this record describes, lost the `dirs`-list readers to `acquire/dirlist.py` (SR-DIR-LIST's). `read_types`, `TypeFilter` and `_default_types` are untouched.
+
+**No decision here moved** (W-288, 2026-10-20): a comment in `acquire/typesfile.py` names `decode.ext.limits.check`, the new home of the `[limits]` presence check ([SR-DECODE](0139_decode.md) decision 24). No code changed.
 
 ### Consequences
 

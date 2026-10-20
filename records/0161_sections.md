@@ -11,7 +11,7 @@ feature: section records — the committed section plane, the index section rule
 owns: [node/src/query/sections.mjs@4c883e2a8a83, src/fux/query/sections.py@d88c194f0e6c]
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: addb9d494cdf45636f4f034e9f7875eea20dae63f5f287d1d45c4750e20c0e94
+content_sha: 9d31a71eb5e02b41a1bf68ee6311d9ac481950234ed38471f9314c9967d17e04
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -160,7 +160,7 @@ a document shard, and each record is one canonical line.
 Over the same text `extract.py` tokenises (the decoded, PII-redacted body):
 
 1. cut at every heading with `_chunk._sections`: the same grammar
-   (`decode/_markdown.py`), a preamble counted as a section, and
+   (`decode/ext/markdown.py`), a preamble counted as a section, and
    whitespace-only sections dropped;
 2. a section that is **only its heading line** folds forward into the next
    section **when that one is strictly deeper**, carrying its heading line

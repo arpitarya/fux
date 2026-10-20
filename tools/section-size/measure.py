@@ -32,8 +32,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
 from fux import store  # noqa: E402
-from fux.decode._markdown import headings as md_headings  # noqa: E402
-from fux.decode._markdown import strip_headings  # noqa: E402
+from fux.decode.ext.markdown import headings as md_headings  # noqa: E402
+from fux.decode.ext.markdown import strip_headings  # noqa: E402
 from fux.acquire import pii as pii_mod  # noqa: E402
 from fux.ingest.extract import _headings_and_body  # noqa: E402
 from fux.ingest.parse import parse_document  # noqa: E402
@@ -46,7 +46,7 @@ def _fill_missing_limits() -> None:
     engine refuses a missing key (L12). `fux doctor --fix` would write them
     from the template; this tool may write nothing into fux-lab, so the same
     template values are merged IN MEMORY, for a key the rung lacks only."""
-    from fux.decode import _limits
+    from fux.decode.ext import limits as _limits
 
     original = _limits._load
 

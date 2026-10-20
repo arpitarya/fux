@@ -249,7 +249,7 @@ def test_an_xlsx_wider_than_max_cols_discloses_the_dropped_columns():
     sheet's width is a property of the sheet, so the text is stable, while a row
     count would move every time the file grows. The cap is read from the
     template `fux setup` writes, never typed here (W-225 stage 4a, SR-LAW-12)."""
-    from fux.decode._limits import template_limits
+    from fux.decode.ext.limits import template_limits
 
     MAX_COLS = template_limits()["xlsx"]["max_cols"]
     out = decode(_sheet([[f"c{i}" for i in range(MAX_COLS + 5)]]), "book.xlsx", root=configured_root())

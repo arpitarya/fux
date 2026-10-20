@@ -19,7 +19,7 @@ wants different JSONL handling must be able to take that and nothing else
 from __future__ import annotations
 
 import json
-from fux.decode._limits import limit
+from fux.decode.ext.limits import limit
 
 # Imports are ABSOLUTE, not relative, and that is what makes this file work in
 # both places it runs: as a package module, and as a consumer copy in
@@ -38,9 +38,11 @@ _RECORD_LEVEL = fixed("markdown", "record_level")
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.jsonl", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output); nor W-282 (moved module paths in comments)
+VERSION = fixed("decoders.jsonl", "version")  # not bumped by W-225 4a (caps moved, same values) nor 5b (numerals moved, same output); nor W-282 (moved module paths in comments); not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.jsonl", "extensions"))
+#: The decoder extensions this decoder calls, read by the reuse key (SR-DECODE decision 24).
+USES = tuple(fixed("decoders.jsonl", "uses"))
 
 #: Records past this are a dataset rather than a document — the same judgement
 #: `csv.MAX_ROWS` makes for the row-oriented shape this format shares.

@@ -26,9 +26,11 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.ini", "version")  # not bumped by W-234: law handles in comments only
+VERSION = fixed("decoders.ini", "version")  # not bumped by W-234: law handles in comments only; not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.ini", "extensions"))
+#: The decoder extensions this decoder calls, read by the reuse key (SR-DECODE decision 24).
+USES = tuple(fixed("decoders.ini", "uses"))
 
 
 def decode(raw: bytes, rel_path: str) -> str | None:

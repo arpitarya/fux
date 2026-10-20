@@ -59,7 +59,7 @@ patterns in `extract.py`: their heading syntax is different, and so is their
 code-block convention (`::` and indentation, `----`, `#+BEGIN_SRC`). Bringing
 those under one scanner is a separate change with its own risk, and no
 decoder emits them — a decoded document is always Markdown
-([SR-DECODE](../../../records/0139_decode.md) decision 2), so this module
+([SR-DECODE](../../../../records/0139_decode.md) decision 2), so this module
 covers every decoded document and every `.md` in the corpus.
 
 ⚠ **Indented code blocks need no handling.** A four-space-indented `#` never
@@ -71,6 +71,14 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from fux.constants import fixed
+
+#: This decoder extension's version. It rides in the reuse key of every decoder
+#: whose `USES` names it (SR-DECODE decision 24), so bump it — in
+#: `constants.toml [extensions.markdown]` — when an edit can change what a decoder
+#: using it RETURNS. `tests/decode/test_decoder_versions.py` fails on a changed
+#: extension whose `VERSION` line the diff did not touch.
+VERSION = fixed("extensions.markdown", "version")
 
 __all__ = ["Heading", "headings", "strip_headings"]
 

@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-19
 feature: the fetch contract, what it is called, and the two shipped templates
-owns: [src/fux/acquire/urlsrc.py@0ff7a50c2648, src/fux/templates@e596891dfbec]
+owns: [src/fux/acquire/urlsrc.py@0ff7a50c2648, src/fux/templates@a0be70be9bef]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: c38c07ffaeb64e2d752bb0f7dceb871ba9e9ae54c99e1ed5f82be249265168e3
+content_sha: 4601d582bf612c88607f0e4a955bcb78ac0b18353500fc09e4b2e4957af52a6c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

@@ -6,7 +6,7 @@ as three runs because a spell-checker touched the middle of it. Joining runs
 without care produces "run book"; joining them naively across paragraphs
 produces one enormous line with no headings in it.
 
-So the shared piece is not "read the zip" — `_zip.py` does that — it is
+So the shared piece is not "read the zip" — `ext/zip.py` does that — it is
 **paragraph assembly**, which is the part that is subtle and identical across
 six formats.
 """
@@ -20,7 +20,14 @@ from __future__ import annotations
 # package` — the copy would be dead on arrival. Absolute imports mean the file
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
 from fux.constants import fixed
-from fux.decode import _xml
+from fux.decode.ext import xml as _xml
+
+#: This decoder extension's version. It rides in the reuse key of every decoder
+#: whose `USES` names it (SR-DECODE decision 24), so bump it — in
+#: `constants.toml [extensions.ooxml]` — when an edit can change what a decoder
+#: using it RETURNS. `tests/decode/test_decoder_versions.py` fails on a changed
+#: extension whose `VERSION` line the diff did not touch.
+VERSION = fixed("extensions.ooxml", "version")
 
 #: Word's built-in style names to Markdown levels: Title, Subtitle, HeadingN,
 #: and a heading style with no number (`constants.toml [ooxml]`).
@@ -79,4 +86,4 @@ def heading_level(style: str | None) -> int | None:
 
 
 # `table_markdown` lived here until 2026-10-19: every table format now becomes
-# Markdown in ONE place, `decode/_table.py::emit` (W-287 stage A).
+# Markdown in ONE place, `decode/ext/table.py::emit` (W-287 stage A; W-288).

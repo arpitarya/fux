@@ -202,7 +202,7 @@ def test_setup_never_overwrites_an_edited_types_file(tmp_path):
     and `fux setup` is a writer of a missing key (L12 decision 3) — so it still
     never REWRITES what the consumer wrote (the list and `[decoders]` are
     theirs), but it APPENDS the `[limits.*]` keys the file lacks."""
-    from fux.decode._limits import template_limits
+    from fux.decode.ext.limits import template_limits
     from fux.acquire import typesfile
 
     setup_mod.run(tmp_path)

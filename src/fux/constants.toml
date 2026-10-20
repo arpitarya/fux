@@ -123,6 +123,10 @@ consumer_dir   = ".fux/decoders"
 # spelling.
 reason_no_decoder       = "no decoder for "
 reason_nothing_readable = ": nothing readable in "
+# The helper modules decode/ext/ replaced in 4.2 (W-288), kept importable as
+# `fux.decode._<name>` ALIASES of `fux.decode.ext.<name>` for decoders written
+# before then (SR-DECODE decision 24). Not `table`: `_table` never shipped.
+legacy_helpers = ["limits", "markdown", "ooxml", "xml", "zip"]
 # Sorted and explicit, never discovered: dispatch must not depend on
 # filesystem order (L4).
 builtin        = ["csv", "docx", "drawio", "html", "image", "ini", "json", "jsonl", "mail", "pdf", "pptx", "rtf", "svg", "toml", "xlsx", "xml", "yaml"]
@@ -137,72 +141,119 @@ prose_types    = ["*.md", "*.markdown", "*.txt", "*.rst", "*.adoc", "*.org"]
 magic_by_mime = { "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" = "PK\u0003\u0004", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" = "PK\u0003\u0004", "application/vnd.openxmlformats-officedocument.presentationml.presentation" = "PK\u0003\u0004", "application/vnd.oasis.opendocument.text" = "PK\u0003\u0004", "application/pdf" = "%PDF-" }
 
 [decoders.csv]
-version    = 2  # 2026-10-19 W-287 A: rows feed the shared table emitter (decode/_table.py); a column empty in every row is dropped
+version    = 2  # 2026-10-19 W-287 A: rows feed the shared table emitter (decode/ext/table.py); a column empty in every row is dropped
 extensions = [".csv", ".tsv"]
+uses       = ["table", "limits"]
 
 [decoders.docx]
 version    = 2  # 2026-10-19 W-287 A3: gridSpan/vMerge expand; a nested table is flattened into its cell, not emitted twice
 extensions = [".docx", ".docm"]
+uses       = ["table", "ooxml", "xml", "zip", "limits"]
 
 [decoders.drawio]
 version    = 1
 extensions = [".drawio", ".dio"]
+uses       = ["xml", "table", "limits"]
 
 [decoders.html]
 version    = 2  # 2026-10-19 W-287 A2/A4: thead/th header, colspan/rowspan, caption, nested tables, pipes escaped in cells
 extensions = [".html", ".htm", ".xhtml"]
+uses       = ["table", "limits"]
 
 [decoders.image]
 version    = 1
 extensions = [".png", ".jpg", ".jpeg", ".gif"]
+uses       = ["limits"]
 
 [decoders.ini]
 version    = 1
 extensions = [".ini", ".cfg", ".properties"]
+uses       = ["limits"]
 
 [decoders.json]
 version    = 1
 extensions = [".json"]
+uses       = ["limits"]
 
 [decoders.jsonl]
 version    = 1
 extensions = [".jsonl"]
+uses       = ["limits"]
 
 [decoders.mail]
 version    = 1
 extensions = [".eml", ".mbox"]
+uses       = ["table", "markdown", "limits"]
 
 [decoders.pdf]
 version    = 1
 extensions = [".pdf"]
+uses       = ["limits"]
 
 [decoders.pptx]
 version    = 1
 extensions = [".pptx", ".pptm"]
+uses       = ["ooxml", "xml", "zip", "limits"]
 
 [decoders.rtf]
 version    = 1
 extensions = [".rtf"]
+uses       = ["limits"]
 
 [decoders.svg]
 version    = 1
 extensions = [".svg"]
+uses       = ["xml", "limits"]
 
 [decoders.toml]
 version    = 1
 extensions = [".toml"]
+uses       = ["limits"]
 
 [decoders.xlsx]
 version    = 3  # 2026-10-19 W-287 A1/A4: cells placed by address, number formats read, merges expanded, header detected
 extensions = [".xlsx", ".xlsm"]
+uses       = ["table", "xml", "zip", "limits"]
 
 [decoders.xml]
 version    = 1
 extensions = [".xml"]
+uses       = ["xml", "limits"]
 
 [decoders.yaml]
 version    = 1
 extensions = [".yaml", ".yml"]
+uses       = ["limits"]
+
+# -- Decoder extensions (decode/ext/*.py) -------------------------------------
+# A decoder extension is a shared module a decoder calls -- the table emitter,
+# the OOXML and XML readers, the zip guard, the heading grammar, the limits
+# seam. It has no suffix and is never chosen by the registry (SR-DECODE
+# decision 24). Its VERSION rides in the reuse key of every decoder whose
+# `uses` names it: `<decoder>@<v>+<ext>@<v>+...`, in the decoder's declared
+# order. Bump one when an edit can change what a decoder using it RETURNS.
+# A decoder's `uses` is the CLOSURE of what it imports -- an extension reached
+# through another extension or another decoder counts (`docx` -> `ooxml` ->
+# `xml` -> `limits`; `mail` -> `html` -> `table`), held by
+# tests/decode/test_decoder_versions.py.
+
+[extensions.limits]
+version = 1
+
+[extensions.markdown]
+version = 1
+
+[extensions.ooxml]
+version = 1
+
+[extensions.table]
+version = 1
+
+[extensions.xml]
+version = 1
+
+[extensions.zip]
+version = 1
 
 [register]
 # The committed register, `.fux/index/REGISTER` -- SR-INGEST decision 22.
@@ -661,7 +712,7 @@ max_code_bytes      = 2
 hex                 = 16
 octal               = 8
 hex_digits_per_byte = 2
-# A `*_percent` cap's denominator (decode/_table.py: `header_fill_percent`).
+# A `*_percent` cap's denominator (decode/ext/table.py: `header_fill_percent`).
 percent             = 100
 
 [tables]
@@ -730,7 +781,7 @@ max_colspan = 1000
 max_rowspan = 65534
 
 [ooxml]
-# Word's built-in paragraph styles as Markdown levels (decode/_ooxml.py):
+# Word's built-in paragraph styles as Markdown levels (decode/ext/ooxml.py):
 # Title, Subtitle, and a heading style that carries no number. HeadingN is N+1.
 title_level      = 1
 subtitle_level   = 2

@@ -250,7 +250,7 @@ def test_the_page_shaped_decoders_still_emit_sibling_headings():
     passages because each unit is one of a run of SIBLINGS under the file's
     title — a structural fact `_chunk._fold` can see, not a claim it must be
     told. This pins the emission the guarantee now rests on."""
-    from fux.decode._markdown import headings
+    from fux.decode.ext.markdown import headings
     from fux.text.chunk import chunk
 
     out = decode(MBOX, "archive.mbox", root=configured_root())

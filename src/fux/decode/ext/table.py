@@ -12,11 +12,12 @@ Before this, three copies of the emitter (`_ooxml.table_markdown`,
 SR-TABULAR decision 7's phantom-row defect was exactly *"two files, one record,
 one of them right."* One emitter cannot disagree with itself.
 
-**Not a decoder** in SR-DECODE's sense: no suffix, never chosen by the
-registry. Naming it a *decoder extension*, moving it under `decode/ext/` and
-versioning it into every importing decoder's reuse key is W-288's. Until then a
-change here must bump the `VERSION` of every decoder that imports it — `csv`,
-`docx`, `html`, `xlsx`.
+**A decoder extension, not a decoder** (W-288, SR-DECODE decision 24): no
+suffix, never chosen by the registry. Its `VERSION` rides in the reuse key of
+every decoder whose `USES` names `table` — `csv`, `docx`, `html`, `xlsx`, and
+`drawio` and `mail` through `html` — so a change here that can move a byte of
+output bumps `constants.toml [extensions.table] version`, and nothing else.
+[SR-TABULAR](../../../../records/0150_tabular.md) owns this file.
 
 **What `emit()` decides, in order:**
 
@@ -56,6 +57,13 @@ import datetime as _dt
 from dataclasses import dataclass, field
 
 from fux.constants import fixed
+
+#: This decoder extension's version. It rides in the reuse key of every decoder
+#: whose `USES` names it (SR-DECODE decision 24), so bump it — in
+#: `constants.toml [extensions.table]` — when an edit can change what a decoder
+#: using it RETURNS. `tests/decode/test_decoder_versions.py` fails on a changed
+#: extension whose `VERSION` line the diff did not touch.
+VERSION = fixed("extensions.table", "version")
 
 __all__ = ["Cell", "Grid", "Table", "emit"]
 

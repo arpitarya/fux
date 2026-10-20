@@ -463,7 +463,7 @@ def test_no_tune_does_not_reach_the_index_limits(tmp_path):
 
 
 def test_a_decoder_reads_the_configured_row_limit(tmp_path):
-    """`decode/_limits.py`: a two-name decoder seeing committed config. The
+    """`decode/ext/limits.py`: a two-name decoder seeing committed config. The
     csv decoder also reads `[limits.csv]` from `.fux/formats.toml`, so the repo
     gets the rest of its config as `fux setup` writes it (W-225 stage 4a)."""
     from fux.decode import decode
@@ -478,7 +478,7 @@ def test_a_decoder_reads_the_configured_row_limit(tmp_path):
 
 def test_the_row_limit_is_not_leaked_between_documents(tmp_path):
     from fux.decode import decode
-    from fux.decode._limits import max_table_rows
+    from fux.decode.ext.limits import max_table_rows
 
     _write(tmp_path, tune_text(index={"max_table_rows": 3}))
     write_config(tmp_path)

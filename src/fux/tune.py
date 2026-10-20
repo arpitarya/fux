@@ -30,7 +30,7 @@ Three things follow and none is optional:
    hook; a bad `[index]` value does, loudly.
 2. **`--no-tune` does not reach `[index]`.** `load(enabled=False)` still skips
    the file, but the index was built under these values, and `refer` decodes
-   fetched bytes under them too (`decode/_limits.py`), so "ignore my tunables"
+   fetched bytes under them too (`decode/ext/limits.py`), so "ignore my tunables"
    cannot un-build what was built. `index_limits()` takes no `enabled`.
 3. **The boundary test proves the exception is real** — it asserts that
    mutating an `[index]` key DOES move a committed byte after a re-ingest,

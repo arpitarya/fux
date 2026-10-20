@@ -29,7 +29,7 @@ from __future__ import annotations
 import csv
 import io
 from fux.constants import fixed
-from fux.decode import _table
+from fux.decode.ext import table as _table
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
 #: same change as any edit that can change what `decode()` returns, and the next
@@ -37,9 +37,11 @@ from fux.decode import _table
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.csv", "version")  # 2 (W-287 A): rows feed the one table emitter, `_table.emit`; an all-empty column is dropped
+VERSION = fixed("decoders.csv", "version")  # 2 (W-287 A): rows feed the one table emitter, `_table.emit`; an all-empty column is dropped; not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.csv", "extensions"))
+#: The decoder extensions this decoder calls, read by the reuse key (SR-DECODE decision 24).
+USES = tuple(fixed("decoders.csv", "uses"))
 
 #: Rows past this are dropped. **Was a hard-coded 500 until 2026-09-06**, and
 #: that number was a quiet data loss: a 754-row file decoded to 500 rows, so a
@@ -52,7 +54,7 @@ EXTENSIONS = tuple(fixed("decoders.csv", "extensions"))
 #: `fux.toml [decode]` from 2026-09-06 until Arpit moved it on 2026-09-11).
 #: `[index]` is tune.toml's one table that changes what is **indexed** —
 #: SR-TUNE decision 13.
-from fux.decode._limits import limit, max_table_rows
+from fux.decode.ext.limits import limit, max_table_rows
 
 #: Guards against a malformed quote turning one line into one enormous field.
 #: ⚠ **`MAX_CELL_CHARS` is `[limits.csv] max_cell_chars` in .fux/formats.toml** since W-225 stage 4a

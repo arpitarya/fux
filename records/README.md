@@ -411,7 +411,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0136](0136_mcp.md) | **SR-MCP** | `fux mcp` — the stdio JSON-RPC server for coding agents. Three tools rather than the whole verb surface, stdlib-only, and **`answer` is deliberately absent** | accepted | yes |
 | [0137](0137_enrich.md) | **SR-ENRICH** | Enrichment as an **agent skill, not an API call** — fux plans and validates, a coding agent generates, and partial coverage is the steady state | accepted | yes |
 | [0138](0138_rerank.md) | **SR-RERANK** | Proximity reranking over the refer plane's own passages — and the cross-encoder refused on cross-machine determinism, not on cost | accepted | yes |
-| [0139](0139_decode.md) | **SR-DECODE** | The decoder plane — bytes become Markdown in one place, and a consumer may bring a dependency fux may not. **A decoder also claims which of its metadata keys are identity** (`META_FIELDS`, 2026-09-20) — read on the import path, unlike a fetcher's `ROUTES`, because a decoder is imported to decode anyway | accepted | yes |
+| [0139](0139_decode.md) | **SR-DECODE** | The decoder plane — bytes become Markdown in one place, and a consumer may bring a dependency fux may not. **A decoder also claims which of its metadata keys are identity** (`META_FIELDS`, 2026-09-20) — read on the import path, unlike a fetcher's `ROUTES`, because a decoder is imported to decode anyway. **Decoder extensions** (`decode/ext/`, 2026-10-20): the shared modules a decoder names in `USES`, each one's `VERSION` in that decoder's reuse key | accepted | yes |
 | [0140](0140_locks.md) | **SR-LOCKS** | The one mutex fux owns over the committed index, and the three sibling files that are constantly mistaken for locks | accepted | yes |
 | [0141](0141_confidence.md) | **SR-CONFIDENCE** | How much the index believes its own answer — four deterministic signals and one band, so an agent can tell a grounded result from the closest thing in a corpus that never discusses the question. ⚠ **Amended 2026-08-27 (decision 11): `--band` gates the CLI, the MCP result is always on** — the block is always computed, only its emission is gated | accepted | **partial** |
 | [0142](0142_provenance.md) | **SR-PROVENANCE** | Fux does not keep an audit trail; it makes one derivable — a derivation on `ask --why`, a re-runnable receipt on `answer --receipt`, and `fux verify`'s four-state verdict | accepted | yes |
@@ -678,7 +678,13 @@ table does not grant.
 | `src/fux/decode/` | SR-DECODE | bytes → Markdown, in one place: the built-in decoders, the registry, the override precedence and the `.fux/decoders/` consumer seam. Separate from SR-INGEST's claim because the record it carries is a **boundary** — where consumer-supplied dependencies become legal — not a step in the walk |
 | `src/fux/decode/csv.py` | SR-TABULAR | how much of a `.csv`/`.tsv` is read — `.fux/tune.toml [index] max_table_rows`. Carved out of SR-DECODE's directory claim on `freshness.py`'s precedent: the record is about **tabular documents**, which reaches past `decode/` into how `refer` cites them |
 | `src/fux/decode/xlsx.py` | SR-TABULAR | the same limit, applied per SHEET — a sheet is the workbook's own division, so truncating the fifth because the first four were long would be arbitrary |
-| `src/fux/decode/_limits.py` | SR-TABULAR | the `ContextVar` seam that lets a two-name decoder read committed config without the protocol growing a third parameter (decision 5) |
+| `src/fux/decode/ext/__init__.py` | SR-DECODE | the decoder-extension package: `NAMES` (the `[extensions.*]` tables) and `version()`, which `USES` is checked against and the reuse key reads (decision 24, W-288) |
+| `src/fux/decode/ext/limits.py` | SR-TABULAR | the decoder extension that is the `ContextVar` seam a two-name decoder reads committed config through, without the protocol growing a third parameter (decision 5) |
+| `src/fux/decode/ext/markdown.py` | SR-DECODE | the decoder extension that is the one heading grammar, shared by ingest and the chunker (decision 14) |
+| `src/fux/decode/ext/ooxml.py` | SR-DECODE | the decoder extension that assembles OOXML paragraph runs and reads Word's heading styles, for `docx` and `pptx` |
+| `src/fux/decode/ext/table.py` | SR-TABULAR | the decoder extension where every table becomes Markdown — the one emitter `csv`, `docx`, `html` and `xlsx` feed (decision 8; SR-DECODE decision 23) |
+| `src/fux/decode/ext/xml.py` | SR-DECODE | the decoder extension that parses XML with any DOCTYPE refused — billion-laughs and XXE closed in one rule |
+| `src/fux/decode/ext/zip.py` | SR-DECODE | the decoder extension that opens an archive under its decompression caps, with members in sorted order |
 | `src/fux/derive/` | SR-T1-ACCELERATOR | T1 build, block maxima and skipping — the declared runtime shapes are `schemas/runtime.schema.json`, carved out to this record |
 | `src/fux/derive/docstable.py` | SR-DOCS-TABLE | `docs.jsonl`'s writer — one docidx-ordered row per document. Carved out of `_build.py`, which decides when it is written (W-261, 2026-10-05: every `kind: component` record owns a file) |
 | `src/fux/derive/manifest.py` | SR-RUNTIME-MANIFEST | `manifest.json`'s nine keys and its writer. Carved out of `_build.py` (W-261, 2026-10-05: every `kind: component` record owns a file) |
@@ -774,7 +780,7 @@ table does not grant.
 | `node/src/config/root.mjs` | SR-CONFIG | the Node twin of `find_root` in `src/fux/config.py` — the same two tells, in the same order |
 | `node/src/config/tune.mjs` | SR-TUNE | the reader half of `src/fux/tune.py` — defaults, the closed key set, the validators and the error collection. A key set that drifts here is a repository one reader refuses and the other accepts |
 | `node/src/correct.mjs` | SR-ENRICH | the Node side of `fux correct` — the marker, the pin and its suspension |
-| `node/src/decode/markdown.mjs` | SR-DECODE | the Node twin of `src/fux/decode/_markdown.py` — the one heading grammar ingest and the chunker share |
+| `node/src/decode/markdown.mjs` | SR-DECODE | the Node twin of `src/fux/decode/ext/markdown.py` — the one heading grammar ingest and the chunker share |
 | `node/src/decode/registry.mjs` | SR-DECODE | the Node decoder registry — which suffix resolves to which decoder, and the binding digest that invalidates a document when a decoder moves |
 | `node/src/errors.mjs` | SR-LAWS | the Node twin of `src/fux/errors.py` — the single flat `FuxError`, no subclass hierarchy |
 | `node/src/graph/community.mjs` | SR-GRAPH | the Node twin of `src/fux/graph/community.py` |
@@ -943,6 +949,7 @@ verbs that need both. `fux-engine` installs all four, exactly as today.
 | `src/fux/inspect_config.py` | core |
 | `src/fux/store/` | core |
 | `src/fux/decode/` | core |
+| `src/fux/decode/ext/` | core |
 | `src/fux/text/` | core |
 | `src/fux/acquire/` | core |
 | `src/fux/templates/` | core |

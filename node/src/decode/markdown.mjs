@@ -1,5 +1,5 @@
 /** The ONE Markdown heading grammar, shared by ingest and the chunker.
- *  Twin of `src/fux/decode/_markdown.py`.
+ *  Twin of `src/fux/decode/ext/markdown.py` (a decoder extension since W-288).
  *
  * **A fenced code block is content, not structure** — a `# comment` inside a
  * ``` block is not a heading, and treating it as one splits a document where

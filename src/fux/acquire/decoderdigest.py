@@ -30,6 +30,18 @@ answer from outside, and leaves the read plane alone.
 ⚠ **A consumer decoder therefore re-extracts on a whitespace edit.** That is the
 cheap direction of being wrong, and it is chosen deliberately.
 
+## Decoder extensions ride in the key (W-288)
+
+Either kind is then followed by `+<ext>@<VERSION>` for every decoder extension
+its `USES` names, in declared order: `docx@2+table@1+ooxml@1+xml@1+zip@1+limits@1`,
+`docx@sha:1a2b…+table@1+…`. [SR-DECODE](../../../records/0139_decode.md)
+decision 24. Before it, a fix to a shared helper moved no decoder's `VERSION`
+and no consumer copy's bytes, so an existing corpus kept the old output until
+`--full` — decision 11a's trap, one layer down. **A consumer copy needs this as
+much as a built-in does:** the seeded copies in `.fux/decoders/` import
+`fux.decode.ext` from the installed engine, so an engine upgrade changes their
+output while their sha stands still.
+
 ## Per EXTENSION, which is the whole design call
 
 A single corpus-wide digest would re-extract every document on any decoder
@@ -73,20 +85,32 @@ def _module_version(name: str) -> int:
     return version if isinstance(version, int) else 0
 
 
+def _extension_version(name: str) -> int:
+    """`VERSION` of decoder extension `name`, or `0` — `_module_version`'s rule."""
+    try:
+        from ..decode import ext as ext_mod
+
+        version = ext_mod.version(name)
+    except Exception:  # pragma: no cover - `_uses_of` already refused unknown names
+        return 0
+    return version if isinstance(version, int) else 0
+
+
 def of(decoder) -> str:
-    """One decoder's digest, from its `origin`."""
+    """One decoder's digest, from its `origin` and its `uses`."""
     origin = getattr(decoder, "origin", "") or ""
     name = getattr(decoder, "name", "") or "?"
+    tail = "".join(f"+{ext}@{_extension_version(ext)}" for ext in getattr(decoder, "uses", ()))
     if origin.startswith(BUILTIN_PREFIX):
-        return f"{name}@{_module_version(origin[len(BUILTIN_PREFIX):])}"
+        return f"{name}@{_module_version(origin[len(BUILTIN_PREFIX):])}{tail}"
     try:
         raw = Path(origin).read_bytes()
     except OSError:
         # Unreadable consumer file: a digest that cannot be computed must not
         # read as "unchanged", or the reuse key would carry stale extraction
         # forward on exactly the run that could not check it.
-        return f"{name}@sha:unreadable"
-    return f"{name}@sha:{hashlib.sha256(raw).hexdigest()[: fixed('decoders', 'digest_hex')]}"
+        return f"{name}@sha:unreadable{tail}"
+    return f"{name}@sha:{hashlib.sha256(raw).hexdigest()[: fixed('decoders', 'digest_hex')]}{tail}"
 
 
 def binding_digests(root: Path | None = None) -> dict[str, str]:

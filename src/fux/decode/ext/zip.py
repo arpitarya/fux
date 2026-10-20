@@ -21,7 +21,15 @@ from __future__ import annotations
 
 import zipfile
 from io import BytesIO
-from fux.decode._limits import limit
+from fux.decode.ext.limits import limit
+from fux.constants import fixed
+
+#: This decoder extension's version. It rides in the reuse key of every decoder
+#: whose `USES` names it (SR-DECODE decision 24), so bump it — in
+#: `constants.toml [extensions.zip]` — when an edit can change what a decoder
+#: using it RETURNS. `tests/decode/test_decoder_versions.py` fails on a changed
+#: extension whose `VERSION` line the diff did not touch.
+VERSION = fixed("extensions.zip", "version")
 
 #: A single document's uncompressed payload. Generous for a real deck or
 #: spreadsheet (the largest in this repo's fixtures is under 1 MB) and far

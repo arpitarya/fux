@@ -21,8 +21,8 @@ from __future__ import annotations
 # `from . import _xml` raises `attempted relative import with no known parent
 # package` — the copy would be dead on arrival. Absolute imports mean the file
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
-from fux.decode import _ooxml, _xml
-from fux.decode._zip import SafeZip, ZipTooBig, numeric_key
+from fux.decode.ext import ooxml as _ooxml, xml as _xml
+from fux.decode.ext.zip import SafeZip, ZipTooBig, numeric_key
 from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
@@ -31,9 +31,11 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.pptx", "version")  # not bumped by W-225 R13: its OOXML part names moved to constants.toml at the same values
+VERSION = fixed("decoders.pptx", "version")  # not bumped by W-225 R13: its OOXML part names moved to constants.toml at the same values; not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.pptx", "extensions"))
+#: The decoder extensions this decoder calls, read by the reuse key (SR-DECODE decision 24).
+USES = tuple(fixed("decoders.pptx", "uses"))
 
 #: A slide is a complete unit: one passage per slide, never merged into
 #: its neighbour and never split at a heading inside it.

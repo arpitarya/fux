@@ -25,7 +25,15 @@ from __future__ import annotations
 
 import re
 import xml.etree.ElementTree as ET
-from fux.decode._limits import limit
+from fux.decode.ext.limits import limit
+from fux.constants import fixed
+
+#: This decoder extension's version. It rides in the reuse key of every decoder
+#: whose `USES` names it (SR-DECODE decision 24), so bump it — in
+#: `constants.toml [extensions.xml]` — when an edit can change what a decoder
+#: using it RETURNS. `tests/decode/test_decoder_versions.py` fails on a changed
+#: extension whose `VERSION` line the diff did not touch.
+VERSION = fixed("extensions.xml", "version")
 
 #: Only the head is searched: a DOCTYPE is legal only in the prolog, so a match
 #: further down is content rather than a declaration, and scanning a whole

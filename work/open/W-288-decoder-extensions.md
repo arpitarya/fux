@@ -16,12 +16,12 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Name the layer: a **decoder extension** is a shared module a decoder calls, with its own `VERSION`; `decode/ext/` is its home | the five shared helpers that already exist stop being nameless | ⏳ |
-| 2 | Put every extension's `VERSION` into the reuse key of every decoder that uses it | a fix in shared code re-extracts the documents it changes — today only `--full` does | ⏳ |
-| 3 | Move W-287's `decode/_table.py` to `ext/table.py` — the first extension built to the rule | the table module gets a version that reaches existing corpora | ⏳ W-287 landed (`1fd1c9a9`) |
-| 4 | Finish what W-287 leaves: csv on the same emitter, `_ooxml.table_markdown` and `html.py::_emit_table` gone if any copy remains | one emitter, zero copies | ⏳ |
-| 5 | Keep W-287's round-trip gate (emit → `_table_bands` → cells) running against `ext/table.py` | the emitter and the chunker stay one contract | ⏳ |
-| 6 | Move the existing helpers (`_ooxml`, `_xml`, `_zip`, `_markdown`, `_limits`) under the same rule | one kind of shared module, not two | ⏳ |
+| 1 | Name the layer: a **decoder extension** is a shared module a decoder calls, with its own `VERSION`; `decode/ext/` is its home | the five shared helpers that already exist stop being nameless | ✅ built, branch not merged |
+| 2 | Put every extension's `VERSION` into the reuse key of every decoder that uses it | a fix in shared code re-extracts the documents it changes — today only `--full` does | ✅ built, branch not merged |
+| 3 | Move W-287's `decode/_table.py` to `ext/table.py` — the first extension built to the rule | the table module gets a version that reaches existing corpora | ✅ built, branch not merged |
+| 4 | Finish what W-287 leaves: csv on the same emitter, `_ooxml.table_markdown` and `html.py::_emit_table` gone if any copy remains | one emitter, zero copies | ✅ no copy was left; `html.py::_emit_table` was an adapter and is now `_add_table` |
+| 5 | Keep W-287's round-trip gate (emit → `_table_bands` → cells) running against `ext/table.py` | the emitter and the chunker stay one contract | ✅ passes against `ext/table.py`, fixtures unchanged |
+| 6 | Move the existing helpers (`_ooxml`, `_xml`, `_zip`, `_markdown`, `_limits`) under the same rule | one kind of shared module, not two | ✅ built; the old names stay importable as aliases |
 
 **Arpit, 2026-10-19 (Cowork):** *"how about we build 1 decoder just for table
 and internally html, docs and xlsx use the same?"* … *"Okay, let's call it
@@ -30,6 +30,39 @@ extensions and file a work item for it."*
 **Model:** Claude Code, **Opus**: a new layer in the decoder protocol with a
 digest change, a record amendment and a five-format refactor. Ratified in
 Cowork, **not built**.
+
+## State
+
+**2026-10-20 (Claude Code, Opus 5.5): built on a worktree branch and not
+merged yet.** The orchestrator merges it together with the W-289 work that ran
+alongside.
+
+- **Built:** `src/fux/decode/ext/` holds `table`, `ooxml`, `xml`, `zip`,
+  `markdown` and `limits`, each with `VERSION = 1` from `constants.toml
+  [extensions.<name>]`. All 17 built-in decoders declare `USES` from
+  `[decoders.<name>] uses`. `decoderdigest` mints
+  `<decoder>@<v>+<ext>@<v>+…`, and a consumer decoder carries the same tail.
+  `test_decoder_versions.py` has the three E4 gates, plus tests for the
+  aliases, the blast radius, the digest shape and a bad `USES`.
+- **Records:** SR-DECODE decision 24 (E1–E5 and the naming table) and
+  decisions 14 and 23 repointed. SR-TABULAR decisions 5, 7 and 8. In
+  `records/README.md`: ownership rows for every `ext/*.py` and the layer-map
+  row. GLOSSARY and CHANGELOG are updated.
+- **Deviations from the design above:**
+  1. **`USES` is the CLOSURE** of what a decoder reaches, including through
+     another decoder. The design said "a decoder that imports `ext.<name>`".
+     The closure gate found `drawio` reaching `table` through `html`, and
+     `mail` does the same.
+  2. **The pre-4.2 names `fux.decode._xml`, `_zip`, `_ooxml`, `_markdown` and
+     `_limits` stay importable**, as `sys.modules` aliases of the extension
+     modules (`[decoders] legacy_helpers`). Without them, every consumer's
+     seeded `.fux/decoders/` copy would fail to import on upgrade. This is the
+     same reason the `json.MAX_DEPTH` shim exists.
+  3. **`pptx` does not read tables**, so it does not go through the table
+     extension. Teaching it would change its output, so it is not part of a move.
+- **Found, not fixed:** a decoder that imports another DECODER (`mail`/`drawio`
+  → `html`; `ini`/`jsonl`/`toml`/`yaml` → `json`) does not carry that
+  decoder's `VERSION` in its key. SR-DECODE decision 24 names this gap.
 
 ## Goal
 

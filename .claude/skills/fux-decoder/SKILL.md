@@ -188,23 +188,39 @@ it to tell you when an **unedited** copy has fallen behind a newer fux, and the
 fix is yours — delete the file and run `fux setup`. **Edit one byte below it and
 the copy is yours**; fux never rewrites it and stops comparing it.
 
-Three shared helpers do the parts that are dangerous to rewrite:
+Shared **decoder extensions** under `fux.decode.ext` do the parts that are
+dangerous to rewrite:
 
-| helper | gives you | why not do it yourself |
+| decoder extension | gives you | why not do it yourself |
 |---|---|---|
-| `fux.decode._zip` | `SafeZip`, `numeric_key` | Decompression-bomb caps, and **sorted** member lists. `namelist()` is archive order — writer-dependent — and `slide10` sorts before `slide2` |
-| `fux.decode._xml` | `parse`, `local`, `text_of` | Refuses any DOCTYPE, which closes billion-laughs and XXE in one rule |
-| `fux.decode._ooxml` | `paragraph_text`, `heading_level`, `table_markdown` | Run assembly. A run boundary is a formatting event, **not** a word boundary |
+| `fux.decode.ext.zip` | `SafeZip`, `numeric_key` | Decompression-bomb caps, and **sorted** member lists. `namelist()` is archive order — writer-dependent — and `slide10` sorts before `slide2` |
+| `fux.decode.ext.xml` | `parse`, `local`, `text_of` | Refuses any DOCTYPE, which closes billion-laughs and XXE in one rule |
+| `fux.decode.ext.ooxml` | `paragraph_text`, `heading_level` | Run assembly. A run boundary is a formatting event, **not** a word boundary |
+| `fux.decode.ext.table` | `Grid`, `Cell`, `Table`, `emit` | The one table emitter: values, spans, the header, the row budget, `\|` escaping — and exactly the Markdown the chunker reads back as rows |
+| `fux.decode.ext.limits` | `limit`, `max_table_rows` | The repository's committed caps (`.fux/formats.toml [limits]`), read without a third `decode()` parameter |
+| `fux.decode.ext.markdown` | `headings`, `strip_headings` | The one heading grammar, fence-aware |
 
-⚠ **Imports must be absolute** — `from fux.decode._zip import SafeZip`, never
-`from . import _zip`. A file loaded by path has no parent package, so a
-relative import raises and the decoder is dead on arrival.
+**Name the ones you call in `USES`**, beside `EXTENSIONS` — for example
+`USES = ("table", "limits")`, counting any your imports reach through another
+extension (`ooxml` uses `xml`, which uses `limits`). Each one's `VERSION` then
+joins your decoder's reuse key, so an engine fix to the table emitter
+re-extracts your documents on the next `fux ingest` instead of waiting for
+`--full`. An unknown name stops the load and names your file. Your decoder's
+**suffixes** are still `EXTENSIONS` — *decoder extension* is a different word
+(`docs/GLOSSARY.md`).
+
+⚠ **Imports must be absolute** — `from fux.decode.ext.zip import SafeZip`,
+never `from . import zip`. A file loaded by path has no parent package, so a
+relative import raises and the decoder is dead on arrival. The pre-4.2 names
+(`fux.decode._zip`, `_xml`, `_ooxml`, `_markdown`, `_limits`) still import, as
+aliases of the same modules — but declare nothing to the reuse key, so prefer
+the `ext` names.
 
 **Pick the closest shipped decoder and read it first:**
 
 | your format looks like | read |
 |---|---|
-| a zip of XML (Office, OpenDocument) | `docx.py`, then `_ooxml.py` |
+| a zip of XML (Office, OpenDocument) | `docx.py`, then `fux/decode/ext/ooxml.py` |
 | markup or tags | `html.py` |
 | nested key/value (JSON, TOML, config) | `json.py` — especially `_prose`, which drops UUIDs, hashes, timestamps and bare numbers |
 | line-oriented text | `yaml.py`, `csv.py` |

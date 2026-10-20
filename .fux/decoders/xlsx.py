@@ -30,8 +30,8 @@ from __future__ import annotations
 # fux ships and the file you edit are byte-identical (SR-DECODE decision 11).
 import re
 
-from fux.decode import _table, _xml
-from fux.decode._zip import SafeZip, ZipTooBig, numeric_key
+from fux.decode.ext import table as _table, xml as _xml
+from fux.decode.ext.zip import SafeZip, ZipTooBig, numeric_key
 from fux.constants import fixed
 
 #: **The reuse key's handle on this decoder** (W-166). Bump it by hand in the
@@ -40,9 +40,11 @@ from fux.constants import fixed
 #: Leaving it alone is the claim that the edit cannot move a byte of output.
 #: `tests/decode/test_decoder_versions.py` fails on a changed module that did
 #: not bump it. [SR-DECODE](../../../records/0139_decode.md) decision 11a.
-VERSION = fixed("decoders.xlsx", "version")  # 3 (W-287 A1/A4): cells by address, number formats, merges, header detection
+VERSION = fixed("decoders.xlsx", "version")  # 3 (W-287 A1/A4): cells by address, number formats, merges, header detection; not bumped by W-288 (imports moved to decode/ext, same output; USES now carries the extensions' VERSIONs)
 
 EXTENSIONS = tuple(fixed("decoders.xlsx", "extensions"))
+#: The decoder extensions this decoder calls, read by the reuse key (SR-DECODE decision 24).
+USES = tuple(fixed("decoders.xlsx", "uses"))
 
 #: The parts ECMA-376 names -- `constants.toml [decoders.xlsx.format]` (R13).
 _SHARED = fixed("decoders.xlsx.format", "shared")
@@ -68,7 +70,7 @@ _FORMAT_LITERAL_RE = re.compile(r'"[^"]*"|\\.|\[[^\]]*\]')
 #: fifth because the first four were long would be arbitrary.
 #: Was a hard-coded 500; now `.fux/tune.toml [index] max_table_rows` (see `csv.py` for the
 #: data-loss this hid).
-from fux.decode._limits import limit, max_table_rows
+from fux.decode.ext.limits import limit, max_table_rows
 
 #: ⚠ **`MAX_COLS` is `[limits.xlsx] max_cols` in .fux/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.

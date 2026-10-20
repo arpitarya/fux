@@ -24,6 +24,10 @@ consumer owns each as a file loaded by path that fux never rewrites.
     WANTS_PATH = True
     def decode(path: Path, rel_path: str) -> str | None: ...
 
+    # optional: the decoder extensions it calls (`fux.decode.ext.<name>`),
+    # each one's VERSION then rides in its reuse key — SR-DECODE decision 24
+    USES = ("table", "limits")
+
 Returning `None` means *this needs a model to read it* — an image, a scanned
 PDF — and is not an error. It is the signal the enrichment queue is built on.
 A decoder never raises for malformed input: one corrupt file in a
@@ -48,14 +52,32 @@ from __future__ import annotations
 import importlib
 import importlib.util
 import os
+import sys
 import tempfile
 from pathlib import Path
 from typing import Callable
 
 from ..config import DEFAULT_TYPES_FILE as TYPES_FILE
 from ..errors import FuxError
-from . import _limits
+from .ext import limits as _limits
 from ..constants import fixed
+
+#: 🔴 **The pre-4.2 helper names stay importable — as ALIASES, never copies**
+#: (W-288, SR-DECODE decision 24). The shared helpers moved to `decode/ext/` as
+#: decoder extensions; every `.fux/decoders/` copy `fux setup` seeded before
+#: then, and every decoder written from the `fux-decoder` skill, imports
+#: `fux.decode._xml` and its siblings. Without these an engine upgrade would stop
+#: each such repo's ingest at its first decoder import. Each old name is bound to
+#: the extension MODULE OBJECT itself — one `ContextVar`, one cache — and no
+#: `_<name>.py` file exists to drift. ⚠ A decoder importing an old name declares
+#: no `USES` for it, so the extension's `VERSION` does not reach its reuse key;
+#: that is the stale copy `fux doctor`'s `seeded copies current` row already
+#: names, and re-seeding closes it.
+for _helper in fixed("decoders", "legacy_helpers"):
+    _extension = importlib.import_module(f"{__name__}.ext.{_helper}")
+    sys.modules.setdefault(f"{__name__}._{_helper}", _extension)
+    globals()[f"_{_helper}"] = _extension
+del _helper, _extension
 
 __all__ = [
     "BUILTIN_MODULES",
@@ -147,7 +169,7 @@ class Decoder:
     """
 
     __slots__ = (
-        "name", "extensions", "primary", "_fn", "wants_path", "origin", "meta_fields",
+        "name", "extensions", "primary", "_fn", "wants_path", "origin", "meta_fields", "uses",
     )
 
     def __init__(
@@ -160,6 +182,7 @@ class Decoder:
         origin: str,
         meta_fields: dict[str, str] | None = None,
         primary: str = "",
+        uses: tuple[str, ...] = (),
     ) -> None:
         self.name = name
         self.extensions = extensions
@@ -182,6 +205,10 @@ class Decoder:
         #: means it declares none, which is NOT the same as "nothing is
         #: indexed" — the engine default still applies.
         self.meta_fields = dict(meta_fields or {})
+        #: The decoder extensions this decoder declares it calls, in its own
+        #: order (SR-DECODE decision 24). Read by the reuse key, never passed to
+        #: `decode()` — the protocol does not grow a parameter (decision 5).
+        self.uses = tuple(uses)
 
     def __call__(self, raw: bytes, rel_path: str) -> str | None:
         if not self.wants_path:
@@ -273,7 +300,40 @@ def _from_module(module, name: str, *, origin: str) -> Decoder | None:
         # the offline path breaks L5. **The two rules differ because the risk
         # differs**, and copying one to the other copies the wrong half.
         meta_fields=_meta_fields_of(module, name, origin),
+        # `USES` is read the same way and for the same reason as `META_FIELDS`.
+        uses=_uses_of(module, origin),
     )
+
+
+def _uses_of(module, origin: str) -> tuple[str, ...]:
+    """A decoder's `USES` — the decoder extensions it calls (SR-DECODE decision 24).
+
+    Absent means *none declared*, the shape of every decoder written before
+    W-288. A name that is not a decoder extension is a hard error naming the
+    file, as an unknown `META_FIELDS` target is: a reuse key built from a name
+    with no `VERSION` behind it would look current for ever.
+    """
+    from .ext import NAMES
+
+    declared = getattr(module, "USES", None)
+    if declared is None:
+        return ()
+    if isinstance(declared, str) or not isinstance(declared, (tuple, list)):
+        raise FuxError(
+            f"decoder {origin} declares USES that is not a tuple of decoder-extension "
+            f"names (SR-DECODE decision 24)"
+        )
+    out: list[str] = []
+    for item in declared:
+        if item not in NAMES:
+            raise FuxError(
+                f"decoder {origin}: USES names {item!r}, which is not a decoder extension. "
+                f"Use any of {', '.join(NAMES)} — the modules under fux.decode.ext"
+            )
+        if item in out:
+            raise FuxError(f"decoder {origin}: USES names {item!r} twice")
+        out.append(item)
+    return tuple(out)
 
 
 def _meta_fields_of(module, name: str, origin: str) -> dict[str, str]:

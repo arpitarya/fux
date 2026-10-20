@@ -12,9 +12,27 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 (`fux.index.v8`); the ranking change ships **off** — its pre-registered run
 failed on latency, not on quality.
 
+**Decoder extensions (W-288).** The shared modules under the decoders get a
+version of their own, and it reaches existing corpora.
+
 ### Changed
 
-- **Every table becomes Markdown in one place** (`decode/_table.py`), fed by the
+- ⚠ **One-time re-extraction on your first `fux ingest` after upgrading.** Every
+  decoded document — PDF, Office, HTML, CSV, JSON, mail and the rest — is
+  extracted again once, because the decoder digest in the reuse key changed
+  shape: `docx@2` is now `docx@2+table@1+ooxml@1+xml@1+zip@1+limits@1`.
+  Markdown and plain text are not re-extracted. No index-format change, and no
+  decoder's output changed. After this, a fix to a shared module re-extracts
+  only the formats that use it, on a plain `fux ingest` rather than `--full`.
+- **The shared decoder helpers moved to `fux.decode.ext`** as *decoder
+  extensions*: `table`, `ooxml`, `xml`, `zip`, `markdown`, `limits`. A decoder
+  names the ones it calls in `USES = (...)`, beside `EXTENSIONS`. An unknown
+  name is an error that names the file. The old import names
+  (`fux.decode._xml`, `_zip`, `_ooxml`, `_markdown`, `_limits`) still work, as
+  aliases, so decoders already in `.fux/decoders/` keep loading. Re-seed an
+  unedited copy (`fux doctor` names it) so that its key includes the
+  extensions it calls.
+- **Every table becomes Markdown in one place** (`decode/ext/table.py`), fed by the
   `.xlsx`, HTML, `.docx` and `.csv` decoders — and every value now sits under its
   true column name: an `.xlsx` cell by its address (Excel omits empty cells, so
   sparse rows shifted left), dates as `2026-07-11` and booleans as `true`/`false`

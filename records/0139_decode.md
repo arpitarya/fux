@@ -6,11 +6,12 @@ title: "SR-DECODE (0139) — the decoder plane: bytes become Markdown in one pla
 description: "Decoding gets one home, one protocol, and a consumer seam where third-party libraries are legal — declared, so a machine that cannot satisfy the declaration fails instead of committing a smaller index."
 status: accepted
 date: 2026-08-26
-feature: the decoder plane — the protocol, the registry, the consumer seam and the enrichment queue
-owns: [src/fux/decode@8db6cb28b665, src/fux/templates/agents/DECODER-SKILL.md@c328738ae3e6, .fux/decoders@bc4ca7321ccc, node/src/decode/markdown.mjs@5dd525feb838, node/src/decode/registry.mjs@5f97a79df7ad]
+amended: 2026-10-20
+feature: the decoder plane — the protocol, the registry, the consumer seam, the enrichment queue and the decoder extensions
+owns: [src/fux/decode@da72579ffe71, src/fux/decode/ext/__init__.py@0102048c0ed3, src/fux/decode/ext/markdown.py@e6152422eabb, src/fux/decode/ext/ooxml.py@f6b06732db01, src/fux/decode/ext/xml.py@904fbe40e264, src/fux/decode/ext/zip.py@809ff180996d, src/fux/templates/agents/DECODER-SKILL.md@c202f8a44e12, .fux/decoders@53e86e4578cd, node/src/decode/markdown.mjs@9b8c05b393cb, node/src/decode/registry.mjs@5f97a79df7ad]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 2944e527fd10d2336c4da66f64647eb2f550157f83e9088c5d4c6727a900719c
+content_sha: b1b032da63580606b5ee6c2f6a109a8d6ed28c9df36a817870d3278a003d2b59
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -21,6 +22,11 @@ content_sha: 2944e527fd10d2336c4da66f64647eb2f550157f83e9088c5d4c6727a900719c
 - [`node/src/decode/markdown.mjs`](../node/src/decode/markdown.mjs) · file
 - [`node/src/decode/registry.mjs`](../node/src/decode/registry.mjs) · file
 - [`src/fux/decode/`](../src/fux/decode) · dir
+- [`src/fux/decode/ext/__init__.py`](../src/fux/decode/ext/__init__.py) · file
+- [`src/fux/decode/ext/markdown.py`](../src/fux/decode/ext/markdown.py) · file
+- [`src/fux/decode/ext/ooxml.py`](../src/fux/decode/ext/ooxml.py) · file
+- [`src/fux/decode/ext/xml.py`](../src/fux/decode/ext/xml.py) · file
+- [`src/fux/decode/ext/zip.py`](../src/fux/decode/ext/zip.py) · file
 - [`src/fux/templates/agents/DECODER-SKILL.md`](../src/fux/templates/agents/DECODER-SKILL.md) · file
 
 <!-- COMPONENTS-END -->
@@ -443,7 +449,7 @@ entirely**, and must. They feed `DEFAULT_TYPES` and the file `fux setup` writes;
 deriving either from declared config would close a loop where the file decides
 what the file's own default should say.
 
-**14. What counts as a heading lives in `decode/_markdown.py`, and both readers
+**14. What counts as a heading lives in `decode/ext/markdown.py`, and both readers
 import it.** A decoder's output has exactly two consumers, and each used to
 carry its own `^#{1,6}` regex: `ingest/extract.py` to mine the `heading` field
 and `phrases`, `text/chunk.py` to decide where a citable passage begins.
@@ -466,9 +472,13 @@ and `phrases`, `text/chunk.py` to decide where a citable passage begins.
   hand-written `.md` in every corpus with no defect behind it.
 - **It sits under `decode/` because it is the decode contract's other half.**
   Decision 2 says a decoder returns Markdown *because* `extract.py` reads `#`;
-  this module is the statement of what `#` means. The leading underscore keeps
-  the loader from mistaking it for a decoder, and `fux setup` never copies it —
-  it is imported as `fux.decode._markdown` by planes, not by consumer files.
+  this module is the statement of what `#` means. It is a **decoder extension**
+  (decision 24): it lives under `decode/ext/`, which the loader never scans for
+  decoders, and `fux setup` never copies it. Planes import it as
+  `fux.decode.ext.markdown`. ⚠ **Its `VERSION` reaches only decoded
+  documents** — the decoders whose `USES` names it. A `.md` file has no
+  decoder; `extract.py`'s `RULES_VERSION` keys it. So a grammar change bumps
+  both.
 - ⚠ **`.rst`, `.adoc` and `.org` keep their own regexes** in `extract.py` and
   get no fence handling. Their heading syntax is not Markdown's and neither is
   their code-block convention. No decoder emits them, so this module still
@@ -824,7 +834,7 @@ this moved where they are written, not what they are.
 **The built-in decoders' caps live in `.fux/formats.toml [limits.<decoder>]`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27).
 The twenty module constants — `MAX_CELL_CHARS`, `MAX_COLS`, `MAX_INFLATED`,
 `MAX_DEPTH`, `MAX_ITEMS` and the rest — are deleted; each decoder reads
-`fux.decode._limits.limit(decoder, key)`, served from the file the registry
+`fux.decode.ext.limits.limit(decoder, key)`, served from the file the registry
 binds with the root, parsed once per file state so a per-cell read is a dict
 lookup. `[limits.zip]` belongs to the shared ZIP reader (docx, pptx, xlsx), and
 `[limits.json] max_depth` is shared by json, jsonl, toml and xml, exactly as the
@@ -840,7 +850,7 @@ changed decoder's `VERSION` line says so.
   the consumer's code — until the consumer refreshes them.
 - **A decoder with no repository bound, or a repo with no `formats.toml`, asks
   for a cap and gets a named error** — there is no value to fall back to.
-  `fux ingest` checks every cap up front (`_limits.check`), so a walk stops once.
+  `fux ingest` checks every cap up front (`ext.limits.check`), so a walk stops once.
 
 **The Markdown grammar and the glob matcher hold no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `markdown.mjs` reads its fence and heading by named regex groups, and `registry.mjs` tests `**` with `startsWith`. Twin behaviour is unchanged.
 
@@ -848,7 +858,7 @@ changed decoder's `VERSION` line says so.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
-**23. Every table becomes Markdown in ONE place, `decode/_table.py`** (W-287
+**23. Every table becomes Markdown in ONE place, `decode/ext/table.py`** (W-287
 stage A, 2026-10-19; Arpit: *"how about we build 1 decoder just for table and
 internally html, docs and xlsx use the same?"*). `xlsx.py`, `html.py`,
 `docx.py` and `csv.py` are **parsers**: each turns its format into a
@@ -860,11 +870,16 @@ the Markdown `text/chunk.py::_table_bands` reads back. `_ooxml.table_markdown`
 and `html.py`'s own emitter are gone; three copies of one rule were how
 SR-TABULAR decision 7's defect happened.
 
-- **Not a decoder**: no suffix, never chosen by the registry. Naming it a
-  *decoder extension*, moving it to `decode/ext/` and putting a `VERSION` of its
-  own into every importing decoder's reuse key is **W-288's**. Until then a
-  change to `_table.py` bumps the `VERSION` of all four importers, as this one
-  did: `csv` → 2, `docx` → 2, `html` → 2, `xlsx` → 3.
+- **Not a decoder — a decoder extension** (decision 24, W-288, 2026-10-20):
+  no suffix, never chosen by the registry, and its own `VERSION` in the reuse
+  key of every decoder whose `USES` names `table` — `csv`, `docx`, `html`,
+  `xlsx`, and `drawio` and `mail` through `html`. W-287 built it as
+  `decode/_table.py` before that existed, so its change bumped all four
+  importers instead: `csv` → 2, `docx` → 2, `html` → 2, `xlsx` → 3. The next
+  change to it bumps `[extensions.table] version` and nothing else.
+  [SR-TABULAR](0150_tabular.md) owns the file (its decision 8 is the rules).
+  `html.py`'s method that hands a parsed table to `emit` and places the result
+  is `_add_table`; it writes no table of its own.
 - **What each parser still owns** — what its format fixes: `xlsx` places a cell
   by its `r=` address (Excel omits empty cells) and reads its kind from `t=` and
   the style's `numFmt` ([SR-TABULAR](0150_tabular.md) decision 8); `html` places
@@ -888,6 +903,97 @@ SR-TABULAR decision 7's defect happened.
   fixture named for its number in `tests/decode/test_tables.py`, and its
   round-trip test decodes one table in all four formats and requires the
   chunker to read back exactly the cells written.
+
+**24. Decoder extensions — one versioned shared layer under the decoders, and
+each one's `VERSION` in the reuse key of every decoder that uses it** (W-288,
+2026-10-20; Arpit, 2026-10-19: *"Okay, let's call it extensions"*). Five shared
+helpers carried no `VERSION` and sat in no reuse key, so a fix to one moved no
+document's bytes and no decoder's version: an existing corpus kept the old
+output until `fux ingest --full` while `fux doctor` stayed green. That is
+decision 11a's trap again, one layer down.
+
+- **E1 — home and shape.** A **decoder extension** is a module
+  `src/fux/decode/ext/<name>.py` that a decoder calls to do part of its work. It
+  declares `VERSION`, read from `constants.toml [extensions.<name>] version`,
+  and nothing else protocol-wise: no suffix, no `decode()`, never chosen by the
+  registry. There are six, each at `1`: `limits`, `markdown`, `ooxml`, `table`,
+  `xml`, `zip`. `fux.decode.ext.NAMES` is the `[extensions.*]` tables, sorted.
+- **E2 — declaration, not introspection.** A decoder names what it calls:
+  `USES = ("table", "limits")`, beside `EXTENSIONS` and `VERSION`. A built-in
+  reads its tuple from `constants.toml [decoders.<name>] uses`. **`USES` is the
+  closure of what the decoder reaches**: an extension reached through another
+  extension or another decoder counts. So `docx` names `ooxml`, `xml` and
+  `limits` (`ooxml` imports `xml`, which imports `limits`), and `drawio` and
+  `mail` name `table` because both call `html`. `USES` is read on the import
+  path, as `META_FIELDS` is (decision 20b). A name that is not a decoder
+  extension, a repeated name, or a value that is not a tuple of names is a hard
+  error naming the file. It is never passed to `decode()`: the protocol does not
+  grow a parameter ([SR-TABULAR](0150_tabular.md) decision 5).
+- **E3 — the digest.** `acquire/decoderdigest.py` mints
+  `<decoder>@<v>+<ext>@<v>+…` per suffix, with the extensions in declared order:
+  `docx@2+table@1+ooxml@1+xml@1+zip@1+limits@1`. **A consumer decoder gets the
+  same tail**, `docx@sha:1a2b…+table@1+…`. A seeded copy in `.fux/decoders/`
+  imports `fux.decode.ext` from the installed engine, so an upgrade changes its
+  output while its sha stays the same. The blast radius stays per suffix: a
+  `table` bump re-extracts the formats that declare `table`, and nothing else.
+- **E4 — the gates**, in `tests/decode/test_decoder_versions.py`:
+  `test_every_extension_declares_a_version` (also: the files under `ext/` and
+  the `[extensions.*]` tables are one list);
+  `test_a_decoders_uses_is_the_closure_of_what_it_imports`, which walks each
+  built-in decoder's imports with `ast`. **That walk is the one place
+  introspection is used**, to catch a missing declaration, never to build the
+  key. It requires exactly the closure, because a declared name the decoder
+  never reaches re-extracts a format for an edit that cannot touch it. The third
+  gate is `test_a_changed_extension_bumped_its_version`, the freshness check
+  `test_a_changed_builtin_decoder_bumped_its_version` already runs, one layer
+  down.
+- **E5 — the existing five moved**, `_ooxml` → `ext/ooxml.py`, `_xml` →
+  `ext/xml.py`, `_zip` → `ext/zip.py`, `_markdown` → `ext/markdown.py`,
+  `_limits` → `ext/limits.py`, and W-287's `_table.py` → `ext/table.py`. Every
+  decoder declares `USES`; no decoder's `VERSION` moved. ⚠ **The digest shape
+  changes once**, so the first `fux ingest` after the upgrade re-extracts every
+  decoded document in every consumer's repo. Markdown and plain text carry
+  `prose`, which did not change, so they are not re-extracted. The
+  CHANGELOG names the cost. The change is not staged across releases, which
+  would leave two digest shapes alive at once.
+- **The old names still import, as aliases and never as copies.** Every
+  `.fux/decoders/` copy that `fux setup` seeded before this change imports
+  `fux.decode._xml` and its siblings, and so does every decoder written from
+  the `fux-decoder` skill. Deleting the names would stop each of those repos'
+  ingest at its first decoder import, the same reason decision 11's
+  `json.MAX_DEPTH` shim exists. `decode/__init__.py` binds each name in
+  `constants.toml [decoders] legacy_helpers` to the extension **module object
+  itself**, so there is one `ContextVar` and one cache, and no `_<name>.py` file
+  exists to drift. `_table` has no alias because it never shipped. ⚠ A decoder
+  that imports an old name declares no `USES` for it, so that extension's
+  `VERSION` does not reach its key. That is the stale copy `fux doctor`'s
+  `seeded copies current` row already names (decision 10), and re-seeding closes
+  it.
+- **Owned per file.** [SR-TABULAR](0150_tabular.md) owns `ext/table.py` and
+  `ext/limits.py`. This record owns `ext/__init__.py`, `ooxml`, `xml`, `zip` and
+  `markdown`. The package is **core**, like the rest of `decode/`.
+- ⚠ **What it does not close: a decoder importing another DECODER.** `mail`
+  and `drawio` call `html`, and `ini`, `jsonl`, `toml` and `yaml` call `json`.
+  An extension reached that way is in the importer's `USES` (E2), but the
+  imported decoder's own `VERSION` is not in the importer's key. A bump to
+  `html` re-extracts `.html` and not `.eml`. That gap predates this decision;
+  it is named here, not fixed.
+
+**The naming — one word, three meanings, and the table is the only defence.**
+
+| phrase | means | where |
+|---|---|---|
+| a decoder's `EXTENSIONS` — its **suffixes** | the file suffixes it claims (`.xlsx`, `.xlsm`) | decision 1 |
+| the consumer's **extension points** | `.fux/decoders/`, `.fux/fetchers/`, where readable source IS the contract | [L10](0012_LAW-10-bundled-output.md) |
+| a **decoder extension** | a versioned shared module under `decode/ext/` that a decoder names in `USES` | this decision |
+
+In prose this layer is always the two-word *decoder extension*. Where a
+sentence must name a `.xlsx`-style extension beside one, the former is a
+**suffix**, which is Python's own word (`Path.suffix`). In code, the package is
+`decode/ext/`, the declaration is `USES`, and `EXTENSIONS` keeps its meaning.
+Both words are in [`docs/GLOSSARY.md`](../docs/GLOSSARY.md). This is Arpit's
+word ([L6](0008_LAW-6-say-index.md)'s kind of ruling); a rename is one word from
+him, and this table is where it lands.
 
 ### Consequences
 

@@ -3,7 +3,7 @@
 ## Why this exists, and why it is not a parameter
 
 A decoder is `EXTENSIONS` plus `decode(raw, rel_path)` — two names, and
-[SR-DECODE](../../../records/0139_decode.md) decision 1 is emphatic that the
+[SR-DECODE](../../../../records/0139_decode.md) decision 1 is emphatic that the
 protocol is the whole interface. Adding a third parameter for configuration
 would break every consumer decoder in every repo to serve one setting.
 
@@ -36,6 +36,14 @@ from __future__ import annotations
 from contextlib import contextmanager
 from contextvars import ContextVar
 from pathlib import Path
+from fux.constants import fixed
+
+#: This decoder extension's version. It rides in the reuse key of every decoder
+#: whose `USES` names it (SR-DECODE decision 24), so bump it — in
+#: `constants.toml [extensions.limits]` — when an edit can change what a decoder
+#: using it RETURNS. `tests/decode/test_decoder_versions.py` fails on a changed
+#: extension whose `VERSION` line the diff did not touch.
+VERSION = fixed("extensions.limits", "version")
 
 __all__ = ["bound_root", "max_table_rows", "limit", "check", "digest_lines", "template_limits"]
 
@@ -67,8 +75,8 @@ def bound_root(root: Path | None):
 def _load(root: Path) -> dict | None:
     """`.fux/formats.toml [limits]`, or `None` when the file is absent — which
     `limit()` then reports, so a decoder that reads no cap never needs the file."""
-    from ..constants import fixed
-    from ..acquire import typesfile
+    from fux.constants import fixed
+    from fux.acquire import typesfile
 
     path = root / fixed("files", "formats")
     try:
@@ -93,8 +101,8 @@ def limit(decoder: str, key: str) -> int:
     caps here instead of holding them as module constants, and every cap is in
     the extract-config digest, so an edited value re-extracts the corpus.
     """
-    from ..constants import fixed
-    from ..errors import FuxError
+    from fux.constants import fixed
+    from fux.errors import FuxError
 
     limits = _LIMITS.get()
     if limits is None:
@@ -121,7 +129,7 @@ def template_limits() -> dict:
 def _template_text() -> str:
     from importlib import resources
 
-    from ..constants import fixed
+    from fux.constants import fixed
 
     return (resources.files("fux") / "templates" / fixed("templates", "formats_limits")).read_text(
         encoding="utf-8"
@@ -132,9 +140,9 @@ def check(root: Path) -> None:
     """Every cap the built-in decoders read is present — ONE error naming each
     missing key, raised where ingest starts, before any decoder runs (the
     `[index]` precedent, SR-TABULAR decision 6)."""
-    from ..constants import fixed
-    from ..errors import FuxError
-    from ..acquire import typesfile
+    from fux.constants import fixed
+    from fux.errors import FuxError
+    from fux.acquire import typesfile
 
     have = typesfile.read(root).limits
     missing = [
@@ -153,7 +161,7 @@ def digest_lines(root: Path) -> str:
 
     Only the keys the built-ins read: a consumer's extra table changes nothing
     fux extracts, so it must not force a re-extraction."""
-    from ..acquire import typesfile
+    from fux.acquire import typesfile
 
     have = typesfile.read(root).limits
     return "\n".join(
@@ -172,8 +180,8 @@ def max_table_rows() -> int:
     A decode with no repository in context has no file to read the cap from,
     and says so rather than inventing one.
     """
-    from ..errors import FuxError
-    from ..tune import index_limits
+    from fux.errors import FuxError
+    from fux.tune import index_limits
 
     root = _ROOT.get()
     if root is None:

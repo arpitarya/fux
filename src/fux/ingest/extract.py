@@ -52,7 +52,7 @@ from ..constants import fixed
 #: sectionless_formats`: `.csv`, `.json`, `.jsonl`) return no `sections`
 #: (SR-SECTIONS decision 2, W-271's option b). Their documents lose their
 #: section lines and `nsec` at the next ingest.
-RULES_VERSION = fixed("versions", "extract_rules")  # 5 since W-273 (no sections for record formats); W-233 did not bump: no families = identical output; W-282 did not bump: imports moved, same output
+RULES_VERSION = fixed("versions", "extract_rules")  # 5 since W-273 (no sections for record formats); W-233 did not bump: no families = identical output; W-282 did not bump: imports moved, same output; nor W-288: the heading grammar moved to decode/ext/markdown.py, same output
 
 #: SR-SECTIONS decision 2 (W-273): extensions whose documents are sectionless
 #: whatever headings their decoder emits — one heading per record is not a
@@ -64,8 +64,8 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..decode._markdown import headings as _md_headings
-from ..decode._markdown import strip_headings as _md_strip_headings
+from ..decode.ext.markdown import headings as _md_headings
+from ..decode.ext.markdown import strip_headings as _md_strip_headings
 from ..text.identifiers import EMPTY, IdentifierRules
 from ..text.tokenize import tokenize
 from .parse import ParsedDoc, meta_fields
@@ -77,7 +77,7 @@ from .parse import ParsedDoc, meta_fields
 #: ⚠ **The cap truncates DISPLAY, never ranking**: `heading` tf below is built
 #: from every heading, so a heading past the cap still ranks.
 
-#: Markdown is NOT here. Its grammar moved to `decode/_markdown.py` on
+#: Markdown is NOT here. Its grammar moved to `decode/ext/markdown.py` on
 #: 2026-09-06, because a regex cannot see a code fence and this one did not:
 #: a `# Install dependencies` line inside a ```bash block was counted as a
 #: heading, given heading-field weight, published in `phrases` where `fux ask`

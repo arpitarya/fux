@@ -8,11 +8,11 @@ status: accepted
 amended: 2026-10-13
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@f1a7ba05c7b5, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@5dfe7951d6c5, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 8e96ef5d94c89c70be97bc52413dd18f97ce7cc068a936649dd76478b50f5afe
+content_sha: 295cecb96dbc7ca6e67021788c996eeb0f0b09bad3b783320139a26e664a0f96
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

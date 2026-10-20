@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-10-09
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py@5d8ba6a4bdcd, tools/t2-eval@cc5410393ce4, tools/quality-controls@cc88d77ca900, tools/vector-gate@54116ebffca4, tools/section-size@6bb7d7b9edad]
+owns: [tests/test_regression_runs.py@5d8ba6a4bdcd, tools/t2-eval@cc5410393ce4, tools/quality-controls@cc88d77ca900, tools/vector-gate@54116ebffca4, tools/section-size@610cd81f5c4c]
 laws: [L4, L13]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: b3d0ca8763ad916cdf8fdd6c42b157401b30bf8f7b9207a18d072a2fb77b88f5
+content_sha: f5a65217aa39dce5f56e91f90ad5c774bd1204a0f8bbda4af184da3b728aceef
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1414,6 +1414,8 @@ reach its answers), `informed`; decision 24e's pool computed by the decider from
 the baseline arm, never by the capturing hand. ⚠ **Its first capture STOPPED on
 G0** (a build defect: tie-breaks on a display string) and was re-captured on the
 fixed engine with the bar unchanged — the STOP is filed beside it, unscored.
+
+**Filed under this record, no decision moved** (W-288, 2026-10-20): `tools/section-size/measure.py` imports the heading grammar and the limits seam from `fux.decode.ext` ([SR-DECODE](0139_decode.md) decision 24). What it measures is unchanged.
 
 ### Consequences
 

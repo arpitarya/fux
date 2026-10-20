@@ -184,7 +184,7 @@ def run(
     # W-225 stage 4a: the decoders' caps, the same way and for the same reason —
     # one error naming every missing `[limits.<decoder>]` key, before any
     # decoder runs, rather than one per document.
-    from ..decode import _limits as decode_limits
+    from ..decode.ext import limits as decode_limits
 
     decode_limits.check(root)
     store_mod.ensure_layout(root)  # `.fux/` README + .gitignore, write-if-missing (SR-DOTFUX)
@@ -1139,7 +1139,7 @@ def _refuse_a_flipped_mode(root: Path, wanted: bool, has_plane: bool) -> None:
 
 
 def _decode_limits_digest(root: Path) -> str:
-    from ..decode import _limits as decode_limits
+    from ..decode.ext import limits as decode_limits
 
     return decode_limits.digest_lines(root)
 

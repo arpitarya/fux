@@ -153,6 +153,17 @@ committed line the operator wrote, and none is built as a committed copy today
 makes the committed artifact small, ACL-safe, and never stale-by-accumulation.
 See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named by [SR-LAWS](../records/0001_LAWS.md), [paper §3](paper/the-fux-index-paper.md).
 
+**Decoder extension** <a id="decoder-extension"></a> — A versioned shared module under `src/fux/decode/ext/`
+that a decoder calls to do part of its work: `table` (the one table emitter),
+`ooxml`, `xml`, `zip`, `markdown` (the heading grammar), `limits` (the caps
+seam). It has no [suffix](#suffix) and is never chosen by the registry. A
+decoder names the ones it calls in `USES`, and each one's `VERSION` rides in
+that decoder's reuse key — `docx@2+table@1+ooxml@1+…` — so a fix to shared
+code re-extracts exactly the documents it can change. ⚠ **Always the two-word
+form in prose**: a decoder's `EXTENSIONS` are its suffixes, and the
+consumer's *extension points* are `.fux/decoders/` and `.fux/fetchers/` (L10).
+See [SR-DECODE](../records/0139_decode.md) decision 24.
+
 **Determinism** — Same sources → byte-identical index and root hash; same
 question → same answer. No wall-clock output, no model in the maintenance
 path, sorted walks, stable serialization, no set-iteration-order dependence.
@@ -784,6 +795,12 @@ declared per source on a committed line and that no committed copy is built
 today. The per-source retention that does exist is `keep=`, gitignored
 ([SR-ACQUIRED](../records/0145_acquired-plane.md)). See
 [SR-LAW-3](../records/0005_LAW-3-content-never-durable.md).
+
+**Suffix** <a id="suffix"></a> — A file's `.xlsx`-style ending, the word Python
+itself uses (`Path.suffix`). It is what a decoder's `EXTENSIONS` lists and what
+the registry dispatches on. Say *suffix* wherever a sentence also names a
+[decoder extension](#decoder-extension), so the two cannot be confused. See
+[SR-DECODE](../records/0139_decode.md) decision 24's naming table.
 
 **Template family** — Two or more documents with an **identical heading
 set** — the same form filled in more than once. The *set*, never the sequence:
