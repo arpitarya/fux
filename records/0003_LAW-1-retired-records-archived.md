@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L1
 owns: [tests/test_retired_records_archived.py@0bbfe61a1b63]
 laws: [L1]
 timestamp: 2026-09-28T00:00:00Z
-content_sha: 16432b8291b1b9498d6a250222e5fd287e950dffbf3f7bceb694912e98b80717
+content_sha: 4bd2e7fc6130540e736775cdb7d408fd38875bc2c1fada0b0e82704af9d6f336
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -27,7 +27,7 @@ content_sha: 16432b8291b1b9498d6a250222e5fd287e950dffbf3f7bceb694912e98b80717
 
 > **This record is the HOME of law L1 — §2's first block IS the law**, and the
 > rest of this record is its rationale. [`CLAUDE.md` §Non-negotiable
-> constraints](../CLAUDE.md) carries a **generated** copy, held byte-equal by
+> constraints](../CLAUDE.md) carries a **generated** one-line pointer, held equal by
 > [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py)
 > ([SR-LAW-0](0002_LAW-0-authority.md) decisions 1 and 5). Amend the law here.
 
@@ -80,8 +80,8 @@ flowchart TD
 
 🔴 **This block IS law L1.** It is the only normative statement of it, and
 [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a **generated**
-copy of it — rendered from these bytes by
-[`scripts/gen-laws.py`](../scripts/gen-laws.py) and held byte-equal by
+one-line pointer to it — rendered from this record's title by
+[`scripts/gen-laws.py`](../scripts/gen-laws.py) and held equal by
 [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py).
 Amend it **here**, then run `python scripts/gen-laws.py --write`.
 Amending a law needs Arpit's ruling, named in this record

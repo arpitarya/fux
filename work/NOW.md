@@ -3,4 +3,4 @@ type: Pointer
 description: "One line: the current state and the immediate next step. Overwritten every session."
 ---
 
-🔴 2026-10-20 Claude Code (Opus 5.5): **W-287 closed; W-288 closed; W-289 built on `main`, unreleased** (plugin packages: 15 under `packages/`, declared-only registry). **Next: Arpit — 15 PyPI trusted publishers and two rulings in W-289 §Decisions; then a release. Inbox also: W-258, W-268, W-290 (Cowork: front-door docs landed; Arpit unzips the `.github/` templates).**
+🟢 2026-10-21 Cowork (Opus 5.5): **W-293 built — codelaw ports (law gate, install smoke, withdraw script, wheel cache, one SR guard, lean `CLAUDE.md`), uncommitted.** **Next: Arpit copies `ci.yml` + `publish.yml` into `.github/workflows/` (W-293 6a), then step 7 on the first `main` run; W-291, W-292 filed by another session for Claude Code. Inbox unchanged: W-289, W-258, W-268.**

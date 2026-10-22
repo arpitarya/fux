@@ -6,14 +6,14 @@ title: "SR-WORK-OWNERSHIP (0054) — owns and describes: the record-to-component
 description: "Two relations, not one. Exactly one record OWNS each component; any number DESCRIBE it. The freshness gate demands the owner and every describer, which closes the hole that let sixteen records rot while the check stayed green. Since 2026-09-13 a record also declares its `kind`, which selects an additional gate and never switches one off."
 status: accepted
 amended: 2026-10-05
-date: 2026-08-27
+date: 2026-10-21
 ratified: 2026-08-27
 feature: the record-to-component model, and the `describes` relation W-82 ruling 4 added to it
-owns: [scripts/sr-guard.sh@78168609634b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@1eba43715793, tests/sr_lib.py@c93fbcc78ec3, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@e3d2172d0b11, tests/test_sr_frontmatter.py@c8c81b4b394a, tests/test_sr_ownership.py@029b43c8f611, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@8124ebcad40e, tests/test_sr_register_status.py@acae7406d76c]
+owns: [scripts/sr-guard.sh@88af468d035b, scripts/sr-hash.py@0ea0d01ed4cb, scripts/sr-owns.py@1eba43715793, tests/sr_lib.py@5a1bb445c662, tests/test_sr_config_keys.py@8525f4428b39, tests/test_sr_content_hash.py@4e9d8237a674, tests/test_sr_freshness.py@471b8ad075b3, tests/test_sr_frontmatter.py@c8c81b4b394a, tests/test_sr_ownership.py@029b43c8f611, tests/test_sr_owns_consistency.py@b3d92e0f7e55, tests/test_sr_owns_hash.py@8124ebcad40e, tests/test_sr_register_status.py@acae7406d76c]
 laws: [0]
 ratifies: W-82 ruling 4
-timestamp: 2026-08-27T00:00:00Z
-content_sha: c81fe1541b8f2d17e2277b98e6a5a9ac31779e72e00554f49a3f596a5780c025
+timestamp: 2026-10-21T00:00:00Z
+content_sha: 2e886ef1a1df580d8fa6c329a28ca11c2eda29e3b111367a09823849453d1800
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -146,7 +146,11 @@ src/fux/query/rank.py        SR-RANKING         SR-TUNE
     hand.** `tests/test_sr_freshness.py` runs in CI on every push (with
     `fetch-depth: 0`, so the runner can see the history it audits).
     `scripts/sr-guard.sh` is the same check at the moment it is cheapest to
-    obey:
+    obey — **the same code, not a copy**: the hook hands the staged change to
+    `tests/sr_lib.py`'s `guard`, whose `missing_records` is what the CI replay
+    calls per commit, so the two cannot disagree and the hook demands every
+    describer exactly as CI does (2026-10-21; before, the hook was a second,
+    owner-only implementation in shell):
 
     ```bash
     ln -sf ../../scripts/sr-guard.sh .git/hooks/commit-msg
@@ -371,7 +375,7 @@ top-level definitions.
     Stamped by [`scripts/sr-owns.py`](../scripts/sr-owns.py) **before**
     `sr-hash.py`, because stamping a claim changes the record.
     🔴 **A directory's file list comes from `git ls-files`, not from the
-    filesystem** (amended 2026-09-13, first CI run of the gate). Walking the
+    filesystem**. Walking the
     directory put whatever the working tree happened to hold into the hash:
     `node/` grows a gitignored `node/dist/` the moment anyone builds the
     bundle, so a claim stamped on that machine could not match the same commit

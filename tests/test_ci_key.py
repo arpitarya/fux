@@ -145,3 +145,46 @@ def test_publish_reads_the_same_key_the_verdict_job_saves() -> None:
     publish = (WORKFLOWS / "publish.yml").read_text(encoding="utf-8")
     assert "python3 scripts/ci-key.py verdict" in publish
     assert "refusing to publish" in publish
+
+
+# -- the wheel key (SR-WORK-RELEASE decision 17) ------------------------------
+
+
+@pytest.mark.parametrize("path", [
+    "tests/test_x.py", "tests_e2e/test_y.py", "tools/differential/node_arm.py",
+    "scripts/law-gate.py", ".github/workflows/ci.yml", "records/0063_WORK-release.md",
+    "work/WORKLOG.md", "docs/index.md", "CHANGELOG.md", "CLAUDE.md",
+])
+def test_wheel_inert_paths(path: str) -> None:
+    assert ci_key.wheel_inert(path), path
+
+
+@pytest.mark.parametrize("path", [
+    "src/fux/cli.py", "src/fux/templates/agents/x.md", "node/src/index.mjs",
+    "packages/fux-decoder-pdf/pyproject.toml", "packages/fux-core/README.md",
+    "pyproject.toml", "README.md", "LICENSE", "records/README.md", "newdir/x.txt",
+])
+def test_wheel_input_paths(path: str) -> None:
+    """The direction that costs correctness: an input that does not move the
+    key would restore a wheel built from different code."""
+    assert not ci_key.wheel_inert(path), path
+
+
+def test_the_wheel_key_moves_on_an_input_and_not_on_a_test(tmp_path, monkeypatch) -> None:
+    root = _repo(tmp_path)
+    monkeypatch.chdir(root)
+    before = ci_key.wheels_key()
+    _commit(root, "tests/test_a.py", "def test(): pass\n")
+    assert ci_key.wheels_key() == before
+    _commit(root, "records/README.md", "layer map\n")
+    assert ci_key.wheels_key() != before
+
+
+def test_only_a_push_restores_wheels_and_publish_never_does() -> None:
+    ci = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
+    build = ci.split("\n  build:\n", 1)[1].split("\n  arm:\n", 1)[0]
+    restore = build.split("id: wheel-cache", 1)[1].split("\n      - ", 1)[0]
+    assert "if: github.event_name == 'push'" in restore
+    assert "scripts/ci-key.py wheels" in build
+    publish = (WORKFLOWS / "publish.yml").read_text(encoding="utf-8")
+    assert "wheel-cache" not in publish

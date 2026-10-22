@@ -32,10 +32,16 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-19** (Claude Code, Opus 5.5 — W-284/285/286, the editor and llms surfaces; before it Claude Code, Opus 5.5 — W-282 Steps 1–2, the untangle and the packaging; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-21** (Cowork, Opus 5.5 — W-293, the codelaw ports; before it Claude Code, Opus 5.5 — W-284/285/286, the editor and llms surfaces; before it Claude Code, Opus 5.5 — W-282 Steps 1–2, the untangle and the packaging; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-10-19 (latest) — THREE NEW SURFACES: `fux llms`, `fux lsp`, THE VS CODE EXTENSION (W-284 · W-285 · W-286)
+### 🟢 2026-10-21 (latest) — WHAT FUX TOOK FROM CODELAW (W-293)
+
+- **Asked (Arpit):** survey codelaw, then build the tiny fixes, the release safety, the text/design changes and a CI wheel cache.
+- **Built:** law gate, install smoke, withdrawal script, wheel cache (SR-WORK-RELEASE d17–20); one SR guard (`sr-guard.sh` → `tests/sr_lib.py`); `CLAUDE.md` carries one line per law and L11 whole (SR-LAW-0 d5).
+- **Standing:** a session acting on a law opens its record — `CLAUDE.md` no longer carries the text, except L11's. A release that half-publishes is withdrawn whole with `scripts/withdraw.sh`, by Arpit.
+
+### 🟢 2026-10-19 — THREE NEW SURFACES: `fux llms`, `fux lsp`, THE VS CODE EXTENSION (W-284 · W-285 · W-286)
 
 - **Asked (Arpit):** llms.txt + llms-full.txt, and MCP + LSP for VS Code — research, file items, build, close, release.
 - **Built:** both verbs are Python, stdlib, reader layer, siblings of `fux mcp`; the extension is dependency-free (hand-rolled LSP client), one bundled file, a `.vsix` attached to the GitHub release — no Marketplace listing (needs Arpit's publisher). The forks and their reopen-triggers: [`editor-and-llms-surfaces.compare.md`](compare/editor-and-llms-surfaces.compare.md).

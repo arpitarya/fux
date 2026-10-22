@@ -7,10 +7,10 @@ description: "The constitutional law. A rule is stated in exactly one SR and eve
 status: accepted
 date: 2026-09-06
 feature: the authority of records — where a rule lives, which record wins, and who may amend one
-owns: [scripts/gen-laws.py@96ca5a116bcc, scripts/gen-components.py@d146ee4a28b1, tests/test_claude_md_laws.py@d5a71ea8bd15, tests/test_record_components.py@5559f217ae22]
+owns: [scripts/gen-laws.py@33fbf93ad822, scripts/gen-components.py@d146ee4a28b1, tests/test_claude_md_laws.py@f68f17e068aa, tests/test_record_components.py@5559f217ae22]
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 48ef72d875cd9387c9923dc72ea8da3075bfe0cc9ce47535e7a3938be95da75a
+content_sha: ac62e15fa1d48a51f6765f686219375e6426507b02780c467abfe0306417b4dc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -88,8 +88,8 @@ the trade: one hop of indirection, bought with the end of silent drift.
 
 🔴 **This block IS law L0.** It is the only normative statement of it, and
 [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a **generated**
-copy of it — rendered from these bytes by
-[`scripts/gen-laws.py`](../scripts/gen-laws.py) and held byte-equal by
+one-line pointer to it — rendered from this record's title by
+[`scripts/gen-laws.py`](../scripts/gen-laws.py) and held equal by
 [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py).
 Amend it **here**, then run `python scripts/gen-laws.py --write`.
 Amending a law needs Arpit's ruling, named in this record
@@ -267,9 +267,11 @@ while both still look correct?* If yes, it is a restatement. If it would
 simply fail, it is an implementation or an enforcement.
 
 **5. A generated view is permitted, and only while a test binds it.**
-`CLAUDE.md`'s law section may carry the law text **generated** from these
-records between markers, because a test asserting equality makes disagreement
-impossible. ⚠ **Remove the test and the block violates decision 1** — the
+`CLAUDE.md`'s law section may carry what is **generated** from these records
+between markers, because a test asserting equality makes disagreement
+impossible. **It carries one line per law — the record's title and a link — and
+L11's text in full** (Arpit, 2026-10-21): every session pays to read that file,
+and L11 is the one prohibition a session must have read before it acts. ⚠ **Remove the test and the block violates decision 1** — the
 permission is the test, not the generation.
 
 **5a. This record owns the generators and the binds that make the permission
@@ -297,10 +299,11 @@ paragraph, where nothing could check it.
 moved into its own `SR-LAW-n` record, fenced by a pair of `LAW-TEXT` HTML
 comment markers;
 [`scripts/gen-laws.py`](../scripts/gen-laws.py) renders `CLAUDE.md`'s
-§Non-negotiable constraints from the ten blocks, rewriting link targets from
-record-relative to repo-root-relative and doing nothing else;
-[`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) holds the two
-byte-equal and refuses a verbatim third copy anywhere in a live document.
+§Non-negotiable constraints from them — decision 5's lines, link targets
+rewritten from record-relative to repo-root-relative;
+[`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) holds the
+render equal to what `CLAUDE.md` carries and refuses a verbatim third copy of a
+block anywhere in a live document.
 
 ⚠ **Two things the migration corrected on the way, both factual rather than
 normative.** L0's own text enumerated the supreme records as `SR-LAW-0`…`SR-LAW-9`

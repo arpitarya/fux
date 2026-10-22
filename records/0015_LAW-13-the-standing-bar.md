@@ -10,7 +10,7 @@ feature: the standing ship bar for ranking changes — its shape, its defaults, 
 owns: []
 laws: [L0, L13]
 timestamp: 2026-10-10T00:00:00Z
-content_sha: beaf7bce4e7cdfb04ffb438af4c381d6d85add89531eed564abda2957e744bbd
+content_sha: 97a6b97faa300098647dff66f80a8ab5d76d29cbcef67927af043eca55d33da2
 ratifies: "Arpit, 2026-10-10 (Cowork), after W-236 and W-269 failed a zero-loss clause while W-269 gained net hit@1: asked 'in general for this tool first thing can we set a bar in general … what can be the bar for specific test cases', was shown one general bar with per-feature parameters (helps the target by SR-RS d19, limited collateral with a default margin of 3 % and at least 2, net positive overall, guardrails, one decided arm, fresh data), and ruled: 'Okay, let's go ahead and go with the proposed bar. I like it. Make the necessary changes as well as create one single SR document for these bars. Create it as a law SR.'"
 ---
 
@@ -21,7 +21,7 @@ ratifies: "Arpit, 2026-10-10 (Cowork), after W-236 and W-269 failed a zero-loss 
 > **This record is the HOME of law L13 — §2's first block IS the law**, and the
 > rest of this record is its defaults, its outcome table and its rationale.
 > [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a
-> **generated** copy, held byte-equal by
+> **generated** one-line pointer, held equal by
 > [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) —
 > [SR-LAW-0](0002_LAW-0-authority.md) decisions 1 and 5. ⚠ **`CLAUDE.md` is not
 > the source**; amend the law here, then run `python scripts/gen-laws.py --write`.
@@ -87,8 +87,8 @@ flowchart LR
 
 🔴 **This block IS law L13.** It is the only normative statement of it, and
 [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a **generated**
-copy of it — rendered from these bytes by
-[`scripts/gen-laws.py`](../scripts/gen-laws.py) and held byte-equal by
+one-line pointer to it — rendered from this record's title by
+[`scripts/gen-laws.py`](../scripts/gen-laws.py) and held equal by
 [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py).
 Amend it **here**, then run `python scripts/gen-laws.py --write`.
 Amending a law needs Arpit's ruling, named in this record

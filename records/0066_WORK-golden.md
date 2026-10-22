@@ -10,7 +10,7 @@ feature: the golden benchmark — its two question sets, the key's custody, its 
 owns: [.claude/hooks/guard-golden-answer.sh@de3c4f5d5725, .claude/hooks/guard-sealed-key.sh@85f6df22a301, tests/test_golden_key_guards.py@280935f6475f, tests/test_settings_never_committed_unlocked.py@df702e8bb51c, tests/test_golden_hook_prose.py@5cf50353a104, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@4cac53fcdc3c, tools/golden-difficulty@d4b84445ced3]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: 1f2a806d2b0dab2f1b2be8c9a2f2454545051143b12aaf771d535758841e3abd
+content_sha: 0f118ae6a5c747d962332a6c14dd90227f588db8b520009643cd7d3da0170b74
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -232,9 +232,8 @@ is the surrounding process:
   what a tool call *targets* and fails closed; the generated law block itself;
   and two tests — `test_golden_key_guards.py`, which fails if a guard stops
   covering **either spelling**, and `test_golden_key_never_committed.py`, which
-  answers from `git ls-files` and opens nothing. ⚠ **Between 2026-09-15 and
-  2026-09-18 this bullet said the guards were a backstop around an empty room.
-  The room is not empty.**
+  answers from `git ls-files` and opens nothing. **The room is not empty**, so
+  the guards are the defence, not a backstop.
 - **The three routes no guard sees.** A recursive `grep`, `rg`, `find` or `ls`
   over `work/` that never names the folder — L11 makes excluding `work/golden/`
   part of the rule. ⚠ **Partly guarded since 2026-09-27** (W-223):
@@ -249,13 +248,10 @@ is the surrounding process:
   provisional Claude-authored key and the 124 released questions; the seed corpus
   and the ladder survived. **Every id from the old set (`g001…`) is orphaned and
   never reused**, so a filed number from it may not be compared with anything
-  scored on set 1, set 2 or set 3. ⚠ **Between 2026-09-15 and 2026-09-21 this
-  bullet said both sets were unwritten. They were written on 2026-09-16** —
-  `set-1.jsonl` (125) and `set-2.jsonl` (124), commit `742e1aa9` — **and
-  `set-3.jsonl` (125) on 2026-09-21.** The questions are on disk; **the answers
-  are Arpit's and are not**, which is the half this record is actually about, and
-  a bullet that said *neither exists* let a reader take the wrong half of that
-  sentence for the current state for five days.
+  scored on set 1, set 2 or set 3. **The questions are on disk** —
+  `set-1.jsonl` (125) and `set-2.jsonl` (124), commit `742e1aa9`, and
+  `set-3.jsonl` (125); **the answers are Arpit's and are not**, which is the half
+  this record is about.
 <!-- GOLDEN-TEXT:END -->
 
 3. **The generator and its bind.**
@@ -299,10 +295,8 @@ is the surrounding process:
    shell command is matched on its text, so a heredoc, an `echo`, a `python -c`
    or a commit message that merely *writes a sentence* naming a key path is
    **refused** — while the same sentence through the **Write/Edit** tool passes,
-   because those calls are checked by `file_path` alone. ⚠ **An earlier form of
-   this decision said "writing prose about the rule is not blocked" without that
-   split, and it was wrong about the half a session actually meets**: the class
-   was recorded four times before anyone ruled on it, the fourth in
+   because those calls are checked by `file_path` alone. The class was recorded
+   four times before it was ruled on, the fourth in
    [the 2026-09-21 ladder rebuild](../work/regression/2026-09-21-ladder-set-3-rebuild/ANALYSIS.md)
    §6.
 

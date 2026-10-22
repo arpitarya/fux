@@ -23,6 +23,37 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-21 — W-293: what fux took from codelaw, built  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Implement text and design change in Fox. Implement release safety. Implement fix now tiny."* → *"additionally implement CI wheel cache keyed by a hash of the inputs"*.
+- **Done:** inbox hook matches rule 45a's `*Empty since`; both hooks name the decider from `git config`. `scripts/law-gate.py`, `scripts/smoke.py`, `scripts/withdraw.sh`, `ci-key.py wheels` + the build job's cache, wired into ci.yml (gate also publish.yml) — SR-WORK-RELEASE d17–20. `sr-guard.sh` now hands the staged change to `tests/sr_lib.py guard`, the CI replay's own judge (SR-WORK-OWNERSHIP d2a). **`CLAUDE.md` changed, said out loud:** the law block is one line per law with L11 whole (`gen-laws.py` `FULL_TEXT`, SR-LAW-0 d5, his ruling this session); history notes cut from §What we are building, §Error contract and the golden block; 42 KB → 33 KB. History sentences trimmed in SR-WORK-BENCHMARK, -OWNERSHIP, -RELEASE, -GOLDEN. W-293 filed 🟢 for the first runner proof.
+- **Found:** a concurrent Cowork session filed W-291 and W-292 while this one worked; this item took W-293. The law gate allows `fux-writer` to carry no bundle, because W-292 removes it.
+- **Not done:** a wholesale rewrite of the WORK records to codelaw's length — only history notes were cut; rewriting the rules risks losing a ruling, and that is a reading pass per record, not a mechanical one.
+- **Evidence (partial green, said so):** built and run in a Linux container from this tree — 19 wheels + sdist; gate ✔ and refuses a missing wheel and npm source; smoke ✔; `withdraw.sh 4.1.0 --report` read both registries; the guard refuses an unstaged owner and honours `no SR affected`. Unit suite 7465 passed; its 17 failures were all present before the change (that container had no `archive/` or `work/golden/`; `llms.txt` was already stale from W-289). `tests_e2e` not run — no engine source changed. Not committed.
+- **Refused:** `.github/workflows/ci.yml` and `publish.yml` — remote tools may not write `.github/` (as W-290 found). Both sent in the chat; W-293 → 🔴 with an inbox row until Arpit places them.
+- **Next:** Arpit places the two workflow files; then W-293 step 7 on the first `main` run. The `commit-msg` hook path is unchanged, so an installed link keeps working.
+
+## 2026-10-21 — W-292 filed: the Node reader installs from npm only  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"rather than that, if somebody wants to install it, they can install it using npm … that will be the only way to install the node package for fux. Create a work item for this."*
+- **Found:** `fux setup` vendors the bundle into `.fux/node/` (shape A) or splices `.fux/node` into a monorepo manifest (shape C), plus the `.fux/fux` shim — SR-NODE-SEARCH decisions 13–16; the `fux-writer` wheel carries the bundle via `packages/layer_hook.py`.
+- **Done:** W-292 filed 🟢 `agent` (Opus): setup writes no Node and edits no manifest, wheel drops the bundle, setup alone removes old copies, doctor warns on leftovers, records/L10 examples/READMEs/guides amended. Three defaults (shim retired, migration in setup only, auto-wiring gone) are his to overturn. Nothing built.
+- **Next:** Claude Code builds W-292.
+
+## 2026-10-21 — W-291 filed: `fux setup` installs the hooks  ·  Cowork (Opus 5.5)
+
+- **Asked:** do hooks that update the index install on `fux setup` by default? Then *"Create a work item to install hooks on Fox setup."*
+- **Found:** no — `setup.py` never calls `hooks.install`; the user must run `fux hooks` (SR-MAINTENANCE decision 5). Doctor passes absent hooks as a choice.
+- **Done:** W-291 filed 🟢 `agent` (Sonnet): setup installs hooks + merge driver by default, `--no-hooks` opts out, no-git / foreign hook never fatal, records and shipped guides amended. Nothing built.
+- **Next:** Claude Code builds W-291.
+
+## 2026-10-21 — codelaw survey: what fux can take back  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"look into code law. Is there something that can be taken from it? Anything as simple as text change or design change is also do."*
+- **Found:** codelaw's work system is fux's, distilled. New there and absent here: one live bug (fux's `inject-inbox.sh` tests the retired `**Empty.**` marker; rule 45a's empty form is `*Empty since`), the decider read from `git config user.name` in hooks, `law-gate.py` (no publish unless every law holds on what ships), `withdraw.sh` (a half-published release), `smoke.sh` (install from dist, npm with no Python, PyPI with no Node, byte-equal output), a CI wheel cache keyed by input hash, and a working Rust → npm + PyPI binary pipeline (W-268's template). Codelaw's WORK records state the same rules in a third of the words; its `CLAUDE.md` is 7 KB to fux's 42 KB.
+- **Found (the other way):** codelaw's `RELEASING.md` step 4 plans six identical PyPI pending publishers — the wall W-289 hit.
+- **Not done:** nothing filed or changed; list given in chat, filing on his word. **Next:** Arpit picks which to file.
+
 ## 2026-10-20 — W-289: rulings, and PyPI's one-pending-publisher limit  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"What are we blocked on W289? … You have the access to the browser. Implement what is pending in there"*.

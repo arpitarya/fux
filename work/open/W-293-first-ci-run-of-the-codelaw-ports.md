@@ -1,0 +1,40 @@
+---
+type: Handoff
+name: W-293
+description: "Arpit's ask (2026-10-21, Cowork): take what codelaw does better into fux — built the same session (inbox-hook fix, decider from git, law gate, withdrawal script, install smoke, wheel cache, lean CLAUDE.md, one SR guard). What is left is proof on a real runner: the wheel cache restores on a push that changes no wheel input, and the law gate and smoke go green in ci.yml's build job."
+item: W-293
+filed: 2026-10-21
+filed_by: "Arpit (Cowork, Opus 5.5)"
+updated: 2026-10-21
+updated_by: "Arpit (Cowork, Opus 5.5)"
+ball: arpit
+---
+
+# W-293 — the first CI run of the codelaw ports
+
+## At a glance
+
+| step | what we do | what it gives us | state |
+|---|---|---|---|
+| 1 | Fix the inbox hook (`*Empty since`), name the decider from `git config` | an empty inbox is never announced; hooks portable | ✅ 2026-10-21 |
+| 2 | `scripts/law-gate.py` in ci.yml and publish.yml | no release ships past a law (L2, L7, L8, L10, completeness) | ✅ built, green locally |
+| 3 | `scripts/smoke.py` in ci.yml | PyPI install (no Node) and npm install (no Python) answer alike | ✅ built, green locally |
+| 4 | `scripts/withdraw.sh` | a half-published release is withdrawn whole | ✅ built; `--report` run against 4.1.0 |
+| 5 | Wheel cache keyed by `ci-key.py wheels` | a docs-only push skips the ~90 s wheel build | ✅ built |
+| 6 | Lean `CLAUDE.md` (one line per law, L11 whole); history trimmed; one SR guard | 42 KB → 33 KB read by every session; the hook and CI cannot disagree | ✅ |
+| 6a | 🔴 **Arpit:** copy `ci.yml` and `publish.yml` (sent in the Cowork chat, 2026-10-21) into `.github/workflows/` — remote tools may not write there | the wiring lands; until then two wiring pins fail (`test_law_gate.py`, `test_ci_key.py`). ⚠ `git add` the four new files (`scripts/law-gate.py`, `smoke.py`, `withdraw.sh`, `tests/test_law_gate.py`) before the suite: `gen-components` links only tracked files, so SR-WORK-RELEASE's Components block reads stale until they are | ⏳ |
+| 7 | **First push to `main`: read the build job** — law gate ✔, smoke ✔; a second push touching only `work/` shows "wheels restored" | the ports proven on a runner, not only in a container | ⏳ |
+
+**Arpit, 2026-10-21 (Cowork):** *"look into code law. Is there something that can be taken from it?"* → *"Implement text and design change in Fox. Implement release safety. Implement fix now tiny."* → *"additionally implement CI wheel cache keyed by a hash of the inputs"*.
+
+**Model:** Claude Code, **Sonnet**: read two CI logs; fix only what they show.
+
+## What step 7 checks
+
+- `build · node units · ladder` prints `✔ law-gate: 19 wheels, 1 sdist, 2 npm package(s)` and `✔ smoke: 5 calls`.
+- On the next push whose diff is only under `work/`, `docs/` or `records/` (not `records/README.md`), the build step prints `✔ wheels restored for ci-wheels-v1-…`.
+- If smoke fails on the runner for PATH reasons (a `git` or `node` the symlink cannot see), fix the smoke, not the gate.
+
+## Where it is decided
+
+[SR-WORK-RELEASE](../../records/0063_WORK-release.md) decisions 17–20 · [SR-WORK-OWNERSHIP](../../records/0054_WORK-ownership.md) decision 2a · [SR-WORK-BLOCKERS](../../records/0064_WORK-blockers.md) decision 9a · [SR-LAW-0](../../records/0002_LAW-0-authority.md) decision 5.

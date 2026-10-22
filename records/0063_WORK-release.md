@@ -5,13 +5,13 @@ name: SR-WORK-RELEASE
 title: "SR-WORK-RELEASE (0063) — one name in two registries, and what actually blocks a merge"
 description: "fux-engine ships to PyPI and npm from one release trigger — PyPI automatically by OIDC, npm staged for a human to approve — and the version has four hand-written sites plus one derived bundle, held equal by check-version-parity.py. main has no required status checks: history is protected, the quality gate is not, so CI green is the author's to read."
 status: accepted
-date: 2026-09-14
+date: 2026-10-21
 amended: 2026-10-20
 feature: how a release reaches two registries, how the version stays equal across its sites, and what the branch wall does not do
-owns: [scripts/check-version-parity.py@b861fee901b6, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@d2f98776acfd, scripts/npm-scoped.py@4214c9c3380a]
+owns: [scripts/check-version-parity.py@b861fee901b6, scripts/law-gate.py@2ca0a5fdc452, scripts/smoke.py@616768f21f5b, scripts/withdraw.sh@a63b6269b96f, tests/test_law_gate.py@828e39aaf887, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@6ad8c5a9373f, tests/test_ci_key.py@a3efeb5bc491, packages@d2f98776acfd, scripts/npm-scoped.py@4214c9c3380a]
 laws: []
-timestamp: 2026-09-14T00:00:00Z
-content_sha: f5aaed8114e0caf846514ecb1c6814c86d4c1feaa4871a5b9d5c5012a22727b2
+timestamp: 2026-10-21T00:00:00Z
+content_sha: 13fdbbef931bd84fc311b5e8dfe560add26691d20d807b99739acc3635666da7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -21,8 +21,12 @@ content_sha: f5aaed8114e0caf846514ecb1c6814c86d4c1feaa4871a5b9d5c5012a22727b2
 - [`packages/`](../packages) · dir
 - [`scripts/check-version-parity.py`](../scripts/check-version-parity.py) · file
 - [`scripts/ci-key.py`](../scripts/ci-key.py) · file
+- [`scripts/law-gate.py`](../scripts/law-gate.py) · file
 - [`scripts/npm-scoped.py`](../scripts/npm-scoped.py) · file
+- [`scripts/smoke.py`](../scripts/smoke.py) · file
+- [`scripts/withdraw.sh`](../scripts/withdraw.sh) · file
 - [`tests/test_ci_key.py`](../tests/test_ci_key.py) · file
+- [`tests/test_law_gate.py`](../tests/test_law_gate.py) · file
 - [`tests/test_version_parity.py`](../tests/test_version_parity.py) · file
 
 **Describes** — reaches into, does not own:
@@ -211,11 +215,9 @@ rather than a string somebody might forget to edit.
 11a. **A release, unlike a merge, IS gated on CI** (2026-09-23). The publish
     workflow's first step refuses unless [`ci.yml`](../.github/workflows/ci.yml)
     holds a green verdict for the code being released — every stage of it,
-    FULL included (`ci.yml` and `node-arm.yml` both, until decision 13 merged
-    them on 2026-09-29). ⚠ **Until 2026-09-30 this read *"green on the exact
-    commit, as a push to `main`"*; decision 14 keys it by the tree instead**,
-    because a FULL cell may now skip on a verdict an earlier commit with the
-    same code earned. **So create the GitHub release only after it finishes.** Created earlier,
+    FULL included. **It is keyed by the tree, not the commit** (decision 14),
+    because a FULL cell may skip on a verdict an earlier commit with the same
+    code earned. **So create the GitHub release only after it finishes.** Created earlier,
     the gate fails, and re-running the job once CI is green publishes it. This
     is two strikes made into a gate
     ([SR-WORK-SESSION](0060_WORK-session.md) d13): `3.0.0-alpha.2` and
@@ -225,7 +227,8 @@ rather than a string somebody might forget to edit.
     it.** Decision 10 is unchanged: merges stay ungated.
 
 12. **A `kind: process` record owns its enforcement**, and this one owns the
-    parity script and its test — **neither of which had an owner** until this
+    parity script and its test, the wheel key, the law gate, the install smoke
+    and the withdrawal script — **neither of which had an owner** until this
     record existed, despite being the only thing standing between a missed bump
     and two registries disagreeing.
 
@@ -372,6 +375,46 @@ rather than a string somebody might forget to edit.
     token on Arpit's accounts, and the extension's record says what one more
     job would take ([SR-VSCODE](0164_vscode.md) decision 8).
 
+17. **CI restores the nineteen wheels instead of rebuilding them when nothing
+    they are built from changed** (Arpit, 2026-10-21). The key is
+    [`scripts/ci-key.py`](../scripts/ci-key.py)`wheels`: decision 14's
+    exclude-list digest, one step wider — tests, tools, scripts, workflows,
+    records and docs are inert, **except `records/README.md`**, whose layer map
+    decides which file ships in which wheel, and the top-level `README.md` and
+    `LICENSE` — plus the Python version. **Only a push restores**; nightly and
+    dispatch build fresh, because the build backend floats and no key sees it.
+    The sdist is always built. **`publish.yml` never restores**: a release
+    builds what it uploads.
+
+18. **No law is walked past by a release.**
+    [`scripts/law-gate.py`](../scripts/law-gate.py) reads what will ship — the
+    wheels, the sdist and the npm directories — and fails when an artefact
+    breaks a law it can show: one wheel per distribution on one version (an
+    install that needs a missing one breaks), an OSI licence and `==`-pinned fux
+    dependencies and **no third-party runtime dependency an accepted record does
+    not name** (L2), a Requires-Python floor of 3.12 (L7), `engines.node >=22`
+    (L8), and an npm package that is its `files` list and one `.mjs`, with no
+    wheel carrying Node source and only `fux-writer` the one bundle (L10). It
+    runs in `ci.yml`'s build job on every push and in `publish.yml` on the
+    artefacts that upload. Taken from codelaw's gate, whose lesson it is.
+
+19. **The install smoke compares what ships, not the module tree.**
+    [`scripts/smoke.py`](../scripts/smoke.py) installs `fux-engine` from
+    `dist/` with no index and **no Node on PATH**, packs and installs the npm
+    bundle with **no Python on PATH**, sets up a three-document fixture and
+    requires both installs to give the same `ask`, `find` and `answer`
+    payloads — parsed, scores at nine places, the differential arm's two
+    ratified tolerances and no others — with at least one carrying results.
+
+20. **A half-published release is withdrawn whole, never re-published under
+    its number.** One release is twenty-one names published by separate jobs,
+    so a failure part-way leaves some on the version and some not.
+    [`scripts/withdraw.sh`](../scripts/withdraw.sh)`VERSION --report` lists
+    what reached each registry; without `--report` it deprecates the npm
+    packages and prints each PyPI yank page. **Arpit runs it** — an OIDC token
+    may publish but not deprecate, and PyPI has no yank API — and the next
+    patch is cut after it.
+
 ### Consequences
 
 - **A version bump is a five-place edit** (four sites plus the changelog), and
@@ -398,8 +441,7 @@ rather than a string somebody might forget to edit.
   `main` for now; the release is the gate** (Arpit, 2026-10-04, W-251 #22).
   Decision 11a's release gate is where a red differential arm stops, and a
   required check with `enforce_admins: true` would block the direct pushes
-  decision 13 permits. Until 2026-10-04 this line read *"not rejected — not
-  decided"*; the ruling closes it, and the veto below is what reopens it.
+  decision 13 permits. The veto below is what reopens it.
 
 ### Reference (required)
 

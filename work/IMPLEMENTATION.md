@@ -28,6 +28,16 @@ Rules:
 
 ---
 
+## 2026-10-21 — **W-293: what fux took from codelaw — release safety, one SR guard, a lean `CLAUDE.md` (main, unreleased)**
+
+| | |
+|---|---|
+| **shipped** | `inject-inbox.sh` matches rule 45a's `*Empty since` (an emptied inbox was announced as waiting); both hooks name the decider from `git config user.name`. `scripts/law-gate.py` (ci.yml + publish.yml), `scripts/smoke.py` (ci.yml), `scripts/withdraw.sh`, `ci-key.py wheels` + the build job's wheel cache. `sr-guard.sh` is a wrapper over `tests/sr_lib.py guard` — the CI replay's judge, `describes` included. `CLAUDE.md` 42 KB → 33 KB: one line per law, L11 whole; history notes trimmed there and in five WORK records |
+| **evidence** | [SR-WORK-RELEASE](../records/0063_WORK-release.md) d17–20, [SR-WORK-OWNERSHIP](../records/0054_WORK-ownership.md) d2a, [SR-WORK-BLOCKERS](../records/0064_WORK-blockers.md) d9a, [SR-LAW-0](../records/0002_LAW-0-authority.md) d5; `tests/test_law_gate.py`, `tests/test_ci_key.py` (wheel key), `tests/test_claude_md_laws.py`. In a Linux container: 19 wheels + sdist built; law gate ✔ and refuses a missing wheel and npm source; smoke ✔ (5 calls, PyPI with no Node == npm with no Python); `withdraw.sh 4.1.0 --report` read both registries; the guard refuses an unstaged owner and honours `no SR affected`; unit suite 7465 passed, the 17 failures all present before the change (no `archive/` or `work/golden/` in that container) |
+| **outcome** | Landed, uncommitted — except the two workflow files, which remote tools may not write; 🔴 Arpit places them (W-293 step 6a). Step 7, the first `main` run, proves the cache and the two gates on a runner. |
+
+---
+
 ## 2026-10-20 — **W-290: the front-door docs (main, unreleased)**
 
 | | |

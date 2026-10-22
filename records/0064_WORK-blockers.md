@@ -5,12 +5,12 @@ name: SR-WORK-BLOCKERS
 title: "SR-WORK-BLOCKERS (0064) — a blocker is a file, not a remark"
 description: "The moment a session cannot proceed without Arpit it writes work/BLOCKED.json and stops. Four decision values, one of which is PROCEED; no working around a blocker by picking a plausible default; and three hooks that enforce it rather than trusting anyone to remember — the inbox injection, the Stop refusal, and a per-asset write lock."
 status: accepted
-date: 2026-09-14
+date: 2026-10-21
 feature: how a session declares that it is blocked, and the three hooks that stop it from carrying on regardless
-owns: [.claude/hooks/stop-if-blocked.sh@b242725e3898, .claude/hooks/inject-inbox.sh@4bd466676c80, .claude/hooks/session-lock.sh@cdfea2091cd8]
+owns: [.claude/hooks/stop-if-blocked.sh@a9c1d4e13655, .claude/hooks/inject-inbox.sh@35bc6fc8c22e, .claude/hooks/session-lock.sh@cdfea2091cd8]
 laws: []
-timestamp: 2026-09-14T00:00:00Z
-content_sha: f454777e5d4ce22f590b550818a0a21dfaade01eaa050ac54d213e1a4ad9d608
+timestamp: 2026-10-21T00:00:00Z
+content_sha: bf3a911a8d44494557f4fe90ecba0aef22763d7e352e11d6fb2a511ffc9fc57f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -129,6 +129,13 @@ unsurfaced.
 
 9. **The lock is per asset, not per session** — the fix for a wall that used to
    serialise unrelated work. Two sessions are expected here, not tolerated.
+
+9a. **The hooks name no person.** The decider a hook names is `git config
+    user.name` in that checkout, and "the decider" when git names nobody; the
+    inbox is found by its `## Blocked on ` heading prefix, and an empty one by
+    SR-WORK-OPEN-QUEUE rule 45a's `*Empty since` marker — the rule's own spelling,
+    so an emptied inbox is never announced as a waiting one. That keeps the three
+    scripts portable to another repository unchanged (Arpit, 2026-10-21).
 
 10. **A `kind: process` record owns its enforcement**, and this one owns the three
     hook scripts. `guard-golden-answer.sh` and `require-progress.sh` are **not**

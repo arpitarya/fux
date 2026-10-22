@@ -14,7 +14,8 @@ if [ "$N" -ge 3 ]; then rm -f .claude/.stop-attempts; exit 0; fi
 echo $((N + 1)) > .claude/.stop-attempts
 
 REASON=$(jq -r '"\(.decision): \(.reason)"' "$B" 2>/dev/null || echo "work/BLOCKED.json is unresolved")
-jq -n --arg r "$REASON" '{hookSpecificOutput:{hookEventName:"Stop",decision:"block",
-  reason:("A blocker is recorded and has not been surfaced to Arpit — " + $r +
+DECIDER=$(git config user.name 2>/dev/null); DECIDER=${DECIDER:-the decider}
+jq -n --arg r "$REASON" --arg d "$DECIDER" '{hookSpecificOutput:{hookEventName:"Stop",decision:"block",
+  reason:("A blocker is recorded and has not been surfaced to " + $d + " — " + $r +
   "  State it in one short paragraph, set .surfaced=true in work/BLOCKED.json, and stop. Do not work around it.")}}'
 exit 0

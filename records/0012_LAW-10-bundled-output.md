@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L10
 owns: []
 laws: [L10]
 timestamp: 2026-09-12T00:00:00Z
-content_sha: df39925018e998354acd5dd91c89799d26c4181596ff4a48b9c36850b35ac3f8
+content_sha: 88dd49902de45af347c81915489156226f705fe473a4416fe4d7ebc3e6a968a7
 ---
 
 # SR-LAW-10 — L10 — the consumer is served build output, never source
@@ -21,7 +21,7 @@ content_sha: df39925018e998354acd5dd91c89799d26c4181596ff4a48b9c36850b35ac3f8
 > rest of this record is its rationale: why it exists, what it has cost, how its
 > wording has moved, and what would reopen it.
 > [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a
-> **generated** copy, held byte-equal by
+> **generated** one-line pointer, held equal by
 > [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) —
 > [SR-LAW-0](0002_LAW-0-authority.md) decisions 1 and 5. ⚠ **`CLAUDE.md` is not
 > the source**; amend the law here, then run `python scripts/gen-laws.py --write`.
@@ -108,8 +108,8 @@ flowchart LR
 
 🔴 **This block IS law L10.** It is the only normative statement of it, and
 [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a **generated**
-copy of it — rendered from these bytes by
-[`scripts/gen-laws.py`](../scripts/gen-laws.py) and held byte-equal by
+one-line pointer to it — rendered from this record's title by
+[`scripts/gen-laws.py`](../scripts/gen-laws.py) and held equal by
 [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py).
 Amend it **here**, then run `python scripts/gen-laws.py --write`.
 Amending a law needs Arpit's ruling, named in this record

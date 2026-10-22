@@ -10,7 +10,7 @@ feature: the rationale, scope, exceptions and reopen-trigger of L12
 owns: []
 laws: [L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 01a8be3fadfd2b06d5f7c6ad91eb7df8fbab28658fa24e9eb212ecf4f2846d08
+content_sha: 1f2b3bd6669c789a1c8a85b71f3889db0b1723628036047ab570862213035513
 ratifies: "Arpit, 2026-09-27 — 'every const or default value will only and only be defined in tune.toml or fux.toml or in one of the other config files, or maybe create a new config file; if the value is missing throw an error, but there shouldn't be any default value within the functions … be it node or python it should always be read from one of the toml files; exception is the files used for setup.' Asked the scope the same day, he ruled: tunable values only in the TOML config, and 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; a missing file or key is a hard error naming the key; setup.py and templates/, tests/ and tests_e2e/, tools/ and scripts/ are exempt. Ratified by Arpit the same day on the W-225 step 1 classification (work/compare/l12-classify.compare.md), 'I accept the recommendation': enum tags, closed vocabularies and presentation counts are not values; the six two-home conflicts resolve to one home each, keeping today's behaviour; the veto check becomes one AST-based test because the greps reach about 60 % of what the law forbids; inspect thresholds get a new .fux/inspect.toml; and every decoder cap enters the extract-config digest. On the R5 scan the same day he ruled R7–R10: a number fixed by a format, protocol or algorithm is a fixed value for constants.toml; every boolean parameter default is a value and goes; the release is 3.0, breaking, with no automatic --fix; __version__ stays in src/fux/__init__.py"
 ---
 
@@ -22,7 +22,7 @@ ratifies: "Arpit, 2026-09-27 — 'every const or default value will only and onl
 > rest of this record is its rationale: why it exists, what it costs, and what
 > would reopen it.
 > [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a
-> **generated** copy, held byte-equal by
+> **generated** one-line pointer, held equal by
 > [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) —
 > [SR-LAW-0](0002_LAW-0-authority.md) decisions 1 and 5. ⚠ **`CLAUDE.md` is not
 > the source**; amend the law here, then run `python scripts/gen-laws.py --write`.
@@ -96,8 +96,8 @@ flowchart LR
 
 🔴 **This block IS law L12.** It is the only normative statement of it, and
 [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a **generated**
-copy of it — rendered from these bytes by
-[`scripts/gen-laws.py`](../scripts/gen-laws.py) and held byte-equal by
+one-line pointer to it — rendered from this record's title by
+[`scripts/gen-laws.py`](../scripts/gen-laws.py) and held equal by
 [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py).
 Amend it **here**, then run `python scripts/gen-laws.py --write`.
 Amending a law needs Arpit's ruling, named in this record

@@ -6,6 +6,7 @@ Three callers, one implementation — the `check-version-parity.py` shape:
 
     python scripts/ci-key.py tree [REV]        # the tree half of the key
     python scripts/ci-key.py cell CELL         # a FULL job's whole key
+    python scripts/ci-key.py wheels [REV]      # the key the built wheels cache under
     python scripts/ci-key.py skips [N]         # how many of the last N commits
                                                # would have skipped FULL
     pytest tests/test_ci_key.py                # every push
@@ -55,13 +56,34 @@ def inert(path: str) -> bool:
     return path.endswith(".md") and not path.startswith(CODE_ROOTS)
 
 
+#: The wheel key (`ci-key.py wheels`) — the same exclude-list shape, one step
+#: wider: everything a wheel is built FROM counts, everything only a test, a
+#: tool or a workflow reads does not. ⚠ `records/README.md` is an input — the
+#: layer map in it decides which file ships in which wheel (packages/layer_hook.py)
+#: — and so are the top-level `README.md` and `LICENSE` (fux-engine's metadata).
+WHEEL_SCHEMA = "ci-wheels-v1"
+WHEEL_INERT_DIRS = ("tests/", "tests_e2e/", "tools/", "scripts/", ".github/", "archive/",
+                    "vscode/", ".claude/", ".fux/", "records/")
+WHEEL_INPUTS = ("README.md", "LICENSE", "records/README.md")
+WHEEL_CODE_ROOTS = ("src/", "node/", "packages/")
+
+
+def wheel_inert(path: str) -> bool:
+    """True when `path` cannot change a built wheel (the exclude list)."""
+    if path in WHEEL_INPUTS:
+        return False
+    if path.startswith(WHEEL_INERT_DIRS) or path.startswith(INERT_DIRS) or path in INERT_FILES:
+        return True
+    return path.endswith(".md") and not path.startswith(WHEEL_CODE_ROOTS)
+
+
 def git(*argv: str) -> str:
     return subprocess.run(
         ["git", *argv], capture_output=True, text=True, encoding="utf-8", check=True
     ).stdout
 
 
-def tree_digest(rev: str = "HEAD") -> str:
+def tree_digest(rev: str = "HEAD", skip=None) -> str:
     """sha256 over `mode type sha<TAB>path` for every non-inert blob at `rev`.
 
     Git's own blob ids, so the digest is a property of the commit and not of
@@ -72,7 +94,7 @@ def tree_digest(rev: str = "HEAD") -> str:
         if not line:
             continue
         path = line.split("\t", 1)[1]
-        if not inert(path):
+        if not (skip or inert)(path):
             h.update(line.encode("utf-8") + b"\n")
     return h.hexdigest()
 
@@ -104,6 +126,14 @@ def verdict_key(rev: str = "HEAD") -> str:
     return f"{SCHEMA}-{tree_digest(rev)[:32]}-all"
 
 
+def wheels_key(rev: str = "HEAD") -> str:
+    """The key ci.yml's build job caches the nineteen wheels under. The Python
+    that builds them is in it; the floating build backend is not, which is why
+    only a push restores — nightly and dispatch build fresh, as FULL does."""
+    return (f"{WHEEL_SCHEMA}-{tree_digest(rev, wheel_inert)[:32]}"
+            f"-py{platform.python_version()}")
+
+
 def skips(n: int) -> tuple[int, list[str]]:
     """Of the last `n` non-merge commits, how many share their parent's tree
     digest — i.e. would have found a verdict and skipped FULL."""
@@ -117,7 +147,7 @@ def skips(n: int) -> tuple[int, list[str]]:
 
 
 def main(argv: list[str]) -> int:
-    if not argv or argv[0] not in ("tree", "cell", "verdict", "skips"):
+    if not argv or argv[0] not in ("tree", "cell", "verdict", "wheels", "skips"):
         print(__doc__, file=sys.stderr)
         return 2
     cmd, rest = argv[0], argv[1:]
@@ -130,6 +160,8 @@ def main(argv: list[str]) -> int:
         print(cell_key(rest[0]))
     elif cmd == "verdict":
         print(verdict_key(*rest[:1]))
+    elif cmd == "wheels":
+        print(wheels_key(*rest[:1]))
     else:
         hit, rows = skips(int(rest[0]) if rest else 40)
         print(*rows, sep="\n")

@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L2
 owns: []
 laws: [L2]
 timestamp: 2026-10-19T00:00:00Z
-content_sha: 2f866cf7c4ddf83c3d22a3cfe0ce0da3cdfef099ffeb5a3d7bcaf86cbd9bb5d7
+content_sha: 6a195150554e3ec9fa1ada4ff9883e185088220955e162a072a8a43f3978419c
 ---
 
 # SR-LAW-2 — L2 — $0, FOSS-only
@@ -21,7 +21,7 @@ content_sha: 2f866cf7c4ddf83c3d22a3cfe0ce0da3cdfef099ffeb5a3d7bcaf86cbd9bb5d7
 > rest of this record is its rationale: why it exists, what it has cost, how its
 > wording has moved, and what would reopen it.
 > [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a
-> **generated** copy, held byte-equal by
+> **generated** one-line pointer, held equal by
 > [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py) —
 > [SR-LAW-0](0002_LAW-0-authority.md) decisions 1 and 5, on Arpit's ruling of
 > 2026-09-06. ⚠ **`CLAUDE.md` is not the source any more**; amend the law here.
@@ -114,7 +114,7 @@ flowchart LR
 ```text
        SR-LAW-2   <-- THIS RECORD states law L2
             |
-            | scripts/gen-laws.py  (test-bound, byte-equal)
+            | scripts/gen-laws.py  (test-bound, one line)
             v
    CLAUDE.md §Non-negotiable constraints
         (GENERATED -- not the source)
@@ -140,8 +140,8 @@ flowchart LR
 
 🔴 **This block IS law L2.** It is the only normative statement of it, and
 [`CLAUDE.md` §Non-negotiable constraints](../CLAUDE.md) carries a **generated**
-copy of it — rendered from these bytes by
-[`scripts/gen-laws.py`](../scripts/gen-laws.py) and held byte-equal by
+one-line pointer to it — rendered from this record's title by
+[`scripts/gen-laws.py`](../scripts/gen-laws.py) and held equal by
 [`tests/test_claude_md_laws.py`](../tests/test_claude_md_laws.py).
 Amend it **here**, then run `python scripts/gen-laws.py --write`.
 Amending a law needs Arpit's ruling, named in this record

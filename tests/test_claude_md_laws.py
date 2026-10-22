@@ -13,7 +13,8 @@ this file's absence as a reopen trigger.
 
 **What is checked, and why each one:**
 
-1. the block in `CLAUDE.md` equals what the records render — the drift itself
+1. the block in `CLAUDE.md` equals what the records render — the drift itself;
+   one line per law from its record's title, and L11's block whole
 2. every handle `L0`–`L10` has exactly one record, and no record has two — a law
    with no home, or two homes, is the same defect as drift one step earlier
 3. no *other* live document carries a law's block verbatim — the residue check,
@@ -165,10 +166,13 @@ def test_no_verbatim_third_copy_of_a_law_exists(gen):
         # the two `assert … in` lines below are what stop that subset being
         # satisfied vacuously by a law that appears in neither.
         record_form = _record_form(owner, handle)
-        claude_form = gen.law_text(owner, handle)
         assert _flat(record_form) in flat[owner], f"{handle} is not in {owner.name}"
-        assert _flat(claude_form) in flat[CLAUDE_MD], f"{handle} is not in CLAUDE.md"
-        for form in (record_form, claude_form):
+        # Since 2026-10-21 `CLAUDE.md` carries most laws as ONE line and only
+        # `FULL_TEXT` (L11) whole; a one-liner is not a copy of the block, so
+        # only the full forms are policed for a third copy.
+        assert _flat(gen.law_entry(owner, handle)) in flat[CLAUDE_MD], f"{handle} is not in CLAUDE.md"
+        forms = (record_form, gen.law_text(owner, handle)) if handle in gen.FULL_TEXT else (record_form,)
+        for form in forms:
             phrase = _flat(form)
             holders = {p for p, t in flat.items() if phrase in t}
             extra = sorted(p.relative_to(ROOT) for p in holders - {owner, CLAUDE_MD})
@@ -195,6 +199,18 @@ def test_sr_laws_routes_every_handle(gen):
 
 
 # -- 5. the reader is told, before they edit the wrong file -------------------
+
+
+def test_only_the_full_text_laws_are_carried_whole(gen):
+    """The lean form (Arpit, 2026-10-21): every law is one line except L11.
+    A full block for any other law is the 42 KB file coming back."""
+    assert gen.FULL_TEXT == ("L11",)
+    block = gen.committed_block()
+    for handle in gen.LAW_ORDER:
+        lines = [l for l in block.split("\n") if l.startswith(f"- **{handle}** ·")]
+        assert len(lines) == 1, handle
+        if handle not in gen.FULL_TEXT:
+            assert lines[0].endswith(".md)"), f"{handle} renders more than its one line"
 
 
 def test_the_claude_md_section_declares_itself_generated(gen):

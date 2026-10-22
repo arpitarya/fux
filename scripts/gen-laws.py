@@ -21,8 +21,10 @@ permission is the test, not the generation.
       - **L4** · **Deterministic — no model in the maintenance path.** ...
       <!-- LAW-TEXT:END L4 -->
 
-- The blocks are concatenated in `LAW_ORDER` (`L0 … L13`) between `CLAUDE.md`'s
-  `<!-- LAWS:BEGIN … -->` / `<!-- LAWS:END -->` markers.
+- Each law renders, in `LAW_ORDER` (`L0 … L13`), between `CLAUDE.md`'s
+  `<!-- LAWS:BEGIN … -->` / `<!-- LAWS:END -->` markers: **one line** — the
+  record's title and a link — or, for a handle in `FULL_TEXT` (L11 alone), the
+  whole block.
 - **Link targets are rewritten, and that is the only transform.** A record lives
   at `records/`, `CLAUDE.md` at the repo root, so the same law text needs two
   spellings of the same target. Rewriting deterministically here is what lets
@@ -57,6 +59,14 @@ CLAUDE_MD = ROOT / "CLAUDE.md"
 #: **Fourteen live laws, fourteen numbers** — L13, the standing ship bar, added
 #: 2026-10-10 (Arpit).
 LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "L10", "L11", "L12", "L13")
+
+#: The laws `CLAUDE.md` carries IN FULL. Every other law renders as ONE line —
+#: its record's title and a link — because every session pays to read this
+#: file and the full text is one click away (Arpit, 2026-10-21, after codelaw's
+#: pointer-only `CLAUDE.md`). **L11 stays whole**: it is a prohibition a session
+#: must have read before it goes near `work/golden/`, Cowork reads this file and
+#: not `records/`, and a link is not a read.
+FULL_TEXT = ("L11",)
 
 BEGIN = "<!-- LAWS:BEGIN"
 END = "<!-- LAWS:END -->"
@@ -176,6 +186,28 @@ def law_text(path: Path, handle: str) -> str:
     return _rewrite_links(body)
 
 
+def _title(path: Path, handle: str) -> str:
+    """The record title after its handle — `L4 — deterministic; …` → `deterministic; …`."""
+    text = path.read_text(encoding="utf-8")
+    match = re.search(r'^title:\s*"(.*)"\s*$', text, re.M)
+    if not match or f" — {handle} — " not in match.group(1):
+        raise SystemExit(f"{path.name}: title must read `SR-LAW-n (NNNN) — {handle} — <the law>`")
+    return match.group(1).split(f" — {handle} — ", 1)[1].strip()
+
+
+def law_line(path: Path, handle: str) -> str:
+    """One law as one line: its title and the record that states it."""
+    name = re.search(r"^name:\s*(\S+)\s*$", path.read_text(encoding="utf-8"), re.M)
+    if not name:
+        raise SystemExit(f"{path.name}: no `name:` in frontmatter")
+    return f"- **{handle}** · {_title(path, handle)} — [{name.group(1)}](records/{path.name})"
+
+
+def law_entry(path: Path, handle: str) -> str:
+    """What `CLAUDE.md` carries for one law: the full block or the one line."""
+    return law_text(path, handle) if handle in FULL_TEXT else law_line(path, handle)
+
+
 def render() -> str:
     """The generated block body — what sits between the markers, no markers."""
     records = law_records()
@@ -187,7 +219,7 @@ def render() -> str:
     extra = [h for h in records if h not in LAW_ORDER]
     if extra:
         raise SystemExit(f"unknown law handle(s) {extra} — add them to LAW_ORDER first")
-    return "\n".join(law_text(records[h], h) for h in LAW_ORDER)
+    return "\n".join(law_entry(records[h], h) for h in LAW_ORDER)
 
 
 def committed_block() -> str:
