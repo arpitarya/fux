@@ -5,8 +5,8 @@ description: "Arpit's ruling (2026-10-19, Cowork): decoders, fetchers and decode
 item: W-289
 filed: 2026-10-19
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-20
-updated_by: "Cowork (Opus 5.5)"
+updated: 2026-10-22
+updated_by: "Claude Code (Opus 5.5)"
 ball: arpit
 ---
 
@@ -312,9 +312,33 @@ W-288.** Everything that does not touch the decoder tree:
   **11 to go**: re-run the upload with `--skip-existing` after a wait, then Cowork
   adds their publishers.
 
+- **Progress 2026-10-22:** a second upload (10 wheels, json excluded) created
+  **mail, office, pdf, rtf**; PyPI answered `429` at **sheet**, which is not on
+  PyPI (checked by its JSON API). **8 of 14 on PyPI; 6 to go** — sheet, svg, xml,
+  fetcher-cdp, fetcher-http, extension-table — by re-running
+  `uvx twine upload --skip-existing /tmp/fuxplug/*` after a wait. `fux-decoder-json`
+  still arrives through CI. Publishers for mail, office, pdf, rtf not yet added.
+
+- **Progress 2026-10-23:** an upload of the 6 remaining wheels got `429` at the first
+  (sheet), creating nothing. Pattern so far: **~4 new projects per account per ~day**.
+  Next: wait ~24 h from the 2026-10-22 upload, then upload one wheel at a time
+  (`--skip-existing`, stop at the first failure); expect two days for the six.
+
+- **Progress 2026-10-24:** the one-at-a-time loop created **sheet, svg, xml,
+  fetcher-cdp** (4.1.1), then `429` at **fetcher-http** — four again, confirming the
+  pattern. **12 of 14 on PyPI; 2 to go** — fetcher-http, extension-table — by the
+  same loop after ~24 h. Publishers still to add: mail, office, pdf, rtf, sheet, svg,
+  xml, fetcher-cdp (plus the last two once up).
+
   ⚠ The uploaded files ARE that version on PyPI for good (files cannot be replaced);
   CI's `skip-existing: true` then skips them at the release. Their `fux-core==` pin
   resolves once the release publishes fux-core.
+
+- **Progress 2026-10-24 (publishers):** Cowork added the `publish.yml` · `pypi`
+  GitHub publisher (`arpitarya/fux`) to **mail, office, pdf, rtf, sheet, svg, xml,
+  fetcher-cdp** — each page re-read after, one publisher apiece. **12 of 14 have
+  their publisher.** Left: **fetcher-http, extension-table** — upload, then publisher.
+  `fux-decoder-json` still arrives through its pending publisher on the first CI release.
 
 ## Blockers
 

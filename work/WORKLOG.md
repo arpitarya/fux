@@ -23,6 +23,14 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-24 — W-294 filed: one `.fux/sources` file, `.fuxignore` the only exclusion  ·  Cowork (Fable 5.1)
+
+- **Asked:** *"research and propose a better way to replace sources/url file, sources/dir file, and .fox ignore. I want to replace all these with one or two files."* → *"Create a work item to implement this."*
+- **Found:** `dirs` and `urls` already share one grammar and one parser (`sourcelist.py`); their attribute sets nest. The real duplication is exclusion in two homes with opposite `!` (SR-FUXIGNORE: "accepted, not mitigated"). `.fuxignore` is 77 fux-written lines vs 14 hand patterns — a report more than a list.
+- **Proposed and taken:** two files — `.fux/sources` (paths + URLs, `!` removed) and `.fux/.fuxignore` unchanged. One file rejected: order would be semantic in half of it. The ingest blocks and the file name are not reopened.
+- **Done:** W-294 filed (🟢 agent, Opus) under fux build; no code moved. Acceptance is `git diff --stat .fux/index` empty after conversion + ingest. 🔴 Hard constraint named: the `!work/golden*` lines are an L11 guard and move to `.fuxignore` in the same change as the test re-point.
+- **Next:** Claude Code picks W-294.
+
 ## 2026-10-21 — W-293: what fux took from codelaw, built  ·  Cowork (Opus 5.5)
 
 - **Asked:** *"Implement text and design change in Fox. Implement release safety. Implement fix now tiny."* → *"additionally implement CI wheel cache keyed by a hash of the inputs"*.

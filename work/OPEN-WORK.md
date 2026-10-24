@@ -25,7 +25,7 @@ here. Read that record before changing anything below it.
 |---|---|---|
 | 🔴 **W-293** — copy `ci.yml` and `publish.yml` from the 2026-10-21 Cowork chat into `.github/workflows/` (the bridge may not write there). [the item](open/W-293-first-ci-run-of-the-codelaw-ports.md) | 2026-10-21 | 1d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-289** — upload the 14 plugin wheels once by API token (PyPI allows one pending publisher per config; commands in the item); then Cowork adds their publishers. Rulings made 2026-10-20. [the item](open/W-289-plugin-packages.md) | 2026-10-20 | 2d |
+| 🔴 **W-289** — only fetcher-http and extension-table remain: upload each (one-at-a-time loop, W-289 §Progress 2026-10-24) after PyPI's 429 clears, then Cowork adds its publisher. Rulings made 2026-10-20. [the item](open/W-289-plugin-packages.md) | 2026-10-20 | 2d |
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 18d |
 | ↳ **blocks:** nothing else in the queue | | |
@@ -38,7 +38,8 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-289** · `arpit` — plugin packages built on `main` (unreleased). Arpit: one token upload of 14 wheels; Claude Code: ruling 1, REGISTER-only package version. Both before the release. Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
+- 🟢 **W-294** · `agent` — `sources/dirs` + `urls` → one `.fux/sources` (paths and URLs, one grammar); `!` leaves it, `.fuxignore` is the only exclusion; `setup` converts; index bytes unchanged. **Opus.** Filed by Arpit (Cowork). [detail](open/W-294-one-sources-file.md)
+- 🔴 **W-289** · `arpit` — plugin packages built on `main` (unreleased). Arpit: only fetcher-http and extension-table remain — upload by token, then publisher (2026-10-24); Claude Code: ruling 1, REGISTER-only package version. Both before the release. Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
 - 🟢 **W-291** · `agent` — `fux setup` installs the index-update git hooks and merge driver by default; `--no-hooks` opts out; no git repo or a foreign hook never fails setup. **Sonnet.** Filed by Arpit (Cowork). [detail](open/W-291-setup-installs-hooks.md)
 - 🟢 **W-292** · `agent` — Node reader only via `npm install fux-engine`: `fux setup` stops vendoring `.fux/node/` + `.fux/fux` and wiring workspaces; wheel drops the bundle; setup removes old copies. **Opus.** Filed by Arpit (Cowork). [detail](open/W-292-node-reader-npm-only.md)
 
