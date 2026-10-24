@@ -536,12 +536,10 @@ def test_ensure_layout_writes_no_fetcher_and_no_source_list(tmp_path):
     fuxdir.ensure_layout(tmp_path)
     assert not (tmp_path / ".fux" / "fetchers").exists()
     assert not (tmp_path / ".fux" / "sources").exists()
-    # `node/` and `fux` are engine-owned and vendored here on purpose
-    # (SR-NODE-SEARCH R2); a fetcher or a source list would still be `setup`'s
-    # alone, which is the invariant this test exists for.
-    assert sorted(p.name for p in (tmp_path / ".fux").iterdir()) == [
-        ".gitignore", "README.md", "fux", "node",
-    ]
+    # `node/` and `fux` were vendored here from 2026-09-12 until W-292 made the
+    # Node reader an npm install (Arpit, 2026-10-21); a fetcher or a source
+    # list is still `setup`'s alone, which is the invariant this test exists for.
+    assert sorted(p.name for p in (tmp_path / ".fux").iterdir()) == [".gitignore", "README.md"]
 
 
 def test_a_plain_ingest_puts_no_code_in_the_repo(tmp_path):

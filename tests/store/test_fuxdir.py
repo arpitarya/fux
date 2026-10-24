@@ -9,22 +9,19 @@ from fux.store import fuxdir
 from l12_fixtures import write_config
 
 
-def test_ensure_layout_writes_readme_gitignore_and_the_node_reader(tmp_path):
-    """Three things, not two — the vendored reader joined on 2026-09-12.
+def test_ensure_layout_writes_readme_and_gitignore_and_no_node_reader(tmp_path):
+    """Two things again, as before 2026-09-12.
 
-    `.fux/node/` and the `.fux/fux` shim are the fourth `.fux/` shape
-    (SR-DOTFUX, SR-NODE-SEARCH R2): committed, engine-owned, overwritten on a
-    version difference. They are written here rather than in `fux setup`
-    because a clone with no Python has to be able to read the index the
-    *first* time anyone ingests, not only after someone runs `setup`.
+    `.fux/node/` and the `.fux/fux` shim were written here from 2026-09-12 to
+    W-292 (Arpit, 2026-10-21), when the Node reader became an npm install and
+    nothing else. Ingest calls this at its head, so it must write neither.
     """
     written = fuxdir.ensure_layout(tmp_path)
-    names = {p.name for p in written}
-    assert {"README.md", ".gitignore", "fux", "package.json"} <= names
+    assert {p.name for p in written} == {"README.md", ".gitignore"}
     assert (tmp_path / ".fux" / "README.md").is_file()
     assert (tmp_path / ".fux" / ".gitignore").is_file()
-    assert (tmp_path / ".fux" / "node" / "fux.mjs").is_file()
-    assert (tmp_path / ".fux" / "fux").is_file()
+    assert not (tmp_path / ".fux" / "node").exists()
+    assert not (tmp_path / ".fux" / "fux").exists()
 
 
 def test_ensure_layout_is_idempotent(tmp_path):
@@ -35,13 +32,8 @@ def test_ensure_layout_is_idempotent(tmp_path):
 
 
 def test_ensure_layout_never_overwrites_consumer_edits(tmp_path):
-    """⚠ **Write-if-missing applies to the two GENERATED files, not to `node/`.**
-
-    A consumer annotates `README.md` and `.gitignore`, so their edits survive.
-    Nobody edits a vendored reader, and a stale one against a bumped `_format`
-    is a wrong answer rather than an old preference — so it is written anyway,
-    and the assertion here is that doing so touched neither annotated file.
-    """
+    """Write-if-missing: a consumer annotates `README.md` and `.gitignore`,
+    and their edits survive."""
     (tmp_path / ".fux").mkdir()
     (tmp_path / ".fux" / "README.md").write_text("mine\n", encoding="utf-8")
     (tmp_path / ".fux" / ".gitignore").write_text("mine too\n", encoding="utf-8")
@@ -65,14 +57,11 @@ def test_gitignore_lists_the_derived_planes_the_blobs_and_the_bytecode(tmp_path)
     line, a repo whose own `.gitignore` lacks the Python entry shows untracked
     bytecode inside the directory fux just told it to commit.
 
-    ⚠ **`node/node_modules/` is a FIFTH** (W-149, 2026-09-12): a package
-    manager's install directory, which exists only in the monorepo shape where
-    `.fux/node` is a workspace member and the reader is installed rather than
-    vendored (SR-NODE-SEARCH decision 13). Listed by PATH rather than by name
-    — `node_modules/` alone would also ignore one a consumer keeps elsewhere
-    under `.fux/`, and nothing here is ignored by accident.
+    (`node/node_modules/` was a fifth from W-149 to W-292: the monorepo
+    shape's install directory. Setup vendors no Node reader any more, so the
+    line is gone from the template; a repository's existing file keeps it.)
 
-    🔴 **`index/*.jsonl.tmp` is a SIXTH and the only one that is not a
+    🔴 **`index/*.jsonl.tmp` is a FIFTH and the only one that is not a
     directory** (W-185, 2026-09-15): the transient `_atomic_write` leaves in the
     **committed** index plane for the duration of a rename. `post-commit`
     defers, so a consumer's next `git add -A` can list it and then fail to stat
@@ -86,7 +75,6 @@ def test_gitignore_lists_the_derived_planes_the_blobs_and_the_bytecode(tmp_path)
     assert entries == [
         *(f"{name}/" for name in (*fuxdir.DERIVED, *fuxdir.ACQUIRED)),
         "__pycache__/",
-        "node/node_modules/",
         "index/*.jsonl.tmp",
     ]
     assert "*" not in entries

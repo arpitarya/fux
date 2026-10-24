@@ -196,3 +196,26 @@ def test_a_wheel_carries_no_file_another_carries(wheels):
                     clashes.append(f"{name}: {owners[name]} and {wheel.name}")
                 owners[name] = wheel.name
     assert not clashes, "\n".join(clashes)
+
+
+def test_no_wheel_carries_the_node_reader(wheels):
+    """W-292 (Arpit, 2026-10-21): the bundle ships on npm alone. Until then
+    fux-writer's wheel carried it at `fux/templates/node/`."""
+    import zipfile
+
+    found = [f"{w.name}: {n}" for w in sorted(wheels.glob("*.whl"))
+             for n in zipfile.ZipFile(w).namelist() if n.endswith(".mjs") or "/templates/node/" in n]
+    assert not found, "\n".join(found)
+
+
+def test_the_installed_setup_writes_no_node_reader(envs, tmp_path):
+    """`pip install` -> `fux setup`: no `.fux/node/`, no `.fux/fux` (W-292)."""
+    for dist in ("fux-writer", "fux-engine"):
+        repo = tmp_path / dist
+        repo.mkdir()
+        (repo / ".git").mkdir()
+        done = _fux(envs[dist], repo, "setup", "--no-agents", check=False)
+        assert done.returncode == 0, done.stderr
+        assert (repo / "fux.toml").is_file()
+        assert not (repo / ".fux" / "node").exists(), dist
+        assert not (repo / ".fux" / "fux").exists(), dist

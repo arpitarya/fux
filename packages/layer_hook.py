@@ -12,10 +12,12 @@ Each distribution's `pyproject.toml` names this hook and its layer::
     path = "../layer_hook.py"      # "packages/layer_hook.py" from the root
     layer = "reader"
 
-and the hook force-includes every file of that layer at `fux/<path>`. The
-writer's wheel also carries the Node reader's bundle at `fux/templates/node/`,
-because `fux setup` — the writer's verb — vendors it (SR-NODE-SEARCH decision
-13; L10: the bundle, never the module tree).
+and the hook force-includes every file of that layer at `fux/<path>`, and
+nothing else. 🔴 **No wheel carries the Node reader's bundle** (W-292, Arpit
+2026-10-21): it ships on npm alone — `fux-engine` and `@fux-engine/reader` —
+and `fux setup` vendors nothing. Until then the writer's wheel carried it at
+`fux/templates/node/`; `tests_e2e/test_role_packages.py` now asserts that no
+built wheel holds a `.mjs`.
 
 **An editable install selects nothing**: `dev-mode-dirs` puts the whole
 `src/` on the path, which is what a developer working on every layer wants.
@@ -26,10 +28,7 @@ the standard library and hatchling, and reaches the bundler by path.
 
 from __future__ import annotations
 
-import importlib.util
 import re
-import sys
-import tempfile
 from pathlib import Path
 
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
@@ -78,19 +77,6 @@ def layer_files(root: Path, layer: str) -> list[Path]:
     return out
 
 
-def _node_bundle(root: Path) -> list[Path]:
-    """Build the Node reader's bundle into a temporary directory (L10)."""
-    if str(root / "src") not in sys.path:
-        sys.path.insert(0, str(root / "src"))
-    spec = importlib.util.find_spec("fux.store.nodebundle")
-    if spec is None:  # pragma: no cover - a tree without the module cannot build
-        raise RuntimeError("src/fux/store/nodebundle.py is missing; cannot bundle the Node reader")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    out = Path(tempfile.mkdtemp(prefix="fux-node-bundle-"))
-    return list(module.write(root / "node", out))
-
-
 class LayerHook(BuildHookInterface):
     PLUGIN_NAME = "fux-layer"
 
@@ -103,6 +89,3 @@ class LayerHook(BuildHookInterface):
         root = repo_root(Path(self.root))
         for path in layer_files(root, layer):
             build_data["force_include"][str(path)] = path.relative_to(root / "src").as_posix()
-        if layer == "writer":
-            for path in _node_bundle(root):
-                build_data["force_include"][str(path)] = f"fux/templates/node/{path.name}"

@@ -105,7 +105,7 @@ That's it. Your teammates, and their agents, now get the same answers from a pla
 - **`fux ingest`** reports what it did: `ingested 3 docs (3 changed, 0 carried forward), 0 not indexed, 0 skipped, 3 shards written`.
 - **`fux doctor`** checks the setup. It's read-only and offline.
 
-> **No Python on the machine?** `fux setup` vendors a single-file, zero-dependency Node reader into `.fux/node/`, so `.fux/fux find rollback` works with nothing installed. Or run `npx fux-engine find rollback` (Node ≥ 22).
+> **No Python on the machine?** Install the single-file, zero-dependency Node reader from npm — `npm install fux-engine`, then `npx fux find rollback` (Node ≥ 22; the package's `bin` is `fux`). **That is the only way to get it**: `fux setup` no longer vendors a copy into `.fux/node/` or writes a `.fux/fux` shim, so a clone with nothing installed no longer answers from Node — one package install first. A repository pins it by listing `fux-engine` in its own `package.json`.
 
 > **A machine that only reads, or only writes?** Since 4.0.0, fux ships as four packages on one version. `fux-engine` is all of them. `fux-reader` ranks and answers, `fux-writer` ingests and keeps the index current, and `fux-core` is what both share. A verb from a package you didn't install is refused by name.
 

@@ -101,7 +101,6 @@ sites = [
   "src/fux/serve/__init__.py::_JobProgress.phase._Phase.update(n)::param::1",
   "src/fux/store/acquired.py::blob_path(ext)::param::''",
   "src/fux/store/acquired.py::save(ext)::param::''",
-  "src/fux/store/fuxdir.py::_packaged_node_files.walk(prefix)::param::''",
 ]
 
 [[allow]]
@@ -230,8 +229,6 @@ sites = [
   "src/fux/serve/__init__.py::_Handler.server_version::class::'fux-serve'",
   "src/fux/serve/__init__.py::_INSPECT_ROUTES::module::{'/inspect/words': '_words', '/inspect/analyze': '_analyz...",
   "src/fux/serve/__init__.py::_JSON::module::'application/json; charset=utf-8'",
-  "src/fux/store/fuxdir.py::SHAPE_VENDORED::module::'A'",
-  "src/fux/store/fuxdir.py::SHAPE_WORKSPACE::module::'C'",
   "src/fux/store/recordschema.py::Field.__init__::get::'never'",
   "src/fux/store/recordschema.py::_PY_TYPES::module::{'str': str, 'int': int, 'bool': bool, 'list': list, 'dic...",
 ]
@@ -267,7 +264,6 @@ sites = [
   "src/fux/acquire/sourcelist.py::_DURATION_UNITS::module::{letter: int(timedelta(**{field: 1}).total_seconds()) for...",
   "src/fux/acquire/typesfile.py::META_TARGETS::module::('body', 'heading', 'title', 'path', 'ctx', 'none')",
   "src/fux/acquire/urlsrc.py::_TYPE_EXT::module::{'text/html': '.html', 'application/xhtml+xml': '.html', ...",
-  "src/fux/store/fuxdir.py::_NODE_MODULES::module::'node_modules'",
 ]
 
 [[allow]]

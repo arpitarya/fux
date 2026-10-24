@@ -483,7 +483,10 @@ readme    = "README.md"
 cachedir_signature = "Signature: 8a477f597d28d172789f06886806bc55"
 
 [bundle]
-# .fux/node/ -- the one generated Node artefact and its sidecars (L10).
+# The one generated Node artefact and its sidecars (L10) -- what npm ships as
+# `fux-engine` and `@fux-engine/reader`, and nothing else (W-292).
+# `dir` and `shim` also name what an earlier `fux setup` vendored -- `.fux/node/`
+# and the `.fux/fux` shim -- which setup now removes and doctor warns about.
 dir      = "node"
 entry    = "fux.mjs"
 shim     = "fux"
@@ -491,8 +494,6 @@ sidecars = ["package.json", "mcp-tools.json", "README.md"]
 # Two of the sidecars, by name: the package manifest and the MCP tool schema.
 package   = "package.json"
 mcp_tools = "mcp-tools.json"
-# chmod bits of the generated `fux` shim: rwxr-xr-x.
-shim_mode = 0o755
 # The rule after a module's banner in the generated bundle, and after the
 # package-surface banner (store/nodebundle.py). The bundle is committed bytes.
 module_banner_width = 68
@@ -632,7 +633,6 @@ identifiers = "identifiers.toml.txt"
 # `{planes}`, `{signature}` and `{marker}` are filled from the keys that own them.
 gitignore    = "fuxdir-gitignore.txt"
 cachedir_tag = "cachedir-tag.txt"
-shim         = "fux-shim.sh.txt"
 hooks_dir    = "hooks"
 hook_preamble = "preamble.sh.txt"
 # W-262 (Arpit, 2026-10-04, W-251 #2 option B): the first line of every decoder

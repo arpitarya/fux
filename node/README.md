@@ -3,26 +3,26 @@
 Read a [fux](https://github.com/arpitarya/fux) index from Node. **The command
 is `fux`; the package is `fux-engine`** — `fux` was taken on npm in 2016.
 
-> **This file ships twice**, on purpose: it is the npm package's page, and
-> `fux setup` vendors it into your repository at `.fux/node/README.md`. So it is
-> written for whoever finds it, in either place.
+## Install it
 
-## Run it
-
-**In a repository that has a fux index, always through the shim:**
+**`npm install fux-engine` is the one way to install the Node reader.** The
+Python package does not carry it and `fux setup` does not write it into your
+repository. Setups through 4.1.0 vendored a copy into `.fux/node/` and a
+`.fux/fux` shim; the next `fux setup` removes both, and only what it wrote.
 
 ```console
-$ .fux/fux find rollback
-$ .fux/fux ask "how do we roll back a release" --band
-$ .fux/fux answer "retry policy" --json
+$ npm install fux-engine            # or add "fux-engine" to your package.json
+$ npx fux find rollback
+$ npx fux ask "how do we roll back a release" --band
+$ npx fux answer "retry policy" --json
 ```
 
-🔴 **`.fux/fux` is the one entry point that is correct in every shape**, which
-is why it is the only one documented. It resolves the reader in three rungs —
-the vendored bundle, then `.fux/node/node_modules/.bin/fux`, then every
-ancestor's `node_modules/.bin/fux` — because npm and Yarn hoist that binary to
-the workspace root and **pnpm and bun do not**. Naming a path instead would be
-right for half the ecosystem and silently wrong for the other half.
+The package's `bin` is `fux`, so `npx fux …` (or `node_modules/.bin/fux …`)
+runs it from anywhere inside a repository that has a fux index — it finds the
+index by walking up from the current directory. **A repository pins it the
+way it pins anything else**: list `fux-engine` in your own `package.json`, or a
+workspace member's. Node ≥ 22; one package install, after which it reads the
+index offline.
 
 **Without a repository, or to try it:**
 
@@ -38,24 +38,9 @@ const ix = await open('.')
 await ix.find('rollback', { top: 5 })
 ```
 
-## What is in `.fux/node/`
-
-`fux setup` writes one of two shapes, and it detects which:
-
-| | what is there | offline | how it runs |
-|---|---|---|---|
-| **the default** | `fux.mjs` (one generated file) · `package.json` · `mcp-tools.json` · this file | **yes** — nothing to install | `.fux/fux …` |
-| **a monorepo** | `package.json` only, declaring `fux-engine@<version>` | after an install | `.fux/fux …`, once your package manager has run |
-
-In the monorepo shape `.fux/node` is declared as a **workspace member** in your
-root manifest — `fux setup` adds that one line, says so, and never adds it
-twice. Run your package manager's `install` afterwards; `fux doctor` tells you
-if you have not.
-
 🔴 **`fux.mjs` is GENERATED. Do not edit it.** It is rebuilt from fux's sources
-at publish time and overwritten whenever the engine version changes. To see what
-it does, read `node/fux.mjs` and `node/src/**` in the fux repository at the
-matching tag — or regenerate it and compare bytes:
+at publish time. To see what it does, read `node/fux.mjs` and `node/src/**` in
+the fux repository at the matching tag — or regenerate it and compare bytes:
 
 ```console
 $ python -m fux.store.nodebundle node node/dist
@@ -69,12 +54,10 @@ it, and the two are held byte-equal by a differential law.**
 
 - **Zero dependencies, and no build step *for you*.** There is no
   `dependencies` key in the published `package.json` at all. Fux's own release
-  pipeline has a bundler; nobody running `fux setup` does, and nothing is
+  pipeline has a bundler; nobody installing the package does, and nothing is
   compiled on your machine.
-- **One artefact, not a module tree.** What lands in your repository is one
-  generated file, so a fux upgrade is a one-file diff and a tampered reader is
-  detectable by rebuilding it. Before 2026-09-12 it was 47 of fux's own `.mjs`
-  files in your tree; `fux setup` deletes them when it upgrades you.
+- **One artefact, not a module tree.** What npm installs is one generated
+  file, so a tampered reader is detectable by rebuilding it.
 - **It never fetches, and it writes one thing: the derived plane.** `fux
   build` rebuilds the gitignored `.fux/runtime/` from the committed index,
   byte-identical to Python's build, under the same write lock, and `--fast`

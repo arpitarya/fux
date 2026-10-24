@@ -75,9 +75,8 @@ path = "src/fux/__init__.py"
 # three dependencies above. Installed together they are the same files one
 # wheel carried before. An editable install puts the whole src/ on the path.
 #
-# The Node read plane's bundle travels in fux-writer's wheel, beside `fux setup`
-# which vendors it (SR-NODE-SEARCH decision 13): one generated `.mjs` plus its
-# sidecars, built at publish (L10).
+# No wheel carries the Node read plane's bundle (W-292, Arpit 2026-10-21): it
+# ships on npm alone, as `fux-engine` and `@fux-engine/reader`.
 bypass-selection = true
 dev-mode-dirs = ["src"]
 

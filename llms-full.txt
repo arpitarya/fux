@@ -32,59 +32,79 @@
 
 ---
 
-# fux
-
 Source: https://raw.githubusercontent.com/arpitarya/fux/main/README.md
+
+# fux
 
 <div align="center">
 
-# fux
-
-### Your team's docs, as a search index your AI agent can trust.
+## Your team's docs, as a search index your AI agent can trust.
 
 **Ranked. Cited. Checked against the source. Committed to git.**<br>
 No server · no vector database · no API key · no model · zero dependencies
 
-[![PyPI](https://img.shields.io/pypi/v/fux-engine?include_prereleases&label=pypi&color=3b82f6)](https://pypi.org/project/fux-engine/)
-[![npm](https://img.shields.io/npm/v/fux-engine/alpha?label=npm&color=3b82f6)](https://www.npmjs.com/package/fux-engine)
+[![PyPI](https://img.shields.io/pypi/v/fux-engine?label=pypi&color=3b82f6)](https://pypi.org/project/fux-engine/)
+[![npm](https://img.shields.io/npm/v/fux-engine?label=npm&color=3b82f6)](https://www.npmjs.com/package/fux-engine)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3b82f6)](https://pypi.org/project/fux-engine/)
+[![Node 22+](https://img.shields.io/badge/node-22%2B-3b82f6)](node/README.md)
 [![Dependencies: 0](https://img.shields.io/badge/dependencies-0-16a34a)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-16a34a)](LICENSE)
 
 *fux is pronounced "fox".*
 
+[Quickstart](#60-second-quickstart) · [Agents](#plug-it-into-your-coding-agent) · [Commands](#everyday-commands) · [Measured](#measured-not-assumed) · [Is it for you?](#is-fux-for-you) · [Roadmap](#roadmap) · [FAQ](#faq)
+
 </div>
 
 ---
 
-Your agent can read every line of your code. It still doesn't know **why** the
-code is the way it is — that lives in ADRs, runbooks, specs, wiki pages and
-the PDF someone attached to a ticket in 2023.
+Your agent can read every line of your code. It still doesn't know **why** the code is the way it is. That lives in ADRs, runbooks, specs, wiki pages, and the PDF someone attached to a ticket in 2023.
 
-So it greps, guesses, or asks a vector database for "the nearest chunk" — and
-gets an answer that sounds right, from a doc that went stale six months ago.
+So it greps, guesses, or asks a vector database for "the nearest chunk". It gets back an answer that sounds right, from a doc that went stale six months ago.
 
 **fux fixes that with boring, auditable arithmetic:**
 
 ```console
 $ fux answer "how do I roll back a release"
+# Deploying and rolling back
+
+# Deploying and rolling back
+
 To roll back a bad release, run `make rollback` from the release branch.
 The previous image tag is kept for 7 days.
 
-  -- docs/deploy.md:L1-L6 (sha 18ac8c4e4d33, current)
+Deploys go out from `main` every weekday at 10:00.
+
+  -- docs/deploy.md:L1-L6 (sha 6155f9c4ddf7, current)
 
 $ fux ask --band "kubernetes autoscaling limits"
 No confident matches.
 confidence: none - nothing in the index scored for this query.
 ```
 
-The first answer quotes exact lines and **proves they still say that today**.
-The second one **refuses** — because your docs don't cover it, and a confident
-wrong answer is worse than none.
+- **The first answer** quotes the exact lines it came from, and **checks that they still say that today**.
+- **The second one refuses.** Your docs don't cover the question, and a confident wrong answer is worse than none.
+
+**Edit the source, and the same answer tells you:**
+
+```console
+$ fux answer "how do I roll back a release"
+note: 1 source(s) changed: docs/deploy.md.
+…
+  -- docs/deploy.md:L1-L7 (sha a76c0744a2dc, stale)
+```
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/arpitarya/fux/main/docs/architecture-high-level.png" alt="fux in three boxes: your documents stay put, a small index is committed to git, queries return ranked, cited answers" width="820">
 </p>
+
+## In plain words
+
+- **fux is a card catalogue for your team's documents.** It doesn't copy the books; it notes which words are on which pages.
+- **The catalogue lives in your git repo**, so everyone who clones it, and every AI assistant they use, searches the same thing.
+- **Ask a question and fux points to the page**, quotes the lines, and tells you whether the page has changed since it was catalogued.
+- **If nothing in your documents answers it, fux says so** instead of guessing.
+- **No AI runs inside fux**, so the same question gets the same answer on every machine.
 
 ## Why people use fux
 
@@ -98,63 +118,41 @@ wrong answer is worse than none.
 | Index reviewable in a PR | — | ❌ opaque vectors | ✅ plain JSONL, diffs like code |
 | Reads PDF, Word, Excel, slides, wikis | ❌ | depends | ✅ editable decoders |
 
-- 🗂 **Clone and ask.** The index lives in `.fux/index/`. Every clone — yours, a
-  teammate's, CI's, your agent's — searches the same thing. Nothing to deploy.
-- 🔍 **Answers you can audit.** `answer` re-reads the cited lines from the
-  source and tells you whether they still match. `--receipt` + `fux verify`
-  lets anyone reproduce it later.
-- 🤖 **Built for agents first.** `fux setup` drops ready-made skills and
-  instructions for **Claude Code, Codex, GitHub Copilot and Kiro**, and
-  `fux mcp` serves the index over MCP, `fux lsp` serves it to your editor, and
-  `fux llms` prints it as an [llms.txt](llms.txt).
-- 🔒 **Offline unless you ask.** No telemetry, no network on any default path,
-  PII redaction before anything is committed.
-- 🧾 **Your docs never move.** fux stores statistics, not content. Sources stay
-  in the repo or in the system that owns them.
+- 🗂 **Clone and ask.** The index lives in `.fux/index/`. Every clone searches the same thing: yours, a teammate's, CI's and your agent's. Nothing to deploy.
+- 🔍 **Answers you can audit.** `answer` re-reads the cited lines from the source and says whether they still match. `--receipt` records the index, settings and source shas an answer came from, and `fux verify` checks a receipt against the tree.
+- 🤖 **Built for agents first.** `fux setup` writes ready-made skills and instructions for **Claude Code, Codex, GitHub Copilot and Kiro**. `fux mcp` serves the index over MCP, `fux lsp` serves it to your editor, and `fux llms` prints it as an [llms.txt](llms.txt).
+- 🔒 **Offline unless you ask.** No telemetry and no network on any default path. PII is redacted before anything is committed.
+- 🧾 **Your docs never move.** fux stores statistics, not content. Sources stay in the repo or in the system that owns them.
 
 ## 60-second quickstart
 
 ```bash
 pip install fux-engine           # Python ≥ 3.12 · Linux, macOS, Windows · zero deps
 cd your-repo
-fux setup                        # writes .fux/, agent instructions, and .fux/plugins.toml
-pip install fux-decoder-pdf ...  # the ONE line setup printed: readers for the formats you have
+fux setup                        # writes .fux/, fux.toml and the agent instructions
 fux ingest                       # indexes README.md and docs/ by default
 fux ask "how do we roll back a release"
 git add .fux fux.toml && git commit -m "Add fux index"
 ```
 
-That's it. Your teammates — and their agents — now get the same answers from a
-plain `git clone`.
+That's it. Your teammates, and their agents, now get the same answers from a plain `git clone`.
 
-> **No Python on the machine?** `fux setup` vendors a single-file,
-> zero-dependency Node reader into `.fux/node/`, so `.fux/fux find rollback`
-> works with nothing installed. Or: `npx fux-engine find rollback`.
+- **What gets indexed** is listed in `.fux/sources/dirs` (`README.md` and `docs` to start). Anything you don't want indexed goes in `.fux/.fuxignore`.
+- **`fux ingest`** reports what it did: `ingested 3 docs (3 changed, 0 carried forward), 0 not indexed, 0 skipped, 3 shards written`.
+- **`fux doctor`** checks the setup. It's read-only and offline.
 
-> **Upgrading from 4.1 or earlier? One breaking change.** fux-engine now reads
-> Markdown and plain text on its own; every other format — PDF, Office, HTML,
-> CSV, JSON, mail, images — is read by a `fux-decoder-*` package that your
-> repository declares in the committed `.fux/plugins.toml`, pinned to one version
-> and digest. Until then those files are not indexed, and `fux ingest` says how
-> many, per format, on stderr. Once per repository: run `fux setup`, run the
-> `pip install …` line it prints, and commit `.fux/plugins.toml`; teammates then
-> run that same one-time `pip install`. A machine missing a declared package, or
-> holding a different build of it, gets a hard error with the install line —
-> never a quietly smaller index. If `.fux/decoders/` holds copies an older
-> `fux setup` wrote, `fux doctor` lists the unedited ones: delete them, so the
-> packages run.
+> **No Python on the machine?** Install the single-file, zero-dependency Node reader from npm — `npm install fux-engine`, then `npx fux find rollback` (Node ≥ 22; the package's `bin` is `fux`). **That is the only way to get it**: `fux setup` no longer vendors a copy into `.fux/node/` or writes a `.fux/fux` shim, so a clone with nothing installed no longer answers from Node — one package install first. A repository pins it by listing `fux-engine` in its own `package.json`.
 
-> **A machine that only reads, or only writes?** Since 4.0.0 fux ships as four
-> packages on one version: `fux-engine` is all of them, `fux-reader` ranks and
-> answers (refer included), `fux-writer` ingests and keeps the index current,
-> and `fux-core` is what both share. No package has an extra, and a verb from a
-> package you did not install is refused by name.
+> **A machine that only reads, or only writes?** Since 4.0.0, fux ships as four packages on one version. `fux-engine` is all of them. `fux-reader` ranks and answers, `fux-writer` ingests and keeps the index current, and `fux-core` is what both share. A verb from a package you didn't install is refused by name.
 
 > **Prefer a library?**
 > ```python
 > from fux import open as fux_open
 > fux_open(".").ask("how do we roll back a release")
 > ```
+
+> [!NOTE]
+> **Coming in the next release: decoders as packages** (built on `main`, not yet published). fux-engine will read Markdown and plain text on its own. Every other format will be read by a `fux-decoder-*` package that your repository declares in the committed `.fux/plugins.toml`, pinned to one version and digest. Upgrading will be a one-time step: run `fux setup`, run the one `pip install …` line it prints, and commit `.fux/plugins.toml`. The details are under *Unreleased* in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Plug it into your coding agent
 
@@ -165,28 +163,20 @@ fux lsp          # LSP over stdio: search, link hovers, backlinks, archived-link
 fux llms --full  # an llms-full.txt of the corpus, to stdout
 ```
 
-**VS Code:** install the `.vsix` from the
-[latest release](https://github.com/arpitarya/fux/releases/latest)
-(`code --install-extension fux-<version>.vsix`). It registers `fux mcp` for
-agent mode automatically and runs `fux lsp` — no `mcp.json` to write
-([`vscode/`](vscode/README.md) · [SR-VSCODE](records/0164_vscode.md)).
+**VS Code:** install the `.vsix` from the [latest release](https://github.com/arpitarya/fux/releases/latest) with `code --install-extension fux-<version>.vsix`. It registers `fux mcp` for agent mode automatically and runs `fux lsp`, so there's no `mcp.json` to write ([`vscode/`](vscode/README.md) · [SR-VSCODE](records/0164_vscode.md)).
 
-The instructions teach the agent to **search the index before grepping**, read
-the JSON (not the prose), and treat an archived document as history rather than
-as the current design. There's deliberately no `answer` tool over MCP — **the
-agent is the answerer; fux is the evidence.**
-([SR-AGENT-POLICY](records/0132_agent-policy.md) · [SR-MCP](records/0136_mcp.md))
+- **The instructions teach the agent to search the index before grepping**, to read the JSON rather than the prose, and to treat an archived document as history rather than as the current design.
+- **There's deliberately no `answer` tool over MCP.** The agent is the answerer; fux is the evidence ([SR-AGENT-POLICY](records/0132_agent-policy.md) · [SR-MCP](records/0136_mcp.md)).
+- **Turn the agent files off** with `[agents] install = []` in `fux.toml`, or with `fux setup --no-agents`.
 
 ## What it can read
 
 - **Text:** Markdown, reStructuredText, AsciiDoc, Org, plain text
-- **Office & data:** PDF, Word, PowerPoint, Excel, CSV/TSV, JSON, YAML, TOML, INI, XML
+- **Office & data:** PDF, Word, PowerPoint, Excel, CSV/TSV, JSON, JSONL, YAML, TOML, INI, XML, RTF
 - **Everything else:** HTML, email, draw.io, SVG, images (via your agent, `fux enrich`)
-- **Web pages and wikis:** `fux add <url>` — plain HTTP, or through the session
-  your **signed-in Chrome** already holds, so internal wikis work too
+- **Web pages and wikis:** `fux add <url>`, over plain HTTP or through the session your **signed-in Chrome** already holds, so internal wikis work too
 
-Every decoder and fetcher is copied into `.fux/` as **your** code — read it,
-edit it, replace it ([SR-DECODE](records/0139_decode.md), [SR-FETCHER](records/0117_fetcher.md)).
+In 4.1, every decoder and fetcher is copied into `.fux/` as **your** code, for you to read, edit or replace ([SR-DECODE](records/0139_decode.md), [SR-FETCHER](records/0117_fetcher.md)).
 
 ## Everyday commands
 
@@ -204,45 +194,77 @@ edit it, replace it ([SR-DECODE](records/0139_decode.md), [SR-FETCHER](records/0
 | Find duplicate, unreachable or boilerplate docs | `fux inspect` |
 | Keep IDs whole (`RF 118` = `RF-118`) | `fux identifiers` |
 | List what is in the index, one line per document | `fux register` (`--json` for scripts) |
-| See it all in a browser | `fux serve` — Ask, Answer, Documents, Words, Index, Identifiers |
+| See it all in a browser | `fux serve`: Ask, Answer, Documents, Words, Index, Identifiers |
 | Check the setup | `fux doctor` (read-only, offline) |
+
+`fux ask --why` shows its working:
+
+```console
+$ fux ask --why "how many times do we retry a card"
+[why] reachable 3 -> window 2 -> placed 2 -> answered 1 (cut at 0.4903)
+       #1 docs/adr-007-retries.md 2.7167  matched retry,card  absent many,times,do
+       #2 README.md 0.4903  matched card  absent many,times,do,retry
+```
 
 Full surface: `fux --help` and [SR-CLI](records/0101_cli-surface.md).
 
 ## Measured, not assumed
 
-Every claim ships with a pre-registered bar and a published run — **including
-the ones that failed.**
+Every claim ships with a pre-registered bar and a published run, **including the ones that failed.**
 
-- ⚡ **27.2 ms** worst-case p95 for warm `ask --fast` over **8,870 RFCs**,
-  against a 150 ms bar ([run](work/regression/2026-08-12-m2-accelerator/report.md)).
-  The fast path must return byte-identical results to the full scan.
-- 🕸 **24/24** on a graded 66-document graph corpus, with the derived graph
-  hashing identically on x86-64 Linux and arm64 macOS
-  ([run](work/regression/2026-08-22-graph-acceptance/report.md)).
-- 🪦 **Failures kept on file.** Index pruning failed its gate
-  ([verdict](work/regression/2026-08-09-pruning-rerun/VERDICT.md)). A dense
-  embedding lane fixed 0 queries and broke 2 — so it was deleted.
+- ⚡ **27.2 ms** worst-case p95 for warm `ask --fast` over **8,870 RFCs**, against a 150 ms bar ([run](work/regression/2026-08-12-m2-accelerator/report.md)). The fast path must return byte-identical results to the full scan.
+- 🕸 **24/24** on a graded 66-document graph corpus, with the derived graph hashing identically on x86-64 Linux and arm64 macOS ([run](work/regression/2026-08-22-graph-acceptance/report.md)).
+- 🪦 **Failures kept on file.** Index pruning failed its gate ([verdict](work/regression/2026-08-09-pruning-rerun/VERDICT.md)). A dense embedding lane fixed 0 queries and broke 2, so it was deleted ([verdict](work/regression/2026-08-24-dense-lane-gate/VERDICT.md)).
 
-## What fux is *not*
+## Is fux for you?
 
-Honesty up front, so you don't find out the hard way:
+**Choose fux when:**
 
-- **Not code search.** No AST, no symbols, no call graph. Pair it with a
-  code-graph tool; fux covers what you *wrote down*.
-- **Not semantic magic.** Ranking is lexical. If your docs say "revert" and you
-  ask "undo", use `--expand`, or teach it once with `fux correct`.
-- **Not a chatbot.** fux finds and verifies evidence. Your agent (or you) writes
-  the answer.
+- your agents keep answering from **stale or invented** context, and you want every answer tied to lines you can check;
+- your knowledge is **spread across formats**: Markdown, PDFs, Office files, wiki pages;
+- you want search that works on a fresh clone and in CI, with **nothing to host and no key to manage**;
+- you need answers that are **reproducible and auditable**, such as for regulated or review-heavy work.
+
+**Look elsewhere when:**
+
+- **you want code search.** fux has no AST, no symbols and no call graph. Pair it with a code-graph tool; fux covers what you *wrote down*.
+- **you want semantic matching out of the box.** Ranking is lexical. If your docs say "revert" and you ask "undo", use `--expand`, or teach it once with `fux correct`.
+- **you want a chatbot.** fux finds and verifies evidence. Your agent, or you, writes the answer.
+
+## Roadmap
+
+From the live queue, [`work/OPEN-WORK.md`](work/OPEN-WORK.md):
+
+| | what | state |
+|---|---|---|
+| ✅ | Index-and-refer engine, Python and Node readers, MCP, LSP, VS Code extension | released, 4.1 |
+| 🔜 | Decoders as `fux-decoder-*` packages, declared in `.fux/plugins.toml` | built on `main`; next release |
+| 🔜 | Live URL-source checks: a vanished source, a real rate limit, parallel signed-in fetches | checklist written; waiting on a hands-on session |
+| 🧭 | Ingest of 10,000 documents in under a second | proposal filed; order to be decided |
+| 🧭 | Better abstention, ranking-parameter tuning, a stronger intent lexicon | research |
+
+## FAQ
+
+**Does fux call an AI model?**
+No. No fux path may call a model, and nothing in the maintenance path uses one. Your agent can generate enrichment through `fux enrich`, and fux validates it.
+
+**Does my content get copied into the repo?**
+No. The committed index holds statistics, not your documents' text. `answer` fetches the cited lines from the source at answer time.
+
+**What stops a secret from reaching git?**
+`.fux/pii.toml` redacts matches before anything reaches the committed index, and fux won't run without it ([SR-PII](records/0148_pii.md)).
+
+**Does it need the network?**
+Only for commands you run on purpose, such as `fux add <url>`, and they say so on stderr ([L5](records/0007_LAW-5-offline-by-default.md)).
+
+**How do teammates stay in sync?**
+They pull. The index is plain JSONL in git, it merges with `fux hooks`' merge driver, and a pull request shows exactly what changed.
 
 ## Status
 
-**`4.1.1` is the latest release** (`pip install fux-engine`). The index format is versioned and fux tells you when to run
-`fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
+**`4.1.0` is the latest release** on PyPI (`pip install fux-engine`) and npm (`npx fux-engine`). The index format is versioned, and fux tells you when to run `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
 
-⭐ **Star the repo** if fux saved your agent from one confident wrong answer —
-it's how other people find it. 👀 **Watch → Custom → Releases** to hear when
-3.0 goes stable.
+⭐ **Star the repo** if fux saved your agent from one confident wrong answer. It's how other people find it. 👀 **Watch → Custom → Releases** to hear about new versions.
 
 ## Under the hood
 
@@ -253,15 +275,14 @@ it's how other people find it. 👀 **Watch → Custom → Releases** to hear wh
 - [How `ask` works](work/architecture-ask.svg) · [how `answer` works](work/architecture-answer.svg) · [decoders](work/architecture-decoders.svg)
 - [Python and Node, component for component](work/architecture-two-readers.svg)
 - [Every plane, what is committed and what isn't](work/architecture-detailed.svg)
-- [The paper](docs/paper/the-fux-index-paper.md) — the architecture of record, with twenty diagrams
+- [The paper](docs/paper/the-fux-index-paper.md), the architecture of record, with twenty diagrams
 
 </details>
 
 <details>
 <summary><b>The fourteen laws fux is built under</b></summary>
 
-Every decision of record lives in the [SR register](records/README.md)
-([SR-LAWS](records/0001_LAWS.md)):
+Every decision of record lives in the [SR register](records/README.md) ([SR-LAWS](records/0001_LAWS.md)):
 [L0 SRs are the source of truth](records/0002_LAW-0-authority.md) ·
 [L1 a retired SR is archived](records/0003_LAW-1-retired-records-archived.md) ·
 [L2 `$0`, FOSS-only](records/0004_LAW-2-zero-cost.md) ·
@@ -276,48 +297,39 @@ Every decision of record lives in the [SR register](records/README.md)
 [L11 the sealed answer key is closed to Claude](records/0013_LAW-11-sealed-answer-key.md) ·
 [L12 every value lives in a config file](records/0014_LAW-12-values-live-in-config.md) ·
 [L13 a ranking change ships only through the standing bar](records/0015_LAW-13-the-standing-bar.md).
-The laws were renumbered on 2026-09-28; an older document is read through
-[SR-LAWS](records/0001_LAWS.md) decision 2a.
+The laws were renumbered on 2026-09-28; an older document is read through [SR-LAWS](records/0001_LAWS.md) decision 2a.
 
 </details>
 
 <details>
 <summary><b>Security and sensitive text</b></summary>
 
-- `.fux/pii.toml` redacts matches before anything reaches the committed index;
-  fux will not run without it ([SR-PII](records/0148_pii.md)).
-- `.fux/refusals.toml` stops a sign-in wall being indexed as the page behind it
-  ([SR-REFUSAL](records/0146_refusals.md)).
-- Only explicit, opt-in commands touch the network, and they say so on stderr
-  ([L5](records/0007_LAW-5-offline-by-default.md)).
+- `.fux/pii.toml` redacts matches before anything reaches the committed index; fux will not run without it ([SR-PII](records/0148_pii.md)).
+- `.fux/refusals.toml` stops a sign-in wall being indexed as the page behind it ([SR-REFUSAL](records/0146_refusals.md)).
+- Only explicit, opt-in commands touch the network, and they say so on stderr ([L5](records/0007_LAW-5-offline-by-default.md)).
+- To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
 </details>
 
 <details>
 <summary><b>Reading order for contributors</b></summary>
 
-1. [`docs/index.md`](docs/index.md) — the map of every doc in the repo
-2. [The SR register](records/README.md) — every decision of record
-3. [The paper](docs/paper/the-fux-index-paper.md) — what ships, what was measured, what was designed and not built
-4. [Sibling environments](work/setup/README.md) — the sandbox, measurement lab and benchmark harness
-5. [`CLAUDE.md`](CLAUDE.md) — how work is done here, for people and agents
+1. [`CONTRIBUTING.md`](CONTRIBUTING.md): build, test and what a pull request owes
+2. [`docs/index.md`](docs/index.md): the map of every doc in the repo
+3. [The SR register](records/README.md): every decision of record
+4. [The paper](docs/paper/the-fux-index-paper.md): what ships, what was measured, what was designed and not built
+5. [Sibling environments](work/setup/README.md): the sandbox, measurement lab and benchmark harness
+6. [`CLAUDE.md`](CLAUDE.md): how work is done here, for people and agents
 
 </details>
 
 ## Contributing
 
-```bash
-uv sync --extra dev && uv run pytest -q tests   # or, with pip, all four packages at once:
-pip install -e packages/fux-core -e packages/fux-reader -e packages/fux-writer -e ".[dev]"
-```
-
-Issues and PRs welcome — bug reports with a failing query are gold. Every change
-to an SR-owned component updates its owning record in the same commit; CI checks
-it. Start with [`CLAUDE.md`](CLAUDE.md).
+Issues and PRs are welcome, and **a bug report with a failing query is gold.** See [CONTRIBUTING.md](CONTRIBUTING.md) for the build, the two test suites and what a change owes its record. Please follow the [Code of Conduct](CODE_OF_CONDUCT.md), and report security issues privately ([SECURITY.md](SECURITY.md)).
 
 ## License
 
-[MIT](LICENSE) — free forever, FOSS-only dependencies forever ([L2](records/0004_LAW-2-zero-cost.md)).
+[MIT](LICENSE). Free forever, with FOSS-only dependencies forever ([L2](records/0004_LAW-2-zero-cost.md)).
 
 ---
 
@@ -2099,9 +2111,11 @@ decode (SR-NODE-SEARCH d3–d4, d9–d11). It reads `tune.toml` and `output.toml
 as Python does — until 2026-09-12 it did not, and this repository disagreed on
 90 of 174 orderings; after, 0 of 199.
 
-The consumer sees Node as **one generated file**, `.fux/node/fux.mjs`, built at
-publish into both registries (L10): 244 KB where the vendored source tree had
-been 44–47 files. The Python side is served the same way — installed by pip,
+The consumer sees Node as **one generated file**, `fux.mjs`, built at publish
+(L10): 244 KB where the vendored source tree had been 44–47 files. Since W-292
+(2026-10-21) it ships on npm alone — `npm install fux-engine` is the one way to
+install it; `fux setup` no longer vendors it into `.fux/node/`, and Figure 12's
+`.fux/node/fux.mjs` label predates that. The Python side is served the same way — installed by pip,
 with `.fux/decoders/` and `.fux/fetchers/` the readable exceptions.
 
 The two readers are the third arm of the differential law: ordering byte-equal,
@@ -5294,7 +5308,7 @@ and before this record each one decided for itself.
 
 | what a consumer got BEFORE 2026-09-12 | what L10 requires — ✅ **all of it ships** |
 |---|---|
-| `.fux/node/src/**` — 30+ readable `.mjs` modules, vendored by `fux setup` | one generated `.fux/node/fux.mjs`, and the old tree PRUNED |
+| `.fux/node/src/**` — 30+ readable `.mjs` modules, vendored by `fux setup` | one generated `fux.mjs` — vendored into `.fux/node/` from 2026-09-12, and **since W-292 (Arpit, 2026-10-21) installed from npm alone** (`npm install fux-engine`); `fux setup` vendors nothing and removes what it once wrote |
 | npm `fux-engine`: `exports: {".": "./src/index.mjs"}`, `files` carries `"src"` | the bundle is the export; `files` drops `src` |
 | `.fux/decoders/*.py` | ✅ **exempt** — the consumer writes these |
 | `.fux/fetchers/*.py` | ✅ **exempt** — the consumer writes these |
@@ -5317,8 +5331,10 @@ concatenation satisfies it. Minification is a separate, ungated choice.
 ⚠ **Bundled at PUBLISH, never on the consumer's machine** — Arpit, 2026-09-12,
 quoted in [SR-NODE-SEARCH](0153_node-search.md) decision 14 (**W-149**, closed;
 its file is deleted, per OPEN-WORK rule 2, so it is named and never cited). The
-bundle is a release artefact built once in fux's own pipeline and shipped inside
-both distributions. A consumer runs no build step; that is what
+bundle is a release artefact built once in fux's own pipeline. Since W-292
+(Arpit, 2026-10-21 — *"`npm install fux-engine` … will be the only way to
+install the node package for fux"*) it ships in **one** distribution, the npm
+package; no PyPI wheel carries it. A consumer runs no build step; that is what
 [L5](0007_LAW-5-offline-by-default.md) is owed.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
@@ -5327,8 +5343,8 @@ both distributions. A consumer runs no build step; that is what
 flowchart LR
     S["node/src/** · src/fux/**<br/>(fux's own source — THIS repo)"]
     B["bundle, at publish<br/>(in-repo, deterministic)"]
-    W["the wheel AND the npm tarball<br/>(both carry the same artefact)"]
-    C[".fux/node/fux.mjs<br/>(ONE file in the consumer's tree)"]
+    W["the npm tarball, fux-engine<br/>(the only carrier since W-292)"]
+    C["node_modules/fux-engine/fux.mjs<br/>(ONE file, installed by npm)"]
     D[".fux/decoders/ · .fux/fetchers/ · .fux/observers/<br/>(SOURCE — the exemption)"]
     S --> B --> W --> C
     W -. "seeded once, then the consumer owns it" .-> D
@@ -5342,13 +5358,13 @@ flowchart LR
             |
             |  bundle, at PUBLISH (in-repo, deterministic)
             v
-   the wheel AND the npm tarball  both carry the same artefact
+   the npm tarball, fux-engine    the only carrier since W-292
             |
      +------+---------------------------+
      v                                  v
-  .fux/node/fux.mjs            .fux/decoders/  .fux/fetchers/  .fux/observers/
-  ONE file in the              SOURCE -- seeded once, then
-  consumer's tree              the consumer owns it
+  node_modules/fux-engine/     .fux/decoders/  .fux/fetchers/  .fux/observers/
+  fux.mjs -- ONE file,         SOURCE -- seeded once, then
+  installed by npm             the consumer owns it
                                (THE EXEMPTION)
 ```
 
@@ -5375,7 +5391,12 @@ Amending a law needs Arpit's ruling, named in this record
 
 ### Context
 
-`fux setup` vendors the Node read plane into `.fux/node/` so a fresh clone can
+⚠ **This section is the 2026-09-12 history the law was written from.** Since
+W-292 (Arpit, 2026-10-21) `fux setup` vendors nothing: the Node reader is
+`npm install fux-engine` and nothing else, and the code named below
+(`_packaged_node_files`, `ensure_node_reader`) is deleted.
+
+`fux setup` vendored the Node read plane into `.fux/node/` so a fresh clone can
 read the index with nothing installed — the promise
 [L5](0007_LAW-5-offline-by-default.md) makes and
 [SR-NODE-SEARCH](0153_node-search.md) implements. The mechanism chosen in
@@ -5431,11 +5452,14 @@ fux ships none and imports none by name.
 
 **3. Bundling happens at publish, in fux's pipeline.** One build, off the single
 `release: published` trigger in
-[`publish.yml`](../.github/workflows/publish.yml), and the same artefact goes
-into the PyPI wheel (as the `fux/templates/node/` payload) and the npm tarball.
-**The consumer never builds.** In a checkout, `fux setup` builds the bundle or
-refuses with a message that says so — it may never quietly fall back to
-vendoring the module tree, or dev and shipped become two different products.
+[`publish.yml`](../.github/workflows/publish.yml), and that artefact goes into
+the npm tarball — `fux-engine`, and the same bytes as `@fux-engine/reader`.
+**The consumer never builds.** ⚠ **Amended on Arpit's ruling of 2026-10-21
+(W-292):** until then the same artefact also went into the PyPI wheel (as the
+`fux/templates/node/` payload) and `fux setup` vendored it; **no wheel carries
+it now** and setup writes none, so there is no checkout fallback left to
+forbid. The law's statement did not move: it already reads *"vendored into
+their tree **or** exported by a published package"*, and npm is the second.
 
 **4. The bundler is fux's own, deterministic and zero-dependency.** Same sources
 → byte-identical output, per [L4](0006_LAW-4-deterministic.md). It is a
@@ -5460,26 +5484,27 @@ refused rather than overlooked.
 
 **8. ✅ This law IS satisfied, as of 2026-09-12 — the same day it was written.**
 W-149 landed the migration in the change that closed it, and the two named
-violations are gone: `.fux/node/` holds one generated `fux.mjs` plus its data
-sidecars (or a workspace manifest alone), and the npm package's `exports` and
-`files` name the bundle with no `"src"`. **`pyproject.toml` no longer mentions
-`node/src`** — the wheel's payload comes from a build hook, so the artefact
-cannot be stale or absent.
+violations are gone; since W-292 (Arpit, 2026-10-21) **nothing is vendored at
+all** — a consumer's tree holds no fux `.mjs`, and the npm package's `exports`
+and `files` name the bundle with no `"src"`. **`pyproject.toml` no longer
+mentions `node/src`**, and no wheel carries a `.mjs`.
 
 **What holds it satisfied**, since a law is only as good as what fails when it
 is broken:
 
 | the clause | what fails |
 |---|---|
-| one artefact in a consumer's tree | `tests/test_setup_node.py::test_setup_writes_the_bundle_and_NO_source_tree` |
-| the stale tree is pruned | `…::test_setup_PRUNES_a_module_tree_left_by_an_older_engine` |
+| nothing vendored into a consumer's tree | `tests/test_setup_node.py::test_setup_writes_no_node_reader_and_no_shim` |
+| what an earlier setup vendored is removed, and only that | `…::test_setup_removes_a_vendored_shape_A_and_says_so`, `…::test_anything_else_under_node_is_kept_and_named` |
+| no wheel carries the bundle | `tests_e2e/test_role_packages.py::test_no_wheel_carries_the_node_reader`, and the same check in `ci.yml` and `publish.yml` |
 | the bundle answers what the sources answer | `tests/test_node_bundle.py` (five verb comparisons + MCP + the library) |
 | the published surface names no `src` | this record's veto commands, plus `publish.yml`'s pre-stage check |
 | the shipped artefact is the measured one | `node_arm.py --bundle-cap`, the arm's sixth surface |
 
 ⚠ **Two exposures remain, and neither is the law's text.** A **consumer who
-never upgrades** keeps their old module tree — the prune runs on a version
-difference, so nothing reaches a repository whose owner stopped running fux.
+never re-runs `fux setup`** keeps whatever an earlier setup vendored — the
+removal is setup's alone and never an ingest's, so nothing reaches a repository
+whose owner stopped running it (`fux doctor`'s `node reader` row warns).
 And **`.fux/decoders/`, `.fux/fetchers/` and `.fux/observers/` are exempt by
 design**, so consumer-owned Python does sit in their tree; that is the inverse
 case decision 2 names, not a gap.
@@ -5516,10 +5541,13 @@ case decision 2 names, not a gap.
 - **Bundle on the consumer's machine at `fux setup` time.** Rejected by Arpit
   explicitly, 2026-09-12: *"It shouldn't be bundled at the consumer end."* It
   would put a build step — and a toolchain — inside the offline promise.
-- **Vendor nothing; make the consumer `npm install fux-engine`.** Rejected: it
-  breaks [L5](0007_LAW-5-offline-by-default.md). A fresh clone must read its
-  index with no network and no install. The workspace shape is offered as an
-  option, never as the only one.
+- **Vendor nothing; make the consumer `npm install fux-engine`.** Rejected on
+  2026-09-12 as breaking [L5](0007_LAW-5-offline-by-default.md) — and ✅
+  **ADOPTED by Arpit on 2026-10-21 (W-292)**: *"if somebody wants to install it,
+  they can install it using npm … that will be the only way."* The L5 reading
+  was too wide: a one-time package install is the consumer installing software,
+  not fux reaching the network, and L5 governs what fux does. What it costs is
+  named: a clone with nothing installed no longer answers from Node.
 - **Vendor the tree but checksum it.** Rejected: it detects the silent fork
   without removing it, and buys a manifest to keep current. If the answer is
   *regenerate and compare*, ship the thing that gets regenerated.
@@ -5552,8 +5580,8 @@ case decision 2 names, not a gap.
 - [SR-NODE-SEARCH](0153_node-search.md) — the plane this law binds first
 - [SR-FUX-DIRECTORY](0102_fux-directory.md) — what `.fux/` holds, and who owns each child
 - [SR-DECODE](0139_decode.md) · [SR-FETCHER](0117_fetcher.md) · [SR-OBSERVE](0157_observe.md) — the three exemptions
-- [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) — `_node_source`, `_packaged_node_files`, `ensure_node_reader`: the code that vendors today
-- [`packages/layer_hook.py`](../packages/layer_hook.py) — the wheels' build hook (since W-282 it builds the bundle into fux-writer's wheel), which replaced
+- [`src/fux/setup.py`](../src/fux/setup.py) — `remove_vendored_reader`: since W-292 the only Node code path in `fux setup`, which removes what an earlier setup vendored
+- [`packages/layer_hook.py`](../packages/layer_hook.py) — the wheels' build hook (it built the bundle into fux-writer's wheel from W-282 to W-292, and carries no bundle now), which replaced
   `pyproject.toml`'s `force-include` list · `node/package.json` `exports` / `files`
   — the published surface, now naming the bundle ·
   [`src/fux/store/nodebundle.py`](../src/fux/store/nodebundle.py) — the bundler
@@ -5568,7 +5596,7 @@ record.
 **How to check it:**
 
 ```bash
-# expect: only .fux/node/fux.mjs — every other hit is a violation
+# expect: no output — since W-292 nothing fux generates is in a consumer's tree
 find .fux \( -name '*.py' -o -name '*.mjs' -o -name '*.js' -o -name '*.ts' \) \
   | grep -v '^\.fux/\(decoders\|fetchers\)/'
 

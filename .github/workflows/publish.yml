@@ -83,8 +83,7 @@ jobs:
         # (SR-NODE-SEARCH decision 14) — and that risk does NOT go away now that
         # both halves publish automatically, because two jobs still run on two
         # runners. One artefact, downloaded by both, is what makes them equal.
-        # The wheel gets the same artefact from `hatch_build.py`, which runs the
-        # same deterministic bundler over the same sources.
+        # No wheel carries it (W-292): npm is the only place the bundle ships.
         run: PYTHONPATH=src python -m fux.store.nodebundle node node/dist
 
       - name: The bundle's version must be the engine's
@@ -132,6 +131,19 @@ jobs:
             python -m build --wheel --outdir dist "$plugin"
           done
           ls dist/
+
+      - name: No wheel carries the Node reader
+        # W-292 (Arpit, 2026-10-21): the bundle ships on npm alone.
+        run: |
+          python - <<'PY'
+          import glob, sys, zipfile
+          bad = [f"{w}: {n}" for w in sorted(glob.glob("dist/*.whl"))
+                 for n in zipfile.ZipFile(w).namelist() if n.endswith(".mjs")]
+          if bad:
+              print("✗ a wheel carries a .mjs:", *bad[:5], sep="\n  ")
+              sys.exit(1)
+          print("✔ no wheel carries a .mjs")
+          PY
 
       - name: Validate distribution metadata
         run: twine check --strict dist/*

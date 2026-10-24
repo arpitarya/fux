@@ -2419,82 +2419,35 @@ def _decoder_imports(root: Path) -> Check:
 
 
 def _node_reader(root: Path) -> Check:
-    """`.fux/node/` is present, matches the engine, and is in a state that RUNS.
+    """Is a Node reader an earlier `fux setup` vendored still in this repository?
 
-    A **warning**, never an error: Python answers without it, so a missing or
-    stale reader costs a Node-only clone, not this machine. But it is the one
-    drift `doctor` can still see -- the vendored copy is overwritten on a
-    version difference by `fux setup`/`fux ingest`, and a repo whose owner has
-    not run either since upgrading ships a reader that may not understand the
-    `_format` of the index sitting beside it.
+    🔴 **Since W-292 (Arpit, 2026-10-21) the Node reader installs from npm
+    alone** — `npm install fux-engine` — and `fux setup` writes nothing for it.
+    **A repository with no Node reader is the normal state**, so the row passes.
+    It warns on a leftover `.fux/node/` or `.fux/fux` from a setup before then:
+    a vendored bundle frozen at the version that wrote it, which nothing
+    rewrites any more and which reads an index it may no longer understand.
+    `fux setup` removes what it wrote; ingest never does (SR-NODE-SEARCH).
 
-    Three things beyond the version since 2026-09-12 (SR-NODE-SEARCH
-    decisions 13-16):
-
-    - **Which shape**, because the two fail differently. Shape A cannot be
-      half-configured; shape C can.
-    - **Whether shape C is actually installed.** A manifest declaring
-      `fux-engine` with no `node_modules` anywhere above it is exactly
-      decision 15's *"half-configured is not a state"*, and `doctor` is where
-      the record says it gets said.
-    - **Whether a stale module tree is still sitting there.** `.fux/node/src/`
-      is fux's own source in a consumer's repository, which L10 forbids; it
-      means `fux setup` has not run since the prune shipped.
+    A **warning**, never an error: Python answers without it.
     """
     from .store import fuxdir
 
-    directory = fuxdir.fux_dir(root)
-    found = fuxdir.node_version(directory)
-    if found is None:
-        return Check("node reader", True, "absent - `fux setup` writes it", level="warn")
-
-    shape = fuxdir.node_shape(directory)
-    where = f"{fixed("fuxdir", "dir")}/{fuxdir.NODE_DIR}/"
-    if found != __version__:
+    found = fuxdir.vendored_leftovers(root)
+    if not found:
         return Check(
-            "node reader",
-            False,
-            f"{where} is {found}; the engine is {__version__} - run `fux setup`",
-            level="warn",
+            "node reader", True, "none vendored - `npm install fux-engine` installs one", level="warn"
         )
-    if (directory / fuxdir.NODE_DIR / "src").is_dir():
-        return Check(
-            "node reader",
-            False,
-            f"{where} still holds fux's source tree (src/) beside the bundle - run "
-            "`fux setup` to prune it (L10)",
-            level="warn",
-        )
-    if shape == fuxdir.SHAPE_WORKSPACE and _installed_reader(root) is None:
-        return Check(
-            "node reader",
-            False,
-            f"{where} is a workspace member declaring fux-engine {found}, but no "
-            "node_modules/.bin/fux resolves - run your package manager's install",
-            level="warn",
-        )
-    kind = "a workspace member" if shape == fuxdir.SHAPE_WORKSPACE else "the vendored bundle"
-    return Check("node reader", True, f"{where} is {found}, {kind}", level="warn")
-
-
-def _installed_reader(root: Path) -> "Path | None":
-    """The installed `fux` bin the shim's rungs 2 and 3 would find, or `None`.
-
-    The rungs are the shim's, in the shim's order, because a check that looked
-    somewhere else would pass on a repository the shim cannot run
-    (SR-NODE-SEARCH decision 16).
-    """
-    from .store import fuxdir
-
-    member = fuxdir.fux_dir(root) / fuxdir.NODE_DIR / "node_modules" / ".bin" / "fux"
-    if member.exists():
-        return member
-    directory = fuxdir.fux_dir(root)
-    for parent in [directory, *directory.parents]:
-        candidate = parent / "node_modules" / ".bin" / "fux"
-        if candidate.exists():
-            return candidate
-    return None
+    names = ", ".join(
+        f"{p.relative_to(root).as_posix()}{'/' if p.is_dir() else ''}" for p in found
+    )
+    return Check(
+        "node reader",
+        False,
+        f"{names} left by an earlier `fux setup` - run `fux setup` to remove "
+        "(the Node reader is `npm install fux-engine` now)",
+        level="warn",
+    )
 
 
 #: Extensions a launcher shim can have, across the platforms fux ships on.

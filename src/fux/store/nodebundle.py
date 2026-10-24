@@ -1,9 +1,11 @@
 """The Node read plane's bundler — one artefact per plane, built at publish.
 
 **Why this file exists.** [L10](../../../records/0012_LAW-10-bundled-output.md)
-says the consumer is served build output, never source: what `fux setup` writes
-into `.fux/node/` and what the npm tarball exports is ONE generated `.mjs`,
-never a copy of `node/src/**`. This is the thing that generates it.
+says the consumer is served build output, never source: what the npm tarball
+exports (`fux-engine`, and the same bytes as `@fux-engine/reader`) is ONE
+generated `.mjs`, never a copy of `node/src/**`. This is the thing that
+generates it. **npm is the only place it ships** (W-292, Arpit 2026-10-21):
+`fux setup` vendors nothing and no PyPI wheel carries it.
 
 ⚠ **Carved out of `store/`'s claim for a different DECISION, not a different
 concern** (`records/README.md` §Ownership) — everything else under `store/` is
@@ -374,8 +376,8 @@ def bundle(node_dir: Path) -> str:
 
 def bundle_files(node_dir: Path) -> "list[tuple[str, bytes]]":
     """`(relative path, bytes)` for the whole published payload — the bundle
-    plus its sidecars, and NOTHING else. This is what the wheel carries at
-    `fux/templates/node/`, what npm packs, and what `fux setup` writes."""
+    plus its sidecars, and NOTHING else. This is what npm packs, and since
+    W-292 the only place it goes."""
     out = [(ENTRY, bundle(node_dir).encode("utf-8"))]
     for name in SIDECARS:
         path = node_dir / name

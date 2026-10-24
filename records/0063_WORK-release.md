@@ -6,12 +6,12 @@ title: "SR-WORK-RELEASE (0063) — one name in two registries, and what actually
 description: "fux-engine ships to PyPI and npm from one release trigger — PyPI automatically by OIDC, npm staged for a human to approve — and the version has four hand-written sites plus one derived bundle, held equal by check-version-parity.py. main has no required status checks: history is protected, the quality gate is not, so CI green is the author's to read."
 status: accepted
 date: 2026-09-14
-amended: 2026-10-20
+amended: 2026-10-24
 feature: how a release reaches two registries, how the version stays equal across its sites, and what the branch wall does not do
-owns: [scripts/check-version-parity.py@b861fee901b6, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@d2f98776acfd, scripts/npm-scoped.py@4214c9c3380a]
+owns: [scripts/check-version-parity.py@b861fee901b6, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@e0f0f99361b7, scripts/npm-scoped.py@4214c9c3380a]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: f5aaed8114e0caf846514ecb1c6814c86d4c1feaa4871a5b9d5c5012a22727b2
+content_sha: c05ef8fab742943208088b87da2a9c6111b3eeaf28acc7178e1b6e020ff76ad9
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -310,14 +310,19 @@ rather than a string somebody might forget to edit.
     |---|---|---|---|
     | PyPI | `fux-core` | the core layer and the `fux` console script | `packages/fux-core/` — wheel |
     | PyPI | `fux-reader` | the reader layer; depends on `fux-core` | `packages/fux-reader/` — wheel |
-    | PyPI | `fux-writer` | the writer layer, `fux-merge-index`, the Node bundle; depends on `fux-core` | `packages/fux-writer/` — wheel |
+    | PyPI | `fux-writer` | the writer layer and `fux-merge-index`; depends on `fux-core`. **No Node bundle** since W-292 (Arpit, 2026-10-21) — it carried one at `fux/templates/node/` until then | `packages/fux-writer/` — wheel |
     | PyPI | `fux-engine` | the engine layer; depends on the three — **installs what it installed before** | the root — sdist + wheel |
-    | npm | `fux-engine` | the Node reader bundle, unchanged | `node/dist/` |
+    | npm | `fux-engine` | the Node reader bundle — **the only place it ships**: `npm install fux-engine` is the one way to install the Node reader (W-292) | `node/dist/` |
     | npm | `@fux-engine/reader` | the same bundle under the scope | `scripts/npm-scoped.py` |
     | PyPI | `fux-decoder-json` · `-config` · `-html` · `-sheet` · `-office` · `-pdf` · `-xml` · `-svg` · `-drawio` · `-image` · `-mail` · `-rtf` | twelve decoder packages; each depends on `fux-core`, and `-html`/`-sheet`/`-office` on `fux-extension-table` | `packages/fux-decoder-*/` — wheel |
     | PyPI | `fux-fetcher-http` · `fux-fetcher-cdp` | the two fetchers; **depend on nothing**, import nothing from fux | `packages/fux-fetcher-*/` — wheel |
     | PyPI | `fux-extension-table` | the table extension; depends on `fux-core` | `packages/fux-extension-table/` — wheel |
 
+    - 🔴 **No wheel carries a `.mjs`** (W-292, Arpit 2026-10-21). The bundle is
+      built once in `publish.yml` for npm alone; `packages/layer_hook.py`
+      force-includes the layer's files and nothing else, and both `ci.yml` and
+      `publish.yml` fail a build whose wheels hold a `.mjs`
+      (`tests_e2e/test_role_packages.py` asserts the same on the built wheels).
     - **The fifteen plugin packages are optional by the repository's choice**
       ([SR-LAW-2](0004_LAW-2-zero-cost.md) decision 2): `fux-engine` depends on
       none of them, and a repository runs one only when its `.fux/plugins.toml`

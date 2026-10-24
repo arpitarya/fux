@@ -8,6 +8,35 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Breaking — the Node reader installs from npm only (W-292)
+
+Arpit, 2026-10-21: *"`npm install fux-engine` … will be the only way to install
+the node package for fux."*
+
+- **`fux setup` no longer vendors the Node reader.** It writes no `.fux/node/`
+  and no `.fux/fux` shim, and never edits your root `package.json` or
+  `pnpm-workspace.yaml` to wire a workspace. ⚠ **Anything that calls
+  `.fux/fux` — a CI step, an agent config, an MCP registration — breaks.**
+  Replace it with `npm install fux-engine` (or list `fux-engine` in your own
+  `package.json`) and `npx fux …`; the package's `bin` is `fux`.
+- ⚠ **The "a clone with nothing installed still answers" promise is
+  withdrawn.** Node needs one package install first; after it, the reader is
+  offline as before.
+- **The next `fux setup` removes what an earlier setup vendored, and only
+  that**: `.fux/node/`'s four files (or the monorepo manifest), the `.fux/fux`
+  shim, and the `.fux/node` entry it spliced into your workspace manifest —
+  each removal printed. Anything else under `.fux/node/` (a `node_modules/`, a
+  stale `src/`, your own file) is kept and named. `fux ingest` never removes
+  anything. Commit the deletions.
+- **`fux doctor`'s `node reader` row** passes when there is no Node reader (the
+  normal state now) and warns on a leftover `.fux/node/` or `.fux/fux` until
+  `fux setup` runs.
+- **No PyPI wheel carries the Node bundle.** `fux-writer` stops shipping
+  `fux/templates/node/`; the bundle ships on npm alone, as `fux-engine` and
+  `@fux-engine/reader`, and CI fails a wheel that holds a `.mjs`.
+- The new `.fux/.gitignore` template drops `node/node_modules/`; an existing
+  file is yours and keeps it.
+
 **Plugin packages — only the engine is mandatory (W-289, phases 1 and 2).** ⚠
 **Breaking for every consumer, once**: after upgrading, fux reads only Markdown
 and plain text until `.fux/plugins.toml` declares the decoder packages your
