@@ -81,3 +81,13 @@ work/golden/golden-answer/
 # switch is a property of one machine at one moment. `tools/golden-switch/`.
 .claude/.golden-lock/
 **/answers.jsonl
+# agent-session scratch: locks and nudge flags (SR-WORK-BLOCKERS, SR-WORK-SESSION)
+.claude/.locks/
+.claude/.stop-attempts
+.claude/.progress-nudged
+.claude/.now-nudged
+work/.NOW.md.tmp
+.claude/.sessions/
+.claude/.now.lock/
+.claude/.disk-usage
+.claude/.disk-nudged

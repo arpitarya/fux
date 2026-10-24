@@ -23,6 +23,8 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
+| 🔴 **W-297** — keep or drop the 8 leftover worktrees (~3 GB) and 9 branches; each holds nothing the live tree lacks, but removing them takes your word (SR-WORK-CLEANUP d3). Rec. **drop all**. [the item](open/W-297-clean-leftover-worktrees.md) | 2026-10-24 | 0d |
+| ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-292** — confirm two edits to L10's rationale: decision 3 amended, and *"make the consumer `npm install`"* marked adopted. Law statement untouched. [the item](open/W-292-node-reader-npm-only.md) | 2026-10-21 | 3d |
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-293** — copy `ci.yml` and `publish.yml` from the 2026-10-21 Cowork chat into `.github/workflows/` (the bridge may not write there). [the item](open/W-293-first-ci-run-of-the-codelaw-ports.md) | 2026-10-21 | 3d |
@@ -40,6 +42,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
+- 🔴 **W-297** · `arpit` — 2 of 10 worktrees removed, stale entries pruned; Arpit rules keep or drop on the other 8 (nothing in them is lost). **Sonnet.** Filed by Arpit (Cowork). [detail](open/W-297-clean-leftover-worktrees.md)
 - 🔴 **W-289** · `arpit` — plugin packages on `main`. Arpit: upload fetcher-http + extension-table, then publisher (ruling 1 built 2026-10-24). Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
 - 🔴 **W-292** · `arpit` — built on `main` (npm-only Node reader); Arpit confirms two L10 rationale edits; fig-12 not redrawn. Filed by Arpit (Cowork). [detail](open/W-292-node-reader-npm-only.md)
 

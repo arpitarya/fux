@@ -21,7 +21,7 @@ permission is the test, not the generation.
       - **L4** · **Deterministic — no model in the maintenance path.** ...
       <!-- LAW-TEXT:END L4 -->
 
-- Each law renders, in `LAW_ORDER` (`L0 … L13`), between `CLAUDE.md`'s
+- Each law renders, in `LAW_ORDER` (`L0 … L14`), between `CLAUDE.md`'s
   `<!-- LAWS:BEGIN … -->` / `<!-- LAWS:END -->` markers: **one line** — the
   record's title and a link — or, for a handle in `FULL_TEXT` (L11 alone), the
   whole block.
@@ -58,7 +58,7 @@ CLAUDE_MD = ROOT / "CLAUDE.md"
 #:
 #: **Fourteen live laws, fourteen numbers** — L13, the standing ship bar, added
 #: 2026-10-10 (Arpit).
-LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "L10", "L11", "L12", "L13")
+LAW_ORDER = ("L0", "L1", "L2", "L3", "L4", "L5", "L6", "L7", "L8", "L9", "L10", "L11", "L12", "L13", "L14")
 
 #: The laws `CLAUDE.md` carries IN FULL. Every other law renders as ONE line —
 #: its record's title and a link — because every session pays to read this

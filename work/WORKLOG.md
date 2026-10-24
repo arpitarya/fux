@@ -23,6 +23,50 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-24 — W-294 built and closed (one `.fux/sources.yaml`); W-289 ruling 1 built; W-297 to Arpit  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement all the OpenWork items."*
+- **Done:** **W-294** finished from its WIP branch and landed on `main` (`2ecba902`): `.fux/sources.yaml` in a strict YAML subset, Python + Node readers held equal by `tests/test_sources_yaml_differential.py`, `!` refused, `fux setup` converts (`.fuxignore` first — the L11 guard moved without a gap), SR-URL-LIST → [SR-SOURCES](../records/0116_url-list.md), SR-DIR-LIST retired to `archive/records/`; acceptance `--full` = 0 index bytes ([run](regression/2026-10-24-w294-sources-yaml-bytes/report.md)). **W-289 ruling 1** on `main` (`cc2e8599`): the package version stays in REGISTER and leaves the reuse key. **W-297**: `integrate` and the W-294 worktree removed, 4 stale entries pruned; the other 8 + 9 branches to Arpit. Three forks did the test conversion and the records sweep in parallel.
+- **Found:** `worktree-cleanup.py`, which W-297 and SR-WORK-CLEANUP name, is not built. The golden switch and its test still named `.fux/sources/dirs` as the guard file — re-pointed to `.fux/.fuxignore` (text only). Editing `packages/fux-fetcher-http` docs moves its pinned hash; reverted.
+- **Decided / left open:** SR-SOURCES keeps SR-URL-LIST's decision numbers where the subject survived (10, 12–17), so ~45 citations stayed valid. Not done: fig-02/fig-03 SVGs (mermaid-cli needs Chromium), the two fetcher packages' README wording (rides their next version). Not picked: the `research` lane (Cowork only, rule 37a); W-281 DoD 5 rides the next real capture.
+- **Mistakes:** a bulk citation rename first ran with an unsplit zsh variable and did nothing — redone through `xargs`. Fork C's package-doc edit caused 20 plugin-drift failures until reverted.
+- **Next:** Arpit rules W-297 (rec. drop all nine). The Cowork session's staged changes (L14, SR-WORK-NOW, SR-WORK-CLEANUP, W-297's filing) were snapshotted to `cowork-staged-2026-10-24` and re-applied on top of the merge, still uncommitted — Arpit commits them after `install-agent-hooks.py`, as their entries say.
+
+## 2026-10-24 — SR-WORK-CLEANUP: a worktree is removed at session end only if nothing is lost; otherwise red, blocked on Arpit  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"whenever a work tree's cleanup happens, always make sure everything is merged into main branch and no data is lost. If any data is supposed to be lost, mark it as red, block it on me, and I'll make a call. Otherwise, automatically do the cleanup when the session ends. Create a work SR for work trees, lock files, cleanup."* — Arpit, for fux, sheetpane and codelaw.
+- **Done:** [SR-WORK-CLEANUP](../records/0070_WORK-cleanup.md), new — worktrees (the four checks, never `--force` / `-D`, red → a `🔴 arpit` item plus an inbox row), other leftovers, lock files (moved here from SR-WORK-BLOCKERS decision 9b, now a pointer), surfaces. It owns `release-locks.sh` and the new `worktree-cleanup.py`. SR-WORK-NOW decision 4 now cleans or queues instead of only queueing. Register, ownership and `CLAUDE.md` rows; W-297 names the tool. The `.claude/` half is `install-agent-hooks.py` v4.
+- **Decided / left open:** cleanup never merges (decision 4); an unmerged branch is red, even though removing only the worktree would keep its commits — "everything merged into main" is the bar Arpit set.
+- **Mistakes:** none.
+- **Next:** Arpit runs `python3 install-agent-hooks.py` (v4), then commits.
+
+## 2026-10-24 — L14: work/MACHINE.md's budget section is law, every GB past 5 GB approved; SR-WORK-NOW  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"So 5 GB is the limit. If it goes beyond it, ask me for my approval on every GB that it increases, and create a law that machine.md should always, machine.md budget section should always be followed."* … *"create a work SR just for now.md, and whatever we talked about, put it in there … have a separate SR work document for now.md."* — Arpit, for fux, sheetpane and codelaw.
+- **Done:** [SR-LAW-14](../records/0016_LAW-14-machine-budget.md) — **L14**, new: MACHINE.md's budget section binds every session and agent; past 5 GB every GB is approved first. It owns `.claude/hooks/disk-budget.py`, which now reads the number from MACHINE.md and raises a permission prompt per GB instead of refusing. [SR-WORK-NOW](../records/0069_WORK-now.md), new: everything decided today about NOW.md, moved out of SR-WORK-SESSION (decision 5 is a pointer; 5a, 5b and 15 are gone, never committed). SR-LAWS, the register, ownership rows and `CLAUDE.md` name both (SR-WORK-DOCS decision 7a); `gen-laws.py` and `test_law_handles.py` know L14. The `.claude/` half is `install-agent-hooks.py` v3.
+- **Found:** at filing, fux is 5.0 GB — at the budget; W-297's ten leftover worktrees hold 4.0 GB of it.
+- **Decided / left open:** none.
+- **Mistakes:** none.
+- **Next:** Arpit runs `python3 install-agent-hooks.py` (v3), then commits.
+
+## 2026-10-24 — NOW.md holds only what is live; a 5 GB disk budget per project, all agents combined  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"now.md should track everything that is being worked in the chat right now … once it ends, now.md should have nothing … if there is any cleanup … create work items, but make sure now.md is empty … no agent in one project should consume more than 5 GB. Even sub agents … combined"* — Arpit, for fux, sheetpane and codelaw.
+- **Done:** [SR-WORK-SESSION](../records/0060_WORK-session.md) decisions 5–5b rewritten — this supersedes the morning's resource ledger, which was never installed — and decision 15, the disk budget; `work/NOW.md` emptied to its two live tables, W-297 now lists its worktrees itself; MACHINE.md's budget section; ownership and governance rows. The `.claude/` half — `now-ledger.py`, `disk-budget.py`, the settings wiring — is in `install-agent-hooks.py` v2.
+- **Found:** at filing, fux is 5.0 GB — at the limit; W-297's ten leftover worktrees hold 4.0 GB of it.
+- **Decided / left open:** the budget is a decision of SR-WORK-SESSION, not a numbered law; Arpit can promote it. The stale in-flight line was dropped — a status note, not live work; its next steps are in OPEN-WORK.
+- **Mistakes:** none.
+- **Next:** Arpit runs `python3 install-agent-hooks.py` (v2), then commits.
+
+## 2026-10-24 — locks are cleaned; NOW.md lists what is in flight and every uncleaned worktree or VM  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"whenever .lock file is created, it needs to be cleaned out … now.md file should have everything that is being implemented right now. And once it is implemented, it should be cleaned … tracks in now.md what virtual machines got created, what work trees got created … if they aren't cleaned, then create a work item to clean them"* — Arpit, for fux, sheetpane and codelaw.
+- **Done:** [SR-WORK-SESSION](../records/0060_WORK-session.md) decisions 5–5b and [SR-WORK-BLOCKERS](../records/0064_WORK-blockers.md) decision 9b; `work/NOW.md` moved to the in-flight list + resource ledger; ownership, governance rows; W-297 filed for the ten worktrees already on disk. The `.claude/` half — `session-lock.sh` (session_id owner, TTL sweep), `release-locks.sh`, `now-resources.py`, the `settings.json` wiring — is in `install-agent-hooks.py`: the bridge refuses writes under `.claude/`.
+- **Found:** `stop-if-blocked.sh`, `require-progress.sh` and `guard-open-work-inbox.sh` emit `decision:"block"` inside `hookSpecificOutput`; Claude Code reads it only at the top level for `Stop` and `PostToolUse`, so none of the three has ever blocked. Fixed in the installer. `session-lock.sh` keyed a lock by `$PPID`, which differs per tool call, so every write left an orphan lock.
+- **Decided / left open:** the 5 GB-per-project budget is proposed, not yet a law — waiting on Arpit.
+- **Mistakes:** none.
+- **Next:** Arpit runs `python3 install-agent-hooks.py`, then commits.
+
 ## 2026-10-24 — the green agent items, built in parallel; five merged to `main`  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"review all the green items in OpenWork file. Implement all of them … in parallel"* → *"stop and merge everything to main"* → *"commit everything. Review open work, what is still pending."*

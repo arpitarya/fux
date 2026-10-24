@@ -1,6 +1,19 @@
 ---
 type: Pointer
-description: "One line: the current state and the immediate next step. Overwritten every session."
+description: "Only what is being worked on right now: one row per live session, plus what those sessions created and have not yet cleaned. Empty when nothing is running."
 ---
 
-🟢 2026-10-24 Claude Code (Opus 5.5): **W-291, W-292, W-295, W-296 and the W-281 driver landed on `main` (not pushed); W-294 half built on its branch `c42c45ee`, not merged.** **Next: Arpit confirms W-292's two L10 rationale edits; W-293's workflow files; resume W-294.**
+# NOW
+
+Kept by `.claude/hooks/now-ledger.py` in Claude Code; a Cowork session adds and removes its own row by hand.
+Rule: [SR-WORK-NOW](../records/0069_WORK-now.md).
+
+## In flight
+
+| session | surface | started | working on |
+|---|---|---|---|
+
+## Resources this session created
+
+| kind | where | host | session | created |
+|---|---|---|---|---|

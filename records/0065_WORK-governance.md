@@ -137,7 +137,7 @@ still listed `DOGFOOD.md`, which no longer exists, and named neither
    | [`IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) | the milestone log — what shipped, when | both | none | a milestone lands |
    | [`WORKLOG.md`](../work/WORKLOG.md) | the per-session trail, append-only; cut at each major release ([SR-WORK-SESSION](0060_WORK-session.md) decision 14) | both (audit) | none; link-exempt because repairing its links would make it false | every session; cut at each major |
    | [`LESSONS.md`](../work/LESSONS.md) | dated build lessons — a log, because the date is the lesson | both | none | a failure teaches something durable |
-   | [`NOW.md`](../work/NOW.md) | the one-line current-state pointer | both | read by a hook on every prompt | every session transition |
+   | [`NOW.md`](../work/NOW.md) | only what is live — empty when nothing runs | both | kept by `now-ledger.py`; shown on every prompt | every session start and end |
    | [`MACHINE.md`](../work/MACHINE.md) | environment and surface quirks | agent | none | a surface breaks in a new way |
    | [SR-WORK-REGISTRY §3](0067_WORK-registry.md) | per-doc freshness for **live** docs — the table lives in the record with its rules; `work/DOC-REGISTRY.md` is retired | both | [`test_doc_registry.py`](../tests/test_doc_registry.py) | any registered doc is touched |
    | [`compare/`](../work/compare/README.md) | live forks — verdict and reopen-trigger | both | none | a fork opens, closes, or its trigger fires |

@@ -86,9 +86,9 @@ def _live_files() -> list[str]:
 
 
 def test_the_current_table_is_dense():
-    """Decision 2: L0–L13, no gaps, since 2026-09-28 (L13 added 2026-10-10)."""
+    """Decision 2: L0–L14, no gaps, since 2026-09-28 (L13 added 2026-10-10, L14 2026-10-24)."""
     handles = _current_handles()
-    assert handles == {f"L{n}" for n in range(14)}, sorted(handles, key=lambda h: int(h[1:]))
+    assert handles == {f"L{n}" for n in range(15)}, sorted(handles, key=lambda h: int(h[1:]))
 
 
 def test_every_live_law_handle_exists():

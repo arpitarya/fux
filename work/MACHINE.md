@@ -469,3 +469,20 @@ here and costs a lock.
 ```bash
 mv work/open/W-nn-….md archive/open/     # untracked: plain mv, no lock
 ```
+
+## Disk budget — law L14: this section is always followed
+
+**This section binds** ([SR-LAW-14](../records/0016_LAW-14-machine-budget.md)): every session and every
+agent follows it — Claude Code or Cowork, main agent or sub-agent. A number here
+changes only by Arpit's ruling. `.claude/hooks/disk-budget.py` reads the
+`budget` row below; keep its `<n> GB` spelling.
+
+| what | value |
+|---|---|
+| budget | 5 GB for the whole project — main session + every sub-agent + every worktree + build output, combined |
+| past the budget | every further GB needs Arpit's approval, asked before it is used: Claude Code raises a permission prompt; a Cowork session asks in chat. One yes approves one GB |
+| new sub-agent or worktree | asks from 90 % of the approved ceiling |
+| approvals reset | when the project is back under the budget |
+| not counted | shared caches outside the repo: `~/.cargo`, the pnpm store, pip's cache |
+| see it | `python3 .claude/hooks/disk-budget.py fresh` |
+| at filing (2026-10-24) | fux is 5.0 GB — at the budget; W-297's ten leftover worktrees hold 4.0 GB of it |

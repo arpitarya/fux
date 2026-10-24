@@ -64,6 +64,8 @@ occurrence — [SR-WORK-SESSION](records/0060_WORK-session.md) decision 13.
 | which record owns a module | [`records/README.md`](records/README.md) §Ownership |
 | the stages a feature moves through | [SR-WORK-LIFECYCLE](records/0058_WORK-lifecycle.md) |
 | what a session owes before it ends, and how long an answer may be | [SR-WORK-SESSION](records/0060_WORK-session.md) |
+| what `work/NOW.md` holds — only what is live | [SR-WORK-NOW](records/0069_WORK-now.md) |
+| what happens to worktrees and lock files when a session ends | [SR-WORK-CLEANUP](records/0070_WORK-cleanup.md) |
 | what a task owes the documentation | [SR-WORK-DOCS](records/0059_WORK-docs.md) |
 | whether a number above 10 000 may be written down | [SR-WORK-SCALE](records/0057_WORK-scale.md) |
 | whether a claim may be grounded in an archived doc | [SR-WORK-ARCHIVE](records/0062_WORK-archive.md) |
@@ -135,7 +137,7 @@ from its record's title — open the record before acting on it — and L11 in f
 because it is a prohibition every session must have read before going near
 `work/golden/`. Amend the record, then run `python scripts/gen-laws.py --write`.
 
-[SR-LAWS](records/0001_LAWS.md) assigns the handles `L0`–`L13` and routes
+[SR-LAWS](records/0001_LAWS.md) assigns the handles `L0`–`L14` and routes
 each to its record; that is all it does now.
 
 <!-- LAWS:BEGIN — GENERATED from records/*_LAW-*.md by scripts/gen-laws.py. Do not edit by hand: amend the record, then run `python scripts/gen-laws.py --write`. -->

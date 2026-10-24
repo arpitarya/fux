@@ -3,7 +3,7 @@ type: Standing Record
 kind: process
 name: SR-WORK-SESSION
 title: "SR-WORK-SESSION (0060) — what a session owes before it ends"
-description: "Three files every session touches — the append-only worklog, the interview kept current DURING the work, and the milestone log a row is earned into by landing — plus the one-line pointer a dying session leaves behind, the transition markers, the ten-line answer, and the two hazards that bite silently when two sessions share a machine."
+description: "Three files every session touches — the append-only worklog, the interview kept current DURING the work, and the milestone log a row is earned into by landing — plus NOW, which is SR-WORK-NOW's, the transition markers, the ten-line answer, and the two hazards that bite silently when two sessions share a machine."
 status: accepted
 date: 2026-09-14
 feature: the session contract — the three files, the running pointer, and how an agent narrates and answers
@@ -49,7 +49,7 @@ flowchart TD
     S[a session, even chat-only] --> W["work/WORKLOG.md<br/>ONE entry before it ends<br/>append-only, newest on top"]
     S --> I["work/INTERVIEW.md<br/>kept current DURING<br/>for a model arriving cold"]
     S --> M["work/IMPLEMENTATION.md<br/>a row earned by LANDING"]
-    S --> N["work/NOW.md<br/>one line, overwritten<br/>read back by the next session"]
+    S --> N["work/NOW.md<br/>only what is live<br/>empty when nothing runs"]
     W --> E{"a wrong past entry?"}
     E -->|"correct it with a NEW entry"| W
     E -->|"never rewrite it"| X[git holds the history]
@@ -63,7 +63,7 @@ flowchart TD
      |-- work/WORKLOG.md        one entry before it ends; append-only, newest on top
      |-- work/INTERVIEW.md      kept current DURING; for a model arriving cold
      |-- work/IMPLEMENTATION.md a row is earned by LANDING, never by planning
-     |-- work/NOW.md            one line, overwritten, read back next session
+     |-- work/NOW.md            only what is live; empty when nothing runs
 
   a wrong past entry -> correct it with a NEW entry, never a rewrite
                         (git holds the history)
@@ -112,9 +112,8 @@ real regression and would have been filed as one.
    store** the queue reconciles against before anything is called done. **A row
    is earned by landing, never by being planned.**
 
-5. **[`work/NOW.md`](../work/NOW.md) carries one line, overwritten.** It is read
-   back into the next session, so a session that dies mid-task leaves a note
-   rather than a mystery.
+5. **[`work/NOW.md`](../work/NOW.md) is [SR-WORK-NOW](0069_WORK-now.md)'s** — only what is being worked on
+   right now, empty when nothing is; a session keeps its own row true.
 
 6. **Announce every transition in one line — a marker, never a summary.** Name
    the item id and what is starting before you start; on finishing, `✓ <id>` and
@@ -206,6 +205,7 @@ real regression and would have been filed as one.
 
 ### Consequences
 
+- Decision 5 points at [SR-WORK-NOW](0069_WORK-now.md), which owns `.claude/hooks/now-ledger.py`.
 - **A new session can start cold** from four files, which is the only reason
   handing work between models works at all.
 - **The worklog grows for one major at a time** (decision 14) — over eleven

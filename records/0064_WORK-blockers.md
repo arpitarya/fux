@@ -137,6 +137,9 @@ unsurfaced.
     so an emptied inbox is never announced as a waiting one. That keeps the three
     scripts portable to another repository unchanged (Arpit, 2026-10-21).
 
+9b. **Cleaning a lock is [SR-WORK-CLEANUP](0070_WORK-cleanup.md)'s** (decisions 8–10). The
+    lock itself stays here: `session-lock.sh` keys it by the hook input's `session_id`.
+
 10. **A `kind: process` record owns its enforcement**, and this one owns the three
     hook scripts. `guard-golden-answer.sh` and `require-progress.sh` are **not**
     claimed: the first belongs to the sealed benchmark's rule and the second to
