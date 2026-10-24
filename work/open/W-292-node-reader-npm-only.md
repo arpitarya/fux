@@ -16,12 +16,12 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | `fux setup` stops writing the Node reader into the repo | installing the Python package no longer puts Node code in the user's repo | ⏳ |
-| 2 | `fux setup` stops editing the user's monorepo `package.json` | fux no longer touches files the user's team owns | ⏳ |
-| 3 | The Python package stops carrying the Node bundle | a smaller Python install; Node code comes from npm only | ⏳ |
-| 4 | Clean up repos set up before this change | old copies don't linger or break the user's package manager | ⏳ |
-| 5 | Update the records, READMEs and agent guides | the docs say `npm install fux-engine` is the one way | ⏳ |
-| 6 | Test it from both test suites | proof it works the way a user runs it | ⏳ |
+| 1 | `fux setup` stops writing the Node reader into the repo | installing the Python package no longer puts Node code in the user's repo | ✅ |
+| 2 | `fux setup` stops editing the user's monorepo `package.json` | fux no longer touches files the user's team owns | ✅ |
+| 3 | The Python package stops carrying the Node bundle | a smaller Python install; Node code comes from npm only | ✅ |
+| 4 | Clean up repos set up before this change | old copies don't linger or break the user's package manager | ✅ |
+| 5 | Update the records, READMEs and agent guides | the docs say `npm install fux-engine` is the one way | ✅ |
+| 6 | Test it from both test suites | proof it works the way a user runs it | ✅ |
 
 **Arpit, 2026-10-21 (Cowork):** *"Today when the consumer installs fux-engine,
 the Python version, the node package also gets installed and is added to
@@ -52,15 +52,15 @@ from `process.cwd()`, so it works from `node_modules/` as it is.
 
 | DoD | what | state |
 |---|---|---|
-| 1 · setup writes no Node | `fux setup` and `ensure_layout` write no `.fux/node/` and no `.fux/fux`. `ensure_node_reader`, `_packaged_node_files`, the shape A/C machinery in `fuxdir.py`, and `detect_workspace` / `wire_workspace` in `setup.py` are deleted, not left unreachable | ⏳ |
-| 2 · no manifest edits | fux never writes the consumer's root `package.json` or `pnpm-workspace.yaml` — except DoD 4's one removal | ⏳ |
-| 3 · wheel carries no bundle | `packages/layer_hook.py` stops force-including `fux/templates/node/` into `fux-writer`. `publish.yml` still builds the bundle once, for npm (`fux-engine` and `@fux-engine/reader`) only. Assert: no built wheel contains a `.mjs` | ⏳ |
-| 4 · migration, setup only | on an existing repo, `fux setup` removes **what an earlier setup wrote**: `.fux/node/` (fux's four files and `package.json`), `.fux/fux`, and the `.fux/node` entry it spliced into a workspace manifest (format-preserving, the reverse of decision 15's splice). It prints each removal. **It never removes a `node_modules/` it did not write, and ingest never runs this** (SR-NODE-SEARCH decision 15 constraint 1's no-op-diff rule stands) | ⏳ |
-| 5 · doctor | the `node reader` row stops checking vendored shapes. It **warns** when a leftover `.fux/node/` or `.fux/fux` exists (*"run `fux setup` to remove"*), and otherwise passes — a repo with no Node reader is the normal state | ⏳ |
-| 6 · records | SR-NODE-SEARCH decisions 13, 15, 16 superseded and decision 14 narrowed to *"the bundle ships on npm only"*, Arpit's ruling 2026-10-21 named; the probes stay filed as history. SR-DOTFUX's `fux` / `node/` rows and its `ensure_layout` row; SR-DOCTOR's `node reader` row; SR-WORK-RELEASE (the wheel no longer carries the bundle); SR-MCP's vendored-copy line; `records/README.md` ownership rows for the deleted code; `sr-hash` restamped | ⏳ |
-| 7 · L10's record | the law statement is untouched — it already reads *"vendored into their tree **or** exported by a published package"*. Only its illustrative rows naming `.fux/node/fux.mjs` change. **A Law record edits only on Arpit's ruling named in it** — name this ask (2026-10-21); if the build finds the statement itself must change, stop and ask | ⏳ |
-| 8 · docs and guides | `README.md` §*No Python on the machine?* and `node/README.md` say `npm install fux-engine` and name `npx fux` / the package's `bin`; the `.fux/fux` and shape tables go. Shipped agent guides (all four surfaces, SR-AGENT-POLICY) checked for `.fux/fux` / `.fux/node`. CHANGELOG under **Breaking** | ⏳ |
-| 9 · tests | `test_setup_node.py` and `test_setup_workspace.py` rewritten to assert the opposite (as decision 13 did when it reversed): setup writes no Node, no manifest edit, migration removes only fux's files. `test_fuxdir.py`, `test_mcp.py`, `test_cli.py`, `test_law_handles.py`, `test_record_paths_resolve.py`, `tests/l12_allow.toml` follow. e2e: `pip install` → `fux setup` writes no `.fux/node/`; `npm install fux-engine` in a scratch repo → `npx fux find …` answers. **Both suites, whole**, plus `node --test node/test/*.test.mjs` | ⏳ |
+| 1 · setup writes no Node | `fux setup` and `ensure_layout` write no `.fux/node/` and no `.fux/fux`. `ensure_node_reader`, `_packaged_node_files`, the shape A/C machinery in `fuxdir.py`, and `detect_workspace` / `wire_workspace` in `setup.py` are deleted, not left unreachable | ✅ |
+| 2 · no manifest edits | fux never writes the consumer's root `package.json` or `pnpm-workspace.yaml` — except DoD 4's one removal | ✅ |
+| 3 · wheel carries no bundle | `packages/layer_hook.py` stops force-including `fux/templates/node/` into `fux-writer`. `publish.yml` still builds the bundle once, for npm (`fux-engine` and `@fux-engine/reader`) only. Assert: no built wheel contains a `.mjs` | ✅ |
+| 4 · migration, setup only | on an existing repo, `fux setup` removes **what an earlier setup wrote**: `.fux/node/` (fux's four files and `package.json`), `.fux/fux`, and the `.fux/node` entry it spliced into a workspace manifest (format-preserving, the reverse of decision 15's splice). It prints each removal. **It never removes a `node_modules/` it did not write, and ingest never runs this** (SR-NODE-SEARCH decision 15 constraint 1's no-op-diff rule stands) | ✅ |
+| 5 · doctor | the `node reader` row stops checking vendored shapes. It **warns** when a leftover `.fux/node/` or `.fux/fux` exists (*"run `fux setup` to remove"*), and otherwise passes — a repo with no Node reader is the normal state | ✅ |
+| 6 · records | SR-NODE-SEARCH decisions 13, 15, 16 superseded and decision 14 narrowed to *"the bundle ships on npm only"*, Arpit's ruling 2026-10-21 named; the probes stay filed as history. SR-DOTFUX's `fux` / `node/` rows and its `ensure_layout` row; SR-DOCTOR's `node reader` row; SR-WORK-RELEASE (the wheel no longer carries the bundle); SR-MCP's vendored-copy line; `records/README.md` ownership rows for the deleted code; `sr-hash` restamped | ✅ |
+| 7 · L10's record | the law statement is untouched — it already reads *"vendored into their tree **or** exported by a published package"*. Only its illustrative rows naming `.fux/node/fux.mjs` change. **A Law record edits only on Arpit's ruling named in it** — name this ask (2026-10-21); if the build finds the statement itself must change, stop and ask | ✅ built — 🔴 Arpit confirms decision 3 and the adopted alternative |
+| 8 · docs and guides | `README.md` §*No Python on the machine?* and `node/README.md` say `npm install fux-engine` and name `npx fux` / the package's `bin`; the `.fux/fux` and shape tables go. Shipped agent guides (all four surfaces, SR-AGENT-POLICY) checked for `.fux/fux` / `.fux/node`. CHANGELOG under **Breaking** | ✅ — paper fig-12 SVG/.mmd not redrawn (no renderer); §5 prose says so |
+| 9 · tests | `test_setup_node.py` and `test_setup_workspace.py` rewritten to assert the opposite (as decision 13 did when it reversed): setup writes no Node, no manifest edit, migration removes only fux's files. `test_fuxdir.py`, `test_mcp.py`, `test_cli.py`, `test_law_handles.py`, `test_record_paths_resolve.py`, `tests/l12_allow.toml` follow. e2e: `pip install` → `fux setup` writes no `.fux/node/`; `npm install fux-engine` in a scratch repo → `npx fux find …` answers. **Both suites, whole**, plus `node --test node/test/*.test.mjs` | ✅ |
 
 ## Blockers
 

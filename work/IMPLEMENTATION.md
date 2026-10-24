@@ -28,6 +28,16 @@ Rules:
 
 ---
 
+## 2026-10-24 — **W-291 · W-292 · W-295 · W-296 · W-281: `fux setup` reshaped, built in parallel (main, unreleased)**
+
+| | |
+|---|---|
+| **shipped** | **W-291** `fux setup` installs the hooks + merge driver (`--no-hooks`). **W-292** the Node reader is `npm install fux-engine` only: setup vendors no `.fux/node/` / `.fux/fux`, wires no workspace, removes exactly what an earlier setup wrote; no wheel carries a `.mjs`. **W-295** the eight policy TOMLs → `.fux/config/` (`configfiles.py`; old address a loud error, pii says *moved*). **W-296** `fux observers init`; setup no longer seeds `.fux/observers/`. **W-281** `tools/quality-controls/capture-driver/` — capture template (no gpg, G1 + G3 in parallel, latency last and alone, step timing). Five worktree branches, merged on `merge-w29x` and fast-forwarded. |
+| **evidence** | SR-MAINTENANCE d5, SR-CLI, SR-DOTFUX (incl. d11), SR-NODE-SEARCH d13–16, SR-LAW-10 d3, SR-WORK-RELEASE, SR-DOCTOR, SR-OBSERVE d1. Tests: `test_setup_hooks.py`, `tests_e2e/test_setup_installs_hooks.py`, `test_setup_node.py`/`test_setup_workspace.py` (inverted), `tests_e2e/test_node_from_npm.py`, `test_configfiles.py`, `test_observe.py`, `test_capture_driver.py`. Merged `main`, whole: unit 7530 passed / 13 failed, then fixed down to the pre-existing W-293 pair (workflow files not placed); e2e 197 passed / 1 failed (index not yet committed). |
+| **outcome** | Landed on `main`, not pushed. 🔴 W-292 stays open: Arpit confirms two L10 rationale edits; fig-12 not redrawn. W-295's fig-02 not redrawn. W-281 DoD 5 owed by the next capture. **W-294 not merged**: half built on its branch (`c42c45ee`); merging it would leave this repo's golden exclusion (L11) unconverted. ⚠ The disk filled twice (six parallel suites). |
+
+---
+
 ## 2026-10-21 — **W-293: what fux took from codelaw — release safety, one SR guard, a lean `CLAUDE.md` (main, unreleased)**
 
 | | |

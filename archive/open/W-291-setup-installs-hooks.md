@@ -16,12 +16,12 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Make setup install the three git hooks and the merge driver | a new repo keeps its index current from the first commit | ⏳ |
-| 2 | Add a way to skip them | teams that do not want hooks can still say no | ⏳ |
-| 3 | Never let setup fail because of the hooks | no git repo, or someone else's hook, is reported, not fatal | ⏳ |
-| 4 | Tell the user what setup wrote outside `.fux/` | the new `.gitattributes` lines are never a surprise | ⏳ |
-| 5 | Update the records and the shipped agent guides | the docs say what the tool now does | ⏳ |
-| 6 | Test it from both test suites | proof it works the way a user runs it | ⏳ |
+| 1 | Make setup install the three git hooks and the merge driver | a new repo keeps its index current from the first commit | ✅ |
+| 2 | Add a way to skip them | teams that do not want hooks can still say no | ✅ |
+| 3 | Never let setup fail because of the hooks | no git repo, or someone else's hook, is reported, not fatal | ✅ |
+| 4 | Tell the user what setup wrote outside `.fux/` | the new `.gitattributes` lines are never a surprise | ✅ |
+| 5 | Update the records and the shipped agent guides | the docs say what the tool now does | ✅ |
+| 6 | Test it from both test suites | proof it works the way a user runs it | ✅ |
 
 **Arpit, 2026-10-21 (Cowork):** *"Create a work item to install hooks on Fox setup."*
 Asked after confirming that today `fux setup` installs no hooks and the user
@@ -46,15 +46,15 @@ After this item, `fux setup` installs what `fux hooks --install` installs:
 
 | DoD | what | state |
 |---|---|---|
-| 1 · on by default | `fux setup` calls the same `hooks.install(root)` that `fux hooks` calls — one installer, no copy — and prints its report (installed / kept) | ⏳ |
-| 2 · opt-out | `fux setup --no-hooks` skips step 1 entirely. Default ruled here as **on**; the flag is the opt-out. ⚠ L12: a CLI flag is not a tunable default — if the build finds it needs a config key instead, that is a question for Arpit, not a code default | ⏳ |
-| 3 · never fatal | **no git repo** (setup may run before one exists, SR-DOTFUX) → one line, *"no git repository — run `fux hooks` after `git init`"*, exit 0. **A hook fux did not write** → kept, named as *kept (yours)*, exit 0. The chain-never-clobber rule in `hooks.py` is unchanged | ⏳ |
-| 4 · announced | `.gitattributes` is a committed file outside `.fux/`; setup lists it in `report.outside`, the same announcement `AGENTS.md` and `.github/` get | ⏳ |
-| 5 · idempotent | a second `fux setup` on a wired repo reinstalls fux's own hooks (re-pinning the interpreter) and changes nothing else | ⏳ |
-| 6 · the daemon is untouched | setup still never starts `fux daemon` — SR-MAINTENANCE decision 9c stands as written | ⏳ |
-| 7 · records | SR-MAINTENANCE decision 5 amended: hooks still never arrive by clone and are never committed; **`fux setup` — a verb a human types — now installs them**, Arpit's ruling 2026-10-21 named. SR-DOTFUX's `fux setup` row gains `.git/hooks/` + `.gitattributes`. SR-CLI gains `--no-hooks`. `sr-hash` restamped | ⏳ |
-| 8 · agent guides | the shipped `fux-index` and `fux-maintain` guides (all four agent surfaces, per SR-AGENT-POLICY) stop saying hooks are installed only when explicitly asked; they say setup installs them and `--no-hooks` skips them. `fux hooks` stays documented for repos set up before this change | ⏳ |
-| 9 · tests | unit: setup installs, `--no-hooks` skips, no-git is exit 0, a foreign hook is kept. e2e: `fux setup` in a fresh `git init` repo, then a commit triggers the re-index. **Both suites, whole** | ⏳ |
+| 1 · on by default | `fux setup` calls the same `hooks.install(root)` that `fux hooks` calls — one installer, no copy — and prints its report (installed / kept) | ✅ |
+| 2 · opt-out | `fux setup --no-hooks` skips step 1 entirely. Default ruled here as **on**; the flag is the opt-out. ⚠ L12: a CLI flag is not a tunable default — if the build finds it needs a config key instead, that is a question for Arpit, not a code default | ✅ |
+| 3 · never fatal | **no git repo** (setup may run before one exists, SR-DOTFUX) → one line, *"no git repository — run `fux hooks` after `git init`"*, exit 0. **A hook fux did not write** → kept, named as *kept (yours)*, exit 0. The chain-never-clobber rule in `hooks.py` is unchanged | ✅ |
+| 4 · announced | `.gitattributes` is a committed file outside `.fux/`; setup lists it in `report.outside`, the same announcement `AGENTS.md` and `.github/` get | ✅ |
+| 5 · idempotent | a second `fux setup` on a wired repo reinstalls fux's own hooks (re-pinning the interpreter) and changes nothing else | ✅ |
+| 6 · the daemon is untouched | setup still never starts `fux daemon` — SR-MAINTENANCE decision 9c stands as written | ✅ |
+| 7 · records | SR-MAINTENANCE decision 5 amended: hooks still never arrive by clone and are never committed; **`fux setup` — a verb a human types — now installs them**, Arpit's ruling 2026-10-21 named. SR-DOTFUX's `fux setup` row gains `.git/hooks/` + `.gitattributes`. SR-CLI gains `--no-hooks`. `sr-hash` restamped | ✅ |
+| 8 · agent guides | the shipped `fux-index` and `fux-maintain` guides (all four agent surfaces, per SR-AGENT-POLICY) stop saying hooks are installed only when explicitly asked; they say setup installs them and `--no-hooks` skips them. `fux hooks` stays documented for repos set up before this change | ✅ |
+| 9 · tests | unit: setup installs, `--no-hooks` skips, no-git is exit 0, a foreign hook is kept. e2e: `fux setup` in a fresh `git init` repo, then a commit triggers the re-index. **Both suites, whole** | ✅ |
 
 ## Blockers
 

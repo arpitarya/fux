@@ -11,7 +11,7 @@ feature: the `fux` command-line interface — every verb, its flags, its exit co
 owns: [src/fux/cli.py@5931750f6a49, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@fe8608a6944a, src/fux/progress.py@e5f2459288d5, tests_e2e@81552f7b5119, node/fux.mjs@36a064b9874d, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d3ab39922babe39fba3d662cacbbea8247be3a216964f15d83a034e6b0905834
+content_sha: 9a5eff457846cb1ae0939b812722a7b10bd64b19d2c8cf6b00a8cc6d983b55b2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -42,7 +42,7 @@ content_sha: d3ab39922babe39fba3d662cacbbea8247be3a216964f15d83a034e6b0905834
 | **read** | `ask` · `find` · `answer` · `lexical` | differ only in how much they commit to. `lexical` is the words alone, **frozen** — decision 12 |
 | **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
 | **serve** | `serve` · `mcp` · `lsp` · `daemon` | long-running processes; the only verbs that do not return. `serve` (W-210, 2026-09-22) is a **local page over the real `ask`**, bound to `127.0.0.1` with no `--host`; `mcp` is the same index over the Model Context Protocol; `lsp` is the same index over the Language Server Protocol, for an editor ([SR-LSP](0163_lsp.md)); `daemon` watches for staleness |
-| **maintenance** | `hooks` · `tune` · `output` · `verify` | wire the repository to keep its own index in step, print the tunables and the output defaults, and re-run a provenance receipt against this tree |
+| **maintenance** | `hooks` · `observers` · `tune` · `output` · `verify` | wire the repository to keep its own index in step, create the analytics observers directory on demand, print the tunables and the output defaults, and re-run a provenance receipt against this tree |
 
 ⚠ **`output` was missing from this table until 2026-09-14 (W-164 gate 2).**
 The verb shipped with [SR-OUTPUT](0143_output-defaults.md) and

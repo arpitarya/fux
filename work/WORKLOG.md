@@ -23,6 +23,36 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+## 2026-10-24 — the green agent items, built in parallel; five merged to `main`  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"review all the green items in OpenWork file. Implement all of them … in parallel"* → *"stop and merge everything to main"* → *"commit everything. Review open work, what is still pending."*
+- **Done:** six worktree agents (W-294/W-292 Opus; W-295/W-296/W-291/W-281 Sonnet). Research items (W-263/265/275/280) skipped: Cowork only (rule 37a). W-281, W-291, W-292, W-295, W-296 merged on `merge-w29x`, fast-forwarded into `main`; W-291/295/296 archived; W-292 → 🔴 for the L10 confirmation. W-294 stopped half built on its branch, not merged (L11: this repo's golden exclusion is still the `dirs` file it converts).
+- **Found:** W-294's agent: ingest's walk pruned only `dirs` `!` directories, so an exclusion written only in `.fuxignore` would still have been walked file by file. Fixed on its branch (`ignored_dir()`), not on `main`. The W-281 commit lacked its `no SR affected` line (the worktree's guard did not fire); reworded locally before any push, trees unchanged.
+- **Hazard:** six parallel full suites filled the disk twice (ENOSPC); agents switched to targeted tests; whole suites run once on merged `main`.
+- **Next:** Arpit confirms W-292's L10 edits; resume W-294 from `c42c45ee`.
+
+## 2026-10-24 — W-296 filed: `.fux/observers/` only on demand; `.fux/node/` is W-292  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Add another work item to not create .fox/node directory and package by default … Let me know if I'm wrong. … don't create .fox/observer directory by default as well. Only create it through CLI command if anybody needs it."*
+- **Found:** the `.fux/node/` half is already **W-292** (filed 2026-10-21: setup stops vendoring `.fux/node/` + `.fux/fux`, `npm install fux-engine` the only route) — not refiled. A missing `observers/` is already supported: one `stat` in dispatch, doctor says `none installed`.
+- **Done:** W-296 filed (🟢 agent, Sonnet): setup stops seeding; `fux observers init` (name proposed, Arpit may rename); setup removes only a byte-identical README-only dir. No code moved.
+- **Next:** Claude Code picks W-296.
+
+## 2026-10-24 — W-295 filed: policy TOMLs move to `.fux/config/`  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"formats.toml, identifiers.toml, inspect.toml, output.toml, pii.toml, plugins.toml, refuser.toml, tune.toml … rather than keeping it in .fox directory, push it into .fox/config directory. Create a work item for this."*
+- **Found:** the addresses are already centralised in `constants.toml [files]`, except `pii_name` / `refusals_name`, which their modules join under `.fux/` themselves, and `plugins`' `file =` in its own block.
+- **Done:** W-295 filed (🟢 agent, Sonnet) under fux build; no code moved. Breaking by the W-294 stance; `setup` migrates; 🔴 the pii hard stop must name the move, not report "missing". `fux.toml`, `sources.yaml` and `.fuxignore` are out of scope (not asked).
+- **Next:** Claude Code picks W-295.
+
+## 2026-10-24 — W-294 amended: `.fux/sources.yaml`, a strict YAML subset  ·  Cowork (Opus 5.5)
+
+- **Asked:** *"Would it be a good idea to have this file as YAML or TOML … a bit hard to edit by hand."* → *"Improve on TOML as well as YAML structure … what I don't like is the empty brackets."* → *"I would like to go with YAML."*
+- **Proposed:** TOML recommended (readers exist in Python stdlib and `config/toml.mjs`; eight sibling `.toml` files); YAML shown with its traps (implicit typing, `#` in URLs, silent indentation moves, no stdlib reader). Both regrouped so a plain path is a bare list item: `paths: {include, archived, enrich}` flag lists, `urls:` entries.
+- **Ruled:** YAML, as a strict schema-typed subset — refuses flow, anchors, tags, multi-doc, block scalars, tabs, duplicates; types come from the schema, never YAML's guess.
+- **Done:** W-294 detail amended (steps 1, 2, 4, 5, 6, 9; §Format; two fork rows; L2 constraint) and its OPEN-WORK row; no code moved.
+- **Next:** Claude Code picks W-294.
+
 ## 2026-10-24 — W-294 filed: one `.fux/sources` file, `.fuxignore` the only exclusion  ·  Cowork (Fable 5.1)
 
 - **Asked:** *"research and propose a better way to replace sources/url file, sources/dir file, and .fox ignore. I want to replace all these with one or two files."* → *"Create a work item to implement this."*

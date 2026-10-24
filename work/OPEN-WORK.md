@@ -23,13 +23,15 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-293** — copy `ci.yml` and `publish.yml` from the 2026-10-21 Cowork chat into `.github/workflows/` (the bridge may not write there). [the item](open/W-293-first-ci-run-of-the-codelaw-ports.md) | 2026-10-21 | 1d |
+| 🔴 **W-292** — confirm two edits to L10's rationale: decision 3 amended, and *"make the consumer `npm install`"* marked adopted. Law statement untouched. [the item](open/W-292-node-reader-npm-only.md) | 2026-10-21 | 3d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-289** — only fetcher-http and extension-table remain: upload each (one-at-a-time loop, W-289 §Progress 2026-10-24) after PyPI's 429 clears, then Cowork adds its publisher. Rulings made 2026-10-20. [the item](open/W-289-plugin-packages.md) | 2026-10-20 | 2d |
+| 🔴 **W-293** — copy `ci.yml` and `publish.yml` from the 2026-10-21 Cowork chat into `.github/workflows/` (the bridge may not write there). [the item](open/W-293-first-ci-run-of-the-codelaw-ports.md) | 2026-10-21 | 3d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 18d |
+| 🔴 **W-289** — only fetcher-http and extension-table remain: upload each (one-at-a-time loop, W-289 §Progress 2026-10-24) after PyPI's 429 clears, then Cowork adds its publisher. Rulings made 2026-10-20. [the item](open/W-289-plugin-packages.md) | 2026-10-20 | 4d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 12d |
+| 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 20d |
+| ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 14d |
 | ↳ **blocks:** nothing else in the queue | | |
 
 ---
@@ -38,16 +40,15 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-294** · `agent` — `sources/dirs` + `urls` → one `.fux/sources` (paths and URLs, one grammar); `!` leaves it, `.fuxignore` is the only exclusion; `setup` converts; index bytes unchanged. **Opus.** Filed by Arpit (Cowork). [detail](open/W-294-one-sources-file.md)
-- 🔴 **W-289** · `arpit` — plugin packages built on `main` (unreleased). Arpit: only fetcher-http and extension-table remain — upload by token, then publisher (2026-10-24); Claude Code: ruling 1, REGISTER-only package version. Both before the release. Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
-- 🟢 **W-291** · `agent` — `fux setup` installs the index-update git hooks and merge driver by default; `--no-hooks` opts out; no git repo or a foreign hook never fails setup. **Sonnet.** Filed by Arpit (Cowork). [detail](open/W-291-setup-installs-hooks.md)
-- 🟢 **W-292** · `agent` — Node reader only via `npm install fux-engine`: `fux setup` stops vendoring `.fux/node/` + `.fux/fux` and wiring workspaces; wheel drops the bundle; setup removes old copies. **Opus.** Filed by Arpit (Cowork). [detail](open/W-292-node-reader-npm-only.md)
+- 🟢 **W-294** · `agent` — `.fux/sources.yaml`; `.fuxignore` the only exclusion. ⚠ Half built, not on `main`: WIP on its branch (`c42c45ee`). **Opus.** Filed by Arpit (Cowork). [detail](open/W-294-one-sources-file.md)
+- 🔴 **W-289** · `arpit` — plugin packages on `main`. Arpit: upload fetcher-http + extension-table, then publisher; Claude Code: ruling 1. Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
+- 🔴 **W-292** · `arpit` — built on `main` (npm-only Node reader); Arpit confirms two L10 rationale edits; fig-12 not redrawn. Filed by Arpit (Cowork). [detail](open/W-292-node-reader-npm-only.md)
 
 
 ### testing
 
 - 🔴 **W-293** · `arpit` — codelaw ports built; Arpit places two workflow files (`.github/` refuses remote writes), then the first `main` run proves gate, smoke, wheel cache. **Sonnet.** Filed by Arpit (Cowork). [detail](open/W-293-first-ci-run-of-the-codelaw-ports.md)
-- 🟢 **W-281** · `agent` — capture and ladder speed: unsigned ladder commits (rung-10000 stalled 12 h on gpg); G1 and G3 in parallel; latency stays standalone. **Sonnet.** Filed by Arpit (Claude Code). [detail](open/W-281-capture-harness-speed.md)
+- 🟢 **W-281** · `agent` — capture driver built (DoD 1–4, never run); DoD 5 (≤ 30 min, timed) owed by the next capture. **Sonnet.** Filed by Arpit (Claude Code). [detail](open/W-281-capture-harness-speed.md)
 - 🔴 **W-258** · `arpit` — one hands-on session on his machine: an answer whose source then vanishes, a real 429 from a real host, parallel CDP fetches in signed-in Chrome. Checklist and bars written. Filed by Arpit (Cowork). [detail](open/W-258-live-network-captures.md)
 
 ### adr update
