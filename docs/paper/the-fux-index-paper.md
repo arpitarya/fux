@@ -678,9 +678,11 @@ decode (SR-NODE-SEARCH d3–d4, d9–d11). It reads `tune.toml` and `output.toml
 as Python does — until 2026-09-12 it did not, and this repository disagreed on
 90 of 174 orderings; after, 0 of 199.
 
-The consumer sees Node as **one generated file**, `.fux/node/fux.mjs`, built at
-publish into both registries (L10): 244 KB where the vendored source tree had
-been 44–47 files. The Python side is served the same way — installed by pip,
+The consumer sees Node as **one generated file**, `fux.mjs`, built at publish
+(L10): 244 KB where the vendored source tree had been 44–47 files. Since W-292
+(2026-10-21) it ships on npm alone — `npm install fux-engine` is the one way to
+install it; `fux setup` no longer vendors it into `.fux/node/`, and Figure 12's
+`.fux/node/fux.mjs` label predates that. The Python side is served the same way — installed by pip,
 with `.fux/decoders/` and `.fux/fetchers/` the readable exceptions.
 
 The two readers are the third arm of the differential law: ordering byte-equal,

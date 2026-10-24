@@ -63,7 +63,6 @@ _GENERATED_PREFIXES = (
     ".fux/runtime/",
     ".fux/enrich/",
     ".fux/acquired/",
-    ".fux/node/",
 )
 
 #: This file names real record paths in its own docstring to say what it flags —

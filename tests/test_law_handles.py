@@ -44,15 +44,13 @@ ROOT = Path(__file__).resolve().parents[1]
 SR_LAWS = ROOT / "records" / "0001_LAWS.md"
 
 #: Frozen-by-law paths, by prefix. Mirrors test_doc_links.py's exemptions and
-#: adds the generated trees: `.fux/index/` is derived from the corpus and
-#: `.fux/node/` is the built bundle.
+#: adds the generated tree: `.fux/index/` is derived from the corpus.
 _FROZEN_PREFIXES = (
     "archive/",
     "work/golden/",
     "work/regression/",
     "work/benchmark/reports/",
     ".fux/index/",
-    ".fux/node/",
 )
 _FROZEN_FILES = frozenset({"work/WORKLOG.md", "CHANGELOG.md", "tools/archived-signal-eval/queries.jsonl"})
 _TEXT_SUFFIXES = frozenset({".md", ".py", ".mjs", ".js", ".sh", ".toml", ".txt", ".html", ".svg", ".yml", ".yaml", ".json", ".mmd"})

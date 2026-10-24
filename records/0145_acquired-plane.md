@@ -5,13 +5,13 @@ name: SR-ACQUIRED
 title: "SR-ACQUIRED (0145) — retained source bytes"
 description: "Fetched source bytes are retained in .fux/acquired/, a third category beside committed and derived: gitignored, and not rebuildable."
 status: accepted
-amended: 2026-10-20
+amended: 2026-10-24
 date: 2026-09-01
 feature: the acquired plane
 owns: [src/fux/store/acquired.py@89dd8c94308a]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: f039810a1f26657979c8a35b512f2cfd9ca1f8d0e9cf9a6b80e059467e04b9f9
+content_sha: 43ecd705a83b629d3a131623ab7398d9993af1e1c96395d3bff002eb629e0609
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -396,6 +396,8 @@ this moved where they are written, not what they are.
 - **Reusing `runtime/fetch-cache/`.** Rejected: a TTL entry expires, and an artifact store that expires is not one. `fetchcache.py`'s own argument for keeping two stores provably separate applies unchanged to a third.
 - **Storing under `runtime/`.** Rejected by decision 1. `runtime/` means rebuildable, and this is not.
 - **Eviction by `mtime`.** Rejected by decision 7. It is the obvious implementation and it smuggles a wall clock into a plane that forbids one, through the filesystem rather than through a field.
+
+**No decision here moved** (W-292, 2026-10-24): `store/fuxdir.py` dropped the `node` and `fux` rows and the Node vendoring — the reader installs from npm alone (Arpit, 2026-10-21, [SR-NODE-SEARCH](0153_node-search.md)) — and the `.gitignore` template lost `node/node_modules/`; the `acquired/` row, its kind and its ignore line did not move.
 
 **No decision here moved** (W-284, W-285, 2026-10-19): `store/fuxdir.py` changed only the lifecycle and serve verb rows of the `.fux/README.md` template, adding `llms` and `lsp`; the `acquired/` row and its kind did not move.
 

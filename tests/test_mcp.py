@@ -388,9 +388,9 @@ def test_the_node_tool_file_matches_the_python_literal():
 
     ⚠ **What this does NOT cover**, stated because it is the live exposure:
     `node/` is published to npm on its own, so a consumer can hold a
-    `fux-engine` whose descriptions never met this assertion. The vendored
-    `.fux/node/` copy is safe — `fux setup` writes it from the same tree — and
-    the npm copy is covered only by releasing from a green CI run.
+    `fux-engine` whose descriptions never met this assertion. Since W-292 npm
+    is the only copy (`fux setup` vendors nothing), so the Node surface is
+    covered only by releasing from a green CI run.
     """
     import json as json_mod
     from pathlib import Path

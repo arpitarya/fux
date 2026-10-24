@@ -3,16 +3,16 @@ type: Standing Record
 kind: component
 name: SR-NODE-SEARCH
 title: "SR-NODE-SEARCH (0153) — the Node read plane: one index, two readers, three arms"
-description: "Why a Node reader exists, what it may and may not do, and the decisions that keep it from becoming a second product: the _format version policy, the never-fetch rule, the url: verdict asymmetry, the shared tool-description file, and the three places where Node is deliberately a SUBSET of Python rather than a copy — the derived graph plane, the accelerator label, and the decoder boundary. Decisions 13-16 carry the SHIPPING shape, ruled AND BUILT on 2026-09-12: the consumer gets a published artefact rather than source, the bundle is built at publish time into both registries, a monorepo is auto-detected and wired up, and the .fux/fux shim resolves the binary across five package managers."
+description: "Why a Node reader exists, what it may and may not do, and the decisions that keep it from becoming a second product: the _format version policy, the never-fetch rule, the url: verdict asymmetry, the shared tool-description file, and the three places where Node is deliberately a SUBSET of Python rather than a copy — the derived graph plane, the accelerator label, and the decoder boundary. Decisions 13-16 carry the SHIPPING shape: the consumer gets a published artefact rather than source, built once at publish. Since W-292 (Arpit, 2026-10-21) that artefact ships on npm ONLY — `npm install fux-engine` is the one way to install the Node reader; decisions 13, 15 and 16 (vendoring into .fux/node/, monorepo wiring, the .fux/fux shim) are superseded and decision 14 is narrowed to npm."
 status: accepted
-amended: 2026-10-20
+amended: 2026-10-24
 date: 2026-09-12
-feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@5dfe7951d6c5, src/fux/store/nodebundle.py@614431b31982]
+feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine` and installed by `npm install fux-engine` alone (W-292), and held byte-equal to Python by the third arm of the differential law"
+owns: [node@d8cdbd2deaf9, src/fux/store/nodebundle.py@4a729b4224cd]
 laws: [L2, L4, L5, L6]
-ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
+ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1. Arpit, 2026-10-21 (W-292) — the Node reader installs from npm only, superseding 13, 15 and 16 and narrowing 14"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 083842b7e348d238de0f3ad0e5a8a6a5d844c3540070b038fd2c85bdf7c833d9
+content_sha: d3113d8c330e314c770467dfdd30afc84b0f5fd41679b76c624336a1f3c34749
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -24,9 +24,9 @@ content_sha: 083842b7e348d238de0f3ad0e5a8a6a5d844c3540070b038fd2c85bdf7c833d9
 
 **Describes** — reaches into, does not own:
 
-- [`src/fux/health.py::_installed_reader,_node_reader`](../src/fux/health.py) · owned by [SR-DOCTOR](0152_doctor.md)
-- [`src/fux/setup.py::_yarn_berry_linker,detect_workspace,wire_workspace`](../src/fux/setup.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
-- [`src/fux/store/fuxdir.py::_node_source,_packaged_node_files,_prune_node_reader,_workspace_manifest,ensure_node_reader,node_shape,node_version`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
+- [`src/fux/health.py::_node_reader`](../src/fux/health.py) · owned by [SR-DOCTOR](0152_doctor.md)
+- [`src/fux/setup.py::_remove_from_json_array,_remove_from_pnpm_yaml,_shim_is_fuxs,_unwire_workspace,_vendored_files,remove_vendored_reader`](../src/fux/setup.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
+- [`src/fux/store/fuxdir.py::vendored_leftovers`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
 - [`tools/differential/node_arm.py::Arm,bundle_entry`](../tools/differential/node_arm.py) · owned by [SR-T1-ACCELERATOR](0110_accelerator.md)
 
 <!-- COMPONENTS-END -->
@@ -39,9 +39,14 @@ content_sha: 083842b7e348d238de0f3ad0e5a8a6a5d844c3540070b038fd2c85bdf7c833d9
 it. Until now Python was also the only thing that could read it, which made
 "clone and ask" a promise fux could only keep for people who had Python.
 
-`node/` is a second reader. It is published to npm as **`fux-engine`**,
-invoked as **`fux`**, and vendored by `fux setup` into **`.fux/node/`** so a
-clone with nothing installed still answers.
+`node/` is a second reader. It is published to npm as **`fux-engine`** and
+invoked as **`fux`**. 🔴 **`npm install fux-engine` is the only way to install
+it** (Arpit, 2026-10-21, W-292): *"if somebody wants to install it, they can
+install it using npm … that will be the only way to install the node package
+for fux."* `fux setup` vendors nothing into `.fux/node/` and writes no
+`.fux/fux` shim any more, so **the old promise that a clone with nothing
+installed still answers is withdrawn** — Node needs one package install, which
+is package installation and not fux reaching the network (L5 is not engaged).
 
 **It is not a port in the usual sense.** A port is allowed to be different in
 ways nobody minds; this one is held byte-equal to Python by a third arm of the
@@ -399,6 +404,21 @@ internally consistent, and the shared descriptions file held only the
 descriptions, not the handlers. `node_arm.py::compare_mcp` now drives both over
 one stdio session per run.
 
+🔴 **SUPERSEDED by W-292 (Arpit, 2026-10-21) — `fux setup` vendors nothing.**
+The rule this decision made — *the consumer gets build output, never source* —
+stands, and is L10's. What it built does not: neither shape is written, the
+`.fux/node/` payload and its prune are deleted (`ensure_node_reader`,
+`_packaged_node_files`, `_prune_node_reader`, `node_shape`), and a consumer who
+wants the Node reader runs `npm install fux-engine`. **`fux setup` now REMOVES
+what an earlier setup wrote** — shape A's four files, or shape C's manifest, and
+only when that manifest is the one setup wrote; anything else under
+`.fux/node/` (a `node_modules/`, a stale `src/`) is kept and named
+(`setup.py::remove_vendored_reader`). **Ingest never runs it**, by
+constraint 1 of decision 15 below, which is the one clause of that decision
+still standing. `doctor`'s `node reader` row warns on a leftover and otherwise
+passes. The text below is what was ruled and built on 2026-09-12, kept as the
+reason the migration has the shape it has.
+
 **13. 🔴 The consumer gets NO SOURCE. `.fux/node/` carries a published
 artefact, never a copy of `node/`.** RULED by Arpit 2026-09-12 and **BUILT the
 same day** (W-149, closed).
@@ -446,6 +466,15 @@ tree goes and `node_modules/` stays. **The test that used to assert the opposite
 (*"writes the whole tree, not just the entry point"*, naming
 `src/query/bm25f.mjs` by hand) **is the same file, rewritten**, which is the only
 honest way to record that a decision reversed.
+
+🔴 **NARROWED by W-292 (Arpit, 2026-10-21): the bundle ships on npm ONLY** —
+`fux-engine` and the same bytes as `@fux-engine/reader`. No PyPI wheel carries
+it: `packages/layer_hook.py` no longer force-includes `fux/templates/node/`
+into `fux-writer`, and CI and `publish.yml` assert that no built wheel holds a
+`.mjs`. Everything else here stands — one build in `publish.yml`, the
+zero-dependency deterministic bundler, the version-parity check, *"it shouldn't
+be bundled at the consumer end"*. The bullets naming the wheel, `_node_source()`
+and `_packaged_node_files` describe code that is deleted.
 
 **14. 🔴 The bundle is built when fux PUBLISHES, and ships inside BOTH
 distributions.** RULED by Arpit 2026-09-12 and **BUILT the same day**.
@@ -534,6 +563,16 @@ distributions.** RULED by Arpit 2026-09-12 and **BUILT the same day**.
   --with-bundle` asserts the built bundle's header and `VERSION` against
   `src/fux/__init__.py` — the bundle is a **derivation**, so what is checked is
   the derivation and not a fifth hand-written site.
+
+🔴 **SUPERSEDED by W-292 (Arpit, 2026-10-21) — fux wires no workspace.**
+`detect_workspace`, `wire_workspace`, `_yarn_berry_linker` and the splicers are
+deleted; `fux setup` never writes a consumer's root `package.json` or
+`pnpm-workspace.yaml` **except to take out the `.fux/node` entry an earlier
+setup added**, by the reverse, format-preserving splice
+(`setup.py::_unwire_workspace`). A team that wants the reader in its workspace
+adds `fux-engine` to its own manifest. **Constraint 1 survives and binds the
+migration**: the edit is `setup`'s alone, never an ingest's. The two probes stay
+filed as history; nothing cites them as in force.
 
 **15. 🔴 A monorepo is AUTO-DETECTED and wired up — and the dot path is
 MEASURED to work.** RULED by Arpit 2026-09-12 (*"Auto detect. Auto detect and
@@ -636,6 +675,14 @@ Yarn 4.1.0). Two findings:
   resolve, which is constraint 4's state in a new costume. `corepack yarn fux`
   is not a fallback either — under PnP a binary is reached through Yarn's own
   resolver, which a three-line `/bin/sh` shim cannot consult.
+
+🔴 **SUPERSEDED by W-292 (Arpit, 2026-10-21) — the `.fux/fux` shim is
+retired**, not kept with rungs 2–3: its stated reason (*"a clone needs nothing
+installed at all"*) is what the ruling removed. The template
+`templates/fux-shim.sh.txt` is deleted; `fux setup` removes a shim whose bytes
+say setup wrote it and keeps any other `.fux/fux`, named. The entry point a
+README names is now the package's own `bin`: `npx fux …` after `npm install
+fux-engine`.
 
 **16. 🔴 `.fux/fux` RESOLVES the binary in three rungs; it no longer assumes a
 path.** RULED 2026-09-12 and **BUILT the same day**. Measured, same probe.

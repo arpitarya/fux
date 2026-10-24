@@ -10,5 +10,4 @@
 # reachable. Both are ignored; only one can be regenerated.
 {planes}
 __pycache__/
-node/node_modules/
 index/*.jsonl.tmp

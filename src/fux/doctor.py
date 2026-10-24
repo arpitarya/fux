@@ -53,7 +53,6 @@ from .health import (  # noqa: F401  (every row keeps its doctor.* name)
     _ignore_reachable,
     _index_not_ignored,
     _index_temp_ignored,
-    _installed_reader,
     _is_git_ignored,
     _is_git_tracked,
     _is_node_shim,

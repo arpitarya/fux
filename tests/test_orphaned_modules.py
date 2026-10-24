@@ -31,6 +31,7 @@ until it is the answer.
 | every first-party decoder module | `constants.toml [plugins.packages.*] modules` | since W-289 phase 2 each lives in a `fux-decoder-*` package and is imported by NAME, only when declared (SR-PLUGINS P7) |
 | `fux.schemas` | `constants.toml` `[schema_files] package` | a data package: `schema.load` resolves it by name through `importlib.resources` (W-226) |
 | every verb module | `cli.VERBS` | `cli.py` is core and runs a verb by module NAME, so a missing layer is refused rather than imported (W-282) |
+| every `python -m fux.<module>` in `.github/workflows/*.yml` | the release and CI workflows | a build-time tool the release runs by module name — `fux.store.nodebundle`, which builds npm's bundle and, since W-292, is imported by nothing that ships |
 
 **All four are read from the repository**, so adding a decoder or an entry
 point keeps the check honest with no edit here. The decoders are the case that
@@ -194,9 +195,22 @@ def _verb_modules() -> set[str]:
     raise AssertionError("cli.py carries no VERBS table")
 
 
+def _workflow_modules() -> set[str]:
+    """Every `python -m fux.<module>` a workflow runs (W-292). The release
+    builds npm's bundle with `python -m fux.store.nodebundle`; since no wheel
+    carries the bundle, nothing that ships imports the bundler, and the
+    workflow is where its caller is declared."""
+    import re
+
+    found: set[str] = set()
+    for workflow in sorted((ROOT / ".github" / "workflows").glob("*.yml")):
+        found |= set(re.findall(r"python3? -m (fux(?:\.\w+)+)", workflow.read_text(encoding="utf-8")))
+    return found
+
+
 def _roots() -> set[str]:
     return (_console_scripts() | {"fux.__main__"} | _builtin_decoders() | _schema_package()
-            | _verb_modules())
+            | _verb_modules() | _workflow_modules())
 
 
 def _reachable(modules: dict[str, Path]) -> set[str]:

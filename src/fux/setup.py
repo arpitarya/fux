@@ -16,6 +16,11 @@ install line. **It installs nothing** — no network from fux (L5) — and a fil
 consumer drops into `.fux/fetchers/` or `.fux/decoders/` still overrides the
 package of the same name (P8).
 
+**`fux setup` writes no Node reader** (W-292, Arpit 2026-10-21): the reader is
+installed by `npm install fux-engine` and nothing else. What an earlier setup
+vendored — `.fux/node/`, the `.fux/fux` shim, a `.fux/node` workspace entry — is
+removed here, exactly that set and nothing more (`remove_vendored_reader`).
+
 Everything here is **write-if-missing**, except `.fux/plugins.toml`, whose rows
 setup ADDS (a package the sources now need) and PINS (a row with no digest,
 once its package is installed; every row under `--pin`) and never removes.
@@ -28,7 +33,6 @@ would be circular. Every other verb errors without one.
 from __future__ import annotations
 
 import json
-import os
 import re
 from typing import NamedTuple
 from dataclasses import dataclass, field
@@ -43,6 +47,7 @@ from .config import (
     load,
 )
 from . import decode as decode_mod
+from .constants import fixed
 from .errors import FuxError
 from .acquire import fuxignore, pii, refusals
 from .store import fuxdir
@@ -693,24 +698,20 @@ class SetupReport:
     converted_types: bool = False
     #: `!` patterns that moved from the old types file into `.fux/.fuxignore`.
     moved_exclusions: list[str] = field(default_factory=list)
-    #: Paths this run DELETED — the Node reader's prune, and nothing else
-    #: today. Separate from `written` because a consumer reading "wrote
-    #: .fux/node/src/query/rank.mjs" about a file that is now gone would be
-    #: told the opposite of what happened (SR-NODE-SEARCH decision 13).
+    #: Paths this run DELETED — what an earlier setup vendored for the Node
+    #: reader (`.fux/node/`'s files and the `.fux/fux` shim), and nothing else.
+    #: Separate from `written` because a consumer reading "wrote .fux/fux"
+    #: about a file that is now gone would be told the opposite of what
+    #: happened (W-292 DoD 4).
     removed: list[str] = field(default_factory=list)
-    #: Which shape `.fux/node/` was written in — `"A"` (the vendored bundle) or
-    #: `"C"` (a workspace member). SR-NODE-SEARCH decision 13.
-    node_shape: str = fuxdir.SHAPE_VENDORED
-    #: The consumer manifest this run EDITED, repo-relative, or `None`.
-    #: **Announced always** — decision 15 constraint 3: a silent write to a
-    #: tracked file a team reviews is how trust goes.
-    wired_manifest: "str | None" = None
-    #: Why shape A was written where a monorepo was detected anyway. Printed,
-    #: because "half-configured is not a state" is only honest if the fallback
-    #: says which state it chose (decision 15 constraint 4).
-    workspace_note: "str | None" = None
-    #: The package manager whose install command the consumer now has to run.
-    workspace_manager: "str | None" = None
+    #: Entries under `.fux/node/` (or the shim) the migration KEPT, each with
+    #: why: fux deletes nothing it did not write, so anything else is named and
+    #: left for the consumer (W-292 DoD 4).
+    left: list[str] = field(default_factory=list)
+    #: Consumer manifests the migration EDITED to take out the `.fux/node`
+    #: workspace entry an earlier setup spliced in. Announced always: a write
+    #: to a tracked file a team reviews is never silent.
+    unwired: list[str] = field(default_factory=list)
     #: Fux-written files this run UPDATED in place — `.fux/plugins.toml`'s
     #: added or pinned rows, and nothing else (SR-PLUGINS P6).
     updated: list[str] = field(default_factory=list)
@@ -1287,152 +1288,67 @@ def _write_root_agents(root: Path, report: SetupReport) -> None:
 
 
 # ---------------------------------------------------------------------------
-# The monorepo shape -- SR-NODE-SEARCH decision 15, ruled by Arpit 2026-09-12
-# ("Auto detect. Auto detect and set it up as well.").
+# The Node reader an earlier setup vendored -- W-292 (Arpit, 2026-10-21:
+# "if somebody wants to install it, they can install it using npm ... that will
+# be the only way to install the node package for fux").
 #
-# 🔴 **This is fux's FIRST write to a file it does not own and a team reviews.**
-# `fux hooks` writes `.git/`, which is machinery; a root `package.json` is
-# source, and a one-line addition arriving as a whole-file reformat is a bad
-# diff in somebody's pull request. Hence: text edits, never a re-serialize.
+# Until 4.1.x `fux setup` wrote `.fux/node/` (the bundle and three sidecars --
+# shape A -- or, in a detected monorepo, a manifest declaring `fux-engine` --
+# shape C), the `.fux/fux` shim, and in shape C a `.fux/node` entry spliced
+# into the consumer's root `package.json` or `pnpm-workspace.yaml`. **Setup now
+# removes exactly that, and nothing else:**
 #
-# ⚠ **It lives in `setup.py` and NOT in `fuxdir.py` on purpose.**
-# `fuxdir.ensure_layout` runs at the head of every ingest; a manifest edit
-# reachable from there would rewrite the consumer's `package.json` on a no-op
-# ingest (decision 15 constraint 1). Structure, rather than a comment asking
-# nobody to call it.
+# - a file is removed only when its NAME is one setup wrote AND `.fux/node/`'s
+#   manifest is the one setup wrote (`fux-engine` with `bin`, or the
+#   `fux-reader` stub depending on `fux-engine`). Anything else under
+#   `.fux/node/` -- a `node_modules/`, a stale `src/`, a consumer's own file --
+#   is KEPT and named, because fux deletes nothing it did not write;
+# - the shim is removed only when its bytes say `fux setup` wrote it;
+# - the manifest entry is removed by a text splice, the reverse of the one
+#   that added it, so the consumer's formatting survives.
 #
-# ⚠ **Why detection does not conflict with "declared, never detected"**:
-# SR-FETCHER decision 5 and W-86 fork E govern INGEST, where detection makes
-# the INDEX a function of the environment and L4 forbids it. Scaffolding is not
-# the index; no law reaches it.
+# ⚠ **Here, in `setup.py`, and never in `fuxdir.ensure_layout`.** That runs at
+# the head of every ingest, and an ingest must not edit committed files outside
+# its plane (SR-NODE-SEARCH decision 15 constraint 1). Doctor warns about a
+# leftover instead (`health._node_reader`).
 # ---------------------------------------------------------------------------
 
-#: The workspace path fux asks for. MEASURED to link in npm, pnpm, yarn 1 and
-#: bun (work/regression/2026-09-12-workspace-dotpath-probe) — the dot prefix
-#: breaks nothing — and MEASURED not to be picked up by a `packages/*` glob in
-#: any of the four, which is why the wiring is required rather than convenient.
-WORKSPACE_MEMBER = ".fux/node"
+#: The workspace entry an earlier setup spliced into a consumer manifest.
+WORKSPACE_MEMBER = f"{fuxdir.FUX_DIR}/{fuxdir.NODE_DIR}"
+
+#: The files shape A wrote: the bundle and its sidecars, by the bundler's names.
+_SHAPE_A = frozenset({fixed("bundle", "entry"), *fixed("bundle", "sidecars")})
+#: The one file shape C wrote: the manifest.
+_SHAPE_C = frozenset({fixed("bundle", "package")})
 
 
-@dataclass(frozen=True)
-class Workspace:
-    """A monorepo fux found, and the one file it would have to edit."""
+def _vendored_files(target: Path) -> "frozenset[str]":
+    """The names under `.fux/node/` an earlier setup wrote, read off its manifest.
 
-    #: `pnpm` / `npm` / `yarn` / `bun` — used for the install command printed
-    #: at the end, and for nothing else. The SHAPE does not depend on it.
-    manager: str
-    #: The manifest carrying the workspace list.
-    manifest: Path
-    #: `"pnpm-yaml"` or `"package-json"` — which editor applies.
-    kind: str
-
-
-def _package_manager(root: Path) -> str:
-    """Whose install command to print, from the lockfile that is actually here."""
-    for name, manager in (
-        ("pnpm-lock.yaml", "pnpm"),
-        ("bun.lockb", "bun"),
-        ("bun.lock", "bun"),
-        ("yarn.lock", "yarn"),
-        ("package-lock.json", "npm"),
-    ):
-        if (root / name).is_file():
-            return manager
-    return "npm"
-
-
-def _yarn_berry_linker(root: Path) -> "str | None":
-    """Yarn 2+'s `nodeLinker`, or `None` when this is not a Berry repository.
-
-    🔴 **MEASURED on 2026-09-12, and the answer splits on this one key**
-    ([probe 2](../../work/regression/2026-09-12-yarn-berry-probe/report.md), Yarn
-    4.1.0):
-
-    | `nodeLinker` | `.fux/node` links | where `fux` lands | shape |
-    |---|---|---|---|
-    | `node-modules` | yes | the workspace ROOT's `node_modules/.bin` | **C** |
-    | `pnp` (Berry's default) | yes | nowhere — there is no `node_modules` | **A** |
-
-    So the dot path was never the problem in Berry either; **the linker is.**
-    Under PnP a binary is reached through Yarn's own resolver, which a
-    three-line `/bin/sh` shim cannot do, and shape A is both correct and
-    offline. `None` means *not Berry* and the ordinary detection continues.
-
-    ⚠ **Checked BEFORE the `workspaces` array, which is not the order
-    SR-NODE-SEARCH decision 15's table was written in — and the table was
-    wrong.** A Berry repository declares `workspaces` in `package.json` exactly
-    like npm does, so a literal first-hit reading of that table gave every
-    Berry repo shape C, including the PnP ones the record's own warning says
-    must not have it. The record is amended with this change.
+    Empty when the manifest is absent, unreadable, or not one fux wrote — and
+    then nothing in the directory is fux's to delete.
     """
-    rc = next((root / n for n in (".yarnrc.yml", ".yarnrc.yaml") if (root / n).is_file()), None)
-    manifest = root / "package.json"
-    berry = rc is not None
-    shape_object = False
-    if manifest.is_file():
-        try:
-            meta = json.loads(manifest.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            meta = {}
-        declared = meta.get("packageManager")
-        if isinstance(declared, str) and declared.startswith("yarn@"):
-            major = declared[len("yarn@") :].split(".")[0]
-            berry = berry or (major.isdigit() and int(major) >= 2)
-        # The object form (`workspaces: {packages: [...]}`) is Berry's own and
-        # is not a list the array splicer can extend.
-        shape_object = isinstance(meta.get("workspaces"), dict)
-    if not berry:
-        return None
-    if shape_object:
-        return "object-form"
-    linker = None
-    if rc is not None:
-        m = re.search(r"^nodeLinker\s*:\s*[\"']?([\w-]+)", rc.read_text(encoding="utf-8"), re.M)
-        linker = m.group(1) if m else None
-    # Berry's default is PnP, so an unset key means PnP — never "assume the
-    # convenient one". Getting this backwards would wire a workspace whose
-    # reader nothing can resolve, which is the state decision 15 forbids.
-    return linker or "pnp"
+    try:
+        meta = json.loads((target / fixed("bundle", "package")).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return frozenset()
+    if not isinstance(meta, dict):
+        return frozenset()
+    deps = meta.get("dependencies")
+    if meta.get("name") == "fux-reader" and isinstance(deps, dict) and "fux-engine" in deps:
+        return _SHAPE_C
+    if meta.get("name") == "fux-engine" and isinstance(meta.get("bin"), dict) and not deps:
+        return _SHAPE_A
+    return frozenset()
 
 
-def detect_workspace(root: Path) -> "Workspace | None":
-    """The monorepo shape, or `None` when there is no monorepo here.
-
-    ⚠ **Yarn Berry comes back as a workspace fux will NOT wire**, rather than
-    as `None`. The difference is what the consumer is told: `None` means "no
-    monorepo", and saying that to somebody who has one would be false. The
-    refusal path prints the real reason and writes shape A.
-    """
-    linker = _yarn_berry_linker(root)
-    if linker is not None and linker != "node-modules":
-        return Workspace(manager="yarn", manifest=root / "package.json", kind=f"yarn-{linker}")
-    for name in ("pnpm-workspace.yaml", "pnpm-workspace.yml"):
-        path = root / name
-        if path.is_file() and re.search(r"^packages\s*:", path.read_text(encoding="utf-8"), re.M):
-            return Workspace(manager="pnpm", manifest=path, kind="pnpm-yaml")
-    manifest = root / "package.json"
-    if manifest.is_file():
-        try:
-            text = manifest.read_text(encoding="utf-8")
-        except OSError:
-            return None
-        try:
-            meta = json.loads(text)
-        except ValueError:
-            # ⚠ **A manifest fux cannot parse but that CLAIMS workspaces is
-            # still a monorepo**, and returning `None` here would write shape A
-            # with nothing said about it. It comes back as a workspace the
-            # refusal path declines, so the run prints the reason (constraint 4).
-            if '"workspaces"' in text:
-                return Workspace(
-                    manager=_package_manager(root), manifest=manifest, kind="package-json"
-                )
-            return None
-        if isinstance(meta.get("workspaces"), list):
-            return Workspace(
-                manager=_package_manager(root), manifest=manifest, kind="package-json"
-            )
-    return None
+def _shim_is_fuxs(path: Path) -> bool:
+    """Did `fux setup` write this `.fux/fux`? Read, never run."""
+    try:
+        head = path.read_text(encoding="utf-8", errors="replace")[: fixed("bundle", "shim_sniff_chars")]
+    except OSError:
+        return False
+    return head.startswith("#!/bin/sh") and "fux setup" in head and "node" in head
 
 
 def _matching_bracket(text: str, start: int) -> int:
@@ -1455,18 +1371,11 @@ def _matching_bracket(text: str, start: int) -> int:
     return -1
 
 
-def _insert_into_json_array(text: str, key: str, member: str) -> "str | None":
-    """Add `member` to the array at `key`, preserving the file's shape.
-
-    Returns the new text, or `None` when the edit is not safe to make — which
-    is a fallback to shape A, never a best-effort write (decision 15
-    constraint 4). Indentation, key order and the trailing newline survive
-    because nothing is re-serialized: this is a splice.
-
-    The key may be quoted (`"workspaces":`, JSON) or bare (`packages:`, a
-    pnpm flow sequence) — one splicer, because the bracket shapes are identical
-    and a second copy would be the drift this repo keeps paying for.
-    """
+def _remove_from_json_array(text: str, key: str, member: str) -> "str | None":
+    """`text` with `"member"` taken out of the array at `key`, or `None` when
+    it is not there. A splice, never a re-serialize, so indentation, key order
+    and the trailing newline survive — the reverse of the insertion setup made
+    (the element went in last, and the element before it gained a comma)."""
     m = re.search(r'"?%s"?\s*:\s*' % re.escape(key), text)
     if m is None:
         return None
@@ -1477,110 +1386,92 @@ def _insert_into_json_array(text: str, key: str, member: str) -> "str | None":
     if close_at == -1:
         return None
     inner = text[open_at + 1 : close_at]
-    if f'"{member}"' in inner:
-        return text  # already wired; idempotent (constraint 3)
     quoted = f'"{member}"'
-    if "\n" not in inner:
-        spliced = quoted if not inner.strip() else f"{inner.rstrip()}, {quoted}"
-        return text[: open_at + 1] + spliced + text[close_at:]
-    # Multi-line: copy the last element's own indentation, and give it the comma
-    # it did not need while it was last. The line holding the closing bracket's
-    # indentation is part of `inner` and is left exactly as it was.
-    lines = inner.splitlines()
-    filled = [i for i, line in enumerate(lines) if line.strip()]
-    if not filled:
+    if quoted not in inner:
         return None
-    at = filled[-1]
-    last = lines[at].rstrip()
-    indent = lines[at][: len(lines[at]) - len(lines[at].lstrip())]
-    lines[at] = last if last.endswith(",") else last + ","
-    lines.insert(at + 1, indent + quoted)
+    if "\n" not in inner:
+        kept = [part.strip() for part in inner.split(",") if part.strip() and part.strip() != quoted]
+        return text[: open_at + 1] + ", ".join(kept) + text[close_at:]
+    lines = inner.split("\n")
+    at = next((i for i, line in enumerate(lines) if line.strip().rstrip(",").strip() == quoted), None)
+    if at is None:
+        return None
+    del lines[at]
+    filled = [i for i, line in enumerate(lines) if line.strip()]
+    # The entry was the last element: the one now last loses the comma it
+    # gained when the entry was appended after it.
+    if filled and at > filled[-1]:
+        last = filled[-1]
+        lines[last] = lines[last].rstrip()
+        if lines[last].endswith(","):
+            lines[last] = lines[last][:-1]
     return text[: open_at + 1] + "\n".join(lines) + text[close_at:]
 
 
-def _insert_into_pnpm_yaml(text: str, member: str) -> "str | None":
-    """Add `member` to `pnpm-workspace.yaml`'s `packages:` list.
-
-    Handles the block form (`- 'packages/*'`) and the flow form
-    (`packages: ["packages/*"]`), matching the quoting style already there.
-    Anything else returns `None` and falls back to shape A.
-    """
+def _remove_from_pnpm_yaml(text: str, member: str) -> "str | None":
+    """`pnpm-workspace.yaml` with `member` taken out of `packages:`, or `None`."""
     m = re.search(r"^packages\s*:(?P<rest>.*)$", text, re.M)
     if m is None:
         return None
     if m.group("rest").strip().startswith("["):
-        # The flow form is JSON enough for the array splicer, applied to the
-        # tail so an earlier `[` in a comment cannot be matched by mistake.
-        spliced = _insert_into_json_array(text[m.start() :], "packages", member)
+        spliced = _remove_from_json_array(text[m.start() :], "packages", member)
         return None if spliced is None else text[: m.start()] + spliced
+    item = re.compile(r"^\s+-\s*([\"']?)%s\1\s*$" % re.escape(member))
     lines = text.splitlines(keepends=True)
-    start = text[: m.start()].count("\n")
-    items: list[int] = []
-    for i in range(start + 1, len(lines)):
-        stripped = lines[i].strip()
-        if not stripped or stripped.startswith("#"):
+    kept = [line for line in lines if not item.match(line.rstrip("\r\n"))]
+    return None if len(kept) == len(lines) else "".join(kept)
+
+
+def _unwire_workspace(root: Path, report: "SetupReport") -> None:
+    """Take `.fux/node` out of the consumer's workspace manifest, if setup put it there."""
+    for name in ("pnpm-workspace.yaml", "pnpm-workspace.yml", "package.json"):
+        path = root / name
+        if not path.is_file():
             continue
-        if re.match(r"^\s+-\s", lines[i]):
-            items.append(i)
-            continue
-        break  # the next key -- the list is over
-    if not items:
-        return None
-    sample = lines[items[-1]]
-    if member in sample or any(member in lines[i] for i in items):
-        return text  # already wired
-    indent = sample[: len(sample) - len(sample.lstrip())]
-    quote = '"' if '"' in sample else ("'" if "'" in sample else "")
-    ending = "\n" if sample.endswith("\n") else ""
-    lines.insert(items[-1] + 1, f"{indent}- {quote}{member}{quote}{ending or chr(10)}")
-    return "".join(lines)
-
-
-def wire_workspace(root: Path, workspace: Workspace) -> "tuple[bool, str | None]":
-    """Declare `.fux/node` in the consumer's manifest.
-
-    Returns `(edited, refusal)`. `edited` is False with a `refusal` string when
-    the manifest cannot be changed safely — comments in the JSON, an unknown
-    list shape, a read-only file. **Half-configured is not a state**: the caller
-    then writes shape A and says why.
-    """
-    path = workspace.manifest
-    try:
-        before = path.read_text(encoding="utf-8")
-    except OSError as exc:
-        return False, f"{path.name} could not be read ({exc.strerror})"
-    if not os.access(path, os.W_OK):
-        return False, f"{path.name} is read-only"
-
-    if workspace.kind == "yarn-pnp":
-        return False, (
-            "this is a Yarn Berry repository using PnP, which has NO node_modules for "
-            "`.fux/fux` to resolve a binary from - measured, not assumed "
-            "(SR-NODE-SEARCH decision 15). Set `nodeLinker: node-modules` and re-run "
-            "`fux setup` if you would rather have the workspace shape"
-        )
-    if workspace.kind == "yarn-object-form":
-        return False, (
-            "this manifest declares `workspaces` as an object, which fux will not edit by "
-            "guess (SR-NODE-SEARCH decision 15 constraint 4)"
-        )
-    if workspace.kind == "pnpm-yaml":
-        after = _insert_into_pnpm_yaml(before, WORKSPACE_MEMBER)
-    else:
         try:
-            json.loads(before)
-        except ValueError:
-            return False, f"{path.name} is not plain JSON (comments or trailing commas?)"
-        after = _insert_into_json_array(before, "workspaces", WORKSPACE_MEMBER)
-    if after is None:
-        return False, f"{path.name}'s workspace list is in a shape fux will not edit by guess"
-    if after == before:
-        return True, None  # already declared -- idempotent, and still shape C
-    try:
-        path.write_text(after, encoding="utf-8")
-    except OSError as exc:
-        return False, f"{path.name} could not be written ({exc.strerror})"
-    return True, None
+            before = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        if name == "package.json":
+            after = _remove_from_json_array(before, "workspaces", WORKSPACE_MEMBER)
+        else:
+            after = _remove_from_pnpm_yaml(before, WORKSPACE_MEMBER)
+        if after is None or after == before:
+            continue
+        try:
+            path.write_text(after, encoding="utf-8")
+        except OSError as exc:
+            report.left.append(f"{name} (still lists {WORKSPACE_MEMBER}; not writable: {exc.strerror})")
+            continue
+        report.unwired.append(name)
+
+
+def remove_vendored_reader(root: Path, report: "SetupReport") -> None:
+    """Remove what an earlier `fux setup` vendored, and only that. W-292 DoD 4."""
+    directory = fuxdir.fux_dir(root)
+    shim = directory / fuxdir.NODE_SHIM
+    if shim.is_file():
+        rel = shim.relative_to(root).as_posix()
+        if _shim_is_fuxs(shim):
+            shim.unlink()
+            report.removed.append(rel)
+        else:
+            report.left.append(f"{rel} (not the shim fux setup wrote)")
+    target = directory / fuxdir.NODE_DIR
+    if target.is_dir():
+        for name in sorted(_vendored_files(target)):
+            path = target / name
+            if path.is_file():
+                path.unlink()
+                report.removed.append(path.relative_to(root).as_posix())
+        for child in sorted(target.iterdir(), key=lambda p: p.name):
+            report.left.append(
+                f"{child.relative_to(root).as_posix()}{'/' if child.is_dir() else ''} "
+                "(not written by fux setup; delete it yourself if it is not wanted)"
+            )
+        if not any(target.iterdir()):
+            target.rmdir()
+    _unwire_workspace(root, report)
 
 
 def write_plugins(root: Path, report: "SetupReport", *, pin_all: bool = False) -> None:
@@ -1656,26 +1547,11 @@ def run(root: Path, *, agents: bool = True, pin: bool = False) -> SetupReport:
     from .output_config import OUTPUT_NAME, specimen as output_specimen
 
     report = SetupReport()
-    # 🔴 **The monorepo shape is decided ONCE, here.** `ensure_layout` runs at
-    # the head of every ingest and must never edit a consumer manifest
-    # (SR-NODE-SEARCH decision 15 constraint 1); what it gets is the answer,
-    # already decided, as a keyword.
-    workspace = detect_workspace(root)
-    if workspace is not None:
-        wired, refusal = wire_workspace(root, workspace)
-        if wired:
-            report.node_shape = fuxdir.SHAPE_WORKSPACE
-            report.wired_manifest = workspace.manifest.relative_to(root).as_posix()
-            report.workspace_manager = workspace.manager
-        else:
-            # Half-configured is not a state (constraint 4): shape A, and the
-            # reason travels to the consumer rather than into a log nobody reads.
-            report.workspace_note = refusal
-    for path in fuxdir.ensure_layout(root, node_shape=report.node_shape):
-        rel = path.relative_to(root).as_posix()
-        # `ensure_node_reader` returns what it wrote AND what it pruned; at this
-        # moment, existence is exactly the difference between the two.
-        (report.written if path.exists() else report.removed).append(rel)
+    for path in fuxdir.ensure_layout(root):
+        report.written.append(path.relative_to(root).as_posix())
+    # W-292: the Node reader installs from npm alone. What an earlier setup
+    # vendored is removed here, and only here -- never by an ingest.
+    remove_vendored_reader(root, report)
 
     directory = fuxdir.fux_dir(root)
     # W-289, SR-PLUGINS P9: no decoder and no fetcher is seeded. The package a
@@ -1824,21 +1700,11 @@ def cmd_setup(args) -> int:
             "`fux observers init` creates it when you want one)"
         )
     for rel in report.removed:
-        print(f"  removed {rel} (stale: the reader ships as one bundle now)")
-    if report.wired_manifest:
-        # Announced, always. Decision 15 constraint 3: a silent write to a
-        # tracked file a team reviews is how trust goes.
-        print()
-        print(f"  monorepo detected: declared {WORKSPACE_MEMBER} in {report.wired_manifest}")
-        print(
-            f"        .fux/node/ holds a manifest only; run `{report.workspace_manager} install`"
-            " and then `.fux/fux ask ...`"
-        )
-    elif report.workspace_note:
-        print()
-        print("  note: a monorepo was detected, and fux vendored the offline bundle")
-        print("        into .fux/node/ rather than wiring a workspace, because:")
-        print(f"        {report.workspace_note}")
+        print(f"  removed {rel} (an earlier setup vendored it; the Node reader is `npm install fux-engine` now)")
+    for rel in report.unwired:
+        print(f"  updated {rel} (removed the {WORKSPACE_MEMBER} workspace entry an earlier setup added)")
+    for note in report.left:
+        print(f"  left  {note}")
     if not report.written:
         print("setup: nothing to do - every consumer-owned file is already here")
     else:

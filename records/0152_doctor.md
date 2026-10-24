@@ -5,14 +5,14 @@ name: SR-DOCTOR
 title: "SR-DOCTOR (0152) — what `fux doctor` checks, and why each row is a warning or an error"
 description: "One record owns the health-check surface. Every check names a cause and never repairs it; warn is the default and error is reserved for a repo a verb will refuse; a check that degrades to `skipped` must name the row that does fail."
 status: accepted
-amended: 2026-10-20
+amended: 2026-10-24
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@e3588499a8e5, tests/test_doctor_register_is_complete.py@dff0d535b078, src/fux/health.py@f665a7447c79, src/fux/query/health.py@f2e53c6fb7b0, src/fux/ingest/health.py@790330a4e1fc]
+owns: [src/fux/doctor.py@479c7b3ec497, tests/test_doctor_register_is_complete.py@dff0d535b078, src/fux/health.py@cfc85b7cb71d, src/fux/query/health.py@f2e53c6fb7b0, src/fux/ingest/health.py@790330a4e1fc]
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 0187a8c6841403a6d81c1ca378bb6b7e70edacd3be1dfd24e980b4862a1c43be
+content_sha: 821b4270c04f77b224e339fb5926e97d441b703cd25a1a627f8811c8a6413295
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -237,7 +237,7 @@ failure `tune.toml` taught (decision 10). The table said `warn` for all three.
 
 
 | `accelerator` | warn | built, fresh or stale against the committed index, **and each committed shard's bytes against the sha `manifest.json` recorded at build** — a same-size, same-mtime byte flip that `is_fresh` cannot see (W-246) | [SR-T1-ACCELERATOR](0110_accelerator.md) |
-| `node reader` | warn | `.fux/node/`'s `package.json` version against the engine's, **its SHAPE, and whether that shape can actually RUN** (amended 2026-09-12, L10). **The one drift `doctor` can still see** under the fourth `.fux/` shape: the vendored bundle is overwritten on a version difference, so a repo whose owner has not run `setup` or `ingest` since upgrading ships a reader that may not understand the index beside it. Three things beyond the version, because the two shapes fail differently: a **stale `src/` tree** still sitting beside the bundle (fux's own source in a consumer's repository — it means `setup` has not run since the prune shipped), a **shape-C manifest with no `node_modules/.bin/fux`** resolving anywhere `.fux/fux` would look (decision 15's *half-configured is not a state*, observed rather than assumed away), and **which shape** it is at all. Never an error — Python answers without it | [SR-NODE-SEARCH](0153_node-search.md) |
+| `node reader` | warn | **a leftover from an earlier `fux setup`** (W-292, Arpit 2026-10-21). The Node reader installs from npm alone (`npm install fux-engine`), so **a repository with no Node reader is the normal state and the row passes**, naming the install. It **warns** when `.fux/node/` or `.fux/fux` still exists — a bundle frozen at the version that wrote it, which nothing rewrites any more — with *"run `fux setup` to remove"*. Existence only: which files are fux's to delete is setup's question, never doctor's (decision 6's *a check, never a deletion*). Until W-292 this row checked the vendored copy's version and shape ([SR-NODE-SEARCH](0153_node-search.md) decisions 13–16, superseded) |
 | `fux on PATH` | warn | **which `fux` the shell resolves.** `npm i -g fux-engine` puts a second `fux` on PATH with a **different verb set**, so `fux ingest` can answer *"this only reads"* on a machine where Python fux would have worked. The row names the resolved path and points at `fux --version`, which is the one command that disambiguates. ⚠ **Read as text, never executed** — doctor does not run a binary the environment chose for it, which is the same rule the `fetcher optional functions` row follows. ⚠ **Amended 2026-09-14 (W-159): "read as text" now excludes a compiled launcher.** A Windows console script is a `.exe`, and reading one with `errors="replace"` to look for the word `node` would report an ordinary Python `fux` as the Node reader whenever those three letters occurred by chance in its bytes — the exact misdiagnosis this row exists to prevent. **The row covers all three platforms**; it was believed Windows-blind on the evidence of a test skipped there, and the fixture was what could not be built, not the row. Deferred until 2026-09-12 on the premise *"no global bin ships in the first npm release"*; the bin shipped and Arpit ruled it stays, so the premise is gone. | [SR-NODE-SEARCH](0153_node-search.md) R1a |
 
 **3. `warn` is the default; `error` is reserved for a repo a verb will refuse.**

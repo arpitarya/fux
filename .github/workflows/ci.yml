@@ -137,6 +137,18 @@ jobs:
           done
           twine check --strict dist/*
           ls dist/
+      - name: No wheel carries the Node reader
+        # W-292 (Arpit, 2026-10-21): the bundle ships on npm alone.
+        run: |
+          python - <<'PY'
+          import glob, sys, zipfile
+          bad = [f"{w}: {n}" for w in sorted(glob.glob("dist/*.whl"))
+                 for n in zipfile.ZipFile(w).namelist() if n.endswith(".mjs")]
+          if bad:
+              print("✗ a wheel carries a .mjs:", *bad[:5], sep="\n  ")
+              sys.exit(1)
+          print("✔ no wheel carries a .mjs")
+          PY
       - name: sdist must not ship the archived old build
         run: |
           python - <<'PY'

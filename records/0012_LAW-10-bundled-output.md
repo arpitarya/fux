@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L10
 owns: []
 laws: [L10]
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 88dd49902de45af347c81915489156226f705fe473a4416fe4d7ebc3e6a968a7
+content_sha: 7d492a572217ac5936538555f308461416781789025bdc16feadcd4bc3ee8b65
 ---
 
 # SR-LAW-10 — L10 — the consumer is served build output, never source
@@ -40,7 +40,7 @@ and before this record each one decided for itself.
 
 | what a consumer got BEFORE 2026-09-12 | what L10 requires — ✅ **all of it ships** |
 |---|---|
-| `.fux/node/src/**` — 30+ readable `.mjs` modules, vendored by `fux setup` | one generated `.fux/node/fux.mjs`, and the old tree PRUNED |
+| `.fux/node/src/**` — 30+ readable `.mjs` modules, vendored by `fux setup` | one generated `fux.mjs` — vendored into `.fux/node/` from 2026-09-12, and **since W-292 (Arpit, 2026-10-21) installed from npm alone** (`npm install fux-engine`); `fux setup` vendors nothing and removes what it once wrote |
 | npm `fux-engine`: `exports: {".": "./src/index.mjs"}`, `files` carries `"src"` | the bundle is the export; `files` drops `src` |
 | `.fux/decoders/*.py` | ✅ **exempt** — the consumer writes these |
 | `.fux/fetchers/*.py` | ✅ **exempt** — the consumer writes these |
@@ -63,8 +63,10 @@ concatenation satisfies it. Minification is a separate, ungated choice.
 ⚠ **Bundled at PUBLISH, never on the consumer's machine** — Arpit, 2026-09-12,
 quoted in [SR-NODE-SEARCH](0153_node-search.md) decision 14 (**W-149**, closed;
 its file is deleted, per OPEN-WORK rule 2, so it is named and never cited). The
-bundle is a release artefact built once in fux's own pipeline and shipped inside
-both distributions. A consumer runs no build step; that is what
+bundle is a release artefact built once in fux's own pipeline. Since W-292
+(Arpit, 2026-10-21 — *"`npm install fux-engine` … will be the only way to
+install the node package for fux"*) it ships in **one** distribution, the npm
+package; no PyPI wheel carries it. A consumer runs no build step; that is what
 [L5](0007_LAW-5-offline-by-default.md) is owed.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
@@ -73,8 +75,8 @@ both distributions. A consumer runs no build step; that is what
 flowchart LR
     S["node/src/** · src/fux/**<br/>(fux's own source — THIS repo)"]
     B["bundle, at publish<br/>(in-repo, deterministic)"]
-    W["the wheel AND the npm tarball<br/>(both carry the same artefact)"]
-    C[".fux/node/fux.mjs<br/>(ONE file in the consumer's tree)"]
+    W["the npm tarball, fux-engine<br/>(the only carrier since W-292)"]
+    C["node_modules/fux-engine/fux.mjs<br/>(ONE file, installed by npm)"]
     D[".fux/decoders/ · .fux/fetchers/ · .fux/observers/<br/>(SOURCE — the exemption)"]
     S --> B --> W --> C
     W -. "seeded once, then the consumer owns it" .-> D
@@ -88,13 +90,13 @@ flowchart LR
             |
             |  bundle, at PUBLISH (in-repo, deterministic)
             v
-   the wheel AND the npm tarball  both carry the same artefact
+   the npm tarball, fux-engine    the only carrier since W-292
             |
      +------+---------------------------+
      v                                  v
-  .fux/node/fux.mjs            .fux/decoders/  .fux/fetchers/  .fux/observers/
-  ONE file in the              SOURCE -- seeded once, then
-  consumer's tree              the consumer owns it
+  node_modules/fux-engine/     .fux/decoders/  .fux/fetchers/  .fux/observers/
+  fux.mjs -- ONE file,         SOURCE -- seeded once, then
+  installed by npm             the consumer owns it
                                (THE EXEMPTION)
 ```
 
@@ -121,7 +123,12 @@ Amending a law needs Arpit's ruling, named in this record
 
 ### Context
 
-`fux setup` vendors the Node read plane into `.fux/node/` so a fresh clone can
+⚠ **This section is the 2026-09-12 history the law was written from.** Since
+W-292 (Arpit, 2026-10-21) `fux setup` vendors nothing: the Node reader is
+`npm install fux-engine` and nothing else, and the code named below
+(`_packaged_node_files`, `ensure_node_reader`) is deleted.
+
+`fux setup` vendored the Node read plane into `.fux/node/` so a fresh clone can
 read the index with nothing installed — the promise
 [L5](0007_LAW-5-offline-by-default.md) makes and
 [SR-NODE-SEARCH](0153_node-search.md) implements. The mechanism chosen in
@@ -177,11 +184,14 @@ fux ships none and imports none by name.
 
 **3. Bundling happens at publish, in fux's pipeline.** One build, off the single
 `release: published` trigger in
-[`publish.yml`](../.github/workflows/publish.yml), and the same artefact goes
-into the PyPI wheel (as the `fux/templates/node/` payload) and the npm tarball.
-**The consumer never builds.** In a checkout, `fux setup` builds the bundle or
-refuses with a message that says so — it may never quietly fall back to
-vendoring the module tree, or dev and shipped become two different products.
+[`publish.yml`](../.github/workflows/publish.yml), and that artefact goes into
+the npm tarball — `fux-engine`, and the same bytes as `@fux-engine/reader`.
+**The consumer never builds.** ⚠ **Amended on Arpit's ruling of 2026-10-21
+(W-292):** until then the same artefact also went into the PyPI wheel (as the
+`fux/templates/node/` payload) and `fux setup` vendored it; **no wheel carries
+it now** and setup writes none, so there is no checkout fallback left to
+forbid. The law's statement did not move: it already reads *"vendored into
+their tree **or** exported by a published package"*, and npm is the second.
 
 **4. The bundler is fux's own, deterministic and zero-dependency.** Same sources
 → byte-identical output, per [L4](0006_LAW-4-deterministic.md). It is a
@@ -206,26 +216,27 @@ refused rather than overlooked.
 
 **8. ✅ This law IS satisfied, as of 2026-09-12 — the same day it was written.**
 W-149 landed the migration in the change that closed it, and the two named
-violations are gone: `.fux/node/` holds one generated `fux.mjs` plus its data
-sidecars (or a workspace manifest alone), and the npm package's `exports` and
-`files` name the bundle with no `"src"`. **`pyproject.toml` no longer mentions
-`node/src`** — the wheel's payload comes from a build hook, so the artefact
-cannot be stale or absent.
+violations are gone; since W-292 (Arpit, 2026-10-21) **nothing is vendored at
+all** — a consumer's tree holds no fux `.mjs`, and the npm package's `exports`
+and `files` name the bundle with no `"src"`. **`pyproject.toml` no longer
+mentions `node/src`**, and no wheel carries a `.mjs`.
 
 **What holds it satisfied**, since a law is only as good as what fails when it
 is broken:
 
 | the clause | what fails |
 |---|---|
-| one artefact in a consumer's tree | `tests/test_setup_node.py::test_setup_writes_the_bundle_and_NO_source_tree` |
-| the stale tree is pruned | `…::test_setup_PRUNES_a_module_tree_left_by_an_older_engine` |
+| nothing vendored into a consumer's tree | `tests/test_setup_node.py::test_setup_writes_no_node_reader_and_no_shim` |
+| what an earlier setup vendored is removed, and only that | `…::test_setup_removes_a_vendored_shape_A_and_says_so`, `…::test_anything_else_under_node_is_kept_and_named` |
+| no wheel carries the bundle | `tests_e2e/test_role_packages.py::test_no_wheel_carries_the_node_reader`, and the same check in `ci.yml` and `publish.yml` |
 | the bundle answers what the sources answer | `tests/test_node_bundle.py` (five verb comparisons + MCP + the library) |
 | the published surface names no `src` | this record's veto commands, plus `publish.yml`'s pre-stage check |
 | the shipped artefact is the measured one | `node_arm.py --bundle-cap`, the arm's sixth surface |
 
 ⚠ **Two exposures remain, and neither is the law's text.** A **consumer who
-never upgrades** keeps their old module tree — the prune runs on a version
-difference, so nothing reaches a repository whose owner stopped running fux.
+never re-runs `fux setup`** keeps whatever an earlier setup vendored — the
+removal is setup's alone and never an ingest's, so nothing reaches a repository
+whose owner stopped running it (`fux doctor`'s `node reader` row warns).
 And **`.fux/decoders/`, `.fux/fetchers/` and `.fux/observers/` are exempt by
 design**, so consumer-owned Python does sit in their tree; that is the inverse
 case decision 2 names, not a gap.
@@ -262,10 +273,13 @@ case decision 2 names, not a gap.
 - **Bundle on the consumer's machine at `fux setup` time.** Rejected by Arpit
   explicitly, 2026-09-12: *"It shouldn't be bundled at the consumer end."* It
   would put a build step — and a toolchain — inside the offline promise.
-- **Vendor nothing; make the consumer `npm install fux-engine`.** Rejected: it
-  breaks [L5](0007_LAW-5-offline-by-default.md). A fresh clone must read its
-  index with no network and no install. The workspace shape is offered as an
-  option, never as the only one.
+- **Vendor nothing; make the consumer `npm install fux-engine`.** Rejected on
+  2026-09-12 as breaking [L5](0007_LAW-5-offline-by-default.md) — and ✅
+  **ADOPTED by Arpit on 2026-10-21 (W-292)**: *"if somebody wants to install it,
+  they can install it using npm … that will be the only way."* The L5 reading
+  was too wide: a one-time package install is the consumer installing software,
+  not fux reaching the network, and L5 governs what fux does. What it costs is
+  named: a clone with nothing installed no longer answers from Node.
 - **Vendor the tree but checksum it.** Rejected: it detects the silent fork
   without removing it, and buys a manifest to keep current. If the answer is
   *regenerate and compare*, ship the thing that gets regenerated.
@@ -298,8 +312,8 @@ case decision 2 names, not a gap.
 - [SR-NODE-SEARCH](0153_node-search.md) — the plane this law binds first
 - [SR-FUX-DIRECTORY](0102_fux-directory.md) — what `.fux/` holds, and who owns each child
 - [SR-DECODE](0139_decode.md) · [SR-FETCHER](0117_fetcher.md) · [SR-OBSERVE](0157_observe.md) — the three exemptions
-- [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) — `_node_source`, `_packaged_node_files`, `ensure_node_reader`: the code that vendors today
-- [`packages/layer_hook.py`](../packages/layer_hook.py) — the wheels' build hook (since W-282 it builds the bundle into fux-writer's wheel), which replaced
+- [`src/fux/setup.py`](../src/fux/setup.py) — `remove_vendored_reader`: since W-292 the only Node code path in `fux setup`, which removes what an earlier setup vendored
+- [`packages/layer_hook.py`](../packages/layer_hook.py) — the wheels' build hook (it built the bundle into fux-writer's wheel from W-282 to W-292, and carries no bundle now), which replaced
   `pyproject.toml`'s `force-include` list · `node/package.json` `exports` / `files`
   — the published surface, now naming the bundle ·
   [`src/fux/store/nodebundle.py`](../src/fux/store/nodebundle.py) — the bundler
@@ -314,7 +328,7 @@ record.
 **How to check it:**
 
 ```bash
-# expect: only .fux/node/fux.mjs — every other hit is a violation
+# expect: no output — since W-292 nothing fux generates is in a consumer's tree
 find .fux \( -name '*.py' -o -name '*.mjs' -o -name '*.js' -o -name '*.ts' \) \
   | grep -v '^\.fux/\(decoders\|fetchers\)/'
 
