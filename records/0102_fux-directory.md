@@ -5,13 +5,13 @@ name: SR-DOTFUX
 title: SR-DOTFUX (0102) — the .fux/ directory
 description: "Every child of .fux/ is declared committed, derived or acquired; the ignore rule is narrow by construction and asserted by doctor against git itself."
 status: accepted
-amended: 2026-10-20
+amended: 2026-10-24
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@c8e8f23d8f04, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@fce900e69053, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@ea75ef28039c]
+owns: [src/fux/store/fuxdir.py@c8e8f23d8f04, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@146010863dbc, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@b516afc15934]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: ddeb424ae29b74a8c2901f9766ce1e41433186baed42c28638d2275363b427fb
+content_sha: e9f6c07715f312aef3ffc7cf4b8f97959d7668b68eb0a582f32240889e0c3420
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -280,7 +280,7 @@ holding code.
 | moment | writes | why |
 |---|---|---|
 | **`ensure_layout`**, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore`, **`.fux/node/` + `.fux/fux`** — 🔴 **and NOTHING outside `.fux/`**: [SR-NODE-SEARCH](0153_node-search.md) decision 15 wires `.fux/node` into the consumer's root manifest, and **that edit belongs to `fux setup` alone**, precisely because this row's own rule is that a no-op ingest produces a no-op diff. ✅ **Structural since 2026-09-12, not a convention**: `detect_workspace`/`wire_workspace` live in `setup.py`, and `ensure_layout(root, node_shape=...)` takes the decided shape as a keyword it never computes — an ingest keeps whatever shape is already on disk and can flip nothing | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory. The reader is here rather than in `setup` for the same reason: a clone with no Python has to be able to read the index the first time anyone ingests, not only after someone remembers to run `setup` |
-| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `formats.toml`, `tune.toml`, `output.toml`, `inspect.toml`, `.fuxignore`, `refusals.toml`, `pii.toml`, `plugins.toml`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions. **No `fetchers/*.py` and no `decoders/*.py`** since W-289 ([SR-PLUGINS](0165_plugins.md) P9): the declared package runs | **optional, explicit, once per repo** — a consumer asked for it |
+| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `formats.toml`, `tune.toml`, `output.toml`, `inspect.toml`, `.fuxignore`, `refusals.toml`, `pii.toml`, `plugins.toml`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions — **and, outside `.fux/`, the git hooks in `.git/hooks/` with the `fux-index` merge driver in `.git/config` and its lines in `.gitattributes`** ([SR-MAINTENANCE](0129_hooks.md) decision 5, amended 2026-10-21, W-291; `fux setup --no-hooks` skips them; never fatal; `.gitattributes` is announced under the OUTSIDE note). **No `fetchers/*.py` and no `decoders/*.py`** since W-289 ([SR-PLUGINS](0165_plugins.md) P9): the declared package runs | **optional, explicit, once per repo** — a consumer asked for it |
 
 **`ensure_layout` must never write a fetcher**, and nothing in either column is
 ever overwritten: a consumer's annotations and edits survive every run. **The
@@ -967,13 +967,7 @@ line raises names the fix itself rather than pointing at the header.
 - **`.fux/observers/` is the third committed consumer-owned directory**
   (W-170, 2026-09-15), beside `fetchers/` and `decoders/`, and it is listed in
   the generated `.fux/README` with the others.
-  ⚠ **W-296 (2026-10-24): `fux setup` no longer creates it.** `fux observers init`
-  does, write-if-missing, when somebody wants analytics; a missing directory is a
-  supported state (one `stat`; `fux doctor` says `none installed`). `fux setup`
-  removes a `.fux/observers/` holding ONLY a README byte-identical to a shipped
-  one (digests in `constants.toml [observe]`) and leaves anything else. The
-  paragraph below is the history of the seeded form.
-  ⚠ **`fux setup` seeded it with a README and NO observer**, which is the
+  ⚠ **`fux setup` seeds it with a README and NO observer**, which is the
   asymmetry worth stating: a decoder and a fetcher have useful built-in
   implementations to write out, and an observer has none — fux carries no
   knowledge of any subscriber ([SR-OBSERVE](0157_observe.md) decision 8), so

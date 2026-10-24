@@ -1,6 +1,6 @@
 ---
 name: fux-maintain
-description: Keep a Fux index current — `fux hooks` and the fux-merge-index driver, `fux daemon start|stop|status`, `fux ingest --check` and `fux ingest --no-fetch`, the background re-index, and resolving a merge conflict in .fux/index without hand-editing. Use for "keep the fux index up to date automatically", "install fux hooks", "are hooks wired", "start the freshness daemon" or "merge conflict in .fux/index". Installing hooks or starting the daemon — only when explicitly asked.
+description: Keep a Fux index current — `fux hooks` and the fux-merge-index driver, `fux daemon start|stop|status`, `fux ingest --check` and `fux ingest --no-fetch`, the background re-index, and resolving a merge conflict in .fux/index without hand-editing. Use for "keep the fux index up to date automatically", "install fux hooks", "are hooks wired", "start the freshness daemon" or "merge conflict in .fux/index". `fux setup` installs the hooks; the daemon — only when explicitly asked.
 ---
 
 # Keeping the Fux index current
@@ -12,9 +12,12 @@ branches.
 
 Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run fux` → `./.venv/bin/fux`, on Windows `.venv\Scripts\fux.exe` → `python -m fux`).
 
-> ⚠ **`fux hooks` writes into `.git/hooks/`, `.git/config` and `.gitattributes`;
-> `fux daemon start` leaves a process running that fetches every listed URL.**
-> Only when a human asked. Status reads (`--json`) are always safe.
+> ⚠ **`fux setup` installs the hooks by default** (W-291; `fux setup --no-hooks`
+> skips them), writing into `.git/hooks/`, `.git/config` and `.gitattributes`.
+> `fux hooks` does the same job alone, for a repo set up before that change or
+> one that opted out. **`fux daemon start` leaves a process running that
+> fetches every listed URL — only when a human asked.** Status reads
+> (`--json`) are always safe.
 
 ---
 
@@ -23,7 +26,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | the ask | what to do |
 |---|---|
 | "are hooks wired" | `fux hooks --json` — §2 |
-| "install fux hooks" / "keep it up to date automatically" | `fux hooks`, then verify with `--json` — §2, §3 |
+| "install fux hooks" / "keep it up to date automatically" | `fux setup` already did, unless `--no-hooks` or the repo predates it: `fux hooks`, then verify with `--json` — §2, §3 |
 | "start the freshness daemon" | `fux daemon start` — §4 |
 | "is the index stale" | `fux ingest --check` — §5 |
 | "merge conflict in .fux/index" | §6. Never edit the JSONL |
@@ -68,8 +71,9 @@ means run `fux hooks --install` again.
   the user: move their hook aside and re-run, or call `fux ingest` from it.
 - **`--uninstall`** deletes marked hooks and the `merge.fux-index` config
   section, and **leaves `.gitattributes` alone**.
-- **Nothing here is cloned.** Every teammate runs `fux hooks` once; commit the
-  `.gitattributes` line so their merges use the driver.
+- **Nothing here is cloned.** Every teammate runs `fux setup` (or `fux hooks`)
+  once; commit the `.gitattributes` line so their merges use the driver. No git
+  repo yet: `fux setup` prints `run fux hooks after git init` and exits 0.
 
 **A hook runs the Python that installed it, not whatever `fux` is on PATH**
 (W-276). `fux hooks --install` writes that interpreter's absolute path into
@@ -260,7 +264,7 @@ git add .fux/index .fux/.fuxignore .fux/enrich   # commit when asked
 
 - **Don't hand-edit or line-splice `.fux/index/*.jsonl`** — a spliced record is one no ingest produced.
 - **Don't run `fux ingest` on a shard that still holds conflict markers** — check out a side first.
-- **Don't install hooks or start the daemon unasked.**
+- **Don't start the daemon unasked.** A repo set up with `--no-hooks` chose that; run `fux hooks` there only when asked.
 - **Don't trust `fux hooks` exit 0** — `REFUSED` lines exit 0 too. Read `--json`.
 - **Don't delete `write.lock` while a runner or daemon is alive** — `fux ingest --stop` is the safe clear.
 - **Don't kill the daemon** — a kill mid-write can leave a partial shard. Use `fux daemon stop`.

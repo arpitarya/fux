@@ -5,13 +5,13 @@ name: SR-CLI
 title: SR-CLI (0101) — the command-line surface
 description: Flat verbs in seven groups, one error boundary, three output modes. Freezes the CLI contract with a captured transcript of every command and its real output.
 status: accepted
-amended: 2026-10-20
+amended: 2026-10-24
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@f6a7b1b86cc2, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@f5e59a40b46a, src/fux/progress.py@10364bd02e0a, tests_e2e@62817a4c65c5, node/fux.mjs@ef9e157970bc, src/fux/stdio.py@9e270b49bdaa]
+owns: [src/fux/cli.py@c6bd6ef09e80, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@f5e59a40b46a, src/fux/progress.py@10364bd02e0a, tests_e2e@2a97897c7b41, node/fux.mjs@ef9e157970bc, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: e654d649ff2e32dcb4c3a93aba85a415a73d7560bd816501b8ef9ae24b0a9410
+content_sha: 5b1bb691bb9373e33e3e5f14bff4b3a039c8879e4bc526a835faec931be375cf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -42,7 +42,7 @@ content_sha: e654d649ff2e32dcb4c3a93aba85a415a73d7560bd816501b8ef9ae24b0a9410
 | **read** | `ask` · `find` · `answer` · `lexical` | differ only in how much they commit to. `lexical` is the words alone, **frozen** — decision 12 |
 | **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
 | **serve** | `serve` · `mcp` · `lsp` · `daemon` | long-running processes; the only verbs that do not return. `serve` (W-210, 2026-09-22) is a **local page over the real `ask`**, bound to `127.0.0.1` with no `--host`; `mcp` is the same index over the Model Context Protocol; `lsp` is the same index over the Language Server Protocol, for an editor ([SR-LSP](0163_lsp.md)); `daemon` watches for staleness |
-| **maintenance** | `hooks` · `tune` · `output` · `verify` · `observers` | wire the repository to keep its own index in step, print the tunables and the output defaults, re-run a provenance receipt against this tree, and (`observers init`, W-296) create `.fux/observers/` when a consumer wants analytics — `fux setup` never does |
+| **maintenance** | `hooks` · `tune` · `output` · `verify` | wire the repository to keep its own index in step, print the tunables and the output defaults, and re-run a provenance receipt against this tree |
 
 ⚠ **`output` was missing from this table until 2026-09-14 (W-164 gate 2).**
 The verb shipped with [SR-OUTPUT](0143_output-defaults.md) and
@@ -326,7 +326,7 @@ verb added later is gated without its author knowing the gate exists.
 ⚠ **A second precondition shares that placement since W-289 phase 2
 (2026-10-20)**: a package `.fux/plugins.toml` declares that is missing or
 drifted stops every verb except `cli.PLUGINS_EXEMPT` — `setup`, `doctor`,
-`tune`, `output`, `hooks`, `daemon`, `observers` — with the install line, exit `1`. The rule
+`tune`, `output`, `hooks`, `daemon` — with the install line, exit `1`. The rule
 is [SR-PLUGINS](0165_plugins.md) P4's; **a missing file is not this refusal**
 (prose only, P3), so a repository that never declared anything runs every verb
 it ran before.
@@ -624,6 +624,8 @@ will pin.
 **`fux ingest` writes none of that.** `ensure_layout` writes only
 `.fux/README.md` and `.fux/.gitignore`, so a repo that wanted an index never
 receives code it did not ask for.
+
+**`--no-hooks` opts out of the git hooks** (W-291, 2026-10-21): `fux setup` calls the installer `fux hooks` calls ([SR-MAINTENANCE](0129_hooks.md) decision 5), prints what it installed, kept or left (`kept (yours)` for a hook fux did not write), and lists `.gitattributes` with the paths outside `.fux/`. Without a git repository it prints `run fux hooks after git init` and still exits 0. Setup and `hooks` are both fux-writer verbs, so the role table is unchanged.
 
 **`--no-agents` opts out of the agent policy files**, and it is an opt-*out*
 because the failure it prevents is silent — an agent citing a retired design
@@ -1449,7 +1451,7 @@ not installed here``, exit 1), never reported as an unknown choice.
 |---|---|
 | fux-core | `tune` · `output` |
 | fux-reader | `ask` · `lexical` · `find` · `answer` · `verify` · `explain` · `graph` · `path` · `build` · `mcp` · `lsp` · `llms` · `doctor` (its rows) |
-| fux-writer | `setup` · `ingest` · `add` · `remove` · `register` · `enrich` · `correct` · `hooks` · `daemon` · `observers` · `doctor` (its rows, and `--fix`) — and the `fux-merge-index` script |
+| fux-writer | `setup` · `ingest` · `add` · `remove` · `register` · `enrich` · `correct` · `hooks` · `daemon` · `doctor` (its rows, and `--fix`) — and the `fux-merge-index` script |
 | fux-engine | everything above, plus `inspect` · `serve` · `identifiers` and the whole `doctor` |
 
 - **`answer` is the reader's whole `answer`**, refer included (ruling F2): the

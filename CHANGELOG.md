@@ -21,6 +21,7 @@ capability may depend on what a machine happens to have installed.
 
 ### Added
 
+- **`fux setup` installs the git hooks and the `fux-index` merge driver (W-291).** The same installer `fux hooks` uses; `fux setup --no-hooks` skips it. Never fatal: no git repository prints `run fux hooks after git init` and exits 0, and a hook fux did not write is kept (`kept (yours)`). `.gitattributes` is announced with the other paths outside `.fux/`. Hooks still never arrive by clone and still run `--no-fetch`; the daemon is not started ([SR-MAINTENANCE](records/0129_hooks.md) decision 5, amended).
 - **Fifteen plugin packages**, built from this tree on fux's own version:
   `fux-decoder-{json,config,html,sheet,office,pdf,xml,svg,drawio,image,mail,rtf}`,
   `fux-fetcher-{http,cdp}` and `fux-extension-table`. `fux-engine` depends on

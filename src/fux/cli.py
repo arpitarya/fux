@@ -331,6 +331,13 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="re-pin every package in .fux/plugins.toml to the installed version and digest",
     )
+    # W-291, SR-MAINTENANCE decision 5: setup installs the git hooks and the
+    # merge driver by default; this is the one-shot opt-out.
+    p_setup.add_argument(
+        "--no-hooks",
+        action="store_true",
+        help="do not install the git hooks and the index merge driver (.git/hooks, .gitattributes)",
+    )
     p_setup.set_defaults(func=_dispatch)
 
     p_doctor = _verb("doctor", help="check environment and repo health")
