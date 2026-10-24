@@ -8,6 +8,8 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+**`.fux/observers/` only on demand (W-296).** `fux setup` no longer creates `.fux/observers/`; the new `fux observers init` does, write-if-missing, when you want analytics. `fux setup` removes an old `.fux/observers/` that holds only the README it once seeded, byte-identical; anything else in it stays. `fux doctor` says `none installed — \`fux observers init\` to add one`.
+
 **Plugin packages — only the engine is mandatory (W-289, phases 1 and 2).** ⚠
 **Breaking for every consumer, once**: after upgrading, fux reads only Markdown
 and plain text until `.fux/plugins.toml` declares the decoder packages your

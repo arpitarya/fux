@@ -47,7 +47,7 @@ COMMITTED: dict[str, str] = {
     # caught rather than shipped.
     "decoders": "consumer-owned code, one module per format. A file here runs INSTEAD of the declared package's module of that name (SR-PLUGINS P8); fux writes none (SR-DECODE)",
     # ASCII only, like every value in this table.
-    "observers": "consumer-owned code, one module per subscriber. Called AFTER a verb has fully rendered, with one record of COUNTS -- never the question, a path, or the answer. It cannot change an answer: no return path, and the dispatch runs after every write (SR-OBSERVE)",
+    "observers": "created on demand by `fux observers init`, never by `fux setup`. Consumer-owned code, one module per subscriber. Called AFTER a verb has fully rendered, with one record of COUNTS -- never the question, a path, or the answer. It cannot change an answer: no return path, and the dispatch runs after every write (SR-OBSERVE)",
     "enrich": "pinned enrichment text, one file per source content sha, plus `queue.tsv` (W-86 P6: what fux could NOT read and a model must). Committed, because a backlog is a team fact",
     # ASCII only, like every other value in these tables.
     "node": "the Node read plane (`fux-engine`) as ONE BUNDLED FILE plus its manifest -- build output, never fux's source (L10). Engine-owned and REWRITTEN on a version change, not write-if-missing, because nobody edits it and a stale copy is a wrong answer. In a monorepo it is a workspace member holding only a manifest (SR-NODE-SEARCH)",
@@ -251,7 +251,7 @@ def _readme() -> str:
         " page over `ask`; `mcp` is the same index over the Model Context Protocol;"
         " `lsp` is the same index over the Language Server Protocol, for an editor;"
         " `daemon` watches for staleness |",
-        "| maintenance | `hooks` `tune` `output` `verify` | wire git to keep the index in step; print or set the tunables; re-run a receipt |",
+        "| maintenance | `hooks` `tune` `output` `verify` `observers` | wire git to keep the index in step; print or set the tunables; re-run a receipt |",
         "",
         "**The three read verbs differ in how much they commit to.** `find`",
         "gives locations and stays out of the way. `ask` gives a ranked list",

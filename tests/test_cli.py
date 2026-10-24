@@ -125,6 +125,8 @@ def test_parser_has_the_verb_surface():
         # are a positional ARGUMENT, not a subparser — `fux daemon start` must
         # not become the first subcommand tree on this surface.
         "daemon",
+        # W-296. `init` is a positional action, not a subparser.
+        "observers",
         # SR-SERVE (W-210, 2026-09-22). A verb, not a flag on `ask`: it does
         # not return, which is the whole of what the `serve` GROUP means, and
         # it answers a different question -- `ask` hands an agent ten links,

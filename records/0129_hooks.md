@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-20
 amended: 2026-10-13
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
-owns: [src/fux/maintain@1d55c635801e, tools/maintenance-bench@1327184f960f, tools/runner-race@ef39682b6efc, src/fux/schemas/state.schema.json@fc7d0f478383, src/fux/acquire/urlstate.py@02bff7516346, src/fux/store/dirty.py@94e65bb0120f, src/fux/store/lastcited.py@f9d94f9e600b]
+owns: [src/fux/maintain@fce3cec50c58, tools/maintenance-bench@1327184f960f, tools/runner-race@ef39682b6efc, src/fux/schemas/state.schema.json@fc7d0f478383, src/fux/acquire/urlstate.py@02bff7516346, src/fux/store/dirty.py@94e65bb0120f, src/fux/store/lastcited.py@f9d94f9e600b]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: e64a7ad7d9e568a43713307c88c9808fd20501aab4711c96aa2f703946be38c0
+content_sha: a8411282bd88f90d7040d9f0d4abdc9f18f574898d6d2ac2342154db595a86b4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

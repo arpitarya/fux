@@ -26,7 +26,7 @@ from ..constants import fixed
 
 _JSON_INDENT = fixed("json", "indent")
 
-__all__ = ["cmd_hooks"]
+__all__ = ["cmd_hooks", "cmd_observers"]
 
 
 def _root() -> Path:
@@ -34,6 +34,24 @@ def _root() -> Path:
     if root is None:
         raise FuxError("no fux.toml or .git found — run from inside a configured repo")
     return root
+
+
+def cmd_observers(args) -> int:
+    """`fux observers init` -- create `.fux/observers/` and its README (W-296).
+
+    Write-if-missing and idempotent; it never writes an observer.
+    """
+    from .. import observe
+
+    root = _root()
+    readme, written = observe.init_dir(root)
+    rel = readme.parent.relative_to(root).as_posix()
+    print(f"observers: {'created' if written else 'already present'} {rel}/")
+    print(
+        "  Drop a *.py with `def observe(record: dict) -> None` in it; it is called "
+        "after each verb renders, with counts and names only, and never changes an answer."
+    )
+    return 0
 
 
 def cmd_daemon(args) -> int:
