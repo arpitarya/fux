@@ -324,6 +324,10 @@ def test_a_skipped_url_gets_a_row_saying_why(tmp_path):
         (provenance.PROSE, {".csv": "csv@sha:bbbb"}, 0),  # no binding claims it
         (provenance.UNKNOWN, {".csv": "csv@sha:bbbb"}, 0),  # predates the ledger
         ("gone@sha:aaaa", {".csv": "csv@sha:bbbb"}, 0),  # decoder no longer bound
+        # W-289 ruling 1: a lockstep package bump alone is not stale...
+        ("pkg:fux-decoder-sheet@4.1.0/csv@2", {".csv": "pkg:fux-decoder-sheet@4.2.0/csv@2"}, 0),
+        # ...a moved module VERSION still is.
+        ("pkg:fux-decoder-sheet@4.1.0/csv@2", {".csv": "pkg:fux-decoder-sheet@4.2.0/csv@3"}, 1),
     ],
 )
 def test_stale_decoder_count_only_counts_what_a_full_ingest_would_fix(

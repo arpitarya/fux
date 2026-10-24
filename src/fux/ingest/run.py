@@ -458,8 +458,12 @@ def run(
     # Keyed by extension, a bumped decoder re-extracts its own documents and
     # nothing else. The same shape `_drop_changed_enrichment` uses one line
     # above, and for the same reason.
+    # The REGISTER keeps the full `pkg:<dist>@<version>/…` string; the reuse key
+    # compares it without the package head, so a lockstep release bump alone
+    # re-extracts nothing (W-289 ruling 1).
     decoder_digests = decoderdigest.binding_digests(root)
-    reusable = _drop_changed_decoders(root, reusable, decoder_digests)
+    decoder_keys = decoderdigest.reuse_keys(decoder_digests)
+    reusable = _drop_changed_decoders(root, reusable, decoder_keys)
     # 🔴 **W-166 DoD 3. A `url:` record was never re-redacted, and its bytes
     # were sitting on disk.** SR-PII's own words before decision 18: *"the data
     # needed to honour a new rule is present and unused."* `_pii_ruleset_moved`
@@ -472,7 +476,7 @@ def run(
     # them back through the one `parse -> redact -> extract` path rather than
     # opening a second one, which is what keeps the re-derived record
     # byte-identical to a freshly fetched one (L4).
-    if carried and (pii_moved or extract_moved or ids_moved or _decoders_moved(root, decoder_digests)):
+    if carried and (pii_moved or extract_moved or ids_moved or _decoders_moved(root, decoder_keys)):
         reacquired, stranded, reacquired_ids = urlingest.reacquire_urls(root, carried, config)
         for doc_id in reacquired:
             carried.pop(doc_id, None)
@@ -807,7 +811,7 @@ def run(
     # W-166: after `write_index`, for `extract-config-digest`'s reason — a run
     # stopped before this line left the OLD records in the shards, and a digest
     # already claiming the new decoder would let the next delta run reuse them.
-    _record_decoder_digests(root, decoder_digests)
+    _record_decoder_digests(root, decoder_keys)
     _record_pii_digest(root, pii_rules)
 
     # W-101 item 4. **Written here and nowhere earlier**: a run that was
@@ -1243,7 +1247,9 @@ def _decoders_moved(root: Path, current: dict[str, str]) -> bool:
         )
     except (OSError, ValueError):
         return True  # never run, or unreadable: re-derive. Wasteful once, never wrong.
-    return previous != current
+    if not isinstance(previous, dict):
+        return True
+    return _as_keys(previous) != current
 
 
 #: `url:` documents a policy change could not reach, as of the last run. Derived
@@ -1472,6 +1478,7 @@ def _drop_changed_decoders(
         previous = {}
     if not isinstance(previous, dict):
         previous = {}
+    previous = _as_keys(previous)
 
     moved = {
         ext
@@ -1485,6 +1492,14 @@ def _drop_changed_decoders(
         for doc_id, record in reusable.items()
         if _binding_suffix(record.get("loc", "")) not in moved
     }
+
+
+def _as_keys(previous: dict) -> dict:
+    """A stored binding map as reuse keys — a pre-ruling run stored full
+    `pkg:…` digests, and comparing those raw would re-extract once for nothing."""
+    from ..acquire import decoderdigest
+
+    return {ext: decoderdigest.reuse_key(d) if isinstance(d, str) else d for ext, d in previous.items()}
 
 
 def _binding_suffix(loc: str) -> str:

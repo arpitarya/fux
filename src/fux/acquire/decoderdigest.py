@@ -24,11 +24,22 @@ answer from outside, and leaves the read plane alone.
 
 | decoder | digest | why |
 |---|---|---|
-| packaged | `pkg:fux-decoder-pdf@4.2.0/pdf@3` — the declared distribution, its version, and the module's `VERSION` | fux owns these packages, so it can require a hand bump and hold it with a test; the distribution and its version name exactly which code read the document (SR-PLUGINS P12, W-289). Until W-289 phase 2 this row was a *built-in*, `pdf@3`, shipped inside fux-core |
+| packaged | `pkg:fux-decoder-pdf@4.2.0/pdf@3` — the declared distribution, its version, and the module's `VERSION`; **its reuse key is `pdf@3`** | fux owns these packages, so it can require a hand bump and hold it with a test; the distribution and its version name exactly which code read the document (SR-PLUGINS P12, W-289). Until W-289 phase 2 this row was a *built-in*, `pdf@3`, shipped inside fux-core |
 | `.fux/decoders/` | `logdoc@sha:1a2b…` — sha of the file | fux can require nothing of a consumer's file and hold nothing about it. A forgotten bump there would silently pin a whole format to stale extraction. The file is committed, so its sha is as stable as the rule it stands for |
 
 ⚠ **A consumer decoder therefore re-extracts on a whitespace edit.** That is the
 cheap direction of being wrong, and it is chosen deliberately.
+
+## The package version names; it does not key (W-289 ruling 1)
+
+**The `pkg:<dist>@<version>/` head is REGISTER's, never the reuse key's**
+(Arpit, 2026-10-20). Every release moves every package's version in lockstep
+(SR-PLUGINS P11), so a key that carried it would re-extract every decoded
+document on every release while no decoder's output moved. `reuse_key()` strips
+the head, leaving `<module>@<VERSION>+<ext tail>`; a decoder's own `VERSION` is
+what moves when its output moves, and the test that holds a hand bump holds it.
+`of()` still mints the full string, so a committed REGISTER row names the exact
+distribution that produced it.
 
 ## Decoder extensions ride in the key (W-288)
 
@@ -118,11 +129,8 @@ def of(decoder) -> str:
 
     A packaged decoder reads `pkg:<dist>@<version>/<module>@<VERSION>+<ext>@<v>…`
     (SR-PLUGINS P12): the distribution that read the document, the module, and
-    the W-288 extension tail. ⚠ **The package version is part of the key**, so a
-    release that moves it — every release, in lockstep (P11) — re-extracts the
-    documents its decoders read once; SR-DECODE decision 11a's "cheap direction
-    of being wrong", chosen so a committed REGISTER row names the exact
-    distribution that produced it.
+    the W-288 extension tail. This is the REGISTER string; the reuse key is
+    `reuse_key()` of it, which drops the package head (W-289 ruling 1).
     """
     origin = getattr(decoder, "origin", "") or ""
     name = getattr(decoder, "name", "") or "?"
@@ -137,6 +145,23 @@ def of(decoder) -> str:
         # forward on exactly the run that could not check it.
         return f"{name}@sha:unreadable{tail}"
     return f"{name}@sha:{hashlib.sha256(raw).hexdigest()[: fixed('decoders', 'digest_hex')]}{tail}"
+
+
+def reuse_key(digest: str) -> str:
+    """What the reuse key compares: `digest` without a `pkg:<dist>@<version>/` head.
+
+    `pkg:fux-decoder-pdf@4.2.0/pdf@3+limits@1` -> `pdf@3+limits@1`; any other
+    digest is its own key. A lockstep release bump therefore re-extracts nothing
+    (W-289 ruling 1); a moved module `VERSION` or extension tail still does.
+    """
+    if digest.startswith(PACKAGE_PREFIX):
+        _package, _slash, digest = digest.partition("/")
+    return digest
+
+
+def reuse_keys(digests: dict[str, str]) -> dict[str, str]:
+    """`reuse_key` over a `{extension: digest}` map, keys unchanged."""
+    return {ext: reuse_key(digest) for ext, digest in digests.items()}
 
 
 def binding_digests(root: Path | None = None) -> dict[str, str]:

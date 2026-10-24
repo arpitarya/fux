@@ -8,6 +8,17 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed — a release no longer re-extracts your decoded documents (W-289 ruling 1)
+
+- **The package version left the reuse key.** A packaged decoder's digest is
+  still `pkg:<dist>@<version>/<module>@<VERSION>+…` in `.fux/index/REGISTER`'s
+  `decoder` column, but ingest's reuse key compares it without the
+  `pkg:<dist>@<version>/` head. Upgrading fux, which moves every first-party
+  package's version in lockstep, no longer re-extracts every PDF, sheet and
+  office file once; a decoder whose output changes bumps its own `VERSION`, and
+  that still re-extracts exactly its documents. `fux doctor`'s `provenance` row
+  no longer counts a lockstep bump as stale.
+
 ### Breaking — the Node reader installs from npm only (W-292)
 
 Arpit, 2026-10-21: *"`npm install fux-engine` … will be the only way to install

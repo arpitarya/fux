@@ -93,6 +93,54 @@ def test_a_decoder_bump_re_extracts_exactly_its_bindings(mixed, monkeypatch):
     assert report.doc_count - report.reused_count == 1  # people.csv, re-extracted
 
 
+def _bump_packages(monkeypatch, version="9.9.9"):
+    """Every packaged digest at another distribution version, module `VERSION`s
+    untouched — what a lockstep release (SR-PLUGINS P11) does to the bindings."""
+    real = decoderdigest.of
+
+    def bumped(decoder):
+        digest = real(decoder)
+        if not digest.startswith(decoderdigest.PACKAGE_PREFIX):
+            return digest
+        head, _, rest = digest.partition("/")
+        return f"{head.rpartition('@')[0]}@{version}/{rest}"
+
+    monkeypatch.setattr(decoderdigest, "of", bumped)
+
+
+def test_a_lockstep_package_bump_alone_re_extracts_nothing(mixed, monkeypatch):
+    """W-289 ruling 1: the package version is REGISTER's, never the reuse key's.
+
+    Every release moves every first-party package's version; a key carrying it
+    would re-extract every decoded document on every release while no decoder's
+    output moved."""
+    from fux.ingest import register
+
+    _bump_packages(monkeypatch)
+    report = run(mixed, refresh_urls=False, full=False)
+    assert report.reused_count == 2
+    assert report.doc_count == 2
+    # ...and REGISTER still names the distribution that is installed now.
+    row = register.read(mixed).rows["docs/people.csv"]
+    assert row.decoder.startswith(decoderdigest.PACKAGE_PREFIX)
+    assert "@9.9.9/" in row.decoder
+
+
+def test_a_module_bump_still_re_extracts_under_a_package_bump(mixed, monkeypatch):
+    """Stripping the package head must not strip the module `VERSION` with it."""
+    import fux_decoder_sheet.csv as csv_mod
+
+    _bump_packages(monkeypatch)
+    monkeypatch.setattr(csv_mod, "VERSION", csv_mod.VERSION + 1)
+    assert run(mixed, refresh_urls=False, full=False).reused_count == 1
+
+
+def test_the_reuse_key_drops_only_the_package_head():
+    assert decoderdigest.reuse_key("pkg:fux-decoder-pdf@4.2.0/pdf@3+limits@1") == "pdf@3+limits@1"
+    assert decoderdigest.reuse_key("logdoc@sha:1a2b+table@1") == "logdoc@sha:1a2b+table@1"
+    assert decoderdigest.reuse_key("pdf@3") == "pdf@3"
+
+
 def test_a_decoder_bump_for_a_format_the_corpus_lacks_changes_nothing(mixed, monkeypatch):
     """A `.pptx` fix must not re-extract a corpus with no slides in it."""
     import fux_decoder_office.pptx as pptx_mod

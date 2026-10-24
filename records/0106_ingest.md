@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-20
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/acquire/ingestlog.py@afe95bbf7a6b, src/fux/ingest@1db22ad4a3e4, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@4ca02fdd1c47, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@6be9d87223eb]
+owns: [src/fux/acquire/ingestlog.py@3953ad922b51, src/fux/ingest@aff12f6ac1c5, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@4ca02fdd1c47, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@c977c497fe3c]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 4f7065803b73d579f5e517cf015c3c87763170b63ec1368e85a7bc991d1adefb
+content_sha: cc96868e839e8e13d53e52e23ed4e0283dda49038ea65c919d46966130360453
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -957,7 +957,11 @@ https://wiki.example/ops/cold-store	9c1f0b2e7a4d5e6f8091a2b3c4d5e6f708192a3b	htm
   phase 2 a packaged decoder's `decoder` names the distribution that read the
   document — `pkg:fux-decoder-pdf@4.1.1/pdf@1+limits@1`, the
   `decoderdigest` string ([SR-PLUGINS](0165_plugins.md) P12) — and a
-  consumer file's is still `<module>@sha:<hex>+…`. The tab after
+  consumer file's is still `<module>@sha:<hex>+…`. **The `pkg:<dist>@<version>/`
+  head is this column's and never the reuse key's** (W-289 ruling 1, Arpit
+  2026-10-20): the key compares `<module>@<VERSION>+<ext tail>`, so a lockstep
+  release re-extracts nothing, and this column names the distribution installed
+  at the last ingest. The tab after
   `loc` is what the whitespace-split sources grammar cannot give: a walked
   path may carry a space; a sources entry may not
   ([SR-URL-LIST](0116_url-list.md) decision 8).
@@ -1167,7 +1171,7 @@ descent before listing it, and records it once as `dir/`.
 
 **No decision here moved** (W-289, 2026-10-20): under this record's directory claims, `acquire/urlsrc.py` (SR-FETCHER's) resolves a declared fetcher package when the consumer has no file of that name, and `ingest/health.py` (SR-DOCTOR's) gained the `seeded copies removable` row ([SR-PLUGINS](0165_plugins.md) P8, P9).
 
-**W-289 phase 2 (2026-10-20) — ingest reads `.fux/config/plugins.toml`.** Two decisions moved: **4b** (a format no declared package reads is counted on stderr, never written into the skip record) and **22**'s `decoder` column, which carries the `pkg:<dist>@<version>/<module>@<VERSION>` digest for a packaged decoder. The digest is also the reuse key, so the first ingest after this change re-extracts every decoded document once, and every later release does the same (the package version moves in lockstep, SR-PLUGINS P11). `acquire/gitdir.py`'s type filter drops the globs no declared package can read (SR-TYPES decision 1), and `fux ingest` refuses before it reads anything when a declared package is missing or drifted (P4). `acquire/ingestlog.py` reads a digest's module through `decoderdigest.name_of`, so a pre-phase-2 `pdf@1` row and a live `pkg:…/pdf@1` row are one decoder.
+**W-289 phase 2 (2026-10-20) — ingest reads `.fux/config/plugins.toml`.** Two decisions moved: **4b** (a format no declared package reads is counted on stderr, never written into the skip record) and **22**'s `decoder` column, which carries the `pkg:<dist>@<version>/<module>@<VERSION>` digest for a packaged decoder. The reuse key is that digest **without its `pkg:<dist>@<version>/` head** (W-289 ruling 1, Arpit 2026-10-20) — `<module>@<VERSION>+<ext tail>` — so a lockstep release (SR-PLUGINS P11) re-extracts nothing; only a moved module `VERSION` or extension tail does. 4b's count is unaffected: it reads no digest. `acquire/gitdir.py`'s type filter drops the globs no declared package can read (SR-TYPES decision 1), and `fux ingest` refuses before it reads anything when a declared package is missing or drifted (P4). `acquire/ingestlog.py` reads a digest's module through `decoderdigest.name_of`, so a pre-phase-2 `pdf@1` row and a live `pkg:…/pdf@1` row are one decoder.
 
 ### Consequences
 

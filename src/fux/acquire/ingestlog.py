@@ -242,17 +242,18 @@ def stale_decoder_count(root: Path, current: dict[str, str]) -> int:
     that the decoder moved. Counting either would report a number that no
     command can bring down.
     """
-    from .decoderdigest import name_of
+    from .decoderdigest import name_of, reuse_key
 
     # By MODULE, so a row written as `pdf@3` before W-289 and a live
-    # `pkg:fux-decoder-pdf@4.2.0/pdf@3` are the same decoder at a moved digest.
-    by_name = {name_of(digest): digest for digest in current.values()}
+    # `pkg:fux-decoder-pdf@4.2.0/pdf@3` are the same decoder; compared by
+    # REUSE KEY, so a lockstep package bump alone is not stale (W-289 ruling 1).
+    by_name = {name_of(digest): reuse_key(digest) for digest in current.values()}
     stale = 0
     for row in read(root).values():
         if row.decoder in (PROSE, UNKNOWN):
             continue
         name = name_of(row.decoder)
         live = by_name.get(name)
-        if live is not None and live != row.decoder:
+        if live is not None and live != reuse_key(row.decoder):
             stale += 1
     return stale

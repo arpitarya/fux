@@ -11,7 +11,7 @@ feature: the decoder plane — the protocol, the registry, the consumer seam, th
 owns: [src/fux/decode@0fc2231fb9da, src/fux/decode/ext/__init__.py@c9bb2ae89770, src/fux/decode/ext/markdown.py@e6152422eabb, src/fux/decode/ext/ooxml.py@f6b06732db01, src/fux/decode/ext/xml.py@5d58ae8c264f, src/fux/decode/ext/zip.py@b219303e98d1, src/fux/templates/agents/DECODER-SKILL.md@cfe08438e531, node/src/decode/markdown.mjs@9b8c05b393cb, node/src/decode/registry.mjs@573eb7a66bde, packages/fux-decoder-config@115bf622ae00, packages/fux-decoder-drawio@ad4bba23c274, packages/fux-decoder-html@95c6656d62cc, packages/fux-decoder-image@0065c168fd3c, packages/fux-decoder-json@06731b213dda, packages/fux-decoder-mail@2200f16576e3, packages/fux-decoder-office@5916341e57d7, packages/fux-decoder-pdf@36d0812fcaea, packages/fux-decoder-rtf@daff861b6177, packages/fux-decoder-svg@0042ed34e59b, packages/fux-decoder-xml@5452af6b39d5]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: c96d33eeb4f20c2bec571d59a4f1041a787086f4a0de57f200e1d24c3bea9d42
+content_sha: 5dea67d39e7153b0bb783ac44029c5e24a31bdadbe9cb57fc0198d99a0851fd2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1079,11 +1079,13 @@ the rule, this decision what it did to the plane).
   4b), and `fux doctor`'s `plugins cover sources` row lists the same.
 - **The digest names the distribution** (P12): `pkg:<dist>@<version>/<module>@<VERSION>`
   plus decision 24's extension tail — `pkg:fux-decoder-office@4.1.1/docx@2+table@1+ooxml@1+xml@1+zip@1+limits@1`.
-  It is the reuse key and REGISTER's `decoder` column alike. ⚠ **The package
-  version is in the key**, so every release — lockstep moves every first-party
-  version (P11) — re-extracts the decoded documents once. That is decision
-  11a's cheap direction of being wrong, accepted so a committed row names the
-  distribution that read it.
+  It is REGISTER's `decoder` column. **The reuse key is the same string without
+  its `pkg:<dist>@<version>/` head** — `docx@2+table@1+…` — (W-289 ruling 1,
+  Arpit 2026-10-20; `decoderdigest.reuse_key`): every release moves every
+  first-party version in lockstep (P11), so a key carrying it would re-extract
+  every decoded document on every release while no output moved. A decoder's
+  own `VERSION` moves when its output moves, and decision 11a's hand-bump test
+  holds that.
 - **`fux add` still proposes the first-party stem** for an observed response
   (`decoder=pdf`) whether or not the package is declared; the line is what
   `fux setup` then reads to propose the package, and until it is declared that

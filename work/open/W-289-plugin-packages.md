@@ -5,7 +5,7 @@ description: "Arpit's ruling (2026-10-19, Cowork): decoders, fetchers and decode
 item: W-289
 filed: 2026-10-19
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-22
+updated: 2026-10-24
 updated_by: "Claude Code (Opus 5.5)"
 ball: arpit
 ---
@@ -196,10 +196,10 @@ W-288.** Everything that does not touch the decoder tree:
   `setup doctor tune output hooks daemon`; the registry calls `require` too.
   `plugins declared` stays a **warning** when the file is missing (prose only
   is legal), not the error this list once planned.
-- **P12** — the digest, reuse key and REGISTER column read
-  `pkg:<dist>@<version>/<module>@<VERSION>+<ext tail>`. ⚠ The package version
-  is in the reuse key, so every lockstep release re-extracts decoded documents
-  once — flagged for Arpit.
+- **P12** — the digest and REGISTER column read
+  `pkg:<dist>@<version>/<module>@<VERSION>+<ext tail>`; the reuse key is the same
+  string without the `pkg:<dist>@<version>/` head (ruling 1, built 2026-10-24:
+  `decoderdigest.reuse_key`), so a lockstep release re-extracts nothing.
 - **P13** — `tests_e2e/test_plugin_l4_gate.py`, in **real** venvs built from
   this tree's wheels: an extra undeclared `fux-decoder-pdf` changes no index
   byte; an installed package edited in place, and a row pinned at another
@@ -274,9 +274,10 @@ W-288.** Everything that does not touch the decoder tree:
 1. **Package version in the reuse key → REGISTER only** (the recommendation). The
    `pkg:<dist>@<version>/…` form stays in REGISTER's `decoder` column and **leaves
    the reuse key/digest**, which keeps `<module>@<VERSION>+<ext tail>`; a decoder's own
-   `VERSION` moves when its output moves. 🟢 **Ratified, not built** — Claude Code:
-   amend P12 here, SR-INGEST (4b, 22) and SR-DECODE's digest sentence in the same
-   change; a test that a lockstep version bump alone re-extracts nothing; both suites.
+   `VERSION` moves when its output moves. ✅ **Built 2026-10-24 (Claude Code, Opus 5.5)**:
+   `decoderdigest.reuse_key`; P12 here and in SR-PLUGINS, SR-INGEST (22, and the
+   phase-2 note naming 4b) and SR-DECODE decision 25 amended;
+   `test_a_lockstep_package_bump_alone_re_extracts_nothing` holds it.
 2. **Import aliases → none** (the recommendation). A pre-4.2 seeded copy fails loudly
    on first ingest with the error that names the fix. As built; nothing to change.
 3. Decision 4 of the earlier list (office + pdf declared here; fetcher tunables;
@@ -343,8 +344,8 @@ W-288.** Everything that does not touch the decoder tree:
 ## Blockers
 
 🔴 Arpit: upload the 14 plugin wheels once by token (§Step 6) and tell Cowork, which
-then adds the 14 trusted publishers. 🟢 Claude Code: build ruling 1 (REGISTER only).
-Both before the release that carries the packages. (W-288, waited on before, is merged.)
+then adds the 14 trusted publishers. ✅ Ruling 1 (REGISTER only) built 2026-10-24.
+The upload before the release that carries the packages. (W-288, waited on before, is merged.)
 
 ## Record affected
 

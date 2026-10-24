@@ -11,7 +11,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 39aa0794aee903675acc067a9dd2d13cbf6904b3bf44d48618c4722946c4a555
+content_sha: e6f75da5813d154902fbe022451e387276d59582d476485d120f20e1faead366
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -471,7 +471,7 @@ Each name below keeps its spelling in code and holds no literal: it is read from
 process naming it ([SR-CONSTANTS](0159_constants.md)). **The values are unchanged** —
 this moved where they are written, not what they are.
 
-- `src/fux/ingest/run.py` — `PII_DIGEST_FILE` ← `[index] pii_digest`, `EXTRACT_CONFIG_DIGEST_FILE` ← `[index] extract_config_digest`, `ENRICH_DIGEST_FILE` ← `[index] enrich_digests`, `DECODER_DIGEST_FILE` ← `[index] decoder_digests`, `STALE_REDACTION_FILE` ← `[runtime] stale_redaction`
+- `src/fux/ingest/run.py` — `PII_DIGEST_FILE` ← `[index] pii_digest`, `EXTRACT_CONFIG_DIGEST_FILE` ← `[index] extract_config_digest`, `ENRICH_DIGEST_FILE` ← `[index] enrich_digests`, `DECODER_DIGEST_FILE` ← `[index] decoder_digests` (it stores reuse keys — the `pkg:<dist>@<version>/` head stripped, W-289 ruling 1), `STALE_REDACTION_FILE` ← `[runtime] stale_redaction`
 
 <!-- L12-VALUES-END -->
 

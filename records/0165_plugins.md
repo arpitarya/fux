@@ -11,7 +11,7 @@ feature: plugin packages — the declaration, its verification, the loader and t
 owns: [src/fux/plugins.py@c64e7b1e0b2b, .fux/config/plugins.toml@988b44457549, tests/test_plugins.py@52c673190765, tests/test_plugin_fence.py@8ce1c2309be8, tests/test_plugin_packages.py@68333db84fa1, tests/test_plugin_registry.py@036392d7b916]
 laws: [L2, L4, L5, L12]
 timestamp: 2026-10-19T00:00:00Z
-content_sha: f320c9f74c570d05d67a94f77198e9ade5b1854c1671720a129e5ba46fdbd1c9
+content_sha: 8b51cf9d443499cdb54192e6bd9f3410930d0c8d154e35bfbf3b71c8abd13267
 ratifies: "Arpit, 2026-10-19 (Cowork), on W-289: 'maybe we can build out a mechanism of extensions, decoders, plugins, and fetchers as separate packages that can be plugged into Fox' -> 'I want to go with the third option' (C: declared, pinned, committed) -> 'i like the recommendation now create a list what are mandatory and what are optional. because we dont need all' -> 'fux-decoder-json and config should also be optional only use if needed' -> 'okay file a work item for this', given in reply to confirming the SR-LAW-2 wording"
 ---
 
@@ -207,10 +207,11 @@ Independent versions would need a compatibility matrix; refused.
 **P12. The register names the distribution.** REGISTER's `decoder` column gains the
 package — `pkg:fux-decoder-pdf@4.2.0/pdf@3`, then W-288's extension tail
 (`+limits@1`) — so a committed row says which distribution read it
-([SR-INGEST](0106_ingest.md) decision 22). **Built in phase 2, as ONE string**: the
-`decoderdigest` digest is the reuse key and the column alike, so they cannot disagree.
-⚠ The package version is in the key, so every lockstep release re-extracts the decoded
-documents once ([SR-DECODE](0139_decode.md) decision 25 names the cost).
+([SR-INGEST](0106_ingest.md) decision 22). **The package version names; it does not
+key** (Arpit, 2026-10-20, ruling 1): the reuse key is the column's string without its
+`pkg:<dist>@<version>/` head — `<module>@<VERSION>+<ext tail>` — so a lockstep release
+re-extracts nothing ([SR-DECODE](0139_decode.md) decision 25). Both come from one
+`decoderdigest.of`, so the module and tail they name cannot disagree.
 
 **P13. The L4 gate.** Two environments on one repository, one with an extra undeclared
 package installed, build byte-identical indexes; one with a declared package at a
@@ -256,8 +257,11 @@ same way `mail` and `drawio` import `html`. Declared in each `pyproject.toml` an
 - **The decoders are packages** (phase 2, 2026-10-20). Every module moved out of
   `src/fux/decode/` into its package with its output unchanged; fux-core and
   fux-engine ship no decoder. An undeclared format is no longer read, and is counted.
-- **Every release re-extracts the decoded documents once**, because the package
-  version is in the digest (P12). Markdown and plain text are untouched.
+- **A release re-extracts nothing by itself** (P12, ruling 1): the package version is
+  in REGISTER's column, not the reuse key. So REGISTER names the distribution
+  installed at the last ingest, which a lockstep bump alone cannot distinguish from
+  the one that extracted — accepted, because a module whose output moves bumps its
+  own `VERSION`.
 - **A copy seeded before phase 2 stops ingest** if it imports a module that moved
   (`fux.decode.json`, `fux.decode.ext.table`): the error names the new import and says
   to delete an unedited copy, which `fux doctor` lists.
