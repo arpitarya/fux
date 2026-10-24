@@ -70,7 +70,15 @@ from .constants import fixed
 
 _JSON_INDENT = fixed("json", "indent")
 
-__all__ = ["CONSUMER_DIR", "Record", "args_hash", "dispatch", "observers_in"]
+__all__ = [
+    "CONSUMER_DIR",
+    "Record",
+    "args_hash",
+    "dispatch",
+    "init_dir",
+    "observers_in",
+    "remove_shipped_scaffold",
+]
 
 #: Where a consumer's observers live. Committed, readable source by contract —
 #: `.fux/runtime/` is the only derived directory under `.fux/`.
@@ -226,6 +234,56 @@ def args_hash(argv: list[str]) -> str:
         i += 1
     normalised = " ".join([verb, *sorted(flags)]).strip()
     return hashlib.sha256(normalised.encode("utf-8")).hexdigest()[: fixed("observe", "args_hash_hex")]
+
+
+def readme_bytes() -> bytes:
+    """The shipped `.fux/observers/README.md` text. Read from the wheel, never imported (L12)."""
+    from importlib import resources
+
+    return (
+        resources.files("fux") / "templates" / fixed("observe", "readme_template")
+    ).read_bytes()
+
+
+def init_dir(root: Path) -> "tuple[Path, bool]":
+    """`fux observers init`: create `.fux/observers/` and its README, **write-if-missing**.
+
+    Returns `(path to README, written)`. Idempotent: a second call, or a call
+    where the consumer already has a README of their own, writes nothing. It
+    never writes an observer -- fux ships none and names no subscriber
+    (SR-OBSERVE decision 8).
+    """
+    readme = root / CONSUMER_DIR / "README.md"
+    if readme.exists():
+        return readme, False
+    readme.parent.mkdir(parents=True, exist_ok=True)
+    readme.write_bytes(readme_bytes())
+    return readme, True
+
+
+def remove_shipped_scaffold(root: Path) -> "str | None":
+    """W-296 migration. Remove `.fux/observers/` when it holds ONLY a `README.md`
+    whose bytes are one fux itself shipped; return the repo-relative path removed.
+
+    🔴 **Never deletes a consumer's file.** An observer, any other entry, an
+    edited README, an unreadable one -- any doubt leaves the directory exactly
+    as found.
+    """
+    directory = root / CONSUMER_DIR
+    try:
+        if directory.is_symlink() or not directory.is_dir():
+            return None
+        entries = list(directory.iterdir())
+        if len(entries) != 1 or entries[0].name != "README.md" or not entries[0].is_file():
+            return None
+        digest = hashlib.sha256(entries[0].read_bytes()).hexdigest()
+        if digest not in fixed("observe", "shipped_readme_sha256"):
+            return None
+        entries[0].unlink()
+        directory.rmdir()
+    except OSError:
+        return None
+    return directory.relative_to(root).as_posix()
 
 
 def observers_in(root: Path) -> list[Path]:

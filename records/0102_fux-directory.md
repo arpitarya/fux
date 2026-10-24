@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-20
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@6b33ceae222f, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@e059b21d3059, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@c785b43be2bc]
+owns: [src/fux/store/fuxdir.py@c8e8f23d8f04, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@fce900e69053, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@ea75ef28039c]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 283f9c1af912d0149f23bf0e99885c307240b9b478ae2063619cdaaf6582d4e2
+content_sha: ddeb424ae29b74a8c2901f9766ce1e41433186baed42c28638d2275363b427fb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -967,7 +967,13 @@ line raises names the fix itself rather than pointing at the header.
 - **`.fux/observers/` is the third committed consumer-owned directory**
   (W-170, 2026-09-15), beside `fetchers/` and `decoders/`, and it is listed in
   the generated `.fux/README` with the others.
-  ⚠ **`fux setup` seeds it with a README and NO observer**, which is the
+  ⚠ **W-296 (2026-10-24): `fux setup` no longer creates it.** `fux observers init`
+  does, write-if-missing, when somebody wants analytics; a missing directory is a
+  supported state (one `stat`; `fux doctor` says `none installed`). `fux setup`
+  removes a `.fux/observers/` holding ONLY a README byte-identical to a shipped
+  one (digests in `constants.toml [observe]`) and leaves anything else. The
+  paragraph below is the history of the seeded form.
+  ⚠ **`fux setup` seeded it with a README and NO observer**, which is the
   asymmetry worth stating: a decoder and a fetcher have useful built-in
   implementations to write out, and an observer has none — fux carries no
   knowledge of any subscriber ([SR-OBSERVE](0157_observe.md) decision 8), so

@@ -7,10 +7,10 @@ description: "After a verb has fully rendered, fux hands every file in `.fux/obs
 status: accepted
 date: 2026-09-14
 feature: the observer hook — the extension point a consumer's analytics subscribe to
-owns: [src/fux/observe.py@b12c1b0c5bc3, tools/observer-bench@e12d60cca125]
+owns: [src/fux/templates/observers-README.md.txt@d80853096279, src/fux/observe.py@de14c849ee1d, tools/observer-bench@e12d60cca125]
 laws: [L2, L3, L4, L5, L9, L10]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 4e07224ca93f35ac06fe0191ee0c6fc7a46c47b53b23c27cb33c6f2e2f30d87f
+content_sha: e7990e4b3b2fa8f65124f7c7ecaffccce45b3e5b9904940bceb98f805f21387b
 ratifies: W-170
 ---
 
@@ -19,6 +19,7 @@ ratifies: W-170
 **Owns** — the components this record decides:
 
 - [`src/fux/observe.py`](../src/fux/observe.py) · file
+- [`src/fux/templates/observers-README.md.txt`](../src/fux/templates/observers-README.md.txt) · file
 - [`tools/observer-bench/`](../tools/observer-bench) · dir
 
 <!-- COMPONENTS-END -->
@@ -30,7 +31,7 @@ ratifies: W-170
 A consumer who wants to know *how* fux is being used — how often, with which
 verb, how confidently — has one honest place to learn it: **after** a verb has
 finished and printed. This record gives that place a name. `.fux/observers/` is
-a directory the consumer owns, seeded empty by `fux setup`, and every `*.py`
+a directory the consumer owns, created on demand by `fux observers init`, and every `*.py`
 (and, on the Node reader, `*.mjs`) in it is called once per invocation with a
 single frozen record of **counts and names only** — the verb, a hash of its
 normalised arguments, the confidence band, the result and `related` counts,
@@ -103,8 +104,9 @@ component.
 ### Decision
 
 1. **The directory.** `.fux/observers/` holds `*.py` for the Python reader and
-   `*.mjs` for the Node reader, readable source by contract, seeded empty by
-   `fux setup`. [SR-FUX-DIRECTORY](0102_fux-directory.md) lists it; SR-LAW-10
+   `*.mjs` for the Node reader, readable source by contract, **created on demand by
+   `fux observers init`** (W-296, 2026-10-24; `fux setup` no longer seeds it, and removes the
+   old README-only scaffold when byte-identical to a shipped one). [SR-FUX-DIRECTORY](0102_fux-directory.md) lists it; SR-LAW-10
    decision 2 exempts it. Node's half ships with the Python half or
    [SR-NODE-SEARCH](0153_node-search.md) declares it out of scope in the same
    change — never silently missing.
@@ -309,3 +311,5 @@ string naming a subscriber.
 byte-identity test with a raising observer installed, the schema grep, and the
 no-subscriber-name grep; until it exists, this record is `proposed` and the
 directory does not exist.
+
+**No decision here moved** (W-296, 2026-10-24). Decision 1's "seeded empty by `fux setup`" became "created on demand by `fux observers init`" (Arpit, Cowork, 2026-10-24: *"don't create the observers directory by default — only through a CLI command if anybody needs it"*). The verb is write-if-missing and writes no observer; `fux setup` removes a `.fux/observers/` holding only a README byte-identical to a shipped one (`constants.toml [observe] shipped_readme_sha256`) and touches nothing else. Dispatch and the doctor row are unchanged apart from the doctor's hint.

@@ -925,6 +925,15 @@ idf_offset = 0.5
 [observe]
 # An observer call's argument hash: this many hex digits of a sha256.
 args_hash_hex = 16
+# `fux observers init` writes this template (W-296). Name only; read, never imported.
+readme_template = "observers-README.md.txt"
+# sha256 of every `.fux/observers/README.md` a `fux setup` ever shipped. A
+# directory holding ONLY a README with one of these digests is the empty
+# scaffold, and setup removes it; any other byte is the consumer's and stays.
+# A shipped text that changes appends its old digest here -- never replaces.
+shipped_readme_sha256 = [
+    "d8085309627941688b9c5e558aa83ebc897618c5ec1f1828c40e58e973177661",
+]
 
 [refer]
 # A fetch-cache entry's file name: this many hex digits of the loc's sha256.

@@ -50,6 +50,7 @@ VERBS: dict[str, tuple[tuple[str, str, str], ...]] = {
     "llms": (('reader', 'fux.llms', 'cmd_llms'),),
     "hooks": (('writer', 'fux.maintain', 'cmd_hooks'),),
     "daemon": (('writer', 'fux.maintain', 'cmd_daemon'),),
+    "observers": (('writer', 'fux.maintain', 'cmd_observers'),),
     "verify": (('reader', 'fux.query', 'cmd_verify'),),
     "explain": (('reader', 'fux.graph', 'cmd_explain'),),
     "graph": (('reader', 'fux.graph', 'cmd_graph'),),
@@ -966,6 +967,15 @@ def build_parser() -> argparse.ArgumentParser:
     _add_output_flags(p_daemon, band=False)
     p_daemon.set_defaults(func=_dispatch)
 
+    # W-296. Creates `.fux/observers/` on demand -- `fux setup` no longer does.
+    # `init` is a POSITIONAL ARGUMENT, not a subparser (no subcommand tree), and
+    # a room for `list` later without a new verb.
+    p_observers = _verb(
+        "observers", help="create `.fux/observers/` for your analytics (init)"
+    )
+    p_observers.add_argument("action", choices=("init",), help="init: create the directory and its README")
+    p_observers.set_defaults(func=_dispatch)
+
     # The graph group. Flat, like every other verb — `fux graph path` would be
     # the first subcommand tree on this surface, and "no subcommand tree" is
     # the constraint SR-CLI keeps.
@@ -1112,7 +1122,7 @@ def _require_pii_rules(command: str) -> None:
 #: SR-PLUGINS P4: the verbs that still run while a declared package is missing
 #: or drifted — the two that diagnose and repair the declaration, and the ones
 #: that neither read the index nor decode a byte. Every other verb refuses.
-PLUGINS_EXEMPT = frozenset({"setup", "doctor", "tune", "output", "hooks", "daemon"})
+PLUGINS_EXEMPT = frozenset({"setup", "doctor", "tune", "output", "hooks", "daemon", "observers"})
 
 
 def _require_plugins(command: str) -> None:

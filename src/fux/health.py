@@ -895,7 +895,7 @@ def _observers(root: Path) -> Check:
     except Exception:
         return Check(name, True, "could not read .fux/observers/")
     if not present:
-        return Check(name, True, "none installed")
+        return Check(name, True, "none installed - `fux observers init` to add one")
     state = observe.liveness(root)
     if not state:
         return Check(name, True, f"{len(present)} installed; not yet observed a run")

@@ -331,3 +331,82 @@ def test_fux_carries_no_knowledge_of_any_subscriber():
         "src/fux/ names a subscriber — SR-OBSERVE decision 8. fux exposes the "
         "seam and knows nothing about who subscribes:\n  " + "\n  ".join(offenders)
     )
+
+
+# ---------------------------------------------------------------------------
+# W-296 -- `.fux/observers/` exists on demand, never by `fux setup`
+# ---------------------------------------------------------------------------
+
+
+def test_setup_leaves_no_observers_directory(tmp_path):
+    from fux import setup as setup_mod
+
+    setup_mod.run(tmp_path)
+    assert not (tmp_path / ".fux" / "observers").exists()
+
+
+def test_observers_init_creates_the_directory_and_twice_is_a_no_op(tmp_path):
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    first = _run(tmp_path, "observers", "init")
+    assert first.returncode == 0, first.stderr
+    readme = tmp_path / ".fux" / "observers" / "README.md"
+    assert readme.read_bytes() == observe.readme_bytes()
+    assert ".fux/observers/" in first.stdout and "observe(record" in first.stdout
+    readme.write_text("mine\n", encoding="utf-8")
+    second = _run(tmp_path, "observers", "init")
+    assert second.returncode == 0 and "already present" in second.stdout
+    assert readme.read_text(encoding="utf-8") == "mine\n"
+    assert [p.name for p in readme.parent.iterdir()] == ["README.md"]
+
+
+def test_the_shipped_readme_digest_is_registered():
+    import hashlib
+    from fux.constants import fixed
+
+    assert hashlib.sha256(observe.readme_bytes()).hexdigest() in fixed("observe", "shipped_readme_sha256")
+
+
+def test_setup_removes_a_byte_identical_readme_only_scaffold(tmp_path):
+    from fux import setup as setup_mod
+
+    directory = tmp_path / ".fux" / "observers"
+    directory.mkdir(parents=True)
+    (directory / "README.md").write_bytes(observe.readme_bytes())
+    setup_mod.run(tmp_path)
+    assert not directory.exists()
+
+
+def test_setup_leaves_an_edited_readme_or_an_observer_alone(tmp_path):
+    from fux import setup as setup_mod
+
+    edited = tmp_path / "a" / ".fux" / "observers"
+    edited.mkdir(parents=True)
+    (edited / "README.md").write_bytes(observe.readme_bytes() + b"\nmine\n")
+    setup_mod.run(tmp_path / "a")
+    assert (edited / "README.md").read_bytes().endswith(b"mine\n")
+
+    withcode = tmp_path / "b" / ".fux" / "observers"
+    withcode.mkdir(parents=True)
+    (withcode / "README.md").write_bytes(observe.readme_bytes())
+    (withcode / "probe.py").write_text("def observe(r): pass\n", encoding="utf-8")
+    setup_mod.run(tmp_path / "b")
+    assert (withcode / "README.md").is_file() and (withcode / "probe.py").is_file()
+
+
+def test_the_doctor_row_points_at_init_when_none_is_installed(tmp_path):
+    from fux import health
+
+    assert "fux observers init" in health._observers(tmp_path).detail
+
+
+def test_an_observer_dropped_into_an_init_created_dir_still_fires(repo):
+    assert _run(repo, "observers", "init").returncode == 0
+    _observer(repo, "probe.py", """
+import json, pathlib
+def observe(record):
+    pathlib.Path("seen.json").write_text(json.dumps(record))
+""")
+    _run(repo, "ask", "rollback")
+    assert json.loads((repo / "seen.json").read_text(encoding="utf-8"))["verb"] == "ask"

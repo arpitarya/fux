@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-20
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@e99127ba732e]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@0517b4f603a6]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 8b0d97103dbf7ddc9d34360fde2eb2896122a0872f9ed2ceda61a43c794ac8ef
+content_sha: 4f4d68ce5d8a72c629e2d0a7837860b4194cb67fff8a4ad58deded824138aa8a
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
