@@ -7,7 +7,7 @@
 import { cellsOf } from "./chunk.mjs";
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
 
-//: `budget`, `perDocFraction` and `citationOverhead` are `.fux/tune.toml
+//: `budget`, `perDocFraction` and `citationOverhead` are `.fux/config/tune.toml
 //: [refer]`'s and arrive from the caller (L12). The overhead is charged per
 //: citation, so the budget bounds the RENDERED answer and not merely its payload.
 

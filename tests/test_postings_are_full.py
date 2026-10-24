@@ -28,6 +28,7 @@ whether full postings are the *right* design -- that was P1's, and is closed.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import pytest
 
 from fux import store
@@ -69,7 +70,7 @@ def repo(tmp_path_factory):
     (root / ".fux" / "sources").mkdir(parents=True)
     (root / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     for rel, text in DOCS.items():
         path = root / rel

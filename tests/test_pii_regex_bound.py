@@ -8,6 +8,7 @@ L5 import fence.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import ast
 from pathlib import Path
 
@@ -40,7 +41,7 @@ SAFE = [
 
 
 def _rules(tmp_path: Path, pattern: str, name: str = "r") -> Path:
-    path = tmp_path / ".fux" / "pii.toml"
+    path = config_file(tmp_path, "pii")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         f"[[rule]]\nname = '{name}'\npattern = '''{pattern}'''\n", encoding="utf-8"
@@ -70,8 +71,7 @@ def test_the_possessive_fix_the_error_names_is_admitted():
 
 
 def test_the_starter_template_loads_clean(tmp_path):
-    path = tmp_path / ".fux" / "pii.toml"
-    path.parent.mkdir(parents=True)
+    path = config_file(tmp_path, "pii")
     path.write_text(
         (SRC / "templates" / "pii.toml.txt").read_text(encoding="utf-8"), encoding="utf-8"
     )

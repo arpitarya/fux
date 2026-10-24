@@ -484,14 +484,14 @@ def load(root: Path) -> Config:
     _refuse_retired_url_keys(path, sources.get("url"))
 
     # SR-TUNE decision 7: every knob that changes ORDER moved to
-    # `.fux/tune.toml`, and the old keys are retired with an error naming the
+    # `.fux/config/tune.toml`, and the old keys are retired with an error naming the
     # new home rather than being silently ignored. The `middleware` -> `fetcher`
     # precedent below is the same shape, for the same reason: a key that is
     # quietly not read is worse than one that errors, because the reader
     # believes their setting is in force.
     if "ranking" in data:
         raise FuxError(
-            f"{path}: [ranking] moved to .fux/tune.toml — it holds every knob that "
+            f"{path}: [ranking] moved to .fux/config/tune.toml — it holds every knob that "
             f"changes how results are ORDERED, and none that changes what is indexed. "
             f"Run `fux setup` to write the file, move the keys across, and delete "
             f"[ranking] from here (SR-TUNE, 2026-08-24)"
@@ -507,13 +507,13 @@ def load(root: Path) -> Config:
             f"that would have moved it measured 0 fixed / 2 broken"
         )
 
-    # 2026-09-11 (Arpit): `[decode] max_table_rows` moved to `.fux/tune.toml
+    # 2026-09-11 (Arpit): `[decode] max_table_rows` moved to `.fux/config/tune.toml
     # [index]`, beside `max_phrases`. Refused by name, not ignored — the
     # `[ranking]` precedent above: a key quietly not read is a setting its
     # author believes is in force.
     if "decode" in data:
         raise FuxError(
-            f"{path}: [decode] moved to .fux/tune.toml — `max_table_rows` now lives in "
+            f"{path}: [decode] moved to .fux/config/tune.toml — `max_table_rows` now lives in "
             f"its [index] table, beside `max_phrases`. Move the value across and delete "
             f"[decode] from here (SR-TUNE decision 13, 2026-09-11)"
         )
@@ -617,7 +617,7 @@ def _refuse_unknown_keys(path: Path, data: dict) -> None:
     **Why refusing beats ignoring.** `dirs_fil = "docs"` used to parse fine and
     do nothing: the consumer's setting was inert and nothing said so. That is the
     same defect as a key documented and never parsed, approached from the other
-    end, and `.fux/tune.toml` has refused unknown keys by name since it existed.
+    end, and `.fux/config/tune.toml` has refused unknown keys by name since it existed.
 
     ⚠ **A key in `REFUSED_KEYS` is skipped here**, because it has a bespoke error
     naming its new home and that answer is strictly better than this one.
@@ -660,7 +660,7 @@ def _refuse_unknown_keys(path: Path, data: dict) -> None:
                 f"{path}: {where}{key} is not a fux.toml key — fux refuses a key it "
                 f"does not read rather than ignoring it, because an ignored key is a "
                 f"setting you believe is in force. Legal here: {legal_in(prefix)}. "
-                f"Ranking knobs live in .fux/tune.toml (SR-TUNE); the full key list "
+                f"Ranking knobs live in .fux/config/tune.toml (SR-TUNE); the full key list "
                 f"is SR-CONFIG decision 13"
             )
 

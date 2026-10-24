@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-24
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@c6bd6ef09e80, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@f5e59a40b46a, src/fux/progress.py@10364bd02e0a, tests_e2e@75d8d300a9f1, node/fux.mjs@ef9e157970bc, src/fux/stdio.py@9e270b49bdaa]
+owns: [src/fux/cli.py@5931750f6a49, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@fe8608a6944a, src/fux/progress.py@e5f2459288d5, tests_e2e@81552f7b5119, node/fux.mjs@36a064b9874d, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 1233169b4da3511ed145838f1cd46f25a40a39d91cd950da9bb2a8c8eb490c8e
+content_sha: d3ab39922babe39fba3d662cacbbea8247be3a216964f15d83a034e6b0905834
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -178,7 +178,7 @@ what makes a flat verb sufficient here rather than merely mandated. They write
 every attribute explicitly ([SR-URL-LIST](0116_url-list.md) decision 12) and
 edit one line, so a human's grouping comments survive.
 
-⚠ **Since 2026-09-11 the type list is `.fux/formats.toml`** ([SR-TYPES](0128_types-list.md)
+⚠ **Since 2026-09-11 the type list is `.fux/config/formats.toml`** ([SR-TYPES](0128_types-list.md)
 decision 12), and every verb hands a `--types` edit to `acquire/typesfile.py`
 instead of the line grammar. **The one-line rule holds there too**: `add` inserts
 one glob into `include`, or one `ext = "module"` into `[decoders]` when a decoder
@@ -240,12 +240,12 @@ exists to prevent, so this decision names the paths and cites the law rather
 than paraphrasing it.
 
 **1e. `setup` writes the files a consumer owns, write-if-missing** — `fux.toml`,
-the source lists, `.fux/tune.toml`, the agent policy files, and
-`.fux/plugins.toml` — **and no decoder or fetcher** ([SR-PLUGINS](0165_plugins.md)
+the source lists, `.fux/config/tune.toml`, the agent policy files, and
+`.fux/config/plugins.toml` — **and no decoder or fetcher** ([SR-PLUGINS](0165_plugins.md)
 P9). It is the only verb that may run before a repo root exists, because it is
 what creates one ([SR-DOTFUX](0102_fux-directory.md) decision 6). Everything it
 writes is the consumer's from that moment, and no later run rewrites any of it —
-**except `.fux/plugins.toml`**, where setup scans the configured sources, adds a
+**except `.fux/config/plugins.toml`**, where setup scans the configured sources, adds a
 row for every package they now need, pins a row whose package is installed but
 has no digest yet, and **prints one install line for what this machine lacks —
 it installs nothing** (P6, L5). **`fux setup --pin`** re-pins every row from what
@@ -307,7 +307,7 @@ to `default=None`; a `nargs="?"` positional defaults to `None` by construction
 and there is nothing to gate. SR-OUTPUT records it by name under its 2026-09-02 note.
 
 **3. `--no-tune` is one flag on five verbs**, not a knob per tune table.
-`ask` · `find` · `answer` · `graph` · `path` ignore `.fux/tune.toml` and answer
+`ask` · `find` · `answer` · `graph` · `path` ignore `.fux/config/tune.toml` and answer
 on the engine's defaults. The question it answers is *"is it me or the
 config?"*, and bisecting that across six switches is an experiment where one
 switch is a single re-run. Decision 2's shared query parser carries it for the
@@ -319,12 +319,12 @@ string.
 stderr, exit `exc.exit_code`; and `KeyboardInterrupt` → exit 130. Internals
 raise. Any traceback that reaches a user is a bug.
 ⚠ **It is also where one repository precondition is checked, before any
-handler runs** (2026-09-11): a missing `.fux/pii.toml` stops the verb. The rule,
+handler runs** (2026-09-11): a missing `.fux/config/pii.toml` stops the verb. The rule,
 its exemptions and why are [SR-PII](0148_pii.md) decision 17's, not this
 record's; what this record owns is the placement — **before dispatch**, so a
 verb added later is gated without its author knowing the gate exists.
 ⚠ **A second precondition shares that placement since W-289 phase 2
-(2026-10-20)**: a package `.fux/plugins.toml` declares that is missing or
+(2026-10-20)**: a package `.fux/config/plugins.toml` declares that is missing or
 drifted stops every verb except `cli.PLUGINS_EXEMPT` — `setup`, `doctor`,
 `tune`, `output`, `hooks`, `daemon` — with the install line, exit `1`. The rule
 is [SR-PLUGINS](0165_plugins.md) P4's; **a missing file is not this refusal**
@@ -513,7 +513,7 @@ had already done its work.
     the flags themselves live in `cli.py`, which this record owns.** Both
     halves are `default=None` (decision 7/10's `--band` pattern repeated): an
     absent flag has to stay distinguishable from an explicit one, or a
-    `[cli.ask] sections` key in `.fux/output.toml` would be unreachable from
+    `[cli.ask] sections` key in `.fux/config/output.toml` would be unreachable from
     the command line. The mutually-exclusive group is the mechanism a
     default-on flag needs — a lone `store_true` can only ever turn the lines
     back on, never off against a file that says `false`.
@@ -562,7 +562,7 @@ missing config file and key from its packaged template, reports each on stderr a
 report. It is one of exactly two writers of a missing key; `fux setup` is the
 other, and nothing else ever writes one.
 
-**`.fux/output.toml` is required ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3a, 2026-09-27).** Every
+**`.fux/config/output.toml` is required ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3a, 2026-09-27).** Every
 verb's rendering defaults — `top`, `max_headings`, `hops`, `band`, `explain`,
 `sections`, `no_refer`, `journal`, `journal_max`, `journal_max_bytes`, `port`, `progress_threshold`,
 `json` — resolve from the file ([SR-OUTPUT](0143_output-defaults.md) decisions 19–20); no argparse `default=`
@@ -600,11 +600,11 @@ $ fux setup --no-agents
   wrote .fux/.gitignore
   … 13 lines omitted …
   wrote fux.toml
-  wrote .fux/tune.toml
-  wrote .fux/output.toml
-  wrote .fux/inspect.toml: written
-  wrote .fux/identifiers.toml: written
-  wrote .fux/plugins.toml
+  wrote .fux/config/tune.toml
+  wrote .fux/config/output.toml
+  wrote .fux/config/inspect.toml: written
+  wrote .fux/config/identifiers.toml: written
+  wrote .fux/config/plugins.toml
 setup: 20 file(s) written. They are yours: commit them, edit them, fux will not rewrite them.
 next: add entries to .fux/sources/dirs, then `fux ingest`
       anything you do NOT want indexed goes in .fux/.fuxignore
@@ -615,9 +615,9 @@ $ fux setup --no-agents
 setup: nothing to do - every consumer-owned file is already here
 ```
 
-`.fux/plugins.toml` declares `fux-decoder-pdf`, because `docs/` holds a PDF. On a
+`.fux/config/plugins.toml` declares `fux-decoder-pdf`, because `docs/` holds a PDF. On a
 machine where a declared package is not installed, setup also prints
-`install the packages .fux/plugins.toml declares (fux installs nothing):` and the
+`install the packages .fux/config/plugins.toml declares (fux installs nothing):` and the
 one `pip install …==<version>` line, then names the rows the next `fux setup`
 will pin.
 
@@ -896,7 +896,7 @@ $ fux add
   handbook archived=false
 
 * 1 line(s) do not state every attribute, so fux did not write them. They load fine (the reader is lenient); `fux add <entry>` rewrites one in full.
-.fux/formats.toml:
+.fux/config/formats.toml:
   *.adoc
   *.markdown
   *.md
@@ -916,7 +916,7 @@ refusing.
 
 | flag | verb | effect |
 |---|---|---|
-| `--types` | `add` · `remove` | the entry is a file-type pattern, not a path, edited in `.fux/formats.toml` (SR-TYPES decision 12). ⚠ Since 2026-09-01 `add` also records the binding — a `[decoders]` line naming the module that would have read the pattern anyway, resolved from the LIVE registry so the written line preserves today's dispatch rather than describing it ([SR-TYPES](0128_types-list.md) decision 11). There is **no `--decoder` flag**: the binding is a property of the extension, so overriding one is a file edit, not a per-invocation choice |
+| `--types` | `add` · `remove` | the entry is a file-type pattern, not a path, edited in `.fux/config/formats.toml` (SR-TYPES decision 12). ⚠ Since 2026-09-01 `add` also records the binding — a `[decoders]` line naming the module that would have read the pattern anyway, resolved from the LIVE registry so the written line preserves today's dispatch rather than describing it ([SR-TYPES](0128_types-list.md) decision 11). There is **no `--decoder` flag**: the binding is a property of the extension, so overriding one is a file edit, not a per-invocation choice |
 | `--cdp` / `--http` | `add` | URLs: record `fetch=`. Both at once is an error, not a silent pick |
 | ~~`--plain` / `--hashed`~~ | `add` | **REMOVED 2026-09-20** (W-194) — they recorded `meta=`, which no longer exists. The flags are gone rather than accepted-and-ignored, so a script still passing one **fails at argparse** instead of silently recording nothing |
 | `--archived` | `add` | dirs: record `archived=true` |
@@ -1105,7 +1105,7 @@ zero. See [SR-FETCHER](0117_fetcher.md) decision 12.
 a repeatable `-q/--query`, on 2026-09-05** (W-109,
 [SR-EXPAND](0149_expand.md)). Both are plain valued options, so decision 10's
 `default=None` rule for gated flags does not reach them — there is no
-`store_true` collapse to avoid and no `.fux/output.toml` value for either to
+`store_true` collapse to avoid and no `.fux/config/output.toml` value for either to
 shadow. Named here anyway, for the reason `--all` and `--keep` were: this record
 constrains *every gated flag* in `cli.py`, so an option deliberately outside
 that set is recorded or a later reader "corrects" it toward a three-state
@@ -1122,7 +1122,7 @@ reason `--expand` does — no `store_true` collapse to avoid, no file value to
 shadow.
 
 ⚠ **`--all` IS a `store_true`, and it is deliberately outside decision 10 too.**
-That rule exists to keep a committed `.fux/output.toml` value reachable from
+That rule exists to keep a committed `.fux/config/output.toml` value reachable from
 the command line; `--all` has no such key and is not gated, because a filter
 that silently applied itself from a config file would make `fux find` return a
 different set of paths in two clones of the same repo. It is per-invocation by
@@ -1210,7 +1210,7 @@ frozen baseline verb stop being a baseline, and every ranking verdict in this
 repository cites `lexical` as its control.
 
 **14b. `--related` / `--no-related` is a pair, and is NOT backed by
-`.fux/output.toml`.** A pair for `--sections`' reason
+`.fux/config/output.toml`.** A pair for `--sections`' reason
 ([SR-OUTPUT](0143_output-defaults.md) decision 10): the tier is on by default,
 so a bare `store_true` could only ever turn it on again. **Why it has no key in
 that file is [SR-OUTPUT](0143_output-defaults.md) decision 23**, which owns the
@@ -1359,9 +1359,9 @@ apart on an L5 surface.
 be distinguishable, because a `--decoder` that arrived as `""` would be a pin
 nobody wrote.
 
-**`.fux/formats.toml` is required, so the e2e suite's hand-built repos write it through `write_config`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27); no verb's surface changed ([SR-TYPES](0128_types-list.md) decision 14).
+**`.fux/config/formats.toml` is required, so the e2e suite's hand-built repos write it through `write_config`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27); no verb's surface changed ([SR-TYPES](0128_types-list.md) decision 14).
 
-**`fux inspect --top` no longer defaults to 20 in the parser** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): absent, it is `.fux/inspect.toml [report] top` ([SR-INSPECT](0156_inspect.md) decision 23).
+**`fux inspect --top` no longer defaults to 20 in the parser** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): absent, it is `.fux/config/inspect.toml [report] top` ([SR-INSPECT](0156_inspect.md) decision 23).
 
 **Decision 5's two process codes are `constants.toml [exit]`** — `usage = 2` (argparse's, and the merge driver's) and `interrupted = 130` (Ctrl-C); `FuxError`'s `1` is unchanged. `--diff`'s arity is its metavar's length, and a verb's elapsed milliseconds are `timedelta` arithmetic. Every `--json` payload is indented by `[json] indent`. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
@@ -1370,7 +1370,7 @@ nobody wrote.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 
-**`fux identifiers [--write] [--json]`** ([SR-IDENTIFIERS](0160_identifiers.md)) proposes identifier families from the index and, with `--write`, replaces only `.fux/identifiers.toml [detected]`; it is gated by `pii.toml` like every non-exempt verb. **`fux ingest --check` reports one index-level drift no document sha shows** — an index built under other identifier families than the file holds (`"state": "identifiers"`), exit 0 like every other drift.
+**`fux identifiers [--write] [--json]`** ([SR-IDENTIFIERS](0160_identifiers.md)) proposes identifier families from the index and, with `--write`, replaces only `.fux/config/identifiers.toml [detected]`; it is gated by `pii.toml` like every non-exempt verb. **`fux ingest --check` reports one index-level drift no document sha shows** — an index built under other identifier families than the file holds (`"state": "identifiers"`), exit 0 like every other drift.
 
 **17. A verb paints the progress bar only when it was MEASURED slow** (Arpit,
 2026-09-29: *"verbs which are supposed to take time add progress bar so that
@@ -1472,11 +1472,11 @@ not installed here``, exit 1), never reported as an unknown choice.
 
 ### Consequences
 
-- 🔴 **`_apply_output_defaults` no longer degrades when `.fux/output.toml` is
+- 🔴 **`_apply_output_defaults` no longer degrades when `.fux/config/output.toml` is
   absent, and that is a REGRESSION shipped knowingly on 2026-08-28.**
   [SR-OUTPUT](0143_output-defaults.md) decision 19 made the file the sole
   source of truth, so this file's resolver now raises where it used to fall
-  back to `DEFAULT_OUTPUT`. **`.fux/output.toml` is write-if-missing
+  back to `DEFAULT_OUTPUT`. **`.fux/config/output.toml` is write-if-missing
   ([SR-DOTFUX](0102_fux-directory.md) decision 6), so it reaches new repos
   only — and every pre-existing repo therefore hard-fails on `ask`/`find`
   with exit 1.** 49 tests fail on `main`; the `tests_e2e/` fixtures

@@ -68,12 +68,12 @@ USES = tuple(fixed("decoders.mail", "uses"))
 #: signatures' case, indistinguishable from base64 junk.
 _HEADERS = ("Subject", "From", "To", "Cc", "Date")
 
-#: ⚠ **`MAX_BODY_CHARS` is `[limits.mail] max_body_chars` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_BODY_CHARS` is `[limits.mail] max_body_chars` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: Messages past this are an archive rather than a document — the same
 #: judgement `csv.MAX_ROWS` makes about rows.
-#: ⚠ **`MAX_MESSAGES` is `[limits.mail] max_messages` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_MESSAGES` is `[limits.mail] max_messages` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: An mbox `From_` separator: literally `From `, an address-shaped token, then

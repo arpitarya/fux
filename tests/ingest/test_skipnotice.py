@@ -15,6 +15,7 @@ are here:
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import hashlib
 from types import SimpleNamespace
 
@@ -33,8 +34,8 @@ def _init(tmp_path) -> None:
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / "docs").mkdir(exist_ok=True)
 
@@ -71,7 +72,7 @@ def _typed(root) -> None:
     """Narrow the allowlist to `*.md` so a `.py` file is a POLICY skip. The
     rewrite drops the decoder caps `_init` seeded, so they are filled back —
     `fux ingest` refuses a formats.toml without them (W-225 stage 4a)."""
-    types = root / ".fux" / "formats.toml"
+    types = config_file(root, "formats")
     types.parent.mkdir(parents=True, exist_ok=True)
     types.write_text('include = ["*.md"]\n', encoding="utf-8")
     write_config(root)

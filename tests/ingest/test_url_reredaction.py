@@ -17,6 +17,7 @@ everyone clones.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 
 import pytest
@@ -49,7 +50,7 @@ def _repo(tmp_path, *, keep=True):
         "max_parallel = 2\n",
         encoding="utf-8",
     )
-    (tmp_path / ".fux" / "pii.toml").write_text("# nothing redacted yet\n", encoding="utf-8")
+    (config_file(tmp_path, "pii")).write_text("# nothing redacted yet\n", encoding="utf-8")
     write_config(tmp_path)
     return tmp_path
 
@@ -142,7 +143,7 @@ def test_an_offline_run_carries_it_forward_unchanged(seeded):
 def test_a_new_pii_rule_re_extracts_the_url_from_retained_bytes(seeded):
     """🔴 **The gap.** No network, no fetch — the bytes are already here."""
     before = _url_record(seeded)
-    (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
+    (config_file(seeded, "pii")).write_text(RULE, encoding="utf-8")
     write_config(seeded)
 
     run(seeded, refresh_urls=False, full=False)  # offline
@@ -156,7 +157,7 @@ def test_the_redacted_term_actually_leaves_the_index(seeded):
     from fux.text.tokenize import tokenize
     from fux.store import term_hash
 
-    (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
+    (config_file(seeded, "pii")).write_text(RULE, encoding="utf-8")
     write_config(seeded)
     run(seeded, refresh_urls=False, full=False)
 
@@ -169,7 +170,7 @@ def test_the_redacted_term_actually_leaves_the_index(seeded):
 
 def test_the_file_half_of_the_corpus_is_re_extracted_too(seeded):
     """A policy change is corpus-wide; the url path is an addition, not a swap."""
-    (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
+    (config_file(seeded, "pii")).write_text(RULE, encoding="utf-8")
     write_config(seeded)
     assert run(seeded, refresh_urls=False, full=False).reused_count == 0
 
@@ -195,7 +196,7 @@ def test_a_url_with_no_retained_blob_is_stranded_not_dropped(seeded):
     acquired.write_manifest(seeded, {})
     before = _url_record(seeded)
 
-    (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
+    (config_file(seeded, "pii")).write_text(RULE, encoding="utf-8")
     write_config(seeded)
     run(seeded, refresh_urls=False, full=False)
 
@@ -204,7 +205,7 @@ def test_a_url_with_no_retained_blob_is_stranded_not_dropped(seeded):
 
 def test_a_stranded_url_is_recorded_for_doctor(seeded):
     acquired.write_manifest(seeded, {})
-    (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
+    (config_file(seeded, "pii")).write_text(RULE, encoding="utf-8")
     write_config(seeded)
     run(seeded, refresh_urls=False, full=False)
 
@@ -214,7 +215,7 @@ def test_a_stranded_url_is_recorded_for_doctor(seeded):
 
 def test_a_stranded_url_is_warned_about_on_the_run_that_strands_it(seeded):
     acquired.write_manifest(seeded, {})
-    (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
+    (config_file(seeded, "pii")).write_text(RULE, encoding="utf-8")
     write_config(seeded)
 
     warnings = "\n".join(run(seeded, refresh_urls=False, full=False).warnings)
@@ -226,13 +227,13 @@ def test_a_stranded_url_is_warned_about_on_the_run_that_strands_it(seeded):
 def test_the_stranded_state_clears_once_the_bytes_are_back(seeded):
     """The state is derived: it is rebuilt by being wrong once, never sticky."""
     acquired.write_manifest(seeded, {})
-    (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
+    (config_file(seeded, "pii")).write_text(RULE, encoding="utf-8")
     write_config(seeded)
     run(seeded, refresh_urls=False, full=False)
     assert (seeded / ".fux" / "runtime" / STALE_REDACTION_FILE).is_file()
 
     _retain(seeded)
-    (seeded / ".fux" / "pii.toml").write_text(RULE + "\n# touched\n", encoding="utf-8")
+    (config_file(seeded, "pii")).write_text(RULE + "\n# touched\n", encoding="utf-8")
     write_config(seeded)
     run(seeded, refresh_urls=False, full=False)
     assert not (seeded / ".fux" / "runtime" / STALE_REDACTION_FILE).is_file()
@@ -242,7 +243,7 @@ def test_doctor_names_a_stranded_url(seeded):
     from fux import doctor
 
     acquired.write_manifest(seeded, {})
-    (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
+    (config_file(seeded, "pii")).write_text(RULE, encoding="utf-8")
     write_config(seeded)
     run(seeded, refresh_urls=False, full=False)
 
@@ -254,7 +255,7 @@ def test_doctor_names_a_stranded_url(seeded):
 
 
 def test_doctor_is_clean_when_nothing_is_stranded(seeded):
-    (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
+    (config_file(seeded, "pii")).write_text(RULE, encoding="utf-8")
     write_config(seeded)
     run(seeded, refresh_urls=False, full=False)
 
@@ -276,7 +277,7 @@ def test_re_derivation_is_byte_identical_to_what_a_fetch_would_produce(seeded, m
     """
     from fux.acquire import urlsrc
 
-    (seeded / ".fux" / "pii.toml").write_text(RULE, encoding="utf-8")
+    (config_file(seeded, "pii")).write_text(RULE, encoding="utf-8")
     write_config(seeded)
     run(seeded, refresh_urls=False, full=False)
     offline = _url_record(seeded)

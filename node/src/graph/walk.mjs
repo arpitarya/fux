@@ -28,7 +28,7 @@
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
 import { fixed } from "../config/constants.mjs";
 
-//: `damping`, `iterations`, `laziness` and `hopDecay` are `.fux/tune.toml
+//: `damping`, `iterations`, `laziness` and `hopDecay` are `.fux/config/tune.toml
 //: [graph]`'s and arrive as arguments (L12); why each is what the template
 //: ships is said beside its key in `templates/tune.toml.txt`.
 

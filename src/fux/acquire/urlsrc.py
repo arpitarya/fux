@@ -123,7 +123,7 @@ def load_fetcher(root: Path, rel_path: str):
 
     🔴 **SR-PLUGINS P8 — the consumer's file, then a declared package, then
     nothing.** A file at `rel_path` is loaded by path and wins outright. Without
-    one, the package `.fux/plugins.toml` declares for `fetch=<name>` is verified
+    one, the package `.fux/config/plugins.toml` declares for `fetch=<name>` is verified
     (P4) and loaded by its fixed import name (P7). An installed package nobody
     declared is never consulted (P3), so this is the one place a fetcher
     package is ever executed, and only once a URL line names it (P10).

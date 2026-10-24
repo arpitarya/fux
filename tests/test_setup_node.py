@@ -19,6 +19,7 @@ must not edit committed files outside its plane.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 from pathlib import Path
 

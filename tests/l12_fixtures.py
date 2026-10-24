@@ -1,7 +1,7 @@
 """The config files every hand-built test repo now needs — L12 (W-225).
 
 [SR-LAW-12](../records/0014_LAW-12-values-live-in-config.md): the engine holds
-no value in code, so a repository with no `.fux/tune.toml` stops the ranked
+no value in code, so a repository with no `.fux/config/tune.toml` stops the ranked
 verbs and `fux ingest` naming the file. A test that hand-builds a repository
 writes the files `fux setup` would, from the same packaged templates, through
 this module — never from literals of its own, so a shipped value changes in one
@@ -19,6 +19,19 @@ from functools import lru_cache
 from pathlib import Path
 
 from fux import tune as tune_mod
+from fux.constants import fixed
+
+
+def config_file(root: "Path | str", name: str) -> Path:
+    """`<root>/.fux/config/<name>.toml` -- THE shared address of a policy file (W-295).
+
+    The address comes from `constants.toml [files]` and the parent directory is
+    created, so a hand-built repository never spells `.fux/config/` itself and a
+    test that writes `pii.toml` need not remember the directory exists.
+    """
+    path = Path(root) / fixed("files", name)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
 
 
 @lru_cache(maxsize=1)
@@ -43,9 +56,8 @@ def chunk_bounds() -> dict[str, int]:
 
 
 def write_tune(root: Path, text: "str | None" = None) -> Path:
-    """Write `.fux/tune.toml` — the template verbatim, or `text` when given."""
-    path = root / ".fux" / "tune.toml"
-    path.parent.mkdir(parents=True, exist_ok=True)
+    """Write `.fux/config/tune.toml` — the template verbatim, or `text` when given."""
+    path = config_file(root, "tune")
     path.write_text(tune_mod.template_text() if text is None else text, encoding="utf-8")
     return path
 
@@ -118,12 +130,12 @@ def write_config(root: Path) -> "list[str]":
 
     changed = setup_mod.fill_missing(root)
     if write_plugins(root):
-        changed.append(".fux/plugins.toml: written")
+        changed.append(".fux/config/plugins.toml: written")
     return changed
 
 
 def write_plugins(root: Path, names: "list[str] | None" = None, *, force: bool = False) -> bool:
-    """Declare plugin packages in `root/.fux/plugins.toml` — THE shared fixture
+    """Declare plugin packages in `root/.fux/config/plugins.toml` — THE shared fixture
     for W-289 phase 2 (SR-PLUGINS).
 
     Since phase 2 a repository decodes nothing until it declares the package
@@ -165,7 +177,7 @@ def configured_root() -> Path:
 
 
 def shipped_output() -> dict:
-    """Every `.fux/output.toml` value as the template ships it, flat by key.
+    """Every `.fux/config/output.toml` value as the template ships it, flat by key.
 
     What the retired `output_config.BUILT_IN` held — derived from the one
     template instead of a second copy (L12), with `json` meaning `[cli.json]
@@ -217,7 +229,7 @@ def template_fux_toml() -> dict:
 
 
 def refusals_scan() -> dict:
-    """`.fux/refusals.toml [scan]` as the template ships it (W-225 stage 4b)."""
+    """`.fux/config/refusals.toml [scan]` as the template ships it (W-225 stage 4b)."""
     import tomllib
 
     from fux import setup as setup_mod
@@ -231,7 +243,7 @@ def refusals_scan_text() -> str:
 
 
 def inspect_template():
-    """`.fux/inspect.toml` as the template ships it — an `InspectConfig` (W-225 4c)."""
+    """`.fux/config/inspect.toml` as the template ships it — an `InspectConfig` (W-225 4c)."""
     from fux import inspect_config
 
     return inspect_config.load(None)

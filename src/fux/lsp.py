@@ -448,7 +448,7 @@ def serve(stdin=None, stdout=None, root: Path | None = None, *, enabled: bool) -
     protocol is tested without a subprocess, as `mcp.serve` is.
 
     How many symbols a search returns is the `top` `fux ask` shows a person —
-    `[cli.ask]`/`[cli]` in `.fux/output.toml`, resolved once here. This is a
+    `[cli.ask]`/`[cli]` in `.fux/config/output.toml`, resolved once here. This is a
     surface for a person in an editor, not an agent, so it reads the person's
     number and not `[mcp]`'s. `enabled=False` is `--no-output-config`.
     """

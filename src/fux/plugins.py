@@ -1,7 +1,7 @@
-"""`.fux/plugins.toml` - the packages a repository declares (W-289, SR-PLUGINS).
+"""`.fux/config/plugins.toml` - the packages a repository declares (W-289, SR-PLUGINS).
 
 Only the engine is mandatory. Every decoder, fetcher and extension package is
-**declared per repository** in a committed `.fux/plugins.toml`, **pinned** by
+**declared per repository** in a committed `.fux/config/plugins.toml`, **pinned** by
 version and digest, and **refused loudly** when missing or drifted — so two
 machines on one repository can never build different indexes because of what
 each happened to have installed ([SR-LAW-2](../../records/0004_LAW-2-zero-cost.md),
@@ -110,7 +110,7 @@ class Package:
 
 @dataclass(frozen=True)
 class Declared:
-    """One `[[package]]` row of `.fux/plugins.toml`."""
+    """One `[[package]]` row of `.fux/config/plugins.toml`."""
 
     package: Package
     version: str
@@ -220,7 +220,7 @@ def package_named(name: str, suffixes: "tuple[str, ...]" = ()) -> Package:
 
 
 def path(root: Path) -> Path:
-    """`.fux/plugins.toml` under `root`."""
+    """`.fux/config/plugins.toml` under `root`."""
     return root / fixed("plugins", "file")
 
 
@@ -298,7 +298,7 @@ def parse(text: str, origin: str) -> dict[str, Declared]:
 #: P2: read once per process, per repository root — and per version of the
 #: file. The key carries the file's stat, so a long-lived process (`fux mcp`,
 #: the daemon) sees an edited declaration the way `decode.registry()` sees an
-#: edited `.fux/formats.toml`, while a 10 000-document walk still parses it once.
+#: edited `.fux/config/formats.toml`, while a 10 000-document walk still parses it once.
 _CACHE: dict[tuple, "dict[str, Declared] | None"] = {}
 
 
@@ -318,7 +318,7 @@ def stamp(root: Path) -> tuple:
 
 
 def read(root: Path) -> "dict[str, Declared] | None":
-    """The declaration, or `None` when `.fux/plugins.toml` does not exist."""
+    """The declaration, or `None` when `.fux/config/plugins.toml` does not exist."""
     key = stamp(root)
     if key not in _CACHE:
         if key[1] is None:
@@ -330,7 +330,7 @@ def read(root: Path) -> "dict[str, Declared] | None":
 
 
 def exists(root: Path) -> bool:
-    """Is there a `.fux/plugins.toml` at all? Absent means prose only (P3)."""
+    """Is there a `.fux/config/plugins.toml` at all? Absent means prose only (P3)."""
     return path(Path(root)).is_file()
 
 
@@ -797,7 +797,7 @@ def render(rows: "list[Declared]") -> str:
     """The file `fux setup` writes, rows sorted by name."""
     row_key = fixed("plugins", "table")
     lines = [
-        "# .fux/plugins.toml -- the packages this repository's index needs (SR-PLUGINS).",
+        "# .fux/config/plugins.toml -- the packages this repository's index needs (SR-PLUGINS).",
         "#",
         "# Committed. Only fux itself is mandatory; every decoder and fetcher package",
         "# runs only when declared here, at exactly this version and digest. An",

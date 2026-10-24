@@ -38,7 +38,7 @@ three hold:
    (SR-DIR-LIST, W-45's verdict E) — the **deprecated** home for exclusions,
    still honoured, and `fux ingest` warns when a pattern is stated here *and*
    in `.fuxignore`;
-3. its name matches the **type allowlist** — `.fux/formats.toml` if that file
+3. its name matches the **type allowlist** — `.fux/config/formats.toml` if that file
    exists, otherwise the built-in `DEFAULT_TYPES` (SR-TYPES, W-55's verdict G).
 
 **No rule inside that trio beats another**, so there is nothing to remember
@@ -226,7 +226,7 @@ def _default_types() -> tuple[str, ...]:
     default that grew when a consumer dropped a `logdoc.py` into
     `.fux/decoders/` would mean **adding a decoder silently starts indexing a
     new file type** — and what counts as a document must stay a committed line
-    a human wrote in `.fux/formats.toml`.
+    a human wrote in `.fux/config/formats.toml`.
     """
     from .. import decode as decode_mod
 
@@ -242,14 +242,14 @@ class TypeFilter:
 
     ⚠ **There is no `deny` any more** (SR-TYPES decision 12, 2026-09-11). The
     `!` subtraction the old line grammar carried was already the deprecated
-    spelling of an exclusion; `.fux/formats.toml` has no such key, and
+    spelling of an exclusion; `.fux/config/formats.toml` has no such key, and
     `.fux/.fuxignore` is the one home for keeping a file out.
     """
 
     allow: tuple[str, ...]
     #: True when the built-in default is in force — i.e. no types file exists.
     default: bool = True
-    #: W-289: the globs `.fux/formats.toml` admits that no declared package can
+    #: W-289: the globs `.fux/config/formats.toml` admits that no declared package can
     #: read (`readable()`). A file one of them matches is not walked and is NOT
     #: a skip — it is counted on `fux ingest`'s stderr instead (SR-PLUGINS P5).
     undeclared: tuple[str, ...] = ()
@@ -263,7 +263,7 @@ class TypeFilter:
 
 
 def read_types(root: Path, rel_path: str = TYPES_FILE) -> TypeFilter:
-    """The type allowlist: `.fux/formats.toml`, which is required.
+    """The type allowlist: `.fux/config/formats.toml`, which is required.
 
     ⚠ **Absent meant the built-in default until W-225 stage 4a** (SR-LAW-12).
     The file now also carries the decoders' caps, which have no copy in code;
@@ -297,7 +297,7 @@ def readable(root: Path, allow: tuple[str, ...]) -> tuple[str, ...]:
     🔴 **SR-TYPES decision 1, since W-289 phase 2: the allowlist in force is
     prose plus every suffix a DECLARED package claims** (SR-PLUGINS P3) — and
     every suffix a consumer decoder in `.fux/decoders/` claims, which a
-    `.fux/formats.toml` line already had to admit. A `*.pdf` glob in a
+    `.fux/config/formats.toml` line already had to admit. A `*.pdf` glob in a
     repository that declares no `fux-decoder-pdf` admits nothing: the file is
     never read as prose (its bytes are a PDF) and never decoded (nothing
     declared can), so it is not walked at all. ⚠ **Not silent**: `fux ingest`

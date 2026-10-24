@@ -1,4 +1,4 @@
-"""Identifier families — `.fux/identifiers.toml`, matched on both sides (W-233).
+"""Identifier families — `.fux/config/identifiers.toml`, matched on both sides (W-233).
 
 **What this adds to the analyzer, and what it leaves alone.** Analyzer v3 keeps
 `RF-118` whole when it is *written* `RF-118`. It does nothing for `RF 118`,
@@ -489,7 +489,7 @@ def parse(data: dict, *, origin: str) -> IdentifierRules:
 
 
 def load(root: Path) -> IdentifierRules:
-    """Parse `.fux/identifiers.toml`. **Absent raises** (L12: the file's
+    """Parse `.fux/config/identifiers.toml`. **Absent raises** (L12: the file's
     existence is the contract; `fux setup` writes it). Empty sections are fine."""
     p = path(root)
     if not p.is_file():

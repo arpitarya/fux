@@ -928,7 +928,7 @@ body.present #progress{display:block}
         <text x="640" y="216" font-size="11" fill="var(--d-body)">weight the term frequencies first, saturate the total.</text>
       </svg>
     </div>
-    <figcaption>Weights are tunable in <code>.fux/tune.toml</code>; these are the defaults.</figcaption>
+    <figcaption>Weights are tunable in <code>.fux/config/tune.toml</code>; these are the defaults.</figcaption>
 
   <div class="note warn">
     <strong>"Hashed" is not "anonymous" — be precise about which.</strong> The <em>terms</em> are
@@ -943,7 +943,7 @@ body.present #progress{display:block}
     cache. <strong>W-194 deleted the mechanism and retired ex-L5</strong>, so the ACL-mismatch leak it
     closed — a title alone telling a reader that a document they cannot open exists — is now an
     <strong>accepted exposure</strong>. Keep a value out of the index with
-    <code>.fux/pii.toml</code>, or do not index the page. See SR-RECORD and ex-SR-LAW-5.
+    <code>.fux/config/pii.toml</code>, or do not index the page. See SR-RECORD and ex-SR-LAW-5.
   </div>
   </figure>
 </section>
@@ -1622,7 +1622,7 @@ confidence: none - nothing in the
       you can re-derive the band, but so you can see it <em>is not comparable</em> across repos that
       tuned differently. See <a href="#s-conf-tune">Tuning the floors</a>.</li>
     <li><strong>On the CLI the block needs <code>--band</code></strong> (or <code>band = true</code>
-      in <code>.fux/output.toml</code>); the <code>fux_search</code> MCP result carries it always,
+      in <code>.fux/config/output.toml</code>); the <code>fux_search</code> MCP result carries it always,
       because a tool call has no flags to pass. <strong>Absent means "not asked for" — it never means
       "not confident".</strong></li>
     <li><strong>Silent at <code>grounded</code>, on purpose.</strong> A note that fires on every
@@ -1687,7 +1687,7 @@ confidence: none - nothing in the
   <h2>Moving the two floors — and what that costs</h2>
   <div class="plain"><b>in plain terms</b><span>You can move the two cutoffs. Here is what each move costs — including the one whose cost has never been measured.</span></div>
 
-  <p class="lede">Both cutoffs live in <code>.fux/tune.toml</code>. Neither can move a score or an
+  <p class="lede">Both cutoffs live in <code>.fux/config/tune.toml</code>. Neither can move a score or an
     ordering: confidence is computed <em>from</em> the ranking and nothing feeds back.</p>
 
 <pre><code>[confidence]
@@ -2424,7 +2424,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
           plane whose committed index depends on it too.</li>
         <li>Dropping a <code>logdoc.py</code> into <code>.fux/decoders/</code> must not silently start
           walking every <code>.log</code> in the repo — what counts as a document is a committed line
-          a human wrote in <code>.fux/formats.toml</code>.</li>
+          a human wrote in <code>.fux/config/formats.toml</code>.</li>
         <li>⚠ <strong>The import fence cannot reach <code>.fux/decoders/</code></strong>. Stated rather
           than papered over: a consumer decoder's offline behaviour is a documented obligation,
           checked by reviewing a committed diff.</li>
@@ -2454,11 +2454,11 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
         <td>Install health, index health, URL health, and where the background re-index stands.</td>
         <td><code>--json</code></td></tr>
       <tr><td><code>fux tune</code></td>
-        <td>Prints the tunables file to paste into <code>.fux/tune.toml</code>. Reads and writes
+        <td>Prints the tunables file to paste into <code>.fux/config/tune.toml</code>. Reads and writes
           nothing.</td><td>—</td></tr>
       <tr><td><code>fux identifiers</code></td>
         <td>Proposes identifier families (<code>RF-{n}</code>) from the index; <code>--write</code> records them in
-          <code>.fux/identifiers.toml [detected]</code> so <code>RF 118</code>, <code>rf118</code> and <code>RF-118</code> are one term. An index change: <code>fux ingest</code> after.</td>
+          <code>.fux/config/identifiers.toml [detected]</code> so <code>RF 118</code>, <code>rf118</code> and <code>RF-118</code> are one term. An index change: <code>fux ingest</code> after.</td>
         <td><code>--write --json</code></td></tr>
       <tr><td><code>fux register</code></td>
           <td>Prints what the index holds, one line per document, <em>from the index</em>: the rows of <code>.fux/index/REGISTER</code> (<code>loc</code>, <code>sha</code>, <code>decoder</code>, a <code>k=v</code> tail such as <code>archived=true</code>). Read-only; <code>--json</code> for scripts; <code>fux register | diff - .fux/index/REGISTER</code> is the drift check by hand.</td>

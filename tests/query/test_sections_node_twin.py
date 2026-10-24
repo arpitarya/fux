@@ -5,7 +5,7 @@ The differential law's Node arm for section records. The corpus is the one
 section, beside short sectionless documents and two-section fillers — so both
 branches of `_best_section` (a sectioned document, and a sectionless one scored
 as its own single section) are reached, and `[ranking] section_weight` is set
-in `.fux/tune.toml`, the file a consumer edits, so both readers resolve it.
+in `.fux/config/tune.toml`, the file a consumer edits, so both readers resolve it.
 
 Held here:
 
@@ -23,6 +23,7 @@ Held here:
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import os
 import shutil
@@ -61,7 +62,7 @@ def corpus(tmp_path_factory) -> Path:
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (root / "fux.toml").write_text("[sources]\n\n[index]\nsection_records = true\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     files = {
         "docs/runbook.md": _long_doc(),
@@ -83,7 +84,7 @@ def corpus(tmp_path_factory) -> Path:
 
 
 def _set_weight(root: Path, weight: float) -> None:
-    tune = root / ".fux" / "tune.toml"
+    tune = config_file(root, "tune")
     lines = tune.read_text(encoding="utf-8").splitlines(keepends=True)
     hits = [i for i, line in enumerate(lines) if line.split("=")[0].strip() == "section_weight"]
     assert len(hits) == 1, "the template must carry exactly one section_weight line"

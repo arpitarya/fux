@@ -1,6 +1,6 @@
 ---
 inclusion: fileMatch
-fileMatchPattern: [".fux/fetchers/**", ".fux/refusals.toml"]
+fileMatchPattern: [".fux/fetchers/**", ".fux/config/refusals.toml"]
 ---
 
 # Editing a Fux fetcher or refusal rule

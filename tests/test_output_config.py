@@ -1,4 +1,4 @@
-"""`.fux/output.toml` — three roots, one precedence chain, no silent fallback.
+"""`.fux/config/output.toml` — three roots, one precedence chain, no silent fallback.
 
 **What these tests guard is the boundary, not the parsing.** A rendering file
 that can quietly change a ranking is the failure mode; every other assertion
@@ -32,7 +32,7 @@ DEFAULT_OUTPUT = template()
 
 
 def write(root, body: str):
-    (root / ".fux").mkdir(parents=True, exist_ok=True)
+    (root / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     (root / OUTPUT_NAME).write_text(body, encoding="utf-8")
     return root
 
@@ -44,7 +44,7 @@ def write(root, body: str):
 
 def test_absent_file_is_an_error_that_names_it(tmp_path):
     """L12 decision 3: fux holds no copy of these values in code, so a repo with
-    no `.fux/output.toml` stops, naming the file and `fux doctor --fix`."""
+    no `.fux/config/output.toml` stops, naming the file and `fux doctor --fix`."""
     with pytest.raises(FuxError, match=r"output\.toml is missing") as exc:
         load(tmp_path, enabled=True)
     assert "fux doctor --fix" in str(exc.value)
@@ -390,7 +390,7 @@ def test_merge_conflict_markers_are_named(tmp_path):
 
 
 def test_utf8_bom_is_stripped_not_diagnosed(tmp_path):
-    (tmp_path / ".fux").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     (tmp_path / OUTPUT_NAME).write_bytes(b"\xef\xbb\xbf[cli]\ntop = 7\n")
     assert load(tmp_path, enabled=True).resolve("ask", "top", as_json=False) == 7
 
@@ -565,7 +565,7 @@ def test_a_malformed_file_still_raises_through_the_cli_seam(tmp_path, monkeypatc
 
 def test_apply_output_defaults_raises_when_the_file_is_incomplete(tmp_path, monkeypatch):
     """⚠ **The behaviour Arpit's 2026-08-28 ruling exists to produce.** A
-    `.fux/output.toml` that is present, parses, and simply never set a key
+    `.fux/config/output.toml` that is present, parses, and simply never set a key
     `ask` needs is not silently filled from `BUILT_IN` any more."""
     from fux.cli import _apply_output_defaults, build_parser
 
@@ -663,7 +663,7 @@ def test_every_gated_flag_is_declared_default_none():
     """SR-OUTPUT decision 10, and veto condition 4.
 
     ⚠ **The one defect in this feature that nothing else can see.** A gated
-    `store_true` left at `default=False` makes `.fux/output.toml` silently
+    `store_true` left at `default=False` makes `.fux/config/output.toml` silently
     never take effect for that key: the loader works, every other test
     passes, and the feature just does not exist. Assert it structurally.
     """
@@ -701,7 +701,7 @@ def test_every_verb_that_reads_the_file_can_bisect_it():
     `BUILT_IN`, so a verb missing `--no-output-config` merely could not be
     bisected on purpose. Now that a repo-in-effect file that omits a key is a
     hard `FuxError`, the same missing flag makes that verb **impossible to
-    run at all** once `.fux/output.toml` exists and is incomplete — `doctor`,
+    run at all** once `.fux/config/output.toml` exists and is incomplete — `doctor`,
     the one verb you would reach for to diagnose that, included. Every verb
     `CLI_VERBS` declares (even an empty key tuple — `doctor`, `explain`,
     `graph`, `hooks`, `daemon` still resolve `json`) must carry the flag, and
@@ -734,7 +734,7 @@ def test_sections_is_declared_for_the_ask_SUBTABLE_only():
     every check counts by. Asserting *one row* here would have forced either a
     `[cli.lexical]` subtable — which can make the two verbs differ, which is
     what the freeze forbids — or dropping the key from `lexical`, which makes
-    `.fux/output.toml` unable to reach it at all.
+    `.fux/config/output.toml` unable to reach it at all.
     """
     from fux.output_config import subtable_for
 

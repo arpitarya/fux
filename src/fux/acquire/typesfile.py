@@ -1,4 +1,4 @@
-"""`.fux/formats.toml` — which files are documents, and which decoder reads each.
+"""`.fux/config/formats.toml` — which files are documents, and which decoder reads each.
 
 **Two keys, and the set is closed** (SR-TYPES decision 12):
 
@@ -326,7 +326,7 @@ def _where_include(text: str, origin: str, glob: str) -> str:
 
 
 def _where_meta(text: str, origin: str, key: str) -> str:
-    """`.fux/formats.toml:12 (meta.doc_id)` — decision 12's F6 rule, which names
+    """`.fux/config/formats.toml:12 (meta.doc_id)` — decision 12's F6 rule, which names
     the KEY rather than the line, because TOML tables have no source position
     and a reader needs the key to find the line themselves."""
     esc = re.escape(key)

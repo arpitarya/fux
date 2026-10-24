@@ -1,4 +1,4 @@
-/** The config readers — `.fux/tune.toml`, `.fux/output.toml`, `.fux/sources/dirs`.
+/** The config readers — `.fux/config/tune.toml`, `.fux/config/output.toml`, `.fux/sources/dirs`.
  *  Run with `node --test` from `node/`.
  *
  * **These run with no Python at all**, which is the point: the differential arm
@@ -80,8 +80,8 @@ test("TOML: the float-keys record is invisible to every consumer", () => {
 
 test("tune: an absent file is an error naming it, and --no-tune reads the template", () => {
   const root = repo({});
-  assert.throws(() => loadTune(root, { enabled: true }), /\.fux\/tune\.toml is missing/);
-  const tuned = repo({ ".fux/tune.toml": tuneText({ ranking: { rerank_weight: 0.3 } }) });
+  assert.throws(() => loadTune(root, { enabled: true }), /\.fux\/config\/tune\.toml is missing/);
+  const tuned = repo({ ".fux/config/tune.toml": tuneText({ ranking: { rerank_weight: 0.3 } }) });
   assert.equal(loadTune(tuned, { enabled: true }).rerankWeight, 0.3);
   assert.equal(loadTune(tuned, { enabled: false }).rerankWeight, 0.0);
   rmSync(root, { recursive: true, force: true });
@@ -90,25 +90,25 @@ test("tune: an absent file is an error naming it, and --no-tune reads the templa
 
 test("tune: a missing key names its table and key, in tune.py's words", () => {
   const text = TUNE_TEMPLATE.split("\n").filter((l) => !l.startsWith("mined_weight")).join("\n");
-  const root = repo({ ".fux/tune.toml": text });
+  const root = repo({ ".fux/config/tune.toml": text });
   assert.throws(() => loadTune(root, { enabled: true }), /\[ranking\] mined_weight is missing/);
   assert.throws(() => loadTune(root, { enabled: true }), /fux doctor --fix/);
 });
 
 test("tune: an unknown table and an unknown key are REFUSALS, not shrugs", () => {
-  const a = repo({ ".fux/tune.toml": "[nope]\nx = 1\n" });
+  const a = repo({ ".fux/config/tune.toml": "[nope]\nx = 1\n" });
   assert.throws(() => loadTune(a, { enabled: true }), /unknown table/);
-  const b = repo({ ".fux/tune.toml": "[ranking]\nrerank_weightt = 0.3\n" });
+  const b = repo({ ".fux/config/tune.toml": "[ranking]\nrerank_weightt = 0.3\n" });
   assert.throws(() => loadTune(b, { enabled: true }), /unknown key/);
 });
 
 test("tune: the alpha.1 field spelling names its replacement", () => {
-  const root = repo({ ".fux/tune.toml": "[bm25f]\nheading_weight = 3.0\n" });
+  const root = repo({ ".fux/config/tune.toml": "[bm25f]\nheading_weight = 3.0\n" });
   assert.throws(() => loadTune(root, { enabled: true }), /lost the `_weight` suffix/);
 });
 
 test("tune: [dense] names what happened to it", () => {
-  const root = repo({ ".fux/tune.toml": "[dense]\nmode = \"on\"\n" });
+  const root = repo({ ".fux/config/tune.toml": "[dense]\nmode = \"on\"\n" });
   assert.throws(() => loadTune(root, { enabled: true }), /REMOVED on 2026-08-25/);
 });
 
@@ -116,19 +116,19 @@ test("tune: a REMOVED key is named as removed, not reported as unknown", () => {
   // All three document priors went on 2026-09-13 (W-151, W-152), and `fux
   // setup` had written every one of them into the consumer's file.
   for (const key of ["superseded_weight", "archived_weight", "recency_half_life_days"]) {
-    const root = repo({ ".fux/tune.toml": `[ranking]\n${key} = 0.5\n` });
+    const root = repo({ ".fux/config/tune.toml": `[ranking]\n${key} = 0.5\n` });
     assert.throws(() => loadTune(root, { enabled: true }), /REMOVED on 2026-09-13/, key);
   }
 });
 
 test("tune: a whole-number key refuses a float, exactly as tune.py does", () => {
-  const root = repo({ ".fux/tune.toml": tuneText({ graph: { iterations: "3.0" } }).replace('iterations = "3.0"', "iterations = 3.0") });
+  const root = repo({ ".fux/config/tune.toml": tuneText({ graph: { iterations: "3.0" } }).replace('iterations = "3.0"', "iterations = 3.0") });
   assert.throws(() => loadTune(root, { enabled: true }), /must be a whole number/);
 });
 
 test("tune: semantic errors are COLLECTED, not reported one at a time", () => {
   const root = repo({
-    ".fux/tune.toml": tuneText({ ranking: { rerank_weight: -1, expand_weight: -2 } }),
+    ".fux/config/tune.toml": tuneText({ ranking: { rerank_weight: -1, expand_weight: -2 } }),
   });
   try {
     loadTune(root, { enabled: true });
@@ -141,13 +141,13 @@ test("tune: semantic errors are COLLECTED, not reported one at a time", () => {
 });
 
 test("tune: an unresolved merge conflict is named, not reported as bad TOML", () => {
-  const root = repo({ ".fux/tune.toml": "<<<<<<< HEAD\n[ranking]\n=======\n>>>>>>> x\n" });
+  const root = repo({ ".fux/config/tune.toml": "<<<<<<< HEAD\n[ranking]\n=======\n>>>>>>> x\n" });
   assert.throws(() => loadTune(root, { enabled: true }), /unresolved merge conflict/);
 });
 
 test("tune: [priority] is sorted longest-key-first so the first match wins", () => {
   const root = repo({
-    ".fux/tune.toml": tuneText({ priority: { docs: 1.5, "docs/adr": 2.0 } }),
+    ".fux/config/tune.toml": tuneText({ priority: { docs: 1.5, "docs/adr": 2.0 } }),
   });
   assert.deepEqual(loadTune(root, { enabled: true }).priority, [["docs/adr", 2.0], ["docs", 1.5]]);
 });
@@ -156,12 +156,12 @@ test("tune: [priority] is sorted longest-key-first so the first match wins", () 
 
 test("output: an ABSENT file is an error naming it; --no-output-config reads the template", () => {
   const root = repo({});
-  assert.throws(() => loadOutput(root, { enabled: true }), /\.fux\/output\.toml is missing/);
+  assert.throws(() => loadOutput(root, { enabled: true }), /\.fux\/config\/output\.toml is missing/);
   assert.equal(loadOutput(root, { enabled: false }).resolve("find", "top", null, { asJson: false }), template().resolve("find", "top", null, { asJson: false }));
 });
 
 test("output: a PRESENT file that omits a key REFUSES — it is the sole source", () => {
-  const root = repo({ ".fux/output.toml": "[cli]\nband = false\n" });
+  const root = repo({ ".fux/config/output.toml": "[cli]\nband = false\n" });
   const cfg = loadOutput(root, { enabled: true });
   assert.equal(cfg.resolve("find", "band", null, { asJson: false }), false);
   assert.throws(() => cfg.resolve("find", "top", null, { asJson: false }), /\[cli\] top is missing/);
@@ -170,7 +170,7 @@ test("output: a PRESENT file that omits a key REFUSES — it is the sole source"
 
 test("output: the precedence chain is flag -> json.verb -> json -> verb -> cli", () => {
   const root = repo({
-    ".fux/output.toml":
+    ".fux/config/output.toml":
       "[cli]\nband = false\ntop = 5\n[cli.find]\ntop = 7\n[cli.json]\nenabled = false\ntop = 9\n",
   });
   const cfg = loadOutput(root, { enabled: true });
@@ -180,22 +180,22 @@ test("output: the precedence chain is flag -> json.verb -> json -> verb -> cli",
 });
 
 test("output: a verb-only key is refused at the SHARED level, by name", () => {
-  const root = repo({ ".fux/output.toml": "[cli]\nhops = 3\n" });
+  const root = repo({ ".fux/config/output.toml": "[cli]\nhops = 3\n" });
   assert.throws(() => loadOutput(root, { enabled: true }), /belongs to one verb only \(path\)/);
 });
 
 test("output: `[mcp]` inherits nothing from `[cli]`", () => {
-  const root = repo({ ".fux/output.toml": "[cli]\ntop = 9\n[mcp]\ntop = 3\n" });
+  const root = repo({ ".fux/config/output.toml": "[cli]\ntop = 9\n[mcp]\ntop = 3\n" });
   assert.equal(loadOutput(root, { enabled: true }).resolveMcp("top"), 3);
 });
 
 test("output: `[mcp] band` is refused by name, with the reason", () => {
-  const root = repo({ ".fux/output.toml": "[mcp]\nband = true\n" });
+  const root = repo({ ".fux/config/output.toml": "[mcp]\nband = true\n" });
   assert.throws(() => loadOutput(root, { enabled: true }), /UNCONDITIONAL, by name/);
 });
 
 test("output: `top = true` is refused — a bool is not a whole number", () => {
-  const root = repo({ ".fux/output.toml": "[cli]\ntop = true\n" });
+  const root = repo({ ".fux/config/output.toml": "[cli]\ntop = true\n" });
   assert.throws(() => loadOutput(root, { enabled: true }), /must be a whole number/);
 });
 
@@ -247,8 +247,8 @@ test("decode: prose is referable and a decoded type is NOT", () => {
   assert.equal(isAlreadyText(root, "data/a.pdf"), false);
 });
 
-test("decode: `.fux/formats.toml` REPLACES the default when it is there", () => {
-  const root = repo({ ".fux/formats.toml": 'include = ["*.txt"]\n[decoders]\n".csv" = "csv"\n' });
+test("decode: `.fux/config/formats.toml` REPLACES the default when it is there", () => {
+  const root = repo({ ".fux/config/formats.toml": 'include = ["*.txt"]\n[decoders]\n".csv" = "csv"\n' });
   assert.equal(isAlreadyText(root, "a.txt"), true);
   assert.equal(isAlreadyText(root, "a.md"), false);   // not declared -> not prose here
   assert.deepEqual(PROSE_TYPES.includes("*.md"), true);

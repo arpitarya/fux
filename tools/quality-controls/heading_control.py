@@ -65,7 +65,7 @@ HEADING_WEIGHTS = [3.0, 1.0, 0.0]
 
 
 def write_tune(root: Path, heading: float) -> None:
-    (root / ".fux" / "tune.toml").write_text(
+    (root / ".fux" / "config" / "tune.toml").write_text(
         "[bm25f]\n"
         "body    = 1.0\n"
         f"heading = {heading}\n"

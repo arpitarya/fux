@@ -17,6 +17,7 @@ function every shard read goes through — never by timing.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import io
 import json
 import shutil
@@ -55,13 +56,13 @@ def _ingest(root: Path, *extra: str) -> None:
 
 @pytest.fixture
 def corpus(tmp_path) -> Path:
-    """A real repository, ingested once — `.fux/pii.toml` included, or every
+    """A real repository, ingested once — `.fux/config/pii.toml` included, or every
     verb refuses (`work/MACHINE.md` §Two test invocations)."""
     root = tmp_path / "repo"
     (root / ".fux" / "sources").mkdir(parents=True)
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (root / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     (root / "docs").mkdir()
     for name, body in DOCS.items():

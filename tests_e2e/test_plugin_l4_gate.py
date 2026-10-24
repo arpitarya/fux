@@ -22,6 +22,7 @@ Built offline with `python -m hatchling build` and installed with
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import os
 import shutil
 import subprocess
@@ -96,14 +97,14 @@ def envs(wheels, tmp_path_factory) -> dict[str, Path]:
 
 @pytest.fixture(scope="module")
 def corpus(tmp_path_factory) -> Path:
-    """Markdown, JSON and a PDF; `.fux/plugins.toml` declares JSON alone."""
+    """Markdown, JSON and a PDF; `.fux/config/plugins.toml` declares JSON alone."""
     root = tmp_path_factory.mktemp("plugin-corpus")
     subprocess.run(["git", "init", "-q"], cwd=root, check=True)
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     # The pin is the dev tree's digest, which is the wheel's: the same files.
     write_plugins(root, ["fux-decoder-json"], force=True)
@@ -175,7 +176,7 @@ def test_a_drifted_declared_package_is_a_hard_error_and_writes_no_index(envs, co
 
 def test_a_declared_package_at_another_version_is_a_hard_error(envs, corpus, tmp_path):
     root = _copy(corpus, tmp_path / "version")
-    declared = root / ".fux" / "plugins.toml"
+    declared = config_file(root, "plugins")
     text = declared.read_text(encoding="utf-8")
     import re
 

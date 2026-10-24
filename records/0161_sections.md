@@ -11,7 +11,7 @@ feature: section records — the committed section plane, the index section rule
 owns: [node/src/query/sections.mjs@4c883e2a8a83, src/fux/query/sections.py@d88c194f0e6c]
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: 9d31a71eb5e02b41a1bf68ee6311d9ac481950234ed38471f9314c9967d17e04
+content_sha: 72a84f7034e9c6ed234221dfebfaa36b28a38b91fe63545b5cad4a0ca9b7378c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -423,7 +423,7 @@ a pass.
 **11. The section plane is OPT-IN: `fux.toml [index] section_records`,
 off by default** (Arpit, 2026-10-11, Cowork, W-274: *"by default it should just
 be documents. Only if explicitly turned on should it be documents as well as
-sections"*; the key lives in `fux.toml [index]`, not in `.fux/tune.toml`).
+sections"*; the key lives in `fux.toml [index]`, not in `.fux/config/tune.toml`).
 
 - **`false`, which the template writes:** ingest builds no section record, so
   no document carries `nsec` and `.fux/index/sections/` does not exist. **The

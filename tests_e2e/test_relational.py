@@ -13,6 +13,7 @@ live files in this tree, and nothing here reads out of `archive/`.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import shutil
 import subprocess
@@ -54,8 +55,8 @@ def linked(tmp_path_factory) -> Path:
     dirs = proj / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (proj / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(proj, "pii")).write_text("", encoding="utf-8")
     write_config(proj)
     _run(proj, "ingest")
     return proj
@@ -150,7 +151,7 @@ def test_ask_is_lexical_when_the_graph_tier_is_off(linked):
     """
     _run(linked, "build")
     off = "[graph]\nask_boost = false\nask_related = false\n"
-    (linked / ".fux" / "tune.toml").write_text(off, encoding="utf-8")
+    (config_file(linked, "tune")).write_text(off, encoding="utf-8")
     write_config(linked)
     try:
         for query in ("storage engine selection", "rollback", "catering"):
@@ -166,7 +167,7 @@ def test_lexical_ignores_a_tune_that_turns_the_tier_on(linked):
     """🔴 **The freeze, tested where it could actually be lost.**
 
     `fux lexical` is the lexical core and has no graph tier *by definition*.
-    A repository whose `.fux/tune.toml` turns the tier on must not be able to
+    A repository whose `.fux/config/tune.toml` turns the tier on must not be able to
     make the frozen baseline verb stop being a baseline — otherwise every
     verdict that cites `lexical` as its control is measuring whatever that
     repo's config happened to say.
@@ -175,7 +176,7 @@ def test_lexical_ignores_a_tune_that_turns_the_tier_on(linked):
     is the assertion that would fail if someone moved that decision outwards.
     """
     _run(linked, "build")
-    (linked / ".fux" / "tune.toml").write_text(
+    (config_file(linked, "tune")).write_text(
         "[graph]\nask_boost = true\nask_related = true\n", encoding="utf-8"
     )
     write_config(linked)

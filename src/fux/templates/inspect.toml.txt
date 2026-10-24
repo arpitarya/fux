@@ -1,4 +1,4 @@
-# .fux/inspect.toml -- what `fux inspect` and the `fux serve` explorer call a
+# .fux/config/inspect.toml -- what `fux inspect` and the `fux serve` explorer call a
 # finding, how much they sample, and how many rows they show. Nothing here
 # changes the index or a ranking: it changes only what the report SAYS about
 # them. Every key is REQUIRED (SR-LAW-12); `fux doctor --fix` writes a missing

@@ -116,7 +116,7 @@ That's it. Your teammates, and their agents, now get the same answers from a pla
 > ```
 
 > [!NOTE]
-> **Coming in the next release: decoders as packages** (built on `main`, not yet published). fux-engine will read Markdown and plain text on its own. Every other format will be read by a `fux-decoder-*` package that your repository declares in the committed `.fux/plugins.toml`, pinned to one version and digest. Upgrading will be a one-time step: run `fux setup`, run the one `pip install …` line it prints, and commit `.fux/plugins.toml`. The details are under *Unreleased* in [`CHANGELOG.md`](CHANGELOG.md).
+> **Coming in the next release: decoders as packages** (built on `main`, not yet published). fux-engine will read Markdown and plain text on its own. Every other format will be read by a `fux-decoder-*` package that your repository declares in the committed `.fux/config/plugins.toml`, pinned to one version and digest. Upgrading will be a one-time step: run `fux setup`, run the one `pip install …` line it prints, and commit `.fux/config/plugins.toml`. The details are under *Unreleased* in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Plug it into your coding agent
 
@@ -202,7 +202,7 @@ From the live queue, [`work/OPEN-WORK.md`](work/OPEN-WORK.md):
 | | what | state |
 |---|---|---|
 | ✅ | Index-and-refer engine, Python and Node readers, MCP, LSP, VS Code extension | released, 4.1 |
-| 🔜 | Decoders as `fux-decoder-*` packages, declared in `.fux/plugins.toml` | built on `main`; next release |
+| 🔜 | Decoders as `fux-decoder-*` packages, declared in `.fux/config/plugins.toml` | built on `main`; next release |
 | 🔜 | Live URL-source checks: a vanished source, a real rate limit, parallel signed-in fetches | checklist written; waiting on a hands-on session |
 | 🧭 | Ingest of 10,000 documents in under a second | proposal filed; order to be decided |
 | 🧭 | Better abstention, ranking-parameter tuning, a stronger intent lexicon | research |
@@ -216,7 +216,7 @@ No. No fux path may call a model, and nothing in the maintenance path uses one. 
 No. The committed index holds statistics, not your documents' text. `answer` fetches the cited lines from the source at answer time.
 
 **What stops a secret from reaching git?**
-`.fux/pii.toml` redacts matches before anything reaches the committed index, and fux won't run without it ([SR-PII](records/0148_pii.md)).
+`.fux/config/pii.toml` redacts matches before anything reaches the committed index, and fux won't run without it ([SR-PII](records/0148_pii.md)).
 
 **Does it need the network?**
 Only for commands you run on purpose, such as `fux add <url>`, and they say so on stderr ([L5](records/0007_LAW-5-offline-by-default.md)).
@@ -268,8 +268,8 @@ The laws were renumbered on 2026-09-28; an older document is read through [SR-LA
 <details>
 <summary><b>Security and sensitive text</b></summary>
 
-- `.fux/pii.toml` redacts matches before anything reaches the committed index; fux will not run without it ([SR-PII](records/0148_pii.md)).
-- `.fux/refusals.toml` stops a sign-in wall being indexed as the page behind it ([SR-REFUSAL](records/0146_refusals.md)).
+- `.fux/config/pii.toml` redacts matches before anything reaches the committed index; fux will not run without it ([SR-PII](records/0148_pii.md)).
+- `.fux/config/refusals.toml` stops a sign-in wall being indexed as the page behind it ([SR-REFUSAL](records/0146_refusals.md)).
 - Only explicit, opt-in commands touch the network, and they say so on stderr ([L5](records/0007_LAW-5-offline-by-default.md)).
 - To report a vulnerability, see [SECURITY.md](SECURITY.md).
 

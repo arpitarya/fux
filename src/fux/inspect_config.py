@@ -1,11 +1,11 @@
-"""`.fux/inspect.toml` — what `fux inspect` calls a finding, how much it samples,
+"""`.fux/config/inspect.toml` — what `fux inspect` calls a finding, how much it samples,
 and how many rows it shows (W-225 stage 4c; SR-LAW-12 decision 1, R6).
 
 Every value the lenses read lives in the file; the packaged template is its one
 home. **Inside a repository the file is required**, and a missing file or key
 is a hard error naming it, with the `fux doctor --fix` remedy. **Outside one**
 — `fux inspect --diff A B` needs no repository — the template itself is read,
-the precedent `.fux/output.toml` set for a run outside a repo.
+the precedent `.fux/config/output.toml` set for a run outside a repo.
 
 Nothing here reaches the index or a ranking: a changed threshold changes only
 what the report SAYS, which is why these are not `tune.toml` keys.
@@ -31,7 +31,7 @@ _FIX_HINT = "`fux doctor --fix` writes every missing key from the template `fux 
 
 @dataclass(frozen=True)
 class InspectConfig:
-    """Every `.fux/inspect.toml` value, by `table.key` → field name."""
+    """Every `.fux/config/inspect.toml` value, by `table.key` → field name."""
 
     boilerplate_df_share: float
     distinctive_df_share: float
@@ -106,7 +106,7 @@ def template_text() -> str:
 
 
 def load(root: Path | None) -> InspectConfig:
-    """The repository's `.fux/inspect.toml`, strictly; the template when `root` is None."""
+    """The repository's `.fux/config/inspect.toml`, strictly; the template when `root` is None."""
     if root is None:
         return _parse(template_text(), "the packaged inspect.toml template")
     path = root / INSPECT_NAME

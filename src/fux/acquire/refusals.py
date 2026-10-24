@@ -19,7 +19,7 @@ response opens `<html>` is refused whatever `Content-Type` came back, which is
 the case the header-only form could not see: the server was telling the truth
 about the sign-in shell it sent.
 
-**Everything else is the consumer's**, declared in `.fux/refusals.toml`, and
+**Everything else is the consumer's**, declared in `.fux/config/refusals.toml`, and
 fux ships no knowledge of any vendor. The rules table ADDS refusals; it can
 never subtract one.
 
@@ -68,8 +68,6 @@ from urllib.parse import urlsplit
 
 from ..errors import FuxError
 from ..constants import fixed, table
-
-RULES_NAME = fixed("files", "refusals_name")
 
 #: Content type -> the bytes a real document of that type must begin with.
 #:
@@ -133,7 +131,7 @@ MAGIC_BY_DECODER: dict[str, bytes] = _magic_by_decoder()
 #: microseconds. The cap stays only so a pathological response cannot make
 #: matching unbounded.
 #:
-#: ⚠ **`BODY_SCAN_BYTES` is `[scan] body_scan_bytes` in `.fux/refusals.toml`** since
+#: ⚠ **`BODY_SCAN_BYTES` is `[scan] body_scan_bytes` in `.fux/config/refusals.toml`** since
 #: W-225 stage 4b (SR-LAW-12); the template writes 1 MiB.
 
 #: Below this, a response is searched for text markers whatever its declared
@@ -215,17 +213,17 @@ class Rule:
 
 
 def rules_path(root: Path) -> Path:
-    """`.fux/refusals.toml` — a fixed location, deliberately not configurable.
+    """`.fux/config/refusals.toml` — a fixed location, deliberately not configurable.
 
-    It sits beside `.fuxignore`, `tune.toml` and `output.toml`, none of which
-    are relocatable either. A knob here would buy nothing and cost a key in
+    It sits beside the other seven policy files in `.fux/config/` (W-295), none
+    of which are relocatable either. A knob here would buy nothing and cost a key in
     `fux.toml` that every reader has to learn.
     """
-    return root / fixed("fuxdir", "dir") / RULES_NAME
+    return root / fixed("files", "refusals")
 
 
 def load(root: Path) -> RuleSet:
-    """Parse `.fux/refusals.toml`. Absent is an empty `RuleSet`; malformed raises.
+    """Parse `.fux/config/refusals.toml`. Absent is an empty `RuleSet`; malformed raises.
 
     ⚠ **Absent stays legal** (W-225 stage 4b): deleting the file is how a
     consumer says *no refusal rules*, so `fux doctor --fix` never recreates it.

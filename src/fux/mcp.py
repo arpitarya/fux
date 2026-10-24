@@ -51,7 +51,7 @@ def _k_property(top: int) -> dict:
     """`k`'s advertised default — the RESOLVED `[mcp] top`, not a literal.
 
     ⚠ **This was a hand-written `5` and `[mcp] top` made it a lie**, and then
-    (until 2026-08-28) a built-in default made it a DIFFERENT lie: a repo whose `.fux/output.toml` set `[mcp] top = 20` still advertised
+    (until 2026-08-28) a built-in default made it a DIFFERENT lie: a repo whose `.fux/config/output.toml` set `[mcp] top = 20` still advertised
     5 in its own tool schema, which is W-83's class of defect exactly — an
     accepted decision (11: "the resolved top") whose code implemented a
     different one. `_tools(top)` closes the gap: it is called once, in

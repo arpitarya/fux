@@ -79,7 +79,7 @@ from ..constants import fixed
 #: The only address this server binds. **Not a flag.** See the module docstring.
 HOST = fixed("serve", "host")
 
-#: The port is `.fux/output.toml [cli.serve] port` (7337 as shipped: arbitrary
+#: The port is `.fux/config/output.toml [cli.serve] port` (7337 as shipped: arbitrary
 #: and high, chosen so it collides with nothing common); `--port` moves it, and
 #: the CLI resolves the two onto `args.port` before this module runs (L12).
 
@@ -476,7 +476,7 @@ _INSPECT_ROUTES = {
 }
 
 
-#: How many rows each capped list carries on the Index tab is `.fux/inspect.toml
+#: How many rows each capped list carries on the Index tab is `.fux/config/inspect.toml
 #: [serve] triage_rows` (W-225 stage 4c): a page can scroll, and the full count
 #: still travels beside every list.
 

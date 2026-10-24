@@ -35,6 +35,7 @@ from .health import (  # noqa: F401  (every row keeps its doctor.* name)
     _RETIRED_AGENT_DIRS,
     _SHIM_SUFFIXES,
     _acquired_health,
+    _config_files_moved,
     _config_loads,
     _decoder_bindings,
     _decoder_imports,
@@ -123,7 +124,7 @@ from .query.health import (  # noqa: F401
 
 
 def _identifiers(root: Path) -> list[Check]:
-    """W-233 — `.fux/identifiers.toml`: loads, the index agrees, families current,
+    """W-233 — `.fux/config/identifiers.toml`: loads, the index agrees, families current,
     and a `[user]` regex behaves the same in both readers (F1–F3).
 
     **Four rows, and only the second is about the index.** A file that does not

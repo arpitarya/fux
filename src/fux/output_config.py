@@ -1,9 +1,9 @@
-"""`.fux/output.toml` — output defaults, in three roots, one per consumer.
+"""`.fux/config/output.toml` — output defaults, in three roots, one per consumer.
 
 **The boundary, unchanged from the first build of this record.** A key
 belongs here iff changing it leaves the ranked result set *and its order*
 identical — it may change what is printed, never what is computed. `fux.toml`
-asks *what is indexed*; `.fux/tune.toml` asks *which documents come back, or
+asks *what is indexed*; `.fux/config/tune.toml` asks *which documents come back, or
 their order*; this file asks *how are they shown*. `top` is the one admitted
 boundary case: it truncates a ranking (allowed) and it bounds
 `confidence.support`, a REPORTED signal (stated, not hidden).
@@ -45,14 +45,14 @@ rendering anyway, not a CLI key. `enabled` is resolved FIRST, in its own pass
         |no
       FuxError -- the key is missing; `fux doctor --fix` writes it
 
-  The FILE read is the repo's `.fux/output.toml`; under --no-output-config, or
+  The FILE read is the repo's `.fux/config/output.toml`; under --no-output-config, or
   with no repo root at all, it is the packaged template `fux setup` writes.
 ```
 
 ## The file is the sole source of truth, and it must exist (L12)
 
 **Every key a verb resolves comes from a file, never from code.** In a repo it
-is `.fux/output.toml`; a missing file, table or key is a `FuxError` naming it
+is `.fux/config/output.toml`; a missing file, table or key is a `FuxError` naming it
 and the remedy, `fux doctor --fix`, which writes exactly the missing keys from
 the template ([L12](../../records/0014_LAW-12-values-live-in-config.md)
 decision 3). `--no-output-config` — the "is it me or the config?" switch — and
@@ -104,7 +104,7 @@ _ROOTS = ("cli", "mcp", "api")
 #:
 #: ⚠ **`graph` has no `top` key.** It had a dead one on the first build:
 #: `graph` has no `--top` flag and reads `seed_depth`/`expand_limit` from
-#: `.fux/tune.toml` instead — truncating a graph walk is a ranking change,
+#: `.fux/config/tune.toml` instead — truncating a graph walk is a ranking change,
 #: which this file may not make (SR-OUTPUT decision 18).
 #:
 #: `json` is deliberately absent from every tuple below: it is not a `[cli]`
@@ -639,7 +639,7 @@ def _parse(path: Path, data: dict) -> OutputDefaults:
 
 
 def load(root: Path | None, *, enabled: bool) -> OutputDefaults:
-    """Read `.fux/output.toml` — every key a verb resolves must be in it.
+    """Read `.fux/config/output.toml` — every key a verb resolves must be in it.
 
     `enabled=False` is `--no-output-config`, and `root=None` is a run outside
     any repo: both read the packaged template instead — the file `fux setup`

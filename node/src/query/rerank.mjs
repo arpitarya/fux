@@ -19,7 +19,7 @@
  *
  * It is the second half of [SR-NODE-SEARCH](../../../records/0153_node-search.md)
  * decision 8. `[ranking] rerank_weight` ships at `0.0`, so this is dead code on
- * an untuned repo — and fux's own `.fux/tune.toml` sets `0.3`, which is exactly
+ * an untuned repo — and fux's own `.fux/config/tune.toml` sets `0.3`, which is exactly
  * why 90 of 174 comparisons were discordant there and 0 of 174 with
  * `--no-tune`. A reader that honours every tune key except the one a consumer
  * actually turned on is not a reader that honours tune.

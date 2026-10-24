@@ -11,7 +11,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 2800638943e911ed12d67c9f4dc05bc446c9b745662868ef3dcbf74f0be5d969
+content_sha: 39aa0794aee903675acc067a9dd2d13cbf6904b3bf44d48618c4722946c4a555
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -199,7 +199,7 @@ it.** Absent when false, so no existing record changes shape.
   query the token `current`.
 - ⚠ **"Both source lists" now means EVERY committed source list** (2026-09-11).
   When decision 1a was written the line grammar parsed three files — `dirs`,
-  `urls` and `types`. `types` moved to `.fux/formats.toml` that day
+  `urls` and `types`. `types` moved to `.fux/config/formats.toml` that day
   ([SR-TYPES](0128_types-list.md)
   decision 12), so the two lists carrying `archived` are now **all** of them.
   The sentence did not change; what it covers did, and it covers more.

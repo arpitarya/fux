@@ -3,7 +3,7 @@
 **F1 (Arpit, 2026-09-28): a verb writes `[detected]`.** Without `--write` this
 prints what the identifier lens finds and how it differs from the committed
 file, and writes nothing. With `--write` it replaces **only the `[detected]`
-table** of `.fux/identifiers.toml`; `[user]`, comments and everything else are
+table** of `.fux/config/identifiers.toml`; `[user]`, comments and everything else are
 kept byte for byte, because `[user]` is the consumer's and wins (F5).
 
 **F2: detection refreshes on demand, never inside `fux ingest`.** A new document

@@ -6,6 +6,7 @@ into the tmp repo, which is exactly the trust boundary the design draws."""
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from l12_fixtures import configured_root, scoring, template_fux_toml, url_limits, write_config
 import pytest
 
@@ -80,8 +81,8 @@ def _write_toml(tmp_path, text, dirs=("docs",)):
     listing = tmp_path / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("".join(f"{d}{chr(10)}" for d in dirs), encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
 
 
@@ -835,7 +836,7 @@ def test_a_decoder_that_ran_and_found_nothing_is_not_reported_as_missing():
     from fux.acquire.urlsrc import _decode_fetched
 
     uuid_only = b'{\n  "uuid": "23f0c01c-4067-49f9-99cd-b19564aa930e"\n}\n'
-    # `configured_root()`: the json decoder reads its caps from `.fux/formats.toml
+    # `configured_root()`: the json decoder reads its caps from `.fux/config/formats.toml
     # [limits.json]`, and with no root there is none to read (W-225 stage 4a).
     markdown, why = _decode_fetched(uuid_only, "json", "https://httpbin.org/uuid", configured_root())
 

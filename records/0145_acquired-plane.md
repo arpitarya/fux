@@ -11,7 +11,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@89dd8c94308a]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 43ecd705a83b629d3a131623ab7398d9993af1e1c96395d3bff002eb629e0609
+content_sha: 494a993552171db940bc1dc9caaffaca79d5069dbed4cf35833f112ca9ab302c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -113,7 +113,7 @@ None is solved by the two caches that already exist, and `refer/fetchcache.py` s
 8. **The store is bounded by `[sources.url] acquired_max_bytes` (required with the table since W-225 stage 3b; the template writes 2 GiB), and eviction is by `run_seq`, oldest first** — never by `mtime`, which would be a clock. **A blob whose URL has `fail_streak > 0` is never evicted**: that is precisely the copy that cannot be re-acquired. `fail_streak > 0`, not `>= FAILING_STREAK` — that constant is the threshold for *reporting* a URL as dead; here one failure already means "may not be re-acquirable", and the cost of protecting it is one blob of disk.
 8a. ⚠ **`acquired_max_bytes` stays in `fux.toml` while `max_table_rows` left it**
     (2026-09-11). On that day `[decode] max_table_rows` moved to
-    `.fux/tune.toml [index]` ([SR-TUNE](0135_tuning.md) decision 13), taking
+    `.fux/config/tune.toml [index]` ([SR-TUNE](0135_tuning.md) decision 13), taking
     `fux.toml`'s top-level table set back to three, and the obvious next
     question is whether this key should follow it. **It should not, and the
     reason is the test that decided the move rather than a preference.**
@@ -159,7 +159,7 @@ of the attribute**, and `UrlEntry` now holds an example of each. Held by
 asserts `config.UrlSource` never grows the key.
 
 ⚠ **`keep` is still resolved from a LINE, and 2026-09-11 is when that stopped
-being the only option.** `.fux/sources/types` became `.fux/formats.toml` that day
+being the only option.** `.fux/sources/types` became `.fux/config/formats.toml` that day
 ([SR-TYPES](0128_types-list.md) decision
 12), so the shared line grammar in `sourcelist.py` now parses **two** committed
 lists rather than three.
@@ -334,7 +334,7 @@ this moved where they are written, not what they are.
 
 **No decision here moved** (W-274, 2026-10-11): `config.py` gained `[index] section_records` and its one-key reader (SR-SECTIONS decision 11). Nothing about the acquired plane changed.
 
-**No decision here moved** (W-289, 2026-10-20): `acquire/urlsrc.py`'s `load_fetcher` now resolves `fetch=<name>` to the consumer's `.fux/fetchers/<name>.py`, else the fetcher package `.fux/plugins.toml` declares ([SR-PLUGINS](0165_plugins.md) P8). Retention still lives in `fetch_all()` and never inside a fetcher (decision 5), so a package fetcher gains it with no line changed; `store/fuxdir.py` added the `plugins.toml` row, and the `acquired/` row and its kind did not move.
+**No decision here moved** (W-289, 2026-10-20): `acquire/urlsrc.py`'s `load_fetcher` now resolves `fetch=<name>` to the consumer's `.fux/fetchers/<name>.py`, else the fetcher package `.fux/config/plugins.toml` declares ([SR-PLUGINS](0165_plugins.md) P8). Retention still lives in `fetch_all()` and never inside a fetcher (decision 5), so a package fetcher gains it with no line changed; `store/fuxdir.py` added the `plugins.toml` row, and the `acquired/` row and its kind did not move.
 
 **W-289 phase 2 (2026-10-20) — no decision here moved.** `acquire/urlsrc.py` and `store/fuxdir.py`, which this record describes, changed for [SR-PLUGINS](0165_plugins.md): a retained blob's suffix still comes from the declared decoder, read from `constants.toml` when that decoder's package is not declared here, and the `.fux/README.md` wording changed. Nothing about the acquired plane moved.
 

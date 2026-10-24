@@ -7,6 +7,7 @@ ranking lane goes red, so every assertion here is made on both.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import subprocess
 import sys
@@ -39,7 +40,7 @@ def repo(tmp_path: Path) -> Path:
     sources = tmp_path / ".fux" / "sources"
     sources.mkdir(parents=True)
     (sources / "dirs").write_text("docs\n", encoding="utf-8")
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / "docs" / "a").mkdir(parents=True)
     (tmp_path / "docs" / "a" / "x.md").write_text("# Cobalt\n\nCobalt alloy notes.\n", encoding="utf-8")

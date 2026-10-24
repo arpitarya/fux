@@ -168,7 +168,7 @@ class Arm:
         self.records: dict[str, dict] = py_reader.read_index(root)
         # The same key the CLI and the Node reader read for `--json` headings,
         # from the same file — never a copy of its value (L12).
-        with (root / ".fux" / "output.toml").open("rb") as f:
+        with (root / ".fux" / "config" / "output.toml").open("rb") as f:
             self.max_headings: int = tomllib.load(f)["cli"]["max_headings"]
 
     # -- the two readers ------------------------------------------------------

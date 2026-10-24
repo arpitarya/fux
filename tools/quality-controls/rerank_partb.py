@@ -68,7 +68,7 @@ LOCATOR = re.compile(r":L(\d+)-L(\d+)$")
 
 def set_weight(tree: Path, value: float) -> str | None:
     """Write `[ranking] rerank_weight`; return the file as it was."""
-    path = tree / ".fux" / "tune.toml"
+    path = tree / ".fux" / "config" / "tune.toml"
     original = path.read_text(encoding="utf-8") if path.is_file() else None
     text = original or ""
     if re.search(r"^rerank_weight\s*=", text, re.M):
@@ -177,7 +177,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  {i}/{len(rows)}", flush=True)
     finally:
         if original is not None:
-            (tree / ".fux" / "tune.toml").write_text(original, encoding="utf-8")
+            (tree / ".fux" / "config" / "tune.toml").write_text(original, encoding="utf-8")
 
     print()
     print(f"{'path':>8}  {'n':>4}  {'off':>5}  {'on':>5}  {'better':>6}  {'worse':>5}  "

@@ -96,7 +96,7 @@ def build(rung: str, arm: str, fux: str, *, setup_args: list[str], ingest_args: 
     run([fux, "setup", *setup_args], cwd=dest)
     (dest / ".fux" / "sources" / "dirs").write_text(
         DIRS if (dest / "ext").is_dir() else DIRS_SEED_ONLY, encoding="utf-8")
-    pii = dest / ".fux" / "pii.toml"
+    pii = dest / ".fux" / "config" / "pii.toml"
     if not pii.exists():
         # HEAD refuses to run without one; v1.0.0 has no such concept and
         # ignores it. An empty file is the only value that means the same thing

@@ -22,7 +22,7 @@ export const WEAK = "weak";
 export const PARTIAL = "partial";
 export const NONE = "none";
 
-//: The two floors are `.fux/tune.toml [confidence]`'s and arrive from the
+//: The two floors are `.fux/config/tune.toml [confidence]`'s and arrive from the
 //: caller (L12). ⚠ `weak` is a SIGNAL, not a refusal (Arpit 2026-09-22,
 //: W-214) — the label is published, nothing abstains on it.
 

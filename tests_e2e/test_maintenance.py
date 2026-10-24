@@ -8,6 +8,7 @@ nothing and the test would still pass.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import os
 import shutil
@@ -99,8 +100,8 @@ def make_repo(path: Path, *, hooks: bool) -> str:
     (path / "docs").mkdir()
     (path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(path, "pii")).write_text("", encoding="utf-8")
     write_config(path)
     # aa.md and gr.md land in the SAME shard, so an edit to each produces
     # adjacent changed lines — which is exactly what a textual merge cannot do.

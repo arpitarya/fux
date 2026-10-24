@@ -1,4 +1,4 @@
-# .fux/plugins.toml -- the packages this repository's index needs (SR-PLUGINS).
+# .fux/config/plugins.toml -- the packages this repository's index needs (SR-PLUGINS).
 #
 # Committed. Only fux itself is mandatory; every decoder and fetcher package
 # runs only when declared here, at exactly this version and digest. An
@@ -12,59 +12,59 @@
 [[package]]
 name = "fux-decoder-config"
 version = "4.1.1"
-digest = "sha256:49fc7e21fa6ac9383cb0c7fb391f037689e4f4367edfadd6b7a600c25c33f0af"
+digest = "sha256:0da22a2c6da2aca6ec0235583ac5f1d1e7cd7408721275466a4674dcc904a91a"
 
 [[package]]
 name = "fux-decoder-html"
 version = "4.1.1"
-digest = "sha256:699dc9085b095c09701f5fd19020fe8b9c8ab301c4d907fdcb40b40a9804976f"
+digest = "sha256:bb32554ca2dab8f5a229d12d406e1083e7b61c261c8357b4ae43dfedb4171fb5"
 
 [[package]]
 name = "fux-decoder-image"
 version = "4.1.1"
-digest = "sha256:ea53318875d7d7bd4d7b693435a85adac06349d1b4f0befc39c38bc8560074c5"
+digest = "sha256:ce8f8d10fe1fd124f69eb8511ea6ab99e28fda4a87f8ac3d9c699857dcd2fd10"
 
 [[package]]
 name = "fux-decoder-json"
 version = "4.1.1"
-digest = "sha256:0d0ac3263c449b709055c1b571881084fe40b334f5d14a25722cb9515021fc93"
+digest = "sha256:63ffc10358ad75133176ac82751b87b20e059b2609d44d51c806d63c24a0f080"
 
 [[package]]
 name = "fux-decoder-mail"
 version = "4.1.1"
-digest = "sha256:e0ca940a050e642b929ae7c52bcde7ffc38573c1f911a26b802a6088de4e9cfb"
+digest = "sha256:732713a2f6d2a60a6156de1067fff279035a995045a3835af10434095c95e220"
 
 [[package]]
 name = "fux-decoder-office"
 version = "4.1.1"
-digest = "sha256:c176e28c784f26c0ac7c1f07d5e7ae5cc03a712a86f26ec2225c98c581e6fc05"
+digest = "sha256:fae01554d50531ef89bf9bbf2a4ead16bb373dd3578cc689581da7be4ab58363"
 
 [[package]]
 name = "fux-decoder-pdf"
 version = "4.1.1"
-digest = "sha256:bf1a91ef37270ff1d78db58dfe3b8e290109d0d9f6704a0c146026fc3557ab9d"
+digest = "sha256:97163751df2ba78266d65d03265966b9418fe3f3d8d3252989eca25e210b91cd"
 
 [[package]]
 name = "fux-decoder-sheet"
 version = "4.1.1"
-digest = "sha256:a630a020ab007f56fa4c1f1f0cf0a2dece0f230009dc44e90c59982cc27546e0"
+digest = "sha256:c0bc6cea8f1965b9d4ea270addf92d037a7013741f9324bea6b603557e7670c2"
 
 [[package]]
 name = "fux-decoder-svg"
 version = "4.1.1"
-digest = "sha256:fc2942885e1f0232f6757f3891c6bcc4a854e0318a23fd7ca19b38239ad51ac0"
+digest = "sha256:d919c42424749acff6bd2e56a98b161ca0d1c2f230d102055ea24f71e7cd1800"
 
 [[package]]
 name = "fux-extension-table"
 version = "4.1.1"
-digest = "sha256:70480709be4899e732c97ce74eb5698e06ff09d737a44963e8558afe908ad46a"
+digest = "sha256:c1f5d4c0aabb711c648270535369f1b17c7e8b79934a830094afc7671fa1f000"
 
 [[package]]
 name = "fux-fetcher-cdp"
 version = "4.1.1"
-digest = "sha256:90a9089745ed1385324a4aaafd3b5e5d896b70cc8935ca60a1a597250c608c1b"
+digest = "sha256:d90d6c50336da58dc463ea07426dd5e8f6b47f40c5bd2f97eddaf4dc61d04639"
 
 [[package]]
 name = "fux-fetcher-http"
 version = "4.1.1"
-digest = "sha256:ebc2586ed07048df59d2f855e16de3f6222c1a5fc86e621e039c4e385e2872da"
+digest = "sha256:c3589bb7a2acbb146390c9853c6f15d146947d7016a262b67ca11717cf94e902"

@@ -74,7 +74,7 @@ def answer_via_refer(
     **not** that case: `refer()` degrades per document, so a `url:` citation
     with no fetcher costs its own citation and nothing else.
 
-    `tune` is the caller's already-loaded `.fux/tune.toml`. **It is passed in
+    `tune` is the caller's already-loaded `.fux/config/tune.toml`. **It is passed in
     rather than loaded here on purpose** — `cmd_answer` has already read the file to rank with, and a
     second read could pick up a different one, producing an answer assembled
     under weights that did not choose it. It also keeps `--no-tune` a single

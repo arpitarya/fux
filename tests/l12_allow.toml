@@ -243,7 +243,7 @@ sites = [
   "src/fux/cli.py::_PROGRESS_COMMANDS::module::('ingest', 'build', 'add', 'remove', 'inspect', 'identifi...",
   "src/fux/cli.py::VERBS::module::{'setup': (('writer', 'fux.setup', 'cmd_setup'),), 'docto...",
   "src/fux/doctor.py::ROWS::module::{**reader_health.ROWS, **writer_health.ROWS, '_identifier...",
-  "src/fux/health.py::ROWS::module::(('core', '_index_not_ignored'), ('core', '_index_temp_ig...",
+  "src/fux/health.py::ROWS::module::(('core', '_config_files_moved'), ('core', '_index_not_ig...",
   "src/fux/ingest/health.py::ROWS::module::{'_stale_redaction': _stale_redaction, '_seeded_copies_re...",
   "src/fux/query/health.py::ROWS::module::{'_journal_size': _journal_size, '_confidence_floors': _c...",
   "src/fux/config.py::KNOWN_AGENTS::module::('claude', 'codex', 'copilot', 'kiro')",
@@ -284,16 +284,16 @@ sites = [
   "node/src/verbs/ask.mjs::RELATED_HEADING::module::\"related (linked from the answers, no query word matched):\"",
   "node/src/verbs/ask.mjs::RELATED_MARKER::module::\"<-\"",
   "node/src/verbs/ask.mjs::SECTION_MARKER::module::\"§\"",
-  "node/src/verbs/find.mjs::FLOOR_OFF_NOTE::module::\"`[confidence] separation_floor = 0.0` in .fux/tune.toml:...",
+  "node/src/verbs/find.mjs::FLOOR_OFF_NOTE::module::\"`[confidence] separation_floor = 0.0` in .fux/config/tun...",
   "node/src/verbs/find.mjs::NO_MATCHES::module::\"No confident matches.\"",
   "src/fux/config.py::_FIX_HINT::module::'`fux doctor --fix` writes every missing key from the tem...",
   "src/fux/store/corrections.py::_HEADER::module::\"# fux corrections — one human-authored question per line...",
   "src/fux/decode/ext/limits.py::_FIX_HINT::module::'`fux doctor --fix` writes every missing key from the tem...",
-  "src/fux/query/confidence.py::FLOOR_OFF_NOTE::module::'`[confidence] separation_floor = 0.0` in .fux/tune.toml:...",
+  "src/fux/query/confidence.py::FLOOR_OFF_NOTE::module::'`[confidence] separation_floor = 0.0` in .fux/config/tun...",
   "src/fux/ingest/health.py::_background_runner::get::'no detail recorded'",
   "src/fux/health.py::_layout_declared::path::'.fux/ layout declared'",
-  "src/fux/health.py::_pii_health::path::'.fux/pii.toml declares no rules'",
-  "src/fux/health.py::_refusal_health::path::'.fux/refusals.toml declares no rules'",
+  "src/fux/health.py::_pii_health::path::'.fux/config/pii.toml declares no rules'",
+  "src/fux/health.py::_refusal_health::path::'.fux/config/refusals.toml declares no rules'",
   "src/fux/health.py::_writable::path::'.fux/ writable'",
   "src/fux/acquire/fuxignore.py::_BLURB::module::{BLOCK_NOT_INDEXED: ('# a committed list said not to inde...",
   "src/fux/acquire/fuxignore.py::_CLOSE::module::'# <<< fux: {name} <<<'",
@@ -321,7 +321,7 @@ sites = [
   "src/fux/sources.py::_OBSERVED_AT_ADD::module::'<observed>'",
   "src/fux/store/fuxdir.py::ACQUIRED::module::{'acquired': 'the bytes a fetch actually returned, for UR...",
   "src/fux/store/fuxdir.py::COMMITTED::module::{'index': 'the wire-format index (SR-RECORD), plus REGIST...",
-  "src/fux/store/fuxdir.py::COMMITTED_FILES::module::{'tune.toml': 'the tunables: HOW results are ordered, nev...",
+  "src/fux/store/fuxdir.py::COMMITTED_FILES::module::{'.fuxignore': \"what is NOT indexed, in .gitignore's gram...",
   "src/fux/store/fuxdir.py::DERIVED::module::{'runtime': \"M2 accelerator segments, M4's fetch cache at...",
   "src/fux/store/recordschema.py::validate::get::'<no id>'",
   "src/fux/tune.py::_FIX_HINT::module::'`fux doctor --fix` writes every missing key from the tem...",
@@ -574,7 +574,7 @@ sites = [
 [[allow]]
 category = "key-name"
 basis = "decision 6 (W-225 stage 5f, 2026-10-04)"
-why = "the names of `.fux/inspect.toml`'s keys and tables"
+why = "the names of `.fux/config/inspect.toml`'s keys and tables"
 sites = [
   "src/fux/inspect_config.py::_SCHEMA::module::{'skeleton_jaccard': ('families', 'share'), 'core_share':...",
 ]

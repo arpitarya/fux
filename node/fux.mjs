@@ -5,7 +5,8 @@
  * `.fux/fux.mjs` so a clone with no Python still answers (W-107 R1/R2).
  */
 import { existsSync, realpathSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
+import { fixed } from "./src/config/constants.mjs";
 import { fileURLToPath } from "node:url";
 import { findRoot } from "./src/config/root.mjs";
 import { runFind } from "./src/verbs/find.mjs";
@@ -37,19 +38,35 @@ import { open, Index } from "./src/index.mjs";
 
 const VERSION = "4.1.1";
 
-/** The PII gate's path, spelled here the way `cli.py` and `api.py` spell it.
+/** The PII gate's path, from `constants.toml [files]` -- the one home of the
+ * address, which since W-295 is `.fux/config/pii.toml`.
  *
  * 🔴 **W-107 O1, ruled by Arpit 2026-09-12: Node enforces it identically.**
- * Python refuses every non-exempt verb without `.fux/pii.toml`
+ * Python refuses every non-exempt verb without the file
  * (SR-PII decision 17). The gate exists because the committed index is
  * redacted, so a Node reader that answered where Python refuses would be a
- * divergence in the PRODUCT, not merely in the code — and this runtime cannot
- * import the Python that carries the rule, so it carries the path itself.
- * `tests/test_cli.py::test_the_node_reader_gates_on_the_same_file` holds this
- * literal equal to the two Python copies. The WORDING below is a
+ * divergence in the PRODUCT, not merely in the code. The WORDING below is a
  * transcription of `pii.require`'s, which stays the one place it is authored.
  */
-const PII_RULES = [".fux", "pii.toml"];
+const PII_RULES = fixed("files", "pii").split("/");
+
+/** W-295: a policy file still at its pre-move address, `.fux/<name>.toml`, is a
+ *  repository that has not run `fux setup` -- NOT one with no policy. Python's
+ *  `configfiles.moved_error`, in the same words. Checked before the PII gate. */
+function requireConfigMoved(root) {
+  const stale = [];
+  for (const name of [...fixed("files", "config_names")].sort()) {
+    const next = fixed("files", name);
+    const old = join(fixed("fuxdir", "dir"), basename(next));
+    const path = join(root, old);
+    if (existsSync(path) && statSync(path).isFile()) {
+      stale.push(`\`${old}\` moved to \`${next}\``);
+    }
+  }
+  if (stale.length === 0) return true;
+  process.stderr.write(`error: ${stale.join(", ")} — run \`fux setup\`\n`);
+  return false;
+}
 
 /** Every verb here reads the index, so every verb is gated. There is no Node
  *  twin of Python's `PII_EXEMPT` — `setup`, `tune`, `output` and `doctor` are
@@ -82,7 +99,7 @@ const WRITE_VERBS = {
 
 function parseArgs(argv) {
   // `undefined` means THE FLAG WAS NOT PASSED, which is what lets
-  // `.fux/output.toml` supply the default. `false` here would be a claim.
+  // `.fux/config/output.toml` supply the default. `false` here would be a claim.
   const out = { _: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -94,12 +111,12 @@ function parseArgs(argv) {
     else if (a === "--no-archived") out.noArchived = true;
     else if (a === "--band") out.band = true;
     else if (a === "--no-sections") out.sections = false;
-    // SR-TUNE decision 11: `.fux/tune.toml` is not read AT ALL, so the answer
+    // SR-TUNE decision 11: `.fux/config/tune.toml` is not read AT ALL, so the answer
     // is the engine's own. The "is it me or the config?" switch, and it has to
     // exist in both runtimes or the question can only be asked of one of them.
     else if (a === "--no-tune") out.noTune = true;
-    // The same loop one level up: `.fux/output.toml` may not decide whether
-    // `.fux/output.toml` is read, so this is a flag and never a key.
+    // The same loop one level up: `.fux/config/output.toml` may not decide whether
+    // `.fux/config/output.toml` is read, so this is a flag and never a key.
     else if (a === "--no-output-config") out.noOutputConfig = true;
     else if (a === "-q") (out.q ||= []).push(argv[++i]);
     else if (a === "--expand") out.expand = argv[++i];
@@ -165,9 +182,10 @@ function main(argv) {
   }
   // Before dispatch and before anything reads the repository, exactly where
   // `cli.py::main` puts it, so no verb handler has to remember.
+  if (!requireConfigMoved(root)) return 1;
   if (!requirePiiRules(root)) return 1;
 
-  // `.fux/output.toml` is folded into `args` ONCE, here, before dispatch —
+  // `.fux/config/output.toml` is folded into `args` ONCE, here, before dispatch —
   // exactly where `cli.py::_apply_output_defaults` does it, so no verb handler
   // has to know the precedence chain exists (W-107 R5).
   try {
@@ -183,7 +201,7 @@ function main(argv) {
   }
 
   // The error contract: internals keep throwing, and the BOUNDARY renders.
-  // One `catch` here rather than a `try` per verb — a malformed `.fux/tune.toml`
+  // One `catch` here rather than a `try` per verb — a malformed `.fux/config/tune.toml`
   // must print the same one-line refusal whichever verb tripped over it.
   try {
     switch (verb) {

@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L7
 owns: []
 laws: [L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 9d3e8be36db874047a326f255fcb16ac380848612a39fe51df7c6b7efb5d5ddc
+content_sha: 0edbda1603b35c7d0b27f3fe60af5ca65354c908a71bc0f48507d323b4864fb0
 ---
 
 # SR-LAW-7 — L7 — Python ≥ 3.12
@@ -47,7 +47,7 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 | PEP 701 f-strings (nested quotes, multi-line expressions) | `.format()` workarounds inside f-strings |
 | `itertools.batched`, `Path.walk()`, `Path.relative_to(walk_up=True)` | the hand-rolled chunker and `os.walk` + path glue |
 
-**`tomllib` is the load-bearing one.** `.fux/tune.toml`, `.fux/output.toml`, `.fux/pii.toml`, `.fux/refusals.toml` and `fux.toml` are all read with it. Under 3.10 every one of those needs a third-party parser — which, before 2026-09-06, [L2](0004_LAW-2-zero-cost.md) forbade outright.
+**`tomllib` is the load-bearing one.** `.fux/config/tune.toml`, `.fux/config/output.toml`, `.fux/config/pii.toml`, `.fux/config/refusals.toml` and `fux.toml` are all read with it. Under 3.10 every one of those needs a third-party parser — which, before 2026-09-06, [L2](0004_LAW-2-zero-cost.md) forbade outright.
 
 ⚠ **L2's amendment weakened this law's justification without changing the law.** A TOML parser is now installable. **3.11 remained the floor until 2026-09-28** — the typing and `ExceptionGroup` arguments stand on their own, and lowering it would buy compatibility with a Python nobody is deploying — but the *strongest* argument for it is no longer *"there is no alternative"*.
 

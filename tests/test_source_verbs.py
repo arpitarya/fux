@@ -14,6 +14,7 @@ keeps these unit tests about the *list*, which is what they are for.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 
 from types import SimpleNamespace
@@ -76,8 +77,8 @@ def repo(tmp_path):
     (tmp_path / ".fux" / "sources").mkdir(parents=True, exist_ok=True)
     (tmp_path / ".fux" / "sources" / "urls").write_text("# my list\n", encoding="utf-8")
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
@@ -94,7 +95,7 @@ def _dirs(repo):
 
 
 def _types(repo):
-    return (repo / ".fux" / "formats.toml").read_text(encoding="utf-8")
+    return (config_file(repo, "formats")).read_text(encoding="utf-8")
 
 
 def _add(repo, monkeypatch, args):
@@ -221,7 +222,7 @@ def test_a_prose_type_is_an_include_glob_because_no_decoder_reads_it(repo, monke
 def test_adding_a_type_edits_one_line_and_keeps_a_comment(repo, monkeypatch):
     """The writer's contract, unchanged by the move to TOML: one line changes and a
     human's comment inside the array survives."""
-    (repo / ".fux" / "formats.toml").write_text(
+    (config_file(repo, "formats")).write_text(
         '# mine\ninclude = [\n  "*.md",  # our docs\n  "*.txt",\n]\n', encoding="utf-8"
     )
     _add(repo, monkeypatch, _args("*.rst", types=True))
@@ -234,14 +235,14 @@ def test_the_writer_refuses_a_layout_it_did_not_write(repo, monkeypatch):
     from fux.errors import FuxError
 
     original = 'include = ["*.md", "*.txt"]\n'
-    (repo / ".fux" / "formats.toml").write_text(original, encoding="utf-8")
+    (config_file(repo, "formats")).write_text(original, encoding="utf-8")
     with pytest.raises(FuxError, match="will not edit it"):
         _add(repo, monkeypatch, _args("*.rst", types=True))
     assert _types(repo) == original
 
 
 def test_a_bare_glob_moves_into_decoders_when_it_gains_a_binding(repo, monkeypatch, capsys):
-    (repo / ".fux" / "formats.toml").write_text('include = [\n  "*.md",\n  "*.pdf",\n]\n', encoding="utf-8")
+    (config_file(repo, "formats")).write_text('include = [\n  "*.md",\n  "*.pdf",\n]\n', encoding="utf-8")
     _add(repo, monkeypatch, _args("*.pdf", types=True))
     text = _types(repo)
     assert '"*.pdf"' not in text and '\npdf = "pdf"\n' in text
@@ -262,13 +263,13 @@ def test_removing_a_type_deletes_its_line_and_never_excludes(repo, monkeypatch, 
 def test_a_leftover_line_grammar_types_file_stops_the_verb(repo, monkeypatch):
     from fux.errors import FuxError
 
-    # The fixture now writes `.fux/formats.toml` (W-225 stage 4a: the file is
+    # The fixture now writes `.fux/config/formats.toml` (W-225 stage 4a: the file is
     # required), so the pre-migration state — the old file ALONE — is made here.
-    (repo / ".fux" / "formats.toml").unlink()
+    (config_file(repo, "formats")).unlink()
     (repo / ".fux" / "sources" / "types").write_text("*.md\n", encoding="utf-8")
     with pytest.raises(FuxError, match="fux setup"):
         _add(repo, monkeypatch, _args("*.pdf", types=True))
-    assert not (repo / ".fux" / "formats.toml").exists()
+    assert not (config_file(repo, "formats")).exists()
 
 
 def test_flags_decide_what_is_recorded(repo, monkeypatch):
@@ -587,9 +588,9 @@ def test_adding_the_first_type_seeds_the_built_in_allowlist(repo, monkeypatch):
     """
     from fux.acquire.gitdir import DEFAULT_TYPES, read_types
 
-    # The fixture writes `.fux/formats.toml` (required since W-225 stage 4a);
+    # The fixture writes `.fux/config/formats.toml` (required since W-225 stage 4a);
     # the seed is `add`'s answer to a repo that has none, so remove it.
-    (repo / ".fux" / "formats.toml").unlink()
+    (config_file(repo, "formats")).unlink()
     _add(repo, monkeypatch, _args("*.tex", types=True))
     allow = set(read_types(repo).allow)
     assert set(DEFAULT_TYPES) <= allow, "the seed IS the default, map included"
@@ -597,7 +598,7 @@ def test_adding_the_first_type_seeds_the_built_in_allowlist(repo, monkeypatch):
 
 
 def test_adding_a_second_type_does_not_re_seed(repo, monkeypatch):
-    (repo / ".fux" / "formats.toml").unlink()  # the seeding path, as above
+    (config_file(repo, "formats")).unlink()  # the seeding path, as above
     _add(repo, monkeypatch, _args("*.pdf", types=True))
     _add(repo, monkeypatch, _args("*.tex", types=True))
     # Counted on the parsed list, not the text: the seeded file's own comment
@@ -741,7 +742,7 @@ def test_bare_add_lists_every_list(repo, monkeypatch, capsys):
     capsys.readouterr()
     _add(repo, monkeypatch, _args(None))
     out = capsys.readouterr().out
-    assert "sources/dirs" in out and "sources/urls" in out and ".fux/formats.toml" in out
+    assert "sources/dirs" in out and "sources/urls" in out and ".fux/config/formats.toml" in out
     assert "https://x.test/a fetch=http decoder=prose" in out
 
 
@@ -843,7 +844,7 @@ def _check_repo(tmp_path):
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     docs = tmp_path / "docs"
     docs.mkdir(exist_ok=True)

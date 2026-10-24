@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L5
 owns: []
 laws: [L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 698dd77cc750f0e626368d1a68e1c37678a9c650059bf78b536453d540d9ff12
+content_sha: 0e76a918876a0771bd45ce2c6aeb191b623363b75f6476c1836ed856e2e99d9c
 ---
 
 # SR-LAW-5 — L5 — offline by default
@@ -49,7 +49,7 @@ open a socket now — and the fence moved with it: the import test asserts that
 text is untouched**, and §"The narrowing that already happened once" below is
 the record of why reading a count off this table is the mistake.
 
-**Network code lives outside the engine's packages.** The two shipped fetchers are their own distributions, `fux-fetcher-http` and `fux-fetcher-cdp`, which a repository runs only when its `.fux/plugins.toml` declares them and a URL line names one; a consumer's own fetcher lives in `.fux/fetchers/`. That is why the engine can keep zero network lines while URLs still work, and the import fence extends to the fetcher packages: no offline path executes one (`tests/test_plugin_fence.py`). It is a decision of [SR-CDP-FETCHER](0118_cdp-fetcher.md) and [SR-PLUGINS](0165_plugins.md) (W-289, ruled by Arpit 2026-10-19), not of this law — the law's text is untouched.
+**Network code lives outside the engine's packages.** The two shipped fetchers are their own distributions, `fux-fetcher-http` and `fux-fetcher-cdp`, which a repository runs only when its `.fux/config/plugins.toml` declares them and a URL line names one; a consumer's own fetcher lives in `.fux/fetchers/`. That is why the engine can keep zero network lines while URLs still work, and the import fence extends to the fetcher packages: no offline path executes one (`tests/test_plugin_fence.py`). It is a decision of [SR-CDP-FETCHER](0118_cdp-fetcher.md) and [SR-PLUGINS](0165_plugins.md) (W-289, ruled by Arpit 2026-10-19), not of this law — the law's text is untouched.
 
 ### ⚠ The narrowing that already happened once
 

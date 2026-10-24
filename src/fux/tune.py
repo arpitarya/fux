@@ -1,4 +1,4 @@
-"""`.fux/tune.toml` — every knob that changes ORDER, plus `[index]`: the two that change the index.
+"""`.fux/config/tune.toml` — every knob that changes ORDER, plus `[index]`: the two that change the index.
 
 [SR-TUNE](../../records/0135_tuning.md) is the record. What this module is:
 
@@ -113,7 +113,7 @@ class Scoring:
     that mistake possible at every call site; one object makes it
     unrepresentable.
 
-    Immutable, and built by `tune.Tune.scoring` from `.fux/tune.toml` — the
+    Immutable, and built by `tune.Tune.scoring` from `.fux/config/tune.toml` — the
     values and why each is what it is live beside their keys in the template
     `fux setup` writes, never here (L12).
     """
@@ -194,7 +194,7 @@ _MAX_REPORTED = 10
 #: internally inconsistent. `[ranking]` keeps its suffixes, where they
 #: genuinely disambiguate (`archived_weight` is not `archived`).
 #:
-#: ⚠ **Breaking for `.fux/tune.toml` written against v2.0.0-alpha.1.**
+#: ⚠ **Breaking for `.fux/config/tune.toml` written against v2.0.0-alpha.1.**
 #: `_LEGACY_FIELD_KEYS` exists only so the error can name the replacement
 #: instead of reporting an unknown key; nothing reads the old spelling.
 _FIELD_KEYS = tuple(TF_FIELDS)
@@ -273,7 +273,7 @@ _OPEN_TABLES = frozenset({"priority", "doctype"})
 #: an unknown key on a line the consumer copied out of fux's own specimen.
 #:
 #: ⚠ **Same reasoning as the `[dense]` refusal below, one level down.** A silent
-#: *"unknown key"* on a key `fux setup` wrote into `.fux/tune.toml` sends
+#: *"unknown key"* on a key `fux setup` wrote into `.fux/config/tune.toml` sends
 #: somebody hunting for a typo in a line they never typed. This table is the
 #: only place a removal is announced, so a key leaves the schema and arrives
 #: here in the same change or the removal is a trap.
@@ -335,7 +335,7 @@ class Tune:
     """Every tunable, resolved. Construct via `load()`; there are no defaults.
 
     [L12](../../records/0014_LAW-12-values-live-in-config.md): every field is
-    read from `.fux/tune.toml`, or — under `--no-tune` — from the template
+    read from `.fux/config/tune.toml`, or — under `--no-tune` — from the template
     `fux setup` writes (`src/fux/templates/tune.toml.txt`). What each value is
     and why is said beside its key in that template, once.
     """
@@ -676,7 +676,7 @@ _TEMPLATE_LABEL = "the packaged tune.toml template (--no-tune)"
 
 
 def load(root: Path, *, enabled: bool) -> Tune:
-    """Read `.fux/tune.toml` — every key required.
+    """Read `.fux/config/tune.toml` — every key required.
 
     `enabled=False` is `--no-tune`: the consumer's file is not read at all and
     the packaged template is read in its place, so the answer is the one a

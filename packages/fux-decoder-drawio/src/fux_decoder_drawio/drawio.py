@@ -46,7 +46,7 @@ USES = tuple(fixed("decoders.drawio", "uses"))
 #: A diagram page is a complete unit — a short page was being absorbed by
 #: the next one and cited under the wrong name.
 
-#: ⚠ **`MAX_INFLATED` is `[limits.drawio] max_inflated` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_INFLATED` is `[limits.drawio] max_inflated` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 _TAG_RE = re.compile(r"<[^>]+>")
 

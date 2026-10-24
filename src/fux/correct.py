@@ -266,7 +266,7 @@ def _refuse_pii(root: Path, question: str) -> None:
     if hits:
         named = ", ".join(sorted(hits))
         raise FuxError(
-            f"the question matches `.fux/pii.toml` rule(s): {named}. A correction is "
+            f"the question matches `.fux/config/pii.toml` rule(s): {named}. A correction is "
             "COMMITTED and INDEXED, so the value would travel twice — in the file "
             "every clone gets, and as a term in `.fux/index/`. Redacting it is not "
             "the fix: `[PII:...]` as vocabulary retrieves nothing. Write the question "

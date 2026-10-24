@@ -1,4 +1,4 @@
-"""The decoder registry is gated on `.fux/plugins.toml` — SR-PLUGINS, W-289 phase 2.
+"""The decoder registry is gated on `.fux/config/plugins.toml` — SR-PLUGINS, W-289 phase 2.
 
 Each test names the decision it holds:
 
@@ -141,7 +141,7 @@ def test_ingest_without_a_declaration_says_prose_only(repo, capsys):
     plugins.path(repo).unlink()
     assert main(["ingest", "--no-fetch"]) == 0
     err = capsys.readouterr().err
-    assert "no .fux/plugins.toml - only Markdown and plain text are read" in err
+    assert "no .fux/config/plugins.toml - only Markdown and plain text are read" in err
     assert "fux setup" in err
     assert "1 .json file(s) not read" in err and "2 .pdf file(s) not read" in err
 
@@ -171,7 +171,7 @@ def test_doctor_and_setup_still_run_with_a_drifted_package(repo, capsys):
     main(["doctor"])
     out = capsys.readouterr()
     assert "plugins installed" in out.out, "doctor ran its rows"
-    assert not out.err.startswith("error: .fux/plugins.toml")
+    assert not out.err.startswith("error: .fux/config/plugins.toml")
     assert main(["setup", "--pin", "--no-agents"]) == 0
     plugins.reset()
     assert plugins.problems(repo) == [], "setup --pin re-pinned the drifted row"

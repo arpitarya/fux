@@ -1,4 +1,4 @@
-# .fux/identifiers.toml -- identifier families (SR-IDENTIFIERS).
+# .fux/config/identifiers.toml -- identifier families (SR-IDENTIFIERS).
 #
 # A family keeps an identifier whole however it is typed. With the template
 # RF-{n}, the text "RF 118", "rf118", "RF–118" and "RF-0118" each add the one

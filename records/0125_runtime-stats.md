@@ -11,7 +11,7 @@ feature: "`.fux/runtime/stats.json` — the corpus-wide aggregates, and the rule
 owns: [node/src/derive/stats.mjs@04eace0fe7a4, src/fux/derive/stats.py@b9882b444f9a]
 laws: [L4]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 51f35e2bed89a2474173e954ac7c0bf2604293ef62ae2a07fce412a245d64aaf
+content_sha: df0071d3ed2c4da59f20d5e74e5af6817f35781a749af5e7ef51a109071ecba0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -131,7 +131,7 @@ storage nobody can account for. The veto below now fires in both directions.
 
 **2. `total_flen` is RAW, and this is the decision the file exists for.** It was
 once a stored *weighted* total, and that made it a **stored function of a
-tunable**. The moment field weights became `.fux/tune.toml` keys, `avg_wlen`
+tunable**. The moment field weights became `.fux/config/tune.toml` keys, `avg_wlen`
 would move on the scan path — which derives it per query — and **not** on the
 accelerator path, which read the baked number. Same corpus, two `avg_wlen`s: the
 two paths returning different bytes, which is [SR-ASK](0103_ask.md)'s

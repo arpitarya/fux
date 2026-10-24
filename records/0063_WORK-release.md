@@ -8,10 +8,10 @@ status: accepted
 date: 2026-10-21
 amended: 2026-10-24
 feature: how a release reaches two registries, how the version stays equal across its sites, and what the branch wall does not do
-owns: [scripts/check-version-parity.py@b861fee901b6, scripts/law-gate.py@2ca0a5fdc452, scripts/smoke.py@616768f21f5b, scripts/withdraw.sh@a63b6269b96f, tests/test_law_gate.py@828e39aaf887, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@6ad8c5a9373f, tests/test_ci_key.py@a3efeb5bc491, packages@e0f0f99361b7, scripts/npm-scoped.py@4214c9c3380a]
+owns: [scripts/check-version-parity.py@b861fee901b6, scripts/law-gate.py@2ca0a5fdc452, scripts/smoke.py@616768f21f5b, scripts/withdraw.sh@a63b6269b96f, tests/test_law_gate.py@828e39aaf887, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@6ad8c5a9373f, tests/test_ci_key.py@8ca23c49b8d4, packages@1efafb7fcd27, scripts/npm-scoped.py@4214c9c3380a]
 laws: []
 timestamp: 2026-10-21T00:00:00Z
-content_sha: d1cdb82593b70c70fce38e3ed4696477eefa702c6e398b7f551f9afa4e103e50
+content_sha: d60377875a307bca69635c56e43a8876dd2aa8aed0a9f6a5e1b13cd146aa8fd2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -328,7 +328,7 @@ rather than a string somebody might forget to edit.
       (`tests_e2e/test_role_packages.py` asserts the same on the built wheels).
     - **The fifteen plugin packages are optional by the repository's choice**
       ([SR-LAW-2](0004_LAW-2-zero-cost.md) decision 2): `fux-engine` depends on
-      none of them, and a repository runs one only when its `.fux/plugins.toml`
+      none of them, and a repository runs one only when its `.fux/config/plugins.toml`
       declares it ([SR-PLUGINS](0165_plugins.md)). Each carries its files in
       its own `src/<import name>/` and is built by hatchling directly — the
       layer map is the engine's, not theirs. `publish.yml`'s

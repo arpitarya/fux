@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@41331033e1d3, node/src/derive@b8e5388ded11, tools/differential@59dfe62c716a, src/fux/schemas/runtime.schema.json@e7f2d4f8acb3]
+owns: [src/fux/derive@41331033e1d3, node/src/derive@b8e5388ded11, tools/differential@9c39bc4dd02e, src/fux/schemas/runtime.schema.json@e7f2d4f8acb3]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a7da4856ac10a8cdd28377302d1d84fd7a2d9c34f0461bddeef833dc6a342eac
+content_sha: 2848ca0951910b7691142be35c70c4d0ecfcd357011534977dd2bb75f86ab1a7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -321,7 +321,7 @@ differential evidence gathered at the default stands unmodified.
 ⚠ **Amended 2026-09-13: `Weighting` now carries ONE multiplier.** The three
 document priors that could also make `trivial` false — `superseded_weight`,
 `archived_weight`, `recency_half_life_days` — were removed (W-151, W-152;
-[SR-TUNE](0135_tuning.md) decision 15), leaving `.fux/tune.toml`'s `[priority]`.
+[SR-TUNE](0135_tuning.md) decision 15), leaving `.fux/config/tune.toml`'s `[priority]`.
 **Nothing about this decision changes.** `maximum` is still the supremum over
 the configuration, the short-circuit still guards the property the bound rests
 on, and `tests/derive/test_weighted_bound.py` still drives the adversarial case
@@ -329,7 +329,7 @@ down both paths — through `[priority]` instead of `archived_weight`. **The
 vehicle is incidental; veto 5 binds whatever multiplier arrives next.**
 
 **`block_bound` takes a `Scoring` for the same reason.** `k1`, `b` and the five
-field weights are `.fux/tune.toml` keys, and they reach the **bound**, not only
+field weights are `.fux/config/tune.toml` keys, and they reach the **bound**, not only
 the scorer; `accel_candidates`, `ask`, `_cannot_reach` and `_kth_score` thread
 the same object down. Document-level multipliers travel through `Weighting`,
 scoring parameters through `Scoring`; a multiplier or a parameter that reaches
@@ -464,7 +464,7 @@ the eight manifests' counts, their `seed/`+`ext/`-only paths, and the nesting
 2026-09-12 (W-107), and it is a correction, not an addition.
 
 The Node arm called `scan.ask` directly. **`fux find` does not** — it calls
-`run_query`, which applies `.fux/tune.toml`, the archived weighting and the
+`run_query`, which applies `.fux/config/tune.toml`, the archived weighting and the
 reranker. So the arm compared Node against a Python path no user reaches, and
 was green because both sides ignored the same things — the failure
 `queryset.py`'s own docstring names: a harness authored after the thing it
@@ -477,7 +477,7 @@ checks gets authored to pass.
 every golden rung. They differ on fux's own repo — 90 of 174 comparisons
 against 0 — because, **when this was measured, Node read no `tune.toml` at
 all**. ⚠ **Closed 2026-09-12** ([SR-NODE-SEARCH](0153_node-search.md) decision
-8): the reader now reads `.fux/tune.toml` and `.fux/output.toml`, and this repo
+8): the reader now reads `.fux/config/tune.toml` and `.fux/config/output.toml`, and this repo
 went 90 of 174 discordant to 0 of 199. The two arms still exist — the
 diagnostic pattern below is why — and on this repo they now agree.
 
@@ -868,7 +868,7 @@ on 2026-10-04 (Arpit) and BUILT the same day (W-259;
   `_rank_of` matched `r.id` (`"file:docs/…"`) against the goldens' bare `doc`
   paths, so no rank could ever match and every non-`known_failure` golden
   failed even when the top result was correct. And it called `scan_ask`/
-  `accel.ask` directly with no `weighting`, so `.fux/tune.toml` was never
+  `accel.ask` directly with no `weighting`, so `.fux/config/tune.toml` was never
   applied — a systematic divergence from what `fux ask` actually returns, not
   noise. Fixed by routing both modes through `run_query` (the same entrypoint
   `cmd_ask` uses) with one shared `Tune`, loaded once per corpus; the harness

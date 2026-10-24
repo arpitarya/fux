@@ -18,6 +18,7 @@ The edge cases numbered below are
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import pytest
 
 from fux import decode as decode_mod
@@ -304,7 +305,7 @@ def test_the_line_decides_what_lands_in_the_index(tmp_path):
         (root / "fux.toml").write_text(
             "[sources]\n[sources.url]\nmax_parallel = 2\n", encoding="utf-8"
         )
-        (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+        (config_file(root, "pii")).write_text("", encoding="utf-8")
         write_config(root)
         (root / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
         (root / ".fux" / "sources" / "urls").write_text(

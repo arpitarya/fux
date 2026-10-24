@@ -9,7 +9,7 @@ XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 
 def _repo(tmp_path):
-    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     (tmp_path / "fux.toml").write_text("[sources]\n")
     return tmp_path
 

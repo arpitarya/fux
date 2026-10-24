@@ -90,7 +90,7 @@ have no pinned path. The merge driver is still resolved on PATH: without
 `fux-merge-index` on PATH the merge prints `not found` and falls back to a
 plain conflict.
 
-⚠ **If `.fux/output.toml` turns JSON on by default** (`[cli.json] enabled = true`),
+⚠ **If `.fux/config/output.toml` turns JSON on by default** (`[cli.json] enabled = true`),
 a bare `fux hooks` only reports. Use `fux hooks --install --no-output-config`.
 
 ---

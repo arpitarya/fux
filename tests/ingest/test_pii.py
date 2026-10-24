@@ -5,6 +5,7 @@ Pure over data. No corpus, no network.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import pytest
 
 from fux.errors import FuxError
@@ -150,21 +151,21 @@ def test_the_digest_is_stable_across_calls():
 def test_a_missing_file_raises_and_names_fux_setup(tmp_path):
     # SR-PII decision 17 reversed "missing is silence": a deleted file must not
     # read as a repo that decided to redact nothing.
-    with pytest.raises(FuxError, match=r"\.fux/pii\.toml is missing.*fux setup"):
+    with pytest.raises(FuxError, match=r"\.fux/config/pii\.toml is missing.*fux setup"):
         pii.load(tmp_path)
 
 
 def test_a_file_with_no_rules_is_legal_and_redacts_nothing(tmp_path):
     # Missing and empty are different answers: empty is a committed choice.
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "pii.toml").write_text("# every rule commented out\n")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "pii")).write_text("# every rule commented out\n")
     write_config(tmp_path)
     assert pii.load(tmp_path) == ()
 
 
 def test_a_malformed_file_raises(tmp_path):
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "pii.toml").write_text("[[rule]\nname = 'x'\n")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "pii")).write_text("[[rule]\nname = 'x'\n")
     write_config(tmp_path)
     with pytest.raises(FuxError, match="invalid TOML"):
         pii.load(tmp_path)

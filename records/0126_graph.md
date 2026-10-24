@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@0ebcd9751ced, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@b814bf2338e5, node/src/graph/walk.mjs@61ee1cbb84df, node/src/verbs/graph.mjs@218d67c1de9b, src/fux/schemas/graph.schema.json@19bd4c486035]
+owns: [src/fux/graph@fa1d69a4b1a3, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@b814bf2338e5, node/src/graph/walk.mjs@354460948a96, node/src/verbs/graph.mjs@3ea9b8e8d1d3, src/fux/schemas/graph.schema.json@19bd4c486035]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: f6fdb5fa9fd3a1d0fd1a7cfd619efbd49660206a92f1c5046b9548d3ae9353d3
+content_sha: 12d65e66204c846f4d67a8760070a1eae912f9dd986a828f05d1c2dde1260369
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -573,7 +573,7 @@ this moved where they are written, not what they are.
 - ⚠ **PPR has three values and no measurement behind two of them.** The
   template ships `damping = 0.85`, PageRank's published value, and `iterations =
   3` and `laziness = 0.5`, conventional choices — all `[graph]` keys, read from
-  `.fux/tune.toml` (L12). **Only the *need* for laziness is measured.** They are
+  `.fux/config/tune.toml` (L12). **Only the *need* for laziness is measured.** They are
   honest starting values, not tuned ones — and a knob does not
   measure them: a consumer varying them is evidence-gathering, not evidence.
 - ⚠ **The plane's load cost is profiled, and it is the plane, not the

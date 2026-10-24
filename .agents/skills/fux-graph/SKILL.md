@@ -114,7 +114,7 @@ edges, both directions), named `c0`, `c1`, … with `c0` the largest.
   everything. Discount an expanded hub unless the question is about it.
 - `"nodes": []` (text: `No confident matches.`) means the query ranked nothing —
   re-phrase in the corpus's words (`fux-usage`).
-- Sizes are `[graph] seed_depth` / `expand_limit` in `.fux/tune.toml`; `--no-tune`
+- Sizes are `[graph] seed_depth` / `expand_limit` in `.fux/config/tune.toml`; `--no-tune`
   ignores that file (`fux-config`).
 
 ## 5 · `path` — how two documents connect
@@ -136,7 +136,7 @@ hops, halved for each hop beyond the first (`[graph] hop_decay`, default 0.5).
 - **Simple** — no document repeats. **Tags are dead ends**: a route may end at
   `tag:x` but never passes through one, so sharing a tag is not a connection.
 - **`--hops N` bounds the search; default 2** (`[cli.path] hops` in
-  `.fux/output.toml`). Widen one step at a time; **3–4 is a sensible ceiling** —
+  `.fux/config/output.toml`). Widen one step at a time; **3–4 is a sensible ceiling** —
   enumeration grows steeply and a large `--hops` can run for minutes.
 
 **No path** is `"paths": []` with exit `0` (text: `No route from … within 2 hop(s).`).

@@ -7,7 +7,7 @@ two readers disagree on this corpus?"* over a real repo. It cannot answer
 corpus that never exercises a branch makes a forgotten transcription silent.
 
 So the feature brings its own corpus: a document reachable **only** through a
-linker's wording, with `[bm25f] anchor` switched on in `.fux/tune.toml` so
+linker's wording, with `[bm25f] anchor` switched on in `.fux/config/tune.toml` so
 both readers pick the weight up from the file a consumer would edit.
 
 Compared on **parsed values, never stdout bytes** — W-107 hazard H2: Python
@@ -19,6 +19,7 @@ resolution (SR-RANKING decision 8a, Arpit's option (b)).
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import os
 import shutil
@@ -40,7 +41,7 @@ pytestmark = pytest.mark.skipif(
 )
 
 #: Written to the file rather than passed in: the point of this test is that
-#: BOTH readers resolve the key out of `.fux/tune.toml`. `None` writes no file,
+#: BOTH readers resolve the key out of `.fux/config/tune.toml`. `None` writes no file,
 #: which is the default (`ANCHOR`, on since 2026-09-24) — the case every fresh
 #: clone is in; `0.0` is what every repo that ran `fux setup` before then pins.
 TUNES = {
@@ -55,7 +56,7 @@ def _corpus(tmp_path: Path, tune: str | None = TUNES["two"]) -> Path:
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     files = {
         "docs/target.md": "# Widget\n\nthis page explains the widget machinery in detail\n",
@@ -72,7 +73,7 @@ def _corpus(tmp_path: Path, tune: str | None = TUNES["two"]) -> Path:
     run(tmp_path, refresh_urls=False, full=False)
     build(tmp_path)
     if tune is not None:
-        (tmp_path / ".fux" / "tune.toml").write_text(tune, encoding="utf-8")
+        (config_file(tmp_path, "tune")).write_text(tune, encoding="utf-8")
         write_config(tmp_path)
     return tmp_path
 

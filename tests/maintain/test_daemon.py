@@ -54,7 +54,7 @@ def _code_only(source: str) -> str:
 
 @pytest.fixture
 def root(tmp_path):
-    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     return tmp_path
 
 

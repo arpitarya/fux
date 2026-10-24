@@ -1,4 +1,4 @@
-"""`.fux/refusals.toml` — parsing, matching, and the always-on magic floor.
+"""`.fux/config/refusals.toml` — parsing, matching, and the always-on magic floor.
 
 Every test here runs on captured bytes. No browser, no network, no Chrome —
 which is the whole argument for the rules being data rather than a predicate.
@@ -6,6 +6,7 @@ which is the whole argument for the rules being data rather than a predicate.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import pytest
 
 from fux.errors import FuxError
@@ -372,8 +373,8 @@ def test_missing_file_still_leaves_the_floor_in_place(tmp_path):
 
 
 def test_malformed_toml_raises(tmp_path):
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "refusals.toml").write_text("[[rule]\nname = ", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "refusals")).write_text("[[rule]\nname = ", encoding="utf-8")
     with pytest.raises(FuxError, match="invalid TOML"):
         refusals.load(tmp_path)
 

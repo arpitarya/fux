@@ -8,6 +8,7 @@ code cannot reach an answer even when it is actively trying to.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import re
 import subprocess
@@ -143,7 +144,7 @@ def _repo(tmp_path: Path) -> Path:
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True, exist_ok=True)
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     # The template's `[observe] max_ms = 50` is a latency budget, and a loaded
     # runner blows it: on Windows under `pytest -n auto` (2026-09-29, the CI
@@ -347,8 +348,8 @@ def test_setup_leaves_no_observers_directory(tmp_path):
 
 def test_observers_init_creates_the_directory_and_twice_is_a_no_op(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True)
+    config_file(tmp_path, "pii").write_text("", encoding="utf-8")
     first = _run(tmp_path, "observers", "init")
     assert first.returncode == 0, first.stderr
     readme = tmp_path / ".fux" / "observers" / "README.md"

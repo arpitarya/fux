@@ -1,6 +1,6 @@
 # W-289: one of the fifteen plugin packages, built from this tree (SR-PLUGINS).
 # Released on fux's own version, in lockstep (P11); a repository runs it only
-# when `.fux/plugins.toml` declares it, pinned (P2-P4).
+# when `.fux/config/plugins.toml` declares it, pinned (P2-P4).
 [build-system]
 requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"

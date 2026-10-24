@@ -6,7 +6,7 @@
  * builds the corpus table from the shards and folds it into a query. Mining is
  * not here: the Node reader never ingests.
  *
- * The weight is `.fux/tune.toml [ranking] mined_weight` — 0.5 as shipped,
+ * The weight is `.fux/config/tune.toml [ranking] mined_weight` — 0.5 as shipped,
  * measured and ratified PASS on 2026-09-27. Off at 0.0, and off reads no pair.
  *
  * Owned, with its Python twin, by [SR-EXPAND](../../../records/0149_expand.md).

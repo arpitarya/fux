@@ -1,4 +1,4 @@
-# .fux/pii.toml -- what is removed from the COMMITTED INDEX, and nowhere else.
+# .fux/config/pii.toml -- what is removed from the COMMITTED INDEX, and nowhere else.
 #
 # THIS FILE IS YOURS, AND FUX WILL NOT RUN WITHOUT IT. `fux setup` writes it
 # once if it is missing and never rewrites it; delete it and every command

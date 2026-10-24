@@ -147,17 +147,17 @@ def _top_help() -> str:
     """
     from .output_config import template
 
-    return f"max results ({template().resolve('ask', 'top', as_json=False)} as shipped; .fux/output.toml sets it)"
+    return f"max results ({template().resolve('ask', 'top', as_json=False)} as shipped; .fux/config/output.toml sets it)"
 
 
 def _hops_help() -> str:
     from .output_config import template
 
-    return f"max edges in a route ({template().resolve('path', 'hops', as_json=False)} as shipped; .fux/output.toml sets it)"
+    return f"max edges in a route ({template().resolve('path', 'hops', as_json=False)} as shipped; .fux/config/output.toml sets it)"
 
 
 def _apply_output_defaults(args) -> None:
-    """Resolve every gated flag through `.fux/output.toml`, ONCE — SR-OUTPUT.
+    """Resolve every gated flag through `.fux/config/output.toml`, ONCE — SR-OUTPUT.
 
     **Done here rather than at each consumer, deliberately.** Downstream code
     then reads a plain `bool`/`int` on `args` exactly as it did before this
@@ -246,7 +246,7 @@ def _apply_output_defaults(args) -> None:
 
 
 def _add_tune_flag(parser: argparse.ArgumentParser) -> None:
-    """`--no-tune` on every verb that reads `.fux/tune.toml` (SR-TUNE decision 11).
+    """`--no-tune` on every verb that reads `.fux/config/tune.toml` (SR-TUNE decision 11).
 
     A flag rather than a verb, per SR-CLI veto 1 — and one flag rather than a
     knob per table, because the question it answers is *"is it me or the
@@ -256,7 +256,7 @@ def _add_tune_flag(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--no-tune",
         action="store_true",
-        help="ignore .fux/tune.toml and use the template `fux setup` writes",
+        help="ignore .fux/config/tune.toml and use the template `fux setup` writes",
     )
 
 
@@ -270,7 +270,7 @@ def _cmd_output(args) -> int:
 def _add_output_flags(parser: argparse.ArgumentParser, *, band: bool) -> None:
     """`--no-output-config`, and `--band` where the verb has a band.
 
-    ⚠ **Every flag `.fux/output.toml` can default is declared `default=None`,
+    ⚠ **Every flag `.fux/config/output.toml` can default is declared `default=None`,
     not `default=False`** — SR-OUTPUT decision 10. At `default=False` an
     absent flag and an explicit one are the same value, the file could never
     take effect, and **nothing would fail**: the loader would work, the tests
@@ -283,7 +283,7 @@ def _add_output_flags(parser: argparse.ArgumentParser, *, band: bool) -> None:
     parser.add_argument(
         "--no-output-config",
         action="store_true",
-        help="ignore .fux/output.toml and use the template `fux setup` writes",
+        help="ignore .fux/config/output.toml and use the template `fux setup` writes",
     )
     if band:
         parser.add_argument(
@@ -324,12 +324,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="do not write the agent policy files outside .fux/ (.claude/, .github/, .kiro/)",
     )
-    # W-289, SR-PLUGINS P4/P6: re-pin every `.fux/plugins.toml` row from what
+    # W-289, SR-PLUGINS P4/P6: re-pin every `.fux/config/plugins.toml` row from what
     # is installed — the one deliberate act after an upgrade, never implicit.
     p_setup.add_argument(
         "--pin",
         action="store_true",
-        help="re-pin every package in .fux/plugins.toml to the installed version and digest",
+        help="re-pin every package in .fux/config/plugins.toml to the installed version and digest",
     )
     # W-291, SR-MAINTENANCE decision 5: setup installs the git hooks and the
     # merge driver by default; this is the one-shot opt-out.
@@ -385,7 +385,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         metavar="N",
         help="how many rows each named list shows (the counts beside them are never truncated); "
-        "default: .fux/inspect.toml [report] top",
+        "default: .fux/config/inspect.toml [report] top",
     )
     p_inspect.add_argument(
         "--retrieval-sample",
@@ -515,7 +515,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_ingest.add_argument("--spawn-runner", action="store_true", help=argparse.SUPPRESS)
     p_ingest.add_argument("--runner", action="store_true", help=argparse.SUPPRESS)
     _add_progress_flags(p_ingest)
-    # SR-OUTPUT decision 15: a verb that reads `.fux/output.toml` must be able
+    # SR-OUTPUT decision 15: a verb that reads `.fux/config/output.toml` must be able
     # to ignore it. This arrived with `--check --json` (W-140 row 14) on the
     # verb that used to own it, and moved here whole with W-177 — the escape
     # hatch is how *is it me or the config?* stays one flag rather than an
@@ -527,7 +527,7 @@ def build_parser() -> argparse.ArgumentParser:
         "build", help="rebuild the derived accelerator from the committed index"
     )
     _add_progress_flags(p_build)
-    # L12: `[cli] progress_threshold` is read from .fux/output.toml, so this
+    # L12: `[cli] progress_threshold` is read from .fux/config/output.toml, so this
     # verb can bisect the file like every other verb that reads it (decision 15).
     _add_output_flags(p_build, band=False)
     p_build.set_defaults(func=_dispatch)
@@ -538,7 +538,7 @@ def build_parser() -> argparse.ArgumentParser:
     def _entry_flags(p: argparse.ArgumentParser) -> None:
         """The attribute flags. Each is checked against the list the entry
         dispatched to, so `--cdp` on a directory is an error, not a no-op."""
-        p.add_argument("--types", action="store_true", help="the entry is a file-type pattern (.fux/formats.toml)")
+        p.add_argument("--types", action="store_true", help="the entry is a file-type pattern (.fux/config/formats.toml)")
         # 🔴 **`--fetch <stem>` is the general form; `--cdp`/`--http` are the two
         # aliases that predate it** (W-199 D1). There is no default fetcher, so
         # `fux add <url>` with none of these RESOLVES a stem from
@@ -646,7 +646,7 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--explain", action="store_true", default=None, help="report which path answered")
         # W-84's matched `§ heading` lines. ⚠ **A pair, not a `store_true`** — the
         # lines are ON by default, so a `store_true` could only ever turn them on
-        # again and `.fux/output.toml` could never turn them off from the command
+        # again and `.fux/config/output.toml` could never turn them off from the command
         # line. `default=None` on BOTH halves is SR-OUTPUT decision 10: an absent
         # flag has to be distinguishable from an explicit one, or the file's value
         # is unreachable and nothing fails to say so.
@@ -663,7 +663,7 @@ def build_parser() -> argparse.ArgumentParser:
         # directions are reachable from the command line and an absent flag stays
         # distinguishable from an explicit one.
         #
-        # 🔴 **It is NOT backed by a key in `.fux/output.toml`, deliberately.**
+        # 🔴 **It is NOT backed by a key in `.fux/config/output.toml`, deliberately.**
         # `[graph] ask_related` already states *do I want the related tier?* for
         # this repository; a second statement in the rendering file would be the
         # restatement [SR-LAW-0](../records/0002_LAW-0-authority.md) forbids —
@@ -882,14 +882,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_mcp = _verb(
         "mcp", help="serve the index over MCP on stdio, for coding agents"
     )
-    # SR-OUTPUT decision 15: on EVERY verb that reads .fux/output.toml,
+    # SR-OUTPUT decision 15: on EVERY verb that reads .fux/config/output.toml,
     # `mcp` included — read directly in `cmd_mcp` rather than folded into
     # `_apply_output_defaults`, because `mcp` carries no `CLI_VERBS` keys of
     # its own (its only knob, `[mcp] top`, is not a CLI flag at all).
     p_mcp.add_argument(
         "--no-output-config",
         action="store_true",
-        help="ignore .fux/output.toml and use the template `fux setup` writes",
+        help="ignore .fux/config/output.toml and use the template `fux setup` writes",
     )
     p_mcp.set_defaults(func=_dispatch)
 
@@ -901,7 +901,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_lsp.add_argument(
         "--no-output-config",
         action="store_true",
-        help="ignore .fux/output.toml and use the template `fux setup` writes",
+        help="ignore .fux/config/output.toml and use the template `fux setup` writes",
     )
     p_lsp.set_defaults(func=_dispatch)
 
@@ -934,7 +934,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_serve.add_argument(
         "--port", type=int, default=None, metavar="N",
-        help="port on 127.0.0.1 (.fux/output.toml [cli.serve] port; 0 asks the OS for a free one)",
+        help="port on 127.0.0.1 (.fux/config/output.toml [cli.serve] port; 0 asks the OS for a free one)",
     )
     p_serve.add_argument(
         "--open", action="store_true", help="open the page in a browser once the server is up"
@@ -1063,13 +1063,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_path.set_defaults(func=_dispatch)
 
     # W-233 (F1): proposes identifier families; `--write` replaces only the
-    # [detected] table of .fux/identifiers.toml. [user] is never touched.
+    # [detected] table of .fux/config/identifiers.toml. [user] is never touched.
     p_ids = _verb(
         "identifiers",
         help="propose identifier families (RF-{n}) from the index; --write records them",
     )
     p_ids.add_argument("--write", action="store_true",
-                       help="rewrite .fux/identifiers.toml [detected]; [user] is kept byte for byte")
+                       help="rewrite .fux/config/identifiers.toml [detected]; [user] is kept byte for byte")
     p_ids.add_argument("--json", action="store_true", default=None, help="machine-readable output")
     _add_progress_flags(p_ids)
     _add_output_flags(p_ids, band=False)
@@ -1079,7 +1079,7 @@ def build_parser() -> argparse.ArgumentParser:
     # writes it, so it works before `fux setup` has run and outside a root.
     # Printing is the whole feature — see `_cmd_tune`.
     p_tune = _verb(
-        "tune", help="print the tunables file for you to paste into .fux/tune.toml"
+        "tune", help="print the tunables file for you to paste into .fux/config/tune.toml"
     )
     p_tune.set_defaults(func=_cmd_tune)
 
@@ -1087,14 +1087,14 @@ def build_parser() -> argparse.ArgumentParser:
     # write TOML, and a writer would mean fux editing a file it promised was
     # yours — the same refusal `fux tune` makes.
     p_output = _verb(
-        "output", help="print the output-defaults file for you to paste into .fux/output.toml"
+        "output", help="print the output-defaults file for you to paste into .fux/config/output.toml"
     )
     p_output.set_defaults(func=_cmd_output)
 
     return parser
 
 
-#: The verbs `main` runs without `.fux/pii.toml` -- SR-PII decision 17's table
+#: The verbs `main` runs without `.fux/config/pii.toml` -- SR-PII decision 17's table
 #: and nothing else. `setup` writes the file; `tune` and `output` print a
 #: specimen and read no repository; `doctor` runs so it can report the missing
 #: file as an error row. **Every other verb is gated, including one added
@@ -1104,12 +1104,12 @@ PII_EXEMPT = frozenset({"setup", "tune", "output", "doctor"})
 #: `pii.rules_path()`'s location, spelled here so the gate costs a stat call and
 #: not an import of `fux.ingest` (~70 ms of decoders on every `ask` and `find`).
 #: `tests/test_cli.py` holds the two equal; the refusal's wording stays in `pii`.
-#: `.fux/pii.toml`, from `constants.toml [files]` -- the one home of the name.
-_PII_RULES = (fixed("fuxdir", "dir"), fixed("files", "pii_name"))
+#: `.fux/config/pii.toml`, from `constants.toml [files]` -- the one home of the name.
+_PII_RULES = (fixed("files", "pii"),)
 
 
 def _require_pii_rules(command: str) -> None:
-    """SR-PII decision 17: no `.fux/pii.toml`, no command.
+    """SR-PII decision 17: no `.fux/config/pii.toml`, no command.
 
     Outside any root there is no repository to hold the file, so the gate does
     not fire and the verb fails, or does not, on its own terms.
@@ -1119,7 +1119,15 @@ def _require_pii_rules(command: str) -> None:
     from .config import find_root
 
     root = find_root()
-    if root is None or root.joinpath(*_PII_RULES).is_file():
+    if root is None:
+        return
+    # W-295: a policy file still at its pre-move address stops EVERY verb but
+    # `setup`, and says where it went -- before the PII gate, so an un-migrated
+    # repo never reads as one with no PII policy.
+    from . import configfiles
+
+    configfiles.require_moved(root)
+    if root.joinpath(*_PII_RULES).is_file():
         return
     from .acquire import pii
 
@@ -1135,7 +1143,7 @@ PLUGINS_EXEMPT = frozenset({"setup", "doctor", "tune", "output", "hooks", "daemo
 def _require_plugins(command: str) -> None:
     """SR-PLUGINS P4: a declared package missing or drifted, no command.
 
-    🔴 **A missing `.fux/plugins.toml` is NOT this refusal** — it means prose
+    🔴 **A missing `.fux/config/plugins.toml` is NOT this refusal** — it means prose
     only, and `fux ingest` and `fux doctor` say so (W-289's decision). What
     refuses is a declaration this machine cannot honour: two machines on one
     repository must never build or read different indexes. Outside any root

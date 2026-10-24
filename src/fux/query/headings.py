@@ -57,10 +57,10 @@ from __future__ import annotations
 
 from ..text.tokenize import tokenize
 
-#: How many matched headings a single result may show is `.fux/output.toml`'s
+#: How many matched headings a single result may show is `.fux/config/output.toml`'s
 #: `max_headings` (`[cli]` for ask/find, `[mcp]` for the MCP surface) — three
 #: as shipped, because the point is to aim a reader at a section, not to
-#: reproduce the outline; `ingest/extract.py` commits up to `.fux/tune.toml
+#: reproduce the outline; `ingest/extract.py` commits up to `.fux/config/tune.toml
 #: [index] max_phrases` of them.
 
 __all__ = ["headings_for"]

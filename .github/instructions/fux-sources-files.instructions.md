@@ -1,5 +1,5 @@
 ---
-applyTo: ".fux/sources/**,.fux/formats.toml,.fux/.fuxignore"
+applyTo: ".fux/sources/**,.fux/config/formats.toml,.fux/.fuxignore"
 ---
 
 # Editing Fux source lists

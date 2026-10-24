@@ -56,7 +56,8 @@ function fixture() {
   copyFileSync(join(REPO, "fux.toml"), join(root, "fux.toml"));
   // This repo's tune turns the graph tier on, which is what makes `ask` read.
   for (const name of ["tune.toml", "output.toml", "identifiers.toml", "formats.toml"]) {
-    copyFileSync(join(REPO, ".fux", name), join(root, ".fux", name));
+    mkdirSync(join(root, ".fux", "config"), { recursive: true });
+    copyFileSync(join(REPO, ".fux", "config", name), join(root, ".fux", "config", name));
   }
   cpSync(join(REPO, ".fux", "sources"), join(root, ".fux", "sources"), { recursive: true });
   build(root);

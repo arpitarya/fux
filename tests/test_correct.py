@@ -114,7 +114,7 @@ def test_normalise_uses_the_analyzer_not_lowercase() -> None:
 
 
 def _repo(tmp_path, *, sha="abc", pin=True, question="how do I roll back?"):
-    (tmp_path / ".fux").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     save_corrections(
         tmp_path, [Correction(question, "file:docs/a.md", "docs/a.md", sha, pin)]
     )
@@ -165,7 +165,7 @@ def test_an_empty_query_never_matches_a_pin(tmp_path) -> None:
 
 
 def test_the_file_is_sorted_so_a_review_diff_does_not_depend_on_order(tmp_path) -> None:
-    (tmp_path / ".fux").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     rows = [
         Correction("zeta?", "file:docs/b.md", "docs/b.md", "s2"),
         Correction("alpha?", "file:docs/a.md", "docs/a.md", "s1"),

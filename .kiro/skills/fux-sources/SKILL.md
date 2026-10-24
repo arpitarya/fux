@@ -45,7 +45,7 @@ attribute is another `fux add` on the same entry — it is an upsert.
 |---|---|---|
 | `.fux/sources/dirs` | directories and single files, repo-relative | `docs/runbooks archived=false enrich=false` · `!docs/drafts` |
 | `.fux/sources/urls` | `http(s)` URLs | `https://wiki.corp/x fetch=http decoder=prose keep=true ttl=24h enrich=false archived=false update=auto` |
-| `.fux/formats.toml` | which file types are documents | `include = ["*.md", …]` and `[decoders]` `csv = "csv"` |
+| `.fux/config/formats.toml` | which file types are documents | `include = ["*.md", …]` and `[decoders]` `csv = "csv"` |
 | `.fux/.fuxignore` | what is kept out | `.gitignore` grammar; `!` **re-includes** |
 
 `fux.toml` can relocate the first two (`[sources] dirs_file`,
@@ -65,7 +65,7 @@ attribute is another `fux add` on the same entry — it is an upsert.
   `ttl` (`0` or `<int>s|m|h|d`), `update` (`auto`|`never`).
 - 🔴 **`fetch=` is a NAME, not an enum** (3.0). It resolves to
   `.fux/fetchers/<name>.py` when that file exists, else to the fetcher package
-  `.fux/plugins.toml` declares (`fux-fetcher-http`, `fux-fetcher-cdp`), so
+  `.fux/config/plugins.toml` declares (`fux-fetcher-http`, `fux-fetcher-cdp`), so
   `fetch=confluence` works the moment you write that file — the same pattern
   `.fux/decoders/` already uses. The grammar
   checks shape only; `fux doctor`'s `fetcher bindings` row reports a name with
@@ -100,7 +100,7 @@ change the lines too (or hand-write lines that omit it).
 ## 3 · `fux add`
 
 **The entry decides the list.** Anything with `scheme://` goes to `urls` (only
-`http`/`https` are accepted); `--types` sends it to `.fux/formats.toml`;
+`http`/`https` are accepted); `--types` sends it to `.fux/config/formats.toml`;
 everything else goes to `dirs` and must exist on disk. `docs/` and `docs` are one
 entry.
 
@@ -193,7 +193,7 @@ files out on their own. `fux add X` refuses while the `!` line exists.
 ## 6 · "Why isn't file X indexed?"
 
 A file is indexed only if **all** of these hold: a `dirs` entry covers it and no
-`!` excludes it · `.fux/.fuxignore` does not ignore it · `.fux/formats.toml`
+`!` excludes it · `.fux/.fuxignore` does not ignore it · `.fux/config/formats.toml`
 admits its type · it is readable.
 
 ```bash
@@ -227,13 +227,13 @@ fux ingest --list-skipped        # read-only, offline: one `path: reason` per li
   load.** It existed for URLs only: `hashed` (the default) committed a title
   *hash* and no readable title or phrases. **Every URL record now commits a
   readable `title` and `phrases`, exactly like a file record** — so a private
-  page's title is in the repo for anyone who clones it. Use `.fux/pii.toml` if a
+  page's title is in the repo for anyone who clones it. Use `.fux/config/pii.toml` if a
   value must not be committed, or do not index the page. **The URL itself was
   always committed either way.** Fix: delete `meta=…` from the line.
 - **`keep=true` (default) retains the fetched bytes in `.fux/acquired/`** —
   gitignored, local, not redacted. It lets `fux answer` verify offline;
   `--no-keep` for pages that must not sit on disk.
-- **PII:** these verbs refuse to run without `.fux/pii.toml`, and redaction
+- **PII:** these verbs refuse to run without `.fux/config/pii.toml`, and redaction
   applies to the committed index only. See `fux-pii`.
 
 ## Don't

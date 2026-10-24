@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-20
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/acquire/ingestlog.py@afe95bbf7a6b, src/fux/ingest@c36f8b245917, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@4ca02fdd1c47, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@088221e5a8d2]
+owns: [src/fux/acquire/ingestlog.py@afe95bbf7a6b, src/fux/ingest@1db22ad4a3e4, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@4ca02fdd1c47, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@6be9d87223eb]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: eb9bb5e59bab7cd8b2b84a44be8d781fcad5103e1911d78890ff6b2faec8779b
+content_sha: 4f7065803b73d579f5e517cf015c3c87763170b63ec1368e85a7bc991d1adefb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -269,7 +269,7 @@ lives in `.fux/.fuxignore` and *decides*: a generated line there would keep the
 file out after the package is declared. Instead every `fux ingest` prints, **on
 stderr**, one line per such suffix with the count and the package to declare
 (`fux: 2 .pdf file(s) not read - no declared package reads .pdf; declare
-fux-decoder-pdf in .fux/plugins.toml`), and — when `.fux/plugins.toml` does not
+fux-decoder-pdf in .fux/config/plugins.toml`), and — when `.fux/config/plugins.toml` does not
 exist at all — one line saying only Markdown and plain text are read, with
 `fux setup` as the lever. Every run, not once: the line is per suffix, not per
 file, so it is never a wall, and the hazard it guards — *a corpus that loses its
@@ -343,7 +343,7 @@ read.
 
 ⚠ **`DEFAULT_TYPES` is unchanged by this.** [SR-TYPES](0128_types-list.md)
 verdict G was measured, and a measurement is replaced only by a better
-measurement. A consumer opts a decodable type in through the types list (`.fux/formats.toml`),
+measurement. A consumer opts a decodable type in through the types list (`.fux/config/formats.toml`),
 which was always permitted.
 
 **12. Both record kinds are assembled through the schema.** The `git` and `url`
@@ -447,7 +447,7 @@ reporting plane. Nothing here changes a committed byte, so **L4 is untouched**.
 
 **15. Extraction reuse is keyed on the content sha AND the PII ruleset digest**
 ([SR-PII](0148_pii.md)). Redaction runs inside this file, between
-`content_sha` and `extract_fields`, so **editing `.fux/pii.toml` changes what
+`content_sha` and `extract_fields`, so **editing `.fux/config/pii.toml` changes what
 should be indexed for documents whose bytes did not change at all**. Reuse on
 the sha alone would mean a rule added today never reaches a document that did
 not also change, and the index would hold terms built under two policies with
@@ -459,7 +459,7 @@ nothing recording which.
 - **A missing digest reads as *moved***, which costs one full extraction and
   then settles. That is the safe direction; the opposite (absent reads as
   *unchanged*) would silently keep terms built under retired rules.
-- A repo with no `.fux/pii.toml` writes no state and behaves exactly as it did
+- A repo with no `.fux/config/pii.toml` writes no state and behaves exactly as it did
   before the feature existed: the empty digest and the absent file both read
   as `""`.
 
@@ -492,7 +492,7 @@ rule, and `runtime/pii-digest` does not cover it.** Decision 15's digest fires
 when the **ruleset** moves; here the ruleset did not move, its **reach** did. A
 consumer sees one full pass on upgrade and the release note says so.
 
-**15b. …and on `.fux/tune.toml [index]`** (2026-09-11). `max_phrases` decides
+**15b. …and on `.fux/config/tune.toml [index]`** (2026-09-11). `max_phrases` decides
 how many headings a record commits and `max_table_rows` which rows a table's
 body holds ([SR-TUNE](0135_tuning.md) decision 13). Neither moves a document's
 sha, so the same hole decision 15 closed for the PII ruleset was open for both.
@@ -856,7 +856,7 @@ true, undocumented, and measured: **3 of the golden seed's 33 identifiers are
 frontmatter-only, and `QCL-IT-ADR-08` was absent from the top 50 at every rung.**
 
 ✅ **BUILT 2026-09-21** — `parse.meta_fields()`, `Decoder.meta_fields`,
-`.fux/formats.toml [meta]`, the `meta fields` doctor row, and
+`.fux/config/formats.toml [meta]`, the `meta fields` doctor row, and
 `tests/ingest/test_meta_fields.py`. Measured in
 [`2026-09-21-frontmatter-reachable`](../work/regression/2026-09-21-frontmatter-reachable/PRE-REGISTRATION.md).
 
@@ -878,7 +878,7 @@ closed `dict[str, str]` — metadata key to index field — resolved in one orde
 
 | | layer | where |
 |---|---|---|
-| 1 | **binding** | `.fux/formats.toml [meta]` ([SR-TYPES](0128_types-list.md) decision 13) |
+| 1 | **binding** | `.fux/config/formats.toml [meta]` ([SR-TYPES](0128_types-list.md) decision 13) |
 | 2 | **claim** | the decoder's `META_FIELDS` ([SR-DECODE](0139_decode.md) decision 20) |
 | 3 | **engine default** | `doc_id` · `id` · `aliases` → `title`; `tags` → `ctx` |
 
@@ -1118,7 +1118,7 @@ The Node reader's `dirsFile` no longer falls back to `.fux/sources/dirs`.
 
 **Every decoder cap is in the extract-config digest** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `_extract_config_digest` appends `limits.<decoder>.<key>=<value>` for every cap the built-ins read, so an edited cap re-extracts the corpus at the next `fux ingest`; a consumer's extra `[limits]` table changes nothing fux extracts and is left out. `fux ingest` checks every cap before any decoder runs. ⚠ **`fux ingest --check` still compares content shas only** and does not see a changed cap — the same as a changed `tune.toml [index]` today; the digest lives in gitignored runtime, so a fresh clone has none to compare. Open for Arpit (W-225).
 
-**The refusal scan's bounds are `.fux/refusals.toml [scan]`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27); `refusals.load` returns them on the `RuleSet` the fetch path already passes ([SR-REFUSAL](0146_refusals.md) decision 9a).
+**The refusal scan's bounds are `.fux/config/refusals.toml [scan]`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27); `refusals.load` returns them on the `RuleSet` the fetch path already passes ([SR-REFUSAL](0146_refusals.md) decision 9a).
 
 **Ingest's parsers hold no numeral** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28): `pii.py`'s checksum tables are `constants.toml [pii.luhn]` and `[pii.verhoeff]`; `fuxignore.py` and `typesfile.py` measure their own tokens (`len("**/")`, named regex groups). Every extracted byte is unchanged.
 
@@ -1131,7 +1131,7 @@ The Node reader's `dirsFile` no longer falls back to `.fux/sources/dirs`.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 
-**`.fux/identifiers.toml` is an input to extraction** ([SR-IDENTIFIERS](0160_identifiers.md)). Ingest loads it once, passes it to every field's analysis and to anchor text, and stamps its effective digest into every shard header; a record is reused only when the whole expected header matches, so an edited file re-analyses the corpus, and a moved digest re-derives carried `url:` records.
+**`.fux/config/identifiers.toml` is an input to extraction** ([SR-IDENTIFIERS](0160_identifiers.md)). Ingest loads it once, passes it to every field's analysis and to anchor text, and stamps its effective digest into every shard header; a record is reused only when the whole expected header matches, so an edited file re-analyses the corpus, and a moved digest re-derives carried `url:` records.
 
 **24. The walk never enters a directory a `!` exclusion removes** (W-244,
 ruled 2026-10-03 under Arpit's delegation; L11 decision 9). `gitdir.walk_sources` used to
@@ -1167,7 +1167,7 @@ descent before listing it, and records it once as `dir/`.
 
 **No decision here moved** (W-289, 2026-10-20): under this record's directory claims, `acquire/urlsrc.py` (SR-FETCHER's) resolves a declared fetcher package when the consumer has no file of that name, and `ingest/health.py` (SR-DOCTOR's) gained the `seeded copies removable` row ([SR-PLUGINS](0165_plugins.md) P8, P9).
 
-**W-289 phase 2 (2026-10-20) — ingest reads `.fux/plugins.toml`.** Two decisions moved: **4b** (a format no declared package reads is counted on stderr, never written into the skip record) and **22**'s `decoder` column, which carries the `pkg:<dist>@<version>/<module>@<VERSION>` digest for a packaged decoder. The digest is also the reuse key, so the first ingest after this change re-extracts every decoded document once, and every later release does the same (the package version moves in lockstep, SR-PLUGINS P11). `acquire/gitdir.py`'s type filter drops the globs no declared package can read (SR-TYPES decision 1), and `fux ingest` refuses before it reads anything when a declared package is missing or drifted (P4). `acquire/ingestlog.py` reads a digest's module through `decoderdigest.name_of`, so a pre-phase-2 `pdf@1` row and a live `pkg:…/pdf@1` row are one decoder.
+**W-289 phase 2 (2026-10-20) — ingest reads `.fux/config/plugins.toml`.** Two decisions moved: **4b** (a format no declared package reads is counted on stderr, never written into the skip record) and **22**'s `decoder` column, which carries the `pkg:<dist>@<version>/<module>@<VERSION>` digest for a packaged decoder. The digest is also the reuse key, so the first ingest after this change re-extracts every decoded document once, and every later release does the same (the package version moves in lockstep, SR-PLUGINS P11). `acquire/gitdir.py`'s type filter drops the globs no declared package can read (SR-TYPES decision 1), and `fux ingest` refuses before it reads anything when a declared package is missing or drifted (P4). `acquire/ingestlog.py` reads a digest's module through `decoderdigest.name_of`, so a pre-phase-2 `pdf@1` row and a live `pkg:…/pdf@1` row are one decoder.
 
 ### Consequences
 

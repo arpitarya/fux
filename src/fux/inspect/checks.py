@@ -78,7 +78,7 @@ _SOURCE = "work/regression/2026-09-14-inspect-floors/"
 #: own dimension. A bound that cannot do both is not a floor, and its number
 #: ships as description alone — `findable share` is the one that failed it.
 def floors(config) -> dict[str, Floor]:
-    """The three measured floors, their bounds read from `.fux/inspect.toml
+    """The three measured floors, their bounds read from `.fux/config/inspect.toml
     [floors]` (W-225 stage 5f). The NUMBERS were module literals until
     2026-10-04; what they mean, and why each bound sits where it does, is
     unchanged and stated in `work/regression/2026-09-14-inspect-floors/`:

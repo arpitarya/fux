@@ -18,6 +18,7 @@ What the frozen bar requires of the build
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from l12_fixtures import scoring, template_tune, tuned, write_config
 import json
 import os
@@ -63,7 +64,7 @@ def _corpus(root: Path, tune: str | None = None) -> Path:
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     for rel, text in FILES.items():
         path = root / rel
@@ -72,7 +73,7 @@ def _corpus(root: Path, tune: str | None = None) -> Path:
     run(root, refresh_urls=False, full=False)
     build(root)
     if tune is not None:
-        (root / ".fux" / "tune.toml").write_text(tune, encoding="utf-8")
+        (config_file(root, "tune")).write_text(tune, encoding="utf-8")
         write_config(root)
     return root
 

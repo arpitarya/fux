@@ -11,7 +11,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/acquire/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@108aa7da8d74]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 45e255af4b94d74f191393b3d51a25994fece8409d951d2823115b8d8f6764ed
+content_sha: 8849ebb0962715fcf971dc4f109d0b6571e405b9ba5b29be55502090a8998765
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -276,7 +276,7 @@ docstring.
     a file that exists and is wrong is the case a loader refusal is for
     ([SR-DOTFUX](0102_fux-directory.md)).
 
-14. **`.fux/refusals.toml` and `.fux/acquired/` do not participate in a
+14. **`.fux/config/refusals.toml` and `.fux/acquired/` do not participate in a
     verdict.** A refusal is caught before the bytes are retained, so a refusal
     page can never become an `as-ingested` comparison.
 
@@ -361,7 +361,7 @@ optional `validate` callable because a duration cannot be a closed enum — and
 `decoder` on the types list was the only other user.
 
 **`decoder`'s spec did not disappear, it went vestigial.** `.fux/sources/types`
-became `.fux/formats.toml` ([SR-TYPES](0128_types-list.md)
+became `.fux/config/formats.toml` ([SR-TYPES](0128_types-list.md)
 decision 12), and `sourcelist.TYPES` survives only as the `fux add
 --types` dispatch token and as the grammar `fux setup` reads when converting a
 legacy file. **So the typed-attribute machinery has exactly one live user, and

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-19
 amended: 2026-10-20
 feature: "`fux-fetcher-http` — the fetcher a URL line gets when it says `fetch=http`"
-owns: [packages/fux-fetcher-http@e24639f5d275]
+owns: [packages/fux-fetcher-http@2715035aaea9]
 laws: [L2, L5, ex-L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: e0659ffe39588943512ec3a9a1561af28ab252eddbcfe62842cdb9acc9231166
+content_sha: 6fca6fdee7e1641a8c5738b65b008d28a77b011cb29aa8a95ff803bc6d36fd26
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -41,7 +41,7 @@ would be the obvious move and would cost the adapter cap: core would hold
 network code, and *"fux never fetches"* would become *"fux fetches, except when
 it doesn't"*. Instead it is **its own package**, `fux-fetcher-http`, which
 imports nothing from fux and which a repository runs only when its
-`.fux/plugins.toml` declares it ([SR-PLUGINS](0165_plugins.md)). An engine fix
+`.fux/config/plugins.toml` declares it ([SR-PLUGINS](0165_plugins.md)). An engine fix
 reaches you with the next install; and when you want to edit it, you copy it to
 `.fux/fetchers/http.py`, which overrides the package and is yours — committed,
 editable, reviewable.
@@ -56,7 +56,7 @@ server felt that afternoon.
 
 ```mermaid
 flowchart LR
-    E[".fux/plugins.toml<br/>declares fux-fetcher-http"] --> G["fux_fetcher_http<br/>(or your .fux/fetchers/http.py)"]
+    E[".fux/config/plugins.toml<br/>declares fux-fetcher-http"] --> G["fux_fetcher_http<br/>(or your .fux/fetchers/http.py)"]
     U["url line, fetch=http"] --> G
     G --> Q["urllib GET<br/>redirects, no decode"]
     Q --> B["(bytes, Content-Type)"]
@@ -68,7 +68,7 @@ flowchart LR
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-  .fux/plugins.toml declares fux-fetcher-http
+  .fux/config/plugins.toml declares fux-fetcher-http
         |
         v
   fux_fetcher_http   <-- or YOUR .fux/fetchers/http.py, which overrides it
@@ -140,7 +140,7 @@ response bytes and the `Content-Type` header returned to fux.
 declared** ([SR-PLUGINS](0165_plugins.md) P10) — never imported from `src/fux/`,
 never written into the consumer's repo by `fux setup` or `ensure_layout`. The
 package **imports nothing from fux and depends on nothing**, and fux executes it
-only when a URL line says `fetch=http` and `.fux/plugins.toml` declares it at its
+only when a URL line says `fetch=http` and `.fux/config/plugins.toml` declares it at its
 pinned version and digest. A repo that only wanted an index installs no network
 code at all. **Core keeps zero network lines and zero network imports**, and the
 adapter cap is structural rather than remembered. A consumer who needs a header,

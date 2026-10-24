@@ -79,7 +79,7 @@ from verdict import FLOOR_OF_ALL_FLOORS, line as vline, rule as vrule  # noqa: E
 def write_tune(root: Path, body: float) -> None:
     """Everything but `body` is left at the shipped weights, so the only thing
     varying across the arms is the field under test."""
-    (root / ".fux" / "tune.toml").write_text(
+    (root / ".fux" / "config" / "tune.toml").write_text(
         "[bm25f]\n"
         f"body    = {body}\n"
         "heading = 3.0\n"

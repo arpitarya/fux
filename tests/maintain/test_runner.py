@@ -8,6 +8,7 @@ they are asserted here rather than trusted.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import os
 import subprocess
@@ -27,8 +28,8 @@ def _corpus(root: Path, docs: int = 3) -> None:
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     (root / "docs").mkdir(exist_ok=True)
     for i in range(docs):

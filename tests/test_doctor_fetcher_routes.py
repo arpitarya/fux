@@ -8,6 +8,7 @@ no-import guard is the property worth asserting, the same shape
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import importlib
 import importlib.util
 
@@ -30,7 +31,7 @@ def _repo(tmp_path, *, routes="", urls="", fetchers=("http",)):
     src = tmp_path / ".fux" / "sources"
     src.mkdir(parents=True, exist_ok=True)
     (src / "urls").write_text(urls, encoding="utf-8")
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     return tmp_path
 
@@ -150,7 +151,7 @@ def _register_repo(tmp_path):
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True)
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")

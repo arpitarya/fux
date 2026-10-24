@@ -27,7 +27,7 @@
 - [SR-LAW-9 (0011) — L9 — a use record is never committed](https://raw.githubusercontent.com/arpitarya/fux/main/records/0011_LAW-9-use-record.md): The only law about USE rather than about the corpus. Written, reverted and re-narrowed in a single day; what survives is one test — will this end up in a commit?
 - [SR-LAW-10 (0012) — L10 — the consumer is served build output, never source](https://raw.githubusercontent.com/arpitarya/fux/main/records/0012_LAW-10-bundled-output.md): What fux puts in front of a consumer — vendored into their repository or exposed as a published package's entry point — is a generated bundle, one artefact per plane. Decoders, fetchers and observers are the only exceptions, because there readable source IS the contract.
 - [SR-LAW-11 (0013) — L11 — the golden answer key is Arpit's custody, and no agent may read one](https://raw.githubusercontent.com/arpitarya/fux/main/records/0013_LAW-11-sealed-answer-key.md): Every answer set — Claude's set 2 and set 3, Codex's set 1 — is Arpit's custody. Since 2026-09-18 a key MAY exist at one address, `work/golden/golden-answers/`, gitignored and closed to every agent on both spellings; the one route an answer travels is Arpit pasting it into a chat, and that route is Codex's alone. Claude is closed on every route, a paste included, with two carve-outs: authoring an agent-authored set, per set; and, since 2026-09-21, a named scoring program Arpit runs from his own shell, which no agent invokes and for which no guard moves. A breach does not fail loudly because a contaminated benchmark number looks exactly like a clean one.
-- [SR-LAW-12 (0014) — L12 — every value lives in a config file, never in code](https://raw.githubusercontent.com/arpitarya/fux/main/records/0014_LAW-12-values-live-in-config.md): No function, module constant or parameter default in fux's engine holds a value. A tunable value is read from a committed TOML file (fux.toml, .fux/tune.toml or another .fux/*.toml); a fixed engine value is read from one internal constants file shipped with the engine. Python and Node read the same key from the same file, and a missing file or key is a hard error that names it. Setup and its templates, tests, tools and scripts are the only places a literal value may sit.
+- [SR-LAW-12 (0014) — L12 — every value lives in a config file, never in code](https://raw.githubusercontent.com/arpitarya/fux/main/records/0014_LAW-12-values-live-in-config.md): No function, module constant or parameter default in fux's engine holds a value. A tunable value is read from a committed TOML file (fux.toml, .fux/config/tune.toml or another .fux/*.toml); a fixed engine value is read from one internal constants file shipped with the engine. Python and Node read the same key from the same file, and a missing file or key is a hard error that names it. Setup and its templates, tests, tools and scripts are the only places a literal value may sit.
 - [SR-LAW-13 (0015) — L13 — a ranking change ships only through the standing bar](https://raw.githubusercontent.com/arpitarya/fux/main/records/0015_LAW-13-the-standing-bar.md): One bar for every change meant to improve what fux ranks. The shape is fixed — gates, the change clearly helps the questions it targets, limited collateral on every other question, a net-positive whole set, and guardrails — and each pre-registration fills in only its parameters. One arm is decided, named before any number; a set already used to decide a mechanism may report another, never decide it. Tightening is free; loosening needs Arpit's ruling.
 
 ---
@@ -152,7 +152,7 @@ That's it. Your teammates, and their agents, now get the same answers from a pla
 > ```
 
 > [!NOTE]
-> **Coming in the next release: decoders as packages** (built on `main`, not yet published). fux-engine will read Markdown and plain text on its own. Every other format will be read by a `fux-decoder-*` package that your repository declares in the committed `.fux/plugins.toml`, pinned to one version and digest. Upgrading will be a one-time step: run `fux setup`, run the one `pip install …` line it prints, and commit `.fux/plugins.toml`. The details are under *Unreleased* in [`CHANGELOG.md`](CHANGELOG.md).
+> **Coming in the next release: decoders as packages** (built on `main`, not yet published). fux-engine will read Markdown and plain text on its own. Every other format will be read by a `fux-decoder-*` package that your repository declares in the committed `.fux/config/plugins.toml`, pinned to one version and digest. Upgrading will be a one-time step: run `fux setup`, run the one `pip install …` line it prints, and commit `.fux/config/plugins.toml`. The details are under *Unreleased* in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Plug it into your coding agent
 
@@ -238,7 +238,7 @@ From the live queue, [`work/OPEN-WORK.md`](work/OPEN-WORK.md):
 | | what | state |
 |---|---|---|
 | ✅ | Index-and-refer engine, Python and Node readers, MCP, LSP, VS Code extension | released, 4.1 |
-| 🔜 | Decoders as `fux-decoder-*` packages, declared in `.fux/plugins.toml` | built on `main`; next release |
+| 🔜 | Decoders as `fux-decoder-*` packages, declared in `.fux/config/plugins.toml` | built on `main`; next release |
 | 🔜 | Live URL-source checks: a vanished source, a real rate limit, parallel signed-in fetches | checklist written; waiting on a hands-on session |
 | 🧭 | Ingest of 10,000 documents in under a second | proposal filed; order to be decided |
 | 🧭 | Better abstention, ranking-parameter tuning, a stronger intent lexicon | research |
@@ -252,7 +252,7 @@ No. No fux path may call a model, and nothing in the maintenance path uses one. 
 No. The committed index holds statistics, not your documents' text. `answer` fetches the cited lines from the source at answer time.
 
 **What stops a secret from reaching git?**
-`.fux/pii.toml` redacts matches before anything reaches the committed index, and fux won't run without it ([SR-PII](records/0148_pii.md)).
+`.fux/config/pii.toml` redacts matches before anything reaches the committed index, and fux won't run without it ([SR-PII](records/0148_pii.md)).
 
 **Does it need the network?**
 Only for commands you run on purpose, such as `fux add <url>`, and they say so on stderr ([L5](records/0007_LAW-5-offline-by-default.md)).
@@ -304,8 +304,8 @@ The laws were renumbered on 2026-09-28; an older document is read through [SR-LA
 <details>
 <summary><b>Security and sensitive text</b></summary>
 
-- `.fux/pii.toml` redacts matches before anything reaches the committed index; fux will not run without it ([SR-PII](records/0148_pii.md)).
-- `.fux/refusals.toml` stops a sign-in wall being indexed as the page behind it ([SR-REFUSAL](records/0146_refusals.md)).
+- `.fux/config/pii.toml` redacts matches before anything reaches the committed index; fux will not run without it ([SR-PII](records/0148_pii.md)).
+- `.fux/config/refusals.toml` stops a sign-in wall being indexed as the page behind it ([SR-REFUSAL](records/0146_refusals.md)).
 - Only explicit, opt-in commands touch the network, and they say so on stderr ([L5](records/0007_LAW-5-offline-by-default.md)).
 - To report a vulnerability, see [SECURITY.md](SECURITY.md).
 
@@ -553,7 +553,7 @@ pruning is forbidden ([P1-RERUN](../work/regression/2026-08-09-pruning-rerun/VER
 worst case is doing the scan's work, never a wrong answer.
 
 **Declared (a plugin package)** — Named, with its version and digest, in the
-committed `.fux/plugins.toml` ([SR-PLUGINS](../records/0165_plugins.md) P2).
+committed `.fux/config/plugins.toml` ([SR-PLUGINS](../records/0165_plugins.md) P2).
 Only a declared [plugin package](#plugin-package) runs; one that is installed
 and not declared is never consulted, and one that is declared and missing or
 different from its pin stops fux with the install line. The opposite of
@@ -754,7 +754,7 @@ source: the record stored a title *hash* and no readable `title` or `phrases`,
 closing the ACL-mismatch leak where a repo-cloner without source access could
 learn that a document exists and what it is called. `plain` was the opt-in,
 enforced at write time. **Every record now commits readable display text**, and
-that leak is an **accepted, documented exposure** — use `.fux/pii.toml` to keep
+that leak is an **accepted, documented exposure** — use `.fux/config/pii.toml` to keep
 a value out of the committed index, or do not index the page.
 `meta=` in a URL line or in `[sources.url]` is now a **named load error**, not
 an ignored key. See [ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md)
@@ -770,7 +770,7 @@ make a hub weightless and turn *widely cited* into *ignored*. **Ships off
 [SR-GRAPH](../records/0126_graph.md) decision 15.
 
 **Identifier family** — A template such as `RF-{n}` in
-`.fux/identifiers.toml` that keeps an ID whole however it is typed: `RF 118`,
+`.fux/config/identifiers.toml` that keeps an ID whole however it is typed: `RF 118`,
 `rf118`, `RF–118` and `RF-0118` each add the one term `rf-118`, in a document at
 ingest and in a question at query time, beside the analyzer's own terms.
 `[user]` is hand-written and wins; `[detected]` is written only by
@@ -795,7 +795,7 @@ pays a query-speed tax and the runtime format never pays a clone tax.
 **Intent prior** — A question's opening cue (*how do I*, *why was*, *what
 is*) read by a fixed lexicon, and the document of the matching type —
 procedure, decision, reference, declared by a `[doctype]` path glob in
-`.fux/tune.toml` — scaled by `1 + [ranking] intent_weight`. **Built 2026-09-28
+`.fux/config/tune.toml` — scaled by `1 + [ranking] intent_weight`. **Built 2026-09-28
 (W-168 step 9); the weight defaults to the measured `0.1`, and the table ships
 empty, so it runs only where types are declared.** See
 [SR-RANKING](../records/0111_ranking.md) decision 13 and
@@ -3688,7 +3688,7 @@ duplication, not by inventing a check that cannot exist.
 - [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) §W-122 — the migration this record authorises, as it landed. Its item file was deleted with its queue row (OPEN-WORK rule 2). **W-146 carried the remainder and closed 2026-09-15** — its last row became [SR-WORK-GOLDEN](0066_WORK-golden.md), the second generated view decision 5 permits; the item file is [archived](../archive/open/W-146-the-rest-of-l0.md).
 - **The two strikes:** `acquired_max_bytes` — named in a record and the ownership table, never parsed, `NameError` on every retaining fetch (2026-09-01); `max_parallel` — two contradicting sentences in one accepted amendment, the code implementing the wrong one ([`archive/open/W-83-the-unconfigured-fetch-ceiling.md`](../archive/open/W-83-the-unconfigured-fetch-ceiling.md)).
 - [`scripts/gen-components.py`](../scripts/gen-components.py) and [`tests/test_record_components.py`](../tests/test_record_components.py) — decision 5's second view, the records' `COMPONENTS` block ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 16 decides its shape).
-- **Precedent for a generated view:** [SR-TUNE](0135_tuning.md) already names `tune.specimen()` in `src/fux/tune.py` as the authority for `.fux/tune.toml`.
+- **Precedent for a generated view:** [SR-TUNE](0135_tuning.md) already names `tune.specimen()` in `src/fux/tune.py` as the authority for `.fux/config/tune.toml`.
 - US Constitution, Article VI, Clause 2 (the Supremacy Clause) and Article V (the amendment path) — the two-level shape and the reason entrenchment is part of it, not an addition to it.
 
 ### Veto condition
@@ -3956,7 +3956,7 @@ this"*. Recorded here as that ruling.
 | clause | before | after |
 |---|---|---|
 | what ships in every install | everything: all 17 decoders, both fetchers | **the engine only** — `fux-core`, `fux-reader`, `fux-writer`, `fux-engine`; Markdown and prose need nothing more |
-| an opt-in capability | refused outright — *"no 'install this for PDFs'"* | **permitted when the COMMITTED repository chooses it** in `.fux/plugins.toml` |
+| an opt-in capability | refused outright — *"no 'install this for PDFs'"* | **permitted when the COMMITTED repository chooses it** in `.fux/config/plugins.toml` |
 | a capability that depends on what a machine has installed | refused | **still refused** — an undeclared package never runs, and a declared one that is missing or differs stops fux |
 | an optional *extra* (`pkg[x]`) | refused | **still refused** |
 
@@ -4043,7 +4043,7 @@ Amending a law needs Arpit's ruling, named in this record
   happens to have installed.** **`fux-engine` is the one mandatory install;
   `fux-reader` and `fux-writer` are role packages, each complete for its role;
   a decoder, fetcher or extension package runs only when the repository's
-  committed `.fux/plugins.toml` declares it, pinned, and one that is missing or
+  committed `.fux/config/plugins.toml` declares it, pinned, and one that is missing or
   differs is refused loudly.**
   **Permission is not authorization:** the law permits a dependency, a record
   still decides one, and every runtime dependency is named by an accepted SR.
@@ -4078,7 +4078,7 @@ Two of them are worse than that: **BSL and SSPL convert on a timer or on a use c
 
 **The test is the OSI approved-licence list** — never the price, never a public repository, never the word "open" in a README. **Read the SPDX identifier, not the marketing.**
 
-**2. Dependencies ship packaged, and the repository chooses, never the machine.** No feature extras: an install-time choice is a support surface, not a feature — which is why the opt-in-extras form was put to Arpit and declined. **A capability may be opt-in only when the committed repository chooses it** — a decoder, fetcher or extension package declared in `.fux/plugins.toml`, pinned to a version and digest ([SR-PLUGINS](0165_plugins.md)). **No capability may depend on what a machine happens to have installed**: an undeclared package never runs, and a declared one that is missing or differs is a hard error naming the install line. `fux-engine` is the one mandatory install; Markdown and prose need nothing else.
+**2. Dependencies ship packaged, and the repository chooses, never the machine.** No feature extras: an install-time choice is a support surface, not a feature — which is why the opt-in-extras form was put to Arpit and declined. **A capability may be opt-in only when the committed repository chooses it** — a decoder, fetcher or extension package declared in `.fux/config/plugins.toml`, pinned to a version and digest ([SR-PLUGINS](0165_plugins.md)). **No capability may depend on what a machine happens to have installed**: an undeclared package never runs, and a declared one that is missing or differs is a hard error naming the install line. `fux-engine` is the one mandatory install; Markdown and prose need nothing else.
 
 **3. Permission is not authorization.** The law permits a dependency; a record still decides one. **Every runtime dependency is named by an accepted SR that says what it does and what was measured without it.** A dependency with no record is a defect, exactly like an undeclared `.fux/` child.
 
@@ -4112,7 +4112,7 @@ Two of them are worse than that: **BSL and SSPL convert on a timer or on a use c
 **Reopen if any of these becomes true:**
 
 1. **A dependency appears in `pyproject.toml` that no accepted record names.** Decision 3 failing.
-2. **A feature extra appears** under `[project.optional-dependencies]` other than `dev`, or **a package runs that `.fux/plugins.toml` does not declare, or runs although it differs from its pin**. Decision 2 failing — the second is SR-PLUGINS veto condition 1.
+2. **A feature extra appears** under `[project.optional-dependencies]` other than `dev`, or **a package runs that `.fux/config/plugins.toml` does not declare, or runs although it differs from its pin**. Decision 2 failing — the second is SR-PLUGINS veto condition 1.
 3. **Two machines produce different root hashes from the same sources and the same commit** — the exposure named in Consequences arriving.
 4. **Anything proposes a paid service, model or library**, however small the price. That is not a reopen so much as a refusal, and it is the clause that never moved.
 
@@ -4503,7 +4503,7 @@ open a socket now — and the fence moved with it: the import test asserts that
 text is untouched**, and §"The narrowing that already happened once" below is
 the record of why reading a count off this table is the mistake.
 
-**Network code lives outside the engine's packages.** The two shipped fetchers are their own distributions, `fux-fetcher-http` and `fux-fetcher-cdp`, which a repository runs only when its `.fux/plugins.toml` declares them and a URL line names one; a consumer's own fetcher lives in `.fux/fetchers/`. That is why the engine can keep zero network lines while URLs still work, and the import fence extends to the fetcher packages: no offline path executes one (`tests/test_plugin_fence.py`). It is a decision of [SR-CDP-FETCHER](0118_cdp-fetcher.md) and [SR-PLUGINS](0165_plugins.md) (W-289, ruled by Arpit 2026-10-19), not of this law — the law's text is untouched.
+**Network code lives outside the engine's packages.** The two shipped fetchers are their own distributions, `fux-fetcher-http` and `fux-fetcher-cdp`, which a repository runs only when its `.fux/config/plugins.toml` declares them and a URL line names one; a consumer's own fetcher lives in `.fux/fetchers/`. That is why the engine can keep zero network lines while URLs still work, and the import fence extends to the fetcher packages: no offline path executes one (`tests/test_plugin_fence.py`). It is a decision of [SR-CDP-FETCHER](0118_cdp-fetcher.md) and [SR-PLUGINS](0165_plugins.md) (W-289, ruled by Arpit 2026-10-19), not of this law — the law's text is untouched.
 
 ### ⚠ The narrowing that already happened once
 
@@ -4798,7 +4798,7 @@ table. ⚠ **A handle is not the law**; read the law in §2 below.
 | PEP 701 f-strings (nested quotes, multi-line expressions) | `.format()` workarounds inside f-strings |
 | `itertools.batched`, `Path.walk()`, `Path.relative_to(walk_up=True)` | the hand-rolled chunker and `os.walk` + path glue |
 
-**`tomllib` is the load-bearing one.** `.fux/tune.toml`, `.fux/output.toml`, `.fux/pii.toml`, `.fux/refusals.toml` and `fux.toml` are all read with it. Under 3.10 every one of those needs a third-party parser — which, before 2026-09-06, [L2](0004_LAW-2-zero-cost.md) forbade outright.
+**`tomllib` is the load-bearing one.** `.fux/config/tune.toml`, `.fux/config/output.toml`, `.fux/config/pii.toml`, `.fux/config/refusals.toml` and `fux.toml` are all read with it. Under 3.10 every one of those needs a third-party parser — which, before 2026-09-06, [L2](0004_LAW-2-zero-cost.md) forbade outright.
 
 ⚠ **L2's amendment weakened this law's justification without changing the law.** A TOML parser is now installable. **3.11 remained the floor until 2026-09-28** — the typing and `ExceptionGroup` arguments stand on their own, and lowering it would buy compatibility with a Python nobody is deploying — but the *strongest* argument for it is no longer *"there is no alternative"*.
 
@@ -6554,7 +6554,7 @@ Source: https://raw.githubusercontent.com/arpitarya/fux/main/records/0014_LAW-12
 > the source**; amend the law here, then run `python scripts/gen-laws.py --write`.
 
 **The one-line case.** `MINED_WEIGHT = 0.5` in `text/mined.py` is a second
-home for a value `.fux/tune.toml` already states. Two homes drift, and the one
+home for a value `.fux/config/tune.toml` already states. Two homes drift, and the one
 in code wins silently whenever the file forgets it.
 
 **The handle:** *Every value lives in a config file, never in code* — the
@@ -6565,13 +6565,13 @@ law**; read the law in §2 below.
 
 | the value | example | its one home | who may edit it |
 |---|---|---|---|
-| **tunable** — a person could choose it differently and the code is still right | `mined_weight`, `k1`, `rerank_weight`, `max_phrases`, a TTL, a sample size, a timeout | a committed TOML in the consumer's repo — `fux.toml`, `.fux/tune.toml`, another `.fux/*.toml`, or a new one | the consumer |
+| **tunable** — a person could choose it differently and the code is still right | `mined_weight`, `k1`, `rerank_weight`, `max_phrases`, a TTL, a sample size, a timeout | a committed TOML in the consumer's repo — `fux.toml`, `.fux/config/tune.toml`, another `.fux/*.toml`, or a new one | the consumer |
 | **fixed** — changing it changes what a committed byte means | `SCHEMA = "fux.graph.v1"`, `RULES_VERSION = 3`, `FIXED_SHARDS = 256`, `"pii-digest"` | the engine's **internal constants file**, `src/fux/constants.toml`, shipped inside both distributions | fux, in a release |
 
 | what a function did BEFORE 2026-09-27 | what L12 requires |
 |---|---|
-| `MINED_WEIGHT = 0.5` in the module; `tune.py` falls back to it when the key is absent | the key is read from `.fux/tune.toml`; absent → error naming `[ranking] mined_weight` |
-| `delete .fux/tune.toml and nothing changes` (SR-TUNE) | delete it and every ranked verb stops, naming the file |
+| `MINED_WEIGHT = 0.5` in the module; `tune.py` falls back to it when the key is absent | the key is read from `.fux/config/tune.toml`; absent → error naming `[ranking] mined_weight` |
+| `delete .fux/config/tune.toml and nothing changes` (SR-TUNE) | delete it and every ranked verb stops, naming the file |
 | `fux.toml` omits a key so a raised default arrives with no edit (SR-CONFIG) | every key is written; a new default reaches a repo through `fux setup` / `fux doctor --fix`, never silently |
 | `def sample(n=100)` | `n` is read from config and passed in; no literal default |
 | `SCHEMA = "fux.graph.v1"` in `graph/plane.py` | read from `src/fux/constants.toml` |
@@ -6630,13 +6630,13 @@ Amending a law needs Arpit's ruling, named in this record
 ([SR-LAW-0](0002_LAW-0-authority.md) decision 3).
 
 <!-- LAW-TEXT:BEGIN L12 -->
-- **L12** · **Every value lives in a config file, never in code.** A *tunable* value — a weight, threshold, limit, timeout, TTL or sample size — is read from a committed TOML file: `fux.toml`, `.fux/tune.toml`, or another `.fux/*.toml`. A *fixed* engine value — a schema id, a format or rules version, the shard count, an artefact file name — is read from the engine's internal constants file, `src/fux/constants.toml`, shipped inside both distributions. Python and Node read the same key from the same file. **A missing file or key is a hard error that names it; no module constant, function body or parameter default supplies a fallback.** The only places a literal value may sit are `setup.py` and `src/fux/templates/`, which write the config files, and `tests/`, `tests_e2e/`, `tools/` and `scripts/`.
+- **L12** · **Every value lives in a config file, never in code.** A *tunable* value — a weight, threshold, limit, timeout, TTL or sample size — is read from a committed TOML file: `fux.toml`, `.fux/config/tune.toml`, or another `.fux/*.toml`. A *fixed* engine value — a schema id, a format or rules version, the shard count, an artefact file name — is read from the engine's internal constants file, `src/fux/constants.toml`, shipped inside both distributions. Python and Node read the same key from the same file. **A missing file or key is a hard error that names it; no module constant, function body or parameter default supplies a fallback.** The only places a literal value may sit are `setup.py` and `src/fux/templates/`, which write the config files, and `tests/`, `tests_e2e/`, `tools/` and `scripts/`.
 <!-- LAW-TEXT:END L12 -->
 
 ### Context
 
 Fux already had the file for tunables. [SR-TUNE](0135_tuning.md) made
-`.fux/tune.toml` the home of every knob that changes order, and
+`.fux/config/tune.toml` the home of every knob that changes order, and
 [SR-CONFIG](0113_config.md) made `fux.toml` the home of policy. Neither made
 the file the **only** home. Both kept the engine's own default in code and let
 the file override it:
@@ -6668,12 +6668,12 @@ Two homes fail three ways:
 ### Decision
 
 **1. A tunable value has one home: a committed TOML file in the consumer's
-repository.** `fux.toml`, `.fux/tune.toml`, `.fux/output.toml`,
-`.fux/formats.toml`, `.fux/pii.toml`, `.fux/refusals.toml` — or a **new**
+repository.** `fux.toml`, `.fux/config/tune.toml`, `.fux/config/output.toml`,
+`.fux/config/formats.toml`, `.fux/config/pii.toml`, `.fux/config/refusals.toml` — or a **new**
 `.fux/*.toml` when no existing file's boundary fits. Which file a key goes in
 is decided by that file's own record (SR-TUNE's boundary rule, SR-CONFIG's
 policy scope); L12 decides only that it goes in one. **The first new file is
-`.fux/inspect.toml`** — `fux inspect`'s finding thresholds, sample sizes and
+`.fux/config/inspect.toml`** — `fux inspect`'s finding thresholds, sample sizes and
 list lengths, which decide what counts as a finding rather than how output
 renders, so they do not belong in `output.toml` (Arpit, 2026-09-27, R6).
 
@@ -6726,7 +6726,7 @@ W-225 classification (R1–R3):
   (`MAX_REPORTED`), display rounding digits, and the *"first N, then (+M
   more)"* cut inside a message. Message formatting, not behaviour. ⚠ **A regex a consumer might
 reasonably want to change is a value** — that is why PII patterns already live
-in `.fux/pii.toml`.
+in `.fux/config/pii.toml`.
 
 **6a. What decision 6 does NOT cover — ruled by Arpit, 2026-09-27, on the R5
 scan (R7–R10 of [the classification](../work/compare/l12-classify.compare.md)).**
@@ -6778,7 +6778,7 @@ example set:
   reopened only if a consumer should be able to add an attribute.
 
 **7. `--no-tune` reads the packaged template, not code.** The "is it me or the
-config?" switch survives: it swaps the consumer's `.fux/tune.toml` for the one
+config?" switch survives: it swaps the consumer's `.fux/config/tune.toml` for the one
 `fux setup` would write today. It never falls back to a constant.
 
 **8. A record that conflicts with L12 is void in the conflicting part**

@@ -22,7 +22,7 @@ const MIN_TABLE_LINES = fixed("markdown", "min_table_lines");
 // W-287 B5 — the header pairs that make a two-column table a RECORD.
 const RECORD_HEADERS = new Set(fixed("tables", "record_headers").map((pair) => JSON.stringify(pair)));
 
-//: The three passage bounds are `.fux/tune.toml [refer]`'s and arrive from the
+//: The three passage bounds are `.fux/config/tune.toml [refer]`'s and arrive from the
 //: caller's `Tune` (L12). Why each is what the template ships — one row per
 //: passage took hit@1 from 0.229 to 0.875 (2026-09-06) — lives beside its key.
 

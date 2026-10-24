@@ -13,7 +13,7 @@ description: Serving the Fux index over MCP with fux mcp - the fux_search, fux_p
 - **The client launches the server with its own search path and working
   directory** - test the exact command before registering it.
 - **Do not commit an absolute path** into a shared MCP config.
-- `[mcp]` in `.fux/output.toml` is read once: restart after editing.
+- `[mcp]` in `.fux/config/output.toml` is read once: restart after editing.
 - Register a server only when asked, and name the file you changed.
 
 Full procedure: the `fux-mcp` skill.

@@ -12,6 +12,7 @@ never engage and every assertion here would pass vacuously.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import os
 import subprocess
@@ -47,8 +48,8 @@ def repo(tmp_path: Path) -> Path:
     dirs = tmp_path / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     docs = tmp_path / "docs"
     docs.mkdir()
@@ -215,7 +216,7 @@ def test_stdout_is_byte_identical_with_the_bar_on_or_off(repo: Path, verb: str):
 
 
 def test_a_below_threshold_phase_paints_nothing_even_when_forced(repo: Path):
-    """W-238: the threshold is a COUNT, read from `.fux/output.toml`. Five
+    """W-238: the threshold is a COUNT, read from `.fux/config/output.toml`. Five
     enrichment files is a `check` phase of five, so `--progress` forces the bar
     on and it still stays silent."""
     (repo / ".fux" / "sources" / "dirs").write_text("docs enrich=true\n", encoding="utf-8")

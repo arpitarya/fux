@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import os
 import subprocess
 
@@ -38,7 +39,7 @@ def test_repo_root_found_from_a_git_checkout(tmp_path):
 
 def test_fux_dir_writable_after_root_found(tmp_path):
     (tmp_path / ".git").mkdir()
-    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     checks = doctor.run(tmp_path)
     writable = next(c for c in checks if c.name == ".fux/ writable")
     assert writable.ok
@@ -148,7 +149,7 @@ def test_check_ignore_is_skipped_outside_a_git_checkout(tmp_path):
 
 def test_undeclared_fux_entry_warns_without_failing_the_command(tmp_path):
     (tmp_path / ".git").mkdir()
-    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     (tmp_path / ".fux" / "scratch").mkdir()
     check = _check(doctor.run(tmp_path), ".fux/ layout declared")
     assert not check.ok
@@ -168,9 +169,9 @@ def test_declared_entries_do_not_warn(tmp_path):
 
 def test_cmd_doctor_exit_code_ignores_warnings(tmp_path, monkeypatch, capsys):
     (tmp_path / ".git").mkdir()
-    (tmp_path / ".fux").mkdir(exist_ok=True)
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     # A repo that does not fetch: `write_config` alone would write the whole
     # template `fux.toml`, whose `[sources.url.config.*]` tables name fetchers
     # this bare repo has not got — an error row, not the warning under test.
@@ -543,7 +544,7 @@ def test_every_check_detail_is_ascii_in_every_branch(tmp_path):
 
     _git_repo(tmp_path)
     (tmp_path / ".gitignore").write_text(".fux/*\n", encoding="utf-8")
-    (tmp_path / ".fux").mkdir(exist_ok=True)
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     (tmp_path / ".fux" / "scratch").mkdir()
     scenarios.append(doctor.run(tmp_path))
 
@@ -569,7 +570,7 @@ def test_doctor_flags_a_types_file_with_no_live_pattern(tmp_path, monkeypatch):
     from fux import doctor as doctor_mod
 
     (tmp_path / "fux.toml").write_text("", encoding="utf-8")
-    types = tmp_path / ".fux" / "formats.toml"
+    types = config_file(tmp_path, "formats")
     types.parent.mkdir(parents=True, exist_ok=True)
     types.write_text('# every line a comment\n# include = ["*.md"]\n', encoding="utf-8")
     check = doctor_mod._types_health(tmp_path)
@@ -587,7 +588,7 @@ def test_doctor_flags_a_leftover_line_grammar_types_file(tmp_path):
     (tmp_path / ".fux" / "sources" / "types").write_text("*.md\n", encoding="utf-8")
     check = doctor_mod._types_health(tmp_path)
     assert not check.ok
-    assert "fux setup" in check.detail and ".fux/formats.toml" in check.detail
+    assert "fux setup" in check.detail and ".fux/config/formats.toml" in check.detail
 
 
 def test_doctor_passes_a_types_file_setup_wrote(tmp_path):
@@ -608,7 +609,7 @@ def test_doctor_fails_when_there_is_no_types_file(tmp_path):
 
     check = doctor_mod._types_health(tmp_path)
     assert not check.ok
-    assert ".fux/formats.toml is missing" in check.detail
+    assert ".fux/config/formats.toml is missing" in check.detail
     assert "fux doctor --fix" in check.detail
 
 
@@ -907,7 +908,7 @@ def test_decoder_bindings_report_nothing_when_none_are_declared(tmp_path):
 
 def test_a_binding_naming_a_missing_module_is_an_error(tmp_path):
     _git_repo(tmp_path)
-    types = tmp_path / ".fux" / "formats.toml"
+    types = config_file(tmp_path, "formats")
     types.parent.mkdir(parents=True, exist_ok=True)
     types.write_text('include = ["*.md"]\n[decoders]\nzzz = "nosuchdecoder"\n', encoding="utf-8")
     check = _check(doctor.run(tmp_path), "decoder bindings")
@@ -924,7 +925,7 @@ def test_a_generated_binding_that_matches_nothing_is_not_reported(tmp_path):
     from fux.acquire import typesfile
 
     bindings = {ext.lstrip("."): name for ext, name in decode.builtin_bindings().items()}
-    types = tmp_path / ".fux" / "formats.toml"
+    types = config_file(tmp_path, "formats")
     types.parent.mkdir(parents=True, exist_ok=True)
     types.write_text(typesfile.render(["*.md"], bindings, grouped=True), encoding="utf-8")
     write_index(tmp_path, [_record()])
@@ -938,7 +939,7 @@ def test_a_hand_written_binding_that_matches_nothing_is_reported(tmp_path):
     from fux.store import write_index
 
     _git_repo(tmp_path)
-    types = tmp_path / ".fux" / "formats.toml"
+    types = config_file(tmp_path, "formats")
     types.parent.mkdir(parents=True, exist_ok=True)
     types.write_text('include = ["*.md"]\n[decoders]\njsno = "json"\n', encoding="utf-8")
     write_index(tmp_path, [_record()])
@@ -953,7 +954,7 @@ def test_a_hand_written_binding_with_documents_is_quiet(tmp_path):
     from fux.store import write_index
 
     _git_repo(tmp_path)
-    types = tmp_path / ".fux" / "formats.toml"
+    types = config_file(tmp_path, "formats")
     types.parent.mkdir(parents=True, exist_ok=True)
     types.write_text('include = ["*.md"]\n[decoders]\ngeojson = "json"\n', encoding="utf-8")
     write_index(tmp_path, [_record(doc_id="file:a.geojson", loc="a.geojson")])
@@ -1175,8 +1176,8 @@ def test_the_counts_file_is_gitignored_like_every_derived_plane(tmp_path):
 
 
 def _tune(tmp_path, body):
-    (tmp_path / ".fux").mkdir(exist_ok=True)
-    (tmp_path / ".fux" / "tune.toml").write_text(f"[ranking]\n{body}\n", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "tune")).write_text(f"[ranking]\n{body}\n", encoding="utf-8")
     write_config(tmp_path)
 
 
@@ -1282,8 +1283,8 @@ def test_a_broken_tune_file_fails_the_doctor(tmp_path):
     """
     _git_repo(tmp_path)
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (tmp_path / ".fux").mkdir(exist_ok=True)
-    (tmp_path / ".fux" / "tune.toml").write_text("[ranking]\nrerank_weight = 'not a number'\n", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "tune")).write_text("[ranking]\nrerank_weight = 'not a number'\n", encoding="utf-8")
     write_config(tmp_path)
 
     check = _check(doctor.run(tmp_path), "tune.toml loads")
@@ -1300,8 +1301,8 @@ def test_the_tune_row_quotes_the_loaders_own_words(tmp_path):
 
     _git_repo(tmp_path)
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (tmp_path / ".fux").mkdir(exist_ok=True)
-    (tmp_path / ".fux" / "tune.toml").write_text("[ranking]\nrerank_weight = 'nope'\n", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "tune")).write_text("[ranking]\nrerank_weight = 'nope'\n", encoding="utf-8")
     write_config(tmp_path)
 
     try:
@@ -1317,8 +1318,8 @@ def test_the_tune_row_quotes_the_loaders_own_words(tmp_path):
 def test_a_valid_tune_file_passes(tmp_path):
     _git_repo(tmp_path)
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (tmp_path / ".fux").mkdir(exist_ok=True)
-    (tmp_path / ".fux" / "tune.toml").write_text("[ranking]\nrerank_weight = 0.5\n", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "tune")).write_text("[ranking]\nrerank_weight = 0.5\n", encoding="utf-8")
     write_config(tmp_path)
     assert _check(doctor.run(tmp_path), "tune.toml loads").ok
 
@@ -1341,7 +1342,7 @@ def test_doctor_fix_writes_the_missing_file_and_then_passes(tmp_path, monkeypatc
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     monkeypatch.chdir(tmp_path)
     doctor.cmd_doctor(argparse.Namespace(fix=True, json=True))
-    assert "fixed: .fux/tune.toml: written" in capsys.readouterr().err
+    assert "fixed: .fux/config/tune.toml: written" in capsys.readouterr().err
     assert _check(doctor.run(tmp_path), "tune.toml loads").ok
 
 
@@ -1500,8 +1501,8 @@ def test_some_other_fux_is_reported_but_not_blamed_on_node(monkeypatch, tmp_path
 
 def test_doctor_run_includes_the_row(tmp_path):
     (tmp_path / ".git").mkdir()
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     names = [c.name for c in doctor.run(tmp_path)]
     assert "fux on PATH" in names
@@ -1572,8 +1573,8 @@ def _drift_repo(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
@@ -1597,9 +1598,9 @@ def test_every_drift_row_is_a_warning_and_none_is_an_error(tmp_path):
     # it on a passing row tests nothing and fails on the dataclass default.
     (root / ".github" / "skills").mkdir(parents=True)
     (root / ".fux" / "README.md").write_text("# old\n", encoding="utf-8")
-    (root / ".fux" / "tune.toml").write_text("[bm25f]\nk1 = 1.2\n", encoding="utf-8")
-    (root / ".fux" / "output.toml").write_text("[cli]\ntop = 5\n", encoding="utf-8")
-    (root / ".fux" / "formats.toml").write_text('include = ["*.md", "*.zzz"]\n', encoding="utf-8")
+    (config_file(root, "tune")).write_text("[bm25f]\nk1 = 1.2\n", encoding="utf-8")
+    (config_file(root, "output")).write_text("[cli]\ntop = 5\n", encoding="utf-8")
+    (config_file(root, "formats")).write_text('include = ["*.md", "*.zzz"]\n', encoding="utf-8")
     (root / ".fux" / "sources" / "dirs").write_text("docs\nhandbook\n", encoding="utf-8")
 
     rows = {c.name: c for c in doctor.run(root)}
@@ -1740,7 +1741,7 @@ def test_a_retired_starter_is_reported(tmp_path, monkeypatch):
     # translates "\n" to "\r\n" on Windows — so the fixture would hash one
     # thing and the file would hold another, and the row would be right to
     # report no match. The defect was the test's, never doctor's.
-    (root / ".fux" / "refusals.toml").write_bytes(body.encode("utf-8"))
+    (config_file(root, "refusals")).write_bytes(body.encode("utf-8"))
     monkeypatch.setattr(
         health, "RETIRED_REFUSAL_STARTERS", (hashlib.sha256(body.encode()).hexdigest(),)
     )
@@ -1753,7 +1754,7 @@ def test_an_edited_refusals_file_is_never_reported(tmp_path, monkeypatch):
     import hashlib
 
     root = _drift_repo(tmp_path)
-    (root / ".fux" / "refusals.toml").write_text("# ours\n", encoding="utf-8")
+    (config_file(root, "refusals")).write_text("# ours\n", encoding="utf-8")
     monkeypatch.setattr(
         health, "RETIRED_REFUSAL_STARTERS", (hashlib.sha256(b"# an old starter\n").hexdigest(),)
     )
@@ -1765,7 +1766,7 @@ def test_an_edited_refusals_file_is_never_reported(tmp_path, monkeypatch):
 
 def test_a_tune_file_missing_a_key_the_engine_gained_is_reported(tmp_path):
     root = _drift_repo(tmp_path)
-    (root / ".fux" / "tune.toml").write_text("[bm25f]\nk1 = 1.2\n", encoding="utf-8")
+    (config_file(root, "tune")).write_text("[bm25f]\nk1 = 1.2\n", encoding="utf-8")
     row = _row(root, "tune.toml current")
     assert not row.ok
     assert "fux doctor --fix" in row.detail, "the row names the one remedy"
@@ -1780,7 +1781,7 @@ def test_a_complete_tune_file_is_not_reported(tmp_path):
     for table, keys in tune_mod._SCHEMA.items():
         lines.append(f"[{table}]")
         lines += [f"{key} = 0" for key in keys]
-    (root / ".fux" / "tune.toml").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (config_file(root, "tune")).write_text("\n".join(lines) + "\n", encoding="utf-8")
     write_config(root)
     assert _row(root, "tune.toml current").ok
 
@@ -1795,7 +1796,7 @@ def test_this_repos_own_output_toml_satisfies_the_row():
 
     The first build expected `cli.explain`, `cli.hops`, `cli.no_refer` and three
     more at those exact paths, and reported **six keys missing from a file that
-    carries every one of them** — `.fux/output.toml` nests per verb on purpose
+    carries every one of them** — `.fux/config/output.toml` nests per verb on purpose
     (`[cli.ask] explain`, `[cli.path] hops`, `[cli.json] enabled`), because a
     rendering default means different things to different verbs.
 
@@ -1806,15 +1807,15 @@ def test_this_repos_own_output_toml_satisfies_the_row():
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[1]
-    if not (root / ".fux" / "output.toml").is_file():  # pragma: no cover
-        pytest.skip("this checkout has no .fux/output.toml")
+    if not (config_file(root, "output")).is_file():  # pragma: no cover
+        pytest.skip("this checkout has no .fux/config/output.toml")
     row = next(c for c in doctor._frozen_keys(root) if c.name == "output.toml current")
     assert row.ok, row.detail
 
 
 def test_an_output_file_genuinely_missing_a_knob_is_reported(tmp_path):
     root = _drift_repo(tmp_path)
-    (root / ".fux" / "output.toml").write_text("[cli]\ntop = 5\n", encoding="utf-8")
+    (config_file(root, "output")).write_text("[cli]\ntop = 5\n", encoding="utf-8")
     row = _row(root, "output.toml current")
     assert not row.ok
     assert "band" in row.detail
@@ -1825,7 +1826,7 @@ def test_an_output_file_genuinely_missing_a_knob_is_reported(tmp_path):
 
 def test_a_declared_type_no_decoder_reads_is_reported(tmp_path):
     root = _drift_repo(tmp_path)
-    (root / ".fux" / "formats.toml").write_text(
+    (config_file(root, "formats")).write_text(
         'include = ["*.md", "*.zzz"]\n', encoding="utf-8"
     )
     row = _row(root, "declared types are readable")
@@ -1840,7 +1841,7 @@ def test_prose_types_are_never_reported_as_unbound(tmp_path):
     single most common line in the file.
     """
     root = _drift_repo(tmp_path)
-    (root / ".fux" / "formats.toml").write_text(
+    (config_file(root, "formats")).write_text(
         'include = ["*.md", "*.txt", "*.rst", "*.adoc", "*.org", "*.markdown"]\n',
         encoding="utf-8",
     )
@@ -1850,7 +1851,7 @@ def test_prose_types_are_never_reported_as_unbound(tmp_path):
 def test_a_glob_naming_no_extension_claims_nothing_and_is_not_reported(tmp_path):
     """`docs/**` makes no claim about a format, so there is nothing to resolve."""
     root = _drift_repo(tmp_path)
-    (root / ".fux" / "formats.toml").write_text(
+    (config_file(root, "formats")).write_text(
         'include = ["*.md", "docs/**"]\n', encoding="utf-8"
     )
     assert _row(root, "declared types are readable").ok

@@ -46,7 +46,7 @@ USES = tuple(fixed("decoders.jsonl", "uses"))
 
 #: Records past this are a dataset rather than a document — the same judgement
 #: `csv.MAX_ROWS` makes for the row-oriented shape this format shares.
-#: ⚠ **`MAX_RECORDS` is `[limits.jsonl] max_records` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_RECORDS` is `[limits.jsonl] max_records` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 

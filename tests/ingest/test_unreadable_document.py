@@ -14,6 +14,7 @@ The result was the exact failure P6 exists to prevent, inverted: a single
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from pathlib import Path
 
 from importlib import import_module
@@ -32,8 +33,8 @@ def _corpus(root: Path) -> None:
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     docs = root / "docs"
     docs.mkdir()

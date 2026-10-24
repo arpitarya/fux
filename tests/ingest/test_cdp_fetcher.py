@@ -2,7 +2,7 @@
 
 The fetcher ships as its own distribution, `fux-fetcher-cdp`
 (`packages/fux-fetcher-cdp/src/fux_fetcher_cdp/__init__.py`, W-289), which a
-repository declares in `.fux/plugins.toml` and fux loads only when a URL line
+repository declares in `.fux/config/plugins.toml` and fux loads only when a URL line
 says `fetch=cdp` (SR-CDP-FETCHER decision 9, SR-PLUGINS P10). These tests load
 the file by path, as a fresh module, so nothing here goes through that gate.
 

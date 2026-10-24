@@ -11,7 +11,7 @@ feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted fr
 owns: [node/src/ingest/dirlist.mjs@3fbfc2e90b52, src/fux/acquire/dirlist.py@d43e93694da4]
 laws: [L4, L6]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: e214af75c41d14c2b2f038a7ffe1abce0558504e971b73bd7bd035939fec895a
+content_sha: d82792d068316f8b228663fc8a3a493911337fbe9d0214a383526175891f0bed
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -64,7 +64,7 @@ them carries `archived: true`.
 ```mermaid
 flowchart LR
     D[".fux/sources/dirs<br/>! subtracts · archived= declared"] --> I["ingest"]
-    T[".fux/formats.toml<br/>what counts as a document"] --> I
+    T[".fux/config/formats.toml<br/>what counts as a document"] --> I
     U[".fux/sources/urls<br/>fetch= meta= declared"] --> I
     I --> R["records<br/>archived: true when declared"]
     R --> X["SR-ARCHIVED-CONTENT<br/>ranking · marker · disclaimer"]
@@ -75,7 +75,7 @@ flowchart LR
 
 ```text
   .fux/sources/dirs   (! subtracts, archived=) --+
-  .fux/formats.toml     (what is a document)     --+--> ingest --> records carrying
+  .fux/config/formats.toml     (what is a document)     --+--> ingest --> records carrying
   .fux/sources/urls   (fetch=, meta=)          --+            archived: true when declared
                                                                     |
                                                                     v
@@ -119,7 +119,7 @@ inflated by them.
 ### Decision
 
 **1. Source directories live in `.fux/sources/dirs`**, one entry per line, a
-committed file beside `urls` (and beside `types` until it became `.fux/formats.toml`
+committed file beside `urls` (and beside `types` until it became `.fux/config/formats.toml`
 on 2026-09-11 — [SR-TYPES](0128_types-list.md) decision 12). `[sources] dirs` in `fux.toml` is a
 **retired key that errors with instructions**
 ([SR-CONFIG](0113_config.md) decision 10).
@@ -224,7 +224,7 @@ is indirect — see [SR-URL-LIST](0116_url-list.md) §The `dirs` attribute set.
 **3a. An explicitly added file does not outrank the type allowlist. A
 `.fuxignore` `!` line does.**
 `fux add docs/architecture.pdf` writes the line, and the document is still
-skipped if `.fux/formats.toml` does not admit it — the verb says so, and says
+skipped if `.fux/config/formats.toml` does not admit it — the verb says so, and says
 which command would change it. This follows from the three conditions being a
 **conjunction with no precedence**; what could plausibly have been read as an
 override is the command. Making an `add` win would produce **a document indexed
@@ -322,7 +322,7 @@ this moved where they are written, not what they are.
   the failure the exclusion work was opened about, so silence was not an option.
 - **`fux.toml` stops being where the corpus is defined.** It keeps policy; the
   *what* lives in three committed lists — two under `.fux/sources/`, plus
-  `.fux/formats.toml`. Config is how the engine
+  `.fux/config/formats.toml`. Config is how the engine
   behaves; the source lists are what it looks at.
 - ⚠ **The archived declaration is only as honest as the person writing it.** A
   derived signal cannot be forgotten; a declared one can. What it buys is
@@ -386,7 +386,7 @@ grep -rn "archive/" src/fux/ --include=*.py
 
 # 2. still one line-grammar parser for dirs and urls
 grep -rln "def parse(" src/fux/ingest/
-# expect: sourcelist.py, plus typesfile.py (.fux/formats.toml, SR-TYPES decision 12)
+# expect: sourcelist.py, plus typesfile.py (.fux/config/formats.toml, SR-TYPES decision 12)
 #         and fuxignore.py (.fux/.fuxignore, SR-FUXIGNORE)
 
 # 3. the attribute set is still closed at two

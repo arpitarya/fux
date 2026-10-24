@@ -112,7 +112,7 @@ def make_repo(path: Path, *, docs: int) -> None:
     (path / "docs").mkdir()
     (path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    (path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (path / ".fux" / "config" / "pii.toml").write_text("", encoding="utf-8")
     for i in range(docs):
         (path / "docs" / f"filler{i:04d}.md").write_text(
             doc(f"filler {i} " + " ".join(f"w{i}x{j}" for j in range(40))), encoding="utf-8"

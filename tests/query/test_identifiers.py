@@ -114,7 +114,7 @@ def test_digest_is_of_the_effective_rules():
 
 
 def _write(tmp_path, text):
-    (tmp_path / ".fux").mkdir(exist_ok=True)
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     (tmp_path / ids_mod.FILE).write_text(text, encoding="utf-8")
 
 

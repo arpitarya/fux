@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-20
 date: 2026-08-19
 feature: the fetch contract, what it is called, and how a fetcher reaches a repository
-owns: [src/fux/acquire/urlsrc.py@bc63887bcee4]
+owns: [src/fux/acquire/urlsrc.py@8115cf4e4be9]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 7cdf7a3508fdc8e768a1fb112e4831b4fc561c3884f66c7fde8c940e0dd907c2
+content_sha: 7fa945bb71ac43510a5b0d90550aab446c86393efe3d3d058e617b44288747fc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -27,7 +27,7 @@ content_sha: 7cdf7a3508fdc8e768a1fb112e4831b4fc561c3884f66c7fde8c940e0dd907c2
 ## §1 — For humans
 
 **Fux never fetches. Your fetcher does.** A Python file in your repo's
-`.fux/fetchers/`, or a fetcher package your repo declares in `.fux/plugins.toml`
+`.fux/fetchers/`, or a fetcher package your repo declares in `.fux/config/plugins.toml`
 ([SR-PLUGINS](0165_plugins.md)), called once per URL under either fenced path —
 `fux add <URL>` (that URL only) or `fux ingest` (all of them). Core holds **zero
 network lines**, and that is the property this record exists to keep true.
@@ -168,7 +168,7 @@ true** — the day a chain lands, the name is wrong again.
 **5. Which fetcher a URL uses is declared, never detected.** Via
 [SR-URL-LIST](0116_url-list.md)'s `fetch=` attribute, which resolves to
 `.fux/fetchers/<name>.py` when the consumer has that file, and otherwise to the
-fetcher package `.fux/plugins.toml` declares for `<name>` ([SR-PLUGINS](0165_plugins.md)
+fetcher package `.fux/config/plugins.toml` declares for `<name>` ([SR-PLUGINS](0165_plugins.md)
 P8) — an installed package nobody declared is never consulted. **A fetcher
 no line names is never imported**, which is what keeps a repo that only wants
 plain HTTP from loading WebSocket code. Automatic escalation from one fetcher to
@@ -190,7 +190,7 @@ presumes more than one can exist in a repo at once.
 **Fux ships two fetchers, as packages, and the engine imports neither.**
 `fux-fetcher-http` and `fux-fetcher-cdp` are separate distributions
 ([SR-PLUGINS](0165_plugins.md) P10) that **import nothing from fux and depend on
-nothing**; a repository runs one only when `.fux/plugins.toml` declares it,
+nothing**; a repository runs one only when `.fux/config/plugins.toml` declares it,
 pinned, and a URL line names it. **`fux setup` seeds no copy** (P9): the package
 is what runs, so an engine fix reaches every repository with its next install —
 the freeze a seeded copy imposed is gone. **A file of the same name in
@@ -712,9 +712,9 @@ decision 5), the files `fux setup` writes.
 
 **No decision here moved** (W-273 phase 2, 2026-10-13): the `section_weight` and `section_records` comments in the templates name `1.0` as the measured value.
 
-**No decision here moved** (W-287, 2026-10-19): `src/fux/templates` gains two template keys — `.fux/tune.toml [ranking] table_column_weight` and `.fux/formats.toml [limits.html|xlsx] header_fill_percent` ([SR-TUNE](0135_tuning.md), [SR-DECODE](0139_decode.md) decision 23). ⚠ **A fetched HTML page's Markdown changes** through the shared `html` decoder at its next refresh — header rows, spans, captions, nested tables, escaped pipes — which is SR-DECODE decision 23's, not a fetcher's.
+**No decision here moved** (W-287, 2026-10-19): `src/fux/templates` gains two template keys — `.fux/config/tune.toml [ranking] table_column_weight` and `.fux/config/formats.toml [limits.html|xlsx] header_fill_percent` ([SR-TUNE](0135_tuning.md), [SR-DECODE](0139_decode.md) decision 23). ⚠ **A fetched HTML page's Markdown changes** through the shared `html` decoder at its next refresh — header rows, spans, captions, nested tables, escaped pipes — which is SR-DECODE decision 23's, not a fetcher's.
 
-**W-289 phase 2 (2026-10-20) — no decision here moved.** Under this record's claim, `acquire/urlsrc.py` gained the decoder half of [SR-PLUGINS](0165_plugins.md) P3: a `decoder=` naming a first-party module whose package is not declared is a named skip at ingest (*"read by fux-decoder-pdf, which .fux/plugins.toml does not declare"*), never prose; `fux add` still proposes the first-party stem for an observed response whether or not its package is declared, and a retained blob still takes that module's own first suffix. The fetch contract is untouched.
+**W-289 phase 2 (2026-10-20) — no decision here moved.** Under this record's claim, `acquire/urlsrc.py` gained the decoder half of [SR-PLUGINS](0165_plugins.md) P3: a `decoder=` naming a first-party module whose package is not declared is a named skip at ingest (*"read by fux-decoder-pdf, which .fux/config/plugins.toml does not declare"*), never prose; `fux add` still proposes the first-party stem for an observed response whether or not its package is declared, and a retained blob still takes that module's own first suffix. The fetch contract is untouched.
 
 ### Consequences
 

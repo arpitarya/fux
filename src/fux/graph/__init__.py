@@ -53,7 +53,7 @@ __all__ = [
 
 
 def _tune_for(root: Path, args):
-    """`.fux/tune.toml` for one graph invocation, honouring `--no-tune`.
+    """`.fux/config/tune.toml` for one graph invocation, honouring `--no-tune`.
 
     Loaded **once per command** and handed down, the same discipline
     `query/__init__.py` applies: `cmd_graph` uses the tune twice — for the seed

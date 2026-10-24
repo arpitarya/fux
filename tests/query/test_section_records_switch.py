@@ -14,6 +14,7 @@ SR-SECTIONS decision 11. Pinned here:
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import re
 import shutil
 import subprocess
@@ -40,7 +41,7 @@ DOCS = {
 def _repo(root: Path, *, on: bool) -> Path:
     (root / ".fux" / "sources").mkdir(parents=True, exist_ok=True)
     (root / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     (root / "fux.toml").write_text(
         f"[sources]\n\n[index]\nsection_records = {str(on).lower()}\n", encoding="utf-8"
     )
@@ -62,7 +63,7 @@ def _flip(root: Path, on: bool) -> None:
 
 
 def _set_weight(root: Path, weight: float) -> None:
-    path = root / ".fux" / "tune.toml"
+    path = config_file(root, "tune")
     text = path.read_text(encoding="utf-8")
     path.write_text(
         re.sub(r"(?m)^section_weight\s*=.*$", f"section_weight = {weight}", text), encoding="utf-8"

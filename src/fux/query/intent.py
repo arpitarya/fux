@@ -7,7 +7,7 @@ Three pieces, ruled D2 · I1 · M1 on 2026-09-24
   value, not a tunable: the pre-registration froze it, and a test holds it
   equal to the frozen tag.
 - **D2, the `[doctype]` table** — glob → type, the consumer's own, in
-  `.fux/tune.toml`, read at query time. Empty by default.
+  `.fux/config/tune.toml`, read at query time. Empty by default.
 - **M1, the prior** — `[ranking] intent_weight` scales a document whose type
   matches the question's intent by `1 + intent_weight`. It is applied by
   `rank.Weighting`, the one multiplier both candidate paths share, so `--fast`

@@ -63,8 +63,8 @@ __all__ = ["Index", "Result", "AskAnswer", "Answer", "open"]
 #: not an import of `fux.ingest`. **This is the second copy of the path in the
 #: tree** and `tests/test_cli.py` holds all of them equal — the refusal's
 #: wording stays in `pii`, which is the part that must not be duplicated.
-#: `.fux/pii.toml`, from `constants.toml [files]` -- the one home of the name.
-_PII_RULES = (fixed("fuxdir", "dir"), fixed("files", "pii_name"))
+#: `.fux/config/pii.toml`, from `constants.toml [files]` -- the one home of the name.
+_PII_RULES = (fixed("files", "pii"),)
 
 
 class _Args(SimpleNamespace):
@@ -210,7 +210,7 @@ class Index:
     # -- read verbs -------------------------------------------------------
 
     def _output(self):
-        """`.fux/output.toml`, for the values a caller did not pass (L12).
+        """`.fux/config/output.toml`, for the values a caller did not pass (L12).
 
         The API reads the CLI's own keys — `[cli.<verb>] top`, `hops`,
         `max_headings` — exactly as the command does, so `fux find` and
@@ -225,7 +225,7 @@ class Index:
         """Ranked document locations. The cheapest verb: no band, no headings.
 
         🔴 **Through `run_query`, not `scan_ask`** (fixed 2026-09-12, W-107).
-        Calling the scan directly skipped `.fux/tune.toml`, the archived
+        Calling the scan directly skipped `.fux/config/tune.toml`, the archived
         weighting and the reranker — so `from fux import open` returned a
         DIFFERENT RANKING from `fux find` on the same index at the same
         version, silently. Measured on this repo, whose tune sets
@@ -255,7 +255,7 @@ class Index:
     ) -> AskAnswer:
         """A ranked list with scores — what you want when judging the engine.
 
-        `band` and `sections` a caller does not pass come from `.fux/output.toml
+        `band` and `sections` a caller does not pass come from `.fux/config/output.toml
         [api]`, which ships them ON where `[cli]` ships `band` off, deliberately:
         a caller in Python has already decided to read the object, and the block
         is the part that says whether to trust it (W-225 stage 6, L12 R8).
@@ -341,7 +341,7 @@ class Index:
         top-k, never `ask`'s boosted list** (SR-GRAPH decision 13): seeding from
         a list the walk already re-ordered would be a walk over its own output.
         `kinds`, `link_idf` and `max_hops` are `--kinds`, `--link-idf` and
-        `--max-hops`; the sizes come from `.fux/tune.toml [graph]`, as the
+        `--max-hops`; the sizes come from `.fux/config/tune.toml [graph]`, as the
         CLI's do.
         """
         from .graph import graph_payload
@@ -419,6 +419,12 @@ def open(root: str | Path) -> Index:  # noqa: A001 - the name is the API
     # measured 2026-09-12, it took `fux.open(".")` from 2 ms to **50 ms**, on
     # the warm path where nothing is wrong. The import happens only on the cold
     # path, where the next statement raises anyway and the wording lives.
+    # W-295: a policy file still at its pre-move address is an error naming the
+    # new one -- the same sentence the CLI prints. Five stat calls, no import of
+    # decoders (`configfiles` imports only constants and errors).
+    from . import configfiles
+
+    configfiles.require_moved(resolved)
     if not resolved.joinpath(*_PII_RULES).is_file():
         from .acquire import pii
 

@@ -31,7 +31,7 @@ between hedging vaguely and saying *"nothing here mentions `mTLS`"*.
 
 `separation_floor` and `doc_coverage_floor` are the *only* values in this
 module that are not structural facts, and since 2026-08-28 a repo may set both
-in `.fux/tune.toml` under `[confidence]` — SR-CONFIDENCE decision 13, which
+in `.fux/config/tune.toml` under `[confidence]` — SR-CONFIDENCE decision 13, which
 **reverses decision 7.**
 
 ⚠ **Read what that gave up.** Decision 7 refused the knob because a consumer
@@ -166,7 +166,7 @@ class Confidence:
     doc_coverage: float
 
     #: The `separation` cutoff **this block's band was actually computed
-    #: under** — `.fux/tune.toml [confidence] separation_floor` (decision 13).
+    #: under** — `.fux/config/tune.toml [confidence] separation_floor` (decision 13).
     #: ⚠ **PROVISIONAL AND UNMEASURED — registered as R10**; why, and what
     #: lowering it costs, is said beside the key in the template.
     #:
@@ -403,7 +403,7 @@ def signals(
     what `rank()` produces.
 
     **The floors arrive from the CALLER, never from this module's globals.**
-    `run_query` resolves them from `.fux/tune.toml` once per query and hands
+    `run_query` resolves them from `.fux/config/tune.toml` once per query and hands
     them down, so a single query cannot be judged by one floor and reported
     with another — the defect a module-global read would make possible the
     moment the value became configurable (decision 13).
@@ -484,7 +484,7 @@ def signals(
 #: of one fact. **ASCII only**: it is printed, and printed text reaches a Windows
 #: console.
 FLOOR_OFF_NOTE = (
-    "`[confidence] separation_floor = 0.0` in .fux/tune.toml: NO answer in this repo "
+    "`[confidence] separation_floor = 0.0` in .fux/config/tune.toml: NO answer in this repo "
     "can ever be `weak` again. That tunes away the SIGNAL, not the ranking - a "
     "`grounded` here does not mean what a `grounded` elsewhere means. The band "
     "publishes the floor it was judged under (`--band`, or the `confidence` block in "

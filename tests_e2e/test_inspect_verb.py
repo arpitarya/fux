@@ -30,6 +30,7 @@ to be right about besides the plants.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import subprocess
 import sys
@@ -87,7 +88,7 @@ def _planted(root: Path) -> None:
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     docs = root / "docs"
     docs.mkdir()
@@ -314,8 +315,8 @@ def test_the_floors_print_the_word_provisional(planted):
 
 def test_inspect_refuses_nothing_and_reports_when_there_is_no_index(tmp_path):
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True, capture_output=True)
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     result = _run(tmp_path, "inspect", check=False)
     assert result.returncode == 1
@@ -341,7 +342,7 @@ def test_the_dictionary_never_names_a_value_pii_toml_redacts(tmp_path):
     sources = tmp_path / ".fux" / "sources"
     sources.mkdir(parents=True)
     (sources / "dirs").write_text("docs\n", encoding="utf-8")
-    (tmp_path / ".fux" / "pii.toml").write_text(
+    (config_file(tmp_path, "pii")).write_text(
         '[[rule]]\nname = "secret"\npattern = "hunter2zzz"\n', encoding="utf-8"
     )
     write_config(tmp_path)

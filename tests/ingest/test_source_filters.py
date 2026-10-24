@@ -8,6 +8,7 @@ an invisible filter is the failure both items were opened about.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import pytest
 
 from fux.errors import FuxError
@@ -110,7 +111,7 @@ def test_an_absent_types_file_is_an_error_and_the_fix_writes_the_default(tmp_pat
     and still not 'nothing'."""
     with pytest.raises(FuxError) as caught:
         read_types(tmp_path)
-    assert ".fux/formats.toml is missing" in str(caught.value)
+    assert ".fux/config/formats.toml is missing" in str(caught.value)
     assert "fux doctor --fix" in str(caught.value)
 
     write_config(tmp_path)  # what `fux doctor --fix` runs
@@ -163,8 +164,8 @@ def test_the_default_never_grows_from_a_consumer_decoder(tmp_path):
 
 
 def _types_toml(tmp_path, text: str) -> None:
-    (tmp_path / ".fux").mkdir(parents=True, exist_ok=True)
-    (tmp_path / ".fux" / "formats.toml").write_text(text, encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "formats")).write_text(text, encoding="utf-8")
 
 
 def test_a_types_file_replaces_the_default_rather_than_extending_it(tmp_path):

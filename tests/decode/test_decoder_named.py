@@ -12,6 +12,7 @@ all. Letting it re-route a declared line would undo the point of declaring one.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from pathlib import Path
 
 import pytest
@@ -94,9 +95,9 @@ def test_a_decoders_binding_table_never_re_routes_a_NAME(tmp_path):
     **not** say *`decoder=json` means something else now* — the line is the most
     specific thing there is.
     """
-    (tmp_path / ".fux").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     write_plugins(tmp_path, ["fux-decoder-json"])
-    (tmp_path / ".fux" / "formats.toml").write_text(
+    (config_file(tmp_path, "formats")).write_text(
         'include = ["*.md"]\n\n[decoders]\ngeojson = "json"\n', encoding="utf-8"
     )
     # ⚠ `.geojson` is claimed by NOTHING, which is the binding shape `_bind`

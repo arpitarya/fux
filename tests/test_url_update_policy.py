@@ -17,6 +17,7 @@ deliver *"check cheaply and stay fresh"*, and it is neither costed nor built.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import pytest
 
 from fux.config import UrlSource
@@ -265,7 +266,7 @@ def _repo(tmp_path, urls, fetcher=FAKE):
     (fux / "sources" / "urls").write_text("\n".join(urls) + "\n", encoding="utf-8")
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
     # SR-PII decision 17: a hand-built repo needs this or every verb refuses.
-    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     docs = tmp_path / "docs"
     docs.mkdir()

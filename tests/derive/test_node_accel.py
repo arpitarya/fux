@@ -19,6 +19,7 @@ The corpus is ingested in a temp directory, never at this repo's root (W-244).
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import os
 import shutil
@@ -60,7 +61,7 @@ def corpus(tmp_path_factory) -> Path:
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     files = {
         "docs/target.md": "# Widget\n\nthis page explains the widget machinery in detail\n",
@@ -83,7 +84,7 @@ def corpus(tmp_path_factory) -> Path:
         path.write_text(text, encoding="utf-8")
     run(root, refresh_urls=False, full=False)
     # A per-source weight, so `Weighting.maximum` is not 1.0 on this corpus.
-    tune = root / ".fux" / "tune.toml"
+    tune = config_file(root, "tune")
     text = tune.read_text(encoding="utf-8")
     assert text.count("\n[priority]\n") == 1
     tune.write_text(text.replace("\n[priority]\n", '\n[priority]\n"docs" = 1.5\n'), encoding="utf-8")

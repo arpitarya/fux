@@ -2,13 +2,14 @@
 
 `registry()` runs two or three times per ingested document, and until
 2026-09-29 each call re-executed every `.fux/decoders/*.py`: 58 000 imports on
-a 1 000-document corpus. `meta_bindings()` re-parsed `.fux/formats.toml` per
+a 1 000-document corpus. `meta_bindings()` re-parsed `.fux/config/formats.toml` per
 document. Both are pure functions of committed files, so they are now cached on
 those files' stat — and the cache must never serve an edit stale.
 """
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import os
 from pathlib import Path
 
@@ -99,7 +100,7 @@ def test_a_caller_cannot_poison_the_cache(repo: Path):
 
 
 def _formats(root: Path, meta: dict[str, str]) -> Path:
-    path = root / ".fux" / "formats.toml"
+    path = config_file(root, "formats")
     text = typesfile.render([], {}, grouped=True)
     text += "\n[meta]\n" + "".join(f'{k} = "{v}"\n' for k, v in meta.items())
     path.write_text(text, encoding="utf-8")

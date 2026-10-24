@@ -79,7 +79,7 @@ export function declareRelated(related) {
 export function runAsk(root, args, { compose }) {
   const query = args._.join(" ");
   const queries = [query, ...(args.q || [])];
-  const top = args.top; // `.fux/output.toml`, resolved before dispatch
+  const top = args.top; // `.fux/config/output.toml`, resolved before dispatch
   // W-242 Tier 0 — this verb's one read of each shard.
   const shards = new Shards(root);
 

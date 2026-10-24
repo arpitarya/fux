@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-09-11
 date: 2026-09-06
 feature: chunking — the strategy vocabulary, the boundary ladder, and the retrieval/citation split
-owns: [src/fux/text/chunk.py@d6ace3a1d499, node/src/refer/chunk.mjs@fa8a64801ed9]
+owns: [src/fux/text/chunk.py@d6ace3a1d499, node/src/refer/chunk.mjs@c6db5b2ee3fb]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 976e6bc696d232cc22fc365dd332425f0f0716f7a39bc43b725137946ba7e81a
+content_sha: bc595432b80f1d61f6947c6f2c8fd4f4432329ed9d80d8c4d226ff4c7389a190
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -87,7 +87,7 @@ row per passage with its header repeated, wherever it appears. It is a property
 of tables, not of spreadsheet formats — a 30-row table inside a `.docx` was
 measured getting row-split, correctly, and a per-format rule would have taken
 that away. How many rows a `csv`/`xlsx` table has to split is not this record's:
-it is `.fux/tune.toml [index] max_table_rows` ([SR-TABULAR](0150_tabular.md),
+it is `.fux/config/tune.toml [index] max_table_rows` ([SR-TABULAR](0150_tabular.md),
 moved there from `fux.toml [decode]` on 2026-09-11).
 
 **2a. A table is recognised with or without edge pipes** (W-287 A5, 2026-10-19).

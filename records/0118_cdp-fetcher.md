@@ -7,10 +7,10 @@ description: "The browser fetcher, for documents a plain GET cannot read. Drives
 status: accepted
 date: 2026-08-19
 feature: "`fux-fetcher-cdp` — the reference fetcher for documents behind a session a headless client does not have: it borrows your browser's and hands fux the bytes"
-owns: [packages/fux-fetcher-cdp@ad8162024587]
+owns: [packages/fux-fetcher-cdp@8ab467ca60e8]
 laws: [L2, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 9d09d769f010a726ad5a801c1f59ab1a4f4c30205c88b38b923aed1c50bd675e
+content_sha: 0d46ba8896e97d17f1cec8f7b4529990ae08ca9babb39f998c8e9d2b2801d3b7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -328,7 +328,7 @@ entry points.
 ships as the distribution `fux-fetcher-cdp`
 ([`packages/fux-fetcher-cdp/`](../packages/fux-fetcher-cdp/)), which **imports
 nothing from fux and depends on nothing**, and a repository runs it only when
-`.fux/plugins.toml` declares it, pinned, and a URL line says `fetch=cdp`
+`.fux/config/plugins.toml` declares it, pinned, and a URL line says `fetch=cdp`
 ([SR-PLUGINS](0165_plugins.md) P10). **Network code is never importable inside an
 offline package**: the engine distributions carry none of it, no engine module
 imports it by name, and no offline path — `fux ingest --no-fetch`, `fux doctor` —

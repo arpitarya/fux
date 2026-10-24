@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-19
 amended: 2026-09-15
 feature: the `extracted` ingest mode — the value in every committed record's `mode` property, and the contract it asserts
-owns: [src/fux/ingest/extract.py@6a9153343598]
+owns: [src/fux/ingest/extract.py@b4e563b31a6f]
 laws: [L2, L3, L4, L5]
 ratifies: W-30
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 153a861eb5519ffb0201a6625991e272b91e426a088a6bfb6bb0f8670af9cf59
+content_sha: 77d775ffe78aa6f95af3dd7a0326a7e64a866cc4aedd56a27ca473fef5e90420
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -168,7 +168,7 @@ the committed value of the `mode` property.
 **2. `extracted` asserts a contract, not a label.** A record in this mode
 guarantees: every property is a pure function of the document's bytes, its path,
 the corpus's link structure and the two committed extraction limits in
-`.fux/tune.toml [index]` (decision 9); no model was consulted at any point; no network
+`.fux/config/tune.toml [index]` (decision 9); no model was consulted at any point; no network
 was touched (L5's fenced paths fetch *bytes*, and extraction is still
 deterministic over them); the run is byte-reproducible.
 
@@ -271,7 +271,7 @@ pattern**. The golden ladder had the right formats and the wrong content: **1 of
 you a change it never triggers (SR-RS decision 23b).
 
 **9. `phrases` holds a document's first `max_phrases` headings, in document
-order, and the cap is committed configuration** — `.fux/tune.toml [index]
+order, and the cap is committed configuration** — `.fux/config/tune.toml [index]
 max_phrases`, default **32** (Arpit, 2026-09-11; it was a hard-coded `12`).
 
 - **Display only.** `heading` tf and `flen` are built from **every** heading, so

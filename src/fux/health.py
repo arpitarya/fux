@@ -175,7 +175,7 @@ def _config_loads(root: Path) -> Check:
 
 
 def _pii_health(root: Path) -> Check:
-    """`.fux/pii.toml` — do the rules load, and do the patterns compile?
+    """`.fux/config/pii.toml` — do the rules load, and do the patterns compile?
 
     ⚠ **Offline and read-only, like every check here: it compiles the patterns
     and never runs them over a corpus.** Compiling catches the fault that
@@ -200,7 +200,7 @@ def _pii_health(root: Path) -> Check:
         return Check("pii rules", False, str(exc))
     if not rules:
         return Check(
-            "pii rules", True, ".fux/pii.toml declares no rules", level="warn"
+            "pii rules", True, ".fux/config/pii.toml declares no rules", level="warn"
         )
     names = ", ".join(rule.name for rule in rules)
     detail = (
@@ -1033,7 +1033,7 @@ def _acquired_health(root: Path) -> Check:
 
 
 def _refusal_health(root: Path) -> Check:
-    """`.fux/refusals.toml` — do the rules load, and has any of them ever fired?
+    """`.fux/config/refusals.toml` — do the rules load, and has any of them ever fired?
 
     **W-101 item 3.** A refusal rule is the one piece of consumer policy whose
     correct behaviour and whose catastrophic behaviour look identical from
@@ -1067,7 +1067,7 @@ def _refusal_health(root: Path) -> Check:
         return Check(
             "refusal rules",
             True,
-            "no .fux/refusals.toml - only the always-on magic-byte floor applies",
+            "no .fux/config/refusals.toml - only the always-on magic-byte floor applies",
             level="warn",
         )
     try:
@@ -1084,7 +1084,7 @@ def _refusal_health(root: Path) -> Check:
 
     if not rules:
         return Check(
-            "refusal rules", True, ".fux/refusals.toml declares no rules", level="warn"
+            "refusal rules", True, ".fux/config/refusals.toml declares no rules", level="warn"
         )
 
     total = sum(counted.values())
@@ -1209,7 +1209,7 @@ def _provenance(root: Path) -> Check:
 
 
 def _decoder_bindings(root: Path) -> Check:
-    """`[decoders]` in `.fux/formats.toml` — does every binding still resolve?
+    """`[decoders]` in `.fux/config/formats.toml` — does every binding still resolve?
 
     **W-101 item 2.** `registry()` refuses a binding that names a module which
     does not exist, and one that takes an extension away from the decoder that
@@ -1349,7 +1349,7 @@ def _recency_prior(root: Path) -> Check:
 
 
 def _output_config_health(root: Path) -> Check:
-    """Will `.fux/output.toml` load — every verb that renders reads it.
+    """Will `.fux/config/output.toml` load — every verb that renders reads it.
 
     Since L12 (W-225) an absent file is an ERROR, not the warning it used to be:
     there is no engine default behind it any more, so every verb that resolves
@@ -1367,7 +1367,7 @@ def _output_config_health(root: Path) -> Check:
 
 
 def _tune_config_health(root: Path) -> Check:
-    """Will `.fux/tune.toml` load — the file whose breakage doctor could not see.
+    """Will `.fux/config/tune.toml` load — the file whose breakage doctor could not see.
 
     ⚠ **A broken tune file left `doctor` green** until 2026-09-11 (W-140 row
     13), and that is the worst shape for this particular file: `fux ingest`
@@ -1393,7 +1393,7 @@ def _tune_config_health(root: Path) -> Check:
             "tune.toml loads",
             False,
             f"{exc} - `ask`, `find` and `answer` refuse while this stands; "
-            "`fux doctor --fix` writes a missing key, `fux tune > .fux/tune.toml` "
+            "`fux doctor --fix` writes a missing key, `fux tune > .fux/config/tune.toml` "
             "rewrites the whole file, and `--no-tune` reads the template for one command",
         )
     return Check("tune.toml loads", True, f"{tune_mod.TUNE_NAME}: parsed, every key valid")
@@ -1404,7 +1404,7 @@ def _types_health(root: Path) -> Check:
 
     Three ways it cannot, each of which `read_types` refuses:
 
-    1. **A leftover `.fux/sources/types`.** The list moved to `.fux/formats.toml`
+    1. **A leftover `.fux/sources/types`.** The list moved to `.fux/config/formats.toml`
        on 2026-09-11 (SR-TYPES decision 12), and a repo that ran `fux setup`
        before then still has the old file. SR-DOTFUX decision 6: when a change
        must reach existing repos the mechanism is *a loader refusal or a
@@ -1805,7 +1805,7 @@ RETIRED_REFUSAL_STARTERS: tuple[str, ...] = ()
 
 
 def _starter_refusals_untouched(root: Path) -> Check:
-    """`.fux/refusals.toml` byte-equal to a starter fux has since replaced.
+    """`.fux/config/refusals.toml` byte-equal to a starter fux has since replaced.
 
     **Byte equality is the right test here, and the opposite call from the
     README row above.** These are rules that decide what enters the index,
@@ -1821,23 +1821,23 @@ def _starter_refusals_untouched(root: Path) -> Check:
     """
     import hashlib
 
-    path = root / fixed("fuxdir", "dir") / fixed("files", "refusals_name")
+    path = root / fixed("files", "refusals")
     if not path.is_file():
-        return Check("refusal rules current", True, "`.fux/refusals.toml` absent")
+        return Check("refusal rules current", True, "`.fux/config/refusals.toml` absent")
     try:
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
     except OSError as exc:
-        return Check("refusal rules current", True, f"`.fux/refusals.toml`: {exc}")
+        return Check("refusal rules current", True, f"`.fux/config/refusals.toml`: {exc}")
     if digest not in RETIRED_REFUSAL_STARTERS:
         return Check(
             "refusal rules current",
             True,
-            "`.fux/refusals.toml` is not a starter fux has retired",
+            "`.fux/config/refusals.toml` is not a starter fux has retired",
         )
     return Check(
         "refusal rules current",
         False,
-        "`.fux/refusals.toml` is byte-identical to a starter fux has since REPLACED - "
+        "`.fux/config/refusals.toml` is byte-identical to a starter fux has since REPLACED - "
         "it has never been edited, and the rules it carries are ones fux stopped "
         "shipping. Compare it against `fux setup`'s current starter and take what "
         "applies to your sign-in pages; `fux setup` will not rewrite it",
@@ -1914,7 +1914,7 @@ def _unbound_types(root: Path) -> Check:
         + ", ".join(f"`{s}`" for s in unbound[:6])
         + (f" and {len(unbound) - 6} more" if len(unbound) > 6 else "")
         + ". Matching documents are walked and then indexed as raw bytes or skipped, "
-        "while `.fux/formats.toml` says they are documents. Write a decoder in "
+        "while `.fux/config/formats.toml` says they are documents. Write a decoder in "
         "`.fux/decoders/`, or drop the glob",
         level="warn",
     )
@@ -2643,7 +2643,7 @@ def _is_git_ignored(root: Path, path: Path) -> bool | None:
 
 
 def _plugins_declared(root: Path) -> Check:
-    """`.fux/plugins.toml` — present, and readable (SR-PLUGINS P2).
+    """`.fux/config/plugins.toml` — present, and readable (SR-PLUGINS P2).
 
     🔴 **One line when it is missing, with the lever** (W-289's first hazard):
     a repository without the file runs no plugin package at all, and every row
@@ -2748,6 +2748,10 @@ def _ascii(text: str) -> str:
 #: the module of the layer it claims. Every check takes the root and returns a
 #: `Check`, a list of them, or `None` (a row that does not apply here).
 ROWS: tuple[tuple[str, str], ...] = (
+    # W-295 -- first, because every row below reads from `.fux/config/` and a
+    # repo that has not run `fux setup` since the move would read as one with
+    # no policy.
+    ("core", "_config_files_moved"),
     ("core", "_index_not_ignored"),
     ("core", "_index_temp_ignored"),
     ("core", "_layout_declared"),
@@ -2841,6 +2845,23 @@ def run_rows(start: Path | None, installed: dict, *, progress=None) -> list[Chec
     finally:
         _PROGRESS = None
     return checks
+
+
+def _config_files_moved(root: Path) -> Check:
+    """W-295: no policy file is still at its pre-move address `.fux/<name>.toml`.
+
+    An **error**: every other verb refuses while one is there, and `doctor` is
+    exempt from that gate only so it can name the fix. There is no fallback
+    reader -- `fux setup` moves the files, byte for byte, and that is the repair.
+    """
+    from . import configfiles
+
+    name = "config files at the pre-W-295 address"
+    stale = configfiles.at_old_address(root)
+    if not stale:
+        return Check(name, True, "none - every policy file is under " + fixed("files", "config_dir"))
+    exc = configfiles.moved_error(root, stale)
+    return Check(name, False, str(exc))
 
 
 def _writable(root: Path) -> Check:

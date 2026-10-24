@@ -1,7 +1,7 @@
 ---
 paths:
   - ".fux/sources/**"
-  - ".fux/formats.toml"
+  - ".fux/config/formats.toml"
   - ".fux/.fuxignore"
 ---
 

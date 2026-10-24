@@ -8,6 +8,7 @@ against a hand-written expectation.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import hashlib
 
 import pytest
@@ -31,8 +32,8 @@ def _init(tmp_path) -> None:
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / "docs").mkdir(exist_ok=True)
 
@@ -189,7 +190,7 @@ def test_reusable_refuses_a_header_that_is_not_the_current_one(corpus, monkeypat
 
 
 def test_reusable_refuses_an_index_built_under_other_identifier_families(corpus):
-    """W-233: editing `.fux/identifiers.toml` re-analyses every document, and
+    """W-233: editing `.fux/config/identifiers.toml` re-analyses every document, and
     reverting it does the same — the digest in the header is the gate."""
     from fux.text import identifiers as ids_mod
 
@@ -221,7 +222,7 @@ def test_a_first_ingest_reuses_nothing(tmp_path):
 
 
 def _tune(root, text: str) -> None:
-    path = root / ".fux" / "tune.toml"
+    path = config_file(root, "tune")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
     write_config(root)

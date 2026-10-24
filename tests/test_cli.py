@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import subprocess
 import sys
@@ -216,7 +217,7 @@ def test_no_verb_grows_a_subcommand_tree():
         assert not nested, f"`fux {name}` grew a subcommand tree"
 
 
-# -- SR-PII decision 17: no .fux/pii.toml, no command -----------------------
+# -- SR-PII decision 17: no .fux/config/pii.toml, no command -----------------------
 
 
 def _verbs():
@@ -252,7 +253,7 @@ def test_the_gate_checks_the_same_file_pii_loads(tmp_path):
     """Every hand-spelled copy of the path, against the one that loads it.
 
     ⚠ **Three copies now, not two.** `cli.py` and `api.py` each spell
-    `.fux/pii.toml` inline so the gate costs a stat instead of importing
+    `.fux/config/pii.toml` inline so the gate costs a stat instead of importing
     `fux.ingest` (~50 ms of decoders on a warm `fux.open`), and `node/fux.mjs`
     spells it a third time for the same reason in a runtime that cannot import
     Python at all. The REFUSAL WORDING is not duplicated — it stays in `pii`,
@@ -277,11 +278,11 @@ def test_the_node_reader_gates_on_the_same_file(tmp_path):
     from fux.acquire import pii
 
     source = (ROOT / "node" / "fux.mjs").read_text(encoding="utf-8")
-    assert '".fux", "pii.toml"' in source, (
+    assert 'const PII_RULES = fixed("files", "pii")' in source, (
         "node/fux.mjs no longer spells the gate's path — a Node-only clone "
         "would answer where Python refuses (W-107 O1)"
     )
-    assert pii.rules_path(tmp_path) == tmp_path / ".fux" / "pii.toml"
+    assert pii.rules_path(tmp_path) == config_file(tmp_path, "pii")
 
     # 🔴 **And in the artefact a consumer actually runs** (2026-09-12, L10).
     # The npm entry point (the only one since W-292) is the BUNDLE, generated from
@@ -291,7 +292,10 @@ def test_the_node_reader_gates_on_the_same_file(tmp_path):
     # 9-12 were all instances of.
     from fux.store import nodebundle
 
-    assert '".fux", "pii.toml"' in nodebundle.bundle(ROOT / "node")
+    bundled = nodebundle.bundle(ROOT / "node")
+    assert 'const PII_RULES = fixed("files", "pii")' in bundled
+    # ...and the address it resolves to travels inlined from constants.toml.
+    assert '.fux/config/pii.toml' in bundled
 
 
 def test_a_gated_verb_stops_before_dispatch_with_exit_1(tmp_path, monkeypatch, capsys):
@@ -299,7 +303,7 @@ def test_a_gated_verb_stops_before_dispatch_with_exit_1(tmp_path, monkeypatch, c
     monkeypatch.chdir(tmp_path)
     assert main(["find", "anything"]) == 1
     err = capsys.readouterr().err
-    assert err.startswith("error: .fux/pii.toml is missing")
+    assert err.startswith("error: .fux/config/pii.toml is missing")
     assert "fux setup" in err
 
 
@@ -307,8 +311,8 @@ def test_the_file_with_no_rules_opens_the_gate(tmp_path, monkeypatch):
     from fux.cli import _require_pii_rules
 
     (tmp_path / ".git").mkdir()
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     monkeypatch.chdir(tmp_path)
     _require_pii_rules("find")
@@ -327,8 +331,8 @@ def test_the_gate_does_not_fire_outside_any_root(tmp_path, monkeypatch):
 def test_the_gate_does_not_import_fux_ingest_when_the_file_exists(tmp_path):
     """~70 ms of decoder imports on every `ask` and `find` is the cost avoided."""
     (tmp_path / ".git").mkdir()
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     code = (
         "import sys; from fux.cli import _require_pii_rules; "

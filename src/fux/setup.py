@@ -6,11 +6,11 @@ module existing (SR-DOTFUX decision 6, SR-FETCHER decision 6):
 | moment | writes | why |
 |---|---|---|
 | `ensure_layout`, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore` | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory |
-| `fux setup` | `fux.toml`, the two source lists with their headers, and `.fux/plugins.toml` | **optional, explicit, once per repo** — a consumer asked for it |
+| `fux setup` | `fux.toml`, the two source lists with their headers, and `.fux/config/plugins.toml` | **optional, explicit, once per repo** — a consumer asked for it |
 
 **`fux setup` writes no decoder or fetcher any more** (W-289, SR-PLUGINS P9).
 Each is a separately published package the repository DECLARES in
-`.fux/plugins.toml`: setup scans the configured sources, proposes the packages
+`.fux/config/plugins.toml`: setup scans the configured sources, proposes the packages
 their formats and URL lines need, writes the declaration, and prints the one
 install line. **It installs nothing** — no network from fux (L5) — and a file a
 consumer drops into `.fux/fetchers/` or `.fux/decoders/` still overrides the
@@ -21,7 +21,7 @@ installed by `npm install fux-engine` and nothing else. What an earlier setup
 vendored — `.fux/node/`, the `.fux/fux` shim, a `.fux/node` workspace entry — is
 removed here, exactly that set and nothing more (`remove_vendored_reader`).
 
-Everything here is **write-if-missing**, except `.fux/plugins.toml`, whose rows
+Everything here is **write-if-missing**, except `.fux/config/plugins.toml`, whose rows
 setup ADDS (a package the sources now need) and PINS (a row with no digest,
 once its package is installed; every row under `--pin`) and never removes.
 
@@ -48,6 +48,7 @@ from .config import (
 )
 from . import decode as decode_mod
 from .constants import fixed
+from . import configfiles
 from .errors import FuxError
 from .acquire import fuxignore, pii, refusals
 from .store import fuxdir
@@ -434,7 +435,7 @@ _TYPES_HEADER = """\
 # .fux/.fuxignore, which is read first and outranks this file.
 #
 # A FORMAT IS READ ONLY WHEN ITS PACKAGE IS DECLARED. Each `[decoders]` module
-# below ships in a fux-decoder-* package, and runs only when .fux/plugins.toml
+# below ships in a fux-decoder-* package, and runs only when .fux/config/plugins.toml
 # declares that package (SR-PLUGINS). Until then its files are not indexed, and
 # `fux ingest` counts them on stderr naming the package -- declaring it is the
 # whole change; nothing here needs editing. Every first-party decoder is
@@ -508,7 +509,7 @@ _TYPES_CONVERTED_HEADER = """\
 _FUXIGNORE = """\
 # What fux does NOT index. Same grammar as .gitignore, and it is the ONE place
 # exclusions belong -- this file is read before anything else, so a line here
-# beats .fux/sources/dirs and .fux/formats.toml both.
+# beats .fux/sources/dirs and .fux/config/formats.toml both.
 #
 #   build/                 a DIRECTORY named build, at any depth (and all of it)
 #   *.log                  a name glob; `*` never crosses a `/`
@@ -529,14 +530,14 @@ _FUXIGNORE = """\
 #
 # A `!` LINE OVERRIDES THE TYPE ALLOWLIST. `!*.py` really does index Python --
 # as RAW BYTES, because no decoder claims .py, which is the exact shape
-# .fux/formats.toml exists to prevent. It takes a line you wrote to get there.
+# .fux/config/formats.toml exists to prevent. It takes a line you wrote to get there.
 #
 # ONE DIVERGENCE FROM GIT, ON PURPOSE: a `#` after whitespace starts a comment,
 # so `*.log   # noisy` is a pattern plus a note. Git reads that whole line as a
 # pattern and matches nothing.
 #
 # THIS FILE IS OPTIONAL AND STARTS EMPTY. Absent or all-comments means nothing
-# is ignored -- unlike .fux/formats.toml, where an empty file is an error,
+# is ignored -- unlike .fux/config/formats.toml, where an empty file is an error,
 # because this one only ever subtracts and so can never empty an index.
 #
 # See SR-FUXIGNORE.
@@ -692,7 +693,7 @@ class SetupReport:
     #: 2: write-if-missing makes the coverage absent precisely where a repo
     #: already has its own conventions, which is where it is most needed.
     skipped_agents_md: bool = False
-    #: True when `.fux/formats.toml` was written FROM a leftover `.fux/sources/types`
+    #: True when `.fux/config/formats.toml` was written FROM a leftover `.fux/sources/types`
     #: (SR-TYPES decision 12). Announced, because the old file still has to be
     #: deleted by hand and fux refuses to run until it is.
     converted_types: bool = False
@@ -712,14 +713,17 @@ class SetupReport:
     #: workspace entry an earlier setup spliced in. Announced always: a write
     #: to a tracked file a team reviews is never silent.
     unwired: list[str] = field(default_factory=list)
-    #: Fux-written files this run UPDATED in place — `.fux/plugins.toml`'s
+    #: Fux-written files this run UPDATED in place — `.fux/config/plugins.toml`'s
     #: added or pinned rows, and nothing else (SR-PLUGINS P6).
     updated: list[str] = field(default_factory=list)
+    #: Policy files MOVED from `.fux/<name>.toml` into `.fux/config/` (W-295),
+    #: as `(old, new)` repo-relative pairs. Not in `written`: nothing was authored.
+    migrated: list[tuple[str, str]] = field(default_factory=list)
     #: The one install line for declared packages this machine lacks, or `None`.
     install_line: "str | None" = None
     #: Declared packages with no digest yet — pinned by the next `fux setup`.
     unpinned: list[str] = field(default_factory=list)
-    #: Why `.fux/plugins.toml` could not be written, when it could not.
+    #: Why `.fux/config/plugins.toml` could not be written, when it could not.
     plugins_note: "str | None" = None
     #: W-296. The README-only `.fux/observers/` scaffold this run removed.
     observers_removed: "str | None" = None
@@ -754,7 +758,7 @@ class Mandatory(NamedTuple):
     - `never` — a table that is the consumer's own map (`[sources.url.config]`,
       handed to their fetchers unread). Its keys are never required or written.
     - `whole_file` — `False` for a file whose ABSENCE is a setting
-      (`.fux/refusals.toml`: no file, no refusal rules). Such a file gains
+      (`.fux/config/refusals.toml`: no file, no refusal rules). Such a file gains
       missing keys when present and is never written when absent.
     """
 
@@ -949,6 +953,9 @@ def fill_missing(root: Path) -> "list[str]":
     """
     import tomllib
 
+    # W-295: a policy file still at its old address would be "missing" here and
+    # written whole, leaving the repo with two. Refuse; `fux setup` moves first.
+    configfiles.require_moved(root)
     changed: list[str] = []
     for rel, template, present_only, never, whole_file in _mandatory_config():
         path = root / rel
@@ -1085,7 +1092,7 @@ def _seed_dirs(root: Path) -> bytes:
 
 
 def _seed_types() -> bytes:
-    """`.fux/formats.toml`, with the built-in default spelled out.
+    """`.fux/config/formats.toml`, with the built-in default spelled out.
 
     **A header alone is not a types file.** A file that admits nothing is one
     `read_types` refuses — so writing comments by themselves made `fux setup`
@@ -1127,7 +1134,7 @@ def _seed_types() -> bytes:
 
 
 def _convert_legacy_types(root: Path, report: "SetupReport") -> None:
-    """Write `.fux/formats.toml` from a leftover `.fux/sources/types` (SR-TYPES decision 12).
+    """Write `.fux/config/formats.toml` from a leftover `.fux/sources/types` (SR-TYPES decision 12).
 
     **Only when the new file is missing** — setup is write-if-missing, and a
     repo holding both has already decided; `read_types` tells it to delete the
@@ -1475,7 +1482,7 @@ def remove_vendored_reader(root: Path, report: "SetupReport") -> None:
 
 
 def write_plugins(root: Path, report: "SetupReport", *, pin_all: bool = False) -> None:
-    """`.fux/plugins.toml` — SR-PLUGINS P6, and the only fux-written file
+    """`.fux/config/plugins.toml` — SR-PLUGINS P6, and the only fux-written file
     setup ever updates.
 
     - **No file**: write one row per package `plugins.propose` names, each
@@ -1553,11 +1560,18 @@ def run(root: Path, *, agents: bool = True, pin: bool = False) -> SetupReport:
     # vendored is removed here, and only here -- never by an ingest.
     remove_vendored_reader(root, report)
 
+    # W-295: the eight policy files moved into `.fux/config/`. BEFORE anything
+    # below reads or seeds one, so a repo set up before the move keeps its
+    # edited files rather than gaining a second, default copy; a file at both
+    # addresses refuses here, naming both (`configfiles.migrate`).
+    for new in configfiles.migrate(root):
+        report.migrated.append((fuxdir.FUX_DIR + "/" + Path(new).name, new))
+
     directory = fuxdir.fux_dir(root)
     # W-289, SR-PLUGINS P9: no decoder and no fetcher is seeded. The package a
     # repository declares is what runs, so an engine fix reaches it with the
     # next install; a file the consumer writes into `.fux/decoders/` or
-    # `.fux/fetchers/` still overrides it (P8). `.fux/plugins.toml` is written
+    # `.fux/fetchers/` still overrides it (P8). `.fux/config/plugins.toml` is written
     # below, after `fux.toml` and the source lists it scans.
 
     # W-296 -- `.fux/observers/` is created on demand by `fux observers init`,
@@ -1690,6 +1704,8 @@ def cmd_setup(args) -> int:
     )
     for rel in report.written:
         print(f"  wrote {rel}")
+    for old, new in report.migrated:
+        print(f"  moved {old} -> {new} (byte for byte; W-295)")
     for rel in report.updated:
         print(f"  updated {rel} (rows added or pinned; none removed)")
     for rel in report.kept:
@@ -1705,7 +1721,7 @@ def cmd_setup(args) -> int:
         print(f"  updated {rel} (removed the {WORKSPACE_MEMBER} workspace entry an earlier setup added)")
     for note in report.left:
         print(f"  left  {note}")
-    if not report.written:
+    if not report.written and not report.migrated:
         print("setup: nothing to do - every consumer-owned file is already here")
     else:
         print(
@@ -1771,10 +1787,10 @@ def cmd_setup(args) -> int:
     # only: these bytes reach a Windows console (SR-CLI veto 7).
     if report.plugins_note:
         print()
-        print(f"  note: .fux/plugins.toml was not written: {report.plugins_note}")
+        print(f"  note: .fux/config/plugins.toml was not written: {report.plugins_note}")
     if report.install_line:
         print()
-        print("  install the packages .fux/plugins.toml declares (fux installs nothing):")
+        print("  install the packages .fux/config/plugins.toml declares (fux installs nothing):")
         print(f"        {report.install_line}")
     if report.unpinned:
         print(
