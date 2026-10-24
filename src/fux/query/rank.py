@@ -144,7 +144,7 @@ def _record_is_archived(record: dict, archived_dirs: frozenset[str]) -> bool:
     re-ingesting the world is not a precondition for the marker being correct.
     Both inputs are *declarations* — the record's own, or the `archived=true`
     line in `.fux/sources/dirs` — so neither path ever derives currency from a
-    path convention, which is what SR-DIR-LIST forbids.
+    path convention, which is what SR-SOURCES forbids.
     """
     if record.get("archived"):
         return True

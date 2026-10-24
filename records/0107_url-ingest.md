@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-05
 date: 2026-08-18
 feature: the `url:` source and how ingestion behaves around the fetcher boundary
-owns: [src/fux/ingest/urlingest.py@b94ca9b209dc]
+owns: [src/fux/ingest/urlingest.py@1df8b3682c1b]
 laws: [L3, L5, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 9a06d4329b425c45cfdcde45359c15f94eead6f53d4a9dfdfd0eccdb3dc7ed65
+content_sha: 3abbce1bdaad0e3b5ba3580fd4ca7452316a03fa00117e3117add4e8c8195b57
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -55,7 +55,7 @@ because a flaky network must never look like a deletion.
 flowchart LR
     subgraph fux ["fux — no network code"]
         R["fux add &lt;URL&gt; · fux ingest"]
-        U[".fux/sources/urls<br/>committed, one per line"]
+        U[".fux/sources.yaml urls:<br/>committed, one entry per URL"]
         N["normalize<br/>CRLF · U+2028/9/85 · NUL"]
         W["records src:url"]
     end
@@ -75,8 +75,8 @@ flowchart LR
 ```text
    fux  (no network code)                 your repo, your code
   +--------------------------+           +------------------------------+
-  | .fux/sources/urls        |           | .fux/fetchers/cdp.py         |
-  |   committed, 1 per line  |           |   fetch(url) -> bytes,str    |
+  | .fux/sources.yaml urls:  |           | .fux/fetchers/cdp.py         |
+  |   committed, 1 per URL   |           |   fetch(url) -> bytes,str    |
   |            |             |  one URL  |   configure(cfg)    optional |
   |  add <URL> · update -----+---------->|   connect() / close()        |
   |            ^             |           +---------------+--------------+
@@ -167,7 +167,7 @@ source-wide policy *under* the line's own attributes, then fetch each URL
 through the fetcher its line declared — importing only the fetchers some line
 actually names. The committed list's grammar, comment rule, dedupe-and-sort,
 closed attribute set and `file:lineno` errors are
-[SR-URL-LIST](0116_url-list.md)'s and are not restated here.
+[SR-SOURCES](0116_url-list.md)'s and are not restated here.
 
 **6. Fux normalizes what comes back**, rather than trusting it: CRLF to LF,
 U+2028/U+2029/U+0085 to spaces, NUL stripped. Those are legal in JSON and
@@ -464,7 +464,7 @@ evidence.*
 
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-CLI](0101_cli-surface.md) ·
 [SR-INGEST](0106_ingest.md) · [SR-RECORD](0109_index-record.md) ·
-[SR-URL-LIST](0116_url-list.md) · [SR-FETCHER](0117_fetcher.md)
+[SR-SOURCES](0116_url-list.md) · [SR-FETCHER](0117_fetcher.md)
 
 **Code**
 

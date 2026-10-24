@@ -6,7 +6,7 @@ module existing (SR-DOTFUX decision 6, SR-FETCHER decision 6):
 | moment | writes | why |
 |---|---|---|
 | `ensure_layout`, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore` | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory |
-| `fux setup` | `fux.toml`, the two source lists with their headers, and `.fux/config/plugins.toml` | **optional, explicit, once per repo** — a consumer asked for it |
+| `fux setup` | `fux.toml`, `.fux/sources.yaml` with its header, and `.fux/config/plugins.toml` | **optional, explicit, once per repo** — a consumer asked for it |
 
 **`fux setup` writes no decoder or fetcher any more** (W-289, SR-PLUGINS P9).
 Each is a separately published package the repository DECLARES in
@@ -51,6 +51,7 @@ from .constants import fixed
 from . import configfiles
 from .errors import FuxError
 from .acquire import fuxignore, pii, refusals
+from .constants import fixed
 from .store import fuxdir
 
 #: The fetchers and decoders a pre-W-289 `fux setup` seeded into `.fux/`, by
@@ -389,7 +390,11 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
 #: SR-AGENT-POLICY decision 1 exists to close, reintroduced by a config line.
 AGENTS_MD_VENDORS = ("codex",)
 
-_DIRS_HEADER = """\
+#: ⚠ **The header the RETIRED `.fux/sources/dirs` was seeded with** (W-294). Kept
+#: for one job: `_convert_legacy_sources` recognises a list's header as fux's own
+#: and drops it rather than carrying a description of `!` lines into a file that
+#: refuses them. A header a human wrote is carried verbatim.
+_LEGACY_DIRS_HEADER = """\
 # What fux indexes. One entry per line: a directory (walked recursively) or a
 # single file, relative to the repo root. `#` starts a comment at the start of
 # a line or after whitespace. The loader dedupes and sorts, so the order here
@@ -409,7 +414,7 @@ _DIRS_HEADER = """\
 #   !work/regression/*/evidence
 #   !**/node_modules
 #
-# See SR-DIR-LIST.
+# See SR-SOURCES.
 """
 
 _TYPES_HEADER = """\
@@ -509,7 +514,7 @@ _TYPES_CONVERTED_HEADER = """\
 _FUXIGNORE = """\
 # What fux does NOT index. Same grammar as .gitignore, and it is the ONE place
 # exclusions belong -- this file is read before anything else, so a line here
-# beats .fux/sources/dirs and .fux/config/formats.toml both.
+# beats .fux/sources.yaml and .fux/config/formats.toml both.
 #
 #   build/                 a DIRECTORY named build, at any depth (and all of it)
 #   *.log                  a name glob; `*` never crosses a `/`
@@ -523,10 +528,8 @@ _FUXIGNORE = """\
 # git, a file under an ignored DIRECTORY cannot be re-included: `build/` then
 # `!build/keep.md` keeps nothing.
 #
-# `!` MEANS THE OPPOSITE HERE OF WHAT IT MEANS IN .fux/sources/dirs. There `!`
-# subtracts; here it adds back. That is the price of the file behaving like the
-# one you already know. `fux ingest` warns if the same pattern is written in
-# both places, which is where the confusion would actually bite.
+# `!` MEANS ONE THING IN .fux/, AND IT IS GIT'S: it adds back. Nothing else in
+# .fux/ spells `!` -- .fux/sources.yaml refuses it.
 #
 # A `!` LINE OVERRIDES THE TYPE ALLOWLIST. `!*.py` really does index Python --
 # as RAW BYTES, because no decoder claims .py, which is the exact shape
@@ -613,7 +616,11 @@ def template_config() -> dict:
     return tomllib.loads(config_text())
 
 def _urls_header() -> str:
-    """The starter `.fux/sources/urls`, with its attribute table DERIVED.
+    """The header the RETIRED `.fux/sources/urls` was seeded with (W-294).
+
+    ⚠ **Kept for `_convert_legacy_sources` alone**, which drops a list's header
+    when it is this one — fux's own words about a line grammar that no longer
+    exists — and carries one a human wrote. What follows is why it was derived.
 
     ⚠ **It was transcribed, and it went stale** (W-140 row 18, fixed
     2026-09-11). The header said *"Two attributes, and the set is closed"*
@@ -662,7 +669,7 @@ def _urls_header() -> str:
 #   https://wiki.corp/hr/policy.xlsx       fetch=cdp   decoder=xlsx
 #
 # `fetch=` and `decoder=` are MANDATORY on every line -- there is no default
-# for either, and a line missing one fails to load (SR-URL-LIST decisions 16
+# for either, and a line missing one fails to load (SR-SOURCES decisions 16
 # and 17). A fetcher retrieves bytes; the decoder named here turns them into
 # Markdown. `decoder=prose` is for a page that is already text.
 #
@@ -674,13 +681,23 @@ def _urls_header() -> str:
 # that one URL once. `fux ingest` re-fetches the lines known to be stale --
 # `--refetch-all` every line, `--failed` the ones whose last run failed, and never a
 # line that says `update=never`. Those are the engine's two networked paths;
-# every other command is offline. See SR-URL-LIST.
+# every other command is offline. See SR-SOURCES.
 """
 
 
 @dataclass
 class SetupReport:
     written: list[str] = field(default_factory=list)
+    #: W-294: `.fux/sources.yaml` was written FROM the retired `.fux/sources/`
+    #: lists, which this run then deleted. Announced, with what moved where.
+    converted_sources: bool = False
+    #: The anchored `.fuxignore` lines the old `dirs` list's `!` lines became.
+    moved_dirs_exclusions: list[str] = field(default_factory=list)
+    #: `fux.toml [sources]` keys this run rewrote (`dirs_file`/`urls_file` →
+    #: `sources_file`), or empty.
+    migrated_keys: list[str] = field(default_factory=list)
+    #: The retired lists this run deleted AFTER converting them.
+    deleted_lists: list[str] = field(default_factory=list)
     kept: list[str] = field(default_factory=list)
     #: Paths written **outside `.fux/` and `fux.toml`** — i.e. into directories
     #: GitHub, AWS and Anthropic own. Tracked separately because
@@ -1079,16 +1096,165 @@ def _write_if_missing(path: Path, content: bytes, report: SetupReport, root: Pat
     report.written.append(rel)
 
 
-def _seed_dirs(root: Path) -> bytes:
-    """The starter directory list: the header, plus what this repo obviously has.
+def _seed_sources(root: Path) -> bytes:
+    """The starter `.fux/sources.yaml`: the header, plus what this repo obviously has.
 
     A seeded line is a suggestion in a file the human owns, not a guess the
     engine keeps making — setup runs once, and every later run keeps whatever
-    the file says.
+    the file says. **No seed, no `paths:` key**: an empty list is refused, so a
+    repo with nothing obvious gets the header alone — a file that lists nothing.
     """
+    from .acquire import sourcesfile
+
+    header = template_bytes(fixed("templates", "sources")).decode("utf-8")
     seeds = [name for name in ("README.md", "docs") if (root / name).exists()]
-    body = "".join(f"{name}\n" for name in sorted(seeds))
-    return (_DIRS_HEADER + ("\n" + body if body else "")).encode("utf-8")
+    text = header
+    if seeds:
+        items = "".join(f"    - {sourcesfile.render_scalar(name)}\n" for name in sorted(seeds))
+        text = f"{header}\n{sourcesfile.PATHS_KEY}:\n  {sourcesfile.INCLUDE}:\n{items}"
+    sourcesfile.parse(text, origin=sourcesfile.FILE)
+    return text.encode("utf-8")
+
+
+# -- W-294: the retired `.fux/sources/` lists, converted once ------------------
+
+
+def _legacy_list_paths(root: Path) -> tuple[str, str]:
+    """Where the retired lists live: what `fux.toml` named, else the defaults.
+
+    Read RAW, never through `config.load` — which refuses the two keys by name
+    (SR-CONFIG decision 10), and which is exactly why this has to run first.
+    """
+    import tomllib
+
+    from .acquire import sourcesfile
+
+    dirs, urls = sourcesfile.LEGACY_DIRS, sourcesfile.LEGACY_URLS
+    path = root / CONFIG_NAME
+    if path.is_file():
+        try:
+            sources = tomllib.loads(path.read_text(encoding="utf-8")).get("sources", {})
+        except tomllib.TOMLDecodeError:
+            sources = {}
+        dirs = str(sources.get("dirs_file", dirs)).strip() or dirs
+        urls = str(sources.get("urls_file", urls)).strip() or urls
+    return dirs, urls
+
+
+def _migrate_sources_keys(root: Path, report: SetupReport) -> None:
+    """Rewrite `fux.toml [sources] dirs_file` / `urls_file` as one `sources_file`.
+
+    **Line-level, like every other `fux.toml` edit setup makes**: the two key
+    lines are replaced by one, inside `[sources]`, and every other byte — the
+    consumer's comments, order, values — is kept. Runs before anything loads
+    the config, because `config.load` refuses both keys by name.
+    """
+    import re
+
+    from .acquire import sourcesfile
+
+    path = root / CONFIG_NAME
+    if not path.is_file():
+        return
+    lines = path.read_text(encoding="utf-8").split("\n")
+    table = None
+    out: list[str] = []
+    wrote = False
+    for raw in lines:
+        stripped = raw.strip()
+        if stripped.startswith("["):
+            table = stripped.strip("[]").strip()
+        match = re.match(r"\s*(dirs_file|urls_file)\s*=", raw) if table == "sources" else None
+        if match is None:
+            out.append(raw)
+            continue
+        report.migrated_keys.append(match.group(1))
+        if not wrote:
+            out.append(f'sources_file = "{sourcesfile.FILE}"')
+            wrote = True
+    if not report.migrated_keys:
+        return
+    path.write_text("\n".join(out), encoding="utf-8", newline="\n")
+
+
+def _convert_legacy_sources(root: Path, report: SetupReport, dirs_rel: str, urls_rel: str) -> None:
+    """`.fux/sources/dirs` + `.fux/sources/urls` → `.fux/sources.yaml`, once.
+
+    **Write-if-missing**, like everything setup does: a repo that already has
+    `.fux/sources.yaml` has decided, and is told to delete the old lists by the
+    reader's refusal (`sourcesfile.check_legacy`).
+
+    🔴 **ORDER IS A LAW HERE, not a style.** The `!` lines of the old `dirs`
+    list become anchored `.fux/.fuxignore` lines, and that write lands
+    **before** the old list is deleted. On this repository three of those lines
+    are the L11 guard that keeps `work/golden/` out of fux's own index; a tree
+    in which neither file excludes it — even for the length of one `fux ingest`
+    — is a breach, not a bug. So: `.fuxignore` first, then `.fux/sources.yaml`,
+    then — and only then — the old files.
+
+    The moved lines go **below the ingest blocks and above the first pattern a
+    human wrote** (`_first_hand_pattern`, the `formats.toml` conversion's
+    placement). `.fuxignore` re-includes outranked a `dirs` `!` line in the walk,
+    so a re-include written against one must keep winning; placing the moved
+    lines first among the hand lines is what keeps it winning.
+    """
+    from .acquire import sourcesfile
+
+    dirs_path, urls_path = root / dirs_rel, root / urls_rel
+    dirs_text = dirs_path.read_text(encoding="utf-8") if dirs_path.is_file() else None
+    urls_text = urls_path.read_text(encoding="utf-8") if urls_path.is_file() else None
+    header = template_bytes(fixed("templates", "sources")).decode("utf-8")
+    converted = sourcesfile.convert_legacy(
+        dirs_text,
+        urls_text,
+        dirs_origin=dirs_rel,
+        urls_origin=urls_rel,
+        header=header,
+        drop_headers=(_LEGACY_DIRS_HEADER, _urls_header()),
+        ignore_pattern=lambda pattern: fuxignore.exclusion_pattern(pattern, is_dir=False),
+    )
+
+    # 1. `.fuxignore` FIRST (the L11 order).
+    if converted.ignore_lines:
+        path = root / fuxignore.IGNORE_FILE
+        existing = path.read_text(encoding="utf-8") if path.is_file() else _FUXIGNORE
+        have = set(fuxignore.parse(existing).patterns())
+        block = list(converted.ignore_lines)
+        fresh = [p for p in converted.moved if p not in have]
+        if fresh:
+            lines = existing.split("\n")
+            at = _first_hand_pattern(lines)
+            note = f"# moved from {dirs_rel} by `fux setup` (W-294): `!` lived there, and exclusion lives here"
+            keep = [ln for ln in block if not ln.strip() or ln.lstrip().startswith("#")
+                    or ln.split()[0] in fresh]
+            lines[at:at] = [note, *keep, ""]
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("\n".join(lines).rstrip("\n") + "\n", encoding="utf-8", newline="\n")
+            # Proved before anything is deleted: the new file must load and
+            # must exclude every pattern the old list subtracted.
+            check = fuxignore.parse(path.read_text(encoding="utf-8")).patterns()
+            missing = [p for p in converted.moved if p not in check]
+            if missing:
+                raise FuxError(
+                    f"{fuxignore.IGNORE_FILE} does not carry {', '.join(missing)} after the move, so "
+                    f"{dirs_rel} was left in place. Nothing was deleted"
+                )
+        report.moved_dirs_exclusions = list(converted.moved)
+
+    # 2. The manifest.
+    _write_if_missing(root / sourcesfile.FILE, converted.text.encode("utf-8"), report, root)
+
+    # 3. Only now, the old lists — and `.fux/sources/` if nothing else is in it.
+    for path in (dirs_path, urls_path):
+        if path.is_file():
+            path.unlink()
+            report.deleted_lists.append(path.relative_to(root).as_posix())
+    for parent in {dirs_path.parent, urls_path.parent}:
+        try:
+            parent.rmdir()
+        except OSError:
+            pass  # not empty (a leftover `types`, say) — the human's to tidy
+    report.converted_sources = True
 
 
 def _seed_types() -> bytes:
@@ -1537,6 +1703,36 @@ def write_plugins(root: Path, report: "SetupReport", *, pin_all: bool = False) -
     report.unpinned = sorted(name for name, decl in rows.items() if not decl.digest)
 
 
+def _configured_sources_file(root: Path) -> str:
+    """`[sources] sources_file` as the consumer's `fux.toml` states it, else the
+    template's. Read RAW: `config.load` may refuse the file for a reason this
+    run is about to fix (a retired key, a missing one)."""
+    import tomllib
+
+    default = template_config()["sources"]["sources_file"]
+    path = root / CONFIG_NAME
+    if not path.is_file():
+        return default
+    try:
+        stated = tomllib.loads(path.read_text(encoding="utf-8")).get("sources", {}).get("sources_file")
+    except tomllib.TOMLDecodeError:
+        return default
+    return stated.strip() if isinstance(stated, str) and stated.strip() else default
+
+
+def _write_sources(root: Path, report: SetupReport) -> None:
+    """`.fux/sources.yaml`: converted from the retired lists if they are here,
+    seeded otherwise — and `fux.toml`'s two old keys rewritten either way."""
+    dirs_rel, urls_rel = _legacy_list_paths(root)
+    legacy = (root / dirs_rel).is_file() or (root / urls_rel).is_file()
+    target = root / _configured_sources_file(root)
+    if legacy and not target.exists():
+        _convert_legacy_sources(root, report, dirs_rel, urls_rel)
+    else:
+        _write_if_missing(target, _seed_sources(root), report, root)
+    _migrate_sources_keys(root, report)
+
+
 def run(root: Path, *, agents: bool = True, pin: bool = False) -> SetupReport:
     """Write the consumer-owned files, write-if-missing. Returns what happened.
 
@@ -1583,15 +1779,16 @@ def run(root: Path, *, agents: bool = True, pin: bool = False) -> SetupReport:
     if gone:
         report.observers_removed = gone
 
-    lists = template_config()["sources"]
-    _write_if_missing(root / lists["dirs_file"], _seed_dirs(root), report, root)
-    _write_if_missing(root / lists["urls_file"], _urls_header().encode("utf-8"), report, root)
     # Header only, no patterns: an ignore file that arrives with guesses in it
     # is one whose first act is to hide a document nobody asked it to hide.
     # Empty is a legal, meaningful state here (SR-FUXIGNORE decision 6) in a
     # way it is not for `types`, so the seed can be honest about knowing
     # nothing. Write-if-missing like the rest -- `fux setup` never rewrites it.
     _write_if_missing(root / fuxignore.IGNORE_FILE, _FUXIGNORE.encode("utf-8"), report, root)
+    # W-294: AFTER `.fuxignore` exists, because the conversion moves the old
+    # `dirs` list's `!` lines into it — and BEFORE anything loads `fux.toml`,
+    # which refuses `dirs_file`/`urls_file` by name.
+    _write_sources(root, report)
     # AFTER `.fuxignore`, because a conversion moves `!` lines into it.
     # Written with the default spelled out rather than left implicit: a consumer
     # should be able to see what fux considers a document without reading its
@@ -1765,6 +1962,23 @@ def cmd_setup(args) -> int:
             f"  now delete {LEGACY_TYPES_FILE} - fux refuses to run while it exists, rather "
             "than guess which of the two files you meant"
         )
+    if report.converted_sources:
+        from .acquire import sourcesfile
+
+        print()
+        print(
+            f"  converted {' and '.join(report.deleted_lists) or 'the old lists'} -> "
+            f"{sourcesfile.FILE} (W-294), and deleted them."
+        )
+        if report.moved_dirs_exclusions:
+            print(
+                f"  moved {len(report.moved_dirs_exclusions)} `!` line(s) to "
+                f"{fuxignore.IGNORE_FILE}, anchored: {', '.join(report.moved_dirs_exclusions)}"
+            )
+    if report.migrated_keys:
+        print(
+            f"  fux.toml: [sources] {' and '.join(report.migrated_keys)} -> sources_file"
+        )
     if report.outside:
         print()
         print(
@@ -1799,6 +2013,6 @@ def cmd_setup(args) -> int:
         )
 
     load(root)  # a hand-edited fux.toml fails loudly here, not on the first ingest
-    print("next: add entries to .fux/sources/dirs, then `fux ingest`")
+    print("next: list paths under `paths:` in .fux/sources.yaml (or `fux add <path>`), then `fux ingest`")
     print("      anything you do NOT want indexed goes in .fux/.fuxignore")
     return 0

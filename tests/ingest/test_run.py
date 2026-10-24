@@ -4,13 +4,13 @@ from l12_fixtures import config_file
 from fux import store
 from fux.ingest.run import run
 from fux.store import dirty
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_dirs
 
 
 def _init(tmp_path, files: dict[str, str], toml: str = "[sources]\n", dirs=("docs",)):
     listing = tmp_path / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text("".join(f"{d}\n" for d in dirs), encoding="utf-8")
+    write_dirs(tmp_path, "".join(f"{d}\n" for d in dirs))
     (tmp_path / "fux.toml").write_text(toml, encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")

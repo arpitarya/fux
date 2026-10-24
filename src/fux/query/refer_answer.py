@@ -210,7 +210,7 @@ def _load_fetchers(root: Path, citations: list[tuple[str, str, str]]):
             # SR-ACQUIRED was written to remove; paying it and then not
             # fetching would be the worst of both.
             return None, noop, False
-        entries = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
+        entries = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.sources_file), config.url)
     except FuxError:
         return None, noop, True
     by_url = {entry.url: entry for entry in entries}

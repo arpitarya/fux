@@ -14,7 +14,7 @@ import pytest
 
 from fux import doctor
 from fux.query import provenance
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_dirs
 
 
 def _repo(tmp_path):
@@ -33,7 +33,7 @@ def _row(root, name):
 def _dirs(root, text):
     path = root / ".fux" / "sources" / "dirs"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+    write_dirs(root, text)
 
 
 def _tune_entries(root, table, entries):

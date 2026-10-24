@@ -17,12 +17,13 @@ import pytest
 from fux.ingest.run import _archived_url_ids, _with_archived
 from fux.acquire.sourcelist import URLS, parse
 from fux.acquire.urlsrc import resolve_urls
+from l12_fixtures import write_urls
 
 
 def _repo(tmp_path, body):
-    (tmp_path / ".fux" / "sources").mkdir(parents=True, exist_ok=True)
-    (tmp_path / ".fux" / "sources" / "urls").write_text(body, encoding="utf-8")
-    return SimpleNamespace(url=None, urls_file=".fux/sources/urls")
+    (tmp_path / ".fux").mkdir(parents=True, exist_ok=True)
+    write_urls(tmp_path, body)
+    return SimpleNamespace(url=None, sources_file=".fux/sources.yaml")
 
 
 # -- the declaration reaches the ingest ------------------------------------
@@ -46,8 +47,8 @@ def test_an_absent_list_is_empty_and_never_raises(tmp_path):
     """The caller only asks when `url:` records exist, and a missing list with
     surviving records is already `urlingest.listed_url_ids`' loud error — this must not
     be a second, worse copy of it."""
-    (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    assert _archived_url_ids(tmp_path, SimpleNamespace(url=None, urls_file=".fux/sources/urls")) == set()
+    (tmp_path / ".fux").mkdir(parents=True)
+    assert _archived_url_ids(tmp_path, SimpleNamespace(url=None, sources_file=".fux/sources.yaml")) == set()
 
 
 def test_it_reads_the_list_without_a_sources_url_block(tmp_path):
@@ -72,7 +73,7 @@ def _url_source():
 
     shipped = template_fux_toml()["sources"]
     base = {k: v for k, v in shipped["url"].items() if not isinstance(v, dict)}
-    base.update(routes={}, config={}, urls_file=shipped["urls_file"])
+    base.update(routes={}, config={}, sources_file=shipped["sources_file"])
     return UrlSource(**base)
 
 

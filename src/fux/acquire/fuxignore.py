@@ -1,10 +1,12 @@
 """`.fux/.fuxignore` — the one file that says what fux does not index.
 
 **Why it exists.** Before this, the answer to *"why is my file not in the
-index?"* lived in four places: a `!` line in `.fux/sources/dirs`, a `!` line in
+index?"* lived in four places: a `!` line in the directory list, a `!` line in
 the types list, the type allowlist in that same file, and two hardcoded rules in
 the walker. (The types list is `.fux/config/formats.toml` since 2026-09-11, and it has no
-`!` at all — SR-TYPES decision 12.) Four places is three too many, and the symptom was always
+`!` at all — SR-TYPES decision 12; the directory list is the `paths:` half of
+`.fux/sources.yaml` since W-294, and it has none either — SR-SOURCES.) Four
+places is three too many, and the symptom was always
 the same — a document silently absent, and no single file to read to find out
 why.
 
@@ -77,19 +79,13 @@ file listed as `empty` and it stays out, still labelled `empty`. The freeze is
 not undone; `skipnotice.stale_warnings` makes it **loud** on stderr, and the
 fix is deleting the line or writing a `!` for it.
 
-## `!` means the opposite here of what it means next door, on purpose
+## `!` means one thing in `.fux/`, and it is git's
 
-In `.fux/sources/dirs`, `!` **subtracts**
-([SR-DIR-LIST](../../../records/0120_dir-list.md) decision 2b). Here it
-**re-includes**. Same character, opposite direction, two files. (`.fux/config/formats.toml`
-has no `!` at all, so the collision is down to one file since 2026-09-11.)
-
-**That collision is accepted rather than avoided**, because the alternative is
-a `.fuxignore` that is not a `.fuxignore` — a reader who has to learn a new
-negation rule for the file named after the one they already know is worse off
-than one who reads this paragraph. `fux ingest` warns when the same pattern
-appears in both places (`duplicate_warnings`), which is where the confusion
-would actually surface.
+Here `!` **re-includes**, exactly as in `.gitignore`. **Nothing else in `.fux/`
+spells `!`**: `.fux/config/formats.toml` never did, and `.fux/sources.yaml` refuses a
+`!`-led entry with an error naming this file (W-294, SR-SOURCES). The collision
+the old directory list carried — `!` subtracting there and re-including here —
+is closed, not mitigated.
 
 ## It outranks the type allowlist, in both directions
 
@@ -108,8 +104,8 @@ about. It takes an explicit `!` line a human wrote to get there, it is visible
 in one committed file, and it is the price of the file meaning what its name
 says.
 
-**What it does not override:** a file has to be under an included
-`.fux/sources/dirs` entry to be seen at all, and `empty` / `binary` /
+**What it does not override:** a file has to be under a path listed in
+`.fux/sources.yaml` to be seen at all, and `empty` / `binary` /
 `non-utf8` still skip a re-included file, because there is nothing to index
 either way.
 """
@@ -310,13 +306,11 @@ class Ignores:
     def patterns(self) -> dict[str, Rule]:
         """`{pattern-as-written: rule}` for every **ignoring** line.
 
-        Negations are left out: `!build` here and `!build` in `sources/dirs`
-        are opposite statements that happen to share a spelling, and warning
-        that they duplicate each other would be wrong.
+        Negations are left out: a re-include is not an exclusion, so it is not
+        what a caller asking "is this already excluded?" is looking for.
         """
-        # Generated lines are exact paths, never patterns anybody would also
-        # write into `sources/`, and there can be hundreds of them. Including
-        # them here would turn an advisory into a scan of the whole block.
+        # Generated lines are exact paths, never patterns anybody would write by
+        # hand, and there can be hundreds of them.
         return {rule.raw: rule for rule in self.rules if not rule.negate}
 
 
@@ -472,7 +466,7 @@ def exclusion_pattern(rel_path: str, *, is_dir: bool) -> str:
     verbatim for `fux remove docs` would also drop `archive/docs` and
     `vendor/x/docs` — a removal nobody asked for, visible only as documents
     quietly missing from the next index. The leading `/` pins it to the repo
-    root, which is the frame `.fux/sources/dirs` entries are already written in.
+    root, which is the frame `.fux/sources.yaml` paths are already written in.
 
     **A trailing `/` when it is a directory**, so a *file* of the same name that
     appears later is not swept up by a line written about a directory.
@@ -490,8 +484,7 @@ def add_exclusion(root: Path, rel_path: str, *, is_dir: bool) -> str:
     **Raises when a hand-written pattern already excludes the path.** Removing
     something already removed is an error and not a quiet success — the contract
     the `!`-line form kept, and the one a caller's exit code depends on. It also
-    keeps this file from growing lines that change nothing, each of which
-    `duplicate_warnings` would then report as a conflict fux created itself.
+    keeps this file from growing lines that change nothing.
 
     Also raises for a path that cannot survive the round trip — see `writable`.
     Refusing is the loud direction: a mangled line ignores a *different* file,
@@ -520,29 +513,6 @@ def add_exclusion(root: Path, rel_path: str, *, is_dir: bool) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text + line + "\n", encoding="utf-8", newline="\n")
     return line
-
-
-def dirs_exclusion_notes(root: Path, *, dirs_file: str) -> list[str]:
-    """One line per surviving `!` entry in the `dirs` list, with the move.
-
-    **`!` lines there are read forever and written never** (W-165 fix 1). They
-    keep working, so this is a note and not a failure — but the two files spell
-    `!` with opposite meanings, and every survivor is one copy-paste away from
-    a person writing `!docs` in `.fuxignore` expecting it to subtract.
-
-    Distinct from `duplicate_warnings`, which fires only when a pattern is in
-    *both* files. This fires on every survivor, including the ones nothing
-    duplicates, because the migration is owed for those too.
-
-    **ASCII only**, for the same reason `reason()` is.
-    """
-    return [
-        f"`!{pattern}` in {dirs_file}:{lineno} still excludes, and still works. "
-        f"`fux remove` writes {IGNORE_FILE} now: move it there as `"
-        f"{exclusion_pattern(pattern, is_dir=False)}` and delete this line "
-        f"- `!` subtracts in {dirs_file} and RE-INCLUDES in {IGNORE_FILE}"
-        for pattern, lineno in sorted(_exclusions(root, dirs_file).items())
-    ]
 
 
 def _render_block(name: str, pairs) -> str:
@@ -576,62 +546,6 @@ def _without_blocks(text: str) -> str:
     while out and not out[0].strip():
         out.pop(0)
     return "\n".join(out)
-
-
-def duplicate_warnings(root: Path, *, dirs_file: str) -> list[str]:
-    """Lines warning that a pattern is stated in two files at once.
-
-    **The duplicate is not an error and is not resolved silently.** Both copies
-    do the same thing, so nothing is broken today — but the two files disagree
-    about `!`, so the day someone edits one of them the two lines stop meaning
-    the same thing, and *that* is the failure this warning is early for.
-
-    **`.fuxignore` is the home; the other line is the one to delete.** The
-    message says which, rather than reporting a conflict and leaving the reader
-    to guess which way it resolves.
-
-    ⚠ **`dirs` only since 2026-09-11.** The types list became `.fux/config/formats.toml`,
-    which has no subtraction to duplicate (SR-TYPES decision 12).
-
-    **ASCII only**, for the same reason `reason()` is.
-    """
-    ignores = read(root)
-    if not ignores:
-        return []
-    mine = ignores.patterns()
-    warnings: list[str] = []
-    for pattern, lineno in _exclusions(root, dirs_file).items():
-        rule = mine.get(pattern) or mine.get(f"{pattern}/")
-        if rule is None:
-            continue
-        warnings.append(
-            f"warning: `{pattern}` is excluded in both {dirs_file}:{lineno} and "
-            f"{IGNORE_FILE}:{rule.lineno}.\n"
-            f"  {IGNORE_FILE} is where exclusions live and it is consulted first, so the "
-            f"dirs line changes nothing today.\n"
-            f"  Delete `!{pattern}` from {dirs_file} - `!` subtracts there and RE-INCLUDES in "
-            f"{IGNORE_FILE}, so leaving both is one edit away from meaning two things."
-        )
-    return sorted(warnings)
-
-
-def _exclusions(root: Path, rel_path: str) -> dict[str, int]:
-    """`{pattern: lineno}` for the `!` lines of the `dirs` list.
-
-    Parsed with the **shared** grammar rather than re-read here: two readers for
-    one file is how the warning and the walk end up disagreeing about which
-    lines exist, and this module exists to remove that class of bug, not add one.
-    """
-    from . import sourcelist
-
-    path = root / rel_path
-    if not path.is_file():
-        return {}
-    try:
-        entries = sourcelist.parse(path.read_text(encoding="utf-8"), sourcelist.DIRS, origin=str(path))
-    except FuxError:
-        return {}  # a broken list is the walk's error to raise, not this advisory's
-    return {entry.value: entry.lineno for entry in entries if entry.exclude}
 
 
 @lru_cache(maxsize=1024)

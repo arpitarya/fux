@@ -7,7 +7,7 @@ modules with one basename make `pytest tests tests_e2e` fail at COLLECTION.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import json
 import os
 import shutil
@@ -41,7 +41,7 @@ def repo(tmp_path: Path) -> Path:
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     sources = tmp_path / ".fux" / "sources"
     sources.mkdir(parents=True)
-    (sources / "dirs").write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     docs = tmp_path / "docs"
@@ -267,7 +267,7 @@ def test_why_says_who_wrote_the_ctx_term(repo: Path) -> None:
 def test_check_reports_a_human_line_and_never_refuses_it(repo: Path) -> None:
     """A correction is by definition a question that failed retrieval. Refusing
     it would delete the correction's effect as the price of reporting it."""
-    (repo / ".fux" / "sources" / "dirs").write_text("docs enrich=true\n", encoding="utf-8")
+    write_dirs(repo, "docs enrich=true\n")
     # A correction with no `?` at all — the case that escaped the check
     # entirely until the human set was unioned into the question list.
     _fux(repo, "correct", "pomegranate molasses", "docs/runbook-rollback.md")

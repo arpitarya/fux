@@ -25,6 +25,7 @@ from fux import setup as setup_mod
 from fux.acquire import urlsrc
 from fux.cli import main
 from fux.errors import FuxError
+from l12_fixtures import write_urls
 
 SRC = Path(__file__).resolve().parents[1] / "src" / "fux"
 PREFIXES = ("fux_decoder_", "fux_fetcher_", "fux_extension_")
@@ -55,12 +56,7 @@ def repo(tmp_path: Path, monkeypatch) -> Path:
     if "[sources.url]\n" not in text:
         text = text.replace("[sources.url.config]", "[sources.url]\n\n[sources.url.config]", 1)
     config.write_text(text, encoding="utf-8")
-    urls = tmp_path / ".fux" / "sources" / "urls"
-    urls.write_text(
-        urls.read_text(encoding="utf-8")
-        + "https://x.test/a fetch=http decoder=html\nhttps://x.test/b fetch=cdp decoder=html\n",
-        encoding="utf-8",
-    )
+    write_urls(tmp_path, "https://x.test/a fetch=http decoder=html\nhttps://x.test/b fetch=cdp decoder=html\n")
     plugins.reset()
     rows = [plugins.pin(n) for n in ("fux-fetcher-http", "fux-fetcher-cdp", "fux-decoder-html", "fux-extension-table")]
     plugins.path(tmp_path).write_text(plugins.render(rows), encoding="utf-8")

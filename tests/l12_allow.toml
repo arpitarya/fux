@@ -17,6 +17,8 @@ category = "identity"
 basis = "decision 6"
 why = "an arithmetic identity, an empty value or a zero-count start: `0`, `1`, `-1`, `0.0`, `1.0`, `''`"
 sites = [
+  "src/fux/acquire/yamlsubset.py::Map.last::class::0",
+  "src/fux/acquire/yamlsubset.py::Map.line::class::0",
   "src/fux/refer/_assemble.py::Citation.order_key::class::''",
   "src/fux/inspect/idfamilies.py::Detection.candidates::class::0",
   "src/fux/inspect/idfamilies.py::Detection.documents::class::0",
@@ -108,6 +110,13 @@ category = "key-name"
 basis = "decision 6"
 why = "names of config keys or tables: what a reader asks for, not a value it holds"
 sites = [
+  "node/src/ingest/sourcelist.mjs::URL_ATTRIBUTES::module::\"fetch\"",
+  "src/fux/acquire/sourcelist.py::_DECODER_HELP::module::_ATTR_TEXTS['decoder_help']",
+  "src/fux/acquire/sourcelist.py::_FETCHER_HELP::module::_ATTR_TEXTS['fetcher_help']",
+  "src/fux/acquire/sourcelist.py::_TTL_HELP::module::_ATTR_TEXTS['ttl_help']",
+  "src/fux/config.py::KNOWN_KEYS::module::('sources.sources_file', 'sources.url.routes', 'sources.u...",
+  "src/fux/config.py::REFUSED_KEYS::module::('sources.dirs', 'sources.dirs_file', 'sources.urls_file'...",
+  "src/fux/config.py::REQUIRED_KEYS::module::{'sources': ('sources_file',), 'index': ('shards', 'git_t...",
   "node/src/config/output.mjs::API_KEYS::module::\"band\"",
   "node/src/config/output.mjs::CLI_VERBS::module::\"band\"",
   "node/src/config/output.mjs::MCP_KEYS::module::\"top\"",
@@ -121,11 +130,7 @@ sites = [
   "node/src/config/tune.mjs::REMOVED_KEYS::module::\"ranking.archived_weight\"",
   "node/src/config/tune.mjs::SCHEMA::module::\"k1\"",
   "node/src/config/tune.mjs::TUNE_FIELDS::module::\"k1\"",
-  "node/src/ingest/sourcelist.mjs::DIRS_ATTRIBUTES::module::\"archived\"",
-  "src/fux/config.py::KNOWN_KEYS::module::('sources.dirs_file', 'sources.urls_file', 'sources.url.r...",
   "src/fux/config.py::OPAQUE_TABLES::module::('sources.url.config',)",
-  "src/fux/config.py::REFUSED_KEYS::module::('sources.dirs', 'sources.types_file', 'sources.url.urls'...",
-  "src/fux/config.py::REQUIRED_KEYS::module::{'sources': ('dirs_file', 'urls_file'), 'index': ('shards...",
   "src/fux/config.py::REQUIRED_URL_KEYS::module::('keep', 'ttl', 'enrich', 'update', 'fetch_at_answer', 'm...",
   "src/fux/config.py::_TABLES::module::frozenset((k.rsplit('.', 1)[0] for k in KNOWN_KEYS if '.'...",
   "src/fux/store/corrections.py::CORRECTIONS_KEY::module::'corrections'",
@@ -165,6 +170,7 @@ category = "enum-tag"
 basis = "decision 6, R1"
 why = "an identifier compared by name and emitted on the wire; the Python/Node parity tests pin both planes"
 sites = [
+  "node/src/ingest/sourcelist.mjs::PROSE_DECODER::module::\"prose\"",
   "node/src/config/output.mjs::isTable::module::\"object\"",
   "node/src/query/confidence.mjs::GROUNDED::module::\"grounded\"",
   "node/src/query/confidence.mjs::NONE::module::\"none\"",
@@ -271,6 +277,8 @@ category = "message"
 basis = "decision 6"
 why = "user-facing text: a message, a marker, help, the prose of a generated file"
 sites = [
+  "node/src/ingest/sourcelist.mjs::REQUIRED_HINTS::module::\"{prose}\"",
+  "src/fux/store/fuxdir.py::COMMITTED_FILES::module::{'sources.yaml': 'what IS indexed: `paths:` lists (`inclu...",
   "node/src/config/output.mjs::FIX_HINT::module::\"`fux doctor --fix` writes every missing key from the tem...",
   "node/src/config/output.mjs::MCP_REFUSED::module::\"the confidence block is UNCONDITIONAL over MCP (SR-CONFI...",
   "node/src/config/output.mjs::REFUSED::module::\"`--no-tune` is the *'is it me or the config?'* switch. A...",
@@ -301,9 +309,6 @@ sites = [
   "src/fux/ingest/queue.py::_HEADER::module::'# Documents fux could not read. A model must. Generated ...",
   "src/fux/acquire/refusals.py::_FIX_HINT::module::'`fux doctor --fix` writes every missing key from the tem...",
   "src/fux/acquire/sourcelist.py::Attribute.placeholder::class::'<value>'",
-  "src/fux/acquire/sourcelist.py::_DECODER_HELP::module::'must be a decoder module name - lowercase letters, digit...",
-  "src/fux/acquire/sourcelist.py::_FETCHER_HELP::module::'must be a fetcher module name - lowercase letters, digit...",
-  "src/fux/acquire/sourcelist.py::_TTL_HELP::module::'must be 0 (always re-fetch) or <number><unit> where unit...",
   "src/fux/maintain/hooks.py::REFS_NOTE::module::'refs/fux/<tree> — see the module note; not built, and no...",
   "src/fux/maintain/hooks.py::_write_gitattributes::path::'.fux/index/REGISTER merge='",
   "src/fux/output_config.py::_FIX_HINT::module::'`fux doctor --fix` writes every missing key from the tem...",
@@ -321,7 +326,6 @@ sites = [
   "src/fux/sources.py::_OBSERVED_AT_ADD::module::'<observed>'",
   "src/fux/store/fuxdir.py::ACQUIRED::module::{'acquired': 'the bytes a fetch actually returned, for UR...",
   "src/fux/store/fuxdir.py::COMMITTED::module::{'index': 'the wire-format index (SR-RECORD), plus REGIST...",
-  "src/fux/store/fuxdir.py::COMMITTED_FILES::module::{'.fuxignore': \"what is NOT indexed, in .gitignore's gram...",
   "src/fux/store/fuxdir.py::DERIVED::module::{'runtime': \"M2 accelerator segments, M4's fetch cache at...",
   "src/fux/store/recordschema.py::validate::get::'<no id>'",
   "src/fux/tune.py::_FIX_HINT::module::'`fux doctor --fix` writes every missing key from the tem...",
@@ -334,6 +338,24 @@ category = "grammar"
 basis = "decision 6"
 why = "parsing logic: a regex, an algorithm's rule table, a character class, a struct layout"
 sites = [
+  "node/src/ingest/sourcelist.mjs::DURATION_UNITS::module::\"s\"",
+  "node/src/ingest/yamlsubset.mjs::COLON::module::\":\"",
+  "node/src/ingest/yamlsubset.mjs::COMMENT::module::\"#\"",
+  "node/src/ingest/yamlsubset.mjs::DOC_MARKERS::module::\"---\"",
+  "node/src/ingest/yamlsubset.mjs::ESCAPES::module::\"\\\\\"",
+  "node/src/ingest/yamlsubset.mjs::ITEM::module::\"- \"",
+  "node/src/ingest/yamlsubset.mjs::SPACE::module::\" \"",
+  "node/src/ingest/yamlsubset.mjs::START::module::\"{\"",
+  "node/src/ingest/yamlsubset.mjs::quoted::inline::2",
+  "src/fux/acquire/sourcesfile.py::_UNSAFE_START::module::set('{}[]&*!|>@`,%#\\'\"?:-')",
+  "src/fux/acquire/yamlsubset.py::_COLON::module::':'",
+  "src/fux/acquire/yamlsubset.py::_COMMENT::module::'#'",
+  "src/fux/acquire/yamlsubset.py::_DOC_MARKERS::module::('---', '...')",
+  "src/fux/acquire/yamlsubset.py::_ESCAPES::module::('\\\\', '\"', '/')",
+  "src/fux/acquire/yamlsubset.py::_ITEM::module::'- '",
+  "src/fux/acquire/yamlsubset.py::_SPACE::module::' '",
+  "src/fux/acquire/yamlsubset.py::_START::module::{'{': 'flow', '}': 'flow', '[': 'flow', ']': 'flow', '&':...",
+  "src/fux/acquire/yamlsubset.py::_quoted::inline::2",
   "src/fux/inspect/idfamilies.py::_NODE_SPANS::module::\"let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{...",
   "src/fux/inspect/idfamilies.py::_utf16::inline::2",
   "packages/fux-decoder-sheet/src/fux_decoder_sheet/xlsx.py::_column::inline::26",
@@ -407,6 +429,7 @@ category = "presentation"
 basis = "decision 6, R3"
 why = "a presentation count: the first N shown then (+M more), a width, a display rounding"
 sites = [
+  "src/fux/acquire/sourcesfile.py::set_url::inline::2",
   "src/fux/identifiers_cmd.py::cmd_identifiers::inline::2",
   "src/fux/identifiers_cmd.py::cmd_identifiers::inline::3",
   "src/fux/inspect/__init__.py::inspect_index::inline::3",
@@ -495,6 +518,7 @@ category = "identity"
 basis = "decision 6 (W-225 stage 5f, 2026-10-04)"
 why = "a zero-count start or an empty value in an `inspect` record type: the lens fills it"
 sites = [
+  "src/fux/acquire/sourcelist.py::PATHS::module::ListSpec(kind='paths', attributes=(Attribute('archived', ...",
   "src/fux/inspect/_scan.py::IndexView.cf::class::field(default_factory=lambda: array('q'))",
   "src/fux/inspect/_scan.py::IndexView.df::class::field(default_factory=lambda: array('i'))",
   "src/fux/inspect/_scan.py::IndexView.postings::class::0",

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-22
 amended: 2026-10-11
 feature: the tuning surface — `.fux/config/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@27b20600c911, .fux/config/tune.toml@3e16953e4cb3, node/src/config/tune.mjs@2376165e517a]
+owns: [src/fux/tune.py@04c79d6cff9f, .fux/config/tune.toml@8d75fac15956, node/src/config/tune.mjs@f465b6c3aed8]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 512080dd6f5c04b48d3b43f8e28aa0d74fdb1ad2423937c31d3f3afb010b0c95
+content_sha: e09fe989a8b0f91f17e10354c2389c77f5bbccdd039ca71469dd46eb32dc1ea5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -59,8 +59,8 @@ The file also carries **per-source priority** — prefer `docs/` over `vendor/`,
 by name, for one source or for all of them. A weight may go **above** `1.0` or
 **below** it, and **the consumer chooses**. Fux's job is to say what the choice
 costs, in numbers. **The only two refusals are a negative weight, which inverts
-ordering, and a zero, which is exclusion** — and `.fux/sources/dirs` already has
-a `!` entry that means exclusion properly.
+ordering, and a zero, which is exclusion** — and `.fux/.fuxignore` already
+means exclusion properly.
 
 ```mermaid
 flowchart TD
@@ -407,7 +407,7 @@ worse than an error ([SR-CONFIG](0113_config.md) decision 10).
 
 **8. Per-source priority: a multiplicative, query-time weight, keyed by source
 entry.** The key is **a source entry exactly as it appears** in
-`.fux/sources/dirs` or `.fux/sources/urls`, so directories, single documents and
+`.fux/sources.yaml` — a `paths:` entry or a URL — so directories, single documents and
 URLs are all addressed the same way. **Anything unlisted is `1.0`**, which is
 how *priority for just one* stays one line.
 
@@ -425,8 +425,8 @@ than on one scoring `12`.** A multiplier preserves within-source ordering
 cannot copy that, and the reason is a property worth being pleased about: its
 source lists are loader-sorted and file order is presentation only, so there is
 no first.** Longest-match is order-independent, deterministic, and consistent
-with [SR-DIR-LIST](0120_dir-list.md) decision 2b's order-independent
-exclusions. Keys are unique, so ties cannot occur. An entry matches a location
+with the loader-sorted, order-independent source list
+([SR-SOURCES](0116_url-list.md)). Keys are unique, so ties cannot occur. An entry matches a location
 exactly or at a `/` boundary (`docs` scales `docs/x.md`, never
 `docs-old/x.md`) — a source entry names a directory, not a string prefix; Node's
 `priorityFor` had this from the start, Python's gained it in W-253.
@@ -460,7 +460,7 @@ denied:
 | value | fux does | why it is not a preference |
 |---|---|---|
 | `w < 0` | error | a negative multiplier **inverts ordering** — broken, not aggressive |
-| `w == 0` | error, naming the `!` entry | that is **exclusion**, and [SR-DIR-LIST](0120_dir-list.md) decision 2a already owns it. **Two ways to do one thing is the rot** |
+| `w == 0` | error, naming `.fux/.fuxignore` | that is **exclusion**, and [SR-FUXIGNORE](0144_fuxignore.md) already owns it. **Two ways to do one thing is the rot** |
 | `w > 0` | **allowed, any value**, cost stated | the ruling |
 
 ⚠ **A fractional field weight is legal.** It was once refused for a storage
@@ -846,8 +846,8 @@ never in W-97's sweep at all** (W-73's law), so no selection evidence for it
 exists outside VERDICT-W143.
 
 - **Nothing is lost to a caller**, which is what separates it from recency: the
-  fact was already public and stays public — `archived=true` in
-  `.fux/sources/dirs`, the `archived` record property, `ARCHIVED_MARKER` and the
+  fact was already public and stays public — the `archived:` declaration in
+  `.fux/sources.yaml`, the `archived` record property, `ARCHIVED_MARKER` and the
   response-level note in prose, and `archived: bool` on every JSON hit,
   `required: always`, with the output schema's own instruction: **"BRANCH ON
   THIS, never on the prose note."** An agent can filter; a human can see.
@@ -1108,7 +1108,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No tune key changed** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `fux.toml` joined `tune.toml` and `output.toml` as a file `fux doctor --fix` fills key by key; `node/test/config.test.mjs` gained `fux.toml`'s `dirs_file` cases ([SR-CONFIG](0113_config.md) decision 17).
+**No tune key changed** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `fux.toml` joined `tune.toml` and `output.toml` as a file `fux doctor --fix` fills key by key; `node/test/config.test.mjs` gained `fux.toml`'s source-list key cases ([SR-CONFIG](0113_config.md) decision 17).
 
 **No tune key changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/tune.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
 
@@ -1331,8 +1331,7 @@ evidence.*
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-CLI](0101_cli-surface.md) ·
 [SR-DOTFUX](0102_fux-directory.md) ·
 [SR-T1-ACCELERATOR](0110_accelerator.md) · [SR-RANKING](0111_ranking.md) ·
-[SR-CONFIG](0113_config.md) · [SR-URL-LIST](0116_url-list.md) ·
-[SR-DIR-LIST](0120_dir-list.md) ·
+[SR-CONFIG](0113_config.md) · [SR-SOURCES](0116_url-list.md) ·
 [SR-RUNTIME-STATS](0125_runtime-stats.md) · [SR-GRAPH](0126_graph.md) ·
 [SR-REFER](0127_refer-plane.md) · [SR-TYPES](0128_types-list.md) ·
 [SR-CACHE](0131_cache.md) · [SR-RS](0133_predictions.md) ·

@@ -62,7 +62,7 @@ every flag `ask` takes and returns `ask`'s exact output shape.
 | `--phrase TEXT` | — | ✓ | keep docs whose local text has these words adjacent, in order |
 | `--under PREFIX` | — | ✓ | keep docs whose `loc` starts with PREFIX (plain string prefix) |
 | `--all` | — | ✓ | keep docs carrying every term of the positional query |
-| `--no-archived` | — | ✓ | drop docs declared archived (`archived=true` in the source list, or the record's own flag); the band still describes the unfiltered list |
+| `--no-archived` | — | ✓ | drop docs declared archived (`archived` in `.fux/sources.yaml`, or the record's own flag); the band still describes the unfiltered list |
 | `--fast` / `--scan` | ✓ | ✓ | accelerator vs reference scan — **identical results**, speed only |
 | `--no-tune` | ✓ | ✓ | ignore `.fux/config/tune.toml` |
 | `--no-output-config` | ✓ | ✓ | ignore `.fux/config/output.toml` |

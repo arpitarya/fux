@@ -551,8 +551,8 @@ body.present #progress{display:block}
   <p class="lede">Every slide after this one is detail on one of these five.</p>
 
   <ol class="pts">
-    <li><strong>Ingest.</strong> Two committed text files — <code>.fux/sources/dirs</code> and
-      <code>.fux/sources/urls</code>, one entry per line — say what to read. Each document is
+    <li><strong>Ingest.</strong> One committed file — <code>.fux/sources.yaml</code>, paths and URLs, includes
+      only — says what to read. Each document is
       fetched, decoded, analysed into five fields, written out as statistics, and
       <strong>the content is thrown away</strong>.</li>
     <li><strong>The committed plane.</strong> <code>.fux/index/</code> — 256 JSONL shards, one
@@ -2240,9 +2240,9 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
         <text x="596" y="100" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1">YOUR REPO — ANYTHING YOU INSTALLED</text>
 
         <rect x="40" y="112" width="240" height="84" rx="10" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.7"/>
-        <text x="56" y="136" font-size="12" fill="var(--d-ink)" font-weight="600">.fux/sources/urls</text>
-        <text x="56" y="156" font-size="10.5" fill="var(--d-body)">one URL per line, plus</text>
-        <text x="56" y="172" font-size="10.5" fill="var(--d-body)">fetch= and ttl= attributes</text>
+        <text x="56" y="136" font-size="12" fill="var(--d-ink)" font-weight="600">.fux/sources.yaml</text>
+        <text x="56" y="156" font-size="10.5" fill="var(--d-body)">one entry per URL, with</text>
+        <text x="56" y="172" font-size="10.5" fill="var(--d-body)">fetch, decoder and ttl</text>
         <text x="56" y="189" font-size="10.5" fill="var(--d-dim)">routing is DECLARED, not sniffed</text>
 
         <rect x="296" y="112" width="240" height="84" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>

@@ -11,7 +11,7 @@ feature: maintenance — the hooks, the deferring runner, the write lock, and th
 owns: [src/fux/maintain@fce3cec50c58, tools/maintenance-bench@1327184f960f, tools/runner-race@1d357606f738, src/fux/schemas/state.schema.json@fc7d0f478383, src/fux/acquire/urlstate.py@02bff7516346, src/fux/store/dirty.py@94e65bb0120f, src/fux/store/lastcited.py@f9d94f9e600b]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: a26ae8297c1c2a64057923dc92984da764da1b496c69c4bc1ae4385b2c1902d2
+content_sha: a46a2c96a6c13529005ca68326775eb748b73c8c85e44dbf8065145e4b8b7b2a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -302,7 +302,7 @@ Setup does not start the daemon (decision 9c stands), and decision 5a is
 untouched: the installed hooks run `--no-fetch` only.
 
 **5a. NO HOOK EVER TOUCHES THE NETWORK.** Without exception — **including** the
-commit that edits `.fux/sources/urls`, which is the exception that was
+commit that edits the `urls:` of `.fux/sources.yaml`, which is the exception that was
 specifically proposed and specifically refused.
 
 - ⚠ **The refused version was narrow and still wrong.** *"Fetch, but only for
@@ -326,7 +326,7 @@ specifically proposed and specifically refused.
   question 1, ruled (b) by Arpit): the daemon's job *is* freshness and it runs
   the bare verb; a git hook stays local-only and names its opt-out in the
   script, where anyone reading their own `.git/hooks/` can see it.
-- **The cost, stated:** URLs added by hand-editing `.fux/sources/urls` are not
+- **The cost, stated:** URLs added by hand-editing `.fux/sources.yaml` are not
   fetched at commit time. They wait for the daemon's next pass or an explicit
   `fux ingest`. That is a delay, not a silence — `fux doctor` reports them.
   🔴 **It did not, until 2026-09-12** (W-140 row 13). Every line of doctor's
@@ -976,7 +976,7 @@ evidence.*
 
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-CLI](0101_cli-surface.md) ·
 [SR-INGEST](0106_ingest.md) · [SR-INDEX-LIFECYCLE](0108_index-lifecycle.md) ·
-[SR-CONFIG](0113_config.md) · [SR-URL-LIST](0116_url-list.md) ·
+[SR-CONFIG](0113_config.md) · [SR-SOURCES](0116_url-list.md) ·
 [SR-GRAPH](0126_graph.md) · [SR-REFER](0127_refer-plane.md) ·
 [SR-MERGE-DRIVER](0130_merge-driver.md)
 

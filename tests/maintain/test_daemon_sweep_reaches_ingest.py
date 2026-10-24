@@ -24,7 +24,7 @@ not been, and this is what was underneath.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs, write_urls
 import ast
 from importlib import import_module
 from pathlib import Path
@@ -47,8 +47,8 @@ def repo(tmp_path, monkeypatch):
     )
     sources = tmp_path / ".fux" / "sources"
     sources.mkdir(parents=True)
-    (sources / "dirs").write_text("docs\n", encoding="utf-8")
-    (sources / "urls").write_text("", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
+    write_urls(tmp_path, "")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)

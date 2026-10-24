@@ -11,7 +11,7 @@ from fux import store as store_mod
 from fux.refer import Policy, refer
 from fux.refer.arc import ARC
 from fux.acquire.freshness import ALWAYS, NEVER
-from l12_fixtures import template_tune, write_config
+from l12_fixtures import template_tune, write_config, write_urls
 from l12_fixtures import template_fux_toml
 
 _TIMEOUT = template_fux_toml()["refer"]["timeout_seconds"]
@@ -50,7 +50,7 @@ def _list_url(root, url, decoder="prose"):
     write_config(root)  # every other key from the template (SR-LAW-12)
     listing = root / ".fux" / "sources" / "urls"
     listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text(f"{url} fetch=http decoder={decoder}\n", encoding="utf-8")
+    write_urls(root, f"{url} fetch=http decoder={decoder}\n")
 
 
 def _sha(text: str) -> str:

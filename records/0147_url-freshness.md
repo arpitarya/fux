@@ -11,7 +11,7 @@ feature: the freshness verdict vocabulary and the per-URL check interval
 owns: [src/fux/acquire/freshness.py@972f2be4435c, node/src/refer/freshness.mjs@108aa7da8d74]
 laws: [L3, L4, L5]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 8849ebb0962715fcf971dc4f109d0b6571e405b9ba5b29be55502090a8998765
+content_sha: 533210752177058770783a548c095262b154cbb06f73dd9f125d152e28203977
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -25,7 +25,7 @@ content_sha: 8849ebb0962715fcf971dc4f109d0b6571e405b9ba5b29be55502090a8998765
 
 - [`node/src/refer/source.mjs`](../node/src/refer/source.mjs) · owned by [SR-REFER](0127_refer-plane.md)
 - [`src/fux/acquire/source.py`](../src/fux/acquire/source.py) · owned by [SR-REFER](0127_refer-plane.md)
-- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py) · owned by [SR-SOURCES](0116_url-list.md)
 - [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
 - [`src/fux/config.py::UrlSource,_load_url_source`](../src/fux/config.py) · owned by [SR-CONFIG](0113_config.md)
 - [`src/fux/refer/__init__.py`](../src/fux/refer/__init__.py) · owned by [SR-REFER](0127_refer-plane.md)
@@ -238,7 +238,7 @@ docstring.
     would drift.
 
     ⚠ **The FIRST, and no longer the only one on this list** (2026-09-15).
-    `fetch=` became typed with [SR-URL-LIST](0116_url-list.md) decision 15, and
+    `fetch=` became typed with [SR-SOURCES](0116_url-list.md) decision 15, and
     that is what forced `Attribute` to carry its own header `placeholder`:
     `_urls_header()` had hardcoded `<duration>` for every attribute with no
     `values`, which was indistinguishable from correct while `ttl` was alone.
@@ -379,7 +379,7 @@ rather than through a second copy ([SR-CONFIG](0113_config.md) decision 12).
     | attribute | when it acts | what it decides |
     |---|---|---|
     | **`ttl=`** *(this record)* | **ask time** — inside `fux answer` | how long a citation may go **unchecked** before fux re-verifies it |
-    | **`update=`** ([SR-URL-LIST](0116_url-list.md) decision 14) | **update time** — a networked `fux ingest`, `--refetch-all` included | whether fux goes back for the document **at all** |
+    | **`update=`** ([SR-SOURCES](0116_url-list.md) decision 14) | **update time** — a networked `fux ingest`, `--refetch-all` included | whether fux goes back for the document **at all** |
 
     - **`ttl=0` is not `update=never`.** `ttl=0` means *check on every answer*
       — maximally networked. `update=never` means *never fetch again* —
@@ -458,7 +458,7 @@ record's own module docstring names — *"CI, or a replayed `--audit` bundle:
 | attribute | when it acts | what it decides |
 |---|---|---|
 | **`ttl=`** | ask time | how long a citation may go **unchecked** |
-| **`update=`** ([SR-URL-LIST](0116_url-list.md) decision 14) | update time | whether fux goes back for the document **at all** |
+| **`update=`** ([SR-SOURCES](0116_url-list.md) decision 14) | update time | whether fux goes back for the document **at all** |
 | **`fetch_at_answer`** *(new)* | **ask time** | whether a socket may open **at all** |
 
 - **The name states its clock, which is the entire reason it is three words.**
@@ -527,7 +527,7 @@ owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
 **2026-09-21 — `from_acquired` decodes a blob by the LINE's `decoder=`**
-(the pipe ruling; [SR-URL-LIST](0116_url-list.md) decision 17).
+(the pipe ruling; [SR-SOURCES](0116_url-list.md) decision 17).
 
 Decision 6's rule stands exactly as written — `from_acquired` **imports**
 `_decode_fetched` and `sanitize` rather than reimplementing them, because a
@@ -636,7 +636,7 @@ asserts the prose no longer says *four-state*.
   journal already existed, and where it is off there is no number to have.
 - **`ttl=` bounds the TTL fetch cache and nothing else, and nothing is owed**
   (ruled 2026-10-04, W-251 §4 #5). `ttl` is ask-time (decision 15); `update=`
-  is the only update-time attribute ([SR-URL-LIST](0116_url-list.md) decision
+  is the only update-time attribute ([SR-SOURCES](0116_url-list.md) decision
   14); the daemon's one clock is `[sources.url] sweep_minutes`
   ([SR-MAINTENANCE](0129_hooks.md) decision 9d, no adaptive scheduling). A
   `ttl`-ordered sweep would be the third clock decision 15 forbids.
@@ -724,7 +724,7 @@ document is never listed here — the body may name one, but archive is not
 evidence.*
 
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-DOTFUX](0102_fux-directory.md) ·
-[SR-URL-LIST](0116_url-list.md) · [SR-FETCHER](0117_fetcher.md) ·
+[SR-SOURCES](0116_url-list.md) · [SR-FETCHER](0117_fetcher.md) ·
 [SR-REFER](0127_refer-plane.md) · [SR-CACHE](0131_cache.md) ·
 [SR-PROVENANCE](0142_provenance.md) · [SR-ACQUIRED](0145_acquired-plane.md) ·
 [SR-REFUSAL](0146_refusals.md)

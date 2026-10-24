@@ -53,12 +53,12 @@ scope docs/adr (enrich=true) — filtered to records/0111_ranking.md
 ```
 
 **`TARGET` is exact** — the loc as the index spells it, or the URL as
-`.fux/sources/urls` spells it. Not a prefix, not a glob. If you are unsure of
+`.fux/sources.yaml` spells it. Not a prefix, not a glob. If you are unsure of
 the spelling, run `fux enrich --plan` with no target and read it off the plan.
 
-**`TARGET` filters; it does not widen.** A document no `enrich=true` line
+**`TARGET` filters; it does not widen.** A document no `enrich` declaration
 reaches is not enrichable, and naming it will tell you so rather than doing it.
-Which directories get enriched is a human's decision — never add `enrich=true`
+Which directories get enriched is a human's decision — never add a path to `enrich:`
 yourself.
 
 ### 🔴 More than one document in the plan? Ask.

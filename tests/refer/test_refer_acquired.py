@@ -13,7 +13,7 @@ import pytest
 from fux.errors import FuxError
 from fux.acquire import source as source_mod
 from fux.store import acquired
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_urls
 
 DOC = "url:https://x/share/TOKEN"
 LOC = "https://x/share/TOKEN"
@@ -40,7 +40,7 @@ def _retain(root, raw=PAGE, ctype=HTML, loc=LOC, decoder="html"):
         write_config(root)  # every other key from the template (SR-LAW-12)
         listing = root / ".fux" / "sources" / "urls"
         listing.parent.mkdir(parents=True, exist_ok=True)
-        listing.write_text(f"{loc} fetch=http decoder={decoder}\n", encoding="utf-8")
+        write_urls(root, f"{loc} fetch=http decoder={decoder}\n")
     return blob
 
 

@@ -11,7 +11,7 @@ one URL, and `fux ingest` (law L5, [SR-CLI](../../records/0101_cli-surface.md)
 decision 1e). A plain ingest never imports a fetcher.
 
 The URL list is a committed *file*, `.fux/sources/urls`, parsed by the one
-shared grammar in `sourcelist.py` (SR-URL-LIST).
+shared grammar in `sourcelist.py` (SR-SOURCES).
 
 **Routing is declared, never detected** (SR-FETCHER decision 5). A line's
 `fetch=` names a fetcher, and a name resolves to `<fetchers dir>/<name>.py` —
@@ -20,7 +20,7 @@ relocates their fetchers relocates all of them with one key. Nothing escalates
 from one fetcher to another: a plain GET that returns a rendered shell returns
 a rendered shell, and a human writes `fetch=cdp` on that line.
 
-**Three layers, and the same order for every attribute** (SR-URL-LIST
+**Three layers, and the same order for every attribute** (SR-SOURCES
 decision 10): the built-in default, then the source-wide `[sources.url]`
 setting, then the line. `[sources.url] fetcher` is the source-wide setting for
 `fetch` (its stem is the fetcher name). A line beats both, and only ever for its
@@ -107,7 +107,7 @@ class UrlEntry:
     #: layer, because `archived` is a fact about one document rather than a
     #: policy about how to reach a source.
     archived: bool = False
-    #: SR-URL-LIST: whether `fux ingest` goes out for this URL **at all**.
+    #: SR-SOURCES: whether `fux ingest` goes out for this URL **at all**.
     #: `"auto"` is today's behaviour; `"never"` pins the document and no socket
     #: is opened for it -- the fetcher is not even resolved, so a consumer's
     #: fetcher module is never imported on its account.
@@ -191,12 +191,13 @@ def read_urls(root: Path, rel_path: str) -> list[sourcelist.Entry]:
     applied by `resolve_urls`, which is the only place that knows about
     `[sources.url]`.
     """
-    return sourcelist.read(
+    from . import sourcesfile
+
+    return sourcesfile.read_urls(
         root,
         rel_path,
-        sourcelist.URLS,
         missing_hint=(
-            "create it with one URL per line (`fux add <URL>` writes one for you), "
+            "list a URL under `urls:` in it (`fux add <URL>` writes the entry for you), "
             "or remove [sources.url] from fux.toml"
         ),
     )
@@ -1054,7 +1055,7 @@ def _unpack(result, fetcher: str) -> tuple[bytes | None, str]:
     ⚠ **A `str` is refused, as of 3.0 (W-253).** The bare-`str` ramp protected
     fetchers written before 2026-08-26 from a contract they had not read;
     3.0.0-alpha.2 already made every such repository rewrite its URL lines
-    (SR-URL-LIST decisions 16-17), so it protected nothing the major had not
+    (SR-SOURCES decisions 16-17), so it protected nothing the major had not
     broken. The refusal is a `FuxError` naming the fetcher and the contract; the
     ingest loop turns it into a named skip of that URL, never a crash
     (SR-FETCHER decision 2).
@@ -1254,7 +1255,7 @@ def declared_decoder(root: Path, loc: str) -> str | None:
         return None
     if config.url is None:
         return None
-    path = root / config.url.urls_file
+    path = root / config.url.sources_file
     try:
         stat = path.stat()
     except OSError:
@@ -1271,9 +1272,9 @@ def _declared_decoders(path: str, mtime_ns: int, size: int) -> dict[str, str]:
     an edit must be seen without restarting the process.
     """
     try:
-        entries = sourcelist.parse(
-            Path(path).read_text(encoding="utf-8"), sourcelist.URLS, origin=path
-        )
+        from . import sourcesfile
+
+        entries = sourcesfile.parse(Path(path).read_text(encoding="utf-8"), origin=path).urls
     except (OSError, FuxError):
         return {}
     return {e.value: e.attrs["decoder"] for e in entries if not e.exclude}

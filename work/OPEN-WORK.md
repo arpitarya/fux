@@ -40,8 +40,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🟢 **W-294** · `agent` — `.fux/sources.yaml`; `.fuxignore` the only exclusion. ⚠ Half built, not on `main`: WIP on its branch (`c42c45ee`). **Opus.** Filed by Arpit (Cowork). [detail](open/W-294-one-sources-file.md)
-- 🔴 **W-289** · `arpit` — plugin packages on `main`. Arpit: upload fetcher-http + extension-table, then publisher; Claude Code: ruling 1. Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
+- 🔴 **W-289** · `arpit` — plugin packages on `main`. Arpit: upload fetcher-http + extension-table, then publisher (ruling 1 built 2026-10-24). Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
 - 🔴 **W-292** · `arpit` — built on `main` (npm-only Node reader); Arpit confirms two L10 rationale edits; fig-12 not redrawn. Filed by Arpit (Cowork). [detail](open/W-292-node-reader-npm-only.md)
 
 

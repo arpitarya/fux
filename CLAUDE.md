@@ -427,7 +427,7 @@ is the surrounding process:
   the ladder, the rungs and what a result may claim are in
   [`work/golden/README.md`](work/golden/README.md).
 - 🔴 **The guards are the defence again, because there is something on disk.**
-  `.gitignore`; `!work/golden` in `.fux/sources/dirs`; `permissions.deny` in
+  `.gitignore`; `/work/golden` in `.fux/.fuxignore`; `permissions.deny` in
   `.claude/settings.json`; `.claude/hooks/guard-golden-answer.sh`, which matches
   what a tool call *targets* and fails closed; the generated law block itself;
   and two tests — `test_golden_key_guards.py`, which fails if a guard stops

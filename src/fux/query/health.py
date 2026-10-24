@@ -224,13 +224,16 @@ def _priority_keys(root: Path) -> Check:
     except FuxError:
         return Check(name, True, "not assessed - fux.toml does not load; see its row")
 
+    from ..acquire import sourcesfile
+
     entries: list[str] = []
-    for rel, spec in ((config.dirs_file, sourcelist.DIRS), (config.url.urls_file, sourcelist.URLS)):
-        try:
-            parsed = sourcelist.parse((root / rel).read_text(encoding="utf-8"), spec, origin=rel)
-        except (OSError, FuxError):
-            continue
-        entries.extend(e.value for e in parsed if not e.exclude)
+    try:
+        parsed = sourcesfile.parse(
+            (root / config.sources_file).read_text(encoding="utf-8"), origin=config.sources_file
+        )
+        entries = [e.value for e in (*parsed.paths, *parsed.urls)]
+    except (OSError, FuxError):
+        pass
 
     def reaches(key: str, entry: str) -> bool:
         probe = math.inf

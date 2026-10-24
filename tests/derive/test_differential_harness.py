@@ -20,7 +20,7 @@ occurrence of a failure class.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import sys
 from pathlib import Path
 
@@ -38,11 +38,10 @@ PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
 
 def _repo(tmp_path: Path, files: dict[str, bytes]) -> Path:
     (tmp_path / "fux.toml").write_text(
-        '[sources]\ndirs_file = ".fux/sources/dirs"\n', encoding="utf-8"
+        '[sources]\nsources_file = ".fux/sources.yaml"\n', encoding="utf-8"
     )
     (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
-    (tmp_path / ".fux" / "sources").mkdir(exist_ok=True)
-    (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     (config_file(tmp_path, "pii")).write_text("[rules]\n", encoding="utf-8")
     write_config(tmp_path)
     for rel, blob in files.items():

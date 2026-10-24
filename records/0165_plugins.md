@@ -6,12 +6,12 @@ title: "SR-PLUGINS (0165) — plugin packages: declared, pinned, refused loudly"
 description: "Only the engine is mandatory. Every decoder, fetcher and extension package is declared per repository in a committed `.fux/config/plugins.toml`, pinned to a version and digest, loaded by one fixed import name, and refused loudly when missing or drifted — so two machines on one repository can never build different indexes."
 status: accepted
 date: 2026-10-19
-amended: 2026-10-20
+amended: 2026-10-24
 feature: plugin packages — the declaration, its verification, the loader and the scan that proposes it
-owns: [src/fux/plugins.py@c64e7b1e0b2b, .fux/config/plugins.toml@988b44457549, tests/test_plugins.py@52c673190765, tests/test_plugin_fence.py@8ce1c2309be8, tests/test_plugin_packages.py@68333db84fa1, tests/test_plugin_registry.py@036392d7b916]
+owns: [src/fux/plugins.py@6af2c97d5fe2, .fux/config/plugins.toml@988b44457549, tests/test_plugins.py@ca27d984782e, tests/test_plugin_fence.py@8fc6dba932ed, tests/test_plugin_packages.py@68333db84fa1, tests/test_plugin_registry.py@036392d7b916]
 laws: [L2, L4, L5, L12]
 timestamp: 2026-10-19T00:00:00Z
-content_sha: 8b51cf9d443499cdb54192e6bd9f3410930d0c8d154e35bfbf3b71c8abd13267
+content_sha: 797ed2c20306483733c86c14375cd917b96cc0d30777f798fc1c5ba28d9473d6
 ratifies: "Arpit, 2026-10-19 (Cowork), on W-289: 'maybe we can build out a mechanism of extensions, decoders, plugins, and fetchers as separate packages that can be plugged into Fox' -> 'I want to go with the third option' (C: declared, pinned, committed) -> 'i like the recommendation now create a list what are mandatory and what are optional. because we dont need all' -> 'fux-decoder-json and config should also be optional only use if needed' -> 'okay file a work item for this', given in reply to confirming the SR-LAW-2 wording"
 ---
 
@@ -165,10 +165,10 @@ a skip is written into `.fux/.fuxignore`, and a generated line there would keep 
 file out after the package is declared. A corpus that loses its PDFs looks exactly
 like one that never had any.
 
-**P6. `fux setup` scans and proposes; it installs nothing.** It walks the configured
-directories — the same roots, `!` exclusions and hand-written `.fuxignore` lines
-ingest honours, **pruning an excluded directory rather than entering it** — reads the
-URL list's `fetch=` and `decoder=` names, adds the HTML decoder for any fetcher, closes
+**P6. `fux setup` scans and proposes; it installs nothing.** It walks the paths
+`.fux/sources.yaml` lists — the same roots and hand-written `.fuxignore` lines
+ingest honours, **pruning an ignored directory rather than entering it** — reads the
+`fetch` and `decoder` of each URL entry there, adds the HTML decoder for any fetcher, closes
 over dependencies, writes the declaration and prints **one** install line. On a later
 run it adds a row the sources now need, pins a row that has no digest once its package
 is installed, and removes nothing. **`fux setup --pin`** re-pins every row from what is

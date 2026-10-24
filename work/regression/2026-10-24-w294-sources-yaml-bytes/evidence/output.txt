@@ -1,0 +1,8 @@
+# run 2026-10-24, base cc2e8599 (main after W-289 ruling 1), new = branch w294-sources-yaml
+# A: main's engine (main checkout .venv), old .fux/sources/{dirs,urls}: ingest, committed f9902f56 (scratch)
+# B, incremental:  ingested 2453 docs (0 changed, 2453 carried forward), 684 not indexed, 3 skipped, 0 shards written
+#                  git diff --stat -- .fux/index   -> (empty)
+# B, --full:
+ingested 2453 docs (0 changed, 0 carried forward), 684 not indexed, 3 skipped, 0 shards written
+index diff lines: 0
+ 1 file changed, 5 insertions(+), 1 deletion(-)

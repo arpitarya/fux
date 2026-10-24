@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@fb19d0082a5b, src/fux/enrich.py@ebab4545a960, src/fux/templates/agents/ENRICH-SKILL.md@88371e2428e7, node/src/correct.mjs@fafeb8b35584, node/test/pins.test.mjs@daebcdb98aac, src/fux/store/corrections.py@be66e8efb505, src/fux/store/enrichfile.py@2f1d9142b1b1]
+owns: [src/fux/correct.py@fb19d0082a5b, src/fux/enrich.py@bdf3d2863f81, src/fux/templates/agents/ENRICH-SKILL.md@9279a34f85d7, node/src/correct.mjs@fafeb8b35584, node/test/pins.test.mjs@daebcdb98aac, src/fux/store/corrections.py@be66e8efb505, src/fux/store/enrichfile.py@2f1d9142b1b1]
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: efdf66369fde8e445f2b68c00b363ec4040b0def5dfa2f9e968192000a263a38
+content_sha: 21f65a6044d0fd668f77bdad98a46fb536a7e0e3c644d1c6dd2f02fdcf4009a6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -61,7 +61,7 @@ flowchart LR
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-  a declared scope (enrich=true on a .fux/sources/dirs line)
+  a declared scope (a path in the enrich: list of .fux/sources.yaml)
         |
         v
   fux enrich --plan      what is MISSING or STALE, per document, by source sha
@@ -136,8 +136,8 @@ of decision 1**: provenance downgrades from *measured* to *declared*, mitigated
 by shape validation and by the fact that enrichment lands as a reviewable diff.
 
 **4. Scope is DECLARED, plus what ingest QUEUED because a model is needed.**
-The declared half is `enrich=true` on a `.fux/sources/dirs` line, the same
-closed-attribute grammar as `archived`, for the same reason: **a path heuristic
+The declared half is a path in the `enrich:` list of `.fux/sources.yaml`, the
+same flag-list shape as `archived`, for the same reason: **a path heuristic
 is exact for the repo that invented it and a silent convention for everyone
 else.** Enrichment costs money and changes ranking, so which directories get it
 is a human decision written in a diffable line.
@@ -545,9 +545,9 @@ see [SR-REFER](0127_refer-plane.md) decision 18 and
 **11. A `url:` document is enrichable, under one synthetic scope**
 ([SR-PII](0148_pii.md), 2026-09-01). `enrich=` joins the URL list's attribute
 set and resolves through the same three layers as `keep` and `ttl`; every URL
-that opts in reports under a single scope named `.fux/sources/urls`.
+that opts in reports under a single scope named `.fux/sources.yaml`.
 
-- **One scope, not one per host.** A `dirs` scope is a path prefix, which is a
+- **One scope, not one per host.** A path scope is a path prefix, which is a
   grouping a human actually chose. A URL list has no such structure — its lines
   share nothing but being URLs — so per-host scopes would report coverage
   against a grouping nobody declared. Decision 4's *declared, never derived*
@@ -680,7 +680,7 @@ a missing blob already is — never a crash inside a planning command.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
-**`fux enrich`'s scopes read the CONFIGURED `[sources] dirs_file`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). They read the template's `.fux/sources/dirs` even in a repo whose `fux.toml` names another list — the stage-3b doctor precedent. Only such a repo sees a change.
+**`fux enrich`'s scopes read the CONFIGURED `[sources] sources_file`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28) — never a template path, so a repo whose `fux.toml` names another list is read as it says.
 
 **`enrich --check` paints a `check` bar over the enrichment files it opens** (W-238, 2026-09-29; [SR-CLI](0101_cli-surface.md) decision 17). Its self-retrieval filter ranks one query per question: 105 s for 300 files at `rung-10000`. `plan(progress=)` counts only documents that HAVE a file, and paints only when `self_retrieval_k > 0`, so `--plan` stays silent. `enrich` gained `--progress` / `--no-progress` and `--no-output-config`. The report is byte-identical.
 
@@ -688,7 +688,7 @@ a missing blob already is — never a crash inside a planning command.
 
 **No decision here moved** (W-254, 2026-10-04): `enrich._chunk_count` passes `frontmatter=False` to the chunker, so an enrichment unit count is what it was before the frontmatter passage existed.
 
-**No decision here moved** (W-261, 2026-10-05): `enrich_dirs` is imported from `acquire/dirlist.py` (SR-DIR-LIST's) instead of `acquire/gitdir.py`; it reads the same committed declaration.
+**No decision here moved** (W-261, 2026-10-05): the enrich scope reader is `sourcesfile.enrich_paths` (SR-SOURCES's), not `acquire/gitdir.py`; it reads the same committed declaration.
 
 
 **W-236 (2026-10-10; branch `w236-sections`, unmerged) — the Node pin row, made equal to Python's.** `node/src/correct.mjs` builds the row for a pinned document the ranking never returned. It now carries `boosted: false` and `route: null`, as Python's `AskResult` always did. That was a parity gap from before W-236, found by its twin test. The row also carries `section: null` while `[ranking] section_weight > 0` ([SR-SECTIONS](0161_sections.md) decision 6).
@@ -735,7 +735,7 @@ a missing blob already is — never a crash inside a planning command.
   [`src/fux/templates/agents/ENRICH-SKILL.md`](../src/fux/templates/agents/ENRICH-SKILL.md);
   the tests — [`tests/test_enrich.py`](../tests/test_enrich.py).
 - The contract this inherits — SR-ENRICHED; the scope
-  grammar — [SR-DIR-LIST](0120_dir-list.md); the field it feeds —
+  grammar — [SR-SOURCES](0116_url-list.md); the field it feeds —
   [SR-RANKING](0111_ranking.md) decision 1.
 - The authorship rule that governs *measuring* enrichment —
   [SR-RS](0133_predictions.md) decisions 11–15.
@@ -796,7 +796,7 @@ evidence.*
 
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-RANKING](0111_ranking.md) ·
 SR-ENRICHED · [SR-FETCHER](0117_fetcher.md) ·
-[SR-DIR-LIST](0120_dir-list.md) · [SR-AGENT-POLICY](0132_agent-policy.md) ·
+[SR-SOURCES](0116_url-list.md) · [SR-AGENT-POLICY](0132_agent-policy.md) ·
 [SR-RS](0133_predictions.md) · [SR-TUNE](0135_tuning.md)
 
 **Code**

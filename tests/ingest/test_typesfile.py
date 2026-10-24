@@ -107,7 +107,7 @@ def test_an_editor_refuses_a_layout_it_did_not_write(text, edit):
 
 
 def test_the_reader_accepts_every_layout_the_editor_refuses():
-    """Reader lenient, writer strict (SR-URL-LIST decision 13, kept)."""
+    """Reader lenient, writer strict (SR-SOURCES decision 13, kept)."""
     listed = typesfile.parse('include = ["*.md", "*.txt"]\ndecoders = { csv = "csv" }\n', origin=ORIGIN)
     assert listed.allow == ("*.csv", "*.md", "*.txt")
 

@@ -18,7 +18,7 @@ from pathlib import Path
 from .. import store as store_mod
 from ..config import load as load_config
 from ..errors import FuxError
-from ..acquire import sourcelist, urlsrc
+from ..acquire import sourcelist, sourcesfile, urlsrc
 
 __all__ = ["listed_url_ids", "observe_url_health", "reacquire_urls", "report_dead_urls"]
 
@@ -62,7 +62,7 @@ def reacquire_urls(
     if config.url is None:
         return {}, [], set()
     try:
-        resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
+        resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.sources_file), config.url)
     except (FuxError, OSError):
         return {}, [], set()
     entries = {f"url:{entry.url}": entry for entry in resolved}
@@ -176,11 +176,10 @@ def listed_url_ids(root: Path, config, existing_urls: dict[str, dict]) -> set[st
     """
     if not existing_urls:
         return set()
-    rel_path = config.urls_file
-    entries = sourcelist.read(
+    rel_path = config.sources_file
+    entries = sourcesfile.read_urls(
         root,
         rel_path,
-        sourcelist.URLS,
         missing_hint=(
             f"the index holds {len(existing_urls)} url document(s) and nothing says which URLs "
             "belong to this corpus. Restore the file, or run `fux remove <URL>` for each"

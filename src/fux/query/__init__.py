@@ -93,7 +93,7 @@ def _archived_ranking(
 
     The weights come from `.fux/config/tune.toml` (SR-TUNE decision 7 moved them out
     of `fux.toml`); the archived *declaration* still comes from the committed
-    dirs list, never from a path convention (SR-DIR-LIST decision 4).
+    dirs list, never from a path convention (SR-SOURCES (paths are declared, never derived)).
 
     Degrades to no archived directories when there is no `fux.toml` at all or
     the dirs list can't be read — the tolerance `_root()` already extends to a
@@ -104,14 +104,14 @@ def _archived_ranking(
     file is not covered by the tolerance either**; see `_tune`.
     """
     from ..config import CONFIG_NAME, load as load_config
-    from ..acquire.dirlist import archived_dirs
+    from ..acquire.sourcesfile import archived_paths
 
     if not (root / CONFIG_NAME).is_file():
         dirs: frozenset[str] = frozenset()
     else:
-        dirs_file = load_config(root).dirs_file
+        sources_file = load_config(root).sources_file
         try:
-            dirs = frozenset(archived_dirs(root, dirs_file))
+            dirs = frozenset(archived_paths(root, sources_file))
         except FuxError:
             dirs = frozenset()
     return (
@@ -862,7 +862,7 @@ def _declare_archived(results) -> None:
 
     The note carries **the rule, not a hedge** — it says what an archived
     document *is* and does not tell the reader what to conclude from it.
-    Intent-neutral by SR-DIR-LIST decision 12: Fux ships facts, not policy.
+    Intent-neutral by SR-ARCHIVED-CONTENT decision 3: Fux ships facts, not policy.
 
     ⚠ **The `(demoted, weight N)` clause is GONE**, with `archived_weight`
     itself (2026-09-13, W-152). Being retired can no longer move a score, so

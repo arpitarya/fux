@@ -24,7 +24,7 @@ import pytest
 
 from fux.ingest.run import STALE_REDACTION_FILE, run
 from fux.store import acquired, read_index
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_dirs, write_urls
 
 LOC = "https://wiki/runbook"
 HTML = "text/html; charset=utf-8"
@@ -41,8 +41,8 @@ RULE = '[[rule]]\nname = "token"\npattern = "zarquon[0-9]{4}"\n'
 def _repo(tmp_path, *, keep=True):
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
     line = f"{LOC} fetch=http decoder=html keep={'true' if keep else 'false'}\n"
-    (tmp_path / ".fux" / "sources" / "urls").write_text(line, encoding="utf-8")
-    (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    write_urls(tmp_path, line)
+    write_dirs(tmp_path, "docs\n")
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text(

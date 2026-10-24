@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@a5cfad43263c, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@277ffe5a13a7]
+owns: [src/fux/config.py@e47677f7b167, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@6e3eebd5c8ee]
 laws: [L5, ex-L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 4a783c6327feb4afa19bbfd0f6d3edb428ad35f577711d09ee39b68ca7a03fca
+content_sha: 378d56dd99670445d6f8fd991734ffeaeb6fb13acfde788422f3a29404d808da
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -28,8 +28,8 @@ content_sha: 4a783c6327feb4afa19bbfd0f6d3edb428ad35f577711d09ee39b68ca7a03fca
 ## §1 — For humans
 
 `fux.toml` is **policy. The source lists are the corpus.** That split is why
-the file is so small: what gets indexed lives in `.fux/sources/dirs`, one entry
-per line, and this file only says how the engine behaves.
+the file is so small: what gets indexed lives in `.fux/sources.yaml`, and this
+file only says how the engine behaves.
 
 **Every key is required** ([SR-LAW-12](0014_LAW-12-values-live-in-config.md),
 decision 17 below). Fux holds no copy of any value in code, so a missing key
@@ -62,7 +62,7 @@ and diagnoses a ranking problem instead of a config one.
 ```mermaid
 flowchart TD
     F["fux.toml"] --> S["[sources]"]
-    S --> D["dirs_file · urls_file — REQUIRED<br/>the two source lists"]
+    S --> D["sources_file — REQUIRED<br/>the one include list"]
     S --> U["[sources.url] — optional TABLE<br/>absent = fetch nothing"]
     U --> ME["keep · ttl · enrich · update<br/>source-wide LAYERS — a URL line wins"]
     U --> MP["max_parallel · sweep_minutes<br/>fetch_at_answer · acquired_max_bytes<br/>thin_words · thin_words_per_kb<br/>failing_streak · parallel_warn_at"]
@@ -91,8 +91,7 @@ flowchart TD
    fux.toml
      |
      +-- [sources]                  every key REQUIRED
-     |     +-- dirs_file       path of the directory list
-     |     +-- urls_file       path of the URL list
+     |     +-- sources_file    path of the include list (paths + URLs)
      |     |
      |     +-- [sources.url]   optional TABLE -- absent = fetch nothing;
      |           |             present = every key below REQUIRED
@@ -147,8 +146,7 @@ Everything the loader reads, annotated:
 
 ```toml
 [sources]
-dirs_file = ".fux/sources/dirs"         # the directory list
-urls_file = ".fux/sources/urls"         # one URL per line, a file not an array
+sources_file = ".fux/sources.yaml"     # paths and URLs, a file not an array
 
 [sources.url]                           # PRESENT: this repo fetches
 keep            = true                  # retain fetched bytes in .fux/acquired/
@@ -230,13 +228,11 @@ extending it is visibly a decision rather than a convenience.
 error in the loader — the caller decides whether it is fatal, which is why
 `fux doctor` can report on a directory that `fux ask` refuses.
 
-**2. `fux.toml` is policy; the source lists are the corpus.** `[sources]
-dirs_file` says where the directory list is ([SR-DIR-LIST](0120_dir-list.md)
-decision 1) and `urls_file` where the URL list is (decision 11a). ⚠ **Amended
-2026-09-27 (W-225 stage 3b):** this read *"there are no required tables: a
-file holding nothing but `[index] shards` is valid"*, and `dirs_file`
-*"defaults to `.fux/sources/dirs`"*. Since [SR-LAW-12](0014_LAW-12-values-live-in-config.md)
-every key is required and nothing defaults — decision 17.
+**2. `fux.toml` is policy; the source list is the corpus.** `[sources]
+sources_file` says where the include list is — paths and URLs in one file
+([SR-SOURCES](0116_url-list.md); decision 11a). Since
+[SR-LAW-12](0014_LAW-12-values-live-in-config.md) every key is required and
+nothing defaults — decision 17.
 
 **3. `[index] shards` documents 256 and cannot change it.** Supplying any other
 value is an error, not a silent override: the shard function is
@@ -247,12 +243,9 @@ tree. The key exists so the number is *visible* rather than folklore.
 `fux ingest` has nothing to do. **Its absence is the one absence L12 leaves
 legal**, because it is a setting rather than a missing value (decision 17).
 
-**5. `fetcher` and `urls_file` default to `.fux/fetchers/http.py` and
-`.fux/sources/urls`.** ⚠ **Superseded twice, and kept as history:** `fetcher`
-was deleted by decision 16 (2026-09-20), `urls_file` moved to `[sources]` by
-decision 11a (2026-09-14), and since W-225 stage 3b (2026-09-27) neither path
-has a default — `urls_file` is required, and its template value is the
-declared `.fux/` layout ([SR-DOTFUX](0102_fux-directory.md)).
+**5. Neither the fetcher nor the source list has a default path.** `fetcher`
+was deleted by decision 16, and `sources_file` is required with the declared
+`.fux/` layout as its template value ([SR-DOTFUX](0102_fux-directory.md)).
 
 ⚠ **This said *"a URL line carrying no `fetch=` means `fetch=http`"* until
 2026-09-12, and it contradicted the next paragraph** (W-140 row 10). A bare line
@@ -425,9 +418,11 @@ exists.
 
 | retired | says |
 |---|---|
-| `[sources.url] urls` | put one URL per line in `.fux/sources/urls` |
+| `[sources.url] urls` | list each URL under `urls:` in the file `[sources] sources_file` names |
 | `[sources.url] middleware` | renamed to `fetcher`; move the file to `.fux/fetchers/` ([SR-FETCHER](0117_fetcher.md) decision 7) |
-| `[sources] dirs` | put one directory per line in `.fux/sources/dirs`; a line may carry `archived=true` ([SR-DIR-LIST](0120_dir-list.md) decision 1) |
+| `[sources] dirs` | list each path under `paths:` in the file `[sources] sources_file` names ([SR-SOURCES](0116_url-list.md)) |
+| `[sources] dirs_file` · `urls_file` | replaced by one `sources_file` (W-294); run `fux setup`, which converts both lists into `.fux/sources.yaml` (their `!` lines move to `.fux/.fuxignore`), writes the new key and deletes the old one |
+| `[sources.url] urls_file` | URLs are listed under `urls:` in the file `[sources] sources_file` names |
 | `[ranking]` (whole table) | moved to `.fux/config/tune.toml`; run `fux setup` to write the file, move the keys across, delete the table ([SR-TUNE](0135_tuning.md) decision 7) |
 | `[decode]` (whole table) | moved to `.fux/config/tune.toml [index]` on 2026-09-11 (Arpit), beside `max_phrases`; move `max_table_rows` across and delete the table ([SR-TUNE](0135_tuning.md) decision 13) |
 | a policy file at `.fux/<name>.toml` | moved to `.fux/config/<name>.toml` (W-295); `fux setup` moves it, every other verb stops saying so ([SR-DOTFUX](0102_fux-directory.md) decision 11) |
@@ -458,21 +453,18 @@ non-negative numbers with **`bool` rejected explicitly**, because `bool` is an
 `int` subclass in Python and `archived_weight = true` would otherwise parse
 silently as `1`.
 
-**11a. `urls_file` lives in `[sources]`, beside `dirs_file`** (Arpit,
-2026-09-14). The two committed source lists are one kind of thing and are now
-named in one place; `[sources.url] urls_file` is **refused by name** with the
-new home in the message.
+**11a. One key names the one source list: `[sources] sources_file`** (Arpit,
+2026-10-24, W-294). Paths and URLs are one kind of thing — what fux indexes —
+and live in one file, `.fux/sources.yaml`; exclusion is not in it, it is
+`.fux/.fuxignore`'s ([SR-FUXIGNORE](0144_fuxignore.md)).
 
 - ⚠ **`[sources.url]`'s PRESENCE still enables URL ingestion.** The key names
   the list; it does not turn anything on. That separation is what the move
   makes visible rather than changing: a repo with no `[sources.url]` still
   resolves a path — `fux add <URL>` needs one to write into — and still fetches
   nothing.
-- `UrlSource.urls_file` keeps carrying the resolved value, so the twelve
-  call sites that hold a `UrlSource` read one field as before. `Config.urls_file`
-  is what the two call sites without one now read, in place of a
-  `config.url is not None else DEFAULT_URLS_FILE` conditional that can no
-  longer disagree with the file.
+- `UrlSource.sources_file` carries the resolved value, so a call site holding
+  only a `UrlSource` reads the same path as one holding the `Config`.
 
 **12. `[sources.url]` gained four keys on 2026-09-01, and every one of them is
 a source-wide *layer*, not a setting.** `keep` ([SR-ACQUIRED](0145_acquired-plane.md)),
@@ -516,7 +508,7 @@ accepted, a component can be assigned, and nothing mechanical reads the record
 against the code.
 
 **`[sources.url] update`** — the source-wide layer of the URL list's
-`update=` attribute ([SR-URL-LIST](0116_url-list.md) decision 14). `"auto"` or
+`update=` attribute ([SR-SOURCES](0116_url-list.md) decision 14). `"auto"` or
 `"never"`; a line still wins; anything else is refused by name with the two legal
 values in the message, like every other closed-set key here.
 
@@ -542,8 +534,7 @@ through without reading a key inside it · `-` a spelling refused **by name**,
 at any value, with an error naming the new home.
 
 ```keys
-+ sources.dirs_file
-+ sources.urls_file
++ sources.sources_file
 + sources.url.routes
 + sources.url.keep
 + sources.url.ttl
@@ -575,6 +566,8 @@ at any value, with an error naming the new home.
 + doctor.acquired_warn_share
 + doctor.pii_rule_budget_ms
 - sources.dirs
+- sources.dirs_file
+- sources.urls_file
 - sources.types_file
 - sources.url.urls
 - sources.url.urls_file
@@ -593,7 +586,7 @@ the boundary.
 
 **14. An undeclared key is REFUSED, not ignored** (2026-09-12, W-122; the defect
 was [W-140](../work/OPEN-WORK.md) row 8). `fux.toml` silently ignored a
-misspelled key, so `dirs_fil = "…"` left the consumer's setting inert with
+misspelled key, so `sources_fil = "…"` left the consumer's setting inert with
 nothing said — the same failure mode as a key documented and never parsed, from
 the other end. `.fux/config/tune.toml` has rejected unknown tables and keys by name
 since it existed ([SR-TUNE](0135_tuning.md)), and this is that behaviour, here.
@@ -691,7 +684,7 @@ decision 17. The omit-to-inherit rule is gone.
 
 **17. Every key is REQUIRED, and a missing one is named** ([SR-LAW-12](0014_LAW-12-values-live-in-config.md);
 W-225 stage 3b, 2026-09-27). `config.load` refuses a `fux.toml` lacking any of
-`[sources] dirs_file · urls_file`, `[index] shards`, `[observe] max_ms` or
+`[sources] sources_file`, `[index] shards`, `[observe] max_ms` or
 `[agents] install` — and, **when `[sources.url]` is present**, any of `keep ·
 ttl · enrich · update · fetch_at_answer · max_parallel · sweep_minutes ·
 acquired_max_bytes`. Every missing key is listed in **one** `FuxError`, after
@@ -718,10 +711,10 @@ missing key from the template `fux setup` uses.*
   repo with no `[sources.url]` (it swept every 60 minutes on a constant);
   `ask`/`find` stop on a present `fux.toml` that does not load (they dropped
   archived demotion silently); observers are skipped when `fux.toml` does not
-  load; and `doctor`'s dirs rows read the configured `dirs_file` instead of
-  `.fux/sources/dirs`.
-- **The Node reader checks only the key it reads**, `[sources] dirs_file`, with
-  the same message; it refuses no retired or unknown key, as before.
+  load; and `doctor`'s source-list rows read the configured `sources_file`.
+- **The Node reader checks only the `[sources]` keys it reads or replaced** —
+  `sources_file`, and the two it replaced, `dirs_file` and `urls_file`, refused
+  with `config.py`'s text; it refuses no other retired or unknown key.
 
 <!-- L12-VALUES-START -->
 
@@ -785,7 +778,7 @@ it decides committed bytes, and that is why it is here beside `shards` and not i
   surprising. Worth the surprise: the alternative is folklore about where 256
   comes from.
 - **A third source-list path constant lives here, with no key at all.**
-  `DEFAULT_TYPES_FILE = ".fux/config/formats.toml"` joins `dirs_file` and `urls_file`
+  `DEFAULT_TYPES_FILE = ".fux/config/formats.toml"` joins `sources_file`
   because paths have one home — but it has **no `fux.toml` key**, deliberately:
   the types list is optional, its absence is meaningful (the built-in default
   applies), and a key whose only job is to relocate an optional file is surface
@@ -802,8 +795,7 @@ it decides committed bytes, and that is why it is here beside `shards` and not i
 - ⚠ **The directory list was include-only, with no exclusions, when this was
   written** — so committed measurement evidence under `work/regression/`
   contaminated the corpus it measures. **No longer true (corrected 2026-09-14):**
-  a `!` line in `.fux/sources/dirs` ([SR-DIR-LIST](0120_dir-list.md) decision 2a)
-  and [`.fux/.fuxignore`](0144_fuxignore.md) both exclude; what remains owed is
+  [`.fux/.fuxignore`](0144_fuxignore.md) excludes; what remains owed is
   that `fux remove` still writes `!` where `.fuxignore` is the stated home
   ([SR-FUXIGNORE](0144_fuxignore.md) Consequences).
 - ⚠ **`[sources.url]` now ships live in a scaffolded repo, and one behaviour
@@ -811,7 +803,7 @@ it decides committed bytes, and that is why it is here beside `shards` and not i
   `[sources.url]` in fux.toml, so nothing can fetch this line yet"*; in a repo
   scaffolded after `max_parallel` became required, it fetches. **The gate did
   not disappear — it moved to where it always really was:**
-  `.fux/sources/urls` is empty, and the only thing that puts an address in it is
+  `.fux/sources.yaml` lists no URL, and the only thing that puts an address in it is
   an explicit `fux add <URL>`. **L5's *explicit, fenced, opt-in* is satisfied by
   the verb, not by a commented table** — and a table you must uncomment before
   the tool works is friction, not a fence. The refusal branch stays for repos
@@ -840,7 +832,7 @@ it decides committed bytes, and that is why it is here beside `shards` and not i
   2026-09-20** — Arpit deleted the key rather than re-defaulting it (W-194), so
   the readable shape won by a route this row did not consider.
 - **Accept unknown keys silently** for forward compatibility. Rejected: a typo
-  in `urls_file` that silently indexes nothing is indistinguishable from a
+  in `sources_file` that silently indexes nothing is indistinguishable from a
   retrieval bug.
 - **URLs as a TOML array.** Rejected on diff and merge behaviour at enterprise
   scale — the reason the retired key errors loudly today.
@@ -911,7 +903,7 @@ evidence.*
 
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-DOTFUX](0102_fux-directory.md) ·
 [SR-ASK](0103_ask.md) · [SR-FETCHER](0117_fetcher.md) ·
-[SR-HTTP-FETCHER](0119_http-fetcher.md) · [SR-DIR-LIST](0120_dir-list.md) ·
+[SR-HTTP-FETCHER](0119_http-fetcher.md) · [SR-SOURCES](0116_url-list.md) ·
 [SR-TYPES](0128_types-list.md) · [SR-AGENT-POLICY](0132_agent-policy.md) ·
 [SR-ARCHIVED-CONTENT](0134_archived-content.md) · [SR-TUNE](0135_tuning.md)
 

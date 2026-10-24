@@ -124,10 +124,16 @@ def test_the_type_allowlist_produces_a_policy_skip(tmp_path):
     assert skipped[0].deliberate
 
 
-def test_a_dirs_exclusion_produces_a_policy_skip(tmp_path):
+def test_a_moved_bang_line_produces_a_policy_skip(tmp_path):
+    """W-294: a `!` line no longer subtracts in the source list — `fux setup`
+    moves it into `.fuxignore` as an anchored pattern. That pattern is still a
+    deliberate, committed exclusion, so its skip is still POLICY."""
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "draft.md").write_text("d", encoding="utf-8")
-    _, skipped = walk_sources(tmp_path, ["docs"], excludes=["docs/draft.md"])
+    ignore = tmp_path / fuxignore.IGNORE_FILE
+    ignore.parent.mkdir(parents=True, exist_ok=True)
+    ignore.write_text(fuxignore.exclusion_pattern("docs/draft.md", is_dir=False) + "\n", encoding="utf-8")
+    _, skipped = walk_sources(tmp_path, ["docs"], ignores=fuxignore.read(tmp_path))
     assert skipped[0].kind == POLICY
 
 

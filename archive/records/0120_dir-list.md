@@ -2,30 +2,19 @@
 type: Standing Record
 kind: component
 name: SR-DIR-LIST
-title: "SR-DIR-LIST (0120) — the committed directory list"
-description: "Source directories live in a line-oriented committed file on the URL list's grammar, with `!` subtraction. A directory may be declared archived=true — a declaration, never derived from a path."
-status: accepted
+title: "SR-DIR-LIST (0120) — the committed directory list (RETIRED 2026-10-24)"
+description: "RETIRED 2026-10-24 (Arpit, W-294) — `.fux/sources/dirs` no longer exists. Paths and URLs became one manifest, `.fux/sources.yaml` (SR-SOURCES), and exclusion — the `!` lines this file carried — lives only in `.fux/.fuxignore`. Kept for the argument behind `!`-as-entry, the two-branch removal and archived-as-declaration."
+status: archived
 amended: 2026-10-05
 date: 2026-08-19
 feature: "`.fux/sources/dirs` — what the engine indexes, what is subtracted from it, which of it is retired, and the grammar for declaring so"
-owns: [node/src/ingest/dirlist.mjs@3fbfc2e90b52, src/fux/acquire/dirlist.py@d43e93694da4]
+owns: []
 laws: [L4, L6]
 timestamp: 2026-08-19T00:00:00Z
 content_sha: d82792d068316f8b228663fc8a3a493911337fbe9d0214a383526175891f0bed
 ---
 
-<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
-
-**Owns** — the components this record decides:
-
-- [`node/src/ingest/dirlist.mjs`](../node/src/ingest/dirlist.mjs) · file
-- [`src/fux/acquire/dirlist.py`](../src/fux/acquire/dirlist.py) · file
-
-**Describes** — reaches into, does not own:
-
-- [`src/fux/acquire/sourcelist.py::_dir_reason`](../src/fux/acquire/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
-
-<!-- COMPONENTS-END -->
+> **ARCHIVED 2026-10-24 — retired by Arpit, 2026-10-24 (W-294): `.fux/sources/dirs` and `.fux/sources/urls` became `.fux/sources.yaml`; successor SR-SOURCES (`records/0116_url-list.md`)**
 
 # SR-DIR-LIST — the committed directory list
 

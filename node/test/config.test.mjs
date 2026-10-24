@@ -1,4 +1,4 @@
-/** The config readers — `.fux/config/tune.toml`, `.fux/config/output.toml`, `.fux/sources/dirs`.
+/** The config readers — `.fux/config/tune.toml`, `.fux/config/output.toml`, `.fux/sources.yaml`.
  *  Run with `node --test` from `node/`.
  *
  * **These run with no Python at all**, which is the point: the differential arm
@@ -17,15 +17,16 @@ import { parseToml, wasFloat } from "../src/config/toml.mjs";
 import { loadTune } from "../src/config/tune.mjs";
 import { TUNE_TEMPLATE, tuneText } from "./l12.mjs";
 import { loadOutput, template } from "../src/config/output.mjs";
-import { parseDirs } from "../src/ingest/sourcelist.mjs";
-import { dirsFile, archivedDirSet } from "../src/ingest/gitdir.mjs";
+import { parseSources } from "../src/ingest/sourcelist.mjs";
+import { parseYamlSubset } from "../src/ingest/yamlsubset.mjs";
+import { sourcesFile, archivedDirSet } from "../src/ingest/gitdir.mjs";
 import { globMatch, isAlreadyText, PROSE_TYPES } from "../src/decode/registry.mjs";
 import { FuxError } from "../src/errors.mjs";
 
 /** A throwaway repo root with the given `.fux/` files. */
 function repo(files) {
   const root = mkdtempSync(join(tmpdir(), "fux-node-"));
-  mkdirSync(join(root, ".fux", "sources"), { recursive: true });
+  mkdirSync(join(root, ".fux"), { recursive: true });
   for (const [rel, body] of Object.entries(files)) {
     const path = join(root, rel);
     mkdirSync(join(path, ".."), { recursive: true });
@@ -199,31 +200,64 @@ test("output: `top = true` is refused — a bool is not a whole number", () => {
   assert.throws(() => loadOutput(root, { enabled: true }), /must be a whole number/);
 });
 
-// -- the dirs list -----------------------------------------------------------
+// -- .fux/sources.yaml (W-294) ------------------------------------------------
 
-test("dirs: `#` starts a comment only at line start or after whitespace", () => {
-  const entries = parseDirs("docs\nwork#notacomment\na # yes\n", "<d>");
-  assert.deepEqual(entries.map((e) => e.value), ["a", "docs", "work#notacomment"]);
+test("sources: `#` starts a comment only at line start or after a space", () => {
+  const { paths } = parseSources("paths:\n  include:\n    - docs\n    - work#notacomment\n    - a # yes\n", "<s>");
+  assert.deepEqual(paths.map((e) => e.value), ["a", "docs", "work#notacomment"]);
 });
 
-test("dirs: archived=true is the declaration, and `!` subtracts", () => {
-  const entries = parseDirs("archive archived=true\ndocs\n!docs/x\n", "<d>");
-  const archived = entries.filter((e) => !e.exclude && e.attrs.archived === "true");
-  assert.deepEqual(archived.map((e) => e.value), ["archive"]);
-  assert.equal(entries[entries.length - 1].exclude, true);   // exclusions sort last
+test("sources: the LIST is the declaration — a path in two lists carries both flags", () => {
+  const { paths } = parseSources(
+    "paths:\n  include:\n    - docs\n  archived:\n    - archive\n  enrich:\n    - archive\n", "<s>");
+  assert.deepEqual(paths, [
+    { value: "archive", attrs: { archived: "true", enrich: "true" }, lineno: 5 },
+    { value: "docs", attrs: { archived: "false", enrich: "false" }, lineno: 3 },
+  ]);
 });
 
-test("dirs: an unknown attribute, `!!`, and an exclusion with attributes all refuse", () => {
-  assert.throws(() => parseDirs("docs mata=plain\n", "<d>"), /unknown attribute/);
-  assert.throws(() => parseDirs("!!docs\n", "<d>"), /not an un-exclude/);
-  assert.throws(() => parseDirs("!docs archived=true\n", "<d>"), /carries no attributes/);
+test("sources: typing is the schema's — `no`, `on`, `null`, `~`, `1.10`, `010` stay text", () => {
+  const { paths } = parseSources("paths:\n  include:\n    - no\n    - on\n    - null\n    - ~\n    - 1.10\n    - 010\n", "<s>");
+  assert.deepEqual(paths.map((e) => e.value), ["010", "1.10", "no", "null", "on", "~"]);
 });
 
-test("dirs: a duplicate that DISAGREES names both lines", () => {
-  assert.throws(
-    () => parseDirs("docs archived=true\ndocs archived=false\n", "<d>"),
-    /appears twice with conflicting attributes/,
-  );
+test("sources: `!` names .fux/.fuxignore, a URL under paths names `urls:`", () => {
+  assert.throws(() => parseSources("paths:\n  include:\n    - '!work/golden'\n", "<s>"),
+    /<s>:3: `!work\/golden` starts with `!`.*\.fux\/\.fuxignore.*`\/work\/golden`/);
+  assert.throws(() => parseSources("paths:\n  include:\n    - !work\n", "<s>"), /<s>:3: `!` starts a YAML tag/);
+  assert.throws(() => parseSources("paths:\n  include:\n    - https://x.org/a\n", "<s>"), /belongs under `urls:`/);
+});
+
+test("sources: a duplicate, an empty list and an unknown key all refuse, naming the line", () => {
+  assert.throws(() => parseSources("paths:\n  include:\n    - a\n    - a\n", "<s>"), /<s>:4: `a` is listed twice/);
+  assert.throws(() => parseSources("paths:\n  include:\n", "<s>"), /<s>:2: `include` is empty/);
+  assert.throws(() => parseSources("dirs:\n  - a\n", "<s>"), /<s>:1: unknown key `dirs`/);
+});
+
+test("sources: a URL entry states fetch and decoder, and its attributes are typed", () => {
+  const ok = "urls:\n  - url: https://x.org/a\n    fetch: http\n    decoder: html\n    ttl: 7d\n";
+  assert.deepEqual(parseSources(ok, "<s>").urls,
+    [{ value: "https://x.org/a", attrs: { fetch: "http", decoder: "html", ttl: "7d" }, lineno: 2 }]);
+  assert.throws(() => parseSources("urls:\n  - url: https://x.org/a\n    fetch: http\n", "<s>"),
+    /<s>:2: `https:\/\/x.org\/a` does not state `decoder:`/);
+  assert.throws(() => parseSources(ok.replace("7d", "7 days"), "<s>"), /<s>:5: ttl: `7 days` must be 0/);
+  assert.throws(() => parseSources(ok + "    keep: no\n", "<s>"), /keep: `no` is not one of true, false/);
+});
+
+test("YAML subset: flow, anchors, documents, block scalars and tabs are refused by name", () => {
+  for (const [text, re] of [
+    ["paths: {}\n", /<s>:1: `\{` starts a flow collection/],
+    ["paths:\n  include: [a]\n", /<s>:2: `\[` starts a flow collection/],
+    ["a: &x b\n", /<s>:1: `&` starts a YAML anchor/],
+    ["a: *x\n", /<s>:1: `\*` starts a YAML alias/],
+    ["---\na: b\n", /<s>:1: `---` starts a YAML document marker/],
+    ["a: |\n  b\n", /<s>:1: `\|` starts a block scalar/],
+    ["a:\n\t- b\n", /<s>:2: a tab in the indentation/],
+    ["a: b\na: c\n", /<s>:2: `a` is given twice in one map \(first on line 1\)/],
+    ["a: b: c\n", /<s>:1: a plain value may not contain `: `/],
+  ]) {
+    assert.throws(() => parseYamlSubset(text, "<s>"), re, text);
+  }
 });
 
 // -- the decode boundary -----------------------------------------------------
@@ -255,32 +289,48 @@ test("decode: `.fux/config/formats.toml` REPLACES the default when it is there",
 });
 
 
-// -- fux.toml `[sources] dirs_file` (W-225 stage 3b) ----------------------------
+// -- fux.toml `[sources] sources_file` (W-294) --------------------------------
 
-test("dirs_file: no fux.toml is no declaration — null, and nothing is archived", () => {
+test("sources_file: no fux.toml is no declaration — null, and nothing is archived", () => {
   const root = repo({});
-  assert.equal(dirsFile(root), null);
+  assert.equal(sourcesFile(root), null);
   assert.equal(archivedDirSet(root).size, 0);
   rmSync(root, { recursive: true });
 });
 
-test("dirs_file: a fux.toml without the key throws config.py's missing-key sentence", () => {
-  const root = repo({ "fux.toml": "[sources]\nurls_file = \".fux/sources/urls\"\n" });
-  assert.throws(() => dirsFile(root), (err) => err instanceof FuxError
-    && /\[sources\] dirs_file is missing/.test(err.message)
+test("sources_file: a fux.toml without the key throws config.py's missing-key sentence", () => {
+  const root = repo({ "fux.toml": "[sources]\n" });
+  assert.throws(() => sourcesFile(root), (err) => err instanceof FuxError
+    && /\[sources\] sources_file is missing/.test(err.message)
     && /fux doctor --fix/.test(err.message));
-  // ⚠ It used to fall back to `.fux/sources/dirs`; the archived set is no longer
-  // read from a path the repo never named.
   assert.throws(() => archivedDirSet(root), FuxError);
   rmSync(root, { recursive: true });
 });
 
-test("dirs_file: the configured list is the one read", () => {
+test("sources_file: the retired `dirs_file` and `urls_file` are refused by name", () => {
+  for (const key of ["dirs_file", "urls_file"]) {
+    const root = repo({ "fux.toml": `[sources]\nsources_file = ".fux/sources.yaml"\n${key} = "x"\n` });
+    assert.throws(() => sourcesFile(root), new RegExp(`\\[sources\\] ${key} was replaced by \\[sources\\] sources_file`));
+    rmSync(root, { recursive: true });
+  }
+});
+
+test("sources_file: the configured manifest is the one read", () => {
   const root = repo({
-    "fux.toml": "[sources]\ndirs_file = \"lists/dirs\"\n",
-    "lists/dirs": "old archived=true\n",
+    "fux.toml": "[sources]\nsources_file = \"lists/s.yaml\"\n",
+    "lists/s.yaml": "paths:\n  include:\n    - docs\n  archived:\n    - old\n",
   });
-  assert.equal(dirsFile(root), "lists/dirs");
+  assert.equal(sourcesFile(root), "lists/s.yaml");
   assert.deepEqual([...archivedDirSet(root)], ["old"]);
+  rmSync(root, { recursive: true });
+});
+
+test("sources_file: a leftover .fux/sources/dirs makes the archived set EMPTY, as Python's does", () => {
+  const root = repo({
+    "fux.toml": "[sources]\nsources_file = \".fux/sources.yaml\"\n",
+    ".fux/sources.yaml": "paths:\n  archived:\n    - old\n",
+    ".fux/sources/dirs": "old archived=true\n",
+  });
+  assert.equal(archivedDirSet(root).size, 0);
   rmSync(root, { recursive: true });
 });

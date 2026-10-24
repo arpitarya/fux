@@ -11,7 +11,7 @@ three states — missing, old format, drift.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import json
 import subprocess
 import sys
@@ -32,7 +32,7 @@ def _repo(tmp_path: Path) -> Path:
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True)
-    (fux / "sources" / "dirs").write_text("docs\nold archived=true\n", encoding="utf-8")
+    write_dirs(fux.parent, "docs\nold archived=true\n")
     (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / "docs").mkdir()

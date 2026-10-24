@@ -95,7 +95,13 @@ formats         = ".fux/config/formats.toml"
 formats_legacy  = ".fux/sources/types"
 fetchers_dir    = ".fux/fetchers"
 corrections     = ".fux/eval/corrections.tsv"
-urls            = ".fux/sources/urls"
+# W-294: the ONE include manifest -- paths and URLs together, in the fux YAML
+# subset ([sources_file] below). Exclusion is spelled in `fuxignore` and nowhere
+# else. The two `_legacy` names are the line-grammar lists it replaced; only
+# `fux setup` reads them, to convert them once.
+sources         = ".fux/sources.yaml"
+dirs_legacy     = ".fux/sources/dirs"
+urls_legacy     = ".fux/sources/urls"
 fuxignore       = ".fux/.fuxignore"
 enrich_dir      = ".fux/enrich"
 enrich_queue    = ".fux/enrich/queue.tsv"
@@ -630,6 +636,9 @@ host = "127.0.0.1"
 
 [templates]
 tune = "tune.toml.txt"
+# W-294: the starter `.fux/sources.yaml` -- header comments only; `fux setup`
+# appends what the repo obviously has.
+sources = "sources.yaml.txt"
 output = "output.toml.txt"
 # The built-in decoders' caps, appended to the seeded .fux/config/formats.toml.
 formats_limits = "formats-limits.toml.txt"
@@ -1026,3 +1035,82 @@ header_key = "identifiers"
 # The digest's width in bytes (blake2b). It is written into every shard header,
 # so a different width is a different committed byte on every repo with families.
 digest_bytes = 16
+
+# -- `.fux/sources.yaml` and the fux YAML subset (W-294, SR-SOURCES) -----------
+# The schema's NAMES and the subset reader's refusal TEXTS, read by both planes
+# (`acquire/yamlsubset.py` + `sourcesfile.py`, and their Node twins) so the two
+# readers cannot word -- or decide -- a refusal differently. `{file}` is the
+# origin, `{line}` the 1-based line number; every text is prefixed
+# `{file}:{line}: ` by the reader.
+
+[sources_file]
+# The two top-level keys, and nothing else.
+paths = "paths"
+urls  = "urls"
+# The flag lists under `paths:`. A path in ANY list is indexed; each list it is
+# in sets that flag. `include` sets none.
+include    = "include"
+path_lists = ["include", "archived", "enrich"]
+# The one key of a `urls:` entry that is not an attribute.
+url_key = "url"
+
+[yaml_subset]
+tab         = "a tab in the indentation -- the fux YAML subset indents with spaces only"
+document    = "`{token}` starts a YAML document marker, and .fux/sources.yaml is one document -- delete the line"
+flow        = "`{token}` starts a flow collection, which the fux YAML subset does not read -- write a block list (`- item`, one per line) or a block map"
+anchor      = "`&` starts a YAML anchor, which the fux YAML subset does not read -- write the value out"
+alias       = "`*` starts a YAML alias, which the fux YAML subset does not read -- write the value out"
+tag         = "`!` starts a YAML tag, which the fux YAML subset does not read. `!` is not an exclusion here: exclusions live in .fux/.fuxignore -- write the pattern there, anchored (`/work/golden`), and delete this line"
+block       = "`{token}` starts a block scalar, which the fux YAML subset does not read -- write the value on one line"
+reserved    = "`{token}` cannot start a plain value -- quote it ('...')"
+directive   = "`%` starts a YAML directive, which the fux YAML subset does not read -- delete the line"
+complex_key = "`?` starts a complex key, which the fux YAML subset does not read"
+colon_space = "a plain value may not contain `: ` -- quote it ('...')"
+unclosed    = "a quoted value is not closed on its line"
+escape      = "`{token}` is not an escape the fux YAML subset reads -- write the character itself, or single-quote the value"
+after_quote = "text after a closing quote -- only a comment (` # ...`) may follow a quoted value"
+indent      = "unexpected indentation -- this line is deeper than the block it sits in"
+dedent      = "this line's indentation matches no enclosing block"
+mixed       = "a list item where a key was expected, or a key where a list item was expected"
+duplicate   = "`{key}` is given twice in one map (first on line {first})"
+key         = "`{token}` is not a key -- a key is plain text followed by `:`"
+empty_item  = "a list item with nothing in it"
+
+# What `sourcesfile.py` (and `node/src/ingest/sourcelist.mjs`) say when the
+# subset parsed and the SCHEMA refuses it. Same `{file}:{line}: ` prefix.
+[sources_messages]
+top         = "the file must be a map whose keys are `paths` and/or `urls`"
+unknown     = "unknown key `{key}`{where} -- the keys here are {known}. Adding one is a change to SR-SOURCES, not a config addition"
+not_map     = "`{key}` must be a block map"
+not_list    = "`{key}` must be a block list (`- item`, one per line)"
+empty       = "`{key}` is empty -- an empty list is not written down; delete the key"
+not_text    = "a {what} is one value, not a list or a map"
+path_twice  = "`{value}` is listed twice in `{list}` (first on line {first}) -- a duplicate is a merge mistake; delete one"
+url_twice   = "`{value}` is listed twice (first on line {first}) -- a duplicate is a merge mistake; delete one entry"
+bang        = "`{value}` starts with `!`, and nothing in .fux/sources.yaml subtracts: exclusions live in .fux/.fuxignore -- write the pattern there, anchored (`/{rest}`), and delete this line"
+url_in_paths = "`{value}` is a URL -- it belongs under `urls:`, as an entry with its own `fetch` and `decoder`"
+no_url      = "a `urls` entry with no `url:` key"
+reason      = "{reason}: `{value}`"
+attribute   = "{key}: `{value}` {fault}"
+required    = "`{value}` does not state `{key}:` and there is no default for it -- add `{key}: <name>` to its entry{hint}"
+missing     = "{file} not found (looked in {path}) -- {hint}"
+missing_hint = "run `fux setup` to write a starter, or `fux add <path>` to list the first entry"
+legacy      = "{legacy} still exists, and fux reads .fux/sources.yaml now -- `fux setup` converts the old lists into it once (exclusions move to .fux/.fuxignore) and removes them. fux refuses to run while the old list exists, rather than guess which you meant"
+# `fux.toml`'s two retired keys (SR-CONFIG decision 10), refused by name.
+retired_key = "[sources] {key} was replaced by [sources] sources_file (W-294): .fux/sources/dirs and .fux/sources/urls became one file, .fux/sources.yaml. Run `fux setup` -- it converts both lists (their `!` lines move to .fux/.fuxignore), writes `sources_file = \".fux/sources.yaml\"` here and deletes this key"
+sources_file_type = "[sources] sources_file must be a path to the include manifest (.fux/sources.yaml)"
+
+# What a `paths:` value, a `urls:` URL or a `urls:` attribute value is refused
+# with -- `acquire/sourcelist.py`'s validators and their Node twin
+# (`node/src/ingest/sourcelist.mjs`), one text for both. `{prose}` is
+# `sourcelist.PROSE_DECODER`.
+[source_attributes]
+url_reason    = "not an http(s) URL"
+path_absolute = "not a repo-relative path"
+path_escapes  = "escapes the repo root"
+ttl_help      = "must be 0 (always re-fetch) or <number><unit> where unit is s, m, h or d - for example 30s, 15m, 1h, 7d"
+decoder_help  = "must be a decoder module name - lowercase letters, digits and underscores, not starting with `_` (a leading underscore marks a shared helper the registry skips), with no `.py` suffix and no directory part"
+fetcher_help  = "must be a fetcher module name - lowercase letters, digits and underscores, not starting with `_`, with no `.py` suffix and no directory part. It resolves to .fux/fetchers/<name>.py. A host map lives in [sources.url.routes]; `fux doctor` reports a name with no file"
+url_decoder_empty = "is empty, and a URL entry may not leave its decoder to be resolved later — a URL has no trustworthy extension. Write `decoder: {prose}` for a page that is already text, or a decoder module name (`html`, `pdf`, `xlsx`, ...)"
+fetch_required_hint   = " naming a file in .fux/fetchers/, or let `fux add` resolve it for you. ([sources.url] fetcher was deleted on 2026-09-20; SR-SOURCES decision 16)"
+decoder_required_hint = " naming a decoder module — `{prose}` for a page that is already text, a built-in (`html`, `pdf`, `xlsx`, ...) or a file in .fux/decoders/. `fux add <URL>` observes the type once and writes it for you (the pipe ruling, 2026-09-18)"

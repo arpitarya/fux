@@ -24,7 +24,7 @@ import pytest
 from fux import decode as decode_mod
 from fux.errors import FuxError
 from fux.acquire import sourcelist, urlsrc
-from l12_fixtures import configured_root, write_config
+from l12_fixtures import configured_root, write_config, write_dirs, write_urls
 
 
 def _parse(text):
@@ -48,7 +48,7 @@ def test_the_absence_error_names_the_DECODER_directory_not_the_fetcher_one():
     """🔴 Why `Attribute.required_hint` exists at all.
 
     `parse` raised **one** message, written for `fetch=`, naming
-    `.fux/fetchers/` and SR-URL-LIST decision 16. A second required attribute
+    `.fux/fetchers/` and SR-SOURCES decision 16. A second required attribute
     would have been reported by pointing the reader at the wrong directory —
     the W-140 row 18 shape, a message transcribed where the fact lives one
     layer away.
@@ -101,7 +101,7 @@ def test_two_lines_for_one_url_with_different_decoders_is_a_hard_error():
 
     Two lines resolving to different decoders would ingest **different bytes for
     one document id**, and letting a merge artefact pick which is exactly what
-    SR-URL-LIST decision 10 refuses.
+    SR-SOURCES decision 5 refuses.
     """
     with pytest.raises(FuxError, match="appears twice with conflicting attributes"):
         _parse(
@@ -129,7 +129,7 @@ def _url_source():
 
     shipped = template_fux_toml()["sources"]
     base = {k: v for k, v in shipped["url"].items() if not isinstance(v, dict)}
-    base.update(routes={}, config={}, urls_file=shipped["urls_file"])
+    base.update(routes={}, config={}, sources_file=shipped["sources_file"])
     return UrlSource(**base)
 
 
@@ -307,10 +307,8 @@ def test_the_line_decides_what_lands_in_the_index(tmp_path):
         )
         (config_file(root, "pii")).write_text("", encoding="utf-8")
         write_config(root)
-        (root / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-        (root / ".fux" / "sources" / "urls").write_text(
-            f"https://x.test/export fetch=probe decoder={stem}\n", encoding="utf-8"
-        )
+        write_dirs(root, "docs\n")
+        write_urls(root, f"https://x.test/export fetch=probe decoder={stem}\n")
         # ⚠ The server calls it HTML on BOTH runs. The header decides nothing.
         (root / ".fux" / "fetchers" / "probe.py").write_text(
             f'def fetch(url):\n    return ({body!r}.encode(), "text/html")\n',

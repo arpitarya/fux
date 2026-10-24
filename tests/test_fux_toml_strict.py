@@ -63,11 +63,11 @@ def test_a_missing_key_lands_after_its_tables_last_key_not_in_the_next_tables_pr
 def test_every_missing_key_is_named_in_one_error(tmp_path):
     (tmp_path / "fux.toml").write_text(_without_url_tables(setup_mod.config_text()).replace(
         "[observe]\nmax_ms = 50\n", ""
-    ).replace("urls_file", "#urls_file"), encoding="utf-8")
+    ).replace("sources_file", "#sources_file"), encoding="utf-8")
     with pytest.raises(FuxError) as exc:
         load(tmp_path)
     message = str(exc.value)
-    assert "[sources] urls_file is missing" in message
+    assert "[sources] sources_file is missing" in message
     assert "[observe] max_ms is missing" in message
     assert "fux doctor --fix" in message
 

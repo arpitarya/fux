@@ -223,8 +223,8 @@ def test_a_consumer_edit_survives_a_later_setup(tmp_path):
 
 def test_the_installer_never_branches_on_a_vendor_directory_existing(tmp_path):
     """Veto 4. A heuristic is exact for the repo it was written against and a
-    silent convention for everyone else — the derivation SR-DIR-LIST decision
-    4 already refused for `archived`."""
+    silent convention for everyone else — the derivation SR-SOURCES already
+    refuses for `archived` (declared, never derived)."""
     import inspect
     import io
     import tokenize

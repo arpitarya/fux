@@ -2,11 +2,16 @@
 
 Successor to `test_url_command.py`, which tested `fux url` before that verb
 was retired. **Every property that file pinned is still pinned here** — a
-written line states every attribute (SR-URL-LIST decision 12), the command
+written line states every attribute (SR-SOURCES decision 12), the command
 opens no socket of its own, it edits one line rather than regenerating the
 file, and the file is LF-only with exactly one trailing newline. What is new
 is that all of it now holds for three lists instead of one, plus the two
 decisions the verbs added: dispatch-on-entry, and remove-by-coverage.
+
+**W-294:** paths and URLs are the two halves of ONE file, `.fux/sources.yaml`
+(a strict YAML subset). `fux add` edits it by a textual insert — one item into
+the right `paths:` list, or one entry block under `urls:` — and never re-renders
+it, so comments and hand order survive; `!` left the file for `.fuxignore`.
 
 Nothing here runs a full ingest unless the test is about ingest: `--no-ingest`
 keeps these unit tests about the *list*, which is what they are for.
@@ -14,7 +19,7 @@ keeps these unit tests about the *list*, which is what they are for.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs, write_urls
 import json
 
 from types import SimpleNamespace
@@ -23,8 +28,8 @@ import pytest
 
 from fux import sources
 from fux.errors import FuxError
-from fux.acquire import sourcelist, typesfile
-from l12_fixtures import write_config
+from fux.acquire import sourcelist, sourcesfile, typesfile
+from l12_fixtures import listed_paths, listed_urls, sources_path, write_config
 
 
 def _args(entry=None, **flags):
@@ -74,9 +79,7 @@ def repo(tmp_path):
     (fetchers / "cdp.py").write_text(
         'def fetch(url):\n    return "# T\\n\\nbody\\n"\n', encoding="utf-8"
     )
-    (tmp_path / ".fux" / "sources").mkdir(parents=True, exist_ok=True)
-    (tmp_path / ".fux" / "sources" / "urls").write_text("# my list\n", encoding="utf-8")
-    (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    sources_path(tmp_path).write_text("# my list\npaths:\n  include:\n    - docs\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
@@ -86,12 +89,33 @@ def repo(tmp_path):
     return tmp_path
 
 
-def _urls(repo):
-    return (repo / ".fux" / "sources" / "urls").read_text(encoding="utf-8")
+def _text(repo):
+    """`.fux/sources.yaml`, as bytes a human would read."""
+    return sources_path(repo).read_text(encoding="utf-8")
 
 
-def _dirs(repo):
-    return (repo / ".fux" / "sources" / "dirs").read_text(encoding="utf-8")
+def _parsed(repo):
+    return sourcesfile.parse(_text(repo), origin=str(sources_path(repo)))
+
+
+def _url(repo, url):
+    """The attributes `url`'s entry states, or None when it is not listed."""
+    entry = next((e for e in _parsed(repo).urls if e.value == url), None)
+    return None if entry is None else {k: entry.attrs[k] for k in entry.declared}
+
+
+def _paths(repo):
+    """`{path: sorted lists it sits in}` — the flags ARE the lists (W-294)."""
+    out = {}
+    for e in _parsed(repo).paths:
+        lists = [f for f in sourcesfile.PATH_LISTS if f != sourcesfile.INCLUDE and e.attrs.get(f) == "true"]
+        out[e.value] = lists or [sourcesfile.INCLUDE]
+    return out
+
+
+#: Every attribute a fux-written URL entry states at the built-ins, in order.
+_FULL = {"fetch": "http", "decoder": "prose", "keep": "true", "ttl": "24h",
+         "enrich": "false", "archived": "false", "update": "auto"}
 
 
 def _types(repo):
@@ -150,8 +174,8 @@ def _ingest(repo, monkeypatch, args):
     [
         ("https://x.test/a", {}, sourcelist.URLS),
         ("http://x.test/a", {}, sourcelist.URLS),
-        ("docs", {}, sourcelist.DIRS),
-        ("docs/one.md", {}, sourcelist.DIRS),
+        ("docs", {}, sourcelist.PATHS),
+        ("docs/one.md", {}, sourcelist.PATHS),
         ("*.pdf", {"types": True}, sourcelist.TYPES),
         # `--types` wins over the shape, because it is the explicit statement.
         ("weird", {"types": True}, sourcelist.TYPES),
@@ -162,13 +186,13 @@ def test_dispatch_picks_the_list_from_the_entry(entry, flags, expected):
 
 
 def test_a_glob_is_not_sniffed_into_the_type_list():
-    """`docs/*` is a reasonable `dirs` entry, so `*` may not mean `--types`.
+    """`docs/*` is a reasonable path entry, so `*` may not mean `--types`.
 
     Guessing between the two lists on a glob character would be wrong exactly
     when it mattered, and silently — the entry would land in a file the user
     never looked at.
     """
-    assert sources.dispatch("docs/*", SimpleNamespace(types=False)) is sourcelist.DIRS
+    assert sources.dispatch("docs/*", SimpleNamespace(types=False)) is sourcelist.PATHS
 
 
 def test_a_trailing_slash_is_the_same_directory(repo, monkeypatch, capsys):
@@ -179,27 +203,38 @@ def test_a_trailing_slash_is_the_same_directory(repo, monkeypatch, capsys):
     `docs` wrote a second line for the same directory.
     """
     _add(repo, monkeypatch, _args("docs/"))
-    # A fux-written line states EVERY attribute explicitly (SR-URL-LIST
-    # decision 12), so this grows when the closed attribute set grows.
-    # `enrich=false` arrived with W-76 Phase 8.
-    assert [line for line in _dirs(repo).splitlines() if line.strip()] == [
-        "docs archived=false enrich=false"
-    ]
-    assert "updated" in capsys.readouterr().out
+    # Since W-294 a path's flags are the lists it sits in, so `docs` in
+    # `include` already says everything `docs/` would: nothing to write.
+    assert _paths(repo) == {"docs": ["include"]}
+    assert _text(repo).count("- docs") == 1
+    assert "unchanged" in capsys.readouterr().out
 
 
 # -- decision 12: a written line states everything --------------------------
 
 
-def test_a_written_line_carries_every_attribute_even_at_its_default(repo, monkeypatch):
+def test_a_written_entry_carries_every_attribute_even_at_its_default(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/a"))
-    assert "https://x.test/a fetch=http decoder=prose" in _urls(repo)
+    assert _url(repo, "https://x.test/a") == _FULL
+    assert "  - url: https://x.test/a\n    fetch: http\n    decoder: prose\n    keep: true\n" in _text(repo)
 
 
-def test_a_dirs_line_carries_its_attribute_too(repo, monkeypatch):
+def test_a_path_lands_in_the_list_its_flags_name(repo, monkeypatch):
+    """W-294: a path has no attribute line — `include` unless a flag names
+    `archived` or `enrich`, and the list IS the flag."""
     (repo / "handbook").mkdir()
+    (repo / "old").mkdir()
     _add(repo, monkeypatch, _args("handbook"))
-    assert "handbook archived=false" in _dirs(repo)
+    _add(repo, monkeypatch, _args("old", archived=True))
+    assert _paths(repo) == {"docs": ["include"], "handbook": ["include"], "old": ["archived"]}
+    assert "  include:\n    - docs\n    - handbook\n  archived:\n    - old\n" in _text(repo)
+
+
+def test_moving_a_path_to_another_list_is_an_update_not_a_second_entry(repo, monkeypatch, capsys):
+    _add(repo, monkeypatch, _args("docs", archived=True))
+    assert _paths(repo) == {"docs": ["archived"]}
+    assert "include:" not in _text(repo), "an emptied list is deleted, never left `[]`"
+    assert "updated" in capsys.readouterr().out
 
 
 def test_a_types_entry_a_decoder_reads_becomes_a_binding(repo, monkeypatch):
@@ -266,6 +301,7 @@ def test_a_leftover_line_grammar_types_file_stops_the_verb(repo, monkeypatch):
     # The fixture now writes `.fux/config/formats.toml` (W-225 stage 4a: the file is
     # required), so the pre-migration state — the old file ALONE — is made here.
     (config_file(repo, "formats")).unlink()
+    (repo / ".fux" / "sources").mkdir(parents=True, exist_ok=True)
     (repo / ".fux" / "sources" / "types").write_text("*.md\n", encoding="utf-8")
     with pytest.raises(FuxError, match="fux setup"):
         _add(repo, monkeypatch, _args("*.pdf", types=True))
@@ -274,13 +310,14 @@ def test_a_leftover_line_grammar_types_file_stops_the_verb(repo, monkeypatch):
 
 def test_flags_decide_what_is_recorded(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/a", cdp=True, plain=True))
-    assert "https://x.test/a fetch=cdp decoder=prose" in _urls(repo)
+    assert _url(repo, "https://x.test/a")["fetch"] == "cdp"
 
 
-def test_an_unflagged_attribute_keeps_what_the_line_already_said(repo, monkeypatch):
+def test_an_unflagged_attribute_keeps_what_the_entry_already_said(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/a", cdp=True, plain=True))
     _add(repo, monkeypatch, _args("https://x.test/a", hashed=True))
-    assert "https://x.test/a fetch=cdp decoder=prose" in _urls(repo)
+    assert _url(repo, "https://x.test/a")["fetch"] == "cdp"
+    assert _text(repo).count("url: https://x.test/a") == 1
 
 
 def test_two_flags_for_one_attribute_is_an_error(repo, monkeypatch):
@@ -291,10 +328,10 @@ def test_two_flags_for_one_attribute_is_an_error(repo, monkeypatch):
 def test_a_flag_the_list_does_not_have_is_an_error_not_a_no_op(repo, monkeypatch):
     """`fux add docs --cdp` is someone believing something false about the line.
 
-    The closed attribute set (SR-URL-LIST decision 11) is only worth having
+    The closed attribute set (SR-SOURCES decision 11) is only worth having
     if it is enforced on the way in as well as on the way out.
     """
-    with pytest.raises(FuxError, match="which `dirs` does not have"):
+    with pytest.raises(FuxError, match="which `paths` does not have"):
         _add(repo, monkeypatch, _args("docs", cdp=True))
 
 
@@ -307,24 +344,24 @@ def test_archived_is_now_legal_on_a_url_too(repo, monkeypatch):
     order the two lists were built in.
     """
     _add(repo, monkeypatch, _args("https://x.test/a", archived=True))
-    assert "https://x.test/a fetch=http decoder=prose keep=true ttl=24h enrich=false archived=true" in _urls(repo)
+    assert _url(repo, "https://x.test/a") == _FULL | {"archived": "true"}
 
 
 def test_a_non_http_url_is_refused_before_anything_is_written(repo, monkeypatch):
-    before = _urls(repo)
+    before = _text(repo)
     with pytest.raises(FuxError, match="not an http"):
         # It dispatches to `dirs` by shape, so force the list to prove the
         # validator runs per-list rather than only on things that look like URLs.
         _add(repo, monkeypatch, _args("ftp://x.test/a"))
-    assert _urls(repo) == before
+    assert _text(repo) == before
 
 
 def test_adding_a_path_that_is_not_on_disk_writes_nothing(repo, monkeypatch):
     """A line that breaks the next ingest is worse than a refused command."""
-    before = _dirs(repo)
+    before = _text(repo)
     with pytest.raises(FuxError, match="does not exist"):
         _add(repo, monkeypatch, _args("nope"))
-    assert _dirs(repo) == before
+    assert _text(repo) == before
 
 
 def test_adding_something_already_excluded_is_an_error(repo, monkeypatch):
@@ -353,54 +390,109 @@ def test_adding_something_a_hand_written_ignore_covers_is_an_error(repo, monkeyp
         _add(repo, monkeypatch, _args("docs/a.md"))
 
 
-# -- one line, never the file ----------------------------------------------
+# -- one insert, never the file (W-294 step 4) -------------------------------
+
+
+_HAND = (
+    "# team sources\n"
+    "paths:\n"
+    "  include:\n"
+    "    - work      # the shared memory\n"
+    "    - docs\n"
+    "\n"
+    "# team A\n"
+    "urls:\n"
+    "  - url: https://x.test/a   # the runbook\n"
+    "    fetch: http\n"
+    "    decoder: prose\n"
+    "\n"
+    "  # team B\n"
+    "  - url: https://x.test/z\n"
+    "    fetch: http\n"
+    "    decoder: prose\n"
+)
+
+
+def _hand(repo):
+    (repo / "work").mkdir()
+    (repo / "handbook").mkdir()
+    sources_path(repo).write_text(_HAND, encoding="utf-8")
 
 
 def test_a_grouping_comment_survives_an_edit(repo, monkeypatch):
-    path = repo / ".fux" / "sources" / "urls"
-    path.write_text("# team A\nhttps://x.test/a fetch=http decoder=prose\n\n# team B\n", encoding="utf-8")
+    _hand(repo)
     _add(repo, monkeypatch, _args("https://x.test/a", plain=True))
-    text = _urls(repo)
-    assert "# team A" in text and "# team B" in text
+    _add(repo, monkeypatch, _args("https://x.test/m"))
+    _add(repo, monkeypatch, _args("handbook"))
+    text = _text(repo)
+    for comment in ("# team sources", "# the shared memory", "# team A", "# team B"):
+        assert comment in text, comment
 
 
 def test_a_trailing_comment_survives_an_edit(repo, monkeypatch):
-    path = repo / ".fux" / "sources" / "urls"
-    path.write_text("https://x.test/a fetch=http decoder=prose  # the runbook\n", encoding="utf-8")
+    _hand(repo)
     _add(repo, monkeypatch, _args("https://x.test/a", cdp=True))
-    assert "# the runbook" in _urls(repo)
+    assert "  - url: https://x.test/a   # the runbook\n    fetch: cdp\n" in _text(repo)
 
 
-def test_lines_land_in_sorted_order(repo, monkeypatch):
+def test_an_insert_never_reorders_what_a_human_wrote(repo, monkeypatch):
+    """The file is NOT re-rendered: `work` stays above `docs` exactly as the
+    human left it, and only the inserted line is new. File order is for
+    humans; the loader sorts (L4), so it cannot move a committed index byte."""
+    _hand(repo)
+    before = _text(repo).splitlines()
+    _add(repo, monkeypatch, _args("handbook"))
+    after = _text(repo).splitlines()
+    added = [line for line in after if line not in before]
+    assert added == ["    - handbook"]
+    assert [line for line in after if line != "    - handbook"] == before
+    assert after.index("    - work      # the shared memory") < after.index("    - docs")
+
+
+def test_a_url_entry_lands_as_one_block_and_touches_no_other_line(repo, monkeypatch):
+    _hand(repo)
+    before = _text(repo).splitlines()
+    _add(repo, monkeypatch, _args("https://x.test/m"))
+    after = _text(repo).splitlines()
+    block = ["  - url: https://x.test/m", *[f"    {k}: {v}" for k, v in _FULL.items()]]
+    at = after.index(block[0])
+    assert after[at : at + len(block)] == block
+    assert after[:at] + after[at + len(block):] == before
+    assert listed_urls(repo) == ["https://x.test/a", "https://x.test/m", "https://x.test/z"]
+
+
+def test_entries_added_to_a_sorted_list_keep_it_sorted(repo, monkeypatch):
     for url in ("https://x.test/c", "https://x.test/a", "https://x.test/b"):
         _add(repo, monkeypatch, _args(url))
-    entries = [line.split()[0] for line in _urls(repo).splitlines() if line and not line.startswith("#")]
-    assert entries == sorted(entries)
+    order = [line.split("url: ")[1] for line in _text(repo).splitlines() if "url: " in line]
+    assert order == sorted(order)
 
 
 def test_the_file_always_ends_in_exactly_one_newline(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/a"))
-    text = _urls(repo)
+    text = _text(repo)
     assert text.endswith("\n") and not text.endswith("\n\n")
 
 
 def test_the_file_is_written_lf_only_regardless_of_host_os(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/a"))
-    assert b"\r\n" not in (repo / ".fux" / "sources" / "urls").read_bytes()
-    _add(repo, monkeypatch, _args("docs/a.md"))
-    assert b"\r\n" not in (repo / ".fux" / "sources" / "dirs").read_bytes()
+    assert b"\r\n" not in sources_path(repo).read_bytes()
+    (repo / "handbook").mkdir()
+    _add(repo, monkeypatch, _args("handbook"))
+    assert b"\r\n" not in sources_path(repo).read_bytes()
 
 
 def test_a_fragment_bearing_url_round_trips_through_the_command(repo, monkeypatch):
+    """`#` with no space before it is TEXT in the subset — `page#section` is a
+    URL with a fragment, never a URL and a comment."""
     _add(repo, monkeypatch, _args("https://x.test/page#section"))
-    assert "https://x.test/page#section fetch=http decoder=prose" in _urls(repo)
+    assert _url(repo, "https://x.test/page#section")["fetch"] == "http"
 
 
-def test_two_urls_differing_only_by_fragment_get_two_lines(repo, monkeypatch):
+def test_two_urls_differing_only_by_fragment_get_two_entries(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/page#a"))
     _add(repo, monkeypatch, _args("https://x.test/page#b"))
-    listed = [line for line in _urls(repo).splitlines() if line.startswith("https://")]
-    assert len(listed) == 2
+    assert listed_urls(repo) == ["https://x.test/page#a", "https://x.test/page#b"]
 
 
 # -- remove-by-coverage (W-63 decision 4) -----------------------------------
@@ -410,25 +502,33 @@ def test_an_entry_with_its_own_line_is_removed_by_deleting_it(repo, monkeypatch,
     (repo / "handbook").mkdir()
     _add(repo, monkeypatch, _args("handbook"))
     _remove(repo, monkeypatch, _args("handbook"))
-    assert "handbook" not in _dirs(repo)
+    assert "handbook" not in _text(repo)
+    assert _paths(repo) == {"docs": ["include"]}
     assert "removed" in capsys.readouterr().out
 
 
-def test_a_covered_entry_is_removed_by_writing_an_exclusion(repo, monkeypatch, capsys):
-    """W-165 fix 1 — the exclusion lands in `.fuxignore`, and `dirs` is untouched.
+def test_removing_the_last_path_of_a_list_deletes_the_list_key(repo, monkeypatch):
+    """An empty list is refused by the reader, so the writer never leaves one."""
+    (repo / "old").mkdir()
+    _add(repo, monkeypatch, _args("old", archived=True))
+    _remove(repo, monkeypatch, _args("old"))
+    assert "archived:" not in _text(repo)
+    assert _paths(repo) == {"docs": ["include"]}
 
-    SR-FUXIGNORE made that file the one place a path is kept out of the index and
-    called the write path *"a migration we now owe"*. `!` in `dirs` keeps being
-    READ (SR-DIR-LIST decision 2a) — it is no longer WRITTEN.
+
+def test_a_covered_entry_is_removed_by_writing_an_exclusion(repo, monkeypatch, capsys):
+    """W-165 fix 1 — the exclusion lands in `.fuxignore`, and the manifest is
+    untouched. Since W-294 `.fuxignore` is the ONLY place exclusion is spelled:
+    `!` is refused in `.fux/sources.yaml`, read or written.
     """
+    before = _text(repo)
     _remove(repo, monkeypatch, _args("docs/a.md"))
     ignore = (repo / ".fux" / ".fuxignore").read_text(encoding="utf-8")
     # Anchored with a leading `/`: a bare `docs/a.md` would be anchored by its
     # own slash, but the rule has to hold for a top-level entry too, where a
     # bare name means "at any depth" and would drop `archive/docs` as well.
     assert "/docs/a.md" in ignore
-    assert "!" not in _dirs(repo)  # nothing new written next door
-    assert "docs" in _dirs(repo)  # the ancestor stays listed
+    assert _text(repo) == before  # nothing written next door; the ancestor stays listed
     out = capsys.readouterr().out
     assert "excluded" in out and "still listed" in out
 
@@ -447,15 +547,16 @@ def test_removing_something_neither_listed_nor_covered_names_both_checks(repo, m
 
 
 def test_removing_a_url_always_deletes_the_line(repo, monkeypatch, capsys):
-    """`urls` has no exclusions, so there is only ever one branch to take."""
+    """A URL has no ancestor, so there is only ever one branch to take."""
     _add(repo, monkeypatch, _args("https://x.test/a"))
     _remove(repo, monkeypatch, _args("https://x.test/a"))
-    assert "https://x.test/a fetch=http decoder=prose" not in _urls(repo)
+    assert _url(repo, "https://x.test/a") is None
+    assert "urls:" not in _text(repo), "the last entry takes the `urls:` key with it"
     assert "removed" in capsys.readouterr().out
 
 
 def test_removing_a_url_that_is_not_listed_fails_loudly(repo, monkeypatch):
-    with pytest.raises(FuxError, match="no exclusions"):
+    with pytest.raises(FuxError, match="A URL has no ancestor to subtract from"):
         _remove(repo, monkeypatch, _args("https://x.test/missing"))
 
 
@@ -463,10 +564,19 @@ def test_removing_a_url_deletes_its_line_and_nothing_else(repo, monkeypatch):
     _add(repo, monkeypatch, _args("https://x.test/a"))
     _add(repo, monkeypatch, _args("https://x.test/b"))
     _remove(repo, monkeypatch, _args("https://x.test/a"))
-    text = _urls(repo)
-    assert "https://x.test/a fetch=http decoder=prose" not in text
-    assert "https://x.test/b fetch=http decoder=prose" in text
+    text = _text(repo)
+    assert _url(repo, "https://x.test/a") is None
+    assert _url(repo, "https://x.test/b") == _FULL
     assert "# my list" in text
+    assert _paths(repo) == {"docs": ["include"]}
+
+
+def test_removing_a_hand_written_url_takes_its_whole_block_and_nothing_else(repo, monkeypatch):
+    _hand(repo)
+    _remove(repo, monkeypatch, _args("https://x.test/a"))
+    text = _text(repo)
+    assert "x.test/a" not in text and "# the runbook" not in text
+    assert "# team B" in text and listed_urls(repo) == ["https://x.test/z"]
 
 
 def test_removing_an_already_excluded_entry_says_so(repo, monkeypatch):
@@ -481,18 +591,15 @@ def test_removing_an_already_excluded_entry_says_so(repo, monkeypatch):
         _remove(repo, monkeypatch, _args("docs/a.md"))
 
 
-def test_removing_something_a_surviving_bang_line_excludes_leaves_it_alone(repo, monkeypatch):
-    """A legacy `!` line is not migrated as a side effect of `fux remove`.
-
-    It already excludes, so there is nothing to do; rewriting it here would be a
-    migration performed by a verb asked to remove something already removed.
-    `fux doctor`'s `dirs exclusions migrated` row is where the move is offered.
-    """
-    dirs = repo / ".fux" / "sources" / "dirs"
-    dirs.write_text(dirs.read_text(encoding="utf-8") + "!docs/a.md\n", encoding="utf-8")
-    with pytest.raises(FuxError, match="already excluded"):
+def test_a_bang_entry_in_the_manifest_stops_the_verb_and_names_fuxignore(repo, monkeypatch):
+    """W-294 step 2: `!` left the source list. A hand-written `!` entry is a loud
+    `file:lineno` error naming `.fux/.fuxignore` — never read as an exclusion,
+    never migrated as a side effect of a verb asked to do something else."""
+    original = "paths:\n  include:\n    - docs\n    - '!docs/a.md'\n"
+    sources_path(repo).write_text(original, encoding="utf-8")
+    with pytest.raises(FuxError, match=r"sources\.yaml:4: .*\.fux/\.fuxignore"):
         _remove(repo, monkeypatch, _args("docs/a.md"))
-    assert "!docs/a.md" in dirs.read_text(encoding="utf-8")  # left exactly as it was
+    assert _text(repo) == original  # left exactly as it was
     assert not (repo / ".fux" / ".fuxignore").is_file()
 
 
@@ -500,17 +607,18 @@ def test_removing_something_a_surviving_bang_line_excludes_leaves_it_alone(repo,
 
 
 def test_dry_run_add_writes_no_bytes(repo, monkeypatch, capsys):
-    before = (repo / ".fux" / "sources" / "urls").read_bytes()
+    before = sources_path(repo).read_bytes()
     _add(repo, monkeypatch, _args("https://x.test/a", dry_run=True))
-    assert (repo / ".fux" / "sources" / "urls").read_bytes() == before
+    assert sources_path(repo).read_bytes() == before
     out = capsys.readouterr().out
     assert "would add" in out and "fetch=http decoder=prose" in out
 
 
 def test_dry_run_remove_writes_no_bytes_and_names_the_branch(repo, monkeypatch, capsys):
-    before = (repo / ".fux" / "sources" / "dirs").read_bytes()
+    before = sources_path(repo).read_bytes()
     _remove(repo, monkeypatch, _args("docs/a.md", dry_run=True))
-    assert (repo / ".fux" / "sources" / "dirs").read_bytes() == before
+    assert sources_path(repo).read_bytes() == before
+    assert not (repo / ".fux" / ".fuxignore").is_file()
     assert "would exclude" in capsys.readouterr().out
 
 
@@ -520,7 +628,7 @@ def test_dry_run_remove_writes_no_bytes_and_names_the_branch(repo, monkeypatch, 
 def test_ingest_refuses_an_entry_nobody_listed(repo, monkeypatch):
     with pytest.raises(FuxError, match="never creates a line"):
         _ingest(repo, monkeypatch, _ingest_args("docs/nothing.md"))
-    assert "docs/nothing.md" not in _dirs(repo)
+    assert "docs/nothing.md" not in _text(repo)
 
 
 def test_ingest_no_fetch_still_refuses_an_entry_nobody_listed(repo, monkeypatch):
@@ -629,7 +737,7 @@ def test_the_module_imports_no_network_library():
 
 def test_add_with_no_fetch_opens_nothing(repo, monkeypatch, capsys):
     _add(repo, monkeypatch, _args("https://x.test/a", no_fetch=True))
-    assert "https://x.test/a fetch=http decoder=prose" in _urls(repo)
+    assert _url(repo, "https://x.test/a") == _FULL
     assert "fetching" not in capsys.readouterr().err
 
 
@@ -642,11 +750,8 @@ def _url_repo(repo):
     """
     (repo / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
     write_config(repo)  # every other key from the template (SR-LAW-12)
-    (repo / ".fux" / "sources" / "urls").write_text(
-        "https://x.test/a fetch=http decoder=prose keep=true ttl=24h "
-        "enrich=false archived=false update=auto\n",
-        encoding="utf-8",
-    )
+    write_urls(repo, "https://x.test/a fetch=http decoder=prose keep=true ttl=24h "
+        "enrich=false archived=false update=auto\n")
     # 🔴 **A REAL fetcher, and it is what makes the fence test load-bearing.**
     # With no `.fux/fetchers/http.py` a networked run dies on *fetcher not
     # found* before it ever reaches a socket — so the offline assertion would
@@ -742,12 +847,16 @@ def test_bare_add_lists_every_list(repo, monkeypatch, capsys):
     capsys.readouterr()
     _add(repo, monkeypatch, _args(None))
     out = capsys.readouterr().out
-    assert "sources/dirs" in out and "sources/urls" in out and ".fux/config/formats.toml" in out
+    assert ".fux/sources.yaml `paths:`" in out and ".fux/sources.yaml `urls:`" in out
+    assert ".fux/config/formats.toml" in out
+    assert "docs  (paths: include)" in out
     assert "https://x.test/a fetch=http decoder=prose" in out
+    # A type prints as a type, not as a path (a W-294 regression, found here).
+    assert "*.md  (paths: include)" not in out
 
 
-def test_listing_marks_a_line_fux_did_not_write(repo, monkeypatch, capsys):
-    (repo / ".fux" / "sources" / "urls").write_text("https://x.test/a fetch=http decoder=prose\n", encoding="utf-8")
+def test_listing_marks_an_entry_fux_did_not_write(repo, monkeypatch, capsys):
+    write_urls(repo, "https://x.test/a fetch=http decoder=prose\n")
     _add(repo, monkeypatch, _args(None))
     out = capsys.readouterr().out
     assert "* https://x.test/a" in out
@@ -755,7 +864,8 @@ def test_listing_marks_a_line_fux_did_not_write(repo, monkeypatch, capsys):
 
 
 def test_listing_an_empty_list_says_so(repo, monkeypatch, capsys):
-    (repo / ".fux" / "sources" / "urls").write_text("", encoding="utf-8")
+    write_urls(repo, "")
+    write_dirs(repo, "")
     _add(repo, monkeypatch, _args(None))
     assert "(empty)" in capsys.readouterr().out
 
@@ -766,7 +876,7 @@ def test_listing_an_empty_list_says_so(repo, monkeypatch, capsys):
 def test_a_cli_written_line_states_the_repo_policy_not_the_engine_default(tmp_path):
     """🔴 `fux add` wrote the ENGINE's defaults onto every line.
 
-    Every generated line states every attribute (SR-URL-LIST decision 12), and
+    Every generated line states every attribute (SR-SOURCES decision 12), and
     the values came from `spec.defaults()` — so a team with
     `[sources.url] ttl = "7d"` got `ttl=24h` written onto each line, and the
     middle layer of a three-layer resolution was dead for every line the CLI
@@ -784,9 +894,7 @@ def test_a_cli_written_line_states_the_repo_policy_not_the_engine_default(tmp_pa
         encoding="utf-8",
     )
     write_config(tmp_path)  # every other key from the template (SR-LAW-12)
-    listing = tmp_path / ".fux" / "sources" / "urls"
-    listing.parent.mkdir(parents=True)
-    listing.write_text("", encoding="utf-8")
+    listing = write_urls(tmp_path, "")
 
     defaults = _source_defaults(tmp_path, sourcelist.URLS)
     _, line, _ = add(listing, "https://wiki.test/p", {"fetch": "cdp"}, sourcelist.URLS, defaults)
@@ -814,12 +922,10 @@ def test_an_explicit_flag_still_beats_the_repo_policy(tmp_path):
     (tmp_path / "fux.toml").write_text(
         '[sources]\n\n[sources.url]\nttl = "7d"\nmax_parallel = 1\n', encoding="utf-8"
     )
-    listing = tmp_path / ".fux" / "sources" / "urls"
-    listing.parent.mkdir(parents=True)
-    listing.write_text("", encoding="utf-8")
+    listing = write_urls(tmp_path, "")
 
     defaults = _source_defaults(tmp_path, sourcelist.URLS)
-    _, line, _ = add(listing, "https://wiki.test/p fetch=http decoder=prose", {"ttl": "30s"}, sourcelist.URLS, defaults)
+    _, line, _ = add(listing, "https://wiki.test/p", {"fetch": "http", "decoder": "prose", "ttl": "30s"}, sourcelist.URLS, defaults)
     assert "ttl=30s" in line, "the flag beats the repo policy, which beats the built-in"
 
 
@@ -831,7 +937,7 @@ def test_a_repo_with_no_sources_url_is_untouched(tmp_path):
     assert _source_defaults(tmp_path, sourcelist.URLS) == {}
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     assert _source_defaults(tmp_path, sourcelist.URLS) == {}
-    assert _source_defaults(tmp_path, sourcelist.DIRS) == {}
+    assert _source_defaults(tmp_path, sourcelist.PATHS) == {}
 
 
 # -- W-140 row 14: the verb built to be read had nothing to read -------------
@@ -840,9 +946,7 @@ def test_a_repo_with_no_sources_url_is_untouched(tmp_path):
 def _check_repo(tmp_path):
     from fux.ingest.run import run
 
-    listing = tmp_path / ".fux" / "sources" / "dirs"
-    listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)

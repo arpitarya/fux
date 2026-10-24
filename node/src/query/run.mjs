@@ -48,9 +48,9 @@ import * as accel from "../derive/accel.mjs";
 /** The document-level multipliers and the directories they apply to.
  *
  * The weights come from `.fux/config/tune.toml`; the archived **declaration** still
- * comes from the committed dirs list, never from a path convention
- * (SR-DIR-LIST decision 4). `archivedDirSet` carries the tolerance: a corpus
- * whose dirs list cannot be read still answers, demoting nothing. */
+ * comes from the committed `.fux/sources.yaml`, never from a path convention
+ * (SR-SOURCES). `archivedDirSet` carries the tolerance: a corpus
+ * whose manifest cannot be read still answers, demoting nothing. */
 export function archivedRanking(root, tune, query = "") {
   const dirs = archivedDirSet(root);
   return new Weighting({

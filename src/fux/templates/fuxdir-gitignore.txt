@@ -1,5 +1,5 @@
 # Gitignored planes, BY NAME. NEVER add `*` here: `.fux/index/`,
-# `.fux/sources/`, `.fux/fetchers/`, `.fux/decoders/` and
+# `.fux/sources.yaml`, `.fux/fetchers/`, `.fux/decoders/` and
 # `.fux/observers/` are committed,
 # and a blanket ignore would drop them from git silently. `fux doctor`
 # checks exactly that.

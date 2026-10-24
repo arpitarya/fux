@@ -11,7 +11,7 @@ feature: refusal detection before decode
 owns: [src/fux/acquire/refusals.py@39e2a244262f, src/fux/templates/refusals.toml.txt@66d038617b23, tools/refusal-probe@5979308bfe8a, .fux/config/refusals.toml@5fdc90fab388]
 laws: [L2, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: db2132cc7939bb41d14c29ca45c8815af99ce1ffdb3672f97c5648e028a6b74b
+content_sha: 37a0e5ff1e878662d1a1e6478a0d41ca9fcf2315a83438c60f716a6e681328c4
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -354,7 +354,7 @@ it is a change to an argument other records rest on, not a local edit.
 ⚠ **A pinned URL is never checked against these rules, because nothing is ever
 fetched for it.** The refusal check sits inside `fetch_all()`, after `_unpack`
 and before persist and decode (decision 1) — and a line carrying `update=never`
-([SR-URL-LIST](0116_url-list.md) decision 14) is filtered out **above**
+([SR-SOURCES](0116_url-list.md) decision 14) is filtered out **above**
 `fetch_all`, so no response exists to refuse. That is correct rather than a gap:
 a refusal rule describes what a *fetched response* may not be, and there is no
 response. **What it means in practice is that a document indexed before it
@@ -407,7 +407,7 @@ URL-free directory in the corpus included.
 🔴 **That is not a regression and it is not a gap in this record** — the same
 blast radius existed for a mistyped `[sources.url] fetcher` path long before
 `fetch=` became an open set. It is named here because the *population* grew:
-[SR-URL-LIST](0116_url-list.md) decision 15 turned a bad `fetch=` value from a
+[SR-SOURCES](0116_url-list.md) decision 15 turned a bad `fetch=` value from a
 parse error at read time into a runtime failure, and a reader of this record
 could otherwise reasonably assume the refusal machinery covers it. It does not,
 and making it do so would mean a repo silently indexing a subset of its corpus —
@@ -417,7 +417,7 @@ and making it do so would mean a repo silently indexing a subset of its corpus �
 (the pipe ruling; [SR-FETCHER](0117_fetcher.md) decision 17c).
 
 `MAGIC_BY_DECODER` sits above `MAGIC`: a URL line declares `decoder=<stem>`
-([SR-URL-LIST](0116_url-list.md) decision 17), and where that stem has a fixed
+([SR-SOURCES](0116_url-list.md) decision 17), and where that stem has a fixed
 signature — `xlsx`, `docx`, `pptx` open `PK\x03\x04`; `pdf` opens `%PDF-` — the
 body is checked against **it**, whatever `Content-Type` came back. The header map
 is the fallback, for a caller with no line: the add-time probe, which is
@@ -555,8 +555,8 @@ away from firing on real short documents. It warns and never refuses, because
   action for each is opposite. Both mechanisms now exist, separately, and the
   post-decode one warns rather than refusing.
 - **A `[refusals]` table in `fux.toml`.** Rejected for the reason
-  SR-URL-LIST gives for the URL list: a growing list of multi-line entries in
-  a TOML file is one diff hunk and one merge conflict.
+  SR-SOURCES gives for the source list: a growing list of multi-line entries in
+  a TOML array is one diff hunk and one merge conflict.
 - **Making the magic-byte floor configurable.** Rejected under decision 6. Its
   whole value is that it is one thing a consumer cannot get wrong, and the
   first request to disable it would come from someone whose real problem was a
@@ -605,7 +605,7 @@ document is never listed here — the body may name one, but archive is not
 evidence.*
 
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-DOTFUX](0102_fux-directory.md) ·
-[SR-URL-INGEST](0107_url-ingest.md) · [SR-URL-LIST](0116_url-list.md) ·
+[SR-URL-INGEST](0107_url-ingest.md) · [SR-SOURCES](0116_url-list.md) ·
 [SR-FETCHER](0117_fetcher.md) · [SR-DECODE](0139_decode.md) ·
 [SR-ACQUIRED](0145_acquired-plane.md)
 

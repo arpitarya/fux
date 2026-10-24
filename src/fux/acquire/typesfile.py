@@ -42,7 +42,7 @@ Any valid TOML with the right keys loads. The editors below change **one
 line** of the canonical layout — one glob per line inside `include = [ ... ]`,
 one `key = "value"` per line under `[decoders]` — and **refuse** a layout they
 did not write rather than reformat it, because a reformat would eat the
-comments a human left inside the array (SR-URL-LIST decision 13, kept).
+comments a human left inside the array (SR-SOURCES decision 13, kept).
 
 ## Positions in errors are best effort, and say so
 

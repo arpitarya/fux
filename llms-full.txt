@@ -137,7 +137,7 @@ git add .fux fux.toml && git commit -m "Add fux index"
 
 That's it. Your teammates, and their agents, now get the same answers from a plain `git clone`.
 
-- **What gets indexed** is listed in `.fux/sources/dirs` (`README.md` and `docs` to start). Anything you don't want indexed goes in `.fux/.fuxignore`.
+- **What gets indexed** is listed in `.fux/sources.yaml` (`README.md` and `docs` to start). Anything you don't want indexed goes in `.fux/.fuxignore`.
 - **`fux ingest`** reports what it did: `ingested 3 docs (3 changed, 0 carried forward), 0 not indexed, 0 skipped, 3 shards written`.
 - **`fux doctor`** checks the setup. It's read-only and offline.
 
@@ -565,7 +565,7 @@ different from its pin stops fux with the install line. The opposite of
 M4's fetch cache nested inside it at `runtime/fetch-cache/`). Created through
 `derived_dir()`, which drops a [`CACHEDIR.TAG`](https://bford.info/cachedir/)
 so backup tools skip it, and named explicitly in `.fux/.gitignore`. Opposite
-of a *committed plane* (`index/`, `sources/`, `fetchers/`). See
+of a *committed plane* (`index/`, `sources.yaml`, `fetchers/`). See
 [SR-DOTFUX](../records/0102_fux-directory.md).
 
 **Doc-id** — A document's integer identity inside the wire index, assigned in
@@ -580,7 +580,7 @@ live answer. Three facts:
   `src/` imports no parser and declares no parsing dependency (`dependencies = []`).
 - **Source files are not indexed by default.** No source-code extension is on
   `DEFAULT_TYPES` (`acquire/gitdir.py`); adding `src/` to
-  [`.fux/sources/dirs`](#fux-directory) still reports *not an indexed file type*
+  [`.fux/sources.yaml`](#fux-directory) still reports *not an indexed file type*
   per file. Indexing code is opt-in, and even then it is indexed **as text**.
 - **What looks like code analysis is not.** The [`code` edge kind](#code-edge-kind)
   is a backtick-quoted path to another indexed document.
@@ -646,7 +646,7 @@ two live in the fux-lab environment, generated deterministically from a seed.
 
 **`.fux` directory** — Fux's directory inside the consumer's repo. Every
 child is **declared** as committed or [derived](#derived-plane): `index/`
-(the wire index), `sources/` (line-oriented lists such as `urls`),
+(the wire index), `sources.yaml` (the include list — paths and URLs),
 `fetchers/` (consumer-owned code) and two generated files — a
 self-describing `README.md` and a `.gitignore` naming **only** the derived
 dirs, never `*`. Both are write-if-missing; anything undeclared is a `fux
@@ -868,7 +868,7 @@ no engine change and no release, exactly as `.fux/decoders/` already works
 validates the *shape* of the name and never imports the module to check it:
 importing a fetcher runs code that may open a browser, and reading a config
 file may not do that. `fux doctor`'s `fetcher bindings` row reports a name with
-no file. See [SR-URL-LIST](../records/0116_url-list.md) decision 15,
+no file. See [SR-SOURCES](../records/0116_url-list.md) decision 15,
 [SR-URL-INGEST](../records/0107_url-ingest.md),
 [SR-DOTFUX](../records/0102_fux-directory.md).
 
@@ -905,7 +905,7 @@ and they are one mechanism plus its bookkeeping.
   may be committed.
 
 See [SR-FETCHER](../records/0117_fetcher.md) decision 16,
-[SR-URL-LIST](../records/0116_url-list.md) decision 16,
+[SR-SOURCES](../records/0116_url-list.md) decision 16,
 [SR-CONFIG](../records/0113_config.md) decision 16,
 [SR-INGEST](../records/0106_ingest.md) decision 22.
 
@@ -945,7 +945,7 @@ URL line ──fetch=cdp──▶ .fux/fetchers/cdp.py ──bytes──▶ .fux
 module) and `observed types` (a declared stem disagreeing with the last
 retained response).
 
-See [SR-URL-LIST](../records/0116_url-list.md) decision 17,
+See [SR-SOURCES](../records/0116_url-list.md) decision 17,
 [SR-FETCHER](../records/0117_fetcher.md) decision 17,
 [SR-DECODE](../records/0139_decode.md) decision 21,
 [SR-URL-INGEST](../records/0107_url-ingest.md) decision 6a.
@@ -1210,7 +1210,7 @@ location. See [SR-CACHE](../records/0131_cache.md) decision 7,
 [SR-REFER](../records/0127_refer-plane.md) decision 6.
 
 **URL source (`[sources.url]`)** — The `src: "url"` ingestion path: URLs are
-read from the committed `.fux/sources/urls` (one per line), fetched through
+read from the `urls:` of the committed `.fux/sources.yaml` (one entry per URL), fetched through
 the consumer's [fetcher](#fetcher-url), and indexed exactly like repo
 files. ⚠ **Until fux 3.x they were indexed with
 [hashed meta](#hashed-meta-meta--hashed) by default**; W-194 removed that, so a
@@ -1593,7 +1593,7 @@ check-ignore` that the index itself is not ignored (SR-FUX-DIRECTORY d1–d5).
 flowchart TB
   subgraph COMMITTED["COMMITTED — travels with the repository"]
     c1["index/  00.jsonl … ff.jsonl<br/>header: fux.index.v2 · analyzer v2 · 5 tf fields"]
-    c2["sources/dirs · sources/urls · formats.toml · .fuxignore"]
+    c2["sources.yaml · formats.toml · .fuxignore"]
     c3["enrich/&lt;sha&gt;.md  (doc2query + human lines → ctx field)<br/>eval/corrections.tsv"]
     c4["tune.toml · output.toml · pii.toml (required) · refusals.toml"]
     c5["decoders/ · fetchers/ · observers/ (proposed)<br/>readable source — the three L10 exemptions"]
@@ -1715,7 +1715,7 @@ two gates inside them that carry laws.
 
 ```mermaid
 flowchart LR
-  W["1 · WALK<br/>.fuxignore first, then sources/dirs,<br/>sources/urls, formats.toml include globs"]
+  W["1 · WALK<br/>.fuxignore first, then sources.yaml<br/>paths and urls, formats.toml include globs"]
   D["2 · DECODE<br/>17 built-in decoders, copied into .fux/decoders/<br/>consumer copy replaces by module name<br/>decode(raw, rel_path) → str | None"]
   Q["None → enrich/queue.tsv with a reason<br/>(never silently dropped)"]
   H["3 · content_sha on the RAW bytes<br/>(before redaction)"]
@@ -1732,10 +1732,10 @@ flowchart LR
 </details>
 
 **Walk.** `.fuxignore` is read first and outranks everything; then
-`sources/dirs` (one path per line, `!` excludes, `archived=true` and
-`enrich=true` attributes), `sources/urls` (per-line `fetch=`, `ttl=`, `keep=`,
-`enrich=`, `archived=`, `update=`), and `formats.toml`'s `include` globs and
-`[decoders]` table. (⚠ `meta=` was a seventh URL attribute until 2026-09-20.)
+`sources.yaml` — `paths:` grouped by flag (`include`, `archived`, `enrich`;
+includes only, exclusion is `.fuxignore`'s) and `urls:` entries (`url`,
+`fetch`, `decoder` required; `ttl`, `keep`, `enrich`, `archived`, `update`
+optional) — and `formats.toml`'s `include` globs and `[decoders]` table.
 
 **Decode.** Seventeen built-in decoders — csv, docx, drawio, html, image, ini,
 json, jsonl, mail, pdf, pptx, rtf, svg, toml, xlsx, xml, yaml — are listed by
@@ -6323,7 +6323,7 @@ and the switch are two different permissions and neither implies the other.**
 - 🔴 **The guards are the defence again.** ⚠ **Reversed 2026-09-18 by decision
   3.** Between 2026-09-15 and that date this bullet read that the guards had
   become a backstop around an empty room. **The room is not empty**, so
-  `.gitignore`, `permissions.deny`, the hook, `.fux/sources/dirs` and
+  `.gitignore`, `permissions.deny`, the hook, `.fux/.fuxignore` and
   `tests/test_golden_key_never_committed.py` are load-bearing, each one covers a
   different surface, and **each one's residual hole is a hole around a real
   key.** Every guard now matches **both spellings**, by glob, and
@@ -6488,7 +6488,7 @@ test -x .claude/hooks/guard-golden-answer.sh && echo GUARD-EXECUTABLE
 
 # 5. the canonical path is ignored by git and excluded from fux's own index
 git check-ignore -q work/golden/golden-answers && echo IGNORED
-grep -n '!work/golden' .fux/sources/dirs               # expect: one line
+grep -n '^/work/golden ' .fux/.fuxignore                # expect: one line
 
 # 6. decision 13 — the scorer emits no answer field. Runs against a SYNTHETIC
 #    key built in a tmpdir; it opens nothing real and needs no key to exist

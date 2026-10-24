@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs, write_urls
 import os
 import subprocess
 
@@ -142,7 +142,7 @@ def test_check_ignore_is_skipped_outside_a_git_checkout(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     dirs = tmp_path / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
-    dirs.write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     check = _check(doctor.run(tmp_path), "index not gitignored")
     assert check.ok and "skipped" in check.detail
 
@@ -322,7 +322,7 @@ def test_url_check_names_listed_urls_that_have_never_been_fetched(tmp_path):
     write_config(tmp_path)
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True, exist_ok=True)
-    urls.write_text("https://a fetch=http decoder=prose\nhttps://never-fetched fetch=http decoder=prose\n", encoding="utf-8")
+    write_urls(tmp_path, "https://a fetch=http decoder=prose\nhttps://never-fetched fetch=http decoder=prose\n")
 
     check = _check(doctor.run(tmp_path), "url sources")
     assert "1 listed URL(s) have never been fetched" in check.detail
@@ -1508,54 +1508,6 @@ def test_doctor_run_includes_the_row(tmp_path):
     assert "fux on PATH" in names
 
 
-# -- W-165 fix 1: the `!` lines `fux remove` no longer writes ----------------
-
-
-def _corpus_with_dirs(tmp_path, dirs_text: str):
-    """A minimal repo whose `dirs` list says exactly `dirs_text`."""
-    (tmp_path / ".git").mkdir()
-    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    write_config(tmp_path)
-    (tmp_path / ".fux" / "sources").mkdir(parents=True, exist_ok=True)
-    (tmp_path / ".fux" / "sources" / "dirs").write_text(dirs_text, encoding="utf-8")
-    return tmp_path
-
-
-def test_no_bang_lines_is_a_clean_migration_row(tmp_path):
-    checks = doctor.run(_corpus_with_dirs(tmp_path, "docs\n"))
-    row = next(c for c in checks if c.name == "dirs exclusions migrated")
-    assert row.ok
-    assert ".fux/.fuxignore" in row.detail
-
-
-def test_a_surviving_bang_line_is_named_with_its_move(tmp_path):
-    """The note lists the survivor and the one-line move — and stays a `warn`.
-
-    `!` lines in `dirs` keep being READ (SR-DIR-LIST decision 2a); breaking them
-    would be a silent re-inclusion, which is the worse direction. So the row
-    reports and never fails the command.
-    """
-    root = _corpus_with_dirs(tmp_path, "docs\n!docs/secret.md\n")
-    row = next(c for c in doctor.run(root) if c.name == "dirs exclusions migrated")
-    assert not row.ok
-    assert row.level == "warn"
-    assert "docs/secret.md" in row.detail
-    assert "/docs/secret.md" in row.detail  # the anchored pattern to write instead
-    assert row.detail.isascii()  # printed, and a Windows console must encode it
-
-
-def test_the_migration_row_fires_without_a_duplicate(tmp_path):
-    """⚠ Distinct from `_ignore_health`'s duplicate finding, which needs BOTH files.
-
-    The survivors nothing duplicates are the ones no other check would mention,
-    and they are the ones the migration is actually owed for.
-    """
-    root = _corpus_with_dirs(tmp_path, "docs\n!docs/secret.md\n")
-    checks = {c.name: c for c in doctor.run(root)}
-    assert checks["fuxignore usable"].ok  # nothing duplicated — that row is clean
-    assert not checks["dirs exclusions migrated"].ok
-
-
 # -- W-163: the setup-drift rows --------------------------------------------
 #
 # 🔴 **One cause, eight rows.** `fux setup` writes once and never rewrites, so
@@ -1572,7 +1524,7 @@ def _drift_repo(tmp_path):
     (tmp_path / ".git").mkdir()
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
@@ -1601,7 +1553,7 @@ def test_every_drift_row_is_a_warning_and_none_is_an_error(tmp_path):
     (config_file(root, "tune")).write_text("[bm25f]\nk1 = 1.2\n", encoding="utf-8")
     (config_file(root, "output")).write_text("[cli]\ntop = 5\n", encoding="utf-8")
     (config_file(root, "formats")).write_text('include = ["*.md", "*.zzz"]\n', encoding="utf-8")
-    (root / ".fux" / "sources" / "dirs").write_text("docs\nhandbook\n", encoding="utf-8")
+    write_dirs(root, "docs\nhandbook\n")
 
     rows = {c.name: c for c in doctor.run(root)}
     assert set(DRIFT_ROWS) <= set(rows), f"missing rows: {sorted(set(DRIFT_ROWS) - set(rows))}"
@@ -1862,7 +1814,7 @@ def test_a_glob_naming_no_extension_claims_nothing_and_is_not_reported(tmp_path)
 
 def test_a_listed_path_that_is_not_on_disk_is_reported(tmp_path):
     root = _drift_repo(tmp_path)
-    (root / ".fux" / "sources" / "dirs").write_text("docs\nhandbook\n", encoding="utf-8")
+    write_dirs(root, "docs\nhandbook\n")
     row = _row(root, "listed directories exist")
     assert not row.ok
     assert "handbook" in row.detail
@@ -1870,12 +1822,12 @@ def test_a_listed_path_that_is_not_on_disk_is_reported(tmp_path):
 
 
 def test_an_exclusion_matching_nothing_is_not_reported(tmp_path):
-    """⚠ A `!` line names a PATTERN. One matching nothing today is what a
-    pattern is for, and reporting it would be reporting a non-event."""
+    """⚠ An exclusion names a PATTERN. One matching nothing today is what a
+    pattern is for, and reporting it would be reporting a non-event. Since
+    W-294 it lives in `.fux/.fuxignore` (the helper moves the `!` line there),
+    and only the manifest's paths are checked against the disk."""
     root = _drift_repo(tmp_path)
-    (root / ".fux" / "sources" / "dirs").write_text(
-        "docs\n!docs/nothing-here\n", encoding="utf-8"
-    )
+    write_dirs(root, "docs\n!docs/nothing-here\n")
     assert _row(root, "listed directories exist").ok
 
 
@@ -1895,9 +1847,7 @@ def _pinned_repo(tmp_path, *, urls=("https://x.test/a fetch=http decoder=prose",
     root = _drift_repo(tmp_path)
     (root / "fux.toml").write_text("[sources]\n[sources.url]\n" + flag, encoding="utf-8")
     write_config(root)  # every other key from the template (SR-LAW-12)
-    (root / ".fux" / "sources" / "urls").write_text(
-        "".join(f"{u}\n" for u in urls), encoding="utf-8"
-    )
+    write_urls(root, "".join(f"{u}\n" for u in urls))
     return root
 
 

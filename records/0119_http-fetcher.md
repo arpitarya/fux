@@ -11,7 +11,7 @@ feature: "`fux-fetcher-http` — the fetcher a URL line gets when it says `fetch
 owns: [packages/fux-fetcher-http@2715035aaea9]
 laws: [L2, L5, ex-L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 6fca6fdee7e1641a8c5738b65b008d28a77b011cb29aa8a95ff803bc6d36fd26
+content_sha: 1caec3997b14fd7f2ed5db218bc44bbe3a02940efbd0e4ee229b60272c6876bb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -102,9 +102,14 @@ error: [sources.url] fetcher not found: .fux/fetchers/cdp.py
 opt-in per line.
 
 ```console
-$ cat .fux/sources/urls
-https://example.com/docs/api
-https://wiki.corp/display/ENG/runbook    fetch=cdp
+$ cat .fux/sources.yaml
+urls:
+  - url: https://example.com/docs/api
+    fetch: http
+    decoder: html
+  - url: https://wiki.corp/display/ENG/runbook
+    fetch: cdp
+    decoder: html
 
 $ fux ingest
 ingested 2 docs (2 changed), 0 skipped, 2 shards written
@@ -162,7 +167,7 @@ fetcher does not make a URL public.*
 🔴 **The separation it drew is what survives, and it is worth more than the
 rule was:** *what fetched a document* and *what may be committed about it* are
 different questions, and a transport must never decide a policy. That is why
-`fetch=` still records nothing on the record ([SR-URL-LIST](0116_url-list.md)),
+`fetch=` still records nothing on the record ([SR-SOURCES](0116_url-list.md)),
 and it is the argument any future per-transport default has to get past.
 
 **5. Both shipped fetchers are consumer code from birth.** Committed, editable,
@@ -266,8 +271,11 @@ $ fux find "oncall rotation" --json | head -4
 **A near-empty document is the signal**, and it is one a human reads once:
 
 ```console
-$ cat .fux/sources/urls
-https://app.corp/handbook    fetch=cdp     # renders client-side
+$ cat .fux/sources.yaml
+urls:
+  - url: https://app.corp/handbook   # renders client-side
+    fetch: cdp
+    decoder: html
 ```
 
 Fux does not retry through Chrome on its own. That is decision 3, and the
@@ -278,7 +286,7 @@ bar gets indexed as a runbook.
 
 `http.py` and its template twin now say that a fetcher retrieving bytes is only
 half the sentence: the **line** names the decoder that converts them
-([SR-URL-LIST](0116_url-list.md) decision 17), `fux add` observes the type once,
+([SR-SOURCES](0116_url-list.md) decision 17), `fux add` observes the type once,
 and *if you are editing this file to change how a page becomes Markdown you are
 in the wrong file* — which the docstring already said, and now says with the
 mechanism that enforces it.
@@ -345,7 +353,7 @@ argument for it: a plain GET that returns a rendered shell on a line declaring
 - The defect that made "write it out" the answer, and the capture that closed
   it — [`2026-08-19-w54`](../work/regression/2026-08-19-w54/report.md) §1.
 - The per-URL attribute that selects a non-default fetcher —
-  [SR-URL-LIST](0116_url-list.md).
+  [SR-SOURCES](0116_url-list.md).
 - Prior art: explicit per-request opt-in, no automatic fallback —
   https://github.com/scrapy-plugins/scrapy-playwright
 - The position this record rejects, stated by its proponents —
@@ -385,7 +393,7 @@ document is never listed here — the body may name one, but archive is not
 evidence.*
 
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-DOTFUX](0102_fux-directory.md) ·
-[SR-CONFIG](0113_config.md) · [SR-URL-LIST](0116_url-list.md) ·
+[SR-CONFIG](0113_config.md) · [SR-SOURCES](0116_url-list.md) ·
 [SR-FETCHER](0117_fetcher.md) · [SR-CDP-FETCHER](0118_cdp-fetcher.md) ·
 [SR-DECODE](0139_decode.md) · [SR-PLUGINS](0165_plugins.md)
 

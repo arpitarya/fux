@@ -22,7 +22,7 @@ Built offline with `python -m hatchling build` and installed with
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import os
 import shutil
 import subprocess
@@ -103,7 +103,7 @@ def corpus(tmp_path_factory) -> Path:
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
-    dirs.write_text("docs\n", encoding="utf-8")
+    write_dirs(root, "docs\n")
     (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     # The pin is the dev tree's digest, which is the wheel's: the same files.

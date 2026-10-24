@@ -115,6 +115,7 @@ on 2026-09-06 are not restored; git holds them.
 | record | archived | retired by, and what it keeps |
 |---|---|---|
 | [`records/0007_LAW-5-hashed-meta.md`](records/0007_LAW-5-hashed-meta.md) | 2026-09-28 | **SR-LAW-5 — law L5, retired 2026-09-20** (Arpit, W-194): hashed display meta was deleted outright. It keeps the ACL-mismatch argument, the AOL-2006 citation and the reopen trigger — the leak L5 closed is an accepted, documented exposure. **The handle L5 is never reused.** No successor |
+| [`records/0120_dir-list.md`](records/0120_dir-list.md) | 2026-10-24 | **SR-DIR-LIST — retired 2026-10-24** (Arpit, W-294): `.fux/sources/dirs` became the `paths:` half of `.fux/sources.yaml`, and its `!` lines moved to `.fux/.fuxignore`, exclusion's one home. It keeps why `!` was an entry rather than an attribute, the two-branch removal and why `archived` is declared, never derived. Successor: SR-SOURCES (`records/0116_url-list.md`) |
 
 ## `handoff/` — the retired handoff directory
 
@@ -164,6 +165,7 @@ they are worth keeping.
 | item | closed | outcome and live successor |
 |---|---|---|
 | [`W-296-observers-on-demand.md`](open/W-296-observers-on-demand.md) | 2026-10-24 | **Done.** `fux setup` no longer seeds `.fux/observers/`; `fux observers init` creates it on demand; setup removes a README-only scaffold whose sha256 is in `constants.toml [observe]`. Live successor: [SR-OBSERVE](../records/0157_observe.md) decision 1. |
+| [`W-294-one-sources-file.md`](open/W-294-one-sources-file.md) | 2026-10-24 | **Done.** `.fux/sources/dirs` + `.fux/sources/urls` became one include manifest, `.fux/sources.yaml`, in a strict YAML subset read by hand-rolled Python and Node twins; exclusion lives only in `.fux/.fuxignore`; `fux setup` converts once; zero index bytes changed on this repo. Live successor: [SR-SOURCES](../records/0116_url-list.md) |
 | [`W-295-config-directory.md`](open/W-295-config-directory.md) | 2026-10-24 | **Done.** The eight policy TOMLs live in `.fux/config/`; `fux setup` moves them byte for byte; every other verb refuses an old-address file with *moved … run `fux setup`*; doctor row `config files at the pre-W-295 address`. Paper fig-02 not redrawn. Live successor: [SR-DOTFUX](../records/0102_fux-directory.md) decision 11, `src/fux/configfiles.py`. |
 | [`W-291-setup-installs-hooks.md`](open/W-291-setup-installs-hooks.md) | 2026-10-24 | **Done.** `fux setup` installs the git hooks and the `fux-index` merge driver through `maintain.hooks.install`; `--no-hooks` opts out; no git repo or a foreign hook is never fatal. Live successor: [SR-MAINTENANCE](../records/0129_hooks.md) decision 5 (amended), [SR-CLI](../records/0101_cli-surface.md). |
 | [`W-290-front-door-docs.md`](open/W-290-front-door-docs.md) | 2026-10-20 | **Done.** README rewritten against the published 4.1.0; `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`; four issue forms and the PR template under `.github/`. Live successor: [`README.md`](../README.md), [`CONTRIBUTING.md`](../CONTRIBUTING.md). |

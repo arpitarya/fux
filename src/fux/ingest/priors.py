@@ -94,7 +94,7 @@ def superseded_ids(records: list[dict]) -> set[str]:
 
     **Declared, never inferred.** A document says `supersedes: [...]` in its
     own frontmatter; nothing guesses from titles, numbering or dates. This is
-    the same rule SR-DIR-LIST decision 10 applies to `archived` — a path
+    the same rule SR-SOURCES (paths are declared, never derived) applies to `archived` — a path
     heuristic is exact for the repo that invented it and a silent convention
     for everybody else.
 

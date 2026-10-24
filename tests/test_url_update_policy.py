@@ -23,7 +23,7 @@ import pytest
 from fux.config import UrlSource
 from fux.errors import FuxError
 from fux.acquire import sourcelist, urlsrc
-from l12_fixtures import url_limits, write_config
+from l12_fixtures import url_limits, write_config, write_dirs, write_urls
 
 
 def _write_fetcher(root, text, name="mw.py", encoding="utf-8"):
@@ -48,7 +48,7 @@ def _source(**overrides):
 
     shipped = setup_mod.template_config()["sources"]
     base = {k: v for k, v in shipped["url"].items() if not isinstance(v, dict)}
-    base.update(routes={}, config={}, urls_file=shipped["urls_file"])
+    base.update(routes={}, config={}, sources_file=shipped["sources_file"])
     base.update(overrides)
     return UrlSource(**base)
 
@@ -187,12 +187,9 @@ def test_doctor_counts_pinned_lines_and_names_the_lossy_ones(tmp_path):
     write_config(tmp_path)  # every other key from the template (SR-LAW-12)
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True)
-    urls.write_text(
-        "https://x.test/pinned update=never fetch=mw decoder=prose\n"
+    write_urls(tmp_path, "https://x.test/pinned update=never fetch=mw decoder=prose\n"
         "https://x.test/lossy update=never keep=false fetch=mw decoder=prose\n"
-        "https://x.test/live fetch=mw decoder=prose\n",
-        encoding="utf-8",
-    )
+        "https://x.test/live fetch=mw decoder=prose\n")
     parts = doctor._pinned_note(tmp_path)
     joined = " ".join(parts)
     assert "2 pinned" in joined
@@ -263,8 +260,8 @@ def _repo(tmp_path, urls, fetcher=FAKE):
     _write_fetcher(tmp_path, fetcher)
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True)
-    (fux / "sources" / "urls").write_text("\n".join(urls) + "\n", encoding="utf-8")
-    (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    write_urls(fux.parent, "\n".join(urls) + "\n")
+    write_dirs(fux.parent, "docs\n")
     # SR-PII decision 17: a hand-built repo needs this or every verb refuses.
     (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
@@ -318,9 +315,7 @@ def test_pinning_a_url_AFTER_it_was_indexed_keeps_its_record(tmp_path):
     run(root, refresh_urls=True, full=False)
     assert "url:https://x.test/doc" in store.read_index(root)
 
-    (root / ".fux" / "sources" / "urls").write_text(
-        "https://x.test/doc update=never fetch=mw decoder=prose\n", encoding="utf-8"
-    )
+    write_urls(root, "https://x.test/doc update=never fetch=mw decoder=prose\n")
     _write_fetcher(root, EXPLODING)
     run(root, refresh_urls=True, full=False)
     assert "url:https://x.test/doc" in store.read_index(root)
@@ -343,7 +338,7 @@ def test_a_corpus_that_declares_nothing_is_byte_identical(tmp_path):
 
 
 def test_the_add_that_writes_a_pinned_line_still_fetches_it_once(tmp_path):
-    """SR-URL-LIST decision 14, which the code contradicted for six days.
+    """SR-SOURCES decision 14, which the code contradicted for six days.
 
     `fux add <URL> --no-update` wrote the line, fetched nothing and exited 1
     saying *the fetch failed* — because the pin filter ran above the fetch and

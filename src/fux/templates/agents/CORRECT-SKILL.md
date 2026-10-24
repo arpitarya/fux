@@ -35,7 +35,7 @@ usually better than a correction:
 | the real problem | the fix |
 |---|---|
 | the document does not use the words people search with, and **you can edit it** | **edit the document.** A correction is for a document you do not own or must not change |
-| the served document is **retired** | `supersedes:` on the successor, or `archived=true` on its `.fux/sources/dirs` line — corpus-wide, not per query |
+| the served document is **retired** | `supersedes:` on the successor, or its path under `archived:` in `.fux/sources.yaml` — corpus-wide, not per query |
 | the corpus genuinely does not answer it | say so. Neither a correction nor a pin makes an answer exist |
 
 ## 2 · The verb

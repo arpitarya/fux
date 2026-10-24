@@ -11,7 +11,7 @@ feature: the decoder plane — the protocol, the registry, the consumer seam, th
 owns: [src/fux/decode@0fc2231fb9da, src/fux/decode/ext/__init__.py@c9bb2ae89770, src/fux/decode/ext/markdown.py@e6152422eabb, src/fux/decode/ext/ooxml.py@f6b06732db01, src/fux/decode/ext/xml.py@5d58ae8c264f, src/fux/decode/ext/zip.py@b219303e98d1, src/fux/templates/agents/DECODER-SKILL.md@cfe08438e531, node/src/decode/markdown.mjs@9b8c05b393cb, node/src/decode/registry.mjs@573eb7a66bde, packages/fux-decoder-config@115bf622ae00, packages/fux-decoder-drawio@ad4bba23c274, packages/fux-decoder-html@95c6656d62cc, packages/fux-decoder-image@0065c168fd3c, packages/fux-decoder-json@06731b213dda, packages/fux-decoder-mail@2200f16576e3, packages/fux-decoder-office@5916341e57d7, packages/fux-decoder-pdf@36d0812fcaea, packages/fux-decoder-rtf@daff861b6177, packages/fux-decoder-svg@0042ed34e59b, packages/fux-decoder-xml@5452af6b39d5]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 5dea67d39e7153b0bb783ac44029c5e24a31bdadbe9cb57fc0198d99a0851fd2
+content_sha: 327e692518ed0208f2aeb0d561bcea17f8110e73c1cef0fbe675ea9ebc5f0c74
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -769,7 +769,7 @@ which is exactly why it was built that way — the note in `doctor.py` says
 *three checks need per-record fields*, and it is now four.
 
 ⚠ **Decoders and fetchers are ONE consumer-plane pattern, and since
-2026-09-15 they are spelled the same way** ([SR-URL-LIST](0116_url-list.md)
+2026-09-15 they are spelled the same way** ([SR-SOURCES](0116_url-list.md)
 decision 15, W-178). `.fux/decoders/<name>.py` + a `[decoders]` binding, and
 `.fux/fetchers/<name>.py` + `fetch=<name>` on a URL line: a module stem
 validated by **shape only**, existence checked where the name is used and
@@ -784,7 +784,7 @@ own doctor row and its own split between shape and existence.
 **21. A decoder can be reached BY NAME, not only by extension** —
 `decoder_named(stem, root)` (the pipe ruling, 2026-09-18; built 2026-09-21 as
 W-199 DoD 10). A URL line declares `decoder=<stem>`
-([SR-URL-LIST](0116_url-list.md) decision 17) because a URL has no trustworthy
+([SR-SOURCES](0116_url-list.md) decision 17) because a URL has no trustworthy
 extension, so the plane needs a lookup that answers the question the line asks.
 
 **21a. It is `registry()`'s first two steps and deliberately NOT its third.** A

@@ -42,7 +42,7 @@ writes **no** decoder or fetcher: a file you put in `.fux/decoders/` or
 | writes | what it is |
 |---|---|
 | `fux.toml` | policy: `[sources]`, `[sources.url]` (`max_parallel` is **required**), `[index]`, `[agents] install` |
-| `.fux/sources/dirs` · `.fux/sources/urls` | what is indexed; `dirs` is seeded with `README.md` and `docs` when they exist |
+| `.fux/sources.yaml` | what is indexed — `paths:` and `urls:`, includes only; seeded with `README.md` and `docs` when they exist |
 | `.fux/config/formats.toml` · `.fux/.fuxignore` | which files are documents · what is excluded |
 | `.fux/config/pii.toml` · `.fux/config/refusals.toml` | redaction rules (required) · what a sign-in wall looks like |
 | `.fux/config/tune.toml` · `.fux/config/output.toml` | ranking knobs · output defaults — the engine defaults spelled out |
@@ -71,6 +71,10 @@ every re-run, even when fux wrote that file itself.** Check for the
 
 A repo still holding `.fux/sources/types` gets it **converted** into
 `.fux/config/formats.toml`; delete the old file afterwards — fux refuses while both exist.
+A repo still holding `.fux/sources/dirs` or `.fux/sources/urls` gets both
+**converted** into `.fux/sources.yaml` (their `!` lines move to
+`.fux/.fuxignore` first), and setup removes them — every other verb refuses
+while either exists.
 
 ---
 
@@ -102,7 +106,7 @@ mode prints `[OK]`, `[WARN]` or `[FAIL]` per row.
 | `fux.toml loads` | error (warn if absent) | the loader's own message, verbatim — fix the key it names |
 | `index not gitignored` | error | an ignore rule (usually `.fux/*`) drops `.fux/index` out of git |
 | `types list usable` | error | `.fux/config/formats.toml` will not load, admits nothing, or old `sources/types` remains |
-| `fuxignore usable` | error on parse · warn on duplicates | a pattern in both `.fuxignore` and `sources/dirs` |
+| `fuxignore usable` | error on parse · warn on duplicates | the `.fuxignore` patterns parse, and a pattern written twice |
 | `pii rules` | error when missing/invalid · warn when empty | ingest refuses without the file |
 | `refusal rules` · `decoder bindings` | error when the file/binding will not load · else warn | a hand-written binding matching no indexed document is a warn |
 | `register` | warn, never error | `.fux/index/REGISTER` against the index beside it, in three named states: **missing** (no file), **old format** (a file without the `# fux.register.v2` line — written before the v2 shape of 2026-10-13) and **drift** (a document with no line, a line for no document, a moved `sha`, a foreign `rules=`). **`fux ingest` rewrites it in every case**; §4b |
@@ -118,7 +122,7 @@ mode prints `[OK]`, `[WARN]` or `[FAIL]` per row.
 
 ## 4 · `fux ingest` — write the committed index
 
-**Offline. Walks `.fux/sources/dirs`, carries URL records forward, rewrites
+**Offline. Walks the `paths:` of `.fux/sources.yaml`, carries URL records forward, rewrites
 `.fux/index/*.jsonl`, then builds the accelerator.** No `--json`: judge it by
 exit code (`0` ok, `1` error, `130` interrupted), then `fux doctor --json`.
 
@@ -166,7 +170,7 @@ fux register --json                            # one JSON object per document
 | `sha` | the document's content sha, as ingested |
 | `decoder` | `{name, digest}` — `digest` is `null` for a decoder shipped with fux, a 16-hex sha for a consumer decoder in `.fux/decoders/` |
 | `rules` | the engine's extraction rules version the file was written at (`rules=` on the format line) |
-| `archived` | `true` only on documents under an `archived=true` source entry; absent otherwise |
+| `archived` | `true` only on documents under a source entry declared archived; absent otherwise |
 | `fetch` | the fetcher name on a URL row; absent on a file row |
 
 **Use `--json` from a script; parse the text only to diff it.** The verb takes
@@ -194,7 +198,7 @@ no network. `ingest` already does this unless given `--no-accelerator`.
 | commit | never commit |
 |---|---|
 | `fux.toml`, `.fux/index/*.jsonl`, `.fux/index/REGISTER` | `.fux/runtime/` — derived, rebuildable |
-| `.fux/sources/`, `.fux/config/formats.toml`, `.fux/.fuxignore` | `.fux/acquired/` — **fetched source bytes**, not rebuildable |
+| `.fux/sources.yaml`, `.fux/config/formats.toml`, `.fux/.fuxignore` | `.fux/acquired/` — **fetched source bytes**, not rebuildable |
 | `.fux/config/pii.toml`, `.fux/config/refusals.toml`, `.fux/config/tune.toml`, `.fux/config/output.toml` | `__pycache__/` under `.fux/decoders/` or `.fux/fetchers/` — **`.fux/.gitignore` does not list these** |
 | `.fux/fetchers/*.py`, `.fux/decoders/*.py`, `.fux/enrich/` | |
 | `.fux/README.md`, `.fux/.gitignore`, and the agent files if the team wants them | |
@@ -239,6 +243,7 @@ still blind to files that were never indexed, which is what this gate catches.
 |---|---|
 | `.fux/config/pii.toml is missing, and fux will not run without it` | **tell the human.** `fux setup` writes the starter but also every other missing committed file and the agent files — run it only when asked, then relay its `wrote` lines. See `fux-pii` |
 | `.fux/sources/types … moved to .fux/config/formats.toml` | `fux setup` converts it; then delete `.fux/sources/types` |
+| `.fux/sources/dirs still exists, and fux reads .fux/sources.yaml now` (or `urls`) · `[sources] dirs_file was replaced by [sources] sources_file` | **tell the human**; `fux setup` converts both lists and the key once — run it only when asked |
 | `lists no file types` (ingest) · `admits nothing` (doctor) | delete `.fux/config/formats.toml` to take the built-in default |
 | `another fux process is writing this index (lock: …)` | wait. If none is running, `fux ingest --stop` clears the stale lock |
 | `did not stop when asked` | a live writer is mid-run; wait, then re-run |

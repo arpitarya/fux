@@ -17,7 +17,7 @@ the change this file exists to refuse.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import json
 import subprocess
 import sys
@@ -56,7 +56,7 @@ def corpus(tmp_path_factory) -> Path:
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     fux = root / ".fux"
     (fux / "sources").mkdir(parents=True)
-    (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    write_dirs(fux.parent, "docs\n")
     (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     docs = root / "docs"

@@ -31,7 +31,7 @@ Claude tool call and the key.
 | guard | why it never moves |
 |---|---|
 | `.gitignore` | **never committed is the one clause no state relaxes** (L11). A key must stay off every ref whether the tree is open or shut |
-| `!work/golden` in `.fux/sources/dirs` | the benchmark's vocabulary must not enter fux's own committed index either way |
+| `/work/golden` in `.fux/.fuxignore` | the benchmark's vocabulary must not enter fux's own committed index either way |
 | the three hook **files** | they are only *deregistered*, never edited or moved — which is what makes `lock` able to promise a byte-identical restore of something it never changed |
 | `tools/golden-score/score.py`'s own refusals | decision 13's carve-out is a **different permission** and an unlock does not widen it |
 
@@ -178,7 +178,7 @@ def cmd_unlock(_args) -> int:
     print("UNLOCKED.")
     print(f"  removed {removed_deny} deny rule(s) and {removed_hooks} hook registration(s)")
     print(f"  the previous settings.json is stashed at {STASHED_SETTINGS.relative_to(ROOT)}")
-    print("  .gitignore and .fux/sources/dirs are UNTOUCHED — a key is never committed,")
+    print("  .gitignore and .fux/.fuxignore are UNTOUCHED — a key is never committed,")
     print("  in either state, and that clause does not move.")
     print()
     print("  Every number measured or scored from here is `informed` PERMANENTLY.")

@@ -19,7 +19,7 @@ test needs no network (L5).
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import json
 import subprocess
 import sys
@@ -103,7 +103,7 @@ def corpus(tmp_path_factory) -> Path:
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
-    dirs.write_text("docs\n", encoding="utf-8")
+    write_dirs(root, "docs\n")
     (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     # Markdown only, so no plugin package is needed — and none is installed in

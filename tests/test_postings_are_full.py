@@ -37,7 +37,7 @@ from fux.ingest.run import run
 from fux.query import run_query
 from fux.text.tokenize import tokenize, tokenize_pairs
 from fux.store import term_hash
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_dirs
 
 DOCS = {
     "docs/retry.md": (
@@ -68,7 +68,7 @@ def _fields(rel: str, text: str) -> list[str]:
 def repo(tmp_path_factory):
     root = tmp_path_factory.mktemp("full-postings")
     (root / ".fux" / "sources").mkdir(parents=True)
-    (root / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    write_dirs(root, "docs\n")
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)

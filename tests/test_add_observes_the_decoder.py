@@ -12,7 +12,7 @@ ladder out of the maintenance path and puts its answer in a committed line.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs, write_urls
 from types import SimpleNamespace
 
 import pytest
@@ -39,9 +39,9 @@ def repo(tmp_path, monkeypatch):
         '[sources.url.routes]\n"x.test" = "probe"\n',
         encoding="utf-8",
     )
-    (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    (tmp_path / ".fux" / "sources" / "urls").write_text("", encoding="utf-8")
-    (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    (tmp_path / ".fux").mkdir(parents=True)
+    write_urls(tmp_path, "")
+    write_dirs(tmp_path, "docs\n")
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / "docs").mkdir()
@@ -58,7 +58,17 @@ def _fetcher(repo, returns):
 
 
 def _urls(repo):
-    return (repo / ".fux" / "sources" / "urls").read_text(encoding="utf-8")
+    """Every listed URL entry, spelled `url key=value …` from what it declares.
+
+    W-294: the entries live in `.fux/sources.yaml` now. Reading them back
+    through the reader, and spelling each in the old one-line form, keeps the
+    assertions below about WHAT was declared rather than about YAML layout."""
+    from fux.acquire import sourcesfile
+
+    text = sourcesfile.read_or_empty(repo, sourcesfile.FILE)
+    return "".join(
+        e.value + "".join(f" {k}={e.attrs[k]}" for k in sorted(e.declared)) + "\n" for e in text.urls
+    )
 
 
 # --- what it writes ---------------------------------------------------------

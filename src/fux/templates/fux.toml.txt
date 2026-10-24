@@ -1,5 +1,5 @@
-# fux.toml -- POLICY, not corpus. What gets indexed is `.fux/sources/dirs` and
-# `.fux/sources/urls`, one entry per line.
+# fux.toml -- POLICY, not corpus. What gets indexed is `.fux/sources.yaml`:
+# paths and URLs, one file. What does NOT is `.fux/.fuxignore`.
 #
 # EVERY KEY, WHAT IT MEANS AND WHAT IT DEFAULTS TO IS IN ONE PLACE:
 #   https://github.com/arpitarya/fux/blob/main/records/0113_config.md
@@ -17,12 +17,11 @@
 # The one exception is a whole table whose PRESENCE is the setting:
 # [sources.url] (delete it and nothing is fetched) and the two maps below it.
 
-# The two source lists, together: one names the directories, one names the URLs.
+# The include manifest: `paths:` and `urls:`, one file.
 [sources]
-dirs_file = ".fux/sources/dirs"
-urls_file = ".fux/sources/urls"
+sources_file = ".fux/sources.yaml"
 
-# Presence of THIS table is what enables URL ingestion -- `urls_file` above
+# Presence of THIS table is what enables URL ingestion -- `sources_file` above
 # only names the list. Nothing is fetched until a URL is listed in it, and
 # only `fux add <URL>` lists one.
 [sources.url]

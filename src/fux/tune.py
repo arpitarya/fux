@@ -291,7 +291,7 @@ _REMOVED_KEYS: dict[tuple[str, str], str] = {
     ("ranking", "archived_weight"): (
         "was REMOVED on 2026-09-13 (W-152). Being retired is a FACT, not a weight. "
         "Delete the key; ranking is unchanged, because it shipped at 1.0. The FACT "
-        "is untouched and already reaches you: `archived=true` in .fux/sources/dirs, "
+        "is untouched and already reaches you: `archived:` in .fux/sources.yaml, "
         "the `archived` record property, the `[archived]` marker in prose output and "
         "`archived: bool` on every JSON hit -- BRANCH ON THAT. " + _PRIORS_REMOVED
     ),

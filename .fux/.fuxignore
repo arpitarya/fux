@@ -28,7 +28,6 @@ docs/paper/figures/src/fig-18-enrich.mmd                                        
 docs/paper/figures/src/fig-19-observers.mmd                                                     # not an indexed file type
 docs/paper/figures/src/fig-20-verbs.mmd                                                         # not an indexed file type
 records/RULE-SINCE                                                                              # not an indexed file type
-work/golden/                                                                                    # excluded by !work/golden
 work/regression/2026-08-20-r5-hook-latency/evidence/run.log                                     # not an indexed file type
 work/regression/2026-08-20-r6-merge-driver/evidence/run.log                                     # not an indexed file type
 work/regression/2026-08-20-refer-plane-r4/evidence/run.log                                      # not an indexed file type
@@ -121,6 +120,11 @@ work/regression/2026-10-13-section-term-v3/evidence/arm-diff-sw-0.0.txt        #
 # tests/ingest/test_fuxignore_preserves_hand_lines.py. The loss came from
 # OUTSIDE the engine, and its shape is a full-file write from a stale staged
 # copy. These two collapse ~257 generated lines on this repo.
+# moved from .fux/sources/dirs by `fux setup` (W-294): `!` lived there, and exclusion lives here
+/work/golden   # the sealed benchmark: its corpus and answer key must never enter fux's own committed index (LAW L11 — records/0013_LAW-11-sealed-answer-key.md)
+/work/golden/golden-answers   # the key's one permitted address (L11 decision 3, Arpit 2026-09-18). Redundant with the parent line ABOVE, and written anyway: the parent is one edit away from being narrowed for an unrelated reason, and this line is the one that would then still be standing.
+/work/golden/golden-answer   # the older singular spelling, kept for the same reason every other guard keeps it — a guard that covers only the live name reads green while the other is open.
+
 __pycache__/
 *.py[cod]
 *.py

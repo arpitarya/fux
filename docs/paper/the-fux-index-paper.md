@@ -160,7 +160,7 @@ check-ignore` that the index itself is not ignored (SR-FUX-DIRECTORY d1–d5).
 flowchart TB
   subgraph COMMITTED["COMMITTED — travels with the repository"]
     c1["index/  00.jsonl … ff.jsonl<br/>header: fux.index.v2 · analyzer v2 · 5 tf fields"]
-    c2["sources/dirs · sources/urls · formats.toml · .fuxignore"]
+    c2["sources.yaml · formats.toml · .fuxignore"]
     c3["enrich/&lt;sha&gt;.md  (doc2query + human lines → ctx field)<br/>eval/corrections.tsv"]
     c4["tune.toml · output.toml · pii.toml (required) · refusals.toml"]
     c5["decoders/ · fetchers/ · observers/ (proposed)<br/>readable source — the three L10 exemptions"]
@@ -282,7 +282,7 @@ two gates inside them that carry laws.
 
 ```mermaid
 flowchart LR
-  W["1 · WALK<br/>.fuxignore first, then sources/dirs,<br/>sources/urls, formats.toml include globs"]
+  W["1 · WALK<br/>.fuxignore first, then sources.yaml<br/>paths and urls, formats.toml include globs"]
   D["2 · DECODE<br/>17 built-in decoders, copied into .fux/decoders/<br/>consumer copy replaces by module name<br/>decode(raw, rel_path) → str | None"]
   Q["None → enrich/queue.tsv with a reason<br/>(never silently dropped)"]
   H["3 · content_sha on the RAW bytes<br/>(before redaction)"]
@@ -299,10 +299,10 @@ flowchart LR
 </details>
 
 **Walk.** `.fuxignore` is read first and outranks everything; then
-`sources/dirs` (one path per line, `!` excludes, `archived=true` and
-`enrich=true` attributes), `sources/urls` (per-line `fetch=`, `ttl=`, `keep=`,
-`enrich=`, `archived=`, `update=`), and `formats.toml`'s `include` globs and
-`[decoders]` table. (⚠ `meta=` was a seventh URL attribute until 2026-09-20.)
+`sources.yaml` — `paths:` grouped by flag (`include`, `archived`, `enrich`;
+includes only, exclusion is `.fuxignore`'s) and `urls:` entries (`url`,
+`fetch`, `decoder` required; `ttl`, `keep`, `enrich`, `archived`, `update`
+optional) — and `formats.toml`'s `include` globs and `[decoders]` table.
 
 **Decode.** Seventeen built-in decoders — csv, docx, drawio, html, image, ini,
 json, jsonl, mail, pdf, pptx, rtf, svg, toml, xlsx, xml, yaml — are listed by

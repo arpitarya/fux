@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from fux import store
 from fux.query.refer_answer import _load_fetchers, answer_via_refer
-from l12_fixtures import template_tune, write_config
+from l12_fixtures import template_tune, write_config, write_urls
 
 #: Logs every lifecycle call to a sibling file, since `_load_fetcher` loads
 #: the module internally with no handle the test can inspect afterwards —
@@ -72,7 +72,7 @@ def _init_url_repo(tmp_path, *, url="https://x.test/a", config_table=""):
     # 🔴 Every URL line states its fetcher since 2026-09-20 (W-199 D2). A case
     # that pins a different one passes it in `url` and this leaves it alone.
     line = url if "fetch=" in url else f"{url} fetch=mw decoder=prose"
-    urls_path.write_text(f"{line}\n", encoding="utf-8")
+    write_urls(tmp_path, f"{line}\n")
 
 
 # -- file: needs no fetcher at all ------------------------------------------
@@ -282,7 +282,7 @@ def test_two_urls_behind_different_fetchers_each_get_their_own(tmp_path):
         )
     urls = tmp_path / ".fux" / "sources" / "urls"
     urls.parent.mkdir(parents=True, exist_ok=True)
-    urls.write_text("https://x.test/a fetch=http decoder=prose\nhttps://x.test/b  fetch=cdp decoder=prose\n", encoding="utf-8")
+    write_urls(tmp_path, "https://x.test/a fetch=http decoder=prose\nhttps://x.test/b  fetch=cdp decoder=prose\n")
 
     fetch, close, _fa = _load_fetchers(
         tmp_path,
@@ -303,9 +303,7 @@ def test_two_urls_behind_different_fetchers_each_get_their_own(tmp_path):
 
 def test_two_urls_behind_one_fetcher_connect_once(tmp_path):
     _init_url_repo(tmp_path, url="https://x.test/a")
-    (tmp_path / ".fux" / "sources" / "urls").write_text(
-        "https://x.test/a fetch=mw decoder=prose\nhttps://x.test/b fetch=mw decoder=prose\n", encoding="utf-8"
-    )
+    write_urls(tmp_path, "https://x.test/a fetch=mw decoder=prose\nhttps://x.test/b fetch=mw decoder=prose\n")
     fetch, close, _fa = _load_fetchers(
         tmp_path,
         [("url:https://x.test/a", "https://x.test/a", "s1"),

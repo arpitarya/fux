@@ -36,7 +36,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from fux.config import load
-from fux.acquire.dirlist import source_dirs
+from fux.acquire.sourcesfile import source_paths
 from fux.acquire.gitdir import WalkedFile, walk_sources
 from fux.text.tokenize import tokenize
 
@@ -104,7 +104,7 @@ def vocabulary(root: Path) -> Vocabulary:
     arm was dead while the synthetic one passed.
     """
     config = load(root)
-    walked, _ = walk_sources(root, source_dirs(root, config.dirs_file))
+    walked, _ = walk_sources(root, source_paths(root, config.sources_file))
     df: dict[str, int] = {}
     skipped: list[str] = []
     for walked_file in walked:

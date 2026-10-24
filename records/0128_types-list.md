@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-20
 amended: 2026-10-20
 feature: the file-type allowlist and `.fux/config/formats.toml`
-owns: [src/fux/acquire/typesfile.py@1a62cdf74ffa, .fux/config/formats.toml@2dfc07ff74b8]
+owns: [src/fux/acquire/typesfile.py@1a0421594be1, .fux/config/formats.toml@2dfc07ff74b8]
 laws: [L2, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: db5d95d98fdc3889573361d034a32e84a5cb70eef97c0a1351f48a63db949485
+content_sha: a949f46aea95f9d2d2ac990e5f8723f94a0cf2213be9855e099987655f56dae8
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -206,12 +206,12 @@ Pinned by `test_the_default_never_grows_from_a_consumer_decoder`.
 extend it. Its shape is decision 12's.
 
 **2a. `.fux/.fuxignore` is where exclusions belong, and the types list has no
-subtraction at all.** [SR-FUXIGNORE](0144_fuxignore.md) decision 5 made
-`.fuxignore` the home and this file's `!` line the deprecated spelling.
-⚠ **Since 2026-09-11 the deprecated spelling is gone** (decision 12, fork F4):
-`.fux/config/formats.toml` has no `exclude` key, a `!` glob in `include` is a loud error
-naming `.fuxignore`, and `fux setup`'s conversion moves every old `!` line
-there.
+subtraction at all.** Exclusion has one home,
+[`.fux/.fuxignore`](0144_fuxignore.md): `.fux/config/formats.toml` has no
+`exclude` key, a `!` glob in `include` is a loud error naming `.fuxignore`
+(decision 12, fork F4) — the same refusal `.fux/sources.yaml` makes of a `!`
+entry ([SR-SOURCES](0116_url-list.md)) — and `fux setup`'s conversion of the old
+types file moves every `!` line there.
 
 **3. The default, never "everything" and never "nothing".**
 *Everything* is the defect. *Nothing* makes the 86 % case do work for the 14 %
@@ -250,13 +250,13 @@ is the line-delimited sibling of `.json`. Source code, shell scripts and
 anchored at the repo root. That is what makes `*.md` mean *every markdown file*
 rather than *a markdown file at the root*.
 
-**7. Below `.fuxignore`, the three conditions are a conjunction, deliberately
+**7. Below `.fuxignore`, the two conditions are a conjunction, deliberately
 not a priority order.** A file `.fux/.fuxignore` says nothing about is indexed
-**iff** it is under an included `dirs` entry **and** no `!` exclusion matches it
-**and** it matches the type allowlist. **No rule inside that trio overrides
-another, so there is no order to remember among them.**
+**iff** it is under a `paths:` entry of `.fux/sources.yaml` **and** it matches
+the type allowlist. **Neither overrides the other, so there is no order to
+remember between them.**
 
-⚠ **There is exactly one thing above the trio, and it decides in both
+⚠ **There is exactly one thing above the pair, and it decides in both
 directions** ([SR-FUXIGNORE](0144_fuxignore.md) decision 4). A path
 `.fux/.fuxignore` **ignores** is skipped whatever this allowlist says; a path it
 **explicitly re-includes** with a `!` line is indexed whatever this allowlist
@@ -264,15 +264,13 @@ says. **`!*.py` therefore indexes Python as raw bytes** — the exact shape this
 record was opened about. It costs one explicit line a human wrote, in one
 committed file, and `fux ingest --list-skipped` shows the result.
 
-**This sentence used to read "the three conditions are a conjunction,
-deliberately not a priority order", full stop**, and decision 3a of
-[SR-DIR-LIST](0120_dir-list.md) still leans on that reading for `fux add`.
-**It still holds for `fux add`, and it no longer holds for `.fuxignore`** —
-a CLI verb may not outrank the allowlist, and a committed line in the one file
+**The conjunction holds for `fux add`, and not for `.fuxignore`** — a CLI
+verb may not outrank the allowlist ([SR-SOURCES](0116_url-list.md): adding a
+file never overrides the type allowlist), and a committed line in the one file
 named after exclusion may. The difference is that the second is visible in a
 file you can read; making an `add` win would index a document *for a reason
-nobody could see in any list*, which is the argument that decided 3a and is
-untouched.
+nobody could see in any list*, which is the argument that keeps `fux add` below
+the allowlist.
 
 **8. Every rejection is reported with its reason** — `not an indexed file type`,
 for a `!` exclusion the pattern that did it, and for `.fuxignore` the file, the
@@ -326,7 +324,7 @@ addition."* This is that change, said out loud.
 
 **Why `decoder` is the exception rather than the first crack in the rule.** The
 old rule's test is *whose property is this?* — and every attribute considered
-before now (a `types=` per `dirs` line, a per-root override) belonged to the
+before now (a `types=` per source path, a per-root override) belonged to the
 **directory**, which is why they were refused. `decoder` belongs to neither the
 directory nor the pattern: it is a property of the **extension**, and an
 extension is exactly what a line in this file names. A binding on
@@ -395,7 +393,7 @@ hand-written one may stay silent.
 **A prose format carries no binding**, because no decoder is in its path — it
 is an `include` glob. (Under the line grammar, `render_line` omitted an
 attribute at an EMPTY default for this reason, the one narrowing of
-[SR-URL-LIST](0116_url-list.md) decision 12; `.fux/config/formats.toml` refuses an empty
+[SR-SOURCES](0116_url-list.md) decision 12; `.fux/config/formats.toml` refuses an empty
 binding outright, because `md = ""` binds nothing.)
 
 **12. The types list is `.fux/config/formats.toml` — an `include` glob array and a
@@ -426,7 +424,7 @@ See decision 13.
 
 | fork | ruled |
 |---|---|
-| F1 location | **`.fux/config/formats.toml`** — named `types.toml` for a few hours on 2026-09-11, then renamed on Arpit's ruling the same day (see below) — beside `tune.toml`, `output.toml`, `refusals.toml` and `pii.toml` — not in `.fux/sources/` |
+| F1 location | **`.fux/config/formats.toml`** — named `types.toml` for a few hours on 2026-09-11, then renamed on Arpit's ruling the same day (see below) — beside `tune.toml`, `output.toml`, `refusals.toml` and `pii.toml` — not in the source list |
 | F2 shape | **`include` + `[decoders]`**, not an array of per-pattern tables. Entries were never order-sensitive (the loader sorts), so an ordered list would spend TOML's verbosity on an order nothing reads |
 | F3 does a binding admit? | **yes.** `[decoders] csv` makes `*.csv` a document; `"*.csv"` also in `include` is a loud *stated twice* error. Exact case only: `"*.CSV"` beside `csv` admits different files and is legal |
 | F4 subtraction | **none** — decision 2a |
@@ -477,7 +475,7 @@ spend TOML's verbosity on an order nothing reads.
 **Why a reversal of a recorded rejection was acceptable.** §Alternatives
 rejected *"a `[sources] types` TOML array"* for three reasons. Two do not reach
 this shape: a multi-line array is one entry per line and merges line by line
-([SR-URL-LIST](0116_url-list.md) decisions 1-2), and a file of its own is not a
+([SR-SOURCES](0116_url-list.md) decisions 1-2), and a file of its own is not a
 corpus decision buried in `fux.toml`. **The third does, and is paid**: the
 three source lists no longer share one grammar and one writer.
 
@@ -496,7 +494,7 @@ grammar used (`_type_reason`); every module name by its shape
 (`_decoder_reason`); and an extension key's shape — lowercase, no dot, no glob
 character. Existence and redirection stay `decode._bind`'s, decision 11a.
 
-**The reader is lenient, the writer is strict** — [SR-URL-LIST](0116_url-list.md)
+**The reader is lenient, the writer is strict** — [SR-SOURCES](0116_url-list.md)
 decision 13, kept. Any valid TOML with the two keys loads. `fux setup` and the
 `fux source` verbs write the canonical layout — `include = [` on its own line,
 one glob per line, one `key = "value"` per line under `[decoders]`, decoders
@@ -567,7 +565,7 @@ carries them.
 
 **No decision here moved** (W-244, 2026-10-04): the walk prunes a `!`-excluded directory before the type allowlist is consulted for anything inside it ([SR-INGEST](0106_ingest.md) decision 24). A file there was skipped before either way, so no type verdict changes.
 
-**No decision here moved** (W-261, 2026-10-05): `acquire/gitdir.py`, which this record describes, lost the `dirs`-list readers to `acquire/dirlist.py` (SR-DIR-LIST's). `read_types`, `TypeFilter` and `_default_types` are untouched.
+**No decision here moved** (W-261, 2026-10-05): `acquire/gitdir.py`, which this record describes, holds no source-list reader — those are `acquire/sourcesfile.py`'s (SR-SOURCES's). `read_types`, `TypeFilter` and `_default_types` are untouched.
 
 **No decision here moved** (W-288, 2026-10-20): a comment in `acquire/typesfile.py` names `decode.ext.limits.check`, the new home of the `[limits]` presence check ([SR-DECODE](0139_decode.md) decision 24). No code changed.
 
@@ -600,14 +598,13 @@ carries them.
   `.fux/.fuxignore` admits a format with no decoder, as raw bytes. That is the
   cost SR-FUXIGNORE decision 4 pays for the file meaning what its name says,
   and **nothing has been measured about how often anyone reaches for it.**
-- **Three lists, two places**: `.fux/sources/dirs` says *where*,
-  `.fux/config/formats.toml` says *what* — and, since decision 11, *read by what* — and
-  `.fux/sources/urls` says *what else*. ⚠ **Until decision 12 all three sat under
-  `.fux/sources/` on one grammar**; the types list left both.
-- 🔴 **Decision 12's costs, stated.** The three source lists no longer share one
-  parser and one writer — `sources.py` branches on `types` in every verb. A
-  semantic error in the types file no longer guarantees `file:lineno`, which
-  every line-grammar list promises. And a repo that ran `fux setup` before
+- **Two files**: `.fux/sources.yaml` says *where* (`paths:`) and *what else*
+  (`urls:`), and `.fux/config/formats.toml` says *what* — and, since decision
+  11, *read by what*.
+- 🔴 **Decision 12's costs, stated.** The types list shares no parser and no
+  writer with `.fux/sources.yaml` — `sources.py` branches on `types` in every
+  verb. A semantic error in the types file does not guarantee `file:lineno`,
+  which `.fux/sources.yaml` promises. And a repo that ran `fux setup` before
   2026-09-11 stops at its next `fux ingest` until it runs `fux setup` and deletes
   the old file — loud, one command, and deliberate.
   ⚠ **The format split is accepted permanently** (W-251 §2, 2026-10-04): the
@@ -644,20 +641,20 @@ the short version:
 - **A compiled-in allowlist with no override.** Rejected: a team whose runbooks
   are `.adoc` waits for a fux release to index their own documents. For a `$0`
   offline tool that is a hard stop.
-- **A `types=` attribute per `dirs` line.** Rejected as more expressive than the
+- **A `types=` attribute per source path.** Rejected as more expressive than the
   problem, and it repeats the same globs on every line — but **not excluded
   forever**; it is exactly the reopen trigger below.
 - **A `[sources] types` TOML array.** Rejected: the shape
-  [SR-DIR-LIST](0120_dir-list.md) had just moved away from. ⚠ **Reversed in
+  the source list had just moved away from. ⚠ **Reversed in
   part by decision 12**, which put the list in TOML in a file of its own. The
   three reasons TOML had been refused, and whether each held against
   decision 12's shape (ported 2026-09-24 from the archived compare doc):
 
   | why TOML had been refused | where | does it hold against decision 12? |
   |---|---|---|
-  | a large inline array is one diff hunk, one merge conflict | [SR-URL-LIST](0116_url-list.md) decisions 1–2 | **No** — TOML arrays span lines with trailing commas and comments; one entry per line merges line by line, and the writer keeps that layout |
-  | it buries a corpus decision in config (`fux.toml`) | SR-URL-LIST and SR-DIR-LIST §Alternatives | **No** — its own file, beside `tune.toml`, not a key in `fux.toml` |
-  | one grammar, one parser for the three lists | [SR-DIR-LIST](0120_dir-list.md) decision 2 | 🔴 **Yes — the cost is real and decision 12 pays it**: `types` left the shared grammar and `sources.py` grew a second writer |
+  | a large inline array is one diff hunk, one merge conflict | [SR-SOURCES](0116_url-list.md) decisions 1–2 | **No** — TOML arrays span lines with trailing commas and comments; one entry per line merges line by line, and the writer keeps that layout |
+  | it buries a corpus decision in config (`fux.toml`) | SR-SOURCES §Alternatives | **No** — its own file, beside `tune.toml`, not a key in `fux.toml` |
+  | one parser for every source list | [SR-SOURCES](0116_url-list.md) | 🔴 **Yes — the cost is real and decision 12 pays it**: `types` has its own reader and `sources.py` a second writer |
 - **Leave `.fux/sources/types` as it was, or move it to `.fux/types` in the same
   line grammar** (options A and B under decision 12). Rejected: neither answers
   the ask — Arpit asked for TOML in `.fux/`, and B moves the file without
@@ -730,8 +727,8 @@ the short version:
 
 1. **A consumer needs different types for different roots** — `docs/` is prose,
    `runbooks/` is `.adoc`, `vendor/` is nothing. The migration is additive: a
-   `types=` attribute on a `dirs` line would override the global file for that
-   root.
+   per-path type list in `.fux/sources.yaml` would override the global file for
+   that root.
 2. **A consumer's corpus is majority prose in a format the default excludes**,
    so the built-in is wrong more often than right.
 3. **A measured run shows the type filter made ranking worse.** ⚠ **It has not
@@ -752,17 +749,18 @@ the short version:
    formats**, which would mean the raw-bytes escape hatch has become a habit
    and the allowlist is not doing the work this record claims for it.
 
-6. **Decision 12: `dirs` or `urls` is proposed as TOML** — the grammar-split
-   cost disappears and the three lists are judged together; **or `types` gains a
+6. **Decision 12: `formats.toml` and `.fux/sources.yaml` are proposed as one
+   format** — the split-writer cost disappears and the lists are judged together
+   (W-294 left `formats.toml` out of scope on purpose); **or `types` gains a
    property of a pattern rather than of an extension**, which `[decoders]` cannot
    hold; **or a defect is filed where a `fux source` verb behaves differently for
-   `types` than for `dirs`** because of the split writer.
+   `types` than for paths** because of the split writer.
 
 **How to check them:**
 
 ```bash
-# 1 — does any consumer's dirs file want per-root types?
-grep -rn 'types=' .fux/sources/dirs
+# 1 — does any consumer's issue tracker ask for per-root types? (no file can
+#     hold the want today; it arrives as a request, not a line)
 
 # 2 — what fraction of a corpus the default admits
 fux ingest --list-skipped | grep -c 'not an indexed file type'
@@ -787,9 +785,9 @@ grep -n "types" work/OPEN-WORK.md                  # a verb-split defect?
 document is never listed here — the body may name one, but archive is not
 evidence.*
 
-**Records** — [SR-INGEST](0106_ingest.md) · [SR-URL-LIST](0116_url-list.md) ·
+**Records** — [SR-INGEST](0106_ingest.md) · [SR-SOURCES](0116_url-list.md) ·
 [SR-FETCHER](0117_fetcher.md) · [SR-HTTP-FETCHER](0119_http-fetcher.md) ·
-[SR-DIR-LIST](0120_dir-list.md) · [SR-DECODE](0139_decode.md) ·
+[SR-DECODE](0139_decode.md) ·
 [SR-FUXIGNORE](0144_fuxignore.md)
 
 **Code**

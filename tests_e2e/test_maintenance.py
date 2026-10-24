@@ -8,7 +8,7 @@ nothing and the test would still pass.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import json
 import os
 import shutil
@@ -99,7 +99,7 @@ def make_repo(path: Path, *, hooks: bool) -> str:
     (path / ".fux" / "sources").mkdir(parents=True)
     (path / "docs").mkdir()
     (path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    write_dirs(path, "docs\n")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(path, "pii")).write_text("", encoding="utf-8")
     write_config(path)

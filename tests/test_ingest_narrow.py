@@ -23,9 +23,8 @@ from fux.sources import _narrow
 
 
 class Entry:
-    def __init__(self, value, exclude=False):
+    def __init__(self, value):
         self.value = value
-        self.exclude = exclude
 
 
 LISTED = [Entry("https://a.test/x"), Entry("https://b.test/y"), Entry("https://c.test/z")]
@@ -100,13 +99,19 @@ def test_a_dirty_url_that_is_no_longer_listed_is_not_fetched(tmp_path):
     assert targeted == {"https://a.test/x"}
 
 
-def test_an_excluded_entry_is_never_a_target(tmp_path):
-    (tmp_path / ".fux" / "runtime").mkdir(parents=True)
-    (tmp_path / ".fux" / "runtime" / "dirty").write_text("url:https://a.test/x\n", encoding="utf-8")
+def test_an_excluded_entry_never_reaches_the_narrowing(tmp_path):
+    """W-294: this used to hand `_narrow` a `!`-led URL line and expect it
+    skipped. `.fux/sources.yaml` refuses the line before any list exists, so
+    the property — a URL the repo excluded is never fetched — is now held by
+    the reader, and the narrowing has no exclusion left to honour."""
+    import pytest
 
-    listed = [Entry("https://a.test/x", exclude=True)]
-    targeted, _ = _narrow(tmp_path, listed, all_urls=False, failed_only=False)
-    assert targeted == set()
+    from fux.acquire import sourcesfile
+    from fux.errors import FuxError
+
+    text = "urls:\n  - url: '!https://a.test/x'\n    fetch: http\n    decoder: prose\n"
+    with pytest.raises(FuxError):
+        sourcesfile.parse(text, origin="s")
 
 
 # -- W-140 row 4: `--failed` was parsed and never read -----------------------

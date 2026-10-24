@@ -17,7 +17,7 @@ import pytest
 
 from fux.errors import FuxError
 from fux.acquire import routes
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_urls
 
 
 def _table(mapping):
@@ -234,7 +234,7 @@ def test_the_answer_path_resolves_through_resolve_urls_and_nothing_else(monkeypa
     (fetchers / "http.py").write_text('def fetch(url):\n    return "# T\\n\\nbody\\n"\n', encoding="utf-8")
     src = tmp_path / ".fux" / "sources"
     src.mkdir(parents=True, exist_ok=True)
-    (src / "urls").write_text("https://x.test/a fetch=http decoder=prose\n", encoding="utf-8")
+    write_urls(tmp_path, "https://x.test/a fetch=http decoder=prose\n")
 
     fetch, close, _ = refer_answer._load_fetchers(
         tmp_path, [("url:https://x.test/a", "https://x.test/a", "sha")]

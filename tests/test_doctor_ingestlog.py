@@ -17,7 +17,7 @@ is how a doctor row becomes one people learn to skip.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import ast
 from pathlib import Path
 
@@ -34,7 +34,7 @@ def _repo(tmp_path) -> Path:
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True, exist_ok=True)
-    (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    write_dirs(fux.parent, "docs\n")
     (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     (tmp_path / "docs").mkdir(exist_ok=True)

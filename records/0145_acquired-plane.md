@@ -11,7 +11,7 @@ feature: the acquired plane
 owns: [src/fux/store/acquired.py@89dd8c94308a]
 laws: []
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 494a993552171db940bc1dc9caaffaca79d5069dbed4cf35833f112ca9ab302c
+content_sha: 447cd16a8993e3d71d5b6f41d68925ce0aae282045ff7a1fab1194470b5cbf01
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -22,7 +22,7 @@ content_sha: 494a993552171db940bc1dc9caaffaca79d5069dbed4cf35833f112ca9ab302c
 
 **Describes** — reaches into, does not own:
 
-- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py) · owned by [SR-SOURCES](0116_url-list.md)
 - [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
 - [`src/fux/config.py::UrlSource,_load_url_source`](../src/fux/config.py) · owned by [SR-CONFIG](0113_config.md)
 - [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) · owned by [SR-DOTFUX](0102_fux-directory.md)
@@ -158,23 +158,16 @@ of the attribute**, and `UrlEntry` now holds an example of each. Held by
 `tests/ingest/test_sourcelist.py::test_archived_has_no_source_wide_layer`, which
 asserts `config.UrlSource` never grows the key.
 
-⚠ **`keep` is still resolved from a LINE, and 2026-09-11 is when that stopped
-being the only option.** `.fux/sources/types` became `.fux/config/formats.toml` that day
-([SR-TYPES](0128_types-list.md) decision
-12), so the shared line grammar in `sourcelist.py` now parses **two** committed
-lists rather than three.
-
-**`urls` was deliberately not moved with it**, and the reason bears on this
-record directly: `keep`'s value comes from **three layers** — the built-in
-default, `[sources.url] keep`, then the line — and a TOML form has to express
-that layering, not just the values. The comparison's **reopen trigger 1** fires
-if `dirs` or `urls` is proposed as TOML, at which point this record's
-three-layer resolution is one of the things that proposal has to answer for.
+⚠ **`keep` is resolved from a URL ENTRY.** Its value comes from **three
+layers** — the built-in default, `[sources.url] keep`, then the entry's own
+`keep:` in `.fux/sources.yaml` ([SR-SOURCES](0116_url-list.md)) — and the
+entry states it only when it overrides the source-wide layer, so the layering
+survives the file's format.
 
 **Nothing about retention, eviction or the bound changed.**
 
 **`update=never` makes this plane's value visible, and its absence costly.**
-[SR-URL-LIST](0116_url-list.md) decision 14 lets a line say *never fetch this
+[SR-SOURCES](0116_url-list.md) decision 14 lets a line say *never fetch this
 again*, and the two pairings are not equivalent:
 
 | pairing | what a citation is worth |
@@ -252,14 +245,14 @@ bounded and evicted by `run_seq` (decision 8).
 owning record was *touched*, never that it was read (CLAUDE.md §Law zero), so a
 co-owner's file changing under this one is exactly the case where a reader needs
 to be told *"not yours"* in writing.
-⚠ **`keep` stays a closed enum** (2026-09-15). [SR-URL-LIST](0116_url-list.md)
+⚠ **`keep` stays a closed enum** (2026-09-15). [SR-SOURCES](0116_url-list.md)
 decision 15 made `fetch=` typed and validated by name shape; `keep` is a policy
 value with a genuinely closed set — `true` or `false`, and no third answer is
 coherent — so it is untouched. **Only `fetch` names a file**, which is the whole
 basis of that loosening.
 
 **2026-09-21 — a blob is named by the DECLARED decoder, not by the header**
-(the pipe ruling; [SR-URL-LIST](0116_url-list.md) decision 17).
+(the pipe ruling; [SR-SOURCES](0116_url-list.md) decision 17).
 
 `acquired.save`'s extension argument used to be `_EXT_FOR[mime]` — the
 `Content-Type` mapped through the ingest-time table. It is now the declared
@@ -439,7 +432,7 @@ $ fux doctor --json | python -c "import json,sys; print(json.load(sys.stdin)['fr
 
 *Every source this record cites, gathered in one place. §2's **Reference (required)** names the grounding; this is the complete list. An archived document is never listed here — the body may name one, but archive is not evidence.*
 
-**Records:** SR-DOTFUX · SR-FETCHER · SR-REFER · SR-RECORD · SR-URL-LIST · SR-URL-INGEST · SR-CACHEDIR-TAG · SR-CLI · SR-URL-FRESHNESS
+**Records:** SR-DOTFUX · SR-FETCHER · SR-REFER · SR-RECORD · SR-SOURCES · SR-URL-INGEST · SR-CACHEDIR-TAG · SR-CLI · SR-URL-FRESHNESS
 
 **Code:**
 

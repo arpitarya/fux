@@ -21,7 +21,7 @@ the value would be decision 7 returning in a new costume.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import json
 import subprocess
 import sys
@@ -39,7 +39,7 @@ def _repo(tmp_path, floor=None):
     (tmp_path / ".git").mkdir()
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)

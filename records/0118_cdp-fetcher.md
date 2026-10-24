@@ -10,7 +10,7 @@ feature: "`fux-fetcher-cdp` — the reference fetcher for documents behind a ses
 owns: [packages/fux-fetcher-cdp@8ab467ca60e8]
 laws: [L2, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 0d46ba8896e97d17f1cec8f7b4529990ae08ca9babb39f998c8e9d2b2801d3b7
+content_sha: 5831e2be8483f491ab71ab96de272bade7d29ef9f86f2016c1ba243749c62f73
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -54,7 +54,7 @@ nondeterministic input to an engine whose central guarantee is byte-identical
 output (L4). Interception has no such property: the bytes are the server's.
 
 **It is never escalated to.** A URL uses this fetcher because a human wrote
-`fetch=cdp` on its line ([SR-URL-LIST](0116_url-list.md)), not because a
+`fetch: cdp` on its entry ([SR-SOURCES](0116_url-list.md)), not because a
 cheaper fetch failed and something retried. That is
 [SR-FETCHER](0117_fetcher.md) decision 5, and it is what keeps the same URL
 producing the same bytes on a bad network day.
@@ -137,12 +137,17 @@ flowchart LR
 ### Examples
 
 Declare it per URL — only lines that need a browser get one
-([SR-URL-LIST](0116_url-list.md)):
+([SR-SOURCES](0116_url-list.md)):
 
 ```console
-$ cat .fux/sources/urls
-https://example.com/docs/api                 # plain GET; no fetcher decision
-https://wiki.corp/display/ENG/runbook        fetch=cdp
+$ cat .fux/sources.yaml
+urls:
+  - url: https://example.com/docs/api           # a plain GET
+    fetch: http
+    decoder: html
+  - url: https://wiki.corp/display/ENG/runbook  # needs a signed-in browser
+    fetch: cdp
+    decoder: html
 ```
 
 Tune it from `fux.toml`, never by editing the file, so your edits and an upgrade
@@ -411,7 +416,7 @@ decision both say it outright.
 **Accepted as the ETag criterion by Arpit on 2026-09-05 (ruling R-1), with no
 code** — the acceptance is of this decision as written, limit included. What he
 asked for *instead* of chasing the bandwidth is a declared knob:
-[SR-URL-LIST](0116_url-list.md) decision 14's `update = auto|never`. 🔴 **That
+[SR-SOURCES](0116_url-list.md) decision 14's `update = auto|never`. 🔴 **That
 knob is not this saving.** It buys bandwidth by giving up freshness; this would
 have bought the check cheaply and stayed fresh. Neither substitutes for the
 other, and a reader who conflates them will believe fux got a saving it did not.
@@ -428,7 +433,7 @@ other, and a reader who conflates them will believe fux got a saving it did not.
 > nobody re-derives it, not so anybody builds it.
 >
 > **How to check:** `fux doctor`'s `url sources` row reports the pinned count;
-> the un-pinned remainder of `.fux/sources/urls` is (b)'s number.
+> the un-pinned remainder of the `urls:` in `.fux/sources.yaml` is (b)'s number.
 
 **13. `LAUNCH_CHROME` defaults to `False`, and the default is the feature.** A
 browser this file launched is signed in to nothing, so every URL worth a browser
@@ -596,7 +601,7 @@ a way that it can pick values from .env file also"*).
 
 `cdp.py` and its template twin say, beside *HTML → Markdown lives in
 `fux.decode.html`*, that **which decoder converts is the URL LINE's to say**
-([SR-URL-LIST](0116_url-list.md) decision 17): every line states
+([SR-SOURCES](0116_url-list.md) decision 17): every line states
 `decoder=<stem>`, `fux add` observes the `Content-Type` once, and ingest never
 re-derives one.
 
@@ -776,7 +781,7 @@ evidence.*
 
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-RECORD](0109_index-record.md) ·
 [SR-PORT-LIST](0114_port-list.md) · [SR-EXTRACTED](0115_extracted-mode.md) ·
-[SR-URL-LIST](0116_url-list.md) · [SR-FETCHER](0117_fetcher.md) ·
+[SR-SOURCES](0116_url-list.md) · [SR-FETCHER](0117_fetcher.md) ·
 [SR-HTTP-FETCHER](0119_http-fetcher.md) · [SR-DECODE](0139_decode.md) · [SR-PLUGINS](0165_plugins.md)
 
 **Code**

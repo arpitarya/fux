@@ -1,4 +1,4 @@
-"""The one grammar, tested once (SR-URL-LIST decisions 2-13, SR-DIR-LIST 2-3).
+"""The one grammar, tested once (SR-SOURCES; the retired line grammar setup converts from).
 
 `urls` and `dirs` share a parser on purpose, so these tests are written against
 the *spec* rather than against either file. A rule that holds here holds for
@@ -17,7 +17,7 @@ def _fill_fetch(text, spec):
     """Supply `fetch=` on any URL line that does not state one.
 
     🔴 **`fetch=` is REQUIRED on a URL line since 2026-09-20** (W-199 D2;
-    SR-URL-LIST decision 16) — there is no default left to inherit. Nearly every
+    SR-SOURCES decision 16) — there is no default left to inherit. Nearly every
     case in this file is about something else (comments, duplicates, fragments,
     the `dirs` grammar), so the helper fills it in rather than every literal
     repeating it. **A case about `fetch` itself states its own and this leaves
@@ -145,7 +145,7 @@ def test_the_url_attribute_set_is_exactly_these_seven():
         "ttl": "24h",        # SR-URL-FRESHNESS: not 0; see decision on the default
         "enrich": "false",   # SR-PII: enrichment is always opted into
         "archived": "false", # SR-ARCHIVED-CONTENT: declared, never inferred
-        "update": "auto",    # SR-URL-LIST: today's behaviour, byte for byte
+        "update": "auto",    # SR-SOURCES: today's behaviour, byte for byte
     }
     assert [a.name for a in sourcelist.URLS.attributes if a.required] == [
         "fetch", "decoder",
@@ -305,7 +305,7 @@ def test_urls_rejects_a_non_http_scheme_at_its_line_number():
 
 def test_dirs_has_its_own_closed_attribute_set():
     (entry,) = _parse("archive/v0.26-docs archived=true", sourcelist.DIRS)
-    # The set is CLOSED and now holds two: `archived` (SR-DIR-LIST) and
+    # The set is CLOSED and now holds two: `archived` (SR-SOURCES) and
     # `enrich` (SR-ENRICH, W-76 Phase 8). `attrs` is *resolved* — every
     # attribute in the spec is present with its default — so this grows
     # whenever the closed set does, which is the point of asserting it.
@@ -376,7 +376,7 @@ def test_fetch_is_still_stated_at_its_default():
     `render_line` omits an attribute whose default is EMPTY — the exception
     `types.decoder` needed, because a bare `decoder=` states no policy. A typed
     `fetch` with an empty default would inherit that exception silently and
-    every generated URL line would stop stating `fetch=`, which SR-URL-LIST
+    every generated URL line would stop stating `fetch=`, which SR-SOURCES
     decision 12 forbids. Nothing in the grammar would have complained.
     """
     line = sourcelist.render_line("https://x.test/a", {}, sourcelist.URLS)

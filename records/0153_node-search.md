@@ -8,11 +8,11 @@ status: accepted
 amended: 2026-10-24
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine` and installed by `npm install fux-engine` alone (W-292), and held byte-equal to Python by the third arm of the differential law"
-owns: [node@99b32d2b083d, src/fux/store/nodebundle.py@4a729b4224cd]
+owns: [node@6f3f25aaff17, src/fux/store/nodebundle.py@4a729b4224cd]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1. Arpit, 2026-10-21 (W-292) — the Node reader installs from npm only, superseding 13, 15 and 16 and narrowing 14"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 9b84cb9b67dee43fae43f51198724c1e597bfbb134fbc8c5d103dc823358a9a7
+content_sha: ef6adba3b35e6a3f6082882642c734786bbba5491c5ee1f0ceefb2421e84f3d6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -254,7 +254,7 @@ differed.
 | `node/src/config/tune.mjs` | the reader half of `tune.py`: the defaults, the closed key set, the validators and the error COLLECTION. Not the writer half — Node never writes this file |
 | `node/src/config/output.mjs` | `output_config.py`'s precedence chain and both closed key sets |
 | `node/src/query/rerank.mjs` | the proximity reranker, which reads document content and so lands with the refer plane |
-| `node/src/ingest/{sourcelist,gitdir}.mjs` | the `archived=true` declaration, read live from `.fux/sources/dirs` rather than trusted to the record's stamped property |
+| `node/src/ingest/{sourcelist,yamlsubset,gitdir}.mjs` | the `archived:` declaration, read live from `.fux/sources.yaml` rather than trusted to the record's stamped property |
 | `node/src/query/run.mjs` | where they all enter — `find`, `ask`, `answer`, `graph` and the library export are projections of it |
 
 🔴 **The integer/float distinction is carried, and it is not pedantry.**
@@ -886,24 +886,22 @@ steering into `.fux/node/`**, which had not been regenerated since. Stated here
 because a commit that says *anchor text* and moves 60 KB of bundle owes the
 reader the reason.
 
-⚠ **`node/src/ingest/sourcelist.mjs` is narrowed for freshness, and the gap is
-covered by parity instead** (2026-09-15, W-178). That module is the **`dirs`
-half** of `src/fux/acquire/sourcelist.py` — Node never fetches (decision 3), so
-`fetch`, `keep`, `ttl` and `update` decide nothing there. A change
-entirely inside the `URLS` spec therefore reported the twin as behind, and
-porting it would have meant teaching this reader a grammar for a list it does
-not read.
+⚠ **`node/src/ingest/sourcelist.mjs` reads the WHOLE `.fux/sources.yaml`,
+URL entries included** (W-294). Node never fetches (decision 3), so `fetch`,
+`keep`, `ttl` and `update` decide nothing there — but a reader that skipped the
+`urls:` half would accept a committed file Python refuses, and
+`query/__init__.py` catches a refusal and degrades to *no archived
+directories*: two readers returning **different archived sets from the same
+committed file**. So both readers validate every entry, through hand-rolled
+twins of one YAML subset (`yamlsubset.py` / `yamlsubset.mjs`, no package —
+L2).
 
-🔴 **The narrowing leaves one thing uncovered and it is named rather than
-accepted.** `test_node_twins` narrows by git's hunk-context header, which names
-an enclosing `def`; the `dirs` **attribute tuple** is a module-level constant
-and has none. So that half is held by
-`test_node_config_parity.py::test_the_dirs_attribute_set_is_the_python_one`,
-which compares the two tuples by value — the stronger check, because it asserts
-the fact rather than asserting that somebody edited a file. It matters here
-specifically: `query/__init__.py` catches a refusal from this parser and
-degrades to *no archived directories*, so two readers with different attribute
-sets return **different archived sets from the same committed file**.
+🔴 **Two checks hold them equal, because a module-level table has no `def`
+for `test_node_twins`'s hunk header to name.**
+`test_node_config_parity.py::test_the_url_attribute_set_is_the_python_one`
+compares Node's `URL_ATTRIBUTES` with `sourcelist.URLS` by value, and
+`tests/test_sources_yaml_differential.py` feeds both readers the same fixtures —
+accepted and refused — and requires the same result in the same words.
 
 ⚠ **`B` moved `0.75 → 0.15` in BOTH readers on 2026-09-16**
 ([SR-RANKING](0111_ranking.md) decision 3, W-144). `node/src/query/bm25f.mjs`
@@ -919,7 +917,7 @@ than a finding, and the one a differential arm on an unchanged corpus could not
 catch, because both readers would still agree with themselves.
 
 **2026-09-21 — the pipe ruling does NOT reach Node, and that is stated rather
-than left to the gate** ([SR-URL-LIST](0116_url-list.md) decision 17).
+than left to the gate** ([SR-SOURCES](0116_url-list.md) decision 17).
 
 Two Node modules sit beside Python halves that moved, and neither is ported:
 
@@ -931,19 +929,10 @@ Two Node modules sit beside Python halves that moved, and neither is ported:
   cover a `.pdf` or `.xlsx` blob, which reads as absent — a pre-existing
   narrowness: the naming rule moved to the declared decoder
   ([SR-ACQUIRED](0145_acquired-plane.md)) and the gap did not.
-- **`ingest/sourcelist.mjs`** — `DIRS_REQUIRED` stays empty and the dead
-  required-attribute branch stays ported. Python grew a **second** required
-  attribute and moved each one's fix text onto the attribute itself
-  (`Attribute.required_hint`), because `fetch=`'s message named
-  `.fux/fetchers/` and would have pointed a missing `decoder=` there too. The
-  Node branch stays generic: a `dirs` attribute made required would have no
-  directory to name.
-
-🔴 **Why the dead branch is still worth carrying:** if a `dirs` attribute is ever
-made required, Python would refuse a line this reader accepts, and
-`query/__init__.py` catches that refusal and degrades to *no archived
-directories* — two readers returning a different archived set from one committed
-file, with nothing to see.
+- **`ingest/sourcelist.mjs`** — refuses a URL entry missing `fetch` or
+  `decoder` with the same fix text Python carries on the attribute
+  (`Attribute.required_hint`), so a file one reader refuses the other refuses
+  too, even though Node never fetches or decodes the URL.
 
 **W-210 — `termContribution` is transcribed, and nothing in `node/` calls it.**
 The Python side extracted BM25F's summand into one function so `--why`'s per-term
@@ -1004,7 +993,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**`dirsFile` is strict** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `null` with no `fux.toml`, a `FuxError` in `config.py`'s words without `[sources] dirs_file` — the fallback to `.fux/sources/dirs` is gone. `node/test/config.test.mjs` holds all three cases ([SR-CONFIG](0113_config.md) decision 17).
+**`sourcesFile` is strict** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27): `null` with no `fux.toml`, a `FuxError` in `config.py`'s words without `[sources] sources_file` or with either retired key (`dirs_file`, `urls_file`) — there is no fallback path. `node/test/config.test.mjs` holds all three cases ([SR-CONFIG](0113_config.md) decision 17).
 
 **`alreadyTextGlobs` stays tolerant of an absent `formats.toml`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27): the file is now required for `fux ingest`, but this read is on the query path, where the fallback costs a conservative skip and never a wrong citation ([SR-TYPES](0128_types-list.md) decision 14).
 
@@ -1113,7 +1102,7 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
 
 **No decision here moved** (W-246, 2026-10-04): the Node output-config reader carries the new `[cli.answer] journal_max_bytes` key beside its Python twin.
 
-**No decision here moved** (W-261, 2026-10-05): Node modules followed their Python owners into files of their own — `derive/docstable.mjs`, `derive/manifest.mjs`, `derive/stamp.mjs`, `derive/stats.mjs`, `store/cachedir.mjs`, `ingest/dirlist.mjs`, and `maintain/runner.mjs` renamed `maintain/lock.mjs`; `verbs/find.mjs` declares `query/find.py` as its twin. The bundle's behaviour and every answer are byte-identical.
+**No decision here moved** (W-261, 2026-10-05): Node modules followed their Python owners into files of their own — `derive/docstable.mjs`, `derive/manifest.mjs`, `derive/stamp.mjs`, `derive/stats.mjs`, `store/cachedir.mjs`, and `maintain/runner.mjs` renamed `maintain/lock.mjs`; `verbs/find.mjs` declares `query/find.py` as its twin. The bundle's behaviour and every answer are byte-identical.
 
 **No decision here moved** (W-276, 2026-10-11): `doctor.py` gained a `git hooks` row (SR-MAINTENANCE decision 3a). The `node reader` rows this record describes did not move, and the Node reader installs no hooks.
 

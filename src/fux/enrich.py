@@ -422,7 +422,7 @@ def _chunk_count(root: Path, record: dict, bounds: dict[str, int]) -> int:
 #: URL list has no such structure -- the lines share nothing but being URLs --
 #: so inventing per-host scopes would report coverage against a grouping
 #: nobody declared. One scope, named after the file the declaration lives in.
-URL_SCOPE = fixed("files", "urls")
+URL_SCOPE = fixed("files", "sources")
 
 
 def _document_text(root: Path, record: dict) -> str | None:
@@ -516,8 +516,8 @@ def cmd_enrich(args) -> int:
     if not scopes:
         print(
             "no enrichment scopes declared.\n"
-            "Add `enrich=true` to a directory line in .fux/sources/dirs, e.g.:\n"
-            "    docs/adr              enrich=true"
+            "List a directory under `paths: enrich:` in .fux/sources.yaml, e.g.:\n"
+            "    paths:\n      enrich:\n        - docs/adr"
         )
         return 0
 
@@ -593,13 +593,13 @@ def _target_problem(root: Path, scopes: dict[str, list[dict]], target: str) -> s
 
 def _scopes(root: Path) -> dict[str, list[dict]]:
     from . import store as store_mod
-    from .acquire.dirlist import enrich_dirs
+    from .acquire.sourcesfile import enrich_paths
 
     from .config import load as load_config
 
-    # The CONFIGURED list -- `.fux/sources/dirs` is only what the template names
-    # (W-225 stage 7; the stage-3b doctor precedent).
-    declared = enrich_dirs(root, load_config(root).dirs_file)
+    # The CONFIGURED manifest -- `.fux/sources.yaml` is only what the template
+    # names (W-225 stage 7; the stage-3b doctor precedent).
+    declared = enrich_paths(root, load_config(root).sources_file)
     urls = _enrich_urls(root)
     if not declared and not urls:
         return {}
@@ -667,7 +667,7 @@ def _enrich_urls(root: Path) -> set[str]:
         source = load_config(root).url
         if source is None:
             return set()
-        entries = urlsrc.read_urls(root, source.urls_file)
+        entries = urlsrc.read_urls(root, source.sources_file)
     except FuxError:
         return set()
     # The same three layers every URL attribute uses: built-in default, then

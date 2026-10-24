@@ -1,8 +1,8 @@
-"""Git-dir source adapter — the committed directory list, and a sorted walk of it.
+"""Git-dir source adapter — a sorted walk of the listed paths.
 
-The list is `.fux/sources/dirs` (SR-DIR-LIST), read through the one shared
-grammar in `sourcelist.py`: one entry per line, `#` comments, the loader
-dedupes and sorts, and a line may declare `archived=true`.
+The list is the `paths:` half of `.fux/sources.yaml` (SR-SOURCES), read by
+`sourcesfile.py`: the loader sorts, and a path under `archived:` is declared
+archived.
 
 Each entry is a directory (walked recursively) or a single file, relative to
 the repo root. Reads raw bytes directly off the filesystem (no git plumbing —
@@ -12,7 +12,7 @@ skipped with a reason, never a crash; a configured source that doesn't exist
 on disk is a misconfiguration and fails loudly instead.
 
 **`archived` is parsed, and since 2026-08-22 it is read.** The declaration is
-the half this module owns. `dirlist.archived_dirs()` exposes it and `is_archived_loc()`
+the half this module owns. `sourcesfile.archived_paths()` exposes it and `is_archived_loc()`
 is the one test for whether a `loc` falls under one — used by `ingest/run.py` to
 stamp the record property (SR-ARCHIVED-CONTENT decision 1) and by
 `query/rank.py` for the marker and the demotion. **One definition, because two
@@ -33,15 +33,23 @@ and the type allowlist.
 precedence.** A path `.fuxignore` says nothing about is indexed **iff** all
 three hold:
 
-1. it lives under an **included** `dirs` entry;
-2. no `!` **exclusion** entry matches it or any of its ancestors
-   (SR-DIR-LIST, W-45's verdict E) — the **deprecated** home for exclusions,
-   still honoured, and `fux ingest` warns when a pattern is stated here *and*
-   in `.fuxignore`;
-3. its name matches the **type allowlist** — `.fux/config/formats.toml` if that file
+1. it lives under a **listed** path;
+2. its name matches the **type allowlist** — `.fux/config/formats.toml` if that file
    exists, otherwise the built-in `DEFAULT_TYPES` (SR-TYPES, W-55's verdict G).
 
-**No rule inside that trio beats another**, so there is nothing to remember
+**There is no third condition any more** (W-294): the `!` lines `.fux/sources/dirs`
+carried were the second home for exclusion, with the opposite meaning of `!` in
+`.fuxignore`, and they moved into `.fuxignore` when the list became
+`.fux/sources.yaml`.
+
+🔴 **A directory a hand-written `.fuxignore` pattern ignores is PRUNED, never
+entered** (W-244's rule, carried to the file that now holds every exclusion).
+Git's rule — a file under an ignored directory cannot be re-included — is what
+makes the prune exact rather than an approximation: `Ignores.decide` says no
+file beneath it can come back. On this repository that is the L11 guard: the
+walk never lists `work/golden/`.
+
+**No rule inside that pair beats another**, so there is nothing to remember
 about precedence among them and nothing to get wrong. Every file that fails one
 of them — or that `.fuxignore` ignored — is reported as *skipped with a reason*
 rather than silently dropped, and `.fuxignore`'s reason names the file, the
@@ -136,7 +144,7 @@ class Skipped:
         return self.kind == POLICY
 
 
-def would_index(root: Path, rel: str, *, excludes, types: TypeFilter | None) -> bool:
+def would_index(root: Path, rel: str, *, types: TypeFilter | None) -> bool:
     """Would this path be indexed if the `.fuxignore` blocks were not there?
 
     **The staleness test for a fux-written line.** A generated line freezes the
@@ -145,15 +153,13 @@ def would_index(root: Path, rel: str, *, excludes, types: TypeFilter | None) -> 
     invisible filter, and an invisible filter is the failure every one of these
     items was opened about. This is what makes it visible.
 
-    The three conditions in the same order the walk applies them, so the answer
+    The conditions in the same order the walk applies them, so the answer
     cannot drift from the walk's. **Bytes are read only for a path that already
-    passed both lists**, which is why this costs nothing on the population that
+    passed the allowlist**, which is why this costs nothing on the population that
     is large: a `.py` file fails the allowlist and is never opened.
     """
     path = root / rel
     if not path.is_file():
-        return False
-    if _excluded_by(rel, list(excludes or [])) is not None:
         return False
     if types is not None and not types.accepts(rel):
         return False
@@ -330,16 +336,14 @@ def walk_sources(
     root: Path,
     dirs: list[str],
     *,
-    excludes: list[str] | None = None,
     types: TypeFilter | None = None,
     ignores: fuxignore.Ignores | None = None,
 ) -> tuple[list[WalkedFile], list[Skipped]]:
-    """Walk the included roots, subtract the exclusions, keep only document types.
+    """Walk the listed roots, honour `.fuxignore`, keep only document types.
 
-    `excludes`, `types` and `ignores` default to "nothing excluded, everything
-    allowed, no opinions" so a caller that has not been updated keeps its old
-    behaviour — but **no such caller ships**: `ingest` passes all three, and the
-    defaults exist for tests that are exercising one condition at a time.
+    `types` and `ignores` default to "everything allowed, no opinions" so a
+    test can exercise one condition at a time — but **no such caller ships**:
+    `ingest` passes both.
 
     **`ignores` is checked first and can end the question in either
     direction** (SR-FUXIGNORE decision 4). An empty `Ignores` — which is what
@@ -347,25 +351,17 @@ def walk_sources(
     passing one, so the old two-condition behaviour is exactly what a repo that
     has not adopted the file still gets.
     """
-    excludes = excludes or []
     ignores = ignores if ignores is not None else fuxignore.Ignores()
     files: dict[str, bytes] = {}
     #: rel -> (reason, kind). The kind is decided at the point of the skip.
     skipped: dict[str, tuple[str, str]] = {}
-    # W-244 (ruled 2026-10-03): a directory a `!` exclusion removes is PRUNED,
-    # never enumerated, and recorded once as `dir/`. Only while no hand-written
-    # `!` re-include exists: a re-include outranks an exclusion (above), and one
-    # could name a file beneath the pruned directory.
-    can_prune = bool(excludes) and not any(rule.negate for rule in ignores.rules)
 
     def prune(directory: Path) -> bool:
-        if not can_prune:
-            return False
         rel_dir = unicodedata.normalize("NFC", directory.relative_to(root).as_posix())
-        pattern = _excluded_by(rel_dir, excludes)
-        if pattern is None:
+        verdict = ignored_dir(ignores, rel_dir)
+        if verdict is None:
             return False
-        skipped.setdefault(rel_dir + "/", (f"excluded by !{pattern}", POLICY))
+        skipped.setdefault(rel_dir + "/", (verdict.reason(), POLICY))
         return True
 
     for entry in dirs:
@@ -397,10 +393,6 @@ def walk_sources(
                 skipped[rel] = (verdict.reason(), _generated_kind(verdict))
                 continue
             if not verdict.reincluded:
-                pattern = _excluded_by(rel, excludes)
-                if pattern is not None:
-                    skipped[rel] = (f"excluded by !{pattern}", POLICY)
-                    continue
                 if types is not None and not types.accepts(rel):
                     if types.awaits_package(rel):
                         continue  # W-289 P5: counted on stderr, never a frozen skip
@@ -426,20 +418,21 @@ def walk_sources(
     return walked, skips
 
 
-def _excluded_by(rel: str, excludes: list[str]) -> str | None:
-    """The first pattern that removes this path, or `None`.
+def ignored_dir(ignores: fuxignore.Ignores, rel_dir: str) -> "fuxignore.Verdict | None":
+    """The verdict that ignores directory `rel_dir`, when a HAND-written line does.
 
-    A pattern matches the file **or any ancestor directory**, so
-    `!work/regression/*/evidence` removes the directory and everything under
-    it — which is what a reader of that line expects, and the only reading
-    under which excluding a tree is one line rather than one line per file.
+    🔴 **Exact, not an approximation.** `Ignores.decide` walks a file's
+    ancestors shallowest-first and stops at the first one ignored, so a file
+    beneath an ignored directory is ignored whatever follows — git's rule. The
+    walk may therefore skip the directory without listing it, and must: W-244
+    found the walk listing `work/golden/` while the tree was LOCKED (L11
+    decision 9 — filtering the output does not stop the walk reading).
+
+    **Hand lines only.** A fux-written block line is an exact path a previous
+    run recorded, never a directory pattern somebody meant.
     """
-    parts = rel.split("/")
-    ancestors = ["/".join(parts[: i + 1]) for i in range(len(parts))]
-    for pattern in excludes:
-        if any(sourcelist.glob_match(pattern, candidate) for candidate in ancestors):
-            return pattern
-    return None
+    verdict = ignores.decide(rel_dir, is_dir=True, hand_only=True)
+    return verdict if verdict.ignored else None
 
 
 def _candidate_paths(base: Path, prune=None):

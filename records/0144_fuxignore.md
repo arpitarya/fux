@@ -6,12 +6,12 @@ title: "SR-FUXIGNORE (0144) — .fux/.fuxignore: one file for what is not indexe
 description: "Exclusion moves out of the source lists into one .gitignore-shaped file that is read first and decides in both directions, including over the type allowlist. `fux ingest` writes the skip list into two delimited blocks at its top."
 status: accepted
 date: 2026-08-27
-amended: 2026-10-20
+amended: 2026-10-24
 feature: the `.fux/.fuxignore` exclusion file
-owns: [src/fux/acquire/fuxignore.py@5cbaedf93f3e]
+owns: [src/fux/acquire/fuxignore.py@9ba7d3144bbc]
 laws: [L2, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 4ab0d320199580affa09f0e6da54bbc727cdcb061e3f2aa21bf87c02df8a48aa
+content_sha: dca106b233afbd1df2b020582e3ce80eb949c101bc2d0c44125f56710e9c6b9b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -31,9 +31,8 @@ content_sha: 4ab0d320199580affa09f0e6da54bbc727cdcb061e3f2aa21bf87c02df8a48aa
 ## §1 — For humans
 
 **"Why is my file not in the index?" had four answers, and you had to know all
-four to ask.** A `!` line in `.fux/sources/dirs`. A `!` line in
-`.fux/sources/types` (the types list until 2026-09-11). The allowlist in that same file. Two rules compiled into
-the walker. The symptom was always identical — a document quietly absent — and
+four to ask.** A `!` line in the old directory list. A `!` line in the old types
+list. The allowlist in that same file. Two rules compiled into the walker. The symptom was always identical — a document quietly absent — and
 the four places had nothing in common but the outcome.
 
 **Exclusion now has one home, and it is the file every developer already
@@ -57,13 +56,11 @@ out of one.
 
 ```mermaid
 flowchart TD
-    F["a file under a dirs entry"] --> G{".fuxignore?"}
+    F["a file under a listed path"] --> G{".fuxignore?"}
     G -->|"in a fux-written block"| S4["skipped:<br/>the reason that put it there"]
     G -->|ignored| S0["skipped:<br/>ignored by .fux/.fuxignore:N"]
     G -->|"explicitly ! re-included"| D
-    G -->|"no rule matched"| E{"matched by a<br/>! exclusion in dirs?"}
-    E -->|yes| S1["skipped:<br/>excluded by !pattern"]
-    E -->|no| T{"matches the<br/>type allowlist?"}
+    G -->|"no rule matched"| T{"matches the<br/>type allowlist?"}
     T -->|no| S2["skipped:<br/>not an indexed file type"]
     T -->|yes| D{"non-empty, and<br/>readable?"}
     D -->|no| S3["skipped:<br/>empty / binary / non-utf8"]
@@ -74,7 +71,7 @@ flowchart TD
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-  a file under a dirs entry
+  a file under a listed path
         |
         v
   .fuxignore says?
@@ -82,9 +79,6 @@ flowchart TD
         |-- ignored ------------------> skipped: ignored by .fux/.fuxignore:N
         |-- explicitly ! re-included --------------------------+
         |-- no rule matched                                    |
-        v                                                      |
-  matched by a ! exclusion in dirs? --yes--> skipped: excluded |
-        | no                                                   |
         v                                                      |
   matches the type allowlist? --no--> skipped: not a doc type  |
         | yes                                                  |
@@ -144,9 +138,9 @@ Four filters, four homes, one symptom.
 
 | where | what it removed | who could find it |
 |---|---|---|
-| `.fux/sources/dirs`, `!` lines | path globs, subtree-wide | someone who knew `!` subtracts there |
-| `.fux/sources/types`, `!` lines | name globs off the allowlist | same, in a different file |
-| `.fux/sources/types`, the allowlist itself | everything not listed | anyone, but it reads as *inclusion* |
+| the old directory list, `!` lines | path globs, subtree-wide | someone who knew `!` subtracts there |
+| the old types list, `!` lines | name globs off the allowlist | same, in a different file |
+| the types allowlist itself | everything not listed | anyone, but it reads as *inclusion* |
 | `gitdir._candidate_paths` / `_skip_reason` | dotfiles, empty, binary, non-utf8 | nobody; it is source |
 
 **No one of them is wrong.** The allowlist in particular is
@@ -156,10 +150,11 @@ arrives with — had no file to be asked in, and the two files that partly
 answered it disagreed about the meaning of `!` with the file everyone already
 knows.
 
-⚠ **The `!` collision is the load-bearing detail.** In `sources/`, `!`
-**subtracts** (SR-DIR-LIST decision 2b, chosen so there is no precedence order
-to get wrong). In `.gitignore`, `!` **re-includes**. A file named `.fuxignore`
-that did not behave like `.gitignore` would be worse than no file at all.
+⚠ **The meaning of `!` was the load-bearing detail.** The old lists used `!` to
+**subtract**; `.gitignore` uses it to **re-include**. A file named `.fuxignore`
+that did not behave like `.gitignore` would be worse than no file at all — so
+this file took git's meaning, and the source manifest gave `!` up entirely
+(decision 5).
 
 ### Decision
 
@@ -177,7 +172,7 @@ be re-included**, which is git's rule and the one that surprises people.
 
 **2a. Order is semantic here and nowhere else in `.fux/`.** Every other list
 fux reads is loader-sorted so that file order cannot change a committed byte
-(SR-URL-LIST decision 10). This one resolves by *last match*, so sorting it
+(SR-SOURCES decision 5). This one resolves by *last match*, so sorting it
 would change its meaning. **L4 still holds** — the same file produces the same
 index on every machine; what is given up is the weaker property that the same
 *set* of lines in any order does, and it is given up knowingly, because a
@@ -196,9 +191,9 @@ header.**
 **4. `.fuxignore` is read first and decides in BOTH directions.**
 
 - A path it **ignores** is skipped, whatever `.fux/config/formats.toml` allows and
-  whatever `.fux/sources/dirs` includes.
-- A path it **explicitly re-includes** with `!` skips past the `dirs`
-  exclusions and the type allowlist entirely.
+  whatever `.fux/sources.yaml` includes.
+- A path it **explicitly re-includes** with `!` skips past the type allowlist
+  entirely.
 
 ⚠ **The second half overrides [SR-TYPES](0128_types-list.md), and that record
 is amended rather than left to contradict this one.** SR-TYPES decision 7 read
@@ -218,65 +213,39 @@ tree.
 nothing for a decoder or an analyzer to read either way, so a switch here would
 only move the emptiness one layer down.
 
-**5. The `!` lines in `sources/dirs` still work, and `.fuxignore` is their new
-home.** They are not removed, and a repo that has one must keep working. **A
-pattern stated in both places raises a warning** naming both `file:lineno` and
-saying which line to delete — the `dirs` one.
+**5. Exclusion is spelled here and nowhere else** (W-294, Arpit 2026-10-24).
+[`.fux/sources.yaml`](0116_url-list.md) is includes only, and an entry starting
+`!` there is refused with a message naming this file and the anchored pattern to
+write (SR-SOURCES decision 4). `.fux/config/formats.toml` has no subtraction
+either ([SR-TYPES](0128_types-list.md) decisions 2a and 12). So `!` has exactly
+one meaning in `.fux/` — this file's *re-include* — and there is no second file
+whose exclusions this one could duplicate or contradict.
 
-**5a. And since 2026-09-14, `fux remove` WRITES here.** The migration
-Consequences called *"a migration we now owe"* is paid; veto condition 3 is
-discharged. The write path is `fuxignore.add_exclusion`, and four properties are
-the whole of it:
+**5a. `fux remove` writes here.** A path covered by a listed ancestor leaves the
+index through a line in this file, written by `fuxignore.add_exclusion`, and
+four properties are the whole of it:
 
 | property | why it is load-bearing |
 |---|---|
-| **the line is ANCHORED — `/docs/a.md`, never `docs/a.md`** | a bare name in this grammar means *at any depth*, so `fux remove docs` would also have dropped `archive/docs` and `vendor/x/docs`. The removal nobody asked for, visible only as documents quietly missing from the next index. The leading `/` pins it to the frame `sources/dirs` entries are already written in |
+| **the line is ANCHORED — `/docs/a.md`, never `docs/a.md`** | a bare name in this grammar means *at any depth*, so `fux remove docs` would also have dropped `archive/docs` and `vendor/x/docs` — the removal nobody asked for, visible only as documents quietly missing. The leading `/` pins it to the frame `.fux/sources.yaml` paths are written in |
 | **a directory gets a trailing `/`** | so a *file* of that name appearing later is not swept up by a line written about a directory |
 | **it goes BELOW the fux blocks, at the end** | last match wins here, so the end is the position that actually decides — and the same place a person editing by hand would write |
-| **a path a hand-written pattern already covers RAISES** | removing something already removed is an error, which is the contract the `!`-line form kept and a caller's exit code depends on. A second line that changes nothing is also a `duplicate_warnings` conflict fux created itself |
+| **a path a hand-written pattern already covers RAISES** | removing something already removed is an error, and a caller's exit code depends on it. A second line that changes nothing is noise fux would have created itself |
 
-⚠ **`fux add` needed a second guard in the same change, and this is the sharp
-edge.** `add` refused a path excluded by a `!` line in `dirs` — *"there is no
-un-exclude by design"* — and consulted **only that file**. Moving the write
-target here would have turned `add` into the un-exclude that refusal exists to
-prevent: `fux remove docs/a.md` then `fux add docs/a.md` writes a line that
-`.fuxignore` goes on beating, so the command reports success and indexes
-nothing. `cmd_add` now consults this file with `hand_only=True` and refuses with
-the pattern's `file:lineno`. **A moved write target is not a local change** — the
-reader on the other side of it had an assumption, and nothing mechanical was
-holding the pair together.
+⚠ **`fux add` consults this file too, and that is the sharp edge.** Without it,
+`fux remove docs/a.md` then `fux add docs/a.md` writes an entry that this file
+goes on beating, so the command reports success and indexes nothing. `cmd_add`
+consults this file with `hand_only=True` and refuses with the pattern's
+`file:lineno`. **A write target and the reader on the other side of it are one
+change**, never two.
 
-**5b. A surviving `!` line is migrated by a person, never as a side effect.**
-`fux remove` on a path an existing `!` line already excludes **leaves that line
-exactly as it is** and raises. Rewriting it there would be a migration performed
-by a verb that was asked to remove something already removed, in a file the
-caller did not name. `fux doctor`'s **`dirs exclusions migrated`** row is where
-the move is offered — one line per survivor, with the anchored pattern to write
-instead, at a moment the reader chose.
-
-⚠ **That row is `warn` and never an error**, because `!` lines here keep being
-*read* ([SR-DIR-LIST](0120_dir-list.md) decision 2a). Failing on one would make
-`doctor` red for a repo that is working correctly, and the fix for red-by-default
-is people ignoring it. **It is also a different finding from the duplicate
-warning above:** that one needs the pattern in *both* files. This one fires on
-*every* survivor — including the ones nothing duplicates, which are precisely the
-ones no other check would ever mention.
-
-⚠ **Amended 2026-09-11: the types half of this decision is gone.** It read *"the
-`!` lines in `sources/dirs` and `sources/types` still work"*. The types list is
-`.fux/config/formats.toml` now and has **no subtraction at all**
-([SR-TYPES](0128_types-list.md) decisions 2a and 12): a `!` glob there is a
-loud error naming this file, and `fux setup`'s conversion of the old file moves
-each `!` line here — **above the first hand-written pattern**, so a re-include
-already written here against the old subtraction keeps winning.
-`duplicate_warnings` lost its `types_file` parameter rather than keeping one that
-could only ever return nothing.
-
-⚠ **The duplicate is warned about precisely because it is currently
-harmless.** Both copies exclude the same thing today. They agree only until
-someone edits one, and the two files mean opposite things by `!`, so the first
-edit produces the opposite of what the other file says, silently. The warning
-is early for that, not for today.
+**5b. `fux setup`'s conversion appends here, anchored.** When it converts the
+retired `.fux/sources/dirs` (SR-SOURCES decision 20), each surviving `!` line
+becomes an anchored pattern **below the ingest blocks**, written **before** the
+old list is deleted — an L11 guard on this repository lived in exactly such a
+line. The retired `.fux/sources/types` list's `!` lines are converted the same
+way, above the first hand-written pattern, so a re-include already written here
+keeps winning.
 
 **6. Absent, empty, or all-comments means nothing is ignored — and that is
 safe here.** The same shape is a loud error for `.fux/config/formats.toml`
@@ -287,8 +256,8 @@ act is hiding a document nobody asked it to hide.
 
 **7. `fux setup` writes the header and no patterns, write-if-missing.**
 Consistent with every other consumer-owned file (SR-DOTFUX decision 6); the
-header carries the whole grammar, both divergences, and the `!`-collision
-warning, so the file explains itself without a doc.
+header carries the whole grammar and both divergences, so the file explains
+itself without a doc.
 
 **8. It is a declared committed file.** `.fuxignore` has a row in
 `fuxdir.COMMITTED_FILES`, because a committed file with no row is reported by
@@ -296,11 +265,12 @@ warning, so the file explains itself without a doc.
 already fired twice.
 
 **9. `fux doctor` reports it.** A `.fuxignore` that will not parse is an
-`error` (it stops `fux ingest`); a duplicated pattern is a `warn`.
+`error` (it stops `fux ingest`); a hand-written rule a later rule always
+overrides is a `warn` (`fuxignore reachable`).
 
 **10. This applies to the git-dir walker only.** A URL has no repo-relative
 path to match, and de-listing a URL is deleting its line
-(SR-URL-LIST). `.fuxignore` never sees the URL plane.
+(SR-SOURCES). `.fuxignore` never sees the URL plane.
 
 **11. `fux ingest` WRITES the skip list into two delimited blocks here.**
 Ruled by Arpit on 2026-08-27. The list lived in `.fux/runtime/skipped` —
@@ -405,8 +375,6 @@ this moved where they are written, not what they are.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28). A function this record owns or describes lost a boolean or value parameter default; every caller now passes the value the default had, so behaviour is unchanged.
 
-**No decision here moved** (W-261, 2026-10-05): `acquire/gitdir.py`, which this record describes, lost the `dirs`-list readers to `acquire/dirlist.py` (SR-DIR-LIST's). `would_index`, `_generated_kind` and the walk's verdicts are untouched.
-
 **W-289 phase 2 (2026-10-20) — no decision here moved.** `acquire/gitdir.py`, which this record describes, drops from the type filter the globs no declared package reads ([SR-PLUGINS](0165_plugins.md) P3), and such a file is **not a skip** — it never reaches the generated `.fuxignore` blocks, where a frozen line would keep it out after the package is declared ([SR-INGEST](0106_ingest.md) decision 4b). Decision 11's freeze is untouched for every other skip.
 
 ### Consequences
@@ -419,22 +387,17 @@ this moved where they are written, not what they are.
 - **One file answers the question people actually ask**, in a grammar they
   already know, with a skip reason that names the file, the line and the
   pattern.
-- ⚠ **The same character now means opposite things in two neighbouring
-  files.** `!` subtracts in `.fux/sources/`, re-includes here. **Accepted, not
-  mitigated** — the alternative was a `.fuxignore` that is not one. The
-  duplicate warning is where the confusion would actually surface, and it is
-  the only place it is caught.
 - ⚠ **A committed line can now index a format with no decoder.** Raw bytes in
   the index is the exact failure SR-TYPES measured (`.json` alone carried
   11.4 % of this repo's tokens as raw bytes). It is one explicit `!` away
   instead of impossible. **Nothing has been measured about how often anyone
   reaches for it.**
 - ⚠ **Order is semantic in one `.fux/` file and in no other.** A reader who has
-  internalised *"file order is presentation only"* from `dirs`, `urls` and
-  `types` will be wrong about this one. The header says so; nothing enforces it.
-- **`SR-TYPES` decision 7 and `SR-DIR-LIST` decision 2b are narrower than
-  they were**, and both records are edited in the same change rather than left
-  to disagree with this one.
+  internalised *"file order is presentation only"* from `.fux/sources.yaml` and
+  `formats.toml` will be wrong about this one. The header says so; nothing enforces it.
+- **`SR-TYPES` decision 7 is narrower than it was** — a conjunction with
+  exactly one thing above it — and that record says so rather than disagreeing
+  with this one.
 - ⚠ **A committed file is now written by a command, and that is new in fux.**
   Every other committed thing `fux ingest` touches is the index itself. This one
   is an **input** to the walk, so a run reads what the previous run wrote. It
@@ -457,19 +420,10 @@ this moved where they are written, not what they are.
 - **The file is now as long as the corpus is unindexable.** On this repo the
   `not indexed` block is in the hundreds of lines. Hand-written patterns are the
   lever: `__pycache__/` and `*.py[cod]` alone keep 257 lines out of it.
-- ✅ **The migration is paid (2026-09-14, W-165 fix 1).** This bullet read *"we
-  now owe a migration: `fux remove` still writes `!` into `sources/dirs` when
-  `.fuxignore` is the stated home for exclusions"* from the day this record was
-  accepted. `fux remove` writes here now — decision 5a — and veto condition 3 is
-  discharged. **What the debt cost while it stood:** every exclusion a consumer
-  created for that period is a `!` line in the other file, in the spelling that
-  means the opposite thing, and no ingest will ever migrate one. Decision 5b is
-  why, and `fux doctor` is where each is named.
-- **The anchoring rule is a behaviour change a reader should expect.** The old
-  `!docs` in `sources/dirs` was a literal path-prefix match against that list's
-  own grammar; `/docs/` here is a gitignore pattern. They agree for every path
-  `fux remove` can be handed — and a *hand-written* `docs` in this file still
-  means any depth, which is the grammar and is not being changed.
+- **The anchoring rule is what a reader should expect from a written line.**
+  `fux remove` and `fux setup` write `/docs/`, a gitignore pattern pinned to the
+  root; a *hand-written* `docs` in this file still means any depth, which is the
+  grammar and is not being changed.
 
 ### Alternatives considered
 
@@ -479,14 +433,14 @@ this moved where they are written, not what they are.
   arrives indexed"* (SR-TYPES decision 1) is unanswered by anything in this
   record. The allowlist stays in the types list (`.fux/config/formats.toml` since
   SR-TYPES decision 12); only exclusion moves.
-- **Keep `!` meaning *subtract* here, for consistency with `sources/`.**
+- **Keep `!` meaning *subtract* here, for consistency with the old source lists.**
   Rejected: it makes the file a `.fuxignore` in name only, and the negation
   rule is the single thing every reader already knows about the format.
 - **Nested per-directory `.fuxignore` files, full git parity.** Rejected under
   decision 1 — the merge order is a new thing to get wrong, and the skip reason
   stops being a single `file:lineno`.
 - **Make `.fuxignore` purely subtractive — no `!` at all.** Rejected: it
-  preserves SR-DIR-LIST's "no precedence to remember" but makes `.fux/**`
+  would leave "no precedence to remember" but makes `.fux/**`
   plus a carve-out impossible, and carve-outs are the most common real use of
   an ignore file.
 - **`!` does not override the type allowlist.** Rejected on Arpit's ruling
@@ -509,14 +463,11 @@ this moved where they are written, not what they are.
   that the walk skips over. Rejected: a `.fuxignore` whose lines do not ignore
   is a file whose name is a lie, and every reader who acts on that name would be
   wrong. If the list is going to live here it has to mean what the file means.
-- **Error on a duplicated pattern instead of warning.** Rejected: both copies
-  agree today, so refusing to run over a harmless redundancy would break
-  working repos to prevent a future edit.
 
 ### Reference (required)
 
 - The code: [`src/fux/acquire/fuxignore.py`](../src/fux/acquire/fuxignore.py)
-  (`parse`, `Ignores.decide`, `duplicate_warnings`, `_translate`, and for
+  (`parse`, `Ignores.decide`, `add_exclusion`, `_translate`, and for
   decision 11 `write_blocks`, `writable`, `Generated`) and its callers,
   [`src/fux/acquire/gitdir.py`](../src/fux/acquire/gitdir.py) (`walk_sources`,
   `would_index`) and
@@ -543,14 +494,11 @@ this moved where they are written, not what they are.
    file is the wrong shape and nesting has earned its cost.
 2. **`!` is measurably used to admit a format with no decoder**, i.e. the
    raw-bytes escape hatch has become a habit rather than an escape hatch.
-3. ✅ **DISCHARGED 2026-09-14 — and kept as a condition, not deleted.**
-   `fux remove` no longer writes into `sources/dirs` (decision 5a). The check
-   below is the one that would catch a regression, so it stays: a veto that is
-   currently false is a condition still being checked, which is the whole point
-   of stating conditions rather than awaiting events.
-4. **The duplicate warning has fired on a repo where the two lines had already
-   drifted apart**, which would make the warning too late and the case for an
-   error.
+3. **An exclusion is found written anywhere but here** — a verb or a
+   conversion that put one into `.fux/sources.yaml` (which refuses `!`) or
+   anywhere else would reopen the one-home rule of decision 5.
+4. *(retired with the duplicate warning, W-294 — there is no second file left
+   for a pattern to be duplicated in.)*
 5. **A generated block appears BELOW a hand-written line**, in any repo. That
    inverts decision 11's ordering property and a machine line would then be able
    to beat a `!` somebody wrote.
@@ -565,17 +513,11 @@ this moved where they are written, not what they are.
 grep -n '^!' .fux/.fuxignore
 
 # 3 — the exclusion write path is `.fuxignore` and nothing else.
-#     ⚠ The grep this replaced looked for the STRING `sources/dirs` near
-#     "remove" in sources.py, which stayed green through the whole debt and
-#     would have stayed green after it was paid: the path is reached through
-#     `list_path`, not spelled at the call site. It was a check that could
-#     not fire. This one exercises the verb.
+#     It exercises the verb rather than grepping for a path string, which
+#     could not fire: the path is reached through a constant, not spelled.
 fux remove docs/some-covered-file.md --dry-run
 # expect: `would exclude /docs/some-covered-file.md` ... `in .fux/.fuxignore`
-git diff --stat .fux/sources/dirs     # must be empty after a real `fux remove`
-
-# 4 — duplicates, if any, with both line numbers
-fux ingest --list-skipped 2>&1 >/dev/null
+grep -n '^\s*- !' .fux/sources.yaml    # expect: nothing — and the loader refuses one
 
 # 5 — the fux blocks must precede every hand-written rule
 awk '/^# >>> fux:/{b=NR} /^[^#[:space:]]/{if(!f)f=NR} END{exit !(b<f||!f)}' .fux/.fuxignore \
@@ -596,7 +538,7 @@ document is never listed here — the body may name one, but archive is not
 evidence.*
 
 **Records** — [SR-INGEST](0106_ingest.md) · [SR-DOTFUX](0102_fux-directory.md) ·
-[SR-URL-LIST](0116_url-list.md) · [SR-DIR-LIST](0120_dir-list.md) ·
+[SR-SOURCES](0116_url-list.md) ·
 [SR-TYPES](0128_types-list.md) · [SR-DECODE](0139_decode.md)
 
 **Code**

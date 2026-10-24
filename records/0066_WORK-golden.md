@@ -7,10 +7,10 @@ description: "The prohibition is law L11 and this record states none of it; what
 status: accepted
 date: 2026-09-28
 feature: the golden benchmark — its two question sets, the key's custody, its guards, what Claude may read, and where the prohibition is stated
-owns: [.claude/hooks/guard-golden-answer.sh@de3c4f5d5725, .claude/hooks/guard-sealed-key.sh@85f6df22a301, tests/test_golden_key_guards.py@280935f6475f, tests/test_settings_never_committed_unlocked.py@df702e8bb51c, tests/test_golden_hook_prose.py@5cf50353a104, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@4cac53fcdc3c, tools/golden-difficulty@d4b84445ced3]
+owns: [.claude/hooks/guard-golden-answer.sh@de3c4f5d5725, .claude/hooks/guard-sealed-key.sh@85f6df22a301, tests/test_golden_key_guards.py@afcf157005f7, tests/test_settings_never_committed_unlocked.py@df702e8bb51c, tests/test_golden_hook_prose.py@5cf50353a104, scripts/gen-golden.py@1b2a854c1f75, tests/test_claude_md_golden.py@4cac53fcdc3c, tools/golden-difficulty@d4b84445ced3]
 laws: [L0, L11]
 timestamp: 2026-09-15T00:00:00Z
-content_sha: 0f118ae6a5c747d962332a6c14dd90227f588db8b520009643cd7d3da0170b74
+content_sha: f7ce2440ef4973bac30bb294c4cacdfbdf7a2fa57057a12e39928fea22f528c0
 ratifies: "Arpit, 2026-09-15 — W-146 row 17: the prohibition gets a record and CLAUDE.md keeps a generated view; the same day he ruled it into law L11 and then amended it — two question sets, one Claude-authored and one Codex-authored, with both answer halves in his custody and no key file at all"
 ---
 
@@ -86,7 +86,7 @@ flowchart TD
     R --> G["work/golden/README.md<br/>links, never restates"]
     subgraph guards ["six guards, none a guarantee"]
         G1[".gitignore"]
-        G2["!work/golden in .fux/sources/dirs"]
+        G2["/work/golden in .fux/.fuxignore"]
         G3["permissions.deny"]
         G4["guard-golden-answer.sh"]
         G4b["guard-sealed-key.sh<br/>(the plural, on the shell surface)"]
@@ -118,7 +118,7 @@ flowchart TD
                             |
                             +-- six guards, none a guarantee:
                                   .gitignore
-                                  !work/golden in .fux/sources/dirs
+                                  /work/golden in .fux/.fuxignore
                                   permissions.deny in .claude/settings.json
                                   .claude/hooks/guard-golden-answer.sh
                                   .claude/hooks/guard-sealed-key.sh
@@ -227,7 +227,7 @@ is the surrounding process:
   the ladder, the rungs and what a result may claim are in
   [`work/golden/README.md`](../work/golden/README.md).
 - 🔴 **The guards are the defence again, because there is something on disk.**
-  `.gitignore`; `!work/golden` in `.fux/sources/dirs`; `permissions.deny` in
+  `.gitignore`; `/work/golden` in `.fux/.fuxignore`; `permissions.deny` in
   `.claude/settings.json`; `.claude/hooks/guard-golden-answer.sh`, which matches
   what a tool call *targets* and fails closed; the generated law block itself;
   and two tests — `test_golden_key_guards.py`, which fails if a guard stops
@@ -431,7 +431,7 @@ is the surrounding process:
     somebody made to that file while the tree was open, silently. The stash puts
     back exactly what was taken.
 
-    🔴 **`.gitignore` and `!work/golden` in `.fux/sources/dirs` are untouched in
+    🔴 **`.gitignore` and `/work/golden` in `.fux/.fuxignore` are untouched in
     both states**, because *never committed* is the clause no state relaxes. The
     switch's own test asserts the program cannot even *reach* those two files —
     it may print their names to tell an operator what it left alone, and a line

@@ -17,7 +17,7 @@ from __future__ import annotations
 from l12_fixtures import config_file
 import dataclasses
 
-from l12_fixtures import scoring, template_tune, write_config
+from l12_fixtures import scoring, template_tune, write_config, write_dirs
 import json
 
 import pytest
@@ -43,7 +43,7 @@ TOPS = (1, 5, 20)
 def _init(tmp_path, files: dict[str, str]) -> None:
     listing = tmp_path / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)

@@ -260,7 +260,7 @@ def url_provenance(root: Path) -> dict[str, tuple[str, str | None]]:
     if config.url is None:
         return {}
     try:
-        entries = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
+        entries = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.sources_file), config.url)
     except FuxError:
         return {}
     return {

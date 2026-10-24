@@ -36,7 +36,7 @@ import pytest
 from fux.derive import build
 from fux.derive import format as fmt
 from fux.ingest.run import run
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_dirs
 
 ENGINE = Path(__file__).resolve().parents[2]
 NODE_ENTRY = ENGINE / "node" / "fux.mjs"
@@ -60,7 +60,7 @@ def corpus(tmp_path_factory) -> Path:
     root = tmp_path_factory.mktemp("sections-node")
     listing = root / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text("docs\n", encoding="utf-8")
+    write_dirs(root, "docs\n")
     (root / "fux.toml").write_text("[sources]\n\n[index]\nsection_records = true\n", encoding="utf-8")
     (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)

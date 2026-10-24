@@ -9,7 +9,7 @@ decision 21.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import json
 import subprocess
 import sys
@@ -41,7 +41,7 @@ def test_a_decoder_that_strips_hrefs_is_an_edge_loss_alert(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     sources = tmp_path / ".fux" / "sources"
     sources.mkdir(parents=True)
-    (sources / "dirs").write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     docs = tmp_path / "docs"

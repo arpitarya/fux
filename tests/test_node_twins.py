@@ -62,8 +62,9 @@ NARROWED = {
     # `gitdir.py` is the git-backed WALK — what ingest visits, what it excludes,
     # a document's `mtime`. Node does not ingest; what crosses is the predicate
     # the QUERY plane calls, and the walk moves constantly for reasons
-    # `is_archived_loc` never sees. (`archived_dirs` moved to `dirlist.py` with
-    # SR-DIR-LIST, W-261, and `ingest/dirlist.mjs` is its whole-file twin.)
+    # `is_archived_loc` never sees. (The archived paths come from
+    # `.fux/sources.yaml` — `sourcesfile.archived_paths`, whose Node twin is
+    # `ingest/sourcelist.mjs`, held equal by tests/test_sources_yaml_differential.py.)
     "ingest/gitdir.mjs": "is_archived_loc",
     # `priors.py` carries the git half (`git_commit_times`) as well, which is
     # an ingest concern with no Node twin. `recency_multiplier` was the narrowed

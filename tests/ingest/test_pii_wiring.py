@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 
 from fux.acquire import pii
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_dirs
 
 SRC = Path(__file__).resolve().parents[2] / "src" / "fux" / "ingest" / "run.py"
 
@@ -261,9 +261,7 @@ def test_ingest_refuses_a_repo_with_no_pii_file(tmp_path):
     from fux.ingest.run import run
 
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    listing = tmp_path / ".fux" / "sources" / "dirs"
-    listing.parent.mkdir(parents=True)
-    listing.write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# a\n\nmail a@b.com\n", encoding="utf-8")
     write_config(tmp_path)  # every OTHER file present, so pii.toml is the one missing
@@ -279,9 +277,7 @@ def test_ingest_refuses_a_repo_with_no_pii_file(tmp_path):
 
 def _repo_with_rule(tmp_path, files: dict[str, str]):
     """A minimal repo with one email rule, ready to ingest."""
-    listing = tmp_path / ".fux" / "sources" / "dirs"
-    listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (config_file(tmp_path, "pii")).write_text(
         "[[rule]]\nname = 'email'\npattern = '[\\w.]+@[\\w.]+\\.\\w+'\n"

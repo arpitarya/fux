@@ -8,7 +8,7 @@ no-import guard is the property worth asserting, the same shape
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, sources_path, write_dirs, write_urls
 import importlib
 import importlib.util
 
@@ -30,7 +30,7 @@ def _repo(tmp_path, *, routes="", urls="", fetchers=("http",)):
         (d / f"{stem}.py").write_text("def fetch(url): ...\n", encoding="utf-8")
     src = tmp_path / ".fux" / "sources"
     src.mkdir(parents=True, exist_ok=True)
-    (src / "urls").write_text(urls, encoding="utf-8")
+    write_urls(tmp_path, urls)
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     return tmp_path
@@ -105,7 +105,7 @@ def test_the_routes_row_never_imports_a_fetcher(tmp_path, monkeypatch):
 # --- pinned fetchers --------------------------------------------------------
 
 def test_a_pin_the_table_would_resolve_differently_is_named(tmp_path):
-    """🔴 The whole cost of SR-URL-LIST decision 16, made visible. Every line is
+    """🔴 The whole cost of SR-SOURCES decision 16, made visible. Every line is
     a pin by design, so a route changed later moves nothing — this row is the
     only thing that says the two have drifted apart."""
     root = _repo(
@@ -122,9 +122,9 @@ def test_it_reports_and_never_rewrites(tmp_path):
         tmp_path, routes='"x.test" = "cdp"\n',
         urls="https://x.test/a fetch=http decoder=prose\n", fetchers=("http", "cdp"),
     )
-    before = (root / ".fux" / "sources" / "urls").read_text(encoding="utf-8")
+    before = sources_path(root).read_text(encoding="utf-8")
     _row(root, "pinned fetchers")
-    assert (root / ".fux" / "sources" / "urls").read_text(encoding="utf-8") == before
+    assert sources_path(root).read_text(encoding="utf-8") == before
 
 
 def test_an_agreeing_pin_is_quiet(tmp_path):
@@ -150,7 +150,7 @@ def _register_repo(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True)
-    (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    write_dirs(fux.parent, "docs\n")
     (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     (tmp_path / "docs").mkdir()

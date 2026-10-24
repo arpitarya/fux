@@ -59,7 +59,7 @@ function fixture() {
     mkdirSync(join(root, ".fux", "config"), { recursive: true });
     copyFileSync(join(REPO, ".fux", "config", name), join(root, ".fux", "config", name));
   }
-  cpSync(join(REPO, ".fux", "sources"), join(root, ".fux", "sources"), { recursive: true });
+  copyFileSync(join(REPO, ".fux", "sources.yaml"), join(root, ".fux", "sources.yaml"));
   build(root);
   return root;
 }

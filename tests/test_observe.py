@@ -8,7 +8,7 @@ code cannot reach an answer even when it is actively trying to.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import json
 import re
 import subprocess
@@ -143,7 +143,7 @@ def _repo(tmp_path: Path) -> Path:
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True, exist_ok=True)
-    (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    write_dirs(fux.parent, "docs\n")
     (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     # The template's `[observe] max_ms = 50` is a latency budget, and a loaded

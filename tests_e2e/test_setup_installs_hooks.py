@@ -30,7 +30,7 @@ def test_setup_wires_the_hooks_and_a_commit_re_indexes(tmp_path):
         assert f"{name}" in state
     assert "unregistered" not in state and "not wired" not in state
 
-    (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    (tmp_path / ".fux" / "sources.yaml").write_text("paths:\n  include:\n    - docs\n", encoding="utf-8")
     assert fux(tmp_path, "ingest").returncode == 0
     git(tmp_path, "add", "-A")
     subprocess.run(

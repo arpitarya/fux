@@ -227,7 +227,7 @@ refusal tells you to expect. **Take one side whole first**, then let ingest
 re-derive:
 
 ```bash
-# 1. resolve and `git add` the content conflicts (docs, .fux/sources/*) first
+# 1. resolve and `git add` the content conflicts (docs, .fux/sources.yaml) first
 shards=$(git diff --name-only --diff-filter=U -- .fux/index)
 git checkout --ours -- $shards && git add $shards
 # 2. conclude the merge when the human is ready — ingest AFTER the merge commit,

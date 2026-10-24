@@ -1,4 +1,4 @@
-"""`.fux/.fuxignore` — the grammar, the precedence, and the duplicate warning.
+"""`.fux/.fuxignore` — the grammar, the precedence, and exclusion's one home.
 
 SR-FUXIGNORE. Three properties carry the record, and each has its own block
 below:
@@ -9,9 +9,9 @@ below:
 2. **It outranks the type allowlist in both directions.** An ignore beats an
    allow; an explicit `!` beats a *dis*allow. The second half is the one that
    changed a decided SR, so it is pinned here rather than left to the walk.
-3. **A pattern stated in two files warns and changes nothing.** The warning is
-   early for the day someone edits one copy — `!` means opposite things in the
-   two files.
+3. **Exclusion has one home** (W-294). The duplicate warning between `dirs`
+   and `.fuxignore` is deleted with the `!` line it warned about: the source
+   manifest refuses `!`, so a pattern can no longer be stated in two files.
 """
 
 from __future__ import annotations
@@ -20,7 +20,8 @@ import pytest
 
 from fux.errors import FuxError
 from fux.acquire import fuxignore
-from fux.acquire.dirlist import source_dirs, source_excludes
+from fux.acquire.sourcesfile import source_paths
+from l12_fixtures import write_dirs
 from fux.acquire.gitdir import read_types, walk_sources
 
 
@@ -119,9 +120,8 @@ def _corpus(tmp_path, *, types='include = ["*.md"]\n', dirs="docs\nsrc\n", ignor
     (tmp_path / "docs/notes.log").write_text("log line\n")
     (tmp_path / "docs/empty.md").write_text("")
     (tmp_path / "src/app.py").write_text("print('x')\n")
-    (tmp_path / ".fux/sources").mkdir(parents=True)
     (tmp_path / ".fux/config").mkdir(parents=True)
-    (tmp_path / ".fux/sources/dirs").write_text(dirs)
+    write_dirs(tmp_path, dirs)
     (tmp_path / ".fux/config/formats.toml").write_text(types)
     if ignore is not None:
         (tmp_path / ".fux/.fuxignore").write_text(ignore)
@@ -131,8 +131,7 @@ def _corpus(tmp_path, *, types='include = ["*.md"]\n', dirs="docs\nsrc\n", ignor
 def _walk(root):
     files, skipped = walk_sources(
         root,
-        source_dirs(root, ".fux/sources/dirs"),
-        excludes=source_excludes(root, ".fux/sources/dirs"),
+        source_paths(root, ".fux/sources.yaml"),
         types=read_types(root, ".fux/config/formats.toml"),
         ignores=fuxignore.read(root),
     )
@@ -191,47 +190,23 @@ def test_every_printed_reason_is_ascii(tmp_path):
         reason.encode("ascii")
 
 
-# -- the duplicate warning -------------------------------------------------
+# -- exclusion's one home (W-294) -----------------------------------------
 
 
-def _warnings(root):
-    return fuxignore.duplicate_warnings(root, dirs_file=".fux/sources/dirs")
+def test_the_duplicate_warning_is_gone_with_the_line_it_warned_about():
+    """SR-FUXIGNORE's `!`-collision consequence ("accepted, not mitigated") is
+    closed, not muted: the function is deleted rather than left always-empty."""
+    assert not hasattr(fuxignore, "duplicate_warnings")
 
 
-def test_a_dirs_exclusion_repeated_in_fuxignore_warns_too(tmp_path):
-    root = _corpus(tmp_path, dirs="docs\nsrc\n!docs/gen\n", ignore="docs/gen\n")
-    (warning,) = _warnings(root)
-    assert ".fux/sources/dirs:3" in warning
+def test_a_bang_entry_in_the_manifest_is_refused_naming_fuxignore():
+    """`!docs/gen` used to subtract in `dirs` and re-include here — same
+    characters, opposite statements. The manifest now refuses it outright, so
+    `!` has exactly one meaning in `.fux/`."""
+    from fux.acquire import sourcesfile
 
-
-def test_a_dirs_exclusion_repeated_in_fuxignore_says_which_line_to_delete(tmp_path):
-    root = _corpus(tmp_path, dirs="docs\nsrc\n!docs/gen\n", ignore="docs/gen\n")
-    (warning,) = _warnings(root)
-    assert ".fux/.fuxignore:1" in warning
-    assert "Delete `!docs/gen` from .fux/sources/dirs" in warning
-    warning.encode("ascii")
-
-
-def test_a_negation_is_not_a_duplicate_of_an_exclusion_that_shares_its_spelling(tmp_path):
-    """`!docs/gen` in `dirs` subtracts; `!docs/gen` here adds back.
-
-    Same characters, opposite statements. Calling them duplicates would tell the
-    reader to delete the line that is doing the opposite thing.
-    """
-    root = _corpus(tmp_path, dirs="docs\nsrc\n!docs/gen\n", ignore="!docs/gen\n")
-    assert _warnings(root) == []
-
-
-def test_no_fuxignore_means_no_warnings_however_many_exclusions_exist(tmp_path):
-    assert _warnings(_corpus(tmp_path, dirs="docs\nsrc\n!docs/gen\n")) == []
-
-
-def test_the_types_list_has_no_exclusions_to_duplicate(tmp_path):
-    """SR-TYPES decision 12: `.fux/config/formats.toml` has no `!`, so the warning's types
-    half is gone rather than silently always-empty."""
-    import inspect
-
-    assert "types_file" not in inspect.signature(fuxignore.duplicate_warnings).parameters
+    with pytest.raises(FuxError, match=r"\.fux/\.fuxignore"):
+        sourcesfile.parse("paths:\n  include:\n    - docs\n    - '!docs/gen'\n", origin="s")
 
 
 # -- W-93: the fux-written blocks ------------------------------------------
@@ -332,8 +307,8 @@ def test_write_blocks_does_not_touch_an_unchanged_file(tmp_path):
     assert target.stat().st_mtime_ns == before, "an unchanged run must leave `git status` quiet"
 
 
-def test_generated_lines_stay_out_of_the_duplicate_warning(tmp_path):
-    """There can be hundreds of them, and they are paths nobody also writes
-    into `sources/`. Including them would turn an advisory into a block scan.
-    """
+def test_generated_lines_stay_out_of_the_hand_patterns(tmp_path):
+    """There can be hundreds of them, and `fux setup`'s conversion asks
+    `patterns()` whether a moved `!` line is already excluded — a block line is
+    an exact path nobody wrote, never the pattern being moved."""
     assert fuxignore.parse(BLOCKED).patterns().keys() == {"*.log"}

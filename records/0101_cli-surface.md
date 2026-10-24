@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-24
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@5931750f6a49, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@fe8608a6944a, src/fux/progress.py@e5f2459288d5, tests_e2e@6bfd2142a1cf, node/fux.mjs@36a064b9874d, src/fux/stdio.py@9e270b49bdaa]
+owns: [src/fux/cli.py@5931750f6a49, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@66d281d37048, src/fux/progress.py@e5f2459288d5, tests_e2e@81e8a1d966f0, node/fux.mjs@36a064b9874d, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: abe7085c2992d758b21dd401f6a0bed5324bdb426ff2b4f1eeed2d06090be9ab
+content_sha: 3e82b4188e3e911675d36aa68b11bab8a09834420332fe9c2b44088d54dc7bfe
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -170,13 +170,16 @@ teeth for this project specifically —
 the constraint. A new verb takes flags or positionals, never a subcommand tree,
 and lands in one of the groups in §1 or argues for a new one in this record.
 
-**1a. `add` / `remove` maintain the corpus, over all three source
-lists.** The entry picks the list — anything with a `scheme://` is a URL,
-`--types` says type pattern, everything else is `dirs`, which already accepts a
-directory *or* a single file. The common cases need no flag at all, which is
-what makes a flat verb sufficient here rather than merely mandated. They write
-every attribute explicitly ([SR-URL-LIST](0116_url-list.md) decision 12) and
-edit one line, so a human's grouping comments survive.
+**1a. `add` / `remove` maintain the corpus, over both source files.** The
+entry picks where it goes — anything with a `scheme://` is a `urls:` entry in
+`.fux/sources.yaml`, `--types` says a type pattern in
+`.fux/config/formats.toml`, everything else is a `paths:` entry, which accepts
+a directory *or* a single file. The common cases need no flag at all, which is
+what makes a flat verb sufficient here rather than merely mandated. A URL entry
+is written with every attribute stated ([SR-SOURCES](0116_url-list.md)
+decision 12), and the edit is a textual insert or delete of one line or one
+entry block — the file is never re-rendered, so a human's comments and hand
+order survive.
 
 ⚠ **Since 2026-09-11 the type list is `.fux/config/formats.toml`** ([SR-TYPES](0128_types-list.md)
 decision 12), and every verb hands a `--types` edit to `acquire/typesfile.py`
@@ -606,7 +609,7 @@ $ fux setup --no-agents
   wrote .fux/config/identifiers.toml: written
   wrote .fux/config/plugins.toml
 setup: 20 file(s) written. They are yours: commit them, edit them, fux will not rewrite them.
-next: add entries to .fux/sources/dirs, then `fux ingest`
+next: list paths under `paths:` in .fux/sources.yaml (or `fux add <path>`), then `fux ingest`
       anything you do NOT want indexed goes in .fux/.fuxignore
 # exit 0
 
@@ -784,8 +787,8 @@ networked paths when the entry is a URL, and it says so on stderr:
 
 ```console
 $ fux add handbook
-added     handbook archived=false
-  in .fux/sources/dirs
+added     handbook  (paths: include)
+  in .fux/sources.yaml
 ingested 3 docs (1 changed, 2 carried forward), 1 skipped, 1 shards written
   skip docs/architecture.pdf: not an indexed file type
 accelerator: 20 terms, 20 blocks, 21 postings (derived, not committed)
@@ -793,7 +796,7 @@ accelerator: 20 terms, 20 blocks, 21 postings (derived, not committed)
 
 $ fux add https://wiki.corp/runbook --cdp --no-keep
 added     https://wiki.corp/runbook fetch=cdp keep=false
-  in .fux/sources/urls
+  in .fux/sources.yaml
 ingested 4 docs (1 changed, 3 carried forward), 1 skipped, 1 shards written
   skip docs/architecture.pdf: not an indexed file type
 accelerator: 26 terms, 26 blocks, 27 postings (derived, not committed)
@@ -802,15 +805,15 @@ accelerator: 26 terms, 26 blocks, 27 postings (derived, not committed)
 ```
 
 **Adding a file never overrides the type allowlist** — inclusion is a
-conjunction with no precedence ([SR-DIR-LIST](0120_dir-list.md) /
+conjunction with no precedence ([SR-SOURCES](0116_url-list.md) /
 [SR-TYPES](0128_types-list.md)), so the line is written, the check still runs,
 and the verb says how to change it. Exit 0: this is a fact about the corpus,
 not an error.
 
 ```console
 $ fux add docs/architecture.pdf
-added     docs/architecture.pdf archived=false
-  in .fux/sources/dirs
+added     docs/architecture.pdf  (paths: include)
+  in .fux/sources.yaml
 ingested 3 docs (0 changed, 3 carried forward), 1 skipped, 0 shards written
   skip docs/architecture.pdf: not an indexed file type
 accelerator: 20 terms, 20 blocks, 21 postings (derived, not committed)
@@ -819,12 +822,13 @@ accelerator: 20 terms, 20 blocks, 21 postings (derived, not committed)
 ```
 
 **`remove` states which branch it took.** Its own line is deleted; a path held
-only by a listed ancestor is subtracted with the `!` the grammar already has:
+only by a listed ancestor is subtracted by an anchored pattern in `.fux/.fuxignore`,
+the one place exclusion is spelled:
 
 ```console
 $ fux remove handbook
 removed   handbook
-  in .fux/sources/dirs
+  in .fux/sources.yaml
 ingested 2 docs (0 changed, 2 carried forward), 0 not indexed, 0 skipped, 0 shards written, 1 records deleted
 accelerator: 7 terms, 7 blocks, 9 postings (derived, not committed)
   dropped file:handbook/rota.md from the index
@@ -844,22 +848,22 @@ $ fux remove docs/onboarding.md
 # exit 1
 
 $ fux remove elsewhere/nope.md
-[stderr] error: elsewhere/nope.md is not in <root>/.fux/sources/dirs: it has no line of its own, and no listed entry covers it. Both were checked. `fux add elsewhere/nope.md` would list it; nothing needs removing
+[stderr] error: elsewhere/nope.md is not in <root>/.fux/sources.yaml: it has no line of its own, and no listed entry covers it. Both were checked. `fux add elsewhere/nope.md` would list it; nothing needs removing
 # exit 1
 ```
 
-⚠ **Three things in that transcript changed on 2026-09-14 and every one is
-captured from the shipped CLI, not written by hand** (W-165):
+⚠ **Three things in that transcript are load-bearing, and every one is
+captured from the shipped CLI, not written by hand:**
 
-1. **`excluded  /docs/onboarding.md` … `in .fux/.fuxignore`** — the exclusion
-   moved next door (SR-FUXIGNORE decision 5a), and so did the `in …` line, which
-   would otherwise point a reader at a file `git diff` shows unchanged. It is
-   anchored with a leading `/`, because a bare name in that grammar means *at any
-   depth*.
+1. **`excluded  /docs/onboarding.md` … `in .fux/.fuxignore`** — exclusion has
+   one home ([SR-FUXIGNORE](0144_fuxignore.md); `.fux/sources.yaml` refuses a
+   `!` entry), and the `in …` line names the file that actually changed. It is
+   anchored with a leading `/`, because a bare name in that grammar means *at
+   any depth*.
 2. **`, 1 records deleted`** — the summary counts what left (SR-INGEST
    Consequences). Present only when the count is non-zero.
 3. **Removing it twice is exit 1.** Removing something already removed is an
-   error, which is the contract the `!`-line form kept.
+   error, not a silent no-op.
 
 **`fux ingest` re-reads; `--check` writes nothing** and is offline for files:
 
@@ -885,17 +889,15 @@ accelerator: 24 terms, 24 blocks, 25 postings (derived, not committed)
 # exit 0
 ```
 
-**Bare `fux add` lists all three, as the loader sees them** — sorted, deduped,
-every attribute resolved, and a `*` on any line fux did not write:
+**Bare `fux add` lists all three, as the loader sees them** — sorted, every
+attribute resolved, and a `*` on any URL entry fux did not write:
 
 ```console
 $ fux add
-.fux/sources/dirs:
-* docs archived=false
-  docs/architecture.pdf archived=false
-  handbook archived=false
-
-* 1 line(s) do not state every attribute, so fux did not write them. They load fine (the reader is lenient); `fux add <entry>` rewrites one in full.
+.fux/sources.yaml `paths:`:
+  docs  (paths: include)
+  docs/architecture.pdf  (paths: include)
+  handbook  (paths: include)
 .fux/config/formats.toml:
   *.adoc
   *.markdown
@@ -904,14 +906,14 @@ $ fux add
   *.pdf decoder=pdf
   *.rst
   *.txt
-.fux/sources/urls:
+.fux/sources.yaml `urls:`:
   https://wiki.corp/runbook fetch=cdp keep=false
 # exit 0
 ```
 
-The `*` is [SR-URL-LIST](0116_url-list.md) decision 13 made visible: the
-reader is lenient so a hand-made or merged list still loads, and a line missing
-an attribute **was not written by fux** — worth reporting, never worth
+The `*` is [SR-SOURCES](0116_url-list.md) decision 13 made visible: the
+reader is lenient so a hand-made or merged list still loads, and a URL entry
+missing an attribute **was not written by fux** — worth reporting, never worth
 refusing.
 
 | flag | verb | effect |
@@ -1131,7 +1133,7 @@ design. **`--no-archived` (2026-10-05, W-262 #3, [SR-FIND](0104_find.md) decisio
 `node/fux.mjs` parses it identically.
 
 **`fux add <URL> --no-update`** records `update=never`
-([SR-URL-LIST](0116_url-list.md) decision 14): this document is pinned and
+([SR-SOURCES](0116_url-list.md) decision 14): this document is pinned and
 `fux ingest` will not fetch it again, `--refetch-all` included.
 
 ⚠ **That `add` still fetches ONCE, and `--help` says so rather than only this
@@ -1167,7 +1169,7 @@ verb's half.
 a line in a repo that had configured its own** (W-140 row 5). A verb on this
 surface writes a consumer's committed file, so what it writes is a claim about
 their policy — resolving `[sources.url]` before rendering the line is the fix,
-and [SR-URL-LIST](0116_url-list.md) carries it. **Three defects in one day
+and [SR-SOURCES](0116_url-list.md) carries it. **Three defects in one day
 where a verb's behaviour came from the wrong layer**: the output config, the
 engine defaults, and an unread flag.
 
@@ -1323,7 +1325,7 @@ left alone on a re-add** — the line is a pin a human meant, and re-adding a UR
 to change its `ttl` must not silently re-route it.
 
 **`fux add --decoder <stem>`** (the pipe ruling, 2026-09-18; built 2026-09-21).
-The other half of the line ([SR-URL-LIST](0116_url-list.md) decision 17), and
+The other half of the line ([SR-SOURCES](0116_url-list.md) decision 17), and
 valid on a `--types` entry too — the one list that already had the attribute and
 never had a flag for it. Without the flag, **`fux add <url>` OBSERVES the type on
 one fetch and writes what it saw**, and an existing line's `decoder=` is left
@@ -1633,8 +1635,8 @@ evidence.*
 
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-DOTFUX](0102_fux-directory.md) ·
 [SR-ANSWER](0105_answer.md) · [SR-INGEST](0106_ingest.md) ·
-[SR-T1-ACCELERATOR](0110_accelerator.md) · [SR-URL-LIST](0116_url-list.md) ·
-[SR-DIR-LIST](0120_dir-list.md) · [SR-GRAPH](0126_graph.md) ·
+[SR-T1-ACCELERATOR](0110_accelerator.md) · [SR-SOURCES](0116_url-list.md) ·
+[SR-GRAPH](0126_graph.md) ·
 [SR-TYPES](0128_types-list.md) · [SR-MAINTENANCE](0129_hooks.md) ·
 [SR-AGENT-POLICY](0132_agent-policy.md) · [SR-MCP](0136_mcp.md) ·
 [SR-TUNE](0135_tuning.md)

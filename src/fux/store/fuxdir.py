@@ -40,7 +40,6 @@ COMMITTED: dict[str, str] = {
     "index": "the wire-format index (SR-RECORD), plus REGISTER: one line per indexed document -- loc, sha, decoder, k=v extras -- derived from the index and committed with it; `fux register` prints the same rows (SR-INGEST decision 22)",
     # ASCII only, like every value in this table. W-295: the eight policy files.
     "config": "the eight policy files you edit, each `<name>.toml` -- `formats` (which files are documents and which decoder reads each extension; optional), `identifiers` (identifier FAMILIES kept whole; CHANGES THE INDEX), `inspect` (what the index REPORT flags), `output` (HOW a result is SHOWN), `pii` (REQUIRED - every command refuses without it; what is REDACTED from the committed index and ONLY from it), `plugins` (which decoder and fetcher PACKAGES this repo runs, each pinned), `refusals` (what a REFUSAL looks like here; consumer-owned) and `tune` (HOW results are ordered, never what is indexed). Moved here from `.fux/<name>.toml` by W-295: `fux setup` moves them, and every other command refuses while one is at the old address (SR-DOTFUX, SR-CONFIG)",
-    "sources": "the committed source lists (`dirs`, `urls`), one entry per line",
     "fetchers": "consumer-owned code, one module per `fetch=` name. A file here runs INSTEAD of the declared fetcher package of that name (SR-PLUGINS P8); fux writes none",
     # ASCII only: `_readme()` encodes this table as ASCII on purpose, for
     # Windows consoles. An em-dash here fails the write, which is how this was
@@ -79,7 +78,10 @@ GENERATED_FILES = tuple(fixed("fuxdir", "generated"))
 COMMITTED_FILES: dict[str, str] = {
     # ASCII only, like every other value in these tables -- `_readme()` encodes
     # them for a Windows console.
-    ".fuxignore": "what is NOT indexed, in .gitignore's grammar. The one place exclusions belong, read before the source lists (SR-FUXIGNORE)",
+    # W-294: the one include manifest -- it replaced the `sources/` directory
+    # and its two line lists (`dirs`, `urls`).
+    "sources.yaml": "what IS indexed: `paths:` lists (`include`, `archived`, `enrich`) and `urls:` entries (each states `fetch` and `decoder`), in the fux YAML subset. Includes only - `!` is refused here (SR-SOURCES)",
+    ".fuxignore": "what is NOT indexed, in .gitignore's grammar. The one place exclusions belong, read before .fux/sources.yaml (SR-FUXIGNORE)",
     # ASCII only, like every other value in these tables.
 }
 

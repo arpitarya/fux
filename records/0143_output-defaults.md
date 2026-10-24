@@ -13,7 +13,7 @@ feature: configurable output defaults
 owns: [src/fux/output_config.py@c23c3f5f9278, src/fux/templates/output.toml.txt@b7dad8f4f7e4, .fux/config/output.toml@4a3a8465d2e4, node/src/config/output.mjs@c1268149675c]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 410c3fd5e96e587b17a4198f220437c0cf31792936abfd54c6da7cd13fdbdcac
+content_sha: 510b4a630c4740685f6a8afed0f8bc6b7076165737722b2de71e70113616265e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -492,7 +492,7 @@ not reach it.
 ⚠ **No output default changed on 2026-09-01 either, and three new flags say so
 by name.** `fux add` gained `--keep`, `--no-keep` and `--ttl`
 ([SR-ACQUIRED](0145_acquired-plane.md), [SR-URL-FRESHNESS](0147_url-freshness.md)).
-All three write an attribute into `.fux/sources/urls`; **none of them gates a
+All three write an attribute into a URL entry of `.fux/sources.yaml`; **none of them gates a
 rendering and none reads `.fux/config/output.toml`**, so decision 10 does not reach
 them and they are correct as plain `store_true` / `metavar` arguments. Recorded
 for the same reason `--all` was: this record constrains *every gated flag* in
@@ -501,8 +501,8 @@ the next reader "fixes" it to `default=None` and gives it a three-state
 resolution it has no file to resolve against.
 
 ⚠ **`fux add --no-update` joins that set on 2026-09-11**, and for exactly the
-reason above: it writes `update=never` into `.fux/sources/urls`
-([SR-URL-LIST](0116_url-list.md) decision 14), gates no rendering, and reads
+reason above: it writes `update: never` into the URL's entry in `.fux/sources.yaml`
+([SR-SOURCES](0116_url-list.md) decision 14), gates no rendering, and reads
 nothing from `.fux/config/output.toml`. It is correct as a plain `store_true`.
 
 **One property makes it *safely* outside decision 10 rather than merely
@@ -763,7 +763,7 @@ The flag is added in `cli.py` with no `default=`, so argparse supplies `None`
 and `sources._overrides` can tell *absent* from *given*
 ([SR-CLI](0101_cli-surface.md)). That distinction is load-bearing here and not
 merely tidy: a `--decoder` arriving as `""` would be written onto the line as a
-pin nobody typed, and on the `urls` grammar an empty `decoder=` is refused —
+pin nobody typed, and in a `urls:` entry an empty `decoder` is refused —
 so the failure would surface as a committed file that does not load.
 
 ⚠ **Stated here because this record constrains every gated flag in that file,
@@ -818,7 +818,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**No output key changed** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `cli.py`'s observer hook no longer runs observers on a `50` ms bound held in code when `fux.toml` does not load ([SR-OBSERVE](0157_observe.md)); `node/test/config.test.mjs` gained the `dirs_file` cases.
+**No output key changed** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `cli.py`'s observer hook no longer runs observers on a `50` ms bound held in code when `fux.toml` does not load ([SR-OBSERVE](0157_observe.md)); `node/test/config.test.mjs` gained the source-list key cases.
 
 **`fux inspect --top` reads `.fux/config/inspect.toml [report] top`, not `output.toml`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): it sizes a report's lists, which is SR-INSPECT's, and no output key changed.
 

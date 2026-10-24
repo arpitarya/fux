@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-20
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@e13353a0e4a1]
+owns: [src/fux/templates/agents@f0deef46086f]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: 4c08add086ae7ee7aac42c2c421a62f738b7789a99eabc15f5b2d9b86370f76e
+content_sha: a1af0ded3e019859d4d21ccb5af64b048e88b50b2c24b29ee40d283454e623ff
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -42,7 +42,7 @@ the conclusion.
 
 ```mermaid
 flowchart LR
-    S[".fux/sources/dirs<br/>archived= declared"] --> I["ingest"]
+    S[".fux/sources.yaml<br/>archived: declared"] --> I["ingest"]
     I --> R["record<br/>archived: true"]
     R --> O["ask · find · answer<br/>the FACT, no conclusion"]
     O --> A["the agent"]
@@ -54,7 +54,7 @@ flowchart LR
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-  .fux/sources/dirs (archived=) --> ingest --> record: archived: true
+  .fux/sources.yaml (archived:) --> ingest --> record: archived: true
                                                         |
                                                         v
                                     ask . find . answer  =  THE FACT
@@ -76,7 +76,7 @@ flowchart LR
 ```console
 $ fux setup                       # abridged: the usage/decoder/enrich skills
   wrote fux.toml                  # are written too, one folder each
-  wrote .fux/sources/dirs
+  wrote .fux/sources.yaml
   wrote .claude/skills/fux-archived-results/SKILL.md
   wrote .agents/skills/fux-usage/SKILL.md
   wrote .github/agents/fux.agent.md
@@ -84,7 +84,7 @@ $ fux setup                       # abridged: the usage/decoder/enrich skills
   wrote .kiro/steering/fux-archived-results.md
   wrote AGENTS.md
 
-  note: everything after .fux/sources/dirs is OUTSIDE .fux/ — it teaches
+  note: everything after .fux/sources.yaml is OUTSIDE .fux/ — it teaches
         Claude, Codex, Copilot and Kiro how to read this index. Turn them off
         with [agents] install = [] in fux.toml, or `fux setup --no-agents`.
 ```
@@ -99,7 +99,7 @@ on a repository they share with a team.
 ```console
 $ fux setup --no-agents
   wrote fux.toml          # [agents] install = []
-  wrote .fux/sources/dirs
+  wrote .fux/sources.yaml
 ```
 
 ---
@@ -223,7 +223,7 @@ in a file they own is a different thing from a default buried in the engine.**
 
 **Detection is refused.** Fux never sniffs for `.kiro/` or `.github/` and infers
 intent — that is precisely the derivation
-[SR-DIR-LIST](0120_dir-list.md) decision 4 refused for `archived`, and the
+[SR-SOURCES](0116_url-list.md) refuses for `archived`, and the
 reasoning transfers unchanged: **a heuristic is exact for the repo it was
 written against and a silent convention for everyone else.**
 Install-all-by-default and declared-never-derived are compatible **because the
@@ -1046,7 +1046,7 @@ document is never listed here — the body may name one, but archive is not
 evidence.*
 
 **Records** — [SR-CLI](0101_cli-surface.md) ·
-[SR-DOTFUX](0102_fux-directory.md) · [SR-DIR-LIST](0120_dir-list.md) ·
+[SR-DOTFUX](0102_fux-directory.md) · [SR-SOURCES](0116_url-list.md) ·
 [SR-REFER](0127_refer-plane.md) ·
 [SR-ARCHIVED-CONTENT](0134_archived-content.md) ·
 [SR-ENRICH](0137_enrich.md) · [SR-DECODE](0139_decode.md)

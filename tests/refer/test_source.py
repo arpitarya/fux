@@ -10,7 +10,7 @@ import pytest
 
 from fux.errors import FuxError
 from fux.acquire.source import GIT, URL, fetch_document, resolve
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_urls
 
 import fux.acquire.source  # for the registry lookup below
 
@@ -31,7 +31,7 @@ def _listed(root, url, decoder="prose"):
     write_config(root)  # every other key from the template (SR-LAW-12)
     listing = root / ".fux" / "sources" / "urls"
     listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text(f"{url} fetch=http decoder={decoder}\n", encoding="utf-8")
+    write_urls(root, f"{url} fetch=http decoder={decoder}\n")
     return root
 
 

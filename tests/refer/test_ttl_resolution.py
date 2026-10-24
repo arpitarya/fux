@@ -15,7 +15,7 @@ import pytest
 
 from fux import refer as refer_mod
 from fux.acquire.freshness import Policy
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_urls
 from l12_fixtures import template_fux_toml
 
 _TIMEOUT = template_fux_toml()["refer"]["timeout_seconds"]
@@ -67,7 +67,7 @@ def test_ttl_zero_on_a_line_opts_that_url_out_entirely():
 
 def _repo(tmp_path, urls_line, source_ttl=None):
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    (tmp_path / ".fux" / "sources" / "urls").write_text(urls_line + "\n")
+    write_urls(tmp_path, urls_line + "\n")
     ttl_key = f'ttl = "{source_ttl}"\n' if source_ttl else ""
     (tmp_path / "fux.toml").write_text("[sources.url]\n" + ttl_key)
     write_config(tmp_path)  # every other key from the template (SR-LAW-12)

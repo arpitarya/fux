@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@fae95be7adad, tools/refer-bench@971d72542a1f, tools/refer-budget-sweep@da100abfb8a5, node/src/refer/assemble.mjs@c87a7a3594a7, node/src/refer/rescore.mjs@eb08cb7e6d28, node/src/refer/source.mjs@b525f684aede, src/fux/acquire/source.py@da0d26931219]
+owns: [src/fux/refer@61bedbf508d1, tools/refer-bench@971d72542a1f, tools/refer-budget-sweep@da100abfb8a5, node/src/refer/assemble.mjs@c87a7a3594a7, node/src/refer/rescore.mjs@eb08cb7e6d28, node/src/refer/source.mjs@b525f684aede, src/fux/acquire/source.py@da0d26931219]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: b59c9f9277eff4169d82c1699606101708f2dcc56779059130b0341f8f3fb90f
+content_sha: 327ddc6186da5d448022a75b6fc584a3e18a623c0992916dcb800d790a342f46
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -394,7 +394,7 @@ of its own provisions stop being theoretical.**
 ⚠ **One `fetcher` for a multi-document call is a defect, and the caller fixes
 it, not this function.** `refer()` still takes one callable, so
 `query/refer_answer.py::_load_fetchers` hands it a **dispatcher keyed on the
-URL** — each document reaching the fetcher its own `.fux/sources/urls` line
+URL** — each document reaching the fetcher its own `.fux/sources.yaml` entry
 names. Handing all three the first document's fetcher compares a rendered page
 against a shell and reports **a false staleness on every query**, which is the
 failure `acquire/source.py`'s own docstring names and the one thing this plane

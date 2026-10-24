@@ -1,12 +1,13 @@
 """URL source (SR-URL-INGEST, relocated by SR-DOTFUX): the consumer-fetcher
-contract, the committed line-oriented URL list, the opaque config table,
+contract, the committed URL list (the `urls:` section of `.fux/sources.yaml`
+since W-294), the opaque config table,
 offline-by-default carry-forward, and determinism. No
 test here touches the network — the fetcher under test is a fake written
 into the tmp repo, which is exactly the trust boundary the design draws."""
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, render_sources, sources_path, write_dirs
 from l12_fixtures import configured_root, scoring, template_fux_toml, url_limits, write_config
 import pytest
 
@@ -52,7 +53,7 @@ def fetch(url):
     return (f"# Page {name}\\n\\nrendered body about {name}\\n".encode(), "text/markdown")
 '''
 
-URLS_FILE = ".fux/sources/urls"
+URLS_FILE = ".fux/sources.yaml"
 
 
 def _urls(tmp_path, rel=URLS_FILE):
@@ -78,51 +79,84 @@ def _entries(urls, fetcher=".fux/fetchers/mw.py", decoder="prose"):
 def _write_toml(tmp_path, text, dirs=("docs",)):
     """Write `fux.toml` and the committed directory list it now implies."""
     (tmp_path / "fux.toml").write_text(text, encoding="utf-8")
-    listing = tmp_path / ".fux" / "sources" / "dirs"
-    listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text("".join(f"{d}{chr(10)}" for d in dirs), encoding="utf-8")
+    write_dirs(tmp_path, "".join(f"{d}{chr(10)}" for d in dirs))
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
 
 
-def _write_urls(tmp_path, lines):
-    """Write a URL list, filling in the REQUIRED attributes the case does not state.
+def _yaml_entry(line: str) -> list[str]:
+    """One retired-grammar URL line as a `urls:` entry block — verbatim, with
+    no validation, so a fault in the line is the READER's to find."""
+    from fux.acquire.sourcesfile import render_scalar
 
-    🔴 **Every URL line must state its fetcher since 2026-09-20** (W-199 D2;
-    SR-URL-LIST decision 16) **and its decoder since 2026-09-21** (the pipe
-    ruling; SR-URL-LIST decision 17) — there is no source-wide default left to
+    head, sep, tail = line.partition(" #")
+    url, *attrs = head.split()
+    out = [f"  - url: {render_scalar(url)}"]
+    for attr in attrs:
+        name, _, value = attr.partition("=")
+        out.append(f"    {name}: {render_scalar(value)}")
+    if sep:
+        out[-1] += f"  #{tail}"
+    return out
+
+
+def _write_urls(tmp_path, lines):
+    """Write the `urls:` section, filling in the REQUIRED attributes the case does not state.
+
+    The cases are still spelled one URL per line in the retired `urls` grammar
+    (`<url> key=value  # note`) — the shortest way to say what a case is about —
+    and this writes each as its `.fux/sources.yaml` entry (W-294), beside
+    whatever `paths:` the case already listed. Comment lines stay comments; a
+    duplicate or a bad attribute is written as-is, for the reader to refuse.
+
+    🔴 **Every URL entry must state its fetcher since 2026-09-20** (W-199 D2;
+    SR-SOURCES decision 16) **and its decoder since 2026-09-21** (the pipe
+    ruling; SR-SOURCES decision 17) — there is no source-wide default left to
     inherit for either. Most cases here are about something else entirely, so
     the helper supplies the fixture's own `mw` fetcher and `decoder=prose`
     rather than every call site repeating both. **A case that is about either
     one states it and this leaves it alone**, which is what keeps the grammar
     cases honest.
     """
-    path = tmp_path / URLS_FILE
+    from fux.acquire import sourcesfile
+
+    path = sources_path(tmp_path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    paths = ()
+    if path.is_file():
+        text = path.read_text(encoding="utf-8")
+        paths = sourcesfile.parse(text.split("\nurls:")[0] if not text.startswith("urls:") else "",
+                                  origin="<fixture>").paths
     out = []
     for line in lines:
         stripped = line.strip()
         # ⚠ **A `#` inside a URL is a FRAGMENT, not a comment** — only a line
-        # that STARTS with `#` is one. Splitting on the first `#` hid a
-        # `fetch=` that sat after a fragment and double-appended one.
-        is_comment = stripped.startswith("#") or not stripped
-        if not is_comment and not stripped.startswith("!"):
-            # ⚠ **Before any TRAILING comment.** Appending at the end put
-            # `fetch=mw` inside `# trailing note`, so the line still had no
-            # fetcher and the helper silently did nothing. A `#` that starts
-            # the line is a comment; one after a URL may be a fragment, so the
-            # split is on ` #` with the space.
-            head, sep, tail = line.partition(" #")
-            missing = "".join(
-                f" {name}={value}"
-                for name, value in (("fetch", "mw"), ("decoder", "prose"))
-                if f"{name}=" not in stripped
-            )
-            if missing:
-                line = f"{head.rstrip()}{missing}{(' #' + tail) if sep else ''}"
-        out.append(line)
-    path.write_text("".join(f"{line}\n" for line in out), encoding="utf-8")
+        # that STARTS with `#` is one.
+        if not stripped:
+            continue
+        if stripped.startswith("#"):
+            out.append(f"  {stripped}")
+            continue
+        head, sep, tail = line.partition(" #")
+        missing = "".join(
+            f" {name}={value}"
+            for name, value in (("fetch", "mw"), ("decoder", "prose"))
+            if f"{name}=" not in stripped
+        )
+        line = f"{head.rstrip()}{missing}{(' #' + tail) if sep else ''}"
+        out += _yaml_entry(line.strip())
+    body = render_sources(paths)
+    if any(not l.lstrip().startswith("#") for l in out):
+        body += "urls:\n" + "".join(f"{l}\n" for l in out)
+    path.write_text(body, encoding="utf-8")
+
+
+def _line_of(tmp_path, needle):
+    """The 1-based line of `.fux/sources.yaml` holding `needle` — what an
+    error names now that the file's layout, not the case's list, sets lines."""
+    lines = sources_path(tmp_path).read_text(encoding="utf-8").split("\n")
+    return next(i for i, l in enumerate(lines, 1) if needle in l)
 
 
 def _init(tmp_path, *, urls, files=None, fetcher=FAKE_FETCHER, config=None):
@@ -146,7 +180,7 @@ def test_config_parses_url_source(tmp_path):
     _init(tmp_path, urls=["https://x.test/a"])
     cfg = load_config(tmp_path)
     assert cfg.url.routes == {}  # `fetcher` was deleted 2026-09-20 (W-199 D2)
-    assert cfg.url.urls_file == ".fux/sources/urls"
+    assert cfg.url.sources_file == ".fux/sources.yaml"
     assert cfg.url.config == {}
     assert not hasattr(cfg.url, "meta"), "`meta` is deleted (W-194), not defaulted"
 
@@ -159,7 +193,7 @@ def test_config_paths_default_into_the_fux_dir(tmp_path):
     # this key's slot holds now is the routes table, empty until a repo writes
     # one, and an empty table resolves nothing rather than falling back.
     assert cfg.url.routes == {}
-    assert cfg.url.urls_file == ".fux/sources/urls"
+    assert cfg.url.sources_file == ".fux/sources.yaml"
 
 
 def test_config_rejects_a_meta_key_outright(tmp_path):
@@ -181,7 +215,7 @@ def test_config_rejects_an_inline_urls_list_and_names_the_file(tmp_path):
         '[sources]\n[sources.url]\nurls = ["https://x.test/a"]\n'
     )
     write_config(tmp_path)
-    with pytest.raises(FuxError, match=r"`\[sources\] urls_file` names"):
+    with pytest.raises(FuxError, match=r"`\[sources\] sources_file` names"):
         load_config(tmp_path)
 
 
@@ -208,14 +242,25 @@ def test_read_urls_ignores_comments_and_blanks(tmp_path):
     assert _urls(tmp_path) == ["https://x.test/a", "https://x.test/b"]
 
 
-def test_read_urls_dedupes_and_sorts(tmp_path):
-    _write_urls(tmp_path, ["https://x.test/b", "https://x.test/a", "https://x.test/b"])
+def test_read_urls_sorts(tmp_path):
+    _write_urls(tmp_path, ["https://x.test/b", "https://x.test/a"])
     assert _urls(tmp_path) == ["https://x.test/a", "https://x.test/b"]
+
+
+def test_read_urls_refuses_a_duplicate_naming_the_first_line(tmp_path):
+    """W-294 changed this: the old list deduped silently. The file is
+    hand-edited, and a silent dedupe hides a merge mistake, so a URL listed
+    twice is now an error naming where it first appeared."""
+    _write_urls(tmp_path, ["https://x.test/b", "https://x.test/a", "https://x.test/b"])
+    first = _line_of(tmp_path, "https://x.test/b")
+    with pytest.raises(FuxError, match=rf"listed twice \(first on line {first}\)"):
+        read_urls(tmp_path, URLS_FILE)
 
 
 def test_read_urls_rejects_a_non_http_line_with_its_line_number(tmp_path):
     _write_urls(tmp_path, ["https://x.test/a", "# note", "ftp://x.test/c"])
-    with pytest.raises(FuxError, match=r"urls:3: not an http\(s\) URL"):
+    line = _line_of(tmp_path, "ftp://")
+    with pytest.raises(FuxError, match=rf"sources\.yaml:{line}: not an http\(s\) URL"):
         read_urls(tmp_path, URLS_FILE)
 
 
@@ -225,28 +270,22 @@ def test_read_urls_empty_file_is_a_valid_zero_url_state(tmp_path):
 
 
 def test_read_urls_missing_file_fails_loudly(tmp_path):
-    with pytest.raises(FuxError, match=r"\.fux/sources/urls not found"):
+    with pytest.raises(FuxError, match=r"\.fux/sources\.yaml not found"):
         read_urls(tmp_path, URLS_FILE)
 
 
-def test_a_missing_urls_file_is_ignored_while_there_is_nothing_to_reconcile(tmp_path):
-    """Narrowed 2026-08-21 (W-63), and the narrowing is the point.
-
-    This used to read "only matters on refresh" and pass because an offline
-    run never looked at the list at all. It now passes for a *different*
-    reason: reconciliation reads the list on every run, but only when the
-    index actually holds `url:` records to reconcile — and here nothing has
-    been ingested yet. The loud-error case is
-    `test_an_offline_run_with_url_records_and_no_list_fails_loudly`.
-    """
+def test_a_manifest_with_no_urls_section_lists_zero_urls(tmp_path):
+    """Re-premised by W-294. The URL list used to be its own file, and a missing
+    one was tolerated while no `url:` record needed reconciling. URLs are a
+    SECTION of `.fux/sources.yaml` now: the file cannot be missing for URLs
+    alone, and a manifest whose `urls:` is absent is a valid zero-URL state on
+    an offline run and a networked one alike."""
     _init(tmp_path, urls=["https://x.test/a"])
-    (tmp_path / URLS_FILE).unlink()
-    run(tmp_path, refresh_urls=False, full=False)  # no url: records exist, so no list is needed or read
-    with pytest.raises(FuxError, match=r"\.fux/sources/urls not found"):
-        run(tmp_path, refresh_urls=True, full=False)
-
-
-# -- fetcher loading ----------------------------------------------------
+    _write_urls(tmp_path, [])
+    assert "urls:" not in sources_path(tmp_path).read_text(encoding="utf-8")
+    run(tmp_path, refresh_urls=False, full=False)
+    run(tmp_path, refresh_urls=True, full=False)
+    assert not any(k.startswith("url:") for k in store.read_index(tmp_path))
 
 
 def test_missing_fetcher_file_fails_loudly(tmp_path):
@@ -483,14 +522,17 @@ def test_an_offline_run_with_url_records_and_no_list_fails_loudly(tmp_path):
 
     Both silent readings are worse than an error: emptying every URL document
     because a file went missing, or carrying them forever, which is the defect
-    above. `dirs` already fails loudly on exactly this condition.
+    above. Since W-294 the URL list and the path list are one file, so its
+    absence is caught where the paths are read — still loud, still before
+    anything is written; the index keeps its `url:` records.
     """
     _init(tmp_path, urls=["https://x.test/a"])
     run(tmp_path, refresh_urls=True, full=False)
 
     (tmp_path / URLS_FILE).unlink()
-    with pytest.raises(FuxError, match="which URLs belong"):
+    with pytest.raises(FuxError, match=r"\.fux/sources\.yaml not found"):
         run(tmp_path, refresh_urls=False, full=False)
+    assert "url:https://x.test/a" in store.read_index(tmp_path)
 
 
 def test_a_repo_with_no_url_records_never_reads_the_list(tmp_path):
@@ -536,7 +578,7 @@ def test_file_doc_gets_ref_edge_to_ingested_url(tmp_path):
     assert not any(e["dst"] == "url:https://x.test/other" for e in edges)  # dangling stays dropped
 
 
-# -- the attribute grammar, per URL (SR-URL-LIST decisions 7-13) ----------
+# -- the attribute grammar, per URL (SR-SOURCES decisions 7-13) ----------
 
 
 def test_a_fragment_survives_the_round_trip(tmp_path):
@@ -559,13 +601,15 @@ def test_a_fragment_bearing_line_can_still_carry_attributes(tmp_path):
 
 def test_an_unknown_attribute_errors_at_file_lineno(tmp_path):
     _write_urls(tmp_path, ["https://x.test/a", "https://x.test/b kep=false"])
-    with pytest.raises(FuxError, match=r"urls:2: unknown attribute 'kep'"):
+    line = _line_of(tmp_path, "kep:")
+    with pytest.raises(FuxError, match=rf"sources\.yaml:{line}: unknown key `kep` in a `urls` entry"):
         read_urls(tmp_path, URLS_FILE)
 
 
 def test_an_unknown_attribute_value_errors_at_file_lineno(tmp_path):
     _write_urls(tmp_path, ["https://x.test/a keep=maybe"])
-    with pytest.raises(FuxError, match=r"urls:1: keep='maybe' is not one of"):
+    line = _line_of(tmp_path, "keep:")
+    with pytest.raises(FuxError, match=rf"sources\.yaml:{line}: keep: `maybe` is not one of"):
         read_urls(tmp_path, URLS_FILE)
 
 
@@ -576,20 +620,25 @@ def test_a_line_still_carrying_meta_is_a_named_error(tmp_path):
     the attribute set is closed — which is the same mechanism that would
     refuse a typo, and is why nothing extra had to be written to get it."""
     _write_urls(tmp_path, ["https://x.test/a meta=hashed"])
-    with pytest.raises(FuxError, match=r"urls:1: unknown attribute 'meta'"):
+    line = _line_of(tmp_path, "meta:")
+    with pytest.raises(FuxError, match=rf"sources\.yaml:{line}: unknown key `meta`"):
         read_urls(tmp_path, URLS_FILE)
 
 
 def test_a_duplicate_with_conflicting_attributes_names_both_lines(tmp_path):
     _write_urls(tmp_path, ["https://x.test/a keep=false", "# note", "https://x.test/a fetch=cdp"])
-    with pytest.raises(FuxError, match=r"urls:1 and .*urls:3"):
+    first = _line_of(tmp_path, "https://x.test/a")
+    with pytest.raises(FuxError, match=rf"sources\.yaml:\d+: .*listed twice \(first on line {first}\)"):
         read_urls(tmp_path, URLS_FILE)
 
 
-def test_a_duplicate_that_agrees_is_a_merge_artefact_not_an_error(tmp_path):
-    _write_urls(tmp_path, ["https://x.test/a keep=true", "https://x.test/a"])
-    (entry,) = read_urls(tmp_path, URLS_FILE)
-    assert entry.attrs["keep"] == "true"  # absent means the default; they agree
+def test_a_duplicate_that_agrees_is_an_error_too(tmp_path):
+    """W-294 reversed this case: two entries that agreed used to be a merge
+    artefact, deduped silently. A hand-edited file now says so — a silent
+    dedupe is exactly what hides the merge mistake."""
+    _write_urls(tmp_path, ["https://x.test/a keep=true", "https://x.test/a keep=true"])
+    with pytest.raises(FuxError, match=r"listed twice"):
+        read_urls(tmp_path, URLS_FILE)
 
 
 def test_file_order_does_not_change_the_parsed_set(tmp_path):

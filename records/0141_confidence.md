@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-27
 amended: 2026-09-22
 feature: the confidence plane
-owns: [src/fux/query/confidence.py@1b6e85d9e2a5, tests/test_confidence_floor_off.py@7b7c0d3e4c18, node/src/query/confidence.mjs@859703f4c0f8, node/test/confidence.test.mjs@77f997d159dc]
+owns: [src/fux/query/confidence.py@1b6e85d9e2a5, tests/test_confidence_floor_off.py@8ddc2a12406d, node/src/query/confidence.mjs@859703f4c0f8, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: bb4fe0b8c9b5bf6e07a748bcf2ac41c454a9bd3fb3808322efc7ac6478c4e339
+content_sha: 8cb988e15dd465dfd273ff750fd17e4e7b6860c1dc1f3b67c6628dbbb3db7741
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

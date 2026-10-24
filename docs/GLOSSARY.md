@@ -233,7 +233,7 @@ different from its pin stops fux with the install line. The opposite of
 M4's fetch cache nested inside it at `runtime/fetch-cache/`). Created through
 `derived_dir()`, which drops a [`CACHEDIR.TAG`](https://bford.info/cachedir/)
 so backup tools skip it, and named explicitly in `.fux/.gitignore`. Opposite
-of a *committed plane* (`index/`, `sources/`, `fetchers/`). See
+of a *committed plane* (`index/`, `sources.yaml`, `fetchers/`). See
 [SR-DOTFUX](../records/0102_fux-directory.md).
 
 **Doc-id** — A document's integer identity inside the wire index, assigned in
@@ -248,7 +248,7 @@ live answer. Three facts:
   `src/` imports no parser and declares no parsing dependency (`dependencies = []`).
 - **Source files are not indexed by default.** No source-code extension is on
   `DEFAULT_TYPES` (`acquire/gitdir.py`); adding `src/` to
-  [`.fux/sources/dirs`](#fux-directory) still reports *not an indexed file type*
+  [`.fux/sources.yaml`](#fux-directory) still reports *not an indexed file type*
   per file. Indexing code is opt-in, and even then it is indexed **as text**.
 - **What looks like code analysis is not.** The [`code` edge kind](#code-edge-kind)
   is a backtick-quoted path to another indexed document.
@@ -314,7 +314,7 @@ two live in the fux-lab environment, generated deterministically from a seed.
 
 **`.fux` directory** — Fux's directory inside the consumer's repo. Every
 child is **declared** as committed or [derived](#derived-plane): `index/`
-(the wire index), `sources/` (line-oriented lists such as `urls`),
+(the wire index), `sources.yaml` (the include list — paths and URLs),
 `fetchers/` (consumer-owned code) and two generated files — a
 self-describing `README.md` and a `.gitignore` naming **only** the derived
 dirs, never `*`. Both are write-if-missing; anything undeclared is a `fux
@@ -536,7 +536,7 @@ no engine change and no release, exactly as `.fux/decoders/` already works
 validates the *shape* of the name and never imports the module to check it:
 importing a fetcher runs code that may open a browser, and reading a config
 file may not do that. `fux doctor`'s `fetcher bindings` row reports a name with
-no file. See [SR-URL-LIST](../records/0116_url-list.md) decision 15,
+no file. See [SR-SOURCES](../records/0116_url-list.md) decision 15,
 [SR-URL-INGEST](../records/0107_url-ingest.md),
 [SR-DOTFUX](../records/0102_fux-directory.md).
 
@@ -573,7 +573,7 @@ and they are one mechanism plus its bookkeeping.
   may be committed.
 
 See [SR-FETCHER](../records/0117_fetcher.md) decision 16,
-[SR-URL-LIST](../records/0116_url-list.md) decision 16,
+[SR-SOURCES](../records/0116_url-list.md) decision 16,
 [SR-CONFIG](../records/0113_config.md) decision 16,
 [SR-INGEST](../records/0106_ingest.md) decision 22.
 
@@ -613,7 +613,7 @@ URL line ──fetch=cdp──▶ .fux/fetchers/cdp.py ──bytes──▶ .fux
 module) and `observed types` (a declared stem disagreeing with the last
 retained response).
 
-See [SR-URL-LIST](../records/0116_url-list.md) decision 17,
+See [SR-SOURCES](../records/0116_url-list.md) decision 17,
 [SR-FETCHER](../records/0117_fetcher.md) decision 17,
 [SR-DECODE](../records/0139_decode.md) decision 21,
 [SR-URL-INGEST](../records/0107_url-ingest.md) decision 6a.
@@ -878,7 +878,7 @@ location. See [SR-CACHE](../records/0131_cache.md) decision 7,
 [SR-REFER](../records/0127_refer-plane.md) decision 6.
 
 **URL source (`[sources.url]`)** — The `src: "url"` ingestion path: URLs are
-read from the committed `.fux/sources/urls` (one per line), fetched through
+read from the `urls:` of the committed `.fux/sources.yaml` (one entry per URL), fetched through
 the consumer's [fetcher](#fetcher-url), and indexed exactly like repo
 files. ⚠ **Until fux 3.x they were indexed with
 [hashed meta](#hashed-meta-meta--hashed) by default**; W-194 removed that, so a

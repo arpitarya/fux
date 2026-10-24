@@ -226,7 +226,7 @@ def test_the_headings_key_is_present_even_when_empty(tmp_path, monkeypatch, caps
 
 def test_find_stdout_is_untouched(tmp_path, monkeypatch, capsys):
     """`find` exists to be piped. A `§` line on its stdout would be read as a
-    filename — the same argument SR-DIR-LIST decision 12 made for the
+    filename — the same argument SR-ARCHIVED-CONTENT decision 3 made for the
     archived marker."""
     monkeypatch.setattr("fux.query.find_root", lambda: _corpus(tmp_path))
     assert cmd_find(_args()) == 0

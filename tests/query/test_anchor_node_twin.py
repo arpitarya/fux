@@ -31,7 +31,7 @@ import pytest
 
 from fux.derive import build
 from fux.ingest.run import run
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_dirs
 
 ENGINE = Path(__file__).resolve().parents[2]
 NODE_ENTRY = ENGINE / "node" / "fux.mjs"
@@ -54,7 +54,7 @@ TUNES = {
 def _corpus(tmp_path: Path, tune: str | None = TUNES["two"]) -> Path:
     listing = tmp_path / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)

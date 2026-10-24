@@ -16,14 +16,14 @@ from __future__ import annotations
 import pytest
 
 from fux.doctor import _fetcher_bindings
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_urls
 
 
 def _repo(tmp_path, *, urls: str, fetchers=("http",)):
     (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
     write_config(tmp_path)  # every other key from the template (SR-LAW-12)
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    (tmp_path / ".fux" / "sources" / "urls").write_text(urls, encoding="utf-8")
+    write_urls(tmp_path, urls)
     d = tmp_path / ".fux" / "fetchers"
     d.mkdir(parents=True)
     for stem in fetchers:

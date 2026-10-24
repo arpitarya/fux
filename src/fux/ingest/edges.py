@@ -86,7 +86,7 @@ class DocScan:
     tags: list[str]
     #: Frontmatter `supersedes:` — paths this document retires. **Declared,
     #: never inferred** (W-76 Phase 2): nothing guesses supersession from
-    #: titles, numbering or dates. Same rule SR-DIR-LIST decision 10 applies
+    #: titles, numbering or dates. Same rule SR-SOURCES (paths are declared, never derived) applies
     #: to `archived`, for the same reason -- a heuristic that is exact for the
     #: repo that invented it is a silent convention for everyone else.
     supersedes: list[str]

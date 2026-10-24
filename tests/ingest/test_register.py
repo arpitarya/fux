@@ -11,7 +11,7 @@ tail present only when it holds a value. The reader parses by the header.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs, write_urls
 import json
 from pathlib import Path
 
@@ -27,7 +27,7 @@ def _repo(tmp_path: Path, *, dirs: str = "docs\n") -> Path:
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True)
-    (fux / "sources" / "dirs").write_text(dirs, encoding="utf-8")
+    write_dirs(fux.parent, dirs)
     (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     docs = tmp_path / "docs"
@@ -164,7 +164,7 @@ def test_a_url_rows_decoder_and_fetcher_come_from_the_committed_list(tmp_path):
     fetchers = root / ".fux" / "fetchers"
     fetchers.mkdir(parents=True, exist_ok=True)
     (fetchers / "cdp.py").write_text("def fetch(url): ...\n", encoding="utf-8")
-    (root / ".fux" / "sources" / "urls").write_text("https://x.test/a fetch=cdp decoder=prose\n", encoding="utf-8")
+    write_urls(root, "https://x.test/a fetch=cdp decoder=prose\n")
     write_config(root)
     assert register.url_provenance(root) == {"url:https://x.test/a": ("prose", "cdp")}
     rows = register.rows_for(

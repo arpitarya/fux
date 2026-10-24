@@ -223,8 +223,8 @@ them.** They exist so the mechanism can be driven before `ask` composes it.
 - **Offline.** All three read the index; nothing is fetched. Parse stdout — stderr
   notes (e.g. *no fresh accelerator*) are advice, not results.
 - ⚠ **No graph output carries `archived`.** Live and retired documents appear
-  **unmarked**. Check a node against the `archived=true` lines in
-  `.fux/sources/dirs` (URLs: `.fux/sources/urls`) or find it in `fux ask --json`,
+  **unmarked**. Check a node against the archived declarations in
+  `.fux/sources.yaml` (`paths: archived:`, or a URL's `archived: true`) or find it in `fux ask --json`,
   whose results carry `"archived": true` — then follow the `fux-archived-results` policy.
 - **Supersession can exist without an edge**: an enrichment's `superseded_by:`
   marks a document superseded with no `supersedes` edge. Over MCP, `superseded`

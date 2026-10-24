@@ -258,3 +258,101 @@ def inspect_args(**given) -> dict:
         # W-225 stage 5f (R8): the flag has no default; `fux inspect` passes False.
         "rebuild_dictionary": False, **given,
     }
+
+
+# -- `.fux/sources.yaml` (W-294) ----------------------------------------------
+#
+# The retired `.fux/sources/dirs` and `.fux/sources/urls` were line-grammar
+# lists, and most hand-built repositories in this suite wrote one in one line.
+# These helpers keep that one line: they take the OLD grammar — what a reader of
+# the test already knows — and write the file fux reads now. `!` lines become
+# anchored `.fux/.fuxignore` patterns, as `fux setup`'s conversion makes them.
+# Writing paths keeps the URL entries already listed, and the reverse.
+
+
+def sources_path(root: Path) -> Path:
+    from fux.acquire import sourcesfile
+
+    return Path(root) / sourcesfile.FILE
+
+
+def _existing_sources(root: Path):
+    from fux.acquire import sourcesfile
+
+    path = sources_path(root)
+    if not path.is_file():
+        return sourcesfile.Sources()
+    return sourcesfile.parse(path.read_text(encoding="utf-8"), origin=str(path))
+
+
+def render_sources(paths=(), urls=()) -> str:
+    """`.fux/sources.yaml` text for `sourcelist.Entry` rows — paths grouped by
+    flag, each URL entry stating the attributes its row declared."""
+    from fux.acquire import sourcelist, sourcesfile
+
+    lists: dict[str, list[str]] = {name: [] for name in sourcesfile.PATH_LISTS}
+    for entry in sorted(paths, key=lambda e: e.value):
+        flags = [f for f in sourcesfile.PATH_LISTS if f != sourcesfile.INCLUDE and entry.attrs.get(f) == "true"]
+        for name in flags or [sourcesfile.INCLUDE]:
+            lists[name].append(entry.value)
+    out: list[str] = []
+    if any(lists.values()):
+        out.append(f"{sourcesfile.PATHS_KEY}:")
+        for name in sourcesfile.PATH_LISTS:
+            if lists[name]:
+                out.append(f"  {name}:")
+                out += [f"    - {sourcesfile.render_scalar(v)}" for v in lists[name]]
+    if urls:
+        out.append(f"{sourcesfile.URLS_KEY}:")
+        for entry in sorted(urls, key=lambda e: e.value):
+            out.append(f"  - {sourcesfile.URL_KEY}: {sourcesfile.render_scalar(entry.value)}")
+            out += [
+                f"    {name}: {sourcesfile.render_scalar(entry.attrs[name])}"
+                for name in sourcelist.URLS.names
+                if name in entry.declared
+            ]
+    return "\n".join(out) + "\n" if out else ""
+
+
+def write_dirs(root: Path, text: str) -> Path:
+    """The `paths:` half, from a retired-`dirs`-grammar `text`; `!` lines go to
+    `.fux/.fuxignore`, anchored. Returns the manifest's path."""
+    from fux.acquire import fuxignore, sourcelist
+
+    root = Path(root)
+    entries = sourcelist.parse(text, sourcelist.DIRS, origin="<fixture dirs>")
+    path = sources_path(root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(render_sources([e for e in entries if not e.exclude], _existing_sources(root).urls),
+                    encoding="utf-8")
+    excludes = [fuxignore.exclusion_pattern(e.value, is_dir=False) for e in entries if e.exclude]
+    if excludes:
+        ignore = root / fuxignore.IGNORE_FILE
+        have = ignore.read_text(encoding="utf-8") if ignore.is_file() else ""
+        lines = [p for p in excludes if p not in have.split("\n")]
+        if lines:
+            body = have + ("" if not have or have.endswith("\n") else "\n") + "\n".join(lines) + "\n"
+            ignore.write_text(body, encoding="utf-8")
+    return path
+
+
+def write_urls(root: Path, text: str) -> Path:
+    """The `urls:` half, from a retired-`urls`-grammar `text`. Returns the path."""
+    from fux.acquire import sourcelist
+
+    root = Path(root)
+    entries = sourcelist.parse(text, sourcelist.URLS, origin="<fixture urls>")
+    path = sources_path(root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(render_sources(_existing_sources(root).paths, entries), encoding="utf-8")
+    return path
+
+
+def listed_urls(root: Path) -> list[str]:
+    """The URLs `.fux/sources.yaml` lists, sorted."""
+    return [e.value for e in _existing_sources(root).urls]
+
+
+def listed_paths(root: Path) -> list[str]:
+    """The paths `.fux/sources.yaml` lists, sorted."""
+    return [e.value for e in _existing_sources(root).paths]

@@ -57,7 +57,7 @@ claim about *another* document, so a carried record can point at something
 this run no longer holds. `_without_dangling_edges` drops those, which is what
 keeps the derived graph plane free of targets no verb can explain.
 
-Which fetcher runs is **per line** (SR-URL-LIST decision 10):
+Which fetcher runs is **per line** (SR-SOURCES decision 10):
 `urlsrc.resolve_urls` layers the built-in default, the source-wide
 `[sources.url]` setting and the line, and everything below it reads one
 already-resolved answer. ⚠ *"and whether a URL's display fields are hashed"*
@@ -83,10 +83,10 @@ from ..errors import FuxError
 from ..progress import NULL as _NULL_PROGRESS
 from . import edges as edges_mod
 from . import extract as extract_mod
-from ..acquire import decoderdigest, fuxignore, gitdir, ingestlog, sourcelist, urlsrc
+from ..acquire import decoderdigest, fuxignore, gitdir, ingestlog, sourcelist, sourcesfile, urlsrc
 from . import register, urlingest
 from .edges import TAG_PREFIX
-from ..acquire.dirlist import archived_dirs, source_dirs, source_excludes
+from ..acquire.sourcesfile import archived_paths, source_paths
 from ..acquire.gitdir import UNFETCHED, Skipped, is_archived_loc, read_types, walk_sources
 from .. import decode as decode_mod
 from ..acquire import pii as pii_mod
@@ -155,7 +155,7 @@ def run(
     thing that may fetch a line declaring `update=never`. A pin freezes a
     document; it cannot freeze one that was never fetched, so the add that
     creates the line gets its single fetch and every run after it is pinned
-    (SR-URL-LIST decision 14). Nothing else ever populates this set.
+    (SR-SOURCES decision 14). Nothing else ever populates this set.
 
     `should_stop` is the **cooperative stop** the deferred runner is halted by
     (W-66 Phase 2, SR-MAINTENANCE decision 1d). It is polled between units of
@@ -190,12 +190,11 @@ def run(
     store_mod.ensure_layout(root)  # `.fux/` README + .gitignore, write-if-missing (SR-DOTFUX)
     files, skipped = walk_sources(
         root,
-        source_dirs(root, config.dirs_file),
-        excludes=source_excludes(root, config.dirs_file),
+        source_paths(root, config.sources_file),
         types=read_types(root),
         ignores=fuxignore.read(root),
     )
-    warnings = fuxignore.duplicate_warnings(root, dirs_file=config.dirs_file)
+    warnings: list[str] = []
     # `walk_sources` returns its whole list at once — nothing to report a
     # count against until it has already finished (W-64's "none until done").
     with progress.phase("walk", len(files)) as p:
@@ -240,7 +239,7 @@ def run(
                 f"a URL fetch was asked for, but there is no [sources.url] in "
                 f"{root / fixed("files", "config")} to do it with. `fux setup` writes a fetcher"
             )
-        resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
+        resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.sources_file), config.url)
         url_listed = {f"url:{entry.url}" for entry in resolved}
         # `url_listed` stays the **whole** list even under `only_urls`: it is what
         # reconciliation and carry-forward key on, so narrowing it here would
@@ -264,7 +263,7 @@ def run(
         # one.
         #
         # ⚠ **ONE exemption, and it is the one the record always named:
-        # `first_fetch`.** [SR-URL-LIST](../../records/0116_url-list.md)
+        # `first_fetch`.** [SR-SOURCES](../../records/0116_url-list.md)
         # decision 14 says *`fux add <URL> --no-update` ... still fetches once —
         # one fetch is what makes the line ingestable at all; the flag governs
         # every run after*. The filter did not know about the add, so that add
@@ -638,8 +637,8 @@ def run(
     # says so on the record, the way `mode` already does, so a record
     # read years later states the rule it was written under instead of having it
     # re-derived by whoever reads it. **Declared, never a path convention** —
-    # this reads the same `.fux/sources/dirs` line the grammar parses.
-    archived_srcs = frozenset(archived_dirs(root, config.dirs_file))
+    # this reads the same `archived:` list of `.fux/sources.yaml`.
+    archived_srcs = frozenset(archived_paths(root, config.sources_file))
     # W-126: the same declaration for `url:` documents. Computed only when this
     # run holds URL records at all, so a corpus of directories never reads the
     # list. Applied to CARRIED records too, which is the point -- flipping
@@ -1629,9 +1628,9 @@ def _reusable(
 
 
 def _archived_url_ids(root: Path, config) -> set[str]:
-    """The `url:` ids `.fux/sources/urls` declares `archived=true` (W-126).
+    """The `url:` ids `.fux/sources.yaml` declares `archived: true` (W-126).
 
-    The URL half of `dirlist.archived_dirs`, and deliberately the same shape:
+    The URL half of `sourcesfile.archived_paths`, and deliberately the same shape:
     **declared in a committed, diffable line, never inferred from the
     document's own text** (SR-ARCHIVED-CONTENT). Inference is not merely
     unreliable — it was measured to INVERT, because BM25F cannot see negation
@@ -1646,10 +1645,10 @@ def _archived_url_ids(root: Path, config) -> set[str]:
     caller only asks when `url:` records exist, and a missing list with
     surviving records is already `urlingest.listed_url_ids`' loud error.
     """
-    rel_path = config.urls_file
+    rel_path = config.sources_file
     if not (root / rel_path).is_file():
         return set()
-    entries = sourcelist.read(root, rel_path, sourcelist.URLS, missing_hint="")
+    entries = sourcesfile.read_urls(root, rel_path)
     return {
         f"url:{entry.value}"
         for entry in entries

@@ -8,6 +8,10 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Breaking — one source list, `.fux/sources.yaml` (W-294)
+
+- **`.fux/sources/dirs` and `.fux/sources/urls` are gone, and so are `fux.toml`'s `[sources] dirs_file` / `urls_file`**: what fux indexes is one include manifest, `.fux/sources.yaml` (`paths:` grouped by `include` / `archived` / `enrich`, `urls:` as entries), in a strict YAML subset, and exclusion lives only in `.fux/.fuxignore` — a `!` entry is refused. Every verb refuses while an old list or key remains; **run `fux setup` once** — it moves each `!` line to `.fux/.fuxignore`, converts both lists, writes `sources_file`, and removes the old files.
+
 ### Changed — a release no longer re-extracts your decoded documents (W-289 ruling 1)
 
 - **The package version left the reuse key.** A packaged decoder's digest is

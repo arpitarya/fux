@@ -101,7 +101,7 @@ git add .fux fux.toml && git commit -m "Add fux index"
 
 That's it. Your teammates, and their agents, now get the same answers from a plain `git clone`.
 
-- **What gets indexed** is listed in `.fux/sources/dirs` (`README.md` and `docs` to start). Anything you don't want indexed goes in `.fux/.fuxignore`.
+- **What gets indexed** is listed in `.fux/sources.yaml` (`README.md` and `docs` to start). Anything you don't want indexed goes in `.fux/.fuxignore`.
 - **`fux ingest`** reports what it did: `ingested 3 docs (3 changed, 0 carried forward), 0 not indexed, 0 skipped, 3 shards written`.
 - **`fux doctor`** checks the setup. It's read-only and offline.
 

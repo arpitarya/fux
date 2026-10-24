@@ -7,7 +7,7 @@ one promise `lock` makes: **a byte-identical restore.**
 uncomfortable on purpose:
 
 1. does `unlock` remove **every** read guard, or only the ones somebody listed?
-2. does it leave `.gitignore` and `.fux/sources/dirs` alone — because *never
+2. does it leave `.gitignore` and `.fux/.fuxignore` alone — because *never
    committed* is the one clause no state relaxes?
 3. does `lock` restore **the same bytes**, and refuse rather than guess when it
    cannot?
@@ -352,7 +352,7 @@ def test_the_switch_can_PRINT_the_never_relaxed_paths_but_never_reach_them():
 
     ⚠ **The first draft of this test forbade the substring outright and went red
     on the switch doing the right thing** — `unlock` prints *".gitignore and
-    .fux/sources/dirs are UNTOUCHED"*, which is exactly the sentence an operator
+    .fux/.fuxignore are UNTOUCHED"*, which is exactly the sentence an operator
     needs. The same mistake `tests/serve/test_page_computes_nothing.py` made
     about the word *stopword*: **naming a thing is not reaching it**, and a rule
     that cannot tell them apart punishes the honest version.
@@ -367,7 +367,7 @@ def test_the_switch_can_PRINT_the_never_relaxed_paths_but_never_reach_them():
     offenders = [
         line.strip()
         for line in body.splitlines()
-        if any(never in line for never in (".gitignore", "sources/dirs"))
+        if any(never in line for never in (".gitignore", ".fuxignore"))
         and any(touch in line for touch in _TOUCHES)
     ]
     assert not offenders, (

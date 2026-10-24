@@ -7,8 +7,9 @@ import pytest
 from fux import setup as setup_mod
 from fux.config import load
 from fux.errors import FuxError
-from fux.acquire.dirlist import read_dirs, source_dirs
-from l12_fixtures import write_config
+from fux.acquire import sourcesfile
+from fux.acquire.sourcesfile import archived_paths, source_paths
+from l12_fixtures import write_config, write_dirs
 
 
 def _write(tmp_path, text, *, fill=True):
@@ -45,28 +46,37 @@ def _missing(table, key):
     return rf"(?s)\[{re.escape(table)}\] {key} is missing.*fux doctor --fix"
 
 
-def _write_dirs(tmp_path, lines, rel=".fux/sources/dirs"):
-    path = tmp_path / rel
+SOURCES = sourcesfile.FILE
+
+
+def _write_dirs(tmp_path, lines):
+    """The `paths:` half of `.fux/sources.yaml`, from the retired line grammar
+    a reader of these cases already knows (W-294)."""
+    write_dirs(tmp_path, "".join(f"{line}\n" for line in lines))
+
+
+def _write_sources(tmp_path, text):
+    path = tmp_path / SOURCES
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("".join(f"{line}\n" for line in lines), encoding="utf-8")
+    path.write_text(text, encoding="utf-8")
 
 
 def test_loads_minimal_config(tmp_path):
     _write(tmp_path, "[sources]\n")
     config = load(tmp_path)
-    assert config.dirs_file == _template("sources", "dirs_file")
+    assert config.sources_file == _template("sources", "sources_file")
     assert config.shards == _template("index", "shards")
 
 
 def test_a_config_with_no_sources_table_at_all_is_refused_naming_its_keys(tmp_path):
     """⚠ **Inverted by W-225 stage 3b** (SR-LAW-12). This asserted *"`fux.toml`
     is policy: every key in it has a default"* — a file with no `[sources]`
-    loaded and resolved `dirs_file` to a path held in code. No key has a
-    default now: each missing one is named, with the command that writes it."""
+    loaded and resolved its list path to a path held in code. No key has a
+    default now: each missing one is named, with the command that writes it.
+    Since W-294 `[sources]` has ONE key, `sources_file`."""
     _write(tmp_path, "[index]\nshards = 256\n", fill=False)
-    with pytest.raises(FuxError, match=_missing("sources", "dirs_file")) as exc:
+    with pytest.raises(FuxError, match=_missing("sources", "sources_file")):
         load(tmp_path)
-    assert "[sources] urls_file is missing" in str(exc.value)
 
 
 def test_an_omitted_shards_is_refused_not_defaulted(tmp_path):
@@ -100,14 +110,14 @@ def test_invalid_toml(tmp_path):
         load(tmp_path)
 
 
-# -- the retired key (SR-DIR-LIST decision 1) -----------------------------
+# -- the retired keys (SR-SOURCES; SR-CONFIG decision 10) -------------------
 
 
 def test_the_retired_dirs_key_errors_with_instructions(tmp_path):
     # It names the KEY that holds the list's path, not a path — since W-225
     # stage 3b there is no default path in code for it to name.
     _write(tmp_path, '[sources]\ndirs = ["docs", "README.md"]\n')
-    with pytest.raises(FuxError, match=r"`\[sources\] dirs_file` names"):
+    with pytest.raises(FuxError, match=r"`\[sources\] sources_file` names"):
         load(tmp_path)
 
 
@@ -118,42 +128,69 @@ def test_an_empty_retired_dirs_key_errors_too(tmp_path):
         load(tmp_path)
 
 
-def test_dirs_file_is_configurable(tmp_path):
-    _write(tmp_path, '[sources]\ndirs_file = "config/sources"\n')
-    assert load(tmp_path).dirs_file == "config/sources"
+def test_sources_file_is_configurable(tmp_path):
+    _write(tmp_path, '[sources]\nsources_file = "config/sources.yaml"\n')
+    assert load(tmp_path).sources_file == "config/sources.yaml"
 
 
-def test_dirs_file_must_be_a_path(tmp_path):
-    _write(tmp_path, "[sources]\ndirs_file = 7\n")
-    with pytest.raises(FuxError, match="dirs_file must be a path"):
+def test_sources_file_must_be_a_path(tmp_path):
+    _write(tmp_path, "[sources]\nsources_file = 7\n")
+    with pytest.raises(FuxError, match="sources_file must be a path"):
+        load(tmp_path)
+
+
+@pytest.mark.parametrize("retired", ["dirs_file", "urls_file"])
+def test_the_two_retired_list_keys_error_with_instructions(tmp_path, retired):
+    """W-294: `dirs_file` + `urls_file` became one `sources_file`. Each old key
+    is refused by name with the one command that converts — never read, never
+    silently ignored (SR-CONFIG decision 10)."""
+    _write(tmp_path, f'[sources]\n{retired} = ".fux/sources/x"\n')
+    with pytest.raises(FuxError, match=rf"\[sources\] {retired} was replaced by \[sources\] sources_file.*fux setup"):
         load(tmp_path)
 
 
 # -- the list itself -------------------------------------------------------
 
 
-def test_the_dirs_list_dedupes_and_sorts(tmp_path):
-    _write_dirs(tmp_path, ["work", "# a note", "docs", "", "work"])
-    assert source_dirs(tmp_path, ".fux/sources/dirs") == ["docs", "work"]
+def test_the_path_lists_sort_and_comments_are_presentation(tmp_path):
+    _write_sources(tmp_path, "paths:\n  include:\n    - work   # a note\n    - docs\n")
+    assert source_paths(tmp_path, SOURCES) == ["docs", "work"]
 
 
-def test_a_directory_may_declare_itself_archived(tmp_path):
-    _write_dirs(tmp_path, ["docs", "old/frozen-docs   archived=true  # retired 2026"])
-    entries = {e.value: e.attrs["archived"] for e in read_dirs(tmp_path, ".fux/sources/dirs")}
+def test_a_path_listed_twice_is_a_merge_mistake_not_a_dedupe(tmp_path):
+    """W-294: the file is hand-edited, and a silent dedupe hides a merge mistake."""
+    _write_sources(tmp_path, "paths:\n  include:\n    - work\n    - docs\n    - work\n")
+    with pytest.raises(FuxError, match=r"sources\.yaml:5: `work` is listed twice"):
+        source_paths(tmp_path, SOURCES)
+
+
+def test_a_path_may_declare_itself_archived(tmp_path):
+    _write_sources(tmp_path, "paths:\n  include:\n    - docs\n  archived:   # retired 2026\n    - old/frozen-docs\n")
+    entries = {e.value: e.attrs["archived"] for e in sourcesfile.read(tmp_path, SOURCES).paths}
     assert entries == {"docs": "false", "old/frozen-docs": "true"}
 
 
 def test_archived_is_declared_and_never_derived_from_the_path(tmp_path):
-    """SR-DIR-LIST decision 4 — the reason it superseded its predecessor."""
+    """SR-SOURCES (from the retired SR-DIR-LIST)."""
     _write_dirs(tmp_path, ["archive/v0.26-docs"])
-    (entry,) = read_dirs(tmp_path, ".fux/sources/dirs")
+    (entry,) = sourcesfile.read(tmp_path, SOURCES).paths
     assert entry.attrs["archived"] == "false"  # the path is a hint, not the signal
 
 
-def test_a_missing_dirs_list_fails_loudly_naming_setup(tmp_path):
+def test_a_missing_manifest_fails_loudly_naming_setup(tmp_path):
     _write(tmp_path, "[sources]\n")
-    with pytest.raises(FuxError, match=r"\.fux/sources/dirs not found.*fux setup"):
-        source_dirs(tmp_path, load(tmp_path).dirs_file)
+    with pytest.raises(FuxError, match=r"\.fux/sources\.yaml not found.*fux setup"):
+        source_paths(tmp_path, load(tmp_path).sources_file)
+
+
+def test_a_leftover_legacy_list_is_refused_rather_than_guessed_around(tmp_path):
+    """No reader for the old paths beyond `fux setup`'s conversion (W-294)."""
+    _write_dirs(tmp_path, ["docs"])
+    legacy = tmp_path / sourcesfile.LEGACY_DIRS
+    legacy.parent.mkdir(parents=True, exist_ok=True)
+    legacy.write_text("docs\n!work/golden\n", encoding="utf-8")
+    with pytest.raises(FuxError, match=r"\.fux/sources/dirs still exists.*fux setup"):
+        source_paths(tmp_path, SOURCES)
 
 
 # -- the ranking keys left this file (SR-TUNE decision 7) ------------------
@@ -208,18 +245,23 @@ def test_config_no_longer_carries_the_ranking_fields(tmp_path):
 # -- the archived directory set (SR-ARCHIVED-CONTENT decision 6's input) ---------
 
 
-def test_archived_dirs_is_only_the_declared_ones(tmp_path):
-    from fux.acquire.dirlist import archived_dirs
-
+def test_archived_paths_is_only_the_declared_ones(tmp_path):
     _write_dirs(tmp_path, ["docs", "old/frozen-docs archived=true"])
-    assert archived_dirs(tmp_path, ".fux/sources/dirs") == ["old/frozen-docs"]
+    assert archived_paths(tmp_path, SOURCES) == ["old/frozen-docs"]
 
 
-def test_archived_dirs_excludes_exclusion_lines(tmp_path):
-    from fux.acquire.dirlist import archived_dirs
+def test_a_bang_entry_is_refused_naming_fuxignore(tmp_path):
+    """W-294 step 2: `!` left the source list. Under `paths:` it is a YAML tag,
+    refused by the subset with the message that names `.fux/.fuxignore`."""
+    _write_sources(tmp_path, "paths:\n  archived:\n    - old\n    - !old/keep\n")
+    with pytest.raises(FuxError, match=r"sources\.yaml:4: .*exclusions live in \.fux/\.fuxignore"):
+        archived_paths(tmp_path, SOURCES)
 
-    _write_dirs(tmp_path, ["old archived=true", "!old/keep"])
-    assert archived_dirs(tmp_path, ".fux/sources/dirs") == ["old"]
+
+def test_a_quoted_bang_entry_is_refused_too(tmp_path):
+    _write_sources(tmp_path, "paths:\n  include:\n    - '!old/keep'\n")
+    with pytest.raises(FuxError, match=r"sources\.yaml:3: .*`!old/keep` starts with `!`.*`/old/keep`"):
+        source_paths(tmp_path, SOURCES)
 
 
 # -- [sources.url] acquired_max_bytes (SR-CONFIG decision 12) --------------
@@ -359,29 +401,29 @@ def test_a_misspelled_fetch_at_answer_is_refused_by_name(tmp_path):
         load(tmp_path)
 
 
-# -- urls_file moved up beside dirs_file (2026-09-14) -------------------------
+# -- one manifest for paths and URLs (W-294) ----------------------------------
 
 
-def test_urls_file_is_read_from_the_sources_table(tmp_path):
-    _write(tmp_path, '[sources]\nurls_file = "docs/urls.txt"\n[sources.url]\n')
+def test_sources_file_is_carried_onto_the_url_source(tmp_path):
+    _write(tmp_path, '[sources]\nsources_file = "docs/sources.yaml"\n[sources.url]\n')
     config = load(tmp_path)
-    assert config.urls_file == "docs/urls.txt"
-    # Carried onto UrlSource too, so every existing caller keeps one field.
-    assert config.url.urls_file == "docs/urls.txt"
+    assert config.sources_file == "docs/sources.yaml"
+    # Carried onto UrlSource too, so a caller holding only it finds `urls:`.
+    assert config.url.sources_file == "docs/sources.yaml"
 
 
-def test_urls_file_resolves_without_a_sources_url_table(tmp_path):
-    """It names the list; `[sources.url]` is what turns fetching ON. A repo
+def test_sources_file_resolves_without_a_sources_url_table(tmp_path):
+    """It names the manifest; `[sources.url]` is what turns fetching ON. A repo
     with no `[sources.url]` still has a path — `fux add <URL>` needs one."""
     _write(tmp_path, "[sources]\n")
     config = load(tmp_path)
     assert config.url is None
-    assert config.urls_file == _template("sources", "urls_file")
+    assert config.sources_file == _template("sources", "sources_file")
 
 
-def test_the_old_spelling_is_refused_by_name_with_its_new_home(tmp_path):
+def test_the_old_url_table_spelling_is_refused_by_name(tmp_path):
     _write(tmp_path, '[sources]\n[sources.url]\nurls_file = "x"\n')
-    with pytest.raises(FuxError, match=r"urls_file moved to \[sources\] urls_file"):
+    with pytest.raises(FuxError, match=r"\[sources\.url\] urls_file is retired.*fux setup"):
         load(tmp_path)
 
 

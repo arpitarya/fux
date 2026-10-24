@@ -50,7 +50,7 @@ error (exit 2). Three candidates is fixed, not configurable.
 1. **Rank** like `ask`, keep the top 3.
 2. **Read each source.** A `file:` document is read from the **working tree** —
    no network, works offline, sees uncommitted edits. A `url:` document goes
-   through **the fetcher its line in `.fux/sources/urls` names** — network,
+   through **the fetcher its entry in `.fux/sources.yaml` names** — network,
    that fetcher's auth and timeouts.
 3. **Compare** the sha of what was read with the sha that was indexed.
 4. **Chunk and re-score** all three documents' passages in one contest. ⚠ **The

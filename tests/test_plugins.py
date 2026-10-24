@@ -18,6 +18,7 @@ from fux import __version__, plugins
 from fux import setup as setup_mod
 from fux.constants import fixed, table
 from fux.errors import FuxError
+from l12_fixtures import listed_paths, write_dirs, write_urls
 
 HTTP = "fux-fetcher-http"
 
@@ -356,8 +357,9 @@ def test_the_scan_prunes_an_excluded_directory_and_never_enters_it(repo, monkeyp
     """W-244 / L11: an excluded directory is pruned, not listed and filtered."""
     (repo / "docs" / "sealed").mkdir()
     (repo / "docs" / "sealed" / "key.pdf").write_bytes(b"%PDF")
-    dirs = repo / ".fux" / "sources" / "dirs"
-    dirs.write_text(dirs.read_text(encoding="utf-8") + "!docs/sealed\n", encoding="utf-8")
+    # W-294: exclusion lives in `.fux/.fuxignore` only; the helper moves the
+    # retired grammar's `!` line there, anchored, as `fux setup` would.
+    write_dirs(repo, "".join(f"{p}\n" for p in listed_paths(repo)) + "!docs/sealed\n")
     entered: list[str] = []
     import os
 
@@ -393,11 +395,7 @@ def test_undeclared_names_the_package_and_the_count():
 
 def test_propose_reads_suffixes_url_lines_and_closes_over_dependencies(repo):
     (repo / "docs" / "sheet.csv").write_text("a,b\n", encoding="utf-8")
-    urls = repo / ".fux" / "sources" / "urls"
-    urls.write_text(
-        urls.read_text(encoding="utf-8") + "https://x.test/a.pdf fetch=cdp decoder=pdf\n",
-        encoding="utf-8",
-    )
+    write_urls(repo, "https://x.test/a.pdf fetch=cdp decoder=pdf\n")
     assert plugins.propose(repo) == [
         "fux-decoder-html",  # every fetcher emits HTML (P10)
         "fux-decoder-pdf",  # decoder= on the URL line
@@ -408,11 +406,7 @@ def test_propose_reads_suffixes_url_lines_and_closes_over_dependencies(repo):
 
 
 def test_a_fetch_name_with_a_consumer_file_needs_no_package(repo):
-    urls = repo / ".fux" / "sources" / "urls"
-    urls.write_text(
-        urls.read_text(encoding="utf-8") + "https://x.test/a fetch=http decoder=prose\n",
-        encoding="utf-8",
-    )
+    write_urls(repo, "https://x.test/a fetch=http decoder=prose\n")
     (repo / ".fux" / "fetchers").mkdir(parents=True, exist_ok=True)
     (repo / ".fux" / "fetchers" / "http.py").write_text("", encoding="utf-8")
     assert HTTP not in plugins.propose(repo)

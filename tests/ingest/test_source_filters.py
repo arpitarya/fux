@@ -1,4 +1,8 @@
-"""The two filters that decide what is a document: `!` exclusions and types.
+"""The two filters that decide what is a document: exclusions and types.
+
+Since W-294 an exclusion has one home, `.fux/.fuxignore` — the `!` line in the
+source list is gone, and `fux setup` moved each one there as an anchored
+pattern. The walk cases below spell the exclusion that way (`EXCLUDE`).
 
 W-45 (verdict E) and W-55 (verdict G), which landed as one grammar change
 because they modify one file's grammar. The property that matters most is
@@ -12,7 +16,7 @@ from l12_fixtures import config_file
 import pytest
 
 from fux.errors import FuxError
-from fux.acquire.dirlist import source_dirs, source_excludes
+from fux.acquire import fuxignore
 from fux.acquire.gitdir import (
     DEFAULT_TYPES,
     TypeFilter,
@@ -20,7 +24,7 @@ from fux.acquire.gitdir import (
     walk_sources,
 )
 from fux.acquire.sourcelist import DIRS, TYPES, URLS, glob_match, parse
-from l12_fixtures import write_config, write_plugins
+from l12_fixtures import write_config, write_dirs, write_plugins
 
 
 # -- the glob matcher ------------------------------------------------------
@@ -210,6 +214,15 @@ def test_a_leftover_line_grammar_types_file_is_refused_not_ignored(tmp_path):
 # -- the walk: three conditions, and every rejection is visible ------------
 
 
+#: What `fux setup` makes of the retired `!work/regression/*/evidence` line.
+EXCLUDE = "/work/regression/*/evidence\n"
+_EXCLUDED = "ignored by .fux/.fuxignore:1 `/work/regression/*/evidence` (work/regression/r1/evidence)"
+
+
+def _excluded() -> "fuxignore.Ignores":
+    return fuxignore.parse(EXCLUDE)
+
+
 @pytest.fixture
 def tree(tmp_path):
     (tmp_path / "docs").mkdir()
@@ -243,7 +256,7 @@ def test_all_three_conditions_apply_together(tree):
     walked, skipped = walk_sources(
         tree,
         ["docs", "work"],
-        excludes=["work/regression/*/evidence"],
+        ignores=_excluded(),
         types=TypeFilter(allow=DEFAULT_TYPES),
     )
     # `docs/data.json` is now WALKED, not skipped — the 2026-08-26 widening.
@@ -255,7 +268,7 @@ def test_all_three_conditions_apply_together(tree):
     # W-244: the excluded directory is recorded ONCE, as a directory, and its
     # files are never enumerated (see `test_an_excluded_directory_is_never_entered`).
     assert {s.rel_path: s.reason for s in skipped} == {
-        "work/regression/r1/evidence/": "excluded by !work/regression/*/evidence",
+        "work/regression/r1/evidence/": _EXCLUDED,
     }
 
 
@@ -264,7 +277,7 @@ def test_an_exclusion_removes_a_whole_tree_not_just_a_matching_file(tree):
     under which excluding a tree is one line rather than one line per file."""
     (tree / "work" / "regression" / "r1" / "evidence" / "deep").mkdir()
     (tree / "work" / "regression" / "r1" / "evidence" / "deep" / "x.md").write_text("# X\n")
-    walked, _ = walk_sources(tree, ["work"], excludes=["work/regression/*/evidence"])
+    walked, _ = walk_sources(tree, ["work"], ignores=_excluded())
     assert not any("evidence" in w.rel_path for w in walked)
 
 
@@ -272,7 +285,7 @@ def test_every_rejection_is_reported_with_a_reason(tree):
     """The property both items were opened about: no invisible filtering."""
     _, skipped = walk_sources(
         tree, ["docs", "work"],
-        excludes=["work/regression/*/evidence"],
+        ignores=_excluded(),
         types=TypeFilter(allow=DEFAULT_TYPES),
     )
     assert all(s.reason for s in skipped)
@@ -285,14 +298,15 @@ def test_no_filters_means_the_old_behaviour(tree):
     assert len(walked) == 4 and skipped == []
 
 
-def test_the_accessors_split_includes_from_exclusions(tmp_path):
-    (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    (tmp_path / ".fux" / "sources" / "dirs").write_text(
-        "docs\nwork\n!work/regression/*/evidence\n", encoding="utf-8"
-    )
-    rel = ".fux/sources/dirs"
-    assert source_dirs(tmp_path, rel) == ["docs", "work"]
-    assert source_excludes(tmp_path, rel) == ["work/regression/*/evidence"]
+def test_a_bang_line_in_the_source_list_is_refused_and_names_fuxignore(tmp_path):
+    """W-294: the accessors no longer split includes from exclusions, because
+    the manifest holds includes only. The old `!` spelling is a loud refusal
+    that names the file the exclusion belongs in."""
+    from fux.acquire import sourcesfile
+
+    text = "paths:\n  include:\n    - docs\n    - '!work/regression/*/evidence'\n"
+    with pytest.raises(FuxError, match=r"sources\.yaml:4: .*\.fux/\.fuxignore"):
+        sourcesfile.parse(text, origin=".fux/sources.yaml")
 
 
 # -- W-244: an excluded directory is PRUNED, never enumerated ---------------
@@ -315,11 +329,11 @@ def test_an_excluded_directory_is_never_entered(tree, monkeypatch):
         return real(path)
 
     monkeypatch.setattr(os, "scandir", spy)
-    walked, skipped = walk_sources(tree, ["work"], excludes=["work/regression/*/evidence"])
+    walked, skipped = walk_sources(tree, ["work"], ignores=_excluded())
     assert not any("evidence" in path for path in scanned), scanned
     assert [w.rel_path for w in walked] == ["work/regression/r1/report.md"]
     assert [(s.rel_path, s.reason) for s in skipped] == [
-        ("work/regression/r1/evidence/", "excluded by !work/regression/*/evidence")
+        ("work/regression/r1/evidence/", _EXCLUDED)
     ]
 
 
@@ -328,20 +342,21 @@ def test_pruning_indexes_exactly_what_enumeration_did(tree):
     list names does. Same walked bytes with the exclusion as without the tree."""
     import shutil
 
-    walked, _ = walk_sources(tree, ["docs", "work"], excludes=["work/regression/*/evidence"])
+    walked, _ = walk_sources(tree, ["docs", "work"], ignores=_excluded())
     shutil.rmtree(tree / "work" / "regression" / "r1" / "evidence")
     bare, _ = walk_sources(tree, ["docs", "work"])
     assert [(w.rel_path, w.content) for w in walked] == [(w.rel_path, w.content) for w in bare]
 
 
-def test_a_hand_written_reinclude_turns_pruning_off(tree):
-    """A `.fuxignore` `!` re-include outranks an exclusion, and could name a
-    file under the excluded directory. While one exists, the walk enumerates as
-    it always did, so that file is still indexed."""
-    from fux.acquire import fuxignore
+def test_a_reinclude_under_an_excluded_directory_does_not_reach_it(tree):
+    """W-294 changed this case's premise. A `.fuxignore` `!` re-include used to
+    outrank a `dirs` exclusion; now both live in `.fuxignore`, and git's rule
+    holds — a file beneath an excluded directory stays out, so pruning stays
+    on. Re-including one file means excluding the directory's CONTENTS."""
+    ignores = fuxignore.parse(EXCLUDE + "!work/regression/r1/evidence/n.md\n")
+    walked, _ = walk_sources(tree, ["work"], ignores=ignores)
+    assert "work/regression/r1/evidence/n.md" not in [w.rel_path for w in walked]
 
-    ignores = fuxignore.parse("!work/regression/r1/evidence/n.md\n")
-    walked, _ = walk_sources(
-        tree, ["work"], excludes=["work/regression/*/evidence"], ignores=ignores
-    )
+    ignores = fuxignore.parse("/work/regression/*/evidence/*\n!work/regression/r1/evidence/n.md\n")
+    walked, _ = walk_sources(tree, ["work"], ignores=ignores)
     assert "work/regression/r1/evidence/n.md" in [w.rel_path for w in walked]

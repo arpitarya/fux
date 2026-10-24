@@ -1,54 +1,23 @@
-"""One parser for both committed source lists — `.fux/sources/urls` and
-`.fux/sources/dirs`.
+"""The attribute vocabulary `.fux/sources.yaml` is typed by — and the retired
+line grammar `fux setup` converts from, once.
 
-The grammar is fixed by SR-URL-LIST decisions 2-13 and reused verbatim by
-SR-DIR-LIST decision 2. **There is one reader for both files on purpose**:
-two parsers for one grammar is how `#`-handling, sorting and the unknown-key
-error end up disagreeing, and the disagreement surfaces as a document
-silently missing rather than as an error.
+**Owned by SR-SOURCES** (`records/0116_url-list.md`). Since W-294 the live
+manifest is YAML, read by `sourcesfile.py` over `yamlsubset.py`; what stays here
+is what that reader and its Node twin share with the rest of the engine:
 
-The grammar, in one place:
-
-- **One entry per line**, blank lines ignored. This is what makes the file
-  merge line by line at 5 000 entries.
-- **`#` begins a comment only at the start of a line or after whitespace.**
-  Not anywhere. A URL fragment (`https://x/page#section`) is part of the
-  entry, and stripping from the first `#` anywhere collapsed two URLs into
-  one and dropped a document with no error.
-- **`<entry> key=value [key=value ...]`**, whitespace-separated. Values carry
-  no whitespace and no quoting (SR-URL-LIST decision 8).
-- **An unknown key, an unknown value, or a repeated key is a loud error
-  naming `file:lineno`.** A reader that does not know a key refuses rather
-  than guesses: a typo'd `mata=plain` that is silently ignored ships a
-  private document to a public index.
-- **The reader is lenient, the writer is strict** (decision 13). A missing
-  attribute takes its default when read, so a hand-made or merged list still
-  loads; `render` always emits every attribute, so a generated file holds no
-  implicit state.
-- **The loader dedupes and sorts.** File order is presentation only, which is
-  L4 applied to config: two people holding the same set in different orders
-  must produce the same committed bytes. A duplicate entry is a merge
-  artefact and not an error — but a duplicate whose *resolved* attributes
-  disagree is, naming both line numbers, because exact entries cannot
-  legitimately disagree and letting a merge artefact pick a privacy policy is
-  the worst available outcome (decision 10).
-
-- **A `!` prefix subtracts** (`dirs` only, and the old `types` grammar).
-  `!work/regression/*/evidence` removes matching paths from the walk. **There is no un-exclude**: `!` subtracts and nothing adds
-  back, so there is no precedence order to remember or to get wrong.
-  Exclusions are **order-independent** — the loader sorts, so two people holding
-  the same set in different orders must produce the same committed bytes, which
-  is L4 applied to config.
-- **An exclusion carries no attributes.** `archived=true` describes a directory
-  whose documents are history; it means nothing about a path being removed, and
-  accepting it silently would be the kind of no-op configuration this grammar's
-  strictness exists to prevent.
-
-The attribute sets are closed and per file: `fetch` and `decoder` for `urls`,
-`archived` for `dirs`. (`types` was the third file until 2026-09-11; it is
-`.fux/config/formats.toml` now, read by `typesfile` — see `TYPES` below.) Adding one is a change
-to the owning record, which is what makes the unknown-key error safe to be
-strict about.
+- **The specs.** `URLS` (a URL entry's closed attribute set — `fetch` and
+  `decoder` required, `keep ttl enrich archived update` optional) and `PATHS`
+  (the path flags, `archived` and `enrich`). An `Attribute` carries its legal
+  values or a typed validator, its default and its refusal texts, so the
+  schema and the writer read one definition (SR-SOURCES decisions 11 and 15).
+- **The validators.** `parse_duration`, the fetcher / decoder stem shapes and
+  the path and URL entry checks — shape only, never existence.
+- **The retired line grammar** — `<entry> key=value ...` per line, `#` comments
+  at a line's start or after whitespace, `!` subtraction on `DIRS`. Only
+  `fux setup`'s one-time conversion of `.fux/sources/dirs` and `.fux/sources/urls`
+  reads it (SR-SOURCES decision 20), and the test fixtures that still speak it.
+- **`TYPES`** — the entry vocabulary `fux source --types` checks against, which
+  is also how `fux setup` reads a leftover `.fux/sources/types`.
 
 ## Glob matching: `*` does not cross a `/`
 
@@ -69,8 +38,13 @@ from functools import lru_cache
 from pathlib import Path, PurePosixPath
 from typing import Callable
 
-from ..constants import fixed
+from ..constants import fixed, table
 from ..errors import FuxError
+
+#: The attribute and entry refusal texts, `constants.toml [source_attributes]` —
+#: read by both planes (W-294), so the Node twin of `.fux/sources.yaml`'s reader
+#: cannot word a refusal differently.
+_ATTR_TEXTS = table("source_attributes")
 
 
 @dataclass(frozen=True)
@@ -110,7 +84,7 @@ class Attribute:
     placeholder: str = "<value>"
     #: 🔴 **A line that does not STATE this attribute fails to parse.** Two
     #: attributes are required, both on `urls` and both for the same reason:
-    #: `fetch` (W-199 D1/D2; SR-URL-LIST decision 16) and `decoder` (the pipe
+    #: `fetch` (W-199 D1/D2; SR-SOURCES decision 16) and `decoder` (the pipe
     #: ruling of 2026-09-18, built as W-199 DoD 10). Neither has a source-wide
     #: fallback to inherit from, and neither is a policy fux can resolve later —
     #: an unstated fetcher is *fux cannot retrieve this at all*, and an unstated
@@ -123,7 +97,7 @@ class Attribute:
     #:
     #: 🔴 **A field rather than one sentence in `parse`, because the second
     #: required attribute arrived a day after the first.** The message `parse`
-    #: raised was `fetch`'s own — it named `.fux/fetchers/` and SR-URL-LIST
+    #: raised was `fetch`'s own — it named `.fux/fetchers/` and SR-SOURCES
     #: decision 16 — so a missing `decoder=` would have been reported by
     #: pointing the reader at the fetchers directory. That is the W-140 row 18
     #: shape again: a message transcribed where the fact lives one layer away.
@@ -206,15 +180,15 @@ class Entry:
 
 def _url_reason(entry: str) -> str | None:
     if not entry.startswith(("http://", "https://")):
-        return "not an http(s) URL"
+        return _ATTR_TEXTS["url_reason"]
     return None
 
 
 def _dir_reason(entry: str) -> str | None:
     if entry.startswith("/"):
-        return "not a repo-relative path"
+        return _ATTR_TEXTS["path_absolute"]
     if ".." in PurePosixPath(entry).parts:
-        return "escapes the repo root"
+        return _ATTR_TEXTS["path_escapes"]
     return None
 
 
@@ -245,10 +219,7 @@ _DURATION_UNITS = {
     for letter, field in {"s": "seconds", "m": "minutes", "h": "hours", "d": "days"}.items()
 }
 
-_TTL_HELP = (
-    "must be 0 (always re-fetch) or <number><unit> where unit is "
-    "s, m, h or d - for example 30s, 15m, 1h, 7d"
-)
+_TTL_HELP = _ATTR_TEXTS["ttl_help"]
 
 
 def parse_duration(raw: str) -> int | None:
@@ -280,11 +251,7 @@ def _ttl_reason(raw: str) -> str | None:
 #: are naming.
 _DECODER_NAME_RE = re.compile(r"[a-z0-9][a-z0-9_]*")
 
-_DECODER_HELP = (
-    "must be a decoder module name - lowercase letters, digits and underscores, "
-    "not starting with `_` (a leading underscore marks a shared helper the "
-    "registry skips), with no `.py` suffix and no directory part"
-)
+_DECODER_HELP = _ATTR_TEXTS["decoder_help"]
 
 
 #: A fetcher name is a MODULE STEM -- `cdp`, never `cdp.py` and never
@@ -295,12 +262,7 @@ _DECODER_HELP = (
 #: for one idea is how they would drift.
 _FETCHER_NAME_RE = re.compile(r"[a-z0-9][a-z0-9_]*")
 
-_FETCHER_HELP = (
-    "must be a fetcher module name - lowercase letters, digits and underscores, "
-    "not starting with `_`, with no `.py` suffix and no directory part. It "
-    "resolves to .fux/fetchers/<name>.py. A host map lives in [sources.url.routes]; "
-    "`fux doctor` reports a name with no file"
-)
+_FETCHER_HELP = _ATTR_TEXTS["fetcher_help"]
 
 
 def _fetcher_reason(raw: str) -> str | None:
@@ -368,11 +330,7 @@ def _url_decoder_reason(raw: str) -> str | None:
     `url decoders` row reports a name with no module, and ingest raises on one.
     """
     if raw == "":
-        return (
-            "is empty, and a URL line may not leave its decoder to be resolved later — "
-            f"a URL has no trustworthy extension. Write `decoder={PROSE_DECODER}` for a page "
-            "that is already text, or a decoder module name (`html`, `pdf`, `xlsx`, ...)"
-        )
+        return _ATTR_TEXTS["url_decoder_empty"].format(prose=PROSE_DECODER)
     return None if _DECODER_NAME_RE.fullmatch(raw) else _DECODER_HELP
 
 
@@ -389,7 +347,7 @@ URLS = ListSpec(
         #
         # ⚠ **The default is `"http"`, NOT `""`.** `render_line`'s
         # empty-default exception would otherwise fire and a generated URL line
-        # would stop stating `fetch=`, which SR-URL-LIST decision 12 requires.
+        # would stop stating `fetch=`, which SR-SOURCES decision 12 requires.
         # 🔴 **REQUIRED since 2026-09-20** (Arpit, W-199 D1/D2). `[sources.url]
         # fetcher` is deleted, so there is no source-wide layer to fall back to
         # and no engine default: a URL line either names its fetcher or fux
@@ -403,10 +361,7 @@ URLS = ListSpec(
         Attribute(
             "fetch", (), "http", validate=_fetcher_reason,
             placeholder="<name>", required=True,
-            required_hint=(
-                " naming a file in .fux/fetchers/, or let `fux add` resolve it for you. "
-                "([sources.url] fetcher was deleted on 2026-09-20; SR-URL-LIST decision 16)"
-            ),
+            required_hint=_ATTR_TEXTS["fetch_required_hint"],
         ),
         # 🔴 **REQUIRED, and the second half of the pipe** (Arpit, 2026-09-18;
         # built as W-199 DoD 10). *"Whenever we add a URL, after that, we have to
@@ -429,12 +384,7 @@ URLS = ListSpec(
         Attribute(
             "decoder", (), PROSE_DECODER, validate=_url_decoder_reason,
             placeholder="<name>", required=True,
-            required_hint=(
-                f" naming a decoder module — `{PROSE_DECODER}` for a page that is already "
-                "text, a built-in (`html`, `pdf`, `xlsx`, ...) or a file in .fux/decoders/. "
-                "`fux add <URL>` observes the type once and writes it for you "
-                "(the pipe ruling, 2026-09-18)"
-            ),
+            required_hint=_ATTR_TEXTS["decoder_required_hint"].format(prose=PROSE_DECODER),
         ),
         # SR-ACQUIRED. Retain the bytes this URL returned.
         #
@@ -476,9 +426,9 @@ URLS = ListSpec(
         # `[sources.url]` is meaningful. `archived` is a fact about one
         # DOCUMENT; a source-wide "everything I fetch is retired" describes no
         # corpus anybody has. `dirs` made the same call for the same reason
-        # (SR-DIR-LIST), and matching it keeps one attribute with one shape.
+        # (SR-SOURCES), and matching it keeps one attribute with one shape.
         Attribute("archived", ("true", "false"), "false"),
-        # W-113, 2026-09-05 (Arpit, ruling R-1). SR-URL-LIST: whether `fux
+        # W-113, 2026-09-05 (Arpit, ruling R-1). SR-SOURCES: whether `fux
         # update` goes out for this line **at all**.
         #
         # 🔴 **TWO WORDS, NEVER A DURATION, and that is the decision.** `ttl=`
@@ -495,6 +445,35 @@ URLS = ListSpec(
     validate=_url_reason,
 )
 
+#: `scheme://` — RFC 3986 §3.1's scheme grammar, anchored, with the `//` that
+#: distinguishes a URL from a Windows drive letter or a `key: value` note.
+_SCHEME_RE = re.compile(r"[a-zA-Z][a-zA-Z0-9+.\-]*://")
+
+
+def has_scheme(entry: str) -> bool:
+    """`entry` starts with a `scheme://` — someone who typed one meant a URL."""
+    return _SCHEME_RE.match(entry) is not None
+
+
+#: The `paths:` half of `.fux/sources.yaml` (W-294, SR-SOURCES): the two flags a
+#: path may carry, each set by the LIST it sits in rather than by an attribute
+#: on its line, and the same repo-relative-path rule `dirs` had. **There is no
+#: `!` here** — `allow_exclusions` is false, and `sourcesfile` refuses a path
+#: that starts with one, naming `.fux/.fuxignore`.
+PATHS = ListSpec(
+    kind="paths",
+    attributes=(
+        Attribute("archived", ("true", "false"), "false"),
+        Attribute("enrich", ("true", "false"), "false"),
+    ),
+    validate=_dir_reason,
+)
+
+#: ⚠ **The grammar of the RETIRED `.fux/sources/dirs` — read by `fux setup`'s
+#: one-time conversion and nothing else** (W-294). The live list is the `paths:`
+#: half of `.fux/sources.yaml` (`PATHS` above); `URLS` below still names the
+#: attribute set of a `urls:` entry AND reads the retired `.fux/sources/urls`
+#: for the same conversion.
 DIRS = ListSpec(
     kind="dirs",
     attributes=(
@@ -698,7 +677,7 @@ def read(root: Path, rel_path: str, spec: ListSpec, *, missing_hint: str) -> lis
 
 
 def render_line(value: str, attrs: dict[str, str], spec: ListSpec) -> str:
-    """One generated line, **every attribute stated** (SR-URL-LIST decision 12).
+    """One generated line, **every attribute stated** (SR-SOURCES decision 12).
 
     A generated file holds no implicit state: the line says what it means, so
     changing a policy is a one-word diff rather than the appearance or

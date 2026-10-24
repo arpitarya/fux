@@ -19,7 +19,7 @@ ran the other.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 from l12_fixtures import scoring, tune_text, write_config
 import pytest
 
@@ -276,9 +276,7 @@ def test_an_index_key_does_change_the_index(tmp_path, key, value):
     key does nothing and belongs nowhere."""
     from fux.ingest.run import run
 
-    listing = tmp_path / ".fux" / "sources" / "dirs"
-    listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")

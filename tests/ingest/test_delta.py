@@ -16,7 +16,7 @@ import pytest
 from fux.ingest.run import run
 from fux.store import HEADER, iter_shard_paths, read_index, shard_path
 from fux.store.reader import read_shard
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_dirs
 
 
 def _doc(i: int, revision: int = 0) -> str:
@@ -30,7 +30,7 @@ def _doc(i: int, revision: int = 0) -> str:
 def _init(tmp_path) -> None:
     listing = tmp_path / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")

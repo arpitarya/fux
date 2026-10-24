@@ -13,7 +13,7 @@ live files in this tree, and nothing here reads out of `archive/`.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import json
 import shutil
 import subprocess
@@ -54,7 +54,7 @@ def linked(tmp_path_factory) -> Path:
     (proj / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     dirs = proj / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
-    dirs.write_text("docs\n", encoding="utf-8")
+    write_dirs(proj, "docs\n")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(proj, "pii")).write_text("", encoding="utf-8")
     write_config(proj)

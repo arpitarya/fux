@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-24
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@37f0b3762b94, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@547cf61ca6b1, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@eea932b66db9, src/fux/configfiles.py@6e46d13a7b71, tests/test_configfiles.py@b0fe4595fc10]
+owns: [src/fux/store/fuxdir.py@32a96febd498, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@1936dbd0d886, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@268e522c2686, src/fux/configfiles.py@6e46d13a7b71, tests/test_configfiles.py@b0fe4595fc10]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 6f2a9de7d6433b747fafb9b57de128d335015f60f40b84c47b4bd6ec4fea8b36
+content_sha: 2e44bbc996e4b60c34e205bd22c9552ebe9f3594e978d377e738e36ba20444d6
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -118,11 +118,10 @@ $ find .fux -maxdepth 2 -type d | sort
 .fux/index
 .fux/runtime
 .fux/runtime/postings
-.fux/sources
 
 $ cat .fux/.gitignore
 # Gitignored planes, BY NAME. NEVER add `*` here: `.fux/index/`,
-# `.fux/sources/`, `.fux/fetchers/` and `.fux/decoders/` are committed,
+# `.fux/sources.yaml`, `.fux/fetchers/` and `.fux/decoders/` are committed,
 # and a blanket ignore would drop them from git silently. `fux doctor`
 # checks exactly that.
 #
@@ -156,7 +155,7 @@ carry.
 The hazard is asymmetric. A derived directory accidentally committed is noise
 someone notices. A **committed directory accidentally ignored is silent data
 loss** — and this repo's own `.gitignore` once carried a `.fux/*` blanket that
-would have eaten `sources/` and `fetchers/` without a word.
+would have eaten the source list and `fetchers/` without a word.
 
 An ignore rule is also the kind of thing a reviewer's eye slides over. It has to
 be a machine's job.
@@ -226,7 +225,7 @@ table is the reasoning.
 | entry | kind | what it is, and why that kind |
 |---|---|---|
 | `index/` | committed | the product; nothing can recompute it. Beside the shards, **`index/REGISTER`**: one line per indexed document — `loc` ⇥ `sha` ⇥ `decoder` ⇥ optional `k=v` — derived from the index and committed with it, so a PR shows what the corpus is without a reader ([SR-INGEST](0106_ingest.md) decision 22; the `fux register` verb prints the same rows from the index) |
-| `sources/` | committed | `dirs` · `urls`, one entry per line, on the one grammar in [SR-URL-LIST](0116_url-list.md). ⚠ **`types` lived here until 2026-09-11** and is `formats.toml` now (the row below) |
+| `sources.yaml` | committed | **what fux indexes, includes only** — `paths:` (flag lists `include` · `archived` · `enrich`) and `urls:` (one entry per URL, `url` · `fetch` · `decoder` required), in the fux YAML subset ([SR-SOURCES](0116_url-list.md)). Exclusion is never spelled here: a `!` entry is refused and named to `.fuxignore` |
 | `formats.toml` | committed | which files are documents and which decoder reads each extension — `include` plus `[decoders]` ([SR-TYPES](0128_types-list.md) decisions 11–12). **Optional**: absent means the built-in default. Write-if-missing — a repo that already has the file keeps it, bindings and all; a repo with only the old `sources/types` has it **converted** by `fux setup`, never rewritten in place |
 | `fetchers/` | committed | consumer code — decision 7. A file here overrides the declared fetcher package of the same name ([SR-PLUGINS](0165_plugins.md) P8); fux writes none |
 | `decoders/` | committed | consumer code — decision 8. A file here overrides the decoder of the same module name; fux writes none |
@@ -281,7 +280,7 @@ holding code.
 | moment | writes | why |
 |---|---|---|
 | **`ensure_layout`**, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore` — 🔴 **and NOTHING else, inside or outside `.fux/`**. It vendored `.fux/node/` and the `.fux/fux` shim from 2026-09-12 until W-292 (Arpit, 2026-10-21) made the Node reader an npm install; removing what an earlier setup left is `fux setup`'s alone ([SR-NODE-SEARCH](0153_node-search.md)), precisely because this row's own rule is that a no-op ingest produces a no-op diff | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory |
-| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `formats.toml`, `tune.toml`, `output.toml`, `inspect.toml`, `.fuxignore`, `refusals.toml`, `pii.toml`, `plugins.toml`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions — **and, outside `.fux/`, the git hooks in `.git/hooks/` with the `fux-index` merge driver in `.git/config` and its lines in `.gitattributes`** ([SR-MAINTENANCE](0129_hooks.md) decision 5, amended 2026-10-21, W-291; `fux setup --no-hooks` skips them; never fatal; `.gitattributes` is announced under the OUTSIDE note). **No `fetchers/*.py` and no `decoders/*.py`** since W-289 ([SR-PLUGINS](0165_plugins.md) P9): the declared package runs | **optional, explicit, once per repo** — a consumer asked for it |
+| **`fux setup`** | `fux.toml`, `sources.yaml`, `formats.toml`, `tune.toml`, `output.toml`, `inspect.toml`, `.fuxignore`, `refusals.toml`, `pii.toml`, `plugins.toml`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions — **and, outside `.fux/`, the git hooks in `.git/hooks/` with the `fux-index` merge driver in `.git/config` and its lines in `.gitattributes`** ([SR-MAINTENANCE](0129_hooks.md) decision 5, amended 2026-10-21, W-291; `fux setup --no-hooks` skips them; never fatal; `.gitattributes` is announced under the OUTSIDE note). **No `fetchers/*.py` and no `decoders/*.py`** since W-289 ([SR-PLUGINS](0165_plugins.md) P9): the declared package runs | **optional, explicit, once per repo** — a consumer asked for it |
 
 **`ensure_layout` must never write a fetcher**, and nothing in either column is
 ever overwritten: a consumer's annotations and edits survive every run. **The
@@ -411,7 +410,7 @@ not.
 
 ⚠ **A SIXTH worked instance, 2026-09-11, and it is the cheap shape.** The
 `fux.toml` template gained a **commented** `#update = "auto"` block documenting
-[SR-URL-LIST](0116_url-list.md) decision 14. Per this decision it reaches **new
+[SR-SOURCES](0116_url-list.md) decision 14. Per this decision it reaches **new
 repos only** — and here that costs nothing, because the key's default *is*
 today's behaviour and an existing repo that never learns the key behaves
 identically. **Contrast the fifth instance above**, where the template lost a
@@ -759,13 +758,14 @@ litter beside the modules `fux setup` writes into `.fux/decoders/` and
   reached them would drop the product from git silently. That is the rule at
   the top of this file, holding for a line that is not a plane.
 
-**The starter `.fux/sources/urls` header is DERIVED from the list spec**, not
-transcribed. It said *"Two attributes, and the set is closed"* while the spec
-had grown to seven, and *"`fux ingest` re-fetches every line"*, which stopped
-being true when narrow-by-default landed and again when `update=never` did.
-Every repo set up in between committed both sentences. `_seed_types` already
-had the rule this needed — *derived, never transcribed* — so the file cannot
-disagree with the engine that wrote it.
+**The starter `.fux/sources.yaml` header is a template**,
+`templates/sources.yaml.txt` ([L12](0014_LAW-12-values-live-in-config.md)), and
+the file is parsed by `sourcesfile.parse` before it is written, so a header that
+broke the subset could never be seeded. ⚠ **Its prose names the URL attribute
+set by hand**, which is the shape W-140 row 18 warned about — a transcribed
+table goes stale silently, and write-if-missing hands the stale copy to every
+new repo while this one stays right. The attribute set is held by
+`sourcelist.URLS` and its Node twin; the header is not.
 
 **`fux setup` announces a hand-written `AGENTS.md`, not its own.** The
 announcement fires on a file fux did not write; it read *kept* instead, so
@@ -821,7 +821,7 @@ rulings in one sitting.** What it writes now, and the rule behind each:
 
 | what | why |
 |---|---|
-| `[sources] urls_file` beside `dirs_file` | the two committed lists are one kind of thing ([SR-CONFIG](0113_config.md) decision 11a) |
+| `[sources] sources_file` | the one committed include list, named by one key ([SR-CONFIG](0113_config.md) decision 11a) |
 | `keep`, `enrich`, `update`, `fetch_at_answer` written **live** | closed, small value domains — the written line is the complete menu. ⚠ `meta` was in this list until W-194 deleted the key, 2026-09-20 |
 | `ttl`, `sweep_minutes`, `acquired_max_bytes` **absent** | defaults that may move; leaving them out is how a new value reaches this repo without an edit |
 | `[sources.url.config]`, shared and empty, with how a per-fetcher sub-table works | one flat table refused every mixed-fetcher repo (decision 8a). **No per-fetcher sub-table is scaffolded since W-289**: they were derived from the two fetcher templates, which are packages now and may not be installed when setup runs — a scaffold derived from them would differ by machine |
@@ -886,23 +886,6 @@ ruling and for the same reason.
   a repo scaffolded today keeps fetching on `fux ingest`, which is what its
   author saw written in their own file.
 
-⚠ **The starter `.fux/sources/urls` header derives its attribute table, and
-that derivation carried a wrong constant until 2026-09-15** (W-178).
-`_urls_header()` printed `<duration>` for every attribute with no enum values —
-correct while `ttl` was the only typed one, and the moment
-[SR-URL-LIST](0116_url-list.md) decision 15 made `fetch=` typed it would have
-written `fetch=<duration>` into **every repo `fux setup` touches**.
-
-🔴 **That is W-140 row 18 arriving through its own fix.** The header went stale
-by being *transcribed*; the remedy was to *derive* it; and this was the
-derivation itself asserting something only one attribute made true. The
-placeholder is `Attribute.placeholder` now — a field on the thing that knows,
-not a special case in this module. **Write-if-missing is what makes it matter:**
-a wrong header reaches new repos only, so this repository's own copy would have
-stayed right while every fresh setup handed out the defect.
-
-
-
 ⚠ **`runtime/` holds one more OBSERVED file since 2026-09-20** (W-200):
 `provenance.jsonl`, one line per document the last ingest consumed.
 
@@ -920,27 +903,9 @@ is a one-line change** — the argument above is a judgement, not a constraint.
 
 **`fux setup` stopped writing `[sources.url] fetcher` on 2026-09-20** (W-199
 D2). The key is deleted, so the scaffolded `fux.toml` carries a commented
-`[sources.url.routes]` example instead, and the generated `.fux/sources/urls`
-header prints `fetch=<name>` as **REQUIRED - no default** rather than naming a
-default it no longer has. ⚠ **That line is DERIVED from the attribute**, which
-is what stops it going stale the way W-140 row 18's transcribed table did — the
-derivation now reads `Attribute.required` as well as `Attribute.default`.
-
-**2026-09-21 — the `.fux/sources/urls` header gains the second required
-attribute** ([SR-URL-LIST](0116_url-list.md) decision 17).
-
-`setup._urls_header()` **derives** the attribute table from `URLS.attributes`, so
-`decoder=<name>  REQUIRED - no default` appeared with no edit — which is the
-point of deriving it (W-140 row 18: the header went stale by being transcribed,
-and was repaired by being derived). What is hand-written and therefore had to
-change: the worked examples, and the paragraph naming which attributes are
-mandatory.
-
-⚠ **Write-if-missing means an existing repo's header does NOT move**, and its
-list stops loading until every line carries `decoder=` — the break decision 17
-ruled. A repo that re-runs `fux setup` keeps its stale header beside a file that
-no longer parses, which is the worst pairing available and is why the error a
-line raises names the fix itself rather than pointing at the header.
+`[sources.url.routes]` example instead, and the starter `.fux/sources.yaml`
+header says `url`, `fetch` and `decoder` are **REQUIRED** — there is no
+default for either attribute.
 
 **`fux setup` seeds `formats.toml` with the caps template appended, and `fill_missing` covers the file** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27): absent is written whole, a present file gains only missing `[limits]` keys ([SR-TYPES](0128_types-list.md) decision 14).
 
@@ -1153,7 +1118,7 @@ evidence.*
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-CLI](0101_cli-surface.md) ·
 [SR-FUXIGNORE](0144_fuxignore.md) ·
 [SR-URL-INGEST](0107_url-ingest.md) · [SR-CONFIG](0113_config.md) ·
-[SR-URL-LIST](0116_url-list.md) · [SR-FETCHER](0117_fetcher.md) ·
+[SR-SOURCES](0116_url-list.md) · [SR-FETCHER](0117_fetcher.md) ·
 [SR-CDP-FETCHER](0118_cdp-fetcher.md) ·
 [SR-CACHEDIR-TAG](0121_cachedir-tag.md) · [SR-TYPES](0128_types-list.md) ·
 [SR-MAINTENANCE](0129_hooks.md) · [SR-AGENT-POLICY](0132_agent-policy.md) ·

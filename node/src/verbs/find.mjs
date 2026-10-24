@@ -10,7 +10,7 @@
  *
  * **stdout is BARE PATHS.** No `[archived]` marker, no filter note, no band —
  * `find` exists to be piped, and anything else on stdout is read by `xargs` as
- * a filename (SR-DIR-LIST decision 12). Every note goes to stderr; the flags
+ * a filename (SR-ARCHIVED-CONTENT decision 3). Every note goes to stderr; the flags
  * are carried in `--json`, which is where a machine reader should look.
  *
  * ⚠ **`find` shows no `[pinned]` marker, on either reader, and that is the

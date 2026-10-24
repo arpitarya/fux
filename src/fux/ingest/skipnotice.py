@@ -156,7 +156,7 @@ def write(root: Path, skipped) -> None:
     )
 
 
-def stale_warnings(root: Path, *, types, excludes) -> list[str]:
+def stale_warnings(root: Path, *, types) -> list[str]:
     """Lines warning that a fux-written line no longer describes its file.
 
     **This is the guard on the cost of writing the list into `.fuxignore`.** A
@@ -170,7 +170,7 @@ def stale_warnings(root: Path, *, types, excludes) -> list[str]:
     it is made *loud*. Advisory, stderr, never an error, and it names the one
     edit that fixes it.
 
-    ⚠ **It costs a byte read only for a path that passes both committed lists**
+    ⚠ **It costs a byte read only for a path that passes the type allowlist**
     — see `gitdir.would_index`. On this repo that is one file out of 599.
     """
     ignores = fuxignore.read(root)
@@ -178,7 +178,7 @@ def stale_warnings(root: Path, *, types, excludes) -> list[str]:
     for g in sorted(ignores.generated.values(), key=lambda g: g.path):
         if ignores.decide(g.path, hand_only=True, is_dir=False).ignored:
             continue  # your own rule covers it; the generated line is not what holds it out
-        if not would_index(root, g.path, excludes=excludes, types=types):
+        if not would_index(root, g.path, types=types):
             continue
         warnings.append(
             f"warning: {fuxignore.IGNORE_FILE} lists `{g.path}` as `{g.note}`, "

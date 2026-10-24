@@ -12,7 +12,7 @@ Both suites are maintained; a feature is not done until both cover it
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, listed_paths, listed_urls, sources_path, write_dirs, write_urls
 import json
 import subprocess
 import sys
@@ -43,9 +43,7 @@ def _run(cwd: Path, *args: str, check: bool = True) -> subprocess.CompletedProce
 
 def _write_fixture(root: Path) -> None:
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    dirs = root / ".fux" / "sources" / "dirs"
-    dirs.parent.mkdir(parents=True, exist_ok=True)
-    dirs.write_text("docs\n", encoding="utf-8")
+    write_dirs(root, "docs\n")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
@@ -140,9 +138,7 @@ def test_retirement_marks_and_never_demotes(tmp_path):
     `archived_weight` is **refused by name** rather than read.
     """
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    dirs = tmp_path / ".fux" / "sources" / "dirs"
-    dirs.parent.mkdir(parents=True, exist_ok=True)
-    dirs.write_text("docs\nold archived=true\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\nold archived=true\n")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
@@ -642,12 +638,12 @@ def test_an_exclusion_line_removes_a_tree_from_the_walk(tmp_path):
     (evidence / "dump.md").write_text(
         "# Why pruning failed\n\nraw output: why did pruning fail\n", encoding="utf-8"
     )
-    (tmp_path / ".fux" / "sources" / "dirs").write_text(
-        "docs\n!docs/runs/*/evidence\n", encoding="utf-8"
-    )
+    # W-294: the exclusion's one home is `.fux/.fuxignore`; the helper moves
+    # the old-grammar `!` line there as the anchored pattern setup writes.
+    write_dirs(tmp_path, "docs\n!docs/runs/*/evidence\n")
+    assert "/docs/runs/*/evidence" in (tmp_path / ".fux" / ".fuxignore").read_text(encoding="utf-8")
 
-    out = _run(tmp_path, "ingest").stdout
-    assert "excluded by !docs/runs/*/evidence" in out
+    _run(tmp_path, "ingest")
     assert "dump.md" not in _run(tmp_path, "find", "pruning", "--json").stdout
 
 
@@ -689,6 +685,7 @@ def test_setup_converts_a_leftover_types_file_and_ingest_refuses_until_it_is_gon
     # the pre-migration repo held the old file ALONE, so remove the new one.
     (config_file(tmp_path, "formats")).unlink()
     legacy = tmp_path / ".fux" / "sources" / "types"
+    legacy.parent.mkdir(parents=True, exist_ok=True)
     legacy.write_text("*.rst\n", encoding="utf-8")
 
     refused = subprocess.run([sys.executable, "-m", "fux.cli", "ingest"], cwd=tmp_path,
@@ -737,6 +734,15 @@ def test_add_records_a_url_line_and_no_fetch_keeps_it_offline(tmp_path):
     found = _run(tmp_path, "find", "handbook", "--json")
     assert "example.invalid" not in found.stdout
 
+    # W-294: the entry is a block under `urls:` in `.fux/sources.yaml`, beside
+    # the `paths:` the fixture listed — and `fux remove` deletes that block alone.
+    text = sources_path(tmp_path).read_text(encoding="utf-8")
+    assert "  - url: https://example.invalid/handbook#oncall\n    fetch: cdp\n" in text
+    assert listed_urls(tmp_path) == ["https://example.invalid/handbook#oncall"]
+    _run(tmp_path, "remove", "https://example.invalid/handbook#oncall")
+    assert listed_urls(tmp_path) == []
+    assert listed_paths(tmp_path) == ["docs"]
+
 
 def test_no_fetch_without_a_decoder_is_refused_and_writes_nothing(tmp_path):
     """🔴 The pipe ruling's one hard interaction between two flags.
@@ -753,7 +759,7 @@ def test_no_fetch_without_a_decoder_is_refused_and_writes_nothing(tmp_path):
     )
     assert refused.returncode != 0
     assert "--decoder" in refused.stderr
-    listing = tmp_path / ".fux" / "sources" / "urls"
+    listing = sources_path(tmp_path)
     # Absent is the strongest form of "no line": the refusal happens before the
     # file is even created, so `fux add` left no trace at all.
     urls = listing.read_text(encoding="utf-8") if listing.is_file() else ""
@@ -800,7 +806,7 @@ def test_add_ingests_by_default(tmp_path):
     )
 
     out = _run(tmp_path, "add", "handbook").stdout
-    assert "added     handbook archived=false" in out
+    assert "added     handbook  (paths: include)" in out
     assert "ingested" in out  # not a record-only verb
 
     assert "handbook/oncall.md" in _run(tmp_path, "find", "oncall rota").stdout
@@ -855,8 +861,8 @@ def test_remove_of_a_listed_entry_deletes_the_line(tmp_path):
     _run(tmp_path, "add", "handbook")
 
     out = _run(tmp_path, "remove", "handbook").stdout
-    assert "removed   handbook archived=false" in out
-    assert "handbook" not in (tmp_path / ".fux" / "sources" / "dirs").read_text(encoding="utf-8")
+    assert "removed   handbook\n  in .fux/sources.yaml" in out
+    assert "handbook" not in listed_paths(tmp_path)
     assert "dropped file:handbook/oncall.md from the index" in out
 
 
@@ -919,7 +925,7 @@ def test_update_is_gone_with_no_alias(tmp_path):
 
 
 def test_add_of_a_file_does_not_override_the_type_allowlist(tmp_path):
-    """Inclusion is a conjunction with no precedence (SR-DIR-LIST/SR-TYPES).
+    """Inclusion is a conjunction with no precedence (SR-SOURCES/SR-TYPES).
 
     Promoting an explicitly-added file past the allowlist would be the W-55
     defect arriving from a new direction, so the line is written, the type
@@ -935,7 +941,7 @@ def test_add_of_a_file_does_not_override_the_type_allowlist(tmp_path):
     (tmp_path / "docs" / "deploy.sh").write_text("#!/bin/sh\necho architecture\n", encoding="utf-8")
 
     out = _run(tmp_path, "add", "docs/deploy.sh").stdout
-    assert "added     docs/deploy.sh archived=false" in out
+    assert "added     docs/deploy.sh  (paths: include)" in out
     assert "not indexed docs/deploy.sh: not an indexed file type" in out
     assert "architecture" not in _run(tmp_path, "find", "architecture").stdout
 
@@ -959,7 +965,7 @@ def test_an_added_file_that_no_decoder_can_read_is_queued_not_fatal(tmp_path):
 
     added = _run(tmp_path, "add", "docs/architecture.pdf")
     assert added.returncode == 0, added.stderr
-    assert "added     docs/architecture.pdf archived=false" in added.stdout
+    assert "added     docs/architecture.pdf  (paths: include)" in added.stdout
 
     # No record: a document with no extraction behind it would rank on its
     # filename alone, which is W-55 arriving through the decoder plane.
@@ -974,7 +980,7 @@ def test_an_added_file_that_no_decoder_can_read_is_queued_not_fatal(tmp_path):
 def test_dry_run_writes_no_bytes_anywhere(tmp_path):
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")
-    dirs = tmp_path / ".fux" / "sources" / "dirs"
+    dirs = sources_path(tmp_path)
     before_list, before_shards = dirs.read_bytes(), _shards(tmp_path)
 
     _run(tmp_path, "add", "docs/format.md", "--dry-run")
@@ -1020,8 +1026,8 @@ def _url_repo(tmp_path: Path, *, extra: str = "") -> None:
     _write_fetcher(tmp_path, _LOGGING_FETCHER)
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True, exist_ok=True)
-    (fux / "sources" / "dirs").write_text("", encoding="utf-8")
-    (fux / "sources" / "urls").write_text("https://x.test/runbook fetch=mw decoder=prose\n", encoding="utf-8")
+    write_dirs(fux.parent, "")
+    write_urls(fux.parent, "https://x.test/runbook fetch=mw decoder=prose\n")
     (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
 
@@ -1097,10 +1103,8 @@ def test_a_consumer_drops_a_fetcher_in_and_names_it_on_a_line(tmp_path):
     )
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True, exist_ok=True)
-    (fux / "sources" / "dirs").write_text("", encoding="utf-8")
-    (fux / "sources" / "urls").write_text(
-        "https://wiki.test/rota fetch=glassbox decoder=prose keep=true\n", encoding="utf-8"
-    )
+    write_dirs(fux.parent, "")
+    write_urls(fux.parent, "https://wiki.test/rota fetch=glassbox decoder=prose keep=true\n")
     (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     fetchers = fux / "fetchers"
@@ -1134,8 +1138,8 @@ def test_a_fetcher_name_with_no_file_is_a_doctor_finding_not_a_parse_error(tmp_p
     )
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True, exist_ok=True)
-    (fux / "sources" / "dirs").write_text("", encoding="utf-8")
-    (fux / "sources" / "urls").write_text("https://wiki.test/rota fetch=glasbox decoder=prose\n", encoding="utf-8")
+    write_dirs(fux.parent, "")
+    write_urls(fux.parent, "https://wiki.test/rota fetch=glasbox decoder=prose\n")
     (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     (fux / "fetchers").mkdir(parents=True, exist_ok=True)

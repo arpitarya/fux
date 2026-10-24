@@ -115,7 +115,7 @@ def _declare_filters(args, dropped: int) -> None:
     """What a filter removed, on **stderr**, so stdout stays a bare path list.
 
     `find` exists to be piped; a note on stdout would be read as a filename.
-    The same reason SR-DIR-LIST decision 12 put the archived note here.
+    The same reason SR-ARCHIVED-CONTENT decision 3 put the archived note here.
     """
     if not dropped:
         return
@@ -216,7 +216,7 @@ def cmd_find(args) -> int:
 
     # **Bare paths, deliberately unmarked.** `find` exists to be piped, so a
     # `[archived]` prefix on stdout would be read as part of the filename — the
-    # concrete reason SR-DIR-LIST decision 12 put the note on stderr. The flag
+    # concrete reason SR-ARCHIVED-CONTENT decision 3 put the note on stderr. The flag
     # is carried in `--json`, which is where a machine reader should look.
     for r in results:
         print(r.loc)

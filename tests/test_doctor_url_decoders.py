@@ -17,7 +17,7 @@ is, which is why the row lists a directory instead of loading it.
 from __future__ import annotations
 
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, sources_path, write_urls
 from fux import doctor
 from fux.store import acquired
 from l12_fixtures import write_config
@@ -41,7 +41,7 @@ def _repo(tmp_path, *, urls="", decoders=()):
             )
     src = tmp_path / ".fux" / "sources"
     src.mkdir(parents=True, exist_ok=True)
-    (src / "urls").write_text(urls, encoding="utf-8")
+    write_urls(tmp_path, urls)
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     return tmp_path
@@ -103,7 +103,10 @@ def test_an_excluded_or_absent_list_is_not_a_finding(tmp_path):
 def test_a_list_that_does_not_parse_is_skipped_rather_than_reported_twice(tmp_path):
     """A line with no `decoder=` at all fails the PARSE, and the fetcher-bindings
     row already reports that. Two rows saying one thing is noise."""
-    root = _repo(tmp_path, urls="https://x.test/a fetch=http\n")
+    root = _repo(tmp_path)
+    sources_path(root).write_text(
+        "urls:\n  - url: https://x.test/a\n    fetch: http\n", encoding="utf-8"
+    )
     row = _row(root, "url decoders")
     assert row.ok and "does not parse" in row.detail
 

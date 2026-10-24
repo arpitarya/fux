@@ -7,10 +7,10 @@ description: The single best answer the index can give — a fetched, re-scored 
 status: accepted
 date: 2026-08-18
 feature: "`fux answer` — one answer, its footing stated, and the report of what changed since the question was last asked"
-owns: [src/fux/query/refer_answer.py@4b2b86bbe1e8]
+owns: [src/fux/query/refer_answer.py@5068425dc3d7]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 1cba52c7a94d3b64389b3a76130fb7933ec9a64953213b3cbbd24bffa46c362a
+content_sha: 017e6ed3aeac8b0dbfbf6b46554fa954182bbd7ad9e02205d1b626ea30f1677a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

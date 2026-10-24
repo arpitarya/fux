@@ -146,9 +146,9 @@ golden-guards:
     [ -x .claude/hooks/guard-golden-traversal.sh ] \
         && ok "guard-golden-traversal.sh is executable (W-223)" \
         || bad "guard-golden-traversal.sh missing or not executable"
-    grep -q '!work/golden' .fux/sources/dirs \
+    grep -q '^/work/golden ' .fux/.fuxignore \
         && ok "excluded from fux's own index" \
-        || bad "not excluded from .fux/sources/dirs"
+        || bad "not excluded in .fux/.fuxignore"
     # ⚠ Config surfaces only. `.claude/.locks/` is the per-asset write lock
     # (SR-WORK-BLOCKERS decision 7) and names every file a session EDITS — so a
     # bare `grep -r .claude/` flags the session that hardened score.py as if it

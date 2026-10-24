@@ -359,7 +359,7 @@ def _declared_ttls(root) -> dict[str, int]:
     source = load_config(root).url
     if source is None:
         return {}
-    entries = urlsrc.read_urls(root, source.urls_file)
+    entries = urlsrc.read_urls(root, source.sources_file)
     out: dict[str, int] = {}
     for resolved in urlsrc.resolve_urls(entries, source):
         seconds = sourcelist.parse_duration(resolved.ttl)

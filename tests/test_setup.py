@@ -17,7 +17,8 @@ import pytest
 
 from fux import setup as setup_mod
 from fux.store import fuxdir
-from l12_fixtures import write_config
+from fux.acquire import sourcesfile
+from l12_fixtures import listed_paths, sources_path, write_config, write_dirs
 
 TEMPLATES = Path(__file__).resolve().parents[1] / "src" / "fux" / "templates"
 
@@ -102,13 +103,14 @@ def test_the_http_fetcher_rejects_an_unknown_config_key():
 # -- what setup does -------------------------------------------------------
 
 
-def test_setup_writes_no_fetcher_and_no_decoder_and_both_source_lists(tmp_path):
-    """SR-PLUGINS P9: the declared package runs; nothing is seeded."""
+def test_setup_writes_no_fetcher_and_no_decoder_and_the_one_source_manifest(tmp_path):
+    """SR-PLUGINS P9: the declared package runs; nothing is seeded. W-294: the
+    two source lists are one `.fux/sources.yaml`, and `.fux/sources/` is gone."""
     report = setup_mod.run(tmp_path)
     assert not (tmp_path / ".fux" / "fetchers").exists()
     assert not (tmp_path / ".fux" / "decoders").exists()
-    assert (tmp_path / ".fux" / "sources" / "dirs").is_file()
-    assert (tmp_path / ".fux" / "sources" / "urls").is_file()
+    assert sources_path(tmp_path).is_file()
+    assert not (tmp_path / ".fux" / "sources").exists()
     assert ".fux/config/plugins.toml" in report.written
     assert report.kept == []
 
@@ -211,24 +213,28 @@ def test_a_fetcher_file_written_by_hand_survives_setup(tmp_path):
 
 def test_setup_never_overwrites_an_edited_source_list(tmp_path):
     setup_mod.run(tmp_path)
-    listing = tmp_path / ".fux" / "sources" / "dirs"
-    listing.write_text("handbook\n", encoding="utf-8")
+    listing = write_dirs(tmp_path, "handbook\n")
+    before = listing.read_bytes()
     setup_mod.run(tmp_path)
-    assert listing.read_text(encoding="utf-8") == "handbook\n"
+    assert listing.read_bytes() == before
+    assert listed_paths(tmp_path) == ["handbook"]
 
 
-def test_setup_seeds_the_dirs_list_from_what_the_repo_actually_has(tmp_path):
+def test_setup_seeds_the_paths_from_what_the_repo_actually_has(tmp_path):
     (tmp_path / "docs").mkdir()
     (tmp_path / "README.md").write_text("# r\n", encoding="utf-8")
     setup_mod.run(tmp_path)
-    lines = (tmp_path / ".fux" / "sources" / "dirs").read_text(encoding="utf-8").splitlines()
-    assert [line for line in lines if line and not line.startswith("#")] == ["README.md", "docs"]
+    assert listed_paths(tmp_path) == ["README.md", "docs"]
+    assert "paths:\n  include:\n    - README.md\n    - docs\n" in sources_path(tmp_path).read_text(encoding="utf-8")
 
 
 def test_setup_seeds_nothing_it_cannot_see(tmp_path):
+    """No seed, no `paths:` key — an empty list is refused, so the starter is
+    the header alone: a file that lists nothing and still loads."""
     setup_mod.run(tmp_path)
-    lines = (tmp_path / ".fux" / "sources" / "dirs").read_text(encoding="utf-8").splitlines()
-    assert [line for line in lines if line and not line.startswith("#")] == []
+    text = sources_path(tmp_path).read_text(encoding="utf-8")
+    assert all(not line or line.startswith("#") for line in text.splitlines())
+    assert listed_paths(tmp_path) == []
 
 
 def test_setup_writes_a_types_file_ingest_can_actually_read(tmp_path):
@@ -403,13 +409,16 @@ def test_setup_never_overwrites_an_edited_config(tmp_path):
     consumer wrote survives byte for byte; the keys they lack are added."""
     from fux.config import load
 
-    (tmp_path / "fux.toml").write_text('[sources]\ndirs_file = "mine"\n', encoding="utf-8")
+    (tmp_path / "fux.toml").write_text('[sources]\nsources_file = "mine.yaml"\n', encoding="utf-8")
     report = setup_mod.run(tmp_path)
     text = (tmp_path / "fux.toml").read_text(encoding="utf-8")
-    assert text.startswith('[sources]\ndirs_file = "mine"\n')
+    assert text.startswith('[sources]\nsources_file = "mine.yaml"\n')
     assert "fux.toml" in report.kept
     assert "fux.toml: [observe] max_ms" in report.written
-    assert load(tmp_path).dirs_file == "mine"
+    assert load(tmp_path).sources_file == "mine.yaml"
+    # The manifest is seeded where the consumer's key points, not the template's.
+    assert (tmp_path / "mine.yaml").is_file()
+    assert not sources_path(tmp_path).exists()
 
 
 def test_the_generated_config_loads(tmp_path):
@@ -417,23 +426,17 @@ def test_the_generated_config_loads(tmp_path):
 
     setup_mod.run(tmp_path)
     config = load(tmp_path)
-    assert config.dirs_file == ".fux/sources/dirs"
+    assert config.sources_file == ".fux/sources.yaml"
     assert config.shards == 256
     # ⚠ CHANGED BY W-85. This asserted `config.url is None` — `[sources.url]`
     # shipped commented out, which is what made the concurrency bound invisible.
     # The table is live now and the OPT-IN MOVED TO THE URL LIST: `[sources.url]`
-    # says *how* to fetch, `.fux/sources/urls` says *whether*, and it is empty.
+    # says *how* to fetch, the `urls:` half of `.fux/sources.yaml` says
+    # *whether*, and it is empty.
     assert config.url is not None
-    # ...and the list it points at is header comments only. Not one address, so
+    # ...and the manifest it points at lists no URL. Not one address, so
     # nothing can be fetched: the opt-in is a URL existing, not a table existing.
-    from fux.acquire import sourcelist
-
-    listed = sourcelist.parse(
-        (tmp_path / config.url.urls_file).read_text(encoding="utf-8"),
-        sourcelist.URLS,
-        origin=config.url.urls_file,
-    )
-    assert listed == []
+    assert sourcesfile.read_urls(tmp_path, config.url.sources_file) == []
 
 
 # -- W-85: the concurrency knob is PRESENT, LIVE and REQUIRED ---------------
@@ -549,9 +552,7 @@ def test_a_plain_ingest_puts_no_code_in_the_repo(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
-    listing = tmp_path / ".fux" / "sources" / "dirs"
-    listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text("docs\n", encoding="utf-8")
+    write_dirs(tmp_path, "docs\n")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
@@ -777,3 +778,116 @@ def test_every_template_pii_rule_exists_in_this_repos_pii_toml():
     mine = {r["name"] for r in tomllib.loads((config_file(root, "pii")).read_text(encoding="utf-8"))["rule"]}
     assert shipped, "the template parsed to no rules"
     assert shipped <= mine, f".fux/config/pii.toml lost template rule(s): {sorted(shipped - mine)}"
+
+
+# -- W-294: the retired `.fux/sources/` lists, converted once -----------------
+
+
+_LEGACY_DIRS = "# my corpus\ndocs\nhandbook enrich=true  # the hand book\nold archived=true\n!work/golden\n"
+_LEGACY_URLS = (
+    "# the wiki\n"
+    "https://wiki.test/a fetch=cdp decoder=html ttl=7d\n"
+    "https://x.test/b fetch=http decoder=prose keep=false\n"
+)
+
+
+def _legacy_sources(root, *, toml=True):
+    """A pre-W-294 repo: both line-grammar lists, a hand `.fuxignore`, and the
+    two retired `fux.toml` keys naming the lists."""
+    legacy = root / ".fux" / "sources"
+    legacy.mkdir(parents=True)
+    (legacy / "dirs").write_text(_LEGACY_DIRS, encoding="utf-8")
+    (legacy / "urls").write_text(_LEGACY_URLS, encoding="utf-8")
+    (root / ".fux" / ".fuxignore").write_text("build/\n", encoding="utf-8")
+    if toml:
+        (root / "fux.toml").write_text(
+            '[sources]\ndirs_file = ".fux/sources/dirs"\nurls_file = ".fux/sources/urls"\n',
+            encoding="utf-8",
+        )
+
+
+def test_setup_converts_both_retired_lists_into_one_manifest(tmp_path):
+    _legacy_sources(tmp_path)
+    report = setup_mod.run(tmp_path, agents=False)
+    assert report.converted_sources
+    assert sorted(report.deleted_lists) == [".fux/sources/dirs", ".fux/sources/urls"]
+    assert not (tmp_path / ".fux" / "sources").exists()
+
+    sources = sourcesfile.read(tmp_path, sourcesfile.FILE)
+    flags = {e.value: (e.attrs["archived"], e.attrs["enrich"]) for e in sources.paths}
+    assert flags == {"docs": ("false", "false"), "handbook": ("false", "true"), "old": ("true", "false")}
+    urls = {e.value: e for e in sources.urls}
+    assert sorted(urls) == ["https://wiki.test/a", "https://x.test/b"]
+    assert (urls["https://wiki.test/a"].attrs["fetch"], urls["https://wiki.test/a"].attrs["ttl"]) == ("cdp", "7d")
+    assert urls["https://x.test/b"].attrs["keep"] == "false"
+
+    text = sources_path(tmp_path).read_text(encoding="utf-8")
+    for comment in ("# my corpus", "# the hand book", "# the wiki"):
+        assert comment in text, f"{comment!r} was not carried"
+    assert "!" not in "".join(l for l in text.splitlines() if not l.lstrip().startswith("#"))
+
+
+def test_setup_moves_a_bang_line_into_fuxignore_anchored_above_the_hand_patterns(tmp_path):
+    _legacy_sources(tmp_path)
+    report = setup_mod.run(tmp_path, agents=False)
+    assert report.moved_dirs_exclusions == ["/work/golden"]
+    lines = [l for l in (tmp_path / ".fux" / ".fuxignore").read_text(encoding="utf-8").splitlines()
+             if l and not l.startswith("#")]
+    assert lines.index("/work/golden") < lines.index("build/"), lines
+
+
+def test_setup_writes_fuxignore_before_it_deletes_the_dirs_list(tmp_path, monkeypatch):
+    """🔴 W-294 step 5: ORDER IS A LAW. On this repo the `!work/golden` lines are
+    an L11 guard; no instant may exist in which neither file excludes it."""
+    _legacy_sources(tmp_path)
+    ignore = tmp_path / ".fux" / ".fuxignore"
+    dirs = tmp_path / ".fux" / "sources" / "dirs"
+    seen = []
+    real_unlink = Path.unlink
+
+    def watching(self, *a, **k):
+        if self == dirs:
+            seen.append("/work/golden" in ignore.read_text(encoding="utf-8"))
+        return real_unlink(self, *a, **k)
+
+    monkeypatch.setattr(Path, "unlink", watching)
+    setup_mod.run(tmp_path, agents=False)
+    assert seen == [True]
+
+
+def test_setup_rewrites_the_two_retired_keys_as_one(tmp_path):
+    from fux.config import load
+
+    _legacy_sources(tmp_path)
+    report = setup_mod.run(tmp_path, agents=False)
+    assert report.migrated_keys == ["dirs_file", "urls_file"]
+    text = (tmp_path / "fux.toml").read_text(encoding="utf-8")
+    assert "dirs_file" not in text and "urls_file" not in text
+    assert text.count("sources_file") == 1
+    assert load(tmp_path).sources_file == sourcesfile.FILE
+
+
+def test_setup_converts_write_if_missing_and_never_over_an_existing_manifest(tmp_path):
+    """A repo that already has `.fux/sources.yaml` has decided: setup neither
+    rewrites it nor deletes the old lists, and the reader refuses until a human
+    removes them — never a silent pick between two files."""
+    from fux.errors import FuxError
+
+    _legacy_sources(tmp_path, toml=False)
+    mine = write_dirs(tmp_path, "handbook\n")
+    before = mine.read_bytes()
+    report = setup_mod.run(tmp_path, agents=False)
+    assert not report.converted_sources
+    assert mine.read_bytes() == before
+    assert (tmp_path / ".fux" / "sources" / "dirs").is_file()
+    with pytest.raises(FuxError, match=r"\.fux/sources/dirs still exists"):
+        sourcesfile.read(tmp_path, sourcesfile.FILE)
+
+
+def test_a_second_setup_after_conversion_changes_nothing(tmp_path):
+    _legacy_sources(tmp_path)
+    setup_mod.run(tmp_path, agents=False)
+    snapshot = {p: p.read_bytes() for p in (sources_path(tmp_path), tmp_path / ".fux" / ".fuxignore", tmp_path / "fux.toml")}
+    report = setup_mod.run(tmp_path, agents=False)
+    assert not report.converted_sources and not report.migrated_keys
+    assert {p: p.read_bytes() for p in snapshot} == snapshot

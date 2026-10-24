@@ -2958,7 +2958,7 @@ a verdict, a hold lifted, or fifty goldens written by hand.
 | W-46 · W-48 — two query defects | SR-CLI · SR-ASK · SR-ANSWER | n/a |
 | **M3** the graph lane | [SR-GRAPH](../records/0126_graph.md) ✅ | **no** — W-57 |
 | **M4 core** the refer plane | [SR-REFER](../records/0127_refer-plane.md) ✅ (2026-08-21, veto 2 open) | **partly** — R4 passed; the budget sweep is W-59 |
-| W-45 + W-55 — what fux indexes | [SR-DIR-LIST](../records/0120_dir-list.md) · [SR-TYPES](../records/0128_types-list.md) ✅ | **no** — rides with W-52 |
+| W-45 + W-55 — what fux indexes | [SR-DIR-LIST](../archive/records/0120_dir-list.md) · [SR-TYPES](../records/0128_types-list.md) ✅ | **no** — rides with W-52 |
 | W-56 — both lab environments | SETUP-LAB · SETUP-PLAYGROUND | rebuilt, under git |
 | **M5** maintenance | [SR-MAINTENANCE](../records/0129_hooks.md) ✅ · [SR-MERGE-DRIVER](../records/0130_merge-driver.md) ✅ | **ruled, not passed** — W-66 builds it, W-67 repairs R6's instrument |
 | W-60 — the TTL fetch cache | [SR-REFER](../records/0127_refer-plane.md) 5a-5c ✅ | n/a |

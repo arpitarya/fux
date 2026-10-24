@@ -416,7 +416,7 @@ def _fetcher_routes(root: Path) -> Check:
     """
     from .config import load as load_config
     from .acquire import routes as routes_mod
-    from .acquire import sourcelist
+    from .acquire import sourcelist, sourcesfile
 
     name = "fetcher routes"
     try:
@@ -458,10 +458,7 @@ def _fetcher_routes(root: Path) -> Check:
         )
 
     try:
-        entries = sourcelist.parse(
-            (root / config.url.urls_file).read_text(encoding="utf-8"),
-            sourcelist.URLS, origin=config.url.urls_file,
-        )
+        entries = sourcesfile.parse((root / config.url.sources_file).read_text(encoding="utf-8"), origin=config.url.sources_file).urls
     except (OSError, FuxError):
         entries = []
 
@@ -495,7 +492,7 @@ def _fetcher_routes(root: Path) -> Check:
 def _pinned_fetchers(root: Path) -> Check:
     """Lines whose `fetch=` pin disagrees with what the routes table now says.
 
-    🔴 **The whole cost of SR-URL-LIST decision 16, made visible.** Arpit ruled
+    🔴 **The whole cost of SR-SOURCES decision 16, made visible.** Arpit ruled
     that every line states a resolved stem, so a route changed later moves
     nothing — this row is the only thing that tells a consumer their table and
     their list have drifted apart, and it names the one-line fix per line.
@@ -506,7 +503,7 @@ def _pinned_fetchers(root: Path) -> Check:
     """
     from .config import load as load_config
     from .acquire import routes as routes_mod
-    from .acquire import sourcelist
+    from .acquire import sourcelist, sourcesfile
 
     name = "pinned fetchers"
     try:
@@ -519,10 +516,7 @@ def _pinned_fetchers(root: Path) -> Check:
     if not table:
         return Check(name, True, "no routes table - nothing for a pin to disagree with", level="warn")
     try:
-        entries = sourcelist.parse(
-            (root / config.url.urls_file).read_text(encoding="utf-8"),
-            sourcelist.URLS, origin=config.url.urls_file,
-        )
+        entries = sourcesfile.parse((root / config.url.sources_file).read_text(encoding="utf-8"), origin=config.url.sources_file).urls
         compiled = routes_mod.validate(table, where="fux.toml: [sources.url.routes]")
     except (OSError, FuxError):
         return Check(name, True, "skipped (the list or the table does not read)", level="warn")
@@ -577,7 +571,7 @@ def _url_decoders(root: Path) -> Check:
     """
     from .config import load as load_config
     from .decode import BUILTIN_MODULES, CONSUMER_DIR, PROSE_DECODER
-    from .acquire import sourcelist
+    from .acquire import sourcelist, sourcesfile
 
     name = "url decoders"
     try:
@@ -587,17 +581,15 @@ def _url_decoders(root: Path) -> Check:
     if config.url is None:
         return Check(name, True, "no [sources.url] - no URL lines to resolve")
 
-    path = root / config.url.urls_file
+    path = root / config.url.sources_file
     if not path.is_file():
-        return Check(name, True, f"no {config.url.urls_file} yet")
+        return Check(name, True, f"no {config.url.sources_file} yet")
     try:
-        entries = sourcelist.parse(
-            path.read_text(encoding="utf-8"), sourcelist.URLS, origin=config.url.urls_file
-        )
+        entries = sourcesfile.parse(path.read_text(encoding="utf-8"), origin=config.url.sources_file).urls
     except (FuxError, OSError):
         return Check(
             name, True,
-            f"skipped ({config.url.urls_file} does not parse - the fetcher bindings row "
+            f"skipped ({config.url.sources_file} does not parse - the fetcher bindings row "
             "reports that)",
             level="warn",
         )
@@ -667,7 +659,7 @@ def _observed_types(root: Path) -> Check:
     decoder.
     """
     from .config import load as load_config
-    from .acquire import sourcelist, urlsrc
+    from .acquire import sourcesfile, urlsrc
     from .store import acquired
 
     name = "observed types"
@@ -678,10 +670,7 @@ def _observed_types(root: Path) -> Check:
     if config.url is None:
         return Check(name, True, "no [sources.url] - nothing is fetched")
     try:
-        entries = sourcelist.parse(
-            (root / config.url.urls_file).read_text(encoding="utf-8"),
-            sourcelist.URLS, origin=config.url.urls_file,
-        )
+        entries = sourcesfile.parse((root / config.url.sources_file).read_text(encoding="utf-8"), origin=config.url.sources_file).urls
     except (FuxError, OSError):
         return Check(name, True, "skipped (the URL list does not read)", level="warn")
     blobs = acquired.read_manifest(root)
@@ -751,7 +740,7 @@ def _fetcher_bindings(root: Path) -> Check:
     when something is already wrong.
     """
     from .config import load as load_config
-    from .acquire import sourcelist, urlsrc
+    from .acquire import sourcesfile, urlsrc
 
     name = "fetcher bindings"
     try:
@@ -761,15 +750,13 @@ def _fetcher_bindings(root: Path) -> Check:
     if config.url is None:
         return Check(name, True, "no [sources.url] - no URL lines to resolve")
 
-    path = root / config.url.urls_file
+    path = root / config.url.sources_file
     if not path.is_file():
-        return Check(name, True, f"no {config.url.urls_file} yet")
+        return Check(name, True, f"no {config.url.sources_file} yet")
     try:
-        entries = sourcelist.parse(
-            path.read_text(encoding="utf-8"), sourcelist.URLS, origin=config.url.urls_file
-        )
+        entries = sourcesfile.parse(path.read_text(encoding="utf-8"), origin=config.url.sources_file).urls
     except (FuxError, OSError) as exc:
-        return Check(name, False, f"{config.url.urls_file}: {exc}")
+        return Check(name, False, f"{config.url.sources_file}: {exc}")
 
     resolved = urlsrc.resolve_urls(entries, config.url)
     if not resolved:
@@ -833,7 +820,7 @@ def _pinned_without_bytes(root: Path) -> Check:
         return Check(name, True, "fetch_at_answer is on - answers may verify against the source")
 
     try:
-        entries = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
+        entries = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.sources_file), config.url)
     except (FuxError, OSError):
         return Check(name, True, "no readable url list - another check owns that")
     if not entries:
@@ -1532,18 +1519,12 @@ def _fetcher_capabilities(root: Path) -> Check:
 
 
 def _ignore_health(root: Path) -> Check:
-    """`.fux/.fuxignore` parses, and states nothing the old lists also state.
+    """`.fux/.fuxignore` parses.
 
-    **Two failures, one check, and neither is fatal to `doctor`'s exit code by
-    accident.** A `.fuxignore` that will not parse stops `fux ingest` outright,
-    so it is an `error`; a pattern written in both `.fuxignore` and a
-    `sources/` `!` line changes nothing today and is a `warn`.
-
-    ⚠ **The duplicate is worth a line precisely because it is currently
-    harmless.** `!` subtracts in `sources/` and re-includes in `.fuxignore`, so
-    the two copies agree only for as long as nobody edits either one. The day
-    someone puts a `!` in front of the `.fuxignore` copy they get the opposite
-    of what the other file says, silently. This check is early for that.
+    A `.fuxignore` that will not parse stops `fux ingest` outright, so it is an
+    `error`. ⚠ **There is no duplicate half any more** (W-294): it warned when a
+    pattern was stated both here and as a `!` line in `.fux/sources/dirs`, and
+    `.fux/sources.yaml` has no `!` lines — this file is exclusion's one home.
     """
     from .acquire import fuxignore
 
@@ -1554,18 +1535,6 @@ def _ignore_health(root: Path) -> Check:
         rules = fuxignore.read(root).rules
     except (FuxError, OSError) as exc:
         return Check("fuxignore usable", False, f"{fuxignore.IGNORE_FILE}: {exc}")
-    dirs_file = _dirs_file(root)
-    duplicates = (
-        fuxignore.duplicate_warnings(root, dirs_file=dirs_file) if dirs_file is not None else []
-    )
-    if duplicates:
-        return Check(
-            "fuxignore usable",
-            False,
-            f"{len(duplicates)} pattern(s) stated in both {fuxignore.IGNORE_FILE} and "
-            f"{dirs_file} - run `fux ingest --list-skipped` for the detail",
-            level="warn",
-        )
     active = sum(1 for r in rules if not r.negate)
     return Check(
         "fuxignore usable",
@@ -1636,46 +1605,6 @@ def _ignore_reachable(root: Path) -> Check:
         )
         + (f"; and {len(shadowed) - 5} more" if len(shadowed) > 5 else "")
         + ". Delete the dead line, or move it below the one that overrides it",
-        level="warn",
-    )
-
-
-def _dirs_exclusions_migrated(root: Path) -> Check:
-    """`!` lines still in `.fux/sources/dirs`, and the one-line move for each.
-
-    **`fux remove` stopped writing them on 2026-09-14** (W-165 fix 1): the
-    exclusion goes to `.fux/.fuxignore`, which SR-FUXIGNORE made the one place a
-    path is kept out of the index. The `!` lines already written keep being read
-    — SR-DIR-LIST decision 2a, and breaking them would be a silent re-inclusion,
-    which is the worse direction — so this is a `warn` and never an error.
-
-    ⚠ **Not the same finding as `_ignore_health`'s duplicate.** That one fires
-    when a pattern is in *both* files and is about the two spellings drifting
-    apart. This fires on *every* survivor, duplicated or not, because the
-    migration is owed for the ones nothing duplicates too — and those are the
-    ones no other check would ever mention.
-
-    **ASCII only** - it is printed, and printed text reaches a Windows console.
-    """
-    from .acquire import fuxignore
-
-    dirs_file = _dirs_file(root)
-    if dirs_file is None:
-        return Check("dirs exclusions migrated", True, "not checked - fux.toml does not load; see its row")
-    try:
-        notes = fuxignore.dirs_exclusion_notes(root, dirs_file=dirs_file)
-    except (FuxError, OSError) as exc:
-        return Check("dirs exclusions migrated", False, f"{dirs_file}: {exc}", level="warn")
-    if not notes:
-        return Check(
-            "dirs exclusions migrated",
-            True,
-            f"no `!` lines in {dirs_file} - exclusions live in {fuxignore.IGNORE_FILE}",
-        )
-    return Check(
-        "dirs exclusions migrated",
-        False,
-        f"{len(notes)} `!` line(s) left in {dirs_file}. " + " ".join(notes),
         level="warn",
     )
 
@@ -1845,15 +1774,15 @@ def _starter_refusals_untouched(root: Path) -> Check:
     )
 
 
-def _dirs_file(root: Path) -> "str | None":
-    """`[sources] dirs_file` as `fux.toml` names it — `None` when the file does
+def _sources_file(root: Path) -> "str | None":
+    """`[sources] sources_file` as `fux.toml` names it — `None` when the file does
     not load, which its own row reports. There is no default path to fall back
     to (SR-LAW-12), and checking one the repo does not use would be a row about
     the wrong file."""
     from .config import load as load_config
 
     try:
-        return load_config(root).dirs_file
+        return load_config(root).sources_file
     except FuxError:
         return None
 
@@ -1938,7 +1867,7 @@ def _glob_suffix(glob: str) -> str:
 
 
 def _listed_dirs_exist(root: Path) -> Check:
-    """A line in `.fux/sources/dirs` naming a path that is not on disk.
+    """A `paths:` entry in `.fux/sources.yaml` naming a path that is not on disk.
 
     🔴 **This is not cosmetic: `walk_sources` RAISES on it**, so the next
     `fux ingest` in this repo exits 1 — which is why `fux add` refuses a path
@@ -1951,25 +1880,23 @@ def _listed_dirs_exist(root: Path) -> Check:
     `ingest` both refuse on a branch where a documented directory is simply not
     checked out, which is a legitimate state to be in for an afternoon.
 
-    ⚠ **Exclusions are not checked.** A `!` line names a pattern, not a path,
-    and a pattern matching nothing today is exactly what a pattern is for.
+    **Path entries only** (W-294): the `urls:` half names no file, and its
+    entries are the URL rows' business.
     """
-    from .acquire import sourcelist
+    from .acquire import sourcesfile
 
-    dirs_file = _dirs_file(root)
-    if dirs_file is None:
+    sources_file = _sources_file(root)
+    if sources_file is None:
         return Check("listed directories exist", True, "not checked - fux.toml does not load; see its row")
-    path = root / dirs_file
+    path = root / sources_file
     if not path.is_file():
-        return Check("listed directories exist", True, f"{dirs_file} absent")
+        return Check("listed directories exist", True, f"{sources_file} absent")
     try:
-        entries = sourcelist.parse(
-            path.read_text(encoding="utf-8"), sourcelist.DIRS, origin=str(path)
-        )
+        entries = sourcesfile.parse(path.read_text(encoding="utf-8"), origin=str(path)).paths
     except (FuxError, OSError) as exc:
-        return Check("listed directories exist", False, f"{dirs_file}: {exc}", level="warn")
+        return Check("listed directories exist", False, f"{sources_file}: {exc}", level="warn")
 
-    gone = [e.value for e in entries if not e.exclude and not (root / e.value).exists()]
+    gone = [e.value for e in entries if not (root / e.value).exists()]
     if not gone:
         return Check(
             "listed directories exist",
@@ -2198,7 +2125,7 @@ def _unfetched_note(root: Path, indexed: list[str]) -> list[str]:
         config = load_config(root)
         if config.url is None:
             return []
-        listed = [e.value for e in urlsrc.read_urls(root, config.url.urls_file)]
+        listed = [e.value for e in urlsrc.read_urls(root, config.url.sources_file)]
     except Exception:
         # The list or the config is another row's finding — `fux.toml loads`
         # and `url sources` both name it. Never two reports for one cause.
@@ -2242,7 +2169,7 @@ def _pinned_note(root: Path) -> list[str]:
         config = load_config(root)
         if config.url is None:
             return []
-        resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
+        resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.sources_file), config.url)
     except Exception:
         # The list or the config is another row's finding -- `fux.toml loads`
         # and `url sources` both name it. Never two reports for one cause.
@@ -2766,7 +2693,6 @@ ROWS: tuple[tuple[str, str], ...] = (
     ("core", "_types_health"),
     ("core", "_ignore_health"),
     ("core", "_ignore_reachable"),
-    ("core", "_dirs_exclusions_migrated"),
     ("writer", "_stale_redaction"),
     # W-163 — the setup-drift rows. Grouped here, after the files they read
     # have each had their own "does it load" row: a stale key set is only worth

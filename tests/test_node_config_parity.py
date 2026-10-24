@@ -272,38 +272,47 @@ def test_the_node_pii_gate_path_is_the_python_one():
     assert rules_path(Path(".")).as_posix() == fixed("files", "pii")
 
 
-def test_the_dirs_attribute_set_is_the_python_one():
+def test_the_url_attribute_set_is_the_python_one():
     """🔴 **The gap `test_node_twins`'s narrowing leaves open, closed by parity.**
 
-    `node/src/ingest/sourcelist.mjs` mirrors the **`dirs` half** of
-    `src/fux/acquire/sourcelist.py` — Node never fetches, so the `urls` spec
-    decides nothing there. The freshness check therefore narrows that twin to
-    `parse`, the shared grammar engine; a change to the `dirs` **attribute
-    tuple** lives at module level, outside any `def`, and git's hunk-context
-    header cannot name it.
+    `node/src/ingest/sourcelist.mjs` reads `.fux/sources.yaml` (W-294) and
+    validates a `urls:` entry against its own `URL_ATTRIBUTES` table — a
+    module-level constant, outside any `def`, which git's hunk-context header
+    cannot name. So the table is held by its VALUE: name, legal values (or
+    the typed validator standing in for them), and whether an entry must
+    state it, in Python's `URLS.names` order. A Node reader with a different
+    set would refuse — or accept — a committed file Python reads the other
+    way, which is the loud half and the lenient half disagreeing.
 
-    So the tuple is held by its VALUE rather than by whether anyone edited the
-    file, which is the better check of the two: `query/__init__.py` catches a
-    refusal from this parser and degrades to *no archived directories*, so a
-    Node reader with a different attribute set returns a **different archived
-    set from the same committed file** — the loud half and the lenient half
-    disagreeing, which is worse than either alone.
+    The path flags need no row here: both readers take them from
+    `constants.toml [sources_file] path_lists`, one value.
     """
-    from fux.acquire.sourcelist import DIRS
+    from fux.acquire import sourcelist
 
     source = _source("ingest/sourcelist.mjs")
-    body = re.search(r"const DIRS_ATTRIBUTES = \[(.*?)\n\];", source, re.S)
-    assert body, "no `DIRS_ATTRIBUTES` in ingest/sourcelist.mjs"
-
+    body = re.search(r"const URL_ATTRIBUTES = \[(.*?)\n\];", source, re.S)
+    assert body, "no `URL_ATTRIBUTES` in ingest/sourcelist.mjs"
     rows = re.findall(
-        r'\[\s*"([a-z_]+)"\s*,\s*\[([^\]]*)\]\s*,\s*"([a-z]+)"', body.group(1)
+        r'\[\s*"([a-z_]+)"\s*,\s*(\[[^\]]*\]|"[a-z_]+")\s*,\s*(true|false)\s*\]', body.group(1)
     )
+    validators = {
+        sourcelist._fetcher_reason: "fetcher",
+        sourcelist._url_decoder_reason: "url_decoder",
+        sourcelist._ttl_reason: "duration",
+    }
     node = [
-        (name, tuple(v.strip().strip('"') for v in vals.split(",")), default)
-        for name, vals, default in rows
+        (
+            name,
+            tuple(v.strip().strip('"') for v in vals.strip("[]").split(",")) if vals.startswith("[") else vals.strip('"'),
+            required == "true",
+        )
+        for name, vals, required in rows
     ]
-    python = [(a.name, a.values, a.default) for a in DIRS.attributes]
+    python = [
+        (a.name, a.values if a.values else validators[a.validate], a.required)
+        for a in sourcelist.URLS.attributes
+    ]
     assert node == python, (
-        "the two readers disagree about `.fux/sources/dirs`:\n"
+        "the two readers disagree about a `.fux/sources.yaml` URL entry:\n"
         f"  node:   {node}\n  python: {python}"
     )

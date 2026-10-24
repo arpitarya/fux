@@ -13,7 +13,7 @@ import pytest
 from fux import enrich as enrich_mod
 from fux.acquire import sourcelist
 from fux.store import acquired
-from l12_fixtures import chunk_bounds, write_config
+from l12_fixtures import chunk_bounds, write_config, write_urls
 
 #: ⚠ **A bare URL, and it carried `fetch=http` until 2026-09-21.** A `loc` is
 #: an address, never a list LINE, so line attributes never belonged in it; the
@@ -28,7 +28,7 @@ PAGE = (
 
 def _repo(tmp_path, line, source_enrich=None):
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    (tmp_path / ".fux" / "sources" / "urls").write_text(line + "\n")
+    write_urls(tmp_path, line + "\n")
     extra = f"enrich = {str(source_enrich).lower()}\n" if source_enrich is not None else ""
     (tmp_path / "fux.toml").write_text("[sources.url]\n" + extra)
     write_config(tmp_path)  # every other key from the template (SR-LAW-12)
@@ -146,5 +146,6 @@ def test_a_missing_file_document_reads_as_none(tmp_path):
 def test_urls_get_ONE_synthetic_scope_named_after_their_file():
     # A `dirs` scope is a path prefix a human chose. A URL list has no such
     # structure, so per-host scopes would report coverage against a grouping
-    # nobody declared.
-    assert enrich_mod.URL_SCOPE == ".fux/sources/urls"
+    # nobody declared. Since W-294 that file is `.fux/sources.yaml`, the one
+    # include manifest, so the scope is named after it.
+    assert enrich_mod.URL_SCOPE == ".fux/sources.yaml"

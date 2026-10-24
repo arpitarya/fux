@@ -20,13 +20,13 @@ import pytest
 from fux.errors import FuxError
 from fux.store import dirty
 from fux.maintain import runner
-from l12_fixtures import write_config
+from l12_fixtures import write_config, write_dirs
 
 
 def _corpus(root: Path, docs: int = 3) -> None:
     listing = root / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
-    listing.write_text("docs\n", encoding="utf-8")
+    write_dirs(root, "docs\n")
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(root, "pii")).write_text("", encoding="utf-8")

@@ -633,38 +633,36 @@ def _claims() -> dict[str, str]:
 def scan(root: Path) -> Counter:
     """Files per lowercase suffix in the configured directories.
 
-    The same roots, `!` exclusions and hand-written `.fuxignore` lines ingest
-    honours — and **an excluded directory is pruned, never entered** (W-244: a
-    walk that lists `work/golden/` reads the sealed key's file names, L11). The
+    The same roots and hand-written `.fuxignore` lines ingest honours — and
+    **an ignored directory is pruned, never entered** (W-244: a walk that lists
+    `work/golden/` reads the sealed key's file names, L11). The
     blocks fux itself writes into `.fuxignore` are NOT honoured: a file fux
     wrote there because nothing could read it is exactly what this scan is for.
     Names only; no file is opened.
     """
     from .acquire import fuxignore
-    from .acquire.dirlist import source_dirs, source_excludes
-    from .acquire.gitdir import _candidate_paths, _excluded_by
+    from .acquire.sourcesfile import source_paths
+    from .acquire.gitdir import _candidate_paths, ignored_dir
     from .config import load as load_config
 
     import unicodedata
 
     config = load_config(root)
-    dirs_file = config.dirs_file
-    excludes = source_excludes(root, dirs_file)
     ignores = fuxignore.read(root)
 
     def prune(directory: Path) -> bool:
         rel = unicodedata.normalize("NFC", directory.relative_to(root).as_posix())
-        return _excluded_by(rel, excludes) is not None
+        return ignored_dir(ignores, rel) is not None
 
     counts: Counter = Counter()
     seen: set[str] = set()
-    for entry in source_dirs(root, dirs_file):
+    for entry in source_paths(root, config.sources_file):
         base = root / entry
         if not base.exists():
             continue
         for item in _candidate_paths(base, prune):
             rel = unicodedata.normalize("NFC", item.relative_to(root).as_posix())
-            if rel in seen or _excluded_by(rel, excludes) is not None:
+            if rel in seen:
                 continue
             seen.add(rel)
             if ignores.decide(rel, is_dir=False, hand_only=True).ignored:
@@ -731,18 +729,16 @@ def notes(root: Path) -> list[str]:
 
 def _url_needs(root: Path) -> tuple[set[str], set[str]]:
     """`(fetch names, decoder modules)` the URL list names; empty without one."""
-    from .acquire import sourcelist
+    from .acquire import sourcesfile
     from .config import load as load_config
 
     config = load_config(root)
     if config.url is None:
         return set(), set()
-    target = root / config.url.urls_file
+    target = root / config.url.sources_file
     if not target.is_file():
         return set(), set()
-    entries = sourcelist.parse(
-        target.read_text(encoding="utf-8"), sourcelist.URLS, origin=config.url.urls_file
-    )
+    entries = sourcesfile.parse(target.read_text(encoding="utf-8"), origin=config.url.sources_file).urls
     fetches = {e.attrs["fetch"] for e in entries if not e.exclude and "fetch" in e.attrs}
     decoders = {e.attrs["decoder"] for e in entries if not e.exclude and "decoder" in e.attrs}
     return fetches, decoders

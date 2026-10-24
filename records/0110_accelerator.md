@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@41331033e1d3, node/src/derive@b8e5388ded11, tools/differential@9c39bc4dd02e, src/fux/schemas/runtime.schema.json@e7f2d4f8acb3]
+owns: [src/fux/derive@41331033e1d3, node/src/derive@b8e5388ded11, tools/differential@fff75655b225, src/fux/schemas/runtime.schema.json@e7f2d4f8acb3]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 2848ca0951910b7691142be35c70c4d0ecfcd357011534977dd2bb75f86ab1a7
+content_sha: 1302392abfe18ddea648300a875e836b845209282de41f493ec5db4457b19408
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -742,7 +742,7 @@ on 2026-10-04 (Arpit) and BUILT the same day (W-259;
 
 **No decision here moved** (W-262, 2026-10-05): the arm's `api` lane calls `ix.graph(q)` without the retired `hops`/`top` arguments — the library's graph verbs now return the CLI's `--json` payloads ([SR-API](0154_api.md) decision 1, Arpit 2026-10-04, W-251 #4). What the lane compares, and at what tolerance, is unchanged.
 
-**No decision here moved** (W-261, 2026-10-05): the four runtime companions' writers moved out of `derive/_build.py` into files their records own — `docstable.py`, `manifest.py`, `stamp.py`, `stats.py`, each with a Node twin beside `build.mjs`. `_build.py` still decides when each is written, in the same order, and `format.py` gained `write_json` (Node: `writeJson`), the serializer `_build.py` used to hold. Every `DETERMINISTIC_FILES` byte is identical. `tools/differential` imports `source_dirs` from `acquire/dirlist.py`.
+**No decision here moved** (W-261, 2026-10-05): the four runtime companions' writers moved out of `derive/_build.py` into files their records own — `docstable.py`, `manifest.py`, `stamp.py`, `stats.py`, each with a Node twin beside `build.mjs`. `_build.py` still decides when each is written, in the same order, and `format.py` gained `write_json` (Node: `writeJson`), the serializer `_build.py` used to hold. Every `DETERMINISTIC_FILES` byte is identical. `tools/differential` imports `source_paths` from `acquire/sourcesfile.py`.
 
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** The accelerator carries the section plane ([SR-SECTIONS](0161_sections.md) decision 7). `fux build` derives `sections.json` (one row `[docidx, k, flen]` per section record, in `(docidx, k)` order) and `sections/<prefix>.json` (term → `[secidx, tf]`), from `.fux/index/sections/` alone. It **refuses an index whose planes disagree**: an orphan section, or an `nsec` that is not the count under its id. With `section_weight > 0`, `_cannot_reach` adds `λ · idf(h) · (k1 + 1) · w(h)` per deferred term before `× weighting.maximum`. That is sound because one BM25 term contribution is below `idf · (k1 + 1)` at any tf and length. Each candidate's sections are then read in full for every query term. `RUNTIME_SCHEMA` is `fux.runtime.v10`.

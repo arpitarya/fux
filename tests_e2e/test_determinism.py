@@ -8,7 +8,7 @@ for — not just a same-machine self-comparison.
 
 from __future__ import annotations
 
-from l12_fixtures import config_file
+from l12_fixtures import config_file, write_dirs
 import hashlib
 import subprocess
 import sys
@@ -26,7 +26,7 @@ def _write_fixture(root: Path) -> None:
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
-    dirs.write_text("docs\n", encoding="utf-8")
+    write_dirs(root, "docs\n")
     # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
     (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)

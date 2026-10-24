@@ -5,7 +5,7 @@
 re-ingest, dirs and URLs alike — and what is left in this file is the planning
 half: `plan_url_refresh`, `check_drift`, `_narrow`, `_locate`, `_check`.
 
-The three committed source lists (`.fux/sources/dirs`, `.fux/sources/urls` and
+The two committed source files (`.fux/sources.yaml` — paths and URLs — and
 `.fux/config/formats.toml`) are what fux indexes. Until W-63 only one of them had a command — `fux url` — so
 the corpus, the thing the whole engine is about, was the part of fux you
 maintained by hand.
@@ -46,21 +46,23 @@ every other fetch uses. And it never writes the index itself — `add`,
 `remove` and `update` all end in **one** `ingest.run`, because a second write
 path is how L4's byte-identical guarantee breaks.
 
-## It edits one line, never the file
+## It edits text, never re-renders the file
 
 A regenerating writer would be simpler and would silently eat the grouping
 comments a human left behind — and under
-[SR-URL-LIST](../../records/0116_url-list.md) decision 3 those comments are
-the reason the file is maintainable at all. So an add inserts one line at its
-sorted position, an update rewrites that one line and keeps its trailing
-comment, and a removal deletes it. Every other byte is untouched. The loader
-sorts regardless (decision 4), so the insertion position is a courtesy to the
-reader, not a correctness property.
+[SR-SOURCES](../../records/0116_url-list.md) decision 18 those comments are the
+reason the file is maintainable at all. So `.fux/sources.yaml` is edited by
+`acquire/sourcesfile.py`'s **textual** writer: an add inserts one line into the
+right `paths:` list (or one entry block under `urls:`) at its sorted position,
+an update rewrites the values that changed on their own lines and keeps their
+comments, and a removal deletes that line or block. Every other byte is
+untouched. The loader sorts regardless (decision 4), so the insertion position
+is a courtesy to the reader, not a correctness property.
 
-A fux-written line carries **every** attribute, explicitly, even where the
-value equals the default (decision 12): a generated file holds no implicit
-state, so changing a policy is a one-word diff rather than the appearance or
-disappearance of a key.
+A fux-written URL entry carries **every** attribute, explicitly, even where
+the value equals the default (decision 12): a generated entry holds no
+implicit state, so changing a policy is a one-word diff rather than the
+appearance or disappearance of a key.
 
 ## `types` is TOML, and its editor is `typesfile`
 
@@ -77,7 +79,6 @@ says the pattern is not there, and `.fux/.fuxignore` is where a file is kept out
 from __future__ import annotations
 
 import json as json_mod
-import re
 from pathlib import Path
 
 from .config import (
@@ -88,7 +89,7 @@ from .config import (
     load,
 )
 from .errors import FuxError
-from .acquire import fuxignore, sourcelist, typesfile
+from .acquire import fuxignore, sourcelist, sourcesfile, typesfile
 from .constants import fixed
 
 _JSON_INDENT = fixed("json", "indent")
@@ -99,18 +100,18 @@ _JSON_INDENT = fixed("json", "indent")
 def dispatch(entry: str, args=None) -> sourcelist.ListSpec:
     """Which list an entry belongs to. **The entry decides; a flag disambiguates.**
 
-    `http(s)://…` is a URL and nothing else is, so URLs need no flag. `dirs`
+    `http(s)://…` is a URL and nothing else is, so URLs need no flag. A path
     is the fallback rather than `types` because it is the common case *and*
     because it already accepts both a directory and a single file — a type
     pattern (`*.pdf`) is the rare, deliberate act, so it is the one that has
     to say `--types`.
 
     There is no sniffing of `*` to mean "a type pattern": `docs/*` is a
-    perfectly reasonable thing to want in `dirs`, and guessing between the two
+    perfectly reasonable thing to want as a path, and guessing between the two
     on a glob character would be wrong exactly when it mattered.
 
     **Anything with a `scheme://` is a URL, not just `http`.** Dispatching on
-    `http(s)://` alone sent `ftp://x/a` to `dirs`, where it was refused for
+    `http(s)://` alone sent `ftp://x/a` to the paths, where it was refused for
     being missing from disk — an answer about the wrong thing entirely.
     Someone who typed a scheme meant a URL, so it goes to the list that has
     an opinion about URLs and gets told the real reason: that one takes
@@ -118,14 +119,9 @@ def dispatch(entry: str, args=None) -> sourcelist.ListSpec:
     """
     if getattr(args, "types", False):
         return sourcelist.TYPES
-    if _SCHEME_RE.match(entry):
+    if sourcelist.has_scheme(entry):
         return sourcelist.URLS
-    return sourcelist.DIRS
-
-
-#: `scheme://` — RFC 3986 §3.1's scheme grammar, anchored, with the `//` that
-#: distinguishes a URL from a Windows drive letter or a `key: value` note.
-_SCHEME_RE = re.compile(r"[a-zA-Z][a-zA-Z0-9+.\-]*://")
+    return sourcelist.PATHS
 
 
 def normalize_entry(entry: str, spec: sourcelist.ListSpec) -> str:
@@ -137,29 +133,32 @@ def normalize_entry(entry: str, spec: sourcelist.ListSpec) -> str:
     things where the corpus has one, and makes `fux remove docs` and
     `fux remove docs/` disagree about whether a line exists.
 
-    Only `dirs` needs it: a URL's trailing slash is significant (`/a/` and
+    Only a path needs it: a URL's trailing slash is significant (`/a/` and
     `/a` can be different pages, and only the server knows), and `types`
     rejects a trailing slash outright.
     """
-    if spec is sourcelist.DIRS and entry != "/":
+    if spec is sourcelist.PATHS and entry != "/":
         stripped = entry.rstrip("/")
         return stripped or entry
     return entry
 
 
 def list_path(root: Path, spec: sourcelist.ListSpec) -> Path:
-    """Where a list lives — the configured path, or the default.
+    """Where a list lives — `[sources] sources_file` for a path or a URL, both
+    halves of one file since W-294, and the formats list (`DEFAULT_TYPES_FILE`) for a type.
 
-    A repo with no `[sources.url]` block still has a URL list path: the
+    A repo with no `[sources.url]` block still has somewhere to list a URL: the
     command that puts the first URL in it should not also demand you configure
     the source first.
     """
-    if spec is sourcelist.URLS:
-        config = load(root)
-        return root / config.urls_file
-    if spec is sourcelist.DIRS:
-        return root / load(root).dirs_file
-    return root / DEFAULT_TYPES_FILE
+    if spec is sourcelist.TYPES:
+        return root / DEFAULT_TYPES_FILE
+    return root / load(root).sources_file
+
+
+def _repo_root(path: Path) -> Path:
+    """The repo root a `.fux/sources.yaml` path sits in."""
+    return path.parents[len(Path(sourcesfile.FILE).parts) - 1]
 
 
 def _read(path: Path, spec: sourcelist.ListSpec) -> list[sourcelist.Entry]:
@@ -172,9 +171,11 @@ def _read(path: Path, spec: sourcelist.ListSpec) -> list[sourcelist.Entry]:
     """
     if spec is sourcelist.TYPES:
         return _type_entries(path)
+    sourcesfile.check_legacy(_repo_root(path))
     if not path.is_file():
         return []
-    return sourcelist.parse(path.read_text(encoding="utf-8"), spec, origin=str(path))
+    parsed = sourcesfile.parse(path.read_text(encoding="utf-8"), origin=str(path))
+    return list(parsed.urls if spec is sourcelist.URLS else parsed.paths)
 
 
 def _types_root(path: Path) -> Path:
@@ -246,65 +247,14 @@ def _add_type(path: Path, value: str, overrides: dict[str, str]) -> tuple[str, s
     return action, line, before
 
 
-# -- writing one line ------------------------------------------------------
-
-
-def _write(path: Path, lines: list[str]) -> None:
-    """Write the lines back, always ending in exactly one newline.
-
-    A committed text file without a trailing newline makes the next diff touch
-    a line nobody edited, which is the opposite of what a one-line writer is
-    for.
-    """
-    text = "\n".join(lines).rstrip("\n")
-    # `newline="\n"` disables the platform-default translation write_text()
-    # otherwise applies — without it this would commit CRLF on Windows and LF
-    # everywhere else, breaking L4's byte-identical guarantee across machines.
-    path.write_text(text + "\n" if text else "", encoding="utf-8", newline="\n")
-
-
-def _split(raw: str) -> tuple[str, str]:
-    """One raw line -> (its entry text, its trailing comment including the `#`)."""
-    body = sourcelist.strip_comment(raw)
-    return body, raw[len(body) :]
-
-
-def _entry_value(raw: str) -> str | None:
-    """The entry a raw line declares, or None for a blank or comment line.
-
-    Includes any leading `!`, so an exclusion and its include are distinct
-    keys here exactly as they are in the parser.
-    """
-    body, _ = _split(raw)
-    stripped = body.strip()
-    return stripped.split()[0] if stripped else None
-
-
-def _insert_at(lines: list[str], value: str) -> int:
-    """The index where `value` belongs, keeping the entry block sorted."""
-    for i, raw in enumerate(lines):
-        existing = _entry_value(raw)
-        if existing is not None and existing > value:
-            return i
-    # No later entry: land after the last one rather than after the file's
-    # trailing blank lines, so a generated list stays a single block.
-    last = max((i for i, raw in enumerate(lines) if _entry_value(raw) is not None), default=None)
-    return last + 1 if last is not None else _after_preamble(lines)
-
-
-def _after_preamble(lines: list[str]) -> int:
-    """The first index past the file's leading comment block, blanks trimmed."""
-    i = 0
-    while i < len(lines) and (not lines[i].strip() or lines[i].lstrip().startswith("#")):
-        i += 1
-    return i
+# -- writing one entry -----------------------------------------------------
 
 
 def _source_defaults(root: Path, spec: sourcelist.ListSpec) -> dict[str, str]:
     """`[sources.url]`'s policy, in the line grammar's own words.
 
     Only the keys that are also line attributes, and only for the URL list —
-    `dirs` has no source-wide table to read. A repo with no `[sources.url]`
+    a path has no source-wide table to read. A repo with no `[sources.url]`
     (or an unreadable `fux.toml`) resolves to nothing, so the engine defaults
     stand exactly as before.
     """
@@ -345,7 +295,7 @@ def add(
 
     ⚠ **Without it, `fux add` overrode the consumer's own configuration**
     (W-140 row 5, fixed 2026-09-11). Every generated line states every
-    attribute ([SR-URL-LIST](../../records/0116_url-list.md) decision 12),
+    attribute ([SR-SOURCES](../../records/0116_url-list.md) decision 12),
     and the values stated came from `spec.defaults()` — **the ENGINE's
     built-ins**. So a team with `[sources.url] ttl = "7d"` got `ttl=24h`
     written onto every line `fux add` produced, and the middle layer of a
@@ -360,50 +310,57 @@ def add(
     if spec is sourcelist.TYPES:
         return _add_type(path, value, overrides)
     text = path.read_text(encoding="utf-8") if path.is_file() else ""
-    lines = text.split("\n")
-
-    existing = sourcelist.parse(text, spec, origin=str(path))
-    prior = next((e for e in existing if e.value == value and not e.exclude), None)
+    origin = str(path)
+    existing = _read(path, spec)
+    prior = next((e for e in existing if e.value == value), None)
     attrs = (
         spec.defaults()
         | {k: v for k, v in (source_defaults or {}).items() if k in spec.defaults()}
         | (prior.attrs if prior is not None else {})
         | overrides
     )
-    body = sourcelist.render_line(value, attrs, spec)
-
-    for i, raw in enumerate(lines):
-        if _entry_value(raw) != value:
-            continue
-        _, comment = _split(raw)
-        previous = raw
-        lines[i] = body + (f"  {comment.strip()}" if comment.strip() else "")
-        _write(path, lines)
-        return ("unchanged" if lines[i] == previous else "updated"), lines[i], previous
-
-    lines.insert(_insert_at(lines, value), body)
-    _write(path, lines)
-    return "added", body, ""
+    previous = _describe(spec, value, prior.attrs) if prior is not None else ""
+    if spec is sourcelist.URLS:
+        new, action = sourcesfile.set_url(text, value, attrs, origin=origin)
+    else:
+        new, action = sourcesfile.set_path(text, value, attrs, origin=origin)
+    if new != text:
+        _write_text(path, new)
+    return action, _describe(spec, value, attrs), previous
 
 
-def remove(path: Path, value: str) -> str:
-    """Delete the line declaring `value`. Returns it, or raises if it is not there."""
+def _describe(spec: sourcelist.ListSpec, value: str, attrs: dict[str, str]) -> str:
+    """How a verb prints one entry: a path with its lists, a URL or a type as a line."""
+    if spec is sourcelist.PATHS:
+        return sourcesfile.describe_path(value, attrs)
+    return sourcelist.render_line(value, attrs, spec)
+
+
+def _write_text(path: Path, text: str) -> None:
+    """Write `text` with LF endings on every platform.
+
+    `newline="\n"` disables the platform-default translation write_text()
+    otherwise applies — without it this would commit CRLF on Windows and LF
+    everywhere else, breaking L4's byte-identical guarantee across machines.
+    """
+    path.write_text(text, encoding="utf-8", newline="\n")
+
+
+def remove(path: Path, value: str, spec: sourcelist.ListSpec) -> str:
+    """Delete `value`'s line (a path) or entry (a URL). Returns what went, or raises."""
     if not path.is_file():
         raise FuxError(f"{path} does not exist — nothing to remove")
-    lines = path.read_text(encoding="utf-8").split("\n")
-    for i, raw in enumerate(lines):
-        if _entry_value(raw) == value:
-            removed = lines.pop(i)
-            _write(path, lines)
-            return removed
-    raise FuxError(f"{value} is not in {path}")
+    text = path.read_text(encoding="utf-8")
+    new, removed = sourcesfile.remove(text, value, kind=spec.kind, origin=str(path))
+    _write_text(path, new)
+    return removed
 
 
 # -- remove-by-coverage ----------------------------------------------------
 
 
 def _normalized(entry: str) -> str:
-    """A `dirs` entry as a path for coverage comparison — no trailing slash.
+    """A listed path as a path for coverage comparison — no trailing slash.
 
     `docs` and `docs/` are the same directory, and a rule that said otherwise
     would make `fux remove docs/onboarding.md` behave differently depending on
@@ -415,14 +372,12 @@ def _normalized(entry: str) -> str:
 def _covering_ancestor(value: str, entries: list[sourcelist.Entry]) -> str | None:
     """The listed entry that pulls `value` into the walk, if any.
 
-    Includes are literal paths, not globs — `walk_sources` recurses into
+    Listed paths are literal, not globs — `walk_sources` recurses into
     `root / entry` — so coverage is a path-prefix question and not a match
-    question. Exclusions are the ones that glob.
+    question.
     """
     target = _normalized(value)
     for entry in entries:
-        if entry.exclude:
-            continue
         base = _normalized(entry.value)
         if target == base or target.startswith(base + "/"):
             return entry.value
@@ -437,7 +392,7 @@ def remove_or_exclude(
     **Two ways in, so two ways out** (W-63 decision 4). A path with its own
     line leaves by deleting that line. A path with no line of its own is in
     the corpus because an ancestor is listed — so it leaves by an exclusion,
-    which is the subtraction the grammar already has.
+    an anchored pattern in `.fux/.fuxignore`.
 
     The alternative was deleting the ancestor's line and re-adding its
     siblings, which is a many-line diff for a one-document change, and which
@@ -447,12 +402,9 @@ def remove_or_exclude(
     different facts about the file and a reader of the diff needs to know
     which one they are looking at.
 
-    ⚠ **The exclusion is written into `.fux/.fuxignore`, not as a `!` line
-    here** (W-165 fix 1). `!` in `dirs` keeps being *read* — SR-DIR-LIST
-    decision 2a, and every line anyone already wrote goes on working — but
-    `.fuxignore` is where exclusion lives (SR-FUXIGNORE), and a verb that kept
-    writing into the older of two spellings was the migration that record
-    called *"a migration we now owe"*. `fux doctor` names the survivors.
+    ⚠ **The exclusion is written into `.fux/.fuxignore`, the one place
+    exclusion is spelled** (SR-FUXIGNORE; W-294 removed `!` from the source
+    list entirely).
     """
     if spec is sourcelist.TYPES:
         typesfile.check_legacy(_types_root(path))
@@ -465,26 +417,13 @@ def remove_or_exclude(
 
     entries = _read(path, spec)
 
-    if any(e.value == value and not e.exclude for e in entries):
-        return "removed", remove(path, value).strip(), ""
+    if any(e.value == value for e in entries):
+        return "removed", remove(path, value, spec).strip(), ""
 
-    if not spec.allow_exclusions:
+    if spec is sourcelist.URLS:
         raise FuxError(
-            f"{value} is not in {path}. `{spec.kind}` has no exclusions — every entry is a line, "
-            "so there is nothing to subtract from and nothing to remove but a line that exists"
-        )
-
-    if any(e.value == value and e.exclude for e in entries):
-        # **The `!` line is left exactly as it is.** It already excludes, so
-        # there is nothing to do; rewriting it into `.fuxignore` here would be
-        # a migration performed as a side effect of a verb that was asked to
-        # remove something already removed. `doctor` is where the move is
-        # offered, at a moment the reader chose (W-165 fix 1).
-        raise FuxError(
-            f"{value} is already excluded by a `!` line in {path}, which is left alone. "
-            "`!` subtracts there and nothing adds back, so there is nothing further to "
-            f"remove — delete that line to put it back. Exclusions are written to "
-            f"{fuxignore.IGNORE_FILE} now; `fux doctor` names the `!` lines still here"
+            f"{value} is not in {path}. A URL has no ancestor to subtract from — every URL "
+            "is an entry of its own, so there is nothing to remove but an entry that exists"
         )
 
     ancestor = _covering_ancestor(value, entries)
@@ -666,7 +605,7 @@ def _overrides(args, spec: sourcelist.ListSpec) -> dict[str, str]:
     A flag that names an attribute this list does not have is also an error
     rather than a silent no-op — `fux add docs/ --cdp` is someone believing
     something about the entry they just wrote, and the closed attribute set
-    (SR-URL-LIST decision 11) is only worth having if it is enforced on the
+    (SR-SOURCES decision 11) is only worth having if it is enforced on the
     way in as well as on the way out.
     """
     pairs = (
@@ -776,7 +715,7 @@ def _drop_acquired(root: Path, spec: sourcelist.ListSpec, entry: str) -> None:
     that the next sweep collects anyway; it must never turn `fux remove` into
     a command that half-worked.
     """
-    if spec.kind != "urls":
+    if spec is not sourcelist.URLS:
         return
     try:
         from .store import acquired
@@ -849,15 +788,14 @@ def cmd_add(args) -> int:
     #
     # ⚠ **An existing line's `fetch=` is left alone, and that is not an
     # optimisation.** Re-adding a URL to change some other attribute must not
-    # silently re-route it: the line is a PIN a human meant (SR-URL-LIST
+    # silently re-route it: the line is a PIN a human meant (SR-SOURCES
     # decision 16), and a route added later deliberately does not move it. Found
     # by `test_an_unflagged_attribute_keeps_what_the_line_already_said` — a
     # second `fux add` with no fetch flag was overwriting the first one's
     # `fetch=cdp` with whatever the table now said.
     if spec is sourcelist.URLS:
         prior_line = next(
-            (e for e in _read(list_path(root, spec), spec)
-             if e.value == entry and not e.exclude),
+            (e for e in _read(list_path(root, spec), spec) if e.value == entry),
             None,
         )
         if "fetch" not in overrides:
@@ -903,19 +841,12 @@ def cmd_add(args) -> int:
             else:
                 overrides["decoder"] = _observed_decoder(root, entry, overrides["fetch"])
 
-    entries = _read(path, spec)
-    if any(e.value == entry and e.exclude for e in entries):
-        raise FuxError(
-            f"{entry} is excluded in {_rel(root, path)}. There is no un-exclude by design — "
-            f"`!` subtracts and nothing adds back, so delete the `!{entry}` line to index it again"
-        )
-    # **The same refusal for the file `remove` writes to now** (W-165 fix 1).
-    # Without this, moving the write target would have quietly turned `add`
-    # into the un-exclude the line above exists to refuse: `fux remove docs/a.md`
-    # then `fux add docs/a.md` would have written a line that the `.fuxignore`
-    # pattern goes on beating, so the command would report success and index
-    # nothing. Refusing is the loud direction, and it names the file to edit.
-    if spec is sourcelist.DIRS:
+    # **Refused against the file `remove` writes to** (W-165 fix 1; the
+    # `hand_only` refusal SR-SOURCES keeps). Without this, `fux remove
+    # docs/a.md` then `fux add docs/a.md` would write a line that the
+    # `.fuxignore` pattern goes on beating, so the command would report success
+    # and index nothing. Refusing is the loud direction, and it names the file.
+    if spec is sourcelist.PATHS:
         verdict = fuxignore.read(root).decide(
             entry, is_dir=(root / entry).is_dir(), hand_only=True
         )
@@ -930,7 +861,7 @@ def cmd_add(args) -> int:
     # `walk_sources` raises on a configured source that is not on disk, so a
     # typo'd `add` would otherwise take the whole corpus down until someone
     # hand-edited the file back.
-    if spec is sourcelist.DIRS and not (root / entry).exists():
+    if spec is sourcelist.PATHS and not (root / entry).exists():
         raise FuxError(
             f"{entry} does not exist (looked in {root / entry}) — nothing would be indexed, and "
             "the next `fux ingest` would fail on it. Nothing was written"
@@ -951,7 +882,7 @@ def cmd_add(args) -> int:
             overrides = overrides | {"decoder": match.name}
 
     if getattr(args, "dry_run", False):
-        preview = sourcelist.render_line(entry, spec.defaults() | overrides, spec)
+        preview = _describe(spec, entry, spec.defaults() | overrides)
         print(f"would add {preview}")
         print(f"  in {_rel(root, path)}")
         if overrides.get("decoder") == _OBSERVED_AT_ADD:
@@ -968,7 +899,7 @@ def cmd_add(args) -> int:
         _seed_types(path)
     action, line, previous = add(path, entry, overrides, spec, source_defaults)
     print(f"{action:9s} {line.strip()}")
-    if action == "updated":
+    if action == "updated" and previous:
         print(f"      was {previous.strip()}")
     print(f"  in {_rel(root, path)}")
 
@@ -996,7 +927,7 @@ def cmd_add(args) -> int:
     # `--no-update` writes `update=never`, and until 2026-09-11 the ingest
     # filter dropped the line before the fetch — so the add wrote a line,
     # fetched nothing, and exited 1 saying the fetch failed, while `--help` and
-    # [SR-URL-LIST](../records/0116_url-list.md) decision 14 both promised one
+    # [SR-SOURCES](../records/0116_url-list.md) decision 14 both promised one
     # fetch (W-140 row 3). Every run after this one is pinned.
     report = _ingest(
         root, args, refresh_urls=refresh, only_urls=only_urls, first_fetch=only_urls
@@ -1100,7 +1031,7 @@ def cmd_remove(args) -> int:
 
     if getattr(args, "dry_run", False):
         entries = _read(path, spec)
-        if any(e.value == entry and not e.exclude for e in entries):
+        if any(e.value == entry for e in entries):
             print(f"would remove  {entry} — it has its own line")
         elif spec is sourcelist.TYPES:
             raise FuxError(
@@ -1113,11 +1044,6 @@ def cmd_remove(args) -> int:
                 raise FuxError(
                     f"{entry} is not in {_rel(root, path)}: no line of its own, and no listed "
                     "entry covers it. Both were checked"
-                )
-            if any(e.value == entry and e.exclude for e in entries):
-                raise FuxError(
-                    f"{entry} is already excluded by a `!` line in {_rel(root, path)}, which "
-                    "would be left alone. Delete that line to put it back"
                 )
             is_dir = (root / entry).is_dir()
             pattern = fuxignore.exclusion_pattern(entry, is_dir=is_dir)
@@ -1140,8 +1066,8 @@ def cmd_remove(args) -> int:
     action, line, detail = remove_or_exclude(root, path, spec, entry)
     print(f"{action:9s} {line}")
     # **The file the line was actually written to**, which stopped being one
-    # file on 2026-09-14: a deletion edits the source list, an exclusion writes
-    # `.fux/.fuxignore` (W-165 fix 1). Naming the list either way would point a
+    # file on 2026-09-14: a deletion edits `.fux/sources.yaml`, an exclusion
+    # writes `.fux/.fuxignore` (W-165 fix 1). Naming the list either way would point a
     # reader at a file `git diff` shows unchanged.
     written = _rel(root, path) if action == "removed" else fuxignore.IGNORE_FILE
     print(f"  in {written}" + (f" — {detail}" if detail else ""))
@@ -1209,7 +1135,7 @@ def plan_url_refresh(root: Path, args) -> tuple[bool, set[str] | None]:
     # nobody listed is a typo, and `fux ingest --no-fetch typo` must not
     # quietly re-ingest the whole corpus and report success. Reading two local
     # files costs the fence nothing — L5 is about opening a socket, not about
-    # opening `.fux/sources/`.
+    # opening `.fux/sources.yaml`.
     spec = _locate(root, entry) if entry else None
 
     if getattr(args, "no_fetch", False):
@@ -1331,7 +1257,7 @@ def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool):
     if failed_only:
         from .acquire import urlstate as urlstate_mod
 
-        known = {e.value for e in listed if not e.exclude}
+        known = {e.value for e in listed}
         failing = {
             url
             for url, health in urlstate_mod.read(root).urls.items()
@@ -1344,7 +1270,7 @@ def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool):
         return None, "no dirty list yet, so nothing is known to be stale"
 
     pending = {i[len("url:"):] for i in dirty_mod.read(root) if i.startswith("url:")}
-    known = {e.value for e in listed if not e.exclude}
+    known = {e.value for e in listed}
     targeted = pending & known
     return targeted, f"{len(targeted)} known stale"
 
@@ -1356,10 +1282,10 @@ def _locate(root: Path, entry: str) -> sourcelist.ListSpec:
     listed is a typo or a misremembered path, and creating it silently is how
     `ingest <entry>` would quietly become a second `add`.
     """
-    for spec in (sourcelist.URLS, sourcelist.DIRS, sourcelist.TYPES):
+    for spec in (sourcelist.URLS, sourcelist.PATHS, sourcelist.TYPES):
         path = list_path(root, spec)
         candidate = normalize_entry(entry, spec)
-        if any(e.value == candidate and not e.exclude for e in _read(path, spec)):
+        if any(e.value == candidate for e in _read(path, spec)):
             return spec
     raise FuxError(
         f"{entry} is not in any source list, so there is nothing to ingest. "
@@ -1488,10 +1414,20 @@ def _short(sha: str) -> str:
 
 
 def _list_all(root: Path) -> int:
-    """Every list, as the loader sees it: sorted, deduped, fully resolved."""
-    for spec in (sourcelist.DIRS, sourcelist.TYPES, sourcelist.URLS):
+    """Every list, as the loader sees it: sorted, fully resolved.
+
+    ⚠ **The completeness mark is URL entries only** (SR-SOURCES decision 13):
+    a path carries no attributes to leave out — its flags are the lists it sits
+    in — so there is nothing for a path to be incomplete about.
+    """
+    for spec, label in (
+        (sourcelist.PATHS, sourcesfile.PATHS_KEY),
+        (sourcelist.TYPES, None),
+        (sourcelist.URLS, sourcesfile.URLS_KEY),
+    ):
         path = list_path(root, spec)
-        print(f"{_rel(root, path)}:")
+        where = _rel(root, path) + (f" `{label}:`" if label else "")
+        print(f"{where}:")
         if not path.is_file():
             print(f"  (no file — `fux add` writes one; {spec.kind} falls back to its default)")
             continue
@@ -1500,15 +1436,13 @@ def _list_all(root: Path) -> int:
             print("  (empty)")
             continue
         for e in entries:
-            mark = " " if e.is_complete() else "*"
-            prefix = "!" if e.exclude else ""
-            body = prefix + e.value if e.exclude else sourcelist.render_line(e.value, e.attrs, spec)
-            print(f"{mark} {body}")
-        incomplete = [e for e in entries if not e.is_complete() and not e.exclude]
+            mark = "*" if spec is sourcelist.URLS and not e.is_complete() else " "
+            print(f"{mark} {_describe(spec, e.value, e.attrs)}")
+        incomplete = [e for e in entries if spec is sourcelist.URLS and not e.is_complete()]
         if incomplete:
             print(
-                f"\n* {len(incomplete)} line(s) do not state every attribute, so fux did not "
-                "write them. They load fine (the reader is lenient); `fux add <entry>` "
+                f"\n* {len(incomplete)} entr(y/ies) do not state every attribute, so fux did not "
+                "write them. They load fine (the reader is lenient); `fux add <URL>` "
                 "rewrites one in full."
             )
     return 0

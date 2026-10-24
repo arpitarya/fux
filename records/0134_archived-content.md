@@ -11,7 +11,7 @@ feature: what happens once a document is declared archived — the record proper
 owns: [tools/archived-signal-eval@30fb75fa7476]
 laws: [L4, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: e6f75da5813d154902fbe022451e387276d59582d476485d120f20e1faead366
+content_sha: 96e84d727709749abfcf93339a770f94aa1c59f3ec20fab3bb19845b71f964d0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -22,7 +22,7 @@ content_sha: e6f75da5813d154902fbe022451e387276d59582d476485d120f20e1faead366
 
 **Describes** — reaches into, does not own:
 
-- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py) · owned by [SR-URL-LIST](0116_url-list.md)
+- [`src/fux/acquire/sourcelist.py`](../src/fux/acquire/sourcelist.py) · owned by [SR-SOURCES](0116_url-list.md)
 - [`src/fux/acquire/urlsrc.py`](../src/fux/acquire/urlsrc.py) · owned by [SR-FETCHER](0117_fetcher.md)
 - [`src/fux/ingest/run.py`](../src/fux/ingest/run.py) · owned by [SR-INGEST](0106_ingest.md)
 
@@ -31,13 +31,12 @@ content_sha: e6f75da5813d154902fbe022451e387276d59582d476485d120f20e1faead366
 # SR-ARCHIVED-CONTENT — what "archived" does, once a document carries it
 
 > **This record owns the behaviour. The file and its grammar are
-> [SR-DIR-LIST](0120_dir-list.md)** — two different questions that once shared
-> one document.
+> [SR-SOURCES](0116_url-list.md)** — two different questions.
 
 ## §1 — For humans
 
-A directory (or, through [SR-URL-LIST](0116_url-list.md)'s shared grammar, a
-URL) can be declared `archived=true` in `.fux/sources/dirs`. **It is still
+A path (listed under `paths: archived:`) or a URL (`archived: true` on its
+entry) can be declared archived in `.fux/sources.yaml`. **It is still
 indexed** — an archived document is the honest answer to *"why does this look
 the way it does,"* and Fux never stops answering that question. What this record
 decides is everything that happens **after** the declaration: does the record
@@ -45,10 +44,13 @@ say so, does ranking change, does a verb tell you, and can you ask for a
 document like that to matter less.
 
 ```console
-$ cat .fux/sources/dirs
-docs
-work
-archive/v0.26-docs        archived=true
+$ cat .fux/sources.yaml
+paths:
+  include:
+    - docs
+    - work
+  archived:
+    - archive/v0.26-docs
 ```
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
@@ -166,15 +168,13 @@ may only narrow on a fact, never on a guess."*
 
 ### Context
 
-[SR-DIR-LIST](0120_dir-list.md) decides the file, its grammar, and that the
-archived attribute is **declared, never derived**. It also had to decide, in the
-same document, what happens once that declaration exists — a record property,
-whether ranking changes, what verbs show, and whether a demotion or a disclaimer
-ships. **That second half kept growing, and the document became two decisions
-wearing one name**: a reader standing up the source-list file and a reader
-asking what a marked document does are two audiences, and one citation
-vocabulary for both produced exactly the ambiguity the cite-by-name rule exists
-to prevent.
+[SR-SOURCES](0116_url-list.md) decides the file, its grammar, and that the
+archived flag is **declared, never derived**. This record decides what happens
+once that declaration exists — a record property, whether ranking changes, what
+verbs show, and whether a demotion or a disclaimer ships. A reader standing up
+the source list and a reader asking what a marked document does are two
+audiences, and one citation vocabulary for both would produce exactly the
+ambiguity the cite-by-name rule exists to prevent.
 
 ### Decision
 
@@ -184,32 +184,27 @@ ingest and stored per record — the way `mode` already is, and for
 the rule it was written under rather than having it inferred by whoever reads
 it.** Absent when false, so no existing record changes shape.
 
-**1a. Both source lists carry `archived`, and since 2026-09-11 that is true of
-`urls` as well as `dirs`** (W-126, Arpit's ask).
+**1a. Both halves of `.fux/sources.yaml` carry `archived`** — a path through
+the `archived:` list, a URL through `archived: true` on its entry (W-126,
+Arpit's ask).
 
 - **Same name, same values, same default, one meaning** — held by
   `tests/ingest/test_sourcelist.py::test_archived_is_the_same_attribute_on_both_lists`
   rather than by two definitions that agree today.
-- 🔴 **The asymmetry it removes was never a decision.** `dirs` gained the
-  attribute on 2026-08-22; `urls` did not, because the URL list was built
-  first and nobody went back. So **a retired page behind a URL could not be
-  declared retired at all** — and that is the document fux is *worst* at
+- 🔴 **A URL must be declarable as retired.** Without it **a retired page
+  behind a URL could not be declared retired at all** — and that is the
+  document fux is *worst* at
   without the declaration, because decision 8 below is measured: BM25F cannot
   see negation, so a page that honestly says *"no longer current"* hands the
   query the token `current`.
-- ⚠ **"Both source lists" now means EVERY committed source list** (2026-09-11).
-  When decision 1a was written the line grammar parsed three files — `dirs`,
-  `urls` and `types`. `types` moved to `.fux/config/formats.toml` that day
-  ([SR-TYPES](0128_types-list.md)
-  decision 12), so the two lists carrying `archived` are now **all** of them.
-  The sentence did not change; what it covers did, and it covers more.
-  ⚠ **`types` never carried `archived` and could not have** — a type pattern
+- ⚠ **`.fux/config/formats.toml` does not carry `archived` and could not**
+  ([SR-TYPES](0128_types-list.md)) — a type pattern
   names an extension, and retirement is a property of a document.
 - **Line-level only. There is no `[sources.url] archived`**, where `keep`,
   `ttl` and `enrich` all have a source-wide middle layer. Those three answer
   *"how do I reach these pages?"*, which a source can answer for all of them;
   `archived` answers *"is this page retired?"*, which no source-wide value can
-  say. `dirs` made the same call. Held by
+  say, and paths make the same call. Held by
   `test_archived_has_no_source_wide_layer`.
 - **It is applied to CARRIED records, not only freshly fetched ones**
   ([SR-INGEST](0106_ingest.md)). A retired page is precisely the one that has
@@ -284,8 +279,8 @@ score by a fact.
   could set correctly**, not a behaviour.
 - **The reasoning that stood behind it is kept, because it binds a replacement.**
   Any future treatment of retirement must key off **the declaration, never a
-  path** ([SR-DIR-LIST](0120_dir-list.md) decision 4), and must not become a
-  per-source attribute on a `dirs` line — **a weight is a ranking parameter, not
+  path** ([SR-SOURCES](0116_url-list.md)), and must not become a
+  per-source attribute in `.fux/sources.yaml` — **a weight is a ranking parameter, not
   a source attribute.**
 - **This is not `df`.** A score multiplier on a finished score is a different
   mechanism from computing `df` over a different population, and decision 4 is
@@ -355,7 +350,7 @@ across four records and two runs.**
 | route | verdict |
 |---|---|
 | **infer from the text** — *"obsolete"*, *"deprecated"*, *"no longer in force"* | 🔴 **refused, and measured to BACKFIRE** |
-| **`archived=true` on the source line** (`dirs` or, since decision 1a, `urls`) | ✅ exact; needs a human, and is per source rather than per document |
+| **`archived` declared in `.fux/sources.yaml`** (a path's `archived:` list, or a URL entry's `archived: true`) | ✅ exact; needs a human, and is per source rather than per document |
 | **`supersedes:` in the successor's frontmatter** | ✅ exact; needs a human, and **cannot cover a document retired before its successor existed** |
 | **`superseded_by:` in an enrichment** ([SR-ENRICH](0137_enrich.md) decision 17) | ✅ exact, **and never touches the original** — the answer for a document you cannot edit |
 
@@ -394,7 +389,7 @@ both:** does the value describe the document, or the route to it?
 ⚠ **Touched 2026-09-11 by a change to `ingest/run.py` that this record does not
 describe.** The redact phase gained a path probe ([SR-PII](0148_pii.md)
 decision 19b), and later the same day the pinned-URL filter gained the add's one
-fetch ([SR-URL-LIST](0116_url-list.md) decision 14). `_archived_url_ids` and
+fetch ([SR-SOURCES](0116_url-list.md) decision 14). `_archived_url_ids` and
 `_with_archived` — the half of that file this record owns the description of —
 are unchanged by both, and the note is recorded here only because the freshness
 gate reads whole files and a reader of this record deserves to know which half
@@ -405,8 +400,8 @@ pinning a retired page is legal and means what both words mean.
 **2026-09-14 — `src/fux/acquire/urlsrc.py and src/fux/ingest/run.py` changed under this record and NOTHING this record
 decides moved.** Two unrelated edits: per-fetcher `[sources.url.config]` resolution in
 `urlsrc` ([SR-CONFIG](0113_config.md) decision 8a), and in `run.py` a
-`config.url is not None else DEFAULT_URLS_FILE` fallback collapsing to
-`config.urls_file` now that the key sits in `[sources]` (decision 11a).
+`config.url is not None else DEFAULT_URLS_FILE` fallback collapsing to one
+configured path (SR-CONFIG decision 11a).
 `UrlEntry.archived`, its deliberate TWO layers, and `_archived_url_ids` are
 untouched.
 
@@ -434,7 +429,7 @@ real question, and it is **not answered here and not in
 raising it would be a second lever in one arm.
 
 ⚠ **`archived` stays a closed enum on both lists** (2026-09-15).
-[SR-URL-LIST](0116_url-list.md) decision 15 opened `fetch=`'s values because it
+[SR-SOURCES](0116_url-list.md) decision 15 opened `fetch=`'s values because it
 names a **file** in a directory the consumer owns. `archived` names neither a
 file nor a module — it is a declaration about a document, `true` or `false` —
 so decision 1a's two-value set is untouched, and an unknown value is still the
@@ -443,7 +438,7 @@ loud error it always was.
 **2026-09-21 — `UrlEntry` grew a field, and `archived`'s two layers are
 untouched.**
 
-`UrlEntry.decoder` was added with no default ([SR-URL-LIST](0116_url-list.md)
+`UrlEntry.decoder` was added with no default ([SR-SOURCES](0116_url-list.md)
 decision 17), so every construction of the dataclass now states it. `archived`
 keeps **two** layers where `keep`/`ttl`/`enrich`/`update` take three, and that is
 still decision 1a's call rather than an omission: a source-wide *"everything I
@@ -475,7 +470,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**The archived declaration's list is `[sources] dirs_file`, with no default path** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). An absent `fux.toml` still means *nothing archived*; a present one that lacks the key, in Python or Node, is an error naming it rather than a silent `.fux/sources/dirs` ([SR-CONFIG](0113_config.md) decision 17).
+**The archived declaration's list is `[sources] sources_file`, with no default path** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). An absent `fux.toml` still means *nothing archived*; a present one that lacks the key, in Python or Node, is an error naming it rather than a silent default path ([SR-CONFIG](0113_config.md) decision 17).
 
 **No archived-content rule changed by stage 4a** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `ingest/run.py` checks the decoders' caps up front and digests them ([SR-INGEST](0106_ingest.md)).
 
@@ -494,7 +489,7 @@ A carried `url:` record re-derived because the identifier-family digest moved ke
 
 **No decision here moved** (W-248, 2026-10-04): in `urlsrc.py` the "nothing readable" skip reason is spelled from `decoders.reason_nothing_readable`; nothing this record decides moved.
 
-**No decision here moved** (W-261, 2026-10-05): `archived_dirs` moved from `acquire/gitdir.py` to `acquire/dirlist.py` (SR-DIR-LIST's), and the URL branch of `ingest/run.py` to `ingest/urlingest.py` (SR-URL-INGEST's). `is_archived_loc`, `_archived_url_ids` and `_with_archived` stayed where they were; the declaration reaches a record exactly as before.
+**No decision here moved** (W-261, 2026-10-05): the archived-path reader moved out of `acquire/gitdir.py` — it is `sourcesfile.archived_paths` (SR-SOURCES's), and the URL branch of `ingest/run.py` to `ingest/urlingest.py` (SR-URL-INGEST's). `is_archived_loc`, `_archived_url_ids` and `_with_archived` stayed where they were; the declaration reaches a record exactly as before.
 
 **No decision here moved** (W-274, 2026-10-11): `ingest/run.py` builds section records only when `fux.toml [index] section_records = true`, and refuses a delta run after that key flips (SR-SECTIONS decision 11). Archived marking is untouched.
 
@@ -572,7 +567,7 @@ A carried `url:` record re-derived because the identifier-family digest moved ke
 | **Down-rank archived documents by default** | rejected under decision 2: *annotate, never reorder*. A rank change needs a measurement on a second corpus |
 | **Filter archived results out by default** | rejected: it makes the historical question unanswerable, which is the reason the set is indexed at all, and **trades a visible wrong answer for an invisible missing one**. Prototyped and set aside — see below |
 | **Two attributes, `archived` and `retired`** | rejected: one word, one meaning (L6) |
-| **A per-source weight on a `dirs` line** | rejected under decision 6: a weight is a ranking parameter, not a source attribute |
+| **A per-source weight in `.fux/sources.yaml`** | rejected under decision 6: a weight is a ranking parameter, not a source attribute |
 | **An `--intent` flag** | rejected under decision 7: a provably incomplete enum, and policy inside an engine that ships facts |
 
 > **Output — the rejected exclusion option, prototyped and never committed.**
@@ -615,7 +610,7 @@ $ fux ask "what commands does the fux command line have" --top 8   # shipped beh
 
 ### Reference (required)
 
-- [SR-DIR-LIST](0120_dir-list.md) — the file and grammar this record's
+- [SR-SOURCES](0116_url-list.md) — the file and grammar this record's
   behaviour attaches to.
 - [SR-RECORD](0109_index-record.md) — the record schema `archived: true` joins;
   [SR-FIND](0104_find.md) — why `find` shows the same fact as `ask`;
@@ -644,7 +639,7 @@ cost on Windows, is stated once in
 marker; if a score or an order differs between an index built with the property
 and one without it; if an archived document is returned with no disclaimer; or
 if **any** mechanism that lets retirement move a score reappears — a tune key, a
-per-source weight on a `dirs` line, or a multiply in `rank()` — without a
+per-source weight in `.fux/sources.yaml`, or a multiply in `rank()` — without a
 pre-registered query set *and* a second corpus.
 
 ⚠ **The first three conditions were written when a weight existed and are
@@ -661,7 +656,7 @@ print([r['loc'] for r in rs if r.get('archived') is None and 'archive' in r['loc
 
 # 2. byte-identical with and without the declaration
 fux ask "<a query with an archived hit>" --top 5 --json > /tmp/a.json
-# remove `archived=true` from .fux/sources/dirs, re-ingest, re-run; diff empty
+# move the path out of `archived:` in .fux/sources.yaml, re-ingest, re-run; diff empty
 diff /tmp/a.json <(fux ask "<same query>" --top 5 --json)
 
 # 3. NO weight exists — the removal, asserted
@@ -703,7 +698,7 @@ evidence.*
 
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-CLI](0101_cli-surface.md) ·
 [SR-FIND](0104_find.md) · [SR-RECORD](0109_index-record.md) ·
-[SR-URL-LIST](0116_url-list.md) · [SR-DIR-LIST](0120_dir-list.md) ·
+[SR-SOURCES](0116_url-list.md) ·
 [SR-REFER](0127_refer-plane.md) ·
 [SR-AGENT-POLICY](0132_agent-policy.md) · [SR-TUNE](0135_tuning.md)
 

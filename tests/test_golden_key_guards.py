@@ -14,7 +14,7 @@ regex alternations differ in whether they reach `golden-answers/`. A guard that
 silently stops matching reads exactly like a guard that is working.
 
 🔴 **This test opens nothing.** It reads the guard files themselves —
-``.gitignore``, ``.claude/settings.json``, the two hooks, ``.fux/sources/dirs``
+``.gitignore``, ``.claude/settings.json``, the two hooks, ``.fux/.fuxignore``
 — and feeds *synthetic* paths to the hooks as subprocesses. No path under either
 spelling is opened, listed, stat'd or globbed; ``git check-ignore`` answers from
 git's rules, not from the filesystem. The companion gate for the committed half
@@ -97,7 +97,9 @@ if not BASH or not HAVE_JQ:
 
 SETTINGS = ROOT / ".claude" / "settings.json"
 GITIGNORE = ROOT / ".gitignore"
-DIRS = ROOT / ".fux" / "sources" / "dirs"
+# W-294: exclusion has one home, so fux's own guard moved here from
+# `.fux/sources/dirs` -- in the same change that deleted that file.
+FUXIGNORE = ROOT / ".fux" / ".fuxignore"
 
 # 🔴 **The switch, and this file now has TWO states to describe.**
 # [L11](../records/0013_LAW-11-sealed-answer-key.md) decision 14 (Arpit,
@@ -401,7 +403,7 @@ def test_both_hooks_are_registered_as_pretooluse_guards():
         )
 
 
-# --- .gitignore and .fux/sources/dirs ---------------------------------------
+# --- .gitignore and .fux/.fuxignore -----------------------------------------
 
 
 def test_git_ignores_both_spellings():
@@ -422,8 +424,21 @@ def test_git_ignores_both_spellings():
 
 def test_fux_never_indexes_the_key():
     """fux's own corpus excludes the sealed benchmark -- its parent and both
-    spellings explicitly, so narrowing the parent line cannot open the key."""
-    text = DIRS.read_text(encoding="utf-8")
-    assert "!work/golden" in text
+    spellings explicitly, so narrowing the parent line cannot open the key.
+
+    Two halves, because `.fuxignore` is last-match-wins: the lines must be
+    THERE, and the parsed file must still DECIDE "ignore" for each path -- a
+    later `!` re-include would leave the lines present and the guard open.
+    Synthetic paths only; `decide` matches strings and opens nothing.
+    """
+    from fux.acquire import fuxignore
+
+    text = FUXIGNORE.read_text(encoding="utf-8")
+    patterns = {line.split("#", 1)[0].strip() for line in text.splitlines()}
+    assert "/work/golden" in patterns
     for rel in (CANONICAL, LEGACY):
-        assert f"!{rel}" in text, f"`{rel}` is not excluded from .fux/sources/dirs by name"
+        assert f"/{rel}" in patterns, f"`{rel}` is not excluded from .fux/.fuxignore by name"
+    ignores = fuxignore.parse(text, origin=str(FUXIGNORE))
+    for rel in ("work/golden", CANONICAL, LEGACY, f"{CANONICAL}/set-1.jsonl", f"{LEGACY}/k.jsonl"):
+        verdict = ignores.decide(rel, is_dir=not rel.endswith(".jsonl"), hand_only=True)
+        assert verdict.rule is not None and not verdict.rule.negate, f"`{rel}` is not ignored by .fux/.fuxignore"

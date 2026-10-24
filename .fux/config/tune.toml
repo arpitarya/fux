@@ -151,7 +151,7 @@ max_table_rows = 20000
 [priority]
 # ⚠ THE ONE TABLE THAT STAYS COMMENTED, and not for consistency's sake: these
 # are not tunables with defaults. A key is a multiplicative weight per SOURCE
-# ENTRY, exactly as it appears in .fux/sources/dirs or .fux/sources/urls, so
+# ENTRY, exactly as it appears in .fux/sources.yaml (a path or a URL), so
 # an uncommented line here would silently REWEIGHT YOUR CORPUS rather than
 # restate a default. Anything unlisted is 1.0 -- an empty table IS the
 # default. When two entries both match, the LONGER one wins.

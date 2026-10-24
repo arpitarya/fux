@@ -7,7 +7,7 @@ import sys
 
 from ..config import find_root, load as load_config
 from ..errors import FuxError
-from ..acquire.dirlist import source_dirs, source_excludes
+from ..acquire.sourcesfile import source_paths
 from ..acquire.gitdir import partition, read_types, walk_sources
 # ⚠ **Aliased, and the alias is the point.** Importing this as the bare name
 # `run` shadows the SUBMODULE `fux.ingest.run`, so `from fux.ingest import run`
@@ -110,8 +110,7 @@ def cmd_ingest(args) -> int:
         config = load_config(root)
         _, skipped = walk_sources(
             root,
-            source_dirs(root, config.dirs_file),
-            excludes=source_excludes(root, config.dirs_file),
+            source_paths(root, config.sources_file),
             types=read_types(root),
             ignores=fuxignore.read(root),
         )
@@ -122,12 +121,6 @@ def cmd_ingest(args) -> int:
         # notice's indented prose lines, neither of which anything parses.
         for s in skipped:
             print(f"{s.rel_path}: {s.reason}")
-        # The duplicate warning reaches stderr here too, not only on an ingest:
-        # `--list-skipped` is the command someone runs *because* a file is
-        # missing, which is precisely when a pattern stated in two places is
-        # the thing they need told.
-        for line in fuxignore.duplicate_warnings(root, dirs_file=config.dirs_file):
-            print(line, file=sys.stderr)
         return 0
 
     # **The networked half** (W-177). A bare `fux ingest` goes out for the URLs
@@ -201,12 +194,7 @@ def ingest_and_report(args_root, args, *, refresh_urls: bool, only_urls=None, fi
     # W-93: a fux-written `.fuxignore` line freezes the verdict that produced
     # it, so a line that has stopped being true is an invisible filter. The
     # freeze is Arpit's call; making it loud is this.
-    config = load_config(args_root)
-    for line in skipnotice.stale_warnings(
-        args_root,
-        types=read_types(args_root),
-        excludes=source_excludes(args_root, config.dirs_file),
-    ):
+    for line in skipnotice.stale_warnings(args_root, types=read_types(args_root)):
         print(line, file=sys.stderr)
     # Advisory, and on stderr so a piped `fux ingest` is unchanged by it.
     for line in report.warnings:

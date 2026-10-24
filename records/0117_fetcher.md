@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-20
 date: 2026-08-19
 feature: the fetch contract, what it is called, and how a fetcher reaches a repository
-owns: [src/fux/acquire/urlsrc.py@8115cf4e4be9]
+owns: [src/fux/acquire/urlsrc.py@42896b07825d]
 laws: [L2, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 7fa945bb71ac43510a5b0d90550aab446c86393efe3d3d058e617b44288747fc
+content_sha: 4429b1dece69f322e5e8eeccd7705ca790cc0b9aa1384deec6281d16628161c0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -50,7 +50,7 @@ per-URL attribute all say one word.
 
 ```mermaid
 flowchart LR
-    L[".fux/sources/urls<br/>fetch= declares which"] --> R["fux add &lt;URL&gt; · fux ingest"]
+    L[".fux/sources.yaml urls:<br/>fetch: declares which"] --> R["fux add &lt;URL&gt; · fux ingest"]
     R --> P["resolve fetch=&lt;name&gt;<br/>your file, else the declared package"]
     P --> F[".fux/fetchers/&lt;name&gt;.py · fux-fetcher-&lt;name&gt;<br/>never fux's own code"]
     F --> B["bytes + Content-Type"]
@@ -63,8 +63,8 @@ flowchart LR
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-  .fux/sources/urls          fux add <URL> · fux ingest
-  (fetch= declares which) -->  |  resolve fetch=<name>
+  .fux/sources.yaml urls:    fux add <URL> · fux ingest
+  (fetch: declares which) -->  |  resolve fetch=<name>
                                v
        .fux/fetchers/<name>.py  (yours, wins)  else  fux-fetcher-<name> (declared, pinned)
                                |              core holds ZERO network lines
@@ -151,7 +151,7 @@ right decoder at all**.
 refused with a `FuxError` that names the fetcher and the contract. At ingest that
 is a **named skip of that URL, never a crash**, and at `fux add` and verify time
 it is the same `FuxError` the other fetcher failures raise. 3.0.0-alpha.2
-(SR-URL-LIST decisions 16-17) already made every pre-2026-08-26 repository
+(SR-SOURCES decisions 16-17) already made every pre-2026-08-26 repository
 rewrite its URL lines, so the ramp protected nothing the major had not broken.
 
 **3. It is called a *fetcher*, not middleware, not an adapter.** The file, the
@@ -166,7 +166,7 @@ returns a document or raises. **This is the decision that keeps decision 3
 true** — the day a chain lands, the name is wrong again.
 
 **5. Which fetcher a URL uses is declared, never detected.** Via
-[SR-URL-LIST](0116_url-list.md)'s `fetch=` attribute, which resolves to
+[SR-SOURCES](0116_url-list.md)'s `fetch=` attribute, which resolves to
 `.fux/fetchers/<name>.py` when the consumer has that file, and otherwise to the
 fetcher package `.fux/config/plugins.toml` declares for `<name>` ([SR-PLUGINS](0165_plugins.md)
 P8) — an installed package nobody declared is never consulted. **A fetcher
@@ -503,7 +503,7 @@ place.
 
 🔴 **A pinned URL never resolves a fetcher, and that is a contract property
 rather than an optimisation.** `update=never`
-([SR-URL-LIST](0116_url-list.md) decision 14) is filtered **above**
+([SR-SOURCES](0116_url-list.md) decision 14) is filtered **above**
 `fetch_all`'s grouping, not inside its per-URL loop.
 
 - **`load_fetcher` imports consumer Python and executes whatever sits at module
@@ -560,7 +560,7 @@ writes it down.** Arpit: *"The set should never be empty. It should be a
 mandatory argument when we are doing an add so that the fetcher gets defined."*
 `fux add` takes `--fetch <stem>`, else resolves through the binding and then the
 claims, and **refuses** when nothing matches — printing the hosts it tried and
-the fetcher stems on disk. [SR-URL-LIST](0116_url-list.md) decision 12 therefore
+the fetcher stems on disk. [SR-SOURCES](0116_url-list.md) decision 12 therefore
 stands **unnarrowed**: `fetch=` is on every generated line.
 
 ⚠ **What that gives up, said aloud rather than discovered.** Every written line
@@ -907,7 +907,7 @@ evidence.*
 **Records** — [SR-LAWS](0001_LAWS.md) · [SR-DOTFUX](0102_fux-directory.md) ·
 [SR-URL-INGEST](0107_url-ingest.md) · [SR-RECORD](0109_index-record.md) ·
 [SR-CONFIG](0113_config.md) · [SR-EXTRACTED](0115_extracted-mode.md) ·
-[SR-URL-LIST](0116_url-list.md) · [SR-CDP-FETCHER](0118_cdp-fetcher.md) ·
+[SR-SOURCES](0116_url-list.md) · [SR-CDP-FETCHER](0118_cdp-fetcher.md) ·
 [SR-HTTP-FETCHER](0119_http-fetcher.md) · [SR-PLUGINS](0165_plugins.md) · [SR-REFER](0127_refer-plane.md) ·
 [SR-DECODE](0139_decode.md)
 

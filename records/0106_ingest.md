@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-20
 date: 2026-08-18
 feature: the `fux ingest` pipeline — sources to committed records
-owns: [src/fux/acquire/ingestlog.py@3953ad922b51, src/fux/ingest@aff12f6ac1c5, src/fux/ingest/priors.py@910fa3f54ae0, node/src/ingest/gitdir.mjs@4ca02fdd1c47, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@c977c497fe3c]
+owns: [src/fux/acquire/ingestlog.py@3953ad922b51, src/fux/ingest@4c1eedc4a685, src/fux/ingest/priors.py@4d5ec3f29df4, node/src/ingest/gitdir.mjs@949b30d77d12, node/src/ingest/priors.mjs@d8d4691d7e49, src/fux/acquire@1fae43994a81]
 laws: [L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: cc96868e839e8e13d53e52e23ed4e0283dda49038ea65c919d46966130360453
+content_sha: d9fa68872f101c857f0a41ced9bb4f6696645bffb1861f51564e2ec3e14fc211
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -84,7 +84,7 @@ working exactly as designed.
 
 ```mermaid
 flowchart LR
-    S[".fux/sources/dirs<br/>one entry per line"] --> W["walk<br/>skips reported once<br/><i>not indexed vs skipped</i>"]
+    S[".fux/sources.yaml<br/>paths: — includes only"] --> W["walk<br/>skips reported once<br/><i>not indexed vs skipped</i>"]
     W --> P["parse + decode<br/>frontmatter + NFC"]
     P --> X["extract<br/>title · phrases · terms · flen<br/><i>skipped when sha is unchanged</i>"]
     X --> E["resolve edges<br/>corpus-wide, every run"]
@@ -301,7 +301,7 @@ before the first byte lands.
 
 **9. De-listing is honoured on every run; only *fetching* needs the fenced
 path.** A `url:` record is carried forward for exactly as long as its line
-exists in `.fux/sources/urls`. Reading that file is not a network call, so
+exists in the `urls:` of `.fux/sources.yaml`. Reading that file is not a network call, so
 removing a document never was a networked operation — and requiring the network
 for it would mean `fux remove <URL>` could not work offline.
 
@@ -312,7 +312,7 @@ never delete a document. Conflating the two is what produced the defect this
 decision fixed.
 
 A missing list with surviving `url:` records is a **loud error**, not a mass
-deletion — the same way a missing `dirs` file is. The two silent readings are
+deletion — the same way a missing `.fux/sources.yaml` is for paths. The two silent readings are
 both worse: emptying every URL document because a file went missing, or
 carrying them forever.
 
@@ -355,8 +355,8 @@ and filled in.
 
 **13. Ingest stamps `archived: true` on records from a declared-archived
 source** ([SR-ARCHIVED-CONTENT](0134_archived-content.md) decision 1). It reads
-`archived_dirs()` — the same `.fux/sources/dirs` declaration the grammar already
-parses — and never a path convention. Three properties, each deliberate:
+`sourcesfile.archived_paths()` — the `archived:` list of `.fux/sources.yaml`,
+a declaration — and never a path convention. Three properties, each deliberate:
 
 - **Absent when false**, so a live record's shape is unchanged and no existing
   consumer's parse breaks. `_format` is **not** bumped: the property set grows
@@ -392,7 +392,7 @@ about the wiring are decisions rather than mechanics:
 
 **15. A skip carries its CLASS, and the summary counts the two separately.**
 `not indexed` is a committed list doing its job — the type allowlist, a
-`.fuxignore` line, a `!` exclusion in `.fux/sources/dirs`. `skipped` is a file
+`.fuxignore` line. `skipped` is a file
 fux opened and could not read: `empty`, `binary`, `non-utf8`, a decode that
 found nothing, a fetch that failed.
 
@@ -736,7 +736,7 @@ rules — the successor must exist, never itself, and a malformed enrichment
 retires nothing. [SR-ENRICH](0137_enrich.md) decisions 17-18.
 
 **A pinned URL is a `POLICY` skip, taken before the fetch and carried forward
-after it.** `update=never` ([SR-URL-LIST](0116_url-list.md) decision 14) filters
+after it.** `update=never` ([SR-SOURCES](0116_url-list.md) decision 14) filters
 the resolved list between `resolve_urls` and `fetch_all`.
 
 - **`POLICY`, not `UNFETCHED`** — decision 15's split says `POLICY` means *the
@@ -757,7 +757,7 @@ the resolved list between `resolve_urls` and `fetch_all`.
 ⚠ **The pinned-URL filter gained its one exemption, 2026-09-11.** A line
 declaring `update=never` is dropped above `fetch_all`'s grouping — except the
 URL `fux add` has just written, which gets the single fetch
-[SR-URL-LIST](0116_url-list.md) decision 14 always promised it. The walk is
+[SR-SOURCES](0116_url-list.md) decision 14 always promised it. The walk is
 otherwise unchanged, and no other caller may populate that set.
 
 ⚠ **The walk gained a second thing to say on stderr, 2026-09-11.** Beside the
@@ -962,10 +962,9 @@ https://wiki.example/ops/cold-store	9c1f0b2e7a4d5e6f8091a2b3c4d5e6f708192a3b	htm
   2026-10-20): the key compares `<module>@<VERSION>+<ext tail>`, so a lockstep
   release re-extracts nothing, and this column names the distribution installed
   at the last ingest. The tab after
-  `loc` is what the whitespace-split sources grammar cannot give: a walked
-  path may carry a space; a sources entry may not
-  ([SR-URL-LIST](0116_url-list.md) decision 8).
-- **The tail:** zero or more `key=value` in the sources-list grammar — no
+  `loc` is what lets a row hold any walked path: a path may carry a space,
+  and a space-split row could not.
+- **The tail:** zero or more `key=value` pairs — no
   whitespace in a value, no bare flag, **no sentinel: a key is present only
   when it holds a value.** The key set is **closed, and it is this list:**
   `archived=true` (the record carries it, from the source entry's declaration —
@@ -1091,7 +1090,7 @@ did.**
 
 The `decoder=` half of the pipe touched `sourcelist.py`, `urlsrc.py` and
 `refusals.py`, each owned more specifically by
-[SR-URL-LIST](0116_url-list.md), [SR-FETCHER](0117_fetcher.md) and
+[SR-SOURCES](0116_url-list.md), [SR-FETCHER](0117_fetcher.md) and
 [SR-REFUSAL](0146_refusals.md). **Decision 22's register is untouched**: its
 `decoder` column already carried the `decoderdigest` string for whatever read a
 document's bytes, and it now carries the digest of the **declared** decoder
@@ -1118,7 +1117,7 @@ re-ingest, and why this decision did not move with it.
 arguments, read from `[sources.url]` by `run.py`; `urlsrc.DEFAULT_MAX_PARALLEL`
 and `acquired.DEFAULT_MAX_BYTES` are deleted, and `resolve_parallel` no longer
 answers an unconfigured call ([SR-CONFIG](0113_config.md) decisions 7a and 17).
-The Node reader's `dirsFile` no longer falls back to `.fux/sources/dirs`.
+The Node reader's `sourcesFile` has no fallback path either: it reads `[sources] sources_file`.
 
 **Every decoder cap is in the extract-config digest** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27). `_extract_config_digest` appends `limits.<decoder>.<key>=<value>` for every cap the built-ins read, so an edited cap re-extracts the corpus at the next `fux ingest`; a consumer's extra `[limits]` table changes nothing fux extracts and is left out. `fux ingest` checks every cap before any decoder runs. ⚠ **`fux ingest --check` still compares content shas only** and does not see a changed cap — the same as a changed `tune.toml [index]` today; the digest lives in gitignored runtime, so a fresh clone has none to compare. Open for Arpit (W-225).
 
@@ -1137,20 +1136,20 @@ The Node reader's `dirsFile` no longer falls back to `.fux/sources/dirs`.
 
 **`.fux/config/identifiers.toml` is an input to extraction** ([SR-IDENTIFIERS](0160_identifiers.md)). Ingest loads it once, passes it to every field's analysis and to anchor text, and stamps its effective digest into every shard header; a record is reused only when the whole expected header matches, so an edited file re-analyses the corpus, and a moved digest re-derives carried `url:` records.
 
-**24. The walk never enters a directory a `!` exclusion removes** (W-244,
-ruled 2026-10-03 under Arpit's delegation; L11 decision 9). `gitdir.walk_sources` used to
-`rglob` every file of an included directory and apply the exclusions after. On
-2026-10-03 that listed `work/golden/`, the sealed answer key's parent, while the
-tree was LOCKED, and wrote four key-file names into `.fux/.fuxignore`.
-`_candidate_paths` is now an `os.walk` that drops an excluded directory from
-descent before listing it, and records it once as `dir/`.
+**24. The walk never enters a directory a hand-written `.fuxignore` line
+excludes** (W-244, ruled 2026-10-03 under Arpit's delegation; L11 decision 9).
+Applying exclusions after listing a directory is a read of that directory, and
+it once listed `work/golden/` — the sealed answer key's parent — while the tree
+was LOCKED. So `_candidate_paths` is an `os.walk` that drops a directory from
+descent before listing it whenever `gitdir.ignored_dir` says a hand-written
+`.fuxignore` line ignores it, and records it once as `dir/`. Exclusion has no
+other home: `.fux/sources.yaml` lists includes only ([SR-SOURCES](0116_url-list.md)).
 
-- **What is indexed does not move.** On this repo the index built with the
-  old walk and with the new one is byte-identical, 257/257 shards. Only the
-  skip list changes ([SR-FUXIGNORE](0144_fuxignore.md) decision 11f).
-- **A hand-written `!` re-include turns pruning off.** It outranks an
-  exclusion and could name a file under the directory, so while
-  `.fuxignore` holds one, the walk enumerates as before.
+- **What is indexed does not move.** Pruning changes only the skip list
+  ([SR-FUXIGNORE](0144_fuxignore.md) decision 11f), never which files are
+  indexed — git's rule already ignores every file beneath an ignored directory.
+- **Only hand-written lines prune.** A fux-written block line is an exact path
+  a previous run recorded, never a directory pattern somebody meant.
 - `followlinks=False` is `rglob`'s own symlink behaviour.
 - Held by `tests/ingest/test_source_filters.py`: a spy on `os.scandir` proves
   the directory is never scanned. The repo tests that walk the root go through
@@ -1160,7 +1159,7 @@ descent before listing it, and records it once as `dir/`.
 
 **No decision here moved** (W-248, 2026-10-04): `ingest/queue.py` gained `model_needed` and `no_decoder`, the readers that classify a row by its reason.
 
-**No decision here moved** (W-261, 2026-10-05): the URL branch of `ingest/run.py` moved to `ingest/urlingest.py` (SR-URL-INGEST's) and the `dirs`-list readers of `acquire/gitdir.py` to `acquire/dirlist.py` (SR-DIR-LIST's). The walk calls both at the same points, and its output is byte-identical. Node's `ingest/gitdir.mjs` lost `archivedDirs` to `ingest/dirlist.mjs` and is narrowed to `is_archived_loc`.
+**No decision here moved** (W-261, 2026-10-05): the URL branch of `ingest/run.py` moved to `ingest/urlingest.py` (SR-URL-INGEST's) and the source-list readers of `acquire/gitdir.py` to `acquire/sourcesfile.py` (SR-SOURCES's). The walk calls both at the same points, and its output is byte-identical. Node's `ingest/gitdir.mjs` reads the same file through `ingest/sourcelist.mjs`.
 
 **W-274, 2026-10-11 — the section plane is opt-in.** Ingest builds section records only under `fux.toml [index] section_records = true`. A delta run whose committed index was built in the other mode refuses and names `fux ingest --full`. The last run's mode is one more line in `runtime/extract-config-digest`, so the first run after this change re-extracts once. The rule is SR-SECTIONS decision 11's.
 
@@ -1288,8 +1287,8 @@ descent before listing it, and records it once as `dir/`.
   (decision 10). [SR-GRAPH](0126_graph.md)'s `edges_from_records` lifts edges
   with no validation on the strength of that, which was true only for
   re-resolved records before.
-- **An offline run reads one more committed file** — `.fux/sources/urls` — but
-  only in a repo that actually holds `url:` records.
+- **An offline run reads the `urls:` of `.fux/sources.yaml`** — but only in a
+  repo that actually holds `url:` records.
 - ⚠ **RETIRED 2026-09-20 (W-194).** This consequence read: *a `hashed` URL
   record writes a second thing before it is eligible to commit* — the
   fresh-fetch loop held the bytes, so it also wrote the extracted title to
