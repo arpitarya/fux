@@ -6,12 +6,12 @@ title: "SR-MAINTENANCE (0129) — the git hooks that keep a committed index in s
 description: "post-commit DEFERS — it writes a dirty list and spawns a detached one-shot re-index; post-merge re-ingests, post-checkout only rebuilds; no hook ever touches the network; every index writer holds one lock; and a resident daemon covers the URLs nobody queries."
 status: accepted
 date: 2026-08-20
-amended: 2026-10-13
+amended: 2026-10-24
 feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
 owns: [src/fux/maintain@1d55c635801e, tools/maintenance-bench@1327184f960f, tools/runner-race@ef39682b6efc, src/fux/schemas/state.schema.json@fc7d0f478383, src/fux/acquire/urlstate.py@02bff7516346, src/fux/store/dirty.py@94e65bb0120f, src/fux/store/lastcited.py@f9d94f9e600b]
 laws: [L4, L5, ex-L5, L7]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: e64a7ad7d9e568a43713307c88c9808fd20501aab4711c96aa2f703946be38c0
+content_sha: 4784088d605e6fbb9deb4eb8901c16f95388b8c359f7dc2a8377b532ea73eadb
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -286,6 +286,20 @@ removes only what it wrote.
 not tracked, so a hook cannot arrive with a clone — **a property to respect
 rather than route around, because a tool that installed itself on clone would
 execute code no reviewer saw.**
+
+*Amended 2026-10-21 (W-291, Arpit's ask, Cowork: "install hooks on fux setup").*
+**`fux setup` — a verb a human types — now installs them**, by calling the one
+installer `fux hooks` calls (`maintain.hooks.install`), unless the human typed
+`fux setup --no-hooks`. This does **not** reverse the paragraph above: a hook
+still never arrives with `git clone` and is still never committed, so a
+colleague who clones a set-up repo has no hook until they run `fux setup` or
+`fux hooks` themselves. What changed is who has to type a second verb, not who
+decides: **only the person who typed `fux setup` gets hooks.** Setup is never
+fatal over them — no git repository prints one line (`run fux hooks after git
+init`) and exits 0, and a hook fux did not write is kept and named *kept
+(yours)*. `.gitattributes` is announced with the other paths outside `.fux/`.
+Setup does not start the daemon (decision 9c stands), and decision 5a is
+untouched: the installed hooks run `--no-fetch` only.
 
 **5a. NO HOOK EVER TOUCHES THE NETWORK.** Without exception — **including** the
 commit that edits `.fux/sources/urls`, which is the exception that was

@@ -5,13 +5,13 @@ name: SR-DOTFUX
 title: SR-DOTFUX (0102) — the .fux/ directory
 description: "Every child of .fux/ is declared committed, derived or acquired; the ignore rule is narrow by construction and asserted by doctor against git itself."
 status: accepted
-amended: 2026-10-20
+amended: 2026-10-24
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@6b33ceae222f, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@e059b21d3059, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@c785b43be2bc]
+owns: [src/fux/store/fuxdir.py@6b33ceae222f, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@40030893e16a, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@a89feeb4e25a]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 283f9c1af912d0149f23bf0e99885c307240b9b478ae2063619cdaaf6582d4e2
+content_sha: c7ddeb881b1b8eec5587877f4bd0eae400dd2c2474686f9d2d96636c87656109
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -280,7 +280,7 @@ holding code.
 | moment | writes | why |
 |---|---|---|
 | **`ensure_layout`**, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore`, **`.fux/node/` + `.fux/fux`** — 🔴 **and NOTHING outside `.fux/`**: [SR-NODE-SEARCH](0153_node-search.md) decision 15 wires `.fux/node` into the consumer's root manifest, and **that edit belongs to `fux setup` alone**, precisely because this row's own rule is that a no-op ingest produces a no-op diff. ✅ **Structural since 2026-09-12, not a convention**: `detect_workspace`/`wire_workspace` live in `setup.py`, and `ensure_layout(root, node_shape=...)` takes the decided shape as a keyword it never computes — an ingest keeps whatever shape is already on disk and can flip nothing | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory. The reader is here rather than in `setup` for the same reason: a clone with no Python has to be able to read the index the first time anyone ingests, not only after someone remembers to run `setup` |
-| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `formats.toml`, `tune.toml`, `output.toml`, `inspect.toml`, `.fuxignore`, `refusals.toml`, `pii.toml`, `plugins.toml`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions. **No `fetchers/*.py` and no `decoders/*.py`** since W-289 ([SR-PLUGINS](0165_plugins.md) P9): the declared package runs | **optional, explicit, once per repo** — a consumer asked for it |
+| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `formats.toml`, `tune.toml`, `output.toml`, `inspect.toml`, `.fuxignore`, `refusals.toml`, `pii.toml`, `plugins.toml`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions — **and, outside `.fux/`, the git hooks in `.git/hooks/` with the `fux-index` merge driver in `.git/config` and its lines in `.gitattributes`** ([SR-MAINTENANCE](0129_hooks.md) decision 5, amended 2026-10-21, W-291; `fux setup --no-hooks` skips them; never fatal; `.gitattributes` is announced under the OUTSIDE note). **No `fetchers/*.py` and no `decoders/*.py`** since W-289 ([SR-PLUGINS](0165_plugins.md) P9): the declared package runs | **optional, explicit, once per repo** — a consumer asked for it |
 
 **`ensure_layout` must never write a fetcher**, and nothing in either column is
 ever overwritten: a consumer's annotations and edits survive every run. **The

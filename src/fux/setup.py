@@ -1808,6 +1808,40 @@ def run(root: Path, *, agents: bool = True, pin: bool = False) -> SetupReport:
     return report
 
 
+#: The one committed file outside `.fux/` that the hooks step may write (W-291).
+HOOKS_OUTSIDE_FILE = ".gitattributes"
+
+
+def _install_hooks(root: Path, report: SetupReport) -> list[str]:
+    """W-291: the same installer `fux hooks` runs, never fatal, never a copy.
+
+    SR-MAINTENANCE decision 5 (amended): a hook cannot arrive by clone, so the
+    person who typed `fux setup` gets them. The daemon is not started here
+    (decision 9c); the hooks run `--no-fetch` only (decision 5a).
+    """
+    from .errors import FuxError
+    from .maintain import hooks as hooks_mod
+
+    if not (root / ".git").exists():
+        return ["hooks: no git repository - run `fux hooks` after `git init`"]
+    attributes = root / HOOKS_OUTSIDE_FILE
+    before = attributes.read_bytes() if attributes.exists() else None
+    try:
+        hook_report = hooks_mod.install(root)
+    except FuxError as exc:
+        return [f"hooks: not installed ({exc}) - run `fux hooks` to retry"]
+    lines = ["hooks:"]
+    lines += [f"  installed {name}" for name in hook_report.installed]
+    lines += [f"  kept      {name}" for name in hook_report.kept]
+    lines += [f"  kept (yours) {name} - not written by fux, never rewritten" for name in hook_report.refused]
+    lines.append(f"  merge driver {hook_report.merge_driver}")
+    after = attributes.read_bytes() if attributes.exists() else None
+    if after != before:
+        report.outside.append(HOOKS_OUTSIDE_FILE)
+        lines.append(f"  wrote {HOOKS_OUTSIDE_FILE} lines (committed; skip all of this with `fux setup --no-hooks`)")
+    return lines
+
+
 def cmd_setup(args) -> int:
     # The one verb that may run before a root exists: it is what *creates* the
     # marker (`fux.toml`), so requiring one first would be circular. Everywhere
@@ -1815,6 +1849,9 @@ def cmd_setup(args) -> int:
     root = find_root() or Path.cwd()
     report = run(
         root, agents=not getattr(args, "no_agents", False), pin=getattr(args, "pin", False)
+    )
+    hook_lines = (
+        [] if getattr(args, "no_hooks", False) else _install_hooks(root, report)
     )
     for rel in report.written:
         print(f"  wrote {rel}")
@@ -1885,15 +1922,20 @@ def cmd_setup(args) -> int:
     if report.outside:
         print()
         print(
-            f"  note: {len(report.outside)} of those are OUTSIDE .fux/ - they teach your "
-            "agents how to read this index:"
+            f"  note: {len(report.outside)} of those are OUTSIDE .fux/ - the agent files "
+            "teach your agents how to read this index:"
         )
         for rel in report.outside:
             print(f"        {rel}")
-        print(
-            "        Turn them off with [agents] install = [] in fux.toml, "
-            "or `fux setup --no-agents`."
-        )
+        if any(rel != HOOKS_OUTSIDE_FILE for rel in report.outside):
+            print(
+                "        Turn them off with [agents] install = [] in fux.toml, "
+                "or `fux setup --no-agents`."
+            )
+    if hook_lines:
+        print()
+        for line in hook_lines:
+            print(line)
 
     # SR-PLUGINS P6: the one install line, printed and never run (L5). ASCII
     # only: these bytes reach a Windows console (SR-CLI veto 7).

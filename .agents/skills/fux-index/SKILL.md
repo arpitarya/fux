@@ -48,6 +48,7 @@ writes **no** decoder or fetcher: a file you put in `.fux/decoders/` or
 | `.fux/tune.toml` · `.fux/output.toml` | ranking knobs · output defaults — the engine defaults spelled out |
 | `.fux/plugins.toml` | the decoder and fetcher **packages** this repo runs, pinned — proposed from your sources; setup prints the one `pip install` line and installs nothing. After a fux upgrade, `fux setup --pin` re-pins every row |
 | `.fux/README.md` · `.fux/.gitignore` | the layout table · ignores `runtime/` and `acquired/` by name |
+| `.git/hooks/` · `.git/config` · `.gitattributes` | **the index-update git hooks and the `fux-index` merge driver** (W-291) — the same install `fux hooks` does; a hook fux did not write is kept and named `kept (yours)`; no git repo prints `run fux hooks after git init` and exits 0. `.gitattributes` is committed and listed under the OUTSIDE note. Skip with `fux setup --no-hooks`; the daemon is never started |
 
 **It also writes agent files OUTSIDE `.fux/`** — under `.claude/{skills,rules}/`,
 `.agents/skills/`, `.github/{agents,instructions}/`, `.kiro/{steering,skills}/`

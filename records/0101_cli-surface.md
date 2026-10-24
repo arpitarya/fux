@@ -5,13 +5,13 @@ name: SR-CLI
 title: SR-CLI (0101) — the command-line surface
 description: Flat verbs in seven groups, one error boundary, three output modes. Freezes the CLI contract with a captured transcript of every command and its real output.
 status: accepted
-amended: 2026-10-20
+amended: 2026-10-24
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@3bd5b00dfd42, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@f5e59a40b46a, src/fux/progress.py@10364bd02e0a, tests_e2e@62817a4c65c5, node/fux.mjs@ef9e157970bc, src/fux/stdio.py@9e270b49bdaa]
+owns: [src/fux/cli.py@1b7d8d8111a4, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@f5e59a40b46a, src/fux/progress.py@10364bd02e0a, tests_e2e@2a97897c7b41, node/fux.mjs@ef9e157970bc, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d3c053667d424210fc1d3332cd044f5e9f288b83e56c100069c065b665a51b75
+content_sha: 89a0ecd96804f41d2e2dc15f5dae169065b16ed0c4e5a5ed62e3f634ee419a42
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -624,6 +624,8 @@ will pin.
 **`fux ingest` writes none of that.** `ensure_layout` writes only
 `.fux/README.md` and `.fux/.gitignore`, so a repo that wanted an index never
 receives code it did not ask for.
+
+**`--no-hooks` opts out of the git hooks** (W-291, 2026-10-21): `fux setup` calls the installer `fux hooks` calls ([SR-MAINTENANCE](0129_hooks.md) decision 5), prints what it installed, kept or left (`kept (yours)` for a hook fux did not write), and lists `.gitattributes` with the paths outside `.fux/`. Without a git repository it prints `run fux hooks after git init` and still exits 0. Setup and `hooks` are both fux-writer verbs, so the role table is unchanged.
 
 **`--no-agents` opts out of the agent policy files**, and it is an opt-*out*
 because the failure it prevents is silent — an agent citing a retired design
