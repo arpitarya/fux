@@ -151,7 +151,7 @@ def _planted(root: Path) -> None:
 def planted(tmp_path):
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True, capture_output=True)
     _planted(tmp_path)
-    setup = _run(tmp_path, "setup", "--no-agents", check=False)
+    setup = _run(tmp_path, "setup", "--no-agents", "--no-hooks", check=False)
     assert setup.returncode == 0, setup.stderr
     # `fux setup` writes `.fux/sources/dirs` write-if-missing; the plant above
     # already wrote it, so the value under test is the planted one.
