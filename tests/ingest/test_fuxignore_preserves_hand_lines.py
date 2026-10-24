@@ -17,7 +17,7 @@ HAND = "# mine\n__pycache__/\n*.py[cod]\n"
 
 
 def _repo(tmp_path):
-    (tmp_path / ".fux").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     (tmp_path / "docs").mkdir(exist_ok=True)
     (tmp_path / "fux.toml").write_text("[fux]\nversion = 1\n", encoding="utf-8")
     return tmp_path

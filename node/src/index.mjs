@@ -11,7 +11,7 @@
  *     await ix.find('rollback', { top: 5 })
  *
  * 🔴 **Every ranking method goes through `runQuery`**, which is where
- * `.fux/tune.toml` enters. Calling the scan directly — which this file did
+ * `.fux/config/tune.toml` enters. Calling the scan directly — which this file did
  * until 2026-09-12, and so did `api.py` — returns a different ranking from the
  * CLI on any tuned repo, silently. Three surfaces, one seam, or it is not one
  * API (SR-NODE-SEARCH decision 8; SR-API decision 6).
@@ -64,7 +64,7 @@ class Index {
     this._planeCache = null;
   }
 
-  /** `.fux/output.toml`, for the values a caller did not pass — the CLI's own
+  /** `.fux/config/output.toml`, for the values a caller did not pass — the CLI's own
    *  keys, exactly as `api.py::_output` reads them (L12). */
   _output() { return loadOutput(this.root, { enabled: true }); }
 
@@ -169,7 +169,7 @@ class Index {
    * A query or `seed`, never both. **The query's seeds are `lexical`'s top-k,
    * never `ask`'s boosted list** (SR-GRAPH decision 13). `kinds`, `linkIdf`
    * and `maxHops` are `--kinds`, `--link-idf` and `--max-hops`; the sizes come
-   * from `.fux/tune.toml [graph]`, as the CLI's do. */
+   * from `.fux/config/tune.toml [graph]`, as the CLI's do. */
   async graph(query = null, { seed = null, kinds = null, linkIdf = null, maxHops = null } = {}) {
     const shards = new Shards(this.root);
     const tune = loadTune(this.root, { enabled: true });

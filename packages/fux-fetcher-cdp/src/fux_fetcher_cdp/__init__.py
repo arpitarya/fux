@@ -1,7 +1,7 @@
 """`fux-fetcher-cdp` — Chrome DevTools Protocol, pure stdlib (W-289, SR-CDP-FETCHER).
 
 **This is a fux plugin package, and it imports nothing from fux.** A repository
-runs it only when `.fux/plugins.toml` declares `fux-fetcher-cdp`, pinned, and a
+runs it only when `.fux/config/plugins.toml` declares `fux-fetcher-cdp`, pinned, and a
 URL line says `fetch=cdp` (SR-PLUGINS P2-P4, P10). Fux loads it under
 `fux add <URL>` or `fux ingest`, calls it once per URL, and decodes the bytes it
 returns exactly like a repo file. No offline path can reach it: its WebSocket

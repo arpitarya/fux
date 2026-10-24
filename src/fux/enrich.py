@@ -57,7 +57,7 @@ from .store import TF_FIELDS
 from .constants import fixed
 
 #: W-110. How far down its own ranking a question must place its document is
-#: `.fux/tune.toml [enrich] self_retrieval_k` — **3** as shipped, ratified by
+#: `.fux/config/tune.toml [enrich] self_retrieval_k` — **3** as shipped, ratified by
 #: Arpit 2026-09-05 and recorded in SR-ENRICH. A question is a *retrieval*
 #: claim, and one that cannot reach the top three on the corpus it was written
 #: for is not one.
@@ -98,7 +98,7 @@ class ScopeReport:
     stale: list[PlanItem]
     malformed: list[tuple[str, str]]
     #: W-102. `(path, [rule names])` for every enrichment whose BODY matches a
-    #: `.fux/pii.toml` rule. Separate from `malformed` because the remedy is
+    #: `.fux/config/pii.toml` rule. Separate from `malformed` because the remedy is
     #: different: a malformed file is fixed by adding a key, this one is fixed
     #: by rewriting the prose, and conflating them would offer the wrong advice.
     pii: list[tuple[str, list[str]]] = field(default_factory=list)
@@ -131,7 +131,7 @@ class ScopeReport:
 #:
 #: What is left is `body`, `heading` and `path` — the document's own content,
 #: which is what doc2query-- actually asks about. **At this repo's own
-#: weights** (`.fux/tune.toml [bm25f]`): the filter judges a question by the
+#: weights** (`.fux/config/tune.toml [bm25f]`): the filter judges a question by the
 #: ranking this repo's searchers get.
 _FILTER_ZEROED = frozenset({"title", "ctx"})
 
@@ -350,7 +350,7 @@ def _unretrievable(root: Path, path: Path, record: dict, k: int) -> list[tuple[s
         raise FuxError(
             "`fux enrich --check` ranks every question against the index, and ranking "
             "is fux-reader's — install fux-engine (or fux-reader beside fux-writer), "
-            "or set [enrich] self_retrieval_k = 0 in .fux/tune.toml"
+            "or set [enrich] self_retrieval_k = 0 in .fux/config/tune.toml"
         ) from None
     from .tune import load as load_tune
 
@@ -765,7 +765,7 @@ def _render_check(reports: list[ScopeReport], *, target: str | None = None, k: i
             # SR-PII decision 7's reasoning applied to a second surface: say
             # WHICH rule fired. `[REDACTED]` everywhere destroys that, and so
             # does "this file contains PII".
-            print(f"      refused: {path} — matches .fux/pii.toml rule(s): {', '.join(names)}")
+            print(f"      refused: {path} — matches .fux/config/pii.toml rule(s): {', '.join(names)}")
         for path, misses in report.unretrievable:
             for question, rank, is_human in misses:
                 where = "absent from the ranking" if rank is None else f"rank {rank}"

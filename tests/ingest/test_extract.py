@@ -25,7 +25,7 @@ def test_title_falls_back_to_filename():
 
 
 def test_phrases_are_headings_only_capped_at_the_default():
-    """The cap was a hard-coded 12 until 2026-09-11; it is `.fux/tune.toml
+    """The cap was a hard-coded 12 until 2026-09-11; it is `.fux/config/tune.toml
     [index] max_phrases` now, default `DEFAULT_MAX_PHRASES` (32)."""
     DEFAULT_MAX_PHRASES = template_index().max_phrases
 

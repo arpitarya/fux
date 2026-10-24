@@ -8,10 +8,10 @@ amended: 2026-10-13
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@87c48db021cb, .fux/inspect.toml@a2b927adc116, src/fux/inspect_config.py@9362e4e69b02]
+owns: [src/fux/inspect@930176d4471c, .fux/config/inspect.toml@a2b927adc116, src/fux/inspect_config.py@5ae9b2f8170a]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: d645329d7ff8ed7f7e5a9a113468cac93a15dd3b7863321dca16696993530053
+content_sha: 3cf2ca29b1d73a1be2d71c71119f81e0ec845b6d0f7d40dc1599b10b86759c7d
 ratifies: W-169
 ---
 
@@ -19,7 +19,7 @@ ratifies: W-169
 
 **Owns** — the components this record decides:
 
-- [`.fux/inspect.toml`](../.fux/inspect.toml) · file
+- [`.fux/config/inspect.toml`](../.fux/config/inspect.toml) · file
 - [`src/fux/inspect/`](../src/fux/inspect) · dir
 - [`src/fux/inspect_config.py`](../src/fux/inspect_config.py) · file
 
@@ -240,7 +240,7 @@ discoverable from the index the whole time and nobody could see it.
     | word-cut passage | a decoder that emits one record per paragraph (`fux-decoder`) |
     | page chrome | a consumer html decoder in `.fux/decoders/` that skips `nav`, `header`, `aside` and `footer` (`fux-decoder`) |
     | link-target tokens | none a consumer can turn — an extraction-rule change under SR-EXTRACTED, its own item, measured first |
-    | identifier family | `fux identifiers --write` records it in `.fux/identifiers.toml [detected]`, `[user] drop` refuses one — an index change: `fux ingest` after (SR-IDENTIFIERS) |
+    | identifier family | `fux identifiers --write` records it in `.fux/config/identifiers.toml [detected]`, `[user] drop` refuses one — an index change: `fux ingest` after (SR-IDENTIFIERS) |
 
 13. **Every truncated list ships its full count beside it.** A capped top-20
     read as a total is how *"20 near-duplicate pairs"* comes to mean *exactly
@@ -263,14 +263,14 @@ discoverable from the index the whole time and nobody could see it.
     is an ingest-side job the Node reader has no home for
     ([SR-NODE-SEARCH](0153_node-search.md) names the derived planes it is
     deliberately a subset of). `inspect` **is** declared in Node's `CLI_VERBS`
-    all the same: that table is not a verb list, it is what `.fux/output.toml`
+    all the same: that table is not a verb list, it is what `.fux/config/output.toml`
     may legally say, and a repo whose file carries `[cli.json] inspect = true`
     must validate on both readers.
 
 <!-- L12-NOTE-START -->
 
 **[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `fux inspect` chunks at the repo's own
-`[refer]` bounds, read strictly from `.fux/tune.toml` — the report no longer
+`[refer]` bounds, read strictly from `.fux/config/tune.toml` — the report no longer
 measures passages under built-in numbers when the file is absent or bad; it
 stops and names it. The facts cache key now carries `table_rows_per_passage` as
 well as the two byte bounds, so a changed value is a cache miss, not a stale row.
@@ -384,7 +384,7 @@ It states no new threshold: its classes are `BOILERPLATE_DF_SHARE` and
 `DISTINCTIVE_DF_SHARE`, the lenses' own. `fux serve` is its only caller today
 ([SR-SERVE](0158_serve.md) decision 4); `fux inspect` prints none of it.
 
-**23. `.fux/inspect.toml` — every threshold, sample and row count the report uses** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28).
+**23. `.fux/config/inspect.toml` — every threshold, sample and row count the report uses** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28).
 The first new consumer file L12 created (R6). Nineteen values left the lens
 modules and their parameter defaults — the boilerplate / distinctive df shares,
 the near-duplicate Jaccard, the link-target share, the minhash signature and
@@ -457,7 +457,7 @@ placed inside `inspect` by the W-220 ruling — a lens, never a verb).
 
 **`identifier_families(progress=)` opens a `detect` phase** over every indexed document, readable or not (W-238, 2026-09-29). `fux identifiers` and `fux doctor` pass the invocation's `Progress`; `inspect` passes none, and nothing it reports changed. `corpus_texts(tick=)` is the per-document hook. `regex_parity` still runs the combined pattern, which is what the Node reader runs ([SR-IDENTIFIERS](0160_identifiers.md) decision 13).
 
-**23a. `[floors]` joins `.fux/inspect.toml` — the headline checks' bounds** (W-225 stage 5f, 2026-10-04).
+**23a. `[floors]` joins `.fux/config/inspect.toml` — the headline checks' bounds** (W-225 stage 5f, 2026-10-04).
 `checks.FLOORS` held the three measured bounds as module literals. It is now
 `checks.floors(config)`, reading `unreachable_share`, `boilerplate_share` and
 `near_duplicate_share` from the file. The values (0.01, 0.60, 0.20) and their

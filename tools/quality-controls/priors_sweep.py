@@ -92,7 +92,7 @@ def write_tune(root: Path, knob: str, value: float) -> None:
     settings = dict(DEFAULTS)
     settings[knob] = value
     body = "[ranking]\n" + "".join(f"{k} = {v}\n" for k, v in sorted(settings.items()))
-    (root / ".fux" / "tune.toml").write_text(body, encoding="utf-8")
+    (root / ".fux" / "config" / "tune.toml").write_text(body, encoding="utf-8")
 
 
 def ranked(root: Path, query: str, top: int = 20) -> list[str]:

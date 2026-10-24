@@ -7,10 +7,10 @@ description: "One URL per line in a committed file, deduped and sorted by the lo
 status: accepted
 date: 2026-08-19
 feature: "`.fux/sources/urls` — the file format itself, and the one grammar both committed source lists are parsed by"
-owns: [src/fux/acquire/sourcelist.py@ef3ccfb0002b, node/src/ingest/sourcelist.mjs@99e1bee84bcf]
+owns: [src/fux/acquire/sourcelist.py@bb884106e22a, node/src/ingest/sourcelist.mjs@99e1bee84bcf]
 laws: [L3, L4, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: d7aa7c997546bf892a8c82c13b1d852625e807ff6516a888e063c15e2d3a0a37
+content_sha: 459718b63057c8f7ee54232f931ae1f81987177f885b2d798ebd151e6ca74cfa
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -255,7 +255,7 @@ named `meta` as the worked example until W-194 deleted it, 2026-09-20.)
 
 ⚠ **Narrowed 2026-09-01: an attribute whose default is the EMPTY STRING is
 omitted at that default.** ⚠ **Moot for `types` since 2026-09-11**: the types
-list left this grammar for `.fux/formats.toml` ([SR-TYPES](0128_types-list.md)
+list left this grammar for `.fux/config/formats.toml` ([SR-TYPES](0128_types-list.md)
 decision 12), so the grammar now parses **two** committed lists. The narrowing
 below stands as written for any future empty-default attribute. `types` gained `decoder=` ([SR-TYPES](0128_types-list.md)
 decision 11), whose empty default means *no binding declared* — and writing a
@@ -582,7 +582,7 @@ pipe** (Arpit, 2026-09-18; built 2026-09-21 as W-199 DoD 10).
   URL, then fell back to prose, **on every ingest**. The line replaces the guess
   with a declaration.
 - 🔴 **The value is a module STEM**, the same vocabulary
-  `.fux/formats.toml [decoders]` uses and the same key SR-DECODE decision 5
+  `.fux/config/formats.toml [decoders]` uses and the same key SR-DECODE decision 5
   resolves an override on: a built-in, or a file in `.fux/decoders/`. **No
   default**, for decision 16's reason — *"resolve it later"* is not a fact about
   a URL.

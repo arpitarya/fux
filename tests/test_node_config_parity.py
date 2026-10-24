@@ -5,7 +5,7 @@ key sets, defaults and glob lists that `src/fux/` also carries. The differential
 arm cannot catch a drift between them, and that is not a gap in the arm — it is
 what the arm structurally is:
 
-- A **key set** drift only shows on a corpus whose `.fux/tune.toml` actually
+- A **key set** drift only shows on a corpus whose `.fux/config/tune.toml` actually
   sets the drifted key, and every golden rung's tune is all-defaults.
 - A **refusal** drift never shows at all. A repository whose config one reader
   refuses and the other accepts does not produce two rankings to compare; it
@@ -21,6 +21,7 @@ W-107 R5 / SR-NODE-SEARCH decision 8.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from l12_fixtures import template_tune
 import json
 import re
@@ -57,7 +58,7 @@ def _js_string_list(source: str, name: str) -> list[str]:
     return re.findall(r'"([^"]*)"', match.group(1))
 
 
-# -- .fux/tune.toml ----------------------------------------------------------
+# -- .fux/config/tune.toml ----------------------------------------------------------
 
 
 def test_the_node_tune_schema_is_the_python_one():
@@ -132,8 +133,7 @@ def test_both_readers_name_a_missing_key_in_the_same_words(tmp_path):
     from fux.errors import FuxError
     from fux.tune import load, template_text
 
-    path = tmp_path / ".fux" / "tune.toml"
-    path.parent.mkdir(parents=True)
+    path = config_file(tmp_path, "tune")
     path.write_text(
         "\n".join(l for l in template_text().splitlines() if not l.startswith("mined_weight")),
         encoding="utf-8",
@@ -156,10 +156,10 @@ def test_both_readers_name_a_missing_file_in_the_same_words(tmp_path):
     with pytest.raises(FuxError) as exc:
         load(tmp_path, enabled=True)
     node = _node_tune(tmp_path, enabled=True)
-    assert node["error"] == str(exc.value).replace(str(tmp_path / ".fux" / "tune.toml"), f"{tmp_path}/.fux/tune.toml")
+    assert node["error"] == str(exc.value).replace(str(config_file(tmp_path, "tune")), f"{tmp_path}/.fux/config/tune.toml")
 
 
-# -- .fux/output.toml --------------------------------------------------------
+# -- .fux/config/output.toml --------------------------------------------------------
 
 
 def test_the_node_output_verbs_and_keys_are_the_python_ones():
@@ -220,7 +220,7 @@ def test_the_journal_key_is_bound_on_BOTH_runtimes_by_name():
 
     SR-PROVENANCE decision 10 as amended makes a committed
     `[cli.answer] journal = true` explicit consent, and the failure mode the
-    ruling guards against is a later session reading `.fux/output.toml` as a
+    ruling guards against is a later session reading `.fux/config/output.toml` as a
     pure *rendering* config and tidying the key out of one runtime. A test that
     only fails as *"`answer` key set differs"* does not tell that session what it
     just broke; this one does.
@@ -256,6 +256,7 @@ def test_the_node_prose_types_are_the_python_ones():
 
 
 def test_the_node_pii_gate_path_is_the_python_one():
+    from fux.constants import fixed
     """The third copy of the path, beside `cli.py` and `api.py`.
 
     `tests/test_cli.py` holds the Python copies equal to each other and to the
@@ -265,10 +266,10 @@ def test_the_node_pii_gate_path_is_the_python_one():
     from fux.acquire.pii import rules_path
 
     entry = (ROOT / "node" / "fux.mjs").read_text(encoding="utf-8")
-    spelled = re.search(r'const PII_RULES = \[(.*?)\];', entry)
-    assert spelled, "node/fux.mjs no longer spells the PII gate path"
-    parts = re.findall(r'"([^"]*)"', spelled.group(1))
-    assert parts == list(rules_path(Path(".")).parts[-2:])
+    spelled = re.search(r'const PII_RULES = fixed\("files", "pii"\)', entry)
+    assert spelled, "node/fux.mjs no longer reads the PII gate path from constants.toml"
+    # W-295: the address is `constants.toml [files] pii`, read by both runtimes.
+    assert rules_path(Path(".")).as_posix() == fixed("files", "pii")
 
 
 def test_the_dirs_attribute_set_is_the_python_one():

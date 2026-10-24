@@ -1,7 +1,7 @@
 """`fux-fetcher-http` — a plain HTTP GET, pure stdlib (W-289, SR-HTTP-FETCHER).
 
 **This is a fux plugin package, and it imports nothing from fux.** A repository
-runs it only when `.fux/plugins.toml` declares `fux-fetcher-http`, pinned, and a
+runs it only when `.fux/config/plugins.toml` declares `fux-fetcher-http`, pinned, and a
 URL line says `fetch=http` (SR-PLUGINS P2-P4, P10). Fux loads it under
 `fux add <URL>` or `fux ingest`, calls it once per URL to RETRIEVE the bytes,
 decodes those itself, and indexes the result exactly like a repo file.

@@ -1,4 +1,4 @@
-/** `.fux/output.toml`, read — HOW a result is shown, never which documents
+/** `.fux/config/output.toml`, read — HOW a result is shown, never which documents
  *  come back. Twin of `src/fux/output_config.py`.
  *
  * 🔴 **W-107 R5's last unbuilt read-path row**, and it is not cosmetic. Python
@@ -19,7 +19,7 @@
  * every other key walks.
  *
  * **Every key comes from a file, never from code** (L12). In a repo it is
- * `.fux/output.toml`, and a missing file, table or key is an error naming it
+ * `.fux/config/output.toml`, and a missing file, table or key is an error naming it
  * and `fux doctor --fix`, in `output_config.py`'s words. `--no-output-config`
  * and a run outside any repo read the packaged template — inlined into the
  * bundle — which is the one home of every shipped rendering value.
@@ -36,7 +36,7 @@ const MAX_REPORTED = 10;
 const ROOTS = ["cli", "mcp", "api"];
 
 //: The closed key set per verb. ⚠ **`graph` has no `top` key** — it has no
-//: `--top` flag and reads `seed_depth`/`expand_limit` from `.fux/tune.toml`
+//: `--top` flag and reads `seed_depth`/`expand_limit` from `.fux/config/tune.toml`
 //: instead; truncating a graph walk is a ranking change, which this file may
 //: not make. `json` is absent from every tuple: it is not a `[cli]` key, it is
 //: the question of WHICH chain the others walk.
@@ -58,7 +58,7 @@ export const CLI_VERBS = {
   daemon: [],
   //: `ingest` is PYTHON-ONLY as a verb (this reader never writes an index) and
   //: is declared for the same reason `inspect` and `correct` below are: this
-  //: table is what `.fux/output.toml` may SAY, not a verb list, so a repo whose
+  //: table is what `.fux/config/output.toml` may SAY, not a verb list, so a repo whose
   //: file carries `[cli.json] ingest = true` must validate on both readers.
   //: ⚠ **It was `update: []` until 2026-09-15** — W-177 deleted that verb and
   //: `fux ingest` absorbed `--check --json`, which is the key this row exists
@@ -67,13 +67,13 @@ export const CLI_VERBS = {
   //: `inspect` is PYTHON-ONLY as a verb (its dictionary build re-tokenises
   //: the sources, which is an ingest-side job Node has no home for yet) and
   //: is still declared here, because this table is not a verb list — it is
-  //: what `.fux/output.toml` is allowed to say. A repo whose file carries
+  //: what `.fux/config/output.toml` is allowed to say. A repo whose file carries
   //: `[cli.json] inspect = true` must VALIDATE on both readers, or the same
   //: committed config is legal for one and an error for the other.
   inspect: ["progress_threshold"],
   //: `correct` is PYTHON-ONLY as a verb (it writes committed files and this
   //: reader never writes) and is declared for the same reason `inspect` is:
-  //: this table is what `.fux/output.toml` may SAY, so a repo whose file
+  //: this table is what `.fux/config/output.toml` may SAY, so a repo whose file
   //: carries `[cli.json] correct = true` must validate on both readers.
   correct: [],
   //: `register` is PYTHON-ONLY as a verb (W-279: it reads the ingest side's
@@ -81,7 +81,7 @@ export const CLI_VERBS = {
   //: repo whose file carries `[cli.json] register = true` must validate on both.
   register: [],
   //: PYTHON-ONLY verbs, declared for the reason `ingest` and `inspect` are:
-  //: this table is what `.fux/output.toml` may SAY, so a key they own must
+  //: this table is what `.fux/config/output.toml` may SAY, so a key they own must
   //: validate on both readers (L12 added them, W-225).
   build: ["progress_threshold"],
   add: ["progress_threshold"],
@@ -353,7 +353,7 @@ function rejectConflictMarkers(label, text) {
   }
 }
 
-/** Read `.fux/output.toml`. `enabled=false` is `--no-output-config`, and
+/** Read `.fux/config/output.toml`. `enabled=false` is `--no-output-config`, and
  *  `root=null` is a run outside any repo: both read the packaged template. */
 export function loadOutput(root, { enabled }) {
   if (enabled !== true && enabled !== false) throw new FuxError("loadOutput: `enabled` is required");

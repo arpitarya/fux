@@ -74,7 +74,7 @@ __all__ = [
 
 
 def _tune(root: Path, *, enabled: bool) -> "Tune":
-    """`.fux/tune.toml`, read once per query.
+    """`.fux/config/tune.toml`, read once per query.
 
     **A missing or malformed tune file is a loud error, never a silent
     default** (SR-TUNE decision 10; L12 decision 3). Degrading would answer a
@@ -91,7 +91,7 @@ def _archived_ranking(
 ) -> tuple["Weighting", frozenset[str]]:
     """The document-level multipliers and the directories they apply to.
 
-    The weights come from `.fux/tune.toml` (SR-TUNE decision 7 moved them out
+    The weights come from `.fux/config/tune.toml` (SR-TUNE decision 7 moved them out
     of `fux.toml`); the archived *declaration* still comes from the committed
     dirs list, never from a path convention (SR-DIR-LIST decision 4).
 
@@ -159,7 +159,7 @@ def run_query(
     """Scan by default; use the accelerator only when `force_scan` is False
     and a fresh build exists. Return `(results, path)`.
 
-    `use_tune=False` is `--no-tune`: `.fux/tune.toml` is not read at all, so
+    `use_tune=False` is `--no-tune`: `.fux/config/tune.toml` is not read at all, so
     the answer is the engine's own (SR-TUNE decision 11). Callers that have
     already loaded a `Tune` pass it as `tune=` rather than paying for a second
     parse.
@@ -622,7 +622,7 @@ def _show_band(args) -> bool:
     """SR-CONFIDENCE decision 11: the CLI emits the block only under `--band`.
 
     By the time this runs, `cli._apply_output_defaults` has already folded
-    `.fux/output.toml` into `args.band`, so this is a plain read — the
+    `.fux/config/output.toml` into `args.band`, so this is a plain read — the
     precedence chain lives in exactly one place and this is not it.
 
     ⚠ **The block is still COMPUTED when this is False.** Gating the
@@ -819,7 +819,7 @@ def _declare_related(related) -> None:
 def _headings_for(record: dict | None, query: str, limit: int) -> list[str]:
     """W-84's matched headings — imported lazily so `find`'s hot path and every
     caller that never renders one pays nothing for the analyzer import. `limit`
-    is `.fux/output.toml`'s `max_headings`, resolved onto `args` by the CLI."""
+    is `.fux/config/output.toml`'s `max_headings`, resolved onto `args` by the CLI."""
     from .headings import headings_for
 
     return headings_for(record, query, limit=limit)
@@ -1575,7 +1575,7 @@ def _provenance_for(root: Path, args, bundle, block, *, best=None) -> dict:
     start one behind a consumer's back. A `$0`, offline tool whose pitch is
     *nothing leaves your machine* may not quietly begin recording questions
     because a law was relaxed. Always-on journalling is a real want and it needs
-    a `.fux/tune.toml` key, which is an SR-TUNE change deliberately not made
+    a `.fux/config/tune.toml` key, which is an SR-TUNE change deliberately not made
     here — it is a fork, and this session may not pick a default on one.
     """
     want_audit = bool(getattr(args, "audit", False))

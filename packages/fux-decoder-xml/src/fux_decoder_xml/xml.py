@@ -38,7 +38,7 @@ USES = tuple(fixed("decoders.xml", "uses"))
 
 #: An attribute value long enough to be a sentence is prose (a `description=`,
 #: a `title=`); shorter ones are ids, types and flags.
-#: ⚠ **`MIN_ATTR_LEN` is `[limits.xml] min_attr_len` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MIN_ATTR_LEN` is `[limits.xml] min_attr_len` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 

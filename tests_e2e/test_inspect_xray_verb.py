@@ -9,6 +9,7 @@ decision 21.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import subprocess
 import sys
@@ -41,7 +42,7 @@ def test_a_decoder_that_strips_hrefs_is_an_edge_loss_alert(tmp_path):
     sources = tmp_path / ".fux" / "sources"
     sources.mkdir(parents=True)
     (sources / "dirs").write_text("docs\n", encoding="utf-8")
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     docs = tmp_path / "docs"
     docs.mkdir()
@@ -75,8 +76,8 @@ def test_the_diff_writes_nothing(tmp_path):
     rows = [{"id": "file:a.md", "edges": []}]
     a = tmp_path / "a.json"
     a.write_text(json.dumps({"corpus": {}, "documents": rows}), encoding="utf-8")
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     before = sorted(p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*"))
     _run(tmp_path, "inspect", "--diff", str(a), str(a))

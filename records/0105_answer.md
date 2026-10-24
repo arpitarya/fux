@@ -7,10 +7,10 @@ description: The single best answer the index can give — a fetched, re-scored 
 status: accepted
 date: 2026-08-18
 feature: "`fux answer` — one answer, its footing stated, and the report of what changed since the question was last asked"
-owns: [src/fux/query/refer_answer.py@d04cd01910cd]
+owns: [src/fux/query/refer_answer.py@4b2b86bbe1e8]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 56b23bcb06ad16c2e544e86e3c9c5dc4a51a8b0ed01fc9de5f58597e6b2773b7
+content_sha: 1cba52c7a94d3b64389b3a76130fb7933ec9a64953213b3cbbd24bffa46c362a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -341,7 +341,7 @@ this moved where they are written, not what they are.
 | `--json` | machine-readable; `{answer, citation, source}` |
 | `--fast` / `--scan` | as on `ask`; the path can never change the answer |
 | `--no-refer` | skip the refer plane; answer from the index's own structure |
-| `--no-tune` | ignore `.fux/tune.toml` |
+| `--no-tune` | ignore `.fux/config/tune.toml` |
 
 No `--top` and no `--explain`. The verb returns one answer; **how many
 documents it reads to build one is `ANSWER_TOP` = 3 and is not a flag**

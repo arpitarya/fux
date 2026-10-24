@@ -7,6 +7,7 @@ ignored, and one that cannot fire is decoration.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import subprocess
 
 import pytest
@@ -37,7 +38,7 @@ def _dirs(root, text):
 
 def _tune_entries(root, table, entries):
     """Put `entries` under the template's own `[table]` header (a second header is a TOML error)."""
-    path = root / ".fux" / "tune.toml"
+    path = config_file(root, "tune")
     text = path.read_text(encoding="utf-8")
     assert f"\n[{table}]\n" in text
     path.write_text(text.replace(f"\n[{table}]\n", f"\n[{table}]\n{entries}", 1), encoding="utf-8")
@@ -199,7 +200,7 @@ def test_no_journal_is_ok(tmp_path):
 
 def test_a_journal_above_the_limit_warns(tmp_path):
     root = _repo(tmp_path)
-    out = root / ".fux" / "output.toml"
+    out = config_file(root, "output")
     out.write_text(
         out.read_text(encoding="utf-8").replace("journal_max_bytes = 4194304", "journal_max_bytes = 100"),
         encoding="utf-8",
@@ -224,7 +225,7 @@ def test_doctor_fix_writes_the_new_key_into_an_older_output_toml(tmp_path):
     from fux import setup as setup_mod
 
     root = _repo(tmp_path)
-    out = root / ".fux" / "output.toml"
+    out = config_file(root, "output")
     out.write_text(
         "\n".join(ln for ln in out.read_text(encoding="utf-8").splitlines() if "journal_max_bytes" not in ln) + "\n",
         encoding="utf-8",

@@ -34,7 +34,7 @@ SORTS = ("df", "cf", "idf", "word")
 
 def _class(df: int, view) -> str:
     """boilerplate · distinctive · common — the view's own thresholds, which are
-    the lenses' (`.fux/inspect.toml [thresholds]`), so there is one copy."""
+    the lenses' (`.fux/config/inspect.toml [thresholds]`), so there is one copy."""
     if view.n and df >= view.boilerplate_df:
         return "boilerplate"
     if df <= view.distinctive_df:

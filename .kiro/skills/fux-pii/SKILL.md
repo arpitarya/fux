@@ -1,13 +1,13 @@
 ---
 name: fux-pii
-description: Understand and diagnose Fux PII redaction in .fux/pii.toml — why fux stops when the file is missing, rule syntax (regex, group, luhn/verhoeff), redaction versus refusal, probing a rule for false positives, and what redaction does not cover. Use for "pii.toml missing", "false positive on a phone or card number", "add a PII rule for employee IDs", "why can't fux find this number". Write rules ONLY when explicitly asked.
+description: Understand and diagnose Fux PII redaction in .fux/config/pii.toml — why fux stops when the file is missing, rule syntax (regex, group, luhn/verhoeff), redaction versus refusal, probing a rule for false positives, and what redaction does not cover. Use for "pii.toml missing", "false positive on a phone or card number", "add a PII rule for employee IDs", "why can't fux find this number". Write rules ONLY when explicitly asked.
 ---
 
 # PII redaction in Fux
 
 Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run fux` → `./.venv/bin/fux`, on Windows `.venv\Scripts\fux.exe` → `python -m fux`).
 
-> ⚠ **`.fux/pii.toml` is committed policy.** A rule change decides which values
+> ⚠ **`.fux/config/pii.toml` is committed policy.** A rule change decides which values
 > ship inside the index every teammate clones. Explaining and probing are always
 > fine; add, loosen, enable or delete a rule only when a human asked for it.
 >
@@ -41,7 +41,7 @@ still indexed.** Nothing is skipped for PII.
 
 | situation | what you see | do |
 |---|---|---|
-| file missing | every verb except `setup`, `tune`, `output`, `doctor` exits `1` with `error: .fux/pii.toml is missing, and fux will not run without it …` | tell the human; `fux setup` writes the starter and keeps every existing file |
+| file missing | every verb except `setup`, `tune`, `output`, `doctor` exits `1` with `error: .fux/config/pii.toml is missing, and fux will not run without it …` | tell the human; `fux setup` writes the starter and keeps every existing file |
 | file present, rules all commented | loads, redacts nothing; `doctor --json` row `pii rules` has `ok: true`, `level: "warn"` | a deliberate choice — leave it |
 | a rule is malformed | `fux ingest` exits `1` naming the rule; `doctor` row `pii rules` has `ok: false` | fix the rule the message names |
 
@@ -139,7 +139,7 @@ that line yourself only if the human agrees, and never quote it back.
 
 1. **Probe it** (section 4) and read every `REDACT` line. Narrow until the list
    is only what should go.
-2. **Append it** to `.fux/pii.toml`, below the narrow rules it must not
+2. **Append it** to `.fux/config/pii.toml`, below the narrow rules it must not
    swallow.
 3. **Check it loads:** `fux doctor --json` → the `pii rules` check has `ok: true`.
 4. **`fux ingest`.** A changed ruleset forces a full re-extract — the summary
@@ -182,7 +182,7 @@ from the working tree under the new rules.
   are, and an `update=never` URL is never re-fetched. After a rule change, run
   `fux ingest --refetch-all` and confirm.
 - **Enrichment:** `fux enrich --check` refuses a file whose body matches a rule
-  (`refused: … matches .fux/pii.toml rule(s): …`). Rewrite the sentence; do not
+  (`refused: … matches .fux/config/pii.toml rule(s): …`). Rewrite the sentence; do not
   paste a redaction into it.
 - **Hashed terms are not redaction, and only a rule removes a value.** Terms
   are stored hashed for **every** document, and anyone who can guess a value can
@@ -190,13 +190,13 @@ from the working tree under the new rules.
   this one and it is gone** (fux 3.x): for URL sources `meta = "hashed"` used to
   keep titles and headings out of the record as readable text. **It never
   touched the terms, and it no longer exists** — every record now commits a
-  readable `title` and `phrases`, and `.fux/pii.toml` is the only thing that
+  readable `title` and `phrases`, and `.fux/config/pii.toml` is the only thing that
   keeps a value out of the committed index.
 
 **Leak check — plaintext values in the committed index:**
 
 ```bash
-python probe.py .fux/pii.toml .fux/index    # any REDACT line here is a value committed in plaintext
+python probe.py .fux/config/pii.toml .fux/index    # any REDACT line here is a value committed in plaintext
 ```
 
 ---
@@ -204,7 +204,7 @@ python probe.py .fux/pii.toml .fux/index    # any REDACT line here is a value co
 ## Don't
 
 - **Don't write real PII** into rules, tests, fixtures, commits or chat.
-- **Don't delete, empty or comment out `.fux/pii.toml`** to make an error go away.
+- **Don't delete, empty or comment out `.fux/config/pii.toml`** to make an error go away.
 - **Don't enable a commented starter rule without probing it** on this corpus.
 - **Don't read an `answer` quote containing a value as a redaction failure.**
 - **Don't look for PII in `--list-skipped`** — nothing is skipped.

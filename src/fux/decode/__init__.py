@@ -10,7 +10,7 @@ has to carry it.
 
 **Two kinds of decoder, one protocol.** Packaged decoders ship in the
 `fux-decoder-*` plugin packages and are stdlib-only (**L2**); **one runs only
-when its package is declared in the committed `.fux/plugins.toml`**, verified
+when its package is declared in the committed `.fux/config/plugins.toml`**, verified
 against its pinned version and digest ([SR-PLUGINS](../../../records/0165_plugins.md)
 P3, P4, W-289). Consumer decoders live in `.fux/decoders/<name>.py`, may
 import whatever the consumer installed, and **override a packaged decoder of
@@ -19,7 +19,7 @@ boundary: fux refuses to own network I/O, model calls, and now third-party
 parsing libraries — the consumer owns each as a file loaded by path that fux
 never rewrites.
 
-🔴 **No declaration, prose only.** A repository without `.fux/plugins.toml`
+🔴 **No declaration, prose only.** A repository without `.fux/config/plugins.toml`
 decodes nothing — Markdown and plain text are read without a decoder — and
 `fux ingest` and `fux doctor` say so in one line, with `fux setup` as the lever.
 An installed package nobody declared is never imported here.
@@ -167,7 +167,7 @@ PROSE_DECODER = "prose"
 #: were one module because ODF puts every kind of document in the same
 #: `content.xml`. `.ipynb` was one. Six extensions in total leave
 #: `DEFAULT_TYPES`, which decision 9 derives from this tuple, so a corpus
-#: containing them stops being walked unless `.fux/formats.toml` opts them
+#: containing them stops being walked unless `.fux/config/formats.toml` opts them
 #: back in — and nothing can, because no built-in claims them any more.
 BUILTIN_MODULES: tuple[str, ...] = tuple(fixed("decoders", "builtin"))
 
@@ -321,7 +321,7 @@ def _load_consumer(path: Path, name: str) -> Decoder:
                 "(W-289). If this file is a copy an older `fux setup` seeded and you never "
                 "edited it, delete it - the declared package runs instead, and `fux doctor` "
                 "lists the copies it can prove unedited. If you edited it, change the import "
-                "and declare the package in .fux/plugins.toml (SR-PLUGINS P8)"
+                "and declare the package in .fux/config/plugins.toml (SR-PLUGINS P8)"
             ) from exc
         # The loud failure Arpit ruled on 2026-08-26. A decoder whose library is
         # absent must NOT quietly hand the file to the enrichment queue: two
@@ -437,7 +437,7 @@ def _meta_fields_of(module, name: str, origin: str) -> dict[str, str]:
 
 #: `registry()`'s cache (W-239). Keyed on everything the map is a function of —
 #: the repo, the stat of every `.py` in `.fux/decoders/` (helpers included, since
-#: a decoder may import one), the stat of `.fux/formats.toml` and the legacy
+#: a decoder may import one), the stat of `.fux/config/formats.toml` and the legacy
 #: file's presence — so an edit is seen in the same process while a walk over
 #: 10 000 documents imports each consumer decoder ONCE. Until 2026-09-29 every
 #: call re-ran `exec_module` on every consumer file, and `registry()` is called
@@ -475,7 +475,7 @@ def _registry_key(root: Path | None) -> tuple:
     from .. import plugins
 
     # W-289: the declaration decides which packaged modules load, so an edited
-    # `.fux/plugins.toml` is a different registry.
+    # `.fux/config/plugins.toml` is a different registry.
     return (os.path.abspath(root), tuple(sorted(files)), types, legacy, plugins.stamp(root))
 
 
@@ -494,7 +494,7 @@ def registry(root: Path | None = None) -> dict[str, Decoder]:
        extension is what makes an override a replacement rather than a race:
        two files both claiming `.html` would otherwise resolve by whichever the
        loader reached first (SR-DECODE decision 5).
-    3. **A `[decoders]` binding in `.fux/formats.toml` wins over both** — and it
+    3. **A `[decoders]` binding in `.fux/config/formats.toml` wins over both** — and it
        is checked, not trusted. A line naming a module that does not exist is a
        hard error, and so is one that takes an extension away from the decoder
        that claims it and gives it to a module that does not. **Giving a
@@ -551,7 +551,7 @@ def _build_registry(root: Path | None) -> dict[str, Decoder]:
         if name not in available and _undeclared_module(name):
             # 🔴 **A binding to a first-party module whose package is not
             # declared reads nothing, and is not an error** (SR-PLUGINS P3): a
-            # `.fux/formats.toml` seeded with every first-party binding stays
+            # `.fux/config/formats.toml` seeded with every first-party binding stays
             # valid in a repository that declares only some packages. The files
             # are counted on `fux ingest`'s stderr and in `fux doctor`, never
             # read as prose (P5).
@@ -661,7 +661,7 @@ _BINDINGS: dict[tuple[str, int, int, bool], dict[str, tuple[str, str]]] = {}
 
 
 def _declared_bindings(root: Path | None) -> dict[str, tuple[str, str]]:
-    """Extension (`.csv`) -> (decoder name, where it was declared), from `.fux/formats.toml`.
+    """Extension (`.csv`) -> (decoder name, where it was declared), from `.fux/config/formats.toml`.
 
     Empty when there is no root or no types file — which is the built-in
     default, where nothing is declared and every extension resolves through the
@@ -709,7 +709,7 @@ def _declared_bindings(root: Path | None) -> dict[str, tuple[str, str]]:
 
 
 def meta_bindings(root: Path | None) -> dict[str, str]:
-    """`.fux/formats.toml [meta]` — metadata key -> index field, or `"none"`.
+    """`.fux/config/formats.toml [meta]` — metadata key -> index field, or `"none"`.
 
     🔴 **It outranks the decoder's claim**, exactly as `[decoders]` outranks a
     built-in's `EXTENSIONS` ([SR-TYPES](../../records/0128_types-list.md)
@@ -742,7 +742,7 @@ _META: dict[tuple[str, int, int, int], dict[str, str]] = {}
 
 
 def declared_bindings(root: Path | None) -> dict[str, str]:
-    """Extension -> the decoder module `.fux/formats.toml` binds it to.
+    """Extension -> the decoder module `.fux/config/formats.toml` binds it to.
 
     The public half of `_declared_bindings`, which also carries the location a
     resolution error needs. **`fux doctor` is the caller**: a binding on
@@ -788,7 +788,7 @@ def decoder_named(name: str, root: Path | None = None) -> Decoder | None:
     """The decoder module called `name`, or `None` — the pipe ruling's lookup.
 
     **A URL line names a decoder by STEM** (`decoder=xlsx`), which is the same
-    vocabulary `.fux/formats.toml [decoders]` uses and the same key SR-DECODE
+    vocabulary `.fux/config/formats.toml [decoders]` uses and the same key SR-DECODE
     decision 5 resolves an override on.
 
     Precedence is `registry()`'s first two steps and **deliberately not its
@@ -842,7 +842,7 @@ def builtin_extensions() -> tuple[str, ...]:
     mean that dropping a `logdoc.py` into `.fux/decoders/` silently starts
     walking every `.log` file in the repo. **Adding a decoder must not, by
     itself, change what is indexed**: a consumer says what is a document in
-    `.fux/formats.toml`, which is a committed line a human wrote.
+    `.fux/config/formats.toml`, which is a committed line a human wrote.
     """
     out: set[str] = set()
     for name in BUILTIN_MODULES:

@@ -1,7 +1,7 @@
 ---
 paths:
   - ".fux/fetchers/**"
-  - ".fux/refusals.toml"
+  - ".fux/config/refusals.toml"
 ---
 
 # Editing a Fux fetcher or refusal rule

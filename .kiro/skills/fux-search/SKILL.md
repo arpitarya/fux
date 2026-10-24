@@ -52,10 +52,10 @@ every flag `ask` takes and returns `ask`'s exact output shape.
 | flag | `ask` | `find` | effect |
 |---|:-:|:-:|---|
 | `--json` | ✓ | ✓ | machine-readable payload; **prefer it**. Every `ask` row below also holds for `fux lexical`, which takes `ask`'s whole flag surface |
-| `--top N` | ✓ | ✓ | max results (engine default 5; `.fux/output.toml` may change it) |
+| `--top N` | ✓ | ✓ | max results (engine default 5; `.fux/config/output.toml` may change it) |
 | `--band` | ✓ | ✓ | emit the `confidence` block (JSON) or a `confidence:` line (stderr) |
 | `-q TEXT` / `--query TEXT` | ✓ | ✓ | another phrasing; repeatable; rankings fused by RRF |
-| `--expand TEXT` | ✓ | ✓ | extra terms scored at a discount (`[ranking] expand_weight` in `.fux/tune.toml`) |
+| `--expand TEXT` | ✓ | ✓ | extra terms scored at a discount (`[ranking] expand_weight` in `.fux/config/tune.toml`) |
 | `--explain` | ✓ | — | which path answered: `[scan]` / `[accelerator]` line, or `"path"` in JSON |
 | `--why` | ✓ | — | the ranking derivation (section 7) |
 | `--sections` / `--no-sections` | ✓ | — | show or hide matched `§ heading` lines **and** the JSON `headings` field |
@@ -64,10 +64,10 @@ every flag `ask` takes and returns `ask`'s exact output shape.
 | `--all` | — | ✓ | keep docs carrying every term of the positional query |
 | `--no-archived` | — | ✓ | drop docs declared archived (`archived=true` in the source list, or the record's own flag); the band still describes the unfiltered list |
 | `--fast` / `--scan` | ✓ | ✓ | accelerator vs reference scan — **identical results**, speed only |
-| `--no-tune` | ✓ | ✓ | ignore `.fux/tune.toml` |
-| `--no-output-config` | ✓ | ✓ | ignore `.fux/output.toml` |
+| `--no-tune` | ✓ | ✓ | ignore `.fux/config/tune.toml` |
+| `--no-output-config` | ✓ | ✓ | ignore `.fux/config/output.toml` |
 
-⚠ **There is no `--no-json`, `--no-band` or `--no-explain`.** If `.fux/output.toml`
+⚠ **There is no `--no-json`, `--no-band` or `--no-explain`.** If `.fux/config/output.toml`
 turns one of those on, the only way back is `--no-output-config`.
 
 ## 3 · Read the JSON, branch on fields
@@ -269,7 +269,7 @@ trimmed — index it defensively — and `expanded`),
 |---|---|
 | `absent` / `missing` lists a key term | the doc lacks that word — a vocabulary issue, not a ranking bug |
 | `rank_before_rerank` differs from `rank` | the proximity reranker moved it |
-| `rank_untuned` differs from `rank` | `.fux/tune.toml` moved it — confirm with `--no-tune` |
+| `rank_untuned` differs from `rank` | `.fux/config/tune.toml` moved it — confirm with `--no-tune` |
 | matches land in `heading`/`title` counts | by default those fields outweigh `body` |
 
 ⚠ **`--why` only describes returned documents.** To ask "why not X", raise
@@ -300,7 +300,7 @@ xargs grep -n "max_retries" < hits.txt
 - **Scan is the default.** `--fast` uses the accelerator when present and fresh.
   The stderr note *"no fresh accelerator"* is advice, not an error; building one
   is the `fux-index` skill's job.
-- **`.fux/output.toml` sets defaults:** `[cli] band`, `top`; `[cli.ask]
+- **`.fux/config/output.toml` sets defaults:** `[cli] band`, `top`; `[cli.ask]
   explain`, `sections`; `[cli.json] enabled`; per-verb tables such as
   `[cli.find]`. A present file that lacks a key a verb needs is an error;
   see `fux-config`.
@@ -310,7 +310,7 @@ xargs grep -n "max_retries" < hits.txt
 | exit | when |
 |---|---|
 | `0` | success — **including no matches** |
-| `1` | fux error: not inside a fux repo, malformed `.fux/tune.toml` or `.fux/output.toml`, missing `.fux/pii.toml` |
+| `1` | fux error: not inside a fux repo, malformed `.fux/config/tune.toml` or `.fux/config/output.toml`, missing `.fux/config/pii.toml` |
 | `2` | usage error — a flag the verb does not take (e.g. `fux find "<q>" --why`) |
 | `130` | interrupted |
 

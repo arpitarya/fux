@@ -48,7 +48,7 @@ runs:
         roles="-e packages/fux-core -e packages/fux-reader -e packages/fux-writer"
         # W-289: the fifteen plugin packages (SR-PLUGINS), from this tree, on
         # EVERY job — with extras or without. Since phase 2 this repository's
-        # committed .fux/plugins.toml declares the decoders it reads, and a
+        # committed .fux/config/plugins.toml declares the decoders it reads, and a
         # declared package that is not installed stops every verb that reads
         # the index (P4): the bare-engine jobs run `fux build` and the arm on
         # this repo, so they need them as much as the dev jobs do. Editable,

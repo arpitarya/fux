@@ -1,6 +1,6 @@
 ---
 inclusion: fileMatch
-fileMatchPattern: [".fux/sources/**", ".fux/formats.toml", ".fux/.fuxignore"]
+fileMatchPattern: [".fux/sources/**", ".fux/config/formats.toml", ".fux/.fuxignore"]
 ---
 
 # Editing Fux source lists

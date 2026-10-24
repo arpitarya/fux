@@ -1,4 +1,4 @@
-"""`.fux/tune.toml` — the loader, the closed key set, and the two refusals.
+"""`.fux/config/tune.toml` — the loader, the closed key set, and the two refusals.
 
 [SR-TUNE](../records/0135_tuning.md) is the record. The boundary rule it
 turns on — *changing any key here leaves `.fux/index/` byte-identical* — has
@@ -39,7 +39,7 @@ def load_on(root) -> Tune:
 
 def test_no_file_is_an_error_that_names_the_file(tmp_path):
     """L12 decision 3: fux holds no copy of these values, so absent is loud."""
-    with pytest.raises(FuxError, match=r"\.fux[/\\]tune\.toml is missing") as exc:
+    with pytest.raises(FuxError, match=r"\.fux[/\\]config[/\\]tune\.toml is missing") as exc:
         load_on(tmp_path)
     assert "fux doctor --fix" in str(exc.value)
 
@@ -310,7 +310,7 @@ def test_a_retired_dense_table_names_its_removal_rather_than_reading_as_a_typo(t
 
 def test_a_removed_ranking_key_names_its_removal_rather_than_reading_as_a_typo(tmp_path):
     """🔴 `superseded_weight` went on 2026-09-13 (W-151), and `fux setup` had
-    WRITTEN it into every `.fux/tune.toml` it ever created.
+    WRITTEN it into every `.fux/config/tune.toml` it ever created.
 
     So the generic *"unknown key"* would send a consumer hunting for a typo in a
     line fux typed for them. The error has to name the removal, its date, and
@@ -333,7 +333,7 @@ def test_rm3_weight_is_refused_by_both_readers(tmp_path):
     gated on a `grounded` first pass it FAILED again, and was removed a second
     time on 2026-10-03. The one refusal names both removals.
 
-    `fux setup` wrote `rm3_weight` into every `.fux/tune.toml` from 3.0.0-alpha.3
+    `fux setup` wrote `rm3_weight` into every `.fux/config/tune.toml` from 3.0.0-alpha.3
     on, so the refusal names the removal (SR-TUNE decision 15) — never a silent
     ignore, never an alias. Both readers refuse the same file, or one of them
     shrugs at a line the other stops on.
@@ -464,7 +464,7 @@ def test_no_tune_does_not_reach_the_index_limits(tmp_path):
 
 def test_a_decoder_reads_the_configured_row_limit(tmp_path):
     """`decode/ext/limits.py`: a two-name decoder seeing committed config. The
-    csv decoder also reads `[limits.csv]` from `.fux/formats.toml`, so the repo
+    csv decoder also reads `[limits.csv]` from `.fux/config/formats.toml`, so the repo
     gets the rest of its config as `fux setup` writes it (W-225 stage 4a)."""
     from fux.decode import decode
 

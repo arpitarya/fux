@@ -7,10 +7,10 @@ description: "A deliberately tiny config: what each key does, why the surface is
 status: accepted
 date: 2026-08-18
 feature: "`fux.toml` — discovery, schema, validation, and the keys that are refused rather than ignored"
-owns: [src/fux/config.py@ebf4c9d628a7, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@6980bf8407fe]
+owns: [src/fux/config.py@a5cfad43263c, node/src/config/root.mjs@aab1cfcd6c25, node/test/config.test.mjs@277ffe5a13a7]
 laws: [L5, ex-L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a8917db6f97c313bc1ec1199ef170de5ade848850004f4b15a4c5a02cc5eca56
+content_sha: 4a783c6327feb4afa19bbfd0f6d3edb428ad35f577711d09ee39b68ca7a03fca
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -51,7 +51,7 @@ fux's schema and turning the adapter cap into a formality. Same discipline as
 PEP 518's `[tool.*]` tables.
 
 **Three tables are refused by name rather than ignored.** `[ranking]` and
-`[dense]` moved to `.fux/tune.toml`, and `[decode]` followed on 2026-09-11 (its
+`[dense]` moved to `.fux/config/tune.toml`, and `[decode]` followed on 2026-09-11 (its
 `max_table_rows` now sits in tune.toml's `[index]`). A config carrying any of
 them stops the run with the new home in the message. A key that is quietly not read is worse than
 one that stops the run, because the reader believes their setting is in force
@@ -80,7 +80,7 @@ flowchart TD
     F --> AG["[agents]"]
     AG --> AI["install — REQUIRED<br/>claude · codex · copilot · kiro; [] = none"]
     F -.->|"REFUSED by name<br/>at any value"| RT["[ranking] · [dense] · [decode]"]
-    RT ==>|"the keys moved"| TU[".fux/tune.toml<br/>ORDERING — SR-TUNE"]
+    RT ==>|"the keys moved"| TU[".fux/config/tune.toml<br/>ORDERING — SR-TUNE"]
     CF -.->|"verbatim"| MW["your fetcher's configure()"]
 ```
 
@@ -136,7 +136,7 @@ flowchart TD
      +-- [decode]   REFUSED --+
                               |
                               v
-                 .fux/tune.toml   ORDERING, plus [index] -- SR-TUNE
+                 .fux/config/tune.toml   ORDERING, plus [index] -- SR-TUNE
 ```
 
 </details>
@@ -345,7 +345,7 @@ that answers 429 to every request (httpbin's `/status/429`) fires the letter of
 the trigger and not its spirit, and the 2026-08-27 run that hit one did not
 promote anything.
 
-⚠ **This key belongs here and not in `.fux/tune.toml`.** SR-TUNE's mechanical
+⚠ **This key belongs here and not in `.fux/config/tune.toml`.** SR-TUNE's mechanical
 test is *does changing it change a byte in `.fux/index/`?* — and this does not,
 so the test alone would misfile it. The second clause settles it: it is not a
 ranking value either. It is **operational**, so it sits beside the other
@@ -428,8 +428,9 @@ exists.
 | `[sources.url] urls` | put one URL per line in `.fux/sources/urls` |
 | `[sources.url] middleware` | renamed to `fetcher`; move the file to `.fux/fetchers/` ([SR-FETCHER](0117_fetcher.md) decision 7) |
 | `[sources] dirs` | put one directory per line in `.fux/sources/dirs`; a line may carry `archived=true` ([SR-DIR-LIST](0120_dir-list.md) decision 1) |
-| `[ranking]` (whole table) | moved to `.fux/tune.toml`; run `fux setup` to write the file, move the keys across, delete the table ([SR-TUNE](0135_tuning.md) decision 7) |
-| `[decode]` (whole table) | moved to `.fux/tune.toml [index]` on 2026-09-11 (Arpit), beside `max_phrases`; move `max_table_rows` across and delete the table ([SR-TUNE](0135_tuning.md) decision 13) |
+| `[ranking]` (whole table) | moved to `.fux/config/tune.toml`; run `fux setup` to write the file, move the keys across, delete the table ([SR-TUNE](0135_tuning.md) decision 7) |
+| `[decode]` (whole table) | moved to `.fux/config/tune.toml [index]` on 2026-09-11 (Arpit), beside `max_phrases`; move `max_table_rows` across and delete the table ([SR-TUNE](0135_tuning.md) decision 13) |
+| a policy file at `.fux/<name>.toml` | moved to `.fux/config/<name>.toml` (W-295); `fux setup` moves it, every other verb stops saying so ([SR-DOTFUX](0102_fux-directory.md) decision 11) |
 | `[dense]` (whole table) | **removed**, not relocated — the lane it configured no longer exists ([SR-ASK](0103_ask.md) decision 9). The error states the removal, the verdict behind it, and that ranking does not move, because `mode` defaulted to `off` |
 
 ⚠ **`[dense]` is the case worth noting.** It was retired to `tune.toml` and
@@ -594,7 +595,7 @@ the boundary.
 was [W-140](../work/OPEN-WORK.md) row 8). `fux.toml` silently ignored a
 misspelled key, so `dirs_fil = "…"` left the consumer's setting inert with
 nothing said — the same failure mode as a key documented and never parsed, from
-the other end. `.fux/tune.toml` has rejected unknown tables and keys by name
+the other end. `.fux/config/tune.toml` has rejected unknown tables and keys by name
 since it existed ([SR-TUNE](0135_tuning.md)), and this is that behaviour, here.
 
 ⚠ **It needed decision 13 first, and that is why it waited.** Rejecting a key
@@ -671,7 +672,7 @@ file before abandoning it. Positive integer milliseconds, required; the template
 writes `50`. ⚠ **If `fux.toml` does not load, observers do not run** (W-225
 stage 3b): they used to run on a bound of `50` held in `cli.py`.
 
-**It is in `fux.toml` and not in `.fux/tune.toml`** because it is not a ranking
+**It is in `fux.toml` and not in `.fux/config/tune.toml`** because it is not a ranking
 knob: it bounds what happens **after** the answer is rendered and cannot move a
 result. [SR-TUNE](0135_tuning.md) decision 1's boundary rule is about what
 changes an answer.
@@ -682,8 +683,8 @@ exits, because Python cannot safely interrupt arbitrary consumer code.
 
 <!-- L12-NOTE-START -->
 
-**[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `.fux/tune.toml` became mandatory
-in stage 2, `.fux/output.toml` in stage 3a, and `fux.toml` in stage 3b —
+**[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `.fux/config/tune.toml` became mandatory
+in stage 2, `.fux/config/output.toml` in stage 3a, and `fux.toml` in stage 3b —
 decision 17. The omit-to-inherit rule is gone.
 
 <!-- L12-NOTE-END -->
@@ -771,7 +772,7 @@ each keeps the number it had in code; the template writes it and `fux doctor
 **`[index] section_records` — W-274, 2026-10-11 (Arpit).** A required boolean,
 `false` in the template. It decides whether ingest writes the section plane, so
 it decides committed bytes, and that is why it is here beside `shards` and not in
-`.fux/tune.toml`. What it means, the flip refusal and the mismatch error are
+`.fux/config/tune.toml`. What it means, the flip refusal and the mismatch error are
 [SR-SECTIONS](0161_sections.md) decision 11's.
 
 ### Consequences
@@ -784,7 +785,7 @@ it decides committed bytes, and that is why it is here beside `shards` and not i
   surprising. Worth the surprise: the alternative is folklore about where 256
   comes from.
 - **A third source-list path constant lives here, with no key at all.**
-  `DEFAULT_TYPES_FILE = ".fux/formats.toml"` joins `dirs_file` and `urls_file`
+  `DEFAULT_TYPES_FILE = ".fux/config/formats.toml"` joins `dirs_file` and `urls_file`
   because paths have one home — but it has **no `fux.toml` key**, deliberately:
   the types list is optional, its absence is meaningful (the built-in default
   applies), and a key whose only job is to relocate an optional file is surface
@@ -887,7 +888,7 @@ grep -n -A6 '^REQUIRED_KEYS' src/fux/config.py
 
 # 3. the retired tables still error rather than being silently ignored
 grep -n 'ranking' src/fux/config.py
-# expect: the refusal, naming .fux/tune.toml. Deleting it does not restore the
+# expect: the refusal, naming .fux/config/tune.toml. Deleting it does not restore the
 # keys — it makes a stale fux.toml quietly index-and-rank the wrong way.
 
 # 4. every rejected value still names the file and the value

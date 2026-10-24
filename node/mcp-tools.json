@@ -13,7 +13,7 @@
           },
           "k": {
             "type": "integer",
-            "description": "Maximum results (default {{TOP}}; this repository's .fux/output.toml may set a different default under [mcp]).",
+            "description": "Maximum results (default {{TOP}}; this repository's .fux/config/output.toml may set a different default under [mcp]).",
             "default": "{{TOP}}"
           },
           "expand": {

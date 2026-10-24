@@ -18,6 +18,7 @@ bundler fails before anyone runs a harness.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import re
 import shutil
@@ -206,8 +207,8 @@ def _repo_with_an_index(tmp_path: Path) -> Path:
     from fux.store import TF_FIELDS, term_hash, write_index
 
     (tmp_path / ".git").mkdir(exist_ok=True)
-    (tmp_path / ".fux").mkdir(exist_ok=True)
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     docs = tmp_path / "docs"
     docs.mkdir(exist_ok=True)

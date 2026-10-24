@@ -403,7 +403,7 @@ def run(
         for wf in files
         if f"file:{wf.rel_path}" in parsed
     }
-    # ⚠ **Editing `.fux/pii.toml` invalidates every carried extraction.**
+    # ⚠ **Editing `.fux/config/pii.toml` invalidates every carried extraction.**
     # Redaction happens BELOW, before `extract_fields`, so a rule change alters
     # what should be indexed for documents whose bytes did not change. Reuse is
     # keyed on the content sha alone, so without this a rule added today would
@@ -423,7 +423,7 @@ def run(
     # already claiming the new value would let the next delta run reuse them.
     extract_digest = _extract_config_digest(limits, root, section_records=config.section_records)
     extract_moved = extract_digest != _read_extract_config_digest(root)
-    # W-233. `.fux/identifiers.toml` is the third input to extraction that no
+    # W-233. `.fux/config/identifiers.toml` is the third input to extraction that no
     # document's sha carries. Its digest is COMMITTED — stamped into every
     # shard header — rather than kept in `runtime/` like the two above,
     # because a fresh clone has no `runtime/` and CI must still be able to see
@@ -1055,7 +1055,7 @@ def _existing_index(root: Path, *, full: bool) -> dict[str, dict]:
 PII_DIGEST_FILE = fixed("index", "pii_digest")
 
 #: The committed inputs to extraction beyond a document's own bytes, from the
-#: last completed run — `.fux/tune.toml [index] max_phrases` and
+#: last completed run — `.fux/config/tune.toml [index] max_phrases` and
 #: `max_table_rows`. Derived, gitignored,
 #: and rebuilt by being wrong once, exactly like `pii-digest`: a missing file
 #: reads as "moved" and costs one full extraction.
@@ -1079,7 +1079,7 @@ def _extract_config_digest(limits, root: Path, *, section_records: bool) -> str:
 
     ⚠ **The caps joined on 2026-09-27 (W-225 stage 4a, SR-LAW-12 decision 9b).**
     A cap such as `max_cell_chars` changes what a decoder emits, and once it
-    lives in `.fux/formats.toml` an edit to it bumps no decoder `VERSION` — so
+    lives in `.fux/config/formats.toml` an edit to it bumps no decoder `VERSION` — so
     without this line a changed cap left an index `fux ingest --check` called
     current.
 
@@ -1177,7 +1177,7 @@ def _record_extract_config_digest(root: Path, digest: str) -> None:
 
 
 def _pii_ruleset_moved(root: Path, rules) -> bool:
-    """Has `.fux/pii.toml` changed since the last run? **Asks only.**
+    """Has `.fux/config/pii.toml` changed since the last run? **Asks only.**
 
     A repo with no rules has no state -- the empty digest is compared against
     an absent file, both read as "", and the answer is "not moved".

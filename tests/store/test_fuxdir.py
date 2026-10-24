@@ -5,6 +5,7 @@ the ignore file lists only derived dirs, derived dirs carry CACHEDIR.TAG.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from fux.store import fuxdir
 from l12_fixtures import write_config
 
@@ -42,7 +43,7 @@ def test_ensure_layout_never_overwrites_consumer_edits(tmp_path):
     is a wrong answer rather than an old preference — so it is written anyway,
     and the assertion here is that doing so touched neither annotated file.
     """
-    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     (tmp_path / ".fux" / "README.md").write_text("mine\n", encoding="utf-8")
     (tmp_path / ".fux" / ".gitignore").write_text("mine too\n", encoding="utf-8")
     written = fuxdir.ensure_layout(tmp_path)
@@ -147,7 +148,7 @@ def test_declared_covers_every_kind_of_child():
     **A kind of child missing from this union is a live defect, not a gap in a
     test.** `COMMITTED_FILES` was added 2026-08-24 because there was no such
     category: `COMMITTED` holds directories, so a committed *file* had no row
-    anywhere and `fux doctor` warned about it forever. `.fux/tune.toml` would
+    anywhere and `fux doctor` warned about it forever. `.fux/config/tune.toml` would
     have shipped straight into that warning.
 
     `ACQUIRED` joined on 2026-09-01 for the same reason and with the same
@@ -168,7 +169,7 @@ def test_a_committed_file_is_not_reported_as_undeclared(tmp_path):
     from fux import doctor
 
     fuxdir.ensure_layout(tmp_path)
-    (tmp_path / ".fux" / "tune.toml").write_text("[bm25f]\n", encoding="utf-8")
+    (config_file(tmp_path, "tune")).write_text("[bm25f]\n", encoding="utf-8")
     write_config(tmp_path)
     extras = sorted(
         p.name for p in (tmp_path / ".fux").iterdir() if p.name not in fuxdir.DECLARED

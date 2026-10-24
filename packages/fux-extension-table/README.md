@@ -6,7 +6,7 @@ it; verify freshness at answer time.
 
 **`fux-extension-table` is a fux extension package: the table extension the HTML, sheet and office decoders share.** Only `fux-engine` is mandatory;
 everything else is declared per repository in the committed
-`.fux/plugins.toml`, pinned to one version and digest, and refused loudly when
+`.fux/config/plugins.toml`, pinned to one version and digest, and refused loudly when
 it is missing or differs, so two machines on one repository never build
 different indexes.
 

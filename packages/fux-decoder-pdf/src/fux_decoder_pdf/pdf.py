@@ -71,11 +71,11 @@ EXTENSIONS = tuple(fixed("decoders.pdf", "extensions"))
 #: The decoder extensions this decoder calls, read by the reuse key (SR-DECODE decision 24).
 USES = tuple(fixed("decoders.pdf", "uses"))
 
-#: ⚠ **`MAX_STREAMS` is `[limits.pdf] max_streams` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_STREAMS` is `[limits.pdf] max_streams` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
-#: ⚠ **`MAX_INFLATED` is `[limits.pdf] max_inflated` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_INFLATED` is `[limits.pdf] max_inflated` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
-#: ⚠ **`MAX_TEXT_CHARS` is `[limits.pdf] max_text_chars` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_TEXT_CHARS` is `[limits.pdf] max_text_chars` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 _STREAM_RE = re.compile(rb"stream\r?\n(.*?)endstream", re.DOTALL)

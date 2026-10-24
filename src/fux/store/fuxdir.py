@@ -40,6 +40,8 @@ FUX_DIR = fixed("fuxdir", "dir")
 #: Declared children of `.fux/` — name -> one-line description for the README.
 COMMITTED: dict[str, str] = {
     "index": "the wire-format index (SR-RECORD), plus REGISTER: one line per indexed document -- loc, sha, decoder, k=v extras -- derived from the index and committed with it; `fux register` prints the same rows (SR-INGEST decision 22)",
+    # ASCII only, like every value in this table. W-295: the eight policy files.
+    "config": "the eight policy files you edit, each `<name>.toml` -- `formats` (which files are documents and which decoder reads each extension; optional), `identifiers` (identifier FAMILIES kept whole; CHANGES THE INDEX), `inspect` (what the index REPORT flags), `output` (HOW a result is SHOWN), `pii` (REQUIRED - every command refuses without it; what is REDACTED from the committed index and ONLY from it), `plugins` (which decoder and fetcher PACKAGES this repo runs, each pinned), `refusals` (what a REFUSAL looks like here; consumer-owned) and `tune` (HOW results are ordered, never what is indexed). Moved here from `.fux/<name>.toml` by W-295: `fux setup` moves them, and every other command refuses while one is at the old address (SR-DOTFUX, SR-CONFIG)",
     "sources": "the committed source lists (`dirs`, `urls`), one entry per line",
     "fetchers": "consumer-owned code, one module per `fetch=` name. A file here runs INSTEAD of the declared fetcher package of that name (SR-PLUGINS P8); fux writes none",
     # ASCII only: `_readme()` encodes this table as ASCII on purpose, for
@@ -76,27 +78,12 @@ GENERATED_FILES = tuple(fixed("fuxdir", "generated"))
 #: committed *file* had no row anywhere and `fux doctor` reported it as an
 #: undeclared entry — SR-DOTFUX veto condition 1, firing. `tune.toml` would
 #: have shipped into that warning on day one; `.fux/enrich/` was already in it.
-#: Found 2026-08-24 by checking the claim instead of asserting it.
+#: Found 2026-08-24 by checking the claim instead of asserting it. Since W-295
+#: the eight policy TOMLs are not files at this level: they sit in `config/`.
 COMMITTED_FILES: dict[str, str] = {
-    "tune.toml": "the tunables: HOW results are ordered, never what is indexed (SR-TUNE)",
-    "output.toml": "the output defaults: HOW a result is SHOWN, never which documents come back (SR-OUTPUT)",
-    # ASCII only, like every other value in these tables.
-    "formats.toml": "which files are documents (`include`) and which decoder reads each extension (`[decoders]`). Optional - absent means the built-in default. Replaced .fux/sources/types on 2026-09-11 (SR-TYPES)",
     # ASCII only, like every other value in these tables -- `_readme()` encodes
     # them for a Windows console.
     ".fuxignore": "what is NOT indexed, in .gitignore's grammar. The one place exclusions belong, read before the source lists (SR-FUXIGNORE)",
-    # ASCII only, like every other value in these tables.
-    # ASCII only, like every other value in these tables.
-    "pii.toml": "REQUIRED - every command refuses without it. What is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (SR-PII)",
-    # ASCII only, like every other value in these tables.
-    "identifiers.toml": "identifier FAMILIES kept whole however they are typed (RF-{n}: RF 118, rf118 and RF-118 are one term). [user] is yours and wins; [detected] is written by `fux identifiers --write`. CHANGES THE INDEX - re-ingest after an edit (SR-IDENTIFIERS)",
-    # ASCII only, like every other value in these tables. Declared late: until
-    # W-233 found the warning, `fux setup` wrote this file and `doctor` then
-    # called it undeclared.
-    "inspect.toml": "the knobs of `fux inspect`'s lenses and floors - what the index REPORT flags, never what is indexed or ranked (SR-INSPECT)",
-    # ASCII only, like every other value in these tables. W-289.
-    "plugins.toml": "which decoder and fetcher PACKAGES this repo runs, each pinned to a version and digest. Only what is declared here runs; a declared package that is missing or differs stops fux with the install line. `fux setup` proposes it from your sources (SR-PLUGINS)",
-    "refusals.toml": "what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (SR-REFUSAL)",
     # ASCII only, like every other value in these tables.
     "fux": "the shim: `.fux/fux find rollback` in a clone with nothing installed. Resolves the reader in three rungs -- the vendored bundle, this member's `node_modules/.bin`, then every ancestor's -- because npm and yarn hoist that bin and pnpm and bun do not (SR-NODE-SEARCH)",
 }

@@ -51,7 +51,7 @@ PROBES_NAME = fixed("inspect", "probes")
 SCHEMA = fixed("inspect", "probes_schema")
 
 #: The bar: in the top ten, the list an agent is handed.
-#: ⚠ **`[probes] probe_rank`** in `.fux/inspect.toml` since W-225 stage 4c (SR-LAW-12).
+#: ⚠ **`[probes] probe_rank`** in `.fux/config/inspect.toml` since W-225 stage 4c (SR-LAW-12).
 
 #: Documents probed when no size is given. Each prose document is ~8 queries, so
 #: 50 is ~400 queries — minutes cold, instant from the cache.

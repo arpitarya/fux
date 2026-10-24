@@ -3,22 +3,22 @@ type: Standing Record
 kind: component
 name: SR-TUNE
 title: "SR-TUNE (0135) — the tunables file, and per-source priority"
-description: "`.fux/tune.toml` — a committed, setup-written, never-rewritten file holding every knob that changes ordering, plus one declared exception (`[index]`: `max_phrases`, `max_table_rows`) that changes the index; plus a per-source preference weight in either direction, where fux states the cost and refuses only what is broken."
+description: "`.fux/config/tune.toml` — a committed, setup-written, never-rewritten file holding every knob that changes ordering, plus one declared exception (`[index]`: `max_phrases`, `max_table_rows`) that changes the index; plus a per-source preference weight in either direction, where fux states the cost and refuses only what is broken."
 status: accepted
 date: 2026-08-22
 amended: 2026-10-11
-feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
-owns: [src/fux/tune.py@fd4dbc74d337, .fux/tune.toml@3e16953e4cb3, node/src/config/tune.mjs@3be0ddaaa953]
+feature: the tuning surface — `.fux/config/tune.toml`, its closed key set, its error contract, and per-source preference weights
+owns: [src/fux/tune.py@27b20600c911, .fux/config/tune.toml@3e16953e4cb3, node/src/config/tune.mjs@2376165e517a]
 laws: [L2, L4, L7]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: b675c400e5b42953f3c1e1fefe204c583af3bc6ad39654c4aa0a5778e6065575
+content_sha: 512080dd6f5c04b48d3b43f8e28aa0d74fdb1ad2423937c31d3f3afb010b0c95
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
-- [`.fux/tune.toml`](../.fux/tune.toml) · file
+- [`.fux/config/tune.toml`](../.fux/config/tune.toml) · file
 - [`node/src/config/tune.mjs`](../node/src/config/tune.mjs) · file
 - [`src/fux/tune.py`](../src/fux/tune.py) · file
 
@@ -34,7 +34,7 @@ content_sha: b675c400e5b42953f3c1e1fefe204c583af3bc6ad39654c4aa0a5778e6065575
 ## §1 — For humans
 
 Fux has a dozen constants that decide what you read first. This record gives
-them a home: `.fux/tune.toml`, written once by `fux setup`, committed to your
+them a home: `.fux/config/tune.toml`, written once by `fux setup`, committed to your
 repo, and **never rewritten by fux again**.
 
 **One rule decides what is allowed in it**, and it is mechanical rather than a
@@ -67,7 +67,7 @@ flowchart TD
     subgraph committed["committed, in your repo"]
       SRC["`.fux/sources/*`<br/>WHAT is indexed"]
       CFG["`fux.toml`<br/>POLICY — how it is fetched"]
-      TUNE["`.fux/tune.toml`<br/>RANKING — what comes first"]
+      TUNE["`.fux/config/tune.toml`<br/>RANKING — what comes first"]
     end
     SRC --> ING["ingest / add / remove / update / hooks"]
     CFG --> ING
@@ -83,7 +83,7 @@ flowchart TD
 ```text
   committed, in your repo
   +----------------------+   +------------------+   +----------------------+
-  | .fux/sources/*       |   | fux.toml         |   | .fux/tune.toml       |
+  | .fux/sources/*       |   | fux.toml         |   | .fux/config/tune.toml       |
   | WHAT is indexed      |   | POLICY - fetching|   | RANKING - what first |
   +----------+-----------+   +--------+---------+   +-----------+----------+
              |                        |                         |
@@ -142,7 +142,7 @@ split across two files decision 7 exists to prevent, happening quietly.
 **1. The boundary rule, and it is a test rather than a taste.**
 
 `fux.toml` is **policy** — what enters the corpus, how it is fetched, what gets
-installed. `.fux/tune.toml` is **ranking** — how what is already known is
+installed. `.fux/config/tune.toml` is **ranking** — how what is already known is
 ordered. Membership is decided by one question:
 
 > **Does changing this value change a byte in `.fux/index/`? Yes → it is not a
@@ -168,7 +168,7 @@ held out of that loop and put through the opposite assertion** —
 requires a committed byte to move, so the exception cannot quietly become a
 home for an index decision that merely happens to be listed there.
 
-**2. `.fux/tune.toml` is COMMITTED.** A declared child of `.fux/`. Three
+**2. `.fux/config/tune.toml` is COMMITTED.** A declared child of `.fux/`. Three
 reasons, and the third decides it:
 
 - ranking must be the same for every developer on the repo and in CI;
@@ -203,7 +203,7 @@ day; the record was the stale one.**
 > arguably a feature, but a silent one.
 
 **What ships now:** every value is written **live**, from the template. Ruled the
-same day as the types list and `.fux/output.toml`, for the same reason: *a file
+same day as the types list and `.fux/config/output.toml`, for the same reason: *a file
 of nothing but comments is a menu*, and a consumer should be able to read what
 fux will do without reading fux's source.
 
@@ -288,7 +288,7 @@ be a second copy of them (W-83's lesson). Comments elided here; the shipped
 file carries them.*
 
 ```toml
-# .fux/tune.toml — HOW results are ordered. Never what is indexed.
+# .fux/config/tune.toml — HOW results are ordered. Never what is indexed.
 # Written once by `fux setup`; fux never rewrites it. Every key is required.
 
 [bm25f]                    # k1, b, and the five field weights in TF_FIELDS order
@@ -549,7 +549,7 @@ a value in code ([L12](0014_LAW-12-values-live-in-config.md) decision 7).
 read, so there is no query-time "off" for them.*
 
 ⚠ **It is a TWO-RUNTIME flag since 2026-09-12, and it had to become one.** The
-Node reader read no `.fux/tune.toml` at all ([SR-NODE-SEARCH](0153_node-search.md)
+Node reader read no `.fux/config/tune.toml` at all ([SR-NODE-SEARCH](0153_node-search.md)
 decision 8), so this switch could only ask *"is it me or the config?"* of the
 half that had a config to ignore. `node/fux.mjs` parses it, `config/tune.mjs`
 honours it, and `tools/differential/node_arm.py` passes it **to both readers or
@@ -644,7 +644,7 @@ purpose.
 
 **13. `[index]` — the two keys that change the index live here too** (Arpit,
 2026-09-11). `max_phrases` and `max_table_rows` sit in one table of
-`.fux/tune.toml`, and that table is the declared exception to decision 1.
+`.fux/config/tune.toml`, and that table is the declared exception to decision 1.
 
 - **What moved.** `max_table_rows` left `fux.toml [decode]`, where
   [SR-TABULAR](0150_tabular.md) put it on 2026-09-06. `max_phrases` is new: it
@@ -796,7 +796,7 @@ reads · `*` an **open** table whose keys are the consumer's own.
 ⚠ **`[priority]` is `*` and cannot be anything else.** Its keys are the
 consumer's own source entries — `docs/adr`, `vendor/` — which fux cannot know in
 advance (decision 8). There is **no `-` row**, and the absence is a fact worth
-stating: `.fux/tune.toml` has never needed one, because it refused unknown tables
+stating: `.fux/config/tune.toml` has never needed one, because it refused unknown tables
 and keys **by name** from the day it existed. `fux.toml` acquired that behaviour
 only on 2026-09-12 (SR-CONFIG decision 14), modelled on this file.
 
@@ -830,7 +830,7 @@ and neither is a document prior.**
   and supersession now reaches ranking through the tie-break and nowhere else.
 - 🔴 **A committed `superseded_weight` is an error that NAMES the removal**, via
   `tune._REMOVED_KEYS` and its Node twin — never a bare *"unknown key"*. `fux
-  setup` wrote this key into `.fux/tune.toml` for every repo that ran it, so a
+  setup` wrote this key into `.fux/config/tune.toml` for every repo that ran it, so a
   generic error would send somebody hunting for a typo in a line they never
   typed. **A key leaves the schema and arrives in that table in the same
   change**, or the removal is a trap.
@@ -1006,7 +1006,7 @@ the record*, and the honest outcome of re-reading it can be *nothing moved*.
 [SR-EXPAND](0149_expand.md) decision 17). RM3 failed its pre-registered run
 twice, on drift, and the key left the schema. **It arrived in `_REMOVED_KEYS`
 and its Node twin in the same change**, as decision 15 requires: `fux setup`
-wrote it into every `.fux/tune.toml` from 3.0.0-alpha.3 on, so a file that still
+wrote it into every `.fux/config/tune.toml` from 3.0.0-alpha.3 on, so a file that still
 sets it is refused with an error that names the removal, never a bare *"unknown
 key"*. Ranking is unchanged, because it shipped at `0.0` and `0.0` ran nothing.
 **Removed a second time on 2026-10-03** (W-237). The key re-entered the schema,
@@ -1121,7 +1121,7 @@ this moved where they are written, not what they are.
 
 **W-269 — what `section_weight` weighs (2026-10-10; on a branch from `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-gain-only/PRE-REGISTRATION.md) passes).** The key, its validation and its template value `0.0` are unchanged. Its meaning moved: λ now multiplies the **gain-only** term, what the best section scores beyond the document as one unit ([SR-SECTIONS](0161_sections.md) decision 5), not the best section's whole score. A value tuned against W-236's B2 means something else here. The default is written only on a PASS, with the merge.
 
-**W-273 — the comment caught up (2026-10-11; same branch, unmerged).** The `section_weight` comment in the template and in this repository's `.fux/tune.toml` described W-236's B2 form; it now describes the gain-only term and names W-270 as the run that decides it. Comment bytes only: the key, its validation and its value `0.0` are unchanged.
+**W-273 — the comment caught up (2026-10-11; same branch, unmerged).** The `section_weight` comment in the template and in this repository's `.fux/config/tune.toml` described W-236's B2 form; it now describes the gain-only term and names W-270 as the run that decides it. Comment bytes only: the key, its validation and its value `0.0` are unchanged.
 
 **W-278 — `section_weight` is bounded above by 1.0 (2026-10-13; same branch, unmerged until [its run](../work/regression/2026-10-13-section-term-v3/PRE-REGISTRATION.md) passes).** λ now interpolates toward the **third form**, the better of the document and its best section scored as a short document ([SR-SECTIONS](0161_sections.md) decision 5). **`1.0` is pure max, and a value above `1.0` is refused** by `tune.load` and by Node's `loadTune`, naming the key and the bound. Above 1.0 the term would extrapolate past the section's own score, which is what produced W-269's leaps. The bound is the `_fraction` validator (Node: `fraction`), not a clamp: a silently clamped `2.0` would rank as `1.0` while claiming not to. Template value still **`0.0`** (OFF); a default is written only on a PASS.
 
@@ -1148,7 +1148,7 @@ this moved where they are written, not what they are.
   because `Tune`'s key set is validated against itself and a new key is just a
   new key. This is a stated bound, not a gate.
 
-- ✅ **A frozen `.fux/tune.toml` is REPORTED (2026-09-14, W-163).**
+- ✅ **A frozen `.fux/config/tune.toml` is REPORTED (2026-09-14, W-163).**
   `fux doctor`'s `tune.toml current` row names every `table.key` the engine has
   gained that the consumer's file does not mention. Since L12 such a key also
   stops `tune.toml loads` — there is no engine default to read in its place —
@@ -1271,7 +1271,7 @@ this moved where they are written, not what they are.
 **Reopen this decision if any of the following becomes true:**
 
 **1 — a tune key OUTSIDE `[index]` reaches the index.** Mutating any such key
-in `.fux/tune.toml` and re-ingesting produces a committed byte different from
+in `.fux/config/tune.toml` and re-ingesting produces a committed byte different from
 the unmutated run. Decision 1 is then false and the file is a second ingest
 config. ⚠ *Amended 2026-09-11 (decision 13) — it fired, by ruling, for `[index]`.*
 **1b — a third key joins `[index]`, or an `[index]` key stops moving the index.**
@@ -1293,7 +1293,7 @@ case, plus
 document multipliers and once for the field weights, and it is verified by
 mutation: reverting `block_bound`'s `scoring` argument makes the suite fail.
 
-**3 — `fux tune` writes `.fux/tune.toml`.** Decision 3b is then false and the
+**3 — `fux tune` writes `.fux/config/tune.toml`.** Decision 3b is then false and the
 consumer's comments are fux's to delete.
 *Check:* `grep -rn "tune.toml" src/fux/` shows no write path outside
 `setup.py`'s write-if-missing.

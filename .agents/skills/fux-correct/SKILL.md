@@ -60,7 +60,7 @@ last line; relay it.
 | refusal | what it means |
 |---|---|
 | *reads as a negative correction* | you wrote *don't serve X*. That is a supersession or an archive decision and it is corpus-wide. Correct the RIGHT document instead |
-| *matches `.fux/pii.toml` rule(s)* | the question contains a value the index redacts. **Rewrite it without the value** — a redacted question indexes `[PII:...]` and retrieves nothing |
+| *matches `.fux/config/pii.toml` rule(s)* | the question contains a value the index redacts. **Rewrite it without the value** — a redacted question indexes `[PII:...]` and retrieves nothing |
 | *is not in the index* | paste the `loc` exactly as `fux find` printed it |
 | *that pin is SUSPENDED* | the document changed after the pin was made. Read it, then `--reaffirm` if it still answers, or `--no-pin` |
 

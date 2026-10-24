@@ -99,7 +99,7 @@ def _no_op_priors(root: Path) -> Check:
         return Check(
             "ranking priors",
             True,
-            "not assessed - .fux/tune.toml does not load (see `tune.toml loads`)",
+            "not assessed - .fux/config/tune.toml does not load (see `tune.toml loads`)",
             level="warn",
         )
 
@@ -216,7 +216,7 @@ def _priority_keys(root: Path) -> Check:
     try:
         tune = load_tune(root, enabled=True)
     except FuxError:
-        return Check(name, True, "not assessed - .fux/tune.toml does not load (see `tune.toml loads`)")
+        return Check(name, True, "not assessed - .fux/config/tune.toml does not load (see `tune.toml loads`)")
     if not tune.priority:
         return Check(name, True, "no [priority] keys declared")
     try:

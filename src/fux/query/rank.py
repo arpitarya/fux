@@ -191,12 +191,12 @@ class Weighting:
     #: fallback for an index built before the record property shipped — it has
     #: not scaled a score since 2026-09-13.
     archived_dirs: frozenset[str] = frozenset()
-    #: `.fux/tune.toml`'s `[priority]` (SR-TUNE decision 8), **sorted
+    #: `.fux/config/tune.toml`'s `[priority]` (SR-TUNE decision 8), **sorted
     #: longest-key-first** by the loader so `priority_for` can stop at the
     #: first match. Empty is the default and costs nothing.
     priority: tuple[tuple[str, float], ...] = ()
     #: W-168 step 9 — the intent → doc-type prior (M1). `doctype` is
-    #: `.fux/tune.toml`'s `[doctype]`, sorted longest-pattern-first;
+    #: `.fux/config/tune.toml`'s `[doctype]`, sorted longest-pattern-first;
     #: `intent_type` is the type the QUESTION's intent prefers
     #: (`query/intent.py`); `intent_factor` is `1 + intent_weight`. **All three
     #: are per query**, which is why `run_query` builds a `Weighting` for every

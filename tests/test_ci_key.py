@@ -42,7 +42,7 @@ def test_inert_paths(path: str) -> None:
     "src/fux/templates/agents/INSPECT-SKILL.md", "node/README.md",
     "tests/fixtures/doc.md", "tests_e2e/fixtures/a.md",
     # The committed index is the arm's corpus.
-    ".fux/index/00.jsonl", ".fux/tune.toml",
+    ".fux/index/00.jsonl", ".fux/config/tune.toml",
     # Not Markdown, so not inert, even beside Markdown.
     "records/RULE-SINCE", ".github/workflows/ci.yml", "scripts/ci-key.py",
     # 🔴 The exclude-list promise: a folder nobody has heard of is code.

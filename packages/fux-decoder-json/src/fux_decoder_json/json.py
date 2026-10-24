@@ -53,7 +53,7 @@ USES = tuple(fixed("decoders.json", "uses"))
 #: Depth past which nesting stops being structure and starts being noise. Six
 #: levels covers every config and API payload worth indexing; deeper is usually
 #: machine-generated and repetitive, which is the shape verdict G punished.
-#: ⚠ **`MAX_DEPTH` is `[limits.json] max_depth` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_DEPTH` is `[limits.json] max_depth` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 
@@ -114,19 +114,19 @@ MAX_DEPTH = _Cap("json", "max_depth")
 #: and it filled the record's twelve `phrases` slots with fifth-level keys
 #: while the top-level structure that names the document never made it in.
 #: Two levels is what a reader would call the outline of a config file.
-#: ⚠ **`MAX_HEADING_DEPTH` is `[limits.json] max_heading_depth` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_HEADING_DEPTH` is `[limits.json] max_heading_depth` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: Below this, a string is a label, an enum, an id — not prose. Two characters
 #: would admit every `"y"`/`"no"` flag in every config in the corpus.
-#: ⚠ **`MIN_PROSE_LEN` is `[limits.json] min_prose_len` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MIN_PROSE_LEN` is `[limits.json] min_prose_len` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: Items of a top-level array past this are a dataset rather than a document —
 #: the same judgement `jsonl.MAX_RECORDS` and `csv.MAX_ROWS` make about the
 #: row-oriented shape a JSON array shares. Truncation is **said in the
 #: document**, not hidden, so a reader of a search hit knows the tail exists.
-#: ⚠ **`MAX_ITEMS` is `[limits.json] max_items` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_ITEMS` is `[limits.json] max_items` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 _NOISE = (

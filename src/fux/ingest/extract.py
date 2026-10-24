@@ -52,7 +52,7 @@ from ..constants import fixed
 #: sectionless_formats`: `.csv`, `.json`, `.jsonl`) return no `sections`
 #: (SR-SECTIONS decision 2, W-271's option b). Their documents lose their
 #: section lines and `nsec` at the next ingest.
-RULES_VERSION = fixed("versions", "extract_rules")  # 5 since W-273 (no sections for record formats); W-233 did not bump: no families = identical output; W-282 did not bump: imports moved, same output; nor W-288: the heading grammar moved to decode/ext/markdown.py, same output
+RULES_VERSION = fixed("versions", "extract_rules")  # 5 since W-273 (no sections for record formats); W-295 did not bump: prose addresses only, same output; W-233 did not bump: no families = identical output; W-282 did not bump: imports moved, same output; nor W-288: the heading grammar moved to decode/ext/markdown.py, same output
 
 #: SR-SECTIONS decision 2 (W-273): extensions whose documents are sectionless
 #: whatever headings their decoder emits — one heading per record is not a
@@ -70,7 +70,7 @@ from ..text.identifiers import EMPTY, IdentifierRules
 from ..text.tokenize import tokenize
 from .parse import ParsedDoc, meta_fields
 
-#: The cap on `phrases` is `.fux/tune.toml [index] max_phrases` (default
+#: The cap on `phrases` is `.fux/config/tune.toml [index] max_phrases` (default
 #: `tune.DEFAULT_MAX_PHRASES`, 32), passed in by `ingest/run.py`. It was a
 #: hard-coded 12 until 2026-09-11. Headings only, not headings + first
 #: sentence — the simpler of the original handoff's two options (SR-EXTRACTED).

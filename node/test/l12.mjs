@@ -1,7 +1,7 @@
 /** The config a hand-built Node test repo needs — L12 (W-225).
  *
  * Twin of `tests/l12_fixtures.py`: the engine holds no value in code, so a test
- * that writes `.fux/tune.toml` writes the packaged template with the few keys it
+ * that writes `.fux/config/tune.toml` writes the packaged template with the few keys it
  * is about changed — never a partial file whose missing keys would be the
  * error the test reports instead of the one it is about.
  */

@@ -1,4 +1,4 @@
-# .fux/refusals.toml -- WHAT A REFUSAL LOOKS LIKE HERE.
+# .fux/config/refusals.toml -- WHAT A REFUSAL LOOKS LIKE HERE.
 #
 # A refusal is a response the server returned INSTEAD of the document: a
 # sign-in wall, a session-expired interstitial, a paywall, a 403 shell, a

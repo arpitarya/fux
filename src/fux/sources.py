@@ -6,7 +6,7 @@ re-ingest, dirs and URLs alike — and what is left in this file is the planning
 half: `plan_url_refresh`, `check_drift`, `_narrow`, `_locate`, `_check`.
 
 The three committed source lists (`.fux/sources/dirs`, `.fux/sources/urls` and
-`.fux/formats.toml`) are what fux indexes. Until W-63 only one of them had a command — `fux url` — so
+`.fux/config/formats.toml`) are what fux indexes. Until W-63 only one of them had a command — `fux url` — so
 the corpus, the thing the whole engine is about, was the part of fux you
 maintained by hand.
 
@@ -64,7 +64,7 @@ disappearance of a key.
 
 ## `types` is TOML, and its editor is `typesfile`
 
-Since 2026-09-11 the types list is `.fux/formats.toml` (SR-TYPES decision 12),
+Since 2026-09-11 the types list is `.fux/config/formats.toml` (SR-TYPES decision 12),
 so every verb here branches on `sourcelist.TYPES` and hands the edit to
 [`acquire/typesfile.py`](acquire/typesfile.py). **The rule above still holds** —
 one line of the file changes, every other byte is kept — and the editor
@@ -178,12 +178,12 @@ def _read(path: Path, spec: sourcelist.ListSpec) -> list[sourcelist.Entry]:
 
 
 def _types_root(path: Path) -> Path:
-    """The repo root a `.fux/formats.toml` path sits in."""
+    """The repo root a `.fux/config/formats.toml` path sits in."""
     return path.parents[len(Path(DEFAULT_TYPES_FILE).parts) - 1]
 
 
 def _type_entries(path: Path) -> list[sourcelist.Entry]:
-    """`.fux/formats.toml` as the entries every verb here already speaks.
+    """`.fux/config/formats.toml` as the entries every verb here already speaks.
 
     **An `include` glob and a `[decoders]` binding are both a pattern** to a
     verb: `*.md` with no decoder, `*.csv` with `decoder=csv`. Each is complete by
@@ -210,7 +210,7 @@ def _type_entries(path: Path) -> list[sourcelist.Entry]:
 
 
 def _add_type(path: Path, value: str, overrides: dict[str, str]) -> tuple[str, str, str]:
-    """`add` for `.fux/formats.toml`: a binding if a decoder reads it, an `include` glob if not.
+    """`add` for `.fux/config/formats.toml`: a binding if a decoder reads it, an `include` glob if not.
 
     **A bare `*.ext` already in `include` moves** when it gains a decoder — the
     file may not state one extension twice (SR-TYPES decision 12), and fux's
@@ -1428,7 +1428,7 @@ def _check(root: Path, entry: str | None, *, as_json: bool) -> int:
             unverified += 1
 
     # W-233: one drift no document's sha shows — the index built under other
-    # identifier families than `.fux/identifiers.toml` holds. Every document
+    # identifier families than `.fux/config/identifiers.toml` holds. Every document
     # would re-analyse, so it is reported once, for the index, not per file.
     # The digest is COMMITTED in the shard header, which is why a fresh clone
     # in CI can see it at all.

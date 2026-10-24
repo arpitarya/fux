@@ -8,6 +8,7 @@ write-if-missing**, so an edited fetcher survives every later run.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import importlib.util
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
@@ -108,7 +109,7 @@ def test_setup_writes_no_fetcher_and_no_decoder_and_both_source_lists(tmp_path):
     assert not (tmp_path / ".fux" / "decoders").exists()
     assert (tmp_path / ".fux" / "sources" / "dirs").is_file()
     assert (tmp_path / ".fux" / "sources" / "urls").is_file()
-    assert ".fux/plugins.toml" in report.written
+    assert ".fux/config/plugins.toml" in report.written
     assert report.kept == []
 
 
@@ -129,7 +130,7 @@ def test_setup_declares_what_the_sources_need_and_prints_one_install_line(tmp_pa
     plugins.reset()
     assert list(plugins.declared(tmp_path)) == ["fux-decoder-pdf"]
     out = capsys.readouterr().out
-    assert "wrote .fux/plugins.toml" in out
+    assert "wrote .fux/config/plugins.toml" in out
     install = [line.strip() for line in out.splitlines() if line.strip().startswith("pip install")]
     assert install == [plugins.install_line([("fux-decoder-pdf", plugins._fux_version())])]
     assert "fux setup` again to pin" in out
@@ -175,7 +176,7 @@ def test_setup_adds_and_pins_rows_and_never_removes_one(tmp_path, monkeypatch):
     found = plugins.declared(tmp_path)
     assert set(found) == {"fux-decoder-pdf", "fux-decoder-rtf", "fux-decoder-json"}
     assert found["fux-decoder-pdf"].digest == plugins.installed_digest("fux_decoder_pdf")
-    assert ".fux/plugins.toml" in report.updated
+    assert ".fux/config/plugins.toml" in report.updated
     plugins.reset()
 
 
@@ -263,7 +264,7 @@ def test_the_written_types_file_spells_the_default_out_as_live_lines(tmp_path):
     from fux.acquire.gitdir import DEFAULT_TYPES
 
     setup_mod.run(tmp_path)
-    text = (tmp_path / ".fux" / "formats.toml").read_text(encoding="utf-8")
+    text = (config_file(tmp_path, "formats")).read_text(encoding="utf-8")
     listed = typesfile.parse(text, origin="formats.toml")
     bindings = {ext.lstrip("."): name for ext, name in builtin_bindings().items()}
     assert listed.decoders == bindings
@@ -293,7 +294,7 @@ def test_setup_never_overwrites_an_edited_types_file(tmp_path):
     from fux.acquire import typesfile
 
     setup_mod.run(tmp_path)
-    listing = tmp_path / ".fux" / "formats.toml"
+    listing = config_file(tmp_path, "formats")
     listing.write_text('include = ["*.md"]\n', encoding="utf-8")
     setup_mod.run(tmp_path)
     text = listing.read_text(encoding="utf-8")
@@ -316,8 +317,8 @@ def test_setup_converts_a_leftover_line_grammar_types_file(tmp_path, capsys):
 
     _legacy(tmp_path, "# mine\n*.md\ndocs/*.txt\n*.csv decoder=csv\n*.geojson decoder=json\n")
     report = setup_mod.run(tmp_path)
-    assert report.converted_types and ".fux/formats.toml" in report.written
-    listed = typesfile.parse((tmp_path / ".fux" / "formats.toml").read_text(encoding="utf-8"), origin="t")
+    assert report.converted_types and ".fux/config/formats.toml" in report.written
+    listed = typesfile.parse((config_file(tmp_path, "formats")).read_text(encoding="utf-8"), origin="t")
     assert listed.include == ("*.md", "docs/*.txt")
     assert listed.decoders == {"csv": "csv", "geojson": "json"}
     assert (tmp_path / ".fux" / "sources" / "types").is_file(), "the old file is the human's to delete"
@@ -360,7 +361,7 @@ def test_an_upper_case_bound_pattern_is_refused_rather_than_converted_wrongly(tm
 def test_bang_lines_move_to_fuxignore_above_the_first_hand_pattern(tmp_path):
     """`.fuxignore` is last-match-wins and already outranked the types list, so a
     re-include written there must keep beating the moved line."""
-    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     (tmp_path / ".fux" / ".fuxignore").write_text("# header\n!keep.min.md\n", encoding="utf-8")
     _legacy(tmp_path, "*.md\n!*.min.md\n")
     report = setup_mod.run(tmp_path)
@@ -375,14 +376,14 @@ def test_bang_lines_move_to_fuxignore_above_the_first_hand_pattern(tmp_path):
 
 
 def test_setup_leaves_both_files_alone_when_the_new_one_exists(tmp_path):
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "formats.toml").write_text('include = ["*.md"]\n', encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "formats")).write_text('include = ["*.md"]\n', encoding="utf-8")
     _legacy(tmp_path, "*.rst\n")
     report = setup_mod.run(tmp_path)
     assert not report.converted_types
     # ⚠ Since W-225 stage 4a (SR-LAW-12) "alone" means the list: setup APPENDS
     # the missing `[limits.*]` caps, and never converts or rewrites a line.
-    text = (tmp_path / ".fux" / "formats.toml").read_text(encoding="utf-8")
+    text = (config_file(tmp_path, "formats")).read_text(encoding="utf-8")
     assert text.startswith('include = ["*.md"]\n') and "*.rst" not in text
     assert (tmp_path / ".fux" / "sources" / "types").read_text(encoding="utf-8") == "*.rst\n"
 
@@ -553,8 +554,8 @@ def test_a_plain_ingest_puts_no_code_in_the_repo(tmp_path):
     listing = tmp_path / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
 
     ingest(tmp_path, refresh_urls=False, full=False)
@@ -765,7 +766,7 @@ def test_no_fetcher_receives_another_fetchers_keys(tmp_path):
 
 
 def test_every_template_pii_rule_exists_in_this_repos_pii_toml():
-    """SR-PII d17: this repo's `.fux/pii.toml` is a consumer copy and may carry more rules
+    """SR-PII d17: this repo's `.fux/config/pii.toml` is a consumer copy and may carry more rules
     or different bodies than the template -- but a rule the template ships and the copy has
     lost is a hole nobody sees. Subset by rule NAME, never byte-equal. W-246 (B-073)."""
     import tomllib
@@ -775,6 +776,6 @@ def test_every_template_pii_rule_exists_in_this_repos_pii_toml():
 
     template = (resources.files("fux") / "templates" / "pii.toml.txt").read_text(encoding="utf-8")
     shipped = {r["name"] for r in tomllib.loads(template)["rule"]}
-    mine = {r["name"] for r in tomllib.loads((root / ".fux" / "pii.toml").read_text(encoding="utf-8"))["rule"]}
+    mine = {r["name"] for r in tomllib.loads((config_file(root, "pii")).read_text(encoding="utf-8"))["rule"]}
     assert shipped, "the template parsed to no rules"
-    assert shipped <= mine, f".fux/pii.toml lost template rule(s): {sorted(shipped - mine)}"
+    assert shipped <= mine, f".fux/config/pii.toml lost template rule(s): {sorted(shipped - mine)}"

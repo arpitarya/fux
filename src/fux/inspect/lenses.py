@@ -59,7 +59,7 @@ LEVERS: dict[str, str] = {
     "word-cut passage": "a decoder that emits one record per paragraph (`fux-decoder`)",
     "page chrome": "a consumer html decoder in `.fux/decoders/` that skips `nav`, `header`, `aside` and `footer` (`fux-decoder`)",
     "link-target tokens": "none a consumer can turn — an extraction-rule change under SR-EXTRACTED, its own item, measured first",
-    "identifier family": "`fux identifiers --write` records it in `.fux/identifiers.toml [detected]`, `[user] drop` refuses one — an index change: `fux ingest` after (SR-IDENTIFIERS)",
+    "identifier family": "`fux identifiers --write` records it in `.fux/config/identifiers.toml [detected]`, `[user] drop` refuses one — an index change: `fux ingest` after (SR-IDENTIFIERS)",
 }
 
 #: 64 permutations in 16 bands of 4 rows. The banding threshold — the Jaccard
@@ -68,7 +68,7 @@ LEVERS: dict[str, str] = {
 #: above `NEAR_DUPLICATE_JACCARD` is found with high probability and the
 #: candidate set stays far smaller than all pairs. Broder 1997.
 #:
-#: ⚠ **`[minhash] signature_size` and `band_rows` in `.fux/inspect.toml`** since
+#: ⚠ **`[minhash] signature_size` and `band_rows` in `.fux/config/inspect.toml`** since
 #: W-225 stage 4c (SR-LAW-12), read through `view.config`; the template writes
 #: 64 and 4, and the arithmetic above assumes those.
 
@@ -333,7 +333,7 @@ def _slope(xs: list[float], ys: list[float]) -> float | None:
 #: query. **Six**, which is about the length of a real question once stopwords
 #: are gone — a fingerprint of thirty terms would retrieve the document by
 #: sheer overlap and would measure nothing.
-#: ⚠ **`[findability] fingerprint_terms`** in `.fux/inspect.toml` since W-225 stage 4c.
+#: ⚠ **`[findability] fingerprint_terms`** in `.fux/config/inspect.toml` since W-225 stage 4c.
 
 #: The rank the document must reach in its own fingerprint's results. Three,
 #: as `fux enrich --check`'s self-retrieval filter uses.

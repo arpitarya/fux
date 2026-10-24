@@ -8,6 +8,7 @@ in `--json` — and that turning the mechanism on writes nothing to the index (L
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import hashlib
 import json
 import subprocess
@@ -42,7 +43,7 @@ def _repo(root: Path, column_weight: float) -> None:
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_tune(root, tune_text(ranking={"table_column_weight": column_weight}))
     write_config(root)
     (root / "docs").mkdir(exist_ok=True)

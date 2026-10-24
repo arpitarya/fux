@@ -39,7 +39,7 @@ A sha is a hash of the whole document and leaks nothing on its own.
 
 ## Rules are the consumer's; the engine ships the matcher
 
-`.fux/pii.toml` is a table of named regex rules, applied **in file order**,
+`.fux/config/pii.toml` is a table of named regex rules, applied **in file order**,
 each a full pass. Fux ships a starter file a consumer edits and owns. There is
 no built-in floor here and deliberately so: unlike a magic byte, *what counts
 as PII* is a policy question that differs by jurisdiction, industry and
@@ -94,10 +94,9 @@ from itertools import cycle
 from dataclasses import dataclass
 from pathlib import Path
 
+from .. import configfiles
 from ..errors import FuxError
 from ..constants import fixed
-
-RULES_NAME = fixed("files", "pii_name")
 
 #: Regex flags a rule may name. A closed set, like every other attribute
 #: vocabulary in the source lists: an unknown flag is a typo that would
@@ -428,16 +427,16 @@ def _in_category(category: str, code: int) -> bool:
 
 
 def rules_path(root: Path) -> Path:
-    """`.fux/pii.toml` — fixed, deliberately not configurable.
+    """`.fux/config/pii.toml` — fixed, deliberately not configurable.
 
-    Beside `.fuxignore`, `tune.toml`, `output.toml` and `refusals.toml`, none
-    of which are relocatable either.
+    Beside the other seven policy files in `.fux/config/` (W-295), none of
+    which are relocatable either.
     """
-    return root / fixed("fuxdir", "dir") / RULES_NAME
+    return root / fixed("files", "pii")
 
 
 def require(root: Path) -> Path:
-    """`.fux/pii.toml`, or `FuxError` naming the fix. SR-PII decision 17.
+    """`.fux/config/pii.toml`, or `FuxError` naming the fix. SR-PII decision 17.
 
     The one place the refusal is worded: `load()` calls it, and the CLI gate
     calls it on the path where the file is missing, so a person meets the same
@@ -445,6 +444,11 @@ def require(root: Path) -> Path:
     """
     path = rules_path(root)
     if not path.is_file():
+        # W-295: a file still at `.fux/config/pii.toml` is a repo that has not run
+        # `fux setup`, NOT a repo with no PII policy -- say which.
+        moved = configfiles.moved_error(root, ["pii"])
+        if moved is not None and configfiles.old_path(root, "pii").is_file():
+            raise moved
         raise FuxError(
             f"{path.relative_to(root).as_posix()} is missing, and fux will not run without it (SR-PII decision 17). "
             "Run `fux setup` to write the starter, then review its rules; to redact "
@@ -454,7 +458,7 @@ def require(root: Path) -> Path:
 
 
 def load(root: Path) -> tuple[Rule, ...]:
-    """Parse `.fux/pii.toml`. Absent raises; malformed raises; no rules is `()`.
+    """Parse `.fux/config/pii.toml`. Absent raises; malformed raises; no rules is `()`.
 
     ⚠ **Absent raised nothing until 2026-09-11** -- it read as "no rules", and
     a deleted file was indistinguishable from a public-docs repo that had

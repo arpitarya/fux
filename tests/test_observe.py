@@ -8,6 +8,7 @@ code cannot reach an answer even when it is actively trying to.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import re
 import subprocess
@@ -143,7 +144,7 @@ def _repo(tmp_path: Path) -> Path:
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True, exist_ok=True)
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     # The template's `[observe] max_ms = 50` is a latency budget, and a loaded
     # runner blows it: on Windows under `pytest -n auto` (2026-09-29, the CI

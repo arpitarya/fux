@@ -10,7 +10,7 @@ feature: the observer hook — the extension point a consumer's analytics subscr
 owns: [src/fux/observe.py@b12c1b0c5bc3, tools/observer-bench@e12d60cca125]
 laws: [L2, L3, L4, L5, L9, L10]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 4e07224ca93f35ac06fe0191ee0c6fc7a46c47b53b23c27cb33c6f2e2f30d87f
+content_sha: a8ec1a15f7468f62b9eba21bef06d901cb60c4d88d46ed601d5f4d74d0f47f65
 ratifies: W-170
 ---
 
@@ -174,7 +174,7 @@ was wrong and this is the correction. **What the cap guarantees is the half
 that matters**: a consumer's analytics cannot make `fux ask` slow, only itself.
 Stating it as a kill would be a promise fux cannot keep.
 
-**10c. `[observe] max_ms` is in `fux.toml`, not `.fux/tune.toml`.** It is not a
+**10c. `[observe] max_ms` is in `fux.toml`, not `.fux/config/tune.toml`.** It is not a
 ranking knob: it bounds how long fux waits **after** the answer is rendered and
 cannot move a result. [SR-TUNE](0135_tuning.md) decision 1's boundary rule is
 about what changes an answer.

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-18
 amended: 2026-09-24
 feature: scoring, ordering, and the analyzer they share with ingest
-owns: [src/fux/query/rank.py@53d44972d1fc, src/fux/query/intent.py@be4df9244aa9, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@38da8c6bfe7e, src/fux/text/tokenize.py@63f4c4872bd7, src/fux/text/analyzer.py@8f02dd1c4e44, src/fux/text/stem.py@86954ab3789b, node/src/query/analyzer.mjs@9833b643cc8d, node/src/query/bm25f.mjs@167ce9d10c88, node/src/query/rank.mjs@afbddd6eeed0, node/src/query/stem.mjs@90946a49a2d8, node/src/query/tokenize.mjs@8fd5727daa05, node/test/analyzer.test.mjs@823f6321024c, src/fux/text@038d18521f1c]
+owns: [src/fux/query/rank.py@be0544baa352, src/fux/query/intent.py@6b4e3d07f447, node/src/query/intent.mjs@29ee1fd6f4c4, src/fux/query/bm25f.py@38da8c6bfe7e, src/fux/text/tokenize.py@63f4c4872bd7, src/fux/text/analyzer.py@22dac31c725c, src/fux/text/stem.py@86954ab3789b, node/src/query/analyzer.mjs@9833b643cc8d, node/src/query/bm25f.mjs@d04cc99b5379, node/src/query/rank.mjs@afbddd6eeed0, node/src/query/stem.mjs@90946a49a2d8, node/src/query/tokenize.mjs@8fd5727daa05, node/test/analyzer.test.mjs@823f6321024c, src/fux/text@47287002bac1]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 13abdfff706430c79128855311bb3df38d67d50345697f2017b882a91fbe6bd2
+content_sha: e4c9eebab2ec281b585d7e31ec12e0d8adfa6210c15ee164ae68eb815e3dfe15
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -235,7 +235,7 @@ iterates over the *posting* rather than over the weights, so a body-only tf of
 **3. The shipped values are `k1 = 1.2`, `b = 0.15`, and field weights `(1.0,
 3.0, 2.0, 1.5, 1.0)`** — body 1.0, heading 3.0, title 2.0, path 1.5, `ctx` 1.0 —
 written by `fux setup` from [`templates/tune.toml.txt`](../src/fux/templates/tune.toml.txt)
-into `.fux/tune.toml [bm25f]`, the only place they live
+into `.fux/config/tune.toml [bm25f]`, the only place they live
 ([L12](0014_LAW-12-values-live-in-config.md)). The weights are aligned
 index-for-index with `TF_FIELDS`, and `Scoring` asserts the two are the same
 length. A silent misalignment would weight `title` as `path` and produce a
@@ -271,7 +271,7 @@ starting points, not measured optima. Listing them in one breath would dress
 guesses as calibration.
 
 ⚠ **None of the seven is a constant in code.** Each is a required `[bm25f]` key
-in `.fux/tune.toml` ([SR-TUNE](0135_tuning.md)); a repo that has not changed
+in `.fux/config/tune.toml` ([SR-TUNE](0135_tuning.md)); a repo that has not changed
 them scores byte-identically to `--no-tune`, which reads the template.
 
 **3a. They travel as ONE frozen `Scoring` object, never as separate
@@ -715,7 +715,7 @@ intent_weight`. `of(record)` is `priority_for(loc) × intent_for(loc)`, and
   tuning on 50 goldens overfits, and the archived numbers give a cross-build
   correctness check a tuned set would forfeit. A tuning run is a pre-registered
   measurement, not a preference — which is why the knobs exist per-repo in
-  `.fux/tune.toml` rather than being moved in `bm25f.py`.
+  `.fux/config/tune.toml` rather than being moved in `bm25f.py`.
 - **Drop stopword filtering as "not in the spec".** Rejected on measurement,
   which showed the failure directly.
 - **Demote superseded documents by default.** Rejected on measurement — see
@@ -775,7 +775,7 @@ grep -rn 'from ..text.tokenize import\|from .tokenize import' src/fux/
 grep -nE '^(k1|b|body|heading|title|path|ctx) ' src/fux/templates/tune.toml.txt
 # expect: 1.2, 0.15, then 1.0 3.0 2.0 1.5 1.0 — body and heading unmoved.
 # The template is what `fux setup` writes and `--no-tune` reads; a repo's own
-# `.fux/tune.toml` may set any of them, so the archived-baseline claim holds for
+# `.fux/config/tune.toml` may set any of them, so the archived-baseline claim holds for
 # `ask --no-tune` and for a repo that kept the template's values.
 
 # 5. the scorer takes them as ONE object, so half a fraction cannot be reweighted

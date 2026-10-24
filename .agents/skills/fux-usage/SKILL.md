@@ -188,10 +188,10 @@ This skill is the router. Load the one that matches the job:
 | `fux setup`, `fux doctor`, `fux ingest`, `fux build`, `fux register`, what to commit | `fux-index` |
 | hooks, the merge driver, the URL daemon, a conflicted index shard | `fux-maintain` |
 | add, remove, archive or refresh what is indexed | `fux-sources` |
-| `fux.toml`, `.fux/tune.toml`, `.fux/output.toml` | `fux-config` |
+| `fux.toml`, `.fux/config/tune.toml`, `.fux/config/output.toml` | `fux-config` |
 | serving the index over MCP | `fux-mcp` |
-| a URL fetcher or `.fux/refusals.toml` | `fux-fetcher` |
-| `.fux/pii.toml` | `fux-pii` |
+| a URL fetcher or `.fux/config/refusals.toml` | `fux-fetcher` |
+| `.fux/config/pii.toml` | `fux-pii` |
 | a file format fux reads badly or not at all | `fux-decoder` |
 | enrichment questions in `.fux/enrich/` | `fux-enrich` |
 

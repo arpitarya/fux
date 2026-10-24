@@ -2,7 +2,7 @@
 
 **Read-only, as every lens is** (SR-INSPECT). It names families and the lever
 that would act on them — `fux identifiers --write` — and applies nothing. The
-verb that writes `.fux/identifiers.toml [detected]` calls `detect` and nothing
+verb that writes `.fux/config/identifiers.toml [detected]` calls `detect` and nothing
 else, so what the report proposes and what the verb writes are one function.
 
 **Deterministic (L4).** No model, no sampling: every indexed document's text is
@@ -24,8 +24,8 @@ every raw analyzer token is considered, and the output is sorted.
    literal when every member shares it (`NRL-HSE-{n}`), else `{X}`; a digit run
    is always `{n}`; `-`/`_` as most often written (`-` on a tie); `.` literal.
 5. A family **qualifies** at ≥ `min_values` distinct values across ≥ `min_docs`
-   documents (`.fux/inspect.toml [identifiers]`), and only if its template
-   parses under the grammar `.fux/identifiers.toml` enforces.
+   documents (`.fux/config/inspect.toml [identifiers]`), and only if its template
+   parses under the grammar `.fux/config/identifiers.toml` enforces.
 """
 
 from __future__ import annotations
@@ -271,7 +271,7 @@ def bench(texts: list[tuple[str, str]], pattern: str, kind: str, *, examples: in
     """Everything the Identifiers tab shows for one typed template or regex.
 
     **Read-only** (SR-SERVE): it compiles the pattern exactly as
-    `.fux/identifiers.toml` would, runs it over the corpus, and returns the line
+    `.fux/config/identifiers.toml` would, runs it over the corpus, and returns the line
     to paste — it writes no byte. A refused pattern returns the refusal, which
     is the same sentence `fux ingest` would stop on.
     """

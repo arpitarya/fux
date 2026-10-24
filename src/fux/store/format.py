@@ -110,7 +110,7 @@ def header_for(ids_digest: str) -> dict:
     ambiguous; this one's is not). The readers check `_format`, `analyzer` and
     `tf_fields` by name and ignore it: they see a shard, not a repo, and cannot
     know which families it should carry. `doctor`, `ingest --check` and
-    ingest's own reuse gate compare it against `.fux/identifiers.toml`.
+    ingest's own reuse gate compare it against `.fux/config/identifiers.toml`.
     """
     return {**HEADER, IDENTIFIERS_KEY: ids_digest} if ids_digest else dict(HEADER)
 

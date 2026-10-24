@@ -12,6 +12,7 @@ Both suites are maintained; a feature is not done until both cover it
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import subprocess
 import sys
@@ -45,8 +46,8 @@ def _write_fixture(root: Path) -> None:
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     docs = root / "docs"
     docs.mkdir()
@@ -142,8 +143,8 @@ def test_retirement_marks_and_never_demotes(tmp_path):
     dirs = tmp_path / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\nold archived=true\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "old").mkdir()
@@ -160,7 +161,7 @@ def test_retirement_marks_and_never_demotes(tmp_path):
     assert default[0]["archived"] is True  # and the reader is TOLD
 
     # The removed key is an error that names the removal, not an unknown key.
-    (tmp_path / ".fux" / "tune.toml").write_text(
+    (config_file(tmp_path, "tune")).write_text(
         "[ranking]\narchived_weight = 0.1\n", encoding="utf-8"
     )
     write_config(tmp_path)
@@ -410,7 +411,7 @@ def test_both_journal_consent_surfaces_write_and_neither_alone_is_removable(tmp_
     TOML configuration."* **Both are explicit consent and both stay.**
 
     This test exists so neither can be tidied away by a later session reading
-    `.fux/output.toml` as a pure *rendering* config. It is not — `journal` is a
+    `.fux/config/output.toml` as a pure *rendering* config. It is not — `journal` is a
     **declared exception** to SR-OUTPUT decision 2's boundary rule: it leaves the
     result set byte-identical and still **writes a durable file**, which is
     exactly why the boundary rule alone was never going to catch it.
@@ -437,7 +438,7 @@ def test_both_journal_consent_surfaces_write_and_neither_alone_is_removable(tmp_
     #     consent in a way that watching somebody's terminal is not.
     #
     # ⚠ The file is the SPECIMEN with one line flipped, not a two-line snippet.
-    # `.fux/output.toml` is a COMPLETE declaration: once it exists every gated
+    # `.fux/config/output.toml` is a COMPLETE declaration: once it exists every gated
     # key must be set, and a sparse file is refused by name. That is the shape a
     # consumer actually has — `fux setup` writes the specimen and they edit a
     # line — so testing the snippet would test a file nobody has.
@@ -446,7 +447,7 @@ def test_both_journal_consent_surfaces_write_and_neither_alone_is_removable(tmp_
     _journal(tmp_path).unlink()
     body = specimen().replace("journal = false", "journal = true")
     assert "journal = true" in body, "the specimen's journal line changed spelling"
-    (tmp_path / ".fux" / "output.toml").write_text(body, encoding="utf-8")
+    (config_file(tmp_path, "output")).write_text(body, encoding="utf-8")
     _run(tmp_path, "answer", q, "--json")
     assert _journal(tmp_path).exists(), (
         "a committed `[cli.answer] journal = true` did not write — SR-PROVENANCE "
@@ -471,7 +472,7 @@ def test_journal_is_refused_by_name_at_the_shared_cli_level(tmp_path):
     The refusal names the key rather than reporting an unknown one.
     """
     _write_fixture(tmp_path)
-    (tmp_path / ".fux" / "output.toml").write_text(
+    (config_file(tmp_path, "output")).write_text(
         "[cli]\njournal = true\n", encoding="utf-8")
     out = _run(tmp_path, "answer", "pruning", "--json", check=False)
     assert out.returncode != 0
@@ -559,7 +560,7 @@ def test_setup_writes_the_consumer_owned_files_and_never_rewrites_them(tmp_path)
     (tmp_path / "docs").mkdir()
     first = _run(tmp_path, "setup")
     # W-289 (SR-PLUGINS P6, P9): the declaration is written; no fetcher is seeded.
-    assert "wrote .fux/plugins.toml" in first.stdout
+    assert "wrote .fux/config/plugins.toml" in first.stdout
     assert not (tmp_path / ".fux" / "fetchers").exists()
 
     # A fetcher the consumer writes is theirs, and overrides the package.
@@ -622,7 +623,7 @@ def test_machine_data_beside_a_document_is_not_indexed(tmp_path):
 def test_a_types_file_replaces_the_default(tmp_path):
     _write_fixture(tmp_path)
     (tmp_path / "docs" / "note.rst").write_text("Pruning notes\n=============\n", encoding="utf-8")
-    (tmp_path / ".fux" / "formats.toml").write_text('include = ["*.rst"]\n', encoding="utf-8")
+    (config_file(tmp_path, "formats")).write_text('include = ["*.rst"]\n', encoding="utf-8")
     # The rewrite dropped the `[limits.*]` caps `fux ingest` requires (W-225
     # stage 4a); refill them the way `fux doctor --fix` would, list untouched.
     write_config(tmp_path)
@@ -654,7 +655,7 @@ def test_setup_writes_the_types_file_with_the_default_spelled_out(tmp_path):
     """A consumer should not have to read fux's source to learn what a document is."""
     (tmp_path / "docs").mkdir()
     _run(tmp_path, "setup")
-    types = (tmp_path / ".fux" / "formats.toml").read_text(encoding="utf-8")
+    types = (config_file(tmp_path, "formats")).read_text(encoding="utf-8")
     assert '"*.md"' in types and '"*.adoc"' in types
 
     # ⚠ Was `assert "No .json" in types`. `.json` rejoined the default on
@@ -684,9 +685,9 @@ def test_setup_converts_a_leftover_types_file_and_ingest_refuses_until_it_is_gon
     """SR-TYPES decision 12, end to end: refused, converted, then deleted by hand."""
     _write_fixture(tmp_path)
     (tmp_path / "docs" / "note.rst").write_text("Pruning notes\n=============\n", encoding="utf-8")
-    # The fixture writes `.fux/formats.toml` (required since W-225 stage 4a);
+    # The fixture writes `.fux/config/formats.toml` (required since W-225 stage 4a);
     # the pre-migration repo held the old file ALONE, so remove the new one.
-    (tmp_path / ".fux" / "formats.toml").unlink()
+    (config_file(tmp_path, "formats")).unlink()
     legacy = tmp_path / ".fux" / "sources" / "types"
     legacy.write_text("*.rst\n", encoding="utf-8")
 
@@ -695,7 +696,7 @@ def test_setup_converts_a_leftover_types_file_and_ingest_refuses_until_it_is_gon
     assert refused.returncode == 1 and "fux setup" in refused.stderr
 
     out = _run(tmp_path, "setup").stdout
-    assert (tmp_path / ".fux" / "formats.toml").is_file()
+    assert (config_file(tmp_path, "formats")).is_file()
     assert "now delete .fux/sources/types" in out and legacy.is_file()
     legacy.unlink()
     _run(tmp_path, "ingest")
@@ -1021,7 +1022,7 @@ def _url_repo(tmp_path: Path, *, extra: str = "") -> None:
     (fux / "sources").mkdir(parents=True, exist_ok=True)
     (fux / "sources" / "dirs").write_text("", encoding="utf-8")
     (fux / "sources" / "urls").write_text("https://x.test/runbook fetch=mw decoder=prose\n", encoding="utf-8")
-    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
 
 
@@ -1100,7 +1101,7 @@ def test_a_consumer_drops_a_fetcher_in_and_names_it_on_a_line(tmp_path):
     (fux / "sources" / "urls").write_text(
         "https://wiki.test/rota fetch=glassbox decoder=prose keep=true\n", encoding="utf-8"
     )
-    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     fetchers = fux / "fetchers"
     fetchers.mkdir(parents=True, exist_ok=True)
@@ -1135,7 +1136,7 @@ def test_a_fetcher_name_with_no_file_is_a_doctor_finding_not_a_parse_error(tmp_p
     (fux / "sources").mkdir(parents=True, exist_ok=True)
     (fux / "sources" / "dirs").write_text("", encoding="utf-8")
     (fux / "sources" / "urls").write_text("https://wiki.test/rota fetch=glasbox decoder=prose\n", encoding="utf-8")
-    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     (fux / "fetchers").mkdir(parents=True, exist_ok=True)
     (fux / "fetchers" / "http.py").write_text("def fetch(url):\n    return ''\n", encoding="utf-8")

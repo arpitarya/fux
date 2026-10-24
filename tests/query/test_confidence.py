@@ -21,6 +21,7 @@ edited test is how a frozen threshold moves in disguise.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from l12_fixtures import cli_args, template_tune, write_config
 import argparse
 import json as json_mod
@@ -528,17 +529,17 @@ def test_a_tuned_floor_cannot_reach_a_score_or_an_ordering(tmp_path, monkeypatch
 
     Confidence is computed FROM `rank()`'s output and handed to the caller;
     nothing downstream feeds back. Making the floors configurable must not have
-    opened a path from `.fux/tune.toml` into the result list.
+    opened a path from `.fux/config/tune.toml` into the result list.
     """
     write_index(tmp_path, [_record(), _record(id="file:docs/b.md", loc="docs/b.md")])
     write_config(tmp_path)
     monkeypatch.chdir(tmp_path)
-    (tmp_path / ".fux").mkdir(exist_ok=True)
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
 
     out_default: dict = {}
     base, _ = run_query(tmp_path, "rollback", 5, confidence_out=out_default, force_scan=True, use_tune=True)
 
-    (tmp_path / ".fux" / "tune.toml").write_text(
+    (config_file(tmp_path, "tune")).write_text(
         "[confidence]\nseparation_floor = 0.0\ndoc_coverage_floor = 1.0\n",
         encoding="utf-8",
     )
@@ -564,8 +565,8 @@ def test_no_tune_recomputes_the_band_at_the_ENGINE_defaults():
     import tempfile, pathlib
     with tempfile.TemporaryDirectory() as d:
         root = pathlib.Path(d)
-        (root / ".fux").mkdir()
-        (root / ".fux" / "tune.toml").write_text(
+        (root / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+        (config_file(root, "tune")).write_text(
             "[confidence]\nseparation_floor = 0.9\n", encoding="utf-8"
         )
         write_config(root)

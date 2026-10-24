@@ -158,7 +158,7 @@ def test_a_missing_dirs_list_fails_loudly_naming_setup(tmp_path):
 
 # -- the ranking keys left this file (SR-TUNE decision 7) ------------------
 #
-# `[ranking]` and `[dense]` moved to `.fux/tune.toml` on 2026-08-24. Their
+# `[ranking]` and `[dense]` moved to `.fux/config/tune.toml` on 2026-08-24. Their
 # validation moved with them (`tests/test_tune.py`); what stays here is the
 # refusal, because a silently ignored key is worse than one that errors — the
 # reader believes their setting is in force. Same shape as the
@@ -167,7 +167,7 @@ def test_a_missing_dirs_list_fails_loudly_naming_setup(tmp_path):
 
 def test_a_retired_ranking_table_names_its_new_home(tmp_path):
     _write(tmp_path, "[sources]\n[ranking]\narchived_weight = 0.5\n")
-    with pytest.raises(FuxError, match=r"\[ranking\] moved to \.fux/tune\.toml"):
+    with pytest.raises(FuxError, match=r"\[ranking\] moved to \.fux/config/tune\.toml"):
         load(tmp_path)
 
 
@@ -191,7 +191,7 @@ def test_an_empty_retired_table_is_refused_too(tmp_path):
     outcome the retirement exists to prevent.
     """
     _write(tmp_path, "[sources]\n[ranking]\n")
-    with pytest.raises(FuxError, match=r"\[ranking\] moved to \.fux/tune\.toml"):
+    with pytest.raises(FuxError, match=r"\[ranking\] moved to \.fux/config/tune\.toml"):
         load(tmp_path)
 
 
@@ -266,7 +266,7 @@ def test_acquired_max_bytes_refuses_zero_and_points_at_the_real_knob(tmp_path):
         load(tmp_path)
 
 
-# -- [decode] moved to .fux/tune.toml [index] (2026-09-11) -------------------
+# -- [decode] moved to .fux/config/tune.toml [index] (2026-09-11) -------------------
 
 
 def _repo(tmp_path, extra: str = "") -> Path:
@@ -279,7 +279,7 @@ def test_a_decode_table_refuses_and_names_its_new_home(tmp_path):
     is quietly not read is a setting its author believes is in force."""
     from fux.config import load
 
-    with pytest.raises(FuxError, match=r"\[decode\] moved to \.fux/tune\.toml"):
+    with pytest.raises(FuxError, match=r"\[decode\] moved to \.fux/config/tune\.toml"):
         load(_repo(tmp_path, "\n[decode]\nmax_table_rows = 250\n"))
 
 
@@ -301,7 +301,7 @@ def test_the_scaffolded_fux_toml_has_no_decode_table():
 
 def test_a_types_file_key_is_refused_by_name(tmp_path):
     """`config.schema.json` advertised `[sources] types_file` and nothing read it;
-    the types list is always `.fux/formats.toml` (SR-TYPES decision 12)."""
+    the types list is always `.fux/config/formats.toml` (SR-TYPES decision 12)."""
     import pytest
 
     from fux.config import load

@@ -51,7 +51,7 @@ EXTENSIONS = tuple(fixed("decoders.yaml", "extensions"))
 #: The decoder extensions this decoder calls, read by the reuse key (SR-DECODE decision 24).
 USES = tuple(fixed("decoders.yaml", "uses"))
 
-#: ⚠ **`MAX_DEPTH` is `[limits.yaml] max_depth` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_DEPTH` is `[limits.yaml] max_depth` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: `key:` or `key: value`, capturing indentation. Anchors and tags are stripped

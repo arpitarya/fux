@@ -1,4 +1,4 @@
-"""`.fux/formats.toml`'s reader and one-line editors — SR-TYPES decision 12.
+"""`.fux/config/formats.toml`'s reader and one-line editors — SR-TYPES decision 12.
 
 The resolution half (does a binding name a real module, does it redirect a
 claimed extension) is `tests/decode/test_binding.py`. This file holds what the
@@ -13,7 +13,7 @@ import pytest
 from fux.errors import FuxError
 from fux.acquire import typesfile
 
-ORIGIN = ".fux/formats.toml"
+ORIGIN = ".fux/config/formats.toml"
 
 
 def test_render_then_parse_is_the_identity_on_the_model():

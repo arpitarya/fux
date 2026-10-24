@@ -4,7 +4,7 @@
  * decides an answer lives here; the verbs are projections of it, which is why
  * `find` cannot rank differently from `ask`.
  *
- * 🔴 **This is where `.fux/tune.toml` enters, and where it did not until
+ * 🔴 **This is where `.fux/config/tune.toml` enters, and where it did not until
  * 2026-09-12.** The gap was invisible for a month because the differential
  * arm's Python side called `scan.ask` directly — the same seam Node's `find`
  * called — so **both readers were ignoring the same file**. Pointed at
@@ -47,7 +47,7 @@ import * as accel from "../derive/accel.mjs";
 
 /** The document-level multipliers and the directories they apply to.
  *
- * The weights come from `.fux/tune.toml`; the archived **declaration** still
+ * The weights come from `.fux/config/tune.toml`; the archived **declaration** still
  * comes from the committed dirs list, never from a path convention
  * (SR-DIR-LIST decision 4). `archivedDirSet` carries the tolerance: a corpus
  * whose dirs list cannot be read still answers, demoting nothing. */
@@ -144,7 +144,7 @@ function withTier(tune, overrides) {
 
 /** One arm: tune, scan, rank, rerank, band.
  *
- * `useTune=false` is `--no-tune`: `.fux/tune.toml` is not read at all, so the
+ * `useTune=false` is `--no-tune`: `.fux/config/tune.toml` is not read at all, so the
  * answer is the engine's own (SR-TUNE decision 11). A caller that has already
  * loaded a `Tune` passes it as `tune` rather than paying for a second parse.
  *

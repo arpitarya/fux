@@ -312,7 +312,7 @@ export function runPath(root, args) {
   }
   const shards = new Shards(root);
   const plane = planeFor(root, shards);
-  const hops = args.hops; // `.fux/output.toml [cli.path] hops`, resolved before dispatch
+  const hops = args.hops; // `.fux/config/output.toml [cli.path] hops`, resolved before dispatch
   const tune = loadTune(root, { enabled: args.noTune !== true });
   const payload = pathPayload(lazyRecords(root, shards), plane, tune, args._[0], args._[1], hops);
   const { from: src, to: dst, truncated } = payload;

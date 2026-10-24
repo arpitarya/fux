@@ -8,17 +8,17 @@ status: accepted
 date: 2026-09-01
 amended: 2026-10-20
 feature: refusal detection before decode
-owns: [src/fux/acquire/refusals.py@f40de632d66c, src/fux/templates/refusals.toml.txt@ffa8d8df1f1a, tools/refusal-probe@5979308bfe8a, .fux/refusals.toml@5fdc90fab388]
+owns: [src/fux/acquire/refusals.py@39e2a244262f, src/fux/templates/refusals.toml.txt@66d038617b23, tools/refusal-probe@5979308bfe8a, .fux/config/refusals.toml@5fdc90fab388]
 laws: [L2, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 38de140b2de5a5f1a39d753b390f7c5f222f52dd74bbb6e3ea5eb8586355e62c
+content_sha: db2132cc7939bb41d14c29ca45c8815af99ce1ffdb3672f97c5648e028a6b74b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
-- [`.fux/refusals.toml`](../.fux/refusals.toml) · file
+- [`.fux/config/refusals.toml`](../.fux/config/refusals.toml) · file
 - [`src/fux/acquire/refusals.py`](../src/fux/acquire/refusals.py) · file
 - [`src/fux/templates/refusals.toml.txt`](../src/fux/templates/refusals.toml.txt) · file
 - [`tools/refusal-probe/`](../tools/refusal-probe) · dir
@@ -41,7 +41,7 @@ perfectly. Nothing downstream can tell it from the real thing, so it lands in
 the index as a document, and the failure surfaces weeks later as a confident
 wrong answer that a human has to notice.
 
-`.fux/refusals.toml` names those responses. It is a table of rules, matched
+`.fux/config/refusals.toml` names those responses. It is a table of rules, matched
 against the response **before** it is decoded, and a match records a skip
 rather than a record. Fux ships no knowledge of any vendor: the rules are the
 consumer's, and the shipped starter is a starting point they own and edit.
@@ -67,7 +67,7 @@ flowchart LR
 ```text
                      fux's, always on        the consumer's, additive
                     +------------------+    +-------------------+
-  fetch() --------> | magic-byte floor | -> | .fux/refusals.toml| -> acquired -> decode
+  fetch() --------> | magic-byte floor | -> | .fux/config/refusals.toml| -> acquired -> decode
                     +------------------+    +-------------------+
                             | no                    | match
                             v                       v
@@ -154,7 +154,7 @@ was written. The document in the index is the viewer's chrome.
    keep the wrong bytes and make them look authoritative
    ([SR-ACQUIRED](0145_acquired-plane.md) decision 6).
 
-2. **The rules table is `.fux/refusals.toml` — a consumer file, in a fixed
+2. **The rules table is `.fux/config/refusals.toml` — a consumer file, in a fixed
    location, additive only.** It sits beside `.fuxignore`, `tune.toml` and
    `output.toml`, none of which are relocatable either. A rule can only **add**
    a refusal; there is no syntax that exempts a response from the floor.
@@ -216,7 +216,7 @@ was written. The document in the index is the viewer's chrome.
    nothing is a rule that reads as protection and is not.
 
 9. **The body scan is bounded at 1 MiB, and the number is measured** — `[scan]
-   body_scan_bytes` in `.fux/refusals.toml` since W-225 stage 4b (decision 9a). The first value
+   body_scan_bytes` in `.fux/config/refusals.toml` since W-225 stage 4b (decision 9a). The first value
    was 64 KiB, reasoning about the wrong risk: the cost it feared was scanning
    a 40 MB workbook for a login string, but a workbook is binary and
    `_searchable_text` already declines to decode it. What reaches this path is
@@ -303,7 +303,7 @@ was written. The document in the index is the viewer's chrome.
 **Output — the strictness, every branch:**
 
 ```console
-$ # no .fux/refusals.toml at all
+$ # no .fux/config/refusals.toml at all
   -> 0 rule(s), no error
 
 $ # malformed TOML
@@ -342,10 +342,10 @@ and no fresh record is written) and it is archived (so its carried record still
 carries the flag). Neither fact suppresses the other, and a reader who assumed
 "refused" implied "unknown" would get that backwards.
 
-⚠ **`.fux/refusals.toml` was cited by name as precedent on 2026-09-11.** The
+⚠ **`.fux/config/refusals.toml` was cited by name as precedent on 2026-09-11.** The
 [types-as-TOML comparison](../archive/compare/types-toml.compare.md) §1 (archived 2026-09-24; its argument is in SR-TYPES decision 12) listed
 it among the four hand-edited `.fux/` policy files already in TOML, and that
-list was part of why `.fux/sources/types` became `.fux/formats.toml`.
+list was part of why `.fux/sources/types` became `.fux/config/formats.toml`.
 
 **No refusal decision is amended.** The consequence worth recording is that this
 file's form now carries weight outside this record — a later proposal to change
@@ -501,7 +501,7 @@ the rules carrying the two bounds — so every caller that iterates is unchanged
   freshness gate asks a describer to say so rather than to be silent.
 
 - ✅ **A never-edited, superseded starter is REPORTED (2026-09-14, W-163).**
-  `fux doctor`'s `refusal rules current` row fires when `.fux/refusals.toml` is
+  `fux doctor`'s `refusal rules current` row fires when `.fux/config/refusals.toml` is
   byte-identical to a starter fux has **REPLACED**: rules that decide what enters
   the index, shipped as a starting point, that nobody ever looked at and that fux
   itself has moved on from.
@@ -525,7 +525,7 @@ reason a human can act on, and the reason names the fix rather than the
 symptom. A consumer with a corporate SSO writes two rules once and every URL
 behind it is covered.
 
-**Harder.** `.fux/refusals.toml` is a file that can be wrong in a way nothing
+**Harder.** `.fux/config/refusals.toml` is a file that can be wrong in a way nothing
 else notices — a rule too broad silently drops real documents. Decision 8's
 strictness catches malformed and typo'd rules; it cannot catch a
 *well-formed rule that is wrong about the world*, and nothing can. That is why

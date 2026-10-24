@@ -1,14 +1,14 @@
 ---
 name: fux-fetcher
-description: Write or edit a Fux URL fetcher in .fux/fetchers/ (http.py, the signed-in-Chrome cdp.py, or a new one) and the sign-in/refusal rules in .fux/refusals.toml. Use ONLY when explicitly asked, e.g. "fux can't fetch our wiki", "add a fetcher for Confluence", "pages come back as the login page", "our wiki pages are being refused". Writes committed Python and policy that decide which web pages enter the index.
+description: Write or edit a Fux URL fetcher in .fux/fetchers/ (http.py, the signed-in-Chrome cdp.py, or a new one) and the sign-in/refusal rules in .fux/config/refusals.toml. Use ONLY when explicitly asked, e.g. "fux can't fetch our wiki", "add a fetcher for Confluence", "pages come back as the login page", "our wiki pages are being refused". Writes committed Python and policy that decide which web pages enter the index.
 ---
 
 # Writing a Fux fetcher
 
 Fux never opens a socket itself. A **fetcher** retrieves each URL's bytes:
 a Python file committed in `.fux/fetchers/`, or a **fetcher package** the repo
-declares in `.fux/plugins.toml` — the two shipped ones are `fux-fetcher-http`
-and `fux-fetcher-cdp`. **`.fux/refusals.toml`** names the responses that are not
+declares in `.fux/config/plugins.toml` — the two shipped ones are `fux-fetcher-http`
+and `fux-fetcher-cdp`. **`.fux/config/refusals.toml`** names the responses that are not
 the document (a sign-in page, an error shell). Fux runs a fetcher only for
 `fux add <URL>`, `fux ingest`, and `fux answer` citing a URL. `fux setup`
 declares the packages a URL list needs and prints the install line; it writes no
@@ -30,7 +30,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | the page needs the user's login (SSO, SharePoint, Confluence) | `fetch=cdp` on that URL's line — §4 |
 | a plain GET needs a header, proxy or token | edit `.fux/fetchers/http.py` |
 | the system needs its own API (Confluence REST, Notion) | a new fetcher file, routed as in §3 |
-| a sign-in page got indexed, or should be caught | a rule in `.fux/refusals.toml` — §5 |
+| a sign-in page got indexed, or should be caught | a rule in `.fux/config/refusals.toml` — §5 |
 | a real page is refused | fix or delete the rule named in `[brackets]` in the skip reason |
 | the host answers 429 | `is_rate_limited` (§2) and a lower `[sources.url] max_parallel` |
 | the page arrives but decodes badly | not a fetcher problem — the `fux-decoder` skill |
@@ -38,7 +38,7 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 **Look before writing:**
 
 ```bash
-ls .fux/fetchers/; cat .fux/plugins.toml; grep -n "fetcher\|max_parallel" fux.toml
+ls .fux/fetchers/; cat .fux/config/plugins.toml; grep -n "fetcher\|max_parallel" fux.toml
 fux doctor --json      # checks: "fetcher optional functions", "refusal rules", "url sources"
 ```
 
@@ -194,14 +194,14 @@ fux add https://sharepoint.corp/…/Plan.xlsx --cdp
   `note: <url> decoded to N word(s) from B bytes … application shell`. Point the
   line at the underlying file, export or API URL instead.
 - **It does not treat an error status as a failure.** A 403 or 404 page comes
-  back as a body, so `.fux/refusals.toml` is what keeps it out.
+  back as a body, so `.fux/config/refusals.toml` is what keeps it out.
 - **Tunables** (`[sources.url.config]`): `cdp_host`, `cdp_port`, `launch_chrome`,
   `chrome_binaries`, `extra_chrome_flags`, `load_timeout_s`,
   `fetcher_max_parallel` — mind the ⚠ in §3 if `http` lines also exist.
 - ⚠ **`MAX_PARALLEL` ships at `1` on purpose.** Raise it only after a multi-URL
   run where you checked each record's content matches its URL.
 
-## 5 · Refusals — `.fux/refusals.toml`
+## 5 · Refusals — `.fux/config/refusals.toml`
 
 **Checked after `fetch`, before anything is kept or decoded.** A match is a skip
 whose reason is the rule's `reason` plus `[name]`; nothing is retained, the prior

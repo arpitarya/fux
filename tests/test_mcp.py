@@ -55,11 +55,11 @@ def _rec(doc_id, title, word, *, edges=(), superseded=False, phrases=(), mtime=N
 
 @pytest.fixture
 def repo(tmp_path):
-    # `serve()` now loads `.fux/output.toml` at start (it must be in effect
+    # `serve()` now loads `.fux/config/output.toml` at start (it must be in effect
     # and cover [mcp] `top`, per output_config's no-fallback rule) — this
     # fixture never goes through `fux setup`, so it writes a live specimen
     # itself, exactly what `fux setup` would have produced.
-    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     (tmp_path / OUTPUT_NAME).write_text(specimen(), encoding="utf-8")
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "retry.md").write_text(

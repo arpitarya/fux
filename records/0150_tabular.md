@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-06
 amended: 2026-10-20
 feature: tabular documents — row granularity, the admitted-row limit, the one table emitter, and what a table citation is
-owns: [packages/fux-decoder-sheet@446fd8804270, src/fux/decode/ext/limits.py@4fe441b1aa86, packages/fux-extension-table@f43a4ccab57e]
+owns: [packages/fux-decoder-sheet@057c62b702be, src/fux/decode/ext/limits.py@bd723211d9b8, packages/fux-extension-table@fd33f09588b9]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 1cb18a818deef3e83db95bad8358d964b3cee33819f2e85370f656d9b9ba906f
+content_sha: a1eb2c91247d2f15d16fab7cc3235a32e8f27f1404be10feb6f06946bb05b8ea
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -38,7 +38,7 @@ was hard-coded in `csv.py` and again in `xlsx.py`. A 754-row file decoded to
 500 rows: a fact in row 600 was **not decoded, not indexed, and not citable in
 any configuration**, and the only trace was a `*(table truncated)*` line that
 nobody diffs. It is now `max_table_rows`, default **20 000** — in
-`.fux/tune.toml [index]` since 2026-09-11 (it began in `fux.toml [decode]`).
+`.fux/config/tune.toml [index]` since 2026-09-11 (it began in `fux.toml [decode]`).
 
 **The second was how a table was cited.** The chunker split on headings and
 blank lines; a table has neither, so a whole sheet arrived as one passage. A
@@ -82,14 +82,14 @@ names is a citation nobody can read.
   carries the section — the sheet name, for `.xlsx` — and losing that costs
   more than the duplication does.
 
-**3. `max_table_rows`, default 20 000, counting DATA rows** — `.fux/tune.toml
+**3. `max_table_rows`, default 20 000, counting DATA rows** — `.fux/config/tune.toml
 [index] max_table_rows` since 2026-09-11. The
 header is always kept and never counted: a consumer who writes 20 000 means
 twenty thousand records. Per **sheet** for `.xlsx`, because a sheet is the
 document's own division and truncating the fifth because the first four were
 long would be arbitrary.
 
-**4. ⚠ REVERSED 2026-09-11 (Arpit): it lives in `.fux/tune.toml [index]`, not
+**4. ⚠ REVERSED 2026-09-11 (Arpit): it lives in `.fux/config/tune.toml [index]`, not
 `fux.toml [decode]`.** As shipped, this decision said a row limit changes what is
 **indexed**, so it could not be a tunable ([SR-TUNE](0135_tuning.md) decision 7)
 and belonged in `fux.toml`. It also added a **fourth** top-level table to
@@ -200,7 +200,7 @@ each rule is.
   the sheet holds a row for.
 - **The header is the first row whose source-filled cells reach
   `[limits.<decoder>] header_fill_percent` of the table's width**
-  (`.fux/formats.toml`, shipped `60`, for `xlsx` and for an HTML table with no
+  (`.fux/config/formats.toml`, shipped `60`, for `xlsx` and for an HTML table with no
   `<th>`; `decode/ext/table.py::_header_index`). Rows above it — a title banner — are prose under
   the sheet heading, so their words are no one's column name. *Filled in the
   source*: a merged banner fills one cell, not five. At `1` the first row is the
@@ -311,7 +311,7 @@ cannot do the work. The correct row outranks the next-best in **42/48
   seconds per document per query; a multi-document `ask --refer` multiplies
   it. **Ruled by Arpit
   2026-09-06** over the alternative of degrading to bands past a threshold.
-  `.fux/tune.toml [index] max_table_rows` is the lever a consumer with big
+  `.fux/config/tune.toml [index] max_table_rows` is the lever a consumer with big
   sheets turns — and, unlike every other tune.toml key, turning it re-extracts.
   Latency is Linux x86_64 and not comparable across machines (TEST-PLAN §2).
 
@@ -347,7 +347,7 @@ python -c "
 from fux.decode import decode
 rows = b'col\n' + b''.join(b'value %d\n' % i for i in range(50))
 print(decode(rows, 'a.csv', __import__('pathlib').Path('.')).count(chr(10) + '| value '))"
-# expect: 50 with the default; the configured number when .fux/tune.toml [index] sets one
+# expect: 50 with the default; the configured number when .fux/config/tune.toml [index] sets one
 
 # one passage per row
 python -c "

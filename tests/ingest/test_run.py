@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from fux import store
 from fux.ingest.run import run
 from fux.store import dirty
@@ -11,8 +12,8 @@ def _init(tmp_path, files: dict[str, str], toml: str = "[sources]\n", dirs=("doc
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("".join(f"{d}\n" for d in dirs), encoding="utf-8")
     (tmp_path / "fux.toml").write_text(toml, encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     for rel, text in files.items():
         path = tmp_path / rel

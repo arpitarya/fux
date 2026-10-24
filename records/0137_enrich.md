@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@e1a235d29134, src/fux/enrich.py@3d0f8ae966d2, src/fux/templates/agents/ENRICH-SKILL.md@be18b8ed75c8, node/src/correct.mjs@fafeb8b35584, node/test/pins.test.mjs@daebcdb98aac, src/fux/store/corrections.py@be66e8efb505, src/fux/store/enrichfile.py@2f1d9142b1b1]
+owns: [src/fux/correct.py@fb19d0082a5b, src/fux/enrich.py@ebab4545a960, src/fux/templates/agents/ENRICH-SKILL.md@88371e2428e7, node/src/correct.mjs@fafeb8b35584, node/test/pins.test.mjs@daebcdb98aac, src/fux/store/corrections.py@be66e8efb505, src/fux/store/enrichfile.py@2f1d9142b1b1]
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 40f342466a9be805b729c8bd9a7e7bdea94cbc6286961d24e65b9b76c4d0c28a
+content_sha: efdf66369fde8e445f2b68c00b363ec4040b0def5dfa2f9e968192000a263a38
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -564,7 +564,7 @@ that opts in reports under a single scope named `.fux/sources/urls`.
 
 **A URL's enrichment is committed and indexed like any other**, so decision 12
 covers it unchanged: the body is redacted before it becomes `ctx`, and
-`fux enrich --check` refuses a file whose body matches a `.fux/pii.toml` rule.
+`fux enrich --check` refuses a file whose body matches a `.fux/config/pii.toml` rule.
 There is nothing URL-specific about that boundary and this section states none.
 
 **19. 🔴 `fux correct` writes a HUMAN question onto the same file, in the same

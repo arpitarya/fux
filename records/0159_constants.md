@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-20
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@e99127ba732e]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@1a9e01e95dc2]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 8b0d97103dbf7ddc9d34360fde2eb2896122a0872f9ed2ceda61a43c794ac8ef
+content_sha: 67f23c0aacc768f6d17f426a2d46b8ccef6b3f62e0ca10723a57de4c1963db64
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -154,7 +154,7 @@ decisions 3 and 17; SR-LAW-12 decision 9a).
 
 **W-225 stage 4a (2026-09-27)** added `[templates] formats_limits` — the file name of the decoder-caps template appended to a seeded `formats.toml`.
 
-**W-225 stage 4c (2026-09-28)** added `[templates] inspect` and `[files] inspect` — the template's name and `.fux/inspect.toml`'s path.
+**W-225 stage 4c (2026-09-28)** added `[templates] inspect` and `[files] inspect` — the template's name and `.fux/config/inspect.toml`'s path.
 
 **W-228 (2026-09-28)** bumped `[inspect] facts_schema` to `fux.inspect.facts.v2`: pass A now records each document's front-matter key names (`meta_keys`), so every cached facts entry is recomputed once ([SR-INSPECT](0156_inspect.md) decision 24).
 

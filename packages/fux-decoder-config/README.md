@@ -6,11 +6,11 @@ it; verify freshness at answer time.
 
 **`fux-decoder-config` is a fux decoder package: configuration files — TOML, YAML, INI.** Only `fux-engine` is mandatory;
 everything else is declared per repository in the committed
-`.fux/plugins.toml`, pinned to one version and digest, and refused loudly when
+`.fux/config/plugins.toml`, pinned to one version and digest, and refused loudly when
 it is missing or differs, so two machines on one repository never build
 different indexes.
 
-It reads `.toml` `.yaml` `.yml` `.ini` `.cfg` `.properties`. Install it and declare it in `.fux/plugins.toml` --
+It reads `.toml` `.yaml` `.yml` `.ini` `.cfg` `.properties`. Install it and declare it in `.fux/config/plugins.toml` --
 `fux setup` proposes it when your sources hold those files -- or fux does not
 read them, and `fux doctor` says so.
 

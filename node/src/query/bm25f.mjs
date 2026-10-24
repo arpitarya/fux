@@ -9,7 +9,7 @@ import { fixed } from "../config/constants.mjs";
 
 const IDF_OFFSET = fixed("bm25f", "idf_offset");
 
-//: `k1`, `b`, the five field weights and `anchor` are `.fux/tune.toml [bm25f]`'s
+//: `k1`, `b`, the five field weights and `anchor` are `.fux/config/tune.toml [bm25f]`'s
 //: and arrive on a `Scoring` built by `config/tune.mjs` (L12). Why each is what
 //: the template ships — `b` MEASURED at 0.15 (W-144), anchor MEASURED at 1.0
 //: (W-168 step 1) — is said once, beside its key in `templates/tune.toml.txt`.
@@ -20,10 +20,10 @@ export class Scoring {
       throw new Error("field weights must align with TF_FIELDS");
     }
     if (typeof k1 !== "number" || typeof b !== "number" || typeof anchor !== "number") {
-      throw new Error("Scoring needs k1, b and anchor — read from .fux/tune.toml [bm25f]");
+      throw new Error("Scoring needs k1, b and anchor — read from .fux/config/tune.toml [bm25f]");
     }
     if (typeof section !== "number") {
-      throw new Error("Scoring needs section — read from .fux/tune.toml [ranking] section_weight");
+      throw new Error("Scoring needs section — read from .fux/config/tune.toml [ranking] section_weight");
     }
     this.k1 = k1; this.b = b; this.weights = weights;
     /** W-168 step 1 — the anchor field's weight (0 = OFF). Kept out of

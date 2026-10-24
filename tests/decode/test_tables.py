@@ -11,6 +11,7 @@ that broke on a padding change would stop being run.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from l12_fixtures import configured_root, tune_text, write_config, write_tune
 
 from fux.decode import decode
@@ -173,8 +174,7 @@ def test_defect_3_a_merged_data_cell_repeats_into_its_span():
 def test_defect_3_at_one_percent_the_first_row_is_the_header_as_before(tmp_path):
     """`[limits.xlsx] header_fill_percent = 1` is the pre-W-287 behaviour: any
     non-blank row reaches it, so the first one is the header."""
-    formats = tmp_path / ".fux" / "formats.toml"
-    formats.parent.mkdir(parents=True)
+    formats = config_file(tmp_path, "formats")
     formats.write_text("[limits.xlsx]\nheader_fill_percent = 1\n", encoding="utf-8")
     write_config(tmp_path)
     sheet = (

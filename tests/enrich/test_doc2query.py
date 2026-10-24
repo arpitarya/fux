@@ -12,6 +12,7 @@ rather than decorative.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from l12_fixtures import chunk_bounds, template_tune, write_config
 import pytest
 
@@ -33,8 +34,8 @@ def _repo(tmp_path):
     dirs = tmp_path / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs                enrich=true\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     return tmp_path
 

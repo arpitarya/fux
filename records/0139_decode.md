@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-26
 amended: 2026-10-20
 feature: the decoder plane — the protocol, the registry, the consumer seam, the enrichment queue and the decoder extensions
-owns: [src/fux/decode@b850b8639175, src/fux/decode/ext/__init__.py@c9bb2ae89770, src/fux/decode/ext/markdown.py@e6152422eabb, src/fux/decode/ext/ooxml.py@f6b06732db01, src/fux/decode/ext/xml.py@904fbe40e264, src/fux/decode/ext/zip.py@809ff180996d, src/fux/templates/agents/DECODER-SKILL.md@046a17bbf04f, node/src/decode/markdown.mjs@9b8c05b393cb, node/src/decode/registry.mjs@5f97a79df7ad, packages/fux-decoder-config@c70265358db8, packages/fux-decoder-drawio@746bc5e609cd, packages/fux-decoder-html@6e591271a9a4, packages/fux-decoder-image@bf396431f6a4, packages/fux-decoder-json@1fcccaa78a04, packages/fux-decoder-mail@e41b6deba238, packages/fux-decoder-office@102fe1c11551, packages/fux-decoder-pdf@06e2a83a46da, packages/fux-decoder-rtf@69e71c4eba5c, packages/fux-decoder-svg@cffecd76162b, packages/fux-decoder-xml@39d1b27141b9]
+owns: [src/fux/decode@0fc2231fb9da, src/fux/decode/ext/__init__.py@c9bb2ae89770, src/fux/decode/ext/markdown.py@e6152422eabb, src/fux/decode/ext/ooxml.py@f6b06732db01, src/fux/decode/ext/xml.py@5d58ae8c264f, src/fux/decode/ext/zip.py@b219303e98d1, src/fux/templates/agents/DECODER-SKILL.md@cfe08438e531, node/src/decode/markdown.mjs@9b8c05b393cb, node/src/decode/registry.mjs@573eb7a66bde, packages/fux-decoder-config@115bf622ae00, packages/fux-decoder-drawio@ad4bba23c274, packages/fux-decoder-html@95c6656d62cc, packages/fux-decoder-image@0065c168fd3c, packages/fux-decoder-json@06731b213dda, packages/fux-decoder-mail@2200f16576e3, packages/fux-decoder-office@5916341e57d7, packages/fux-decoder-pdf@36d0812fcaea, packages/fux-decoder-rtf@daff861b6177, packages/fux-decoder-svg@0042ed34e59b, packages/fux-decoder-xml@5452af6b39d5]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: c633b07dff23c1581c773f20ea6d60ffd43be9ece9277d0dc426e462706269be
+content_sha: c96d33eeb4f20c2bec571d59a4f1041a787086f4a0de57f200e1d24c3bea9d42
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -72,7 +72,7 @@ flowchart TD
     P --> X["extract.py"]
     C -->|yes| O{"is there a file in<br/>.fux/decoders/ ?"}
     O -->|"yes: the consumer's override"| CD["the CONSUMER FILE runs<br/>consumer dependencies allowed"]
-    O -->|"no: the normal case"| D{"is its package declared<br/>in .fux/plugins.toml ?"}
+    O -->|"no: the normal case"| D{"is its package declared<br/>in .fux/config/plugins.toml ?"}
     D -->|"yes, and verified"| BD["the PACKAGED decoder runs<br/>stdlib only, L2"]
     D -->|"no"| U["not read, never prose:<br/>counted on ingest's stderr"]
     CD --> R{"Markdown, or None?"}
@@ -97,7 +97,7 @@ flowchart TD
   frontmatter          yes: the consumer's   no: the normal case
         |              override                   |
         |                     |         is its package declared in
-        |                     |         .fux/plugins.toml ?
+        |                     |         .fux/config/plugins.toml ?
         |                     |            |               |
         |                     |      yes, verified         no
         |                     |            |               |
@@ -210,7 +210,7 @@ shrinks. ⚠ **Detection would break L4 outright:** a decoder that ran whenever
 its library happened to import makes two developers with identical sources
 commit different root hashes. **Declared-and-committed plus a loud failure is
 what preserves *same sources → same index*.** ⚠ **Since W-289 phase 2 the same
-rule governs the packaged decoders**: a package `.fux/plugins.toml` declares
+rule governs the packaged decoders**: a package `.fux/config/plugins.toml` declares
 that is missing, or installed at another version or digest, stops every verb
 that reads the index or ingests ([SR-PLUGINS](0165_plugins.md) P4), and an
 installed package nobody declared is never imported (P3).
@@ -223,7 +223,7 @@ thousand is not that.**
 **9. The default type allowlist is prose plus every extension a BUILT-IN decoder
 claims** — and since W-289 phase 2 a *built-in* is a first-party module in a
 `fux-decoder-*` package, and **the allowlist in force is prose plus every
-suffix a DECLARED package claims**: `.fux/formats.toml` as seeded spells every
+suffix a DECLARED package claims**: `.fux/config/formats.toml` as seeded spells every
 first-party binding out, and a glob whose package is not declared admits
 nothing until it is ([SR-TYPES](0128_types-list.md) decision 1). ⚠ **This decision once read the opposite** — that widening it needed a
 pre-registered measurement — and **that was wrong on its own terms.** The
@@ -432,9 +432,9 @@ is what it means for dispatch.
 
 ⚠ **Where the binding lives moved on 2026-09-11** ([SR-TYPES](0128_types-list.md)
 decision 12): it was `decoder=<module>` on a `*.ext` line of `.fux/sources/types`,
-and is `<ext> = "<module>"` under `[decoders]` in `.fux/formats.toml`.
+and is `<ext> = "<module>"` under `[decoders]` in `.fux/config/formats.toml`.
 `_declared_bindings` reads it through `acquire/typesfile.py` and passes `_bind` a
-**location string** (`.fux/formats.toml:14 (decoders.geojson)`) instead of a line
+**location string** (`.fux/config/formats.toml:14 (decoders.geojson)`) instead of a line
 number, because a parsed TOML value carries no position. **`_bound_extension`
 is deleted, not moved**: its one job was refusing a path-scoped binding, which a
 key that IS an extension cannot express. A leftover `.fux/sources/types` is a
@@ -689,7 +689,7 @@ copying one to the other has copied the wrong half.
 **20c. A key not in the resolved map is not indexed, and the closed list is per
 decoder.** That is the auditable shape [W-201](../archive/open/W-201-frontmatter-scalars-not-indexed.md)
 asked for, without a global list: what is searchable is visible in the decoder
-that produced it, or overridden in `.fux/formats.toml [meta]`
+that produced it, or overridden in `.fux/config/formats.toml [meta]`
 ([SR-TYPES](0128_types-list.md) decision 13).
 
 **20d. A claim may name a person key; the engine default never does.** `owner`,
@@ -825,14 +825,14 @@ files they read** (W-239, 2026-09-29). `registry()` runs two or three times per
 document (`decode`, `claims`, extraction's `META_FIELDS` lookup), and until
 this change each call re-executed every `.fux/decoders/*.py`. On a
 1 000-document corpus that was 58 000 imports and 35% of the ingest.
-`meta_bindings()` re-parsed `.fux/formats.toml` per document, which was
+`meta_bindings()` re-parsed `.fux/config/formats.toml` per document, which was
 another 13%.
 
 - **The key is everything the result depends on:**
   - the repo;
   - `(name, mtime_ns, size, inode)` of every `.py` in `.fux/decoders/`,
     helpers included, because a decoder may import one;
-  - the stat of `.fux/formats.toml`;
+  - the stat of `.fux/config/formats.toml`;
   - whether the legacy types file exists.
 
   An edit, an addition or a removal is seen in the same process, which is
@@ -872,7 +872,7 @@ this moved where they are written, not what they are.
 
 <!-- L12-VALUES-END -->
 
-**The built-in decoders' caps live in `.fux/formats.toml [limits.<decoder>]`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27).
+**The built-in decoders' caps live in `.fux/config/formats.toml [limits.<decoder>]`** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27).
 The twenty module constants — `MAX_CELL_CHARS`, `MAX_COLS`, `MAX_INFLATED`,
 `MAX_DEPTH`, `MAX_ITEMS` and the rest — are deleted; each decoder reads
 `fux.decode.ext.limits.limit(decoder, key)`, served from the file the registry
@@ -1062,12 +1062,12 @@ the rule, this decision what it did to the plane).
   `fux-extension-table`. **fux-core ships `decode/__init__.py` and the decoder
   SDK (`decode/ext/`) and no decoder.** No `VERSION` moved: every decoded file
   in this repository decodes to the same bytes before and after.
-- **What the registry loads.** A module from a package `.fux/plugins.toml`
+- **What the registry loads.** A module from a package `.fux/config/plugins.toml`
   declares, verified first (P4) and imported by its fixed name (P7); a file in
   `.fux/decoders/` of the same module name instead (decision 5, P8); nothing
   else. **No declaration means prose only** — not an error: `fux ingest` and
   `fux doctor` say so in one line, with `fux setup` as the lever. A
-  `[decoders]` binding in `.fux/formats.toml` to a first-party module whose
+  `[decoders]` binding in `.fux/config/formats.toml` to a first-party module whose
   package is undeclared reads nothing and is not an error either, so the file
   `fux setup` seeds with every binding stays valid; a binding to a module no
   package carries and no file provides is still decision 13's hard error.

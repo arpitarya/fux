@@ -69,11 +69,11 @@ _FORMAT_LITERAL_RE = re.compile(r'"[^"]*"|\\.|\[[^\]]*\]')
 #: Per SHEET, not per workbook — a five-sheet workbook admits the limit five
 #: times, because a sheet is the document's own division and truncating the
 #: fifth because the first four were long would be arbitrary.
-#: Was a hard-coded 500; now `.fux/tune.toml [index] max_table_rows` (see `csv.py` for the
+#: Was a hard-coded 500; now `.fux/config/tune.toml [index] max_table_rows` (see `csv.py` for the
 #: data-loss this hid).
 from fux.decode.ext.limits import limit, max_table_rows
 
-#: ⚠ **`MAX_COLS` is `[limits.xlsx] max_cols` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_COLS` is `[limits.xlsx] max_cols` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 

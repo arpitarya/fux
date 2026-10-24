@@ -24,7 +24,7 @@ Both directions are tested because both diverge, for different reasons:
 
 ⚠ **The VEHICLE changed on 2026-09-13 and the law did not.** These tests drove
 the weight through `archived_weight`, which was removed with the other two
-document priors (W-152). `.fux/tune.toml`'s `[priority]` is the one multiplier
+document priors (W-152). `.fux/config/tune.toml`'s `[priority]` is the one multiplier
 left, so it carries the law now — same corpus, same weights, same assertions.
 **The vehicle is incidental; `SR-T1-ACCELERATOR` veto 5 is what is under test,
 and it binds whatever multiplier arrives next.**

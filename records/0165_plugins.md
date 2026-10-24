@@ -3,15 +3,15 @@ type: Standing Record
 kind: component
 name: SR-PLUGINS
 title: "SR-PLUGINS (0165) — plugin packages: declared, pinned, refused loudly"
-description: "Only the engine is mandatory. Every decoder, fetcher and extension package is declared per repository in a committed `.fux/plugins.toml`, pinned to a version and digest, loaded by one fixed import name, and refused loudly when missing or drifted — so two machines on one repository can never build different indexes."
+description: "Only the engine is mandatory. Every decoder, fetcher and extension package is declared per repository in a committed `.fux/config/plugins.toml`, pinned to a version and digest, loaded by one fixed import name, and refused loudly when missing or drifted — so two machines on one repository can never build different indexes."
 status: accepted
 date: 2026-10-19
 amended: 2026-10-20
 feature: plugin packages — the declaration, its verification, the loader and the scan that proposes it
-owns: [src/fux/plugins.py@f841cf499dc1, .fux/plugins.toml@05a8986e0790, tests/test_plugins.py@52c673190765, tests/test_plugin_fence.py@8ce1c2309be8, tests/test_plugin_packages.py@68333db84fa1, tests/test_plugin_registry.py@774c0279b2c8]
+owns: [src/fux/plugins.py@c64e7b1e0b2b, .fux/config/plugins.toml@988b44457549, tests/test_plugins.py@52c673190765, tests/test_plugin_fence.py@8ce1c2309be8, tests/test_plugin_packages.py@68333db84fa1, tests/test_plugin_registry.py@036392d7b916]
 laws: [L2, L4, L5, L12]
 timestamp: 2026-10-19T00:00:00Z
-content_sha: d2eadae3be484b65698227db713a465911c81229c05c98941ae71669bcb4b46c
+content_sha: f320c9f74c570d05d67a94f77198e9ade5b1854c1671720a129e5ba46fdbd1c9
 ratifies: "Arpit, 2026-10-19 (Cowork), on W-289: 'maybe we can build out a mechanism of extensions, decoders, plugins, and fetchers as separate packages that can be plugged into Fox' -> 'I want to go with the third option' (C: declared, pinned, committed) -> 'i like the recommendation now create a list what are mandatory and what are optional. because we dont need all' -> 'fux-decoder-json and config should also be optional only use if needed' -> 'okay file a work item for this', given in reply to confirming the SR-LAW-2 wording"
 ---
 
@@ -19,7 +19,7 @@ ratifies: "Arpit, 2026-10-19 (Cowork), on W-289: 'maybe we can build out a mecha
 
 **Owns** — the components this record decides:
 
-- [`.fux/plugins.toml`](../.fux/plugins.toml) · file
+- [`.fux/config/plugins.toml`](../.fux/config/plugins.toml) · file
 - [`src/fux/plugins.py`](../src/fux/plugins.py) · file
 - [`tests/test_plugin_fence.py`](../tests/test_plugin_fence.py) · file
 - [`tests/test_plugin_packages.py`](../tests/test_plugin_packages.py) · file
@@ -35,7 +35,7 @@ ratifies: "Arpit, 2026-10-19 (Cowork), on W-289: 'maybe we can build out a mecha
 **fux-engine reads Markdown and prose on its own. Everything else is a package your
 repository declares.** A PDF reader, an Office reader, the two URL fetchers — each is
 a separately published package (`fux-decoder-pdf`, `fux-fetcher-cdp`, …), and a
-repository runs one only when its committed `.fux/plugins.toml` names it, at exactly
+repository runs one only when its committed `.fux/config/plugins.toml` names it, at exactly
 one version and digest.
 
 **The point is that two machines cannot disagree.** A package somebody happened to
@@ -49,7 +49,7 @@ your repository overrides the package of the same name.
 
 ```mermaid
 flowchart LR
-    S["fux setup<br/>scans the sources"] --> T[".fux/plugins.toml<br/>(committed: name · version · digest)"]
+    S["fux setup<br/>scans the sources"] --> T[".fux/config/plugins.toml<br/>(committed: name · version · digest)"]
     T --> V{"installed, and equal<br/>to the pin?"}
     V -->|no| E["hard error<br/>+ the pip install line"]
     V -->|yes| L["load by its ONE import name<br/>fux_&lt;kind&gt;_&lt;subject&gt;"]
@@ -64,7 +64,7 @@ flowchart LR
   fux setup (scans the sources)
         |
         v
-  .fux/plugins.toml   (committed: name, version, digest per package)
+  .fux/config/plugins.toml   (committed: name, version, digest per package)
         |
         v
   installed, and equal to the pin? --no--> hard error + the pip install line
@@ -111,14 +111,14 @@ sentence true.
 
 ### Decision
 
-**P2. The declaration is `.fux/plugins.toml`, committed.** One `[[package]]` row per
+**P2. The declaration is `.fux/config/plugins.toml`, committed.** One `[[package]]` row per
 package: `name`, `version`, `digest`, and — for a third-party decoder only —
 `suffixes`. A first-party row may not restate its suffixes: the first-party table is
 `src/fux/constants.toml [plugins.packages]`, fixed identity a repository cannot
 redefine. A row with an unknown key, a duplicate name, or two packages claiming one
 suffix is refused by name. The file is parsed once per process while it is
 unchanged, before any package runs — the cache is keyed on its stat, as
-`decode.registry()`'s is on `.fux/formats.toml`, so a long-lived `fux mcp` or
+`decode.registry()`'s is on `.fux/config/formats.toml`, so a long-lived `fux mcp` or
 daemon sees an edited declaration (phase 2) ([SR-DOTFUX](0102_fux-directory.md)
 declares the child).
 
@@ -127,9 +127,9 @@ package nobody declared is never consulted — there is no fallback to *"whateve
 installed"*. The decoder registry imports a module only from a declared package
 (`decode._packaged_decoders`), and the type allowlist in force is *prose plus every
 suffix a declared package claims* ([SR-TYPES](0128_types-list.md) decision 1). **No
-`.fux/plugins.toml` at all means prose only — not an error**: `fux ingest` and `fux
+`.fux/config/plugins.toml` at all means prose only — not an error**: `fux ingest` and `fux
 doctor` say so in one line with `fux setup` as the lever (W-289's first hazard; Arpit's
-call in the phase-2 brief). A `.fux/formats.toml` binding to a first-party module whose
+call in the phase-2 brief). A `.fux/config/formats.toml` binding to a first-party module whose
 package is undeclared reads nothing and is not an error either
 ([SR-DECODE](0139_decode.md) decision 25).
 
@@ -245,7 +245,7 @@ same way `mail` and `drawio` import `html`. Declared in each `pyproject.toml` an
 ### Consequences
 
 - **Breaking for every consumer, once.** After the upgrade a repository needs `fux
-  setup`, the install line it prints, and a commit of `.fux/plugins.toml`. `fux
+  setup`, the install line it prints, and a commit of `.fux/config/plugins.toml`. `fux
   doctor` says so in one line on the first run.
 - **Engine fixes reach consumers again**, because setup seeds no copy
   ([SR-FETCHER](0117_fetcher.md) decision 6). A copy an older setup left keeps
@@ -284,7 +284,7 @@ same way `mail` and `drawio` import `html`. Declared in each `pyproject.toml` an
 
 **Reopen this decision if any of these becomes true:**
 
-1. **A package runs that `.fux/plugins.toml` does not declare, or runs although it
+1. **A package runs that `.fux/config/plugins.toml` does not declare, or runs although it
    differs from its pin.** `plugins.load` is the only place one is executed.
 2. **Two environments on one repository build different indexes** because of what each
    had installed (P13).

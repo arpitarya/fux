@@ -30,7 +30,7 @@
  * Not *"does a decoder claim this extension?"* — which would need the built-in
  * registry, every `.fux/decoders/*.py`, and their precedence, all mirrored in
  * JS and all able to drift. Instead: *"is this document ALREADY TEXT?"*, which
- * `.fux/formats.toml`'s `include` list answers in committed bytes, written by
+ * `.fux/config/formats.toml`'s `include` list answers in committed bytes, written by
  * the consumer and read by both runtimes. A bound extension is never repeated
  * in `include` (SR-TYPES decision 12), so the two sets do not overlap and the
  * complement is exact.
@@ -40,7 +40,7 @@ import { join } from "node:path";
 import { parseToml } from "../config/toml.mjs";
 import { fixed } from "../config/constants.mjs";
 
-//: The built-in `include` default, for a repo with no `.fux/formats.toml` —
+//: The built-in `include` default, for a repo with no `.fux/config/formats.toml` —
 //: `acquire/gitdir.py::_PROSE_TYPES`. **Held equal to Python's by
 //: `tests/test_node_decode_boundary.py`**: a format that becomes prose on one
 //: side and not the other is a silent citation defect, which is the whole
@@ -70,7 +70,7 @@ export function globMatch(pattern, path) {
   return new RegExp(`^${out}$`).test(subject);
 }
 
-/** The `include` globs in force for this repo: `.fux/formats.toml`'s if it has
+/** The `include` globs in force for this repo: `.fux/config/formats.toml`'s if it has
  *  one, the built-in default otherwise.
  *
  *  **An absent file never means "everything" and never means "nothing".**

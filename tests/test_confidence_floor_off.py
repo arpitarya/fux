@@ -21,6 +21,7 @@ the value would be decision 7 returning in a new costume.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import subprocess
 import sys
@@ -39,13 +40,13 @@ def _repo(tmp_path, floor=None):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# Rollback\n\nhow to roll back\n", encoding="utf-8")
     if floor is not None:
-        (tmp_path / ".fux" / "tune.toml").write_text(
+        (config_file(tmp_path, "tune")).write_text(
             f"[confidence]\nseparation_floor = {floor}\n", encoding="utf-8"
         )
         write_config(tmp_path)
@@ -87,7 +88,7 @@ def test_doc_coverage_floor_at_zero_is_NOT_reported(tmp_path):
     """⚠ `0.0` is that clause's shipped default — decision 13's own comment says
     `0.0 = the clause is OFF`. Firing on it would fire on every repo there is."""
     root = _repo(tmp_path)
-    (root / ".fux" / "tune.toml").write_text(
+    (config_file(root, "tune")).write_text(
         "[confidence]\ndoc_coverage_floor = 0.0\n", encoding="utf-8"
     )
     write_config(root)
@@ -98,7 +99,7 @@ def test_an_unparseable_tune_file_defers_to_its_own_row(tmp_path):
     """Two rows telling different stories about one broken file teaches a reader
     to trust neither. `tune.toml loads` is the row for that."""
     root = _repo(tmp_path)
-    (root / ".fux" / "tune.toml").write_text("[confidence\n", encoding="utf-8")
+    (config_file(root, "tune")).write_text("[confidence\n", encoding="utf-8")
     write_config(root)
     assert _row(root).ok
 
@@ -187,7 +188,7 @@ def test_all_three_read_verbs_say_it(tmp_path):
 
 def test_the_node_reader_says_it_too():
     """Both readers, or the one place a repo answers from Node is the one place
-    the note goes unsaid. Node reads `.fux/tune.toml` through `runQuery`
+    the note goes unsaid. Node reads `.fux/config/tune.toml` through `runQuery`
     (SR-NODE-SEARCH decision 8), so it knows the floor and owes the sentence."""
     node = ROOT / "node" / "src" / "verbs" / "find.mjs"
     body = node.read_text(encoding="utf-8")

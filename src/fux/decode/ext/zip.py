@@ -29,22 +29,22 @@ from fux.constants import fixed
 #: `constants.toml [extensions.zip]` — when an edit can change what a decoder
 #: using it RETURNS. `tests/decode/test_decoder_versions.py` fails on a changed
 #: extension whose `VERSION` line the diff did not touch.
-VERSION = fixed("extensions.zip", "version")
+VERSION = fixed("extensions.zip", "version")  # W-295 did not bump: policy-file addresses in prose and messages only, same output
 
 #: A single document's uncompressed payload. Generous for a real deck or
 #: spreadsheet (the largest in this repo's fixtures is under 1 MB) and far
 #: below what a bomb needs to hurt.
-#: ⚠ **`MAX_UNCOMPRESSED` is `[limits.zip] max_uncompressed` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_UNCOMPRESSED` is `[limits.zip] max_uncompressed` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: Members, not bytes. A deck with a thousand slides is unusual; a hundred
 #: thousand entries is an attack or a mistake, and either way not a document.
-#: ⚠ **`MAX_MEMBERS` is `[limits.zip] max_members` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_MEMBERS` is `[limits.zip] max_members` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 #: Per-member, so one pathological entry cannot consume the whole budget while
 #: staying under the archive total.
-#: ⚠ **`MAX_MEMBER_BYTES` is `[limits.zip] max_member_bytes` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_MEMBER_BYTES` is `[limits.zip] max_member_bytes` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 

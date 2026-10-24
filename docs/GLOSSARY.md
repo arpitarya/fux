@@ -221,7 +221,7 @@ pruning is forbidden ([P1-RERUN](../work/regression/2026-08-09-pruning-rerun/VER
 worst case is doing the scan's work, never a wrong answer.
 
 **Declared (a plugin package)** — Named, with its version and digest, in the
-committed `.fux/plugins.toml` ([SR-PLUGINS](../records/0165_plugins.md) P2).
+committed `.fux/config/plugins.toml` ([SR-PLUGINS](../records/0165_plugins.md) P2).
 Only a declared [plugin package](#plugin-package) runs; one that is installed
 and not declared is never consulted, and one that is declared and missing or
 different from its pin stops fux with the install line. The opposite of
@@ -422,7 +422,7 @@ source: the record stored a title *hash* and no readable `title` or `phrases`,
 closing the ACL-mismatch leak where a repo-cloner without source access could
 learn that a document exists and what it is called. `plain` was the opt-in,
 enforced at write time. **Every record now commits readable display text**, and
-that leak is an **accepted, documented exposure** — use `.fux/pii.toml` to keep
+that leak is an **accepted, documented exposure** — use `.fux/config/pii.toml` to keep
 a value out of the committed index, or do not index the page.
 `meta=` in a URL line or in `[sources.url]` is now a **named load error**, not
 an ignored key. See [ex-SR-LAW-5](../archive/records/0007_LAW-5-hashed-meta.md)
@@ -438,7 +438,7 @@ make a hub weightless and turn *widely cited* into *ignored*. **Ships off
 [SR-GRAPH](../records/0126_graph.md) decision 15.
 
 **Identifier family** — A template such as `RF-{n}` in
-`.fux/identifiers.toml` that keeps an ID whole however it is typed: `RF 118`,
+`.fux/config/identifiers.toml` that keeps an ID whole however it is typed: `RF 118`,
 `rf118`, `RF–118` and `RF-0118` each add the one term `rf-118`, in a document at
 ingest and in a question at query time, beside the analyzer's own terms.
 `[user]` is hand-written and wins; `[detected]` is written only by
@@ -463,7 +463,7 @@ pays a query-speed tax and the runtime format never pays a clone tax.
 **Intent prior** — A question's opening cue (*how do I*, *why was*, *what
 is*) read by a fixed lexicon, and the document of the matching type —
 procedure, decision, reference, declared by a `[doctype]` path glob in
-`.fux/tune.toml` — scaled by `1 + [ranking] intent_weight`. **Built 2026-09-28
+`.fux/config/tune.toml` — scaled by `1 + [ranking] intent_weight`. **Built 2026-09-28
 (W-168 step 9); the weight defaults to the measured `0.1`, and the table ships
 empty, so it runs only where types are declared.** See
 [SR-RANKING](../records/0111_ranking.md) decision 13 and

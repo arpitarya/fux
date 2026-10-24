@@ -4,7 +4,7 @@
  *
  * 🔴 **It goes through `runQuery`, not `scan.ask`.** That is the whole of
  * [SR-NODE-SEARCH](../../../records/0153_node-search.md) decision 8 at the
- * call site: `scan.ask` skips `.fux/tune.toml`, the archived weighting and the
+ * call site: `scan.ask` skips `.fux/config/tune.toml`, the archived weighting and the
  * reranker, and calling it here is what made a tuned repo answer differently in
  * the two runtimes.
  *
@@ -152,7 +152,7 @@ export function decline() {
  *  `doctor.FLOOR_OFF_NOTE` (W-164 gate 4). ASCII only — a Windows console's
  *  default codepage must be able to encode it. */
 export const FLOOR_OFF_NOTE =
-  "`[confidence] separation_floor = 0.0` in .fux/tune.toml: NO answer in this repo " +
+  "`[confidence] separation_floor = 0.0` in .fux/config/tune.toml: NO answer in this repo " +
   "can ever be `weak` again. That tunes away the SIGNAL, not the ranking - a " +
   "`grounded` here does not mean what a `grounded` elsewhere means. The band " +
   "publishes the floor it was judged under (`--band`, or the `confidence` block in " +
@@ -167,7 +167,7 @@ let floorNoteSaid = false;
 /** Twin of `_declare_floor_off` in `src/fux/query/__init__.py`.
  *
  * SR-CONFIDENCE decision 13 says of itself that nothing mechanical catches a
- * floor tuned to zero. Both readers catch it now: Node reads `.fux/tune.toml`
+ * floor tuned to zero. Both readers catch it now: Node reads `.fux/config/tune.toml`
  * through `runQuery` (SR-NODE-SEARCH decision 8), so a repo answering from the
  * Node reader would otherwise be the one place the note went unsaid.
  *
@@ -183,7 +183,7 @@ export function declareFloorOff(tune, quiet) {
 export function runFind(root, args) {
   const query = args._.join(" ");
   const queries = [query, ...(args.q || [])];
-  const top = args.top; // `.fux/output.toml`, resolved before dispatch
+  const top = args.top; // `.fux/config/output.toml`, resolved before dispatch
   // W-242 Tier 0 — this verb's one read of each shard, shared by the ranking
   // and the display reads below.
   const shards = new Shards(root);

@@ -17,6 +17,7 @@ the change this file exists to refuse.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import subprocess
 import sys
@@ -47,7 +48,7 @@ DOCS = {
 def corpus(tmp_path_factory) -> Path:
     """A three-document repository, ingested once for this module.
 
-    ⚠ **`.fux/pii.toml` must exist or every verb refuses** — `work/MACHINE.md`
+    ⚠ **`.fux/config/pii.toml` must exist or every verb refuses** — `work/MACHINE.md`
     §Two test invocations names a hand-built repo without it as one of the two
     failures that are not failures.
     """
@@ -56,7 +57,7 @@ def corpus(tmp_path_factory) -> Path:
     fux = root / ".fux"
     (fux / "sources").mkdir(parents=True)
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     docs = root / "docs"
     docs.mkdir()

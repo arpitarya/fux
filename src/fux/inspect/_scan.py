@@ -44,7 +44,7 @@ __all__ = [
 #: on purpose — an absolute IDF floor moves with `n`, so the same term would be
 #: boilerplate on one rung of a corpus and not on the next, and the report's
 #: own vocabulary would stop meaning one thing.
-#: ⚠ **`[thresholds] boilerplate_df_share` in `.fux/inspect.toml`** since W-225
+#: ⚠ **`[thresholds] boilerplate_df_share` in `.fux/config/inspect.toml`** since W-225
 #: stage 4c (SR-LAW-12); read through `IndexView.config`.
 
 #: A term at or below this share is **distinctive** — rare enough that a query
@@ -114,7 +114,7 @@ class IndexView:
     edges: list[tuple[str, str, str, int]] = field(default_factory=list)
     #: shards read, and the content sha of each — the dictionary's cache key
     shards: dict[str, str] = field(default_factory=dict)
-    #: `.fux/inspect.toml`, set by `read_index_view` (W-225 stage 4c). `None` is
+    #: `.fux/config/inspect.toml`, set by `read_index_view` (W-225 stage 4c). `None` is
     #: *not configured*, never a value: a threshold read then raises, naming it.
     config: object = None
 
@@ -138,7 +138,7 @@ class IndexView:
     def _config(self):
         if self.config is None:
             raise FuxError(
-                "an IndexView with no .fux/inspect.toml attached - `read_index_view` "
+                "an IndexView with no .fux/config/inspect.toml attached - `read_index_view` "
                 "attaches it; fux holds no copy of the thresholds in code"
             )
         return self.config

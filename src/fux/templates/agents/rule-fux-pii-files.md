@@ -1,11 +1,11 @@
 ---
 paths:
-  - ".fux/pii.toml"
+  - ".fux/config/pii.toml"
 ---
 
 # Editing Fux PII rules
 
-`.fux/pii.toml` decides which values are redacted from the committed index.
+`.fux/config/pii.toml` decides which values are redacted from the committed index.
 
 - **Only when a human asked.** Never delete or empty the file to get past an
   error - fux refuses to run without it on purpose.

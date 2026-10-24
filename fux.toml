@@ -3,7 +3,7 @@
 #
 # EVERY KEY, WHAT IT MEANS AND WHAT IT DEFAULTS TO IS IN ONE PLACE:
 #   https://github.com/arpitarya/fux/blob/main/records/0113_config.md
-# Ranking knobs are not here at all -- they live in .fux/tune.toml (SR-TUNE):
+# Ranking knobs are not here at all -- they live in .fux/config/tune.toml (SR-TUNE):
 #   https://github.com/arpitarya/fux/blob/main/records/0135_tuning.md
 #
 # This file does not explain its own keys, deliberately: a comment that
@@ -96,7 +96,7 @@ shards = 256
 git_timeout_s = 120
 
 # false: whole documents only. true: ingest also writes the section plane,
-# .fux/index/sections/, which [ranking] section_weight in .fux/tune.toml reads;
+# .fux/index/sections/, which [ranking] section_weight in .fux/config/tune.toml reads;
 # set that to 1.0, the measured value (W-278). About doubles the index.
 # Flipping it changes committed bytes: run `fux ingest --full` after.
 section_records = false

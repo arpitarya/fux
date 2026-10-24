@@ -3,24 +3,24 @@ type: Standing Record
 kind: component
 name: SR-OUTPUT
 title: SR-OUTPUT (0143) — output defaults are configurable, in a third file
-description: "`.fux/output.toml` sets the default SHAPE of every verb's output — and of the MCP surface, which has no flags at all. A third file because it has a third boundary: it changes how a result is shown, never which documents come back."
+description: "`.fux/config/output.toml` sets the default SHAPE of every verb's output — and of the MCP surface, which has no flags at all. A third file because it has a third boundary: it changes how a result is shown, never which documents come back."
 status: accepted
 built: 2026-08-28
 amended: 2026-10-20
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@5d3b9020433f, src/fux/templates/output.toml.txt@0952128ae0aa, .fux/output.toml@4a3a8465d2e4, node/src/config/output.mjs@a00d8fa88ee8]
+owns: [src/fux/output_config.py@c23c3f5f9278, src/fux/templates/output.toml.txt@b7dad8f4f7e4, .fux/config/output.toml@4a3a8465d2e4, node/src/config/output.mjs@c1268149675c]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 8aa114843814eb6b373768faed5c4c1b5be23dea487c823f6765460ee63f4f57
+content_sha: 410c3fd5e96e587b17a4198f220437c0cf31792936abfd54c6da7cd13fdbdcac
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
-- [`.fux/output.toml`](../.fux/output.toml) · file
+- [`.fux/config/output.toml`](../.fux/config/output.toml) · file
 - [`node/src/config/output.mjs`](../node/src/config/output.mjs) · file
 - [`src/fux/output_config.py`](../src/fux/output_config.py) · file
 - [`src/fux/templates/output.toml.txt`](../src/fux/templates/output.toml.txt) · file
@@ -45,21 +45,21 @@ content_sha: 8aa114843814eb6b373768faed5c4c1b5be23dea487c823f6765460ee63f4f57
 wants a different shape retypes the same flags on every invocation — **and an
 MCP client cannot retype anything, because a tool call has no flags.**
 
-This record adds **`.fux/output.toml`**: committed, and read only at the
+This record adds **`.fux/config/output.toml`**: committed, and read only at the
 moment a result is printed. **Required, key by key** ([L12](0014_LAW-12-values-live-in-config.md)):
 it is the *sole* source of every key a verb resolves; an absent file or a key
 it does not set is a hard error naming `fux doctor --fix`. `--no-output-config`
 and a run outside any repo read the packaged template instead. See decisions 19
 and 20.
 
-**Why a third file and not a table in `.fux/tune.toml`.** Because the boundary
+**Why a third file and not a table in `.fux/config/tune.toml`.** Because the boundary
 is different, and the difference is mechanical rather than aesthetic:
 
 | file | the test it applies | asked of |
 |---|---|---|
 | `fux.toml` | does it change **what is indexed**? | sources, ingest |
-| `.fux/tune.toml` | does it change **which documents come back, or their order**? | `k1`, field weights, priority |
-| **`.fux/output.toml`** | neither — does it change **how they are shown**? | `top`, `json`, `band`, `hops` |
+| `.fux/config/tune.toml` | does it change **which documents come back, or their order**? | `k1`, field weights, priority |
+| **`.fux/config/output.toml`** | neither — does it change **how they are shown**? | `top`, `json`, `band`, `hops` |
 
 ⚠ **`tune.toml`'s own rule would have admitted these keys.** Its rule is
 *"changing the value leaves `.fux/index/` byte-identical"*, which output
@@ -78,7 +78,7 @@ so on the line itself.
 that layout has not existed since the three-root rewrite (W-140 row 12). The
 real roots are `[cli]`, `[cli.json]` and `[mcp]`, with per-verb subtables under
 the first two. **There is no built-in rung** ([L12](0014_LAW-12-values-live-in-config.md)):
-the file read is the repo's `.fux/output.toml`, or — under `--no-output-config`
+the file read is the repo's `.fux/config/output.toml`, or — under `--no-output-config`
 or with no repo at all — the packaged template `fux setup` writes.
 
 ```mermaid
@@ -104,7 +104,7 @@ flowchart LR
         |
         no
         v
-  which file? the repo's .fux/output.toml -- or, under --no-output-config or
+  which file? the repo's .fux/config/output.toml -- or, under --no-output-config or
         |      with no repo, the packaged template (L12). ABSENT = FuxError.
         v
   [cli.json.<verb>] set? --yes--> value used     (--json renderings only)
@@ -135,7 +135,7 @@ name**: setting it there reads as global and is not.
 ### Examples
 
 ```console
-$ cat .fux/output.toml
+$ cat .fux/config/output.toml
 [cli]
 band = true
 
@@ -171,7 +171,7 @@ null
 
 ### Decision
 
-1. **`.fux/output.toml` exists.** Committed, required (L12), written by
+1. **`.fux/config/output.toml` exists.** Committed, required (L12), written by
    `fux setup`, and **never rewritten by fux** except that `fux doctor --fix`
    appends a missing key from the template — the `tune.toml` precedent
    (SR-TUNE decision 3b), for the same reason: `tomllib` reads and the stdlib
@@ -293,7 +293,7 @@ null
 
 13. **`fux output` prints the specimen and exits** — the exact twin of
     `fux tune`, one boundary further in. It writes nothing, here or ever.
-    ⚠ Both print with `end=""`, so `fux output > .fux/output.toml` is
+    ⚠ Both print with `end=""`, so `fux output > .fux/config/output.toml` is
     byte-identical to what `fux setup` writes. `_cmd_tune` did not, and the
     two committed files round-tripped differently until 2026-08-27.
 
@@ -310,7 +310,7 @@ null
     writes exactly that key from the template — never a rewrite of anything the
     consumer wrote (SR-DOTFUX decision 6).
 
-    `[priority]` in `.fux/tune.toml` is the one table that stays commented,
+    `[priority]` in `.fux/config/tune.toml` is the one table that stays commented,
     and it is not an inconsistency: its keys are the consumer's own source
     entries, so an uncommented line there would silently reweight a corpus
     rather than restate a default. Anything unlisted is already `1.0` — an
@@ -338,7 +338,7 @@ null
 
 18. ⚠ **`graph` has NO `top` key, and had a dead one.** `[graph] top`
     validated and did nothing: `graph` has no `--top` flag and `cmd_graph`
-    reads `seed_depth`/`expand_limit` from `.fux/tune.toml`. It is removed
+    reads `seed_depth`/`expand_limit` from `.fux/config/tune.toml`. It is removed
     rather than wired, because **both of those change WHICH nodes come back** —
     truncating a walk is a ranking change, which this file may not make.
 
@@ -362,7 +362,7 @@ null
     a verb resolves a key the file does not set, `resolve()` / `resolve_json()`
     / `resolve_mcp()` raise `FuxError` — `<file>:`, then `[table] key is
     missing`, then the `fux doctor --fix` remedy, in the same words as
-    `.fux/tune.toml` and in both runtimes — rather than returning a number
+    `.fux/config/tune.toml` and in both runtimes — rather than returning a number
     nobody chose and nobody can see in a diff. `load()` raises the same way
     when the file is missing entirely (decision 20).
 
@@ -377,7 +377,7 @@ null
     `mcp`.** `doctor`, `hooks`, `daemon`, `explain`, `graph` and `path` all
     resolve at least `json` through `CLI_VERBS` (several with an empty
     per-verb key tuple, which still walks the `json` pass), so every one of
-    them was a `FuxError` waiting for a repo whose `.fux/output.toml` predates
+    them was a `FuxError` waiting for a repo whose `.fux/config/output.toml` predates
     a key this version needs — with **no flag on the command line to bisect
     it**, on `doctor` in particular, the verb you would run to diagnose
     exactly that. Decision 15 already named this requirement (*"every verb
@@ -396,7 +396,7 @@ null
 20. **A MISSING FILE IS AN ERROR, AND `doctor` STILL RUNS**
     ([L12](0014_LAW-12-values-live-in-config.md) decision 3; release 3.0,
     breaking, R9). There is no built-in behind the file, so `load()` raises when
-    `.fux/output.toml` does not exist, naming the file and `fux doctor --fix`.
+    `.fux/config/output.toml` does not exist, naming the file and `fux doctor --fix`.
     **The lesson that shaped this decision's earlier form still binds: the verb
     that names the fix must be able to start.** `cli._apply_output_defaults`
     lets `doctor` alone render from the template when the repo's file cannot be
@@ -420,7 +420,7 @@ null
 
 20a. ⚠ **Decision 20's lesson was applied by a DIFFERENT record on
     2026-09-11, and the evidence it was learned is an exemption list.**
-    [SR-PII](0148_pii.md) decision 17 makes a missing `.fux/pii.toml` a hard
+    [SR-PII](0148_pii.md) decision 17 makes a missing `.fux/config/pii.toml` a hard
     stop — the same mechanism decision 19 chose and decision 20 reversed, for a
     file with the same write-if-missing lifecycle. **The difference is
     `PII_EXEMPT` in `cli.py`**, which carries `doctor` alongside `setup`,
@@ -493,7 +493,7 @@ not reach it.
 by name.** `fux add` gained `--keep`, `--no-keep` and `--ttl`
 ([SR-ACQUIRED](0145_acquired-plane.md), [SR-URL-FRESHNESS](0147_url-freshness.md)).
 All three write an attribute into `.fux/sources/urls`; **none of them gates a
-rendering and none reads `.fux/output.toml`**, so decision 10 does not reach
+rendering and none reads `.fux/config/output.toml`**, so decision 10 does not reach
 them and they are correct as plain `store_true` / `metavar` arguments. Recorded
 for the same reason `--all` was: this record constrains *every gated flag* in
 `cli.py`, so a flag that is deliberately outside that set has to be named, or
@@ -503,7 +503,7 @@ resolution it has no file to resolve against.
 ⚠ **`fux add --no-update` joins that set on 2026-09-11**, and for exactly the
 reason above: it writes `update=never` into `.fux/sources/urls`
 ([SR-URL-LIST](0116_url-list.md) decision 14), gates no rendering, and reads
-nothing from `.fux/output.toml`. It is correct as a plain `store_true`.
+nothing from `.fux/config/output.toml`. It is correct as a plain `store_true`.
 
 **One property makes it *safely* outside decision 10 rather than merely
 outside it**, and it is worth stating because the next source-list flag may not
@@ -518,7 +518,7 @@ reading it.
 a flag.** `fux enrich` gained an optional positional `TARGET`
 ([SR-CLI](0101_cli-surface.md) decision 2a, [SR-ENRICH](0137_enrich.md)
 decision 13). It selects **which document `--plan`/`--check` report on** and
-gates no rendering; it reads nothing from `.fux/output.toml`, and `enrich` has
+gates no rendering; it reads nothing from `.fux/config/output.toml`, and `enrich` has
 no `[cli.enrich]` block to read one from.
 
 **It is also structurally outside decision 10.** That rule exists because
@@ -572,7 +572,7 @@ The emission gate is untouched — `_show_band`/`_gated` are unchanged and
 older fux.
 
 ⚠ **`find`'s `--phrase`/`--under`/`--all`/`--no-archived` are NOT gated flags and take no
-`.fux/output.toml` key**, which is deliberate rather than an omission: a filter
+`.fux/config/output.toml` key**, which is deliberate rather than an omission: a filter
 that applied itself from a committed file would make `fux find` return a
 different set of paths in two clones of the same repo. The `[filter]` note they
 print goes to **stderr**, so stdout stays a bare path list a pipe can read.
@@ -647,7 +647,7 @@ keys`.
       names the key in both runtimes so a drop fails with what it broke rather
       than with *"`answer` key set differs"*.
       ⚠ **The committed surface is a COMPLETE declaration, which the test had to
-      learn:** once `.fux/output.toml` exists every gated key must be set, so a
+      learn:** once `.fux/config/output.toml` exists every gated key must be set, so a
       two-line snippet is refused. The realistic path — and the one now tested —
       is the specimen with one line flipped.
     - **L9 is untouched by this.** The journal is gitignored, local, and never
@@ -658,7 +658,7 @@ keys`.
 
 **22. Both readers fold this file in, at the same place, since 2026-09-12.**
 
-The Node reader read no `.fux/output.toml`, so `fux find rollback` with no
+The Node reader read no `.fux/config/output.toml`, so `fux find rollback` with no
 flags returned `[cli] top` results under Python and five under Node — and
 worse, a **present** file is the sole source of every key (decision 19), so a
 repository whose file omits a key makes Python refuse and Node answer. That is
@@ -704,7 +704,7 @@ latency and nothing else.
 **23b. Decision 19 makes every new key a BREAKING CHANGE to every committed
 file, and that price buys nothing here.** An unset key is a hard error, by
 design. So adding `related` would make `fux ask` **exit 1 in every repository
-whose `.fux/output.toml` predates this version** — the precise failure decision
+whose `.fux/config/output.toml` predates this version** — the precise failure decision
 19's own ⚠ note describes — in order to ship a knob duplicating one the consumer
 already has. Measured, not predicted: it was added, `test_apply_output_defaults`
 went red on a fixture, and this repository's own `ask` refused until the key was
@@ -784,7 +784,7 @@ says so.** That change edited one thing in `src/fux/store/fuxdir.py`: the
 ([SR-DOTFUX](0102_fux-directory.md); [SR-INSPECT](0156_inspect.md)).
 **It does not reach this record's claim on that file.**
 
-**No decision moved (W-285, W-284, 2026-10-19).** `fux lsp` reads `.fux/output.toml` once at start-up and resolves `ask`'s `top` through `resolve("ask", "top")` — the person's number, for a person's editor — and honours `--no-output-config` (decision 15). Like `mcp`, it has no `CLI_VERBS` row: it carries no gated flag. `fux llms` has no output key and no `--json`, so it neither reads the file nor needs a row. The `cli.py` edit adds their parsers; no gated flag was added.
+**No decision moved (W-285, W-284, 2026-10-19).** `fux lsp` reads `.fux/config/output.toml` once at start-up and resolves `ask`'s `top` through `resolve("ask", "top")` — the person's number, for a person's editor — and honours `--no-output-config` (decision 15). Like `mcp`, it has no `CLI_VERBS` row: it carries no gated flag. `fux llms` has no output key and no `--json`, so it neither reads the file nor needs a row. The `cli.py` edit adds their parsers; no gated flag was added.
 
 **No decision moved (W-279, 2026-10-13).** `CLI_VERBS` gained `register: ()`
 — the new read-only verb ([SR-CLI](0101_cli-surface.md) decision 18) resolves
@@ -797,8 +797,8 @@ say, so `[cli.json] register = true` validates on both readers.
 
 <!-- L12-NOTE-START -->
 
-**[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `.fux/output.toml` keeps its built-ins until
-W-225's stage 3; `.fux/tune.toml` is mandatory already, so a verb whose output
+**[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** `.fux/config/output.toml` keeps its built-ins until
+W-225's stage 3; `.fux/config/tune.toml` is mandatory already, so a verb whose output
 default this file sets can now stop on a missing tune key before it renders.
 
 <!-- L12-NOTE-END -->
@@ -820,7 +820,7 @@ this moved where they are written, not what they are.
 
 **No output key changed** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 3b, 2026-09-27). `cli.py`'s observer hook no longer runs observers on a `50` ms bound held in code when `fux.toml` does not load ([SR-OBSERVE](0157_observe.md)); `node/test/config.test.mjs` gained the `dirs_file` cases.
 
-**`fux inspect --top` reads `.fux/inspect.toml [report] top`, not `output.toml`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): it sizes a report's lists, which is SR-INSPECT's, and no output key changed.
+**`fux inspect --top` reads `.fux/config/inspect.toml [report] top`, not `output.toml`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4c, 2026-09-28): it sizes a report's lists, which is SR-INSPECT's, and no output key changed.
 
 **No output key changed** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5a, 2026-09-28). `node/src/config/output.mjs` strips a byte-order mark through `toml.mjs`'s `BOM` rather than a code point.
 
@@ -828,7 +828,7 @@ this moved where they are written, not what they are.
 
 **No output default changed with the intent prior** (W-168 step 9, 2026-09-28).
 `query/__init__.py` gained `_intent_prior` and `--why`'s `intent` block; the
-prior's switches live in `.fux/tune.toml` ([SR-TUNE](0135_tuning.md) decision
+prior's switches live in `.fux/config/tune.toml` ([SR-TUNE](0135_tuning.md) decision
 20), not here.
 
 **25. A fourth root, `[api]`, holds the library's defaults** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8; W-225
@@ -845,7 +845,7 @@ anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 
-`fux identifiers`'s `--json` and `--write` are not output-gated: the verb has no `.fux/output.toml` table, so both default to off rather than to `None` ([SR-IDENTIFIERS](0160_identifiers.md)).
+`fux identifiers`'s `--json` and `--write` are not output-gated: the verb has no `.fux/config/output.toml` table, so both default to off rather than to `None` ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 **`doctor`, `identifiers` and `enrich` declare `progress_threshold`** in `CLI_VERBS`, on both readers (W-238, 2026-09-29; [SR-CLI](0101_cli-surface.md) decision 17). They now paint the bar, and the one `Progress` a verb builds reads its threshold from this file (L12). `identifiers` and `enrich` gained `--no-output-config` (decision 15), and `identifiers --json` defaults to `None` (decision 10). As a result `[cli.json] identifiers` is now a key a file may set. The template's comment names the three verbs.
 
@@ -862,7 +862,7 @@ anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
 **No decision here moved** (W-261, 2026-10-05): `cmd_find` moved to `query/find.py` (SR-FIND's); this record's `describes` row followed it, and the emission gate (`_show_band`) is still the one in `query/__init__.py`.
 
 
-**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `section` on an `ask` hit is gated by the ranking weight that produces it, not by an output flag: absent at `section_weight = 0.0`, present on every row otherwise ([SR-SECTIONS](0161_sections.md) decision 6). No new output key in `.fux/output.toml`.
+**W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `section` on an `ask` hit is gated by the ranking weight that produces it, not by an output flag: absent at `section_weight = 0.0`, present on every row otherwise ([SR-SECTIONS](0161_sections.md) decision 6). No new output key in `.fux/config/output.toml`.
 
 **No decision here moved** (W-282, 2026-10-18): `cli.py` became core and runs a verb through its `VERBS` table, leaving a verb whose layer is not installed out of the parser and refusing it by name before argparse. `_apply_output_defaults` still runs in `main` before any verb is dispatched, unchanged.
 
@@ -882,7 +882,7 @@ anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
   is printed.** `answerable` is `band != none`
   ([SR-CONFIDENCE](0141_confidence.md) decision 3a, Arpit's ruling), so a
   `weak` block now reads `answerable: true`. **Nothing about this record's
-  gating moved**: `band = true` in `.fux/output.toml` still decides emission,
+  gating moved**: `band = true` in `.fux/config/output.toml` still decides emission,
   and absent still means *not asked for*. The `_doc` block of
   `output.schema.json#confidence` was rewritten in the same change, because a
   consumer reads the rule there rather than in a record.
@@ -912,7 +912,7 @@ anywhere: the caller passes them. `resolve()`'s `as_json` is now required too.
   [SR-CONFIDENCE](0141_confidence.md) decision 13 left unguarded. A knob here
   would be a new way to produce the defect the note exists to close.
 
-- ✅ **A frozen `.fux/output.toml` is REPORTED (2026-09-14, W-163)**, the
+- ✅ **A frozen `.fux/config/output.toml` is REPORTED (2026-09-14, W-163)**, the
   companion to SR-TUNE's row and with the same reasoning: a key the engine gained
   resolves to its default, nothing breaks, and the file meant to show the knob
   does not mention it.
@@ -975,7 +975,7 @@ catchable by the tests that existed when they were written.**
 
 | option | why not |
 |---|---|
-| **an `[output]` table inside `.fux/tune.toml`** | no new file, and tune's own rule admits the keys. But *"tune"* would then mean two different things, and its one-line header — *"HOW results are ordered"* — stops being true. **The boundary, not the file count, is what makes this wrong.** |
+| **an `[output]` table inside `.fux/config/tune.toml`** | no new file, and tune's own rule admits the keys. But *"tune"* would then mean two different things, and its one-line header — *"HOW results are ordered"* — stops being true. **The boundary, not the file count, is what makes this wrong.** |
 | **an `[output]` table in the repo-root `fux.toml`** | `fux.toml` is *what is indexed*. Mixing rendering into it breaks SR-CONFIG's boundary and grows the file with the most schema surface already. |
 | **flags only, no file** | leaves MCP unconfigurable in principle, and leaves SR-CONFIDENCE decision 11's cost mitigated by documentation alone. |
 | **environment variables** | invisible in a diff, not committed, and per-shell rather than per-repo — every property that makes a committed file the right answer here. |
@@ -1042,7 +1042,7 @@ choice rather than the console's. Nothing about the guard itself changed;
    can see it.
 5. **A value appears in `output_config.py`, `output.mjs` or a `cli.py`
    `default=`.** Decision 6's single home — the template — has been forked (L12).
-6. **A verb resolves a key `.fux/output.toml` does not set and gets a value
+6. **A verb resolves a key `.fux/config/output.toml` does not set and gets a value
    back instead of `FuxError`, while the file is in effect** (no
    `--no-output-config`, a repo root exists). Decision 19 is then false and
    the old silent-fallback behaviour has returned.
@@ -1051,7 +1051,7 @@ choice rather than the console's. Nothing about the guard itself changed;
    bisected from the file that might be why it fails, and if the file is
    incomplete it cannot be RUN at all — decision 19's bootstrap gap,
    reopened.
-8. **`load()` returns a value for a repo with no `.fux/output.toml`**, or
+8. **`load()` returns a value for a repo with no `.fux/config/output.toml`**, or
    **`fux doctor` cannot start in one.** The first is the silent fallback L12
    removes; the second strands the repo with no verb to name — or write — the
    fix (decision 20).

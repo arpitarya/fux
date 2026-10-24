@@ -1,4 +1,4 @@
-# .fux/tune.toml -- HOW results are ordered, plus [index]: how much of a
+# .fux/config/tune.toml -- HOW results are ordered, plus [index]: how much of a
 # document is indexed.
 #
 # Written once by `fux setup`; fux never rewrites it. EVERY KEY IS REQUIRED

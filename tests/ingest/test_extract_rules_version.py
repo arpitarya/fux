@@ -16,6 +16,7 @@ invisible.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import re
 import subprocess
 from pathlib import Path
@@ -94,13 +95,13 @@ def test_the_caps_are_still_in_the_digest_too():
 
 def test_a_changed_decoder_cap_forces_re_extraction(tmp_path):
     """W-225 DoD 7b (SR-LAW-12 decision 9b): a decoder cap moved out of code
-    into `.fux/formats.toml [limits]`, where an edit bumps no decoder `VERSION`.
+    into `.fux/config/formats.toml [limits]`, where an edit bumps no decoder `VERSION`.
     So the digest must carry every cap, or a changed `max_cell_chars` would
     leave an index `fux ingest --check` calls current while every CSV it holds
     was cut at the old width. The new value is template + 1, never typed."""
     write_config(tmp_path)
     before = _extract_config_digest(_Limits(), tmp_path, section_records=False)
-    path = tmp_path / ".fux" / "formats.toml"
+    path = config_file(tmp_path, "formats")
     shipped = typesfile.read(tmp_path).limits["csv"]["max_cell_chars"]
     text, n = re.subn(
         r"(?m)^max_cell_chars\s*=.*$", f"max_cell_chars = {shipped + 1}", path.read_text(encoding="utf-8")

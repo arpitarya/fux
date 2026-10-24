@@ -19,6 +19,7 @@ test needs no network (L5).
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import subprocess
 import sys
@@ -103,11 +104,11 @@ def corpus(tmp_path_factory) -> Path:
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     # Markdown only, so no plugin package is needed — and none is installed in
     # these venvs. No declaration means prose only (SR-PLUGINS, W-289 phase 2).
-    (root / ".fux" / "plugins.toml").unlink()
+    (config_file(root, "plugins")).unlink()
     docs = root / "docs"
     (docs / "sub").mkdir(parents=True)
     (docs / "a.md").write_text("---\ntitle: A\ntags: [x, y]\n---\n# A\n\nsee [b](b.md) and `docs/a.md`\n",

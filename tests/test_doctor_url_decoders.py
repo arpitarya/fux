@@ -17,6 +17,7 @@ is, which is why the row lists a directory instead of loading it.
 from __future__ import annotations
 
 
+from l12_fixtures import config_file
 from fux import doctor
 from fux.store import acquired
 from l12_fixtures import write_config
@@ -41,7 +42,7 @@ def _repo(tmp_path, *, urls="", decoders=()):
     src = tmp_path / ".fux" / "sources"
     src.mkdir(parents=True, exist_ok=True)
     (src / "urls").write_text(urls, encoding="utf-8")
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     return tmp_path
 

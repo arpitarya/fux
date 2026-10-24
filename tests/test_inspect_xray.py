@@ -15,6 +15,7 @@ line of W-220's §Tests, on a corpus small enough to reason about by hand:
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import re
 import subprocess
@@ -61,7 +62,7 @@ def corpus(tmp_path_factory) -> Path:
     fux = root / ".fux"
     (fux / "sources").mkdir(parents=True)
     (fux / "sources" / "dirs").write_text("docs\nwork\n!work/golden\n", encoding="utf-8")
-    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     for rel, body in DOCS.items():
         path = root / rel

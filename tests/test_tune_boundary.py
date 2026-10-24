@@ -1,6 +1,6 @@
 """SR-TUNE decision 1's membership test, executed rather than asserted.
 
-**The rule is mechanical, not a taste:** a value may live in `.fux/tune.toml`
+**The rule is mechanical, not a taste:** a value may live in `.fux/config/tune.toml`
 if and only if changing it leaves `.fux/index/` **byte-identical**. Decision 1b
 says that is *"enforced, not asserted: a test mutates every key in
 `tune.toml`"*. This is that test.
@@ -19,6 +19,7 @@ ran the other.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from l12_fixtures import scoring, tune_text, write_config
 import pytest
 
@@ -279,8 +280,8 @@ def test_an_index_key_does_change_the_index(tmp_path, key, value):
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text(

@@ -1,4 +1,4 @@
-/** Identifier families — `.fux/identifiers.toml`, matched on both sides (W-233).
+/** Identifier families — `.fux/config/identifiers.toml`, matched on both sides (W-233).
  *
  * Twin of `src/fux/text/identifiers.py`. A family (a template such as
  * `RF-{n}`, or a guarded `[user]` regex) is matched against the TEXT, and each
@@ -291,7 +291,7 @@ export function parse(data, origin) {
   );
 }
 
-/** Parse `.fux/identifiers.toml`. **Absent throws** (L12); empty sections are fine. */
+/** Parse `.fux/config/identifiers.toml`. **Absent throws** (L12); empty sections are fine. */
 export function loadIdentifiers(root) {
   const path = join(root, IDENTIFIERS_FILE);
   let raw;

@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-13
 date: 2026-08-18
 feature: generation and update of the committed index, and the refusal that keeps its derived accelerator from diverging
-owns: [src/fux/store@bbe86f696742, node/src/store/format.mjs@4fc4a43aafe0, node/src/store/reader.mjs@ea5bf3de3b4d]
+owns: [src/fux/store@1b85032480be, node/src/store/format.mjs@4fc4a43aafe0, node/src/store/reader.mjs@ea5bf3de3b4d]
 laws: [L2, L3, L4, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 5dbfba0a5119dcadb2124d3422948ffb50b486fbcfe584fbb97d5b89fe14f627
+content_sha: cd5d918e3ebe3c36021fc5f26d9170b52c94a734ed13b12574a94df27893cd45
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -550,7 +550,7 @@ tripwire directly instead.
 parsed** (W-140 row 9, 2026-09-11). Until then it fell into the *no `_format`
 header* branch and reported *this is not a fux index shard, or the file is
 truncated* — which sends a reader hunting for corruption when the answer is an
-unresolved merge and two commands. `.fux/tune.toml` and `.fux/output.toml`
+unresolved merge and two commands. `.fux/config/tune.toml` and `.fux/config/output.toml`
 already refused markers by name; the committed index, the file most likely of
 the three to be merged, did not.
 

@@ -206,7 +206,7 @@ identifier out of the document and into your prose.** You almost never need to
 particular person or credential is never that.
 
 `fux enrich --check` refuses a file whose body matches a rule in
-`.fux/pii.toml` and names the rule. When it does, **rewrite the sentence
+`.fux/config/pii.toml` and names the rule. When it does, **rewrite the sentence
 without the value.** Do not add a `pii.toml` rule to cover it: that would index
 `[PII:email]` as vocabulary, which is worse than useless.
 

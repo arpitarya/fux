@@ -3,14 +3,14 @@ type: Standing Record
 kind: component
 name: SR-IDENTIFIERS
 title: SR-IDENTIFIERS (0160) — identifier families are kept whole however they are typed
-description: "A committed .fux/identifiers.toml names ID families (RF-{n}); both readers match them against the text at ingest and at query time and add one canonical term per match beside analyzer v3's output, so RF 118, rf118, RF–118 and RF-0118 are the term rf-118. [user] is hand-written and wins; [detected] is written only by `fux identifiers --write` from an inspect lens. The effective rules' digest is stamped into every shard header."
+description: "A committed .fux/config/identifiers.toml names ID families (RF-{n}); both readers match them against the text at ingest and at query time and add one canonical term per match beside analyzer v3's output, so RF 118, rf118, RF–118 and RF-0118 are the term rf-118. [user] is hand-written and wins; [detected] is written only by `fux identifiers --write` from an inspect lens. The effective rules' digest is stamped into every shard header."
 status: accepted
 date: 2026-09-28
-feature: "identifier families — `.fux/identifiers.toml`, its matcher on both readers, the lens, `fux identifiers`, the doctor rows and the serve Identifiers tab"
-owns: [.fux/identifiers.toml@457cfe1314bb, node/src/query/identifiers.mjs@cc6f565fb5c5, node/test/identifiers.test.mjs@adaa94b58166, src/fux/identifiers_cmd.py@8176d1eec38d, src/fux/text/identifiers.py@e4a09d574a3e]
+feature: "identifier families — `.fux/config/identifiers.toml`, its matcher on both readers, the lens, `fux identifiers`, the doctor rows and the serve Identifiers tab"
+owns: [.fux/config/identifiers.toml@457cfe1314bb, node/src/query/identifiers.mjs@462419f6c008, node/test/identifiers.test.mjs@5cb6e3e073f6, src/fux/identifiers_cmd.py@2c49beee6f9f, src/fux/text/identifiers.py@8188ddc299a0]
 laws: [L2, L4, L10, L12]
 timestamp: 2026-09-28T00:00:00Z
-content_sha: a077cecdcbe6b1cdf193ed429b5566dbf61991953c83710c46746015a0244ebf
+content_sha: afe5b59ae0b15871289619c9c5e071aafdca4ed8d18d34703538844d8109a751
 ratifies: "W-233 — Arpit, 2026-09-28 (Cowork), F1–F5: a verb writes [detected]; refresh on demand with a doctor warning; templates by default and a guarded regex in [user] only; the whole form unstemmed plus its parts; [detected] applies once written and [user] overrides it"
 ---
 
@@ -18,7 +18,7 @@ ratifies: "W-233 — Arpit, 2026-09-28 (Cowork), F1–F5: a verb writes [detecte
 
 **Owns** — the components this record decides:
 
-- [`.fux/identifiers.toml`](../.fux/identifiers.toml) · file
+- [`.fux/config/identifiers.toml`](../.fux/config/identifiers.toml) · file
 - [`node/src/query/identifiers.mjs`](../node/src/query/identifiers.mjs) · file
 - [`node/test/identifiers.test.mjs`](../node/test/identifiers.test.mjs) · file
 - [`src/fux/identifiers_cmd.py`](../src/fux/identifiers_cmd.py) · file
@@ -41,7 +41,7 @@ measured what that leaves:
 **Nothing was wrong with scoring.** Every query that reached the whole form
 ranked its document first. **The break is spelling.**
 
-A **family** is a template such as `RF-{n}`, written in `.fux/identifiers.toml`.
+A **family** is a template such as `RF-{n}`, written in `.fux/config/identifiers.toml`.
 Both readers look for it in the text, in a document at ingest and in a question
 at query time. Every match adds **one** term, its canonical form (`rf-118`),
 beside everything v3 already emits. So the five spellings above become one
@@ -77,7 +77,7 @@ rollback.
 
 ### Decision
 
-1. **The file.** `.fux/identifiers.toml` (`constants.toml [files] identifiers`)
+1. **The file.** `.fux/config/identifiers.toml` (`constants.toml [files] identifiers`)
    has two tables:
    - `[user]` holds `keep`, `drop` and `regex`;
    - `[detected]` holds `families`.

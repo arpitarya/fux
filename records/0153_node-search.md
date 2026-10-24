@@ -8,11 +8,11 @@ status: accepted
 amended: 2026-10-20
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine`, vendored into `.fux/node/` by `fux setup`, and held byte-equal to Python by the third arm of the differential law"
-owns: [node@5dfe7951d6c5, src/fux/store/nodebundle.py@614431b31982]
+owns: [node@cdc420a4caf7, src/fux/store/nodebundle.py@614431b31982]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 083842b7e348d238de0f3ad0e5a8a6a5d844c3540070b038fd2c85bdf7c833d9
+content_sha: d225bd5f45c7e954e8b27c32105be1c8b5591d5184e098781393eb9f43c3cb31
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -222,7 +222,7 @@ exactly where the divergence risk concentrates:
   measured 2026-09-12: **30 of 324 ordered pairs disagree.** Every comparison
   on a doc id goes through `cmpCodePoints`.
 
-**8. ✅ Node reads `.fux/tune.toml` and `.fux/output.toml`. CLOSED 2026-09-12.**
+**8. ✅ Node reads `.fux/config/tune.toml` and `.fux/config/output.toml`. CLOSED 2026-09-12.**
 
 This decision was filed as a **gap, not a decision**: Node read neither file,
 so a consumer who ran `fux tune` got **a different ranked list from the same
@@ -272,7 +272,7 @@ be.** [SR-TUNE](0135_tuning.md) decision 11 calls it the *"is it me or the
 config?"* switch; a flag that exists in one reader can only ask the question of
 that reader. `node/fux.mjs` parses it and `tools/differential/node_arm.py`
 passes it **to both sides or to neither** — flipping only Python's would compare
-a tuned reader against an untuned one and file `.fux/tune.toml` as a
+a tuned reader against an untuned one and file `.fux/config/tune.toml` as a
 transcription defect.
 
 **9. The graph lane is ASYMMETRIC: Python requires `fux build`, Node does not.**
@@ -370,7 +370,7 @@ it cannot reproduce.
 ⚠ **The question is asked the right way round.** Not *"does a decoder claim
 this extension?"* — which would need the built-in registry, every
 `.fux/decoders/*.py` and their precedence, all mirrored in JS and all able to
-drift — but *"is this document ALREADY TEXT?"*, which `.fux/formats.toml`'s
+drift — but *"is this document ALREADY TEXT?"*, which `.fux/config/formats.toml`'s
 `include` list answers in committed bytes both runtimes read. A bound extension
 is never repeated in `include` ([SR-TYPES](0128_types-list.md) decision 12), so
 the two sets do not overlap and the complement is exact. **Under-claiming is the
@@ -812,7 +812,7 @@ corpus** (W-168 step 1, 2026-09-15).
 the same anchor path their Python twins do: the byte regex over every line, the
 `at` fold on parsed lines, the second targeted pass through `recordFor`, `atf`
 and `alen` on every candidate, and `[bm25f] anchor` read out of
-`.fux/tune.toml`.
+`.fux/config/tune.toml`.
 
 🔴 **The differential arm could not have caught a forgotten transcription
 here.** It answers *do the two readers disagree on this corpus?* — and a corpus
@@ -967,12 +967,12 @@ this moved where they are written, not what they are.
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 5e, 2026-09-28). A component this record owns or describes now reads a value from `fux.toml` or `constants.toml` that it held in code ([SR-CONFIG](0113_config.md) decision 18); every value is unchanged.
 
-**Node's boolean defaults went with Python's** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28): `runQuery`, `runAsk`, `tiers`, `expand`/`ppr` and `OutputDefaults.resolve` take them explicitly, and `runQuery` throws on a missing one. `Index.ask`/`answer` read `.fux/output.toml [api]` ([SR-OUTPUT](0143_output-defaults.md) decision 25).
+**Node's boolean defaults went with Python's** ([L12](0014_LAW-12-values-live-in-config.md) decision 6a R8, W-225 stage 6, 2026-09-28): `runQuery`, `runAsk`, `tiers`, `expand`/`ppr` and `OutputDefaults.resolve` take them explicitly, and `runQuery` throws on a missing one. `Index.ask`/`answer` read `.fux/config/output.toml [api]` ([SR-OUTPUT](0143_output-defaults.md) decision 25).
 
 **No decision here moved** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 7, 2026-09-28). A component this record owns or describes now reads an artefact name or a format value from `constants.toml` that it spelled in code; every value is unchanged. The veto test `tests/test_l12_values_live_in_config.py` now holds the rest of its literals to `tests/l12_allow.toml`.
 
 
-**The Node reader analyzes every question with the repo's identifier families**, loaded by `identifiersFor(root)` from `.fux/identifiers.toml`, exactly as Python does; the twin is `node/src/query/identifiers.mjs`, held to Python's by one shared fixture ([SR-IDENTIFIERS](0160_identifiers.md)).
+**The Node reader analyzes every question with the repo's identifier families**, loaded by `identifiersFor(root)` from `.fux/config/identifiers.toml`, exactly as Python does; the twin is `node/src/query/identifiers.mjs`, held to Python's by one shared fixture ([SR-IDENTIFIERS](0160_identifiers.md)).
 
 **`node/src/config/output.mjs`'s `CLI_VERBS` gains `identifiers` and `enrich`, and `doctor` gains `progress_threshold`** (W-238, 2026-09-29). All three are Python-only verbs, declared so that one committed `output.toml` validates the same way on both readers ([SR-OUTPUT](0143_output-defaults.md)). No Node verb's behaviour changed.
 
@@ -1081,7 +1081,7 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
 
 **The Node reader twins W-287's refer-plane half** (2026-10-19): `refer/chunk.mjs` (pipe-less tables, `row` metadata), `refer/rescore.mjs` (`columnWeight`, three-field rows, the selector, the sheet locator, ties on `order_key`), `refer/assemble.mjs` (`cells`/`table`/`columns_matched`, `recordOf`), `verbs/answer.mjs` (the record keys and the text record) and `verbs/mcp.mjs` (`fux_passage`'s row). Held equal by `tests/refer/test_table_twins.py`; Node still declines a decoded document, so an `.xlsx` row is never cited from Node (decision 11).
 
-**No decision here moved** (W-289, 2026-10-20): module-level edits in three files this record describes by symbol — `setup.py` (no decoder or fetcher is seeded; `.fux/plugins.toml` is written), `health.py` (three plugin rows in `ROWS`) and `store/fuxdir.py` (the `plugins.toml` row) — left `detect_workspace`, `wire_workspace`, the `node reader` row and every `.fux/node/` writer untouched ([SR-PLUGINS](0165_plugins.md)). npm is unchanged: plugin packages are writer-side and Python only.
+**No decision here moved** (W-289, 2026-10-20): module-level edits in three files this record describes by symbol — `setup.py` (no decoder or fetcher is seeded; `.fux/config/plugins.toml` is written), `health.py` (three plugin rows in `ROWS`) and `store/fuxdir.py` (the `plugins.toml` row) — left `detect_workspace`, `wire_workspace`, the `node reader` row and every `.fux/node/` writer untouched ([SR-PLUGINS](0165_plugins.md)). npm is unchanged: plugin packages are writer-side and Python only.
 
 **W-289 phase 2 (2026-10-20) — no decision here moved.** `health.py`, `setup.py` and `store/fuxdir.py`, which this record describes, changed for [SR-PLUGINS](0165_plugins.md) — the doctor rows on the declaration, the types-file header, the `.fux/README.md` wording. The vendored Node reader and its shapes are untouched; Node still declines a decoded document rather than decoding it.
 

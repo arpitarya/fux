@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import os
 import subprocess
 import sys
@@ -19,8 +20,8 @@ def test_fux_version_via_subprocess():
 
 def test_fux_doctor_via_subprocess(tmp_path):
     (tmp_path / ".git").mkdir()
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")  # SR-PII decision 17
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")  # SR-PII decision 17
     # A repo that does not fetch: with no fux.toml, `write_config` writes the
     # whole template, whose `[sources.url.config.*]` tables name fetchers this
     # bare repo has not got — a real [FAIL], and not what this test is about.
@@ -43,8 +44,8 @@ def test_fux_doctor_output_is_ascii_safe(tmp_path):
     exits 1 with a UnicodeEncodeError instead of printing. Force the
     strictest plausible stdout encoding to catch this on any platform."""
     (tmp_path / ".git").mkdir()
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")  # SR-PII decision 17
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")  # SR-PII decision 17
     # A repo that does not fetch: with no fux.toml, `write_config` writes the
     # whole template, whose `[sources.url.config.*]` tables name fetchers this
     # bare repo has not got — a real [FAIL], and not what this test is about.
@@ -166,7 +167,7 @@ def test_a_repo_without_pii_toml_stops_every_gated_verb(tmp_path):
     assert "[FAIL] pii rules" in doctor.stdout
 
     assert fux("setup").returncode == 0
-    assert (tmp_path / ".fux" / "pii.toml").is_file()
+    assert (config_file(tmp_path, "pii")).is_file()
     ingest = fux("ingest")
     assert ingest.returncode == 0, ingest.stderr
     assert "[FAIL] pii rules" not in fux("doctor").stdout

@@ -33,7 +33,7 @@ __all__ = [
 #: A document whose inline link targets are at least this share of its body
 #: tokens is flagged. **Provisional**, in SR-INSPECT's sense: tuned to no
 #: corpus, printed with that word, and a flag is *attention*, never a failure.
-#: ⚠ **`[thresholds] link_target_share`** in `.fux/inspect.toml` since W-225 stage 4c.
+#: ⚠ **`[thresholds] link_target_share`** in `.fux/config/inspect.toml` since W-225 stage 4c.
 
 #: The findings a triage row can carry, in the order the report names them.
 FINDINGS = (

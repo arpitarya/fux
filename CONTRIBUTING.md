@@ -39,7 +39,7 @@ pip install -e packages/fux-core -e packages/fux-reader -e packages/fux-writer -
 
 - **Both Python suites are maintained**, and a feature isn't done until both cover it and pass.
 - **Run both suites whole** before believing a change is done.
-- **Two invocations fail for reasons that aren't failures**: the bare `node --test node/test`, and a hand-built test repo with no `.fux/pii.toml`. [`work/MACHINE.md`](work/MACHINE.md) has what to type instead.
+- **Two invocations fail for reasons that aren't failures**: the bare `node --test node/test`, and a hand-built test repo with no `.fux/config/pii.toml`. [`work/MACHINE.md`](work/MACHINE.md) has what to type instead.
 
 ---
 

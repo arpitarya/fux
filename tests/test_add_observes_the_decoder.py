@@ -12,6 +12,7 @@ ladder out of the maintenance path and puts its answer in a committed line.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from types import SimpleNamespace
 
 import pytest
@@ -41,7 +42,7 @@ def repo(tmp_path, monkeypatch):
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
     (tmp_path / ".fux" / "sources" / "urls").write_text("", encoding="utf-8")
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
@@ -130,7 +131,7 @@ def test_a_refusal_fires_BEFORE_the_proposal(repo):
     """Edge case 6. A sign-in shell is valid HTML and would propose
     `decoder=html` perfectly happily — pinning the page fux could not read as
     the page it reads from now on."""
-    (repo / ".fux" / "refusals.toml").write_text(
+    (config_file(repo, "refusals")).write_text(
         '[[rule]]\nname = "sso"\nreason = "sign in wall"\nbody_contains = ["loginfmt"]\n'
         + refusals_scan_text(),
         encoding="utf-8",

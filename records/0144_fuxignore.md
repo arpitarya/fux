@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-27
 amended: 2026-10-20
 feature: the `.fux/.fuxignore` exclusion file
-owns: [src/fux/acquire/fuxignore.py@286e1f84fe6a]
+owns: [src/fux/acquire/fuxignore.py@5cbaedf93f3e]
 laws: [L2, L4]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 976ca2f3be53d654ee7b569520310aafced131f54f83a0a23f44ced67e3de785
+content_sha: 4ab0d320199580affa09f0e6da54bbc727cdcb061e3f2aa21bf87c02df8a48aa
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -195,7 +195,7 @@ header.**
 
 **4. `.fuxignore` is read first and decides in BOTH directions.**
 
-- A path it **ignores** is skipped, whatever `.fux/formats.toml` allows and
+- A path it **ignores** is skipped, whatever `.fux/config/formats.toml` allows and
   whatever `.fux/sources/dirs` includes.
 - A path it **explicitly re-includes** with `!` skips past the `dirs`
   exclusions and the type allowlist entirely.
@@ -264,7 +264,7 @@ ones no other check would ever mention.
 
 ⚠ **Amended 2026-09-11: the types half of this decision is gone.** It read *"the
 `!` lines in `sources/dirs` and `sources/types` still work"*. The types list is
-`.fux/formats.toml` now and has **no subtraction at all**
+`.fux/config/formats.toml` now and has **no subtraction at all**
 ([SR-TYPES](0128_types-list.md) decisions 2a and 12): a `!` glob there is a
 loud error naming this file, and `fux setup`'s conversion of the old file moves
 each `!` line here — **above the first hand-written pattern**, so a re-include
@@ -279,7 +279,7 @@ edit produces the opposite of what the other file says, silently. The warning
 is early for that, not for today.
 
 **6. Absent, empty, or all-comments means nothing is ignored — and that is
-safe here.** The same shape is a loud error for `.fux/formats.toml`
+safe here.** The same shape is a loud error for `.fux/config/formats.toml`
 (SR-TYPES decision 3) because a present-but-empty allowlist empties the index.
 This file only ever subtracts by default, so an empty one cannot. It therefore
 has **no built-in default**: shipping guesses in an ignore file means its first
@@ -343,7 +343,7 @@ hide. A block line hides nothing new: the path was **already** not indexed when
 the line was written, by a rule that was already in force.
 
 ⚠ **What it DOES change: the list now decides.** A block line is a real ignore,
-so it **freezes** the verdict that produced it. Widen `.fux/formats.toml` and
+so it **freezes** the verdict that produced it. Widen `.fux/config/formats.toml` and
 the listed `.py` files stay out. Write content into a file listed as `empty` and
 it stays out, still labelled `empty`. **The freeze was stated and accepted**
 rather than avoided — it is what "put the list in `.fuxignore`" means, and the
@@ -477,7 +477,7 @@ this moved where they are written, not what they are.
   Rejected: it inverts SR-TYPES from an allowlist to a denylist, and *"a
   denylist is never finished — the next generated format nobody has heard of
   arrives indexed"* (SR-TYPES decision 1) is unanswered by anything in this
-  record. The allowlist stays in the types list (`.fux/formats.toml` since
+  record. The allowlist stays in the types list (`.fux/config/formats.toml` since
   SR-TYPES decision 12); only exclusion moves.
 - **Keep `!` meaning *subtract* here, for consistency with `sources/`.**
   Rejected: it makes the file a `.fuxignore` in name only, and the negation

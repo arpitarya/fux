@@ -7,6 +7,7 @@ modules with one basename make `pytest tests tests_e2e` fail at COLLECTION.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import os
 import shutil
@@ -41,7 +42,7 @@ def repo(tmp_path: Path) -> Path:
     sources = tmp_path / ".fux" / "sources"
     sources.mkdir(parents=True)
     (sources / "dirs").write_text("docs\n", encoding="utf-8")
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     docs = tmp_path / "docs"
     docs.mkdir()
@@ -131,7 +132,7 @@ def test_a_negative_correction_is_refused_with_the_pointer(repo: Path) -> None:
 
 
 def test_a_pii_match_is_refused_and_not_redacted(repo: Path) -> None:
-    (repo / ".fux" / "pii.toml").write_text(
+    (config_file(repo, "pii")).write_text(
         '[[rule]]\nname = "email"\npattern = "[a-z]+@[a-z]+\\\\.[a-z]+"\n', encoding="utf-8"
     )
     write_config(repo)

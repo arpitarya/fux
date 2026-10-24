@@ -7,6 +7,7 @@ that the browser computes nothing — is `test_page_computes_nothing.py`'s.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import subprocess
 import sys
@@ -38,7 +39,7 @@ def corpus(tmp_path_factory) -> Path:
     fux = root / ".fux"
     (fux / "sources").mkdir(parents=True)
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     docs = root / "docs"
     docs.mkdir()

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-27
 amended: 2026-09-22
 feature: the confidence plane
-owns: [src/fux/query/confidence.py@4ca01e637d08, tests/test_confidence_floor_off.py@ee4823ba1f03, node/src/query/confidence.mjs@dff2265ec85a, node/test/confidence.test.mjs@77f997d159dc]
+owns: [src/fux/query/confidence.py@1b6e85d9e2a5, tests/test_confidence_floor_off.py@7b7c0d3e4c18, node/src/query/confidence.mjs@859703f4c0f8, node/test/confidence.test.mjs@77f997d159dc]
 laws: [L2, L4, L5]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: b0b09ffcc8a5cc0406919f8983d81691d22b771a09f8b9f2d154ac4b853250ea
+content_sha: bb4fe0b8c9b5bf6e07a748bcf2ac41c454a9bd3fb3808322efc7ac6478c4e339
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -52,7 +52,7 @@ query term exists in no document; the cited bytes changed since ingest. Only
 must be calibrated to**: the confidence target `t = 0.75`. This record does not
 get to pick a second one.
 
-⚠ **Since 2026-08-28 both numeric floors are `.fux/tune.toml` keys** —
+⚠ **Since 2026-08-28 both numeric floors are `.fux/config/tune.toml` keys** —
 `[confidence] separation_floor` and `doc_coverage_floor` (decision 13, which
 **reverses decision 7**). **A band is therefore no longer comparable across
 repos on its own**, so the block now publishes the floor it was judged under.
@@ -434,7 +434,7 @@ should have declined, and this is the surface on which it declines.
       against a 604-passed baseline.**
     - ✅ **The documentation-only mitigation is retired.**
       [SR-OUTPUT](0143_output-defaults.md) lets a repo commit `band = true` in
-      `.fux/output.toml`, so the agent surface gets a **default** rather than
+      `.fux/config/output.toml`, so the agent surface gets a **default** rather than
       an instruction it has to have read.
     - **Reopen trigger:** a measured case of an agent answering from a `none`
       or `weak` result because it did not pass `--band`. One is enough.
@@ -442,7 +442,7 @@ should have declined, and this is the surface on which it declines.
 **13. BOTH FLOORS ARE `tune.toml` KEYS — ruled by Arpit, 2026-08-28, in
 Cowork. This reverses decision 7.**
 
-`.fux/tune.toml` gains one table:
+`.fux/config/tune.toml` gains one table:
 
 ```toml
 [confidence]

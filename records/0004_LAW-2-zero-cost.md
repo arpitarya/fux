@@ -10,7 +10,7 @@ feature: the rationale, history and reopen-trigger of L2
 owns: []
 laws: [L2]
 timestamp: 2026-10-19T00:00:00Z
-content_sha: 2f866cf7c4ddf83c3d22a3cfe0ce0da3cdfef099ffeb5a3d7bcaf86cbd9bb5d7
+content_sha: 5649701ed1252f5410d011de46a5717321d3a68f0ea5e913f57b8591084fdee2
 ---
 
 # SR-LAW-2 — L2 — $0, FOSS-only
@@ -78,7 +78,7 @@ this"*. Recorded here as that ruling.
 | clause | before | after |
 |---|---|---|
 | what ships in every install | everything: all 17 decoders, both fetchers | **the engine only** — `fux-core`, `fux-reader`, `fux-writer`, `fux-engine`; Markdown and prose need nothing more |
-| an opt-in capability | refused outright — *"no 'install this for PDFs'"* | **permitted when the COMMITTED repository chooses it** in `.fux/plugins.toml` |
+| an opt-in capability | refused outright — *"no 'install this for PDFs'"* | **permitted when the COMMITTED repository chooses it** in `.fux/config/plugins.toml` |
 | a capability that depends on what a machine has installed | refused | **still refused** — an undeclared package never runs, and a declared one that is missing or differs stops fux |
 | an optional *extra* (`pkg[x]`) | refused | **still refused** |
 
@@ -165,7 +165,7 @@ Amending a law needs Arpit's ruling, named in this record
   happens to have installed.** **`fux-engine` is the one mandatory install;
   `fux-reader` and `fux-writer` are role packages, each complete for its role;
   a decoder, fetcher or extension package runs only when the repository's
-  committed `.fux/plugins.toml` declares it, pinned, and one that is missing or
+  committed `.fux/config/plugins.toml` declares it, pinned, and one that is missing or
   differs is refused loudly.**
   **Permission is not authorization:** the law permits a dependency, a record
   still decides one, and every runtime dependency is named by an accepted SR.
@@ -200,7 +200,7 @@ Two of them are worse than that: **BSL and SSPL convert on a timer or on a use c
 
 **The test is the OSI approved-licence list** — never the price, never a public repository, never the word "open" in a README. **Read the SPDX identifier, not the marketing.**
 
-**2. Dependencies ship packaged, and the repository chooses, never the machine.** No feature extras: an install-time choice is a support surface, not a feature — which is why the opt-in-extras form was put to Arpit and declined. **A capability may be opt-in only when the committed repository chooses it** — a decoder, fetcher or extension package declared in `.fux/plugins.toml`, pinned to a version and digest ([SR-PLUGINS](0165_plugins.md)). **No capability may depend on what a machine happens to have installed**: an undeclared package never runs, and a declared one that is missing or differs is a hard error naming the install line. `fux-engine` is the one mandatory install; Markdown and prose need nothing else.
+**2. Dependencies ship packaged, and the repository chooses, never the machine.** No feature extras: an install-time choice is a support surface, not a feature — which is why the opt-in-extras form was put to Arpit and declined. **A capability may be opt-in only when the committed repository chooses it** — a decoder, fetcher or extension package declared in `.fux/config/plugins.toml`, pinned to a version and digest ([SR-PLUGINS](0165_plugins.md)). **No capability may depend on what a machine happens to have installed**: an undeclared package never runs, and a declared one that is missing or differs is a hard error naming the install line. `fux-engine` is the one mandatory install; Markdown and prose need nothing else.
 
 **3. Permission is not authorization.** The law permits a dependency; a record still decides one. **Every runtime dependency is named by an accepted SR that says what it does and what was measured without it.** A dependency with no record is a defect, exactly like an undeclared `.fux/` child.
 
@@ -234,7 +234,7 @@ Two of them are worse than that: **BSL and SSPL convert on a timer or on a use c
 **Reopen if any of these becomes true:**
 
 1. **A dependency appears in `pyproject.toml` that no accepted record names.** Decision 3 failing.
-2. **A feature extra appears** under `[project.optional-dependencies]` other than `dev`, or **a package runs that `.fux/plugins.toml` does not declare, or runs although it differs from its pin**. Decision 2 failing — the second is SR-PLUGINS veto condition 1.
+2. **A feature extra appears** under `[project.optional-dependencies]` other than `dev`, or **a package runs that `.fux/config/plugins.toml` does not declare, or runs although it differs from its pin**. Decision 2 failing — the second is SR-PLUGINS veto condition 1.
 3. **Two machines produce different root hashes from the same sources and the same commit** — the exposure named in Consequences arriving.
 4. **Anything proposes a paid service, model or library**, however small the price. That is not a reopen so much as a refusal, and it is the clause that never moved.
 

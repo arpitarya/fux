@@ -60,9 +60,9 @@ existing consumer without asking is exactly the surprise a `$0`, offline,
 
 🔴 **TWO surfaces opt in, and both are explicit consent** (Arpit, 2026-09-13;
 SR-PROVENANCE decision 10 as amended): `fux answer --journal` for one
-invocation, and `[cli.answer] journal = true` in **`.fux/output.toml`** for the
+invocation, and `[cli.answer] journal = true` in **`.fux/config/output.toml`** for the
 repository — the second reviewable in git rather than by watching a terminal.
-⚠ **NOT `.fux/tune.toml`**, which this docstring claimed until 2026-09-13 and
+⚠ **NOT `.fux/config/tune.toml`**, which this docstring claimed until 2026-09-13 and
 which the ruling explicitly REJECTED as option (c): `tune.toml` is the ranking
 file and journalling is not ranking. `journal_max` bounds it. The bound is a
 *design default*, not a law — L9 no longer requires one, and Arpit's standing
@@ -169,7 +169,7 @@ LEGACY_SCHEMA = fixed("receipt", "legacy_schema")
 
 JOURNAL_NAME = fixed("receipt", "journal")
 
-#: The bound on journalled receipts is `.fux/output.toml [cli.answer]
+#: The bound on journalled receipts is `.fux/config/output.toml [cli.answer]
 #: journal_max` — a *design* value, not a law: L9 as reverted requires
 #: confinement, not a size. The oldest entries are dropped, because the value of
 #: a use record is overwhelmingly in the recent tail.
@@ -219,7 +219,7 @@ def index_digest(root: Path) -> str:
 
 
 def tune_digest(root: Path) -> str:
-    """`sha256` of `.fux/tune.toml`, or `"none"` when the file is absent.
+    """`sha256` of `.fux/config/tune.toml`, or `"none"` when the file is absent.
 
     `"none"` and a digest are different states and must stay so: an answer that
     changed because somebody *added* a tune file has drifted on config exactly

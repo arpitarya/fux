@@ -16,7 +16,7 @@ Four rules, and every one of them is load-bearing (W-64):
    though the bytes it protects are elsewhere. There is no timer anywhere in
    this file.
 4. **A count threshold, not a delay onset.** A phase paints only once its
-   total exceeds its threshold (`.fux/output.toml [cli] progress_threshold`),
+   total exceeds its threshold (`.fux/config/output.toml [cli] progress_threshold`),
    so a run where almost everything carries
    forward (`fux remove`, most `fux ingest` re-runs) never flashes a bar it
    would immediately clear.
@@ -36,7 +36,7 @@ __all__ = ["Progress", "NULL"]
 #: Below the threshold, a phase's bar costs more terminal churn than it earns —
 #: the count threshold rule (W-64, rule 4). No timer backs it: it is checked
 #: once, against a total that is already known. The number is
-#: `.fux/output.toml [cli] progress_threshold`, resolved by the CLI (L12).
+#: `.fux/config/output.toml [cli] progress_threshold`, resolved by the CLI (L12).
 
 _BAR_WIDTH = 20
 _FULL = "█"  # █

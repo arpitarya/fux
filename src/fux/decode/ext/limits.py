@@ -22,7 +22,7 @@ kind of defect to leave for someone else.
 
 ## L4 holds
 
-The value lives in `.fux/tune.toml [index]` (moved from `fux.toml [decode]` on
+The value lives in `.fux/config/tune.toml [index]` (moved from `fux.toml [decode]` on
 2026-09-11, Arpit — SR-TUNE decision 13). That file is **committed**, so `same
 sources -> same index` becomes `same sources + same committed [index] -> same
 index`. `[index]` is the one tune.toml table that changes what is **indexed**,
@@ -43,7 +43,7 @@ from fux.constants import fixed
 #: `constants.toml [extensions.limits]` — when an edit can change what a decoder
 #: using it RETURNS. `tests/decode/test_decoder_versions.py` fails on a changed
 #: extension whose `VERSION` line the diff did not touch.
-VERSION = fixed("extensions.limits", "version")
+VERSION = fixed("extensions.limits", "version")  # W-295 did not bump: policy-file addresses in prose and messages only, same output
 
 __all__ = ["bound_root", "max_table_rows", "limit", "check", "digest_lines", "template_limits"]
 
@@ -56,7 +56,7 @@ _ROOT: ContextVar[Path | None] = ContextVar("fux_decode_root", default=None)
 #: CSV cell, so it must be a dict lookup and never a file read.
 _LIMITS: ContextVar[dict | None] = ContextVar("fux_decode_limits", default=None)
 #: `(path, mtime_ns, size) -> [limits]`, so a walk over thousands of documents
-#: parses `.fux/formats.toml` once, not once per document.
+#: parses `.fux/config/formats.toml` once, not once per document.
 _CACHE: dict[tuple, dict] = {}
 
 
@@ -73,7 +73,7 @@ def bound_root(root: Path | None):
 
 
 def _load(root: Path) -> dict | None:
-    """`.fux/formats.toml [limits]`, or `None` when the file is absent — which
+    """`.fux/config/formats.toml [limits]`, or `None` when the file is absent — which
     `limit()` then reports, so a decoder that reads no cap never needs the file."""
     from fux.constants import fixed
     from fux.acquire import typesfile
@@ -95,7 +95,7 @@ _FIX_HINT = "`fux doctor --fix` writes every missing key from the template `fux 
 
 
 def limit(decoder: str, key: str) -> int:
-    """`.fux/formats.toml [limits.<decoder>] <key>` — there is no default (L12).
+    """`.fux/config/formats.toml [limits.<decoder>] <key>` — there is no default (L12).
 
     W-225 stage 4a (SR-LAW-12 decision 9b). Each built-in decoder reads its
     caps here instead of holding them as module constants, and every cap is in
@@ -109,7 +109,7 @@ def limit(decoder: str, key: str) -> int:
         where = "no repository in context" if _ROOT.get() is None else f"no {fixed('files', 'formats')}"
         raise FuxError(
             f"the {decoder} decoder asked for [limits.{decoder}] {key} with {where} - it is "
-            f"read from .fux/formats.toml, and fux holds no copy of it in code. {_FIX_HINT}"
+            f"read from .fux/config/formats.toml, and fux holds no copy of it in code. {_FIX_HINT}"
         )
     try:
         return limits[decoder][key]
@@ -172,7 +172,7 @@ def digest_lines(root: Path) -> str:
 
 
 def max_table_rows() -> int:
-    """`.fux/tune.toml [index] max_table_rows` — there is no default (L12).
+    """`.fux/config/tune.toml [index] max_table_rows` — there is no default (L12).
 
     A malformed or missing `[index]` is reported by `tune.index_limits()` where
     ingest reads it first, before any decoder runs, so a walk over thousands of
@@ -187,6 +187,6 @@ def max_table_rows() -> int:
     if root is None:
         raise FuxError(
             "a decoder asked for [index] max_table_rows with no repository in context - "
-            "it is read from .fux/tune.toml, and fux holds no copy of it in code"
+            "it is read from .fux/config/tune.toml, and fux holds no copy of it in code"
         )
     return index_limits(root).max_table_rows

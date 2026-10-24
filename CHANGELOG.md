@@ -8,6 +8,15 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+**Policy files move to `.fux/config/` (W-295).** ⚠ **Breaking, once**: `formats`,
+`identifiers`, `inspect`, `output`, `pii`, `plugins`, `refusals` and `tune`
+(`.toml`) now live in `.fux/config/`. Run `fux setup`: it moves each file byte
+for byte (and refuses, naming both, when a file is at both addresses). Until
+you do, every other command stops with ``.fux/pii.toml moved to
+.fux/config/pii.toml - run `fux setup` `` -- there is no fallback reader.
+`fux doctor` gains the row `config files at the pre-W-295 address`. The index is
+unchanged byte for byte ([SR-DOTFUX](records/0102_fux-directory.md) decision 11).
+
 **Plugin packages — only the engine is mandatory (W-289, phases 1 and 2).** ⚠
 **Breaking for every consumer, once**: after upgrading, fux reads only Markdown
 and plain text until `.fux/plugins.toml` declares the decoder packages your

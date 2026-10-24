@@ -16,6 +16,7 @@ knew. A green suite that never exercised "we did not look" would be the fourth.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 
 from fux.query import provenance
@@ -86,8 +87,8 @@ def test_tune_digest_says_none_rather_than_hashing_absence(tmp_path):
     only say so if absence has its own token.
     """
     assert provenance.tune_digest(tmp_path) == "none"
-    (tmp_path / ".fux").mkdir(exist_ok=True)
-    (tmp_path / ".fux" / "tune.toml").write_text("[bm25f]\nk1 = 1.2\n")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "tune")).write_text("[bm25f]\nk1 = 1.2\n")
     write_config(tmp_path)
     assert provenance.tune_digest(tmp_path) not in ("", "none")
 
@@ -400,8 +401,8 @@ def test_a_new_tune_file_drifts_on_CONFIG_not_on_corpus(tmp_path):
     """
     _corpus(tmp_path)
     payload = provenance.receipt(tmp_path, "rollback", path="refer", subject=[])
-    (tmp_path / ".fux").mkdir(exist_ok=True)
-    (tmp_path / ".fux" / "tune.toml").write_text("[bm25f]\nk1 = 9.9\n")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "tune")).write_text("[bm25f]\nk1 = 9.9\n")
     write_config(tmp_path)
     result = provenance.verify(tmp_path, payload)
     assert result.verdict == provenance.DRIFTED_CONFIG
@@ -771,7 +772,7 @@ def test_verify_never_reaches_the_network(tmp_path):
 def test_the_receipt_shape_does_not_vary_by_config(tmp_path, monkeypatch):
     """⚠ SR-PROVENANCE decision 15's refusal, made mechanical.
 
-    `.fux/output.toml` may change what is EMITTED; it may not make one artifact
+    `.fux/config/output.toml` may change what is EMITTED; it may not make one artifact
     two shapes. Two receipts of the same answer must be identical, which is the
     same reason decision 8 forbids a timestamp.
     """

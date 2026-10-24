@@ -8,11 +8,11 @@ status: accepted
 date: 2026-08-27
 ratified: 2026-08-27
 feature: answer provenance — the derivation, the receipt, the journal and verification
-owns: [src/fux/query/provenance.py@88c67c28dc3e]
+owns: [src/fux/query/provenance.py@d769ffcf3cf4]
 laws: [L2, L4, L5, L9]
 ratifies: W-91
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 45416f88e886aa2426395e697b56ec1e4255dcb5f7bfb135147b2289747601dd
+content_sha: acf38340bb673d19f53ebbbc3478dd06157102c37eae32b1c0a61411789df954
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -35,7 +35,7 @@ Fux already says **what** it used — a citation with a `sha` — and, since
 [SR-CONFIDENCE](0141_confidence.md), **how much it believes it**. It has never
 said **how it got there**, or **what it left out**. A consuming agent handed a
 ranked list cannot tell a document that won on the corpus from one that won
-because somebody edited `.fux/tune.toml`, and no citation list can show the
+because somebody edited `.fux/config/tune.toml`, and no citation list can show the
 document that was considered and cut.
 
 The word *audit trail* implies a log kept over time. Fux's answer is the same
@@ -213,7 +213,7 @@ questions because a law was relaxed. **Consent is explicit, always.**
 explicit.** *"I need the flag as well as output TOML configuration."*
 
 This decision said *"only `--journal` WRITES"* and that stopped being true when
-`.fux/output.toml` shipped: `[cli.answer] journal = true` sets the same
+`.fux/config/output.toml` shipped: `[cli.answer] journal = true` sets the same
 `args.journal` the flag does. **The capability stays; what was missing was the
 ruling, and it is made.**
 
@@ -228,12 +228,12 @@ ruling, and it is made.**
   fork this decision reserved was *always-on by default*, and that is still
   refused.** An opt-in someone committed is not a default fux picked.
 - ⚠ **The asymmetry is real and is handled by disclosure, not by refusal.**
-  `journal` is the one key in `.fux/output.toml` that writes to disk; every
+  `journal` is the one key in `.fux/config/output.toml` that writes to disk; every
   other key there changes how an answer is *displayed*. So the key is named as
   such in [SR-OUTPUT](0143_output-defaults.md) decision 22 and on the generated
   specimen's own line — a reader of a rendering config is told, in the file,
   which key is not about rendering.
-- **`.fux/tune.toml` is REFUSED as the home** — the option this decision
+- **`.fux/config/tune.toml` is REFUSED as the home** — the option this decision
   originally reserved. `tune.toml` is the *ranking* file; journalling is not
   ranking, and putting it there would trade one mislabelled home for another.
 - ✅ **BUILT 2026-09-13 (W-147).** Both surfaces are bound by
@@ -245,13 +245,13 @@ ruling, and it is made.**
   much larger consent than the one ruled. The specimen line now opens *"⚠ NOT a
   rendering key"* and names the file it appends to.
   ⚠ **One property the test had to learn, and it is worth knowing:**
-  `.fux/output.toml` is a **complete declaration** — once it exists every gated
+  `.fux/config/output.toml` is a **complete declaration** — once it exists every gated
   key must be set, and a two-line snippet is refused. So the committed surface
   a consumer actually has is the specimen with one line flipped, and that is
   what is tested.
   ⚠ **A stale sentence was corrected on contact:** `query/provenance.py`'s
   module docstring said the opt-in was `[provenance] journal = true` in
-  **`.fux/tune.toml`** — the very home this decision REFUSES. It said so from
+  **`.fux/config/tune.toml`** — the very home this decision REFUSES. It said so from
   before the ruling and nothing mechanical could have caught it.
 
 **11. The journal is bounded by a DESIGN DEFAULT, not by a law.**
@@ -399,7 +399,7 @@ world?*, whose answer depends on a network the verifier does not control.
 - ⚠ **A `[answer] receipt_derivation` knob was considered and REFUSED.** The
   receipt's *shape* would then vary by repo, so two receipts of the same answer
   would differ — **exactly what the no-timestamp rule (decision 8) exists to
-  prevent.** `.fux/output.toml` may change what is emitted; it may not make one
+  prevent.** `.fux/config/output.toml` may change what is emitted; it may not make one
   artifact two shapes.
 
 ⚠ **The receipt records `--expand` verbatim, and `--why` labels the terms it
@@ -531,12 +531,12 @@ takes: add the field to the engine's own output, or do not show the number.**
 <!-- L12-NOTE-START -->
 
 **[L12](0014_LAW-12-values-live-in-config.md) (W-225, 2026-09-27).** A receipt's config digest is unchanged in
-form; what changed is that a tree with no `.fux/tune.toml` can no longer rank at
+form; what changed is that a tree with no `.fux/config/tune.toml` can no longer rank at
 all, so `verify` on such a tree reports `drifted:config` before it looks for an
 index.
 
 **[L12](0014_LAW-12-values-live-in-config.md) (W-225 stage 3a, 2026-09-27).** How many receipts the journal keeps is
-`.fux/output.toml [cli.answer] journal_max` (1000 as shipped); `remember()`
+`.fux/config/output.toml [cli.answer] journal_max` (1000 as shipped); `remember()`
 takes it required, and the constant it replaced is gone.
 
 <!-- L12-NOTE-END -->

@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-20
 date: 2026-08-22
 feature: the agent-facing policy and skill artifacts Fux ships, and their installer
-owns: [src/fux/templates/agents@a071966d5ff4]
+owns: [src/fux/templates/agents@d6866bf9d8f0]
 laws: [L2, L6]
 timestamp: 2026-08-22T00:00:00Z
-content_sha: d12fbefe9704ce3fecb20aab07398449e95e1e9f7f3398ce4ca2a239517586d5
+content_sha: f66a35222374b684ce3e03724a2b3342f987dc4aee66b952c1e5dce883d7af7e
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -803,7 +803,7 @@ gate, and it is the trap that decision warns about.
 **`fux-serve`'s description names five tabs** (2026-09-27): the explorer gained a Words tab ([SR-SERVE](0158_serve.md)), and the description was re-trimmed to the 500-character listing budget in all four copies; no policy rendering changed.
 
 
-The shipped `fux-inspect`, `fux-serve` and `fux-config` skills name identifier families ([SR-IDENTIFIERS](0160_identifiers.md)): the `identifiers` lens, the explorer's sixth tab, and `.fux/identifiers.toml` with its `fux identifiers --write` verb — each marked as an index change an agent proposes and never runs unasked.
+The shipped `fux-inspect`, `fux-serve` and `fux-config` skills name identifier families ([SR-IDENTIFIERS](0160_identifiers.md)): the `identifiers` lens, the explorer's sixth tab, and `.fux/config/identifiers.toml` with its `fux identifiers --write` verb — each marked as an index change an agent proposes and never runs unasked.
 
 **The INDEX and ENRICH skills name the new progress bars** (W-238, 2026-09-29): `doctor` and `identifiers` paint `read`/`detect`, and `enrich --check` paints `check`, all on stderr and silenced by `--no-progress` ([SR-CLI](0101_cli-surface.md) decision 17). One line each, in the templates and in this repo's three installed copies. No policy moved.
 
@@ -811,7 +811,7 @@ The shipped `fux-inspect`, `fux-serve` and `fux-config` skills name identifier f
 
 **No decision here moved** (W-273 phase 2, 2026-10-13): the `fux-config` skill's `section_records` row names `section_weight = 1.0` as the measured value to set with it (W-278, ruled ship as an opt-in pair).
 
-**No decision here moved** (W-289, 2026-10-20): the `fux-fetcher`, `fux-index` and `fux-sources` skill templates say a fetcher is a file in `.fux/fetchers/` or a declared fetcher package, that `fux setup` writes `.fux/plugins.toml` and no decoder or fetcher, and name `fux setup --pin` and the `seeded copies removable` row ([SR-PLUGINS](0165_plugins.md)); the repo's installed copies were refreshed byte-equal. The `fux-decoder` skill's stamp paragraph is SR-DECODE's and moves with W-289 phase 2.
+**No decision here moved** (W-289, 2026-10-20): the `fux-fetcher`, `fux-index` and `fux-sources` skill templates say a fetcher is a file in `.fux/fetchers/` or a declared fetcher package, that `fux setup` writes `.fux/config/plugins.toml` and no decoder or fetcher, and name `fux setup --pin` and the `seeded copies removable` row ([SR-PLUGINS](0165_plugins.md)); the repo's installed copies were refreshed byte-equal. The `fux-decoder` skill's stamp paragraph is SR-DECODE's and moves with W-289 phase 2.
 
 **W-289 phase 2 (2026-10-20) — no decision here moved.** The `fux-decoder-files` steering, rule and instructions renderings (and the `fux-decoder` skill, SR-DECODE's) now say a file in `.fux/decoders/` runs instead of the declared package's module of the same name, rather than that the copies there are what run.
 

@@ -3,15 +3,15 @@ type: Standing Record
 kind: law
 name: SR-LAW-12
 title: "SR-LAW-12 (0014) — L12 — every value lives in a config file, never in code"
-description: "No function, module constant or parameter default in fux's engine holds a value. A tunable value is read from a committed TOML file (fux.toml, .fux/tune.toml or another .fux/*.toml); a fixed engine value is read from one internal constants file shipped with the engine. Python and Node read the same key from the same file, and a missing file or key is a hard error that names it. Setup and its templates, tests, tools and scripts are the only places a literal value may sit."
+description: "No function, module constant or parameter default in fux's engine holds a value. A tunable value is read from a committed TOML file (fux.toml, .fux/config/tune.toml or another .fux/*.toml); a fixed engine value is read from one internal constants file shipped with the engine. Python and Node read the same key from the same file, and a missing file or key is a hard error that names it. Setup and its templates, tests, tools and scripts are the only places a literal value may sit."
 status: accepted
 date: 2026-09-27
 feature: the rationale, scope, exceptions and reopen-trigger of L12
 owns: []
 laws: [L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 01a8be3fadfd2b06d5f7c6ad91eb7df8fbab28658fa24e9eb212ecf4f2846d08
-ratifies: "Arpit, 2026-09-27 — 'every const or default value will only and only be defined in tune.toml or fux.toml or in one of the other config files, or maybe create a new config file; if the value is missing throw an error, but there shouldn't be any default value within the functions … be it node or python it should always be read from one of the toml files; exception is the files used for setup.' Asked the scope the same day, he ruled: tunable values only in the TOML config, and 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; a missing file or key is a hard error naming the key; setup.py and templates/, tests/ and tests_e2e/, tools/ and scripts/ are exempt. Ratified by Arpit the same day on the W-225 step 1 classification (work/compare/l12-classify.compare.md), 'I accept the recommendation': enum tags, closed vocabularies and presentation counts are not values; the six two-home conflicts resolve to one home each, keeping today's behaviour; the veto check becomes one AST-based test because the greps reach about 60 % of what the law forbids; inspect thresholds get a new .fux/inspect.toml; and every decoder cap enters the extract-config digest. On the R5 scan the same day he ruled R7–R10: a number fixed by a format, protocol or algorithm is a fixed value for constants.toml; every boolean parameter default is a value and goes; the release is 3.0, breaking, with no automatic --fix; __version__ stays in src/fux/__init__.py"
+content_sha: 9d389e271697f87f76bbc959bef822c8c1080558a665fe4b9b38a65211f401fc
+ratifies: "Arpit, 2026-09-27 — 'every const or default value will only and only be defined in tune.toml or fux.toml or in one of the other config files, or maybe create a new config file; if the value is missing throw an error, but there shouldn't be any default value within the functions … be it node or python it should always be read from one of the toml files; exception is the files used for setup.' Asked the scope the same day, he ruled: tunable values only in the TOML config, and 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; a missing file or key is a hard error naming the key; setup.py and templates/, tests/ and tests_e2e/, tools/ and scripts/ are exempt. Ratified by Arpit the same day on the W-225 step 1 classification (work/compare/l12-classify.compare.md), 'I accept the recommendation': enum tags, closed vocabularies and presentation counts are not values; the six two-home conflicts resolve to one home each, keeping today's behaviour; the veto check becomes one AST-based test because the greps reach about 60 % of what the law forbids; inspect thresholds get a new .fux/config/inspect.toml; and every decoder cap enters the extract-config digest. On the R5 scan the same day he ruled R7–R10: a number fixed by a format, protocol or algorithm is a fixed value for constants.toml; every boolean parameter default is a value and goes; the release is 3.0, breaking, with no automatic --fix; __version__ stays in src/fux/__init__.py"
 ---
 
 # SR-LAW-12 — L12 — every value lives in a config file, never in code
@@ -28,7 +28,7 @@ ratifies: "Arpit, 2026-09-27 — 'every const or default value will only and onl
 > the source**; amend the law here, then run `python scripts/gen-laws.py --write`.
 
 **The one-line case.** `MINED_WEIGHT = 0.5` in `text/mined.py` is a second
-home for a value `.fux/tune.toml` already states. Two homes drift, and the one
+home for a value `.fux/config/tune.toml` already states. Two homes drift, and the one
 in code wins silently whenever the file forgets it.
 
 **The handle:** *Every value lives in a config file, never in code* — the
@@ -39,13 +39,13 @@ law**; read the law in §2 below.
 
 | the value | example | its one home | who may edit it |
 |---|---|---|---|
-| **tunable** — a person could choose it differently and the code is still right | `mined_weight`, `k1`, `rerank_weight`, `max_phrases`, a TTL, a sample size, a timeout | a committed TOML in the consumer's repo — `fux.toml`, `.fux/tune.toml`, another `.fux/*.toml`, or a new one | the consumer |
+| **tunable** — a person could choose it differently and the code is still right | `mined_weight`, `k1`, `rerank_weight`, `max_phrases`, a TTL, a sample size, a timeout | a committed TOML in the consumer's repo — `fux.toml`, `.fux/config/tune.toml`, another `.fux/*.toml`, or a new one | the consumer |
 | **fixed** — changing it changes what a committed byte means | `SCHEMA = "fux.graph.v1"`, `RULES_VERSION = 3`, `FIXED_SHARDS = 256`, `"pii-digest"` | the engine's **internal constants file**, `src/fux/constants.toml`, shipped inside both distributions | fux, in a release |
 
 | what a function did BEFORE 2026-09-27 | what L12 requires |
 |---|---|
-| `MINED_WEIGHT = 0.5` in the module; `tune.py` falls back to it when the key is absent | the key is read from `.fux/tune.toml`; absent → error naming `[ranking] mined_weight` |
-| `delete .fux/tune.toml and nothing changes` (SR-TUNE) | delete it and every ranked verb stops, naming the file |
+| `MINED_WEIGHT = 0.5` in the module; `tune.py` falls back to it when the key is absent | the key is read from `.fux/config/tune.toml`; absent → error naming `[ranking] mined_weight` |
+| `delete .fux/config/tune.toml and nothing changes` (SR-TUNE) | delete it and every ranked verb stops, naming the file |
 | `fux.toml` omits a key so a raised default arrives with no edit (SR-CONFIG) | every key is written; a new default reaches a repo through `fux setup` / `fux doctor --fix`, never silently |
 | `def sample(n=100)` | `n` is read from config and passed in; no literal default |
 | `SCHEMA = "fux.graph.v1"` in `graph/plane.py` | read from `src/fux/constants.toml` |
@@ -104,13 +104,13 @@ Amending a law needs Arpit's ruling, named in this record
 ([SR-LAW-0](0002_LAW-0-authority.md) decision 3).
 
 <!-- LAW-TEXT:BEGIN L12 -->
-- **L12** · **Every value lives in a config file, never in code.** A *tunable* value — a weight, threshold, limit, timeout, TTL or sample size — is read from a committed TOML file: `fux.toml`, `.fux/tune.toml`, or another `.fux/*.toml`. A *fixed* engine value — a schema id, a format or rules version, the shard count, an artefact file name — is read from the engine's internal constants file, `src/fux/constants.toml`, shipped inside both distributions. Python and Node read the same key from the same file. **A missing file or key is a hard error that names it; no module constant, function body or parameter default supplies a fallback.** The only places a literal value may sit are `setup.py` and `src/fux/templates/`, which write the config files, and `tests/`, `tests_e2e/`, `tools/` and `scripts/`.
+- **L12** · **Every value lives in a config file, never in code.** A *tunable* value — a weight, threshold, limit, timeout, TTL or sample size — is read from a committed TOML file: `fux.toml`, `.fux/config/tune.toml`, or another `.fux/*.toml`. A *fixed* engine value — a schema id, a format or rules version, the shard count, an artefact file name — is read from the engine's internal constants file, `src/fux/constants.toml`, shipped inside both distributions. Python and Node read the same key from the same file. **A missing file or key is a hard error that names it; no module constant, function body or parameter default supplies a fallback.** The only places a literal value may sit are `setup.py` and `src/fux/templates/`, which write the config files, and `tests/`, `tests_e2e/`, `tools/` and `scripts/`.
 <!-- LAW-TEXT:END L12 -->
 
 ### Context
 
 Fux already had the file for tunables. [SR-TUNE](0135_tuning.md) made
-`.fux/tune.toml` the home of every knob that changes order, and
+`.fux/config/tune.toml` the home of every knob that changes order, and
 [SR-CONFIG](0113_config.md) made `fux.toml` the home of policy. Neither made
 the file the **only** home. Both kept the engine's own default in code and let
 the file override it:
@@ -142,12 +142,12 @@ Two homes fail three ways:
 ### Decision
 
 **1. A tunable value has one home: a committed TOML file in the consumer's
-repository.** `fux.toml`, `.fux/tune.toml`, `.fux/output.toml`,
-`.fux/formats.toml`, `.fux/pii.toml`, `.fux/refusals.toml` — or a **new**
+repository.** `fux.toml`, `.fux/config/tune.toml`, `.fux/config/output.toml`,
+`.fux/config/formats.toml`, `.fux/config/pii.toml`, `.fux/config/refusals.toml` — or a **new**
 `.fux/*.toml` when no existing file's boundary fits. Which file a key goes in
 is decided by that file's own record (SR-TUNE's boundary rule, SR-CONFIG's
 policy scope); L12 decides only that it goes in one. **The first new file is
-`.fux/inspect.toml`** — `fux inspect`'s finding thresholds, sample sizes and
+`.fux/config/inspect.toml`** — `fux inspect`'s finding thresholds, sample sizes and
 list lengths, which decide what counts as a finding rather than how output
 renders, so they do not belong in `output.toml` (Arpit, 2026-09-27, R6).
 
@@ -200,7 +200,7 @@ W-225 classification (R1–R3):
   (`MAX_REPORTED`), display rounding digits, and the *"first N, then (+M
   more)"* cut inside a message. Message formatting, not behaviour. ⚠ **A regex a consumer might
 reasonably want to change is a value** — that is why PII patterns already live
-in `.fux/pii.toml`.
+in `.fux/config/pii.toml`.
 
 **6a. What decision 6 does NOT cover — ruled by Arpit, 2026-09-27, on the R5
 scan (R7–R10 of [the classification](../work/compare/l12-classify.compare.md)).**
@@ -252,7 +252,7 @@ example set:
   reopened only if a consumer should be able to add an attribute.
 
 **7. `--no-tune` reads the packaged template, not code.** The "is it me or the
-config?" switch survives: it swaps the consumer's `.fux/tune.toml` for the one
+config?" switch survives: it swaps the consumer's `.fux/config/tune.toml` for the one
 `fux setup` would write today. It never falls back to a constant.
 
 **8. A record that conflicts with L12 is void in the conflicting part**

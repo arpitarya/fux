@@ -18,6 +18,7 @@ Also held here, because each is a way two writers on one tree go wrong:
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import os
 import shutil
@@ -46,7 +47,7 @@ def corpus(tmp_path_factory) -> Path:
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     files = {
         "docs/target.md": "# Widget — the machinery\n\nthis page explains the widget machinery\n",

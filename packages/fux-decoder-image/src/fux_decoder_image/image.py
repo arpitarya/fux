@@ -58,7 +58,7 @@ EXTENSIONS = tuple(fixed("decoders.image", "extensions"))
 #: The decoder extensions this decoder calls, read by the reuse key (SR-DECODE decision 24).
 USES = tuple(fixed("decoders.image", "uses"))
 
-#: ⚠ **`MAX_INFLATED` is `[limits.image] max_inflated` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_INFLATED` is `[limits.image] max_inflated` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 # Every number the three formats fix -- a signature, a marker, a record layout --

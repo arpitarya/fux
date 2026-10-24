@@ -69,11 +69,11 @@ test("drop beats keep and detected; rules sort by code point", () => {
 test("loadIdentifiers: missing is an error, empty sections are valid, [user] only is valid", () => {
   const root = mkdtempSync(join(tmpdir(), "fux-ids-"));
   assert.throws(() => loadIdentifiers(root), /identifiers\.toml is missing/);
-  mkdirSync(join(root, ".fux"));
-  writeFileSync(join(root, ".fux", "identifiers.toml"), "[user]\nkeep = []\n\n[detected]\nfamilies = []\n");
+  mkdirSync(join(root, ".fux", "config"), { recursive: true });
+  writeFileSync(join(root, ".fux", "config", "identifiers.toml"), "[user]\nkeep = []\n\n[detected]\nfamilies = []\n");
   assert.ok(loadIdentifiers(root).empty);
-  writeFileSync(join(root, ".fux", "identifiers.toml"), '[user]\nkeep = ["RF-{n}"]\n');
+  writeFileSync(join(root, ".fux", "config", "identifiers.toml"), '[user]\nkeep = ["RF-{n}"]\n');
   assert.deepEqual(loadIdentifiers(root).rules.map((r) => r.source), ["RF-{n}"]);
-  writeFileSync(join(root, ".fux", "identifiers.toml"), '[user]\nkeeps = ["RF-{n}"]\n');
+  writeFileSync(join(root, ".fux", "config", "identifiers.toml"), '[user]\nkeeps = ["RF-{n}"]\n');
   assert.throws(() => loadIdentifiers(root), { name: "FuxError" });
 });

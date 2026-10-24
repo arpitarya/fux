@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-14
 amended: 2026-10-20
 feature: how a release reaches two registries, how the version stays equal across its sites, and what the branch wall does not do
-owns: [scripts/check-version-parity.py@b861fee901b6, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@13d06ab9d14d, packages@d2f98776acfd, scripts/npm-scoped.py@4214c9c3380a]
+owns: [scripts/check-version-parity.py@b861fee901b6, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@5e3aa327e687, tests/test_ci_key.py@b053f119b9f5, packages@8278d26deca5, scripts/npm-scoped.py@4214c9c3380a]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: f5aaed8114e0caf846514ecb1c6814c86d4c1feaa4871a5b9d5c5012a22727b2
+content_sha: e9b7458cfd964b7497fef357c52455cb42a402f4212e0e8d414d041109702d17
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -320,7 +320,7 @@ rather than a string somebody might forget to edit.
 
     - **The fifteen plugin packages are optional by the repository's choice**
       ([SR-LAW-2](0004_LAW-2-zero-cost.md) decision 2): `fux-engine` depends on
-      none of them, and a repository runs one only when its `.fux/plugins.toml`
+      none of them, and a repository runs one only when its `.fux/config/plugins.toml`
       declares it ([SR-PLUGINS](0165_plugins.md)). Each carries its files in
       its own `src/<import name>/` and is built by hatchling directly — the
       layer map is the engine's, not theirs. `publish.yml`'s

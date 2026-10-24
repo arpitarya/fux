@@ -27,6 +27,7 @@ than npm, where a consumer picks versions independently.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 from pathlib import Path
 import os
@@ -249,7 +250,7 @@ def test_the_vendored_reader_answers_in_a_clone(tmp_path):
         pytest.skip("no node on PATH")
 
     _setup(tmp_path)
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     from fux.store import TF_FIELDS, term_hash, write_index
 
@@ -287,7 +288,7 @@ def test_the_vendored_reader_refuses_without_pii_rules(tmp_path):
         pytest.skip("no node on PATH")
 
     _setup(tmp_path)
-    (tmp_path / ".fux" / "pii.toml").unlink(missing_ok=True)
+    (config_file(tmp_path, "pii")).unlink(missing_ok=True)
     proc = subprocess.run(
         ["node", str(tmp_path / ".fux" / "node" / "fux.mjs"), "find", "rollback"],
         capture_output=True, text=True, encoding="utf-8", cwd=tmp_path,

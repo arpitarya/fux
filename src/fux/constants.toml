@@ -83,9 +83,15 @@ community_max_sweeps  = 20
 
 [files]
 config          = "fux.toml"
-tune            = ".fux/tune.toml"
-output          = ".fux/output.toml"
-formats         = ".fux/formats.toml"
+# W-295: the eight policy files a consumer edits live in ONE directory,
+# `.fux/config/`, and every address below is a full path -- no module joins a
+# directory onto a bare name. `config_names` is the set `fux setup` migrates
+# from the pre-W-295 address `.fux/<name>.toml` and every other verb refuses on.
+config_dir      = ".fux/config"
+config_names    = ["formats", "identifiers", "inspect", "output", "pii", "plugins", "refusals", "tune"]
+tune            = ".fux/config/tune.toml"
+output          = ".fux/config/output.toml"
+formats         = ".fux/config/formats.toml"
 formats_legacy  = ".fux/sources/types"
 fetchers_dir    = ".fux/fetchers"
 corrections     = ".fux/eval/corrections.tsv"
@@ -94,12 +100,12 @@ fuxignore       = ".fux/.fuxignore"
 enrich_dir      = ".fux/enrich"
 enrich_queue    = ".fux/enrich/queue.tsv"
 enrich_progress = ".fux/runtime/enrich-progress.tsv"
-# Names, not paths: each is joined under .fux/ by its module.
-pii_name        = "pii.toml"
-refusals_name   = "refusals.toml"
+pii             = ".fux/config/pii.toml"
+refusals        = ".fux/config/refusals.toml"
+plugins         = ".fux/config/plugins.toml"
 observers_dir   = ".fux/observers"
-inspect         = ".fux/inspect.toml"
-identifiers     = ".fux/identifiers.toml"
+inspect         = ".fux/config/inspect.toml"
+identifiers     = ".fux/config/identifiers.toml"
 
 [routes]
 # A `.fux/sources/routes` host pattern that is a regex, not a literal.
@@ -109,7 +115,7 @@ regex_prefix = "re:"
 # A first-party decoder's VERSION enters the decoder digest; its EXTENSIONS are
 # its default claim. Since W-289 phase 2 every decoder module ships in a plugin
 # package (`[plugins.packages.*] modules`) and runs only when the repository
-# declares that package in `.fux/plugins.toml` (SR-PLUGINS P3); the module reads
+# declares that package in `.fux/config/plugins.toml` (SR-PLUGINS P3); the module reads
 # these keys through `fux.constants`, absolutely.
 
 [decoders]
@@ -136,7 +142,7 @@ legacy_helpers = ["limits", "markdown", "ooxml", "xml", "zip"]
 # package whose `[plugins.packages.*] modules` names it.
 builtin        = ["csv", "docx", "drawio", "html", "image", "ini", "json", "jsonl", "mail", "pdf", "pptx", "rtf", "svg", "toml", "xlsx", "xml", "yaml"]
 # Already-text formats that reach no decoder -- the prose half of the default
-# `include` that `fux setup` writes into .fux/formats.toml.
+# `include` that `fux setup` writes into .fux/config/formats.toml.
 prose_types    = ["*.md", "*.markdown", "*.txt", "*.rst", "*.adoc", "*.org"]
 # The always-on magic-byte floor, checked against the type the SERVER claimed
 # (acquire/refusals.py `MAGIC`). Keyed by MIME, not by decoder, because ODT has a
@@ -325,13 +331,13 @@ npm_reader = "@fux-engine/reader"
 
 # -- Plugin packages (W-289, SR-PLUGINS) --------------------------------------
 # Every package beyond the engine is DECLARED per repository in the committed
-# `.fux/plugins.toml`, pinned, and refused loudly when missing or drifted. The
+# `.fux/config/plugins.toml`, pinned, and refused loudly when missing or drifted. The
 # first-party set is fixed identity, never a knob: `fux doctor` marks it, the
 # release builds one wheel per name on fux's own version, and a name in this
 # table cannot be redefined by a repository's declaration.
 
 [plugins]
-file = ".fux/plugins.toml"
+file = ".fux/config/plugins.toml"
 # The declaration's one array of tables, and the keys a row may carry.
 table = "package"
 keys = ["name", "version", "digest", "suffixes"]
@@ -624,7 +630,7 @@ host = "127.0.0.1"
 [templates]
 tune = "tune.toml.txt"
 output = "output.toml.txt"
-# The built-in decoders' caps, appended to the seeded .fux/formats.toml.
+# The built-in decoders' caps, appended to the seeded .fux/config/formats.toml.
 formats_limits = "formats-limits.toml.txt"
 inspect = "inspect.toml.txt"
 identifiers = "identifiers.toml.txt"

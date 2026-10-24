@@ -102,10 +102,10 @@ Returns `{"path", "line_start", "line_end", "sha", "text"}`.
 
 ## 3 · Output defaults — `[mcp] top` is the only knob
 
-- **`[mcp]` in `.fux/output.toml` configures this server, and it inherits nothing
+- **`[mcp]` in `.fux/config/output.toml` configures this server, and it inherits nothing
   from `[cli]`.** Its one key is `top`. `band` and `json` are refused there —
   the confidence block is unconditional and a result is always JSON.
-- **Read once, at start-up.** After editing `.fux/output.toml`, restart the server.
+- **Read once, at start-up.** After editing `.fux/config/output.toml`, restart the server.
   Index changes (`fux ingest`, `fux build`) are picked up on the next call.
 - **No file** → the built-in default (5). **A file that exists but has no
   `[mcp] top`** → the server refuses to start (§6).
@@ -209,8 +209,8 @@ workspace one. Check the MCP server panel.
 |---|---|---|
 | `command not found`, `ENOENT`, "failed to connect" | the client's `PATH` lacks `fux` or `uv` | an absolute `command` (§4) |
 | `error: no fux.toml or .git found …` | launched outside the repo | set `cwd`, or `uv run --directory` |
-| `error: .fux/pii.toml is missing …` | the repo never ran `fux setup` | ask a human — setup writes committed files |
-| `error: .fux/output.toml does not set …` naming `[mcp]` | the file predates the key | add `[mcp]` with `top = 5`, or `--no-output-config` |
+| `error: .fux/config/pii.toml is missing …` | the repo never ran `fux setup` | ask a human — setup writes committed files |
+| `error: .fux/config/output.toml does not set …` naming `[mcp]` | the file predates the key | add `[mcp]` with `top = 5`, or `--no-output-config` |
 | connected, but no tools | not approved / not trusted / `disabled` / Codex timed out | approve in the client; raise `startup_timeout_sec` |
 | tools work, results are from another repo | the nearest `.git` above `cwd` is a different repo | point `cwd` at the right root |
 | `k` default did not change after editing | `[mcp]` is read once | restart the server |

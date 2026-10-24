@@ -116,7 +116,7 @@ def analyze(text: str, ids: IdentifierRules = EMPTY) -> list[str]:
     **`ids` — the repo's identifier families (W-233).** Each family match adds
     ONE term, its canonical form, beside everything below; nothing below
     changes. With no families this is the v3 loop, byte for byte, which is what
-    makes an empty `.fux/identifiers.toml` a rollback. See `_with_families`.
+    makes an empty `.fux/config/identifiers.toml` a rollback. See `_with_families`.
     """
     if not ids.rules:
         out: list[str] = []

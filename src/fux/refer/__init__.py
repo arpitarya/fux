@@ -159,7 +159,7 @@ def refer(
     documents answer the query, only which of their passages do and which of
     those fit.
 
-    `tune` is the caller's already-resolved `.fux/tune.toml` (L12: there is no
+    `tune` is the caller's already-resolved `.fux/config/tune.toml` (L12: there is no
     module default to fall back to). Its `[refer]` keys — the passage bounds,
     the byte budget, the per-document share and the citation overhead — **cannot
     change which documents are looked at or what a citation's `sha` is**: they

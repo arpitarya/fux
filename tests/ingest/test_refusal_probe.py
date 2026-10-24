@@ -12,6 +12,7 @@ notice.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import tomllib
 from pathlib import Path
 
@@ -27,12 +28,12 @@ CASES = tomllib.loads((PROBE / "cases.toml").read_text(encoding="utf-8"))["case"
 def rules(tmp_path_factory):
     """The SHIPPED starter, loaded exactly as a consumer's repo would load it."""
     root = tmp_path_factory.mktemp("repo")
-    (root / ".fux").mkdir()
+    (root / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     template = (
         Path(__file__).resolve().parents[2]
         / "src" / "fux" / "templates" / "refusals.toml.txt"
     )
-    (root / ".fux" / "refusals.toml").write_text(
+    (config_file(root, "refusals")).write_text(
         template.read_text(encoding="utf-8"), encoding="utf-8"
     )
     return refusals.load(root)

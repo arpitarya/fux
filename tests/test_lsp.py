@@ -48,7 +48,7 @@ def _rec(doc_id, title, word, *, edges=(), superseded=False, archived=False, phr
 
 @pytest.fixture
 def repo(tmp_path):
-    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     (tmp_path / OUTPUT_NAME).write_text(specimen(), encoding="utf-8")
     docs = tmp_path / "docs"
     docs.mkdir()

@@ -13,6 +13,7 @@ decoders resolve different dicts.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from l12_fixtures import template_index
 import pytest
 
@@ -97,7 +98,7 @@ def test_a_none_binding_silences_a_claim(tmp_path) -> None:
     worth knowing BEFORE the decoder is installed rather than after."""
     fux = tmp_path / ".fux"
     fux.mkdir()
-    (fux / "formats.toml").write_text('[meta]\nowner = "none"\n', encoding="utf-8")
+    (config_file(fux.parent, "formats")).write_text('[meta]\nowner = "none"\n', encoding="utf-8")
     claimed = decoder("mail", owner="title")
     assert "owner" in meta_fields(claimed, None)
     assert "owner" not in meta_fields(claimed, tmp_path)
@@ -107,7 +108,7 @@ def test_a_binding_outranks_a_claim_which_outranks_the_default(tmp_path) -> None
     """Decision 23a's order, asserted as an order rather than as three cases."""
     fux = tmp_path / ".fux"
     fux.mkdir()
-    (fux / "formats.toml").write_text('[meta]\ndoc_id = "ctx"\n', encoding="utf-8")
+    (config_file(fux.parent, "formats")).write_text('[meta]\ndoc_id = "ctx"\n', encoding="utf-8")
     claimed = decoder("mail", doc_id="heading")
     assert meta_fields(None, None)["doc_id"] == "title"      # 3 · default
     assert meta_fields(claimed, None)["doc_id"] == "heading"  # 2 · claim

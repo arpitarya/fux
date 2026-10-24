@@ -20,6 +20,7 @@ What the frozen bar requires of the build
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from l12_fixtures import scoring, template_tune, tune_text, tuned, write_config
 import importlib.util
 import json
@@ -71,7 +72,7 @@ def _corpus(root: Path, tune: str | None = None) -> Path:
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     for rel, text in FILES.items():
         path = root / rel
@@ -80,7 +81,7 @@ def _corpus(root: Path, tune: str | None = None) -> Path:
     run(root, refresh_urls=False, full=False)
     build(root)
     if tune is not None:
-        (root / ".fux" / "tune.toml").write_text(tune, encoding="utf-8")
+        (config_file(root, "tune")).write_text(tune, encoding="utf-8")
         write_config(root)
     return root
 
@@ -154,8 +155,8 @@ def test_a_glob_matches_the_whole_location(pattern, loc, expected):
 
 def test_the_longest_pattern_wins_whatever_the_file_order(tmp_path):
     text = tune_text(doctype={"*-decision-*": "decision", "*/special-decision-*": "reference"})
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "tune.toml").write_text(text, encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "tune")).write_text(text, encoding="utf-8")
     from fux.tune import load
 
     doctype = load(tmp_path, enabled=True).doctype
@@ -165,8 +166,8 @@ def test_the_longest_pattern_wins_whatever_the_file_order(tmp_path):
 
 
 def test_a_doctype_outside_the_three_is_refused(tmp_path):
-    (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "tune.toml").write_text(tune_text(doctype={"*x*": "runbook"}), encoding="utf-8")
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
+    (config_file(tmp_path, "tune")).write_text(tune_text(doctype={"*x*": "runbook"}), encoding="utf-8")
     from fux.tune import load
 
     with pytest.raises(FuxError, match=r'\[doctype\] "\*x\*" must be one of'):

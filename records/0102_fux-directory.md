@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-20
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py@6b33ceae222f, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@e059b21d3059, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@c785b43be2bc]
+owns: [src/fux/store/fuxdir.py@ebfaf5690b2d, node/src/store/fuxdir.mjs@c7319007458f, src/fux/setup.py@a0ef2563509c, tests/test_verb_table_agreement.py@1e7999ffd28f, src/fux/templates@8605eb93b67f]
 laws: [L3, L4, ex-L5]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 283f9c1af912d0149f23bf0e99885c307240b9b478ae2063619cdaaf6582d4e2
+content_sha: d44a0ab29f671c7c06e1b946809187675374e0caff7a258034a336c3d5d8874b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -19,9 +19,11 @@ content_sha: 283f9c1af912d0149f23bf0e99885c307240b9b478ae2063619cdaaf6582d4e2
 **Owns** — the components this record decides:
 
 - [`node/src/store/fuxdir.mjs`](../node/src/store/fuxdir.mjs) · file
+- [`src/fux/configfiles.py`](../src/fux/configfiles.py) · file
 - [`src/fux/setup.py`](../src/fux/setup.py) · file
 - [`src/fux/store/fuxdir.py`](../src/fux/store/fuxdir.py) · file
 - [`src/fux/templates/`](../src/fux/templates) · dir
+- [`tests/test_configfiles.py`](../tests/test_configfiles.py) · file
 - [`tests/test_verb_table_agreement.py`](../tests/test_verb_table_agreement.py) · file
 
 <!-- COMPONENTS-END -->
@@ -349,7 +351,7 @@ in themselves — which is this decision holding, not an exception to it.
 
 ⚠ **A THIRD worked instance, 2026-08-28 — and this one had already broken
 `main` before it was caught.** [SR-OUTPUT](0143_output-defaults.md) decision
-19 made a missing `.fux/output.toml` a hard `FuxError` at load time. The file
+19 made a missing `.fux/config/output.toml` a hard `FuxError` at load time. The file
 is write-if-missing, so it reaches **new repos only** — which meant `fux ask`,
 `fux find` **and `fux doctor`** all exited 1, after an upgrade, in **every repo
 that predates the file**. 49 tests went red on `main`.
@@ -376,7 +378,7 @@ second situation.
 BACKWARDS, which is why it is recorded rather than assumed symmetric.** Every
 instance above is a template that **gained** something a new repo gets and an
 old one does not. Here the `fux.toml` template **lost** a table: `[decode]
-max_table_rows` moved to `.fux/tune.toml [index]` on Arpit's ruling
+max_table_rows` moved to `.fux/config/tune.toml [index]` on Arpit's ruling
 ([SR-TUNE](0135_tuning.md) decision 13, [SR-CONFIG](0113_config.md)
 decision 10). `fux setup` never rewrites a `fux.toml`, so **every repo set up
 between 2026-09-06 and 2026-09-11 still carries the table**, and nothing in this
@@ -780,7 +782,7 @@ the keys it lacks, at the end of their own table with the template's comment —
 nothing the consumer wrote is changed or reordered. `fux setup` and `fux doctor
 --fix` are its only callers.
 
-`.fux/output.toml` joined `fill_missing`'s files in stage 3a (2026-09-27) — its
+`.fux/config/output.toml` joined `fill_missing`'s files in stage 3a (2026-09-27) — its
 template is `src/fux/templates/output.toml.txt`, and it is now required.
 
 <!-- L12-NOTE-END -->
@@ -941,7 +943,7 @@ line raises names the fix itself rather than pointing at the header.
 
 **`fux setup` seeds `formats.toml` with the caps template appended, and `fill_missing` covers the file** ([L12](0014_LAW-12-values-live-in-config.md) decision 9b, W-225 stage 4a, 2026-09-27): absent is written whole, a present file gains only missing `[limits]` keys ([SR-TYPES](0128_types-list.md) decision 14).
 
-**`setup.Mandatory` gained `whole_file`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27): `.fux/refusals.toml` gains missing `[scan]` keys when present and is never written when absent, because its absence means *no rules* ([SR-REFUSAL](0146_refusals.md) decision 9a).
+**`setup.Mandatory` gained `whole_file`** ([L12](0014_LAW-12-values-live-in-config.md), W-225 stage 4b, 2026-09-27): `.fux/config/refusals.toml` gains missing `[scan]` keys when present and is never written when absent, because its absence means *no rules* ([SR-REFUSAL](0146_refusals.md) decision 9a).
 
 **The `fux` shim's chmod bits are `constants.toml [bundle] shim_mode`** (`0o755`), and the manifest `fux setup` writes is indented by `[json] indent`. Nothing written into `.fux/` changed. ([L12](0014_LAW-12-values-live-in-config.md) decision 6a, W-225 stage 5c, 2026-09-28)
 
@@ -959,7 +961,15 @@ line raises names the fix itself rather than pointing at the header.
 
 **W-236 — section records (2026-10-10; built on branch `w236-sections`, unmerged until [its run](../work/regression/2026-10-10-section-records/PRE-REGISTRATION.md) passes).** `.fux/index/sections/` is **committed**, inside `.fux/index/` ([SR-SECTIONS](0161_sections.md) decision 1). **It exists only when `fux.toml [index] section_records = true`** (W-274, SR-SECTIONS decision 11); the template writes `false`, and then neither the directory nor any `nsec` is written. The runtime gains `sections.json` and `sections/`, derived and gitignored with the rest of `.fux/runtime/`.
 
-**W-289 phase 2 (2026-10-20) — no decision here moved; the README's wording followed it.** `.fux/decoders/` and `.fux/fetchers/` stay declared children, committed and consumer-owned, but nothing fux ships is seeded into either any more: a file there runs **instead of** the declared package module of the same name ([SR-PLUGINS](0165_plugins.md) P8). The generated `.fux/README.md` table and its fetchers paragraph now say so (`store/fuxdir.py`), and the `.fux/formats.toml` header `fux setup` writes says a bound format is read only when its package is declared. This repository deleted its own unedited decoder and fetcher copies, so both directories are absent here — an absent child is a legal state, as it always was.
+**W-289 phase 2 (2026-10-20) — no decision here moved; the README's wording followed it.** `.fux/decoders/` and `.fux/fetchers/` stay declared children, committed and consumer-owned, but nothing fux ships is seeded into either any more: a file there runs **instead of** the declared package module of the same name ([SR-PLUGINS](0165_plugins.md) P8). The generated `.fux/README.md` table and its fetchers paragraph now say so (`store/fuxdir.py`), and the `.fux/config/formats.toml` header `fux setup` writes says a bound format is read only when its package is declared. This repository deleted its own unedited decoder and fetcher copies, so both directories are absent here — an absent child is a legal state, as it always was.
+
+**11. The eight policy files live in `.fux/config/`, and the move is breaking with no fallback** (Arpit, 2026-10-24, W-295). `formats`, `identifiers`, `inspect`, `output`, `pii`, `plugins`, `refusals` and `tune` — each `<name>.toml` — are the files a consumer edits to say what fux does here, and they now share one declared committed child, `config/`, instead of eight loose files at `.fux/`'s top level. Every address is a `constants.toml [files]` key (L12) — `config_dir` and one full path per file — and **no module joins a directory onto a bare name**. `fux.toml` stays at the repository root; `.fuxignore`, the source lists and the code and data directories stay where they were. The stance is W-177's, W-199's and W-294's:
+
+- **`fux setup` moves them, once.** A file found at `.fux/<name>.toml` and absent at `.fux/config/<name>.toml` is renamed — content, comments and mode untouched, never re-seeded or rewritten. The step runs **before** anything else in `setup` reads or seeds a policy file, so a repository set up under the old layout keeps what its team edited. A stem present at **both** addresses refuses, naming both, and nothing is moved — all-or-nothing, so a refusal never leaves a half-moved directory.
+- **Every other verb stops, loudly.** A file at the old address is `` `.fux/pii.toml` moved to `.fux/config/pii.toml` — run `fux setup` ``, from the CLI gate and from `fux.open` alike, and from the Node reader in the same words. 🔴 **The `pii.toml` hard stop says this and not *"missing"*** ([SR-PII](0148_pii.md) decision 17): an un-migrated repository must not read as one with no redaction policy. There is **no fallback reader** at the old address; `doctor` is exempt from the gate so it can name the fix (`config files at the pre-W-295 address`, [SR-DOCTOR](0152_doctor.md)).
+- **Index bytes do not move.** Where a policy file sits changes no byte of the index (L4): `fux ingest` after the move leaves the committed `.fux/index/` diff empty — W-295 step 8's proof, run on this repository.
+
+The code is `src/fux/configfiles.py` (it imports `constants` and `errors` only, because the gate runs before every verb); its test is `tests/test_configfiles.py`.
 
 ### Consequences
 

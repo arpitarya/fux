@@ -27,6 +27,7 @@ companion here asserts no query-plane module imports it.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import os
 import stat
@@ -73,7 +74,7 @@ def _repo(tmp_path, *, urls=(), files=None):
         "".join(f"{u}\n" for u in urls), encoding="utf-8"
     )
     # SR-PII decision 17: every verb refuses without this file.
-    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config((fux).parent)
     for rel, text in files.items():
         path = tmp_path / rel

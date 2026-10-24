@@ -3,7 +3,7 @@
 **Why it exists.** Before this, the answer to *"why is my file not in the
 index?"* lived in four places: a `!` line in `.fux/sources/dirs`, a `!` line in
 the types list, the type allowlist in that same file, and two hardcoded rules in
-the walker. (The types list is `.fux/formats.toml` since 2026-09-11, and it has no
+the walker. (The types list is `.fux/config/formats.toml` since 2026-09-11, and it has no
 `!` at all — SR-TYPES decision 12.) Four places is three too many, and the symptom was always
 the same — a document silently absent, and no single file to read to find out
 why.
@@ -72,7 +72,7 @@ five properties make that survivable:
 
 ⚠ **The cost, stated because it was accepted rather than avoided: a generated
 line DECIDES.** It freezes the verdict that produced it — widen
-`.fux/formats.toml` and the listed `.py` files stay out; write content into a
+`.fux/config/formats.toml` and the listed `.py` files stay out; write content into a
 file listed as `empty` and it stays out, still labelled `empty`. The freeze is
 not undone; `skipnotice.stale_warnings` makes it **loud** on stderr, and the
 fix is deleting the line or writing a `!` for it.
@@ -81,7 +81,7 @@ fix is deleting the line or writing a `!` for it.
 
 In `.fux/sources/dirs`, `!` **subtracts**
 ([SR-DIR-LIST](../../../records/0120_dir-list.md) decision 2b). Here it
-**re-includes**. Same character, opposite direction, two files. (`.fux/formats.toml`
+**re-includes**. Same character, opposite direction, two files. (`.fux/config/formats.toml`
 has no `!` at all, so the collision is down to one file since 2026-09-11.)
 
 **That collision is accepted rather than avoided**, because the alternative is
@@ -590,7 +590,7 @@ def duplicate_warnings(root: Path, *, dirs_file: str) -> list[str]:
     message says which, rather than reporting a conflict and leaving the reader
     to guess which way it resolves.
 
-    ⚠ **`dirs` only since 2026-09-11.** The types list became `.fux/formats.toml`,
+    ⚠ **`dirs` only since 2026-09-11.** The types list became `.fux/config/formats.toml`,
     which has no subtraction to duplicate (SR-TYPES decision 12).
 
     **ASCII only**, for the same reason `reason()` is.

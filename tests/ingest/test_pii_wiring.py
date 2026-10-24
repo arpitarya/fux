@@ -8,6 +8,7 @@ source and report `stale` forever — a defect that presents as a working featur
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import ast
 import json
 from pathlib import Path
@@ -241,14 +242,16 @@ def test_the_digest_lives_under_runtime_which_is_gitignored():
 def test_pii_toml_is_a_declared_committed_file():
     from fux.store import fuxdir
 
-    assert "pii.toml" in fuxdir.COMMITTED_FILES
-    assert "pii.toml" in fuxdir.DECLARED
+    # W-295: the eight policy files are one declared directory, not eight files.
+    assert "config" in fuxdir.COMMITTED
+    assert "config" in fuxdir.DECLARED
+    assert "pii.toml" not in fuxdir.DECLARED
 
 
 def test_the_generated_readme_says_index_only():
     from fux.store import fuxdir
 
-    row = next(l for l in fuxdir._readme().splitlines() if "`pii.toml`" in l)
+    row = next(l for l in fuxdir._readme().splitlines() if "`config/`" in l)
     assert "ONLY" in row
 
 
@@ -280,7 +283,7 @@ def _repo_with_rule(tmp_path, files: dict[str, str]):
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
-    (tmp_path / ".fux" / "pii.toml").write_text(
+    (config_file(tmp_path, "pii")).write_text(
         "[[rule]]\nname = 'email'\npattern = '[\\w.]+@[\\w.]+\\.\\w+'\n"
         "replacement = '[PII:email]'\n",
         encoding="utf-8",

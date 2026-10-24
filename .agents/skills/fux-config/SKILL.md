@@ -1,6 +1,6 @@
 ---
 name: fux-config
-description: Read, explain and diagnose Fux configuration — fux.toml, .fux/tune.toml (`fux tune`) and .fux/output.toml (`fux output`), precedence, validation errors, and judging a tuning change honestly. Use for "change fux defaults", "always show the confidence band", "tune ranking weights", "what does this fux.toml key do", "fux.toml won't load". Explaining is always fine; edits change ranking for everyone, so make them ONLY when explicitly asked.
+description: Read, explain and diagnose Fux configuration — fux.toml, .fux/config/tune.toml (`fux tune`) and .fux/config/output.toml (`fux output`), precedence, validation errors, and judging a tuning change honestly. Use for "change fux defaults", "always show the confidence band", "tune ranking weights", "what does this fux.toml key do", "fux.toml won't load". Explaining is always fine; edits change ranking for everyone, so make them ONLY when explicitly asked.
 ---
 
 # Configuring Fux
@@ -18,10 +18,10 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | the ask | file | how it is written |
 |---|---|---|
 | where documents come from, how URLs are fetched, which agent files `fux setup` installs | `fux.toml` | `fux setup`, once |
-| which documents come back first, confidence floors, how much of a document is indexed | `.fux/tune.toml` | `fux setup` once; `fux tune` prints the defaults |
-| how results are shown — band, top, json, sections, hops | `.fux/output.toml` | `fux setup` once; `fux output` prints the defaults |
-| what is redacted from the index | `.fux/pii.toml` | see `fux-pii` |
-| which IDs are kept whole however typed (`RF 118` = `RF-118`) | `.fux/identifiers.toml` | `fux setup` once, both tables empty; `[user]` by hand (it wins), `[detected]` only by `fux identifiers --write`. **Changes the index** — `fux ingest` after, and `fux doctor` says when the index was built under other families |
+| which documents come back first, confidence floors, how much of a document is indexed | `.fux/config/tune.toml` | `fux setup` once; `fux tune` prints the defaults |
+| how results are shown — band, top, json, sections, hops | `.fux/config/output.toml` | `fux setup` once; `fux output` prints the defaults |
+| what is redacted from the index | `.fux/config/pii.toml` | see `fux-pii` |
+| which IDs are kept whole however typed (`RF 118` = `RF-118`) | `.fux/config/identifiers.toml` | `fux setup` once, both tables empty; `[user]` by hand (it wins), `[detected]` only by `fux identifiers --write`. **Changes the index** — `fux ingest` after, and `fux doctor` says when the index was built under other families |
 
 **Fux never rewrites any of them.** `fux tune` and `fux output` read no
 repository — they print the **engine defaults**, not this repo's values.
@@ -30,8 +30,8 @@ All four are committed; only `.fux/runtime/` and `.fux/acquired/` are local.
 **See what this repo changed from the defaults:**
 
 ```bash
-diff <(fux tune) .fux/tune.toml
-diff <(fux output) .fux/output.toml
+diff <(fux tune) .fux/config/tune.toml
+diff <(fux output) .fux/config/output.toml
 fux doctor --json    # rows: "fux.toml loads", "output.toml present", "ranking priors"
 ```
 
@@ -64,7 +64,7 @@ refuses.** A query succeeding proves nothing about `fux.toml`; the
 | `acquired_max_bytes` | store default | byte cap on `.fux/acquired/` |
 | `[sources.url.config]` | `{}` | handed **verbatim** to the fetcher's `configure()`; fux reads no key in it |
 | `[index] shards` | `256` | documents the value; any other number is an error |
-| `[index] section_records` | `false` | `false` = whole documents only. `true` = ingest also writes `.fux/index/sections/`, which `.fux/tune.toml [ranking] section_weight` reads. **It changes committed bytes**: after flipping it, a plain `fux ingest` refuses, so run `fux ingest --full`. `section_weight > 0` with this `false` is a hard error. **To turn sections on:** set this `true`, run `fux ingest --full`, and set `section_weight = 1.0`, the measured value (W-278: no question lost, +6 of 165 at rank 1) |
+| `[index] section_records` | `false` | `false` = whole documents only. `true` = ingest also writes `.fux/index/sections/`, which `.fux/config/tune.toml [ranking] section_weight` reads. **It changes committed bytes**: after flipping it, a plain `fux ingest` refuses, so run `fux ingest --full`. `section_weight > 0` with this `false` is a hard error. **To turn sections on:** set this `true`, run `fux ingest --full`, and set `section_weight = 1.0`, the measured value (W-278: no question lost, +6 of 165 at rank 1) |
 | `[agents] install` | all of `claude`, `codex`, `copilot`, `kiro` | vendors `fux setup` writes files for; `[]` = none |
 
 **`keep`, `ttl`, `update` and `enrich` are source-wide defaults** — a
@@ -98,12 +98,12 @@ of that and only removes the socket.
 ⚠ **Any other unknown key is REFUSED by name**, and the error lists what is
 legal at that level. `metta = "plain"` fails the load rather than sitting
 inert — a key quietly not read is a setting its author believes is in force.
-Ranking and index-limit keys live in `.fux/tune.toml`, which refuses unknown
+Ranking and index-limit keys live in `.fux/config/tune.toml`, which refuses unknown
 keys the same way.
 
 ---
 
-## 3 · `.fux/tune.toml` — ranking, plus index limits
+## 3 · `.fux/config/tune.toml` — ranking, plus index limits
 
 | table | keys (engine default) | read by |
 |---|---|---|
@@ -164,7 +164,7 @@ that broke.
      fux ask "$q" --json --top 5 --no-output-config |
        python3 -c 'import json,sys; print(" ".join(r["loc"] for r in json.load(sys.stdin)["results"]))'
    done < queries.txt > /tmp/before.txt
-   # edit ONE key in .fux/tune.toml, re-run into /tmp/after.txt, then:
+   # edit ONE key in .fux/config/tune.toml, re-run into /tmp/after.txt, then:
    diff /tmp/before.txt /tmp/after.txt
    ```
 
@@ -177,7 +177,7 @@ that broke.
 
 ---
 
-## 5 · `.fux/output.toml` — how results are shown
+## 5 · `.fux/config/output.toml` — how results are shown
 
 | table | keys (default) | reaches |
 |---|---|---|
@@ -227,8 +227,8 @@ names.**
 
 | message contains | do |
 |---|---|
-| `[ranking] moved to .fux/tune.toml` | move the keys into tune's `[ranking]`, delete the table |
-| `[decode] moved to .fux/tune.toml` | move `max_table_rows` to tune's `[index]` |
+| `[ranking] moved to .fux/config/tune.toml` | move the keys into tune's `[ranking]`, delete the table |
+| `[decode] moved to .fux/config/tune.toml` | move `max_table_rows` to tune's `[index]` |
 | `max_parallel must be present` | add `max_parallel = 4` under `[sources.url]` |
 | `unknown table(s)` / `unknown key(s)` (tune) | fix the spelling; `fux tune` lists every key |
 | `field weights lost the _weight suffix` | rename `heading_weight` → `heading`, etc. |

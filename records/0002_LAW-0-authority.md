@@ -10,7 +10,7 @@ feature: the authority of records — where a rule lives, which record wins, and
 owns: [scripts/gen-laws.py@96ca5a116bcc, scripts/gen-components.py@d146ee4a28b1, tests/test_claude_md_laws.py@d5a71ea8bd15, tests/test_record_components.py@5559f217ae22]
 laws: [L0]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: 48ef72d875cd9387c9923dc72ea8da3075bfe0cc9ce47535e7a3938be95da75a
+content_sha: 6e5f7fb0c93aae573c337a7470d5fec6e99758f9532dfa3b229975d708373336
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -369,7 +369,7 @@ duplication, not by inventing a check that cannot exist.
 - [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) §W-122 — the migration this record authorises, as it landed. Its item file was deleted with its queue row (OPEN-WORK rule 2). **W-146 carried the remainder and closed 2026-09-15** — its last row became [SR-WORK-GOLDEN](0066_WORK-golden.md), the second generated view decision 5 permits; the item file is [archived](../archive/open/W-146-the-rest-of-l0.md).
 - **The two strikes:** `acquired_max_bytes` — named in a record and the ownership table, never parsed, `NameError` on every retaining fetch (2026-09-01); `max_parallel` — two contradicting sentences in one accepted amendment, the code implementing the wrong one ([`archive/open/W-83-the-unconfigured-fetch-ceiling.md`](../archive/open/W-83-the-unconfigured-fetch-ceiling.md)).
 - [`scripts/gen-components.py`](../scripts/gen-components.py) and [`tests/test_record_components.py`](../tests/test_record_components.py) — decision 5's second view, the records' `COMPONENTS` block ([SR-WORK-OWNERSHIP](0054_WORK-ownership.md) decision 16 decides its shape).
-- **Precedent for a generated view:** [SR-TUNE](0135_tuning.md) already names `tune.specimen()` in `src/fux/tune.py` as the authority for `.fux/tune.toml`.
+- **Precedent for a generated view:** [SR-TUNE](0135_tuning.md) already names `tune.specimen()` in `src/fux/tune.py` as the authority for `.fux/config/tune.toml`.
 - US Constitution, Article VI, Clause 2 (the Supremacy Clause) and Article V (the amendment path) — the two-level shape and the reason entrenchment is part of it, not an addition to it.
 
 ### Veto condition

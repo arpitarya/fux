@@ -9,7 +9,7 @@
  */
 import { tokenize } from "./tokenize.mjs";
 
-//: `limit` is `.fux/output.toml`'s `max_headings` — `[cli]` for ask/find,
+//: `limit` is `.fux/config/output.toml`'s `max_headings` — `[cli]` for ask/find,
 //: `[mcp]` for the MCP surface — resolved by the caller (L12).
 export function headingsFor(record, query, limit) {
   if (!record) return [];

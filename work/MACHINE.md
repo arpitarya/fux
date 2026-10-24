@@ -236,7 +236,7 @@ they live here rather than in `CLAUDE.md` (W-173).
 | you typed | what happens | what to type |
 |---|---|---|
 | `node --test node/test` | `MODULE_NOT_FOUND` | `node --test node/test/*.test.mjs` |
-| a hand-built test repo with no `.fux/pii.toml` | **every CLI verb refuses**, `ingest` included | `: > .fux/pii.toml` — an empty file is enough |
+| a hand-built test repo with no `.fux/config/pii.toml` | **every CLI verb refuses**, `ingest` included | `: > .fux/config/pii.toml` — an empty file is enough |
 
 🔴 **`node --test node/test` reads as a test failure and is not one.** Without
 the glob, Node resolves the bare directory as a **module path** rather than as a

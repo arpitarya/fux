@@ -7,10 +7,10 @@ description: "Fux still does not fetch — the refer plane reuses the consumer-f
 status: accepted
 date: 2026-08-20
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@deb80a9325b9, tools/refer-bench@971d72542a1f, tools/refer-budget-sweep@da100abfb8a5, node/src/refer/assemble.mjs@cd053158edc1, node/src/refer/rescore.mjs@eb08cb7e6d28, node/src/refer/source.mjs@b525f684aede, src/fux/acquire/source.py@da0d26931219]
+owns: [src/fux/refer@fae95be7adad, tools/refer-bench@971d72542a1f, tools/refer-budget-sweep@da100abfb8a5, node/src/refer/assemble.mjs@c87a7a3594a7, node/src/refer/rescore.mjs@eb08cb7e6d28, node/src/refer/source.mjs@b525f684aede, src/fux/acquire/source.py@da0d26931219]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: f014b9eaa903aa467f0025ce87137718e503af9b5d642f70420099c51d77ff9d
+content_sha: b59c9f9277eff4169d82c1699606101708f2dcc56779059130b0341f8f3fb90f
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

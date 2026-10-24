@@ -1,4 +1,4 @@
-# .fux/output.toml — HOW a result is SHOWN. Never which documents come back.
+# .fux/config/output.toml — HOW a result is SHOWN. Never which documents come back.
 #
 # Written once by `fux setup`; fux never rewrites it. EVERY KEY IS REQUIRED
 # (law L12, records/0014_LAW-12-values-live-in-config.md): fux holds no copy of

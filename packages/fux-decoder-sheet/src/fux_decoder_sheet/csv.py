@@ -50,14 +50,14 @@ USES = tuple(fixed("decoders.csv", "uses"))
 #: nobody diffs it. Found by a lab harness that planted answers past the limit
 #: and could not find them (`work/regression/2026-09-06-csv-chunk-granularity/`).
 #:
-#: Now `.fux/tune.toml [index] max_table_rows`, defaulting to 20 000 (in
+#: Now `.fux/config/tune.toml [index] max_table_rows`, defaulting to 20 000 (in
 #: `fux.toml [decode]` from 2026-09-06 until Arpit moved it on 2026-09-11).
 #: `[index]` is tune.toml's one table that changes what is **indexed** —
 #: SR-TUNE decision 13.
 from fux.decode.ext.limits import limit, max_table_rows
 
 #: Guards against a malformed quote turning one line into one enormous field.
-#: ⚠ **`MAX_CELL_CHARS` is `[limits.csv] max_cell_chars` in .fux/formats.toml** since W-225 stage 4a
+#: ⚠ **`MAX_CELL_CHARS` is `[limits.csv] max_cell_chars` in .fux/config/formats.toml** since W-225 stage 4a
 #: (SR-LAW-12 decision 9b): read per call through `limit()`, in the extract-config digest.
 
 

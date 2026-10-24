@@ -1,5 +1,5 @@
 ---
-applyTo: ".fux/fetchers/**,.fux/refusals.toml"
+applyTo: ".fux/fetchers/**,.fux/config/refusals.toml"
 ---
 
 # Editing a Fux fetcher or refusal rule

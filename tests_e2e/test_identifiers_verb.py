@@ -9,6 +9,7 @@ ingest, the exact document is first for every spelling — and `fux doctor` and
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import subprocess
 import sys
@@ -44,7 +45,7 @@ def repo(tmp_path: Path) -> Path:
     subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "c"],
                    cwd=tmp_path, check=True)
     assert _fux(tmp_path, "setup").returncode == 0
-    assert (tmp_path / ".fux" / "identifiers.toml").is_file(), "setup writes the file (L12)"
+    assert (config_file(tmp_path, "identifiers")).is_file(), "setup writes the file (L12)"
     assert _fux(tmp_path, "ingest").returncode == 0
     return tmp_path
 
@@ -56,7 +57,7 @@ def test_families_put_the_exact_document_first_for_every_spelling(repo):
     assert [f["template"] for f in proposed["families"]] == ["RF-{n}"]
     assert proposed["written"] is False
 
-    path = repo / ".fux" / "identifiers.toml"
+    path = config_file(repo, "identifiers")
     user_before = path.read_text("utf-8").split("[detected]")[0]
     wrote = _fux(repo, "identifiers", "--write")
     assert wrote.returncode == 0, wrote.stderr
@@ -77,7 +78,7 @@ def test_families_put_the_exact_document_first_for_every_spelling(repo):
 
 
 def test_a_refused_regex_stops_ingest_by_name(repo):
-    path = repo / ".fux" / "identifiers.toml"
+    path = config_file(repo, "identifiers")
     path.write_text(path.read_text("utf-8").replace("regex = []", 'regex = ["(a+)+"]'), "utf-8")
     out = _fux(repo, "ingest")
     assert out.returncode != 0
@@ -85,8 +86,8 @@ def test_a_refused_regex_stops_ingest_by_name(repo):
 
 
 def test_a_missing_file_is_named(repo):
-    (repo / ".fux" / "identifiers.toml").unlink()
+    (config_file(repo, "identifiers")).unlink()
     out = _fux(repo, "ask", "RF 118")
     assert out.returncode != 0 and "identifiers.toml is missing" in out.stderr
     assert _fux(repo, "doctor", "--fix").returncode in (0, 1)
-    assert (repo / ".fux" / "identifiers.toml").is_file(), "`doctor --fix` restores it"
+    assert (config_file(repo, "identifiers")).is_file(), "`doctor --fix` restores it"

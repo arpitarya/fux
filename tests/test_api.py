@@ -7,7 +7,7 @@ Four things are asserted here and each is a promise the record makes:
    `src/fux/__init__.py` makes it true — a file SR-LAWS owns, which is why the
    register carries a `describes` row pointing at this record.
 2. **The gate fires here too.** `open()` outside a root, and `open()` in a repo
-   with no `.fux/pii.toml`, both raise `FuxError`. A library caller that
+   with no `.fux/config/pii.toml`, both raise `FuxError`. A library caller that
    bypassed the gate would be reading a promise the CLI does not make
    (SR-PII decision 17; W-107 O1 answered the same way for Node).
 3. **The gate costs a STAT, not an import.** `from .ingest import pii` pulls in
@@ -21,6 +21,7 @@ Four things are asserted here and each is a promise the record makes:
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import sys
 
 import pytest
@@ -53,10 +54,10 @@ def _rec(doc_id: str, title: str, word: str, *, phrases=(), mtime=None) -> dict:
 @pytest.fixture
 def repo(tmp_path):
     (tmp_path / ".git").mkdir()
-    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     # CLAUDE.md §Build & test: a test that builds a repo by hand writes
-    # `.fux/pii.toml`, or every verb refuses (SR-PII decision 17).
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # `.fux/config/pii.toml`, or every verb refuses (SR-PII decision 17).
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / OUTPUT_NAME).write_text(specimen(), encoding="utf-8")
     (tmp_path / "docs").mkdir()

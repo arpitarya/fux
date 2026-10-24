@@ -7,7 +7,7 @@ description: Write a new Fux decoder, or edit an existing one, in .fux/decoders/
 
 A **decoder** turns one file format into Markdown so Fux can index it. Seventeen
 are first-party, shipped in `fux-decoder-*` packages (`fux-decoder-pdf`,
-`fux-decoder-office`, …). **One runs only when `.fux/plugins.toml` declares its
+`fux-decoder-office`, …). **One runs only when `.fux/config/plugins.toml` declares its
 package**, installed at the pinned version and digest. A file you put in
 `.fux/decoders/<module>.py` overrides the package's module of that name.
 
@@ -21,7 +21,7 @@ package**, installed at the pinned version and digest. A file you put in
 
 | the ask | what to do |
 |---|---|
-| Fux ignores a format a first-party package reads (`fux ingest` prints `N .pdf file(s) not read`) | **Not a decoder job.** Declare the package: `fux setup` adds it to `.fux/plugins.toml` and prints the install line |
+| Fux ignores a format a first-party package reads (`fux ingest` prints `N .pdf file(s) not read`) | **Not a decoder job.** Declare the package: `fux setup` adds it to `.fux/config/plugins.toml` and prints the install line |
 | Fux ignores a format entirely | **New decoder.** A new file in `.fux/decoders/` |
 | Fux reads a format badly | **Override the shipped one.** Copy the package's module into `.fux/decoders/<module>.py` and edit the copy — it now runs instead of the package's |
 | A format needs a library Fux does not ship (`pypdf`, `olefile`, OCR) | **Override or replace**, and add the dependency to the repo's own environment |
@@ -29,7 +29,7 @@ package**, installed at the pinned version and digest. A file you put in
 **Check what exists before writing anything:**
 
 ```bash
-cat .fux/plugins.toml          # the declared packages
+cat .fux/config/plugins.toml          # the declared packages
 ls .fux/decoders/              # your overrides, if any
 fux doctor | grep -i plugins   # what is declared, installed, and not covered
 python -c "import fux_decoder_pdf.pdf as m; print(m.__file__)"   # a shipped module, to copy
@@ -128,7 +128,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
 ```
 
 **Then make the type indexable.** A decoder alone is not enough — the walker
-still filters on `.fux/formats.toml`. Bind each extension to your module under
+still filters on `.fux/config/formats.toml`. Bind each extension to your module under
 `[decoders]`; a bound extension is a document, and fux checks the binding
 against the module it names:
 
@@ -139,7 +139,7 @@ vtt = "srtdoc"
 ```
 
 A binding to a first-party module (`pdf = "pdf"`) reads nothing until its
-package is declared in `.fux/plugins.toml` — or until a file of that module
+package is declared in `.fux/config/plugins.toml` — or until a file of that module
 name sits in `.fux/decoders/`.
 
 ---
@@ -208,7 +208,7 @@ depends on:
 | `fux.decode.ext.xml` | `parse`, `local`, `text_of` | Refuses any DOCTYPE, which closes billion-laughs and XXE in one rule |
 | `fux.decode.ext.ooxml` | `paragraph_text`, `heading_level` | Run assembly. A run boundary is a formatting event, **not** a word boundary |
 | `fux_extension_table.table` | `Grid`, `Cell`, `Table`, `emit` | The one table emitter: values, spans, the header, the row budget, `\|` escaping — and exactly the Markdown the chunker reads back as rows |
-| `fux.decode.ext.limits` | `limit`, `max_table_rows` | The repository's committed caps (`.fux/formats.toml [limits]`), read without a third `decode()` parameter |
+| `fux.decode.ext.limits` | `limit`, `max_table_rows` | The repository's committed caps (`.fux/config/formats.toml [limits]`), read without a third `decode()` parameter |
 | `fux.decode.ext.markdown` | `headings`, `strip_headings` | The one heading grammar, fence-aware |
 
 **Name the ones you call in `USES`**, beside `EXTENSIONS` — for example
@@ -267,10 +267,10 @@ each already cost a defect in the shipped set:
 |---|---|
 | the decision of record | `records/0139_decode.md` — §1 for the shape, §2 for the protocol and every per-format judgement |
 | the seventeen shipped decoders | the `fux-decoder-*` packages; which one reads what is `fux.plugins.first_party()` |
-| which packages this repo declares | `.fux/plugins.toml`, and `records/0165_plugins.md` |
+| which packages this repo declares | `.fux/config/plugins.toml`, and `records/0165_plugins.md` |
 | the loader, the override rule, the registry | `fux.decode.__init__` — read its module docstring |
 | where decoding joins ingest | `fux.ingest.parse.parse_document` |
-| which files are walked at all | `.fux/formats.toml`, and `records/0128_types-list.md` |
+| which files are walked at all | `.fux/config/formats.toml`, and `records/0128_types-list.md` |
 | what `.fux/` may contain | `records/0102_fux-directory.md` |
 | worked tests to copy | `tests/decode/test_formats.py` — fixtures are built in the test, never committed as binaries, so the input is readable beside the assertion |
 

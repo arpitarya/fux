@@ -7,6 +7,7 @@ work -- it is a `fux doctor` line. Two origins, never one count.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from types import SimpleNamespace
 
 from l12_fixtures import write_config
@@ -26,7 +27,7 @@ def _planted(tmp_path):
     (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     (root / ".fux" / "sources").mkdir(parents=True)
     (root / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     docs = root / "docs"
     docs.mkdir()

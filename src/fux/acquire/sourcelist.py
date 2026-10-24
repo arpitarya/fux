@@ -46,7 +46,7 @@ The grammar, in one place:
 
 The attribute sets are closed and per file: `fetch` and `decoder` for `urls`,
 `archived` for `dirs`. (`types` was the third file until 2026-09-11; it is
-`.fux/formats.toml` now, read by `typesfile` — see `TYPES` below.) Adding one is a change
+`.fux/config/formats.toml` now, read by `typesfile` — see `TYPES` below.) Adding one is a change
 to the owning record, which is what makes the unknown-key error safe to be
 strict about.
 
@@ -515,7 +515,7 @@ DIRS = ListSpec(
 
 #: The vocabulary of a type pattern — **no longer the grammar of a committed file.**
 #:
-#: ⚠ **Since 2026-09-11 the types list is `.fux/formats.toml`**, read and written by
+#: ⚠ **Since 2026-09-11 the types list is `.fux/config/formats.toml`**, read and written by
 #: [`typesfile`](typesfile.py) (SR-TYPES decision 12), so this parser reads two
 #: committed lists, not three. `TYPES` survives for two jobs and nothing else:
 #:

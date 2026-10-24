@@ -5,7 +5,7 @@
  * sees it: nothing in the reader was changed to make it countable, so a pass
  * that bypasses `Shards` is counted exactly like one that uses it.
  *
- * Run against this repository's committed index, whose `.fux/tune.toml` turns
+ * Run against this repository's committed index, whose `.fux/config/tune.toml` turns
  * on the graph tier and the mined table — the two passes that used to read
  * every shard a second and third time. Before Tier 0 this test failed at 3.
  */

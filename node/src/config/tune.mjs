@@ -1,4 +1,4 @@
-/** `.fux/tune.toml`, read. The reader half of `src/fux/tune.py`.
+/** `.fux/config/tune.toml`, read. The reader half of `src/fux/tune.py`.
  *
  * 🔴 **This file closes [SR-NODE-SEARCH](../../../records/0153_node-search.md)
  * decision 8**, which was filed as a gap rather than a decision: Node read no
@@ -349,7 +349,7 @@ function rejectConflictMarkers(label, text) {
   }
 }
 
-/** Read `.fux/tune.toml` — every key required.
+/** Read `.fux/config/tune.toml` — every key required.
  *
  * `enabled=false` is `--no-tune`: the consumer's file is not read at all and
  * the packaged template is read in its place (SR-TUNE decision 11; L12

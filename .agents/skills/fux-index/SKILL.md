@@ -26,13 +26,13 @@ Resolve the `fux` command first — see the `fux-usage` skill (`fux` → `uv run
 | "make CI check the index" | §7 |
 
 **Every verb except `setup`, `doctor`, `tune` and `output` stops when
-`.fux/pii.toml` is missing.** See §8 and `fux-pii`.
+`.fux/config/pii.toml` is missing.** See §8 and `fux-pii`.
 
 ---
 
 ## 2 · `fux setup` — scaffold once
 
-**Write-if-missing, always** — except `.fux/plugins.toml`, whose rows setup adds
+**Write-if-missing, always** — except `.fux/config/plugins.toml`, whose rows setup adds
 and pins (`updated <path>`), never removes. Each other path prints `wrote <path>`
 or `kept <path> (yours; never rewritten)`. A consumer's edit is never
 overwritten, so a newer template never reaches a file that already exists. Setup
@@ -43,10 +43,10 @@ writes **no** decoder or fetcher: a file you put in `.fux/decoders/` or
 |---|---|
 | `fux.toml` | policy: `[sources]`, `[sources.url]` (`max_parallel` is **required**), `[index]`, `[agents] install` |
 | `.fux/sources/dirs` · `.fux/sources/urls` | what is indexed; `dirs` is seeded with `README.md` and `docs` when they exist |
-| `.fux/formats.toml` · `.fux/.fuxignore` | which files are documents · what is excluded |
-| `.fux/pii.toml` · `.fux/refusals.toml` | redaction rules (required) · what a sign-in wall looks like |
-| `.fux/tune.toml` · `.fux/output.toml` | ranking knobs · output defaults — the engine defaults spelled out |
-| `.fux/plugins.toml` | the decoder and fetcher **packages** this repo runs, pinned — proposed from your sources; setup prints the one `pip install` line and installs nothing. After a fux upgrade, `fux setup --pin` re-pins every row |
+| `.fux/config/formats.toml` · `.fux/.fuxignore` | which files are documents · what is excluded |
+| `.fux/config/pii.toml` · `.fux/config/refusals.toml` | redaction rules (required) · what a sign-in wall looks like |
+| `.fux/config/tune.toml` · `.fux/config/output.toml` | ranking knobs · output defaults — the engine defaults spelled out |
+| `.fux/config/plugins.toml` | the decoder and fetcher **packages** this repo runs, pinned — proposed from your sources; setup prints the one `pip install` line and installs nothing. After a fux upgrade, `fux setup --pin` re-pins every row |
 | `.fux/README.md` · `.fux/.gitignore` | the layout table · ignores `runtime/` and `acquired/` by name |
 
 **It also writes agent files OUTSIDE `.fux/`** — under `.claude/{skills,rules}/`,
@@ -69,7 +69,7 @@ every re-run, even when fux wrote that file itself.** Check for the
 `# Working with fux in this repo` block before pasting; never paste it twice.
 
 A repo still holding `.fux/sources/types` gets it **converted** into
-`.fux/formats.toml`; delete the old file afterwards — fux refuses while both exist.
+`.fux/config/formats.toml`; delete the old file afterwards — fux refuses while both exist.
 
 ---
 
@@ -100,7 +100,7 @@ mode prints `[OK]`, `[WARN]` or `[FAIL]` per row.
 | `python version` · `repo root` · `.fux/ writable` | error | wrong interpreter · no `fux.toml`/`.git` above cwd · `.fux/` not writable |
 | `fux.toml loads` | error (warn if absent) | the loader's own message, verbatim — fix the key it names |
 | `index not gitignored` | error | an ignore rule (usually `.fux/*`) drops `.fux/index` out of git |
-| `types list usable` | error | `.fux/formats.toml` will not load, admits nothing, or old `sources/types` remains |
+| `types list usable` | error | `.fux/config/formats.toml` will not load, admits nothing, or old `sources/types` remains |
 | `fuxignore usable` | error on parse · warn on duplicates | a pattern in both `.fuxignore` and `sources/dirs` |
 | `pii rules` | error when missing/invalid · warn when empty | ingest refuses without the file |
 | `refusal rules` · `decoder bindings` | error when the file/binding will not load · else warn | a hand-written binding matching no indexed document is a warn |
@@ -132,7 +132,7 @@ exit code (`0` ok, `1` error, `130` interrupted), then `fux doctor --json`.
 
 **One writer at a time.** Ingest holds `.fux/runtime/write.lock`. If a
 background re-index holds it, ingest asks it to stop, waits, then runs.
-Editing `.fux/pii.toml` or `[index]` in `tune.toml` invalidates carry-forward automatically.
+Editing `.fux/config/pii.toml` or `[index]` in `tune.toml` invalidates carry-forward automatically.
 
 The summary line is
 `ingested N docs (C changed, R carried forward), X not indexed, Y skipped, S shards written`.
@@ -193,8 +193,8 @@ no network. `ingest` already does this unless given `--no-accelerator`.
 | commit | never commit |
 |---|---|
 | `fux.toml`, `.fux/index/*.jsonl`, `.fux/index/REGISTER` | `.fux/runtime/` — derived, rebuildable |
-| `.fux/sources/`, `.fux/formats.toml`, `.fux/.fuxignore` | `.fux/acquired/` — **fetched source bytes**, not rebuildable |
-| `.fux/pii.toml`, `.fux/refusals.toml`, `.fux/tune.toml`, `.fux/output.toml` | `__pycache__/` under `.fux/decoders/` or `.fux/fetchers/` — **`.fux/.gitignore` does not list these** |
+| `.fux/sources/`, `.fux/config/formats.toml`, `.fux/.fuxignore` | `.fux/acquired/` — **fetched source bytes**, not rebuildable |
+| `.fux/config/pii.toml`, `.fux/config/refusals.toml`, `.fux/config/tune.toml`, `.fux/config/output.toml` | `__pycache__/` under `.fux/decoders/` or `.fux/fetchers/` — **`.fux/.gitignore` does not list these** |
 | `.fux/fetchers/*.py`, `.fux/decoders/*.py`, `.fux/enrich/` | |
 | `.fux/README.md`, `.fux/.gitignore`, and the agent files if the team wants them | |
 
@@ -236,9 +236,9 @@ still blind to files that were never indexed, which is what this gate catches.
 
 | message contains | fix |
 |---|---|
-| `.fux/pii.toml is missing, and fux will not run without it` | **tell the human.** `fux setup` writes the starter but also every other missing committed file and the agent files — run it only when asked, then relay its `wrote` lines. See `fux-pii` |
-| `.fux/sources/types … moved to .fux/formats.toml` | `fux setup` converts it; then delete `.fux/sources/types` |
-| `lists no file types` (ingest) · `admits nothing` (doctor) | delete `.fux/formats.toml` to take the built-in default |
+| `.fux/config/pii.toml is missing, and fux will not run without it` | **tell the human.** `fux setup` writes the starter but also every other missing committed file and the agent files — run it only when asked, then relay its `wrote` lines. See `fux-pii` |
+| `.fux/sources/types … moved to .fux/config/formats.toml` | `fux setup` converts it; then delete `.fux/sources/types` |
+| `lists no file types` (ingest) · `admits nothing` (doctor) | delete `.fux/config/formats.toml` to take the built-in default |
 | `another fux process is writing this index (lock: …)` | wait. If none is running, `fux ingest --stop` clears the stale lock |
 | `did not stop when asked` | a live writer is mid-run; wait, then re-run |
 | `….jsonl:1: not valid JSON` | merge conflict markers in a shard — `fux-maintain` §6 |

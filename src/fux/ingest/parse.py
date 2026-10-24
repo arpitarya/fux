@@ -57,7 +57,7 @@ def parse_document(content: bytes, rel_path: str, root: Path | None = None) -> P
 #:
 #: 🔴 **No person key, ever, by default** (decision 23c). `owner`, `author` and
 #: `contributors` are names, and SR-PII runs on a value before it enters a
-#: posting list. A consumer may bind one explicitly in `.fux/formats.toml
+#: posting list. A consumer may bind one explicitly in `.fux/config/formats.toml
 #: [meta]`; **fux never decides it for them.**
 #:
 #: ⚠ `tags` -> `ctx` is in the default and a tag is not a name — but a consumer
@@ -79,7 +79,7 @@ def meta_fields(decoder=None, root: Path | None = None) -> dict[str, str]:
 
     | | layer | where |
     |---|---|---|
-    | 1 | **binding** | `.fux/formats.toml [meta]` (SR-TYPES decision 13) |
+    | 1 | **binding** | `.fux/config/formats.toml [meta]` (SR-TYPES decision 13) |
     | 2 | **claim** | the decoder's `META_FIELDS` (SR-DECODE decision 20) |
     | 3 | **default** | `DEFAULT_META_FIELDS` above |
 

@@ -7,10 +7,10 @@ description: "BM25F is a bag of words and cannot see where terms are. The rerank
 status: accepted
 date: 2026-08-24
 feature: proximity reranking over the refer plane's passages, and the refusal that bounds it
-owns: [src/fux/query/rerank.py@84b1bdc19364, node/src/query/rerank.mjs@be6714bbed81]
+owns: [src/fux/query/rerank.py@84b1bdc19364, node/src/query/rerank.mjs@05a8c799df20]
 laws: [L2, L4, L5]
 timestamp: 2026-08-24T00:00:00Z
-content_sha: fb7c10fdc509515f0031db46769689d9e53b7da75beb241135f5f131c17fd71a
+content_sha: 308066986dae866d3d5b19738cb1600a085b24d053935cb530a4beb9738b6b7d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

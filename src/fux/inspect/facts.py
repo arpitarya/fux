@@ -105,7 +105,7 @@ def cache_key(sha: str, decoder_digest: str, bounds: dict[str, int]) -> str:
 def refer_bounds(root: Path) -> dict[str, int]:
     """`[refer]`'s passage bounds, as `chunk` takes them — no default (L12).
 
-    A missing or malformed `.fux/tune.toml` stops the report naming the key,
+    A missing or malformed `.fux/config/tune.toml` stops the report naming the key,
     rather than measuring passages under numbers this repo never chose.
     """
     from .. import tune as tune_mod

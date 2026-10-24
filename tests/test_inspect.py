@@ -217,7 +217,7 @@ def test_a_repository_with_no_index_says_so_rather_than_tracing_back(tmp_path) -
     from fux.errors import FuxError
     from fux.inspect import inspect_index
 
-    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "config").mkdir(parents=True, exist_ok=True)
     with pytest.raises(FuxError) as excinfo:
         write_config(tmp_path)
         inspect_index(tmp_path, **inspect_args())

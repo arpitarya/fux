@@ -56,7 +56,7 @@ error (exit 2). Three candidates is fixed, not configurable.
 4. **Chunk and re-score** all three documents' passages in one contest. ⚠ **The
    winning passage can come from the second or third document**, so `answer`
    and `ask` may disagree about which document is first.
-5. **Assemble** under `[refer] budget` in `.fux/tune.toml` (default 8000 bytes
+5. **Assemble** under `[refer] budget` in `.fux/config/tune.toml` (default 8000 bytes
    for the whole rendered answer). The best passage is seated first.
 6. **Fall back.** If no candidate yields a passage, the answer comes from the
    index alone and says so (`source: index`).
@@ -187,7 +187,7 @@ failure decides:
 
 | verdict | exit | means |
 |---|---|---|
-| `drifted:config` | 1 | engine version differs, or `.fux/tune.toml` differs (or appeared) |
+| `drifted:config` | 1 | engine version differs, or `.fux/config/tune.toml` differs (or appeared) |
 | `drifted:corpus` | 1 | the committed index differs, or `--rerun` cited a different document |
 | `unverifiable` | 1 | not a fux receipt, an older format, no index here, `--rerun` was not passed — **or the receipt came from a `refer` answer** |
 | `reproduced` | 0 | `--rerun` cited the same documents, in the same order |
@@ -206,17 +206,17 @@ failure decides:
 - **Upgrading fux makes every older receipt `drifted:config`.**
 
 **`--journal` stores the question in plaintext** in a local, gitignored file,
-keeping the newest 1000 receipts. Use it only when asked. `.fux/output.toml`
+keeping the newest 1000 receipts. Use it only when asked. `.fux/config/output.toml`
 can switch it on (`[cli.answer] journal`), as it can `no_refer`; neither has an
 off flag, so use `--no-output-config` to bypass.
 
 ## 9 · Budget and exit codes
 
 - **`audit.budget`** is `{bytes, used, dropped}`. `dropped` passages scored but
-  did not fit. A bigger answer is a `[refer] budget` change in `.fux/tune.toml`
+  did not fit. A bigger answer is a `[refer] budget` change in `.fux/config/tune.toml`
   (see `fux-config`), not a retry.
 - **`answer` exits 0** on success, on no match and on the index fallback; `1` on a
-  fux error (outside a repo, bad config, missing `.fux/pii.toml`); `2` on a usage
+  fux error (outside a repo, bad config, missing `.fux/config/pii.toml`); `2` on a usage
   error. **`verify` exits 0 only for `reproduced`**, and 1 for an unreadable file.
 
 `answer` carries no `archived` flag. If a cited document may be retired, run `fux ask --json` for the same question and follow the `fux-archived-results` policy.

@@ -8,6 +8,7 @@ readers move in one change or the differential arm's ranking lane goes red.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import subprocess
 import sys
@@ -40,7 +41,7 @@ def repo(tmp_path: Path) -> Path:
     sources = tmp_path / ".fux" / "sources"
     sources.mkdir(parents=True)
     (sources / "dirs").write_text("docs\nold archived=true\n", encoding="utf-8")
-    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(tmp_path, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     (tmp_path / "docs").mkdir()
     (tmp_path / "old").mkdir()

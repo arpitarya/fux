@@ -42,7 +42,7 @@ from .tokenize import tokenize
 
 __all__ = ["PATTERN", "Pair", "fold", "mine", "pairs_from_line", "table_from_records", "table_from_shards"]
 
-#: The weight is `.fux/tune.toml [ranking] mined_weight` — `0.5` as the
+#: The weight is `.fux/config/tune.toml [ranking] mined_weight` — `0.5` as the
 #: template ships it, W-168 step 4's measured value: the first to clear
 #: [the frozen bar](../../work/regression/2026-09-27-mined-expansion/PRE-REGISTRATION.md)
 #: (6 wins, 0 losses, no baseline rank-1 hit lost), ratified PASS 2026-09-27.

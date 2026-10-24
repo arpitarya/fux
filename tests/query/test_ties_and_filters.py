@@ -12,6 +12,7 @@ which **removes** results the ranking already produced and retrieves nothing.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 from l12_fixtures import scoring, write_config
 import pytest
 
@@ -205,8 +206,8 @@ def _filter_corpus(root):
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
-    # SR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
-    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    # SR-PII decision 17: a repo without .fux/config/pii.toml refuses; empty redacts nothing.
+    (config_file(root, "pii")).write_text("", encoding="utf-8")
     write_config(root)
     (root / "docs" / "runbooks").mkdir(parents=True)
     (root / "docs" / "runbooks" / "roll.md").write_text(

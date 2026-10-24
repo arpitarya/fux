@@ -33,13 +33,13 @@ from fux.constants import fixed
 #: `constants.toml [extensions.xml]` — when an edit can change what a decoder
 #: using it RETURNS. `tests/decode/test_decoder_versions.py` fails on a changed
 #: extension whose `VERSION` line the diff did not touch.
-VERSION = fixed("extensions.xml", "version")
+VERSION = fixed("extensions.xml", "version")  # W-295 did not bump: policy-file addresses in prose and messages only, same output
 
 #: Only the head is searched: a DOCTYPE is legal only in the prolog, so a match
 #: further down is content rather than a declaration, and scanning a whole
 #: document for it would turn a cheap check into a linear one.
 _DOCTYPE_RE = re.compile(rb"<!DOCTYPE", re.IGNORECASE)
-#: How much of the head counts as the prolog is `.fux/formats.toml [limits.xml]
+#: How much of the head counts as the prolog is `.fux/config/formats.toml [limits.xml]
 #: prolog_bytes` (W-225 stage 5b), read per call like every other cap.
 
 

@@ -13,6 +13,7 @@ fake of the other.
 
 from __future__ import annotations
 
+from l12_fixtures import config_file
 import json
 import shutil
 import subprocess
@@ -37,7 +38,7 @@ def corpus(tmp_path: Path) -> Path:
     fux = tmp_path / ".fux"
     (fux / "sources").mkdir(parents=True)
     (fux / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
-    (fux / "pii.toml").write_text("", encoding="utf-8")
+    (config_file(fux.parent, "pii")).write_text("", encoding="utf-8")
     write_config(tmp_path)
     docs = tmp_path / "docs"
     docs.mkdir()
