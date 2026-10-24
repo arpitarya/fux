@@ -16,11 +16,11 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Stop the test-data builder signing its commits | no more 12-hour stall waiting on gpg | ⏳ |
-| 2 | Run the 10 000-document ingest in the background | about 10 minutes saved | ⏳ |
-| 3 | Run the three comparison arms side by side | about 10 minutes saved | ⏳ |
-| 4 | Keep the timing check last and alone | speed numbers stay honest | ⏳ |
-| 5 | Time every step of the next capture | proof: about 45 min down to 30 or less | ⏳ |
+| 1 | Stop the test-data builder signing its commits | no more 12-hour stall waiting on gpg | ✅ built (template) |
+| 2 | Run the 10 000-document ingest in the background | about 10 minutes saved | ✅ built (template) |
+| 3 | Run the three comparison arms side by side | about 10 minutes saved | ✅ built (template) |
+| 4 | Keep the timing check last and alone | speed numbers stay honest | ✅ built (template) |
+| 5 | Time every step of the next capture | proof: about 45 min down to 30 or less | ⏳ owed by the next capture |
 
 **Arpit, 2026-10-13 (Claude Code):** *"why does it take an hour? can it be
 done faster … okay add a work item for improving the performance."*
@@ -48,11 +48,11 @@ And the ladder: **rung-10000 took 43 690 s on 2026-10-13** (rung-05000 took
 
 | DoD | what | state |
 |---|---|---|
-| 1 · ladder never signs | the builder's commits run with `-c commit.gpgsign=false` (a rung is lab data, never pushed). The driver change goes in the next ladder run's `build_from_worktree.py`; the fux-lab builder stays unmodified unless Arpit says otherwise | ⏳ |
-| 2 · G1 in parallel | the `rung-10000` copy and its `ingest --full` start in the background at the top of the capture and are joined before latency | ⏳ |
-| 3 · G3 by arm in parallel | one `g3.py` process per treatment arm, or the arms' `--why` calls interleaved in one process: **the frozen `g3.py` is not edited** (its hash is in a bar); a driver may only run it differently | ⏳ |
-| 4 · latency untouched | runs last, alone, after every background job is joined and `uptime` is recorded; nothing here changes `latency.py` or its three-runs rule | ⏳ |
-| 5 · measured | the next capture logs each step's wall time; target ≤ 30 min, with the latency step unchanged | ⏳ |
+| 1 · ladder never signs | the builder's commits run with `-c commit.gpgsign=false` (a rung is lab data, never pushed). The driver change goes in the next ladder run's `build_from_worktree.py`; the fux-lab builder stays unmodified unless Arpit says otherwise | ✅ built in tools/quality-controls/capture-driver/, unmeasured |
+| 2 · G1 in parallel | the `rung-10000` copy and its `ingest --full` start in the background at the top of the capture and are joined before latency | ✅ built in tools/quality-controls/capture-driver/, unmeasured |
+| 3 · G3 by arm in parallel | one `g3.py` process per treatment arm, or the arms' `--why` calls interleaved in one process: **the frozen `g3.py` is not edited** (its hash is in a bar); a driver may only run it differently | ✅ built in tools/quality-controls/capture-driver/, unmeasured |
+| 4 · latency untouched | runs last, alone, after every background job is joined and `uptime` is recorded; nothing here changes `latency.py` or its three-runs rule | ✅ built in tools/quality-controls/capture-driver/, unmeasured |
+| 5 · measured | the next capture logs each step's wall time; target ≤ 30 min, with the latency step unchanged | ⏳ owed by the next run: capture.sh logs capture-timing.tsv; not run (shared machine, SR-RS filing) |
 
 ## Hazards
 
