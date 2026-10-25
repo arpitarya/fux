@@ -6,7 +6,7 @@ item: W-301
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Fable 5.1)"
 updated: 2026-10-25
-updated_by: "Arpit (Cowork, Fable 5.1)"
+updated_by: "Claude (Claude Code, Opus 5.5)"
 ball: agent
 ---
 
@@ -16,11 +16,26 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | The segment manifest `fux-index.json` carries `content = {npm, pypi, version}` — the **docs** package the index describes (codelaw: index in `@codelaw/rules-js-fux-index`, content in `@codelaw/rules-js`) | the index package and the docs package may differ, as codelaw ruled | ⏳ |
-| 2 | A hit's `location` is `pkg:<docs-package>@<version>#<path-inside-package>`; `id` stays the segment's record id; the hit also names `package` (the index package) for provenance | every hit says where it came from | ⏳ |
-| 3 | `fux_passage` / `fux refer`: resolve the docs package root by module resolution, join the fragment, collapse `..` **before** the containment check, read the file, cite its fresh sha | SR-MCP d7 widened from "the repository" to "the repository or a pinned package's root"; content never copied (L3) | ⏳ |
-| 4 | Installed docs package version ≠ manifest `content.version` → `FuxError` naming both versions and the install line (P4's shape) | a stale index never cites a file it did not index | ⏳ |
-| 5 | Node twin in `node/src/refer/source.mjs`; differential test over the fixture | same passage, same sha, both planes | ⏳ |
+| 1 | The segment manifest `fux-index.json` carries `content = {npm, pypi, version}` — the **docs** package the index describes (codelaw: index in `@codelaw/rules-js-fux-index`, content in `@codelaw/rules-js`) | the index package and the docs package may differ, as codelaw ruled | ✅ 2026-10-25 — already `always` in the schema (W-299); `pkgsrc` refuses a `content` with no name or no version by name |
+| 2 | A hit's `location` is `pkg:<docs-package>@<version>#<path-inside-package>`; `id` stays the segment's record id; the hit also names `package` (the index package) for provenance | every hit says where it came from | ✅ 2026-10-25 — `pkgsrc.hit_fields`, on every MCP `fux_search` hit; segment hits arrive with W-300 |
+| 3 | `fux_passage` / `fux refer`: resolve the docs package root by module resolution, join the fragment, collapse `..` **before** the containment check, read the file, cite its fresh sha | SR-MCP d7 widened from "the repository" to "the repository or a pinned package's root"; content never copied (L3) | ✅ 2026-10-25 — ⚠ the fresh sha is `content_sha`, not `git hash-object` (flagged in SR-PKG-INDEX d11) |
+| 4 | Installed docs package version ≠ manifest `content.version` → `FuxError` naming both versions and the install line (P4's shape) | a stale index never cites a file it did not index | ✅ 2026-10-25 |
+| 5 | Node twin in `node/src/refer/source.mjs`; differential test over the fixture | same passage, same sha, both planes | ✅ 2026-10-25 — `refer/pkgsrc.mjs` + `source.mjs`; `tests/test_pkg_index.py` differential |
+
+**DoD 2 — the grep list** (every `file:`/`url:` branch in `src/fux` and `node/src`, 2026-10-25):
+
+| branch | `pkg:` behaviour |
+|---|---|
+| `acquire/source.py::resolve` / `fetch_document`, `node/src/refer/source.mjs::resolve` | **accepted** — strategy `PKG`, read in place (`pkgsrc.read`) |
+| `refer/__init__.py` `_obtain` / `_readable` / chunk (`!= GIT`) | **accepted** — `LOCAL = (GIT, PKG)`: no fetch decision, no TTL cache, decoded, frontmatter |
+| `refer/__init__.py::_mark_changed_urls_dirty`, `from_acquired` | unaffected — `url:` only; a `pkg:` file never marks dirty and has no acquired blob |
+| `mcp.py::_passage`, `verbs/mcp.mjs::fuxPassage` | **accepted**; `file:` stripped; `url:` refused by name |
+| `mcp.py::_related`, `verbs/mcp.mjs::fuxRelated` | **refused by name** |
+| `correct.py::_resolve` | **refused by name** (Node runs no `fux correct`) |
+| `graph/__init__.py::_resolve_doc`, `verbs/graph.mjs::resolveDoc` | **refused by name** |
+| `inspect/xray.py::document` | **refused by name**; `inspect/facts.py`, `inspect/dictionary.py`, `xray.py::_folder` iterate the repository's own records — unaffected (no record carries `pkg:`) |
+| `verbs/answer.mjs::obtain` | **accepted** — `readPackage`, declined when Node cannot decode the type |
+| `enrich.py`, `health.py`, `sources.py`, `llms.py`, `lsp.py`, `ingest/run.py`, `ingest/edges.py`, `store/reader.py`, `store/pack.py`, `query/refer_answer.py`, `query/rerank.py`, `node/src/query/rerank.mjs`, `mcp.py`/`mcp.mjs` outbound edge paths | unaffected — they read ids from the repository's own records or the ingest walk, and `pkg:` is never a record id (SR-RECORD) |
 
 **Arpit, 2026-10-25 (Cowork):** *"This looks good to me."* on the design: *the
 hit's location names the docs package (what the reader opens), not the index
@@ -28,7 +43,7 @@ package.* Codelaw's side (index as its own optional package on npm **and** PyPI)
 is codelaw's W-34, recorded in W-298.
 
 **Model:** Claude Code, **Opus** — a containment boundary is being widened.
-**Ratified, not built.**
+**Ratified; built 2026-10-25** (Claude Code, Opus 5.5) — `work/IMPLEMENTATION.md`.
 
 ## Why
 

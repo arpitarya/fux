@@ -30,7 +30,8 @@ import { chunk } from "../refer/chunk.mjs";
 import { rescore } from "../refer/rescore.mjs";
 import { assemble, recordOf } from "../refer/assemble.mjs";
 import { Verdict } from "../refer/freshness.mjs";
-import { resolve, readLocal, fromAcquired, GIT } from "../refer/source.mjs";
+import { resolve, readLocal, fromAcquired, GIT, PKG } from "../refer/source.mjs";
+import { parse as parsePkg, readPackage } from "../refer/pkgsrc.mjs";
 import { passageBoost } from "../query/rerank.mjs";
 import { alreadyTextGlobs, isAlreadyText } from "../decode/registry.mjs";
 import { declareFloorOff, decline } from "./find.mjs";
@@ -46,6 +47,21 @@ export const ANSWER_TOP = fixed("answer", "candidates");
 function obtain(root, record, textGlobs) {
   const indexedSha = record.sha || "";
   const [kind, target] = resolve(record.id);
+  if (kind === PKG) {
+    // W-301 — a `pkg:` location (W-300's merged hits carry one): read inside
+    // the installed docs package, locally, like `file:`, and declined by the
+    // same no-decoder rule on the path inside the package.
+    try {
+      const [, , inner] = parsePkg(target);
+      if (!isAlreadyText(root, inner, textGlobs)) {
+        return { text: null, verdict: Verdict.unverified(indexedSha, "node has no decoder for this type"), lineNumbers: true };
+      }
+      const [raw, sha] = readPackage(root, target);
+      return { text: raw.toString("utf8"), verdict: Verdict.verify(indexedSha, sha), lineNumbers: true, frontmatter: true };
+    } catch (err) {
+      return { text: null, verdict: Verdict.unverified(indexedSha, String(err.message)), lineNumbers: true };
+    }
+  }
   if (kind === GIT) {
     // 🔴 **A document Node cannot DECODE is declined, not guessed at.** Python
     // runs the bytes back through the decoder plane before chunking, so a

@@ -8,10 +8,10 @@ amended: 2026-10-13
 status: accepted
 date: 2026-09-14
 feature: the index X-ray
-owns: [src/fux/inspect@930176d4471c, .fux/config/inspect.toml@a2b927adc116, src/fux/inspect_config.py@5ae9b2f8170a]
+owns: [src/fux/inspect@d595cf8fb76c, .fux/config/inspect.toml@a2b927adc116, src/fux/inspect_config.py@5ae9b2f8170a]
 laws: [L3, L4, L5, L6, L9]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 3cf2ca29b1d73a1be2d71c71119f81e0ec845b6d0f7d40dc1599b10b86759c7d
+content_sha: 133feca04488faba924f6f9527e2c9c3301670ba0414323daf2419cffe815659
 ratifies: W-169
 ---
 
@@ -478,6 +478,8 @@ evidence (`work/regression/2026-09-14-inspect-floors/`) are unchanged.
 **No decision here moved** (W-254, 2026-10-04): `inspect/facts.py` and `xray.py` pass `frontmatter=` to the chunker so the passage counts they report match `answer`'s.
 
 **No decision here moved** (2026-10-04, found by W-249's capture): the families lens's misfit `missing` list now breaks a tied sort key by the heading, so `fux inspect --json` no longer moves with `PYTHONHASHSEED` (L4's no-set-iteration-order clause); `tests/test_inspect_families.py::test_a_misfits_missing_list_does_not_move_with_the_hash_seed`.
+
+**No decision here moved** (W-301, 2026-10-25): the document X-ray refuses a `pkg:` location by name; the lenses iterate the repository's own records, none of which carries one ([SR-PKG-INDEX](0166_pkg-index.md) decision 11).
 
 ### Consequences
 

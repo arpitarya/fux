@@ -1,5 +1,5 @@
 /** Where a document's bytes come from — **the local checkout, and nothing
- *  else.** Twin of the `GIT` half of `src/fux/acquire/source.py`.
+ *  else.** Twin of the `GIT` and `PKG` halves of `src/fux/acquire/source.py`.
  *
  * 🔴 **Node never fetches, and this module is where that is enforced.** It
  * imports no transport and has no fetcher seam to inject one through. A `url:`
@@ -26,18 +26,41 @@
  *
  * Owned, with its Python twin, by [SR-URL-FRESHNESS](../../../records/0147_url-freshness.md).
  */
-import { readFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, existsSync, realpathSync } from "node:fs";
+import { isAbsolute, join, relative, resolve as resolvePath, sep } from "node:path";
 import { contentSha } from "../store/format.mjs";
 import { fixed } from "../config/constants.mjs";
 
 export const GIT = "git";
 export const URL = "url";
+/** W-301: a `pkg:` location — read inside the installed docs package, locally,
+ *  like `file:`. The reader is `pkgsrc.mjs::readPackage` (it imports `contain`
+ *  from here, so this module does not import it back: the bundle refuses a
+ *  cycle). A location the read plane composes, never a record id
+ *  (SR-PKG-INDEX d11). */
+export const PKG = "pkg";
 
 export function resolve(docId) {
   if (docId.startsWith("file:")) return [GIT, docId.slice("file:".length)];
   if (docId.startsWith("url:")) return [URL, docId.slice("url:".length)];
+  if (docId.startsWith(fixed("pkg_location", "scheme"))) return [PKG, docId];
   return [GIT, docId];
+}
+
+function realOrSelf(path) {
+  try { return realpathSync(path); } catch { return path; }
+}
+
+/** THE containment function — twin of `source.py::contain`: `base/rel` with
+ *  `..` collapsed and links resolved, or `null` when it lands outside `base`.
+ *  🔴 `relative`, not `startsWith(base + "/")` — the separator is `\` on
+ *  Windows (the defect `fux_passage` once had). */
+export function contain(base, rel) {
+  const anchor = realOrSelf(resolvePath(base));
+  const target = realOrSelf(resolvePath(anchor, rel));
+  const inside = relative(anchor, target);
+  if (inside !== "" && (isAbsolute(inside) || inside.split(sep)[0] === "..")) return null;
+  return target;
 }
 
 /** Read a document from the working tree. **Reading your own checkout is not

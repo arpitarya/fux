@@ -175,7 +175,7 @@ export function segmentDocs(directory) {
 }
 
 /** The installed npm package's directory, resolved from the repository root. */
-function packageDir(root, npm) {
+export function packageDir(root, npm) {
   const req = createRequire(join(root, fixed("plugins.index", "npm_manifest")));
   for (const base of req.resolve.paths(npm) ?? []) {
     const candidate = join(base, ...npm.split("/"));
@@ -184,7 +184,7 @@ function packageDir(root, npm) {
   return null;
 }
 
-function installedVersion(root, npm) {
+export function installedVersion(root, npm) {
   const dir = packageDir(root, npm);
   if (dir === null) return null;
   try {

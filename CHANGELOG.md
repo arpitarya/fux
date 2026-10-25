@@ -8,6 +8,8 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+**`pkg:` locations (W-301).** A document from a pinned index package is addressed in the docs package it indexes — `pkg:<docs package>@<version>#<path>` — and `fux_passage` reads it inside the installed package, in place, after `..` collapses and only within that package. A docs package installed at another version than the index's manifest names stops with both versions and the install line. MCP `fux_search` results now carry `location` (what to pass `fux_passage`) and `package` (the index package, `null` for the repository); `fux_passage` also accepts a `file:` id and refuses a `url:` one by name. `fux correct`, `fux explain`/`graph`/`path`, `fux inspect` and `fux_related` refuse a `pkg:` location by name.
+
 **Front-door docs, second pass.** No engine change. The README is repositioned as a search engine for the documents a team writes, with the index in git: the comparison is `grep`/`rg` vs fux (the vector-DB column is gone — a different job), a *Who searches it* table, a section on packages that ship their own index (ruled 2026-10-25, in build), and 5.0.0 stated as released. New: [`docs/how-fux-is-used.md`](docs/how-fux-is-used.md), five usage stories.
 
 ## [5.0.0] - 2026-10-25

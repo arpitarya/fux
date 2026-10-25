@@ -195,8 +195,13 @@ def _root() -> Path:
 
 def _resolve(root: Path, given: str) -> tuple[str, dict]:
     """`(doc id, record)` for a `loc` or an id. Refuses anything else by name."""
+    from .acquire import pkgsrc
     from .store import read_index
 
+    # W-301: a `pkg:` location names a pinned package's file, which this
+    # repository does not own and `fux correct` never writes -- refused BY NAME,
+    # never looked up as `file:pkg:…`.
+    pkgsrc.refuse(given, "fux correct")
     records = read_index(root)
     doc_id = given if given.startswith(("file:", "url:")) else f"file:{given}"
     record = records.get(doc_id)

@@ -28,6 +28,16 @@ Rules:
 
 ---
 
+## 2026-10-25 — **W-301: `pkg:` locations — a package's passage is read inside the installed package**
+
+| | |
+|---|---|
+| **shipped** | `src/fux/acquire/pkgsrc.py` + Node twin `node/src/refer/pkgsrc.mjs`: the manifest's `content` read off the verified segment; `hit_fields` → `location = pkg:<docs>@<content.version>#<loc>` and `package` (the index pin's name), `file:`/`url:` id and `null` for a repository hit; the reader — docs package by module resolution from the repo root (`importlib` / `createRequire(<repo>/package.json)`), installed version ≠ `content.version` refused naming both and the install line, fragment contained after `..` collapses, read in place, `content_sha`. `acquire/source.py`: a third strategy `PKG`, `LOCAL = (GIT, PKG)` (the refer plane's `!= GIT` branches now ask *is it local?*), and `contain`, the one containment function `fux_passage` now uses too. MCP: `fux_search` hits carry `location` + `package`; `fux_passage` reads a `pkg:` location, strips `file:`, refuses `url:` by name; `fux_related`, `fux correct`, the graph verbs and `fux inspect`'s X-ray refuse `pkg:` by name. Node: `source.mjs` (PKG, `contain`), `verbs/mcp.mjs`, `verbs/graph.mjs`, `verbs/answer.mjs`. `[pkg_location]` and `[pkg_location_refusals]` in `constants.toml`. |
+| **evidence** | [SR-PKG-INDEX](../records/0166_pkg-index.md) d11 (mechanism), [SR-MCP](../records/0136_mcp.md) d7 widened + d7a, [SR-REFER](../records/0127_refer-plane.md) d29, [SR-RECORD](../records/0109_index-record.md) (`pkg:` is not a record id). `tests/test_pkg_index.py` — 13 new tests over the fixture's docs package `acme-docs` (read in place with the record's sha, four traversals refused after collapse, drift 1.0.1-vs-1.0.0, missing/unpinned/malformed, refer `PKG` strategy, four verbs refusing by name, Python≡Node passage bytes/sha/refusals). |
+| **outcome** | Built; the merged ranking that produces segment hits is W-300's — it calls `pkgsrc.hit_fields(id, loc, seg)` where hits render and passes `pkgsrc.location(seg, loc)` to the refer plane. ⚠ **Deviation flagged for Arpit**: the fresh sha is `content_sha` (the ledger's blake2b, what the segment record carries), not `git hash-object` as the item worded it. |
+
+---
+
 ## 2026-10-25 — **W-293: the codelaw ports' first CI run — proven on a runner**
 
 | | |

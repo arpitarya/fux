@@ -18,7 +18,7 @@
  * unguarded once this file ships to npm on its own.
  */
 import { readFileSync, statSync } from "node:fs";
-import { basename, dirname, isAbsolute, join, relative, resolve as resolvePath, sep } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createInterface } from "node:readline";
 import { runQuery } from "../query/run.mjs";
@@ -33,6 +33,8 @@ import { FuxError } from "../errors.mjs";
 import { loadTune } from "../config/tune.mjs";
 import { chunk, cellsOf } from "../refer/chunk.mjs";
 import { fixed } from "../config/constants.mjs";
+import { contain } from "../refer/source.mjs";
+import { hitFields, isPkg, read as readPkg, refuse as refusePkg } from "../refer/pkgsrc.mjs";
 
 const JSON_INDENT = fixed("json", "indent");
 
@@ -234,6 +236,10 @@ function fuxSearch(root, args, top, maxHeadings, held = null) {
       // present, `[]` when nothing matches, because an absent key would be
       // indistinguishable from an older server.
       headings: headingsFor(record, query, maxHeadings),
+      // W-301 (SR-MCP d7): `location` is what fux_passage reads, `package` the
+      // index package a hit came from (`null` for the repository). Every hit of
+      // this ranking is the repository's; W-300's merged hits pass a segment.
+      ...hitFields(r.id, r.loc, null),
     };
   });
   return {
@@ -283,25 +289,32 @@ function rowAt(root, text, start, end) {
 
 function fuxPassage(root, args) {
   const rel = args.path ?? "";
-  // Refuse to escape the repo. `resolve` collapses `..` BEFORE the check, so a
-  // traversal cannot slip through by being spelled differently.
-  const target = resolvePath(root, rel);
-  const base = resolvePath(root);
-  // 🔴 `relative`, not `startsWith(base + "/")` — the separator is `\` on
-  // Windows, so the prefix test matched NOTHING there and `fux_passage`
-  // refused every path in the repository, including the one it had just cited.
-  // Python's twin used `Path.is_relative_to` and was always correct; the
-  // differential arm caught the divergence on its first Windows run.
-  const inside = relative(base, target);
-  if (inside !== "" && (isAbsolute(inside) || inside.split(sep)[0] === "..")) {
-    throw new FuxError(`'${rel}' resolves outside the repository`);
-  }
   let raw;
-  try {
-    if (!statSync(target).isFile()) throw new Error("not a file");
-    raw = readFileSync(target);
-  } catch {
-    throw new FuxError(`'${rel}' is not a file in this repository`);
+  let sha;
+  if (isPkg(rel)) {
+    // W-301 (SR-MCP d7 widened): a pinned package's file, resolved from the
+    // repository root and read IN PLACE — contained in that package's root,
+    // version-checked against the manifest, never copied.
+    const got = readPkg(root, rel);
+    raw = got.content;
+    sha = got.sha;
+  } else {
+    if (rel.startsWith("url:")) {
+      throw new FuxError(`'${rel}' is a url: document - fux_passage reads files, never a fetch`);
+    }
+    const local = rel.startsWith("file:") ? rel.slice("file:".length) : rel;
+    // Refuse to escape the repo. `contain` collapses `..` BEFORE the check, so a
+    // traversal cannot slip through by being spelled differently — and uses
+    // `relative`, never a `/`-prefix test that matched nothing on Windows.
+    const target = contain(root, local);
+    if (target === null) throw new FuxError(`'${rel}' resolves outside the repository`);
+    try {
+      if (!statSync(target).isFile()) throw new Error("not a file");
+      raw = readFileSync(target);
+    } catch {
+      throw new FuxError(`'${rel}' is not a file in this repository`);
+    }
+    sha = contentSha(raw);
   }
   const text = raw.toString("utf8");
   const lines = splitLines(text);
@@ -311,7 +324,7 @@ function fuxPassage(root, args) {
     path: rel,
     line_start: start,
     line_end: end,
-    sha: contentSha(raw),
+    sha,
     text: lines.slice(start - 1, end).join("\n"),
     ...rowAt(root, text, start, end),
   };
@@ -332,6 +345,8 @@ function fuxPassage(root, args) {
  * build. */
 function fuxRelated(root, args, held = null) {
   const rel = args.path ?? "";
+  // W-301: refused BY NAME, never read as `file:pkg:…` (twin of `_related`).
+  refusePkg(rel, "fux_related");
   const docId = rel.startsWith("file:") || rel.startsWith("url:") ? rel : `file:${rel}`;
   const records = recordsById(root, held);
   const record = records.get(docId);
