@@ -20,5 +20,3 @@ Rule: [SR-WORK-NOW](../records/0069_WORK-now.md).
 
 | kind | where | host | session | created |
 |---|---|---|---|---|
-| worktree | /Users/arpitarya/my_programs/fux/.claude/worktrees/agent-a42da0f618cb59aa3 | Arpits-MacBook.local | 4aad6236 | 2026-10-25 16:00 |
-| worktree | /Users/arpitarya/my_programs/fux/.claude/worktrees/agent-a4c6bc315d09e4640 | Arpits-MacBook.local | 4aad6236 | 2026-10-25 16:00 |
