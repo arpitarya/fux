@@ -35,6 +35,7 @@ VERBS: dict[str, tuple[tuple[str, str, str], ...]] = {
     "inspect": (('engine', 'fux.inspect', 'cmd_inspect'),),
     "register": (('writer', 'fux.ingest.register', 'cmd_register'),),
     "ingest": (('writer', 'fux.ingest', 'cmd_ingest'),),
+    "pack": (('writer', 'fux.ingest.pack', 'cmd_pack'),),
     "ask": (('reader', 'fux.query', 'cmd_ask'),),
     "lexical": (('reader', 'fux.query', 'cmd_lexical'),),
     "find": (('reader', 'fux.query.find', 'cmd_find'),),
@@ -103,19 +104,6 @@ def _cmd_tune(args) -> int:
     from .tune import specimen
 
     print(specimen())
-    return 0
-
-
-def _cmd_pack(args) -> int:
-    from .config import find_root
-    from .store import pack
-
-    content = pack.parse_content(args.content)  # before anything reads the repository
-    root = find_root()
-    if root is None:
-        raise FuxError("not inside a fux repository -- there is no index to pack")
-    manifest = pack.write_segment(root, Path(args.outdir), content, npm=args.npm, pypi=args.pypi)
-    print(f"packed {manifest['docs']} documents into {args.outdir} ({manifest['digest']})")
     return 0
 
 
@@ -392,7 +380,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_pack.add_argument("--content", default=None, metavar="NAME@VERSION", help="the package that ships this segment")
     p_pack.add_argument("--npm", default=None, metavar="NAME", help="the npm name, if it differs from --content's")
     p_pack.add_argument("--pypi", default=None, metavar="NAME", help="the PyPI name, if it differs from --content's")
-    p_pack.set_defaults(func=_cmd_pack)
+    p_pack.set_defaults(func=_dispatch)
 
     # `register` prints the committed register's rows FROM THE INDEX -- the
     # records, the decoder digest table and the URL list -- so a program reads

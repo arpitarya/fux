@@ -28,6 +28,16 @@ Rules:
 
 ---
 
+## 2026-10-25 — **W-299 + W-302: index packages — the pin, the runtime, and `fux pack` (main, unreleased)**
+
+| | |
+|---|---|
+| **shipped** | `9688d479`. SR-PKG-INDEX (0166) accepted. `src/fux/plugins.py` `kind = "index"` rows (parse, `segment_digest`, `check_index` in d7's order, `locate_index`, `pin_index`) + Node twin `node/src/config/plugins.mjs`; `src/fux/derive/segments.py` + `node/src/derive/segments.mjs` inflate into `.fux/runtime/pkg/<name>@<version>/` (`build` = `build_own` + inflation); `fux setup --index/--index-npm/--pin`; doctor rows `index packages`, `merged corpus`; `src/fux/store/pack.py` + `fux pack`; `fux-index.schema.json`; `docs/publish-an-index-package.md`. Records amended: SR-PLUGINS, SR-DOCTOR, SR-WORK-SCALE d16, SR-DOTFUX, SR-T1-ACCELERATOR, SR-CLI. |
+| **evidence** | `tests/test_pkg_index.py` (incl. the Python≡Node byte-identical inflation differential), `tests_e2e/test_pack_verb.py`, `node/test/plugins-index.test.mjs`; unit 7775 passed, Node 259/259. |
+| **outcome** | W-299 closed. W-302 steps 1–4 done; step 5 (the e2e round trip through search and passage) waits on W-300 and W-301. ⚠ SR-PKG-INDEX d4's deviation (the manifest is outside the digest — a file cannot hold its own hash) is flagged there for Arpit's ratification. Built by session f7e74b47's sub-agents, finished by 4aad6236: a Node import cycle, a `plugins.problems()` loop that had dropped the dependency check, and L12 literals were fixed before commit. |
+
+---
+
 ## 2026-10-25 — **W-293: the codelaw ports' first CI run — proven on a runner**
 
 | | |

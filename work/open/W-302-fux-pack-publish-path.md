@@ -16,10 +16,10 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | `fux pack <outdir> --content <npm-or-pypi name>@<version>` copies `.fux/index/*.jsonl` and `.fux/config/identifiers.toml` into `<outdir>/`, writes `fux-index.json` | the shippable segment, one command | ⏳ |
-| 2 | Manifest fields: `fux_version`, `index_header` (copied), `content {npm, pypi, version}`, `docs`, `digest` — the same segment-files digest W-299 verifies | anyone reproduces the digest from the same docs (L4) | ⏳ |
-| 3 | Refuses: a dirty index (`.fux/runtime/dirty` set / uncommitted shards), a foreign header, `url:` records present (a package segment may hold `file:` records only), `--content` missing | a half-ingested or network-born segment never ships | ⏳ |
-| 4 | Author's recipe in `docs/` — `.fux/sources.yaml` → `fux ingest` → `fux pack` → put `<outdir>` in the index package's wheel **and** npm tarball — with a CI example | any package author can do it | ⏳ |
+| 1 | `fux pack <outdir> --content <npm-or-pypi name>@<version>` copies `.fux/index/*.jsonl` and `.fux/config/identifiers.toml` into `<outdir>/`, writes `fux-index.json` | the shippable segment, one command | ✅ |
+| 2 | Manifest fields: `fux_version`, `index_header` (copied), `content {npm, pypi, version}`, `docs`, `digest` — the same segment-files digest W-299 verifies | anyone reproduces the digest from the same docs (L4) | ✅ |
+| 3 | Refuses: a dirty index (`.fux/runtime/dirty` set / uncommitted shards), a foreign header, `url:` records present (a package segment may hold `file:` records only), `--content` missing | a half-ingested or network-born segment never ships | ✅ |
+| 4 | Author's recipe in `docs/` — `.fux/sources.yaml` → `fux ingest` → `fux pack` → put `<outdir>` in the index package's wheel **and** npm tarball — with a CI example | any package author can do it | ✅ |
 | 5 | `tests_e2e`: build a fixture docs package, pack it, pin it (W-299), search it (W-300), read a passage (W-301) | the round trip, as a user | ⏳ |
 
 **Arpit, 2026-10-25 (Cowork), Fork B:** *"New read-only `fux pack <outdir>` verb"*
