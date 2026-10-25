@@ -28,6 +28,16 @@ Rules:
 
 ---
 
+## 2026-10-25 — **W-298: packages ship their own fux index — research closed, four build items filed**
+
+| | |
+|---|---|
+| **shipped** | No code. Step 1 spike run and filed: 20 sealed plain-words intents over `@codelaw/rules-js@0.1.0` (140 rules) in a scratch consumer repo, fux `main` @ `658bc91` — **19/20 in the top 5 of `fux ask`, bar 16; 13/20 at rank 1; `fux find` identical**. Steps 2–6 designed in chat and ruled by Arpit: pin in `.fux/config/plugins.toml` `kind = "index"`, segment-only digest, per-identifiers-digest query hashing, Σ df/n/total_flen + one `rank()`, `pkg:<docs-pkg>@<ver>#<path>` locations read in place, `fux pack`, `scope` = repo\|packages\|all, lockstep wire compat, 10k ceiling counts the merged corpus. |
+| **evidence** | [`2026-10-25-w298-step1-codelaw-rules`](regression/2026-10-25-w298-step1-codelaw-rules/report.md) (+ VERDICT, ANALYSIS, sealed intents); the rulings quoted in [`archive/open/W-298-packages-ship-their-index.md`](../archive/open/W-298-packages-ship-their-index.md). |
+| **outcome** | Filed **W-299** (pin + runtime inflation + SR-PKG-INDEX, 🟢 Opus), **W-300** (merged query + `scope`, 🟡 on W-299), **W-301** (`pkg:` passage in place, 🟡 on W-299), **W-302** (`fux pack`, 🟢 Sonnet) — all ratified, not built. No record changed yet: SR-PKG-INDEX is W-299 step 0. Open: the item's "438 rules" vs the published pack's 140. |
+
+---
+
 ## 2026-10-25 — **W-297: leftover agent worktrees cleaned**
 
 | | |

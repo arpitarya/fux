@@ -3130,6 +3130,7 @@ the reason is that the measuring environments are gone.**
 
 ## 2 · In flight, and the immediate next step
 
+*Updated **2026-10-25** (Cowork, Opus 5.5) — maintainer line: this session. **W-298 filed** (research): packages ship their own fux index and one query searches many; codelaw's rule packs are the first consumer. Its step 1 is a 20-intent spike, bar 16 of 20, set before the run.*
 *Updated **2026-10-20** (Cowork, Opus 5.5) — maintainer line: this session. **W-290: the front-door docs landed** (README on 4.1.0, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT); 🔴 Arpit places the `.github/` templates. ⚠ 4.1.1 is cut, not released — say 4.1.0 until the release.*
 *Updated **2026-10-20** (Claude Code, Opus 5.5) — maintainer line: this session. **W-288 and W-289 are built on `main`, unreleased**; W-289 waits on Arpit for 15 PyPI trusted publishers and two rulings (its §Decisions for Arpit). ⚠ A worktree's commits fire the post-commit hook with the MAIN checkout's venv, which writes a stale-format `.fux/index/` into the worktree — never stage it there.*
 

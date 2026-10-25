@@ -1,0 +1,21 @@
+id	intent (plain words, as a user would type it)	expected rule
+i01	my useEffect is missing a variable in its dependency array	react/exhaustive-deps
+i02	warning about key when rendering a list with map	react/jsx-key
+i03	opening a link in a new tab is a security risk	react/jsx-no-target-blank
+i04	can I call a hook inside an if statement	react/rules-of-hooks
+i05	naming convention for a custom hook	react/hook-prefix
+i06	how should I name the props interface of a component	react/props-type-name
+i07	switch case keeps running into the next one without a break	js/no-fallthrough
+i08	put all the module exports at the bottom of the file	js/exports-at-end
+i09	should I use default export or named exports	js/no-default-export
+i10	order of import statements, node builtins first then packages then local files	js/import-groups
+i11	left a debugger line in the code	js/no-debugger
+i12	checking if something is NaN with === does not work	js/use-isnan
+i13	a function is exported but no file imports it anywhere	graph/no-unused-exports
+i14	async function passed to the Promise constructor	js/no-async-promise-executor
+i15	using the any type in typescript	ts/no-explicit-any
+i16	ts-ignore comment to silence the compiler error	ts/ban-ts-comment
+i17	importing something that is only used as a type	ts/type-only-imports
+i18	exiting the process from inside library code	node/no-process-exit
+i19	package imported but not listed in package.json dependencies	node/no-extraneous-import
+i20	boolean property on a web component that starts out switched on	stencil/ban-default-true

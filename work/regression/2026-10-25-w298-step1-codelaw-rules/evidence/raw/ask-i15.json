@@ -1,0 +1,155 @@
+{
+  "results": [
+    {
+      "id": "file:node_modules/@codelaw/rules-js/rules/ts/no-empty-object-type.md",
+      "title": "No empty interfaces or {} types",
+      "loc": "node_modules/@codelaw/rules-js/rules/ts/no-empty-object-type.md",
+      "score": 4.473206208898969,
+      "archived": false,
+      "tie": false,
+      "mtime": null,
+      "pinned": false,
+      "boosted": false,
+      "route": null,
+      "headings": [
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "file:node_modules/@codelaw/rules-js/rules/react/rules-of-hooks.md",
+      "title": "Hooks are called at the top level of components and hooks",
+      "loc": "node_modules/@codelaw/rules-js/rules/react/rules-of-hooks.md",
+      "score": 4.2025233112803715,
+      "archived": false,
+      "tie": false,
+      "mtime": null,
+      "pinned": false,
+      "boosted": false,
+      "route": null,
+      "headings": [
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "file:node_modules/@codelaw/rules-js/rules/js/no-case-declarations.md",
+      "title": "No let, const, function or class directly in a case",
+      "loc": "node_modules/@codelaw/rules-js/rules/js/no-case-declarations.md",
+      "score": 4.160360561270874,
+      "archived": false,
+      "tie": false,
+      "mtime": null,
+      "pinned": false,
+      "boosted": false,
+      "route": null,
+      "headings": [
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "file:node_modules/@codelaw/rules-js/rules/ts/no-explicit-any.md",
+      "title": "No explicit any",
+      "loc": "node_modules/@codelaw/rules-js/rules/ts/no-explicit-any.md",
+      "score": 4.151670447837862,
+      "archived": false,
+      "tie": false,
+      "mtime": null,
+      "pinned": false,
+      "boosted": false,
+      "route": null,
+      "headings": [
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "file:node_modules/@codelaw/rules-js/rules/react/hook-prefix.md",
+      "title": "Functions that call hooks are named use\u2026",
+      "loc": "node_modules/@codelaw/rules-js/rules/react/hook-prefix.md",
+      "score": 3.843327188569147,
+      "archived": false,
+      "tie": false,
+      "mtime": null,
+      "pinned": false,
+      "boosted": false,
+      "route": null,
+      "headings": [
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "file:node_modules/@codelaw/rules-js/rules/ts/no-unsafe-function-type.md",
+      "title": "No Function type",
+      "loc": "node_modules/@codelaw/rules-js/rules/ts/no-unsafe-function-type.md",
+      "score": 3.7226488312195913,
+      "archived": false,
+      "tie": false,
+      "mtime": null,
+      "pinned": false,
+      "boosted": false,
+      "route": null,
+      "headings": [
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "file:node_modules/@codelaw/rules-js/rules/js/use-isnan.md",
+      "title": "Test for NaN with Number.isNaN",
+      "loc": "node_modules/@codelaw/rules-js/rules/js/use-isnan.md",
+      "score": 3.567624221341338,
+      "archived": false,
+      "tie": false,
+      "mtime": null,
+      "pinned": false,
+      "boosted": false,
+      "route": null,
+      "headings": [
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "file:node_modules/@codelaw/rules-js/rules/js/no-unused-labels.md",
+      "title": "Every label is used",
+      "loc": "node_modules/@codelaw/rules-js/rules/js/no-unused-labels.md",
+      "score": 3.4447508488089094,
+      "archived": false,
+      "tie": false,
+      "mtime": null,
+      "pinned": false,
+      "boosted": false,
+      "route": null,
+      "headings": [
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "file:node_modules/@codelaw/rules-js/rules/js/no-compare-neg-zero.md",
+      "title": "No comparisons against -0",
+      "loc": "node_modules/@codelaw/rules-js/rules/js/no-compare-neg-zero.md",
+      "score": 3.429596033610191,
+      "archived": false,
+      "tie": false,
+      "mtime": null,
+      "pinned": false,
+      "boosted": false,
+      "route": null,
+      "headings": [
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "file:node_modules/@codelaw/rules-js/rules/ts/no-array-constructor.md",
+      "title": "No Array constructor with several arguments",
+      "loc": "node_modules/@codelaw/rules-js/rules/ts/no-array-constructor.md",
+      "score": 3.4175034201557746,
+      "archived": false,
+      "tie": false,
+      "mtime": null,
+      "pinned": false,
+      "boosted": false,
+      "route": null,
+      "headings": [
+        "TypeScript"
+      ]
+    }
+  ],
+  "related": []
+}

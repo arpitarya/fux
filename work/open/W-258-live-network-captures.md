@@ -16,11 +16,15 @@ ball: arpit
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 0 | Arpit says when to run | the go-ahead | ✅ ruled 2026-10-25 — §1 and §2 go, when he has time |
+| 0 | Arpit says when to run | the go-ahead | 🔴 on hold by his word (2026-10-25) — scope ruled: §1 + §2, §3 parked |
 | 1 | Ask fux questions, take one source offline, ask again (about 20 min, no logins) | proof fux still answers honestly when a source disappears | ⏳ |
 | 2 | Point fux at a real website that rate-limits us | proof a "slow down" page is never indexed as a document | ⏳ |
 | 3 | Fetch 12+ signed-in pages in parallel Chrome tabs (recommended: park this one) | a safe parallel setting for consumers | parked 2026-10-25 → [B-274](../BACKLOG.md) |
 | 4 | An agent writes the pass bars down first, then reports the results | the records restated on real numbers | ⏳ |
+
+**Arpit, 2026-10-25 (later, Cowork):** *"W258, let's keep it blocked for some more
+time."* — the scope ruling below stands (§1 + §2; §3 parked); **when** to run is
+held again until he says so.
 
 **Arpit, 2026-10-25 (Cowork docket):** *"A · §1+§2 go, park §3 (Recommended)"* —
 the hold is lifted for §1 and §2, run when he has time (§1 first: ≈ 20 min, no

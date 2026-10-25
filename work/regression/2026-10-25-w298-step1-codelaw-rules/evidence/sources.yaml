@@ -1,0 +1,34 @@
+# .fux/sources.yaml -- what fux indexes. INCLUDES ONLY: anything you do NOT
+# want indexed goes in .fux/.fuxignore, the one place exclusion is spelled.
+# Nothing here subtracts, and a `!` entry is refused.
+#
+# Two sections, both optional:
+#
+#   paths:              files or directories (walked recursively), relative to
+#     include:          the repo root. A path in ANY list is indexed; the list
+#       - docs          it sits in is its flag. `include` sets none.
+#     archived:         indexed as HISTORY -- declared here, never derived from
+#       - old/2023      a path name.
+#     enrich:           in scope for `fux enrich`.
+#       - handbook
+#
+#   urls:               one entry per URL. `url`, `fetch` and `decoder` are
+#     - url: https://wiki.corp/display/ENG/runbook        REQUIRED -- there is
+#       fetch: cdp      no default for either attribute. `fux add <URL>` writes
+#       decoder: html   the entry with every attribute stated and fetches it once.
+#       ttl: 7d
+#
+# A URL entry's other attributes: keep (true|false), ttl (0 or <n><s|m|h|d>),
+# enrich (true|false), archived (true|false), update (auto|never).
+#
+# THE FUX YAML SUBSET. Block maps and lists, plain or quoted values, `#`
+# comments (at a line's start or after a space -- so `page#frag` is text).
+# Refused, loudly, with the line: `{}` / `[]`, anchors, aliases, tags, `---`,
+# `|` / `>` blocks, tabs, duplicate keys, a path or URL twice, an empty list.
+# Every value is TEXT unless its key says otherwise: a path named `no` or
+# `1.10` is that path. The loader sorts, so order here is for humans only.
+#
+# See SR-SOURCES.
+paths:
+  include:
+    - node_modules/@codelaw/rules-js/rules

@@ -40,6 +40,32 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** make CI green (W-293's workflow merge; the filing's hooks or its claims), then create the v5.0.0 release; then yank the 4.1.1 plugin files.
 
 
+## 2026-10-25 — W-298 step 1 RUN and PASSED (19/20); W-298 closed and archived  ·  Cowork, cloud linked to the Mac (Fable 5.1)
+
+- **Asked:** *"How to execute 298 step 1. You go ahead and execute it."*
+- **Done:** cloned `main` @ `658bc91` into the cloud container (`uv sync`, fux 5.0.0 — the Mac's venv cannot run the engine from the bridge and `uv` cannot clear its lock there); `npm pack @codelaw/rules-js@0.1.0` → 140 rules under a scratch repo's `node_modules/`; `fux setup`, `sources.yaml` → the rules dir, `fux ingest` (140 docs, 0.78 s). **Sealed 20 plain-words intents + expected rules (sha256) before the first query.** `fux ask --json --top 10` and `fux find`: **19/20 in the top 5, 13/20 at rank 1, `find` ≡ `ask`**; bar 16. Filed [`2026-10-25-w298-step1-codelaw-rules`](regression/2026-10-25-w298-step1-codelaw-rules/report.md) with VERDICT, ANALYSIS, raw JSON per call, `REPRODUCE.sh`; README row + registry bump. **W-298 closed**: file moved to `archive/open/`, archive-map row, IMPLEMENTATION entry, queue row removed; **W-299 and W-302 🟡 → 🟢**. No code, no record changed except SR-WORK-REGISTRY §3. Nothing committed.
+- **Found:** the item says **438** rules; the published pack has **140** — recorded in the run, unreconciled. The one miss (`i08`) is a synonym gap (*bottom* vs *end*) on a word the whole `node/` pack repeats — `fux correct`'s shape, not a ranking defect. ⚠ SR-WORK-REGISTRY §3's `regression/` row has carried a run log in its **trigger** column since at least 2026-10-10 (three sessions prepended there); this session wrote to the log column and bumped the date, and left the trigger column as found — for Arpit or the next records sweep.
+- **Decided / left open:** `informed` — the intents' author is the engine family and read the rule titles. One segment, no consumer docs: nothing here speaks for the merged query (W-300's L13 run does).
+- **Mistakes:** first draft of the registry bump landed in the trigger column (following the row's existing drift); redone into the log column before anything was saved for good.
+- **Next:** W-299 step 0 (SR-PKG-INDEX) and W-302 in Claude Code, in parallel; W-300/W-301 after W-299.
+
+## 2026-10-25 — W-298 researched and ruled in chat; W-299 · W-300 · W-301 · W-302 filed  ·  Cowork, cloud linked to the Mac (Fable 5.1)
+
+- **Asked:** *"research W298 and propose how it is going to work just within the chat"* → *"This looks good to me. If there are any open questions, let's answer them right now and then file the work items for all."*
+- **Done:** read the item, SR-PLUGINS, SR-DOTFUX, SR-MCP d7, `store/reader.py`, `store/format.py`, `query/bm25f.py`, `query/rank.py`, `query/scan.py`; proposed the design in chat (segment-only digest; per-identifiers-digest query hashing; Σ df/n/total_flen + one `rank()`; `pkg:` names the docs package; `fux pack`). Five rulings taken by question card. Filed **W-299** (pin + runtime inflation + SR-PKG-INDEX, Opus), **W-300** (merged query + `scope`, Opus), **W-301** (`pkg:` locations + passage in place, Opus), **W-302** (`fux pack`, Sonnet) — all `fux build`, 🟡 on W-298 step 1, **ratified, not built**. W-298's table, DoD and open questions updated; queue rows added. No code, no record changed, nothing committed.
+- **Found:** term keys are unsalted `blake2b(term)` and `rank()` takes `df`/`n`/`avg_wlen` as inputs, so the merge is arithmetic — but the `identifiers` digest in the shard header means a package built under other identifier rules needs the query hashed under *its* rules; the reader already refuses a foreign `_format`/`analyzer`/`tf_fields` header, which is what makes "lockstep" free.
+- **Decided / left open:** Fork A → plugins.toml `kind = "index"`; Fork B → `fux pack`; `scope` = repo|packages|all default all; wire compat lockstep; 10k ceiling counts the merged corpus. Left: W-298 step 1 (the spike) — codelaw is not mounted in this session; the four build items wait on its bar unless Arpit lifts the gate.
+- **Mistakes:** none. Suites not run: the Cowork bridge cannot import the engine (known; see MACHINE.md).
+- **Next:** W-298 step 1 on a machine with codelaw's `node_modules` (Cowork, or Arpit); then W-299 step 0 (the SR) in Claude Code.
+
+## 2026-10-25 — W-298 filed: packages ship their own fux index  ·  Cowork, cloud linked to the Mac (Opus 5.5)
+
+- **Asked:** from a codelaw W-05 research session, by voice: *"whosoever is creating those packages, they can create the Fux index … it can search through multiple indexes"* → *"go ahead and file it as a Fux work item."*
+- **Done:** filed **W-298** (`research`, `cowork`, 🟢): pinned package sources reusing SR-PLUGINS, a multi-segment query with merged statistics in both runtimes, `pkg:` locations read in place, a publish path for authors. Step 1 is a 20-intent spike over codelaw's rule packs, bar 16 of 20 in the top 5, set before the run. No code, no record changed, nothing committed.
+- **Decided / left open:** codelaw ruled its side (each pack's index is its own optional package on npm and PyPI — codelaw's W-34). Left for Arpit at step 6: a `scope` parameter on `fux_search`, segment-format compatibility across versions, and whether a shipped segment counts toward the 10 000 ceiling.
+- **Mistakes:** none. The unit suite was not run: this Mac's `.venv` points at a Python that no longer exists, and `uv` is offline here.
+- **Next:** W-298 step 1, the spike.
+
 ## 2026-10-25 — W-289 publishers finished (14/14); inbox docket: W-292 closed, W-293 · W-289 · W-258 · W-268 ruled  ·  Cowork (Opus 5.5)
 
 - **Asked:** add the GitHub trusted publisher to fux-fetcher-http and fux-extension-table; then *"what are the blockers? Let's go one by one and ratify them."*
@@ -48,6 +74,7 @@ play: the worklog is the granular, per-exchange trail.
 - **Decided / left open:** no record changed except SR-WORK-REGISTRY's §3 rows (restamped); the L10 record already names the 2026-10-21 ruling. Not committed — another session's work is staged in the same files; files moved with `mv`, not `git mv` (the bridge cannot remove git's lock files).
 - **Mistakes:** none.
 - **Next:** W-293 (Claude Code, Sonnet) → CHANGELOG fold → Arpit publishes 4.1.1. W-268's steps to file (Cowork).
+- **Later the same session:** W-258 put back on hold by Arpit (*"keep it blocked for some more time"*) — scope ruling kept. `fux-decoder-json` checked: not on PyPI (404); its pending publisher is the route, created by the 4.1.1 CI release.
 
 ## 2026-10-25 — W-297 closed: the eight leftover worktrees removed on Arpit's ruling  ·  Claude Code (Opus 5.5)
 
