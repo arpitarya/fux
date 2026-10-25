@@ -7,7 +7,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fux-decoder-rtf"
-version = "5.0.0"
+version = "5.1.0"
 description = "Fux decoder package: Rich Text Format."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -15,7 +15,7 @@ requires-python = ">=3.12"
 license = "MIT"
 authors = [{ name = "arpit arya", email = "arpitarya.me@gmail.com" }]
 # The pins are the release's one version, held equal by scripts/check-version-parity.py.
-dependencies = ["fux-core==5.0.0"]
+dependencies = ["fux-core==5.1.0"]
 
 [project.urls]
 Homepage = "https://github.com/arpitarya/fux"

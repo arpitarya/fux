@@ -8,7 +8,7 @@ bind this — cost, determinism, network, content — are stated once each in
 `from fux import open` is the read API (SR-API); the CLI is `fux`.
 """
 
-__version__ = "5.0.0"
+__version__ = "5.1.0"
 
 __all__ = ["__version__", "open"]
 

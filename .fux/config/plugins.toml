@@ -11,60 +11,60 @@
 
 [[package]]
 name = "fux-decoder-config"
-version = "5.0.0"
+version = "5.1.0"
 digest = "sha256:0da22a2c6da2aca6ec0235583ac5f1d1e7cd7408721275466a4674dcc904a91a"
 
 [[package]]
 name = "fux-decoder-html"
-version = "5.0.0"
+version = "5.1.0"
 digest = "sha256:bb32554ca2dab8f5a229d12d406e1083e7b61c261c8357b4ae43dfedb4171fb5"
 
 [[package]]
 name = "fux-decoder-image"
-version = "5.0.0"
+version = "5.1.0"
 digest = "sha256:ce8f8d10fe1fd124f69eb8511ea6ab99e28fda4a87f8ac3d9c699857dcd2fd10"
 
 [[package]]
 name = "fux-decoder-json"
-version = "5.0.0"
+version = "5.1.0"
 digest = "sha256:63ffc10358ad75133176ac82751b87b20e059b2609d44d51c806d63c24a0f080"
 
 [[package]]
 name = "fux-decoder-mail"
-version = "5.0.0"
+version = "5.1.0"
 digest = "sha256:732713a2f6d2a60a6156de1067fff279035a995045a3835af10434095c95e220"
 
 [[package]]
 name = "fux-decoder-office"
-version = "5.0.0"
+version = "5.1.0"
 digest = "sha256:fae01554d50531ef89bf9bbf2a4ead16bb373dd3578cc689581da7be4ab58363"
 
 [[package]]
 name = "fux-decoder-pdf"
-version = "5.0.0"
+version = "5.1.0"
 digest = "sha256:97163751df2ba78266d65d03265966b9418fe3f3d8d3252989eca25e210b91cd"
 
 [[package]]
 name = "fux-decoder-sheet"
-version = "5.0.0"
+version = "5.1.0"
 digest = "sha256:c0bc6cea8f1965b9d4ea270addf92d037a7013741f9324bea6b603557e7670c2"
 
 [[package]]
 name = "fux-decoder-svg"
-version = "5.0.0"
+version = "5.1.0"
 digest = "sha256:d919c42424749acff6bd2e56a98b161ca0d1c2f230d102055ea24f71e7cd1800"
 
 [[package]]
 name = "fux-extension-table"
-version = "5.0.0"
+version = "5.1.0"
 digest = "sha256:c1f5d4c0aabb711c648270535369f1b17c7e8b79934a830094afc7671fa1f000"
 
 [[package]]
 name = "fux-fetcher-cdp"
-version = "5.0.0"
+version = "5.1.0"
 digest = "sha256:d90d6c50336da58dc463ea07426dd5e8f6b47f40c5bd2f97eddaf4dc61d04639"
 
 [[package]]
 name = "fux-fetcher-http"
-version = "5.0.0"
+version = "5.1.0"
 digest = "sha256:c3589bb7a2acbb146390c9853c6f15d146947d7016a262b67ca11717cf94e902"

@@ -16,9 +16,9 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | Pick the number. Proposed **5.1.0** — the work is additive (a new pin kind, a new verb, an optional `scope`); a repository with no pin ranks byte-identically (W-300 gates G0a–c). If anything found is breaking, stop and ask | the right semver | ⏳ |
-| 2 | Bump every version site; `scripts/check-version-parity.py` green, `--with-bundle` on a built bundle (SR-WORK-RELEASE d3–6); the plugin packages move in lockstep (SR-PLUGINS P11) | one number on every name | ⏳ |
-| 3 | Fold `CHANGELOG.md` `[Unreleased]` into the new version; flip the README's package section and `docs/how-fux-is-used.md` Story 4 from *in build* to released | users read what shipped | ⏳ |
+| 1 | Pick the number. Proposed **5.1.0** — the work is additive (a new pin kind, a new verb, an optional `scope`); a repository with no pin ranks byte-identically (W-300 gates G0a–c). If anything found is breaking, stop and ask | the right semver | ✅ |
+| 2 | Bump every version site; `scripts/check-version-parity.py` green, `--with-bundle` on a built bundle (SR-WORK-RELEASE d3–6); the plugin packages move in lockstep (SR-PLUGINS P11) | one number on every name | ✅ |
+| 3 | Fold `CHANGELOG.md` `[Unreleased]` into the new version; flip the README's package section and `docs/how-fux-is-used.md` Story 4 from *in build* to released | users read what shipped | ✅ |
 | 4 | Both suites whole, then CI green on the release sha (SR-WORK-RELEASE d11a, d13) | nothing red ships | ⏳ |
 | 5 | **Arpit** creates the GitHub release; `publish.yml` publishes PyPI and npm | it is out | 🔴 Arpit's hand |
 | 6 | Verify all twenty-one names (SR-WORK-RELEASE d15) at the version; record in `IMPLEMENTATION.md` | grounded, not believed | ⏳ |

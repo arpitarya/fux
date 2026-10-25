@@ -112,7 +112,7 @@ The same index, five ways in. **The coding agent is the primary one**; the other
 | who | how | what they get |
 |---|---|---|
 | **Your AI coding agent** *(primary)* | `fux setup` writes the skills; `fux mcp` serves the index | evidence it must cite, and a refusal when the docs are silent, so it stops inventing |
-| **Your agent, in a package you depend on** *(in build)* | the package ships its own index; you pin it | one query over your docs **and** the docs of every pinned package, read in place |
+| **Your agent, in a package you depend on** *(5.1.0)* | the package ships its own index; you pin it | one query over your docs **and** the docs of every pinned package, read in place |
 | **You, at the terminal** | `fux ask`, `fux answer`, `fux find` | ranked documents, or one answer quoted from the source with a current/stale verdict |
 | **You, in a browser or editor** | `fux serve`, `fux lsp`, the VS Code extension | a local search page that shows *why* each document ranked; search, link hovers and backlinks in the editor |
 | **CI and scripts** | `fux find --json`, `fux verify`, `fux doctor` | file paths to pipe, a receipt checked against the tree, a read-only health check |
@@ -184,15 +184,15 @@ fux llms --full  # an llms-full.txt of the corpus, to stdout
 
 ## Packages that ship their own index
 
-> **Status: designed and ruled on 2026-10-25, being built now** (W-299 · W-300 · W-301 · W-302 in [`work/OPEN-WORK.md`](work/OPEN-WORK.md)). Not in a release yet.
+> **Released in 5.1.0** ([SR-PKG-INDEX](records/0166_pkg-index.md)).
 
-A library's documentation is a corpus too, and today every consumer who wants to search it has to index it themselves. The next fux lets the **package author** do it once:
+A library's documentation is a corpus too, and today every consumer who wants to search it has to index it themselves. Since 5.1.0, the **package author** does it once:
 
 1. The author runs `fux ingest` over the package's docs and `fux pack` to produce a small index segment, and ships it inside the npm tarball or the wheel ([the recipe](docs/publish-an-index-package.md)).
 2. The consumer pins it with one row in `.fux/config/plugins.toml`, by name, version and digest.
-3. **One query searches the repo's own index and every pinned package's**, with word statistics merged so a big package cannot drown your own docs. A hit names its package, and the passage is read **in place** inside the installed package. Nothing is copied; nothing is re-ingested.
+3. **One query searches the repo's own index and every pinned package's**, ranked once on word statistics summed across all of them; `fux ask --scope repo|packages|all` (and `scope` on `fux_search`) narrows it when a large package crowds the top of the list. A hit names its package, and the passage is read **in place** inside the installed package. Nothing is copied; nothing is re-ingested.
 
-Take [sheetpane](https://github.com/arpitarya/sheetpane), two web components that view, edit and review `.xlsx` and `.csv` files inside any web page. Once its CI packs an index, an app that depends on it can ask *"does sheetpane support formulas"* and get the line from sheetpane's own docs that says it doesn't, next to the hit from the app's own ADR that says why it was chosen anyway. The first consumer is [codelaw](https://github.com/arpitarya/codelaw)'s rule packs: the spike that gated the design put the right rule in the top five for **19 of 20** plain-words questions, against a bar of 16 ([run](work/regression/2026-10-25-w298-step1-codelaw-rules/report.md)).
+Take [sheetpane](https://github.com/arpitarya/sheetpane), two web components that view, edit and review `.xlsx` and `.csv` files inside any web page. Once its CI packs an index (it does not yet), an app that depends on it can ask *"does sheetpane support formulas"* and get the line from sheetpane's own docs that says it doesn't, next to the hit from the app's own ADR that says why it was chosen anyway. The first consumer is [codelaw](https://github.com/arpitarya/codelaw)'s rule packs: the spike that gated the design put the right rule in the top five for **19 of 20** plain-words questions, against a bar of 16 ([run](work/regression/2026-10-25-w298-step1-codelaw-rules/report.md)).
 
 The 10 000-document design point counts the merged corpus, repo plus every pinned segment, and `fux doctor` reports the sum.
 
@@ -251,7 +251,7 @@ Every claim ships with a pre-registered bar and a published run, **including the
 - you want **search over what your team wrote down**, from a fresh clone and in CI, with **nothing to host and no key to manage**;
 - your knowledge is **spread across formats**: Markdown, PDFs, Office files, wiki pages;
 - you need answers that are **reproducible and auditable**, such as for regulated or review-heavy work;
-- you maintain a library and want its users, and their agents, to **search your docs without copying them** *(in build, above)*.
+- you maintain a library and want its users, and their agents, to **search your docs without copying them** *(5.1.0, above)*.
 
 **Look elsewhere when:**
 
@@ -267,7 +267,7 @@ From the live queue, [`work/OPEN-WORK.md`](work/OPEN-WORK.md):
 |---|---|---|
 | ✅ | Index-and-refer engine, Python and Node readers, MCP, LSP, VS Code extension | released |
 | ✅ | Decoders and fetchers as `fux-decoder-*` / `fux-fetcher-*` packages, declared in `.fux/config/plugins.toml` | released, 5.0.0 |
-| 🔨 | Packages ship their own index; one query over repo + pinned packages; `fux pack` | ruled 2026-10-25; being built |
+| ✅ | Packages ship their own index; one query over repo + pinned packages; `fux pack` | released, 5.1.0 |
 | 🔜 | Live URL-source checks: a vanished source, a real rate limit, parallel signed-in fetches | checklist written; waiting on a hands-on session |
 | 🧭 | Ingest of 10,000 documents in under a second | proposal filed; order to be decided |
 | 🧭 | Better abstention, ranking-parameter tuning, a stronger intent lexicon | research |
@@ -300,7 +300,7 @@ The design point is 10 000 documents, and that is a ceiling on what fux measures
 
 ## Status
 
-**`5.0.0` is the latest release** on PyPI (`pip install fux-engine`) and npm (`npm install fux-engine`). The index format is versioned, and fux tells you when to run `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
+**`5.1.0` is the latest release** on PyPI (`pip install fux-engine`) and npm (`npm install fux-engine`). The index format is versioned, and fux tells you when to run `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ⭐ **Star the repo** if fux saved you, or your agent, from one confident wrong answer. It's how other people find it. 👀 **Watch → Custom → Releases** to hear about new versions.
 

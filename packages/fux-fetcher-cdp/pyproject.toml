@@ -7,7 +7,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fux-fetcher-cdp"
-version = "5.0.0"
+version = "5.1.0"
 description = "Fux fetcher package: your signed-in Chrome, over the DevTools protocol."
 readme = "README.md"
 requires-python = ">=3.12"

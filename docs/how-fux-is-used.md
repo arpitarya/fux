@@ -18,7 +18,7 @@ fux is AI, so an index built for an agent can be read by anything. The stories
 run in the order a team meets them — a person first, then the agent — not in
 the order fux is built for.
 
-Everything here is either released in `5.0.0` or marked **in build**. Nothing
+Everything here is released in `5.1.0` unless it is marked **in build**. Nothing
 is promised that the queue does not hold.
 
 ## The one idea
@@ -133,12 +133,10 @@ test, not against how many tokens it indexed.
 
 ## Story 4 — The package that ships its own index
 
-> **In build.** Designed and ruled on 2026-10-25 as W-298; the build is
-> W-299 (the pin), W-300 (one query over many segments), W-301 (`pkg:`
-> locations read in place) and W-302 (`fux pack`) in
-> [`work/OPEN-WORK.md`](../work/OPEN-WORK.md). The author's recipe is
-> [Publish an index package](publish-an-index-package.md). Nothing below is
-> in a release yet.
+> **Released in 5.1.0** ([SR-PKG-INDEX](../records/0166_pkg-index.md)). The
+> author's recipe is [Publish an index package](publish-an-index-package.md).
+> sheetpane does not ship a segment yet, so the transcript below is the shape
+> of a real run, not a capture of one.
 
 Arpit maintains [sheetpane](https://github.com/arpitarya/sheetpane): two web
 components that view, edit and review `.xlsx` and `.csv` files inside any web
@@ -148,7 +146,7 @@ depends on sheetpane cannot search those docs with fux unless it indexes
 `node_modules/sheetpane/docs` itself, and an npm-only consumer cannot ingest at
 all, because ingest is Python.
 
-The package-index design moves that work to where it belongs:
+fux 5.1.0 moves that work to where it belongs:
 
 1. **sheetpane's CI** runs `fux ingest` over its docs and `fux pack`, which
    emits a small segment — the index shards, the identifier families it was
@@ -170,13 +168,14 @@ The package-index design moves that work to where it belongs:
    `pkg:sheetpane@<version>#docs/cells.md` — sheetpane's own line saying cells
    are plain text and formulas are not supported. `fux_passage` reads that
    passage **in place**, inside the installed package, after a path-containment
-   check. Nothing was copied and nothing was re-ingested. *(Illustrative: the
-   shape of the location and the verb are ruled; the output is not yet real.)*
+   check. Nothing was copied and nothing was re-ingested. *(Illustrative until
+   sheetpane packs a segment: the location and the verb are what 5.1.0 does.)*
 
 Word statistics are summed across the repo's index and every pinned segment and
-ranked once, so a large package cannot drown an application's own docs, and the
-same query hashes the same way in Python and Node. `scope` on the MCP tool lets
-an agent ask `repo`, `packages` or `all` (the default).
+ranked once, and the same query hashes the same way in Python and Node. A large
+package can crowd an application's own docs out of the top of the list; `scope`
+(`fux ask --scope`, and on the MCP tool) is the lever: `repo`, `packages` or
+`all` (the default).
 
 The first consumer is [codelaw](https://github.com/arpitarya/codelaw), whose
 rules are Markdown files. The spike that gated the design pointed today's fux
