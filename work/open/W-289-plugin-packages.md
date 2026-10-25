@@ -365,6 +365,8 @@ W-288.** Everything that does not touch the decoder tree:
   Step 6's PyPI setup is complete.** Left: the first CI release carrying the
   packages, which also brings `fux-decoder-json` through its pending publisher.
 
+- **Released 2026-10-25 (Claude Code):** v5.0.0 at `6aae2ae1`, after CI went green (run 40192043910, verdict key saved). Publish run 40193299331: every job green — fux-core/reader/writer, fux-engine, the fifteen plugins (`fux-decoder-json` first appears), npm `fux-engine` and `@fux-engine/reader`, the `.vsix`. Left: Arpit yanks the 14 hand-uploaded 4.1.1 plugin files (`scripts/withdraw.sh` prints the yank pages).
+
 ## Blockers
 
 ✅ The 14 wheels are uploaded and all 14 have their trusted publisher (2026-10-25).

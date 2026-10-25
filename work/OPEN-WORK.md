@@ -23,7 +23,7 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-289** — re-ruled 2026-10-25: release **5.0.0** once CI is green; then **yank the 14 hand-uploaded 4.1.1 plugin files** (they pin a fux-core 4.1.1 that never ships). [the item](open/W-289-plugin-packages.md) | 2026-10-20 | 5d |
+| 🔴 **W-289** — **5.0.0 released** 2026-10-25 (PyPI 19 names + npm 2). Left for you: **yank the 14 hand-uploaded 4.1.1 plugin files** on PyPI (they pin a fux-core 4.1.1 that never ships). [the item](open/W-289-plugin-packages.md) | 2026-10-20 | 5d |
 | ↳ **blocks:** nothing else in the queue | | |
 | 🔴 **W-258** — **on hold by his word** (2026-10-25, again): say when to run §1 (vanishing source, ~20 min) and §2 (a real 429). §3 parked as B-274. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 21d |
 | ↳ **blocks:** nothing else in the queue | | |
@@ -34,7 +34,7 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-289** · `arpit` — plugin packages; all 14 on PyPI with their publisher. Re-ruled 5.0.0 (2026-10-25): version bumped, the release waits on CI green; then yank the 4.1.1 plugin files. Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
+- 🔴 **W-289** · `arpit` — plugin packages; **5.0.0 released 2026-10-25**, all 15 plugins on PyPI through CI. Left: Arpit yanks the 14 hand-uploaded 4.1.1 plugin files. Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
 - 🟢 **W-299** · `agent` — index packages: `kind = "index"` pin, segment-only digest, resolve/refuse in both runtimes, `runtime/pkg/`; step 0 writes SR-PKG-INDEX. **Opus.** Ratified, not built. Filed by Arpit (Cowork). [detail](open/W-299-index-package-pin.md)
 - 🟡 **W-300** · `agent` — one query over repo + pinned segments: per-digest hashing, df/n summed, one `rank()`, foreign refused, `scope`; Python ≡ Node. Waits on W-299. **Opus.** Ratified, not built. Filed by Arpit (Cowork). [detail](open/W-300-merged-query-over-segments.md)
 - 🟡 **W-301** · `agent` — `pkg:<docs-pkg>@<ver>#<path>` locations; `fux_passage` reads in place after `..`-collapse + containment; drift refused. Waits on W-299. **Opus.** Ratified, not built. Filed by Arpit (Cowork). [detail](open/W-301-pkg-locations-read-in-place.md)
