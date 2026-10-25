@@ -7,10 +7,10 @@ description: "When a session ends, every worktree it made is removed automatical
 status: accepted
 date: 2026-10-24
 feature: "cleanup — worktrees, lock files, what a session leaves behind"
-owns: [.claude/hooks/worktree-cleanup.py@000000000000, .claude/hooks/release-locks.sh@000000000000]
+owns: [.claude/hooks/worktree-cleanup.py@c6310b30dbac, .claude/hooks/release-locks.sh@e88802b2a41d]
 laws: [L0]
 timestamp: 2026-10-24T13:30:00Z
-content_sha: 73eb30763d338e25b83cbc184f11700b64b80df6edf99c25d239345f040818fa
+content_sha: 6416d3643866f9711a2e326085f50fb6c19f9ea46bbb0284f2a947d917d16022
 ratifies: "Arpit, 2026-10-24 (Cowork): whenever .lock file is created, it needs to be cleaned out as well → then: whenever a work tree's cleanup happens, always make sure everything is merged into main branch and no data is lost. If any data is supposed to be lost, mark it as red, block it on me, and I'll make a call. Otherwise, automatically do the cleanup when the session ends. Create a work SR for work trees, lock files, cleanup."
 ---
 
@@ -18,8 +18,8 @@ ratifies: "Arpit, 2026-10-24 (Cowork): whenever .lock file is created, it needs 
 
 **Owns** — the components this record decides:
 
-- `.claude/hooks/release-locks.sh` · file
-- `.claude/hooks/worktree-cleanup.py` · file
+- [`.claude/hooks/release-locks.sh`](../.claude/hooks/release-locks.sh) · file
+- [`.claude/hooks/worktree-cleanup.py`](../.claude/hooks/worktree-cleanup.py) · file
 
 <!-- COMPONENTS-END -->
 

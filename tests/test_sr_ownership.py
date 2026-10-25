@@ -487,6 +487,12 @@ _UNREACHABLE_BY_THE_GATE = {
     # thing and read as authority while doing it.
     "SR-WORK-SCALE", "SR-WORK-LIFECYCLE", "SR-WORK-DOCS", "SR-WORK-SESSION",
     "SR-WORK-OKF", "SR-WORK-ARCHIVE", "SR-WORK-RELEASE", "SR-WORK-BLOCKERS",
+    # SR-LAW-14, SR-WORK-NOW and SR-WORK-CLEANUP (2026-10-24, Cowork's filing;
+    # hooks built 2026-10-25) for SR-WORK-BLOCKERS' reason: their subject is
+    # how agents work on this machine, and they own their enforcement outside
+    # `src/` — disk-budget.py, now-ledger.py, worktree-cleanup.py and
+    # release-locks.sh under `.claude/hooks/`, tested by test_agent_hooks.py.
+    "SR-LAW-14", "SR-WORK-NOW", "SR-WORK-CLEANUP",
     # SR-WORK-GOVERNANCE (2026-09-14) owns no component and never will: it is
     # the MAP of what governs what, converted from `work/governance.md`. Its
     # subject is the inventory of governing files, so no change under `src/`

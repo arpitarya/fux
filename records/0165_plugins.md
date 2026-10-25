@@ -8,10 +8,10 @@ status: accepted
 date: 2026-10-19
 amended: 2026-10-24
 feature: plugin packages — the declaration, its verification, the loader and the scan that proposes it
-owns: [src/fux/plugins.py@6af2c97d5fe2, .fux/config/plugins.toml@988b44457549, tests/test_plugins.py@ca27d984782e, tests/test_plugin_fence.py@8fc6dba932ed, tests/test_plugin_packages.py@68333db84fa1, tests/test_plugin_registry.py@036392d7b916]
+owns: [src/fux/plugins.py@6af2c97d5fe2, .fux/config/plugins.toml@1863f6b0a99f, tests/test_plugins.py@ca27d984782e, tests/test_plugin_fence.py@8fc6dba932ed, tests/test_plugin_packages.py@68333db84fa1, tests/test_plugin_registry.py@036392d7b916]
 laws: [L2, L4, L5, L12]
 timestamp: 2026-10-19T00:00:00Z
-content_sha: 797ed2c20306483733c86c14375cd917b96cc0d30777f798fc1c5ba28d9473d6
+content_sha: 16803d193fe0b572f24db3fb0c211ed8aaf68c03602bbd3b8b6ef510ce24de96
 ratifies: "Arpit, 2026-10-19 (Cowork), on W-289: 'maybe we can build out a mechanism of extensions, decoders, plugins, and fetchers as separate packages that can be plugged into Fox' -> 'I want to go with the third option' (C: declared, pinned, committed) -> 'i like the recommendation now create a list what are mandatory and what are optional. because we dont need all' -> 'fux-decoder-json and config should also be optional only use if needed' -> 'okay file a work item for this', given in reply to confirming the SR-LAW-2 wording"
 ---
 

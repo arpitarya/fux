@@ -7,10 +7,10 @@ description: "The budget section of work/MACHINE.md binds every session and ever
 status: accepted
 date: 2026-10-24
 feature: "the machine budget as a law"
-owns: [.claude/hooks/disk-budget.py@000000000000]
+owns: [.claude/hooks/disk-budget.py@ca0edf3bc5f2]
 laws: [L0, L14]
 timestamp: 2026-10-24T13:00:00Z
-content_sha: e0c77f6befb553150af616f4f692444f30c86ecac14de14c5f2e3867b19361cf
+content_sha: 72d7697ab5f20076ba47361388466fc59309ae9dee6b46ec4c2b226f8ca17e67
 ratifies: "Arpit, 2026-10-24 (Cowork): no agent in one project should consume more than 5 GB. Even sub agents shouldn't go beyond 5 GB … one main agent, there are two sub agents combined, it should not cross 5 GB. → then: So 5 GB is the limit. If it goes beyond it, ask me for my approval on every GB that it increases, and create a law that machine.md should always, machine.md budget section should always be followed."
 ---
 
@@ -18,7 +18,7 @@ ratifies: "Arpit, 2026-10-24 (Cowork): no agent in one project should consume mo
 
 **Owns** — the components this record decides:
 
-- `.claude/hooks/disk-budget.py` · file
+- [`.claude/hooks/disk-budget.py`](../.claude/hooks/disk-budget.py) · file
 
 <!-- COMPONENTS-END -->
 

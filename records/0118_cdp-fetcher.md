@@ -7,10 +7,10 @@ description: "The browser fetcher, for documents a plain GET cannot read. Drives
 status: accepted
 date: 2026-08-19
 feature: "`fux-fetcher-cdp` — the reference fetcher for documents behind a session a headless client does not have: it borrows your browser's and hands fux the bytes"
-owns: [packages/fux-fetcher-cdp@8ab467ca60e8]
+owns: [packages/fux-fetcher-cdp@a6c09c5e37e6]
 laws: [L2, L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 5831e2be8483f491ab71ab96de272bade7d29ef9f86f2016c1ba243749c62f73
+content_sha: aadc2f33ec289b1d20278cbd4b0fafbc2efaa78e380a6856551d15577ca7621b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

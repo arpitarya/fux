@@ -39,6 +39,10 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/inject-inbox.sh"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py show"
           }
         ]
       }
@@ -57,6 +61,22 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/require-progress.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py stop"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/release-locks.sh"
           }
         ]
       }
@@ -87,6 +107,15 @@
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-lock.sh"
           }
         ]
+      },
+      {
+        "matcher": "Bash|Agent|Task|EnterWorktree|Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/disk-budget.py pre"
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -96,6 +125,49 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/guard-open-work-inbox.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Agent|Task|EnterWorktree|Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/disk-budget.py post"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Agent|Task|EnterWorktree|ExitWorktree",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py sync"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py start"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py end",
+            "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/release-locks.sh"
           }
         ]
       }

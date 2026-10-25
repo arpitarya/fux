@@ -7174,7 +7174,7 @@ Source: https://raw.githubusercontent.com/arpitarya/fux/main/records/0016_LAW-14
 
 **Owns** — the components this record decides:
 
-- `.claude/hooks/disk-budget.py` · file
+- [`.claude/hooks/disk-budget.py`](../.claude/hooks/disk-budget.py) · file
 
 <!-- COMPONENTS-END -->
 

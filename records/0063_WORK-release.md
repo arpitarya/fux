@@ -8,10 +8,10 @@ status: accepted
 date: 2026-10-21
 amended: 2026-10-24
 feature: how a release reaches two registries, how the version stays equal across its sites, and what the branch wall does not do
-owns: [scripts/check-version-parity.py@b861fee901b6, scripts/law-gate.py@2ca0a5fdc452, scripts/smoke.py@616768f21f5b, scripts/withdraw.sh@a63b6269b96f, tests/test_law_gate.py@828e39aaf887, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@6ad8c5a9373f, tests/test_ci_key.py@8ca23c49b8d4, packages@1efafb7fcd27, scripts/npm-scoped.py@4214c9c3380a]
+owns: [scripts/check-version-parity.py@b861fee901b6, scripts/law-gate.py@2ca0a5fdc452, scripts/smoke.py@c7f9c01e6460, scripts/withdraw.sh@a63b6269b96f, tests/test_law_gate.py@828e39aaf887, tests/test_version_parity.py@f1f8f26280aa, scripts/ci-key.py@6ad8c5a9373f, tests/test_ci_key.py@8ca23c49b8d4, packages@06d5967a5746, scripts/npm-scoped.py@4214c9c3380a]
 laws: []
 timestamp: 2026-10-21T00:00:00Z
-content_sha: d60377875a307bca69635c56e43a8876dd2aa8aed0a9f6a5e1b13cd146aa8fd2
+content_sha: 7e79aceb64f79e256b15992e6874ef61e82fae00226c17c0c9a4d67345d0fba3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

@@ -24,6 +24,22 @@ play: the worklog is the granular, per-exchange trail.
 ```
 
 
+## 2026-10-25 — CI to green: W-293 wiring, Windows fixes, the four agent hooks built  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"Keep an eye on CI. Fix it. And keep following it until everything is green."* Then, asked how to close the four missing hooks: *"Claude Code builds them."*
+- **Done:** W-293 step 6a — wheel cache, both npm names bundled, law gate (✔ locally: 19 wheels · 1 sdist · 2 npm on 5.0.0) and smoke in ci.yml; law gate in publish.yml. Windows: the Node moved-file error names its path with `/`; the differential test decodes Node's output as UTF-8; mode and `bash -n` checks skip on Windows; the table e2e fixture is written LF. A linux-3.13 race in the off-PATH hook e2e (drain first). **Built the four hooks Cowork's L14 / SR-WORK-NOW / SR-WORK-CLEANUP filing owns** — `disk-budget.py`, `now-ledger.py`, `worktree-cleanup.py`, `release-locks.sh` — from the records' decisions (Cowork's `install-agent-hooks.py` v4 was not on this machine), registered in `.claude/settings.json` (additions only; deny rules untouched; golden state `locked`), 17 tests in `tests/test_agent_hooks.py`. CLAUDE.md law block regenerated for L14 (a generated view). Hashes stamped on the records whose code changed.
+- 🔴 **L11 — declared.** A `find ~ -maxdepth 5 -name 'install-agent-hooks*' -not -path '*/work/golden/*'` filtered only its output: the walk itself descended into `work/golden/`. Nothing from there reached the session — the output was empty, no name and no byte — but L11 closes the tree to listing while locked. No guard saw it (the root was `~`, not `work/`). Walks since then start below `src/` or prune.
+- **Found, not fixed:** a CRLF Markdown table on Windows yields no `cells` — the chunker splits on `"\n"` by design (a Node twin); changing it changes index bytes and goes through L13. `smoke.py` cannot run on this Mac: `ensurepip` SIGABRTs in any fresh venv here.
+- **Next:** read CI on the push; when FULL is green, the 5.0.0 release (W-289).
+
+## 2026-10-25 — W-289: version 5.0.0, committed and pushed; the release waits on CI  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"Upgrade the version to 5.0.0. Commit everything. Push everything and publish a new version."* Asked first, because it reversed W-289 decision 4 (4.1.1, ruled the same day); Arpit chose **5.0.0, overrule today**.
+- **Done:** 23 parity sites → 5.0.0, `uv.lock`, `.fux/config/plugins.toml` re-pinned (`fux setup --pin` — a version copy the parity script does not check), CHANGELOG `[Unreleased]` → `[5.0.0]` (`[4.1.1]` marked never released), README, **`CLAUDE.md`'s version line (a fact, SR-WORK-DOCS d8)**, `llms*.txt` regenerated, W-289 decision 4 amended. Committed together with a concurrent Cowork session's pending edits (Arpit confirmed it was finished), and pushed.
+- **Not done — the publish.** Unit suite: 42 failures in this tree, none from the bump once re-pinned: Cowork's L14 / SR-WORK-NOW / SR-WORK-CLEANUP filing claims four `.claude/hooks/*` files that do not exist, leaves `content_sha` empty and CLAUDE.md's law block without L14; W-293's tests expect the law gate and wheel cache in the workflows. Nightly CI red since 2026-10-20. `publish.yml` refuses a release without a green verdict (SR-WORK-RELEASE 11a), so no GitHub release was created. e2e suite not run.
+- **Next:** make CI green (W-293's workflow merge; the filing's hooks or its claims), then create the v5.0.0 release; then yank the 4.1.1 plugin files.
+
+
 ## 2026-10-25 — W-289 publishers finished (14/14); inbox docket: W-292 closed, W-293 · W-289 · W-258 · W-268 ruled  ·  Cowork (Opus 5.5)
 
 - **Asked:** add the GitHub trusted publisher to fux-fetcher-http and fux-extension-table; then *"what are the blockers? Let's go one by one and ratify them."*
@@ -2690,14 +2706,6 @@ instead of throwing a traceback on a missing key.
 - **Decided / open:** verdicts reached, and what's still awaiting a call.
 - **Next:** the single immediate next step.
 ```
-## 2026-10-25 — W-289: version 5.0.0, committed and pushed; the release waits on CI  ·  Claude Code (Opus 5.5)
-
-- **Asked:** *"Upgrade the version to 5.0.0. Commit everything. Push everything and publish a new version."* Asked first, because it reversed W-289 decision 4 (4.1.1, ruled the same day); Arpit chose **5.0.0, overrule today**.
-- **Done:** 23 parity sites → 5.0.0, `uv.lock`, `.fux/config/plugins.toml` re-pinned (`fux setup --pin` — a version copy the parity script does not check), CHANGELOG `[Unreleased]` → `[5.0.0]` (`[4.1.1]` marked never released), README, **`CLAUDE.md`'s version line (a fact, SR-WORK-DOCS d8)**, `llms*.txt` regenerated, W-289 decision 4 amended. Committed together with a concurrent Cowork session's pending edits (Arpit confirmed it was finished), and pushed.
-- **Not done — the publish.** Unit suite: 42 failures in this tree, none from the bump once re-pinned: Cowork's L14 / SR-WORK-NOW / SR-WORK-CLEANUP filing claims four `.claude/hooks/*` files that do not exist, leaves `content_sha` empty and CLAUDE.md's law block without L14; W-293's tests expect the law gate and wheel cache in the workflows. Nightly CI red since 2026-10-20. `publish.yml` refuses a release without a green verdict (SR-WORK-RELEASE 11a), so no GitHub release was created. e2e suite not run.
-- **Next:** make CI green (W-293's workflow merge; the filing's hooks or its claims), then create the v5.0.0 release; then yank the 4.1.1 plugin files.
-
-
 ## 2026-09-28 — W-234 built: the laws renumbered, L7 Python ≥ 3.12, new L8 Node ≥ 22  ·  Claude Code (Opus)
 
 **Asked:** implement W-234. Arpit chose to run it in place while another session

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-06
 amended: 2026-10-20
 feature: tabular documents — row granularity, the admitted-row limit, the one table emitter, and what a table citation is
-owns: [packages/fux-decoder-sheet@057c62b702be, src/fux/decode/ext/limits.py@bd723211d9b8, packages/fux-extension-table@fd33f09588b9]
+owns: [packages/fux-decoder-sheet@ee81ef9b1c5d, src/fux/decode/ext/limits.py@bd723211d9b8, packages/fux-extension-table@14d15bd73d67]
 laws: [L2, L3, L4]
 timestamp: 2026-09-06T00:00:00Z
-content_sha: a1eb2c91247d2f15d16fab7cc3235a32e8f27f1404be10feb6f06946bb05b8ea
+content_sha: bba238b2a9921436ae8abe01ac8581cd433dd946716e3087800faefd1695c73b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
