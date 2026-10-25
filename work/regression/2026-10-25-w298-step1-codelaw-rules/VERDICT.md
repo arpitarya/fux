@@ -1,3 +1,16 @@
+---
+type: Verdict
+name: W-298-STEP-1-CODELAW-RULES
+description: "W-298 step 1: free-text search over the published codelaw rules pack with today's fux — 19 of 20 plain-words intents place the expected rule in the top 5 of `fux ask`, against a bar of 16 set in the item before any run. PASS; W-299 and W-302 unblocked."
+verdict: PASS
+prediction: W-298-STEP-1-CODELAW-RULES
+pre_registration: work/open/W-298-packages-ship-their-index.md
+run: 2026-10-25-w298-step1-codelaw-rules
+item: W-298
+filed: 2026-10-25
+classification: informed
+---
+
 # VERDICT — W-298 step 1
 
 **Ruling:** **PASS.** 19 of 20 intents place the expected rule in the top 5 of `fux ask`; the pre-set bar is 16 of 20.

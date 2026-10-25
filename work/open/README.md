@@ -16,7 +16,8 @@ detail. The detail lives here, one file per `W-nn`, named
    **The row is one or two lines, always; every other word about the item lives
    in this file** (Arpit, 2026-09-11 — OPEN-WORK rule 10, gated by
    `tests/test_open_work_rows_are_short.py`). **The row opens with its ball** —
-   🔴 blocked on Arpit (directly or through another item) · 🟡 waiting · 🟢 no
+   🔴 blocked on Arpit (directly or through another item) · 🟡 waiting, with
+   its blocker right after the id (`🟡 **W-nn** waits on **W-mm**`, rule 23d) · 🟢 no
    blockers — then optional 🧨 broken or worsening and 🔺, which only Arpit adds
    (OPEN-WORK rule 6).
 2. **When an item closes its row is deleted and its file MOVES to

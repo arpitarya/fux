@@ -2658,6 +2658,61 @@ def _plugins_undeclared(root: Path) -> Check:
     )
 
 
+def _index_packages(root: Path) -> "list[Check] | None":
+    """One `index packages` row per `kind = "index"` pin (SR-PKG-INDEX d7, d9).
+
+    **An error** when a pin cannot be read, because every verb refuses then.
+    Located and hashed, never imported (L5). No row when nothing is pinned.
+    """
+    from . import plugins
+
+    try:
+        pins = plugins.indexes(root)
+    except FuxError:
+        return None  # the `plugins declared` row already says why
+    rows: list[Check] = []
+    for pin in pins.values():
+        problem = plugins.check_index(pin)
+        if problem is not None:
+            rows.append(Check("index packages", False, _ascii(problem)))
+            continue
+        docs = plugins.segment_docs(plugins.segment_root(pin))
+        rows.append(Check("index packages", True, f"{pin.name} {pin.version}: verified, {docs} document(s)"))
+    return rows or None
+
+
+def _merged_corpus(root: Path) -> "Check | None":
+    """The repository's documents plus every readable pinned segment's, against
+    the 10 000 ceiling (SR-PKG-INDEX d9, SR-WORK-SCALE). A warning above it."""
+    from . import plugins
+
+    try:
+        pins = plugins.indexes(root)
+    except FuxError:
+        return None
+    if not pins:
+        return None
+    own = plugins.segment_docs(root / Path(fixed("index", "dir")).parent)
+    parts = [f"repo {own}"]
+    total = own
+    for pin in pins.values():
+        if plugins.check_index(pin) is not None:
+            parts.append(f"{pin.name} unreadable")
+            continue
+        docs = plugins.segment_docs(plugins.segment_root(pin))
+        parts.append(f"{pin.name} {docs}")
+        total += docs
+    ceiling = fixed("scale", "ceiling")
+    detail = f"{total} document(s) merged ({', '.join(parts)}); the ceiling is {ceiling}"
+    if total > ceiling:
+        return Check(
+            "merged corpus", False,
+            detail + " - above it, nothing fux measures or promises holds (SR-WORK-SCALE)",
+            level="warn",
+        )
+    return Check("merged corpus", True, detail)
+
+
 def _ascii(text: str) -> str:
     """A doctor detail reaches a Windows console (SR-CLI veto 7)."""
     return text.replace("—", "-").encode("ascii", "replace").decode("ascii")
@@ -2686,6 +2741,8 @@ ROWS: tuple[tuple[str, str], ...] = (
     ("core", "_plugins_declared"),
     ("core", "_plugins_installed"),
     ("core", "_plugins_undeclared"),
+    ("core", "_index_packages"),
+    ("core", "_merged_corpus"),
     ("core", "_output_config_health"),
     ("reader", "_journal_size"),
     ("core", "_tune_config_health"),

@@ -16,6 +16,7 @@ import { runExplain, runGraph, runPath } from "./src/verbs/graph.mjs";
 import { runMcp } from "./src/verbs/mcp.mjs";
 import { build as buildPlane } from "./src/derive/build.mjs";
 import { withWriteLock } from "./src/maintain/lock.mjs";
+import { requireIndexPackages } from "./src/config/plugins.mjs";
 
 /** `fux build` — `ingest/__init__.py::cmd_build`: the same lock, the same line. */
 function runBuild(root) {
@@ -206,6 +207,9 @@ function main(argv) {
   // One `catch` here rather than a `try` per verb — a malformed `.fux/config/tune.toml`
   // must print the same one-line refusal whichever verb tripped over it.
   try {
+    // SR-PKG-INDEX d7: a pinned index package that is missing, other, drifted
+    // or foreign stops every verb, as `cli._require_plugins` does in Python.
+    requireIndexPackages(root);
     switch (verb) {
       case "find":
         return runFind(root, args);

@@ -1,0 +1,55 @@
+{
+  "_comment": [
+    "THE INDEX-PACKAGE MANIFEST -- `fux-index.json` at the root of a shipped",
+    "segment (SR-PKG-INDEX decision 3). `fux pack` writes it (W-302); the",
+    "`kind = \"index\"` pin reads it (W-299); `pkg:` locations read `content`",
+    "(W-301).",
+    "",
+    "THE MANIFEST IS NOT COVERED BY THE SEGMENT DIGEST, because it carries the",
+    "digest and a file cannot hold its own hash. So the reader trusts none of its",
+    "numbers: `digest` is checked against the digest computed over the shards and",
+    "`identifiers.toml`, and the header is read off the shards themselves.",
+    "(SR-PKG-INDEX decision 4 -- a deviation from W-299's step 2, flagged for",
+    "Arpit's ratification.)"
+  ],
+
+  "schema": "fux.index-package.v1",
+
+  "fields": {
+    "fux_version":  { "type": "str",  "required": "always", "doc": "the fux version that packed the segment" },
+    "index_header": { "type": "dict", "required": "always",
+                      "doc": "the shards' header line, parsed: `_format`, `analyzer`, `tf_fields`, and `identifiers` when rules exist" },
+    "content":      { "type": "dict", "required": "always",
+                      "doc": "the DOCS package the index describes -- `npm` and/or `pypi` (at least one) and `version`; see the `content` shape" },
+    "docs":         { "type": "int",  "required": "always", "doc": "the number of document records across the shards" },
+    "digest":       { "type": "str",  "required": "always",
+                      "doc": "`sha256:<hex>` over `[plugins.index] segment`, in the RECORD-line form -- what the pin holds" }
+  },
+
+  "content": {
+    "_doc": [
+      "The docs package. The index package and the docs package may differ",
+      "(codelaw: index in `@codelaw/rules-js-fux-index`, content in",
+      "`@codelaw/rules-js`), which is why the pin's own `npm`/`pypi` and these",
+      "are separate. At least one of `npm` and `pypi` is present."
+    ],
+    "fields": {
+      "npm":     { "type": "str", "required": "never" },
+      "pypi":    { "type": "str", "required": "never" },
+      "version": { "type": "str", "required": "always" }
+    },
+    "example": { "npm": "@acme/docs", "pypi": "acme-docs", "version": "1.2.0" }
+  },
+
+  "example": {
+    "fux_version": "5.0.0",
+    "index_header": {
+      "_format": "fux.index.v8",
+      "analyzer": "v3",
+      "tf_fields": ["body", "heading", "title", "path", "ctx"]
+    },
+    "content": { "npm": "@acme/docs", "pypi": "acme-docs", "version": "1.2.0" },
+    "docs": 2,
+    "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

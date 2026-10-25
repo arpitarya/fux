@@ -36,6 +36,11 @@ CLAUDE.md's two-strikes rule makes the second time the trigger for a gate.
    queue; the words `not a queue item` when it is not. A noun phrase alone --
    *"waiting on a subscriber"* -- satisfied rule 6 while hiding which of two
    opposite states the row was in.
+6b. **A 🟡 row shows its blocker right after its id** (rule 23d, Arpit
+   2026-10-25): `🟡 **W-nn** waits on **W-mm**`, or `**<project> W-mm**` for
+   another project's item, and a local blocker is an open row. The check is
+   `scripts/check-open-work-inbox.py`'s, imported -- the PostToolUse hook and
+   this suite run one implementation.
 
    ⚠ **Not checkable:** whether 🧨 is true, and whether Arpit, rather than an
    agent, added a 🔺. Both are stated in rule 6 and rest on judgment.
@@ -188,7 +193,20 @@ _DATE = re.compile(r"\b20\d\d-\d\d-\d\d\b")
 _LEAD = re.compile(r"^- (\S+)( 🧨)?( 🔺)? \*\*(W-\d+)\*\*")
 _INBOX_LEAD = re.compile(r"^\|\s*(\S+)( 🧨)?( 🔺)? \*\*(W-\d+)\b")
 _WAITS = re.compile(r"\b(blocked on|after|waiting on|waits on)\b", re.IGNORECASE)
-_WAITS_ON_ID = re.compile(r"\b(?:blocked on|after|waiting on|waits on)\s+(W-\d+)", re.IGNORECASE)
+#: `\**` so the rule-23d form, `waits on **W-299**`, is the same edge as the bare one.
+#: `**fux W-298**` -- another project's item -- is never an edge: a word sits between.
+_WAITS_ON_ID = re.compile(r"\b(?:blocked on|after|waiting on|waits on)\s+\**(W-\d+)", re.IGNORECASE)
+#: Rule 23d: every local id in the blocker tag right after the row's own id, not just the first.
+_TAG_IDS = re.compile(r"^- \S+(?: 🧨)?(?: 🔺)? \*\*W-\d+\*\* waits on ((?:\*\*[^*]+\*\*(?:, | and )?)+)")
+
+
+def blockers_of(text: str) -> set[str]:
+    """Every queue id a row waits on: rule 27's verb list, plus each local id in its rule-23d tag."""
+    ids = set(_WAITS_ON_ID.findall(text))
+    tag = _TAG_IDS.match(text)
+    if tag:
+        ids |= set(re.findall(r"\*\*(W-\d+)\*\*", tag.group(1)))
+    return ids
 
 #: Rule 23a (Arpit, 2026-09-15). A 🟡 row waiting on something that is NOT a
 #: queue item says so **in these words**, so the two states are distinguishable
@@ -353,7 +371,7 @@ def test_a_do_first_item_is_not_waiting_on_a_normal_one() -> None:
     for wid, (line, _, top, text) in items.items():
         if not top:
             continue
-        for blocker in _WAITS_ON_ID.findall(text):
+        for blocker in blockers_of(text):
             if blocker in items and not items[blocker][2]:
                 bad.append(f"L{line}: {wid} has 🔺 but waits on {blocker}, which has no 🔺.")
     assert not bad, (
@@ -386,7 +404,7 @@ def waiting_on(decision: str) -> set[str]:
     """Every open item that waits on `decision`, directly or through a chain of rows."""
     edges: dict[str, set[str]] = {}
     for wid, (_, _, _, text) in marked_items().items():
-        for blocker in _WAITS_ON_ID.findall(text):
+        for blocker in blockers_of(text):
             edges.setdefault(blocker, set()).add(wid)
     seen: set[str] = set()
     todo = [decision]
@@ -656,3 +674,45 @@ def test_rules_62_64_the_checker_rejects_what_it_should() -> None:
     assert authorship_defects({**ok, "filed_by": '"Arpit"'})
     assert authorship_defects({**ok, "filed_by": "Arpit (Cowork, Opus 5.5)"})
     assert authorship_defects({**ok, "updated": "18 Oct"})
+
+
+def _inbox_script():
+    """`scripts/check-open-work-inbox.py`, imported: the hook and the suite share one check."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "check_open_work_inbox", ROOT / "scripts" / "check-open-work-inbox.py"
+    )
+    assert spec and spec.loader, "scripts/check-open-work-inbox.py is not importable"
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_rule_23d_every_yellow_row_names_its_blocker_after_its_id() -> None:
+    """SR-WORK-OPEN-QUEUE rule 23d (Arpit, 2026-10-25): *"The yellow balls in open work should
+    always have the other work item mentioned based on which it is on hold. Always, always,
+    always."* The blocker sits right after the id, as visible as the id: `waits on **W-mm**`."""
+    bad = _inbox_script().check_yellow(QUEUE)
+    assert not bad, "rule 23d:\n  " + "\n  ".join(bad)
+
+
+def test_rule_23d_the_checker_rejects_what_it_should(tmp_path: Path) -> None:
+    """The 🟡 checker on fixed inputs, so a pattern that matches nothing cannot pass vacuously."""
+    check = _inbox_script().check_yellow
+
+    def queue(*rows: str) -> Path:
+        p = tmp_path / "OPEN-WORK.md"
+        p.write_text("# q\n\n## Open items\n\n### fux build\n\n" + "\n".join(rows) + "\n\n---\n", encoding="utf-8")
+        return p
+
+    green = "- 🟢 **W-2** · `agent` — x. [detail](open/W-2-x.md)"
+    assert check(queue(green, "- 🟡 **W-3** waits on **W-2** · `agent` — y")) == []
+    assert check(queue("- 🟡 🧨 **W-3** waits on **fux W-299** · `agent` — y")) == []
+    assert check(queue(green, "- 🟡 **W-3** waits on **W-2**, **codelaw W-34** · `agent` — y")) == []
+    assert check(queue(green, "- 🟡 **W-3** · `agent` — waits on W-2"))  # in the prose, not after the id
+    assert check(queue("- 🟡 **W-3** waits on **W-9** · `agent` — y"))  # W-9 is not an open row
+    assert check(queue("- 🟡 **W-3** waits on **W-3** · `agent` — y"))  # itself
+    assert check(queue("- 🟡 **W-3** waits on **a subscriber** · `agent` — y"))  # a noun, not a reference
+    assert check(queue("- 🟡 **W-3** waits on **fux 5.1.0** · `agent` — y")) == []  # another project's version
+    assert check(queue("- 🟡 **W-3** waits on **298** · `agent` — y"))  # neither an id nor `<project> <ref>`

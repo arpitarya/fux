@@ -1,3 +1,8 @@
+---
+type: Analysis
+run: 2026-10-25-w298-step1-codelaw-rules
+---
+
 # ANALYSIS — W-298 step 1
 
 ## The one miss — `i08`, rank 6

@@ -220,7 +220,7 @@ def _readme() -> str:
         "| group | verbs | what the group does |",
         "|---|---|---|",
         "| lifecycle | `setup` `doctor` `inspect` `identifiers` `register` `llms` | set the repo up, check the environment, X-ray the index it produced, record the ID families it holds, and list what the index holds (one line per document, for a machine; or as an llms.txt, for a language model) |",
-        "| write | `ingest` `build` | `ingest` writes the committed index - the first time and every time after, for directories and URLs alike, re-fetching the URLs known to be stale; `build` derives the local accelerator from it |",
+        "| write | `ingest` `build` `pack` | `ingest` writes the committed index - the first time and every time after, for directories and URLs alike, re-fetching the URLs known to be stale; `build` derives the local accelerator from it; `pack` copies the committed index into a directory a package author ships (read-only on `.fux/`) |",
         "| sources | `add` `remove` `enrich` `correct` | maintain what is indexed. `add`/`remove` write lines and end in an ingest; `enrich` plans and validates a model's text; `correct` writes one question a PERSON typed onto the document that answers it |",
         "| read | `ask` `find` `answer` `lexical` | the same question, differing only in how much each commits to. `lexical` is BM25F alone, frozen - the baseline `ask` is measured against |",
         "| graph | `explain` `graph` `path` | answer with relationships the documents stated, never with a ranking |",

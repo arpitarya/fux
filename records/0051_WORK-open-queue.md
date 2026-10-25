@@ -7,11 +7,11 @@ description: "The live queue's discipline has one home, and this is it. Sixty-fo
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@edc408037b7f, tests/test_open_work_is_not_stale.py@51da5a4571e6, tests/test_no_work_item_is_lost.py@9b0527556e40, scripts/check-open-work-inbox.py@0eee6f43e26c, .claude/hooks/guard-open-work-inbox.sh@1b479b74cb33]
+owns: [tests/test_open_work_rows_are_short.py@445891f35ca9, tests/test_open_work_is_not_stale.py@51da5a4571e6, tests/test_no_work_item_is_lost.py@9b0527556e40, scripts/check-open-work-inbox.py@5aaef5626f84, .claude/hooks/guard-open-work-inbox.sh@9d43fe555a98]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: d7dc897c9c7b5e9f58fc336f4ba945d5edbd5a7c9c5fd00d918ac253188815b8
+content_sha: b269e5365d4138a7508c566dc49c660d5f60f4fa14dbf9f01edc9ba0c5f12cb3
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -52,7 +52,7 @@ flowchart TD
     C --> D{which ball?}
     D -->|"🔴 blocked on Arpit"| E["a Blocked-on-Arpit row<br/>+ its ↳ blocks: sub-row"]
     D -->|"🟣 gated on a date"| F["the row names YYYY-MM-DD"]
-    D -->|"🟡 waiting on an item"| G["the row names what"]
+    D -->|"🟡 waiting on an item"| G["right after the id:<br/>W-nn waits on W-mm"]
     D -->|"🟢 no blockers"| H["an agent may pick it up"]
     E --> I[the work happens]
     F --> I
@@ -71,7 +71,7 @@ an item is opened
        which ball?
          RED    blocked on Arpit  -> a Blocked-on-Arpit row + its "blocks:" sub-row
          PURPLE gated on a date   -> the row names YYYY-MM-DD
-         YELLOW waiting on an item-> the row names what
+         YELLOW waiting on an item-> right after the id: waits on **W-mm**
          GREEN  no blockers       -> an agent may pick it up
   -> the work happens
   -> outcome in IMPLEMENTATION.md, evidence in regression/
@@ -134,7 +134,8 @@ that is the only thing the file says.
 **C · The shape of a row**
 
 13. **One or two lines per item, always.**
-14. **A row is:** ball, optional 🧨, optional 🔺, id, lane, what is open, and a
+14. **A row is:** ball, optional 🧨, optional 🔺, id, — on a 🟡 row — its
+    blocker (rule 23d), lane, what is open, and a
     link to the item's file — and, under *Open items*, who filed it (rule 64).
 15. **At most 280 characters.** Two 2 000-character lines are not a one-liner.
 16. **A row has no body** — no nested bullet, no table, no indented paragraph.
@@ -181,6 +182,23 @@ that is the only thing the file says.
     admits nothing can clear it has already done the analysis that produces the
     item, and leaving it unfiled spends that analysis every time a session
     re-reads the row.
+23d. **A 🟡 row shows its blocker right after its id, as visibly as the id**
+    (Arpit, 2026-10-25: *"The yellow balls in open work should always have the
+    other work item mentioned based on which it is on hold. Always, always,
+    always. If it is from another project, call out that project or give some
+    kind of reference, but it needs to be visible, similar to how work item and
+    its number are visible."*). The row opens
+    ``- 🟡 **W-nn** waits on **W-mm** · `lane` — …``; several blockers are
+    `waits on **W-mm**, **W-kk**`. **Another project's blocker names the
+    project:** `waits on **codelaw W-34**` — or, when that project has no item
+    for it, a reference a reader can follow: a record (`**codelaw SR-PACKAGES**`),
+    a version (`**sheetpane 0.3.0**`) or an issue/PR (`**lockmaster #12**`).
+    A blocker in this queue is an **open row in it**; one that has closed is
+    rule 28's re-ball, never a stale tag. The words in the row's prose
+    may still explain the wait; they no longer carry it.
+    **Gated on every write** by `scripts/check-open-work-inbox.py` (the
+    PostToolUse hook) and in the suite by `tests/test_open_work_rows_are_short.py`,
+    which imports the same check.
 24. 🟢 **no blockers, good to go.**
 25. **Red wins, then purple.** An item waiting on several things is 🔴 if any
     chain ends at Arpit, else 🟣 if any chain ends at a date.
@@ -392,7 +410,7 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
    to this one.
 
    <!-- LEGEND:BEGIN -->
-   **A ball on every row, always one:** 🔴 blocked on Arpit, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item · 🟢 no blockers.
+   **A ball on every row, always one:** 🔴 blocked on Arpit, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item, named right after the id — `waits on **W-mm**`, or `**<project> W-mm**` for another project's · 🟢 no blockers.
    **Optional, after the ball:** 🧨 broken or getting worse · 🔺 do first (Arpit only). Full legend: [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 20–34.
    <!-- LEGEND:END -->
 
@@ -515,6 +533,16 @@ both `↳ blocks:` checks validating a single row for two days, green throughout
     shape, `updated` ≥ `filed`, and every open-items row's `Filed by` equal to
     its file's. **Whether `updated_by` was actually set by the last change is
     judgement**, since nothing but the commit can say who made it.
+
+11. **A 🟡 row's blocker is shown, not described** (Arpit, 2026-10-25 — rule
+    23d). Rule 23a made every 🟡 row name an id, but the id sat mid-sentence
+    (*"…Python ≡ Node. Waits on W-299. **Opus.**"*), and a cross-project wait
+    named no id at all (codelaw's *"waiting on Fux item 298"*). A reader
+    scanning the balls saw *that* a row waited, not *on what*. The blocker now
+    sits beside the id it holds up, in the same bold, and another project's
+    blocker carries that project's name. The check lives in
+    `scripts/check-open-work-inbox.py` so the hook that already fires on every
+    queue write enforces it; the suite imports it rather than restating it.
 
 **No decision here moved** (W-245, 2026-10-04): `tests/test_open_work_is_not_stale.py`'s docstrings and failure messages cited rules 2, 3 and 4 by their pre-renumber handles; they now cite rules 3 and 10, 8 and 9, and 46.
 

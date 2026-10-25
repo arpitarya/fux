@@ -39,10 +39,11 @@ Source: https://raw.githubusercontent.com/arpitarya/fux/main/README.md
 
 <div align="center">
 
-## Your team's docs, as a search index your AI agent can trust.
+## A search engine for the documents your team writes. The index lives in git.
 
-**Ranked. Cited. Checked against the source. Committed to git.**<br>
-No server · no vector database · no API key · no model · zero dependencies
+**Ranked. Cited. Checked against the source. The same answer on every machine.**<br>
+**Built for your AI coding agent first. Works just as well with no AI at all.**<br>
+No server · no API key · no model · zero dependencies · offline by default
 
 [![PyPI](https://img.shields.io/pypi/v/fux-engine?label=pypi&color=3b82f6)](https://pypi.org/project/fux-engine/)
 [![npm](https://img.shields.io/npm/v/fux-engine?label=npm&color=3b82f6)](https://www.npmjs.com/package/fux-engine)
@@ -53,22 +54,18 @@ No server · no vector database · no API key · no model · zero dependencies
 
 *fux is pronounced "fox".*
 
-[Quickstart](#60-second-quickstart) · [Agents](#plug-it-into-your-coding-agent) · [Commands](#everyday-commands) · [Measured](#measured-not-assumed) · [Is it for you?](#is-fux-for-you) · [Roadmap](#roadmap) · [FAQ](#faq)
+[Quickstart](#60-second-quickstart) · [Who searches it](#who-searches-it) · [Agents](#plug-it-into-your-coding-agent) · [Packages](#packages-that-ship-their-own-index) · [Commands](#everyday-commands) · [Measured](#measured-not-assumed) · [Is it for you?](#is-fux-for-you) · [Roadmap](#roadmap) · [FAQ](#faq)
 
 </div>
 
 ---
 
-Your agent can read every line of your code. It still doesn't know **why** the code is the way it is. That lives in ADRs, runbooks, specs, wiki pages, and the PDF someone attached to a ticket in 2023.
+Google does not store the web. It builds an **index** of the web, and the index is what you search.
 
-So it greps, guesses, or asks a vector database for "the nearest chunk". It gets back an answer that sounds right, from a doc that went stale six months ago.
-
-**fux fixes that with boring, auditable arithmetic:**
+fux does the same for the documents your team writes: ADRs, runbooks, specs, wiki pages, the PDF someone attached to a ticket in 2023. It builds a small index, **commits it to your repository**, and from then on anyone who clones the repo searches the same thing and gets the same answer. **The primary searcher is your AI coding agent**, which gets evidence it must cite and a refusal when the docs are silent. Because nothing inside fux is AI, the same index also serves a person at a terminal, an editor, and a script in CI, for free.
 
 ```console
 $ fux answer "how do I roll back a release"
-# Deploying and rolling back
-
 # Deploying and rolling back
 
 To roll back a bad release, run `make rollback` from the release branch.
@@ -83,7 +80,7 @@ No confident matches.
 confidence: none - nothing in the index scored for this query.
 ```
 
-- **The first answer** quotes the exact lines it came from, and **checks that they still say that today**.
+- **The first answer** quotes the exact lines it came from and **checks that they still say that today**.
 - **The second one refuses.** Your docs don't cover the question, and a confident wrong answer is worse than none.
 
 **Edit the source, and the same answer tells you:**
@@ -102,58 +99,73 @@ note: 1 source(s) changed: docs/deploy.md.
 ## In plain words
 
 - **fux is a card catalogue for your team's documents.** It doesn't copy the books; it notes which words are on which pages.
-- **The catalogue lives in your git repo**, so everyone who clones it, and every AI assistant they use, searches the same thing.
+- **The catalogue lives in your git repo**, so everyone who clones it, and every tool they use, searches the same thing.
 - **Ask a question and fux points to the page**, quotes the lines, and tells you whether the page has changed since it was catalogued.
 - **If nothing in your documents answers it, fux says so** instead of guessing.
-- **No AI runs inside fux**, so the same question gets the same answer on every machine.
+- **Your coding agent is the first customer.** fux hands it ranked evidence with line numbers, and a refusal when there is none, so it stops inventing.
+- **No AI runs inside fux.** It is arithmetic over words, so the same question gets the same answer on every machine. That is also why it works with no AI at all: the same index is a search engine for people and scripts.
 
-## Why people use fux
+## Who searches it
 
-| | `grep` / `rg` | Vector-DB RAG | **fux** |
-|---|---|---|---|
-| Ranks by relevance | ❌ | ✅ | ✅ BM25F, field-weighted |
-| Runs with nothing hosted | ✅ | ❌ server, embeddings, key | ✅ |
-| Same query → same result, every machine | ✅ | ⚠️ depends on model + chunker | ✅ byte-identical |
-| Cites exact line ranges | lines, unranked | chunks | ✅ plus a **current / stale** verdict |
-| Says "I don't know" | — | returns the nearest neighbour | ✅ confidence band |
-| Index reviewable in a PR | — | ❌ opaque vectors | ✅ plain JSONL, diffs like code |
-| Reads PDF, Word, Excel, slides, wikis | ❌ | depends | ✅ editable decoders |
+The same index, five ways in. **The coding agent is the primary one**; the other four come free, because an index that is only arithmetic can be read by anything. None of them needs a server.
+
+| who | how | what they get |
+|---|---|---|
+| **Your AI coding agent** *(primary)* | `fux setup` writes the skills; `fux mcp` serves the index | evidence it must cite, and a refusal when the docs are silent, so it stops inventing |
+| **Your agent, in a package you depend on** *(in build)* | the package ships its own index; you pin it | one query over your docs **and** the docs of every pinned package, read in place |
+| **You, at the terminal** | `fux ask`, `fux answer`, `fux find` | ranked documents, or one answer quoted from the source with a current/stale verdict |
+| **You, in a browser or editor** | `fux serve`, `fux lsp`, the VS Code extension | a local search page that shows *why* each document ranked; search, link hovers and backlinks in the editor |
+| **CI and scripts** | `fux find --json`, `fux verify`, `fux doctor` | file paths to pipe, a receipt checked against the tree, a read-only health check |
+
+The longer version, as five short stories, is [**How fux is used**](docs/how-fux-is-used.md).
+
+## Why not just grep?
+
+`grep` and `rg` are the right tool when you know the string. fux is for when you know the *question*.
+
+| | `grep` / `rg` | **fux** |
+|---|---|---|
+| Finds a string you already know | ✅ | ✅ `fux find` |
+| Ranks documents for a question | ❌ every line, in file order | ✅ BM25F, field-weighted, best page first |
+| Says "I don't know" | — | ✅ a confidence band, and a refusal below it |
+| Cites what it found | lines, unranked | ✅ exact line ranges, plus a **current / stale** verdict against the source |
+| Same result on every machine | ✅ | ✅ byte-identical |
+| Index reviewable in a pull request | — | ✅ plain JSONL, diffs like code |
+| Reads PDF, Word, Excel, slides, wiki pages | ❌ | ✅ through declared decoder packages |
+| Needs anything hosted | no | no |
 
 - 🗂 **Clone and ask.** The index lives in `.fux/index/`. Every clone searches the same thing: yours, a teammate's, CI's and your agent's. Nothing to deploy.
 - 🔍 **Answers you can audit.** `answer` re-reads the cited lines from the source and says whether they still match. `--receipt` records the index, settings and source shas an answer came from, and `fux verify` checks a receipt against the tree.
-- 🤖 **Built for agents first.** `fux setup` writes ready-made skills and instructions for **Claude Code, Codex, GitHub Copilot and Kiro**. `fux mcp` serves the index over MCP, `fux lsp` serves it to your editor, and `fux llms` prints it as an [llms.txt](llms.txt).
 - 🔒 **Offline unless you ask.** No telemetry and no network on any default path. PII is redacted before anything is committed.
 - 🧾 **Your docs never move.** fux stores statistics, not content. Sources stay in the repo or in the system that owns them.
+- 🤖 **Agents first, everyone else free.** `fux setup` writes ready-made skills for Claude Code, Codex, GitHub Copilot and Kiro; that is the primary path. Turn them off with `--no-agents` and the same index is still a search engine for people and scripts.
 
 ## 60-second quickstart
 
 ```bash
 pip install fux-engine           # Python ≥ 3.12 · Linux, macOS, Windows · zero deps
 cd your-repo
-fux setup                        # writes .fux/, fux.toml and the agent instructions
+fux setup                        # writes .fux/, fux.toml, the agent files; prints one pip install line if your docs need decoders
 fux ingest                       # indexes README.md and docs/ by default
 fux ask "how do we roll back a release"
 git add .fux fux.toml && git commit -m "Add fux index"
 ```
 
-That's it. Your teammates, and their agents, now get the same answers from a plain `git clone`.
+That's it. Your teammates, their editors, your CI and their agents now get the same answers from a plain `git clone`.
 
 - **What gets indexed** is listed in `.fux/sources.yaml` (`README.md` and `docs` to start). Anything you don't want indexed goes in `.fux/.fuxignore`.
 - **`fux ingest`** reports what it did: `ingested 3 docs (3 changed, 0 carried forward), 0 not indexed, 0 skipped, 3 shards written`.
 - **`fux doctor`** checks the setup. It's read-only and offline.
 
-> **No Python on the machine?** Install the single-file, zero-dependency Node reader from npm — `npm install fux-engine`, then `npx fux find rollback` (Node ≥ 22; the package's `bin` is `fux`). **That is the only way to get it**: `fux setup` no longer vendors a copy into `.fux/node/` or writes a `.fux/fux` shim, so a clone with nothing installed no longer answers from Node — one package install first. A repository pins it by listing `fux-engine` in its own `package.json`.
+> **No Python on the machine?** Install the single-file, zero-dependency Node reader from npm: `npm install fux-engine`, then `npx fux find rollback` (Node ≥ 22; the package's `bin` is `fux`). The Node reader ranks and answers; ingest is Python. A repository pins it by listing `fux-engine` in its own `package.json`.
 
-> **A machine that only reads, or only writes?** Since 4.0.0, fux ships as four packages on one version. `fux-engine` is all of them. `fux-reader` ranks and answers, `fux-writer` ingests and keeps the index current, and `fux-core` is what both share. A verb from a package you didn't install is refused by name.
+> **A machine that only reads, or only writes?** fux ships as four packages on one version. `fux-engine` is all of them. `fux-reader` ranks and answers, `fux-writer` ingests and keeps the index current, and `fux-core` is what both share. A verb from a package you didn't install is refused by name.
 
 > **Prefer a library?**
 > ```python
 > from fux import open as fux_open
 > fux_open(".").ask("how do we roll back a release")
 > ```
-
-> [!NOTE]
-> **Coming in the next release: decoders as packages** (built on `main`, not yet published). fux-engine will read Markdown and plain text on its own. Every other format will be read by a `fux-decoder-*` package that your repository declares in the committed `.fux/config/plugins.toml`, pinned to one version and digest. Upgrading will be a one-time step: run `fux setup`, run the one `pip install …` line it prints, and commit `.fux/config/plugins.toml`. The details are under *Unreleased* in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Plug it into your coding agent
 
@@ -170,14 +182,27 @@ fux llms --full  # an llms-full.txt of the corpus, to stdout
 - **There's deliberately no `answer` tool over MCP.** The agent is the answerer; fux is the evidence ([SR-AGENT-POLICY](records/0132_agent-policy.md) · [SR-MCP](records/0136_mcp.md)).
 - **Turn the agent files off** with `[agents] install = []` in `fux.toml`, or with `fux setup --no-agents`.
 
+## Packages that ship their own index
+
+> **Status: designed and ruled on 2026-10-25, being built now** (W-299 · W-300 · W-301 · W-302 in [`work/OPEN-WORK.md`](work/OPEN-WORK.md)). Not in a release yet.
+
+A library's documentation is a corpus too, and today every consumer who wants to search it has to index it themselves. The next fux lets the **package author** do it once:
+
+1. The author runs `fux ingest` over the package's docs and `fux pack` to produce a small index segment, and ships it inside the npm tarball or the wheel ([the recipe](docs/publish-an-index-package.md)).
+2. The consumer pins it with one row in `.fux/config/plugins.toml`, by name, version and digest.
+3. **One query searches the repo's own index and every pinned package's**, with word statistics merged so a big package cannot drown your own docs. A hit names its package, and the passage is read **in place** inside the installed package. Nothing is copied; nothing is re-ingested.
+
+Take [sheetpane](https://github.com/arpitarya/sheetpane), two web components that view, edit and review `.xlsx` and `.csv` files inside any web page. Once its CI packs an index, an app that depends on it can ask *"does sheetpane support formulas"* and get the line from sheetpane's own docs that says it doesn't, next to the hit from the app's own ADR that says why it was chosen anyway. The first consumer is [codelaw](https://github.com/arpitarya/codelaw)'s rule packs: the spike that gated the design put the right rule in the top five for **19 of 20** plain-words questions, against a bar of 16 ([run](work/regression/2026-10-25-w298-step1-codelaw-rules/report.md)).
+
+The 10 000-document design point counts the merged corpus, repo plus every pinned segment, and `fux doctor` reports the sum.
+
 ## What it can read
 
-- **Text:** Markdown, reStructuredText, AsciiDoc, Org, plain text
-- **Office & data:** PDF, Word, PowerPoint, Excel, CSV/TSV, JSON, JSONL, YAML, TOML, INI, XML, RTF
-- **Everything else:** HTML, email, draw.io, SVG, images (via your agent, `fux enrich`)
-- **Web pages and wikis:** `fux add <url>`, over plain HTTP or through the session your **signed-in Chrome** already holds, so internal wikis work too
+- **Built in:** Markdown and plain text.
+- **Through declared decoder packages:** reStructuredText, AsciiDoc, Org · PDF, Word, PowerPoint, Excel, CSV/TSV · JSON, JSONL, YAML, TOML, INI, XML, RTF · HTML, email, draw.io, SVG · images (via your agent, `fux enrich`).
+- **Web pages and wikis:** `fux add <url>`, over plain HTTP or through the session your **signed-in Chrome** already holds, so internal wikis work too.
 
-In 4.1, every decoder and fetcher is copied into `.fux/` as **your** code, for you to read, edit or replace ([SR-DECODE](records/0139_decode.md), [SR-FETCHER](records/0117_fetcher.md)).
+Since 5.0, only the engine is mandatory. Every other format is read by a `fux-decoder-*` or `fux-fetcher-*` package that **your repository declares** in the committed `.fux/config/plugins.toml`, pinned to one version and digest; `fux setup` scans your sources, writes the declaration and prints the one `pip install` line. A package nobody declared never runs ([SR-PLUGINS](records/0165_plugins.md), [SR-DECODE](records/0139_decode.md), [SR-FETCHER](records/0117_fetcher.md)).
 
 ## Everyday commands
 
@@ -215,22 +240,24 @@ Every claim ships with a pre-registered bar and a published run, **including the
 
 - ⚡ **27.2 ms** worst-case p95 for warm `ask --fast` over **8,870 RFCs**, against a 150 ms bar ([run](work/regression/2026-08-12-m2-accelerator/report.md)). The fast path must return byte-identical results to the full scan.
 - 🕸 **24/24** on a graded 66-document graph corpus, with the derived graph hashing identically on x86-64 Linux and arm64 macOS ([run](work/regression/2026-08-22-graph-acceptance/report.md)).
+- 📦 **19/20** plain-words questions found the right rule in the top five of a published rule pack, the spike that gated package indexes ([run](work/regression/2026-10-25-w298-step1-codelaw-rules/report.md)).
 - 🪦 **Failures kept on file.** Index pruning failed its gate ([verdict](work/regression/2026-08-09-pruning-rerun/VERDICT.md)). A dense embedding lane fixed 0 queries and broke 2, so it was deleted ([verdict](work/regression/2026-08-24-dense-lane-gate/VERDICT.md)).
 
 ## Is fux for you?
 
 **Choose fux when:**
 
-- your agents keep answering from **stale or invented** context, and you want every answer tied to lines you can check;
+- your coding agents keep answering from **stale or invented** context, and you want every answer tied to lines you can check (the primary case);
+- you want **search over what your team wrote down**, from a fresh clone and in CI, with **nothing to host and no key to manage**;
 - your knowledge is **spread across formats**: Markdown, PDFs, Office files, wiki pages;
-- you want search that works on a fresh clone and in CI, with **nothing to host and no key to manage**;
-- you need answers that are **reproducible and auditable**, such as for regulated or review-heavy work.
+- you need answers that are **reproducible and auditable**, such as for regulated or review-heavy work;
+- you maintain a library and want its users, and their agents, to **search your docs without copying them** *(in build, above)*.
 
 **Look elsewhere when:**
 
 - **you want code search.** fux has no AST, no symbols and no call graph. Pair it with a code-graph tool; fux covers what you *wrote down*.
 - **you want semantic matching out of the box.** Ranking is lexical. If your docs say "revert" and you ask "undo", use `--expand`, or teach it once with `fux correct`.
-- **you want a chatbot.** fux finds and verifies evidence. Your agent, or you, writes the answer.
+- **you are building a chat feature into a product.** That is a vector store, an embedding model and a server, run for your end users at runtime. fux is the developer-side index of a team's own documents, committed next to them. Different job; see the FAQ.
 
 ## Roadmap
 
@@ -238,13 +265,20 @@ From the live queue, [`work/OPEN-WORK.md`](work/OPEN-WORK.md):
 
 | | what | state |
 |---|---|---|
-| ✅ | Index-and-refer engine, Python and Node readers, MCP, LSP, VS Code extension | released, 4.1 |
-| 🔜 | Decoders as `fux-decoder-*` packages, declared in `.fux/config/plugins.toml` | built on `main`; next release |
+| ✅ | Index-and-refer engine, Python and Node readers, MCP, LSP, VS Code extension | released |
+| ✅ | Decoders and fetchers as `fux-decoder-*` / `fux-fetcher-*` packages, declared in `.fux/config/plugins.toml` | released, 5.0.0 |
+| 🔨 | Packages ship their own index; one query over repo + pinned packages; `fux pack` | ruled 2026-10-25; being built |
 | 🔜 | Live URL-source checks: a vanished source, a real rate limit, parallel signed-in fetches | checklist written; waiting on a hands-on session |
 | 🧭 | Ingest of 10,000 documents in under a second | proposal filed; order to be decided |
 | 🧭 | Better abstention, ranking-parameter tuning, a stronger intent lexicon | research |
 
 ## FAQ
+
+**Do I need an AI to use fux?**
+No. fux is built for AI coding agents first, and that is where most teams start. But no AI runs inside it, so the same index is a plain search engine with a terminal, a browser page, an editor plug-in and a library interface. Scripts and people are the second audience, and they need nothing extra.
+
+**Is fux a vector database, or a RAG stack?**
+No, and it isn't trying to be. A vector store plus an embedding model is what you run behind a chat feature *inside* a product, serving end users at runtime. fux is the index of the documents a team writes, committed with them and searched by the people and tools working on that repo. If you build a product chatbot later, fux can be the thing that hands it cited, verified passages; it does not replace the chatbot's own stack.
 
 **Does fux call an AI model?**
 No. No fux path may call a model, and nothing in the maintenance path uses one. Your agent can generate enrichment through `fux enrich`, and fux validates it.
@@ -261,11 +295,14 @@ Only for commands you run on purpose, such as `fux add <url>`, and they say so o
 **How do teammates stay in sync?**
 They pull. The index is plain JSONL in git, it merges with `fux hooks`' merge driver, and a pull request shows exactly what changed.
 
+**How big can it go?**
+The design point is 10 000 documents, and that is a ceiling on what fux measures and promises, not a target it merely reaches. Every published number was taken at or below it.
+
 ## Status
 
-**`5.0.0` is the latest release** on PyPI (`pip install fux-engine`) and npm (`npx fux-engine`). The index format is versioned, and fux tells you when to run `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
+**`5.0.0` is the latest release** on PyPI (`pip install fux-engine`) and npm (`npm install fux-engine`). The index format is versioned, and fux tells you when to run `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
 
-⭐ **Star the repo** if fux saved your agent from one confident wrong answer. It's how other people find it. 👀 **Watch → Custom → Releases** to hear about new versions.
+⭐ **Star the repo** if fux saved you, or your agent, from one confident wrong answer. It's how other people find it. 👀 **Watch → Custom → Releases** to hear about new versions.
 
 ## Under the hood
 
@@ -281,7 +318,7 @@ They pull. The index is plain JSONL in git, it merges with `fux hooks`' merge dr
 </details>
 
 <details>
-<summary><b>The fourteen laws fux is built under</b></summary>
+<summary><b>The fifteen laws fux is built under</b></summary>
 
 Every decision of record lives in the [SR register](records/README.md) ([SR-LAWS](records/0001_LAWS.md)):
 [L0 SRs are the source of truth](records/0002_LAW-0-authority.md) ·
@@ -297,7 +334,8 @@ Every decision of record lives in the [SR register](records/README.md) ([SR-LAWS
 [L10 build output, never source](records/0012_LAW-10-bundled-output.md) ·
 [L11 the sealed answer key is closed to Claude](records/0013_LAW-11-sealed-answer-key.md) ·
 [L12 every value lives in a config file](records/0014_LAW-12-values-live-in-config.md) ·
-[L13 a ranking change ships only through the standing bar](records/0015_LAW-13-the-standing-bar.md).
+[L13 a ranking change ships only through the standing bar](records/0015_LAW-13-the-standing-bar.md) ·
+[L14 the machine budget is always followed](records/0016_LAW-14-machine-budget.md).
 The laws were renumbered on 2026-09-28; an older document is read through [SR-LAWS](records/0001_LAWS.md) decision 2a.
 
 </details>
@@ -1362,6 +1400,8 @@ records/            THE STANDING RECORDS — the register, TEMPLATE.md, SR-LAWS 
                     since 2026-09-13, and in the OKF bundle from wherever it sits
 docs/               WHAT THE PROJECT IS
   GLOSSARY.md       every recurring term, defined once
+  how-fux-is-used.md            the five usage stories — the README's long form, for marketing and adoption
+  publish-an-index-package.md   the package author's recipe: ingest, `fux pack`, ship
   index.md          the OKF bundle root — this file
 src/fux/            the engine — every component claimed in records/README.md
 node/               the Node read plane — authored .mjs; ONE bundled file ships (L10)
@@ -1404,6 +1444,8 @@ gating rule stands for every milestone after it**
 * [Machine notes](../work/MACHINE.md) - what breaks on which surface, and why.
 * [Doc registry](../records/0067_WORK-registry.md) - maintained docs, update triggers, last-verified dates.
 * [Glossary](GLOSSARY.md) - recurring terms, defined once.
+* [How fux is used](how-fux-is-used.md) - five stories: terminal, pull request, coding agent, a package shipping its own index, search with no AI; what fux is not; how to describe it.
+* [Publish an index package](publish-an-index-package.md) - the author's recipe: ingest, `fux pack`, ship in the wheel and the npm tarball.
 
 # Decisions
 

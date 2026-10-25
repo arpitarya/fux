@@ -166,7 +166,11 @@ def test_approvals_reset_back_under_the_budget(budget, monkeypatch):
 def ledger(tmp_path, monkeypatch):
     mod = _load("now-ledger")
     now = tmp_path / "NOW.md"
-    now.write_text((ROOT / "work" / "NOW.md").read_text(encoding="utf-8"), encoding="utf-8")
+    # the live file's shape, never its rows: a session running on this tree
+    # would otherwise be counted by every test below
+    text = (ROOT / "work" / "NOW.md").read_text(encoding="utf-8")
+    text = mod.set_rows(text, mod.FLIGHT, [])
+    now.write_text(text, encoding="utf-8")
     monkeypatch.setattr(mod, "NOW_MD", now)
     monkeypatch.setattr(mod, "SESSIONS", tmp_path / "sessions")
     monkeypatch.setattr(mod, "LOCK", tmp_path / "now.lock")

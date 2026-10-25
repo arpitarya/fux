@@ -28,6 +28,16 @@ Rules:
 
 ---
 
+## 2026-10-25 — **W-293: the codelaw ports' first CI run — proven on a runner**
+
+| | |
+|---|---|
+| **shipped** | No new code (the wiring landed in `ef483944`). Step 7 read from GitHub Actions: CI run **40192043910** (`main` @ `6aae2ae1`, build job) — wheel cache not found, built and saved; `✔ law-gate: 19 wheels, 1 sdist, 2 npm package(s) — every law holds on what ships (5.0.0)`; `✔ smoke: 5 calls, PyPI install (no Node) == npm install (no Python)`. Run **40193299244** (tag `v5.0.0`, same tree) — `✔ wheels restored for ci-wheels-v1-bfe7b1e70e77b6a6a2b6fc88803af010-py3.12.15`, gate ✔, smoke ✔. |
+| **evidence** | The two run ids above (build job logs); `python3 scripts/ci-key.py wheels` gives the same tree hash `bfe7b1e7…` at `6aae2ae1` and at `755a61df`, so the three unpushed work-only commits restore on their push by construction. |
+| **outcome** | Closed. ⚠ The literal "a push whose diff is only under `work/`" case is shown by key equality plus a same-tree restore, not yet by a work-only push itself. The smoke ran for the first time here (it cannot run on Arpit's Mac, ensurepip SIGABRT). |
+
+---
+
 ## 2026-10-25 — **W-298: packages ship their own fux index — research closed, four build items filed**
 
 | | |
@@ -6503,6 +6513,7 @@ it closed by ratification, not by landing; see the W-27 row above.
 | L11-13B-FACET-COUNTS | ✅ **landed 2026-09-28** (Arpit ruled on W-168) — `tools/golden-score/score.py` emits `facets_top5` and `facets_key` per question, as counts only, and L11 decision 13b names both, including the per-row tag membership it publishes. `tests/test_golden_score_output.py` pins the fields and their silence (11 pass). ⚠ Step 7 stopped before it needed the column; it stays for option C | [L11](../records/0013_LAW-11-sealed-answer-key.md) 13b |
 | W-168-STEP-10-SECTION-RECORDS | 🔴 **FAIL — drift** (2026-10-10; decider run by Arpit, then parked by his ruling) — committed `doc#s<k>` section records, B2 `S + λ·max_k S_sec`, `section_weight ∈ {0.1, 0.25, 0.5, 1.0}` vs `0.0`, `hit@1` on the key's `step10_section` pool (23) of `set-5-claude` at a re-ingested copy of gen-4 `rung-01000`. G0 and G1 PASS. **Every arm loses baseline rank-1 hits (4 · 5 · 9 · 10)**, and pool misses rise 23 → 26 · 26 · 28 · 28. The term favoured short documents. Built on branch `w236-sections`, never merged. `informed`. | [VERDICT](regression/2026-10-10-section-records/VERDICT.md) |
 | W-269-SECTION-GAIN-ONLY | 🔴 **FAIL — drift** (2026-10-10; decider run by Arpit) — B2's gain-only variant `S_doc + λ · max(0, max_k S_sec − S_self)`, `section_weight ∈ {0.25, 0.5, 1.0, 2.0}` vs `0.0`, W-236's bar unchanged plus G3. G0, G1, G3 PASS. **Every arm loses baseline rank-1 hits (2 · 4 · 4 · 5)** while pool misses fall 23 → 23 · 21 · 19 · 13. Built on branch `claude/gracious-galileo-aqrg8b`, never merged. `informed`; second mechanism on the same 90 questions. | [VERDICT](regression/2026-10-10-section-gain-only/VERDICT.md) |
+| W-298-STEP-1-CODELAW-RULES | ✅ **PASS** (2026-10-25, Cowork) — free-text search over the published codelaw rules pack (140 rules) with today's fux: 19 of 20 plain-words intents place the expected rule in the top 5 of `fux ask`, against a bar of 16 set in W-298 before the run; `informed`. Unblocked W-299 and W-302 | [verdict](regression/2026-10-25-w298-step1-codelaw-rules/VERDICT.md) |
 | W-270-SECTION-RETEST-SET-6 | ⏸ **STOP by the frozen table, filed INCONCLUSIVE** (2026-10-11; decider run by Arpit) — the gain-only term at `section_weight = 2.0` on `set-6-claude` under L13: the baseline's `step10_section` slice was **11, below the floor of 15**, a data defect and never a verdict on the term; gates G0, G1, G3 PASS; the latency guardrail had failed (+328 ms). Successor: W-278 on `set-7-claude` | [verdict](regression/2026-10-11-section-retest-set-6/VERDICT.md) |
 | W-278-SECTION-TERM-V3 | 🟡 **INCONCLUSIVE, ruled ship by Arpit** (2026-10-13; decider run by Arpit) — the third form at `section_weight = 1.0` on `set-7-claude` under L13: gates G0 · G1 · G3 · G4 PASS; latency +49.5 ms; whole set `hit@1` 117 → 123, **0 losses**; slice 5 of 24, below SR-RS d19's floor. Ruled: ship as an opt-in pair (`section_records = true` + `section_weight = 1.0`, both off by default). [verdict](regression/2026-10-13-section-term-v3/VERDICT.md) |
 | W-287-TABLE-COLUMNS | 🔴 **FAIL — guardrail** (2026-10-19; decider run by Arpit) — three-field table-row scoring + column selector + key column + record tables at `table_column_weight = 1.0` on a seeded tabular set (102 questions) under L13: G0 · G1 PASS; slice `hit@1` and `cell@1` each **59 wins, 0 losses**; no prose collateral; `ask` unchanged — but `answer` p95 on a 20 000-row sheet **1.74×** (limit 1.2×). Stays `0.0`. [verdict](regression/2026-10-19-w287-table-columns/VERDICT.md) |

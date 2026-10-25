@@ -106,6 +106,19 @@ def _cmd_tune(args) -> int:
     return 0
 
 
+def _cmd_pack(args) -> int:
+    from .config import find_root
+    from .store import pack
+
+    content = pack.parse_content(args.content)  # before anything reads the repository
+    root = find_root()
+    if root is None:
+        raise FuxError("not inside a fux repository -- there is no index to pack")
+    manifest = pack.write_segment(root, Path(args.outdir), content, npm=args.npm, pypi=args.pypi)
+    print(f"packed {manifest['docs']} documents into {args.outdir} ({manifest['digest']})")
+    return 0
+
+
 #: The write verbs — the only ones that construct a `Progress` in `main`
 #: (W-64). `add`/`remove` joined it in W-63: they end in `ingest.run()`, so
 #: they inherit the bar from that seam rather than growing one of their own.
@@ -331,6 +344,18 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="re-pin every package in .fux/config/plugins.toml to the installed version and digest",
     )
+    # W-299, SR-PKG-INDEX d2: setup never proposes an index row on its own (no
+    # source names one), so it writes one only when told, from what is installed.
+    p_setup.add_argument(
+        "--index",
+        metavar="PYPI_NAME",
+        help="pin the installed index package PYPI_NAME as a `kind = \"index\"` row in .fux/config/plugins.toml",
+    )
+    p_setup.add_argument(
+        "--index-npm",
+        metavar="NPM_NAME",
+        help="the same index package's npm name, written into the row --index adds",
+    )
     # W-291, SR-MAINTENANCE decision 5: setup installs the git hooks and the
     # merge driver by default; this is the one-shot opt-out.
     p_setup.add_argument(
@@ -358,6 +383,16 @@ def build_parser() -> argparse.ArgumentParser:
     _add_progress_flags(p_doctor)
     _add_output_flags(p_doctor, band=False)
     p_doctor.set_defaults(func=_dispatch)
+
+    # W-302, SR-PKG-INDEX: the package author's publish path. Read-only on
+    # `.fux/`; `--content` is checked in `store/pack.py` so a missing one is the
+    # one `FuxError`, not argparse's exit 2.
+    p_pack = _verb("pack", help="write the committed index as a shippable segment (for a package author)")
+    p_pack.add_argument("outdir", help="the directory to write the segment into (outside .fux/)")
+    p_pack.add_argument("--content", default=None, metavar="NAME@VERSION", help="the package that ships this segment")
+    p_pack.add_argument("--npm", default=None, metavar="NAME", help="the npm name, if it differs from --content's")
+    p_pack.add_argument("--pypi", default=None, metavar="NAME", help="the PyPI name, if it differs from --content's")
+    p_pack.set_defaults(func=_cmd_pack)
 
     # `register` prints the committed register's rows FROM THE INDEX -- the
     # records, the decoder digest table and the URL list -- so a program reads

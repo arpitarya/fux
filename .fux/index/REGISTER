@@ -771,7 +771,7 @@ work/INTERVIEW.md	ff7fca405f8da3c10745b63179fef9336a129594	prose
 work/LESSONS.md	f91b46f8742c542fe12e2d871452148c56751eae	prose
 work/MACHINE.md	9db25bde124a67c191714cd380fbcd2ed3d67e5a	prose
 work/NOW.md	bc54e790e851998e074c27054a8a11c5b20e6738	prose
-work/OPEN-WORK.md	6f10268ff6bf9eede6b636705a23d2b50d82c6c4	prose
+work/OPEN-WORK.md	e21318de7a8e7c14a23cf7ae9b5c75f48d5262ae	prose
 work/README.md	d5073a07920179dc0c35071dc2337a8ed6856ddb	prose
 work/WORKLOG.md	11062d19834ebf4db382473c4145a02ee1a3a57e	prose
 work/architecture-algorithms.svg	fdf6ef399bf2649dd92510973076e607cb955576	pkg:fux-decoder-svg@5.0.0/svg@1+xml@1+limits@1
@@ -826,7 +826,7 @@ work/open/W-268-ingest-under-one-second.md	fb1407609f1bbed38ed40faac7f054a3c69e1
 work/open/W-275-ranking-tuner-research.md	cfd785d941f8e566cea5eceff3db7f44f2878db7	prose
 work/open/W-280-intent-lexicon-research.md	4b582eae12e7d665d03c47716c5cbeab7e38070e	prose
 work/open/W-281-capture-harness-speed.md	c367af1fdef62dbf90ef7235ca6853c15d2edb53	prose
-work/open/W-289-plugin-packages.md	22aca0aac1dc518c288bbf899714e3f3b0d36f70	prose
+work/open/W-289-plugin-packages.md	fb9b0b1d3a024e63277cc174da39cbaeb8555e6c	prose
 work/open/W-293-first-ci-run-of-the-codelaw-ports.md	da6e43335b47b2b24f1ecebb1c884aa153a51b2f	prose
 work/open/W-299-index-package-pin.md	9453b0c9eb13e74ad427089c4efb4543b87e2991	prose
 work/open/W-300-merged-query-over-segments.md	e8090737e7c2675d55d8d8463081e1f69f56db6b	prose

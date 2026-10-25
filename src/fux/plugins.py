@@ -39,6 +39,8 @@ import base64
 import hashlib
 import importlib.metadata
 import importlib.util
+import json
+import re
 import tomllib
 from collections import Counter
 from dataclasses import dataclass
@@ -49,6 +51,7 @@ from .errors import FuxError
 
 __all__ = [
     "Declared",
+    "IndexPin",
     "Package",
     "Resolution",
     "check",
@@ -60,6 +63,16 @@ __all__ = [
     "for_decoder_module",
     "for_fetch",
     "for_suffix",
+    "check_index",
+    "index_install_line",
+    "indexes",
+    "locate_index",
+    "parse_indexes",
+    "pin_index",
+    "segment_digest",
+    "segment_docs",
+    "segment_root",
+    "verify_index",
     "install_line",
     "installed_digest",
     "installed_version",
@@ -131,6 +144,27 @@ class Resolution:
     name: str
     path: Path | None = None
     declared: Declared | None = None
+
+
+@dataclass(frozen=True)
+class IndexPin:
+    """One `kind = "index"` row of `.fux/config/plugins.toml` (SR-PKG-INDEX d2).
+
+    A package that ships a fux index segment — data, never code. It is located
+    by its registry names, never by a path (d5), and nothing in it is executed.
+    """
+
+    name: str
+    version: str
+    #: `sha256:<hex>` over the segment files, or empty when not pinned yet.
+    digest: str
+    npm: str | None = None
+    pypi: str | None = None
+
+    @property
+    def import_name(self) -> str | None:
+        """The PyPI distribution's normalised name — the segment's import package."""
+        return re.sub(r"[-_.]+", "_", self.pypi).lower() if self.pypi else None
 
 
 # -- the first-party table -----------------------------------------------------
@@ -225,11 +259,60 @@ def path(root: Path) -> Path:
 
 
 def parse(text: str, origin: str) -> dict[str, Declared]:
-    """P2: the declaration, validated. Malformed is a `FuxError` naming the file.
+    """P2: the declaration's package rows, validated. Malformed is a `FuxError`
+    naming the file.
 
     The order of rows is presentation: the result is keyed and sorted by name,
-    so two files declaring the same set are the same declaration (L4).
+    so two files declaring the same set are the same declaration (L4). The
+    `kind = "index"` rows are validated too, and returned by `parse_indexes`.
     """
+    return _parse(text, origin)[0]
+
+
+def parse_indexes(text: str, origin: str) -> dict[str, IndexPin]:
+    """SR-PKG-INDEX d2: the declaration's `kind = "index"` rows, by name."""
+    return _parse(text, origin)[1]
+
+
+def _parse_index_row(row: dict, origin: str, row_key: str) -> IndexPin:
+    """One `kind = "index"` row, or a `FuxError` naming what is wrong with it."""
+    allowed = set(fixed("plugins.index", "keys"))
+    name = row.get("name")
+    label = name if isinstance(name, str) and name else f"a `[[{row_key}]]` index row"
+    if "suffixes" in row:
+        raise FuxError(
+            f"{origin}: {label} is an index package, which reads no format - delete its "
+            "`suffixes` key (SR-PKG-INDEX d2)"
+        )
+    unknown = sorted(set(row) - allowed)
+    if unknown:
+        raise FuxError(f"{origin}: {label} carries unknown key(s) {', '.join(unknown)} (SR-PKG-INDEX d2)")
+    if not isinstance(name, str) or not re.fullmatch(fixed("plugins.index", "name_pattern"), name):
+        raise FuxError(
+            f"{origin}: an index row's `name` must match {fixed('plugins.index', 'name_pattern')} "
+            f"(got {_json_value(name)}) - it names a directory under .fux/runtime/ (SR-PKG-INDEX d2)"
+        )
+    version, digest = row.get("version"), row.get("digest", "")
+    if not isinstance(version, str) or not version:
+        raise FuxError(f"{origin}: {name} has no `version` - every package is pinned")
+    prefix = fixed("plugins", "digest_prefix")
+    if not isinstance(digest, str) or (digest and not digest.startswith(prefix)):
+        raise FuxError(f"{origin}: {name}'s `digest` must read `{prefix}<hex>`")
+    names = {}
+    for key in ("npm", "pypi"):
+        value = row.get(key)
+        if value is not None and (not isinstance(value, str) or not value):
+            raise FuxError(f"{origin}: {name}'s `{key}` must be a package name")
+        names[key] = value
+    if not names["npm"] and not names["pypi"]:
+        raise FuxError(
+            f"{origin}: {name} names neither an `npm` nor a `pypi` package, so nothing can "
+            "locate it (SR-PKG-INDEX d2)"
+        )
+    return IndexPin(name=name, version=version, digest=digest, npm=names["npm"], pypi=names["pypi"])
+
+
+def _parse(text: str, origin: str) -> "tuple[dict[str, Declared], dict[str, IndexPin]]":
     try:
         data = tomllib.loads(text)
     except tomllib.TOMLDecodeError as exc:
@@ -248,9 +331,22 @@ def parse(text: str, origin: str) -> dict[str, Declared]:
     prefix = fixed("plugins", "digest_prefix")
     declarable = set(fixed("plugins", "declarable")) | {"extension"}
     out: dict[str, Declared] = {}
+    index_kind = fixed("plugins.index", "kind")
+    found_indexes: dict[str, IndexPin] = {}
     for row in rows:
         if not isinstance(row, dict):
             raise FuxError(f"{origin}: every `[[{row_key}]]` entry must be a table")
+        if "kind" in row:
+            if row["kind"] != index_kind:
+                raise FuxError(
+                    f"{origin}: a `[[{row_key}]]` row's `kind` may only be {index_kind!r} - a "
+                    "decoder, fetcher or extension package's kind is its name (SR-PKG-INDEX d2)"
+                )
+            pin = _parse_index_row(row, origin, row_key)
+            if pin.name in out or pin.name in found_indexes:
+                raise FuxError(f"{origin}: {pin.name} is declared twice")
+            found_indexes[pin.name] = pin
+            continue
         unknown = sorted(set(row) - allowed)
         if unknown:
             raise FuxError(f"{origin}: a `[[{row_key}]]` row carries unknown key(s) {', '.join(unknown)}")
@@ -261,7 +357,7 @@ def parse(text: str, origin: str) -> dict[str, Declared]:
             raise FuxError(f"{origin}: {name} has no `version` - every package is pinned")
         if not isinstance(digest, str) or (digest and not digest.startswith(prefix)):
             raise FuxError(f"{origin}: {name}'s `digest` must read `{prefix}<hex>`")
-        if name in out:
+        if name in out or name in found_indexes:
             raise FuxError(f"{origin}: {name} is declared twice")
         suffixes = row.get("suffixes")
         if name in first_party():
@@ -292,14 +388,14 @@ def parse(text: str, origin: str) -> dict[str, Declared]:
                     "exactly one declared package may read a format"
                 )
             claimed[suffix] = name
-    return dict(sorted(out.items()))
+    return dict(sorted(out.items())), dict(sorted(found_indexes.items()))
 
 
 #: P2: read once per process, per repository root — and per version of the
 #: file. The key carries the file's stat, so a long-lived process (`fux mcp`,
 #: the daemon) sees an edited declaration the way `decode.registry()` sees an
 #: edited `.fux/config/formats.toml`, while a 10 000-document walk still parses it once.
-_CACHE: dict[tuple, "dict[str, Declared] | None"] = {}
+_CACHE: dict[tuple, "tuple[dict[str, Declared], dict[str, IndexPin]] | None"] = {}
 
 
 def reset() -> None:
@@ -317,16 +413,28 @@ def stamp(root: Path) -> tuple:
     return (str(target), st.st_mtime_ns, st.st_size, st.st_ino)
 
 
-def read(root: Path) -> "dict[str, Declared] | None":
-    """The declaration, or `None` when `.fux/config/plugins.toml` does not exist."""
+def _read_all(root: Path) -> "tuple[dict[str, Declared], dict[str, IndexPin]] | None":
     key = stamp(root)
     if key not in _CACHE:
         if key[1] is None:
             _CACHE[key] = None
         else:
             target = path(Path(root).resolve())
-            _CACHE[key] = parse(target.read_text(encoding="utf-8"), fixed("plugins", "file"))
+            _CACHE[key] = _parse(target.read_text(encoding="utf-8"), fixed("plugins", "file"))
     return _CACHE[key]
+
+
+def read(root: Path) -> "dict[str, Declared] | None":
+    """The declaration's package rows, or `None` when `.fux/config/plugins.toml`
+    does not exist."""
+    found = _read_all(root)
+    return None if found is None else found[0]
+
+
+def indexes(root: Path) -> dict[str, IndexPin]:
+    """Every `kind = "index"` row (SR-PKG-INDEX d2); empty when there is no file."""
+    found = _read_all(root)
+    return {} if found is None else found[1]
 
 
 def exists(root: Path) -> bool:
@@ -425,6 +533,193 @@ def installed_digest(module: str) -> str | None:
     return fixed("plugins", "digest_prefix") + hashlib.sha256(body).hexdigest()
 
 
+def segment_digest(directory: Path) -> str | None:
+    """`sha256:<hex>` over an index segment's files, or `None` if it has none.
+
+    The ONE digest of a shipped index (SR-PKG-INDEX): `fux pack` writes it into
+    the manifest and the `kind = "index"` pin verifies it. It covers the files
+    `[plugins.index] segment` names, relative to `directory`, in the same RECORD
+    line form as `installed_digest` — so a wheel and an npm tarball holding the
+    same segment bytes agree, whatever else either distribution carries.
+    """
+    files = sorted(
+        {item for pattern in fixed("plugins.index", "segment") for item in directory.glob(pattern) if item.is_file()}
+    )
+    if not files:
+        return None
+    lines = [f"{item.relative_to(directory).as_posix()},sha256={_record_hash(item.read_bytes())}" for item in files]
+    body = "\n".join(lines).encode("utf-8")
+    return fixed("plugins", "digest_prefix") + hashlib.sha256(body).hexdigest()
+
+
+def _shard_glob() -> str:
+    """The one `[plugins.index] segment` glob that names the document shards."""
+    suffix = fixed("index", "shard_suffix")
+    return next(g for g in fixed("plugins.index", "segment") if g.endswith(suffix))
+
+
+def segment_docs(directory: Path) -> int:
+    """How many document records a segment's shards hold — read off the shards,
+    never the manifest's `docs` (SR-PKG-INDEX d3: the manifest is not covered)."""
+    header = fixed("index", "shard_header_lines")
+    total = 0
+    for item in sorted(directory.glob(_shard_glob())):
+        if item.is_file():
+            lines = [line for line in item.read_bytes().split(b"\n") if line.strip()]
+            total += max(0, len(lines) - header)
+    return total
+
+
+# -- SR-PKG-INDEX: the `kind = "index"` pin --------------------------------------
+
+
+def index_install_line(pin: IndexPin, runtime: str | None = None) -> str:
+    """The one install line for an index pin in `runtime` (Python unless
+    `"node"`). fux never runs it."""
+    if runtime == "node":
+        return f"{fixed('plugins.index', 'npm_install')} {pin.npm}@{pin.version}"
+    return install_line([(pin.pypi, pin.version)])
+
+
+def segment_root(pin: IndexPin) -> Path | None:
+    """SR-PKG-INDEX d5: the installed segment's directory, or `None`.
+
+    🔴 **Located, never imported**: `find_spec` on a top-level name does not
+    execute it, and a namespace package (no `__init__.py`) resolves too. It must
+    resolve to exactly one directory, and that directory must hold the manifest.
+    """
+    if not pin.import_name:
+        return None
+    try:
+        spec = importlib.util.find_spec(pin.import_name)
+    except (ImportError, ValueError):
+        return None
+    locations = list(spec.submodule_search_locations or []) if spec is not None else []
+    if len(locations) != 1:
+        return None
+    directory = Path(locations[0])
+    return directory if (directory / fixed("plugins.index", "manifest")).is_file() else None
+
+
+def _json_value(value) -> str:
+    return json.dumps(value, separators=(",", ":"), ensure_ascii=False)
+
+
+def _foreign(directory: Path) -> "dict | None":
+    """d6: the first shard header key that is not the reader's, or `None`."""
+    want = {key: fixed("index", source) for key, source in fixed("plugins.index", "header_keys").items()}
+    index_glob = _shard_glob()
+    for shard in sorted(directory.glob(index_glob)):
+        if not shard.is_file():
+            continue
+        with shard.open("rb") as handle:
+            first = handle.readline()
+        try:
+            header = json.loads(first)
+        except ValueError:
+            header = {}
+        if not isinstance(header, dict):
+            header = {}
+        for key, value in want.items():
+            if header.get(key) != value:
+                return {
+                    "shard": shard.relative_to(directory).as_posix(),
+                    "key": key,
+                    "got_value": _json_value(header.get(key)),
+                    "want_value": _json_value(value),
+                }
+    return None
+
+
+def _manifest_digest(directory: Path) -> str:
+    """What the manifest claims as the digest, as a word for the refusal."""
+    try:
+        data = json.loads((directory / fixed("plugins.index", "manifest")).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return "no digest"
+    value = data.get("digest") if isinstance(data, dict) else None
+    return value if isinstance(value, str) and value else "no digest"
+
+
+def _refusal(code: str, **values) -> str:
+    return fixed("pkg_index_refusals", code).format(**values)
+
+
+def check_index(pin: IndexPin) -> str | None:
+    """SR-PKG-INDEX d7: why this index pin cannot be read, or `None` when it can.
+
+    The checks run in the record's order, and the words are
+    `constants.toml [pkg_index_refusals]`, shared with the Node twin.
+    """
+    return _check_index(pin)[1]
+
+
+def _check_index(pin: IndexPin) -> "tuple[str | None, str | None]":
+    """`(code, refusal)` — the code is what the differential test compares."""
+    name, version = pin.name, pin.version
+    expected = f"pinned {name} {version}" + (f" {pin.digest}" if pin.digest else "")
+    if not pin.pypi:
+        return "no_registry", _refusal("no_registry", name=name, key="pypi", expected=expected)
+    install = index_install_line(pin)
+    have = installed_version(pin.pypi)
+    if have is None:
+        return "missing", _refusal("missing", name=name, expected=expected, install=install)
+    if have != version:
+        return "other_version", _refusal("other_version", name=name, have=have, expected=expected, install=install)
+    if not pin.digest:
+        return "no_digest", _refusal("no_digest", name=name, version=version)
+    manifest = fixed("plugins.index", "manifest")
+    directory = segment_root(pin)
+    if directory is None:
+        return "no_segment", _refusal("no_segment", name=name, have=have, manifest=manifest, install=install)
+    got = segment_digest(directory) or "nothing"
+    if got != pin.digest:
+        return "drifted", _refusal("drifted", name=name, have=have, got=got, expected=expected, install=install)
+    claimed = _manifest_digest(directory)
+    if claimed != got:
+        return "manifest", _refusal(
+            "manifest", name=name, have=have, manifest=manifest, claimed=claimed, got=got, install=install
+        )
+    foreign = _foreign(directory)
+    if foreign is not None:
+        return "foreign", _refusal("foreign", name=name, have=have, **foreign)
+    return None, None
+
+
+def verify_index(pin: IndexPin) -> None:
+    """d7 as a refusal."""
+    problem = check_index(pin)
+    if problem is not None:
+        raise FuxError(f"{fixed('plugins', 'file')}: {problem} (SR-PLUGINS P4)")
+
+
+def locate_index(pin: IndexPin) -> Path:
+    """Verify, then the segment's directory — the only way a segment is read."""
+    verify_index(pin)
+    directory = segment_root(pin)
+    assert directory is not None  # verify_index located it
+    return directory
+
+
+def pin_index(pypi: str, npm: str | None = None, name: str | None = None) -> IndexPin:
+    """An index row for the installed PyPI distribution `pypi` (`fux setup
+    --index`, `--pin`): its version and its segment's digest, from what is
+    installed. Refused when it is not installed or holds no segment."""
+    version = installed_version(pypi)
+    if version is None:
+        raise FuxError(f"{pypi} is not installed, so there is no index segment to pin")
+    pin = IndexPin(name=name or pypi.lower(), version=version, digest="", npm=npm, pypi=pypi)
+    directory = segment_root(pin)
+    if directory is None:
+        raise FuxError(
+            f"{pypi} {version} is installed but holds no index segment "
+            f"(no {fixed('plugins.index', 'manifest')}) (SR-PKG-INDEX d5)"
+        )
+    return IndexPin(
+        name=pin.name, version=version, digest=segment_digest(directory) or "", npm=npm, pypi=pypi
+    )
+
+
 def _fux_version() -> str:
     from . import __version__
 
@@ -504,6 +799,10 @@ def problems(root: Path) -> list[str]:
         for dep in decl.package.depends:
             if dep not in found:
                 out.append(f"{name} needs {dep}, which is not declared - run `fux setup` to add it")
+    for pin in indexes(root).values():  # SR-PKG-INDEX d7: index rows, the same gate
+        problem = check_index(pin)
+        if problem is not None:
+            out.append(problem)
     needs = fixed("plugins", "fetcher_needs")
     fetchers = sorted(n for n, d in found.items() if d.package.kind == "fetcher")
     if fetchers and needs not in found:
@@ -789,7 +1088,7 @@ def pin(name: str, suffixes: "tuple[str, ...]" = ()) -> Declared:
     return Declared(package=package, version=version, digest=digest)
 
 
-def render(rows: "list[Declared]") -> str:
+def render(rows: "list[Declared]", index_rows: "list[IndexPin] | tuple" = ()) -> str:
     """The file `fux setup` writes, rows sorted by name."""
     row_key = fixed("plugins", "table")
     lines = [
@@ -810,4 +1109,10 @@ def render(rows: "list[Declared]") -> str:
         if not decl.package.first_party and decl.package.suffixes:
             quoted = ", ".join(f'"{s}"' for s in decl.package.suffixes)
             lines.append(f"suffixes = [{quoted}]")
+    for pin in sorted(index_rows, key=lambda p: p.name):
+        lines += ["", f"[[{row_key}]]", f'name = "{pin.name}"', f'kind = "{fixed("plugins.index", "kind")}"']
+        lines += [f'version = "{pin.version}"', f'digest = "{pin.digest}"']
+        for key in ("npm", "pypi"):
+            if getattr(pin, key):
+                lines.append(f'{key} = "{getattr(pin, key)}"')
     return "\n".join(lines) + "\n"

@@ -6,7 +6,7 @@ item: W-293
 filed: 2026-10-21
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Claude Code (Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5), step 7 read"
 ball: agent
 ---
 
@@ -23,7 +23,7 @@ ball: agent
 | 5 | Wheel cache keyed by `ci-key.py wheels` | a docs-only push skips the ~90 s wheel build | ✅ built |
 | 6 | Lean `CLAUDE.md` (one line per law, L11 whole); history trimmed; one SR guard | 42 KB → 33 KB read by every session; the hook and CI cannot disagree | ✅ |
 | 6a | 🟢 **Claude Code** (on Arpit's Mac) merges the law-gate, smoke and wheel-cache steps into the **current** `ci.yml` and `publish.yml` — never the 2026-10-21 chat copies, which predate W-292's `.mjs` wheel check (2026-10-24) — and runs both suites. Ruled 2026-10-25 (below) | the wiring lands: ci.yml's build job restores/saves `wheels/` under `ci-key.py wheels` (push only), then bundles both npm names, runs the law gate (✔ locally, 19 wheels · 1 sdist · 2 npm, 5.0.0) and the smoke; publish.yml runs the gate. The smoke got `commit.gpgsign false` for its fixture. ⚠ The smoke could not run on Arpit's Mac (ensurepip SIGABRTs in any fresh venv there) — step 7 is its first run | ✅ 2026-10-25 (Claude Code) |
-| 7 | **First push to `main`: read the build job** — law gate ✔, smoke ✔; a second push touching only `work/` shows "wheels restored" | the ports proven on a runner, not only in a container | ⏳ |
+| 7 | **First push to `main`: read the build job** — law gate ✔, smoke ✔; a second push touching only `work/` shows "wheels restored" | the ports proven on a runner, not only in a container | ✅ 2026-10-25 (Claude Code): run 40192043910 (`main`, 6aae2ae1) — wheel cache miss then saved, `✔ law-gate: 19 wheels, 1 sdist, 2 npm package(s)`, `✔ smoke: 5 calls`; run 40193299244 (tag `v5.0.0`, same tree) — `✔ wheels restored for ci-wheels-v1-bfe7b1e7…`, gate ✔, smoke ✔. The three unpushed work-only commits key to the same `bfe7b1e7…` (`ci-key.py wheels`), so their push restores by construction |
 
 **Arpit, 2026-10-21 (Cowork):** *"look into code law. Is there something that can be taken from it?"* → *"Implement text and design change in Fox. Implement release safety. Implement fix now tiny."* → *"additionally implement CI wheel cache keyed by a hash of the inputs"*.
 

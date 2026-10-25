@@ -5,6 +5,9 @@ directly beneath it is exactly one `*Empty since YYYY-MM-DD ...*` declaration
 (one logical sentence — it may soft-wrap across physical lines) and nothing
 else: no recap prose, no restated rulings.
 
+It also checks rule 23d: every 🟡 row names what it waits on right
+after its id (`🟡 **W-nn** waits on **W-mm**`).
+
 Read-only. Exits 0 (silent) if the section is well-formed or absent. Exits 1
 with a one-line reason on stdout if it is not — the caller decides what to do
 with that (block, or just print it).
@@ -86,17 +89,76 @@ def check(open_work: Path):
     )
 
 
+# SR-WORK-OPEN-QUEUE rule 23d (Arpit, 2026-10-25): a 🟡 row shows what it waits on
+# right after its id, as visibly as the id itself — `🟡 **W-nn** waits on **W-mm**`,
+# or `waits on **<project> W-mm**` for another project's item. The rule is stated
+# in the record, not here; this only reads rows.
+RULE_YELLOW = "23d"
+ROW_LEAD = re.compile(r"^(?:- )?(?P<ball>🔴|🟣|🟡|🟢)(?: ?🧨)?(?: ?🔺)? \*\*(?P<id>W-\d+)\*\*(?P<rest>.*)$")
+BLOCKER_TAG = re.compile(r"^ waits on (?P<refs>\*\*[^*]+\*\*(?:(?:, | and )\*\*[^*]+\*\*)*)(?=[ .,;:·]|$)")
+REF = re.compile(r"\*\*([^*]+)\*\*")
+LOCAL_REF = re.compile(r"^W-\d+$")
+#: Another project's blocker: `<project> <ref>`, the ref something a reader can follow —
+#: an item `W-nn`, a record `SR-…`, a version `5.1.0`, or an issue/PR `#12`.
+FOREIGN_REF = re.compile(r"^[A-Za-z][A-Za-z0-9_.@/-]* (?:W-\d+|SR-[A-Z0-9-]+|v?\d[\w.-]*|#\d+|PR #\d+)$")
+
+
+def check_yellow(open_work: Path):
+    """Every reason a 🟡 row under `## Open items` breaks rule 23d, or an empty list."""
+    lines = open_work.read_text(encoding="utf-8").splitlines()
+    try:
+        start = next(i for i, l in enumerate(lines) if l.strip() == "## Open items")
+    except StopIteration:
+        return []
+    rows = []
+    for l in lines[start + 1:]:
+        if l.startswith(("# ", "## ")):
+            break
+        m = ROW_LEAD.match(l)
+        if m:
+            rows.append(m)
+    open_ids = {m.group("id") for m in rows}
+    errors = []
+    for m in rows:
+        if m.group("ball") != "🟡":
+            continue
+        wid = m.group("id")
+        tag = BLOCKER_TAG.match(m.group("rest"))
+        if not tag:
+            errors.append(
+                f"rule {RULE_YELLOW}: {wid} is 🟡 but does not name what it waits on right after its id — "
+                f"write `🟡 **{wid}** waits on **W-mm**`, or `waits on **<project> W-mm**` for another project's item"
+            )
+            continue
+        for ref in (r.strip() for r in REF.findall(tag.group("refs"))):
+            if LOCAL_REF.match(ref):
+                if ref == wid:
+                    errors.append(f"rule {RULE_YELLOW}: {wid} waits on itself")
+                elif ref not in open_ids:
+                    errors.append(
+                        f"rule {RULE_YELLOW}: {wid} waits on **{ref}**, which is not an open row in this queue — "
+                        f"if it closed, re-ball {wid} (rule 28); if it is another project's, write **<project> {ref}**"
+                    )
+            elif not FOREIGN_REF.match(ref):
+                errors.append(
+                    f"rule {RULE_YELLOW}: {wid} waits on **{ref}** — name a queue item `W-mm`, "
+                    f"or another project's as `<project> <ref>` — `fux W-299`, `fux SR-PKG-INDEX`, `fux 5.1.0`, `fux #12`"
+                )
+    return errors
+
+
 def main():
     root = find_repo_root(Path.cwd())
     if root is None:
-        return 0  # not in this repo — nothing to check
+        return 0
     open_work = root / "work" / "OPEN-WORK.md"
     if not open_work.is_file():
         return 0
-    error = check(open_work)
-    if error is None:
+    errors = [e for e in [check(open_work)] if e] + check_yellow(open_work)
+    if not errors:
         return 0
-    print(f"work/OPEN-WORK.md — {error} (see records/0051_WORK-open-queue.md rule 45a)")
+    message = "work/OPEN-WORK.md — " + " · ".join(errors) + " (see records/0051_WORK-open-queue.md)\n"
+    sys.stdout.buffer.write(message.encode("utf-8"))  # whatever the locale (work/MACHINE.md)
     return 1
 
 

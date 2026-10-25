@@ -156,8 +156,8 @@ def test_the_file_is_read_once_per_process(tmp_path, monkeypatch):
     long-lived `fux mcp` sees an edited declaration)."""
     _declare(tmp_path, _row("fux-decoder-pdf"))
     calls = []
-    real = plugins.parse
-    monkeypatch.setattr(plugins, "parse", lambda *a: calls.append(a) or real(*a))
+    real = plugins._parse  # one parse yields both the package and the index rows
+    monkeypatch.setattr(plugins, "_parse", lambda *a: calls.append(a) or real(*a))
     for _ in range(3):
         assert list(plugins.declared(tmp_path)) == ["fux-decoder-pdf"]
     assert len(calls) == 1

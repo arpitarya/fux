@@ -365,6 +365,36 @@ install = "pip install"
 # it out after the package is declared; `fux ingest` counts it on stderr.
 skip_undeclared = "no declared package reads this format"
 
+# An index package (W-299, W-302, SR-PKG-INDEX): a segment shipped as data.
+[plugins.index]
+# The row's `kind`, and the keys an index row may carry (a `suffixes` key is refused).
+kind = "index"
+keys = ["name", "version", "digest", "kind", "npm", "pypi"]
+# The files the segment digest covers, as globs relative to the segment root.
+# The manifest is NOT covered: it carries the digest, and a file cannot hold
+# its own hash. Its header is checked against the shards instead (W-299 step 4).
+segment = ["index/*.jsonl", "identifiers.toml"]
+manifest = "fux-index.json"
+# The derived, gitignored child of `.fux/runtime/` a pinned segment inflates into.
+runtime_child = "pkg"
+# W-299 (SR-PKG-INDEX d2, d6-d8): a pin's `name` (it names a directory under
+# `runtime/pkg/`, so no separator and no `..`); the shard-header keys that must
+# equal the reader's `[index]` values (lockstep -- `identifiers` may differ);
+# the file in `runtime/pkg/<name>@<version>/` holding the pin digest it was
+# built from, written last; and how a Node refusal spells the install line.
+name_pattern = "^[a-z0-9][a-z0-9._-]*$"
+header_keys = { _format = "schema", analyzer = "analyzer", tf_fields = "tf_fields" }
+pin_stamp = "pin"
+npm_install = "npm install"
+# The file that makes a directory an npm package, and holds its `version`.
+npm_manifest = "package.json"
+# `fux pack` (W-302): where it writes, relative to <outdir> -- the segment's own
+# layout, so a wheel and an npm tarball hold the same relative paths.
+pack_index_dir = "index"
+pack_identifiers = "identifiers.toml"
+# The manifest's `content` keys (the package whose docs the segment indexes).
+pack_content_keys = ["npm", "pypi", "version"]
+
 [plugins.packages.fux-decoder-json]
 kind = "decoder"
 suffixes = [".json", ".jsonl"]
@@ -524,6 +554,8 @@ schema      = "fux.acquired.v1"
 # decision 6, W-226); `fux.schema.load` resolves every name below from it.
 package      = "fux.schemas"
 output       = "output.schema.json"
+# A shipped index segment's manifest, `fux-index.json` (SR-PKG-INDEX d3).
+fux_index    = "fux-index.schema.json"
 index_record = "index-record.schema.json"
 graph        = "graph.schema.json"
 
@@ -1114,3 +1146,23 @@ fetcher_help  = "must be a fetcher module name - lowercase letters, digits and u
 url_decoder_empty = "is empty, and a URL entry may not leave its decoder to be resolved later — a URL has no trustworthy extension. Write `decoder: {prose}` for a page that is already text, or a decoder module name (`html`, `pdf`, `xlsx`, ...)"
 fetch_required_hint   = " naming a file in .fux/fetchers/, or let `fux add` resolve it for you. ([sources.url] fetcher was deleted on 2026-09-20; SR-SOURCES decision 16)"
 decoder_required_hint = " naming a decoder module — `{prose}` for a page that is already text, a built-in (`html`, `pdf`, `xlsx`, ...) or a file in .fux/decoders/. `fux add <URL>` observes the type once and writes it for you (the pipe ruling, 2026-09-18)"
+
+# What a `kind = "index"` pin is refused with (W-299, SR-PKG-INDEX d7) -- one
+# text for `plugins.check_index` and its Node twin (`node/src/config/plugins.mjs`),
+# in this order. `{expected}` is `pinned <name> <version>[ <digest>]`, `{install}`
+# the runtime's own install line; values in `{got_value}`/`{want_value}` are JSON.
+[pkg_index_refusals]
+no_registry   = "{name} is pinned with no `{key}` name, so this runtime cannot read it ({expected}) - add the index package's `{key}` name to its row"
+missing       = "{name} is pinned and not installed ({expected}) - run `{install}`"
+other_version = "{name} {have} is installed, {expected} - run `{install}`"
+no_digest     = "{name} {version} is pinned without a digest - run `fux setup --pin` to pin it"
+no_segment    = "{name} {have} is installed but holds no index segment (no {manifest}) - reinstall it: `{install}`"
+drifted       = "{name} {have} has drifted: its segment hashes to {got}, {expected}. Reinstall it (`{install}`), or re-pin a deliberate change with `fux setup --pin`"
+manifest      = "{name} {have} is malformed: its {manifest} claims {claimed}, but its segment hashes to {got} - reinstall it: `{install}`"
+foreign       = "{name} {have} is a foreign segment: {shard} has {key} {got_value} where this reader needs {want_value} (lockstep, SR-PKG-INDEX d6) - install the release of {name} packed by this fux version"
+
+# SR-WORK-SCALE: the design point, which is a ceiling on what is promised. Since
+# W-299 (SR-PKG-INDEX d9) `fux doctor` counts it against the MERGED corpus --
+# the repository's documents plus every pinned index package's -- and warns above it.
+[scale]
+ceiling = 10000

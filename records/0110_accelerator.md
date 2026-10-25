@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@41331033e1d3, node/src/derive@b8e5388ded11, tools/differential@fff75655b225, src/fux/schemas/runtime.schema.json@e7f2d4f8acb3]
+owns: [src/fux/derive@294bff6c0395, node/src/derive@dde3404f16b6, tools/differential@fff75655b225, src/fux/schemas/runtime.schema.json@e7f2d4f8acb3]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: 1302392abfe18ddea648300a875e836b845209282de41f493ec5db4457b19408
+content_sha: e65d96927da9e5d324e23786c97ff4b22d9577ec46ee44368d4fa1812443bfc0
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -279,6 +279,14 @@ this moved where they are written, not what they are.
 - `src/fux/derive/format.py` — `RUNTIME_DIR` ← `[runtime] dir`, `BLOCK_SIZE` ← `[runtime] block_size`, `RUNTIME_SCHEMA` ← `[runtime] schema`, `DOCS_FIELDS` ← `[runtime] docs_fields`, `DOCS_NAME` ← `[runtime] docs`, `ANCHORS_DIR` ← `[runtime] anchors_dir`, `STATS_NAME` ← `[runtime] stats`, `MINED_NAME` ← `[runtime] mined`, `MANIFEST_NAME` ← `[runtime] manifest`, `STAMP_NAME` ← `[runtime] stamp`, `POSTINGS_DIR` ← `[runtime] postings_dir`, `DETERMINISTIC_FILES` ← `[graph] file`
 
 <!-- L12-VALUES-END -->
+
+**`build` ends by inflating every pinned index package** (W-299, 2026-10-25):
+`derive.build` (and `derive/build.mjs::build`) writes the repository's plane with
+`build_own` (`buildOwn`), then verifies each `kind = "index"` pin and builds
+its `.fux/runtime/pkg/<name>@<version>/` with that same function. When a
+package's segment is rebuilt, and what it is refused for, are
+[SR-PKG-INDEX](0166_pkg-index.md)'s (decision 8, `derive/segments.py` and its
+twin); what the plane holds is this record's, unchanged.
 
 ### The weighted bound
 

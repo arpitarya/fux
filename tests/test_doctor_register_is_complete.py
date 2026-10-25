@@ -42,6 +42,9 @@ RECORD = ROOT / "records" / "0152_doctor.md"
 #: ⚠ **By name, never by pattern.** A regex exemption would quietly grow to
 #: cover rows nobody meant to exempt, which is how a gate stops gating.
 CONDITIONAL = {
+    # W-299: both rows exist only when a `kind = "index"` package is pinned.
+    "index packages": "`_index_packages` reports only when an index package is pinned",
+    "merged corpus": "`_merged_corpus` reports only when an index package is pinned",
     "url daemon": "`_daemon` returns None unless a refresh daemon is configured",
     # W-233: the three rows about an INDEX need one; the parity row needs a [user] regex.
     "identifier families indexed": "`_identifiers` reports it only when an index exists",

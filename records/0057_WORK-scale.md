@@ -10,7 +10,7 @@ feature: the design point, and the ceiling it puts on what may be measured and w
 owns: []
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: f5830d5336c7da4500cd3069321302704b29cc52720bfb0101844744bac885e0
+content_sha: ecba5e30fb9fce1f1aa935b3683858ca86b919fe99b6bb4c5433d0abd158eaa5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -175,6 +175,12 @@ a correct document to satisfy a rule that does not apply to it.
     commitment would fail the very distinction decision 7 rests on.** Writing a
     looser check to have one would be the moving-threshold failure wearing a
     helpful face.
+
+16. **The ceiling counts the merged corpus** (Arpit, 2026-10-25, *"10k ceiling
+    counts the merged corpus"*, W-299): the repository's documents plus every
+    pinned index package's ([SR-PKG-INDEX](0166_pkg-index.md) decision 9). A
+    repository of 6 000 documents pinning a 5 000-document package is above it,
+    and `fux doctor`'s `merged corpus` row says so.
 
 ### Consequences
 

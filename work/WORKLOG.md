@@ -24,6 +24,20 @@ play: the worklog is the granular, per-exchange trail.
 ```
 
 
+## 2026-10-25 — README repositioned for sales and marketing; `docs/how-fux-is-used.md` created  ·  Claude Code remote (Fable 5.1)
+
+- **Asked:** *"I want the Fox README document to be created for sales and marketing purposes. Create a separate document on how it is going to be used … comparing it with grep RG makes sense. Comparing it with VectorDB RAG might not be the best way to go … if somebody wants to use it just as a search algorithm, that will also work. It is somewhat like how Google does it … we filed a work item where packages will have its own optional Fox index … add that in there as well, maybe write a story on how Fox can be used. I linked sheet pane in there."*
+- **Done:** `README.md` rewritten in place — Google-index lede, *Who searches it* (five ways in), `grep`/`rg` vs fux only, §Packages that ship their own index (marked in build, W-299…W-302; sheetpane and codelaw; the 19/20 spike), 5.0.0 facts (decoder packages released; the stale *next release* note and the *In 4.1* paragraph gone), L14 in the laws block, two new FAQ answers (no AI needed; not a vector database). New `docs/how-fux-is-used.md` (type Guide): five stories, *What fux is not*, *How to describe it*. Registry rows, `docs/index.md`, CHANGELOG `[Unreleased]`.
+- **Found:** two live Claude Code sessions (f7e74b47, e2598401) hold uncommitted W-299/W-302 work in this tree, so **nothing was committed** — the four files above are left for Arpit to stage by pathspec. The README's old *Coming in the next release* note described 5.0.0 as unreleased on the day it shipped. `fux ingest --check` exits 0 whether or not anything drifted (SR-INGEST decision 21); the story doc says a pipeline reads its report, not its exit code.
+- **Next:** when W-299…W-302 land, flip Story 4 and the README's package section from *in build* to released and replace the illustrative `pkg:` transcript with a real run.
+
+## 2026-10-25 — "implement all the green items": triage found none closable by this session  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement all the green items in OpenWork … in parallel … keep running till its closure."*
+- **Found:** 🟢 W-299 and W-302 are in flight in this tree under live session f7e74b47 (files written minutes before), so they are its rows and its work (SR-WORK-NOW d2). W-268, W-263, W-265, W-275 and W-280 are `research`, which is Cowork only (rule 37a). W-281's one open DoD (5, a timed ≤ 30 min capture) needs an unloaded machine, and the other session is building now (L13 d3, SR-WORK-SESSION d12). W-300 and W-301 are 🟡, waiting on W-299.
+- **Done:** nothing changed in code. This entry only.
+- **Next:** when f7e74b47 lands W-299, W-300 and W-301 become 🟢 and can be built in parallel. W-281 DoD 5 runs when the machine is idle.
+
 ## 2026-10-25 — CI to green: W-293 wiring, Windows fixes, the four agent hooks built  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"Keep an eye on CI. Fix it. And keep following it until everything is green."* Then, asked how to close the four missing hooks: *"Claude Code builds them."*

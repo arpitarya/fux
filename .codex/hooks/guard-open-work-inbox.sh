@@ -2,7 +2,9 @@
 # PostToolUse(shell) advisory — catches a malformed "Blocked on Arpit"
 # section right after a session writes one.
 #
-# The rule enforced is SR-WORK-OPEN-QUEUE rule 45a — stated once there, NOT
+# Also a 🟡 row that does not name its blocker right after its id (rule 23d).
+#
+# The rules enforced are SR-WORK-OPEN-QUEUE rules 45a and 23d — stated once there, NOT
 # here (L0). See .claude/hooks/guard-open-work-inbox.sh for the fuller note
 # and the 2026-09-15 failure this guards against (work/LESSONS.md).
 #

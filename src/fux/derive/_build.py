@@ -70,7 +70,23 @@ class BuildReport:
 
 
 def build(root: Path, *, progress=None) -> BuildReport:
-    """Materialize `.fux/runtime/` from the committed index."""
+    """Materialize `.fux/runtime/` from the committed index.
+
+    Then every pinned index package is verified and inflated into
+    `.fux/runtime/pkg/` ([SR-PKG-INDEX](../../../records/0166_pkg-index.md)
+    decision 8, `segments.inflate_all`). The report counts the repository's
+    plane alone.
+    """
+    report = build_own(root, progress=progress)
+    from . import segments
+
+    segments.inflate_all(root)
+    return report
+
+
+def build_own(root: Path, *, progress=None) -> BuildReport:
+    """`.fux/runtime/` from the committed index at `root`, and nothing else —
+    what a pinned segment's own runtime is built with."""
     progress = progress or _NULL_PROGRESS
     docs, postings, anchors, stats, shard_stamp, records, sections = _read_committed(root, progress)
 

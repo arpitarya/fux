@@ -8,6 +8,8 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+**Front-door docs, second pass.** No engine change. The README is repositioned as a search engine for the documents a team writes, with the index in git: the comparison is `grep`/`rg` vs fux (the vector-DB column is gone — a different job), a *Who searches it* table, a section on packages that ship their own index (ruled 2026-10-25, in build), and 5.0.0 stated as released. New: [`docs/how-fux-is-used.md`](docs/how-fux-is-used.md), five usage stories.
+
 ## [5.0.0] - 2026-10-25
 
 **A major version, because three changes break existing setups**: one source

@@ -31,6 +31,7 @@ import * as docstable from "./docstable.mjs";
 import * as manifest from "./manifest.mjs";
 import * as stamp from "./stamp.mjs";
 import * as statsPlane from "./stats.mjs";
+import { inflateAll } from "./segments.mjs";
 
 const FIELD_COUNT = TF_FIELDS.length;
 const HEADER_LINES = fixed("index", "shard_header_lines");
@@ -377,8 +378,18 @@ function clear(directory) {
   }
 }
 
-/** Materialize `.fux/runtime/` from the committed index. Returns the report. */
+/** Materialize `.fux/runtime/` from the committed index, then verify and
+ *  inflate every pinned index package into `.fux/runtime/pkg/` (SR-PKG-INDEX
+ *  d8, `segments.mjs`). The report counts the repository alone. */
 export function build(root) {
+  const report = buildOwn(root);
+  inflateAll(root, buildOwn);
+  return report;
+}
+
+/** `.fux/runtime/` from the committed index at `root`, and nothing else —
+ *  what a pinned segment's own runtime is built with. */
+export function buildOwn(root) {
   const { docs, postings, anchors, stats, shardStamp, records, sections } = readCommitted(root);
 
   const directory = derivedDir(root, fmt.RUNTIME_DIR);

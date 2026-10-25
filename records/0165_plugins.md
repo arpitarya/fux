@@ -8,10 +8,10 @@ status: accepted
 date: 2026-10-19
 amended: 2026-10-24
 feature: plugin packages — the declaration, its verification, the loader and the scan that proposes it
-owns: [src/fux/plugins.py@6af2c97d5fe2, .fux/config/plugins.toml@1863f6b0a99f, tests/test_plugins.py@ca27d984782e, tests/test_plugin_fence.py@8fc6dba932ed, tests/test_plugin_packages.py@68333db84fa1, tests/test_plugin_registry.py@036392d7b916]
+owns: [src/fux/plugins.py@d78240997410, .fux/config/plugins.toml@1863f6b0a99f, tests/test_plugins.py@303f73c72d12, tests/test_plugin_fence.py@8fc6dba932ed, tests/test_plugin_packages.py@68333db84fa1, tests/test_plugin_registry.py@036392d7b916]
 laws: [L2, L4, L5, L12]
 timestamp: 2026-10-19T00:00:00Z
-content_sha: 16803d193fe0b572f24db3fb0c211ed8aaf68c03602bbd3b8b6ef510ce24de96
+content_sha: 9b56185f3059d73f2523c6596919caeebffd48e0fa98118eb438c23e5aa6c0f1
 ratifies: "Arpit, 2026-10-19 (Cowork), on W-289: 'maybe we can build out a mechanism of extensions, decoders, plugins, and fetchers as separate packages that can be plugged into Fox' -> 'I want to go with the third option' (C: declared, pinned, committed) -> 'i like the recommendation now create a list what are mandatory and what are optional. because we dont need all' -> 'fux-decoder-json and config should also be optional only use if needed' -> 'okay file a work item for this', given in reply to confirming the SR-LAW-2 wording"
 ---
 
@@ -122,6 +122,14 @@ unchanged, before any package runs — the cache is keyed on its stat, as
 daemon sees an edited declaration (phase 2) ([SR-DOTFUX](0102_fux-directory.md)
 declares the child).
 
+**A row with `kind = "index"` is an index pin, not a package that runs** (W-299,
+2026-10-25): a package that ships a fux index segment — data, never code. Its keys,
+its refusals and its runtime are [SR-PKG-INDEX](0166_pkg-index.md)'s (decisions 2,
+7 and 8); this record contributes the file, the RECORD-line digest form P4 uses,
+and P4's verb-wide refusal, which `plugins.require` applies to index rows too. A
+`kind` with any other value is refused: a decoder, fetcher or extension package's
+kind is its name.
+
 **P3. Declared, never detected.** A package runs only when declared. An installed
 package nobody declared is never consulted — there is no fallback to *"whatever is
 installed"*. The decoder registry imports a module only from a declared package
@@ -173,7 +181,8 @@ over dependencies, writes the declaration and prints **one** install line. On a 
 run it adds a row the sources now need, pins a row that has no digest once its package
 is installed, and removes nothing. **`fux setup --pin`** re-pins every row from what is
 installed — the one deliberate act after an upgrade, never implicit. No network from
-fux (L5).
+fux (L5). **It never proposes an index row** (SR-PKG-INDEX d2): no source names an
+index nobody declared, so `fux setup --index <pypi name>` writes one only when told.
 
 **P7. Discovery by one fixed import name.** A package named `fux-<kind>-<subject>` is
 imported as `fux_<kind>_<subject>` and by nothing else. **No entry-point scan**, so an

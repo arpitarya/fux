@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # PostToolUse(Write|Edit|MultiEdit|NotebookEdit|Bash) — catches a malformed
 # "Blocked on Arpit" section the moment a session writes one, instead of at
-# the next test run.
+# the next test run. It also catches a 🟡 row that does not name its blocker
+# right after its id (SR-WORK-OPEN-QUEUE rule 23d).
 #
 # 🔴 `Bash` is in the matcher because leaving it out cost the guard its
 # second catch: on 2026-09-18 two paragraphs of recap landed under a populated

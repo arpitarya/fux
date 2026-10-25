@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-24
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@5931750f6a49, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@66d281d37048, src/fux/progress.py@e5f2459288d5, tests_e2e@d3e05bc7aca9, node/fux.mjs@073b0d5689f6, src/fux/stdio.py@9e270b49bdaa]
+owns: [src/fux/cli.py@cc2cf06868fb, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@66d281d37048, src/fux/progress.py@e5f2459288d5, tests_e2e@ceea0c6cb3bc, node/fux.mjs@03e35d89dbbf, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: f0562eb3b8c325f2d53e21d24c5d799ea17cf69689d316570214c6f1932b4044
+content_sha: 8a3ae2dd8e5f63f6ee3e227844a98f7d920cb1555088ca0eff3adecfa4381adc
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -37,7 +37,7 @@ content_sha: f0562eb3b8c325f2d53e21d24c5d799ea17cf69689d316570214c6f1932b4044
 | group | verbs | |
 |---|---|---|
 | **lifecycle** | `setup` · `doctor` · `inspect` · `identifiers` · `register` · `llms` | set the repo up, check the environment, then X-ray the index — `doctor`'s fix is a command or a config edit, `inspect`'s is a change to the corpus, `identifiers` records the ID families `inspect` found (SR-IDENTIFIERS) ([SR-INSPECT](0156_inspect.md)), `register` prints what the index holds, one line per document, for a machine ([SR-INGEST](0106_ingest.md) decision 22d; decision 18), and `llms` prints it as an llms.txt for a language model ([SR-LLMS](0162_llms.md)) |
-| **write** | `ingest` · `build` | one writes the committed plane, one derives from it. **`ingest` is the first ingest AND every re-ingest**, directories and URLs alike — decision 16 |
+| **write** | `ingest` · `build` · `pack` | one writes the committed plane, one derives from it, and `pack <outdir> --content NAME@VERSION` copies the committed index and `identifiers.toml` into `<outdir>` with a `fux-index.json` manifest, for a package author to ship (W-302, [SR-PKG-INDEX](README.md) — the publish path; **read-only on `.fux/`**, writes only `<outdir>`). **`ingest` is the first ingest AND every re-ingest**, directories and URLs alike — decision 16 |
 | **sources** | `add` · `remove` · `enrich` · `correct` | maintain what is indexed — `add` and `remove` write lines and end in an ingest, `enrich` plans and validates a MODEL's text, and `correct` writes one question a PERSON typed ([SR-ENRICH](0137_enrich.md) decision 19). ⚠ **`update` was a fourth verb here and decision 16 deleted it** |
 | **read** | `ask` · `find` · `answer` · `lexical` | differ only in how much they commit to. `lexical` is the words alone, **frozen** — decision 12 |
 | **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
@@ -283,6 +283,23 @@ rewrite ([SR-DOTFUX](0102_fux-directory.md)). The human pastes; the file stays
 theirs. It reads no repo state either, so it works before `fux setup` has run
 and outside a root — the second verb with that property, earned the opposite
 way to `setup`: by writing nothing rather than by creating the root.
+
+**1i. `pack` is a verb because it is the package author's publish step, and it
+is read-only on the repository** (W-302, Arpit 2026-10-25, Fork B). `fux pack
+<outdir> --content NAME@VERSION [--npm NAME] [--pypi NAME]` copies the
+committed shards and the `identifiers.toml` in force into `<outdir>` and writes
+`fux-index.json` beside them; it ingests nothing, fetches nothing and writes
+nothing under `.fux/` (a `<outdir>` inside `.fux/` is refused). It is gated like
+any index-reading verb — the PII and plugin gates run, `PLUGINS_EXEMPT` does not
+name it. **Exit codes under decision 5:** `0` packed; `1` for every refusal, each
+a `FuxError` raised before the first byte is written — `--content` missing or not
+`NAME@VERSION` (checked in the handler, so it is `1`, not argparse's `2`), a dirty
+index (`.fux/runtime/dirty` non-empty), uncommitted shards or `identifiers.toml`
+(per `git status`; where git cannot tell, this check is skipped and the dirty
+list still runs), a header this engine did not write from the `identifiers.toml`
+in force, or a `url:` record (a package segment holds `file:` records only);
+`2` stays argparse's. The segment layout, the manifest and the digest are
+SR-PKG-INDEX's; the digest is `plugins.segment_digest`, never recomputed.
 
 **2. The three query verbs share one parser.** Every one takes a positional
 `query`, `--json`, a mutually exclusive `--fast`/`--scan` pair (`--scan`, the

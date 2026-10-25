@@ -8,11 +8,11 @@ status: accepted
 amended: 2026-10-24
 date: 2026-09-11
 feature: "`fux doctor` — the read-only, offline health command and its check register"
-owns: [src/fux/doctor.py@020abfea858a, tests/test_doctor_register_is_complete.py@dff0d535b078, src/fux/health.py@5494cd3651a0, src/fux/query/health.py@1152ad21e863, src/fux/ingest/health.py@790330a4e1fc]
+owns: [src/fux/doctor.py@020abfea858a, tests/test_doctor_register_is_complete.py@d42d5e1c1c7b, src/fux/health.py@4b8d2be7bb12, src/fux/query/health.py@1152ad21e863, src/fux/ingest/health.py@790330a4e1fc]
 laws: [L5, L9]
 ratifies: "Arpit, 2026-09-11 — *create a new adr for doctor*"
 timestamp: 2026-09-11T00:00:00Z
-content_sha: 4f1a97b6ef66b6d4a4460e782942ab1dc7099e1bf49826fae5e88c5e996cfa55
+content_sha: d0e60d3569409916a0ce740a0d0c4ab2773ae6ed676c4ce2e0a0423137a05133
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -175,6 +175,8 @@ authoritative about the row.**
 | `.fux/ layout declared` | warn | undeclared entries at `.fux/`'s top level | [SR-DOTFUX](0102_fux-directory.md) |
 | `plugins declared` | warn when absent, **error** when unreadable | `.fux/config/plugins.toml` — present and parsed, with the declared packages and how many are first-party. **Absent is ONE line with the lever, `fux setup`**: a repository with no declaration reads only Markdown and plain text (W-289 phase 2) and runs no decoder or fetcher package, and every row that would list what that costs defers to this one. **A warning, not an error, deliberately**: prose only is a legal state (SR-PLUGINS P3), so phase 1's plan to promote it was dropped | [SR-PLUGINS](0165_plugins.md) P2 |
 | `plugins installed` | **error** | every declared package installed at its pinned version and digest — **located and hashed, never imported** — its dependencies declared, and `fux-decoder-html` declared wherever a fetcher is (every fetcher emits HTML). Names the package, what was expected, and the `pip install` line or `fux setup --pin` | [SR-PLUGINS](0165_plugins.md) P4 · P10 |
+| `index packages` | **error** | one row per `kind = "index"` pin: installed at its pinned version, its segment digest equal to the pin and to its manifest, its shard headers the reader's own — **located and hashed, never imported**. Names the package and the install line, in SR-PKG-INDEX d7's order. No row when nothing is pinned | [SR-PKG-INDEX](0166_pkg-index.md) d7 |
+| `merged corpus` | warn | the repository's documents plus every readable pinned segment's, against the 10 000 ceiling; above it, a warning. No row when nothing is pinned | [SR-PKG-INDEX](0166_pkg-index.md) d9 · [SR-WORK-SCALE](0057_WORK-scale.md) d16 |
 | `plugins cover sources` | warn | a suffix in the configured sources that a first-party package reads and nothing in the repository does — no declared package and, since phase 2, no consumer file in `.fux/decoders/` — with its count and the package — **never silent**, because a corpus that loses its PDFs looks exactly like one that never had any. `fux ingest` prints the same lines on stderr (`plugins.notes`). Lists names; opens no file; prunes an excluded directory rather than entering it | [SR-PLUGINS](0165_plugins.md) P5 |
 | `index temp files ignored` | warn | `.fux/index/<shard>.jsonl.tmp` not gitignored — a background re-index leaves it in the **committed** index plane for the duration of a rename, and a `git add -A` running at that moment dies `unable to stat`. ⚠ **The row exists because the fix cannot reach the repos that need it**: `.fux/.gitignore` is write-if-missing (decision 11) | [SR-DOTFUX](0102_fux-directory.md) decision 6c |
 | `pii rules` | **error** when absent | a missing `.fux/config/pii.toml`; otherwise compiles every pattern offline and states the scope. ⚠ It cannot see an over-broad rule and says so — only [`tools/pii-probe/`](../tools/pii-probe/) can | [SR-PII](0148_pii.md) decision 17 |

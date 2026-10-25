@@ -14,7 +14,7 @@ session owes — is stated once in
 **[SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md)** and is not repeated
 here. Read that record before changing anything below it.
 
-**A ball on every row, always one:** 🔴 blocked on Arpit, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item · 🟢 no blockers.
+**A ball on every row, always one:** 🔴 blocked on Arpit, directly or through another item · 🟣 gated on a named date, directly or through another item · 🟡 waiting on another item, named right after the id — `waits on **W-mm**`, or `**<project> W-mm**` for another project's · 🟢 no blockers.
 **Optional, after the ball:** 🧨 broken or getting worse · 🔺 do first (Arpit only). Full legend: [SR-WORK-OPEN-QUEUE](../records/0051_WORK-open-queue.md) rules 20–34.
 
 ---
@@ -36,14 +36,13 @@ here. Read that record before changing anything below it.
 
 - 🔴 **W-289** · `arpit` — plugin packages; **5.0.0 released 2026-10-25**, all 15 plugins on PyPI through CI. Left: Arpit yanks the 14 hand-uploaded 4.1.1 plugin files. Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
 - 🟢 **W-299** · `agent` — index packages: `kind = "index"` pin, segment-only digest, resolve/refuse in both runtimes, `runtime/pkg/`; step 0 writes SR-PKG-INDEX. **Opus.** Ratified, not built. Filed by Arpit (Cowork). [detail](open/W-299-index-package-pin.md)
-- 🟡 **W-300** · `agent` — one query over repo + pinned segments: per-digest hashing, df/n summed, one `rank()`, foreign refused, `scope`; Python ≡ Node. Waits on W-299. **Opus.** Ratified, not built. Filed by Arpit (Cowork). [detail](open/W-300-merged-query-over-segments.md)
-- 🟡 **W-301** · `agent` — `pkg:<docs-pkg>@<ver>#<path>` locations; `fux_passage` reads in place after `..`-collapse + containment; drift refused. Waits on W-299. **Opus.** Ratified, not built. Filed by Arpit (Cowork). [detail](open/W-301-pkg-locations-read-in-place.md)
+- 🟡 **W-300** waits on **W-299** · `agent` — one query over repo + pinned segments: per-digest hashing, df/n summed, one `rank()`, foreign refused, `scope`; Python ≡ Node. **Opus.** Ratified, not built. Filed by Arpit (Cowork). [detail](open/W-300-merged-query-over-segments.md)
+- 🟡 **W-301** waits on **W-299** · `agent` — `pkg:<docs-pkg>@<ver>#<path>` locations; `fux_passage` reads in place after `..`-collapse + containment; drift refused. **Opus.** Ratified, not built. Filed by Arpit (Cowork). [detail](open/W-301-pkg-locations-read-in-place.md)
 - 🟢 **W-302** · `agent` — `fux pack <outdir>`: read-only verb emitting shards + identifiers.toml + manifest; refuses dirty/foreign/`url:`; author recipe. W-298 step 1 passed. **Sonnet.** Ratified, not built. Filed by Arpit (Cowork). [detail](open/W-302-fux-pack-publish-path.md)
 
 
 ### testing
 
-- 🟢 **W-293** · `agent` — codelaw ports built; Claude Code merges gate/smoke/cache into the *current* workflow files (keep W-292's `.mjs` check), both suites; then Arpit pushes. **Sonnet.** Filed by Arpit (Cowork). [detail](open/W-293-first-ci-run-of-the-codelaw-ports.md)
 - 🟢 **W-281** · `agent` — capture driver built (DoD 1–4, never run); DoD 5 (≤ 30 min, timed) owed by the next capture. **Sonnet.** Filed by Arpit (Claude Code). [detail](open/W-281-capture-harness-speed.md)
 - 🔴 **W-258** · `arpit` — on hold by Arpit's word (2026-10-25): §1 (a source vanishes, ~20 min) and §2 (a real 429) run when he says; §3 parked as B-274. Checklist and bars written. Filed by Arpit (Cowork). [detail](open/W-258-live-network-captures.md)
 

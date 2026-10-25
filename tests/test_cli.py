@@ -148,6 +148,10 @@ def test_parser_has_the_verb_surface():
         # the index, for a program -- the file is what a PR shows, the verb is
         # what a machine calls, and a second committed copy is what it refuses.
         "register",
+        # SR-PKG-INDEX (W-302). A verb, not a flag on `ingest`: it runs after
+        # one, reads the committed index, and writes OUTSIDE `.fux/` -- the
+        # package author's publish path, read-only on the repository.
+        "pack",
         # SR-IDENTIFIERS (W-233, F1). A verb rather than a flag on `inspect`,
         # because it WRITES: `inspect` is read-only by contract, and the one
         # table it proposes is recorded only when a person asks for it.

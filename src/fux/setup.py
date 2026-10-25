@@ -1647,7 +1647,10 @@ def remove_vendored_reader(root: Path, report: "SetupReport") -> None:
     _unwire_workspace(root, report)
 
 
-def write_plugins(root: Path, report: "SetupReport", *, pin_all: bool = False) -> None:
+def write_plugins(
+    root: Path, report: "SetupReport", *, pin_all: bool = False, index: "str | None" = None,
+    index_npm: "str | None" = None,
+) -> None:
     """`.fux/config/plugins.toml` — SR-PLUGINS P6, and the only fux-written file
     setup ever updates.
 
@@ -1658,7 +1661,11 @@ def write_plugins(root: Path, report: "SetupReport", *, pin_all: bool = False) -
       package is installed. Nothing is removed — an unneeded row is the
       consumer's to delete.
     - **`--pin`**: every row is re-pinned from what is installed — the one
-      deliberate act after an upgrade, and never implicit.
+      deliberate act after an upgrade, and never implicit. An index row
+      (SR-PKG-INDEX d2) is re-pinned from its installed PyPI distribution; an
+      npm-only one is kept as written.
+    - **`--index <pypi>`** adds (or re-pins) one `kind = "index"` row from the
+      installed distribution — never proposed by the scan, only when told.
 
     🔴 **Installs nothing.** The packages a row names but this machine lacks
     become ONE install line, printed by `cmd_setup` (L5: fux opens no socket).
@@ -1669,12 +1676,33 @@ def write_plugins(root: Path, report: "SetupReport", *, pin_all: bool = False) -
     rel = target.relative_to(root).as_posix()
     try:
         existing = plugins.read(root)
+        index_rows = dict(plugins.indexes(root))
         proposed = plugins.propose(root)
+        if index is not None:
+            fresh_index = plugins.pin_index(index, npm=index_npm)
+            if index_rows.get(fresh_index.name) != fresh_index:
+                index_rows[fresh_index.name] = fresh_index
+                index_changed = True
+            else:
+                index_changed = False
+        else:
+            index_changed = False
     except FuxError as exc:
         report.plugins_note = str(exc)
         return
+    if pin_all:
+        for name, row in sorted(index_rows.items()):
+            if not row.pypi:
+                continue  # npm-only: Python cannot see it, so it keeps its row
+            try:
+                fresh_index = plugins.pin_index(row.pypi, npm=row.npm, name=row.name)
+            except FuxError:
+                continue  # not installed here: the row is kept as written
+            if fresh_index != row:
+                index_rows[name] = fresh_index
+                index_changed = True
     rows = dict(existing or {})
-    changed = existing is None
+    changed = existing is None or index_changed
     for name in proposed:
         if name not in rows:
             rows[name] = plugins.pin(name)
@@ -1691,7 +1719,7 @@ def write_plugins(root: Path, report: "SetupReport", *, pin_all: bool = False) -
                 changed = True
     if changed:
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(plugins.render(list(rows.values())), encoding="utf-8")
+        target.write_text(plugins.render(list(rows.values()), list(index_rows.values())), encoding="utf-8")
         (report.written if existing is None else report.updated).append(rel)
         plugins.reset()
     missing = [
@@ -1733,7 +1761,10 @@ def _write_sources(root: Path, report: SetupReport) -> None:
     _migrate_sources_keys(root, report)
 
 
-def run(root: Path, *, agents: bool = True, pin: bool = False) -> SetupReport:
+def run(
+    root: Path, *, agents: bool = True, pin: bool = False, index: "str | None" = None,
+    index_npm: "str | None" = None,
+) -> SetupReport:
     """Write the consumer-owned files, write-if-missing. Returns what happened.
 
     `agents=False` is `--no-agents`, and it must write **nothing** under
@@ -1833,7 +1864,7 @@ def run(root: Path, *, agents: bool = True, pin: bool = False) -> SetupReport:
     report.written += fill_missing(root)
     # W-289, SR-PLUGINS P6: after `fux.toml` and the two source lists, which
     # are what the scan reads.
-    write_plugins(root, report, pin_all=pin)
+    write_plugins(root, report, pin_all=pin, index=index, index_npm=index_npm)
 
     # After `fux.toml`, so a first run reads the default this very call just
     # wrote out in full, and a later run reads whatever the consumer edited it
@@ -1894,7 +1925,8 @@ def cmd_setup(args) -> int:
     # else, no root is an error.
     root = find_root() or Path.cwd()
     report = run(
-        root, agents=not getattr(args, "no_agents", False), pin=getattr(args, "pin", False)
+        root, agents=not getattr(args, "no_agents", False), pin=getattr(args, "pin", False),
+        index=getattr(args, "index", None), index_npm=getattr(args, "index_npm", None),
     )
     hook_lines = (
         [] if getattr(args, "no_hooks", False) else _install_hooks(root, report)

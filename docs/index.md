@@ -94,6 +94,8 @@ records/            THE STANDING RECORDS — the register, TEMPLATE.md, SR-LAWS 
                     since 2026-09-13, and in the OKF bundle from wherever it sits
 docs/               WHAT THE PROJECT IS
   GLOSSARY.md       every recurring term, defined once
+  how-fux-is-used.md            the five usage stories — the README's long form, for marketing and adoption
+  publish-an-index-package.md   the package author's recipe: ingest, `fux pack`, ship
   index.md          the OKF bundle root — this file
 src/fux/            the engine — every component claimed in records/README.md
 node/               the Node read plane — authored .mjs; ONE bundled file ships (L10)
@@ -136,6 +138,8 @@ gating rule stands for every milestone after it**
 * [Machine notes](../work/MACHINE.md) - what breaks on which surface, and why.
 * [Doc registry](../records/0067_WORK-registry.md) - maintained docs, update triggers, last-verified dates.
 * [Glossary](GLOSSARY.md) - recurring terms, defined once.
+* [How fux is used](how-fux-is-used.md) - five stories: terminal, pull request, coding agent, a package shipping its own index, search with no AI; what fux is not; how to describe it.
+* [Publish an index package](publish-an-index-package.md) - the author's recipe: ingest, `fux pack`, ship in the wheel and the npm tarball.
 
 # Decisions
 
