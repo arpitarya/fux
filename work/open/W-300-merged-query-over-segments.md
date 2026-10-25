@@ -6,7 +6,7 @@ item: W-300
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Fable 5.1)"
 updated: 2026-10-25
-updated_by: "Arpit (Cowork, Fable 5.1)"
+updated_by: "Claude (Claude Code, Opus 5.5)"
 ball: agent
 ---
 
@@ -16,19 +16,19 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 1 | The query is hashed **once per distinct `identifiers` digest** — the consumer's `identifiers.toml` for the repo, each segment's shipped `identifiers.toml` for that segment. Term keys are unsalted `blake2b(term)`, so equal tokens meet | identifier-family tokens match inside a package built under other rules; nothing silently misses | ⏳ |
-| 2 | Per segment: candidates + per-segment `df`, `n`, `total_flen` (the B2 scan or the runtime postings, as today). Then **sum**: `df = Σ df`, `n = Σ n`, `total_flen = Σ`; one `avg_wlen`; **one `rank()` call** over the union | one yardstick, shared idf, deterministic for a pinned set (L4) | ⏳ |
-| 3 | A segment whose `_format` / `analyzer` / `tf_fields` differ from the reader's is **refused by name** before the scan — never scored, never skipped silently | lockstep, as ruled | ⏳ |
-| 4 | `fux_search` gains optional `scope`: `repo` · `packages` · `all` (default). `fux ask --scope` mirrors it. Still three MCP tools | the lever against a large package filling the top-k | ⏳ |
-| 5 | Node: the same four steps in `node/src/query/`; one differential test over repo + fixture segment | the same answer on every machine | ⏳ |
-| 6 | Pre-register and run the merged-vs-repo-only comparison under L13's standing bar on the fixture corpus; file under `work/regression/` | a ranking change ships only through the bar | ⏳ |
+| 1 | The query is hashed **once per distinct `identifiers` digest** — the consumer's `identifiers.toml` for the repo, each segment's shipped `identifiers.toml` for that segment. Term keys are unsalted `blake2b(term)`, so equal tokens meet | identifier-family tokens match inside a package built under other rules; nothing silently misses | ✅ built (`scan.merged_hashes`) |
+| 2 | Per segment: candidates + per-segment `df`, `n`, `total_flen` (the B2 scan or the runtime postings, as today). Then **sum**: `df = Σ df`, `n = Σ n`, `total_flen = Σ`; one `avg_wlen`; **one `rank()` call** over the union | one yardstick, shared idf, deterministic for a pinned set (L4) | ✅ built (`scan.merged_candidates` / `merged_ask`) |
+| 3 | A segment whose `_format` / `analyzer` / `tf_fields` differ from the reader's is **refused by name** before the scan — never scored, never skipped silently | lockstep, as ruled | ✅ built (`segments_for` → `plugins.locate_index`) |
+| 4 | `fux_search` gains optional `scope`: `repo` · `packages` · `all` (default). `fux ask --scope` mirrors it. Still three MCP tools | the lever against a large package filling the top-k | ✅ built (`[scope]`, `--scope`, `fux_search.scope`) |
+| 5 | Node: the same four steps in `node/src/query/`; one differential test over repo + fixture segment | the same answer on every machine | ✅ built (`tests/test_pkg_merged_query.py`) |
+| 6 | Pre-register and run the merged-vs-repo-only comparison under L13's standing bar on the fixture corpus; file under `work/regression/` | a ranking change ships only through the bar | 🟡 run, **INCONCLUSIVE → Arpit** (table PASS; [verdict](../regression/2026-10-25-w300-merged-query/VERDICT.md)) |
 
 **Arpit, 2026-10-25 (Cowork):** *"Yes, all three as recommended"* — `scope` =
 repo|packages|all default all; wire compat lockstep; the 10 000 ceiling counts the
 merged corpus. Design accepted in chat: *"This looks good to me."*
 
 **Model:** Claude Code, **Opus** — the ranking arithmetic and the differential law.
-**Ratified, not built.**
+**Built on branch `worktree-agent-a4c6bc315d09e4640`; the L13 verdict awaits Arpit.**
 
 ## Why
 

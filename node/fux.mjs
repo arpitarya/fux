@@ -123,6 +123,9 @@ function parseArgs(argv) {
     else if (a === "--no-output-config") out.noOutputConfig = true;
     else if (a === "-q") (out.q ||= []).push(argv[++i]);
     else if (a === "--expand") out.expand = argv[++i];
+    // W-300 — `ask --scope repo|packages|all` (SR-PKG-INDEX d10); the value is
+    // checked where it is used, against `constants.toml [scope]`.
+    else if (a === "--scope") out.scope = argv[++i];
     else if (a === "--no-refer") out.noRefer = true;
     // W-242 Tier 1 — `cli.py`'s pair. `--fast` reads `.fux/runtime/` when it is
     // fresh and scans when it is not; `--scan` is the default, kept for a bug

@@ -1,0 +1,18 @@
+{
+  "G0a_no_pin_byte_identical": {
+    "questions": 30,
+    "differ": 0
+  },
+  "G0b_scope_repo_byte_identical": {
+    "questions": 30,
+    "differ": 0
+  },
+  "G0c_this_repository_byte_identical": {
+    "questions": 30,
+    "differ": 12
+  },
+  "G_node_equals_python": {
+    "questions": 30,
+    "differ": 0
+  }
+}

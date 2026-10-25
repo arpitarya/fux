@@ -611,6 +611,17 @@ method_not_found = -32601
 # fux_search's score and fux_related's mass are rounded to this many digits.
 score_digits     = 6
 
+# W-300 (SR-PKG-INDEX d10): which segments one query ranks over -- the
+# repository's own index, every pinned index package, or both under one
+# ranking with summed statistics. `default` is what `fux ask --scope` and
+# fux_search's `scope` mean when neither is given (Arpit, 2026-10-25:
+# "scope = repo|packages|all, default all"). Every other verb ranks `repo`.
+[scope]
+repo     = "repo"
+packages = "packages"
+all      = "all"
+default  = "all"
+
 [lsp]
 # LSP 3.17 base protocol (lsp.py, W-285). JSON-RPC's own version and reserved
 # codes are [mcp]'s; these are the ones LSP adds.

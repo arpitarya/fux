@@ -33,8 +33,9 @@ import { FuxError } from "../errors.mjs";
 import { loadTune } from "../config/tune.mjs";
 import { chunk, cellsOf } from "../refer/chunk.mjs";
 import { fixed } from "../config/constants.mjs";
+import { rootFor } from "../derive/segments.mjs";
 import { contain } from "../refer/source.mjs";
-import { hitFields, isPkg, read as readPkg, refuse as refusePkg } from "../refer/pkgsrc.mjs";
+import { hitFields, isPkg, read as readPkg, refuse as refusePkg, segments as pkgSegments } from "../refer/pkgsrc.mjs";
 
 const JSON_INDENT = fixed("json", "indent");
 
@@ -209,16 +210,25 @@ function fuxSearch(root, args, top, maxHeadings, held = null) {
   // only as `Resident`'s set (W-249), which re-keys before every call because
   // this server is long-lived and `ingest` rewrites the index under it.
   const shards = held ?? new Shards(root);
+  // W-300 (SR-PKG-INDEX d10): `all` when the call names none.
+  const scope = String(args.scope || fixed("scope", "default"));
   const { results, related, confidence, path } = runQuery(root, query, k, {
-    useTune: true, wantConfidence: true, compose: true, expand, shards,
+    useTune: true, wantConfidence: true, compose: true, expand, shards, scope,
     // `mcp.py::_search` passes `force_scan=False`: the plane answers when it is
     // fresh, and the scan when it is not (W-242 Tier 1).
     fast: true,
   });
   const records = results.length ? recordsById(root, shards) : new Map();
+  // W-301 — each pin's verified segment, read once per call, named by pin.
+  const segs = results.some((r) => r.package !== undefined)
+    ? new Map(pkgSegments(root).map((seg) => [seg.pin.name, seg]))
+    : new Map();
   const out = results.map((r) => {
-    const record = records.get(r.id) ?? {};
-    return {
+    // W-300: a package hit's record is read from its own segment's runtime.
+    const record = (r.package !== undefined
+      ? recordsById(rootFor(root, r.package)).get(r.id)
+      : records.get(r.id)) ?? {};
+    const hit = {
       path: r.loc,
       title: r.title,
       score: pyRound(r.score, SCORE_DIGITS),
@@ -237,10 +247,11 @@ function fuxSearch(root, args, top, maxHeadings, held = null) {
       // indistinguishable from an older server.
       headings: headingsFor(record, query, maxHeadings),
       // W-301 (SR-MCP d7): `location` is what fux_passage reads, `package` the
-      // index package a hit came from (`null` for the repository). Every hit of
-      // this ranking is the repository's; W-300's merged hits pass a segment.
-      ...hitFields(r.id, r.loc, null),
+      // index package a hit came from (`null` for the repository). A W-300
+      // merged hit passes its segment, so its location is `pkg:`.
+      ...hitFields(r.id, r.loc, r.package !== undefined ? segs.get(r.package) : null),
     };
+    return hit;
   });
   return {
     results: out,

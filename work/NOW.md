@@ -14,7 +14,7 @@ Rule: [SR-WORK-NOW](../records/0069_WORK-now.md).
 |---|---|---|---|
 | f7e74b47 | Claude Code | 2026-10-25 12:39 | W-299 + W-302 built in parallel by two sub-agents in this tree; W-293 closed |
 | e2598401 | Claude Code | 2026-10-25 12:53 | stood down: W-299 landed (9688d479); W-300 + W-301 claimed by 4aad6236, so not built here; no code changed |
-| 4aad6236 | Claude Code | 2026-10-25 15:30 | W-299 + W-302 committed (9688d479), suites running; W-300 + W-301 building in parallel in two agent worktrees |
+| 4aad6236 | Claude Code | 2026-10-25 15:30 | W-299…W-302 built and merged; W-300's L13 ruling is with Arpit; cleaning up the two agent worktrees |
 
 ## Resources this session created
 

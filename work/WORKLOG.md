@@ -24,6 +24,13 @@ play: the worklog is the granular, per-exchange trail.
 ```
 
 
+## 2026-10-25 — W-300 + W-301 built in parallel and merged; W-301, W-302 closed; W-300 to Arpit  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"implement W300, W301 while the unit tests are being executed"*, toward *"… everything in parallel and close it out"*.
+- **Done:** two Opus agents in worktrees. W-301 (`pkg:` locations, read in place, `..` collapsed before containment, drift refused) merged as `01d8e48c`. W-300 (one `rank()` over repo + pinned segments, per-digest hashing, `scope`, Python ≡ Node) merged after it, already merged with main and wired to W-301's `hit_fields`; it also built W-302 step 5 (`tests_e2e/test_pkg_round_trip.py`). The merged tree passes: unit 7832 (the freshness check clears through the commit message), Node 259/259, e2e 208. W-301 and W-302 archived.
+- **Found:** W-300's L13 run reads PASS by the table (gates 0/30 differ ×4, slice 16/0) and is filed INCONCLUSIVE by its own pre-registration (builder wrote the questions; no golden G; section@1/latency unmeasurable), so it goes to Arpit's inbox. The agent's harness refused files named `report.md`/`ANALYSIS.md`, so this session wrote both from the run's evidence, adding the SR-RS d22 headroom table. Open hazards, all recorded: a package doc and a repo doc can share an id, and post-rank steps keyed on id alone can conflate them; W-301 cites the index's `content_sha`, not `git hash-object` (flagged in SR-PKG-INDEX d11); `fux_related` refuses `pkg:`. Worktree e2e with a relative `PYTHONPATH=src` silently tests main's code.
+- **Next:** Arpit rules W-300's run; the README's package section and `docs/how-fux-is-used.md` Story 4 still say *in build*. They move to *released* at the next release.
+
 ## 2026-10-25 — W-299 + W-302 finished and committed; W-300 + W-301 started in parallel  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"commit everything and implement everything that is green then the yellow ones everything in parallel and close it out"*; then *"implement W300, W301 while the unit tests are being executed"*.

@@ -31,7 +31,8 @@ import { rescore } from "../refer/rescore.mjs";
 import { assemble, recordOf } from "../refer/assemble.mjs";
 import { Verdict } from "../refer/freshness.mjs";
 import { resolve, readLocal, fromAcquired, GIT, PKG } from "../refer/source.mjs";
-import { parse as parsePkg, readPackage } from "../refer/pkgsrc.mjs";
+import { location as pkgLocation, parse as parsePkg, readPackage, segments as pkgSegments } from "../refer/pkgsrc.mjs";
+import { rootFor } from "../derive/segments.mjs";
 import { passageBoost } from "../query/rerank.mjs";
 import { alreadyTextGlobs, isAlreadyText } from "../decode/registry.mjs";
 import { declareFloorOff, decline } from "./find.mjs";
@@ -120,10 +121,14 @@ export function answerPayload(root, args) {
   //
   // W-242 Tier 0 — this verb's one read of each shard, shared by the ranking
   // and the record reads below.
+  //
+  // W-300 + W-301: `answer` ranks the merged corpus at `[scope] default`, as
+  // `build_answer` does in Python; a package winner is referred at its `pkg:`
+  // location, read inside the installed docs package (SR-PKG-INDEX d10, d11).
   const shards = new Shards(root);
   const { results, related, confidence, tune } = runQuery(root, query, ANSWER_TOP, {
     useTune: args.noTune !== true, wantConfidence: true, compose: true, expand: args.expand ?? "",
-    shards, fast: args.fast === true,
+    shards, fast: args.fast === true, scope: fixed("scope", "default"),
   });
   declareFloorOff(tune, Boolean(args.json));
   const band = (block, freshness) => {
@@ -149,7 +154,7 @@ export function answerPayload(root, args) {
   // "unverified" — deliberately not upgraded, because nothing was checked.
   if (args.noRefer) {
     const top = results[0];
-    const record = recordFor(root, top.id, shards);
+    const record = top.package !== undefined ? recordFor(rootFor(root, top.package), top.id) : recordFor(root, top.id, shards);
     const payload = {
       answer: { passages: [{ id: top.id, loc: top.loc, heading: top.title,
                              text: (record?.phrases || []).join("\n"), score: top.score }] },
@@ -170,13 +175,20 @@ export function answerPayload(root, args) {
   // winner on fetched bytes; this order is the tie-break when it cannot
   // separate two, and a document the words found should win that tie against
   // one only a link reached.
+  // W-300 + W-301: each pin's verified segment, read once per answer.
+  const segs = results.some((r) => r.package !== undefined)
+    ? new Map(pkgSegments(root).map((seg) => [seg.pin.name, seg]))
+    : new Map();
   for (const r of [...results, ...(related ?? [])]) {
-    const record = recordFor(root, r.id, shards);
-    if (!record) continue;
+    const pkg = r.package !== undefined ? r.package : null;
+    const own = pkg !== null ? recordFor(rootFor(root, pkg), r.id) : recordFor(root, r.id, shards);
+    if (!own) continue;
+    // A package hit is obtained at its `pkg:` location — `obtain` reads `record.id`.
+    const record = pkg !== null ? { ...own, id: pkgLocation(segs.get(pkg), r.loc) } : own;
     const got = obtain(root, record, textGlobs);
-    verdicts.set(r.id, got.verdict);
+    verdicts.set(record.id, got.verdict);
     if (got.text === null) continue;
-    candidates.push([r.id, r.loc, record.sha || "",
+    candidates.push([record.id, r.loc, record.sha || "",
                      chunk(got.text, { ...tune.chunkBounds(), lineNumbers: got.lineNumbers, frontmatter: got.frontmatter })]);
   }
 

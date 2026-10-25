@@ -40,7 +40,10 @@ from pathlib import Path
 from .. import store as store_mod
 from .tokenize import tokenize
 
-__all__ = ["PATTERN", "Pair", "fold", "mine", "pairs_from_line", "table_from_records", "table_from_shards"]
+__all__ = [
+    "PATTERN", "Pair", "fold", "merge_tables", "mine", "pairs_from_line", "table_from_records",
+    "table_from_shards",
+]
 
 #: The weight is `.fux/config/tune.toml [ranking] mined_weight` — `0.5` as the
 #: template ships it, W-168 step 4's measured value: the first to clear
@@ -127,6 +130,12 @@ def table_from_shards(root: Path) -> tuple[Pair, ...]:
         for line in lines:
             table.update(pairs_from_line(line))
     return tuple(sorted(table))
+
+
+def merge_tables(tables) -> tuple[Pair, ...]:
+    """Several segments' tables as one corpus table (W-300, SR-PKG-INDEX d10):
+    the union, de-duplicated and sorted exactly as one table is."""
+    return tuple(sorted({pair for table in tables for pair in table}))
 
 
 def fold(table, query_hashes: list[str]) -> list[str]:

@@ -16,6 +16,10 @@ import { FuxError } from "../errors.mjs";
 import { BOM, parseToml } from "../config/toml.mjs";
 import { fixed } from "../config/constants.mjs";
 import { cmpCodePoints } from "../compat/pyfloat.mjs";
+import { blake2bHex } from "../hash/blake2b.mjs";
+
+//: `constants.toml [identifiers] digest_bytes` — the width of the rules digest.
+const DIGEST_BYTES = fixed("identifiers", "digest_bytes");
 
 //: `constants.toml [identifiers] flexible_separators` — the Python twin reads the same key.
 const FLEX = fixed("identifiers", "flexible_separators");
@@ -217,6 +221,14 @@ export class IdentifierRules {
 
   get empty() {
     return this.rules.length === 0;
+  }
+
+  /** Of the EFFECTIVE rules, not the file bytes — `IdentifierRules.digest`'s
+   *  twin. Empty for no rules. W-300 hashes a query once per distinct digest. */
+  get digest() {
+    if (!this.rules.length) return "";
+    const blob = this.rules.map((r) => `${r.kind}\t${r.source}`).join("\n");
+    return blake2bHex(new TextEncoder().encode(blob), DIGEST_BYTES);
   }
 
   /** `[start, end, canonical]` for every match, in text order. */

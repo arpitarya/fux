@@ -27,7 +27,7 @@ from .. import plugins
 from ..constants import fixed
 from ..store.cachedir import runtime_dir
 
-__all__ = ["inflate", "inflate_all", "is_current", "packages_dir", "segment_dir"]
+__all__ = ["inflate", "inflate_all", "is_current", "packages_dir", "root_for", "segment_dir"]
 
 
 def packages_dir(root: Path) -> Path:
@@ -38,6 +38,16 @@ def packages_dir(root: Path) -> Path:
 def segment_dir(root: Path, pin: plugins.IndexPin) -> Path:
     """`.fux/runtime/pkg/<name>@<version>/` for one pin."""
     return packages_dir(root) / f"{pin.name}@{pin.version}"
+
+
+def root_for(root: Path, package: str | None) -> Path:
+    """The root a hit's own record lives under (W-300): the repository for
+    `None`, the pin's runtime for a package hit. Display reads only — the
+    title, the headings, the `sha` — so they come from the record that was
+    ranked rather than from a repository document that shares its id."""
+    if package is None:
+        return root
+    return segment_dir(root, plugins.indexes(root)[package])
 
 
 def is_current(root: Path, pin: plugins.IndexPin) -> bool:

@@ -69,6 +69,26 @@ def _k_property(top: int) -> dict:
     }
 
 
+def _scope_property() -> dict:
+    """W-300 — `fux_search`'s optional `scope` (SR-PKG-INDEX d10, SR-MCP d14).
+
+    The values and the default are `constants.toml [scope]` (L12). Still three
+    tools: a scope is an argument of the one search, never a fourth tool."""
+    values = [fixed("scope", k) for k in ("repo", "packages", "all")]
+    return {
+        "type": "string",
+        "enum": values,
+        "default": fixed("scope", "default"),
+        "description": (
+            "OPTIONAL. Which indexes to rank over: `repo` is this repository's own "
+            "documents, `packages` the index packages this repository pins in "
+            ".fux/config/plugins.toml, `all` both under ONE ranking with shared "
+            "statistics. A hit from a package carries `package`. Narrow to `repo` "
+            "when a large package fills the results."
+        ),
+    }
+
+
 def _tools(top: int) -> list[dict]:
     """The tool surface, with `k`'s advertised default bound to `top`.
 
@@ -127,6 +147,7 @@ def _tools(top: int) -> list[dict]:
                         "the vocabulary the corpus would use for the missing term."
                     ),
                 },
+                "scope": _scope_property(),
             },
             "required": ["query"],
         },
@@ -192,6 +213,14 @@ def _root() -> Path:
     return root
 
 
+def _package_record(root: Path, result) -> dict:
+    """A package hit's own record, from its segment's runtime (W-300)."""
+    from .derive.segments import root_for
+    from .store import read_index
+
+    return read_index(root_for(root, result.package)).get(result.id, {})
+
+
 def _search(root: Path, args: dict, *, top: int, max_headings: int) -> dict:
     from .acquire import pkgsrc
     from .query import run_query
@@ -221,17 +250,24 @@ def _search(root: Path, args: dict, *, top: int, max_headings: int) -> dict:
     # neighbours since the tool existed. Handing it the neighbours it would
     # have asked for saves the round trip it was told to make.
     related: list = []
+    # W-300 (SR-PKG-INDEX d10): `all` when the call names none.
+    scope = str(args.get("scope") or fixed("scope", "default"))
     results, path = run_query(
         root, query, k, force_scan=False, confidence_out=signals, expand=expand,
-        related_out=related,
+        related_out=related, scope=scope,
         use_tune=True,
     )
     block = signals.get("confidence")
     records = read_index(root) if results else {}
+    # W-301 — each pin's verified segment, read once per call, named by pin.
+    segs = (
+        {seg.pin.name: seg for seg in pkgsrc.segments(root)}
+        if any(r.package is not None for r in results) else {}
+    )
     out = []
     for r in results:
-        record = records.get(r.id, {})
-        out.append(
+        record = _package_record(root, r) if r.package is not None else records.get(r.id, {})
+        hit = (
             {
                 "path": r.loc,
                 "title": r.title,
@@ -260,11 +296,12 @@ def _search(root: Path, args: dict, *, top: int, max_headings: int) -> dict:
                 # address `fux_passage` reads (`file:`/`url:` id, or `pkg:` for
                 # a hit whose record came from a pinned index segment) and
                 # `package` the index package's pin name, `None` for the
-                # repository. Every hit from this ranking is the repository's;
-                # W-300's merged hits pass their `pkgsrc.Segment` here.
-                **pkgsrc.hit_fields(r.id, r.loc, None),
+                # repository. A W-300 merged hit passes its `pkgsrc.Segment`,
+                # so its location is `pkg:`.
+                **pkgsrc.hit_fields(r.id, r.loc, segs.get(r.package) if r.package is not None else None),
             }
         )
+        out.append(hit)
     return {
         "results": out,
         # 🔴 **ITS OWN KEY, AND NEVER MERGED INTO `results`.** These documents

@@ -1,0 +1,31 @@
+id	slice	expected	question
+s01	package	acme-docs-index:file:docs/rollback.md	how do I roll back a widget release
+s02	package	acme-docs-index:file:docs/rollback.md	run the zarquon migration in reverse
+s03	package	acme-docs-index:file:docs/rollback.md	does a rollback delete customer data
+s04	package	acme-docs-index:file:docs/rollback.md	pin the previous widget version
+s05	package	acme-docs-index:file:docs/glossary.md	what is zarquon
+s06	package	acme-docs-index:file:docs/glossary.md	which protocol does a widget speak to its broker
+s07	package	acme-docs-index:file:docs/glossary.md	zarquon protocol definition
+s08	package	acme-docs-index:file:docs/glossary.md	glossary of widget terms
+s09	package	acme-docs-index:file:docs/configuration.md	where does a widget read its configuration
+s10	package	acme-docs-index:file:docs/configuration.md	widget.toml settings
+s11	package	acme-docs-index:file:docs/configuration.md	how often does the widget retry a failed call
+s12	package	acme-docs-index:file:docs/configuration.md	the retries key
+s13	package	acme-docs-index:file:docs/configuration.md	retry limit for a failed zarquon call
+s14	package	acme-docs-index:file:docs/configuration.md	configuring a widget
+s15	package	acme-docs-index:file:docs/rollback.md	undo a bad widget release
+s16	package	acme-docs-index:file:docs/rollback.md	reverse migration when rolling back
+r01	repo	repo:file:docs/deploy.md	how is the widget image deployed to production
+r02	repo	repo:file:docs/deploy.md	smoke tests before promoting from staging
+r03	repo	repo:file:docs/oncall.md	who carries the pager
+r04	repo	repo:file:docs/oncall.md	when to escalate a widget outage
+r05	repo	repo:file:docs/billing.md	nightly invoice export
+r06	repo	repo:file:docs/billing.md	what happens when a billing export fails
+r07	repo	repo:file:docs/broker.md	which broker do we run between the widget fleet and orders
+r08	repo	repo:file:docs/broker.md	are queues mirrored across zones
+r09	repo	repo:file:docs/incidents.md	what goes in an incident review
+r10	repo	repo:file:docs/incidents.md	customer impact in the incident timeline
+r11	repo	repo:file:docs/secrets.md	where do secrets live
+r12	repo	repo:file:docs/secrets.md	does a widget write its credentials to disk
+r13	repo	repo:file:docs/deploy.md	deploy pipeline registry push
+r14	repo	repo:file:docs/incidents.md	follow-up actions with owners

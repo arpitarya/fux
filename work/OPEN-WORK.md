@@ -25,6 +25,8 @@ here. Read that record before changing anything below it.
 |---|---|---|
 | 🔴 **W-289** — **5.0.0 released** 2026-10-25 (PyPI 19 names + npm 2). Left for you: **yank the 14 hand-uploaded 4.1.1 plugin files** on PyPI (they pin a fux-core 4.1.1 that never ships). [the item](open/W-289-plugin-packages.md) | 2026-10-20 | 5d |
 | ↳ **blocks:** nothing else in the queue | | |
+| 🔴 **W-300** — **rule the L13 run** of the merged query: gates identical, slice 16 wins / 0 losses; the table reads PASS, filed INCONCLUSIVE (the builder wrote the questions). PASS, or a blind re-run? [the item](open/W-300-merged-query-over-segments.md) | 2026-10-25 | 0d |
+| ↳ **blocks:** nothing else in the queue (it gates releasing index packages) | | |
 | 🔴 **W-258** — **on hold by his word** (2026-10-25, again): say when to run §1 (vanishing source, ~20 min) and §2 (a real 429). §3 parked as B-274. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 21d |
 | ↳ **blocks:** nothing else in the queue | | |
 
@@ -35,9 +37,7 @@ here. Read that record before changing anything below it.
 ### fux build
 
 - 🔴 **W-289** · `arpit` — plugin packages; **5.0.0 released 2026-10-25**, all 15 plugins on PyPI through CI. Left: Arpit yanks the 14 hand-uploaded 4.1.1 plugin files. Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
-- 🟢 **W-300** · `agent` — one query over repo + pinned segments: per-digest hashing, df/n summed, one `rank()`, foreign refused, `scope`; Python ≡ Node. **Opus.** Building now (4aad6236). Filed by Arpit (Cowork). [detail](open/W-300-merged-query-over-segments.md)
-- 🟡 **W-301** waits on **W-300** · `agent` — `pkg:` locations built and merged (ef34b29d); Python ≡ Node. Left: W-300's merged hits call `pkgsrc.hit_fields`. **Opus.** Filed by Arpit (Cowork). [detail](open/W-301-pkg-locations-read-in-place.md)
-- 🟡 **W-302** waits on **W-300**, **W-301** · `agent` — `fux pack` built (steps 1–4, 9688d479); left: step 5, the e2e round trip pack → pin → search → passage. **Sonnet.** Filed by Arpit (Cowork). [detail](open/W-302-fux-pack-publish-path.md)
+- 🔴 **W-300** · `arpit` — merged query + `scope` built and merged (Python ≡ Node, wired to W-301's `pkg:` hits). Left: Arpit rules the L13 run — table reads PASS, filed INCONCLUSIVE. **Opus.** Filed by Arpit (Cowork). [detail](open/W-300-merged-query-over-segments.md)
 
 
 ### testing

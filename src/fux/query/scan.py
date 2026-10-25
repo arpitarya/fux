@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import re
+from dataclasses import dataclass
 from pathlib import Path
 
 from .. import store as store_mod
@@ -72,7 +73,10 @@ def _flen_from_line(line: bytes) -> list[int] | None:
         return []
     return [int(part) for part in inner.split(b",")]
 
-__all__ = ["AskResult", "ask", "query_term_hashes", "scan_candidates"]
+__all__ = [
+    "AskResult", "Segment", "ask", "merged_ask", "merged_candidates", "merged_hashes",
+    "query_term_hashes", "scan_candidates", "segments_for",
+]
 
 
 def query_term_hashes(query: str, ids: IdentifierRules = EMPTY) -> list[str]:
@@ -94,6 +98,27 @@ def scan_candidates(
     root: Path, query_hashes: list[str], *, scoring: Scoring
 ) -> tuple[list[dict], dict[str, int], Corpus]:
     """The B2 pass: candidate records, `df`, and the corpus statistics.
+
+    One segment — the repository at `root` — weighted into a `Corpus` here.
+    The raw pass is `_scan_segment`, which W-300's merged query calls once per
+    segment and sums before weighting (`merged_candidates`).
+    """
+    candidates, df, n, total_flen, total_anchor_len = _scan_segment(
+        root, query_hashes, scoring=scoring
+    )
+    return (
+        candidates,
+        df,
+        Corpus(n=n, total_wlen=derive_wlen(total_flen, scoring, total_anchor_len)),
+    )
+
+
+def _scan_segment(
+    root: Path, query_hashes: list[str], *, scoring: Scoring
+) -> tuple[list[dict], dict[str, int], int, list[int], int]:
+    """The raw B2 pass over one segment: candidates, `df`, `n`, the five RAW
+    per-field token totals and the anchor token total — never weighted here,
+    so a sum over segments is weighted ONCE (SR-PKG-INDEX d10).
 
     ## W-168 step 1 — what the anchor field adds to this pass
 
@@ -191,14 +216,7 @@ def scan_candidates(
             record["atf"] = anchor_tf.get(doc_id, {})
             record["alen"] = anchor_len.get(doc_id, 0)
 
-    return (
-        candidates,
-        df,
-        Corpus(
-            n=total_docs,
-            total_wlen=derive_wlen(total_flen, scoring, total_anchor_len),
-        ),
-    )
+    return candidates, df, total_docs, total_flen, total_anchor_len
 
 
 def _fold_out_edges(record: dict, wanted: set[bytes], anchor_tf: dict[str, dict[str, int]]) -> None:
@@ -287,6 +305,147 @@ def ask(
         return []
     collect = list(expansion.hashes) if expansion is not None else query_hashes
     candidates, df, corpus = scan_candidates(root, collect, scoring=scoring)
+    return rank(
+        candidates, collect, df, corpus, top,
+        archived_dirs=archived_dirs,
+        weighting=weighting, scoring=scoring, stats_out=stats_out,
+        expansion=expansion,
+    )
+
+
+# -- W-300: one query over many segments (SR-PKG-INDEX decision 10) ----------
+
+
+@dataclass(frozen=True)
+class Segment:
+    """One index the merged query ranks over.
+
+    `root` is laid out as a repository — the repository itself, or a pinned
+    package's verified runtime under `.fux/runtime/pkg/<name>@<version>/`
+    (SR-PKG-INDEX d8) — so the same B2 pass reads either. `package` is the
+    pin's name, `None` for the repository; it is copied onto every candidate
+    record the segment yields, so a hit can say where it came from.
+    """
+
+    root: Path
+    package: str | None
+    ids: IdentifierRules
+
+
+def segments_for(root: Path, scope: str) -> list[Segment]:
+    """The segments `scope` names, the repository first, then every pin by name.
+
+    🔴 **Every pin is verified before a byte of it is read** — `segments.inflate`
+    runs `plugins.locate_index`, which refuses a missing, other, drifted or
+    FOREIGN segment by name (SR-PKG-INDEX d6, d7), and builds its runtime only
+    when the pin digest moved. A foreign `_format`, `analyzer` or `tf_fields`
+    therefore stops the query; it is never scored and never skipped.
+    """
+    from ..constants import fixed
+    from ..errors import FuxError
+
+    repo, packages, everything = (fixed("scope", k) for k in ("repo", "packages", "all"))
+    if scope not in (repo, packages, everything):
+        raise FuxError(f"scope must be one of {repo}, {packages}, {everything} — got {scope!r}")
+    out: list[Segment] = []
+    if scope in (repo, everything):
+        out.append(Segment(root=root, package=None, ids=ids_mod.for_root(root)))
+    if scope in (packages, everything):
+        from .. import plugins
+        from ..derive import segments as segments_mod
+
+        for name, pin in sorted(plugins.indexes(root).items()):
+            segments_mod.inflate(root, pin)
+            seg_root = segments_mod.segment_dir(root, pin)
+            out.append(Segment(root=seg_root, package=name, ids=ids_mod.for_root(seg_root)))
+    return out
+
+
+def merged_hashes(query: str, segments: list[Segment]) -> list[str]:
+    """The query hashed ONCE PER DISTINCT `identifiers` digest, unioned in order.
+
+    Term keys are unsalted `blake2b(term)`, so equal tokens meet across
+    segments; what differs between segments built under different identifier
+    rules is only which canonical identifier terms the analyzer ADDS
+    (`RF 118` -> `rf-118`). Hashing once per digest is what lets a package's
+    family identifier match inside that package at all.
+
+    **The union is the one hash list every segment is scanned for and `rank()`
+    sums over**, in a fixed order: the first segment's hashes, then each later
+    digest's new ones. Scanning every segment for the union keeps `df` exact
+    for every hash in every segment — a per-segment list would count a
+    package-rule term as absent from the repository without having looked.
+    """
+    by_digest: dict[str, list[str]] = {}
+    for segment in segments:
+        digest = segment.ids.digest
+        if digest not in by_digest:
+            by_digest[digest] = query_term_hashes(query, segment.ids)
+    return list(dict.fromkeys(h for hashes in by_digest.values() for h in hashes))
+
+
+def merged_candidates(
+    segments: list[Segment], query_hashes: list[str], *, scoring: Scoring
+) -> tuple[list[dict], dict[str, int], Corpus]:
+    """Every segment's B2 pass, statistics SUMMED, weighted once.
+
+    `df = Σ df`, `n = Σ n`, `total_flen = Σ total_flen` (per field, raw),
+    and the anchor total likewise; `avg_wlen` is then derived ONCE from the
+    sums, so the merged corpus has one yardstick and a shared `idf`. Anchor
+    text folds **within** a segment only: each pass resolves its own edges'
+    targets against its own records, so a package's edges never reach the
+    repository (W-300 §Hazards).
+    """
+    candidates: list[dict] = []
+    df: dict[str, int] = dict.fromkeys(query_hashes, 0)
+    n = 0
+    total_flen = [0] * len(TF_FIELDS)
+    total_anchor_len = 0
+    for segment in segments:
+        seg_candidates, seg_df, seg_n, seg_flen, seg_anchor = _scan_segment(
+            segment.root, query_hashes, scoring=scoring
+        )
+        if segment.package is not None:
+            for record in seg_candidates:
+                record["package"] = segment.package
+        candidates.extend(seg_candidates)
+        for h in query_hashes:
+            df[h] += seg_df[h]
+        n += seg_n
+        for i, count in enumerate(seg_flen):
+            total_flen[i] += count
+        total_anchor_len += seg_anchor
+    return (
+        candidates,
+        df,
+        Corpus(n=n, total_wlen=derive_wlen(total_flen, scoring, total_anchor_len)),
+    )
+
+
+def merged_ask(
+    segments: list[Segment],
+    query_hashes: list[str],
+    top: int,
+    *,
+    archived_dirs: frozenset[str] = frozenset(),
+    weighting=None,
+    scoring: Scoring,
+    stats_out: dict | None = None,
+    expansion=None,
+) -> list[AskResult]:
+    """`ask` over several segments — ONE `rank()` call over the union.
+
+    `query_hashes` is `merged_hashes`' list. Scores from separate corpora are
+    never fused (`fuse.py` is refused for this by design): the candidates of
+    every segment are scored together, against the summed statistics.
+    """
+    if not query_hashes:
+        if stats_out is not None:
+            stats_out.setdefault("df", {})
+            stats_out.setdefault("n", 0)
+        return []
+    collect = list(expansion.hashes) if expansion is not None else query_hashes
+    candidates, df, corpus = merged_candidates(segments, collect, scoring=scoring)
     return rank(
         candidates, collect, df, corpus, top,
         archived_dirs=archived_dirs,

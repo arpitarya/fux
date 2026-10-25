@@ -6,7 +6,7 @@ item: W-302
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Fable 5.1)"
 updated: 2026-10-25
-updated_by: "Arpit (Cowork, Fable 5.1)"
+updated_by: "Claude (Claude Code, Opus 5.5)"
 ball: agent
 ---
 
@@ -20,7 +20,7 @@ ball: agent
 | 2 | Manifest fields: `fux_version`, `index_header` (copied), `content {npm, pypi, version}`, `docs`, `digest` — the same segment-files digest W-299 verifies | anyone reproduces the digest from the same docs (L4) | ✅ |
 | 3 | Refuses: a dirty index (`.fux/runtime/dirty` set / uncommitted shards), a foreign header, `url:` records present (a package segment may hold `file:` records only), `--content` missing | a half-ingested or network-born segment never ships | ✅ |
 | 4 | Author's recipe in `docs/` — `.fux/sources.yaml` → `fux ingest` → `fux pack` → put `<outdir>` in the index package's wheel **and** npm tarball — with a CI example | any package author can do it | ✅ |
-| 5 | `tests_e2e`: build a fixture docs package, pack it, pin it (W-299), search it (W-300), read a passage (W-301) | the round trip, as a user | ⏳ |
+| 5 | `tests_e2e`: build a fixture docs package, pack it, pin it (W-299), search it (W-300), read a passage (W-301) | the round trip, as a user | ✅ `tests_e2e/test_pkg_round_trip.py` (W-300 branch) |
 
 **Arpit, 2026-10-25 (Cowork), Fork B:** *"New read-only `fux pack <outdir>` verb"*
 over a documented recipe only.

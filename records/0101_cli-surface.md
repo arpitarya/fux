@@ -5,13 +5,13 @@ name: SR-CLI
 title: SR-CLI (0101) — the command-line surface
 description: Flat verbs in seven groups, one error boundary, three output modes. Freezes the CLI contract with a captured transcript of every command and its real output.
 status: accepted
-amended: 2026-10-24
+amended: 2026-10-25
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@3d39055e8ba5, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@66d281d37048, src/fux/progress.py@e5f2459288d5, tests_e2e@ceea0c6cb3bc, node/fux.mjs@03e35d89dbbf, src/fux/stdio.py@9e270b49bdaa]
+owns: [src/fux/cli.py@0149fc8ac950, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@66d281d37048, src/fux/progress.py@e5f2459288d5, tests_e2e@18b3478ea30d, node/fux.mjs@a5599ee390b3, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: a1d12a3ea71f40b868b776c727332ac4cdfb5475a4660d68dd84810623a8368e
+content_sha: e8bae58385eacb53644012368d2cd98bf0d76334a93d45c0e1119ad5b3e8a27a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1489,6 +1489,14 @@ not installed here``, exit 1), never reported as an unknown choice.
   other packages' verbs.
 
 **No decision here moved** (W-287, 2026-10-19): `tests_e2e/` gains `test_table_answers.py` — `fux answer` on a Markdown table, through the real CLI.
+
+**`ask` and `lexical` gain `--scope repo|packages|all`** (W-300, 2026-10-25;
+[SR-PKG-INDEX](0166_pkg-index.md) decision 10), in `cli.py`'s shared ask-shaped
+parser and `node/fux.mjs`. `default=None`; `ask` then reads `constants.toml
+[scope] default` (`all`). **Inert on `lexical`**, exactly as `--related` is: the
+frozen baseline ranks the repository alone, so decision 12's freeze holds and the
+two parsers stay one factory. The choices are `[scope]`'s three values (L12). No
+other verb takes it.
 
 ### Consequences
 

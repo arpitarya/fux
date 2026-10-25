@@ -53,6 +53,14 @@ export function tableFromShards(root, shards = null) {
   return [...seen.values()].sort(cmpPair);
 }
 
+/** Several segments' tables as one corpus table — `merge_tables`' twin (W-300):
+ *  the union, de-duplicated and sorted exactly as one table is. */
+export function mergeTables(tables) {
+  const seen = new Map();
+  for (const table of tables) for (const pair of table) seen.set(JSON.stringify(pair), pair);
+  return [...seen.values()].sort(cmpPair);
+}
+
 /** The hashes the corpus adds to a query. For each pair `(A, B)` in sorted
  *  order: `A ⊆ Q` and `B ⊄ Q` adds `B \ Q`; the reverse adds `A \ Q`. Added
  *  hashes are de-duplicated first-seen. */

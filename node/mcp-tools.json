@@ -19,6 +19,16 @@
           "expand": {
             "type": "string",
             "description": "OPTIONAL. Words you expect the document to use, when they differ from the question's. Scored at a lower weight than the question's own terms, and a document matching ONLY these is never returned. Use it after a search comes back `partial` with a non-empty `missing`: re-search with the vocabulary the corpus would use for the missing term."
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "repo",
+              "packages",
+              "all"
+            ],
+            "default": "all",
+            "description": "OPTIONAL. Which indexes to rank over: `repo` is this repository's own documents, `packages` the index packages this repository pins in .fux/config/plugins.toml, `all` both under ONE ranking with shared statistics. A hit from a package carries `package`. Narrow to `repo` when a large package fills the results."
           }
         },
         "required": [

@@ -1,0 +1,38 @@
+{
+  "gates_ok": false,
+  "slice_winnable": 16,
+  "slice_floor_ok": true,
+  "C1": {
+    "wins": 16,
+    "losses": 0,
+    "verdict_line": "b=16 c=0 discordant=16 net=16 p=0.0000 (net needed 10, alpha=0.05) -> B",
+    "holds": true
+  },
+  "C2": {
+    "wins": 0,
+    "losses": 0,
+    "margin": 2,
+    "holds": true
+  },
+  "C3": {
+    "wins": 16,
+    "losses": 0,
+    "holds": true
+  },
+  "GR_hit5": {
+    "baseline_repo": 14,
+    "decided_all": 30,
+    "holds": true
+  },
+  "GR_grounded": {
+    "baseline_repo": 8,
+    "decided_all": 13,
+    "holds": true
+  },
+  "hit@1": {
+    "baseline_repo": 14,
+    "decided_all": 30,
+    "reported_packages": 16
+  },
+  "table_reading": "STOP"
+}
