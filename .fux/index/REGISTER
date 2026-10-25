@@ -681,7 +681,7 @@ records/0102_fux-directory.md	2cc3b88dd8d6a5eab710ddf33fb3e4aec6812623	prose
 records/0103_ask.md	f8ec267176adea90590ce49c36a40c5ba63f187e	prose
 records/0104_find.md	6209b9c472b4be7c543f86a49d050526d49876fc	prose
 records/0105_answer.md	78c69bb18d95490574de676a31186d80a48f773f	prose
-records/0106_ingest.md	f441c5d07a40ced62d905fd38aed15ed8faa8c59	prose
+records/0106_ingest.md	6221260fdbe5c07c882c7f8888e6e8e5ef09b132	prose
 records/0107_url-ingest.md	a7978b81a8c7bca531dc57796fae2954fec2b972	prose
 records/0108_index-lifecycle.md	adc15964f7a7c5f7e9e448a9c8d4c63b76d74b66	prose
 records/0109_index-record.md	20b3072c1ba4104ad14a979bb4c82f39d5cd0829	prose
@@ -740,7 +740,7 @@ records/0162_llms.md	ba1ce0dfe6aa2be5fda66f0f6f6421226006cbcb	prose
 records/0163_lsp.md	4a915a5980ade93d463ee923216ba644dd93ee22	prose
 records/0164_vscode.md	b10494c0a9c5a41b42145e5a81381549a5b90302	prose
 records/0165_plugins.md	8961195ac5e3f59d74c6f1f77c10853ff4fc4c4a	prose
-records/0166_pkg-index.md	18e5f8c9b485ccfc676d43a515e7d6e7c720a0ba	prose
+records/0166_pkg-index.md	29d4cd692108fff496ce1bfed60d7b629139377a	prose
 records/BIBLIOGRAPHY.md	d3b9cb6a23f44f9bd97360e36fea0efe11a83a17	prose
 records/README.md	a22f0f5e701d5bc9143960f732a2185a61b54b27	prose
 records/TEMPLATE.md	5c8f49120633c5766122218aa4e9f9d09a5f35c5	prose
@@ -771,12 +771,12 @@ tools/t2-eval/PRE-REGISTRATION.md	0678bc82904423b9aa82c801f4286abbdc84961c	prose
 tools/vector-gate/README.md	544da73b4409bef1e5dac598d9b8214d8abf4180	prose
 work/BACKLOG.md	908efa33e8d396c82d8cc66cc74552221d86ac65	prose
 work/BLOCKED.json	5598b94e0d231527edb50b11f34722b0a6a86ed4	pkg:fux-decoder-json@5.0.0/json@1+limits@1
-work/IMPLEMENTATION.md	b021de46e3c0ada4ef4af30bfdc62b864372bfdc	prose
+work/IMPLEMENTATION.md	ad6ac35475a2fefdc2b3dcee105d0b9fbab3b7e8	prose
 work/INTERVIEW.md	ff7fca405f8da3c10745b63179fef9336a129594	prose
 work/LESSONS.md	f91b46f8742c542fe12e2d871452148c56751eae	prose
 work/MACHINE.md	9db25bde124a67c191714cd380fbcd2ed3d67e5a	prose
 work/NOW.md	f8df3afb4a0f76a3ff64339327eb10fc7149ce1a	prose
-work/OPEN-WORK.md	826de04df5ffadd58df895779d057134622d5e59	prose
+work/OPEN-WORK.md	499e8a0334f4f59df65e9c2b9efd5d6057fe3e6e	prose
 work/README.md	d5073a07920179dc0c35071dc2337a8ed6856ddb	prose
 work/WORKLOG.md	50c9bb73bd35608a5a9533bf8c749b7a4a712daf	prose
 work/architecture-algorithms.svg	fdf6ef399bf2649dd92510973076e607cb955576	pkg:fux-decoder-svg@5.0.0/svg@1+xml@1+limits@1
