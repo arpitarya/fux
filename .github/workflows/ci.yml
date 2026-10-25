@@ -126,17 +126,42 @@ jobs:
       # runs local-only, in fux-lab. This checks the manifests and nothing
       # else. Its own job until 2026-09-30; folded here to save a runner (W-243).
       - run: python tools/differential/ladder_check.py
+      # W-293 (SR-WORK-RELEASE d17): the nineteen wheels are restored instead
+      # of rebuilt when nothing they are built from changed. Only a push
+      # restores; nightly and dispatch build fresh. The sdist is always built.
+      - name: wheel key
+        id: wheel-key
+        run: echo "key=$(python scripts/ci-key.py wheels)" >> "$GITHUB_OUTPUT"
+      - name: restore the wheels
+        uses: actions/cache/restore@v4
+        id: wheel-cache
+        if: github.event_name == 'push'
+        with:
+          path: wheels/
+          key: ${{ steps.wheel-key.outputs.key }}
       # W-282: fux-engine's sdist + wheel, and the three role wheels.
       # W-289: and the fifteen plugin wheels (SR-PLUGINS P11).
       - run: |
           pip install build twine
-          python -m build
-          for role in core reader writer; do python -m build --wheel --outdir dist "packages/fux-$role"; done
-          for plugin in packages/fux-decoder-* packages/fux-fetcher-* packages/fux-extension-*; do
-            python -m build --wheel --outdir dist "$plugin"
-          done
+          if [ "${{ steps.wheel-cache.outputs.cache-hit }}" = "true" ]; then
+            echo "✔ wheels restored for ${{ steps.wheel-key.outputs.key }}"
+          else
+            python -m build --wheel --outdir wheels
+            for role in core reader writer; do python -m build --wheel --outdir wheels "packages/fux-$role"; done
+            for plugin in packages/fux-decoder-* packages/fux-fetcher-* packages/fux-extension-*; do
+              python -m build --wheel --outdir wheels "$plugin"
+            done
+          fi
+          python -m build --sdist --outdir dist
+          cp wheels/*.whl dist/
           twine check --strict dist/*
           ls dist/
+      - name: save the wheels
+        if: github.event_name == 'push' && steps.wheel-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: wheels/
+          key: ${{ steps.wheel-key.outputs.key }}
       - name: No wheel carries the Node reader
         # W-292 (Arpit, 2026-10-21): the bundle ships on npm alone.
         run: |
@@ -162,6 +187,16 @@ jobs:
               sys.exit(1)
           print("✔ sdist clean")
           PY
+      # W-293 (SR-WORK-RELEASE d18-19): the bundle built the way publish.yml
+      # builds it, then the law gate and the install smoke on what would ship.
+      - name: bundle the Node reader, both names
+        run: |
+          PYTHONPATH=src python -m fux.store.nodebundle node node/dist
+          python scripts/npm-scoped.py node/dist node/dist-scoped
+      - name: law gate
+        run: python scripts/law-gate.py dist --npm node/dist node/dist-scoped
+      - name: install smoke
+        run: python scripts/smoke.py dist node/dist
 
   arm:
     # The differential arm (W-107), transcription pass on this repo, over ten

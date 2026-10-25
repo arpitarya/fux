@@ -148,6 +148,11 @@ jobs:
       - name: Validate distribution metadata
         run: twine check --strict dist/*
 
+      - name: No law is walked past by a release
+        # W-293 (SR-WORK-RELEASE d18): the wheels, the sdist and both npm
+        # directories this release uploads, before either registry job runs.
+        run: python scripts/law-gate.py dist --npm node/dist node/dist-scoped
+
       - uses: actions/upload-artifact@v6
         with:
           name: dist

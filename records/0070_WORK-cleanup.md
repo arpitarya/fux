@@ -10,11 +10,16 @@ feature: "cleanup — worktrees, lock files, what a session leaves behind"
 owns: [.claude/hooks/worktree-cleanup.py@000000000000, .claude/hooks/release-locks.sh@000000000000]
 laws: [L0]
 timestamp: 2026-10-24T13:30:00Z
-content_sha: ""
+content_sha: 73eb30763d338e25b83cbc184f11700b64b80df6edf99c25d239345f040818fa
 ratifies: "Arpit, 2026-10-24 (Cowork): whenever .lock file is created, it needs to be cleaned out as well → then: whenever a work tree's cleanup happens, always make sure everything is merged into main branch and no data is lost. If any data is supposed to be lost, mark it as red, block it on me, and I'll make a call. Otherwise, automatically do the cleanup when the session ends. Create a work SR for work trees, lock files, cleanup."
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- `.claude/hooks/release-locks.sh` · file
+- `.claude/hooks/worktree-cleanup.py` · file
 
 <!-- COMPONENTS-END -->
 

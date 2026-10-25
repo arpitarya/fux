@@ -528,6 +528,9 @@ def test_a_commit_with_fux_off_path_still_re_indexes(tmp_path):
     said nothing — 39 commits on this repository. It now runs the interpreter
     `fux hooks --install` pinned, so PATH does not matter."""
     make_repo(tmp_path, hooks=True)
+    # make_repo's own commit may still be re-indexing; this commit would then
+    # say "already running" instead (seen on linux · py3.13, 2026-10-25).
+    assert _drain(tmp_path), "make_repo's runner never finished"
     (tmp_path / "docs" / "x.md").write_text(doc("offpathterm"), encoding="utf-8")
     git(tmp_path, "add", "-A")
     result = subprocess.run(

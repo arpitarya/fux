@@ -10,11 +10,15 @@ feature: "work/NOW.md — the live view"
 owns: [.claude/hooks/now-ledger.py@000000000000]
 laws: [L0]
 timestamp: 2026-10-24T13:00:00Z
-content_sha: ""
+content_sha: f7b78f920d8986b9801fcd79e54d7db81afd1c1934864e6edac12ec2c253445b
 ratifies: "Arpit, 2026-10-24 (Cowork): now.md should track everything that is being worked in the chat right now, either through Claude Cowork or through Claude Code. But once it ends, now.md should have nothing … when the session is about to end, if there is any cleanup that is supposed to happen and that hasn't been done … create work items, but make sure now.md is empty."
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+**Owns** — the components this record decides:
+
+- `.claude/hooks/now-ledger.py` · file
 
 <!-- COMPONENTS-END -->
 

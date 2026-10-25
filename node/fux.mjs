@@ -57,7 +57,9 @@ function requireConfigMoved(root) {
   const stale = [];
   for (const name of [...fixed("files", "config_names")].sort()) {
     const next = fixed("files", name);
-    const old = join(fixed("fuxdir", "dir"), basename(next));
+    // `/`, never `join`: the address is named as Python's `as_posix()` names it,
+    // so Windows prints a forward slash there too, never a backslash.
+    const old = `${fixed("fuxdir", "dir")}/${basename(next)}`;
     const path = join(root, old);
     if (existsSync(path) && statSync(path).isFile()) {
       stale.push(`\`${old}\` moved to \`${next}\``);

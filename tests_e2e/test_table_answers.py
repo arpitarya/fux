@@ -47,7 +47,7 @@ def _repo(root: Path, column_weight: float) -> None:
     write_tune(root, tune_text(ranking={"table_column_weight": column_weight}))
     write_config(root)
     (root / "docs").mkdir(exist_ok=True)
-    (root / "docs" / "tickets.md").write_text(TICKETS, encoding="utf-8")
+    (root / "docs" / "tickets.md").write_text(TICKETS, encoding="utf-8", newline="\n")  # LF on Windows too
 
 
 def _index_digest(root: Path) -> str:

@@ -10,7 +10,7 @@ feature: the session contract — the three files, the running pointer, and how 
 owns: [scripts/commit-paths.py@aba59e8951c7, .claude/hooks/require-progress.sh@840ebec2e7b7]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 9831def0d67ea4e77441f70cbc340c171ecf54b385abc41e3ac086e721385081
+content_sha: 3f8aade5be8c450b7372a55e0ffdefcaaa90bb203aadf26d7f2685220baa9143
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

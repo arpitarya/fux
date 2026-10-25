@@ -6,7 +6,7 @@ item: W-293
 filed: 2026-10-21
 filed_by: "Arpit (Cowork, Opus 5.5)"
 updated: 2026-10-25
-updated_by: "Cowork (Opus 5.5)"
+updated_by: "Claude Code (Opus 5.5)"
 ball: agent
 ---
 
@@ -22,7 +22,7 @@ ball: agent
 | 4 | `scripts/withdraw.sh` | a half-published release is withdrawn whole | ✅ built; `--report` run against 4.1.0 |
 | 5 | Wheel cache keyed by `ci-key.py wheels` | a docs-only push skips the ~90 s wheel build | ✅ built |
 | 6 | Lean `CLAUDE.md` (one line per law, L11 whole); history trimmed; one SR guard | 42 KB → 33 KB read by every session; the hook and CI cannot disagree | ✅ |
-| 6a | 🟢 **Claude Code** (on Arpit's Mac) merges the law-gate, smoke and wheel-cache steps into the **current** `ci.yml` and `publish.yml` — never the 2026-10-21 chat copies, which predate W-292's `.mjs` wheel check (2026-10-24) — and runs both suites. Ruled 2026-10-25 (below) | the wiring lands; until then two wiring pins fail (`test_law_gate.py`, `test_ci_key.py`). ⚠ `git add` the four new files (`scripts/law-gate.py`, `smoke.py`, `withdraw.sh`, `tests/test_law_gate.py`) before the suite: `gen-components` links only tracked files, so SR-WORK-RELEASE's Components block reads stale until they are | ⏳ |
+| 6a | 🟢 **Claude Code** (on Arpit's Mac) merges the law-gate, smoke and wheel-cache steps into the **current** `ci.yml` and `publish.yml` — never the 2026-10-21 chat copies, which predate W-292's `.mjs` wheel check (2026-10-24) — and runs both suites. Ruled 2026-10-25 (below) | the wiring lands: ci.yml's build job restores/saves `wheels/` under `ci-key.py wheels` (push only), then bundles both npm names, runs the law gate (✔ locally, 19 wheels · 1 sdist · 2 npm, 5.0.0) and the smoke; publish.yml runs the gate. The smoke got `commit.gpgsign false` for its fixture. ⚠ The smoke could not run on Arpit's Mac (ensurepip SIGABRTs in any fresh venv there) — step 7 is its first run | ✅ 2026-10-25 (Claude Code) |
 | 7 | **First push to `main`: read the build job** — law gate ✔, smoke ✔; a second push touching only `work/` shows "wheels restored" | the ports proven on a runner, not only in a container | ⏳ |
 
 **Arpit, 2026-10-21 (Cowork):** *"look into code law. Is there something that can be taken from it?"* → *"Implement text and design change in Fox. Implement release safety. Implement fix now tiny."* → *"additionally implement CI wheel cache keyed by a hash of the inputs"*.

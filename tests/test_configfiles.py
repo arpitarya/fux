@@ -62,7 +62,9 @@ def test_setup_moves_all_eight_byte_for_byte_and_keeps_the_mode(tmp_path, monkey
     # (`fill_missing` may ADD keys to tune/output/inspect; pii and refusals are verbatim).
     assert config_file(tmp_path, "pii").read_bytes() == before["pii"]
     assert config_file(tmp_path, "refusals").read_bytes().startswith(before["refusals"])
-    assert stat.S_IMODE(os.stat(config_file(tmp_path, "pii")).st_mode) == 0o600
+    # Windows has no POSIX mode bits to keep: chmod sets only read-only there.
+    if os.name != "nt":
+        assert stat.S_IMODE(os.stat(config_file(tmp_path, "pii")).st_mode) == 0o600
 
 
 def test_migrate_alone_is_a_pure_rename(tmp_path):

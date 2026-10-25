@@ -7172,6 +7172,10 @@ Source: https://raw.githubusercontent.com/arpitarya/fux/main/records/0016_LAW-14
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
+**Owns** — the components this record decides:
+
+- `.claude/hooks/disk-budget.py` · file
+
 <!-- COMPONENTS-END -->
 
 # SR-LAW-14 — L14 — `work/MACHINE.md`'s budget section is always followed

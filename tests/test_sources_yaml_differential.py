@@ -113,7 +113,8 @@ def _node(texts: dict[str, str]) -> dict[str, dict]:
         " process.stdout.write(JSON.stringify(out)); })"
     )
     done = subprocess.run(
-        ["node", "-e", script], input=json.dumps(texts), capture_output=True, text=True, check=True
+        ["node", "-e", script], input=json.dumps(texts), capture_output=True, text=True,
+        encoding="utf-8", check=True,
     )
     return json.loads(done.stdout)
 

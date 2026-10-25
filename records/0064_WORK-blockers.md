@@ -10,7 +10,7 @@ feature: how a session declares that it is blocked, and the three hooks that sto
 owns: [.claude/hooks/stop-if-blocked.sh@a9c1d4e13655, .claude/hooks/inject-inbox.sh@35bc6fc8c22e, .claude/hooks/session-lock.sh@cdfea2091cd8]
 laws: []
 timestamp: 2026-10-21T00:00:00Z
-content_sha: bf3a911a8d44494557f4fe90ecba0aef22763d7e352e11d6fb2a511ffc9fc57f
+content_sha: 39985df1adbea8f5f1240af7d12c57f5e714bda7ee0d401c76e63517960abe2b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

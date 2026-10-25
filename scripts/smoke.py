@@ -98,8 +98,10 @@ def main(argv: list[str]) -> int:
         for rel, text in DOCS.items():
             (repo / rel).parent.mkdir(parents=True, exist_ok=True)
             (repo / rel).write_text(text, encoding="utf-8")
+        # A fixture commit is never signed: a global commit.gpgsign would need a
+        # gpg the PATH-restricted run cannot see.
         for args in (["init", "-q"], ["config", "user.email", "smoke@fux"], ["config", "user.name", "smoke"],
-                     ["add", "-A"], ["commit", "-qm", "fixture"]):
+                     ["config", "commit.gpgsign", "false"], ["add", "-A"], ["commit", "-qm", "fixture"]):
             run(["git", *args], repo, [git_only])
 
         # PyPI half — no Node on PATH

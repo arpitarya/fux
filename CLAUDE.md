@@ -244,6 +244,7 @@ each to its record; that is all it does now.
   [SR-WORK-GOLDEN](records/0066_WORK-golden.md)'s.
 - **L12** · every value lives in a config file, never in code — [SR-LAW-12](records/0014_LAW-12-values-live-in-config.md)
 - **L13** · a ranking change ships only through the standing bar — [SR-LAW-13](records/0015_LAW-13-the-standing-bar.md)
+- **L14** · work/MACHINE.md's budget section is always followed — [SR-LAW-14](records/0016_LAW-14-machine-budget.md)
 
 <!-- LAWS:END -->
 

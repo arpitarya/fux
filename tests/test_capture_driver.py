@@ -63,9 +63,12 @@ def test_merge_refuses_mismatched_parts(tmp_path):
 
 def test_builder_disables_signing_and_capture_orders_latency_last():
     assert "commit.gpgsign=false" in (DRV / "build_from_worktree.py").read_text()
-    sh = (DRV / "capture.sh").read_text()
+    sh = (DRV / "capture.sh").read_text(encoding="utf-8")
     assert sh.index('wait "$G1_PID"') < sh.index("step latency python3")
     assert sh.index("step g3_parallel") < sh.index("step latency python3")
     for frozen in ("g0.py", "g3.py", "g4.py", "latency.py", "decide.py"):
         assert not (DRV / frozen).exists()
-    subprocess.run(["bash", "-n", str(DRV / "capture.sh")], check=True)
+    # The driver runs on Arpit's Mac; on a Windows runner `bash` may be WSL's,
+    # which cannot open a D:\ path. Linux and macOS check the syntax.
+    if sys.platform != "win32":
+        subprocess.run(["bash", "-n", str(DRV / "capture.sh")], check=True)

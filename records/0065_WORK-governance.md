@@ -10,7 +10,7 @@ feature: the governance map — which file governs what, who reads it, and what 
 owns: [tests/test_record_paths_resolve.py@02158f28f2e2, tests/test_work_queue_rules_have_one_home.py@be2e38b86b0d]
 laws: [L0]
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 642fe5ce4f14754214dd84059b354e1c2228d2176d9a5a11fcfa466bb4a7a952
+content_sha: 68244360a1dfe6f9b8c189c961c8ad7008cfae5c25eb366dfb19b34e8d5b6132
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
