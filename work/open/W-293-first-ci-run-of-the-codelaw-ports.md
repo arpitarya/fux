@@ -5,9 +5,9 @@ description: "Arpit's ask (2026-10-21, Cowork): take what codelaw does better in
 item: W-293
 filed: 2026-10-21
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-21
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: arpit
+updated: 2026-10-25
+updated_by: "Cowork (Opus 5.5)"
+ball: agent
 ---
 
 # W-293 — the first CI run of the codelaw ports
@@ -22,10 +22,17 @@ ball: arpit
 | 4 | `scripts/withdraw.sh` | a half-published release is withdrawn whole | ✅ built; `--report` run against 4.1.0 |
 | 5 | Wheel cache keyed by `ci-key.py wheels` | a docs-only push skips the ~90 s wheel build | ✅ built |
 | 6 | Lean `CLAUDE.md` (one line per law, L11 whole); history trimmed; one SR guard | 42 KB → 33 KB read by every session; the hook and CI cannot disagree | ✅ |
-| 6a | 🔴 **Arpit:** copy `ci.yml` and `publish.yml` (sent in the Cowork chat, 2026-10-21) into `.github/workflows/` — remote tools may not write there | the wiring lands; until then two wiring pins fail (`test_law_gate.py`, `test_ci_key.py`). ⚠ `git add` the four new files (`scripts/law-gate.py`, `smoke.py`, `withdraw.sh`, `tests/test_law_gate.py`) before the suite: `gen-components` links only tracked files, so SR-WORK-RELEASE's Components block reads stale until they are | ⏳ |
+| 6a | 🟢 **Claude Code** (on Arpit's Mac) merges the law-gate, smoke and wheel-cache steps into the **current** `ci.yml` and `publish.yml` — never the 2026-10-21 chat copies, which predate W-292's `.mjs` wheel check (2026-10-24) — and runs both suites. Ruled 2026-10-25 (below) | the wiring lands; until then two wiring pins fail (`test_law_gate.py`, `test_ci_key.py`). ⚠ `git add` the four new files (`scripts/law-gate.py`, `smoke.py`, `withdraw.sh`, `tests/test_law_gate.py`) before the suite: `gen-components` links only tracked files, so SR-WORK-RELEASE's Components block reads stale until they are | ⏳ |
 | 7 | **First push to `main`: read the build job** — law gate ✔, smoke ✔; a second push touching only `work/` shows "wheels restored" | the ports proven on a runner, not only in a container | ⏳ |
 
 **Arpit, 2026-10-21 (Cowork):** *"look into code law. Is there something that can be taken from it?"* → *"Implement text and design change in Fox. Implement release safety. Implement fix now tiny."* → *"additionally implement CI wheel cache keyed by a hash of the inputs"*.
+
+**Arpit, 2026-10-25 (Cowork docket):** *"A · Claude Code merges (Recommended)"* —
+step 6a moves from his hands to Claude Code. Why: the 2026-10-21 chat copies
+predate W-292's edits to both workflow files (2026-10-24), so pasting them would
+delete the no-`.mjs`-in-a-wheel check; and Claude Code on his Mac has committed to
+`.github/workflows/` before (W-289, W-292) — only the Cowork bridge may not.
+Arpit still pushes; step 7 then reads the run.
 
 **Model:** Claude Code, **Sonnet**: read two CI logs; fix only what they show.
 

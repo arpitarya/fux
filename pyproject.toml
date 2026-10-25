@@ -30,7 +30,7 @@ classifiers = [
 # W-282: fux-engine is the one install of everything — the three role
 # packages, pinned to this release's one version (held equal by
 # scripts/check-version-parity.py), plus the engine's own verbs.
-dependencies = ["fux-core==4.1.1", "fux-reader==4.1.1", "fux-writer==4.1.1"]
+dependencies = ["fux-core==5.0.0", "fux-reader==5.0.0", "fux-writer==5.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/arpitarya/fux"

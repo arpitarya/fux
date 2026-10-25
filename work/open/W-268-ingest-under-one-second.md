@@ -5,9 +5,9 @@ description: "Arpit's ask (2026-10-10): `fux ingest` of 10 000 documents in unde
 item: W-268
 filed: 2026-10-10
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-18
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: arpit
+updated: 2026-10-25
+updated_by: "Cowork (Opus 5.5)"
+ball: cowork
 ---
 
 # W-268 — ingest under one second
@@ -17,8 +17,8 @@ ball: arpit
 | step | what we do | what it gives us | state |
 |---|---|---|---|
 | 1 | Find where the 4.9 seconds go and what could remove them | a proposal and a side-by-side comparison | ✅ 2026-10-10 |
-| 2 | Arpit picks the order — Python incremental first, then Rust (recommended), Rust now, or incremental only | the build order | 🔴 Arpit decides |
-| 3 | Arpit picks what happens on a machine with no pre-built Rust package — fall back to Python (recommended) or fail | no consumer ever installs Rust | 🔴 Arpit decides |
+| 2 | Arpit picks the order — Python incremental first, then Rust (recommended), Rust now, or incremental only | the build order | ✅ ruled 2026-10-25 — **S1**: incremental Python first, then the Rust core |
+| 3 | Arpit picks what happens on a machine with no pre-built Rust package — fall back to Python (recommended) or fail | no consumer ever installs Rust | ✅ ruled 2026-10-25 — **P1**: the Python engine is the fallback and the reference |
 | 4 | Measure start-up, the runtime build and file reading on the Mac | the three unknowns, measured before any code | ⏳ |
 | 5 | File the chosen build steps as their own items | work that can start | ⏳ |
 
@@ -26,6 +26,12 @@ ball: arpit
 If programming language is a boundary, find another programming language in
 which it can be done in a faster way. But do some research. I would love to
 bring it under one second."*
+
+**Arpit, 2026-10-25 (Cowork docket):** *"S1 · Incremental, then Rust (Recommended)"*
+and *"P1 · Python fallback (Recommended)"* — F1 = S1, F3 = P1; F2 = Rust + PyO3 with
+abi3 wheels stands from 2026-10-10. Next (Cowork): file the chosen steps as W-items —
+step 0 first (Sonnet, measure on the Mac), each with its bar named before it runs —
+mark the proposal `graduated`, archive this item (DoD 3).
 
 **Status 2026-10-10: research DONE — 🔴 Arpit picks a shape.** The proposal is
 [`ingest-under-one-second.md`](../proposals/ingest-under-one-second.md). In one

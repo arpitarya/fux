@@ -5,8 +5,8 @@ description: "Arpit's ruling (2026-10-19, Cowork): decoders, fetchers and decode
 item: W-289
 filed: 2026-10-19
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-24
-updated_by: "Claude Code (Opus 5.5)"
+updated: 2026-10-25
+updated_by: "Cowork (Opus 5.5)"
 ball: arpit
 ---
 
@@ -21,7 +21,7 @@ ball: arpit
 | 3 | Split the 17 built-in decoders, 2 fetchers and the table extension into 15 packages | a repo installs only the readers it needs | ✅ fetchers (phase 1); the 17 decoder modules and `table` moved into their packages, fux-core ships none (phase 2) |
 | 4 | `fux setup` scans the sources and writes the first `plugins.toml`; `fux ingest` and `fux doctor` name every undeclared suffix | nothing is skipped silently | ✅ setup + doctor (phase 1); ingest's per-suffix stderr count (phase 2) |
 | 5 | Stop seeding copies into `.fux/decoders/` and `.fux/fetchers/` — the package runs; a same-named file there still overrides | engine fixes reach consumers again | ✅ seeding stopped, both overrides built; this repo's twins deleted (phase 2) |
-| 6 | Publish 15 new PyPI names in lockstep with fux's version | 6 names become 21, one release | 🔴 PyPI refuses 15 identical pending publishers; Arpit uploads 14 wheels once by token, then Cowork adds the publishers (see §Step 6 below) |
+| 6 | Publish 15 new PyPI names in lockstep with fux's version | 6 names become 21, one release | ✅ 14 uploaded by token, 14 publishers added (2026-10-25); 🔴 the 4.1.1 release (ruled 2026-10-25, decision 4) brings fux-core 4.1.1 and `fux-decoder-json` (see §Step 6 below) |
 
 **Arpit, 2026-10-19 (Cowork):** *"maybe we can build out a mechanism of extensions,
 decoders, plugins, and fetchers as separate packages that can be plugged into Fox"* →
@@ -282,6 +282,19 @@ W-288.** Everything that does not touch the decoder tree:
    on first ingest with the error that names the fix. As built; nothing to change.
 3. Decision 4 of the earlier list (office + pdf declared here; fetcher tunables;
    table pinned as a row) stands — not reversed.
+4. **The release version → 5.0.0** — ⚠ **reversed the same day.** **Arpit, 2026-10-25
+   (Claude Code):** *"Upgrade the version to 5.0.0 … publish a new version"*, chosen
+   over 4.1.1 when asked, with the cost named: the 14 hand-uploaded 4.1.1 plugin files
+   pin a `fux-core==4.1.1` that will never exist, so they stay uninstallable (yank
+   them); CI publishes all fifteen plugins at 5.0.0 through their publishers. The
+   CHANGELOG folds `[Unreleased]` into `[5.0.0]`; `[4.1.1]` is marked never released.
+   The ruling it replaces, kept because it was his: **4.1.1, no 5.0.0.** **Arpit, 2026-10-25 (Cowork
+   docket):** *"B · Release as 4.1.1"* and *"no upgrade to version 5.0.0"*. Found the
+   same day: the 14 plugin projects' 4.1.1 files require `fux-core==4.1.1`, which
+   PyPI does not have (404; latest 4.1.0), so they do not install until 4.1.1 is
+   released. Next: after W-293 lands, Claude Code folds CHANGELOG `[Unreleased]`
+   (three breaking changes: W-294, W-292, this item) into the `[4.1.1]` entry, whose
+   *"No engine change"* stops being true; then Arpit publishes the 4.1.1 release.
 
 ## Step 6 — what PyPI actually allows (found 2026-10-20, Cowork)
 
@@ -341,10 +354,21 @@ W-288.** Everything that does not touch the decoder tree:
   their publisher.** Left: **fetcher-http, extension-table** — upload, then publisher.
   `fux-decoder-json` still arrives through its pending publisher on the first CI release.
 
+- **Progress 2026-10-25:** `/tmp/fuxplug` was gone (reboot); Arpit rebuilt
+  **fetcher-http** and **extension-table** from `main` (W-295 changed only their prose)
+  and uploaded both. **All 14 on PyPI at 4.1.1** (checked by the JSON API). Left:
+  Cowork adds the publisher to those two; `fux-decoder-json` arrives through CI.
+
+- **Progress 2026-10-25 (publishers):** Cowork added the `publish.yml` · `pypi`
+  GitHub publisher (`arpitarya/fux`) to **fetcher-http** and **extension-table** —
+  each page re-read after, one publisher apiece. **14 of 14 have their publisher;
+  Step 6's PyPI setup is complete.** Left: the first CI release carrying the
+  packages, which also brings `fux-decoder-json` through its pending publisher.
+
 ## Blockers
 
-🔴 Arpit: upload the 14 plugin wheels once by token (§Step 6) and tell Cowork, which
-then adds the 14 trusted publishers. ✅ Ruling 1 (REGISTER only) built 2026-10-24.
+✅ The 14 wheels are uploaded and all 14 have their trusted publisher (2026-10-25).
+🔴 Arpit: publish the 4.1.1 release (decision 4), after W-293 lands and Claude Code folds the CHANGELOG. ✅ Ruling 1 (REGISTER only) built 2026-10-24.
 The upload before the release that carries the packages. (W-288, waited on before, is merged.)
 
 ## Record affected

@@ -23,6 +23,24 @@ play: the worklog is the granular, per-exchange trail.
 
 ```
 
+
+## 2026-10-25 — W-289 publishers finished (14/14); inbox docket: W-292 closed, W-293 · W-289 · W-258 · W-268 ruled  ·  Cowork (Opus 5.5)
+
+- **Asked:** add the GitHub trusted publisher to fux-fetcher-http and fux-extension-table; then *"what are the blockers? Let's go one by one and ratify them."*
+- **Done:** both publishers added in Arpit's Chrome (`arpitarya/fux` · `publish.yml` · `pypi`), each page re-read — one publisher apiece, 14 of 14. Docket over the five inbox rows: **W-292** closed and archived (SR-LAW-10 d3 + the adopted *npm install* alternative confirmed); **W-293** step 6a re-balled 🟢 to Claude Code; **W-289** ruled 4.1.1, *"no upgrade to version 5.0.0"*; **W-258** §1/§2 go, §3 → B-274; **W-268** S1 + P1, compare doc accepted. Inbox ages recomputed; W-292's `ball: agent` drift fixed.
+- **Found:** the 2026-10-21 workflow copies predate W-292's edits to both files (2026-10-24) — pasting them would have deleted the no-`.mjs` wheel check; Claude Code has written `.github/workflows/` before, only the bridge cannot. The 14 plugin packages require `fux-core==4.1.1`, a 404 on PyPI today.
+- **Decided / left open:** no record changed except SR-WORK-REGISTRY's §3 rows (restamped); the L10 record already names the 2026-10-21 ruling. Not committed — another session's work is staged in the same files; files moved with `mv`, not `git mv` (the bridge cannot remove git's lock files).
+- **Mistakes:** none.
+- **Next:** W-293 (Claude Code, Sonnet) → CHANGELOG fold → Arpit publishes 4.1.1. W-268's steps to file (Cowork).
+
+## 2026-10-25 — W-297 closed: the eight leftover worktrees removed on Arpit's ruling  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"commit everything"*, then which worktrees remain and why, then *"whatever is present in main delete their worktrees."*
+- **Done:** committed the Cowork filing + session bookkeeping (`bd91bfea`) and the re-ingested index (`a0b45507`); removed all 8 remaining worktrees and their branches, each re-checked first (no commit outside `main`, no uncommitted file outside `.fux/index/`); W-297 closed and archived. fux ~5 GB → 995 MB.
+- **Decided / left open:** branch `worktree-agent-a02544a49dceb592f` kept — its 2 W-294 draft commits are not in `main`, so the ruling does not reach them.
+- **Mistakes:** none.
+- **Next:** nothing agent-closable in the queue.
+
 ## 2026-10-24 — W-294 built and closed (one `.fux/sources.yaml`); W-289 ruling 1 built; W-297 to Arpit  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement all the OpenWork items."*
@@ -2672,6 +2690,13 @@ instead of throwing a traceback on a missing key.
 - **Decided / open:** verdicts reached, and what's still awaiting a call.
 - **Next:** the single immediate next step.
 ```
+## 2026-10-25 — W-289: version 5.0.0, committed and pushed; the release waits on CI  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"Upgrade the version to 5.0.0. Commit everything. Push everything and publish a new version."* Asked first, because it reversed W-289 decision 4 (4.1.1, ruled the same day); Arpit chose **5.0.0, overrule today**.
+- **Done:** 23 parity sites → 5.0.0, `uv.lock`, `.fux/config/plugins.toml` re-pinned (`fux setup --pin` — a version copy the parity script does not check), CHANGELOG `[Unreleased]` → `[5.0.0]` (`[4.1.1]` marked never released), README, **`CLAUDE.md`'s version line (a fact, SR-WORK-DOCS d8)**, `llms*.txt` regenerated, W-289 decision 4 amended. Committed together with a concurrent Cowork session's pending edits (Arpit confirmed it was finished), and pushed.
+- **Not done — the publish.** Unit suite: 42 failures in this tree, none from the bump once re-pinned: Cowork's L14 / SR-WORK-NOW / SR-WORK-CLEANUP filing claims four `.claude/hooks/*` files that do not exist, leaves `content_sha` empty and CLAUDE.md's law block without L14; W-293's tests expect the law gate and wheel cache in the workflows. Nightly CI red since 2026-10-20. `publish.yml` refuses a release without a green verdict (SR-WORK-RELEASE 11a), so no GitHub release was created. e2e suite not run.
+- **Next:** make CI green (W-293's workflow merge; the filing's hooks or its claims), then create the v5.0.0 release; then yank the 4.1.1 plugin files.
+
 
 ## 2026-09-28 — W-234 built: the laws renumbered, L7 Python ≥ 3.12, new L8 Node ≥ 22  ·  Claude Code (Opus)
 

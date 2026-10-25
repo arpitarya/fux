@@ -14,7 +14,7 @@
 
 ## records
 
-- [SR-LAWS (0001) — the laws have exactly one home, and records cite it](https://raw.githubusercontent.com/arpitarya/fux/main/records/0001_LAWS.md): The non-negotiable constraints are normative in CLAUDE.md only; this record names them L0-L13 so a decision can cite one without restating it.
+- [SR-LAWS (0001) — the laws have exactly one home, and records cite it](https://raw.githubusercontent.com/arpitarya/fux/main/records/0001_LAWS.md): The non-negotiable constraints are normative in CLAUDE.md only; this record names them L0-L14 so a decision can cite one without restating it.
 - [SR-LAW-0 (0002) — L0 — SRs are the only source of truth, and the Law records outrank every other record](https://raw.githubusercontent.com/arpitarya/fux/main/records/0002_LAW-0-authority.md): The constitutional law. A rule is stated in exactly one SR and every other artifact links to it; the Law records outrank every other SR and a conflicting record is void in the conflicting part; a Law changes only on Arpit's ruling. Carries the describes/implements/enforces test that makes the source clause followable, and states plainly which half is gated and which is judgment.
 - [SR-LAW-1 (0003) — L1 — a retired SR is archived, never deleted](https://raw.githubusercontent.com/arpitarya/fux/main/records/0003_LAW-1-retired-records-archived.md): A standing record whose law, rule or subject is retired is MOVED to archive/records/, mirroring its path, in the change that retires it — with a row in archive/README.md, status: archived and a dated banner. It may be named, never cited. Superseded records are out of scope and are still rewritten or deleted in place.
 - [SR-LAW-2 (0004) — L2 — $0, FOSS-only](https://raw.githubusercontent.com/arpitarya/fux/main/records/0004_LAW-2-zero-cost.md): Why fux costs nothing and depends on nothing anyone must buy; the 2026-09-06 amendment that withdrew the zero-dependency guarantee while hardening the money clause; and the 2026-10-19 amendment that lets the committed repository, never the machine, choose an opt-in package.
@@ -29,6 +29,7 @@
 - [SR-LAW-11 (0013) — L11 — the golden answer key is Arpit's custody, and no agent may read one](https://raw.githubusercontent.com/arpitarya/fux/main/records/0013_LAW-11-sealed-answer-key.md): Every answer set — Claude's set 2 and set 3, Codex's set 1 — is Arpit's custody. Since 2026-09-18 a key MAY exist at one address, `work/golden/golden-answers/`, gitignored and closed to every agent on both spellings; the one route an answer travels is Arpit pasting it into a chat, and that route is Codex's alone. Claude is closed on every route, a paste included, with two carve-outs: authoring an agent-authored set, per set; and, since 2026-09-21, a named scoring program Arpit runs from his own shell, which no agent invokes and for which no guard moves. A breach does not fail loudly because a contaminated benchmark number looks exactly like a clean one.
 - [SR-LAW-12 (0014) — L12 — every value lives in a config file, never in code](https://raw.githubusercontent.com/arpitarya/fux/main/records/0014_LAW-12-values-live-in-config.md): No function, module constant or parameter default in fux's engine holds a value. A tunable value is read from a committed TOML file (fux.toml, .fux/config/tune.toml or another .fux/*.toml); a fixed engine value is read from one internal constants file shipped with the engine. Python and Node read the same key from the same file, and a missing file or key is a hard error that names it. Setup and its templates, tests, tools and scripts are the only places a literal value may sit.
 - [SR-LAW-13 (0015) — L13 — a ranking change ships only through the standing bar](https://raw.githubusercontent.com/arpitarya/fux/main/records/0015_LAW-13-the-standing-bar.md): One bar for every change meant to improve what fux ranks. The shape is fixed — gates, the change clearly helps the questions it targets, limited collateral on every other question, a net-positive whole set, and guardrails — and each pre-registration fills in only its parameters. One arm is decided, named before any number; a set already used to decide a mechanism may report another, never decide it. Tightening is free; loosening needs Arpit's ruling.
+- [SR-LAW-14 (0016) — L14 — work/MACHINE.md's budget section is always followed](https://raw.githubusercontent.com/arpitarya/fux/main/records/0016_LAW-14-machine-budget.md): The budget section of work/MACHINE.md binds every session and every agent — Claude Code or Cowork, main agent or sub-agent. Today it holds 5 GB of disk per project, all agents combined; past it, every further GB needs Arpit's approval before it is used. Only Arpit changes the number.
 
 ---
 
@@ -262,7 +263,7 @@ They pull. The index is plain JSONL in git, it merges with `fux hooks`' merge dr
 
 ## Status
 
-**`4.1.0` is the latest release** on PyPI (`pip install fux-engine`) and npm (`npx fux-engine`). The index format is versioned, and fux tells you when to run `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
+**`5.0.0` is the latest release** on PyPI (`pip install fux-engine`) and npm (`npx fux-engine`). The index format is versioned, and fux tells you when to run `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ⭐ **Star the repo** if fux saved your agent from one confident wrong answer. It's how other people find it. 👀 **Watch → Custom → Releases** to hear about new versions.
 
@@ -2718,6 +2719,7 @@ numbering and nothing else — read the law itself in its own `SR-LAW-n` record.
 | **L11** | The golden answer key is Arpit's custody — one permitted address, `work/golden/golden-answers/`, gitignored and closed to every agent by any route | [SR-LAW-11](0013_LAW-11-sealed-answer-key.md) |
 | **L12** | Every value lives in a config file, never in code — tunables in the consumer's TOML, fixed values in the engine's constants file; a missing key is an error | [SR-LAW-12](0014_LAW-12-values-live-in-config.md) |
 | **L13** | A ranking change ships only through the standing bar — helps its target by the paired floor, limited collateral, net positive, guardrails; one decided arm; fresh data | [SR-LAW-13](0015_LAW-13-the-standing-bar.md) |
+| **L14** | The machine budget is always followed — `work/MACHINE.md`'s budget section binds every session and agent: 5 GB of disk per project, all agents combined; every GB past it needs Arpit's approval | [SR-LAW-14](0016_LAW-14-machine-budget.md) |
 
 **Two laws retired before the 2026-09-28 renumber carry an `ex-` handle in live
 text** (decision 2a): `ex-L5`, hashed display meta (retired 2026-09-20,
@@ -2743,7 +2745,7 @@ one line each from the record's title, L11 whole — rendered by
 
 ```mermaid
 flowchart TD
-    N["SR-LAWS<br/>(this record — the handles L0..L13)"]
+    N["SR-LAWS<br/>(this record — the handles L0..L14)"]
     W["SR-LAW-0 … SR-LAW-13<br/>(each STATES one law)"]
     L["CLAUDE.md §Non-negotiable constraints<br/>(GENERATED · test-bound · not the source)"]
     A["SR-RECORD"]
@@ -2763,7 +2765,7 @@ flowchart TD
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-                    SR-LAWS          <-- this record: the handles L0..L13
+                    SR-LAWS          <-- this record: the handles L0..L14
                         |
         +---------------+---------------+---------------+
         v               v               v               v
@@ -2809,7 +2811,7 @@ record**, and `CLAUDE.md` carries a generated, test-bound view of all fourteen. 
 strike-through is deliberate: the sentence is what several live citations point
 at, and deleting it would make them resolve to nothing.
 
-**2. This record assigns the handles L0–L13, dense, in the order of the table
+**2. This record assigns the handles L0–L14, dense, in the order of the table
 above.** ⚠ **Amended 2026-09-28 on Arpit's ruling** (Cowork, W-234):
 *"law 13 … renumber it to law 1, renumber rest of them, then law 7 which says
 python 311, change it to Python 312 and create a new law for node similar to
@@ -3127,6 +3129,12 @@ retired SR is archived* (now **L1**, decision 2a's last row), and frozen text �
 written from that habit now reads as the ship bar and passes
 `tests/test_law_handles.py`; the live archive map was repointed to L1 in the
 same change that added L13.
+
+**12. L14 was added on 2026-10-24 (Arpit, Cowork): the machine budget in
+`work/MACHINE.md` is always followed.** A new handle at the end of the table, so
+no citation moves. The record is [SR-LAW-14](0016_LAW-14-machine-budget.md),
+file `0016`. Arpit asked for a law so that no session can decide on its own to
+spend past the budget — past it, every GB is his to approve.
 
 ### Consequences
 
@@ -7155,3 +7163,129 @@ ranking change, is fine. Any other is a breach to raise.
 
 - [`work/regression/2026-10-10-section-records/VERDICT.md`](../work/regression/2026-10-10-section-records/VERDICT.md)
 - [`work/regression/2026-10-10-section-gain-only/VERDICT.md`](../work/regression/2026-10-10-section-gain-only/VERDICT.md)
+
+---
+
+# SR-LAW-14 (0016) — L14 — work/MACHINE.md's budget section is always followed
+
+Source: https://raw.githubusercontent.com/arpitarya/fux/main/records/0016_LAW-14-machine-budget.md
+
+<!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
+
+<!-- COMPONENTS-END -->
+
+# SR-LAW-14 — L14 — `work/MACHINE.md`'s budget section is always followed
+
+## §1 — For humans
+
+**The law (L14).**
+
+> **[`work/MACHINE.md`](../work/MACHINE.md)'s budget section is always followed** — by every session and every agent in it, Claude Code or Cowork, main agent or sub-agent. Today it holds one budget: **5 GB of disk per project, all agents combined.** Past it, **every further GB needs Arpit's approval, asked before that GB is used.** A number in that section changes only by Arpit's ruling; an agent never raises its own ceiling.
+
+**Ruled by Arpit, 2026-10-24:** *"no agent in one project should consume more than 5 GB. Even sub agents shouldn't go beyond 5 GB … one main agent, there are two sub agents combined, it should not cross 5 GB."* — then *"So 5 GB is the limit. If it goes beyond it, ask me for my approval on every GB that it increases, and create a law that machine.md should always, machine.md budget section should always be followed."*
+
+**Why it exists.** The laptop's disk reached 100 %. Agents ran in parallel, each
+in its own worktree with its own build output, and nothing added them up — one
+project's build folder alone reached 15 GB. A budget nobody measures is a wish;
+this law makes it a number that is measured before every action that grows it.
+
+```mermaid
+flowchart LR
+    A["an action that grows the disk<br/>(sub-agent, worktree, build, install)"] --> M["measure the whole project"]
+    M -->|under the budget| OK["runs"]
+    M -->|past it, inside an approved GB| OK
+    M -->|past every approved GB| Q["asks Arpit"]
+    Q -->|yes| G["one more GB approved"] --> OK
+    Q -->|no| N["does not run — clean up instead"]
+```
+
+<details>
+<summary><b>ASCII twin</b></summary>
+
+```text
+   grows the disk --> measure the whole project --+--> under budget ............ runs
+                                                   +--> past it, approved GB .... runs
+                                                   +--> past every approved GB -> ask Arpit
+                                                                                  yes: +1 GB, runs
+                                                                                  no:  clean up instead
+```
+
+</details>
+
+---
+
+## §2 — For agents
+
+### Context
+
+`work/MACHINE.md` records how each surface behaves. Its **budget section** is
+the one part of it that is not a description but a limit, and a limit only
+holds if it outranks the session that wants to exceed it — so it is a law.
+
+<!-- LAW-TEXT:BEGIN L14 -->
+- **L14** · **The machine budget is always followed.** [`work/MACHINE.md`](../work/MACHINE.md)'s budget section binds every session and every agent in it — today, 5 GB of disk per project, all agents combined; past it, every further GB needs Arpit's approval before it is used. Only Arpit changes the number.
+<!-- LAW-TEXT:END L14 -->
+
+### Decision
+
+1. **The budget section of `work/MACHINE.md` is normative.** The rest of that
+   file describes surfaces; the `## Disk budget` section binds, as this law.
+   Its `budget` row is the one place the number lives —
+   `.claude/hooks/disk-budget.py` reads it from there.
+2. **What counts, all together:** the repo (its `.git` and every worktree under
+   it included), every git worktree outside it, and all build output — the
+   main session and every sub-agent combined. Shared caches outside the repo
+   (`~/.cargo`, the pnpm store, pip's cache) do not count.
+3. **Under the budget nothing is asked. Past it, every further GB is approved
+   before it is used** — one yes approves exactly one GB. A new sub-agent or
+   worktree asks from 90 % of the approved ceiling, since one can cross it on
+   its own. Back under the budget, the approvals are forgotten.
+4. **Claude Code enforces it** with `.claude/hooks/disk-budget.py`: `PreToolUse`
+   raises a permission prompt for an action that would grow the project into
+   an unapproved GB; `PostToolUse` records a yes and says so the moment the
+   project has grown past what was approved; every prompt shows the usage from
+   80 % of the budget.
+5. **A Cowork session runs no hooks, so it keeps the law by hand:** it measures
+   (`du -sh` of the repo) before it starts agents, worktrees or builds, and asks
+   Arpit in chat before going past the budget or an approved GB.
+6. **Only Arpit changes the number** — the section's row is edited in the same
+   change that records the ruling in the worklog. Going past it with approval
+   is not changing it.
+
+### Consequences
+
+- Fewer agents run at once on a full project; the prompt makes the cost of the
+  next one visible before it is paid.
+- **What it cannot do:** a single command that is already running can grow past
+  the approved GB before it finishes — the hook asks *before* an action and
+  measures *after* it, and the next growing action asks again.
+- A measurement is reused for 60 seconds, so a burst of tool calls costs one
+  `du`.
+
+### Alternatives considered
+
+- **A hard refusal at 5 GB** — rejected by Arpit: past the budget the answer is
+  a question per GB, not a wall.
+- **A budget per agent** — rejected: the ruling is *combined*; a sub-agent spends
+  the same disk as its parent.
+- **The number in `.claude/settings.json`** — rejected: two homes for one number;
+  `work/MACHINE.md` is the one the law names.
+
+### Reference (required)
+
+- [`.claude/hooks/disk-budget.py`](../.claude/hooks/disk-budget.py) — decision 4.
+- [`work/MACHINE.md`](../work/MACHINE.md) §Disk budget — decision 1.
+
+### Veto condition
+
+**Reopen this decision if:** a project sits past its approved ceiling with nobody asked.
+
+**How to check it:** `python3 .claude/hooks/disk-budget.py fresh` — the usage must be under the budget, or under the GB Arpit approved.
+
+---
+
+## References
+
+**Code** — [`.claude/hooks/disk-budget.py`](../.claude/hooks/disk-budget.py)
+
+**Project docs** — [`work/MACHINE.md`](../work/MACHINE.md)

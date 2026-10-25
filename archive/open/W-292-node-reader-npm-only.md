@@ -5,9 +5,9 @@ description: "Arpit's ask (2026-10-21, Cowork): the Node reader is installed ONL
 item: W-292
 filed: 2026-10-21
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-21
-updated_by: "Arpit (Cowork, Opus 5.5)"
-ball: agent
+updated: 2026-10-25
+updated_by: "Cowork (Opus 5.5)"
+ball: closed
 ---
 
 # W-292 — the Node reader installs from npm only
@@ -58,9 +58,19 @@ from `process.cwd()`, so it works from `node_modules/` as it is.
 | 4 · migration, setup only | on an existing repo, `fux setup` removes **what an earlier setup wrote**: `.fux/node/` (fux's four files and `package.json`), `.fux/fux`, and the `.fux/node` entry it spliced into a workspace manifest (format-preserving, the reverse of decision 15's splice). It prints each removal. **It never removes a `node_modules/` it did not write, and ingest never runs this** (SR-NODE-SEARCH decision 15 constraint 1's no-op-diff rule stands) | ✅ |
 | 5 · doctor | the `node reader` row stops checking vendored shapes. It **warns** when a leftover `.fux/node/` or `.fux/fux` exists (*"run `fux setup` to remove"*), and otherwise passes — a repo with no Node reader is the normal state | ✅ |
 | 6 · records | SR-NODE-SEARCH decisions 13, 15, 16 superseded and decision 14 narrowed to *"the bundle ships on npm only"*, Arpit's ruling 2026-10-21 named; the probes stay filed as history. SR-DOTFUX's `fux` / `node/` rows and its `ensure_layout` row; SR-DOCTOR's `node reader` row; SR-WORK-RELEASE (the wheel no longer carries the bundle); SR-MCP's vendored-copy line; `records/README.md` ownership rows for the deleted code; `sr-hash` restamped | ✅ |
-| 7 · L10's record | the law statement is untouched — it already reads *"vendored into their tree **or** exported by a published package"*. Only its illustrative rows naming `.fux/node/fux.mjs` change. **A Law record edits only on Arpit's ruling named in it** — name this ask (2026-10-21); if the build finds the statement itself must change, stop and ask | ✅ built — 🔴 Arpit confirms decision 3 and the adopted alternative |
+| 7 · L10's record | the law statement is untouched — it already reads *"vendored into their tree **or** exported by a published package"*. Only its illustrative rows naming `.fux/node/fux.mjs` change. **A Law record edits only on Arpit's ruling named in it** — name this ask (2026-10-21); if the build finds the statement itself must change, stop and ask | ✅ built; **confirmed by Arpit 2026-10-25** — decision 3 amended and the *npm install* alternative marked adopted, both as written |
 | 8 · docs and guides | `README.md` §*No Python on the machine?* and `node/README.md` say `npm install fux-engine` and name `npx fux` / the package's `bin`; the `.fux/fux` and shape tables go. Shipped agent guides (all four surfaces, SR-AGENT-POLICY) checked for `.fux/fux` / `.fux/node`. CHANGELOG under **Breaking** | ✅ — paper fig-12 SVG/.mmd not redrawn (no renderer); §5 prose says so |
 | 9 · tests | `test_setup_node.py` and `test_setup_workspace.py` rewritten to assert the opposite (as decision 13 did when it reversed): setup writes no Node, no manifest edit, migration removes only fux's files. `test_fuxdir.py`, `test_mcp.py`, `test_cli.py`, `test_law_handles.py`, `test_record_paths_resolve.py`, `tests/l12_allow.toml` follow. e2e: `pip install` → `fux setup` writes no `.fux/node/`; `npm install fux-engine` in a scratch repo → `npx fux find …` answers. **Both suites, whole**, plus `node --test node/test/*.test.mjs` | ✅ |
+
+## Closed 2026-10-25
+
+**Arpit, 2026-10-25 (Cowork docket):** *"A · Confirm both (Recommended)"* — the two
+edits to [SR-LAW-10](../../records/0012_LAW-10-bundled-output.md) stand as built:
+decision 3 amended (the bundle ships in the npm package only) and the rejected
+alternative *"make the consumer `npm install fux-engine`"* marked adopted, with its
+L5 reading. The law's statement did not move. Every DoD row is ✅; paper fig-12 is
+not redrawn (DoD 8 names it). Live successors: SR-NODE-SEARCH decision 14,
+SR-LAW-10 decision 3.
 
 ## Blockers
 

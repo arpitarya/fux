@@ -23,17 +23,9 @@ here. Read that record before changing anything below it.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **W-297** — keep or drop the 8 leftover worktrees (~3 GB) and 9 branches; each holds nothing the live tree lacks, but removing them takes your word (SR-WORK-CLEANUP d3). Rec. **drop all**. [the item](open/W-297-clean-leftover-worktrees.md) | 2026-10-24 | 0d |
+| 🔴 **W-289** — re-ruled 2026-10-25: release as **5.0.0** (bumped and pushed). The publish waits on a green CI (SR-WORK-RELEASE 11a): W-293's workflow merge and the L14/NOW/CLEANUP filing's missing hooks redden the unit suite. After 5.0.0 is out, **yank the 14 hand-uploaded 4.1.1 plugin files** (they pin a fux-core 4.1.1 that will never exist). [the item](open/W-289-plugin-packages.md) | 2026-10-20 | 5d |
 | ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-292** — confirm two edits to L10's rationale: decision 3 amended, and *"make the consumer `npm install`"* marked adopted. Law statement untouched. [the item](open/W-292-node-reader-npm-only.md) | 2026-10-21 | 3d |
-| ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-293** — copy `ci.yml` and `publish.yml` from the 2026-10-21 Cowork chat into `.github/workflows/` (the bridge may not write there). [the item](open/W-293-first-ci-run-of-the-codelaw-ports.md) | 2026-10-21 | 3d |
-| ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-289** — only fetcher-http and extension-table remain: upload each (one-at-a-time loop, W-289 §Progress 2026-10-24) after PyPI's 429 clears, then Cowork adds its publisher. Rulings made 2026-10-20. [the item](open/W-289-plugin-packages.md) | 2026-10-20 | 4d |
-| ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-258** — **on hold by his word** (2026-10-04): say when to run the live URL-source checks. Recommended: §1 vanishing source + §2 real 429; park §3. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 20d |
-| ↳ **blocks:** nothing else in the queue | | |
-| 🔴 **W-268** — ingest of 10 000 docs in under a second, in Rust (his direction; no consumer installs Rust). Pick the order and the no-wheel fallback — rec. Python incremental first; Python engine as fallback. [the item](open/W-268-ingest-under-one-second.md) | 2026-10-10 | 14d |
+| 🔴 **W-258** — ruled 2026-10-25: run §1 (vanishing source, ~20 min, no logins) and §2 (a real 429) when you have time; §3 parked as B-274. [the item](open/W-258-live-network-captures.md) | 2026-10-04 | 21d |
 | ↳ **blocks:** nothing else in the queue | | |
 
 ---
@@ -42,23 +34,21 @@ here. Read that record before changing anything below it.
 
 ### fux build
 
-- 🔴 **W-297** · `arpit` — 2 of 10 worktrees removed, stale entries pruned; Arpit rules keep or drop on the other 8 (nothing in them is lost). **Sonnet.** Filed by Arpit (Cowork). [detail](open/W-297-clean-leftover-worktrees.md)
-- 🔴 **W-289** · `arpit` — plugin packages on `main`. Arpit: upload fetcher-http + extension-table, then publisher (ruling 1 built 2026-10-24). Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
-- 🔴 **W-292** · `arpit` — built on `main` (npm-only Node reader); Arpit confirms two L10 rationale edits; fig-12 not redrawn. Filed by Arpit (Cowork). [detail](open/W-292-node-reader-npm-only.md)
+- 🔴 **W-289** · `arpit` — plugin packages on `main`; all 14 on PyPI with their publisher. Re-ruled 5.0.0 (2026-10-25): bumped, CHANGELOG `[5.0.0]`, pushed; the release waits on CI green; then yank the 4.1.1 plugin files. Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
 
 
 ### testing
 
-- 🔴 **W-293** · `arpit` — codelaw ports built; Arpit places two workflow files (`.github/` refuses remote writes), then the first `main` run proves gate, smoke, wheel cache. **Sonnet.** Filed by Arpit (Cowork). [detail](open/W-293-first-ci-run-of-the-codelaw-ports.md)
+- 🟢 **W-293** · `agent` — codelaw ports built; Claude Code merges gate/smoke/cache into the *current* workflow files (keep W-292's `.mjs` check), both suites; then Arpit pushes. **Sonnet.** Filed by Arpit (Cowork). [detail](open/W-293-first-ci-run-of-the-codelaw-ports.md)
 - 🟢 **W-281** · `agent` — capture driver built (DoD 1–4, never run); DoD 5 (≤ 30 min, timed) owed by the next capture. **Sonnet.** Filed by Arpit (Claude Code). [detail](open/W-281-capture-harness-speed.md)
-- 🔴 **W-258** · `arpit` — one hands-on session on his machine: an answer whose source then vanishes, a real 429 from a real host, parallel CDP fetches in signed-in Chrome. Checklist and bars written. Filed by Arpit (Cowork). [detail](open/W-258-live-network-captures.md)
+- 🔴 **W-258** · `arpit` — ruled 2026-10-25: Arpit runs §1 (a source vanishes, ~20 min) and §2 (a real 429) when he has time; §3 parked as B-274. Checklist and bars written. Filed by Arpit (Cowork). [detail](open/W-258-live-network-captures.md)
 
 ### adr update
 
 
 ### research
 
-- 🔴 **W-268** · `cowork` — ingest of 10 000 docs in under a second. Proposal + compare doc filed; Rust is his direction. Arpit picks the order and the fallback. **Cowork.** Filed by Arpit (Cowork). [detail](open/W-268-ingest-under-one-second.md)
+- 🟢 **W-268** · `cowork` — ingest of 10 000 docs in under a second. Ruled S1 + P1 (2026-10-25); file the steps, step 0 (measure, **Sonnet**) first. **Cowork.** Filed by Arpit (Cowork). [detail](open/W-268-ingest-under-one-second.md)
 - 🟢 **W-263** · `cowork` — research and propose the never-built `enriched` ingest mode: its overlap with `fux enrich`, and whether it may write index records itself. No code. **Opus.** Filed by Arpit (Cowork). [detail](open/W-263-enriched-mode-proposal.md)
 - 🟢 **W-265** · `cowork` — deep research: how fux can better spot a question it cannot answer (the coverage floor tested no better than chance). No code. **Opus.** Filed by Arpit (Cowork). [detail](open/W-265-abstention-research.md)
 - 🟢 **W-275** · `cowork` — is there a tool to tune `b`, `k1`, field weights, `section_weight` — or can one be built? Survey + proposal; train on retired sets, decide only via L13. No code. **Cowork.** Filed by Arpit (Cowork). [detail](open/W-275-ranking-tuner-research.md)

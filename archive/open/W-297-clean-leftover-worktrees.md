@@ -5,12 +5,21 @@ description: "Clean the ten agent worktrees under .claude/worktrees/ (≈4 GB) t
 item: W-297
 filed: 2026-10-24
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-24
+updated: 2026-10-25
 updated_by: "Claude Code (Opus 5.5)"
-ball: arpit
+ball: done
 ---
 
 # W-297 — clean the leftover agent worktrees
+
+> **DONE 2026-10-25.** Arpit ruled *"whatever is present in main delete their
+> worktrees"*. All eight remaining worktrees held nothing `main` lacks (every
+> commit merged or patch-equal; uncommitted bytes only regenerated
+> `.fux/index/` shards), so each was removed with `--force` and its branch with
+> `-D`, under that ruling (SR-WORK-CLEANUP decision 3). Kept: the branch
+> `worktree-agent-a02544a49dceb592f` (no worktree) — its 2 W-294 draft commits
+> are not in `main`, so the ruling does not reach them. fux: ~5 GB → 995 MB,
+> back under L14's 5 GB budget.
 
 ## At a glance
 
@@ -18,7 +27,7 @@ ball: arpit
 |---|---|---|---|
 | 1 | For each worktree listed below: is its branch merged into `main`, and is its tree clean (`git -C <path> status --porcelain`)? | which are safe to remove | ✅ 2026-10-24 — §Verdicts |
 | 2 | `git worktree remove <path>` each merged, clean one; `git branch -d` its branch | ≈400 MB back per worktree; its row drops from NOW.md by itself | ✅ `integrate` removed; `agent-a02544a49dceb592f` removed after W-294 merged from it |
-| 3 | An unmerged or dirty one: to the inbox with its branch, last commit and `git diff --stat main...` | nothing unmerged is lost | 🔴 8 worktrees + 1 branch → Arpit (§Verdicts) |
+| 3 | An unmerged or dirty one: to the inbox with its branch, last commit and `git diff --stat main...` | nothing unmerged is lost | ✅ Arpit 2026-10-25: *"whatever is present in main delete their worktrees"* — all 8 removed with their branches |
 | 4 | `git worktree prune` for the four `/private/tmp/claude-501/…/scratchpad/{build,engine,own,pre}` entries whose folders are gone | `git worktree list` matches the disk | ✅ pruned |
 
 **Arpit, 2026-10-24 (Cowork):** *"what work trees got created … if they aren't cleaned, then create a work item to clean them."*
@@ -80,9 +89,9 @@ None of them is left, and `git worktree list` shows only the main checkout plus 
 
 | DoD | what | state |
 |---|---|---|
-| 1 · merged ones gone | every merged, clean worktree removed and its branch deleted | ⏳ |
-| 2 · nothing lost | every unmerged or dirty one is on the inbox with its diff, not removed | ⏳ |
-| 3 · disk agrees | none of the paths below in `git worktree list`; fux back under its 5 GB budget ([L14](../../records/0016_LAW-14-machine-budget.md), the machine-budget law) | ⏳ |
+| 1 · merged ones gone | every merged, clean worktree removed and its branch deleted | ✅ |
+| 2 · nothing lost | every unmerged or dirty one is on the inbox with its diff, not removed | ✅ |
+| 3 · disk agrees | none of the paths below in `git worktree list`; fux back under its 5 GB budget ([L14](../../records/0016_LAW-14-machine-budget.md), the machine-budget law) | ✅ |
 
 ## Hazards
 

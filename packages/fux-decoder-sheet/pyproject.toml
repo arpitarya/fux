@@ -7,7 +7,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fux-decoder-sheet"
-version = "4.1.1"
+version = "5.0.0"
 description = "Fux decoder package: spreadsheets — Excel workbooks, CSV and TSV."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -15,7 +15,7 @@ requires-python = ">=3.12"
 license = "MIT"
 authors = [{ name = "arpit arya", email = "arpitarya.me@gmail.com" }]
 # The pins are the release's one version, held equal by scripts/check-version-parity.py.
-dependencies = ["fux-core==4.1.1", "fux-extension-table==4.1.1"]
+dependencies = ["fux-core==5.0.0", "fux-extension-table==5.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/arpitarya/fux"

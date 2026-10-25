@@ -5,7 +5,7 @@ description: "W-268 — ingest of 10 000 documents in under one second. Three fo
 
 # Ingest under one second — the order, the language, the fallback
 
-> **Verdict:** **proposed — Arpit picks F1 and F3.** F2 carries his direction
+> **Verdict:** **ACCEPTED — Arpit, 2026-10-25 (Cowork docket): F1 = S1, F3 = P1**, as recommended; F2 = Rust stands from 2026-10-10. *Was:* proposed — Arpit picks F1 and F3. F2 carries his direction
 > (2026-10-10): *"We can build it in Rust. The only catch here is I don't want
 > consumer to install Rust."* Recommended: **F1 = S1** (incremental Python
 > first, then a Rust core behind its own spike) · **F2 = Rust + PyO3/maturin,
@@ -14,7 +14,7 @@ description: "W-268 — ingest of 10 000 documents in under one second. Three fo
 
 | | |
 |---|---|
-| **status** | proposed — research done 2026-10-10 in Cowork ([proposal](../proposals/ingest-under-one-second.md)); nothing built |
+| **status** | **accepted 2026-10-25** (F1 = S1, F3 = P1); nothing built — research done 2026-10-10 in Cowork ([proposal](../proposals/ingest-under-one-second.md)); nothing built |
 | **the call** | skip unchanged documents in Python (G1/G2), then move the hot path of a full ingest into a Rust core shipped as pre-compiled wheels (G3); a machine with no wheel runs today's Python engine, byte-identical and slower |
 | **confidence** | **high** that G1/G2 are reachable in Python (the 4.90 s is all unchanged-document work); **medium** on G3 < 1 s natively — projected from a prototype and engine numbers, not measured on fux; **low** on macOS per-file read cost until step 0 measures it |
 | **reopen-trigger** | (1) step 0 measures opening + reading 10 000 files on the Mac at ≥ 1 s **even in parallel**, or Python start-up + import alone at ≥ 1 s; **or** (2) the Rust spike projects G3 ≥ 1 s from measured stages; **or** (3) a platform fux supports cannot be given a wheel; **or** (4) a filed run shows pure Python reaching G3 < 1 s (free-threading, a JIT) |

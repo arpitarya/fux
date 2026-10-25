@@ -27,7 +27,7 @@ no session should treat this file as exhaustive.
 that the queue holds instead carry no row here: W-87, W-136, W-140,
 W-144, W-145, W-146, W-147, W-148, W-154, W-155, W-157, and — promoted
 from rows here on 2026-09-14 — W-163 (eight doctor rows), W-164 (four gates),
-W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search improvements), W-169 (`fux inspect`), W-170 (cage search leg), W-176 (the nine abstention gates, from B-175); from rows here on 2026-10-04 — W-253 (B-100, B-146, B-151), W-254 (B-150), W-255 (B-260), W-256 (B-098, B-113, B-103 and the loopback halves of B-102/B-124), W-257 (B-108–B-110), W-258 (B-101 and the live halves of B-102/B-124); from B-272 on 2026-10-18 — W-282 (its §8, the package split; the row stays for the store).
+W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search improvements), W-169 (`fux inspect`), W-170 (cage search leg), W-176 (the nine abstention gates, from B-175); from rows here on 2026-10-04 — W-253 (B-100, B-146, B-151), W-254 (B-150), W-255 (B-260), W-256 (B-098, B-113, B-103 and the loopback halves of B-102/B-124), W-257 (B-108–B-110), W-258 (the live halves of B-102/B-124; B-101 parked back as B-274 on 2026-10-25); from B-272 on 2026-10-18 — W-282 (its §8, the package split; the row stays for the store).
 
 ---
 
@@ -80,6 +80,7 @@ W-165 (three CLI fixes), W-166 (carry-forward invalidation), W-168 (search impro
 | B-135 | The double-load hazard "is unchanged and still unmeasured" — Copilot sees two same-name skill copies | [SR-AGENT-POLICY](../records/0132_agent-policy.md) decision 14a ⚠ | Observe or rule out a duplicate-name error in Copilot |
 | B-245 | The vector plane (`fux embed`, `.fux/vectors/`, `--qvec`, RRF) — closed unbuilt 2026-09-14: its gate can never fire; `tools/vector-gate/` held by the fallback until `SR-VECTORS` | [SR-RS](../records/0133_predictions.md) d19, d20 · archived W-112 | **Reopen when both hold:** a rank-contract corpus **and** doc2query measured (met, [W-257](regression/2026-10-10-enriched-rung/VERDICT.md)) |
 | B-262 | Cascade ranking is "unbuilt and unmeasured, deliberately" — stage-1 `recall@k` is the gate; its data does not exist: no SR-WORK-TESTDATA row names tabular documents, so a T15 comes first (ex-B-044) | [SR-CHUNKING](../records/0151_chunking.md) §What is NOT done · [SR-TABULAR](../records/0150_tabular.md) Consequences 🔴 | A tabular T-row and seed tables, then stage-1 `recall@k` > ~0.98 |
+| B-274 | CDP `MAX_PARALLEL` on session-gated sources — "It does not justify a number": loopback only, so it stays `1` (ex-B-101; from W-258 §3, 2026-10-25) | [SR-CDP-FETCHER](../records/0118_cdp-fetcher.md) 7c | A live run at parallel 1/2/4/6 on ≥ 12 of Arpit's signed-in, non-employer sources |
 
 ---
 

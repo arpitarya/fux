@@ -226,7 +226,7 @@ They pull. The index is plain JSONL in git, it merges with `fux hooks`' merge dr
 
 ## Status
 
-**`4.1.0` is the latest release** on PyPI (`pip install fux-engine`) and npm (`npx fux-engine`). The index format is versioned, and fux tells you when to run `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
+**`5.0.0` is the latest release** on PyPI (`pip install fux-engine`) and npm (`npx fux-engine`). The index format is versioned, and fux tells you when to run `fux ingest --full`. Every change is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ⭐ **Star the repo** if fux saved your agent from one confident wrong answer. It's how other people find it. 👀 **Watch → Custom → Releases** to hear about new versions.
 

@@ -8,6 +8,16 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-10-25
+
+**A major version, because three changes break existing setups**: one source
+list (`.fux/sources.yaml`, W-294), the Node reader from npm only (W-292), and
+the policy TOMLs under `.fux/config/` (W-295). **Run `fux setup` once after
+upgrading.** This is also the first release of the plugin packages (W-289):
+fifteen `fux-decoder-*` / `fux-fetcher-*` / `fux-extension-*` names on PyPI,
+in lockstep with fux. Their hand-uploaded 4.1.1 wheels pin a `fux-core 4.1.1`
+that was never released; use 5.0.0.
+
 ### Breaking — one source list, `.fux/sources.yaml` (W-294)
 
 - **`.fux/sources/dirs` and `.fux/sources/urls` are gone, and so are `fux.toml`'s `[sources] dirs_file` / `urls_file`**: what fux indexes is one include manifest, `.fux/sources.yaml` (`paths:` grouped by `include` / `archived` / `enrich`, `urls:` as entries), in a strict YAML subset, and exclusion lives only in `.fux/.fuxignore` — a `!` entry is refused. Every verb refuses while an old list or key remains; **run `fux setup` once** — it moves each `!` line to `.fux/.fuxignore`, converts both lists, writes `sources_file`, and removes the old files.
@@ -195,7 +205,7 @@ for, a roadmap from the queue, and an FAQ. It now says what PyPI and npm serve
 (4.1.0) and describes plugin packages as the next release. New:
 `CONTRIBUTING.md`, `SECURITY.md` and `CODE_OF_CONDUCT.md`.
 
-## [4.1.1] - 2026-10-19
+## [4.1.1] - 2026-10-19 — never released, superseded by 5.0.0
 
 **No engine change.** A version bump on all six names — `fux-core`,
 `fux-reader`, `fux-writer` and `fux-engine` on PyPI, `fux-engine` and

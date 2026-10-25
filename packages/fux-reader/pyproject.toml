@@ -17,7 +17,7 @@ authors = [{ name = "arpit arya", email = "arpitarya.me@gmail.com" }]
 # L2: OSI-approved licences only, and no optional extras (role packages are
 # complete for their role — records/0004_LAW-2-zero-cost.md). The pin is the
 # release's one version, held equal by scripts/check-version-parity.py.
-dependencies = ["fux-core==4.1.1"]
+dependencies = ["fux-core==5.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/arpitarya/fux"

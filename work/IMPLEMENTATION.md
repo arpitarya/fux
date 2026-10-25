@@ -28,6 +28,16 @@ Rules:
 
 ---
 
+## 2026-10-25 — **W-297: leftover agent worktrees cleaned**
+
+| | |
+|---|---|
+| **shipped** | 10 worktrees removed (2 by SR-WORK-CLEANUP decision 1's check, 8 by Arpit's ruling 2026-10-25), their branches deleted, 4 stale `/private/tmp` entries pruned. Kept: branch `worktree-agent-a02544a49dceb592f` — 2 W-294 draft commits not in `main`. |
+| **evidence** | [SR-WORK-CLEANUP](../records/0070_WORK-cleanup.md) d1–3; per-worktree verdicts in [`archive/open/W-297-clean-leftover-worktrees.md`](../archive/open/W-297-clean-leftover-worktrees.md). |
+| **outcome** | fux ~5 GB → 995 MB, under [L14](../records/0016_LAW-14-machine-budget.md)'s 5 GB budget. `worktree-cleanup.py`, which SR-WORK-CLEANUP decision 6 names, is still not built. |
+
+---
+
 ## 2026-10-24 — **W-294: one `.fux/sources.yaml`; `.fuxignore` the only exclusion · W-289 ruling 1 (main, unreleased)**
 
 | | |
