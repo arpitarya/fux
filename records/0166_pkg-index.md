@@ -11,7 +11,7 @@ feature: index packages — a shipped fux index segment, pinned, verified and in
 owns: [src/fux/derive/segments.py@b7f3a78a5705, src/fux/acquire/pkgsrc.py@75d20a3e93b4, node/src/refer/pkgsrc.mjs@c71f169dcae1, src/fux/schemas/fux-index.schema.json@281aee116429, node/src/derive/segments.mjs@9cf5f4542b9b, node/src/config/plugins.mjs@16c05b6509e4, node/test/plugins-index.test.mjs@10cf624c880c, tests/test_pkg_index.py@495426ce6af8, tests/fixtures/pkg-index@2a4c96efba2c, tests/test_pkg_merged_query.py@77103d2f3872]
 laws: [L2, L3, L4, L5, L12]
 timestamp: 2026-10-25T00:00:00Z
-content_sha: e0ed1babcb214cf1c0ac5aed89652d0358f921719d0f3fee1dacdaec3c43aeac
+content_sha: 46bdfaaf09f4e79ee99e94f856788953ad02edfc9e383dbfca3589f81973ce24
 ratifies: "Arpit, 2026-10-25 (Cowork), on W-298's forks: 'plugins.toml, kind = \"index\"' for the pin's home; the three open questions accepted as a set — scope = repo|packages|all, default all · wire compat = lockstep · 10k ceiling counts the merged corpus — 'Yes, all three as recommended.' Then: 'file the work items for all.' (W-299, W-300, W-301, W-302)"
 ---
 
@@ -273,11 +273,16 @@ summed, with `scope` choosing the segments. **Built by W-300**, in both runtimes
   hazard of the window's id-keyed post-rank stages (`in_window`, `sections`) —
   the hit's `location` is what disambiguates it for a reader.
 
-**The L13 verdict is INCONCLUSIVE → Arpit** (2026-10-25): the table reads PASS
-on the fixture (slice `hit@1` 16–0, nothing outside it moved, every gate
-byte-identical), filed INCONCLUSIVE by the pre-registration's own rule because
-the builder decided its own run (SR-RS d6), golden G0 was not run, and two
-guardrails are unmeasurable on a 9-document fixture.
+**The L13 verdict is PASS, ruled by Arpit** (2026-10-25, Cowork: *"declare it
+as pass … keep scope as all … go ahead and ship it"*): the table reads PASS on
+the fixture (slice `hit@1` 16–0, nothing outside it moved, every gate
+byte-identical); the pre-registration had filed it INCONCLUSIVE because the
+builder decided its own run (SR-RS d6), golden G0 was not run, and two
+guardrails are unmeasurable on a 9-document fixture. **`scope = all` stays the
+default.** Those gaps — chiefly whether a package larger than its consumer
+pushes the repository's own answers off rank 1 — are what the right test is
+designed to measure (W-303, research); if it fails, the remedy is
+`[scope] default`, not the ranker.
 
 **11. `pkg:` locations — a hit in a segment names the DOCS package, and its
 passage is read inside the installed package** (Arpit, 2026-10-25: *"This looks
@@ -365,7 +370,8 @@ good to me."*; built by W-301). The mechanism is
 
 ### Reference (required)
 
-- [`work/open/W-300-merged-query-over-segments.md`](../work/open/W-300-merged-query-over-segments.md)
+- [`archive/open/W-300-merged-query-over-segments.md`](../archive/open/W-300-merged-query-over-segments.md) (closed 2026-10-25; L13 PASS by Arpit's ruling)
+- [`work/open/W-303-merged-query-right-test.md`](../work/open/W-303-merged-query-right-test.md) — the right test of decision 10
 - [`work/regression/2026-10-25-w300-merged-query/VERDICT.md`](../work/regression/2026-10-25-w300-merged-query/VERDICT.md)
 - [`archive/open/W-299-index-package-pin.md`](../archive/open/W-299-index-package-pin.md) (closed 2026-10-25)
   — the ruling quoted above and the steps this record states.

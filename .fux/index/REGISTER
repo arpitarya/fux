@@ -242,6 +242,8 @@ archive/open/W-297-clean-leftover-worktrees.md	8c211a5a2449624e16c9e9e86d4953ea8
 archive/open/W-298-packages-ship-their-index.md	86879d23dd172cb033db14cbd849bbe92b208a60	prose	archived=true
 archive/open/W-299-index-package-pin.md	f9480d439a0bb189e896783033193560a48ad756	prose	archived=true
 archive/open/W-30-ratify-adr-0001.md	181d91e7e0dc2d19e4be278f34482a733fc8844d	prose	archived=true
+archive/open/W-301-pkg-locations-read-in-place.md	55a1a31110852d194dbecebc9a5803ee2bd5fb59	prose	archived=true
+archive/open/W-302-fux-pack-publish-path.md	7b74c7d63e6bda2fb778a60315a7c1930902af61	prose	archived=true
 archive/open/W-31-ratify-adr-0010-0011.md	f001d18e8a10412f1ba7454a9ab62efdc27addc0	prose	archived=true
 archive/open/W-32-claude-md-adoption.md	c108aeb7afd828c1ac3e873a20343fe3276bf0d6	prose	archived=true
 archive/open/W-33-adr-numbering-contradiction.md	fa2d2744236ebb802335e1263a0c576b62eb00cc	prose	archived=true
@@ -740,7 +742,7 @@ records/0162_llms.md	ba1ce0dfe6aa2be5fda66f0f6f6421226006cbcb	prose
 records/0163_lsp.md	4a915a5980ade93d463ee923216ba644dd93ee22	prose
 records/0164_vscode.md	b10494c0a9c5a41b42145e5a81381549a5b90302	prose
 records/0165_plugins.md	8961195ac5e3f59d74c6f1f77c10853ff4fc4c4a	prose
-records/0166_pkg-index.md	6645ec931bb6a4c90e2bdc756c797ff9aaf34c41	prose
+records/0166_pkg-index.md	1492b60a6dbd282647431c8f738a909c2bccb037	prose
 records/BIBLIOGRAPHY.md	d3b9cb6a23f44f9bd97360e36fea0efe11a83a17	prose
 records/README.md	444c227b6a8f2446e5e31f3b02a3a5443265addf	prose
 records/TEMPLATE.md	5c8f49120633c5766122218aa4e9f9d09a5f35c5	prose
@@ -775,10 +777,10 @@ work/IMPLEMENTATION.md	bf871ee6959d524269f74d2a9d5b22f4b0a17ca5	prose
 work/INTERVIEW.md	ff7fca405f8da3c10745b63179fef9336a129594	prose
 work/LESSONS.md	f91b46f8742c542fe12e2d871452148c56751eae	prose
 work/MACHINE.md	9db25bde124a67c191714cd380fbcd2ed3d67e5a	prose
-work/NOW.md	f8df3afb4a0f76a3ff64339327eb10fc7149ce1a	prose
-work/OPEN-WORK.md	499e8a0334f4f59df65e9c2b9efd5d6057fe3e6e	prose
+work/NOW.md	2e64390dccd96379f6e5f83b9bedc9f90f1abe31	prose
+work/OPEN-WORK.md	a73f23170c771d36b5c9c6812c6b6267c1e98093	prose
 work/README.md	d5073a07920179dc0c35071dc2337a8ed6856ddb	prose
-work/WORKLOG.md	50c9bb73bd35608a5a9533bf8c749b7a4a712daf	prose
+work/WORKLOG.md	f4116316cfdf496b092ef0cb3c197c9fac7a15ce	prose
 work/architecture-algorithms.svg	fdf6ef399bf2649dd92510973076e607cb955576	pkg:fux-decoder-svg@5.0.0/svg@1+xml@1+limits@1
 work/architecture-answer.svg	3e133168cf7695f77b23accae2835e28418ee770	pkg:fux-decoder-svg@5.0.0/svg@1+xml@1+limits@1
 work/architecture-ask.svg	40d6f07068f275412528bb14d5a3455bc0626778	pkg:fux-decoder-svg@5.0.0/svg@1+xml@1+limits@1
@@ -833,8 +835,6 @@ work/open/W-280-intent-lexicon-research.md	4b582eae12e7d665d03c47716c5cbeab7e380
 work/open/W-281-capture-harness-speed.md	c367af1fdef62dbf90ef7235ca6853c15d2edb53	prose
 work/open/W-289-plugin-packages.md	fb9b0b1d3a024e63277cc174da39cbaeb8555e6c	prose
 work/open/W-300-merged-query-over-segments.md	dd9ab22dfe382c8c0d3d586d63f73f3e2858d98c	prose
-work/open/W-301-pkg-locations-read-in-place.md	55a1a31110852d194dbecebc9a5803ee2bd5fb59	prose
-work/open/W-302-fux-pack-publish-path.md	7b74c7d63e6bda2fb778a60315a7c1930902af61	prose
 work/proposals/README.md	f1e7fc69c0cba6a32e913c177ee48b8ac598ab05	prose
 work/proposals/build-plan-2026-10.md	7872d33ab8c7a411b8fc2b613b413b188ce2694b	prose
 work/proposals/code-pattern-recognition.md	94d72e5b92f5d2f2f69d2c868a5ca18792eea466	prose
@@ -2511,6 +2511,7 @@ work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/rows.jsonl	221d50ba
 work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/rows.tsv	98fadbc18d20be4ea9f7d310cc9ce1871ec72a57	pkg:fux-decoder-sheet@5.0.0/csv@2+table@1+limits@1
 work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/sources.yaml	746352d2c189e63b3415d2edb7de741cb4c80007	pkg:fux-decoder-config@5.0.0/yaml@1+limits@1
 work/regression/2026-10-25-w298-step1-codelaw-rules/report.md	293038b0487a4e7b99faa64619077d851286abe0	prose
+work/regression/2026-10-25-w300-merged-query/ANALYSIS.md	f2c93b1c5fd05994875e8f2560cc8d935c7b1b26	prose
 work/regression/2026-10-25-w300-merged-query/PRE-REGISTRATION.md	a5af72efa133cd318885743f96fae0926b691791	prose
 work/regression/2026-10-25-w300-merged-query/VERDICT.md	817350ae7e5f8d10dc21d6039ed1e528997a2442	prose
 work/regression/2026-10-25-w300-merged-query/evidence/corpus/docs/billing.md	d957a1a99f003552a4c480e5b705a2260cff8391	prose
@@ -2527,6 +2528,7 @@ work/regression/2026-10-25-w300-merged-query/evidence/run1-void/rows.jsonl	3cd6b
 work/regression/2026-10-25-w300-merged-query/evidence/run1-void/summary.json	053a9b2ee5bb44ae527c0addbe7acbd41cc36491	pkg:fux-decoder-json@5.0.0/json@1+limits@1
 work/regression/2026-10-25-w300-merged-query/evidence/run2-stdout.json	fa66c1981e01f7f6af582727c8211621dc51c0da	pkg:fux-decoder-json@5.0.0/json@1+limits@1
 work/regression/2026-10-25-w300-merged-query/evidence/summary.json	fa66c1981e01f7f6af582727c8211621dc51c0da	pkg:fux-decoder-json@5.0.0/json@1+limits@1
+work/regression/2026-10-25-w300-merged-query/report.md	16db8ce61d15f9a8fa5cb0bd23cf8c546d949dcb	prose
 work/regression/README.md	4a61e087c4217a2220572589a13ed33d49070ad9	prose
 work/setup/README.md	8935fc0c9d09b3375f340a21371901685c11ca11	prose
 work/setup/fux-benchmark.md	257701f3a2287981e563016f5b178425069f797e	prose

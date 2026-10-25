@@ -24,6 +24,13 @@ play: the worklog is the granular, per-exchange trail.
 ```
 
 
+## 2026-10-25 — W-300 ruled PASS and closed; W-303 (right test) and W-304 (release) filed  ·  Cowork (Opus 5.5)
+
+- **Asked:** how a package location is configured (codelaw example); what blocks W-300; then *"go with the suggestion … keep scope as all. Yeah, declare it as pass, but add a research item or add a testing item, how to test it this in the right way. For now, go ahead and ship it."*
+- **Done:** W-300's VERDICT and report marked PASS by Arpit's ruling (the run as filed kept underneath); SR-PKG-INDEX d10 amended; W-300 closed and archived; **W-303** filed under research (design the crowding test: a large real package beside a real repo, questions not by Claude); **W-304** filed under fux build (release W-299…W-302, then Arpit publishes). CHANGELOG's stale "W-300/W-301 in build" bullet dropped. No code moved.
+- **Found:** W-299, W-301 and W-302 were archived with no `archive/README.md` row (rule 57) and W-298's row linked to their old `work/open/` paths — rows added and links repointed (rule 56).
+- **Next:** W-304 (Claude Code, Sonnet), then Arpit creates the GitHub release.
+
 ## 2026-10-25 — W-300 + W-301 built in parallel and merged; W-301, W-302 closed; W-300 to Arpit  ·  Claude Code (Opus 5.5)
 
 - **Asked:** *"implement W300, W301 while the unit tests are being executed"*, toward *"… everything in parallel and close it out"*.

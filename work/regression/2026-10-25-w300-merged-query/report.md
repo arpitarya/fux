@@ -4,10 +4,12 @@ run: 2026-10-25-w300-merged-query
 item: W-300
 date: 2026-10-25
 classification: informed
-status: INCONCLUSIVE → Arpit (the table reads PASS; the pre-registration filed a PASS from this run as INCONCLUSIVE)
+status: PASS — ruled by Arpit 2026-10-25 (the table reads PASS; the pre-registration filed it INCONCLUSIVE → Arpit; he declared PASS)
 ---
 
-# 2026-10-25 — W-300: one query over the repository and a pinned index package — **INCONCLUSIVE → Arpit**
+# 2026-10-25 — W-300: one query over the repository and a pinned index package — **PASS (ruled by Arpit)**
+
+**Arpit ruled PASS on 2026-10-25 (Cowork)** and kept `scope = all` as the default — see the [VERDICT](VERDICT.md). The run below is as it was filed; the proper test is W-303.
 
 Filed by the parent session (4aad6236) from the run's own evidence files: the
 building agent's harness refused to write files named `report.md` and

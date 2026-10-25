@@ -17,7 +17,6 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 - **`kind = "index"` rows in `.fux/config/plugins.toml`** pin a package that ships a built index segment — name, version, a digest over the segment files only, and its npm and PyPI names. Both runtimes locate it by module resolution from the repository root, refuse it loudly when missing, at another version, drifted or foreign (one set of words in Python and Node), and inflate it into the gitignored `.fux/runtime/pkg/<name>@<version>/`. `fux setup --index <pypi> [--index-npm <npm>]` writes a row; `fux setup --pin` re-pins. `fux doctor` gains `index packages` and `merged corpus` rows. [SR-PKG-INDEX](records/0166_pkg-index.md).
 - **`fux pack <outdir> --content NAME@VERSION`** — the publish path for a package author: copies the committed shards and `identifiers.toml`, writes `fux-index.json`, and refuses a dirty, uncommitted, foreign or `url:`-bearing index. Read-only on `.fux/`. Recipe: [`docs/publish-an-index-package.md`](docs/publish-an-index-package.md).
-- Searching a pinned package beside the repository (W-300) and reading its passages in place (W-301) are in build.
 
 ## [5.0.0] - 2026-10-25
 

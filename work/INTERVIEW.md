@@ -32,10 +32,17 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-25** (Cowork, Opus 5.5 — the inbox docket: W-292 closed, W-293/W-289/W-258/W-268 ruled; before it Cowork, Opus 5.5 — W-293, the codelaw ports; before it Claude Code, Opus 5.5 — W-284/285/286, the editor and llms surfaces; before it Claude Code, Opus 5.5 — W-282 Steps 1–2, the untangle and the packaging; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-25** (Cowork, Opus 5.5 — W-300 ruled PASS, W-303 + W-304 filed; before it Cowork, Opus 5.5 — the inbox docket: W-292 closed, W-293/W-289/W-258/W-268 ruled; before it Cowork, Opus 5.5 — W-293, the codelaw ports; before it Claude Code, Opus 5.5 — W-284/285/286, the editor and llms surfaces; before it Claude Code, Opus 5.5 — W-282 Steps 1–2, the untangle and the packaging; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🔴 2026-10-25 (latest) — THE INBOX DOCKET: ONE CLOSED, FOUR RULED; 4.1.1 IS THE NEXT RELEASE
+### 🟢 2026-10-25 (latest) — W-300 RULED PASS; `scope = all` KEPT; THE RIGHT TEST IS W-303, THE RELEASE IS W-304
+
+- **Ruled (Arpit, Cowork):** W-300's L13 run — table PASS, filed INCONCLUSIVE because the builder wrote its own questions — is **PASS**. `scope` stays `all` by default. No "no claim on large packages" caveat is added.
+- **Why it was safe to ship:** a repository with no pin ranks byte-identically (gates G0a–c); only a repo that adds a `kind = "index"` pin sees a change.
+- **What is still untested:** whether a package larger than its consumer pushes the repository's own answers off rank 1. The 16–0 was near-certain by construction (package questions were unanswerable from the repo alone). **W-303** (research, Cowork) designs that test; if it fails, the remedy is `[scope] default`, not the ranker.
+- **Order now:** W-304 (Claude Code, Sonnet) prepares the release of W-299…W-302 → Arpit publishes. W-299, W-301, W-302 were archived without map rows; added by this session (rule 56).
+
+### 🔴 2026-10-25 — THE INBOX DOCKET: ONE CLOSED, FOUR RULED; 4.1.1 IS THE NEXT RELEASE
 
 - **Ruled (Arpit, Cowork docket):** W-292 closed — the two SR-LAW-10 edits confirmed as built. W-293 step 6a → Claude Code merges the CI steps into the *current* workflow files (the 10-21 chat copies would delete W-292's `.mjs` check). W-289 → the release goes out as **4.1.1, no 5.0.0**. W-258 → §1 + §2 run when he has time; §3 parked as B-274. W-268 → S1 (incremental Python, then Rust) + P1 (Python fallback).
 - **Found:** the 14 plugin projects on PyPI pin `fux-core==4.1.1`, which is not on PyPI (latest 4.1.0) — they do not install until 4.1.1 is published.
@@ -3130,6 +3137,7 @@ the reason is that the measuring environments are gone.**
 
 ## 2 · In flight, and the immediate next step
 
+*Updated **2026-10-25** (Cowork, Opus 5.5) — maintainer line: this session. **W-300 ruled PASS and closed**; next: **W-304** (release, Claude Code) and **W-303** (the right test of the merged query, Cowork research).*
 *Updated **2026-10-25** (Cowork, Opus 5.5) — maintainer line: this session. **W-298 filed** (research): packages ship their own fux index and one query searches many; codelaw's rule packs are the first consumer. Its step 1 is a 20-intent spike, bar 16 of 20, set before the run.*
 *Updated **2026-10-20** (Cowork, Opus 5.5) — maintainer line: this session. **W-290: the front-door docs landed** (README on 4.1.0, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT); 🔴 Arpit places the `.github/` templates. ⚠ 4.1.1 is cut, not released — say 4.1.0 until the release.*
 *Updated **2026-10-20** (Claude Code, Opus 5.5) — maintainer line: this session. **W-288 and W-289 are built on `main`, unreleased**; W-289 waits on Arpit for 15 PyPI trusted publishers and two rulings (its §Decisions for Arpit). ⚠ A worktree's commits fire the post-commit hook with the MAIN checkout's venv, which writes a stale-format `.fux/index/` into the worktree — never stage it there.*
