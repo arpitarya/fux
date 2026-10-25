@@ -93,7 +93,8 @@ def _tools(top: int) -> list[dict]:
             "Search the committed index for documents relevant to a natural-language "
             "question. Returns ranked documents with content hashes and the headings "
             "that match your query -- section-level, not line-level; call fux_passage "
-            "for the lines. This is the call to make first for any 'where is X' or "
+            "with a result's `location` for the lines (`package` names the pinned index "
+            "package a result came from, null for this repository). This is the call to make first for any 'where is X' or "
             "'why did we decide Y' question about this repository. "
             "READ THE `confidence` BLOCK BEFORE USING THE RESULTS. If "
             "`confidence.answerable` is false, do not answer from these results at "
@@ -136,7 +137,9 @@ def _tools(top: int) -> list[dict]:
             "Read the verbatim text of a cited span, addressed as returned by "
             "fux_search. Use this instead of reading a whole file when you already "
             "have a citation: it returns only the cited lines and the hash they were "
-            "read at, as `path`, `line_start`, `line_end`, `sha` and `text`. `cells` "
+            "read at, as `path`, `line_start`, `line_end`, `sha` and `text`. `path` is "
+            "a repository path or a fux_search result's location -- a pkg: location is "
+            "read inside the installed package it names. `cells` "
             "([column, value] pairs), `table` and `row` are set when the span is one "
             "table row and null otherwise."
         ),
@@ -190,6 +193,7 @@ def _root() -> Path:
 
 
 def _search(root: Path, args: dict, *, top: int, max_headings: int) -> dict:
+    from .acquire import pkgsrc
     from .query import run_query
     from .query.headings import headings_for
 
@@ -252,6 +256,13 @@ def _search(root: Path, args: dict, *, top: int, max_headings: int) -> dict:
                 # for a `hashed` record, which carried no display text at all;
                 # W-194 deleted that shape on 2026-09-20.)
                 "headings": headings_for(record, query, limit=max_headings),
+                # W-301 (SR-MCP d7, SR-PKG-INDEX d11) -- `location` is the
+                # address `fux_passage` reads (`file:`/`url:` id, or `pkg:` for
+                # a hit whose record came from a pinned index segment) and
+                # `package` the index package's pin name, `None` for the
+                # repository. Every hit from this ranking is the repository's;
+                # W-300's merged hits pass their `pkgsrc.Segment` here.
+                **pkgsrc.hit_fields(r.id, r.loc, None),
             }
         )
     return {
@@ -320,18 +331,31 @@ def _search(root: Path, args: dict, *, top: int, max_headings: int) -> dict:
 
 
 def _passage(root: Path, args: dict) -> dict:
+    from .acquire import pkgsrc
+    from .acquire.source import contain
     from .store import content_sha
 
     rel = args.get("path") or ""
-    # Refuse to escape the repo. `resolve()` collapses `..` BEFORE the check,
-    # so a traversal cannot slip through by being spelled differently.
-    target = (root / rel).resolve()
-    if not target.is_relative_to(root.resolve()):
-        raise FuxError(f"{rel!r} resolves outside the repository")
-    if not target.is_file():
-        raise FuxError(f"{rel!r} is not a file in this repository")
+    if pkgsrc.is_pkg(rel):
+        # W-301 (SR-MCP d7 widened): a pinned package's file, resolved by
+        # module resolution and read IN PLACE -- contained in that package's
+        # root, version-checked against the manifest, never copied.
+        got = pkgsrc.read(root, rel)
+        raw, sha = got.content, got.sha
+    else:
+        if rel.startswith("url:"):
+            raise FuxError(f"{rel!r} is a url: document - fux_passage reads files, never a fetch")
+        local = rel.removeprefix("file:")
+        # Refuse to escape the repo. `contain` collapses `..` BEFORE the check,
+        # so a traversal cannot slip through by being spelled differently.
+        target = contain(root, local)
+        if target is None:
+            raise FuxError(f"{rel!r} resolves outside the repository")
+        if not target.is_file():
+            raise FuxError(f"{rel!r} is not a file in this repository")
+        raw = target.read_bytes()
+        sha = content_sha(raw)
 
-    raw = target.read_bytes()
     text = raw.decode("utf-8", errors="replace")
     lines = text.splitlines()
     start = max(1, int(args.get("line_start") or 1))
@@ -340,7 +364,7 @@ def _passage(root: Path, args: dict) -> dict:
         "path": rel,
         "line_start": start,
         "line_end": end,
-        "sha": content_sha(raw),
+        "sha": sha,
         "text": "\n".join(lines[start - 1 : end]),
         **_row_at(root, text, start, end),
     }
@@ -405,7 +429,12 @@ def _related(root: Path, args: dict) -> dict:
     from .graph.model import Graph, edges_from_records
     from .store import read_index
 
+    from .acquire import pkgsrc
+
     rel = args.get("path") or ""
+    # W-301: a `pkg:` location is refused BY NAME, never read as `file:pkg:…`.
+    # The segment's own edges are W-300's merged-graph question, not this one.
+    pkgsrc.refuse(rel, "fux_related")
     doc_id = rel if rel.startswith(("file:", "url:")) else f"file:{rel}"
     records = read_index(root)
     record = records.get(doc_id)

@@ -246,6 +246,11 @@ def document(root: Path, view, loc: str) -> dict:
     fields, redacted, exactly as the dictionary does for the corpus. Nothing here
     walks any other document's bytes.
     """
+    from ..acquire import pkgsrc
+
+    # W-301: inspect X-rays this repository's index; a `pkg:` location is
+    # refused by name, never matched as a `loc`.
+    pkgsrc.refuse(loc, "fux inspect")
     passages_cap, words = view.config.passages_cap, view.config.words
     from ..errors import FuxError
     from ..ingest import register

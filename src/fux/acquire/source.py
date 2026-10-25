@@ -17,12 +17,18 @@ time; this module is the same half at verify time.
 reuses it rather than inventing a second.** A second one would make
 SR-FETCHER's veto fire on its own successor.
 
-## Two strategies, and how a document gets one
+## Three strategies, and how a document gets one
 
 | id scheme | strategy | notes |
 |---|---|---|
 | `file:` | read the local checkout | free, offline, always available — a git source never degrades |
 | `url:` | the consumer fetcher | networked, opt-in, bounded by the policy's timeout |
+| `pkg:` | read inside the installed docs package | local like `file:` — never a fetch, never a copy; W-301, `acquire/pkgsrc.py` |
+
+**`pkg:` is a location, not a record id** (SR-PKG-INDEX d11): a hit from a
+pinned index segment is addressed in the docs package its manifest names, and
+reading one is a local read under every policy — `LOCAL` is the set of
+strategies that read the machine's own files.
 
 **A `url:` document is verified with the same fetcher it was ingested with**,
 resolved from `.fux/sources/urls`. This pays the debt SR-URL-INGEST recorded
@@ -51,13 +57,17 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .. import store as store_mod
+from ..constants import fixed
 from ..errors import FuxError
 from .urlsrc import _decode_fetched, _unpack, declared_decoder, sanitize
 
-__all__ = ["Fetched", "resolve", "fetch_document", "from_acquired", "GIT", "URL"]
+__all__ = ["Fetched", "resolve", "fetch_document", "from_acquired", "contain", "GIT", "URL", "PKG", "LOCAL"]
 
 GIT = "git"
 URL = "url"
+PKG = "pkg"
+#: The strategies that read this machine's own files: never a fetch, never cached.
+LOCAL = (GIT, PKG)
 
 
 @dataclass(frozen=True)
@@ -77,7 +87,25 @@ def resolve(doc_id: str) -> str:
         return GIT
     if doc_id.startswith("url:"):
         return URL
+    if doc_id.startswith(fixed("pkg_location", "scheme")):
+        return PKG
     raise FuxError(f"cannot verify {doc_id!r}: unknown id scheme")
+
+
+def contain(base: Path, rel: str) -> Path | None:
+    """THE containment function (W-301): `base / rel` with `..` collapsed and
+    links resolved, or `None` when that lands outside `base`.
+
+    `resolve()` collapses `..` **before** the check, so a traversal cannot slip
+    through by being spelled differently. The allowed roots are the repository
+    root (`fux_passage` on a path) and each pinned docs package's root (a `pkg:`
+    location) — and every caller passes the ONE root its address names, so a
+    `pkg:` fragment is held inside its own package, never merely inside some
+    allowed root.
+    """
+    anchor = Path(base).resolve()
+    target = (anchor / rel).resolve()
+    return target if target.is_relative_to(anchor) else None
 
 
 def fetch_document(root: Path, doc_id: str, loc: str, *, fetcher=None) -> Fetched:
@@ -87,9 +115,20 @@ def fetch_document(root: Path, doc_id: str, loc: str, *, fetcher=None) -> Fetche
     the URL strategy takes the consumer's callable. Tests pass a fake, which is
     why nothing in this suite opens a socket.
     """
-    if resolve(doc_id) == GIT:
+    strategy = resolve(doc_id)
+    if strategy == GIT:
         return _read_local(root, doc_id, loc)
+    if strategy == PKG:
+        return _read_package(root, doc_id)
     return _fetch_url(root, doc_id, loc, fetcher)
+
+
+def _read_package(root: Path, doc_id: str) -> Fetched:
+    """A `pkg:` location, read inside the installed docs package (W-301)."""
+    from . import pkgsrc
+
+    got = pkgsrc.read(root, doc_id)
+    return Fetched(doc_id, got.loc, got.content, got.sha, PKG)
 
 
 def from_acquired(root: Path, doc_id: str, loc: str) -> Fetched | None:

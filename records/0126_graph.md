@@ -7,10 +7,10 @@ description: "The ref/tag/code edges ingest already extracts become a queryable 
 status: accepted
 date: 2026-08-20
 feature: the graph lane — three relational verbs, a derived plane, and a lazy walk
-owns: [src/fux/graph@fa1d69a4b1a3, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@b814bf2338e5, node/src/graph/walk.mjs@354460948a96, node/src/verbs/graph.mjs@3ea9b8e8d1d3, src/fux/schemas/graph.schema.json@19bd4c486035]
+owns: [src/fux/graph@9ebffe0be10a, tools/graph-bench@9c330ea14b42, node/src/graph/community.mjs@94709cb9eeae, node/src/graph/model.mjs@a8751d45fc90, node/src/graph/plane.mjs@b814bf2338e5, node/src/graph/walk.mjs@354460948a96, node/src/verbs/graph.mjs@ffd5788a46a4, src/fux/schemas/graph.schema.json@19bd4c486035]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: 12d65e66204c846f4d67a8760070a1eae912f9dd986a828f05d1c2dde1260369
+content_sha: ba0902e37a8b30bf2d29e0128d05a7ad98549932ec8919bddc03443ba9b412db
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -502,6 +502,8 @@ this moved where they are written, not what they are.
 **No decision here moved** (W-242 Tier 1, 2026-10-03): Node's `fux graph --fast` seeds from the derived plane when it is fresh, as Python's does; the seeds are the same documents either way.
 
 **No decision here moved** (W-259, 2026-10-04): `node/src/graph/plane.mjs` gained `loadFresh` and `planeFor`, and `verbs/graph.mjs` takes `planeFor`, so Node's `explain`, `graph` and `path` read a fresh `graph.json` instead of rebuilding it, and read the records only when a refusal needs them ([SR-NODE-SEARCH](0153_node-search.md) decision 9); the plane and the output are byte-identical.
+
+**No decision here moved** (W-301, 2026-10-25): the graph verbs refuse a `pkg:` location by name (`[pkg_location_refusals] refused`) instead of reading it as `file:pkg:…` — the graph is the repository's own ([SR-PKG-INDEX](0166_pkg-index.md) decision 11).
 
 ### Consequences
 

@@ -7,11 +7,11 @@ description: "`fux enrich` plans and validates; a coding agent generates. Fux ne
 status: accepted
 date: 2026-08-23
 feature: document enrichment — the deterministic halves fux owns, and the generation it refuses to own
-owns: [src/fux/correct.py@fb19d0082a5b, src/fux/enrich.py@bdf3d2863f81, src/fux/templates/agents/ENRICH-SKILL.md@9279a34f85d7, node/src/correct.mjs@fafeb8b35584, node/test/pins.test.mjs@daebcdb98aac, src/fux/store/corrections.py@be66e8efb505, src/fux/store/enrichfile.py@2f1d9142b1b1]
+owns: [src/fux/correct.py@ec580d825bfb, src/fux/enrich.py@bdf3d2863f81, src/fux/templates/agents/ENRICH-SKILL.md@9279a34f85d7, node/src/correct.mjs@674182dced0e, node/test/pins.test.mjs@daebcdb98aac, src/fux/store/corrections.py@be66e8efb505, src/fux/store/enrichfile.py@2f1d9142b1b1]
 laws: [L2, L3, L4, L5]
 supersedes: SR-ENRICHED
 timestamp: 2026-08-23T00:00:00Z
-content_sha: 21f65a6044d0fd668f77bdad98a46fb536a7e0e3c644d1c6dd2f02fdcf4009a6
+content_sha: ee54e933a664590f64067090c96b10555912b30cc54d053544bdd88b7cdbbb4a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -692,6 +692,8 @@ a missing blob already is — never a crash inside a planning command.
 
 
 **W-236 (2026-10-10; branch `w236-sections`, unmerged) — the Node pin row, made equal to Python's.** `node/src/correct.mjs` builds the row for a pinned document the ranking never returned. It now carries `boosted: false` and `route: null`, as Python's `AskResult` always did. That was a parity gap from before W-236, found by its twin test. The row also carries `section: null` while `[ranking] section_weight > 0` ([SR-SECTIONS](0161_sections.md) decision 6).
+
+**No decision here moved** (W-301, 2026-10-25): `fux correct` refuses a `pkg:` location by name instead of looking it up as `file:pkg:…` — a pinned package's file is not this repository's to correct ([SR-PKG-INDEX](0166_pkg-index.md) decision 11). Node's `correct.mjs` gains only a header note: it runs no `fux correct`.
 
 ### Consequences
 
