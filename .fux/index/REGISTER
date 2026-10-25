@@ -1,6 +1,6 @@
 # fux.register.v2	rules=5
 # loc	sha	decoder	[k=v ...]
-CHANGELOG.md	a7e414265b2b8728b3cc25906a3e95b411cddf77	prose
+CHANGELOG.md	c6a907644d0ffc1352f804366bc8fb981c2e32fd	prose
 CLAUDE.md	c980ed7d88af8d494623b880fae6aec738d1a196	prose
 README.md	402352b303186e2a86523191228e92800fe3f3d5	prose
 archive/PLAN-v0.30.md	2e0ef4e71c9f6d31558cf644bbf0da82c0af9b1d	prose	archived=true
@@ -240,6 +240,7 @@ archive/open/W-295-config-directory.md	217e46aa71aeb5543630561bc3fb04ba097a96e5	
 archive/open/W-296-observers-on-demand.md	5fc3e92d79d7ca19dc390d44ed7fbc39f27241ef	prose	archived=true
 archive/open/W-297-clean-leftover-worktrees.md	8c211a5a2449624e16c9e9e86d4953ea817f7363	prose	archived=true
 archive/open/W-298-packages-ship-their-index.md	86879d23dd172cb033db14cbd849bbe92b208a60	prose	archived=true
+archive/open/W-299-index-package-pin.md	f9480d439a0bb189e896783033193560a48ad756	prose	archived=true
 archive/open/W-30-ratify-adr-0001.md	181d91e7e0dc2d19e4be278f34482a733fc8844d	prose	archived=true
 archive/open/W-31-ratify-adr-0010-0011.md	f001d18e8a10412f1ba7454a9ab62efdc27addc0	prose	archived=true
 archive/open/W-32-claude-md-adoption.md	c108aeb7afd828c1ac3e873a20343fe3276bf0d6	prose	archived=true
@@ -675,12 +676,12 @@ records/0067_WORK-registry.md	a55875e27d64fa0a93789cbc206fd74f9c1be2bc	prose
 records/0068_WORK-test-data.md	a437be3ce2d31a1d9d7c181339827df7bbd3ee86	prose
 records/0069_WORK-now.md	db10561bb4875608c847b35bfec5f623df0c8ff4	prose
 records/0070_WORK-cleanup.md	52ece3a26441cb2fdb4619feb988adc8a0bed24c	prose
-records/0101_cli-surface.md	19b0a824316eb01b1f99141142f161b0f3a6fd5b	prose
+records/0101_cli-surface.md	087d5f6efd59a9dcf1a3445c7bc3f0bcc573512c	prose
 records/0102_fux-directory.md	2cc3b88dd8d6a5eab710ddf33fb3e4aec6812623	prose
 records/0103_ask.md	8468f172562b9258d0e7a3e6fec53424e7ed4004	prose
 records/0104_find.md	6209b9c472b4be7c543f86a49d050526d49876fc	prose
 records/0105_answer.md	78c69bb18d95490574de676a31186d80a48f773f	prose
-records/0106_ingest.md	f1582683c41a27c36142fb118bdda415d5eda067	prose
+records/0106_ingest.md	c0727aee805014e262438a614b7020a96fb1b29b	prose
 records/0107_url-ingest.md	a7978b81a8c7bca531dc57796fae2954fec2b972	prose
 records/0108_index-lifecycle.md	adc15964f7a7c5f7e9e448a9c8d4c63b76d74b66	prose
 records/0109_index-record.md	0b2c5b14b97026a169dddde691a3395425a05335	prose
@@ -770,14 +771,14 @@ tools/t2-eval/PRE-REGISTRATION.md	0678bc82904423b9aa82c801f4286abbdc84961c	prose
 tools/vector-gate/README.md	544da73b4409bef1e5dac598d9b8214d8abf4180	prose
 work/BACKLOG.md	908efa33e8d396c82d8cc66cc74552221d86ac65	prose
 work/BLOCKED.json	5598b94e0d231527edb50b11f34722b0a6a86ed4	pkg:fux-decoder-json@5.0.0/json@1+limits@1
-work/IMPLEMENTATION.md	e3364962ad966a07d39926cac47a46a26dbe3c7f	prose
+work/IMPLEMENTATION.md	9c67052b90fb61ef51553fb5cef05af2bccf7a0b	prose
 work/INTERVIEW.md	ff7fca405f8da3c10745b63179fef9336a129594	prose
 work/LESSONS.md	f91b46f8742c542fe12e2d871452148c56751eae	prose
 work/MACHINE.md	9db25bde124a67c191714cd380fbcd2ed3d67e5a	prose
-work/NOW.md	b7d06615ef0b6288bf6a53d7e34853ef964c129c	prose
-work/OPEN-WORK.md	b33cc2a8567a43630e69aba8ff15e718b4cb1707	prose
+work/NOW.md	f8df3afb4a0f76a3ff64339327eb10fc7149ce1a	prose
+work/OPEN-WORK.md	826de04df5ffadd58df895779d057134622d5e59	prose
 work/README.md	d5073a07920179dc0c35071dc2337a8ed6856ddb	prose
-work/WORKLOG.md	3ff4bd4f7a11fed5584b0fe89d6f734346932dd9	prose
+work/WORKLOG.md	50c9bb73bd35608a5a9533bf8c749b7a4a712daf	prose
 work/architecture-algorithms.svg	fdf6ef399bf2649dd92510973076e607cb955576	pkg:fux-decoder-svg@5.0.0/svg@1+xml@1+limits@1
 work/architecture-answer.svg	3e133168cf7695f77b23accae2835e28418ee770	pkg:fux-decoder-svg@5.0.0/svg@1+xml@1+limits@1
 work/architecture-ask.svg	40d6f07068f275412528bb14d5a3455bc0626778	pkg:fux-decoder-svg@5.0.0/svg@1+xml@1+limits@1
@@ -831,10 +832,9 @@ work/open/W-275-ranking-tuner-research.md	cfd785d941f8e566cea5eceff3db7f44f2878d
 work/open/W-280-intent-lexicon-research.md	4b582eae12e7d665d03c47716c5cbeab7e38070e	prose
 work/open/W-281-capture-harness-speed.md	c367af1fdef62dbf90ef7235ca6853c15d2edb53	prose
 work/open/W-289-plugin-packages.md	fb9b0b1d3a024e63277cc174da39cbaeb8555e6c	prose
-work/open/W-299-index-package-pin.md	9453b0c9eb13e74ad427089c4efb4543b87e2991	prose
 work/open/W-300-merged-query-over-segments.md	e8090737e7c2675d55d8d8463081e1f69f56db6b	prose
 work/open/W-301-pkg-locations-read-in-place.md	d4d66b16d8a427438853ae4a48bf0c4a2058986e	prose
-work/open/W-302-fux-pack-publish-path.md	508da7a46c6a40992a95c7ccba2bb10232f1f316	prose
+work/open/W-302-fux-pack-publish-path.md	56800306fdd3ee9658ec4ff0b0e2009c16255b20	prose
 work/proposals/README.md	f1e7fc69c0cba6a32e913c177ee48b8ac598ab05	prose
 work/proposals/build-plan-2026-10.md	7872d33ab8c7a411b8fc2b613b413b188ce2694b	prose
 work/proposals/code-pattern-recognition.md	94d72e5b92f5d2f2f69d2c868a5ca18792eea466	prose
