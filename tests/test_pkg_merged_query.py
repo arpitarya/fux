@@ -67,7 +67,8 @@ def _repo(root: Path, files: dict[str, str], *, keep: list[str] | None = None) -
         )
     (root / "docs").mkdir(exist_ok=True)
     for name, text in files.items():
-        (root / "docs" / name).write_text(text, encoding="utf-8")
+        # LF on every platform: the installed docs are the LF fixture's bytes
+        (root / "docs" / name).write_text(text, encoding="utf-8", newline="\n")
     return root
 
 

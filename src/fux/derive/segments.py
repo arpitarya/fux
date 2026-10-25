@@ -84,7 +84,8 @@ def inflate(root: Path, pin: plugins.IndexPin) -> bool:
         shutil.rmtree(target)
     _copy_segment(source, target)
     build_own(target)
-    (target / fixed("plugins.index", "pin_stamp")).write_text(pin.digest + "\n", encoding="utf-8")
+    # bytes, so Windows writes the LF Node writes (the runtimes are byte-identical)
+    (target / fixed("plugins.index", "pin_stamp")).write_bytes((pin.digest + "\n").encode("utf-8"))
     return True
 
 

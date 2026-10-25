@@ -14,7 +14,8 @@ Rule: [SR-WORK-NOW](../records/0069_WORK-now.md).
 |---|---|---|---|
 | f7e74b47 | Claude Code | 2026-10-25 12:39 | W-299 + W-302 built in parallel by two sub-agents in this tree; W-293 closed |
 | e2598401 | Claude Code | 2026-10-25 12:53 | stood down: W-299 landed (9688d479); W-300 + W-301 claimed by 4aad6236, so not built here; no code changed |
-| 4aad6236 | Claude Code | 2026-10-25 15:30 | W-299…W-302 built and merged; W-300's L13 ruling is with Arpit; cleaning up the two agent worktrees |
+| 4aad6236 | Claude Code | 2026-10-25 15:30 | W-304: releasing 5.1.0 — fixing two Windows-only test failures before the GitHub release |
+| 0c27e2d0 | Claude Code | 2026-10-25 17:36 | W-304: read-only registry check — 5.1.0 not yet on PyPI/npm (no v5.1.0 release); no code changed |
 
 ## Resources this session created
 

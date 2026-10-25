@@ -8,10 +8,10 @@ status: accepted
 date: 2026-10-25
 amended: 2026-10-25
 feature: index packages — a shipped fux index segment, pinned, verified and inflated in both runtimes
-owns: [src/fux/derive/segments.py@b7f3a78a5705, src/fux/acquire/pkgsrc.py@75d20a3e93b4, node/src/refer/pkgsrc.mjs@c71f169dcae1, src/fux/schemas/fux-index.schema.json@281aee116429, node/src/derive/segments.mjs@9cf5f4542b9b, node/src/config/plugins.mjs@16c05b6509e4, node/test/plugins-index.test.mjs@10cf624c880c, tests/test_pkg_index.py@495426ce6af8, tests/fixtures/pkg-index@2a4c96efba2c, tests/test_pkg_merged_query.py@77103d2f3872]
+owns: [src/fux/derive/segments.py@f3f39601279a, src/fux/acquire/pkgsrc.py@75d20a3e93b4, node/src/refer/pkgsrc.mjs@c71f169dcae1, src/fux/schemas/fux-index.schema.json@281aee116429, node/src/derive/segments.mjs@9cf5f4542b9b, node/src/config/plugins.mjs@16c05b6509e4, node/test/plugins-index.test.mjs@10cf624c880c, tests/test_pkg_index.py@495426ce6af8, tests/fixtures/pkg-index@2a4c96efba2c, tests/test_pkg_merged_query.py@87fe59d9a171]
 laws: [L2, L3, L4, L5, L12]
 timestamp: 2026-10-25T00:00:00Z
-content_sha: 46bdfaaf09f4e79ee99e94f856788953ad02edfc9e383dbfca3589f81973ce24
+content_sha: 54f7cfabe11f6e26f32b6739bbc8cc663cd2556e55dc9c5e79752eb0e0893ce9
 ratifies: "Arpit, 2026-10-25 (Cowork), on W-298's forks: 'plugins.toml, kind = \"index\"' for the pin's home; the three open questions accepted as a set — scope = repo|packages|all, default all · wire compat = lockstep · 10k ceiling counts the merged corpus — 'Yes, all three as recommended.' Then: 'file the work items for all.' (W-299, W-300, W-301, W-302)"
 ---
 
