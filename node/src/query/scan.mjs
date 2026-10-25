@@ -54,8 +54,17 @@ export function queryTermHashes(query, ids = EMPTY) {
   return out;
 }
 
-/** The B2 pass: candidate records, `df`, and the corpus statistics. */
+/** The B2 pass: candidate records, `df`, and the corpus statistics — one
+ *  segment, the repository at `root`, weighted into a `Corpus` here. */
 export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
+  const [candidates, df, n, totalFlen, totalAnchorLen] = scanSegment(root, queryHashes, { scoring, shards });
+  return [candidates, df, new Corpus(n, deriveWlen(totalFlen, scoring, totalAnchorLen))];
+}
+
+/** The raw B2 pass over one segment — `_scan_segment`'s twin: candidates,
+ *  `df`, `n`, the RAW per-field totals and the anchor total, never weighted
+ *  here, so a sum over segments is weighted ONCE (SR-PKG-INDEX d10). */
+export function scanSegment(root, queryHashes, { scoring, shards = null }) {
   // W-242 Tier 0: the call's shard set, so this pass, the graph plane and the
   // mined table read each shard once between them.
   const set = shardsFor(root, shards);
@@ -157,11 +166,64 @@ export function scanCandidates(root, queryHashes, { scoring, shards = null }) {
     }
   }
 
-  return [
-    candidates,
-    df,
-    new Corpus(totalDocs, deriveWlen(totalFlen, scoring, totalAnchorLen)),
-  ];
+  return [candidates, df, totalDocs, totalFlen, totalAnchorLen];
+}
+
+// -- W-300: one query over many segments (SR-PKG-INDEX decision 10) ----------
+
+/** The query hashed ONCE PER DISTINCT `identifiers` digest, unioned in order —
+ *  `merged_hashes`' twin. `segments` are `{ root, package, ids }`. */
+export function mergedHashes(query, segments) {
+  const byDigest = new Map();
+  for (const segment of segments) {
+    const digest = segment.ids.digest;
+    if (!byDigest.has(digest)) byDigest.set(digest, queryTermHashes(query, segment.ids));
+  }
+  const seen = new Set();
+  const out = [];
+  for (const hashes of byDigest.values()) {
+    for (const h of hashes) if (!seen.has(h)) { seen.add(h); out.push(h); }
+  }
+  return out;
+}
+
+/** Every segment's B2 pass, statistics SUMMED, weighted once —
+ *  `merged_candidates`' twin. Anchor text folds within a segment only. */
+export function mergedCandidates(segments, queryHashes, { scoring }) {
+  const candidates = [];
+  const df = {};
+  for (const h of queryHashes) df[h] = 0;
+  let n = 0;
+  const totalFlen = new Array(TF_FIELDS.length).fill(0);
+  let totalAnchorLen = 0;
+  for (const segment of segments) {
+    const [segCandidates, segDf, segN, segFlen, segAnchor] = scanSegment(
+      segment.root, queryHashes, { scoring, shards: segment.shards ?? null },
+    );
+    if (segment.package !== null) for (const record of segCandidates) record.package = segment.package;
+    for (const record of segCandidates) candidates.push(record);
+    for (const h of queryHashes) df[h] += segDf[h];
+    n += segN;
+    for (let i = 0; i < segFlen.length; i++) totalFlen[i] += segFlen[i];
+    totalAnchorLen += segAnchor;
+  }
+  return [candidates, df, new Corpus(n, deriveWlen(totalFlen, scoring, totalAnchorLen))];
+}
+
+/** `ask` over several segments — ONE `rank()` call over the union. */
+export function mergedAsk(segments, queryHashes, top, opts) {
+  const { weighting = null, scoring, statsOut = null, expansion = null } = opts;
+  if (!queryHashes.length) {
+    if (statsOut !== null) {
+      if (!("df" in statsOut)) statsOut.df = {};
+      if (!("n" in statsOut)) statsOut.n = 0;
+    }
+    return [];
+  }
+  const collect = expansion ? expansion.hashes : queryHashes;
+  const [candidates, df, corpus] = mergedCandidates(segments, collect, { scoring });
+  if (statsOut !== null) { statsOut.df = df; statsOut.n = corpus.n; }
+  return rank(candidates, collect, df, corpus, top, { weighting, scoring, statsOut, expansion });
 }
 
 /** The reference path. */

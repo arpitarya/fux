@@ -8,6 +8,8 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+**One query over the repository and every pinned index package (W-300).** `fux ask --scope repo|packages|all` and `fux_search`'s new optional `scope` (default `all`) rank the repository and every `kind = "index"` pin in `.fux/config/plugins.toml` under one ranking: the question is hashed once per distinct `identifiers` digest, `df` / `n` / `total_flen` are summed across segments, and `rank()` runs once. A hit from a package carries `package`; a repository hit is unchanged byte for byte, and with no pin nothing changes. A foreign or drifted segment stops the query naming the package. `fux lexical`, `answer` and `find` still rank the repository alone. Both readers.
+
 **Front-door docs, second pass.** No engine change. The README is repositioned as a search engine for the documents a team writes, with the index in git: the comparison is `grep`/`rg` vs fux (the vector-DB column is gone — a different job), a *Who searches it* table, a section on packages that ship their own index (ruled 2026-10-25, in build), and 5.0.0 stated as released. New: [`docs/how-fux-is-used.md`](docs/how-fux-is-used.md), five usage stories.
 
 ## [5.0.0] - 2026-10-25

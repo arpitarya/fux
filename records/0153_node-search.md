@@ -5,14 +5,14 @@ name: SR-NODE-SEARCH
 title: "SR-NODE-SEARCH (0153) — the Node read plane: one index, two readers, three arms"
 description: "Why a Node reader exists, what it may and may not do, and the decisions that keep it from becoming a second product: the _format version policy, the never-fetch rule, the url: verdict asymmetry, the shared tool-description file, and the three places where Node is deliberately a SUBSET of Python rather than a copy — the derived graph plane, the accelerator label, and the decoder boundary. Decisions 13-16 carry the SHIPPING shape: the consumer gets a published artefact rather than source, built once at publish. Since W-292 (Arpit, 2026-10-21) that artefact ships on npm ONLY — `npm install fux-engine` is the one way to install the Node reader; decisions 13, 15 and 16 (vendoring into .fux/node/, monorepo wiring, the .fux/fux shim) are superseded and decision 14 is narrowed to npm."
 status: accepted
-amended: 2026-10-24
+amended: 2026-10-25
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine` and installed by `npm install fux-engine` alone (W-292), and held byte-equal to Python by the third arm of the differential law"
-owns: [node@590dbe73e142, src/fux/store/nodebundle.py@4a729b4224cd]
+owns: [node@ba50afbf9b75, src/fux/store/nodebundle.py@4a729b4224cd]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1. Arpit, 2026-10-21 (W-292) — the Node reader installs from npm only, superseding 13, 15 and 16 and narrowing 14"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 2437989454325b09715a3ea40b5d6c569ea59fafe5711e12d8a423c24b0cdacd
+content_sha: 916e83943af610067755f09d62c7e9b8d2f57899272b5378d66e7341bf905bb2
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1120,6 +1120,26 @@ this decision and [PRE-REGISTRATION-NODE-2](../work/benchmark/PRE-REGISTRATION-N
 **No decision here moved** (W-289, 2026-10-20): module-level edits in three files this record describes by symbol — `setup.py` (no decoder or fetcher is seeded; `.fux/config/plugins.toml` is written), `health.py` (three plugin rows in `ROWS`) and `store/fuxdir.py` (the `plugins.toml` row) — left `detect_workspace`, `wire_workspace`, the `node reader` row and every `.fux/node/` writer untouched ([SR-PLUGINS](0165_plugins.md)). npm is unchanged: plugin packages are writer-side and Python only.
 
 **W-289 phase 2 (2026-10-20) — no decision here moved.** `health.py`, `setup.py` and `store/fuxdir.py`, which this record describes, changed for [SR-PLUGINS](0165_plugins.md) — the doctor rows on the declaration, the types-file header, the `.fux/README.md` wording. The vendored Node reader and its shapes are untouched; Node still declines a decoded document rather than decoding it.
+
+**26. The merged query is transcribed, not diverged** (W-300, 2026-10-25;
+[SR-PKG-INDEX](0166_pkg-index.md) decision 10). `runQuery` takes `scope`
+(`null` = the repository alone, the path before W-300); `run.mjs::segmentsFor` is
+`scan.segments_for`'s twin — the repository first, the pins by name, each verified
+and inflated by `segments.mjs::inflate(…, buildOwn)` before it is read. `scan.mjs`
+splits `scanCandidates` into `scanSegment` (raw totals) and adds `mergedHashes`,
+`mergedCandidates` and `mergedAsk`; `mined.mjs::mergeTables` and
+`IdentifierRules.digest` are the new twins of `mined.merge_tables` and
+`IdentifierRules.digest`. **Decision 24's runtime reading is per segment**: each
+pinned segment is scanned through its own `Shards`, from its own runtime directory;
+the merged query never reads `--fast`'s plane, as in Python. `rank.mjs` copies a
+candidate's `package` onto the hit after `section`, and `ask` / `fux_search` read a
+package hit's record from its segment (`segments.mjs::rootFor`). `fux ask --scope`
+and `fux_search`'s `scope` default to `[scope] default`; `lexical` and `answer`
+pass none. **Held equal** by `tests/test_pkg_merged_query.py` — `runQuery`,
+`fux ask --json` and `fux_search` against Python over the repository plus the
+fixture segment, at every scope: ids, `package` and order exactly, scores at
+decision 1's `round(9)` (this fixture's `n = 3` is one of the inputs where
+`Math.log` and `math.log` differ by one ulp).
 
 ### Consequences
 

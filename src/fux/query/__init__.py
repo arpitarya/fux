@@ -155,9 +155,19 @@ def run_query(
     trace_out: dict | None = None,
     expand: str = "",
     related_out: list | None = None,
+    scope: str | None = None,
 ) -> tuple[list[AskResult], str]:
     """Scan by default; use the accelerator only when `force_scan` is False
     and a fresh build exists. Return `(results, path)`.
+
+    `scope` is W-300's (SR-PKG-INDEX d10): `None` and `repo` rank the
+    repository alone, by the code path below exactly as it ran before W-300;
+    `packages` and `all` rank the pinned index packages — alone, or with the
+    repository — under ONE `rank()` call over summed statistics
+    (`scan.merged_ask`). `all` with no pin is the repository alone, on the
+    same unchanged path. **The merged query is always the scan**: the
+    accelerator's block-max skipping bounds a document against one segment's
+    statistics, and the merged answer is defined by the summed ones.
 
     `use_tune=False` is `--no-tune`: `.fux/config/tune.toml` is not read at all, so
     the answer is the engine's own (SR-TUNE decision 11). Callers that have
@@ -243,6 +253,13 @@ def run_query(
     # W-233: the families the index was written with, so the question gains
     # the same canonical terms (`RF 118` -> `rf-118`).
     ids = ids_mod.for_root(root)
+    segs = _merged_segments(root, scope)
+    if segs is not None:
+        return _run_merged(
+            root, query, top, segs, tune=tune, weighting=weighting, dirs=dirs, depth=depth,
+            stats=stats, expand=expand, confidence_out=confidence_out, trace_out=trace_out,
+            related_out=related_out, ids=segs[0].ids if segs else ids,
+        )
     query_hashes = query_term_hashes(query, ids)
     expansion = build_expansion(
         query_hashes, query_term_hashes(expand, ids) if expand else [], tune.expand_weight
@@ -287,6 +304,64 @@ def run_query(
         root, query, results, rerank_weight, top, depth, tune, stats, related_out, trace_out
     )
     _fill_trace(trace_out, results, rerank_weight)
+    _fill_confidence(confidence_out, stats, query, final, tune, ids)
+    return final, "scan"
+
+
+def _merged_segments(root: Path, scope: str | None):
+    """W-300 — the segments a merged query runs over, or `None` for the
+    repository alone on the pre-W-300 path (no scope, `repo`, or `all` with
+    no pinned package)."""
+    if scope is None or scope == fixed("scope", "repo"):
+        return None
+    from .scan import segments_for
+
+    segs = segments_for(root, scope)
+    if all(seg.package is None for seg in segs) and segs:
+        return None
+    return segs
+
+
+def _run_merged(
+    root, query, top, segs, *, tune, weighting, dirs, depth, stats, expand,
+    confidence_out, trace_out, related_out, ids,
+):
+    """`run_query` over several segments (SR-PKG-INDEX d10). Same stages, same
+    order; what differs is only where the candidates and statistics come from.
+
+    - the query (and `--expand`) is hashed once per distinct `identifiers`
+      digest and unioned (`scan.merged_hashes`);
+    - the mined table is the union of every segment's own pairs, so an
+      abbreviation a package declares expands a question over that package;
+    - the candidates and `df`/`n`/`total_flen` are summed, and `rank()` is
+      called once (`scan.merged_ask`);
+    - the stages after `rank()` read the repository (`rerank`, the pin, the
+      graph plane): a package hit is a document the repository's graph has no
+      edge to, and the reranker declines to read one — it holds no bytes of
+      a package's files (W-301 is what reads them in place).
+    """
+    from .expand import build as build_expansion
+    from .scan import merged_ask, merged_hashes
+
+    query_hashes = merged_hashes(query, segs)
+    expansion = build_expansion(
+        query_hashes, merged_hashes(expand, segs) if expand else [], tune.expand_weight
+    )
+    if tune.mined_weight > 0 and query_hashes:
+        from ..text import mined as mined_mod
+        from .expand import stack
+
+        table = mined_mod.merge_tables(mined_mod.table_from_shards(seg.root) for seg in segs)
+        expansion = stack(expansion, mined_mod.fold(table, query_hashes), tune.mined_weight)
+    results = merged_ask(
+        segs, query_hashes, depth, weighting=weighting, archived_dirs=dirs,
+        scoring=tune.scoring, stats_out=stats, expansion=expansion,
+    )
+    final = _compose(
+        root, query, results, tune.rerank_weight, top, depth, tune, stats, related_out,
+        trace_out,
+    )
+    _fill_trace(trace_out, results, tune.rerank_weight)
     _fill_confidence(confidence_out, stats, query, final, tune, ids)
     return final, "scan"
 
@@ -386,7 +461,7 @@ def _band_guard(root: Path, query: str, stats: dict | None, results: list) -> No
         lexical = stats.get("top_doc_hashes")
         if lexical is None:
             return
-        record = _record_for(root, results[0].id)
+        record = _record_for(_hit_root(root, results[0]), results[0].id)
         if record is None:
             return
         from .bm25f import idf
@@ -556,7 +631,14 @@ def _maybe_rerank(root: Path, query: str, results, tune: "Tune", top: int, uplif
     """
     if tune.rerank_weight <= 0:
         return results[:top]
-    return rerank.rerank(root, query, results, tune=tune, uplift_out=uplift_out)[:top]
+    # W-300: a package hit's bytes are not in this repository, so the reader
+    # declines it and its score passes through — `rerank`'s own unreadable case.
+    foreign = {(r.id, r.loc) for r in results if r.package is not None}
+    read = None
+    if foreign:
+        def read(root_, doc_id, loc):
+            return None if (doc_id, loc) in foreign else rerank._read_local_text(root_, doc_id, loc)
+    return rerank.rerank(root, query, results, tune=tune, read=read, uplift_out=uplift_out)[:top]
 
 
 # -- the output contract -------------------------------------------------------
@@ -948,7 +1030,7 @@ def _expand_of(args) -> str:
     return str(getattr(args, "expand", "") or "")
 
 
-def _run_fused(root, args, top, *, tune, confidence_out, trace_out=None, related_out=None):
+def _run_fused(root, args, top, *, tune, confidence_out, trace_out=None, related_out=None, scope=None):
     """`run_query` for one question, or several fused by RRF. W-109.
 
     Returns `(results, path, fused)`.
@@ -973,7 +1055,7 @@ def _run_fused(root, args, top, *, tune, confidence_out, trace_out=None, related
     results, path = run_query(
         root, queries[0], top, force_scan=_force_scan(args), tune=tune,
         confidence_out=confidence_out, trace_out=trace_out, expand=expand,
-        related_out=related_out,
+        related_out=related_out, scope=scope,
         use_tune=True,
     )
     if len(queries) == 1:
@@ -997,7 +1079,7 @@ def _run_fused(root, args, top, *, tune, confidence_out, trace_out=None, related
     for q in queries[1:]:
         more, _ = run_query(
             root, q, top, force_scan=_force_scan(args), tune=tune, expand=expand,
-            use_tune=True,
+            use_tune=True, scope=scope,
         )
         arms.append(more)
     return fuse_results(arms, top), path, True
@@ -1144,12 +1226,16 @@ def build_ask(root: Path, args, *, compose: bool, with_related: bool) -> AskBuil
     want_why = bool(getattr(args, "why", False))
     trace: dict | None = {} if want_why else None
     related: list = []
+    # W-300 (SR-PKG-INDEX d10): `ask` ranks over `--scope`, `all` when it is
+    # not given; the frozen `lexical` is the repository alone, always — it is
+    # the baseline, and a pinned package joining it would move the baseline.
+    scope = (getattr(args, "scope", None) or fixed("scope", "default")) if compose else None
     results, path, fused = _run_fused(
         root, args, args.top, tune=tune, confidence_out=signals, trace_out=trace,
-        related_out=related if with_related else None,
+        related_out=related if with_related else None, scope=scope,
     )
     block = signals.get("confidence")
-    why = _derivation_for(root, args, results, path, signals, trace, tune) if want_why else None
+    why = _derivation_for(root, args, results, path, signals, trace, tune, scope) if want_why else None
     return AskBuilt(
         root=root, query=args.query, results=results, related=related, block=block,
         path=path, why=why, tune=tune, fused=fused,
@@ -1189,7 +1275,7 @@ def _ask_shaped(args, *, compose: bool) -> int:
     # and a heading is not part of one. `find` is the verb for piping and is
     # deliberately unchanged.
     for r in results:
-        record = _record_for(root, r.id)
+        record = _record_for(_hit_root(root, r), r.id)
         mark = f"{ARCHIVED_MARKER} " if r.archived else ""
         if getattr(r, "pinned", False):
             mark = f"{PINNED_MARKER} " + mark
@@ -1254,7 +1340,7 @@ def _note_run(args, results, related, block) -> None:
     )
 
 
-def _derivation_for(root: Path, args, results, path, signals, trace, tune):
+def _derivation_for(root: Path, args, results, path, signals, trace, tune, scope=None):
     """Assemble the `--why` block. **Never raises** — see `_fill_confidence`.
 
     ⚠ **The untuned comparison is a SECOND QUERY, and that is deliberate.**
@@ -1281,18 +1367,20 @@ def _derivation_for(root: Path, args, results, path, signals, trace, tune):
                 untuned, _ = run_query(
                     root, args.query, args.top,
                     force_scan=_force_scan(args), use_tune=False,
-                    expand=_expand_of(args),
+                    expand=_expand_of(args), scope=scope,
                 )
             except Exception:
                 untuned = None
         stats = signals.get("stats") if isinstance(signals, dict) else None
+        # W-300: a package hit's record is read from its own segment.
+        roots = {r.id: _hit_root(root, r) for r in results if getattr(r, "package", None)}
         return provenance.derive(
             root,
             args.query,
             results,
             path=path,
             stats=stats,
-            records=lambda doc_id: _record_for(root, doc_id),
+            records=lambda doc_id: _record_for(roots.get(doc_id, root), doc_id),
             window=(trace or {}).get("window"),
             pre_rerank=(trace or {}).get("pre_rerank"),
             untuned=untuned,
@@ -2013,6 +2101,17 @@ def _phrases_for(root: Path, doc_id: str) -> list[str]:
     return list(record.get("phrases", [])) if record is not None else []
 
 
+def _hit_root(root: Path, result) -> Path:
+    """Where `result`'s own record lives — the repository, or its package's
+    runtime (W-300, `derive.segments.root_for`)."""
+    package = getattr(result, "package", None)
+    if package is None:
+        return root
+    from ..derive.segments import root_for
+
+    return root_for(root, package)
+
+
 def _record_for(root: Path, doc_id: str) -> dict | None:
     """`doc_id`'s own committed record, read from its shard alone — one shard,
     not the corpus, the same shape as `_phrases_for`."""
@@ -2088,8 +2187,12 @@ def _as_dict(
     consumer said don't compute it"*, which only the consumer can set and
     only on `ask`. `find` has no `sections` key, so its payload is unchanged.
     """
-    record = _record_for(root, result.id)
+    record = _record_for(_hit_root(root, result), result.id)
     payload = dict(result.__dict__)
+    # W-300: a repository hit carries no `package` key, so an answer from the
+    # repository alone is byte-equal to one written before the merged query.
+    if payload.get("package") is None:
+        payload.pop("package", None)
     # W-236 (SR-SECTIONS decision 6): the best-section key exists only while
     # `section_weight` is on. Off, the hit is byte-identical to one written
     # before section records existed; on, `null` is a claim — sectionless, or

@@ -104,6 +104,11 @@ export function answerPayload(root, args) {
   //
   // W-242 Tier 0 — this verb's one read of each shard, shared by the ranking
   // and the record reads below.
+  //
+  // W-300: no `scope` here, so `runQuery` ranks the repository alone, as
+  // `cmd_answer` does in Python — `answer` refers its winner from the source
+  // that owns it, and a package's files are read in place only once W-301
+  // gives a hit a `pkg:` location (SR-PKG-INDEX d10, d11).
   const shards = new Shards(root);
   const { results, related, confidence, tune } = runQuery(root, query, ANSWER_TOP, {
     useTune: args.noTune !== true, wantConfidence: true, compose: true, expand: args.expand ?? "",

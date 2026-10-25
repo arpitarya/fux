@@ -103,6 +103,13 @@ class AskResult:
     #: renderers never emit the key**; what decides that is the weight, not
     #: this value, because `None` is also an honest on-value.
     section: str | None = None
+    #: W-300 — the pinned index package this hit was ranked from
+    #: (SR-PKG-INDEX d10), `None` for the repository's own documents. **Not a
+    #: score and not part of the sort key**: the merged query copies it onto
+    #: the candidate record and `rank()` only carries it out. Absent from
+    #: every payload while `None`, so a repository-only answer is byte-equal
+    #: to the engine before W-300.
+    package: str | None = None
 
 
 @dataclass(frozen=True)
@@ -523,6 +530,7 @@ def rank(
             # every other field, rather than being a second read on one path.
             mtime=record.get("mtime"),
             section=sections_out[record["id"]][0] if section_on else None,
+            package=record.get("package"),
         )
         for i, (record, s, archived) in enumerate(scored[:top])
     ]

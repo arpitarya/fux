@@ -24,9 +24,16 @@
  * `separation` for an ordering nobody was shown — and the reranker exists
  * precisely to change which document is first.
  */
-import { ask as scanAsk, queryTermHashes } from "./scan.mjs";
+import { ask as scanAsk, mergedAsk, mergedHashes, queryTermHashes } from "./scan.mjs";
 import { FuxError } from "../errors.mjs";
-import { fold as minedFold, tableFromShards } from "./mined.mjs";
+import { fold as minedFold, mergeTables, tableFromShards } from "./mined.mjs";
+import { fixed } from "../config/constants.mjs";
+import { indexes } from "../config/plugins.mjs";
+import { inflate, rootFor, segmentDir } from "../derive/segments.mjs";
+import { buildOwn } from "../derive/build.mjs";
+import { Shards } from "../store/reader.mjs";
+import { readLocalText } from "./rerank.mjs";
+import { cmpCodePoints } from "../compat/pyfloat.mjs";
 import { rank, Weighting } from "./rank.mjs";
 import { signals } from "./confidence.mjs";
 import { headingsFor } from "./headings.mjs";
@@ -72,10 +79,49 @@ function intentPrior(tune, query) {
   return { doctype: tune.doctype, intentType: typeOfIntent(cue), intentFactor: 1.0 + tune.intentWeight };
 }
 
-/** Proximity rerank, then truncate to what the caller asked for. */
+/** Proximity rerank, then truncate to what the caller asked for. A package
+ *  hit's bytes are not in this repository (W-300), so the reader declines it
+ *  and its score passes through — `rerank`'s own unreadable case. */
 function maybeRerank(root, query, results, tune, top) {
   if (tune.rerankWeight <= 0) return results.slice(0, top);
-  return rerank(root, query, results, { tune }).slice(0, top);
+  const foreign = new Set(results.filter((r) => r.package !== undefined).map((r) => `${r.id}\u0000${r.loc}`));
+  const read = foreign.size
+    ? (root_, docId, loc) => (foreign.has(`${docId}\u0000${loc}`) ? null : readLocalText(root_, docId, loc))
+    : null;
+  return rerank(root, query, results, { tune, read }).slice(0, top);
+}
+
+/** The segments `scope` names, the repository first, then every pin by name —
+ *  `scan.segments_for`'s twin (SR-PKG-INDEX d10). Every pin is verified, and
+ *  its runtime built when the pin moved, before a byte of it is read: a
+ *  foreign segment stops the query by name (`locateIndex`). */
+export function segmentsFor(root, scope, shards = null) {
+  const [repo, packages, everything] = ["repo", "packages", "all"].map((k) => fixed("scope", k));
+  if (![repo, packages, everything].includes(scope)) {
+    throw new FuxError(`scope must be one of ${repo}, ${packages}, ${everything} — got '${scope}'`);
+  }
+  const out = [];
+  if (scope === repo || scope === everything) {
+    out.push({ root, package: null, ids: identifiersFor(root), shards });
+  }
+  if (scope === packages || scope === everything) {
+    const pins = [...indexes(root).entries()].sort((a, b) => cmpCodePoints(a[0], b[0]));
+    for (const [name, pin] of pins) {
+      inflate(root, pin, buildOwn);
+      const segRoot = segmentDir(root, pin);
+      out.push({ root: segRoot, package: name, ids: identifiersFor(segRoot), shards: new Shards(segRoot) });
+    }
+  }
+  return out;
+}
+
+/** `null` for the repository alone on the pre-W-300 path (no scope, `repo`,
+ *  or `all` with no pin); otherwise the segments to merge. */
+function mergedSegments(root, scope, shards) {
+  if (scope === null || scope === undefined || scope === fixed("scope", "repo")) return null;
+  const segs = segmentsFor(root, scope, shards);
+  if (segs.length && segs.every((s) => s.package === null)) return null;
+  return segs;
 }
 
 /** The confidence block, or `null`. **Never throws** — a signal that can fail a
@@ -124,7 +170,10 @@ function bandGuard(root, query, statsOut, results, shards) {
   try {
     const lexical = statsOut.top_doc_hashes;
     if (lexical === null || lexical === undefined) return;
-    const record = recordFor(root, results[0].id, shards);
+    const top = results[0];
+    const record = top.package !== undefined
+      ? recordFor(rootFor(root, top.package), top.id)  // W-300: its own segment
+      : recordFor(root, top.id, shards);
     if (record === null || record === undefined) return;
     const terms = record.terms ?? {};
     const shown = queryTermHashes(query, identifiersFor(root)).filter((h) => h in terms);
@@ -158,7 +207,7 @@ function withTier(tune, overrides) {
  * scan stays the default. `path` in the result says which one answered. */
 export function runQuery(root, query, top, {
   tune = null, useTune, expand = "", wantConfidence,
-  compose, related: wantRelated, shards = null, fast = false,
+  compose, related: wantRelated, shards = null, fast = false, scope = null,
 }) {
   // Required, and a JS destructure cannot say so: a missing `compose` would read
   // as `fux lexical` and silently drop the graph tier (W-225 stage 6, L12 R8).
@@ -206,28 +255,37 @@ export function runQuery(root, query, top, {
   const depth = (rerankWeight > 0 || graphOn) ? Math.max(top, resolved.rerankDepth) : top;
 
   // W-233: the families the index was written with (`RF 118` -> `rf-118`).
-  const ids = identifiersFor(root);
-  const queryHashes = queryTermHashes(query, ids);
+  // W-300 (SR-PKG-INDEX d10): `scope` past the repository merges the pinned
+  // segments — the query hashed once per identifiers digest, the statistics
+  // summed, one `rank()` call — and is always the scan, as in Python.
+  const segs = mergedSegments(root, scope, set);
+  const ids = segs !== null && segs.length ? segs[0].ids : identifiersFor(root);
+  const hashesOf = (text) => (segs !== null ? mergedHashes(text, segs) : queryTermHashes(text, ids));
+  const queryHashes = hashesOf(query);
   let expansion = expandMod.build(
-    queryHashes, expand ? queryTermHashes(expand, ids) : [], resolved.expandWeight,
+    queryHashes, expand ? hashesOf(expand) : [], resolved.expandWeight,
   );
   // W-242 Tier 1 — the plane answers only when asked AND fresh; anything else
   // (missing, stale, an unknown schema) is the scan, as in Python.
-  const useAccel = fast === true && accel.usable(root);
+  const useAccel = segs === null && fast === true && accel.usable(root);
 
   // W-168 step 4 — corpus-mined expansion. Off at 0.0, and off reads no pair.
   // Folded over the user's words only; stacks on `--expand`, whose hashes keep
   // the caller's weight. Twin of `run_query`'s block. The table comes from the
   // path that will answer, so `--fast` and `--scan` fold identically.
   if (resolved.minedWeight > 0 && queryHashes.length) {
-    const table = useAccel ? accel.minedTable(root) : tableFromShards(root, set);
+    const table = segs !== null
+      ? mergeTables(segs.map((s) => tableFromShards(s.root, s.shards)))
+      : useAccel ? accel.minedTable(root) : tableFromShards(root, set);
     expansion = expandMod.stack(expansion, minedFold(table, queryHashes), resolved.minedWeight);
   }
 
   const statsOut = {};
-  const window = useAccel
-    ? accel.ask(root, query, depth, { skipping: true, weighting, scoring, statsOut, expansion })
-    : scanAsk(root, query, depth, { weighting, scoring, statsOut, expansion, shards: set });
+  const window = segs !== null
+    ? mergedAsk(segs, queryHashes, depth, { weighting, scoring, statsOut, expansion })
+    : useAccel
+      ? accel.ask(root, query, depth, { skipping: true, weighting, scoring, statsOut, expansion })
+      : scanAsk(root, query, depth, { weighting, scoring, statsOut, expansion, shards: set });
   // W-162. **After the reranker, and the confidence block is built from the
   // PINNED list** — the band describes the answer the reader was shown, so a
   // pinned #1 the corpus barely supports must still say `weak`.

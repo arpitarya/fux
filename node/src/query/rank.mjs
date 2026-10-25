@@ -209,6 +209,10 @@ export function rank(
     // W-236 — the best index section, AFTER `route` as in `AskResult`, and
     // only while the term is on: off, the key does not exist (decision 6).
     if (sectionOn) hit.section = sectionsOut.get(record.id)[0];
+    // W-300 — the pinned index package this hit was ranked from, AFTER
+    // `section` as in `AskResult`, and only on a package hit: a repository
+    // answer is byte-equal to the reader before the merged query.
+    if (record.package !== undefined && record.package !== null) hit.package = record.package;
     return hit;
   });
 }

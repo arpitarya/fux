@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-24
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@9872f27c86bd]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@02161a2a3258]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 24b7f9192b0003e4cd85af0909323d29bff83b2431381e487c7884e7d27f0ae3
+content_sha: 1551663df12583c60f0339cb3e1936513943f0cbab356b86c0856ae9c1689ed8
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -207,6 +207,8 @@ pattern. A consumer who wants other cues is I2, which is not built.
 **No decision here moved** (W-289, 2026-10-20): `[plugins]` and `[plugins.packages.<name>]` hold the plugin declaration's fixed identity — the file's name and row keys, the naming rule, the digest prefix, the install line's verb, and the fifteen first-party packages with their kind, suffixes, decoder modules and dependencies ([SR-PLUGINS](0165_plugins.md) P2). A repository's declaration cannot redefine a name in this table.
 
 **New fixed values, one retired, no decision moved** (W-289 phase 2, 2026-10-20; [SR-DECODE](0139_decode.md) decision 25): `[decoders] package_prefix` (`pkg:`, the head of a packaged decoder's origin and digest, SR-PLUGINS P12) replaces `[decoders] builtin_prefix`, retired with the last built-in decoder; `package` on every `[extensions.<name>]` table names the distribution that ships it (`fux-core`, or `fux-extension-table` for `table`); `[plugins] skip_undeclared`, the walk's reason for a format no declared package reads; and `depends` on `fux-decoder-config`, `-xml` (`fux-decoder-json`), `-mail` and `-drawio` (`fux-decoder-html`), the cross-decoder imports phase 2 turned into package dependencies.
+
+**New fixed values, no decision moved** (W-300, 2026-10-25): `[scope]` — `repo`, `packages`, `all` and `default = "all"`, the merged query's three values and the default `fux ask --scope` and `fux_search`'s `scope` resolve to ([SR-PKG-INDEX](0166_pkg-index.md) decision 10, Arpit 2026-10-25). Both planes read it.
 
 **No decision here moved** (W-292, 2026-10-24): `[bundle] shim_mode` and `[templates] shim` are deleted with the `.fux/fux` shim they described — `fux setup` writes no Node reader any more (Arpit, 2026-10-21, [SR-NODE-SEARCH](0153_node-search.md)). `[bundle] dir` and `shim` stay, now naming what an earlier setup vendored so setup can remove it and doctor can warn; every other `[bundle]` key still feeds the npm bundle.
 

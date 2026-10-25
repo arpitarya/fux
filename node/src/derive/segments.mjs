@@ -33,6 +33,13 @@ export function segmentDir(root, pin) {
   return join(packagesDir(root), `${pin.name}@${pin.version}`);
 }
 
+/** The root a hit's own record lives under (W-300): the repository for
+ *  `null`, the pin's runtime for a package hit. `root_for`'s twin. */
+export function rootFor(root, pkg) {
+  if (pkg === null || pkg === undefined) return root;
+  return segmentDir(root, indexes(root).get(pkg));
+}
+
 /** Was this pin's runtime built from exactly this pin digest? */
 export function isCurrent(root, pin) {
   try {

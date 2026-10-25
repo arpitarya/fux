@@ -33,6 +33,7 @@ import { headingsFor } from "../query/headings.mjs";
 import { recordFor, Shards } from "../store/reader.mjs";
 import { declareArchived, declareConfidence, declareFloorOff, decline } from "./find.mjs";
 import { fixed } from "../config/constants.mjs";
+import { rootFor } from "../derive/segments.mjs";
 
 const JSON_INDENT = fixed("json", "indent");
 
@@ -85,6 +86,9 @@ export function runAsk(root, args, { compose }) {
 
   const { results, related, confidence, fused, tune } = runFused(root, queries, top, {
     shards,
+    // W-300 (SR-PKG-INDEX d10): `ask` ranks over `--scope`, `[scope] default`
+    // when it is not given; the frozen `lexical` is the repository alone.
+    scope: compose ? (args.scope ?? fixed("scope", "default")) : null,
     fast: args.fast === true,
     useTune: args.noTune !== true,
     wantConfidence: true,
@@ -106,7 +110,10 @@ export function runAsk(root, args, { compose }) {
   // this reader has no `--why`.)
   const rows = results.map((r) => {
     const out = { ...r };
-    if (showSections) out.headings = headingsFor(recordFor(root, r.id, shards), query, args.maxHeadings);
+    // W-300: a package hit's record is its own segment's, never a repository
+    // document that happens to share its id.
+    const record = r.package !== undefined ? recordFor(rootFor(root, r.package), r.id) : recordFor(root, r.id, shards);
+    if (showSections) out.headings = headingsFor(record, query, args.maxHeadings);
     return out;
   });
 

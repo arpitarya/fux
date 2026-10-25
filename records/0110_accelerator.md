@@ -7,10 +7,10 @@ description: A disposable term-major index under .fux/runtime/ that makes warm q
 status: accepted
 date: 2026-08-18
 feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
-owns: [src/fux/derive@294bff6c0395, node/src/derive@dde3404f16b6, tools/differential@fff75655b225, src/fux/schemas/runtime.schema.json@e7f2d4f8acb3]
+owns: [src/fux/derive@5d4a65601988, node/src/derive@56d456f3b49f, tools/differential@fff75655b225, src/fux/schemas/runtime.schema.json@e7f2d4f8acb3]
 laws: [L2, L4]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: e65d96927da9e5d324e23786c97ff4b22d9577ec46ee44368d4fa1812443bfc0
+content_sha: 33f5f1cb3fbe3b0b2784d9dccda1c1366c92b19dab8e35c47adac9ff9ac38bd5
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -758,6 +758,8 @@ on 2026-10-04 (Arpit) and BUILT the same day (W-259;
 **W-278 — `fux.runtime.v11` (2026-10-13; branch, unmerged).** `stats.json` drops `sec_units` and `sec_total_flen` ([SR-RUNTIME-STATS](0125_runtime-stats.md)); `accel.py::attach_sections_by_id` serves the scan's section attachment from `sections.json` and the section postings when `is_fresh` holds ([SR-SECTIONS](0161_sections.md) decision 7). On the Node side `isFresh` and `readStamp` moved to `node/src/derive/fresh.mjs`, re-exported by `accel.mjs`, because the scan now needs them and `accel.mjs` imports the scan: the bundle refuses an import cycle. No decision here moved.
 
 **W-273 phase 2 (2026-10-13):** `accel.py::attach_sections_by_id` moved to `query/sections.py` and its Node half from `fresh.mjs` to `node/src/query/sections.mjs`, both owned by [SR-SECTIONS](0161_sections.md); `fresh.mjs` keeps `isFresh` and `readStamp`. No decision here moved.
+
+**No decision here moved** (W-300, 2026-10-25): `derive/segments.py` and `segments.mjs` gain `root_for` / `rootFor` — where a package hit's own record lives — for [SR-PKG-INDEX](0166_pkg-index.md) decision 10's merged query, which **never reads this plane**: it is always the scan, because block-max skipping bounds a document against one segment's statistics and the merged answer is defined by the summed ones. Nothing in `accel.py`, `_build.py` or the runtime's bytes moved.
 
 ### Consequences
 

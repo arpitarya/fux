@@ -733,6 +733,16 @@ def build_parser() -> argparse.ArgumentParser:
             "--why", action="store_true",
             help="how the ranking got here: matched terms, the cut line, rerank and tune deltas",
         )
+        # W-300 (SR-PKG-INDEX d10): which indexes ONE ranking runs over — the
+        # repository, the pinned index packages, or both with summed statistics.
+        # `None` means not given, and `ask` then reads `[scope] default`
+        # (`all`). ⚠ **Inert on `lexical`, like `--related`**: the frozen
+        # baseline ranks the repository alone, whatever this says.
+        scopes = [fixed("scope", k) for k in ("repo", "packages", "all")]
+        p.add_argument(
+            "--scope", choices=scopes, default=None,
+            help=f"rank the repository, the pinned index packages, or all (default {fixed('scope', 'default')})",
+        )
         # W-109. **Repeatable, and fused in RANK space** — each phrasing is ranked
         # on its own and the lists are combined by RRF (k = 60). `dest="also"`
         # because `query` is already the positional: the first question is

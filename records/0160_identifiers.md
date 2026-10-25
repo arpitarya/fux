@@ -7,10 +7,10 @@ description: "A committed .fux/config/identifiers.toml names ID families (RF-{n}
 status: accepted
 date: 2026-09-28
 feature: "identifier families — `.fux/config/identifiers.toml`, its matcher on both readers, the lens, `fux identifiers`, the doctor rows and the serve Identifiers tab"
-owns: [.fux/config/identifiers.toml@457cfe1314bb, node/src/query/identifiers.mjs@462419f6c008, node/test/identifiers.test.mjs@5cb6e3e073f6, src/fux/identifiers_cmd.py@2c49beee6f9f, src/fux/text/identifiers.py@8188ddc299a0]
+owns: [.fux/config/identifiers.toml@457cfe1314bb, node/src/query/identifiers.mjs@33f9b67d5aab, node/test/identifiers.test.mjs@5cb6e3e073f6, src/fux/identifiers_cmd.py@2c49beee6f9f, src/fux/text/identifiers.py@8188ddc299a0]
 laws: [L2, L4, L10, L12]
 timestamp: 2026-09-28T00:00:00Z
-content_sha: afe5b59ae0b15871289619c9c5e071aafdca4ed8d18d34703538844d8109a751
+content_sha: 5f36d2b203e583b3ee0934f3583fda490d14055da07126c519d07e97511dfa0e
 ratifies: "W-233 — Arpit, 2026-09-28 (Cowork), F1–F5: a verb writes [detected]; refresh on demand with a doctor warning; templates by default and a guarded regex in [user] only; the whole form unstemmed plus its parts; [detected] applies once written and [user] overrides it"
 ---
 
@@ -215,6 +215,8 @@ rollback.
       `rung-10000` drops from 45.6 s to 6.5 s together with
       [SR-DECODE](0139_decode.md) decision 22
       ([filed](../work/regression/2026-09-29-w239-extract-speed/report.md)).
+
+**No decision here moved** (W-300, 2026-10-25): the Node `IdentifierRules` gains `digest`, `IdentifierRules.digest`'s twin over the same effective rules, so the merged query can hash a question once per distinct digest on both readers ([SR-PKG-INDEX](0166_pkg-index.md) decision 10). Matching and the canonical form are untouched.
 
 ### Consequences
 
