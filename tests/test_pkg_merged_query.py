@@ -121,6 +121,16 @@ def _consume(tmp_path: Path, segment: Path, monkeypatch) -> Path:
     npm = root / "node_modules" / NAME
     shutil.copytree(segment, npm)
     (npm / "package.json").write_text(json.dumps({"name": NAME, "version": VERSION}), encoding="utf-8")
+    # The DOCS package the manifest's `content` names (W-301), so a package
+    # winner can be read in place.
+    docs_py = site / "acme_docs"
+    shutil.copytree(FIXTURE, docs_py / "docs")
+    docs_info = site / f"acme_docs-{VERSION}.dist-info"
+    docs_info.mkdir(parents=True)
+    (docs_info / "METADATA").write_text(f"Metadata-Version: 2.1\nName: acme-docs\nVersion: {VERSION}\n", encoding="utf-8")
+    docs_npm = root / "node_modules" / "acme-docs"
+    shutil.copytree(FIXTURE, docs_npm / "docs")
+    (docs_npm / "package.json").write_text(json.dumps({"name": "acme-docs", "version": VERSION}), encoding="utf-8")
     monkeypatch.syspath_prepend(str(site))
     importlib.invalidate_caches()
     plugins.reset()
@@ -288,8 +298,10 @@ def test_fux_search_takes_scope_and_names_the_package(consumer):
     assert {hit.get("package") for hit in both["results"]} == {None, NAME}
     package_hit = next(hit for hit in both["results"] if hit.get("package"))
     assert package_hit["sha"]  # read from the package's own record
+    # W-301: a merged hit's location is the docs package's `pkg:` address.
+    assert package_hit["location"] == f"pkg:acme-docs@{VERSION}#{package_hit['path']}"
     repo = mcp._search(consumer, {"query": "widget rollback", "k": 10, "scope": REPO}, top=5, max_headings=3)
-    assert all("package" not in hit for hit in repo["results"])
+    assert all(hit["package"] is None and hit["location"].startswith("file:") for hit in repo["results"])
 
 
 # -- step 5: Python ≡ Node over the repository plus the fixture segment ---------------
@@ -386,3 +398,35 @@ def test_ask_json_answers_identically_on_both_readers(consumer, scope):
     )
     py = build_ask(consumer, args, compose=True, with_related=True).payload()["results"]
     assert _shape(py) == _shape(json.loads(out.stdout)["results"])
+
+
+# -- W-300 + W-301: `answer` refers a package winner at its `pkg:` location ----------
+
+
+def _py_answer(root: Path, query: str) -> dict:
+    from fux.api import _Args
+    from fux.query import build_answer
+
+    args = _Args(query=query, json=True, band=False, no_refer=False, audit=False, receipt=False, top=None)
+    return build_answer(root, args).payload
+
+
+def test_answer_reads_a_package_winner_inside_the_installed_docs_package(consumer):
+    payload = _py_answer(consumer, "run the zarquon migration in reverse")
+    assert payload["source"] == "refer", payload
+    assert payload["citation"]["id"] == f"pkg:acme-docs@{VERSION}#docs/rollback.md"
+    assert payload["citation"]["freshness"] == "current"
+
+
+@pytest.mark.skipif(not HAS_NODE, reason="node is not on PATH")
+def test_answer_cites_the_same_package_location_on_both_readers(consumer):
+    query = "run the zarquon migration in reverse"
+    out = subprocess.run(
+        ["node", str(ENGINE / "node" / "fux.mjs"), "answer", *query.split(), "--json"],
+        cwd=consumer, capture_output=True, text=True, encoding="utf-8",
+    )
+    assert out.returncode == 0, out.stderr
+    node = json.loads(out.stdout)
+    py = _py_answer(consumer, query)
+    assert node["citation"]["id"] == py["citation"]["id"] == f"pkg:acme-docs@{VERSION}#docs/rollback.md"
+    assert node["citation"]["sha"] == py["citation"]["sha"]

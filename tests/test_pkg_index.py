@@ -441,3 +441,184 @@ def test_doctor_prints_the_package_rows_and_the_merged_count(consumer, segment, 
     monkeypatch.setattr(health, "fixed", lambda t, k: 3 if (t, k) == ("scale", "ceiling") else fixed(t, k))
     above = health._merged_corpus(consumer)
     assert not above.ok and above.level == "warn" and "SR-WORK-SCALE" in above.detail
+
+
+# -- d11 (W-301): `pkg:` locations, read inside the installed docs package ---------------
+
+DOCS = "acme-docs"
+DOCS_IMPORT = "acme_docs"
+MCP_MJS = ENGINE / "node" / "src" / "verbs" / "mcp.mjs"
+
+
+def _install_docs(site: Path, consumer: Path, version: str = VERSION) -> Path:
+    """The DOCS package the segment indexes (manifest `content`), installed on
+    both registries: `acme_docs/docs/*.md` beside a `.dist-info`, and
+    `node_modules/acme-docs/docs/*.md` beside a `package.json`. Returns the
+    Python package root."""
+    py = site / DOCS_IMPORT
+    shutil.copytree(FIXTURE / "docs", py / "docs")
+    info = site / f"{DOCS_IMPORT}-{version}.dist-info"
+    info.mkdir(parents=True)
+    (info / "METADATA").write_text(f"Metadata-Version: 2.1\nName: {DOCS}\nVersion: {version}\n", encoding="utf-8")
+    npm = consumer / "node_modules" / DOCS
+    shutil.copytree(FIXTURE / "docs", npm / "docs")
+    (npm / "package.json").write_text(json.dumps({"name": DOCS, "version": version}), encoding="utf-8")
+    importlib.invalidate_caches()
+    return py
+
+
+@pytest.fixture
+def pinned(consumer, segment):
+    """The consumer with the index pinned and inflated, and the docs installed."""
+    _declare(consumer, _pin_row(plugins.segment_digest(segment)))
+    segments.inflate_all(consumer)
+    docs = _install_docs(Path(sys.path[0]), consumer)
+    return consumer, docs
+
+
+def _segment_records(root: Path) -> dict:
+    """A segment's records, read directly from its inflated repository layout —
+    the way every root-keyed reader opens a pinned package."""
+    from fux.store import read_index
+
+    return read_index(segments.segment_dir(root, plugins.indexes(root)[NAME]))
+
+
+def _location(loc: str) -> str:
+    return f"pkg:{DOCS}@{VERSION}#{loc}"
+
+
+def test_a_segment_hit_names_the_docs_package_and_the_index_package(pinned):
+    from fux.acquire import pkgsrc
+
+    root, _ = pinned
+    seg = pkgsrc.segment(plugins.indexes(root)[NAME])
+    assert seg.content == pkgsrc.Content(version=VERSION, npm=DOCS, pypi=DOCS)
+    records = _segment_records(root)
+    assert records
+    for doc_id, record in records.items():
+        assert doc_id.startswith("file:")  # the record id is unchanged
+        assert pkgsrc.hit_fields(doc_id, record["loc"], seg) == {"location": _location(record["loc"]), "package": NAME}
+    assert pkgsrc.hit_fields("file:docs/own.md", "docs/own.md") == {"location": "file:docs/own.md", "package": None}
+
+
+def test_fux_passage_reads_a_package_file_in_place_with_its_fresh_sha(pinned):
+    from fux import mcp
+    from fux.acquire import pkgsrc
+    from fux.store import content_sha
+
+    root, docs = pinned
+    for record in _segment_records(root).values():
+        location = _location(record["loc"])
+        installed = docs / record["loc"]
+        got = mcp._passage(root, {"path": location})
+        assert got["text"] == "\n".join(installed.read_text(encoding="utf-8").splitlines())
+        # the fresh sha is the ledger hash of the INSTALLED bytes -- and so equals
+        # the sha the segment's record was indexed at
+        assert got["sha"] == content_sha(installed.read_bytes()) == record["sha"]
+        assert pkgsrc.read(root, location).path == installed.resolve()  # read in place, never a copy
+    one = mcp._passage(root, {"path": _location("docs/glossary.md"), "line_start": 1, "line_end": 1})
+    assert one["text"] == (docs / "docs" / "glossary.md").read_text(encoding="utf-8").splitlines()[0]
+
+
+@pytest.mark.parametrize("fragment", ["../../etc/passwd", "docs/../../x", f"../{IMPORT}/fux-index.json", "/etc/passwd"])
+def test_a_traversal_out_of_the_docs_package_is_refused_after_collapse(pinned, fragment):
+    from fux import mcp
+
+    root, _ = pinned
+    with pytest.raises(FuxError) as caught:
+        mcp._passage(root, {"path": _location(fragment)})
+    assert str(caught.value) == f"'{_location(fragment)}' resolves outside {DOCS}@{VERSION}"
+
+
+def test_another_installed_docs_version_is_refused_naming_both_and_the_install_line(consumer, segment):
+    from fux import mcp
+
+    _declare(consumer, _pin_row(plugins.segment_digest(segment)))
+    _install_docs(Path(sys.path[0]), consumer, version="1.0.1")
+    with pytest.raises(FuxError) as caught:
+        mcp._passage(consumer, {"path": _location("docs/glossary.md")})
+    text = str(caught.value)
+    assert f"{DOCS} 1.0.1 is installed" in text and f"indexes {DOCS} {VERSION}" in text
+    assert f"pip install {DOCS}=={VERSION}" in text
+
+
+def test_a_missing_docs_package_an_unpinned_one_and_a_malformed_location_are_refused(consumer, segment):
+    from fux.acquire import pkgsrc
+
+    _declare(consumer, _pin_row(plugins.segment_digest(segment)))
+    with pytest.raises(FuxError, match=f"{DOCS} is not installed.*pip install {DOCS}=={VERSION}"):
+        pkgsrc.read(consumer, _location("docs/glossary.md"))
+    with pytest.raises(FuxError, match="which no pinned index package describes"):
+        pkgsrc.read(consumer, f"pkg:{DOCS}@9.9.9#docs/glossary.md")
+    for bad in (f"pkg:{DOCS}#docs/glossary.md", f"pkg:{DOCS}@{VERSION}", f"pkg:@{VERSION}#x"):
+        with pytest.raises(FuxError, match="is not a pkg: location"):
+            pkgsrc.read(consumer, bad)
+
+
+def test_the_refer_plane_reads_a_pkg_location_locally(pinned):
+    from fux.acquire import source
+
+    root, docs = pinned
+    location = _location("docs/rollback.md")
+    got = source.fetch_document(root, location, "docs/rollback.md")
+    want = (source.PKG, "docs/rollback.md", (docs / "docs" / "rollback.md").read_bytes())
+    assert (got.strategy, got.loc, got.content) == want
+    assert source.PKG in source.LOCAL and source.from_acquired(root, location, "docs/rollback.md") is None
+
+
+def test_verbs_that_read_only_the_repository_refuse_a_pkg_location_by_name(pinned):
+    from fux import correct, mcp
+    from fux import graph as graph_mod
+    from fux.inspect import xray
+
+    root, _ = pinned
+    location = _location("docs/glossary.md")
+    for call, verb in (
+        (lambda: correct._resolve(root, location), "fux correct"),
+        (lambda: graph_mod._resolve_doc(root, location), "the graph"),
+        (lambda: mcp._related(root, {"path": location}), "fux_related"),
+        (lambda: xray.document(root, None, location), "fux inspect"),
+    ):
+        with pytest.raises(FuxError) as caught:
+            call()
+        assert str(caught.value) == (
+            f"'{location}' is a pkg: location, and {verb} reads only this repository's own documents"
+            " - a pinned package's file is read with fux_passage"
+        )
+
+
+def _passage_both(root: Path, path: str) -> tuple[dict, dict]:
+    from fux import mcp
+
+    message = {"jsonrpc": "2.0", "id": 1, "method": "tools/call",
+               "params": {"name": "fux_passage", "arguments": {"path": path}}}
+    py = mcp._handle(root, message, top=5, max_headings=3)["result"]
+    node = _node(
+        f"import {{ handle }} from {json.dumps(MCP_MJS.as_uri())};"
+        f"console.log(JSON.stringify(handle(process.cwd(), {json.dumps(message)}, 5, 3).result));",
+        root,
+    )
+    return py, node
+
+
+@pytest.mark.skipif(not HAS_NODE, reason="node is not on PATH")
+def test_python_and_node_read_the_same_package_passage_and_refuse_alike(pinned):
+    root, _ = pinned
+    for record in _segment_records(root).values():
+        py, node = _passage_both(root, _location(record["loc"]))
+        assert py["structuredContent"] == node["structuredContent"]
+        assert py["structuredContent"]["sha"] == record["sha"]
+    for bad in (_location("docs/../../x"), _location("docs/absent.md"), f"pkg:{DOCS}@9.9.9#x", "pkg:nothing"):
+        py, node = _passage_both(root, bad)
+        assert py["isError"] and node["isError"]
+        assert py["content"][0]["text"] == node["content"][0]["text"]
+
+
+@pytest.mark.skipif(not HAS_NODE, reason="node is not on PATH")
+def test_python_and_node_refuse_a_drifted_docs_package_alike(consumer, segment):
+    _declare(consumer, _pin_row(plugins.segment_digest(segment)))
+    _install_docs(Path(sys.path[0]), consumer, version="1.0.1")
+    py, node = _passage_both(consumer, _location("docs/glossary.md"))
+    want = py["content"][0]["text"].replace(f"pip install {DOCS}=={VERSION}", f"npm install {DOCS}@{VERSION}")
+    assert node["content"][0]["text"] == want

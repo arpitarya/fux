@@ -1542,6 +1542,9 @@ def build_answer(root: Path, args) -> AnswerBuilt:
         root, args.query, ANSWER_TOP, force_scan=_force_scan(args), tune=tune,
         confidence_out=signals, expand=_expand_of(args), related_out=related,
         use_tune=True,
+        # W-300 + W-301: `answer` ranks the merged corpus at `[scope] default`;
+        # a package winner is referred at its `pkg:` location (`_answer_via_refer`).
+        scope=fixed("scope", "default"),
     )
     block = signals.get("confidence")
     if block is None:
@@ -1606,8 +1609,8 @@ def build_answer(root: Path, args) -> AnswerBuilt:
             return built(payload, block=upgraded, extra=extra, bundle=referred)
 
     extra = _provenance_for(root, args, None, block, best=best)
-    phrases = _phrases_for(root, best.id)
-    title = _resolve_title(root, best.id, best.title)
+    phrases = _phrases_for(_hit_root(root, best), best.id)
+    title = _resolve_title(_hit_root(root, best), best.id, best.title)
     payload = {
         "answer": {"title": title, "phrases": phrases},
         # ⚠ **No `pinned` key here, deliberately** (W-162). `answer`'s
@@ -1845,11 +1848,24 @@ def _answer_via_refer(
     # fetched bytes and picks a winner; the order here is the tie-break when it
     # cannot separate two candidates, and a document the words found should win
     # that tie against one only a link reached.
+    # W-300 + W-301: a package hit is referred at its `pkg:` location — read
+    # inside the installed docs package — with the sha its own segment indexed.
+    segs: dict = {}
+    if any(getattr(r, "package", None) for r in results):
+        from ..acquire import pkgsrc
+
+        segs = {seg.pin.name: seg for seg in pkgsrc.segments(root)}
     for result in [*results, *(related or [])]:
-        record = _record_for(root, result.id)
+        package = getattr(result, "package", None)
+        record = _record_for(_hit_root(root, result), result.id)
         if record is None:
             continue
-        citations.append((result.id, result.loc, record["sha"]))
+        doc_id = result.id
+        if package is not None:
+            from ..acquire import pkgsrc
+
+            doc_id = pkgsrc.location(segs[package], result.loc)
+        citations.append((doc_id, result.loc, record["sha"]))
     if not citations:
         return None
     return answer_via_refer(

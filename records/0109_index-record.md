@@ -6,11 +6,12 @@ title: SR-RECORD (0109) — one line of the committed index, property by propert
 description: What every property of a committed JSONL record is for, why it is in the committed plane at all, and the ones that are conditional.
 status: accepted
 date: 2026-08-18
+amended: 2026-10-25
 feature: the committed record schema — `fux.index.v2`
 owns: [src/fux/schemas/index-record.schema.json@58adc06eb3c2]
 laws: [L3, L4, ex-L5, L6]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: bda9fe54b042d4fc2333a5908e6bea9d97dad2dab363c36cbfdc00b3dd8ac517
+content_sha: 1fd73134d998036c53d3d3781f7a9e922523900e0de1d4b3661167f4628f563b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -216,7 +217,7 @@ refactor.**
 
 | property | purpose |
 |---|---|
-| `id` | the primary key, and the shard input. `file:<path>` or `url:<url>`; the prefix is the namespace, so two sources cannot collide |
+| `id` | the primary key, and the shard input. `file:<path>` or `url:<url>`; the prefix is the namespace, so two sources cannot collide. **`pkg:<docs package>@<version>#<path>` is NOT a record id** (W-301): it is the *location* the read plane composes for a record of a pinned index segment, whose own id stays `file:` ([SR-PKG-INDEX](0166_pkg-index.md) decision 11) — no record ever carries it, and every verb that takes an id refuses it by name or reads it in place |
 | `src` | which adapter owns this document — `"git"` or `"url"`. Determines the default `meta` policy, and who fetches it |
 | `loc` | where to fetch it **in its owning system** — a repo-relative path, or the URL itself. Not a local path: the refer plane needs the address the *source* understands |
 

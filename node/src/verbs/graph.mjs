@@ -34,6 +34,7 @@ import { runQuery } from "../query/run.mjs";
 import { loadTune } from "../config/tune.mjs";
 import { FuxError } from "../errors.mjs";
 import { fixed } from "../config/constants.mjs";
+import { refuse as refusePkg } from "../refer/pkgsrc.mjs";
 
 const JSON_INDENT = fixed("json", "indent");
 
@@ -41,6 +42,8 @@ const JSON_INDENT = fixed("json", "indent");
  *  A user reads `docs/a.md` out of `find` and types it back; requiring the
  *  prefix would make the two verbs disagree about what a document is called. */
 function resolveDoc(given) {
+  // W-301: the graph is this repository's; a `pkg:` location is refused by name.
+  refusePkg(given, "the graph");
   if (given.startsWith("file:") || given.startsWith("url:") || given.startsWith(TAG_PREFIX)) {
     return given;
   }

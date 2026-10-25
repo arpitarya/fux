@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-24
 date: 2026-09-27
 feature: "`src/fux/constants.toml` and its two loaders"
-owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@02161a2a3258]
+owns: [node/src/config/constants.mjs@916abe09cc01, src/fux/constants.py@e3b8a65f5c07, src/fux/constants.toml@7d07f83e3f9d]
 laws: [L10, L12]
 timestamp: 2026-09-27T00:00:00Z
-content_sha: 1551663df12583c60f0339cb3e1936513943f0cbab356b86c0856ae9c1689ed8
+content_sha: 0268b3c23614bfdb96613cb3e88071c64946636b46667b9da47a402e40d3afbc
 ratifies: "W-225 — Arpit, 2026-09-27: fixed values go to 'another internal-to-code file for the rest of the values like SCHEMA, RULES_VERSION'; on the R5 scan the same day, a number fixed by a file format, protocol or algorithm is a fixed value too (R7)"
 ---
 
@@ -211,6 +211,8 @@ pattern. A consumer who wants other cues is I2, which is not built.
 **New fixed values, no decision moved** (W-300, 2026-10-25): `[scope]` — `repo`, `packages`, `all` and `default = "all"`, the merged query's three values and the default `fux ask --scope` and `fux_search`'s `scope` resolve to ([SR-PKG-INDEX](0166_pkg-index.md) decision 10, Arpit 2026-10-25). Both planes read it.
 
 **No decision here moved** (W-292, 2026-10-24): `[bundle] shim_mode` and `[templates] shim` are deleted with the `.fux/fux` shim they described — `fux setup` writes no Node reader any more (Arpit, 2026-10-21, [SR-NODE-SEARCH](0153_node-search.md)). `[bundle] dir` and `shim` stay, now naming what an earlier setup vendored so setup can remove it and doctor can warn; every other `[bundle]` key still feeds the npm bundle.
+
+**No decision here moved** (W-301, 2026-10-25): two tables added for [SR-PKG-INDEX](0166_pkg-index.md) decision 11 — `[pkg_location]` (the `pkg:` scheme and its two separators) and `[pkg_location_refusals]` (one set of words for Python and Node).
 
 ### Consequences
 

@@ -10,6 +10,10 @@
  * in `.fux/enrich/<sha>.md`, indexed as `ctx` by ingest, so both readers see it
  * as ordinary index statistics. **Only the pin needs code**, because a pin is
  * applied at query time rather than at ingest.
+ *
+ * ⚠ **W-301's `pkg:` refusal in `correct.py::_resolve` has nothing to port**:
+ * it guards the writer verb's argument, and Node runs no `fux correct`. Stated
+ * because `tests/test_node_twins.py` asks.
  */
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";

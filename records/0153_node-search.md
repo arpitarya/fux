@@ -8,11 +8,11 @@ status: accepted
 amended: 2026-10-25
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine` and installed by `npm install fux-engine` alone (W-292), and held byte-equal to Python by the third arm of the differential law"
-owns: [node@ba50afbf9b75, src/fux/store/nodebundle.py@4a729b4224cd]
+owns: [node@2ecb2aa9e9ad, src/fux/store/nodebundle.py@4a729b4224cd]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1. Arpit, 2026-10-21 (W-292) — the Node reader installs from npm only, superseding 13, 15 and 16 and narrowing 14"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 916e83943af610067755f09d62c7e9b8d2f57899272b5378d66e7341bf905bb2
+content_sha: 5a2b3cea8b8028e69eebeb3223e7325674fbe1de675d41fe5b7b0ada36f1c310
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1134,8 +1134,8 @@ pinned segment is scanned through its own `Shards`, from its own runtime directo
 the merged query never reads `--fast`'s plane, as in Python. `rank.mjs` copies a
 candidate's `package` onto the hit after `section`, and `ask` / `fux_search` read a
 package hit's record from its segment (`segments.mjs::rootFor`). `fux ask --scope`
-and `fux_search`'s `scope` default to `[scope] default`; `lexical` and `answer`
-pass none. **Held equal** by `tests/test_pkg_merged_query.py` — `runQuery`,
+and `fux_search`'s `scope` default to `[scope] default`; `lexical` passes none; `answer` ranks at `[scope] default` and hands `obtain` a
+record whose `id` is the hit's `pkg:` location (W-301). **Held equal** by `tests/test_pkg_merged_query.py` — `runQuery`,
 `fux ask --json` and `fux_search` against Python over the repository plus the
 fixture segment, at every scope: ids, `package` and order exactly, scores at
 decision 1's `round(9)` (this fixture's `n = 3` is one of the inputs where

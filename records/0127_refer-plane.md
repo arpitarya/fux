@@ -6,11 +6,12 @@ title: "SR-REFER (0127) — the refer plane: fetch from the source, verify by co
 description: "Fux still does not fetch — the refer plane reuses the consumer-fetcher contract. Freshness is verified by content sha rather than by age. The answer limit is a byte budget, not k. A table row is scored by row and by column behind one key, shipped off (decision 28)."
 status: accepted
 date: 2026-08-20
+amended: 2026-10-25
 feature: the refer plane — fetch, verify, chunk, re-score, assemble
-owns: [src/fux/refer@61bedbf508d1, tools/refer-bench@971d72542a1f, tools/refer-budget-sweep@da100abfb8a5, node/src/refer/assemble.mjs@c87a7a3594a7, node/src/refer/rescore.mjs@eb08cb7e6d28, node/src/refer/source.mjs@b525f684aede, src/fux/acquire/source.py@da0d26931219]
+owns: [src/fux/refer@b49ff447327e, tools/refer-bench@971d72542a1f, tools/refer-budget-sweep@da100abfb8a5, node/src/refer/assemble.mjs@c87a7a3594a7, node/src/refer/rescore.mjs@eb08cb7e6d28, node/src/refer/source.mjs@4e34e6af732c, src/fux/acquire/source.py@c17e179f4853]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 327ddc6186da5d448022a75b6fc584a3e18a623c0992916dcb800d790a342f46
+content_sha: bdd5222bcef6371b08a64785596d9a9acfa2cb94aee8a4a656e373d7dfa3799c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -679,6 +680,23 @@ Found by that run's G0 gate on 2 of 102 questions, before any endpoint existed.
 **No decision here moved** (W-253, 2026-10-04): A bare-`str` fetcher return is refused at verify time too (`_unpack` is shared with ingest), per [SR-FETCHER](0117_fetcher.md) decision 2.
 
 **No decision here moved** (W-254, 2026-10-04): `refer/__init__.py` passes the undecoded flag to the chunker (decision 23, one clause added).
+
+**29. A third id scheme, `pkg:`, read locally like `file:`** (W-301, 2026-10-25;
+the mechanism is [SR-PKG-INDEX](0166_pkg-index.md) decision 11). A document a
+pinned index segment indexed is addressed `pkg:<docs package>@<version>#<path>`
+and `acquire/source.py::resolve` gives it the strategy `PKG`. **`LOCAL = (GIT,
+PKG)`** is the set of strategies that read this machine's own files, and every
+branch of `_obtain` and `_readable` that used to ask *is this `GIT`?* now asks *is
+this local?*: a `pkg:` read happens under the `never` policy (decision 7's
+reason — reading what is installed is not going out), is never TTL-cached, never
+consults `.fux/acquired/`, is decoded by its suffix and chunked with
+frontmatter, and never marks a URL dirty. The bytes are read **in place**
+inside the installed package (L3) and hashed with `content_sha`, which is what
+the segment's record carries, so decision 5's comparison holds unchanged. The
+one containment function is `source.py::contain` (Node `source.mjs::contain`),
+shared with `fux_passage` ([SR-MCP](0136_mcp.md) decision 7). Node's `answer`
+reads a `pkg:` location through `refer/pkgsrc.mjs::readPackage`, declining a
+type it cannot decode exactly as it does a `file:`.
 
 ### Consequences
 

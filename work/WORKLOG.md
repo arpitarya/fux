@@ -24,12 +24,26 @@ play: the worklog is the granular, per-exchange trail.
 ```
 
 
+## 2026-10-25 — W-299 + W-302 finished and committed; W-300 + W-301 started in parallel  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"commit everything and implement everything that is green then the yellow ones everything in parallel and close it out"*; then *"implement W300, W301 while the unit tests are being executed"*.
+- **Found:** the tree held W-299/W-302 half-built by f7e74b47 (idle 2.5 h) and red: a Node import cycle (`build.mjs` ↔ `segments.mjs`), `plugins.problems()` had lost the dependency check inside the new index loop, L12 literals, SR-PKG-INDEX with empty `owns:`/hash, sibling records unamended, and the Cowork W-298 run filed without Verdict front matter, per-query `.jsonl` rows, a pre-registration pointer or a register row. `test_agent_hooks`' ledger fixture copied live NOW.md rows, so it failed whenever another session was running.
+- **Done:** all of the above fixed; records amended (SR-PLUGINS, SR-DOCTOR, SR-WORK-SCALE d16, SR-DOTFUX, SR-T1-ACCELERATOR); committed `9688d479` together with the remote session's README work and W-293's close. W-299 closed and archived; W-302 left on step 5. W-300 and W-301 handed to two Opus agents in separate worktrees.
+- **Next:** merge both branches, wire W-301's location onto W-300's merged hits, both suites, W-302 step 5, close all three.
+
 ## 2026-10-25 — README repositioned for sales and marketing; `docs/how-fux-is-used.md` created  ·  Claude Code remote (Fable 5.1)
 
 - **Asked:** *"I want the Fox README document to be created for sales and marketing purposes. Create a separate document on how it is going to be used … comparing it with grep RG makes sense. Comparing it with VectorDB RAG might not be the best way to go … if somebody wants to use it just as a search algorithm, that will also work. It is somewhat like how Google does it … we filed a work item where packages will have its own optional Fox index … add that in there as well, maybe write a story on how Fox can be used. I linked sheet pane in there."*
 - **Done:** `README.md` rewritten in place — Google-index lede, *Who searches it* (five ways in), `grep`/`rg` vs fux only, §Packages that ship their own index (marked in build, W-299…W-302; sheetpane and codelaw; the 19/20 spike), 5.0.0 facts (decoder packages released; the stale *next release* note and the *In 4.1* paragraph gone), L14 in the laws block, two new FAQ answers (no AI needed; not a vector database). New `docs/how-fux-is-used.md` (type Guide): five stories, *What fux is not*, *How to describe it*. Registry rows, `docs/index.md`, CHANGELOG `[Unreleased]`.
 - **Found:** two live Claude Code sessions (f7e74b47, e2598401) hold uncommitted W-299/W-302 work in this tree, so **nothing was committed** — the four files above are left for Arpit to stage by pathspec. The README's old *Coming in the next release* note described 5.0.0 as unreleased on the day it shipped. `fux ingest --check` exits 0 whether or not anything drifted (SR-INGEST decision 21); the story doc says a pipeline reads its report, not its exit code.
 - **Next:** when W-299…W-302 land, flip Story 4 and the README's package section from *in build* to released and replace the illustrative `pkg:` transcript with a real run.
+
+## 2026-10-25 — waited for W-299, then stood down: W-300 + W-301 belong to 4aad6236  ·  Claude Code (Opus 5.5)
+
+- **Asked:** *"continue"*: picked up as "build W-300 and W-301 once W-299 lands".
+- **Found:** W-299 and W-302 landed in 9688d479. Session 4aad6236 (from 15:30) claims W-300 + W-301 next in its NOW row, so a second builder in the same tree would collide (SR-WORK-NOW d2, SR-WORK-SESSION d10).
+- **Done:** nothing changed in code. NOW row and this entry only.
+- **Next:** 4aad6236 builds W-300 and W-301. W-281 DoD 5 waits for an idle machine.
 
 ## 2026-10-25 — "implement all the green items": triage found none closable by this session  ·  Claude Code (Opus 5.5)
 

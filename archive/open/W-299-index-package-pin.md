@@ -16,14 +16,14 @@ ball: agent
 
 | step | what we do | what it gives us | state |
 |---|---|---|---|
-| 0 | Write **SR-PKG-INDEX** (`proposed` → `accepted` on the five rulings below): the segment, its manifest, the pin, the merged query, `pkg:` locations, the publish path | one record the four items cite; L0 satisfied before code | ⏳ |
-| 1 | `.fux/config/plugins.toml` learns a `kind = "index"` row: `name`, `version`, `digest`, `npm`, `pypi`. Refused by name: unknown key, duplicate, a `suffixes` key on an index row | the pin is committed, so two machines search the same thing | ⏳ |
-| 2 | Digest = `sha256:` over the **segment files only** (`index/*.jsonl`, `identifiers.toml`, `fux-index.json`) in P4's RECORD-line form — never the whole wheel or tarball | one digest covers both registries; reproducible from the same docs (L4) | ⏳ |
-| 3 | Locate by module resolution — `importlib.util.find_spec` / Node `createRequire(root).resolve` — never a path. Missing, other version, no digest, drifted bytes → `FuxError` naming the package and the install line (P4, verb-wide) | no silent fallback to whatever is installed (P3) | ⏳ |
-| 4 | Verify the segment header against the reader's (`_format`, `analyzer`, `tf_fields`); refuse a foreign segment by name. `identifiers` digest MAY differ (W-300 handles it) | lockstep compatibility, as ruled | ⏳ |
-| 5 | Inflate into `.fux/runtime/pkg/<name>@<version>/` (derived, gitignored, keyed on the pin digest) — the same builder that fills `.fux/runtime/` for the repo; Node reads and builds it too (W-242) | the segment is query-fast on both runtimes | ⏳ |
-| 6 | `fux setup --pin` re-pins index rows from what is installed; `fux doctor` gains `index packages` rows and reports the **merged** document count against the 10 000 ceiling | the after-upgrade act stays deliberate; the ceiling is visible | ⏳ |
-| 7 | Both suites; a differential test that Python and Node resolve, verify and refuse identically | done means done on both planes | ⏳ |
+| 0 | Write **SR-PKG-INDEX** (`proposed` → `accepted` on the five rulings below): the segment, its manifest, the pin, the merged query, `pkg:` locations, the publish path | one record the four items cite; L0 satisfied before code | ✅ |
+| 1 | `.fux/config/plugins.toml` learns a `kind = "index"` row: `name`, `version`, `digest`, `npm`, `pypi`. Refused by name: unknown key, duplicate, a `suffixes` key on an index row | the pin is committed, so two machines search the same thing | ✅ |
+| 2 | Digest = `sha256:` over the **segment files only** (`index/*.jsonl`, `identifiers.toml`, `fux-index.json`) in P4's RECORD-line form — never the whole wheel or tarball | one digest covers both registries; reproducible from the same docs (L4) | ✅ |
+| 3 | Locate by module resolution — `importlib.util.find_spec` / Node `createRequire(root).resolve` — never a path. Missing, other version, no digest, drifted bytes → `FuxError` naming the package and the install line (P4, verb-wide) | no silent fallback to whatever is installed (P3) | ✅ |
+| 4 | Verify the segment header against the reader's (`_format`, `analyzer`, `tf_fields`); refuse a foreign segment by name. `identifiers` digest MAY differ (W-300 handles it) | lockstep compatibility, as ruled | ✅ |
+| 5 | Inflate into `.fux/runtime/pkg/<name>@<version>/` (derived, gitignored, keyed on the pin digest) — the same builder that fills `.fux/runtime/` for the repo; Node reads and builds it too (W-242) | the segment is query-fast on both runtimes | ✅ |
+| 6 | `fux setup --pin` re-pins index rows from what is installed; `fux doctor` gains `index packages` rows and reports the **merged** document count against the 10 000 ceiling | the after-upgrade act stays deliberate; the ceiling is visible | ✅ |
+| 7 | Both suites; a differential test that Python and Node resolve, verify and refuse identically | done means done on both planes | ✅ |
 
 **Arpit, 2026-10-25 (Cowork), on W-298's forks:** *"plugins.toml, kind = \"index\""*
 for the pin's home (over a `packages:` section in `sources.yaml`); the three open

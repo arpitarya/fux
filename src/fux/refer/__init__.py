@@ -74,7 +74,7 @@ from ..acquire.freshness import (
 )
 from ._rescore import ScoredPassage, rescore
 from ..errors import FuxError
-from ..acquire.source import GIT, Fetched, fetch_document, from_acquired
+from ..acquire.source import LOCAL, Fetched, fetch_document, from_acquired
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from ..tune import Tune
@@ -202,7 +202,7 @@ def refer(
                     text,
                     **tune.chunk_bounds(),
                     line_numbers=not generated,
-                    frontmatter=not generated and result.strategy == GIT,
+                    frontmatter=not generated and result.strategy in LOCAL,
                 ),
             )
         )
@@ -260,7 +260,7 @@ def _readable(root: Path, result) -> tuple[str, bool]:
     exists nowhere on disk. `_rescore.locator` falls back to `path#p3`, and the
     passage's heading travels beside it in the citation.
     """
-    if result.strategy != GIT:
+    if result.strategy not in LOCAL:
         return result.content.decode("utf-8", errors="replace"), False
     try:
         decoded = _decode_bytes(result.content, result.loc, root)
@@ -438,10 +438,10 @@ def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fe
     refusing it would make `--audit` unable to quote the very repository it is
     auditing. What `never` forbids is going *out*.
     """
-    from ..acquire.source import GIT, resolve
+    from ..acquire.source import LOCAL, resolve
 
     strategy = resolve(doc_id)
-    if strategy != GIT and not decision.fetch:
+    if strategy not in LOCAL and not decision.fetch:
         # Policy forbids going out -- but if the bytes this record was built
         # from are on disk, comparing against them is a REAL comparison and
         # strictly more than `unverified` has ever been able to say.
@@ -458,7 +458,7 @@ def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fe
     # `file:` read is free and always available, so caching it would add a
     # staleness window in exchange for nothing.
     ttl = _effective_ttl(loc, policy, ttls or {})
-    if strategy != GIT and policy.caches and ttl > 0 and fetch_cache is not None:
+    if strategy not in LOCAL and policy.caches and ttl > 0 and fetch_cache is not None:
         entry = fetch_cache.get(loc, ttl)
         if entry is not None:
             age = entry.age_seconds(fetch_cache.now())
@@ -515,6 +515,6 @@ def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fe
     # "never serve this from a cache", and a copy that is written but never
     # read is a copy of an access-controlled document sitting on disk for no
     # benefit at all.
-    if strategy != GIT and policy.caches and ttl > 0 and fetch_cache is not None:
+    if strategy not in LOCAL and policy.caches and ttl > 0 and fetch_cache is not None:
         fetch_cache.put(loc, result.sha, result.content)
     return result, Cited(doc_id, loc, verify(indexed_sha, result.sha), strategy)

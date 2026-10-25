@@ -8,10 +8,10 @@ status: accepted
 amended: 2026-10-25
 date: 2026-08-18
 feature: the `fux` command-line interface — every verb, its flags, its exit codes and its `--json` shape
-owns: [src/fux/cli.py@2cbe5c299826, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@66d281d37048, src/fux/progress.py@e5f2459288d5, tests_e2e@ceea0c6cb3bc, node/fux.mjs@a5599ee390b3, src/fux/stdio.py@9e270b49bdaa]
+owns: [src/fux/cli.py@0149fc8ac950, src/fux/__main__.py@0a1638c56e7b, src/fux/sources.py@66d281d37048, src/fux/progress.py@e5f2459288d5, tests_e2e@18b3478ea30d, node/fux.mjs@a5599ee390b3, src/fux/stdio.py@9e270b49bdaa]
 laws: [L2, L5, L7]
 timestamp: 2026-08-18T00:00:00Z
-content_sha: d20f50880889685cf7c0fb7d81c4870a557c17e79479c841b2be4e00a2955154
+content_sha: e8bae58385eacb53644012368d2cd98bf0d76334a93d45c0e1119ad5b3e8a27a
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -288,7 +288,8 @@ way to `setup`: by writing nothing rather than by creating the root.
 is read-only on the repository** (W-302, Arpit 2026-10-25, Fork B). `fux pack
 <outdir> --content NAME@VERSION [--npm NAME] [--pypi NAME]` copies the
 committed shards and the `identifiers.toml` in force into `<outdir>` and writes
-`fux-index.json` beside them; it ingests nothing, fetches nothing and writes
+`fux-index.json` beside them. **It ships in the writer layer** (`fux.ingest.pack`,
+beside `fux ingest`), so a reader-only or core-only install lists no `pack`. It ingests nothing, fetches nothing and writes
 nothing under `.fux/` (a `<outdir>` inside `.fux/` is refused). It is gated like
 any index-reading verb — the PII and plugin gates run, `PLUGINS_EXEMPT` does not
 name it. **Exit codes under decision 5:** `0` packed; `1` for every refusal, each

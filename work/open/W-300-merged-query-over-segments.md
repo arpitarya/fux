@@ -6,7 +6,7 @@ item: W-300
 filed: 2026-10-25
 filed_by: "Arpit (Cowork, Fable 5.1)"
 updated: 2026-10-25
-updated_by: "Claude Code (Opus 5.5), W-300 build"
+updated_by: "Claude (Claude Code, Opus 5.5)"
 ball: agent
 ---
 

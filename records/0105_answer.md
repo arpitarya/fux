@@ -10,7 +10,7 @@ feature: "`fux answer` — one answer, its footing stated, and the report of wha
 owns: [src/fux/query/refer_answer.py@5068425dc3d7]
 laws: [L2, L3, L4]
 timestamp: 2026-08-21T00:00:00Z
-content_sha: 017e6ed3aeac8b0dbfbf6b46554fa954182bbd7ad9e02205d1b626ea30f1677a
+content_sha: a4eb793d3fe2f2ba84e3ea04281a08fdf2fb56862f9e630154d13ed9f305dc5b
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -543,6 +543,18 @@ The question `fux answer` ranks is analyzed with the repo's identifier families,
 
 
 **W-236 — section records (2026-10-10; branch `w236-sections`, unmerged).** `answer`'s passages are unchanged. `text/chunk.py` gains `index_sections`, the *index's* section rule beside `_fold`, and `answer` does not call it. A hit's `section` (only while `[ranking] section_weight > 0`) names an index section by ordinal; refer recovers its heading by cutting the fetched bytes the same way ([SR-SECTIONS](0161_sections.md) Consequences).
+
+**`answer` ranks the merged corpus and refers a package winner in place** (W-300 +
+W-301, 2026-10-25; [SR-PKG-INDEX](0166_pkg-index.md) decisions 10–11).
+`build_answer` (Node `answerPayload`) calls `run_query` at `[scope] default`
+(`all`), with no flag: with no pin that is the repository alone, unchanged. A
+candidate ranked from a pinned index package enters the refer plane with its
+`pkg:` location as its `doc_id` (`pkgsrc.location(seg, loc)`, `pkgsrc.segments`
+read once per answer) and the sha its own segment indexed, so the citation names
+the docs package and the passage is read inside the installed package — Node's
+`obtain` is handed a record whose `id` is that location. The index fallback reads
+a package winner's phrases and title from its own segment. Decisions 1–4 (one
+question, three candidates, the refer/index fork) are unchanged.
 
 ### Consequences
 

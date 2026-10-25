@@ -80,6 +80,11 @@ def _resolve_doc(root: Path, given: str) -> str:
     the `file:` prefix would make the two verbs disagree about what a document
     is called.
     """
+    from ..acquire import pkgsrc
+
+    # W-301: the graph is this repository's; a `pkg:` location is refused by
+    # name rather than read as `file:pkg:…`.
+    pkgsrc.refuse(given, "the graph")
     if given.startswith(("file:", "url:", TAG_PREFIX)):
         return given
     return f"file:{given}"

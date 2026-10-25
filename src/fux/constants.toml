@@ -1172,6 +1172,33 @@ drifted       = "{name} {have} has drifted: its segment hashes to {got}, {expect
 manifest      = "{name} {have} is malformed: its {manifest} claims {claimed}, but its segment hashes to {got} - reinstall it: `{install}`"
 foreign       = "{name} {have} is a foreign segment: {shard} has {key} {got_value} where this reader needs {want_value} (lockstep, SR-PKG-INDEX d6) - install the release of {name} packed by this fux version"
 
+# W-301 (SR-PKG-INDEX d11): a hit in a pinned index package is located in the
+# DOCS package its manifest's `content` names -- `pkg:<docs>@<version>#<path>`,
+# the docs package's npm name when it has one, else its PyPI name. `fragment`
+# splits the address from the path inside the package; the LAST `@` before it
+# splits a scoped npm name from its version.
+[pkg_location]
+scheme = "pkg:"
+fragment = "#"
+version_sep = "@"
+
+# What a `pkg:` location is refused with (W-301, SR-PKG-INDEX d11) -- one text for
+# `acquire/pkgsrc.py` and its Node twin (`node/src/refer/pkgsrc.mjs`). `{install}`
+# is the runtime's own install line, `{key}` its registry (`pypi` or `npm`);
+# `refused` is the sentence every verb that reads only the repository's own
+# documents says to a `pkg:` id, by name, instead of reading it as a `file:`.
+[pkg_location_refusals]
+malformed   = "'{location}' is not a pkg: location - it reads pkg:<docs package>@<version>#<path inside the package>"
+not_pinned  = "'{location}' names {name}@{version}, which no pinned index package describes - pin the index package that indexes it in .fux/config/plugins.toml (SR-PKG-INDEX d11)"
+content     = "{index} {index_version} is malformed: its {manifest} `content` must name `npm` and/or `pypi` and a `version` (SR-PKG-INDEX d3)"
+no_registry = "{name}@{version} has no `{key}` name in {index}'s {manifest} `content`, so this runtime cannot read its files"
+missing     = "{name} is not installed, and {index} {index_version} indexes {name} {version} - run `{install}`"
+drifted     = "{name} {have} is installed, but {index} {index_version} indexes {name} {version} - run `{install}`, or pin the index package released for {name} {have}"
+no_root     = "{name} {have} is installed but resolves to no single package directory - reinstall it: `{install}`"
+outside     = "'{location}' resolves outside {name}@{version}"
+not_file    = "'{location}' is not a file in {name}@{version}"
+refused     = "'{given}' is a pkg: location, and {verb} reads only this repository's own documents - a pinned package's file is read with fux_passage"
+
 # SR-WORK-SCALE: the design point, which is a ceiling on what is promised. Since
 # W-299 (SR-PKG-INDEX d9) `fux doctor` counts it against the MERGED corpus --
 # the repository's documents plus every pinned index package's -- and warns above it.

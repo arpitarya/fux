@@ -8,10 +8,10 @@ status: accepted
 date: 2026-10-25
 amended: 2026-10-25
 feature: index packages — a shipped fux index segment, pinned, verified and inflated in both runtimes
-owns: [src/fux/derive/segments.py@b7f3a78a5705, src/fux/schemas/fux-index.schema.json@281aee116429, node/src/derive/segments.mjs@9cf5f4542b9b, node/src/config/plugins.mjs@3735dbe4973d, node/test/plugins-index.test.mjs@10cf624c880c, tests/test_pkg_index.py@df16fe5c2820, tests/fixtures/pkg-index@eb97fc679bf1]
+owns: [src/fux/derive/segments.py@b7f3a78a5705, src/fux/acquire/pkgsrc.py@75d20a3e93b4, node/src/refer/pkgsrc.mjs@c71f169dcae1, src/fux/schemas/fux-index.schema.json@281aee116429, node/src/derive/segments.mjs@9cf5f4542b9b, node/src/config/plugins.mjs@16c05b6509e4, node/test/plugins-index.test.mjs@10cf624c880c, tests/test_pkg_index.py@495426ce6af8, tests/fixtures/pkg-index@2a4c96efba2c, tests/test_pkg_merged_query.py@77103d2f3872]
 laws: [L2, L3, L4, L5, L12]
 timestamp: 2026-10-25T00:00:00Z
-content_sha: 783e17ded8c29a83bd2dd3580d8e09bea072590e1d60e3d4e45e1c2ff057daa8
+content_sha: 9eebdedfa24996e5c3d77fabdcd5f76e349065f14c5db10da66be3ac81249eb9
 ratifies: "Arpit, 2026-10-25 (Cowork), on W-298's forks: 'plugins.toml, kind = \"index\"' for the pin's home; the three open questions accepted as a set — scope = repo|packages|all, default all · wire compat = lockstep · 10k ceiling counts the merged corpus — 'Yes, all three as recommended.' Then: 'file the work items for all.' (W-299, W-300, W-301, W-302)"
 ---
 
@@ -21,7 +21,9 @@ ratifies: "Arpit, 2026-10-25 (Cowork), on W-298's forks: 'plugins.toml, kind = \
 
 - [`node/src/config/plugins.mjs`](../node/src/config/plugins.mjs) · file
 - [`node/src/derive/segments.mjs`](../node/src/derive/segments.mjs) · file
+- [`node/src/refer/pkgsrc.mjs`](../node/src/refer/pkgsrc.mjs) · file
 - [`node/test/plugins-index.test.mjs`](../node/test/plugins-index.test.mjs) · file
+- [`src/fux/acquire/pkgsrc.py`](../src/fux/acquire/pkgsrc.py) · file
 - [`src/fux/derive/segments.py`](../src/fux/derive/segments.py) · file
 - [`src/fux/schemas/fux-index.schema.json`](../src/fux/schemas/fux-index.schema.json) · file
 - [`tests/fixtures/pkg-index/`](../tests/fixtures/pkg-index) · dir
@@ -162,8 +164,8 @@ Python one.
 > own hash. The manifest is therefore outside the digest, and what it could vouch
 > for is checked independently — its `digest` against the computed one, the
 > header against the shards. A manifest edited to carry other `content` or `docs`
-> values verifies; W-301's version check on the docs package (its step 4) is what
-> catches a lying `content.version`.
+> values verifies; W-301's version check on the docs package (its step 4,
+> decision 11, built 2026-10-25) is what catches a lying `content.version`.
 
 **5. Located by module resolution, never by a path.** Python: the PyPI
 distribution's version from `importlib.metadata`, its segment from
@@ -253,19 +255,23 @@ summed, with `scope` choosing the segments. **Built by W-300**, in both runtimes
   The proximity reranker **declines** a package hit (its bytes are not in the
   repository, W-301 reads them in place) and its score passes through. Display
   reads a package hit's own record from its segment (`segments.root_for`).
-- **Who merges.** `fux ask` (`--scope`, default `all`) and `fux_search` (`scope`,
-  default `all`). **Every other verb ranks the repository alone** — `lexical` is
-  the frozen baseline, `answer` refers its winner from the source that owns it
-  (W-301's `pkg:` is what makes a package winner referable), and `find`,
+- **Who merges.** `fux ask` (`--scope`, default `all`), `fux_search` (`scope`,
+  default `all`) and `fux answer` (at `[scope] default`, no flag): a package
+  winner is referred at its decision-11 `pkg:` location — the refer plane's
+  candidate `doc_id` is `pkgsrc.location(seg, loc)`, with the sha the segment
+  indexed — and read inside the installed docs package. **Every other verb ranks
+  the repository alone** — `lexical` is the frozen baseline, and `find`,
   `enrich`, `lsp` call `run_query` with no scope. With no pin, `all` **is** the
   repository alone on the unchanged code path, and `scope = repo` is byte-equal
   to the engine before W-300 — the L13 run's gates G0a–c
   ([`work/regression/2026-10-25-w300-merged-query/`](../work/regression/2026-10-25-w300-merged-query/VERDICT.md)).
-- **A hit names its segment only by `package`**, present on a package hit and
-  absent on a repository hit (so a repository-only payload is byte-equal). Its
-  `id` stays the segment's record id; an id a package shares with the repository
-  is a known hazard of the window's id-keyed stages (`in_window`, `sections`) that
-  W-301's `pkg:` location is what disambiguates.
+- **A hit names its segment by `package`** — on `ask --json` only on a package
+  hit (a repository-only payload is byte-equal); on `fux_search`, decision 11's
+  `location` and `package` on every hit (`pkgsrc.hit_fields` with the hit's
+  segment, `pkgsrc.segments(root)` read once per call). Its `id` stays the
+  segment's record id; an id a package shares with the repository is a known
+  hazard of the window's id-keyed post-rank stages (`in_window`, `sections`) —
+  the hit's `location` is what disambiguates it for a reader.
 
 **The L13 verdict is INCONCLUSIVE → Arpit** (2026-10-25): the table reads PASS
 on the fixture (slice `hit@1` 16–0, nothing outside it moved, every gate
@@ -273,9 +279,59 @@ byte-identical), filed INCONCLUSIVE by the pre-registration's own rule because
 the builder decided its own run (SR-RS d6), golden G0 was not run, and two
 guardrails are unmeasurable on a 9-document fixture.
 
-**11. `pkg:` locations** — a hit in a segment names the docs package from the
-manifest's `content`, and the passage is read inside the installed package.
-**Ratified, built by W-301**, which states its mechanism here when it lands.
+**11. `pkg:` locations — a hit in a segment names the DOCS package, and its
+passage is read inside the installed package** (Arpit, 2026-10-25: *"This looks
+good to me."*; built by W-301). The mechanism is
+[`src/fux/acquire/pkgsrc.py`](../src/fux/acquire/pkgsrc.py), twinned by
+[`node/src/refer/pkgsrc.mjs`](../node/src/refer/pkgsrc.mjs):
+
+- **The manifest's `content` is required** (`npm` and/or `pypi`, and `version` —
+  decision 3; the schema marks it `always` and `pkgsrc` refuses a `content` with
+  neither name or no version by name). It is read off the **verified** segment
+  (`plugins.locate_index` first), and only through `pkgsrc.segment(pin)`.
+- **The location** is `pkg:<docs package>@<content.version>#<the record's loc>` —
+  the npm name when `content` has one, else the PyPI name, so the string is the
+  same in both runtimes (`[pkg_location]`). The record's own `id` stays `file:`
+  ([SR-RECORD](0109_index-record.md)); `pkg:` is composed at render time and
+  never stored. `pkgsrc.hit_fields(id, loc, segment)` is the ONE function that
+  produces a hit's `location` and `package` (the pin's name — the **index**
+  package, for provenance); a repository hit gets its own id and `null`.
+- **Reading one**: parse (the first `#` splits the fragment, the last `@` before
+  it the version, so a scoped npm name survives) → find the pin whose verified
+  `content` names that package at that version, else refused → resolve the docs
+  package **by module resolution from the repository root**, never a path
+  (Python: `importlib.metadata` for the version of `content.pypi` and
+  `find_spec(<normalised name>)` for its one directory, located never imported;
+  Node: `content.npm` through `createRequire(<repo>/package.json)`) → 🔴 **an
+  installed docs version other than `content.version` is a `FuxError` naming
+  both and the install line** (`pip install <pypi>==<version>` / `npm install
+  <npm>@<version>`, printed, never run) — so a lying `content.version`
+  (decision 4's open door) and a hoisted second copy of the docs package are
+  both caught here → join the fragment and contain it with
+  `acquire/source.py::contain`, which collapses `..` **before** the check and
+  holds the address to **its own** package's root (the allowed roots are the
+  repository root ∪ every pinned docs root, and each caller passes the one its
+  address names) → read the file **in place** (L3) and hash it with
+  `content_sha`.
+- ⚠ **The fresh sha is `content_sha`, not `git hash-object`**, a deviation from
+  the item's wording, flagged for Arpit: every `sha` in this engine is the
+  ledger's blake2b ([SR-RECORD](0109_index-record.md)), the segment's record
+  carries that one, and only that one lets the fresh read be compared with the
+  indexed one (SR-REFER decision 5). The test asserts it equals the ledger hash
+  of the installed bytes **and** the segment record's `sha`.
+- **Every verb that reads only the repository's own documents refuses a `pkg:`
+  id by name** (`[pkg_location_refusals] refused`) rather than reading it as
+  `file:pkg:…`: `fux correct`, `fux explain`/`graph`/`path`, `fux inspect`'s
+  document X-ray, and `fux_related`. `fux_passage` and the refer plane accept it
+  ([SR-MCP](0136_mcp.md) decisions 7 and 7a, [SR-REFER](0127_refer-plane.md)
+  decision 29). The refusal texts are one set of words in both runtimes; only
+  the install line and the registry key differ.
+- **Where a merged ranking calls it** (W-300): for a hit whose record came from a
+  segment, `pkgsrc.hit_fields(record_id, loc, seg)` where the hit is rendered
+  (`mcp.py::_search`, `verbs/mcp.mjs::fuxSearch` — both pass `None` today), and
+  `pkgsrc.location(seg, loc)` as the `doc_id` it hands the refer plane
+  (`refer()`'s candidates, Node `answer.mjs::obtain`), with `pkgsrc.segments(root)`
+  computed once per call.
 
 ### Consequences
 
@@ -309,12 +365,15 @@ manifest's `content`, and the passage is read inside the installed package.
 
 ### Reference (required)
 
-- [`work/open/W-299-index-package-pin.md`](../work/open/W-299-index-package-pin.md)
 - [`work/open/W-300-merged-query-over-segments.md`](../work/open/W-300-merged-query-over-segments.md)
 - [`work/regression/2026-10-25-w300-merged-query/VERDICT.md`](../work/regression/2026-10-25-w300-merged-query/VERDICT.md)
+- [`archive/open/W-299-index-package-pin.md`](../archive/open/W-299-index-package-pin.md) (closed 2026-10-25)
   — the ruling quoted above and the steps this record states.
 - [`src/fux/plugins.py`](../src/fux/plugins.py) — the row, the digest, the checks.
 - [`src/fux/derive/segments.py`](../src/fux/derive/segments.py) — the inflation.
+- [`work/open/W-301-pkg-locations-read-in-place.md`](../work/open/W-301-pkg-locations-read-in-place.md)
+  — decision 11's ruling and steps.
+- [`src/fux/acquire/pkgsrc.py`](../src/fux/acquire/pkgsrc.py) — the `pkg:` location, its reader and its refusals.
 
 ### Veto condition
 
@@ -324,8 +383,12 @@ manifest's `content`, and the passage is read inside the installed package.
    differs from the pin.**
 2. **Python and Node disagree** on whether a pin verifies, or on the refusal's text.
 3. **The same pin inflates to different bytes** in Python and in Node.
+4. **A `pkg:` location is read outside its own docs package's root**, from a docs
+   package installed at another version than the manifest's `content.version`, or
+   from anything but the installed file itself (a copy) — or Python and Node
+   return different bytes, sha or refusal text for one location.
 
-4. **A merged query scores a segment it did not verify**, or answers
+5. **A merged query scores a segment it did not verify**, or answers
    `scope = repo` with anything but the engine's repository-alone bytes.
 
 **How to check it:** `.venv/bin/python -m pytest -q tests/test_pkg_index.py
@@ -340,7 +403,7 @@ tests/test_pkg_merged_query.py` and `node --test node/test/plugins-index.test.mj
 document is never listed here — the body may name one, but archive is not
 evidence.*
 
-**Records** — [SR-PLUGINS](0165_plugins.md) · [SR-DOTFUX](0102_fux-directory.md) · [SR-WORK-SCALE](0057_WORK-scale.md) · [SR-DOCTOR](0152_doctor.md)
+**Records** — [SR-PLUGINS](0165_plugins.md) · [SR-DOTFUX](0102_fux-directory.md) · [SR-WORK-SCALE](0057_WORK-scale.md) · [SR-DOCTOR](0152_doctor.md) · [SR-RECORD](0109_index-record.md) · [SR-MCP](0136_mcp.md) · [SR-REFER](0127_refer-plane.md)
 
 **Code**
 
@@ -355,7 +418,10 @@ evidence.*
 - [`src/fux/query/scan.py`](../src/fux/query/scan.py)
 - [`node/src/query/run.mjs`](../node/src/query/run.mjs)
 - [`tests/test_pkg_merged_query.py`](../tests/test_pkg_merged_query.py)
+- [`src/fux/acquire/pkgsrc.py`](../src/fux/acquire/pkgsrc.py)
+- [`node/src/refer/pkgsrc.mjs`](../node/src/refer/pkgsrc.mjs)
 
 **Project docs**
 
-- [`work/open/W-299-index-package-pin.md`](../work/open/W-299-index-package-pin.md)
+- [`archive/open/W-299-index-package-pin.md`](../archive/open/W-299-index-package-pin.md) (closed 2026-10-25)
+- [`work/open/W-301-pkg-locations-read-in-place.md`](../work/open/W-301-pkg-locations-read-in-place.md)
