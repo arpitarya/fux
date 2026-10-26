@@ -1,0 +1,36 @@
+{
+  "files": {
+    ".claude/hooks/block-main.py": "d770a5aa497998e6c4973b4f26a14c2d1967a9c9da87e6aec733e34db6e9ca12",
+    ".claude/hooks/claim-guard.py": "08638d6960bffcfb1f9a3a9c6b36812761cc3339fd22648a95c5e53a755dc5e3",
+    ".claude/hooks/disk-budget.py": "56ac3beaf5cbff2e17acae976d45d8eee5be3fedeb7a62507167ccd408d324cc",
+    ".claude/hooks/guard-open-work-inbox.sh": "2100bea49ebe037c7c0b35cedef6c4a2f5e8189c4ea3e7d76e7292e44737d10c",
+    ".claude/hooks/inject-inbox.sh": "091a13576448241782ae330d03ee5afbdc34e8fd46b7494c51a91acbda282a1b",
+    ".claude/hooks/now-ledger.py": "2cb11ab07e18aea86da2de98c1635ab2b6b8f887397691b74d4ad674dbf12151",
+    ".claude/hooks/release-locks.sh": "da32d663fae1edd12dd3b26d7744f6f062af80c3e53f4882490162cc25d7d659",
+    ".claude/hooks/require-progress.sh": "1f18eb786a477a21c0b27fa3abb95a27d78d157be339a6f8ef64398ca76a7d29",
+    ".claude/hooks/session-lock.sh": "febe0bec484001ae2a10f0133da2e830a1ecbe161a6509a2646bd1ce0a2283f8",
+    ".claude/hooks/stop-if-blocked.sh": "18f8fdbe8ca93dfc2008a4f73ac7cd04ef6bc780ae8899b680ee3f4fa1281c45",
+    ".claude/hooks/worktree-cleanup.py": "cdaeb8a416068f21d32ebc3b6e860bd62710729b91a78fdcc4a0b1388ef55c40",
+    ".claude/skills/docket/SKILL.md": "bb5a3a52501a78e43bf6da5ca830bd7a875496fc19274a394b66dc3521b4a7e8"
+  },
+  "kit": "25f18c0786a381d3ec91a555678dd7e17d183ee4316911630738e161de4e5f90",
+  "settings": [
+    "$CLAUDE_PROJECT_DIR/.claude/hooks/guard-open-work-inbox.sh",
+    "$CLAUDE_PROJECT_DIR/.claude/hooks/inject-inbox.sh",
+    "$CLAUDE_PROJECT_DIR/.claude/hooks/release-locks.sh",
+    "$CLAUDE_PROJECT_DIR/.claude/hooks/require-progress.sh",
+    "$CLAUDE_PROJECT_DIR/.claude/hooks/session-lock.sh",
+    "$CLAUDE_PROJECT_DIR/.claude/hooks/stop-if-blocked.sh",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-main.py\"",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/claim-guard.py\"",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/disk-budget.py\" post",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/disk-budget.py\" pre",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/disk-budget.py\" prompt",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py\" end",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py\" show",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py\" start",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py\" stop",
+    "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py\" sync"
+  ],
+  "version": "0.0.1"
+}
