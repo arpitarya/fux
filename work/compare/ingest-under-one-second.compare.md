@@ -5,6 +5,8 @@ description: "W-268 — ingest of 10 000 documents in under one second. Three fo
 
 # Ingest under one second — the order, the language, the fallback
 
+> ⚠ **2026-10-26 — F1 SUPERSEDED, F3 CONFIRMED (Arpit, Cowork, W-305):** straight to Rust with incremental built into the Rust pipeline (no Python shape A); the Python engine stays as fallback and reference (P1). Decision record: [`rust-ingest-core.compare.md`](rust-ingest-core.compare.md). The verdict below is the 2026-10-25 one, kept as history.
+
 > **Verdict:** **ACCEPTED — Arpit, 2026-10-25 (Cowork docket): F1 = S1, F3 = P1**, as recommended; F2 = Rust stands from 2026-10-10. *Was:* proposed — Arpit picks F1 and F3. F2 carries his direction
 > (2026-10-10): *"We can build it in Rust. The only catch here is I don't want
 > consumer to install Rust."* Recommended: **F1 = S1** (incremental Python

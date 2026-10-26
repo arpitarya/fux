@@ -7,10 +7,10 @@ description: "The moment a session cannot proceed without Arpit it writes work/B
 status: accepted
 date: 2026-10-21
 feature: how a session declares that it is blocked, and the three hooks that stop it from carrying on regardless
-owns: [.claude/hooks/stop-if-blocked.sh@a9c1d4e13655, .claude/hooks/inject-inbox.sh@35bc6fc8c22e, .claude/hooks/session-lock.sh@cdfea2091cd8]
+owns: [.claude/hooks/stop-if-blocked.sh@18f8fdbe8ca9, .claude/hooks/inject-inbox.sh@091a13576448, .claude/hooks/session-lock.sh@febe0bec4840]
 laws: []
 timestamp: 2026-10-21T00:00:00Z
-content_sha: 39985df1adbea8f5f1240af7d12c57f5e714bda7ee0d401c76e63517960abe2b
+content_sha: 6c1904c2009c055889969f7c6e0c795a66be3087b5dbe5e4120587c4a39e1c5c
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

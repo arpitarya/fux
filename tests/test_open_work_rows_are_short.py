@@ -83,11 +83,15 @@ _DETAIL = re.compile(r"\]\((open/(W-\d+)-[^)\s]+\.md)\)")
 _SUBJECT = re.compile(r"^- [^A-Za-z0-9*]*\*\*(W-\d+)\b")
 
 
+#: Rule 37b: a group heading ends in its count, `### build (10)`.
+_COUNT = re.compile(r" \(\d+\)$")
+
+
 def _section(title: str, stop: str) -> list[tuple[int, str]]:
     out: list[tuple[int, str]] = []
     inside = False
     for lineno, line in enumerate(QUEUE.read_text(encoding="utf-8").splitlines(), 1):
-        if line.rstrip() == title:
+        if _COUNT.sub("", line.rstrip()) == title:  # `### research (7)` is `### research` (rule 37b)
             inside = True
             continue
         if inside and line.startswith(stop):
@@ -468,7 +472,7 @@ _GIT_STATE = re.compile(
 
 def test_rule_37_the_open_items_are_grouped_by_what_closing_them_takes() -> None:
     """SR-WORK-OPEN-QUEUE rule 37: the four group headers are present under `## Open items`."""
-    headers = {l.strip() for _, l in _section("## Open items", "# The rules") if l.startswith("### ")}
+    headers = {_COUNT.sub("", l.strip()) for _, l in _section("## Open items", "# The rules") if l.startswith("### ")}
     missing = [g for g in GROUPS if g not in headers]
     assert not missing, f"rule 37: group header(s) missing from OPEN-WORK: {missing}"
 
@@ -716,3 +720,23 @@ def test_rule_23d_the_checker_rejects_what_it_should(tmp_path: Path) -> None:
     assert check(queue("- 🟡 **W-3** waits on **a subscriber** · `agent` — y"))  # a noun, not a reference
     assert check(queue("- 🟡 **W-3** waits on **fux 5.1.0** · `agent` — y")) == []  # another project's version
     assert check(queue("- 🟡 **W-3** waits on **298** · `agent` — y"))  # neither an id nor `<project> <ref>`
+
+
+def test_rule_37b_every_group_heading_carries_its_count() -> None:
+    """SR-WORK-OPEN-QUEUE rule 37b (Arpit, 2026-10-26): `### build (10)` — the count of open
+    items under each group heading, checked by the same script the PostToolUse hook runs."""
+    bad = _inbox_script().check_counts(QUEUE)
+    assert not bad, "rule 37b:\n  " + "\n  ".join(bad)
+
+
+def test_rule_37b_the_checker_rejects_what_it_should(tmp_path: Path) -> None:
+    check = _inbox_script().check_counts
+    row = "- 🟢 **W-1** · `agent` — x. [detail](open/W-1-x.md)"
+    def q(*lines: str) -> Path:
+        p = tmp_path / "OPEN-WORK.md"
+        p.write_text("## Open items\n\n" + "\n".join(lines) + "\n\n---\n", encoding="utf-8")
+        return p
+    assert check(q("### fux build (1)", "", row, "", "### testing (0)")) == []
+    assert check(q("### fux build", "", row))          # no count
+    assert check(q("### fux build (2)", "", row))      # wrong count
+    assert check(q("### testing"))                     # an empty group still says (0)

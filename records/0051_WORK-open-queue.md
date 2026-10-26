@@ -7,11 +7,11 @@ description: "The live queue's discipline has one home, and this is it. Sixty-fo
 status: accepted
 date: 2026-09-13
 feature: the discipline of the single live work queue — its rules, its markers, and the three tests that enforce them
-owns: [tests/test_open_work_rows_are_short.py@445891f35ca9, tests/test_open_work_is_not_stale.py@51da5a4571e6, tests/test_no_work_item_is_lost.py@9b0527556e40, scripts/check-open-work-inbox.py@5aaef5626f84, .claude/hooks/guard-open-work-inbox.sh@9d43fe555a98]
+owns: [tests/test_open_work_rows_are_short.py@e6c2234f924e, tests/test_open_work_is_not_stale.py@51da5a4571e6, tests/test_no_work_item_is_lost.py@9b0527556e40, scripts/check-open-work-inbox.py@bdbb2528e80e, .claude/hooks/guard-open-work-inbox.sh@2100bea49ebe]
 laws: [L0]
 ratifies: W-146 ruling 1 · Arpit 2026-09-13 (archive, never delete)
 timestamp: 2026-09-13T00:00:00Z
-content_sha: b269e5365d4138a7508c566dc49c660d5f60f4fa14dbf9f01edc9ba0c5f12cb3
+content_sha: 426cca51843ad673c46b5001a93019f511b210707cd7e3078612940b68c7438d
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -239,6 +239,11 @@ that is the only thing the file says.
     *agent* as Claude Code for the other three sections), and does not start one
     because it was asked to "work the queue". Research may still *file* items
     into the other sections; those are built as usual.
+37b. **Every group heading carries its count of open items** (Arpit,
+    2026-10-26: *"in front of every title in open items put a count of open
+    items"*) — `### build (10)`, `### testing (0)`; an empty group says `(0)`.
+    The count is of rows, and changes in the same edit as the row it counts.
+    Checked on every write by `scripts/check-open-work-inbox.py`.
 38. **Each item's file names the record its change will have to update.** If it
     cannot name one, it says **"no SR affected"** out loud.
 

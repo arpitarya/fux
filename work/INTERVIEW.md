@@ -32,10 +32,18 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-10-25** (Cowork, Opus 5.5 — W-300 ruled PASS, W-303 + W-304 filed; before it Cowork, Opus 5.5 — the inbox docket: W-292 closed, W-293/W-289/W-258/W-268 ruled; before it Cowork, Opus 5.5 — W-293, the codelaw ports; before it Claude Code, Opus 5.5 — W-284/285/286, the editor and llms surfaces; before it Claude Code, Opus 5.5 — W-282 Steps 1–2, the untangle and the packaging; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-10-26** (Cowork, Opus 5.5 — W-305 filed: ingest Rust-only; before it Cowork, Opus 5.5 — W-300 ruled PASS, W-303 + W-304 filed; before it Cowork, Opus 5.5 — the inbox docket: W-292 closed, W-293/W-289/W-258/W-268 ruled; before it Cowork, Opus 5.5 — W-293, the codelaw ports; before it Claude Code, Opus 5.5 — W-284/285/286, the editor and llms surfaces; before it Claude Code, Opus 5.5 — W-282 Steps 1–2, the untangle and the packaging; before it Cowork, Opus 5.5 — W-282 filed; meeting-view rule; filed/updated by).* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### 🟢 2026-10-25 (latest) — W-300 RULED PASS; `scope = all` KEPT; THE RIGHT TEST IS W-303, THE RELEASE IS W-304
+### 🟢 2026-10-26 (latest) — INGEST GOES RUST; PYTHON KEPT AS THE FALLBACK (W-305 RULED)
+
+- **Arpit's direction (Cowork):** design the core engine to be built on Rust; the whole ingest path runs only in Rust and Python's ingest is replaced. That reverses W-268's F1 = S1 and F3 = P1, ruled the day before. F2 (Rust + PyO3, no consumer installs Rust) stands.
+- **Filed:** [proposal](proposals/rust-ingest-core.md) + **W-305**. One PyO3 module in a new `fux-native` platform-wheel distribution; incremental from day one; Python decoders called back, JSON ported (~39 % of fux's own corpus).
+- **New blocker no earlier doc named:** the shipped `pii.toml` template uses look-around and back-references, which Rust's `regex` crate cannot compile — fork R6.
+- **Ruled (Arpit, same session):** straight to Rust, incremental built in · **Python ingest KEPT as fallback and reference** (against the recommendation — so P1 stands and two engines are held equal) · text + JSON native · both analyzers held equal · `fancy-regex` · runtime build in Rust · new `fux-native`. [compare doc](compare/rust-ingest-core.compare.md).
+- **Order now:** Cowork files W-305's seven build steps, step 0 (Sonnet, measure on the Mac) first. Arpit's PyPI trusted publisher for `fux-native` is owed before the wheels step publishes.
+
+### 🟢 2026-10-25 — W-300 RULED PASS; `scope = all` KEPT; THE RIGHT TEST IS W-303, THE RELEASE IS W-304
 
 - **Ruled (Arpit, Cowork):** W-300's L13 run — table PASS, filed INCONCLUSIVE because the builder wrote its own questions — is **PASS**. `scope` stays `all` by default. No "no claim on large packages" caveat is added.
 - **Why it was safe to ship:** a repository with no pin ranks byte-identically (gates G0a–c); only a repo that adds a `kind = "index"` pin sees a change.

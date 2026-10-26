@@ -7,10 +7,10 @@ description: "One row per live session, Claude Code or Cowork; what a live sessi
 status: accepted
 date: 2026-10-24
 feature: "work/NOW.md — the live view"
-owns: [.claude/hooks/now-ledger.py@7f69f9ae9289]
+owns: [.claude/hooks/now-ledger.py@2cb11ab07e18]
 laws: [L0]
 timestamp: 2026-10-24T13:00:00Z
-content_sha: e8c14e338f9a1ce55349de6f72542dc4db81b29578ba2f30245678e882246adc
+content_sha: 0349e6d1020f17d59df432e4d2f8af43b7c1130dde06146e9b9586f836adc7ca
 ratifies: "Arpit, 2026-10-24 (Cowork): now.md should track everything that is being worked in the chat right now, either through Claude Cowork or through Claude Code. But once it ends, now.md should have nothing … when the session is about to end, if there is any cleanup that is supposed to happen and that hasn't been done … create work items, but make sure now.md is empty."
 ---
 

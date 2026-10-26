@@ -1,0 +1,35 @@
+# fux's landing rules — lockmaster SR-ARCHITECTURE decision 13 (lockmaster W-09, 2026-10-26).
+# Read by `lockmaster` from the main checkout. Every landing runs in a fresh worktree
+# with no .venv of its own, so each command borrows the main checkout's: the .venv
+# beside the git common dir. pytest, the e2e suite and Node stay in CI.
+#
+# The committed index is rebuilt in every landing (Arpit, 2026-10-26: "Rebuild on
+# landing"), so main's .fux/index is always the index of main's docs. fux's own
+# post-commit / post-merge / post-checkout re-index hooks do not run inside
+# lockmaster's git steps (lockmaster SR-ARCHITECTURE decision 18); they still run
+# for a person's own git commands.
+#
+# `scripts/sr-owns.py` belongs in [checks] once main is green on it — on 2026-10-26
+# it is red (the owns hashes are being re-stamped for 5.1.0), and a red check would
+# stop every landing.
+
+[main]
+branch = "main"
+
+[checks]
+inbox = 'PY="$(git rev-parse --path-format=absolute --git-common-dir)/../.venv/bin/python" && "$PY" -B scripts/check-open-work-inbox.py'
+versions = 'PY="$(git rev-parse --path-format=absolute --git-common-dir)/../.venv/bin/python" && "$PY" -B scripts/check-version-parity.py'
+records = 'PY="$(git rev-parse --path-format=absolute --git-common-dir)/../.venv/bin/python" && "$PY" -B scripts/sr-hash.py'
+
+[generated]
+".fux/index" = 'PY="$(git rev-parse --path-format=absolute --git-common-dir)/../.venv/bin/python" && FUX_NO_PROGRESS=1 PYTHONPATH=src "$PY" -m fux.cli ingest --no-fetch'
+"llms.txt" = 'PY="$(git rev-parse --path-format=absolute --git-common-dir)/../.venv/bin/python" && PYTHONPATH=src "$PY" -B scripts/gen-llms.py --write'
+"llms-full.txt" = 'PY="$(git rev-parse --path-format=absolute --git-common-dir)/../.venv/bin/python" && PYTHONPATH=src "$PY" -B scripts/gen-llms.py --write'
+
+[merge]
+"work/WORKLOG.md" = "append-newest-first"
+"work/LESSONS.md" = "append-newest-first"
+"work/IMPLEMENTATION.md" = "append-newest-first"
+"work/OPEN-WORK.md" = "table-rows"
+"work/BACKLOG.md" = "table-rows"
+"archive/README.md" = "table-rows"

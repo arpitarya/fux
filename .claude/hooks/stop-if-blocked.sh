@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # Stop hook — refuse to end a turn while a blocker is unsurfaced.
-# Exit 0 + decision:"block" keeps the turn alive; the agent must state it.
 # Loop guard: three refusals, then let it stop and let the human read the file.
 set -uo pipefail
 cd "$(dirname "$0")/../.." || exit 0

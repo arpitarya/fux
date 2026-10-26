@@ -24,6 +24,15 @@ play: the worklog is the granular, per-exchange trail.
 ```
 
 
+
+## 2026-10-26 — W-305 filed: ingest runs only in Rust, Python's ingest replaced  ·  Cowork (Opus 5.5)
+
+- **Asked:** how to re-set up fux as dogfood here (steps, plugins, decoders); why ingest is slow; whether Rust beats Python; then *"Let's design for it to be built on Rust. And Python will be replaced by Rust. The whole ingest part … would be only in Rust. Research, propose, create a work item. Ask me if there are any blockers."*
+- **Done:** [`proposals/rust-ingest-core.md`](proposals/rust-ingest-core.md) and **W-305** filed; W-268 re-balled 🔴, waiting on W-305; a reopen note on `ingest-under-one-second.compare.md` (verdict unchanged until he rules); INTERVIEW, proposals index and registry rows bumped. No code, no record change.
+- **Found:** (1) the shipped `pii.toml` uses look-around and back-references, which Rust's `regex` cannot compile — fork R6; (2) JSON/JSONL is ~39 % of fux's own indexable files and is a decoder *package*, so a "built-ins native, packages called back" split would leave the dogfood corpus slow — JSON goes native; (3) during the reset, `fux setup` wrote an empty `.fux/.fuxignore` without the `/work/golden` lines — flagged to Arpit before his ingest, not a breach.
+- **Checked (partial — bridge VM, stdlib-only suites):** 1 600 doc/record/queue tests green after this change. ⚠ `test_sr_owns_hash` is red **from the reset commit `bceedbb5`, not this session**: eight `.fux/config/*.toml` files were regenerated and their owning records' `owns:` hashes were not re-stamped (SR-TYPES, SR-TUNE, SR-OUTPUT-DEFAULTS, SR-REFUSALS, SR-PII, SR-INSPECT, SR-IDENTIFIERS, SR-PLUGINS). Left for a Claude Code session: re-read each record, then `sr-owns.py --write` and `sr-hash.py --write`.
+- **Ruled (Arpit, same session):** R1 straight to Rust · **R2/R3 Python ingest kept as fallback** (against the recommendation) · R4 text + JSON native · R5 both analyzers held equal (re-recommended after R2) · R6 `fancy-regex` · R7 runtime in Rust · R8 `fux-native`. Written into [`compare/rust-ingest-core.compare.md`](compare/rust-ingest-core.compare.md); the proposal graduated; W-305 → 🟢, W-268 → 🟡.
+- **Next:** Cowork files the seven build steps, step 0 (Sonnet, measure on the Mac) first; the `fux-native` trusted publisher (Arpit) is owed before the wheels step publishes.
 ## 2026-10-25 — W-300 ruled PASS and closed; W-303 (right test) and W-304 (release) filed  ·  Cowork (Opus 5.5)
 
 - **Asked:** how a package location is configured (codelaw example); what blocks W-300; then *"go with the suggestion … keep scope as all. Yeah, declare it as pass, but add a research item or add a testing item, how to test it this in the right way. For now, go ahead and ship it."*

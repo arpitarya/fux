@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 from pathlib import Path
 
@@ -36,9 +37,11 @@ def _registered() -> list[str]:
             for hook in group["hooks"]:
                 if hook.get("type") != "command":
                     continue
-                cmd = hook["command"].split()[0]
-                assert cmd.startswith(PREFIX), f"hook `{cmd}` is not launched from the project dir"
-                out.add(cmd[len(PREFIX):])
+                # `$CLAUDE_PROJECT_DIR/.claude/hooks/x.sh`, or lockmaster's kit form
+                # `python3 "$CLAUDE_PROJECT_DIR/.claude/hooks/x.py" mode` (SR-WORK-SESSION decision 15).
+                m = re.search(r"\$CLAUDE_PROJECT_DIR/([^\"\s]+)", hook["command"])
+                assert m, f"hook `{hook['command']}` is not launched from the project dir"
+                out.add(m.group(1))
     return sorted(out)
 
 

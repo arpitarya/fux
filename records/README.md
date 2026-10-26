@@ -925,6 +925,9 @@ table does not grant.
 | `.claude/hooks/guard-open-work-inbox.sh` | SR-WORK-OPEN-QUEUE | the same check at session start, which is where the first-output rule bites |
 | `scripts/commit-paths.py` | SR-WORK-SESSION | explicit pathspecs when the index carries another session's work — decision 10, executable. **This record named no code path at all until 2026-09-21** |
 | `.claude/hooks/require-progress.sh` | SR-WORK-SESSION | what a session owes before it ends (decisions 1–5), enforced at the moment it would otherwise be skipped |
+| `.claude/hooks/block-main.py` | SR-WORK-SESSION | decision 15 — lockmaster's kit: only lockmaster writes to `main` |
+| `.claude/hooks/claim-guard.py` | SR-WORK-SESSION | decision 15 — lockmaster's kit: a write outside the change's claim is warned |
+| `lockmaster.toml` | SR-WORK-SESSION | decision 15 — this repo's landing checks, the index and `llms*.txt` rebuilt on landing, and the merge drivers |
 | `.claude/hooks/now-ledger.py` | SR-WORK-NOW | `work/NOW.md` as only what is live — a row per live session; at `SessionEnd` whatever it left uncleaned becomes one cleanup work item and its rows leave ([SR-WORK-NOW](0069_WORK-now.md) decisions 2–5) |
 | `.claude/hooks/disk-budget.py` | SR-LAW-14 | keeps `work/MACHINE.md`'s budget section — 5 GB per project, all agents combined; past it, a permission prompt for every further GB ([SR-LAW-14](0016_LAW-14-machine-budget.md) decision 4) |
 | `.claude/hooks/fux-index-hint.sh` | SR-AGENT-SURFACES | the acting surface that puts the index in front of an agent before it reaches for `grep` |

@@ -16,3 +16,12 @@
 .fux/index/*.jsonl merge=fux-index
 .fux/index/REGISTER merge=fux-index
 .fux/index/sections/*.jsonl merge=fux-index
+
+# lockmaster:begin — written by `lockmaster drivers` from lockmaster.toml [merge]; edit that, not this
+work/WORKLOG.md merge=lockmaster-append-newest-first
+work/LESSONS.md merge=lockmaster-append-newest-first
+work/IMPLEMENTATION.md merge=lockmaster-append-newest-first
+work/OPEN-WORK.md merge=lockmaster-table-rows
+work/BACKLOG.md merge=lockmaster-table-rows
+archive/README.md merge=lockmaster-table-rows
+# lockmaster:end

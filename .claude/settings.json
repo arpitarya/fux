@@ -33,16 +33,38 @@
     ]
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py\" start"
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/inject-inbox.sh"
-          },
+          }
+        ]
+      },
+      {
+        "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py show"
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py\" show"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/disk-budget.py\" prompt"
           }
         ]
       }
@@ -68,7 +90,26 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py stop"
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py\" stop"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/release-locks.sh"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py\" end",
+            "timeout": 60
           }
         ]
       },
@@ -82,6 +123,37 @@
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-lock.sh"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/claim-guard.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Agent|Task|EnterWorktree",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/disk-budget.py\" pre"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-main.py\""
+          }
+        ]
+      },
       {
         "matcher": "Read|Grep|Glob|Bash|Edit|Write|MultiEdit|NotebookEdit|Task|Agent",
         "hooks": [
@@ -98,24 +170,6 @@
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/guard-golden-traversal.sh"
           }
         ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-lock.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash|Agent|Task|EnterWorktree|Write|Edit|MultiEdit|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/disk-budget.py pre"
-          }
-        ]
       }
     ],
     "PostToolUse": [
@@ -129,45 +183,15 @@
         ]
       },
       {
-        "matcher": "Bash|Agent|Task|EnterWorktree|Write|Edit|MultiEdit|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/disk-budget.py post"
-          }
-        ]
-      },
-      {
         "matcher": "Bash|Agent|Task|EnterWorktree|ExitWorktree",
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py sync"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py start"
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py end",
-            "timeout": 60
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/now-ledger.py\" sync"
           },
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/release-locks.sh"
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/disk-budget.py\" post"
           }
         ]
       }

@@ -5,7 +5,7 @@ description: "Arpit's ask (2026-10-10): `fux ingest` of 10 000 documents in unde
 item: W-268
 filed: 2026-10-10
 filed_by: "Arpit (Cowork, Opus 5.5)"
-updated: 2026-10-25
+updated: 2026-10-26
 updated_by: "Cowork (Opus 5.5)"
 ball: cowork
 ---
@@ -20,7 +20,9 @@ ball: cowork
 | 2 | Arpit picks the order — Python incremental first, then Rust (recommended), Rust now, or incremental only | the build order | ✅ ruled 2026-10-25 — **S1**: incremental Python first, then the Rust core |
 | 3 | Arpit picks what happens on a machine with no pre-built Rust package — fall back to Python (recommended) or fail | no consumer ever installs Rust | ✅ ruled 2026-10-25 — **P1**: the Python engine is the fallback and the reference |
 | 4 | Measure start-up, the runtime build and file reading on the Mac | the three unknowns, measured before any code | ⏳ |
-| 5 | File the chosen build steps as their own items | work that can start | ⏳ |
+| 5 | File the chosen build steps as their own items | work that can start | ⏸ replaced — Arpit's 2026-10-26 direction (Rust only, Python's ingest replaced) moved the build plan to [W-305](W-305-rust-ingest-core.md); this item waits on its rulings |
+
+**⚠ 2026-10-26 — build plan superseded; ruled the same day (W-305): F1 → straight to Rust, F3 = P1 confirmed.** Arpit (Cowork): *"Python will be replaced by Rust. The whole ingest part … would be only in Rust."* That reverses F1 = S1 and F3 = P1 below. The new design and its forks R1–R8 are [W-305](W-305-rust-ingest-core.md) / [`rust-ingest-core.md`](../proposals/rust-ingest-core.md). This item keeps the goal and the clock (G1–G3); step 4's measurement becomes W-305's step 0.
 
 **Arpit, 2026-10-10 (Cowork), closing W-267:** *"No boundaries, no limitations.
 If programming language is a boundary, find another programming language in
