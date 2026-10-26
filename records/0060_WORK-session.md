@@ -7,17 +7,20 @@ description: "Three files every session touches — the append-only worklog, the
 status: accepted
 date: 2026-09-14
 feature: the session contract — the three files, the running pointer, and how an agent narrates and answers
-owns: [scripts/commit-paths.py@aba59e8951c7, .claude/hooks/require-progress.sh@840ebec2e7b7]
+owns: [scripts/commit-paths.py@aba59e8951c7, .claude/hooks/require-progress.sh@1f18eb786a47, .claude/hooks/block-main.py@d770a5aa4979, .claude/hooks/claim-guard.py@08638d6960bf, lockmaster.toml@8931056162d5]
 laws: []
 timestamp: 2026-09-14T00:00:00Z
-content_sha: 3f8aade5be8c450b7372a55e0ffdefcaaa90bb203aadf26d7f2685220baa9143
+content_sha: ca22d92c8a8859ad98bbc2816c18581db984e8669625dc2bc0db58ff9c4e9d16
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
 
 **Owns** — the components this record decides:
 
+- [`.claude/hooks/block-main.py`](../.claude/hooks/block-main.py) · file
+- [`.claude/hooks/claim-guard.py`](../.claude/hooks/claim-guard.py) · file
 - [`.claude/hooks/require-progress.sh`](../.claude/hooks/require-progress.sh) · file
+- [`lockmaster.toml`](../lockmaster.toml) · file
 - [`scripts/commit-paths.py`](../scripts/commit-paths.py) · file
 
 <!-- COMPONENTS-END -->
@@ -202,6 +205,23 @@ real regression and would have been filed as one.
     58's durable record of a closure and backs no live claim
     ([SR-WORK-ARCHIVE](0062_WORK-archive.md) decision 5). **First cut: 3.0.0
     GA.**
+15. 🔴 **Changes land on `main` through lockmaster** (Arpit, 2026-10-26 —
+    lockmaster W-09: *"implement in codelaw and fux"*). An agent session never
+    commits to `main`: `.claude/hooks/block-main.py` refuses it, and
+    `claim-guard.py` warns on a write outside the change's claim. The way round
+    is `lockmaster start W-nn --paths …` → edit in its worktree →
+    `lockmaster submit -m "…"`, which lands only the claimed paths, one change
+    at a time, after the checks in [`lockmaster.toml`](../lockmaster.toml) —
+    and **rebuilds the committed index in every landing** (Arpit, 2026-10-26:
+    *"Rebuild on landing"*), so `main`'s `.fux/index` is always its docs'.
+    **The hooks pinned in `.claude/lockmaster.lock` are lockmaster's kit**
+    (`disk-budget`, `now-ledger`, `worktree-cleanup`, `release-locks`,
+    `session-lock`, `inject-inbox`, `stop-if-blocked`, `require-progress`,
+    `guard-open-work-inbox`, `block-main`, `claim-guard`) — changed in the
+    lockmaster repository's `kit/` and re-installed with `lockmaster install .`,
+    never edited here; their behaviour is tested there
+    (`tests/test_kit_hooks.py`). The golden guards and `fux-index-hint.sh` stay
+    fux's own. The decider's own terminal can still commit by hand.
 
 ### Consequences
 

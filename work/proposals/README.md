@@ -58,6 +58,19 @@ moved to the archive on 2026-09-14.
 *Newest first. Every `.md` in this directory has a row; a file with no row is
 the defect this ordering exists to make visible.*
 
+## Filed 2026-10-26
+
+* [The ingest engine in Rust — Python's ingest replaced](rust-ingest-core.md)
+  — Arpit's direction (2026-10-26): the whole ingest path runs in Rust, built
+  incremental from the start (reverses W-268's S1); on ruling, Python's ingest
+  stays as the fallback (P1 kept).
+  One PyO3 module in a new `fux-native` platform-wheel distribution, incremental
+  from day one, Python decoders called back (JSON ported — ~39 % of fux's own
+  corpus). Names a blocker no earlier doc did: the shipped `pii.toml` uses
+  look-around and back-references Rust's `regex` cannot compile. Eight forks
+  R1–R8. **Graduated 2026-10-26** into [the compare doc](../compare/rust-ingest-core.compare.md) —
+  ruled the same day, Python kept as fallback; [W-305](../open/W-305-rust-ingest-core.md).
+
 ## Filed 2026-10-10
 
 * [Ingest under one second — 10 000 documents, any language](ingest-under-one-second.md)

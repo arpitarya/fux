@@ -1,89 +1,66 @@
 #!/usr/bin/env python3
-"""Remove a git worktree only when nothing in it can be lost — SR-WORK-CLEANUP.
+"""Worktree cleanup — SR-WORK-CLEANUP decisions 1-6 and 10.
 
-    python3 .claude/hooks/worktree-cleanup.py            # every worktree's verdict
+A worktree is removed only when nothing in it can be lost: its HEAD is in
+`main`, it has no modified/staged/deleted/untracked file, every ignored file is
+build output, and no live process holds its lock. Removal is `git worktree
+remove` then `git branch -d` then `git worktree prune` — never forced, so git
+itself refuses if a check here was wrong.
+
+    python3 .claude/hooks/worktree-cleanup.py            # report every verdict
     python3 .claude/hooks/worktree-cleanup.py --apply    # remove the safe ones
+    python3 .claude/hooks/worktree-cleanup.py --apply PATH...   # only these
 
-Nothing is lost when all four hold (decision 1):
-
-    (a) its HEAD is already in `main` — every commit merged;
-    (b) it has no modified, staged, deleted or untracked file;
-    (c) every ignored file in it is build output (BUILD_OUTPUT below);
-    (d) no live process holds its lock.
-
-Cleaning is `git worktree remove` — never `--force` — then `git branch -d` —
-never `-D` — then `git worktree prune` (decision 2). Git refuses either one if a
-check here was wrong, so a bug in this file cannot lose data. A red worktree is
-never touched; `now-ledger.py` files it for Arpit (decision 3). Cleanup never
-merges (decision 4).
-
-Importable: `now-ledger.py` loads `verdicts()` and `clean()` at SessionEnd.
-Stdlib only.
+Imported by now-ledger.py at SessionEnd (SR-WORK-NOW decision 4).
 """
-from __future__ import annotations
-
 import os
+import re
 import subprocess
 import sys
-from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-#: What an ignored path may be, by any one of its components, for (c) to hold.
-#: The list grows only by Arpit's ruling (SR-WORK-CLEANUP, Consequences).
-BUILD_OUTPUT = frozenset({
+# Decision 1(c): the only ignored files a removal may take with it. Grows only
+# by the decider's ruling.
+BUILD_OUTPUT = {
     "target", "node_modules", "dist", "build", ".venv", "venv", "__pycache__",
-    ".pytest_cache", ".mypy_cache", ".ruff_cache", ".tox", ".nox", ".coverage",
-    "htmlcov", ".eggs", ".cache", ".turbo", ".next", ".parcel-cache", "runtime",
+    ".pytest_cache", ".mypy_cache", ".ruff_cache", ".tox", ".nox", ".cache",
+    ".turbo", ".next", ".parcel-cache", "coverage", ".coverage", ".lockmaster",
+    "htmlcov", ".eggs", "runtime", ".codelaw",  # fux's and codelaw's rulings, joined in the kit (W-09)
     ".DS_Store",
-})
+}
 
 
-def git(*argv: str, cwd: Path = ROOT, check: bool = False) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", *argv], cwd=cwd, capture_output=True, text=True,
-                          encoding="utf-8", check=check)
+def git(*args, cwd=ROOT):
+    r = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
+    return r.returncode, r.stdout, r.stderr.strip()
 
 
-@dataclass
-class Worktree:
-    path: Path
-    head: str = ""
-    branch: str = ""  # short name, "" when detached
-    locked: str | None = None  # the lock reason; None when unlocked
-    reasons: list[str] = field(default_factory=list)
-    stale_lock: bool = False
-
-    @property
-    def safe(self) -> bool:
-        return not self.reasons
-
-
-def worktrees(root: Path = ROOT) -> list[Worktree]:
-    """Every worktree but the main one, from `git worktree list --porcelain`."""
-    out = git("worktree", "list", "--porcelain", cwd=root).stdout
-    found: list[Worktree] = []
-    for block in out.strip().split("\n\n"):
-        wt = None
-        for line in block.splitlines():
-            key, _, value = line.partition(" ")
-            if key == "worktree":
-                wt = Worktree(Path(value))
-            elif wt is None:
-                continue
-            elif key == "HEAD":
-                wt.head = value
-            elif key == "branch":
-                wt.branch = value.removeprefix("refs/heads/")
-            elif key == "locked":
-                wt.locked = value
-        if wt is not None:
-            found.append(wt)
-    main = Path(git("rev-parse", "--show-toplevel", cwd=root).stdout.strip() or root).resolve()
-    return [w for w in found if w.path.resolve() != main]
+def worktrees():
+    """Every worktree but the main one: dicts of path, head, branch, locked."""
+    _, out, _ = git("worktree", "list", "--porcelain")
+    trees, cur = [], {}
+    for line in out.splitlines() + [""]:
+        if not line:
+            if cur:
+                trees.append(cur)
+            cur = {}
+            continue
+        key, _, val = line.partition(" ")
+        if key == "worktree":
+            cur = {"path": val, "head": "", "branch": "", "locked": None}
+        elif key == "HEAD":
+            cur["head"] = val
+        elif key == "branch":
+            cur["branch"] = val.removeprefix("refs/heads/")
+        elif key == "locked":
+            cur["locked"] = val
+    main = str(ROOT)
+    return [t for t in trees if os.path.realpath(t["path"]) != os.path.realpath(main)]
 
 
-def _pid_alive(pid: int) -> bool:
+def pid_alive(pid):
     try:
         os.kill(pid, 0)
     except ProcessLookupError:
@@ -93,87 +70,88 @@ def _pid_alive(pid: int) -> bool:
     return True
 
 
-def _lock_pid(reason: str) -> int | None:
-    for token in reason.replace("=", " ").replace(":", " ").split():
-        if token.isdigit():
-            return int(token)
-    return None
+def lock_state(reason):
+    """None (unlocked), 'stale' (pid dead, decision 10) or 'live' (red)."""
+    if reason is None:
+        return None
+    m = re.search(r"pid[ :=]*(\d+)", reason)
+    if m and not pid_alive(int(m.group(1))):
+        return "stale"
+    return "live"
 
 
-def check(wt: Worktree, root: Path = ROOT, main_ref: str = "main") -> Worktree:
-    """Fill `wt.reasons` with every way removing it could lose something."""
-    if not wt.path.is_dir():
-        wt.reasons.append("its directory is gone (prune will drop it)")
-        return wt
-    if wt.head and git("merge-base", "--is-ancestor", wt.head, main_ref, cwd=root).returncode != 0:
-        wt.reasons.append(f"HEAD {wt.head[:8]} is not in {main_ref}")
-    status = git("status", "--porcelain", "--ignored", "--untracked-files=all", cwd=wt.path)
-    if status.returncode != 0:
-        wt.reasons.append("git status failed: " + status.stderr.strip()[:120])
-        return wt
-    dirty, ignored = [], []
-    for line in status.stdout.splitlines():
-        code, path = line[:2], line[3:]
-        if code == "!!":
-            if not any(part in BUILD_OUTPUT for part in Path(path.rstrip("/")).parts):
-                ignored.append(path)
-        elif line.strip():
-            dirty.append(path)
-    if dirty:
-        wt.reasons.append(f"{len(dirty)} modified/untracked file(s), e.g. {dirty[0]}")
-    if ignored:
-        wt.reasons.append(f"{len(ignored)} ignored non-build file(s), e.g. {ignored[0]}")
-    if wt.locked is not None:
-        pid = _lock_pid(wt.locked)
-        if pid is None:
-            wt.reasons.append(f"locked, naming no pid ({wt.locked or 'no reason'})")
-        elif _pid_alive(pid):
-            wt.reasons.append(f"locked by live pid {pid}")
-        else:
-            wt.stale_lock = True  # decision 10: lifted as part of the removal
-    return wt
+def verdict(t):
+    """(safe, reasons) for one worktree — decision 1's four checks."""
+    path, reasons = t["path"], []
+    if not Path(path).is_dir():
+        return True, ["already gone"]
+    if not t["head"]:
+        reasons.append("no HEAD")
+    elif git("merge-base", "--is-ancestor", t["head"], "main")[0] != 0:
+        reasons.append(f"HEAD {t['head'][:8]} is not in main")
+    _, st, _ = git("status", "--porcelain", "--untracked-files=all", cwd=path)
+    if st.strip():
+        n = len(st.splitlines())
+        reasons.append(f"{n} modified, staged, deleted or untracked file{'s' * (n != 1)}")
+    _, ig, _ = git("status", "--porcelain", "--ignored", "--untracked-files=normal", cwd=path)
+    for line in ig.splitlines():
+        if line.startswith("!! "):
+            rel = line[3:].rstrip("/")
+            if not any(part in BUILD_OUTPUT for part in Path(rel).parts):
+                reasons.append(f"ignored `{rel}` is not build output")
+    if lock_state(t["locked"]) == "live":
+        reasons.append(f"locked by a live process or no pid ({t['locked'] or 'no reason'})")
+    return not reasons, reasons
 
 
-def verdicts(root: Path = ROOT, paths: set[Path] | None = None) -> list[Worktree]:
-    """Every (or each named) worktree, checked."""
-    out = []
-    for wt in worktrees(root):
-        if paths is not None and wt.path.resolve() not in {p.resolve() for p in paths}:
+def clean(t):
+    """Remove one safe worktree. Returns (ok, message). Never forces."""
+    path = t["path"]
+    if lock_state(t["locked"]) == "stale":
+        git("worktree", "unlock", path)
+    if Path(path).is_dir():
+        code, _, err = git("worktree", "remove", path)
+        if code != 0:
+            return False, f"git refused to remove {path}: {err}"
+    if t["branch"] and t["branch"] != "main":
+        code, _, err = git("branch", "-d", t["branch"])
+        if code != 0:
+            return False, f"removed {path}; git refused to delete branch {t['branch']}: {err}"
+    git("worktree", "prune")
+    return True, f"removed {path}" + (f" and branch {t['branch']}" if t["branch"] else "")
+
+
+def sweep(paths=None, apply=False):
+    """Check (and with apply, clean) the worktrees, optionally only `paths`.
+    Returns (cleaned, red): lists of (path, message-or-reasons)."""
+    want = {os.path.realpath(p) for p in paths} if paths else None
+    cleaned, red = [], []
+    for t in worktrees():
+        if want is not None and os.path.realpath(t["path"]) not in want:
             continue
-        out.append(check(wt, root))
-    return out
-
-
-def clean(wt: Worktree, root: Path = ROOT) -> str | None:
-    """Remove one SAFE worktree. Returns None on success, else what git said."""
-    if not wt.safe:
-        return "not safe: " + "; ".join(wt.reasons)
-    if wt.stale_lock:
-        git("worktree", "unlock", str(wt.path), cwd=root)
-    done = git("worktree", "remove", str(wt.path), cwd=root)  # never --force
-    if done.returncode != 0:
-        return done.stderr.strip()
-    if wt.branch:
-        git("branch", "-d", wt.branch, cwd=root)  # never -D; a refusal keeps the branch
-    git("worktree", "prune", cwd=root)
-    return None
-
-
-def main(argv: list[str]) -> int:
-    apply = "--apply" in argv
-    found = verdicts()
-    if not found:
-        print("no worktrees besides the main one")
-        return 0
-    for wt in found:
-        if wt.safe:
-            if apply:
-                err = clean(wt)
-                print(f"  removed  {wt.path}" if err is None else f"  kept     {wt.path} — git: {err}")
-            else:
-                print(f"  safe     {wt.path}")
+        safe, reasons = verdict(t)
+        if not safe:
+            red.append((t["path"], reasons))
+        elif apply:
+            ok, msg = clean(t)
+            (cleaned if ok else red).append((t["path"], msg if ok else [msg]))
         else:
-            print(f"  RED      {wt.path} — " + "; ".join(wt.reasons))
+            cleaned.append((t["path"], "safe to remove"))
+    if apply:
+        git("worktree", "prune")
+    return cleaned, red
+
+
+def main(argv):
+    apply = "--apply" in argv
+    paths = [a for a in argv if not a.startswith("--")] or None
+    cleaned, red = sweep(paths, apply)
+    for path, msg in cleaned:
+        print(f"ok   {path} — {msg}")
+    for path, reasons in red:
+        print(f"RED  {path} — " + "; ".join(reasons))
+    if not cleaned and not red:
+        print("no worktrees besides main")
     return 0
 
 

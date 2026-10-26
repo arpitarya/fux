@@ -6,7 +6,8 @@ directly beneath it is exactly one `*Empty since YYYY-MM-DD ...*` declaration
 else: no recap prose, no restated rulings.
 
 It also checks rule 23d: every 🟡 row names what it waits on right
-after its id (`🟡 **W-nn** waits on **W-mm**`).
+after its id (`🟡 **W-nn** waits on **W-mm**`), and rule 37b: every group heading
+under `## Open items` carries its count of open items (`### build (10)`).
 
 Read-only. Exits 0 (silent) if the section is well-formed or absent. Exits 1
 with a one-line reason on stdout if it is not — the caller decides what to do
@@ -147,6 +148,42 @@ def check_yellow(open_work: Path):
     return errors
 
 
+# SR-WORK-OPEN-QUEUE rule 37b (Arpit, 2026-10-26): every group heading under
+# `## Open items` carries the number of open items under it — `### build (10)`,
+# `### testing (0)`. The rule is stated in the record, not here.
+RULE_COUNTS = "37b"
+GROUP_HEAD = re.compile(r"^### (?P<name>.+?)(?: \((?P<n>\d+)\))?\s*$")
+
+
+def group_counts(lines):
+    """[(line index, name, stated count or None, rows under it)] for `## Open items`."""
+    try:
+        start = next(i for i, l in enumerate(lines) if l.strip() == "## Open items")
+    except StopIteration:
+        return []
+    groups = []
+    for i in range(start + 1, len(lines)):
+        l = lines[i]
+        if l.startswith(("# ", "## ")):
+            break
+        m = GROUP_HEAD.match(l)
+        if m:
+            groups.append([i, m.group("name"), None if m.group("n") is None else int(m.group("n")), 0])
+        elif groups and ROW_LEAD.match(l):
+            groups[-1][3] += 1
+    return groups
+
+
+def check_counts(open_work: Path):
+    """Every reason a group heading's count is missing or wrong, or an empty list."""
+    lines = open_work.read_text(encoding="utf-8").splitlines()
+    return [
+        f"rule {RULE_COUNTS}: `### {name}` must read `### {name} ({rows})`"
+        + ("" if stated is None else f" — it says ({stated})")
+        for _, name, stated, rows in group_counts(lines) if stated != rows
+    ]
+
+
 def main():
     root = find_repo_root(Path.cwd())
     if root is None:
@@ -154,7 +191,7 @@ def main():
     open_work = root / "work" / "OPEN-WORK.md"
     if not open_work.is_file():
         return 0
-    errors = [e for e in [check(open_work)] if e] + check_yellow(open_work)
+    errors = [e for e in [check(open_work)] if e] + check_yellow(open_work) + check_counts(open_work)
     if not errors:
         return 0
     message = "work/OPEN-WORK.md — " + " · ".join(errors) + " (see records/0051_WORK-open-queue.md)\n"

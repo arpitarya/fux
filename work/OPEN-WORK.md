@@ -32,24 +32,25 @@ here. Read that record before changing anything below it.
 
 ## Open items
 
-### fux build
+### fux build (2)
 
 - 🔴 **W-289** · `arpit` — plugin packages; **5.0.0 released 2026-10-25**, all 15 plugins on PyPI through CI. Left: Arpit yanks the 14 hand-uploaded 4.1.1 plugin files. Filed by Arpit (Cowork). [detail](open/W-289-plugin-packages.md)
 - 🟢 **W-304** · `agent` — release the index-package work: bump the version everywhere, fold the changelog, flip the "in build" docs; then Arpit publishes. **Sonnet.** Filed by Arpit (Cowork). [detail](open/W-304-release-index-packages.md)
 
 
-### testing
+### testing (2)
 
 - 🟢 **W-281** · `agent` — capture driver built (DoD 1–4, never run); DoD 5 (≤ 30 min, timed) owed by the next capture. **Sonnet.** Filed by Arpit (Claude Code). [detail](open/W-281-capture-harness-speed.md)
 - 🔴 **W-258** · `arpit` — on hold by Arpit's word (2026-10-25): §1 (a source vanishes, ~20 min) and §2 (a real 429) run when he says; §3 parked as B-274. Checklist and bars written. Filed by Arpit (Cowork). [detail](open/W-258-live-network-captures.md)
 
-### adr update
+### adr update (0)
 
 
-### research
+### research (7)
 
 - 🟢 **W-303** · `cowork` — research: how to test the merged search properly — a big real package beside a real repo, checking it never pushes the repo's own answers down. No code. **Cowork.** Filed by Arpit (Cowork). [detail](open/W-303-merged-query-right-test.md)
-- 🟢 **W-268** · `cowork` — ingest of 10 000 docs in under a second. Ruled S1 + P1 (2026-10-25); file the steps, step 0 (measure, **Sonnet**) first. **Cowork.** Filed by Arpit (Cowork). [detail](open/W-268-ingest-under-one-second.md)
+- 🟢 **W-305** · `cowork` — the ingest engine in Rust, Python kept as fallback. R1–R8 ruled 2026-10-26; file the seven build steps, step 0 (measure on the Mac, **Sonnet**) first. **Cowork.** Filed by Arpit (Cowork). [detail](open/W-305-rust-ingest-core.md)
+- 🟡 **W-268** waits on **W-305** · `cowork` — ingest of 10 000 docs in under a second; holds the goal and the clock, its build plan replaced by W-305's. **Cowork.** Filed by Arpit (Cowork). [detail](open/W-268-ingest-under-one-second.md)
 - 🟢 **W-263** · `cowork` — research and propose the never-built `enriched` ingest mode: its overlap with `fux enrich`, and whether it may write index records itself. No code. **Opus.** Filed by Arpit (Cowork). [detail](open/W-263-enriched-mode-proposal.md)
 - 🟢 **W-265** · `cowork` — deep research: how fux can better spot a question it cannot answer (the coverage floor tested no better than chance). No code. **Opus.** Filed by Arpit (Cowork). [detail](open/W-265-abstention-research.md)
 - 🟢 **W-275** · `cowork` — is there a tool to tune `b`, `k1`, field weights, `section_weight` — or can one be built? Survey + proposal; train on retired sets, decide only via L13. No code. **Cowork.** Filed by Arpit (Cowork). [detail](open/W-275-ranking-tuner-research.md)
