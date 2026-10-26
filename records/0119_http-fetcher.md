@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-19
 amended: 2026-10-20
 feature: "`fux-fetcher-http` — the fetcher a URL line gets when it says `fetch=http`"
-owns: [packages/fux-fetcher-http@e0a83c491946]
+owns: [packages/fux-fetcher-http@fe43e0b17511]
 laws: [L2, L5, ex-L5]
 timestamp: 2026-08-19T00:00:00Z
-content_sha: 29df8493cd46a27856947f09a13cd08347e8be51a9b309d14f1a0348f5b96405
+content_sha: bddef7adf7f1faca8a24dc46e165232ff2e371af619d2d4e85545b7297bbf670
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
