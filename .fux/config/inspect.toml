@@ -1,4 +1,4 @@
-# .fux/inspect.toml -- what `fux inspect` and the `fux serve` explorer call a
+# .fux/config/inspect.toml -- what `fux inspect` and the `fux serve` explorer call a
 # finding, how much they sample, and how many rows they show. Nothing here
 # changes the index or a ranking: it changes only what the report SAYS about
 # them. Every key is REQUIRED (SR-LAW-12); `fux doctor --fix` writes a missing
@@ -36,6 +36,20 @@ fingerprint_terms = 6
 findable_rank     = 3
 retrieval_sample  = 100
 
+# Document families (W-228): two documents share a family when the Jaccard of
+# their heading-and-front-matter-key sets is at least `skeleton_jaccard` against
+# EVERY member (complete linkage). A member missing a heading that at least
+# `core_share` of its family carries is a misfit; `misfit_floor` is the share
+# of family members that flags the lens. Measured on golden (W-228, 2026-10-09):
+# it does not fire falsely on any gen-4 rung (1.5-10.7 %); no corpus has yet
+# shown it firing when it should.
+# `length_edges` cut body tokens into the bands a family reports.
+[families]
+skeleton_jaccard = 0.60
+core_share       = 0.80
+misfit_floor     = 0.20
+length_edges     = [200, 1000, 5000]
+
 # Title probes: a title is a probe that finds its document in the top
 # `probe_rank`. `probe_sample` documents are probed; `--all` probes every one.
 [probes]
@@ -58,13 +72,14 @@ triage_rows    = 200
 words_page     = 200
 words_page_max = 1000
 
-[families]
-skeleton_jaccard = 0.60
-core_share       = 0.80
-misfit_floor     = 0.20
-length_edges     = [200, 1000, 5000]
-
+# Identifier families (`fux identifiers`, W-233): a shape such as RF-{n} is
+# proposed when at least `min_values` distinct identifiers of that shape occur
+# across at least `min_docs` documents. Lower finds more families and more
+# noise; the proposals only take effect once `fux identifiers --write` runs.
+# `parity_sample`: how many indexed documents (in id order) `fux doctor` and
+# `fux serve`'s Identifiers tab match with BOTH regex engines, Python and Node,
+# to prove a [user] regex means the same thing in each.
 [identifiers]
-min_values = 3
-min_docs   = 2
+min_values    = 3
+min_docs      = 2
 parity_sample = 500

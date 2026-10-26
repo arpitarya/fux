@@ -1,4 +1,4 @@
-# .fux/refusals.toml -- WHAT A REFUSAL LOOKS LIKE HERE.
+# .fux/config/refusals.toml -- WHAT A REFUSAL LOOKS LIKE HERE.
 #
 # A refusal is a response the server returned INSTEAD of the document: a
 # sign-in wall, a session-expired interstitial, a paywall, a 403 shell, a
@@ -238,6 +238,9 @@ body_contains = [
 # content_type  = ["text/html"]
 # body_contains = ["upgrade-your-plan", "subscription-required"]
 
+# How much of a response the rules above may search (SR-LAW-12, W-225 stage 4b).
+# Required whenever this file exists; `fux doctor --fix` writes a missing key.
+# Decided in SR-REFUSAL: https://github.com/arpitarya/fux/blob/main/records/0146_refusals.md
 [scan]
 body_scan_bytes   = 1048576
 always_scan_under = 8192
