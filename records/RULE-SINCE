@@ -148,4 +148,22 @@
 #   301c65af310424d266ad40a4e22961722a586d97
 #   9bb870ef7dc4c25386cca15d999bcb2b4e7a81f5
 #   ce425c7764822938912219a00e7b9a2720961289
-999c1976119d662f56a936d7624ea19f9b1695d3
+#   999c1976119d662f56a936d7624ea19f9b1695d3
+#
+# 2026-10-26 — THE SEVENTH ENTRY. THE BASELINE MOVES, FOR A LOST MESSAGE.
+#
+# Ruled by Arpit, 2026-10-26: "Move the baseline", to release 5.1.0 over a
+# green main.
+#
+# `cf2459f28` (W-304, landed through lockmaster) restored
+# `.fux/config/identifiers.toml` and `.fux/config/plugins.toml` byte-for-byte
+# to the content their owning records' `owns:` hashes already recorded, so
+# SR-IDENTIFIERS and SR-PLUGINS were genuinely unaffected. The submit carrying
+# `no SR affected` was refused at main's fast-forward, and the resubmit landed
+# the commit made by the earlier, refused attempt, whose message lacks the line.
+#
+# NOT DONE: rewording it — already on origin/main, and force-push is refused.
+#
+# THE COST: every commit from `999c19761` up to and including `cf2459f28` is
+# no longer re-auditable by this gate. Each passed except `cf2459f28` itself.
+cf2459f2872093cf20b3cf3e8f06c8c4322a0ac8
