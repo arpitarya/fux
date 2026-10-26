@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-26
 amended: 2026-10-20
 feature: the decoder plane — the protocol, the registry, the consumer seam, the enrichment queue and the decoder extensions
-owns: [src/fux/decode@0fc2231fb9da, src/fux/decode/ext/__init__.py@c9bb2ae89770, src/fux/decode/ext/markdown.py@e6152422eabb, src/fux/decode/ext/ooxml.py@f6b06732db01, src/fux/decode/ext/xml.py@5d58ae8c264f, src/fux/decode/ext/zip.py@b219303e98d1, src/fux/templates/agents/DECODER-SKILL.md@cfe08438e531, node/src/decode/markdown.mjs@9b8c05b393cb, node/src/decode/registry.mjs@573eb7a66bde, packages/fux-decoder-config@4e0fad9ec7bd, packages/fux-decoder-drawio@9eaa710bae7d, packages/fux-decoder-html@61edaa402d9a, packages/fux-decoder-image@27b770fa2b84, packages/fux-decoder-json@b3f4c6e7aa95, packages/fux-decoder-mail@cf980a8b0837, packages/fux-decoder-office@e03bed4b9a17, packages/fux-decoder-pdf@3f0e679a9f49, packages/fux-decoder-rtf@cf095dab1b83, packages/fux-decoder-svg@9e6853364d32, packages/fux-decoder-xml@5176f9c963af]
+owns: [src/fux/decode@0fc2231fb9da, src/fux/decode/ext/__init__.py@c9bb2ae89770, src/fux/decode/ext/markdown.py@e6152422eabb, src/fux/decode/ext/ooxml.py@f6b06732db01, src/fux/decode/ext/xml.py@5d58ae8c264f, src/fux/decode/ext/zip.py@b219303e98d1, src/fux/templates/agents/DECODER-SKILL.md@cfe08438e531, node/src/decode/markdown.mjs@9b8c05b393cb, node/src/decode/registry.mjs@573eb7a66bde, packages/fux-decoder-config@d84e68ad3071, packages/fux-decoder-drawio@afadf60fd2e3, packages/fux-decoder-html@5879880381bf, packages/fux-decoder-image@998b925be0b7, packages/fux-decoder-json@ce8215512209, packages/fux-decoder-mail@fb3aaf0c3856, packages/fux-decoder-office@04bb61cd1ea6, packages/fux-decoder-pdf@ba51895794ad, packages/fux-decoder-rtf@57bb39ad8c70, packages/fux-decoder-svg@0955513e05d9, packages/fux-decoder-xml@2d855c39298f]
 laws: [L2, L3, L4, L5]
 timestamp: 2026-08-26T00:00:00Z
-content_sha: 71f93af8fef9a0ef99cbb4353fa1c9dbaf5d24a44e5875604af84ab62b70deb8
+content_sha: 4c3e04ce87449c93fb44d00c18dae17798c22578ab409f9e6f801e6eb3a0d630
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

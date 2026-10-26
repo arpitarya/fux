@@ -8,6 +8,15 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [5.1.1] - 2026-10-26
+
+**A packaging patch.** No engine change for Python. 5.1.0 reached PyPI without `fux-engine`'s source distribution: the sdist was 126 MB, over PyPI's 100 MB project limit. 5.1.1 ships it at about 52 MB.
+
+### Fixed
+
+- **`fux-engine`'s sdist leaves out what is not buildable source**: `work/regression` (the measured runs), `work/golden` and a local `.fux/runtime/`.
+- **Node reader: `ask -q` reads each section shard once.** With the section plane on and no inflated runtime, the committed fallback re-read section shards for every `-q` phrasing. It now reads through the call's `Shards` set. Same results, fewer reads.
+
 ## [5.1.0] - 2026-10-25
 
 **Packages can ship their own fux index.** Additive: a repository that pins no index package ranks byte-identically to 5.0.0 (W-300 gates G0a–c).
