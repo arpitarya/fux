@@ -49,6 +49,7 @@ archive/handoff/W-107-finish-handoff.md	45aa32b9525d9d38f89de904bb6ae415aa395a36
 archive/handoff/W-107-finish-prompt.md	8d48911fbc7803e9ddf4ba48564b757a2390650c	prose	archived=true
 archive/handoff/W-98-acquired-plane-handoff.md	6340b488413dd2d70d99f516e6208d81d8f33da5	prose	archived=true
 archive/handoff/W-98-acquired-plane-prompt.md	53aee655682b2f9a7e62928a0d01d1478aafc1f6	prose	archived=true
+archive/handoff/W-98-refusals-starter.toml	df910163da375301421bc54f7127a852e63a83ab	pkg:fux-decoder-config@5.1.0/toml@1+limits@1	archived=true
 archive/handoff/v0.30.0-m1-t0-slice-handoff.md	246c25a43ee952e3897cbdab5a0192df3342d181	prose	archived=true
 archive/handoff/v0.30.0-m1-t0-slice-prompt.md	0f93caaa6f034cad1014f1f8d9a6a1a1271acf31	prose	archived=true
 archive/handoff/v0.31.0-fux-dir-layout-handoff.md	7775184b2fc44fcaf9806d12654ef1bb48cceee5	prose	archived=true
@@ -423,6 +424,7 @@ archive/v0.1/fux/data/global/rules/async-everywhere.md	134b95711e6157b3a1007860a
 archive/v0.1/fux/data/global/rules/doc-per-code-change.md	a8adfd5938d693a7b44fab3f2a6bc0d711da4f97	prose	archived=true
 archive/v0.1/fux/data/global/rules/files-max-100-lines.md	cd080a3babd7b30825b0ed03749fe7fe0ccc8061	prose	archived=true
 archive/v0.1/fux/data/global/rules/no-secrets-in-vcs.md	5f2f4b7751f18bb0b207f4cd756ddf6ed0e2b96a	prose	archived=true
+archive/v0.1/fux/data/packs/indian-markets-tax/pack.toml	dd0bafee86be227e4ad9ee1949ec31a351e846b9	pkg:fux-decoder-config@5.1.0/toml@1+limits@1	archived=true
 archive/v0.1/fux/data/packs/indian-markets-tax/rules/capital-gains-equity.md	2cf0b3a495dc2a04cbece06f51523db47c77f737	prose	archived=true
 archive/v0.1/fux/data/packs/indian-markets-tax/rules/market-hours-nse.md	483d373adf8881140433b26ed652ade5f7748d99	prose	archived=true
 archive/v0.1/fux/data/schema.json	f2c1bf448fbb5de5c9ba28c8c13722e257f78040	pkg:fux-decoder-json@5.1.0/json@1+limits@1	archived=true
@@ -441,11 +443,13 @@ archive/v0.1/fux/data/skills/trace/SKILL.md	5dec9af3ed99355111913d1e49cca3328d60
 archive/v0.1/fux/templates/formula.md	b46611e9932eca51251b55e3966f1389b59131c2	prose	archived=true
 archive/v0.1/fux/templates/spec.md	7bb3d7822a66f9863c1a43fab53aa8ead3b7906b	prose	archived=true
 archive/v0.1/probes/Probes.md	721e11aa7cc2979ce2954ade1913c451d2328f6b	prose	archived=true
+archive/v0.1/pyproject.toml	debd5fc9835e6821c97404178fc9b0b6a8996f97	pkg:fux-decoder-config@5.1.0/toml@1+limits@1	archived=true
 archive/v0.1/tools/skillgen/expected/fux__data__copilot__prompts__fux.prompt.md	cb77c97a74ae1cfa93d7e8823b815230059e178c	prose	archived=true
 archive/v0.1/tools/skillgen/expected/fux__data__skills__agents__SKILL.md	bee384e1388f6a3531110d7f1619bd67d8bcf440	prose	archived=true
 archive/v0.1/tools/skillgen/expected/fux__data__skills__fux__SKILL.md	de5fbb50e8eaa0103fbf5fcddcd1d80713c5c728	prose	archived=true
 archive/v0.1/tools/skillgen/fragments/core/copilot.md	963fb07c00cf910d4cf942109f28e31cd30557f3	prose	archived=true
 archive/v0.1/tools/skillgen/fragments/core/core.md	219628b47232edd5221d7d0d6f9c997b176577b3	prose	archived=true
+archive/v0.1/tools/skillgen/platforms.toml	e4193fc48124ff55b5401cf7ee462c870dd58cba	pkg:fux-decoder-config@5.1.0/toml@1+limits@1	archived=true
 archive/v0.26-docs/IMPLEMENTATION.md	091e66cb44ebf24efce3577d4d0081e4f600475b	prose	archived=true
 archive/v0.26-docs/adr/0001-config-and-setup.md	a9afaf83dc7040d70d7743fba27c0cbe013c332f	prose	archived=true
 archive/v0.26-docs/adr/0002-ingest-cache-chunker.md	039235ec51aab16e21bd23da4c5ff8e365ef4948	prose	archived=true
@@ -589,14 +593,18 @@ archive/v0.26/conformance/README.md	01964d18f1d80adb1857ad82b60423bb0ac69f0a	pro
 archive/v0.26/proposals/chunk-level-dense-codes.md	0eceb88881e6fe3fbd380548b2a40ade75bf2ecb	prose	archived=true
 archive/v0.26/proposals/hybrid-degrades-at-scale.md	800fa82ce9fb0d9bb63d1214202469fb919775fd	prose	archived=true
 archive/v0.26/proposals/knowledge-substrate.md	406bc5ef1d161539e0c416ef2cfe69b85ab9ec52	prose	archived=true
+archive/v0.26/pyproject.toml	5344d1ef90a6d35ae196d7ec6a92645a12f2eeb8	pkg:fux-decoder-config@5.1.0/toml@1+limits@1	archived=true
 archive/v0.26/src/fux/embed/data/model.json	995b56ff0ba1f917fa3519096aa1220ddccc7671	pkg:fux-decoder-json@5.1.0/json@1+limits@1	archived=true
 archive/v0.26/tests/data/embed_reference.json	489fcdb99686cc6b6f722ca5dffa85ed92866299	pkg:fux-decoder-json@5.1.0/json@1+limits@1	archived=true
 archive/v0.26/tests_e2e/corpus/data/config.json	b4ea7d19ee70d9e2027dbada5cc247e4d30bc170	pkg:fux-decoder-json@5.1.0/json@1+limits@1	archived=true
+archive/v0.26/tests_e2e/corpus/data/settings.yaml	46d163a9a4839e57ea84bc46f5531f94cb0a5f2d	pkg:fux-decoder-config@5.1.0/yaml@1+limits@1	archived=true
 archive/v0.26/tests_e2e/corpus/docs/decisions/adr-001.md	e7d229a02d1dfa47f828a29274537a38d671048a	prose	archived=true
 archive/v0.26/tests_e2e/corpus/docs/guide.md	186e8a70a1c15137f0f196feff595bcebd84c146	prose	archived=true
 archive/v0.26/tests_e2e/corpus/docs/no-headings.md	7dab46cb01ce1dd940d414403965b1df4ca9c40c	prose	archived=true
 archive/v0.26/tests_e2e/corpus/docs/unicode-café.md	549b0be7425b536470780a0678e99e28c0051e94	prose	archived=true
 archive/v0.26/tests_e2e/corpus/notes/todo.txt	61e1cde326c2c0ceb13b7d5d7c2c08fe26e3ed6f	prose	archived=true
+archive/v0.26/tests_e2e/corpus/office/report.pdf	46448c5e18b5404d6ff3770ec4e9ed7b584697af	pkg:fux-decoder-pdf@5.1.0/pdf@1+limits@1	archived=true
+archive/v0.26/tests_e2e/corpus/office/spec.docx	0717fdf16b6e007a3c576cc6b22ce5b351714614	pkg:fux-decoder-office@5.1.0/docx@2+table@1+ooxml@1+xml@1+zip@1+limits@1	archived=true
 archive/v0.26/tests_e2e/eval/README-relational.md	69ea7fd93ade7e29378b104187b76a875bf9cee4	prose	archived=true
 archive/v0.26/tests_e2e/eval/README.md	d03b65f6bc83b4bed4f589165a3d75176667895a	prose	archived=true
 archive/v0.26/tests_e2e/eval/pairs.jsonl	1e10bcd6ddadc076ac81b5c958f7defedc65270e	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1	archived=true
@@ -616,6 +624,7 @@ archive/v0.26/tests_e2e/site/index.html	02058064b9154ec6b22685898a9b46a49988d702
 archive/v0.26/tests_e2e/site/page2.html	9ec63442940888325f6a8464914790cd1b33f11c	pkg:fux-decoder-html@5.1.0/html@2+table@1+limits@1	archived=true
 archive/v0.26/tests_e2e/site/private/secret.html	7eea4514fcbbe38e7cbc036c39e21949658cf527	pkg:fux-decoder-html@5.1.0/html@2+table@1+limits@1	archived=true
 archive/v0.26/tests_e2e/site/robots.txt	ee22f00a9ec474d01d82053ebe649ba13986e62e	prose	archived=true
+archive/v0.26/tests_e2e/site/spec.pdf	46448c5e18b5404d6ff3770ec4e9ed7b584697af	pkg:fux-decoder-pdf@5.1.0/pdf@1+limits@1	archived=true
 archive/v0.26/tools/distill/README.md	e0ae067d7607200f495b147c8d96f9fd57f31f6a	prose	archived=true
 archive/v0.30-rev1-planning/README.md	1b49ba97234ecb9d1cf95479f77abbf40878e37f	prose	archived=true
 archive/v0.30-rev1-planning/architecture-components.svg	7ded80c88197fd3525dfba1a52f9937e4fae15c2	pkg:fux-decoder-svg@5.1.0/svg@1+xml@1+limits@1	archived=true
@@ -672,7 +681,7 @@ records/0069_WORK-now.md	db10561bb4875608c847b35bfec5f623df0c8ff4	prose
 records/0070_WORK-cleanup.md	52ece3a26441cb2fdb4619feb988adc8a0bed24c	prose
 records/0101_cli-surface.md	48c50bae76944927771de7190b631b422aaa7278	prose
 records/0102_fux-directory.md	2cc3b88dd8d6a5eab710ddf33fb3e4aec6812623	prose
-records/0103_ask.md	e44d2835abb4da6ee846feea34b908a9425619a9	prose
+records/0103_ask.md	937549ba315b91d9ab7889936bc823ac8e4aa41d	prose
 records/0104_find.md	6209b9c472b4be7c543f86a49d050526d49876fc	prose
 records/0105_answer.md	c9cc75eba14a678458b803031cf05088c6bff1ce	prose
 records/0106_ingest.md	6221260fdbe5c07c882c7f8888e6e8e5ef09b132	prose
@@ -696,14 +705,14 @@ records/0124_runtime-stamp.md	0f5742cbc0bb5b3cd737a0b3cba161c39fe43f93	prose
 records/0125_runtime-stats.md	5c832d48e761297e3d1630ca2bbb78f1cff99bc3	prose
 records/0126_graph.md	0e2de7cc664972023dc77b83d029b6aa016a23ad	prose
 records/0127_refer-plane.md	817e1649dee9d59bf07b1001bb15468d192fcc9d	prose
-records/0128_types-list.md	06a58a4fbfbf830a3a100715105edf1d47a51807	prose
+records/0128_types-list.md	84bcd6af177b3338f26f6cc89b268d2fc1639440	prose
 records/0129_hooks.md	4bbf9f2781a49674315c50ebf1f5262244a4e580	prose
 records/0130_merge-driver.md	42058862d92bce3bdb9880e88bac40b4b1665d92	prose
 records/0131_cache.md	ab3777683644a8c7afbd4ef8302bed58f55119b9	prose
 records/0132_agent-policy.md	4a1228d09703fcd76691e4dc941da74f12f3d259	prose
 records/0133_predictions.md	f0c9626b27aaad67493843fc7929eeee0cfb0b1e	prose
 records/0134_archived-content.md	31a3706b2c86d063cc6ce7439535bda1b7f050d4	prose
-records/0135_tuning.md	a969baf72d907a6ab3f7516f81f30a275ef9dfe5	prose
+records/0135_tuning.md	f64dcce6fdcadb4923cdbf4dd39b6e11cfbb873b	prose
 records/0136_mcp.md	249b63e285d1762bb716fa13ab5516fdbf476c04	prose
 records/0137_enrich.md	2cd2860744ef421ab5834fbaa46987f012bac243	prose
 records/0138_rerank.md	9430b76f717fba773721fc0243493a6cab898049	prose
@@ -711,25 +720,25 @@ records/0139_decode.md	6627133976c6a2e9f0f818a92cfbd24a43611b43	prose
 records/0140_locks.md	eda20971d73ad360a60cecd222ec6b0381a8cf08	prose
 records/0141_confidence.md	b5fbe2cc0efdeea73ff50f6e342fc4f779b875e6	prose
 records/0142_provenance.md	ec49667904e4eb5f51650004d1eaba151272d791	prose
-records/0143_output-defaults.md	d2dc4ceb75266de9e2fe5db5fe48f33b7838d8bf	prose
+records/0143_output-defaults.md	834c4f06686af59ed9e372883723945a1db68516	prose
 records/0144_fuxignore.md	6203e340f481c03daef44a8d1068d9386fcb62c1	prose
 records/0145_acquired-plane.md	128fce94c7120c2548ad402c475ba840e96fb967	prose
-records/0146_refusals.md	b6e3857ec7828040a91b725e47335bfd1cdcc1c8	prose
+records/0146_refusals.md	9bde2e529bc3e2fb89b6a0948ab2574191b963b6	prose
 records/0147_url-freshness.md	c1be3a6d97d977900f68127598549260710c381a	prose
-records/0148_pii.md	16d8151b081b401fc98d63547e3096c828d3e16e	prose
+records/0148_pii.md	71f06b1f2e48a9cc8d9195ae10c298d4cc10ff66	prose
 records/0149_expand.md	b855a01b3d080e6ad35f4e63a9866d0c309a3e6d	prose
 records/0150_tabular.md	c0429c24176298c9342d84f988d77bef090414fb	prose
 records/0151_chunking.md	235fb8a6cc7cf50ce19da24ab2e3872c5d770cf0	prose
 records/0152_doctor.md	556605816a8178dbda5a6f4ace72dd8892dbe064	prose
-records/0153_node-search.md	b61c20e775385f313abe02269db025402cbe9e10	prose
+records/0153_node-search.md	58f2b9cb0a160bd73547d6507a2a090c34abf1d5	prose
 records/0154_api.md	5c720f3d6e8c00cd04ffa65d80e4e465628a1079	prose
 records/0155_agent-surfaces.md	c0c2ecdbd9a406b030bd680c201e6dd44fb5947d	prose
-records/0156_inspect.md	79ca32b03c6c5a98c63b3b2041a62293a83868fa	prose
+records/0156_inspect.md	000320ba9f647f1b8b5f5bcd2c053e83db7d1562	prose
 records/0157_observe.md	3be9e3db82cbde23d6b18c2e7d630de4e841fbcf	prose
 records/0158_serve.md	d652191a386f25fad203519be2d165e15b73cc81	prose
 records/0159_constants.md	49d9a6304f019906cf506665bb47ae43d7c9d112	prose
 records/0160_identifiers.md	8d9abacc3f49a1d83c7150efa835d1dde48959a5	prose
-records/0161_sections.md	6735a2b7daf97a3533474ec24414902bc50d643e	prose
+records/0161_sections.md	1e7442829269d2f760aead259a491c4064c8527c	prose
 records/0162_llms.md	ba1ce0dfe6aa2be5fda66f0f6f6421226006cbcb	prose
 records/0163_lsp.md	4a915a5980ade93d463ee923216ba644dd93ee22	prose
 records/0164_vscode.md	40204c3e017048c6d9e358243c22fc30ade8874f	prose
@@ -754,11 +763,13 @@ tools/quality-controls/capture-driver/README.md	dc4ed01ffa53a6eeb81e6a9f945d03fa
 tools/quality-controls/decoys.jsonl	8c7059f9b986da403a76fcb23d7b43f665f14624	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 tools/quality-controls/priors-probes.jsonl	5f9f75922af6d4b63c73d7c360fd83f1d7bae84b	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 tools/quality/README.md	63e1f913f362f434a346acf24443e71762bd41d0	prose
+tools/quality/mix.toml	39fda01a1f548f78c9eeb94d98e89e0120faabee	pkg:fux-decoder-config@5.1.0/toml@1+limits@1
 tools/refer-bench/PRE-REGISTRATION.md	2ef5c1d049e69f75aa3aa9b44287ed7ce5118cff	prose
 tools/refer-budget-sweep/PRE-REGISTRATION.md	2f52493d4af2d5ad8a3f8921a01ba5a0f35a6f2d	prose
 tools/refusal-probe/README.md	58fd48d7c5a8ccd74222fce216956a03a7797733	prose
 tools/refusal-probe/captures/onedrive-viewer-shell.html	cf7120dbb24e66773ebcc783d6a89bedad091187	pkg:fux-decoder-html@5.1.0/html@2+table@1+limits@1
 tools/refusal-probe/captures/ordinary-wiki-page.stand-in.html	3eff4e7b9c162fa89fbaec5ed9e307eabb9f823a	pkg:fux-decoder-html@5.1.0/html@2+table@1+limits@1
+tools/refusal-probe/cases.toml	982fec8fcc073a7de3366fb15955a5daed0eb63a	pkg:fux-decoder-config@5.1.0/toml@1+limits@1
 tools/t2-eval/PRE-REGISTRATION.md	0678bc82904423b9aa82c801f4286abbdc84961c	prose
 tools/vector-gate/README.md	544da73b4409bef1e5dac598d9b8214d8abf4180	prose
 work/BACKLOG.md	908efa33e8d396c82d8cc66cc74552221d86ac65	prose
@@ -1019,6 +1030,7 @@ work/regression/2026-08-27-r10-separation-floor/report.md	b2cbf3c5f7dfd07644eace
 work/regression/2026-08-28-annotator-agreement/ANALYSIS.md	8f6b5e9a819b50653b66bac50434dc96cc162cff	prose
 work/regression/2026-08-28-annotator-agreement/evidence/annotator-1.jsonl	c7ffbaf596479b3c744ce53cfb72b206ccc1ecce	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-08-28-annotator-agreement/evidence/annotator-2.jsonl	682398b43f1d7f08e7f6a1dc9daf868d7d10e67d	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-08-28-annotator-agreement/evidence/per-query.csv	f9cb6629f315c2c10404346a8354d525caa0dfc3	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-08-28-annotator-agreement/evidence/queries-as-given-to-annotators.jsonl	565c4c61133959154aa580dfd0a1161ac81a8f31	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-08-28-annotator-agreement/evidence/queries-migrated-decision-12.jsonl	2bb38df1fa187e1e6643622564df58824a1245e2	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-08-28-annotator-agreement/report.md	def9f9b5fee020ab696cd84aada047e211c3c800	prose
@@ -1029,6 +1041,7 @@ work/regression/2026-08-28-benchmark-contested/VERDICT-C3.md	0f8277fd4680da346a3
 work/regression/2026-08-28-benchmark-contested/VERDICT-C4.md	f813c62bab532db7fa98489ace4c39316f318d89	prose
 work/regression/2026-08-28-benchmark-contested/VERDICT-C5.md	eaafcac3408dacb18f06e2ba8bd93e9af6e22944	prose
 work/regression/2026-08-28-benchmark-contested/VERDICT.md	c9c50d315b8e57623e01bb673653ea67827cf1d0	prose
+work/regression/2026-08-28-benchmark-contested/evidence/ARMS.toml	72773f3f5bea16db2f6d9b944d29a4e36556200e	pkg:fux-decoder-config@5.1.0/toml@1+limits@1
 work/regression/2026-08-28-benchmark-contested/evidence/eval/t10000/chains.jsonl	2f325858ae103d8042d4f10fb6083e11999e3c64	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-08-28-benchmark-contested/evidence/eval/t10000/contested.jsonl	f9bb366f2d7ca4bd77f08e5c728adfe1fd0a1b22	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-08-28-benchmark-contested/evidence/eval/t10000/decoys.jsonl	d470cd24a4af1f0717952a399e9875019a1f1aa4	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
@@ -1063,6 +1076,7 @@ work/regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B6.md	dca4fe6fdb3f26787c
 work/regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B7.md	a2d7039b2a5effe44af5cc33232de77f89d1ccb1	prose
 work/regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B9.md	05f62499cd7502081eb9b6e23061294c3b039391	prose
 work/regression/2026-08-28-benchmark-v1-vs-head/VERDICT.md	7a5e8dacf0d792d8ee10ca88261b7cfb513d18fa	prose
+work/regression/2026-08-28-benchmark-v1-vs-head/evidence/ARMS.toml	b6eeffe0f168dd89be1a4b20b78d3d06c1e611e1	pkg:fux-decoder-config@5.1.0/toml@1+limits@1
 work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t100/chains.jsonl	ca79751ffb247ecdcef6e7e55105cf3d7c969ac6	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t100/decoys.jsonl	fdc11a1bf043242a32d23c5acdc11427ad9cdb72	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-08-28-benchmark-v1-vs-head/evidence/eval/t100/pairs.jsonl	e12097425dc91bd0d33886369c393ed0e167ecea	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
@@ -1093,6 +1107,7 @@ work/regression/2026-08-28-benchmark-v1-vs-head/evidence/rows/latency-t10000.jso
 work/regression/2026-08-28-benchmark-v1-vs-head/report.md	c83e4bd8c7a3ada68e1c481069e30b046af49262	prose
 work/regression/2026-08-28-blind-unanswerable/ANALYSIS.md	1c58b7f85027dcab09277af02155c015a0fe3d06	prose
 work/regression/2026-08-28-blind-unanswerable/evidence/ground_truth.jsonl	27ad5a47a016daca5f18f4e625c59ff0d63ead16	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-08-28-blind-unanswerable/evidence/per-query.csv	fa2deae78feb18459b9ddba79bb88a95d455ef8a	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-08-28-blind-unanswerable/evidence/relevance_annotation.jsonl	c7ffbaf596479b3c744ce53cfb72b206ccc1ecce	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-08-28-blind-unanswerable/evidence/unanswerable.jsonl	684b802c8c595176ee6b101d3dbec3b84d1008bc	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-08-28-blind-unanswerable/report.md	ba9332e97fc931ae224d80e2f60f6d4b45110917	prose
@@ -1101,8 +1116,10 @@ work/regression/2026-08-28-doc-coverage/evidence/distributions.txt	f720d3b569b67
 work/regression/2026-08-28-doc-coverage/report.md	1367edceddb08848bc83ec899d645c6409a931a8	prose
 work/regression/2026-08-28-first-recall/ANALYSIS.md	c2924f7a38790ac4b64cebc279f0ae795d49a6bf	prose
 work/regression/2026-08-28-first-recall/evidence/goldens-as-measured.jsonl	2bb38df1fa187e1e6643622564df58824a1245e2	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-08-28-first-recall/evidence/per-query.csv	34947e5de36e2c4f5a24c575f12e29ba2806e125	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-08-28-first-recall/report.md	c07f0c60fb06a1c8d3eeadb5636ab0e98c87b6c8	prose
 work/regression/2026-08-28-placebo-and-seal/ANALYSIS.md	f87e39326f77e3279d84907923c76b1f9cd8b1e0	prose
+work/regression/2026-08-28-placebo-and-seal/evidence/per-query.csv	a2449d96ac2c0c4300d653353430e5e4a29a43f9	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/1c2e5ca2556c0ede07f8b1cffe51127dadcc3b60.md	90abc27991bb9067e7d4c1057faf1f6cffa64cdd	prose
 work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/6a727ca45d2a2699ba45a88cd5ee1f5831631197.md	08978bbf2a10cdf85032608dcc5bc4db2bbd041d	prose
 work/regression/2026-08-28-placebo-and-seal/evidence/placebo-arm/7e504f4cd3a8c42901d835aaf7b0af1321ad241c.md	2b45420f8419e74d9410fc2b18d61227d5708b47	prose
@@ -1134,28 +1151,34 @@ work/regression/2026-09-02-enrich-pii-leak/evidence/arm-head.txt	a5b597fbff12b15
 work/regression/2026-09-02-enrich-pii-leak/evidence/arm-pre-w102.txt	777583304810f55a5cff1e54c8a93d490077ca5d	prose
 work/regression/2026-09-02-enrich-pii-leak/evidence/e04b8e826b719558804907708f3a5c9d3ae8aae3.md	d6e5bd2334056a5b2cbc40c9de45287a63bd64c6	prose
 work/regression/2026-09-02-enrich-pii-leak/evidence/per-query-rows.jsonl	a9ad5a94c0084b0636a33fc33e431ee05b70eb8a	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-09-02-enrich-pii-leak/evidence/pii.toml	107ed938ad89f2020e4877bc0822294f0e9247a3	pkg:fux-decoder-config@5.1.0/toml@1+limits@1
 work/regression/2026-09-02-enrich-pii-leak/report.md	97811ef1381f98fdf7f58f5b5d032825332175a9	prose
 work/regression/2026-09-05-answer-top3/ANALYSIS.md	13e28051d2d0f23a7b93704723f63c5482bd2085	prose
 work/regression/2026-09-05-answer-top3/evidence/goldens-arm-A-main.txt	2472a508fed5b8bbd27d902479fa0d19affd6631	prose
 work/regression/2026-09-05-answer-top3/evidence/goldens-arm-B-w108.txt	2472a508fed5b8bbd27d902479fa0d19affd6631	prose
 work/regression/2026-09-05-answer-top3/evidence/goldens-as-measured.jsonl	2bb38df1fa187e1e6643622564df58824a1245e2	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-09-05-answer-top3/evidence/per-query.csv	037165dcb9625d9c26e3754800430b95a5474b68	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-05-answer-top3/evidence/per-query.jsonl	225d40443f80cc4e936ffd767268cbcaab80bd92	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-05-answer-top3/report.md	fcb253d70321b2e938d972daa46b70c29f2f2b07	prose
 work/regression/2026-09-05-declared-ties/ANALYSIS.md	a41eec7d82cf330d764169c2fec4341bedee1263	prose
 work/regression/2026-09-05-declared-ties/evidence/differential-playground.txt	09a7525fb15f0c1312628ff347a7593d6a333608	prose
+work/regression/2026-09-05-declared-ties/evidence/per-query-playground.csv	cee615be46a889602f2b4724b6fbf03b2568d929	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-05-declared-ties/evidence/per-query-playground.jsonl	bf70877cf2795977df6d75dc0eb67277eacffab3	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-09-05-declared-ties/evidence/per-query-t10000.csv	873be99e65366a0391de89079103ad36e944550d	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-05-declared-ties/evidence/per-query-t10000.jsonl	1a50747a2eee7c5dbf21d1a6dbdb9f3d12d31a92	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-05-declared-ties/report.md	c5386382ddf6c2d4fc6f5ff762206a0900dc7ace	prose
 work/regression/2026-09-05-doc2query/ANALYSIS.md	480391624042925d4af7022ef53ab52804004c87	prose
 work/regression/2026-09-05-doc2query/VERDICT.md	9cc51903664d5219df9f23eaf2bd755a00c6a42d	prose
 work/regression/2026-09-05-doc2query/evidence/blind-questions.jsonl	5e17728de109bfc0417a15eee1822d724e8feb31	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-05-doc2query/evidence/check-output.txt	692bdda3d030ac1a7e5e886cbcf98bd54d116f56	prose
+work/regression/2026-09-05-doc2query/evidence/per-query.csv	d12fe3d069b11f7b859ccffbace6276854dc3c52	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-05-doc2query/evidence/per-query.jsonl	f1ca09df141328c62f26cd48bac2c492bcc3744a	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-05-doc2query/evidence/summary.txt	2d8e13895de2a5b3cdad95e2b9b2f03b817a6d0d	prose
 work/regression/2026-09-05-doc2query/report.md	22d64a719a4e447d9a4ad6f62b275fefaf4966d2	prose
 work/regression/2026-09-05-expand/ANALYSIS.md	1df619ed2b6b5b34f737d1525b47d94e300a76fe	prose
 work/regression/2026-09-05-expand/evidence/blind-expansions.jsonl	b6f81e5c25641d84b9c462a69d25063764c8213a	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-05-expand/evidence/blind-queries-as-given.jsonl	565c4c61133959154aa580dfd0a1161ac81a8f31	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-09-05-expand/evidence/per-query.csv	89b8af0dff056c1658a31fd41ff5ec4ebbae6511	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-05-expand/evidence/per-query.jsonl	9a9661580efdf07c393005cac87b5b1567fcec22	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-05-expand/evidence/summary.txt	1df40019337ad66ce516bf8bf41a2f828422045c	prose
 work/regression/2026-09-05-expand/report.md	05429d85280d6564cfe02776d4fcf229bca44e85	prose
@@ -1167,8 +1190,12 @@ work/regression/2026-09-05-node-log-divergence/evidence/compare-t10000.txt	80077
 work/regression/2026-09-05-node-log-divergence/evidence/logprobe-glibc-output.txt	3f115b4a839ba09233da97547df3c1cf106b981b	prose
 work/regression/2026-09-05-node-log-divergence/evidence/logprobe-output.txt	f777722e55a7b0d241f3cc172e8df791c7b04262	prose
 work/regression/2026-09-05-node-log-divergence/evidence/logprobe-self-output.txt	03db684de3111ee5524a8ecfa6d92206809c5e63	prose
+work/regression/2026-09-05-node-log-divergence/evidence/per-query-playground.csv	dad5d141b1077d702de21be6ad84c96b18221b01	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-05-node-log-divergence/evidence/per-query-playground.jsonl	cfab151711aa270c47bad8cd4d3e6305417eeebd	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-09-05-node-log-divergence/evidence/per-query-self-glibc.csv	9f7508ca0ecdb4fb0c0c498525d30ac78cb4f493	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
+work/regression/2026-09-05-node-log-divergence/evidence/per-query-self.csv	3e1032eec488521112cc0604f10ec9b8c92345d5	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-05-node-log-divergence/evidence/per-query-self.jsonl	014243c18f795c201a6497437ec66f87b3fdab17	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-09-05-node-log-divergence/evidence/per-query-t10000.csv	eed2dd99d1c3a226a23c7d542083830e28413410	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-05-node-log-divergence/evidence/per-query-t10000.jsonl	d56eda7baec4585c0eb53136c44678849fd33070	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-05-node-log-divergence/evidence/queries-self.txt	06f37d97f05247f65590c7b79bdd83c7af7a93c6	prose
 work/regression/2026-09-05-node-log-divergence/report.md	513aedfa163ca77e9a713dab41ff53aab38bb3e9	prose
@@ -1179,8 +1206,11 @@ work/regression/2026-09-05-vector-gate/evidence/cross-arm-mean-vs-st.txt	0df85c3
 work/regression/2026-09-05-vector-gate/evidence/grade-node-cls.txt	d78941193938f2873bf3f116447916f2f16899a5	prose
 work/regression/2026-09-05-vector-gate/evidence/grade-node.txt	f63176cc8ceb7ed0e1067fd751f13ea279b80f32	prose
 work/regression/2026-09-05-vector-gate/evidence/grade-py.txt	7fd3497e339fb92a687970ad53c55b5e1ebec918	prose
+work/regression/2026-09-05-vector-gate/evidence/per-query-node-cls.csv	e4ab466ef9d6c2dc560f082d8587e1d94d99dce7	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-05-vector-gate/evidence/per-query-node-cls.jsonl	157064ea15ad3d4af57d7dd02e693c9244918966	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-09-05-vector-gate/evidence/per-query-node.csv	29f6fd961d7768b8956010b7cdf3cc916d96491e	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-05-vector-gate/evidence/per-query-node.jsonl	c1015da33d730c64d9b9415ad1a723cf69941fa6	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-09-05-vector-gate/evidence/per-query-py.csv	c2aa8e4be3945b63cfdfe2057c49d90a2c768a4e	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-05-vector-gate/evidence/per-query-py.jsonl	18d48170f206f26afd7af61cc60c721eb06c2213	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-05-vector-gate/evidence/prepared.json	0575a98494b427c75a7fa225914626f9776b9137	pkg:fux-decoder-json@5.1.0/json@1+limits@1
 work/regression/2026-09-05-vector-gate/report.md	b4c45e7f23847cd2ac028e60daedd6c7fe6cca2b	prose
@@ -1196,6 +1226,7 @@ work/regression/2026-09-06-csv-chunk-granularity/evidence/set-b.txt	e0307dda2016
 work/regression/2026-09-06-csv-chunk-granularity/report.md	5a2b7fb9b660417fdc078bdb6f92b7f816fb5855	prose
 work/regression/2026-09-11-blind-unanswerable-rerun/ANALYSIS.md	adb55063dc23e0b62f04bd741f93953a36581785	prose
 work/regression/2026-09-11-blind-unanswerable-rerun/PRE-REGISTRATION.md	108e8a2cf3a8f8159366e37960946f2d3638fc73	prose
+work/regression/2026-09-11-blind-unanswerable-rerun/evidence/per-query.csv	df6d341d342f003277b1ca9bb335ce416e4fc6be	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-11-blind-unanswerable-rerun/evidence/per-query.jsonl	052019a85d014cda54ac8bc8d9da3e73bfddeeb9	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-11-blind-unanswerable-rerun/report.md	488fdd2cccb31a2b4db8df00a2fa3a56da01f4f2	prose
 work/regression/2026-09-11-four-priors-headroom/ANALYSIS.md	85dfb38e46d8502d386fc250cbde86eaf301defa	prose
@@ -1203,6 +1234,7 @@ work/regression/2026-09-11-four-priors-headroom/evidence/per-query.jsonl	39b2e3a
 work/regression/2026-09-11-four-priors-headroom/report.md	851008c5300d223ada67461acadd40fbcdf83432	prose
 work/regression/2026-09-11-third-annotator/ANALYSIS.md	dd237ed2bd6075d4a19cede2a743f7f75dcaf1b4	prose
 work/regression/2026-09-11-third-annotator/evidence/annotator-3.jsonl	95794398ed1812e9d27fc6b80a049407c77a54fe	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-09-11-third-annotator/evidence/per-query.csv	33ff4e5ebe519da27110f38badbdefa2bb16b03d	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-11-third-annotator/report.md	977606b74c52eaff91583b5ee77f4aef1ddd7ee6	prose
 work/regression/2026-09-11-w116-chunking/ANALYSIS.md	121a481e32e557ef64d54cf80c0ba7a7bcde9e72	prose
 work/regression/2026-09-11-w116-chunking/evidence/fux-corpus-per-document.jsonl	8bcd792597eb014c473ce35f6fd9bb89c9163d40	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
@@ -1211,6 +1243,8 @@ work/regression/2026-09-11-w116-chunking/evidence/playground-before.jsonl	5e153b
 work/regression/2026-09-11-w116-chunking/report.md	3272969db2e7231d948aa5718d7dd63a90f939bd	prose
 work/regression/2026-09-12-benchmark-l9/ANALYSIS.md	fbf448a207c5ae51ccd4a5b77196f815615991c4	prose
 work/regression/2026-09-12-benchmark-l9/RANKDIFF.md	7f71b9f369f2725bcdfbad956f56e2211f91354f	prose
+work/regression/2026-09-12-benchmark-l9/evidence/ARMS.toml	543f727b224e3976d05b8f6c3f857a0916eebf77	pkg:fux-decoder-config@5.1.0/toml@1+limits@1
+work/regression/2026-09-12-benchmark-l9/evidence/latency.csv	c87d1b96407c8d13f3f198aa1b5b6684628cf349	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-12-benchmark-l9/evidence/nullcontrol-docs-00100-scan.json	5f0b18ed1fe042b0af505ff74cd779639e1c552f	pkg:fux-decoder-json@5.1.0/json@1+limits@1
 work/regression/2026-09-12-benchmark-l9/evidence/nullcontrol-docs-01000-scan.json	74858e2baba054031a2d08f73feb61bd330cccb3	pkg:fux-decoder-json@5.1.0/json@1+limits@1
 work/regression/2026-09-12-benchmark-l9/evidence/ranked-lists.jsonl	3986ab05f2d748a3cfe1db56f9f226b1342908b5	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
@@ -1219,6 +1253,7 @@ work/regression/2026-09-12-golden-ladder/ANALYSIS.md	69d0e8220782399cc621dea5d13
 work/regression/2026-09-12-golden-ladder/ANSWERS-FOR-REVIEW.md	61c5ed20ffced1bacaadc5afafd9e0d3b24958af	prose
 work/regression/2026-09-12-golden-ladder/PRE-REGISTRATION.md	f1550f8cf7b51cea3eed54053afe472e782fce37	prose
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a01-marrowbeck-excursion-sop.md	7fbc7792cfb7aa40e9a366c07aed5b82b72c9fdf	prose
+work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a02-vantorix-sensor-thresholds.yaml	62839571d0f0cea3e535a3fb68d2b9a3ed1e216d	pkg:fux-decoder-config@5.1.0/yaml@1+limits@1
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a03-petrichor-postmortem-insulin.md	a909b40a845a1f420258b80bd6109a5b2cb74e0a	prose
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a04-okapi-night-handover.txt	87406f76426b0fe35c1f9d67f143480234a578a5	prose
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a05-norvell-telematics-decision-2026.md	a7723364bcacca8eba075281c8da7b7bd6594466	prose
@@ -1229,6 +1264,7 @@ work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a10-vantorix-it-access.md	5ab77667ee3c0717cf67ed1bc87deca345fca6b5	prose
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a11-petrichor-hr-leave.md	20d31b37cd0083bace5f3a900580f004ee4c6eea	prose
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a12-okapi-workshop.md	91f66270cc00d67ce6255c8adbf34572a1b540c3	prose
+work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a13-halberd-insurance-claim.eml	4e08386c4b87d62f0a0036d86d1901a777b12386	pkg:fux-decoder-mail@5.1.0/mail@1+table@1+markdown@1+limits@1
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a14-sundari-onboarding.html	af66a4928a6d433ae378edcb26788043264678da	pkg:fux-decoder-html@5.1.0/html@2+table@1+limits@1
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a15-release-notes-tilecutter.md	246487d591d261311367268822f592c85a4aa3e6	prose
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a16-ward-notice.html	41099449b6c591691e1cb8574f47aa17f0adfdc9	pkg:fux-decoder-html@5.1.0/html@2+table@1+limits@1
@@ -1236,6 +1272,8 @@ work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a18-bicycle-bench-notes.txt	82adc6fff67f7808e4be83117de6a9fc901e7e86	prose
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a19-norvell-telematics-decision-2022.md	396220731b194c29b400c6fc254112977a8e4c3f	prose
 work/regression/2026-09-12-golden-ladder/evidence/generator/golden-ext-authored/a20-braidwood-rate-card-2023.md	80d904a6f8d37ea9386f5486a830a2c18ebf8d87	prose
+work/regression/2026-09-12-golden-ladder/evidence/per-query.csv	e95fe2bc377c44cf72f0b2b59f89b4a238456741	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
+work/regression/2026-09-12-golden-ladder/evidence/per-question.tsv	bb1d9e624768bb254c2b17f5fbc71f7d7cf5c01a	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-12-golden-ladder/evidence/rung-00100/answers.jsonl	6730add267064c3113a06064201fa10f95c760e7	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-12-golden-ladder/evidence/rung-00100/predictions.jsonl	6e9241353d62101add1ebafa0afcbcb643315392	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-12-golden-ladder/evidence/rung-00200/answers.jsonl	c7c163b475f9dca00b9cc34db94f7a6000ec68cc	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
@@ -1321,6 +1359,8 @@ work/regression/2026-09-12-reaim-and-instruments/evidence/w144-graded.txt	144977
 work/regression/2026-09-12-reaim-and-instruments/report.md	22f3de0ab11dd59a9f69622dd3e8b913427064e8	prose
 work/regression/2026-09-12-vector-gate-crossarch/ANALYSIS.md	56147ee96213b8bddc84c50568e60814bcc62c53	prose
 work/regression/2026-09-12-vector-gate-crossarch/evidence/corpus-manifest.json	079cb6adc2f82023bfbd0aca580005ee96272e7c	pkg:fux-decoder-json@5.1.0/json@1+limits@1
+work/regression/2026-09-12-vector-gate-crossarch/evidence/per-chunk-rows.csv	6bd0b12bee9446ca904122868f0e9a3e247be49e	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
+work/regression/2026-09-12-vector-gate-crossarch/evidence/per-query-rows.csv	7fa22683b759025ce0e6fe3b9589739482d5329f	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-12-vector-gate-crossarch/evidence/per-query-rows.jsonl	bf892fd871942cf3586aa3eb6cdfb2c24a63f017	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-12-vector-gate-crossarch/report.md	8418f23f41a1b12eb754595ceb3efcb998599f11	prose
 work/regression/2026-09-12-workspace-dotpath-probe/ANALYSIS.md	c4c75d520167d9ecf042880ead087b8209e9448a	prose
@@ -1332,14 +1372,19 @@ work/regression/2026-09-12-yarn-berry-probe/evidence/results.txt	3f799ed4efb93d5
 work/regression/2026-09-12-yarn-berry-probe/report.md	7c22577b1dc31ba8f58f7ee33cabeff2bbca94d2	prose
 work/regression/2026-09-13-benchmark-captures/ANALYSIS.md	74166686ddac6aa3a099ce7899609c874cb87ecd	prose
 work/regression/2026-09-13-benchmark-captures/RANKDIFF.md	69b267afd2d50778a127b290f29e7b9451cc9c44	prose
+work/regression/2026-09-13-benchmark-captures/evidence/ARMS.toml	0d843d558538cd94973cfab73b67606800b825c5	pkg:fux-decoder-config@5.1.0/toml@1+limits@1
 work/regression/2026-09-13-benchmark-captures/evidence/answer-layer.jsonl	f6900292129395ccfdb5a03f8aa9a30ed2872156	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-13-benchmark-captures/evidence/hits.jsonl	8f24314477676749b9ebae83c956c97f1139c3c4	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-09-13-benchmark-captures/evidence/index-size.csv	a14c9fbb1a57a7f6eff58dc0ed6aa5d9fa7f0a8f	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
+work/regression/2026-09-13-benchmark-captures/evidence/latency.csv	93046719a4feb0585e8c84ab058521e0752abbbc	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-13-benchmark-captures/evidence/nullcontrol-docs-00100-scan.json	5f0b18ed1fe042b0af505ff74cd779639e1c552f	pkg:fux-decoder-json@5.1.0/json@1+limits@1
 work/regression/2026-09-13-benchmark-captures/evidence/rankdiff.jsonl	b964fe84b61ced893737fb360b0f751750781351	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-13-benchmark-captures/evidence/ranked-lists.jsonl	6800c848c195b5aa7627feab201ddf3eba33545b	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-13-benchmark-captures/report.md	06459631423e90b38e7a4f50b63a0c7a68fe4448	prose
 work/regression/2026-09-13-rerank-cost/ANALYSIS.md	ab97ecc00ef8014e19d154268f1119ff6032483e	prose
 work/regression/2026-09-13-rerank-cost/PRE-REGISTRATION.md	bed7704263295956ae68b75e5e99cb52015ed9a2	prose
+work/regression/2026-09-13-rerank-cost/evidence/latency-rung-00100.csv	c753b384beb7878516ea527b9d1964a186fd5603	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
+work/regression/2026-09-13-rerank-cost/evidence/latency-rung-01000.csv	caeff7c21fa59a128a5d741080bfed5005c0349d	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-13-rerank-cost/report.md	f07b57459ed0616c2ea81722c092c1780ba0a936	prose
 work/regression/2026-09-13-table-is-the-answer/ANALYSIS.md	959764102d8693cd5a66592b6c034fe9c65b3259	prose
 work/regression/2026-09-13-table-is-the-answer/PRE-REGISTRATION.md	1b97239ef01540546672cb90b4d6599dea341012	prose
@@ -1422,8 +1467,13 @@ work/regression/2026-09-15-ladder-reingest/evidence/ladder-check.txt	2f882293fce
 work/regression/2026-09-15-ladder-reingest/evidence/rungs.json	09f0dff598b2c43eaa081b2ed47b42781eb169c4	pkg:fux-decoder-json@5.1.0/json@1+limits@1
 work/regression/2026-09-15-ladder-reingest/report.md	1285ddb95e35b63ebf6fd2d9cde1a7466d17aa4a	prose
 work/regression/2026-09-15-ladder-seed-refresh/ANALYSIS.md	46a24c023b68b482acafe705b43758cc415501e9	prose
+work/regression/2026-09-15-ladder-seed-refresh/evidence/rebuild-diff.tsv	d2a043938c615fc8187eb2b4dad03380b9e2e71b	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
+work/regression/2026-09-15-ladder-seed-refresh/evidence/rung-readable.tsv	0a1932662bbb938a4dde6dd112c69a582511805e	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-15-ladder-seed-refresh/report.md	5944d8a076d08e05cbddd38d56367868ece30a3c	prose
 work/regression/2026-09-15-node-column/ANALYSIS.md	ab4e5c87527e8c7411a7f4309b67ae1556eeab32	prose
+work/regression/2026-09-15-node-column/evidence/latency-docs-00100-scan.csv	0cfe96bf6191612038efd9f76b14fdcc0b6b976b	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
+work/regression/2026-09-15-node-column/evidence/latency-docs-01000-scan.csv	6f17a5d6b197946e090994eea200aff8bec1dd78	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
+work/regression/2026-09-15-node-column/evidence/latency-docs-10000-scan.csv	24bec469a9d2a442da2673722f0265c0717df241	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-15-node-column/evidence/tier-10000.txt	e073cfcc2ff923db871d061f22d26f4710013aa0	prose
 work/regression/2026-09-15-node-column/evidence/tiers-100-and-1000.txt	b2c9ca8aa500697c395ba17d344dc9d951a98702	prose
 work/regression/2026-09-15-node-column/report.md	f0536bcea571f8de4d22aece3e6633eaa9778db7	prose
@@ -1486,8 +1536,11 @@ work/regression/2026-09-16-identifier-survival/evidence/survival.json	0cbb168545
 work/regression/2026-09-16-identifier-survival/report.md	12a83290681691b295464706dccba1dc7e622208	prose
 work/regression/2026-09-16-node-column/ANALYSIS.md	0229f2ce430fb35826b0bd7c4f949a5f568c2782	prose
 work/regression/2026-09-16-node-column/RANKDIFF.md	0b0bbff72b033e1c93b89269886ab616bb0a9eb8	prose
+work/regression/2026-09-16-node-column/evidence/ARMS.toml	423afeb587c44ffda0d311ba5b06340413061296	pkg:fux-decoder-config@5.1.0/toml@1+limits@1
 work/regression/2026-09-16-node-column/evidence/answer-layer.jsonl	3c14e021de517d402450c6e426d8e94b68c66d04	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-16-node-column/evidence/hits.jsonl	7d5dac56193864058c8671581577600e7a55e5d1	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-09-16-node-column/evidence/index-size.csv	b5f288e15b30c9b3e037db21b48da09bbc1dd63d	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
+work/regression/2026-09-16-node-column/evidence/latency.csv	0213d1d5ef70348d2c2f4beadd6ed6adca852bb2	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-16-node-column/evidence/parity.jsonl	6ac967631b2bff50e44594236753587a17f6b02f	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-16-node-column/evidence/rankdiff.jsonl	51eba743dbd4a5556ed94c36d42b00d44a70e09d	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-16-node-column/evidence/ranked-lists.jsonl	37735df791ba8089e659c265d8dbfc627aa5a03e	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
@@ -1959,6 +2012,7 @@ work/regression/2026-09-28-authority-prior/evidence/au-0.5/rung-01000/handoff-se
 work/regression/2026-09-28-authority-prior/evidence/au-0.5/rung-01000/predictions-set-4-claude.jsonl	d12e9629a257d1d9a7a36864f74e06cb1db74fe7	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-28-authority-prior/evidence/decision.json	212af464367182e1c288b1d1e339354857a038d3	pkg:fux-decoder-json@5.1.0/json@1+limits@1
 work/regression/2026-09-28-authority-prior/evidence/describe.json	8653e66fa8e22e927008fa3c2b878bb7766f6895	pkg:fux-decoder-json@5.1.0/json@1+limits@1
+work/regression/2026-09-28-authority-prior/evidence/multi-commit.tsv	ac35e7f68fe9adcdfe0cf2862d3d193665dd2050	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-28-authority-prior/evidence/per-query.jsonl	692ee78af8b4812f7eb95a2361915a30210dad6c	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-28-authority-prior/evidence/tag_authority.txt	201a1cef9804009d3f5cadd19db181d5a686cb9a	prose
 work/regression/2026-09-28-authority-prior/evidence/tags-set-4-claude.jsonl	c67e34524a9556eb33fd3704a087bfc72d0f85f5	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
@@ -1973,6 +2027,7 @@ work/regression/2026-09-28-families-lens-ladder/evidence/families-rung-01000-aft
 work/regression/2026-09-28-families-lens-ladder/evidence/families-rung-01000.json	f3c43f8d1f9a0ac0cd48f7a389332175e9952044	pkg:fux-decoder-json@5.1.0/json@1+limits@1
 work/regression/2026-09-28-families-lens-ladder/evidence/families-rung-seed-after.json	b4bd3454a781c15146c90cdb4665a02cfcf1aa7c	pkg:fux-decoder-json@5.1.0/json@1+limits@1
 work/regression/2026-09-28-families-lens-ladder/evidence/families-rung-seed.json	26ea7b05cdff715a758e5f72124798e9bf7eb7c2	pkg:fux-decoder-json@5.1.0/json@1+limits@1
+work/regression/2026-09-28-families-lens-ladder/evidence/inspect.toml	c4a2ca2a455fe77bca6f72b01d8a14ce7191a0ac	pkg:fux-decoder-config@5.1.0/toml@1+limits@1
 work/regression/2026-09-28-families-lens-ladder/evidence/prose-rung-01000-section-4b.md	f920223e0213ac8be694f173a79259e1efa87f42	prose
 work/regression/2026-09-28-families-lens-ladder/report.md	dc3165a292f433f2cbde9b05926f61e892e7324e	prose
 work/regression/2026-09-28-identifier-families/ANALYSIS.md	bbc30cacb72dea00bdebf2527d03a917fbcf51f3	prose
@@ -1995,6 +2050,9 @@ work/regression/2026-09-28-identifier-families/evidence/g2-rung-00100.txt	11a689
 work/regression/2026-09-28-identifier-families/evidence/g2-rung-01000.txt	7337c233b317d3b12a7d0493a4e05e07f13cd75c	prose
 work/regression/2026-09-28-identifier-families/evidence/g2-rung-10000.txt	5c8e711c10458fa4ce9e02801d43749846c761a6	prose
 work/regression/2026-09-28-identifier-families/evidence/g3-rung-01000.txt	472259e22c138ee4a6e0aecc44991ecec153a86f	prose
+work/regression/2026-09-28-identifier-families/evidence/identifiers-rung-00100.toml	9768e6a2d8ff6bf2d86e23fe8b890968af268055	pkg:fux-decoder-config@5.1.0/toml@1+limits@1
+work/regression/2026-09-28-identifier-families/evidence/identifiers-rung-01000.toml	67c02d3728797531883e536974d50b0df98b1d05	pkg:fux-decoder-config@5.1.0/toml@1+limits@1
+work/regression/2026-09-28-identifier-families/evidence/identifiers-rung-10000.toml	1db169c003904610e4a95b2225ee6c2c231ee60e	pkg:fux-decoder-config@5.1.0/toml@1+limits@1
 work/regression/2026-09-28-identifier-families/evidence/output.txt	3f7c5ff2313767ebda104bf8e5b1ba827ab65587	prose
 work/regression/2026-09-28-identifier-families/evidence/per-query-rows.jsonl	0392b9a7aeddb680cb589f67a0b3a05a8b763c61	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-28-identifier-families/evidence/variants-rung-00100.jsonl	1efa066cc87bd610aba9d60a7bc00be2c90836e7	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
@@ -2059,6 +2117,7 @@ work/regression/2026-09-29-w239-extract-speed/report.md	44f11845ba2120992b8e6de9
 work/regression/2026-09-30-ci-arm-batching/ANALYSIS.md	a06d683976940c7ad6fa931108bf2fa4cd24c577	prose
 work/regression/2026-09-30-ci-arm-batching/evidence/bench-2026-10-03-after-w242.jsonl	7f14100ac158529e3c5ff051e6dbfb9e087a087b	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-09-30-ci-arm-batching/evidence/bench.jsonl	e1f3fd27c8adcf52d0b69265dbdaa452c0a88378	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-09-30-ci-arm-batching/evidence/ci-jobs-36666260696.tsv	3a55cd9fafef61b67af34e52ae9b9504a87ada69	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-09-30-ci-arm-batching/evidence/unit-spawn-profile.txt	ead371d10151313d821158a53d406ae6d0abd4d7	prose
 work/regression/2026-09-30-ci-arm-batching/report.md	5fdc27b97e5e5aa73c0c4156774cf56eeb296b6e	prose
 work/regression/2026-09-30-rm3-grounded/ANALYSIS.md	9b68260e020b5d3953c754936ff157182f3b173e	prose
@@ -2408,6 +2467,7 @@ work/regression/2026-10-24-w294-sources-yaml-bytes/evidence/output.txt	186473a1e
 work/regression/2026-10-24-w294-sources-yaml-bytes/report.md	a6b85ad87b6250e821c83519c50a7db921039acb	prose
 work/regression/2026-10-25-w298-step1-codelaw-rules/ANALYSIS.md	17e6f5f0889dfe92f72e6e3d7d754c87593d2524	prose
 work/regression/2026-10-25-w298-step1-codelaw-rules/VERDICT.md	fef04671dfd49c587c906155341ae7a05d5484b5	prose
+work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/intents.tsv	a6b7ebecc5e3a5feaeb03b7e06ac6fb383271d8d	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/pre-registration/work/open/W-298-packages-ship-their-index.md	86879d23dd172cb033db14cbd849bbe92b208a60	prose
 work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/raw/ask-i01.json	a36fc7d46231bdbf0b61abb90b4a41bc8949d710	pkg:fux-decoder-json@5.1.0/json@1+limits@1
 work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/raw/ask-i02.json	d7a11a46d304ff1f1a8c6ee5721cd1ab19d8779e	pkg:fux-decoder-json@5.1.0/json@1+limits@1
@@ -2450,6 +2510,8 @@ work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/raw/find-i18.json	a
 work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/raw/find-i19.json	030615a012092d656867e6f8c5c825553ef9e24c	pkg:fux-decoder-json@5.1.0/json@1+limits@1
 work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/raw/find-i20.json	31273ed33a9b3c575f129622e0276bab4e84e558	pkg:fux-decoder-json@5.1.0/json@1+limits@1
 work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/rows.jsonl	221d50ba278a25975f3dbaa937bc60e3b6ed5d8d	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
+work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/rows.tsv	2aceb4797b207d659b6c6aa3f4eb85a78f18e383	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
+work/regression/2026-10-25-w298-step1-codelaw-rules/evidence/sources.yaml	746352d2c189e63b3415d2edb7de741cb4c80007	pkg:fux-decoder-config@5.1.0/yaml@1+limits@1
 work/regression/2026-10-25-w298-step1-codelaw-rules/report.md	293038b0487a4e7b99faa64619077d851286abe0	prose
 work/regression/2026-10-25-w300-merged-query/ANALYSIS.md	f2c93b1c5fd05994875e8f2560cc8d935c7b1b26	prose
 work/regression/2026-10-25-w300-merged-query/PRE-REGISTRATION.md	a5af72efa133cd318885743f96fae0926b691791	prose
@@ -2461,6 +2523,7 @@ work/regression/2026-10-25-w300-merged-query/evidence/corpus/docs/incidents.md	b
 work/regression/2026-10-25-w300-merged-query/evidence/corpus/docs/oncall.md	b2c098c617c2ec5b770b262f1ba1b4bfc8acf685	prose
 work/regression/2026-10-25-w300-merged-query/evidence/corpus/docs/secrets.md	a0c7d1249c441c66eb30bb65b23442621aad8e79	prose
 work/regression/2026-10-25-w300-merged-query/evidence/gates.json	95dcf48c076c862b699d2bcfb436d7d2b2a12011	pkg:fux-decoder-json@5.1.0/json@1+limits@1
+work/regression/2026-10-25-w300-merged-query/evidence/questions.tsv	7c1892f0c1c115aa7934e0453f65f7703e043393	pkg:fux-decoder-sheet@5.1.0/csv@2+table@1+limits@1
 work/regression/2026-10-25-w300-merged-query/evidence/rows.jsonl	3cd6b4d7637246173e5ff880d85b24caa33a0dbc	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1
 work/regression/2026-10-25-w300-merged-query/evidence/run1-void/gates.json	54d8875a66c0780d4943f774d324235f0cec3dd2	pkg:fux-decoder-json@5.1.0/json@1+limits@1
 work/regression/2026-10-25-w300-merged-query/evidence/run1-void/rows.jsonl	3cd6b4d7637246173e5ff880d85b24caa33a0dbc	pkg:fux-decoder-json@5.1.0/jsonl@1+limits@1

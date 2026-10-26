@@ -10,10 +10,10 @@ amended: 2026-10-20
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
-owns: [src/fux/output_config.py@c23c3f5f9278, src/fux/templates/output.toml.txt@b7dad8f4f7e4, .fux/config/output.toml@4a3a8465d2e4, node/src/config/output.mjs@c1268149675c]
+owns: [src/fux/output_config.py@c23c3f5f9278, src/fux/templates/output.toml.txt@b7dad8f4f7e4, .fux/config/output.toml@b7dad8f4f7e4, node/src/config/output.mjs@c1268149675c]
 laws: [1, 3, 4, 7]
 timestamp: 2026-08-27T00:00:00Z
-content_sha: 510b4a630c4740685f6a8afed0f8bc6b7076165737722b2de71e70113616265e
+content_sha: 9270279bb7bd773727bf195c68619908c613a1399c61c0bad05e6c4873ff6906
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

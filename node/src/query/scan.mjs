@@ -142,7 +142,7 @@ export function scanSegment(root, queryHashes, { scoring, shards = null }) {
     }
   }
 
-  if (sectionOn) attachSections(root, candidates, queryHashes);
+  if (sectionOn) attachSections(root, candidates, queryHashes, set);
 
   if (anchorOn) {
     // 🔴 The RETRIEVAL half. A document whose only match is a linker's wording

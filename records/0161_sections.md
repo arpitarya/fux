@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-30
 amended: 2026-10-13
 feature: section records — the committed section plane, the index section rule, and the B2 best-section term
-owns: [node/src/query/sections.mjs@4c883e2a8a83, src/fux/query/sections.py@d88c194f0e6c]
+owns: [node/src/query/sections.mjs@db78e4d3c51b, src/fux/query/sections.py@d88c194f0e6c]
 laws: [L3, L4, L5, L12]
 timestamp: 2026-09-30T00:00:00Z
-content_sha: 72a84f7034e9c6ed234221dfebfaa36b28a38b91fe63545b5cad4a0ca9b7378c
+content_sha: 1cf8b327debc6b5cef79faeb13153d450b9132c34d0c21e639527f2030f847cf
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

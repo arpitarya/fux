@@ -72,6 +72,22 @@ parallel_warn_at     = 16
 # into .fux/fetchers/. Each fetcher's keys and defaults are in its docs.
 [sources.url.config]
 
+
+# Only .fux/fetchers/cdp.py receives these.
+[sources.url.config.cdp]
+cdp_host             = "127.0.0.1"
+cdp_port             = 9299
+chrome_binaries      = ["google-chrome", "chromium", "chromium-browser", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/Applications/Chromium.app/Contents/MacOS/Chromium"]
+fetcher_max_parallel = 1
+launch_chrome        = false
+load_timeout_s       = 30.0
+
+# Only .fux/fetchers/http.py receives these.
+[sources.url.config.http]
+fetcher_max_parallel = 8
+timeout_s            = 30.0
+user_agent           = "fux/0.x (+https://github.com/arpitarya/fux)"
+
 [index]
 shards        = 256
 git_timeout_s = 120

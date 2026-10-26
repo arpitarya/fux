@@ -8,11 +8,11 @@ status: accepted
 amended: 2026-10-25
 date: 2026-09-12
 feature: "`node/` — the zero-dependency Node.js read plane, published as `fux-engine` and installed by `npm install fux-engine` alone (W-292), and held byte-equal to Python by the third arm of the differential law"
-owns: [node@d0eff4f463a7, src/fux/store/nodebundle.py@4a729b4224cd]
+owns: [node@c21c1085c591, src/fux/store/nodebundle.py@4a729b4224cd]
 laws: [L2, L4, L5, L6]
 ratifies: "Arpit, 2026-09-12 — R1-R6 in W-107, which closed the same day (archive/open/W-107-node-read-plane.md); and decisions 13-16, ruled the same day in the exchange recorded in work/open/W-149-the-consumer-gets-no-source.md §1. Arpit, 2026-10-21 (W-292) — the Node reader installs from npm only, superseding 13, 15 and 16 and narrowing 14"
 timestamp: 2026-09-12T00:00:00Z
-content_sha: 2355f99561f0ca03afd04bd09864f12169bbd27308d1b08cf35526aba9995717
+content_sha: 2697e26d5848cca15df89c3d643defb6a4acddde9480a118ac2e064fe0808de7
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
@@ -1028,8 +1028,10 @@ Ratified 2026-09-30 (Arpit); Tier 0 BUILT 2026-09-30, Tiers 1 and 2 BUILT 2026-1
   plus one more per `recordFor`: 769 opens for 257 shards on this repo.
   - **The mechanism is `store/reader.mjs::Shards`**, a per-call object: a verb,
     a library method or one MCP tool call makes one and hands it down to the
-    scan, the mined table, the pin, the graph tier, the band guard and every
-    display `recordFor`. `-q` arms share their
+    scan, the mined table, the pin, the graph tier, the band guard, the
+    section plane's committed fallback (`query/sections.mjs`, added
+    2026-10-26 when this repo turned the plane on and `-q` read each section
+    shard twice) and every display `recordFor`. `-q` arms share their
     caller's. A function called without one makes its own, so no public
     signature changed meaning.
   - 🔴 **It is never module-level and never kept on a long-lived object
