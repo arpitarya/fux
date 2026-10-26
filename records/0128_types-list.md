@@ -8,10 +8,10 @@ status: accepted
 date: 2026-08-20
 amended: 2026-10-20
 feature: the file-type allowlist and `.fux/config/formats.toml`
-owns: [src/fux/acquire/typesfile.py@1a0421594be1, .fux/config/formats.toml@2dfc07ff74b8]
+owns: [src/fux/acquire/typesfile.py@1a0421594be1, .fux/config/formats.toml@9c112c6568dd]
 laws: [L2, L4]
 timestamp: 2026-08-20T00:00:00Z
-content_sha: a949f46aea95f9d2d2ac990e5f8723f94a0cf2213be9855e099987655f56dae8
+content_sha: eef29f5b80190856bce9eb65c7d6254389b455af27857fd2a02c25ee45e0aada
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->

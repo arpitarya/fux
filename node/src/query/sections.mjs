@@ -8,7 +8,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
-import { iterSectionPaths, rawRecordLines, sectionOrdinal } from "../store/reader.mjs";
+import { iterSectionPaths, sectionOrdinal, shardsFor } from "../store/reader.mjs";
 import { sectionParent, shardFor } from "../store/format.mjs";
 import * as fmt from "../derive/format.mjs";
 import { isFresh } from "../derive/fresh.mjs";
@@ -20,9 +20,10 @@ const ID_RE = /"id":"((?:[^"\\]|\\.)*)"/g;
 const FLEN_AT_RE = /"flen":\[([0-9,\s]*)\]/g;
 
 /** Attach `secs` to every sectioned candidate: the derived plane when fresh,
- *  the committed plane otherwise. */
-export function attach(root, candidates, queryHashes) {
-  if (!fromRuntime(root, candidates, queryHashes)) fromCommitted(root, candidates, queryHashes);
+ *  the committed plane otherwise. `shards` is the call's set (W-242 Tier 0), so
+ *  a `-q` fusion's second phrasing reads no section shard a second time. */
+export function attach(root, candidates, queryHashes, shards = null) {
+  if (!fromRuntime(root, candidates, queryHashes)) fromCommitted(root, candidates, queryHashes, shardsFor(root, shards));
 }
 
 /** `sections.py::_from_runtime` (W-278 DoD 2). When the runtime is fresh, each
@@ -75,7 +76,7 @@ function fromRuntime(root, candidates, queryHashes) {
  *  entry is found in the shard's text directly, so a line with no query term
  *  is never visited, and one that does yields its id, `flen` and the query's
  *  own `terms` entries by position — never a whole-line parse. */
-function fromCommitted(root, candidates, queryHashes) {
+function fromCommitted(root, candidates, queryHashes, set) {
   const byId = new Map();
   for (const record of candidates) if (record.nsec) byId.set(record.id, record);
   if (byId.size === 0) return;
@@ -84,7 +85,7 @@ function fromCommitted(root, candidates, queryHashes) {
   const bags = new Map();
   for (const path of iterSectionPaths(root)) {
     if (!shards.has(basename(path, ".jsonl"))) continue;
-    const [, lines] = rawRecordLines(path);
+    const lines = set.lines(path);
     const data = lines.map((line) => line.toString("utf8")).join("\n");
     const found = new Map();
     for (const [h, key] of keys) {

@@ -8,10 +8,10 @@ status: accepted
 date: 2026-09-01
 amended: 2026-10-20
 feature: refusal detection before decode
-owns: [src/fux/acquire/refusals.py@39e2a244262f, src/fux/templates/refusals.toml.txt@66d038617b23, tools/refusal-probe@5979308bfe8a, .fux/config/refusals.toml@5fdc90fab388]
+owns: [src/fux/acquire/refusals.py@39e2a244262f, src/fux/templates/refusals.toml.txt@66d038617b23, tools/refusal-probe@5979308bfe8a, .fux/config/refusals.toml@66d038617b23]
 laws: [L2, L4]
 timestamp: 2026-09-01T00:00:00Z
-content_sha: 37a0e5ff1e878662d1a1e6478a0d41ca9fcf2315a83438c60f716a6e681328c4
+content_sha: 26fcdc3c1eebbc71816f8253a0f990cf882396c52a349b6ed835f930a2f82089
 ---
 
 <!-- COMPONENTS-START — GENERATED from records/README.md's OWNERSHIP and DESCRIBES tables by scripts/gen-components.py. Do not edit by hand: change the table, then run `python scripts/gen-components.py --write`. -->
