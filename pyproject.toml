@@ -86,8 +86,11 @@ layer = "engine"
 
 [tool.hatch.build.targets.sdist]
 # The sdist is the buildable source + its tests/docs — never the archived old
-# build, lockfile, or CI plumbing.
-exclude = ["/archive", "/uv.lock", "/.github", "/scripts", "/.DS_Store", "**/.DS_Store"]
+# build, lockfile, or CI plumbing. Nor the measured runs (work/regression), the
+# golden sets or a local runtime: 5.1.0's sdist crossed PyPI's 100 MB project
+# limit with them in (2026-10-26).
+exclude = ["/archive", "/uv.lock", "/.github", "/scripts", "/.DS_Store", "**/.DS_Store",
+           "/work/regression", "/work/golden", "/.fux/runtime"]
 
 [tool.ruff]
 line-length = 100
